@@ -126,28 +126,48 @@ EVP_PKEY* load_dsa_key(char *key)
 
 - (BOOL)validatePath:(NSString *)path withEncodedDSASignature:(NSString *)encodedSignature
 {
-	EVP_PKEY* pkey;
-	if(!encodedSignature || !SUInfoValueForKey(SUPublicDSAKeyKey) || !(pkey = load_dsa_key((char *)[SUInfoValueForKey(SUPublicDSAKeyKey) UTF8String])))
-		return NO;
+	BOOL result = NO;
+	if(!encodedSignature) { return false; }
+		
+	NSString *pkeyString = SUInfoValueForKey(SUPublicDSAKeyKey); // Fetch the app's public DSA key.
+	if (!pkeyString) { return false; }
 	
+	// Remove whitespace around each line of the key.
+	NSMutableArray *pkeyTrimmedLines = [NSMutableArray array];
+	NSEnumerator *pkeyLinesEnumerator = [[pkeyString componentsSeparatedByString:@"\n"] objectEnumerator];
+	NSString *pkeyLine;
+	while ((pkeyLine = [pkeyLinesEnumerator nextObject]) != nil)
+	{
+		[pkeyTrimmedLines addObject:[pkeyLine stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]];
+	}
+	pkeyString = [pkeyTrimmedLines componentsJoinedByString:@"\n"]; // Put them back together.
+
+	EVP_PKEY* pkey = NULL;
+	pkey = load_dsa_key((char *)[pkeyString UTF8String]);
+	if (!pkey) { return false; }
+
 	// Now, the signature is in base64; we have to decode it into a binary stream.
 	unsigned char *signature = (unsigned char *)[encodedSignature UTF8String];
-	long length = b64decode(signature);
+	long length = b64decode(signature); // Decode the signature in-place and get the new length of the signature string.
 	
+	// We've got the signature, now get the file data.
 	NSData *pathData = [NSData dataWithContentsOfFile:path];
-	if (!pathData) { return NO; }
+	if (!pathData) { return false; }
+	
+	// Hash the file with SHA-1.
 	unsigned char md[SHA_DIGEST_LENGTH];
 	SHA1([pathData bytes], [pathData length], md);
 	
-	BOOL res = false;
+	// Actually verify the signature on the file.
 	EVP_MD_CTX ctx;
-	if(EVP_VerifyInit(&ctx, EVP_dss1()) == 1)
+	if(EVP_VerifyInit(&ctx, EVP_dss1()) == 1) // We're using DSA keys.
 	{
 		EVP_VerifyUpdate(&ctx, md, SHA_DIGEST_LENGTH);
-		res = EVP_VerifyFinal(&ctx, signature, length, pkey) == 1;
+		result = (EVP_VerifyFinal(&ctx, signature, length, pkey) == 1);
 	}
+	
 	EVP_PKEY_free(pkey);
-	return res;
+	return result;
 }
 
 @end
