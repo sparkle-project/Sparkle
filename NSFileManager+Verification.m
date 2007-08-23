@@ -127,10 +127,10 @@ EVP_PKEY* load_dsa_key(char *key)
 - (BOOL)validatePath:(NSString *)path withEncodedDSASignature:(NSString *)encodedSignature
 {
 	BOOL result = NO;
-	if(!encodedSignature) { return false; }
+	if(!encodedSignature) { return NO; }
 		
 	NSString *pkeyString = SUInfoValueForKey(SUPublicDSAKeyKey); // Fetch the app's public DSA key.
-	if (!pkeyString) { return false; }
+	if (!pkeyString) { return NO; }
 	
 	// Remove whitespace around each line of the key.
 	NSMutableArray *pkeyTrimmedLines = [NSMutableArray array];
@@ -144,7 +144,7 @@ EVP_PKEY* load_dsa_key(char *key)
 
 	EVP_PKEY* pkey = NULL;
 	pkey = load_dsa_key((char *)[pkeyString UTF8String]);
-	if (!pkey) { return false; }
+	if (!pkey) { return NO; }
 
 	// Now, the signature is in base64; we have to decode it into a binary stream.
 	unsigned char *signature = (unsigned char *)[encodedSignature UTF8String];
@@ -152,7 +152,7 @@ EVP_PKEY* load_dsa_key(char *key)
 	
 	// We've got the signature, now get the file data.
 	NSData *pathData = [NSData dataWithContentsOfFile:path];
-	if (!pathData) { return false; }
+	if (!pathData) { return NO; }
 	
 	// Hash the file with SHA-1.
 	unsigned char md[SHA_DIGEST_LENGTH];
