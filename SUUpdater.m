@@ -203,16 +203,27 @@
 
 - (NSTimeInterval)storedCheckInterval
 {
+	// Define some minimum intervals to avoid DOS-like checking attacks.
+#ifdef DEBUG
+	#define MIN_INTERVAL 60
+#else
+	#define MIN_INTERVAL 60*60
+#endif
+	
 	// Returns the scheduled check interval stored in the user defaults / info.plist. User defaults override Info.plist.
+	long interval = 0; // 0 signifies not to do timed checking.
 	if ([[NSUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey])
 	{
-		long interval = [[[NSUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey] longValue];
-		if (interval > 0)
-			return interval;
+		interval = [[[NSUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey] longValue];
 	}
-	if (SUInfoValueForKey(SUScheduledCheckIntervalKey))
-		return [SUInfoValueForKey(SUScheduledCheckIntervalKey) longValue];
-	return 0;
+	else if (SUInfoValueForKey(SUScheduledCheckIntervalKey))
+	{
+		interval = [SUInfoValueForKey(SUScheduledCheckIntervalKey) longValue];
+	}
+	if (interval >= MIN_INTERVAL)
+		return interval;
+	else
+		return 0;
 }
 
 - (void)beginDownload
