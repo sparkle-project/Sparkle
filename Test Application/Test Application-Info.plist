@@ -24,7 +24,5 @@
 	<string>NSApplication</string>
 	<key>SUFeedURL</key>
 	<string>http://www.andymatuschak.org/files/sparkletestcast.xml</string>
-	<key>SUCheckAtStartup</key><false/>
-	<key>SUScheduledCheckInterval</key><integer>30</integer>
 </dict>
 </plist>
