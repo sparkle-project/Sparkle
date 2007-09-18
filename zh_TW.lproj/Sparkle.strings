@@ -1,0 +1,77 @@
+﻿/* No comment provided by engineer. */
+"%.0lfk of %.0lfk" = "%1$.0lfk / %2$.0lfk";
+
+/* No comment provided by engineer. */
+"%@ %@ has been installed and will be ready to use next time %@ starts! Would you like to relaunch now?" = "%1$@ %2$@ 已安裝且下次 %3$@ 啟動時將會準備就緒！您現在是否要重新啟動？ ";
+
+/* No comment provided by engineer. */
+"%@ %@ is currently the newest version available." = "%1$@ %2$@ 已是目前最新的版本。";
+
+/* No comment provided by engineer. */
+"%@ %@ is now available (you have %@). Would you like to download it now?" = "%1$@ %2$@ 現在可供下載 (您有的是 %3$@)。您是否要現在進行下載？";
+
+/* No comment provided by engineer. */
+"%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help." = "%@ 沒有寫入到此應用程式目錄的權限！您是否正在從磁碟映像檔中執行？如果不是，請向您的系統管理者尋求協助。";
+
+/* No comment provided by engineer. */
+"A new version of %@ has been installed!" = "已安裝新版本的 %@！";
+
+/* No comment provided by engineer. */
+"A new version of %@ is available!" = "已有新版本的 %@ 可供下載！";
+
+/* No comment provided by engineer. */
+"An error occurred during installation. Please try again later." = "安裝期間發生錯誤。請稍後再試一次。";
+
+/* No comment provided by engineer. */
+"An error occurred in retrieving update information. Please try again later." = "擷取更新資訊時發生錯誤。請稍後再試一次。請稍後再試一次。";
+
+/* No comment provided by engineer. */
+"An error occurred while extracting the archive. Please try again later." = "解壓縮封存檔時發生錯誤。";
+
+/* No comment provided by engineer. */
+"An error occurred while trying to download the file. Please try again later." = "嘗試下載檔案時發生錯誤。請稍後再試一次。";
+
+/* No comment provided by engineer. */
+"An update is already in progress!" = "更新已在進行中！";
+
+/* No comment provided by engineer. */
+"Cancel" = "取消";
+
+/* No comment provided by engineer. */
+"Check for updates on startup?" = "啟動時檢查更新項目？";
+
+/* No comment provided by engineer. */
+"Downloading update..." = "正在下載更新項目⋯";
+
+/* No comment provided by engineer. */
+"Extracting update..." = "正在解壓縮更新項目⋯";
+
+/* No comment provided by engineer. */
+"Install and Relaunch" = "安裝與重新啟動";
+
+/* No comment provided by engineer. */
+"Installing update..." = "安裝更新...";
+
+/* No comment provided by engineer. */
+"No" = "否";
+
+/* No comment provided by engineer. */
+"OK" = "好";
+
+/* No comment provided by engineer. */
+"Ready to install!" = "準備安裝！";
+
+/* No comment provided by engineer. */
+"Update Error!" = "更新發生錯誤！";
+
+/* No comment provided by engineer. */
+"Updating %@" = "正在更新 %@";
+
+/* No comment provided by engineer. */
+"Would you like %@ to check for updates on startup? If not, you can initiate the check manually from the application menu." = "你想要 %@ 在啟動時檢查更新項目嗎？如果不要，你可以從應用程式選單中以手動方式檢查更新項目。";
+
+/* No comment provided by engineer. */
+"Yes" = "是";
+
+/* No comment provided by engineer. */
+"You're up to date!" = "你已有最新版本！";
