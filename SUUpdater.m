@@ -578,18 +578,16 @@
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
 
-	// Thanks to Allan Odgaard for this restart code, which is much more clever than mine was.
-	setenv("LAUNCH_PATH", [currentAppPath UTF8String], 1);
-	setenv("TEMP_FOLDER", [[downloadPath stringByDeletingLastPathComponent] UTF8String], 1); // delete the temp stuff after it's all over
-	system("/bin/bash -c '{ for (( i = 0; i < 3000 && $(echo $(/bin/ps -xp $PPID|/usr/bin/wc -l))-1; i++ )); do\n"
-		   "    /bin/sleep .2;\n"
-		   "  done\n"
-		   "  if [[ $(/bin/ps -xp $PPID|/usr/bin/wc -l) -ne 2 ]]; then\n"
-		   "    /usr/bin/open \"${LAUNCH_PATH}\"\n"
-		   "  fi\n"
-		   "  rm -rf \"${TEMP_FOLDER}\"\n"
-		   "} &>/dev/null &'");
-	[NSApp terminate:self];	
+	NSString *relaunchPath = [[[[NSBundle bundleForClass:[self class]] executablePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"relaunch"];
+	if (!relaunchPath) // slight hack to resolve issues with running with in configurations
+	{
+		NSString *frameworkPath = [[[NSBundle mainBundle] sharedFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
+		NSBundle *framework = [NSBundle bundleWithPath:frameworkPath];
+		relaunchPath = [[[framework executablePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"relaunch"];
+	}
+	
+	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:currentAppPath, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
+	[NSApp terminate:self];
 }
 
 - (IBAction)cancelDownload:sender
