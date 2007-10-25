@@ -153,9 +153,9 @@
 		if (verbosity)
 		{
 			NSBeep();
-			if ([[statusController window] isVisible])
+			if (statusController && [[statusController window] isVisible])
 				[statusController showWindow:self];
-			else if ([[updateAlert window] isVisible])
+			else if (updateAlert && [[updateAlert window] isVisible])
 				[updateAlert showWindow:self];
 			else
 				[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An update is already in progress!", nil)];
@@ -256,6 +256,7 @@
 - (void)updateAlert:(SUUpdateAlert *)alert finishedWithChoice:(SUUpdateAlertChoice)choice
 {
 	[alert release];
+	updateAlert = nil;
 	switch (choice)
 	{
 		case SUInstallUpdateChoice:
