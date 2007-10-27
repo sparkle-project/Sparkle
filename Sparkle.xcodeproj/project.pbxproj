@@ -63,7 +63,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 6132423F0CD06DB000106AA4 /* Relaunch Tool */;
+			remoteGlobalIDString = 6132423F0CD06DB000106AA4;
 			remoteInfo = "Relaunch Tool";
 		};
 		61B5F91B09C4CF7200B25A18 /* PBXContainerItemProxy */ = {
@@ -786,6 +786,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
+				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;

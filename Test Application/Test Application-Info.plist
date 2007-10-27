@@ -8,6 +8,8 @@
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIconFile</key>
 	<string>Sparkle</string>
+	<key>CFBundleName</key>
+	<string>Sparkle Test App</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.andymatuschak.SparkleTestApp</string>
 	<key>CFBundleInfoDictionaryVersion</key>

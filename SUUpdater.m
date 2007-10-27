@@ -532,7 +532,7 @@
 		
 		if (!newAppDownloadPath || ![[NSFileManager defaultManager] fileExistsAtPath:newAppDownloadPath])
 		{
-			[NSException raise:@"SUInstallException" format:@"The update archive didn't contain an application with the proper name: %@. Remember, the updated app's file name must be identical to {CFBundleName}.app", [SUInfoValueForKey(@"CFBundleName") stringByAppendingPathExtension:@"app"]];
+			[NSException raise:@"SUInstallException" format:@"The update archive didn't contain an application with the proper name: %@. Remember, the updated app's file name must be identical to {CFBundleString}.app", [SUUnlocalizedInfoValueForKey(@"CFBundleName") stringByAppendingPathExtension:@"app"]];
 		}
 	}
 	@catch(NSException *e) 

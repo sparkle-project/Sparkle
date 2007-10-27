@@ -14,11 +14,7 @@
 
 id SUUnlocalizedInfoValueForKey(NSString *key)
 {
-	// Okay, but if it isn't there, let's use the general one.
-	id value = [[[NSBundle mainBundle] infoDictionary] valueForKey:key];
-	if (!value)
-		return SUInfoValueForKey(key);
-	return value;
+	return [[[NSBundle mainBundle] infoDictionary] objectForKey:key];
 }
 
 id SUInfoValueForKey(NSString *key)
