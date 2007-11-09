@@ -18,7 +18,7 @@
 	while ((currentApp = [appEnumerator nextObject]))
 	{
 		// Potential gotcha: the new version of your app better have the same NSApplicationName.
-		if([[currentApp objectForKey:@"NSApplicationName"] isEqualToString:SUHostAppName()])
+		if([[currentApp objectForKey:@"NSApplicationName"] isEqualToString:[[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"]])
 			count++;
 	}
 	return count;	

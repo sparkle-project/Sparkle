@@ -12,7 +12,7 @@
 
 @implementation SUAutomaticUpdateAlert
 
-- initWithAppcastItem:(SUAppcastItem *)item
+- initWithAppcastItem:(SUAppcastItem *)item andUtilities:(SUUtilities *)aUtility;
 {
 	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"SUAutomaticUpdateAlert" ofType:@"nib"];
 	if (!path) // slight hack to resolve issues with running with in configurations
@@ -26,10 +26,19 @@
 	[super initWithWindowNibPath:path owner:self];
 	
 	updateItem = [item retain];
+	utilities = [aUtility retain];
 	[self setShouldCascadeWindows:NO];
 	
 	return self;
 }
+
+- (void) dealloc
+{
+	[utilities release];
+	[updateItem release];
+	[super dealloc];
+}
+
 
 - (IBAction)relaunchNow:sender
 {
@@ -45,17 +54,17 @@
 
 - (NSImage *)applicationIcon
 {
-	return [NSImage imageNamed:@"NSApplicationIcon"];
+	return [utilities hostAppIcon];
 }
 
 - (NSString *)titleText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ has been installed!", nil), SUHostAppDisplayName()];
+	return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ has been installed!", nil), [utilities hostAppDisplayName]];
 }
 
 - (NSString *)descriptionText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"%@ %@ has been installed and will be ready to use next time %@ starts! Would you like to relaunch now?", nil), SUHostAppDisplayName(), [updateItem versionString], SUHostAppDisplayName()];
+	return [NSString stringWithFormat:SULocalizedString(@"%@ %@ has been installed and will be ready to use next time %@ starts! Would you like to relaunch now?", nil), [utilities hostAppDisplayName], [updateItem versionString], [utilities hostAppDisplayName]];
 }
 
 @end

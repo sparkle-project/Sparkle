@@ -124,12 +124,10 @@ EVP_PKEY* load_dsa_key(char *key)
 	return [hash isEqualToString:[NSString stringWithCString:hexDigest]];
 }
 
-- (BOOL)validatePath:(NSString *)path withEncodedDSASignature:(NSString *)encodedSignature
+- (BOOL)validatePath:(NSString *)path withEncodedDSASignature:(NSString *)encodedSignature withPublicDSAKey:(NSString *)pkeyString
 {
 	BOOL result = NO;
-	if(!encodedSignature) { return NO; }
-		
-	NSString *pkeyString = SUInfoValueForKey(SUPublicDSAKeyKey); // Fetch the app's public DSA key.
+	if (!encodedSignature) { return NO; }
 	if (!pkeyString) { return NO; }
 	
 	// Remove whitespace around each line of the key.

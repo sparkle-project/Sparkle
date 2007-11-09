@@ -7,50 +7,110 @@
 //
 
 #import "SUUtilities.h"
+#import "SUUpdater.h"
+#import "SUBundleDefaults.h"
 
-@interface SUUtilities : NSObject
-	+(NSString *)localizedStringForKey:(NSString *)key withComment:(NSString *)comment;
-@end
 
-id SUUnlocalizedInfoValueForKey(NSString *key)
+@implementation SUUtilities
+
++ (NSString *)localizedStringForKey:(NSString *)key withComment:(NSString *)comment 
 {
-	return [[[NSBundle mainBundle] infoDictionary] objectForKey:key];
+	return NSLocalizedStringFromTableInBundle(key, @"Sparkle", [NSBundle bundleForClass:[self class]], comment);
 }
 
-id SUInfoValueForKey(NSString *key)
+- (id)initWithUpdater:(SUUpdater *)aUpdater
 {
-	return [[NSBundle mainBundle] objectForInfoDictionaryKey:key];
+	self = [super init];
+	if (self != nil) {
+		updater = [aUpdater retain];
+		defaults = [[SUBundleDefaults alloc] initWithUtilitie:self];
+	}
+	return self;
 }
 
-NSString *SUHostAppName()
+- (void) dealloc
 {
-	if (SUInfoValueForKey(@"CFBundleName")) { return SUInfoValueForKey(@"CFBundleName"); }
-	return [[[NSFileManager defaultManager] displayNameAtPath:[[NSBundle mainBundle] bundlePath]] stringByDeletingPathExtension];
+	[updater release];
+	[defaults release];
+	
+	[super dealloc];
 }
 
-NSString *SUHostAppDisplayName()
+- (id)unlocalizedInfoValueForKey:(NSString *)key
 {
-	if (SUInfoValueForKey(@"CFBundleDisplayName")) { return SUInfoValueForKey(@"CFBundleDisplayName"); }
-	return SUHostAppName();
+	return [[[updater updateBundle] infoDictionary] objectForKey:key];
 }
 
-NSString *SUHostAppVersion()
+- (id)infoValueForKey:(NSString *)key
 {
-	return SUInfoValueForKey(@"CFBundleVersion");
+	return [[updater updateBundle] objectForInfoDictionaryKey:key];
 }
 
-NSString *SUHostAppVersionString()
+- (NSString *)hostAppName
 {
-	NSString *shortVersionString = SUInfoValueForKey(@"CFBundleShortVersionString");
+	if ([self infoValueForKey:@"CFBundleName"]) { return [self infoValueForKey:@"CFBundleName"]; }
+	return [[[NSFileManager defaultManager] displayNameAtPath:[[updater updateBundle] bundlePath]] stringByDeletingPathExtension];
+}
+
+- (NSString *)hostAppDisplayName
+{
+	if ([self infoValueForKey:@"CFBundleDisplayName"]) { return [self infoValueForKey:@"CFBundleDisplayName"]; }
+	return [self hostAppName];
+}
+
+- (NSString *)hostAppVersion
+{
+	return [self infoValueForKey:@"CFBundleVersion"];
+}
+
+- (NSString *)hostAppVersionString
+{
+	NSString *shortVersionString = [self infoValueForKey:@"CFBundleShortVersionString"];
 	if (shortVersionString)
 	{
-		if (![shortVersionString isEqualToString:SUHostAppVersion()])
-			shortVersionString = [shortVersionString stringByAppendingFormat:@"/%@", SUHostAppVersion()];
+		if (![shortVersionString isEqualToString:[self hostAppVersion]])
+			shortVersionString = [shortVersionString stringByAppendingFormat:@"/%@", [self hostAppVersion]];
 		return shortVersionString;
 	}
 	else
-		return SUHostAppVersion(); // fall back on CFBundleVersion
+		return [self hostAppVersion]; // fall back on CFBundleVersion
 }
+
+- (NSString *)hostAppID
+{
+	return [self unlocalizedInfoValueForKey:@"CFBundleIdentifier"];
+}
+
+- (NSImage *)hostAppIcon
+{
+	// draw the app's icon
+    NSImage* iconImage = nil;
+    NSString* iconFileStr = [[[updater updateBundle] infoDictionary] objectForKey:@"CFBundleIconFile"];
+	if (iconFileStr != nil && [iconFileStr length] > 0)
+		iconFileStr = [[updater updateBundle] pathForResource:iconFileStr ofType:@"icns"];
+    if (iconFileStr != nil && [iconFileStr length] > 0)
+	
+    {
+        // we have a real icon
+        iconImage = [[NSImage alloc] initWithContentsOfFile:iconFileStr];
+    }
+    else
+    {
+        // no particular app icon defined, use the default system icon
+        iconImage = [NSImage imageNamed: @"NSApplicationIcon"];
+        // or
+        //NSString* appIconType = NSFileTypeForHFSTypeCode(kGenericApplicationIcon);
+        //iconImage = [[NSWorkspace sharedWorkspace] iconForFileType:appIconType];
+    }
+	return iconImage;
+}
+
+- (SUBundleDefaults *)standardBundleDefaults
+{
+	return [[defaults retain] autorelease];
+}
+
+@end
 
 NSString *SULocalizedString(NSString *key, NSString *comment) {
 	return [SUUtilities localizedStringForKey:key withComment:comment];
@@ -192,12 +252,3 @@ NSComparisonResult SUStandardVersionComparison(NSString *versionA, NSString *ver
     // The 2 strings are identical
     return NSOrderedSame;
 }
-
-@implementation SUUtilities
-
-+ (NSString *)localizedStringForKey:(NSString *)key withComment:(NSString *)comment 
-{
-	return NSLocalizedStringFromTableInBundle(key, @"Sparkle", [NSBundle bundleForClass:[self class]], comment);
-}
-
-@end

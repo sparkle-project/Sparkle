@@ -13,7 +13,7 @@
 
 @implementation SUUpdateAlert
 
-- initWithAppcastItem:(SUAppcastItem *)item
+- initWithAppcastItem:(SUAppcastItem *)item andUtilities:(SUUtilities *)aUtility
 {
 	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"SUUpdateAlert" ofType:@"nib"];
 	if (!path) // slight hack to resolve issues with running with in configurations
@@ -27,6 +27,7 @@
 	[super initWithWindowNibPath:path owner:self];
 	
 	updateItem = [item retain];
+	utilities = [aUtility retain];
 	[self setShouldCascadeWindows:NO];
 	
 	return self;
@@ -35,6 +36,7 @@
 - (void)dealloc
 {
 	[updateItem release];
+	[utilities release];
 	[super dealloc];
 }
 
@@ -89,15 +91,15 @@
 
 - (BOOL)showsReleaseNotes
 {
-	if (!SUInfoValueForKey(SUShowReleaseNotesKey)) { return YES; } // defaults to YES
-	return [SUInfoValueForKey(SUShowReleaseNotesKey) boolValue];
+	if (![utilities infoValueForKey:SUShowReleaseNotesKey]) { return YES; } // defaults to YES
+	return [[utilities infoValueForKey:SUShowReleaseNotesKey] boolValue];
 }
 
 - (BOOL)allowsAutomaticUpdates
 {
-	if (!SUInfoValueForKey(SUExpectsDSASignatureKey)) { return NO; } // automatic updating requires DSA-signed updates
-	if (!SUInfoValueForKey(SUAllowsAutomaticUpdatesKey)) { return YES; } // defaults to YES
-	return [SUInfoValueForKey(SUAllowsAutomaticUpdatesKey) boolValue];
+	if ([utilities infoValueForKey:SUExpectsDSASignatureKey]) { return NO; } // automatic updating requires DSA-signed updates
+	if ([utilities infoValueForKey:SUAllowsAutomaticUpdatesKey]) { return YES; } // defaults to YES
+	return [[utilities infoValueForKey:SUAllowsAutomaticUpdatesKey] boolValue];
 }
 
 - (void)awakeFromNib
@@ -143,17 +145,17 @@
 
 - (NSImage *)applicationIcon
 {
-	return [NSImage imageNamed:@"NSApplicationIcon"];
+	return [utilities hostAppIcon];
 }
 
 - (NSString *)titleText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is available!", nil), SUHostAppDisplayName()];
+	return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is available!", nil), [utilities hostAppDisplayName]];
 }
 
 - (NSString *)descriptionText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available (you have %@). Would you like to download it now?", nil), SUHostAppDisplayName(), [updateItem versionString], SUHostAppVersionString()];	
+	return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available (you have %@). Would you like to download it now?", nil), [utilities hostAppDisplayName], [updateItem versionString], [utilities hostAppVersionString]];	
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:frame

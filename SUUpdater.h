@@ -18,7 +18,7 @@
 // getting, which it assumes are in the description (or body) field of the relevant RSS item.
 // Set SUShowReleaseNotes to <false/> in Info.plist to hide the button.
 
-@class SUAppcastItem, SUUpdateAlert, SUStatusController;
+@class SUAppcastItem, SUUpdateAlert, SUStatusController, SUUtilities;
 @interface SUUpdater : NSObject {
 	SUAppcastItem *updateItem;
 	
@@ -35,7 +35,14 @@
 	BOOL updateInProgress;
 	
 	NSString *currentSystemVersion;
+	
+	NSBundle *updateBundle;
+	SUUtilities *utilities;
 }
+
+- (id)initWithBundle:(NSBundle *)bundle;
+
+- (NSBundle *)updateBundle;
 
 // This IBAction is meant for a main menu item. Hook up any menu item to this action,
 // and Sparkle will check for updates and report back its findings verbosely.

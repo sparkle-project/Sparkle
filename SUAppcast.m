@@ -13,6 +13,15 @@
 
 @implementation SUAppcast
 
+- (id)initWithUtilities:(SUUtilities *)aUtility
+{
+	self = [super init];
+	if (self != nil) {
+		utilities = [aUtility retain];
+	}
+	return self;
+}
+
 - (void)fetchAppcastFromURL:(NSURL *)url
 {
 	[NSThread detachNewThreadSelector:@selector(_fetchAppcastFromURL:) toTarget:self withObject:url]; // let's not block the main thread
@@ -25,6 +34,7 @@
 
 - (void)dealloc
 {
+	[utilities release];
 	[items release];
 	[super dealloc];
 }
@@ -46,7 +56,7 @@
 	RSS *feed;
 	@try
 	{
-		NSString *userAgent = [NSString stringWithFormat: @"%@/%@ (Mac OS X) Sparkle/1.1", SUHostAppName(), SUHostAppVersion()];
+		NSString *userAgent = [NSString stringWithFormat: @"%@/%@ (Mac OS X) Sparkle/1.1", [utilities hostAppName], [utilities hostAppVersion]];
 		
 		feed = [[RSS alloc] initWithURL:url normalize:YES userAgent:userAgent];
 		if (!feed)

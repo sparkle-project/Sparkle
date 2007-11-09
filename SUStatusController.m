@@ -11,7 +11,7 @@
 
 @implementation SUStatusController
 
-- init
+- initWithUtilities:(SUUtilities *)aUtility
 {
 	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"SUStatus" ofType:@"nib"];
 	if (!path) // slight hack to resolve issues with running in debug configurations
@@ -23,11 +23,13 @@
 	}
 	[super initWithWindowNibPath:path owner:self];
 	[self setShouldCascadeWindows:NO];
+	utilities = [aUtility retain];
 	return self;
 }
 
 - (void)dealloc
 {
+	[utilities release];
 	[title release];
 	[statusText release];
 	[buttonTitle release];
@@ -42,12 +44,12 @@
 
 - (NSString *)windowTitle
 {
-	return [NSString stringWithFormat:SULocalizedString(@"Updating %@", nil), SUHostAppDisplayName()];
+	return [NSString stringWithFormat:SULocalizedString(@"Updating %@", nil), [utilities hostAppDisplayName]];
 }
 
 - (NSImage *)applicationIcon
 {
-	return [NSImage imageNamed:@"NSApplicationIcon"];
+	return [utilities hostAppIcon];
 }
 
 - (void)beginActionWithTitle:(NSString *)aTitle maxProgressValue:(double)aMaxProgressValue statusText:(NSString *)aStatusText
