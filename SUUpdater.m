@@ -283,7 +283,7 @@
 {
 	if (![self isAutomaticallyUpdating])
 	{
-		statusController = [[SUStatusController alloc] init];
+		statusController = [[SUStatusController alloc] initWithUtilities:utilities];
 		[statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", nil) maxProgressValue:0 statusText:nil];
 		[statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
 		[statusController showWindow:self];
