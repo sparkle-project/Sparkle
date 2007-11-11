@@ -580,6 +580,8 @@
 	NSString *currentAppPath = [[NSBundle mainBundle] bundlePath];
 	NSString *currentBundlePath = [updateBundle bundlePath];
 	NSString *newAppDownloadPath = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[[utilities unlocalizedInfoValueForKey:@"CFBundleName"] stringByAppendingPathExtension:@"app"]];
+	BOOL isPackage = NO;
+	int processIdentifier = [[NSProcessInfo processInfo] processIdentifier];
 	@try 
 	{
 		if (![self isAutomaticallyUpdating])
@@ -598,20 +600,33 @@
 		if (![utilities unlocalizedInfoValueForKey:@"CFBundleName"]) { [NSException raise:@"SUInstallException" format:@"This application has no CFBundleName! This key must be set to the application's name."]; }
 
 		// Search subdirectories for the application
-		NSString *file, *appName = [[utilities unlocalizedInfoValueForKey:@"CFBundleName"] stringByAppendingPathExtension:[utilities hostAppExtension]];
+		NSString *file, *appName = [utilities unlocalizedInfoValueForKey:@"CFBundleName"];
 		NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:[downloadPath stringByDeletingLastPathComponent]];
 		while ((file = [dirEnum nextObject]))
 		{
 			// Some DMGs have symlinks into /Applications! That's no good!
 			if ([file isEqualToString:@"/Applications"])
 				[dirEnum skipDescendents];
-			if ([[file lastPathComponent] isEqualToString:appName]) // We found one!
+			if ([[file pathExtension] isEqualToString:[utilities hostAppExtension]] &&
+				[[file stringByDeletingPathExtension] isEqualToString:appName]) // We found one!
 			{
+				isPackage = NO;
 				newAppDownloadPath = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:file];
 				break;
 			}
-			if ([[file pathExtension] isEqualToString:[utilities hostAppExtension]]) // No point in looking in app bundles.
+			else if (([[file pathExtension] isEqualToString:@"pkg"] || [[file pathExtension] isEqualToString:@"mpkg"]) &&
+					  [[file stringByDeletingPathExtension] isEqualToString:appName])
+			{
+				isPackage = YES;
+				newAppDownloadPath = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:file];
+				break;
+			}
+			if ([[file pathExtension] isEqualToString:[utilities hostAppExtension]] ||
+				[[file pathExtension] isEqualToString:@"pkg"] ||
+				[[file pathExtension] isEqualToString:@"mpkg"]) // No point in looking in bundles.
+			{
 				[dirEnum skipDescendents];
+			}
 		}
 		
 		if (!newAppDownloadPath || ![[NSFileManager defaultManager] fileExistsAtPath:newAppDownloadPath])
@@ -629,23 +644,43 @@
 	
 	if ([self isAutomaticallyUpdating]) // Don't do authentication if we're automatically updating; that'd be surprising.
 	{
-		int tag = 0;
-		BOOL result = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[currentBundlePath stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[currentBundlePath lastPathComponent]] tag:&tag];
-		result &= [[NSFileManager defaultManager] movePath:newAppDownloadPath toPath:currentBundlePath handler:nil];
-		if (!result)
+		if (!isPackage)
 		{
-			[self abandonUpdate];
-			return;
+			int tag = 0;
+			BOOL result = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[currentBundlePath stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[currentBundlePath lastPathComponent]] tag:&tag];
+			result &= [[NSFileManager defaultManager] movePath:newAppDownloadPath toPath:currentBundlePath handler:nil];
+			if (!result)
+			{
+				[self abandonUpdate];
+				return;
+			}
+		}
+		else
+		{
+			NSString *installerPath = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.installer"];
+			installerPath = [installerPath stringByAppendingString:@"/Contents/MacOS/Installer"];
+			NSTask *installer = [NSTask launchedTaskWithLaunchPath:installerPath arguments:[NSArray arrayWithObjects:newAppDownloadPath, nil]];
+			processIdentifier = [installer processIdentifier];
 		}
 	}
 	else // But if we're updating by the action of the user, do an authenticated move.
 	{
-		// Outside of the @try block because we want to be a little more informative on this error.
-		if (![[NSFileManager defaultManager] movePathWithAuthentication:newAppDownloadPath toPath:currentBundlePath])
+		if (!isPackage)
 		{
-			[self showUpdateErrorAlertWithInfo:[NSString stringWithFormat:SULocalizedString(@"%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help.", nil), [utilities hostAppDisplayName]]];
-			[self abandonUpdate];
-			return;
+			// Outside of the @try block because we want to be a little more informative on this error.
+			if (![[NSFileManager defaultManager] movePathWithAuthentication:newAppDownloadPath toPath:currentBundlePath])
+			{
+				[self showUpdateErrorAlertWithInfo:[NSString stringWithFormat:SULocalizedString(@"%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help.", nil), [utilities hostAppDisplayName]]];
+				[self abandonUpdate];
+				return;
+			}
+		}
+		else
+		{
+			NSString *installerPath = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.installer"];
+			installerPath = [installerPath stringByAppendingString:@"/Contents/MacOS/Installer"];
+			NSTask *installer = [NSTask launchedTaskWithLaunchPath:installerPath arguments:[NSArray arrayWithObjects:newAppDownloadPath, nil]];
+			processIdentifier = [installer processIdentifier];
 		}
 	}
 		
@@ -670,7 +705,7 @@
 		relaunchPath = [[[framework executablePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"relaunch"];
 	}
 	
-	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:currentAppPath, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
+	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:currentAppPath, [NSString stringWithFormat:@"%d", processIdentifier], nil]];
 	[NSApp terminate:self];
 }
 
