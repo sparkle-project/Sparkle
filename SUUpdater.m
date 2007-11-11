@@ -697,13 +697,14 @@
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
 
-	NSString *relaunchPath = [[[[NSBundle bundleForClass:[self class]] executablePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"relaunch"];
+	NSString *relaunchPath = [[[NSBundle bundleForClass:[self class]] executablePath] stringByDeletingLastPathComponent];
 	if (!relaunchPath) // slight hack to resolve issues with running with in configurations
 	{
 		NSString *frameworkPath = [[[NSBundle mainBundle] sharedFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
 		NSBundle *framework = [NSBundle bundleWithPath:frameworkPath];
-		relaunchPath = [[[framework executablePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"relaunch"];
+		relaunchPath = [[framework executablePath] stringByDeletingLastPathComponent];
 	}
+	relaunchPath = [relaunchPath stringByAppendingPathComponent:@"relaunch.app/Contents/MacOS/relaunch"];
 	
 	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:currentAppPath, [NSString stringWithFormat:@"%d", processIdentifier], nil]];
 	[NSApp terminate:self];

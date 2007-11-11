@@ -23,8 +23,6 @@
 		61299A8D09CA790200B7442F /* SUUnarchiver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A8B09CA790200B7442F /* SUUnarchiver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		61299A8E09CA790200B7442F /* SUUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A8C09CA790200B7442F /* SUUnarchiver.m */; };
 		61299B3609CB04E000B7442F /* Sparkle.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299B3509CB04E000B7442F /* Sparkle.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		6132424C0CD06DE900106AA4 /* relaunch.m in Sources */ = {isa = PBXBuildFile; fileRef = 613242130CD06CEF00106AA4 /* relaunch.m */; };
-		613242610CD06E2200106AA4 /* relaunch in CopyFiles */ = {isa = PBXBuildFile; fileRef = 613242400CD06DB000106AA4 /* relaunch */; };
 		61407C390A4099050009F71F /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; };
 		6196CFF909C72148000DC222 /* SUStatusController.h in Headers */ = {isa = PBXBuildFile; fileRef = 6196CFE309C71ADE000DC222 /* SUStatusController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6196CFFA09C72149000DC222 /* SUStatusController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6196CFE409C71ADE000DC222 /* SUStatusController.m */; };
@@ -58,22 +56,24 @@
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
 		D18A64E80CE2588900C49C71 /* SUBundleDefaults.h in Headers */ = {isa = PBXBuildFile; fileRef = D18A64E60CE2588900C49C71 /* SUBundleDefaults.h */; };
 		D18A64E90CE2588900C49C71 /* SUBundleDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = D18A64E70CE2588900C49C71 /* SUBundleDefaults.m */; };
+		D1E42C370CE754C700F50EB9 /* relaunch.m in Sources */ = {isa = PBXBuildFile; fileRef = 613242130CD06CEF00106AA4 /* relaunch.m */; };
+		D1E42C3B0CE755A000F50EB9 /* relaunch.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1E42C2F0CE754AE00F50EB9 /* relaunch.app */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		6132425C0CD06E0500106AA4 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 6132423F0CD06DB000106AA4;
-			remoteInfo = "Relaunch Tool";
-		};
 		61B5F91B09C4CF7200B25A18 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = Sparkle;
+		};
+		D1E42C3E0CE755D700F50EB9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D1E42C2E0CE754AE00F50EB9 /* Relaunch Tool */;
+			remoteInfo = "Relaunch Tool";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -94,7 +94,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				613242610CD06E2200106AA4 /* relaunch in CopyFiles */,
+				D1E42C3B0CE755A000F50EB9 /* relaunch.app in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -121,7 +121,6 @@
 		61299A8C09CA790200B7442F /* SUUnarchiver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUnarchiver.m; sourceTree = "<group>"; };
 		61299B3509CB04E000B7442F /* Sparkle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sparkle.h; sourceTree = "<group>"; };
 		613242130CD06CEF00106AA4 /* relaunch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = relaunch.m; sourceTree = "<group>"; };
-		613242400CD06DB000106AA4 /* relaunch */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = relaunch; sourceTree = BUILT_PRODUCTS_DIR; };
 		6196CFE309C71ADE000DC222 /* SUStatusController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStatusController.h; sourceTree = "<group>"; };
 		6196CFE409C71ADE000DC222 /* SUStatusController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUStatusController.m; sourceTree = "<group>"; };
 		61AAE8230A321A7F00D8810D /* en */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Sparkle.strings; sourceTree = "<group>"; };
@@ -231,18 +230,12 @@
 		8DC2EF5B0486A6940098B216 /* Sparkle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Sparkle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D18A64E60CE2588900C49C71 /* SUBundleDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBundleDefaults.h; sourceTree = "<group>"; };
 		D18A64E70CE2588900C49C71 /* SUBundleDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBundleDefaults.m; sourceTree = "<group>"; };
+		D1E42C2F0CE754AE00F50EB9 /* relaunch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = relaunch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D1E42C330CE754AE00F50EB9 /* Relaunch Tool-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Relaunch Tool-Info.plist"; sourceTree = "<group>"; };
 		D2F7E79907B2D74100F64583 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
-		DA142A740CC79FEA00CE54F3 /* relaunch */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = relaunch; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		6132423E0CD06DB000106AA4 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		61B5F90009C4CEE200B25A18 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -262,6 +255,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D1E42C2D0CE754AE00F50EB9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -270,7 +270,7 @@
 			children = (
 				8DC2EF5B0486A6940098B216 /* Sparkle.framework */,
 				61B5F90209C4CEE200B25A18 /* Sparkle Test App.app */,
-				613242400CD06DB000106AA4 /* relaunch */,
+				D1E42C2F0CE754AE00F50EB9 /* relaunch.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -300,9 +300,9 @@
 		089C1665FE841158C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				D1E42C330CE754AE00F50EB9 /* Relaunch Tool-Info.plist */,
 				8DC2EF5A0486A6940098B216 /* Info.plist */,
 				610D5A740A1670A4004AAD9C /* SUStatus.nib */,
-				DA142A740CC79FEA00CE54F3 /* relaunch */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -457,22 +457,6 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		6132423F0CD06DB000106AA4 /* Relaunch Tool */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 613242500CD06DEE00106AA4 /* Build configuration list for PBXNativeTarget "Relaunch Tool" */;
-			buildPhases = (
-				6132423D0CD06DB000106AA4 /* Sources */,
-				6132423E0CD06DB000106AA4 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "Relaunch Tool";
-			productName = "Relaunch Tool";
-			productReference = 613242400CD06DB000106AA4 /* relaunch */;
-			productType = "com.apple.product-type.tool";
-		};
 		61B5F90109C4CEE200B25A18 /* Sparkle Test App */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 61B5F90509C4CEE300B25A18 /* Build configuration list for PBXNativeTarget "Sparkle Test App" */;
@@ -506,13 +490,30 @@
 			buildRules = (
 			);
 			dependencies = (
-				6132425D0CD06E0500106AA4 /* PBXTargetDependency */,
+				D1E42C3F0CE755D700F50EB9 /* PBXTargetDependency */,
 			);
 			name = Sparkle;
 			productInstallPath = "$(HOME)/Library/Frameworks";
 			productName = Sparkle;
 			productReference = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */;
 			productType = "com.apple.product-type.framework";
+		};
+		D1E42C2E0CE754AE00F50EB9 /* Relaunch Tool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D1E42C360CE754AF00F50EB9 /* Build configuration list for PBXNativeTarget "Relaunch Tool" */;
+			buildPhases = (
+				D1E42C2B0CE754AE00F50EB9 /* Resources */,
+				D1E42C2C0CE754AE00F50EB9 /* Sources */,
+				D1E42C2D0CE754AE00F50EB9 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Relaunch Tool";
+			productName = "Relaunch Tool";
+			productReference = D1E42C2F0CE754AE00F50EB9 /* relaunch.app */;
+			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
@@ -562,7 +563,7 @@
 			targets = (
 				8DC2EF4F0486A6940098B216 /* Sparkle */,
 				61B5F90109C4CEE200B25A18 /* Sparkle Test App */,
-				6132423F0CD06DB000106AA4 /* Relaunch Tool */,
+				D1E42C2E0CE754AE00F50EB9 /* Relaunch Tool */,
 			);
 		};
 /* End PBXProject section */
@@ -589,6 +590,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D1E42C2B0CE754AE00F50EB9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -603,19 +611,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "ln -sf \"`basename \\\"${VERSIONS_FOLDER_PATH}\\\"`/${CURRENT_VERSION}/relaunch\" \"`dirname \\\"${BUILT_PRODUCTS_DIR}/${VERSIONS_FOLDER_PATH}\\\"`\"";
+			shellScript = "ln -sf \"`basename \\\"${VERSIONS_FOLDER_PATH}\\\"`/${CURRENT_VERSION}/relaunch.app\" \"`dirname \\\"${BUILT_PRODUCTS_DIR}/${VERSIONS_FOLDER_PATH}\\\"`\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		6132423D0CD06DB000106AA4 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				6132424C0CD06DE900106AA4 /* relaunch.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		61B5F8FF09C4CEE200B25A18 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -648,18 +648,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D1E42C2C0CE754AE00F50EB9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D1E42C370CE754C700F50EB9 /* relaunch.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		6132425D0CD06E0500106AA4 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 6132423F0CD06DB000106AA4 /* Relaunch Tool */;
-			targetProxy = 6132425C0CD06E0500106AA4 /* PBXContainerItemProxy */;
-		};
 		61B5F91C09C4CF7200B25A18 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8DC2EF4F0486A6940098B216 /* Sparkle */;
 			targetProxy = 61B5F91B09C4CF7200B25A18 /* PBXContainerItemProxy */;
+		};
+		D1E42C3F0CE755D700F50EB9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D1E42C2E0CE754AE00F50EB9 /* Relaunch Tool */;
+			targetProxy = D1E42C3E0CE755D700F50EB9 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -886,51 +894,6 @@
 			};
 			name = Release;
 		};
-		613242420CD06DB000106AA4 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
-				INSTALL_PATH = /usr/local/bin;
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = relaunch;
-				ZERO_LINK = YES;
-			};
-			name = Debug;
-		};
-		613242430CD06DB000106AA4 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
-				INSTALL_PATH = /usr/local/bin;
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = relaunch;
-				ZERO_LINK = NO;
-			};
-			name = Release;
-		};
 		61B5F90609C4CEE300B25A18 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -982,6 +945,55 @@
 			};
 			name = Release;
 		};
+		D1E42C340CE754AF00F50EB9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INFOPLIST_FILE = "Relaunch Tool-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = relaunch;
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		D1E42C350CE754AF00F50EB9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INFOPLIST_FILE = "Relaunch Tool-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = relaunch;
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1003,20 +1015,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		613242500CD06DEE00106AA4 /* Build configuration list for PBXNativeTarget "Relaunch Tool" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				613242420CD06DB000106AA4 /* Debug */,
-				613242430CD06DB000106AA4 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		61B5F90509C4CEE300B25A18 /* Build configuration list for PBXNativeTarget "Sparkle Test App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				61B5F90609C4CEE300B25A18 /* Debug */,
 				61B5F90709C4CEE300B25A18 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D1E42C360CE754AF00F50EB9 /* Build configuration list for PBXNativeTarget "Relaunch Tool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D1E42C340CE754AF00F50EB9 /* Debug */,
+				D1E42C350CE754AF00F50EB9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
