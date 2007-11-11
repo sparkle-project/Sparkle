@@ -70,13 +70,29 @@
 {
 	return (NSArray *)CFPreferencesCopyValue((CFStringRef)defaultName, (CFStringRef)applicationID,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
 }
+
 /*
 - (int)integerForKey:(NSString *)defaultName; 
 - (float)floatForKey:(NSString *)defaultName; 
-- (BOOL)boolForKey:(NSString *)defaultName;  
+*/
 
+- (BOOL)boolForKey:(NSString *)defaultName
+{
+	CFPropertyListRef plr = (CFPropertyListRef)CFPreferencesCopyValue((CFStringRef)defaultName, (CFStringRef)applicationID,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+	if (plr == NULL)
+		return NO;
+	return CFBooleanGetValue((CFBooleanRef)plr);
+}
+ 
+/*
 - (void)setInteger:(int)value forKey:(NSString *)defaultName;
 - (void)setFloat:(float)value forKey:(NSString *)defaultName;
-- (void)setBool:(BOOL)value forKey:(NSString *)defaultName;
 */
+
+- (void)setBool:(BOOL)value forKey:(NSString *)defaultName
+{
+	CFPreferencesSetValue((CFStringRef)defaultName, (CFBooleanRef)[NSNumber numberWithBool:value], (CFStringRef)applicationID,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+	CFPreferencesSynchronize((CFStringRef)applicationID, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+}
+
 @end

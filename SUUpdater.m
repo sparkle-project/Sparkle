@@ -101,6 +101,9 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)note
 {
+	if ([[utilities standardBundleDefaults] boolForKey:SUIgnoreChecksKey])
+		return;
+		
 	// If there's a scheduled interval, we see if it's been longer than that interval since the last
 	// check. If so, we perform a startup check; if not, we don't.	
 	if ([self storedCheckInterval])
@@ -188,10 +191,28 @@
 	[self checkForUpdatesAndNotify:YES]; // if we're coming from IB, then we want to be more verbose.
 }
 
+- (BOOL)validateMenuItem:(NSMenuItem *)item {
+    if ([item action] == @selector(checkForUpdates:)) {
+		if (![[utilities standardBundleDefaults] boolForKey:SUIgnoreChecksKey])
+		{
+			if (updateInProgress)
+				return NO;
+			else
+				return YES;
+		} else {
+			return NO;
+		}
+    }
+    return NO;
+}
+
 // If the verbosity flag is YES, Sparkle will say when it can't reach the server and when there's no new update.
 // This is generally useful for a menu item--when the check is explicitly invoked.
 - (void)checkForUpdatesAndNotify:(BOOL)verbosity
 {	
+	if ([[utilities standardBundleDefaults] boolForKey:SUIgnoreChecksKey])
+		return;
+
 	if (updateInProgress)
 	{
 		if (verbosity)

@@ -18,3 +18,4 @@ extern NSString *SUExpectsDSASignatureKey;
 extern NSString *SUPublicDSAKeyKey;
 extern NSString *SUAutomaticallyUpdateKey;
 extern NSString *SUAllowsAutomaticUpdatesKey;
+extern NSString *SUIgnoreChecksKey;

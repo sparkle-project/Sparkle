@@ -18,3 +18,4 @@ NSString *SUExpectsDSASignatureKey = @"SUExpectsDSASignature";
 NSString *SUPublicDSAKeyKey = @"SUPublicDSAKey";
 NSString *SUAutomaticallyUpdateKey = @"SUAutomaticallyUpdate";
 NSString *SUAllowsAutomaticUpdatesKey = @"SUAllowsAutomaticUpdates";
+NSString *SUIgnoreChecksKey = @"SUIgnoreChecks";

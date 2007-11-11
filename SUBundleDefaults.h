@@ -28,10 +28,12 @@
 /*
 - (int)integerForKey:(NSString *)defaultName; 
 - (float)floatForKey:(NSString *)defaultName; 
+*/
 - (BOOL)boolForKey:(NSString *)defaultName;  
-
+/*
 - (void)setInteger:(int)value forKey:(NSString *)defaultName;
 - (void)setFloat:(float)value forKey:(NSString *)defaultName;
-- (void)setBool:(BOOL)value forKey:(NSString *)defaultName;
 */
+- (void)setBool:(BOOL)value forKey:(NSString *)defaultName;
+
 @end
