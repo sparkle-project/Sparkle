@@ -27,6 +27,11 @@
 			// ppid is launchd (1) => parent terminated already
 			[self relaunch];
 		}
+		
+		ProcessSerialNumber psn;
+		if (GetProcessForPID(ppid, &psn) == procNotFound) {
+			[self relaunch];
+		}
 	}
 	return self;
 }
@@ -53,6 +58,7 @@ int main (int argc, const char * argv[])
 	
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
+	[NSApplication sharedApplication];
 	[[[TerminationListener alloc] initWithExecutablePath:argv[1] parentProcessId:atoi(argv[2])] autorelease];
 	[NSApp run];
 	
