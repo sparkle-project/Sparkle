@@ -26,5 +26,5 @@
 @end
 
 @interface NSObject (SUAppcastDelegate)
-- appcastDidFinishLoading:(SUAppcast *)appcast;
+- (void)appcastDidFinishLoading:(SUAppcast *)appcast;
 @end

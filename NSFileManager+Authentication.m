@@ -14,6 +14,8 @@
 #import <unistd.h>
 #import <sys/stat.h>
 #import <dirent.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 @implementation NSFileManager (SUAuthenticationAdditions)
 

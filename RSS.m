@@ -42,6 +42,12 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMA
 
 #import "RSS.h"
 
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_4
+@interface NSError (TigerPlusMethods)
+- (NSString *)localizedFailureReason;
+@end
+#endif
+
 // This comparator function is used to sort the RSS items by their published date.
 int compareNewsItems(id item1, id item2, void *context)
 {
@@ -154,8 +160,13 @@ int compareNewsItems(id item1, id item2, void *context)
 	
 	if (rssData == nil)
 	{
+    NSString *failureReason;
+    if ([error respondsToSelector:@selector(localizedFailureReason)])
+      failureReason = [error localizedFailureReason];
+    else
+      failureReason = [error localizedDescription];
 		NSException *exception = [NSException exceptionWithName: @"RSSDownloadFailed"
-														 reason: [error localizedFailureReason] userInfo: [error userInfo] ];
+														 reason: failureReason userInfo: [error userInfo] ];
 		[exception raise];
 	}
 	
@@ -664,11 +675,15 @@ int compareNewsItems(id item1, id item2, void *context)
 				else if ([name isEqualTo: @"amp"])
 					name = @"&";
 				
-				else if ([name isEqualTo: @"rsquo"])
-					name = [NSString stringWithUTF8String:"\u2019"];
+				else if ([name isEqualTo: @"rsquo"]) {
+          char rsquo[4] = { 0xe2, 0x80, 0x99, 0x0 };
+					name = [NSString stringWithUTF8String: rsquo];
+        }
 				
-				else if ([name isEqualTo: @"lsquo"])
-					name = [NSString stringWithUTF8String:"\u2018"];
+				else if ([name isEqualTo: @"lsquo"]) {
+          char lsquo[4] = { 0xe2, 0x80, 0x98, 0x0 };
+					name = [NSString stringWithUTF8String: lsquo];
+        }
 				
 				else if ([name isEqualTo: @"apos"])
 					name = @"'";				
