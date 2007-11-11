@@ -578,6 +578,7 @@
 - (IBAction)installAndRestart:sender
 {
 	NSString *currentAppPath = [[NSBundle mainBundle] bundlePath];
+	NSString *currentBundlePath = [updateBundle bundlePath];
 	NSString *newAppDownloadPath = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[[utilities unlocalizedInfoValueForKey:@"CFBundleName"] stringByAppendingPathExtension:@"app"]];
 	@try 
 	{
@@ -597,7 +598,7 @@
 		if (![utilities unlocalizedInfoValueForKey:@"CFBundleName"]) { [NSException raise:@"SUInstallException" format:@"This application has no CFBundleName! This key must be set to the application's name."]; }
 
 		// Search subdirectories for the application
-		NSString *file, *appName = [[utilities unlocalizedInfoValueForKey:@"CFBundleName"] stringByAppendingPathExtension:@"app"];
+		NSString *file, *appName = [[utilities unlocalizedInfoValueForKey:@"CFBundleName"] stringByAppendingPathExtension:[utilities hostAppExtension]];
 		NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:[downloadPath stringByDeletingLastPathComponent]];
 		while ((file = [dirEnum nextObject]))
 		{
@@ -609,13 +610,13 @@
 				newAppDownloadPath = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:file];
 				break;
 			}
-			if ([[file pathExtension] isEqualToString:@".app"]) // No point in looking in app bundles.
+			if ([[file pathExtension] isEqualToString:[utilities hostAppExtension]]) // No point in looking in app bundles.
 				[dirEnum skipDescendents];
 		}
 		
 		if (!newAppDownloadPath || ![[NSFileManager defaultManager] fileExistsAtPath:newAppDownloadPath])
 		{
-			[NSException raise:@"SUInstallException" format:@"The update archive didn't contain an application with the proper name: %@. Remember, the updated app's file name must be identical to {CFBundleString}.app", [[utilities unlocalizedInfoValueForKey:@"CFBundleName"] stringByAppendingPathExtension:@"app"]];
+			[NSException raise:@"SUInstallException" format:@"The update archive didn't contain an application with the proper name: %@. Remember, the updated app's file name must be identical to {CFBundleString}.{Extension}", [[utilities unlocalizedInfoValueForKey:@"CFBundleName"] stringByAppendingPathExtension:[utilities hostAppExtension]]];
 		}
 	}
 	@catch(NSException *e) 
@@ -629,8 +630,8 @@
 	if ([self isAutomaticallyUpdating]) // Don't do authentication if we're automatically updating; that'd be surprising.
 	{
 		int tag = 0;
-		BOOL result = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[currentAppPath stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[currentAppPath lastPathComponent]] tag:&tag];
-		result &= [[NSFileManager defaultManager] movePath:newAppDownloadPath toPath:currentAppPath handler:nil];
+		BOOL result = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[currentBundlePath stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[currentBundlePath lastPathComponent]] tag:&tag];
+		result &= [[NSFileManager defaultManager] movePath:newAppDownloadPath toPath:currentBundlePath handler:nil];
 		if (!result)
 		{
 			[self abandonUpdate];
@@ -640,7 +641,7 @@
 	else // But if we're updating by the action of the user, do an authenticated move.
 	{
 		// Outside of the @try block because we want to be a little more informative on this error.
-		if (![[NSFileManager defaultManager] movePathWithAuthentication:newAppDownloadPath toPath:currentAppPath])
+		if (![[NSFileManager defaultManager] movePathWithAuthentication:newAppDownloadPath toPath:currentBundlePath])
 		{
 			[self showUpdateErrorAlertWithInfo:[NSString stringWithFormat:SULocalizedString(@"%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help.", nil), [utilities hostAppDisplayName]]];
 			[self abandonUpdate];

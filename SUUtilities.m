@@ -105,6 +105,11 @@
 	return iconImage;
 }
 
+- (NSString *)hostAppExtension
+{
+	return [[[NSFileManager defaultManager] displayNameAtPath:[[updater updateBundle] bundlePath]] pathExtension];
+}
+
 - (SUBundleDefaults *)standardBundleDefaults
 {
 	return [[defaults retain] autorelease];

@@ -25,6 +25,7 @@
 - (NSString *)hostAppVersionString;
 - (NSString *)hostAppID;
 - (NSImage *)hostAppIcon;
+- (NSString *)hostAppExtension;
 - (SUBundleDefaults *)standardBundleDefaults;
 @end
 
