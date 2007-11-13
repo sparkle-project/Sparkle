@@ -198,7 +198,7 @@
 		61AAE8890A32203800D8810D /* zh_CN */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = zh_CN; path = zh_CN.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61AAE88A0A32203800D8810D /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/SUAutomaticUpdateAlert.nib; sourceTree = "<group>"; };
 		61AAE88B0A32203800D8810D /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_CN; path = zh_CN.lproj/SUUpdateAlert.nib; sourceTree = "<group>"; };
-		61AAE88C0A32203F00D8810D /* zh_TW */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		61AAE88C0A32203F00D8810D /* zh_TW */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61AAE88D0A32203F00D8810D /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/SUAutomaticUpdateAlert.nib; sourceTree = "<group>"; };
 		61AAE88E0A32203F00D8810D /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/SUUpdateAlert.nib; sourceTree = "<group>"; };
 		61B5F8DD09C4CE3C00B25A18 /* md5.c */ = {isa = PBXFileReference; fileEncoding = 30; includeInIndex = 0; lastKnownFileType = sourcecode.c.c; path = md5.c; sourceTree = "<group>"; };

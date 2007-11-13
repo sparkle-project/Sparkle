@@ -500,7 +500,7 @@
 	}
 	else
 	{
-		[statusController beginActionWithTitle:SULocalizedString(@"Ready to install!", nil) maxProgressValue:1 statusText:nil];
+		[statusController beginActionWithTitle:SULocalizedString(@"Ready to Install", nil) maxProgressValue:1 statusText:nil];
 		[statusController setProgressValue:1]; // fill the bar
 		[statusController setButtonTitle:SULocalizedString(@"Install and Relaunch", nil) target:self action:@selector(installAndRestart:) isDefault:YES];
 		[NSApp requestUserAttention:NSInformationalRequest];
