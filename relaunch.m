@@ -47,7 +47,7 @@
 - (void) relaunch
 {
 	[[NSWorkspace sharedWorkspace] launchApplication:[NSString stringWithUTF8String:executablePath]];	
-	[NSApp terminate:self];
+	[NSApp stop:self];
 }
 
 @end
@@ -60,9 +60,8 @@ int main (int argc, const char * argv[])
 	
 	[NSApplication sharedApplication];
 	[[[TerminationListener alloc] initWithExecutablePath:argv[1] parentProcessId:atoi(argv[2])] autorelease];
-	[NSApp run];
+	[[NSApplication sharedApplication] run];
 	
-	// This will not be executed because -[NSApp terminate:] is called
 	[pool release];
 	
 	return EXIT_SUCCESS;
