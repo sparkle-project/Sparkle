@@ -14,8 +14,6 @@
 #import <unistd.h>
 #import <sys/stat.h>
 #import <dirent.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 
 @implementation NSFileManager (SUAuthenticationAdditions)
 
@@ -52,7 +50,7 @@
 	return res;
 }
 
-- (BOOL)_movePathWithForcedAuthentication:(NSString *)src toPath:(NSString *)dst
+- (BOOL)_copyPathWithForcedAuthentication:(NSString *)src toPath:(NSString *)dst
 {
 	NSString *tmp = [[[dst stringByDeletingPathExtension] stringByAppendingString:@".old"] stringByAppendingPathExtension:[dst pathExtension]];
 	BOOL res = NO;
@@ -60,25 +58,20 @@
 	if((stat([src UTF8String], &sb) != 0) || (stat([tmp UTF8String], &sb) == 0) || stat([dst UTF8String], &sb) != 0)
 		return false;
 	
-	char* buf = NULL;
-	asprintf(&buf,
-			 "mv -f \"$DST_PATH\" \"$TMP_PATH\" && "
-			 "mv -f \"$SRC_PATH\" \"$DST_PATH\" && "
-			 "rm -rf \"$TMP_PATH\" && "
-			 "chown -R %d:%d \"$DST_PATH\"",
-			 sb.st_uid, sb.st_gid);
-	
-	if(!buf)
-		return false;
+	NSString *command = [NSString stringWithFormat:@"mv -f \"%@\" \"%@\" && cp -f -R \"%@\" \"%@\" && rm -rf \"%@\" && chown -R %d:%d \"%@\"",
+						 dst,
+						 tmp,
+						 src,
+						 dst,
+						 tmp,
+						 sb.st_uid,
+						 sb.st_gid,
+						 dst];
 	
 	AuthorizationRef auth;
 	if(AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &auth) == errAuthorizationSuccess)
 	{
-		setenv("SRC_PATH", [src UTF8String], 1);
-		setenv("DST_PATH", [dst UTF8String], 1);
-		setenv("TMP_PATH", [tmp UTF8String], 1);
-		sig_t oldSigChildHandler = signal(SIGCHLD, SIG_DFL);
-		char const* arguments[] = { "-c", buf, NULL };
+		char const* arguments[] = { "-c", [command UTF8String], NULL };
 		if(AuthorizationExecuteWithPrivileges(auth, "/bin/sh", kAuthorizationFlagDefaults, (char**)arguments, NULL) == errAuthorizationSuccess)
 		{
 			int status;
@@ -86,25 +79,24 @@
 			if(pid != -1 && WIFEXITED(status) && WEXITSTATUS(status) == 0)
 				res = YES;
 		}
-		signal(SIGCHLD, oldSigChildHandler);
 	}
 	AuthorizationFree(auth, 0);
-	free(buf);
+	
 	return res;	
 }
 
-- (BOOL)movePathWithAuthentication:(NSString *)src toPath:(NSString *)dst
+- (BOOL)copyPathWithAuthentication:(NSString *)src toPath:(NSString *)dst
 {
 	if ([[NSFileManager defaultManager] isWritableFileAtPath:dst] && [[NSFileManager defaultManager] isWritableFileAtPath:[dst stringByDeletingLastPathComponent]])
 	{
 		int tag = 0;
 		BOOL result = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[dst stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[dst lastPathComponent]] tag:&tag];
-		result &= [[NSFileManager defaultManager] movePath:src toPath:dst handler:NULL];
+		result &= [[NSFileManager defaultManager] copyPath:src toPath:dst handler:nil];
 		return result;
 	}
 	else
 	{
-		return [self _movePathWithForcedAuthentication:src toPath:dst];
+		return [self _copyPathWithForcedAuthentication:src toPath:dst];
 	}
 }
 

@@ -107,7 +107,7 @@
 
 - (NSString *)hostAppExtension
 {
-	return [[[NSFileManager defaultManager] displayNameAtPath:[[updater updateBundle] bundlePath]] pathExtension];
+	return [[[updater updateBundle] bundlePath] pathExtension];
 }
 
 - (SUBundleDefaults *)standardBundleDefaults

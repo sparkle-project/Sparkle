@@ -9,6 +9,11 @@
 #import "SUStatusController.h"
 #import "SUUtilities.h"
 
+@interface SUStatusController (Private)
+- (NSProgressIndicator *)progressBar;
+- (void)setProgressBar:(NSProgressIndicator *)theProgressBar;
+@end
+
 @implementation SUStatusController
 
 - initWithUtilities:(SUUtilities *)aUtility
@@ -33,6 +38,8 @@
 	[title release];
 	[statusText release];
 	[buttonTitle release];
+	[self setProgressBar:nil];
+
 	[super dealloc];
 }
 
@@ -40,6 +47,9 @@
 {
 	[[self window] center];
 	[[self window] setFrameAutosaveName:@"SUStatusFrame"];
+	
+	// set progress bar to threaded animation
+	[[self progressBar] setUsesThreadedAnimation:YES];
 }
 
 - (NSString *)windowTitle
@@ -119,3 +129,26 @@
 }
 
 @end
+
+@implementation SUStatusController (Private)
+
+//---------------------------------------------------------- 
+//  progressBar 
+//---------------------------------------------------------- 
+- (NSProgressIndicator *)progressBar
+{
+    return mProgressBar; 
+}
+
+- (void)setProgressBar:(NSProgressIndicator *)theProgressBar
+{
+    if (mProgressBar != theProgressBar)
+    {
+        [mProgressBar release];
+        mProgressBar = [theProgressBar retain];
+    }
+}
+
+@end
+
+

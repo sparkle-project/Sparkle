@@ -462,11 +462,15 @@
 		name = [name stringByDeletingPathExtension];
 	
 	// We create a temporary directory in /tmp and stick the file there.
-	NSString *tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:[[NSProcessInfo processInfo] globallyUniqueString]];
+	// Not using a GUID here because hdiutil for some reason chokes on GUIDs. Too long? I really have no idea.
+	NSString *tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:@"update"];
+	int cnt=1;
+	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
+		tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"update%d", cnt++]];
 	BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir attributes:nil];
 	if (!success)
 	{
-		[NSException raise:@"SUFailTmpWrite" format:@"Couldn't create temporary directory in /var/tmp"];
+		[NSException raise:@"SUFailTmpWrite" format:@"Couldn't create temporary directory at %@", tempDir];
 		[download cancel];
 		[download release];
 	}
@@ -608,7 +612,7 @@
 			if ([file isEqualToString:@"/Applications"])
 				[dirEnum skipDescendents];
 			if ([[file pathExtension] isEqualToString:[utilities hostAppExtension]] &&
-				[[file stringByDeletingPathExtension] isEqualToString:appName]) // We found one!
+				[[[file stringByDeletingPathExtension] lastPathComponent] isEqualToString:appName]) // We found one!
 			{
 				isPackage = NO;
 				newAppDownloadPath = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:file];
@@ -631,7 +635,7 @@
 		
 		if (!newAppDownloadPath || ![[NSFileManager defaultManager] fileExistsAtPath:newAppDownloadPath])
 		{
-			[NSException raise:@"SUInstallException" format:@"The update archive didn't contain an application with the proper name: %@. Remember, the updated app's file name must be identical to {CFBundleString}.{Extension}", [[utilities unlocalizedInfoValueForKey:@"CFBundleName"] stringByAppendingPathExtension:[utilities hostAppExtension]]];
+			[NSException raise:@"SUInstallException" format:@"The update archive didn't contain an application with the proper name: %@. Remember, the updated app's file name must be identical to {CFBundleName}.{Extension}", [[utilities unlocalizedInfoValueForKey:@"CFBundleName"] stringByAppendingPathExtension:[utilities hostAppExtension]]];
 		}
 	}
 	@catch(NSException *e) 
@@ -665,22 +669,21 @@
 	}
 	else // But if we're updating by the action of the user, do an authenticated move.
 	{
-		if (!isPackage)
-		{
-			// Outside of the @try block because we want to be a little more informative on this error.
-			if (![[NSFileManager defaultManager] movePathWithAuthentication:newAppDownloadPath toPath:currentBundlePath])
-			{
-				[self showUpdateErrorAlertWithInfo:[NSString stringWithFormat:SULocalizedString(@"%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help.", nil), [utilities hostAppDisplayName]]];
-				[self abandonUpdate];
-				return;
-			}
-		}
-		else
+		if (isPackage)
 		{
 			NSString *installerPath = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.installer"];
 			installerPath = [installerPath stringByAppendingString:@"/Contents/MacOS/Installer"];
 			NSTask *installer = [NSTask launchedTaskWithLaunchPath:installerPath arguments:[NSArray arrayWithObjects:newAppDownloadPath, nil]];
 			processIdentifier = [installer processIdentifier];
+		}
+		else
+		{			
+			if (![[NSFileManager defaultManager] copyPathWithAuthentication:newAppDownloadPath toPath:currentBundlePath])
+			{
+				[self showUpdateErrorAlertWithInfo:[NSString stringWithFormat:SULocalizedString(@"%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help.", nil), [utilities hostAppDisplayName]]];
+				[self abandonUpdate];
+				return;
+			}
 		}
 	}
 		
@@ -695,17 +698,24 @@
 		}
 	}
 	
+	// This is really sloppy and coupled, but gosh darn it, I'm not maintaining this codebase much longer. Sorry!
+	// If we've got a DMG, we've mounted it; now we've got to unmount it.
+	if ([[[downloadPath pathExtension] lowercaseString] isEqualToString:@"dmg"])
+	{
+		[NSTask launchedTaskWithLaunchPath:@"/usr/bin/hdiutil" arguments:[NSArray arrayWithObjects:@"detach", [newAppDownloadPath stringByDeletingLastPathComponent], @"-force", nil]];	
+	}
+	
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
 
 	NSString *relaunchPath = [[[NSBundle bundleForClass:[self class]] executablePath] stringByDeletingLastPathComponent];
-	if (!relaunchPath) // slight hack to resolve issues with running with in configurations
+	if (!relaunchPath) // slight hack to resolve issues with running within bundles
 	{
 		NSString *frameworkPath = [[[NSBundle mainBundle] sharedFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
 		NSBundle *framework = [NSBundle bundleWithPath:frameworkPath];
 		relaunchPath = [[framework executablePath] stringByDeletingLastPathComponent];
 	}
 	relaunchPath = [relaunchPath stringByAppendingPathComponent:@"relaunch.app/Contents/MacOS/relaunch"];
-	
+
 	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:currentAppPath, [NSString stringWithFormat:@"%d", processIdentifier], nil]];
 	[NSApp terminate:self];
 }

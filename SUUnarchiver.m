@@ -7,7 +7,8 @@
 //
 
 #import "SUUnarchiver.h"
-
+#import <Carbon/Carbon.h>
+#import "NTSynchronousTask.h"
 
 @implementation SUUnarchiver
 
@@ -23,7 +24,6 @@
 	
 	long current = 0;
 	FILE *fp, *cmdFP;
-	sig_t oldSigPipeHandler = signal(SIGPIPE, SIG_IGN);
 	if ((fp = fopen([archivePath UTF8String], "r")))
 	{
 		setenv("DESTINATION", [[archivePath stringByDeletingLastPathComponent] UTF8String], 1);
@@ -48,7 +48,7 @@
 		}
 		fclose(fp);
 	}	
-	signal(SIGPIPE, oldSigPipeHandler);
+
 	return YES;
 }
 
@@ -73,19 +73,28 @@
 }
 
 - (BOOL)_extractDMG:(NSString *)archivePath
-{
-	sig_t oldSigChildHandler = signal(SIGCHLD, SIG_DFL);
-	// First, we internet-enable the volume.
-	NSTask *hdiTask = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/env" arguments:[NSArray arrayWithObjects:@"hdiutil", @"internet-enable", @"-quiet", archivePath, nil]];
-	[hdiTask waitUntilExit];
-	if ([hdiTask terminationStatus] != 0) { return NO; }
+{		
+	// get a unique mount point path
+	NSString *mountPoint = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"mp"];
+	int cnt=1;
+	while ([[NSFileManager defaultManager] fileExistsAtPath:mountPoint] && cnt <= 999)
+		mountPoint = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"mp%d", cnt++]];
 	
-	// Now, open the volume; it'll extract into its own directory.
-	hdiTask = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/env" arguments:[NSArray arrayWithObjects:@"hdiutil", @"attach", @"-idme", @"-noidmereveal", @"-noidmetrash", @"-noverify", @"-nobrowse", @"-noautoopen", @"-quiet", archivePath, nil]];
-	[hdiTask waitUntilExit];
-	if ([hdiTask terminationStatus] != 0) { return NO; }
-	
-	signal(SIGCHLD, oldSigChildHandler);
+	if (![[NSFileManager defaultManager] fileExistsAtPath:mountPoint])
+	{		
+		// create mount point folder
+		[[NSFileManager defaultManager] createDirectoryAtPath:mountPoint attributes:nil];
+		
+		if ([[NSFileManager defaultManager] fileExistsAtPath:mountPoint])
+		{
+			NSArray* arguments = [NSArray arrayWithObjects:@"attach", archivePath, @"-mountpoint", mountPoint, @"-noverify", @"-nobrowse", @"-noautoopen", nil];
+			// set up a pipe and push "yes" (y works too), this will accept any license agreement crap
+			// not every .dmg needs this, but this will make sure it works with everyone
+			NSData* yesData = [[[NSData alloc] initWithBytes:"yes\n" length:4] autorelease];
+			
+			[NTSynchronousTask task:@"/usr/bin/hdiutil" directory:@"/" withArgs:arguments input:yesData];
+		}
+	}
 	
 	return YES;
 }
@@ -98,12 +107,26 @@
 	// The methods take the path of the archive to extract. They return a BOOL indicating whether
 	// we should continue with the update; returns NO if an error occurred.
 	NSDictionary *commandDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-																   @"_extractTBZ:", @"tbz",
-																   @"_extractTGZ:", @"tgz",
-																   @"_extractTAR:", @"tar", 
-																   @"_extractZIP:", @"zip", 
-																   @"_extractDMG:", @"dmg", nil];
-	SEL command = NSSelectorFromString([commandDictionary objectForKey:[path pathExtension]]);
+																   @"_extractTBZ:", @".tbz",
+																   @"_extractTBZ:", @".tar.bz2",
+																   @"_extractTGZ:", @".tgz",
+																   @"_extractTGZ:", @".tar.gz",
+																   @"_extractTAR:", @".tar", 
+																   @"_extractZIP:", @".zip", 
+																   @"_extractDMG:", @".dmg",
+																   nil];
+	SEL command = NULL;
+	NSString *theLastPathComponent = [[path lastPathComponent] lowercaseString];
+	NSEnumerator *theEnumerator = [[commandDictionary allKeys] objectEnumerator];
+	NSString *theExtension = NULL;
+	while ((theExtension = [theEnumerator nextObject]) != NULL)
+		{
+		if ([[theLastPathComponent substringFromIndex:[theLastPathComponent length] - [theExtension length]] isEqualToString:theExtension])
+			{
+			command = NSSelectorFromString([commandDictionary objectForKey:theExtension]);
+			break;
+			}
+		}
 	
 	BOOL result;
 	if (command)

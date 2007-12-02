@@ -14,6 +14,7 @@
 	double progressValue, maxProgressValue;
 	NSString *title, *statusText, *buttonTitle;
 	IBOutlet NSButton *actionButton;
+	IBOutlet NSProgressIndicator* mProgressBar;
 }
 
 - initWithUtilities:(SUUtilities *)aUtility;
