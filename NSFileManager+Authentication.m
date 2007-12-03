@@ -13,6 +13,7 @@
 
 #import <unistd.h>
 #import <sys/stat.h>
+#import <sys/wait.h>
 #import <dirent.h>
 
 @implementation NSFileManager (SUAuthenticationAdditions)
