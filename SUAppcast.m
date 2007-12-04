@@ -53,12 +53,12 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	
-	RSS *feed;
+	RSS *feed = [RSS alloc];
 	@try
 	{
 		NSString *userAgent = [NSString stringWithFormat: @"%@/%@ (Mac OS X) Sparkle/1.1", [utilities hostAppName], [utilities hostAppVersion]];
 		
-		feed = [[RSS alloc] initWithURL:url normalize:YES userAgent:userAgent];
+		feed = [feed initWithURL:url normalize:YES userAgent:userAgent];
 		if (!feed)
 			[NSException raise:@"SUFeedException" format:@"Couldn't fetch feed from server."];
 		
@@ -70,7 +70,6 @@
 			[tempItems addObject:[[[SUAppcastItem alloc] initWithDictionary:current] autorelease]];
 		}
 		items = [[NSArray arrayWithArray:tempItems] retain];
-		[feed release];
 		
 		if ([delegate respondsToSelector:@selector(appcastDidFinishLoading:)])
 			[delegate performSelectorOnMainThread:@selector(appcastDidFinishLoading:) withObject:self waitUntilDone:NO];
@@ -83,6 +82,7 @@
 	}
 	@finally
 	{
+		[feed release];
 		[pool release];	
 	}
 }
