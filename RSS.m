@@ -317,7 +317,14 @@ int compareNewsItems(id item1, id item2, void *context)
 				id keyEnumerator = [(NSDictionary *)websiteInfo->attributes keyEnumerator], current;
 				while ((current = [keyEnumerator nextObject]))
 				{
-					[enclosureDictionary setObject:[(NSDictionary *)websiteInfo->attributes objectForKey:current] forKey:current];
+					NSString *escapedAttributeValue = [(NSDictionary *)websiteInfo->attributes objectForKey:current];
+					CFStringRef attributeValue = CFXMLCreateStringByUnescapingEntities(kCFAllocatorDefault, (CFStringRef)escapedAttributeValue, NULL);
+					if (attributeValue)
+					{
+						// Do a stringWithString dance rather than just casting so that it's GC safe without using the 10.4+ CFMakeCollectable.
+						[enclosureDictionary setObject:[NSString stringWithString:(NSString *)attributeValue] forKey:current];
+						CFRelease(attributeValue);
+					}
 				}
 				[itemDictionaryMutable setObject: enclosureDictionary forKey: itemName];
 				continue;
