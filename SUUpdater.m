@@ -583,7 +583,7 @@
 {
 	NSString *currentAppPath = [[NSBundle mainBundle] bundlePath];
 	NSString *currentBundlePath = [updateBundle bundlePath];
-	NSString *newAppDownloadPath;// = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[[utilities unlocalizedInfoValueForKey:@"CFBundleName"] stringByAppendingPathExtension:@"app"]];
+	NSString *newAppDownloadPath;
 	BOOL isPackage = NO;
 	int processIdentifier = [[NSProcessInfo processInfo] processIdentifier];
 	@try 
