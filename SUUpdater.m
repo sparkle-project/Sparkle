@@ -110,7 +110,7 @@
 	{
 		NSTimeInterval interval = [self storedCheckInterval];
 		NSDate *lastCheck = [[utilities standardBundleDefaults] objectForKey:SULastCheckTimeKey];
-		if (!lastCheck) { lastCheck = [NSDate date]; }
+		if (!lastCheck) { lastCheck = [NSDate distantPast]; }
 		NSTimeInterval intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheck];
 		if (intervalSinceCheck < interval)
 		{
