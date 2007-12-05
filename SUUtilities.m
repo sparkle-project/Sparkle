@@ -133,7 +133,7 @@ int SUGetCharType(NSString *character)
 {
     if ([character isEqualToString:@"."]) {
         return kPeriodType;
-    } else if ([character isEqualToString:@"0"] || [character intValue] != 0) {
+    } else if ([[NSCharacterSet decimalDigitCharacterSet] characterIsMember:[character characterAtIndex:0]]) {
         return kNumberType;
     } else {
         return kStringType;
