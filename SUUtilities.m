@@ -9,7 +9,7 @@
 #import "SUUtilities.h"
 #import "SUUpdater.h"
 #import "SUBundleDefaults.h"
-
+#import "NSWorkspace_RBAdditions.h"
 
 @implementation SUUtilities
 
@@ -63,6 +63,11 @@
 	return [self infoValueForKey:@"CFBundleVersion"];
 }
 
+- (NSString *)hostAppPath
+{
+	return [[updater updateBundle] bundlePath] ;
+}
+
 - (NSString *)hostAppVersionString
 {
 	NSString *shortVersionString = [self infoValueForKey:@"CFBundleShortVersionString"];
@@ -113,6 +118,11 @@
 - (SUBundleDefaults *)standardBundleDefaults
 {
 	return [[defaults retain] autorelease];
+}
+
+- (BOOL)isRunningFromDiskImage
+{	
+	return [[[NSWorkspace sharedWorkspace] propertiesForPath:[self hostAppPath]] objectForKey:NSWorkspace_RBimagefilepath] != nil;
 }
 
 @end

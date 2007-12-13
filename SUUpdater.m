@@ -212,7 +212,14 @@
 {	
 	if ([[utilities standardBundleDefaults] boolForKey:SUIgnoreChecksKey])
 		return;
-
+	
+	if ([utilities isRunningFromDiskImage])
+	{
+		if (verbosity)
+			[self showUpdateErrorAlertWithInfo:[NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated when it's running from a disk image. Move %1$@ to your Applications folder, relaunch it, and try again.", nil), [utilities hostAppName]]];
+		return;
+	}
+	
 	if (updateInProgress)
 	{
 		if (verbosity)
@@ -578,10 +585,10 @@
 	NSLog(@"Download error: %@", [error localizedDescription]);
 	[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred while trying to download the file. Please try again later.", nil)];
 }
-
+	 
 - (IBAction)installAndRestart:sender
 {
-	NSString *currentAppPath = [[NSBundle mainBundle] bundlePath];
+	NSString *currentAppPath = [utilities hostAppPath];
 	NSString *currentBundlePath = [updateBundle bundlePath];
 	NSString *newAppDownloadPath = nil;
 	BOOL isPackage = NO;

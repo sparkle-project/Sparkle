@@ -25,7 +25,9 @@
 - (NSString *)hostAppVersionString;
 - (NSString *)hostAppID;
 - (NSImage *)hostAppIcon;
+- (NSString *)hostAppPath;
 - (NSString *)hostAppExtension;
+- (BOOL)isRunningFromDiskImage;
 - (SUBundleDefaults *)standardBundleDefaults;
 @end
 
