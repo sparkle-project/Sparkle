@@ -19,7 +19,7 @@
 #import <openssl/rsa.h>
 #import <openssl/sha.h>
 
-int b64decode(unsigned char* str)
+long b64decode(unsigned char* str)
 {
     unsigned char *cur, *start;
     int d, dlast, phase;
@@ -83,7 +83,7 @@ EVP_PKEY* load_dsa_key(char *key)
 {
 	EVP_PKEY* pkey = NULL;
 	BIO *bio;
-	if((bio = BIO_new_mem_buf(key, strlen(key))))
+	if((bio = BIO_new_mem_buf(key, (int)strlen(key))))
 	{
 		DSA* dsa_key = 0;
 		if(PEM_read_bio_DSA_PUBKEY(bio, &dsa_key, NULL, NULL))
@@ -112,7 +112,7 @@ EVP_PKEY* load_dsa_key(char *key)
 	
 	md5_state_t md5_state;
 	md5_init(&md5_state);
-	md5_append(&md5_state, [data bytes], [data length]);
+	md5_append(&md5_state, [data bytes], (int)[data length]);
 	unsigned char digest[16];
 	md5_finish(&md5_state, digest);
 	
@@ -161,7 +161,7 @@ EVP_PKEY* load_dsa_key(char *key)
 	if(EVP_VerifyInit(&ctx, EVP_dss1()) == 1) // We're using DSA keys.
 	{
 		EVP_VerifyUpdate(&ctx, md, SHA_DIGEST_LENGTH);
-		result = (EVP_VerifyFinal(&ctx, signature, length, pkey) == 1);
+		result = (EVP_VerifyFinal(&ctx, signature, (unsigned int)length, pkey) == 1);
 	}
 	
 	EVP_PKEY_free(pkey);

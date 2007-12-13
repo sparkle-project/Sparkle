@@ -49,7 +49,7 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMA
 #endif
 
 // This comparator function is used to sort the RSS items by their published date.
-int compareNewsItems(id item1, id item2, void *context)
+NSComparisonResult compareNewsItems(id item1, id item2, void *context)
 {
 	// We compare item2 with item1 instead of the other way 'round because we want descending, not ascending. Bit of a hack.
 	return [(NSDate *)[NSDate dateWithNaturalLanguageString:[item2 objectForKey:@"pubDate"]] compare:(NSDate *)[NSDate dateWithNaturalLanguageString:[item1 objectForKey:@"pubDate"]]];
@@ -211,7 +211,7 @@ int compareNewsItems(id item1, id item2, void *context)
 	
 	CFXMLTreeRef channelTree, childTree;
 	CFXMLNodeRef childNode;
-	int childCount, i;
+	CFIndex childCount, i;
 	NSString *childName;
 	NSMutableDictionary *headerItemsMutable;
 	
@@ -259,7 +259,7 @@ int compareNewsItems(id item1, id item2, void *context)
 	CFXMLNodeRef childNode, itemNode;
 	NSString *childName;
 	NSString *itemName, *itemValue;
-	int childCount, itemChildCount, i, j;
+	CFIndex childCount, itemChildCount, i, j;
 	NSMutableDictionary *itemDictionaryMutable;
 	NSMutableArray *itemsArrayMutable;
 	
@@ -374,8 +374,8 @@ int compareNewsItems(id item1, id item2, void *context)
 
 - (void) flattenimagechildren: (CFXMLTreeRef) tree into: (NSMutableDictionary *) dictionary {
 	
-	int childCount = CFTreeGetChildCount (tree);
-	int i = 0;
+	CFIndex childCount = CFTreeGetChildCount (tree);
+	CFIndex i = 0;
 	CFXMLTreeRef childTree;
 	CFXMLNodeRef childNode;
 	NSString *childName, *childValue, *keyName;
@@ -450,7 +450,7 @@ int compareNewsItems(id item1, id item2, void *context)
 
 - (CFXMLTreeRef) getnamedtree: (CFXMLTreeRef) currentTree name: (NSString *) name {
 	
-	int childCount, i;
+	CFIndex childCount, i;
 	CFXMLNodeRef xmlNode;
 	CFXMLTreeRef xmlTreeNode;
 	NSString *itemName;
@@ -614,7 +614,7 @@ int compareNewsItems(id item1, id item2, void *context)
 			
 			if ([stringComponents count] > 1) {
 			
-				int len;
+				size_t len;
 				
 				tempcstring = [title UTF8String];
 				
@@ -649,7 +649,7 @@ int compareNewsItems(id item1, id item2, void *context)
 	
 	CFXMLNodeRef node;
 	CFXMLTreeRef itemTree;
-	int childCount, ix;
+	CFIndex childCount, ix;
 	NSMutableString *valueMutable;
 	NSString *value;
 	NSString *name;

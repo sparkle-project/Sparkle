@@ -69,12 +69,12 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMA
 	} /*trimWhiteSpace*/
 
 
-- (NSString *) ellipsizeAfterNWords: (int) n {
+- (NSString *) ellipsizeAfterNWords: (NSInteger) n {
 	
 	NSArray *stringComponents = [self componentsSeparatedByString: @" "];
 	NSMutableArray *componentsCopy = [stringComponents mutableCopy];
-	int ix = n;
-	int len = [componentsCopy count];
+	NSInteger ix = n;
+	NSInteger len = [componentsCopy count];
 	
 	if (len < n)
 		ix = len;
@@ -87,9 +87,9 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMA
 
 - (NSString *) stripHTML {
 	
-	int len = [self length];
+	NSInteger len = [self length];
 	NSMutableString *s = [NSMutableString stringWithCapacity: len];
-	int i = 0, level = 0;
+	NSInteger i = 0, level = 0;
 	
 	for (i = 0; i < len; i++) {
 		

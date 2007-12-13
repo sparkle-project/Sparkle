@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 44;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -874,12 +874,20 @@
 				ARCHS = (
 					i386,
 					ppc,
+					ppc64,
+					x86_64,
 				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				"MACOSX_DEPLOYMENT_TARGET[arch=i386]" = 10.4;
+				"MACOSX_DEPLOYMENT_TARGET[arch=ppc]" = 10.3;
+				OTHER_CFLAGS = "-fsingle-precision-constant";
 				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				"SDKROOT[arch=i386]" = /Developer/SDKs/MacOSX10.4u.sdk;
+				"SDKROOT[arch=ppc]" = /Developer/SDKs/MacOSX10.4u.sdk;
 				WARNING_CFLAGS = "-wall";
 			};
 			name = Debug;
@@ -890,12 +898,20 @@
 				ARCHS = (
 					i386,
 					ppc,
+					ppc64,
+					x86_64,
 				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				"MACOSX_DEPLOYMENT_TARGET[arch=i386]" = 10.4;
+				"MACOSX_DEPLOYMENT_TARGET[arch=ppc]" = 10.3;
+				OTHER_CFLAGS = "-fsingle-precision-constant";
 				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				"SDKROOT[arch=i386]" = /Developer/SDKs/MacOSX10.4u.sdk;
+				"SDKROOT[arch=ppc]" = /Developer/SDKs/MacOSX10.4u.sdk;
 				WARNING_CFLAGS = "-wall";
 			};
 			name = Release;

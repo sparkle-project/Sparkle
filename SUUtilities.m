@@ -144,7 +144,7 @@ NSArray *SUSplitVersionString(NSString *version)
 {
     NSString *character;
     NSMutableString *s;
-    int i, n, oldType, newType;
+    NSInteger i, n, oldType, newType;
     NSMutableArray *parts = [NSMutableArray array];
     if ([version length] == 0) {
         // Nothing to do here
@@ -180,7 +180,7 @@ NSComparisonResult SUStandardVersionComparison(NSString *versionA, NSString *ver
     NSArray *partsB = SUSplitVersionString(versionB);
     
     NSString *partA, *partB;
-    int i, n, typeA, typeB, intA, intB;
+    NSInteger i, n, typeA, typeB, intA, intB;
     
     n = MIN([partsA count], [partsB count]);
     for (i = 0; i < n; ++i) {

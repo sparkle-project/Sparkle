@@ -24,10 +24,10 @@
 	
 	long current = 0;
 	FILE *fp, *cmdFP;
-	if ((fp = fopen([archivePath UTF8String], "r")))
+	if ((fp = fopen([archivePath fileSystemRepresentation], "r")))
 	{
 		setenv("DESTINATION", [[archivePath stringByDeletingLastPathComponent] UTF8String], 1);
-		if ((cmdFP = popen([command cString], "w")))
+		if ((cmdFP = popen([command fileSystemRepresentation], "w")))
 		{
 			char buf[32*1024];
 			long len;

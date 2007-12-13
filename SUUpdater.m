@@ -116,7 +116,7 @@
 		{
 			// Hasn't been long enough; schedule a check for the future.
 			[self performSelector:@selector(checkForUpdatesInBackground) withObject:nil afterDelay:(interval-intervalSinceCheck)];
-			[self performSelector:@selector(scheduleCheckWithIntervalObject:) withObject:[NSNumber numberWithLong:interval] afterDelay:(interval-intervalSinceCheck)];
+			[self performSelector:@selector(scheduleCheckWithIntervalObject:) withObject:[NSNumber numberWithDouble:interval] afterDelay:(interval-intervalSinceCheck)];
 		}
 		else
 		{
@@ -583,7 +583,7 @@
 {
 	NSString *currentAppPath = [[NSBundle mainBundle] bundlePath];
 	NSString *currentBundlePath = [updateBundle bundlePath];
-	NSString *newAppDownloadPath;
+	NSString *newAppDownloadPath = nil;
 	BOOL isPackage = NO;
 	int processIdentifier = [[NSProcessInfo processInfo] processIdentifier];
 	@try 
@@ -650,7 +650,7 @@
 	{
 		if (!isPackage)
 		{
-			int tag = 0;
+			NSInteger tag = 0;
 			BOOL result = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[currentBundlePath stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[currentBundlePath lastPathComponent]] tag:&tag];
 			result &= [[NSFileManager defaultManager] movePath:newAppDownloadPath toPath:currentBundlePath handler:nil];
 			if (!result)
