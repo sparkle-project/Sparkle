@@ -56,7 +56,7 @@
 	RSS *feed = [RSS alloc];
 	@try
 	{
-		NSString *userAgent = [NSString stringWithFormat: @"%@/%@ (Mac OS X) Sparkle/1.1", [utilities hostAppName], [utilities hostAppVersion]];
+		NSString *userAgent = [NSString stringWithFormat: @"%@/%@ (Mac OS X) Sparkle/1.5b1", [utilities hostAppName], [utilities hostAppVersion]];
 		
 		feed = [feed initWithURL:url normalize:YES userAgent:userAgent];
 		if (!feed)

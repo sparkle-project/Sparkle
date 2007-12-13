@@ -236,7 +236,7 @@
 		appcastString = [utilities infoValueForKey:SUFeedURLKey];
 	if (!appcastString) { [NSException raise:@"SUNoFeedURL" format:@"No feed URL is specified in the Info.plist or the user defaults!"]; }
 	
-	SUAppcast *appcast = [[SUAppcast alloc] init];
+	SUAppcast *appcast = [[SUAppcast alloc] initWithUtilities:utilities];
 	[appcast setDelegate:self];
 	[appcast fetchAppcastFromURL:[NSURL URLWithString:appcastString]];
 }
