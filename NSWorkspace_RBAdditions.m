@@ -106,7 +106,8 @@ static NSString* CheckParents(io_object_t thing,NSString* part,NSMutableDictiona
 			if ((value = [props objectForKey:@"USB Vendor Name"])) {
 				result = AddPart(result,value);
 			}
-			NSString* cls = [(NSString*)IOObjectCopyClass(nextParent) autorelease];
+			io_name_t ts;  // char[128]
+			NSString* cls = ( IOObjectGetClass (nextParent, ts) == KERN_SUCCESS ) ? [NSString stringWithCString:ts ] : nil;
 			if (![cls isEqualToString:@"IOPCIDevice"]) {
 			
 // Uncomment the following line to have the device tree dumped to the console.
