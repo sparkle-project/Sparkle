@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#define SULocalizedString(key,comment) [SUUtilities localizedStringForKey:key withComment:comment]
 
 @class SUUpdater, SUBundleDefaults;
 @interface SUUtilities : NSObject {
@@ -34,4 +35,4 @@
 NSComparisonResult SUStandardVersionComparison(NSString * versionA, NSString * versionB);
 
 // If running make localizable-strings for genstrings, ignore the error on this line.
-NSString *SULocalizedString(NSString *key, NSString *comment);
+//NSString *SULocalizedString(NSString *key, NSString *comment);

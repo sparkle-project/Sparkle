@@ -127,10 +127,6 @@
 
 @end
 
-NSString *SULocalizedString(NSString *key, NSString *comment) {
-	return [SUUtilities localizedStringForKey:key withComment:comment];
-}
-
 enum {
     kNumberType,
     kStringType,
