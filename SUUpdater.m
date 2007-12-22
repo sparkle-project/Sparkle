@@ -489,9 +489,6 @@
 
 - (IBAction)installAndRestart:sender
 {
-	NSString *newAppDownloadPath = nil;
-	BOOL isPackage = NO;
-
 	[statusController beginActionWithTitle:SULocalizedString(@"Installing update...", nil) maxProgressValue:0 statusText:nil];
 	[statusController setButtonEnabled:NO];
 	
@@ -501,30 +498,31 @@
 		[NSApp sendEvent:event];	
 
 	// Search subdirectories for the application
-	NSString *file, *bundleFileName = [[hostBundle bundlePath] lastPathComponent];
+	NSString *currentFile, *newAppDownloadPath, *bundleFileName = [[hostBundle bundlePath] lastPathComponent];
+	BOOL isPackage = NO;
 	NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:[downloadPath stringByDeletingLastPathComponent]];
-	while ((file = [dirEnum nextObject]))
+	while ((currentFile = [dirEnum nextObject]))
 	{
 		// Some DMGs have symlinks into /Applications! That's no good! And there's no point in looking in bundles.
-		if ([file isEqualToString:@"/Applications"] ||
-			[[file pathExtension] isEqualToString:[[hostBundle bundlePath] pathExtension]] ||
-			[[file pathExtension] isEqualToString:@"pkg"] ||
-			[[file pathExtension] isEqualToString:@"mpkg"])
+		if ([currentFile isEqualToString:@"/Applications"] ||
+			[[currentFile pathExtension] isEqualToString:[[hostBundle bundlePath] pathExtension]] ||
+			[[currentFile pathExtension] isEqualToString:@"pkg"] ||
+			[[currentFile pathExtension] isEqualToString:@"mpkg"])
 		{
 			[dirEnum skipDescendents];
 		}
 		
-		if ([[file lastPathComponent] isEqualToString:bundleFileName]) // We found one!
+		if ([[currentFile lastPathComponent] isEqualToString:bundleFileName]) // We found one!
 		{
 			isPackage = NO;
-			newAppDownloadPath = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:file];
+			newAppDownloadPath = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:currentFile];
 			break;
 		}
-		else if (([[file pathExtension] isEqualToString:@"pkg"] || [[file pathExtension] isEqualToString:@"mpkg"]) &&
-				 [[file stringByDeletingPathExtension] isEqualToString:[[[hostBundle bundlePath] lastPathComponent] stringByDeletingPathExtension]])
+		else if (([[currentFile pathExtension] isEqualToString:@"pkg"] || [[currentFile pathExtension] isEqualToString:@"mpkg"]) &&
+				  [[[currentFile lastPathComponent] stringByDeletingPathExtension] isEqualToString:[bundleFileName stringByDeletingPathExtension]])
 		{
 			isPackage = YES;
-			newAppDownloadPath = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:file];
+			newAppDownloadPath = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:currentFile];
 			break;
 		}
 	}
@@ -538,6 +536,20 @@
 	}
 	
 	// Now that we've found the path we care about, let's install it.
+	
+	// But before we do that, we need to copy out relaunch.app so we can run it later.
+	NSString *relaunchPath = [[[NSBundle bundleForClass:[self class]] executablePath] stringByDeletingLastPathComponent];
+	if (!relaunchPath) // Slight hack to resolve issues with running within bundles
+	{
+		NSString *frameworkPath = [[[NSBundle mainBundle] sharedFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
+		NSBundle *framework = [NSBundle bundleWithPath:frameworkPath];
+		relaunchPath = [[framework executablePath] stringByDeletingLastPathComponent];
+	}
+	relaunchPath = [relaunchPath stringByAppendingPathComponent:@"relaunch.app/Contents/MacOS/relaunch"];
+	NSString *newRelaunchPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"relaunch"];
+	[[NSFileManager defaultManager] copyPath:relaunchPath toPath:newRelaunchPath handler:nil];
+	
+	// Alright, *now* we can actually install the new version.
 	int processIdentifierToWatch = [[NSProcessInfo processInfo] processIdentifier];
 	if (isPackage)
 	{
@@ -577,17 +589,8 @@
 	}
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-	
-	NSString *relaunchPath = [[[NSBundle bundleForClass:[self class]] executablePath] stringByDeletingLastPathComponent];
-	if (!relaunchPath) // slight hack to resolve issues with running within bundles
-	{
-		NSString *frameworkPath = [[[NSBundle mainBundle] sharedFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
-		NSBundle *framework = [NSBundle bundleWithPath:frameworkPath];
-		relaunchPath = [[framework executablePath] stringByDeletingLastPathComponent];
-	}
-	relaunchPath = [relaunchPath stringByAppendingPathComponent:@"relaunch.app/Contents/MacOS/relaunch"];
-	
-	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", processIdentifierToWatch], nil]];
+		
+	[NSTask launchedTaskWithLaunchPath:newRelaunchPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", processIdentifierToWatch], nil]];
 	[NSApp terminate:self];
 }
 
