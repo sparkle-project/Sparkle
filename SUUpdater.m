@@ -222,15 +222,9 @@
 
 - (BOOL)newVersionAvailable
 {
-	// First, we have to make sure that the newest version can run on the user's system.
-	// Apple recommends using SystemVersion.plist instead of Gestalt() here, don't ask me why.
-	// This code *should* use NSSearchPathForDirectoriesInDomains(NSCoreServiceDirectory, NSSystemDomainMask, YES)
-	// but that returns /Library/CoreServices for some reason
-	NSString *versionPlistPath = @"/System/Library/CoreServices/SystemVersion.plist";
-	// This returns a version string of the form X.Y.Z
-	NSString *systemVersionString = [[NSDictionary dictionaryWithContentsOfFile:versionPlistPath] objectForKey:@"ProductVersion"];
+	// We also have to make sure that the newest version can run on the user's system.
 	id <SUVersionComparison> comparator = [SUStandardVersionComparator defaultComparator];
-	BOOL canRunOnCurrentSystem = ([comparator compareVersion:[updateItem minimumSystemVersion] toVersion:systemVersionString] != NSOrderedDescending);
+	BOOL canRunOnCurrentSystem = ([comparator compareVersion:[updateItem minimumSystemVersion] toVersion:SUSystemVersionString()] != NSOrderedDescending);
 	return (canRunOnCurrentSystem && ([comparator compareVersion:[hostBundle version] toVersion:[updateItem fileVersion]]) == NSOrderedAscending);
 }
 
