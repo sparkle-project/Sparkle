@@ -21,7 +21,6 @@
 
 #import "NSFileManager+Authentication.h"
 #import "NSFileManager+Verification.h"
-#import "NSApplication+AppCopies.h"
 
 #import <stdio.h>
 #import <sys/stat.h>

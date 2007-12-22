@@ -20,8 +20,6 @@
 		61299A2F09CA2DAB00B7442F /* NSFileManager+Verification.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A2D09CA2DAB00B7442F /* NSFileManager+Verification.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		61299A3009CA2DAB00B7442F /* NSFileManager+Verification.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A2E09CA2DAB00B7442F /* NSFileManager+Verification.m */; };
 		61299A4A09CA2DD000B7442F /* NSFileManager+Authentication.h in Headers */ = {isa = PBXBuildFile; fileRef = 6129984309C9E2DA00B7442F /* NSFileManager+Authentication.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		61299A4B09CA2DD100B7442F /* NSApplication+AppCopies.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A1209C9E4FC00B7442F /* NSApplication+AppCopies.m */; };
-		61299A4C09CA2DD200B7442F /* NSApplication+AppCopies.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A1109C9E4FC00B7442F /* NSApplication+AppCopies.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		61299A5C09CA6D4500B7442F /* SUConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A5B09CA6D4500B7442F /* SUConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		61299A6009CA6EB100B7442F /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
 		61299A8D09CA790200B7442F /* SUUnarchiver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A8B09CA790200B7442F /* SUUnarchiver.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -123,8 +121,6 @@
 		6120721009CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUAutomaticUpdateAlert.h; sourceTree = "<group>"; };
 		6120721109CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUAutomaticUpdateAlert.m; sourceTree = "<group>"; };
 		6129984309C9E2DA00B7442F /* NSFileManager+Authentication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+Authentication.h"; sourceTree = "<group>"; };
-		61299A1109C9E4FC00B7442F /* NSApplication+AppCopies.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSApplication+AppCopies.h"; sourceTree = "<group>"; };
-		61299A1209C9E4FC00B7442F /* NSApplication+AppCopies.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSApplication+AppCopies.m"; sourceTree = "<group>"; };
 		61299A2D09CA2DAB00B7442F /* NSFileManager+Verification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+Verification.h"; sourceTree = "<group>"; };
 		61299A2E09CA2DAB00B7442F /* NSFileManager+Verification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+Verification.m"; sourceTree = "<group>"; };
 		61299A5B09CA6D4500B7442F /* SUConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUConstants.h; sourceTree = "<group>"; };
@@ -377,8 +373,6 @@
 		61299B3809CB053D00B7442F /* Cocoa Categories */ = {
 			isa = PBXGroup;
 			children = (
-				61299A1109C9E4FC00B7442F /* NSApplication+AppCopies.h */,
-				61299A1209C9E4FC00B7442F /* NSApplication+AppCopies.m */,
 				6129984309C9E2DA00B7442F /* NSFileManager+Authentication.h */,
 				61B5F8E509C4CE3C00B25A18 /* NSFileManager+Authentication.m */,
 				61299A2D09CA2DAB00B7442F /* NSFileManager+Verification.h */,
@@ -467,7 +461,6 @@
 				6196CFF909C72148000DC222 /* SUStatusController.h in Headers */,
 				61299A2F09CA2DAB00B7442F /* NSFileManager+Verification.h in Headers */,
 				61299A4A09CA2DD000B7442F /* NSFileManager+Authentication.h in Headers */,
-				61299A4C09CA2DD200B7442F /* NSApplication+AppCopies.h in Headers */,
 				61299A5C09CA6D4500B7442F /* SUConstants.h in Headers */,
 				61299A8D09CA790200B7442F /* SUUnarchiver.h in Headers */,
 				61299B3609CB04E000B7442F /* Sparkle.h in Headers */,
@@ -665,7 +658,6 @@
 				61B5FCDE09C52A9F00B25A18 /* SUUpdateAlert.m in Sources */,
 				6196CFFA09C72149000DC222 /* SUStatusController.m in Sources */,
 				61299A3009CA2DAB00B7442F /* NSFileManager+Verification.m in Sources */,
-				61299A4B09CA2DD100B7442F /* NSApplication+AppCopies.m in Sources */,
 				61299A6009CA6EB100B7442F /* SUConstants.m in Sources */,
 				61299A8E09CA790200B7442F /* SUUnarchiver.m in Sources */,
 				6120721309CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.m in Sources */,
