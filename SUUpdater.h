@@ -27,10 +27,8 @@
 	NSTimer *checkTimer;
 	NSTimeInterval checkInterval;	
 	
-	BOOL verbose;
+	BOOL userInitiated;
 	BOOL updateInProgress;
-	
-	NSString *currentSystemVersion;
 	
 	NSBundle *hostBundle;
 }
@@ -47,8 +45,7 @@
 // want to call to update programmatically; only use checkForUpdates: with buttons and menu items.
 - (void)checkForUpdatesInBackground;
 
-// This method allows you to schedule a check to run every time interval. You can
-// pass 0 to this method to cancel a previously scheduled timer. You probably don't want
+// This method allows you to schedule a check to run every time interval. You probably don't want
 // to call this directly: if you set a SUScheduledCheckInterval key in Info.plist or
 // the user defaults, Sparkle will set this up for you automatically on startup. You might
 // just want to call this every time the user changes the setting in the preferences.

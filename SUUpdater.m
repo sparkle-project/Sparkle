@@ -30,9 +30,9 @@
 #import <dirent.h>
 
 @interface SUUpdater (Private)
-- (void)checkForUpdatesAndNotify:(BOOL)verbosity;
+- (void)beginUpdateCheck;
 - (void)showUpdateErrorAlertWithInfo:(NSString *)info;
-- (NSTimeInterval)checkInterval;
+- (NSTimeInterval)storedCheckInterval;
 - (void)abandonUpdate;
 - (IBAction)installAndRestart:sender;
 - (NSString *)systemVersionString;
@@ -52,24 +52,6 @@
 	[[SUUserDefaults standardUserDefaults] setIdentifier:[hostBundle bundleIdentifier]];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidFinishLaunching:) name:NSApplicationDidFinishLaunchingNotification object:NSApp];
 	return self;
-}
-
-- (void)scheduleCheckWithInterval:(NSTimeInterval)interval
-{
-	if (checkTimer)
-	{
-		[checkTimer invalidate];
-		checkTimer = nil;
-	}
-	
-	checkInterval = interval;
-	if (interval > 0)
-		checkTimer = [NSTimer scheduledTimerWithTimeInterval:interval target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:YES];
-}
-
-- (void)scheduleCheckWithIntervalObject:(NSNumber *)interval
-{
-	[self scheduleCheckWithInterval:[interval doubleValue]];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)note
@@ -108,14 +90,48 @@
 		
 		// Now we want to figure out how long until we check again.
 		NSTimeInterval delayUntilCheck;
-		if (intervalSinceCheck < [self checkInterval])
-			delayUntilCheck = ([self checkInterval] -intervalSinceCheck); // It hasn't been long enough.
+		if (intervalSinceCheck < [self storedCheckInterval])
+			delayUntilCheck = ([self storedCheckInterval] - intervalSinceCheck); // It hasn't been long enough.
 		else
 			delayUntilCheck = 0; // We're overdue! Run one now.
 		
 		[self performSelector:@selector(checkForUpdatesInBackground) withObject:nil afterDelay:delayUntilCheck];
-		[self performSelector:@selector(scheduleCheckWithIntervalObject:) withObject:[NSNumber numberWithDouble:[self checkInterval]] afterDelay:delayUntilCheck];
+		[self performSelector:@selector(scheduleCheckWithIntervalObject:) withObject:[NSNumber numberWithDouble:[self storedCheckInterval]] afterDelay:delayUntilCheck];
 	}
+}
+
+- (NSTimeInterval)storedCheckInterval
+{	
+	// Find the stored check interval. User defaults override Info.plist.
+	long interval;
+	if ([[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey])
+		interval = [[[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey] longValue];
+	else if ([hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey])
+		interval = [[hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey] longValue];
+	
+	if (interval >= SU_MIN_CHECK_INTERVAL)
+		return interval;
+	else
+		return SU_DEFAULT_CHECK_INTERVAL; // Neither the user nor the developer has a preference.
+}
+
+- (void)scheduleCheckWithInterval:(NSTimeInterval)interval
+{
+	if (checkTimer)
+	{
+		[checkTimer invalidate];
+		checkTimer = nil;
+	}
+	
+	checkInterval = interval;
+	if (interval > 0)
+		checkTimer = [NSTimer scheduledTimerWithTimeInterval:interval target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:YES];
+}
+
+// An unfortunate necessity in order to use performSelector:withObject:afterDelay:
+- (void)scheduleCheckWithIntervalObject:(NSNumber *)interval
+{
+	[self scheduleCheckWithInterval:[interval doubleValue]];
 }
 
 - (void)dealloc
@@ -130,23 +146,21 @@
 	if (checkTimer)
 		[checkTimer invalidate];
 	
-	if (currentSystemVersion)
-		[currentSystemVersion release];
-	
 	[hostBundle release];
-		
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super dealloc];
 }
 
 - (void)checkForUpdatesInBackground
 {
-	[self checkForUpdatesAndNotify:NO];
+	userInitiated = NO;
+	[self beginUpdateCheck];
 }
 
 - (IBAction)checkForUpdates:sender
 {
-	[self checkForUpdatesAndNotify:YES]; // if we're coming from IB, then we want to be more verbose.
+	userInitiated = YES;
+	[self beginUpdateCheck];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item
@@ -161,39 +175,24 @@
 	return YES;
 }
 
-// If the verbosity flag is YES, Sparkle will say when it can't reach the server and when there's no new update.
-// This is generally useful for a menu item--when the check is explicitly invoked.
-- (void)checkForUpdatesAndNotify:(BOOL)verbosity
+- (void)beginUpdateCheck
 {		
 	if ([hostBundle isRunningFromDiskImage])
 	{
-		if (verbosity)
+		if (userInitiated)
 			[self showUpdateErrorAlertWithInfo:[NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated when it's running from a disk image. Move %1$@ to your Applications folder, relaunch it, and try again.", nil), [hostBundle name]]];
 		return;
 	}
 	
-	if (updateInProgress)
-	{
-		if (verbosity)
-		{
-			NSBeep();
-			if (statusController && [[statusController window] isVisible])
-				[statusController showWindow:self];
-			else if (updateAlert && [[updateAlert window] isVisible])
-				[updateAlert showWindow:self];
-			else
-				[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An update is already in progress!", nil)];
-		}
-		return;
-	}
-	verbose = verbosity;
+	if (updateInProgress) { return; }
 	updateInProgress = YES;
 	
 	// A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
 	NSString *appcastString = [[SUUserDefaults standardUserDefaults] objectForKey:SUFeedURLKey];
 	if (!appcastString)
 		appcastString = [hostBundle objectForInfoDictionaryKey:SUFeedURLKey];
-	if (!appcastString) { [NSException raise:@"SUNoFeedURL" format:@"No feed URL is specified in the Info.plist or the user defaults!"]; }
+	if (!appcastString)
+		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the SUFeedURLKey in either the Info.plist or the user defaults!"];
 	
 	SUAppcast *appcast = [[SUAppcast alloc] init];
 	[appcast setDelegate:self];
@@ -219,7 +218,7 @@
 
 - (BOOL)isAutomaticallyUpdating
 {
-	return [self automaticallyUpdates] && !verbose;
+	return [self automaticallyUpdates] && !userInitiated;
 }
 
 - (void)showUpdateErrorAlertWithInfo:(NSString *)info
@@ -237,21 +236,6 @@
 		[appIcon setName:@"NSApplicationIcon"];
 }
 
-- (NSTimeInterval)checkInterval
-{	
-	// Returns the scheduled check interval stored in the user defaults / info.plist. User defaults override Info.plist.
-	long interval;
-	if ([[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey])
-		interval = [[[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey] longValue];
-	else if ([hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey])
-		interval = [[hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey] longValue];
-
-	if (interval >= SU_MIN_CHECK_INTERVAL)
-		return interval;
-	else
-		return SU_DEFAULT_CHECK_INTERVAL; // Neither the user nor the developer has a preference.
-}
-
 - (void)beginDownload
 {
 	if (![self isAutomaticallyUpdating])
@@ -263,20 +247,6 @@
 	}
 	
 	downloader = [[NSURLDownload alloc] initWithRequest:[NSURLRequest requestWithURL:[updateItem fileURL]] delegate:self];	
-}
-
-- (void)remindMeLater
-{
-	// Clear out the skipped version so the dialog will actually come back if it was already skipped.
-	[[SUUserDefaults standardUserDefaults] setObject:nil forKey:SUSkippedVersionKey];
-	
-	if (checkInterval)
-		[self scheduleCheckWithInterval:checkInterval];
-	else
-	{
-		// If the host hasn't provided a check interval, we'll use 30 minutes.
-		[self scheduleCheckWithInterval:30 * 60];
-	}
 }
 
 - (void)updateAlert:(SUUpdateAlert *)alert finishedWithChoice:(SUUpdateAlertChoice)choice
@@ -292,15 +262,14 @@
 			break;
 			
 		case SURemindMeLaterChoice:
-			updateInProgress = NO;
-			[self remindMeLater];
+			// Clear out the skipped version so the dialog will actually come back if it was already skipped.
+			[[SUUserDefaults standardUserDefaults] setObject:nil forKey:SUSkippedVersionKey];	
+			[self abandonUpdate];
 			break;
 			
 		case SUSkipThisVersionChoice:
-			updateInProgress = NO;
 			[[SUUserDefaults standardUserDefaults] setObject:[updateItem fileVersion] forKey:SUSkippedVersionKey];
-			if (checkInterval)
-				[self scheduleCheckWithInterval:checkInterval];
+			[self abandonUpdate];
 			break;
 	}			
 }
@@ -336,7 +305,7 @@
 {
 	[ac autorelease];
 	updateInProgress = NO;
-	if (verbose)
+	if (userInitiated)
 		[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil)];
 }
 
@@ -366,7 +335,7 @@
 			[NSException raise:@"SUAppcastException" format:@"Can't extract a version string from the appcast feed. The filenames should look like YourApp_1.5.tgz, where 1.5 is the version number."];
 		}
 		
-		if (!verbose && [[[SUUserDefaults standardUserDefaults] objectForKey:SUSkippedVersionKey] isEqualToString:[updateItem fileVersion]]) { updateInProgress = NO; return; }
+		if (!userInitiated && [[[SUUserDefaults standardUserDefaults] objectForKey:SUSkippedVersionKey] isEqualToString:[updateItem fileVersion]]) { updateInProgress = NO; return; }
 		
 		if ([self newVersionAvailable])
 		{
@@ -387,7 +356,7 @@
 		}
 		else
 		{
-			if (verbose) // We only notify on no new version when we're being verbose.
+			if (userInitiated) // We only notify on no new version when we're being verbose.
 			{
 				NSImage *bundleIcon = [hostBundle icon];
 				NSImage *appIcon = [NSImage imageNamed: @"NSApplicationIcon"];
@@ -406,7 +375,7 @@
 	{
 		NSLog([e reason]);
 		updateInProgress = NO;
-		if (verbose)
+		if (userInitiated)
 			[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil)];
 	}
 }
@@ -525,12 +494,16 @@
 
 - (void)abandonUpdate
 {
-	[updateItem autorelease];
+	if (updateItem) { [updateItem autorelease]; }
 	updateItem = nil;
-	[statusController close];
-	[statusController autorelease];
+	if (statusController)
+	{
+		[statusController close];
+		[statusController autorelease];
+	}
 	statusController = nil;
 	updateInProgress = NO;
+	[self scheduleCheckWithInterval:checkInterval];
 }
 
 - (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
@@ -683,11 +656,6 @@
 		[downloader release];
 	}
 	[self abandonUpdate];
-	
-	if (checkInterval)
-	{
-		[self scheduleCheckWithInterval:checkInterval];
-	}
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification
