@@ -10,6 +10,5 @@
 
 // For the paranoid folks!
 @interface NSFileManager (SUVerification)
-- (BOOL)validatePath:(NSString *)path withMD5Hash:(NSString *)hash;
 - (BOOL)validatePath:(NSString *)path withEncodedDSASignature:(NSString *)encodedSignature withPublicDSAKey:(NSString *)pkeyString;
 @end

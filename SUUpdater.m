@@ -466,13 +466,7 @@
 		[statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", nil) maxProgressValue:0 statusText:nil];
 	
 	@try 
-	{
-		// If the developer's provided a sparkle:md5Hash attribute on the enclosure, let's verify that.
-		if ([updateItem MD5Sum] && ![[NSFileManager defaultManager] validatePath:downloadPath withMD5Hash:[updateItem MD5Sum]])
-		{
-			[NSException raise:@"SUUnarchiveException" format:@"MD5 verification of the update archive failed."];
-		}
-		
+	{		
 		// DSA verification, if activated by the developer
 		if ([[hostBundle objectForInfoDictionaryKey:SUExpectsDSASignatureKey] boolValue])
 		{

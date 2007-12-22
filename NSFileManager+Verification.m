@@ -9,7 +9,6 @@
 // DSA stuff adapted from code provided by Allan Odgaard. Thanks, Allan!
 
 #import "NSFileManager+Verification.h"
-#import "md5.h"
 
 #import <stdio.h>
 #import <openssl/evp.h>
@@ -103,25 +102,6 @@ EVP_PKEY* load_dsa_key(char *key)
 }
 
 @implementation NSFileManager (SUVerification)
-
-- (BOOL)validatePath:(NSString *)path withMD5Hash:(NSString *)hash
-{
-	NSData *data = [NSData dataWithContentsOfFile:path];
-	if (!data) { return NO; }
-	
-	md5_state_t md5_state;
-	md5_init(&md5_state);
-	md5_append(&md5_state, [data bytes], (int)[data length]);
-	unsigned char digest[16];
-	md5_finish(&md5_state, digest);
-	
-	int di;
-	char hexDigest[32];
-	for (di = 0; di < 16; di++)
-	    sprintf(hexDigest + di*2, "%02x", digest[di]);
-	
-	return [hash isEqualToString:[NSString stringWithCString:hexDigest]];
-}
 
 - (BOOL)validatePath:(NSString *)path withEncodedDSASignature:(NSString *)encodedSignature withPublicDSAKey:(NSString *)pkeyString
 {
