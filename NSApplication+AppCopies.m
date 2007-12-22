@@ -7,7 +7,6 @@
 //
 
 #import "NSApplication+AppCopies.h"
-#import "SUUtilities.h"
 
 @implementation NSApplication (SUAppCopies)
 

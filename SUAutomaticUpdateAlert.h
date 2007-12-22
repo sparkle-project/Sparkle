@@ -8,13 +8,13 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class SUAppcastItem, SUUtilities;
+@class SUAppcastItem;
 @interface SUAutomaticUpdateAlert : NSWindowController {
 	SUAppcastItem *updateItem;
-	SUUtilities *utilities;
+	NSBundle *hostBundle;
 }
 
-- initWithAppcastItem:(SUAppcastItem *)item andUtilities:(SUUtilities *)aUtility;;
+- initWithAppcastItem:(SUAppcastItem *)item hostBundle:(NSBundle *)hostBundle;
 
 - (IBAction)relaunchNow:sender;
 - (IBAction)relaunchLater:sender;

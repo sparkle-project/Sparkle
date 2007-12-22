@@ -8,14 +8,11 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class RSS, SUAppcastItem, SUUtilities;
+@class RSS, SUAppcastItem;
 @interface SUAppcast : NSObject {
 	NSArray *items;
 	id delegate;
-	SUUtilities *utilities;
 }
-
-- (id)initWithUtilities:(SUUtilities *)aUtility;
 
 - (void)fetchAppcastFromURL:(NSURL *)url;
 - (void)setDelegate:delegate;
@@ -27,4 +24,6 @@
 
 @interface NSObject (SUAppcastDelegate)
 - (void)appcastDidFinishLoading:(SUAppcast *)appcast;
+- (void)appcastDidFailToLoad:(SUAppcast *)appcast;
+- (NSString *)userAgentForAppcast:(SUAppcast *)appcast;
 @end

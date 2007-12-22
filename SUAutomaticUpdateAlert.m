@@ -7,26 +7,25 @@
 //
 
 #import "SUAutomaticUpdateAlert.h"
-#import "SUUtilities.h"
+#import "NSBundle+SUAdditions.h"
 #import "SUAppcastItem.h"
 
 @implementation SUAutomaticUpdateAlert
 
-- initWithAppcastItem:(SUAppcastItem *)item andUtilities:(SUUtilities *)aUtility;
+- initWithAppcastItem:(SUAppcastItem *)item hostBundle:(NSBundle *)hb;
 {
+	updateItem = [item retain];
+	hostBundle = [hb retain];
+
 	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"SUAutomaticUpdateAlert" ofType:@"nib"];
-	if (!path) // slight hack to resolve issues with running with in configurations
+	if (path == nil) // Slight hack to resolve issues with running Sparkle in debug configurations.
 	{
-		NSBundle *current = [NSBundle bundleForClass:[self class]];
-		NSString *frameworkPath = [[[NSBundle mainBundle] sharedFrameworksPath] stringByAppendingFormat:@"/Sparkle.framework", [current bundleIdentifier]];
+		NSString *frameworkPath = [[hostBundle sharedFrameworksPath] stringByAppendingString:@"/Sparkle.framework"];
 		NSBundle *framework = [NSBundle bundleWithPath:frameworkPath];
 		path = [framework pathForResource:@"SUAutomaticUpdateAlert" ofType:@"nib"];
 	}
 	
 	[super initWithWindowNibPath:path owner:self];
-	
-	updateItem = [item retain];
-	utilities = [aUtility retain];
 	[self setShouldCascadeWindows:NO];
 	
 	return self;
@@ -34,7 +33,7 @@
 
 - (void) dealloc
 {
-	[utilities release];
+	[hostBundle release];
 	[updateItem release];
 	[super dealloc];
 }
@@ -54,17 +53,17 @@
 
 - (NSImage *)applicationIcon
 {
-	return [utilities hostAppIcon];
+	return [hostBundle icon];
 }
 
 - (NSString *)titleText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ has been installed!", nil), [utilities hostAppDisplayName]];
+	return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ has been installed!", nil), [hostBundle name]];
 }
 
 - (NSString *)descriptionText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"%@ %@ has been installed and will be ready to use next time %@ starts! Would you like to relaunch now?", nil), [utilities hostAppDisplayName], [updateItem versionString], [utilities hostAppDisplayName]];
+	return [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been installed and will be ready to use next time %1$@ starts! Would you like to relaunch now?", nil), [hostBundle name], [hostBundle displayVersion]];
 }
 
 @end

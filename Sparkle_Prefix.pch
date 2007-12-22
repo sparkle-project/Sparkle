@@ -2,6 +2,8 @@
 // Prefix header for all source files of the 'Sparkle' target in the 'Sparkle' project.
 //
 
+#define SULocalizedString(key,comment) NSLocalizedStringFromTableInBundle(key, @"Sparkle", [NSBundle bundleForClass:[self class]], comment)
+
 #ifdef __OBJC__
     #import <Cocoa/Cocoa.h>
 	#import "SUConstants.h"

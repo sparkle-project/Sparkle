@@ -8,19 +8,9 @@
 
 #import "SUAppcast.h"
 #import "SUAppcastItem.h"
-#import "SUUtilities.h"
 #import "RSS.h"
 
 @implementation SUAppcast
-
-- (id)initWithUtilities:(SUUtilities *)aUtility
-{
-	self = [super init];
-	if (self != nil) {
-		utilities = [aUtility retain];
-	}
-	return self;
-}
 
 - (void)fetchAppcastFromURL:(NSURL *)url
 {
@@ -34,7 +24,6 @@
 
 - (void)dealloc
 {
-	[utilities release];
 	[items release];
 	[super dealloc];
 }
@@ -56,7 +45,9 @@
 	RSS *feed = [RSS alloc];
 	@try
 	{
-		NSString *userAgent = [NSString stringWithFormat: @"%@/%@ (Mac OS X) Sparkle/1.5b1", [utilities hostAppName], [utilities hostAppVersion]];
+		NSString *userAgent = nil;
+		if ([delegate respondsToSelector:@selector(userAgentForAppcast:)])
+			userAgent = [delegate userAgentForAppcast:self];
 		
 		feed = [feed initWithURL:url normalize:YES userAgent:userAgent];
 		if (!feed)

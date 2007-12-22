@@ -9,7 +9,6 @@
 // DSA stuff adapted from code provided by Allan Odgaard. Thanks, Allan!
 
 #import "NSFileManager+Verification.h"
-#import "SUUtilities.h"
 #import "md5.h"
 
 #import <stdio.h>

@@ -8,35 +8,33 @@
 
 #import "SUUpdateAlert.h"
 #import "SUAppcastItem.h"
-#import "SUUtilities.h"
+#import "NSBundle+SUAdditions.h"
 #import <WebKit/WebKit.h>
 
 @implementation SUUpdateAlert
 
-- initWithAppcastItem:(SUAppcastItem *)item andUtilities:(SUUtilities *)aUtility
+- initWithAppcastItem:(SUAppcastItem *)item hostBundle:(NSBundle *)hb
 {
+	hostBundle = [hb retain];
+	updateItem = [item retain];
+
 	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"SUUpdateAlert" ofType:@"nib"];
-	if (!path) // slight hack to resolve issues with running with in configurations
+	if (path == nil) // Slight hack to resolve issues with running Sparkle in debug configurations.
 	{
-		NSBundle *current = [NSBundle bundleForClass:[self class]];
-		NSString *frameworkPath = [[[NSBundle mainBundle] sharedFrameworksPath] stringByAppendingFormat:@"/Sparkle.framework", [current bundleIdentifier]];
+		NSString *frameworkPath = [[hostBundle sharedFrameworksPath] stringByAppendingString:@"/Sparkle.framework"];
 		NSBundle *framework = [NSBundle bundleWithPath:frameworkPath];
 		path = [framework pathForResource:@"SUUpdateAlert" ofType:@"nib"];
 	}
 	
 	[super initWithWindowNibPath:path owner:self];
-	
-	updateItem = [item retain];
-	utilities = [aUtility retain];
 	[self setShouldCascadeWindows:NO];
-	
 	return self;
 }
 
 - (void)dealloc
 {
 	[updateItem release];
-	[utilities release];
+	[hostBundle release];
 	[super dealloc];
 }
 
@@ -91,15 +89,18 @@
 
 - (BOOL)showsReleaseNotes
 {
-	if (![utilities infoValueForKey:SUShowReleaseNotesKey]) { return YES; } // defaults to YES
-	return [[utilities infoValueForKey:SUShowReleaseNotesKey] boolValue];
+	NSNumber *shouldShowReleaseNotes = [hostBundle objectForInfoDictionaryKey:SUShowReleaseNotesKey];
+	if (shouldShowReleaseNotes == nil)
+		return YES; // defaults to YES
+	else
+		return [shouldShowReleaseNotes boolValue];
 }
 
 - (BOOL)allowsAutomaticUpdates
 {
-	if ([utilities infoValueForKey:SUExpectsDSASignatureKey]) { return NO; } // automatic updating requires DSA-signed updates
-	if ([utilities infoValueForKey:SUAllowsAutomaticUpdatesKey]) { return YES; } // defaults to YES
-	return [[utilities infoValueForKey:SUAllowsAutomaticUpdatesKey] boolValue];
+	if ([hostBundle objectForInfoDictionaryKey:SUExpectsDSASignatureKey]) { return NO; } // automatic updating requires DSA-signed updates
+	if ([hostBundle objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey]) { return YES; } // defaults to YES
+	return [[hostBundle objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] boolValue];
 }
 
 - (void)awakeFromNib
@@ -145,17 +146,17 @@
 
 - (NSImage *)applicationIcon
 {
-	return [utilities hostAppIcon];
+	return [hostBundle icon];
 }
 
 - (NSString *)titleText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is available!", nil), [utilities hostAppDisplayName]];
+	return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is available!", nil), [hostBundle name]];
 }
 
 - (NSString *)descriptionText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available (you have %@). Would you like to download it now?", nil), [utilities hostAppDisplayName], [updateItem versionString], [utilities hostAppVersionString]];	
+	return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available (you have %@). Would you like to download it now?", nil), [hostBundle name], [updateItem versionString], [hostBundle displayVersion]];	
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:frame

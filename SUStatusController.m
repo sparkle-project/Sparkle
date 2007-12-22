@@ -7,39 +7,31 @@
 //
 
 #import "SUStatusController.h"
-#import "SUUtilities.h"
-
-@interface SUStatusController (Private)
-- (NSProgressIndicator *)progressBar;
-- (void)setProgressBar:(NSProgressIndicator *)theProgressBar;
-@end
+#import "NSBundle+SUAdditions.h"
 
 @implementation SUStatusController
 
-- initWithUtilities:(SUUtilities *)aUtility
+- initWithHostBundle:(NSBundle *)hb
 {
+	hostBundle = [hb retain];
 	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"SUStatus" ofType:@"nib"];
-	if (!path) // slight hack to resolve issues with running in debug configurations
+	if (path == nil) // Slight hack to resolve issues with running Sparkle in debug configurations.
 	{
-		NSBundle *current = [NSBundle bundleForClass:[self class]];
-		NSString *frameworkPath = [[[NSBundle mainBundle] sharedFrameworksPath] stringByAppendingFormat:@"/Sparkle.framework", [current bundleIdentifier]];
+		NSString *frameworkPath = [[hostBundle sharedFrameworksPath] stringByAppendingString:@"/Sparkle.framework"];
 		NSBundle *framework = [NSBundle bundleWithPath:frameworkPath];
 		path = [framework pathForResource:@"SUStatus" ofType:@"nib"];
 	}
 	[super initWithWindowNibPath:path owner:self];
 	[self setShouldCascadeWindows:NO];
-	utilities = [aUtility retain];
 	return self;
 }
 
 - (void)dealloc
 {
-	[utilities release];
+	[hostBundle release];
 	[title release];
 	[statusText release];
 	[buttonTitle release];
-	[self setProgressBar:nil];
-
 	[super dealloc];
 }
 
@@ -47,19 +39,17 @@
 {
 	[[self window] center];
 	[[self window] setFrameAutosaveName:@"SUStatusFrame"];
-	
-	// set progress bar to threaded animation
-	[[self progressBar] setUsesThreadedAnimation:YES];
+	[progressBar setUsesThreadedAnimation:YES];
 }
 
 - (NSString *)windowTitle
 {
-	return [NSString stringWithFormat:SULocalizedString(@"Updating %@", nil), [utilities hostAppDisplayName]];
+	return [NSString stringWithFormat:SULocalizedString(@"Updating %@", nil), [hostBundle name]];
 }
 
 - (NSImage *)applicationIcon
 {
-	return [utilities hostAppIcon];
+	return [hostBundle icon];
 }
 
 - (void)beginActionWithTitle:(NSString *)aTitle maxProgressValue:(double)aMaxProgressValue statusText:(NSString *)aStatusText
@@ -126,27 +116,6 @@
 	[self willChangeValueForKey:@"statusText"];
 	statusText = [aStatusText copy];
 	[self didChangeValueForKey:@"statusText"];	
-}
-
-@end
-
-@implementation SUStatusController (Private)
-
-//---------------------------------------------------------- 
-//  progressBar 
-//---------------------------------------------------------- 
-- (NSProgressIndicator *)progressBar
-{
-    return mProgressBar; 
-}
-
-- (void)setProgressBar:(NSProgressIndicator *)theProgressBar
-{
-    if (mProgressBar != theProgressBar)
-    {
-        [mProgressBar release];
-        mProgressBar = [theProgressBar retain];
-    }
 }
 
 @end

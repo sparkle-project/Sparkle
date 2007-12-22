@@ -15,10 +15,10 @@ typedef enum
 	SUSkipThisVersionChoice
 } SUUpdateAlertChoice;
 
-@class WebView, SUAppcastItem, SUUtilities;
+@class WebView, SUAppcastItem;
 @interface SUUpdateAlert : NSWindowController {
 	SUAppcastItem *updateItem;
-	SUUtilities *utilities;
+	NSBundle *hostBundle;
 	id delegate;
 	
 	IBOutlet WebView *releaseNotesView;
@@ -27,7 +27,7 @@ typedef enum
 	BOOL webViewFinishedLoading;
 }
 
-- initWithAppcastItem:(SUAppcastItem *)item andUtilities:(SUUtilities *)aUtility;
+- initWithAppcastItem:(SUAppcastItem *)item hostBundle:(NSBundle *)hostBundle;
 - (void)setDelegate:delegate;
 
 - (IBAction)installUpdate:sender;

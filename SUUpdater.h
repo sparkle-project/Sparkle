@@ -14,11 +14,7 @@
 
 // .zip, .dmg, .tar, .tbz, .tgz archives are supported at this time.
 
-// By default, Sparkle offers to show the user the release notes of the build they'll be
-// getting, which it assumes are in the description (or body) field of the relevant RSS item.
-// Set SUShowReleaseNotes to <false/> in Info.plist to hide the button.
-
-@class SUAppcastItem, SUUpdateAlert, SUStatusController, SUUtilities;
+@class SUAppcastItem, SUUpdateAlert, SUStatusController;
 @interface SUUpdater : NSObject {
 	SUAppcastItem *updateItem;
 	
@@ -36,13 +32,10 @@
 	
 	NSString *currentSystemVersion;
 	
-	NSBundle *updateBundle;
-	SUUtilities *utilities;
+	NSBundle *hostBundle;
 }
 
 - (id)initWithBundle:(NSBundle *)bundle;
-
-- (NSBundle *)updateBundle;
 
 // This IBAction is meant for a main menu item. Hook up any menu item to this action,
 // and Sparkle will check for updates and report back its findings verbosely.

@@ -10,7 +10,10 @@
 #import "SUAppcast.h"
 #import "SUAppcastItem.h"
 #import "SUUnarchiver.h"
-#import "SUUtilities.h"
+#import "NSBundle+SUAdditions.h"
+#import "SUUserDefaults.h"
+#import "SUVersionComparisonProtocol.h"
+#import "SUStandardVersionComparator.h"
 
 #import "SUUpdateAlert.h"
 #import "SUAutomaticUpdateAlert.h"
@@ -39,11 +42,14 @@
 
 - init
 {
+	return [self initWithBundle:[[NSBundle mainBundle] retain]];
+}
+
+- (id)initWithBundle:(NSBundle *)bundle
+{
 	self = [super init];
-	
-	updateBundle = [[NSBundle mainBundle] retain];
-	utilities = [[SUUtilities alloc] initWithUpdater:self];
-	
+	hostBundle = [bundle retain];
+	[[SUUserDefaults standardUserDefaults] setIdentifier:[hostBundle bundleIdentifier]];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidFinishLaunching:) name:@"NSApplicationDidFinishLaunchingNotification" object:NSApp];	
 	
 	// OS version (Apple recommends using SystemVersion.plist instead of Gestalt() here, don't ask me why).
@@ -52,33 +58,7 @@
 	NSString *versionPlistPath = @"/System/Library/CoreServices/SystemVersion.plist";
 	//gets a version string of the form X.Y.Z
 	currentSystemVersion = [[[NSDictionary dictionaryWithContentsOfFile:versionPlistPath] objectForKey:@"ProductVersion"] retain];
-	
 	return self;
-}
-
-
-- (id)initWithBundle:(NSBundle *)bundle
-{
-	self = [super init];
-	if (self != nil) {
-		updateBundle = [bundle retain];
-		utilities = [[SUUtilities alloc] initWithUpdater:self];
-	
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidFinishLaunching:) name:@"NSApplicationDidFinishLaunchingNotification" object:NSApp];	
-	
-		// OS version (Apple recommends using SystemVersion.plist instead of Gestalt() here, don't ask me why).
-		// This code *should* use NSSearchPathForDirectoriesInDomains(NSCoreServiceDirectory, NSSystemDomainMask, YES)
-		// but that returns /Library/CoreServices for some reason
-		NSString *versionPlistPath = @"/System/Library/CoreServices/SystemVersion.plist";
-		//gets a version string of the form X.Y.Z
-		currentSystemVersion = [[[NSDictionary dictionaryWithContentsOfFile:versionPlistPath] objectForKey:@"ProductVersion"] retain];
-	}
-	return self;
-}
-
-- (NSBundle *)updateBundle
-{
-	return [[updateBundle retain] autorelease]; 
 }
 
 - (void)scheduleCheckWithInterval:(NSTimeInterval)interval
@@ -101,15 +81,15 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)note
 {
-	if ([[utilities standardBundleDefaults] boolForKey:SUIgnoreChecksKey])
+	if ([[SUUserDefaults standardUserDefaults] boolForKey:SUIgnoreChecksKey])
 		return;
-		
+	
 	// If there's a scheduled interval, we see if it's been longer than that interval since the last
 	// check. If so, we perform a startup check; if not, we don't.	
 	if ([self storedCheckInterval])
 	{
 		NSTimeInterval interval = [self storedCheckInterval];
-		NSDate *lastCheck = [[utilities standardBundleDefaults] objectForKey:SULastCheckTimeKey];
+		NSDate *lastCheck = [[SUUserDefaults standardUserDefaults] objectForKey:SULastCheckTimeKey];
 		if (!lastCheck) { lastCheck = [NSDate distantPast]; }
 		NSTimeInterval intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheck];
 		if (intervalSinceCheck < interval)
@@ -127,28 +107,28 @@
 	else
 	{
 		// There's no scheduled check, so let's see if we're supposed to check on startup.
-		NSNumber *shouldCheckAtStartup = [[utilities standardBundleDefaults] objectForKey:SUCheckAtStartupKey];
+		NSNumber *shouldCheckAtStartup = [[SUUserDefaults standardUserDefaults] objectForKey:SUCheckAtStartupKey];
 		if (!shouldCheckAtStartup) // hasn't been set yet; ask the user
 		{
 			// Let's see if there's a key in Info.plist for a default, though. We'll let that override the dialog if it's there.
-			NSNumber *infoStartupValue = [utilities infoValueForKey:SUCheckAtStartupKey];
+			NSNumber *infoStartupValue = [hostBundle objectForInfoDictionaryKey:SUCheckAtStartupKey];
 			if (infoStartupValue)
 			{
 				shouldCheckAtStartup = infoStartupValue;
 			}
 			else
 			{
-				NSImage *bundleIcon = [utilities hostAppIcon];
+				NSImage *bundleIcon = [hostBundle icon];
 				NSImage *appIcon = [NSImage imageNamed: @"NSApplicationIcon"];
 				if ([appIcon setName:@"NSApplicationIconWorkAround"]) 
 					[bundleIcon setName:@"NSApplicationIcon"];
-					
-				shouldCheckAtStartup = [NSNumber numberWithBool:NSRunAlertPanel(SULocalizedString(@"Check for updates on startup?", nil), [NSString stringWithFormat:SULocalizedString(@"Would you like %@ to check for updates on startup? If not, you can initiate the check manually from the %@ menu.", nil), [utilities hostAppDisplayName], [utilities hostAppDisplayName]], SULocalizedString(@"Yes", nil), SULocalizedString(@"No", nil), nil) == NSAlertDefaultReturn];
-			
+				
+				shouldCheckAtStartup = [NSNumber numberWithBool:NSRunAlertPanel(SULocalizedString(@"Check for updates on startup?", nil), [NSString stringWithFormat:SULocalizedString(@"Would you like %1$@ to check for updates on startup? If not, you can initiate the check manually from the %1$@ menu.", nil), [hostBundle name]], SULocalizedString(@"Yes", nil), SULocalizedString(@"No", nil), nil) == NSAlertDefaultReturn];
+				
 				if ([bundleIcon setName:@"NSApplicationIconWorkAround2"]) 
 					[appIcon setName:@"NSApplicationIcon"];
 			}
-			[[utilities standardBundleDefaults] setObject:shouldCheckAtStartup forKey:SUCheckAtStartupKey];
+			[[SUUserDefaults standardUserDefaults] setObject:shouldCheckAtStartup forKey:SUCheckAtStartupKey];
 		}
 		
 		if ([shouldCheckAtStartup boolValue])
@@ -159,7 +139,7 @@
 - (void)dealloc
 {
 	[updateItem release];
-    [updateAlert release];
+	[updateAlert release];
 	
 	[downloadPath release];
 	[statusController release];
@@ -171,12 +151,8 @@
 	if (currentSystemVersion)
 		[currentSystemVersion release];
 	
-	if (updateBundle)
-		[updateBundle release];
-	
-	if (utilities)
-		[utilities release];
-	
+	[hostBundle release];
+		
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super dealloc];
 }
@@ -192,8 +168,8 @@
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item {
-    if ([item action] == @selector(checkForUpdates:)) {
-		if (![[utilities standardBundleDefaults] boolForKey:SUIgnoreChecksKey])
+	if ([item action] == @selector(checkForUpdates:)) {
+		if (![[SUUserDefaults standardUserDefaults] boolForKey:SUIgnoreChecksKey])
 		{
 			if (updateInProgress)
 				return NO;
@@ -202,21 +178,21 @@
 		} else {
 			return NO;
 		}
-    }
-    return NO;
+	}
+	return NO;
 }
 
 // If the verbosity flag is YES, Sparkle will say when it can't reach the server and when there's no new update.
 // This is generally useful for a menu item--when the check is explicitly invoked.
 - (void)checkForUpdatesAndNotify:(BOOL)verbosity
 {	
-	if ([[utilities standardBundleDefaults] boolForKey:SUIgnoreChecksKey])
+	if ([[SUUserDefaults standardUserDefaults] boolForKey:SUIgnoreChecksKey])
 		return;
 	
-	if ([utilities isRunningFromDiskImage])
+	if ([hostBundle isRunningFromDiskImage])
 	{
 		if (verbosity)
-			[self showUpdateErrorAlertWithInfo:[NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated when it's running from a disk image. Move %1$@ to your Applications folder, relaunch it, and try again.", nil), [utilities hostAppName]]];
+			[self showUpdateErrorAlertWithInfo:[NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated when it's running from a disk image. Move %1$@ to your Applications folder, relaunch it, and try again.", nil), [hostBundle name]]];
 		return;
 	}
 	
@@ -238,12 +214,12 @@
 	updateInProgress = YES;
 	
 	// A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
-	NSString *appcastString = [[utilities standardBundleDefaults] objectForKey:SUFeedURLKey];
+	NSString *appcastString = [[SUUserDefaults standardUserDefaults] objectForKey:SUFeedURLKey];
 	if (!appcastString)
-		appcastString = [utilities infoValueForKey:SUFeedURLKey];
+		appcastString = [hostBundle objectForInfoDictionaryKey:SUFeedURLKey];
 	if (!appcastString) { [NSException raise:@"SUNoFeedURL" format:@"No feed URL is specified in the Info.plist or the user defaults!"]; }
 	
-	SUAppcast *appcast = [[SUAppcast alloc] initWithUtilities:utilities];
+	SUAppcast *appcast = [[SUAppcast alloc] init];
 	[appcast setDelegate:self];
 	[appcast fetchAppcastFromURL:[NSURL URLWithString:appcastString]];
 }
@@ -251,15 +227,15 @@
 - (BOOL)automaticallyUpdates
 {
 	// If the SUAllowsAutomaticUpdatesKey exists and is set to NO, return NO.
-	if ([[utilities infoValueForKey:SUAllowsAutomaticUpdatesKey] boolValue] == NO && [utilities infoValueForKey:SUAllowsAutomaticUpdatesKey]) { return NO; }
+	if ([[hostBundle objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] boolValue] == NO && [hostBundle objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey]) { return NO; }
 	
 	// If we're not using DSA signatures, we aren't going to trust any updates automatically.
-	if (![[utilities infoValueForKey:SUExpectsDSASignatureKey] boolValue]) { return NO; }
+	if (![[hostBundle objectForInfoDictionaryKey:SUExpectsDSASignatureKey] boolValue]) { return NO; }
 	
 	// If there's no setting, we default to NO.
-	if (![[utilities standardBundleDefaults] objectForKey:SUAutomaticallyUpdateKey]) { return NO; }
+	if (![[SUUserDefaults standardUserDefaults] objectForKey:SUAutomaticallyUpdateKey]) { return NO; }
 	
-	return [[[utilities standardBundleDefaults] objectForKey:SUAutomaticallyUpdateKey] boolValue];
+	return [[[SUUserDefaults standardUserDefaults] objectForKey:SUAutomaticallyUpdateKey] boolValue];
 }
 
 - (BOOL)isAutomaticallyUpdating
@@ -271,11 +247,11 @@
 {
 	if ([self isAutomaticallyUpdating]) { return; }
 	
-	NSImage *bundleIcon = [utilities hostAppIcon];
+	NSImage *bundleIcon = [hostBundle icon];
 	NSImage *appIcon = [NSImage imageNamed: @"NSApplicationIcon"];
 	if ([appIcon setName:@"NSApplicationIconWorkAround"]) 
 		[bundleIcon setName:@"NSApplicationIcon"];
-					
+	
 	NSRunAlertPanel(SULocalizedString(@"Update Error!", nil), info, SULocalizedString(@"Cancel", nil), nil, nil);
 	
 	if ([bundleIcon setName:@"NSApplicationIconWorkAround2"]) 
@@ -286,20 +262,20 @@
 {
 	// Define some minimum intervals to avoid DOS-like checking attacks.
 #ifdef DEBUG
-	#define MIN_INTERVAL 60
+#define MIN_INTERVAL 60
 #else
-	#define MIN_INTERVAL 60*60
+#define MIN_INTERVAL 60*60
 #endif
 	
 	// Returns the scheduled check interval stored in the user defaults / info.plist. User defaults override Info.plist.
 	long interval = 0; // 0 signifies not to do timed checking.
-	if ([[utilities standardBundleDefaults] objectForKey:SUScheduledCheckIntervalKey])
+	if ([[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey])
 	{
-		interval = [[[utilities standardBundleDefaults] objectForKey:SUScheduledCheckIntervalKey] longValue];
+		interval = [[[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey] longValue];
 	}
-	else if ([utilities infoValueForKey:SUScheduledCheckIntervalKey])
+	else if ([hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey])
 	{
-		interval = [[utilities infoValueForKey:SUScheduledCheckIntervalKey] longValue];
+		interval = [[hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey] longValue];
 	}
 	if (interval >= MIN_INTERVAL)
 		return interval;
@@ -311,7 +287,7 @@
 {
 	if (![self isAutomaticallyUpdating])
 	{
-		statusController = [[SUStatusController alloc] initWithUtilities:utilities];
+		statusController = [[SUStatusController alloc] initWithHostBundle:hostBundle];
 		[statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", nil) maxProgressValue:0 statusText:nil];
 		[statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
 		[statusController showWindow:self];
@@ -323,7 +299,7 @@
 - (void)remindMeLater
 {
 	// Clear out the skipped version so the dialog will actually come back if it was already skipped.
-	[[utilities standardBundleDefaults] setObject:nil forKey:SUSkippedVersionKey];
+	[[SUUserDefaults standardUserDefaults] setObject:nil forKey:SUSkippedVersionKey];
 	
 	if (checkInterval)
 		[self scheduleCheckWithInterval:checkInterval];
@@ -342,7 +318,7 @@
 	{
 		case SUInstallUpdateChoice:
 			// Clear out the skipped version so the dialog will come back if the download fails.
-			[[utilities standardBundleDefaults] setObject:nil forKey:SUSkippedVersionKey];
+			[[SUUserDefaults standardUserDefaults] setObject:nil forKey:SUSkippedVersionKey];
 			[self beginDownload];
 			break;
 			
@@ -353,7 +329,7 @@
 			
 		case SUSkipThisVersionChoice:
 			updateInProgress = NO;
-			[[utilities standardBundleDefaults] setObject:[updateItem fileVersion] forKey:SUSkippedVersionKey];
+			[[SUUserDefaults standardUserDefaults] setObject:[updateItem fileVersion] forKey:SUSkippedVersionKey];
 			if (checkInterval)
 				[self scheduleCheckWithInterval:checkInterval];
 			break;
@@ -362,7 +338,7 @@
 
 - (void)showUpdatePanel
 {
-	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem andUtilities:utilities];
+	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem hostBundle:hostBundle];
 	[updateAlert setDelegate:self];
 	
 	// Only show the update alert if the app is active; otherwise, we'll wait until it is.
@@ -370,6 +346,16 @@
 		[updateAlert showWindow:self];
 	else
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
+}
+
+- (NSString *)systemVersionString
+{
+	return currentSystemVersion;
+}
+
+- (NSString *)userAgentForAppcast:(SUAppcast *)ac
+{
+	return [NSString stringWithFormat: @"%@/%@ Sparkle/1.5b1", [hostBundle name], [hostBundle displayVersion]];
 }
 
 - (void)appcastDidFailToLoad:(SUAppcast *)ac
@@ -383,36 +369,31 @@
 // Override this to change the new version comparison logic!
 - (BOOL)newVersionAvailable
 {
-	BOOL canRunOnCurrentSystem = (SUStandardVersionComparison([updateItem minimumSystemVersion], [self systemVersionString]) != NSOrderedAscending);
-	return (canRunOnCurrentSystem && (SUStandardVersionComparison([updateItem fileVersion], [utilities hostAppVersion]) == NSOrderedAscending));
-	// Want straight-up string comparison like Sparkle 1.0b3 and earlier? Uncomment the line below and comment the one above.
-	// return ![SUHostAppVersion() isEqualToString:[updateItem fileVersion]];
-}
-
-- (NSString *)systemVersionString
-{
-	return currentSystemVersion;
+	id <SUVersionComparison> comparator = [SUStandardVersionComparator defaultComparator];
+	BOOL canRunOnCurrentSystem = ([comparator compareVersion:[updateItem minimumSystemVersion] toVersion:[self systemVersionString]] != NSOrderedDescending);
+	return (canRunOnCurrentSystem && ([comparator compareVersion:[hostBundle version] toVersion:[updateItem fileVersion]]) == NSOrderedAscending);
 }
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac
 {
 	@try
 	{
-		if (!ac) { [NSException raise:@"SUAppcastException" format:@"Couldn't get a valid appcast from the server."]; }
-
+		if (!ac)
+			[NSException raise:@"SUAppcastException" format:@"Couldn't get a valid appcast from the server."];
+		
 		updateItem = [[ac newestItem] retain];
 		[ac autorelease];
-
+		
 		// Record the time of the check for host app use and for interval checks on startup.
-		[[utilities standardBundleDefaults] setObject:[NSDate date] forKey:SULastCheckTimeKey];
-
+		[[SUUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:SULastCheckTimeKey];
+		
 		if (![updateItem fileVersion])
 		{
 			[NSException raise:@"SUAppcastException" format:@"Can't extract a version string from the appcast feed. The filenames should look like YourApp_1.5.tgz, where 1.5 is the version number."];
 		}
-
-		if (!verbose && [[[utilities standardBundleDefaults] objectForKey:SUSkippedVersionKey] isEqualToString:[updateItem fileVersion]]) { updateInProgress = NO; return; }
-
+		
+		if (!verbose && [[[SUUserDefaults standardUserDefaults] objectForKey:SUSkippedVersionKey] isEqualToString:[updateItem fileVersion]]) { updateInProgress = NO; return; }
+		
 		if ([self newVersionAvailable])
 		{
 			if (checkTimer)	// There's a new version! Let's disable the automated checking timer unless the user cancels.
@@ -434,12 +415,12 @@
 		{
 			if (verbose) // We only notify on no new version when we're being verbose.
 			{
-				NSImage *bundleIcon = [utilities hostAppIcon];
+				NSImage *bundleIcon = [hostBundle icon];
 				NSImage *appIcon = [NSImage imageNamed: @"NSApplicationIcon"];
 				if ([appIcon setName:@"NSApplicationIconWorkAround"]) 
 					[bundleIcon setName:@"NSApplicationIcon"];
-					
-				NSRunAlertPanel(SULocalizedString(@"You're up to date!", nil), [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [utilities hostAppDisplayName], [utilities hostAppVersionString]], SULocalizedString(@"OK", nil), nil, nil);
+				
+				NSRunAlertPanel(SULocalizedString(@"You're up to date!", nil), [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [hostBundle name], [hostBundle displayVersion]], SULocalizedString(@"OK", nil), nil, nil);
 				
 				if ([bundleIcon setName:@"NSApplicationIconWorkAround2"]) 
 					[appIcon setName:@"NSApplicationIcon"];
@@ -540,10 +521,10 @@
 		}
 		
 		// DSA verification, if activated by the developer
-		if ([[utilities infoValueForKey:SUExpectsDSASignatureKey] boolValue])
+		if ([[hostBundle objectForInfoDictionaryKey:SUExpectsDSASignatureKey] boolValue])
 		{
 			NSString *dsaSignature = [updateItem DSASignature];
-			NSString *pkeyString = [utilities infoValueForKey:SUPublicDSAKeyKey]; // Fetch the app's public DSA key.
+			NSString *pkeyString = [hostBundle objectForInfoDictionaryKey:SUPublicDSAKeyKey]; // Fetch the app's public DSA key.
 			if (![[NSFileManager defaultManager] validatePath:downloadPath withEncodedDSASignature:dsaSignature withPublicDSAKey:pkeyString])
 			{
 				[NSException raise:@"SUUnarchiveException" format:@"DSA verification of the update archive failed."];
@@ -585,11 +566,9 @@
 	NSLog(@"Download error: %@", [error localizedDescription]);
 	[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred while trying to download the file. Please try again later.", nil)];
 }
-	 
+
 - (IBAction)installAndRestart:sender
 {
-	NSString *currentAppPath = [utilities hostAppPath];
-	NSString *currentBundlePath = [updateBundle bundlePath];
 	NSString *newAppDownloadPath = nil;
 	BOOL isPackage = NO;
 	int processIdentifier = [[NSProcessInfo processInfo] processIdentifier];
@@ -605,34 +584,29 @@
 			while((event = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:nil inMode:NSDefaultRunLoopMode dequeue:YES]))
 				[NSApp sendEvent:event];			
 		}
-		
-		// We assume that the archive will contain a file named {CFBundleName}.app
-		// (where, obviously, CFBundleName comes from Info.plist)
-		if (![utilities unlocalizedInfoValueForKey:@"CFBundleName"]) { [NSException raise:@"SUInstallException" format:@"This application has no CFBundleName! This key must be set to the application's name."]; }
-
+				
 		// Search subdirectories for the application
-		NSString *file, *appName = [utilities unlocalizedInfoValueForKey:@"CFBundleName"];
+		NSString *file, *bundleFileName = [[hostBundle bundlePath] lastPathComponent];
 		NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:[downloadPath stringByDeletingLastPathComponent]];
 		while ((file = [dirEnum nextObject]))
 		{
 			// Some DMGs have symlinks into /Applications! That's no good!
 			if ([file isEqualToString:@"/Applications"])
 				[dirEnum skipDescendents];
-			if ([[file pathExtension] isEqualToString:[utilities hostAppExtension]] &&
-				[[[file stringByDeletingPathExtension] lastPathComponent] isEqualToString:appName]) // We found one!
+			if ([[file lastPathComponent] isEqualToString:bundleFileName]) // We found one!
 			{
 				isPackage = NO;
 				newAppDownloadPath = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:file];
 				break;
 			}
 			else if (([[file pathExtension] isEqualToString:@"pkg"] || [[file pathExtension] isEqualToString:@"mpkg"]) &&
-					  [[file stringByDeletingPathExtension] isEqualToString:appName])
+					 [[file stringByDeletingPathExtension] isEqualToString:[[[hostBundle bundlePath] lastPathComponent] stringByDeletingPathExtension]])
 			{
 				isPackage = YES;
 				newAppDownloadPath = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:file];
 				break;
 			}
-			if ([[file pathExtension] isEqualToString:[utilities hostAppExtension]] ||
+			if ([[file pathExtension] isEqualToString:[[hostBundle bundlePath] pathExtension]] ||
 				[[file pathExtension] isEqualToString:@"pkg"] ||
 				[[file pathExtension] isEqualToString:@"mpkg"]) // No point in looking in bundles.
 			{
@@ -642,7 +616,7 @@
 		
 		if (!newAppDownloadPath || ![[NSFileManager defaultManager] fileExistsAtPath:newAppDownloadPath])
 		{
-			[NSException raise:@"SUInstallException" format:@"The update archive didn't contain an application with the proper name: %@. Remember, the updated app's file name must be identical to {CFBundleName}.{Extension}", [[utilities unlocalizedInfoValueForKey:@"CFBundleName"] stringByAppendingPathExtension:[utilities hostAppExtension]]];
+			[NSException raise:@"SUInstallException" format:@"The update archive didn't contain an application with the proper name: %@.", bundleFileName];
 		}
 	}
 	@catch(NSException *e) 
@@ -658,8 +632,8 @@
 		if (!isPackage)
 		{
 			NSInteger tag = 0;
-			BOOL result = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[currentBundlePath stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[currentBundlePath lastPathComponent]] tag:&tag];
-			result &= [[NSFileManager defaultManager] movePath:newAppDownloadPath toPath:currentBundlePath handler:nil];
+			BOOL result = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[[hostBundle bundlePath] stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[[hostBundle bundlePath] lastPathComponent]] tag:&tag];
+			result &= [[NSFileManager defaultManager] movePath:newAppDownloadPath toPath:[hostBundle bundlePath] handler:nil];
 			if (!result)
 			{
 				[self abandonUpdate];
@@ -685,19 +659,19 @@
 		}
 		else
 		{			
-			if (![[NSFileManager defaultManager] copyPathWithAuthentication:newAppDownloadPath toPath:currentBundlePath])
+			if (![[NSFileManager defaultManager] copyPathWithAuthentication:newAppDownloadPath toPath:[hostBundle bundlePath]])
 			{
-				[self showUpdateErrorAlertWithInfo:[NSString stringWithFormat:SULocalizedString(@"%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help.", nil), [utilities hostAppDisplayName]]];
+				[self showUpdateErrorAlertWithInfo:[NSString stringWithFormat:SULocalizedString(@"%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help.", nil), [hostBundle name]]];
 				[self abandonUpdate];
 				return;
 			}
 		}
 	}
-		
+	
 	// Prompt for permission to restart if we're automatically updating.
 	if ([self isAutomaticallyUpdating])
 	{
-		SUAutomaticUpdateAlert *alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:updateItem andUtilities:utilities];
+		SUAutomaticUpdateAlert *alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:updateItem hostBundle:hostBundle];
 		if ([NSApp runModalForWindow:[alert window]] == NSAlertAlternateReturn)
 		{
 			[alert release];
@@ -713,7 +687,7 @@
 	}
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-
+	
 	NSString *relaunchPath = [[[NSBundle bundleForClass:[self class]] executablePath] stringByDeletingLastPathComponent];
 	if (!relaunchPath) // slight hack to resolve issues with running within bundles
 	{
@@ -722,8 +696,8 @@
 		relaunchPath = [[framework executablePath] stringByDeletingLastPathComponent];
 	}
 	relaunchPath = [relaunchPath stringByAppendingPathComponent:@"relaunch.app/Contents/MacOS/relaunch"];
-
-	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:currentAppPath, [NSString stringWithFormat:@"%d", processIdentifier], nil]];
+	
+	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", processIdentifier], nil]];
 	[NSApp terminate:self];
 }
 

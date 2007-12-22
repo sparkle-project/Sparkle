@@ -7,7 +7,6 @@
 //
 
 #import "SUUpdater.h"
-#import "SUUtilities.h"
 #import "SUConstants.h"
 #import "SUAppcast.h"
 #import "SUAppcastItem.h"
@@ -16,7 +15,9 @@
 #import "SUStatusController.h"
 #import "SUUnarchiver.h"
 #import "SUStatusChecker.h"
+#import "SUUserDefaults.h"
 
 #import "NSApplication+AppCopies.h"
 #import "NSFileManager+Authentication.h"
 #import "NSFileManager+Verification.h"
+#import "NSBundle+SUAdditions.h"
