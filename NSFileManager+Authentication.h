@@ -7,5 +7,5 @@
 //
 
 @interface NSFileManager (SUAuthenticationAdditions)
-- (BOOL)copyPathWithAuthentication:(NSString *)src toPath:(NSString *)dst;
+- (BOOL)copyPath:(NSString *)src overPath:(NSString *)dst withAuthentication:(BOOL)useAuthentication;
 @end

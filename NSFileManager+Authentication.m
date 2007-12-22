@@ -86,7 +86,7 @@
 	return res;	
 }
 
-- (BOOL)copyPathWithAuthentication:(NSString *)src toPath:(NSString *)dst
+- (BOOL)copyPath:(NSString *)src overPath:(NSString *)dst withAuthentication:(BOOL)useAuthentication
 {
 	if ([[NSFileManager defaultManager] isWritableFileAtPath:dst] && [[NSFileManager defaultManager] isWritableFileAtPath:[dst stringByDeletingLastPathComponent]])
 	{
@@ -95,7 +95,7 @@
 		result &= [[NSFileManager defaultManager] copyPath:src toPath:dst handler:nil];
 		return result;
 	}
-	else
+	else if (useAuthentication == YES)
 	{
 		return [self _copyPathWithForcedAuthentication:src toPath:dst];
 	}

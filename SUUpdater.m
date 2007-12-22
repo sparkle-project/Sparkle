@@ -352,13 +352,11 @@
 
 - (void)beginDownload
 {
-	if (![self isAutomaticallyUpdating])
-	{
-		statusController = [[SUStatusController alloc] initWithHostBundle:hostBundle];
-		[statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", nil) maxProgressValue:0 statusText:nil];
-		[statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
+	statusController = [[SUStatusController alloc] initWithHostBundle:hostBundle];
+	[statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", nil) maxProgressValue:0 statusText:nil];
+	[statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
+	if ([self isAutomaticallyUpdating] == NO)
 		[statusController showWindow:self];
-	}
 	
 	downloader = [[NSURLDownload alloc] initWithRequest:[NSURLRequest requestWithURL:[updateItem fileURL]] delegate:self];	
 }
@@ -429,7 +427,6 @@
 
 - (void)unarchiver:(SUUnarchiver *)ua extractedLength:(long)length
 {
-	if ([self isAutomaticallyUpdating]) { return; }
 	if ([statusController maxProgressValue] == 0)
 		[statusController setMaxProgressValue:[[[[NSFileManager defaultManager] fileAttributesAtPath:downloadPath traverseLink:NO] objectForKey:NSFileSize] longValue]];
 	[statusController setProgressValue:[statusController progressValue] + length];
@@ -462,8 +459,7 @@
 - (void)extractUpdate
 {
 	// Now we have to extract the downloaded archive.
-	if (![self isAutomaticallyUpdating])
-		[statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", nil) maxProgressValue:0 statusText:nil];
+	[statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", nil) maxProgressValue:0 statusText:nil];
 	
 	@try 
 	{		
@@ -495,100 +491,70 @@
 {
 	NSString *newAppDownloadPath = nil;
 	BOOL isPackage = NO;
-	int processIdentifier = [[NSProcessInfo processInfo] processIdentifier];
-	@try 
+
+	[statusController beginActionWithTitle:SULocalizedString(@"Installing update...", nil) maxProgressValue:0 statusText:nil];
+	[statusController setButtonEnabled:NO];
+	
+	// Hack to force us to wait for the UI to update.
+	NSEvent *event;
+	while((event = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:nil inMode:NSDefaultRunLoopMode dequeue:YES]))
+		[NSApp sendEvent:event];	
+
+	// Search subdirectories for the application
+	NSString *file, *bundleFileName = [[hostBundle bundlePath] lastPathComponent];
+	NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:[downloadPath stringByDeletingLastPathComponent]];
+	while ((file = [dirEnum nextObject]))
 	{
-		if (![self isAutomaticallyUpdating])
+		// Some DMGs have symlinks into /Applications! That's no good! And there's no point in looking in bundles.
+		if ([file isEqualToString:@"/Applications"] ||
+			[[file pathExtension] isEqualToString:[[hostBundle bundlePath] pathExtension]] ||
+			[[file pathExtension] isEqualToString:@"pkg"] ||
+			[[file pathExtension] isEqualToString:@"mpkg"])
 		{
-			[statusController beginActionWithTitle:SULocalizedString(@"Installing update...", nil) maxProgressValue:0 statusText:nil];
-			[statusController setButtonEnabled:NO];
-			
-			// We have to wait for the UI to update.
-			NSEvent *event;
-			while((event = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:nil inMode:NSDefaultRunLoopMode dequeue:YES]))
-				[NSApp sendEvent:event];			
-		}
-				
-		// Search subdirectories for the application
-		NSString *file, *bundleFileName = [[hostBundle bundlePath] lastPathComponent];
-		NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:[downloadPath stringByDeletingLastPathComponent]];
-		while ((file = [dirEnum nextObject]))
-		{
-			// Some DMGs have symlinks into /Applications! That's no good!
-			if ([file isEqualToString:@"/Applications"])
-				[dirEnum skipDescendents];
-			if ([[file lastPathComponent] isEqualToString:bundleFileName]) // We found one!
-			{
-				isPackage = NO;
-				newAppDownloadPath = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:file];
-				break;
-			}
-			else if (([[file pathExtension] isEqualToString:@"pkg"] || [[file pathExtension] isEqualToString:@"mpkg"]) &&
-					 [[file stringByDeletingPathExtension] isEqualToString:[[[hostBundle bundlePath] lastPathComponent] stringByDeletingPathExtension]])
-			{
-				isPackage = YES;
-				newAppDownloadPath = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:file];
-				break;
-			}
-			if ([[file pathExtension] isEqualToString:[[hostBundle bundlePath] pathExtension]] ||
-				[[file pathExtension] isEqualToString:@"pkg"] ||
-				[[file pathExtension] isEqualToString:@"mpkg"]) // No point in looking in bundles.
-			{
-				[dirEnum skipDescendents];
-			}
+			[dirEnum skipDescendents];
 		}
 		
-		if (!newAppDownloadPath || ![[NSFileManager defaultManager] fileExistsAtPath:newAppDownloadPath])
+		if ([[file lastPathComponent] isEqualToString:bundleFileName]) // We found one!
 		{
-			[NSException raise:@"SUInstallException" format:@"The update archive didn't contain an application with the proper name: %@.", bundleFileName];
+			isPackage = NO;
+			newAppDownloadPath = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:file];
+			break;
 		}
-	}
-	@catch(NSException *e) 
-	{
-		NSLog([e reason]);
-		[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred during installation. Please try again later.", nil)];
-		[self abandonUpdate];
-		return;
+		else if (([[file pathExtension] isEqualToString:@"pkg"] || [[file pathExtension] isEqualToString:@"mpkg"]) &&
+				 [[file stringByDeletingPathExtension] isEqualToString:[[[hostBundle bundlePath] lastPathComponent] stringByDeletingPathExtension]])
+		{
+			isPackage = YES;
+			newAppDownloadPath = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:file];
+			break;
+		}
 	}
 	
-	if ([self isAutomaticallyUpdating]) // Don't do authentication if we're automatically updating; that'd be surprising.
+	if (![[NSFileManager defaultManager] fileExistsAtPath:newAppDownloadPath])
 	{
-		if (!isPackage)
-		{
-			NSInteger tag = 0;
-			BOOL result = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[[hostBundle bundlePath] stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[[hostBundle bundlePath] lastPathComponent]] tag:&tag];
-			result &= [[NSFileManager defaultManager] movePath:newAppDownloadPath toPath:[hostBundle bundlePath] handler:nil];
-			if (!result)
-			{
-				[self abandonUpdate];
-				return;
-			}
-		}
-		else
-		{
-			NSString *installerPath = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.installer"];
-			installerPath = [installerPath stringByAppendingString:@"/Contents/MacOS/Installer"];
-			NSTask *installer = [NSTask launchedTaskWithLaunchPath:installerPath arguments:[NSArray arrayWithObjects:newAppDownloadPath, nil]];
-			processIdentifier = [installer processIdentifier];
-		}
+		NSLog(@"The update archive didn't contain an application or package with the proper name: %@ or %@.", bundleFileName, [[bundleFileName stringByDeletingPathExtension] stringByAppendingPathComponent:@".[m]pkg"]);
+		[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred during installation. Please try again later.", nil)];
+		[self abandonUpdate];
+		return;		
 	}
-	else // But if we're updating by the action of the user, do an authenticated move.
+	
+	// Now that we've found the path we care about, let's install it.
+	int processIdentifierToWatch = [[NSProcessInfo processInfo] processIdentifier];
+	if (isPackage)
 	{
-		if (isPackage)
+		NSString *installerPath = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.installer"];
+		installerPath = [installerPath stringByAppendingString:@"/Contents/MacOS/Installer"];
+		NSTask *installer = [NSTask launchedTaskWithLaunchPath:installerPath arguments:[NSArray arrayWithObjects:newAppDownloadPath, nil]];
+		processIdentifierToWatch = [installer processIdentifier]; // We want to wait until the installer quits.
+	}
+	else
+	{
+		if (![[NSFileManager defaultManager] copyPath:newAppDownloadPath
+											 overPath:[hostBundle bundlePath]
+								   withAuthentication:![self isAutomaticallyUpdating]])
 		{
-			NSString *installerPath = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.installer"];
-			installerPath = [installerPath stringByAppendingString:@"/Contents/MacOS/Installer"];
-			NSTask *installer = [NSTask launchedTaskWithLaunchPath:installerPath arguments:[NSArray arrayWithObjects:newAppDownloadPath, nil]];
-			processIdentifier = [installer processIdentifier];
-		}
-		else
-		{			
-			if (![[NSFileManager defaultManager] copyPathWithAuthentication:newAppDownloadPath toPath:[hostBundle bundlePath]])
-			{
-				[self showUpdateErrorAlertWithInfo:[NSString stringWithFormat:SULocalizedString(@"%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help.", nil), [hostBundle name]]];
-				[self abandonUpdate];
-				return;
-			}
+			[self showUpdateErrorAlertWithInfo:[NSString stringWithFormat:SULocalizedString(@"%@ can't install the update! Make sure you have enough disk space.", nil), [hostBundle name]]];
+			[self abandonUpdate];
+			return;
 		}
 	}
 	
@@ -603,7 +569,7 @@
 		}
 	}
 	
-	// This is really sloppy and coupled, but gosh darn it, I'm not maintaining this codebase much longer. Sorry!
+	// This is really sloppy and coupled, but I can't think of a better way to deal with this.
 	// If we've got a DMG, we've mounted it; now we've got to unmount it.
 	if ([[[downloadPath pathExtension] lowercaseString] isEqualToString:@"dmg"])
 	{
@@ -621,7 +587,7 @@
 	}
 	relaunchPath = [relaunchPath stringByAppendingPathComponent:@"relaunch.app/Contents/MacOS/relaunch"];
 	
-	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", processIdentifier], nil]];
+	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", processIdentifierToWatch], nil]];
 	[NSApp terminate:self];
 }
 
