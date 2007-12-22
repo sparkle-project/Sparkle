@@ -32,7 +32,7 @@
 @interface SUUpdater (Private)
 - (void)checkForUpdatesAndNotify:(BOOL)verbosity;
 - (void)showUpdateErrorAlertWithInfo:(NSString *)info;
-- (NSTimeInterval)storedCheckInterval;
+- (NSTimeInterval)checkInterval;
 - (void)abandonUpdate;
 - (IBAction)installAndRestart:sender;
 - (NSString *)systemVersionString;
@@ -50,14 +50,7 @@
 	self = [super init];
 	hostBundle = [bundle retain];
 	[[SUUserDefaults standardUserDefaults] setIdentifier:[hostBundle bundleIdentifier]];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidFinishLaunching:) name:@"NSApplicationDidFinishLaunchingNotification" object:NSApp];	
-	
-	// OS version (Apple recommends using SystemVersion.plist instead of Gestalt() here, don't ask me why).
-	// This code *should* use NSSearchPathForDirectoriesInDomains(NSCoreServiceDirectory, NSSystemDomainMask, YES)
-	// but that returns /Library/CoreServices for some reason
-	NSString *versionPlistPath = @"/System/Library/CoreServices/SystemVersion.plist";
-	//gets a version string of the form X.Y.Z
-	currentSystemVersion = [[[NSDictionary dictionaryWithContentsOfFile:versionPlistPath] objectForKey:@"ProductVersion"] retain];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidFinishLaunching:) name:NSApplicationDidFinishLaunchingNotification object:NSApp];
 	return self;
 }
 
@@ -81,58 +74,47 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)note
 {
-	if ([[SUUserDefaults standardUserDefaults] boolForKey:SUIgnoreChecksKey])
-		return;
+	// If the user has been asked about automatic checks and said no, get out of here.
+	if ([[SUUserDefaults standardUserDefaults] objectForKey:SUEnableAutomaticChecksKey] &&
+		[[SUUserDefaults standardUserDefaults] boolForKey:SUEnableAutomaticChecksKey] == NO) { return; }
 	
-	// If there's a scheduled interval, we see if it's been longer than that interval since the last
-	// check. If so, we perform a startup check; if not, we don't.	
-	if ([self storedCheckInterval])
+	// Has he been asked already?
+	if ([[SUUserDefaults standardUserDefaults] objectForKey:SUEnableAutomaticChecksKey] == nil)
 	{
-		NSTimeInterval interval = [self storedCheckInterval];
-		NSDate *lastCheck = [[SUUserDefaults standardUserDefaults] objectForKey:SULastCheckTimeKey];
-		if (!lastCheck) { lastCheck = [NSDate distantPast]; }
-		NSTimeInterval intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheck];
-		if (intervalSinceCheck < interval)
+		// Now, we don't want to ask the user for permission to do a weird thing on the first launch.
+		// We wait until the second launch.
+		if ([[SUUserDefaults standardUserDefaults] boolForKey:SUHasLaunchedBeforeKey] == NO)
 		{
-			// Hasn't been long enough; schedule a check for the future.
-			[self performSelector:@selector(checkForUpdatesInBackground) withObject:nil afterDelay:(interval-intervalSinceCheck)];
-			[self performSelector:@selector(scheduleCheckWithIntervalObject:) withObject:[NSNumber numberWithDouble:interval] afterDelay:(interval-intervalSinceCheck)];
-		}
-		else
-		{
-			[self scheduleCheckWithInterval:interval];
-			[self checkForUpdatesInBackground];
-		}
-	}
-	else
-	{
-		// There's no scheduled check, so let's see if we're supposed to check on startup.
-		NSNumber *shouldCheckAtStartup = [[SUUserDefaults standardUserDefaults] objectForKey:SUCheckAtStartupKey];
-		if (!shouldCheckAtStartup) // hasn't been set yet; ask the user
-		{
-			// Let's see if there's a key in Info.plist for a default, though. We'll let that override the dialog if it's there.
-			NSNumber *infoStartupValue = [hostBundle objectForInfoDictionaryKey:SUCheckAtStartupKey];
-			if (infoStartupValue)
-			{
-				shouldCheckAtStartup = infoStartupValue;
-			}
-			else
-			{
-				NSImage *bundleIcon = [hostBundle icon];
-				NSImage *appIcon = [NSImage imageNamed: @"NSApplicationIcon"];
-				if ([appIcon setName:@"NSApplicationIconWorkAround"]) 
-					[bundleIcon setName:@"NSApplicationIcon"];
-				
-				shouldCheckAtStartup = [NSNumber numberWithBool:NSRunAlertPanel(SULocalizedString(@"Check for updates on startup?", nil), [NSString stringWithFormat:SULocalizedString(@"Would you like %1$@ to check for updates on startup? If not, you can initiate the check manually from the %1$@ menu.", nil), [hostBundle name]], SULocalizedString(@"Yes", nil), SULocalizedString(@"No", nil), nil) == NSAlertDefaultReturn];
-				
-				if ([bundleIcon setName:@"NSApplicationIconWorkAround2"]) 
-					[appIcon setName:@"NSApplicationIcon"];
-			}
-			[[SUUserDefaults standardUserDefaults] setObject:shouldCheckAtStartup forKey:SUCheckAtStartupKey];
+			[[SUUserDefaults standardUserDefaults] setBool:YES forKey:SUHasLaunchedBeforeKey];
+			return;
 		}
 		
-		if ([shouldCheckAtStartup boolValue])
-			[self checkForUpdatesInBackground];
+		// The user's never been asked, so let's see if they want automatic checking.
+		NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"Allow automatic update checking?", nil) defaultButton:SULocalizedString(@"Allow", nil) alternateButton:SULocalizedString(@"Don't Allow", nil) otherButton:nil informativeTextWithFormat:SULocalizedString(@"Would you like %1$@ to automatically check for updates to itself? If not, you can check for updates manually from the %1$@ menu.", nil), [hostBundle name]];
+		[alert setIcon:[hostBundle icon]];
+		[[SUUserDefaults standardUserDefaults] setBool:([alert runModal] == NSAlertDefaultReturn) forKey:SUEnableAutomaticChecksKey];
+		
+		// Let's get rid of that extra key cluttering up the user defaults, too.
+		[[SUUserDefaults standardUserDefaults] setObject:nil forKey:SUHasLaunchedBeforeKey];
+	}
+	
+	// Now that we know we've asked, do we have permission?
+	if ([[SUUserDefaults standardUserDefaults] boolForKey:SUEnableAutomaticChecksKey])
+	{
+		// How long has it been since last we checked for an update?
+		NSDate *lastCheckDate = [[SUUserDefaults standardUserDefaults] objectForKey:SULastCheckTimeKey];
+		if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
+		NSTimeInterval intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
+		
+		// Now we want to figure out how long until we check again.
+		NSTimeInterval delayUntilCheck;
+		if (intervalSinceCheck < [self checkInterval])
+			delayUntilCheck = ([self checkInterval] -intervalSinceCheck); // It hasn't been long enough.
+		else
+			delayUntilCheck = 0; // We're overdue! Run one now.
+		
+		[self performSelector:@selector(checkForUpdatesInBackground) withObject:nil afterDelay:delayUntilCheck];
+		[self performSelector:@selector(scheduleCheckWithIntervalObject:) withObject:[NSNumber numberWithDouble:[self checkInterval]] afterDelay:delayUntilCheck];
 	}
 }
 
@@ -167,28 +149,22 @@
 	[self checkForUpdatesAndNotify:YES]; // if we're coming from IB, then we want to be more verbose.
 }
 
-- (BOOL)validateMenuItem:(NSMenuItem *)item {
-	if ([item action] == @selector(checkForUpdates:)) {
-		if (![[SUUserDefaults standardUserDefaults] boolForKey:SUIgnoreChecksKey])
-		{
-			if (updateInProgress)
-				return NO;
-			else
-				return YES;
-		} else {
+- (BOOL)validateMenuItem:(NSMenuItem *)item
+{
+	if ([item action] == @selector(checkForUpdates:))
+	{
+		if (updateInProgress)
 			return NO;
-		}
+		else
+			return YES;
 	}
-	return NO;
+	return YES;
 }
 
 // If the verbosity flag is YES, Sparkle will say when it can't reach the server and when there's no new update.
 // This is generally useful for a menu item--when the check is explicitly invoked.
 - (void)checkForUpdatesAndNotify:(BOOL)verbosity
-{	
-	if ([[SUUserDefaults standardUserDefaults] boolForKey:SUIgnoreChecksKey])
-		return;
-	
+{		
 	if ([hostBundle isRunningFromDiskImage])
 	{
 		if (verbosity)
@@ -227,15 +203,18 @@
 - (BOOL)automaticallyUpdates
 {
 	// If the SUAllowsAutomaticUpdatesKey exists and is set to NO, return NO.
-	if ([[hostBundle objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] boolValue] == NO && [hostBundle objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey]) { return NO; }
+	if ([[hostBundle objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] boolValue] == NO)
+		return NO;
 	
 	// If we're not using DSA signatures, we aren't going to trust any updates automatically.
-	if (![[hostBundle objectForInfoDictionaryKey:SUExpectsDSASignatureKey] boolValue]) { return NO; }
+	if ([[hostBundle objectForInfoDictionaryKey:SUExpectsDSASignatureKey] boolValue] != YES)
+		return NO;
 	
-	// If there's no setting, we default to NO.
-	if (![[SUUserDefaults standardUserDefaults] objectForKey:SUAutomaticallyUpdateKey]) { return NO; }
+	// If there's no setting, or it's set to no, we're not automatically updating.
+	if ([[SUUserDefaults standardUserDefaults] boolForKey:SUAutomaticallyUpdateKey] != YES)
+		return NO;
 	
-	return [[[SUUserDefaults standardUserDefaults] objectForKey:SUAutomaticallyUpdateKey] boolValue];
+	return YES; // Otherwise, we're good to go.
 }
 
 - (BOOL)isAutomaticallyUpdating
@@ -258,29 +237,19 @@
 		[appIcon setName:@"NSApplicationIcon"];
 }
 
-- (NSTimeInterval)storedCheckInterval
-{
-	// Define some minimum intervals to avoid DOS-like checking attacks.
-#ifdef DEBUG
-#define MIN_INTERVAL 60
-#else
-#define MIN_INTERVAL 60*60
-#endif
-	
+- (NSTimeInterval)checkInterval
+{	
 	// Returns the scheduled check interval stored in the user defaults / info.plist. User defaults override Info.plist.
-	long interval = 0; // 0 signifies not to do timed checking.
+	long interval;
 	if ([[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey])
-	{
 		interval = [[[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey] longValue];
-	}
 	else if ([hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey])
-	{
 		interval = [[hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey] longValue];
-	}
-	if (interval >= MIN_INTERVAL)
+
+	if (interval >= SU_MIN_CHECK_INTERVAL)
 		return interval;
 	else
-		return 0;
+		return SU_DEFAULT_CHECK_INTERVAL; // Neither the user nor the developer has a preference.
 }
 
 - (void)beginDownload
@@ -350,7 +319,12 @@
 
 - (NSString *)systemVersionString
 {
-	return currentSystemVersion;
+	// OS version (Apple recommends using SystemVersion.plist instead of Gestalt() here, don't ask me why).
+	// This code *should* use NSSearchPathForDirectoriesInDomains(NSCoreServiceDirectory, NSSystemDomainMask, YES)
+	// but that returns /Library/CoreServices for some reason
+	NSString *versionPlistPath = @"/System/Library/CoreServices/SystemVersion.plist";
+	// This returns a version string of the form X.Y.Z
+	return [[NSDictionary dictionaryWithContentsOfFile:versionPlistPath] objectForKey:@"ProductVersion"];
 }
 
 - (NSString *)userAgentForAppcast:(SUAppcast *)ac

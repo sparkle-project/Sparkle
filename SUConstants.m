@@ -8,7 +8,7 @@
 
 NSString *SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotificationName";
 
-NSString *SUCheckAtStartupKey = @"SUCheckAtStartup";
+NSString *SUHasLaunchedBeforeKey = @"SUHasLaunchedBefore";
 NSString *SUFeedURLKey = @"SUFeedURL";
 NSString *SUShowReleaseNotesKey = @"SUShowReleaseNotes";
 NSString *SUSkippedVersionKey = @"SUSkippedVersion";
@@ -18,4 +18,4 @@ NSString *SUExpectsDSASignatureKey = @"SUExpectsDSASignature";
 NSString *SUPublicDSAKeyKey = @"SUPublicDSAKey";
 NSString *SUAutomaticallyUpdateKey = @"SUAutomaticallyUpdate";
 NSString *SUAllowsAutomaticUpdatesKey = @"SUAllowsAutomaticUpdates";
-NSString *SUIgnoreChecksKey = @"SUIgnoreChecks";
+NSString *SUEnableAutomaticChecksKey = @"SUEnableAutomaticChecks";

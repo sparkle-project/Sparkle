@@ -8,8 +8,8 @@
 
 extern NSString *SUUpdaterWillRestartNotification;
 
-extern NSString *SUCheckAtStartupKey;
 extern NSString *SUFeedURLKey;
+extern NSString *SUHasLaunchedBeforeKey;
 extern NSString *SUShowReleaseNotesKey;
 extern NSString *SUSkippedVersionKey;
 extern NSString *SUScheduledCheckIntervalKey;
@@ -18,7 +18,7 @@ extern NSString *SUExpectsDSASignatureKey;
 extern NSString *SUPublicDSAKeyKey;
 extern NSString *SUAutomaticallyUpdateKey;
 extern NSString *SUAllowsAutomaticUpdatesKey;
-extern NSString *SUIgnoreChecksKey;
+extern NSString *SUEnableAutomaticChecksKey;
 
 // NSInteger is a type that was added to Leopard.
 // Here is some glue to ensure that NSInteger will work with pre-10.5 SDKs:

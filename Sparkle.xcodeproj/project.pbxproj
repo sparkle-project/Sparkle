@@ -826,8 +826,6 @@
 				ARCHS = (
 					i386,
 					ppc,
-					ppc64,
-					x86_64,
 				);
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				COPY_PHASE_STRIP = NO;
@@ -847,6 +845,10 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				MACH_O_TYPE = mh_dylib;
+				OTHER_CFLAGS = (
+					"-fsingle-precision-constant",
+					"-DDEBUG",
+				);
 				OTHER_LDFLAGS = "-lcrypto";
 				PRODUCT_NAME = Sparkle;
 				SKIP_INSTALL = YES;
@@ -947,6 +949,10 @@
 		61B5F90609C4CEE300B25A18 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = (
+					i386,
+					ppc,
+				);
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
