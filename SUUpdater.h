@@ -33,7 +33,7 @@
 	NSBundle *hostBundle;
 }
 
-- (id)initWithBundle:(NSBundle *)bundle;
+- (void)setHostBundle:(NSBundle *)hostBundle;
 
 // This IBAction is meant for a main menu item. Hook up any menu item to this action,
 // and Sparkle will check for updates and report back its findings verbosely.

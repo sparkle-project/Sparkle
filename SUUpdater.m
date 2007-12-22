@@ -31,6 +31,9 @@
 
 @interface SUUpdater (Private)
 - (void)beginUpdateCheck;
+- (void)showUpdateAlert;
+- (void)beginDownload;
+- (void)extractUpdate;
 - (void)showUpdateErrorAlertWithInfo:(NSString *)info;
 - (NSTimeInterval)storedCheckInterval;
 - (void)abandonUpdate;
@@ -40,19 +43,38 @@
 
 @implementation SUUpdater
 
-- init
+#pragma mark Initialization
+
+// SUUpdater's a singleton now! And I'm enforcing it!
++ (id)allocWithZone:(NSZone *)zone
 {
-	return [self initWithBundle:[[NSBundle mainBundle] retain]];
+	static SUUpdater *sharedUpdater = nil;
+	if (sharedUpdater == nil)
+		sharedUpdater = [super allocWithZone:zone];
+    return sharedUpdater;
 }
 
-- (id)initWithBundle:(NSBundle *)bundle
++ (SUUpdater *)sharedUpdater
+{
+	return [SUUpdater alloc];
+}
+
+- init
 {
 	self = [super init];
-	hostBundle = [bundle retain];
-	[[SUUserDefaults standardUserDefaults] setIdentifier:[hostBundle bundleIdentifier]];
+	[self setHostBundle:[NSBundle mainBundle]];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidFinishLaunching:) name:NSApplicationDidFinishLaunchingNotification object:NSApp];
 	return self;
 }
+
+- (void)setHostBundle:(NSBundle *)hb
+{
+	[hostBundle release];
+	hostBundle = [hb retain];
+	[[SUUserDefaults standardUserDefaults] setIdentifier:[hostBundle bundleIdentifier]];
+}
+
+#pragma mark Automatic check support
 
 - (void)applicationDidFinishLaunching:(NSNotification *)note
 {
@@ -80,9 +102,17 @@
 		[[SUUserDefaults standardUserDefaults] setObject:nil forKey:SUHasLaunchedBeforeKey];
 	}
 	
-	// Now that we know we've asked, do we have permission?
-	if ([[SUUserDefaults standardUserDefaults] boolForKey:SUEnableAutomaticChecksKey])
+	if ([[SUUserDefaults standardUserDefaults] boolForKey:SUEnableAutomaticChecksKey] == YES)
 	{
+		// Find the stored check interval. User defaults override Info.plist.
+		if ([[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey])
+			checkInterval = [[[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey] longValue];
+		else if ([hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey])
+			checkInterval = [[hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey] longValue];
+		
+		if (checkInterval < SU_MIN_CHECK_INTERVAL) // This can also mean one that isn't set.
+			checkInterval = SU_DEFAULT_CHECK_INTERVAL;
+		
 		// How long has it been since last we checked for an update?
 		NSDate *lastCheckDate = [[SUUserDefaults standardUserDefaults] objectForKey:SULastCheckTimeKey];
 		if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
@@ -98,21 +128,6 @@
 		[self performSelector:@selector(checkForUpdatesInBackground) withObject:nil afterDelay:delayUntilCheck];
 		[self performSelector:@selector(scheduleCheckWithIntervalObject:) withObject:[NSNumber numberWithDouble:[self storedCheckInterval]] afterDelay:delayUntilCheck];
 	}
-}
-
-- (NSTimeInterval)storedCheckInterval
-{	
-	// Find the stored check interval. User defaults override Info.plist.
-	long interval;
-	if ([[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey])
-		interval = [[[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey] longValue];
-	else if ([hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey])
-		interval = [[hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey] longValue];
-	
-	if (interval >= SU_MIN_CHECK_INTERVAL)
-		return interval;
-	else
-		return SU_DEFAULT_CHECK_INTERVAL; // Neither the user nor the developer has a preference.
 }
 
 - (void)scheduleCheckWithInterval:(NSTimeInterval)interval
@@ -132,23 +147,6 @@
 - (void)scheduleCheckWithIntervalObject:(NSNumber *)interval
 {
 	[self scheduleCheckWithInterval:[interval doubleValue]];
-}
-
-- (void)dealloc
-{
-	[updateItem release];
-	[updateAlert release];
-	
-	[downloadPath release];
-	[statusController release];
-	[downloader release];
-	
-	if (checkTimer)
-		[checkTimer invalidate];
-	
-	[hostBundle release];
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[super dealloc];
 }
 
 - (void)checkForUpdatesInBackground
@@ -175,6 +173,30 @@
 	return YES;
 }
 
+- (BOOL)automaticallyUpdates
+{
+	// If the SUAllowsAutomaticUpdatesKey exists and is set to NO, return NO.
+	if ([[hostBundle objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] boolValue] == NO)
+		return NO;
+	
+	// If we're not using DSA signatures, we aren't going to trust any updates automatically.
+	if ([[hostBundle objectForInfoDictionaryKey:SUExpectsDSASignatureKey] boolValue] != YES)
+		return NO;
+	
+	// If there's no setting, or it's set to no, we're not automatically updating.
+	if ([[SUUserDefaults standardUserDefaults] boolForKey:SUAutomaticallyUpdateKey] != YES)
+		return NO;
+	
+	return YES; // Otherwise, we're good to go.
+}
+
+- (BOOL)isAutomaticallyUpdating
+{
+	return [self automaticallyUpdates] && !userInitiated;
+}
+
+#pragma mark Appcast-fetching phase
+
 - (void)beginUpdateCheck
 {		
 	if ([hostBundle isRunningFromDiskImage])
@@ -199,54 +221,107 @@
 	[appcast fetchAppcastFromURL:[NSURL URLWithString:appcastString]];
 }
 
-- (BOOL)automaticallyUpdates
+- (BOOL)newVersionAvailable
 {
-	// If the SUAllowsAutomaticUpdatesKey exists and is set to NO, return NO.
-	if ([[hostBundle objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] boolValue] == NO)
-		return NO;
-	
-	// If we're not using DSA signatures, we aren't going to trust any updates automatically.
-	if ([[hostBundle objectForInfoDictionaryKey:SUExpectsDSASignatureKey] boolValue] != YES)
-		return NO;
-	
-	// If there's no setting, or it's set to no, we're not automatically updating.
-	if ([[SUUserDefaults standardUserDefaults] boolForKey:SUAutomaticallyUpdateKey] != YES)
-		return NO;
-	
-	return YES; // Otherwise, we're good to go.
+	// First, we have to make sure that the newest version can run on the user's system.
+	// Apple recommends using SystemVersion.plist instead of Gestalt() here, don't ask me why.
+	// This code *should* use NSSearchPathForDirectoriesInDomains(NSCoreServiceDirectory, NSSystemDomainMask, YES)
+	// but that returns /Library/CoreServices for some reason
+	NSString *versionPlistPath = @"/System/Library/CoreServices/SystemVersion.plist";
+	// This returns a version string of the form X.Y.Z
+	NSString *systemVersionString = [[NSDictionary dictionaryWithContentsOfFile:versionPlistPath] objectForKey:@"ProductVersion"];
+	id <SUVersionComparison> comparator = [SUStandardVersionComparator defaultComparator];
+	BOOL canRunOnCurrentSystem = ([comparator compareVersion:[updateItem minimumSystemVersion] toVersion:systemVersionString] != NSOrderedDescending);
+	return (canRunOnCurrentSystem && ([comparator compareVersion:[hostBundle version] toVersion:[updateItem fileVersion]]) == NSOrderedAscending);
 }
 
-- (BOOL)isAutomaticallyUpdating
+- (void)appcastDidFinishLoading:(SUAppcast *)ac
 {
-	return [self automaticallyUpdates] && !userInitiated;
-}
-
-- (void)showUpdateErrorAlertWithInfo:(NSString *)info
-{
-	if ([self isAutomaticallyUpdating]) { return; }
-	
-	NSImage *bundleIcon = [hostBundle icon];
-	NSImage *appIcon = [NSImage imageNamed: @"NSApplicationIcon"];
-	if ([appIcon setName:@"NSApplicationIconWorkAround"]) 
-		[bundleIcon setName:@"NSApplicationIcon"];
-	
-	NSRunAlertPanel(SULocalizedString(@"Update Error!", nil), info, SULocalizedString(@"Cancel", nil), nil, nil);
-	
-	if ([bundleIcon setName:@"NSApplicationIconWorkAround2"]) 
-		[appIcon setName:@"NSApplicationIcon"];
-}
-
-- (void)beginDownload
-{
-	if (![self isAutomaticallyUpdating])
+	@try
 	{
-		statusController = [[SUStatusController alloc] initWithHostBundle:hostBundle];
-		[statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", nil) maxProgressValue:0 statusText:nil];
-		[statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
-		[statusController showWindow:self];
+		if (!ac)
+			[NSException raise:@"SUAppcastException" format:@"Couldn't get a valid appcast from the server."];
+		
+		updateItem = [[ac newestItem] retain];
+		[ac autorelease];
+		
+		// Record the time of the check for host app use and for interval checks on startup.
+		[[SUUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:SULastCheckTimeKey];
+		
+		if (![updateItem fileVersion])
+		{
+			[NSException raise:@"SUAppcastException" format:@"Can't extract a version string from the appcast feed. The filenames should look like YourApp_1.5.tgz, where 1.5 is the version number."];
+		}
+		
+		if (!userInitiated && [[[SUUserDefaults standardUserDefaults] objectForKey:SUSkippedVersionKey] isEqualToString:[updateItem fileVersion]]) { [self abandonUpdate]; return; }
+		
+		if ([self newVersionAvailable])
+		{
+			if (checkTimer)	// There's a new version! Let's disable the automated checking timer.
+			{
+				[checkTimer invalidate];
+				checkTimer = nil;
+			}
+			
+			if ([self isAutomaticallyUpdating])
+				[self beginDownload];
+			else
+				[self showUpdateAlert];
+		}
+		else
+		{
+			if (userInitiated)
+			{
+				NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"You're up to date!", nil) defaultButton:SULocalizedString(@"OK", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [hostBundle name], [hostBundle displayVersion]];
+				[alert setIcon:[hostBundle icon]];
+				[alert runModal];
+			}
+			[self abandonUpdate];
+		}
 	}
+	@catch (NSException *e)
+	{
+		[self abandonUpdate];
+		if (userInitiated)
+		{
+			NSLog([e reason]);
+			[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil)];
+		}
+	}
+}
+
+- (NSString *)userAgentForAppcast:(SUAppcast *)ac
+{
+	return [NSString stringWithFormat: @"%@/%@ Sparkle/1.5b1", [hostBundle name], [hostBundle displayVersion]];
+}
+
+- (void)appcastDidFailToLoad:(SUAppcast *)ac
+{
+	[ac autorelease];
+	updateInProgress = NO;
+	if (userInitiated)
+		[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil)];
+}
+
+#pragma mark The update alert phase
+
+- (void)showUpdateAlert
+{
+	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem hostBundle:hostBundle];
+	[updateAlert setDelegate:self];
 	
-	downloader = [[NSURLDownload alloc] initWithRequest:[NSURLRequest requestWithURL:[updateItem fileURL]] delegate:self];	
+	// Only show the update alert if the app is active; otherwise, we'll wait until it is.
+	if ([NSApp isActive])
+		[updateAlert showWindow:self];
+	else
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
+}
+
+- (void)applicationDidBecomeActive:(NSNotification *)aNotification
+{
+	// We don't want to display the update alert until the application becomes active.
+	[updateAlert showWindow:self];
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
 }
 
 - (void)updateAlert:(SUUpdateAlert *)alert finishedWithChoice:(SUUpdateAlertChoice)choice
@@ -274,110 +349,19 @@
 	}			
 }
 
-- (void)showUpdatePanel
+#pragma mark The downloading phase
+
+- (void)beginDownload
 {
-	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem hostBundle:hostBundle];
-	[updateAlert setDelegate:self];
+	if (![self isAutomaticallyUpdating])
+	{
+		statusController = [[SUStatusController alloc] initWithHostBundle:hostBundle];
+		[statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", nil) maxProgressValue:0 statusText:nil];
+		[statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
+		[statusController showWindow:self];
+	}
 	
-	// Only show the update alert if the app is active; otherwise, we'll wait until it is.
-	if ([NSApp isActive])
-		[updateAlert showWindow:self];
-	else
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
-}
-
-- (NSString *)systemVersionString
-{
-	// OS version (Apple recommends using SystemVersion.plist instead of Gestalt() here, don't ask me why).
-	// This code *should* use NSSearchPathForDirectoriesInDomains(NSCoreServiceDirectory, NSSystemDomainMask, YES)
-	// but that returns /Library/CoreServices for some reason
-	NSString *versionPlistPath = @"/System/Library/CoreServices/SystemVersion.plist";
-	// This returns a version string of the form X.Y.Z
-	return [[NSDictionary dictionaryWithContentsOfFile:versionPlistPath] objectForKey:@"ProductVersion"];
-}
-
-- (NSString *)userAgentForAppcast:(SUAppcast *)ac
-{
-	return [NSString stringWithFormat: @"%@/%@ Sparkle/1.5b1", [hostBundle name], [hostBundle displayVersion]];
-}
-
-- (void)appcastDidFailToLoad:(SUAppcast *)ac
-{
-	[ac autorelease];
-	updateInProgress = NO;
-	if (userInitiated)
-		[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil)];
-}
-
-// Override this to change the new version comparison logic!
-- (BOOL)newVersionAvailable
-{
-	id <SUVersionComparison> comparator = [SUStandardVersionComparator defaultComparator];
-	BOOL canRunOnCurrentSystem = ([comparator compareVersion:[updateItem minimumSystemVersion] toVersion:[self systemVersionString]] != NSOrderedDescending);
-	return (canRunOnCurrentSystem && ([comparator compareVersion:[hostBundle version] toVersion:[updateItem fileVersion]]) == NSOrderedAscending);
-}
-
-- (void)appcastDidFinishLoading:(SUAppcast *)ac
-{
-	@try
-	{
-		if (!ac)
-			[NSException raise:@"SUAppcastException" format:@"Couldn't get a valid appcast from the server."];
-		
-		updateItem = [[ac newestItem] retain];
-		[ac autorelease];
-		
-		// Record the time of the check for host app use and for interval checks on startup.
-		[[SUUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:SULastCheckTimeKey];
-		
-		if (![updateItem fileVersion])
-		{
-			[NSException raise:@"SUAppcastException" format:@"Can't extract a version string from the appcast feed. The filenames should look like YourApp_1.5.tgz, where 1.5 is the version number."];
-		}
-		
-		if (!userInitiated && [[[SUUserDefaults standardUserDefaults] objectForKey:SUSkippedVersionKey] isEqualToString:[updateItem fileVersion]]) { updateInProgress = NO; return; }
-		
-		if ([self newVersionAvailable])
-		{
-			if (checkTimer)	// There's a new version! Let's disable the automated checking timer unless the user cancels.
-			{
-				[checkTimer invalidate];
-				checkTimer = nil;
-			}
-			
-			if ([self isAutomaticallyUpdating])
-			{
-				[self beginDownload];
-			}
-			else
-			{
-				[self showUpdatePanel];
-			}
-		}
-		else
-		{
-			if (userInitiated) // We only notify on no new version when we're being verbose.
-			{
-				NSImage *bundleIcon = [hostBundle icon];
-				NSImage *appIcon = [NSImage imageNamed: @"NSApplicationIcon"];
-				if ([appIcon setName:@"NSApplicationIconWorkAround"]) 
-					[bundleIcon setName:@"NSApplicationIcon"];
-				
-				NSRunAlertPanel(SULocalizedString(@"You're up to date!", nil), [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [hostBundle name], [hostBundle displayVersion]], SULocalizedString(@"OK", nil), nil, nil);
-				
-				if ([bundleIcon setName:@"NSApplicationIconWorkAround2"]) 
-					[appIcon setName:@"NSApplicationIcon"];
-			}
-			updateInProgress = NO;
-		}
-	}
-	@catch (NSException *e)
-	{
-		NSLog([e reason]);
-		updateInProgress = NO;
-		if (userInitiated)
-			[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil)];
-	}
+	downloader = [[NSURLDownload alloc] initWithRequest:[NSURLRequest requestWithURL:[updateItem fileURL]] delegate:self];	
 }
 
 - (void)download:(NSURLDownload *)download didReceiveResponse:(NSURLResponse *)response
@@ -416,6 +400,33 @@
 	[statusController setProgressValue:[statusController progressValue] + length];
 	[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%.0lfk of %.0lfk", nil), [statusController progressValue] / 1024.0, [statusController maxProgressValue] / 1024.0]];
 }
+
+- (IBAction)cancelDownload:sender
+{
+	if (downloader)
+	{
+		[downloader cancel];
+		[downloader release];
+	}
+	[self abandonUpdate];
+}
+
+- (void)downloadDidFinish:(NSURLDownload *)download
+{
+	[download release];
+	downloader = nil;
+	[self extractUpdate];
+}
+
+- (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
+{
+	[self abandonUpdate];
+	
+	NSLog(@"Download error: %@", [error localizedDescription]);
+	[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred while trying to download the file. Please try again later.", nil)];
+}
+
+#pragma mark Extraction phase
 
 - (void)unarchiver:(SUUnarchiver *)ua extractedLength:(long)length
 {
@@ -485,34 +496,7 @@
 	}	
 }
 
-- (void)downloadDidFinish:(NSURLDownload *)download
-{
-	[download release];
-	downloader = nil;
-	[self extractUpdate];
-}
-
-- (void)abandonUpdate
-{
-	if (updateItem) { [updateItem autorelease]; }
-	updateItem = nil;
-	if (statusController)
-	{
-		[statusController close];
-		[statusController autorelease];
-	}
-	statusController = nil;
-	updateInProgress = NO;
-	[self scheduleCheckWithInterval:checkInterval];
-}
-
-- (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
-{
-	[self abandonUpdate];
-	
-	NSLog(@"Download error: %@", [error localizedDescription]);
-	[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred while trying to download the file. Please try again later.", nil)];
-}
+#pragma mark Installation
 
 - (IBAction)installAndRestart:sender
 {
@@ -648,21 +632,40 @@
 	[NSApp terminate:self];
 }
 
-- (IBAction)cancelDownload:sender
+#pragma mark Error handling
+
+- (void)showUpdateErrorAlertWithInfo:(NSString *)info
 {
-	if (downloader)
-	{
-		[downloader cancel];
-		[downloader release];
-	}
-	[self abandonUpdate];
+	if ([self isAutomaticallyUpdating]) { return; }
+	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"Update Error!", nil) defaultButton:SULocalizedString(@"Cancel Update", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:info];
+	[alert setIcon:[hostBundle icon]];
+	[alert runModal];
 }
 
-- (void)applicationDidBecomeActive:(NSNotification *)aNotification
+- (void)abandonUpdate
 {
-	// We don't want to display the update alert until the application becomes active.
-	[updateAlert showWindow:self];
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
+	if (updateItem) { [updateItem autorelease]; }
+	updateItem = nil;
+	if (statusController)
+	{
+		[statusController close];
+		[statusController autorelease];
+	}
+	statusController = nil;
+	updateInProgress = NO;
+	[self scheduleCheckWithInterval:checkInterval];
+}
+
+- (void)dealloc
+{
+	[updateItem release];
+	[downloader release];	
+	[downloadPath release];
+	[statusController release];
+	[hostBundle release];	
+	if (checkTimer) { [checkTimer invalidate]; }
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[super dealloc];
 }
 
 @end
