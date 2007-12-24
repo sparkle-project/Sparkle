@@ -35,6 +35,8 @@
 		61A225A50D1C4AC000430CCD /* SUStandardVersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */; };
 		61A2262B0D1C58FD00430CCD /* SUUserDefaults.h in Headers */ = {isa = PBXBuildFile; fileRef = 61A226290D1C58FD00430CCD /* SUUserDefaults.h */; };
 		61A2262C0D1C58FD00430CCD /* SUUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A2262A0D1C58FD00430CCD /* SUUserDefaults.m */; };
+		61A2279C0D1CEE7600430CCD /* SUSystemProfiler.h in Headers */ = {isa = PBXBuildFile; fileRef = 61A2279A0D1CEE7600430CCD /* SUSystemProfiler.h */; };
+		61A2279D0D1CEE7600430CCD /* SUSystemProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A2279B0D1CEE7600430CCD /* SUSystemProfiler.m */; };
 		61AAE8280A321A7F00D8810D /* Sparkle.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8220A321A7F00D8810D /* Sparkle.strings */; };
 		61AAE8290A321A8000D8810D /* SUAutomaticUpdateAlert.nib in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8240A321A7F00D8810D /* SUAutomaticUpdateAlert.nib */; };
 		61AAE82A0A321A8000D8810D /* SUUpdateAlert.nib in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8260A321A7F00D8810D /* SUUpdateAlert.nib */; };
@@ -136,6 +138,8 @@
 		61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUStandardVersionComparator.m; sourceTree = "<group>"; };
 		61A226290D1C58FD00430CCD /* SUUserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUserDefaults.h; sourceTree = "<group>"; };
 		61A2262A0D1C58FD00430CCD /* SUUserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUserDefaults.m; sourceTree = "<group>"; };
+		61A2279A0D1CEE7600430CCD /* SUSystemProfiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUSystemProfiler.h; sourceTree = "<group>"; };
+		61A2279B0D1CEE7600430CCD /* SUSystemProfiler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUSystemProfiler.m; sourceTree = "<group>"; };
 		61AAE8230A321A7F00D8810D /* en */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61AAE8250A321A7F00D8810D /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/SUAutomaticUpdateAlert.nib; sourceTree = "<group>"; };
 		61AAE8270A321A7F00D8810D /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/SUUpdateAlert.nib; sourceTree = "<group>"; };
@@ -421,6 +425,8 @@
 				61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */,
 				61A226290D1C58FD00430CCD /* SUUserDefaults.h */,
 				61A2262A0D1C58FD00430CCD /* SUUserDefaults.m */,
+				61A2279A0D1CEE7600430CCD /* SUSystemProfiler.h */,
+				61A2279B0D1CEE7600430CCD /* SUSystemProfiler.m */,
 			);
 			includeInIndex = 1;
 			name = Utilities;
@@ -464,6 +470,7 @@
 				61A2259E0D1C495D00430CCD /* SUVersionComparisonProtocol.h in Headers */,
 				61A225A40D1C4AC000430CCD /* SUStandardVersionComparator.h in Headers */,
 				61A2262B0D1C58FD00430CCD /* SUUserDefaults.h in Headers */,
+				61A2279C0D1CEE7600430CCD /* SUSystemProfiler.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -659,6 +666,7 @@
 				61A225940D1C3ADD00430CCD /* NSBundle+SUAdditions.m in Sources */,
 				61A225A50D1C4AC000430CCD /* SUStandardVersionComparator.m in Sources */,
 				61A2262C0D1C58FD00430CCD /* SUUserDefaults.m in Sources */,
+				61A2279D0D1CEE7600430CCD /* SUSystemProfiler.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -835,6 +843,8 @@
 				);
 				OTHER_LDFLAGS = "-lcrypto";
 				PRODUCT_NAME = Sparkle;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
+				"SDKROOT[arch=ppc]" = /Developer/SDKs/MacOSX10.3.9.sdk;
 				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = NO;
 				WARNING_CFLAGS = "-Wall";
@@ -855,8 +865,8 @@
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_COMPATIBILITY_VERSION = 1.5;
+				DYLIB_CURRENT_VERSION = 1.5;
 				FRAMEWORK_VERSION = A;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -865,14 +875,20 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Sparkle_Prefix.pch;
+				GCC_REUSE_STRINGS = NO;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.3;
+				"MACOSX_DEPLOYMENT_TARGET[arch=i386]" = 10.4;
+				"MACOSX_DEPLOYMENT_TARGET[arch=x86_64]" = 10.5;
 				OTHER_LDFLAGS = "-lcrypto";
 				PREBINDING = YES;
 				PRODUCT_NAME = Sparkle;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
+				"SDKROOT[arch=ppc]" = /Developer/SDKs/MacOSX10.3.9.sdk;
+				"SDKROOT[arch=x86_64]" = /Developer/SDKs/MacOSX10.5.sdk;
 				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = all;
@@ -888,13 +904,11 @@
 				ARCHS = (
 					i386,
 					ppc,
-					ppc64,
-					x86_64,
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				"MACOSX_DEPLOYMENT_TARGET[arch=i386]" = 10.4;
 				"MACOSX_DEPLOYMENT_TARGET[arch=ppc]" = 10.3;
 				OTHER_CFLAGS = "-fsingle-precision-constant";
@@ -902,6 +916,7 @@
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				"SDKROOT[arch=i386]" = /Developer/SDKs/MacOSX10.4u.sdk;
 				"SDKROOT[arch=ppc]" = /Developer/SDKs/MacOSX10.4u.sdk;
+				VALID_ARCHS = "ppc7400 ppc970 i386 x86_64 ppc";
 				WARNING_CFLAGS = "-wall";
 			};
 			name = Debug;
@@ -912,13 +927,11 @@
 				ARCHS = (
 					i386,
 					ppc,
-					ppc64,
-					x86_64,
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				"MACOSX_DEPLOYMENT_TARGET[arch=i386]" = 10.4;
 				"MACOSX_DEPLOYMENT_TARGET[arch=ppc]" = 10.3;
 				OTHER_CFLAGS = "-fsingle-precision-constant";
@@ -926,6 +939,7 @@
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				"SDKROOT[arch=i386]" = /Developer/SDKs/MacOSX10.4u.sdk;
 				"SDKROOT[arch=ppc]" = /Developer/SDKs/MacOSX10.4u.sdk;
+				VALID_ARCHS = "ppc7400 ppc970 i386 x86_64 ppc";
 				WARNING_CFLAGS = "-wall";
 			};
 			name = Release;

@@ -34,7 +34,6 @@
 - (void)beginDownload;
 - (void)extractUpdate;
 - (void)showUpdateErrorAlertWithInfo:(NSString *)info;
-- (NSTimeInterval)storedCheckInterval;
 - (void)abandonUpdate;
 - (IBAction)installAndRestart:sender;
 - (NSString *)systemVersionString;
@@ -119,13 +118,13 @@
 		
 		// Now we want to figure out how long until we check again.
 		NSTimeInterval delayUntilCheck;
-		if (intervalSinceCheck < [self storedCheckInterval])
-			delayUntilCheck = ([self storedCheckInterval] - intervalSinceCheck); // It hasn't been long enough.
+		if (intervalSinceCheck < checkInterval)
+			delayUntilCheck = (checkInterval - intervalSinceCheck); // It hasn't been long enough.
 		else
 			delayUntilCheck = 0; // We're overdue! Run one now.
 		
 		[self performSelector:@selector(checkForUpdatesInBackground) withObject:nil afterDelay:delayUntilCheck];
-		[self performSelector:@selector(scheduleCheckWithIntervalObject:) withObject:[NSNumber numberWithDouble:[self storedCheckInterval]] afterDelay:delayUntilCheck];
+		[self performSelector:@selector(scheduleCheckWithIntervalObject:) withObject:[NSNumber numberWithDouble:checkInterval] afterDelay:delayUntilCheck];
 	}
 }
 
@@ -492,7 +491,7 @@
 		[NSApp sendEvent:event];	
 
 	// Search subdirectories for the application
-	NSString *currentFile, *newAppDownloadPath, *bundleFileName = [[hostBundle bundlePath] lastPathComponent];
+	NSString *currentFile, *newAppDownloadPath = nil, *bundleFileName = [[hostBundle bundlePath] lastPathComponent];
 	BOOL isPackage = NO;
 	NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:[downloadPath stringByDeletingLastPathComponent]];
 	while ((currentFile = [dirEnum nextObject]))

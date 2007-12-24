@@ -96,9 +96,9 @@
 		return result;
 	}
 	else if (useAuthentication == YES)
-	{
 		return [self _copyPathWithForcedAuthentication:src toPath:dst];
-	}
+	else
+		return NO;
 }
 
 @end
