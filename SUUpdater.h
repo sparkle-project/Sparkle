@@ -53,6 +53,9 @@
 
 @end
 
+#import "Sparkle.h"
+
+
 // Define some minimum intervals to avoid DOS-like checking attacks. These are in seconds.
 #ifdef DEBUG
 #define SU_MIN_CHECK_INTERVAL 60

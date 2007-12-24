@@ -6,6 +6,8 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
+#import <Cocoa/Cocoa.h>
+
 NSString *SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotificationName";
 
 NSString *SUHasLaunchedBeforeKey = @"SUHasLaunchedBefore";

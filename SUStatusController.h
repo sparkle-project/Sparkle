@@ -6,7 +6,7 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import "Sparkle.h"
 
 @interface SUStatusController : NSWindowController {
 	double progressValue, maxProgressValue;

@@ -7,8 +7,6 @@
 //
 
 #import "SUUpdateAlert.h"
-#import "SUAppcastItem.h"
-#import "NSBundle+SUAdditions.h"
 #import <WebKit/WebKit.h>
 
 @implementation SUUpdateAlert

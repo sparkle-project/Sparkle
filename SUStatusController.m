@@ -7,7 +7,6 @@
 //
 
 #import "SUStatusController.h"
-#import "NSBundle+SUAdditions.h"
 
 @implementation SUStatusController
 

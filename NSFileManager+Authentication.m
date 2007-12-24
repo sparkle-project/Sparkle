@@ -8,13 +8,13 @@
 
 // This code based on generous contribution from Allan Odgaard. Thanks, Allan!
 
-#import "sys/stat.h"
-#import <Security/Security.h>
+#import "NSFileManager+Authentication.h"
 
-#import <unistd.h>
+#import <Security/Security.h>
 #import <sys/stat.h>
 #import <sys/wait.h>
 #import <dirent.h>
+#import <unistd.h>
 
 @implementation NSFileManager (SUAuthenticationAdditions)
 

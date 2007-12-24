@@ -7,8 +7,6 @@
 //
 
 #import "SUAutomaticUpdateAlert.h"
-#import "NSBundle+SUAdditions.h"
-#import "SUAppcastItem.h"
 
 @implementation SUAutomaticUpdateAlert
 

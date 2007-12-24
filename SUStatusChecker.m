@@ -6,8 +6,6 @@
 //
 
 #import "SUStatusChecker.h"
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
 
 @interface SUStatusChecker (Private)
 - (id)initForDelegate:(id<SUStatusCheckerDelegate>)inDelegate;

@@ -8,7 +8,6 @@
 
 #import "SUAppcastItem.h"
 
-
 @implementation SUAppcastItem
 
 - initWithDictionary:(NSDictionary *)dict

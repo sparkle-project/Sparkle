@@ -109,7 +109,6 @@
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		32DBCF5E0370ADEE00C91783 /* Sparkle_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sparkle_Prefix.pch; sourceTree = "<group>"; };
 		345AF9E20A5D707200D7DA6F /* SUStatusChecker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStatusChecker.h; sourceTree = "<group>"; };
 		345AF9E30A5D707200D7DA6F /* SUStatusChecker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUStatusChecker.m; sourceTree = "<group>"; };
 		610D5A740A1670A4004AAD9C /* SUStatus.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SUStatus.nib; sourceTree = "<group>"; };
@@ -365,7 +364,6 @@
 				61AAE8240A321A7F00D8810D /* SUAutomaticUpdateAlert.nib */,
 				61AAE8260A321A7F00D8810D /* SUUpdateAlert.nib */,
 				61299B3509CB04E000B7442F /* Sparkle.h */,
-				32DBCF5E0370ADEE00C91783 /* Sparkle_Prefix.pch */,
 			);
 			name = "Other Sources";
 			sourceTree = "<group>";
@@ -410,8 +408,8 @@
 			children = (
 				611779570D1111C400749C97 /* NSWorkspace_RBAdditions.h */,
 				611779560D1111C400749C97 /* NSWorkspace_RBAdditions.m */,
-				610EC1BF0CF3914D00AE239E /* NTSynchronousTask.m */,
 				610EC1C00CF3914D00AE239E /* NTSynchronousTask.h */,
+				610EC1BF0CF3914D00AE239E /* NTSynchronousTask.m */,
 				61B5F8DF09C4CE3C00B25A18 /* NSString+extras.h */,
 				61B5F8E009C4CE3C00B25A18 /* NSString+extras.m */,
 				61B5F8E109C4CE3C00B25A18 /* RSS.h */,
@@ -831,8 +829,8 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = Sparkle_Prefix.pch;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
 				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
@@ -873,8 +871,8 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = Sparkle_Prefix.pch;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = "";
 				GCC_REUSE_STRINGS = NO;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				INFOPLIST_FILE = Info.plist;

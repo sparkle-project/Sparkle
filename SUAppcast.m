@@ -7,7 +7,6 @@
 //
 
 #import "SUAppcast.h"
-#import "SUAppcastItem.h"
 #import "RSS.h"
 
 @implementation SUAppcast

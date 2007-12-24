@@ -7,21 +7,6 @@
 //
 
 #import "SUUpdater.h"
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
-#import "SUUnarchiver.h"
-#import "NSBundle+SUAdditions.h"
-#import "SUUserDefaults.h"
-#import "SUVersionComparisonProtocol.h"
-#import "SUStandardVersionComparator.h"
-
-#import "SUUpdateAlert.h"
-#import "SUAutomaticUpdateAlert.h"
-#import "SUStatusController.h"
-
-#import "NSFileManager+Authentication.h"
-#import "NSFileManager+Verification.h"
-
 #import <stdio.h>
 #import <sys/stat.h>
 #import <unistd.h>

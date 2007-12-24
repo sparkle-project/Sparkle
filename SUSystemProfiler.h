@@ -6,8 +6,7 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
-
+#import "Sparkle.h"
 
 @interface SUSystemProfiler : NSObject {}
 + (NSURL *)profiledURLForAppcastURL:(NSURL *)appcastURL hostBundle:(NSBundle *)hostBundle;

@@ -5,8 +5,7 @@
 //  Created by Evan Schoenberg on 7/6/06.
 //
 
-#import <Cocoa/Cocoa.h>
-#import <Sparkle/SUUpdater.h>
+#import "SUUpdater.h"
 
 @class SUStatusChecker;
 

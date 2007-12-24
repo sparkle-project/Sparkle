@@ -6,7 +6,7 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import "Sparkle.h"
 
 @class RSS, SUAppcastItem;
 @interface SUAppcast : NSObject {

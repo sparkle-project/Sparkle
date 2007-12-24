@@ -6,6 +6,8 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
+#import "Sparkle.h"
+
 @interface NSFileManager (SUAuthenticationAdditions)
 - (BOOL)copyPath:(NSString *)src overPath:(NSString *)dst withAuthentication:(BOOL)useAuthentication;
 @end
