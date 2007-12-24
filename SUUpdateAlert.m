@@ -96,8 +96,10 @@
 
 - (BOOL)allowsAutomaticUpdates
 {
-	if ([hostBundle objectForInfoDictionaryKey:SUExpectsDSASignatureKey]) { return NO; } // automatic updating requires DSA-signed updates
-	if ([hostBundle objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey]) { return YES; } // defaults to YES
+	if (![[hostBundle objectForInfoDictionaryKey:SUExpectsDSASignatureKey] boolValue])
+		return NO; // Automatic updating requires DSA-signed updates
+	if (![hostBundle objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey])
+		return YES; // defaults to YES
 	return [[hostBundle objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] boolValue];
 }
 
