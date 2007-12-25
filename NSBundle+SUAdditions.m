@@ -43,11 +43,17 @@
 {
 	// Cache the application icon.
 	NSString *iconPath = [self pathForResource:[self objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType:@"icns"];
+	// According to the OS X docs, "CFBundleIconFile - This key identifies the file containing
+	// the icon for the bundle. The filename you specify does not need to include the .icns
+	// extension, although it may."
+	//
+	// However, if it *does* include the '.icns' the above method fails (tested on OS X 10.3.9) so we'll also try:
+	if (!iconPath)
+		iconPath = [self pathForResource:[self objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType: nil];
 	NSImage *icon = [[[NSImage alloc] initWithContentsOfFile:iconPath] autorelease];
 	if (icon)
-		return icon;
-	else // Use a default icon if none is defined.
-        return [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kGenericApplicationIcon)];
+		return icon;	else // Use a default icon if none is defined.
+	return [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kGenericApplicationIcon)];
 }
 
 - (BOOL)isRunningFromDiskImage
