@@ -6,8 +6,8 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
+#import "Sparkle.h"
 #import "SUAppcast.h"
-#import "RSS.h"
 
 @implementation SUAppcast
 

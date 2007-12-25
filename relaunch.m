@@ -1,5 +1,6 @@
 // gcc -Wall -arch i386 -arch ppc -Os -s -framework AppKit -o relaunch relaunch.m
 
+#import "Sparkle.h"
 #import <AppKit/AppKit.h>
 #import <unistd.h>
 

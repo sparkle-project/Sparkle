@@ -6,7 +6,8 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
+#ifndef SUUNARCHIVER_H
+#define SUUNARCHIVER_H
 
 @interface SUUnarchiver : NSObject {
 	id delegate;
@@ -22,3 +23,5 @@
 - (void)unarchiverDidFinish:(SUUnarchiver *)unarchiver;
 - (void)unarchiverDidFail:(SUUnarchiver *)unarchiver;
 @end
+
+#endif

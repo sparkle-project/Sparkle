@@ -6,7 +6,8 @@
 //  Copyright 2005 __MyCompanyName__. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#ifndef NTSYNCHRONOUSTASK_H
+#define NTSYNCHRONOUSTASK_H
 
 @interface NTSynchronousTask : NSObject
 {
@@ -24,3 +25,5 @@
 + (NSData*)task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input;
 
 @end
+
+#endif

@@ -6,8 +6,8 @@
 //  Copyright 2007 Andy Matuschak. All rights reserved.
 //
 
+#import "Sparkle.h"
 #import "NSBundle+SUAdditions.h"
-#import "NSWorkspace_RBAdditions.h"
 
 @implementation NSBundle (SUAdditions)
 

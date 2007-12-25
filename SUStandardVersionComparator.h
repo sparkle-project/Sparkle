@@ -6,7 +6,11 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
-#import "Sparkle.h"
+#ifndef SUSTANDARDVERSIONCOMPARATOR_H
+#define SUSTANDARDVERSIONCOMPARATOR_H
+
+
+#import "SUVersionComparisonProtocol.h"
 
 /*!
     @class
@@ -28,3 +32,5 @@
 */
 - (NSComparisonResult)compareVersion:(NSString *)versionA toVersion:(NSString *)versionB;
 @end
+
+#endif

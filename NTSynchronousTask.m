@@ -6,6 +6,7 @@
 //  Copyright 2005 __MyCompanyName__. All rights reserved.
 //
 
+#import "Sparkle.h"
 #import "NTSynchronousTask.h"
 
 @interface NTSynchronousTask (Private)

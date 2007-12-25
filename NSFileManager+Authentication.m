@@ -8,6 +8,7 @@
 
 // This code based on generous contribution from Allan Odgaard. Thanks, Allan!
 
+#import "Sparkle.h"
 #import "NSFileManager+Authentication.h"
 
 #import <Security/Security.h>

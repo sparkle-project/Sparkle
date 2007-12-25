@@ -6,7 +6,9 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
+#ifndef SUSTATUSCONTROLLER_H
+#define SUSTATUSCONTROLLER_H
+
 
 @interface SUStatusController : NSWindowController {
 	double progressValue, maxProgressValue;
@@ -34,3 +36,5 @@
 - (void)setStatusText:(NSString *)statusText;
 
 @end
+
+#endif

@@ -6,9 +6,9 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
+
+#import "Sparkle.h"
 #import "SUUnarchiver.h"
-#import <Carbon/Carbon.h>
-#import "NTSynchronousTask.h"
 
 @implementation SUUnarchiver
 

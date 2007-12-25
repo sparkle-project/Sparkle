@@ -6,7 +6,8 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
+#ifndef SUAPPCAST_H
+#define SUAPPCAST_H
 
 @class RSS, SUAppcastItem;
 @interface SUAppcast : NSObject {
@@ -27,3 +28,5 @@
 - (void)appcastDidFailToLoad:(SUAppcast *)appcast;
 - (NSString *)userAgentForAppcast:(SUAppcast *)appcast;
 @end
+
+#endif

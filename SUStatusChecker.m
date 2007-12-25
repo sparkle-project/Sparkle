@@ -5,6 +5,7 @@
 //  Created by Evan Schoenberg on 7/6/06.
 //
 
+#import "Sparkle.h"
 #import "SUStatusChecker.h"
 
 @interface SUStatusChecker (Private)

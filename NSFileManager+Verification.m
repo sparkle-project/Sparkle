@@ -8,6 +8,7 @@
 
 // DSA stuff adapted from code provided by Allan Odgaard. Thanks, Allan!
 
+#import "Sparkle.h"
 #import "NSFileManager+Verification.h"
 
 #import <stdio.h>

@@ -6,8 +6,12 @@
 //  Copyright 2006 __MyCompanyName__. All rights reserved.
 //
 
+#import "Sparkle.h"
 #import "SUUpdater.h"
-#import "sys/stat.h"
+
+#import <sys/types.h>
+#import <sys/wait.h>
+#import <sys/stat.h">
 #import <Security/Security.h>
 
 @implementation SUUpdater (SUAuthenticationAdditions)

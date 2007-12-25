@@ -31,6 +31,10 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMA
 
 */
 
+#ifndef RSS_H
+#define RSS_H
+
+
 /*
 	RSS.h
 	A class for reading RSS feeds.
@@ -96,3 +100,5 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMA
 - (NSString *) getelementvalue: (CFXMLTreeRef) tree;
 
 @end
+
+#endif

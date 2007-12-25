@@ -6,7 +6,8 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
+#ifndef SUAUTOMATICUPDATEALERT_H
+#define SUAUTOMATICUPDATEALERT_H
 
 @class SUAppcastItem;
 @interface SUAutomaticUpdateAlert : NSWindowController {
@@ -20,3 +21,5 @@
 - (IBAction)relaunchLater:sender;
 
 @end
+
+#endif

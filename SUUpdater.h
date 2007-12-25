@@ -6,7 +6,8 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#ifndef SUUPDATER_H
+#define SUUPDATER_H
 
 // Before you use Sparkle in your app, you must set SUFeedURL in Info.plist to the
 // address of the appcast on your webserver. If you don't already have an 
@@ -53,18 +54,17 @@
 
 @end
 
-#import "Sparkle.h"
-
-
 // Define some minimum intervals to avoid DOS-like checking attacks. These are in seconds.
 #ifdef DEBUG
-#define SU_MIN_CHECK_INTERVAL 60
+	#define SU_MIN_CHECK_INTERVAL 60
 #else
-#define SU_MIN_CHECK_INTERVAL 60*60
+	#define SU_MIN_CHECK_INTERVAL 60*60
 #endif
 
 #ifdef DEBUG
-#define SU_DEFAULT_CHECK_INTERVAL 60
+	#define SU_DEFAULT_CHECK_INTERVAL 60
 #else
-#define SU_DEFAULT_CHECK_INTERVAL 60*60*24
+	#define SU_DEFAULT_CHECK_INTERVAL 60*60*24
+#endif
+
 #endif

@@ -6,7 +6,9 @@
 //  Copyright 2007 Rainer Brockerhoff. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#ifndef NSWORKSPACE_RBADDITIONS_H
+#define NSWORKSPACE_RBADDITIONS_H
+
 
 extern NSString* NSWorkspace_RBfstypename;
 extern NSString* NSWorkspace_RBmntonname;
@@ -35,3 +37,5 @@ extern NSString* NSWorkspace_RBserverURL;
 - (NSDictionary*)propertiesForPath:(NSString*)path;
 
 @end
+
+#endif

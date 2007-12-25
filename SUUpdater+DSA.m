@@ -8,7 +8,9 @@
 
 // Thanks to Allan Odgaard for this code!
 
+#import "Sparkle.h"
 #import "SUUpdater.h"
+
 #import <stdio.h>
 #import <openssl/evp.h>
 #import <openssl/bio.h>

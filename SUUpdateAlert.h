@@ -6,7 +6,8 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
+#ifndef SUUPDATEALERT_H
+#define SUUPDATEALERT_H
 
 typedef enum
 {
@@ -39,3 +40,5 @@ typedef enum
 @interface NSObject (SUUpdateAlertDelegate)
 - (void)updateAlert:(SUUpdateAlert *)updateAlert finishedWithChoice:(SUUpdateAlertChoice)updateChoice;
 @end
+
+#endif

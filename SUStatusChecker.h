@@ -5,6 +5,9 @@
 //  Created by Evan Schoenberg on 7/6/06.
 //
 
+#ifndef SUSTATUSCHECKER_H
+#define SUSTATUSCHECKER_H
+
 #import "SUUpdater.h"
 
 @class SUStatusChecker;
@@ -23,3 +26,5 @@
 + (SUStatusChecker *)statusCheckerForDelegate:(id<SUStatusCheckerDelegate>)delegate;
 
 @end
+
+#endif

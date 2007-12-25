@@ -6,7 +6,8 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import "Sparkle.h"
+#import "SUConstants.h"
 
 NSString *SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotificationName";
 

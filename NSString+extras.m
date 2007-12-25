@@ -40,6 +40,7 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMA
 	Copyright (c) 2002 Brent Simmons. All rights reserved.
 */
 
+#import "Sparkle.h"
 #import "NSString+extras.h"
 
 

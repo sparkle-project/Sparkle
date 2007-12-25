@@ -6,7 +6,8 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#ifndef SUUSERDEFAULTS_H
+#define SUUSERDEFAULTS_H
 
 /*!
     @class
@@ -36,3 +37,5 @@
 - (BOOL)boolForKey:(NSString *)defaultName;
 - (void)setBool:(BOOL)value forKey:(NSString *)defaultName;
 @end
+
+#endif

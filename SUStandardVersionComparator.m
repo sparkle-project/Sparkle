@@ -6,6 +6,7 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
+#import "Sparkle.h"
 #import "SUStandardVersionComparator.h"
 
 @implementation SUStandardVersionComparator

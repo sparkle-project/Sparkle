@@ -6,7 +6,9 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
+#ifndef SUAPPCASTITEM_H
+#define SUAPPCASTITEM_H
+
 
 @interface SUAppcastItem : NSObject {
 	NSString *title;
@@ -59,3 +61,5 @@
 - (void)setMinimumSystemVersion:(NSString *)systemVersionString;
 
 @end
+
+#endif

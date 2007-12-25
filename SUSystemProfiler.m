@@ -6,8 +6,9 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
+#import "Sparkle.h"
 #import "SUSystemProfiler.h"
-#import "NSBundle+SUAdditions.h"
+
 #import <sys/sysctl.h>
 
 @implementation SUSystemProfiler

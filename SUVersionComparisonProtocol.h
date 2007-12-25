@@ -6,7 +6,8 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#ifndef SUVERSIONCOMPARISONPROTOCOL_H
+#define SUVERSIONCOMPARISONPROTOCOL_H
 
 /*!
     @protocol
@@ -22,3 +23,5 @@
 - (NSComparisonResult)compareVersion:(NSString *)versionA toVersion:(NSString *)versionB;
 
 @end
+
+#endif

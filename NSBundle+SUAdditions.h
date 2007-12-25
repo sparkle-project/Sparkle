@@ -6,7 +6,8 @@
 //  Copyright 2007 Andy Matuschak. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#ifndef NSBUNDLE_PLUS_ADDITIONS_H
+#define NSBUNDLE_PLUS_ADDITIONS_H
 
 @interface NSBundle (SUAdditions)
 /*!
@@ -43,3 +44,5 @@
 */
 - (BOOL)isRunningFromDiskImage;
 @end
+
+#endif

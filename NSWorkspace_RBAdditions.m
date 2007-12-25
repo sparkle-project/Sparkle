@@ -6,7 +6,9 @@
 //  Copyright 2007 Rainer Brockerhoff. All rights reserved.
 //
 
+#import "Sparkle.h"
 #import "NSWorkspace_RBAdditions.h"
+
 #include <IOKit/IOKitLib.h>
 #include <sys/mount.h>
 #include <mach/mach.h>
