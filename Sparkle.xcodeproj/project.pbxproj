@@ -911,9 +911,9 @@
 				"MACOSX_DEPLOYMENT_TARGET[arch=ppc]" = 10.3;
 				OTHER_CFLAGS = "-fsingle-precision-constant";
 				PREBINDING = NO;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
 				"SDKROOT[arch=i386]" = /Developer/SDKs/MacOSX10.4u.sdk;
-				"SDKROOT[arch=ppc]" = /Developer/SDKs/MacOSX10.4u.sdk;
+				"SDKROOT[arch=ppc]" = /Developer/SDKs/MacOSX10.3.9.sdk;
 				VALID_ARCHS = "ppc7400 ppc970 i386 x86_64 ppc";
 				WARNING_CFLAGS = "-wall";
 			};
@@ -925,6 +925,8 @@
 				ARCHS = (
 					i386,
 					ppc,
+					ppc64,
+					x86_64,
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -932,11 +934,13 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				"MACOSX_DEPLOYMENT_TARGET[arch=i386]" = 10.4;
 				"MACOSX_DEPLOYMENT_TARGET[arch=ppc]" = 10.3;
+				"MACOSX_DEPLOYMENT_TARGET[arch=x86_64]" = 10.5;
 				OTHER_CFLAGS = "-fsingle-precision-constant";
 				PREBINDING = NO;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
 				"SDKROOT[arch=i386]" = /Developer/SDKs/MacOSX10.4u.sdk;
-				"SDKROOT[arch=ppc]" = /Developer/SDKs/MacOSX10.4u.sdk;
+				"SDKROOT[arch=ppc]" = /Developer/SDKs/MacOSX10.3.9.sdk;
+				"SDKROOT[arch=x86_64]" = /Developer/SDKs/MacOSX10.5.sdk;
 				VALID_ARCHS = "ppc7400 ppc970 i386 x86_64 ppc";
 				WARNING_CFLAGS = "-wall";
 			};
