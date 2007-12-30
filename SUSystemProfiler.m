@@ -3,7 +3,8 @@
 //  Sparkle
 //
 //  Created by Andy Matuschak on 12/22/07.
-//  Copyright 2007 __MyCompanyName__. All rights reserved.
+//  Copyright 2007 Andy Matuschak. All rights reserved.
+//  Adapted from Sparkle+, by Tom Harrington.
 //
 
 #import "Sparkle.h"

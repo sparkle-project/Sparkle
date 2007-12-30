@@ -47,8 +47,11 @@
 - init
 {
 	self = [super init];
-	[self setHostBundle:[NSBundle mainBundle]];
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidFinishLaunching:) name:NSApplicationDidFinishLaunchingNotification object:NSApp];
+	if (self)
+	{
+		[self setHostBundle:[NSBundle mainBundle]];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidFinishLaunching:) name:NSApplicationDidFinishLaunchingNotification object:NSApp];
+	}
 	return self;
 }
 

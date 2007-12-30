@@ -16,7 +16,7 @@
 
 @implementation SUStatusChecker
 
-+ (SUStatusChecker *)statusCheckerForDelegate:(id<SUStatusCheckerDelegate>)inDelegate;
++ (SUStatusChecker *)statusCheckerForDelegate:(id<SUStatusCheckerDelegate>)inDelegate
 {
 	SUStatusChecker *statusChecker = [[self alloc] initForDelegate:inDelegate];
 
@@ -25,12 +25,14 @@
 
 - (id)initForDelegate:(id<SUStatusCheckerDelegate>)inDelegate
 {
-	[super init];
+	self = [super init];
+	if (self)
+	{
+		scDelegate = [inDelegate retain];
 
-	scDelegate = [inDelegate retain];
-
-	[self checkForUpdatesAndNotify:NO];
-
+		[self checkForUpdatesAndNotify:NO];
+	}
+	
 	return self;
 }
 

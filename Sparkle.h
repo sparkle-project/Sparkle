@@ -15,16 +15,26 @@
 
 #define SULocalizedString(key,comment) NSLocalizedStringFromTableInBundle(key, @"Sparkle", [NSBundle bundleForClass:[self class]], comment)
 
+#import <CoreServices/CoreServices.h>
 #ifdef __OBJC__
 #import <Cocoa/Cocoa.h>
 #import "SUConstants.h"
 #endif
 
-// Apple recommends using SystemVersion.plist instead of Gestalt() here, don't ask me why.
-// This code *should* use NSSearchPathForDirectoriesInDomains(NSCoreServiceDirectory, NSSystemDomainMask, YES)
-// but that returns /Library/CoreServices for some reason
 // This returns a version string of the form X.Y.Z
-#define SUSystemVersionString() [[NSDictionary dictionaryWithContentsOfFile:@"/System/Library/CoreServices/SystemVersion.plist"] objectForKey:@"ProductVersion"]
+inline NSString* SUSystemVersionString(void)
+{
+	long major, minor, bugfix;
+	OSErr err1 = Gestalt (gestaltSystemVersionMajor, &major);
+	OSErr err2 = Gestalt (gestaltSystemVersionMinor, &minor);
+	OSErr err3 = Gestalt (gestaltSystemVersionBugFix, &bugfix);
+	NSString* verStr = nil;
+	if (!err1 && !err2 && !err3)
+	{
+		verStr = [NSString stringWithFormat:@"%ld.%ld.%ld", major, minor, bugfix];
+	}
+	return verStr;
+}
 
 
 // This list should include the shared headers. It doesn't matter if some of them aren't shared (unless
@@ -55,4 +65,3 @@
 #import "SUVersionComparisonProtocol.h"
 
 #endif
-
