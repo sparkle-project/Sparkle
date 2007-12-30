@@ -24,10 +24,10 @@
 // This returns a version string of the form X.Y.Z
 inline NSString* SUSystemVersionString(void)
 {
-	long major, minor, bugfix;
-	OSErr err1 = Gestalt (gestaltSystemVersionMajor, &major);
-	OSErr err2 = Gestalt (gestaltSystemVersionMinor, &minor);
-	OSErr err3 = Gestalt (gestaltSystemVersionBugFix, &bugfix);
+	SInt32 major, minor, bugfix;
+	OSErr err1 = Gestalt(gestaltSystemVersionMajor, &major);
+	OSErr err2 = Gestalt(gestaltSystemVersionMinor, &minor);
+	OSErr err3 = Gestalt(gestaltSystemVersionBugFix, &bugfix);
 	NSString* verStr = nil;
 	if (!err1 && !err2 && !err3)
 	{

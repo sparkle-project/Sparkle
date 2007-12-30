@@ -158,7 +158,7 @@
 
 - (NSString *)descriptionText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available—you have %@. Would you like to download it now?", nil), [hostBundle name], [updateItem versionString], [hostBundle displayVersion]];	
+	return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available%Cyou have %@. Would you like to download it now?", nil), [hostBundle name], [updateItem versionString], 0x2014, [hostBundle displayVersion]];	
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:frame
