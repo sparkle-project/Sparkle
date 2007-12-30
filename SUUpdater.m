@@ -33,6 +33,7 @@
 // SUUpdater's a singleton now! And I'm enforcing it!
 + (id)allocWithZone:(NSZone *)zone
 {
+	if ([self class] != [SUUpdater class]) { return [super allocWithZone:zone]; }
 	static SUUpdater *sharedUpdater = nil;
 	if (sharedUpdater == nil)
 		sharedUpdater = [super allocWithZone:zone];
