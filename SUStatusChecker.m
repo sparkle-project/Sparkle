@@ -30,7 +30,7 @@
 	{
 		scDelegate = [inDelegate retain];
 
-		[self checkForUpdatesAndNotify:NO];
+		[self checkForUpdatesInBackground];
 	}
 	
 	return self;
