@@ -18,7 +18,7 @@
 	NSBundle *hostBundle;
 }
 
-- initWithHostBundle:(NSBundle *)hostBundle;
+- (id)initWithHostBundle:(NSBundle *)hostBundle;
 
 // Pass 0 for the max progress value to get an indeterminate progress bar.
 // Pass nil for the status text to not show it.

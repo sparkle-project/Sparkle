@@ -482,7 +482,7 @@ NSComparisonResult compareNewsItems(id item1, id item2, void *context)
 	Also trim white space, remove HTML when appropriate.
 	*/
 	
-	NSString *description, *link, *title;
+	NSString *description, *normalizedLink, *title;
 	BOOL nilDescription = NO;
 	
 	/*Description*/
@@ -505,9 +505,9 @@ NSComparisonResult compareNewsItems(id item1, id item2, void *context)
 	
 	/*Link*/
 	
-	link = [rssItem objectForKey: linkKey];
+	normalizedLink = [rssItem objectForKey: linkKey];
 	
-	if ([NSString stringIsEmpty: link]) {
+	if ([NSString stringIsEmpty: normalizedLink]) {
 		
 		/*Try to get a URL from the description.*/
 		
@@ -517,21 +517,21 @@ NSComparisonResult compareNewsItems(id item1, id item2, void *context)
 			
 			if ([stringComponents count] > 1) {
 							
-				link = [stringComponents objectAtIndex: 1];
+				normalizedLink = [stringComponents objectAtIndex: 1];
 			
-				stringComponents = [link componentsSeparatedByString: @"\""];
+				stringComponents = [normalizedLink componentsSeparatedByString: @"\""];
 
-				link = [stringComponents objectAtIndex: 0];			
+				normalizedLink = [stringComponents objectAtIndex: 0];			
 				} /*if*/				
 			} /*if*/
 		} /*if*/
 	
-	if (link == nil)
-		link = @"";
+	if (normalizedLink == nil)
+		normalizedLink = @"";
 	
-	link = [link trimWhiteSpace];
+	normalizedLink = [normalizedLink trimWhiteSpace];
 	
-	[rssItem setObject: link forKey: linkKey];
+	[rssItem setObject: normalizedLink forKey: linkKey];
 	
 	/*Title*/
 	
@@ -703,7 +703,7 @@ NSComparisonResult compareNewsItems(id item1, id item2, void *context)
 			} /*if*/
 		} /*for*/
 	
-	value = [valueMutable copy];
+	value = [[valueMutable trimWhiteSpace] retain];
 	
 	[valueMutable autorelease];
 

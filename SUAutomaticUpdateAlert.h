@@ -15,7 +15,7 @@
 	NSBundle *hostBundle;
 }
 
-- initWithAppcastItem:(SUAppcastItem *)item hostBundle:(NSBundle *)hostBundle;
+- (id)initWithAppcastItem:(SUAppcastItem *)item hostBundle:(NSBundle *)hostBundle;
 
 - (IBAction)relaunchNow:sender;
 - (IBAction)relaunchLater:sender;

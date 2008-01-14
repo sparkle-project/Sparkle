@@ -88,9 +88,9 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMA
 
 - (NSString *) stripHTML {
 	
-	NSInteger len = [self length];
+	NSUInteger len = [self length];
 	NSMutableString *s = [NSMutableString stringWithCapacity: len];
-	NSInteger i = 0, level = 0;
+	NSUInteger i = 0, level = 0;
 	
 	for (i = 0; i < len; i++) {
 		

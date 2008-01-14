@@ -11,7 +11,7 @@
 
 @implementation SUAutomaticUpdateAlert
 
-- initWithAppcastItem:(SUAppcastItem *)item hostBundle:(NSBundle *)hb;
+- (id)initWithAppcastItem:(SUAppcastItem *)item hostBundle:(NSBundle *)hb;
 {
 	updateItem = [item retain];
 	hostBundle = [hb retain];
@@ -19,12 +19,12 @@
 	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"SUAutomaticUpdateAlert" ofType:@"nib"];
 	if (path == nil) // Slight hack to resolve issues with running Sparkle in debug configurations.
 	{
-		NSString *frameworkPath = [[hostBundle sharedFrameworksPath] stringByAppendingString:@"/Sparkle.framework"];
+		NSString *frameworkPath = [[hostBundle sharedFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
 		NSBundle *framework = [NSBundle bundleWithPath:frameworkPath];
 		path = [framework pathForResource:@"SUAutomaticUpdateAlert" ofType:@"nib"];
 	}
 	
-	[super initWithWindowNibPath:path owner:self];
+	self = [super initWithWindowNibPath:path owner:self];
 	[self setShouldCascadeWindows:NO];
 	
 	return self;

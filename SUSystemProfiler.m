@@ -16,7 +16,7 @@
 + (NSDictionary *)modelTranslationTable
 {
 	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"SUModelTranslation" ofType:@"plist"];
-	return [[NSDictionary alloc] initWithContentsOfFile:path];	
+	return [[[NSDictionary alloc] initWithContentsOfFile:path] autorelease];
 }
 
 + (NSMutableArray *)systemProfileInformationArrayWithHostBundle:(NSBundle *)hostBundle
@@ -30,7 +30,7 @@
 	int value = 0 ;
 	unsigned long length = sizeof(value) ;
 	
-	// OS version (Apple recommends using SystemVersion.plist instead of Gestalt() here, don't ask me why).
+	// OS version
 	NSString *currentSystemVersion = SUSystemVersionString();
 	if (currentSystemVersion != nil)
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"osVersion",@"OS Version",currentSystemVersion,currentSystemVersion,nil] forKeys:profileDictKeys]];

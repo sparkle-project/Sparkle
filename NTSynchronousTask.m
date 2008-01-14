@@ -36,14 +36,16 @@
 - (id)init;
 {
     self = [super init];
+	if (self)
+	{
+		[self setTask:[[[NSTask alloc] init] autorelease]];
+		[self setOutputPipe:[[[NSPipe alloc] init] autorelease]];
+		[self setInputPipe:[[[NSPipe alloc] init] autorelease]];
 		
-	[self setTask:[[[NSTask alloc] init] autorelease]];
-	[self setOutputPipe:[[[NSPipe alloc] init] autorelease]];
-	[self setInputPipe:[[[NSPipe alloc] init] autorelease]];
+		[[self task] setStandardInput:[self inputPipe]];
+		[[self task] setStandardOutput:[self outputPipe]];
+	}
 	
-    [[self task] setStandardInput:[self inputPipe]];
-    [[self task] setStandardOutput:[self outputPipe]];
-		
     return self;
 }
 

@@ -13,7 +13,7 @@
 
 @implementation SUUpdateAlert
 
-- initWithAppcastItem:(SUAppcastItem *)item hostBundle:(NSBundle *)hb
+- (id)initWithAppcastItem:(SUAppcastItem *)item hostBundle:(NSBundle *)hb
 {
 	hostBundle = [hb retain];
 	updateItem = [item retain];
@@ -21,12 +21,12 @@
 	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"SUUpdateAlert" ofType:@"nib"];
 	if (path == nil) // Slight hack to resolve issues with running Sparkle in debug configurations.
 	{
-		NSString *frameworkPath = [[hostBundle sharedFrameworksPath] stringByAppendingString:@"/Sparkle.framework"];
+		NSString *frameworkPath = [[hostBundle sharedFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
 		NSBundle *framework = [NSBundle bundleWithPath:frameworkPath];
 		path = [framework pathForResource:@"SUUpdateAlert" ofType:@"nib"];
 	}
 	
-	[super initWithWindowNibPath:path owner:self];
+	self = [super initWithWindowNibPath:path owner:self];
 	[self setShouldCascadeWindows:NO];
 	return self;
 }
@@ -158,7 +158,7 @@
 
 - (NSString *)descriptionText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available%Cyou have %@. Would you like to download it now?", nil), [hostBundle name], [updateItem versionString], 0x2014, [hostBundle displayVersion]];	
+	return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available%Cyou have %@. Would you like to download it now?", nil), [hostBundle name], [updateItem versionString], 0x2014, [hostBundle displayVersion]];
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:frame

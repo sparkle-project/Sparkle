@@ -3,7 +3,7 @@
 //  Sparkle
 //
 //  Created by Andy Matuschak on 12/21/07.
-//  Copyright 2007 __MyCompanyName__. All rights reserved.
+//  Copyright 2007 Andy Matuschak. All rights reserved.
 //
 
 #ifndef SUUSERDEFAULTS_H
@@ -32,7 +32,7 @@
 */
 - (void)setIdentifier:(NSString *)identifier;
 
-- objectForKey:(NSString *)defaultName;
+- (id)objectForKey:(NSString *)defaultName;
 - (void)setObject:(id)value forKey:(NSString *)defaultName;
 - (BOOL)boolForKey:(NSString *)defaultName;
 - (void)setBool:(BOOL)value forKey:(NSString *)defaultName;

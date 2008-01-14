@@ -28,7 +28,7 @@ typedef enum
 	BOOL webViewFinishedLoading;
 }
 
-- initWithAppcastItem:(SUAppcastItem *)item hostBundle:(NSBundle *)hostBundle;
+- (id)initWithAppcastItem:(SUAppcastItem *)item hostBundle:(NSBundle *)hostBundle;
 - (void)setDelegate:delegate;
 
 - (IBAction)installUpdate:sender;

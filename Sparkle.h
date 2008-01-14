@@ -22,7 +22,7 @@
 #endif
 
 // This returns a version string of the form X.Y.Z
-inline NSString* SUSystemVersionString(void)
+static inline NSString* SUSystemVersionString(void)
 {
 	SInt32 major, minor, bugfix;
 	OSErr err1 = Gestalt(gestaltSystemVersionMajor, &major);
@@ -31,7 +31,7 @@ inline NSString* SUSystemVersionString(void)
 	NSString* verStr = nil;
 	if (!err1 && !err2 && !err3)
 	{
-		verStr = [NSString stringWithFormat:@"%ld.%ld.%ld", major, minor, bugfix];
+		verStr = [NSString stringWithFormat:@"%d.%d.%d", major, minor, bugfix];
 	}
 	return verStr;
 }

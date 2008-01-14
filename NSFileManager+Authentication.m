@@ -57,7 +57,7 @@
 	NSString *tmp = [[[dst stringByDeletingPathExtension] stringByAppendingString:@".old"] stringByAppendingPathExtension:[dst pathExtension]];
 	BOOL res = NO;
 	struct stat sb;
-	if((stat([src UTF8String], &sb) != 0) || (stat([tmp UTF8String], &sb) == 0) || stat([dst UTF8String], &sb) != 0)
+	if((stat([src fileSystemRepresentation], &sb) != 0) || (stat([tmp fileSystemRepresentation], &sb) == 0) || stat([dst fileSystemRepresentation], &sb) != 0)
 		return false;
 	
 	NSString *command = [NSString stringWithFormat:@"mv -f \"%@\" \"%@\" && cp -f -R \"%@\" \"%@\" && rm -rf \"%@\" && chown -R %d:%d \"%@\"",
@@ -73,7 +73,7 @@
 	AuthorizationRef auth;
 	if(AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &auth) == errAuthorizationSuccess)
 	{
-		char const* arguments[] = { "-c", [command UTF8String], NULL };
+		char const* arguments[] = { "-c", [command fileSystemRepresentation], NULL };
 		if(AuthorizationExecuteWithPrivileges(auth, "/bin/sh", kAuthorizationFlagDefaults, (char**)arguments, NULL) == errAuthorizationSuccess)
 		{
 			int status;

@@ -45,7 +45,7 @@
 	return [SUUpdater alloc];
 }
 
-- init
+- (id)init
 {
 	self = [super init];
 	if (self)
