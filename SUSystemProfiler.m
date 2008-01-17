@@ -31,7 +31,7 @@
 	unsigned long length = sizeof(value) ;
 	
 	// OS version
-	NSString *currentSystemVersion = SUSystemVersionString();
+	NSString *currentSystemVersion = [SUUpdater systemVersionString];
 	if (currentSystemVersion != nil)
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"osVersion",@"OS Version",currentSystemVersion,currentSystemVersion,nil] forKeys:profileDictKeys]];
 	

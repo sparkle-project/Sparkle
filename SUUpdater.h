@@ -52,6 +52,8 @@
 // just want to call this every time the user changes the setting in the preferences.
 - (void)scheduleCheckWithInterval:(NSTimeInterval)interval;
 
++ (NSString *)systemVersionString; // Returns the current system's version.
+
 @end
 
 // Define some minimum intervals to avoid DOS-like checking attacks. These are in seconds.

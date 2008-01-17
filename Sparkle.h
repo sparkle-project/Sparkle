@@ -21,21 +21,6 @@
 #import "SUConstants.h"
 #endif
 
-// This returns a version string of the form X.Y.Z
-static inline NSString* SUSystemVersionString(void)
-{
-	SInt32 major, minor, bugfix;
-	OSErr err1 = Gestalt(gestaltSystemVersionMajor, &major);
-	OSErr err2 = Gestalt(gestaltSystemVersionMinor, &minor);
-	OSErr err3 = Gestalt(gestaltSystemVersionBugFix, &bugfix);
-	NSString* verStr = nil;
-	if (!err1 && !err2 && !err3)
-	{
-		verStr = [NSString stringWithFormat:@"%d.%d.%d", major, minor, bugfix];
-	}
-	return verStr;
-}
-
 
 // This list should include the shared headers. It doesn't matter if some of them aren't shared (unless
 // there are name-space collisions) so we can list all of them to start with:
