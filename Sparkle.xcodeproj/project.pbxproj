@@ -843,7 +843,6 @@
 				);
 				OTHER_LDFLAGS = "-lcrypto";
 				PRODUCT_NAME = Sparkle;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
 				"SDKROOT[arch=ppc]" = /Developer/SDKs/MacOSX10.3.9.sdk;
 				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = NO;
@@ -882,13 +881,12 @@
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.3;
 				"MACOSX_DEPLOYMENT_TARGET[arch=i386]" = 10.4;
+				"MACOSX_DEPLOYMENT_TARGET[arch=ppc64]" = 10.5;
 				"MACOSX_DEPLOYMENT_TARGET[arch=x86_64]" = 10.5;
 				OTHER_LDFLAGS = "-lcrypto";
 				PREBINDING = YES;
 				PRODUCT_NAME = Sparkle;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
 				"SDKROOT[arch=ppc]" = /Developer/SDKs/MacOSX10.3.9.sdk;
-				"SDKROOT[arch=x86_64]" = /Developer/SDKs/MacOSX10.5.sdk;
 				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = all;
@@ -928,7 +926,6 @@
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
 				"SDKROOT[arch=i386]" = /Developer/SDKs/MacOSX10.4u.sdk;
 				"SDKROOT[arch=ppc]" = /Developer/SDKs/MacOSX10.3.9.sdk;
-				VALID_ARCHS = "ppc7400 ppc970 i386 x86_64 ppc";
 				WARNING_CFLAGS = "-Wall";
 			};
 			name = Debug;
@@ -960,15 +957,16 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				"MACOSX_DEPLOYMENT_TARGET[arch=i386]" = 10.4;
+				"MACOSX_DEPLOYMENT_TARGET[arch=ppc64]" = 10.5;
 				"MACOSX_DEPLOYMENT_TARGET[arch=ppc]" = 10.3;
 				"MACOSX_DEPLOYMENT_TARGET[arch=x86_64]" = 10.5;
 				OTHER_CFLAGS = "-fsingle-precision-constant";
 				PREBINDING = NO;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
 				"SDKROOT[arch=i386]" = /Developer/SDKs/MacOSX10.4u.sdk;
+				"SDKROOT[arch=ppc64]" = /Developer/SDKs/MacOSX10.5.sdk;
 				"SDKROOT[arch=ppc]" = /Developer/SDKs/MacOSX10.3.9.sdk;
 				"SDKROOT[arch=x86_64]" = /Developer/SDKs/MacOSX10.5.sdk;
-				VALID_ARCHS = "ppc7400 ppc970 i386 x86_64 ppc";
 				WARNING_CFLAGS = "-Wall";
 			};
 			name = Release;
