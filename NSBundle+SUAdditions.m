@@ -29,12 +29,7 @@
 {
 	NSString *shortVersionString = [self objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
 	if (shortVersionString)
-	{
-		if ([shortVersionString isEqualToString:[self version]])
-			return shortVersionString;
-		else
-			return [shortVersionString stringByAppendingFormat:@" (%@)", [self version]];
-	}
+		return shortVersionString;
 	else
 		return [self version]; // Fall back on the normal version string.
 }
