@@ -822,7 +822,7 @@
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)";
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1.5;
 				FRAMEWORK_VERSION = A;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -903,6 +903,7 @@
 					i386,
 					ppc,
 				);
+				CURRENT_PROJECT_VERSION = 1.5;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -926,6 +927,7 @@
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
 				"SDKROOT[arch=i386]" = /Developer/SDKs/MacOSX10.4u.sdk;
 				"SDKROOT[arch=ppc]" = /Developer/SDKs/MacOSX10.3.9.sdk;
+				VERSIONING_SYSTEM = "apple-generic";
 				WARNING_CFLAGS = "-Wall";
 			};
 			name = Debug;
@@ -939,6 +941,7 @@
 					ppc64,
 					x86_64,
 				);
+				CURRENT_PROJECT_VERSION = 1.5;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
@@ -968,6 +971,7 @@
 				"SDKROOT[arch=ppc64]" = /Developer/SDKs/MacOSX10.5.sdk;
 				"SDKROOT[arch=ppc]" = /Developer/SDKs/MacOSX10.3.9.sdk;
 				"SDKROOT[arch=x86_64]" = /Developer/SDKs/MacOSX10.5.sdk;
+				VERSIONING_SYSTEM = "apple-generic";
 				WARNING_CFLAGS = "-Wall";
 			};
 			name = Release;

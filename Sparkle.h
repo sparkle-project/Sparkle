@@ -15,7 +15,6 @@
 
 #define SULocalizedString(key,comment) NSLocalizedStringFromTableInBundle(key, @"Sparkle", [NSBundle bundleForClass:[self class]], comment)
 
-#import <CoreServices/CoreServices.h>
 #ifdef __OBJC__
 #import <Cocoa/Cocoa.h>
 #import "SUConstants.h"
