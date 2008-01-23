@@ -102,4 +102,11 @@
 		return NO;
 }
 
+-(BOOL)fileManager:(NSFileManager *)manager shouldProceedAfterError:(NSDictionary *)errorInfo
+{
+	NSLog(@"Sparkle: An error occurred in copying the new version of the product from %@ to %@: %@", [errorInfo objectForKey:@"Path"], [errorInfo objectForKey:@"ToPath"], [errorInfo objectForKey:@"Error"]);
+	return NO;
+}
+
+
 @end
