@@ -10,7 +10,6 @@
 
 @interface SUStatusChecker (Private)
 - (id)initForDelegate:(id<SUStatusCheckerDelegate>)inDelegate;
-- (void)checkForUpdatesAndNotify:(BOOL)verbosity;
 - (BOOL)newVersionAvailable;
 @end;
 

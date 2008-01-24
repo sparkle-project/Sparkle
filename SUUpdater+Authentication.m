@@ -11,7 +11,7 @@
 
 #import <sys/types.h>
 #import <sys/wait.h>
-#import <sys/stat.h">
+#import <sys/stat.h>
 #import <Security/Security.h>
 
 @implementation SUUpdater (SUAuthenticationAdditions)
