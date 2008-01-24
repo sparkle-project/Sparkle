@@ -85,9 +85,6 @@
 		NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"Allow automatic update checking?", nil) defaultButton:SULocalizedString(@"Allow", nil) alternateButton:SULocalizedString(@"Don't Allow", nil) otherButton:nil informativeTextWithFormat:SULocalizedString(@"Would you like %1$@ to automatically check for updates to itself? If not, you can check for updates manually from the %1$@ menu.", nil), [hostBundle name]];
 		[alert setIcon:[hostBundle icon]];
 		[[SUUserDefaults standardUserDefaults] setBool:([alert runModal] == NSAlertDefaultReturn) forKey:SUEnableAutomaticChecksKey];
-		
-		// Let's get rid of that extra key cluttering up the user defaults, too.
-		[[SUUserDefaults standardUserDefaults] setObject:nil forKey:SUHasLaunchedBeforeKey];
 	}
 	
 	if ([[SUUserDefaults standardUserDefaults] boolForKey:SUEnableAutomaticChecksKey] == YES)
@@ -185,6 +182,17 @@
 
 #pragma mark Appcast-fetching phase
 
+- (NSArray *)feedParameters
+{
+	BOOL sendingSystemProfile = ([[SUUserDefaults standardUserDefaults] boolForKey:SUSendProfileInfoKey] == YES);
+	NSArray *parameters = [NSArray array];
+	if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)])
+		parameters = [parameters arrayByAddingObjectsFromArray:[delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile]];
+	if (sendingSystemProfile)
+		parameters = [parameters arrayByAddingObjectsFromArray:[hostBundle systemProfile]];
+	return parameters;
+}
+
 - (void)beginUpdateCheck
 {		
 	if ([hostBundle isRunningFromDiskImage])
@@ -206,7 +214,7 @@
 	
 	SUAppcast *appcast = [[SUAppcast alloc] init];
 	[appcast setDelegate:self];
-	[appcast fetchAppcastFromURL:[NSURL URLWithString:appcastString]];
+	[appcast fetchAppcastFromURL:[NSURL URLWithString:appcastString] parameters:[self feedParameters]];
 }
 
 - (BOOL)newVersionAvailable
@@ -607,7 +615,8 @@
 	[downloader release];	
 	[downloadPath release];
 	[statusController release];
-	[hostBundle release];	
+	[hostBundle release];
+	[delegate release];
 	if (checkTimer) { [checkTimer invalidate]; }
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super dealloc];
@@ -635,6 +644,12 @@
 		verStr = [[[NSDictionary dictionaryWithContentsOfFile:versionPlistPath] objectForKey:@"ProductVersion"] retain];
 	}
 	return verStr;
+}
+
+- (void)setDelegate:aDelegate
+{
+	[delegate release];
+	delegate = [aDelegate retain];
 }
 
 @end

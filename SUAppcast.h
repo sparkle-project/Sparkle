@@ -15,7 +15,7 @@
 	id delegate;
 }
 
-- (void)fetchAppcastFromURL:(NSURL *)url;
+- (void)fetchAppcastFromURL:(NSURL *)url parameters:(NSArray *)parameters;
 - (void)setDelegate:delegate;
 
 - (SUAppcastItem *)newestItem;

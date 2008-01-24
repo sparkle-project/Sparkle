@@ -10,7 +10,8 @@
 #define SUSYSTEMPROFILER_H
 
 @interface SUSystemProfiler : NSObject {}
-+ (NSURL *)profiledURLForAppcastURL:(NSURL *)appcastURL hostBundle:(NSBundle *)hostBundle;
++ (SUSystemProfiler *)sharedSystemProfiler;
+- (NSMutableArray *)systemProfileArrayForHostBundle:(NSBundle *)hostBundle;
 @end
 
 #endif

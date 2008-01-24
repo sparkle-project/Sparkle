@@ -43,6 +43,13 @@
 	@abstract	Returns whether the application is running from a disk image.
 */
 - (BOOL)isRunningFromDiskImage;
+
+/*!
+	@method
+	@abstract	Returns a profile of the users system useful for statistical purposes.
+	@discussion Returns an array of dictionaries; each dictionary represents a piece of data and has keys "key", "visibleKey", "value", and "visibleValue".
+*/
+- (NSArray *)systemProfile;
 @end
 
 #endif

@@ -24,6 +24,7 @@ extern NSString *SUPublicDSAKeyKey;
 extern NSString *SUAutomaticallyUpdateKey;
 extern NSString *SUAllowsAutomaticUpdatesKey;
 extern NSString *SUEnableAutomaticChecksKey;
+extern NSString *SUSendProfileInfoKey;
 
 // NSInteger is a type that was added to Leopard.
 // Here is some glue to ensure that NSInteger will work with pre-10.5 SDKs:

@@ -22,3 +22,4 @@ NSString *SUPublicDSAKeyKey = @"SUPublicDSAKey";
 NSString *SUAutomaticallyUpdateKey = @"SUAutomaticallyUpdate";
 NSString *SUAllowsAutomaticUpdatesKey = @"SUAllowsAutomaticUpdates";
 NSString *SUEnableAutomaticChecksKey = @"SUEnableAutomaticChecks";
+NSString *SUSendProfileInfoKey = @"SUSendProfileInfo";

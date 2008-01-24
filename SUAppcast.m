@@ -9,11 +9,34 @@
 #import "Sparkle.h"
 #import "SUAppcast.h"
 
+@interface NSURL (SUParameterAdditions)
+- (NSURL *)URLWithParameters:(NSArray *)parameters;
+@end
+
+@implementation NSURL (SUParameterAdditions)
+- (NSURL *)URLWithParameters:(NSArray *)parameters;
+{
+	if (parameters == nil || [parameters count] == 0) { return self; }
+	NSMutableArray *profileInfo = [NSMutableArray array];
+	NSEnumerator *profileInfoEnumerator = [parameters objectEnumerator];
+	NSDictionary *currentProfileInfo;
+	while ((currentProfileInfo = [profileInfoEnumerator nextObject])) {
+		[profileInfo addObject:[NSString stringWithFormat:@"%@=%@", [currentProfileInfo objectForKey:@"key"], [currentProfileInfo objectForKey:@"value"]]];
+	}
+	
+	NSString *appcastStringWithProfile = [NSString stringWithFormat:@"%@?%@", [self absoluteString], [profileInfo componentsJoinedByString:@"&"]];
+	
+	// Clean it up so it's a valid URL
+	return [NSURL URLWithString:[appcastStringWithProfile stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+}
+@end
+
+
 @implementation SUAppcast
 
-- (void)fetchAppcastFromURL:(NSURL *)url
+- (void)fetchAppcastFromURL:(NSURL *)url parameters:(NSArray *)parameters
 {
-	[NSThread detachNewThreadSelector:@selector(_fetchAppcastFromURL:) toTarget:self withObject:url]; // let's not block the main thread
+	[NSThread detachNewThreadSelector:@selector(_fetchAppcastFromURL:) toTarget:self withObject:[url URLWithParameters:parameters]]; // let's not block the main thread
 }
 
 - (void)setDelegate:del

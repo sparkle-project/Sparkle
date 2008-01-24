@@ -13,13 +13,21 @@
 #import <sys/sysctl.h>
 
 @implementation SUSystemProfiler
-+ (NSDictionary *)modelTranslationTable
++ (SUSystemProfiler *)sharedSystemProfiler
+{
+	static SUSystemProfiler *sharedSystemProfiler = nil;
+	if (!sharedSystemProfiler)
+		sharedSystemProfiler = [[self alloc] init];
+	return sharedSystemProfiler;
+}
+
+- (NSDictionary *)modelTranslationTable
 {
 	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"SUModelTranslation" ofType:@"plist"];
 	return [[[NSDictionary alloc] initWithContentsOfFile:path] autorelease];
 }
 
-+ (NSMutableArray *)systemProfileInformationArrayWithHostBundle:(NSBundle *)hostBundle
+- (NSMutableArray *)systemProfileArrayForHostBundle:(NSBundle *)hostBundle
 {
 	NSDictionary *modelTranslation = [self modelTranslationTable];
 	
@@ -118,18 +126,4 @@
 	return profileArray;
 }
 
-+ (NSURL *)profiledURLForAppcastURL:(NSURL *)appcastURL hostBundle:(NSBundle *)hostBundle
-{
-	NSMutableArray *profileInfo = [NSMutableArray array];
-	NSEnumerator *profileInfoEnumerator = [[self systemProfileInformationArrayWithHostBundle:hostBundle] objectEnumerator];
-	NSDictionary *currentProfileInfo;
-	while ((currentProfileInfo = [profileInfoEnumerator nextObject])) {
-		[profileInfo addObject:[NSString stringWithFormat:@"%@=%@", [currentProfileInfo objectForKey:@"key"], [currentProfileInfo objectForKey:@"value"]]];
-	}
-	
-	NSString *appcastStringWithProfile = [NSString stringWithFormat:@"%@?%@", [appcastURL absoluteString], [profileInfo componentsJoinedByString:@"&"]];
-	
-	// Clean it up so it's a valid URL
-	return [NSURL URLWithString:[appcastStringWithProfile stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-}
 @end

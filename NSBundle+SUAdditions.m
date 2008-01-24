@@ -56,4 +56,9 @@
 	return [[[NSWorkspace sharedWorkspace] propertiesForPath:[self bundlePath]] objectForKey:NSWorkspace_RBimagefilepath] != nil;
 }
 
+- (NSArray *)systemProfile
+{
+	return [[SUSystemProfiler sharedSystemProfiler] systemProfileArrayForHostBundle:self];
+}
+
 @end
