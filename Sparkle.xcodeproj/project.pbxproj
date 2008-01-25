@@ -25,6 +25,8 @@
 		61299A8D09CA790200B7442F /* SUUnarchiver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A8B09CA790200B7442F /* SUUnarchiver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		61299A8E09CA790200B7442F /* SUUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A8C09CA790200B7442F /* SUUnarchiver.m */; };
 		61299B3609CB04E000B7442F /* Sparkle.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299B3509CB04E000B7442F /* Sparkle.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		612DCBAF0D488BC60015DBEA /* SUUpdatePermissionPrompt.h in Headers */ = {isa = PBXBuildFile; fileRef = 612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */; };
+		612DCBB00D488BC60015DBEA /* SUUpdatePermissionPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */; };
 		61407C390A4099050009F71F /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; };
 		6160E7E10D3B4A8800E9CD71 /* NTSynchronousTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 610EC1C00CF3914D00AE239E /* NTSynchronousTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6196CFF909C72148000DC222 /* SUStatusController.h in Headers */ = {isa = PBXBuildFile; fileRef = 6196CFE309C71ADE000DC222 /* SUStatusController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -128,6 +130,8 @@
 		61299A8B09CA790200B7442F /* SUUnarchiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUnarchiver.h; sourceTree = "<group>"; };
 		61299A8C09CA790200B7442F /* SUUnarchiver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUnarchiver.m; sourceTree = "<group>"; };
 		61299B3509CB04E000B7442F /* Sparkle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sparkle.h; sourceTree = "<group>"; };
+		612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdatePermissionPrompt.h; sourceTree = "<group>"; };
+		612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdatePermissionPrompt.m; sourceTree = "<group>"; };
 		613242130CD06CEF00106AA4 /* relaunch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = relaunch.m; sourceTree = "<group>"; };
 		6196CFE309C71ADE000DC222 /* SUStatusController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStatusController.h; sourceTree = "<group>"; };
 		6196CFE409C71ADE000DC222 /* SUStatusController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUStatusController.m; sourceTree = "<group>"; };
@@ -400,6 +404,8 @@
 				6120721109CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.m */,
 				6196CFE309C71ADE000DC222 /* SUStatusController.h */,
 				6196CFE409C71ADE000DC222 /* SUStatusController.m */,
+				612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */,
+				612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */,
 			);
 			name = "User Interface";
 			sourceTree = "<group>";
@@ -471,6 +477,7 @@
 				61A2262B0D1C58FD00430CCD /* SUUserDefaults.h in Headers */,
 				61A2279C0D1CEE7600430CCD /* SUSystemProfiler.h in Headers */,
 				6160E7E10D3B4A8800E9CD71 /* NTSynchronousTask.h in Headers */,
+				612DCBAF0D488BC60015DBEA /* SUUpdatePermissionPrompt.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -667,6 +674,7 @@
 				61A225A50D1C4AC000430CCD /* SUStandardVersionComparator.m in Sources */,
 				61A2262C0D1C58FD00430CCD /* SUUserDefaults.m in Sources */,
 				61A2279D0D1CEE7600430CCD /* SUSystemProfiler.m in Sources */,
+				612DCBB00D488BC60015DBEA /* SUUpdatePermissionPrompt.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
