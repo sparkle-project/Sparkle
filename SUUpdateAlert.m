@@ -65,6 +65,8 @@
 
 - (void)displayReleaseNotes
 {
+	[[WebPreferences standardPreferences] setStandardFontFamily:[[NSFont systemFontOfSize:8] familyName]];
+	[releaseNotesView setPreferences:[WebPreferences standardPreferences]];
 	[releaseNotesView setFrameLoadDelegate:self];
 	[releaseNotesView setPolicyDelegate:self];
 	
