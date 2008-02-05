@@ -497,7 +497,7 @@ static SUUpdater *sharedUpdater = nil;
 	while ((currentFile = [dirEnum nextObject]))
 	{
 		// Some DMGs have symlinks into /Applications! That's no good! And there's no point in looking in bundles.
-		if ([currentFile isEqualToString:@"/Applications"] ||
+		if ([[NSFileManager defaultManager] isAliasFolderAtPath:[[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:currentFile]] ||
 			[[currentFile pathExtension] isEqualToString:[[hostBundle bundlePath] pathExtension]] ||
 			[[currentFile pathExtension] isEqualToString:@"pkg"] ||
 			[[currentFile pathExtension] isEqualToString:@"mpkg"])

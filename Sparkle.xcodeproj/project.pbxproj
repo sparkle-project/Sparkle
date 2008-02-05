@@ -29,6 +29,8 @@
 		612DCBB00D488BC60015DBEA /* SUUpdatePermissionPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */; };
 		61407C390A4099050009F71F /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; };
 		6160E7E10D3B4A8800E9CD71 /* NTSynchronousTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 610EC1C00CF3914D00AE239E /* NTSynchronousTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6171D9070D57B81800BFE886 /* NSFileManager+Aliases.h in Headers */ = {isa = PBXBuildFile; fileRef = 6171D9050D57B81800BFE886 /* NSFileManager+Aliases.h */; };
+		6171D9080D57B81800BFE886 /* NSFileManager+Aliases.m in Sources */ = {isa = PBXBuildFile; fileRef = 6171D9060D57B81800BFE886 /* NSFileManager+Aliases.m */; };
 		6196CFF909C72148000DC222 /* SUStatusController.h in Headers */ = {isa = PBXBuildFile; fileRef = 6196CFE309C71ADE000DC222 /* SUStatusController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6196CFFA09C72149000DC222 /* SUStatusController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6196CFE409C71ADE000DC222 /* SUStatusController.m */; };
 		61A225930D1C3ADD00430CCD /* NSBundle+SUAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 61A225910D1C3ADD00430CCD /* NSBundle+SUAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -133,6 +135,8 @@
 		612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdatePermissionPrompt.h; sourceTree = "<group>"; };
 		612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdatePermissionPrompt.m; sourceTree = "<group>"; };
 		613242130CD06CEF00106AA4 /* relaunch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = relaunch.m; sourceTree = "<group>"; };
+		6171D9050D57B81800BFE886 /* NSFileManager+Aliases.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+Aliases.h"; sourceTree = "<group>"; };
+		6171D9060D57B81800BFE886 /* NSFileManager+Aliases.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+Aliases.m"; sourceTree = "<group>"; };
 		6196CFE309C71ADE000DC222 /* SUStatusController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStatusController.h; sourceTree = "<group>"; };
 		6196CFE409C71ADE000DC222 /* SUStatusController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUStatusController.m; sourceTree = "<group>"; };
 		61A225910D1C3ADD00430CCD /* NSBundle+SUAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBundle+SUAdditions.h"; sourceTree = "<group>"; };
@@ -380,6 +384,8 @@
 				61B5F8E509C4CE3C00B25A18 /* NSFileManager+Authentication.m */,
 				61299A2D09CA2DAB00B7442F /* NSFileManager+Verification.h */,
 				61299A2E09CA2DAB00B7442F /* NSFileManager+Verification.m */,
+				6171D9050D57B81800BFE886 /* NSFileManager+Aliases.h */,
+				6171D9060D57B81800BFE886 /* NSFileManager+Aliases.m */,
 			);
 			name = "Cocoa Categories";
 			sourceTree = "<group>";
@@ -478,6 +484,7 @@
 				61A2279C0D1CEE7600430CCD /* SUSystemProfiler.h in Headers */,
 				6160E7E10D3B4A8800E9CD71 /* NTSynchronousTask.h in Headers */,
 				612DCBAF0D488BC60015DBEA /* SUUpdatePermissionPrompt.h in Headers */,
+				6171D9070D57B81800BFE886 /* NSFileManager+Aliases.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -675,6 +682,7 @@
 				61A2262C0D1C58FD00430CCD /* SUUserDefaults.m in Sources */,
 				61A2279D0D1CEE7600430CCD /* SUSystemProfiler.m in Sources */,
 				612DCBB00D488BC60015DBEA /* SUUpdatePermissionPrompt.m in Sources */,
+				6171D9080D57B81800BFE886 /* NSFileManager+Aliases.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

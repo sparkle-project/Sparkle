@@ -27,6 +27,7 @@
 #import "NSBundle+SUAdditions.h"
 #import "NSFileManager+Authentication.h"
 #import "NSFileManager+Verification.h"
+#import "NSFileManager+Aliases.h"
 #import "NSString+extras.h"
 #import "NSWorkspace_RBAdditions.h"
 
