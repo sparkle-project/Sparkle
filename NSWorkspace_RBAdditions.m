@@ -109,7 +109,7 @@ static NSString* CheckParents(io_object_t thing,NSString* part,NSMutableDictiona
 				result = AddPart(result,value);
 			}
 			io_name_t ts;  // char[128]
-			NSString* cls = ( IOObjectGetClass (nextParent, ts) == KERN_SUCCESS ) ? [NSString stringWithCString:ts ] : nil;
+			NSString* cls = ( IOObjectGetClass (nextParent, ts) == KERN_SUCCESS ) ? [NSString stringWithUTF8String:ts ] : nil;
 			if (![cls isEqualToString:@"IOPCIDevice"]) {
 			
 // Uncomment the following line to have the device tree dumped to the console.
@@ -117,6 +117,7 @@ static NSString* CheckParents(io_object_t thing,NSString* part,NSMutableDictiona
 
 				result = CheckParents(nextParent,result,dict);
 			}
+			if (props) { CFRelease(props); }
 			IOObjectRelease(nextParent);
 		}
     }
@@ -132,22 +133,24 @@ static NSString* CheckParents(io_object_t thing,NSString* part,NSMutableDictiona
 // This assumes that the length of path is less than PATH_MAX (currently 1024 characters).
 
 - (NSDictionary*)propertiesForPath:(NSString*)path {
-	const char* ccpath = (const char*)[path fileSystemRepresentation];
+	const char* ccpath = [path fileSystemRepresentation];
 	NSMutableDictionary* result = nil;
-	struct statfs fs;
+	struct statfs fs = {};
 	if (!statfs(ccpath,&fs)) {
 		NSString* from = [NSString stringWithUTF8String:fs.f_mntfromname];
 		result = [NSMutableDictionary dictionaryWithObjectsAndKeys:
 			[NSString stringWithUTF8String:fs.f_fstypename],NSWorkspace_RBfstypename,
 			[NSString stringWithUTF8String:fs.f_mntonname],NSWorkspace_RBmntonname,
 			nil];
-		if (strncmp(fs.f_mntfromname,"/dev/",5)==0) {
-// For a local volume,get the IO registry tree and search it for further info.
+		const char* devstring = "/dev/";
+		size_t devstringlen = 5;
+		if (strncmp(fs.f_mntfromname,devstring,devstringlen)==0) {
+			// For a local volume,get the IO registry tree and search it for further info.
 			mach_port_t masterPort = 0;
 			io_iterator_t mediaIterator = 0;
 			kern_return_t kernResult = IOMasterPort(bootstrap_port,&masterPort);
 			if (kernResult==KERN_SUCCESS) {
-				CFMutableDictionaryRef classesToMatch = IOBSDNameMatching(masterPort,0,&fs.f_mntfromname[5]);
+				CFMutableDictionaryRef classesToMatch = IOBSDNameMatching(masterPort,0,&fs.f_mntfromname[devstringlen]);
 				if (classesToMatch) {
 					kernResult = IOServiceGetMatchingServices(masterPort,classesToMatch,&mediaIterator);
 					if ((kernResult==KERN_SUCCESS)&&mediaIterator) {
