@@ -51,15 +51,11 @@ static SUUpdater *sharedUpdater = nil;
 
 - (id)init
 {
-	if (self = [super init]) {
-		if (sharedUpdater == nil) {
-			[self setHostBundle:[NSBundle mainBundle]];
-			[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidFinishLaunching:) name:NSApplicationDidFinishLaunchingNotification object:NSApp];
-		} else if (self != sharedUpdater) {
-			// this should never happen
-			[self release];
-			self = [sharedUpdater retain];
-		}
+	self = [super init];
+	if (self)
+	{
+		[self setHostBundle:[NSBundle mainBundle]];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidFinishLaunching:) name:NSApplicationDidFinishLaunchingNotification object:NSApp];
 	}
 	return self;
 }
