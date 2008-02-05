@@ -29,28 +29,37 @@
 
 #pragma mark Initialization
 
+static SUUpdater *sharedUpdater = nil;
+
 // SUUpdater's a singleton now! And I'm enforcing it!
+// This will probably break the world if you try to write a Sparkle-enabled plugin for a Sparkle-enabled app.
 + (id)allocWithZone:(NSZone *)zone
 {
-	if ([self class] != [SUUpdater class]) { return [super allocWithZone:zone]; }
-	static SUUpdater *sharedUpdater = nil;
-	if (sharedUpdater == nil)
+	if ([self class] != [SUUpdater class] || sharedUpdater == nil)
 		sharedUpdater = [super allocWithZone:zone];
+	else
+		[sharedUpdater retain];
     return sharedUpdater;
 }
 
 + (SUUpdater *)sharedUpdater
 {
-	return [SUUpdater alloc];
+	if (sharedUpdater == nil)
+		[[[self class] alloc] init];
+	return sharedUpdater;
 }
 
 - (id)init
 {
-	self = [super init];
-	if (self)
-	{
-		[self setHostBundle:[NSBundle mainBundle]];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidFinishLaunching:) name:NSApplicationDidFinishLaunchingNotification object:NSApp];
+	if (self = [super init]) {
+		if (sharedUpdater == nil) {
+			[self setHostBundle:[NSBundle mainBundle]];
+			[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidFinishLaunching:) name:NSApplicationDidFinishLaunchingNotification object:NSApp];
+		} else if (self != sharedUpdater) {
+			// this should never happen
+			[self release];
+			self = [sharedUpdater retain];
+		}
 	}
 	return self;
 }
