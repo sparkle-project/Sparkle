@@ -29,7 +29,7 @@
 		612DCBB00D488BC60015DBEA /* SUUpdatePermissionPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */; };
 		61407C390A4099050009F71F /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; };
 		6160E7E10D3B4A8800E9CD71 /* NTSynchronousTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 610EC1C00CF3914D00AE239E /* NTSynchronousTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		6171D9070D57B81800BFE886 /* NSFileManager+Aliases.h in Headers */ = {isa = PBXBuildFile; fileRef = 6171D9050D57B81800BFE886 /* NSFileManager+Aliases.h */; };
+		6171D9070D57B81800BFE886 /* NSFileManager+Aliases.h in Headers */ = {isa = PBXBuildFile; fileRef = 6171D9050D57B81800BFE886 /* NSFileManager+Aliases.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6171D9080D57B81800BFE886 /* NSFileManager+Aliases.m in Sources */ = {isa = PBXBuildFile; fileRef = 6171D9060D57B81800BFE886 /* NSFileManager+Aliases.m */; };
 		6196CFF909C72148000DC222 /* SUStatusController.h in Headers */ = {isa = PBXBuildFile; fileRef = 6196CFE309C71ADE000DC222 /* SUStatusController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6196CFFA09C72149000DC222 /* SUStatusController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6196CFE409C71ADE000DC222 /* SUStatusController.m */; };
