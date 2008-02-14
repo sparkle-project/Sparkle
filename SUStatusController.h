@@ -9,8 +9,9 @@
 #ifndef SUSTATUSCONTROLLER_H
 #define SUSTATUSCONTROLLER_H
 
+#import "SUWindowController.h"
 
-@interface SUStatusController : NSWindowController {
+@interface SUStatusController : SUWindowController {
 	double progressValue, maxProgressValue;
 	NSString *title, *statusText, *buttonTitle;
 	IBOutlet NSButton *actionButton;

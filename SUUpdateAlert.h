@@ -9,6 +9,8 @@
 #ifndef SUUPDATEALERT_H
 #define SUUPDATEALERT_H
 
+#import "SUWindowController.h"
+
 typedef enum
 {
 	SUInstallUpdateChoice,
@@ -17,7 +19,7 @@ typedef enum
 } SUUpdateAlertChoice;
 
 @class WebView, SUAppcastItem;
-@interface SUUpdateAlert : NSWindowController {
+@interface SUUpdateAlert : SUWindowController {
 	SUAppcastItem *updateItem;
 	NSBundle *hostBundle;
 	id delegate;

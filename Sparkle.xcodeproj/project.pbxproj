@@ -15,6 +15,8 @@
 		611779590D1111C900749C97 /* NSWorkspace_RBAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 611779570D1111C400749C97 /* NSWorkspace_RBAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6117795A0D1111C900749C97 /* NSWorkspace_RBAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 611779560D1111C400749C97 /* NSWorkspace_RBAdditions.m */; };
 		61177A1F0D1112E900749C97 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6117796E0D1112E000749C97 /* IOKit.framework */; };
+		61180BCA0D64138900B4E0D1 /* SUWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = 61180BC80D64138900B4E0D1 /* SUWindowController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		61180BCB0D64138900B4E0D1 /* SUWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 61180BC90D64138900B4E0D1 /* SUWindowController.m */; };
 		6120721209CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.h in Headers */ = {isa = PBXBuildFile; fileRef = 6120721009CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6120721309CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 6120721109CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.m */; };
 		61299A2F09CA2DAB00B7442F /* NSFileManager+Verification.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A2D09CA2DAB00B7442F /* NSFileManager+Verification.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -122,6 +124,8 @@
 		611779560D1111C400749C97 /* NSWorkspace_RBAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSWorkspace_RBAdditions.m; sourceTree = "<group>"; };
 		611779570D1111C400749C97 /* NSWorkspace_RBAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSWorkspace_RBAdditions.h; sourceTree = "<group>"; };
 		6117796E0D1112E000749C97 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
+		61180BC80D64138900B4E0D1 /* SUWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUWindowController.h; sourceTree = "<group>"; };
+		61180BC90D64138900B4E0D1 /* SUWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUWindowController.m; sourceTree = "<group>"; };
 		6120721009CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUAutomaticUpdateAlert.h; sourceTree = "<group>"; };
 		6120721109CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUAutomaticUpdateAlert.m; sourceTree = "<group>"; };
 		6129984309C9E2DA00B7442F /* NSFileManager+Authentication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+Authentication.h"; sourceTree = "<group>"; };
@@ -412,6 +416,8 @@
 				6196CFE409C71ADE000DC222 /* SUStatusController.m */,
 				612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */,
 				612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */,
+				61180BC80D64138900B4E0D1 /* SUWindowController.h */,
+				61180BC90D64138900B4E0D1 /* SUWindowController.m */,
 			);
 			name = "User Interface";
 			sourceTree = "<group>";
@@ -485,6 +491,7 @@
 				6160E7E10D3B4A8800E9CD71 /* NTSynchronousTask.h in Headers */,
 				612DCBAF0D488BC60015DBEA /* SUUpdatePermissionPrompt.h in Headers */,
 				6171D9070D57B81800BFE886 /* NSFileManager+Aliases.h in Headers */,
+				61180BCA0D64138900B4E0D1 /* SUWindowController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -683,6 +690,7 @@
 				61A2279D0D1CEE7600430CCD /* SUSystemProfiler.m in Sources */,
 				612DCBB00D488BC60015DBEA /* SUUpdatePermissionPrompt.m in Sources */,
 				6171D9080D57B81800BFE886 /* NSFileManager+Aliases.m in Sources */,
+				61180BCB0D64138900B4E0D1 /* SUWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

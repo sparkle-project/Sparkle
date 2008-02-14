@@ -25,9 +25,9 @@
 // there are name-space collisions) so we can list all of them to start with:
 
 #import "NSBundle+SUAdditions.h"
+#import "NSFileManager+Aliases.h"
 #import "NSFileManager+Authentication.h"
 #import "NSFileManager+Verification.h"
-#import "NSFileManager+Aliases.h"
 #import "NSString+extras.h"
 #import "NSWorkspace_RBAdditions.h"
 
@@ -48,5 +48,6 @@
 #import "SUUpdater.h"
 #import "SUUserDefaults.h"
 #import "SUVersionComparisonProtocol.h"
+#import "SUWindowController.h"
 
 #endif

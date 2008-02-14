@@ -14,14 +14,7 @@
 - (id)initWithHostBundle:(NSBundle *)hb
 {
 	hostBundle = [hb retain];
-	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"SUStatus" ofType:@"nib"];
-	if (path == nil) // Slight hack to resolve issues with running Sparkle in debug configurations.
-	{
-		NSString *frameworkPath = [[hostBundle sharedFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
-		NSBundle *framework = [NSBundle bundleWithPath:frameworkPath];
-		path = [framework pathForResource:@"SUStatus" ofType:@"nib"];
-	}
-	self = [super initWithWindowNibPath:path owner:self];
+	[super initWithHostBundle:hb windowNibName:@"SUStatus"];
 	[self setShouldCascadeWindows:NO];
 	return self;
 }

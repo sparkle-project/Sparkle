@@ -15,18 +15,8 @@
 {
 	updateItem = [item retain];
 	hostBundle = [hb retain];
-
-	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"SUAutomaticUpdateAlert" ofType:@"nib"];
-	if (path == nil) // Slight hack to resolve issues with running Sparkle in debug configurations.
-	{
-		NSString *frameworkPath = [[hostBundle sharedFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
-		NSBundle *framework = [NSBundle bundleWithPath:frameworkPath];
-		path = [framework pathForResource:@"SUAutomaticUpdateAlert" ofType:@"nib"];
-	}
-	
-	self = [super initWithWindowNibPath:path owner:self];
-	[self setShouldCascadeWindows:NO];
-	
+	[super initWithHostBundle:hb windowNibName:@"SUAutomaticUpdateAlert"];
+	[self setShouldCascadeWindows:NO];	
 	return self;
 }
 

@@ -9,8 +9,10 @@
 #ifndef SUAUTOMATICUPDATEALERT_H
 #define SUAUTOMATICUPDATEALERT_H
 
+#import "SUWindowController.h"
+
 @class SUAppcastItem;
-@interface SUAutomaticUpdateAlert : NSWindowController {
+@interface SUAutomaticUpdateAlert : SUWindowController {
 	SUAppcastItem *updateItem;
 	NSBundle *hostBundle;
 }
