@@ -11,7 +11,7 @@
 
 #import "Sparkle.h"
 
-@interface SUUpdatePermissionPrompt : NSWindowController {
+@interface SUUpdatePermissionPrompt : SUWindowController {
 
 }
 
