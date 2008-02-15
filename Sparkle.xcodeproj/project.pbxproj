@@ -31,6 +31,7 @@
 		612DCBAF0D488BC60015DBEA /* SUUpdatePermissionPrompt.h in Headers */ = {isa = PBXBuildFile; fileRef = 612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */; };
 		612DCBB00D488BC60015DBEA /* SUUpdatePermissionPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */; };
 		61407C390A4099050009F71F /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; };
+		615AE3D00D64DC40001CA7BD /* SUModelTranslation.plist in Resources */ = {isa = PBXBuildFile; fileRef = 615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */; };
 		6160E7E10D3B4A8800E9CD71 /* NTSynchronousTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 610EC1C00CF3914D00AE239E /* NTSynchronousTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6171D9070D57B81800BFE886 /* NSFileManager+Aliases.h in Headers */ = {isa = PBXBuildFile; fileRef = 6171D9050D57B81800BFE886 /* NSFileManager+Aliases.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6171D9080D57B81800BFE886 /* NSFileManager+Aliases.m in Sources */ = {isa = PBXBuildFile; fileRef = 6171D9060D57B81800BFE886 /* NSFileManager+Aliases.m */; };
@@ -141,6 +142,7 @@
 		612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdatePermissionPrompt.h; sourceTree = "<group>"; };
 		612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdatePermissionPrompt.m; sourceTree = "<group>"; };
 		613242130CD06CEF00106AA4 /* relaunch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = relaunch.m; sourceTree = "<group>"; };
+		615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = SUModelTranslation.plist; sourceTree = "<group>"; };
 		6171D9050D57B81800BFE886 /* NSFileManager+Aliases.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+Aliases.h"; sourceTree = "<group>"; };
 		6171D9060D57B81800BFE886 /* NSFileManager+Aliases.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+Aliases.m"; sourceTree = "<group>"; };
 		6196CFE309C71ADE000DC222 /* SUStatusController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStatusController.h; sourceTree = "<group>"; };
@@ -375,6 +377,7 @@
 		32C88DFF0371C24200C91783 /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
+				615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */,
 				61AAE8220A321A7F00D8810D /* Sparkle.strings */,
 				61AAE8240A321A7F00D8810D /* SUAutomaticUpdateAlert.nib */,
 				61AAE8260A321A7F00D8810D /* SUUpdateAlert.nib */,
@@ -632,6 +635,7 @@
 				61AAE8290A321A8000D8810D /* SUAutomaticUpdateAlert.nib in Resources */,
 				61AAE82A0A321A8000D8810D /* SUUpdateAlert.nib in Resources */,
 				61180C900D64262100B4E0D1 /* SUUpdatePermissionPrompt.nib in Resources */,
+				615AE3D00D64DC40001CA7BD /* SUModelTranslation.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
