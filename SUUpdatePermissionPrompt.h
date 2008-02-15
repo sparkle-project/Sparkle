@@ -11,10 +11,26 @@
 
 #import "Sparkle.h"
 
+typedef enum {
+	SUAutomaticallyUpdate,
+	SUDoNotAutomaticallyUpdate
+} SUPermissionPromptResult;
+
 @interface SUUpdatePermissionPrompt : SUWindowController {
-
+	NSBundle *hostBundle;
+	id delegate;
+	IBOutlet NSTextField *descriptionTextField;
+	IBOutlet NSView *moreInfoView;
+	IBOutlet NSButton *moreInfoButton;
+	BOOL isShowingMoreInfo, shouldSendProfile;
 }
++ (void)promptWithHostBundle:(NSBundle *)hb delegate:(id)d;
+- (IBAction)toggleMoreInfo:(id)sender;
+- (IBAction)finishPrompt:(id)sender;
+@end
 
+@interface NSObject (SUUpdatePermissionPromptDelegateInformalProtocol)
+- (void)updatePermissionPromptFinishedWithResult:(SUPermissionPromptResult)result;
 @end
 
 #endif

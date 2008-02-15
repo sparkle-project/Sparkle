@@ -6,37 +6,37 @@
 	<array>
 		<dict>
 			<key>CLASS</key>
-			<string>NSObject</string>
+			<string>SUWindowController</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>checkForUpdates</key>
+				<key>finishPrompt</key>
 				<string>id</string>
-				<key>closeProfileInfoSheet</key>
+				<key>toggleMoreInfo</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
-			<string>SUUpdater</string>
+			<string>SUUpdatePermissionPrompt</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
-				<key>checkForUpdatesText</key>
-				<string>NSTextField</string>
 				<key>delegate</key>
 				<string>id</string>
-				<key>profileMoreInfoButton</key>
+				<key>descriptionTextField</key>
+				<string>NSTextField</string>
+				<key>moreInfoButton</key>
 				<string>NSButton</string>
-				<key>profileMoreInfoView</key>
+				<key>moreInfoView</key>
 				<string>NSView</string>
-				<key>profileMoreInfoWindow</key>
-				<string>NSWindow</string>
 			</dict>
 			<key>SUPERCLASS</key>
-			<string>NSObject</string>
+			<string>SUWindowController</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -45,6 +45,12 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

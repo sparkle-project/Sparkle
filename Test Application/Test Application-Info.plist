@@ -26,5 +26,7 @@
 	<string>NSApplication</string>
 	<key>SUFeedURL</key>
 	<string>http://www.andymatuschak.org/files/sparkletestcast.xml</string>
+	<key>SUEnableSystemProfiling</key>
+	<true/>
 </dict>
 </plist>

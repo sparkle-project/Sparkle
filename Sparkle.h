@@ -46,6 +46,7 @@
 #import "SUUnarchiver.h"
 #import "SUUpdateAlert.h"
 #import "SUUpdater.h"
+#import "SUUpdatePermissionPrompt.h"
 #import "SUUserDefaults.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SUWindowController.h"

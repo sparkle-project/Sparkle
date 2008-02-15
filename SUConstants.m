@@ -21,5 +21,6 @@ NSString *SUExpectsDSASignatureKey = @"SUExpectsDSASignature";
 NSString *SUPublicDSAKeyKey = @"SUPublicDSAKey";
 NSString *SUAutomaticallyUpdateKey = @"SUAutomaticallyUpdate";
 NSString *SUAllowsAutomaticUpdatesKey = @"SUAllowsAutomaticUpdates";
+NSString *SUEnableSystemProfilingKey = @"SUEnableSystemProfiling";
 NSString *SUEnableAutomaticChecksKey = @"SUEnableAutomaticChecks";
 NSString *SUSendProfileInfoKey = @"SUSendProfileInfo";

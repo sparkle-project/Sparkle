@@ -17,6 +17,7 @@
 
 @interface SUUpdater (Private)
 - (void)beginUpdateCheck;
+- (void)beginUpdateCycle;
 - (void)showUpdateAlert;
 - (void)beginDownload;
 - (void)extractUpdate;
@@ -83,38 +84,46 @@ static SUUpdater *sharedUpdater = nil;
 			return;
 		}
 		
-		// The user's never been asked, so let's see if they want automatic checking.
-		NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"Allow automatic update checking?", nil) defaultButton:SULocalizedString(@"Allow", nil) alternateButton:SULocalizedString(@"Don't Allow", nil) otherButton:nil informativeTextWithFormat:SULocalizedString(@"Would you like %1$@ to automatically check for updates to itself? If not, you can check for updates manually from the %1$@ menu.", nil), [hostBundle name]];
-		[alert setIcon:[hostBundle icon]];
-		[[SUUserDefaults standardUserDefaults] setBool:([alert runModal] == NSAlertDefaultReturn) forKey:SUEnableAutomaticChecksKey];
+		[SUUpdatePermissionPrompt promptWithHostBundle:hostBundle delegate:self];
 	}
 	
 	if ([[SUUserDefaults standardUserDefaults] boolForKey:SUEnableAutomaticChecksKey] == YES)
-	{
-		// Find the stored check interval. User defaults override Info.plist.
-		if ([[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey])
-			checkInterval = [[[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey] longValue];
-		else if ([hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey])
-			checkInterval = [[hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey] longValue];
-		
-		if (checkInterval < SU_MIN_CHECK_INTERVAL) // This can also mean one that isn't set.
-			checkInterval = SU_DEFAULT_CHECK_INTERVAL;
-		
-		// How long has it been since last we checked for an update?
-		NSDate *lastCheckDate = [[SUUserDefaults standardUserDefaults] objectForKey:SULastCheckTimeKey];
-		if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
-		NSTimeInterval intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
-		
-		// Now we want to figure out how long until we check again.
-		NSTimeInterval delayUntilCheck;
-		if (intervalSinceCheck < checkInterval)
-			delayUntilCheck = (checkInterval - intervalSinceCheck); // It hasn't been long enough.
-		else
-			delayUntilCheck = 0; // We're overdue! Run one now.
-		
-		[self performSelector:@selector(checkForUpdatesInBackground) withObject:nil afterDelay:delayUntilCheck];
-		[self performSelector:@selector(scheduleCheckWithIntervalObject:) withObject:[NSNumber numberWithDouble:checkInterval] afterDelay:delayUntilCheck];
-	}
+		[self beginUpdateCycle];
+}
+
+- (void)updatePermissionPromptFinishedWithResult:(SUPermissionPromptResult)result
+{
+	BOOL automaticallyUpdate = (result == SUAutomaticallyUpdate);
+	[[SUUserDefaults standardUserDefaults] setBool:(result == SUAutomaticallyUpdate) forKey:SUEnableAutomaticChecksKey];
+	if (automaticallyUpdate)
+		[self beginUpdateCycle];
+}
+
+- (void)beginUpdateCycle
+{
+	// Find the stored check interval. User defaults override Info.plist.
+	if ([[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey])
+		checkInterval = [[[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey] longValue];
+	else if ([hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey])
+		checkInterval = [[hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey] longValue];
+	
+	if (checkInterval < SU_MIN_CHECK_INTERVAL) // This can also mean one that isn't set.
+		checkInterval = SU_DEFAULT_CHECK_INTERVAL;
+	
+	// How long has it been since last we checked for an update?
+	NSDate *lastCheckDate = [[SUUserDefaults standardUserDefaults] objectForKey:SULastCheckTimeKey];
+	if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
+	NSTimeInterval intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
+	
+	// Now we want to figure out how long until we check again.
+	NSTimeInterval delayUntilCheck;
+	if (intervalSinceCheck < checkInterval)
+		delayUntilCheck = (checkInterval - intervalSinceCheck); // It hasn't been long enough.
+	else
+		delayUntilCheck = 0; // We're overdue! Run one now.
+	
+	[self performSelector:@selector(checkForUpdatesInBackground) withObject:nil afterDelay:delayUntilCheck];
+	[self performSelector:@selector(scheduleCheckWithIntervalObject:) withObject:[NSNumber numberWithDouble:checkInterval] afterDelay:delayUntilCheck];	
 }
 
 - (void)scheduleCheckWithInterval:(NSTimeInterval)interval
