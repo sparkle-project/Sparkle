@@ -30,8 +30,7 @@
 + (void)promptWithHostBundle:(NSBundle *)hb delegate:(id)d
 {
 	id prompt = [[[self class] alloc] initWithHostBundle:hb delegate:d];
-	[[prompt window] center];
-	[prompt showWindow:self];
+	[NSApp runModalForWindow:[prompt window]];
 }
 
 - (void)awakeFromNib
@@ -117,6 +116,7 @@
 	[[SUUserDefaults standardUserDefaults] setBool:shouldSendProfile forKey:SUSendProfileInfoKey];
 	[delegate updatePermissionPromptFinishedWithResult:([sender tag] == 1 ? SUAutomaticallyUpdate : SUDoNotAutomaticallyUpdate)];
 	[[self window] close];
+	[NSApp stopModal];
 	[self autorelease];
 }
 
