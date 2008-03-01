@@ -30,6 +30,7 @@
 + (void)promptWithHostBundle:(NSBundle *)hb delegate:(id)d
 {
 	id prompt = [[[self class] alloc] initWithHostBundle:hb delegate:d];
+	[[prompt window] center];
 	[prompt showWindow:self];
 }
 
