@@ -18,12 +18,15 @@
 
 - (id)initWithHostBundle:(NSBundle *)hb delegate:(id)d
 {
-	hostBundle = [hb retain];
-	delegate = [d retain];
-	isShowingMoreInfo = NO;
-	shouldSendProfile = [self shouldAskAboutProfile];
-	[super initWithHostBundle:hb windowNibName:@"SUUpdatePermissionPrompt"];
-	[self setShouldCascadeWindows:NO];
+	self = [super initWithHostBundle:hb windowNibName:@"SUUpdatePermissionPrompt"];
+	if (self)
+	{
+		hostBundle = [hb retain];
+		delegate = [d retain];
+		isShowingMoreInfo = NO;
+		shouldSendProfile = [self shouldAskAboutProfile];
+		[self setShouldCascadeWindows:NO];
+	}
 	return self;
 }
 

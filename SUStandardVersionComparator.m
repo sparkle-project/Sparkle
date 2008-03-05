@@ -127,7 +127,8 @@ typedef enum {
         // Yep. Lets get the next part of the larger
         // n holds the index of the part we want.
         NSString *missingPart;
-        int missingType, shorterResult, largerResult;
+        SUCharacterType missingType;
+		NSComparisonResult shorterResult, largerResult;
         
         if ([partsA count] > [partsB count]) {
             missingPart = [partsA objectAtIndex:n];

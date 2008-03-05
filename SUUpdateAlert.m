@@ -15,10 +15,13 @@
 
 - (id)initWithAppcastItem:(SUAppcastItem *)item hostBundle:(NSBundle *)hb
 {
-	hostBundle = [hb retain];
-	updateItem = [item retain];
-	[super initWithHostBundle:hb windowNibName:@"SUUpdateAlert"];
-	[self setShouldCascadeWindows:NO];
+	self = [super initWithHostBundle:hb windowNibName:@"SUUpdateAlert"];
+	if (self)
+	{
+		hostBundle = [hb retain];
+		updateItem = [item retain];
+		[self setShouldCascadeWindows:NO];
+	}
 	return self;
 }
 

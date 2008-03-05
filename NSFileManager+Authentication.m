@@ -21,8 +21,8 @@
 
 - (BOOL)currentUserOwnsPath:(NSString *)oPath
 {
-	char *path = (char *)[oPath fileSystemRepresentation];
-	unsigned int uid = getuid();
+	const char *path = [oPath fileSystemRepresentation];
+	uid_t uid = getuid();
 	bool res = false;
 	struct stat sb;
 	if(stat(path, &sb) == 0)
@@ -39,11 +39,13 @@
 					if(strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 						continue;
 					
-					char descend[strlen(path) + 1 + entry->d_namlen + 1];
-					strcpy(descend, path);
-					strcat(descend, "/");
-					strcat(descend, entry->d_name);
-					res = [self currentUserOwnsPath:[NSString stringWithUTF8String:descend]];
+					size_t len = strlen(path) + 1 + entry->d_namlen + 1;
+					char descend[len];
+					strlcpy(descend, path, len);
+					strlcat(descend, "/", len);
+					strlcat(descend, entry->d_name, len);
+					NSString* newPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:descend length:strlen(descend)];
+					res = [self currentUserOwnsPath:newPath];
 				}
 				closedir(dir);
 			}
@@ -70,19 +72,19 @@
 						 sb.st_gid,
 						 dst];
 	
-	AuthorizationRef auth;
+	AuthorizationRef auth = NULL;
 	if(AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &auth) == errAuthorizationSuccess)
 	{
 		char const* arguments[] = { "-c", [command fileSystemRepresentation], NULL };
-		if(AuthorizationExecuteWithPrivileges(auth, "/bin/sh", kAuthorizationFlagDefaults, (char**)arguments, NULL) == errAuthorizationSuccess)
+		if(AuthorizationExecuteWithPrivileges(auth, "/bin/sh", kAuthorizationFlagDefaults, (char *const *)arguments, NULL) == errAuthorizationSuccess)
 		{
 			int status;
-			int pid = wait(&status);
+			pid_t pid = wait(&status);
 			if(pid != -1 && WIFEXITED(status) && WEXITSTATUS(status) == 0)
 				res = YES;
 		}
+		AuthorizationFree(auth, 0);
 	}
-	AuthorizationFree(auth, 0);
 	
 	return res;	
 }

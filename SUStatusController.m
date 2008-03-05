@@ -13,9 +13,12 @@
 
 - (id)initWithHostBundle:(NSBundle *)hb
 {
-	hostBundle = [hb retain];
-	[super initWithHostBundle:hb windowNibName:@"SUStatus"];
-	[self setShouldCascadeWindows:NO];
+	self = [super initWithHostBundle:hb windowNibName:@"SUStatus"];
+	if (self)
+	{
+		hostBundle = [hb retain];
+		[self setShouldCascadeWindows:NO];
+	}
 	return self;
 }
 
