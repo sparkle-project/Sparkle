@@ -217,15 +217,16 @@ static SUUpdater *sharedUpdater = nil;
 	updateInProgress = YES;
 	
 	// A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
-	NSString *appcastString = [[SUUserDefaults standardUserDefaults] objectForKey:SUFeedURLKey];
+	NSString *appcastString = [[SUUserDefaults standardUserDefaults] objectForKey:SUFeedURLKey];	// if URL is quoted (because of pre-processing in plist files), remove quotes from the string
 	if (!appcastString)
 		appcastString = [hostBundle objectForInfoDictionaryKey:SUFeedURLKey];
 	if (!appcastString)
 		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the SUFeedURLKey in either the Info.plist or the user defaults!"];
 	
+	NSCharacterSet* quoteSet = [NSCharacterSet characterSetWithCharactersInString: @"\"\'"];
 	SUAppcast *appcast = [[SUAppcast alloc] init];
 	[appcast setDelegate:self];
-	[appcast fetchAppcastFromURL:[NSURL URLWithString:appcastString] parameters:[self feedParameters]];
+	[appcast fetchAppcastFromURL:[NSURL URLWithString:[appcastString stringByTrimmingCharactersInSet:quoteSet]] parameters:[self feedParameters]];
 }
 
 - (BOOL)newVersionAvailable
