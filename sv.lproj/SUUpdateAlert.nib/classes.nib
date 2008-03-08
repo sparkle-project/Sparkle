@@ -6,6 +6,11 @@
             SUPERCLASS = NSObject;
         },
                 {
+            CLASS = NSApplication;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSResponder;
+        },
+                {
             CLASS = NSObject;
             LANGUAGE = ObjC;
         },
@@ -18,21 +23,9 @@
             CLASS = SUUpdateAlert;
             LANGUAGE = ObjC;
             OUTLETS =             {
+                delegate = id;
                 description = NSTextField;
                 releaseNotesView = WebView;
-            };
-            SUPERCLASS = NSWindowController;
-        },
-                {
-            ACTIONS =             {
-                installUpdate = id;
-                remindMeLater = id;
-                skipThisVersion = id;
-            };
-            CLASS = SUUpdateAlertController;
-            LANGUAGE = ObjC;
-            OUTLETS =             {
-                releaseNotesView = id;
             };
             SUPERCLASS = NSWindowController;
         }

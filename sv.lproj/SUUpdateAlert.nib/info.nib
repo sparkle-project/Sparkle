@@ -3,14 +3,16 @@
 <plist version="1.0">
 <dict>
 	<key>IBDocumentLocation</key>
-	<string>26 84 356 240 0 0 1440 878 </string>
+	<string>69 84 356 240 0 0 1440 878 </string>
 	<key>IBFramework Version</key>
 	<string>489.0</string>
-	<key>IBOpenObjects</key>
-	<array>
-		<integer>5</integer>
-	</array>
+	<key>IBLastKnownRelativeProjectPath</key>
+	<string>../../Sparkle.xcodeproj</string>
+	<key>IBOldestOS</key>
+	<integer>5</integer>
 	<key>IBSystem Version</key>
-	<string>9B18</string>
+	<string>9C31</string>
+	<key>targetFramework</key>
+	<string>IBCocoaFramework</string>
 </dict>
 </plist>
