@@ -90,9 +90,7 @@
 
 - (void)setProgressValue:(double)value
 {
-	[self willChangeValueForKey:@"progressValue"];
 	progressValue = value;
-	[self didChangeValueForKey:@"progressValue"];	
 }
 
 - (double)maxProgressValue
@@ -102,17 +100,13 @@
 
 - (void)setMaxProgressValue:(double)value
 {
-	[self willChangeValueForKey:@"maxProgressValue"];
 	maxProgressValue = value;
-	[self didChangeValueForKey:@"maxProgressValue"];
 	[self setProgressValue:0];
 }
 
 - (void)setStatusText:(NSString *)aStatusText
 {
-	[self willChangeValueForKey:@"statusText"];
 	statusText = [aStatusText copy];
-	[self didChangeValueForKey:@"statusText"];	
 }
 
 @end
