@@ -1,0 +1,245 @@
+// !$*UTF8*$!
+{
+	0867D690FE84028FC02AAC07 /* Project object */ = {
+		activeArchitecture = i386;
+		activeBuildConfigurationName = Debug;
+		activeExecutable = FAEC981A0D94C8750008EDA9 /* Sparkle Test App */;
+		activeTarget = 61B5F90109C4CEE200B25A18 /* Sparkle Test App */;
+		codeSenseManager = FAEC98240D94C8760008EDA9 /* Code sense */;
+		executables = (
+			FAEC981A0D94C8750008EDA9 /* Sparkle Test App */,
+			FAEC981B0D94C8750008EDA9 /* Relaunch Tool */,
+		);
+		perUserDictionary = {
+			PBXPerProjectTemplateStateSaveDate = 227854453;
+			PBXWorkspaceStateSaveDate = 227854453;
+		};
+		sourceControlManager = FAEC98230D94C8760008EDA9 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	61B5F90109C4CEE200B25A18 /* Sparkle Test App */ = {
+		activeExec = 0;
+		executables = (
+			FAEC981A0D94C8750008EDA9 /* Sparkle Test App */,
+		);
+	};
+	8DC2EF4F0486A6940098B216 /* Sparkle */ = {
+		activeExec = 0;
+	};
+	D1E42C2E0CE754AE00F50EB9 /* Relaunch Tool */ = {
+		activeExec = 0;
+		executables = (
+			FAEC981B0D94C8750008EDA9 /* Relaunch Tool */,
+		);
+	};
+	FAEC981A0D94C8750008EDA9 /* Sparkle Test App */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+			{
+				active = YES;
+				name = MallocPreScribble;
+				value = 1;
+			},
+			{
+				active = YES;
+				name = MallocScribble;
+				value = 1;
+			},
+			{
+				active = YES;
+				name = MallocGuardEdges;
+				value = 1;
+			},
+			{
+				active = YES;
+				name = MallocCheckHeapStart;
+				value = 1;
+			},
+			{
+				active = YES;
+				name = MallocCheckHeapEach;
+				value = 100000;
+			},
+			{
+				active = YES;
+				name = MallocStackLogging;
+				value = 1;
+			},
+			{
+				active = NO;
+				name = MallocStackLoggingNoCompact;
+				value = 1;
+			},
+			{
+				active = YES;
+				name = NSDebugEnabled;
+				value = YES;
+			},
+			{
+				active = YES;
+				name = NSZombieEnabled;
+				value = YES;
+			},
+			{
+				active = NO;
+				name = NSDeallocateZombies;
+				value = NO;
+			},
+			{
+				active = YES;
+				name = NSAutoreleaseFreedObjectCheckEnabled;
+				value = YES;
+			},
+			{
+				active = NO;
+				name = MALLOC_PROTECT_BEFORE;
+				value = 1;
+			},
+			{
+				active = YES;
+				name = MALLOC_ALTIVEC_SIZE;
+				value = 1;
+			},
+			{
+				active = YES;
+				name = MALLOC_FILL_SPACE;
+				value = 1;
+			},
+			{
+				active = NO;
+				name = CFZombieLevel;
+				value = 65553;
+			},
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "Sparkle Test App";
+		sourceDirectories = (
+		);
+	};
+	FAEC981B0D94C8750008EDA9 /* Relaunch Tool */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+			{
+				active = YES;
+				name = MallocPreScribble;
+				value = 1;
+			},
+			{
+				active = YES;
+				name = MallocScribble;
+				value = 1;
+			},
+			{
+				active = YES;
+				name = MallocGuardEdges;
+				value = 1;
+			},
+			{
+				active = YES;
+				name = MallocCheckHeapStart;
+				value = 1;
+			},
+			{
+				active = YES;
+				name = MallocCheckHeapEach;
+				value = 100000;
+			},
+			{
+				active = YES;
+				name = MallocStackLogging;
+				value = 1;
+			},
+			{
+				active = NO;
+				name = MallocStackLoggingNoCompact;
+				value = 1;
+			},
+			{
+				active = YES;
+				name = NSDebugEnabled;
+				value = YES;
+			},
+			{
+				active = YES;
+				name = NSZombieEnabled;
+				value = YES;
+			},
+			{
+				active = NO;
+				name = NSDeallocateZombies;
+				value = NO;
+			},
+			{
+				active = YES;
+				name = NSAutoreleaseFreedObjectCheckEnabled;
+				value = YES;
+			},
+			{
+				active = NO;
+				name = MALLOC_PROTECT_BEFORE;
+				value = 1;
+			},
+			{
+				active = YES;
+				name = MALLOC_ALTIVEC_SIZE;
+				value = 1;
+			},
+			{
+				active = YES;
+				name = MALLOC_FILL_SPACE;
+				value = 1;
+			},
+			{
+				active = NO;
+				name = CFZombieLevel;
+				value = 65553;
+			},
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "Relaunch Tool";
+		sourceDirectories = (
+		);
+	};
+	FAEC98230D94C8760008EDA9 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+		};
+	};
+	FAEC98240D94C8760008EDA9 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+}

@@ -1,0 +1,5 @@
+// Test Application only
+
+INFOPLIST_FILE = Test Application/Test Application-Info.plist
+PRODUCT_NAME = Sparkle Test App
+WRAPPER_EXTENSION = app

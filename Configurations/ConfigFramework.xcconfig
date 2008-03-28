@@ -1,0 +1,10 @@
+// Framework only
+
+INSTALL_PATH = @executable_path/../Frameworks
+DYLIB_COMPATIBILITY_VERSION = 1.5
+DYLIB_CURRENT_VERSION = 1.5
+PRODUCT_NAME = Sparkle
+WRAPPER_EXTENSION = framework
+OTHER_LDFLAGS = -lcrypto
+FRAMEWORK_VERSION = A
+INFOPLIST_FILE = Info.plist
