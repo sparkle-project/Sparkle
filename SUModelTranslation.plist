@@ -1,25 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>ADP2,1</key>
 	<string>Developer Transition Kit</string>
-	<key>iMac1,1</key>
-	<string>iMac G3 (Rev A-D)</string>
-	<key>iMac4,1</key>
-	<string>iMac (Core Duo)</string>
-	<key>iMac4,2</key>
-	<string>iMac for Education (17-inch, Core Duo)</string>
-	<key>iMac5,1</key>
-	<string>iMac (Core 2 Duo, 17 or 20 inch, SuperDrive)</string>
-	<key>iMac5,2</key>
-	<string>iMac (Core 2 Duo, 17 inch, Combo Drive)</string>
-	<key>iMac6,1</key>
-	<string>iMac (Core 2 Duo, 24 inch, SuperDrive)</string>
 	<key>MacBook1,1</key>
 	<string>MacBook (Core Duo)</string>
 	<key>MacBook2,1</key>
 	<string>MacBook (Core 2 Duo)</string>
+	<key>MacBook4,1</key>
+	<string>MacBook (Core 2 Duo Feb 2008)</string>
 	<key>MacBookAir1,1</key>
 	<string>MacBook Air (January 2008)</string>
 	<key>MacBookPro1,1</key>
@@ -34,14 +24,16 @@
 	<string>MacBook Pro Core 2 Duo (15-inch LED, Core 2 Duo)</string>
 	<key>MacBookPro3,2</key>
 	<string>MacBook Pro Core 2 Duo (17-inch HD, Core 2 Duo)</string>
-	<key>Macmini1,1</key>
-	<string>Mac Mini (Core Solo/Duo)</string>
+	<key>MacBookPro4,1</key>
+	<string>MacBook Pro (Core 2 Duo Feb 2008)</string>
 	<key>MacPro1,1</key>
 	<string>Mac Pro (four-core)</string>
 	<key>MacPro2,1</key>
 	<string>Mac Pro (eight-core)</string>
 	<key>MacPro3,1</key>
 	<string>Mac Pro (January 2008 4- or 8- core "Harpertown")</string>
+	<key>Macmini1,1</key>
+	<string>Mac Mini (Core Solo/Duo)</string>
 	<key>PowerBook1,1</key>
 	<string>PowerBook G3</string>
 	<key>PowerBook2,1</key>
@@ -164,5 +156,17 @@
 	<string>Xserve (Intel Xeon)</string>
 	<key>Xserve2,1</key>
 	<string>Xserve (January 2008 quad-core)</string>
+	<key>iMac1,1</key>
+	<string>iMac G3 (Rev A-D)</string>
+	<key>iMac4,1</key>
+	<string>iMac (Core Duo)</string>
+	<key>iMac4,2</key>
+	<string>iMac for Education (17-inch, Core Duo)</string>
+	<key>iMac5,1</key>
+	<string>iMac (Core 2 Duo, 17 or 20 inch, SuperDrive)</string>
+	<key>iMac5,2</key>
+	<string>iMac (Core 2 Duo, 17 inch, Combo Drive)</string>
+	<key>iMac6,1</key>
+	<string>iMac (Core 2 Duo, 24 inch, SuperDrive)</string>
 </dict>
 </plist>
