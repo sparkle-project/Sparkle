@@ -68,7 +68,7 @@
 		61B5FCDE09C52A9F00B25A18 /* SUUpdateAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5FCA109C5228F00B25A18 /* SUUpdateAlert.m */; };
 		61B5FCDF09C52A9F00B25A18 /* SUUpdateAlert.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B5FCA009C5228F00B25A18 /* SUUpdateAlert.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		61BBDF820A49220C00378739 /* Sparkle.icns in Resources */ = {isa = PBXBuildFile; fileRef = 61BBDF810A49220C00378739 /* Sparkle.icns */; };
-		D1BE33120D78B6BD00E7D068 /* SUUpdatePermissionPrompt.nib in Resources */ = {isa = PBXBuildFile; fileRef = D1BE33110D78B6BD00E7D068 /* SUUpdatePermissionPrompt.nib */; };
+		61C46F340D9C54F300B06326 /* SUUpdatePermissionPrompt.nib in Resources */ = {isa = PBXBuildFile; fileRef = 61C46F330D9C54F300B06326 /* SUUpdatePermissionPrompt.nib */; };
 		D1E42C370CE754C700F50EB9 /* relaunch.m in Sources */ = {isa = PBXBuildFile; fileRef = 613242130CD06CEF00106AA4 /* relaunch.m */; };
 		D1E42C3B0CE755A000F50EB9 /* relaunch.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1E42C2F0CE754AE00F50EB9 /* relaunch.app */; };
 		FAEFA2F70D94AA7500472538 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
@@ -258,9 +258,9 @@
 		61B5FCA009C5228F00B25A18 /* SUUpdateAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdateAlert.h; sourceTree = "<group>"; };
 		61B5FCA109C5228F00B25A18 /* SUUpdateAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdateAlert.m; sourceTree = "<group>"; };
 		61BBDF810A49220C00378739 /* Sparkle.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Sparkle.icns; sourceTree = "<group>"; };
+		61C46F350D9C54F300B06326 /* en */ = {isa = PBXFileReference; lastKnownFileType = file; name = en; path = en.lproj/SUUpdatePermissionPrompt.nib; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* Sparkle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Sparkle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D1BE33110D78B6BD00E7D068 /* SUUpdatePermissionPrompt.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SUUpdatePermissionPrompt.nib; sourceTree = "<group>"; };
 		D1E42C2F0CE754AE00F50EB9 /* relaunch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = relaunch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D1E42C330CE754AE00F50EB9 /* Relaunch Tool-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Relaunch Tool-Info.plist"; sourceTree = "<group>"; };
 		FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkDebug.xcconfig; sourceTree = "<group>"; };
@@ -382,7 +382,7 @@
 			children = (
 				615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */,
 				61AAE8220A321A7F00D8810D /* Sparkle.strings */,
-				D1BE33110D78B6BD00E7D068 /* SUUpdatePermissionPrompt.nib */,
+				61C46F330D9C54F300B06326 /* SUUpdatePermissionPrompt.nib */,
 				61AAE8240A321A7F00D8810D /* SUAutomaticUpdateAlert.nib */,
 				61AAE8260A321A7F00D8810D /* SUUpdateAlert.nib */,
 				61299B3509CB04E000B7442F /* Sparkle.h */,
@@ -657,7 +657,7 @@
 				61AAE8290A321A8000D8810D /* SUAutomaticUpdateAlert.nib in Resources */,
 				61AAE82A0A321A8000D8810D /* SUUpdateAlert.nib in Resources */,
 				615AE3D00D64DC40001CA7BD /* SUModelTranslation.plist in Resources */,
-				D1BE33120D78B6BD00E7D068 /* SUUpdatePermissionPrompt.nib in Resources */,
+				61C46F340D9C54F300B06326 /* SUUpdatePermissionPrompt.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -861,6 +861,14 @@
 				61B5F92D09C4CFD800B25A18 /* English */,
 			);
 			name = MainMenu.nib;
+			sourceTree = "<group>";
+		};
+		61C46F330D9C54F300B06326 /* SUUpdatePermissionPrompt.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				61C46F350D9C54F300B06326 /* en */,
+			);
+			name = SUUpdatePermissionPrompt.nib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
