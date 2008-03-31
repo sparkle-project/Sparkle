@@ -53,6 +53,9 @@
 
 - (BOOL)isRunningFromDiskImage
 {	
+	// This check causes crashes on 10.3; for now, we'll just skip it.
+	if (floor(NSAppKitVersionNumber) < NSAppKitVersionNumber10_4)
+		return NO;
 	return [[[NSWorkspace sharedWorkspace] propertiesForPath:[self bundlePath]] objectForKey:NSWorkspace_RBimagefilepath] != nil;
 }
 
