@@ -538,20 +538,6 @@ static SUUpdater *sharedUpdater = nil;
 		return;		
 	}
 	
-	// Now that we've found the path we care about, let's install it.
-	
-	// But before we do that, we need to copy out relaunch.app so we can run it later.
-	NSString *relaunchPath = [[[NSBundle bundleForClass:[self class]] executablePath] stringByDeletingLastPathComponent];
-	if (!relaunchPath) // Slight hack to resolve issues with running within bundles
-	{
-		NSString *frameworkPath = [[[NSBundle mainBundle] sharedFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
-		NSBundle *framework = [NSBundle bundleWithPath:frameworkPath];
-		relaunchPath = [[framework executablePath] stringByDeletingLastPathComponent];
-	}
-	relaunchPath = [relaunchPath stringByAppendingPathComponent:@"relaunch.app/Contents/MacOS/relaunch"];
-	NSString *newRelaunchPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"relaunch"];
-	[[NSFileManager defaultManager] copyPath:relaunchPath toPath:newRelaunchPath handler:nil];
-	
 	// Alright, *now* we can actually install the new version.
 	int processIdentifierToWatch = [[NSProcessInfo processInfo] processIdentifier];
 	if (isPackage)
@@ -592,8 +578,13 @@ static SUUpdater *sharedUpdater = nil;
 	}
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-		
-	[NSTask launchedTaskWithLaunchPath:newRelaunchPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", processIdentifierToWatch], nil]];
+	
+	NSString *relaunchPath = [[NSBundle bundleForClass:[self class]] pathForResource:@"relaunch" ofType:nil];
+	@try {
+		[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", processIdentifierToWatch], nil]];
+	} @catch (NSException *e) {
+		NSLog(@"relaunch error: %@", e);
+	}
 	[NSApp terminate:self];
 }
 

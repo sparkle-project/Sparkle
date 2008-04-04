@@ -56,7 +56,11 @@
 	// This check causes crashes on 10.3; for now, we'll just skip it.
 	if (floor(NSAppKitVersionNumber) < NSAppKitVersionNumber10_4)
 		return NO;
-	return [[[NSWorkspace sharedWorkspace] propertiesForPath:[self bundlePath]] objectForKey:NSWorkspace_RBimagefilepath] != nil;
+	
+	NSDictionary *pathProperties = [[NSWorkspace sharedWorkspace] propertiesForPath:[self bundlePath]];
+	BOOL isDiskImage = [pathProperties objectForKey:NSWorkspace_RBimagefilepath] != nil;
+	BOOL isFileVault = [[pathProperties objectForKey:NSWorkspace_RBmntonname] hasPrefix:@"/Users/"];
+	return isDiskImage && !isFileVault;
 }
 
 - (NSArray *)systemProfile

@@ -71,12 +71,11 @@
 		61C1F2780DA066C2007ACE13 /* NSFileManager+ExtendedAttributes.h in Headers */ = {isa = PBXBuildFile; fileRef = 61C1F2760DA066C2007ACE13 /* NSFileManager+ExtendedAttributes.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		61C1F2790DA066C2007ACE13 /* NSFileManager+ExtendedAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 61C1F2770DA066C2007ACE13 /* NSFileManager+ExtendedAttributes.m */; };
 		61C46F340D9C54F300B06326 /* SUUpdatePermissionPrompt.nib in Resources */ = {isa = PBXBuildFile; fileRef = 61C46F330D9C54F300B06326 /* SUUpdatePermissionPrompt.nib */; };
-		D1E42C370CE754C700F50EB9 /* relaunch.m in Sources */ = {isa = PBXBuildFile; fileRef = 613242130CD06CEF00106AA4 /* relaunch.m */; };
-		D1E42C3B0CE755A000F50EB9 /* relaunch.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = D1E42C2F0CE754AE00F50EB9 /* relaunch.app */; };
+		DAAEFC9B0DA5722F0051E0D0 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
+		DAAEFD4E0DA572330051E0D0 /* relaunch.m in Sources */ = {isa = PBXBuildFile; fileRef = 613242130CD06CEF00106AA4 /* relaunch.m */; };
+		DAAEFD510DA572550051E0D0 /* relaunch in CopyFiles */ = {isa = PBXBuildFile; fileRef = DAAEFC960DA571DF0051E0D0 /* relaunch */; };
 		FAEFA2F70D94AA7500472538 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		FAEFA2F80D94AA7900472538 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
-		FAEFA2FA0D94AA8300472538 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
-		FAEFA2FC0D94AA8900472538 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
 		FAEFA3040D94AB3400472538 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
 		FAEFA3050D94AB3400472538 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 /* End PBXBuildFile section */
@@ -89,12 +88,12 @@
 			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = Sparkle;
 		};
-		D1E42C3E0CE755D700F50EB9 /* PBXContainerItemProxy */ = {
+		DAAEFD4F0DA572460051E0D0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D1E42C2E0CE754AE00F50EB9;
-			remoteInfo = "Relaunch Tool";
+			remoteGlobalIDString = DAAEFC950DA571DF0051E0D0;
+			remoteInfo = relaunch;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -113,9 +112,9 @@
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
-			dstSubfolderSpec = 6;
+			dstSubfolderSpec = 7;
 			files = (
-				D1E42C3B0CE755A000F50EB9 /* relaunch.app in CopyFiles */,
+				DAAEFD510DA572550051E0D0 /* relaunch in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -265,8 +264,7 @@
 		61C46F350D9C54F300B06326 /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/SUUpdatePermissionPrompt.nib; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* Sparkle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Sparkle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D1E42C2F0CE754AE00F50EB9 /* relaunch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = relaunch.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		D1E42C330CE754AE00F50EB9 /* Relaunch Tool-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Relaunch Tool-Info.plist"; sourceTree = "<group>"; };
+		DAAEFC960DA571DF0051E0D0 /* relaunch */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = relaunch; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigTestAppDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigCommonRelease.xcconfig; sourceTree = "<group>"; };
@@ -305,12 +303,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		D1E42C2D0CE754AE00F50EB9 /* Frameworks */ = {
+		DAAEFC940DA571DF0051E0D0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FAEFA2FA0D94AA8300472538 /* Foundation.framework in Frameworks */,
-				FAEFA2FC0D94AA8900472538 /* AppKit.framework in Frameworks */,
+				DAAEFC9B0DA5722F0051E0D0 /* AppKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -322,7 +319,7 @@
 			children = (
 				8DC2EF5B0486A6940098B216 /* Sparkle.framework */,
 				61B5F90209C4CEE200B25A18 /* Sparkle Test App.app */,
-				D1E42C2F0CE754AE00F50EB9 /* relaunch.app */,
+				DAAEFC960DA571DF0051E0D0 /* relaunch */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -356,7 +353,6 @@
 		089C1665FE841158C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				D1E42C330CE754AE00F50EB9 /* Relaunch Tool-Info.plist */,
 				8DC2EF5A0486A6940098B216 /* Info.plist */,
 				610D5A740A1670A4004AAD9C /* SUStatus.nib */,
 			);
@@ -566,7 +562,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				D1E42C3F0CE755D700F50EB9 /* PBXTargetDependency */,
+				DAAEFD500DA572460051E0D0 /* PBXTargetDependency */,
 			);
 			name = Sparkle;
 			productInstallPath = "$(HOME)/Library/Frameworks";
@@ -574,22 +570,21 @@
 			productReference = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		D1E42C2E0CE754AE00F50EB9 /* Relaunch Tool */ = {
+		DAAEFC950DA571DF0051E0D0 /* relaunch tool */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D1E42C360CE754AF00F50EB9 /* Build configuration list for PBXNativeTarget "Relaunch Tool" */;
+			buildConfigurationList = DAAEFC9A0DA571FD0051E0D0 /* Build configuration list for PBXNativeTarget "relaunch tool" */;
 			buildPhases = (
-				D1E42C2B0CE754AE00F50EB9 /* Resources */,
-				D1E42C2C0CE754AE00F50EB9 /* Sources */,
-				D1E42C2D0CE754AE00F50EB9 /* Frameworks */,
+				DAAEFC930DA571DF0051E0D0 /* Sources */,
+				DAAEFC940DA571DF0051E0D0 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = "Relaunch Tool";
-			productName = "Relaunch Tool";
-			productReference = D1E42C2F0CE754AE00F50EB9 /* relaunch.app */;
-			productType = "com.apple.product-type.application";
+			name = "relaunch tool";
+			productName = relaunch;
+			productReference = DAAEFC960DA571DF0051E0D0 /* relaunch */;
+			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
 
@@ -639,7 +634,7 @@
 			targets = (
 				8DC2EF4F0486A6940098B216 /* Sparkle */,
 				61B5F90109C4CEE200B25A18 /* Sparkle Test App */,
-				D1E42C2E0CE754AE00F50EB9 /* Relaunch Tool */,
+				DAAEFC950DA571DF0051E0D0 /* relaunch tool */,
 			);
 		};
 /* End PBXProject section */
@@ -665,13 +660,6 @@
 				61AAE82A0A321A8000D8810D /* SUUpdateAlert.nib in Resources */,
 				615AE3D00D64DC40001CA7BD /* SUModelTranslation.plist in Resources */,
 				61C46F340D9C54F300B06326 /* SUUpdatePermissionPrompt.nib in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D1E42C2B0CE754AE00F50EB9 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -732,11 +720,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		D1E42C2C0CE754AE00F50EB9 /* Sources */ = {
+		DAAEFC930DA571DF0051E0D0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D1E42C370CE754C700F50EB9 /* relaunch.m in Sources */,
+				DAAEFD4E0DA572330051E0D0 /* relaunch.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -748,10 +736,10 @@
 			target = 8DC2EF4F0486A6940098B216 /* Sparkle */;
 			targetProxy = 61B5F91B09C4CF7200B25A18 /* PBXContainerItemProxy */;
 		};
-		D1E42C3F0CE755D700F50EB9 /* PBXTargetDependency */ = {
+		DAAEFD500DA572460051E0D0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = D1E42C2E0CE754AE00F50EB9 /* Relaunch Tool */;
-			targetProxy = D1E42C3E0CE755D700F50EB9 /* PBXContainerItemProxy */;
+			target = DAAEFC950DA571DF0051E0D0 /* relaunch tool */;
+			targetProxy = DAAEFD4F0DA572460051E0D0 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -922,14 +910,14 @@
 			};
 			name = Release;
 		};
-		D1E42C340CE754AF00F50EB9 /* Debug */ = {
+		DAAEFC980DA571DF0051E0D0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
 		};
-		D1E42C350CE754AF00F50EB9 /* Release */ = {
+		DAAEFC990DA571DF0051E0D0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
 			buildSettings = {
@@ -966,11 +954,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D1E42C360CE754AF00F50EB9 /* Build configuration list for PBXNativeTarget "Relaunch Tool" */ = {
+		DAAEFC9A0DA571FD0051E0D0 /* Build configuration list for PBXNativeTarget "relaunch tool" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				D1E42C340CE754AF00F50EB9 /* Debug */,
-				D1E42C350CE754AF00F50EB9 /* Release */,
+				DAAEFC980DA571DF0051E0D0 /* Debug */,
+				DAAEFC990DA571DF0051E0D0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

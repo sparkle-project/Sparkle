@@ -85,9 +85,14 @@ static OSStatus AuthorizationExecuteWithPrivilegesAndWait(
 	return res;
 }
 
+- (NSString *)_temporaryCopyNameForPath:(NSString *)filename
+{
+	return [[[filename stringByDeletingPathExtension] stringByAppendingString:@".old"] stringByAppendingPathExtension:[filename pathExtension]];
+}
+
 - (BOOL)_copyPathWithForcedAuthentication:(NSString *)src toPath:(NSString *)dst
 {
-	NSString *tmp = [[[dst stringByDeletingPathExtension] stringByAppendingString:@".old"] stringByAppendingPathExtension:[dst pathExtension]];
+	NSString *tmp = [self _temporaryCopyNameForPath:dst];
 	const char* srcPath = [src fileSystemRepresentation];
 	const char* tmpPath = [tmp fileSystemRepresentation];
 	const char* dstPath = [dst fileSystemRepresentation];
@@ -189,11 +194,19 @@ static OSStatus AuthorizationExecuteWithPrivilegesAndWait(
 
 - (BOOL)copyPath:(NSString *)src overPath:(NSString *)dst withAuthentication:(BOOL)useAuthentication
 {
+	NSLog(@"Copying %@ to %@...", dst, [self _temporaryCopyNameForPath:dst]);
 	if ([[NSFileManager defaultManager] isWritableFileAtPath:dst] && [[NSFileManager defaultManager] isWritableFileAtPath:[dst stringByDeletingLastPathComponent]])
 	{
 		NSInteger tag = 0;
-		BOOL result = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[dst stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[dst lastPathComponent]] tag:&tag];
+		BOOL result;
+		NSString *tmpPath = [self _temporaryCopyNameForPath:dst];
+		NSLog(@"Performing traditional copy from %@ to %@...", src, dst);
+		result = [[NSFileManager defaultManager] movePath:dst toPath:tmpPath handler:self];
+		NSLog(@"Moving %@ to %@...", src, dst);
 		result &= [[NSFileManager defaultManager] copyPath:src toPath:dst handler:nil];
+		NSLog(@"Moving %@ to the trash...", tmpPath);
+		result &= [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:tmpPath destination:@"" files:[NSArray arrayWithObject:[tmpPath lastPathComponent]] tag:&tag];
+		NSLog(@"Success!");
 		
 		// If the currently-running application is trusted, the new
 		// version should be trusted as well.  Remove it from the
@@ -204,9 +217,8 @@ static OSStatus AuthorizationExecuteWithPrivilegesAndWait(
 		// new home in case it's moved across filesystems: if that
 		// happens, the move is actually a copy, and it may result
 		// in the application being quarantined.
-		if (result) {
+		if (result)
 			[self releaseFromQuarantine:dst];
-		}
 		
 		return result;
 	}
@@ -216,11 +228,16 @@ static OSStatus AuthorizationExecuteWithPrivilegesAndWait(
 		return NO;
 }
 
--(BOOL)fileManager:(NSFileManager *)manager shouldProceedAfterError:(NSDictionary *)errorInfo
+- (BOOL)fileManager:(NSFileManager *)fileManager shouldProceedAfterError:(NSError *)error copyingItemAtPath:(NSString *)srcPath toPath:(NSString *)dstPath
 {
-	NSLog(@"Sparkle: An error occurred in copying the new version of the product from %@ to %@: %@", [errorInfo objectForKey:@"Path"], [errorInfo objectForKey:@"ToPath"], [errorInfo objectForKey:@"Error"]);
+	NSLog(@"Sparkle: An error occurred in copying %@ to %@: %@", srcPath, dstPath, [error localizedDescription]);
 	return NO;
 }
 
+- (BOOL)fileManager:(NSFileManager *)fileManager shouldProceedAfterError:(NSError *)error movingItemAtPath:(NSString *)srcPath toPath:(NSString *)dstPath
+{
+	NSLog(@"Sparkle: An error occurred in moving %@ to %@: %@", srcPath, dstPath, [error localizedDescription]);
+	return NO;
+}
 
 @end

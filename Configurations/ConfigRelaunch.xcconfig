@@ -1,5 +1,3 @@
 // Relaunch Tool only
 
-INFOPLIST_FILE = Relaunch Tool-Info.plist
 PRODUCT_NAME = relaunch
-WRAPPER_EXTENSION = app
