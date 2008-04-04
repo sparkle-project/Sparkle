@@ -194,19 +194,14 @@ static OSStatus AuthorizationExecuteWithPrivilegesAndWait(
 
 - (BOOL)copyPath:(NSString *)src overPath:(NSString *)dst withAuthentication:(BOOL)useAuthentication
 {
-	NSLog(@"Copying %@ to %@...", dst, [self _temporaryCopyNameForPath:dst]);
 	if ([[NSFileManager defaultManager] isWritableFileAtPath:dst] && [[NSFileManager defaultManager] isWritableFileAtPath:[dst stringByDeletingLastPathComponent]])
 	{
 		NSInteger tag = 0;
 		BOOL result;
 		NSString *tmpPath = [self _temporaryCopyNameForPath:dst];
-		NSLog(@"Performing traditional copy from %@ to %@...", src, dst);
 		result = [[NSFileManager defaultManager] movePath:dst toPath:tmpPath handler:self];
-		NSLog(@"Moving %@ to %@...", src, dst);
 		result &= [[NSFileManager defaultManager] copyPath:src toPath:dst handler:nil];
-		NSLog(@"Moving %@ to the trash...", tmpPath);
-		result &= [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:tmpPath destination:@"" files:[NSArray arrayWithObject:[tmpPath lastPathComponent]] tag:&tag];
-		NSLog(@"Success!");
+		result &= [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[tmpPath stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[tmpPath lastPathComponent]] tag:&tag];
 		
 		// If the currently-running application is trusted, the new
 		// version should be trusted as well.  Remove it from the
