@@ -557,7 +557,6 @@
 				8DC2EF540486A6940098B216 /* Sources */,
 				8DC2EF560486A6940098B216 /* Frameworks */,
 				DA142A520CC79E5A00CE54F3 /* CopyFiles */,
-				DA142B130CC7A66B00CE54F3 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -664,22 +663,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		DA142B130CC7A66B00CE54F3 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "ln -sf \"`basename \\\"${VERSIONS_FOLDER_PATH}\\\"`/${CURRENT_VERSION}/relaunch.app\" \"`dirname \\\"${BUILT_PRODUCTS_DIR}/${VERSIONS_FOLDER_PATH}\\\"`\"";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		61B5F8FF09C4CEE200B25A18 /* Sources */ = {
