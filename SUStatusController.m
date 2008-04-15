@@ -102,6 +102,7 @@
 {
 	maxProgressValue = value;
 	[self setProgressValue:0];
+	[progressBar setIndeterminate:(value == 0)];
 }
 
 - (void)setStatusText:(NSString *)aStatusText

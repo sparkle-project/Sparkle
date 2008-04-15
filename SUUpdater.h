@@ -15,7 +15,7 @@
 
 // .zip, .dmg, .tar, .tbz, .tgz archives are supported at this time.
 
-@class SUAppcastItem, SUUpdateAlert, SUStatusController;
+@class SUAppcastItem, SUUpdateAlert, SUStatusController, SUUnarchiver;
 @interface SUUpdater : NSObject {
 	SUAppcastItem *updateItem;
 	
@@ -33,6 +33,8 @@
 	
 	NSBundle *hostBundle;
 	id delegate;
+	
+	SUUnarchiver *unarchiver;
 }
 
 - (void)setHostBundle:(NSBundle *)hostBundle;

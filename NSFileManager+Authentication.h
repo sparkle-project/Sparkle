@@ -10,7 +10,7 @@
 #define NSFILEMANAGER_PLUS_AUTHENTICATION_H
 
 @interface NSFileManager (SUAuthenticationAdditions)
-- (BOOL)copyPath:(NSString *)src overPath:(NSString *)dst withAuthentication:(BOOL)useAuthentication;
+- (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst error:(NSError **)error;
 @end
 
 #endif

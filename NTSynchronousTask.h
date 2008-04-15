@@ -3,7 +3,7 @@
 //  CocoatechCore
 //
 //  Created by Steve Gehrman on 9/29/05.
-//  Copyright 2005 __MyCompanyName__. All rights reserved.
+//  Copyright 2005 Steve Gehrman. All rights reserved.
 //
 
 #ifndef NTSYNCHRONOUSTASK_H

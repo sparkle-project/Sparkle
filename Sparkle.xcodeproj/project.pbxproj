@@ -34,6 +34,12 @@
 		6160E7E10D3B4A8800E9CD71 /* NTSynchronousTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 610EC1C00CF3914D00AE239E /* NTSynchronousTask.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6171D9070D57B81800BFE886 /* NSFileManager+Aliases.h in Headers */ = {isa = PBXBuildFile; fileRef = 6171D9050D57B81800BFE886 /* NSFileManager+Aliases.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6171D9080D57B81800BFE886 /* NSFileManager+Aliases.m in Sources */ = {isa = PBXBuildFile; fileRef = 6171D9060D57B81800BFE886 /* NSFileManager+Aliases.m */; };
+		618FA5010DAE88B40026945C /* SUInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 618FA4FF0DAE88B40026945C /* SUInstaller.h */; };
+		618FA5020DAE88B40026945C /* SUInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5000DAE88B40026945C /* SUInstaller.m */; };
+		618FA5050DAE8AB80026945C /* SUPlainInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 618FA5030DAE8AB80026945C /* SUPlainInstaller.h */; };
+		618FA5060DAE8AB80026945C /* SUPlainInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5040DAE8AB80026945C /* SUPlainInstaller.m */; };
+		618FA5220DAE8E8A0026945C /* SUPackageInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 618FA5200DAE8E8A0026945C /* SUPackageInstaller.h */; };
+		618FA5230DAE8E8A0026945C /* SUPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5210DAE8E8A0026945C /* SUPackageInstaller.m */; };
 		6196CFF909C72148000DC222 /* SUStatusController.h in Headers */ = {isa = PBXBuildFile; fileRef = 6196CFE309C71ADE000DC222 /* SUStatusController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6196CFFA09C72149000DC222 /* SUStatusController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6196CFE409C71ADE000DC222 /* SUStatusController.m */; };
 		61A225930D1C3ADD00430CCD /* NSBundle+SUAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 61A225910D1C3ADD00430CCD /* NSBundle+SUAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -149,6 +155,12 @@
 		615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = SUModelTranslation.plist; sourceTree = "<group>"; };
 		6171D9050D57B81800BFE886 /* NSFileManager+Aliases.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+Aliases.h"; sourceTree = "<group>"; };
 		6171D9060D57B81800BFE886 /* NSFileManager+Aliases.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+Aliases.m"; sourceTree = "<group>"; };
+		618FA4FF0DAE88B40026945C /* SUInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUInstaller.h; sourceTree = "<group>"; };
+		618FA5000DAE88B40026945C /* SUInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUInstaller.m; sourceTree = "<group>"; };
+		618FA5030DAE8AB80026945C /* SUPlainInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUPlainInstaller.h; sourceTree = "<group>"; };
+		618FA5040DAE8AB80026945C /* SUPlainInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUPlainInstaller.m; sourceTree = "<group>"; };
+		618FA5200DAE8E8A0026945C /* SUPackageInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUPackageInstaller.h; sourceTree = "<group>"; };
+		618FA5210DAE8E8A0026945C /* SUPackageInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUPackageInstaller.m; sourceTree = "<group>"; };
 		6196CFE309C71ADE000DC222 /* SUStatusController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStatusController.h; sourceTree = "<group>"; };
 		6196CFE409C71ADE000DC222 /* SUStatusController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUStatusController.m; sourceTree = "<group>"; };
 		61A225910D1C3ADD00430CCD /* NSBundle+SUAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBundle+SUAdditions.h"; sourceTree = "<group>"; };
@@ -365,6 +377,7 @@
 				61299B3909CB055000B7442F /* Appcast Support */,
 				61299B3809CB053D00B7442F /* Cocoa Categories */,
 				61299B3A09CB056100B7442F /* User Interface */,
+				618FA6DB0DB485440026945C /* Installation */,
 				61B5F8F309C4CE5900B25A18 /* Utilities */,
 				61B5F8E309C4CE3C00B25A18 /* SUUpdater.h */,
 				61B5F8E409C4CE3C00B25A18 /* SUUpdater.m */,
@@ -429,6 +442,19 @@
 				61180BC90D64138900B4E0D1 /* SUWindowController.m */,
 			);
 			name = "User Interface";
+			sourceTree = "<group>";
+		};
+		618FA6DB0DB485440026945C /* Installation */ = {
+			isa = PBXGroup;
+			children = (
+				618FA4FF0DAE88B40026945C /* SUInstaller.h */,
+				618FA5000DAE88B40026945C /* SUInstaller.m */,
+				618FA5030DAE8AB80026945C /* SUPlainInstaller.h */,
+				618FA5040DAE8AB80026945C /* SUPlainInstaller.m */,
+				618FA5200DAE8E8A0026945C /* SUPackageInstaller.h */,
+				618FA5210DAE8E8A0026945C /* SUPackageInstaller.m */,
+			);
+			name = Installation;
 			sourceTree = "<group>";
 		};
 		61B5F8F309C4CE5900B25A18 /* Utilities */ = {
@@ -523,6 +549,9 @@
 				6171D9070D57B81800BFE886 /* NSFileManager+Aliases.h in Headers */,
 				61180BCA0D64138900B4E0D1 /* SUWindowController.h in Headers */,
 				61C1F2780DA066C2007ACE13 /* NSFileManager+ExtendedAttributes.h in Headers */,
+				618FA5010DAE88B40026945C /* SUInstaller.h in Headers */,
+				618FA5050DAE8AB80026945C /* SUPlainInstaller.h in Headers */,
+				618FA5220DAE8E8A0026945C /* SUPackageInstaller.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -700,6 +729,9 @@
 				6171D9080D57B81800BFE886 /* NSFileManager+Aliases.m in Sources */,
 				61180BCB0D64138900B4E0D1 /* SUWindowController.m in Sources */,
 				61C1F2790DA066C2007ACE13 /* NSFileManager+ExtendedAttributes.m in Sources */,
+				618FA5020DAE88B40026945C /* SUInstaller.m in Sources */,
+				618FA5060DAE8AB80026945C /* SUPlainInstaller.m in Sources */,
+				618FA5230DAE8E8A0026945C /* SUPackageInstaller.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

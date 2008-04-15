@@ -39,6 +39,7 @@
 #import "SUAppcastItem.h"
 #import "SUAutomaticUpdateAlert.h"
 #import "SUConstants.h"
+#import "SUInstaller.h"
 #import "SUStandardVersionComparator.h"
 #import "SUStatusChecker.h"
 #import "SUStatusController.h"

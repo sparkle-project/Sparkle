@@ -436,9 +436,7 @@ static SUUpdater *sharedUpdater = nil;
 }
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)ua
-{
-	[ua autorelease];
-	
+{	
 	if ([self isAutomaticallyUpdating])
 	{
 		[self installAndRestart:self];
@@ -454,7 +452,7 @@ static SUUpdater *sharedUpdater = nil;
 
 - (void)unarchiverDidFail:(SUUnarchiver *)ua
 {
-	[ua autorelease];
+	[ua release];
 	[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil)];
 	[self abandonUpdate];
 }
@@ -477,7 +475,7 @@ static SUUpdater *sharedUpdater = nil;
 			}
 		}
 		
-		SUUnarchiver *unarchiver = [[SUUnarchiver alloc] init];
+		unarchiver = [[SUUnarchiver alloc] init];
 		[unarchiver setDelegate:self];
 		[unarchiver unarchivePath:downloadPath]; // asynchronous extraction!
 	}
@@ -495,70 +493,6 @@ static SUUpdater *sharedUpdater = nil;
 	[statusController beginActionWithTitle:SULocalizedString(@"Installing update...", nil) maxProgressValue:0 statusText:nil];
 	[statusController setButtonEnabled:NO];
 	
-	// Hack to force us to wait for the UI to update.
-	NSEvent *event;
-	while((event = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:nil inMode:NSDefaultRunLoopMode dequeue:YES]))
-		[NSApp sendEvent:event];	
-
-	// Search subdirectories for the application
-	NSString *currentFile, *newAppDownloadPath = nil, *bundleFileName = [[hostBundle bundlePath] lastPathComponent];
-	BOOL isPackage = NO;
-	NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:[downloadPath stringByDeletingLastPathComponent]];
-	while ((currentFile = [dirEnum nextObject]))
-	{
-		// Some DMGs have symlinks into /Applications! That's no good! And there's no point in looking in bundles.
-		if ([[NSFileManager defaultManager] isAliasFolderAtPath:[[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:currentFile]] ||
-			[[currentFile pathExtension] isEqualToString:[[hostBundle bundlePath] pathExtension]] ||
-			[[currentFile pathExtension] isEqualToString:@"pkg"] ||
-			[[currentFile pathExtension] isEqualToString:@"mpkg"])
-		{
-			[dirEnum skipDescendents];
-		}
-		
-		if ([[currentFile lastPathComponent] isEqualToString:bundleFileName]) // We found one!
-		{
-			isPackage = NO;
-			newAppDownloadPath = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:currentFile];
-			break;
-		}
-		else if (([[currentFile pathExtension] isEqualToString:@"pkg"] || [[currentFile pathExtension] isEqualToString:@"mpkg"]) &&
-				  [[[currentFile lastPathComponent] stringByDeletingPathExtension] isEqualToString:[bundleFileName stringByDeletingPathExtension]])
-		{
-			isPackage = YES;
-			newAppDownloadPath = [[downloadPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:currentFile];
-			break;
-		}
-	}
-	
-	if (![[NSFileManager defaultManager] fileExistsAtPath:newAppDownloadPath])
-	{
-		NSLog(@"The update archive didn't contain an application or package with the proper name: %@ or %@.", bundleFileName, [[bundleFileName stringByDeletingPathExtension] stringByAppendingPathComponent:@".[m]pkg"]);
-		[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred during installation. Please try again later.", nil)];
-		[self abandonUpdate];
-		return;		
-	}
-	
-	// Alright, *now* we can actually install the new version.
-	int processIdentifierToWatch = [[NSProcessInfo processInfo] processIdentifier];
-	if (isPackage)
-	{
-		NSString *installerPath = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.installer"];
-		installerPath = [installerPath stringByAppendingString:@"/Contents/MacOS/Installer"];
-		NSTask *installer = [NSTask launchedTaskWithLaunchPath:installerPath arguments:[NSArray arrayWithObjects:newAppDownloadPath, nil]];
-		processIdentifierToWatch = [installer processIdentifier]; // We want to wait until the installer quits.
-	}
-	else
-	{
-		if (![[NSFileManager defaultManager] copyPath:newAppDownloadPath
-											 overPath:[hostBundle bundlePath]
-								   withAuthentication:![self isAutomaticallyUpdating]])
-		{
-			[self showUpdateErrorAlertWithInfo:[NSString stringWithFormat:SULocalizedString(@"%@ can't install the update! Make sure you have enough disk space.", nil), [hostBundle name]]];
-			[self abandonUpdate];
-			return;
-		}
-	}
-	
 	// Prompt for permission to restart if we're automatically updating.
 	if ([self isAutomaticallyUpdating])
 	{
@@ -570,22 +504,36 @@ static SUUpdater *sharedUpdater = nil;
 		}
 	}
 	
-	// This is really sloppy and coupled, but I can't think of a better way to deal with this.
-	// If we've got a DMG, we've mounted it; now we've got to unmount it.
-	if ([[[downloadPath pathExtension] lowercaseString] isEqualToString:@"dmg"])
-	{
-		[NSTask launchedTaskWithLaunchPath:@"/usr/bin/hdiutil" arguments:[NSArray arrayWithObjects:@"detach", [newAppDownloadPath stringByDeletingLastPathComponent], @"-force", nil]];	
-	}
+	[SUInstaller installFromUpdateFolder:[downloadPath stringByDeletingLastPathComponent] overHostBundle:hostBundle delegate:self];
+}
 	
+- (void)installerFinishedForHostBundle:(NSBundle *)hb
+{
+	if (hb != hostBundle) { return; }
+	
+	[unarchiver cleanUp];
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
 	
 	NSString *relaunchPath = [[NSBundle bundleForClass:[self class]] pathForResource:@"relaunch" ofType:nil];
-	@try {
-		[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", processIdentifierToWatch], nil]];
-	} @catch (NSException *e) {
-		NSLog(@"relaunch error: %@", e);
+	@try
+	{
+		[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
+	}
+	@catch (NSException *e)
+	{
+		NSLog(@"Sparkle relaunch error: %@", e);
+		[self showUpdateErrorAlertWithInfo:[NSString stringWithFormat:SULocalizedString(@"Couldn't restart %1$@, but the new version will be available next time you run %1$@.", nil), [hostBundle name]]];
+		[self abandonUpdate];
 	}
 	[NSApp terminate:self];
+}
+
+- (void)installerForHostBundle:(NSBundle *)hb failedWithError:(NSError *)error
+{
+	if (hb != hostBundle) { return; }
+	NSLog(@"Sparkle Installation Error: %@", [error localizedDescription]);
+	[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred during installation. Please try again later.", nil)];
+	[self abandonUpdate];
 }
 
 #pragma mark Error handling

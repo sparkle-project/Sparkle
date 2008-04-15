@@ -13,7 +13,7 @@
 @implementation SUUnarchiver
 
 // This method abstracts the types that use a command line tool piping data from stdin.
-- (BOOL)_extractArchivePath:archivePath pipingDataToCommand:(NSString *)command
+- (BOOL)_extractArchivePipingDataToCommand:(NSString *)command
 {
 	// Get the file size.
 	NSNumber *fs = [[[NSFileManager defaultManager] fileAttributesAtPath:archivePath traverseLink:NO] objectForKey:NSFileSize];
@@ -52,27 +52,27 @@
 	return YES;
 }
 
-- (BOOL)_extractTAR:(NSString *)archivePath
+- (BOOL)_extractTAR
 {
-	return [self _extractArchivePath:archivePath pipingDataToCommand:@"tar -xC \"$DESTINATION\""];
+	return [self _extractArchivePipingDataToCommand:@"tar -xC \"$DESTINATION\""];
 }
 
-- (BOOL)_extractTGZ:(NSString *)archivePath
+- (BOOL)_extractTGZ
 {
-	return [self _extractArchivePath:archivePath pipingDataToCommand:@"tar -zxC \"$DESTINATION\""];
+	return [self _extractArchivePipingDataToCommand:@"tar -zxC \"$DESTINATION\""];
 }
 
-- (BOOL)_extractTBZ:(NSString *)archivePath
+- (BOOL)_extractTBZ
 {
-	return [self _extractArchivePath:archivePath pipingDataToCommand:@"tar -jxC \"$DESTINATION\""];
+	return [self _extractArchivePipingDataToCommand:@"tar -jxC \"$DESTINATION\""];
 }
 
-- (BOOL)_extractZIP:(NSString *)archivePath
+- (BOOL)_extractZIP
 {
-	return [self _extractArchivePath:archivePath pipingDataToCommand:@"ditto -x -k - \"$DESTINATION\""];
+	return [self _extractArchivePipingDataToCommand:@"ditto -x -k - \"$DESTINATION\""];
 }
 
-- (BOOL)_extractDMG:(NSString *)archivePath
+- (BOOL)_extractDMG
 {		
 	// get a unique mount point path
 	NSString *mountPoint = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"mp"];
@@ -99,7 +99,7 @@
 	return YES;
 }
 
-- (void)_unarchivePath:(NSString *)path
+- (void)_unarchive
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
@@ -107,33 +107,32 @@
 	// The methods take the path of the archive to extract. They return a BOOL indicating whether
 	// we should continue with the update; returns NO if an error occurred.
 	NSDictionary *commandDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-																   @"_extractTBZ:", @".tbz",
-																   @"_extractTBZ:", @".tar.bz2",
-																   @"_extractTGZ:", @".tgz",
-																   @"_extractTGZ:", @".tar.gz",
-																   @"_extractTAR:", @".tar", 
-																   @"_extractZIP:", @".zip", 
-																   @"_extractDMG:", @".dmg",
+																   @"_extractTBZ", @".tbz",
+																   @"_extractTBZ", @".tar.bz2",
+																   @"_extractTGZ", @".tgz",
+																   @"_extractTGZ", @".tar.gz",
+																   @"_extractTAR", @".tar", 
+																   @"_extractZIP", @".zip", 
+																   @"_extractDMG", @".dmg",
 																   nil];
 	SEL command = NULL;
-	NSString *theLastPathComponent = [[path lastPathComponent] lowercaseString];
+	NSString *theLastPathComponent = [[archivePath lastPathComponent] lowercaseString];
 	NSEnumerator *theEnumerator = [[commandDictionary allKeys] objectEnumerator];
 	NSString *theExtension = NULL;
 	while ((theExtension = [theEnumerator nextObject]) != NULL)
-		{
+	{
 		if ([[theLastPathComponent substringFromIndex:[theLastPathComponent length] - [theExtension length]] isEqualToString:theExtension])
-			{
+		{
 			command = NSSelectorFromString([commandDictionary objectForKey:theExtension]);
 			break;
-			}
 		}
+	}
 	
 	BOOL result;
 	if (command)
 	{
 		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[self methodSignatureForSelector:command]];
 		[invocation setSelector:command];
-		[invocation setArgument:&path atIndex:2]; // 0 and 1 are private!
 		[invocation invokeWithTarget:self];
 		[invocation getReturnValue:&result];
 	}
@@ -156,12 +155,28 @@
 
 - (void)unarchivePath:(NSString *)path
 {
-	[NSThread detachNewThreadSelector:@selector(_unarchivePath:) toTarget:self withObject:path];
+	archivePath = [path copy];
+	[NSThread detachNewThreadSelector:@selector(_unarchive) toTarget:self withObject:nil];
 }
 
 - (void)setDelegate:del
 {
 	delegate = del;
+}
+
+- (void)cleanUp
+{
+	if ([[archivePath pathExtension] isEqualToString:@".dmg"])
+	{
+		[NSTask launchedTaskWithLaunchPath:@"/usr/bin/hdiutil" arguments:[NSArray arrayWithObjects:@"detach", [archivePath stringByDeletingLastPathComponent], @"-force", nil]];	
+	}
+	[[NSFileManager defaultManager] removeFileAtPath:archivePath handler:nil];
+}
+
+- (void)dealloc
+{
+	[archivePath release];
+	[super dealloc];
 }
 
 @end

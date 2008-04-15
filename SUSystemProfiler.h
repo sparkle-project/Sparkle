@@ -3,7 +3,7 @@
 //  Sparkle
 //
 //  Created by Andy Matuschak on 12/22/07.
-//  Copyright 2007 __MyCompanyName__. All rights reserved.
+//  Copyright 2007 Andy Matuschak. All rights reserved.
 //
 
 #ifndef SUSYSTEMPROFILER_H

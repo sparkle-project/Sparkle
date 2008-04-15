@@ -24,3 +24,9 @@ NSString *SUAllowsAutomaticUpdatesKey = @"SUAllowsAutomaticUpdates";
 NSString *SUEnableSystemProfilingKey = @"SUEnableSystemProfiling";
 NSString *SUEnableAutomaticChecksKey = @"SUEnableAutomaticChecks";
 NSString *SUSendProfileInfoKey = @"SUSendProfileInfo";
+
+NSString *SUSparkleErrorDomain = @"SUSparkleErrorDomain";
+OSStatus SUFileCopyFailure = 9000;
+OSStatus SUAuthenticationFailure = 9001;
+OSStatus SUMissingUpdateError = 9002;
+OSStatus SUMissingInstallerToolError = 9003;
