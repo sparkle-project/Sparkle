@@ -98,7 +98,7 @@ typedef enum {
                     return NSOrderedAscending;
                 }
             } else if (typeA == kStringType) {
-                NSComparisonResult result = [partB compare:partA];
+                NSComparisonResult result = [partA compare:partB];
                 if (result != NSOrderedSame) {
                     return result;
                 }
