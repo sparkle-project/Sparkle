@@ -100,7 +100,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 612279D80DB5470200AB99EA /* Sparkle Unit Tests */;
+			remoteGlobalIDString = 612279D80DB5470200AB99EA;
 			remoteInfo = "Sparkle Unit Tests";
 		};
 		61B5F91B09C4CF7200B25A18 /* PBXContainerItemProxy */ = {
@@ -158,7 +158,7 @@
 		6120721009CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUAutomaticUpdateAlert.h; sourceTree = "<group>"; };
 		6120721109CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUAutomaticUpdateAlert.m; sourceTree = "<group>"; };
 		612279D90DB5470200AB99EA /* Sparkle Unit Tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Sparkle Unit Tests.octest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		612279DA0DB5470200AB99EA /* Sparkle Unit Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Sparkle Unit Tests-Info.plist"; sourceTree = "<group>"; };
+		612279DA0DB5470200AB99EA /* Sparkle Unit Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Sparkle Unit Tests-Info.plist"; path = "Tests/Sparkle Unit Tests-Info.plist"; sourceTree = "<group>"; };
 		61227A140DB548B800AB99EA /* SUVersionComparisonTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUVersionComparisonTest.h; path = Tests/SUVersionComparisonTest.h; sourceTree = "<group>"; };
 		61227A150DB548B800AB99EA /* SUVersionComparisonTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUVersionComparisonTest.m; path = Tests/SUVersionComparisonTest.m; sourceTree = "<group>"; };
 		6129984309C9E2DA00B7442F /* NSFileManager+Authentication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+Authentication.h"; sourceTree = "<group>"; };
@@ -376,7 +376,6 @@
 				FA1941C40D94A6EA00DD942E /* Configurations */,
 				0867D69AFE84028FC02AAC07 /* Apple Frameworks and Libraries */,
 				034768DFFF38A50411DB9C8B /* Products */,
-				612279DA0DB5470200AB99EA /* Sparkle Unit Tests-Info.plist */,
 			);
 			name = Sparkle;
 			sourceTree = "<group>";
@@ -439,6 +438,7 @@
 			children = (
 				61227A140DB548B800AB99EA /* SUVersionComparisonTest.h */,
 				61227A150DB548B800AB99EA /* SUVersionComparisonTest.m */,
+				612279DA0DB5470200AB99EA /* Sparkle Unit Tests-Info.plist */,
 			);
 			name = Tests;
 			sourceTree = "<group>";
@@ -1027,7 +1027,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Cocoa.framework/Headers/Cocoa.h";
-				INFOPLIST_FILE = "Sparkle Unit Tests-Info.plist";
+				INFOPLIST_FILE = "Tests/Sparkle Unit Tests-Info.plist";
 				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Bundles";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -1054,7 +1054,7 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Cocoa.framework/Headers/Cocoa.h";
-				INFOPLIST_FILE = "Sparkle Unit Tests-Info.plist";
+				INFOPLIST_FILE = "Tests/Sparkle Unit Tests-Info.plist";
 				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Bundles";
 				OTHER_LDFLAGS = (
 					"-framework",
