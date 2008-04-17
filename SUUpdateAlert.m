@@ -104,7 +104,6 @@
 - (void)awakeFromNib
 {	
 	[[self window] setLevel:NSFloatingWindowLevel];
-	[[self window] setFrameAutosaveName:@"SUUpdateAlertFrame"];
 		
 	// We're gonna do some frame magic to match the window's size to the description field and the presence of the release notes view.
 	NSRect frame = [[self window] frame];
@@ -112,11 +111,8 @@
 	if (![self showsReleaseNotes])
 	{
 		// Resize the window to be appropriate for not having a huge release notes view.
-		frame.size.height -= [releaseNotesView frame].size.height;
-		// No resizing!
+		frame.size.height -= [releaseNotesView frame].size.height + 40; // Extra 40 is for the release notes label and margin.
 		[[self window] setShowsResizeIndicator:NO];
-		[[self window] setMinSize:frame.size];
-		[[self window] setMaxSize:frame.size];
 	}
 	
 	if (![self allowsAutomaticUpdates])
