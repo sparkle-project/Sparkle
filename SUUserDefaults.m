@@ -53,6 +53,10 @@
 	[self verifyIdentifier];
 	CFPreferencesSetValue((CFStringRef)defaultName, value, (CFStringRef)identifier,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
 	CFPreferencesSynchronize((CFStringRef)identifier, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+	// If anything's bound to this through an NSUserDefaultsController, it won't know that anything's changed.
+	// We can't get an NSUserDefaults object for anything other than the standard one for the app, so this won't work for bundles.
+	// But it's the best we can do: this will make NSUserDefaultsControllers know about the changes that have been made.
+	[[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (BOOL)boolForKey:(NSString *)defaultName
@@ -75,6 +79,10 @@
 	[self verifyIdentifier];
 	CFPreferencesSetValue((CFStringRef)defaultName, (CFBooleanRef)[NSNumber numberWithBool:value], (CFStringRef)identifier,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
 	CFPreferencesSynchronize((CFStringRef)identifier, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+	// If anything's bound to this through an NSUserDefaultsController, it won't know that anything's changed.
+	// We can't get an NSUserDefaults object for anything other than the standard one for the app, so this won't work for bundles.
+	// But it's the best we can do: this will make NSUserDefaultsControllers know about the changes that have been made.	
+	[[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 @end
