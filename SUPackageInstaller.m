@@ -13,7 +13,7 @@
 
 + (void)installPath:(NSString *)path overHostBundle:(NSBundle *)bundle delegate:delegate
 {
-	NSError *error;
+	NSError *error = nil;
 	BOOL result = YES;
 	
 	NSString *installerPath = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.installer"];

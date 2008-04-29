@@ -14,10 +14,12 @@
 - (NSString *)name
 {
 	NSString *name = [self objectForInfoDictionaryKey:@"CFBundleDisplayName"];
-	if (name)
-		return name;
-	else
-		return [[[NSFileManager defaultManager] displayNameAtPath:[self bundlePath]] stringByDeletingPathExtension];
+	if (name) return name;
+	
+	name = [self objectForInfoDictionaryKey:@"CFBundleName"];
+	if (name) return name;
+	
+	return [[[NSFileManager defaultManager] displayNameAtPath:[self bundlePath]] stringByDeletingPathExtension];
 }
 
 - (NSString *)version

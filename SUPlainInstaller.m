@@ -20,7 +20,11 @@
 
 + (void)performInstallationWithInfo:(NSDictionary *)info
 {
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
 	[self installPath:[info objectForKey:SUInstallerPathKey] overHostBundle:[info objectForKey:SUInstallerHostBundleKey] delegate:[info objectForKey:SUInstallerDelegateKey]];
+	
+	[pool release];
 }
 
 @end

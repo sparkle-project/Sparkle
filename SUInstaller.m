@@ -19,13 +19,14 @@ NSString *SUInstallerDelegateKey = @"SUInstallerDelegate";
 + (void)installFromUpdateFolder:(NSString *)updateFolder overHostBundle:(NSBundle *)hostBundle delegate:delegate;
 {
 	// Search subdirectories for the application
-	NSString *currentFile, *newAppDownloadPath = nil, *bundleFileName = [[hostBundle bundlePath] lastPathComponent];
+	NSString *currentFile, *newAppDownloadPath = nil, *bundleFileName = [[hostBundle bundlePath] lastPathComponent], *alternateBundleFileName = [[hostBundle name] stringByAppendingPathExtension:[[hostBundle bundlePath] pathExtension]];
 	BOOL isPackage = NO;
 	NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:updateFolder];
 	while ((currentFile = [dirEnum nextObject]))
 	{
 		NSString *currentPath = [updateFolder stringByAppendingPathComponent:currentFile];		
-		if ([[currentFile lastPathComponent] isEqualToString:bundleFileName]) // We found one!
+		if ([[currentFile lastPathComponent] isEqualToString:bundleFileName] ||
+			[[currentFile lastPathComponent] isEqualToString:alternateBundleFileName]) // We found one!
 		{
 			isPackage = NO;
 			newAppDownloadPath = currentPath;
