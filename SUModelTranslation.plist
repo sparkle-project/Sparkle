@@ -168,5 +168,7 @@
 	<string>iMac (Core 2 Duo, 17 inch, Combo Drive)</string>
 	<key>iMac6,1</key>
 	<string>iMac (Core 2 Duo, 24 inch, SuperDrive)</string>
+	<key>iMac8,1</key>
+	<string>iMac (April 2008)</string>
 </dict>
 </plist>
