@@ -135,6 +135,7 @@ static SUUpdater *sharedUpdater = nil;
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
 	if (object != driver) { return; }
+	[driver removeObserver:self forKeyPath:@"finished"];
 	[driver release]; driver = nil;
 	[NSTimer scheduledTimerWithTimeInterval:checkInterval target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO];
 }
