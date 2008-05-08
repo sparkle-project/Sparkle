@@ -12,8 +12,8 @@
 #import "Sparkle.h"
 
 typedef enum {
-	SUAutomaticallyUpdate,
-	SUDoNotAutomaticallyUpdate
+	SUAutomaticallyCheck,
+	SUDoNotAutomaticallyCheck
 } SUPermissionPromptResult;
 
 @interface SUUpdatePermissionPrompt : SUWindowController {

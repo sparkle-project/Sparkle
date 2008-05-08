@@ -11,70 +11,6 @@
 
 @implementation SUAppcastItem
 
-- initWithDictionary:(NSDictionary *)dict
-{
-	self = [super init];
-	if (self)
-	{
-		[self setTitle:[dict objectForKey:@"title"]];
-		[self setDate:[dict objectForKey:@"pubDate"]];
-		[self setDescription:[dict objectForKey:@"description"]];
-		
-		id enclosure = [dict objectForKey:@"enclosure"];
-		[self setDSASignature:[enclosure objectForKey:@"sparkle:dsaSignature"]];
-		[self setMD5Sum:[enclosure objectForKey:@"sparkle:md5Sum"]];
-		
-		[self setFileURL:[NSURL URLWithString:[[enclosure objectForKey:@"url"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
-		
-		// Find the appropriate release notes URL.
-		if ([dict objectForKey:@"sparkle:releaseNotesLink"])
-		{
-			[self setReleaseNotesURL:[NSURL URLWithString:[dict objectForKey:@"sparkle:releaseNotesLink"]]];
-		}
-		else if ([[self description] hasPrefix:@"http://"]) // if the description starts with http://, use that.
-		{
-			[self setReleaseNotesURL:[NSURL URLWithString:[self description]]];
-		}
-		else
-		{
-			[self setReleaseNotesURL:nil];
-		}
-		
-		NSString *minVersion = [dict objectForKey:@"sparkle:minimumSystemVersion"];
-		if(minVersion)
-			[self setMinimumSystemVersion:minVersion];
-		else
-			[self setMinimumSystemVersion:@"10.3.0"];//sparkle doesn't run on 10.2-, so we don't have to worry about it
-		
-		// Try to find a version string.
-		// Finding the new version number from the RSS feed is a little bit hacky. There are two ways:
-		// 1. A "sparkle:version" attribute on the enclosure tag, an extension from the RSS spec.
-		// 2. If there isn't a version attribute, Sparkle will parse the path in the enclosure, expecting
-		//    that it will look like this: http://something.com/YourApp_0.5.zip. It'll read whatever's between the last
-		//    underscore and the last period as the version number. So name your packages like this: APPNAME_VERSION.extension.
-		//    The big caveat with this is that you can't have underscores in your version strings, as that'll confuse Sparkle.
-		//    Feel free to change the separator string to a hyphen or something more suited to your needs if you like.
-		NSString *newVersion = [enclosure objectForKey:@"sparkle:version"];
-		if (!newVersion) // no sparkle:version attribute
-		{
-			// Separate the url by underscores and take the last component, as that'll be closest to the end,
-			// then we remove the extension. Hopefully, this will be the version.
-			NSArray *fileComponents = [[enclosure objectForKey:@"url"] componentsSeparatedByString:@"_"];
-			if ([fileComponents count] > 1)
-				newVersion = [[fileComponents lastObject] stringByDeletingPathExtension];
-		}
-		[self setFileVersion:newVersion];
-		
-		NSString *shortVersionString = [enclosure objectForKey:@"sparkle:shortVersionString"];
-		if (shortVersionString)
-			[self setVersionString:shortVersionString];
-		else
-			[self setVersionString:[self fileVersion]];
-	}
-	
-	return self;
-}
-
 // Attack of accessors!
 
 - (NSString *)title { return [[title retain] autorelease]; }
@@ -120,16 +56,7 @@
     [DSASignature release];
     DSASignature = [aDSASignature copy];
 }
-
-
-- (NSString *)MD5Sum { return [[MD5Sum retain] autorelease]; }
-
-- (void)setMD5Sum:(NSString *)aMD5Sum
-{
-    [MD5Sum release];
-    MD5Sum = [aMD5Sum copy];
-}
-
+			
 
 - (NSURL *)fileURL { return [[fileURL retain] autorelease]; }
 
@@ -140,21 +67,21 @@
 }
 
 
-- (NSString *)fileVersion { return [[fileVersion retain] autorelease]; }
+- (NSString *)versionString { return [[versionString retain] autorelease]; }
 
-- (void)setFileVersion:(NSString *)aFileVersion
+- (void)setVersionString:(NSString *)s
 {
-    [fileVersion release];
-    fileVersion = [aFileVersion copy];
+    [versionString release];
+    versionString = [s copy];
 }
 
 
-- (NSString *)versionString { return [[versionString retain] autorelease]; }
+- (NSString *)displayVersionString { return [[displayVersionString retain] autorelease]; }
 
-- (void)setVersionString:(NSString *)aVersionString
+- (void)setDisplayVersionString:(NSString *)s
 {
-    [versionString release];
-    versionString = [aVersionString copy];
+    [displayVersionString release];
+    displayVersionString = [s copy];
 }
 
 
@@ -165,6 +92,59 @@
 	minimumSystemVersion = [systemVersionString copy];
 }
 
+- initWithDictionary:(NSDictionary *)dict
+{
+	self = [super init];
+	if (self)
+	{
+		[self setTitle:[dict objectForKey:@"title"]];
+		[self setDate:[dict objectForKey:@"pubDate"]];
+		[self setDescription:[dict objectForKey:@"description"]];
+		
+		id enclosure = [dict objectForKey:@"enclosure"];
+		if (enclosure == nil || [enclosure objectForKey:@"url"] == nil)
+			[NSException raise:@"SUAppcastException" format:@"Couldn't find an download URL for feed entry %@!", [self title]];
+		[self setFileURL:[NSURL URLWithString:[[enclosure objectForKey:@"url"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+		[self setDSASignature:[enclosure objectForKey:@"sparkle:dsaSignature"]];		
+		
+		// Try to find a version string.
+		// Finding the new version number from the RSS feed is a little bit hacky. There are two ways:
+		// 1. A "sparkle:version" attribute on the enclosure tag, an extension from the RSS spec.
+		// 2. If there isn't a version attribute, Sparkle will parse the path in the enclosure, expecting
+		//    that it will look like this: http://something.com/YourApp_0.5.zip. It'll read whatever's between the last
+		//    underscore and the last period as the version number. So name your packages like this: APPNAME_VERSION.extension.
+		//    The big caveat with this is that you can't have underscores in your version strings, as that'll confuse Sparkle.
+		//    Feel free to change the separator string to a hyphen or something more suited to your needs if you like.
+		NSString *newVersion = [enclosure objectForKey:@"sparkle:version"];
+		if (!newVersion) // no sparkle:version attribute
+		{
+			// Separate the url by underscores and take the last component, as that'll be closest to the end,
+			// then we remove the extension. Hopefully, this will be the version.
+			NSArray *fileComponents = [[enclosure objectForKey:@"url"] componentsSeparatedByString:@"_"];
+			if ([fileComponents count] > 1)
+				newVersion = [[fileComponents lastObject] stringByDeletingPathExtension];
+			else
+				[NSException raise:@"SUAppcastException" format:@"Couldn't find a version string for %@! You need a sparkle:version attribute.", [enclosure objectForKey:@"url"]];
+		}
+		[self setVersionString:newVersion];
+		[self setMinimumSystemVersion:[dict objectForKey:@"sparkle:minimumSystemVersion"]];
+		
+		NSString *shortVersionString = [enclosure objectForKey:@"sparkle:shortVersionString"];
+		if (shortVersionString)
+			[self setDisplayVersionString:shortVersionString];
+		else
+			[self setDisplayVersionString:[self versionString]];
+		
+		// Find the appropriate release notes URL.
+		if ([dict objectForKey:@"sparkle:releaseNotesLink"])
+			[self setReleaseNotesURL:[NSURL URLWithString:[dict objectForKey:@"sparkle:releaseNotesLink"]]];
+		else if ([[self description] hasPrefix:@"http://"]) // if the description starts with http://, use that.
+			[self setReleaseNotesURL:[NSURL URLWithString:[self description]]];
+		else
+			[self setReleaseNotesURL:nil];
+	}
+	return self;
+}
 
 - (void)dealloc
 {
@@ -173,10 +153,9 @@
     [self setDescription:nil];
     [self setReleaseNotesURL:nil];
     [self setDSASignature:nil];
-    [self setMD5Sum:nil];
     [self setFileURL:nil];
-    [self setFileVersion:nil];
-	[self setVersionString:nil];
+    [self setVersionString:nil];
+	[self setDisplayVersionString:nil];
     [super dealloc];
 }
 

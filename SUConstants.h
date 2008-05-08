@@ -12,6 +12,7 @@
 
 
 extern NSString *SUUpdaterWillRestartNotification;
+extern NSString *SUTechnicalErrorInformationKey;
 
 extern NSString *SUFeedURLKey;
 extern NSString *SUHasLaunchedBeforeKey;
@@ -28,10 +29,26 @@ extern NSString *SUEnableSystemProfilingKey;
 extern NSString *SUSendProfileInfoKey;
 
 extern NSString *SUSparkleErrorDomain;
+// Appcast phase errors.
+extern OSStatus SUAppcastParseError;
+extern OSStatus SUNoUpdateError;
+extern OSStatus SUAppcastError;
+extern OSStatus SURunningFromDiskImageError;
+
+// Downlaod phase errors.
+extern OSStatus SUTemporaryDirectoryError;
+
+// Extraction phase errors.
+extern OSStatus SUUnarchivingError;
+extern OSStatus SUSignatureError;
+
+// Installation phase errors.
 extern OSStatus SUFileCopyFailure;
 extern OSStatus SUAuthenticationFailure;
 extern OSStatus SUMissingUpdateError;
 extern OSStatus SUMissingInstallerToolError;
+extern OSStatus SURelaunchError;
+extern OSStatus SUInstallationError;
 
 // NSInteger is a type that was added to Leopard.
 // Here is some glue to ensure that NSInteger will work with pre-10.5 SDKs:

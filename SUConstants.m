@@ -10,6 +10,7 @@
 #import "SUConstants.h"
 
 NSString *SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotificationName";
+NSString *SUTechnicalErrorInformationKey = @"SUTechnicalErrorInformation";
 
 NSString *SUHasLaunchedBeforeKey = @"SUHasLaunchedBefore";
 NSString *SUFeedURLKey = @"SUFeedURL";
@@ -26,7 +27,19 @@ NSString *SUEnableAutomaticChecksKey = @"SUEnableAutomaticChecks";
 NSString *SUSendProfileInfoKey = @"SUSendProfileInfo";
 
 NSString *SUSparkleErrorDomain = @"SUSparkleErrorDomain";
-OSStatus SUFileCopyFailure = 9000;
-OSStatus SUAuthenticationFailure = 9001;
-OSStatus SUMissingUpdateError = 9002;
-OSStatus SUMissingInstallerToolError = 9003;
+OSStatus SUAppcastParseError = 1000;
+OSStatus SUNoUpdateError = 1001;
+OSStatus SUAppcastError = 1002;
+OSStatus SURunningFromDiskImageError = 1003;
+
+OSStatus SUTemporaryDirectoryError = 2000;
+
+OSStatus SUUnarchivingError = 3000;
+OSStatus SUSignatureError = 3001;
+
+OSStatus SUFileCopyFailure = 4000;
+OSStatus SUAuthenticationFailure = 4001;
+OSStatus SUMissingUpdateError = 4002;
+OSStatus SUMissingInstallerToolError = 4003;
+OSStatus SURelaunchError = 4004;
+OSStatus SUInstallationError = 4005;

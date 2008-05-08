@@ -6,6 +6,9 @@
 //  Copyright 2008 Mark Mentovai.  All rights reserved.
 //
 
+#ifndef NSFILEMANAGER_PLUS_EXTENDEDATTRIBUTES
+#define NSFILEMANAGER_PLUS_EXTENDEDATTRIBUTES
+
 #import <Cocoa/Cocoa.h>
 
 @interface NSFileManager (ExtendedAttributes)
@@ -46,3 +49,5 @@
 - (void)releaseFromQuarantine:(NSString*)root;
 
 @end
+
+#endif

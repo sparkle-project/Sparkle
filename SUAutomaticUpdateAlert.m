@@ -11,19 +11,21 @@
 
 @implementation SUAutomaticUpdateAlert
 
-- (id)initWithAppcastItem:(SUAppcastItem *)item hostBundle:(NSBundle *)hb;
+- (id)initWithAppcastItem:(SUAppcastItem *)item hostBundle:(NSBundle *)hb delegate:del;
 {
 	self = [super initWithHostBundle:hb windowNibName:@"SUAutomaticUpdateAlert"];
 	if (self)
 	{
 		updateItem = [item retain];
+		delegate = del;
 		hostBundle = [hb retain];
 		[self setShouldCascadeWindows:NO];	
+		[[self window] center];
 	}
 	return self;
 }
 
-- (void) dealloc
+- (void)dealloc
 {
 	[hostBundle release];
 	[updateItem release];
@@ -31,16 +33,22 @@
 }
 
 
-- (IBAction)relaunchNow:sender
+- (IBAction)installNow:sender
 {
 	[self close];
-	[NSApp stopModalWithCode:NSAlertDefaultReturn];
+	[delegate automaticUpdateAlert:self finishedWithChoice:SUInstallNowChoice];
 }
 
-- (IBAction)relaunchLater:sender
+- (IBAction)installLater:sender
 {
 	[self close];
-	[NSApp stopModalWithCode:NSAlertAlternateReturn];
+	[delegate automaticUpdateAlert:self finishedWithChoice:SUInstallLaterChoice];
+}
+
+- (IBAction)doNotInstall:sender
+{
+	[self close];
+	[delegate automaticUpdateAlert:self finishedWithChoice:SUDoNotInstallChoice];
 }
 
 - (NSImage *)applicationIcon
@@ -50,12 +58,12 @@
 
 - (NSString *)titleText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ has been installed!", nil), [hostBundle name]];
+	return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is ready to install!", nil), [hostBundle name]];
 }
 
 - (NSString *)descriptionText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been installed and will be ready to use next time %1$@ starts! Would you like to relaunch now?", nil), [hostBundle name], [hostBundle displayVersion]];
+	return [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?", nil), [hostBundle name], [hostBundle displayVersion]];
 }
 
 @end

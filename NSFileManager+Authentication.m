@@ -88,7 +88,13 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	}
 	else
 		postFix = @"old";
-	return [[[path stringByDeletingPathExtension] stringByAppendingFormat:@" (%@)", postFix] stringByAppendingPathExtension:[path pathExtension]];
+	NSString *prefix = [[path stringByDeletingPathExtension] stringByAppendingFormat:@" (%@)", postFix];
+	NSString *tempDir = [prefix stringByAppendingPathExtension:[path pathExtension]];
+	// Now let's make sure we get a unique path.
+	int cnt=2;
+	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999999)
+		tempDir = [NSString stringWithFormat:@"%@ %d.%@", prefix, cnt++, [path pathExtension]];
+	return tempDir;
 }
 
 - (BOOL)_copyPathWithForcedAuthentication:(NSString *)src toPath:(NSString *)dst error:(NSError **)error
@@ -206,27 +212,18 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		return [self _copyPathWithForcedAuthentication:src toPath:dst error:error];
 
 	NSString *tmpPath = [self _temporaryCopyNameForPath:dst];
-	
-	// We get more error information if we're running on Leopard, so let's use that if we can.
-	if ([[NSFileManager defaultManager] respondsToSelector:@selector(moveItemAtPath:toPath:error:)])
+
+	if (![[NSFileManager defaultManager] movePath:dst toPath:tmpPath handler:self])
 	{
-		if (![[NSFileManager defaultManager] moveItemAtPath:dst toPath:tmpPath error:error]) { return NO; }
-		if (![[NSFileManager defaultManager] copyItemAtPath:src toPath:dst error:error]) { return NO; }
+		if (error != NULL)
+			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
+		return NO;			
 	}
-	else // We just get generic error messages.
+	if (![[NSFileManager defaultManager] copyPath:src toPath:dst handler:self])
 	{
-		if (![[NSFileManager defaultManager] movePath:dst toPath:tmpPath handler:self])
-		{
-			if (error != NULL)
-				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
-			return NO;			
-		}
-		if (![[NSFileManager defaultManager] copyPath:src toPath:dst handler:self])
-		{
-			if (error != NULL)
-				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't copy %@ to %@.", src, dst] forKey:NSLocalizedDescriptionKey]];
-			return NO;			
-		}
+		if (error != NULL)
+			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't copy %@ to %@.", src, dst] forKey:NSLocalizedDescriptionKey]];
+		return NO;			
 	}
 	
 	// Trash the old copy of the app.

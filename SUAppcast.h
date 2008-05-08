@@ -12,11 +12,13 @@
 @class RSS, SUAppcastItem;
 @interface SUAppcast : NSObject {
 	NSArray *items;
+	NSString *userAgentString;
 	id delegate;
 }
 
-- (void)fetchAppcastFromURL:(NSURL *)url parameters:(NSArray *)parameters;
+- (void)fetchAppcastFromURL:(NSURL *)url;
 - (void)setDelegate:delegate;
+- (void)setUserAgentString:(NSString *)userAgentString;
 
 - (SUAppcastItem *)newestItem;
 - (NSArray *)items;
@@ -25,8 +27,7 @@
 
 @interface NSObject (SUAppcastDelegate)
 - (void)appcastDidFinishLoading:(SUAppcast *)appcast;
-- (void)appcastDidFailToLoad:(SUAppcast *)appcast;
-- (NSString *)userAgentForAppcast:(SUAppcast *)appcast;
+- (void)appcast:(SUAppcast *)appcast failedToLoadWithError:(NSError *)error;
 @end
 
 #endif

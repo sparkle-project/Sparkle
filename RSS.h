@@ -61,13 +61,11 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMA
 
 
 /*Public*/
+- (RSS *)initWithURL:(NSURL *) url normalize:(BOOL) fl userAgent:(NSString*)userAgent error:(NSError **)error;
 
 - (RSS *) initWithTitle: (NSString *) title andDescription: (NSString *) description;
 
 - (RSS *) initWithData: (NSData *) rssData normalize: (BOOL) fl;
-
-- (RSS *) initWithURL: (NSURL *) url normalize: (BOOL) fl;
-- (RSS *) initWithURL: (NSURL *) url normalize: (BOOL) fl userAgent:(NSString *)userAgent;
 
 - (NSDictionary *) headerItems;
 

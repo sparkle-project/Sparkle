@@ -6,18 +6,19 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
+#ifndef SUINSTALLER_H
+#define SUINSTALLER_H
+
 #import <Cocoa/Cocoa.h>
 
 @interface SUInstaller : NSObject { }
-+ (void)installFromUpdateFolder:(NSString *)updateFolder overHostBundle:(NSBundle *)hostBundle delegate:delegate;
++ (void)installFromUpdateFolder:(NSString *)updateFolder overHostBundle:(NSBundle *)hostBundle delegate:delegate synchronously:(BOOL)synchronously;
 + (void)_finishInstallationWithResult:(BOOL)result hostBundle:(NSBundle *)hostBundle error:(NSError *)error delegate:delegate;
 @end
 
 @interface NSObject (SUInstallerDelegateInformalProtocol)
-- installerFinishedForHostBundle:(NSBundle *)hostBundle;
-- installerForHostBundle:(NSBundle *)hostBundle failedWithError:(NSError *)error;
+- (void)installerFinishedForHostBundle:(NSBundle *)hostBundle;
+- (void)installerForHostBundle:(NSBundle *)hostBundle failedWithError:(NSError *)error;
 @end
 
-extern NSString *SUInstallerPathKey;
-extern NSString *SUInstallerHostBundleKey;
-extern NSString *SUInstallerDelegateKey;
+#endif

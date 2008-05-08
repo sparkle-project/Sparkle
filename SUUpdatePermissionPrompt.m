@@ -117,7 +117,7 @@
 	if (![delegate respondsToSelector:@selector(updatePermissionPromptFinishedWithResult:)])
 		[NSException raise:@"SUInvalidDelegate" format:@"SUUpdatePermissionPrompt's delegate (%@) doesn't respond to updatePermissionPromptFinishedWithResult:!", delegate];
 	[[SUUserDefaults standardUserDefaults] setBool:shouldSendProfile forKey:SUSendProfileInfoKey];
-	[delegate updatePermissionPromptFinishedWithResult:([sender tag] == 1 ? SUAutomaticallyUpdate : SUDoNotAutomaticallyUpdate)];
+	[delegate updatePermissionPromptFinishedWithResult:([sender tag] == 1 ? SUAutomaticallyCheck : SUDoNotAutomaticallyCheck)];
 	[[self window] close];
 	[NSApp stopModal];
 	[self autorelease];

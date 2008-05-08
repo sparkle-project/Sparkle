@@ -138,41 +138,31 @@ NSComparisonResult compareNewsItems(id item1, id item2, void *context)
 	} /*initWithData*/
 
 
-- (RSS *) initWithURL: (NSURL *) url normalize: (BOOL) fl
-{
-	return [self initWithURL: url normalize: fl userAgent: nil];
-}
-
 	 
 	
-- (RSS *) initWithURL: (NSURL *) url normalize: (BOOL) fl userAgent: (NSString*)userAgent
+- (RSS *)initWithURL:(NSURL *)url normalize:(BOOL)fl userAgent:(NSString*)userAgent error:(NSError **)error
 {
-	NSData *rssData;
-
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL: url cachePolicy: NSURLRequestReloadIgnoringCacheData
 										timeoutInterval: 30.0];
 	if (userAgent)
 		[request setValue: userAgent forHTTPHeaderField: @"User-Agent"];
 			
-	NSURLResponse *response=0;
-	NSError *error=0;
-
-	rssData = [NSURLConnection sendSynchronousRequest: request returningResponse: &response error: &error];
+	NSURLResponse *response = nil;
+	NSData *rssData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:error];
+	if (rssData == nil) { return nil; }
 	
-	if (rssData == nil)
+	@try
 	{
-    NSString *failureReason;
-    if ([error respondsToSelector:@selector(localizedFailureReason)])
-      failureReason = [error localizedFailureReason];
-    else
-      failureReason = [error localizedDescription];
-		NSException *exception = [NSException exceptionWithName: @"RSSDownloadFailed"
-														 reason: failureReason userInfo: [error userInfo] ];
-		[exception raise];
+		[self initWithData:rssData normalize:fl];
 	}
-	
-	return [self initWithData: rssData normalize: fl];	
-} /*initWithUrl*/
+	@catch (NSException *parseException)
+	{
+		if (error)
+			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while parsing the update feed.", nil), NSLocalizedDescriptionKey, [parseException reason], NSLocalizedFailureReasonErrorKey, nil]];
+		return nil;
+	}
+	return self;
+}
 
 
 - (NSDictionary *) headerItems {

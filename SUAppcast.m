@@ -9,39 +9,11 @@
 #import "Sparkle.h"
 #import "SUAppcast.h"
 
-@interface NSURL (SUParameterAdditions)
-- (NSURL *)URLWithParameters:(NSArray *)parameters;
-@end
-
-@implementation NSURL (SUParameterAdditions)
-- (NSURL *)URLWithParameters:(NSArray *)parameters;
-{
-	if (parameters == nil || [parameters count] == 0) { return self; }
-	NSMutableArray *profileInfo = [NSMutableArray array];
-	NSEnumerator *profileInfoEnumerator = [parameters objectEnumerator];
-	NSDictionary *currentProfileInfo;
-	while ((currentProfileInfo = [profileInfoEnumerator nextObject])) {
-		[profileInfo addObject:[NSString stringWithFormat:@"%@=%@", [currentProfileInfo objectForKey:@"key"], [currentProfileInfo objectForKey:@"value"]]];
-	}
-	
-	NSString *appcastStringWithProfile = [NSString stringWithFormat:@"%@?%@", [self absoluteString], [profileInfo componentsJoinedByString:@"&"]];
-	
-	// Clean it up so it's a valid URL
-	return [NSURL URLWithString:[appcastStringWithProfile stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-}
-@end
-
-
 @implementation SUAppcast
 
-- (void)fetchAppcastFromURL:(NSURL *)url parameters:(NSArray *)parameters
+- (void)fetchAppcastFromURL:(NSURL *)url
 {
-	[NSThread detachNewThreadSelector:@selector(_fetchAppcastFromURL:) toTarget:self withObject:[url URLWithParameters:parameters]]; // let's not block the main thread
-}
-
-- (void)setDelegate:del
-{
-	delegate = del;
+	[NSThread detachNewThreadSelector:@selector(_fetchAppcastFromURL:) toTarget:self withObject:url];
 }
 
 - (void)dealloc
@@ -52,7 +24,10 @@
 
 - (SUAppcastItem *)newestItem
 {
-	return [items objectAtIndex:0]; // the RSS class takes care of sorting by published date, descending.
+	if ([items count] > 0)
+		return [items objectAtIndex:0]; // the RSS class takes care of sorting by published date, descending.
+	else
+		return nil;
 }
 
 - (NSArray *)items
@@ -64,40 +39,56 @@
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	
-	RSS *feed = [RSS alloc];
+	NSError *error = nil;
+	RSS *feed = [[RSS alloc] initWithURL:url normalize:YES userAgent:userAgentString error:&error];
+	if (!feed)
+	{
+		[self performSelectorOnMainThread:@selector(reportError:) withObject:error waitUntilDone:NO];
+		return;
+	}
+		
+	// Set up all the appcast items:
+	items = [NSMutableArray array];
+	id enumerator = [[feed newsItems] objectEnumerator], current;
 	@try
 	{
-		NSString *userAgent = nil;
-		if ([delegate respondsToSelector:@selector(userAgentForAppcast:)])
-			userAgent = [delegate userAgentForAppcast:self];
-		
-		feed = [feed initWithURL:url normalize:YES userAgent:userAgent];
-		if (!feed)
-			[NSException raise:@"SUFeedException" format:@"Couldn't fetch feed from server."];
-		
-		// Set up all the appcast items
-		NSMutableArray *tempItems = [NSMutableArray array];
-		id enumerator = [[feed newsItems] objectEnumerator], current;
 		while ((current = [enumerator nextObject]))
 		{
-			[tempItems addObject:[[[SUAppcastItem alloc] initWithDictionary:current] autorelease]];
+			[(NSMutableArray *)items addObject:[[[SUAppcastItem alloc] initWithDictionary:current] autorelease]];
 		}
-		items = [[NSArray arrayWithArray:tempItems] retain];
-		
-		if ([delegate respondsToSelector:@selector(appcastDidFinishLoading:)])
-			[delegate performSelectorOnMainThread:@selector(appcastDidFinishLoading:) withObject:self waitUntilDone:NO];
-		
 	}
-	@catch (NSException *e)
+	@catch (NSException *parseException)
 	{
-		if ([delegate respondsToSelector:@selector(appcastDidFailToLoad:)])
-			[delegate performSelectorOnMainThread:@selector(appcastDidFailToLoad:) withObject:self waitUntilDone:NO];
+		error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while parsing the update feed.", nil), NSLocalizedDescriptionKey, [parseException reason], SUTechnicalErrorInformationKey, nil]];
+		[self performSelectorOnMainThread:@selector(reportError:) withObject:error waitUntilDone:NO];
+		return;
 	}
-	@finally
+	items = [[NSArray arrayWithArray:items] retain]; // Make the items list immutable.
+	
+	if ([delegate respondsToSelector:@selector(appcastDidFinishLoading:)])
+		[delegate performSelectorOnMainThread:@selector(appcastDidFinishLoading:) withObject:self waitUntilDone:NO];
+		
+	[feed release];
+	[pool release];
+}
+
+- (void)reportError:(NSError *)error
+{
+	if ([delegate respondsToSelector:@selector(appcast:failedToLoadWithError:)])
 	{
-		[feed release];
-		[pool release];	
+		[delegate appcast:self failedToLoadWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil), NSLocalizedDescriptionKey, [error localizedDescription], NSLocalizedFailureReasonErrorKey, nil]]];
 	}
+}
+
+- (void)setUserAgentString:(NSString *)uas
+{
+	[userAgentString release];
+	userAgentString = [uas copy];
+}
+
+- (void)setDelegate:del
+{
+	delegate = del;
 }
 
 @end

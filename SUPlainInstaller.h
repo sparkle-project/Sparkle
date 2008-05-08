@@ -6,8 +6,13 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
+#ifndef SUPLAININSTALLER_H
+#define SUPLAININSTALLER_H
+
 #import "Sparkle.h"
 
 @interface SUPlainInstaller : SUInstaller { }
-+ (void)installPath:(NSString *)path overHostBundle:(NSBundle *)bundle delegate:delegate;
++ (void)performInstallationWithPath:(NSString *)path hostBundle:(NSBundle *)hostBundle delegate:delegate synchronously:(BOOL)synchronously;
 @end
+
+#endif

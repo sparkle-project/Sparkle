@@ -9,21 +9,10 @@
 #import "Sparkle.h"
 #import "SUUpdater.h"
 
-#import <stdio.h>
-#import <sys/stat.h>
-#import <unistd.h>
-#import <signal.h>
-#import <dirent.h>
-
 @interface SUUpdater (Private)
-- (void)beginUpdateCheck;
 - (void)beginUpdateCycle;
-- (void)showUpdateAlert;
-- (void)beginDownload;
-- (void)extractUpdate;
-- (void)showUpdateErrorAlertWithInfo:(NSString *)info;
-- (void)abandonUpdate;
-- (IBAction)installAndRestart:sender;
+- (NSArray *)feedParameters;
+- (BOOL)automaticallyUpdates;
 @end
 
 @implementation SUUpdater
@@ -58,15 +47,6 @@ static SUUpdater *sharedUpdater = nil;
 	return self;
 }
 
-- (void)setHostBundle:(NSBundle *)hb
-{
-	[hostBundle release];
-	hostBundle = [hb retain];
-	[[SUUserDefaults standardUserDefaults] setIdentifier:[hostBundle bundleIdentifier]];
-}
-
-#pragma mark Automatic check support
-
 - (void)applicationDidFinishLaunching:(NSNotification *)note
 {
 	// If the user has been asked about automatic checks and said no, get out of here.
@@ -79,12 +59,9 @@ static SUUpdater *sharedUpdater = nil;
 		// Now, we don't want to ask the user for permission to do a weird thing on the first launch.
 		// We wait until the second launch.
 		if ([[SUUserDefaults standardUserDefaults] boolForKey:SUHasLaunchedBeforeKey] == NO)
-		{
 			[[SUUserDefaults standardUserDefaults] setBool:YES forKey:SUHasLaunchedBeforeKey];
-			return;
-		}
-		
-		[SUUpdatePermissionPrompt promptWithHostBundle:hostBundle delegate:self];
+		else
+			[SUUpdatePermissionPrompt promptWithHostBundle:hostBundle delegate:self];
 	}
 	
 	if ([[SUUserDefaults standardUserDefaults] boolForKey:SUEnableAutomaticChecksKey] == YES)
@@ -93,9 +70,9 @@ static SUUpdater *sharedUpdater = nil;
 
 - (void)updatePermissionPromptFinishedWithResult:(SUPermissionPromptResult)result
 {
-	BOOL automaticallyUpdate = (result == SUAutomaticallyUpdate);
-	[[SUUserDefaults standardUserDefaults] setBool:(result == SUAutomaticallyUpdate) forKey:SUEnableAutomaticChecksKey];
-	if (automaticallyUpdate)
+	BOOL automaticallyCheck = (result == SUAutomaticallyCheck);
+	[[SUUserDefaults standardUserDefaults] setBool:automaticallyCheck forKey:SUEnableAutomaticChecksKey];
+	if ([self automaticallyUpdates])
 		[self beginUpdateCycle];
 }
 
@@ -122,57 +99,51 @@ static SUUpdater *sharedUpdater = nil;
 	else
 		delayUntilCheck = 0; // We're overdue! Run one now.
 	
-	[self performSelector:@selector(checkForUpdatesInBackground) withObject:nil afterDelay:delayUntilCheck];
-	[self performSelector:@selector(scheduleCheckWithIntervalObject:) withObject:[NSNumber numberWithDouble:checkInterval] afterDelay:delayUntilCheck];	
-}
-
-- (void)scheduleCheckWithInterval:(NSTimeInterval)interval
-{
-	if (checkTimer)
-	{
-		[checkTimer invalidate];
-		checkTimer = nil;
-	}
-	
-	checkInterval = interval;
-	if (interval > 0)
-		checkTimer = [NSTimer scheduledTimerWithTimeInterval:interval target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:YES];
-}
-
-// An unfortunate necessity in order to use performSelector:withObject:afterDelay:
-- (void)scheduleCheckWithIntervalObject:(NSNumber *)interval
-{
-	[self scheduleCheckWithInterval:[interval doubleValue]];
+	checkTimer = [NSTimer scheduledTimerWithTimeInterval:delayUntilCheck target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO];
 }
 
 - (void)checkForUpdatesInBackground
 {
-	userInitiated = NO;
-	[self beginUpdateCheck];
+	[self checkForUpdatesWithDriver:[[[([self automaticallyUpdates] ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class]) alloc] init] autorelease]];
 }
 
 - (IBAction)checkForUpdates:sender
 {
-	userInitiated = YES;
-	[self beginUpdateCheck];
+	[self checkForUpdatesWithDriver:[[[SUUserInitiatedUpdateDriver alloc] init] autorelease]];
 }
 
-- (BOOL)validateMenuItem:(NSMenuItem *)item
+- (void)checkForUpdatesWithDriver:(SUUpdateDriver *)d
 {
-	if ([item action] == @selector(checkForUpdates:))
-	{
-		if (updateInProgress)
-			return NO;
-		else
-			return YES;
-	}
-	return YES;
+	if ([self updateInProgress]) { return; }
+	if (checkTimer) { [checkTimer invalidate]; checkTimer = nil; }
+	
+	// A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
+	NSString *appcastString = [[SUUserDefaults standardUserDefaults] objectForKey:SUFeedURLKey];
+	if (!appcastString)
+		appcastString = [hostBundle objectForInfoDictionaryKey:SUFeedURLKey];
+	if (!appcastString)
+		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the SUFeedURLKey in either the Info.plist or the user defaults!"];
+	NSCharacterSet* quoteSet = [NSCharacterSet characterSetWithCharactersInString: @"\"\'"]; // Some feed publishers add quotes; strip 'em.
+	NSURL *feedURL = [[NSURL URLWithString:[appcastString stringByTrimmingCharactersInSet:quoteSet]] URLWithParameters:[self feedParameters]];
+	
+	driver = [d retain];
+	if ([driver delegate] == nil) { [driver setDelegate:delegate]; }
+	[driver addObserver:self forKeyPath:@"finished" options:0 context:NULL];
+	[driver checkForUpdatesAtURL:feedURL hostBundle:hostBundle];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+	if (object != driver) { return; }
+	[driver release]; driver = nil;
+	[NSTimer scheduledTimerWithTimeInterval:checkInterval target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO];
 }
 
 - (BOOL)automaticallyUpdates
 {
 	// If the SUAllowsAutomaticUpdatesKey exists and is set to NO, return NO.
-	if ([[hostBundle objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] boolValue] == NO)
+	if ([hostBundle objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] &&
+		[[hostBundle objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] boolValue] == NO)
 		return NO;
 	
 	// If we're not using DSA signatures, we aren't going to trust any updates automatically.
@@ -186,13 +157,6 @@ static SUUpdater *sharedUpdater = nil;
 	return YES; // Otherwise, we're good to go.
 }
 
-- (BOOL)isAutomaticallyUpdating
-{
-	return [self automaticallyUpdates] && !userInitiated;
-}
-
-#pragma mark Appcast-fetching phase
-
 - (NSArray *)feedParameters
 {
 	BOOL sendingSystemProfile = ([[SUUserDefaults standardUserDefaults] boolForKey:SUSendProfileInfoKey] == YES);
@@ -204,403 +168,37 @@ static SUUpdater *sharedUpdater = nil;
 	return parameters;
 }
 
-- (void)beginUpdateCheck
-{		
-	if ([hostBundle isRunningFromDiskImage])
-	{
-		if (userInitiated)
-			[self showUpdateErrorAlertWithInfo:[NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated when it's running from a disk image. Move %1$@ to your Applications folder, relaunch it, and try again.", nil), [hostBundle name]]];
-		return;
-	}
-	
-	if (updateInProgress) { return; }
-	updateInProgress = YES;
-	
-	// A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
-	NSString *appcastString = [[SUUserDefaults standardUserDefaults] objectForKey:SUFeedURLKey];	// if URL is quoted (because of pre-processing in plist files), remove quotes from the string
-	if (!appcastString)
-		appcastString = [hostBundle objectForInfoDictionaryKey:SUFeedURLKey];
-	if (!appcastString)
-		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the SUFeedURLKey in either the Info.plist or the user defaults!"];
-	
-	NSCharacterSet* quoteSet = [NSCharacterSet characterSetWithCharactersInString: @"\"\'"];
-	SUAppcast *appcast = [[SUAppcast alloc] init];
-	[appcast setDelegate:self];
-	[appcast fetchAppcastFromURL:[NSURL URLWithString:[appcastString stringByTrimmingCharactersInSet:quoteSet]] parameters:[self feedParameters]];
-}
-
-- (BOOL)newVersionAvailable
-{
-	// We also have to make sure that the newest version can run on the user's system.
-	id <SUVersionComparison> comparator = [SUStandardVersionComparator defaultComparator];
-	BOOL canRunOnCurrentSystem = ([comparator compareVersion:[updateItem minimumSystemVersion] toVersion:[SUUpdater systemVersionString]] != NSOrderedDescending);
-	return (canRunOnCurrentSystem && ([comparator compareVersion:[hostBundle version] toVersion:[updateItem fileVersion]]) == NSOrderedAscending);
-}
-
-- (void)appcastDidFinishLoading:(SUAppcast *)ac
-{
-	@try
-	{
-		if (!ac)
-			[NSException raise:@"SUAppcastException" format:@"Couldn't get a valid appcast from the server."];
-		
-		updateItem = [[ac newestItem] retain];
-		[ac autorelease];
-		
-		// Record the time of the check for host app use and for interval checks on startup.
-		[[SUUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:SULastCheckTimeKey];
-		
-		if (![updateItem fileVersion])
-		{
-			[NSException raise:@"SUAppcastException" format:@"Can't extract a version string from the appcast feed. The filenames should look like YourApp_1.5.tgz, where 1.5 is the version number."];
-		}
-		
-		if (!userInitiated && [[[SUUserDefaults standardUserDefaults] objectForKey:SUSkippedVersionKey] isEqualToString:[updateItem fileVersion]]) { [self abandonUpdate]; return; }
-		
-		if ([self newVersionAvailable])
-		{
-			if (checkTimer)	// There's a new version! Let's disable the automated checking timer.
-			{
-				[checkTimer invalidate];
-				checkTimer = nil;
-			}
-			
-			if ([self isAutomaticallyUpdating])
-				[self beginDownload];
-			else
-				[self showUpdateAlert];
-		}
-		else
-		{
-			if (userInitiated)
-			{
-				NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"You're up to date!", nil) defaultButton:SULocalizedString(@"OK", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [hostBundle name], [hostBundle displayVersion]];
-				[alert setIcon:[hostBundle icon]];
-				[alert runModal];
-			}
-			[self abandonUpdate];
-		}
-	}
-	@catch (NSException *e)
-	{
-		[self abandonUpdate];
-		if (userInitiated)
-		{
-			NSLog([e reason]);
-			[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil)];
-		}
-	}
-}
-
-- (NSString *)userAgentForAppcast:(SUAppcast *)ac
-{
-	return [NSString stringWithFormat: @"%@/%@ Sparkle/1.5b1", [hostBundle name], [hostBundle displayVersion]];
-}
-
-- (void)appcastDidFailToLoad:(SUAppcast *)ac
-{
-	[ac autorelease];
-	updateInProgress = NO;
-	if (userInitiated)
-		[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil)];
-}
-
-#pragma mark The update alert phase
-
-- (void)showUpdateAlert
-{
-	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem hostBundle:hostBundle];
-	[updateAlert setDelegate:self];
-	
-	// Only show the update alert if the app is active; otherwise, we'll wait until it is.
-	if ([NSApp isActive])
-		[updateAlert showWindow:self];
-	else
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
-}
-
-- (void)applicationDidBecomeActive:(NSNotification *)aNotification
-{
-	// We don't want to display the update alert until the application becomes active.
-	[updateAlert showWindow:self];
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
-}
-
-- (void)updateAlert:(SUUpdateAlert *)alert finishedWithChoice:(SUUpdateAlertChoice)choice
-{
-	[alert release];
-	updateAlert = nil;
-	switch (choice)
-	{
-		case SUInstallUpdateChoice:
-			// Clear out the skipped version so the dialog will come back if the download fails.
-			[[SUUserDefaults standardUserDefaults] setObject:nil forKey:SUSkippedVersionKey];
-			[self beginDownload];
-			break;
-			
-		case SURemindMeLaterChoice:
-			// Clear out the skipped version so the dialog will actually come back if it was already skipped.
-			[[SUUserDefaults standardUserDefaults] setObject:nil forKey:SUSkippedVersionKey];	
-			[self abandonUpdate];
-			break;
-			
-		case SUSkipThisVersionChoice:
-			[[SUUserDefaults standardUserDefaults] setObject:[updateItem fileVersion] forKey:SUSkippedVersionKey];
-			[self abandonUpdate];
-			break;
-	}			
-}
-
-#pragma mark The downloading phase
-
-- (void)beginDownload
-{
-	statusController = [[SUStatusController alloc] initWithHostBundle:hostBundle];
-	[statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", nil) maxProgressValue:0 statusText:nil];
-	[statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
-	if ([self isAutomaticallyUpdating] == NO)
-		[statusController showWindow:self];
-	
-	downloader = [[NSURLDownload alloc] initWithRequest:[NSURLRequest requestWithURL:[updateItem fileURL]] delegate:self];	
-}
-
-- (void)download:(NSURLDownload *)download didReceiveResponse:(NSURLResponse *)response
-{
-	[statusController setMaxProgressValue:[response expectedContentLength]];
-}
-
-- (void)download:(NSURLDownload *)download decideDestinationWithSuggestedFilename:(NSString *)name
-{
-	// If name ends in .txt, the server probably has a stupid MIME configuration. We'll give
-	// the developer the benefit of the doubt and chop that off.
-	if ([[name pathExtension] isEqualToString:@"txt"])
-		name = [name stringByDeletingPathExtension];
-	
-	// We create a temporary directory in /tmp and stick the file there.
-	// Not using a GUID here because hdiutil for some reason chokes on GUIDs. Too long? I really have no idea.
-	NSString *tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:@"update"];
-	int cnt=1;
-	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
-		tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"update%d", cnt++]];
-	BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir attributes:nil];
-	if (!success)
-	{
-		[NSException raise:@"SUFailTmpWrite" format:@"Couldn't create temporary directory at %@", tempDir];
-		[download cancel];
-		[download release];
-	}
-	
-	[downloadPath autorelease];
-	downloadPath = [[tempDir stringByAppendingPathComponent:name] retain];
-	[download setDestination:downloadPath allowOverwrite:YES];
-}
-
-- (void)download:(NSURLDownload *)download didReceiveDataOfLength:(unsigned)length
-{
-	[statusController setProgressValue:[statusController progressValue] + length];
-	[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%.0lfk of %.0lfk", nil), [statusController progressValue] / 1024.0, [statusController maxProgressValue] / 1024.0]];
-}
-
-- (IBAction)cancelDownload:sender
-{
-	if (downloader)
-	{
-		[downloader cancel];
-		[downloader release];
-	}
-	[self abandonUpdate];
-}
-
-- (void)downloadDidFinish:(NSURLDownload *)download
-{
-	[download release];
-	downloader = nil;
-	[self extractUpdate];
-}
-
-- (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
-{
-	[self abandonUpdate];
-	
-	NSLog(@"Download error: %@", [error localizedDescription]);
-	[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred while trying to download the file. Please try again later.", nil)];
-}
-
-#pragma mark Extraction phase
-
-- (void)unarchiver:(SUUnarchiver *)ua extractedLength:(long)length
-{
-	if ([statusController maxProgressValue] == 0)
-		[statusController setMaxProgressValue:[[[[NSFileManager defaultManager] fileAttributesAtPath:downloadPath traverseLink:NO] objectForKey:NSFileSize] longValue]];
-	[statusController setProgressValue:[statusController progressValue] + length];
-}
-
-- (void)unarchiverDidFinish:(SUUnarchiver *)ua
-{	
-	if ([self isAutomaticallyUpdating])
-	{
-		[self installAndRestart:self];
-	}
-	else
-	{
-		[statusController beginActionWithTitle:SULocalizedString(@"Ready to Install", nil) maxProgressValue:1 statusText:nil];
-		[statusController setProgressValue:1]; // fill the bar
-		[statusController setButtonTitle:SULocalizedString(@"Install and Relaunch", nil) target:self action:@selector(installAndRestart:) isDefault:YES];
-		[NSApp requestUserAttention:NSInformationalRequest];
-	}
-}
-
-- (void)unarchiverDidFail:(SUUnarchiver *)ua
-{
-	[ua release];
-	[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil)];
-	[self abandonUpdate];
-}
-
-- (void)extractUpdate
-{
-	// Now we have to extract the downloaded archive.
-	[statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", nil) maxProgressValue:0 statusText:nil];
-	
-	@try 
-	{		
-		// DSA verification, if activated by the developer
-		if ([[hostBundle objectForInfoDictionaryKey:SUExpectsDSASignatureKey] boolValue])
-		{
-			NSString *dsaSignature = [updateItem DSASignature];
-			NSString *pkeyString = [hostBundle objectForInfoDictionaryKey:SUPublicDSAKeyKey]; // Fetch the app's public DSA key.
-			if (![[NSFileManager defaultManager] validatePath:downloadPath withEncodedDSASignature:dsaSignature withPublicDSAKey:pkeyString])
-			{
-				[NSException raise:@"SUUnarchiveException" format:@"DSA verification of the update archive failed."];
-			}
-		}
-		
-		unarchiver = [[SUUnarchiver alloc] init];
-		[unarchiver setDelegate:self];
-		[unarchiver unarchivePath:downloadPath]; // asynchronous extraction!
-	}
-	@catch(NSException *e) {
-		NSLog([e reason]);
-		[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil)];
-		[self abandonUpdate];
-	}	
-}
-
-#pragma mark Installation
-
-- (IBAction)installAndRestart:sender
-{
-	[statusController beginActionWithTitle:SULocalizedString(@"Installing update...", nil) maxProgressValue:0 statusText:nil];
-	[statusController setButtonEnabled:NO];
-	
-	// Prompt for permission to restart if we're automatically updating.
-	if ([self isAutomaticallyUpdating])
-	{
-		SUAutomaticUpdateAlert *alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:updateItem hostBundle:hostBundle];
-		if ([NSApp runModalForWindow:[alert window]] == NSAlertAlternateReturn)
-		{
-			[alert release];
-			return;
-		}
-	}
-	
-	[SUInstaller installFromUpdateFolder:[downloadPath stringByDeletingLastPathComponent] overHostBundle:hostBundle delegate:self];
-}
-	
-- (void)installerFinishedForHostBundle:(NSBundle *)hb
-{
-	if (hb != hostBundle) { return; }
-	
-	[unarchiver cleanUp];
-	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-	
-	NSString *relaunchPath = [[NSBundle bundleForClass:[self class]] pathForResource:@"relaunch" ofType:nil];
-	@try
-	{
-		[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
-	}
-	@catch (NSException *e)
-	{
-		NSLog(@"Sparkle relaunch error: %@", e);
-		[self showUpdateErrorAlertWithInfo:[NSString stringWithFormat:SULocalizedString(@"Couldn't restart %1$@, but the new version will be available next time you run %1$@.", nil), [hostBundle name]]];
-		[self abandonUpdate];
-	}
-	[NSApp terminate:self];
-}
-
-- (void)installerForHostBundle:(NSBundle *)hb failedWithError:(NSError *)error
-{
-	if (hb != hostBundle) { return; }
-	NSLog(@"Sparkle Installation Error: %@", [error localizedDescription]);
-	[self showUpdateErrorAlertWithInfo:SULocalizedString(@"An error occurred during installation. Please try again later.", nil)];
-	[self abandonUpdate];
-}
-
-#pragma mark Error handling
-
-- (void)showUpdateErrorAlertWithInfo:(NSString *)info
-{
-	if ([self isAutomaticallyUpdating]) { return; }
-	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"Update Error!", nil) defaultButton:SULocalizedString(@"Cancel Update", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:info];
-	[alert setIcon:[hostBundle icon]];
-	[alert runModal];
-}
-
-- (void)abandonUpdate
-{
-	if (updateItem) { [updateItem autorelease]; }
-	updateItem = nil;
-	if (statusController)
-	{
-		[statusController close];
-		[statusController autorelease];
-	}
-	statusController = nil;
-	updateInProgress = NO;
-	[self scheduleCheckWithInterval:checkInterval];
-}
-
 - (void)dealloc
 {
-	[updateItem release];
-	[downloader release];	
-	[downloadPath release];
-	[statusController release];
 	[hostBundle release];
 	[delegate release];
 	if (checkTimer) { [checkTimer invalidate]; }
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super dealloc];
 }
 
-+ (NSString *)systemVersionString
+- (BOOL)validateMenuItem:(NSMenuItem *)item
 {
-	// This returns a version string of the form X.Y.Z
-	// There may be a better way to deal with the problem that gestaltSystemVersionMajor
-	//  et al. are not defined in 10.3, but this is probably good enough.
-	NSString* verStr = nil;
-#if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_4
-	SInt32 major, minor, bugfix;
-	OSErr err1 = Gestalt(gestaltSystemVersionMajor, &major);
-	OSErr err2 = Gestalt(gestaltSystemVersionMinor, &minor);
-	OSErr err3 = Gestalt(gestaltSystemVersionBugFix, &bugfix);
-	if (!err1 && !err2 && !err3)
-	{
-		verStr = [NSString stringWithFormat:@"%d.%d.%d", major, minor, bugfix];
-	}
-	else
-#endif
-	{
-	 	NSString *versionPlistPath = @"/System/Library/CoreServices/SystemVersion.plist";
-		verStr = [[[NSDictionary dictionaryWithContentsOfFile:versionPlistPath] objectForKey:@"ProductVersion"] retain];
-	}
-	return verStr;
+	if ([item action] == @selector(checkForUpdates:))
+		return ![self updateInProgress];
+	return YES;
 }
 
 - (void)setDelegate:aDelegate
 {
 	[delegate release];
 	delegate = [aDelegate retain];
+}
+
+- (void)setHostBundle:(NSBundle *)hb
+{
+	[hostBundle release];
+	hostBundle = [hb retain];
+	[[SUUserDefaults standardUserDefaults] setIdentifier:[hostBundle bundleIdentifier]];
+}
+
+- (BOOL)updateInProgress
+{
+	return driver && ([driver finished] == NO);
 }
 
 @end
