@@ -20,7 +20,6 @@
 - (void)setDelegate:delegate;
 - (void)setUserAgentString:(NSString *)userAgentString;
 
-- (SUAppcastItem *)newestItem;
 - (NSArray *)items;
 
 @end

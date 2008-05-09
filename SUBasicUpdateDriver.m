@@ -38,7 +38,10 @@
 
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui
 {
-	return [[[SUUserDefaults standardUserDefaults] objectForKey:SUSkippedVersionKey] isEqualToString:[ui versionString]];
+	NSString *skippedVersion = [[SUUserDefaults standardUserDefaults] objectForKey:SUSkippedVersionKey];
+	if (skippedVersion == nil) { return NO; }
+	return [[SUStandardVersionComparator defaultComparator] compareVersion:[ui versionString]
+																 toVersion:skippedVersion] != NSOrderedDescending;
 }
 
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
@@ -48,11 +51,19 @@
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac
 {
-	updateItem = [[ac newestItem] retain];
+	NSArray* updates = [ac items];
+	if ([updates count] > 0)
+		[[SUUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:SULastCheckTimeKey];
+	
+	// Find the first update we can actually use.
+	NSEnumerator *updateEnumerator = [updates objectEnumerator];
+	do {
+		updateItem = [updateEnumerator nextObject];
+	} while (updateItem && ![self hostSupportsItem:updateItem]);
+	
+	[updateItem retain];
 	CFRelease(ac); // Remember that we're explicitly managing the memory of the appcast.
 	if (updateItem == nil) { [self didNotFindUpdate]; return; }
-		
-	[[SUUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:SULastCheckTimeKey];
 	
 	if ([self itemContainsValidUpdate:updateItem])
 		[self didFindValidUpdate];

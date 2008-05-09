@@ -22,14 +22,6 @@
 	[super dealloc];
 }
 
-- (SUAppcastItem *)newestItem
-{
-	if ([items count] > 0)
-		return [items objectAtIndex:0]; // the RSS class takes care of sorting by published date, descending.
-	else
-		return nil;
-}
-
 - (NSArray *)items
 {
 	return items;
