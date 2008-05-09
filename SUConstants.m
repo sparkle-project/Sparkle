@@ -24,6 +24,7 @@ NSString *SUAutomaticallyUpdateKey = @"SUAutomaticallyUpdate";
 NSString *SUAllowsAutomaticUpdatesKey = @"SUAllowsAutomaticUpdates";
 NSString *SUEnableSystemProfilingKey = @"SUEnableSystemProfiling";
 NSString *SUEnableAutomaticChecksKey = @"SUEnableAutomaticChecks";
+NSString *SUEnableAutomaticChecksKeyOld = @"SUCheckAtStartup";
 NSString *SUSendProfileInfoKey = @"SUSendProfileInfo";
 
 NSString *SUSparkleErrorDomain = @"SUSparkleErrorDomain";

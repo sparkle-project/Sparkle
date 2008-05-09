@@ -56,9 +56,11 @@ static SUUpdater *sharedUpdater = nil;
 	// Has he been asked already?
 	if ([[SUUserDefaults standardUserDefaults] objectForKey:SUEnableAutomaticChecksKey] == nil)
 	{
+		if ([[SUUserDefaults standardUserDefaults] objectForKey:SUEnableAutomaticChecksKeyOld])
+			[[SUUserDefaults standardUserDefaults] setBool:[[SUUserDefaults standardUserDefaults] boolForKey:SUEnableAutomaticChecksKeyOld] forKey:SUEnableAutomaticChecksKey];
 		// Now, we don't want to ask the user for permission to do a weird thing on the first launch.
 		// We wait until the second launch.
-		if ([[SUUserDefaults standardUserDefaults] boolForKey:SUHasLaunchedBeforeKey] == NO)
+		else if ([[SUUserDefaults standardUserDefaults] boolForKey:SUHasLaunchedBeforeKey] == NO)
 			[[SUUserDefaults standardUserDefaults] setBool:YES forKey:SUHasLaunchedBeforeKey];
 		else
 			[SUUpdatePermissionPrompt promptWithHostBundle:hostBundle delegate:self];
