@@ -108,7 +108,7 @@
 {
 	// We do this here instead of in extractUpdate so that we only have a determinate progress bar for archives with progress.
 	if ([statusController maxProgressValue] == 0)
-		[statusController setMaxProgressValue:[[[[NSFileManager defaultManager] fileAttributesAtPath:downloadPath traverseLink:NO] objectForKey:NSFileSize] longValue]];
+		[statusController setMaxProgressValue:[[[[NSFileManager defaultManager] fileAttributesAtPath:downloadPath traverseLink:NO] objectForKey:NSFileSize] doubleValue]];
 	[statusController setProgressValue:[statusController progressValue] + length];
 }
 

@@ -82,9 +82,9 @@ static SUUpdater *sharedUpdater = nil;
 {
 	// Find the stored check interval. User defaults override Info.plist.
 	if ([[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey])
-		checkInterval = [[[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey] longValue];
+		checkInterval = [[[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey] doubleValue];
 	else if ([hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey])
-		checkInterval = [[hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey] longValue];
+		checkInterval = [[hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey] doubleValue];
 	
 	if (checkInterval < SU_MIN_CHECK_INTERVAL) // This can also mean one that isn't set.
 		checkInterval = SU_DEFAULT_CHECK_INTERVAL;
