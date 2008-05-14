@@ -60,10 +60,19 @@ NSString *SUInstallerDelegateKey = @"SUInstallerDelegate";
 	}
 }
 
++ (void)_mdimportBundle:(NSBundle *)bundle
+{
+	NSTask *mdimport = [[[NSTask alloc] init] autorelease];
+	[mdimport setLaunchPath:@"/usr/bin/mdimport"];
+	[mdimport setArguments:[NSArray arrayWithObject:[bundle bundlePath]]];
+	[mdimport launch];
+}
+
 + (void)_finishInstallationWithResult:(BOOL)result hostBundle:(NSBundle *)hostBundle error:(NSError *)error delegate:delegate
 {
 	if (result == YES)
 	{
+		[self _mdimportBundle:hostBundle];
 		if ([delegate respondsToSelector:@selector(installerFinishedForHostBundle:)])
 			[delegate installerFinishedForHostBundle:hostBundle];
 	}
