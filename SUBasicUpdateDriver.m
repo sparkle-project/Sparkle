@@ -181,7 +181,7 @@
 	@catch (NSException *e)
 	{
 		// Note that we explicitly use the host app's name here, since updating plugin for Mail relaunches Mail, not just the plugin.
-		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [NSApp name]], NSLocalizedDescriptionKey, [e reason], NSLocalizedFailureReasonErrorKey, nil]]];
+		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [[NSBundle mainBundle] name]], NSLocalizedDescriptionKey, [e reason], NSLocalizedFailureReasonErrorKey, nil]]];
 		// We intentionally don't abandon the update here so that the host won't initiate another.
 	}
 	[NSApp terminate:self];

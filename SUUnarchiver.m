@@ -41,8 +41,7 @@
 				
 				fwrite(buf, 1, len, cmdFP);
 				
-				if ([delegate respondsToSelector:@selector(unarchiver:extractedLength:)])
-					[delegate unarchiver:self extractedLength:len];
+				[self performSelectorOnMainThread:@selector(notifyDelegateOfExtractedLength:) withObject:[NSNumber numberWithLong:len] waitUntilDone:NO];
 			}
 			pclose(cmdFP);
 		}
@@ -140,15 +139,9 @@
 		result = NO;
 	
 	if (result)
-	{
-		if ([delegate respondsToSelector:@selector(unarchiverDidFinish:)])
-			[delegate performSelector:@selector(unarchiverDidFinish:) withObject:self];
-	}
+		[self performSelectorOnMainThread:@selector(notifyDelegateOfSuccess) withObject:nil waitUntilDone:NO];
 	else
-	{
-		if ([delegate respondsToSelector:@selector(unarchiverDidFail:)])
-			[delegate performSelector:@selector(unarchiverDidFail:) withObject:self];
-	}
+		[self performSelectorOnMainThread:@selector(notifyDelegateOfFailure) withObject:nil waitUntilDone:NO];
 
 	[pool release];
 }
@@ -177,6 +170,24 @@
 {
 	[archivePath release];
 	[super dealloc];
+}
+
+- (void)notifyDelegateOfExtractedLength:(long)length
+{
+	if ([delegate respondsToSelector:@selector(unarchiver:extractedLength:)])
+		[delegate unarchiver:self extractedLength:length];
+}
+
+- (void)notifyDelegateOfSuccess
+{
+	if ([delegate respondsToSelector:@selector(unarchiverDidFinish:)])
+		[delegate performSelector:@selector(unarchiverDidFinish:) withObject:self];
+}
+
+- (void)notifyDelegateOfFailure
+{
+	if ([delegate respondsToSelector:@selector(unarchiverDidFail:)])
+		[delegate performSelector:@selector(unarchiverDidFail:) withObject:self];
 }
 
 @end
