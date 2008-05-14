@@ -50,6 +50,8 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMA
 
 
 @interface RSS : NSObject {
+	NSMutableData *incrementalData;
+	id delegate;
 	
 	NSDictionary *headerItems;
 	NSMutableArray *newsItems;
@@ -59,44 +61,17 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMA
 	BOOL normalize;
 	}
 
+- (RSS *)initWithURL:(NSURL *) url userAgent:(NSString*)userAgent delegate:delegate;
+- (BOOL)loadData:(NSData *)rssData normalize:(BOOL)fl;
 
-/*Public*/
-- (RSS *)initWithURL:(NSURL *) url normalize:(BOOL) fl userAgent:(NSString*)userAgent error:(NSError **)error;
-
-- (RSS *) initWithTitle: (NSString *) title andDescription: (NSString *) description;
-
-- (RSS *) initWithData: (NSData *) rssData normalize: (BOOL) fl;
-
-- (NSDictionary *) headerItems;
-
-- (NSMutableArray *) newsItems;
-
-- (NSString *) version;
-
-// AMM's extensions for Sparkle
+- (NSMutableArray *)newsItems;
 - (NSDictionary *)newestItem;
 
+@end
 
-/*Private*/
-
-- (void) createheaderdictionary: (CFXMLTreeRef) tree;
-
-- (void) createitemsarray: (CFXMLTreeRef) tree;
-
-- (void) setversionstring: (CFXMLTreeRef) tree;
-
-- (void) flattenimagechildren: (CFXMLTreeRef) tree into: (NSMutableDictionary *) dictionary;
-
-- (void) flattensourceattributes: (CFXMLNodeRef) node into: (NSMutableDictionary *) dictionary;
-
-- (CFXMLTreeRef) getchanneltree: (CFXMLTreeRef) tree;
-
-- (CFXMLTreeRef) getnamedtree: (CFXMLTreeRef) currentTree name: (NSString *) name;
-
-- (void) normalizeRSSItem: (NSMutableDictionary *) rssItem;
-
-- (NSString *) getelementvalue: (CFXMLTreeRef) tree;
-
+@interface NSObject (RSSDelegateProtocol)
+- (void)feedDidFinishLoading:(RSS *)feed;
+- (void)feed:(RSS *)feed didFailWithError:(NSError *)error;
 @end
 
 #endif

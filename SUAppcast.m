@@ -9,12 +9,11 @@
 #import "Sparkle.h"
 #import "SUAppcast.h"
 
-@implementation SUAppcast
+@interface SUAppcast (Private)
+- (void)reportError:(NSError *)error;
+@end
 
-- (void)fetchAppcastFromURL:(NSURL *)url
-{
-	[NSThread detachNewThreadSelector:@selector(_fetchAppcastFromURL:) toTarget:self withObject:url];
-}
+@implementation SUAppcast
 
 - (void)dealloc
 {
@@ -27,18 +26,14 @@
 	return items;
 }
 
-- (void)_fetchAppcastFromURL:(NSURL *)url
+- (void)fetchAppcastFromURL:(NSURL *)url
 {
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-	
-	NSError *error = nil;
-	RSS *feed = [[RSS alloc] initWithURL:url normalize:YES userAgent:userAgentString error:&error];
-	if (!feed)
-	{
-		[self performSelectorOnMainThread:@selector(reportError:) withObject:error waitUntilDone:NO];
-		return;
-	}
-		
+	RSS *feed = [[RSS alloc] initWithURL:url userAgent:userAgentString delegate:self];
+	CFRetain(feed); // Manage the RSS feed's memory manually.
+}
+
+- (void)feedDidFinishLoading:(RSS *)feed
+{
 	// Set up all the appcast items:
 	items = [NSMutableArray array];
 	id enumerator = [[feed newsItems] objectEnumerator], current;
@@ -51,8 +46,7 @@
 	}
 	@catch (NSException *parseException)
 	{
-		error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while parsing the update feed.", nil), NSLocalizedDescriptionKey, [parseException reason], SUTechnicalErrorInformationKey, nil]];
-		[self performSelectorOnMainThread:@selector(reportError:) withObject:error waitUntilDone:NO];
+		[self reportError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while parsing the update feed.", nil), NSLocalizedDescriptionKey, [parseException reason], SUTechnicalErrorInformationKey, nil]]];
 		return;
 	}
 	items = [[NSArray arrayWithArray:items] retain]; // Make the items list immutable.
@@ -60,8 +54,12 @@
 	if ([delegate respondsToSelector:@selector(appcastDidFinishLoading:)])
 		[delegate performSelectorOnMainThread:@selector(appcastDidFinishLoading:) withObject:self waitUntilDone:NO];
 		
-	[feed release];
-	[pool release];
+	CFRelease(feed);
+}
+
+- (void)feed:(RSS *)feed didFailWithError:(NSError *)error
+{
+	[self reportError:error];
 }
 
 - (void)reportError:(NSError *)error
