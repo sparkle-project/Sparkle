@@ -182,7 +182,7 @@
 		
 		NSString *realRelauncherPath = relaunchPath;
 		if(!relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath])
-			realRelauncherPath = [[NSBundle bundleForClass:[self class]] pathForAuxiliaryExecutable:@"relaunch"];
+			realRelauncherPath = [[NSBundle bundleForClass:[self class]] pathForResource:@"relaunch" ofType:@""];
 
 		[NSTask launchedTaskWithLaunchPath:realRelauncherPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
 		

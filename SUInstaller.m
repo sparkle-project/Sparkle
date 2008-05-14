@@ -56,7 +56,7 @@ NSString *SUInstallerDelegateKey = @"SUInstallerDelegate";
 	}
 	else
 	{
-		NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]] pathForAuxiliaryExecutable:@"relaunch"];
+		NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]]  pathForResource:@"relaunch" ofType:@""];
 		NSString *targetPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
 		if([[NSFileManager defaultManager] copyPath:relaunchPathToCopy toPath:targetPath handler:nil])
 			*relaunchPath = targetPath;
