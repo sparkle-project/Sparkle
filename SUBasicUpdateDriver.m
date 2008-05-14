@@ -110,7 +110,6 @@
 	{
 		// Okay, something's really broken with /tmp
 		[download cancel];
-		[download release]; download = nil;
 		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Can't make a temporary directory for the update download at %@.",tempDir] forKey:NSLocalizedDescriptionKey]]];
 	}
 	
@@ -120,13 +119,14 @@
 
 - (void)downloadDidFinish:(NSURLDownload *)d
 {
-	[download release];
-	download = nil;
 	[self extractUpdate];
 }
 
 - (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
 {
+	// Get rid of what we've downloaded so far, if anything.
+	if (downloadPath != nil)
+		[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[downloadPath stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[downloadPath lastPathComponent]] tag:NULL];
 	[self abortUpdateWithError:error];
 }
 
@@ -213,6 +213,7 @@
 	[hostBundle release];
 	[downloadPath release];
 	[unarchiver release];
+	[download release];
 	[super dealloc];
 }
 
