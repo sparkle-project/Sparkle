@@ -160,7 +160,9 @@
 
 - (void)installUpdate
 {
-	[SUInstaller installFromUpdateFolder:[downloadPath stringByDeletingLastPathComponent] overHostBundle:hostBundle delegate:self synchronously:NO];
+	//This will copy the relauncher into NSTemporaryDirectory() just before it overwrites the bundle
+	//See https://bugs.launchpad.net/sparkle/+bug/230123
+	[SUInstaller installFromUpdateFolder:[downloadPath stringByDeletingLastPathComponent] overHostBundle:hostBundle delegate:self synchronously:NO relauncherPath:&relaunchPath];
 }
 
 - (void)installerFinishedForHostBundle:(NSBundle *)hb
@@ -173,10 +175,26 @@
 - (void)relaunchHostApp
 {
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-	NSString *relaunchPath = [[NSBundle bundleForClass:[self class]] pathForResource:@"relaunch" ofType:nil];
+		
 	@try
 	{
-		[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
+		//if we failed to copy the relauncher into NSTemporaryDirectory(), use the one in the new bundle and hope for the best.
+		
+		NSString *realRelauncherPath = relaunchPath;
+		if(!relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath])
+			realRelauncherPath = [[NSBundle bundleForClass:[self class]] pathForAuxiliaryExecutable:@"relaunch"];
+
+		[NSTask launchedTaskWithLaunchPath:realRelauncherPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
+		
+		//if there's a possibility that a copy of relauncher is in NSTemporaryDirectory(), we need to be sure to clean it up
+		if(relaunchPath)
+		{
+			[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation 
+														 source:[relaunchPath stringByDeletingLastPathComponent] 
+													destination:@"" 
+														  files:[NSArray arrayWithObject:[relaunchPath lastPathComponent]] 
+															tag:NULL];
+		}
 	}
 	@catch (NSException *e)
 	{

@@ -20,6 +20,7 @@
 	NSURLDownload *download;
 	NSString *downloadPath;
 	SUUnarchiver *unarchiver;
+	NSString *relaunchPath;
 }
 
 - (void)checkForUpdatesAtURL:(NSURL *)appcastURL hostBundle:(NSBundle *)hb;

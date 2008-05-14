@@ -12,7 +12,7 @@
 #import <Cocoa/Cocoa.h>
 
 @interface SUInstaller : NSObject { }
-+ (void)installFromUpdateFolder:(NSString *)updateFolder overHostBundle:(NSBundle *)hostBundle delegate:delegate synchronously:(BOOL)synchronously;
++ (void)installFromUpdateFolder:(NSString *)updateFolder overHostBundle:(NSBundle *)hostBundle delegate:delegate synchronously:(BOOL)synchronously relauncherPath:(NSString **)relaunchPath;
 + (void)_finishInstallationWithResult:(BOOL)result hostBundle:(NSBundle *)hostBundle error:(NSError *)error delegate:delegate;
 @end
 

@@ -16,7 +16,7 @@ NSString *SUInstallerDelegateKey = @"SUInstallerDelegate";
 
 @implementation SUInstaller
 
-+ (void)installFromUpdateFolder:(NSString *)updateFolder overHostBundle:(NSBundle *)hostBundle delegate:delegate synchronously:(BOOL)synchronously;
++ (void)installFromUpdateFolder:(NSString *)updateFolder overHostBundle:(NSBundle *)hostBundle delegate:delegate synchronously:(BOOL)synchronously relauncherPath:(NSString **)relaunchPath;
 {
 	// Search subdirectories for the application
 	NSString *currentFile, *newAppDownloadPath = nil, *bundleFileName = [[hostBundle bundlePath] lastPathComponent], *alternateBundleFileName = [[hostBundle name] stringByAppendingPathExtension:[[hostBundle bundlePath] pathExtension]];
@@ -56,6 +56,11 @@ NSString *SUInstallerDelegateKey = @"SUInstallerDelegate";
 	}
 	else
 	{
+		NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]] pathForAuxiliaryExecutable:@"relaunch"];
+		NSString *targetPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
+		if([[NSFileManager defaultManager] copyPath:relaunchPathToCopy toPath:targetPath handler:nil])
+			*relaunchPath = targetPath;
+		
 		[(isPackage ? [SUPackageInstaller class] : [SUPlainInstaller class]) performInstallationWithPath:newAppDownloadPath hostBundle:hostBundle delegate:delegate synchronously:synchronously];
 	}
 }

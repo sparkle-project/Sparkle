@@ -49,7 +49,7 @@
 - (void)installUpdate
 {
 	showErrors = YES;
-	[SUInstaller installFromUpdateFolder:[downloadPath stringByDeletingLastPathComponent] overHostBundle:hostBundle delegate:self synchronously:postponingInstallation];
+	[SUInstaller installFromUpdateFolder:[downloadPath stringByDeletingLastPathComponent] overHostBundle:hostBundle delegate:self synchronously:postponingInstallation relauncherPath:&relaunchPath];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)note
