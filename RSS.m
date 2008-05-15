@@ -49,6 +49,18 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMA
 @end
 #endif
 
+@interface RSS (Private)
+- (void) createheaderdictionary: (CFXMLTreeRef) tree;
+- (void) createitemsarray: (CFXMLTreeRef) tree;
+- (void) setversionstring: (CFXMLTreeRef) tree;
+- (void) flattenimagechildren: (CFXMLTreeRef) tree into: (NSMutableDictionary *) dictionary;
+- (void) flattensourceattributes: (CFXMLNodeRef) node into: (NSMutableDictionary *) dictionary;
+- (CFXMLTreeRef) getchanneltree: (CFXMLTreeRef) tree;
+- (CFXMLTreeRef) getnamedtree: (CFXMLTreeRef) currentTree name: (NSString *) name;
+- (void) normalizeRSSItem: (NSMutableDictionary *) rssItem;
+- (NSString *) getelementvalue: (CFXMLTreeRef) tree;
+@end
+
 // This comparator function is used to sort the RSS items by their published date.
 NSComparisonResult compareNewsItems(id item1, id item2, void *context)
 {
@@ -98,72 +110,79 @@ NSComparisonResult compareNewsItems(id item1, id item2, void *context)
 	} /*initWithTitle*/
 	
 	
-- (RSS *) initWithData: (NSData *) rssData normalize: (BOOL) fl {
-	
+- (BOOL)loadData:(NSData *)rssData normalize:(BOOL)fl
+{
 	CFXMLTreeRef tree;
-	
 	flRdf = NO;
-	
 	normalize = fl;
 	
 	NS_DURING
-	
 		tree = CFXMLTreeCreateFromData (kCFAllocatorDefault, (CFDataRef) rssData,
 			NULL,  kCFXMLParserSkipWhitespace, kCFXMLNodeCurrentVersion);
-	
 	NS_HANDLER
-		
 		tree = nil;
-	
 	NS_ENDHANDLER
 	
-	if (tree == nil) {
-		
-		/*If there was a problem parsing the RSS file,
-		raise an exception.*/
-	
-		[self release];
-		return nil;
-		} /*if*/
+	if (tree == nil)
+		return NO;
 	
 	[self createheaderdictionary: tree];
-	
 	[self createitemsarray: tree];
-	
 	[self setversionstring: tree];
 	
-	CFRelease (tree);
-	
-	return (self);
-	} /*initWithData*/
+	return YES;
+}
 
-
-	 
 	
-- (RSS *)initWithURL:(NSURL *)url normalize:(BOOL)fl userAgent:(NSString*)userAgent error:(NSError **)error
+- (RSS *)initWithURL:(NSURL *)url userAgent:(NSString*)userAgent delegate:del
 {
-	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL: url cachePolicy: NSURLRequestReloadIgnoringCacheData
-										timeoutInterval: 30.0];
-	if (userAgent)
-		[request setValue: userAgent forHTTPHeaderField: @"User-Agent"];
-			
-	NSURLResponse *response = nil;
-	NSData *rssData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:error];
-	if (rssData == nil) { return nil; }
-	
-	@try
+	self = [super init];
+	if (self)
 	{
-		[self initWithData:rssData normalize:fl];
-	}
-	@catch (NSException *parseException)
-	{
-		if (error)
-			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while parsing the update feed.", nil), NSLocalizedDescriptionKey, [parseException reason], NSLocalizedFailureReasonErrorKey, nil]];
-		return nil;
+		delegate = del;
+		NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL: url cachePolicy: NSURLRequestReloadIgnoringCacheData
+											timeoutInterval: 30.0];
+		if (userAgent)
+			[request setValue: userAgent forHTTPHeaderField: @"User-Agent"];
+				
+		incrementalData = [[NSMutableData data] retain];
+		NSURLConnection *connection = [NSURLConnection connectionWithRequest:request delegate:self];
+		CFRetain(connection);
 	}
 	return self;
 }
 
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+{
+	[incrementalData appendData:data];
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection
+{
+	CFRelease(connection);
+	
+	NSError *error = nil;
+	@try
+	{
+		if (![self loadData:incrementalData normalize:YES])
+			error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:[NSDictionary dictionaryWithObject:SULocalizedString(@"An error occurred while parsing the update feed.", nil) forKey:NSLocalizedDescriptionKey]];
+	}
+	@catch (NSException *parseException)
+	{
+		error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:SULocalizedString(@"An error occurred while parsing the update feed: %@", nil), [parseException reason]] forKey:NSLocalizedFailureReasonErrorKey]];
+	}
+	
+	if (error)
+		[delegate feed:self didFailWithError:error];
+	else
+		[delegate feedDidFinishLoading:self];
+}
+
+- (void)connection:(NSURLConnection*) connection didFailWithError:(NSError *)error
+{
+	CFRelease(connection);
+	[delegate feed:self didFailWithError:error];
+}
 
 - (NSDictionary *) headerItems {
 	
@@ -184,7 +203,7 @@ NSComparisonResult compareNewsItems(id item1, id item2, void *context)
 
 
 - (void) dealloc {
-		
+	[incrementalData release];
 	[headerItems release];
 
 	[newsItems release];

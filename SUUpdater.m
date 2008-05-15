@@ -139,7 +139,8 @@ static SUUpdater *sharedUpdater = nil;
 	if (object != driver) { return; }
 	[driver removeObserver:self forKeyPath:@"finished"];
 	[driver release]; driver = nil;
-	[NSTimer scheduledTimerWithTimeInterval:checkInterval target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO];
+	if ([self automaticallyUpdates])
+		checkTimer = [NSTimer scheduledTimerWithTimeInterval:checkInterval target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO];
 }
 
 - (BOOL)automaticallyUpdates
