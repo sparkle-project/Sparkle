@@ -180,11 +180,10 @@
 	{
 		//if we failed to copy the relauncher into NSTemporaryDirectory(), use the one in the new bundle and hope for the best.
 		
-		NSString *realRelauncherPath = relaunchPath;
 		if(!relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath])
-			realRelauncherPath = [[NSBundle bundleForClass:[self class]] pathForResource:@"relaunch" ofType:@""];
+			@throw [NSException exceptionWithName:@"SURelauncherNotFound" reason:@"No relauncher available" userInfo:nil];
 
-		[NSTask launchedTaskWithLaunchPath:realRelauncherPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
+		[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
 	}
 	@catch (NSException *e)
 	{
