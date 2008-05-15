@@ -58,6 +58,8 @@ NSString *SUInstallerDelegateKey = @"SUInstallerDelegate";
 	{
 		NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]]  pathForResource:@"relaunch" ofType:@""];
 		NSString *targetPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
+		//Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems
+		[[NSFileManager defaultManager] removeFileAtPath:targetPath handler:nil];
 		if([[NSFileManager defaultManager] copyPath:relaunchPathToCopy toPath:targetPath handler:nil])
 			*relaunchPath = targetPath;
 		

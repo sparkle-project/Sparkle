@@ -185,16 +185,6 @@
 			realRelauncherPath = [[NSBundle bundleForClass:[self class]] pathForResource:@"relaunch" ofType:@""];
 
 		[NSTask launchedTaskWithLaunchPath:realRelauncherPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
-		
-		//if there's a possibility that a copy of relauncher is in NSTemporaryDirectory(), we need to be sure to clean it up
-		if(relaunchPath)
-		{
-			[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation 
-														 source:[relaunchPath stringByDeletingLastPathComponent] 
-													destination:@"" 
-														  files:[NSArray arrayWithObject:[relaunchPath lastPathComponent]] 
-															tag:NULL];
-		}
 	}
 	@catch (NSException *e)
 	{
