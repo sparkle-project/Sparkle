@@ -158,9 +158,19 @@
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:[NSDictionary dictionaryWithObject:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) forKey:NSLocalizedDescriptionKey]]];
 }
 
+- (BOOL)shouldInstallSynchronously { return NO; }
+
 - (void)installUpdate
 {
-	[SUInstaller installFromUpdateFolder:[downloadPath stringByDeletingLastPathComponent] overHostBundle:hostBundle delegate:self synchronously:NO];
+	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
+	NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]]  pathForResource:@"relaunch" ofType:@""];
+	NSString *targetPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
+	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems
+	[[NSFileManager defaultManager] removeFileAtPath:targetPath handler:nil];
+	if ([[NSFileManager defaultManager] copyPath:relaunchPathToCopy toPath:targetPath handler:nil])
+		relaunchPath = [targetPath retain];
+	
+	[SUInstaller installFromUpdateFolder:[downloadPath stringByDeletingLastPathComponent] overHostBundle:hostBundle delegate:self synchronously:[self shouldInstallSynchronously]];
 }
 
 - (void)installerFinishedForHostBundle:(NSBundle *)hb
@@ -173,9 +183,12 @@
 - (void)relaunchHostApp
 {
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-	NSString *relaunchPath = [[NSBundle bundleForClass:[self class]] pathForResource:@"relaunch" ofType:nil];
+		
 	@try
-	{
+	{		
+		if(!relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath])
+			[NSException raise:@"SURelauncherNotFound" format:@"Couldn't find the relauncher (expected to find it at %@)", relaunchPath];
+
 		[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
 	}
 	@catch (NSException *e)
@@ -190,6 +203,7 @@
 - (void)installerForHostBundle:(NSBundle *)hb failedWithError:(NSError *)error
 {
 	if (hb != hostBundle) { return; }
+	[[NSFileManager defaultManager] removeFileAtPath:relaunchPath handler:NULL]; // Clean up the copied relauncher.
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while installing the update. Please try again later.", nil), NSLocalizedDescriptionKey, [error localizedDescription], NSLocalizedFailureReasonErrorKey, nil]]];
 }
 
@@ -212,6 +226,7 @@
 {
 	[hostBundle release];
 	[downloadPath release];
+	[relaunchPath release];
 	[unarchiver release];
 	[download release];
 	[super dealloc];

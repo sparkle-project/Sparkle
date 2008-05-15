@@ -16,7 +16,7 @@ NSString *SUInstallerDelegateKey = @"SUInstallerDelegate";
 
 @implementation SUInstaller
 
-+ (void)installFromUpdateFolder:(NSString *)updateFolder overHostBundle:(NSBundle *)hostBundle delegate:delegate synchronously:(BOOL)synchronously;
++ (void)installFromUpdateFolder:(NSString *)updateFolder overHostBundle:(NSBundle *)hostBundle delegate:delegate synchronously:(BOOL)synchronously
 {
 	// Search subdirectories for the application
 	NSString *currentFile, *newAppDownloadPath = nil, *bundleFileName = [[hostBundle bundlePath] lastPathComponent], *alternateBundleFileName = [[hostBundle name] stringByAppendingPathExtension:[[hostBundle bundlePath] pathExtension]];

@@ -46,10 +46,12 @@
 	}
 }
 
+- (BOOL)shouldInstallSynchronously { return postponingInstallation; }
+
 - (void)installUpdate
 {
 	showErrors = YES;
-	[SUInstaller installFromUpdateFolder:[downloadPath stringByDeletingLastPathComponent] overHostBundle:hostBundle delegate:self synchronously:postponingInstallation];
+	[super installUpdate];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)note
