@@ -8,6 +8,7 @@
 
 #import "SUUserInitiatedUpdateDriver.h"
 #import "Sparkle.h"
+#import "NSNumber+Units.h"
 
 @implementation SUUserInitiatedUpdateDriver
 
@@ -83,7 +84,7 @@
 - (void)download:(NSURLDownload *)download didReceiveDataOfLength:(unsigned)length
 {
 	[statusController setProgressValue:[statusController progressValue] + length];
-	[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%.0lfkb of %.0lfkb", nil), [statusController progressValue] / 1024.0, [statusController maxProgressValue] / 1024.0]];
+	[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [NSNumber humanReadableSizeFromDouble:[statusController progressValue]], [NSNumber humanReadableSizeFromDouble:[statusController maxProgressValue]]]];
 }
 
 - (IBAction)cancelDownload:sender
