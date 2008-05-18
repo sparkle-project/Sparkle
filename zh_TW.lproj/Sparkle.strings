@@ -1,5 +1,5 @@
 ﻿/* No comment provided by engineer. */
-"%.0lfk of %.0lfk" = "%1$.0lfk / %2$.0lfk";
+"%@ of %@" = "%1$@ / %2$@";
 
 /* No comment provided by engineer. */
 "%@ %@ has been installed and will be ready to use next time %@ starts! Would you like to relaunch now?" = "%1$@ %2$@ 已安裝且下次 %3$@ 啟動時將會準備就緒！您現在是否要重新啟動？ ";
