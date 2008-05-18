@@ -7,22 +7,22 @@
 //
 
 #import "NSNumber+Units.h"
-
+#import "Sparkle.h"
 
 @implementation NSNumber (Units)
 
 + (NSString *)humanReadableSizeFromDouble:(double)value
 {
 	if (value < 1024)
-		return [NSString stringWithFormat:@"%ul", value];
+		return [NSString stringWithFormat:@"%.0lf %@", value, SULocalizedString(@"B", @"the unit for bytes")];
 	
 	if (value < 1024 * 1024)
-		return [NSString stringWithFormat:@"%.0lf KB", value / 1024.0];
+		return [NSString stringWithFormat:@"%.0lf %@", value / 1024.0, SULocalizedString(@"KB", @"the unit for kilobytes")];
 
 	if (value < 1024 * 1024 * 1024)
-		return [NSString stringWithFormat:@"%.1lf MB", value / 1024.0 / 1024.0];
+		return [NSString stringWithFormat:@"%.1lf %@", value / 1024.0 / 1024.0, SULocalizedString(@"MB", @"the unit for megabytes")];
 
-	return [NSString stringWithFormat:@"%.2lf GB", value / 1024.0 / 1024.0 / 1024.0];
+	return [NSString stringWithFormat:@"%.2lf %@", value / 1024.0 / 1024.0 / 1024.0, SULocalizedString(@"GB", @"the unit for gigabytes")];
 }
 
 @end
