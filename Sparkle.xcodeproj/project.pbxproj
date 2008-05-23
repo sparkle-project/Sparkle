@@ -94,6 +94,8 @@
 		61C46F340D9C54F300B06326 /* SUUpdatePermissionPrompt.nib in Resources */ = {isa = PBXBuildFile; fileRef = 61C46F330D9C54F300B06326 /* SUUpdatePermissionPrompt.nib */; };
 		61F83F720DBFE140006FDD30 /* SUBasicUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */; };
 		61F83F740DBFE141006FDD30 /* SUBasicUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		784590C10DE0429F00D0D64B /* NSNumber+Units.h in Headers */ = {isa = PBXBuildFile; fileRef = 784590BF0DE0429F00D0D64B /* NSNumber+Units.h */; };
+		784590C20DE0429F00D0D64B /* NSNumber+Units.m in Sources */ = {isa = PBXBuildFile; fileRef = 784590C00DE0429F00D0D64B /* NSNumber+Units.m */; };
 		DAAEFC9B0DA5722F0051E0D0 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
 		DAAEFD4E0DA572330051E0D0 /* relaunch.m in Sources */ = {isa = PBXBuildFile; fileRef = 613242130CD06CEF00106AA4 /* relaunch.m */; };
 		DAAEFD510DA572550051E0D0 /* relaunch in Resources */ = {isa = PBXBuildFile; fileRef = DAAEFC960DA571DF0051E0D0 /* relaunch */; };
@@ -263,6 +265,8 @@
 		61C46F350D9C54F300B06326 /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/SUUpdatePermissionPrompt.nib; sourceTree = "<group>"; };
 		61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBasicUpdateDriver.h; sourceTree = "<group>"; };
 		61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBasicUpdateDriver.m; sourceTree = "<group>"; };
+		784590BF0DE0429F00D0D64B /* NSNumber+Units.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSNumber+Units.h"; sourceTree = "<group>"; };
+		784590C00DE0429F00D0D64B /* NSNumber+Units.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSNumber+Units.m"; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* Sparkle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Sparkle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAAEFC960DA571DF0051E0D0 /* relaunch */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = relaunch; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -474,6 +478,8 @@
 			children = (
 				61A225910D1C3ADD00430CCD /* NSBundle+SUAdditions.h */,
 				61A225920D1C3ADD00430CCD /* NSBundle+SUAdditions.m */,
+				784590BF0DE0429F00D0D64B /* NSNumber+Units.h */,
+				784590C00DE0429F00D0D64B /* NSNumber+Units.m */,
 				611779570D1111C400749C97 /* NSWorkspace_RBAdditions.h */,
 				611779560D1111C400749C97 /* NSWorkspace_RBAdditions.m */,
 				610134750DD252E60049ACDF /* NSWorkspace+SystemVersion.h */,
@@ -583,6 +589,7 @@
 				610134770DD252E60049ACDF /* NSWorkspace+SystemVersion.h in Headers */,
 				6101347B0DD2541A0049ACDF /* SUProbingUpdateDriver.h in Headers */,
 				61699BCC0DDB92BD005878A4 /* SUVersionComparisonTest.h in Headers */,
+				784590C10DE0429F00D0D64B /* NSNumber+Units.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -822,6 +829,7 @@
 				610134740DD250470049ACDF /* SUUpdateDriver.m in Sources */,
 				610134780DD252E60049ACDF /* NSWorkspace+SystemVersion.m in Sources */,
 				6101347C0DD2541A0049ACDF /* SUProbingUpdateDriver.m in Sources */,
+				784590C20DE0429F00D0D64B /* NSNumber+Units.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
