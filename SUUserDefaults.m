@@ -40,7 +40,7 @@
 - (id)objectForKey:(NSString *)defaultName
 {
 	[self verifyIdentifier];
-	CFPropertyListRef obj = CFPreferencesCopyValue((CFStringRef)defaultName, (CFStringRef)identifier,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+	CFPropertyListRef obj = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)identifier);
 #if MAC_OS_X_VERSION_MIN_REQUIRED > 1050
 	return [NSMakeCollectable(obj) autorelease];
 #else
@@ -63,7 +63,7 @@
 {
 	BOOL value;
 	[self verifyIdentifier];
-	CFPropertyListRef plr = CFPreferencesCopyValue((CFStringRef)defaultName, (CFStringRef)identifier,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+	CFPropertyListRef plr = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)identifier);
 	if (plr == NULL)
 		value = NO;
 	else {
