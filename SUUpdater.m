@@ -14,6 +14,7 @@
 - (NSArray *)feedParameters;
 - (BOOL)automaticallyUpdates;
 - (BOOL)shouldScheduleUpdateCheck;
+- (NSTimeInterval)checkInterval;
 @end
 
 @implementation SUUpdater
@@ -82,16 +83,7 @@ static SUUpdater *sharedUpdater = nil;
 }
 
 - (void)beginUpdateCycle
-{
-	// Find the stored check interval. User defaults override Info.plist.
-	if ([[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey])
-		checkInterval = [[[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey] doubleValue];
-	else if ([hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey])
-		checkInterval = [[hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey] doubleValue];
-	
-	if (checkInterval < SU_MIN_CHECK_INTERVAL) // This can also mean one that isn't set.
-		checkInterval = SU_DEFAULT_CHECK_INTERVAL;
-	
+{	
 	// How long has it been since last we checked for an update?
 	NSDate *lastCheckDate = [[SUUserDefaults standardUserDefaults] objectForKey:SULastCheckTimeKey];
 	if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
@@ -99,8 +91,8 @@ static SUUpdater *sharedUpdater = nil;
 	
 	// Now we want to figure out how long until we check again.
 	NSTimeInterval delayUntilCheck;
-	if (intervalSinceCheck < checkInterval)
-		delayUntilCheck = (checkInterval - intervalSinceCheck); // It hasn't been long enough.
+	if (intervalSinceCheck < [self checkInterval])
+		delayUntilCheck = ([self checkInterval] - intervalSinceCheck); // It hasn't been long enough.
 	else
 		delayUntilCheck = 0; // We're overdue! Run one now.
 	
@@ -143,7 +135,7 @@ static SUUpdater *sharedUpdater = nil;
 	[driver removeObserver:self forKeyPath:@"finished"];
 	[driver release]; driver = nil;
 	if ([self shouldScheduleUpdateCheck])
-		checkTimer = [NSTimer scheduledTimerWithTimeInterval:checkInterval target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO];
+		checkTimer = [NSTimer scheduledTimerWithTimeInterval:[self checkInterval] target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO];
 }
 
 - (BOOL)shouldScheduleUpdateCheck
@@ -186,6 +178,20 @@ static SUUpdater *sharedUpdater = nil;
 	if (sendingSystemProfile)
 		parameters = [parameters arrayByAddingObjectsFromArray:[hostBundle systemProfile]];
 	return parameters;
+}
+
+- (NSTimeInterval)checkInterval
+{
+	NSTimeInterval checkInterval = 0;
+	// Find the stored check interval. User defaults override Info.plist.
+	if ([[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey])
+		checkInterval = [[[SUUserDefaults standardUserDefaults] objectForKey:SUScheduledCheckIntervalKey] doubleValue];
+	else if ([hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey])
+		checkInterval = [[hostBundle objectForInfoDictionaryKey:SUScheduledCheckIntervalKey] doubleValue];
+	
+	if (checkInterval < SU_MIN_CHECK_INTERVAL) // This can also mean one that isn't set.
+		checkInterval = SU_DEFAULT_CHECK_INTERVAL;	
+	return checkInterval;
 }
 
 - (void)dealloc

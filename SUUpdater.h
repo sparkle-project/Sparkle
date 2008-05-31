@@ -12,7 +12,6 @@
 @class SUUpdateDriver;
 @interface SUUpdater : NSObject {
 	NSTimer *checkTimer;
-	NSTimeInterval checkInterval;
 	SUUpdateDriver *driver;
 	
 	NSBundle *hostBundle;
