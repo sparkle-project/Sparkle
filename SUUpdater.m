@@ -53,8 +53,9 @@ static SUUpdater *sharedUpdater = nil;
 	if ([[SUUserDefaults standardUserDefaults] objectForKey:SUEnableAutomaticChecksKey] &&
 		[[SUUserDefaults standardUserDefaults] boolForKey:SUEnableAutomaticChecksKey] == NO) { return; }
 	
-	// Has he been asked already?
-	if ([[SUUserDefaults standardUserDefaults] objectForKey:SUEnableAutomaticChecksKey] == nil)
+	// Has he been asked already? And don't ask if the host has a default value set in its Info.plist.
+	if ([[SUUserDefaults standardUserDefaults] objectForKey:SUEnableAutomaticChecksKey] == nil &&
+		[hostBundle objectForInfoDictionaryKey:SUEnableAutomaticChecksKey] == nil)
 	{
 		if ([[SUUserDefaults standardUserDefaults] objectForKey:SUEnableAutomaticChecksKeyOld])
 			[[SUUserDefaults standardUserDefaults] setBool:[[SUUserDefaults standardUserDefaults] boolForKey:SUEnableAutomaticChecksKeyOld] forKey:SUEnableAutomaticChecksKey];
@@ -66,7 +67,10 @@ static SUUpdater *sharedUpdater = nil;
 			[SUUpdatePermissionPrompt promptWithHostBundle:hostBundle delegate:self];
 	}
 	
-	if ([[SUUserDefaults standardUserDefaults] boolForKey:SUEnableAutomaticChecksKey] == YES)
+	// We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
+	if ([[SUUserDefaults standardUserDefaults] boolForKey:SUEnableAutomaticChecksKey] == YES ||
+		([[SUUserDefaults standardUserDefaults] objectForKey:SUEnableAutomaticChecksKey] == nil &&
+			[[hostBundle objectForInfoDictionaryKey:SUEnableAutomaticChecksKey] boolValue] == YES))
 		[self beginUpdateCycle];
 }
 
