@@ -49,6 +49,7 @@
 #import "SUStandardVersionComparator.h"
 #import "SUStatusController.h"
 #import "SUSystemProfiler.h"
+#import "SUUIBasedUpdateDriver.h"
 #import "SUUnarchiver.h"
 #import "SUUpdateAlert.h"
 #import "SUUpdateDriver.h"

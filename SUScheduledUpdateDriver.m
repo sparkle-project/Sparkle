@@ -11,12 +11,6 @@
 
 @implementation SUScheduledUpdateDriver
 
-- (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
-{
-	// I wish I could think of a good way to not duplicate this code from SUBasicUpdateDriver, but inheritance makes it tricky.
-	return [self hostSupportsItem:ui] && [self isItemNewer:ui] && ![self itemContainsSkippedVersion:ui];
-}
-
 - (void)didFindValidUpdate
 {
 	showErrors = YES; // We only start showing errors after we present the UI for the first time.

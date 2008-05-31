@@ -10,9 +10,9 @@
 #define SUSCHEDULEDUPDATEDRIVER_H
 
 #import <Cocoa/Cocoa.h>
-#import "SUUserInitiatedUpdateDriver.h"
+#import "SUUIBasedUpdateDriver.h"
 
-@interface SUScheduledUpdateDriver : SUUserInitiatedUpdateDriver {
+@interface SUScheduledUpdateDriver : SUUIBasedUpdateDriver {
 	BOOL showErrors;
 }
 

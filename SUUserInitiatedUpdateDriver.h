@@ -2,7 +2,7 @@
 //  SUUserInitiatedUpdateDriver.h
 //  Sparkle
 //
-//  Created by Andy Matuschak on 5/5/08.
+//  Created by Andy Matuschak on 5/30/08.
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
@@ -10,12 +10,10 @@
 #define SUUSERINITIATEDUPDATEDRIVER_H
 
 #import <Cocoa/Cocoa.h>
-#import "SUBasicUpdateDriver.h"
+#import "SUUIBasedUpdateDriver.h"
 
-@class SUStatusController, SUUpdateAlert;
-@interface SUUserInitiatedUpdateDriver : SUBasicUpdateDriver {
-	SUStatusController *statusController;
-	SUUpdateAlert *updateAlert;
+@interface SUUserInitiatedUpdateDriver : SUUIBasedUpdateDriver {
+	SUStatusController *checkingController;
 }
 
 @end
