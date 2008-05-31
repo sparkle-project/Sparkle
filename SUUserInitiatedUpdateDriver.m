@@ -34,6 +34,9 @@
 	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem hostBundle:hostBundle];
 	[updateAlert setDelegate:self];
 	
+	// If the app is a menubar app or the like, we need to focus it first:
+	if ([[hostBundle objectForInfoDictionaryKey:@"LSUIElement"] doubleValue]) { [NSApp activateIgnoringOtherApps:YES]; }
+	
 	// Only show the update alert if the app is active; otherwise, we'll wait until it is.
 	if ([NSApp isActive])
 		[updateAlert showWindow:self];
