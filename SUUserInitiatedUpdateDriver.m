@@ -14,11 +14,6 @@
 
 - (void)checkForUpdatesAtURL:(NSURL *)appcastURL hostBundle:(NSBundle *)hb
 {
-	if ([hostBundle isRunningFromDiskImage])
-	{
-		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated when it's running from a disk image. Move %1$@ to your Applications folder, relaunch it, and try again.", nil), [hostBundle name]] forKey:NSLocalizedDescriptionKey]]];
-		return;
-	}
 	[super checkForUpdatesAtURL:appcastURL hostBundle:hb];
 }
 

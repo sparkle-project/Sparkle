@@ -14,6 +14,13 @@
 - (void)checkForUpdatesAtURL:(NSURL *)appcastURL hostBundle:(NSBundle *)hb
 {	
 	hostBundle = [hb retain];
+	
+	if ([hostBundle isRunningFromDiskImage])
+	{
+		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated when it's running from a disk image. Move %1$@ to your Applications folder, relaunch it, and try again.", nil), [hostBundle name]] forKey:NSLocalizedDescriptionKey]]];
+		return;
+	}	
+	
 	SUAppcast *appcast = [[SUAppcast alloc] init];
 	CFRetain(appcast); // We'll manage the appcast's memory ourselves so we don't have to make it an IV to support GC.
 	[appcast release];
