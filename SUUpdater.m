@@ -13,6 +13,7 @@
 - (void)beginUpdateCycle;
 - (NSArray *)feedParameters;
 - (BOOL)automaticallyUpdates;
+- (BOOL)shouldScheduleUpdateCheck;
 @end
 
 @implementation SUUpdater
@@ -68,9 +69,7 @@ static SUUpdater *sharedUpdater = nil;
 	}
 	
 	// We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
-	if ([[SUUserDefaults standardUserDefaults] boolForKey:SUEnableAutomaticChecksKey] == YES ||
-		([[SUUserDefaults standardUserDefaults] objectForKey:SUEnableAutomaticChecksKey] == nil &&
-			[[hostBundle objectForInfoDictionaryKey:SUEnableAutomaticChecksKey] boolValue] == YES))
+	if ([self shouldScheduleUpdateCheck])
 		[self beginUpdateCycle];
 }
 
@@ -143,8 +142,21 @@ static SUUpdater *sharedUpdater = nil;
 	if (object != driver) { return; }
 	[driver removeObserver:self forKeyPath:@"finished"];
 	[driver release]; driver = nil;
-	if ([self automaticallyUpdates])
+	if ([self shouldScheduleUpdateCheck])
 		checkTimer = [NSTimer scheduledTimerWithTimeInterval:checkInterval target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO];
+}
+
+- (BOOL)shouldScheduleUpdateCheck
+{
+	// Breaking this down for readability:
+	// If the user says he wants automatic update checks, let's do it.
+	if ([[SUUserDefaults standardUserDefaults] boolForKey:SUEnableAutomaticChecksKey] == YES)
+		return YES;
+	// If the user hasn't said anything, but the developer says we should do it, let's do it.
+	if ([[SUUserDefaults standardUserDefaults] objectForKey:SUEnableAutomaticChecksKey] == nil &&
+	  [[hostBundle objectForInfoDictionaryKey:SUEnableAutomaticChecksKey] boolValue] == YES)
+		return YES;
+	return NO; // Otherwise, don't bothe.r
 }
 
 - (BOOL)automaticallyUpdates
