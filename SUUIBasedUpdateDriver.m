@@ -43,6 +43,8 @@
 - (void)updateAlert:(SUUpdateAlert *)alert finishedWithChoice:(SUUpdateAlertChoice)choice
 {
 	[updateAlert release]; updateAlert = nil;
+	if ([delegate respondsToSelector:@selector(userChoseAction:forUpdate:)])
+		[delegate userChoseAction:choice forUpdate:updateItem];
 	[[SUUserDefaults standardUserDefaults] setObject:nil forKey:SUSkippedVersionKey];
 	switch (choice)
 	{

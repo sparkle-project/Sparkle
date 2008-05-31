@@ -33,22 +33,35 @@
 @end
 
 @interface NSObject (SUUpdaterDelegateInformalProtocol)
-/*!
-    @method     
-    @abstract   Delegate method for host apps to define additional feed parameters
-	@discussion This method allows you to add extra parameters to the appcast URL, potentially based on whether or not Sparkle will also be sending along the system profile. This method should return an array of dictionaries with the  following keys:
- 
- key: 		The key to be used  when reporting data to the server
- 
- visibleKey:	Alternate version of key to be used in UI displays of profile information
- 
- value:		Value to be used when reporting data to the server
- 
- visibleValue:	Alternate version of value to be used in UI displays of profile information.
-*/
-
-
+// This method allows you to add extra parameters to the appcast URL, potentially based on whether or not
+// Sparkle will also be sending along the system profile. This method should return an array of dictionaries with the following keys:
 - (NSArray *)feedParametersForUpdater:(SUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
+
+// Use this to override the default behavior for Sparkle prompting the user about automatic update checks.
+- (BOOL)shouldPromptForPermissionToCheckForUpdates;
+
+// Implement this if you want to do some special handling with the appcast once it finishes loading.
+- (void)appcastDidFinishLoading:(SUAppcast *)appcast;
+
+// If you're using special logic or extensions in your appcast, implement this to use your own logic for finding
+// a valid update, if any, in the given appcast.
+- (SUAppcastItem *)bestValidUpdateInAppcast:(SUAppcast *)appcast;
+
+// Sent when a valid update is found by the update driver.
+- (void)didFindValidUpdate:(SUAppcastItem *)update;
+
+// Sent when the user makes a choice in the update alert dialog (install now / remind me later / skip this version).
+- (void)userChoseAction:(SUUpdateAlertChoice)action forUpdate:(SUAppcastItem *)update;
+
+// Sent immediately before installing the specified update.
+- (void)updateWillInstall:(SUAppcastItem *)update;
+
+// Return YES to delay the relaunch until you do some processing; invoke the given NSInvocation to continue.
+- (BOOL)shouldPostponeRelaunchForUpdate:(SUAppcastItem *)update untilInvoking:(NSInvocation *)invocation;
+
+// Called immediately before relaunching.
+- (void)updaterWillRelaunchApplication;
+
 @end
 
 // Define some minimum intervals to avoid DOS-like checking attacks. These are in seconds.

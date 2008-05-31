@@ -23,6 +23,8 @@
 	NSURL *fileURL;
 	NSString *versionString;
 	NSString *displayVersionString;
+	
+	NSDictionary *propertiesDictionary;
 }
 
 // Initializes with data from a dictionary provided by the RSS class.
@@ -37,6 +39,9 @@
 - (NSURL *)fileURL;
 - (NSString *)DSASignature;
 - (NSString *)minimumSystemVersion;
+
+// Returns the dictionary provided in initWithDictionary; this might be useful later for extensions.
+- (NSDictionary *)propertiesDictionary;
 
 @end
 

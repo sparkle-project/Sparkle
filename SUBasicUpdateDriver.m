@@ -58,17 +58,28 @@
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac
 {
+	if ([delegate respondsToSelector:@selector(appcastDidFinishLoading:)])
+		[delegate appcastDidFinishLoading:ac];
+	
 	NSArray* updates = [ac items];
 	if ([updates count] > 0)
 		[[SUUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:SULastCheckTimeKey];
 	
-	// Find the first update we can actually use.
-	NSEnumerator *updateEnumerator = [updates objectEnumerator];
-	do {
-		updateItem = [updateEnumerator nextObject];
-	} while (updateItem && ![self hostSupportsItem:updateItem]);
-	
-	[updateItem retain];
+	// Now we have to find the best valid update in the appcast.
+	if ([delegate respondsToSelector:@selector(bestValidUpdateInAppcast:)]) // Does the delegate want to handle it?
+	{
+		updateItem = [delegate bestValidUpdateInAppcast:ac];
+	}
+	else // If not, we'll take care of it ourselves.
+	{
+		// Find the first update we can actually use.
+		NSEnumerator *updateEnumerator = [updates objectEnumerator];
+		do {
+			updateItem = [updateEnumerator nextObject];
+		} while (updateItem && ![self hostSupportsItem:updateItem]);
+		
+		[updateItem retain];
+	}
 	CFRelease(ac); // Remember that we're explicitly managing the memory of the appcast.
 	if (updateItem == nil) { [self didNotFindUpdate]; return; }
 	
@@ -86,6 +97,8 @@
 
 - (void)didFindValidUpdate
 {
+	if ([delegate respondsToSelector:@selector(didFindValidUpdate:)])
+		[delegate didFindValidUpdate:updateItem];
 	[self downloadUpdate];
 }
 
@@ -168,6 +181,8 @@
 
 - (void)installUpdate
 {
+	if ([delegate respondsToSelector:@selector(updateWillInstall:)])
+		[delegate updateWillInstall:updateItem];
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
 	NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]]  pathForResource:@"relaunch" ofType:@""];
 	NSString *targetPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
@@ -188,8 +203,22 @@
 
 - (void)relaunchHostApp
 {
+	// Give the host app an opportunity to postpone the relaunch.
+	static BOOL postponedOnce = NO;
+	if (!postponedOnce && [delegate respondsToSelector:@selector(shouldPostponeRelaunchForUpdate:untilInvoking:)])
+	{
+		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[[self class] instanceMethodSignatureForSelector:@selector(relaunchHostApp)] retain]];
+		[invocation setSelector:@selector(relaunchHostApp)];
+		[invocation setTarget:self];
+		postponedOnce = YES;
+		if ([delegate shouldPostponeRelaunchForUpdate:updateItem untilInvoking:invocation])
+			return;
+	}
+	
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-		
+	if ([delegate respondsToSelector:@selector(updaterWillRelaunchApplication)])
+		[delegate updaterWillRelaunchApplication];
+	
 	@try
 	{		
 		if(!relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath])

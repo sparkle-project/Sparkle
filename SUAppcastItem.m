@@ -97,6 +97,7 @@
 	self = [super init];
 	if (self)
 	{
+		propertiesDictionary = [dict retain];
 		[self setTitle:[dict objectForKey:@"title"]];
 		[self setDate:[dict objectForKey:@"pubDate"]];
 		[self setDescription:[dict objectForKey:@"description"]];
@@ -156,7 +157,13 @@
     [self setFileURL:nil];
     [self setVersionString:nil];
 	[self setDisplayVersionString:nil];
+	[propertiesDictionary release];
     [super dealloc];
+}
+
+- (NSDictionary *)propertiesDictionary
+{
+	return propertiesDictionary;
 }
 
 @end
