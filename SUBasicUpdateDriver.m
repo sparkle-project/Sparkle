@@ -135,8 +135,7 @@
 	// DSA verification, if activated by the developer
 	if ([[hostBundle objectForInfoDictionaryKey:SUExpectsDSASignatureKey] boolValue])
 	{
-		NSString *pkeyString = [hostBundle objectForInfoDictionaryKey:SUPublicDSAKeyKey];
-		if (![[NSFileManager defaultManager] validatePath:downloadPath withEncodedDSASignature:[updateItem DSASignature] withPublicDSAKey:pkeyString])
+		if (![[NSFileManager defaultManager] validatePath:downloadPath withEncodedDSASignature:[updateItem DSASignature] withPublicDSAKey:[hostBundle publicDSAKey]])
 		{
 			[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUSignatureError userInfo:[NSDictionary dictionaryWithObject:@"The update is improperly signed." forKey:NSLocalizedDescriptionKey]]];
 			return;

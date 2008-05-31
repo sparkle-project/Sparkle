@@ -65,6 +65,18 @@
 	return isDiskImage && !isFileVault;
 }
 
+- (NSString *)publicDSAKey
+{
+	// Maybe the key is just a string in the Info.plist.
+	NSString *key = [self objectForInfoDictionaryKey:SUPublicDSAKeyKey];
+	if (key) { return key; }
+	
+	// More likely, we've got a reference to a Resources file by filename:
+	NSString *keyFilename = [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];
+	if (!keyFilename) { return nil; }
+	return [NSString stringWithContentsOfFile:[self pathForResource:keyFilename ofType:nil]];
+}
+
 - (NSArray *)systemProfile
 {
 	return [[SUSystemProfiler sharedSystemProfiler] systemProfileArrayForHostBundle:self];

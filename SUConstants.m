@@ -20,6 +20,7 @@ NSString *SUScheduledCheckIntervalKey = @"SUScheduledCheckInterval";
 NSString *SULastCheckTimeKey = @"SULastCheckTime";
 NSString *SUExpectsDSASignatureKey = @"SUExpectsDSASignature";
 NSString *SUPublicDSAKeyKey = @"SUPublicDSAKey";
+NSString *SUPublicDSAKeyFileKey = @"SUPublicDSAKeyFile";
 NSString *SUAutomaticallyUpdateKey = @"SUAutomaticallyUpdate";
 NSString *SUAllowsAutomaticUpdatesKey = @"SUAllowsAutomaticUpdates";
 NSString *SUEnableSystemProfilingKey = @"SUEnableSystemProfiling";

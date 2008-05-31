@@ -50,6 +50,8 @@
 	@discussion Returns an array of dictionaries; each dictionary represents a piece of data and has keys "key", "visibleKey", "value", and "visibleValue".
 */
 - (NSArray *)systemProfile;
+
+- (NSString *)publicDSAKey;
 @end
 
 #endif
