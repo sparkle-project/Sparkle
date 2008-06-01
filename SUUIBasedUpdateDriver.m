@@ -78,10 +78,7 @@
 - (IBAction)cancelDownload:sender
 {
 	if (download)
-	{
 		[download cancel];
-		[download release];
-	}
 	[self abortUpdate];
 }
 
