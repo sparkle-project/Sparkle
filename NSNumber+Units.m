@@ -17,7 +17,7 @@
 		return [NSString stringWithFormat:@"%.0lf %@", value, SULocalizedString(@"B", @"the unit for bytes")];
 	
 	if (value < 1024 * 1024)
-		return [NSString stringWithFormat:@"%.0lf %@", value / 1024.0, SULocalizedString(@"kB", @"the unit for kilobytes")];
+		return [NSString stringWithFormat:@"%.0lf %@", value / 1024.0, SULocalizedString(@"KB", @"the unit for kilobytes")];
 
 	if (value < 1024 * 1024 * 1024)
 		return [NSString stringWithFormat:@"%.1lf %@", value / 1024.0 / 1024.0, SULocalizedString(@"MB", @"the unit for megabytes")];
