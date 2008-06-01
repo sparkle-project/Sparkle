@@ -3,15 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>IBFramework Version</key>
-	<string>644</string>
+	<string>658</string>
 	<key>IBLastKnownRelativeProjectPath</key>
-	<string>../../Sparkle.xcodeproj</string>
+	<string>../Sparkle.xcodeproj</string>
 	<key>IBOldestOS</key>
 	<integer>5</integer>
 	<key>IBOpenObjects</key>
 	<array>
+		<integer>39</integer>
 		<integer>6</integer>
-		<integer>42</integer>
 	</array>
 	<key>IBSystem Version</key>
 	<string>9C7010</string>
