@@ -14,7 +14,6 @@ GCC_PRECOMPILE_PREFIX_HEADER = YES
 GCC_PREFIX_HEADER = $(SDKROOT)/System/Library/Frameworks/Cocoa.framework/Headers/Cocoa.h
 GCC_FAST_OBJC_DISPATCH = YES
 GCC_FAST_OBJC_DISPATCH[arch=ppc] = NO // requires 10.4
-GCC_ENABLE_OBJC_GC = supported
 
 // Enable warnings
 GCC_WARN_CHECK_SWITCH_STATEMENTS = YES
