@@ -32,6 +32,8 @@
 	SUAssertAscending(@"1.0b1", @"1.0");
 	SUAssertAscending(@"0.9", @"1.0a1");
 	SUAssertAscending(@"1.0b", @"1.0b2");
+	SUAssertAscending(@"1.0b10", @"1.0b11");
+	SUAssertAscending(@"1.0b9", @"1.0b10");
 	SUAssertAscending(@"1.0rc", @"1.0");
 	SUAssertAscending(@"1.0b", @"1.0");
 	SUAssertAscending(@"1.0pre1", @"1.0");
