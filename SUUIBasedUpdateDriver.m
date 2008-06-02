@@ -31,7 +31,8 @@
 {
 	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"You're up to date!", nil) defaultButton:SULocalizedString(@"OK", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [hostBundle name], [hostBundle displayVersion]];
 	[alert setIcon:[hostBundle icon]];
-	[alert runModal];	
+	[alert runModal];
+	[self abortUpdate];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification
