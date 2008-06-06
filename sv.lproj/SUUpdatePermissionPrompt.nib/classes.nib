@@ -1,0 +1,34 @@
+{
+    IBClasses =     (
+                {
+            CLASS = FirstResponder;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSObject;
+        },
+                {
+            CLASS = NSObject;
+            LANGUAGE = ObjC;
+        },
+                {
+            ACTIONS =             {
+                finishPrompt = id;
+                toggleMoreInfo = id;
+            };
+            CLASS = SUUpdatePermissionPrompt;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                delegate = id;
+                descriptionTextField = NSTextField;
+                moreInfoButton = NSButton;
+                moreInfoView = NSView;
+            };
+            SUPERCLASS = SUWindowController;
+        },
+                {
+            CLASS = SUWindowController;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSWindowController;
+        }
+    );
+    IBVersion = 1;
+}
