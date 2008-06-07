@@ -1,6 +1,8 @@
 
 #import <AppKit/AppKit.h>
 
+#include <unistd.h>
+
 @interface TerminationListener : NSObject
 {
 	const char *executablePath;

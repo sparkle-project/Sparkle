@@ -9,6 +9,8 @@
 #ifndef NSBUNDLE_PLUS_ADDITIONS_H
 #define NSBUNDLE_PLUS_ADDITIONS_H
 
+#import <Cocoa/Cocoa.h>
+
 @interface NSBundle (SUAdditions)
 /*!
 	@method     
