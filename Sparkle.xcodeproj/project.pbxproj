@@ -1001,6 +1001,7 @@
 		61072EAD0DF263BD008FE88B /* Release (GC dual-mode; 10.5-only) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_VERSION = "";
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
 		};
