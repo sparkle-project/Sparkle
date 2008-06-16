@@ -70,7 +70,7 @@
 	[statusController setMaxProgressValue:[response expectedContentLength]];
 }
 
-- (void)download:(NSURLDownload *)download didReceiveDataOfLength:(unsigned)length
+- (void)download:(NSURLDownload *)download didReceiveDataOfLength:(NSUInteger)length
 {
 	[statusController setProgressValue:[statusController progressValue] + length];
 	[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [NSNumber humanReadableSizeFromDouble:[statusController progressValue]], [NSNumber humanReadableSizeFromDouble:[statusController maxProgressValue]]]];
