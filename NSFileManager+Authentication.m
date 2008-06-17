@@ -229,11 +229,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	// Trash the old copy of the app.
 	NSInteger tag = 0;
 	if (![[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[tmpPath stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[tmpPath lastPathComponent]] tag:&tag])
-	{
-		if (error != NULL)
-			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to the trash. This is often a sign of a permissions error.", src, dst] forKey:NSLocalizedDescriptionKey]];
-		return NO;					
-	}
+		NSLog(@"Sparkle error: couldn't move %@ to the trash. This is often a sign of a permissions error.", src, dst);
 	
 	// If the currently-running application is trusted, the new
 	// version should be trusted as well.  Remove it from the
