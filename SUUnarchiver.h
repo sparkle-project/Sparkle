@@ -11,12 +11,13 @@
 
 @interface SUUnarchiver : NSObject {
 	id delegate;
-	NSString *archivePath;
+	NSURL *archiveURL;
 }
 
-- (void)unarchivePath:(NSString *)path;
++ (SUUnarchiver *)unarchiverForURL:(NSURL *)URL;
 - (void)setDelegate:delegate;
-- (void)cleanUp;
+
+- (void)start;
 
 @end
 

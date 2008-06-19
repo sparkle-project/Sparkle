@@ -162,9 +162,10 @@
 		}
 	}
 	
-	unarchiver = [[SUUnarchiver alloc] init];
+	unarchiver = [[SUUnarchiver unarchiverForURL:[[[NSURL alloc] initFileURLWithPath:downloadPath] autorelease]] retain];
+#warning check for nonexistant unarchiver
 	[unarchiver setDelegate:self];
-	[unarchiver unarchivePath:downloadPath];
+	[unarchiver start];
 }
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)ua
@@ -197,7 +198,6 @@
 - (void)installerFinishedForHostBundle:(NSBundle *)hb
 {
 	if (hb != hostBundle) { return; }
-	[unarchiver cleanUp];
 	[self relaunchHostApp];
 }
 

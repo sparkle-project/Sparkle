@@ -62,7 +62,6 @@
 - (void)installerFinishedForHostBundle:(NSBundle *)hb
 {
 	if (hb != hostBundle) { return; }
-	[unarchiver cleanUp];
 	if (!postponingInstallation)
 		[self relaunchHostApp];
 }

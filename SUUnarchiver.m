@@ -9,147 +9,22 @@
 
 #import "Sparkle.h"
 #import "SUUnarchiver.h"
+#import "SUUnarchiver_Private.h"
 
 @implementation SUUnarchiver
 
-// This method abstracts the types that use a command line tool piping data from stdin.
-- (BOOL)_extractArchivePipingDataToCommand:(NSString *)command
+extern NSMutableArray *__unarchiverImplementations;
+
++ (SUUnarchiver *)unarchiverForURL:(NSURL *)URL
 {
-	// Get the file size.
-	NSNumber *fs = [[[NSFileManager defaultManager] fileAttributesAtPath:archivePath traverseLink:NO] objectForKey:NSFileSize];
-	if (fs == nil) { return NO; }
-		
-	// Thank you, Allan Odgaard!
-	// (who wrote the following extraction alg.)
-	
-	long current = 0;
-	FILE *fp, *cmdFP;
-	if ((fp = fopen([archivePath fileSystemRepresentation], "r")))
+	NSEnumerator *implementationEnumerator = [[self _unarchiverImplementations] objectEnumerator];
+	id current;
+	while ((current = [implementationEnumerator nextObject]))
 	{
-		setenv("DESTINATION", [[archivePath stringByDeletingLastPathComponent] UTF8String], 1);
-		if ((cmdFP = popen([command fileSystemRepresentation], "w")))
-		{
-			char buf[32*1024];
-			long len;
-			while((len = fread(buf, 1, 32 * 1024, fp)))
-			{				
-				current += len;
-				
-				NSEvent *event;
-				while((event = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:nil inMode:NSDefaultRunLoopMode dequeue:YES]))
-					[NSApp sendEvent:event];
-				
-				fwrite(buf, 1, len, cmdFP);
-				
-				[self performSelectorOnMainThread:@selector(notifyDelegateOfExtractedLength:) withObject:[NSNumber numberWithLong:len] waitUntilDone:NO];
-			}
-			pclose(cmdFP);
-		}
-		fclose(fp);
-	}	
-
-	return YES;
-}
-
-- (BOOL)_extractTAR
-{
-	return [self _extractArchivePipingDataToCommand:@"tar -xC \"$DESTINATION\""];
-}
-
-- (BOOL)_extractTGZ
-{
-	return [self _extractArchivePipingDataToCommand:@"tar -zxC \"$DESTINATION\""];
-}
-
-- (BOOL)_extractTBZ
-{
-	return [self _extractArchivePipingDataToCommand:@"tar -jxC \"$DESTINATION\""];
-}
-
-- (BOOL)_extractZIP
-{
-	return [self _extractArchivePipingDataToCommand:@"ditto -x -k - \"$DESTINATION\""];
-}
-
-- (BOOL)_extractDMG
-{		
-	// get a unique mount point path
-	NSString *mountPoint = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"mp"];
-	int cnt=1;
-	while ([[NSFileManager defaultManager] fileExistsAtPath:mountPoint] && cnt <= 999)
-		mountPoint = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"mp%d", cnt++]];
-	
-	if (![[NSFileManager defaultManager] fileExistsAtPath:mountPoint])
-	{		
-		// create mount point folder
-		[[NSFileManager defaultManager] createDirectoryAtPath:mountPoint attributes:nil];
-		
-		if ([[NSFileManager defaultManager] fileExistsAtPath:mountPoint])
-		{
-			NSArray* arguments = [NSArray arrayWithObjects:@"attach", archivePath, @"-mountpoint", mountPoint, @"-noverify", @"-nobrowse", @"-noautoopen", nil];
-			// set up a pipe and push "yes" (y works too), this will accept any license agreement crap
-			// not every .dmg needs this, but this will make sure it works with everyone
-			NSData* yesData = [[[NSData alloc] initWithBytes:"yes\n" length:4] autorelease];
-			
-			[NTSynchronousTask task:@"/usr/bin/hdiutil" directory:@"/" withArgs:arguments input:yesData];
-		}
+		if ([current _canUnarchiveURL:URL])
+			return [[[current alloc] _initWithURL:URL] autorelease];
 	}
-	
-	return YES;
-}
-
-- (void)_unarchive
-{
-	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-
-	// This dictionary associates names of methods responsible for extraction with file extensions.
-	// The methods take the path of the archive to extract. They return a BOOL indicating whether
-	// we should continue with the update; returns NO if an error occurred.
-	NSDictionary *commandDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
-																   @"_extractTBZ", @".tbz",
-																   @"_extractTBZ", @".tar.bz2",
-																   @"_extractTGZ", @".tgz",
-																   @"_extractTGZ", @".tar.gz",
-																   @"_extractTAR", @".tar", 
-																   @"_extractZIP", @".zip", 
-																   @"_extractDMG", @".dmg",
-																   nil];
-	SEL command = NULL;
-	NSString *theLastPathComponent = [[archivePath lastPathComponent] lowercaseString];
-	NSEnumerator *theEnumerator = [[commandDictionary allKeys] objectEnumerator];
-	NSString *theExtension = NULL;
-	while ((theExtension = [theEnumerator nextObject]) != NULL)
-	{
-		if ([[theLastPathComponent substringFromIndex:[theLastPathComponent length] - [theExtension length]] isEqualToString:theExtension])
-		{
-			command = NSSelectorFromString([commandDictionary objectForKey:theExtension]);
-			break;
-		}
-	}
-	
-	BOOL result;
-	if (command)
-	{
-		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[self methodSignatureForSelector:command]];
-		[invocation setSelector:command];
-		[invocation invokeWithTarget:self];
-		[invocation getReturnValue:&result];
-	}
-	else
-		result = NO;
-	
-	if (result)
-		[self performSelectorOnMainThread:@selector(notifyDelegateOfSuccess) withObject:nil waitUntilDone:NO];
-	else
-		[self performSelectorOnMainThread:@selector(notifyDelegateOfFailure) withObject:nil waitUntilDone:NO];
-
-	[pool release];
-}
-
-- (void)unarchivePath:(NSString *)path
-{
-	archivePath = [path copy];
-	[NSThread detachNewThreadSelector:@selector(_unarchive) toTarget:self withObject:nil];
+	return nil;
 }
 
 - (void)setDelegate:del
@@ -157,37 +32,9 @@
 	delegate = del;
 }
 
-- (void)cleanUp
+- (void)start
 {
-	if ([[archivePath pathExtension] isEqualToString:@".dmg"])
-	{
-		[NSTask launchedTaskWithLaunchPath:@"/usr/bin/hdiutil" arguments:[NSArray arrayWithObjects:@"detach", [archivePath stringByDeletingLastPathComponent], @"-force", nil]];	
-	}
-	[[NSFileManager defaultManager] removeFileAtPath:archivePath handler:nil];
-}
-
-- (void)dealloc
-{
-	[archivePath release];
-	[super dealloc];
-}
-
-- (void)notifyDelegateOfExtractedLength:(long)length
-{
-	if ([delegate respondsToSelector:@selector(unarchiver:extractedLength:)])
-		[delegate unarchiver:self extractedLength:length];
-}
-
-- (void)notifyDelegateOfSuccess
-{
-	if ([delegate respondsToSelector:@selector(unarchiverDidFinish:)])
-		[delegate performSelector:@selector(unarchiverDidFinish:) withObject:self];
-}
-
-- (void)notifyDelegateOfFailure
-{
-	if ([delegate respondsToSelector:@selector(unarchiverDidFail:)])
-		[delegate performSelector:@selector(unarchiverDidFail:) withObject:self];
+	// No-op
 }
 
 @end

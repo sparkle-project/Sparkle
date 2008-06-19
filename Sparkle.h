@@ -14,6 +14,7 @@
 #define SPARKLE_H
 
 #define SULocalizedString(key,comment) NSLocalizedStringFromTableInBundle(key, @"Sparkle", [NSBundle bundleForClass:[self class]], comment)
+#define SUAbstractFail() NSAssert2(nil, @"Can't call %@ on an instance of %@; this is an abstract method!", __PRETTY_FUNCTION__, [self class]);
 
 #ifdef __OBJC__
 #import <Cocoa/Cocoa.h>
