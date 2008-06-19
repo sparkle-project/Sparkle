@@ -184,6 +184,11 @@ NSComparisonResult compareNewsItems(id item1, id item2, void *context)
 	[delegate feed:self didFailWithError:error];
 }
 
+- (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse
+{
+	return request;
+}
+
 - (NSDictionary *) headerItems {
 	
 	return (headerItems);
