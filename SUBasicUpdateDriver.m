@@ -162,19 +162,26 @@
 		}
 	}
 	
-	unarchiver = [[SUUnarchiver unarchiverForURL:[[[NSURL alloc] initFileURLWithPath:downloadPath] autorelease]] retain];
-#warning check for nonexistant unarchiver
+	SUUnarchiver *unarchiver = [[SUUnarchiver unarchiverForURL:[[[NSURL alloc] initFileURLWithPath:downloadPath] autorelease]] retain];
+	CFRetain(unarchiver); // Manage this memory manually so we don't have to make it an IV.
+	if (!unarchiver)
+	{
+		NSLog(@"Sparkle Error: No valid unarchiver for %@!", downloadPath);
+		[self unarchiverDidFail:nil];
+	}
 	[unarchiver setDelegate:self];
 	[unarchiver start];
 }
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)ua
 {
+	if (ua) { CFRelease(ua); }
 	[self installUpdate];
 }
 
 - (void)unarchiverDidFail:(SUUnarchiver *)ua
 {
+	if (ua) { CFRelease(ua); }
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:[NSDictionary dictionaryWithObject:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) forKey:NSLocalizedDescriptionKey]]];
 }
 
@@ -262,8 +269,6 @@
 	[hostBundle release];
 	[downloadPath release];
 	[relaunchPath release];
-	[unarchiver release];
-	[download release];
 	[super dealloc];
 }
 
