@@ -16,30 +16,22 @@
 - (id) initWithExecutablePath:(const char *)execPath parentProcessId:(pid_t)ppid
 {
 	self = [super init];
-	if (self != nil) {
+	if (self != nil)
+	{
 		executablePath = execPath;
 		parentProcessId = ppid;
-		
-		[[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(applicationDidTerminate:) name:NSWorkspaceDidTerminateApplicationNotification object:nil];
-		if (getppid() == 1) {
-			// ppid is launchd (1) => parent terminated already
+		if (getppid() == 1) // ppid is launchd (1) => parent terminated already
 			[self relaunch];
-		}
-		
-		ProcessSerialNumber psn;
-		if (GetProcessForPID(ppid, &psn) == procNotFound) {
-			[self relaunch];
-		}
+		[NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(watchdog:) userInfo:nil repeats:YES];
 	}
 	return self;
 }
 
-- (void) applicationDidTerminate:(NSNotification *)notification
+- (void)watchdog:(NSTimer *)timer
 {
-	if (parentProcessId == [[[notification userInfo] valueForKey:@"NSApplicationProcessIdentifier"] intValue]) {
-		// parent just terminated
+	ProcessSerialNumber psn;
+	if (GetProcessForPID(parentProcessId, &psn) == procNotFound)
 		[self relaunch];
-	}
 }
 
 - (void) relaunch
