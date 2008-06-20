@@ -42,6 +42,7 @@
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	NSString *archivePath = [archiveURL path];
+	FILE *fp = NULL, *cmdFP = NULL;
 	
 	// Get the file size.
 	NSNumber *fs = [[[NSFileManager defaultManager] fileAttributesAtPath:archivePath traverseLink:NO] objectForKey:NSFileSize];
@@ -49,27 +50,21 @@
 	
 	// Thank you, Allan Odgaard!
 	// (who wrote the following extraction alg.)
+	fp = fopen([archivePath fileSystemRepresentation], "r");
+	if (!fp) goto reportError;
 	
-	long current = 0;
-	FILE *fp, *cmdFP;
-	if ((fp = fopen([archivePath fileSystemRepresentation], "r")))
-	{
-		setenv("DESTINATION", [[archivePath stringByDeletingLastPathComponent] UTF8String], 1);
-		if ((cmdFP = popen([command fileSystemRepresentation], "w")))
-		{
-			char buf[32*1024];
-			long len;
-			while((len = fread(buf, 1, 32*1024, fp)))
-			{				
-				current += len;				
-				fwrite(buf, 1, len, cmdFP);
-				[self performSelectorOnMainThread:@selector(_notifyDelegateOfExtractedLength:) withObject:[NSNumber numberWithLong:len] waitUntilDone:NO];
-			}
-			pclose(cmdFP);
-		}
-		else goto reportError;
+	setenv("DESTINATION", [[archivePath stringByDeletingLastPathComponent] UTF8String], 1);
+	cmdFP = popen([command fileSystemRepresentation], "w");
+	if (!cmdFP) goto reportError;
+	
+	char buf[32*1024];
+	long len;
+	while((len = fread(buf, 1, 32*1024, fp)))
+	{				
+		fwrite(buf, 1, len, cmdFP);
+		[self performSelectorOnMainThread:@selector(_notifyDelegateOfExtractedLength:) withObject:[NSNumber numberWithLong:len] waitUntilDone:NO];
 	}
-	else goto reportError;
+	pclose(cmdFP);
 	
 	[self performSelectorOnMainThread:@selector(_notifyDelegateOfSuccess) withObject:nil waitUntilDone:NO];
 	goto finally;
