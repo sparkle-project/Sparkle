@@ -223,6 +223,7 @@ static SUUpdater *sharedUpdater = nil;
 
 - (void)setHostBundle:(NSBundle *)hb
 {
+	if (hostBundle == hb) return;
 	[hostBundle release];
 	hostBundle = [hb retain];
 	[[SUUserDefaults standardUserDefaults] setIdentifier:[hostBundle bundleIdentifier]];

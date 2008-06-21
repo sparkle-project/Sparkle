@@ -27,8 +27,11 @@
 
 - (void)setIdentifier:(NSString *)anIdentifier
 {
-	[identifier autorelease];
-	identifier = [anIdentifier copy];
+	if (identifier != anIdentifier)
+	{
+		[identifier release];
+		identifier = [anIdentifier copy];
+	}
 }
 
 - (void)verifyIdentifier

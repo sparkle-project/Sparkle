@@ -61,7 +61,11 @@
 - (void)setButtonTitle:(NSString *)aButtonTitle target:target action:(SEL)action isDefault:(BOOL)isDefault
 {
 	[self willChangeValueForKey:@"buttonTitle"];
-	buttonTitle = [aButtonTitle copy];
+	if (buttonTitle != aButtonTitle)
+	{
+		[buttonTitle release];
+		buttonTitle = [aButtonTitle copy];
+	}
 	[self didChangeValueForKey:@"buttonTitle"];	
 	
 	[self window];
@@ -113,7 +117,11 @@
 
 - (void)setStatusText:(NSString *)aStatusText
 {
-	statusText = [aStatusText copy];
+	if (statusText != aStatusText)
+	{
+		[statusText release];
+		statusText = [aStatusText copy];
+	}
 }
 
 @end

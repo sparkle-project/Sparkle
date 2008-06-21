@@ -70,8 +70,11 @@
 
 - (void)setUserAgentString:(NSString *)uas
 {
-	[userAgentString release];
-	userAgentString = [uas copy];
+	if (uas != userAgentString)
+	{
+		[userAgentString release];
+		userAgentString = [uas copy];
+	}
 }
 
 - (void)setDelegate:del
