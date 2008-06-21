@@ -585,7 +585,7 @@ NSComparisonResult compareNewsItems(id item1, id item2, void *context)
 
 				shortTitle = [shortTitle trimWhiteSpace];
 				
-				title = [NSString stringWithFormat: @"%@...", shortTitle];				
+				title = [NSString stringWithFormat: @"%@\u2026", shortTitle];				
 				} /*else*/				
 			} /*if*/
 			
@@ -609,7 +609,7 @@ NSComparisonResult compareNewsItems(id item1, id item2, void *context)
 		
 		[rssItem setObject: description forKey: descriptionKey];
 		
-		title = [NSString stringWithFormat: @"%@...", shortTitle];				
+		title = [NSString stringWithFormat: @"%@\u2026", shortTitle];				
 		
 		[rssItem setObject: title forKey: titleKey];
 		} /*if*/
