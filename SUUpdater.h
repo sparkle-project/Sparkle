@@ -18,6 +18,8 @@
 	id delegate;
 }
 
++ (SUUpdater *)sharedUpdater;
+
 - (void)setHostBundle:(NSBundle *)hostBundle;
 - (void)setDelegate:(id)delegate;
 
