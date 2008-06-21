@@ -50,16 +50,13 @@ static NSMutableArray *__unarchiverImplementations;
 
 + (void)_registerImplementation:(Class)implementation
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	if (!__unarchiverImplementations)
-		__unarchiverImplementations = [[NSMutableArray array] retain];
+		__unarchiverImplementations = [[NSMutableArray alloc] init];
 	[__unarchiverImplementations addObject:implementation];
-	[pool drain];
 }
 
 + (NSArray *)_unarchiverImplementations
 {
-	//return [NSArray arrayWithObjects:NSClassFromString(@"SUPipedUnarchiver"), NSClassFromString(@"SUDiskImageUnarchiver"), nil];
 	return [NSArray arrayWithArray:__unarchiverImplementations];
 }
 
