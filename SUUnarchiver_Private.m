@@ -50,9 +50,11 @@ static NSMutableArray *__unarchiverImplementations;
 
 + (void)_registerImplementation:(Class)implementation
 {
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	if (!__unarchiverImplementations)
 		__unarchiverImplementations = [[NSMutableArray array] retain];
 	[__unarchiverImplementations addObject:implementation];
+	[pool drain];
 }
 
 + (NSArray *)_unarchiverImplementations
