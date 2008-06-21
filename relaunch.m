@@ -36,7 +36,7 @@
 
 - (void) relaunch
 {
-	[[NSWorkspace sharedWorkspace] launchApplication:[NSString stringWithUTF8String:executablePath]];
+	[[NSWorkspace sharedWorkspace] openFile:[NSString stringWithUTF8String:executablePath]];
 	[[NSFileManager defaultManager] removeFileAtPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"relaunch"] handler:nil];
 	exit(0);
 }
