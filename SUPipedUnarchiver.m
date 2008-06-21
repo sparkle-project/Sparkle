@@ -53,7 +53,7 @@
 	fp = fopen([archivePath fileSystemRepresentation], "r");
 	if (!fp) goto reportError;
 	
-	setenv("DESTINATION", [[archivePath stringByDeletingLastPathComponent] UTF8String], 1);
+	setenv("DESTINATION", [[archivePath stringByDeletingLastPathComponent] fileSystemRepresentation], 1);
 	cmdFP = popen([command fileSystemRepresentation], "w");
 	if (!cmdFP) goto reportError;
 	

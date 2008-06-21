@@ -66,7 +66,7 @@ static NSMutableArray *__unarchiverImplementations;
 - (NSString *)__UTI
 {
 	FSRef fsRefToItem;
-	FSPathMakeRef((UInt8 *)[[self path] UTF8String], &fsRefToItem, NULL );
+	FSPathMakeRef((UInt8 *)[[self path] fileSystemRepresentation], &fsRefToItem, NULL );
 	
 	NSString *UTI = nil;
 	LSCopyItemAttribute(&fsRefToItem, kLSRolesAll, kLSItemContentType, (CFTypeRef *)(&UTI));

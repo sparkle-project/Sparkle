@@ -137,11 +137,8 @@ static NSString* CheckParents(io_object_t thing,NSString* part,NSMutableDictiona
 	NSMutableDictionary* result = nil;
 	struct statfs fs = {};
 	if (!statfs(ccpath,&fs)) {
-		NSString* from = [NSString stringWithUTF8String:fs.f_mntfromname];
-		result = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-			[NSString stringWithUTF8String:fs.f_fstypename],NSWorkspace_RBfstypename,
-			[NSString stringWithUTF8String:fs.f_mntonname],NSWorkspace_RBmntonname,
-			nil];
+		NSString* from = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:fs.f_mntfromname length:strlen(fs.f_mntfromname)];
+		result = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSString stringWithUTF8String:fs.f_fstypename], NSWorkspace_RBfstypename, [[NSFileManager defaultManager] stringWithFileSystemRepresentation:fs.f_mntonname length:strlen(fs.f_mntonname)], NSWorkspace_RBmntonname, nil];
 		const char* devstring = "/dev/";
 		size_t devstringlen = 5;
 		if (strncmp(fs.f_mntfromname,devstring,devstringlen)==0) {
