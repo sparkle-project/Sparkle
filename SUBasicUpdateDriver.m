@@ -162,13 +162,13 @@
 		}
 	}
 	
-	SUUnarchiver *unarchiver = [[SUUnarchiver unarchiverForURL:[[[NSURL alloc] initFileURLWithPath:downloadPath] autorelease]] retain];
-	CFRetain(unarchiver); // Manage this memory manually so we don't have to make it an IV.
+	SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForURL:[[[NSURL alloc] initFileURLWithPath:downloadPath] autorelease]];
 	if (!unarchiver)
 	{
 		NSLog(@"Sparkle Error: No valid unarchiver for %@!", downloadPath);
 		[self unarchiverDidFail:nil];
 	}
+	CFRetain(unarchiver); // Manage this memory manually so we don't have to make it an IV.
 	[unarchiver setDelegate:self];
 	[unarchiver start];
 }
