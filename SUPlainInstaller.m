@@ -27,7 +27,7 @@ extern NSString *SUInstallerDelegateKey;
 	
 	[self installPath:[info objectForKey:SUInstallerPathKey] overHostBundle:[info objectForKey:SUInstallerHostBundleKey] delegate:[info objectForKey:SUInstallerDelegateKey]];
 	
-	[pool release];
+	[pool drain];
 }
 
 + (void)performInstallationWithPath:(NSString *)path hostBundle:(NSBundle *)hostBundle delegate:delegate synchronously:(BOOL)synchronously;

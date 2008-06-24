@@ -53,7 +53,7 @@ int main (int argc, const char * argv[])
 	[[[TerminationListener alloc] initWithExecutablePath:argv[1] parentProcessId:atoi(argv[2])] autorelease];
 	[[NSApplication sharedApplication] run];
 	
-	[pool release];
+	[pool drain];
 	
 	return EXIT_SUCCESS;
 }
