@@ -20,8 +20,6 @@
 	NSURLDownload *download;
 	NSString *downloadPath;
 	
-	SUUnarchiver *unarchiver;
-	
 	NSString *relaunchPath;
 }
 

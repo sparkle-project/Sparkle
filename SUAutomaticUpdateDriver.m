@@ -15,14 +15,14 @@
 {
 	alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:updateItem hostBundle:hostBundle delegate:self];
 	if ([NSApp isActive])
-		[alert showWindow:self];
+		[[alert window] makeKeyAndOrderFront:self];
 	else
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];	
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification
 {
-	[alert showWindow:self];
+	[[alert window] makeKeyAndOrderFront:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
 }
 
@@ -62,7 +62,6 @@
 - (void)installerFinishedForHostBundle:(NSBundle *)hb
 {
 	if (hb != hostBundle) { return; }
-	[unarchiver cleanUp];
 	if (!postponingInstallation)
 		[self relaunchHostApp];
 }

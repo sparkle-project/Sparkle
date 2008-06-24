@@ -84,7 +84,7 @@
 	NS_HANDLER;
 	NS_ENDHANDLER;
 	
-	[pool release];
+	[pool drain];
 	
 	// retained above
 	[result autorelease];

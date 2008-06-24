@@ -27,8 +27,11 @@
 
 - (void)setIdentifier:(NSString *)anIdentifier
 {
-	[identifier autorelease];
-	identifier = [anIdentifier copy];
+	if (identifier != anIdentifier)
+	{
+		[identifier release];
+		identifier = [anIdentifier copy];
+	}
 }
 
 - (void)verifyIdentifier
@@ -41,6 +44,12 @@
 {
 	[self verifyIdentifier];
 	CFPropertyListRef obj = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)identifier);
+	// Under Tiger, CFPreferencesCopyAppValue doesn't get values from NSRegistratioDomain, so anything
+	// passed into -[NSUserDefaults registerDefaults:] is ignored.  The following line falls
+	// back to using NSUserDefaults, but only if the host bundle is the main bundle, and no value
+	// is found elsewhere.
+	if (obj == NULL && [identifier isEqualToString:[[NSBundle mainBundle] bundleIdentifier]])
+		obj = [[NSUserDefaults standardUserDefaults] objectForKey:defaultName];
 #if MAC_OS_X_VERSION_MIN_REQUIRED > 1050
 	return [NSMakeCollectable(obj) autorelease];
 #else

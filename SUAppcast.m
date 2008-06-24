@@ -35,25 +35,23 @@
 - (void)feedDidFinishLoading:(RSS *)feed
 {
 	// Set up all the appcast items:
-	items = [NSMutableArray array];
+	NSArray *tempItems = [NSMutableArray array];
 	id enumerator = [[feed newsItems] objectEnumerator], current;
 	@try
 	{
 		while ((current = [enumerator nextObject]))
 		{
-			[(NSMutableArray *)items addObject:[[[SUAppcastItem alloc] initWithDictionary:current] autorelease]];
+			[(NSMutableArray *)tempItems addObject:[[[SUAppcastItem alloc] initWithDictionary:current] autorelease]];
 		}
+		items = [[NSArray arrayWithArray:tempItems] retain]; // Make the items list immutable.
+		
+		if ([delegate respondsToSelector:@selector(appcastDidFinishLoading:)])
+			[delegate performSelectorOnMainThread:@selector(appcastDidFinishLoading:) withObject:self waitUntilDone:NO];		
 	}
 	@catch (NSException *parseException)
 	{
 		[self reportError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while parsing the update feed.", nil), NSLocalizedDescriptionKey, [parseException reason], SUTechnicalErrorInformationKey, nil]]];
-		return;
 	}
-	items = [[NSArray arrayWithArray:items] retain]; // Make the items list immutable.
-	
-	if ([delegate respondsToSelector:@selector(appcastDidFinishLoading:)])
-		[delegate performSelectorOnMainThread:@selector(appcastDidFinishLoading:) withObject:self waitUntilDone:NO];
-		
 	CFRelease(feed);
 }
 
@@ -72,8 +70,11 @@
 
 - (void)setUserAgentString:(NSString *)uas
 {
-	[userAgentString release];
-	userAgentString = [uas copy];
+	if (uas != userAgentString)
+	{
+		[userAgentString release];
+		userAgentString = [uas copy];
+	}
 }
 
 - (void)setDelegate:del

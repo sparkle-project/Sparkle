@@ -22,7 +22,7 @@
 	
 	// Only show the update alert if the app is active; otherwise, we'll wait until it is.
 	if ([NSApp isActive])
-		[updateAlert showWindow:self];
+		[[updateAlert window] makeKeyAndOrderFront:self];
 	else
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
@@ -37,7 +37,7 @@
 
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification
 {
-	[updateAlert showWindow:self];
+	[[updateAlert window] makeKeyAndOrderFront:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
 }
 
@@ -51,7 +51,7 @@
 	{
 		case SUInstallUpdateChoice:
 			statusController = [[SUStatusController alloc] initWithHostBundle:hostBundle];
-			[statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", nil) maxProgressValue:0 statusText:nil];
+			[statusController beginActionWithTitle:SULocalizedString(@"Downloading update\u2026", nil) maxProgressValue:0 statusText:nil];
 			[statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
 			[statusController showWindow:self];	
 			[self downloadUpdate];
@@ -70,7 +70,7 @@
 	[statusController setMaxProgressValue:[response expectedContentLength]];
 }
 
-- (void)download:(NSURLDownload *)download didReceiveDataOfLength:(unsigned)length
+- (void)download:(NSURLDownload *)download didReceiveDataOfLength:(NSUInteger)length
 {
 	[statusController setProgressValue:[statusController progressValue] + length];
 	[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [NSNumber humanReadableSizeFromDouble:[statusController progressValue]], [NSNumber humanReadableSizeFromDouble:[statusController maxProgressValue]]]];
@@ -86,7 +86,7 @@
 - (void)extractUpdate
 {
 	// Now we have to extract the downloaded archive.
-	[statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", nil) maxProgressValue:0 statusText:nil];
+	[statusController beginActionWithTitle:SULocalizedString(@"Extracting update\u2026", nil) maxProgressValue:0 statusText:nil];
 	[statusController setButtonEnabled:NO];
 	[super extractUpdate];
 }
@@ -112,7 +112,7 @@
 
 - (void)installUpdate
 {
-	[statusController beginActionWithTitle:SULocalizedString(@"Installing update...", nil) maxProgressValue:0 statusText:nil];
+	[statusController beginActionWithTitle:SULocalizedString(@"Installing update\u2026", nil) maxProgressValue:0 statusText:nil];
 	[statusController setButtonEnabled:NO];
 	[super installUpdate];	
 }

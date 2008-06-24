@@ -17,6 +17,7 @@
 
 - (void)setTitle:(NSString *)aTitle
 {
+	if (title == aTitle) return;
     [title release];
     title = [aTitle copy];
 }
@@ -26,6 +27,7 @@
 
 - (void)setDate:(NSDate *)aDate
 {
+	if (date == aDate) return;
     [date release];
     date = [aDate copy];
 }
@@ -35,6 +37,7 @@
 
 - (void)setDescription:(NSString *)aDescription
 {
+	if (description == aDescription) return;
     [description release];
     description = [aDescription copy];
 }
@@ -44,6 +47,7 @@
 
 - (void)setReleaseNotesURL:(NSURL *)aReleaseNotesURL
 {
+	if (releaseNotesURL == aReleaseNotesURL) return;
     [releaseNotesURL release];
     releaseNotesURL = [aReleaseNotesURL copy];
 }
@@ -53,6 +57,7 @@
 
 - (void)setDSASignature:(NSString *)aDSASignature
 {
+	if (DSASignature == aDSASignature) return;
     [DSASignature release];
     DSASignature = [aDSASignature copy];
 }
@@ -62,6 +67,7 @@
 
 - (void)setFileURL:(NSURL *)aFileURL
 {
+	if (fileURL == aFileURL) return;
     [fileURL release];
     fileURL = [aFileURL copy];
 }
@@ -71,6 +77,7 @@
 
 - (void)setVersionString:(NSString *)s
 {
+	if (versionString == s) return;
     [versionString release];
     versionString = [s copy];
 }
@@ -80,6 +87,7 @@
 
 - (void)setDisplayVersionString:(NSString *)s
 {
+	if (displayVersionString == s) return;
     [displayVersionString release];
     displayVersionString = [s copy];
 }
@@ -88,6 +96,7 @@
 - (NSString *)minimumSystemVersion { return [[minimumSystemVersion retain] autorelease]; }
 - (void)setMinimumSystemVersion:(NSString *)systemVersionString
 {
+	if (minimumSystemVersion == systemVersionString) return;
 	[minimumSystemVersion release];
 	minimumSystemVersion = [systemVersionString copy];
 }

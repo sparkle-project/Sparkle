@@ -16,9 +16,21 @@
 	[super checkForUpdatesAtURL:appcastURL hostBundle:hb];
 	checkingController = [[SUStatusController alloc] initWithHostBundle:hb];
 	[checkingController window]; // Force the checking controller to load its window.
-	[checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates...", nil) maxProgressValue:0 statusText:nil];
+	[checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates\u2026", nil) maxProgressValue:0 statusText:nil];
 	[checkingController setButtonHidden:YES];
 	[checkingController showWindow:self];
+}
+
+- (void)closeCheckingWindow
+{
+	[[checkingController window] close];
+	[checkingController release];
+}
+
+- (void)appcast:(SUAppcast *)ac failedToLoadWithError:(NSError *)error
+{
+	[self closeCheckingWindow];
+	[super appcast:ac failedToLoadWithError:error];
 }
 
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
@@ -29,15 +41,13 @@
 
 - (void)didNotFindUpdate
 {
-	[[checkingController window] close];
-	[checkingController release];
+	[self closeCheckingWindow];
 	[super didNotFindUpdate];
 }
 
 - (void)didFindValidUpdate
 {
-	[[checkingController window] close];
-	[checkingController release];
+	[self closeCheckingWindow];
 	[super didFindValidUpdate];
 }
 

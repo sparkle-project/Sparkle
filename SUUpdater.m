@@ -217,12 +217,12 @@ static SUUpdater *sharedUpdater = nil;
 
 - (void)setDelegate:aDelegate
 {
-	[delegate release];
-	delegate = [aDelegate retain];
+	delegate = aDelegate;
 }
 
 - (void)setHostBundle:(NSBundle *)hb
 {
+	if (hostBundle == hb) return;
 	[hostBundle release];
 	hostBundle = [hb retain];
 	[[SUUserDefaults standardUserDefaults] setIdentifier:[hostBundle bundleIdentifier]];
