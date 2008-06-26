@@ -222,6 +222,8 @@
 		if ([delegate shouldPostponeRelaunchForUpdate:updateItem untilInvoking:invocation])
 			return;
 	}
+
+	[self cleanUp]; // Clean up the download and extracted files.
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
 	if ([delegate respondsToSelector:@selector(updaterWillRelaunchApplication)])
@@ -241,6 +243,11 @@
 		// We intentionally don't abandon the update here so that the host won't initiate another.
 	}
 	[NSApp terminate:self];
+}
+
+- (void)cleanUp
+{
+	[[NSFileManager defaultManager] removeFileAtPath:[downloadPath stringByDeletingLastPathComponent] handler:nil];	
 }
 
 - (void)installerForHostBundle:(NSBundle *)hb failedWithError:(NSError *)error
