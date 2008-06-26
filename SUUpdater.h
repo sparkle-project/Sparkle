@@ -15,7 +15,7 @@
 	SUUpdateDriver *driver;
 	
 	NSBundle *hostBundle;
-	id delegate;
+	IBOutlet id delegate;
 }
 
 + (SUUpdater *)sharedUpdater;
