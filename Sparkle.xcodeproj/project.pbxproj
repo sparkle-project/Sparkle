@@ -1033,6 +1033,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 61072EB20DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig */;
 			buildSettings = {
+				INSTALL_PATH = "@loader_path/../Frameworks";
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
 		};
