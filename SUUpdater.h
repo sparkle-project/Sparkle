@@ -22,7 +22,6 @@
 
 + (SUUpdater *)sharedUpdater;
 
-- (void)setHostBundle:(NSBundle *)hostBundle;
 - (void)setDelegate:(id)delegate;
 
 // This IBAction is meant for a main menu item. Hook up any menu item to this action,
@@ -31,6 +30,14 @@
 
 // This forces an update to begin with a particular driver (see SU*UpdateDriver.h)
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)driver;
+
+// For non-.app updates:
+// Call this when your bundle is loaded to tell Sparkle what to update.
+- (void)setHostBundle:(NSBundle *)hostBundle;
+
+// Call this to appropriately reschedule or cancel the update checking timer if preferences for time interval or automatic checks change.
+// If you're using a .app, this'll be picked up automatically via NSUserDefaultsController, but for non-.apps, there's no way to observe changes.
+- (void)updatePreferencesChanged;
 
 - (BOOL)updateInProgress;
 
