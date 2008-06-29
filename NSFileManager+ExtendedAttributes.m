@@ -20,7 +20,7 @@
 #define XATTR_NOFOLLOW 1
 #endif  // SDK >= 10.4
 
-@implementation NSFileManager (ExtendedAttributes)
+@implementation NSFileManager (MMExtendedAttributes)
 
 - (int)removeXAttr:(const char*)name
           fromFile:(NSString*)file

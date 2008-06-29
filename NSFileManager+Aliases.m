@@ -9,7 +9,7 @@
 #import "NSFileManager+Aliases.h"
 
 
-@implementation NSFileManager (Aliases)
+@implementation NSFileManager (SUAliases)
 
 - (BOOL)isAliasFolderAtPath:(NSString *)path
 {

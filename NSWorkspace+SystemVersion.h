@@ -11,7 +11,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface NSWorkspace (SystemVersion)
+@interface NSWorkspace (SUSystemVersion)
 + (NSString *)systemVersionString;
 @end
 

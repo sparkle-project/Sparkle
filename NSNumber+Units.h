@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 
 
-@interface NSNumber (Units)
+@interface NSNumber (JWUnits)
 
 + (NSString *)humanReadableSizeFromDouble:(double)value;
 
