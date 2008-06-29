@@ -9,7 +9,9 @@
 #ifndef SUUPDATER_H
 #define SUUPDATER_H
 
-@class SUUpdateDriver;
+#import "SUUpdateAlert.h"
+
+@class SUUpdateDriver, SUAppcastItem, SUAppcast;
 @interface SUUpdater : NSObject {
 	NSTimer *checkTimer;
 	SUUpdateDriver *driver;
