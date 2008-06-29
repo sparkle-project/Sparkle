@@ -23,8 +23,18 @@
 
 - (void)closeCheckingWindow
 {
-	[[checkingController window] close];
-	[checkingController release];
+	if (checkingController)
+	{
+		[[checkingController window] close];
+		[checkingController release];
+		checkingController = nil;
+	}
+}
+
+- (void)appcastDidFinishLoading:(SUAppcast *)ac
+{
+	[self closeCheckingWindow];
+	[super appcastDidFinishLoading:ac];
 }
 
 - (void)appcast:(SUAppcast *)ac failedToLoadWithError:(NSError *)error
@@ -37,18 +47,6 @@
 {
 	// We don't check to see if this update's been skipped, because the user explicitly *asked* if he had the latest version.
 	return [self hostSupportsItem:ui] && [self isItemNewer:ui];
-}
-
-- (void)didNotFindUpdate
-{
-	[self closeCheckingWindow];
-	[super didNotFindUpdate];
-}
-
-- (void)didFindValidUpdate
-{
-	[self closeCheckingWindow];
-	[super didFindValidUpdate];
 }
 
 @end
