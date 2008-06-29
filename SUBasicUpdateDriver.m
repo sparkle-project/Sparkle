@@ -58,17 +58,17 @@
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac
 {
-	if ([delegate respondsToSelector:@selector(appcastDidFinishLoading:)])
-		[delegate appcastDidFinishLoading:ac];
+	if ([delegate respondsToSelector:@selector(appcastDidFinishLoading:forHostBundle:)])
+		[delegate appcastDidFinishLoading:ac forHostBundle:hostBundle];
 	
 	NSArray* updates = [ac items];
 	if ([updates count] > 0)
 		[[SUUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:SULastCheckTimeKey];
 	
 	// Now we have to find the best valid update in the appcast.
-	if ([delegate respondsToSelector:@selector(bestValidUpdateInAppcast:)]) // Does the delegate want to handle it?
+	if ([delegate respondsToSelector:@selector(bestValidUpdateInAppcast:forHostBundle:)]) // Does the delegate want to handle it?
 	{
-		updateItem = [delegate bestValidUpdateInAppcast:ac];
+		updateItem = [delegate bestValidUpdateInAppcast:ac forHostBundle:hostBundle];
 	}
 	else // If not, we'll take care of it ourselves.
 	{
@@ -97,13 +97,15 @@
 
 - (void)didFindValidUpdate
 {
-	if ([delegate respondsToSelector:@selector(didFindValidUpdate:)])
-		[delegate didFindValidUpdate:updateItem];
+	if ([delegate respondsToSelector:@selector(didFindValidUpdate:toHostBundle:)])
+		[delegate didFindValidUpdate:updateItem toHostBundle:hostBundle];
 	[self downloadUpdate];
 }
 
 - (void)didNotFindUpdate
 {
+	if ([delegate respondsToSelector:@selector(didNotFindUpdateToHostBundle:)])
+		[delegate didNotFindUpdateToHostBundle:hostBundle];
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUNoUpdateError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:SULocalizedString(@"You already have the newest version of %@.", nil), [hostBundle name]] forKey:NSLocalizedDescriptionKey]]];
 }
 
@@ -190,8 +192,8 @@
 
 - (void)installUpdate
 {
-	if ([delegate respondsToSelector:@selector(updateWillInstall:)])
-		[delegate updateWillInstall:updateItem];
+	if ([delegate respondsToSelector:@selector(updateWillInstall:toHostBundle:)])
+		[delegate updateWillInstall:updateItem toHostBundle:hostBundle];
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
 	NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]]  pathForResource:@"relaunch" ofType:@""];
 	NSString *targetPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
@@ -213,13 +215,13 @@
 {
 	// Give the host app an opportunity to postpone the relaunch.
 	static BOOL postponedOnce = NO;
-	if (!postponedOnce && [delegate respondsToSelector:@selector(shouldPostponeRelaunchForUpdate:untilInvoking:)])
+	if (!postponedOnce && [delegate respondsToSelector:@selector(shouldPostponeRelaunchForUpdate:toHostBundle:untilInvoking:)])
 	{
 		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[[self class] instanceMethodSignatureForSelector:@selector(relaunchHostApp)] retain]];
 		[invocation setSelector:@selector(relaunchHostApp)];
 		[invocation setTarget:self];
 		postponedOnce = YES;
-		if ([delegate shouldPostponeRelaunchForUpdate:updateItem untilInvoking:invocation])
+		if ([delegate shouldPostponeRelaunchForUpdate:updateItem toHostBundle:hostBundle untilInvoking:invocation])
 			return;
 	}
 

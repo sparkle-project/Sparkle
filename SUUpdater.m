@@ -58,9 +58,9 @@ static SUUpdater *sharedUpdater = nil;
 		[[SUUserDefaults standardUserDefaults] boolForKey:SUEnableAutomaticChecksKey] == NO) { return; }
 	
 	// Does the delegate want to take care of the logic for when we should ask permission to update?
-	if ([delegate respondsToSelector:@selector(shouldPromptForPermissionToCheckForUpdates)])
+	if ([delegate respondsToSelector:@selector(shouldPromptForPermissionToCheckForUpdatesToHostBundle)])
 	{
-		if ([delegate shouldPromptForPermissionToCheckForUpdates])
+		if ([delegate shouldPromptForPermissionToCheckForUpdatesToHostBundle:hostBundle])
 			[SUUpdatePermissionPrompt promptWithHostBundle:hostBundle delegate:self];
 	}	
 	// Has he been asked already? And don't ask if the host has a default value set in its Info.plist.
@@ -202,8 +202,8 @@ static SUUpdater *sharedUpdater = nil;
 {
 	BOOL sendingSystemProfile = ([[SUUserDefaults standardUserDefaults] boolForKey:SUSendProfileInfoKey] == YES);
 	NSArray *parameters = [NSArray array];
-	if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)])
-		parameters = [parameters arrayByAddingObjectsFromArray:[delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile]];
+	if ([delegate respondsToSelector:@selector(feedParametersForHostBundle:sendingSystemProfile:)])
+		parameters = [parameters arrayByAddingObjectsFromArray:[delegate feedParametersForHostBundle:hostBundle sendingSystemProfile:sendingSystemProfile]];
 	if (sendingSystemProfile)
 		parameters = [parameters arrayByAddingObjectsFromArray:[hostBundle systemProfile]];
 	return parameters;
