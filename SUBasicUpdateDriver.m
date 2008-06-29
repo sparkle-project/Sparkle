@@ -229,19 +229,16 @@
 	if ([delegate respondsToSelector:@selector(updaterWillRelaunchApplication)])
 		[delegate updaterWillRelaunchApplication];
 	
-	@try
-	{		
-		if(!relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath])
-			[NSException raise:@"SURelauncherNotFound" format:@"Couldn't find the relauncher (expected to find it at %@)", relaunchPath];
-
-		[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
-	}
-	@catch (NSException *e)
+	if(!relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath])
 	{
 		// Note that we explicitly use the host app's name here, since updating plugin for Mail relaunches Mail, not just the plugin.
-		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [[NSBundle mainBundle] name]], NSLocalizedDescriptionKey, [e reason], NSLocalizedFailureReasonErrorKey, nil]]];
+		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [[NSBundle mainBundle] name]], NSLocalizedDescriptionKey, [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@)", relaunchPath], NSLocalizedFailureReasonErrorKey, nil]]];
 		// We intentionally don't abandon the update here so that the host won't initiate another.
-	}
+		return;
+	}		
+	
+	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:[hostBundle bundlePath], [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
+
 	[NSApp terminate:self];
 }
 
