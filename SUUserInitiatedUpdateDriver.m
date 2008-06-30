@@ -17,18 +17,44 @@
 	checkingController = [[SUStatusController alloc] initWithHostBundle:hb];
 	[checkingController window]; // Force the checking controller to load its window.
 	[checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates\u2026", nil) maxProgressValue:0 statusText:nil];
-	[checkingController setButtonHidden:YES];
+	[checkingController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
 	[checkingController showWindow:self];
 }
 
 - (void)closeCheckingWindow
 {
-	[[checkingController window] close];
-	[checkingController release];
+	if (checkingController)
+	{
+		[[checkingController window] close];
+		[checkingController release];
+		checkingController = nil;
+	}
+}
+
+- (void)cancelCheckForUpdates:sender
+{
+	[self closeCheckingWindow];
+	isCanceled = YES;
+}
+
+- (void)appcastDidFinishLoading:(SUAppcast *)ac
+{
+	if (isCanceled)
+	{
+		[self abortUpdate];
+		return;
+	}
+	[self closeCheckingWindow];
+	[super appcastDidFinishLoading:ac];
 }
 
 - (void)appcast:(SUAppcast *)ac failedToLoadWithError:(NSError *)error
 {
+	if (isCanceled)
+	{
+		[self abortUpdate];
+		return;
+	}
 	[self closeCheckingWindow];
 	[super appcast:ac failedToLoadWithError:error];
 }
@@ -37,18 +63,6 @@
 {
 	// We don't check to see if this update's been skipped, because the user explicitly *asked* if he had the latest version.
 	return [self hostSupportsItem:ui] && [self isItemNewer:ui];
-}
-
-- (void)didNotFindUpdate
-{
-	[self closeCheckingWindow];
-	[super didNotFindUpdate];
-}
-
-- (void)didFindValidUpdate
-{
-	[self closeCheckingWindow];
-	[super didFindValidUpdate];
 }
 
 @end

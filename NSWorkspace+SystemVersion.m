@@ -9,7 +9,7 @@
 #import "NSWorkspace+SystemVersion.h"
 
 
-@implementation NSWorkspace (SystemVersion)
+@implementation NSWorkspace (SUSystemVersion)
 + (NSString *)systemVersionString
 {
 	// This returns a version string of the form X.Y.Z

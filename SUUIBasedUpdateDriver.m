@@ -29,6 +29,8 @@
 
 - (void)didNotFindUpdate
 {
+	if ([delegate respondsToSelector:@selector(didNotFindUpdateToHostBundle:)])
+		[delegate didNotFindUpdateToHostBundle:hostBundle];
 	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"You're up to date!", nil) defaultButton:SULocalizedString(@"OK", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [hostBundle name], [hostBundle displayVersion]];
 	[alert setIcon:[hostBundle icon]];
 	[alert runModal];
@@ -44,8 +46,8 @@
 - (void)updateAlert:(SUUpdateAlert *)alert finishedWithChoice:(SUUpdateAlertChoice)choice
 {
 	[updateAlert release]; updateAlert = nil;
-	if ([delegate respondsToSelector:@selector(userChoseAction:forUpdate:)])
-		[delegate userChoseAction:choice forUpdate:updateItem];
+	if ([delegate respondsToSelector:@selector(userChoseAction:forUpdate:toHostBundle:)])
+		[delegate userChoseAction:choice forUpdate:updateItem toHostBundle:hostBundle];
 	[[SUUserDefaults standardUserDefaults] setObject:nil forKey:SUSkippedVersionKey];
 	switch (choice)
 	{

@@ -87,12 +87,6 @@
 	[actionButton setEnabled:enabled];
 }
 
-- (void)setButtonHidden:(BOOL)hidden
-{
-	[actionButton setHidden:hidden];
-	[[actionButton superview] display];
-}
-
 - (double)progressValue
 {
 	return progressValue;

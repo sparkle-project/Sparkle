@@ -11,7 +11,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface NSFileManager (Aliases)
+@interface NSFileManager (SUAliases)
 - (BOOL)isAliasFolderAtPath:(NSString *)path;
 @end
 

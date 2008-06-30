@@ -48,7 +48,7 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMA
 #import <CoreFoundation/CoreFoundation.h>
 #import "SUConstants.h"	// for NSInteger
 
-@interface NSString (extras)
+@interface NSString (BSextras)
 
 - (NSString *)stringWithSubstitute:(NSString *)subs forCharactersFromSet:(NSCharacterSet *)set;
 

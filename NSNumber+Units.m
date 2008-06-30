@@ -9,7 +9,7 @@
 #import "NSNumber+Units.h"
 #import "Sparkle.h"
 
-@implementation NSNumber (Units)
+@implementation NSNumber (JWUnits)
 
 + (NSString *)humanReadableSizeFromDouble:(double)value
 {

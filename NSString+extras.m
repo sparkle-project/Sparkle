@@ -44,7 +44,7 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMA
 #import "NSString+extras.h"
 
 
-@implementation NSString (extras)
+@implementation NSString (BSextras)
 
 - (NSString *)stringWithSubstitute:(NSString *)subs forCharactersFromSet:(NSCharacterSet *)set
 {

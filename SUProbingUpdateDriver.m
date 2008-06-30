@@ -11,17 +11,15 @@
 
 @implementation SUProbingUpdateDriver
 
+// Stop as soon as we have an answer! The superclasses will already have taken care of notifying the delegate.
+
 - (void)didFindValidUpdate
 {
-	if ([delegate respondsToSelector:@selector(didFindValidUpdate:toHostBundle:)])
-		[delegate didFindValidUpdate:updateItem toHostBundle:hostBundle];
 	[self abortUpdate];
 }
 
 - (void)didNotFindUpdate
 {
-	if ([delegate respondsToSelector:@selector(didNotFindUpdateToHostBundle:)])
-		[delegate didNotFindUpdateToHostBundle:hostBundle];
 	[self abortUpdate];
 }
 

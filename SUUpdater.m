@@ -10,10 +10,10 @@
 #import "SUUpdater.h"
 
 @interface SUUpdater (Private)
-- (void)beginUpdateCycle;
 - (NSArray *)feedParameters;
 - (BOOL)automaticallyUpdates;
 - (BOOL)shouldScheduleUpdateCheck;
+- (void)scheduleNextUpdateCheck;
 - (NSTimeInterval)checkInterval;
 @end
 
@@ -45,6 +45,8 @@ static SUUpdater *sharedUpdater = nil;
 		sharedUpdater = self;
 		[self setHostBundle:[NSBundle mainBundle]];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidFinishLaunching:) name:NSApplicationDidFinishLaunchingNotification object:NSApp];
+		[[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:[@"values." stringByAppendingString:SUScheduledCheckIntervalKey] options:0 context:NULL];
+		[[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:[@"values." stringByAppendingString:SUEnableAutomaticChecksKey] options:0 context:NULL];
 	}
 	return self;
 }
@@ -56,9 +58,9 @@ static SUUpdater *sharedUpdater = nil;
 		[[SUUserDefaults standardUserDefaults] boolForKey:SUEnableAutomaticChecksKey] == NO) { return; }
 	
 	// Does the delegate want to take care of the logic for when we should ask permission to update?
-	if ([delegate respondsToSelector:@selector(shouldPromptForPermissionToCheckForUpdates)])
+	if ([delegate respondsToSelector:@selector(shouldPromptForPermissionToCheckForUpdatesToHostBundle)])
 	{
-		if ([delegate shouldPromptForPermissionToCheckForUpdates])
+		if ([delegate shouldPromptForPermissionToCheckForUpdatesToHostBundle:hostBundle])
 			[SUUpdatePermissionPrompt promptWithHostBundle:hostBundle delegate:self];
 	}	
 	// Has he been asked already? And don't ask if the host has a default value set in its Info.plist.
@@ -76,20 +78,28 @@ static SUUpdater *sharedUpdater = nil;
 	}
 	
 	// We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
-	if ([self shouldScheduleUpdateCheck])
-		[self beginUpdateCycle];
+	[self scheduleNextUpdateCheck];
 }
 
 - (void)updatePermissionPromptFinishedWithResult:(SUPermissionPromptResult)result
 {
 	BOOL automaticallyCheck = (result == SUAutomaticallyCheck);
 	[[SUUserDefaults standardUserDefaults] setBool:automaticallyCheck forKey:SUEnableAutomaticChecksKey];
-	if ([self automaticallyUpdates])
-		[self beginUpdateCycle];
+	[self scheduleNextUpdateCheck];
 }
 
-- (void)beginUpdateCycle
+- (void)scheduleNextUpdateCheck
 {	
+	@synchronized (checkTimer)
+	{
+		if (checkTimer)
+		{
+			[checkTimer invalidate];
+			checkTimer = nil;
+		}
+	}
+	if (![self shouldScheduleUpdateCheck]) return;
+	
 	// How long has it been since last we checked for an update?
 	NSDate *lastCheckDate = [[SUUserDefaults standardUserDefaults] objectForKey:SULastCheckTimeKey];
 	if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
@@ -101,7 +111,6 @@ static SUUpdater *sharedUpdater = nil;
 		delayUntilCheck = ([self checkInterval] - intervalSinceCheck); // It hasn't been long enough.
 	else
 		delayUntilCheck = 0; // We're overdue! Run one now.
-	
 	checkTimer = [NSTimer scheduledTimerWithTimeInterval:delayUntilCheck target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO];
 }
 
@@ -118,7 +127,7 @@ static SUUpdater *sharedUpdater = nil;
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)d
 {
 	if ([self updateInProgress]) { return; }
-	if (checkTimer) { [checkTimer invalidate]; checkTimer = nil; }
+	@synchronized (checkTimer) { if (checkTimer) { [checkTimer invalidate]; checkTimer = nil; } }
 	
 	// A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
 	NSString *appcastString = [[SUUserDefaults standardUserDefaults] objectForKey:SUFeedURLKey];
@@ -137,11 +146,25 @@ static SUUpdater *sharedUpdater = nil;
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if (object != driver) { return; }
-	[driver removeObserver:self forKeyPath:@"finished"];
-	[driver release]; driver = nil;
-	if ([self shouldScheduleUpdateCheck])
-		checkTimer = [NSTimer scheduledTimerWithTimeInterval:[self checkInterval] target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO];
+	if (object == driver && [keyPath isEqualToString:@"finished"])
+	{
+		[driver removeObserver:self forKeyPath:@"finished"];
+		[driver release]; driver = nil;
+		[self scheduleNextUpdateCheck];
+	}
+	else if (object == [NSUserDefaultsController sharedUserDefaultsController] && ([keyPath hasSuffix:SUScheduledCheckIntervalKey] || [keyPath hasSuffix:SUEnableAutomaticChecksKey]))
+	{
+		[self updatePreferencesChanged];
+	}
+	else
+	{
+		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+	}
+}
+
+- (void)updatePreferencesChanged
+{
+	[self scheduleNextUpdateCheck];
 }
 
 - (BOOL)shouldScheduleUpdateCheck
@@ -154,7 +177,7 @@ static SUUpdater *sharedUpdater = nil;
 	if ([[SUUserDefaults standardUserDefaults] objectForKey:SUEnableAutomaticChecksKey] == nil &&
 	  [[hostBundle objectForInfoDictionaryKey:SUEnableAutomaticChecksKey] boolValue] == YES)
 		return YES;
-	return NO; // Otherwise, don't bothe.r
+	return NO; // Otherwise, don't bother.
 }
 
 - (BOOL)automaticallyUpdates
@@ -179,8 +202,8 @@ static SUUpdater *sharedUpdater = nil;
 {
 	BOOL sendingSystemProfile = ([[SUUserDefaults standardUserDefaults] boolForKey:SUSendProfileInfoKey] == YES);
 	NSArray *parameters = [NSArray array];
-	if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)])
-		parameters = [parameters arrayByAddingObjectsFromArray:[delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile]];
+	if ([delegate respondsToSelector:@selector(feedParametersForHostBundle:sendingSystemProfile:)])
+		parameters = [parameters arrayByAddingObjectsFromArray:[delegate feedParametersForHostBundle:hostBundle sendingSystemProfile:sendingSystemProfile]];
 	if (sendingSystemProfile)
 		parameters = [parameters arrayByAddingObjectsFromArray:[hostBundle systemProfile]];
 	return parameters;

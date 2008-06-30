@@ -16,9 +16,4 @@
 @interface SUProbingUpdateDriver : SUBasicUpdateDriver { }
 @end
 
-@interface NSObject (SUProbeDriverDelegateProtocol)
-- (void)didFindValidUpdate:(SUAppcastItem *)item toHostBundle:(NSBundle *)hb;
-- (void)didNotFindUpdateToHostBundle:(NSBundle *)hb;
-@end
-
 #endif

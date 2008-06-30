@@ -11,7 +11,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface NSFileManager (ExtendedAttributes)
+@interface NSFileManager (MMExtendedAttributes)
 
 // Wraps the removexattr system call, allowing an AppKit-style NSString* to
 // be used for the pathname argument.  Note that the order of the arguments
