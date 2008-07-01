@@ -25,7 +25,7 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>SUFeedURL</key>
-	<string>http://www.andymatuschfsfjak.org/files/sparkletestcast.xml</string>
+	<string>http://www.andymatuschak.org/files/sparkletestcast.xml</string>
 	<key>SUEnableSystemProfiling</key>
 	<true/>
 </dict>
