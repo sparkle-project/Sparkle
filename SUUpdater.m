@@ -91,13 +91,10 @@ static SUUpdater *sharedUpdater = nil;
 
 - (void)scheduleNextUpdateCheck
 {	
-	@synchronized (checkTimer)
+	if (checkTimer)
 	{
-		if (checkTimer)
-		{
-			[checkTimer invalidate];
-			checkTimer = nil;
-		}
+		[checkTimer invalidate];
+		checkTimer = nil;
 	}
 	if (![self shouldScheduleUpdateCheck]) return;
 	
@@ -128,7 +125,7 @@ static SUUpdater *sharedUpdater = nil;
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)d
 {
 	if ([self updateInProgress]) { return; }
-	@synchronized (checkTimer) { if (checkTimer) { [checkTimer invalidate]; checkTimer = nil; } }
+	if (checkTimer) { [checkTimer invalidate]; checkTimer = nil; }
 	
 	driver = [d retain];
 	if ([driver delegate] == nil) { [driver setDelegate:delegate]; }
