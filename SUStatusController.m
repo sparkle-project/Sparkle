@@ -104,9 +104,10 @@
 
 - (void)setMaxProgressValue:(double)value
 {
+	if (value < 0) value = 0;
 	maxProgressValue = value;
 	[self setProgressValue:0];
-	[progressBar setIndeterminate:(value == 0)];
+	[progressBar startAnimation:self];
 }
 
 - (void)setStatusText:(NSString *)aStatusText
