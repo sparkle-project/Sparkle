@@ -85,8 +85,7 @@ static SUUpdater *sharedUpdater = nil;
 
 - (void)updatePermissionPromptFinishedWithResult:(SUPermissionPromptResult)result
 {
-	BOOL automaticallyCheck = (result == SUAutomaticallyCheck);
-	[[SUUserDefaults standardUserDefaults] setBool:automaticallyCheck forKey:SUEnableAutomaticChecksKey];
+	[[SUUserDefaults standardUserDefaults] setBool:(result == SUAutomaticallyCheck) forKey:SUEnableAutomaticChecksKey];
 	[self scheduleNextUpdateCheck];
 }
 
