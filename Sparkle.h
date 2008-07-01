@@ -30,7 +30,6 @@
 #import "NSFileManager+Authentication.h"
 #import "NSFileManager+Verification.h"
 #import "NSString+extras.h"
-#import "NSURL+Parameters.h"
 #import "NSWorkspace_RBAdditions.h"
 #import "NSWorkspace+SystemVersion.h"
 

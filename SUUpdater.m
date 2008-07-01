@@ -15,6 +15,7 @@
 - (BOOL)shouldScheduleUpdateCheck;
 - (void)scheduleNextUpdateCheck;
 - (NSTimeInterval)checkInterval;
+- (NSURL *)feedURL;
 @end
 
 @implementation SUUpdater
@@ -129,19 +130,10 @@ static SUUpdater *sharedUpdater = nil;
 	if ([self updateInProgress]) { return; }
 	@synchronized (checkTimer) { if (checkTimer) { [checkTimer invalidate]; checkTimer = nil; } }
 	
-	// A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
-	NSString *appcastString = [[SUUserDefaults standardUserDefaults] objectForKey:SUFeedURLKey];
-	if (!appcastString)
-		appcastString = [hostBundle objectForInfoDictionaryKey:SUFeedURLKey];
-	if (!appcastString)
-		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the SUFeedURLKey in either the Info.plist or the user defaults!"];
-	NSCharacterSet* quoteSet = [NSCharacterSet characterSetWithCharactersInString: @"\"\'"]; // Some feed publishers add quotes; strip 'em.
-	NSURL *feedURL = [[NSURL URLWithString:[appcastString stringByTrimmingCharactersInSet:quoteSet]] URLWithParameters:[self feedParameters]];
-	
 	driver = [d retain];
 	if ([driver delegate] == nil) { [driver setDelegate:delegate]; }
 	[driver addObserver:self forKeyPath:@"finished" options:0 context:NULL];
-	[driver checkForUpdatesAtURL:feedURL hostBundle:hostBundle];
+	[driver checkForUpdatesAtURL:[self feedURL] hostBundle:hostBundle];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -198,15 +190,42 @@ static SUUpdater *sharedUpdater = nil;
 	return YES; // Otherwise, we're good to go.
 }
 
-- (NSArray *)feedParameters
+- (NSURL *)_baseFeedURL
 {
+	// A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
+	NSString *appcastString = [[SUUserDefaults standardUserDefaults] objectForKey:SUFeedURLKey];
+	if (!appcastString)
+		appcastString = [hostBundle objectForInfoDictionaryKey:SUFeedURLKey];
+	if (!appcastString) // Can't find an appcast string!
+		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the SUFeedURLKey in either the Info.plist or the user defaults!"];
+	NSCharacterSet* quoteSet = [NSCharacterSet characterSetWithCharactersInString: @"\"\'"]; // Some feed publishers add quotes; strip 'em.
+	return [NSURL URLWithString:[appcastString stringByTrimmingCharactersInSet:quoteSet]] ;
+}
+
+- (NSURL *)feedURL
+{
+	NSURL *baseFeedURL = [self _baseFeedURL];
+	
+	// Determine all the parameters we're attaching to the base feed URL.
 	BOOL sendingSystemProfile = ([[SUUserDefaults standardUserDefaults] boolForKey:SUSendProfileInfoKey] == YES);
 	NSArray *parameters = [NSArray array];
 	if ([delegate respondsToSelector:@selector(feedParametersForHostBundle:sendingSystemProfile:)])
 		parameters = [parameters arrayByAddingObjectsFromArray:[delegate feedParametersForHostBundle:hostBundle sendingSystemProfile:sendingSystemProfile]];
 	if (sendingSystemProfile)
 		parameters = [parameters arrayByAddingObjectsFromArray:[hostBundle systemProfile]];
-	return parameters;
+	if (parameters == nil || [parameters count] == 0) { return baseFeedURL; }
+	
+	// Build up the parameterized URL.
+	NSMutableArray *parameterStrings = [NSMutableArray array];
+	NSEnumerator *profileInfoEnumerator = [parameters objectEnumerator];
+	NSDictionary *currentProfileInfo;
+	while ((currentProfileInfo = [profileInfoEnumerator nextObject]))
+		[parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", [currentProfileInfo objectForKey:@"key"], [currentProfileInfo objectForKey:@"value"]]];
+	
+	NSString *appcastStringWithProfile = [NSString stringWithFormat:@"%@?%@", [baseFeedURL absoluteString], [parameterStrings componentsJoinedByString:@"&"]];
+	
+	// Clean it up so it's a valid URL
+	return [NSURL URLWithString:[appcastStringWithProfile stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
 }
 
 - (NSTimeInterval)checkInterval

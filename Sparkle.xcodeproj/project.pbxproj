@@ -90,8 +90,6 @@
 		61B5FCDF09C52A9F00B25A18 /* SUUpdateAlert.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B5FCA009C5228F00B25A18 /* SUUpdateAlert.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		61B93A3C0DD02D7000DCD2F8 /* SUUIBasedUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B93A390DD02D6400DCD2F8 /* SUUIBasedUpdateDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		61B93A3D0DD02D7000DCD2F8 /* SUUIBasedUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B93A3A0DD02D6400DCD2F8 /* SUUIBasedUpdateDriver.m */; };
-		61B93AA20DD0E2D300DCD2F8 /* NSURL+Parameters.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B93AA00DD0E2D300DCD2F8 /* NSURL+Parameters.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		61B93AA30DD0E2D300DCD2F8 /* NSURL+Parameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B93AA10DD0E2D300DCD2F8 /* NSURL+Parameters.m */; };
 		61B93B270DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B93B250DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		61B93B280DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B93B260DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.m */; };
 		61B93C090DD112FF00DCD2F8 /* SUScheduledUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B93C070DD112FF00DCD2F8 /* SUScheduledUpdateDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -249,8 +247,6 @@
 		61B5FCA109C5228F00B25A18 /* SUUpdateAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdateAlert.m; sourceTree = "<group>"; };
 		61B93A390DD02D6400DCD2F8 /* SUUIBasedUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUIBasedUpdateDriver.h; sourceTree = "<group>"; };
 		61B93A3A0DD02D6400DCD2F8 /* SUUIBasedUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUIBasedUpdateDriver.m; sourceTree = "<group>"; };
-		61B93AA00DD0E2D300DCD2F8 /* NSURL+Parameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURL+Parameters.h"; sourceTree = "<group>"; };
-		61B93AA10DD0E2D300DCD2F8 /* NSURL+Parameters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURL+Parameters.m"; sourceTree = "<group>"; };
 		61B93B250DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUAutomaticUpdateDriver.h; sourceTree = "<group>"; };
 		61B93B260DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUAutomaticUpdateDriver.m; sourceTree = "<group>"; };
 		61B93C070DD112FF00DCD2F8 /* SUScheduledUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUScheduledUpdateDriver.h; sourceTree = "<group>"; };
@@ -447,8 +443,6 @@
 				61B5F8E209C4CE3C00B25A18 /* RSS.m */,
 				61B5F8DF09C4CE3C00B25A18 /* NSString+extras.h */,
 				61B5F8E009C4CE3C00B25A18 /* NSString+extras.m */,
-				61B93AA00DD0E2D300DCD2F8 /* NSURL+Parameters.h */,
-				61B93AA10DD0E2D300DCD2F8 /* NSURL+Parameters.m */,
 			);
 			name = "Appcast Support";
 			sourceTree = "<group>";
@@ -596,7 +590,6 @@
 				618FA5220DAE8E8A0026945C /* SUPackageInstaller.h in Headers */,
 				61F83F740DBFE141006FDD30 /* SUBasicUpdateDriver.h in Headers */,
 				61B93A3C0DD02D7000DCD2F8 /* SUUIBasedUpdateDriver.h in Headers */,
-				61B93AA20DD0E2D300DCD2F8 /* NSURL+Parameters.h in Headers */,
 				61B93B270DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.h in Headers */,
 				61B93C090DD112FF00DCD2F8 /* SUScheduledUpdateDriver.h in Headers */,
 				610134730DD250470049ACDF /* SUUpdateDriver.h in Headers */,
@@ -859,7 +852,6 @@
 				618FA5230DAE8E8A0026945C /* SUPackageInstaller.m in Sources */,
 				61F83F720DBFE140006FDD30 /* SUBasicUpdateDriver.m in Sources */,
 				61B93A3D0DD02D7000DCD2F8 /* SUUIBasedUpdateDriver.m in Sources */,
-				61B93AA30DD0E2D300DCD2F8 /* NSURL+Parameters.m in Sources */,
 				61B93B280DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.m in Sources */,
 				61B93C0A0DD112FF00DCD2F8 /* SUScheduledUpdateDriver.m in Sources */,
 				610134740DD250470049ACDF /* SUUpdateDriver.m in Sources */,
