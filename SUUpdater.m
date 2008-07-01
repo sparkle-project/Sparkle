@@ -46,6 +46,7 @@ static SUUpdater *sharedUpdater = nil;
 		sharedUpdater = self;
 		[self setHostBundle:[NSBundle mainBundle]];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidFinishLaunching:) name:NSApplicationDidFinishLaunchingNotification object:NSApp];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(driverDidFinish:) name:SUUpdateDriverFinishedNotification object:nil];
 		[[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:[@"values." stringByAppendingString:SUScheduledCheckIntervalKey] options:0 context:NULL];
 		[[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:[@"values." stringByAppendingString:SUEnableAutomaticChecksKey] options:0 context:NULL];
 	}
@@ -132,19 +133,12 @@ static SUUpdater *sharedUpdater = nil;
 	
 	driver = [d retain];
 	if ([driver delegate] == nil) { [driver setDelegate:delegate]; }
-	[driver addObserver:self forKeyPath:@"finished" options:0 context:NULL];
 	[driver checkForUpdatesAtURL:[self feedURL] hostBundle:hostBundle];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if (object == driver && [keyPath isEqualToString:@"finished"])
-	{
-		[driver removeObserver:self forKeyPath:@"finished"];
-		[driver release]; driver = nil;
-		[self scheduleNextUpdateCheck];
-	}
-	else if (object == [NSUserDefaultsController sharedUserDefaultsController] && ([keyPath hasSuffix:SUScheduledCheckIntervalKey] || [keyPath hasSuffix:SUEnableAutomaticChecksKey]))
+	if (object == [NSUserDefaultsController sharedUserDefaultsController] && ([keyPath hasSuffix:SUScheduledCheckIntervalKey] || [keyPath hasSuffix:SUEnableAutomaticChecksKey]))
 	{
 		[self updatePreferencesChanged];
 	}
@@ -247,6 +241,7 @@ static SUUpdater *sharedUpdater = nil;
 	[hostBundle release];
 	[delegate release];
 	if (checkTimer) { [checkTimer invalidate]; }
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super dealloc];
 }
 
@@ -273,6 +268,14 @@ static SUUpdater *sharedUpdater = nil;
 - (BOOL)updateInProgress
 {
 	return driver && ([driver finished] == NO);
+}
+
+- (void)driverDidFinish:(NSNotification *)notification
+{
+	if ([notification object] != driver) return;
+	[driver release];
+	driver = nil;
+	[self scheduleNextUpdateCheck];
 }
 
 @end
