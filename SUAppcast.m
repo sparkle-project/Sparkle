@@ -40,10 +40,10 @@
     BOOL success = YES;
     while ((current = [enumerator nextObject]))
     {
-        SUAppcastItem *item = [[[SUAppcastItem alloc] initWithDictionary:current] autorelease];
+        SUAppcastItem *item = [[SUAppcastItem alloc] initWithDictionary:current];
         if (item)
         {
-            [(NSMutableArray *)tempItems addObject:item];
+            [(NSMutableArray *)tempItems addObject:[item autorelease]];
         }
         else
         {
@@ -51,6 +51,8 @@
             break;
         }
     }
+	[feed release];
+    feed = nil;
 	if (success)
 	{
         items = [tempItems copy]; // Make the items list immutable.
@@ -62,8 +64,6 @@
     {
 		[self reportError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while parsing the update feed.", nil), NSLocalizedDescriptionKey, nil]]];
 	}
-	[feed release];
-    feed = nil;
 }
 
 - (void)feed:(RSS *)aFeed didFailWithError:(NSError *)error
