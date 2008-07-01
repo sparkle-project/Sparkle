@@ -268,12 +268,15 @@
 		NSLog(@"Sparkle Error: %@", [error localizedDescription]);
 	if ([error localizedFailureReason])
 		NSLog(@"Sparkle Error (continued): %@", [error localizedFailureReason]);
+	if (download)
+		[download cancel];
 	[self abortUpdate];
 }
 
 - (void)dealloc
 {
 	[hostBundle release];
+	[download release];
 	[downloadPath release];
 	[relaunchPath release];
 	[super dealloc];
