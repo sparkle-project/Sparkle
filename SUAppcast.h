@@ -14,6 +14,7 @@
 	NSArray *items;
 	NSString *userAgentString;
 	id delegate;
+	RSS *feed;
 }
 
 - (void)fetchAppcastFromURL:(NSURL *)url;

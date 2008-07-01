@@ -106,16 +106,7 @@
 	self = [super init];
 	if (self)
 	{
-		propertiesDictionary = [dict retain];
-		[self setTitle:[dict objectForKey:@"title"]];
-		[self setDate:[dict objectForKey:@"pubDate"]];
-		[self setDescription:[dict objectForKey:@"description"]];
-		
 		id enclosure = [dict objectForKey:@"enclosure"];
-		if (enclosure == nil || [enclosure objectForKey:@"url"] == nil)
-			[NSException raise:@"SUAppcastException" format:@"Couldn't find an download URL for feed entry %@!", [self title]];
-		[self setFileURL:[NSURL URLWithString:[[enclosure objectForKey:@"url"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
-		[self setDSASignature:[enclosure objectForKey:@"sparkle:dsaSignature"]];		
 		
 		// Try to find a version string.
 		// Finding the new version number from the RSS feed is a little bit hacky. There are two ways:
@@ -126,32 +117,47 @@
 		//    The big caveat with this is that you can't have underscores in your version strings, as that'll confuse Sparkle.
 		//    Feel free to change the separator string to a hyphen or something more suited to your needs if you like.
 		NSString *newVersion = [enclosure objectForKey:@"sparkle:version"];
-		if (!newVersion) // no sparkle:version attribute
+		if (newVersion == nil) // no sparkle:version attribute
 		{
 			// Separate the url by underscores and take the last component, as that'll be closest to the end,
 			// then we remove the extension. Hopefully, this will be the version.
 			NSArray *fileComponents = [[enclosure objectForKey:@"url"] componentsSeparatedByString:@"_"];
 			if ([fileComponents count] > 1)
 				newVersion = [[fileComponents lastObject] stringByDeletingPathExtension];
-			else
-				[NSException raise:@"SUAppcastException" format:@"Couldn't find a version string for %@! You need a sparkle:version attribute.", [enclosure objectForKey:@"url"]];
 		}
-		[self setVersionString:newVersion];
-		[self setMinimumSystemVersion:[dict objectForKey:@"sparkle:minimumSystemVersion"]];
-		
-		NSString *shortVersionString = [enclosure objectForKey:@"sparkle:shortVersionString"];
-		if (shortVersionString)
-			[self setDisplayVersionString:shortVersionString];
-		else
-			[self setDisplayVersionString:[self versionString]];
-		
-		// Find the appropriate release notes URL.
-		if ([dict objectForKey:@"sparkle:releaseNotesLink"])
-			[self setReleaseNotesURL:[NSURL URLWithString:[dict objectForKey:@"sparkle:releaseNotesLink"]]];
-		else if ([[self description] hasPrefix:@"http://"]) // if the description starts with http://, use that.
-			[self setReleaseNotesURL:[NSURL URLWithString:[self description]]];
-		else
-			[self setReleaseNotesURL:nil];
+        
+		if (enclosure == nil || [enclosure objectForKey:@"url"] == nil || newVersion == nil)
+        {
+            [self release];
+            self = nil;
+        }
+        else
+        {
+            propertiesDictionary = [dict retain];
+            [self setTitle:[dict objectForKey:@"title"]];
+            [self setDate:[dict objectForKey:@"pubDate"]];
+            [self setDescription:[dict objectForKey:@"description"]];
+            
+            [self setFileURL:[NSURL URLWithString:[[enclosure objectForKey:@"url"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+            [self setDSASignature:[enclosure objectForKey:@"sparkle:dsaSignature"]];		
+            
+            [self setVersionString:newVersion];
+            [self setMinimumSystemVersion:[dict objectForKey:@"sparkle:minimumSystemVersion"]];
+            
+            NSString *shortVersionString = [enclosure objectForKey:@"sparkle:shortVersionString"];
+            if (shortVersionString)
+                [self setDisplayVersionString:shortVersionString];
+            else
+                [self setDisplayVersionString:[self versionString]];
+            
+            // Find the appropriate release notes URL.
+            if ([dict objectForKey:@"sparkle:releaseNotesLink"])
+                [self setReleaseNotesURL:[NSURL URLWithString:[dict objectForKey:@"sparkle:releaseNotesLink"]]];
+            else if ([[self description] hasPrefix:@"http://"]) // if the description starts with http://, use that.
+                [self setReleaseNotesURL:[NSURL URLWithString:[self description]]];
+            else
+                [self setReleaseNotesURL:nil];
+        }
 	}
 	return self;
 }
