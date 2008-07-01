@@ -28,6 +28,7 @@
 	[appcast setDelegate:self];
 	[appcast setUserAgentString:[NSString stringWithFormat: @"%@/%@ Sparkle/1.5b2", [hostBundle name], [hostBundle displayVersion]]];
 	[appcast fetchAppcastFromURL:appcastURL];
+	[[SUUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:SULastCheckTimeKey];
 }
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui
@@ -60,11 +61,7 @@
 {
 	if ([delegate respondsToSelector:@selector(appcastDidFinishLoading:forHostBundle:)])
 		[delegate appcastDidFinishLoading:ac forHostBundle:hostBundle];
-	
-	NSArray* updates = [ac items];
-	if ([updates count] > 0)
-		[[SUUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:SULastCheckTimeKey];
-	
+		
 	// Now we have to find the best valid update in the appcast.
 	if ([delegate respondsToSelector:@selector(bestValidUpdateInAppcast:forHostBundle:)]) // Does the delegate want to handle it?
 	{
@@ -73,7 +70,7 @@
 	else // If not, we'll take care of it ourselves.
 	{
 		// Find the first update we can actually use.
-		NSEnumerator *updateEnumerator = [updates objectEnumerator];
+		NSEnumerator *updateEnumerator = [[ac items] objectEnumerator];
 		do {
 			updateItem = [updateEnumerator nextObject];
 		} while (updateItem && ![self hostSupportsItem:updateItem]);
