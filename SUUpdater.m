@@ -235,7 +235,6 @@ static SUUpdater *sharedUpdater = nil;
 - (void)dealloc
 {
 	[hostBundle release];
-	[delegate release];
 	if (checkTimer) { [checkTimer invalidate]; }
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super dealloc];
