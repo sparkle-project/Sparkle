@@ -69,10 +69,6 @@
 		61AAE8280A321A7F00D8810D /* Sparkle.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8220A321A7F00D8810D /* Sparkle.strings */; };
 		61AAE8290A321A8000D8810D /* SUAutomaticUpdateAlert.nib in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8240A321A7F00D8810D /* SUAutomaticUpdateAlert.nib */; };
 		61AAE82A0A321A8000D8810D /* SUUpdateAlert.nib in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8260A321A7F00D8810D /* SUUpdateAlert.nib */; };
-		61B5F8E909C4CE3C00B25A18 /* NSString+extras.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B5F8DF09C4CE3C00B25A18 /* NSString+extras.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		61B5F8EA09C4CE3C00B25A18 /* NSString+extras.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5F8E009C4CE3C00B25A18 /* NSString+extras.m */; };
-		61B5F8EB09C4CE3C00B25A18 /* RSS.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B5F8E109C4CE3C00B25A18 /* RSS.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		61B5F8EC09C4CE3C00B25A18 /* RSS.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5F8E209C4CE3C00B25A18 /* RSS.m */; };
 		61B5F8ED09C4CE3C00B25A18 /* SUUpdater.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B5F8E309C4CE3C00B25A18 /* SUUpdater.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		61B5F8EE09C4CE3C00B25A18 /* SUUpdater.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5F8E409C4CE3C00B25A18 /* SUUpdater.m */; };
 		61B5F8EF09C4CE3C00B25A18 /* NSFileManager+Authentication.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5F8E509C4CE3C00B25A18 /* NSFileManager+Authentication.m */; };
@@ -225,10 +221,6 @@
 		61AAE84F0A321AF700D8810D /* es */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61AAE8590A321B0400D8810D /* fr */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61AAE8710A321F7700D8810D /* nl */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Sparkle.strings; sourceTree = "<group>"; };
-		61B5F8DF09C4CE3C00B25A18 /* NSString+extras.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = "NSString+extras.h"; sourceTree = "<group>"; };
-		61B5F8E009C4CE3C00B25A18 /* NSString+extras.m */ = {isa = PBXFileReference; fileEncoding = 30; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; path = "NSString+extras.m"; sourceTree = "<group>"; };
-		61B5F8E109C4CE3C00B25A18 /* RSS.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = RSS.h; sourceTree = "<group>"; };
-		61B5F8E209C4CE3C00B25A18 /* RSS.m */ = {isa = PBXFileReference; fileEncoding = 30; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; path = RSS.m; sourceTree = "<group>"; };
 		61B5F8E309C4CE3C00B25A18 /* SUUpdater.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SUUpdater.h; sourceTree = "<group>"; };
 		61B5F8E409C4CE3C00B25A18 /* SUUpdater.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SUUpdater.m; sourceTree = "<group>"; };
 		61B5F8E509C4CE3C00B25A18 /* NSFileManager+Authentication.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+Authentication.m"; sourceTree = "<group>"; };
@@ -439,10 +431,6 @@
 				61A2259C0D1C495D00430CCD /* SUVersionComparisonProtocol.h */,
 				61A225A20D1C4AC000430CCD /* SUStandardVersionComparator.h */,
 				61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */,
-				61B5F8E109C4CE3C00B25A18 /* RSS.h */,
-				61B5F8E209C4CE3C00B25A18 /* RSS.m */,
-				61B5F8DF09C4CE3C00B25A18 /* NSString+extras.h */,
-				61B5F8E009C4CE3C00B25A18 /* NSString+extras.m */,
 			);
 			name = "Appcast Support";
 			sourceTree = "<group>";
@@ -561,8 +549,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				61B5F8E909C4CE3C00B25A18 /* NSString+extras.h in Headers */,
-				61B5F8EB09C4CE3C00B25A18 /* RSS.h in Headers */,
 				61B5F8ED09C4CE3C00B25A18 /* SUUpdater.h in Headers */,
 				61B5FC0D09C4FC8200B25A18 /* SUAppcast.h in Headers */,
 				61B5FC7009C51F4A00B25A18 /* SUAppcastItem.h in Headers */,
@@ -825,8 +811,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				61B5F8EA09C4CE3C00B25A18 /* NSString+extras.m in Sources */,
-				61B5F8EC09C4CE3C00B25A18 /* RSS.m in Sources */,
 				61B5F8EE09C4CE3C00B25A18 /* SUUpdater.m in Sources */,
 				61B5F8EF09C4CE3C00B25A18 /* NSFileManager+Authentication.m in Sources */,
 				61B5FBB709C4FAFF00B25A18 /* SUAppcast.m in Sources */,

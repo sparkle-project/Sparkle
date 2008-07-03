@@ -29,13 +29,10 @@
 #import "NSFileManager+Aliases.h"
 #import "NSFileManager+Authentication.h"
 #import "NSFileManager+Verification.h"
-#import "NSString+extras.h"
 #import "NSWorkspace_RBAdditions.h"
 #import "NSWorkspace+SystemVersion.h"
 
 #import "NTSynchronousTask.h"
-
-#import "RSS.h"
 
 #import "SUAppcast.h"
 #import "SUAppcastItem.h"
