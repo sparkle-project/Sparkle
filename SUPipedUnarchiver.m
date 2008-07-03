@@ -15,7 +15,7 @@
 {
 	static NSDictionary *typeSelectorDictionary;
 	if (!typeSelectorDictionary)
-		typeSelectorDictionary = [[NSDictionary dictionaryWithObjectsAndKeys:@"_extractZIP", @"public.zip-archive", @"_extractTGZ", @"org.gnu.gnu-zip-tar-archive", @"_extractTBZ", @"org.bzip.bzip2-tar-archive", @"_extractTAR", @"public.tar-archive", nil] retain];
+		typeSelectorDictionary = [[NSDictionary dictionaryWithObjectsAndKeys:@"_extractZIP", @"com.pkware.zip-archive", @"_extractTGZ", @"org.gnu.gnu-zip-tar-archive", @"_extractTBZ", @"org.bzip.bzip2-tar-archive", @"_extractTAR", @"public.tar-archive", nil] retain];
 
 	NSEnumerator *typeEnumerator = [typeSelectorDictionary keyEnumerator];
 	id currentType;
