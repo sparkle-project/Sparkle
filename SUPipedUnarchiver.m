@@ -14,8 +14,9 @@
 + (SEL)_selectorConformingToTypeOfURL:(NSURL *)URL
 {
 	static NSDictionary *typeSelectorDictionary;
+	// HACK: The UTI detector is dumb (not my fault!) and sees .tar.gz files as plain .gz files. If we see something of type .bz2 or .gz, we'll assume it's really a .tar.bz2 or .tar.gz.
 	if (!typeSelectorDictionary)
-		typeSelectorDictionary = [[NSDictionary dictionaryWithObjectsAndKeys:@"_extractZIP", @"com.pkware.zip-archive", @"_extractTGZ", @"org.gnu.gnu-zip-tar-archive", @"_extractTBZ", @"org.bzip.bzip2-tar-archive", @"_extractTAR", @"public.tar-archive", nil] retain];
+		typeSelectorDictionary = [[NSDictionary dictionaryWithObjectsAndKeys:@"_extractZIP", @"com.pkware.zip-archive", @"_extractTGZ", @"org.gnu.gnu-zip-tar-archive", @"_extractTGZ", @"org.gnu.gnu-zip-archive", @"_extractTBZ", @"org.bzip.bzip2-tar-archive", @"_extractTBZ", @"org.bzip.bzip2-archive", @"_extractTAR", @"public.tar-archive", nil] retain];
 
 	NSEnumerator *typeEnumerator = [typeSelectorDictionary keyEnumerator];
 	id currentType;
