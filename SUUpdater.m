@@ -60,7 +60,7 @@ static SUUpdater *sharedUpdater = nil;
 		[[SUUserDefaults standardUserDefaults] boolForKey:SUEnableAutomaticChecksKey] == NO) { return; }
 	
 	// Does the delegate want to take care of the logic for when we should ask permission to update?
-	if ([delegate respondsToSelector:@selector(shouldPromptForPermissionToCheckForUpdatesToHostBundle)])
+	if ([delegate respondsToSelector:@selector(shouldPromptForPermissionToCheckForUpdatesToHostBundle:)])
 	{
 		if ([delegate shouldPromptForPermissionToCheckForUpdatesToHostBundle:hostBundle])
 			[SUUpdatePermissionPrompt promptWithHostBundle:hostBundle delegate:self];
