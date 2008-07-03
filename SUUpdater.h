@@ -10,6 +10,7 @@
 #define SUUPDATER_H
 
 #import "SUUpdateAlert.h"
+#import "SUVersionComparisonProtocol.h"
 
 @class SUUpdateDriver, SUAppcastItem, SUAppcast;
 @interface SUUpdater : NSObject {
@@ -45,7 +46,6 @@
 - (void)updatePreferencesChanged;
 
 - (BOOL)updateInProgress;
-
 @end
 
 @interface NSObject (SUUpdaterDelegateInformalProtocol)
@@ -80,6 +80,10 @@
 
 // Called immediately before relaunching.
 - (void)updaterWillRelaunchApplication;
+
+// This method allows you to provide a custom version comparator.
+// If you don't implement this method or return nil, the standard version comparator will be used.
+- (id <SUVersionComparison>)versionComparatorForHostBundle:(NSBundle *)hb;
 
 @end
 

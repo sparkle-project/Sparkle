@@ -31,25 +31,37 @@
 	[[SUUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:SULastCheckTimeKey];
 }
 
+- (id <SUVersionComparison>)_versionComparator
+{
+	id <SUVersionComparison> comparator = nil;
+	
+	// Give the delegate a chance to provide a custom version comparator
+	if ([delegate respondsToSelector:@selector(versionComparatorForHostBundle:)])
+		comparator = [delegate versionComparatorForHostBundle:hostBundle];
+	
+	// If we don't get a comparator from the delegate, use the default comparator
+	if (!comparator)
+		comparator = [SUStandardVersionComparator defaultComparator];
+	
+	return comparator;	
+}
+
 - (BOOL)isItemNewer:(SUAppcastItem *)ui
 {
-	return [[SUStandardVersionComparator defaultComparator] compareVersion:[hostBundle version]
-																 toVersion:[ui versionString]] == NSOrderedAscending;
+	return [[self _versionComparator] compareVersion:[hostBundle version] toVersion:[ui versionString]] == NSOrderedAscending;
 }
 
 - (BOOL)hostSupportsItem:(SUAppcastItem *)ui
 {
 	if ([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) { return YES; }
-	return [[SUStandardVersionComparator defaultComparator] compareVersion:[ui minimumSystemVersion]
-																 toVersion:[NSWorkspace systemVersionString]] != NSOrderedDescending;
+	return [[self _versionComparator] compareVersion:[ui minimumSystemVersion] toVersion:[NSWorkspace systemVersionString]] != NSOrderedDescending;
 }
 
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui
 {
 	NSString *skippedVersion = [[SUUserDefaults standardUserDefaults] objectForKey:SUSkippedVersionKey];
 	if (skippedVersion == nil) { return NO; }
-	return [[SUStandardVersionComparator defaultComparator] compareVersion:[ui versionString]
-																 toVersion:skippedVersion] != NSOrderedDescending;
+	return [[self _versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
 }
 
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
