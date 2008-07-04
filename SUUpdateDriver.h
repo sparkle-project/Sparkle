@@ -11,6 +11,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+extern NSString *SUUpdateDriverFinishedNotification;
+
 @interface SUUpdateDriver : NSObject
 {
 	BOOL finished;

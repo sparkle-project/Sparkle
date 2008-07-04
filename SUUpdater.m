@@ -15,6 +15,7 @@
 - (BOOL)shouldScheduleUpdateCheck;
 - (void)scheduleNextUpdateCheck;
 - (NSTimeInterval)checkInterval;
+- (NSURL *)feedURL;
 @end
 
 @implementation SUUpdater
@@ -45,6 +46,7 @@ static SUUpdater *sharedUpdater = nil;
 		sharedUpdater = self;
 		[self setHostBundle:[NSBundle mainBundle]];
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidFinishLaunching:) name:NSApplicationDidFinishLaunchingNotification object:NSApp];
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(driverDidFinish:) name:SUUpdateDriverFinishedNotification object:nil];
 		[[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:[@"values." stringByAppendingString:SUScheduledCheckIntervalKey] options:0 context:NULL];
 		[[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:[@"values." stringByAppendingString:SUEnableAutomaticChecksKey] options:0 context:NULL];
 	}
@@ -58,7 +60,7 @@ static SUUpdater *sharedUpdater = nil;
 		[[SUUserDefaults standardUserDefaults] boolForKey:SUEnableAutomaticChecksKey] == NO) { return; }
 	
 	// Does the delegate want to take care of the logic for when we should ask permission to update?
-	if ([delegate respondsToSelector:@selector(shouldPromptForPermissionToCheckForUpdatesToHostBundle)])
+	if ([delegate respondsToSelector:@selector(shouldPromptForPermissionToCheckForUpdatesToHostBundle:)])
 	{
 		if ([delegate shouldPromptForPermissionToCheckForUpdatesToHostBundle:hostBundle])
 			[SUUpdatePermissionPrompt promptWithHostBundle:hostBundle delegate:self];
@@ -83,20 +85,16 @@ static SUUpdater *sharedUpdater = nil;
 
 - (void)updatePermissionPromptFinishedWithResult:(SUPermissionPromptResult)result
 {
-	BOOL automaticallyCheck = (result == SUAutomaticallyCheck);
-	[[SUUserDefaults standardUserDefaults] setBool:automaticallyCheck forKey:SUEnableAutomaticChecksKey];
+	[[SUUserDefaults standardUserDefaults] setBool:(result == SUAutomaticallyCheck) forKey:SUEnableAutomaticChecksKey];
 	[self scheduleNextUpdateCheck];
 }
 
 - (void)scheduleNextUpdateCheck
 {	
-	@synchronized (checkTimer)
+	if (checkTimer)
 	{
-		if (checkTimer)
-		{
-			[checkTimer invalidate];
-			checkTimer = nil;
-		}
+		[checkTimer invalidate];
+		checkTimer = nil;
 	}
 	if (![self shouldScheduleUpdateCheck]) return;
 	
@@ -127,32 +125,16 @@ static SUUpdater *sharedUpdater = nil;
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)d
 {
 	if ([self updateInProgress]) { return; }
-	@synchronized (checkTimer) { if (checkTimer) { [checkTimer invalidate]; checkTimer = nil; } }
-	
-	// A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
-	NSString *appcastString = [[SUUserDefaults standardUserDefaults] objectForKey:SUFeedURLKey];
-	if (!appcastString)
-		appcastString = [hostBundle objectForInfoDictionaryKey:SUFeedURLKey];
-	if (!appcastString)
-		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the SUFeedURLKey in either the Info.plist or the user defaults!"];
-	NSCharacterSet* quoteSet = [NSCharacterSet characterSetWithCharactersInString: @"\"\'"]; // Some feed publishers add quotes; strip 'em.
-	NSURL *feedURL = [[NSURL URLWithString:[appcastString stringByTrimmingCharactersInSet:quoteSet]] URLWithParameters:[self feedParameters]];
+	if (checkTimer) { [checkTimer invalidate]; checkTimer = nil; }
 	
 	driver = [d retain];
 	if ([driver delegate] == nil) { [driver setDelegate:delegate]; }
-	[driver addObserver:self forKeyPath:@"finished" options:0 context:NULL];
-	[driver checkForUpdatesAtURL:feedURL hostBundle:hostBundle];
+	[driver checkForUpdatesAtURL:[self feedURL] hostBundle:hostBundle];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if (object == driver && [keyPath isEqualToString:@"finished"])
-	{
-		[driver removeObserver:self forKeyPath:@"finished"];
-		[driver release]; driver = nil;
-		[self scheduleNextUpdateCheck];
-	}
-	else if (object == [NSUserDefaultsController sharedUserDefaultsController] && ([keyPath hasSuffix:SUScheduledCheckIntervalKey] || [keyPath hasSuffix:SUEnableAutomaticChecksKey]))
+	if (object == [NSUserDefaultsController sharedUserDefaultsController] && ([keyPath hasSuffix:SUScheduledCheckIntervalKey] || [keyPath hasSuffix:SUEnableAutomaticChecksKey]))
 	{
 		[self updatePreferencesChanged];
 	}
@@ -198,15 +180,42 @@ static SUUpdater *sharedUpdater = nil;
 	return YES; // Otherwise, we're good to go.
 }
 
-- (NSArray *)feedParameters
+- (NSURL *)_baseFeedURL
 {
+	// A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
+	NSString *appcastString = [[SUUserDefaults standardUserDefaults] objectForKey:SUFeedURLKey];
+	if (!appcastString)
+		appcastString = [hostBundle objectForInfoDictionaryKey:SUFeedURLKey];
+	if (!appcastString) // Can't find an appcast string!
+		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the SUFeedURLKey in either the Info.plist or the user defaults!"];
+	NSCharacterSet* quoteSet = [NSCharacterSet characterSetWithCharactersInString: @"\"\'"]; // Some feed publishers add quotes; strip 'em.
+	return [NSURL URLWithString:[appcastString stringByTrimmingCharactersInSet:quoteSet]] ;
+}
+
+- (NSURL *)feedURL
+{
+	NSURL *baseFeedURL = [self _baseFeedURL];
+	
+	// Determine all the parameters we're attaching to the base feed URL.
 	BOOL sendingSystemProfile = ([[SUUserDefaults standardUserDefaults] boolForKey:SUSendProfileInfoKey] == YES);
 	NSArray *parameters = [NSArray array];
 	if ([delegate respondsToSelector:@selector(feedParametersForHostBundle:sendingSystemProfile:)])
 		parameters = [parameters arrayByAddingObjectsFromArray:[delegate feedParametersForHostBundle:hostBundle sendingSystemProfile:sendingSystemProfile]];
 	if (sendingSystemProfile)
 		parameters = [parameters arrayByAddingObjectsFromArray:[hostBundle systemProfile]];
-	return parameters;
+	if (parameters == nil || [parameters count] == 0) { return baseFeedURL; }
+	
+	// Build up the parameterized URL.
+	NSMutableArray *parameterStrings = [NSMutableArray array];
+	NSEnumerator *profileInfoEnumerator = [parameters objectEnumerator];
+	NSDictionary *currentProfileInfo;
+	while ((currentProfileInfo = [profileInfoEnumerator nextObject]))
+		[parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", [currentProfileInfo objectForKey:@"key"], [currentProfileInfo objectForKey:@"value"]]];
+	
+	NSString *appcastStringWithProfile = [NSString stringWithFormat:@"%@?%@", [baseFeedURL absoluteString], [parameterStrings componentsJoinedByString:@"&"]];
+	
+	// Clean it up so it's a valid URL
+	return [NSURL URLWithString:[appcastStringWithProfile stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
 }
 
 - (NSTimeInterval)checkInterval
@@ -226,8 +235,8 @@ static SUUpdater *sharedUpdater = nil;
 - (void)dealloc
 {
 	[hostBundle release];
-	[delegate release];
 	if (checkTimer) { [checkTimer invalidate]; }
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super dealloc];
 }
 
@@ -254,6 +263,14 @@ static SUUpdater *sharedUpdater = nil;
 - (BOOL)updateInProgress
 {
 	return driver && ([driver finished] == NO);
+}
+
+- (void)driverDidFinish:(NSNotification *)notification
+{
+	if ([notification object] != driver) return;
+	[driver release];
+	driver = nil;
+	[self scheduleNextUpdateCheck];
 }
 
 @end

@@ -14,6 +14,7 @@
 	NSArray *items;
 	NSString *userAgentString;
 	id delegate;
+	NSMutableData *incrementalData;
 }
 
 - (void)fetchAppcastFromURL:(NSURL *)url;

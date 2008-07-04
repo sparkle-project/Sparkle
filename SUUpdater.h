@@ -10,6 +10,7 @@
 #define SUUPDATER_H
 
 #import "SUUpdateAlert.h"
+#import "SUVersionComparisonProtocol.h"
 
 @class SUUpdateDriver, SUAppcastItem, SUAppcast;
 @interface SUUpdater : NSObject {
@@ -28,6 +29,11 @@
 // and Sparkle will check for updates and report back its findings verbosely.
 - (IBAction)checkForUpdates:sender;
 
+// This kicks off an update meant to be programmatically initiated. That is, it will display no UI unless it actually finds an update,
+// in which case it proceeds as usual. If the fully automated updating is turned on, however, this will invoke that behavior, and if an
+// update is found, it will be downloaded and prepped for installation.
+- (void)checkForUpdatesInBackground;
+
 // This forces an update to begin with a particular driver (see SU*UpdateDriver.h)
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)driver;
 
@@ -40,7 +46,6 @@
 - (void)updatePreferencesChanged;
 
 - (BOOL)updateInProgress;
-
 @end
 
 @interface NSObject (SUUpdaterDelegateInformalProtocol)
@@ -75,6 +80,10 @@
 
 // Called immediately before relaunching.
 - (void)updaterWillRelaunchApplication;
+
+// This method allows you to provide a custom version comparator.
+// If you don't implement this method or return nil, the standard version comparator will be used.
+- (id <SUVersionComparison>)versionComparatorForHostBundle:(NSBundle *)hb;
 
 @end
 

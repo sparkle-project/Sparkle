@@ -75,7 +75,10 @@
 - (void)download:(NSURLDownload *)download didReceiveDataOfLength:(NSUInteger)length
 {
 	[statusController setProgressValue:[statusController progressValue] + length];
-	[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [NSNumber humanReadableSizeFromDouble:[statusController progressValue]], [NSNumber humanReadableSizeFromDouble:[statusController maxProgressValue]]]];
+	if ([statusController maxProgressValue] > 0)
+		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [NSNumber humanReadableSizeFromDouble:[statusController progressValue]], [NSNumber humanReadableSizeFromDouble:[statusController maxProgressValue]]]];
+	else
+		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [NSNumber humanReadableSizeFromDouble:[statusController progressValue]]]];
 }
 
 - (IBAction)cancelDownload:sender

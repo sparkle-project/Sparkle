@@ -28,27 +28,40 @@
 	[appcast setDelegate:self];
 	[appcast setUserAgentString:[NSString stringWithFormat: @"%@/%@ Sparkle/1.5b2", [hostBundle name], [hostBundle displayVersion]]];
 	[appcast fetchAppcastFromURL:appcastURL];
+	[[SUUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:SULastCheckTimeKey];
+}
+
+- (id <SUVersionComparison>)_versionComparator
+{
+	id <SUVersionComparison> comparator = nil;
+	
+	// Give the delegate a chance to provide a custom version comparator
+	if ([delegate respondsToSelector:@selector(versionComparatorForHostBundle:)])
+		comparator = [delegate versionComparatorForHostBundle:hostBundle];
+	
+	// If we don't get a comparator from the delegate, use the default comparator
+	if (!comparator)
+		comparator = [SUStandardVersionComparator defaultComparator];
+	
+	return comparator;	
 }
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui
 {
-	return [[SUStandardVersionComparator defaultComparator] compareVersion:[hostBundle version]
-																 toVersion:[ui versionString]] == NSOrderedAscending;
+	return [[self _versionComparator] compareVersion:[hostBundle version] toVersion:[ui versionString]] == NSOrderedAscending;
 }
 
 - (BOOL)hostSupportsItem:(SUAppcastItem *)ui
 {
 	if ([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) { return YES; }
-	return [[SUStandardVersionComparator defaultComparator] compareVersion:[ui minimumSystemVersion]
-																 toVersion:[NSWorkspace systemVersionString]] != NSOrderedDescending;
+	return [[self _versionComparator] compareVersion:[ui minimumSystemVersion] toVersion:[NSWorkspace systemVersionString]] != NSOrderedDescending;
 }
 
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui
 {
 	NSString *skippedVersion = [[SUUserDefaults standardUserDefaults] objectForKey:SUSkippedVersionKey];
 	if (skippedVersion == nil) { return NO; }
-	return [[SUStandardVersionComparator defaultComparator] compareVersion:[ui versionString]
-																 toVersion:skippedVersion] != NSOrderedDescending;
+	return [[self _versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
 }
 
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
@@ -60,11 +73,7 @@
 {
 	if ([delegate respondsToSelector:@selector(appcastDidFinishLoading:forHostBundle:)])
 		[delegate appcastDidFinishLoading:ac forHostBundle:hostBundle];
-	
-	NSArray* updates = [ac items];
-	if ([updates count] > 0)
-		[[SUUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:SULastCheckTimeKey];
-	
+		
 	// Now we have to find the best valid update in the appcast.
 	if ([delegate respondsToSelector:@selector(bestValidUpdateInAppcast:forHostBundle:)]) // Does the delegate want to handle it?
 	{
@@ -73,7 +82,7 @@
 	else // If not, we'll take care of it ourselves.
 	{
 		// Find the first update we can actually use.
-		NSEnumerator *updateEnumerator = [updates objectEnumerator];
+		NSEnumerator *updateEnumerator = [[ac items] objectEnumerator];
 		do {
 			updateItem = [updateEnumerator nextObject];
 		} while (updateItem && ![self hostSupportsItem:updateItem]);
@@ -268,12 +277,15 @@
 		NSLog(@"Sparkle Error: %@", [error localizedDescription]);
 	if ([error localizedFailureReason])
 		NSLog(@"Sparkle Error (continued): %@", [error localizedFailureReason]);
+	if (download)
+		[download cancel];
 	[self abortUpdate];
 }
 
 - (void)dealloc
 {
 	[hostBundle release];
+	[download release];
 	[downloadPath release];
 	[relaunchPath release];
 	[super dealloc];

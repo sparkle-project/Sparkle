@@ -82,7 +82,8 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	if ((bundle = [NSBundle bundleWithPath:path]))
 	{
 		// We'll clean it up a little for safety.
-		NSMutableCharacterSet *validCharacters = [NSMutableCharacterSet alphanumericCharacterSet];
+		// The cast is necessary because of a bug in the headers in pre-10.5 SDKs
+		NSMutableCharacterSet *validCharacters = (id)[NSMutableCharacterSet alphanumericCharacterSet];
 		[validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
 		postFix = [[bundle objectForInfoDictionaryKey:@"CFBundleVersion"] stringByTrimmingCharactersInSet:[validCharacters invertedSet]];
 	}
