@@ -53,7 +53,7 @@
 		iconPath = [self pathForResource:[self objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType: nil];
 	NSImage *icon = [[[NSImage alloc] initWithContentsOfFile:iconPath] autorelease];
 	// Use a default icon if none is defined.
-	if (!icon) { [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kGenericApplicationIcon)]; }
+	if (!icon) { icon = [NSImage imageNamed:@"NSDefaultApplicationIcon"]; }
 	return icon;
 }
 
