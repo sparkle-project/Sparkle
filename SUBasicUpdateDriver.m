@@ -54,7 +54,7 @@
 - (BOOL)hostSupportsItem:(SUAppcastItem *)ui
 {
 	if ([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) { return YES; }
-	return [[self _versionComparator] compareVersion:[ui minimumSystemVersion] toVersion:[NSWorkspace systemVersionString]] != NSOrderedDescending;
+	return [[SUStandardVersionComparator defaultComparator] compareVersion:[ui minimumSystemVersion] toVersion:[NSWorkspace systemVersionString]] != NSOrderedDescending;
 }
 
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui
