@@ -129,6 +129,7 @@ static SUUpdater *sharedUpdater = nil;
 	
 	driver = [d retain];
 	if ([driver delegate] == nil) { [driver setDelegate:delegate]; }
+	NSLog(@"Checking %@", [self feedURL]);
 	[driver checkForUpdatesAtURL:[self feedURL] hostBundle:hostBundle];
 }
 

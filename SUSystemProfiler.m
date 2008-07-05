@@ -56,12 +56,24 @@
 		}
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"cputype",@"CPU Type", [NSNumber numberWithInt:value], visibleCPUType,nil] forKeys:profileDictKeys]];
 	}
+	error = sysctlbyname("hw.cpu64bit_capable", &value, &length, NULL, 0);
+	if(error != 0)
+		error = sysctlbyname("hw.optional.x86_64", &value, &length, NULL, 0); //x86 specific
+	if(error != 0)
+		error = sysctlbyname("hw.optional.64bitops", &value, &length, NULL, 0); //PPC specific
+	
+	BOOL is64bit = NO;
+	
+	if (error == 0) {
+		is64bit = value == 1;
+		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"cpu64bit", @"CPU is 64-Bit?", [NSNumber numberWithBool:is64bit], is64bit ? @"Yes" : @"No", nil] forKeys:profileDictKeys]];
+	}
 	error = sysctlbyname("hw.cpusubtype", &value, &length, NULL, 0);
 	if (error == 0) {
 		NSString *visibleCPUSubType;
 		if (cpuType == 7) {
 			// Intel
-			visibleCPUSubType = @"Intel";	// If anyone knows how to tell a Core Duo from a Core Solo, please email tph@atomicbird.com
+			visibleCPUSubType = is64bit ? @"Intel Core 2" : @"Intel Core";	// If anyone knows how to tell a Core Duo from a Core Solo, please email tph@atomicbird.com
 		} else if (cpuType == 18) {
 			// PowerPC
 			switch(value) {
@@ -116,7 +128,7 @@
 	SInt32 gestaltInfo;
 	err = Gestalt(gestaltProcClkSpeedMHz,&gestaltInfo);
 	if (err == noErr)
-		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"cpuFreqMHz",@"CPU Speed (MHz)", [NSNumber numberWithInt:gestaltInfo], [NSNumber numberWithInt:gestaltInfo],nil] forKeys:profileDictKeys]];
+		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"cpuFreqMHz",@"CPU Speed (GHz)", [NSNumber numberWithInt:gestaltInfo], [NSNumber numberWithDouble:gestaltInfo/1000.0],nil] forKeys:profileDictKeys]];
 	
 	// amount of RAM
 	err = Gestalt(gestaltPhysicalRAMSizeInMegabytes,&gestaltInfo);
