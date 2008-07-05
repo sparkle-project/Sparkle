@@ -26,7 +26,7 @@
 	[appcast release];
 	
 	[appcast setDelegate:self];
-	[appcast setUserAgentString:[NSString stringWithFormat: @"%@/%@ Sparkle/1.5b2", [hostBundle name], [hostBundle displayVersion]]];
+	[appcast setUserAgentString:[NSString stringWithFormat: @"%@/%@ Sparkle/1.5b3", [hostBundle name], [hostBundle displayVersion]]];
 	[appcast fetchAppcastFromURL:appcastURL];
 	[[SUUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:SULastCheckTimeKey];
 }
