@@ -48,6 +48,12 @@
 	[super appcastDidFinishLoading:ac];
 }
 
+- (void)abortUpdate
+{
+	[self closeCheckingWindow];
+	[super abortUpdate];
+}
+
 - (void)appcast:(SUAppcast *)ac failedToLoadWithError:(NSError *)error
 {
 	if (isCanceled)
@@ -55,7 +61,6 @@
 		[self abortUpdate];
 		return;
 	}
-	[self closeCheckingWindow];
 	[super appcast:ac failedToLoadWithError:error];
 }
 
