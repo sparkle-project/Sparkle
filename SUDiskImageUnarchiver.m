@@ -29,8 +29,7 @@
 	BOOL mountedSuccessfully = NO;
 	
 	// get a unique mount point path
-	NSString *mountPrefix = [@"/Volumes" stringByAppendingPathComponent:[[archivePath lastPathComponent] stringByDeletingPathExtension]];
-	NSString *mountPoint = [mountPrefix stringByAppendingString:[[NSProcessInfo processInfo] globallyUniqueString]];
+	NSString *mountPoint = [@"/Volumes" stringByAppendingPathComponent:[[NSProcessInfo processInfo] globallyUniqueString]];
 	
 	if ([[NSFileManager defaultManager] fileExistsAtPath:mountPoint]) goto reportError;
 
@@ -55,7 +54,10 @@
 	id subpathEnumerator = [[[NSFileManager defaultManager] directoryContentsAtPath:mountPoint] objectEnumerator], currentSubpath;
 	while ((currentSubpath = [subpathEnumerator nextObject]))
 	{
-		if (![[NSFileManager defaultManager] copyPath:[mountPoint stringByAppendingPathComponent:currentSubpath] toPath:[targetPath stringByAppendingPathComponent:currentSubpath] handler:nil])
+		NSString *currentFullPath = [mountPoint stringByAppendingPathComponent:currentSubpath];
+		// Don't bother trying (and failing) to copy out files we can't read. That's not going to be the app anyway.
+		if (![[NSFileManager defaultManager] isReadableFileAtPath:currentFullPath]) continue;
+		if (![[NSFileManager defaultManager] copyPath:currentFullPath toPath:[targetPath stringByAppendingPathComponent:currentSubpath] handler:nil])
 			goto reportError;
 	}
 			
@@ -67,7 +69,9 @@ reportError:
 
 finally:
 	if (mountedSuccessfully)
-		[NSTask launchedTaskWithLaunchPath:@"/usr/bin/hdiutil" arguments:[NSArray arrayWithObjects:@"detach", mountPoint, @"-force", nil]];	
+		[NSTask launchedTaskWithLaunchPath:@"/usr/bin/hdiutil" arguments:[NSArray arrayWithObjects:@"detach", mountPoint, @"-force", nil]];
+	else
+		[[NSFileManager defaultManager] removeFileAtPath:mountPoint handler:nil];
 	[pool drain];
 }
 
