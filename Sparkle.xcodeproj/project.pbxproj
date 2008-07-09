@@ -258,6 +258,10 @@
 		61F365330E1898A3007ECA02 /* nl */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = nl; path = nl.lproj/SUUpdatePermissionPrompt.nib; sourceTree = "<group>"; };
 		61F365340E1898A3007ECA02 /* nl */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = nl; path = nl.lproj/SUUpdateAlert.nib; sourceTree = "<group>"; };
 		61F365350E1898A3007ECA02 /* nl */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = nl; path = nl.lproj/SUAutomaticUpdateAlert.nib; sourceTree = "<group>"; };
+		61F614540E24A12D009F47E7 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		61F614550E24A12D009F47E7 /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/SUAutomaticUpdateAlert.nib; sourceTree = "<group>"; };
+		61F614560E24A12D009F47E7 /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/SUUpdateAlert.nib; sourceTree = "<group>"; };
+		61F614570E24A12D009F47E7 /* it */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it; path = it.lproj/SUUpdatePermissionPrompt.nib; sourceTree = "<group>"; };
 		61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBasicUpdateDriver.h; sourceTree = "<group>"; };
 		61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBasicUpdateDriver.m; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -887,6 +891,7 @@
 				61AAE8590A321B0400D8810D /* fr */,
 				61AAE8710A321F7700D8810D /* nl */,
 				619B17200E1E9D0800E72754 /* de */,
+				61F614540E24A12D009F47E7 /* it */,
 			);
 			name = Sparkle.strings;
 			sourceTree = "<group>";
@@ -899,6 +904,7 @@
 				61F365300E18988F007ECA02 /* fr */,
 				61F365350E1898A3007ECA02 /* nl */,
 				619B17210E1E9D0800E72754 /* de */,
+				61F614550E24A12D009F47E7 /* it */,
 			);
 			name = SUAutomaticUpdateAlert.nib;
 			sourceTree = "<group>";
@@ -911,6 +917,7 @@
 				61F3652F0E18988F007ECA02 /* fr */,
 				61F365340E1898A3007ECA02 /* nl */,
 				619B17220E1E9D0800E72754 /* de */,
+				61F614560E24A12D009F47E7 /* it */,
 			);
 			name = SUUpdateAlert.nib;
 			sourceTree = "<group>";
@@ -939,6 +946,7 @@
 				61F3652E0E18988F007ECA02 /* fr */,
 				61F365330E1898A3007ECA02 /* nl */,
 				619B17230E1E9D0800E72754 /* de */,
+				61F614570E24A12D009F47E7 /* it */,
 			);
 			name = SUUpdatePermissionPrompt.nib;
 			sourceTree = "<group>";
