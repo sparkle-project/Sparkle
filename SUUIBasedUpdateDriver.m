@@ -8,7 +8,6 @@
 
 #import "SUUIBasedUpdateDriver.h"
 #import "Sparkle.h"
-#import "NSNumber+Units.h"
 
 @implementation SUUIBasedUpdateDriver
 
@@ -72,13 +71,27 @@
 	[statusController setMaxProgressValue:[response expectedContentLength]];
 }
 
+- (NSString *)_humanReadableSizeFromDouble:(double)value
+{
+	if (value < 1024)
+		return [NSString stringWithFormat:@"%.0lf %@", value, SULocalizedString(@"B", @"the unit for bytes")];
+	
+	if (value < 1024 * 1024)
+		return [NSString stringWithFormat:@"%.0lf %@", value / 1024.0, SULocalizedString(@"KB", @"the unit for kilobytes")];
+	
+	if (value < 1024 * 1024 * 1024)
+		return [NSString stringWithFormat:@"%.1lf %@", value / 1024.0 / 1024.0, SULocalizedString(@"MB", @"the unit for megabytes")];
+	
+	return [NSString stringWithFormat:@"%.2lf %@", value / 1024.0 / 1024.0 / 1024.0, SULocalizedString(@"GB", @"the unit for gigabytes")];	
+}
+
 - (void)download:(NSURLDownload *)download didReceiveDataOfLength:(NSUInteger)length
 {
 	[statusController setProgressValue:[statusController progressValue] + length];
 	if ([statusController maxProgressValue] > 0)
-		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [NSNumber humanReadableSizeFromDouble:[statusController progressValue]], [NSNumber humanReadableSizeFromDouble:[statusController maxProgressValue]]]];
+		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [self _humanReadableSizeFromDouble:[statusController progressValue]], [self _humanReadableSizeFromDouble:[statusController maxProgressValue]]]];
 	else
-		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [NSNumber humanReadableSizeFromDouble:[statusController progressValue]]]];
+		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self _humanReadableSizeFromDouble:[statusController progressValue]]]];
 }
 
 - (IBAction)cancelDownload:sender
