@@ -15,7 +15,7 @@
 {
 	[super checkForUpdatesAtURL:appcastURL hostBundle:hb];
 	checkingController = [[SUStatusController alloc] initWithHostBundle:hb];
-	[checkingController window]; // Force the checking controller to load its window.
+	[[checkingController window] center]; // Force the checking controller to load its window.
 	[checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates\u2026", nil) maxProgressValue:0 statusText:nil];
 	[checkingController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
 	[checkingController showWindow:self];
