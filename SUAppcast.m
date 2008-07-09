@@ -101,7 +101,7 @@
 					if (date)
 						[dict setObject:date forKey:name];
 				}
-                else
+                else if (name != nil)
                 {
 					// add all other values as strings
 					[dict setObject:[[node stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] forKey:name];
@@ -118,7 +118,7 @@
 			}
             else
             {
-                failed = YES;
+				NSLog(@"Sparkle Updater: Failed to parse appcast item with appcast dictionary %@!", dict);
             }
             [dict removeAllObjects];
 		}
