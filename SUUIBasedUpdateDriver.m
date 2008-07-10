@@ -52,7 +52,7 @@
 	{
 		case SUInstallUpdateChoice:
 			statusController = [[SUStatusController alloc] initWithHostBundle:hostBundle];
-			[statusController beginActionWithTitle:SULocalizedString(@"Downloading update\u2026", nil) maxProgressValue:0 statusText:nil];
+			[statusController beginActionWithTitle:SULocalizedString(@"Downloading update\u2026", @"Take care not to overflow the status window.") maxProgressValue:0 statusText:nil];
 			[statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
 			[statusController showWindow:self];	
 			[self downloadUpdate];
@@ -104,7 +104,7 @@
 - (void)extractUpdate
 {
 	// Now we have to extract the downloaded archive.
-	[statusController beginActionWithTitle:SULocalizedString(@"Extracting update\u2026", nil) maxProgressValue:0 statusText:nil];
+	[statusController beginActionWithTitle:SULocalizedString(@"Extracting update\u2026", @"Take care not to overflow the status window.") maxProgressValue:0 statusText:nil];
 	[statusController setButtonEnabled:NO];
 	[super extractUpdate];
 }
@@ -130,7 +130,7 @@
 
 - (void)installUpdate
 {
-	[statusController beginActionWithTitle:SULocalizedString(@"Installing update\u2026", nil) maxProgressValue:0 statusText:nil];
+	[statusController beginActionWithTitle:SULocalizedString(@"Installing update\u2026", @"Take care not to overflow the status window.") maxProgressValue:0 statusText:nil];
 	[statusController setButtonEnabled:NO];
 	[super installUpdate];	
 }
