@@ -160,6 +160,12 @@
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while downloading the update. Please try again later.", nil), NSLocalizedDescriptionKey, [error localizedDescription], NSLocalizedFailureReasonErrorKey, nil]]];
 }
 
+- (BOOL)download:(NSURLDownload *)download shouldDecodeSourceDataOfMIMEType:(NSString *)encodingType
+{
+	if ([encodingType isEqualToString:@"application/gzip"]) return NO;
+	return YES;
+}
+
 - (void)extractUpdate
 {
 	// DSA verification, if activated by the developer

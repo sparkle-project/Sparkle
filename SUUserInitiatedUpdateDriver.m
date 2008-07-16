@@ -13,12 +13,12 @@
 
 - (void)checkForUpdatesAtURL:(NSURL *)appcastURL host:(SUHost *)hb
 {
-	[super checkForUpdatesAtURL:appcastURL host:hb];
 	checkingController = [[SUStatusController alloc] initWithHost:hb];
 	[[checkingController window] center]; // Force the checking controller to load its window.
 	[checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates\u2026", nil) maxProgressValue:0 statusText:nil];
 	[checkingController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
 	[checkingController showWindow:self];
+	[super checkForUpdatesAtURL:appcastURL hostBundle:hb];
 }
 
 - (void)closeCheckingWindow
@@ -48,10 +48,10 @@
 	[super appcastDidFinishLoading:ac];
 }
 
-- (void)abortUpdate
+- (void)abortUpdateWithError:(NSError *)error
 {
 	[self closeCheckingWindow];
-	[super abortUpdate];
+	[super abortUpdateWithError:error];
 }
 
 - (void)appcast:(SUAppcast *)ac failedToLoadWithError:(NSError *)error
