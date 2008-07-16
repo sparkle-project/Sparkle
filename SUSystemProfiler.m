@@ -27,7 +27,7 @@
 	return [[[NSDictionary alloc] initWithContentsOfFile:path] autorelease];
 }
 
-- (NSMutableArray *)systemProfileArrayForHostBundle:(NSBundle *)hostBundle
+- (NSMutableArray *)systemProfileArrayForHost:(SUHost *)host
 {
 	NSDictionary *modelTranslation = [self modelTranslationTable];
 	
@@ -115,10 +115,10 @@
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"lang",@"Preferred Language", [languages objectAtIndex:0], [languages objectAtIndex:0],nil] forKeys:profileDictKeys]];
 	
 	// Application sending the request
-	NSString *appName = [hostBundle name];
+	NSString *appName = [host name];
 	if (appName)
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"appName",@"Application Name", appName, appName,nil] forKeys:profileDictKeys]];
-	NSString *appVersion = [hostBundle version];
+	NSString *appVersion = [host version];
 	if (appVersion)
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"appVersion",@"Application Version", appVersion, appVersion,nil] forKeys:profileDictKeys]];
 	

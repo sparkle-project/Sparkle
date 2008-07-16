@@ -11,12 +11,12 @@
 
 @implementation SUStatusController
 
-- (id)initWithHostBundle:(NSBundle *)hb
+- (id)initWithHost:(SUHost *)hb
 {
-	self = [super initWithHostBundle:hb windowNibName:@"SUStatus"];
+	self = [super initWithHost:hb windowNibName:@"SUStatus"];
 	if (self)
 	{
-		hostBundle = [hb retain];
+		host = [hb retain];
 		[self setShouldCascadeWindows:NO];
 	}
 	return self;
@@ -24,7 +24,7 @@
 
 - (void)dealloc
 {
-	[hostBundle release];
+	[host release];
 	[title release];
 	[statusText release];
 	[buttonTitle release];
@@ -40,12 +40,12 @@
 
 - (NSString *)windowTitle
 {
-	return [NSString stringWithFormat:SULocalizedString(@"Updating %@", nil), [hostBundle name]];
+	return [NSString stringWithFormat:SULocalizedString(@"Updating %@", nil), [host name]];
 }
 
 - (NSImage *)applicationIcon
 {
-	return [hostBundle icon];
+	return [host icon];
 }
 
 - (void)beginActionWithTitle:(NSString *)aTitle maxProgressValue:(double)aMaxProgressValue statusText:(NSString *)aStatusText

@@ -13,7 +13,7 @@
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)ua
 {
-	alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:updateItem hostBundle:hostBundle delegate:self];
+	alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:updateItem host:host delegate:self];
 	if ([NSApp isActive])
 		[[alert window] makeKeyAndOrderFront:self];
 	else
@@ -40,7 +40,7 @@
 			break;
 
 		case SUDoNotInstallChoice:
-			[[SUUserDefaults standardUserDefaults] setObject:[updateItem versionString] forKey:SUSkippedVersionKey];
+			[host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
 			[self abortUpdate];
 			break;
 	}
@@ -59,9 +59,9 @@
 	[self installUpdate];
 }
 
-- (void)installerFinishedForHostBundle:(NSBundle *)hb
+- (void)installerFinishedForHost:(SUHost *)aHost
 {
-	if (hb != hostBundle) { return; }
+	if (aHost != host) { return; }
 	if (!postponingInstallation)
 		[self relaunchHostApp];
 }

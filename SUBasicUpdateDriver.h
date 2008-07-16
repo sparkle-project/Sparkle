@@ -12,9 +12,8 @@
 #import <Cocoa/Cocoa.h>
 #import "SUUpdateDriver.h"
 
-@class SUAppcastItem, SUUnarchiver, SUAppcast, SUUnarchiver;
+@class SUAppcastItem, SUUnarchiver, SUAppcast, SUUnarchiver, SUHost;
 @interface SUBasicUpdateDriver : SUUpdateDriver {
-	NSBundle *hostBundle;
 	SUAppcastItem *updateItem;
 	
 	NSURLDownload *download;
@@ -23,7 +22,7 @@
 	NSString *relaunchPath;
 }
 
-- (void)checkForUpdatesAtURL:(NSURL *)appcastURL hostBundle:(NSBundle *)hb;
+- (void)checkForUpdatesAtURL:(NSURL *)appcastURL host:(SUHost *)hb;
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac;
 - (void)appcast:(SUAppcast *)ac failedToLoadWithError:(NSError *)error;
@@ -45,8 +44,8 @@
 - (void)unarchiverDidFail:(SUUnarchiver *)ua;
 
 - (void)installUpdate;
-- (void)installerFinishedForHostBundle:(NSBundle *)hb;
-- (void)installerForHostBundle:(NSBundle *)hb failedWithError:(NSError *)error;
+- (void)installerFinishedForHost:(SUHost *)hb;
+- (void)installerForHost:(SUHost *)hb failedWithError:(NSError *)error;
 
 - (void)relaunchHostApp;
 - (void)cleanUp;

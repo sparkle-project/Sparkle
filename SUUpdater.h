@@ -17,11 +17,12 @@
 	NSTimer *checkTimer;
 	SUUpdateDriver *driver;
 	
-	NSBundle *hostBundle;
+	SUHost *host;
 	IBOutlet id delegate;
 }
 
 + (SUUpdater *)sharedUpdater;
++ (SUUpdater *)updaterForBundle:(NSBundle *)bundle;
 
 - (void)setDelegate:(id)delegate;
 
@@ -37,10 +38,6 @@
 // This forces an update to begin with a particular driver (see SU*UpdateDriver.h)
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)driver;
 
-// For non-.app updates:
-// Call this when your bundle is loaded to tell Sparkle what to update.
-- (void)setHostBundle:(NSBundle *)hostBundle;
-
 // Call this to appropriately reschedule or cancel the update checking timer if preferences for time interval or automatic checks change.
 // If you're using a .app, this'll be picked up automatically via NSUserDefaultsController, but for non-.apps, there's no way to observe changes.
 - (void)updatePreferencesChanged;
@@ -51,39 +48,39 @@
 @interface NSObject (SUUpdaterDelegateInformalProtocol)
 // This method allows you to add extra parameters to the appcast URL, potentially based on whether or not
 // Sparkle will also be sending along the system profile. This method should return an array of dictionaries with the following keys:
-- (NSArray *)feedParametersForHostBundle:(NSBundle *)bundle sendingSystemProfile:(BOOL)sendingProfile;
+- (NSArray *)feedParametersForHost:(SUHost *)bundle sendingSystemProfile:(BOOL)sendingProfile;
 
 // Use this to override the default behavior for Sparkle prompting the user about automatic update checks.
-- (BOOL)shouldPromptForPermissionToCheckForUpdatesToHostBundle:(NSBundle *)bundle;
+- (BOOL)shouldPromptForPermissionToCheckForUpdatesToHost:(SUHost *)bundle;
 
 // Implement this if you want to do some special handling with the appcast once it finishes loading.
-- (void)appcastDidFinishLoading:(SUAppcast *)appcast forHostBundle:(NSBundle *)bundle;
+- (void)appcastDidFinishLoading:(SUAppcast *)appcast forHost:(SUHost *)bundle;
 
 // If you're using special logic or extensions in your appcast, implement this to use your own logic for finding
 // a valid update, if any, in the given appcast.
-- (SUAppcastItem *)bestValidUpdateInAppcast:(SUAppcast *)appcast forHostBundle:(NSBundle *)bundle;
+- (SUAppcastItem *)bestValidUpdateInAppcast:(SUAppcast *)appcast forHost:(SUHost *)bundle;
 
 // Sent when a valid update is found by the update driver.
-- (void)didFindValidUpdate:(SUAppcastItem *)update toHostBundle:(NSBundle *)bundle;
+- (void)didFindValidUpdate:(SUAppcastItem *)update toHost:(SUHost *)bundle;
 
 // Sent when a valid update is not found.
-- (void)didNotFindUpdateToHostBundle:(NSBundle *)hb;
+- (void)didNotFindUpdateToHost:(SUHost *)hb;
 
 // Sent when the user makes a choice in the update alert dialog (install now / remind me later / skip this version).
-- (void)userChoseAction:(SUUpdateAlertChoice)action forUpdate:(SUAppcastItem *)update toHostBundle:(NSBundle *)bundle;
+- (void)userChoseAction:(SUUpdateAlertChoice)action forUpdate:(SUAppcastItem *)update toHost:(SUHost *)bundle;
 
 // Sent immediately before installing the specified update.
-- (void)updateWillInstall:(SUAppcastItem *)update toHostBundle:(NSBundle *)bundle;
+- (void)updateWillInstall:(SUAppcastItem *)update toHost:(SUHost *)bundle;
 
 // Return YES to delay the relaunch until you do some processing; invoke the given NSInvocation to continue.
-- (BOOL)shouldPostponeRelaunchForUpdate:(SUAppcastItem *)update toHostBundle:(NSBundle *)hostBundle untilInvoking:(NSInvocation *)invocation;
+- (BOOL)shouldPostponeRelaunchForUpdate:(SUAppcastItem *)update toHost:(SUHost *)hostBundle untilInvoking:(NSInvocation *)invocation;
 
 // Called immediately before relaunching.
 - (void)updaterWillRelaunchApplication;
 
 // This method allows you to provide a custom version comparator.
 // If you don't implement this method or return nil, the standard version comparator will be used.
-- (id <SUVersionComparison>)versionComparatorForHostBundle:(NSBundle *)hb;
+- (id <SUVersionComparison>)versionComparatorForHost:(SUHost *)hb;
 
 @end
 

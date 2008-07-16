@@ -11,7 +11,7 @@
 
 @implementation SUPackageInstaller
 
-+ (void)installPath:(NSString *)path overHostBundle:(NSBundle *)bundle delegate:delegate
++ (void)installPath:(NSString *)path overHost:(SUHost *)bundle delegate:delegate
 {
 	NSError *error = nil;
 	BOOL result = YES;
@@ -26,7 +26,7 @@
 	NSTask *installer = [NSTask launchedTaskWithLaunchPath:installerPath arguments:[NSArray arrayWithObjects:path, nil]];
 	[installer waitUntilExit];
 	// Known bug: if the installation fails or is canceled, Sparkle goes ahead and restarts, thinking everything is fine.
-	[self _finishInstallationWithResult:result hostBundle:bundle error:error delegate:delegate];
+	[self _finishInstallationWithResult:result host:bundle error:error delegate:delegate];
 }
 
 @end

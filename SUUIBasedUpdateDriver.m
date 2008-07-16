@@ -13,11 +13,11 @@
 
 - (void)didFindValidUpdate
 {
-	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem hostBundle:hostBundle];
+	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem host:host];
 	[updateAlert setDelegate:self];
 	
 	// If the app is a menubar app or the like, we need to focus it first:
-	if ([[hostBundle objectForInfoDictionaryKey:@"LSUIElement"] doubleValue]) { [NSApp activateIgnoringOtherApps:YES]; }
+	if ([[host objectForInfoDictionaryKey:@"LSUIElement"] doubleValue]) { [NSApp activateIgnoringOtherApps:YES]; }
 	
 	// Only show the update alert if the app is active; otherwise, we'll wait until it is.
 	if ([NSApp isActive])
@@ -28,10 +28,10 @@
 
 - (void)didNotFindUpdate
 {
-	if ([delegate respondsToSelector:@selector(didNotFindUpdateToHostBundle:)])
-		[delegate didNotFindUpdateToHostBundle:hostBundle];
-	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"You're up to date!", nil) defaultButton:SULocalizedString(@"OK", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [hostBundle name], [hostBundle displayVersion]];
-	[alert setIcon:[hostBundle icon]];
+	if ([delegate respondsToSelector:@selector(didNotFindUpdateToHost:)])
+		[delegate didNotFindUpdateToHost:host];
+	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"You're up to date!", nil) defaultButton:SULocalizedString(@"OK", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [host name], [host displayVersion]];
+	[alert setIcon:[host icon]];
 	[alert runModal];
 	[self abortUpdate];
 }
@@ -45,13 +45,13 @@
 - (void)updateAlert:(SUUpdateAlert *)alert finishedWithChoice:(SUUpdateAlertChoice)choice
 {
 	[updateAlert release]; updateAlert = nil;
-	if ([delegate respondsToSelector:@selector(userChoseAction:forUpdate:toHostBundle:)])
-		[delegate userChoseAction:choice forUpdate:updateItem toHostBundle:hostBundle];
-	[[SUUserDefaults standardUserDefaults] setObject:nil forKey:SUSkippedVersionKey];
+	if ([delegate respondsToSelector:@selector(userChoseAction:forUpdate:toHost:)])
+		[delegate userChoseAction:choice forUpdate:updateItem toHost:host];
+	[host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
 	switch (choice)
 	{
 		case SUInstallUpdateChoice:
-			statusController = [[SUStatusController alloc] initWithHostBundle:hostBundle];
+			statusController = [[SUStatusController alloc] initWithHost:host];
 			[statusController beginActionWithTitle:SULocalizedString(@"Downloading update\u2026", @"Take care not to overflow the status window.") maxProgressValue:0 statusText:nil];
 			[statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
 			[statusController showWindow:self];	
@@ -59,7 +59,7 @@
 			break;
 			
 		case SUSkipThisVersionChoice:
-			[[SUUserDefaults standardUserDefaults] setObject:[updateItem versionString] forKey:SUSkippedVersionKey];
+			[host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
 		case SURemindMeLaterChoice:
 			[self abortUpdate];
 			break;			
@@ -138,7 +138,7 @@
 - (void)abortUpdateWithError:(NSError *)error
 {
 	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"Update Error!", nil) defaultButton:SULocalizedString(@"Cancel Update", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:[error localizedDescription]];
-	[alert setIcon:[hostBundle icon]];
+	[alert setIcon:[host icon]];
 	[alert runModal];
 	[super abortUpdateWithError:error];
 }

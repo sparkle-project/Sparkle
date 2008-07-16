@@ -11,15 +11,16 @@
 
 #import "SUWindowController.h"
 
+@class SUHost;
 @interface SUStatusController : SUWindowController {
 	double progressValue, maxProgressValue;
 	NSString *title, *statusText, *buttonTitle;
 	IBOutlet NSButton *actionButton;
 	IBOutlet NSProgressIndicator* progressBar;
-	NSBundle *hostBundle;
+	SUHost *host;
 }
 
-- (id)initWithHostBundle:(NSBundle *)hostBundle;
+- (id)initWithHost:(SUHost *)host;
 
 // Pass 0 for the max progress value to get an indeterminate progress bar.
 // Pass nil for the status text to not show it.

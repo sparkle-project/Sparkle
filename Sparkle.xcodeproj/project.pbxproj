@@ -55,13 +55,9 @@
 		618FA5230DAE8E8A0026945C /* SUPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5210DAE8E8A0026945C /* SUPackageInstaller.m */; };
 		6196CFF909C72148000DC222 /* SUStatusController.h in Headers */ = {isa = PBXBuildFile; fileRef = 6196CFE309C71ADE000DC222 /* SUStatusController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6196CFFA09C72149000DC222 /* SUStatusController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6196CFE409C71ADE000DC222 /* SUStatusController.m */; };
-		61A225930D1C3ADD00430CCD /* NSBundle+SUAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 61A225910D1C3ADD00430CCD /* NSBundle+SUAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		61A225940D1C3ADD00430CCD /* NSBundle+SUAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A225920D1C3ADD00430CCD /* NSBundle+SUAdditions.m */; };
 		61A2259E0D1C495D00430CCD /* SUVersionComparisonProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 61A2259C0D1C495D00430CCD /* SUVersionComparisonProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		61A225A40D1C4AC000430CCD /* SUStandardVersionComparator.h in Headers */ = {isa = PBXBuildFile; fileRef = 61A225A20D1C4AC000430CCD /* SUStandardVersionComparator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		61A225A50D1C4AC000430CCD /* SUStandardVersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */; };
-		61A2262B0D1C58FD00430CCD /* SUUserDefaults.h in Headers */ = {isa = PBXBuildFile; fileRef = 61A226290D1C58FD00430CCD /* SUUserDefaults.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		61A2262C0D1C58FD00430CCD /* SUUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A2262A0D1C58FD00430CCD /* SUUserDefaults.m */; };
 		61A2279C0D1CEE7600430CCD /* SUSystemProfiler.h in Headers */ = {isa = PBXBuildFile; fileRef = 61A2279A0D1CEE7600430CCD /* SUSystemProfiler.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		61A2279D0D1CEE7600430CCD /* SUSystemProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A2279B0D1CEE7600430CCD /* SUSystemProfiler.m */; };
 		61A354550DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61A354530DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -95,6 +91,8 @@
 		61C1F2790DA066C2007ACE13 /* NSFileManager+ExtendedAttributes.m in Sources */ = {isa = PBXBuildFile; fileRef = 61C1F2770DA066C2007ACE13 /* NSFileManager+ExtendedAttributes.m */; };
 		61C46F340D9C54F300B06326 /* SUUpdatePermissionPrompt.nib in Resources */ = {isa = PBXBuildFile; fileRef = 61C46F330D9C54F300B06326 /* SUUpdatePermissionPrompt.nib */; };
 		61D85D6D0E10B2ED00F9B4A9 /* SUPipedUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 6129C0B90E0B79810062CE76 /* SUPipedUnarchiver.m */; };
+		61EF67560E25B58D00F754E0 /* SUHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 61EF67550E25B58D00F754E0 /* SUHost.m */; };
+		61EF67590E25C5B400F754E0 /* SUHost.h in Headers */ = {isa = PBXBuildFile; fileRef = 61EF67580E25C5B400F754E0 /* SUHost.h */; };
 		61F83F720DBFE140006FDD30 /* SUBasicUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */; };
 		61F83F740DBFE141006FDD30 /* SUBasicUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DAAEFC9B0DA5722F0051E0D0 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
@@ -206,13 +204,9 @@
 		619B17210E1E9D0800E72754 /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/SUAutomaticUpdateAlert.nib; sourceTree = "<group>"; };
 		619B17220E1E9D0800E72754 /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/SUUpdateAlert.nib; sourceTree = "<group>"; };
 		619B17230E1E9D0800E72754 /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/SUUpdatePermissionPrompt.nib; sourceTree = "<group>"; };
-		61A225910D1C3ADD00430CCD /* NSBundle+SUAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSBundle+SUAdditions.h"; sourceTree = "<group>"; };
-		61A225920D1C3ADD00430CCD /* NSBundle+SUAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSBundle+SUAdditions.m"; sourceTree = "<group>"; };
 		61A2259C0D1C495D00430CCD /* SUVersionComparisonProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionComparisonProtocol.h; sourceTree = "<group>"; };
 		61A225A20D1C4AC000430CCD /* SUStandardVersionComparator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStandardVersionComparator.h; sourceTree = "<group>"; };
 		61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUStandardVersionComparator.m; sourceTree = "<group>"; };
-		61A226290D1C58FD00430CCD /* SUUserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUserDefaults.h; sourceTree = "<group>"; };
-		61A2262A0D1C58FD00430CCD /* SUUserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUserDefaults.m; sourceTree = "<group>"; };
 		61A2279A0D1CEE7600430CCD /* SUSystemProfiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUSystemProfiler.h; sourceTree = "<group>"; };
 		61A2279B0D1CEE7600430CCD /* SUSystemProfiler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUSystemProfiler.m; sourceTree = "<group>"; };
 		61A354530DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUserInitiatedUpdateDriver.h; sourceTree = "<group>"; };
@@ -249,6 +243,8 @@
 		61C1F2760DA066C2007ACE13 /* NSFileManager+ExtendedAttributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileManager+ExtendedAttributes.h"; sourceTree = "<group>"; };
 		61C1F2770DA066C2007ACE13 /* NSFileManager+ExtendedAttributes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileManager+ExtendedAttributes.m"; sourceTree = "<group>"; };
 		61C46F350D9C54F300B06326 /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/SUUpdatePermissionPrompt.nib; sourceTree = "<group>"; };
+		61EF67550E25B58D00F754E0 /* SUHost.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUHost.m; sourceTree = "<group>"; };
+		61EF67580E25C5B400F754E0 /* SUHost.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUHost.h; sourceTree = "<group>"; };
 		61F3651A0E18987B007ECA02 /* es */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = es; path = es.lproj/SUUpdatePermissionPrompt.nib; sourceTree = "<group>"; };
 		61F3652A0E189883007ECA02 /* es */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = es; path = es.lproj/SUUpdateAlert.nib; sourceTree = "<group>"; };
 		61F3652B0E189883007ECA02 /* es */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = es; path = es.lproj/SUAutomaticUpdateAlert.nib; sourceTree = "<group>"; };
@@ -473,8 +469,8 @@
 		61B5F8F309C4CE5900B25A18 /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
-				61A225910D1C3ADD00430CCD /* NSBundle+SUAdditions.h */,
-				61A225920D1C3ADD00430CCD /* NSBundle+SUAdditions.m */,
+				61EF67580E25C5B400F754E0 /* SUHost.h */,
+				61EF67550E25B58D00F754E0 /* SUHost.m */,
 				611779570D1111C400749C97 /* NSWorkspace_RBAdditions.h */,
 				611779560D1111C400749C97 /* NSWorkspace_RBAdditions.m */,
 				610134750DD252E60049ACDF /* NSWorkspace+SystemVersion.h */,
@@ -482,8 +478,6 @@
 				61299B3509CB04E000B7442F /* Sparkle.h */,
 				61299A5B09CA6D4500B7442F /* SUConstants.h */,
 				61299A5F09CA6EB100B7442F /* SUConstants.m */,
-				61A226290D1C58FD00430CCD /* SUUserDefaults.h */,
-				61A2262A0D1C58FD00430CCD /* SUUserDefaults.m */,
 			);
 			includeInIndex = 1;
 			name = "Other Sources";
@@ -563,10 +557,8 @@
 				61299B3609CB04E000B7442F /* Sparkle.h in Headers */,
 				6120721209CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.h in Headers */,
 				611779590D1111C900749C97 /* NSWorkspace_RBAdditions.h in Headers */,
-				61A225930D1C3ADD00430CCD /* NSBundle+SUAdditions.h in Headers */,
 				61A2259E0D1C495D00430CCD /* SUVersionComparisonProtocol.h in Headers */,
 				61A225A40D1C4AC000430CCD /* SUStandardVersionComparator.h in Headers */,
-				61A2262B0D1C58FD00430CCD /* SUUserDefaults.h in Headers */,
 				61A2279C0D1CEE7600430CCD /* SUSystemProfiler.h in Headers */,
 				6160E7E10D3B4A8800E9CD71 /* NTSynchronousTask.h in Headers */,
 				612DCBAF0D488BC60015DBEA /* SUUpdatePermissionPrompt.h in Headers */,
@@ -588,6 +580,7 @@
 				6102FE460E077FCE00F85D09 /* SUPipedUnarchiver.h in Headers */,
 				6102FE4A0E07803800F85D09 /* SUDiskImageUnarchiver.h in Headers */,
 				6102FE5B0E08C7EC00F85D09 /* SUUnarchiver_Private.h in Headers */,
+				61EF67590E25C5B400F754E0 /* SUHost.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -824,9 +817,7 @@
 				6120721309CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.m in Sources */,
 				610EC1E00CF3A5FE00AE239E /* NTSynchronousTask.m in Sources */,
 				6117795A0D1111C900749C97 /* NSWorkspace_RBAdditions.m in Sources */,
-				61A225940D1C3ADD00430CCD /* NSBundle+SUAdditions.m in Sources */,
 				61A225A50D1C4AC000430CCD /* SUStandardVersionComparator.m in Sources */,
-				61A2262C0D1C58FD00430CCD /* SUUserDefaults.m in Sources */,
 				61A2279D0D1CEE7600430CCD /* SUSystemProfiler.m in Sources */,
 				612DCBB00D488BC60015DBEA /* SUUpdatePermissionPrompt.m in Sources */,
 				6171D9080D57B81800BFE886 /* NSFileManager+Aliases.m in Sources */,
@@ -846,6 +837,7 @@
 				6102FE4B0E07803800F85D09 /* SUDiskImageUnarchiver.m in Sources */,
 				6102FE5C0E08C7EC00F85D09 /* SUUnarchiver_Private.m in Sources */,
 				61D85D6D0E10B2ED00F9B4A9 /* SUPipedUnarchiver.m in Sources */,
+				61EF67560E25B58D00F754E0 /* SUHost.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1041,7 +1033,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(NATIVE_ARCH)";
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
 				GCC_DYNAMIC_NO_PIC = NO;

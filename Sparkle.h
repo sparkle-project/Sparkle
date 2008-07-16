@@ -25,7 +25,6 @@
 // This list should include the shared headers. It doesn't matter if some of them aren't shared (unless
 // there are name-space collisions) so we can list all of them to start with:
 
-#import "NSBundle+SUAdditions.h"
 #import "NSFileManager+Aliases.h"
 #import "NSFileManager+Authentication.h"
 #import "NSFileManager+Verification.h"
@@ -40,6 +39,7 @@
 #import "SUAutomaticUpdateDriver.h"
 #import "SUBasicUpdateDriver.h"
 #import "SUConstants.h"
+#import "SUHost.h"
 #import "SUInstaller.h"
 #import "SUProbingUpdateDriver.h"
 #import "SUScheduledUpdateDriver.h"
@@ -53,7 +53,6 @@
 #import "SUUpdater.h"
 #import "SUUpdatePermissionPrompt.h"
 #import "SUUserInitiatedUpdateDriver.h"
-#import "SUUserDefaults.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SUWindowController.h"
 

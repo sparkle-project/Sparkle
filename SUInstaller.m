@@ -11,15 +11,15 @@
 #import "SUPackageInstaller.h"
 
 NSString *SUInstallerPathKey = @"SUInstallerPath";
-NSString *SUInstallerHostBundleKey = @"SUInstallerHostBundle";
+NSString *SUInstallerHostKey = @"SUInstallerHost";
 NSString *SUInstallerDelegateKey = @"SUInstallerDelegate";
 
 @implementation SUInstaller
 
-+ (void)installFromUpdateFolder:(NSString *)updateFolder overHostBundle:(NSBundle *)hostBundle delegate:delegate synchronously:(BOOL)synchronously
++ (void)installFromUpdateFolder:(NSString *)updateFolder overHost:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously
 {
 	// Search subdirectories for the application
-	NSString *currentFile, *newAppDownloadPath = nil, *bundleFileName = [[hostBundle bundlePath] lastPathComponent], *alternateBundleFileName = [[hostBundle name] stringByAppendingPathExtension:[[hostBundle bundlePath] pathExtension]];
+	NSString *currentFile, *newAppDownloadPath = nil, *bundleFileName = [[host bundlePath] lastPathComponent], *alternateBundleFileName = [[host name] stringByAppendingPathExtension:[[host bundlePath] pathExtension]];
 	BOOL isPackage = NO;
 	NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:updateFolder];
 	while ((currentFile = [dirEnum nextObject]))
@@ -42,7 +42,7 @@ NSString *SUInstallerDelegateKey = @"SUInstallerDelegate";
 		
 		// Some DMGs have symlinks into /Applications! That's no good! And there's no point in looking in bundles.
 		if ([[NSFileManager defaultManager] isAliasFolderAtPath:currentPath] ||
-			[[currentFile pathExtension] isEqualToString:[[hostBundle bundlePath] pathExtension]] ||
+			[[currentFile pathExtension] isEqualToString:[[host bundlePath] pathExtension]] ||
 			[[currentFile pathExtension] isEqualToString:@"pkg"] ||
 			[[currentFile pathExtension] isEqualToString:@"mpkg"])
 		{
@@ -52,34 +52,34 @@ NSString *SUInstallerDelegateKey = @"SUInstallerDelegate";
 	
 	if (newAppDownloadPath == nil)
 	{
-		[self _finishInstallationWithResult:NO hostBundle:hostBundle error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find an appropriate update in the downloaded package." forKey:NSLocalizedDescriptionKey]] delegate:delegate];
+		[self _finishInstallationWithResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find an appropriate update in the downloaded package." forKey:NSLocalizedDescriptionKey]] delegate:delegate];
 	}
 	else
 	{
-		[(isPackage ? [SUPackageInstaller class] : [SUPlainInstaller class]) performInstallationWithPath:newAppDownloadPath hostBundle:hostBundle delegate:delegate synchronously:synchronously];
+		[(isPackage ? [SUPackageInstaller class] : [SUPlainInstaller class]) performInstallationWithPath:newAppDownloadPath host:host delegate:delegate synchronously:synchronously];
 	}
 }
 
-+ (void)_mdimportBundle:(NSBundle *)bundle
++ (void)_mdimportHost:(SUHost *)host
 {
 	NSTask *mdimport = [[[NSTask alloc] init] autorelease];
 	[mdimport setLaunchPath:@"/usr/bin/mdimport"];
-	[mdimport setArguments:[NSArray arrayWithObject:[bundle bundlePath]]];
+	[mdimport setArguments:[NSArray arrayWithObject:[host bundlePath]]];
 	[mdimport launch];
 }
 
-+ (void)_finishInstallationWithResult:(BOOL)result hostBundle:(NSBundle *)hostBundle error:(NSError *)error delegate:delegate
++ (void)_finishInstallationWithResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:delegate
 {
 	if (result == YES)
 	{
-		[self _mdimportBundle:hostBundle];
-		if ([delegate respondsToSelector:@selector(installerFinishedForHostBundle:)])
-			[delegate installerFinishedForHostBundle:hostBundle];
+		[self _mdimportHost:host];
+		if ([delegate respondsToSelector:@selector(installerFinishedForHost:)])
+			[delegate installerFinishedForHost:host];
 	}
 	else
 	{
-		if ([delegate respondsToSelector:@selector(installerForHostBundle:failedWithError:)])
-			[delegate installerForHostBundle:hostBundle failedWithError:error];
+		if ([delegate respondsToSelector:@selector(installerForHost:failedWithError:)])
+			[delegate installerForHost:host failedWithError:error];
 	}		
 }
 
