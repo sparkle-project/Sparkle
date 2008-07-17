@@ -6,6 +6,7 @@
 //
 
 #import "Sparkle.h"
+#import <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
 
 @implementation SUHost
 
@@ -77,16 +78,11 @@
 	return icon;
 }
 
-- (BOOL)isRunningFromDiskImage
+- (BOOL)isRunningOnReadOnlyVolume
 {	
-	// This check causes crashes on 10.3; for now, we'll just skip it.
-	if (floor(NSAppKitVersionNumber) < NSAppKitVersionNumber10_4)
-		return NO;
-	
-	NSDictionary *pathProperties = [[NSWorkspace sharedWorkspace] propertiesForPath:[bundle bundlePath]];
-	BOOL isDiskImage = [pathProperties objectForKey:NSWorkspace_RBimagefilepath] != nil;
-	BOOL isFileVault = [[pathProperties objectForKey:NSWorkspace_RBmntonname] hasPrefix:@"/Users/"];
-	return isDiskImage && !isFileVault;
+	struct statfs statfs_info;
+	statfs([[bundle bundlePath] fileSystemRepresentation], &statfs_info);
+	return (statfs_info.f_flags & MNT_RDONLY);
 }
 
 - (NSString *)publicDSAKey

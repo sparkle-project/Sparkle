@@ -14,9 +14,9 @@
 - (void)checkForUpdatesAtURL:(NSURL *)appcastURL host:(SUHost *)aHost
 {	
 	[super checkForUpdatesAtURL:appcastURL host:aHost];
-	if ([aHost isRunningFromDiskImage])
+	if ([aHost isRunningOnReadOnlyVolume])
 	{
-		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated when it's running from a disk image. Move %1$@ to your Applications folder, relaunch it from there, and try again.", nil), [aHost name]] forKey:NSLocalizedDescriptionKey]]];
+		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again.", nil), [aHost name]] forKey:NSLocalizedDescriptionKey]]];
 		return;
 	}	
 	

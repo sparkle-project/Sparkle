@@ -22,8 +22,6 @@
 		610D5A1A0A1661B8004AAD9C /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; };
 		610D5A750A1670A4004AAD9C /* SUStatus.nib in Resources */ = {isa = PBXBuildFile; fileRef = 610D5A740A1670A4004AAD9C /* SUStatus.nib */; };
 		610EC1E00CF3A5FE00AE239E /* NTSynchronousTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 610EC1BF0CF3914D00AE239E /* NTSynchronousTask.m */; };
-		611779590D1111C900749C97 /* NSWorkspace_RBAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 611779570D1111C400749C97 /* NSWorkspace_RBAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		6117795A0D1111C900749C97 /* NSWorkspace_RBAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 611779560D1111C400749C97 /* NSWorkspace_RBAdditions.m */; };
 		61177A1F0D1112E900749C97 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6117796E0D1112E000749C97 /* IOKit.framework */; };
 		61180BCA0D64138900B4E0D1 /* SUWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = 61180BC80D64138900B4E0D1 /* SUWindowController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		61180BCB0D64138900B4E0D1 /* SUWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 61180BC90D64138900B4E0D1 /* SUWindowController.m */; };
@@ -167,8 +165,6 @@
 		610D5A740A1670A4004AAD9C /* SUStatus.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SUStatus.nib; sourceTree = "<group>"; };
 		610EC1BF0CF3914D00AE239E /* NTSynchronousTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTSynchronousTask.m; sourceTree = "<group>"; };
 		610EC1C00CF3914D00AE239E /* NTSynchronousTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTSynchronousTask.h; sourceTree = "<group>"; };
-		611779560D1111C400749C97 /* NSWorkspace_RBAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSWorkspace_RBAdditions.m; sourceTree = "<group>"; };
-		611779570D1111C400749C97 /* NSWorkspace_RBAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSWorkspace_RBAdditions.h; sourceTree = "<group>"; };
 		6117796E0D1112E000749C97 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		61180BC80D64138900B4E0D1 /* SUWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUWindowController.h; sourceTree = "<group>"; };
 		61180BC90D64138900B4E0D1 /* SUWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUWindowController.m; sourceTree = "<group>"; };
@@ -474,8 +470,6 @@
 			children = (
 				61EF67580E25C5B400F754E0 /* SUHost.h */,
 				61EF67550E25B58D00F754E0 /* SUHost.m */,
-				611779570D1111C400749C97 /* NSWorkspace_RBAdditions.h */,
-				611779560D1111C400749C97 /* NSWorkspace_RBAdditions.m */,
 				610134750DD252E60049ACDF /* NSWorkspace+SystemVersion.h */,
 				610134760DD252E60049ACDF /* NSWorkspace+SystemVersion.m */,
 				61299B3509CB04E000B7442F /* Sparkle.h */,
@@ -559,7 +553,6 @@
 				61299A8D09CA790200B7442F /* SUUnarchiver.h in Headers */,
 				61299B3609CB04E000B7442F /* Sparkle.h in Headers */,
 				6120721209CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.h in Headers */,
-				611779590D1111C900749C97 /* NSWorkspace_RBAdditions.h in Headers */,
 				61A2259E0D1C495D00430CCD /* SUVersionComparisonProtocol.h in Headers */,
 				61A225A40D1C4AC000430CCD /* SUStandardVersionComparator.h in Headers */,
 				61A2279C0D1CEE7600430CCD /* SUSystemProfiler.h in Headers */,
@@ -820,7 +813,6 @@
 				61299A8E09CA790200B7442F /* SUUnarchiver.m in Sources */,
 				6120721309CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.m in Sources */,
 				610EC1E00CF3A5FE00AE239E /* NTSynchronousTask.m in Sources */,
-				6117795A0D1111C900749C97 /* NSWorkspace_RBAdditions.m in Sources */,
 				61A225A50D1C4AC000430CCD /* SUStandardVersionComparator.m in Sources */,
 				61A2279D0D1CEE7600430CCD /* SUSystemProfiler.m in Sources */,
 				612DCBB00D488BC60015DBEA /* SUUpdatePermissionPrompt.m in Sources */,

@@ -19,7 +19,7 @@
 - (NSString *)version;
 - (NSString *)displayVersion;
 - (NSImage *)icon;
-- (BOOL)isRunningFromDiskImage;
+- (BOOL)isRunningOnReadOnlyVolume;
 - (NSString *)publicDSAKey;
 - (NSArray *)systemProfile;
 

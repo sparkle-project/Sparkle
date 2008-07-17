@@ -18,7 +18,7 @@
 	[checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates\u2026", nil) maxProgressValue:0 statusText:nil];
 	[checkingController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
 	[checkingController showWindow:self];
-	[super checkForUpdatesAtURL:appcastURL hostBundle:hb];
+	[super checkForUpdatesAtURL:appcastURL host:hb];
 }
 
 - (void)closeCheckingWindow
