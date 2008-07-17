@@ -15,16 +15,12 @@
 @interface SUUnarchiver (Private)
 + (void)_registerImplementation:(Class)implementation;
 + (NSArray *)_unarchiverImplementations;
-+ (BOOL)_canUnarchiveURL:(NSURL *)URL;
-- _initWithURL:(NSURL *)URL;
++ (BOOL)_canUnarchivePath:(NSString *)path;
+- _initWithPath:(NSString *)path;
 
 - (void)_notifyDelegateOfExtractedLength:(long)length;
 - (void)_notifyDelegateOfSuccess;
 - (void)_notifyDelegateOfFailure;
-@end
-
-@interface NSURL (SUTypeDetection)
-- (BOOL)conformsToType:(NSString *)type;
 @end
 
 #endif

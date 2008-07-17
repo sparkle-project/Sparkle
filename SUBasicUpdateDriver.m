@@ -179,7 +179,7 @@
 		}
 	}
 	
-	SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForURL:[[[NSURL alloc] initFileURLWithPath:downloadPath] autorelease]];
+	SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:downloadPath];
 	if (!unarchiver)
 	{
 		NSLog(@"Sparkle Error: No valid unarchiver for %@!", downloadPath);

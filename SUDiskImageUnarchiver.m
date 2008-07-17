@@ -12,9 +12,9 @@
 
 @implementation SUDiskImageUnarchiver
 
-+ (BOOL)_canUnarchiveURL:(NSURL *)URL
++ (BOOL)_canUnarchivePath:(NSString *)path
 {
-	return [URL conformsToType:@"public.disk-image"];
+	return [[path pathExtension] isEqualToString:@"dmg"];
 }
 
 - (void)start
@@ -25,7 +25,6 @@
 - (void)_extractDMG
 {		
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	NSString *archivePath = [archiveURL path];
 	BOOL mountedSuccessfully = NO;
 	
 	// get a unique mount point path
