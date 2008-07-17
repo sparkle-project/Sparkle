@@ -19,14 +19,11 @@ extern NSString *SUUpdateDriverFinishedNotification;
 	SUHost *host;
 	
 	BOOL finished;
-	id delegate;
 }
 - (void)checkForUpdatesAtURL:(NSURL *)appcastURL host:(SUHost *)hb;
 - (void)abortUpdate;
 - (BOOL)finished;
 
-- delegate;
-- (void)setDelegate:delegate;
 @end
 
 #endif

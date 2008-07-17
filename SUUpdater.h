@@ -23,8 +23,10 @@
 
 + (SUUpdater *)sharedUpdater;
 + (SUUpdater *)updaterForBundle:(NSBundle *)bundle;
+- (NSBundle *)hostBundle;
 
 - (void)setDelegate:(id)delegate;
+- delegate;
 
 // This IBAction is meant for a main menu item. Hook up any menu item to this action,
 // and Sparkle will check for updates and report back its findings verbosely.
@@ -47,40 +49,37 @@
 
 @interface NSObject (SUUpdaterDelegateInformalProtocol)
 // This method allows you to add extra parameters to the appcast URL, potentially based on whether or not
-// Sparkle will also be sending along the system profile. This method should return an array of dictionaries with the following keys:
-- (NSArray *)feedParametersForHost:(SUHost *)bundle sendingSystemProfile:(BOOL)sendingProfile;
+// Sparkle will also be sending along the system profile. This method should return an array of dictionaries with keys: "key" and "value".
+- (NSArray *)feedParametersForUpdater:(SUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
 
 // Use this to override the default behavior for Sparkle prompting the user about automatic update checks.
-- (BOOL)shouldPromptForPermissionToCheckForUpdatesToHost:(SUHost *)bundle;
+- (BOOL)updaterShouldPromptForPermissionToCheckForUpdates:(SUUpdater *)bundle;
 
 // Implement this if you want to do some special handling with the appcast once it finishes loading.
-- (void)appcastDidFinishLoading:(SUAppcast *)appcast forHost:(SUHost *)bundle;
+- (void)updater:(SUUpdater *)updater didFinishLoadingAppcast:(SUAppcast *)appcast;
 
 // If you're using special logic or extensions in your appcast, implement this to use your own logic for finding
 // a valid update, if any, in the given appcast.
-- (SUAppcastItem *)bestValidUpdateInAppcast:(SUAppcast *)appcast forHost:(SUHost *)bundle;
+- (SUAppcastItem *)bestValidUpdateInAppcast:(SUAppcast *)appcast forUpdater:(SUUpdater *)bundle;
 
 // Sent when a valid update is found by the update driver.
-- (void)didFindValidUpdate:(SUAppcastItem *)update toHost:(SUHost *)bundle;
+- (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)update;
 
 // Sent when a valid update is not found.
-- (void)didNotFindUpdateToHost:(SUHost *)hb;
-
-// Sent when the user makes a choice in the update alert dialog (install now / remind me later / skip this version).
-- (void)userChoseAction:(SUUpdateAlertChoice)action forUpdate:(SUAppcastItem *)update toHost:(SUHost *)bundle;
+- (void)updaterDidNotFindUpdate:(SUUpdater *)update;
 
 // Sent immediately before installing the specified update.
-- (void)updateWillInstall:(SUAppcastItem *)update toHost:(SUHost *)bundle;
+- (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)update;
 
 // Return YES to delay the relaunch until you do some processing; invoke the given NSInvocation to continue.
-- (BOOL)shouldPostponeRelaunchForUpdate:(SUAppcastItem *)update toHost:(SUHost *)hostBundle untilInvoking:(NSInvocation *)invocation;
+- (BOOL)updater:(SUUpdater *)updater shouldPostponeRelaunchForUpdate:(SUAppcastItem *)update untilInvoking:(NSInvocation *)invocation;
 
 // Called immediately before relaunching.
-- (void)updaterWillRelaunchApplication;
+- (void)updaterWillRelaunchApplication:(SUUpdater *)updater;
 
 // This method allows you to provide a custom version comparator.
 // If you don't implement this method or return nil, the standard version comparator will be used.
-- (id <SUVersionComparison>)versionComparatorForHost:(SUHost *)hb;
+- (id <SUVersionComparison>)versionComparatorForUpdater:(SUUpdater *)updater;
 
 @end
 

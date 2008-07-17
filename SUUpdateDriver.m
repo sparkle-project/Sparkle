@@ -23,6 +23,4 @@ NSString *SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 }
 
 - (BOOL)finished { return finished; }
-- delegate { return delegate; }
-- (void)setDelegate:del { delegate = del; }
 @end

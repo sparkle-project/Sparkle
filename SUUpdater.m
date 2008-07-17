@@ -82,9 +82,9 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
         shouldPrompt = NO;
     }
     // Does the delegate want to take care of the logic for when we should ask permission to update?
-    else if ([delegate respondsToSelector:@selector(shouldPromptForPermissionToCheckForUpdatesToHostBundle:)])
+    else if ([delegate respondsToSelector:@selector(updaterShouldPromptForPermissionToCheckForUpdates:)])
     {
-        shouldPrompt = [delegate shouldPromptForPermissionToCheckForUpdatesToHost:host];
+        shouldPrompt = [delegate updaterShouldPromptForPermissionToCheckForUpdates:self];
     }	
     // Has he been asked already? And don't ask if the host has a default value set in its Info.plist.
     else if ([host objectForUserDefaultsKey:SUEnableAutomaticChecksKey] == nil &&
@@ -175,7 +175,6 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the SUFeedURLKey in either the Info.plist or the user defaults!"];
 	
 	driver = [d retain];
-	if ([driver delegate] == nil) { [driver setDelegate:delegate]; }
 	[driver checkForUpdatesAtURL:[self feedURL] host:host];
 }
 
@@ -271,8 +270,8 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	// Determine all the parameters we're attaching to the base feed URL.
 	BOOL sendingSystemProfile = ([host boolForUserDefaultsKey:SUSendProfileInfoKey] == YES);
 	NSArray *parameters = [NSArray array];
-	if ([delegate respondsToSelector:@selector(feedParametersForHostBundle:sendingSystemProfile:)])
-		parameters = [parameters arrayByAddingObjectsFromArray:[delegate feedParametersForHost:host sendingSystemProfile:sendingSystemProfile]];
+	if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)])
+		parameters = [parameters arrayByAddingObjectsFromArray:[delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile]];
 	if (sendingSystemProfile)
 		parameters = [parameters arrayByAddingObjectsFromArray:[host systemProfile]];
 	if (parameters == nil || [parameters count] == 0) { return baseFeedURL; }
@@ -329,20 +328,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	return driver && ([driver finished] == NO);
 }
 
-// Redirect driver delegate methods to our delegate
-/*
-- (void)appcastDidFinishLoading:(SUAppcast *)appcast forHost:(SUHost *)bundle
-{
-	if ([delegate respondsToSelector:@selector(appcastDidFinishLoading:forHost:)])
-		[delegate appcastDidFinishLoading:ac forHost:bundle];
-}
-
-- (SUAppcastItem *)bestValidUpdateInAppcast:(SUAppcast *)appcast forHost:(SUHost *)bundle
-{
-	if ([delegate respondsToSelector:@selector(bestValidUpdateInAppcast:forHost:)]) // Does the delegate want to handle it?
-		return [delegate bestValidUpdateInAppcast:ac forHost:bundle];
-    else
-        return nil;
-}*/
+- delegate { return delegate; }
+- (NSBundle *)hostBundle { return [host bundle]; }
 
 @end

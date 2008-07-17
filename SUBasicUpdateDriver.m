@@ -34,9 +34,10 @@
 {
 	id <SUVersionComparison> comparator = nil;
 	
+	SUUpdater *updater = [SUUpdater updaterForBundle:[host bundle]];
 	// Give the delegate a chance to provide a custom version comparator
-	if ([delegate respondsToSelector:@selector(versionComparatorForHost:)])
-		comparator = [delegate versionComparatorForHost:host];
+	if ([[updater delegate] respondsToSelector:@selector(versionComparatorForUpdater:)])
+		comparator = [[updater delegate] versionComparatorForUpdater:updater];
 	
 	// If we don't get a comparator from the delegate, use the default comparator
 	if (!comparator)
@@ -70,13 +71,14 @@
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac
 {
-	if ([delegate respondsToSelector:@selector(appcastDidFinishLoading:forHost:)])
-		[delegate appcastDidFinishLoading:ac forHost:host];
+	SUUpdater *updater = [SUUpdater updaterForBundle:[host bundle]];
+	if ([[updater delegate] respondsToSelector:@selector(updater:didFinishLoadingAppcast:)])
+		[[updater delegate] updater:updater didFinishLoadingAppcast:ac];
 		
 	// Now we have to find the best valid update in the appcast.
-	if ([delegate respondsToSelector:@selector(bestValidUpdateInAppcast:forHost:)]) // Does the delegate want to handle it?
+	if ([[updater delegate] respondsToSelector:@selector(bestValidUpdateInAppcast:forUpdater:)]) // Does the delegate want to handle it?
 	{
-		updateItem = [delegate bestValidUpdateInAppcast:ac forHost:host];
+		updateItem = [[updater delegate] bestValidUpdateInAppcast:ac forUpdater:updater];
 	}
 	else // If not, we'll take care of it ourselves.
 	{
@@ -105,15 +107,17 @@
 
 - (void)didFindValidUpdate
 {
-	if ([delegate respondsToSelector:@selector(didFindValidUpdate:toHost:)])
-		[delegate didFindValidUpdate:updateItem toHost:host];
+	SUUpdater *updater = [SUUpdater updaterForBundle:[host bundle]];
+	if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
+		[[updater delegate] updater:updater didFindValidUpdate:updateItem];
 	[self downloadUpdate];
 }
 
 - (void)didNotFindUpdate
 {
-	if ([delegate respondsToSelector:@selector(didNotFindUpdateToHost:)])
-		[delegate didNotFindUpdateToHost:host];
+	SUUpdater *updater = [SUUpdater updaterForBundle:[host bundle]];
+	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
+		[[updater delegate] updaterDidNotFindUpdate:updater];
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUNoUpdateError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:SULocalizedString(@"You already have the newest version of %@.", nil), [host name]] forKey:NSLocalizedDescriptionKey]]];
 }
 
@@ -206,8 +210,9 @@
 
 - (void)installUpdate
 {
-	if ([delegate respondsToSelector:@selector(updateWillInstall:toHost:)])
-		[delegate updateWillInstall:updateItem toHost:host];
+	SUUpdater *updater = [SUUpdater updaterForBundle:[host bundle]];
+	if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdate:)])
+		[[updater delegate] updater:updater willInstallUpdate:updateItem];
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
 	NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]]  pathForResource:@"relaunch" ofType:@""];
 	NSString *targetPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
@@ -229,21 +234,22 @@
 {
 	// Give the host app an opportunity to postpone the relaunch.
 	static BOOL postponedOnce = NO;
-	if (!postponedOnce && [delegate respondsToSelector:@selector(shouldPostponeRelaunchForUpdate:toHost:untilInvoking:)])
+	SUUpdater *updater = [SUUpdater updaterForBundle:[host bundle]];
+	if (!postponedOnce && [[updater delegate] respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
 	{
 		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[[self class] instanceMethodSignatureForSelector:@selector(relaunchHostApp)] retain]];
 		[invocation setSelector:@selector(relaunchHostApp)];
 		[invocation setTarget:self];
 		postponedOnce = YES;
-		if ([delegate shouldPostponeRelaunchForUpdate:updateItem toHost:host untilInvoking:invocation])
+		if ([[updater delegate] updater:updater shouldPostponeRelaunchForUpdate:updateItem untilInvoking:invocation])
 			return;
 	}
 
 	[self cleanUp]; // Clean up the download and extracted files.
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-	if ([delegate respondsToSelector:@selector(updaterWillRelaunchApplication)])
-		[delegate updaterWillRelaunchApplication];
+	if ([[updater delegate] respondsToSelector:@selector(updaterWillRelaunchApplication)])
+		[[updater delegate] updaterWillRelaunchApplication:updater];
 	
 	if(!relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath])
 	{
