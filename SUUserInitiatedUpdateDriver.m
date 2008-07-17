@@ -54,6 +54,12 @@
 	[super abortUpdateWithError:error];
 }
 
+- (void)abortUpdate
+{
+	[self closeCheckingWindow];
+	[super abortUpdate];
+}
+
 - (void)appcast:(SUAppcast *)ac failedToLoadWithError:(NSError *)error
 {
 	if (isCanceled)
