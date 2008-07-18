@@ -140,15 +140,18 @@
 
 - (BOOL)boolForUserDefaultsKey:(NSString *)defaultName
 {
+	if (bundle == [NSBundle mainBundle])
+		return [[NSUserDefaults standardUserDefaults] boolForKey:defaultName];
+	
 	BOOL value;
 	CFPropertyListRef plr = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
 	if (plr == NULL)
 		value = NO;
-	else {
+	else
+	{
 		value = (BOOL)CFBooleanGetValue((CFBooleanRef)plr);
 		CFRelease(plr);
 	}
-	
 	return value;
 }
 
