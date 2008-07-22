@@ -10,20 +10,20 @@
 
 @implementation SUUnarchiver (Private)
 
-- _initWithURL:(NSURL *)URL
+- _initWithPath:(NSString *)path
 {
 	if ((self = [super init]))
-		archiveURL = [URL copy];
+		archivePath = [path copy];
 	return self;
 }
 
 - (void)dealloc
 {
-	[archiveURL release];
+	[archivePath release];
 	[super dealloc];
 }
 
-+ (BOOL)_canUnarchiveURL:(NSURL *)URL
++ (BOOL)_canUnarchivePath:(NSString *)path
 {
 	return NO;
 }
@@ -60,21 +60,4 @@ static NSMutableArray *__unarchiverImplementations;
 	return [NSArray arrayWithArray:__unarchiverImplementations];
 }
 
-@end
-
-@implementation NSURL (SUTypeDetection)
-- (NSString *)__UTI
-{
-	FSRef fsRefToItem;
-	FSPathMakeRef((UInt8 *)[[self path] fileSystemRepresentation], &fsRefToItem, NULL );
-	
-	NSString *UTI = nil;
-	LSCopyItemAttribute(&fsRefToItem, kLSRolesAll, kLSItemContentType, (CFTypeRef *)(&UTI));
-	return [UTI autorelease];
-}
-
-- (BOOL)conformsToType:(NSString *)type
-{
-	return UTTypeConformsTo((CFStringRef)[self __UTI], (CFStringRef)type);
-}
 @end

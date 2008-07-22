@@ -11,21 +11,20 @@
 
 @implementation SUPipedUnarchiver
 
-+ (SEL)_selectorConformingToTypeOfURL:(NSURL *)URL
++ (SEL)_selectorConformingToTypeOfPath:(NSString *)path
 {
 	static NSDictionary *typeSelectorDictionary;
-	// HACK: The UTI detector is dumb (not my fault!) and sees .tar.gz files as plain .gz files. If we see something of type .bz2 or .gz, we'll assume it's really a .tar.bz2 or .tar.gz.
 	if (!typeSelectorDictionary)
-		typeSelectorDictionary = [[NSDictionary dictionaryWithObjectsAndKeys:@"_extractZIP", @"com.pkware.zip-archive",
-								   @"_extractTGZ", @"org.gnu.gnu-zip-tar-archive", @"_extractTGZ", @"org.gnu.gnu-zip-archive",
-								   @"_extractTBZ", @"org.bzip.bzip2-tar-archive", @"_extractTBZ", @"org.bzip.bzip2-archive", @"_extractTBZ", @"public.archive.bzip2",
-								   @"_extractTAR", @"public.tar-archive", nil] retain];
+		typeSelectorDictionary = [[NSDictionary dictionaryWithObjectsAndKeys:@"_extractZIP", @".zip", @"_extractTAR", @".tar",
+								   @"_extractTGZ", @".tar.gz", @"_extractTGZ", @".tgz",
+								   @"_extractTBZ", @".tar.bz2", @"_extractTBZ", @".tbz", nil] retain];
 
+	NSString *lastPathComponent = [path lastPathComponent];
 	NSEnumerator *typeEnumerator = [typeSelectorDictionary keyEnumerator];
 	id currentType;
 	while ((currentType = [typeEnumerator nextObject]))
 	{
-		if ([URL conformsToType:currentType])
+		if ([[lastPathComponent substringFromIndex:[lastPathComponent length] - [currentType length]] isEqualToString:currentType])
 			return NSSelectorFromString([typeSelectorDictionary objectForKey:currentType]);
 	}
 	return NULL;
@@ -33,19 +32,18 @@
 
 - (void)start
 {
-	[NSThread detachNewThreadSelector:[[self class] _selectorConformingToTypeOfURL:archiveURL] toTarget:self withObject:nil];
+	[NSThread detachNewThreadSelector:[[self class] _selectorConformingToTypeOfPath:archivePath] toTarget:self withObject:nil];
 }
 
-+ (BOOL)_canUnarchiveURL:(NSURL *)URL
++ (BOOL)_canUnarchivePath:(NSString *)path
 {
-	return ([self _selectorConformingToTypeOfURL:URL] != nil);
+	return ([self _selectorConformingToTypeOfPath:path] != nil);
 }
 
 // This method abstracts the types that use a command line tool piping data from stdin.
 - (void)_extractArchivePipingDataToCommand:(NSString *)command
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	NSString *archivePath = [archiveURL path];
 	FILE *fp = NULL, *cmdFP = NULL;
 	
 	// Get the file size.
