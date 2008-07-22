@@ -19,6 +19,10 @@
 	// If the app is a menubar app or the like, we need to focus it first:
 	if ([[host objectForInfoDictionaryKey:@"LSUIElement"] doubleValue]) { [NSApp activateIgnoringOtherApps:YES]; }
 	
+	SUUpdater *updater = [SUUpdater updaterForBundle:[host bundle]];
+	if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
+		[[updater delegate] updater:updater didFindValidUpdate:updateItem];
+	
 	// Only show the update alert if the app is active; otherwise, we'll wait until it is.
 	if ([NSApp isActive])
 		[[updateAlert window] makeKeyAndOrderFront:self];
