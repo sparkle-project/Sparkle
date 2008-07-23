@@ -21,6 +21,8 @@
 	NSString *downloadPath;
 	
 	NSString *relaunchPath;
+	
+	BOOL isBackgroundApplication;
 }
 
 - (void)checkForUpdatesAtURL:(NSURL *)appcastURL hostBundle:(NSBundle *)hb;

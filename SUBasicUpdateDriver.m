@@ -14,6 +14,7 @@
 - (void)checkForUpdatesAtURL:(NSURL *)appcastURL hostBundle:(NSBundle *)hb
 {	
 	hostBundle = [hb retain];
+	isBackgroundApplication = ([[hostBundle objectForInfoDictionaryKey:@"LSUIElement"] doubleValue]);
 	
 	if ([hostBundle isRunningFromDiskImage])
 	{
@@ -165,7 +166,7 @@
 {
 	// We don't want the download system to extract our gzips.
 	// Note that we use a substring matching here instead of direct comparison because the docs say "application/gzip" but the system *uses* "application/x-gzip". This is a documentation bug.
-	return ([encodingType rangeOfString:@"gzip"].origin == NSNotFound);
+	return ([encodingType rangeOfString:@"gzip"].location == NSNotFound);
 }
 
 - (void)extractUpdate

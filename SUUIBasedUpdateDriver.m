@@ -16,8 +16,15 @@
 	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem hostBundle:hostBundle];
 	[updateAlert setDelegate:self];
 	
-	// If the app is a menubar app or the like, we need to focus it first:
-	if ([[hostBundle objectForInfoDictionaryKey:@"LSUIElement"] doubleValue]) { [NSApp activateIgnoringOtherApps:YES]; }
+	// If the app is a menubar app or the like, we need to focus it first and alter the
+	// update prompt to behave like a normal window. Otherwise if the window were hidden
+	// there may be no way for the application to be activated to make it visible again.
+	if (isBackgroundApplication)
+	{
+		[[updateAlert window] setHidesOnDeactivate:NO];
+		[[updateAlert window] setLevel:NSNormalWindowLevel];
+		[NSApp activateIgnoringOtherApps:YES];
+	}
 	
 	// Only show the update alert if the app is active; otherwise, we'll wait until it is.
 	if ([NSApp isActive])
@@ -31,8 +38,7 @@
 	if ([delegate respondsToSelector:@selector(didNotFindUpdateToHostBundle:)])
 		[delegate didNotFindUpdateToHostBundle:hostBundle];
 	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"You're up to date!", nil) defaultButton:SULocalizedString(@"OK", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [hostBundle name], [hostBundle displayVersion]];
-	[alert setIcon:[hostBundle icon]];
-	[alert runModal];
+	[self showModalAlert:alert];
 	[self abortUpdate];
 }
 
@@ -138,8 +144,7 @@
 - (void)abortUpdateWithError:(NSError *)error
 {
 	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"Update Error!", nil) defaultButton:SULocalizedString(@"Cancel Update", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:[error localizedDescription]];
-	[alert setIcon:[hostBundle icon]];
-	[alert runModal];
+	[self showModalAlert:alert];
 	[super abortUpdateWithError:error];
 }
 
@@ -151,6 +156,16 @@
 		[statusController autorelease];
 	}
 	[super abortUpdate];
+}
+
+- (void)showModalAlert:(NSAlert *)alert
+{
+	// When showing a modal alert we need to ensure that background applications
+	// are focused to inform the user since there is no dock icon to notify them.
+	if (isBackgroundApplication) { [NSApp activateIgnoringOtherApps:YES]; }
+	
+	[alert setIcon:[hostBundle icon]];
+	[alert runModal];
 }
 
 @end
