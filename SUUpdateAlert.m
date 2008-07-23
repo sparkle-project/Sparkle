@@ -13,12 +13,12 @@
 
 @implementation SUUpdateAlert
 
-- (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)hb
+- (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost
 {
-	self = [super initWithHost:hb windowNibName:@"SUUpdateAlert"];
+	self = [super initWithHost:host windowNibName:@"SUUpdateAlert"];
 	if (self)
 	{
-		host = [hb retain];
+		host = [aHost retain];
 		updateItem = [item retain];
 		[self setShouldCascadeWindows:NO];
 	}

@@ -20,7 +20,7 @@ extern NSString *SUUpdateDriverFinishedNotification;
 	
 	BOOL finished;
 }
-- (void)checkForUpdatesAtURL:(NSURL *)appcastURL host:(SUHost *)hb;
+- (void)checkForUpdatesAtURL:(NSURL *)appcastURL host:(SUHost *)host;
 - (void)abortUpdate;
 - (BOOL)finished;
 

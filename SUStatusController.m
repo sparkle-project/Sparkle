@@ -11,12 +11,12 @@
 
 @implementation SUStatusController
 
-- (id)initWithHost:(SUHost *)hb
+- (id)initWithHost:(SUHost *)aHost
 {
-	self = [super initWithHost:hb windowNibName:@"SUStatus"];
+	self = [super initWithHost:aHost windowNibName:@"SUStatus"];
 	if (self)
 	{
-		host = [hb retain];
+		host = [aHost retain];
 		[self setShouldCascadeWindows:NO];
 	}
 	return self;

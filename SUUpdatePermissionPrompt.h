@@ -25,7 +25,7 @@ typedef enum {
 	IBOutlet NSButton *moreInfoButton;
 	BOOL isShowingMoreInfo, shouldSendProfile;
 }
-+ (void)promptWithHost:(SUHost *)hb delegate:(id)d;
++ (void)promptWithHost:(SUHost *)aHost delegate:(id)d;
 - (IBAction)toggleMoreInfo:(id)sender;
 - (IBAction)finishPrompt:(id)sender;
 @end

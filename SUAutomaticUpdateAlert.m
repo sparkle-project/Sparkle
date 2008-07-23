@@ -11,14 +11,14 @@
 
 @implementation SUAutomaticUpdateAlert
 
-- (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)hb delegate:del;
+- (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost delegate:del;
 {
-	self = [super initWithHost:hb windowNibName:@"SUAutomaticUpdateAlert"];
+	self = [super initWithHost:aHost windowNibName:@"SUAutomaticUpdateAlert"];
 	if (self)
 	{
 		updateItem = [item retain];
 		delegate = del;
-		host = [hb retain];
+		host = [aHost retain];
 		[self setShouldCascadeWindows:NO];	
 		[[self window] center];
 	}

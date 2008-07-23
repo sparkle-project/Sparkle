@@ -85,6 +85,11 @@
 	return (statfs_info.f_flags & MNT_RDONLY);
 }
 
+- (BOOL)isBackgroundApplication
+{
+	return [[bundle objectForInfoDictionaryKey:@"LSUIElement"] doubleValue];
+}
+
 - (NSString *)publicDSAKey
 {
 	// Maybe the key is just a string in the Info.plist.

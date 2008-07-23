@@ -16,12 +16,12 @@
 	return [[host objectForInfoDictionaryKey:SUEnableSystemProfilingKey] boolValue];
 }
 
-- (id)initWithHost:(SUHost *)hb delegate:(id)d
+- (id)initWithHost:(SUHost *)aHost delegate:(id)d
 {
-	self = [super initWithHost:hb windowNibName:@"SUUpdatePermissionPrompt"];
+	self = [super initWithHost:aHost windowNibName:@"SUUpdatePermissionPrompt"];
 	if (self)
 	{
-		host = [hb retain];
+		host = [aHost retain];
 		delegate = [d retain];
 		isShowingMoreInfo = NO;
 		shouldSendProfile = [self shouldAskAboutProfile];
@@ -30,9 +30,14 @@
 	return self;
 }
 
-+ (void)promptWithHost:(SUHost *)hb delegate:(id)d
++ (void)promptWithHost:(SUHost *)host delegate:(id)d
 {
-	id prompt = [[[self class] alloc] initWithHost:hb delegate:d];
+	// If this is a background application we need to focus it in order to bring the prompt
+	// to the user's attention. Otherwise the prompt would be hidden behind other applications and
+	// the user would not know why the application was paused.
+	if ([host isBackgroundApplication]) { [NSApp activateIgnoringOtherApps:YES]; }
+	
+	id prompt = [[[self class] alloc] initWithHost:host delegate:d];
 	[NSApp runModalForWindow:[prompt window]];
 }
 

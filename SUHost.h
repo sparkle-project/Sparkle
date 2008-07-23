@@ -20,6 +20,7 @@
 - (NSString *)displayVersion;
 - (NSImage *)icon;
 - (BOOL)isRunningOnReadOnlyVolume;
+- (BOOL)isBackgroundApplication;
 - (NSString *)publicDSAKey;
 - (NSArray *)systemProfile;
 

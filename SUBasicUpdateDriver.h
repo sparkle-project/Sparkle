@@ -22,7 +22,7 @@
 	NSString *relaunchPath;
 }
 
-- (void)checkForUpdatesAtURL:(NSURL *)appcastURL host:(SUHost *)hb;
+- (void)checkForUpdatesAtURL:(NSURL *)appcastURL host:(SUHost *)host;
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac;
 - (void)appcast:(SUAppcast *)ac failedToLoadWithError:(NSError *)error;
@@ -44,8 +44,8 @@
 - (void)unarchiverDidFail:(SUUnarchiver *)ua;
 
 - (void)installUpdate;
-- (void)installerFinishedForHost:(SUHost *)hb;
-- (void)installerForHost:(SUHost *)hb failedWithError:(NSError *)error;
+- (void)installerFinishedForHost:(SUHost *)host;
+- (void)installerForHost:(SUHost *)host failedWithError:(NSError *)error;
 
 - (void)relaunchHostApp;
 - (void)cleanUp;
