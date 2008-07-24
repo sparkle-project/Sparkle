@@ -117,7 +117,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	BOOL automaticallyCheck = (result == SUAutomaticallyCheck);
 	[host setBool:automaticallyCheck forUserDefaultsKey:SUEnableAutomaticChecksKey];
     // Schedule checks, but make sure we ignore the delayed call from KVO
-	[self updatePreferencesChanged];
+	[self resetUpdateCycle];
 }
 
 - (void)updateDriverDidFinish:(NSNotification *)note
@@ -206,9 +206,9 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
     {
         // Allow a small delay, because perhaps the user or developer wants to change both preferences. This allows the developer to interpret a zero check interval as a sign to disable automatic checking.
         // Or we may get this from the developer and from our own KVO observation, this will effectively coalesce them.
-        [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(updatePreferencesChanged) object:nil];
-        [self performSelector:@selector(updatePreferencesChanged) withObject:nil afterDelay:15];
-        [self updatePreferencesChanged];
+        [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
+        [self performSelector:@selector(resetUpdateCycle) withObject:nil afterDelay:15];
+        [self resetUpdateCycle];
     }
     else
     {
@@ -216,9 +216,9 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
     }
 }
 
-- (void)updatePreferencesChanged
+- (void)resetUpdateCycle
 {
-    [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(updatePreferencesChanged) object:nil];
+    [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
     [self scheduleNextUpdateCheck];
 }
 

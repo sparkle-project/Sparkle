@@ -40,9 +40,8 @@
 // This forces an update to begin with a particular driver (see SU*UpdateDriver.h)
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)driver;
 
-// Call this to appropriately reschedule or cancel the update checking timer if preferences for time interval or automatic checks change.
-// If you're using a .app, this'll be picked up automatically via NSUserDefaultsController, but for non-.apps, there's no way to observe changes.
-- (void)updatePreferencesChanged;
+// Call this to appropriately schedule or cancel the update checking timer according to the preferences for time interval and automatic checks.
+- (void)resetUpdateCycle;
 
 - (BOOL)updateInProgress;
 @end
