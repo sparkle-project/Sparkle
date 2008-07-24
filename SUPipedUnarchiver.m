@@ -24,6 +24,7 @@
 	id currentType;
 	while ((currentType = [typeEnumerator nextObject]))
 	{
+		if ([currentType length] > [lastPathComponent length]) continue;
 		if ([[lastPathComponent substringFromIndex:[lastPathComponent length] - [currentType length]] isEqualToString:currentType])
 			return NSSelectorFromString([typeSelectorDictionary objectForKey:currentType]);
 	}
