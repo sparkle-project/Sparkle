@@ -12,6 +12,8 @@
 	NSBundle *bundle;
 }
 
++ (NSString *)systemVersionString;
+
 - (id)initWithBundle:(NSBundle *)aBundle;
 - (NSBundle *)bundle;
 - (NSString *)bundlePath;

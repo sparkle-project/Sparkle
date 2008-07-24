@@ -1,5 +1,5 @@
 //
-//  NSFileManager+Verification.m
+//  SUDSAVerifier.m
 //  Sparkle
 //
 //  Created by Andy Matuschak on 3/16/06.
@@ -8,8 +8,7 @@
 
 // DSA stuff adapted from code provided by Allan Odgaard. Thanks, Allan!
 
-#import "Sparkle.h"
-#import "NSFileManager+Verification.h"
+#import "SUDSAVerifier.h"
 
 #import <stdio.h>
 #import <openssl/evp.h>
@@ -102,9 +101,9 @@ EVP_PKEY* load_dsa_key(char *key)
 	return pkey;
 }
 
-@implementation NSFileManager (SUVerification)
+@implementation SUDSAVerifier
 
-- (BOOL)validatePath:(NSString *)path withEncodedDSASignature:(NSString *)encodedSignature withPublicDSAKey:(NSString *)pkeyString
++ (BOOL)validatePath:(NSString *)path withEncodedDSASignature:(NSString *)encodedSignature withPublicDSAKey:(NSString *)pkeyString
 {
 	BOOL result = NO;
 	if (!encodedSignature) { return NO; }

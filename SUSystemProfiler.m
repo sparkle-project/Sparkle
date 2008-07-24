@@ -39,7 +39,7 @@
 	unsigned long length = sizeof(value) ;
 	
 	// OS version
-	NSString *currentSystemVersion = [NSWorkspace systemVersionString];
+	NSString *currentSystemVersion = [SUHost systemVersionString];
 	if (currentSystemVersion != nil)
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"osVersion",@"OS Version",currentSystemVersion,currentSystemVersion,nil] forKeys:profileDictKeys]];
 	

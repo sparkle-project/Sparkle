@@ -16,6 +16,26 @@ NSString *SUInstallerDelegateKey = @"SUInstallerDelegate";
 
 @implementation SUInstaller
 
++ (BOOL)_isAliasFolderAtPath:(NSString *)path
+{
+	FSRef fileRef;
+	OSStatus err = noErr;
+	Boolean aliasFileFlag, folderFlag;
+	NSURL *fileURL = [NSURL fileURLWithPath:path];
+	
+	if (FALSE == CFURLGetFSRef((CFURLRef)fileURL, &fileRef))
+		err = coreFoundationUnknownErr;
+	
+	if (noErr == err)
+		err = FSIsAliasFile(&fileRef, &aliasFileFlag, &folderFlag);
+	
+	if (noErr == err)
+		return (BOOL)(aliasFileFlag && folderFlag);
+	else
+		return NO;	
+}
+
+
 + (void)installFromUpdateFolder:(NSString *)updateFolder overHost:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously
 {
 	// Search subdirectories for the application
@@ -41,7 +61,7 @@ NSString *SUInstallerDelegateKey = @"SUInstallerDelegate";
 		}
 		
 		// Some DMGs have symlinks into /Applications! That's no good! And there's no point in looking in bundles.
-		if ([[NSFileManager defaultManager] isAliasFolderAtPath:currentPath] ||
+		if ([self _isAliasFolderAtPath:currentPath] ||
 			[[currentFile pathExtension] isEqualToString:[[host bundlePath] pathExtension]] ||
 			[[currentFile pathExtension] isEqualToString:@"pkg"] ||
 			[[currentFile pathExtension] isEqualToString:@"mpkg"])

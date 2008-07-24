@@ -7,6 +7,7 @@
 //
 
 #import "SUPlainInstaller.h"
+#import "SUPlainInstallerInternals.h"
 
 extern NSString *SUInstallerPathKey;
 extern NSString *SUInstallerHostKey;
@@ -17,7 +18,7 @@ extern NSString *SUInstallerDelegateKey;
 + (void)installPath:(NSString *)path overHost:(SUHost *)bundle delegate:delegate
 {
 	NSError *error;
-	BOOL result = [[NSFileManager defaultManager] copyPathWithAuthentication:path overPath:[bundle bundlePath] error:&error];
+	BOOL result = [self copyPathWithAuthentication:path overPath:[bundle bundlePath] error:&error];
 	[self _finishInstallationWithResult:result host:bundle error:error delegate:delegate];
 }
 
