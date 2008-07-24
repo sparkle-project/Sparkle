@@ -9,7 +9,6 @@
 #ifndef SUAPPCASTITEM_H
 #define SUAPPCASTITEM_H
 
-
 @interface SUAppcastItem : NSObject {
 	NSString *title;
 	NSDate *date;

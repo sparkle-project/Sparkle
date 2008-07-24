@@ -8,6 +8,7 @@
 
 #import "SUUpdatePermissionPrompt.h"
 
+#import "SUHost.h"
 
 @implementation SUUpdatePermissionPrompt
 
@@ -69,7 +70,7 @@
 
 - (NSArray *)systemProfileInformationArray
 {
-	return [[SUSystemProfiler sharedSystemProfiler] systemProfileArrayForHost:host];
+	return [host systemProfile];
 }
 
 - (IBAction)toggleMoreInfo:(id)sender

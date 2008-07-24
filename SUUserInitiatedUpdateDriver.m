@@ -7,7 +7,9 @@
 //
 
 #import "SUUserInitiatedUpdateDriver.h"
-#import "Sparkle.h"
+
+#import "SUStatusController.h"
+#import "SUHost.h"
 
 @implementation SUUserInitiatedUpdateDriver
 

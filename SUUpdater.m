@@ -6,10 +6,18 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
 #import "SUUpdater.h"
 
+#import "SUHost.h"
+#import "SUUpdatePermissionPrompt.h"
+
+#import "SUAutomaticUpdateDriver.h"
+#import "SUProbingUpdateDriver.h"
+#import "SUUserInitiatedUpdateDriver.h"
+#import "SUScheduledUpdateDriver.h"
+
 @interface SUUpdater (Private)
+- (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
 - (NSArray *)feedParameters;
 - (BOOL)automaticallyUpdates;
 - (BOOL)shouldScheduleUpdateCheck;
@@ -160,6 +168,11 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 - (IBAction)checkForUpdates:sender
 {
 	[self checkForUpdatesWithDriver:[[[SUUserInitiatedUpdateDriver alloc] init] autorelease]];
+}
+
+- (void)checkForUpdateInformation
+{
+	[self checkForUpdatesWithDriver:[[[SUProbingUpdateDriver alloc] init] autorelease]];
 }
 
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)d

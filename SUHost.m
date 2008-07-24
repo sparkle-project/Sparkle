@@ -5,7 +5,9 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
+#import "SUHost.h"
+
+#import "SUSystemProfiler.h"
 #import <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
 
 @implementation SUHost

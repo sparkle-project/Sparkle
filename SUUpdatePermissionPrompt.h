@@ -9,7 +9,7 @@
 #ifndef SUUPDATEPERMISSIONPROMPT_H
 #define SUUPDATEPERMISSIONPROMPT_H
 
-#import "Sparkle.h"
+#import "SUWindowController.h"
 
 typedef enum {
 	SUAutomaticallyCheck,

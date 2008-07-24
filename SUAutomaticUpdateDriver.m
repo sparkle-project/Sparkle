@@ -7,7 +7,9 @@
 //
 
 #import "SUAutomaticUpdateDriver.h"
-#import "Sparkle.h"
+
+#import "SUAutomaticUpdateAlert.h"
+#import "SUHost.h"
 
 @implementation SUAutomaticUpdateDriver
 

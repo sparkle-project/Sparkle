@@ -7,7 +7,10 @@
 //
 
 #import "SUUIBasedUpdateDriver.h"
-#import "Sparkle.h"
+
+#import "SUUpdateAlert.h"
+#import "SUHost.h"
+#import "SUStatusController.h"
 
 @implementation SUUIBasedUpdateDriver
 

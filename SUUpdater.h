@@ -9,10 +9,9 @@
 #ifndef SUUPDATER_H
 #define SUUPDATER_H
 
-#import "SUUpdateAlert.h"
-#import "SUVersionComparisonProtocol.h"
+#import <Sparkle/SUVersionComparisonProtocol.h>
 
-@class SUUpdateDriver, SUAppcastItem, SUAppcast;
+@class SUUpdateDriver, SUAppcastItem, SUHost, SUAppcast;
 @interface SUUpdater : NSObject {
 	NSTimer *checkTimer;
 	SUUpdateDriver *driver;
@@ -37,8 +36,9 @@
 // update is found, it will be downloaded and prepped for installation.
 - (void)checkForUpdatesInBackground;
 
-// This forces an update to begin with a particular driver (see SU*UpdateDriver.h)
-- (void)checkForUpdatesWithDriver:(SUUpdateDriver *)driver;
+// This begins a "probing" check for updates which will not actually offer to update to that version. The delegate methods, though,
+// (up to updater:didFindValidUpdate: and updaterDidNotFindUpdate:), are called, so you can use that information in your UI.
+- (void)checkForUpdateInformation;
 
 // Call this to appropriately schedule or cancel the update checking timer according to the preferences for time interval and automatic checks.
 - (void)resetUpdateCycle;

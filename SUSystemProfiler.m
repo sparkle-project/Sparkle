@@ -7,9 +7,9 @@
 //  Adapted from Sparkle+, by Tom Harrington.
 //
 
-#import "Sparkle.h"
 #import "SUSystemProfiler.h"
 
+#import "SUHost.h"
 #import <sys/sysctl.h>
 
 @implementation SUSystemProfiler

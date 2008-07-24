@@ -7,7 +7,7 @@
 //
 
 #import "SUVersionComparisonTest.h"
-#import "Sparkle.h"
+#import "SUStandardVersionComparator.h"
 
 @implementation SUVersionComparisonTest
 

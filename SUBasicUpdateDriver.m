@@ -6,10 +6,13 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
 #import "SUBasicUpdateDriver.h"
 
+#import "SUHost.h"
 #import "SUDSAVerifier.h"
+#import "SUInstaller.h"
+#import "SUStandardVersionComparator.h"
+#import "SUUnarchiver.h"
 
 @implementation SUBasicUpdateDriver
 
