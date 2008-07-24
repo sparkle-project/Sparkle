@@ -18,11 +18,11 @@
 	[checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates\u2026", nil) maxProgressValue:0 statusText:nil];
 	[checkingController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
 	[checkingController showWindow:self];
-	[super checkForUpdatesAtURL:appcastURL host:host];
+	[super checkForUpdatesAtURL:appcastURL host:aHost];
 	
 	// For background applications, obtain focus.
 	// Useful if the update check is requested from another app like System Preferences.
-	if ([host isBackgroundApplication])
+	if ([aHost isBackgroundApplication])
 	{
 		[NSApp activateIgnoringOtherApps:YES];
 	}
