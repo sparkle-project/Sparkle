@@ -958,7 +958,6 @@
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
 				GCC_DEBUGGING_SYMBOLS = full;
-				GCC_PREFIX_HEADER = Sparkle.pch;
 			};
 			name = Release;
 		};
