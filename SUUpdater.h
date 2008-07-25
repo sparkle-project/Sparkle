@@ -27,6 +27,15 @@
 - (void)setDelegate:(id)delegate;
 - delegate;
 
+- (void)setAutomaticallyChecksForUpdates:(BOOL)automaticallyChecks;
+- (BOOL)automaticallyChecksForUpdates;
+
+- (void)setUpdateCheckInterval:(NSTimeInterval)interval;
+- (NSTimeInterval)updateCheckInterval;
+
+- (void)setFeedURL:(NSURL *)feedURL;
+- (NSURL *)feedURL;
+
 // This IBAction is meant for a main menu item. Hook up any menu item to this action,
 // and Sparkle will check for updates and report back its findings verbosely.
 - (IBAction)checkForUpdates:sender;

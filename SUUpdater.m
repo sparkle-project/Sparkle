@@ -18,16 +18,13 @@
 
 @interface SUUpdater (Private)
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
-- (NSArray *)feedParameters;
 - (BOOL)automaticallyUpdates;
-- (BOOL)shouldScheduleUpdateCheck;
 - (void)scheduleNextUpdateCheck;
-- (NSTimeInterval)checkInterval;
 - (void)registerAsObserver;
 - (void)unregisterAsObserver;
 - (void)updateDriverDidFinish:(NSNotification *)note;
 - initForBundle:(NSBundle *)bundle;
-- (NSURL *)feedURL;
+- (NSURL *)parameterizedFeedURL;
 @end
 
 @implementation SUUpdater
@@ -99,7 +96,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
         [host objectForInfoDictionaryKey:SUEnableAutomaticChecksKey] == nil)
     {
         if ([host objectForUserDefaultsKey:SUEnableAutomaticChecksKeyOld])
-            [host setBool:[host boolForUserDefaultsKey:SUEnableAutomaticChecksKeyOld] forUserDefaultsKey:SUEnableAutomaticChecksKey];
+            [self setAutomaticallyChecksForUpdates:[host boolForUserDefaultsKey:SUEnableAutomaticChecksKeyOld]];
         // Now, we don't want to ask the user for permission to do a weird thing on the first launch.
         // We wait until the second launch.
         else if ([host boolForUserDefaultsKey:SUHasLaunchedBeforeKey] == NO)
@@ -122,8 +119,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 
 - (void)updatePermissionPromptFinishedWithResult:(SUPermissionPromptResult)result
 {
-	BOOL automaticallyCheck = (result == SUAutomaticallyCheck);
-	[host setBool:automaticallyCheck forUserDefaultsKey:SUEnableAutomaticChecksKey];
+	[self setAutomaticallyChecksForUpdates:(result == SUAutomaticallyCheck)];
     // Schedule checks, but make sure we ignore the delayed call from KVO
 	[self resetUpdateCycle];
 }
@@ -144,7 +140,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 		[checkTimer invalidate];
 		checkTimer = nil;
 	}
-	if (![self shouldScheduleUpdateCheck]) return;
+	if (![self automaticallyChecksForUpdates]) return;
 	
 	// How long has it been since last we checked for an update?
 	NSDate *lastCheckDate = [host objectForUserDefaultsKey:SULastCheckTimeKey];
@@ -153,8 +149,8 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	
 	// Now we want to figure out how long until we check again.
 	NSTimeInterval delayUntilCheck;
-	if (intervalSinceCheck < [self checkInterval])
-		delayUntilCheck = ([self checkInterval] - intervalSinceCheck); // It hasn't been long enough.
+	if (intervalSinceCheck < [self updateCheckInterval])
+		delayUntilCheck = ([self updateCheckInterval] - intervalSinceCheck); // It hasn't been long enough.
 	else
 		delayUntilCheck = 0; // We're overdue! Run one now.
 	checkTimer = [NSTimer scheduledTimerWithTimeInterval:delayUntilCheck target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO];
@@ -179,16 +175,9 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 {
 	if ([self updateInProgress]) { return; }
 	if (checkTimer) { [checkTimer invalidate]; checkTimer = nil; }
-	
-	// A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
-	NSString *appcastString = [host objectForUserDefaultsKey:SUFeedURLKey];
-	if (!appcastString)
-		appcastString = [host objectForInfoDictionaryKey:SUFeedURLKey];
-	if (!appcastString)
-		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the SUFeedURLKey in either the Info.plist or the user defaults!"];
-	
+		
 	driver = [d retain];
-	[driver checkForUpdatesAtURL:[self feedURL] host:host];
+	[driver checkForUpdatesAtURL:[self parameterizedFeedURL] host:host];
 }
 
 - (void)registerAsObserver
@@ -235,7 +224,12 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
     [self scheduleNextUpdateCheck];
 }
 
-- (BOOL)shouldScheduleUpdateCheck
+- (void)setAutomaticallyChecksForUpdates:(BOOL)automaticallyCheckForUpdates
+{
+	[host setBool:automaticallyCheckForUpdates forUserDefaultsKey:SUEnableAutomaticChecksKey];
+}
+
+- (BOOL)automaticallyChecksForUpdates
 {
 	// Breaking this down for readability:
 	// If the user says he wants automatic update checks, let's do it.
@@ -264,7 +258,12 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	return YES; // Otherwise, we're good to go.
 }
 
-- (NSURL *)_baseFeedURL
+- (void)setFeedURL:(NSURL *)feedURL
+{
+	[host setObject:[feedURL absoluteString] forUserDefaultsKey:SUFeedURLKey];
+}
+
+- (NSURL *)feedURL
 {
 	// A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
 	NSString *appcastString = [host objectForUserDefaultsKey:SUFeedURLKey];
@@ -273,12 +272,12 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	if (!appcastString) // Can't find an appcast string!
 		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the SUFeedURLKey in either the Info.plist or the user defaults!"];
 	NSCharacterSet* quoteSet = [NSCharacterSet characterSetWithCharactersInString: @"\"\'"]; // Some feed publishers add quotes; strip 'em.
-	return [NSURL URLWithString:[appcastString stringByTrimmingCharactersInSet:quoteSet]] ;
+	return [NSURL URLWithString:[appcastString stringByTrimmingCharactersInSet:quoteSet]];
 }
 
-- (NSURL *)feedURL
+- (NSURL *)parameterizedFeedURL
 {
-	NSURL *baseFeedURL = [self _baseFeedURL];
+	NSURL *baseFeedURL = [self feedURL];
 	
 	// Determine all the parameters we're attaching to the base feed URL.
 	BOOL sendingSystemProfile = ([host boolForUserDefaultsKey:SUSendProfileInfoKey] == YES);
@@ -302,7 +301,12 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	return [NSURL URLWithString:[appcastStringWithProfile stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
 }
 
-- (NSTimeInterval)checkInterval
+- (void)setUpdateCheckInterval:(NSTimeInterval)updateCheckInterval
+{
+	[host setObject:[NSNumber numberWithDouble:updateCheckInterval] forUserDefaultsKey:SUScheduledCheckIntervalKey];
+}
+
+- (NSTimeInterval)updateCheckInterval
 {
 	NSTimeInterval checkInterval = 0;
 	// Find the stored check interval. User defaults override Info.plist.
