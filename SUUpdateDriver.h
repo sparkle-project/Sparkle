@@ -13,17 +13,17 @@
 
 extern NSString *SUUpdateDriverFinishedNotification;
 
+@class SUHost;
 @interface SUUpdateDriver : NSObject
 {
+	SUHost *host;
+	
 	BOOL finished;
-	id delegate;
 }
-- (void)checkForUpdatesAtURL:(NSURL *)appcastURL hostBundle:(NSBundle *)hb;
+- (void)checkForUpdatesAtURL:(NSURL *)appcastURL host:(SUHost *)host;
 - (void)abortUpdate;
 - (BOOL)finished;
 
-- delegate;
-- (void)setDelegate:delegate;
 @end
 
 #endif

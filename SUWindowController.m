@@ -10,12 +10,12 @@
 
 @implementation SUWindowController
 
-- (id)initWithHostBundle:(NSBundle *)hb windowNibName:(NSString *)nibName
+- (id)initWithHost:(SUHost *)host windowNibName:(NSString *)nibName
 {
 	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:nibName ofType:@"nib"];
 	if (path == nil) // Slight hack to resolve issues with running Sparkle in debug configurations.
 	{
-		NSString *frameworkPath = [[hb sharedFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
+		NSString *frameworkPath = [[host sharedFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
 		NSBundle *framework = [NSBundle bundleWithPath:frameworkPath];
 		path = [framework pathForResource:nibName ofType:@"nib"];
 	}

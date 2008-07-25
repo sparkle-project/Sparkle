@@ -8,20 +8,21 @@
 
 #import "SUUpdatePermissionPrompt.h"
 
+#import "SUHost.h"
 
 @implementation SUUpdatePermissionPrompt
 
 - (BOOL)shouldAskAboutProfile
 {
-	return [[hostBundle objectForInfoDictionaryKey:SUEnableSystemProfilingKey] boolValue];
+	return [[host objectForInfoDictionaryKey:SUEnableSystemProfilingKey] boolValue];
 }
 
-- (id)initWithHostBundle:(NSBundle *)hb delegate:(id)d
+- (id)initWithHost:(SUHost *)aHost delegate:(id)d
 {
-	self = [super initWithHostBundle:hb windowNibName:@"SUUpdatePermissionPrompt"];
+	self = [super initWithHost:aHost windowNibName:@"SUUpdatePermissionPrompt"];
 	if (self)
 	{
-		hostBundle = [hb retain];
+		host = [aHost retain];
 		delegate = [d retain];
 		isShowingMoreInfo = NO;
 		shouldSendProfile = [self shouldAskAboutProfile];
@@ -30,9 +31,14 @@
 	return self;
 }
 
-+ (void)promptWithHostBundle:(NSBundle *)hb delegate:(id)d
++ (void)promptWithHost:(SUHost *)host delegate:(id)d
 {
-	id prompt = [[[self class] alloc] initWithHostBundle:hb delegate:d];
+	// If this is a background application we need to focus it in order to bring the prompt
+	// to the user's attention. Otherwise the prompt would be hidden behind other applications and
+	// the user would not know why the application was paused.
+	if ([host isBackgroundApplication]) { [NSApp activateIgnoringOtherApps:YES]; }
+	
+	id prompt = [[[self class] alloc] initWithHost:host delegate:d];
 	[NSApp runModalForWindow:[prompt window]];
 }
 
@@ -48,23 +54,23 @@
 
 - (void)dealloc
 {
-	[hostBundle release];
+	[host release];
 	[super dealloc];
 }
 
 - (NSImage *)icon
 {
-	return [hostBundle icon];
+	return [host icon];
 }
 
 - (NSString *)promptDescription
 {
-	return [NSString stringWithFormat:SULocalizedString(@"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu.", nil), [hostBundle name]];
+	return [NSString stringWithFormat:SULocalizedString(@"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu.", nil), [host name]];
 }
 
 - (NSArray *)systemProfileInformationArray
 {
-	return [[SUSystemProfiler sharedSystemProfiler] systemProfileArrayForHostBundle:hostBundle];
+	return [host systemProfile];
 }
 
 - (IBAction)toggleMoreInfo:(id)sender
@@ -116,7 +122,7 @@
 {
 	if (![delegate respondsToSelector:@selector(updatePermissionPromptFinishedWithResult:)])
 		[NSException raise:@"SUInvalidDelegate" format:@"SUUpdatePermissionPrompt's delegate (%@) doesn't respond to updatePermissionPromptFinishedWithResult:!", delegate];
-	[[SUUserDefaults standardUserDefaults] setBool:shouldSendProfile forKey:SUSendProfileInfoKey];
+	[host setBool:shouldSendProfile forUserDefaultsKey:SUSendProfileInfoKey];
 	[delegate updatePermissionPromptFinishedWithResult:([sender tag] == 1 ? SUAutomaticallyCheck : SUDoNotAutomaticallyCheck)];
 	[[self window] close];
 	[NSApp stopModal];

@@ -18,14 +18,14 @@ typedef enum
 	SUDoNotInstallChoice
 } SUAutomaticInstallationChoice;
 
-@class SUAppcastItem;
+@class SUAppcastItem, SUHost;
 @interface SUAutomaticUpdateAlert : SUWindowController {
 	SUAppcastItem *updateItem;
 	id delegate;
-	NSBundle *hostBundle;
+	SUHost *host;
 }
 
-- (id)initWithAppcastItem:(SUAppcastItem *)item hostBundle:(NSBundle *)hostBundle delegate:delegate;
+- (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)hostBundle delegate:delegate;
 - (IBAction)installNow:sender;
 - (IBAction)installLater:sender;
 - (IBAction)doNotInstall:sender;

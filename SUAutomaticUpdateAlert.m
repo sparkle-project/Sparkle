@@ -6,19 +6,20 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
 #import "SUAutomaticUpdateAlert.h"
+
+#import "SUHost.h"
 
 @implementation SUAutomaticUpdateAlert
 
-- (id)initWithAppcastItem:(SUAppcastItem *)item hostBundle:(NSBundle *)hb delegate:del;
+- (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost delegate:del;
 {
-	self = [super initWithHostBundle:hb windowNibName:@"SUAutomaticUpdateAlert"];
+	self = [super initWithHost:aHost windowNibName:@"SUAutomaticUpdateAlert"];
 	if (self)
 	{
 		updateItem = [item retain];
 		delegate = del;
-		hostBundle = [hb retain];
+		host = [aHost retain];
 		[self setShouldCascadeWindows:NO];	
 		[[self window] center];
 	}
@@ -27,7 +28,7 @@
 
 - (void)dealloc
 {
-	[hostBundle release];
+	[host release];
 	[updateItem release];
 	[super dealloc];
 }
@@ -53,17 +54,17 @@
 
 - (NSImage *)applicationIcon
 {
-	return [hostBundle icon];
+	return [host icon];
 }
 
 - (NSString *)titleText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is ready to install!", nil), [hostBundle name]];
+	return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is ready to install!", nil), [host name]];
 }
 
 - (NSString *)descriptionText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?", nil), [hostBundle name], [hostBundle displayVersion]];
+	return [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?", nil), [host name], [host displayVersion]];
 }
 
 @end

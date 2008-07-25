@@ -6,19 +6,19 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
 #import "SUUpdateAlert.h"
 
+#import "SUHost.h"
 #import <WebKit/WebKit.h>
 
 @implementation SUUpdateAlert
 
-- (id)initWithAppcastItem:(SUAppcastItem *)item hostBundle:(NSBundle *)hb
+- (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost
 {
-	self = [super initWithHostBundle:hb windowNibName:@"SUUpdateAlert"];
+	self = [super initWithHost:host windowNibName:@"SUUpdateAlert"];
 	if (self)
 	{
-		hostBundle = [hb retain];
+		host = [aHost retain];
 		updateItem = [item retain];
 		[self setShouldCascadeWindows:NO];
 	}
@@ -28,7 +28,7 @@
 - (void)dealloc
 {
 	[updateItem release];
-	[hostBundle release];
+	[host release];
 	[super dealloc];
 }
 
@@ -85,7 +85,7 @@
 
 - (BOOL)showsReleaseNotes
 {
-	NSNumber *shouldShowReleaseNotes = [hostBundle objectForInfoDictionaryKey:SUShowReleaseNotesKey];
+	NSNumber *shouldShowReleaseNotes = [host objectForInfoDictionaryKey:SUShowReleaseNotesKey];
 	if (shouldShowReleaseNotes == nil)
 		return YES; // defaults to YES
 	else
@@ -94,11 +94,11 @@
 
 - (BOOL)allowsAutomaticUpdates
 {
-	if (![[hostBundle objectForInfoDictionaryKey:SUExpectsDSASignatureKey] boolValue])
+	if (![[host objectForInfoDictionaryKey:SUExpectsDSASignatureKey] boolValue])
 		return NO; // Automatic updating requires DSA-signed updates
-	if (![hostBundle objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey])
+	if (![host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey])
 		return YES; // defaults to YES
-	return [[hostBundle objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] boolValue];
+	return [[host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] boolValue];
 }
 
 - (void)awakeFromNib
@@ -140,17 +140,17 @@
 
 - (NSImage *)applicationIcon
 {
-	return [hostBundle icon];
+	return [host icon];
 }
 
 - (NSString *)titleText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is available!", nil), [hostBundle name]];
+	return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is available!", nil), [host name]];
 }
 
 - (NSString *)descriptionText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available\u2014you have %@. Would you like to download it now?", nil), [hostBundle name], [updateItem displayVersionString], [hostBundle displayVersion]];
+	return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available\u2014you have %@. Would you like to download it now?", nil), [host name], [updateItem displayVersionString], [host displayVersion]];
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:frame

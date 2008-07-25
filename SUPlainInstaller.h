@@ -10,9 +10,10 @@
 #define SUPLAININSTALLER_H
 
 #import "Sparkle.h"
+#import "SUInstaller.h"
 
 @interface SUPlainInstaller : SUInstaller { }
-+ (void)performInstallationWithPath:(NSString *)path hostBundle:(NSBundle *)hostBundle delegate:delegate synchronously:(BOOL)synchronously;
++ (void)performInstallationWithPath:(NSString *)path host:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously;
 @end
 
 #endif

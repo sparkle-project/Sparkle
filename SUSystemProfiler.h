@@ -9,9 +9,10 @@
 #ifndef SUSYSTEMPROFILER_H
 #define SUSYSTEMPROFILER_H
 
+@class SUHost;
 @interface SUSystemProfiler : NSObject {}
 + (SUSystemProfiler *)sharedSystemProfiler;
-- (NSMutableArray *)systemProfileArrayForHostBundle:(NSBundle *)hostBundle;
+- (NSMutableArray *)systemProfileArrayForHost:(SUHost *)host;
 @end
 
 #endif

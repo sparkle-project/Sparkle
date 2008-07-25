@@ -18,6 +18,8 @@
 	SUUpdateAlert *updateAlert;
 }
 
+- (void)showModalAlert:(NSAlert *)alert;
+
 @end
 
 #endif

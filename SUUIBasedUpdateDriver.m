@@ -7,17 +7,31 @@
 //
 
 #import "SUUIBasedUpdateDriver.h"
-#import "Sparkle.h"
+
+#import "SUUpdateAlert.h"
+#import "SUHost.h"
+#import "SUStatusController.h"
 
 @implementation SUUIBasedUpdateDriver
 
 - (void)didFindValidUpdate
 {
-	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem hostBundle:hostBundle];
+	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem host:host];
 	[updateAlert setDelegate:self];
 	
-	// If the app is a menubar app or the like, we need to focus it first:
-	if ([[hostBundle objectForInfoDictionaryKey:@"LSUIElement"] doubleValue]) { [NSApp activateIgnoringOtherApps:YES]; }
+	SUUpdater *updater = [SUUpdater updaterForBundle:[host bundle]];
+	if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
+		[[updater delegate] updater:updater didFindValidUpdate:updateItem];
+
+	// If the app is a menubar app or the like, we need to focus it first and alter the
+	// update prompt to behave like a normal window. Otherwise if the window were hidden
+	// there may be no way for the application to be activated to make it visible again.
+	if ([host isBackgroundApplication])
+	{
+		[[updateAlert window] setHidesOnDeactivate:NO];
+		[[updateAlert window] setLevel:NSNormalWindowLevel];
+		[NSApp activateIgnoringOtherApps:YES];
+	}
 	
 	// Only show the update alert if the app is active; otherwise, we'll wait until it is.
 	if ([NSApp isActive])
@@ -28,11 +42,11 @@
 
 - (void)didNotFindUpdate
 {
-	if ([delegate respondsToSelector:@selector(didNotFindUpdateToHostBundle:)])
-		[delegate didNotFindUpdateToHostBundle:hostBundle];
-	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"You're up to date!", nil) defaultButton:SULocalizedString(@"OK", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [hostBundle name], [hostBundle displayVersion]];
-	[alert setIcon:[hostBundle icon]];
-	[alert runModal];
+	SUUpdater *updater = [SUUpdater updaterForBundle:[host bundle]];
+	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
+		[[updater delegate] updaterDidNotFindUpdate:updater];
+	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"You're up to date!", nil) defaultButton:SULocalizedString(@"OK", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [host name], [host displayVersion]];
+	[self showModalAlert:alert];
 	[self abortUpdate];
 }
 
@@ -45,13 +59,11 @@
 - (void)updateAlert:(SUUpdateAlert *)alert finishedWithChoice:(SUUpdateAlertChoice)choice
 {
 	[updateAlert release]; updateAlert = nil;
-	if ([delegate respondsToSelector:@selector(userChoseAction:forUpdate:toHostBundle:)])
-		[delegate userChoseAction:choice forUpdate:updateItem toHostBundle:hostBundle];
-	[[SUUserDefaults standardUserDefaults] setObject:nil forKey:SUSkippedVersionKey];
+	[host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
 	switch (choice)
 	{
 		case SUInstallUpdateChoice:
-			statusController = [[SUStatusController alloc] initWithHostBundle:hostBundle];
+			statusController = [[SUStatusController alloc] initWithHost:host];
 			[statusController beginActionWithTitle:SULocalizedString(@"Downloading update\u2026", @"Take care not to overflow the status window.") maxProgressValue:0 statusText:nil];
 			[statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
 			[statusController showWindow:self];	
@@ -59,7 +71,7 @@
 			break;
 			
 		case SUSkipThisVersionChoice:
-			[[SUUserDefaults standardUserDefaults] setObject:[updateItem versionString] forKey:SUSkippedVersionKey];
+			[host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
 		case SURemindMeLaterChoice:
 			[self abortUpdate];
 			break;			
@@ -138,8 +150,7 @@
 - (void)abortUpdateWithError:(NSError *)error
 {
 	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"Update Error!", nil) defaultButton:SULocalizedString(@"Cancel Update", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:[error localizedDescription]];
-	[alert setIcon:[hostBundle icon]];
-	[alert runModal];
+	[self showModalAlert:alert];
 	[super abortUpdateWithError:error];
 }
 
@@ -151,6 +162,16 @@
 		[statusController autorelease];
 	}
 	[super abortUpdate];
+}
+
+- (void)showModalAlert:(NSAlert *)alert
+{
+	// When showing a modal alert we need to ensure that background applications
+	// are focused to inform the user since there is no dock icon to notify them.
+	if ([host isBackgroundApplication]) { [NSApp activateIgnoringOtherApps:YES]; }
+	
+	[alert setIcon:[host icon]];
+	[alert runModal];
 }
 
 @end

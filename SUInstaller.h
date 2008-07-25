@@ -11,14 +11,15 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class SUHost;
 @interface SUInstaller : NSObject { }
-+ (void)installFromUpdateFolder:(NSString *)updateFolder overHostBundle:(NSBundle *)hostBundle delegate:delegate synchronously:(BOOL)synchronously;
-+ (void)_finishInstallationWithResult:(BOOL)result hostBundle:(NSBundle *)hostBundle error:(NSError *)error delegate:delegate;
++ (void)installFromUpdateFolder:(NSString *)updateFolder overHost:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously;
++ (void)_finishInstallationWithResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:delegate;
 @end
 
 @interface NSObject (SUInstallerDelegateInformalProtocol)
-- (void)installerFinishedForHostBundle:(NSBundle *)hostBundle;
-- (void)installerForHostBundle:(NSBundle *)hostBundle failedWithError:(NSError *)error;
+- (void)installerFinishedForHost:(SUHost *)host;
+- (void)installerForHost:(SUHost *)host failedWithError:(NSError *)error;
 @end
 
 #endif

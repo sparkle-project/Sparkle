@@ -11,9 +11,9 @@
 NSString *SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
 @implementation SUUpdateDriver
-- (void)checkForUpdatesAtURL:(NSURL *)appcastURL hostBundle:(NSBundle *)hb
+- (void)checkForUpdatesAtURL:(NSURL *)appcastURL host:(SUHost *)h
 {
-	[NSException raise:@"SUAbstractDriverError" format:@"Don't use SUUpdateDriver directly; use a subclass."];
+	host = [h retain];
 }
 
 - (void)abortUpdate
@@ -23,6 +23,4 @@ NSString *SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 }
 
 - (BOOL)finished { return finished; }
-- delegate { return delegate; }
-- (void)setDelegate:del { delegate = del; }
 @end
