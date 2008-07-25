@@ -9,7 +9,7 @@
 #ifndef SUAPPCAST_H
 #define SUAPPCAST_H
 
-@class RSS, SUAppcastItem;
+@class SUAppcastItem;
 @interface SUAppcast : NSObject {
 	NSArray *items;
 	NSString *userAgentString;
