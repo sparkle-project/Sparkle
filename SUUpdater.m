@@ -210,10 +210,6 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
         // Or we may get this from the developer and from our own KVO observation, this will effectively coalesce them.
         [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
         [self performSelector:@selector(resetUpdateCycle) withObject:nil afterDelay:15];
-		if ([keyPath rangeOfString:SUEnableAutomaticChecksKey].location != NSNotFound)
-			[self didChangeValueForKey:@"automaticallyChecksForUpdates"];
-		else if ([keyPath rangeOfString:SUScheduledCheckIntervalKey].location != NSNotFound)
-			[self didChangeValueForKey:@"updateCheckInterval"];
         [self resetUpdateCycle];
     }
     else
