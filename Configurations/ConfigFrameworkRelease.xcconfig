@@ -1,3 +1,8 @@
 #include "ConfigCommon.xcconfig"
 #include "ConfigCommonRelease.xcconfig"
 #include "ConfigFramework.xcconfig"
+
+STRIP_INSTALLED_PRODUCT = YES
+DEPLOYMENT_POSTPROCESSING = YES
+STRIPFLAGS = -u -r
+STRIP_STYLE = non-global
