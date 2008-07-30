@@ -17,6 +17,7 @@
 #import "SUScheduledUpdateDriver.h"
 
 @interface SUUpdater (Private)
+- initForBundle:(NSBundle *)bundle;
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
 - (BOOL)automaticallyUpdates;
 - (void)scheduleNextUpdateCheck;
@@ -45,7 +46,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
     if (bundle == nil) bundle = [NSBundle mainBundle];
 	id updater = [sharedUpdaters objectForKey:[NSValue valueWithNonretainedObject:bundle]];
 	if (updater == nil)
-		updater = [[[self class] alloc] initWithBundle:bundle];
+		updater = [[[self class] alloc] initForBundle:bundle];
 	return updater;
 }
 
