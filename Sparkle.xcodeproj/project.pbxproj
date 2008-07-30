@@ -190,6 +190,10 @@
 		618FA5040DAE8AB80026945C /* SUPlainInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUPlainInstaller.m; sourceTree = "<group>"; };
 		618FA5200DAE8E8A0026945C /* SUPackageInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUPackageInstaller.h; sourceTree = "<group>"; };
 		618FA5210DAE8E8A0026945C /* SUPackageInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUPackageInstaller.m; sourceTree = "<group>"; };
+		6195D48F0E404AD600D41A50 /* ru */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ru; path = ru.lproj/SUUpdatePermissionPrompt.nib; sourceTree = "<group>"; };
+		6195D4900E404AD600D41A50 /* ru */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ru; path = ru.lproj/SUUpdateAlert.nib; sourceTree = "<group>"; };
+		6195D4910E404AD600D41A50 /* ru */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ru; path = ru.lproj/SUAutomaticUpdateAlert.nib; sourceTree = "<group>"; };
+		6195D4920E404AD700D41A50 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		6196CFE309C71ADE000DC222 /* SUStatusController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStatusController.h; sourceTree = "<group>"; };
 		6196CFE409C71ADE000DC222 /* SUStatusController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUStatusController.m; sourceTree = "<group>"; };
 		619B17200E1E9D0800E72754 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Sparkle.strings; sourceTree = "<group>"; };
@@ -634,6 +638,7 @@
 				8DC2EF540486A6940098B216 /* Sources */,
 				8DC2EF560486A6940098B216 /* Frameworks */,
 				6131B1910DDCDE32005215F0 /* Run Script: Set Bzr Version Info */,
+				6195D4B40E40505A00D41A50 /* Run Script: Link fr_ca to fr */,
 			);
 			buildRules = (
 			);
@@ -702,6 +707,7 @@
 				th,
 				tr,
 				zh_CN,
+				fr_ca,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* Sparkle */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
@@ -781,6 +787,20 @@
 			shellPath = "/usr/bin/env ruby";
 			shellScript = "# Xcode auto-versioning script for Subversion\n# by Axel Andersson, modified by Daniel Jalkut to add\n# \"--revision HEAD\" to the svn info line, which allows\n# the latest revision to always be used.\n\nif ENV[\"BUILT_PRODUCTS_DIR\"].nil?\n\tSTDERR.print \"#{$0}: Must be run from Xcode!\"\n\texit(1)\nend\n\n# Get the current Bzr revision number and use it to set the CFBundleVersion value\nENV[\"PATH\"] = \"/bin:/sw/bin:/usr/bin:/usr/local/bin:/sbin:/usr/sbin:/opt/local/bin\"\nexit(0) if `type bzr` == \"\"\nrev = `/usr/bin/env bzr revno`\ninfo = \"#{ENV[\"BUILT_PRODUCTS_DIR\"]}/#{ENV[\"WRAPPER_NAME\"]}/Resources/Info.plist\"\nversion = rev[/[\\d.]+/]\n\nif version.nil?\n\tSTDERR.print \"#{$0}: Can't find a Bazaar revision!\"\n\texit(0)\nend\n\ninfo_contents = File.read(info)\nif info_contents.nil?\n\tSTDERR.print \"#{$0}: Can't read in the Info.plist file!\"\n\texit(1)\nend\n\ninfo_contents.sub!(/([\\t ]+<key>CFBundleVersion<\\/key>\\n[\\t ]+<string>).*?(<\\/string>)/, '\\1' + version + '\\2')\nSTDERR.print info_contents\nf = File.open(info, \"w\")\nf.write(info_contents)\nf.close";
 			showEnvVarsInLog = 0;
+		};
+		6195D4B40E40505A00D41A50 /* Run Script: Link fr_ca to fr */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script: Link fr_ca to fr";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = "/usr/bin/env ruby";
+			shellScript = "resources = \"#{ENV[\"BUILT_PRODUCTS_DIR\"]}/#{ENV[\"WRAPPER_NAME\"]}/Resources\"\n`ln -s \"#{resources}/fr.lproj\" \"#{resources}/fr_ca.lproj\"`";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -881,6 +901,7 @@
 				619B17200E1E9D0800E72754 /* de */,
 				61F614540E24A12D009F47E7 /* it */,
 				618915730E35937600B5E981 /* sv */,
+				6195D4920E404AD700D41A50 /* ru */,
 			);
 			name = Sparkle.strings;
 			sourceTree = "<group>";
@@ -895,6 +916,7 @@
 				619B17210E1E9D0800E72754 /* de */,
 				61F614550E24A12D009F47E7 /* it */,
 				618915720E35937600B5E981 /* sv */,
+				6195D4910E404AD600D41A50 /* ru */,
 			);
 			name = SUAutomaticUpdateAlert.nib;
 			sourceTree = "<group>";
@@ -909,6 +931,7 @@
 				619B17220E1E9D0800E72754 /* de */,
 				61F614560E24A12D009F47E7 /* it */,
 				618915710E35937600B5E981 /* sv */,
+				6195D4900E404AD600D41A50 /* ru */,
 			);
 			name = SUUpdateAlert.nib;
 			sourceTree = "<group>";
@@ -939,6 +962,7 @@
 				619B17230E1E9D0800E72754 /* de */,
 				61F614570E24A12D009F47E7 /* it */,
 				618915700E35937600B5E981 /* sv */,
+				6195D48F0E404AD600D41A50 /* ru */,
 			);
 			name = SUUpdatePermissionPrompt.nib;
 			sourceTree = "<group>";
