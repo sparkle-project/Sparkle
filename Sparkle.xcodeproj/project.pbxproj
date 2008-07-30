@@ -638,7 +638,7 @@
 				8DC2EF540486A6940098B216 /* Sources */,
 				8DC2EF560486A6940098B216 /* Frameworks */,
 				6131B1910DDCDE32005215F0 /* Run Script: Set Bzr Version Info */,
-				6195D4B40E40505A00D41A50 /* Run Script: Link fr_ca to fr */,
+				6195D4B40E40505A00D41A50 /* Run Script: Link fr_CA to fr */,
 			);
 			buildRules = (
 			);
@@ -788,19 +788,19 @@
 			shellScript = "# Xcode auto-versioning script for Subversion\n# by Axel Andersson, modified by Daniel Jalkut to add\n# \"--revision HEAD\" to the svn info line, which allows\n# the latest revision to always be used.\n\nif ENV[\"BUILT_PRODUCTS_DIR\"].nil?\n\tSTDERR.print \"#{$0}: Must be run from Xcode!\"\n\texit(1)\nend\n\n# Get the current Bzr revision number and use it to set the CFBundleVersion value\nENV[\"PATH\"] = \"/bin:/sw/bin:/usr/bin:/usr/local/bin:/sbin:/usr/sbin:/opt/local/bin\"\nexit(0) if `type bzr` == \"\"\nrev = `/usr/bin/env bzr revno`\ninfo = \"#{ENV[\"BUILT_PRODUCTS_DIR\"]}/#{ENV[\"WRAPPER_NAME\"]}/Resources/Info.plist\"\nversion = rev[/[\\d.]+/]\n\nif version.nil?\n\tSTDERR.print \"#{$0}: Can't find a Bazaar revision!\"\n\texit(0)\nend\n\ninfo_contents = File.read(info)\nif info_contents.nil?\n\tSTDERR.print \"#{$0}: Can't read in the Info.plist file!\"\n\texit(1)\nend\n\ninfo_contents.sub!(/([\\t ]+<key>CFBundleVersion<\\/key>\\n[\\t ]+<string>).*?(<\\/string>)/, '\\1' + version + '\\2')\nSTDERR.print info_contents\nf = File.open(info, \"w\")\nf.write(info_contents)\nf.close";
 			showEnvVarsInLog = 0;
 		};
-		6195D4B40E40505A00D41A50 /* Run Script: Link fr_ca to fr */ = {
+		6195D4B40E40505A00D41A50 /* Run Script: Link fr_CA to fr */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Run Script: Link fr_ca to fr";
+			name = "Run Script: Link fr_CA to fr";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env ruby";
-			shellScript = "resources = \"#{ENV[\"BUILT_PRODUCTS_DIR\"]}/#{ENV[\"WRAPPER_NAME\"]}/Resources\"\n`ln -s \"#{resources}/fr.lproj\" \"#{resources}/fr_ca.lproj\"`";
+			shellScript = "resources = \"#{ENV[\"BUILT_PRODUCTS_DIR\"]}/#{ENV[\"WRAPPER_NAME\"]}/Resources\"\n`ln -s \"#{resources}/fr.lproj\" \"#{resources}/fr_CA.lproj\"`";
 		};
 /* End PBXShellScriptBuildPhase section */
 
