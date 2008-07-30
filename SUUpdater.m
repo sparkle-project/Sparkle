@@ -282,6 +282,15 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	
 	// Determine all the parameters we're attaching to the base feed URL.
 	BOOL sendingSystemProfile = ([host boolForUserDefaultsKey:SUSendProfileInfoKey] == YES);
+
+	NSDate *lastSubmitDate = [host objectForUserDefaultsKey:SULastProfileSubmitDateKey];
+	if(!lastSubmitDate)
+	    lastSubmitDate = [NSDate distantPast];
+#define ONE_WEEK (NSTimeInterval)(60 * 60 * 24 * 7)
+	sendingSystemProfile = sendingSystemProfile && (-[lastSubmitDate timeIntervalSinceNow] >= ONE_WEEK);
+	if(sendingSystemProfile)
+		[host setObject:[NSDate date] forUserDefaultsKey:SULastProfileSubmitDateKey];
+
 	NSArray *parameters = [NSArray array];
 	if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)])
 		parameters = [parameters arrayByAddingObjectsFromArray:[delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile]];

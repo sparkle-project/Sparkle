@@ -29,6 +29,7 @@ extern NSString *SUEnableAutomaticChecksKey;
 extern NSString *SUEnableAutomaticChecksKeyOld;
 extern NSString *SUEnableSystemProfilingKey;
 extern NSString *SUSendProfileInfoKey;
+extern NSString *SULastProfileSubmitDateKey;
 
 extern NSString *SUSparkleErrorDomain;
 // Appcast phase errors.
