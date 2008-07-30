@@ -82,6 +82,11 @@
 	[actionButton setKeyEquivalent:isDefault ? @"\r" : @""];
 }
 
+- (BOOL)progressBarShouldAnimate
+{
+	return YES;
+}
+
 - (void)setButtonEnabled:(BOOL)enabled
 {
 	[actionButton setEnabled:enabled];
