@@ -27,6 +27,7 @@ NSString *SUEnableSystemProfilingKey = @"SUEnableSystemProfiling";
 NSString *SUEnableAutomaticChecksKey = @"SUEnableAutomaticChecks";
 NSString *SUEnableAutomaticChecksKeyOld = @"SUCheckAtStartup";
 NSString *SUSendProfileInfoKey = @"SUSendProfileInfo";
+NSString *SULastProfileSubmitDateKey = @"SULastProfileSubmissionDate";
 
 NSString *SUSparkleErrorDomain = @"SUSparkleErrorDomain";
 OSStatus SUAppcastParseError = 1000;

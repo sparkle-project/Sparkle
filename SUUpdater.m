@@ -282,11 +282,22 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	
 	// Determine all the parameters we're attaching to the base feed URL.
 	BOOL sendingSystemProfile = ([host boolForUserDefaultsKey:SUSendProfileInfoKey] == YES);
+
+	// Let's only send the system profiling information once per week at most, so we normalize daily-checkers vs. biweekly-checkers and the such.
+	NSDate *lastSubmitDate = [host objectForUserDefaultsKey:SULastProfileSubmitDateKey];
+	if(!lastSubmitDate)
+	    lastSubmitDate = [NSDate distantPast];
+	const NSTimeInterval oneWeek = 60 * 60 * 24 * 7;
+	sendingSystemProfile &= (-[lastSubmitDate timeIntervalSinceNow] >= oneWeek);
+
 	NSArray *parameters = [NSArray array];
 	if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)])
 		parameters = [parameters arrayByAddingObjectsFromArray:[delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile]];
 	if (sendingSystemProfile)
+	{
 		parameters = [parameters arrayByAddingObjectsFromArray:[host systemProfile]];
+		[host setObject:[NSDate date] forUserDefaultsKey:SULastProfileSubmitDateKey];
+	}
 	if (parameters == nil || [parameters count] == 0) { return baseFeedURL; }
 	
 	// Build up the parameterized URL.
