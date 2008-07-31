@@ -89,6 +89,9 @@
 // If you don't implement this method or return nil, the standard version comparator will be used.
 - (id <SUVersionComparison>)versionComparatorForUpdater:(SUUpdater *)updater;
 
+// Returns the path which is used to relaunch the client after the update is installed. By default, the path of the host bundle.
+- (NSString *)pathToRelaunchForUpdater:(SUUpdater *)updater;
+
 @end
 
 // Define some minimum intervals to avoid DOS-like checking attacks. These are in seconds.
