@@ -89,7 +89,7 @@
 
 - (BOOL)isBackgroundApplication
 {
-	return [[bundle objectForInfoDictionaryKey:@"LSUIElement"] doubleValue];
+	return [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSUIElement"] doubleValue];
 }
 
 - (NSString *)publicDSAKey
