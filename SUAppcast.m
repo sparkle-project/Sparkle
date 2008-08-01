@@ -11,6 +11,7 @@
 
 @interface SUAppcast (Private)
 - (void)reportError:(NSError *)error;
+- (NSXMLNode *)bestNodeInNodes:(NSArray *)nodes;
 @end
 
 @implementation SUAppcast
@@ -70,27 +71,44 @@
 		
 		NSEnumerator *nodeEnum = [xmlItems objectEnumerator];
 		NSXMLNode *node;
+		NSMutableDictionary *nodesDict = [NSMutableDictionary dictionary];
 		NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 		
 		while (failed == NO && (node = [nodeEnum nextObject]))
         {
-			// walk the children in reverse
-			node = [[node children] lastObject];
-			while (nil != node)
+			// First, we'll "index" all the first-level children of this appcast item so we can pick them out by language later.
+            if ([[node children] count])
             {
-				
-				NSString *name = [node name];
-				
-				if ([name isEqualToString:@"enclosure"]) {
+                node = [node childAtIndex:0];
+                while (nil != node)
+                {
+                    NSString *name = [node name];
+                    NSMutableArray *nodes = [nodesDict objectForKey:name];
+                    if (nodes == nil)
+                    {
+                        nodes = [NSMutableArray array];
+                        [nodesDict setObject:nodes forKey:name];
+                    }
+                    [nodes addObject:node];
+                    
+                    node = [node nextSibling];
+                }
+            }
+            
+            NSEnumerator *nameEnum = [nodesDict keyEnumerator];
+            NSString *name;
+            while ((name = [nameEnum nextObject]))
+            {
+                node = [self bestNodeInNodes:[nodesDict objectForKey:name]];
+				if ([name isEqualToString:@"enclosure"])
+				{
 					// enclosure is flattened as a separate dictionary for some reason
 					NSEnumerator *attributeEnum = [[(NSXMLElement *)node attributes] objectEnumerator];
 					NSXMLNode *attribute;
 					NSMutableDictionary *encDict = [NSMutableDictionary dictionary];
 					
 					while ((attribute = [attributeEnum nextObject]))
-                    {
 						[encDict setObject:[attribute stringValue] forKey:[attribute name]];
-					}
 					[dict setObject:encDict forKey:@"enclosure"];
 					
 				}
@@ -106,10 +124,8 @@
 					// add all other values as strings
 					[dict setObject:[[node stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] forKey:name];
 				}
-				
-				// previous sibling; returns nil when exhausted
-				node = [node previousSibling];
-			}
+            }
+            
 			SUAppcastItem *anItem = [[SUAppcastItem alloc] initWithDictionary:dict];
             if (anItem)
             {
@@ -120,6 +136,7 @@
             {
 				NSLog(@"Sparkle Updater: Failed to parse appcast item with appcast dictionary %@!", dict);
             }
+            [nodesDict removeAllObjects];
             [dict removeAllObjects];
 		}
 	}
@@ -161,6 +178,31 @@
 	{
 		[delegate appcast:self failedToLoadWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil), NSLocalizedDescriptionKey, [error localizedDescription], NSLocalizedFailureReasonErrorKey, nil]]];
 	}
+}
+
+- (NSXMLNode *)bestNodeInNodes:(NSArray *)nodes
+{
+	// We use this method to pick out the localized version of a node when one's available.
+    if ([nodes count] == 1)
+        return [nodes objectAtIndex:0];
+    else if ([nodes count] == 0)
+        return nil;
+    
+    NSEnumerator *nodeEnum = [nodes objectEnumerator];
+    NSXMLElement *node;
+    NSMutableArray *languages = [NSMutableArray array];
+    NSString *lang;
+    NSInteger i;
+    while ((node = [nodeEnum nextObject]))
+    {
+        lang = [[node attributeForName:@"xml:lang"] stringValue];
+        [languages addObject:(lang ?: @"en")]; // Default to a key being English if no xml:lang is specified.
+    }
+    lang = [[NSBundle preferredLocalizationsFromArray:languages] objectAtIndex:0];
+    i = [languages indexOfObject:(lang ?: @"en")];
+    if (i == NSNotFound)
+        i = 0;
+    return [nodes objectAtIndex:i];
 }
 
 - (void)setUserAgentString:(NSString *)uas
