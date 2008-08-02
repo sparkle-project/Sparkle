@@ -10,7 +10,7 @@
 #define SUDSAVERIFIER_H
 
 // For the paranoid folks!
-@interface SUDSAVerifier {}
+@interface SUDSAVerifier : NSObject {}
 + (BOOL)validatePath:(NSString *)path withEncodedDSASignature:(NSString *)encodedSignature withPublicDSAKey:(NSString *)pkeyString;
 @end
 
