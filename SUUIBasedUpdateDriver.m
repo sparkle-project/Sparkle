@@ -29,7 +29,6 @@
 	if ([host isBackgroundApplication])
 	{
 		[[updateAlert window] setHidesOnDeactivate:NO];
-		[[updateAlert window] setLevel:NSNormalWindowLevel];
 		[NSApp activateIgnoringOtherApps:YES];
 	}
 	
