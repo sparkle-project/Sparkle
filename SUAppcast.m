@@ -196,10 +196,10 @@
     while ((node = [nodeEnum nextObject]))
     {
         lang = [[node attributeForName:@"xml:lang"] stringValue];
-        [languages addObject:(lang ?: @"en")]; // Default to a key being English if no xml:lang is specified.
+        [languages addObject:(lang ?: @"")]; // Default to a key being English if no xml:lang is specified.
     }
     lang = [[NSBundle preferredLocalizationsFromArray:languages] objectAtIndex:0];
-    i = [languages indexOfObject:(lang ?: @"en")];
+    i = [languages indexOfObject:(lang ?: @"")];
     if (i == NSNotFound)
         i = 0;
     return [nodes objectAtIndex:i];
