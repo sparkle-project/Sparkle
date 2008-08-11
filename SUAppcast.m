@@ -83,14 +83,16 @@
                 while (nil != node)
                 {
                     NSString *name = [node name];
-                    NSMutableArray *nodes = [nodesDict objectForKey:name];
-                    if (nodes == nil)
+                    if (name)
                     {
-                        nodes = [NSMutableArray array];
-                        [nodesDict setObject:nodes forKey:name];
+                        NSMutableArray *nodes = [nodesDict objectForKey:name];
+                        if (nodes == nil)
+                        {
+                            nodes = [NSMutableArray array];
+                            [nodesDict setObject:nodes forKey:name];
+                        }
+                        [nodes addObject:node];
                     }
-                    [nodes addObject:node];
-                    
                     node = [node nextSibling];
                 }
             }
@@ -196,10 +198,10 @@
     while ((node = [nodeEnum nextObject]))
     {
         lang = [[node attributeForName:@"xml:lang"] stringValue];
-        [languages addObject:(lang ?: @"")]; // Default to a key being English if no xml:lang is specified.
+        [languages addObject:(lang ?: @"")];
     }
     lang = [[NSBundle preferredLocalizationsFromArray:languages] objectAtIndex:0];
-    i = [languages indexOfObject:(lang ?: @"")];
+    i = [languages indexOfObject:([languages containsObject:lang] ? lang : @"")];
     if (i == NSNotFound)
         i = 0;
     return [nodes objectAtIndex:i];
