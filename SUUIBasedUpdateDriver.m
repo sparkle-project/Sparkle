@@ -19,7 +19,6 @@
 	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem host:host];
 	[updateAlert setDelegate:self];
 	
-	SUUpdater *updater = [SUUpdater updaterForBundle:[host bundle]];
 	if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
 		[[updater delegate] updater:updater didFindValidUpdate:updateItem];
 
@@ -41,7 +40,6 @@
 
 - (void)didNotFindUpdate
 {
-	SUUpdater *updater = [SUUpdater updaterForBundle:[host bundle]];
 	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
 		[[updater delegate] updaterDidNotFindUpdate:updater];
 	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"You're up to date!", nil) defaultButton:SULocalizedString(@"OK", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [host name], [host displayVersion]];

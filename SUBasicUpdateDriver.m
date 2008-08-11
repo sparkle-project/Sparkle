@@ -42,7 +42,6 @@
 {
 	id <SUVersionComparison> comparator = nil;
 	
-	SUUpdater *updater = [SUUpdater updaterForBundle:[host bundle]];
 	// Give the delegate a chance to provide a custom version comparator
 	if ([[updater delegate] respondsToSelector:@selector(versionComparatorForUpdater:)])
 		comparator = [[updater delegate] versionComparatorForUpdater:updater];
@@ -79,7 +78,6 @@
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac
 {
-	SUUpdater *updater = [SUUpdater updaterForBundle:[host bundle]];
 	if ([[updater delegate] respondsToSelector:@selector(updater:didFinishLoadingAppcast:)])
 		[[updater delegate] updater:updater didFinishLoadingAppcast:ac];
 		
@@ -115,7 +113,6 @@
 
 - (void)didFindValidUpdate
 {
-	SUUpdater *updater = [SUUpdater updaterForBundle:[host bundle]];
 	if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
 		[[updater delegate] updater:updater didFindValidUpdate:updateItem];
 	[self downloadUpdate];
@@ -123,7 +120,6 @@
 
 - (void)didNotFindUpdate
 {
-	SUUpdater *updater = [SUUpdater updaterForBundle:[host bundle]];
 	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
 		[[updater delegate] updaterDidNotFindUpdate:updater];
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUNoUpdateError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:SULocalizedString(@"You already have the newest version of %@.", nil), [host name]] forKey:NSLocalizedDescriptionKey]]];
@@ -219,7 +215,6 @@
 
 - (void)installUpdate
 {
-	SUUpdater *updater = [SUUpdater updaterForBundle:[host bundle]];
 	if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdate:)])
 		[[updater delegate] updater:updater willInstallUpdate:updateItem];
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
@@ -243,7 +238,6 @@
 {
 	// Give the host app an opportunity to postpone the relaunch.
 	static BOOL postponedOnce = NO;
-	SUUpdater *updater = [SUUpdater updaterForBundle:[host bundle]];
 	if (!postponedOnce && [[updater delegate] respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
 	{
 		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[[self class] instanceMethodSignatureForSelector:@selector(relaunchHostApp)] retain]];

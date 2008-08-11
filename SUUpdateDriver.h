@@ -13,13 +13,16 @@
 
 extern NSString *SUUpdateDriverFinishedNotification;
 
-@class SUHost;
+@class SUHost, SUUpdater;
 @interface SUUpdateDriver : NSObject
 {
 	SUHost *host;
+	SUUpdater *updater;
 	
 	BOOL finished;
 }
+
+- initWithUpdater:(SUUpdater *)updater;
 - (void)checkForUpdatesAtURL:(NSURL *)appcastURL host:(SUHost *)host;
 - (void)abortUpdate;
 - (BOOL)finished;

@@ -11,6 +11,13 @@
 NSString *SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
 @implementation SUUpdateDriver
+- initWithUpdater:(SUUpdater *)anUpdater
+{
+	if ((self = [super init]))
+		updater = anUpdater;
+	return self;
+}
+
 - (void)checkForUpdatesAtURL:(NSURL *)appcastURL host:(SUHost *)h
 {
 	host = [h retain];
