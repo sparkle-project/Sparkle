@@ -210,8 +210,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
         // Allow a small delay, because perhaps the user or developer wants to change both preferences. This allows the developer to interpret a zero check interval as a sign to disable automatic checking.
         // Or we may get this from the developer and from our own KVO observation, this will effectively coalesce them.
         [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
-        [self performSelector:@selector(resetUpdateCycle) withObject:nil afterDelay:15];
-        [self resetUpdateCycle];
+        [self performSelector:@selector(resetUpdateCycle) withObject:nil afterDelay:1];
     }
     else
     {
