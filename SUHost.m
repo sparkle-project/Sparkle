@@ -137,12 +137,16 @@
 
 - (void)setObject:(id)value forUserDefaultsKey:(NSString *)defaultName;
 {
-	CFPreferencesSetValue((CFStringRef)defaultName, value, (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
-	CFPreferencesSynchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
-	// If anything's bound to this through an NSUserDefaultsController, it won't know that anything's changed.
-	// We can't get an NSUserDefaults object for anything other than the standard one for the app, so this won't work for bundles.
-	// But it's the best we can do: this will make NSUserDefaultsControllers know about the changes that have been made.
-	[[NSUserDefaults standardUserDefaults] synchronize];
+	// If we're using a .app, we'll use the standard user defaults mechanism; otherwise, we have to get CF-y.
+	if (bundle == [NSBundle mainBundle])
+	{
+		[[NSUserDefaults standardUserDefaults] setObject:value forKey:defaultName];
+	}
+	else
+	{
+		CFPreferencesSetValue((CFStringRef)defaultName, value, (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		CFPreferencesSynchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+	}
 }
 
 - (BOOL)boolForUserDefaultsKey:(NSString *)defaultName
@@ -164,12 +168,16 @@
 
 - (void)setBool:(BOOL)value forUserDefaultsKey:(NSString *)defaultName
 {
-	CFPreferencesSetValue((CFStringRef)defaultName, (CFBooleanRef)[NSNumber numberWithBool:value], (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
-	CFPreferencesSynchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
-	// If anything's bound to this through an NSUserDefaultsController, it won't know that anything's changed.
-	// We can't get an NSUserDefaults object for anything other than the standard one for the app, so this won't work for bundles.
-	// But it's the best we can do: this will make NSUserDefaultsControllers know about the changes that have been made.	
-	[[NSUserDefaults standardUserDefaults] synchronize];
+	// If we're using a .app, we'll use the standard user defaults mechanism; otherwise, we have to get CF-y.
+	if (bundle == [NSBundle mainBundle])
+	{
+		[[NSUserDefaults standardUserDefaults] setBool:value forKey:defaultName];
+	}
+	else
+	{
+		CFPreferencesSetValue((CFStringRef)defaultName, (CFBooleanRef)[NSNumber numberWithBool:value], (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		CFPreferencesSynchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+	}
 }
 
 + (NSString *)systemVersionString
