@@ -56,8 +56,7 @@
 @end
 
 @interface NSObject (SUUpdaterDelegateInformalProtocol)
-// This method allows you to add extra parameters to the appcast URL, potentially based on whether or not
-// Sparkle will also be sending along the system profile. This method should return an array of dictionaries with keys: "key" and "value".
+// This method allows you to add extra parameters to the appcast URL, potentially based on whether or not Sparkle will also be sending along the system profile. This method should return an array of dictionaries with keys: "key", "value", "displayKey", "displayValue", the latter two being specifically for display to the user.
 - (NSArray *)feedParametersForUpdater:(SUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
 
 // Use this to override the default behavior for Sparkle prompting the user about automatic update checks.

@@ -33,7 +33,7 @@
 	
 	// Gather profile information and append it to the URL.
 	NSMutableArray *profileArray = [NSMutableArray array];
-	NSArray *profileDictKeys = [NSArray arrayWithObjects:@"key", @"visibleKey", @"value", @"visibleValue", nil];
+	NSArray *profileDictKeys = [NSArray arrayWithObjects:@"key", @"displayKey", @"value", @"displayValue", nil];
 	int error = 0 ;
 	int value = 0 ;
 	unsigned long length = sizeof(value) ;

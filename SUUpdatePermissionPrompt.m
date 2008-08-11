@@ -17,7 +17,7 @@
 	return [[host objectForInfoDictionaryKey:SUEnableSystemProfilingKey] boolValue];
 }
 
-- (id)initWithHost:(SUHost *)aHost delegate:(id)d
+- (id)initWithHost:(SUHost *)aHost systemProfile:(NSArray *)profile delegate:(id)d
 {
 	self = [super initWithHost:aHost windowNibName:@"SUUpdatePermissionPrompt"];
 	if (self)
@@ -26,19 +26,20 @@
 		delegate = [d retain];
 		isShowingMoreInfo = NO;
 		shouldSendProfile = [self shouldAskAboutProfile];
+		systemProfileInformationArray = [profile retain];
 		[self setShouldCascadeWindows:NO];
 	}
 	return self;
 }
 
-+ (void)promptWithHost:(SUHost *)host delegate:(id)d
++ (void)promptWithHost:(SUHost *)aHost systemProfile:(NSArray *)profile delegate:(id)d
 {
 	// If this is a background application we need to focus it in order to bring the prompt
 	// to the user's attention. Otherwise the prompt would be hidden behind other applications and
 	// the user would not know why the application was paused.
-	if ([host isBackgroundApplication]) { [NSApp activateIgnoringOtherApps:YES]; }
+	if ([aHost isBackgroundApplication]) { [NSApp activateIgnoringOtherApps:YES]; }
 	
-	id prompt = [[[self class] alloc] initWithHost:host delegate:d];
+	id prompt = [[[self class] alloc] initWithHost:aHost systemProfile:profile delegate:d];
 	[NSApp runModalForWindow:[prompt window]];
 }
 
@@ -55,6 +56,7 @@
 - (void)dealloc
 {
 	[host release];
+	[systemProfileInformationArray release];
 	[super dealloc];
 }
 
@@ -66,11 +68,6 @@
 - (NSString *)promptDescription
 {
 	return [NSString stringWithFormat:SULocalizedString(@"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu.", nil), [host name]];
-}
-
-- (NSArray *)systemProfileInformationArray
-{
-	return [host systemProfile];
 }
 
 - (IBAction)toggleMoreInfo:(id)sender

@@ -19,6 +19,7 @@
 @interface SUUpdater (Private)
 - initForBundle:(NSBundle *)bundle;
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
+- (BOOL)_sendingSystemProfile;
 - (BOOL)automaticallyUpdates;
 - (void)scheduleNextUpdateCheck;
 - (void)registerAsObserver;
@@ -108,7 +109,10 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
     
     if (shouldPrompt)
     {
-        [SUUpdatePermissionPrompt promptWithHost:host delegate:self];
+		NSArray *profileInfo = [host systemProfile];
+		if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)])
+			profileInfo = [profileInfo arrayByAddingObjectsFromArray:[delegate feedParametersForUpdater:self sendingSystemProfile:[self _sendingSystemProfile]]];		
+        [SUUpdatePermissionPrompt promptWithHost:host systemProfile:profileInfo delegate:self];
         // We start the update checks and register as observer for changes after the prompt finishes
 	}
     else 
@@ -275,12 +279,17 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	return [NSURL URLWithString:[appcastString stringByTrimmingCharactersInSet:quoteSet]];
 }
 
+- (BOOL)_sendingSystemProfile
+{
+	return ([host boolForUserDefaultsKey:SUSendProfileInfoKey] == YES);
+}
+
 - (NSURL *)parameterizedFeedURL
 {
 	NSURL *baseFeedURL = [self feedURL];
 	
 	// Determine all the parameters we're attaching to the base feed URL.
-	BOOL sendingSystemProfile = ([host boolForUserDefaultsKey:SUSendProfileInfoKey] == YES);
+	BOOL sendingSystemProfile = [self _sendingSystemProfile];
 
 	// Let's only send the system profiling information once per week at most, so we normalize daily-checkers vs. biweekly-checkers and the such.
 	NSDate *lastSubmitDate = [host objectForUserDefaultsKey:SULastProfileSubmitDateKey];
