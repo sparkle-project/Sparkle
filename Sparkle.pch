@@ -6,7 +6,8 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
-#define SULocalizedString(key,comment) NSLocalizedStringFromTableInBundle(key, @"Sparkle", [NSBundle bundleWithIdentifier:@"org.andymatuschak.Sparkle"], comment)
+#define SPARKLE_BUNDLE [NSBundle bundleWithIdentifier:@"org.andymatuschak.Sparkle"]
+#define SULocalizedString(key,comment) NSLocalizedStringFromTableInBundle(key, @"Sparkle", SPARKLE_BUNDLE, comment)
 #define SUAbstractFail() NSAssert2(nil, @"Can't call %@ on an instance of %@; this is an abstract method!", __PRETTY_FUNCTION__, [self class]);
 
 #ifdef __OBJC__

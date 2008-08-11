@@ -30,7 +30,10 @@
 	[appcast release];
 	
 	[appcast setDelegate:self];
-	[appcast setUserAgentString:[NSString stringWithFormat: @"%@/%@ Sparkle/1.5b4", [aHost name], [aHost displayVersion]]];
+	NSString *userAgent = [NSString stringWithFormat: @"%@/%@ Sparkle/%@", [aHost name], [aHost displayVersion], ([SPARKLE_BUNDLE objectForInfoDictionaryKey:@"CFBundleVersion"] ?: nil)];
+	NSData * cleanedAgent = [userAgent dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+	userAgent = [NSString stringWithCString:[cleanedAgent bytes] length:[cleanedAgent length]];
+	[appcast setUserAgentString:userAgent];
 	[appcast fetchAppcastFromURL:appcastURL];
 	[host setObject:[NSDate date] forUserDefaultsKey:SULastCheckTimeKey];
 }
