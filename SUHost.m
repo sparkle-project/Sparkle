@@ -180,6 +180,14 @@
 	}
 }
 
+- (id)objectForKey:(NSString *)key {
+    return [self objectForUserDefaultsKey:key] ?: [self objectForInfoDictionaryKey:key];
+}
+
+- (BOOL)boolForKey:(NSString *)key {
+    return [self objectForUserDefaultsKey:key] ? [self boolForUserDefaultsKey] : [self boolForInfoDictionaryKey];
+}
+
 + (NSString *)systemVersionString
 {
 	// This returns a version string of the form X.Y.Z

@@ -94,8 +94,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
         shouldPrompt = [delegate updaterShouldPromptForPermissionToCheckForUpdates:self];
     }	
     // Has he been asked already? And don't ask if the host has a default value set in its Info.plist.
-    else if ([host objectForUserDefaultsKey:SUEnableAutomaticChecksKey] == nil &&
-        [host objectForInfoDictionaryKey:SUEnableAutomaticChecksKey] == nil)
+    else if ([host objectForKey:SUEnableAutomaticChecksKey] == nil)
     {
         if ([host objectForUserDefaultsKey:SUEnableAutomaticChecksKeyOld])
             [self setAutomaticallyChecksForUpdates:[host boolForUserDefaultsKey:SUEnableAutomaticChecksKeyOld]];
@@ -236,11 +235,8 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 - (BOOL)automaticallyChecksForUpdates
 {
 	// Breaking this down for readability:
-	// If the user says he wants automatic update checks, let's do it.
-	if ([host boolForUserDefaultsKey:SUEnableAutomaticChecksKey] == YES)
-		return YES;
-	// If the user hasn't said anything, but the developer says we should do it, let's do it.
-	if ([host objectForUserDefaultsKey:SUEnableAutomaticChecksKey] == nil && [host boolForInfoDictionaryKey:SUEnableAutomaticChecksKey] == YES)
+	// If the user or the developer says he wants automatic update checks, let's do it.
+	if ([host boolForKey:SUEnableAutomaticChecksKey] == YES)
 		return YES;
 	return NO; // Otherwise, don't bother.
 }
@@ -270,9 +266,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 - (NSURL *)feedURL
 {
 	// A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
-	NSString *appcastString = [host objectForUserDefaultsKey:SUFeedURLKey];
-	if (!appcastString)
-		appcastString = [host objectForInfoDictionaryKey:SUFeedURLKey];
+	NSString *appcastString = [host objectForKey:SUFeedURLKey];
 	if (!appcastString) // Can't find an appcast string!
 		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the SUFeedURLKey in either the Info.plist or the user defaults!"];
 	NSCharacterSet* quoteSet = [NSCharacterSet characterSetWithCharactersInString: @"\"\'"]; // Some feed publishers add quotes; strip 'em.
@@ -328,12 +322,8 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 
 - (NSTimeInterval)updateCheckInterval
 {
-	NSTimeInterval checkInterval = 0;
 	// Find the stored check interval. User defaults override Info.plist.
-	if ([host objectForUserDefaultsKey:SUScheduledCheckIntervalKey])
-		checkInterval = [[host objectForUserDefaultsKey:SUScheduledCheckIntervalKey] doubleValue];
-	else if ([host objectForInfoDictionaryKey:SUScheduledCheckIntervalKey])
-		checkInterval = [[host objectForInfoDictionaryKey:SUScheduledCheckIntervalKey] doubleValue];
+	NSTimeInterval checkInterval = [[host objectForKey:SUScheduledCheckIntervalKey] doubleValue];
 	
 	if (checkInterval < SU_MIN_CHECK_INTERVAL) // This can also mean one that isn't set.
 		checkInterval = SU_DEFAULT_CHECK_INTERVAL;	
