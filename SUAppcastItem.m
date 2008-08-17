@@ -33,13 +33,13 @@
 }
 
 
-- (NSString *)description { return [[description retain] autorelease]; }
+- (NSString *)itemDescription { return [[itemDescription retain] autorelease]; }
 
-- (void)setDescription:(NSString *)aDescription
+- (void)setItemDescription:(NSString *)anItemDescription
 {
-	if (description == aDescription) return;
-    [description release];
-    description = [aDescription copy];
+	if (itemDescription == anItemDescription) return;
+    [itemDescription release];
+    itemDescription = [anItemDescription copy];
 }
 
 
@@ -136,7 +136,7 @@
             propertiesDictionary = [[NSMutableDictionary alloc] initWithDictionary:dict];
             [self setTitle:[dict objectForKey:@"title"]];
             [self setDate:[dict objectForKey:@"pubDate"]];
-            [self setDescription:[dict objectForKey:@"description"]];
+            [self setItemDescription:[dict objectForKey:@"description"]];
             
             [self setFileURL:[NSURL URLWithString:[[enclosure objectForKey:@"url"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
             [self setDSASignature:[enclosure objectForKey:@"sparkle:dsaSignature"]];		
@@ -153,8 +153,8 @@
             // Find the appropriate release notes URL.
             if ([dict objectForKey:@"sparkle:releaseNotesLink"])
                 [self setReleaseNotesURL:[NSURL URLWithString:[dict objectForKey:@"sparkle:releaseNotesLink"]]];
-            else if ([[self description] hasPrefix:@"http://"]) // if the description starts with http://, use that.
-                [self setReleaseNotesURL:[NSURL URLWithString:[self description]]];
+            else if ([[self itemDescription] hasPrefix:@"http://"]) // if the description starts with http://, use that.
+                [self setReleaseNotesURL:[NSURL URLWithString:[self itemDescription]]];
             else
                 [self setReleaseNotesURL:nil];
         }
@@ -166,7 +166,7 @@
 {
     [self setTitle:nil];
     [self setDate:nil];
-    [self setDescription:nil];
+    [self setItemDescription:nil];
     [self setReleaseNotesURL:nil];
     [self setDSASignature:nil];
     [self setFileURL:nil];
