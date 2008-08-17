@@ -323,6 +323,9 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	while ((currentProfileInfo = [profileInfoEnumerator nextObject]))
 		[parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", [currentProfileInfo objectForKey:@"key"], [currentProfileInfo objectForKey:@"value"]]];
 	
+	NSString *separatorCharacter = @"?";
+	if ([baseFeedURL query])
+		separatorCharacter = @"&"; // In case the URL is already http://foo.org/baz.xml?bat=4
 	NSString *appcastStringWithProfile = [NSString stringWithFormat:@"%@?%@", [baseFeedURL absoluteString], [parameterStrings componentsJoinedByString:@"&"]];
 	
 	// Clean it up so it's a valid URL
