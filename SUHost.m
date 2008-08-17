@@ -185,7 +185,7 @@
 }
 
 - (BOOL)boolForKey:(NSString *)key {
-    return [self objectForUserDefaultsKey:key] ? [self boolForUserDefaultsKey] : [self boolForInfoDictionaryKey];
+    return [self objectForUserDefaultsKey:key] ? [self boolForUserDefaultsKey:key] : [self boolForInfoDictionaryKey:key];
 }
 
 + (NSString *)systemVersionString

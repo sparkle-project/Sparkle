@@ -19,8 +19,7 @@
 @interface SUUpdater (Private)
 - initForBundle:(NSBundle *)bundle;
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
-- (BOOL)_sendingSystemProfile;
-- (BOOL)automaticallyUpdates;
+- (BOOL)automaticallyDownloadsUpdates;
 - (void)scheduleNextUpdateCheck;
 - (void)registerAsObserver;
 - (void)unregisterAsObserver;
@@ -110,7 +109,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
     {
 		NSArray *profileInfo = [host systemProfile];
 		if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)])
-			profileInfo = [profileInfo arrayByAddingObjectsFromArray:[delegate feedParametersForUpdater:self sendingSystemProfile:[self _sendingSystemProfile]]];		
+			profileInfo = [profileInfo arrayByAddingObjectsFromArray:[delegate feedParametersForUpdater:self sendingSystemProfile:[self sendsSystemProfile]]];		
         [SUUpdatePermissionPrompt promptWithHost:host systemProfile:profileInfo delegate:self];
         // We start the update checks and register as observer for changes after the prompt finishes
 	}
@@ -162,7 +161,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 
 - (void)checkForUpdatesInBackground
 {
-	[self checkForUpdatesWithDriver:[[[([self automaticallyUpdates] ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class]) alloc] initWithUpdater:self] autorelease]];
+	[self checkForUpdatesWithDriver:[[[([self automaticallyDownloadsUpdates] ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class]) alloc] initWithUpdater:self] autorelease]];
 }
 
 - (IBAction)checkForUpdates:sender
@@ -234,14 +233,15 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 
 - (BOOL)automaticallyChecksForUpdates
 {
-	// Breaking this down for readability:
-	// If the user or the developer says he wants automatic update checks, let's do it.
-	if ([host boolForKey:SUEnableAutomaticChecksKey] == YES)
-		return YES;
-	return NO; // Otherwise, don't bother.
+	return [host boolForKey:SUEnableAutomaticChecksKey];
 }
 
-- (BOOL)automaticallyUpdates
+- (void)setAutomaticallyDownloadsUpdates:(BOOL)automaticallyUpdates
+{
+	[host setBool:automaticallyUpdates forUserDefaultsKey:SUAutomaticallyUpdateKey];
+}
+
+- (BOOL)automaticallyDownloadsUpdates
 {
 	// If the SUAllowsAutomaticUpdatesKey exists and is set to NO, return NO.
 	if ([host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] && [host boolForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] == NO)
@@ -251,11 +251,8 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	if ([host boolForInfoDictionaryKey:SUExpectsDSASignatureKey] != YES)
 		return NO;
 	
-	// If there's no setting, or it's set to no, we're not automatically updating.
-	if ([host boolForUserDefaultsKey:SUAutomaticallyUpdateKey] != YES)
-		return NO;
-	
-	return YES; // Otherwise, we're good to go.
+	// Otherwise, automatically downloading updates is allowed. Does the user want it?
+	return [host boolForUserDefaultsKey:SUAutomaticallyUpdateKey];
 }
 
 - (void)setFeedURL:(NSURL *)feedURL
@@ -273,9 +270,14 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	return [NSURL URLWithString:[appcastString stringByTrimmingCharactersInSet:quoteSet]];
 }
 
-- (BOOL)_sendingSystemProfile
+- (void)setSendsSystemProfile:(BOOL)sendsSystemProfile
 {
-	return ([host boolForUserDefaultsKey:SUSendProfileInfoKey] == YES);
+	[host setBool:sendsSystemProfile forUserDefaultsKey:SUSendProfileInfoKey];
+}
+
+- (BOOL)sendsSystemProfile
+{
+	return [host boolForUserDefaultsKey:SUSendProfileInfoKey];
 }
 
 - (NSURL *)parameterizedFeedURL
@@ -283,7 +285,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	NSURL *baseFeedURL = [self feedURL];
 	
 	// Determine all the parameters we're attaching to the base feed URL.
-	BOOL sendingSystemProfile = [self _sendingSystemProfile];
+	BOOL sendingSystemProfile = [self sendsSystemProfile];
 
 	// Let's only send the system profiling information once per week at most, so we normalize daily-checkers vs. biweekly-checkers and the such.
 	NSDate *lastSubmitDate = [host objectForUserDefaultsKey:SULastProfileSubmitDateKey];

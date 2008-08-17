@@ -36,6 +36,12 @@
 - (void)setFeedURL:(NSURL *)feedURL;
 - (NSURL *)feedURL;
 
+- (void)setSendsSystemProfile:(BOOL)sendsSystemProfile;
+- (BOOL)sendsSystemProfile;
+
+- (void)setAutomaticallyDownloadsUpdates:(BOOL)automaticallyDownloadsUpdates;
+- (BOOL)automaticallyDownloadsUpdates;
+
 // This IBAction is meant for a main menu item. Hook up any menu item to this action,
 // and Sparkle will check for updates and report back its findings verbosely.
 - (IBAction)checkForUpdates:sender;
