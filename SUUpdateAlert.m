@@ -150,7 +150,15 @@
 
 - (NSString *)descriptionText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available\u2014you have %@. Would you like to download it now?", nil), [host name], [updateItem displayVersionString], [host displayVersion]];
+	NSString *updateItemVersion = [updateItem displayVersionString];
+    NSString *hostVersion = [host displayVersion];
+	// Display more info if the version strings are the same; useful for betas.
+    if ([updateItemVersion isEqualToString:hostVersion])
+	{
+        updateItemVersion = [updateItemVersion stringByAppendingFormat:@" (%@)", [updateItem versionString]];
+        hostVersion = [hostVersion stringByAppendingFormat:@" (%@)", [host version]];
+    }
+    return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available\u2014you have %@. Would you like to download it now?", nil), [host name], updateItemVersion, hostVersion];
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:frame
