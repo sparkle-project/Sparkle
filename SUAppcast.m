@@ -19,6 +19,8 @@
 - (void)dealloc
 {
 	[items release];
+	[userAgentString release];
+	[incrementalData release];
 	[super dealloc];
 }
 

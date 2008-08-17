@@ -301,7 +301,7 @@
 
 - (void)dealloc
 {
-	[host release];
+	[updateItem release];
 	[download release];
 	[downloadPath release];
 	[relaunchPath release];

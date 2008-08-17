@@ -30,4 +30,11 @@ NSString *SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 }
 
 - (BOOL)finished { return finished; }
+
+- (void)dealloc
+{
+    [host release];
+    [super dealloc];
+}
+
 @end
