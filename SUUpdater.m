@@ -136,6 +136,12 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
     }
 }
 
+- (NSDate*)lastUpdateCheckDate
+{
+	return [host objectForUserDefaultsKey:SULastCheckTimeKey];
+}
+
+
 - (void)scheduleNextUpdateCheck
 {	
 	if (checkTimer)
@@ -146,7 +152,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	if (![self automaticallyChecksForUpdates]) return;
 	
 	// How long has it been since last we checked for an update?
-	NSDate *lastCheckDate = [host objectForUserDefaultsKey:SULastCheckTimeKey];
+	NSDate *lastCheckDate = [self lastUpdateCheckDate];
 	if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
 	NSTimeInterval intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
 	
