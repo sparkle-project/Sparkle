@@ -79,7 +79,7 @@
 	}
 	else
 	{
-		[[releaseNotesView mainFrame] loadHTMLString:[updateItem description] baseURL:nil];
+		[[releaseNotesView mainFrame] loadHTMLString:[updateItem itemDescription] baseURL:nil];
 	}	
 }
 
