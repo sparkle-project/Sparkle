@@ -7,19 +7,23 @@
 //
 
 #import "SUProbingUpdateDriver.h"
-
+#import "SUUpdater.h"
 
 @implementation SUProbingUpdateDriver
 
-// Stop as soon as we have an answer! The superclasses will already have taken care of notifying the delegate.
+// Stop as soon as we have an answer! Since the superclass implementations are not called, we are responsible for notifying the delegate.
 
 - (void)didFindValidUpdate
 {
+	if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
+		[[updater delegate] updater:updater didFindValidUpdate:updateItem];
 	[self abortUpdate];
 }
 
 - (void)didNotFindUpdate
 {
+	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
+		[[updater delegate] updaterDidNotFindUpdate:updater];
 	[self abortUpdate];
 }
 
