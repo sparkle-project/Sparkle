@@ -251,7 +251,7 @@
 	[self cleanUp]; // Clean up the download and extracted files.
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-	if ([[updater delegate] respondsToSelector:@selector(updaterWillRelaunchApplication)])
+	if ([[updater delegate] respondsToSelector:@selector(updaterWillRelaunchApplication:)])
 		[[updater delegate] updaterWillRelaunchApplication:updater];
 	
 	if(!relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath])
