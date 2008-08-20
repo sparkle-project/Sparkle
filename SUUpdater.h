@@ -51,11 +51,14 @@
 // update is found, it will be downloaded and prepped for installation.
 - (void)checkForUpdatesInBackground;
 
+// Date of last update check. Returns null if no check has been performed.
+- (NSDate*)lastUpdateCheckDate;
+
 // This begins a "probing" check for updates which will not actually offer to update to that version. The delegate methods, though,
 // (up to updater:didFindValidUpdate: and updaterDidNotFindUpdate:), are called, so you can use that information in your UI.
 - (void)checkForUpdateInformation;
 
-// Call this to appropriately schedule or cancel the update checking timer according to the preferences for time interval and automatic checks.
+// Call this to appropriately schedule or cancel the update checking timer according to the preferences for time interval and automatic checks. This call does not change the date of the next check, but only the internal NSTimer.
 - (void)resetUpdateCycle;
 
 - (BOOL)updateInProgress;

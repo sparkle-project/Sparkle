@@ -35,7 +35,6 @@
 	userAgent = [NSString stringWithCString:[cleanedAgent bytes] length:[cleanedAgent length]];
 	[appcast setUserAgentString:userAgent];
 	[appcast fetchAppcastFromURL:appcastURL];
-	[host setObject:[NSDate date] forUserDefaultsKey:SULastCheckTimeKey];
 }
 
 - (id <SUVersionComparison>)_versionComparator

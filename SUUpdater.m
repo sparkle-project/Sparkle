@@ -138,6 +138,11 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
     }
 }
 
+- (NSDate *)lastUpdateCheckDate
+{
+	return [host objectForUserDefaultsKey:SULastCheckTimeKey];
+}
+
 - (void)scheduleNextUpdateCheck
 {	
 	if (checkTimer)
@@ -148,7 +153,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	if (![self automaticallyChecksForUpdates]) return;
 	
 	// How long has it been since last we checked for an update?
-	NSDate *lastCheckDate = [host objectForUserDefaultsKey:SULastCheckTimeKey];
+	NSDate *lastCheckDate = [self lastUpdateCheckDate];
 	if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
 	NSTimeInterval intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
 	
@@ -183,6 +188,10 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	if ([self updateInProgress]) { return; }
 	if (checkTimer) { [checkTimer invalidate]; checkTimer = nil; }
 		
+	[self willChangeValueForKey:@"lastUpdateCheckDate"];
+	[host setObject:[NSDate date] forUserDefaultsKey:SULastCheckTimeKey];
+	[self didChangeValueForKey:@"lastUpdateCheckDate"];
+	
 	driver = [d retain];
 	[driver checkForUpdatesAtURL:[self parameterizedFeedURL] host:host];
 }
