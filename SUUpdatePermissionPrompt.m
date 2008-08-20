@@ -43,6 +43,8 @@
 	[NSApp runModalForWindow:[prompt window]];
 }
 
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [host bundlePath]]; }
+
 - (void)awakeFromNib
 {
 	if (![self shouldAskAboutProfile])

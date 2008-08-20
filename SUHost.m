@@ -28,6 +28,8 @@
 	[super dealloc];
 }
 
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self bundlePath]]; }
+
 - (NSBundle *)bundle
 {
     return bundle;

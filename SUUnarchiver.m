@@ -27,6 +27,8 @@ extern NSMutableArray *__unarchiverImplementations;
 	return nil;
 }
 
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], archivePath]; }
+
 - (void)setDelegate:del
 {
 	delegate = del;

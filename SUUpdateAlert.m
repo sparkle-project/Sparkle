@@ -25,6 +25,8 @@
 	return self;
 }
 
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [host bundlePath]]; }
+
 - (void)dealloc
 {
 	[updateItem release];

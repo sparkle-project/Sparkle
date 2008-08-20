@@ -31,6 +31,8 @@
 	[super dealloc];
 }
 
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [host bundlePath]]; }
+
 - (void)awakeFromNib
 {
 	[[self window] center];

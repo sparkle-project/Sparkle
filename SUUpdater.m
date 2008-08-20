@@ -78,6 +78,8 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
     return [self initForBundle:[NSBundle mainBundle]];
 }
 
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [host bundlePath]]; }
+
 - (void)applicationDidFinishLaunching:(NSNotification *)note
 {
     BOOL shouldPrompt = NO;

@@ -33,6 +33,7 @@
 	[super dealloc];
 }
 
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [host bundlePath]]; }
 
 - (IBAction)installNow:sender
 {
