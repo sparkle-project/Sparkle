@@ -23,7 +23,7 @@
 	if (self)
 	{
 		host = [aHost retain];
-		delegate = [d retain];
+		delegate = d;
 		isShowingMoreInfo = NO;
 		shouldSendProfile = [self shouldAskAboutProfile];
 		systemProfileInformationArray = [profile retain];
