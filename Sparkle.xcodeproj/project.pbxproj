@@ -40,6 +40,7 @@
 		615AE3D00D64DC40001CA7BD /* SUModelTranslation.plist in Resources */ = {isa = PBXBuildFile; fileRef = 615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */; };
 		6160E7E10D3B4A8800E9CD71 /* NTSynchronousTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 610EC1C00CF3914D00AE239E /* NTSynchronousTask.h */; settings = {ATTRIBUTES = (); }; };
 		61699BCC0DDB92BD005878A4 /* SUVersionComparisonTest.h in Headers */ = {isa = PBXBuildFile; fileRef = 61227A140DB548B800AB99EA /* SUVersionComparisonTest.h */; settings = {ATTRIBUTES = (); }; };
+		618E9CFD0E7328F1004646D8 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 618E9CFC0E7328F1004646D8 /* dsa_pub.pem */; };
 		618FA5010DAE88B40026945C /* SUInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 618FA4FF0DAE88B40026945C /* SUInstaller.h */; settings = {ATTRIBUTES = (); }; };
 		618FA5020DAE88B40026945C /* SUInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5000DAE88B40026945C /* SUInstaller.m */; };
 		618FA5050DAE8AB80026945C /* SUPlainInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 618FA5030DAE8AB80026945C /* SUPlainInstaller.h */; settings = {ATTRIBUTES = (); }; };
@@ -184,6 +185,7 @@
 		618915710E35937600B5E981 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/SUUpdateAlert.nib; sourceTree = "<group>"; };
 		618915720E35937600B5E981 /* sv */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv; path = sv.lproj/SUAutomaticUpdateAlert.nib; sourceTree = "<group>"; };
 		618915730E35937600B5E981 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		618E9CFC0E7328F1004646D8 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = "Test Application/dsa_pub.pem"; sourceTree = "<group>"; };
 		618FA4FF0DAE88B40026945C /* SUInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUInstaller.h; sourceTree = "<group>"; };
 		618FA5000DAE88B40026945C /* SUInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUInstaller.m; sourceTree = "<group>"; };
 		618FA5030DAE8AB80026945C /* SUPlainInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUPlainInstaller.h; sourceTree = "<group>"; };
@@ -479,6 +481,7 @@
 				61B5F92C09C4CFD800B25A18 /* MainMenu.nib */,
 				61B5F92409C4CFC900B25A18 /* main.m */,
 				61B5F90409C4CEE200B25A18 /* Test Application-Info.plist */,
+				618E9CFC0E7328F1004646D8 /* dsa_pub.pem */,
 			);
 			name = "Test Application Sources";
 			sourceTree = "<group>";
@@ -738,6 +741,7 @@
 				61B5F92F09C4CFD800B25A18 /* MainMenu.nib in Resources */,
 				61BBDF820A49220C00378739 /* Sparkle.icns in Resources */,
 				61072EB30DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig in Resources */,
+				618E9CFD0E7328F1004646D8 /* dsa_pub.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

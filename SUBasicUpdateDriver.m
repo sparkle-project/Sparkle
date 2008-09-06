@@ -158,6 +158,16 @@
 
 - (void)downloadDidFinish:(NSURLDownload *)d
 {
+	// New in Sparkle 1.5: we're now checking signatures on all non-https downloads.
+	if (![[[[d request] URL] scheme] isEqualToString:@"https"])
+	{
+		if (![SUDSAVerifier validatePath:downloadPath withEncodedDSASignature:[updateItem DSASignature] withPublicDSAKey:[host publicDSAKey]])
+		{
+			[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUSignatureError userInfo:[NSDictionary dictionaryWithObject:@"The update is improperly signed." forKey:NSLocalizedDescriptionKey]]];
+			return;
+		}
+	}
+	
 	[self extractUpdate];
 }
 
@@ -177,17 +187,7 @@
 }
 
 - (void)extractUpdate
-{
-	// DSA verification, if activated by the developer
-	if ([[host objectForInfoDictionaryKey:SUExpectsDSASignatureKey] boolValue])
-	{
-		if (![SUDSAVerifier validatePath:downloadPath withEncodedDSASignature:[updateItem DSASignature] withPublicDSAKey:[host publicDSAKey]])
-		{
-			[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUSignatureError userInfo:[NSDictionary dictionaryWithObject:@"The update is improperly signed." forKey:NSLocalizedDescriptionKey]]];
-			return;
-		}
-	}
-	
+{	
 	SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:downloadPath];
 	if (!unarchiver)
 	{
