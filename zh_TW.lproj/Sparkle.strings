@@ -41,16 +41,16 @@
 "Check for updates on startup?" = "啟動時檢查更新項目？";
 
 /* No comment provided by engineer. */
-"Downloading update…" = "正在下載更新項目⋯";
+"Downloading update..." = "正在下載更新項目⋯";
 
 /* No comment provided by engineer. */
-"Extracting update…" = "正在解壓縮更新項目⋯";
+"Extracting update..." = "正在解壓縮更新項目⋯";
 
 /* No comment provided by engineer. */
 "Install and Relaunch" = "安裝與重新啟動";
 
 /* No comment provided by engineer. */
-"Installing update…" = "安裝更新…";
+"Installing update..." = "安裝更新…";
 
 /* No comment provided by engineer. */
 "No" = "否";
