@@ -270,10 +270,6 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	if ([host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] && [host boolForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] == NO)
 		return NO;
 	
-	// If we're not using DSA signatures, we aren't going to trust any updates automatically.
-	if ([host boolForInfoDictionaryKey:SUExpectsDSASignatureKey] != YES)
-		return NO;
-	
 	// Otherwise, automatically downloading updates is allowed. Does the user want it?
 	return [host boolForUserDefaultsKey:SUAutomaticallyUpdateKey];
 }

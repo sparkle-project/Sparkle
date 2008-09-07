@@ -98,11 +98,9 @@
 
 - (BOOL)allowsAutomaticUpdates
 {
-	if (![[host objectForInfoDictionaryKey:SUExpectsDSASignatureKey] boolValue])
-		return NO; // Automatic updating requires DSA-signed updates
 	if (![host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey])
 		return YES; // defaults to YES
-	return [[host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] boolValue];
+	return [host boolForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
 }
 
 - (void)awakeFromNib

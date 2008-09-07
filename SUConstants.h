@@ -20,7 +20,6 @@ extern NSString *SUShowReleaseNotesKey;
 extern NSString *SUSkippedVersionKey;
 extern NSString *SUScheduledCheckIntervalKey;
 extern NSString *SULastCheckTimeKey;
-extern NSString *SUExpectsDSASignatureKey;
 extern NSString *SUPublicDSAKeyKey;
 extern NSString *SUPublicDSAKeyFileKey;
 extern NSString *SUAutomaticallyUpdateKey;
