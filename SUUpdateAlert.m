@@ -79,7 +79,14 @@
 	// If there's a release notes URL, load it; otherwise, just stick the contents of the description into the web view.
 	if ([updateItem releaseNotesURL])
 	{
-		[[releaseNotesView mainFrame] loadRequest:[NSURLRequest requestWithURL:[updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30]];
+		if ([[updateItem releaseNotesURL] isFileURL])
+		{
+			[[releaseNotesView mainFrame] loadHTMLString:@"Release notes with file:// URLs are not supported for security reasons&mdash;Javascript would be able to read files on your file system." baseURL:nil];
+		}
+		else
+		{
+			[[releaseNotesView mainFrame] loadRequest:[NSURLRequest requestWithURL:[updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30]];
+		}
 	}
 	else
 	{
