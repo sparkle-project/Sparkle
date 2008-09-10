@@ -227,7 +227,7 @@
 	if ([[NSFileManager defaultManager] copyPath:relaunchPathToCopy toPath:targetPath handler:nil])
 		relaunchPath = [targetPath retain];
 	
-	[SUInstaller installFromUpdateFolder:[downloadPath stringByDeletingLastPathComponent] overHost:host delegate:self synchronously:[self shouldInstallSynchronously]];
+	[SUInstaller installFromUpdateFolder:[downloadPath stringByDeletingLastPathComponent] overHost:host delegate:self synchronously:[self shouldInstallSynchronously] versionComparator:[self _versionComparator]];
 }
 
 - (void)installerFinishedForHost:(SUHost *)aHost

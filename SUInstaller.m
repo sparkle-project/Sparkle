@@ -10,10 +10,6 @@
 #import "SUPlainInstaller.h"
 #import "SUPackageInstaller.h"
 
-NSString *SUInstallerPathKey = @"SUInstallerPath";
-NSString *SUInstallerHostKey = @"SUInstallerHost";
-NSString *SUInstallerDelegateKey = @"SUInstallerDelegate";
-
 @implementation SUInstaller
 
 + (BOOL)_isAliasFolderAtPath:(NSString *)path
@@ -36,7 +32,7 @@ NSString *SUInstallerDelegateKey = @"SUInstallerDelegate";
 }
 
 
-+ (void)installFromUpdateFolder:(NSString *)updateFolder overHost:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously
++ (void)installFromUpdateFolder:(NSString *)updateFolder overHost:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
 {
 	// Search subdirectories for the application
 	NSString *currentFile, *newAppDownloadPath = nil, *bundleFileName = [[host bundlePath] lastPathComponent], *alternateBundleFileName = [[host name] stringByAppendingPathExtension:[[host bundlePath] pathExtension]];
@@ -76,7 +72,7 @@ NSString *SUInstallerDelegateKey = @"SUInstallerDelegate";
 	}
 	else
 	{
-		[(isPackage ? [SUPackageInstaller class] : [SUPlainInstaller class]) performInstallationWithPath:newAppDownloadPath host:host delegate:delegate synchronously:synchronously];
+		[(isPackage ? [SUPackageInstaller class] : [SUPlainInstaller class]) performInstallationWithPath:newAppDownloadPath host:host delegate:delegate synchronously:synchronously versionComparator:comparator];
 	}
 }
 

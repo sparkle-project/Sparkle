@@ -13,7 +13,6 @@
 #import "SUPlainInstaller.h"
 
 @interface SUPackageInstaller : SUPlainInstaller { }
-+ (void)installPath:(NSString *)path overHost:(SUHost *)bundle delegate:delegate;
 @end
 
 #endif

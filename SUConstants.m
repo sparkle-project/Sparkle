@@ -46,3 +46,4 @@ OSStatus SUMissingUpdateError = 4002;
 OSStatus SUMissingInstallerToolError = 4003;
 OSStatus SURelaunchError = 4004;
 OSStatus SUInstallationError = 4005;
+OSStatus SUDowngradeError = 4006;

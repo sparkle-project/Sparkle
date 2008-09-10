@@ -10,10 +10,11 @@
 #define SUINSTALLER_H
 
 #import <Cocoa/Cocoa.h>
+#import "SUVersionComparisonProtocol.h"
 
 @class SUHost;
 @interface SUInstaller : NSObject { }
-+ (void)installFromUpdateFolder:(NSString *)updateFolder overHost:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously;
++ (void)installFromUpdateFolder:(NSString *)updateFolder overHost:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator;
 + (void)_finishInstallationWithResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:delegate;
 @end
 
