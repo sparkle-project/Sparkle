@@ -64,6 +64,7 @@
 	// Set the default font, but avoid polluting the standard preferences.
 	WebPreferences *preferences = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:[WebPreferences standardPreferences]]];
     [preferences setStandardFontFamily:[[NSFont systemFontOfSize:8] familyName]];
+	[preferences setDefaultFontSize:(int)[NSFont systemFontSizeForControlSize:NSSmallControlSize]];
 	[releaseNotesView setPreferences:preferences];
 	[releaseNotesView setFrameLoadDelegate:self];
 	[releaseNotesView setPolicyDelegate:self];
