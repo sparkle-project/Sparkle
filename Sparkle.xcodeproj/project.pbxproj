@@ -16,7 +16,6 @@
 		6102FE4B0E07803800F85D09 /* SUDiskImageUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 6102FE490E07803800F85D09 /* SUDiskImageUnarchiver.m */; };
 		6102FE5B0E08C7EC00F85D09 /* SUUnarchiver_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6102FE590E08C7EC00F85D09 /* SUUnarchiver_Private.h */; settings = {ATTRIBUTES = (); }; };
 		6102FE5C0E08C7EC00F85D09 /* SUUnarchiver_Private.m in Sources */ = {isa = PBXBuildFile; fileRef = 6102FE5A0E08C7EC00F85D09 /* SUUnarchiver_Private.m */; };
-		61072EB30DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 61072EB20DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig */; };
 		610D5A1A0A1661B8004AAD9C /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; };
 		610D5A750A1670A4004AAD9C /* SUStatus.nib in Resources */ = {isa = PBXBuildFile; fileRef = 610D5A740A1670A4004AAD9C /* SUStatus.nib */; };
 		610EC1E00CF3A5FE00AE239E /* NTSynchronousTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 610EC1BF0CF3914D00AE239E /* NTSynchronousTask.m */; };
@@ -740,7 +739,6 @@
 				61B5F92E09C4CFD800B25A18 /* InfoPlist.strings in Resources */,
 				61B5F92F09C4CFD800B25A18 /* MainMenu.nib in Resources */,
 				61BBDF820A49220C00378739 /* Sparkle.icns in Resources */,
-				61072EB30DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig in Resources */,
 				618E9CFD0E7328F1004646D8 /* dsa_pub.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
