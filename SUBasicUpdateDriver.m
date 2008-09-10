@@ -158,9 +158,9 @@
 
 - (void)downloadDidFinish:(NSURLDownload *)d
 {
-	// New in Sparkle 1.5: we're now checking signatures on all non-secure downloads, where "secure" is defined as being over SSL and downloaded from the same host as the appcast.
+	// New in Sparkle 1.5: we're now checking signatures on all non-secure downloads, where "secure" is defined as both the appcast and the download being transmitted over SSL.
 	NSURL *downloadURL = [[d request] URL];
-	if (!([[downloadURL scheme] isEqualToString:@"https"] && [[downloadURL host] isEqualToString:[appcastURL host]]))
+	if (!([[downloadURL scheme] isEqualToString:@"https"] && [[appcastURL scheme] isEqualToString:@"https"]))
 	{
 		if (![SUDSAVerifier validatePath:downloadPath withEncodedDSASignature:[updateItem DSASignature] withPublicDSAKey:[host publicDSAKey]])
 		{
