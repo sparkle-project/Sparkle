@@ -16,9 +16,9 @@
 
 @implementation SUBasicUpdateDriver
 
-- (void)checkForUpdatesAtURL:(NSURL *)appcastURL host:(SUHost *)aHost
+- (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
 {	
-	[super checkForUpdatesAtURL:appcastURL host:aHost];
+	[super checkForUpdatesAtURL:URL host:aHost];
 	if ([aHost isRunningOnReadOnlyVolume])
 	{
 		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again.", nil), [aHost name]] forKey:NSLocalizedDescriptionKey]]];
@@ -34,7 +34,7 @@
 	NSData * cleanedAgent = [userAgent dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
 	userAgent = [NSString stringWithCString:[cleanedAgent bytes] length:[cleanedAgent length]];
 	[appcast setUserAgentString:userAgent];
-	[appcast fetchAppcastFromURL:appcastURL];
+	[appcast fetchAppcastFromURL:URL];
 }
 
 - (id <SUVersionComparison>)_versionComparator
@@ -158,8 +158,9 @@
 
 - (void)downloadDidFinish:(NSURLDownload *)d
 {
-	// New in Sparkle 1.5: we're now checking signatures on all non-https downloads.
-	if (![[[[d request] URL] scheme] isEqualToString:@"https"])
+	// New in Sparkle 1.5: we're now checking signatures on all non-secure downloads, where "secure" is defined as being over SSL and downloaded from the same host as the appcast.
+	NSURL *downloadURL = [[d request] URL];
+	if (!([[downloadURL scheme] isEqualToString:@"https"] && [[downloadURL host] isEqualToString:[appcastURL host]]))
 	{
 		if (![SUDSAVerifier validatePath:downloadPath withEncodedDSASignature:[updateItem DSASignature] withPublicDSAKey:[host publicDSAKey]])
 		{

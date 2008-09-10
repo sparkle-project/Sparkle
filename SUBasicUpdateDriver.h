@@ -22,7 +22,7 @@
 	NSString *relaunchPath;
 }
 
-- (void)checkForUpdatesAtURL:(NSURL *)appcastURL host:(SUHost *)host;
+- (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac;
 - (void)appcast:(SUAppcast *)ac failedToLoadWithError:(NSError *)error;

@@ -18,12 +18,13 @@ extern NSString *SUUpdateDriverFinishedNotification;
 {
 	SUHost *host;
 	SUUpdater *updater;
+	NSURL *appcastURL;
 	
 	BOOL finished;
 }
 
 - initWithUpdater:(SUUpdater *)updater;
-- (void)checkForUpdatesAtURL:(NSURL *)appcastURL host:(SUHost *)host;
+- (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
 - (void)abortUpdate;
 - (BOOL)finished;
 

@@ -13,14 +13,14 @@
 
 @implementation SUUserInitiatedUpdateDriver
 
-- (void)checkForUpdatesAtURL:(NSURL *)appcastURL host:(SUHost *)aHost
+- (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
 {
 	checkingController = [[SUStatusController alloc] initWithHost:aHost];
 	[[checkingController window] center]; // Force the checking controller to load its window.
 	[checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates...", nil) maxProgressValue:0 statusText:nil];
 	[checkingController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
 	[checkingController showWindow:self];
-	[super checkForUpdatesAtURL:appcastURL host:aHost];
+	[super checkForUpdatesAtURL:URL host:aHost];
 	
 	// For background applications, obtain focus.
 	// Useful if the update check is requested from another app like System Preferences.

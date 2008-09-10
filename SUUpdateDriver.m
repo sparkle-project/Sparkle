@@ -20,8 +20,9 @@ NSString *SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [host bundlePath]]; }
 
-- (void)checkForUpdatesAtURL:(NSURL *)appcastURL host:(SUHost *)h
+- (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)h
 {
+	appcastURL = [URL copy];
 	host = [h retain];
 }
 
@@ -36,6 +37,7 @@ NSString *SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 - (void)dealloc
 {
     [host release];
+	[appcastURL release];
     [super dealloc];
 }
 
