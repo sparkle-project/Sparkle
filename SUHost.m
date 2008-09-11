@@ -93,7 +93,13 @@
 
 - (BOOL)isBackgroundApplication
 {
-	return [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSUIElement"] doubleValue];
+	ProcessSerialNumber PSN;
+	GetCurrentProcess(&PSN);
+	NSDictionary * processInfo = (NSDictionary *)ProcessInformationCopyDictionary(&PSN, kProcessDictionaryIncludeAllInformationMask);
+	BOOL isElement = [[processInfo objectForKey:@"LSUIElement"] boolValue];
+	if (processInfo)
+		CFRelease(processInfo);
+	return isElement;
 }
 
 - (NSString *)publicDSAKey
