@@ -9,6 +9,7 @@
 #import "SUInstaller.h"
 #import "SUPlainInstaller.h"
 #import "SUPackageInstaller.h"
+#import "SUHost.h"
 
 @implementation SUInstaller
 
@@ -54,6 +55,17 @@
 			isPackage = YES;
 			newAppDownloadPath = currentPath;
 			break;
+		}
+		else
+		{
+			// Try matching on bundle identifiers in case the user has changed the name of the host app
+			NSBundle *incomingBundle = [NSBundle bundleWithPath:currentPath];
+			if(incomingBundle && [[incomingBundle bundleIdentifier] isEqualToString:[[host bundle] bundleIdentifier]])
+			{
+				isPackage = NO;
+				newAppDownloadPath = currentPath;
+				break;
+			}
 		}
 		
 		// Some DMGs have symlinks into /Applications! That's no good! And there's no point in looking in bundles.
