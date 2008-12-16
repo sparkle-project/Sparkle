@@ -111,7 +111,8 @@
 	// More likely, we've got a reference to a Resources file by filename:
 	NSString *keyFilename = [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];
 	if (!keyFilename) { return nil; }
-	return [NSString stringWithContentsOfFile:[bundle pathForResource:keyFilename ofType:nil]];
+	NSError *ignoreErr;
+	return [NSString stringWithContentsOfFile:[bundle pathForResource:keyFilename ofType:nil] encoding:NSASCIIStringEncoding error: &ignoreErr];
 }
 
 - (NSArray *)systemProfile
