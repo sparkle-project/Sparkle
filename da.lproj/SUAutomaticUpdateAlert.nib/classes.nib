@@ -1,0 +1,29 @@
+{
+    IBClasses =     (
+                {
+            CLASS = FirstResponder;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSObject;
+        },
+                {
+            CLASS = NSObject;
+            LANGUAGE = ObjC;
+        },
+                {
+            ACTIONS =             {
+                doNotInstall = id;
+                installLater = id;
+                installNow = id;
+            };
+            CLASS = SUAutomaticUpdateAlert;
+            LANGUAGE = ObjC;
+            SUPERCLASS = SUWindowController;
+        },
+                {
+            CLASS = SUWindowController;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSWindowController;
+        }
+    );
+    IBVersion = 1;
+}
