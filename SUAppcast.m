@@ -20,7 +20,6 @@
 {
 	[items release];
 	[userAgentString release];
-	[incrementalData release];
 	[super dealloc];
 }
 
@@ -35,26 +34,36 @@
     if (userAgentString)
         [request setValue:userAgentString forHTTPHeaderField:@"User-Agent"];
             
-    incrementalData = [[NSMutableData alloc] init];
-    NSURLConnection *connection = [NSURLConnection connectionWithRequest:request delegate:self];
-    CFRetain(connection);
+    NSURLDownload *download = [[[NSURLDownload alloc] initWithRequest:request delegate:self] autorelease];
+    CFRetain(download);
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+- (void)download:(NSURLDownload *)download decideDestinationWithSuggestedFilename:(NSString *)filename
 {
-	[incrementalData appendData:data];
+    NSString *destinationFilename = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
+    [download setDestination:destinationFilename allowOverwrite:NO];
 }
 
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection
+- (void)download:(NSURLDownload *)download didCreateDestination:(NSString *)path
 {
-	CFRelease(connection);
+    [downloadFilename release];
+    downloadFilename = [path copy];
+}
+
+- (void)downloadDidFinish:(NSURLDownload *)download
+{
+	CFRelease(download);
     
 	NSError *error = nil;
-    NSXMLDocument *document = [[NSXMLDocument alloc] initWithData:incrementalData options:0 error:&error];
+    NSXMLDocument *document = [[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:0 error:&error];
 	BOOL failed = NO;
 	NSArray *xmlItems = nil;
 	NSMutableArray *appcastItems = [NSMutableArray array];
 	
+    [[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
+    [downloadFilename release];
+    downloadFilename = nil;
+    
     if (nil == document)
     {
         failed = YES;
@@ -164,14 +173,18 @@
 	}
 }
 
-- (void)connection:(NSURLConnection*)connection didFailWithError:(NSError *)error
+- (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
 {
-	CFRelease(connection);
+	CFRelease(download);
+    
+    [[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
+    [downloadFilename release];
+    downloadFilename = nil;
     
 	[self reportError:error];
 }
 
-- (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse
+- (NSURLRequest *)download:(NSURLDownload *)download willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse
 {
 	return request;
 }

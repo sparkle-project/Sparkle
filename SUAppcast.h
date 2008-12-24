@@ -14,7 +14,7 @@
 	NSArray *items;
 	NSString *userAgentString;
 	id delegate;
-	NSMutableData *incrementalData;
+	NSString *downloadFilename;
 }
 
 - (void)fetchAppcastFromURL:(NSURL *)url;
