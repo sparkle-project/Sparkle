@@ -18,6 +18,7 @@
 
 @interface SUUpdater (Private)
 - initForBundle:(NSBundle *)bundle;
+- (void)startUpdateCycle;
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
 - (BOOL)automaticallyDownloadsUpdates;
 - (void)scheduleNextUpdateCheck;
@@ -68,6 +69,8 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
         [sharedUpdaters setObject:self forKey:[NSValue valueWithNonretainedObject:bundle]];
         host = [[SUHost alloc] initWithBundle:bundle];
         [self registerAsObserver];
+        // This runs the permission prompt if needed, but never before the app has finished launching because the runloop won't run before that
+        [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:0];
 	}
 	return self;
 }
@@ -80,7 +83,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [host bundlePath]]; }
 
-- (void)applicationDidFinishLaunching:(NSNotification *)note
+- (void)startUpdateCycle
 {
     BOOL shouldPrompt = NO;
     
@@ -198,7 +201,6 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 
 - (void)registerAsObserver
 {
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidFinishLaunching:) name:NSApplicationDidFinishLaunchingNotification object:NSApp];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDriverDidFinish:) name:SUUpdateDriverFinishedNotification object:nil];
     // No sense observing the shared NSUserDefaultsController when we're not updating the main bundle.
     if ([host bundle] != [NSBundle mainBundle]) return;
