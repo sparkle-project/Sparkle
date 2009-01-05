@@ -139,7 +139,7 @@
 		return [[NSUserDefaults standardUserDefaults] objectForKey:defaultName];
 	
 	CFPropertyListRef obj = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
-#if MAC_OS_X_VERSION_MAX_ALLOWED > 1050
+#if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4
 	return [NSMakeCollectable(obj) autorelease];
 #else
 	return [(id)obj autorelease];
