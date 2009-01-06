@@ -16,23 +16,35 @@
 	NSError *error = nil;
 	BOOL result = YES;
 	
-	NSString* openCommand = @"/usr/bin/open";
-	if ([[NSFileManager defaultManager] fileExistsAtPath:openCommand])
-	{
-		// Using "open" insures that the installer application is brought to the front.
-		// The -W and -n options were added to the 'open' command in 10.5
-		// -W = wait until the app has quit.  -n = Open another instance if already open.
-		// -b = app bundle identifier
-		NSArray *args = [NSArray arrayWithObjects:@"-W", @"-n", @"-b", @"com.apple.installer", path, nil];
-		NSTask *openTask = [NSTask launchedTaskWithLaunchPath:openCommand arguments:args];
-		[openTask waitUntilExit];
+	if (floor(NSAppKitVersionNumber) == NSAppKitVersionNumber10_4) {
+		// 10.4 uses Installer.app because the "open" command in 10.4 doesn't support -W and -n
+		NSString *installerPath = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.installer"];
+  		if ([[NSFileManager defaultManager] fileExistsAtPath:installerPath])
+		{
+			NSTask *installer = [NSTask launchedTaskWithLaunchPath:installerPath arguments:[NSArray arrayWithObjects:path, nil]];
+			[installer waitUntilExit];
+		} else {
+			result = NO;
+			error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingInstallerToolError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find Apple's installer tool!" forKey:NSLocalizedDescriptionKey]];
+		}
+	} else {
+		// 10.5 and later. Run installer using the "open" command to ensure it is launched in front of current application.
+		NSString* openCommand = @"/usr/bin/open";
+		if ([[NSFileManager defaultManager] fileExistsAtPath:openCommand])
+		{
+			// The -W and -n options were added to the 'open' command in 10.5
+			// -W = wait until the app has quit.
+			// -n = Open another instance if already open.
+			// -b = app bundle identifier
+			NSArray *args = [NSArray arrayWithObjects:@"-W", @"-n", @"-b", @"com.apple.installer", path, nil];
+			NSTask *openTask = [NSTask launchedTaskWithLaunchPath:openCommand arguments:args];
+			[openTask waitUntilExit];
+		} else {
+			result = NO;
+			error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingInstallerToolError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find Apple's installer tool!" forKey:NSLocalizedDescriptionKey]];
+		}
 	}
-	else
-	{
-		error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingInstallerToolError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find Apple's installer tool!" forKey:NSLocalizedDescriptionKey]];
-		result = NO;
-	}
-
+	
 	// Known bug: if the installation fails or is canceled, Sparkle goes ahead and restarts, thinking everything is fine.
 	[self _finishInstallationWithResult:result host:host error:error delegate:delegate];
 }
