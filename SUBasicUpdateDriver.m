@@ -142,7 +142,7 @@
 	NSString *prefix = [NSString stringWithFormat:@"%@ %@ Update", [host name], [host version]];
 	NSString *tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:prefix];
 	int cnt=1;
-	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999999)
+	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
 		tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", prefix, cnt++]];
 	BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir attributes:nil];
 	if (!success)

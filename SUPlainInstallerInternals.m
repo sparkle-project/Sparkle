@@ -99,14 +99,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
 	// Let's try to read the version number so the filename will be more meaningful.
 	NSString *postFix;
-	NSBundle *bundle;
-	if ((bundle = [NSBundle bundleWithPath:path]))
+	NSString *version;
+	if ((version = [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:@"CFBundleVersion"]) && ![version isEqualToString:@""])
 	{
 		// We'll clean it up a little for safety.
 		// The cast is necessary because of a bug in the headers in pre-10.5 SDKs
 		NSMutableCharacterSet *validCharacters = (id)[NSMutableCharacterSet alphanumericCharacterSet];
 		[validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
-		postFix = [[bundle objectForInfoDictionaryKey:@"CFBundleVersion"] stringByTrimmingCharactersInSet:[validCharacters invertedSet]];
+		postFix = [version stringByTrimmingCharactersInSet:[validCharacters invertedSet]];
 	}
 	else
 		postFix = @"old";
@@ -114,7 +114,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	NSString *tempDir = [prefix stringByAppendingPathExtension:[path pathExtension]];
 	// Now let's make sure we get a unique path.
 	int cnt=2;
-	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999999)
+	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
 		tempDir = [NSString stringWithFormat:@"%@ %d.%@", prefix, cnt++, [path pathExtension]];
 	return tempDir;
 }

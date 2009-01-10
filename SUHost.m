@@ -55,7 +55,10 @@
 
 - (NSString *)version
 {
-	return [bundle objectForInfoDictionaryKey:@"CFBundleVersion"];
+	NSString *version = [bundle objectForInfoDictionaryKey:@"CFBundleVersion"];
+	if (!version || [version isEqualToString:@""])
+		[NSException raise:@"SUNoVersionException" format:@"This host (%@) has no CFBundleVersion! This attribute is required.", [self bundlePath]];
+	return version;
 }
 
 - (NSString *)displayVersion
