@@ -93,7 +93,15 @@
 	NSTask *mdimport = [[[NSTask alloc] init] autorelease];
 	[mdimport setLaunchPath:@"/usr/bin/mdimport"];
 	[mdimport setArguments:[NSArray arrayWithObject:[host bundlePath]]];
-	[mdimport launch];
+	@try
+	{
+		[mdimport launch];
+	}
+	@catch (NSException * launchException)
+	{
+		// No big deal.
+		NSLog(@"Sparkle Error: %@", [launchException description]);
+	}
 }
 
 + (void)_finishInstallationWithResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:delegate
