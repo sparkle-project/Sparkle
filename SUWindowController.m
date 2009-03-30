@@ -15,7 +15,7 @@
 	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:nibName ofType:@"nib"];
 	if (path == nil) // Slight hack to resolve issues with running Sparkle in debug configurations.
 	{
-		NSString *frameworkPath = [[host sharedFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
+		NSString *frameworkPath = [[[host bundle] sharedFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
 		NSBundle *framework = [NSBundle bundleWithPath:frameworkPath];
 		path = [framework pathForResource:nibName ofType:@"nib"];
 	}
