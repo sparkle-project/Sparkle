@@ -7,6 +7,7 @@
 //
 
 #import "SUWindowController.h"
+#import "SUHost.h"
 
 @implementation SUWindowController
 
