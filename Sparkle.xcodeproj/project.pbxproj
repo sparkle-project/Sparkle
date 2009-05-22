@@ -818,7 +818,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env ruby";
-			shellScript = "resources = \"#{ENV[\"BUILT_PRODUCTS_DIR\"]}/#{ENV[\"WRAPPER_NAME\"]}/Resources\"\n`ln -s \"fr.lproj\" \"#{resources}/fr_CA.lproj\"`";
+			shellScript = "resources = \"#{ENV[\"BUILT_PRODUCTS_DIR\"]}/#{ENV[\"WRAPPER_NAME\"]}/Resources\"\n`ln -sfh \"fr.lproj\" \"#{resources}/fr_CA.lproj\"`";
 		};
 /* End PBXShellScriptBuildPhase section */
 
