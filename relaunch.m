@@ -39,7 +39,11 @@
 - (void) relaunch
 {
 	[[NSWorkspace sharedWorkspace] openFile:[[NSFileManager defaultManager] stringWithFileSystemRepresentation:executablePath length:strlen(executablePath)]];
+#ifndef MAC_OS_X_VERSION_10_5
+    [[NSFileManager defaultManager] removeFileAtPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"relaunch"] handler:nil];
+#else
 	[[NSFileManager defaultManager] removeItemAtPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"relaunch"] error:NULL];
+#endif
 	exit(0);
 }
 

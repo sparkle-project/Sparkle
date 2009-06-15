@@ -144,7 +144,11 @@
 	int cnt=1;
 	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
 		tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", prefix, cnt++]];
+#ifndef MAC_OS_X_VERSION_10_5
+    BOOL BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir attributes:nil];
+#else
 	BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir withIntermediateDirectories:YES attributes:nil error:NULL];
+#endif
 	if (!success)
 	{
 		// Okay, something's really broken with /tmp
@@ -223,8 +227,13 @@
 	NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]]  pathForResource:@"relaunch" ofType:@""];
 	NSString *targetPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems
+#ifndef MAC_OS_X_VERSION_10_5
+    [[NSFileManager defaultManager] removeFileAtPath:targetPath handler:nil];
+	if ([[NSFileManager defaultManager] copyPath:relaunchPathToCopy toPath:targetPath handler:nil])
+#else
 	[[NSFileManager defaultManager] removeItemAtPath:targetPath error:NULL];
 	if ([[NSFileManager defaultManager] copyItemAtPath:relaunchPathToCopy toPath:targetPath error:NULL])
+#endif
 		relaunchPath = [targetPath retain];
 	
 	[SUInstaller installFromUpdateFolder:[downloadPath stringByDeletingLastPathComponent] overHost:host delegate:self synchronously:[self shouldInstallSynchronously] versionComparator:[self _versionComparator]];
@@ -274,13 +283,21 @@
 
 - (void)cleanUp
 {
-	[[NSFileManager defaultManager] removeItemAtPath:[downloadPath stringByDeletingLastPathComponent] error:NULL];	
+#ifndef MAC_OS_X_VERSION_10_5
+    [[NSFileManager defaultManager] removeFileAtPath:[downloadPath stringByDeletingLastPathComponent] handler:nil];
+#else
+	[[NSFileManager defaultManager] removeItemAtPath:[downloadPath stringByDeletingLastPathComponent] error:NULL];
+#endif
 }
 
 - (void)installerForHost:(SUHost *)aHost failedWithError:(NSError *)error
 {
 	if (aHost != host) { return; }
+#ifndef MAC_OS_X_VERSION_10_5
+    [[NSFileManager defaultManager] removeFileAtPath:relaunchPath handler:nil]; // Clean up the copied relauncher.
+#else
 	[[NSFileManager defaultManager] removeItemAtPath:relaunchPath error:NULL]; // Clean up the copied relauncher.
+#endif
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while installing the update. Please try again later.", nil), NSLocalizedDescriptionKey, [error localizedDescription], NSLocalizedFailureReasonErrorKey, nil]]];
 }
 
