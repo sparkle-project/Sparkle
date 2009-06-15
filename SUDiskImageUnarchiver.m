@@ -33,7 +33,7 @@
 	if ([[NSFileManager defaultManager] fileExistsAtPath:mountPoint]) goto reportError;
 
 	// create mount point folder
-	[[NSFileManager defaultManager] createDirectoryAtPath:mountPoint attributes:nil];
+	[[NSFileManager defaultManager] createDirectoryAtPath:mountPoint withIntermediateDirectories:YES attributes:nil error:NULL];
 	if (![[NSFileManager defaultManager] fileExistsAtPath:mountPoint]) goto reportError;
 
 	NSArray* arguments = [NSArray arrayWithObjects:@"attach", archivePath, @"-mountpoint", mountPoint, @"-noverify", @"-nobrowse", @"-noautoopen", nil];
@@ -47,16 +47,16 @@
 	
 	// Now that we've mounted it, we need to copy out its contents.
 	NSString *targetPath = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[mountPoint lastPathComponent]];
-	if (![[NSFileManager defaultManager] createDirectoryAtPath:targetPath attributes:nil]) goto reportError;
+	if (![[NSFileManager defaultManager] createDirectoryAtPath:targetPath withIntermediateDirectories:YES attributes:nil error:NULL]) goto reportError;
 	
 	// We can't just copyPath: from the volume root because that always fails. Seems to be a bug.
-	id subpathEnumerator = [[[NSFileManager defaultManager] directoryContentsAtPath:mountPoint] objectEnumerator], currentSubpath;
+	id subpathEnumerator = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:mountPoint error:NULL] objectEnumerator], currentSubpath;
 	while ((currentSubpath = [subpathEnumerator nextObject]))
 	{
 		NSString *currentFullPath = [mountPoint stringByAppendingPathComponent:currentSubpath];
 		// Don't bother trying (and failing) to copy out files we can't read. That's not going to be the app anyway.
 		if (![[NSFileManager defaultManager] isReadableFileAtPath:currentFullPath]) continue;
-		if (![[NSFileManager defaultManager] copyPath:currentFullPath toPath:[targetPath stringByAppendingPathComponent:currentSubpath] handler:nil])
+		if (![[NSFileManager defaultManager] copyItemAtPath:currentFullPath toPath:[targetPath stringByAppendingPathComponent:currentSubpath] error:NULL])
 			goto reportError;
 	}
 			
@@ -70,7 +70,7 @@ finally:
 	if (mountedSuccessfully)
 		[NSTask launchedTaskWithLaunchPath:@"/usr/bin/hdiutil" arguments:[NSArray arrayWithObjects:@"detach", mountPoint, @"-force", nil]];
 	else
-		[[NSFileManager defaultManager] removeFileAtPath:mountPoint handler:nil];
+		[[NSFileManager defaultManager] removeItemAtPath:mountPoint error:NULL];
 	[pool drain];
 }
 

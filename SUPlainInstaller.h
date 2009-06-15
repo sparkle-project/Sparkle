@@ -11,6 +11,7 @@
 
 #import "Sparkle.h"
 #import "SUInstaller.h"
+#import "SUHost.h"
 #import "SUVersionComparisonProtocol.h"
 
 @interface SUPlainInstaller : SUInstaller { }

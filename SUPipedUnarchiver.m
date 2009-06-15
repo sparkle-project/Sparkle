@@ -48,7 +48,7 @@
 	FILE *fp = NULL, *cmdFP = NULL;
 	
 	// Get the file size.
-	NSNumber *fs = [[[NSFileManager defaultManager] fileAttributesAtPath:archivePath traverseLink:NO] objectForKey:NSFileSize];
+	NSNumber *fs = [[[NSFileManager defaultManager] attributesOfItemAtPath:archivePath error:NULL] objectForKey:NSFileSize];
 	if (fs == nil) goto reportError;
 	
 	// Thank you, Allan Odgaard!

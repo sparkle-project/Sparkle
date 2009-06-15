@@ -60,7 +60,7 @@
 	NSArray *xmlItems = nil;
 	NSMutableArray *appcastItems = [NSMutableArray array];
 	
-    [[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:NULL];
     [downloadFilename release];
     downloadFilename = nil;
     
@@ -177,7 +177,7 @@
 {
 	CFRelease(download);
     
-    [[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
+    [[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:NULL];
     [downloadFilename release];
     downloadFilename = nil;
     
