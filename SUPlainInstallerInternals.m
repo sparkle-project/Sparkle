@@ -234,7 +234,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		return [self _copyPathWithForcedAuthentication:src toPath:dst error:error];
 
 	NSString *tmpPath = [self _temporaryCopyNameForPath:dst];
-#ifndef MAC_OS_X_VERSION_10_5
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
     if (![[NSFileManager defaultManager] movePath:dst toPath:tmpPath handler:self])
 #else
 	if (![[NSFileManager defaultManager] moveItemAtPath:dst toPath:tmpPath error:NULL])
@@ -244,7 +244,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
 		return NO;			
 	}
-#ifndef MAC_OS_X_VERSION_10_5
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
     if (![[NSFileManager defaultManager] copyPath:src toPath:dst handler:self])
 #else
 	if (![[NSFileManager defaultManager] copyItemAtPath:src toPath:dst error:NULL])
@@ -327,7 +327,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	// Only recurse if it's actually a directory.  Don't recurse into a
 	// root-level symbolic link.
 	NSDictionary* rootAttributes =
-#ifndef MAC_OS_X_VERSION_10_5
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
     [[NSFileManager defaultManager] fileAttributesAtPath:root traverseLink:NO];
 #else
 	[[NSFileManager defaultManager] attributesOfItemAtPath:root error:NULL];
