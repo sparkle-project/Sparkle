@@ -1022,7 +1022,6 @@
 		1DEB91B208733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				WARNING_CFLAGS = "-Wundeclared-selector";
 			};
 			name = Debug;
