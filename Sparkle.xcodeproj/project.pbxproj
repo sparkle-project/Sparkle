@@ -264,6 +264,10 @@
 		61C268090E2DB5D000175E6C /* License.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = License.txt; sourceTree = "<group>"; };
 		61C46F350D9C54F300B06326 /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/SUUpdatePermissionPrompt.nib; sourceTree = "<group>"; };
 		61CFB3280E385186007A1735 /* Sparkle.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sparkle.pch; sourceTree = "<group>"; };
+		61E31A7F103299450051D188 /* pt_BR */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = pt_BR; path = pt_BR.lproj/SUUpdatePermissionPrompt.nib; sourceTree = "<group>"; };
+		61E31A80103299500051D188 /* pt_BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt_BR; path = pt_BR.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		61E31A81103299560051D188 /* pt_BR */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = pt_BR; path = pt_BR.lproj/SUAutomaticUpdateAlert.nib; sourceTree = "<group>"; };
+		61E31A821032995F0051D188 /* pt_BR */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = pt_BR; path = pt_BR.lproj/SUUpdateAlert.nib; sourceTree = "<group>"; };
 		61EF67550E25B58D00F754E0 /* SUHost.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUHost.m; sourceTree = "<group>"; };
 		61EF67580E25C5B400F754E0 /* SUHost.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUHost.h; sourceTree = "<group>"; };
 		61F3651A0E18987B007ECA02 /* es */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = es; path = es.lproj/SUUpdatePermissionPrompt.nib; sourceTree = "<group>"; };
@@ -665,6 +669,7 @@
 				8DC2EF560486A6940098B216 /* Frameworks */,
 				6131B1910DDCDE32005215F0 /* Run Script: Set Bzr Version Info */,
 				6195D4B40E40505A00D41A50 /* Run Script: Link fr_CA to fr */,
+				61E31A85103299750051D188 /* Run Script: Link pt to pt_BR */,
 			);
 			buildRules = (
 			);
@@ -734,6 +739,7 @@
 				tr,
 				zh_CN,
 				fr_ca,
+				pt_BR,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* Sparkle */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
@@ -827,6 +833,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env ruby";
 			shellScript = "resources = \"#{ENV[\"BUILT_PRODUCTS_DIR\"]}/#{ENV[\"WRAPPER_NAME\"]}/Resources\"\n`ln -sfh \"fr.lproj\" \"#{resources}/fr_CA.lproj\"`";
+		};
+		61E31A85103299750051D188 /* Run Script: Link pt to pt_BR */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script: Link pt to pt_BR";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = "/usr/bin/env ruby";
+			shellScript = "resources = \"#{ENV[\"BUILT_PRODUCTS_DIR\"]}/#{ENV[\"WRAPPER_NAME\"]}/Resources\"\n`ln -sfh \"pt_BR.lproj\" \"#{resources}/pt.lproj\"`";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -934,6 +954,7 @@
 				613151B20FB4946A000DCD59 /* is */,
 				611A904210240DD300CC659E /* pl */,
 				611A904610240DF700CC659E /* ja */,
+				61E31A80103299500051D188 /* pt_BR */,
 			);
 			name = Sparkle.strings;
 			sourceTree = "<group>";
@@ -955,6 +976,7 @@
 				613151B40FB49488000DCD59 /* is */,
 				611A904410240DE800CC659E /* pl */,
 				611A904810240E0600CC659E /* ja */,
+				61E31A81103299560051D188 /* pt_BR */,
 			);
 			name = SUAutomaticUpdateAlert.nib;
 			sourceTree = "<group>";
@@ -976,6 +998,7 @@
 				613151B50FB49492000DCD59 /* is */,
 				611A904510240DF000CC659E /* pl */,
 				611A904910240E0C00CC659E /* ja */,
+				61E31A821032995F0051D188 /* pt_BR */,
 			);
 			name = SUUpdateAlert.nib;
 			sourceTree = "<group>";
@@ -1013,6 +1036,7 @@
 				613151B30FB49480000DCD59 /* is */,
 				611A904310240DE000CC659E /* pl */,
 				611A904710240DFF00CC659E /* ja */,
+				61E31A7F103299450051D188 /* pt_BR */,
 			);
 			name = SUUpdatePermissionPrompt.nib;
 			sourceTree = "<group>";
