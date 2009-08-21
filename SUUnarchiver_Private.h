@@ -18,7 +18,7 @@
 + (BOOL)_canUnarchivePath:(NSString *)path;
 - _initWithPath:(NSString *)path;
 
-- (void)_notifyDelegateOfExtractedLength:(long)length;
+- (void)_notifyDelegateOfExtractedLength:(NSNumber *)length;
 - (void)_notifyDelegateOfSuccess;
 - (void)_notifyDelegateOfFailure;
 @end
