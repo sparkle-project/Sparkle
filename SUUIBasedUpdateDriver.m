@@ -122,7 +122,11 @@
 {
 	// We do this here instead of in extractUpdate so that we only have a determinate progress bar for archives with progress.
 	if ([statusController maxProgressValue] == 0)
-		[statusController setMaxProgressValue:[[[[NSFileManager defaultManager] fileAttributesAtPath:downloadPath traverseLink:NO] objectForKey:NSFileSize] doubleValue]];
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
+        [statusController setMaxProgressValue:[[[[NSFileManager defaultManager] fileAttributesAtPath:downloadPath traverseLink:NO] objectForKey:NSFileSize] doubleValue]];
+#else
+		[statusController setMaxProgressValue:[[[[NSFileManager defaultManager] attributesOfItemAtPath:downloadPath error:NULL] objectForKey:NSFileSize] doubleValue]];
+#endif
 	[statusController setProgressValue:[statusController progressValue] + length];
 }
 

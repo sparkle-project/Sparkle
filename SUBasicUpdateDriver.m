@@ -137,13 +137,20 @@
 		name = [name stringByDeletingPathExtension];
 	
 	// We create a temporary directory in /tmp and stick the file there.
-	// Not using a GUID here because hdiutil for some reason chokes on GUIDs. Too long? I really have no idea.
+	// Not using a GUID here because hdiutil (for DMGs) for some reason chokes on GUIDs. Too long? I really have no idea.
 	NSString *prefix = [NSString stringWithFormat:@"%@ %@ Update", [host name], [host version]];
 	NSString *tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:prefix];
 	int cnt=1;
 	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
+	{
 		tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", prefix, cnt++]];
+	}
+	
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
 	BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir attributes:nil];
+#else
+	BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir withIntermediateDirectories:YES attributes:nil error:NULL];
+#endif
 	if (!success)
 	{
 		// Okay, something's really broken with /tmp
@@ -159,11 +166,12 @@
 {
 	// New in Sparkle 1.5: we're now checking signatures on all non-secure downloads, where "secure" is defined as both the appcast and the download being transmitted over SSL.
 	NSURL *downloadURL = [[d request] URL];
-	if (!([[downloadURL scheme] isEqualToString:@"https"] && [[appcastURL scheme] isEqualToString:@"https"]) || !([downloadURL isFileURL] && [appcastURL isFileURL]) || [host publicDSAKey])
+	if (!(([[downloadURL scheme] isEqualToString:@"https"] && [[appcastURL scheme] isEqualToString:@"https"]) ||
+		  ([downloadURL isFileURL] && [appcastURL isFileURL])))
 	{
-		if (![SUDSAVerifier validatePath:downloadPath withEncodedDSASignature:[updateItem DSASignature] withPublicDSAKey:[host publicDSAKey]])
+		if (![host publicDSAKey] || ![SUDSAVerifier validatePath:downloadPath withEncodedDSASignature:[updateItem DSASignature] withPublicDSAKey:[host publicDSAKey]])
 		{
-			[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUSignatureError userInfo:[NSDictionary dictionaryWithObject:@"The update is improperly signed." forKey:NSLocalizedDescriptionKey]]];
+			[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUSignatureError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil), NSLocalizedDescriptionKey, @"The update is improperly signed.", NSLocalizedFailureReasonErrorKey, nil]]];
 			return;
 		}
 	}
@@ -221,10 +229,18 @@
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
 	NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]]  pathForResource:@"relaunch" ofType:@""];
 	NSString *targetPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
-	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems
-	[[NSFileManager defaultManager] removeFileAtPath:targetPath handler:nil];
+	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
+	NSError *error = nil;
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
+    [[NSFileManager defaultManager] removeFileAtPath:targetPath handler:nil];
 	if ([[NSFileManager defaultManager] copyPath:relaunchPathToCopy toPath:targetPath handler:nil])
+#else
+	[[NSFileManager defaultManager] removeItemAtPath:targetPath error:NULL];
+	if ([[NSFileManager defaultManager] copyItemAtPath:relaunchPathToCopy toPath:targetPath error:&error])
+#endif
 		relaunchPath = [targetPath retain];
+	else
+		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil), NSLocalizedDescriptionKey, [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", relaunchPathToCopy, targetPath, (error ? [error localizedDescription] : @"")], NSLocalizedFailureReasonErrorKey, nil]]];
 	
 	[SUInstaller installFromUpdateFolder:[downloadPath stringByDeletingLastPathComponent] overHost:host delegate:self synchronously:[self shouldInstallSynchronously] versionComparator:[self _versionComparator]];
 }
@@ -273,13 +289,16 @@
 
 - (void)cleanUp
 {
-	[[NSFileManager defaultManager] removeFileAtPath:[downloadPath stringByDeletingLastPathComponent] handler:nil];	
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
+    [[NSFileManager defaultManager] removeFileAtPath:[downloadPath stringByDeletingLastPathComponent] handler:nil];
+#else
+	[[NSFileManager defaultManager] removeItemAtPath:[downloadPath stringByDeletingLastPathComponent] error:NULL];
+#endif
 }
 
 - (void)installerForHost:(SUHost *)aHost failedWithError:(NSError *)error
 {
 	if (aHost != host) { return; }
-	[[NSFileManager defaultManager] removeFileAtPath:relaunchPath handler:NULL]; // Clean up the copied relauncher.
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while installing the update. Please try again later.", nil), NSLocalizedDescriptionKey, [error localizedDescription], NSLocalizedFailureReasonErrorKey, nil]]];
 }
 

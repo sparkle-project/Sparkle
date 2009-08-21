@@ -39,6 +39,7 @@
 	[releaseNotesView stopLoading:self];
 	[releaseNotesView setFrameLoadDelegate:nil];
 	[releaseNotesView setPolicyDelegate:nil];
+	[releaseNotesView removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
 	[self close];
 	if ([delegate respondsToSelector:@selector(updateAlert:finishedWithChoice:)])
 		[delegate updateAlert:self finishedWithChoice:choice];
