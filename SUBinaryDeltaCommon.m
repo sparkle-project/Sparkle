@@ -68,7 +68,7 @@ static void _hashOfFile(unsigned char* hash, FTSENT *ent)
             return;
         }
 
-        size_t fileSize = ent->fts_statp->st_size;
+        size_t fileSize = (size_t)ent->fts_statp->st_size;
         void *buffer = mmap(0, fileSize, PROT_READ, MAP_FILE | MAP_PRIVATE, fileDescriptor, 0);
         if (buffer == (void*)-1) {
             close(fileDescriptor);

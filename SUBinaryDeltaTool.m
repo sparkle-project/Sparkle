@@ -6,6 +6,8 @@
 //  Copyright 2009 Mark Rowe. All rights reserved.
 //
 
+#define _DARWIN_NO_64_BIT_INODE 1
+
 #include "SUBinaryDeltaCommon.h"
 #include "SUBinaryDeltaApply.h"
 #include <CommonCrypto/CommonDigest.h>
@@ -75,7 +77,7 @@ static NSString *temporaryPatchFile(NSString *patchFile)
 
 static BOOL shouldSkipDeltaCompression(NSString *key, NSDictionary* originalInfo, NSDictionary *newInfo)
 {
-    size_t fileSize = [[newInfo objectForKey:@"size"] unsignedLongLongValue];
+    unsigned long long fileSize = [[newInfo objectForKey:@"size"] unsignedLongLongValue];
     if (fileSize < 4096)
         return YES;
 
