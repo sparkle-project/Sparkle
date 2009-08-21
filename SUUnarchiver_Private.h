@@ -16,7 +16,7 @@
 + (void)_registerImplementation:(Class)implementation;
 + (NSArray *)_unarchiverImplementations;
 + (BOOL)_canUnarchivePath:(NSString *)path;
-- _initWithPath:(NSString *)path;
+- _initWithPath:(NSString *)path host:(SUHost *)host;
 
 - (void)_notifyDelegateOfExtractedLength:(long)length;
 - (void)_notifyDelegateOfSuccess;

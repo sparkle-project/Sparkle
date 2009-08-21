@@ -15,14 +15,14 @@
 
 extern NSMutableArray *__unarchiverImplementations;
 
-+ (SUUnarchiver *)unarchiverForPath:(NSString *)path
++ (SUUnarchiver *)unarchiverForPath:(NSString *)path updatingHost:(SUHost *)host
 {
 	NSEnumerator *implementationEnumerator = [[self _unarchiverImplementations] objectEnumerator];
 	id current;
 	while ((current = [implementationEnumerator nextObject]))
 	{
 		if ([current _canUnarchivePath:path])
-			return [[[current alloc] _initWithPath:path] autorelease];
+			return [[[current alloc] _initWithPath:path host:host] autorelease];
 	}
 	return nil;
 }
