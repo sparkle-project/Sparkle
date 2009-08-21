@@ -673,7 +673,7 @@
 				8DC2EF520486A6940098B216 /* Resources */,
 				8DC2EF540486A6940098B216 /* Sources */,
 				8DC2EF560486A6940098B216 /* Frameworks */,
-				6131B1910DDCDE32005215F0 /* Run Script: Set Bzr Version Info */,
+				6131B1910DDCDE32005215F0 /* Run Script: Set git Version Info */,
 				6195D4B40E40505A00D41A50 /* Run Script: Link fr_CA to fr */,
 				61E31A85103299750051D188 /* Run Script: Link pt to pt_BR */,
 			);
@@ -811,19 +811,19 @@
 			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
 			showEnvVarsInLog = 0;
 		};
-		6131B1910DDCDE32005215F0 /* Run Script: Set Bzr Version Info */ = {
+		6131B1910DDCDE32005215F0 /* Run Script: Set git Version Info */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 12;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Run Script: Set Bzr Version Info";
+			name = "Run Script: Set git Version Info";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env ruby";
-			shellScript = "# Xcode auto-versioning script for Subversion\n# by Axel Andersson, modified by Daniel Jalkut to add\n# \"--revision HEAD\" to the svn info line, which allows\n# the latest revision to always be used.\n\nif ENV[\"BUILT_PRODUCTS_DIR\"].nil?\n\tSTDERR.print \"#{$0}: Must be run from Xcode!\"\n\texit(1)\nend\n\n# Get the current Bzr revision number and use it to set the CFBundleVersion value\nENV[\"PATH\"] = \"/bin:/sw/bin:/usr/bin:/usr/local/bin:/sbin:/usr/sbin:/opt/local/bin\"\nexit(0) if `type bzr` == \"\"\nrev = `/usr/bin/env bzr revno`\ninfo = \"#{ENV[\"BUILT_PRODUCTS_DIR\"]}/#{ENV[\"WRAPPER_NAME\"]}/Resources/Info.plist\"\nversion = rev[/[\\d.]+/]\n\nif version.nil?\n\tSTDERR.print \"#{$0}: Can't find a Bazaar revision!\"\n\texit(0)\nend\n\ninfo_contents = File.read(info)\nif info_contents.nil?\n\tSTDERR.print \"#{$0}: Can't read in the Info.plist file!\"\n\texit(1)\nend\n\ninfo_contents.sub!(/([\\t ]+<key>CFBundleVersion<\\/key>\\n[\\t ]+<string>).*?(<\\/string>)/, '\\1' + version + '\\2')\nSTDERR.print info_contents\nf = File.open(info, \"w\")\nf.write(info_contents)\nf.close";
+			shellScript = "# Xcode auto-versioning script for Subversion\n# by Axel Andersson, modified by Daniel Jalkut to add\n# \"--revision HEAD\" to the svn info line, which allows\n# the latest revision to always be used.\n\nif ENV[\"BUILT_PRODUCTS_DIR\"].nil?\n\tSTDERR.print \"#{$0}: Must be run from Xcode!\"\n\texit(1)\nend\n\n# Get the current Git master hash and use it to set the CFBundleVersion value\nENV[\"PATH\"] = \"/bin:/sw/bin:/usr/local/git/bin:/usr/bin:/usr/local/bin:/sbin:/usr/sbin:/opt/local/bin\"\nexit(0) if `type git` == \"\"\nrev = `/usr/bin/env git show-ref --abbrev heads/master`\ninfo = \"#{ENV[\"BUILT_PRODUCTS_DIR\"]}/#{ENV[\"WRAPPER_NAME\"]}/Resources/Info.plist\"\nversion = rev.split(\" \")[0]\n\nif version.nil?\n\tSTDERR.print \"#{$0}: Can't find a Git hash!\"\n\texit(0)\nend\n\ninfo_contents = File.read(info)\nif info_contents.nil?\n\tSTDERR.print \"#{$0}: Can't read in the Info.plist file!\"\n\texit(1)\nend\n\ninfo_contents.sub!(/([\\t ]+<key>CFBundleVersion<\\/key>\\n[\\t ]+<string>).*?(<\\/string>)/, '\\1' + version + '\\2')\nSTDERR.print info_contents\nf = File.open(info, \"w\")\nf.write(info_contents)\nf.close";
 			showEnvVarsInLog = 0;
 		};
 		6195D4B40E40505A00D41A50 /* Run Script: Link fr_CA to fr */ = {
