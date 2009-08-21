@@ -48,7 +48,11 @@
 	FILE *fp = NULL, *cmdFP = NULL;
 	
 	// Get the file size.
-	NSNumber *fs = [[[NSFileManager defaultManager] fileAttributesAtPath:archivePath traverseLink:NO] objectForKey:NSFileSize];
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
+    NSNumber *fs = [[[NSFileManager defaultManager] fileAttributesAtPath:archivePath traverseLink:NO] objectForKey:NSFileSize];
+#else
+	NSNumber *fs = [[[NSFileManager defaultManager] attributesOfItemAtPath:archivePath error:NULL] objectForKey:NSFileSize];
+#endif
 	if (fs == nil) goto reportError;
 	
 	// Thank you, Allan Odgaard!
@@ -58,16 +62,26 @@
 	
 	setenv("DESTINATION", [[archivePath stringByDeletingLastPathComponent] fileSystemRepresentation], 1);
 	cmdFP = popen([command fileSystemRepresentation], "w");
+	long written;
 	if (!cmdFP) goto reportError;
 	
 	char buf[32*1024];
 	long len;
 	while((len = fread(buf, 1, 32*1024, fp)))
 	{				
-		fwrite(buf, 1, len, cmdFP);
+		written = fwrite(buf, 1, len, cmdFP);
+		if( written < len )
+		{
+			pclose(cmdFP);
+			goto reportError;
+		}
+			
 		[self performSelectorOnMainThread:@selector(_notifyDelegateOfExtractedLength:) withObject:[NSNumber numberWithLong:len] waitUntilDone:NO];
 	}
 	pclose(cmdFP);
+	
+	if( ferror( fp ) )
+		goto reportError;
 	
 	[self performSelectorOnMainThread:@selector(_notifyDelegateOfSuccess) withObject:nil waitUntilDone:NO];
 	goto finally;

@@ -8,6 +8,7 @@
 
 #import "SUPlainInstaller.h"
 #import "SUPlainInstallerInternals.h"
+#import "SUHost.h"
 
 NSString *SUInstallerPathKey = @"SUInstallerPath";
 NSString *SUInstallerHostKey = @"SUInstallerHost";

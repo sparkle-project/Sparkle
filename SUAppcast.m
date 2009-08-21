@@ -59,8 +59,11 @@
 	BOOL failed = NO;
 	NSArray *xmlItems = nil;
 	NSMutableArray *appcastItems = [NSMutableArray array];
-	
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
     [[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
+#else
+    [[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:NULL];
+#endif
     [downloadFilename release];
     downloadFilename = nil;
     
@@ -176,8 +179,11 @@
 - (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
 {
 	CFRelease(download);
-    
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
     [[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
+#else
+    [[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:NULL];
+#endif
     [downloadFilename release];
     downloadFilename = nil;
     
