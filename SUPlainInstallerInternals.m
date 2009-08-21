@@ -95,7 +95,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	return res;
 }
 
-+ (NSString *)_temporaryCopyNameForPath:(NSString *)path
++ (NSString *)_temporaryInstallationPathForPath:(NSString *)path
 {
 	// Let's try to read the version number so the filename will be more meaningful.
 	NSString *postFix;
@@ -121,7 +121,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 + (BOOL)_copyPathWithForcedAuthentication:(NSString *)src toPath:(NSString *)dst error:(NSError **)error
 {
-	NSString *tmp = [self _temporaryCopyNameForPath:dst];
+	NSString *tmp = [self _temporaryInstallationPathForPath:dst];
 	const char* srcPath = [src fileSystemRepresentation];
 	const char* tmpPath = [tmp fileSystemRepresentation];
 	const char* dstPath = [dst fileSystemRepresentation];
@@ -233,7 +233,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	if (![[NSFileManager defaultManager] isWritableFileAtPath:dst] || ![[NSFileManager defaultManager] isWritableFileAtPath:[dst stringByDeletingLastPathComponent]])
 		return [self _copyPathWithForcedAuthentication:src toPath:dst error:error];
 
-	NSString *tmpPath = [self _temporaryCopyNameForPath:dst];
+	NSString *tmpPath = [self _temporaryInstallationPathForPath:dst];
 #if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
     if (![[NSFileManager defaultManager] movePath:dst toPath:tmpPath handler:nil])
 #else
