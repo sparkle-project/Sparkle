@@ -14,12 +14,18 @@
 		5D06E8EC0FD68CE4005AE3F6 /* SUBinaryDeltaApply.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E00FD68CC7005AE3F6 /* SUBinaryDeltaApply.m */; };
 		5D06E8ED0FD68CE4005AE3F6 /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E20FD68CC7005AE3F6 /* SUBinaryDeltaCommon.m */; };
 		5D06E8FD0FD68D6B005AE3F6 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */; };
-		5D06E8FE0FD68D6B005AE3F6 /* libxar.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D06E8F90FD68D53005AE3F6 /* libxar.dylib */; };
 		5D06E8FF0FD68D6D005AE3F6 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */; };
-		5D06E9000FD68D6D005AE3F6 /* libxar.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D06E8F90FD68D53005AE3F6 /* libxar.dylib */; };
 		5D06E9050FD68D7D005AE3F6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		5D06E9390FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D06E9370FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.h */; };
 		5D06E93A0FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E9380FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m */; };
+		5D1AF58A0FD7678C0065DB48 /* libxarstatic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5890FD7678C0065DB48 /* libxarstatic.a */; };
+		5D1AF58B0FD7678C0065DB48 /* libxarstatic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5890FD7678C0065DB48 /* libxarstatic.a */; };
+		5D1AF5900FD767AD0065DB48 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF58F0FD767AD0065DB48 /* libxml2.dylib */; };
+		5D1AF5940FD767B90065DB48 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF58F0FD767AD0065DB48 /* libxml2.dylib */; };
+		5D1AF59A0FD767E50065DB48 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5990FD767E50065DB48 /* libz.dylib */; };
+		5D1AF59C0FD768010065DB48 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF59B0FD768010065DB48 /* libcrypto.dylib */; };
+		5D1AF82B0FD768180065DB48 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5990FD767E50065DB48 /* libz.dylib */; };
+		5D1AF82C0FD7681A0065DB48 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF59B0FD768010065DB48 /* libcrypto.dylib */; };
 		610134730DD250470049ACDF /* SUUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 610134710DD250470049ACDF /* SUUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
 		610134740DD250470049ACDF /* SUUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 610134720DD250470049ACDF /* SUUpdateDriver.m */; };
 		6101347B0DD2541A0049ACDF /* SUProbingUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 610134790DD2541A0049ACDF /* SUProbingUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
@@ -116,7 +122,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216 /* Sparkle */;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = Sparkle;
 		};
 		61227AB90DB5C4BB00AB99EA /* PBXContainerItemProxy */ = {
@@ -176,10 +182,13 @@
 		5D06E8F10FD68D21005AE3F6 /* ConfigBinaryDelta.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigBinaryDelta.xcconfig; sourceTree = "<group>"; };
 		5D06E8F20FD68D21005AE3F6 /* ConfigBinaryDeltaDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigBinaryDeltaDebug.xcconfig; sourceTree = "<group>"; };
 		5D06E8F30FD68D21005AE3F6 /* ConfigBinaryDeltaRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigBinaryDeltaRelease.xcconfig; sourceTree = "<group>"; };
-		5D06E8F90FD68D53005AE3F6 /* libxar.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxar.dylib; path = /usr/lib/libxar.dylib; sourceTree = "<absolute>"; };
 		5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbz2.dylib; path = /usr/lib/libbz2.dylib; sourceTree = "<absolute>"; };
 		5D06E9370FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBinaryDeltaUnarchiver.h; sourceTree = "<group>"; };
 		5D06E9380FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBinaryDeltaUnarchiver.m; sourceTree = "<group>"; };
+		5D1AF5890FD7678C0065DB48 /* libxarstatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libxarstatic.a; sourceTree = "<group>"; };
+		5D1AF58F0FD767AD0065DB48 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = /usr/lib/libxml2.dylib; sourceTree = "<absolute>"; };
+		5D1AF5990FD767E50065DB48 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
+		5D1AF59B0FD768010065DB48 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
 		610134710DD250470049ACDF /* SUUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdateDriver.h; sourceTree = "<group>"; };
 		610134720DD250470049ACDF /* SUUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdateDriver.m; sourceTree = "<group>"; };
 		610134790DD2541A0049ACDF /* SUProbingUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUProbingUpdateDriver.h; sourceTree = "<group>"; };
@@ -332,8 +341,11 @@
 			files = (
 				5D06E8D80FD68C8E005AE3F6 /* Sparkle.framework in Frameworks */,
 				5D06E8FF0FD68D6D005AE3F6 /* libbz2.dylib in Frameworks */,
-				5D06E9000FD68D6D005AE3F6 /* libxar.dylib in Frameworks */,
 				5D06E9050FD68D7D005AE3F6 /* Foundation.framework in Frameworks */,
+				5D1AF58B0FD7678C0065DB48 /* libxarstatic.a in Frameworks */,
+				5D1AF5900FD767AD0065DB48 /* libxml2.dylib in Frameworks */,
+				5D1AF59A0FD767E50065DB48 /* libz.dylib in Frameworks */,
+				5D1AF59C0FD768010065DB48 /* libcrypto.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -366,7 +378,10 @@
 				FAEFA2F70D94AA7500472538 /* Foundation.framework in Frameworks */,
 				FAEFA2F80D94AA7900472538 /* AppKit.framework in Frameworks */,
 				5D06E8FD0FD68D6B005AE3F6 /* libbz2.dylib in Frameworks */,
-				5D06E8FE0FD68D6B005AE3F6 /* libxar.dylib in Frameworks */,
+				5D1AF58A0FD7678C0065DB48 /* libxarstatic.a in Frameworks */,
+				5D1AF5940FD767B90065DB48 /* libxml2.dylib in Frameworks */,
+				5D1AF82B0FD768180065DB48 /* libz.dylib in Frameworks */,
+				5D1AF82C0FD7681A0065DB48 /* libcrypto.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -421,7 +436,10 @@
 				0867D6A5FE840307C02AAC07 /* AppKit.framework */,
 				0867D69BFE84028FC02AAC07 /* Foundation.framework */,
 				5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */,
-				5D06E8F90FD68D53005AE3F6 /* libxar.dylib */,
+				5D1AF58F0FD767AD0065DB48 /* libxml2.dylib */,
+				5D1AF5890FD7678C0065DB48 /* libxarstatic.a */,
+				5D1AF5990FD767E50065DB48 /* libz.dylib */,
+				5D1AF59B0FD768010065DB48 /* libcrypto.dylib */,
 			);
 			name = "Apple Frameworks and Libraries";
 			sourceTree = "<group>";
