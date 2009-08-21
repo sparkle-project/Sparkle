@@ -101,6 +101,19 @@
 	minimumSystemVersion = [systemVersionString copy];
 }
 
+- (NSDictionary *)deltaUpdates { return [[deltaUpdates retain] autorelease]; }
+- (void)setDeltaUpdates:(NSDictionary *)updates
+{
+	if (deltaUpdates == updates) return;
+	[deltaUpdates release];
+	deltaUpdates = [updates copy];
+}
+
+- (BOOL)isDeltaUpdate
+{
+	return [[propertiesDictionary objectForKey:@"enclosure"] objectForKey:@"sparkle:deltaFrom"] != nil;
+}
+
 - initWithDictionary:(NSDictionary *)dict
 {
 	self = [super init];
@@ -157,6 +170,24 @@
                 [self setReleaseNotesURL:[NSURL URLWithString:[self itemDescription]]];
             else
                 [self setReleaseNotesURL:nil];
+
+            if ([dict objectForKey:@"deltas"]) {
+                NSMutableDictionary *deltas = [NSMutableDictionary dictionary];
+                NSArray *deltaDictionaries = [dict objectForKey:@"deltas"];
+                NSEnumerator *deltaDictionariesEnum = [deltaDictionaries objectEnumerator];
+                NSDictionary *deltaDictionary;
+                while ((deltaDictionary = [deltaDictionariesEnum nextObject])) {
+                    NSMutableDictionary *fakeAppCastDict = [dict mutableCopy];
+                    [fakeAppCastDict removeObjectForKey:@"deltas"];
+                    [fakeAppCastDict setObject:deltaDictionary forKey:@"enclosure"];
+                    SUAppcastItem *deltaItem = [[[self class] alloc] initWithDictionary:fakeAppCastDict];
+                    [fakeAppCastDict release];
+
+                    [deltas setObject:deltaItem forKey:[deltaDictionary objectForKey:@"sparkle:deltaFrom"]];
+                    [deltaItem release];
+                }
+                [self setDeltaUpdates:deltas];
+            }
         }
 	}
 	return self;

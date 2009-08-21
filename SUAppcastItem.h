@@ -22,7 +22,9 @@
 	NSURL *fileURL;
 	NSString *versionString;
 	NSString *displayVersionString;
-	
+
+	NSDictionary *deltaUpdates;
+
 	NSDictionary *propertiesDictionary;
 }
 
@@ -38,6 +40,8 @@
 - (NSURL *)fileURL;
 - (NSString *)DSASignature;
 - (NSString *)minimumSystemVersion;
+- (NSDictionary *)deltaUpdates;
+- (BOOL)isDeltaUpdate;
 
 // Returns the dictionary provided in initWithDictionary; this might be useful later for extensions.
 - (NSDictionary *)propertiesDictionary;
