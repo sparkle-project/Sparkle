@@ -291,6 +291,25 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	return [NSURL URLWithString:[appcastString stringByTrimmingCharactersInSet:quoteSet]];
 }
 
+- (void)setUserAgentString:(NSString *)userAgent
+{
+	if (customUserAgentString == userAgent)
+		return;
+
+	[customUserAgentString release];
+	customUserAgentString = [userAgent copy];
+}
+
+- (NSString *)userAgentString
+{
+	if (customUserAgentString)
+		return customUserAgentString;
+
+	NSString *userAgent = [NSString stringWithFormat:@"%@/%@ Sparkle/%@", [host name], [host displayVersion], [SPARKLE_BUNDLE objectForInfoDictionaryKey:@"CFBundleVersion"] ?: nil];
+	NSData *cleanedAgent = [userAgent dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+	return [[[NSString alloc] initWithData:cleanedAgent encoding:NSASCIIStringEncoding] autorelease];
+}
+
 - (void)setSendsSystemProfile:(BOOL)sendsSystemProfile
 {
 	[host setBool:sendsSystemProfile forUserDefaultsKey:SUSendProfileInfoKey];

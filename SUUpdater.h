@@ -15,7 +15,8 @@
 @interface SUUpdater : NSObject {
 	NSTimer *checkTimer;
 	SUUpdateDriver *driver;
-	
+
+	NSString *customUserAgentString;
 	SUHost *host;
 	IBOutlet id delegate;
 }
@@ -37,6 +38,9 @@
 
 - (void)setFeedURL:(NSURL *)feedURL;
 - (NSURL *)feedURL;
+
+- (void)setUserAgentString:(NSString *)userAgent;
+- (NSString *)userAgentString;
 
 - (void)setSendsSystemProfile:(BOOL)sendsSystemProfile;
 - (BOOL)sendsSystemProfile;
