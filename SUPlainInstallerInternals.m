@@ -235,7 +235,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 	NSString *tmpPath = [self _temporaryCopyNameForPath:dst];
 #if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-    if (![[NSFileManager defaultManager] movePath:dst toPath:tmpPath handler:self])
+    if (![[NSFileManager defaultManager] movePath:dst toPath:tmpPath handler:nil])
 #else
 	if (![[NSFileManager defaultManager] moveItemAtPath:dst toPath:tmpPath error:NULL])
 #endif
@@ -245,7 +245,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		return NO;			
 	}
 #if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
-    if (![[NSFileManager defaultManager] copyPath:src toPath:dst handler:self])
+    if (![[NSFileManager defaultManager] copyPath:src toPath:dst handler:nil])
 #else
 	if (![[NSFileManager defaultManager] copyItemAtPath:src toPath:dst error:NULL])
 #endif
