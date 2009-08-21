@@ -33,7 +33,11 @@
 	if ([[NSFileManager defaultManager] fileExistsAtPath:mountPoint]) goto reportError;
 
 	// create mount point folder
-	[[NSFileManager defaultManager] createDirectoryAtPath:mountPoint attributes:nil];
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
+    [[NSFileManager defaultManager] createDirectoryAtPath:mountPoint attributes:nil];
+#else
+	[[NSFileManager defaultManager] createDirectoryAtPath:mountPoint withIntermediateDirectories:YES attributes:nil error:NULL];
+#endif
 	if (![[NSFileManager defaultManager] fileExistsAtPath:mountPoint]) goto reportError;
 
 	NSArray* arguments = [NSArray arrayWithObjects:@"attach", archivePath, @"-mountpoint", mountPoint, @"-noverify", @"-nobrowse", @"-noautoopen", nil];
@@ -47,16 +51,29 @@
 	
 	// Now that we've mounted it, we need to copy out its contents.
 	NSString *targetPath = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[mountPoint lastPathComponent]];
-	if (![[NSFileManager defaultManager] createDirectoryAtPath:targetPath attributes:nil]) goto reportError;
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
+    if (![[NSFileManager defaultManager] createDirectoryAtPath:targetPath attributes:nil]) goto reportError;
+#else
+	if (![[NSFileManager defaultManager] createDirectoryAtPath:targetPath withIntermediateDirectories:YES attributes:nil error:NULL]) goto reportError;
+#endif
 	
 	// We can't just copyPath: from the volume root because that always fails. Seems to be a bug.
-	id subpathEnumerator = [[[NSFileManager defaultManager] directoryContentsAtPath:mountPoint] objectEnumerator], currentSubpath;
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
+    id subpathEnumerator = [[[NSFileManager defaultManager] directoryContentsAtPath:mountPoint] objectEnumerator];
+#else
+	id subpathEnumerator = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:mountPoint error:NULL] objectEnumerator];
+#endif
+	NSString *currentSubpath;
 	while ((currentSubpath = [subpathEnumerator nextObject]))
 	{
 		NSString *currentFullPath = [mountPoint stringByAppendingPathComponent:currentSubpath];
 		// Don't bother trying (and failing) to copy out files we can't read. That's not going to be the app anyway.
 		if (![[NSFileManager defaultManager] isReadableFileAtPath:currentFullPath]) continue;
-		if (![[NSFileManager defaultManager] copyPath:currentFullPath toPath:[targetPath stringByAppendingPathComponent:currentSubpath] handler:nil])
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
+        if (![[NSFileManager defaultManager] copyPath:currentFullPath toPath:[targetPath stringByAppendingPathComponent:currentSubpath] handler:nil])
+#else
+		if (![[NSFileManager defaultManager] copyItemAtPath:currentFullPath toPath:[targetPath stringByAppendingPathComponent:currentSubpath] error:NULL])
+#endif
 			goto reportError;
 	}
 			
@@ -70,7 +87,11 @@ finally:
 	if (mountedSuccessfully)
 		[NSTask launchedTaskWithLaunchPath:@"/usr/bin/hdiutil" arguments:[NSArray arrayWithObjects:@"detach", mountPoint, @"-force", nil]];
 	else
-		[[NSFileManager defaultManager] removeFileAtPath:mountPoint handler:nil];
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
+        [[NSFileManager defaultManager] removeFileAtPath:mountPoint handler:nil];
+#else
+		[[NSFileManager defaultManager] removeItemAtPath:mountPoint error:NULL];
+#endif
 	[pool drain];
 }
 

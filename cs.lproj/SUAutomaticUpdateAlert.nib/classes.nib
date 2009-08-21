@@ -6,12 +6,6 @@
 	<array>
 		<dict>
 			<key>CLASS</key>
-			<string>NSObject</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>SUWindowController</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -21,26 +15,17 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>finishPrompt</key>
+				<key>doNotInstall</key>
 				<string>id</string>
-				<key>toggleMoreInfo</key>
+				<key>installLater</key>
+				<string>id</string>
+				<key>installNow</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
-			<string>SUUpdatePermissionPrompt</string>
+			<string>SUAutomaticUpdateAlert</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>delegate</key>
-				<string>id</string>
-				<key>descriptionTextField</key>
-				<string>NSTextField</string>
-				<key>moreInfoButton</key>
-				<string>NSButton</string>
-				<key>moreInfoView</key>
-				<string>NSView</string>
-			</dict>
 			<key>SUPERCLASS</key>
 			<string>SUWindowController</string>
 		</dict>
@@ -51,6 +36,12 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

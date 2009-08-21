@@ -13,6 +13,7 @@
 #import "SUInstaller.h"
 #import "SUVersionComparisonProtocol.h"
 
+@class SUHost;
 @interface SUPlainInstaller : SUInstaller { }
 + (void)performInstallationWithPath:(NSString *)path host:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator;
 @end
