@@ -31,7 +31,7 @@
 - (void)_notifyDelegateOfExtractedLength:(NSNumber *)length
 {
 	if ([delegate respondsToSelector:@selector(unarchiver:extractedLength:)])
-		[delegate unarchiver:self extractedLength:[length doubleValue]];
+		[delegate unarchiver:self extractedLength:[length longValue]];
 }
 
 - (void)_notifyDelegateOfSuccess
