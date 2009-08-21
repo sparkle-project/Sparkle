@@ -1137,6 +1137,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = "Sparkle Unit Tests";
+				WARNING_CFLAGS = "";
 				WRAPPER_EXTENSION = octest;
 				ZERO_LINK = NO;
 			};
