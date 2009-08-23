@@ -221,7 +221,7 @@
 #endif
 	{
 	 	NSString *versionPlistPath = @"/System/Library/CoreServices/SystemVersion.plist";
-		verStr = [[[NSDictionary dictionaryWithContentsOfFile:versionPlistPath] objectForKey:@"ProductVersion"] retain];
+		verStr = [[NSDictionary dictionaryWithContentsOfFile:versionPlistPath] objectForKey:@"ProductVersion"];
 	}
 	return verStr;
 }

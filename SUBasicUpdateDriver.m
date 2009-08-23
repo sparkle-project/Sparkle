@@ -30,10 +30,7 @@
 	[appcast release];
 	
 	[appcast setDelegate:self];
-	NSString *userAgent = [NSString stringWithFormat: @"%@/%@ Sparkle/%@", [aHost name], [aHost displayVersion], ([SPARKLE_BUNDLE objectForInfoDictionaryKey:@"CFBundleVersion"] ?: nil)];
-	NSData * cleanedAgent = [userAgent dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-	userAgent = [[[NSString alloc] initWithData:cleanedAgent encoding:NSASCIIStringEncoding] autorelease];
-	[appcast setUserAgentString:userAgent];
+	[appcast setUserAgentString:[updater userAgentString]];
 	[appcast fetchAppcastFromURL:URL];
 }
 
@@ -134,7 +131,9 @@
 
 - (void)downloadUpdate
 {
-	download = [[NSURLDownload alloc] initWithRequest:[NSURLRequest requestWithURL:[updateItem fileURL]] delegate:self];	
+	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[updateItem fileURL]];
+	[request setValue:[updater userAgentString] forHTTPHeaderField:@"User-Agent"];
+	download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
 }
 
 - (void)download:(NSURLDownload *)d decideDestinationWithSuggestedFilename:(NSString *)name
@@ -280,7 +279,7 @@
 	static BOOL postponedOnce = NO;
 	if (!postponedOnce && [[updater delegate] respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
 	{
-		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[[self class] instanceMethodSignatureForSelector:@selector(relaunchHostApp)] retain]];
+		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(relaunchHostApp)]];
 		[invocation setSelector:@selector(relaunchHostApp)];
 		[invocation setTarget:self];
 		postponedOnce = YES;
