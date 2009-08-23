@@ -257,7 +257,7 @@
 	static BOOL postponedOnce = NO;
 	if (!postponedOnce && [[updater delegate] respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
 	{
-		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[[self class] instanceMethodSignatureForSelector:@selector(relaunchHostApp)] retain]];
+		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(relaunchHostApp)]];
 		[invocation setSelector:@selector(relaunchHostApp)];
 		[invocation setTarget:self];
 		postponedOnce = YES;
