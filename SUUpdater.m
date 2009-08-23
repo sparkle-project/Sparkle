@@ -174,6 +174,8 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 
 - (void)checkForUpdatesInBackground
 {
+	checkTimer = nil; // Timer doesn't repeat, so it's invalid, just needs to be set to nil.
+	
 	[self checkForUpdatesWithDriver:[[[([self automaticallyDownloadsUpdates] ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class]) alloc] initWithUpdater:self] autorelease]];
 }
 
