@@ -12,7 +12,8 @@
 #import "SUPlainInstaller.h"
 
 @interface SUPlainInstaller (Internals)
-+ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst error:(NSError **)error;
++ (NSString *)temporaryNameForPath:(NSString *)path;
++ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp error:(NSError **)error;
 @end
 
 #endif

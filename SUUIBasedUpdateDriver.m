@@ -157,6 +157,7 @@
 	{
 		[statusController close];
 		[statusController autorelease];
+		statusController = nil;
 	}
 }
 
@@ -173,6 +174,7 @@
 	{
 		[statusController close];
 		[statusController autorelease];
+		statusController = nil;
 	}
 	[super abortUpdate];
 }

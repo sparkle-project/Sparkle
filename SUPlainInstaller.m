@@ -8,45 +8,53 @@
 
 #import "SUPlainInstaller.h"
 #import "SUPlainInstallerInternals.h"
-#import "SUHost.h"
 
 NSString *SUInstallerPathKey = @"SUInstallerPath";
+NSString *SUInstallerTargetPathKey = @"SUInstallerTargetPath";
+NSString *SUInstallerTempNameKey = @"SUInstallerTempName";
 NSString *SUInstallerHostKey = @"SUInstallerHost";
 NSString *SUInstallerDelegateKey = @"SUInstallerDelegate";
-NSString *SUInstallerVersionComparatorKey = @"SUInstallerVersionComparator";
+NSString *SUInstallerResultKey = @"SUInstallerResult";
+NSString *SUInstallerErrorKey = @"SUInstallerError";
 
 @implementation SUPlainInstaller
 
-+ (void)installPath:(NSString *)path overHost:(SUHost *)bundle delegate:delegate versionComparator:(id <SUVersionComparison>)comparator
++ (void)_finishInstallationWithInfo:(NSDictionary *)info
 {
-	NSError *error;
-	BOOL result = YES;
-
-	// Prevent malicious downgrades:
-	if ([comparator compareVersion:[bundle version] toVersion:[[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:@"CFBundleVersion"]] == NSOrderedDescending)
-	{
-		NSString * errorMessage = [NSString stringWithFormat:@"Sparkle Updater: Possible attack in progress! Attempting to \"upgrade\" from %@ to %@. Aborting update.", [bundle version], [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:@"CFBundleVersion"]];
-		result = NO;
-		error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
-	}
-	
-	if (result)
-		result = [self copyPathWithAuthentication:path overPath:[bundle bundlePath] error:&error];
-	[self _finishInstallationWithResult:result host:bundle error:error delegate:delegate];
+	[self _finishInstallationWithResult:[[info objectForKey:SUInstallerResultKey] boolValue] host:[info objectForKey:SUInstallerHostKey] error:[info objectForKey:SUInstallerErrorKey] delegate:[info objectForKey:SUInstallerDelegateKey]];
 }
 
 + (void)_performInstallationWithInfo:(NSDictionary *)info
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
-	[self installPath:[info objectForKey:SUInstallerPathKey] overHost:[info objectForKey:SUInstallerHostKey] delegate:[info objectForKey:SUInstallerDelegateKey] versionComparator:[info objectForKey:SUInstallerVersionComparatorKey]];
+	NSError *error = nil;
 	
+	BOOL result = [self copyPathWithAuthentication:[info objectForKey:SUInstallerPathKey] overPath:[info objectForKey:SUInstallerTargetPathKey] temporaryName:[info objectForKey:SUInstallerTempNameKey] error:&error];
+	
+	NSMutableDictionary *mutableInfo = [[info mutableCopy] autorelease];
+	[mutableInfo setObject:[NSNumber numberWithBool:result] forKey:SUInstallerResultKey];
+	if (!result && error)
+		[mutableInfo setObject:error forKey:SUInstallerErrorKey];
+	[self performSelectorOnMainThread:@selector(_finishInstallationWithInfo:) withObject:mutableInfo waitUntilDone:NO];
+    
 	[pool drain];
 }
 
 + (void)performInstallationWithPath:(NSString *)path host:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
 {
-	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:path, SUInstallerPathKey, host, SUInstallerHostKey, delegate, SUInstallerDelegateKey, comparator, SUInstallerVersionComparatorKey, nil];
+	// Prevent malicious downgrades:
+	if ([comparator compareVersion:[host version] toVersion:[[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:@"CFBundleVersion"]] == NSOrderedDescending)
+	{
+		NSString * errorMessage = [NSString stringWithFormat:@"Sparkle Updater: Possible attack in progress! Attempting to \"upgrade\" from %@ to %@. Aborting update.", [host version], [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:@"CFBundleVersion"]];
+		NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
+		[self _finishInstallationWithResult:NO host:host error:error delegate:delegate];
+		return;
+	}
+    
+    NSString *targetPath = [host bundlePath];
+    NSString *tempName = [self temporaryNameForPath:targetPath];
+	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:path, SUInstallerPathKey, targetPath, SUInstallerTargetPathKey, tempName, SUInstallerTempNameKey, host, SUInstallerHostKey, delegate, SUInstallerDelegateKey, nil];
 	if (synchronously)
 		[self _performInstallationWithInfo:info];
 	else
