@@ -48,7 +48,7 @@
 	FILE *fp = NULL, *cmdFP = NULL;
 	
 	// Get the file size.
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
     NSNumber *fs = [[[NSFileManager defaultManager] fileAttributesAtPath:archivePath traverseLink:NO] objectForKey:NSFileSize];
 #else
 	NSNumber *fs = [[[NSFileManager defaultManager] attributesOfItemAtPath:archivePath error:NULL] objectForKey:NSFileSize];
