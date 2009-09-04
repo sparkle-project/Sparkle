@@ -11,7 +11,7 @@
 			<string key="NS.object.0">732</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="41"/>
+			<integer value="39"/>
 			<integer value="6"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
@@ -412,10 +412,10 @@
 						<object class="NSTextFieldCell" key="NSCell" id="325029528">
 							<int key="NSCellFlags">67239424</int>
 							<int key="NSCellFlags2">272629760</int>
-							<string type="base64-UTF8" key="NSContents">TGUgaW5mb3JtYXppb25pIGRlbCBwcm9maWxvIGRpIHNpc3RlbWEgYW5vbWlubyBzb25vIHV0aWxpenph
+							<string type="base64-UTF8" key="NSContents">TGUgaW5mb3JtYXppb25pIGRlbCBwcm9maWxvIGRpIHNpc3RlbWEgYW5vbmltbyBzb25vIHV0aWxpenph
 dGUgcGVyIGFpdXRhcmNpIGluIGZ1dHVyaSBsYXZvcmkgZGkgc3ZpbHVwcG8uIENvbnRhdHRhY2kgc2Ug
-aGFpIGRlaSBxdWVzaXRpIHN1bGwnYXJnb21lbnRvLgoKUXVlc3RlIHNvbm8gbGUgaW5mb3JtYXppb25p
-IGNoZSB2ZXJyZWJiZXJvIGludmlhdGU6A</string>
+aGFpIGRlaSBxdWVzaXRpIHN1bGzigJlhcmdvbWVudG8uCgpRdWVzdGUgc29ubyBsZSBpbmZvcm1hemlv
+bmkgY2hlIHZlcnJlYmJlcm8gaW52aWF0ZTo</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="960497707"/>
 							<reference key="NSBackgroundColor" ref="307098406"/>
