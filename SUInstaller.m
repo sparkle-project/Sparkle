@@ -38,6 +38,7 @@
 	// Search subdirectories for the application
 	NSString *currentFile, *newAppDownloadPath = nil, *bundleFileName = [[host bundlePath] lastPathComponent], *alternateBundleFileName = [[host name] stringByAppendingPathExtension:[[host bundlePath] pathExtension]];
 	BOOL isPackage = NO;
+	NSString *fallbackPackagePath = nil;
 	NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:updateFolder];
 	while ((currentFile = [dirEnum nextObject]))
 	{
@@ -49,12 +50,20 @@
 			newAppDownloadPath = currentPath;
 			break;
 		}
-		else if (([[currentFile pathExtension] isEqualToString:@"pkg"] || [[currentFile pathExtension] isEqualToString:@"mpkg"]) &&
-				 [[[currentFile lastPathComponent] stringByDeletingPathExtension] isEqualToString:[bundleFileName stringByDeletingPathExtension]])
+		else if ([[currentFile pathExtension] isEqualToString:@"pkg"] ||
+				 [[currentFile pathExtension] isEqualToString:@"mpkg"])
 		{
-			isPackage = YES;
-			newAppDownloadPath = currentPath;
-			break;
+			if ([[[currentFile lastPathComponent] stringByDeletingPathExtension] isEqualToString:[bundleFileName stringByDeletingPathExtension]])
+			{
+				isPackage = YES;
+				newAppDownloadPath = currentPath;
+				break;
+			}
+			else
+			{
+				// Remember any other non-matching packages we have seen should we need to use one of them as a fallback.
+				fallbackPackagePath = currentPath;
+			}
 		}
 		else
 		{
@@ -71,6 +80,14 @@
 		// Some DMGs have symlinks into /Applications! That's no good!
 		if ([self _isAliasFolderAtPath:currentPath])
 			[dirEnum skipDescendents];
+	}
+
+	// We don't have a valid path. Try to use the fallback package.
+
+	if (newAppDownloadPath == nil && fallbackPackagePath != nil)
+	{
+		isPackage = YES;
+		newAppDownloadPath = fallbackPackagePath;
 	}
 	
 	if (newAppDownloadPath == nil)
