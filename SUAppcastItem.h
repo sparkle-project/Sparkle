@@ -28,6 +28,7 @@
 
 // Initializes with data from a dictionary provided by the RSS class.
 - initWithDictionary:(NSDictionary *)dict;
+- initWithDictionary:(NSDictionary *)dict failureReason:(NSString**)error;
 
 - (NSString *)title;
 - (NSString *)versionString;

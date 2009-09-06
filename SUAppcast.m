@@ -142,7 +142,8 @@
 				}
             }
             
-			SUAppcastItem *anItem = [[SUAppcastItem alloc] initWithDictionary:dict];
+			NSString *errString;
+			SUAppcastItem *anItem = [[SUAppcastItem alloc] initWithDictionary:dict failureReason:&errString];
             if (anItem)
             {
                 [appcastItems addObject:anItem];
@@ -150,7 +151,7 @@
 			}
             else
             {
-				NSLog(@"Sparkle Updater: Failed to parse appcast item with appcast dictionary %@!", dict);
+				NSLog(@"Sparkle Updater: Failed to parse appcast item: %@.\nAppcast dictionary was: %@", errString, dict);
             }
             [nodesDict removeAllObjects];
             [dict removeAllObjects];

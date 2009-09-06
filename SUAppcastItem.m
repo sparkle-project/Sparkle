@@ -103,10 +103,23 @@
 
 - initWithDictionary:(NSDictionary *)dict
 {
+	return [self initWithDictionary:dict failureReason:nil];
+}
+
+- initWithDictionary:(NSDictionary *)dict failureReason:(NSString**)error
+{
 	self = [super init];
 	if (self)
 	{
 		id enclosure = [dict objectForKey:@"enclosure"];
+		
+		if (!enclosure)
+		{
+			if (error)
+				*error = @"No enclosure in feed item";
+			[self release];
+			return nil;
+		}
 		
 		// Try to find a version string.
 		// Finding the new version number from the RSS feed is a little bit hacky. There are two ways:
@@ -125,39 +138,47 @@
 			if ([fileComponents count] > 1)
 				newVersion = [[fileComponents lastObject] stringByDeletingPathExtension];
 		}
+		
+		if (![enclosure objectForKey:@"url"] )
+		{
+			if (error)
+				*error = @"Feed item's enclosure lacks URL";
+			[self release];
+			return nil;
+		}
+		
+		if(!newVersion )
+		{
+			if (error)
+				*error = @"Feed item lacks sparkle:version attribute, and version couldn't be deduced from file name (would have used last component of a file name like AppName_1.3.4.zip)";
+			[self release];
+			return nil;
+		}
         
-		if (enclosure == nil || [enclosure objectForKey:@"url"] == nil || newVersion == nil)
-        {
-            [self release];
-            self = nil;
-        }
-        else
-        {
-            propertiesDictionary = [[NSMutableDictionary alloc] initWithDictionary:dict];
-            [self setTitle:[dict objectForKey:@"title"]];
-            [self setDate:[dict objectForKey:@"pubDate"]];
-            [self setItemDescription:[dict objectForKey:@"description"]];
-            
-            [self setFileURL:[NSURL URLWithString:[[enclosure objectForKey:@"url"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
-            [self setDSASignature:[enclosure objectForKey:@"sparkle:dsaSignature"]];		
-            
-            [self setVersionString:newVersion];
-            [self setMinimumSystemVersion:[dict objectForKey:@"sparkle:minimumSystemVersion"]];
-            
-            NSString *shortVersionString = [enclosure objectForKey:@"sparkle:shortVersionString"];
-            if (shortVersionString)
-                [self setDisplayVersionString:shortVersionString];
-            else
-                [self setDisplayVersionString:[self versionString]];
-            
-            // Find the appropriate release notes URL.
-            if ([dict objectForKey:@"sparkle:releaseNotesLink"])
-                [self setReleaseNotesURL:[NSURL URLWithString:[dict objectForKey:@"sparkle:releaseNotesLink"]]];
-            else if ([[self itemDescription] hasPrefix:@"http://"]) // if the description starts with http://, use that.
-                [self setReleaseNotesURL:[NSURL URLWithString:[self itemDescription]]];
-            else
-                [self setReleaseNotesURL:nil];
-        }
+		propertiesDictionary = [[NSMutableDictionary alloc] initWithDictionary:dict];
+		[self setTitle:[dict objectForKey:@"title"]];
+		[self setDate:[dict objectForKey:@"pubDate"]];
+		[self setItemDescription:[dict objectForKey:@"description"]];
+		
+		[self setFileURL:[NSURL URLWithString:[[enclosure objectForKey:@"url"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+		[self setDSASignature:[enclosure objectForKey:@"sparkle:dsaSignature"]];		
+		
+		[self setVersionString:newVersion];
+		[self setMinimumSystemVersion:[dict objectForKey:@"sparkle:minimumSystemVersion"]];
+		
+		NSString *shortVersionString = [enclosure objectForKey:@"sparkle:shortVersionString"];
+		if (shortVersionString)
+			[self setDisplayVersionString:shortVersionString];
+		else
+			[self setDisplayVersionString:[self versionString]];
+		
+		// Find the appropriate release notes URL.
+		if ([dict objectForKey:@"sparkle:releaseNotesLink"])
+			[self setReleaseNotesURL:[NSURL URLWithString:[dict objectForKey:@"sparkle:releaseNotesLink"]]];
+		else if ([[self itemDescription] hasPrefix:@"http://"]) // if the description starts with http://, use that.
+			[self setReleaseNotesURL:[NSURL URLWithString:[self itemDescription]]];
+		else
+			[self setReleaseNotesURL:nil];
 	}
 	return self;
 }
