@@ -180,11 +180,14 @@
 - (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
 {
 	CFRelease(download);
+	if (downloadFilename)
+	{
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-    [[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
+		[[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
 #else
-    [[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:NULL];
+		[[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:NULL];
 #endif
+	}
     [downloadFilename release];
     downloadFilename = nil;
     
