@@ -14,9 +14,9 @@
 
 - (id)initWithBundle:(NSBundle *)aBundle
 {
-    if (aBundle == nil) aBundle = [NSBundle mainBundle];
 	if ((self = [super init]))
 	{
+		if (aBundle == nil) aBundle = [NSBundle mainBundle];
         bundle = [aBundle retain];
 		if (![bundle bundleIdentifier])
 			NSLog(@"Sparkle Error: the bundle being updated at %@ has no CFBundleIdentifier! This will cause preference read/write to not work properly.", bundle);
@@ -114,7 +114,7 @@
 	// More likely, we've got a reference to a Resources file by filename:
 	NSString *keyFilename = [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];
 	if (!keyFilename) { return nil; }
-	NSError *ignoreErr;
+	NSError *ignoreErr = nil;
 	return [NSString stringWithContentsOfFile:[bundle pathForResource:keyFilename ofType:nil] encoding:NSASCIIStringEncoding error: &ignoreErr];
 }
 
@@ -135,18 +135,14 @@
 
 - (id)objectForUserDefaultsKey:(NSString *)defaultName
 {
-	// Under Tiger, CFPreferencesCopyAppValue doesn't get values from NSRegistratioDomain, so anything
+	// Under Tiger, CFPreferencesCopyAppValue doesn't get values from NSRegistrationDomain, so anything
 	// passed into -[NSUserDefaults registerDefaults:] is ignored.  The following line falls
 	// back to using NSUserDefaults, but only if the host bundle is the main bundle.
 	if (bundle == [NSBundle mainBundle])
 		return [[NSUserDefaults standardUserDefaults] objectForKey:defaultName];
 	
 	CFPropertyListRef obj = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
-#if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4
-	return [NSMakeCollectable(obj) autorelease];
-#else
-	return [(id)obj autorelease];
-#endif	
+	return [(id)CFMakeCollectable(obj) autorelease];
 }
 
 - (void)setObject:(id)value forUserDefaultsKey:(NSString *)defaultName;

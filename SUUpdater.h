@@ -12,7 +12,9 @@
 #import <Sparkle/SUVersionComparisonProtocol.h>
 
 @class SUUpdateDriver, SUAppcastItem, SUHost, SUAppcast;
-@interface SUUpdater : NSObject {
+@interface SUUpdater : NSObject
+{
+@private
 	NSTimer *checkTimer;
 	SUUpdateDriver *driver;
 

@@ -185,14 +185,14 @@
 
 - (void)dealloc
 {
-    [self setTitle:nil];
-    [self setDate:nil];
-    [self setItemDescription:nil];
-    [self setReleaseNotesURL:nil];
-    [self setDSASignature:nil];
-    [self setFileURL:nil];
-    [self setVersionString:nil];
-	[self setDisplayVersionString:nil];
+	[title release];
+	[date release];
+	[itemDescription release];
+	[releaseNotesURL release];
+	[DSASignature release];
+	[fileURL release];
+	[versionString release];
+	[displayVersionString release];
 	[propertiesDictionary release];
     [super dealloc];
 }

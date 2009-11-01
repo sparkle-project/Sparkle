@@ -34,9 +34,9 @@
 	// Gather profile information and append it to the URL.
 	NSMutableArray *profileArray = [NSMutableArray array];
 	NSArray *profileDictKeys = [NSArray arrayWithObjects:@"key", @"displayKey", @"value", @"displayValue", nil];
-	int error = 0 ;
-	int value = 0 ;
-	unsigned long length = sizeof(value) ;
+	int error = 0;
+	int value = 0;
+	size_t length = sizeof(value);
 	
 	// OS version
 	NSString *currentSystemVersion = [SUHost systemVersionString];
@@ -89,18 +89,18 @@
 	}
 	error = sysctlbyname("hw.model", NULL, &length, NULL, 0);
 	if (error == 0) {
-		char *cpuModel;
-		cpuModel = (char *)malloc(sizeof(char) * length);
-		error = sysctlbyname("hw.model", cpuModel, &length, NULL, 0);
-		if (error == 0) {
-			NSString *rawModelName = [NSString stringWithUTF8String:cpuModel];
-			NSString *visibleModelName = [modelTranslation objectForKey:rawModelName];
-			if (visibleModelName == nil)
-				visibleModelName = rawModelName;
-			[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"model",@"Mac Model", rawModelName, visibleModelName, nil] forKeys:profileDictKeys]];
-		}
-		if (cpuModel != NULL)
+		char *cpuModel = (char *)malloc(sizeof(char) * length);
+		if (cpuModel != NULL) {
+			error = sysctlbyname("hw.model", cpuModel, &length, NULL, 0);
+			if (error == 0) {
+				NSString *rawModelName = [NSString stringWithUTF8String:cpuModel];
+				NSString *visibleModelName = [modelTranslation objectForKey:rawModelName];
+				if (visibleModelName == nil)
+					visibleModelName = rawModelName;
+				[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"model",@"Mac Model", rawModelName, visibleModelName, nil] forKeys:profileDictKeys]];
+			}
 			free(cpuModel);
+		}
 	}
 	
 	// Number of CPUs
@@ -111,7 +111,7 @@
 	// User preferred language
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
 	NSArray *languages = [defs objectForKey:@"AppleLanguages"];
-	if (languages && ([languages count] > 0))
+	if ([languages count] > 0)
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"lang",@"Preferred Language", [languages objectAtIndex:0], [languages objectAtIndex:0],nil] forKeys:profileDictKeys]];
 	
 	// Application sending the request
@@ -124,9 +124,8 @@
 	
 	// Number of displays?
 	// CPU speed
-	OSErr err;
 	SInt32 gestaltInfo;
-	err = Gestalt(gestaltProcClkSpeedMHz,&gestaltInfo);
+	OSErr err = Gestalt(gestaltProcClkSpeedMHz,&gestaltInfo);
 	if (err == noErr)
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"cpuFreqMHz",@"CPU Speed (GHz)", [NSNumber numberWithInt:gestaltInfo], [NSNumber numberWithDouble:gestaltInfo/1000.0],nil] forKeys:profileDictKeys]];
 	

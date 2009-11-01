@@ -94,7 +94,7 @@
 	}
     
     updateItem = [item retain];
-	CFRelease(ac); // Remember that we're explicitly managing the memory of the appcast.
+	if (ac) { CFRelease(ac); } // Remember that we're explicitly managing the memory of the appcast.
 	if (updateItem == nil) { [self didNotFindUpdate]; return; }
 	
 	if ([self itemContainsValidUpdate:updateItem])
@@ -105,7 +105,7 @@
 
 - (void)appcast:(SUAppcast *)ac failedToLoadWithError:(NSError *)error
 {
-	CFRelease(ac); // Remember that we're explicitly managing the memory of the appcast.
+	if (ac) { CFRelease(ac); } // Remember that we're explicitly managing the memory of the appcast.
 	[self abortUpdateWithError:error];
 }
 
@@ -139,27 +139,31 @@
 	// We create a temporary directory in /tmp and stick the file there.
 	// Not using a GUID here because hdiutil (for DMGs) for some reason chokes on GUIDs. Too long? I really have no idea.
 	NSString *prefix = [NSString stringWithFormat:@"%@ %@ Update", [host name], [host version]];
-	NSString *tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:prefix];
-	int cnt=1;
-	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
+	NSString *tempDir = NSTemporaryDirectory();
+	if (tempDir)
 	{
-		tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", prefix, cnt++]];
-	}
+		tempDir = [tempDir stringByAppendingPathComponent:prefix];
+		unsigned int cnt=1;
+		while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
+		{
+			tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %u", prefix, cnt++]];
+		}
 	
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-	BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir attributes:nil];
+		BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir attributes:nil];
 #else
-	BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir withIntermediateDirectories:YES attributes:nil error:NULL];
+		BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir withIntermediateDirectories:YES attributes:nil error:nil];
 #endif
-	if (!success)
-	{
-		// Okay, something's really broken with /tmp
-		[download cancel];
-		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Can't make a temporary directory for the update download at %@.",tempDir] forKey:NSLocalizedDescriptionKey]]];
+		if (!success)
+		{
+			// Okay, something's really broken with /tmp
+			[download cancel];
+			[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Can't make a temporary directory for the update download at %@.",tempDir] forKey:NSLocalizedDescriptionKey]]];
+		}
+		
+		downloadPath = [[tempDir stringByAppendingPathComponent:name] retain];
+		[download setDestination:downloadPath allowOverwrite:YES];
 	}
-	
-	downloadPath = [[tempDir stringByAppendingPathComponent:name] retain];
-	[download setDestination:downloadPath allowOverwrite:YES];
 }
 
 - (void)downloadDidFinish:(NSURLDownload *)d
@@ -226,8 +230,9 @@
 {
 	if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdate:)])
 		[[updater delegate] updater:updater willInstallUpdate:updateItem];
+	
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
-	NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]]  pathForResource:@"relaunch" ofType:@""];
+	NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]] pathForResource:@"relaunch" ofType:@""];
 	NSString *targetPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
 	NSError *error = nil;
@@ -235,7 +240,7 @@
     [[NSFileManager defaultManager] removeFileAtPath:targetPath handler:nil];
 	if ([[NSFileManager defaultManager] copyPath:relaunchPathToCopy toPath:targetPath handler:nil])
 #else
-	[[NSFileManager defaultManager] removeItemAtPath:targetPath error:NULL];
+	[[NSFileManager defaultManager] removeItemAtPath:targetPath error:nil];
 	if ([[NSFileManager defaultManager] copyItemAtPath:relaunchPathToCopy toPath:targetPath error:&error])
 #endif
 		relaunchPath = [targetPath retain];
@@ -292,7 +297,7 @@
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
     [[NSFileManager defaultManager] removeFileAtPath:[downloadPath stringByDeletingLastPathComponent] handler:nil];
 #else
-	[[NSFileManager defaultManager] removeItemAtPath:[downloadPath stringByDeletingLastPathComponent] error:NULL];
+	[[NSFileManager defaultManager] removeItemAtPath:[downloadPath stringByDeletingLastPathComponent] error:nil];
 #endif
 }
 

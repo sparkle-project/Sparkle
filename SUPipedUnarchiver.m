@@ -49,9 +49,9 @@
 	
 	// Get the file size.
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-    NSNumber *fs = [[[NSFileManager defaultManager] fileAttributesAtPath:archivePath traverseLink:NO] objectForKey:NSFileSize];
+	NSNumber *fs = [[[NSFileManager defaultManager] fileAttributesAtPath:archivePath traverseLink:NO] objectForKey:NSFileSize];
 #else
-	NSNumber *fs = [[[NSFileManager defaultManager] attributesOfItemAtPath:archivePath error:NULL] objectForKey:NSFileSize];
+	NSNumber *fs = [[[NSFileManager defaultManager] attributesOfItemAtPath:archivePath error:nil] objectForKey:NSFileSize];
 #endif
 	if (fs == nil) goto reportError;
 	
@@ -62,11 +62,11 @@
 	
 	setenv("DESTINATION", [[archivePath stringByDeletingLastPathComponent] fileSystemRepresentation], 1);
 	cmdFP = popen([command fileSystemRepresentation], "w");
-	long written;
+	size_t written;
 	if (!cmdFP) goto reportError;
 	
 	char buf[32*1024];
-	long len;
+	size_t len;
 	while((len = fread(buf, 1, 32*1024, fp)))
 	{				
 		written = fwrite(buf, 1, len, cmdFP);
@@ -76,7 +76,7 @@
 			goto reportError;
 		}
 			
-		[self performSelectorOnMainThread:@selector(_notifyDelegateOfExtractedLength:) withObject:[NSNumber numberWithLong:len] waitUntilDone:NO];
+		[self performSelectorOnMainThread:@selector(_notifyDelegateOfExtractedLength:) withObject:[NSNumber numberWithUnsignedLong:len] waitUntilDone:NO];
 	}
 	pclose(cmdFP);
 	

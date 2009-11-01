@@ -35,14 +35,13 @@
 	do
 	{
 		CFUUIDRef uuid = CFUUIDCreate(NULL);
-		mountPointName = (NSString *)CFUUIDCreateString(NULL, uuid);
-		CFRelease(uuid);
-#if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4
-		[NSMakeCollectable((CFStringRef)mountPointName) autorelease];
-#else
-		[mountPointName autorelease];
-#endif
-		mountPoint = [@"/Volumes" stringByAppendingPathComponent:mountPointName];
+		if (uuid)
+		{
+			CFStringRef uuidString = CFUUIDCreateString(NULL, uuid);
+			CFRelease(uuid);
+			mountPoint = [@"/Volumes" stringByAppendingPathComponent:(NSString*)uuidString];
+			CFRelease(uuidString);
+		}
 	}
 	while (noErr == FSPathMakeRefWithOptions((UInt8 *)[mountPoint fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &tmpRef, NULL));
 	
@@ -57,7 +56,7 @@
 	
 	// Now that we've mounted it, we need to copy out its contents.
 	FSRef srcRef, dstRef;
-	OSErr err;
+	OSStatus err;
 	err = FSPathMakeRef((UInt8 *)[mountPoint fileSystemRepresentation], &srcRef, NULL);
 	if (err != noErr) goto reportError;
 	err = FSPathMakeRef((UInt8 *)[[archivePath stringByDeletingLastPathComponent] fileSystemRepresentation], &dstRef, NULL);
