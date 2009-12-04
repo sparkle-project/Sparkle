@@ -233,7 +233,7 @@
 	if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdate:)])
 		[[updater delegate] updater:updater willInstallUpdate:updateItem];
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
-	NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]]  pathForResource:@"finish_installation" ofType:@""];
+	NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]]  pathForResource:@"finish_installation" ofType:@"app"];
 	NSString *appSupportFolder = [[@"~/Library/Application Support/" stringByExpandingTildeInPath] stringByAppendingPathComponent: [host name]];
 	NSString *targetPath = [appSupportFolder stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
@@ -291,7 +291,8 @@
 		NSString *pathToRelaunch = [host bundlePath];
 		if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
 			pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
-		[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], [downloadPath stringByDeletingLastPathComponent], nil]];
+		NSString	*relaunchToolPath = [relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS/finish_installation"];
+		[NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:[NSArray arrayWithObjects:pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], [downloadPath stringByDeletingLastPathComponent], nil]];
 
 		[NSApp terminate:self];
 	}

@@ -3,6 +3,7 @@
 #import "SUInstaller.h"
 #import "SUHost.h"
 #import "SUStandardVersionComparator.h"
+#import "SUStatusController.h"
 
 #include <unistd.h>
 
@@ -12,10 +13,15 @@
 	pid_t			parentProcessId;
 	const char		*folderPath;
 	NSString		*selfPath;
+	NSTimer			*watchdogTimer;
 }
 
-- (void) relaunch;
-- (void) install;
+- (void)	parentHasQuit;
+
+- (void)	relaunch;
+- (void)	install;
+
+- (void)	watchdog:(NSTimer *)timer;
 
 @end
 
@@ -27,17 +33,16 @@
 	self = [super init];
 	if (self != nil)
 	{
-		ProcessSerialNumber		psn = { 0, kCurrentProcess };
-		TransformProcessType( &psn, kProcessTransformToForegroundApplication );
-		[[NSApplication sharedApplication] activateIgnoringOtherApps: YES];
-		
 		executablePath = execPath;
 		parentProcessId = ppid;
 		folderPath = inFolderPath;
 		selfPath = [inSelfPath retain];
-		if (getppid() == 1) // ppid is launchd (1) => parent terminated already
-			[self install];
-		[NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(watchdog:) userInfo:nil repeats:YES];
+		BOOL	alreadyTerminated = (getppid() == 1); // ppid is launchd (1) => parent terminated already
+		
+		if( alreadyTerminated )
+			[self parentHasQuit];
+		else
+			watchdogTimer = [[NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(watchdog:) userInfo:nil repeats:YES] retain];
 	}
 	return self;
 }
@@ -47,8 +52,21 @@
 {
 	[selfPath release];
 	selfPath = nil;
+	[watchdogTimer release];
+	watchdogTimer = nil;
 	
 	[super dealloc];
+}
+
+
+-(void)	parentHasQuit
+{
+	[watchdogTimer invalidate];
+	
+	if( folderPath )
+		[self install];
+	else
+		[self relaunch];
 }
 
 
@@ -56,7 +74,7 @@
 {
 	ProcessSerialNumber psn;
 	if (GetProcessForPID(parentProcessId, &psn) == procNotFound)
-		[self install];
+		[self parentHasQuit];
 }
 
 - (void) relaunch
@@ -78,29 +96,15 @@
 	NSBundle			*theBundle = [NSBundle bundleWithPath: [NSString stringWithUTF8String: executablePath]];
 	SUHost				*theHost = [[[SUHost alloc] initWithBundle: theBundle] autorelease];
 	
-	NSRect				wdBox = NSMakeRect( 100, 100, 300, 70 );
-	NSWindow			*statusWindowHack = [[NSWindow alloc] initWithContentRect: wdBox
-												styleMask: NSTitledWindowMask backing: NSBackingStoreBuffered defer: NO];	// +++ LEAK, but app closes when this finishes anyway.
-	NSTextField			*progressMessageField = [[[NSTextField alloc] initWithFrame: NSMakeRect( 12, 40, wdBox.size.width -24, 18 )] autorelease];
-	[progressMessageField setStringValue: [[NSFileManager defaultManager] displayNameAtPath: [theHost bundlePath]]];
-	[progressMessageField setDrawsBackground: NO];
-	[progressMessageField setBordered: NO];
-	[progressMessageField setBezeled: NO];
-	[progressMessageField setEditable: NO];
-	[[statusWindowHack contentView] addSubview: progressMessageField];
-	
-	NSProgressIndicator	*progressView = [[[NSProgressIndicator alloc] initWithFrame: NSMakeRect( 12, 16, wdBox.size.width -24, 16 )] autorelease];
-	[progressView setStyle: NSProgressIndicatorBarStyle];
-	[progressView setIndeterminate: YES];
-	[[statusWindowHack contentView] addSubview: progressView];
-	[statusWindowHack center];
-	[[NSApplication sharedApplication] activateIgnoringOtherApps: YES];
-	[statusWindowHack makeKeyAndOrderFront: nil];
-	[progressView startAnimation: self];
+	SUStatusController*	statusCtl = [[SUStatusController alloc] initWithHost: theHost];	// We quit anyway after we've installed, so leak this for now.
+	[statusCtl setButtonTitle: SULocalizedString(@"Cancel Update",@"") target: nil action: Nil isDefault: NO];
+	[statusCtl beginActionWithTitle: SULocalizedString(@"Installing update...",@"")
+					maxProgressValue: 0 statusText: @""];
+	[statusCtl showWindow: self];
 	
 	[SUInstaller installFromUpdateFolder: [NSString stringWithUTF8String: folderPath]
 					overHost: theHost
-					delegate: self synchronously: YES
+					delegate: self synchronously: NO
 					versionComparator: [SUStandardVersionComparator defaultComparator]];
 }
 
@@ -119,8 +123,16 @@
 
 int main (int argc, const char * argv[])
 {
-	if (argc != 4) return EXIT_FAILURE;
+	if( argc < 3 || argc > 4 )
+		return EXIT_FAILURE;
 	
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	
+	ProcessSerialNumber		psn = { 0, kCurrentProcess };
+	TransformProcessType( &psn, kProcessTransformToForegroundApplication );
+	[[NSApplication sharedApplication] activateIgnoringOtherApps: YES];
+		
+	#if 0	// Cmdline tool
 	NSString*	selfPath = nil;
 	if( argv[0][0] == '/' )
 		selfPath = [NSString stringWithUTF8String: argv[0]];
@@ -129,11 +141,15 @@ int main (int argc, const char * argv[])
 		selfPath = [[NSFileManager defaultManager] currentDirectoryPath];
 		selfPath = [selfPath stringByAppendingPathComponent: [NSString stringWithUTF8String: argv[0]]];
 	}
-	
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	#else
+	NSString*	selfPath = [[NSBundle mainBundle] bundlePath];
+	#endif
 	
 	[NSApplication sharedApplication];
-	[[[TerminationListener alloc] initWithExecutablePath: argv[1] parentProcessId: atoi(argv[2]) folderPath: argv[3] selfPath: selfPath] autorelease];
+	[[[TerminationListener alloc] initWithExecutablePath: (argc > 1) ? argv[1] : NULL
+										parentProcessId: (argc > 2) ? atoi(argv[2]) : 0
+										folderPath: (argc > 3) ? argv[3] : NULL
+										selfPath: selfPath] autorelease];
 	[[NSApplication sharedApplication] run];
 	
 	[pool drain];
