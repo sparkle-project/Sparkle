@@ -146,6 +146,7 @@
 	[statusController setProgressValue:1]; // Fill the bar.
 	[statusController setButtonEnabled:YES];
 	[statusController setButtonTitle:SULocalizedString(@"Install and Relaunch", nil) target:self action:@selector(installAndRestart:) isDefault:YES];
+	[[statusController window] makeKeyAndOrderFront: self];
 	[NSApp requestUserAttention:NSInformationalRequest];	
 }
 
