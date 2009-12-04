@@ -73,7 +73,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
         host = [[SUHost alloc] initWithBundle:bundle];
         [self registerAsObserver];
 		
-#if 0
+#if !ENDANGER_USERS_WITH_INSECURE_UPDATES
 		// Saving-the-developer-from-a-stupid-mistake-check:
 		if (![[[self feedURL] scheme] isEqualToString:@"https"] && ![host publicDSAKey])
 			NSRunAlertPanel(@"Insecure update error!", @"For security reasons, you need to distribute your appcast over SSL or sign your updates. See Sparkle's documentation for more information.", @"OK", nil, nil);

@@ -168,7 +168,7 @@
 
 - (void)downloadDidFinish:(NSURLDownload *)d
 {
-	#if 0	// +++
+	#if !ENDANGER_USERS_WITH_INSECURE_UPDATES
 	// New in Sparkle 1.5: we're now checking signatures on all non-secure downloads, where "secure" is defined as both the appcast and the download being transmitted over SSL.
 	NSURL *downloadURL = [[d request] URL];
 	if (!(([[downloadURL scheme] isEqualToString:@"https"] && [[appcastURL scheme] isEqualToString:@"https"]) ||

@@ -10,6 +10,8 @@
 #ifndef SUCONSTANTS_H
 #define SUCONSTANTS_H
 
+#define ENDANGER_USERS_WITH_INSECURE_UPDATES		1
+#define PERMIT_AUTOMATED_DOWNGRADES					1
 
 // -----------------------------------------------------------------------------
 //	Notifications:
