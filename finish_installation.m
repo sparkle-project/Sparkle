@@ -63,8 +63,10 @@
 {
 	[[NSWorkspace sharedWorkspace] openFile:[[NSFileManager defaultManager] stringWithFileSystemRepresentation:executablePath length:strlen(executablePath)]];
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+    [[NSFileManager defaultManager] removeFileAtPath: [SUInstaller updateFolder] handler: nil];
     [[NSFileManager defaultManager] removeFileAtPath: selfPath handler: nil];
 #else
+	[[NSFileManager defaultManager] removeItemAtPath: [SUInstaller updateFolder] error: NULL];
 	[[NSFileManager defaultManager] removeItemAtPath: selfPath error: NULL];
 #endif
 	exit(EXIT_SUCCESS);
@@ -73,8 +75,28 @@
 
 -(void)	install
 {
-	NSBundle	*theBundle = [NSBundle bundleWithPath: [NSString stringWithUTF8String: executablePath]];
-	SUHost		*theHost = [[[SUHost alloc] initWithBundle: theBundle] autorelease];
+	NSBundle			*theBundle = [NSBundle bundleWithPath: [NSString stringWithUTF8String: executablePath]];
+	SUHost				*theHost = [[[SUHost alloc] initWithBundle: theBundle] autorelease];
+	
+	NSRect				wdBox = NSMakeRect( 100, 100, 300, 70 );
+	NSWindow			*statusWindowHack = [[NSWindow alloc] initWithContentRect: wdBox
+												styleMask: NSTitledWindowMask backing: NSBackingStoreBuffered defer: NO];	// +++ LEAK, but app closes when this finishes anyway.
+	NSTextField			*progressMessageField = [[[NSTextField alloc] initWithFrame: NSMakeRect( 12, 40, wdBox.size.width -24, 18 )] autorelease];
+	[progressMessageField setStringValue: [[NSFileManager defaultManager] displayNameAtPath: [theHost bundlePath]]];
+	[progressMessageField setDrawsBackground: NO];
+	[progressMessageField setBordered: NO];
+	[progressMessageField setBezeled: NO];
+	[progressMessageField setEditable: NO];
+	[[statusWindowHack contentView] addSubview: progressMessageField];
+	
+	NSProgressIndicator	*progressView = [[[NSProgressIndicator alloc] initWithFrame: NSMakeRect( 12, 16, wdBox.size.width -24, 16 )] autorelease];
+	[progressView setStyle: NSProgressIndicatorBarStyle];
+	[progressView setIndeterminate: YES];
+	[[statusWindowHack contentView] addSubview: progressView];
+	[statusWindowHack center];
+	[[NSApplication sharedApplication] activateIgnoringOtherApps: YES];
+	[statusWindowHack makeKeyAndOrderFront: nil];
+	[progressView startAnimation: self];
 	
 	[SUInstaller installFromUpdateFolder: [NSString stringWithUTF8String: folderPath]
 					overHost: theHost

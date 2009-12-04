@@ -6,10 +6,24 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
+// -----------------------------------------------------------------------------
+//	Headers:
+// -----------------------------------------------------------------------------
+
 #import "SUUpdateAlert.h"
 
 #import "SUHost.h"
 #import <WebKit/WebKit.h>
+
+#import "SUConstants.h"
+
+
+@interface WebView (SUTenFiveProperty)
+
+-(void)	setDrawsBackground: (BOOL)state;
+
+@end
+
 
 @implementation SUUpdateAlert
 
@@ -48,6 +62,11 @@
 - (IBAction)installUpdate:sender
 {
 	[self endWithSelection:SUInstallUpdateChoice];
+}
+
+- (IBAction)openInfoURL:sender
+{
+	[self endWithSelection:SUOpenInfoURLChoice];
 }
 
 - (IBAction)skipThisVersion:sender
@@ -99,26 +118,40 @@
 {
 	NSNumber *shouldShowReleaseNotes = [host objectForInfoDictionaryKey:SUShowReleaseNotesKey];
 	if (shouldShowReleaseNotes == nil)
-		return YES; // defaults to YES
+	{
+		// UK 2007-09-18: Don't show release notes if RSS item contains no description and no release notes URL:
+		return( ([updateItem itemDescription] != nil
+			&& [[[updateItem itemDescription] stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0)
+			|| [updateItem releaseNotesURL] != nil );
+	}
 	else
 		return [shouldShowReleaseNotes boolValue];
 }
 
 - (BOOL)allowsAutomaticUpdates
 {
-	if (![host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey])
-		return YES; // defaults to YES
-	return [host boolForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
+	BOOL		allowAutoUpdates = YES;	// Defaults to YES.
+	if( [host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] )
+		allowAutoUpdates = [host boolForInfoDictionaryKey: SUAllowsAutomaticUpdatesKey];
+	
+	// UK 2007-08-31: Give delegate a chance to modify this choice:
+	if( delegate && [delegate respondsToSelector: @selector(updateAlert:shouldAllowAutoUpdate:)] )
+		[delegate updateAlert: self shouldAllowAutoUpdate: &allowAutoUpdates];
+	
+	return allowAutoUpdates;
 }
 
 - (void)awakeFromNib
 {	
-	[[self window] setLevel:NSFloatingWindowLevel];
+	NSString*	sizeStr = [host objectForInfoDictionaryKey:SUFixedHTMLDisplaySizeKey];
+
+	//[[self window] setLevel:NSFloatingWindowLevel];	// This means the window will float over all other apps, if our app is switched out ?! UK 2007-09-04
+	[[self window] setFrameAutosaveName: sizeStr ? @"" : @"SUUpdateAlertFrame"];
 		
 	// We're gonna do some frame magic to match the window's size to the description field and the presence of the release notes view.
-	NSRect frame = [[self window] frame];
-	
-	if (![self showsReleaseNotes])
+	NSRect	frame = [[self window] frame];
+	BOOL	showReleaseNotes = [self showsReleaseNotes];	// UK 2007-09-18
+	if (!showReleaseNotes)	// UK 2007-09-18
 	{
 		// Resize the window to be appropriate for not having a huge release notes view.
 		frame.size.height -= [releaseNotesView frame].size.height + 40; // Extra 40 is for the release notes label and margin.
@@ -133,14 +166,51 @@
 		[[[releaseNotesView superview] superview] setFrame:boxFrame];
 	}
 	
+	if( showReleaseNotes )	// UK 2007-09-18 (whole block)
+	{
+		if( sizeStr )
+		{
+			NSSize		desiredSize = NSSizeFromString( sizeStr );
+			NSSize		sizeDiff = NSZeroSize;
+			NSBox*		boxView = (NSBox*)[[releaseNotesView superview] superview];
+			
+			//[boxView setBorderType: NSNoBorder];
+			[releaseNotesView setDrawsBackground: NO];
+			
+			sizeDiff.width = desiredSize.width -[releaseNotesView frame].size.width;
+			sizeDiff.height = desiredSize.height -[releaseNotesView frame].size.height;
+			frame.size.width += sizeDiff.width;
+			frame.size.height += sizeDiff.height;
+			
+			// No resizing:
+			[[self window] setShowsResizeIndicator:NO];
+			[[self window] setMinSize:frame.size];
+			[[self window] setMaxSize:frame.size];
+		}
+	}
+	
 	[[self window] setFrame:frame display:NO];
 	[[self window] center];
 	
-	if ([self showsReleaseNotes])
+	if (showReleaseNotes)	// UK 2007-09-18
 	{
 		[self displayReleaseNotes];
 	}
+	
+	[[[releaseNotesView superview] superview] setHidden: !showReleaseNotes];	// UK 2007-09-18
+	
+	if( [updateItem fileURL] == nil )	// UK 2007-08-31 (whole if clause)
+	{
+		[installButton setTitle: SULocalizedString( @"Learn More...", @"Alternate title for 'Install Update' button." )];
+		[installButton setAction: @selector(openInfoURL:)];
+	}
 }
+
+-(BOOL)showsReleaseNotesText
+{
+	return( [host objectForInfoDictionaryKey:SUFixedHTMLDisplaySizeKey] == nil );
+}
+
 
 - (BOOL)windowShouldClose:note
 {

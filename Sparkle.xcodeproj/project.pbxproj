@@ -16,6 +16,11 @@
 		552B69F010C0791800050E82 /* SUPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5210DAE8E8A0026945C /* SUPackageInstaller.m */; };
 		552B6A3710C0795600050E82 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
 		552B6A5E10C07FC200050E82 /* SUStandardVersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */; };
+		55D8F80910C58B210011E7FA /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55D8F80810C58B210011E7FA /* SULog.m */; };
+		55D8F80A10C58B210011E7FA /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55D8F80810C58B210011E7FA /* SULog.m */; };
+		55D8F80B10C58B210011E7FA /* SULog.h in Headers */ = {isa = PBXBuildFile; fileRef = 55D8F80710C58B210011E7FA /* SULog.h */; };
+		55D8F80C10C58B210011E7FA /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55D8F80810C58B210011E7FA /* SULog.m */; };
+		55D8F80D10C58B210011E7FA /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55D8F80810C58B210011E7FA /* SULog.m */; };
 		610134730DD250470049ACDF /* SUUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 610134710DD250470049ACDF /* SUUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
 		610134740DD250470049ACDF /* SUUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 610134720DD250470049ACDF /* SUUpdateDriver.m */; };
 		6101347B0DD2541A0049ACDF /* SUProbingUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 610134790DD2541A0049ACDF /* SUProbingUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
@@ -154,6 +159,9 @@
 /* Begin PBXFileReference section */
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		55D8F80410C589F40011E7FA /* ThreadSafePreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ThreadSafePreferences.h; path = Elgato/ThreadSafePreferences.h; sourceTree = "<group>"; };
+		55D8F80710C58B210011E7FA /* SULog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULog.h; sourceTree = "<group>"; };
+		55D8F80810C58B210011E7FA /* SULog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SULog.m; sourceTree = "<group>"; };
 		610134710DD250470049ACDF /* SUUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdateDriver.h; sourceTree = "<group>"; };
 		610134720DD250470049ACDF /* SUUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdateDriver.m; sourceTree = "<group>"; };
 		610134790DD2541A0049ACDF /* SUProbingUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUProbingUpdateDriver.h; sourceTree = "<group>"; };
@@ -374,6 +382,9 @@
 		0867D691FE84028FC02AAC07 /* Sparkle */ = {
 			isa = PBXGroup;
 			children = (
+				55D8F80410C589F40011E7FA /* ThreadSafePreferences.h */,
+				55D8F80710C58B210011E7FA /* SULog.h */,
+				55D8F80810C58B210011E7FA /* SULog.m */,
 				61F83F6E0DBFE07A006FDD30 /* Update Control */,
 				61299B3909CB055000B7442F /* Appcast Support */,
 				618FA6DB0DB485440026945C /* Installation */,
@@ -630,6 +641,7 @@
 				6102FE5B0E08C7EC00F85D09 /* SUUnarchiver_Private.h in Headers */,
 				61EF67590E25C5B400F754E0 /* SUHost.h in Headers */,
 				61CFB3290E385186007A1735 /* Sparkle.pch in Headers */,
+				55D8F80B10C58B210011E7FA /* SULog.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -872,6 +884,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				61227A160DB548B800AB99EA /* SUVersionComparisonTest.m in Sources */,
+				55D8F80D10C58B210011E7FA /* SULog.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -880,6 +893,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				61B5F93009C4CFDC00B25A18 /* main.m in Sources */,
+				55D8F80A10C58B210011E7FA /* SULog.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -916,6 +930,7 @@
 				6102FE5C0E08C7EC00F85D09 /* SUUnarchiver_Private.m in Sources */,
 				61D85D6D0E10B2ED00F9B4A9 /* SUPipedUnarchiver.m in Sources */,
 				61EF67560E25B58D00F754E0 /* SUHost.m in Sources */,
+				55D8F80C10C58B210011E7FA /* SULog.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -932,6 +947,7 @@
 				552B69ED10C0791000050E82 /* SUSystemProfiler.m in Sources */,
 				552B69F010C0791800050E82 /* SUPackageInstaller.m in Sources */,
 				552B6A5E10C07FC200050E82 /* SUStandardVersionComparator.m in Sources */,
+				55D8F80910C58B210011E7FA /* SULog.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1127,6 +1143,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
 			buildSettings = {
+				GCC_PREFIX_HEADER = "";
 				PRODUCT_NAME = finish_installation;
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
@@ -1235,6 +1252,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
 			buildSettings = {
+				GCC_PREFIX_HEADER = "";
 				PRODUCT_NAME = finish_installation;
 			};
 			name = Debug;
@@ -1243,6 +1261,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
 			buildSettings = {
+				GCC_PREFIX_HEADER = "";
 				PRODUCT_NAME = finish_installation;
 			};
 			name = Release;

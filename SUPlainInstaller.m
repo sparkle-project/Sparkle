@@ -9,6 +9,8 @@
 #import "SUPlainInstaller.h"
 #import "SUPlainInstallerInternals.h"
 #import "SUConstants.h"
+#import "SUHost.h"
+
 
 NSString *SUInstallerPathKey = @"SUInstallerPath";
 NSString *SUInstallerTargetPathKey = @"SUInstallerTargetPath";
@@ -22,11 +24,15 @@ NSString *SUInstallerErrorKey = @"SUInstallerError";
 
 + (void)_finishInstallationWithInfo:(NSDictionary *)info
 {
+	// *** GETS CALLED ON NON-MAIN THREAD!
+	
 	[self _finishInstallationWithResult:[[info objectForKey:SUInstallerResultKey] boolValue] host:[info objectForKey:SUInstallerHostKey] error:[info objectForKey:SUInstallerErrorKey] delegate:[info objectForKey:SUInstallerDelegateKey]];
 }
 
 + (void)_performInstallationWithInfo:(NSDictionary *)info
 {
+	// *** GETS CALLED ON NON-MAIN THREAD!
+	
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	NSError *error = nil;

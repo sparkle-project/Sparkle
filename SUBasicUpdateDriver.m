@@ -13,6 +13,9 @@
 #import "SUInstaller.h"
 #import "SUStandardVersionComparator.h"
 #import "SUUnarchiver.h"
+#import "SUConstants.h"
+#import "SULog.h"
+
 
 @implementation SUBasicUpdateDriver
 
@@ -165,6 +168,7 @@
 
 - (void)downloadDidFinish:(NSURLDownload *)d
 {
+	#if 0	// +++
 	// New in Sparkle 1.5: we're now checking signatures on all non-secure downloads, where "secure" is defined as both the appcast and the download being transmitted over SSL.
 	NSURL *downloadURL = [[d request] URL];
 	if (!(([[downloadURL scheme] isEqualToString:@"https"] && [[appcastURL scheme] isEqualToString:@"https"]) ||
@@ -176,6 +180,7 @@
 			return;
 		}
 	}
+	#endif
 	
 	[self extractUpdate];
 }
@@ -200,7 +205,7 @@
 	SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:downloadPath];
 	if (!unarchiver)
 	{
-		NSLog(@"Sparkle Error: No valid unarchiver for %@!", downloadPath);
+		SULog(@"Sparkle Error: No valid unarchiver for %@!", downloadPath);
 		[self unarchiverDidFail:nil];
 		return;
 	}
@@ -231,7 +236,11 @@
 	NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]]  pathForResource:@"finish_installation" ofType:@""];
 	NSString *appSupportFolder = [[@"~/Library/Application Support/" stringByExpandingTildeInPath] stringByAppendingPathComponent: [host name]];
 	NSString *targetPath = [appSupportFolder stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
-	[[NSFileManager defaultManager] createDirectoryAtPath: targetPath withIntermediateDirectories: YES attributes: [NSDictionary dictionary] error: NULL];
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+	[[NSFileManager defaultManager] createDirectoryAtPath: [targetPath stringByDeletingLastPathComponent] attributes: [NSDictionary dictionary]];
+#else
+	[[NSFileManager defaultManager] createDirectoryAtPath: [targetPath stringByDeletingLastPathComponent] withIntermediateDirectories: YES attributes: [NSDictionary dictionary] error: NULL];
+#endif
 
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
 	NSError *error = nil;
@@ -251,36 +260,43 @@
 
 - (void)installAndRelaunchWithTool
 {
-	// Give the host app an opportunity to postpone the relaunch.
-	static BOOL postponedOnce = NO;
-	if (!postponedOnce && [[updater delegate] respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
-	{
-		NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(relaunchHostApp)]];
-		[invocation setSelector:@selector(relaunchHostApp)];
-		[invocation setTarget:self];
-		postponedOnce = YES;
-		if ([[updater delegate] updater:updater shouldPostponeRelaunchForUpdate:updateItem untilInvoking:invocation])
-			return;
-	}
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-	if ([[updater delegate] respondsToSelector:@selector(updaterWillRelaunchApplication:)])
-		[[updater delegate] updaterWillRelaunchApplication:updater];
-	
-	if(!relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath])
-	{
-		// Note that we explicitly use the host app's name here, since updating plugin for Mail relaunches Mail, not just the plugin.
-		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [host name]], NSLocalizedDescriptionKey, [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@)", relaunchPath], NSLocalizedFailureReasonErrorKey, nil]]];
-		// We intentionally don't abandon the update here so that the host won't initiate another.
-		return;
-	}		
-	
-	NSString *pathToRelaunch = [host bundlePath];
-	if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
-		pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
-	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], [downloadPath stringByDeletingLastPathComponent], nil]];
+	BOOL	mayRelaunchAtAll = [updater mayUpdateAndRestart];
 
-	[NSApp terminate:self];
+	if( mayRelaunchAtAll )
+	{
+		// Give the host app an opportunity to postpone the relaunch.
+		static BOOL postponedOnce = NO;
+		if (!postponedOnce && [[updater delegate] respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
+		{
+			NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(relaunchHostApp)]];
+			[invocation setSelector:@selector(relaunchHostApp)];
+			[invocation setTarget:self];
+			postponedOnce = YES;
+			if ([[updater delegate] updater:updater shouldPostponeRelaunchForUpdate:updateItem untilInvoking:invocation])
+				return;
+		}
+	
+		[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
+		if ([[updater delegate] respondsToSelector:@selector(updaterWillRelaunchApplication:)])
+			[[updater delegate] updaterWillRelaunchApplication:updater];
+	
+		if(!relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath])
+		{
+			// Note that we explicitly use the host app's name here, since updating plugin for Mail relaunches Mail, not just the plugin.
+			[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [host name]], NSLocalizedDescriptionKey, [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@)", relaunchPath], NSLocalizedFailureReasonErrorKey, nil]]];
+			// We intentionally don't abandon the update here so that the host won't initiate another.
+			return;
+		}		
+		
+		NSString *pathToRelaunch = [host bundlePath];
+		if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
+			pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
+		[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], [downloadPath stringByDeletingLastPathComponent], nil]];
+
+		[NSApp terminate:self];
+	}
+	else
+		[self abortUpdate];
 }
 
 - (void)cleanUp
@@ -295,11 +311,13 @@
 - (void)installerForHost:(SUHost *)aHost failedWithError:(NSError *)error
 {
 	if (aHost != host) { return; }
+	[[NSFileManager defaultManager] removeFileAtPath:relaunchPath handler:NULL]; // Clean up the copied relauncher.
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while installing the update. Please try again later.", nil), NSLocalizedDescriptionKey, [error localizedDescription], NSLocalizedFailureReasonErrorKey, nil]]];
 }
 
 - (void)abortUpdate
 {
+	[[self retain] autorelease];	// In case the notification center was the last one holding on to us.
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super abortUpdate];
 }
@@ -307,9 +325,9 @@
 - (void)abortUpdateWithError:(NSError *)error
 {
 	if ([error code] != SUNoUpdateError) // Let's not bother logging this.
-		NSLog(@"Sparkle Error: %@", [error localizedDescription]);
+		SULog(@"Sparkle Error: %@", [error localizedDescription]);
 	if ([error localizedFailureReason])
-		NSLog(@"Sparkle Error (continued): %@", [error localizedFailureReason]);
+		SULog(@"Sparkle Error (continued): %@", [error localizedFailureReason]);
 	if (download)
 		[download cancel];
 	[self abortUpdate];

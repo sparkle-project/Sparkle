@@ -6,7 +6,11 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
+#import "SUUpdater.h"
+
+#import "SUAppcast.h"
+#import "SUAppcastItem.h"
+#import "SUVersionComparisonProtocol.h"
 #import "SUPlainInstallerInternals.h"
 #import "SUConstants.h"
 
@@ -16,6 +20,8 @@
 #import <sys/wait.h>
 #import <dirent.h>
 #import <unistd.h>
+#import <sys/param.h>
+
 
 @interface SUPlainInstaller (MMExtendedAttributes)
 // Removes the directory tree rooted at |root| from the file quarantine.
@@ -43,6 +49,8 @@
 
 static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char* executablePath, AuthorizationFlags options, const char* const* arguments)
 {
+	// *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
+
 	sig_t oldSigChildHandler = signal(SIGCHLD, SIG_DFL);
 	BOOL returnValue = YES;
 
@@ -86,8 +94,67 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	return [tempDir lastPathComponent];
 }
 
++ (NSString *)_temporaryCopyNameForPath:(NSString *)path didFindTrash: (BOOL*)outDidFindTrash
+{
+	// *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
+	NSString *tempDir = nil;
+	
+	UInt8			trashPath[MAXPATHLEN +1] = { 0 };
+	FSRef			trashRef, pathRef;
+	FSVolumeRefNum	vSrcRefNum = kFSInvalidVolumeRefNum;
+	FSCatalogInfo	catInfo = { 0 };
+	OSStatus err = FSPathMakeRef( (UInt8*) [path fileSystemRepresentation], &pathRef, NULL );
+	if( err == noErr )
+	{
+		err = FSGetCatalogInfo( &pathRef, kFSCatInfoVolume, &catInfo, NULL, NULL, NULL );
+		vSrcRefNum = catInfo.volume;
+	}
+	if( err == noErr )
+		err = FSFindFolder( vSrcRefNum, kTrashFolderType, kCreateFolder, &trashRef );
+	if( err == noErr )
+		err = FSGetCatalogInfo( &trashRef, kFSCatInfoVolume, &catInfo, NULL, NULL, NULL );
+	if( err == noErr && vSrcRefNum != catInfo.volume )
+		err = nsvErr;	// Couldn't find a trash folder on same volume as given path. Docs say this may happen in the future.
+	if( err == noErr )
+		err = FSRefMakePath( &trashRef, trashPath, MAXPATHLEN );
+	if( err == noErr )
+		tempDir = [NSString stringWithUTF8String: (char*) trashPath];
+	if( outDidFindTrash )
+		*outDidFindTrash = (tempDir != nil);
+	if( !tempDir )
+		tempDir = [path stringByDeletingLastPathComponent];
+	
+	// Let's try to read the version number so the filename will be more meaningful.
+	NSString *postFix = nil;
+	NSString *version = nil;
+	if ((version = [[NSBundle bundleWithPath: path] objectForInfoDictionaryKey:@"CFBundleVersion"]) && ![version isEqualToString:@""])
+	{
+		// We'll clean it up a little for safety.
+		// The cast is necessary because of a bug in the headers in pre-10.5 SDKs
+		NSMutableCharacterSet *validCharacters = (id)[NSMutableCharacterSet alphanumericCharacterSet];
+		[validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
+		postFix = [version stringByTrimmingCharactersInSet:[validCharacters invertedSet]];
+	}
+	else
+		postFix = @"old";
+	NSString *prefix = [NSString stringWithFormat: @"%@ (%@)", [[path lastPathComponent] stringByDeletingPathExtension], postFix];
+	NSString *tempName = [prefix stringByAppendingPathExtension: [path pathExtension]];
+	tempDir = [tempDir stringByAppendingPathComponent: tempName];
+	
+	// Now let's make sure we get a unique path.
+	int cnt=2;
+	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 9999)
+		tempDir = [[tempDir stringByDeletingLastPathComponent] stringByAppendingPathComponent: [NSString stringWithFormat:@"%@ %d.%@", prefix, cnt++, [path pathExtension]]];
+	
+	return tempDir;
+}
+
 + (BOOL)_copyPathWithForcedAuthentication:(NSString *)src toPath:(NSString *)dst temporaryPath:(NSString *)tmp error:(NSError **)error
 {
+	// *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
+	
+	//BOOL		foundTrash = NO;	// +++ Using trash as tmp folder to begin with would be way cooler, IMHO.
+	//NSString*	tmp = [self _temporaryCopyNameForPath:dst didFindTrash: &foundTrash];
 	const char* srcPath = [src fileSystemRepresentation];
 	const char* tmpPath = [tmp fileSystemRepresentation];
 	const char* dstPath = [dst fileSystemRepresentation];
@@ -112,35 +179,35 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		snprintf(uidgid, sizeof(uidgid), "%d:%d",
 				 dstSB.st_uid, dstSB.st_gid);
 		
-		const char* executables[] = {
-			"/bin/rm",
-			"/bin/mv",
-			"/bin/mv",
-			"/bin/rm",
-			NULL,  // pause here and do some housekeeping before
-			// continuing
-			"/usr/sbin/chown",
-			NULL   // stop here for real
-		};
+		if( res )	// Set permissions while it's still in source, so we have it with working and correct perms when it arrives at destination.
+		{
+			const char* coParams[] = { "-R", uidgid, srcPath, NULL };
+			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/usr/sbin/chown", kAuthorizationFlagDefaults, coParams );
+		}
 		
-		// 4 is the maximum number of arguments to any command,
-		// including the NULL that signals the end of an argument
-		// list.
-		const char* const argumentLists[][4] = {
-			{ "-rf", tmpPath, NULL }, // make room for the temporary file... this is kinda unsafe; should probably do something better.
-			{ "-f", dstPath, tmpPath, NULL },  // mv
-			{ "-f", srcPath, dstPath, NULL },  // mv
-			{ "-rf", tmpPath, NULL },  // rm
-			{ NULL },  // pause
-			{ "-R", uidgid, dstPath, NULL },  // chown
-			{ NULL }  // stop
-		};
+		BOOL	haveDst = [[NSFileManager defaultManager] fileExistsAtPath: dst];
+		if( res && haveDst )	// If there's something at our tmp path (previous failed update or whatever) delete that first.
+		{
+			const char*	rmParams[] = { "-rf", tmpPath, NULL };
+			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams );
+		}
 		
-		// Process the commands up until the first NULL
-		int commandIndex = 0;
-		for (; executables[commandIndex] != NULL; ++commandIndex) {
-			if (res)
-				res = AuthorizationExecuteWithPrivilegesAndWait(auth, executables[commandIndex], kAuthorizationFlagDefaults, argumentLists[commandIndex]);
+		if( res && haveDst )	// Move old exe to tmp path.
+		{
+			const char* mvParams[] = { "-f", dstPath, tmpPath, NULL };
+			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/mv", kAuthorizationFlagDefaults, mvParams );
+		}
+				
+		if( res )	// Move new exe to old exe's path.
+		{
+			const char* mvParams2[] = { "-f", srcPath, dstPath, NULL };
+			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/mv", kAuthorizationFlagDefaults, mvParams2 );
+		}
+		
+		if( res && haveDst /*&& !foundTrash*/ )	// If we managed to put the old exe in the trash, leave it there for the user to delete or recover.
+		{									// ...  Otherwise we better delete it, wouldn't want dozens of old versions lying around next to the new one.
+			const char* rmParams2[] = { "-rf", tmpPath, NULL };
+			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams2 );
 		}
 		
 		// If the currently-running application is trusted, the new
@@ -157,15 +224,6 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		// attributes to release the files from the quarantine.
 		if (res) {
 			[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:dst waitUntilDone:YES];
-		}
-		
-		// Now move past the NULL we found and continue executing
-		// commands from the list.
-		++commandIndex;
-		
-		for (; executables[commandIndex] != NULL; ++commandIndex) {
-			if (res)
-				res = AuthorizationExecuteWithPrivilegesAndWait(auth, executables[commandIndex], kAuthorizationFlagDefaults, argumentLists[commandIndex]);
 		}
 		
 		AuthorizationFree(auth, 0);
@@ -269,6 +327,8 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
           fromFile:(NSString*)file
            options:(int)options
 {
+	// *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
+
 	typedef int (*removexattr_type)(const char*, const char*, int);
 	// Reference removexattr directly, it's in the SDK.
 	static removexattr_type removexattr_func = removexattr;
@@ -300,6 +360,8 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 + (void)releaseFromQuarantine:(NSString*)root
 {
+	// *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
+
 	const char* quarantineAttribute = "com.apple.quarantine";
 	const int removeXAttrOptions = XATTR_NOFOLLOW;
 	

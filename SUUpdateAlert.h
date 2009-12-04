@@ -15,7 +15,8 @@ typedef enum
 {
 	SUInstallUpdateChoice,
 	SURemindMeLaterChoice,
-	SUSkipThisVersionChoice
+	SUSkipThisVersionChoice,
+	SUOpenInfoURLChoice
 } SUUpdateAlertChoice;
 
 @class WebView, SUAppcastItem, SUHost;
@@ -26,6 +27,7 @@ typedef enum
 	
 	IBOutlet WebView *releaseNotesView;
 	IBOutlet NSTextField *description;
+	IBOutlet NSButton *installButton;	// UK 2007-08-31.
 	NSProgressIndicator *releaseNotesSpinner;
 	BOOL webViewFinishedLoading;
 }
@@ -41,6 +43,7 @@ typedef enum
 
 @interface NSObject (SUUpdateAlertDelegate)
 - (void)updateAlert:(SUUpdateAlert *)updateAlert finishedWithChoice:(SUUpdateAlertChoice)updateChoice;
+- (void)updateAlert:(SUUpdateAlert *)updateAlert shouldAllowAutoUpdate: (BOOL*)shouldAllowAutoUpdate;
 @end
 
 #endif

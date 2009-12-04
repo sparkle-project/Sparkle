@@ -1,0 +1,12 @@
+﻿
+/* Class = "NSButtonCell"; title = "Install and Relaunch"; ObjectID = "41"; */
+"Install and Relaunch" = "Instalar e reiniciar";
+
+/* Class = "NSButtonCell"; title = "Install on Quit"; ObjectID = "42"; */
+"Install on Quit" = "Install on Quit";
+
+/* NSButton (Automatically download and install updates in the future) : <title:Automatically download and install updates in the future> (oid:17) */
+"Automatically download and install updates in the future" = "Descarregar e instalar atualizações automaticamente no futuro";
+
+/* Class = "NSButtonCell"; title = "Don't Install"; ObjectID = "44"; */
+"Don't Install" = "Don't Install";

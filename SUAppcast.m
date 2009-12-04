@@ -6,8 +6,15 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
+#import "SUUpdater.h"
+
 #import "SUAppcast.h"
+#import "SUAppcastItem.h"
+#import "SUVersionComparisonProtocol.h"
+#import "SUAppcast.h"
+#import "SUConstants.h"
+#import "SULog.h"
+
 
 @interface SUAppcast (Private)
 - (void)reportError:(NSError *)error;
@@ -19,7 +26,12 @@
 - (void)dealloc
 {
 	[items release];
+	items = nil;
 	[userAgentString release];
+	userAgentString = nil;
+	[downloadFilename release];
+	downloadFilename = nil;
+	
 	[super dealloc];
 }
 
@@ -59,6 +71,12 @@
 	BOOL failed = NO;
 	NSArray *xmlItems = nil;
 	NSMutableArray *appcastItems = [NSMutableArray array];
+
+	#if DEBUG
+	NSString* debugXML = [NSString stringWithContentsOfFile: downloadFilename encoding: NSUTF8StringEncoding error: nil];
+	SULog(@"<<<< XML >>>>\n%@\n>>>> XML <<<<", debugXML);
+	#endif
+	
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
     [[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
 #else

@@ -10,6 +10,7 @@
 
 #import "SUAutomaticUpdateAlert.h"
 #import "SUHost.h"
+#import "SUConstants.h"
 
 @implementation SUAutomaticUpdateDriver
 

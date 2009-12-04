@@ -11,6 +11,7 @@
 #import "SUUpdateAlert.h"
 #import "SUHost.h"
 #import "SUStatusController.h"
+#import "SUConstants.h"
 
 @implementation SUUIBasedUpdateDriver
 
@@ -66,9 +67,17 @@
 			[statusController showWindow:self];	
 			[self downloadUpdate];
 			break;
-			
+		
+		case SUOpenInfoURLChoice:
+			[[NSWorkspace sharedWorkspace] openURL: [updateItem infoURL]];
+			[self abortUpdate];
+			break;
+		
 		case SUSkipThisVersionChoice:
 			[host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+			[self abortUpdate];
+			break;
+			
 		case SURemindMeLaterChoice:
 			[self abortUpdate];
 			break;			
@@ -79,6 +88,7 @@
 {
 	[statusController setMaxProgressValue:[response expectedContentLength]];
 }
+
 
 - (NSString *)_humanReadableSizeFromDouble:(double)value
 {
@@ -139,7 +149,11 @@
 	[NSApp requestUserAttention:NSInformationalRequest];	
 }
 
-- (void)installAndRestart:sender { [self installUpdate]; }
+- (void)installAndRestart: (id)sender
+{
+	if( [updater mayUpdateAndRestart] )
+		[self installUpdate];
+}
 
 - (void)installUpdate
 {

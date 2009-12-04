@@ -11,8 +11,17 @@
 #define SUCONSTANTS_H
 
 
+// -----------------------------------------------------------------------------
+//	Notifications:
+// -----------------------------------------------------------------------------
+
 extern NSString *SUUpdaterWillRestartNotification;
+
 extern NSString *SUTechnicalErrorInformationKey;
+
+// -----------------------------------------------------------------------------
+//	PList keys::
+// -----------------------------------------------------------------------------
 
 extern NSString *SUFeedURLKey;
 extern NSString *SUHasLaunchedBeforeKey;
@@ -29,6 +38,12 @@ extern NSString *SUEnableAutomaticChecksKeyOld;
 extern NSString *SUEnableSystemProfilingKey;
 extern NSString *SUSendProfileInfoKey;
 extern NSString *SULastProfileSubmitDateKey;
+extern NSString *SUFixedHTMLDisplaySizeKey;
+extern NSString *SUKeepDownloadOnFailedInstallKey;
+
+// -----------------------------------------------------------------------------
+//	Errors:
+// -----------------------------------------------------------------------------
 
 extern NSString *SUSparkleErrorDomain;
 // Appcast phase errors.
@@ -52,6 +67,11 @@ extern OSStatus SUMissingInstallerToolError;
 extern OSStatus SURelaunchError;
 extern OSStatus SUInstallationError;
 extern OSStatus SUDowngradeError;
+
+
+// -----------------------------------------------------------------------------
+//	NSInteger fixer-upper:
+// -----------------------------------------------------------------------------
 
 // NSInteger is a type that was added to Leopard.
 // Here is some glue to ensure that NSInteger will work with pre-10.5 SDKs:

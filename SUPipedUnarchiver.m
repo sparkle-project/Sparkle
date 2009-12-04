@@ -8,6 +8,8 @@
 
 #import "SUPipedUnarchiver.h"
 #import "SUUnarchiver_Private.h"
+#import "SULog.h"
+
 
 @implementation SUPipedUnarchiver
 
@@ -18,7 +20,7 @@
 		typeSelectorDictionary = [[NSDictionary dictionaryWithObjectsAndKeys:@"_extractZIP", @".zip", @"_extractTAR", @".tar",
 								   @"_extractTGZ", @".tar.gz", @"_extractTGZ", @".tgz",
 								   @"_extractTBZ", @".tar.bz2", @"_extractTBZ", @".tbz", nil] retain];
-
+	
 	NSString *lastPathComponent = [path lastPathComponent];
 	NSEnumerator *typeEnumerator = [typeSelectorDictionary keyEnumerator];
 	id currentType;
@@ -44,6 +46,10 @@
 // This method abstracts the types that use a command line tool piping data from stdin.
 - (void)_extractArchivePipingDataToCommand:(NSString *)command
 {
+	// *** GETS CALLED ON NON-MAIN THREAD!!!
+	
+	SULog(@"Extracting %@ using '%@'",archivePath,command);
+
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	FILE *fp = NULL, *cmdFP = NULL;
 	
@@ -97,21 +103,29 @@ finally:
 
 - (void)_extractTAR
 {
+	// *** GETS CALLED ON NON-MAIN THREAD!!!
+	
 	return [self _extractArchivePipingDataToCommand:@"tar -xC \"$DESTINATION\""];
 }
 
 - (void)_extractTGZ
 {
+	// *** GETS CALLED ON NON-MAIN THREAD!!!
+	
 	return [self _extractArchivePipingDataToCommand:@"tar -zxC \"$DESTINATION\""];
 }
 
 - (void)_extractTBZ
 {
+	// *** GETS CALLED ON NON-MAIN THREAD!!!
+	
 	return [self _extractArchivePipingDataToCommand:@"tar -jxC \"$DESTINATION\""];
 }
 
 - (void)_extractZIP
 {
+	// *** GETS CALLED ON NON-MAIN THREAD!!!
+	
 	return [self _extractArchivePipingDataToCommand:@"ditto -x -k - \"$DESTINATION\""];
 }
 

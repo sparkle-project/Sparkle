@@ -7,6 +7,7 @@
 //
 
 #import "SUPackageInstaller.h"
+#import <Cocoa/Cocoa.h>
 #import "SUConstants.h"
 
 #ifndef NSAppKitVersionNumber10_4

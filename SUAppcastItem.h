@@ -24,6 +24,8 @@
 	NSString *displayVersionString;
 	
 	NSDictionary *propertiesDictionary;
+	
+	NSURL *infoURL;	// UK 2007-08-31
 }
 
 // Initializes with data from a dictionary provided by the RSS class.
@@ -42,6 +44,8 @@
 
 // Returns the dictionary provided in initWithDictionary; this might be useful later for extensions.
 - (NSDictionary *)propertiesDictionary;
+
+- (NSURL *)infoURL;						// UK 2007-08-31
 
 @end
 

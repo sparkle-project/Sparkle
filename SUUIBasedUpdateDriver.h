@@ -13,7 +13,9 @@
 #import "SUBasicUpdateDriver.h"
 
 @class SUStatusController, SUUpdateAlert;
-@interface SUUIBasedUpdateDriver : SUBasicUpdateDriver {
+
+@interface SUUIBasedUpdateDriver : SUBasicUpdateDriver
+{
 	SUStatusController *statusController;
 	SUUpdateAlert *updateAlert;
 }

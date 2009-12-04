@@ -15,9 +15,13 @@
 #import "SUProbingUpdateDriver.h"
 #import "SUUserInitiatedUpdateDriver.h"
 #import "SUScheduledUpdateDriver.h"
+#import "SUConstants.h"
+#import "SULog.h"
+#include <SystemConfiguration/SCNetwork.h>	// UK 2007-04-27
+
 
 @interface SUUpdater (Private)
-- initForBundle:(NSBundle *)bundle;
+- (id)initForBundle:(NSBundle *)bundle;
 - (void)startUpdateCycle;
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
 - (BOOL)automaticallyDownloadsUpdates;
@@ -25,7 +29,6 @@
 - (void)registerAsObserver;
 - (void)unregisterAsObserver;
 - (void)updateDriverDidFinish:(NSNotification *)note;
-- initForBundle:(NSBundle *)bundle;
 - (NSURL *)parameterizedFeedURL;
 @end
 
@@ -52,7 +55,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 }
 
 // This is the designated initializer for SUUpdater, important for subclasses
-- initForBundle:(NSBundle *)bundle
+- (id)initForBundle:(NSBundle *)bundle
 {
 	self = [super init];
     if (bundle == nil) bundle = [NSBundle mainBundle];
@@ -70,10 +73,11 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
         host = [[SUHost alloc] initWithBundle:bundle];
         [self registerAsObserver];
 		
+#if 0
 		// Saving-the-developer-from-a-stupid-mistake-check:
 		if (![[[self feedURL] scheme] isEqualToString:@"https"] && ![host publicDSAKey])
 			NSRunAlertPanel(@"Insecure update error!", @"For security reasons, you need to distribute your appcast over SSL or sign your updates. See Sparkle's documentation for more information.", @"OK", nil, nil);
-		
+#endif
         // This runs the permission prompt if needed, but never before the app has finished launching because the runloop won't run before that
         [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:0];
 	}
@@ -86,7 +90,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
     return [self initForBundle:[NSBundle mainBundle]];
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [host bundlePath]]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [host bundlePath], [host installationPath]]; }
 
 - (void)startUpdateCycle
 {
@@ -157,6 +161,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	if (checkTimer)
 	{
 		[checkTimer invalidate];
+		[checkTimer release];		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
 		checkTimer = nil;
 	}
 	if (![self automaticallyChecksForUpdates]) return;
@@ -174,17 +179,79 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 		delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
 	else
 		delayUntilCheck = 0; // We're overdue! Run one now.
-	checkTimer = [NSTimer scheduledTimerWithTimeInterval:delayUntilCheck target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO];
+	checkTimer = [[NSTimer scheduledTimerWithTimeInterval:delayUntilCheck target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO] retain];		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
 }
+
+
+-(void)	putFeedURLIntoDictionary: (NSMutableDictionary*)theDict	// You release this.
+{
+	[theDict setObject: [self feedURL] forKey: @"feedURL"];
+}
+
+-(void)	checkForUpdatesInBgReachabilityCheckWithDriver: (SUUpdateDriver*)inDriver /* RUNS ON ITS OWN THREAD */
+{
+	NS_DURING
+		// This method *must* be called on its own thread. SCNetworkReachabilityCheckByName
+		//	can block, and it can be waiting a long time on slow networks, and we
+		//	wouldn't want to beachball the main thread for a background operation.
+		// We could use asynchronous reachability callbacks, but those aren't
+		//	reliable enough and can 'get lost' sometimes, which we don't want.
+		
+		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+		SCNetworkConnectionFlags flags = 0;
+		BOOL isNetworkReachable = YES;
+		
+		// Don't perform automatic checks on unconnected laptops or dial-up connections that aren't online:
+		NSMutableDictionary*		theDict = [NSMutableDictionary dictionary];
+		[self performSelectorOnMainThread: @selector(putFeedURLIntoDictionary:) withObject: theDict waitUntilDone: YES];	// Get feed URL on main thread, it's not safe to call elsewhere.
+		if( SCNetworkCheckReachabilityByName( [[[theDict objectForKey: @"feedURL"] host] cStringUsingEncoding: NSUTF8StringEncoding], &flags ) )
+		{
+			BOOL reachable =	(flags & kSCNetworkFlagsReachable)				== kSCNetworkFlagsReachable;
+			BOOL automatic =	(flags & kSCNetworkFlagsConnectionAutomatic)	== kSCNetworkFlagsConnectionAutomatic;
+			BOOL local =		(flags & kSCNetworkFlagsIsLocalAddress)			== kSCNetworkFlagsIsLocalAddress;
+			
+			//NSLog(@"reachable = %s, automatic = %s, local = %s", (reachable?"YES":"NO"), (automatic?"YES":"NO"), (local?"YES":"NO"));
+			
+			if( !(reachable || automatic || local) )
+				isNetworkReachable = NO;
+		}
+		
+		if( isNetworkReachable )
+		{
+			[self performSelectorOnMainThread: @selector(checkForUpdatesWithDriver:) withObject: inDriver waitUntilDone: NO];
+		}
+		
+		[pool release];
+	NS_HANDLER
+		NSLog(@"UNCAUGHT EXCEPTION IN UPDATE CHECK TIMER: %@",[localException reason]);
+		// Don't propagate the exception beyond here. In Carbon apps that would trash the stack.
+	NS_ENDHANDLER
+}
+
 
 - (void)checkForUpdatesInBackground
 {
-	checkTimer = nil; // Timer doesn't repeat, so it's invalid, just needs to be set to nil.
+	if( [delegate respondsToSelector: @selector(updaterMayCheckForUpdates:)] && ![delegate updaterMayCheckForUpdates: self] )
+	{
+		[self scheduleNextUpdateCheck];
+		return;
+	}
 	
-	[self checkForUpdatesWithDriver:[[[([self automaticallyDownloadsUpdates] ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class]) alloc] initWithUpdater:self] autorelease]];
+	// Background update checks should only happen if we have a network connection.
+	//	Wouldn't want to annoy users on dial-up by establishing a connection every
+	//	hour or so:
+	SUUpdateDriver *	theUpdateDriver = [[[([self automaticallyDownloadsUpdates] ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class]) alloc] initWithUpdater:self] autorelease];
+	
+	[NSThread detachNewThreadSelector: @selector(checkForUpdatesInBgReachabilityCheckWithDriver:) toTarget: self withObject: theUpdateDriver];
 }
 
-- (IBAction)checkForUpdates:sender
+
+-(BOOL)	mayUpdateAndRestart
+{
+	return( !delegate || ![delegate respondsToSelector: @selector(updaterShouldRelaunchApplication:)] || [delegate updaterShouldRelaunchApplication: self] );
+}
+
+- (IBAction)checkForUpdates: (id)sender
 {
 	[self checkForUpdatesWithDriver:[[[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self] autorelease]];
 }
@@ -197,14 +264,21 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)d
 {
 	if ([self updateInProgress]) { return; }
-	if (checkTimer) { [checkTimer invalidate]; checkTimer = nil; }
+	if (checkTimer) { [checkTimer invalidate]; [checkTimer release]; checkTimer = nil; }		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
+	
+	SUClearLog();
+	SULog( @"===== %@ =====", [[NSFileManager defaultManager] displayNameAtPath: [[NSBundle mainBundle] bundlePath]] );
 		
 	[self willChangeValueForKey:@"lastUpdateCheckDate"];
 	[host setObject:[NSDate date] forUserDefaultsKey:SULastCheckTimeKey];
 	[self didChangeValueForKey:@"lastUpdateCheckDate"];
 	
 	driver = [d retain];
-	[driver checkForUpdatesAtURL:[self parameterizedFeedURL] host:host];
+	NSURL*	theFeedURL = [self parameterizedFeedURL];
+	if( theFeedURL )	// Use a NIL URL to cancel quietly.
+		[driver checkForUpdatesAtURL: theFeedURL host:host];
+	else
+		[driver abortUpdate];
 }
 
 - (void)registerAsObserver
@@ -289,14 +363,20 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	[host setObject:[feedURL absoluteString] forUserDefaultsKey:SUFeedURLKey];
 }
 
-- (NSURL *)feedURL
+- (NSURL *)feedURL // *** MUST BE CALLED ON MAIN THREAD ***
 {
 	// A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
 	NSString *appcastString = [host objectForKey:SUFeedURLKey];
+	if( [delegate respondsToSelector: @selector(feedURLStringForUpdater:)] )
+		appcastString = [delegate feedURLStringForUpdater: self];
 	if (!appcastString) // Can't find an appcast string!
 		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the SUFeedURL key in either the Info.plist or the user defaults!"];
 	NSCharacterSet* quoteSet = [NSCharacterSet characterSetWithCharactersInString: @"\"\'"]; // Some feed publishers add quotes; strip 'em.
-	return [NSURL URLWithString:[appcastString stringByTrimmingCharactersInSet:quoteSet]];
+	NSString*	castUrlStr = [appcastString stringByTrimmingCharactersInSet:quoteSet];
+	if( !castUrlStr || [castUrlStr length] == 0 )
+		return nil;
+	else
+		return [NSURL URLWithString: castUrlStr];
 }
 
 - (void)setUserAgentString:(NSString *)userAgent
@@ -393,7 +473,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 {
 	[self unregisterAsObserver];
 	[host release];
-	if (checkTimer) { [checkTimer invalidate]; }
+	if (checkTimer) { [checkTimer invalidate]; [checkTimer release]; checkTimer = nil; }		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
 	[super dealloc];
 }
 

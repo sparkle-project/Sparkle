@@ -6,7 +6,11 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
+#import "SUUpdater.h"
+
+#import "SUAppcast.h"
+#import "SUAppcastItem.h"
+#import "SUVersionComparisonProtocol.h"
 #import "SUAppcastItem.h"
 
 @implementation SUAppcastItem
@@ -101,6 +105,16 @@
 	minimumSystemVersion = [systemVersionString copy];
 }
 
+
+- (NSURL *)infoURL	{ return [[infoURL retain] autorelease]; }	// UK 2007-08-31 (whole method)
+
+- (void)setInfoURL:(NSURL *)aFileURL	// UK 2007-08-31 (whole method)
+{
+	if( aFileURL == infoURL ) return;
+	[infoURL release];
+	infoURL = [aFileURL copy];
+}
+
 - initWithDictionary:(NSDictionary *)dict
 {
 	return [self initWithDictionary:dict failureReason:nil];
@@ -130,7 +144,9 @@
 		//    The big caveat with this is that you can't have underscores in your version strings, as that'll confuse Sparkle.
 		//    Feel free to change the separator string to a hyphen or something more suited to your needs if you like.
 		NSString *newVersion = [enclosure objectForKey:@"sparkle:version"];
-		if (newVersion == nil) // no sparkle:version attribute
+		if( newVersion == nil )
+			newVersion = [dict objectForKey:@"sparkle:version"];	// UK 2007-08-31 Get version from the item, in case it's a download-less item (i.e. paid upgrade).
+		if (newVersion == nil) // no sparkle:version attribute anywhere?
 		{
 			// Separate the url by underscores and take the last component, as that'll be closest to the end,
 			// then we remove the extension. Hopefully, this will be the version.
@@ -160,7 +176,16 @@
 		[self setDate:[dict objectForKey:@"pubDate"]];
 		[self setItemDescription:[dict objectForKey:@"description"]];
 		
-		[self setFileURL:[NSURL URLWithString:[[enclosure objectForKey:@"url"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+		NSString*	theInfoURL = [dict objectForKey:@"link"];
+		if( theInfoURL )
+		{
+			if( ![theInfoURL isKindOfClass: [NSString class]] )
+				NSLog(@"SUAppcastItem -initWithDictionary: Info URL is not of valid type.");
+			else
+				[self setInfoURL:[NSURL URLWithString:theInfoURL]];
+		}
+			
+            		[self setFileURL:[NSURL URLWithString:[[enclosure objectForKey:@"url"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
 		[self setDSASignature:[enclosure objectForKey:@"sparkle:dsaSignature"]];		
 		
 		[self setVersionString:newVersion];
@@ -193,6 +218,7 @@
     [self setFileURL:nil];
     [self setVersionString:nil];
 	[self setDisplayVersionString:nil];
+	[self setInfoURL:nil];
 	[propertiesDictionary release];
     [super dealloc];
 }

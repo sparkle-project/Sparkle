@@ -6,7 +6,11 @@
 //  Copyright 2005 Steve Gehrman. All rights reserved.
 //
 
-#import "Sparkle.h"
+#import "SUUpdater.h"
+
+#import "SUAppcast.h"
+#import "SUAppcastItem.h"
+#import "SUVersionComparisonProtocol.h"
 #import "NTSynchronousTask.h"
 
 @interface NTSynchronousTask (Private)
@@ -44,6 +48,7 @@
 		
 		[[self task] setStandardInput:[self inputPipe]];
 		[[self task] setStandardOutput:[self outputPipe]];
+		[[self task] setStandardError:[self outputPipe]];
 	}
 	
     return self;
@@ -64,11 +69,13 @@
     [super dealloc];
 }
 
-+ (NSData*)task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input;
++(int)	task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input output: (NSData**)outData
 {
 	// we need this wacky pool here, otherwise we run out of pipes, the pipes are internally autoreleased
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	NSData* result=nil;
+	NSAutoreleasePool *	pool = [[NSAutoreleasePool alloc] init];
+	int					taskResult = 0;
+	if( outData )
+		*outData = nil;
 	
 	NS_DURING
 	{
@@ -76,20 +83,23 @@
 		
 		[task run:toolPath directory:currentDirectory withArgs:args input:input];
 		
-		if ([task result] == 0)
-			result = [[task output] retain];
+		taskResult = [task result];
+		if( outData )
+			*outData = [[task output] retain];
 				
 		[task release];
 	}	
 	NS_HANDLER;
+		taskResult = errCppGeneral;
 	NS_ENDHANDLER;
 	
 	[pool drain];
 	
 	// retained above
-	[result autorelease];
+	if( outData )
+		[*outData autorelease];
 	
-    return result;
+    return taskResult;
 }
 
 @end
