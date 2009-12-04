@@ -7,6 +7,7 @@
 //
 
 #import "SUPackageInstaller.h"
+#import "SUConstants.h"
 
 #ifndef NSAppKitVersionNumber10_4
 #define NSAppKitVersionNumber10_4 824

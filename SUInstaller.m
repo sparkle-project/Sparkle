@@ -9,7 +9,8 @@
 #import "SUInstaller.h"
 #import "SUPlainInstaller.h"
 #import "SUPackageInstaller.h"
-#import "SUHost.h" 
+#import "SUHost.h"
+#import "SUConstants.h"
 
 @implementation SUInstaller
 
@@ -36,10 +37,13 @@
 + (void)installFromUpdateFolder:(NSString *)updateFolder overHost:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
 {
 	// Search subdirectories for the application
-	NSString *currentFile, *newAppDownloadPath = nil, *bundleFileName = [[host bundlePath] lastPathComponent], *alternateBundleFileName = [[host name] stringByAppendingPathExtension:[[host bundlePath] pathExtension]];
+	NSString	*currentFile, *newAppDownloadPath = nil,
+				*bundleFileName = [[host bundlePath] lastPathComponent],
+				*alternateBundleFileName = [[host name] stringByAppendingPathExtension: [[host bundlePath] pathExtension]];
 	BOOL isPackage = NO;
 	NSString *fallbackPackagePath = nil;
-	NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:updateFolder];
+	NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath: updateFolder];
+	
 	while ((currentFile = [dirEnum nextObject]))
 	{
 		NSString *currentPath = [updateFolder stringByAppendingPathComponent:currentFile];		
@@ -81,7 +85,7 @@
 		if ([self _isAliasFolderAtPath:currentPath])
 			[dirEnum skipDescendents];
 	}
-
+	
 	// We don't have a valid path. Try to use the fallback package.
 
 	if (newAppDownloadPath == nil && fallbackPackagePath != nil)

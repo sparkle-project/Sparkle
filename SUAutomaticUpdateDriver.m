@@ -71,13 +71,6 @@
 	[self installUpdate];
 }
 
-- (void)installerFinishedForHost:(SUHost *)aHost
-{
-	if (aHost != host) { return; }
-	if (!postponingInstallation)
-		[self relaunchHostApp];
-}
-
 - (void)abortUpdateWithError:(NSError *)error
 {
 	if (showErrors)

@@ -44,10 +44,9 @@
 - (void)unarchiverDidFail:(SUUnarchiver *)ua;
 
 - (void)installUpdate;
-- (void)installerFinishedForHost:(SUHost *)host;
 - (void)installerForHost:(SUHost *)host failedWithError:(NSError *)error;
 
-- (void)relaunchHostApp;
+- (void)installAndRelaunchWithTool;
 - (void)cleanUp;
 
 - (void)abortUpdate;

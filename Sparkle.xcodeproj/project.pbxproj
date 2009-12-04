@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		552B69D410C0785600050E82 /* SUInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5000DAE88B40026945C /* SUInstaller.m */; };
+		552B69D510C0786A00050E82 /* SUHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 61EF67550E25B58D00F754E0 /* SUHost.m */; };
+		552B69DC10C0788200050E82 /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
+		552B69E910C0790500050E82 /* SUPlainInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5040DAE8AB80026945C /* SUPlainInstaller.m */; };
+		552B69EA10C0790800050E82 /* SUPlainInstallerInternals.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5F8E509C4CE3C00B25A18 /* SUPlainInstallerInternals.m */; };
+		552B69ED10C0791000050E82 /* SUSystemProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A2279B0D1CEE7600430CCD /* SUSystemProfiler.m */; };
+		552B69F010C0791800050E82 /* SUPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5210DAE8E8A0026945C /* SUPackageInstaller.m */; };
+		552B6A3710C0795600050E82 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
+		552B6A5E10C07FC200050E82 /* SUStandardVersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */; };
 		610134730DD250470049ACDF /* SUUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 610134710DD250470049ACDF /* SUUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
 		610134740DD250470049ACDF /* SUUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 610134720DD250470049ACDF /* SUUpdateDriver.m */; };
 		6101347B0DD2541A0049ACDF /* SUProbingUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 610134790DD2541A0049ACDF /* SUProbingUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
@@ -90,8 +99,8 @@
 		61F83F740DBFE141006FDD30 /* SUBasicUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
 		61FA52880E2D9EA400EF58AD /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		DAAEFC9B0DA5722F0051E0D0 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
-		DAAEFD4E0DA572330051E0D0 /* relaunch.m in Sources */ = {isa = PBXBuildFile; fileRef = 613242130CD06CEF00106AA4 /* relaunch.m */; };
-		DAAEFD510DA572550051E0D0 /* relaunch in Resources */ = {isa = PBXBuildFile; fileRef = DAAEFC960DA571DF0051E0D0 /* relaunch */; };
+		DAAEFD4E0DA572330051E0D0 /* finish_installation.m in Sources */ = {isa = PBXBuildFile; fileRef = 613242130CD06CEF00106AA4 /* finish_installation.m */; };
+		DAAEFD510DA572550051E0D0 /* finish_installation in Resources */ = {isa = PBXBuildFile; fileRef = DAAEFC960DA571DF0051E0D0 /* finish_installation */; };
 		FAEFA2F70D94AA7500472538 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		FAEFA2F80D94AA7900472538 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
 		FAEFA3040D94AB3400472538 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
@@ -202,7 +211,7 @@
 		613151B30FB49480000DCD59 /* is */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = is; path = is.lproj/SUUpdatePermissionPrompt.nib; sourceTree = "<group>"; };
 		613151B40FB49488000DCD59 /* is */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = is; path = is.lproj/SUAutomaticUpdateAlert.nib; sourceTree = "<group>"; };
 		613151B50FB49492000DCD59 /* is */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = is; path = is.lproj/SUUpdateAlert.nib; sourceTree = "<group>"; };
-		613242130CD06CEF00106AA4 /* relaunch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = relaunch.m; sourceTree = "<group>"; };
+		613242130CD06CEF00106AA4 /* finish_installation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = finish_installation.m; sourceTree = "<group>"; };
 		615409A8103BA09100125AF1 /* ConfigTestAppReleaseGCSupport.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigTestAppReleaseGCSupport.xcconfig; sourceTree = "<group>"; };
 		615409C4103BBC4000125AF1 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		615409C5103BBC5000125AF1 /* cs */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = cs; path = cs.lproj/SUUpdatePermissionPrompt.nib; sourceTree = "<group>"; };
@@ -292,7 +301,7 @@
 		61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBasicUpdateDriver.m; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* Sparkle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Sparkle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DAAEFC960DA571DF0051E0D0 /* relaunch */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = relaunch; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAAEFC960DA571DF0051E0D0 /* finish_installation */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = finish_installation; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigTestAppDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigCommonRelease.xcconfig; sourceTree = "<group>"; };
@@ -343,6 +352,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				552B6A3710C0795600050E82 /* Security.framework in Frameworks */,
 				DAAEFC9B0DA5722F0051E0D0 /* AppKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -355,7 +365,7 @@
 			children = (
 				8DC2EF5B0486A6940098B216 /* Sparkle.framework */,
 				61B5F90209C4CEE200B25A18 /* Sparkle Test App.app */,
-				DAAEFC960DA571DF0051E0D0 /* relaunch */,
+				DAAEFC960DA571DF0051E0D0 /* finish_installation */,
 				612279D90DB5470200AB99EA /* Sparkle Unit Tests.octest */,
 			);
 			name = Products;
@@ -427,7 +437,7 @@
 		6101355D0DD25BB70049ACDF /* Support */ = {
 			isa = PBXGroup;
 			children = (
-				613242130CD06CEF00106AA4 /* relaunch.m */,
+				613242130CD06CEF00106AA4 /* finish_installation.m */,
 			);
 			name = Support;
 			sourceTree = "<group>";
@@ -688,9 +698,9 @@
 			productReference = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		DAAEFC950DA571DF0051E0D0 /* relaunch tool */ = {
+		DAAEFC950DA571DF0051E0D0 /* finish_installation tool */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DAAEFC9A0DA571FD0051E0D0 /* Build configuration list for PBXNativeTarget "relaunch tool" */;
+			buildConfigurationList = DAAEFC9A0DA571FD0051E0D0 /* Build configuration list for PBXNativeTarget "finish_installation tool" */;
 			buildPhases = (
 				DAAEFC930DA571DF0051E0D0 /* Sources */,
 				DAAEFC940DA571DF0051E0D0 /* Frameworks */,
@@ -699,9 +709,9 @@
 			);
 			dependencies = (
 			);
-			name = "relaunch tool";
+			name = "finish_installation tool";
 			productName = relaunch;
-			productReference = DAAEFC960DA571DF0051E0D0 /* relaunch */;
+			productReference = DAAEFC960DA571DF0051E0D0 /* finish_installation */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -754,7 +764,7 @@
 			targets = (
 				8DC2EF4F0486A6940098B216 /* Sparkle */,
 				61B5F90109C4CEE200B25A18 /* Sparkle Test App */,
-				DAAEFC950DA571DF0051E0D0 /* relaunch tool */,
+				DAAEFC950DA571DF0051E0D0 /* finish_installation tool */,
 				612279D80DB5470200AB99EA /* Sparkle Unit Tests */,
 			);
 		};
@@ -784,7 +794,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				61C2680A0E2DB5D000175E6C /* License.txt in Resources */,
-				DAAEFD510DA572550051E0D0 /* relaunch in Resources */,
+				DAAEFD510DA572550051E0D0 /* finish_installation in Resources */,
 				610D5A750A1670A4004AAD9C /* SUStatus.nib in Resources */,
 				61AAE8280A321A7F00D8810D /* Sparkle.strings in Resources */,
 				61AAE8290A321A8000D8810D /* SUAutomaticUpdateAlert.nib in Resources */,
@@ -913,7 +923,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DAAEFD4E0DA572330051E0D0 /* relaunch.m in Sources */,
+				DAAEFD4E0DA572330051E0D0 /* finish_installation.m in Sources */,
+				552B69D410C0785600050E82 /* SUInstaller.m in Sources */,
+				552B69D510C0786A00050E82 /* SUHost.m in Sources */,
+				552B69DC10C0788200050E82 /* SUConstants.m in Sources */,
+				552B69E910C0790500050E82 /* SUPlainInstaller.m in Sources */,
+				552B69EA10C0790800050E82 /* SUPlainInstallerInternals.m in Sources */,
+				552B69ED10C0791000050E82 /* SUSystemProfiler.m in Sources */,
+				552B69F010C0791800050E82 /* SUPackageInstaller.m in Sources */,
+				552B6A5E10C07FC200050E82 /* SUStandardVersionComparator.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -937,7 +955,7 @@
 		};
 		DAAEFD500DA572460051E0D0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = DAAEFC950DA571DF0051E0D0 /* relaunch tool */;
+			target = DAAEFC950DA571DF0051E0D0 /* finish_installation tool */;
 			targetProxy = DAAEFD4F0DA572460051E0D0 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -1109,6 +1127,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
 			buildSettings = {
+				PRODUCT_NAME = finish_installation;
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
 		};
@@ -1216,6 +1235,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
 			buildSettings = {
+				PRODUCT_NAME = finish_installation;
 			};
 			name = Debug;
 		};
@@ -1223,6 +1243,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
 			buildSettings = {
+				PRODUCT_NAME = finish_installation;
 			};
 			name = Release;
 		};
@@ -1269,7 +1290,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DAAEFC9A0DA571FD0051E0D0 /* Build configuration list for PBXNativeTarget "relaunch tool" */ = {
+		DAAEFC9A0DA571FD0051E0D0 /* Build configuration list for PBXNativeTarget "finish_installation tool" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DAAEFC980DA571DF0051E0D0 /* Debug */,

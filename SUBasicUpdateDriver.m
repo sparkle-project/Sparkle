@@ -139,11 +139,12 @@
 	// We create a temporary directory in /tmp and stick the file there.
 	// Not using a GUID here because hdiutil (for DMGs) for some reason chokes on GUIDs. Too long? I really have no idea.
 	NSString *prefix = [NSString stringWithFormat:@"%@ %@ Update", [host name], [host version]];
-	NSString *tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:prefix];
+	NSString *desktopFolder = [@"~/Desktop" stringByExpandingTildeInPath];
+	NSString *tempDir = [desktopFolder stringByAppendingPathComponent:prefix];
 	int cnt=1;
 	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
 	{
-		tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", prefix, cnt++]];
+		tempDir = [desktopFolder stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", prefix, cnt++]];
 	}
 	
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
@@ -227,8 +228,11 @@
 	if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdate:)])
 		[[updater delegate] updater:updater willInstallUpdate:updateItem];
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
-	NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]]  pathForResource:@"relaunch" ofType:@""];
-	NSString *targetPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
+	NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]]  pathForResource:@"finish_installation" ofType:@""];
+	NSString *appSupportFolder = [[@"~/Library/Application Support/" stringByExpandingTildeInPath] stringByAppendingPathComponent: [host name]];
+	NSString *targetPath = [appSupportFolder stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
+	[[NSFileManager defaultManager] createDirectoryAtPath: targetPath withIntermediateDirectories: YES attributes: [NSDictionary dictionary] error: NULL];
+
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
 	NSError *error = nil;
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
@@ -242,16 +246,10 @@
 	else
 		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil), NSLocalizedDescriptionKey, [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", relaunchPathToCopy, targetPath, (error ? [error localizedDescription] : @"")], NSLocalizedFailureReasonErrorKey, nil]]];
 	
-	[SUInstaller installFromUpdateFolder:[downloadPath stringByDeletingLastPathComponent] overHost:host delegate:self synchronously:[self shouldInstallSynchronously] versionComparator:[self _versionComparator]];
+	[self installAndRelaunchWithTool];
 }
 
-- (void)installerFinishedForHost:(SUHost *)aHost
-{
-	if (aHost != host) { return; }
-	[self relaunchHostApp];
-}
-
-- (void)relaunchHostApp
+- (void)installAndRelaunchWithTool
 {
 	// Give the host app an opportunity to postpone the relaunch.
 	static BOOL postponedOnce = NO;
@@ -264,8 +262,6 @@
 		if ([[updater delegate] updater:updater shouldPostponeRelaunchForUpdate:updateItem untilInvoking:invocation])
 			return;
 	}
-
-	[self cleanUp]; // Clean up the download and extracted files.
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
 	if ([[updater delegate] respondsToSelector:@selector(updaterWillRelaunchApplication:)])
@@ -282,7 +278,7 @@
 	NSString *pathToRelaunch = [host bundlePath];
 	if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
 		pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
-	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
+	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], [downloadPath stringByDeletingLastPathComponent], nil]];
 
 	[NSApp terminate:self];
 }

@@ -8,6 +8,7 @@
 
 #import "Sparkle.h"
 #import "SUPlainInstallerInternals.h"
+#import "SUConstants.h"
 
 #import <CoreServices/CoreServices.h>
 #import <Security/Security.h>
