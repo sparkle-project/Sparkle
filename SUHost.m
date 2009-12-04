@@ -48,7 +48,7 @@
 
 - (NSString *)installationPath
 {
-#if 1
+#if NORMALIZE_INSTALLED_APP_NAME
     return [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.%@", [bundle objectForInfoDictionaryKey:@"CFBundleName"], [[bundle bundlePath] pathExtension]]];
 #else
 	return [bundle bundlePath];
