@@ -18,6 +18,7 @@
 + (void)_finishInstallationWithResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:delegate;
 
 + (NSString*)updateFolder;
++ (void)notifyDelegateOfFailure: (NSDictionary*)dict;
 @end
 
 @interface NSObject (SUInstallerDelegateInformalProtocol)
