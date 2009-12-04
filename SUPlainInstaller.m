@@ -59,7 +59,7 @@ NSString *SUInstallerErrorKey = @"SUInstallerError";
 		return;
 	}
     
-    NSString *targetPath = [host bundlePath];
+    NSString *targetPath = [host installationPath];
     NSString *tempName = [self temporaryNameForPath:targetPath];
 	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:path, SUInstallerPathKey, targetPath, SUInstallerTargetPathKey, tempName, SUInstallerTempNameKey, host, SUInstallerHostKey, delegate, SUInstallerDelegateKey, nil];
 	if (synchronously)
