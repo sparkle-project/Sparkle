@@ -125,6 +125,7 @@
 	[self setProgressValue:0];
 	[progressBar setIndeterminate:(value == 0)];
 	[progressBar startAnimation:self];
+	[progressBar setUsesThreadedAnimation: YES];
 }
 
 - (void)setStatusText:(NSString *)aStatusText
