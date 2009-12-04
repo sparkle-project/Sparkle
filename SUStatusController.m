@@ -90,7 +90,7 @@
 	[actionButton setKeyEquivalent:isDefault ? @"\r" : @""];
 	
 	// 06/05/2008 Alex: Avoid a crash when cancelling during the extraction
-	[self setButtonEnabled:(target != NULL)];
+	[self setButtonEnabled: (target != nil)];
 }
 
 - (BOOL)progressBarShouldAnimate
