@@ -223,7 +223,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 		
 		[pool release];
 	NS_HANDLER
-		NSLog(@"UNCAUGHT EXCEPTION IN UPDATE CHECK TIMER: %@",[localException reason]);
+		SULog(@"UNCAUGHT EXCEPTION IN UPDATE CHECK TIMER: %@",[localException reason]);
 		// Don't propagate the exception beyond here. In Carbon apps that would trash the stack.
 	NS_ENDHANDLER
 }

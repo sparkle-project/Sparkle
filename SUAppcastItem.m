@@ -180,7 +180,7 @@
 		if( theInfoURL )
 		{
 			if( ![theInfoURL isKindOfClass: [NSString class]] )
-				NSLog(@"SUAppcastItem -initWithDictionary: Info URL is not of valid type.");
+				SULog(@"SUAppcastItem -initWithDictionary: Info URL is not of valid type.");
 			else
 				[self setInfoURL:[NSURL URLWithString:theInfoURL]];
 		}

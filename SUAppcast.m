@@ -169,7 +169,7 @@
 			}
             else
             {
-				NSLog(@"Sparkle Updater: Failed to parse appcast item: %@.\nAppcast dictionary was: %@", errString, dict);
+				SULog(@"Sparkle Updater: Failed to parse appcast item: %@.\nAppcast dictionary was: %@", errString, dict);
             }
             [nodesDict removeAllObjects];
             [dict removeAllObjects];

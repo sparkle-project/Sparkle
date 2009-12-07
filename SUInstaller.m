@@ -121,6 +121,8 @@ static NSString*	sUpdateFolder = nil;
 {
 	// *** GETS CALLED ON NON-MAIN THREAD!
 	
+	SULog( @"mdimporting" );
+	
 	NSTask *mdimport = [[[NSTask alloc] init] autorelease];
 	[mdimport setLaunchPath:@"/usr/bin/mdimport"];
 	[mdimport setArguments:[NSArray arrayWithObject:[host installationPath]]];
