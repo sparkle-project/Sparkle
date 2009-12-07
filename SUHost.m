@@ -23,7 +23,7 @@
 	{
         bundle = [aBundle retain];
 		if (![bundle bundleIdentifier])
-			NSLog(@"Sparkle Error: the bundle being updated at %@ has no CFBundleIdentifier! This will cause preference read/write to not work properly.", bundle);
+			SULog(@"Sparkle Error: the bundle being updated at %@ has no CFBundleIdentifier! This will cause preference read/write to not work properly.", bundle);
     }
     return self;
 }
