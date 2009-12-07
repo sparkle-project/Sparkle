@@ -8,7 +8,7 @@
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ é atualmente a versão mais nova disponível.";
 
 /* No comment provided by engineer. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ está disponível—você possui a %3$@. Gostaria de obtê-la agora?";
+"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ está disponível—você possui a %3$@.Gostaria de obtê-la agora?";
 
 /* No comment provided by engineer. */
 "%@ downloaded" = "%@ downloaded";
@@ -47,16 +47,16 @@
 "Cancel" = "Cancelar";
 
 /* No comment provided by engineer. */
-"Cancel Update" = "Cancel Update";
+"Cancel Update" = "Cancelar Atualização";
 
 /* No comment provided by engineer. */
 "Checking for updates..." = "Checking for updates…";
 
-/* No comment provided by engineer. */
-"Downloading update..." = "Obtendo atualizações...";
+/* Take care not to overflow the status window. */
+"Downloading update..." = "Obtendo atualizações…";
 
-/* No comment provided by engineer. */
-"Extracting update..." = "Extraindo atualizações...";
+/* Take care not to overflow the status window. */
+"Extracting update..." = "Extraindo atualizações…";
 
 /* the unit for gigabytes */
 "GB" = "GB";
@@ -64,8 +64,8 @@
 /* No comment provided by engineer. */
 "Install and Relaunch" = "Instalar e reiniciar";
 
-/* No comment provided by engineer. */
-"Installing update..." = "Instalando atualizações...";
+/* Take care not to overflow the status window. */
+"Installing update..." = "Instalando atualizações…";
 
 /* the unit for kilobytes */
 "KB" = "KB";
@@ -92,4 +92,4 @@
 "You already have the newest version of %@." = "You already have the newest version of %@.";
 
 /* No comment provided by engineer. */
-"You're up-to-date!" = "Aplicativo está atualizado!";
+"You're up-to-date!" = "Você está atualizado!";

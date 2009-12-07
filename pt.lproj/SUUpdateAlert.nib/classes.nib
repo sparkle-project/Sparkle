@@ -46,8 +46,6 @@
 				<string>id</string>
 				<key>description</key>
 				<string>NSTextField</string>
-				<key>installButton</key>
-				<string>NSButton</string>
 				<key>releaseNotesView</key>
 				<string>WebView</string>
 			</dict>
