@@ -253,27 +253,23 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 + (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp error:(NSError **)error
 {
-	FSRef srcRef, dstRef, targetRef, movedRef;
-	OSErr err;
+	FSRef		srcRef, dstRef, targetRef, movedRef;
+	OSErr		err;
+	BOOL		hadFileAtDest = NO;
+	NSString	*tmpPath = [[dst stringByDeletingLastPathComponent] stringByAppendingPathComponent:tmp];
 	
 	err = FSPathMakeRefWithOptions((UInt8 *)[dst fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &dstRef, NULL);
-	if (err != noErr)
+	hadFileAtDest = (err == noErr);	// There is a file at the destination, move it aside. If we normalized the name, we might not get here, so don't error.
+	if( hadFileAtDest )
 	{
-		NSString *errorMessage = [NSString stringWithFormat:@"Couldn't copy %@ over %@ because there is no file at %@.", src, dst, dst];
-		if (error != NULL)
-			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
-		return NO;
+		if (0 != access([dst fileSystemRepresentation], W_OK) || 0 != access([[dst stringByDeletingLastPathComponent] fileSystemRepresentation], W_OK))
+			return [self _copyPathWithForcedAuthentication:src toPath:dst temporaryPath:tmpPath error:error];
 	}
-	
-	NSString *tmpPath = [[dst stringByDeletingLastPathComponent] stringByAppendingPathComponent:tmp];
-	
-	if (0 != access([dst fileSystemRepresentation], W_OK) || 0 != access([[dst stringByDeletingLastPathComponent] fileSystemRepresentation], W_OK))
-		return [self _copyPathWithForcedAuthentication:src toPath:dst temporaryPath:tmpPath error:error];
 	
 	err = FSPathMakeRef((UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &targetRef, NULL);
 	if (err == noErr)
 		err = FSMoveObjectSync(&dstRef, &targetRef, (CFStringRef)tmp, &movedRef, 0);
-	if (err != noErr)
+	if (err != noErr && hadFileAtDest)
 	{
 		if (error != NULL)
 			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
@@ -285,21 +281,25 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	if (err != noErr)
 	{
 		// We better move the old version back to its old location
-		FSMoveObjectSync(&movedRef, &targetRef, (CFStringRef)[dst lastPathComponent], &movedRef, 0);
+		if( hadFileAtDest )
+			FSMoveObjectSync(&movedRef, &targetRef, (CFStringRef)[dst lastPathComponent], &movedRef, 0);
 		if (error != NULL)
 			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't copy %@ to %@.", src, dst] forKey:NSLocalizedDescriptionKey]];
 		return NO;			
 	}
 	
 	// Trash the old copy of the app.
+	if( hadFileAtDest )
+	{
 #if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4
-	if (FSMoveObjectToTrashSync == NULL)
-		[self performSelectorOnMainThread:@selector(_movePathToTrash:) withObject:tmpPath waitUntilDone:YES];
-	else if (noErr != FSMoveObjectToTrashSync(&movedRef, NULL, 0))
-		NSLog(@"Sparkle error: couldn't move %@ to the trash. This is often a sign of a permissions error.", tmpPath);
+		if (FSMoveObjectToTrashSync == NULL)
+			[self performSelectorOnMainThread:@selector(_movePathToTrash:) withObject:tmpPath waitUntilDone:YES];
+		else if (noErr != FSMoveObjectToTrashSync(&movedRef, NULL, 0))
+			NSLog(@"Sparkle error: couldn't move %@ to the trash. This is often a sign of a permissions error.", tmpPath);
 #else
-	[self performSelectorOnMainThread:@selector(_movePathToTrash:) withObject:tmpPath waitUntilDone:YES];
+		[self performSelectorOnMainThread:@selector(_movePathToTrash:) withObject:tmpPath waitUntilDone:YES];
 #endif
+	}
 	
 	// If the currently-running application is trusted, the new
 	// version should be trusted as well.  Remove it from the
