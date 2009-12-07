@@ -14,6 +14,7 @@
 @interface SUPlainInstaller (Internals)
 + (NSString *)temporaryNameForPath:(NSString *)path;
 + (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp error:(NSError **)error;
++ (void)_movePathToTrash:(NSString *)path;
 @end
 
 #endif

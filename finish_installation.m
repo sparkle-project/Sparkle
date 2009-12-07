@@ -14,6 +14,7 @@
 	const char		*folderPath;
 	NSString		*selfPath;
 	NSTimer			*watchdogTimer;
+	SUHost			*host;
 }
 
 - (void)	parentHasQuit;
@@ -54,6 +55,8 @@
 	selfPath = nil;
 	[watchdogTimer release];
 	watchdogTimer = nil;
+	[host release];
+	host = nil;
 	
 	[super dealloc];
 }
@@ -79,12 +82,19 @@
 
 - (void) relaunch
 {
-	[[NSWorkspace sharedWorkspace] openFile:[[NSFileManager defaultManager] stringWithFileSystemRepresentation:executablePath length:strlen(executablePath)]];
+	NSString	*appPath = nil;
+	if( !folderPath )
+		appPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:executablePath length:strlen(executablePath)];
+	else
+		appPath = [host installationPath];
+	[[NSWorkspace sharedWorkspace] openFile: appPath];
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-    [[NSFileManager defaultManager] removeFileAtPath: [SUInstaller updateFolder] handler: nil];
+	if( folderPath )
+    	[[NSFileManager defaultManager] removeFileAtPath: [SUInstaller updateFolder] handler: nil];
     [[NSFileManager defaultManager] removeFileAtPath: selfPath handler: nil];
 #else
-	[[NSFileManager defaultManager] removeItemAtPath: [SUInstaller updateFolder] error: NULL];
+	if( folderPath )
+    	[[NSFileManager defaultManager] removeItemAtPath: [SUInstaller updateFolder] error: NULL];
 	[[NSFileManager defaultManager] removeItemAtPath: selfPath error: NULL];
 #endif
 	exit(EXIT_SUCCESS);
@@ -94,16 +104,16 @@
 -(void)	install
 {
 	NSBundle			*theBundle = [NSBundle bundleWithPath: [NSString stringWithUTF8String: executablePath]];
-	SUHost				*theHost = [[[SUHost alloc] initWithBundle: theBundle] autorelease];
+	host = [[SUHost alloc] initWithBundle: theBundle];
 	
-	SUStatusController*	statusCtl = [[SUStatusController alloc] initWithHost: theHost];	// We quit anyway after we've installed, so leak this for now.
+	SUStatusController*	statusCtl = [[SUStatusController alloc] initWithHost: host];	// We quit anyway after we've installed, so leak this for now.
 	[statusCtl setButtonTitle: SULocalizedString(@"Cancel Update",@"") target: nil action: Nil isDefault: NO];
 	[statusCtl beginActionWithTitle: SULocalizedString(@"Installing update...",@"")
 					maxProgressValue: 0 statusText: @""];
 	[statusCtl showWindow: self];
 	
 	[SUInstaller installFromUpdateFolder: [NSString stringWithUTF8String: folderPath]
-					overHost: theHost
+					overHost: host
 					delegate: self synchronously: NO
 					versionComparator: [SUStandardVersionComparator defaultComparator]];
 }

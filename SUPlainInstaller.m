@@ -37,8 +37,19 @@ NSString *SUInstallerErrorKey = @"SUInstallerError";
 	
 	NSError *error = nil;
 	
-	BOOL result = [self copyPathWithAuthentication:[info objectForKey:SUInstallerPathKey] overPath:[info objectForKey:SUInstallerTargetPathKey] temporaryName:[info objectForKey:SUInstallerTempNameKey] error:&error];
+	NSString	*	oldPath = [[info objectForKey:SUInstallerHostKey] bundlePath];
+	NSString	*	installationPath = [[info objectForKey:SUInstallerHostKey] installationPath];
+	BOOL result = [self copyPathWithAuthentication:[info objectForKey:SUInstallerPathKey] overPath: installationPath temporaryName:[info objectForKey:SUInstallerTempNameKey] error:&error];
 	
+	//NSLog( @"oldPath = %@ installationPath = %@", oldPath, installationPath );
+	if( result )
+	{
+		BOOL	haveOld = [[NSFileManager defaultManager] fileExistsAtPath: oldPath];
+		BOOL	differentFromNew = ![oldPath isEqualToString: installationPath];
+		if( haveOld && differentFromNew )
+			[self _movePathToTrash: oldPath];	// On success, trash old copy if there's still one due to renaming.
+		//NSLog( @"haveOld = %s differentFromNew = %s", (haveOld? "YES":"NO"), (differentFromNew? "YES":"NO") );
+	}
 	NSMutableDictionary *mutableInfo = [[info mutableCopy] autorelease];
 	[mutableInfo setObject:[NSNumber numberWithBool:result] forKey:SUInstallerResultKey];
 	if (!result && error)
