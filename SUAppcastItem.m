@@ -12,6 +12,7 @@
 #import "SUAppcastItem.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SUAppcastItem.h"
+#import "SULog.h"
 
 @implementation SUAppcastItem
 
@@ -185,7 +186,7 @@
 				[self setInfoURL:[NSURL URLWithString:theInfoURL]];
 		}
 			
-            		[self setFileURL:[NSURL URLWithString:[[enclosure objectForKey:@"url"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+		[self setFileURL:[NSURL URLWithString:[[enclosure objectForKey:@"url"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
 		[self setDSASignature:[enclosure objectForKey:@"sparkle:dsaSignature"]];		
 		
 		[self setVersionString:newVersion];
