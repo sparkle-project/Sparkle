@@ -10,6 +10,8 @@
 #define SUUPDATEALERT_H
 
 #import "SUWindowController.h"
+#import "SUVersionDisplayProtocol.h"
+
 
 typedef enum
 {
@@ -24,6 +26,7 @@ typedef enum
 	SUAppcastItem *updateItem;
 	SUHost *host;
 	id delegate;
+	id<SUVersionDisplay>	versionDisplayer;
 	
 	IBOutlet WebView *releaseNotesView;
 	IBOutlet NSTextField *description;
@@ -38,6 +41,8 @@ typedef enum
 - (IBAction)installUpdate:sender;
 - (IBAction)skipThisVersion:sender;
 - (IBAction)remindMeLater:sender;
+
+- (void)setVersionDisplayer: (id<SUVersionDisplay>)disp;
 
 @end
 

@@ -48,6 +48,11 @@
 	[super dealloc];
 }
 
+- (void)setVersionDisplayer: (id<SUVersionDisplay>)disp
+{
+	versionDisplayer = disp;
+}
+
 - (void)endWithSelection:(SUUpdateAlertChoice)choice
 {
 	[releaseNotesView stopLoading:self];
@@ -233,11 +238,13 @@
 	NSString *updateItemVersion = [updateItem displayVersionString];
     NSString *hostVersion = [host displayVersion];
 	// Display more info if the version strings are the same; useful for betas.
-    if ([updateItemVersion isEqualToString:hostVersion])
+    if( !versionDisplayer && [updateItemVersion isEqualToString:hostVersion] )
 	{
         updateItemVersion = [updateItemVersion stringByAppendingFormat:@" (%@)", [updateItem versionString]];
         hostVersion = [hostVersion stringByAppendingFormat:@" (%@)", [host version]];
     }
+	else
+		[versionDisplayer formatVersion: &updateItemVersion andVersion: &hostVersion];
     return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", nil), [host name], updateItemVersion, hostVersion];
 }
 

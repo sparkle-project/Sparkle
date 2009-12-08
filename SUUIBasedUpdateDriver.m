@@ -20,6 +20,11 @@
 	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem host:host];
 	[updateAlert setDelegate:self];
 	
+	id<SUVersionDisplay>	versDisp = nil;
+	if ([[updater delegate] respondsToSelector:@selector(versionDisplayerForUpdater:)])
+		versDisp = [[updater delegate] versionDisplayerForUpdater: updater];
+	[updateAlert setVersionDisplayer: versDisp];
+	
 	if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
 		[[updater delegate] updater:updater didFindValidUpdate:updateItem];
 
