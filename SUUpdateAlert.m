@@ -150,7 +150,8 @@
 {	
 	NSString*	sizeStr = [host objectForInfoDictionaryKey:SUFixedHTMLDisplaySizeKey];
 
-	//[[self window] setLevel:NSFloatingWindowLevel];	// This means the window will float over all other apps, if our app is switched out ?! UK 2007-09-04
+	if( [host isBackgroundApplication] )
+		[[self window] setLevel:NSFloatingWindowLevel];	// This means the window will float over all other apps, if our app is switched out ?! UK 2007-09-04
 	[[self window] setFrameAutosaveName: sizeStr ? @"" : @"SUUpdateAlertFrame"];
 		
 	// We're gonna do some frame magic to match the window's size to the description field and the presence of the release notes view.
