@@ -195,7 +195,7 @@
 }
 
 - (id)objectForKey:(NSString *)key {
-    return [self objectForUserDefaultsKey:key] ?: [self objectForInfoDictionaryKey:key];
+    return [self objectForUserDefaultsKey:key] ? [self objectForUserDefaultsKey:key] : [self objectForInfoDictionaryKey:key];
 }
 
 - (BOOL)boolForKey:(NSString *)key {
