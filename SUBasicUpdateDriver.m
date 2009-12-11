@@ -143,11 +143,13 @@
 	// Not using a GUID here because hdiutil (for DMGs) for some reason chokes on GUIDs. Too long? I really have no idea.
 	NSString *prefix = [NSString stringWithFormat:@"%@ %@ Update", [host name], [host version]];
 	NSString *desktopFolder = [@"~/Desktop" stringByExpandingTildeInPath];
-	NSString *tempDir = [desktopFolder stringByAppendingPathComponent:prefix];
+	[tempDir release];
+	tempDir = [[desktopFolder stringByAppendingPathComponent:prefix] retain];
 	int cnt=1;
 	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
 	{
-		tempDir = [desktopFolder stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", prefix, cnt++]];
+		[tempDir release];
+		tempDir = [[desktopFolder stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", prefix, cnt++]] retain];
 	}
 	
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
@@ -188,8 +190,8 @@
 - (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
 {
 	// Get rid of what we've downloaded so far, if anything.
-	if (downloadPath != nil)
-		[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[downloadPath stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[downloadPath lastPathComponent]] tag:NULL];
+	if (tempDir != nil)	// tempDir contains downloadPath, so we implicitly delete both here.
+		[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[tempDir stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[tempDir lastPathComponent]] tag:NULL];
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while downloading the update. Please try again later.", nil), NSLocalizedDescriptionKey, [error localizedDescription], NSLocalizedFailureReasonErrorKey, nil]]];
 }
 
@@ -292,7 +294,7 @@
 		if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
 			pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
 		NSString	*relaunchToolPath = [relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS/finish_installation"];
-		[NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:[NSArray arrayWithObjects:pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], [downloadPath stringByDeletingLastPathComponent], nil]];
+		[NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:[NSArray arrayWithObjects:pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], tempDir, nil]];
 
 		[NSApp terminate:self];
 	}
@@ -303,9 +305,9 @@
 - (void)cleanUp
 {
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-    [[NSFileManager defaultManager] removeFileAtPath:[downloadPath stringByDeletingLastPathComponent] handler:nil];
+    [[NSFileManager defaultManager] removeFileAtPath: tempDir handler:nil];
 #else
-	[[NSFileManager defaultManager] removeItemAtPath:[downloadPath stringByDeletingLastPathComponent] error:NULL];
+	[[NSFileManager defaultManager] removeItemAtPath: tempDir error:NULL];
 #endif
 }
 
@@ -339,6 +341,7 @@
 	[updateItem release];
 	[download release];
 	[downloadPath release];
+	[tempDir release];
 	[relaunchPath release];
 	[super dealloc];
 }
