@@ -138,8 +138,8 @@ int main (int argc, const char * argv[])
 	
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
-	ProcessSerialNumber		psn = { 0, kCurrentProcess };
-	TransformProcessType( &psn, kProcessTransformToForegroundApplication );
+	//ProcessSerialNumber		psn = { 0, kCurrentProcess };
+	//TransformProcessType( &psn, kProcessTransformToForegroundApplication );
 	[[NSApplication sharedApplication] activateIgnoringOtherApps: YES];
 		
 	#if 0	// Cmdline tool
