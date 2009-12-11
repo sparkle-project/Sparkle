@@ -60,12 +60,15 @@ typedef enum {
     for (i = 1; i <= n; ++i) {
         character = [version substringWithRange:NSMakeRange(i, 1)];
         newType = [self typeOfCharacter:character];
-        if (oldType != newType || oldType == kSeparatorType) {
+        if (oldType != newType )
+		{
+			if ( kSeparatorType != oldType ) {
             // We've reached a new segment
 			NSString *aPart = [[NSString alloc] initWithString:s];
-            [parts addObject:aPart];
+			[parts addObject:aPart];
 			[aPart release];
-            [s setString:character];
+            }
+			[s setString:character];
         } else {
             // Add character to string and continue
             [s appendString:character];
