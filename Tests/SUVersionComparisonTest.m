@@ -42,6 +42,11 @@
 	SUAssertAscending(@"1.0 alpha", @"1.0 beta");
 	SUAssertEqual(@"1.0  - beta", @"1.0beta");
 	SUAssertEqual(@"1.0  - beta", @"1.0 beta");
+	SUAssertAscending(@"1.0 (1234)", @"1.0 (1235)");
+	SUAssertAscending(@"1.0b1 (1234)", @"1.0 (1234)");
+	SUAssertAscending(@"1.0b5 (1234)", @"1.0b5 (1235)");
+	SUAssertAscending(@"1.0b5 (1234)", @"1.0.1b5 (1234)");
+	SUAssertAscending(@"1.0.1b5 (1234)", @"1.0.1b6 (1234)");
 }
 
 @end
