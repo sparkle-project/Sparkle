@@ -178,7 +178,7 @@
 		{
 			NSSize		desiredSize = NSSizeFromString( sizeStr );
 			NSSize		sizeDiff = NSZeroSize;
-			NSBox*		boxView = (NSBox*)[[releaseNotesView superview] superview];
+			// NSBox*		boxView = (NSBox*)[[releaseNotesView superview] superview];
 			
 			//[boxView setBorderType: NSNoBorder];
 			[releaseNotesView setDrawsBackground: NO];
