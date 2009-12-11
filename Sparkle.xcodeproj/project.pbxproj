@@ -124,6 +124,9 @@
 		DAAEFC9B0DA5722F0051E0D0 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
 		DAAEFD4E0DA572330051E0D0 /* finish_installation.m in Sources */ = {isa = PBXBuildFile; fileRef = 613242130CD06CEF00106AA4 /* finish_installation.m */; };
 		DAAEFD510DA572550051E0D0 /* finish_installation in Resources */ = {isa = PBXBuildFile; fileRef = DAAEFC960DA571DF0051E0D0 /* finish_installation */; };
+		E0AA6C4110D259170009485A /* SUStatusController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6196CFE409C71ADE000DC222 /* SUStatusController.m */; };
+		E0AA6C4410D2591F0009485A /* SUWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 61180BC90D64138900B4E0D1 /* SUWindowController.m */; };
+		E0AA6C9E10D2598E0009485A /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E0AA6C4910D259600009485A /* SystemConfiguration.framework */; };
 		FAEFA2F70D94AA7500472538 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		FAEFA2F80D94AA7900472538 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
 		FAEFA3040D94AB3400472538 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
@@ -332,6 +335,7 @@
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* Sparkle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Sparkle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAAEFC960DA571DF0051E0D0 /* finish_installation */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = finish_installation; sourceTree = BUILT_PRODUCTS_DIR; };
+		E0AA6C4910D259600009485A /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigTestAppDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigCommonRelease.xcconfig; sourceTree = "<group>"; };
@@ -380,6 +384,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E0AA6C9E10D2598E0009485A /* SystemConfiguration.framework in Frameworks */,
 				61B5F8F709C4CEB300B25A18 /* Security.framework in Frameworks */,
 				61B5FC4C09C4FD5E00B25A18 /* WebKit.framework in Frameworks */,
 				61177A1F0D1112E900749C97 /* IOKit.framework in Frameworks */,
@@ -440,6 +445,7 @@
 		0867D69AFE84028FC02AAC07 /* Apple Frameworks and Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				E0AA6C4910D259600009485A /* SystemConfiguration.framework */,
 				6117796E0D1112E000749C97 /* IOKit.framework */,
 				61B5FC3F09C4FD4000B25A18 /* WebKit.framework */,
 				61B5F8F609C4CEB300B25A18 /* Security.framework */,
@@ -1036,6 +1042,8 @@
 				552B69E910C0790500050E82 /* SUPlainInstaller.m in Sources */,
 				552B69EA10C0790800050E82 /* SUPlainInstallerInternals.m in Sources */,
 				552B69ED10C0791000050E82 /* SUSystemProfiler.m in Sources */,
+				E0AA6C4110D259170009485A /* SUStatusController.m in Sources */,
+				E0AA6C4410D2591F0009485A /* SUWindowController.m in Sources */,
 				552B69F010C0791800050E82 /* SUPackageInstaller.m in Sources */,
 				552B6A5E10C07FC200050E82 /* SUStandardVersionComparator.m in Sources */,
 				55D8F80910C58B210011E7FA /* SULog.m in Sources */,
@@ -1321,7 +1329,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
 			buildSettings = {
-				GCC_PREFIX_HEADER = "";
+				GCC_PREFIX_HEADER = Sparkle.pch;
 				PRODUCT_NAME = finish_installation;
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
@@ -1430,7 +1438,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
 			buildSettings = {
-				GCC_PREFIX_HEADER = "";
+				GCC_PREFIX_HEADER = Sparkle.pch;
 				PRODUCT_NAME = finish_installation;
 			};
 			name = Debug;
@@ -1439,7 +1447,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
 			buildSettings = {
-				GCC_PREFIX_HEADER = "";
+				GCC_PREFIX_HEADER = Sparkle.pch;
 				PRODUCT_NAME = finish_installation;
 			};
 			name = Release;
