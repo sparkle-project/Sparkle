@@ -7,54 +7,66 @@
 
 #include <unistd.h>
 
+#define	LONG_IMSTALLATION_TIME			1.2				// If the Installation takes longer than this time the Application Icon is shown in the Dock so that the user has some feedback.
+#define	CHECK_FOR_PARENT_TO_QUIT_TIME	.5				// Time this app uses to recheck if the parent has already died.
+										
 @interface TerminationListener : NSObject
 {
-	const char		*executablePath;
-	pid_t			parentProcessId;
-	const char		*folderPath;
+	const char		*executablepath;
+	pid_t			parentprocessid;
+	const char		*folderpath;
 	NSString		*selfPath;
 	NSTimer			*watchdogTimer;
+	NSTimer			*longInstallationTimer;
 	SUHost			*host;
 }
 
-- (void)	parentHasQuit;
+- (void) parentHasQuit;
 
-- (void)	relaunch;
-- (void)	install;
+- (void) relaunch;
+- (void) install;
 
-- (void)	watchdog:(NSTimer *)timer;
+- (void) showAppIconInDock:(NSTimer *)aTimer;
+- (void) watchdog:(NSTimer *)aTimer;
 
 @end
 
 @implementation TerminationListener
 
-- (id) initWithExecutablePath:(const char *)execPath parentProcessId:(pid_t)ppid folderPath: (const char*)inFolderPath
+- (id) initWithExecutablePath:(const char *)execpath parentProcessId:(pid_t)ppid folderPath: (const char*)infolderpath
 		selfPath: (NSString*)inSelfPath
 {
-	self = [super init];
-	if (self != nil)
-	{
-		executablePath = execPath;
-		parentProcessId = ppid;
-		folderPath = inFolderPath;
-		selfPath = [inSelfPath retain];
-		BOOL	alreadyTerminated = (getppid() == 1); // ppid is launchd (1) => parent terminated already
-		
-		if( alreadyTerminated )
-			[self parentHasQuit];
-		else
-			watchdogTimer = [[NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(watchdog:) userInfo:nil repeats:YES] retain];
-	}
+	if( !(self = [super init]) )
+		return nil;
+	
+	executablepath	= execpath;
+	parentprocessid	= ppid;
+	folderpath		= infolderpath;
+	selfPath		= [inSelfPath retain];
+	
+	BOOL	alreadyTerminated = (getppid() == 1); // ppid is launchd (1) => parent terminated already
+	
+	if( alreadyTerminated )
+		[self parentHasQuit];
+	else
+		watchdogTimer = [[NSTimer scheduledTimerWithTimeInterval:CHECK_FOR_PARENT_TO_QUIT_TIME target:self selector:@selector(watchdog:) userInfo:nil repeats:YES] retain];
+
 	return self;
 }
 
 
 -(void)	dealloc
 {
+	[longInstallationTimer invalidate];
+	[longInstallationTimer release];
+	longInstallationTimer = nil;
+
 	[selfPath release];
 	selfPath = nil;
+
 	[watchdogTimer release];
 	watchdogTimer = nil;
+
 	[host release];
 	host = nil;
 	
@@ -65,35 +77,42 @@
 -(void)	parentHasQuit
 {
 	[watchdogTimer invalidate];
-	
-	if( folderPath )
+	longInstallationTimer	= [[NSTimer scheduledTimerWithTimeInterval:LONG_IMSTALLATION_TIME target:self selector:@selector(showAppIconInDock:) userInfo:nil repeats:NO] retain];
+
+	if( folderpath )
 		[self install];
 	else
 		[self relaunch];
 }
 
-
-- (void)watchdog:(NSTimer *)timer
+- (void) watchdog:(NSTimer *)aTimer
 {
 	ProcessSerialNumber psn;
-	if (GetProcessForPID(parentProcessId, &psn) == procNotFound)
+	if (GetProcessForPID(parentprocessid, &psn) == procNotFound)
 		[self parentHasQuit];
 }
+
+- (void)showAppIconInDock:(NSTimer *)aTimer;
+{
+	ProcessSerialNumber		psn = { 0, kCurrentProcess };
+	TransformProcessType( &psn, kProcessTransformToForegroundApplication );
+}
+
 
 - (void) relaunch
 {
 	NSString	*appPath = nil;
-	if( !folderPath )
-		appPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:executablePath length:strlen(executablePath)];
+	if( !folderpath )
+		appPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:executablepath length:strlen(executablepath)];
 	else
 		appPath = [host installationPath];
 	[[NSWorkspace sharedWorkspace] openFile: appPath];
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-	if( folderPath )
+	if( folderpath )
     	[[NSFileManager defaultManager] removeFileAtPath: [SUInstaller updateFolder] handler: nil];
     [[NSFileManager defaultManager] removeFileAtPath: selfPath handler: nil];
 #else
-	if( folderPath )
+	if( folderpath )
     	[[NSFileManager defaultManager] removeItemAtPath: [SUInstaller updateFolder] error: NULL];
 	[[NSFileManager defaultManager] removeItemAtPath: selfPath error: NULL];
 #endif
@@ -101,9 +120,9 @@
 }
 
 
--(void)	install
+- (void) install
 {
-	NSBundle			*theBundle = [NSBundle bundleWithPath: [NSString stringWithUTF8String: executablePath]];
+	NSBundle	*theBundle = [NSBundle bundleWithPath: [NSString stringWithUTF8String: executablepath]];
 	host = [[SUHost alloc] initWithBundle: theBundle];
 	
 	SUStatusController*	statusCtl = [[SUStatusController alloc] initWithHost: host];	// We quit anyway after we've installed, so leak this for now.
@@ -112,18 +131,18 @@
 					maxProgressValue: 0 statusText: @""];
 	[statusCtl showWindow: self];
 	
-	[SUInstaller installFromUpdateFolder: [NSString stringWithUTF8String: folderPath]
+	[SUInstaller installFromUpdateFolder: [NSString stringWithUTF8String: folderpath]
 					overHost: host
 					delegate: self synchronously: NO
 					versionComparator: [SUStandardVersionComparator defaultComparator]];
 }
 
-- (void)installerFinishedForHost:(SUHost *)aHost
+- (void) installerFinishedForHost:(SUHost *)aHost
 {
 	[self relaunch];
 }
 
-- (void)installerForHost:(SUHost *)host failedWithError:(NSError *)error
+- (void) installerForHost:(SUHost *)host failedWithError:(NSError *)error
 {
 	NSRunAlertPanel( @"", @"%@", @"OK", @"", @"", error );
 	exit(EXIT_FAILURE);
