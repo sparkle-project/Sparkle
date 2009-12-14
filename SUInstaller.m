@@ -129,6 +129,7 @@ static NSString*	sUpdateFolder = nil;
 	@try
 	{
 		[mdimport launch];
+		[mdimport waitUntilExit];
 	}
 	@catch (NSException * launchException)
 	{
