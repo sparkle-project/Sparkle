@@ -119,7 +119,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	if( err == noErr )
 		err = FSRefMakePath( &trashRef, trashPath, MAXPATHLEN );
 	if( err == noErr )
-		tempDir = [NSString stringWithUTF8String: (char*) trashPath];
+		tempDir = [[NSFileManager defaultManager] stringWithFileSystemRepresentation: (char*) trashPath length: strlen((char*) trashPath)];
 	if( outDidFindTrash )
 		*outDidFindTrash = (tempDir != nil);
 	if( !tempDir )
