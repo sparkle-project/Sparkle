@@ -18,6 +18,7 @@
 	
 	NSURLDownload *download;
 	NSString *downloadPath;
+	NSString *tempDir;
 	
 	NSString *relaunchPath;
 }
