@@ -124,7 +124,7 @@
 
 - (void) install
 {
-	NSBundle	*theBundle = [NSBundle bundleWithPath: [NSString stringWithUTF8String: executablepath]];
+	NSBundle			*theBundle = [NSBundle bundleWithPath: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: executablepath length:strlen(executablepath)]];
 	host = [[SUHost alloc] initWithBundle: theBundle];
 	
 	SUStatusController*	statusCtl = [[SUStatusController alloc] initWithHost: host];	// We quit anyway after we've installed, so leak this for now.
@@ -133,7 +133,7 @@
 					maxProgressValue: 0 statusText: @""];
 	[statusCtl showWindow: self];
 	
-	[SUInstaller installFromUpdateFolder: [NSString stringWithUTF8String: folderpath]
+	[SUInstaller installFromUpdateFolder: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: folderpath length: strlen(folderpath)]
 					overHost: host
 					delegate: self synchronously: NO
 					versionComparator: [SUStandardVersionComparator defaultComparator]];
@@ -166,11 +166,11 @@ int main (int argc, const char * argv[])
 	#if 0	// Cmdline tool
 	NSString*	selfPath = nil;
 	if( argv[0][0] == '/' )
-		selfPath = [NSString stringWithUTF8String: argv[0]];
+		selfPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation: argv[0] length: strlen(argv[0])];
 	else
 	{
 		selfPath = [[NSFileManager defaultManager] currentDirectoryPath];
-		selfPath = [selfPath stringByAppendingPathComponent: [NSString stringWithUTF8String: argv[0]]];
+		selfPath = [selfPath stringByAppendingPathComponent: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: argv[0] length: strlen(argv[0])]];
 	}
 	#else
 	NSString*	selfPath = [[NSBundle mainBundle] bundlePath];
