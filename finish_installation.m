@@ -146,7 +146,7 @@
 
 - (void) installerForHost:(SUHost *)host failedWithError:(NSError *)error
 {
-	NSRunAlertPanel( @"", @"%@", @"OK", @"", @"", error );
+	NSRunAlertPanel( @"", @"%@", @"OK", @"", @"", [error localizedDescription] );
 	exit(EXIT_FAILURE);
 }
 
