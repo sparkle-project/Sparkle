@@ -7,7 +7,7 @@
 
 #include <unistd.h>
 
-#define	LONG_IMSTALLATION_TIME			1.2				// If the Installation takes longer than this time the Application Icon is shown in the Dock so that the user has some feedback.
+#define	LONG_INSTALLATION_TIME			1.2				// If the Installation takes longer than this time the Application Icon is shown in the Dock so that the user has some feedback.
 #define	CHECK_FOR_PARENT_TO_QUIT_TIME	.5				// Time this app uses to recheck if the parent has already died.
 										
 @interface TerminationListener : NSObject
@@ -77,7 +77,9 @@
 -(void)	parentHasQuit
 {
 	[watchdogTimer invalidate];
-	longInstallationTimer	= [[NSTimer scheduledTimerWithTimeInterval:LONG_IMSTALLATION_TIME target:self selector:@selector(showAppIconInDock:) userInfo:nil repeats:NO] retain];
+	longInstallationTimer = [[NSTimer scheduledTimerWithTimeInterval: LONG_INSTALLATION_TIME
+								target: self selector: @selector(showAppIconInDock:)
+								userInfo:nil repeats:NO] retain];
 
 	if( folderpath )
 		[self install];
