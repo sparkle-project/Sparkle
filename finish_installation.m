@@ -4,6 +4,7 @@
 #import "SUHost.h"
 #import "SUStandardVersionComparator.h"
 #import "SUStatusController.h"
+#import "SUPlainInstallerInternals.h"
 
 #include <unistd.h>
 
@@ -109,13 +110,15 @@
 	else
 		appPath = [host installationPath];
 	[[NSWorkspace sharedWorkspace] openFile: appPath];
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	if( folderpath )
-    	[[NSFileManager defaultManager] removeFileAtPath: [SUInstaller updateFolder] handler: nil];
+	{
+		NSError*		theError = nil;
+    	if( ![SUPlainInstaller _removeFileAtPath: [SUInstaller updateFolder] error: &theError] )
+			SULog( @"Couldn't remove update folder: %@.", theError );
+	}
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
     [[NSFileManager defaultManager] removeFileAtPath: selfPath handler: nil];
 #else
-	if( folderpath )
-    	[[NSFileManager defaultManager] removeItemAtPath: [SUInstaller updateFolder] error: NULL];
 	[[NSFileManager defaultManager] removeItemAtPath: selfPath error: NULL];
 #endif
 	exit(EXIT_SUCCESS);
