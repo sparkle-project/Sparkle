@@ -262,7 +262,8 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	
 	AuthorizationRef auth = NULL;
 	OSStatus authStat = errAuthorizationDenied;
-	while (authStat == errAuthorizationDenied) {
+	while( authStat == errAuthorizationDenied )
+	{
 		authStat = AuthorizationCreate(NULL,
 									   kAuthorizationEmptyEnvironment,
 									   kAuthorizationFlagDefaults,
@@ -319,6 +320,69 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:[NSDictionary dictionaryWithObject:@"Couldn't get permission to authenticate." forKey:NSLocalizedDescriptionKey]];
 	}
 	return res;
+}
+
+
++ (BOOL)_removeFileAtPathWithForcedAuthentication:(NSString *)src error:(NSError **)error
+{
+	// *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
+	
+	const char* srcPath = [src fileSystemRepresentation];
+	
+	AuthorizationRef auth = NULL;
+	OSStatus authStat = errAuthorizationDenied;
+	while( authStat == errAuthorizationDenied )
+	{
+		authStat = AuthorizationCreate(NULL,
+									   kAuthorizationEmptyEnvironment,
+									   kAuthorizationFlagDefaults,
+									   &auth);
+	}
+	
+	BOOL res = NO;
+	if (authStat == errAuthorizationSuccess)
+	{
+		res = YES;
+		
+		if( res )	// If there's something at our tmp path (previous failed update or whatever) delete that first.
+		{
+			const char*	rmParams[] = { "-rf", srcPath, NULL };
+			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams );
+			if( !res )
+				SULog(@"Can't remove destination file");
+		}
+		
+		AuthorizationFree(auth, 0);
+		
+		if (!res)
+		{
+			// Something went wrong somewhere along the way, but we're not sure exactly where.
+			NSString *errorMessage = [NSString stringWithFormat:@"Authenticated file remove from %@ failed.", src];
+			if (error != NULL)
+				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
+		}
+	}
+	else
+	{
+		if (error != NULL)
+			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:[NSDictionary dictionaryWithObject:@"Couldn't get permission to authenticate." forKey:NSLocalizedDescriptionKey]];
+	}
+	return res;
+}
+
++ (BOOL)_removeFileAtPath:(NSString *)path error: (NSError**)error
+{
+	BOOL	success = YES;
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+    if( ![[NSFileManager defaultManager] removeFileAtPath: path handler: nil] )
+#else
+	if( ![[NSFileManager defaultManager] removeItemAtPath: path error: NULL] )
+#endif
+	{
+		success = [self _removeFileAtPathWithForcedAuthentication: path error: error];
+	}
+	
+	return success;
 }
 
 + (void)_movePathToTrash:(NSString *)path
