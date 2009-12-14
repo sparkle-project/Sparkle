@@ -118,11 +118,16 @@
 		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self _humanReadableSizeFromDouble:[statusController progressValue]]]];
 }
 
-- (IBAction)cancelDownload:sender
+- (IBAction)cancelDownload: (id)sender
 {
 	if (download)
 		[download cancel];
 	[self abortUpdate];
+	if (tempDir != nil)	// tempDir contains downloadPath, so we implicitly delete both here.
+	{
+		if( ![[NSFileManager defaultManager] removeFileAtPath: tempDir handler: nil] )
+			[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[tempDir stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[tempDir lastPathComponent]] tag:NULL];
+	}
 }
 
 - (void)extractUpdate
