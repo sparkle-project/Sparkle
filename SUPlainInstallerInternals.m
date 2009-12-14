@@ -182,6 +182,24 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		snprintf(uidgid, sizeof(uidgid), "%d:%d",
 				 dstSB.st_uid, dstSB.st_gid);
 		
+		// If the currently-running application is trusted, the new
+		// version should be trusted as well.  Remove it from the
+		// quarantine to avoid a delay at launch, and to avoid
+		// presenting the user with a confusing trust dialog.
+		//
+		// This needs to be done after the application is moved to its
+		// new home with "mv" in case it's moved across filesystems: if
+		// that happens, "mv" actually performs a copy and may result
+		// in the application being quarantined.  It also needs to be
+		// done before "chown" changes ownership, because the ownership
+		// change will almost certainly make it impossible to change
+		// attributes to release the files from the quarantine.
+		if (res)
+		{
+			SULog(@"releaseFromQuarantine");
+			[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:dst waitUntilDone:YES];
+		}
+		
 		if( res )	// Set permissions while it's still in source, so we have it with working and correct perms when it arrives at destination.
 		{
 			const char* coParams[] = { "-R", uidgid, srcPath, NULL };
@@ -212,22 +230,6 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 //			const char* rmParams2[] = { "-rf", tmpPath, NULL };
 //			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams2 );
 //		}
-		
-		// If the currently-running application is trusted, the new
-		// version should be trusted as well.  Remove it from the
-		// quarantine to avoid a delay at launch, and to avoid
-		// presenting the user with a confusing trust dialog.
-		//
-		// This needs to be done after the application is moved to its
-		// new home with "mv" in case it's moved across filesystems: if
-		// that happens, "mv" actually performs a copy and may result
-		// in the application being quarantined.  It also needs to be
-		// done before "chown" changes ownership, because the ownership
-		// change will almost certainly make it impossible to change
-		// attributes to release the files from the quarantine.
-		if (res) {
-			[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:dst waitUntilDone:YES];
-		}
 		
 		AuthorizationFree(auth, 0);
 		
@@ -342,17 +344,28 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 + (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp error:(NSError **)error
 {
-	FSRef		srcRef, dstRef, dstDirRev, movedRef, tmpDirRef;
+	FSRef		srcRef, dstRef, dstDirRef, movedRef, tmpDirRef;
 	OSErr		err;
 	BOOL		hadFileAtDest = NO, didFindTrash = NO;
 	NSString	*tmpPath = [self _temporaryCopyNameForPath: dst didFindTrash: &didFindTrash];
 	
+	// Make FSRef for destination:
 	err = FSPathMakeRefWithOptions((UInt8 *)[dst fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &dstRef, NULL);
 	hadFileAtDest = (err == noErr);	// There is a file at the destination, move it aside. If we normalized the name, we might not get here, so don't error.
 	if( hadFileAtDest )
 	{
 		if (0 != access([dst fileSystemRepresentation], W_OK) || 0 != access([[dst stringByDeletingLastPathComponent] fileSystemRepresentation], W_OK))
+		{
 			return [self _copyPathWithForcedAuthentication:src toPath:dst temporaryPath:tmpPath error:error];
+		}
+	}
+	else
+	{
+		if (0 != access([[dst stringByDeletingLastPathComponent] fileSystemRepresentation], W_OK)
+			|| 0 != access([[[dst stringByDeletingLastPathComponent] stringByDeletingLastPathComponent] fileSystemRepresentation], W_OK))
+		{
+			return [self _copyPathWithForcedAuthentication:src toPath:dst temporaryPath:tmpPath error:error];
+		}
 	}
 	
 	if( hadFileAtDest )
@@ -362,9 +375,12 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 			err = FSPathMakeRef((UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &tmpDirRef, NULL);
 	}
 	
-	err = FSPathMakeRef((UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &dstDirRev, NULL);
-	if (err == noErr)
+	err = FSPathMakeRef((UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &dstDirRef, NULL);
+	
+	if (err == noErr && hadFileAtDest)
+	{
 		err = FSMoveObjectSync(&dstRef, &tmpDirRef, (CFStringRef)[tmpPath lastPathComponent], &movedRef, 0);
+	}
 	if (err != noErr && hadFileAtDest)
 	{
 		if (error != NULL)
@@ -373,12 +389,12 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	}
 	err = FSPathMakeRef((UInt8 *)[src fileSystemRepresentation], &srcRef, NULL);
 	if (err == noErr)
-		err = FSCopyObjectSync(&srcRef, &dstDirRev, (CFStringRef)[dst lastPathComponent], NULL, 0);
+		err = FSCopyObjectSync(&srcRef, &dstDirRef, (CFStringRef)[dst lastPathComponent], NULL, 0);
 	if (err != noErr)
 	{
 		// We better move the old version back to its old location
 		if( hadFileAtDest )
-			FSMoveObjectSync(&movedRef, &dstDirRev, (CFStringRef)[dst lastPathComponent], &movedRef, 0);
+			FSMoveObjectSync(&movedRef, &dstDirRef, (CFStringRef)[dst lastPathComponent], &movedRef, 0);
 		if (error != NULL)
 			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't copy %@ to %@.", src, dst] forKey:NSLocalizedDescriptionKey]];
 		return NO;			
