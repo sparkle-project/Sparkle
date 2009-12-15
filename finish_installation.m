@@ -5,6 +5,7 @@
 #import "SUStandardVersionComparator.h"
 #import "SUStatusController.h"
 #import "SUPlainInstallerInternals.h"
+#import "SULog.h"
 
 #include <unistd.h>
 
