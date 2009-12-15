@@ -141,7 +141,7 @@
 	
 	// We create a temporary directory in /tmp and stick the file there.
 	// Not using a GUID here because hdiutil (for DMGs) for some reason chokes on GUIDs. Too long? I really have no idea.
-	NSString *prefix = [NSString stringWithFormat:@"%@ %@ Update", [host name], [host version]];
+	NSString *prefix = [NSString stringWithFormat:@"%@ %@ Update", [host name], [updateItem versionString]];
 	NSString *desktopFolder = [@"~/Desktop" stringByExpandingTildeInPath];
 	[tempDir release];
 	tempDir = [[desktopFolder stringByAppendingPathComponent:prefix] retain];

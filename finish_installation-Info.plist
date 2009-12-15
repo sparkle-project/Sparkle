@@ -26,5 +26,9 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>LSBackgroundOnly</key>
+	<string>1</string>
+	<key>LSUIElement</key>
+	<string>1</string>
 </dict>
 </plist>
