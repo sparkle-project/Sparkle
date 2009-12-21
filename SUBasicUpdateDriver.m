@@ -143,7 +143,7 @@
 	if (tempDir)
 	{
 		tempDir = [tempDir stringByAppendingPathComponent:prefix];
-		unsigned int cnt=1;
+		unsigned int cnt = 1;
 		while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
 		{
 			tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %u", prefix, cnt++]];
