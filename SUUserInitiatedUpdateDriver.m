@@ -17,7 +17,7 @@
 {
 	checkingController = [[SUStatusController alloc] initWithHost:aHost];
 	[[checkingController window] center]; // Force the checking controller to load its window.
-	[checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates...", nil) maxProgressValue:0 statusText:nil];
+	[checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates...", nil) maxProgressValue:0.0 statusText:nil];
 	[checkingController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
 	[checkingController showWindow:self];
 	[super checkForUpdatesAtURL:URL host:aHost];

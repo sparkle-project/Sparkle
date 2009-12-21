@@ -56,10 +56,10 @@
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 
-    [self setTask:nil];
-    [self setOutputPipe:nil];
-    [self setInputPipe:nil];
-	[self setOutput:nil];
+    [mv_task release];
+    [mv_outputPipe release];
+    [mv_inputPipe release];
+	[mv_output release];
 
     [super dealloc];
 }
@@ -70,7 +70,7 @@
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	NSData* result=nil;
 	
-	NS_DURING
+	@try
 	{
 		NTSynchronousTask* task = [[NTSynchronousTask alloc] init];
 		
@@ -81,8 +81,7 @@
 				
 		[task release];
 	}	
-	NS_HANDLER;
-	NS_ENDHANDLER;
+	@catch (NSException *localException) { }
 	
 	[pool drain];
 	
@@ -91,10 +90,6 @@
 	
     return result;
 }
-
-@end
-
-@implementation NTSynchronousTask (Private)
 
 - (void)run:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input;
 {
@@ -118,12 +113,12 @@
 	
 	[[[self outputPipe] fileHandleForReading] readToEndOfFileInBackgroundAndNotifyForModes:[NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, NSEventTrackingRunLoopMode, nil]];
 	
-	NS_DURING
+	@try
+	{
 		[[self task] launch];
 		success = YES;
-	NS_HANDLER
-		;
-	NS_ENDHANDLER
+	}
+	@catch (NSException *localException) { }
 	
 	if (success)
 	{

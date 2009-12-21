@@ -9,13 +9,13 @@
 #import "SUPlainInstaller.h"
 #import "SUPlainInstallerInternals.h"
 
-NSString *SUInstallerPathKey = @"SUInstallerPath";
-NSString *SUInstallerTargetPathKey = @"SUInstallerTargetPath";
-NSString *SUInstallerTempNameKey = @"SUInstallerTempName";
-NSString *SUInstallerHostKey = @"SUInstallerHost";
-NSString *SUInstallerDelegateKey = @"SUInstallerDelegate";
-NSString *SUInstallerResultKey = @"SUInstallerResult";
-NSString *SUInstallerErrorKey = @"SUInstallerError";
+static NSString * const SUInstallerPathKey = @"SUInstallerPath";
+static NSString * const SUInstallerTargetPathKey = @"SUInstallerTargetPath";
+static NSString * const SUInstallerTempNameKey = @"SUInstallerTempName";
+static NSString * const SUInstallerHostKey = @"SUInstallerHost";
+static NSString * const SUInstallerDelegateKey = @"SUInstallerDelegate";
+static NSString * const SUInstallerResultKey = @"SUInstallerResult";
+static NSString * const SUInstallerErrorKey = @"SUInstallerError";
 
 @implementation SUPlainInstaller
 

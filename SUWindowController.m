@@ -20,7 +20,8 @@
 		NSBundle *framework = [NSBundle bundleWithPath:frameworkPath];
 		path = [framework pathForResource:nibName ofType:@"nib"];
 	}
-	return [super initWithWindowNibPath:path owner:self];	
+	self = [super initWithWindowNibPath:path owner:self];	
+	return self;
 }
 
 @end

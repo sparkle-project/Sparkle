@@ -182,7 +182,7 @@
 
 - (void)webView:sender decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:frame decisionListener:listener
 {
-    if (webViewFinishedLoading == YES) {
+    if (webViewFinishedLoading) {
         [[NSWorkspace sharedWorkspace] openURL:[request URL]];
 		
         [listener ignore];

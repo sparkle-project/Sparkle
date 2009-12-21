@@ -92,6 +92,8 @@
 		DAAEFC9B0DA5722F0051E0D0 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
 		DAAEFD4E0DA572330051E0D0 /* relaunch.m in Sources */ = {isa = PBXBuildFile; fileRef = 613242130CD06CEF00106AA4 /* relaunch.m */; };
 		DAAEFD510DA572550051E0D0 /* relaunch in Resources */ = {isa = PBXBuildFile; fileRef = DAAEFC960DA571DF0051E0D0 /* relaunch */; };
+		FA8342D2104A4B1F001FE2FF /* SUStandardVersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */; };
+		FA8342DE104A4B54001FE2FF /* SUStandardVersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */; };
 		FAEFA2F70D94AA7500472538 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		FAEFA2F80D94AA7900472538 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
 		FAEFA3040D94AB3400472538 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
@@ -309,6 +311,10 @@
 		FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigRelaunchDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigRelaunchRelease.xcconfig; sourceTree = "<group>"; };
 		FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkRelease.xcconfig; sourceTree = "<group>"; };
+		FA302AFD109D13190060F891 /* ConfigUnitTestReleaseGCSupport.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigUnitTestReleaseGCSupport.xcconfig; sourceTree = "<group>"; };
+		FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigUnitTestRelease.xcconfig; sourceTree = "<group>"; };
+		FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigUnitTestDebug.xcconfig; sourceTree = "<group>"; };
+		FA3AAF3B1050B273004B3130 /* ConfigUnitTest.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigUnitTest.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -580,6 +586,10 @@
 				FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */,
 				FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */,
 				FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */,
+				FA3AAF3B1050B273004B3130 /* ConfigUnitTest.xcconfig */,
+				FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */,
+				FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */,
+				FA302AFD109D13190060F891 /* ConfigUnitTestReleaseGCSupport.xcconfig */,
 			);
 			path = Configurations;
 			sourceTree = "<group>";
@@ -867,6 +877,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				61227A160DB548B800AB99EA /* SUVersionComparisonTest.m in Sources */,
+				FA8342DE104A4B54001FE2FF /* SUStandardVersionComparator.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -875,6 +886,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				61B5F93009C4CFDC00B25A18 /* main.m in Sources */,
+				FA8342D2104A4B1F001FE2FF /* SUStandardVersionComparator.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1103,7 +1115,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 61072EB20DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig */;
 			buildSettings = {
-				INSTALL_PATH = "@loader_path/../Frameworks";
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
 		};
@@ -1123,87 +1134,22 @@
 		};
 		61072EB10DF263BD008FE88B /* Release (GC dual-mode; 10.5-only) */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA302AFD109D13190060F891 /* ConfigUnitTestReleaseGCSupport.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(NATIVE_ARCH)";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Cocoa.framework/Headers/Cocoa.h";
-				INFOPLIST_FILE = "Tests/Sparkle Unit Tests-Info.plist";
-				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Bundles";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Cocoa,
-					"-framework",
-					SenTestingKit,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = "Sparkle Unit Tests";
-				WARNING_CFLAGS = "";
-				WRAPPER_EXTENSION = octest;
-				ZERO_LINK = NO;
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
 		};
 		612279DB0DB5470300AB99EA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
-				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Cocoa.framework/Headers/Cocoa.h";
-				INFOPLIST_FILE = "Tests/Sparkle Unit Tests-Info.plist";
-				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Bundles";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Cocoa,
-					"-framework",
-					SenTestingKit,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = "Sparkle Unit Tests";
-				WRAPPER_EXTENSION = octest;
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
 		612279DC0DB5470300AB99EA /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(NATIVE_ARCH)";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Cocoa.framework/Headers/Cocoa.h";
-				INFOPLIST_FILE = "Tests/Sparkle Unit Tests-Info.plist";
-				INSTALL_PATH = "$(USER_LIBRARY_DIR)/Bundles";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Cocoa,
-					"-framework",
-					SenTestingKit,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = "Sparkle Unit Tests";
-				WRAPPER_EXTENSION = octest;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};

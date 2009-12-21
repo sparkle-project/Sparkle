@@ -40,8 +40,12 @@
 
 - (void)download:(NSURLDownload *)download decideDestinationWithSuggestedFilename:(NSString *)filename
 {
-    NSString *destinationFilename = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
-    [download setDestination:destinationFilename allowOverwrite:NO];
+	NSString* destinationFilename = NSTemporaryDirectory();
+	if (destinationFilename)
+	{
+		destinationFilename = [destinationFilename stringByAppendingPathComponent:filename];
+		[download setDestination:destinationFilename allowOverwrite:NO];
+	}
 }
 
 - (void)download:(NSURLDownload *)download didCreateDestination:(NSString *)path
@@ -52,7 +56,8 @@
 
 - (void)downloadDidFinish:(NSURLDownload *)download
 {
-	CFRelease(download);
+	if (download)
+		CFRelease(download);
     
 	NSError *error = nil;
     NSXMLDocument *document = [[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:0 error:&error];
@@ -62,7 +67,7 @@
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
     [[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
 #else
-    [[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:NULL];
+    [[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:nil];
 #endif
     [downloadFilename release];
     downloadFilename = nil;
@@ -179,13 +184,14 @@
 
 - (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
 {
-	CFRelease(download);
+	if (download)
+		CFRelease(download);
 	if (downloadFilename)
 	{
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 		[[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
 #else
-		[[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:NULL];
+		[[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:nil];
 #endif
 	}
     [downloadFilename release];
@@ -219,7 +225,7 @@
     NSXMLElement *node;
     NSMutableArray *languages = [NSMutableArray array];
     NSString *lang;
-    NSInteger i;
+    NSUInteger i;
     while ((node = [nodeEnum nextObject]))
     {
         lang = [[node attributeForName:@"xml:lang"] stringValue];

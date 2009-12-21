@@ -13,7 +13,9 @@
 #import "SUBasicUpdateDriver.h"
 
 @class SUAutomaticUpdateAlert;
-@interface SUAutomaticUpdateDriver : SUBasicUpdateDriver {
+@interface SUAutomaticUpdateDriver : SUBasicUpdateDriver
+{
+@private
 	BOOL postponingInstallation, showErrors;
 	SUAutomaticUpdateAlert *alert;
 }

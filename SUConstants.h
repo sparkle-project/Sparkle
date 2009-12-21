@@ -11,26 +11,26 @@
 #define SUCONSTANTS_H
 
 
-extern NSString *SUUpdaterWillRestartNotification;
-extern NSString *SUTechnicalErrorInformationKey;
+extern NSString *const SUUpdaterWillRestartNotification;
+extern NSString *const SUTechnicalErrorInformationKey;
 
-extern NSString *SUFeedURLKey;
-extern NSString *SUHasLaunchedBeforeKey;
-extern NSString *SUShowReleaseNotesKey;
-extern NSString *SUSkippedVersionKey;
-extern NSString *SUScheduledCheckIntervalKey;
-extern NSString *SULastCheckTimeKey;
-extern NSString *SUPublicDSAKeyKey;
-extern NSString *SUPublicDSAKeyFileKey;
-extern NSString *SUAutomaticallyUpdateKey;
-extern NSString *SUAllowsAutomaticUpdatesKey;
-extern NSString *SUEnableAutomaticChecksKey;
-extern NSString *SUEnableAutomaticChecksKeyOld;
-extern NSString *SUEnableSystemProfilingKey;
-extern NSString *SUSendProfileInfoKey;
-extern NSString *SULastProfileSubmitDateKey;
+extern NSString *const SUFeedURLKey;
+extern NSString *const SUHasLaunchedBeforeKey;
+extern NSString *const SUShowReleaseNotesKey;
+extern NSString *const SUSkippedVersionKey;
+extern NSString *const SUScheduledCheckIntervalKey;
+extern NSString *const SULastCheckTimeKey;
+extern NSString *const SUPublicDSAKeyKey;
+extern NSString *const SUPublicDSAKeyFileKey;
+extern NSString *const SUAutomaticallyUpdateKey;
+extern NSString *const SUAllowsAutomaticUpdatesKey;
+extern NSString *const SUEnableAutomaticChecksKey;
+extern NSString *const SUEnableAutomaticChecksKeyOld;
+extern NSString *const SUEnableSystemProfilingKey;
+extern NSString *const SUSendProfileInfoKey;
+extern NSString *const SULastProfileSubmitDateKey;
 
-extern NSString *SUSparkleErrorDomain;
+extern NSString *const SUSparkleErrorDomain;
 // Appcast phase errors.
 extern OSStatus SUAppcastParseError;
 extern OSStatus SUNoUpdateError;

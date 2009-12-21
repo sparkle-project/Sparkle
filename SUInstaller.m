@@ -118,7 +118,7 @@
 
 + (void)_finishInstallationWithResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:delegate
 {
-	if (result == YES)
+	if (result)
 	{
 		[self _mdimportHost:host];
 		if ([delegate respondsToSelector:@selector(installerFinishedForHost:)])
