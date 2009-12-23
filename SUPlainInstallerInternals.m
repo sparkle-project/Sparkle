@@ -163,7 +163,17 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	const char* dstPath = [dst fileSystemRepresentation];
 	
 	struct stat dstSB;
-	stat(dstPath, &dstSB);
+	if( stat(dstPath, &dstSB) != 0 )	// Doesn't exist yet, try containing folder.
+	{
+		const char*	dstDirPath = [[dst stringByDeletingLastPathComponent] fileSystemRepresentation];
+		if( stat(dstDirPath, &dstSB) != 0 )
+		{
+			NSString *errorMessage = [NSString stringWithFormat:@"Stat on %@ during authenticated file copy failed.", dst];
+			if (error != NULL)
+				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
+			return NO;
+		}
+	}
 	
 	AuthorizationRef auth = NULL;
 	OSStatus authStat = errAuthorizationDenied;
@@ -179,7 +189,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		res = YES;
 		
 		char uidgid[42];
-		snprintf(uidgid, sizeof(uidgid), "%d:%d",
+		snprintf(uidgid, sizeof(uidgid), "%u:%u",
 				 dstSB.st_uid, dstSB.st_gid);
 		
 		// If the currently-running application is trusted, the new
@@ -204,6 +214,8 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		{
 			const char* coParams[] = { "-R", uidgid, srcPath, NULL };
 			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/usr/sbin/chown", kAuthorizationFlagDefaults, coParams );
+			if( !res )
+				SULog( @"chown -R %s %s failed.", uidgid, srcPath );
 		}
 		
 		BOOL	haveDst = [[NSFileManager defaultManager] fileExistsAtPath: dst];
@@ -211,18 +223,24 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		{
 			const char*	rmParams[] = { "-rf", tmpPath, NULL };
 			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams );
+			if( !res )
+				SULog( @"rm failed" );
 		}
 		
 		if( res && haveDst )	// Move old exe to tmp path.
 		{
 			const char* mvParams[] = { "-f", dstPath, tmpPath, NULL };
 			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/mv", kAuthorizationFlagDefaults, mvParams );
+			if( !res )
+				SULog( @"mv 1 failed" );
 		}
 				
 		if( res )	// Move new exe to old exe's path.
 		{
 			const char* mvParams2[] = { "-f", srcPath, dstPath, NULL };
 			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/mv", kAuthorizationFlagDefaults, mvParams2 );
+			if( !res )
+				SULog( @"mv 2 failed" );
 		}
 		
 //		if( res && haveDst /*&& !foundTrash*/ )	// If we managed to put the old exe in the trash, leave it there for the user to delete or recover.
