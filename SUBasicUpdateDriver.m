@@ -288,7 +288,8 @@
 	if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
 		pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
 	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
-
+	
+	[self setValue:[NSNumber numberWithBool:YES] forKey:@"finished"];
 	[NSApp terminate:self];
 }
 
