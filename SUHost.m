@@ -83,7 +83,17 @@
 		iconPath = [bundle pathForResource:[bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType: nil];
 	NSImage *icon = [[[NSImage alloc] initWithContentsOfFile:iconPath] autorelease];
 	// Use a default icon if none is defined.
-	if (!icon) { icon = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(bundle == [NSBundle mainBundle] ? kGenericApplicationIcon : UTGetOSTypeFromString(CFSTR("BNDL")))]; }
+	if (!icon) {
+		BOOL isMainBundle = (bundle == [NSBundle mainBundle]);
+		
+		// Starting with 10.6, iconForFileType: accepts a UTI.
+		NSString *fileType = nil;
+		if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_5)
+			fileType = isMainBundle ? NSFileTypeForHFSTypeCode(kGenericApplicationIcon) : @".bundle";
+		else
+			fileType = isMainBundle ? (NSString*)kUTTypeApplication : (NSString*)kUTTypeBundle;
+		icon = [[NSWorkspace sharedWorkspace] iconForFileType:fileType];
+	}
 	return icon;
 }
 
