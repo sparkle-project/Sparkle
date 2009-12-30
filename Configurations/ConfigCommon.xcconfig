@@ -45,7 +45,5 @@ GCC_WARN_UNUSED_LABEL = YES
 GCC_WARN_UNUSED_VALUE = YES
 GCC_WARN_UNUSED_PARAMETER = YES
 GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES
+GCC_WARN_UNDECLARED_SELECTOR = YES
 WARNING_CFLAGS = -Wall -Wundef -Wendif-labels -Wpointer-arith -Wcast-align -Wwrite-strings -Wmissing-noreturn -Wmissing-format-attribute -Wpacked -Wredundant-decls -Winline -Wdisabled-optimization -Wformat=2 -Wlarger-than-32768 -Winvalid-pch
-
-// TODO: 
-// GCC_WARN_UNDECLARED_SELECTOR = YES only 7 warnings
