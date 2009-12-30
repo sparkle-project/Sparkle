@@ -143,7 +143,7 @@
 	if (tempDir)
 	{
 		tempDir = [tempDir stringByAppendingPathComponent:prefix];
-		unsigned int cnt=1;
+		unsigned int cnt = 1;
 		while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
 		{
 			tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %u", prefix, cnt++]];
@@ -288,7 +288,8 @@
 	if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
 		pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
 	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
-
+	
+	[self setValue:[NSNumber numberWithBool:YES] forKey:@"finished"];
 	[NSApp terminate:self];
 }
 

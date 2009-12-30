@@ -229,7 +229,7 @@
     while ((node = [nodeEnum nextObject]))
     {
         lang = [[node attributeForName:@"xml:lang"] stringValue];
-        [languages addObject:(lang ?: @"")];
+        [languages addObject:(lang ? lang : @"")];
     }
     lang = [[NSBundle preferredLocalizationsFromArray:languages] objectAtIndex:0];
     i = [languages indexOfObject:([languages containsObject:lang] ? lang : @"")];
