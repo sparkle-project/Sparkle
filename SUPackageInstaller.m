@@ -8,10 +8,6 @@
 
 #import "SUPackageInstaller.h"
 
-#ifndef NSAppKitVersionNumber10_4
-#define NSAppKitVersionNumber10_4 824
-#endif
-
 NSString *SUPackageInstallerCommandKey = @"SUPackageInstallerCommand";
 NSString *SUPackageInstallerArgumentsKey = @"SUPackageInstallerArguments";
 NSString *SUPackageInstallerHostKey = @"SUPackageInstallerHost";
