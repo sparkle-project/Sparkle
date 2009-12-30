@@ -16,6 +16,13 @@
 
 @implementation TerminationListener
 
+- (void)watchdog:(NSTimer *)timer
+{
+	ProcessSerialNumber psn;
+	if (GetProcessForPID(parentProcessId, &psn) == procNotFound)
+		[self relaunch];
+}
+
 - (id) initWithExecutablePath:(const char *)execPath parentProcessId:(pid_t)ppid
 {
 	self = [super init];
@@ -28,13 +35,6 @@
 		[NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(watchdog:) userInfo:nil repeats:YES];
 	}
 	return self;
-}
-
-- (void)watchdog:(NSTimer *)timer
-{
-	ProcessSerialNumber psn;
-	if (GetProcessForPID(parentProcessId, &psn) == procNotFound)
-		[self relaunch];
 }
 
 - (void) relaunch

@@ -18,11 +18,6 @@
 	return [[path pathExtension] isEqualToString:@"dmg"];
 }
 
-- (void)start
-{
-	[NSThread detachNewThreadSelector:@selector(_extractDMG) toTarget:self withObject:nil];
-}
-
 - (void)_extractDMG
 {		
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -75,6 +70,11 @@ finally:
 	if (mountedSuccessfully)
 		[NSTask launchedTaskWithLaunchPath:@"/usr/bin/hdiutil" arguments:[NSArray arrayWithObjects:@"detach", mountPoint, @"-force", nil]];
 	[pool drain];
+}
+
+- (void)start
+{
+	[NSThread detachNewThreadSelector:@selector(_extractDMG) toTarget:self withObject:nil];
 }
 
 + (void)load

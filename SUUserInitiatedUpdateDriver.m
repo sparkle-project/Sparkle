@@ -13,6 +13,22 @@
 
 @implementation SUUserInitiatedUpdateDriver
 
+- (void)closeCheckingWindow
+{
+	if (checkingController)
+	{
+		[[checkingController window] close];
+		[checkingController release];
+		checkingController = nil;
+	}
+}
+
+- (void)cancelCheckForUpdates:sender
+{
+	[self closeCheckingWindow];
+	isCanceled = YES;
+}
+
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
 {
 	checkingController = [[SUStatusController alloc] initWithHost:aHost];
@@ -28,22 +44,6 @@
 	{
 		[NSApp activateIgnoringOtherApps:YES];
 	}
-}
-
-- (void)closeCheckingWindow
-{
-	if (checkingController)
-	{
-		[[checkingController window] close];
-		[checkingController release];
-		checkingController = nil;
-	}
-}
-
-- (void)cancelCheckForUpdates:sender
-{
-	[self closeCheckingWindow];
-	isCanceled = YES;
 }
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac

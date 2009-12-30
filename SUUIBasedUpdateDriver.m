@@ -14,6 +14,13 @@
 
 @implementation SUUIBasedUpdateDriver
 
+- (IBAction)cancelDownload:sender
+{
+	if (download)
+		[download cancel];
+	[self abortUpdate];
+}
+
 - (void)didFindValidUpdate
 {
 	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem host:host];
@@ -103,13 +110,6 @@
 		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self _humanReadableSizeFromDouble:[statusController progressValue]]]];
 }
 
-- (IBAction)cancelDownload:sender
-{
-	if (download)
-		[download cancel];
-	[self abortUpdate];
-}
-
 - (void)extractUpdate
 {
 	// Now we have to extract the downloaded archive.
@@ -134,6 +134,8 @@
 	[statusController setProgressValue:[statusController progressValue] + (double)length];
 }
 
+- (void)installAndRestart:sender { [self installUpdate]; }
+
 - (void)unarchiverDidFinish:(SUUnarchiver *)ua
 {
 	[statusController beginActionWithTitle:SULocalizedString(@"Ready to Install", nil) maxProgressValue:1.0 statusText:nil];
@@ -142,8 +144,6 @@
 	[statusController setButtonTitle:SULocalizedString(@"Install and Relaunch", nil) target:self action:@selector(installAndRestart:) isDefault:YES];
 	[NSApp requestUserAttention:NSInformationalRequest];	
 }
-
-- (void)installAndRestart:sender { [self installUpdate]; }
 
 - (void)installUpdate
 {
