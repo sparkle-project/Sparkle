@@ -34,7 +34,7 @@
 	[appcast fetchAppcastFromURL:URL];
 }
 
-- (id <SUVersionComparison>)_versionComparator
+- (id <SUVersionComparison>)versionComparator
 {
 	id <SUVersionComparison> comparator = nil;
 	
@@ -51,7 +51,7 @@
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui
 {
-	return [[self _versionComparator] compareVersion:[host version] toVersion:[ui versionString]] == NSOrderedAscending;
+	return [[self versionComparator] compareVersion:[host version] toVersion:[ui versionString]] == NSOrderedAscending;
 }
 
 - (BOOL)hostSupportsItem:(SUAppcastItem *)ui
@@ -64,7 +64,7 @@
 {
 	NSString *skippedVersion = [host objectForUserDefaultsKey:SUSkippedVersionKey];
 	if (skippedVersion == nil) { return NO; }
-	return [[self _versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
+	return [[self versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
 }
 
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
@@ -247,7 +247,7 @@
 	else
 		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil), NSLocalizedDescriptionKey, [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", relaunchPathToCopy, targetPath, (error ? [error localizedDescription] : @"")], NSLocalizedFailureReasonErrorKey, nil]]];
 	
-	[SUInstaller installFromUpdateFolder:[downloadPath stringByDeletingLastPathComponent] overHost:host delegate:self synchronously:[self shouldInstallSynchronously] versionComparator:[self _versionComparator]];
+	[SUInstaller installFromUpdateFolder:[downloadPath stringByDeletingLastPathComponent] overHost:host delegate:self synchronously:[self shouldInstallSynchronously] versionComparator:[self versionComparator]];
 }
 
 - (void)installerFinishedForHost:(SUHost *)aHost

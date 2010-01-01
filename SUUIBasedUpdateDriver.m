@@ -87,7 +87,7 @@
 	[statusController setMaxProgressValue:[response expectedContentLength]];
 }
 
-- (NSString *)_humanReadableSizeFromDouble:(double)value
+- (NSString *)humanReadableSizeFromDouble:(double)value
 {
 	if (value < 1000)
 		return [NSString stringWithFormat:@"%.0lf %@", value, SULocalizedString(@"B", @"the unit for bytes")];
@@ -105,9 +105,9 @@
 {
 	[statusController setProgressValue:[statusController progressValue] + (double)length];
 	if ([statusController maxProgressValue] > 0.0)
-		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [self _humanReadableSizeFromDouble:[statusController progressValue]], [self _humanReadableSizeFromDouble:[statusController maxProgressValue]]]];
+		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [self humanReadableSizeFromDouble:[statusController progressValue]], [self humanReadableSizeFromDouble:[statusController maxProgressValue]]]];
 	else
-		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self _humanReadableSizeFromDouble:[statusController progressValue]]]];
+		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self humanReadableSizeFromDouble:[statusController progressValue]]]];
 }
 
 - (void)extractUpdate

@@ -15,12 +15,12 @@ NSString *SUPackageInstallerDelegateKey = @"SUPackageInstallerDelegate";
 
 @implementation SUPackageInstaller
 
-+ (void)_finishInstallationWithInfo:(NSDictionary *)info
++ (void)finishInstallationWithInfo:(NSDictionary *)info
 {
-	[self _finishInstallationWithResult:YES host:[info objectForKey:SUPackageInstallerHostKey] error:nil delegate:[info objectForKey:SUPackageInstallerDelegateKey]];
+	[self finishInstallationWithResult:YES host:[info objectForKey:SUPackageInstallerHostKey] error:nil delegate:[info objectForKey:SUPackageInstallerDelegateKey]];
 }
 
-+ (void)_performInstallationWithInfo:(NSDictionary *)info
++ (void)performInstallationWithInfo:(NSDictionary *)info
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
@@ -28,7 +28,7 @@ NSString *SUPackageInstallerDelegateKey = @"SUPackageInstallerDelegate";
 	[installer waitUntilExit];
 	
 	// Known bug: if the installation fails or is canceled, Sparkle goes ahead and restarts, thinking everything is fine.
-	[self performSelectorOnMainThread:@selector(_finishInstallationWithInfo:) withObject:info waitUntilDone:NO];
+	[self performSelectorOnMainThread:@selector(finishInstallationWithInfo:) withObject:info waitUntilDone:NO];
 	
 	[pool drain];
 }
@@ -54,15 +54,15 @@ NSString *SUPackageInstallerDelegateKey = @"SUPackageInstallerDelegate";
 	if (![[NSFileManager defaultManager] fileExistsAtPath:command])
 	{
 		NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingInstallerToolError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find Apple's installer tool!" forKey:NSLocalizedDescriptionKey]];
-		[self _finishInstallationWithResult:NO host:host error:error delegate:delegate];
+		[self finishInstallationWithResult:NO host:host error:error delegate:delegate];
 	}
 	else 
 	{
 		NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:command, SUPackageInstallerCommandKey, args, SUPackageInstallerArgumentsKey, host, SUPackageInstallerHostKey, delegate, SUPackageInstallerDelegateKey, nil];
 		if (synchronously)
-			[self _performInstallationWithInfo:info];
+			[self performInstallationWithInfo:info];
 		else
-			[NSThread detachNewThreadSelector:@selector(_performInstallationWithInfo:) toTarget:self withObject:info];
+			[NSThread detachNewThreadSelector:@selector(performInstallationWithInfo:) toTarget:self withObject:info];
 	}
 }
 

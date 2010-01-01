@@ -85,7 +85,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	return [tempDir lastPathComponent];
 }
 
-+ (BOOL)_copyPathWithForcedAuthentication:(NSString *)src toPath:(NSString *)dst temporaryPath:(NSString *)tmp error:(NSError **)error
++ (BOOL)copyPathWithForcedAuthentication:(NSString *)src toPath:(NSString *)dst temporaryPath:(NSString *)tmp error:(NSError **)error
 {
 	const char* srcPath = [src fileSystemRepresentation];
 	const char* tmpPath = [tmp fileSystemRepresentation];
@@ -185,7 +185,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	return res;
 }
 
-+ (void)_movePathToTrash:(NSString *)path
++ (void)movePathToTrash:(NSString *)path
 {
 	NSInteger tag = 0;
 	if (![[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[path stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[path lastPathComponent]] tag:&tag])
@@ -209,7 +209,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	NSString *tmpPath = [[dst stringByDeletingLastPathComponent] stringByAppendingPathComponent:tmp];
 	
 	if (0 != access([dst fileSystemRepresentation], W_OK) || 0 != access([[dst stringByDeletingLastPathComponent] fileSystemRepresentation], W_OK))
-		return [self _copyPathWithForcedAuthentication:src toPath:dst temporaryPath:tmpPath error:error];
+		return [self copyPathWithForcedAuthentication:src toPath:dst temporaryPath:tmpPath error:error];
 	
 	err = FSPathMakeRef((UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &targetRef, NULL);
 	if (err == noErr)
@@ -235,11 +235,11 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	// Trash the old copy of the app.
 #if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4
 	if (FSMoveObjectToTrashSync == NULL)
-		[self performSelectorOnMainThread:@selector(_movePathToTrash:) withObject:tmpPath waitUntilDone:YES];
+		[self performSelectorOnMainThread:@selector(movePathToTrash:) withObject:tmpPath waitUntilDone:YES];
 	else if (noErr != FSMoveObjectToTrashSync(&movedRef, NULL, 0))
 		NSLog(@"Sparkle error: couldn't move %@ to the trash. This is often a sign of a permissions error.", tmpPath);
 #else
-	[self performSelectorOnMainThread:@selector(_movePathToTrash:) withObject:tmpPath waitUntilDone:YES];
+	[self performSelectorOnMainThread:@selector(movePathToTrash:) withObject:tmpPath waitUntilDone:YES];
 #endif
 	
 	// If the currently-running application is trusted, the new
