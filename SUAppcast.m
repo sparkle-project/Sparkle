@@ -60,7 +60,7 @@
 		CFRelease(download);
     
 	NSError *error = nil;
-    NSXMLDocument *document = [[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:0 error:&error];
+    NSXMLDocument *document = [[[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:0 error:&error] autorelease];
 	BOOL failed = NO;
 	NSArray *xmlItems = nil;
 	NSMutableArray *appcastItems = [NSMutableArray array];
@@ -148,11 +148,10 @@
             }
             
 			NSString *errString;
-			SUAppcastItem *anItem = [[SUAppcastItem alloc] initWithDictionary:dict failureReason:&errString];
+			SUAppcastItem *anItem = [[[SUAppcastItem alloc] initWithDictionary:dict failureReason:&errString] autorelease];
             if (anItem)
             {
                 [appcastItems addObject:anItem];
-                [anItem release];
 			}
             else
             {
@@ -162,8 +161,6 @@
             [dict removeAllObjects];
 		}
 	}
-    
-	[document release];
 	
 	if ([appcastItems count])
     {

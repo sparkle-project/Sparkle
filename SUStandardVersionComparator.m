@@ -55,9 +55,8 @@ typedef enum {
         newType = [self typeOfCharacter:character];
         if (oldType != newType || oldType == kPeriodType) {
             // We've reached a new segment
-			NSString *aPart = [[NSString alloc] initWithString:s];
+			NSString *aPart = [[[NSString alloc] initWithString:s] autorelease];
             [parts addObject:aPart];
-			[aPart release];
             [s setString:character];
         } else {
             // Add character to string and continue
