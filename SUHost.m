@@ -108,8 +108,8 @@
 {
 	ProcessSerialNumber PSN;
 	GetCurrentProcess(&PSN);
-	NSDictionary * processInfo = (NSDictionary *)ProcessInformationCopyDictionary(&PSN, kProcessDictionaryIncludeAllInformationMask);
-	BOOL isElement = [[processInfo objectForKey:@"LSUIElement"] boolValue];
+	CFDictionaryRef processInfo = ProcessInformationCopyDictionary(&PSN, kProcessDictionaryIncludeAllInformationMask);
+	BOOL isElement = [[(NSDictionary *)processInfo objectForKey:@"LSUIElement"] boolValue];
 	if (processInfo)
 		CFRelease(processInfo);
 	return isElement;

@@ -33,9 +33,12 @@
 		if (uuid)
 		{
 			CFStringRef uuidString = CFUUIDCreateString(NULL, uuid);
+			if (uuidString)
+			{
+				mountPoint = [@"/Volumes" stringByAppendingPathComponent:(NSString*)uuidString];
+				CFRelease(uuidString);
+			}
 			CFRelease(uuid);
-			mountPoint = [@"/Volumes" stringByAppendingPathComponent:(NSString*)uuidString];
-			CFRelease(uuidString);
 		}
 	}
 	while (noErr == FSPathMakeRefWithOptions((UInt8 *)[mountPoint fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &tmpRef, NULL));
