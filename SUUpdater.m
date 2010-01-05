@@ -47,7 +47,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
     if (bundle == nil) bundle = [NSBundle mainBundle];
 	id updater = [sharedUpdaters objectForKey:[NSValue valueWithNonretainedObject:bundle]];
 	if (updater == nil)
-		updater = [[[self class] alloc] initForBundle:bundle];
+		updater = [[[[self class] alloc] initForBundle:bundle] autorelease];
 	return updater;
 }
 
