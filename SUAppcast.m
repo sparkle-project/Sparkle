@@ -176,7 +176,7 @@
 	}
 }
 
-- (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
+- (void)download:(NSURLDownload *)aDownload didFailWithError:(NSError *)error
 {
 	if (downloadFilename)
 	{
@@ -192,7 +192,7 @@
 	[self reportError:error];
 }
 
-- (NSURLRequest *)download:(NSURLDownload *)download willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse
+- (NSURLRequest *)download:(NSURLDownload *)aDownload willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse
 {
 	return request;
 }
