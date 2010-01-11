@@ -9,6 +9,23 @@
 #import "Sparkle.h"
 #import "SUAppcast.h"
 
+@interface NSXMLElement (SUAppcastExtensions)
+- (NSDictionary *)attributesAsDictionary;
+@end
+
+@implementation NSXMLElement (SUAppcastExtensions)
+- (NSDictionary *)attributesAsDictionary
+{
+	NSEnumerator *attributeEnum = [[self attributes] objectEnumerator];
+	NSXMLNode *attribute;
+	NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+
+	while ((attribute = [attributeEnum nextObject]))
+		[dictionary setObject:[attribute stringValue] forKey:[attribute name]];
+	return dictionary;
+}
+@end
+
 @interface SUAppcast (Private)
 - (void)reportError:(NSError *)error;
 - (NSXMLNode *)bestNodeInNodes:(NSArray *)nodes;
@@ -121,12 +138,7 @@
 				if ([name isEqualToString:@"enclosure"])
 				{
 					// enclosure is flattened as a separate dictionary for some reason
-					NSEnumerator *attributeEnum = [[(NSXMLElement *)node attributes] objectEnumerator];
-					NSXMLNode *attribute;
-					NSMutableDictionary *encDict = [NSMutableDictionary dictionary];
-					
-					while ((attribute = [attributeEnum nextObject]))
-						[encDict setObject:[attribute stringValue] forKey:[attribute name]];
+					NSDictionary *encDict = [(NSXMLElement *)node attributesAsDictionary];
 					[dict setObject:encDict forKey:@"enclosure"];
 					
 				}
@@ -137,8 +149,19 @@
 					if (date)
 						[dict setObject:date forKey:name];
 				}
-                else if (name != nil)
-                {
+				else if ([name isEqualToString:@"sparkle:deltas"])
+				{
+					NSMutableArray *deltas = [NSMutableArray array];
+					NSEnumerator *childEnum = [[node children] objectEnumerator];
+					NSXMLNode *child;
+					while ((child = [childEnum nextObject])) {
+						if ([[child name] isEqualToString:@"enclosure"])
+							[deltas addObject:[(NSXMLElement *)child attributesAsDictionary]];
+					}
+					[dict setObject:deltas forKey:@"deltas"];
+				}
+				else if (name != nil)
+				{
 					// add all other values as strings
 					[dict setObject:[[node stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] forKey:name];
 				}

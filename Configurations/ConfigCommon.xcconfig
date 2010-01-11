@@ -47,3 +47,4 @@ GCC_WARN_UNUSED_PARAMETER = YES
 GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES
 GCC_WARN_UNDECLARED_SELECTOR = YES
 WARNING_CFLAGS = -Wall -Wundef -Wendif-labels -Wpointer-arith -Wcast-align -Wwrite-strings -Wmissing-noreturn -Wmissing-format-attribute -Wpacked -Wredundant-decls -Winline -Wdisabled-optimization -Wformat=2 -Wlarger-than-32768 -Winvalid-pch
+LIBRARY_SEARCH_PATHS = $(inherited) $(SRCROOT)

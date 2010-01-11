@@ -91,6 +91,12 @@
 		do {
 			item = [updateEnumerator nextObject];
 		} while (item && ![self hostSupportsItem:item]);
+
+		SUAppcastItem *deltaUpdateItem = [[item deltaUpdates] objectForKey:[host version]];
+		if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem]) {
+			nonDeltaUpdateItem = [item retain];
+			item = deltaUpdateItem;
+		}
 	}
     
     updateItem = [item retain];
@@ -200,7 +206,7 @@
 
 - (void)extractUpdate
 {	
-	SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:downloadPath];
+	SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:downloadPath updatingHost:host];
 	if (!unarchiver)
 	{
 		NSLog(@"Sparkle Error: No valid unarchiver for %@!", downloadPath);
@@ -212,6 +218,16 @@
 	[unarchiver start];
 }
 
+- (void)failedToApplyDeltaUpdate
+{
+	// When a delta update fails to apply we fall back on updating via a full install.
+	[updateItem release];
+	updateItem = nonDeltaUpdateItem;
+	nonDeltaUpdateItem = nil;
+
+	[self downloadUpdate];
+}
+
 - (void)unarchiverDidFinish:(SUUnarchiver *)ua
 {
 	if (ua) { CFRelease(ua); }
@@ -221,6 +237,12 @@
 - (void)unarchiverDidFail:(SUUnarchiver *)ua
 {
 	if (ua) { CFRelease(ua); }
+
+	if ([updateItem isDeltaUpdate]) {
+		[self failedToApplyDeltaUpdate];
+		return;
+	}
+
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:[NSDictionary dictionaryWithObject:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) forKey:NSLocalizedDescriptionKey]]];
 }
 
@@ -328,6 +350,7 @@
 - (void)dealloc
 {
 	[updateItem release];
+	[nonDeltaUpdateItem release];
 	[download release];
 	[downloadPath release];
 	[relaunchPath release];
