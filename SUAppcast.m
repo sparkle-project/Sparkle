@@ -20,6 +20,7 @@
 {
 	[items release];
 	[userAgentString release];
+	[download release];
 	[super dealloc];
 }
 
@@ -34,11 +35,10 @@
     if (userAgentString)
         [request setValue:userAgentString forHTTPHeaderField:@"User-Agent"];
             
-    NSURLDownload *download = [[[NSURLDownload alloc] initWithRequest:request delegate:self] autorelease];
-    CFRetain(download);
+    download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
 }
 
-- (void)download:(NSURLDownload *)download decideDestinationWithSuggestedFilename:(NSString *)filename
+- (void)download:(NSURLDownload *)aDownload decideDestinationWithSuggestedFilename:(NSString *)filename
 {
 	NSString* destinationFilename = NSTemporaryDirectory();
 	if (destinationFilename)
@@ -48,17 +48,14 @@
 	}
 }
 
-- (void)download:(NSURLDownload *)download didCreateDestination:(NSString *)path
+- (void)download:(NSURLDownload *)aDownload didCreateDestination:(NSString *)path
 {
     [downloadFilename release];
     downloadFilename = [path copy];
 }
 
-- (void)downloadDidFinish:(NSURLDownload *)download
-{
-	if (download)
-		CFRelease(download);
-    
+- (void)downloadDidFinish:(NSURLDownload *)aDownload
+{    
 	NSError *error = nil;
     NSXMLDocument *document = [[[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:0 error:&error] autorelease];
 	BOOL failed = NO;
@@ -181,8 +178,6 @@
 
 - (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
 {
-	if (download)
-		CFRelease(download);
 	if (downloadFilename)
 	{
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
