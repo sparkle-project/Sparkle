@@ -232,7 +232,7 @@
 		[[updater delegate] updater:updater willInstallUpdate:updateItem];
 	
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
-	NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]] pathForResource:@"relaunch" ofType:@""];
+	NSString *relaunchPathToCopy = [SPARKLE_BUNDLE pathForResource:@"relaunch" ofType:@""];
 	NSString *targetPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
 	NSError *error = nil;
