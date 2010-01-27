@@ -125,7 +125,6 @@
 	[delegate updatePermissionPromptFinishedWithResult:([sender tag] == 1 ? SUAutomaticallyCheck : SUDoNotAutomaticallyCheck)];
 	[[self window] close];
 	[NSApp stopModal];
-	[self autorelease];
 }
 
 @end
