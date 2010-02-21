@@ -50,9 +50,9 @@
 		cpuType = value;
 		NSString *visibleCPUType;
 		switch(value) {
-			case 7:		visibleCPUType=@"Intel";	break;
-			case 18:	visibleCPUType=@"PowerPC";	break;
-			default:	visibleCPUType=@"Unknown";	break;
+			case CPU_TYPE_X86:		visibleCPUType = @"Intel";		break;
+			case CPU_TYPE_POWERPC:	visibleCPUType = @"PowerPC";	break;
+			default:				visibleCPUType = @"Unknown";	break;
 		}
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"cputype",@"CPU Type", [NSNumber numberWithInt:value], visibleCPUType,nil] forKeys:profileDictKeys]];
 	}
