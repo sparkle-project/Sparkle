@@ -51,7 +51,7 @@
 			<object class="NSWindowTemplate" id="912809986">
 				<int key="NSWindowStyleMask">15</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{305, 568}, {586, 370}}</string>
+				<string key="NSWindowRect">{{399, 283}, {586, 370}}</string>
 				<int key="NSWTFlags">-260571136</int>
 				<string key="NSWindowTitle">Software Update</string>
 				<string key="NSWindowClass">NSWindow</string>

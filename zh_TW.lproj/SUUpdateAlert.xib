@@ -51,7 +51,7 @@
 			<object class="NSWindowTemplate" id="932604135">
 				<int key="NSWindowStyleMask">15</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{248, 468}, {586, 370}}</string>
+				<string key="NSWindowRect">{{411, 283}, {586, 370}}</string>
 				<int key="NSWTFlags">-260571136</int>
 				<string key="NSWindowTitle">軟體更新</string>
 				<string key="NSWindowClass">NSWindow</string>
@@ -342,7 +342,7 @@
 						<object class="NSButton" id="301585120">
 							<reference key="NSNextResponder" ref="664214667"/>
 							<int key="NSvFlags">256</int>
-							<string key="NSFrame">{{106, 50}, {442, 16}}</string>
+							<string key="NSFrame">{{106, 49}, {442, 18}}</string>
 							<reference key="NSSuperview" ref="664214667"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="746291927">
@@ -366,7 +366,7 @@
 					<string key="NSFrameSize">{586, 370}</string>
 					<reference key="NSSuperview"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMinSize">{586, 392}</string>
 				<string key="NSMaxSize">{3.40282e+38, 3.40282e+38}</string>
 				<string key="NSFrameAutosaveName"/>
