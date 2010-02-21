@@ -398,7 +398,6 @@
 		0867D691FE84028FC02AAC07 /* Sparkle */ = {
 			isa = PBXGroup;
 			children = (
-				55D8F80410C589F40011E7FA /* ThreadSafePreferences.h */,
 				55D8F80710C58B210011E7FA /* SULog.h */,
 				55D8F80810C58B210011E7FA /* SULog.m */,
 				61F83F6E0DBFE07A006FDD30 /* Update Control */,
@@ -549,6 +548,7 @@
 				61CFB3280E385186007A1735 /* Sparkle.pch */,
 				61299A5B09CA6D4500B7442F /* SUConstants.h */,
 				61299A5F09CA6EB100B7442F /* SUConstants.m */,
+				55D8F80410C589F40011E7FA /* ThreadSafePreferences.h */,
 			);
 			includeInIndex = 1;
 			name = "Other Sources";
