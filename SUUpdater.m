@@ -27,6 +27,7 @@
 - (void)updateDriverDidFinish:(NSNotification *)note;
 - initForBundle:(NSBundle *)bundle;
 - (NSURL *)parameterizedFeedURL;
+- (void)checkForUpdatesInBackgroundTimerFired:(NSTimer*)theTimer;
 @end
 
 @implementation SUUpdater
