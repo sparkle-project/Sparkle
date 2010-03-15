@@ -160,6 +160,17 @@
 
 - (NSString *)descriptionText
 {
+	NSString* actionSentence = nil;
+	
+	if ([[updateItem fileURLType] isEqualToString:@"text/html"])
+	{
+		actionSentence = SULocalizedString(@"Would you like to see more info on the web?", nil);
+	}
+	else
+	{
+		actionSentence = SULocalizedString(@"Would you like to download it now?", nil);
+	}
+
 	NSString *updateItemVersion = [updateItem displayVersionString];
     NSString *hostVersion = [host displayVersion];
 	// Display more info if the version strings are the same; useful for betas.
@@ -168,7 +179,21 @@
         updateItemVersion = [updateItemVersion stringByAppendingFormat:@" (%@)", [updateItem versionString]];
         hostVersion = [hostVersion stringByAppendingFormat:@" (%@)", [host version]];
     }
-    return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", nil), [host name], updateItemVersion, hostVersion];
+	
+	return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available (you have %@). %@", nil), [host name], updateItemVersion, hostVersion, actionSentence];
+}
+
+
+- (NSString *)defaultButtonTitle
+{
+	if ([[updateItem fileURLType] isEqualToString:@"text/html"])
+	{
+		return SULocalizedString(@"More Info", @"More Info Button");
+	}
+	else
+	{
+		return SULocalizedString(@"Install Update", @"Install Update Button");
+	}
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:frame

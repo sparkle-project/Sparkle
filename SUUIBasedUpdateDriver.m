@@ -67,11 +67,26 @@
 	switch (choice)
 	{
 		case SUInstallUpdateChoice:
-			statusController = [[SUStatusController alloc] initWithHost:host];
-			[statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
-			[statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
-			[statusController showWindow:self];	
-			[self downloadUpdate];
+
+			// If the update item is HTML then we treat it as a URL to open instead of a file to download
+			if ([[updateItem fileURLType] isEqualToString:@"text/html"])
+			{
+				[[NSWorkspace sharedWorkspace] openURL:[updateItem fileURL]];
+
+				// "Skip" the release so we don't show them again...
+				[host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+
+				[self abortUpdate];
+			}
+			else
+			{
+				statusController = [[SUStatusController alloc] initWithHost:host];
+				[statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
+				[statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
+				[statusController showWindow:self];	
+			
+				[self downloadUpdate];
+			}			
 			break;
 			
 		case SUSkipThisVersionChoice:

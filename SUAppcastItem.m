@@ -73,6 +73,15 @@
 }
 
 
+- (NSString *)fileURLType { return [[fileURLType retain] autorelease]; }
+
+- (void)setFileURLType:(NSString *)aFileURLType
+{
+    [fileURLType release];
+    fileURLType = [aFileURLType copy];
+}
+
+
 - (NSString *)versionString { return [[versionString retain] autorelease]; }
 
 - (void)setVersionString:(NSString *)s
@@ -161,6 +170,8 @@
 		[self setItemDescription:[dict objectForKey:@"description"]];
 		
 		[self setFileURL:[NSURL URLWithString:[[enclosure objectForKey:@"url"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+		[self setFileURLType:[enclosure objectForKey:@"type"]];
+		
 		[self setDSASignature:[enclosure objectForKey:@"sparkle:dsaSignature"]];		
 		
 		[self setVersionString:newVersion];
@@ -191,6 +202,7 @@
 	[releaseNotesURL release];
 	[DSASignature release];
 	[fileURL release];
+	[fileURLType release];
 	[versionString release];
 	[displayVersionString release];
 	[propertiesDictionary release];
