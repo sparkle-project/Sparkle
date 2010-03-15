@@ -174,7 +174,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 		delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
 	else
 		delayUntilCheck = 0; // We're overdue! Run one now.
-	checkTimer = [NSTimer scheduledTimerWithTimeInterval:delayUntilCheck target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO];
+	checkTimer = [NSTimer scheduledTimerWithTimeInterval:delayUntilCheck target:self selector:@selector(checkForUpdatesInBackgroundTimerFired:) userInfo:nil repeats:NO];
 }
 
 - (void)checkForUpdatesInBackground
@@ -182,6 +182,12 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 	checkTimer = nil; // Timer doesn't repeat, so it's invalid, just needs to be set to nil.
 	
 	[self checkForUpdatesWithDriver:[[[([self automaticallyDownloadsUpdates] ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class]) alloc] initWithUpdater:self] autorelease]];
+}
+
+- (void)checkForUpdatesInBackgroundTimerFired:(NSTimer*)theTimer
+{
+	checkTimer = nil;
+	[self checkForUpdatesInBackground];
 }
 
 - (IBAction)checkForUpdates:sender
@@ -394,7 +400,6 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 {
 	[self unregisterAsObserver];
 	[host release];
-	if (checkTimer) { [checkTimer invalidate]; }
 	[super dealloc];
 }
 
