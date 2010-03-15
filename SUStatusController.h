@@ -12,7 +12,9 @@
 #import "SUWindowController.h"
 
 @class SUHost;
-@interface SUStatusController : SUWindowController {
+@interface SUStatusController : SUWindowController
+{
+@private
 	double progressValue, maxProgressValue;
 	NSString *title, *statusText, *buttonTitle;
 	IBOutlet NSButton *actionButton;

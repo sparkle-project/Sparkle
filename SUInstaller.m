@@ -13,7 +13,7 @@
 
 @implementation SUInstaller
 
-+ (BOOL)_isAliasFolderAtPath:(NSString *)path
++ (BOOL)isAliasFolderAtPath:(NSString *)path
 {
 	FSRef fileRef;
 	OSStatus err = noErr;
@@ -78,7 +78,7 @@
 		}
 		
 		// Some DMGs have symlinks into /Applications! That's no good!
-		if ([self _isAliasFolderAtPath:currentPath])
+		if ([self isAliasFolderAtPath:currentPath])
 			[dirEnum skipDescendents];
 	}
 
@@ -92,7 +92,7 @@
 	
 	if (newAppDownloadPath == nil)
 	{
-		[self _finishInstallationWithResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find an appropriate update in the downloaded package." forKey:NSLocalizedDescriptionKey]] delegate:delegate];
+		[self finishInstallationWithResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find an appropriate update in the downloaded package." forKey:NSLocalizedDescriptionKey]] delegate:delegate];
 	}
 	else
 	{
@@ -100,7 +100,7 @@
 	}
 }
 
-+ (void)_mdimportHost:(SUHost *)host
++ (void)mdimportHost:(SUHost *)host
 {
 	NSTask *mdimport = [[[NSTask alloc] init] autorelease];
 	[mdimport setLaunchPath:@"/usr/bin/mdimport"];
@@ -116,11 +116,11 @@
 	}
 }
 
-+ (void)_finishInstallationWithResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:delegate
++ (void)finishInstallationWithResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:delegate
 {
-	if (result == YES)
+	if (result)
 	{
-		[self _mdimportHost:host];
+		[self mdimportHost:host];
 		if ([delegate respondsToSelector:@selector(installerFinishedForHost:)])
 			[delegate installerFinishedForHost:host];
 	}

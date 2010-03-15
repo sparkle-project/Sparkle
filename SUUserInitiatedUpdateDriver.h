@@ -12,7 +12,9 @@
 #import <Cocoa/Cocoa.h>
 #import "SUUIBasedUpdateDriver.h"
 
-@interface SUUserInitiatedUpdateDriver : SUUIBasedUpdateDriver {
+@interface SUUserInitiatedUpdateDriver : SUUIBasedUpdateDriver
+{
+@private
 	SUStatusController *checkingController;
 	BOOL isCanceled;
 }

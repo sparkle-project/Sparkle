@@ -17,7 +17,7 @@
 #import <openssl/rsa.h>
 #import <openssl/sha.h>
 
-long b64decode(unsigned char* str)
+static long b64decode(unsigned char* str)
 {
     unsigned char *cur, *start;
     int d, dlast, phase;
@@ -41,12 +41,12 @@ long b64decode(unsigned char* str)
         -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1   /* F0-FF */
     };
 	
-    d = dlast = phase = 0;
+    dlast = phase = 0;
     start = str;
     for (cur = str; *cur != '\0'; ++cur )
     {
 		if(*cur == '\n' || *cur == '\r'){phase = dlast = 0; continue;}
-        d = table[(int)*cur];
+        d = table[(unsigned int)*cur];
         if(d != -1)
         {
             switch(phase)
@@ -77,26 +77,30 @@ long b64decode(unsigned char* str)
     return str - start;
 }
 
-EVP_PKEY* load_dsa_key(char *key)
+static EVP_PKEY* load_dsa_key(char *key)
 {
 	EVP_PKEY* pkey = NULL;
-	BIO *bio;
-	if((bio = BIO_new_mem_buf(key, (int)strlen(key))))
+	size_t keylen = strlen(key);
+	if (keylen <= INT_MAX)
 	{
-		DSA* dsa_key = 0;
-		if(PEM_read_bio_DSA_PUBKEY(bio, &dsa_key, NULL, NULL))
+		BIO *bio;
+		if((bio = BIO_new_mem_buf(key, (int)keylen)))
 		{
-			if((pkey = EVP_PKEY_new()))
+			DSA* dsa_key = 0;
+			if(PEM_read_bio_DSA_PUBKEY(bio, &dsa_key, NULL, NULL))
 			{
-				if(EVP_PKEY_assign_DSA(pkey, dsa_key) != 1)
+				if((pkey = EVP_PKEY_new()))
 				{
-					DSA_free(dsa_key);
-					EVP_PKEY_free(pkey);
-					pkey = NULL;
+					if(EVP_PKEY_assign_DSA(pkey, dsa_key) != 1)
+					{
+						DSA_free(dsa_key);
+						EVP_PKEY_free(pkey);
+						pkey = NULL;
+					}
 				}
 			}
+			BIO_free(bio);
 		}
-		BIO_free(bio);
 	}
 	return pkey;
 }
@@ -119,12 +123,15 @@ EVP_PKEY* load_dsa_key(char *key)
 	}
 	pkeyString = [pkeyTrimmedLines componentsJoinedByString:@"\n"]; // Put them back together.
 
+	NSMutableData* pkeyData = [[[pkeyString dataUsingEncoding:NSUTF8StringEncoding] mutableCopy] autorelease];
+	void *pkeyBytes = [pkeyData mutableBytes];
 	EVP_PKEY* pkey = NULL;
-	pkey = load_dsa_key((char *)[pkeyString UTF8String]);
+	pkey = load_dsa_key(pkeyBytes);
 	if (!pkey) { return NO; }
 
 	// Now, the signature is in base64; we have to decode it into a binary stream.
-	unsigned char *signature = (unsigned char *)[encodedSignature UTF8String];
+	NSMutableData* signatureData = [[[encodedSignature dataUsingEncoding:NSUTF8StringEncoding] mutableCopy] autorelease];
+	void *signature = [signatureData mutableBytes];
 	long length = b64decode(signature); // Decode the signature in-place and get the new length of the signature string.
 	
 	// We've got the signature, now get the file data.
@@ -140,10 +147,17 @@ EVP_PKEY* load_dsa_key(char *key)
 	if(EVP_VerifyInit(&ctx, EVP_dss1()) == 1) // We're using DSA keys.
 	{
 		EVP_VerifyUpdate(&ctx, md, SHA_DIGEST_LENGTH);
+		if ((length < 0) || (length > 0x7FFFFFFF)) { return NO; } // test before cast below
 		result = (EVP_VerifyFinal(&ctx, signature, (unsigned int)length, pkey) == 1);
 	}
 	
 	EVP_PKEY_free(pkey);
+	
+	// Prevent these from being collected earlier than we want (our only reference is an inner pointer).
+	[pkeyData self];
+	[signatureData self];
+	[pathData self];
+	
 	return result;
 }
 

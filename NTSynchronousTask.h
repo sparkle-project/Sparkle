@@ -11,6 +11,7 @@
 
 @interface NTSynchronousTask : NSObject
 {
+@private
     NSTask *mv_task;
     NSPipe *mv_outputPipe;
     NSPipe *mv_inputPipe;

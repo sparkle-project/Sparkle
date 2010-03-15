@@ -10,7 +10,7 @@
 
 @implementation SUUnarchiver (Private)
 
-- _initWithPath:(NSString *)path
+- (id)initWithPath:(NSString *)path
 {
 	if ((self = [super init]))
 		archivePath = [path copy];
@@ -23,41 +23,41 @@
 	[super dealloc];
 }
 
-+ (BOOL)_canUnarchivePath:(NSString *)path
++ (BOOL)canUnarchivePath:(NSString *)path
 {
 	return NO;
 }
 
-- (void)_notifyDelegateOfExtractedLength:(NSNumber *)length
+- (void)notifyDelegateOfExtractedLength:(NSNumber *)length
 {
 	if ([delegate respondsToSelector:@selector(unarchiver:extractedLength:)])
-		[delegate unarchiver:self extractedLength:[length longValue]];
+		[delegate unarchiver:self extractedLength:[length unsignedLongValue]];
 }
 
-- (void)_notifyDelegateOfSuccess
+- (void)notifyDelegateOfSuccess
 {
 	if ([delegate respondsToSelector:@selector(unarchiverDidFinish:)])
 		[delegate performSelector:@selector(unarchiverDidFinish:) withObject:self];
 }
 
-- (void)_notifyDelegateOfFailure
+- (void)notifyDelegateOfFailure
 {
 	if ([delegate respondsToSelector:@selector(unarchiverDidFail:)])
 		[delegate performSelector:@selector(unarchiverDidFail:) withObject:self];
 }
 
-static NSMutableArray *__unarchiverImplementations;
+static NSMutableArray *gUnarchiverImplementations;
 
-+ (void)_registerImplementation:(Class)implementation
++ (void)registerImplementation:(Class)implementation
 {
-	if (!__unarchiverImplementations)
-		__unarchiverImplementations = [[NSMutableArray alloc] init];
-	[__unarchiverImplementations addObject:implementation];
+	if (!gUnarchiverImplementations)
+		gUnarchiverImplementations = [[NSMutableArray alloc] init];
+	[gUnarchiverImplementations addObject:implementation];
 }
 
-+ (NSArray *)_unarchiverImplementations
++ (NSArray *)unarchiverImplementations
 {
-	return [NSArray arrayWithArray:__unarchiverImplementations];
+	return [NSArray arrayWithArray:gUnarchiverImplementations];
 }
 
 @end

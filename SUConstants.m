@@ -9,27 +9,27 @@
 #import "Sparkle.h"
 #import "SUConstants.h"
 
-NSString *SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotificationName";
-NSString *SUTechnicalErrorInformationKey = @"SUTechnicalErrorInformation";
+NSString *const SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotificationName";
+NSString *const SUTechnicalErrorInformationKey = @"SUTechnicalErrorInformation";
 
-NSString *SUHasLaunchedBeforeKey = @"SUHasLaunchedBefore";
-NSString *SUFeedURLKey = @"SUFeedURL";
-NSString *SUShowReleaseNotesKey = @"SUShowReleaseNotes";
-NSString *SUSkippedVersionKey = @"SUSkippedVersion";
-NSString *SUScheduledCheckIntervalKey = @"SUScheduledCheckInterval";
-NSString *SULastCheckTimeKey = @"SULastCheckTime";
-NSString *SUExpectsDSASignatureKey = @"SUExpectsDSASignature";
-NSString *SUPublicDSAKeyKey = @"SUPublicDSAKey";
-NSString *SUPublicDSAKeyFileKey = @"SUPublicDSAKeyFile";
-NSString *SUAutomaticallyUpdateKey = @"SUAutomaticallyUpdate";
-NSString *SUAllowsAutomaticUpdatesKey = @"SUAllowsAutomaticUpdates";
-NSString *SUEnableSystemProfilingKey = @"SUEnableSystemProfiling";
-NSString *SUEnableAutomaticChecksKey = @"SUEnableAutomaticChecks";
-NSString *SUEnableAutomaticChecksKeyOld = @"SUCheckAtStartup";
-NSString *SUSendProfileInfoKey = @"SUSendProfileInfo";
-NSString *SULastProfileSubmitDateKey = @"SULastProfileSubmissionDate";
+NSString *const SUHasLaunchedBeforeKey = @"SUHasLaunchedBefore";
+NSString *const SUFeedURLKey = @"SUFeedURL";
+NSString *const SUShowReleaseNotesKey = @"SUShowReleaseNotes";
+NSString *const SUSkippedVersionKey = @"SUSkippedVersion";
+NSString *const SUScheduledCheckIntervalKey = @"SUScheduledCheckInterval";
+NSString *const SULastCheckTimeKey = @"SULastCheckTime";
+NSString *const SUExpectsDSASignatureKey = @"SUExpectsDSASignature";
+NSString *const SUPublicDSAKeyKey = @"SUPublicDSAKey";
+NSString *const SUPublicDSAKeyFileKey = @"SUPublicDSAKeyFile";
+NSString *const SUAutomaticallyUpdateKey = @"SUAutomaticallyUpdate";
+NSString *const SUAllowsAutomaticUpdatesKey = @"SUAllowsAutomaticUpdates";
+NSString *const SUEnableSystemProfilingKey = @"SUEnableSystemProfiling";
+NSString *const SUEnableAutomaticChecksKey = @"SUEnableAutomaticChecks";
+NSString *const SUEnableAutomaticChecksKeyOld = @"SUCheckAtStartup";
+NSString *const SUSendProfileInfoKey = @"SUSendProfileInfo";
+NSString *const SULastProfileSubmitDateKey = @"SULastProfileSubmissionDate";
 
-NSString *SUSparkleErrorDomain = @"SUSparkleErrorDomain";
+NSString *const SUSparkleErrorDomain = @"SUSparkleErrorDomain";
 OSStatus SUAppcastParseError = 1000;
 OSStatus SUNoUpdateError = 1001;
 OSStatus SUAppcastError = 1002;

@@ -34,7 +34,7 @@
 #pragma mark Initialization
 
 static NSMutableDictionary *sharedUpdaters = nil;
-static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
+static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
 
 + (SUUpdater *)sharedUpdater
 {
@@ -47,7 +47,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
     if (bundle == nil) bundle = [NSBundle mainBundle];
 	id updater = [sharedUpdaters objectForKey:[NSValue valueWithNonretainedObject:bundle]];
 	if (updater == nil)
-		updater = [[[self class] alloc] initForBundle:bundle];
+		updater = [[[[self class] alloc] initForBundle:bundle] autorelease];
 	return updater;
 }
 
@@ -357,7 +357,7 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 		parameters = [parameters arrayByAddingObjectsFromArray:[host systemProfile]];
 		[host setObject:[NSDate date] forUserDefaultsKey:SULastProfileSubmitDateKey];
 	}
-	if (parameters == nil || [parameters count] == 0) { return baseFeedURL; }
+	if ([parameters count] == 0) { return baseFeedURL; }
 	
 	// Build up the parameterized URL.
 	NSMutableArray *parameterStrings = [NSMutableArray array];

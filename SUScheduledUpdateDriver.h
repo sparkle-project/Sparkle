@@ -12,7 +12,9 @@
 #import <Cocoa/Cocoa.h>
 #import "SUUIBasedUpdateDriver.h"
 
-@interface SUScheduledUpdateDriver : SUUIBasedUpdateDriver {
+@interface SUScheduledUpdateDriver : SUUIBasedUpdateDriver
+{
+@private
 	BOOL showErrors;
 }
 
