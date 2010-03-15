@@ -1067,6 +1067,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH)";
 			};
 			name = Debug;
 		};
