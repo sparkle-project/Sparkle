@@ -17,6 +17,9 @@
 #import "SUHost.h"
 #import <ImageIO/ImageIO.h>
 #import <ServiceManagement/ServiceManagement.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
+#import <SystemConfiguration/SystemConfiguration.h>
+
 
 #include "AppKitPrevention.h"
 
@@ -70,6 +73,8 @@
             }
         }
         
+        // If we are running as the root user, there is no need to explicitly set the UserName / GroupName keys
+        // because we are submitting under the user domain, which should automatically use the the console user.
         NSMutableDictionary *jobDictionary = [[NSMutableDictionary alloc] init];
         jobDictionary[@"Label"] = label;
         jobDictionary[@"ProgramArguments"] = arguments;
@@ -100,7 +105,7 @@
     return (submittedJob == true);
 }
 
-- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle updaterIdentifier:(NSString *)updaterIdentifier authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain
+- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle updaterIdentifier:(NSString *)updaterIdentifier userName:(NSString *)userName homeDirectory:(NSString *)homeDirectory authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain rootUser:(BOOL)rootUser
 {
     SUFileManager *fileManager = [[SUFileManager alloc] init];
     
@@ -109,12 +114,6 @@
     
     NSString *hostBundleIdentifier = hostBundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
-    
-    NSString *homeDirectory = NSHomeDirectory();
-    assert(homeDirectory != nil);
-    
-    NSString *userName = NSUserName();
-    assert(userName != nil);
     
     // The first argument has to be the path to the program, and the second is a host identifier so that the installer knows what mach services to host
     // The third and forth arguments are for home directory and user name which only pkg installer scripts may need
@@ -133,7 +132,7 @@
     
     BOOL canceledAuthorization = NO;
     BOOL failedToUseSystemDomain = NO;
-    if (auth != NULL && systemDomain) {
+    if (auth != NULL && systemDomain && !rootUser) {
         // See Apple's 'EvenBetterAuthorizationSample' sample code and
         // https://developer.apple.com/library/mac/technotes/tn2095/_index.html#//apple_ref/doc/uid/DTS10003110-CH1-SECTION7
         // We can set a custom right name for authenticating as an administrator
@@ -207,7 +206,13 @@
                             NSString *path = [[NSString alloc] initWithUTF8String:pathBuffer];
                             tempIconDestinationURL = [NSURL fileURLWithPath:path];
                             
-                            CGImageDestinationRef imageDestination = CGImageDestinationCreateWithURL((CFURLRef)tempIconDestinationURL, kUTTypePNG, 1, NULL);
+                            CGImageDestinationRef imageDestination = NULL;
+                            if (@available(macOS 11, *)) {
+                                CFStringRef uti = (__bridge CFStringRef)[UTTypePNG identifier];
+                                imageDestination = CGImageDestinationCreateWithURL((CFURLRef)tempIconDestinationURL, uti, 1, NULL);
+                            } else {
+                                imageDestination = CGImageDestinationCreateWithURL((CFURLRef)tempIconDestinationURL, kUTTypePNG, 1, NULL);
+                            }
                             if (imageDestination != NULL) {
                                 CGImageDestinationAddImageFromSource(imageDestination, imageSource, imageIndex, (CFDictionaryRef)@{});
                                 if (CGImageDestinationFinalize(imageDestination)) {
@@ -301,13 +306,21 @@
     return status;
 }
 
-- (NSString *)pathForBundledTool:(NSString *)toolName extension:(NSString *)extension inBundle:(NSBundle *)bundle
+- (NSString *)pathForBundledTool:(NSString *)toolName extension:(NSString *)extension fromBundle:(NSBundle *)bundle
 {
     // If the path extension is empty, we don't want to add a "." at the end
     NSString *nameWithExtension = (extension.length > 0) ? [toolName stringByAppendingPathExtension:extension] : toolName;
     assert(nameWithExtension != nil);
     
-    NSURL *auxiliaryToolURL = [bundle URLForAuxiliaryExecutable:nameWithExtension];
+    NSURL *auxiliaryToolURL;
+    if ([bundle.bundleURL.pathExtension isEqualToString:@"xpc"]) {
+        // Paranoid check to get full bundle URL
+        NSURL *fullURL = bundle.bundleURL.URLByResolvingSymlinksInPath;
+        
+        auxiliaryToolURL = [fullURL.URLByDeletingLastPathComponent.URLByDeletingLastPathComponent URLByAppendingPathComponent:nameWithExtension];
+    } else {
+        auxiliaryToolURL = [bundle URLForAuxiliaryExecutable:nameWithExtension];
+    }
     assert(auxiliaryToolURL != nil);
     
     NSURL *resolvedAuxiliaryToolURL = [auxiliaryToolURL URLByResolvingSymlinksInPath];
@@ -332,7 +345,7 @@ BOOL SPUSystemNeedsAuthorizationAccessForBundlePath(NSString *bundlePath)
         NSString *tempFilename = @"permission_test" ;
         
         SUFileManager *suFileManager = [[SUFileManager alloc] init];
-        NSURL *tempDirectoryURL = [suFileManager makeTemporaryDirectoryWithPreferredName:tempFilename appropriateForDirectoryURL:[NSURL fileURLWithPath:NSTemporaryDirectory()] error:NULL];
+        NSURL *tempDirectoryURL = [suFileManager makeTemporaryDirectoryAppropriateForDirectoryURL:[NSURL fileURLWithPath:NSTemporaryDirectory()] error:NULL];
         
         if (tempDirectoryURL == nil) {
             // I don't imagine this ever happening but in case it does, requesting authorization may be the better option
@@ -353,38 +366,46 @@ BOOL SPUSystemNeedsAuthorizationAccessForBundlePath(NSString *bundlePath)
     return needsAuthorization;
 }
 
-static BOOL SPUSystemNeedsAuthorizationAccess(NSString *path, NSString *installationType)
+static BOOL SPUUsesSystemDomainForBundlePath(NSString *path, NSString *installationType, BOOL rootUser)
 {
-    BOOL needsAuthorization;
-    if ([installationType isEqualToString:SPUInstallationTypeGuidedPackage]) {
-        needsAuthorization = YES;
-    } else if ([installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
-        needsAuthorization = NO;
+    if (!rootUser) {
+        if ([installationType isEqualToString:SPUInstallationTypeGuidedPackage]) {
+            return YES;
+        } else if ([installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
+            return NO;
+        } else {
+            return SPUSystemNeedsAuthorizationAccessForBundlePath(path);
+        }
     } else {
-        needsAuthorization = SPUSystemNeedsAuthorizationAccessForBundlePath(path);
+        // If we are the root user we use the system domain even if we don't need escalated authorization.
+        // Note interactive package installations are not supported as root.
+        return YES;
     }
-    return needsAuthorization;
 }
-
 
 // Note: do not pass untrusted information such as paths to the installer and progress agent tools, when we can find them ourselves here
 - (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath updaterIdentifier:(NSString *)updaterIdentifier authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction completion:(void (^)(SUInstallerLauncherStatus, BOOL))completionHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        BOOL needsSystemAuthorization = SPUSystemNeedsAuthorizationAccess(hostBundlePath, installationType);
+        // We could do a sort of preflight Authorization test instead of testing if we are running as root,
+        // but I think this is not necessarily a better approach. We have to chown() the launcher cache directory later on,
+        // and that is not necessarily related to a preflight test. It's more related to being ran under a root / different user from the active GUI session
+        BOOL rootUser = (geteuid() == 0);
+        
+        BOOL inSystemDomain = SPUUsesSystemDomainForBundlePath(hostBundlePath, installationType, rootUser);
         
         NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
         if (hostBundle == nil) {
             SULog(SULogLevelError, @"InstallerLauncher failed to create bundle at %@", hostBundlePath);
             SULog(SULogLevelError, @"Please make sure InstallerLauncher is not sandboxed and do not sign your app by passing --deep. Check: codesign -d --entitlements :- \"%@\"", NSBundle.mainBundle.bundlePath);
             SULog(SULogLevelError, @"More information regarding sandboxing: https://sparkle-project.org/documentation/sandboxing/");
-            completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
+            completionHandler(SUInstallerLauncherFailure, inSystemDomain);
             return;
         }
         
-        // if we need to use the system domain and we aren't allowed interaction, then try sometime later when interaction is allowed
-        if (needsSystemAuthorization && !allowingDriverInteraction) {
-            completionHandler(SUInstallerLauncherAuthorizeLater, needsSystemAuthorization);
+        // if we need to use the system authorization from non-root and we aren't allowed interaction, then try sometime later when interaction is allowed
+        if (inSystemDomain && !rootUser && !allowingDriverInteraction) {
+            completionHandler(SUInstallerLauncherAuthorizeLater, inSystemDomain);
             return;
         }
         
@@ -396,19 +417,19 @@ static BOOL SPUSystemNeedsAuthorizationAccess(NSString *path, NSString *installa
         
         // Note we do not have to copy this tool out of the bundle it's in because it's a utility with no dependencies.
         // Furthermore, we can keep the tool at a place that may not necessarily be writable.
-        NSString *installerPath = [self pathForBundledTool:@""SPARKLE_RELAUNCH_TOOL_NAME extension:@"" inBundle:ourBundle];
+        NSString *installerPath = [self pathForBundledTool:@""SPARKLE_RELAUNCH_TOOL_NAME extension:@"" fromBundle:ourBundle];
         if (installerPath == nil) {
             SULog(SULogLevelError, @"Error: Cannot submit installer because the installer could not be located");
-            completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
+            completionHandler(SUInstallerLauncherFailure, inSystemDomain);
             return;
         }
         
         // We do however have to copy the progress tool app somewhere safe due to its external depedencies
-        NSString *progressToolResourcePath = [self pathForBundledTool:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME extension:@"app" inBundle:ourBundle];
+        NSString *progressToolResourcePath = [self pathForBundledTool:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME extension:@"app" fromBundle:ourBundle];
         
         if (progressToolResourcePath == nil) {
             SULog(SULogLevelError, @"Error: Cannot submit progress tool because the progress tool could not be located");
-            completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
+            completionHandler(SUInstallerLauncherFailure, inSystemDomain);
             return;
         }
         
@@ -424,25 +445,69 @@ static BOOL SPUSystemNeedsAuthorizationAccess(NSString *path, NSString *installa
         NSString *launcherCachePath = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:rootLauncherCachePath];
         if (launcherCachePath == nil) {
             SULog(SULogLevelError, @"Failed to create cache directory for progress tool in %@", rootLauncherCachePath);
-            completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
+            completionHandler(SUInstallerLauncherFailure, inSystemDomain);
             return;
+        }
+        
+        SUFileManager *fileManager = [[SUFileManager alloc] init];
+        
+        NSString *userName;
+        NSString *homeDirectory;
+        if (!rootUser) {
+            // Normal path
+            homeDirectory = NSHomeDirectory();
+            assert(homeDirectory != nil);
+            
+            userName = NSUserName();
+            assert(userName != nil);
+        } else {
+            // As the root user we need to obtain the user name and home directory reflecting
+            // the user's console session.
+            
+            uid_t uid = 0;
+            gid_t gid = 0;
+            CFStringRef userNameRef = SCDynamicStoreCopyConsoleUser(NULL, &uid, &gid);
+            if (userNameRef == NULL) {
+                SULog(SULogLevelError, @"Failed to retrieve user name from the console user");
+                completionHandler(SUInstallerLauncherFailure, inSystemDomain);
+                return;
+            }
+            
+            userName = (NSString *)CFBridgingRelease(userNameRef);
+            homeDirectory = NSHomeDirectoryForUser(userName);
+            if (homeDirectory == nil) {
+                SULog(SULogLevelError, @"Failed to retrieve home directory for user: %@", userName);
+                
+                completionHandler(SUInstallerLauncherFailure, inSystemDomain);
+                return;
+            }
+            
+            // Ensure the console user has ownership of the launcher cache directory
+            // Otherwise the updater may not launch and not be able to clean up itself
+            NSError *changeOwnerAndGroupError = nil;
+            if (![fileManager changeOwnerAndGroupOfItemAtURL:[NSURL fileURLWithPath:launcherCachePath] ownerID:uid groupID:gid error:&changeOwnerAndGroupError]) {
+                SULog(SULogLevelError, @"Failed to change owner and group for launcher cache directory: %@", changeOwnerAndGroupError);
+                
+                completionHandler(SUInstallerLauncherFailure, inSystemDomain);
+                return;
+            }
         }
         
         NSString *progressToolPath = [launcherCachePath stringByAppendingPathComponent:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME@".app"];
         
         NSError *copyError = nil;
         // SUFileManager is more reliable for copying files around
-        if (![[[SUFileManager alloc] init] copyItemAtURL:[NSURL fileURLWithPath:progressToolResourcePath] toURL:[NSURL fileURLWithPath:progressToolPath] error:&copyError]) {
+        if (![fileManager copyItemAtURL:[NSURL fileURLWithPath:progressToolResourcePath] toURL:[NSURL fileURLWithPath:progressToolPath] error:&copyError]) {
             SULog(SULogLevelError, @"Failed to copy progress tool to cache: %@", copyError);
-            completionHandler(SUInstallerLauncherFailure, needsSystemAuthorization);
+            completionHandler(SUInstallerLauncherFailure, inSystemDomain);
             return;
         }
         
-        SUInstallerLauncherStatus installerStatus = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle updaterIdentifier:updaterIdentifier authorizationPrompt:authorizationPrompt inSystemDomain:needsSystemAuthorization];
+        SUInstallerLauncherStatus installerStatus = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle updaterIdentifier:updaterIdentifier userName:userName homeDirectory:homeDirectory authorizationPrompt:authorizationPrompt inSystemDomain:inSystemDomain rootUser:rootUser];
         
         BOOL submittedProgressTool = NO;
         if (installerStatus == SUInstallerLauncherSuccess) {
-            submittedProgressTool = [self submitProgressToolAtPath:progressToolPath withHostBundle:hostBundle inSystemDomainForInstaller:needsSystemAuthorization];
+            submittedProgressTool = [self submitProgressToolAtPath:progressToolPath withHostBundle:hostBundle inSystemDomainForInstaller:inSystemDomain];
             
             if (!submittedProgressTool) {
                 SULog(SULogLevelError, @"Failed to submit progress tool job");
@@ -453,9 +518,9 @@ static BOOL SPUSystemNeedsAuthorizationAccess(NSString *path, NSString *installa
         }
         
         if (installerStatus == SUInstallerLauncherCanceled) {
-            completionHandler(installerStatus, needsSystemAuthorization);
+            completionHandler(installerStatus, inSystemDomain);
         } else {
-            completionHandler(submittedProgressTool ? SUInstallerLauncherSuccess : SUInstallerLauncherFailure, needsSystemAuthorization);
+            completionHandler(submittedProgressTool ? SUInstallerLauncherSuccess : SUInstallerLauncherFailure, inSystemDomain);
         }
     });
 }

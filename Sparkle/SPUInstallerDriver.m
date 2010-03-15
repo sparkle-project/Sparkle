@@ -43,7 +43,6 @@
 @property (nonatomic, readonly) NSBundle *applicationBundle;
 @property (nonatomic, weak, readonly) id<SPUInstallerDriverDelegate> delegate;
 @property (nonatomic) SPUInstallerMessageType currentStage;
-@property (nonatomic) BOOL startedInstalling;
 
 @property (nonatomic) id<SUInstallerConnectionProtocol> installerConnection;
 
@@ -65,12 +64,14 @@
 @end
 
 @implementation SPUInstallerDriver
+{
+    void (^_updateWillInstallHandler)(void);
+}
 
 @synthesize host = _host;
 @synthesize applicationBundle = _applicationBundle;
 @synthesize delegate = _delegate;
 @synthesize currentStage = _currentStage;
-@synthesize startedInstalling = _startedInstalling;
 @synthesize installerConnection = _installerConnection;
 @synthesize extractionAttempts = _extractionAttempts;
 @synthesize postponedOnce = _postponedOnce;
@@ -97,6 +98,48 @@
     return self;
 }
 
+- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler
+{
+    _updateWillInstallHandler = [updateWillInstallHandler copy];
+}
+
+- (void)_reportInstallerError:(nullable NSError *)currentInstallerError genericErrorCode:(NSInteger)genericErrorCode genericUserInfo:(NSDictionary *)genericUserInfo
+{
+    // First see if there is a good custom error we can show
+    // We only check for signing validation errors currently
+    NSError *customError;
+    if (currentInstallerError != nil) {
+        NSError *underlyingError = currentInstallerError.userInfo[NSUnderlyingErrorKey];
+        if (underlyingError != nil && underlyingError.code == SUValidationError) {
+            NSDictionary *userInfo = @{
+                NSLocalizedDescriptionKey: SULocalizedString(@"The update is improperly signed and could not be validated. Please try again later or contact the app developer.", nil),
+                NSUnderlyingErrorKey: (NSError * _Nonnull)currentInstallerError
+            };
+            
+            customError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:userInfo];
+        } else {
+            customError = nil;
+        }
+    } else {
+        customError = nil;
+    }
+    
+    // Otherwise if there's no custom error, then use a generic installer error to show
+    // and keep the underlying error around for logging
+    NSError *installerError;
+    if (customError != nil) {
+        installerError = customError;
+    } else {
+        NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:genericUserInfo];
+        if (currentInstallerError != nil) {
+            userInfo[NSUnderlyingErrorKey] = currentInstallerError;
+        }
+        installerError = [NSError errorWithDomain:SUSparkleErrorDomain code:genericErrorCode userInfo:userInfo];
+    }
+    
+    [self.delegate installerIsRequestingAbortInstallWithError:installerError];
+}
+
 - (void)setUpConnection
 {
     if (self.installerConnection != nil) {
@@ -106,7 +149,7 @@
     NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    if (!SPUXPCServiceExists(@INSTALLER_CONNECTION_BUNDLE_ID)) {
+    if (!SPUXPCServiceIsEnabled(SUEnableInstallerConnectionServiceKey)) {
         self.installerConnection = [[SUInstallerConnection alloc] initWithDelegate:self];
     } else {
         self.installerConnection = [[SUXPCInstallerConnection alloc] initWithDelegate:self];
@@ -117,18 +160,12 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             SPUInstallerDriver *strongSelf = weakSelf;
             if (strongSelf.installerConnection != nil && !strongSelf.aborted) {
-                
-                NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{
+                NSDictionary *genericUserInfo = @{
                     NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
                     NSLocalizedFailureReasonErrorKey:@"The remote port connection was invalidated from the updater. For additional details, please check Console logs for "@SPARKLE_RELAUNCH_TOOL_NAME". If your application is sandboxed, please also ensure Installer Connection & Status entitlements are correctly set up: https://sparkle-project.org/documentation/sandboxing/"
-                }];
+                };
                 
-                NSError *installerError = strongSelf.installerError;
-                if (installerError != nil) {
-                    userInfo[NSUnderlyingErrorKey] = installerError;
-                }
-                
-                [strongSelf.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:userInfo]];
+                [strongSelf _reportInstallerError:strongSelf.installerError genericErrorCode:SUInstallationError genericUserInfo:genericUserInfo];
             }
         });
     }];
@@ -238,22 +275,15 @@
             [self.delegate installerDidFailToApplyDeltaUpdate];
         } else {
             // Don't have to store current stage because we're going to abort
-            NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) }];
+            NSDictionary *genericUserInfo = @{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) };
             
             NSError *unarchivedError = (NSError *)SPUUnarchiveRootObjectSecurely(data, [NSError class]);
-            if (unarchivedError != nil) {
-                userInfo[NSUnderlyingErrorKey] = unarchivedError;
-            }
-            
-            [self.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:userInfo]];
+            [self _reportInstallerError:unarchivedError genericErrorCode:SUUnarchivingError genericUserInfo:genericUserInfo];
         }
     } else if (identifier == SPUValidationStarted) {
         self.currentStage = identifier;
     } else if (identifier == SPUInstallationStartedStage1) {
         self.currentStage = identifier;
-        [self.delegate installerDidStartInstalling];
-        self.startedInstalling = YES;
-        
     } else if (identifier == SPUInstallationFinishedStage1) {
         self.currentStage = identifier;
         
@@ -281,12 +311,6 @@
     } else if (identifier == SPUInstallationFinishedStage2) {
         self.currentStage = identifier;
         
-        if (!self.startedInstalling) {
-            // It's possible we can start from resuming to stage 2 rather than doing stage 1 again, so we should notify to start installing if we haven't done so already
-            self.startedInstalling = YES;
-            [self.delegate installerDidStartInstalling];
-        }
-        
         BOOL hasTargetTerminated = NO;
         if (data.length >= sizeof(uint8_t)) {
             hasTargetTerminated = (BOOL)*((const uint8_t *)data.bytes);
@@ -294,9 +318,7 @@
         
         [self.delegate installerWillFinishInstallationAndRelaunch:self.relaunch];
         
-        if (!hasTargetTerminated) {
-            [self.delegate installerIsSendingAppTerminationSignal];
-        }
+        [self.delegate installerDidStartInstallingWithApplicationTerminated:hasTargetTerminated];
     } else if (identifier == SPUInstallationFinishedStage3) {
         self.currentStage = identifier;
         
@@ -323,7 +345,7 @@
     __block BOOL retrievedLaunchStatus = NO;
     NSXPCConnection *launcherConnection = nil;
     
-    if (!SPUXPCServiceExists(@INSTALLER_LAUNCHER_BUNDLE_ID)) {
+    if (!SPUXPCServiceIsEnabled(SUEnableInstallerLauncherServiceKey)) {
         installerLauncher = [[SUInstallerLauncher alloc] init];
     } else {
         launcherConnection = [[NSXPCConnection alloc] initWithServiceName:@INSTALLER_LAUNCHER_BUNDLE_ID];
@@ -460,6 +482,10 @@
                 return;
             }
         }
+    }
+    
+    if (_updateWillInstallHandler != NULL) {
+        _updateWillInstallHandler();
     }
     
     // Set up connection to the installer if one is not set up already

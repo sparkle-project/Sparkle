@@ -127,7 +127,7 @@
 /**
  * If the update is a bundle, then it must meet any one of:
  *
- *  * old and new DSA public keys are the same and valid (it allows change of Code Signing identity), or
+ *  * old and new Ed(DSA) public keys are the same and valid (it allows change of Code Signing identity), or
  *
  *  * old and new Code Signing identity are the same and valid
  *

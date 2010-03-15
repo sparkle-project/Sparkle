@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>For unit test only</title>
+    <item>
+        <title>Version 3.0</title>
+        <pubDate>Sat, 26 Jul 2014 15:20:12 +0000</pubDate>
+        <sparkle:releaseNotesLink>https://sparkle-project.org/notes/relnote-3.0.txt</sparkle:releaseNotesLink>
+        <sparkle:fullReleaseNotesLink>https://sparkle-project.org/fullnotes.txt</sparkle:fullReleaseNotesLink>
+        <link>https://sparkle-project.org</link>
+        <enclosure url="https://sparkle-project.org/release-3.0.zip" sparkle:version="3.0" length="1346234" />
+    </item>
+    <item>
+        <title>Version 2.0</title>
+        <pubDate>Sat, 26 Jul 2014 15:20:12 +0000</pubDate>
+        <sparkle:releaseNotesLink>http://sparkle-project.org/notes/relnote-2.0.txt</sparkle:releaseNotesLink>
+        <sparkle:fullReleaseNotesLink>http://sparkle-project.org/fullnotes.txt</sparkle:fullReleaseNotesLink>
+        <link>http://sparkle-project.org</link>
+        <enclosure url="http://sparkle-project.org/release-2.0.zip" sparkle:version="2.0" length="1346234" />
+    </item>
+    <item>
+        <title>Version 1.0</title>
+        <pubDate>Sat, 26 Jul 2014 15:20:12 +0000</pubDate>
+        <sparkle:releaseNotesLink>file://sparkle-project.org/notes/relnote-1.0.txt</sparkle:releaseNotesLink>
+        <sparkle:fullReleaseNotesLink>file://sparkle-project.org/fullnotes.txt</sparkle:fullReleaseNotesLink>
+        <link>file://sparkle-project.org</link>
+        <enclosure url="file://sparkle-project.org/release-1.0.zip" sparkle:version="1.0" length="1346234" />
+    </item>
+  </channel>
+</rss>

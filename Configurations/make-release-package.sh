@@ -13,10 +13,6 @@ function verify_code_signatures() {
 
     # Search the current directory for all instances of the framework to verify them (XCFrameworks can have multiple copies of a framework for different platforms).
     find "${verification_directory}" -name "Sparkle.framework" -type d -exec codesign --verify -vvv --deep {} \;
-    codesign --verify -vvv --deep "${verification_directory}/XPCServices/org.sparkle-project.Downloader.xpc"
-    codesign --verify -vvv --deep "${verification_directory}/XPCServices/org.sparkle-project.InstallerConnection.xpc"
-    codesign --verify -vvv --deep "${verification_directory}/XPCServices/org.sparkle-project.InstallerLauncher.xpc"
-    codesign --verify -vvv --deep "${verification_directory}/XPCServices/org.sparkle-project.InstallerStatus.xpc"
     codesign --verify -vvv --deep "${verification_directory}/sparkle.app"
     codesign --verify -vvv --deep "${verification_directory}/Sparkle Test App.app"
     codesign --verify -vvv --deep "${verification_directory}/bin/BinaryDelta"
@@ -41,55 +37,49 @@ if [ "$ACTION" = "" ] ; then
     cp "$CONFIGURATION_BUILD_DIR/generate_appcast" "$CONFIGURATION_BUILD_DIR/staging/bin"
     cp "$CONFIGURATION_BUILD_DIR/generate_keys" "$CONFIGURATION_BUILD_DIR/staging/bin"
     cp "$CONFIGURATION_BUILD_DIR/sign_update" "$CONFIGURATION_BUILD_DIR/staging/bin"
-    cp "$SRCROOT/Configurations/codesign_xpc_service.py" "$CONFIGURATION_BUILD_DIR/staging/bin/codesign_xpc_service"
-    chmod 0755 "$CONFIGURATION_BUILD_DIR/staging/bin/codesign_xpc_service"
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app" "$CONFIGURATION_BUILD_DIR/staging"
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app" "$CONFIGURATION_BUILD_DIR/staging-spm"
     cp -R "$CONFIGURATION_BUILD_DIR/sparkle.app" "$CONFIGURATION_BUILD_DIR/staging"
     cp -R "$CONFIGURATION_BUILD_DIR/sparkle.app" "$CONFIGURATION_BUILD_DIR/staging-spm"
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework" "$CONFIGURATION_BUILD_DIR/staging"
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.xcframework" "$CONFIGURATION_BUILD_DIR/staging-spm"
+    
+    if [[ "$SPARKLE_EMBED_DOWNLOADER_XPC_SERVICE" -eq 1 ]]; then
+        mkdir -p "$CONFIGURATION_BUILD_DIR/staging/Entitlements"
+        mkdir -p "$CONFIGURATION_BUILD_DIR/staging-spm/Entitlements"
+        
+        cp -R "$SRCROOT/Downloader/org.sparkle-project.Downloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging/Entitlements/$DOWNLOADER_NAME.entitlements"
+        cp -R "$SRCROOT/Downloader/org.sparkle-project.Downloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging-spm/Entitlements/$DOWNLOADER_NAME.entitlements"
+    fi
 
-    mkdir -p "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-
-    cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_LAUNCHER_BUNDLE_ID.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-    cp -R "$CONFIGURATION_BUILD_DIR/$DOWNLOADER_BUNDLE_ID.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-    cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_CONNECTION_BUNDLE_ID.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-    cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_STATUS_BUNDLE_ID.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-
-    cp "$SRCROOT/Downloader/$DOWNLOADER_BUNDLE_ID.entitlements" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-    cp "$SRCROOT/InstallerConnection/$INSTALLER_CONNECTION_BUNDLE_ID.entitlements" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-    cp "$SRCROOT/InstallerStatus/$INSTALLER_STATUS_BUNDLE_ID.entitlements" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+    mkdir -p "$CONFIGURATION_BUILD_DIR/staging/Symbols"
 
     # Only copy dSYMs for Release builds, but don't check for the presence of the actual files
     # because missing dSYMs in a release build SHOULD trigger a build failure
     if [ "$CONFIGURATION" = "Release" ] ; then
-        cp -R "$CONFIGURATION_BUILD_DIR/BinaryDelta.dSYM" "$CONFIGURATION_BUILD_DIR/staging/bin"
-        cp -R "$CONFIGURATION_BUILD_DIR/generate_appcast.dSYM" "$CONFIGURATION_BUILD_DIR/staging/bin"
-        cp -R "$CONFIGURATION_BUILD_DIR/generate_keys.dSYM" "$CONFIGURATION_BUILD_DIR/staging/bin"
-        cp -R "$CONFIGURATION_BUILD_DIR/sign_update.dSYM" "$CONFIGURATION_BUILD_DIR/staging/bin"
-        cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
-        cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging-spm"
-        cp -R "$CONFIGURATION_BUILD_DIR/sparkle.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
-        cp -R "$CONFIGURATION_BUILD_DIR/sparkle.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging-spm"
-        cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
-
-        cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_LAUNCHER_BUNDLE_ID.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-        cp -R "$CONFIGURATION_BUILD_DIR/$DOWNLOADER_BUNDLE_ID.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-        cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_CONNECTION_BUNDLE_ID.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-        cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_STATUS_BUNDLE_ID.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+        cp -R "$CONFIGURATION_BUILD_DIR/BinaryDelta.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/generate_appcast.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/generate_keys.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/sign_update.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/sparkle.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/Autoupdate.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/Updater.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/${INSTALLER_LAUNCHER_NAME}.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
+        cp -R "$CONFIGURATION_BUILD_DIR/${DOWNLOADER_NAME}.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/Symbols"
     fi
     cp -R "$CONFIGURATION_BUILD_DIR/staging/bin" "$CONFIGURATION_BUILD_DIR/staging-spm"
-    cp -R "$CONFIGURATION_BUILD_DIR/staging/XPCServices" "$CONFIGURATION_BUILD_DIR/staging-spm"
+    cp -R "$CONFIGURATION_BUILD_DIR/staging/Symbols" "$CONFIGURATION_BUILD_DIR/staging-spm"
 
     cd "$CONFIGURATION_BUILD_DIR/staging"
-    
+
     if [ -x "$(command -v xz)" ]; then
         XZ_EXISTS=1
     else
         XZ_EXISTS=0
     fi
-    
+
     rm -rf "/tmp/sparkle-extract"
     mkdir -p "/tmp/sparkle-extract"
 
@@ -116,7 +106,7 @@ if [ "$ACTION" = "" ] ; then
 
     rm -rf "/tmp/sparkle-extract"
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
-    
+
     # Generate zip containing the xcframework for SPM
     rm -rf "/tmp/sparkle-spm-extract"
     mkdir -p "/tmp/sparkle-spm-extract"
@@ -128,7 +118,7 @@ if [ "$ACTION" = "" ] ; then
     # This guards against our archives being corrupt / created incorrectly
     ditto -x -k "../Sparkle-for-Swift-Package-Manager.zip" "/tmp/sparkle-spm-extract"
     verify_code_signatures "/tmp/sparkle-spm-extract"
-    
+
     rm -rf "/tmp/sparkle-spm-extract"
     rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
 
@@ -144,10 +134,12 @@ if [ "$ACTION" = "" ] ; then
         exit 1
     fi
 
-    # Generate new Package manifest and podspec
+    # Generate new Package manifest, podspec, and carthage files
     cd "$CONFIGURATION_BUILD_DIR"
     cp "$SRCROOT/Package.swift" "$CONFIGURATION_BUILD_DIR"
     cp "$SRCROOT/Sparkle.podspec" "$CONFIGURATION_BUILD_DIR"
+    cp "$SRCROOT/Carthage-dev.json" "$CONFIGURATION_BUILD_DIR"
+    
     if [ "$XCODE_VERSION_MAJOR" -ge "1200" ]; then
         # is equivalent to shasum -a 256 FILE
         spm_checksum=$(swift package compute-checksum "Sparkle-for-Swift-Package-Manager.zip")
@@ -160,16 +152,20 @@ if [ "$ACTION" = "" ] ; then
         echo "Checksum: $spm_checksum"
 
         sed -E -i '' -e "/s\.version.+=/ s/\".+\"/\"$MARKETING_VERSION\"/" "Sparkle.podspec"
+        
+        "$SRCROOT/Configurations/update-carthage.py" "Carthage-dev.json" "$MARKETING_VERSION"
         cp "Sparkle.podspec" "$SRCROOT"
-        echo "Sparkle.podspec updated with following values:"
+        # Note the Carthage-dev.json file will finally be copied to the website repo in Carthage/Sparkle.json in the end
+        cp "Carthage-dev.json" "$SRCROOT"
+        echo "Sparkle.podspec and Carthage-dev.json updated with following values:"
         echo "Version: $MARKETING_VERSION"
     else
         echo "warning: Xcode version $XCODE_VERSION_ACTUAL does not support computing checksums for Swift Packages. Please update the Package manifest manually."
     fi
-    
-    if [ "$XZ_EXISTS" -eq 1 ] ; then
+
+    if [ "$XZ_EXISTS" -ne 1 ] ; then
         echo "WARNING: xz compression is used for official releases but bz2 is being used instead because xz tool is not installed on your system."
     fi
-        
+
     rm -rf "$CONFIGURATION_BUILD_DIR/staging-spm"
 fi

@@ -16,7 +16,6 @@
 #import "SUHost.h"
 #import "SULog.h"
 #import "SUErrors.h"
-#import "SPUURLRequest.h"
 #import "SPUDownloadedUpdate.h"
 #import "SPUDownloadData.h"
 
@@ -61,7 +60,7 @@
     if (self != nil) {
         _host = host;
         
-        if (!SPUXPCServiceExists(@DOWNLOADER_BUNDLE_ID)) {
+        if (!SPUXPCServiceIsEnabled(SUEnableDownloaderServiceKey)) {
             _downloader = [[SPUDownloader alloc] initWithDelegate:self];
         } else {
             _connection = [[NSXPCConnection alloc] initWithServiceName:@DOWNLOADER_BUNDLE_ID];
@@ -160,9 +159,9 @@
         NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
         assert(bundleIdentifier != nil);
         
-        [self.downloader startPersistentDownloadWithRequest:[SPUURLRequest URLRequestWithRequest:self.request] bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];
+        [self.downloader startPersistentDownloadWithRequest:self.request bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];
     } else {
-        [self.downloader startTemporaryDownloadWithRequest:[SPUURLRequest URLRequestWithRequest:self.request]];
+        [self.downloader startTemporaryDownloadWithRequest:self.request];
     }
 }
 

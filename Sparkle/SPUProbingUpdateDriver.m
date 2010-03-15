@@ -38,6 +38,14 @@
     [self.basicDriver setCompletionHandler:completionBlock];
 }
 
+- (void)setUpdateShownHandler:(void (^)(void))updateShownHandler
+{
+}
+
+- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler
+{
+}
+
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
 {
     [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES];

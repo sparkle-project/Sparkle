@@ -1,8 +1,8 @@
 Pod::Spec.new do |s|
   s.name        = "Sparkle"
-  s.version     = "2.0.0-beta.3"
+  s.version     = "2.1.0"
   s.summary     = "A software update framework for macOS"
-  s.description = "Sparkle is an easy-to-use software update framework for Cocoa developers."
+  s.description = "Sparkle is an easy-to-use software update framework for macOS."
   s.homepage    = "https://sparkle-project.org"
   s.documentation_url = "https://sparkle-project.org/documentation/"
   s.screenshot  = "https://sparkle-project.org/images/screenshot-noshadow@2x.png"
@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
     :file => 'LICENSE'
   }
   s.authors     = {
-    'Mayur Pawashe' => 'zorgiepoo@gmail.com',
+    'Zorg' => 'zorgiepoo@gmail.com',
     'Kornel Lesiński' => 'pornel@pornel.net',
     'Jake Petroules' => 'jake.petroules@petroules.com',
     'C.W. Betts' => 'computers57@hotmail.com',
@@ -20,10 +20,10 @@ Pod::Spec.new do |s|
 
   s.platform = :osx, '10.11'
   s.source   = { :http => "https://github.com/sparkle-project/Sparkle/releases/download/#{s.version}/Sparkle-#{s.version}.tar.xz" }
-  s.source_files = 'Sparkle.framework/Versions/A/Headers/*.h'
+  s.source_files = 'Sparkle.framework/Versions/B/Headers/*.h'
 
-  s.preserve_paths = ['bin/*', 'XPCServices/*']
-  s.public_header_files = 'Sparkle.framework/Versions/A/Headers/*.h'
+  s.preserve_paths = ['bin/*', 'Entitlements', 'Symbols']
+  s.public_header_files = 'Sparkle.framework/Versions/B/Headers/*.h'
   s.vendored_frameworks  = 'Sparkle.framework'
   s.xcconfig            = {
     'FRAMEWORK_SEARCH_PATHS' => '"${PODS_ROOT}/Sparkle"',

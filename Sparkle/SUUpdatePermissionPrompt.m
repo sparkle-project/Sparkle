@@ -16,7 +16,6 @@
 #import "SUHost.h"
 #import "SUConstants.h"
 #import "SUApplicationInfo.h"
-#import "SUTouchBarForwardDeclarations.h"
 #import "SUTouchBarButtonGroup.h"
 
 static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUUpdatePermissionPrompt";

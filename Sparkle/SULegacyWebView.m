@@ -13,6 +13,9 @@
 #import "SULog.h"
 #import <WebKit/WebKit.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 @interface SULegacyWebView () <WebPolicyDelegate, WebFrameLoadDelegate, WebUIDelegate>
 
 @property (nonatomic, readonly) WebView *webView;
@@ -162,5 +165,7 @@
 }
 
 @end
+
+#pragma clang diagnostic pop
 
 #endif

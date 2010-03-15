@@ -16,6 +16,7 @@
         <sparkle:informationalUpdate>
             <sparkle:version>2.5</sparkle:version>
             <sparkle:version>2.4</sparkle:version>
+            <sparkle:belowVersion>0.5</sparkle:belowVersion>
         </sparkle:informationalUpdate>
         <link>http://sparkle-project.org</link>
     </item>

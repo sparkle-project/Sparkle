@@ -12,7 +12,7 @@ import ArgumentParser
 
 let PRIVATE_KEY_LABEL = "Private key for signing Sparkle updates"
 
-private func commonKeychainItemAttributes() -> [String: Any] {
+private func commonKeychainItemAttributes(account: String) -> [String: Any] {
     /// Attributes used for both adding a new item and matching an existing one.
     return [
         /// The type of the item (a generic password).
@@ -22,7 +22,7 @@ private func commonKeychainItemAttributes() -> [String: Any] {
         kSecAttrService  as String: "https://sparkle-project.org",
         
         /// The account name for the item (in this case, the key type).
-        kSecAttrAccount  as String: "ed25519",
+        kSecAttrAccount  as String: account,
         
         /// The protocol used by the service (not actually used, so we claim SSH).
         kSecAttrProtocol as String: kSecAttrProtocolSSH as String,
@@ -40,9 +40,9 @@ private func failure(_ message: String) -> Never {
     exit(1)
 }
 
-func findKeyPair() -> Data? {
+func findKeyPair(account: String) -> Data? {
     var item: CFTypeRef?
-    let res = SecItemCopyMatching(commonKeychainItemAttributes().merging([
+    let res = SecItemCopyMatching(commonKeychainItemAttributes(account: account).merging([
         /// Return a matched item's value as a CFData object.
         kSecReturnData as String: kCFBooleanTrue!,
     ], uniquingKeysWith: { $1 }) as CFDictionary, &item)
@@ -102,8 +102,8 @@ func generateKeyPair() -> (publicEdKey: Data, privateEdKey: Data) {
     return (Data(publicEdKey), Data(privateEdKey))
 }
 
-func storeKeyPair(publicEdKey: Data, privateEdKey: Data) {
-    let query = commonKeychainItemAttributes().merging([
+func storeKeyPair(account: String, publicEdKey: Data, privateEdKey: Data) {
+    let query = commonKeychainItemAttributes(account: account).merging([
         /// Mark the new item as sensitive (requires keychain password to export - e.g. a private key).
         kSecAttrIsSensitive as String: kCFBooleanTrue!,
 
@@ -157,6 +157,9 @@ func printNewPublicKeyUsage(_ publicKey: Data) {
 }
 
 struct GenerateKeys: ParsableCommand {
+    @Option(help: ArgumentHelp("The account name to use when generating or looking up keys from your keychain. If this is not specified, a default global account is used instead. We recommend using different accounts for different organizations."))
+    var account: String = "ed25519"
+    
     @Flag(name: .customShort("p"), help: ArgumentHelp("Looks up and just prints the existing public key stored in the Keychain."))
     var lookUpPublicKey: Bool = false
     
@@ -203,7 +206,7 @@ struct GenerateKeys: ParsableCommand {
     func run() throws {
         if lookUpPublicKey {
             /// Lookup mode - print just the pubkey and exit
-            if let keyPair = findKeyPair() {
+            if let keyPair = findKeyPair(account: account) {
                 let pubKey = keyPair[64...]
                 print(pubKey.base64EncodedString())
             } else {
@@ -216,7 +219,7 @@ struct GenerateKeys: ParsableCommand {
                 failure("private-key-file already exists: \(exportURL.path)")
             }
             
-            guard let keyPair = findKeyPair() else {
+            guard let keyPair = findKeyPair(account: account) else {
                 failure("No existing signing key found!")
             }
             
@@ -248,12 +251,12 @@ struct GenerateKeys: ParsableCommand {
             let publicKey = privateAndPublicKey[64...]
             let privateKey = privateAndPublicKey[0..<64]
             
-            storeKeyPair(publicEdKey: publicKey, privateEdKey: privateKey)
+            storeKeyPair(account: account, publicEdKey: publicKey, privateEdKey: privateKey)
             
             printNewPublicKeyUsage(publicKey)
         } else {
             /// Default mode - find an existing public key and print its usage, or generate new keys
-            if let keyPair = findKeyPair() {
+            if let keyPair = findKeyPair(account: account) {
                 let pubKey = keyPair[64...]
                 print("""
                     A pre-existing signing key was found. This is how it should appear in your Info.plist:
@@ -266,7 +269,7 @@ struct GenerateKeys: ParsableCommand {
                 print("Generating a new signing key. This may take a moment, depending on your machine.")
                 
                 let (pubKey, privKey) = generateKeyPair()
-                storeKeyPair(publicEdKey: pubKey, privateEdKey: privKey)
+                storeKeyPair(account: account, publicEdKey: pubKey, privateEdKey: privKey)
                 
                 printNewPublicKeyUsage(pubKey)
             }

@@ -1,18 +1,47 @@
+# 2.1.0
+
+* New Binary Delta format (version 3)
+  * Features a custom and more efficient container format, migrating away from the deprecated xar format (Zorg) (#2051)
+  * Adds delta compression options for lzma, bzip2, zlib, lzfse, lz4, and no compression (Zorg) (#2051)
+  * Changes default delta format compression from bzip2 (in version 2) to lzma (in version 3) resulting in smaller deltas (Zorg) (#2051)
+  * Preserve file system (HFS+/apfs) level compression when applying delta updates (Zorg) (#2084)
+  * Tracks renames and binary diffs for files that have moved around to new locations using intelligent heuristics (Zorg) (#2051, #2053)
+  * Added more unit tests, UI tests, and generate_appcast/BinaryDelta tools support for the new format (Zorg) (#2052, #2054)
+* Major upgrade improvements (#2070)
+  * Fix skipping a major version to not skip subsequent major versions (Zorg) (#2079)
+  * Add sparkle:belowVersion element for informational updates (Zorg) (#2080)
+  * Add option to allow developers to ignore/reset user skipped upgrades (Zorg) (#2081)
+* Fix progress bar and button alignment for checking updates (Zorg) (#2066)
+  * This deprecates `-[SPUUserDriver showInstallingUpdate]` and `-[SPUUserDriver showSendingTerminationSignal]` in favor for `-[SPUUserDriver showInstallingUpdateWithApplicationTerminated:]`
+* Fix unsteady progress when installing updates (Zorg) (#2072)
+* Check http statusCode in didFinishDownloadingToURL (Eric Shapiro, Zorg) (#2049, #2073)
+* Use strcoll_l() for locale-independent comparisons for delta updates (Dan Rigdon-Bel) (#2087)
+* Fix version compare not treating '2.1.0' and '2.1' as being equal (Zorg) (#2065)
+* Add verify and account options for signing updates (Zorg) (#2074)
+* Add delta patch and Apple code signing verification in generate_appcast (Zorg) (#2076, #2077)
+* Use more modern NSSecureCoding APIs when available (Zorg) (#2058)
+* Use more modern FileManager APIs for copying files (Zorg) (#2059)
+* Fix make release failing when customizing XPC_SERVICE_BUNDLE_ID_PREFIX (Zorg) (#2060)
+* Preserve the Entitlements directory in podspec (digitalMoksha) (#2062)
+* Add hidden option to generate_appcast to set max CDATA threshold (Zorg) (#2075)
+
+This update introduces a new major format for [delta updates](https://sparkle-project.org/documentation/delta-updates/), which migrates away from deprecated APIs (xar) and creates smaller patches. If you don't use `generate_appcast`, please check the [compatibility notes for creating delta updates](https://sparkle-project.org/documentation/delta-updates/#compatibility).
+
 # 2.0.0
 
 * Support for Sandboxed Applications (Zorg)
 * Support for writing custom user interfaces (Zorg)
 * Support for updating external Sparkle-based bundles (Zorg)
   * Added command line utility to update Sparkle-based bundles (Zorg)
-* More modern architecture
+* Modern architecture
   * Moves extraction, validation, and installation into a submitted launchd agent/daemon with XPC communication (Zorg)
   * Features faster installs with shorter update/relaunch times (#1802) (Zorg)
-  * Provides more robust installs that need to request user authorization (Zorg)
-  * Adoption of atomic-safe bundle replacing updates leveraging APFS (#1801) (Zorg)
+  * Provides more robust installs when user authorization is needed (Zorg)
+  * Adoption of improved atomic-safe updates leveraging APFS (#1801) (Zorg)
 * API Changes
   * Introduced new SPUStandardUpdaterController, SPUUpdater, SPUUserDriver classes/protocols (Zorg)
   * Decoupled AppKit and UI logic in the framework from core functionality (Zorg)
-  * Ensure (most) API / ABI compatibility with Sparkle 1.x; you can likely test Sparkle 2 in an existing app without any changes (Zorg)
+  * Ensure (most) API compatibility with Sparkle 1; you can likely test Sparkle 2 in an existing app with little to no changes (Zorg)
   * Deprecated SUUpdater, albeit it is still functional for testing and transitional purposes (Zorg)
   * `-bestValidUpdateInAppcast:forUpdater:` delegate method behavior has been refined and discouraged for some cases. Please review its updated header documentation in `SPUUpdaterDelegate.h` if you use this method. (#1838, #1862, #1879, #1880) (Zorg)
   * Delegation methods may have been removed or added to the newer updater API. Please review `SPUUpdaterDelegate` if using `SPUUpdater`. (Zorg)
@@ -24,26 +53,35 @@
   * Sparkle uses the icon of the bundle to update for its authorization dialog. A 32x32 image representation of the icon is needed. (Zorg)
   * Sudden termination for silent automatic updates isn't disabled anymore (Zorg)
 * Policy Changes
-  * Distributing updates without EdDSA signing the archives is now deprecated (Zorg)
-  * Package based updates that are zipped or archived must add sparkle:installationType="package" to the appcast item enclosure (Zorg)
+  * Non-bare package based updates that are zipped or archived must add sparkle:installationType="package" to the appcast item enclosure (this doesn't apply to bare packages which aren't archived) (Zorg)
   * We now recommend using sparkle:version and sparkle:shortVersionString top level elements instead of enclosure attributes (#1878) (Zorg)
   * The link element in an appcast item is now used for directing users to the product's website if they don't meet minimum system requirements (#1877) (Zorg)
-* Major/Paid Upgrades Enhancements
-  * Latest minor updates are preferred over major updates (specified by sparkle:minimumAutoupdateVersion) (#1850) Zorg
-  * Major updates can be skipped with a user confirmation (#1853) Zorg
-* Informational only and critical updates can be specified selectively by app version (#1862)
 * Expose why a new update is unavailable and direct user to prior release notes or website info (#1877, #1886) (Zorg)
-* Add support for posting updates only on specific channels (#1879) (Zorg)
+  * Add <sparkle:fullReleaseNotesLink> element allowing Sparkle to show a better stylized and full changelog to the user (#2001) (aONe)
+  * Add delegate API allowing applications to show full in-app or offline version history to the user (#1989) (Billy Gray)
+* Major/Paid Upgrades Enhancements
+  * Latest minor updates are preferred over major updates (specified by sparkle:minimumAutoupdateVersion) (#1850) (Zorg)
+  * Major updates can be skipped with a user confirmation (#1853) (Zorg)
+* Informational only and critical updates can be specified selectively by app version (#1862)
+* Add support for posting updates only on specific channels (eg for supporting beta updates) (#1879) (Zorg)
 * System profiler privacy and transparency (#1690) (Martin Pilkington)
 * Support getting app icon from asset catalog (#1694) (Charles Srstka)
-* Don't hide update alert window now on deactivation (#1804) (Zorg)
 * Don't bring up authorization just because group ID doesn't match (#1830) (Zorg)
-* Raise minimum system version to 10.11 (Zorg)
+* Raise minimum system version to macOS 10.11 (Zorg)
 * Special thanks to developers using early builds of this release in production and contributors for keeping this running (Kornel, Jonas Zaugg, Gwynne Raskind, Jordan Rose, Tony Arnold, Bryan Jones, Christian Tietze, Jakob Egger, and many more)
 
 Please visit [Sparkle's website](http://sparkle-project.org) for more information on documentation and migration.
 
-If you are migrating from earlier alpha versions of Sparkle 2, please re-familiarize yourself with the [Sandboxing guide](https://sparkle-project.org/documentation/sandboxing/). Some of the XPC Services are now optional and integration with code signing has been simplified. The SPUUserDriver protocol for custom user interfaces has been greatly simplified too.
+If you are migrating from earlier beta versions of Sparkle 2 and use sandboxing, please re-familiarize yourself with the [Sandboxing guide](https://sparkle-project.org/documentation/sandboxing/). Some of the XPC Services are now optional and integration with XPC Services and code signing have been simplified. The SPUUserDriver protocol for custom user interfaces has been greatly simplified too.
+
+# 1.27.1
+
+ * Use px instead of pt when specifying font size to fix default font size in WebView from #1962 (regressed in 1.25.0 with WKWebView adoption) (Daniel Jalkut)
+ * Fix to prevent Sparkle manipulating the host app's high level WebView defaults from #1961 (affecting only macOS versions before 10.11 in 1.x branch) (Daniel Jalkut)
+ * Add safer handling of applying binary delta files from #1990 (Zorg)
+ * Don't use current date unless necessary when scheduling next update from #1991 (Zorg)
+ * Whitelist about:srcdoc as a safe web URL from #1938, #2007 (Louis Pontoise, Zorg)
+ * Backport not hiding update window on deactivation from #2008 (Zorg)
 
 # 1.27.0
 

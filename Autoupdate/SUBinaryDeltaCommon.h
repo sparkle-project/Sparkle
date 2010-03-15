@@ -10,32 +10,15 @@
 #define SUBINARYDELTACOMMON_H
 
 #import <Foundation/Foundation.h>
-
+#import "SPUDeltaCompressionMode.h"
 #include <fts.h>
 
 #define PERMISSION_FLAGS (S_IRWXU | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX)
-
-#define IS_VALID_PERMISSIONS(mode) \
-    (((mode & PERMISSION_FLAGS) == 0755) || ((mode & PERMISSION_FLAGS) == 0644))
+#define VALID_SYMBOLIC_LINK_PERMISSIONS 0755
 
 #define APPLE_CODE_SIGN_XATTR_CODE_DIRECTORY_KEY "com.apple.cs.CodeDirectory"
 #define APPLE_CODE_SIGN_XATTR_CODE_REQUIREMENTS_KEY "com.apple.cs.CodeRequirements"
 #define APPLE_CODE_SIGN_XATTR_CODE_SIGNATURE_KEY "com.apple.cs.CodeSignature"
-
-#define BINARY_DELTA_ATTRIBUTES_KEY "binary-delta-attributes"
-#define MAJOR_DIFF_VERSION_KEY "major-version"
-#define MINOR_DIFF_VERSION_KEY "minor-version"
-#define BEFORE_TREE_SHA1_KEY "before-tree-sha1"
-#define AFTER_TREE_SHA1_KEY "after-tree-sha1"
-#define DELETE_KEY "delete"
-#define EXTRACT_KEY "extract"
-#define BINARY_DELTA_KEY "binary-delta"
-#define MODIFY_PERMISSIONS_KEY "mod-permissions"
-
-// Properties no longer used in new patches
-#define DELETE_THEN_EXTRACT_OLD_KEY "delete-then-extract"
-#define BEFORE_TREE_SHA1_OLD_KEY "before-sha1"
-#define AFTER_TREE_SHA1_OLD_KEY "after-sha1"
 
 #define VERBOSE_DELETED "Deleted" // file is deleted from the file system when applying a patch
 #define VERBOSE_REMOVED "Removed" // file is set to be removed when creating a patch
@@ -44,23 +27,40 @@
 #define VERBOSE_PATCHED "Patched" // file is patched when applying a patch
 #define VERBOSE_UPDATED "Updated" // file's contents are updated
 #define VERBOSE_MODIFIED "Modified" // file's metadata is modified
+#define VERBOSE_CLONED "Cloned" // file is cloned in content from a differently named file
 
 #define MAJOR_VERSION_IS_AT_LEAST(actualMajor, expectedMajor) (actualMajor >= expectedMajor)
 
-// Each major version will be assigned a name of a color
+// Relative path of custom icon data that may be set on a bundle via a resource fork
+#define CUSTOM_ICON_PATH @"/Icon\r"
+
 // Changes that break backwards compatibility will have different major versions
 // Changes that affect creating but not applying patches will have different minor versions
-
 typedef NS_ENUM(uint16_t, SUBinaryDeltaMajorVersion)
 {
-    SUAzureMajorVersion = 1,
-    SUBeigeMajorVersion = 2
+    // Note: support for creating or applying version 1 deltas have been removed
+    SUBinaryDeltaMajorVersion1 = 1,
+    SUBinaryDeltaMajorVersion2 = 2,
+    SUBinaryDeltaMajorVersion3 = 3
 };
 
-#define FIRST_DELTA_DIFF_MAJOR_VERSION SUAzureMajorVersion
-#define LATEST_DELTA_DIFF_MAJOR_VERSION SUBeigeMajorVersion
+extern SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionDefault;
+extern SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionLatest;
+extern SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionFirst;
+extern SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionFirstSupported;
+
+#define COMPRESSION_METHOD_ARGUMENT_DESCRIPTION @"The compression method to use for generating delta updates. Supported methods for version 3 delta files are 'lzma', 'bzip2', 'zlib', 'lzfse', 'lz4', 'none', and 'default'. Note that version 2 delta files only support 'bzip2', 'none', and 'default' so other methods will be ignored if version 2 files are being generated. The 'default' compression for version 3 delta files is currently lzma."
+
+#define COMPRESSION_LEVEL_ARGUMENT_DESCRIPTION @"The compression level to use for generating delta updates. This only applies if the compression method used is bzip2 which accepts values from 1 - 9. A special value of 0 will use the default compression level."
+
+SPUDeltaCompressionMode deltaCompressionModeFromDescription(NSString *description, BOOL *requestValid);
+NSString *deltaCompressionStringFromMode(SPUDeltaCompressionMode mode);
 
 extern int compareFiles(const FTSENT **a, const FTSENT **b);
+BOOL getRawHashOfTreeWithVersion(unsigned char *hashBuffer, NSString *path, uint16_t majorVersion);
+BOOL getRawHashOfTreeAndFileTablesWithVersion(unsigned char *hashBuffer, NSString *path, uint16_t majorVersion, NSMutableDictionary<NSData *, NSMutableArray<NSString *> *> *hashToFileKeyDictionary, NSMutableDictionary<NSString *, NSData *> *fileKeyToHashDictionary);
+NSString *displayHashFromRawHash(const unsigned char *hash);
+void getRawHashFromDisplayHash(unsigned char *hash, NSString *hexHash);
 extern NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion);
 extern NSString *hashOfTree(NSString *path);
 extern BOOL removeTree(NSString *path);
@@ -70,5 +70,5 @@ extern NSString *pathRelativeToDirectory(NSString *directory, NSString *path);
 NSString *temporaryFilename(NSString *base);
 NSString *temporaryDirectory(NSString *base);
 NSString *stringWithFileSystemRepresentation(const char*);
-int latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion);
+uint16_t latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion);
 #endif

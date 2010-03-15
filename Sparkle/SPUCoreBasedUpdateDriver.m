@@ -13,6 +13,7 @@
 #import "SPUInstallerDriver.h"
 #import "SPUDownloadDriver.h"
 #import "SULog.h"
+#import "SULog+NSError.h"
 #import "SUErrors.h"
 #import "SPUResumableUpdate.h"
 #import "SPUDownloadedUpdate.h"
@@ -86,6 +87,11 @@
 - (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock
 {
     [self.basicDriver setCompletionHandler:completionBlock];
+}
+
+- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler
+{
+    [self.installerDriver setUpdateWillInstallHandler:updateWillInstallHandler];
 }
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background requiresSilentInstall:(BOOL)silentInstall
@@ -247,24 +253,31 @@
 
 - (void)downloadDriverDidFailToDownloadFileWithError:(NSError *)error
 {
-    if ([self.updaterDelegate respondsToSelector:@selector((updater:failedToDownloadUpdate:error:))]) {
-        NSError *errorToReport = [error.userInfo objectForKey:NSUnderlyingErrorKey];
-        if (errorToReport == nil) {
-            errorToReport = error;
+    if ([self.updateItem isDeltaUpdate]) {
+        SULog(SULogLevelError, @"Failed to download delta update. Falling back to regular update...");
+        SULogError(error);
+        
+        [self fallBackAndDownloadRegularUpdate];
+    } else {
+        if ([self.updaterDelegate respondsToSelector:@selector((updater:failedToDownloadUpdate:error:))]) {
+            NSError *errorToReport = [error.userInfo objectForKey:NSUnderlyingErrorKey];
+            if (errorToReport == nil) {
+                errorToReport = error;
+            }
+            
+            [self.updaterDelegate updater:self.updater
+                               failedToDownloadUpdate:self.updateItem
+                                                error:errorToReport];
         }
         
-        [self.updaterDelegate updater:self.updater
-                           failedToDownloadUpdate:self.updateItem
-                                            error:errorToReport];
+        [self.delegate coreDriverIsRequestingAbortUpdateWithError:error];
     }
-    
-    [self.delegate coreDriverIsRequestingAbortUpdateWithError:error];
 }
 
-- (void)installerDidStartInstalling
+- (void)installerDidStartInstallingWithApplicationTerminated:(BOOL)applicationTerminated
 {
-    if ([self.delegate respondsToSelector:@selector(installerDidStartInstalling)]) {
-        [self.delegate installerDidStartInstalling];
+    if ([self.delegate respondsToSelector:@selector(installerDidStartInstallingWithApplicationTerminated:)]) {
+        [self.delegate installerDidStartInstallingWithApplicationTerminated:applicationTerminated];
     }
 }
 
@@ -324,14 +337,6 @@
     }
 }
 
-- (void)installerIsSendingAppTerminationSignal
-{
-    // If they don't respond or do anything, we'll just install after the user terminates the app anyway
-    if ([self.delegate respondsToSelector:@selector(installerIsSendingAppTerminationSignal)]) {
-        [self.delegate installerIsSendingAppTerminationSignal];
-    }
-}
-
 - (void)installerIsRequestingAbortInstallWithError:(nullable NSError *)error
 {
     [self.delegate coreDriverIsRequestingAbortUpdateWithError:error];
@@ -343,20 +348,25 @@
     [self.delegate basicDriverIsRequestingAbortUpdateWithError:error];
 }
 
-- (void)installerDidFailToApplyDeltaUpdate
+- (void)fallBackAndDownloadRegularUpdate
 {
     SUAppcastItem *secondaryUpdateItem = self.secondaryUpdateItem;
     assert(secondaryUpdateItem != nil);
     
     BOOL backgroundDownload = self.downloadDriver.inBackground;
     
-    [self clearDownloadedUpdate];
-    
     // Fall back to the non-delta update. Note that we don't want to trigger another update was found event.
     self.updateItem = secondaryUpdateItem;
     self.secondaryUpdateItem = nil;
     
     [self downloadUpdateFromAppcastItem:secondaryUpdateItem secondaryAppcastItem:nil inBackground:backgroundDownload];
+}
+
+- (void)installerDidFailToApplyDeltaUpdate
+{
+    [self clearDownloadedUpdate];
+    
+    [self fallBackAndDownloadRegularUpdate];
 }
 
 - (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately error:(nullable NSError *)error

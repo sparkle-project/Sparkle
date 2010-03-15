@@ -10,8 +10,9 @@
 #define SUBINARYDELTACREATE_H
 
 #import "SUBinaryDeltaCommon.h"
+#import "SPUDeltaArchiveProtocol.h"
 
 @class NSString;
-BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, SUBinaryDeltaMajorVersion majorVersion, BOOL verbose, NSError * __autoreleasing *error);
+BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, SUBinaryDeltaMajorVersion majorVersion, SPUDeltaCompressionMode compression, uint8_t compressionLevel, BOOL verbose, NSError * __autoreleasing *error);
 
 #endif

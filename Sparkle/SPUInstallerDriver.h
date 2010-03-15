@@ -15,11 +15,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SPUInstallerDriverDelegate <NSObject>
 
-- (void)installerDidStartInstalling;
+- (void)installerDidStartInstallingWithApplicationTerminated:(BOOL)applicationTerminated;
 - (void)installerDidStartExtracting;
 - (void)installerDidExtractUpdateWithProgress:(double)progress;
 - (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently;
-- (void)installerIsSendingAppTerminationSignal;
 - (void)installerWillFinishInstallationAndRelaunch:(BOOL)relaunch;
 - (void)installerDidFinishInstallationAndRelaunched:(BOOL)relaunch acknowledgement:(void(^)(void))acknowledgement;
 
@@ -33,6 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater updaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SPUInstallerDriverDelegate>)delegate;
 
 - (void)resumeInstallingUpdateWithUpdateItem:(SUAppcastItem *)updateItem systemDomain:(BOOL)systemDomain;
+
+- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler;
 
 - (void)extractDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate silently:(BOOL)silently completion:(void (^)(NSError * _Nullable))completionHandler;
 

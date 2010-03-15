@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>For unit test only</title>
+    <item>
+        <title>Version 4.1</title>
+        <sparkle:version>4.1</sparkle:version>
+        <sparkle:minimumAutoupdateVersion>4.0</sparkle:minimumAutoupdateVersion>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="1346234" />
+    </item>
+    <item>
+        <title>Version 4.0</title>
+        <sparkle:version>4.0</sparkle:version>
+        <sparkle:minimumAutoupdateVersion>4.0</sparkle:minimumAutoupdateVersion>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="1346234" />
+    </item>
+    <item>
+        <title>Version 3.9</title>
+        <sparkle:version>3.9</sparkle:version>
+        <sparkle:minimumAutoupdateVersion>3.0</sparkle:minimumAutoupdateVersion>
+        <sparkle:ignoreSkippedUpgradesBelowVersion>3.5</sparkle:ignoreSkippedUpgradesBelowVersion>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="1346234" />
+    </item>
+    <item>
+        <title>Version 3.0</title>
+        <sparkle:version>3.0</sparkle:version>
+        <sparkle:minimumAutoupdateVersion>3.0</sparkle:minimumAutoupdateVersion>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="1346234" />
+    </item>
+    <item>
+        <title>Version 2.0</title>
+        <!-- this should have no effect because there is no minimumAutoupdateVersion -->
+        <sparkle:ignoreSkippedUpgradesBelowVersion>2.0</sparkle:ignoreSkippedUpgradesBelowVersion>
+        <sparkle:version>2.0</sparkle:version>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" length="1346234" />
+    </item>
+  </channel>
+</rss>

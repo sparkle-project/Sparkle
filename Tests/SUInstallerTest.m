@@ -37,8 +37,8 @@
 {
     uid_t uid = getuid();
 
-    if (uid) {
-        NSLog(@"Test must be run as root: sudo xctest -XCTest SUInstallerTest 'Sparkle Unit Tests.xctest'");
+    if (uid != 0) {
+        NSLog(@"Test must be run as root: sudo xcodebuild -project Sparkle.xcodeproj -scheme Sparkle '-only-testing:Sparkle Unit Tests/SUInstallerTest/testInstallIfRoot' test");
         return;
     }
 

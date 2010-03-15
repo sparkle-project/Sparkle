@@ -15,5 +15,21 @@
         <sparkle:version>2.0</sparkle:version>
         <link>/info/info-2.0.txt</link>
     </item>
+    <item>
+        <title>Version 1.0</title>
+        <description>desc</description>
+        <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
+        <sparkle:version>1.0</sparkle:version>
+        <sparkle:fullReleaseNotesLink>notes/fullnotes.txt</sparkle:fullReleaseNotesLink>
+        <enclosure url="release-1.0.zip" sparkle:version="1.0" length="1346234" />
+    </item>
+    <item>
+        <title>Version 0.9</title>
+        <description>desc</description>
+        <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
+        <sparkle:version>0.9</sparkle:version>
+        <sparkle:fullReleaseNotesLink>https://sparkle-project.org/releasenotes.html</sparkle:fullReleaseNotesLink>
+        <enclosure url="release-0.9.zip" sparkle:version="0.9" length="1346234" />
+    </item>
   </channel>
 </rss>

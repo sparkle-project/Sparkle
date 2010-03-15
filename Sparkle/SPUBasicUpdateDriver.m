@@ -18,6 +18,7 @@
 #import "SPUResumableUpdate.h"
 #import "SPUAppcastItemState.h"
 #import "SUAppcastItem+Private.h"
+#import "SPUInstallationType.h"
 
 
 #include "AppKitPrevention.h"
@@ -75,7 +76,7 @@
         if ([self.host isRunningTranslocated]) {
             [self.delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningTranslocated userInfo:@{ NSLocalizedRecoverySuggestionErrorKey: [NSString stringWithFormat:SULocalizedString(@"Quit %1$@, move it into your Applications folder, relaunch it from there and try again.", nil), hostName], NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"%1$@ can’t be updated if it’s running from the location it was downloaded to.", nil), hostName], }]];
         } else {
-            [self.delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated, because it was opened from a read-only or a temporary location.", nil), hostName], NSLocalizedRecoverySuggestionErrorKey: [NSString stringWithFormat:SULocalizedString(@"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again.", nil), hostName] }]];
+            [self.delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"%1$@ can’t be updated, because it was opened from a read-only or a temporary location.", nil), hostName], NSLocalizedRecoverySuggestionErrorKey: [NSString stringWithFormat:SULocalizedString(@"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again.", nil), hostName] }]];
         }
     } else {
         [self.appcastDriver loadAppcastFromURL:appcastURL userAgent:userAgent httpHeaders:httpHeaders inBackground:background];
@@ -139,21 +140,31 @@
 - (void)notifyFoundValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem secondaryAppcastItem:(SUAppcastItem * _Nullable)secondaryUpdateItem systemDomain:(NSNumber * _Nullable)systemDomain resuming:(BOOL)resuming
 {
     if (!self.aborted) {
-        // If the update is not being resumed from a prior session, give the delegate a chance to bail
-        NSError *shouldNotProceedError = nil;
-        if (!resuming && [self.updaterDelegate respondsToSelector:@selector(updater:shouldProceedWithUpdate:updateCheck:error:)] && ![self.updaterDelegate updater:self.updater shouldProceedWithUpdate:updateItem updateCheck:self.updateCheck error:&shouldNotProceedError]) {
-            [self.delegate basicDriverIsRequestingAbortUpdateWithError:shouldNotProceedError];
-        } else {
-            [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
-                                                                object:self.updater
-                                                              userInfo:@{ SUUpdaterAppcastItemNotificationKey: updateItem }];
-            
-            if ([self.updaterDelegate respondsToSelector:@selector((updater:didFindValidUpdate:))]) {
-                [self.updaterDelegate updater:self.updater didFindValidUpdate:updateItem];
+        if (!resuming) {
+            // interactive pkg based updates are not supported under root user
+            if ([updateItem.installationType isEqualToString:SPUInstallationTypeInteractivePackage] && geteuid() == 0) {
+                [self.delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationRootInteractiveError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"Interactive based packages cannot be installed as the root user.", nil) }]];
+                return;
+            } else {
+                // Give the delegate a chance to bail
+                
+                NSError *shouldNotProceedError = nil;
+                if ([self.updaterDelegate respondsToSelector:@selector(updater:shouldProceedWithUpdate:updateCheck:error:)] && ![self.updaterDelegate updater:self.updater shouldProceedWithUpdate:updateItem updateCheck:self.updateCheck error:&shouldNotProceedError]) {
+                    [self.delegate basicDriverIsRequestingAbortUpdateWithError:shouldNotProceedError];
+                    return;
+                }
             }
-            
-            [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem systemDomain:systemDomain];
         }
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
+                                                            object:self.updater
+                                                          userInfo:@{ SUUpdaterAppcastItemNotificationKey: updateItem }];
+        
+        if ([self.updaterDelegate respondsToSelector:@selector((updater:didFindValidUpdate:))]) {
+            [self.updaterDelegate updater:self.updater didFindValidUpdate:updateItem];
+        }
+        
+        [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem secondaryAppcastItem:secondaryUpdateItem systemDomain:systemDomain];
     }
 }
 
@@ -173,15 +184,15 @@
             switch (hostToLatestAppcastItemComparisonResult) {
                 case NSOrderedDescending:
                     // This means the user is a 'newer than latest' version. give a slight hint to the user instead of wrongly claiming this version is identical to the latest feed version.
-                    localizedDescription = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
+                    localizedDescription = SULocalizedString(@"You’re up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
                     
-                    recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.\n(You are currently running version %@.)", nil), [self.host name], latestAppcastItem.displayVersionString, [self.host displayVersion]];
+                    recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.\n(You are currently running version %@.)", nil), [self.host name], latestAppcastItem.displayVersionString, [self.host displayVersion]];
                     
                     reason = SPUNoUpdateFoundReasonOnNewerThanLatestVersion;
                     break;
                 case NSOrderedSame:
                     // No new update is available and we're on the latest
-                    localizedDescription = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
+                    localizedDescription = SULocalizedString(@"You’re up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
                     
                     recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
                     
@@ -193,18 +204,18 @@
                     if (!latestAppcastItem.minimumOperatingSystemVersionIsOK) {
                         localizedDescription = SULocalizedString(@"Your macOS version is too old", nil);
                         
-                        recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required.", nil), [self.host name], latestAppcastItem.versionString, latestAppcastItem.minimumSystemVersion];
+                        recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ is available but your macOS version is too old to install it. At least macOS %3$@ is required.", nil), [self.host name], latestAppcastItem.displayVersionString, latestAppcastItem.minimumSystemVersion];
                         
                         reason = SPUNoUpdateFoundReasonSystemIsTooOld;
                     } else if (!latestAppcastItem.maximumOperatingSystemVersionIsOK) {
                         localizedDescription = SULocalizedString(@"Your macOS version is too new", nil);
                         
-                        recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@.", nil), [self.host name], latestAppcastItem.versionString, latestAppcastItem.maximumSystemVersion];
+                        recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ is available but your macOS version is too new for this update. This update only supports up to macOS %3$@.", nil), [self.host name], latestAppcastItem.displayVersionString, latestAppcastItem.maximumSystemVersion];
                         
                         reason = SPUNoUpdateFoundReasonSystemIsTooNew;
                     } else {
                         // We shouldn't realistically get here
-                        localizedDescription = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
+                        localizedDescription = SULocalizedString(@"You’re up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
                         
                         recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
                         
@@ -217,7 +228,7 @@
             // We will need to assume the user is up to date if the feed doen't have any applicable update items
             // There could be update items on channels the updater is not subscribed to for example. But we can't tell the user about them.
             // There could also only be update items available for other platforms or none at all.
-            localizedDescription = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
+            localizedDescription = SULocalizedString(@"You’re up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
             recoverySuggestion = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
             
             reason = SPUNoUpdateFoundReasonOnLatestVersion;

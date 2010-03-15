@@ -10,18 +10,7 @@
 
 #include <asl.h>
 #include <Availability.h>
-
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101200
 #include <os/log.h>
-#else
-
-typedef struct os_log_s *os_log_t;
-#define os_log_create(subsystem, category) nil
-
-#define os_log(log, format, ...)
-#define os_log_error(log, format, ...)
-
-#endif
 
 #include "AppKitPrevention.h"
 #import "SUOperatingSystem.h"
@@ -45,10 +34,11 @@ void SULog(SULogLevel level, NSString *format, ...)
     dispatch_once(&onceToken, ^{
         NSBundle *mainBundle = [NSBundle mainBundle];
 
-        hasOSLogging = [SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 12, 0}];
-#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101200
-        hasOSLogging = NO;
-#endif
+        if (@available(macOS 10.12, *)) {
+            hasOSLogging = YES;
+        } else {
+            hasOSLogging = NO;
+        }
 
         if (hasOSLogging) {
             const char *subsystem = SPARKLE_BUNDLE_IDENTIFIER;
@@ -65,7 +55,10 @@ void SULog(SULogLevel level, NSString *format, ...)
             }
 
             NSString *displayName = [[NSFileManager defaultManager] displayNameAtPath:mainBundle.bundlePath];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
             client = asl_open([displayName stringByAppendingString:@" [Sparkle]"].UTF8String, SPARKLE_BUNDLE_IDENTIFIER, options);
+#pragma clang diagnostic pop
             queue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
         }
     });
@@ -103,13 +96,20 @@ void SULog(SULogLevel level, NSString *format, ...)
 
     // Otherwise use ASL
     // Make sure we do not async, because if we async, the log may not be delivered deterministically
+    // TODO: When we remove support for macOS 10.11, remove all this asl code
     dispatch_sync(queue, ^{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         aslmsg message = asl_new(ASL_TYPE_MSG);
+#pragma clang diagnostic pop
         if (message == NULL) {
             return;
         }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         if (asl_set(message, ASL_KEY_MSG, logMessage.UTF8String) != 0) {
+#pragma clang diagnostic pop
             return;
         }
         
@@ -117,16 +117,25 @@ void SULog(SULogLevel level, NSString *format, ...)
         switch (level) {
             case SULogLevelDefault:
                 // Just use one level below the error level
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
                 levelSetResult = asl_set(message, ASL_KEY_LEVEL, TO_STRING(ASL_LEVEL_WARNING));
+#pragma clang diagnostic pop
                 break;
             case SULogLevelError:
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
                 levelSetResult = asl_set(message, ASL_KEY_LEVEL, TO_STRING(ASL_LEVEL_ERR));
+#pragma clang diagnostic pop
                 break;
         }
         if (levelSetResult != 0) {
             return;
         }
         
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         asl_send(client, message);
+#pragma clang diagnostic pop
     });
 }

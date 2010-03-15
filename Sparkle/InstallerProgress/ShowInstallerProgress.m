@@ -24,10 +24,10 @@
 
 - (void)installerProgressShouldDisplayWithHost:(SUHost *)host
 {
-    self.statusController = [[SUStatusController alloc] initWithHost:host];
+    self.statusController = [[SUStatusController alloc] initWithHost:host centerPointValue:nil minimizable:NO];
     
     [self.statusController setButtonTitle:SULocalizedString(@"Cancel Update", @"") target:nil action:nil isDefault:NO];
-    [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"") maxProgressValue:0 statusText:@""];
+    [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update…", @"") maxProgressValue:0 statusText:@""];
     [self.statusController showWindow:self];
 }
 

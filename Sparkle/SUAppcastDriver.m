@@ -28,6 +28,10 @@
 #import "SPUAppcastItemStateResolver+Private.h"
 #import "SPUAppcastItemState.h"
 
+// For statfs()
+#include <sys/param.h>
+#include <sys/mount.h>
+
 
 #include "AppKitPrevention.h"
 
@@ -42,6 +46,9 @@
 @end
 
 @implementation SUAppcastDriver
+{
+    NSNumber * _Nullable _systemSupportsDeltaUpdates; // BOOL
+}
 
 @synthesize host = _host;
 @synthesize updater = _updater;
@@ -111,7 +118,27 @@
 {
     SUAppcastItem *deltaItem = (regularItem != nil) ? [[self class] deltaUpdateFromAppcastItem:regularItem hostVersion:self.host.version] : nil;
     
-    if (deltaItem != nil) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdirect-ivar-access"
+    if (deltaItem != nil && _systemSupportsDeltaUpdates == nil) {
+        // Delta updates are not supported on fat32 and exfat systems
+        // This is because they do not preserve permissions at all, which we require
+        // We shouldn't download delta updates in cases where we can detect they aren't supported
+        struct statfs volumeInfo = {0};
+        NSURL *hostBundleURL = self.host.bundle.bundleURL;
+        if (statfs(hostBundleURL.fileSystemRepresentation, &volumeInfo) == 0) {
+            if (strncmp("msdos", volumeInfo.f_fstypename, sizeof(volumeInfo.f_fstypename)) == 0 ||
+                strncmp("exfat", volumeInfo.f_fstypename, sizeof(volumeInfo.f_fstypename)) == 0) {
+                _systemSupportsDeltaUpdates = @NO;
+            } else {
+                _systemSupportsDeltaUpdates = @YES;
+            }
+        } else {
+            _systemSupportsDeltaUpdates = @YES;
+        }
+    }
+    
+    if (deltaItem != nil && _systemSupportsDeltaUpdates.boolValue) {
         if (secondaryUpdate != NULL) {
             *secondaryUpdate = regularItem;
         }
@@ -122,6 +149,7 @@
         }
         return regularItem;
     }
+#pragma clang diagnostic pop
 }
 
 - (SUAppcastItem *)retrieveBestAppcastItemFromAppcast:(SUAppcast *)appcast versionComparator:(id<SUVersionComparison>)versionComparator secondaryUpdate:(SUAppcastItem * __autoreleasing _Nullable *)secondaryAppcastItem
@@ -140,7 +168,6 @@
             regularItemFromDelegate = nil;
             delegateOptedOutOfSelection = NO;
         } else {
-            assert(!candidateItem.deltaUpdate);
             if (candidateItem.deltaUpdate) {
                 // Client would have to go out of their way to examine the .deltaUpdates to return one
                 // We need them to give us a regular update item back instead..
@@ -253,6 +280,12 @@
             return NO;
         }
         
+        // Delta updates cannot be top-level entries
+        BOOL isDeltaUpdate = [item isDeltaUpdate];
+        if (isDeltaUpdate) {
+            return NO;
+        }
+        
         NSString *channel = item.channel;
         if (channel == nil) {
             // Item is on the default channel
@@ -334,10 +367,12 @@
 + (BOOL)item:(SUAppcastItem *)ui containsSkippedUpdate:(SPUSkippedUpdate * _Nullable)skippedUpdate hostPassesSkippedMajorVersion:(BOOL)hostPassesSkippedMajorVersion versionComparator:(id<SUVersionComparison>)versionComparator
 {
     NSString *skippedMajorVersion = skippedUpdate.majorVersion;
+    NSString *skippedMajorSubreleaseVersion = skippedUpdate.majorSubreleaseVersion;
     
-    if (!hostPassesSkippedMajorVersion && skippedMajorVersion != nil && [versionComparator compareVersion:skippedMajorVersion toVersion:ui.versionString] != NSOrderedDescending) {
-        // Item is on a greater or equal version than a major version we've skipped
-        // So we skip this item
+    if (!hostPassesSkippedMajorVersion && skippedMajorVersion != nil && ui.minimumAutoupdateVersion != nil && [versionComparator compareVersion:skippedMajorVersion toVersion:(NSString * _Nonnull)ui.minimumAutoupdateVersion] != NSOrderedAscending && (ui.ignoreSkippedUpgradesBelowVersion == nil || (skippedMajorSubreleaseVersion != nil && [versionComparator compareVersion:skippedMajorSubreleaseVersion toVersion:(NSString * _Nonnull)ui.ignoreSkippedUpgradesBelowVersion] != NSOrderedAscending))) {
+        // If skipped major version is >= than the item's minimumAutoupdateVersion, we can skip the item.
+        // But if there is an ignoreSkippedUpgradesBelowVersion, we can only skip the item if the last skipped subrelease
+        // version is >= than that version provided by the item
         return YES;
     }
     

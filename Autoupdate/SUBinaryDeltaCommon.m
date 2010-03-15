@@ -16,13 +16,81 @@
 #include <sys/mman.h>
 #include <sys/param.h>
 #include <sys/stat.h>
-#include <xar/xar.h>
+#include <xlocale.h>
 
 #include "AppKitPrevention.h"
 
+// Note: the framework bundle version must be bumped, and generate_appcast must be updated to compare it,
+// when we add/change new major versions and defaults. Unit tests need to be updated to use new versions too.
+SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionDefault = SUBinaryDeltaMajorVersion3;
+SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionLatest = SUBinaryDeltaMajorVersion3;
+SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionFirst = SUBinaryDeltaMajorVersion1;
+SUBinaryDeltaMajorVersion SUBinaryDeltaMajorVersionFirstSupported = SUBinaryDeltaMajorVersion2;
+
+SPUDeltaCompressionMode deltaCompressionModeFromDescription(NSString *requestedDescription, BOOL *requestValid)
+{
+    // Set to NO later if request was not valid
+    if (requestValid != NULL) {
+        *requestValid = YES;
+    }
+    
+    SPUDeltaCompressionMode compression;
+    NSString *description = requestedDescription.lowercaseString;
+    
+    if ([description isEqualToString:@"default"]) {
+        compression = SPUDeltaCompressionModeDefault;
+    } else if ([description isEqualToString:@"none"]) {
+        compression = SPUDeltaCompressionModeNone;
+    } else if ([description isEqualToString:@"bzip2"]) {
+        compression = SPUDeltaCompressionModeBzip2;
+    } else if ([description isEqualToString:@"lzma"]) {
+        compression = SPUDeltaCompressionModeLZMA;
+    } else if ([description isEqualToString:@"lzfse"]) {
+        compression = SPUDeltaCompressionModeLZFSE;
+    } else if ([description isEqualToString:@"lz4"]) {
+        compression = SPUDeltaCompressionModeLZ4;
+    } else if ([description isEqualToString:@"zlib"]) {
+        compression = SPUDeltaCompressionModeZLIB;
+    } else {
+        compression = SPUDeltaCompressionModeDefault;
+        
+        if (requestValid != NULL) {
+            *requestValid = NO;
+        }
+    }
+    
+    return compression;
+}
+
+NSString *deltaCompressionStringFromMode(SPUDeltaCompressionMode mode)
+{
+    switch (mode) {
+        case SPUDeltaCompressionModeBzip2:
+            return @"bzip2";
+        case SPUDeltaCompressionModeLZMA:
+            return @"LZMA";
+        case SPUDeltaCompressionModeNone:
+            return @"no";
+        case SPUDeltaCompressionModeLZ4:
+            return @"LZ4";
+        case SPUDeltaCompressionModeLZFSE:
+            return @"LZFSE";
+        case SPUDeltaCompressionModeZLIB:
+            return @"ZLIB";
+        default:
+            break;
+    }
+    
+    if (mode == SPUDeltaCompressionModeDefault) {
+        return @"default";
+    }
+    
+    return @"unknown";
+}
+
 int compareFiles(const FTSENT **a, const FTSENT **b)
 {
-    return strcoll((*a)->fts_name, (*b)->fts_name);
+    return strcoll_l((*a)->fts_name, (*b)->fts_name, _c_locale);
 }
 
 NSString *pathRelativeToDirectory(NSString *directory, NSString *path)
@@ -39,13 +107,15 @@ NSString *stringWithFileSystemRepresentation(const char *input)
     return [[NSFileManager defaultManager] stringWithFileSystemRepresentation:input length:strlen(input)];
 }
 
-int latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion)
+uint16_t latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion)
 {
     switch (majorVersion) {
-        case SUAzureMajorVersion:
-            return 1;
-        case SUBeigeMajorVersion:
+        case SUBinaryDeltaMajorVersion1:
+            return 2;
+        case SUBinaryDeltaMajorVersion2:
             return 3;
+        case SUBinaryDeltaMajorVersion3:
+            return 0;
     }
     return 0;
 }
@@ -96,7 +166,7 @@ static void _hashOfBuffer(unsigned char *hash, const char *buffer, ssize_t buffe
     CC_SHA1_Final(hash, &hashContext);
 }
 
-static BOOL _hashOfFileContents(unsigned char *hash, FTSENT *ent)
+static BOOL _hashOfFileContents(unsigned char *hash, FTSENT *ent, void *tempBuffer, size_t tempBufferSize)
 {
     if (ent->fts_info == FTS_SL) {
         char linkDestination[MAXPATHLEN + 1];
@@ -108,27 +178,37 @@ static BOOL _hashOfFileContents(unsigned char *hash, FTSENT *ent)
 
         _hashOfBuffer(hash, linkDestination, linkDestinationLength);
     } else if (ent->fts_info == FTS_F) {
-        int fileDescriptor = open(ent->fts_path, O_RDONLY);
-        if (fileDescriptor == -1) {
-            perror("open");
-            return NO;
-        }
-
         ssize_t fileSize = ent->fts_statp->st_size;
-        if (fileSize == 0) {
+        if (fileSize <= 0) {
             _hashOfBuffer(hash, NULL, 0);
         } else {
-            void *buffer = mmap(0, (size_t)fileSize, PROT_READ, MAP_FILE | MAP_PRIVATE, fileDescriptor, 0);
-            if (buffer == (void *)-1) {
-                close(fileDescriptor);
-                perror("mmap");
+            FILE *file = fopen(ent->fts_path, "rb");
+            if (file == NULL) {
+                perror("fopen");
                 return NO;
             }
-
-            _hashOfBuffer(hash, buffer, fileSize);
-            munmap(buffer, (size_t)fileSize);
+            
+            CC_SHA1_CTX hashContext;
+            CC_SHA1_Init(&hashContext);
+            
+            size_t bytesLeft = (size_t)fileSize;
+            while (bytesLeft > 0) {
+                size_t bytesToConsume = (bytesLeft >= tempBufferSize) ? tempBufferSize : bytesLeft;
+                
+                if (fread(tempBuffer, bytesToConsume, 1, file) < 1) {
+                    perror("fread");
+                    fclose(file);
+                    return NO;
+                }
+                
+                CC_SHA1_Update(&hashContext, tempBuffer, (CC_LONG)bytesToConsume);
+                bytesLeft -= bytesToConsume;
+            }
+            
+            CC_SHA1_Final(hash, &hashContext);
+            
+            fclose(file);
         }
-        close(fileDescriptor);
     } else if (ent->fts_info == FTS_D) {
         memset(hash, 0xdd, CC_SHA1_DIGEST_LENGTH);
     } else {
@@ -137,18 +217,31 @@ static BOOL _hashOfFileContents(unsigned char *hash, FTSENT *ent)
     return YES;
 }
 
-NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
+BOOL getRawHashOfTreeWithVersion(unsigned char *hashBuffer, NSString *path, uint16_t majorVersion)
+{
+    return getRawHashOfTreeAndFileTablesWithVersion(hashBuffer, path, majorVersion, nil, nil);
+}
+
+BOOL getRawHashOfTreeAndFileTablesWithVersion(unsigned char *hashBuffer, NSString *path, uint16_t __unused majorVersion, NSMutableDictionary<NSData *, NSMutableArray<NSString *> *> *hashToFileKeyDictionary, NSMutableDictionary<NSString *, NSData *> *fileKeyToHashDictionary)
 {
     char pathBuffer[PATH_MAX] = { 0 };
     if (![path getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)]) {
-        return nil;
+        return NO;
     }
 
+    const size_t tempBufferSize = 16384;
+    void *tempBuffer = calloc(1, tempBufferSize);
+    if (tempBuffer == NULL) {
+        perror("calloc");
+        return NO;
+    }
+    
     char *const sourcePaths[] = { pathBuffer, 0 };
     FTS *fts = fts_open(sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
     if (!fts) {
         perror("fts_open");
-        return nil;
+        free(tempBuffer);
+        return NO;
     }
 
     CC_SHA1_CTX hashContext;
@@ -162,53 +255,97 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
         if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D)
             continue;
 
-        if (ent->fts_info == FTS_D && !MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion)) {
+        NSString *relativePath = pathRelativeToDirectory(normalizedPath, stringWithFileSystemRepresentation(ent->fts_path));
+        
+        // Ignore icon resource fork data
+        if (relativePath.length == 0 || [relativePath isEqualToString:CUSTOM_ICON_PATH]) {
             continue;
         }
-
-        NSString *relativePath = pathRelativeToDirectory(normalizedPath, stringWithFileSystemRepresentation(ent->fts_path));
-        if (relativePath.length == 0)
-            continue;
 
         unsigned char fileHash[CC_SHA1_DIGEST_LENGTH];
-        if (!_hashOfFileContents(fileHash, ent)) {
-            return nil;
+        if (!_hashOfFileContents(fileHash, ent, tempBuffer, tempBufferSize)) {
+            fts_close(fts);
+            free(tempBuffer);
+            return NO;
         }
         CC_SHA1_Update(&hashContext, fileHash, sizeof(fileHash));
+        
+        // For file hash tables we only track regular files
+        if (ent->fts_info == FTS_F) {
+            NSData *hashKey = [NSData dataWithBytes:fileHash length:sizeof(fileHash)];
+            
+            if (hashToFileKeyDictionary != nil) {
+                if (hashToFileKeyDictionary[hashKey] == nil) {
+                    hashToFileKeyDictionary[hashKey] = [NSMutableArray array];
+                }
+                [hashToFileKeyDictionary[hashKey] addObject:relativePath];
+            }
+            
+            if (fileKeyToHashDictionary != nil) {
+                fileKeyToHashDictionary[relativePath] = hashKey;
+            }
+        }
 
         const char *relativePathBytes = [relativePath fileSystemRepresentation];
         CC_SHA1_Update(&hashContext, relativePathBytes, (CC_LONG)strlen(relativePathBytes));
 
-        if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion)) {
-            uint16_t mode = ent->fts_statp->st_mode;
-            // permission of symlinks is irrelevant and can't be changed.
-            // hardcoding a value helps avoid differences between filesystems.
-            if (ent->fts_info == FTS_SL) {
-                mode = 0755;
-            }
-            uint16_t type = ent->fts_info;
-            uint16_t permissions = mode & PERMISSION_FLAGS;
+        uint16_t mode = ent->fts_statp->st_mode;
+        uint16_t type = ent->fts_info;
+        uint16_t permissions = mode & PERMISSION_FLAGS;
+        
+        // permission of symlinks are 0777 on some linux file systems and can't be changed,
+        // differing from the 0755 macOS default.
+        // hardcoding a value helps avoid differences between filesystems.
+        uint16_t hashedPermissions = (ent->fts_info == FTS_SL) ? VALID_SYMBOLIC_LINK_PERMISSIONS : permissions;
 
-            CC_SHA1_Update(&hashContext, &type, sizeof(type));
-            CC_SHA1_Update(&hashContext, &permissions, sizeof(permissions));
-        }
+        CC_SHA1_Update(&hashContext, &type, sizeof(type));
+        CC_SHA1_Update(&hashContext, &hashedPermissions, sizeof(hashedPermissions));
     }
+    
+    free(tempBuffer);
+    
     fts_close(fts);
 
-    unsigned char hash[CC_SHA1_DIGEST_LENGTH];
-    CC_SHA1_Final(hash, &hashContext);
+    CC_SHA1_Final(hashBuffer, &hashContext);
+    
+    return YES;
+}
 
-    char hexHash[CC_SHA1_DIGEST_LENGTH * 2 + 1];
-    size_t i;
-    for (i = 0; i < CC_SHA1_DIGEST_LENGTH; i++)
+void getRawHashFromDisplayHash(unsigned char *hash, NSString *hexHash)
+{
+    const char *hexString = hexHash.UTF8String;
+    if (hexString == NULL) {
+        return;
+    }
+    
+    for (size_t blockIndex = 0; blockIndex < CC_SHA1_DIGEST_LENGTH; blockIndex++) {
+        const char *currentBlock = hexString + blockIndex * 2;
+        char convertedBlock[3] = {currentBlock[0], currentBlock[1], '\0'};
+        hash[blockIndex] = (unsigned char)strtol(convertedBlock, NULL, 16);
+    }
+}
+
+NSString *displayHashFromRawHash(const unsigned char *hash)
+{
+    char hexHash[CC_SHA1_DIGEST_LENGTH * 2 + 1] = {0};
+    for (size_t i = 0; i < CC_SHA1_DIGEST_LENGTH; i++) {
         sprintf(hexHash + i * 2, "%02x", hash[i]);
-
+    }
     return @(hexHash);
+}
+
+NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
+{
+    unsigned char hash[CC_SHA1_DIGEST_LENGTH];
+    if (!getRawHashOfTreeWithVersion(hash, path, majorVersion)) {
+        return nil;
+    }
+    return displayHashFromRawHash(hash);
 }
 
 extern NSString *hashOfTree(NSString *path)
 {
-    return hashOfTreeWithVersion(path, LATEST_DELTA_DIFF_MAJOR_VERSION);
+    return hashOfTreeWithVersion(path, SUBinaryDeltaMajorVersionLatest);
 }
 
 BOOL removeTree(NSString *path)

@@ -29,6 +29,7 @@ static NSString *SUAppcastItemDescriptionKey = @"itemDescription";
 static NSString *SUAppcastItemMaximumSystemVersionKey = @"maximumSystemVersion";
 static NSString *SUAppcastItemMinimumSystemVersionKey = @"minimumSystemVersion";
 static NSString *SUAppcastItemReleaseNotesURLKey = @"releaseNotesURL";
+static NSString *SUAppcastItemFullReleaseNotesURLKey = @"fullReleaseNotesURL";
 static NSString *SUAppcastItemTitleKey = @"title";
 static NSString *SUAppcastItemVersionStringKey = @"versionString";
 static NSString *SUAppcastItemPropertiesKey = @"propertiesDictionary";
@@ -65,12 +66,14 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
 @synthesize maximumSystemVersion = _maximumSystemVersion;
 @synthesize minimumSystemVersion = _minimumSystemVersion;
 @synthesize releaseNotesURL = _releaseNotesURL;
+@synthesize fullReleaseNotesURL = _fullReleaseNotesURL;
 @synthesize title = _title;
 @synthesize versionString = _versionString;
 @synthesize osString = _osString;
 @synthesize propertiesDictionary = _propertiesDictionary;
 @synthesize installationType = _installationType;
 @synthesize minimumAutoupdateVersion = _minimumAutoupdateVersion;
+@synthesize ignoreSkippedUpgradesBelowVersion = _ignoreSkippedUpgradesBelowVersion;
 @synthesize phasedRolloutInterval = _phasedRolloutInterval;
 @synthesize state = _state;
 @synthesize hasCriticalInformation = _hasCriticalInformation;
@@ -113,7 +116,9 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         _maximumSystemVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemMaximumSystemVersionKey] copy];
         _minimumSystemVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemMinimumSystemVersionKey] copy];
         _minimumAutoupdateVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastElementMinimumAutoupdateVersion] copy];
+        _ignoreSkippedUpgradesBelowVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastElementIgnoreSkippedUpgradesBelowVersion] copy];
         _releaseNotesURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemReleaseNotesURLKey];
+        _fullReleaseNotesURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemFullReleaseNotesURLKey];
         _title = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemTitleKey] copy];
         
         NSString *versionString =  [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemVersionStringKey] copy];
@@ -180,12 +185,20 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         [encoder encodeObject:self.minimumAutoupdateVersion forKey:SUAppcastElementMinimumAutoupdateVersion];
     }
     
+    if (self.ignoreSkippedUpgradesBelowVersion != nil) {
+        [encoder encodeObject:self.ignoreSkippedUpgradesBelowVersion forKey:SUAppcastElementIgnoreSkippedUpgradesBelowVersion];
+    }
+    
     if (self.state != nil) {
         [encoder encodeObject:self.state forKey:SUAppcastItemStateKey];
     }
     
     if (self.releaseNotesURL != nil) {
         [encoder encodeObject:self.releaseNotesURL forKey:SUAppcastItemReleaseNotesURLKey];
+    }
+    
+    if (self.fullReleaseNotesURL != nil) {
+        [encoder encodeObject:self.fullReleaseNotesURL forKey:SUAppcastItemFullReleaseNotesURLKey];
     }
     
     if (self.title != nil) {
@@ -378,10 +391,17 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
             if (![theInfoURL isKindOfClass:[NSString class]]) {
                 SULog(SULogLevelError, @"%@ -%@ Info URL is not of valid type.", NSStringFromClass([self class]), NSStringFromSelector(_cmd));
             } else {
+                NSURL *infoURL;
                 if (appcastURL != nil) {
-                    _infoURL = [NSURL URLWithString:theInfoURL relativeToURL:appcastURL];
+                    infoURL = [NSURL URLWithString:theInfoURL relativeToURL:appcastURL];
                 } else {
-                    _infoURL = [NSURL URLWithString:theInfoURL];
+                    infoURL = [NSURL URLWithString:theInfoURL];
+                }
+                
+                if ([infoURL.scheme caseInsensitiveCompare:@"http"] == NSOrderedSame || [infoURL.scheme caseInsensitiveCompare:@"https"] == NSOrderedSame) {
+                    _infoURL = infoURL;
+                } else {
+                    SULog(SULogLevelError, @"%@ -%@ Info URL must have a http or https URL scheme.", NSStringFromClass([self class]), NSStringFromSelector(_cmd));
                 }
             }
         }
@@ -424,10 +444,19 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         if (enclosureURLString) {
             // Sparkle used to always URL-encode, so for backwards compatibility spaces in URLs must be forgiven.
             NSString *fileURLString = [enclosureURLString stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
+            
+            NSURL *fileURL;
             if (appcastURL != nil) {
-                _fileURL = [NSURL URLWithString:fileURLString relativeToURL:appcastURL];
+                fileURL = [NSURL URLWithString:fileURLString relativeToURL:appcastURL];
             } else {
-                _fileURL = [NSURL URLWithString:fileURLString];
+                fileURL = [NSURL URLWithString:fileURLString];
+            }
+            
+            if ([fileURL.scheme caseInsensitiveCompare:@"http"] == NSOrderedSame || [fileURL.scheme caseInsensitiveCompare:@"https"] == NSOrderedSame) {
+                _fileURL = fileURL;
+            } else {
+                SULog(SULogLevelError, @"File URLs must have a http or https URL scheme.");
+                _fileURL = nil;
             }
         }
         if (enclosure) {
@@ -439,6 +468,8 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
         _minimumSystemVersion = [(NSString *)[dict objectForKey:SUAppcastElementMinimumSystemVersion] copy];
         _maximumSystemVersion = [(NSString *)[dict objectForKey:SUAppcastElementMaximumSystemVersion] copy];
         _minimumAutoupdateVersion = [(NSString *)[dict objectForKey:SUAppcastElementMinimumAutoupdateVersion] copy];
+        
+        _ignoreSkippedUpgradesBelowVersion = [(NSString *)[dict objectForKey:SUAppcastElementIgnoreSkippedUpgradesBelowVersion] copy];
         
         NSString *channel = [dict objectForKey:SUAppcastElementChannel];
         if (channel != nil) {
@@ -533,15 +564,35 @@ static NSString *SUAppcastItemStateKey = @"SUAppcastItemState";
             } else {
                 url = [NSURL URLWithString:releaseNotesString];
             }
-            if ([url isFileURL]) {
-                SULog(SULogLevelError, @"Release notes with file:// URLs are not supported");
-            } else {
+            if ([url.scheme caseInsensitiveCompare:@"http"] == NSOrderedSame || [url.scheme caseInsensitiveCompare:@"https"] == NSOrderedSame) {
                 _releaseNotesURL = url;
+            } else {
+                SULog(SULogLevelError, @"Release notes must have a http or https URL scheme.");
+                _releaseNotesURL = nil;
             }
         } else if ([self.itemDescription hasPrefix:@"http://"] || [self.itemDescription hasPrefix:@"https://"]) { // if the description starts with http:// or https:// use that.
             _releaseNotesURL = [NSURL URLWithString:(NSString * _Nonnull)self.itemDescription];
         } else {
             _releaseNotesURL = nil;
+        }
+        
+        // Get full release notes URL if informed.
+        NSString *fullReleaseNotesString = [dict objectForKey:SUAppcastElementFullReleaseNotesLink];
+        if (fullReleaseNotesString) {
+            NSURL *url;
+            if (appcastURL != nil) {
+                url = [NSURL URLWithString:fullReleaseNotesString relativeToURL:appcastURL];
+            } else {
+                url = [NSURL URLWithString:fullReleaseNotesString];
+            }
+            if ([url.scheme caseInsensitiveCompare:@"http"] == NSOrderedSame || [url.scheme caseInsensitiveCompare:@"https"] == NSOrderedSame) {
+                _fullReleaseNotesURL = url;
+            } else {
+                SULog(SULogLevelError, @"Full release notes must have a http or https URL scheme.");
+                _fullReleaseNotesURL = nil;
+            }
+        } else {
+            _fullReleaseNotesURL = nil;
         }
 
         NSArray *deltaDictionaries = [dict objectForKey:SUAppcastElementDeltas];

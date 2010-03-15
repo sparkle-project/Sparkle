@@ -65,8 +65,12 @@
 - (void)displayHTMLReleaseNotes:(NSData *)releaseNotes
 {
     // Note: this is the only API we rely on here that references AppKit
-    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:releaseNotes documentAttributes:nil];
-    [self displayReleaseNotes:attributedString.string.UTF8String];
+    // We shouldn't invoke it when the calling process is ran under root.
+    // If only there was an API to translated HTML -> text that didn't rely on AppKit..
+    if (geteuid() != 0) {
+        NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:releaseNotes documentAttributes:nil];
+        [self displayReleaseNotes:attributedString.string.UTF8String];
+    }
 }
 
 - (void)displayPlainTextReleaseNotes:(NSData *)releaseNotes encoding:(NSStringEncoding)encoding
@@ -194,7 +198,7 @@
 - (void)showDownloadDidStartExtractingUpdate
 {
     if (self.verbose) {
-        fprintf(stderr, "Extracting update...\n");
+        fprintf(stderr, "Extracting Update...\n");
     }
 }
 
@@ -217,7 +221,7 @@
     }
 }
 
-- (void)showInstallingUpdate
+- (void)showInstallingUpdateWithApplicationTerminated:(BOOL)__unused applicationTerminated
 {
     if (self.verbose) {
         fprintf(stderr, "Installing Update...\n");
@@ -235,11 +239,6 @@
 
 - (void)dismissUpdateInstallation
 {
-}
-
-- (void)showSendingTerminationSignal
-{
-    // We are already showing that the update is installing, so there is no need to do anything here
 }
 
 @end

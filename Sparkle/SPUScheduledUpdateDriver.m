@@ -19,6 +19,7 @@
 
 @property (nonatomic, readonly) SPUUIBasedUpdateDriver *uiDriver;
 @property (nonatomic) BOOL showedUpdate;
+@property (nonatomic) void (^updateDidShowHandler)(void);
 
 @end
 
@@ -26,6 +27,7 @@
 
 @synthesize uiDriver = _uiDriver;
 @synthesize showedUpdate = _showedUpdate;
+@synthesize updateDidShowHandler = _updateDidShowHandler;
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate
 {
@@ -39,6 +41,16 @@
 - (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock
 {
     [self.uiDriver setCompletionHandler:completionBlock];
+}
+
+- (void)setUpdateShownHandler:(void (^)(void))handler
+{
+    self.updateDidShowHandler = handler;
+}
+
+- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler
+{
+    [self.uiDriver setUpdateWillInstallHandler:updateWillInstallHandler];
 }
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders
@@ -59,6 +71,10 @@
 - (void)uiDriverDidShowUpdate
 {
     self.showedUpdate = YES;
+    
+    if (self.updateDidShowHandler != nil) {
+        self.updateDidShowHandler();
+    }
 }
 
 - (BOOL)showingUpdate

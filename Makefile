@@ -7,10 +7,10 @@ ifndef BUILDDIR
 endif
 
 localizable-strings:
-	rm -f Sparkle/en.lproj/Sparkle.strings
-	genstrings -o Sparkle/en.lproj -s SULocalizedString Sparkle/*.m Sparkle/*.h
-	iconv -f UTF-16 -t UTF-8 < Sparkle/en.lproj/Localizable.strings > Sparkle/en.lproj/Sparkle.strings
-	rm Sparkle/en.lproj/Localizable.strings
+	rm -f Sparkle/Base.lproj/Sparkle.strings
+	genstrings -o Sparkle/Base.lproj -s SULocalizedString Sparkle/*.m
+	iconv -f UTF-16 -t UTF-8 < Sparkle/Base.lproj/Localizable.strings > Sparkle/Base.lproj/Sparkle.strings
+	rm Sparkle/Base.lproj/Localizable.strings
 
 release:
 	xcodebuild -scheme Distribution -configuration Release -derivedDataPath "$(BUILDDIR)" build

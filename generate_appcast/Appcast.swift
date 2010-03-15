@@ -11,10 +11,10 @@ func makeError(code: SUError, _ description: String) -> NSError {
         ])
 }
 
-func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: PrivateKeys, versions: Set<String>?, maximumDeltas: Int, verbose: Bool) throws -> [String: [ArchiveItem]] {
+func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: PrivateKeys, versions: Set<String>?, maximumDeltas: Int, deltaCompressionModeDescription: String, deltaCompressionLevel: UInt8, disableNestedCodeCheck: Bool, verbose: Bool) throws -> [String: [ArchiveItem]] {
     let comparator = SUStandardVersionComparator()
 
-    let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir, archivesDestDir: cacheDir, verbose: verbose))
+    let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir, archivesDestDir: cacheDir, disableNestedCodeCheck: disableNestedCodeCheck, verbose: verbose))
         .sorted(by: {
             .orderedDescending == comparator.compareVersion($0.version, toVersion: $1.version)
         })
@@ -108,8 +108,70 @@ func makeAppcast(archivesSourceDir: URL, cacheDirectory cacheDir: URL, keys: Pri
                     continue
                 }
                 if !fm.fileExists(atPath: deltaPath.path) {
+                    // Test if old and new app have the same code signing signature. If not, omit a warning.
+                    // This is a good time to do this check because our delta handling code sets a marker
+                    // to avoid this path each time generate_appcast is called.
+                    let oldAppCodeSigned = SUCodeSigningVerifier.bundle(atURLIsCodeSigned: item.appPath)
+                    let newAppCodeSigned = SUCodeSigningVerifier.bundle(atURLIsCodeSigned: latestItem.appPath)
+                    
+                    if oldAppCodeSigned != newAppCodeSigned && !newAppCodeSigned {
+                        print("Warning: New app is not code signed but older version (\(item)) is: \(latestItem)")
+                    } else if oldAppCodeSigned && newAppCodeSigned {
+                        do {
+                            try SUCodeSigningVerifier.codeSignature(atBundleURL: item.appPath, matchesSignatureAtBundleURL: latestItem.appPath)
+                        } catch {
+                            print("Warning: found mismatch code signing identity between \(item) and \(latestItem)")
+                        }
+                    }
+                        
                     do {
-                        delta = try DeltaUpdate.create(from: item, to: latestItem, archivePath: deltaPath)
+                        // Decide the most appropriate delta version
+                        let deltaVersion: SUBinaryDeltaMajorVersion
+                        if let frameworkVersion = item.frameworkVersion {
+                            switch comparator.compareVersion(frameworkVersion, toVersion: "2010") {
+                            case .orderedSame:
+                                fallthrough
+                            case .orderedDescending:
+                                deltaVersion = .version3
+                            case .orderedAscending:
+                                deltaVersion = .version2
+                            }
+                        } else {
+                            deltaVersion = SUBinaryDeltaMajorVersionDefault
+                            print("Warning: Sparkle.framework version for \(item.appPath.lastPathComponent) (\(item.shortVersion) (\(item.version))) was not found. Falling back to generating delta using default delta version..")
+                        }
+                        
+                        let requestedDeltaCompressionMode = deltaCompressionModeFromDescription(deltaCompressionModeDescription, nil)
+                        
+                        // Version 2 formats only support bzip2, none, and default options
+                        let deltaCompressionMode: SPUDeltaCompressionMode
+                        if deltaVersion == .version2 {
+                            switch requestedDeltaCompressionMode {
+                            case .LZFSE:
+                                fallthrough
+                            case .LZ4:
+                                fallthrough
+                            case .LZMA:
+                                fallthrough
+                            case .ZLIB:
+                                deltaCompressionMode = .bzip2
+                                print("Warning: Delta compression mode '\(deltaCompressionModeDescription)' was requested but using default compression instead because version 2 delta file from version \(item.version) needs to be generated..")
+                            case SPUDeltaCompressionModeDefault:
+                                fallthrough
+                            case .none:
+                                fallthrough
+                            case .bzip2:
+                                deltaCompressionMode = requestedDeltaCompressionMode
+                            @unknown default:
+                                // This shouldn't happen
+                                print("Warning: failed to parse delta compression mode \(deltaCompressionModeDescription). There is a logic bug in generate_appcast.")
+                                deltaCompressionMode = SPUDeltaCompressionModeDefault
+                            }
+                        } else {
+                            deltaCompressionMode = requestedDeltaCompressionMode
+                        }
+                        
+                        delta = try DeltaUpdate.create(from: item, to: latestItem, deltaVersion: deltaVersion, deltaCompressionMode: deltaCompressionMode, deltaCompressionLevel: deltaCompressionLevel, archivePath: deltaPath)
                     } catch {
                         print("Could not create delta update", deltaPath.path, error)
                         continue

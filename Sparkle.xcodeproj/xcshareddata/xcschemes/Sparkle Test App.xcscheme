@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "61B5F90109C4CEE200B25A18"
-               BuildableName = "Sparkle Test App.app"
+               BuildableName = ".app"
                BlueprintName = "Sparkle Test App"
                ReferencedContainer = "container:Sparkle.xcodeproj">
             </BuildableReference>
@@ -47,7 +47,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "61B5F90109C4CEE200B25A18"
-            BuildableName = "Sparkle Test App.app"
+            BuildableName = ".app"
             BlueprintName = "Sparkle Test App"
             ReferencedContainer = "container:Sparkle.xcodeproj">
          </BuildableReference>
@@ -64,7 +64,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "61B5F90109C4CEE200B25A18"
-            BuildableName = "Sparkle Test App.app"
+            BuildableName = ".app"
             BlueprintName = "Sparkle Test App"
             ReferencedContainer = "container:Sparkle.xcodeproj">
          </BuildableReference>

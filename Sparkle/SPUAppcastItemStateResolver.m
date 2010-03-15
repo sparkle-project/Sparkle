@@ -98,8 +98,22 @@
         return YES;
     }
     
+    NSString *hostVersion = self.hostVersion;
+    
     // Informational update only for a set of host versions we're updating from
-    return [informationalUpdateVersions containsObject:self.hostVersion];
+    if ([informationalUpdateVersions containsObject:hostVersion]) {
+        return YES;
+    }
+    
+    // If an informational update version has a '<' prefix, this is an informational update if
+    // hostVersion < this info update version
+    for (NSString *informationalUpdateVersion in informationalUpdateVersions) {
+        if ([informationalUpdateVersion hasPrefix:@"<"] && [self.applicationVersionComparator compareVersion:hostVersion toVersion:[informationalUpdateVersion substringFromIndex:1]] == NSOrderedAscending) {
+            return YES;
+        }
+    }
+    
+    return NO;
 }
 
 - (SPUAppcastItemState *)resolveStateWithInformationalUpdateVersions:(NSSet<NSString *> * _Nullable)informationalUpdateVersions minimumOperatingSystemVersion:(NSString * _Nullable)minimumOperatingSystemVersion maximumOperatingSystemVersion:(NSString * _Nullable)maximumOperatingSystemVersion minimumAutoupdateVersion:(NSString * _Nullable)minimumAutoupdateVersion criticalUpdateDictionary:(NSDictionary * _Nullable)criticalUpdateDictionary

@@ -32,6 +32,8 @@
 	<string>http://localhost:1337/sparkletestcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>eRFPLZuNM6m8bltmtpPX4fzKbufI1z6rKJHtgIIsllk=</string>
+	<key>SUEnableInstallerLauncherService</key>
+	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

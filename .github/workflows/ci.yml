@@ -10,17 +10,21 @@ jobs:
   build:
     strategy:
       matrix:
-        xcode: ['xcode12.5', 'xcode13']
+        xcode: ['xcode12.5.1', 'xcode13.3.1']
         include:
-            - xcode: 'xcode12.5'
-              xcode-path: '/Applications/Xcode_12.5.app/Contents/Developer'
+            - xcode: 'xcode13.3.1'
+              xcode-path: '/Applications/Xcode_13.3.1.app/Contents/Developer'
               upload-dist: true
-            - xcode: 'xcode13'
-              xcode-path: '/Applications/Xcode_13.0.app/Contents/Developer'
-              upload-dist: false # In Beta, so no upload
+              run-analyzer: true
+              macos: 'macos-12'
+            - xcode: 'xcode12.5.1'
+              xcode-path: '/Applications/Xcode_12.5.1.app/Contents/Developer'
+              upload-dist: false
+              run-analyzer: false
+              macos: 'macos-11'
             
     name: Build and Test Sparkle
-    runs-on: macos-11
+    runs-on: ${{ matrix.macos }}
 
     steps:
       - name: Checkout
@@ -48,6 +52,41 @@ jobs:
           DEVELOPER_DIR: ${{ matrix.xcode-path }}
         run: |
           xcodebuild test-without-building -project Sparkle.xcodeproj -scheme UITests -configuration Debug -derivedDataPath build
+
+      - name: Analyze Sparkle
+        if: ${{ matrix.run-analyzer && github.event_name == 'pull_request' }}
+        env:
+          DEVELOPER_DIR: ${{ matrix.xcode-path }}
+        run: |
+            xcodebuild analyze -project Sparkle.xcodeproj -quiet -scheme Sparkle -configuration Release -derivedDataPath analyze > anaylze_output.txt
+            
+      - name: Find Analyzed Warnings
+        if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' }}
+        id: findwarnings
+        env:
+          DEVELOPER_DIR: ${{ matrix.xcode-path }}
+        run: |
+            if grep -q "warning:" anaylze_output.txt; then
+                echo '::set-output name=analyzestatus::0'
+            else
+                echo '::set-output name=analyzestatus::1'
+            fi
+        
+      - name: Extract Analyzed Warnings
+        if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
+        id: warnings
+        run: |
+            echo ::set-output name=content::$(cat anaylze_output.txt)
+      
+      - name: Post Analyzed Warnings
+        if: ${{ success() && matrix.run-analyzer && github.event_name == 'pull_request' && steps.findwarnings.outputs.analyzestatus == '0' }}
+        uses: mshick/add-pr-comment@v1
+        with:
+            allow-repeats: false
+            repo-token: ${{ secrets.BOT_PERSONAL_ACCESS_TOKEN }}
+            repo-token-user-login: 'Sparkle-Bot'
+            message: "``` ${{ steps.warnings.outputs.content }} ```"
+        
       - name: Build Release Distribution
         env:
           DEVELOPER_DIR: ${{ matrix.xcode-path }}

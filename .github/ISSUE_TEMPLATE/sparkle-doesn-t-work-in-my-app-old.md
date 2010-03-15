@@ -1,6 +1,6 @@
 ---
 name: Sparkle 1.x doesn't work in my app
-about: Problems with integration, unexpected errors
+about: Problems with integration, unexpected errors using Sparkle 1
 title: ''
 labels: '1.x'
 assignees: ''
@@ -32,3 +32,5 @@ https://github.com/sparkle-project/Sparkle#troubleshooting
 ```
 
 ### Steps to reproduce the behavior
+
+[The more information provided and pasted verbatim, the easier it will be to diagnose an issue. If you can provide the affected application/binary and XML feed to reproduce an issue, share them]

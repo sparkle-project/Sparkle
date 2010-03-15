@@ -1,93 +1,92 @@
-"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "¡%1$@ %2$@ se ha descargado y está lista para usarse! Ésta es una actualización importante. ¿Te gustaría instalarla y volver a abrir %1$@ ahora?";
-
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "¡%1$@ %2$@ se ha descargado y está lista para usarse! ¿Te gustaría instalarla y volver a abrir %1$@ ahora?";
-
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ no se puede actualizar porque fue abierta desde una ubicación temporal o de solo lectura.";
-
-"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Usa Finder para copiar %1$@ a la carpeta Aplicaciones, vuélvela a abrir desde ahí e inténtalo de nuevo.";
-
+/* No comment provided by engineer. */
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ es la versión más nueva disponible.";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ es la versión más nueva disponible.\n(You are currently running version %3$@.)";
+/* No comment provided by engineer. */
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ es la versión más nueva disponible.\n(You are currently running version %3$@.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ ya está disponible (tienes la %3$@). ¿Quisieras descargarla ahora?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ ya está disponible (tienes la %3$@). ¿Quisieras descargarla ahora?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ ya está disponible--tú tienes la %3$@. ¿Quisieras aprender más acerca de esta actualización en la red?";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ ya está disponible--tú tienes la %3$@. ¿Quisieras aprender más acerca de esta actualización en la red?";
 
+/* The download progress in a unit of bytes, e.g. 100 KB */
 "%@ downloaded" = "%@ descargado";
 
+/* The download progress in units of bytes, e.g. 100 KB of 1,0 MB */
 "%@ of %@" = "%1$@ de %2$@";
 
+/* Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install. */
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "¡%1$@ %2$@ se ha descargado y está lista para usarse! Ésta es una actualización importante. ¿Te gustaría instalarla y volver a abrir %1$@ ahora?";
+
+/* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "¡%1$@ %2$@ se ha descargado y está lista para usarse! ¿Te gustaría instalarla y volver a abrir %1$@ ahora?";
+
+/* No comment provided by engineer. */
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ no se puede actualizar porque fue abierta desde una ubicación temporal o de solo lectura.";
+
+/* No comment provided by engineer. */
 "A new version of %@ is available!" = "¡Una nueva versión de %@ está disponible!";
 
+/* No comment provided by engineer. */
 "A new version of %@ is ready to install!" = "¡Una nueva versión de %@ está lista para instalarse!";
 
+/* No comment provided by engineer. */
 "An error occurred in retrieving update information. Please try again later." = "Ocurrió un error al recopilar información sobre la actualización. Por favor inténtalo de nuevo más tarde.";
 
+/* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Ocurrió un error al descargar la actualización. Por favor inténtalo de nuevo más tarde.";
 
+/* No comment provided by engineer. */
 "An error occurred while extracting the archive. Please try again later." = "Ocurrió un error al extraer el archivo. Por favor inténtalo de nuevo más tarde.";
 
-"An error occurred while installing the update. Please try again later." = "Ocurrió un error al instalar la actualización. Por favor inténtalo de nuevo más tarde.";
-
+/* No comment provided by engineer. */
 "An error occurred while parsing the update feed." = "Ocurrió un error al analizar la información de la actualización.";
 
-"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Ocurrió un error al volver a abrir %1$@, pero la nueva versión estará disponible la próxima vez que abras %1$@.";
-
+/* No comment provided by engineer. */
 "An important update to %@ is ready to install" = "Una actualización importante para %@ está lista para instalarse";
 
-/* the unit for bytes */
-"B" = "B";
-
+/* No comment provided by engineer. */
 "Cancel" = "Cancelar";
 
+/* No comment provided by engineer. */
 "Cancel Update" = "Cancelar actualización";
 
-"Checking for updates..." = "Buscando actualizaciones…";
+/* No comment provided by engineer. */
+"Checking for updates…" = "Buscando actualizaciones…";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "Descargando actualización…";
+"Downloading update…" = "Descargando actualización…";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "Extrayendo actualización…";
+"Extracting update…" = "Extrayendo actualización…";
 
-/* the unit for gigabytes */
-"GB" = "GB";
-
+/* No comment provided by engineer. */
 "Install and Relaunch" = "Instalar y volver a abrir";
 
 /* Take care not to overflow the status window. */
-"Installing update..." = "Instalando actualización…";
+"Installing update…" = "Instalando actualización…";
 
-/* the unit for kilobytes */
-"KB" = "KB";
+/* Alternate title for 'Install Update' button when there's no download in RSS feed. */
+"Learn More…" = "Más información…";
 
-/* Alternative name for "Install" button if we have a paid update or other update
-	without a download but with a URL. */
-"Learn More..." = "Más información…";
-
-/* the unit for megabytes */
-"MB" = "MB";
-
-/* OK button. */
+/* No comment provided by engineer. */
 "OK" = "Aceptar";
 
-/* Status message on progress window once download has finished. */
+/* No comment provided by engineer. */
 "Ready to Install" = "Listo para instalarse";
 
-/* Message that is optionally shown at startup to allow users to turn on/off update checks. */
+/* No comment provided by engineer. */
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "¿Debería %1$@ buscar actualizaciones automáticamente? Siempre puedes buscar actualizaciones manualmente desde el menú %1$@.";
 
-"The update is improperly signed." = "La actualización está firmada incorrectamente.";
-
+/* No comment provided by engineer. */
 "Update Error!" = "¡Error de actualización!";
 
+/* No comment provided by engineer. */
 "Updating %@" = "Actualizando %@";
 
-/* 'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI) */
-"You already have the newest version of %@." = "Ya tienes la versión más nueva de %@.";
+/* No comment provided by engineer. */
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Usa Finder para copiar %1$@ a la carpeta Aplicaciones, vuélvela a abrir desde ahí e inténtalo de nuevo.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You're up-to-date!" = "¡Está actualizado!";
+"You’re up-to-date!" = "¡Está actualizado!";

@@ -21,29 +21,6 @@ extern int renamex_np(const char *, const char *, unsigned int) __attribute__((w
 
 static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
 
-static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
-
-    char path[PATH_MAX] = {0};
-    if (![url.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"URL of the file (%@) cannot be represented as a file path", url.lastPathComponent] }];
-        }
-        return NO;
-    }
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    OSStatus makeResult = FSPathMakeRefWithOptions((const UInt8 *)path, kFSPathMakeRefDoNotFollowLeafSymlink, ref, NULL);
-#pragma clang diagnostic pop
-    if (makeResult != noErr) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:makeResult userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create file system reference for %@", url.lastPathComponent] }];
-        }
-        return NO;
-    }
-    return YES;
-}
-
 #pragma clang diagnostic push
 // Use direct access because it's easier, clearer, and faster
 #pragma clang diagnostic ignored "-Wdirect-ivar-access"
@@ -184,89 +161,15 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     return success;
 }
 
-/*
- * Copies an item from one location to another
- * This intentionally does *not* use copyfile() or any API that uses it such as NSFileManager's copy item method
- * This is because copyfile() can fail to copy symbolic links from one network mount to another, which will affect copying apps
- * This failure occurs because the system may think symbolic links on a SMB mount are zero bytes in size
- * For more info, see bug reports at http://openradar.appspot.com/radar?id=4925873463492608
- * and http://openradar.appspot.com/radar?id=5024037222744064
- */
 - (BOOL)copyItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError * __autoreleasing *)error
 {
-    if (![self _itemExistsAtURL:sourceURL]) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source file to copy (%@) does not exist.", sourceURL.lastPathComponent] }];
-        }
-        return NO;
-    }
-
-    if (![self _itemExistsAtURL:destinationURL.URLByDeletingLastPathComponent]) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination parent directory to copy into (%@) does not exist.", destinationURL.URLByDeletingLastPathComponent.lastPathComponent] }];
-        }
-        return NO;
-    }
-
-    if ([self _itemExistsAtURL:destinationURL]) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination file to copy to (%@) already exists.", destinationURL.lastPathComponent] }];
-        }
-        return NO;
-    }
-
-    FSRef sourceRef;
-    if (!SUMakeRefFromURL(sourceURL, &sourceRef, error)) {
-        return NO;
-    }
-
-    FSRef destinationParentRef;
-    if (!SUMakeRefFromURL(destinationURL.URLByDeletingLastPathComponent, &destinationParentRef, error)) {
-        return NO;
-    }
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    OSStatus copyResult = FSCopyObjectSync(&sourceRef, &destinationParentRef, (__bridge CFStringRef)(destinationURL.lastPathComponent), NULL, kFSFileOperationDefaultOptions);
-#pragma clang diagnostic pop
-
-    if (copyResult != noErr) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:copyResult userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to copy file (%@)", sourceURL.lastPathComponent] }];
-        }
-    }
-
-    return YES;
+    return [_fileManager copyItemAtURL:sourceURL toURL:destinationURL error:error];
 }
 
-/*
- * Retrieves the volume ID that a particular url resides on
- * The url must point to a file that exists
- * There is no cocoa equivalent for obtaining the volume ID
- * Although NSURLVolumeURLForRemountingKey exists as a resource key for NSURL,
- * that will not return a URL if the mount is not re-mountable and I otherwise don't trust the API
- */
-- (BOOL)_getVolumeID:(FSVolumeRefNum *)volumeID ofItemAtURL:(NSURL *)url
+- (BOOL)_getVolumeID:(out id _Nullable __autoreleasing * _Nonnull)outVolumeIdentifier ofItemAtURL:(NSURL *)url
 {
-    FSRef pathRef;
-    if (!SUMakeRefFromURL(url, &pathRef, NULL)) {
-        return NO;
-    }
-
-    FSCatalogInfo catalogInfo;
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    OSErr catalogError = FSGetCatalogInfo(&pathRef, kFSCatInfoVolume, &catalogInfo, NULL, NULL, NULL);
-#pragma clang diagnostic pop
-    if (catalogError != noErr) {
-        return NO;
-    }
-
-    if (volumeID != NULL) {
-        *volumeID = catalogInfo.volume;
-    }
-
-    return YES;
+    NSError *error = nil;
+    return [url getResourceValue:outVolumeIdentifier forKey:NSURLVolumeIdentifierKey error:&error];
 }
 
 - (BOOL)moveItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError *__autoreleasing *)error
@@ -298,20 +201,20 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     // one network mount to another one. This is possibly related to the fact that
     // moving a file will try to preserve ownership but copying won't
 
-    FSVolumeRefNum sourceVolume = 0;
-    BOOL foundSourceVolume = [self _getVolumeID:&sourceVolume ofItemAtURL:sourceURL];
+    id sourceVolumeIdentifier = nil;
+    BOOL foundSourceVolume = [self _getVolumeID:&sourceVolumeIdentifier ofItemAtURL:sourceURL];
 
-    FSVolumeRefNum destinationVolume = 0;
-    BOOL foundDestinationVolume = [self _getVolumeID:&destinationVolume ofItemAtURL:destinationURLParent];
+    id destinationVolumeIdentifier = nil;
+    BOOL foundDestinationVolume = [self _getVolumeID:&destinationVolumeIdentifier ofItemAtURL:destinationURLParent];
 
-    if (foundSourceVolume && foundDestinationVolume && sourceVolume != destinationVolume) {
+    if (foundSourceVolume && foundDestinationVolume && ![(NSObject *)sourceVolumeIdentifier isEqual:destinationVolumeIdentifier]) {
         return ([self copyItemAtURL:sourceURL toURL:destinationURL error:error] && [self removeItemAtURL:sourceURL error:error]);
     }
 
     return [_fileManager moveItemAtURL:sourceURL toURL:destinationURL error:error];
 }
 
-- (BOOL)replaceItemAtURL:(NSURL *)originalItemURL withItemAtURL:(NSURL *)newItemURL error:(NSError * __autoreleasing *)error __OSX_AVAILABLE(10.13)
+- (BOOL)swapItemAtURL:(NSURL *)originalItemURL withItemAtURL:(NSURL *)newItemURL error:(NSError * __autoreleasing *)error API_AVAILABLE(macos(10.13))
 {
     char originalPath[PATH_MAX] = {0};
     if (![originalItemURL.path getFileSystemRepresentation:originalPath maxLength:sizeof(originalPath)]) {
@@ -340,7 +243,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     return YES;
 }
 
-- (BOOL)_changeOwnerAndGroupOfItemAtURL:(NSURL *)targetURL ownerID:(NSNumber *)ownerID groupID:(NSNumber *)groupID error:(NSError * __autoreleasing *)error
+- (BOOL)changeOwnerAndGroupOfItemAtURL:(NSURL *)targetURL ownerID:(uid_t)ownerID groupID:(gid_t)groupID error:(NSError * __autoreleasing *)error
 {
     char path[PATH_MAX] = {0};
     if (![targetURL.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
@@ -359,12 +262,12 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     }
     
     // We use fchown instead of chown because the latter can follow symbolic links
-    BOOL success = (fchown(fileDescriptor, ownerID.unsignedIntValue, groupID.unsignedIntValue) == 0);
+    BOOL success = (fchown(fileDescriptor, ownerID, groupID) == 0);
     close(fileDescriptor);
     
     if (!success) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to change owner & group for %@ with owner ID %u and group ID %u.", targetURL.path.lastPathComponent, ownerID.unsignedIntValue, groupID.unsignedIntValue] }];
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to change owner & group for %@ with owner ID %u and group ID %u.", targetURL.path.lastPathComponent, ownerID, groupID] }];
         }
     }
 
@@ -438,14 +341,14 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     // If we can't change both the new owner & group, try to only change the owner
     // If this works, this is sufficient enough for performing the update
     NSNumber *groupIDToUse;
-    if (![self _changeOwnerAndGroupOfItemAtURL:targetURL ownerID:ownerID groupID:groupID error:NULL]) {
+    if (![self changeOwnerAndGroupOfItemAtURL:targetURL ownerID:ownerID.unsignedIntValue groupID:groupID.unsignedIntValue error:NULL]) {
         if ((targetOwnerID != nil && [ownerID isEqualToNumber:targetOwnerID])) {
             // Assume they're the same even if we don't check every file recursively
             // Speeds up the common case like above
             return YES;
         }
         
-        if (![self _changeOwnerAndGroupOfItemAtURL:targetURL ownerID:ownerID groupID:targetGroupID error:error]) {
+        if (![self changeOwnerAndGroupOfItemAtURL:targetURL ownerID:ownerID.unsignedIntValue groupID:targetGroupID.unsignedIntValue error:error]) {
             return NO;
         }
         
@@ -457,7 +360,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     if (isTargetADirectory) {
         NSDirectoryEnumerator *directoryEnumerator = [_fileManager enumeratorAtURL:targetURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
         for (NSURL *url in directoryEnumerator) {
-            if (![self _changeOwnerAndGroupOfItemAtURL:url ownerID:ownerID groupID:groupIDToUse error:error]) {
+            if (![self changeOwnerAndGroupOfItemAtURL:url ownerID:ownerID.unsignedIntValue groupID:groupIDToUse.unsignedIntValue error:error]) {
                 return NO;
             }
         }
@@ -641,25 +544,9 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     return YES;
 }
 
-- (NSURL *)makeTemporaryDirectoryWithPreferredName:(NSString *)preferredName appropriateForDirectoryURL:(NSURL *)directoryURL error:(NSError * __autoreleasing *)error
+- (NSURL *)makeTemporaryDirectoryAppropriateForDirectoryURL:(NSURL *)directoryURL error:(NSError * __autoreleasing *)error
 {
-    NSError *tempError = nil;
-    NSURL *tempURL = [_fileManager URLForDirectory:NSItemReplacementDirectory inDomain:NSUserDomainMask appropriateForURL:directoryURL create:YES error:&tempError];
-
-    if (tempURL != nil) {
-        return tempURL;
-    }
-
-    // It is pretty unlikely in my testing we will get here, but just in case we do, we should create a directory inside
-    // the directory pointed by directoryURL, using the preferredName
-
-    NSURL *desiredURL = [directoryURL URLByAppendingPathComponent:preferredName];
-    NSUInteger tagIndex = 1;
-    while ([self _itemExistsAtURL:desiredURL] && tagIndex <= 9999) {
-        desiredURL = [directoryURL URLByAppendingPathComponent:[preferredName stringByAppendingFormat:@" (%lu)", (unsigned long)++tagIndex]];
-    }
-
-    return [self makeDirectoryAtURL:desiredURL error:error] ? desiredURL : nil;
+    return [_fileManager URLForDirectory:NSItemReplacementDirectory inDomain:NSUserDomainMask appropriateForURL:directoryURL create:YES error:error];
 }
 
 - (BOOL)removeItemAtURL:(NSURL *)url error:(NSError * __autoreleasing *)error

@@ -26,7 +26,6 @@
 #import "SPUDownloadData.h"
 #import "SUApplicationInfo.h"
 #import "SPUUpdaterSettings.h"
-#import "SUTouchBarForwardDeclarations.h"
 #import "SUTouchBarButtonGroup.h"
 #import "SPUXPCServiceInfo.h"
 #import "SPUUserUpdateState.h"
@@ -38,7 +37,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 @property (strong) SUAppcastItem *updateItem;
 @property (strong) SUHost *host;
 @property (nonatomic) BOOL allowsAutomaticUpdates;
-@property (nonatomic, copy, nullable) void(^completionBlock)(SPUUserUpdateChoice);
+@property (nonatomic, copy, nullable) void(^completionBlock)(SPUUserUpdateChoice, NSRect, BOOL);
 @property (nonatomic) SPUUserUpdateState *state;
 
 @property (strong) NSProgressIndicator *releaseNotesSpinner;
@@ -59,6 +58,9 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 @end
 
 @implementation SUUpdateAlert
+{
+    void (^_didBecomeKeyBlock)(void);
+}
 
 @synthesize completionBlock = _completionBlock;
 @synthesize state = _state;
@@ -83,7 +85,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 @synthesize webView = _webView;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice))block
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item state:(SPUUserUpdateState *)state host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUserUpdateChoice, NSRect, BOOL))completionBlock didBecomeKeyBlock:(void (^)(void))didBecomeKeyBlock
 {
     self = [super initWithWindowNibName:@"SUUpdateAlert"];
     if (self != nil) {
@@ -92,11 +94,14 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         versionDisplayer = aVersionDisplayer;
         
         _state = state;
-        _completionBlock = [block copy];
+        _completionBlock = [completionBlock copy];
+        _didBecomeKeyBlock = [didBecomeKeyBlock copy];
         
         SPUUpdaterSettings *updaterSettings = [[SPUUpdaterSettings alloc] initWithHostBundle:host.bundle];
         _allowsAutomaticUpdates = updaterSettings.allowsAutomaticUpdates && updaterSettings.automaticallyChecksForUpdates && !item.informationOnlyUpdate;
         [self setShouldCascadeWindows:NO];
+    } else {
+        assert(false);
     }
     return self;
 }
@@ -116,10 +121,14 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 {
     [self.webView stopLoading];
     [self.webView.view removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
+    
+    BOOL wasKeyWindow = self.window.keyWindow;
+    NSRect windowFrame = self.window.frame;
+    
     [self close];
     
     if (self.completionBlock != nil) {
-        self.completionBlock(choice);
+        self.completionBlock(choice, windowFrame, wasKeyWindow);
         self.completionBlock = nil;
     }
 }
@@ -141,23 +150,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (IBAction)skipThisVersion:(id)__unused sender
 {
-    if (self.updateItem.majorUpgrade) {
-        NSAlert *alert = [[NSAlert alloc] init];
-        alert.alertStyle = NSAlertStyleInformational;
-        alert.informativeText = SULocalizedString(@"Skipping this major upgrade will opt out of alerts for future updates.", nil);
-        alert.messageText = SULocalizedString(@"Are you sure you want to skip this upgrade?", nil);
-        
-        [alert addButtonWithTitle:SULocalizedString(@"Skip Upgrade", nil)];
-        [alert addButtonWithTitle:SULocalizedString(@"Don't Skip", nil)];
-        
-        [alert beginSheetModalForWindow:(NSWindow * _Nonnull)self.window completionHandler:^(NSModalResponse response) {
-            if (response == NSAlertFirstButtonReturn) {
-                [self endWithSelection:SPUUserUpdateChoiceSkip];
-            }
-        }];
-    } else {
-        [self endWithSelection:SPUUserUpdateChoiceSkip];
-    }
+    [self endWithSelection:SPUUserUpdateChoiceSkip];
 }
 
 - (IBAction)remindMeLater:(id)__unused sender
@@ -169,19 +162,17 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 {
     [self adaptReleaseNotesAppearance];
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
     if (@available(macOS 10.14, *)) {
         if (!self.observingAppearance) {
             [self.webView.view addObserver:self forKeyPath:@"effectiveAppearance" options:0 context:nil];
             self.observingAppearance = YES;
         }
     }
-#endif
     
     // Stick a nice big spinner in the middle of the web view until the page is loaded.
     NSRect frame = [[self.webView.view superview] frame];
     self.releaseNotesSpinner = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(NSMidX(frame) - 16, NSMidY(frame) - 16, 32, 32)];
-    [self.releaseNotesSpinner setStyle:NSProgressIndicatorSpinningStyle];
+    [self.releaseNotesSpinner setStyle:NSProgressIndicatorStyleSpinning];
     [self.releaseNotesSpinner startAnimation:self];
     [[self.webView.view superview] addSubview:self.releaseNotesSpinner];
     
@@ -203,29 +194,24 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(__attribute__((unused)) NSDictionary<NSKeyValueChangeKey,id> *)change context:(__attribute__((unused)) void *)context {
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
     if (@available(macOS 10.14, *)) {
         if (object == self.webView.view && [keyPath isEqualToString:@"effectiveAppearance"]) {
             [self adaptReleaseNotesAppearance];
         }
     }
-#endif
 }
 
 - (void)dealloc {
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
     if (@available(macOS 10.14, *)) {
         if (self.observingAppearance) {
             [self.webView.view removeObserver:self forKeyPath:@"effectiveAppearance"];
             self.observingAppearance = NO;
         }
     }
-#endif
 }
 
 - (void)adaptReleaseNotesAppearance
 {
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
     if (@available(macOS 10.14, *))
     {
         NSAppearanceName bestAppearance = [self.webView.view.effectiveAppearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
@@ -257,7 +243,6 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
             [self.webView setDrawsBackground:YES];
         }
     }
-#endif
 }
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
@@ -330,12 +315,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
     [self.window setFrameAutosaveName: showReleaseNotes ? @"SUUpdateAlert" : @"SUUpdateAlertSmall" ];
 
-    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
-        [self.window setLevel:NSFloatingWindowLevel]; // This means the window will float over all other apps, if our app is switched out ?!
-    }
-
     if (self.updateItem.informationOnlyUpdate) {
-        [self.installButton setTitle:SULocalizedString(@"Learn More...", @"Alternate title for 'Install Update' button when there's no download in RSS feed.")];
+        [self.installButton setTitle:SULocalizedString(@"Learn More…", @"Alternate title for 'Install Update' button when there's no download in RSS feed.")];
         [self.installButton setAction:@selector(openInfoURL:)];
     }
 
@@ -389,6 +370,13 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     [self.window center];
 }
 
+- (void)windowDidBecomeKey:(NSNotification *)__unused note
+{
+    if (_didBecomeKeyBlock != NULL) {
+        _didBecomeKeyBlock();
+    }
+}
+
 - (BOOL)windowShouldClose:(NSNotification *) __unused note
 {
 	[self endWithSelection:SPUUserUpdateChoiceDismiss];
@@ -432,16 +420,16 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     NSString *finalString = nil;
 
     if (self.updateItem.informationOnlyUpdate) {
-        finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?", @"Description text for SUUpdateAlert when the update informational with no download."), self.host.name, updateItemVersion, hostVersion];
+        finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?", @"Description text for SUUpdateAlert when the update informational with no download."), self.host.name, updateItemVersion, hostVersion];
     } else if (self.updateItem.criticalUpdate) {
         if (self.state.stage == SPUUserUpdateStageNotDownloaded) {
-            finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. This is an important update; would you like to download it now?", @"Description text for SUUpdateAlert when the critical update is downloadable."), self.host.name, updateItemVersion, hostVersion];
+            finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available—you have %@. This is an important update; would you like to download it now?", @"Description text for SUUpdateAlert when the critical update is downloadable."), self.host.name, updateItemVersion, hostVersion];
         } else {
             finalString = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?", @"Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install."), self.host.name, updateItemVersion];
         }
     } else {
         if (self.state.stage == SPUUserUpdateStageNotDownloaded) {
-            finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", @"Description text for SUUpdateAlert when the update is downloadable."), self.host.name, updateItemVersion, hostVersion];
+            finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available—you have %@. Would you like to download it now?", @"Description text for SUUpdateAlert when the update is downloadable."), self.host.name, updateItemVersion, hostVersion];
         } else {
             finalString = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?", @"Description text for SUUpdateAlert when the update has already been downloaded and ready to install."), self.host.name, updateItemVersion];
         }

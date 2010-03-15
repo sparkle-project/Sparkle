@@ -13,6 +13,7 @@
 #import "SPUSecureCoding.h"
 #import "SUInstallerStatus.h"
 #import "SUXPCInstallerStatus.h"
+#import "SUConstants.h"
 #import "SULog.h"
 
 
@@ -27,7 +28,7 @@
 + (void)probeInstallerInProgressForHostBundleIdentifier:(NSString *)hostBundleIdentifier completion:(void (^)(BOOL))completionHandler
 {
     id<SUInstallerStatusProtocol> installerStatus = nil;
-    BOOL usesXPC = SPUXPCServiceExists(@INSTALLER_STATUS_BUNDLE_ID);
+    BOOL usesXPC = SPUXPCServiceIsEnabled(SUEnableInstallerStatusServiceKey);
     if (!usesXPC) {
         installerStatus = [[SUInstallerStatus alloc] init];
     } else {
@@ -90,7 +91,7 @@
 + (void)probeInstallerUpdateItemForHostBundleIdentifier:(NSString *)hostBundleIdentifier completion:(void (^)(SPUInstallationInfo  * _Nullable))completionHandler
 {
     id<SUInstallerStatusProtocol> installerStatus = nil;
-    BOOL usesXPC = SPUXPCServiceExists(@INSTALLER_STATUS_BUNDLE_ID);
+    BOOL usesXPC = SPUXPCServiceIsEnabled(SUEnableInstallerStatusServiceKey);
     if (!usesXPC) {
         installerStatus = [[SUInstallerStatus alloc] init];
     } else {

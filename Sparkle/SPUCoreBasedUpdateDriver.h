@@ -38,11 +38,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)coreDriverDidStartExtractingUpdate;
 
-- (void)installerDidStartInstalling;
+- (void)installerDidStartInstallingWithApplicationTerminated:(BOOL)applicationTerminated;
 
 - (void)installerDidExtractUpdateWithProgress:(double)progress;
-
-- (void)installerIsSendingAppTerminationSignal;
 
 - (void)installerDidFinishInstallationAndRelaunched:(BOOL)relaunched acknowledgement:(void(^)(void))acknowledgement;
 
@@ -53,6 +51,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle updateCheck:(SPUUpdateCheck)updateCheck updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUCoreBasedUpdateDriverDelegate>)delegate;
 
 - (void)setCompletionHandler:(SPUUpdateDriverCompletion)completionBlock;
+
+- (void)setUpdateWillInstallHandler:(void (^)(void))updateWillInstallHandler;
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background requiresSilentInstall:(BOOL)silentInstall;
 

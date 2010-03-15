@@ -53,7 +53,7 @@
     if (self.updateButton == nil) {
         NSButton *updateButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 160, 100)];
         updateButton.title = title;
-        updateButton.bezelStyle = NSRecessedBezelStyle;
+        updateButton.bezelStyle = NSBezelStyleRecessed;
         
         self.updateButton = updateButton;
     } else {
@@ -251,15 +251,14 @@
     [self addUpdateButtonWithTitle:[NSString stringWithFormat:@"Extracting (%d%%)…", (int)(progress * 100)]];
 }
 
-- (void)showInstallingUpdate
+- (void)showInstallingUpdateWithApplicationTerminated:(BOOL)applicationTerminated
 {
-    [self addUpdateButtonWithTitle:@"Installing…"];
-}
-
-- (void)showSendingTerminationSignal
-{
-    // In case our termination request fails or is delayed
-    [self removeUpdateButton];
+    if (applicationTerminated) {
+        [self addUpdateButtonWithTitle:@"Installing…"];
+    } else {
+        // In case our termination request fails or is delayed
+        [self removeUpdateButton];
+    }
 }
 
 - (void)showUpdateInstalledAndRelaunched:(BOOL)__unused relaunched acknowledgement:(void (^)(void))acknowledgement

@@ -1,129 +1,83 @@
-/* de_DE v0.1 - No comment provided by engineer. */
-
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ indirildi ve kullanıma hazır! Şimdi yüklemek ister misiniz? Uygulama yeniden başlatılacaktır.";
-
-/* de_DE v0.1 - No comment provided by engineer. */
-
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location." = "%1$@ uygulaması geçici veya salt okunur bir konumdan açıldığı için güncellenemedi.";
-
-"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Lütfen %1$@ uygulamasını Uygulamalar dizinine kopyalayıp yeniden başlatınız.";
-
-/* de_DE v0.1 - No comment provided by engineer. */
-
+/* No comment provided by engineer. */
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ mevcut en yeni sürümdür.";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ mevcut en yeni sürümdür.\n(Şu anda %3$@ sürümünü kullanıyorsunuz.)";
-
-/* de_DE v0.1 - No comment provided by engineer. */
+/* No comment provided by engineer. */
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ mevcut en yeni sürümdür.\n(Şu anda %3$@ sürümünü kullanıyorsunuz.)";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ çıktı (Kullandığınız Sürüm: %3$@). Şimdi yeni sürümü indirmek ister misiniz?";
+"%@ %@ is now available—you have %@. Would you like to download it now?" = "%1$@ %2$@ çıktı (Kullandığınız Sürüm: %3$@). Şimdi yeni sürümü indirmek ister misiniz?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ çıktı (kullandığınız sürüm: %3$@). Bu güncelleme ile ilgili olarak web sayfasından daha fazla bilgi almak ister misiniz?";
+"%@ %@ is now available—you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ çıktı (kullandığınız sürüm: %3$@). Bu güncelleme ile ilgili olarak web sayfasından daha fazla bilgi almak ister misiniz?";
 
+/* The download progress in a unit of bytes, e.g. 100 KB */
 "%@ downloaded" = "%@ indirildi";
 
-/* de_DE v0.1 - No comment provided by engineer. */
-
+/* The download progress in units of bytes, e.g. 100 KB of 1,0 MB */
 "%@ of %@" = "%1$@ / %2$@";
 
-/* de_DE v0.1 - No comment provided by engineer. */
+/* Description text for SUUpdateAlert when the update has already been downloaded and ready to install. */
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ indirildi ve kullanıma hazır! Şimdi yüklemek ister misiniz? Uygulama yeniden başlatılacaktır.";
 
+/* No comment provided by engineer. */
+"%1$@ can’t be updated, because it was opened from a read-only or a temporary location." = "%1$@ uygulaması geçici veya salt okunur bir konumdan açıldığı için güncellenemedi.";
+
+/* No comment provided by engineer. */
 "A new version of %@ is available!" = "%@ uygulaması için yeni bir sürüm var!";
 
-/* de_DE v0.1 - No comment provided by engineer. */
-
+/* No comment provided by engineer. */
 "A new version of %@ is ready to install!" = "%@ uygulamasının yeni bir sürümü yüklenmeye hazır!";
 
-/* de_DE v0.1 - No comment provided by engineer. */
-
+/* No comment provided by engineer. */
 "An error occurred in retrieving update information. Please try again later." = "Güncelleme bilgilerini alırken bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.";
 
-/* de_DE v0.1 - No comment provided by engineer. */
-
+/* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Güncelleme indirilirken bir hata oluştu. Lütfen sonra tekrar deneyiniz.";
 
-/* de_DE v0.1 - No comment provided by engineer. */
-
+/* No comment provided by engineer. */
 "An error occurred while extracting the archive. Please try again later." = "İndirilen arşivi açarken bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.";
 
-/* de_DE v0.1 - No comment provided by engineer. */
-
-"An error occurred while installing the update. Please try again later." = "Güncellemeyi yüklerken bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.";
-
-/* de_DE v0.1 - No comment provided by engineer. */
-
+/* No comment provided by engineer. */
 "An error occurred while parsing the update feed." = "Güncelleme kaynağını incelerken bir hata oluştu.";
 
-/* de_DE v0.1 - No comment provided by engineer. */
-
-"An error occurred while parsing the update feed: %@" = "Güncelleme kaynağını incelerken bir hata oluştu: %@";
-
-/* de_DE v0.1 - No comment provided by engineer. */
-
-"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "%1$@ uygulamasını açarken bir hata oluştu; ancak güncelleme %1$@ uygulamasını yeniden başlattığınızda hazır olacaktır.";
-
-/* de_DE v0.1 - the unit for bytes */
-
-"B" = "B";
-
-/* de_DE v0.1 - No comment provided by engineer. */
-
+/* No comment provided by engineer. */
 "Cancel" = "Vazgeç";
 
-/* de_DE v0.1 - No comment provided by engineer. */
-
+/* No comment provided by engineer. */
 "Cancel Update" = "Güncellemeyi iptal et";
 
-/* de_DE v0.1 - No comment provided by engineer. */
+/* No comment provided by engineer. */
+"Checking for updates…" = "Güncellemelere bakılıyor…";
 
-"Checking for updates..." = "Güncellemelere bakılıyor...";
+/* Take care not to overflow the status window. */
+"Downloading update…" = "Güncelleme indiriliyor…";
 
-/* de_DE v0.1 - No comment provided by engineer. */
+/* Take care not to overflow the status window. */
+"Extracting update…" = "Güncelleme ayıklanıyor…";
 
-"Downloading update..." = "Güncelleme indiriliyor...";
-
-/* de_DE v0.1 - No comment provided by engineer. */
-
-"Extracting update..." = "Güncelleme ayıklanıyor...";
-
-/* de_DE v0.1 - the unit for gigabytes */
-
-"GB" = "GB";
-
-/* de_DE v0.1 - No comment provided by engineer. */
-
+/* No comment provided by engineer. */
 "Install and Relaunch" = "Kur ve yeniden başlat";
 
+/* Take care not to overflow the status window. */
+"Installing update…" = "Güncelleme kuruluyor…";
 
-"Installing update..." = "Güncelleme kuruluyor...";
-
-/* the unit for kilobytes */
-
-"KB" = "KB";
-
-/* the unit for megabytes */
-
-"MB" = "MB";
-
-
+/* No comment provided by engineer. */
 "OK" = "Tamam";
 
-
+/* No comment provided by engineer. */
 "Ready to Install" = "Kuruluma hazır";
 
-
+/* No comment provided by engineer. */
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "%1$@ uygulaması için güncellemeler otomatik olarak aransın mı? Güncelleme işlemini el ile uygulama menüsünden de başlatabilirsiniz.";
 
-
+/* No comment provided by engineer. */
 "Update Error!" = "Güncelleme hatası.";
 
-
+/* No comment provided by engineer. */
 "Updating %@" = "%@ güncelleniyor";
 
+/* No comment provided by engineer. */
+"Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "Lütfen %1$@ uygulamasını Uygulamalar dizinine kopyalayıp yeniden başlatınız.";
 
-"You already have the newest version of %@." = "%@ uygulamasının en güncel sürümü sizde mevcut.";
-
-
-"You're up-to-date!" = "Uygulama güncel!";
+/* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
+"You’re up-to-date!" = "Uygulama güncel!";
