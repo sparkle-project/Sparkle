@@ -1080,6 +1080,7 @@
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH)";
+				INSTALL_PATH = "@executable_path/../Frameworks";
 			};
 			name = Debug;
 		};
@@ -1088,6 +1089,7 @@
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
 				GCC_DEBUGGING_SYMBOLS = full;
+				INSTALL_PATH = "@executable_path/../Frameworks";
 			};
 			name = Release;
 		};
@@ -1116,6 +1118,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 61072EB20DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig */;
 			buildSettings = {
+				INSTALL_PATH = "@executable_path/../Frameworks";
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
 		};
@@ -1180,6 +1183,7 @@
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
 				GCC_DEBUGGING_SYMBOLS = full;
+				INSTALL_PATH = "@executable_path/../Frameworks";
 			};
 			name = "Release10.6+";
 		};
