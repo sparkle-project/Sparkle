@@ -247,6 +247,8 @@ static void offtout(off_t x, u_char *buf)
         buf[7] |= 0x80;
 }
 
+int bsdiff(int argc, char *argv[]); // Added by AMM: suppresses a warning about the following not having a prototype.
+
 int bsdiff(int argc, char *argv[])
 {
     int fd;

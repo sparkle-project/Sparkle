@@ -224,7 +224,7 @@ usage:
         id value = [newTreeState valueForKey:key];
 
         if ([value isEqual:[NSNull null]]) {
-            xar_file_t newFile = xar_add_frombuffer(x, 0, [key fileSystemRepresentation], "", 1);
+            xar_file_t newFile = xar_add_frombuffer(x, 0, [key fileSystemRepresentation], (char *)"", 1);
             assert(newFile);
             xar_prop_set(newFile, "delete", "true");
             continue;
