@@ -7,6 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5D06E8D80FD68C8E005AE3F6 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; };
+		5D06E8E90FD68CDB005AE3F6 /* bsdiff.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */; settings = {COMPILER_FLAGS = "-Wno-shorten-64-to-32"; }; };
+		5D06E8EA0FD68CDB005AE3F6 /* SUBinaryDeltaTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E30FD68CC7005AE3F6 /* SUBinaryDeltaTool.m */; };
+		5D06E8EB0FD68CE4005AE3F6 /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; settings = {COMPILER_FLAGS = "-Wno-shorten-64-to-32"; }; };
+		5D06E8EC0FD68CE4005AE3F6 /* SUBinaryDeltaApply.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E00FD68CC7005AE3F6 /* SUBinaryDeltaApply.m */; };
+		5D06E8ED0FD68CE4005AE3F6 /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E20FD68CC7005AE3F6 /* SUBinaryDeltaCommon.m */; };
+		5D06E8FD0FD68D6B005AE3F6 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */; };
+		5D06E8FF0FD68D6D005AE3F6 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */; };
+		5D06E9050FD68D7D005AE3F6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
+		5D06E9390FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.h in Headers */ = {isa = PBXBuildFile; fileRef = 5D06E9370FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.h */; };
+		5D06E93A0FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E9380FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m */; };
+		5D1AF58A0FD7678C0065DB48 /* libxar.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5890FD7678C0065DB48 /* libxar.1.dylib */; };
+		5D1AF58B0FD7678C0065DB48 /* libxar.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5890FD7678C0065DB48 /* libxar.1.dylib */; };
+		5D1AF5900FD767AD0065DB48 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF58F0FD767AD0065DB48 /* libxml2.dylib */; };
+		5D1AF5940FD767B90065DB48 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF58F0FD767AD0065DB48 /* libxml2.dylib */; };
+		5D1AF59A0FD767E50065DB48 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5990FD767E50065DB48 /* libz.dylib */; };
+		5D1AF59C0FD768010065DB48 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF59B0FD768010065DB48 /* libcrypto.dylib */; };
+		5D1AF82B0FD768180065DB48 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5990FD767E50065DB48 /* libz.dylib */; };
+		5D1AF82C0FD7681A0065DB48 /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF59B0FD768010065DB48 /* libcrypto.dylib */; };
 		610134730DD250470049ACDF /* SUUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 610134710DD250470049ACDF /* SUUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
 		610134740DD250470049ACDF /* SUUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 610134720DD250470049ACDF /* SUUpdateDriver.m */; };
 		6101347B0DD2541A0049ACDF /* SUProbingUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 610134790DD2541A0049ACDF /* SUProbingUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
@@ -19,6 +38,7 @@
 		610D5A1A0A1661B8004AAD9C /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; };
 		610D5A750A1670A4004AAD9C /* SUStatus.nib in Resources */ = {isa = PBXBuildFile; fileRef = 610D5A740A1670A4004AAD9C /* SUStatus.nib */; };
 		610EC1E00CF3A5FE00AE239E /* NTSynchronousTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 610EC1BF0CF3914D00AE239E /* NTSynchronousTask.m */; };
+		611142E910FB1BE5009810AA /* bspatch.h in Headers */ = {isa = PBXBuildFile; fileRef = 611142E810FB1BE5009810AA /* bspatch.h */; };
 		61177A1F0D1112E900749C97 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6117796E0D1112E000749C97 /* IOKit.framework */; };
 		61180BCA0D64138900B4E0D1 /* SUWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = 61180BC80D64138900B4E0D1 /* SUWindowController.h */; settings = {ATTRIBUTES = (); }; };
 		61180BCB0D64138900B4E0D1 /* SUWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 61180BC90D64138900B4E0D1 /* SUWindowController.m */; };
@@ -101,6 +121,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		5D06E8D50FD68C86005AE3F6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = Sparkle;
+		};
 		61227AB90DB5C4BB00AB99EA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -147,6 +174,24 @@
 /* Begin PBXFileReference section */
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		5D06E8D00FD68C7C005AE3F6 /* BinaryDelta */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BinaryDelta; sourceTree = BUILT_PRODUCTS_DIR; };
+		5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */ = {isa = PBXFileReference; comments = "-Wno-shorten-64-to-32"; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bsdiff.c; sourceTree = "<group>"; };
+		5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bspatch.c; sourceTree = "<group>"; };
+		5D06E8DF0FD68CC7005AE3F6 /* SUBinaryDeltaApply.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBinaryDeltaApply.h; sourceTree = "<group>"; };
+		5D06E8E00FD68CC7005AE3F6 /* SUBinaryDeltaApply.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBinaryDeltaApply.m; sourceTree = "<group>"; };
+		5D06E8E10FD68CC7005AE3F6 /* SUBinaryDeltaCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBinaryDeltaCommon.h; sourceTree = "<group>"; };
+		5D06E8E20FD68CC7005AE3F6 /* SUBinaryDeltaCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBinaryDeltaCommon.m; sourceTree = "<group>"; };
+		5D06E8E30FD68CC7005AE3F6 /* SUBinaryDeltaTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBinaryDeltaTool.m; sourceTree = "<group>"; };
+		5D06E8F10FD68D21005AE3F6 /* ConfigBinaryDelta.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigBinaryDelta.xcconfig; sourceTree = "<group>"; };
+		5D06E8F20FD68D21005AE3F6 /* ConfigBinaryDeltaDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigBinaryDeltaDebug.xcconfig; sourceTree = "<group>"; };
+		5D06E8F30FD68D21005AE3F6 /* ConfigBinaryDeltaRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigBinaryDeltaRelease.xcconfig; sourceTree = "<group>"; };
+		5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbz2.dylib; path = /usr/lib/libbz2.dylib; sourceTree = "<absolute>"; };
+		5D06E9370FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBinaryDeltaUnarchiver.h; sourceTree = "<group>"; };
+		5D06E9380FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBinaryDeltaUnarchiver.m; sourceTree = "<group>"; };
+		5D1AF5890FD7678C0065DB48 /* libxar.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxar.1.dylib; path = /usr/lib/libxar.1.dylib; sourceTree = "<absolute>"; };
+		5D1AF58F0FD767AD0065DB48 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = /usr/lib/libxml2.dylib; sourceTree = "<absolute>"; };
+		5D1AF5990FD767E50065DB48 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
+		5D1AF59B0FD768010065DB48 /* libcrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.dylib; path = /usr/lib/libcrypto.dylib; sourceTree = "<absolute>"; };
 		610134710DD250470049ACDF /* SUUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdateDriver.h; sourceTree = "<group>"; };
 		610134720DD250470049ACDF /* SUUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdateDriver.m; sourceTree = "<group>"; };
 		610134790DD2541A0049ACDF /* SUProbingUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUProbingUpdateDriver.h; sourceTree = "<group>"; };
@@ -160,6 +205,7 @@
 		610D5A740A1670A4004AAD9C /* SUStatus.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SUStatus.nib; sourceTree = "<group>"; };
 		610EC1BF0CF3914D00AE239E /* NTSynchronousTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NTSynchronousTask.m; sourceTree = "<group>"; };
 		610EC1C00CF3914D00AE239E /* NTSynchronousTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NTSynchronousTask.h; sourceTree = "<group>"; };
+		611142E810FB1BE5009810AA /* bspatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bspatch.h; sourceTree = "<group>"; };
 		61131A050F846CE600E97AF6 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61131A090F846D0A00E97AF6 /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_CN; path = zh_CN.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61131A0A0F846D1100E97AF6 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/Sparkle.strings; sourceTree = "<group>"; };
@@ -318,6 +364,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		5D06E8CE0FD68C7C005AE3F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5D06E8D80FD68C8E005AE3F6 /* Sparkle.framework in Frameworks */,
+				5D06E8FF0FD68D6D005AE3F6 /* libbz2.dylib in Frameworks */,
+				5D06E9050FD68D7D005AE3F6 /* Foundation.framework in Frameworks */,
+				5D1AF58B0FD7678C0065DB48 /* libxar.1.dylib in Frameworks */,
+				5D1AF5900FD767AD0065DB48 /* libxml2.dylib in Frameworks */,
+				5D1AF59A0FD767E50065DB48 /* libz.dylib in Frameworks */,
+				5D1AF59C0FD768010065DB48 /* libcrypto.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		612279D60DB5470200AB99EA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -346,6 +406,11 @@
 				61177A1F0D1112E900749C97 /* IOKit.framework in Frameworks */,
 				FAEFA2F70D94AA7500472538 /* Foundation.framework in Frameworks */,
 				FAEFA2F80D94AA7900472538 /* AppKit.framework in Frameworks */,
+				5D06E8FD0FD68D6B005AE3F6 /* libbz2.dylib in Frameworks */,
+				5D1AF58A0FD7678C0065DB48 /* libxar.1.dylib in Frameworks */,
+				5D1AF5940FD767B90065DB48 /* libxml2.dylib in Frameworks */,
+				5D1AF82B0FD768180065DB48 /* libz.dylib in Frameworks */,
+				5D1AF82C0FD7681A0065DB48 /* libcrypto.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -367,6 +432,7 @@
 				61B5F90209C4CEE200B25A18 /* Sparkle Test App.app */,
 				DAAEFC960DA571DF0051E0D0 /* relaunch */,
 				612279D90DB5470200AB99EA /* Sparkle Unit Tests.octest */,
+				5D06E8D00FD68C7C005AE3F6 /* BinaryDelta */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -398,6 +464,11 @@
 				61B5F8F609C4CEB300B25A18 /* Security.framework */,
 				0867D6A5FE840307C02AAC07 /* AppKit.framework */,
 				0867D69BFE84028FC02AAC07 /* Foundation.framework */,
+				5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */,
+				5D1AF58F0FD767AD0065DB48 /* libxml2.dylib */,
+				5D1AF5890FD7678C0065DB48 /* libxar.1.dylib */,
+				5D1AF5990FD767E50065DB48 /* libz.dylib */,
+				5D1AF59B0FD768010065DB48 /* libcrypto.dylib */,
 			);
 			name = "Apple Frameworks and Libraries";
 			sourceTree = "<group>";
@@ -417,9 +488,27 @@
 			name = "Framework Resources";
 			sourceTree = "<group>";
 		};
+		5D06E8D90FD68C95005AE3F6 /* Binary Delta */ = {
+			isa = PBXGroup;
+			children = (
+				5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */,
+				5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */,
+				5D06E8DF0FD68CC7005AE3F6 /* SUBinaryDeltaApply.h */,
+				5D06E8E00FD68CC7005AE3F6 /* SUBinaryDeltaApply.m */,
+				5D06E8E10FD68CC7005AE3F6 /* SUBinaryDeltaCommon.h */,
+				5D06E8E20FD68CC7005AE3F6 /* SUBinaryDeltaCommon.m */,
+				5D06E8E30FD68CC7005AE3F6 /* SUBinaryDeltaTool.m */,
+				5D06E9370FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.h */,
+				5D06E9380FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m */,
+				611142E810FB1BE5009810AA /* bspatch.h */,
+			);
+			name = "Binary Delta";
+			sourceTree = "<group>";
+		};
 		6101354A0DD25B7F0049ACDF /* Unarchiving */ = {
 			isa = PBXGroup;
 			children = (
+				5D06E8D90FD68C95005AE3F6 /* Binary Delta */,
 				61299A8B09CA790200B7442F /* SUUnarchiver.h */,
 				61299A8C09CA790200B7442F /* SUUnarchiver.m */,
 				6102FE590E08C7EC00F85D09 /* SUUnarchiver_Private.h */,
@@ -572,6 +661,9 @@
 		FA1941C40D94A6EA00DD942E /* Configurations */ = {
 			isa = PBXGroup;
 			children = (
+				5D06E8F10FD68D21005AE3F6 /* ConfigBinaryDelta.xcconfig */,
+				5D06E8F20FD68D21005AE3F6 /* ConfigBinaryDeltaDebug.xcconfig */,
+				5D06E8F30FD68D21005AE3F6 /* ConfigBinaryDeltaRelease.xcconfig */,
 				FA1941D00D94A70100DD942E /* ConfigCommon.xcconfig */,
 				FA1941CF0D94A70100DD942E /* ConfigCommonDebug.xcconfig */,
 				FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */,
@@ -634,12 +726,32 @@
 				6102FE5B0E08C7EC00F85D09 /* SUUnarchiver_Private.h in Headers */,
 				61EF67590E25C5B400F754E0 /* SUHost.h in Headers */,
 				61CFB3290E385186007A1735 /* Sparkle.pch in Headers */,
+				5D06E9390FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.h in Headers */,
+				611142E910FB1BE5009810AA /* bspatch.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		5D06E8CF0FD68C7C005AE3F6 /* BinaryDelta */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5D06E8DA0FD68C95005AE3F6 /* Build configuration list for PBXNativeTarget "BinaryDelta" */;
+			buildPhases = (
+				5D06E8CD0FD68C7C005AE3F6 /* Sources */,
+				5D06E8CE0FD68C7C005AE3F6 /* Frameworks */,
+				5D06E90D0FD68DA3005AE3F6 /* Fix Install Name */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5D06E8D60FD68C86005AE3F6 /* PBXTargetDependency */,
+			);
+			name = BinaryDelta;
+			productName = BinaryDelta;
+			productReference = 5D06E8D00FD68C7C005AE3F6 /* BinaryDelta */;
+			productType = "com.apple.product-type.tool";
+		};
 		612279D80DB5470200AB99EA /* Sparkle Unit Tests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 612279DD0DB5470300AB99EA /* Build configuration list for PBXNativeTarget "Sparkle Unit Tests" */;
@@ -771,6 +883,7 @@
 				61B5F90109C4CEE200B25A18 /* Sparkle Test App */,
 				DAAEFC950DA571DF0051E0D0 /* relaunch tool */,
 				612279D80DB5470200AB99EA /* Sparkle Unit Tests */,
+				5D06E8CF0FD68C7C005AE3F6 /* BinaryDelta */,
 			);
 		};
 /* End PBXProject section */
@@ -812,6 +925,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		5D06E90D0FD68DA3005AE3F6 /* Fix Install Name */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Fix Install Name";
+			outputPaths = (
+				"$(CONFIGURATION_BUILD_DIR)/BinaryDelta",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "install_name_tool -change \"@loader_path/../Frameworks/Sparkle.framework/Versions/A/Sparkle\" \"@loader_path/Sparkle.framework/Versions/A/Sparkle\" \"${CONFIGURATION_BUILD_DIR}/BinaryDelta\"";
+		};
 		612279D70DB5470200AB99EA /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -872,6 +1000,15 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		5D06E8CD0FD68C7C005AE3F6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5D06E8E90FD68CDB005AE3F6 /* bsdiff.c in Sources */,
+				5D06E8EA0FD68CDB005AE3F6 /* SUBinaryDeltaTool.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		612279D50DB5470200AB99EA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -923,6 +1060,10 @@
 				6102FE5C0E08C7EC00F85D09 /* SUUnarchiver_Private.m in Sources */,
 				61D85D6D0E10B2ED00F9B4A9 /* SUPipedUnarchiver.m in Sources */,
 				61EF67560E25B58D00F754E0 /* SUHost.m in Sources */,
+				5D06E8EB0FD68CE4005AE3F6 /* bspatch.c in Sources */,
+				5D06E8EC0FD68CE4005AE3F6 /* SUBinaryDeltaApply.m in Sources */,
+				5D06E8ED0FD68CE4005AE3F6 /* SUBinaryDeltaCommon.m in Sources */,
+				5D06E93A0FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -937,6 +1078,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		5D06E8D60FD68C86005AE3F6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8DC2EF4F0486A6940098B216 /* Sparkle */;
+			targetProxy = 5D06E8D50FD68C86005AE3F6 /* PBXContainerItemProxy */;
+		};
 		61227ABA0DB5C4BB00AB99EA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 612279D80DB5470200AB99EA /* Sparkle Unit Tests */;
@@ -1104,6 +1250,27 @@
 			};
 			name = Release;
 		};
+		5D06E8D20FD68C7D005AE3F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5D06E8F20FD68D21005AE3F6 /* ConfigBinaryDeltaDebug.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		5D06E8D30FD68C7D005AE3F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5D06E8F30FD68D21005AE3F6 /* ConfigBinaryDeltaRelease.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		5D06E8D40FD68C7D005AE3F6 /* Release (GC dual-mode; 10.5-only) */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5D06E8F30FD68D21005AE3F6 /* ConfigBinaryDeltaRelease.xcconfig */;
+			buildSettings = {
+			};
+			name = "Release (GC dual-mode; 10.5-only)";
+		};
 		61072EAD0DF263BD008FE88B /* Release (GC dual-mode; 10.5-only) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1200,6 +1367,16 @@
 				1DEB91B208733DA50010E9CD /* Debug */,
 				1DEB91B308733DA50010E9CD /* Release */,
 				61072EAD0DF263BD008FE88B /* Release (GC dual-mode; 10.5-only) */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5D06E8DA0FD68C95005AE3F6 /* Build configuration list for PBXNativeTarget "BinaryDelta" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5D06E8D20FD68C7D005AE3F6 /* Debug */,
+				5D06E8D30FD68C7D005AE3F6 /* Release */,
+				5D06E8D40FD68C7D005AE3F6 /* Release (GC dual-mode; 10.5-only) */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

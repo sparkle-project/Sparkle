@@ -10,16 +10,20 @@
 
 @implementation SUUnarchiver (Private)
 
-- (id)initWithPath:(NSString *)path
+- (id)initWithPath:(NSString *)path host:(SUHost *)host
 {
 	if ((self = [super init]))
+	{
 		archivePath = [path copy];
+		updateHost = [host retain];
+	}
 	return self;
 }
 
 - (void)dealloc
 {
 	[archivePath release];
+	[updateHost release];
 	[super dealloc];
 }
 
