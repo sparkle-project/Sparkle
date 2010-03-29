@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5C7919AC0EFBE07100B25B61 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5C7919A70EFBE05500B25B61 /* Carbon.framework */; };
+		5C791A750EFBE0B400B25B61 /* SUCarbonAPI.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C791A720EFBE0B400B25B61 /* SUCarbonAPI.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5C791A770EFBE0B400B25B61 /* SUCarbonUpdater.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C791A740EFBE0B400B25B61 /* SUCarbonUpdater.m */; };
+		5C791B220EFC045A00B25B61 /* SUCarbonUpdater.h in Headers */ = {isa = PBXBuildFile; fileRef = 5C791A730EFBE0B400B25B61 /* SUCarbonUpdater.h */; };
 		610134730DD250470049ACDF /* SUUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 610134710DD250470049ACDF /* SUUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
 		610134740DD250470049ACDF /* SUUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 610134720DD250470049ACDF /* SUUpdateDriver.m */; };
 		6101347B0DD2541A0049ACDF /* SUProbingUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 610134790DD2541A0049ACDF /* SUProbingUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
@@ -145,6 +149,10 @@
 /* Begin PBXFileReference section */
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		5C7919A70EFBE05500B25B61 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		5C791A720EFBE0B400B25B61 /* SUCarbonAPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUCarbonAPI.h; path = "Carbon Support/SUCarbonAPI.h"; sourceTree = SOURCE_ROOT; };
+		5C791A730EFBE0B400B25B61 /* SUCarbonUpdater.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUCarbonUpdater.h; path = "Carbon Support/SUCarbonUpdater.h"; sourceTree = SOURCE_ROOT; };
+		5C791A740EFBE0B400B25B61 /* SUCarbonUpdater.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUCarbonUpdater.m; path = "Carbon Support/SUCarbonUpdater.m"; sourceTree = SOURCE_ROOT; };
 		610134710DD250470049ACDF /* SUUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdateDriver.h; sourceTree = "<group>"; };
 		610134720DD250470049ACDF /* SUUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdateDriver.m; sourceTree = "<group>"; };
 		610134790DD2541A0049ACDF /* SUProbingUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUProbingUpdateDriver.h; sourceTree = "<group>"; };
@@ -298,6 +306,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5C7919AC0EFBE07100B25B61 /* Carbon.framework in Frameworks */,
 				61B5F8F709C4CEB300B25A18 /* Security.framework in Frameworks */,
 				61B5FC4C09C4FD5E00B25A18 /* WebKit.framework in Frameworks */,
 				61177A1F0D1112E900749C97 /* IOKit.framework in Frameworks */,
@@ -350,6 +359,7 @@
 		0867D69AFE84028FC02AAC07 /* Apple Frameworks and Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				5C7919A70EFBE05500B25B61 /* Carbon.framework */,
 				6117796E0D1112E000749C97 /* IOKit.framework */,
 				61B5FC3F09C4FD4000B25A18 /* WebKit.framework */,
 				61B5F8F609C4CEB300B25A18 /* Security.framework */,
@@ -373,6 +383,16 @@
 			);
 			name = "Framework Resources";
 			sourceTree = "<group>";
+		};
+		5C791A710EFBE0B400B25B61 /* Carbon Support */ = {
+			isa = PBXGroup;
+			children = (
+				5C791A720EFBE0B400B25B61 /* SUCarbonAPI.h */,
+				5C791A730EFBE0B400B25B61 /* SUCarbonUpdater.h */,
+				5C791A740EFBE0B400B25B61 /* SUCarbonUpdater.m */,
+			);
+			path = "Carbon Support";
+			sourceTree = SOURCE_ROOT;
 		};
 		6101354A0DD25B7F0049ACDF /* Unarchiving */ = {
 			isa = PBXGroup;
@@ -522,6 +542,7 @@
 				61B5F8E409C4CE3C00B25A18 /* SUUpdater.m */,
 				61CFB2C20E38496B007A1735 /* Drivers */,
 				61CFB2C10E384958007A1735 /* Support */,
+				5C791A710EFBE0B400B25B61 /* Carbon Support */,
 			);
 			name = "Update Control";
 			sourceTree = "<group>";
@@ -586,6 +607,8 @@
 				6102FE5B0E08C7EC00F85D09 /* SUUnarchiver_Private.h in Headers */,
 				61EF67590E25C5B400F754E0 /* SUHost.h in Headers */,
 				61CFB3290E385186007A1735 /* Sparkle.pch in Headers */,
+				5C791A750EFBE0B400B25B61 /* SUCarbonAPI.h in Headers */,
+				5C791B220EFC045A00B25B61 /* SUCarbonUpdater.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -856,6 +879,7 @@
 				6102FE5C0E08C7EC00F85D09 /* SUUnarchiver_Private.m in Sources */,
 				61D85D6D0E10B2ED00F9B4A9 /* SUPipedUnarchiver.m in Sources */,
 				61EF67560E25B58D00F754E0 /* SUHost.m in Sources */,
+				5C791A770EFBE0B400B25B61 /* SUCarbonUpdater.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -976,14 +1000,16 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 			};
 			name = Debug;
 		};
 		1DEB91AF08733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
+			baseConfigurationReference = 61072EB20DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig */;
 			buildSettings = {
 				GCC_DEBUGGING_SYMBOLS = full;
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 			};
 			name = Release;
 		};
@@ -1013,6 +1039,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 61072EB20DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig */;
 			buildSettings = {
+				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				INSTALL_PATH = "@loader_path/../Frameworks";
 			};
 			name = "Release (GC dual-mode; 10.5-only)";

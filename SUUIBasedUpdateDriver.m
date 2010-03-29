@@ -14,6 +14,14 @@
 
 @implementation SUUIBasedUpdateDriver
 
+- (void)showUpdateWindow
+{
+	[[updateAlert window] makeKeyAndOrderFront:self];
+
+	if ([[updater delegate] respondsToSelector:@selector(updaterDidShowUpdatePanel:)])
+		[[updater delegate] updaterDidShowUpdatePanel:updater];
+}
+
 - (void)didFindValidUpdate
 {
 	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem host:host];

@@ -269,7 +269,10 @@
 		pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
 	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
 
-	[NSApp terminate:self];
+	if ([[updater delegate] respondsToSelector:@selector(doQuitApplication)])
+		[[updater delegate] doQuitApplication];
+	else
+		[NSApp terminate:self];
 }
 
 - (void)cleanUp

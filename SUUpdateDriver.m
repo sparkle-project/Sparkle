@@ -7,6 +7,7 @@
 //
 
 #import "SUUpdateDriver.h"
+#import "SUUpdater.h"
 
 NSString *SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
@@ -30,6 +31,9 @@ NSString *SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 {
 	[self setValue:[NSNumber numberWithBool:YES] forKey:@"finished"];	
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdateDriverFinishedNotification object:self];
+	
+	if ([[updater delegate] respondsToSelector:@selector(updaterDidAbandonUpdate:)])
+		[[updater delegate] updaterDidAbandonUpdate:updater];
 }
 
 - (BOOL)finished { return finished; }

@@ -69,5 +69,8 @@ extern OSStatus SUDowngradeError;
 	#define NSINTEGER_DEFINED 1
 #endif
 
+// Set this flag to 1 for Carbon API support
+// Won't interfere with Cocoa Version either way.
+#define SU_SPARKLE_FOR_CARBON	1
 
 #endif
