@@ -2,16 +2,16 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10A432</string>
-		<string key="IBDocument.InterfaceBuilderVersion">732</string>
-		<string key="IBDocument.AppKitVersion">1038</string>
-		<string key="IBDocument.HIToolboxVersion">437.00</string>
+		<string key="IBDocument.SystemVersion">10D573</string>
+		<string key="IBDocument.InterfaceBuilderVersion">785</string>
+		<string key="IBDocument.AppKitVersion">1038.29</string>
+		<string key="IBDocument.HIToolboxVersion">460.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">732</string>
+			<string key="NS.object.0">785</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="41"/>
+			<integer value="39"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -410,8 +410,8 @@
 							<int key="NSCellFlags2">272629760</int>
 							<string type="base64-UTF8" key="NSContents">RGFzIGFub255bWlzaWVydGUgU3lzdGVtcHJvZmlsIGhpbGZ0IHVucyBiZWkgd2VpdGVyZW4gRW50d2lj
 a2x1bmdlbi4gRsO8ciB3ZWl0ZXJlIEZyYWdlbiB6dW0gYW5vbnltaXNpZXJ0ZW4gU3lzdGVtcHJvZmls
-IGvDtm5uZW4gU2llIHNpY2ggYW4gdW5zIHdlbmRlbi4KCkZvbGdlbmRlIEluZm9ybWF0aW9uZW4gd8O8
-cmRlbiDDvGJlcnRyYWdlbjo</string>
+IGvDtm5uZW4gU2llIHNpY2ggYW4gdW5zIHdlbmRlbi4KCkRpZXNlIEluZm9ycm1hdGlvbmVuIHfDvHJk
+ZW4gYW4gdW5zIGdlc2VuZGV0IHdlcmRlbjo</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="275139400"/>
 							<reference key="NSBackgroundColor" ref="113780984"/>
@@ -870,9 +870,21 @@ cmRlbiDDvGJlcnRyYWdlbjo</string>
 				<boolean value="YES" key="13.ImportedFromIB2"/>
 				<string key="14.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="14.ImportedFromIB2"/>
+				<string key="163.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="164.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="165.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="166.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="167.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="168.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="169.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="170.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="171.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="171.IBShouldRemoveOnLegacySave"/>
+				<string key="172.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="172.IBShouldRemoveOnLegacySave"/>
+				<string key="173.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="173.IBShouldRemoveOnLegacySave"/>
+				<string key="174.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="174.IBShouldRemoveOnLegacySave"/>
 				<string key="24.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="24.ImportedFromIB2"/>
@@ -884,7 +896,7 @@ cmRlbiDDvGJlcnRyYWdlbjo</string>
 				<boolean value="YES" key="34.ImportedFromIB2"/>
 				<string key="37.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="37.ImportedFromIB2"/>
-				<string key="39.IBEditorWindowLastContentRect">{{382, 512}, {365, 254}}</string>
+				<string key="39.IBEditorWindowLastContentRect">{{134, 540}, {365, 254}}</string>
 				<string key="39.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="39.ImportedFromIB2"/>
 				<string key="40.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -918,6 +930,7 @@ cmRlbiDDvGJlcnRyYWdlbjo</string>
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<object class="IBPartialClassDescription">
 					<string key="className">FirstResponder</string>
+					<string key="superclassName">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>
@@ -937,11 +950,39 @@ cmRlbiDDvGJlcnRyYWdlbjo</string>
 						<string key="finishPrompt:">id</string>
 						<string key="toggleMoreInfo:">id</string>
 					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="finishPrompt:">
+							<string key="name">finishPrompt:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="toggleMoreInfo:">
+							<string key="name">toggleMoreInfo:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="delegate">id</string>
 						<string key="descriptionTextField">NSTextField</string>
 						<string key="moreInfoButton">NSButton</string>
 						<string key="moreInfoView">NSView</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="delegate">
+							<string key="name">delegate</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="descriptionTextField">
+							<string key="name">descriptionTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="moreInfoButton">
+							<string key="name">moreInfoButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="moreInfoView">
+							<string key="name">moreInfoView</string>
+							<string key="candidateClassName">NSView</string>
+						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
@@ -959,6 +1000,7 @@ cmRlbiDDvGJlcnRyYWdlbjo</string>
 			</array>
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
+		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
 			<integer value="1050" key="NS.object.0"/>
@@ -966,5 +1008,9 @@ cmRlbiDDvGJlcnRyYWdlbjo</string>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<string key="IBDocument.LastKnownRelativeProjectPath">../Sparkle.xcodeproj</string>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
+		<dictionary class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
+			<string key="NSApplicationIcon">{128, 128}</string>
+			<string key="NSSwitch">{15, 15}</string>
+		</dictionary>
 	</data>
 </archive>
