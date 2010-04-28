@@ -75,7 +75,7 @@
 {    
 	NSError *error = nil;
 	
-	NSXMLDocument *document;
+	NSXMLDocument *document = nil;
 	BOOL failed = NO;
 	NSArray *xmlItems = nil;
 	NSMutableArray *appcastItems = [NSMutableArray array];
