@@ -13,6 +13,7 @@
 #import "SUInstaller.h"
 #import "SUStandardVersionComparator.h"
 #import "SUUnarchiver.h"
+#import "SUBinaryDeltaCommon.h"
 
 @implementation SUBasicUpdateDriver
 
@@ -92,10 +93,12 @@
 			item = [updateEnumerator nextObject];
 		} while (item && ![self hostSupportsItem:item]);
 
-		SUAppcastItem *deltaUpdateItem = [[item deltaUpdates] objectForKey:[host version]];
-		if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem]) {
-			nonDeltaUpdateItem = [item retain];
-			item = deltaUpdateItem;
+		if (binaryDeltaSupported()) {        
+			SUAppcastItem *deltaUpdateItem = [[item deltaUpdates] objectForKey:[host version]];
+			if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem]) {
+				nonDeltaUpdateItem = [item retain];
+				item = deltaUpdateItem;
+			}
 		}
 	}
     
