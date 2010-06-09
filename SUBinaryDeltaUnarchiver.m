@@ -6,6 +6,7 @@
 //  Copyright 2009 Mark Rowe. All rights reserved.
 //
 
+#import "SUBinaryDeltaCommon.h"
 #import "SUBinaryDeltaUnarchiver.h"
 #import "SUBinaryDeltaApply.h"
 #import "SUUnarchiver_Private.h"
@@ -16,7 +17,7 @@
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
-	return [[path pathExtension] isEqualToString:@"delta"];
+	return binaryDeltaSupported() && [[path pathExtension] isEqualToString:@"delta"];
 }
 
 - (void)applyBinaryDelta

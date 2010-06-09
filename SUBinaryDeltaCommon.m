@@ -16,6 +16,15 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 
+extern int xar_close(void*) __attribute__((weak_import));
+    
+int binaryDeltaSupported(void)
+{
+    // OS X 10.4 didn't include libxar, so we link against it weakly.
+    // This checks whether libxar is available at runtime.
+    return xar_close != 0;
+}
+
 int compareFiles(const FTSENT **a, const FTSENT **b)
 {
     return strcoll((*a)->fts_name, (*b)->fts_name);
