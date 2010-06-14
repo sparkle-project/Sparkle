@@ -201,6 +201,7 @@
 	[itemDescription release];
 	[releaseNotesURL release];
 	[DSASignature release];
+	[minimumSystemVersion release];
 	[fileURL release];
 	[fileURLType release];
 	[versionString release];
