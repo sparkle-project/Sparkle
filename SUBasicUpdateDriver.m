@@ -315,7 +315,7 @@
 	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
 	
 	[self setValue:[NSNumber numberWithBool:YES] forKey:@"finished"];
-	[NSApp terminate:self];
+	[NSApp terminate:nil];
 }
 
 - (void)cleanUp
