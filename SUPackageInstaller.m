@@ -40,8 +40,7 @@ NSString *SUPackageInstallerDelegateKey = @"SUPackageInstallerDelegate";
 	
 	if (floor(NSAppKitVersionNumber) == NSAppKitVersionNumber10_4) {
 		// 10.4 uses Installer.app because the "open" command in 10.4 doesn't support -W and -n
-		command = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.installer"];
-		command = [command stringByAppendingString:@"/Contents/MacOS/Installer"];
+		command = [[NSBundle bundleWithIdentifier:@"com.apple.installer"] executablePath];
 		args = [NSArray arrayWithObjects:path, nil];
 	} else {
 		// 10.5 and later. Run installer using the "open" command to ensure it is launched in front of current application.
