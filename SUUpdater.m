@@ -358,7 +358,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	NSEnumerator *profileInfoEnumerator = [parameters objectEnumerator];
 	NSDictionary *currentProfileInfo;
 	while ((currentProfileInfo = [profileInfoEnumerator nextObject]))
-		[parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", [currentProfileInfo objectForKey:@"key"], [currentProfileInfo objectForKey:@"value"]]];
+		[parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", [[[currentProfileInfo objectForKey:@"key"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], [[[currentProfileInfo objectForKey:@"value"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
 	
 	NSString *separatorCharacter = @"?";
 	if ([baseFeedURL query])
@@ -366,7 +366,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	NSString *appcastStringWithProfile = [NSString stringWithFormat:@"%@%@%@", [baseFeedURL absoluteString], separatorCharacter, [parameterStrings componentsJoinedByString:@"&"]];
 	
 	// Clean it up so it's a valid URL
-	return [NSURL URLWithString:[appcastStringWithProfile stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+	return [NSURL URLWithString:appcastStringWithProfile];
 }
 
 - (void)setUpdateCheckInterval:(NSTimeInterval)updateCheckInterval
