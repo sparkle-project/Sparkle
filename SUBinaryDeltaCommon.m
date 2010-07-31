@@ -60,7 +60,7 @@ static void _hashOfFile(unsigned char* hash, FTSENT *ent)
 {
     if (ent->fts_info == FTS_SL) {
         char linkDestination[MAXPATHLEN + 1];
-        size_t linkDestinationLength = readlink(ent->fts_path, linkDestination, MAXPATHLEN);
+        ssize_t linkDestinationLength = readlink(ent->fts_path, linkDestination, MAXPATHLEN);
         if (linkDestinationLength < 0) {
             perror("readlink");
             return;
