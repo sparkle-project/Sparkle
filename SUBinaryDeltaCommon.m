@@ -80,6 +80,7 @@ static void _hashOfFile(unsigned char* hash, FTSENT *ent)
         size_t fileSize = (size_t)ent->fts_statp->st_size;
         if (fileSize == 0) {
             _hashOfBuffer(hash, NULL, 0);
+            close(fileDescriptor);
             return;
         }
 		
