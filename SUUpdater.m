@@ -210,22 +210,22 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - (void)registerAsObserver
 {
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDriverDidFinish:) name:SUUpdateDriverFinishedNotification object:nil];
-    // No sense observing the shared NSUserDefaultsController when we're not updating the main bundle.
-    if ([host bundle] != [NSBundle mainBundle]) return;
     [[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:[@"values." stringByAppendingString:SUScheduledCheckIntervalKey] options:0 context:SUUpdaterDefaultsObservationContext];
     [[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:[@"values." stringByAppendingString:SUEnableAutomaticChecksKey] options:0 context:SUUpdaterDefaultsObservationContext];
 }
 
 - (void)unregisterAsObserver
 {
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-    // Removing self as a KVO observer if no observer was registered leads to an NSException. But we don't care.
 	@try
 	{
+		[[NSNotificationCenter defaultCenter] removeObserver:self];
 		[[NSUserDefaultsController sharedUserDefaultsController] removeObserver:self forKeyPath:[@"values." stringByAppendingString:SUScheduledCheckIntervalKey]];
 		[[NSUserDefaultsController sharedUserDefaultsController] removeObserver:self forKeyPath:[@"values." stringByAppendingString:SUEnableAutomaticChecksKey]];
 	}
-	@catch (NSException *e) { }
+	@catch (NSException *e)
+	{
+		NSLog(@"Sparkle Error: [SUUpdater unregisterAsObserver] called, but the updater wasn't registered as an observer.");
+	}
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
