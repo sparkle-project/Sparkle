@@ -56,6 +56,11 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 {
 	self = [super init];
     if (bundle == nil) bundle = [NSBundle mainBundle];
+	
+	// Register as observer straight away to avoid exceptions on -dealloc when -unregisterAsObserver is called:
+	if (self)
+		[self registerAsObserver];
+	
 	id updater = [sharedUpdaters objectForKey:[NSValue valueWithNonretainedObject:bundle]];
     if (updater)
 	{
@@ -68,7 +73,6 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
             sharedUpdaters = [[NSMutableDictionary alloc] init];
         [sharedUpdaters setObject:self forKey:[NSValue valueWithNonretainedObject:bundle]];
         host = [[SUHost alloc] initWithBundle:bundle];
-        [self registerAsObserver];
 		
 		// Saving-the-developer-from-a-stupid-mistake-check:
 		if (![[[self feedURL] scheme] isEqualToString:@"https"] && ![host publicDSAKey])
