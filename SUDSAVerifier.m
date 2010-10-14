@@ -133,6 +133,7 @@ static EVP_PKEY* load_dsa_key(char *key)
 	NSMutableData* signatureData = [[[encodedSignature dataUsingEncoding:NSUTF8StringEncoding] mutableCopy] autorelease];
 	void *signature = [signatureData mutableBytes];
 	long length = b64decode(signature); // Decode the signature in-place and get the new length of the signature string.
+	if ((length < 0) || (length > 0x7FFFFFFF)) { return NO; } // test before cast below
 	
 	// We've got the signature, now get the file data.
 	NSData *pathData = [NSData dataWithContentsOfFile:path];
@@ -144,12 +145,14 @@ static EVP_PKEY* load_dsa_key(char *key)
 	
 	// Actually verify the signature on the file.
 	EVP_MD_CTX ctx;
+	EVP_MD_CTX_init(&ctx);
 	if(EVP_VerifyInit(&ctx, EVP_dss1()) == 1) // We're using DSA keys.
 	{
 		EVP_VerifyUpdate(&ctx, md, SHA_DIGEST_LENGTH);
-		if ((length < 0) || (length > 0x7FFFFFFF)) { return NO; } // test before cast below
-		result = (EVP_VerifyFinal(&ctx, signature, (unsigned int)length, pkey) == 1);
+		
+		result = EVP_VerifyFinal(&ctx, signature, (unsigned int)length, pkey);
 	}
+	EVP_MD_CTX_cleanup(&ctx);
 	
 	EVP_PKEY_free(pkey);
 	
@@ -158,7 +161,7 @@ static EVP_PKEY* load_dsa_key(char *key)
 	[signatureData self];
 	[pathData self];
 	
-	return result;
+	return result == 1;
 }
 
 @end
