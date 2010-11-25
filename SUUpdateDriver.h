@@ -11,7 +11,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-extern NSString *SUUpdateDriverFinishedNotification;
+extern NSString * const SUUpdateDriverFinishedNotification;
 
 @class SUHost, SUUpdater;
 @interface SUUpdateDriver : NSObject

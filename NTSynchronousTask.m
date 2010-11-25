@@ -9,147 +9,7 @@
 #import "Sparkle.h"
 #import "NTSynchronousTask.h"
 
-@interface NTSynchronousTask (Private)
-- (void)run:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input;
-
-- (NSTask *)task;
-- (void)setTask:(NSTask *)theTask;
-
-- (NSPipe *)outputPipe;
-- (void)setOutputPipe:(NSPipe *)theOutputPipe;
-
-- (NSPipe *)inputPipe;
-- (void)setInputPipe:(NSPipe *)theInputPipe;
-
-- (NSData *)output;
-- (void)setOutput:(NSData *)theOutput;
-
-- (BOOL)done;
-- (void)setDone:(BOOL)flag;
-
-- (int)result;
-- (void)setResult:(int)theResult;
-@end
-
 @implementation NTSynchronousTask
-
-- (id)init;
-{
-    self = [super init];
-	if (self)
-	{
-		[self setTask:[[[NSTask alloc] init] autorelease]];
-		[self setOutputPipe:[[[NSPipe alloc] init] autorelease]];
-		[self setInputPipe:[[[NSPipe alloc] init] autorelease]];
-		
-		[[self task] setStandardInput:[self inputPipe]];
-		[[self task] setStandardOutput:[self outputPipe]];
-	}
-	
-    return self;
-}
-
-//---------------------------------------------------------- 
-// dealloc
-//---------------------------------------------------------- 
-- (void)dealloc
-{
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-
-    [self setTask:nil];
-    [self setOutputPipe:nil];
-    [self setInputPipe:nil];
-	[self setOutput:nil];
-
-    [super dealloc];
-}
-
-+ (NSData*)task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input;
-{
-	// we need this wacky pool here, otherwise we run out of pipes, the pipes are internally autoreleased
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	NSData* result=nil;
-	
-	NS_DURING
-	{
-		NTSynchronousTask* task = [[NTSynchronousTask alloc] init];
-		
-		[task run:toolPath directory:currentDirectory withArgs:args input:input];
-		
-		if ([task result] == 0)
-			result = [[task output] retain];
-				
-		[task release];
-	}	
-	NS_HANDLER;
-	NS_ENDHANDLER;
-	
-	[pool drain];
-	
-	// retained above
-	[result autorelease];
-	
-    return result;
-}
-
-@end
-
-@implementation NTSynchronousTask (Private)
-
-- (void)run:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input;
-{
-	BOOL success = NO;
-	
-	if (currentDirectory)
-		[[self task] setCurrentDirectoryPath: currentDirectory];
-	
-	[[self task] setLaunchPath:toolPath];
-	[[self task] setArguments:args];
-				
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(taskOutputAvailable:)
-												 name:NSFileHandleReadToEndOfFileCompletionNotification
-											   object:[[self outputPipe] fileHandleForReading]];
-		
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(taskDidTerminate:)
-												 name:NSTaskDidTerminateNotification
-											   object:[self task]];	
-	
-	[[[self outputPipe] fileHandleForReading] readToEndOfFileInBackgroundAndNotifyForModes:[NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, NSEventTrackingRunLoopMode, nil]];
-	
-	NS_DURING
-		[[self task] launch];
-		success = YES;
-	NS_HANDLER
-		;
-	NS_ENDHANDLER
-	
-	if (success)
-	{
-		if (input)
-		{
-			// feed the running task our input
-			[[[self inputPipe] fileHandleForWriting] writeData:input];
-			[[[self inputPipe] fileHandleForWriting] closeFile];
-		}
-						
-		// loop until we are done receiving the data
-		if (![self done])
-		{
-			double resolution = 1;
-			BOOL isRunning;
-			NSDate* next;
-			
-			do {
-				next = [NSDate dateWithTimeIntervalSinceNow:resolution]; 
-				
-				isRunning = [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
-													 beforeDate:next];
-			} while (isRunning && ![self done]);
-		}
-	}
-}
 
 //---------------------------------------------------------- 
 //  task 
@@ -241,10 +101,6 @@
     mv_result = theResult;
 }
 
-@end
-
-@implementation NTSynchronousTask (Notifications)
-
 - (void)taskOutputAvailable:(NSNotification*)note
 {
 	[self setOutput:[[note userInfo] objectForKey:NSFileHandleNotificationDataItem]];
@@ -257,6 +113,117 @@
     [self setResult:[[self task] terminationStatus]];
 }
 
+- (id)init;
+{
+    self = [super init];
+	if (self)
+	{
+		[self setTask:[[[NSTask alloc] init] autorelease]];
+		[self setOutputPipe:[[[NSPipe alloc] init] autorelease]];
+		[self setInputPipe:[[[NSPipe alloc] init] autorelease]];
+		
+		[[self task] setStandardInput:[self inputPipe]];
+		[[self task] setStandardOutput:[self outputPipe]];
+	}
+	
+    return self;
+}
+
+//---------------------------------------------------------- 
+// dealloc
+//---------------------------------------------------------- 
+- (void)dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+
+    [mv_task release];
+    [mv_outputPipe release];
+    [mv_inputPipe release];
+	[mv_output release];
+
+    [super dealloc];
+}
+
+- (void)run:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input;
+{
+	BOOL success = NO;
+	
+	if (currentDirectory)
+		[[self task] setCurrentDirectoryPath: currentDirectory];
+	
+	[[self task] setLaunchPath:toolPath];
+	[[self task] setArguments:args];
+				
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(taskOutputAvailable:)
+												 name:NSFileHandleReadToEndOfFileCompletionNotification
+											   object:[[self outputPipe] fileHandleForReading]];
+		
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(taskDidTerminate:)
+												 name:NSTaskDidTerminateNotification
+											   object:[self task]];	
+	
+	[[[self outputPipe] fileHandleForReading] readToEndOfFileInBackgroundAndNotifyForModes:[NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, NSEventTrackingRunLoopMode, nil]];
+	
+	@try
+	{
+		[[self task] launch];
+		success = YES;
+	}
+	@catch (NSException *localException) { }
+	
+	if (success)
+	{
+		if (input)
+		{
+			// feed the running task our input
+			[[[self inputPipe] fileHandleForWriting] writeData:input];
+			[[[self inputPipe] fileHandleForWriting] closeFile];
+		}
+						
+		// loop until we are done receiving the data
+		if (![self done])
+		{
+			double resolution = 1;
+			BOOL isRunning;
+			NSDate* next;
+			
+			do {
+				next = [NSDate dateWithTimeIntervalSinceNow:resolution]; 
+				
+				isRunning = [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+													 beforeDate:next];
+			} while (isRunning && ![self done]);
+		}
+	}
+}
+
++ (NSData*)task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input;
+{
+	// we need this wacky pool here, otherwise we run out of pipes, the pipes are internally autoreleased
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	NSData* result=nil;
+	
+	@try
+	{
+		NTSynchronousTask* task = [[NTSynchronousTask alloc] init];
+		
+		[task run:toolPath directory:currentDirectory withArgs:args input:input];
+		
+		if ([task result] == 0)
+			result = [[task output] retain];
+				
+		[task release];
+	}	
+	@catch (NSException *localException) { }
+	
+	[pool drain];
+	
+	// retained above
+	[result autorelease];
+	
+    return result;
+}
+
 @end
-
-

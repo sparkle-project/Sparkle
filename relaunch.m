@@ -1,19 +1,27 @@
 
 #import <AppKit/AppKit.h>
 
-#include <unistd.h>
+#import <unistd.h>
 
 @interface TerminationListener : NSObject
 {
+@private
 	const char *executablePath;
 	pid_t parentProcessId;
 }
 
-- (void) relaunch;
+- (void)relaunch __dead2;
 
 @end
 
 @implementation TerminationListener
+
+- (void)watchdog:(NSTimer *)timer
+{
+	ProcessSerialNumber psn;
+	if (GetProcessForPID(parentProcessId, &psn) == procNotFound)
+		[self relaunch];
+}
 
 - (id) initWithExecutablePath:(const char *)execPath parentProcessId:(pid_t)ppid
 {
@@ -29,21 +37,19 @@
 	return self;
 }
 
-- (void)watchdog:(NSTimer *)timer
-{
-	ProcessSerialNumber psn;
-	if (GetProcessForPID(parentProcessId, &psn) == procNotFound)
-		[self relaunch];
-}
-
 - (void) relaunch
 {
 	[[NSWorkspace sharedWorkspace] openFile:[[NSFileManager defaultManager] stringWithFileSystemRepresentation:executablePath length:strlen(executablePath)]];
+	NSString* path = NSTemporaryDirectory();
+	if (path)
+	{
+		path = [path stringByAppendingPathComponent:@"relaunch"];
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-    [[NSFileManager defaultManager] removeFileAtPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"relaunch"] handler:nil];
+		[[NSFileManager defaultManager] removeFileAtPath:path handler:nil];
 #else
-	[[NSFileManager defaultManager] removeItemAtPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"relaunch"] error:NULL];
+		[[NSFileManager defaultManager] removeItemAtPath:path error:nil];
 #endif
+	}
 	exit(0);
 }
 

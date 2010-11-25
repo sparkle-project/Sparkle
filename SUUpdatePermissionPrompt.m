@@ -39,7 +39,7 @@
 	// the user would not know why the application was paused.
 	if ([aHost isBackgroundApplication]) { [NSApp activateIgnoringOtherApps:YES]; }
 	
-	id prompt = [[[self class] alloc] initWithHost:aHost systemProfile:profile delegate:d];
+	id prompt = [[[[self class] alloc] initWithHost:aHost systemProfile:profile delegate:d] autorelease];
 	[NSApp runModalForWindow:[prompt window]];
 }
 
@@ -125,7 +125,6 @@
 	[delegate updatePermissionPromptFinishedWithResult:([sender tag] == 1 ? SUAutomaticallyCheck : SUDoNotAutomaticallyCheck)];
 	[[self window] close];
 	[NSApp stopModal];
-	[self autorelease];
 }
 
 @end

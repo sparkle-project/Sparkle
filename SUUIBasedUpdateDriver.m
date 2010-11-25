@@ -14,6 +14,13 @@
 
 @implementation SUUIBasedUpdateDriver
 
+- (IBAction)cancelDownload:sender
+{
+	if (download)
+		[download cancel];
+	[self abortUpdate];
+}
+
 - (void)didFindValidUpdate
 {
 	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem host:host];
@@ -61,7 +68,7 @@
 	{
 		case SUInstallUpdateChoice:
 			statusController = [[SUStatusController alloc] initWithHost:host];
-			[statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0 statusText:nil];
+			[statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
 			[statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
 			[statusController showWindow:self];	
 			[self downloadUpdate];
@@ -80,70 +87,67 @@
 	[statusController setMaxProgressValue:[response expectedContentLength]];
 }
 
-- (NSString *)_humanReadableSizeFromDouble:(double)value
+- (NSString *)humanReadableSizeFromDouble:(double)value
 {
-	if (value < 1024)
+	if (value < 1000)
 		return [NSString stringWithFormat:@"%.0lf %@", value, SULocalizedString(@"B", @"the unit for bytes")];
 	
-	if (value < 1024 * 1024)
-		return [NSString stringWithFormat:@"%.0lf %@", value / 1024.0, SULocalizedString(@"KB", @"the unit for kilobytes")];
+	if (value < 1000 * 1000)
+		return [NSString stringWithFormat:@"%.0lf %@", value / 1000.0, SULocalizedString(@"KB", @"the unit for kilobytes")];
 	
-	if (value < 1024 * 1024 * 1024)
-		return [NSString stringWithFormat:@"%.1lf %@", value / 1024.0 / 1024.0, SULocalizedString(@"MB", @"the unit for megabytes")];
+	if (value < 1000 * 1000 * 1000)
+		return [NSString stringWithFormat:@"%.1lf %@", value / 1000.0 / 1000.0, SULocalizedString(@"MB", @"the unit for megabytes")];
 	
-	return [NSString stringWithFormat:@"%.2lf %@", value / 1024.0 / 1024.0 / 1024.0, SULocalizedString(@"GB", @"the unit for gigabytes")];	
+	return [NSString stringWithFormat:@"%.2lf %@", value / 1000.0 / 1000.0 / 1000.0, SULocalizedString(@"GB", @"the unit for gigabytes")];	
 }
 
 - (void)download:(NSURLDownload *)download didReceiveDataOfLength:(NSUInteger)length
 {
-	[statusController setProgressValue:[statusController progressValue] + length];
-	if ([statusController maxProgressValue] > 0)
-		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [self _humanReadableSizeFromDouble:[statusController progressValue]], [self _humanReadableSizeFromDouble:[statusController maxProgressValue]]]];
+	[statusController setProgressValue:[statusController progressValue] + (double)length];
+	if ([statusController maxProgressValue] > 0.0)
+		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [self humanReadableSizeFromDouble:[statusController progressValue]], [self humanReadableSizeFromDouble:[statusController maxProgressValue]]]];
 	else
-		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self _humanReadableSizeFromDouble:[statusController progressValue]]]];
-}
-
-- (IBAction)cancelDownload:sender
-{
-	if (download)
-		[download cancel];
-	[self abortUpdate];
+		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self humanReadableSizeFromDouble:[statusController progressValue]]]];
 }
 
 - (void)extractUpdate
 {
 	// Now we have to extract the downloaded archive.
-	[statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", @"Take care not to overflow the status window.") maxProgressValue:0 statusText:nil];
+	[statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
 	[statusController setButtonEnabled:NO];
 	[super extractUpdate];
 }
 
-- (void)unarchiver:(SUUnarchiver *)ua extractedLength:(long)length
+- (void)unarchiver:(SUUnarchiver *)ua extractedLength:(unsigned long)length
 {
 	// We do this here instead of in extractUpdate so that we only have a determinate progress bar for archives with progress.
-	if ([statusController maxProgressValue] == 0)
+	if ([statusController maxProgressValue] == 0.0)
+	{
+		NSDictionary * attributes;
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-        [statusController setMaxProgressValue:[[[[NSFileManager defaultManager] fileAttributesAtPath:downloadPath traverseLink:NO] objectForKey:NSFileSize] doubleValue]];
+		attributes = [[NSFileManager defaultManager] fileAttributesAtPath:downloadPath traverseLink:NO];
 #else
-		[statusController setMaxProgressValue:[[[[NSFileManager defaultManager] attributesOfItemAtPath:downloadPath error:NULL] objectForKey:NSFileSize] doubleValue]];
+		attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:downloadPath error:nil];
 #endif
-	[statusController setProgressValue:[statusController progressValue] + length];
+		[statusController setMaxProgressValue:[[attributes objectForKey:NSFileSize] doubleValue]];
+	}
+	[statusController setProgressValue:[statusController progressValue] + (double)length];
 }
+
+- (void)installAndRestart:sender { [self installUpdate]; }
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)ua
 {
-	[statusController beginActionWithTitle:SULocalizedString(@"Ready to Install", nil) maxProgressValue:1 statusText:nil];
-	[statusController setProgressValue:1]; // Fill the bar.
+	[statusController beginActionWithTitle:SULocalizedString(@"Ready to Install", nil) maxProgressValue:1.0 statusText:nil];
+	[statusController setProgressValue:1.0]; // Fill the bar.
 	[statusController setButtonEnabled:YES];
 	[statusController setButtonTitle:SULocalizedString(@"Install and Relaunch", nil) target:self action:@selector(installAndRestart:) isDefault:YES];
 	[NSApp requestUserAttention:NSInformationalRequest];	
 }
 
-- (void)installAndRestart:sender { [self installUpdate]; }
-
 - (void)installUpdate
 {
-	[statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"Take care not to overflow the status window.") maxProgressValue:0 statusText:nil];
+	[statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
 	[statusController setButtonEnabled:NO];
 	[super installUpdate];
 	

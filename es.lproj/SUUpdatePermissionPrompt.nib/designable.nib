@@ -2,17 +2,17 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10A432</string>
-		<string key="IBDocument.InterfaceBuilderVersion">732</string>
-		<string key="IBDocument.AppKitVersion">1038</string>
-		<string key="IBDocument.HIToolboxVersion">437.00</string>
+		<string key="IBDocument.SystemVersion">10D573</string>
+		<string key="IBDocument.InterfaceBuilderVersion">785</string>
+		<string key="IBDocument.AppKitVersion">1038.29</string>
+		<string key="IBDocument.HIToolboxVersion">460.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">732</string>
+			<string key="NS.object.0">785</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="41"/>
 			<integer value="6"/>
+			<integer value="39"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -31,7 +31,7 @@
 			<object class="NSWindowTemplate" id="249432238">
 				<int key="NSWindowStyleMask">1</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{83, 491}, {471, 169}}</string>
+				<string key="NSWindowRect">{{83, 472}, {471, 188}}</string>
 				<int key="NSWTFlags">1886912512</int>
 				<string key="NSWindowTitle"/>
 				<object class="NSMutableString" key="NSWindowClass">
@@ -49,7 +49,7 @@
 						<object class="NSButton" id="109751002">
 							<reference key="NSNextResponder" ref="590688073"/>
 							<int key="NSvFlags">257</int>
-							<string key="NSFrame">{{232, 16}, {225, 32}}</string>
+							<string key="NSFrame">{{232, 12}, {225, 32}}</string>
 							<reference key="NSSuperview" ref="590688073"/>
 							<int key="NSTag">1</int>
 							<bool key="NSEnabled">YES</bool>
@@ -76,7 +76,7 @@
 						<object class="NSButton" id="78347976">
 							<reference key="NSNextResponder" ref="590688073"/>
 							<int key="NSvFlags">257</int>
-							<string key="NSFrame">{{101, 16}, {131, 32}}</string>
+							<string key="NSFrame">{{101, 12}, {131, 32}}</string>
 							<reference key="NSSuperview" ref="590688073"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="204847796">
@@ -97,7 +97,7 @@
 						<object class="NSTextField" id="919409379">
 							<reference key="NSNextResponder" ref="590688073"/>
 							<int key="NSvFlags">264</int>
-							<string key="NSFrame">{{104, 115}, {289, 34}}</string>
+							<string key="NSFrame">{{104, 134}, {289, 34}}</string>
 							<reference key="NSSuperview" ref="590688073"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="783143563">
@@ -133,13 +133,13 @@
 						<object class="NSTextField" id="103292136">
 							<reference key="NSNextResponder" ref="590688073"/>
 							<int key="NSvFlags">266</int>
-							<string key="NSFrame">{{104, 59}, {348, 42}}</string>
+							<string key="NSFrame">{{104, 78}, {348, 42}}</string>
 							<reference key="NSSuperview" ref="590688073"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="85448423">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">272629760</int>
-								<string key="NSContents">NO LOCALIZAR</string>
+								<string type="base64-UTF8" key="NSContents">Tk8gTE9DQUxJWkFSCmZvbwpiYXI</string>
 								<object class="NSFont" key="NSSupport" id="26">
 									<string key="NSName">LucidaGrande</string>
 									<double key="NSSize">11</double>
@@ -153,7 +153,7 @@
 						<object class="NSButton" id="782385580">
 							<reference key="NSNextResponder" ref="590688073"/>
 							<int key="NSvFlags">264</int>
-							<string key="NSFrame">{{104, 54}, {278, 18}}</string>
+							<string key="NSFrame">{{104, 50}, {278, 18}}</string>
 							<reference key="NSSuperview" ref="590688073"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="802434944">
@@ -188,7 +188,7 @@
 								<string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
 								<string>NeXT TIFF v4.0 pasteboard type</string>
 							</set>
-							<string key="NSFrame">{{23, 85}, {64, 64}}</string>
+							<string key="NSFrame">{{23, 104}, {64, 64}}</string>
 							<reference key="NSSuperview" ref="590688073"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="491785320">
@@ -208,7 +208,7 @@
 						<object class="NSButton" id="899489358">
 							<reference key="NSNextResponder" ref="590688073"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{83, 51}, {27, 26}}</string>
+							<string key="NSFrame">{{83, 47}, {27, 26}}</string>
 							<reference key="NSSuperview" ref="590688073"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="984934783">
@@ -226,7 +226,7 @@
 							</object>
 						</object>
 					</array>
-					<string key="NSFrameSize">{471, 169}</string>
+					<string key="NSFrameSize">{471, 188}</string>
 					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
@@ -413,7 +413,7 @@
 							<string type="base64-UTF8" key="NSContents">TGEgaW5mb3JtYWNpw7NuIGRlIHBlcmZpbCBkZSBzaXN0ZW1hIGFuw7NuaW1vIHNlIHVzYSBwYXJhIGF5
 dWRhcm5vcyBhIHBsYW5lYXIgZWwgdHJhYmFqbyBkZSBkZXNhcnJvbGxvIGZ1dHVyby4gUG9yIGZhdm9y
 LCBww7NuZ2FzZSBlbiBjb250YWN0byBjb24gbm9zb3Ryb3Mgc2kgdGllbmUgcHJlZ3VudGFzIHNvYnJl
-IGVzdG8uCgpFc3RhIGVzIGxhIGluZm9ybWFjacOzbiBxdWUgc2Ugbm9zIGVudmlhcsOtYTo</string>
+IGVzdG8uCgpFc3RhIGVzIGxhIGluZm9ybWFjacOzbiBxdWUgc2Vyw61hIGVudmlhZGE6A</string>
 							<reference key="NSSupport" ref="26"/>
 							<reference key="NSControlView" ref="591470794"/>
 							<reference key="NSBackgroundColor" ref="138804755"/>
@@ -913,9 +913,9 @@ IGVzdG8uCgpFc3RhIGVzIGxhIGluZm9ybWFjacOzbiBxdWUgc2Ugbm9zIGVudmlhcsOtYTo</string>
 				<boolean value="YES" key="46.ImportedFromIB2"/>
 				<string key="49.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="49.ImportedFromIB2"/>
-				<string key="5.IBEditorWindowLastContentRect">{{0, 676}, {471, 169}}</string>
+				<string key="5.IBEditorWindowLastContentRect">{{0, 657}, {471, 188}}</string>
 				<string key="5.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="5.IBWindowTemplateEditedContentRect">{{0, 676}, {471, 169}}</string>
+				<string key="5.IBWindowTemplateEditedContentRect">{{0, 657}, {471, 188}}</string>
 				<boolean value="YES" key="5.ImportedFromIB2"/>
 				<boolean value="YES" key="5.windowTemplate.hasMinSize"/>
 				<string key="5.windowTemplate.minSize">{213, 107}</string>
@@ -928,7 +928,7 @@ IGVzdG8uCgpFc3RhIGVzIGxhIGluZm9ybWFjacOzbiBxdWUgc2Ugbm9zIGVudmlhcsOtYTo</string>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">174</int>
+			<int key="maxID">188</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1003,11 +1003,39 @@ IGVzdG8uCgpFc3RhIGVzIGxhIGluZm9ybWFjacOzbiBxdWUgc2Ugbm9zIGVudmlhcsOtYTo</string>
 						<string key="finishPrompt:">id</string>
 						<string key="toggleMoreInfo:">id</string>
 					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="finishPrompt:">
+							<string key="name">finishPrompt:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="toggleMoreInfo:">
+							<string key="name">toggleMoreInfo:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="delegate">id</string>
 						<string key="descriptionTextField">NSTextField</string>
 						<string key="moreInfoButton">NSButton</string>
 						<string key="moreInfoView">NSView</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="delegate">
+							<string key="name">delegate</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="descriptionTextField">
+							<string key="name">descriptionTextField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="moreInfoButton">
+							<string key="name">moreInfoButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="moreInfoView">
+							<string key="name">moreInfoView</string>
+							<string key="candidateClassName">NSView</string>
+						</object>
 					</dictionary>
 					<reference key="sourceIdentifier" ref="902463418"/>
 				</object>
@@ -1613,6 +1641,13 @@ IGVzdG8uCgpFc3RhIGVzIGxhIGluZm9ybWFjacOzbiBxdWUgc2Ugbm9zIGVudmlhcsOtYTo</string>
 						<string key="NS.key.0">showWindow:</string>
 						<string key="NS.object.0">id</string>
 					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">showWindow:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">showWindow:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBFrameworkSource</string>
 						<string key="minorKey">AppKit.framework/Headers/NSWindowController.h</string>
@@ -1621,6 +1656,7 @@ IGVzdG8uCgpFc3RhIGVzIGxhIGluZm9ybWFjacOzbiBxdWUgc2Ugbm9zIGVudmlhcsOtYTo</string>
 			</array>
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
+		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
 			<integer value="1050" key="NS.object.0"/>
@@ -1632,5 +1668,9 @@ IGVzdG8uCgpFc3RhIGVzIGxhIGluZm9ybWFjacOzbiBxdWUgc2Ugbm9zIGVudmlhcsOtYTo</string>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<string key="IBDocument.LastKnownRelativeProjectPath">../Sparkle.xcodeproj</string>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
+		<dictionary class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
+			<string key="NSApplicationIcon">{128, 128}</string>
+			<string key="NSSwitch">{15, 15}</string>
+		</dictionary>
 	</data>
 </archive>

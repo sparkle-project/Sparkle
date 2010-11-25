@@ -14,9 +14,9 @@
 
 - (id)initWithBundle:(NSBundle *)aBundle
 {
-    if (aBundle == nil) aBundle = [NSBundle mainBundle];
 	if ((self = [super init]))
 	{
+		if (aBundle == nil) aBundle = [NSBundle mainBundle];
         bundle = [aBundle retain];
 		if (![bundle bundleIdentifier])
 			NSLog(@"Sparkle Error: the bundle being updated at %@ has no CFBundleIdentifier! This will cause preference read/write to not work properly.", bundle);
@@ -83,7 +83,17 @@
 		iconPath = [bundle pathForResource:[bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType: nil];
 	NSImage *icon = [[[NSImage alloc] initWithContentsOfFile:iconPath] autorelease];
 	// Use a default icon if none is defined.
-	if (!icon) { icon = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(bundle == [NSBundle mainBundle] ? kGenericApplicationIcon : UTGetOSTypeFromString(CFSTR("BNDL")))]; }
+	if (!icon) {
+		BOOL isMainBundle = (bundle == [NSBundle mainBundle]);
+		
+		// Starting with 10.6, iconForFileType: accepts a UTI.
+		NSString *fileType = nil;
+		if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_5)
+			fileType = isMainBundle ? NSFileTypeForHFSTypeCode(kGenericApplicationIcon) : @".bundle";
+		else
+			fileType = isMainBundle ? (NSString*)kUTTypeApplication : (NSString*)kUTTypeBundle;
+		icon = [[NSWorkspace sharedWorkspace] iconForFileType:fileType];
+	}
 	return icon;
 }
 
@@ -98,8 +108,8 @@
 {
 	ProcessSerialNumber PSN;
 	GetCurrentProcess(&PSN);
-	NSDictionary * processInfo = (NSDictionary *)ProcessInformationCopyDictionary(&PSN, kProcessDictionaryIncludeAllInformationMask);
-	BOOL isElement = [[processInfo objectForKey:@"LSUIElement"] boolValue];
+	CFDictionaryRef processInfo = ProcessInformationCopyDictionary(&PSN, kProcessDictionaryIncludeAllInformationMask);
+	BOOL isElement = [[(NSDictionary *)processInfo objectForKey:@"LSUIElement"] boolValue];
 	if (processInfo)
 		CFRelease(processInfo);
 	return isElement;
@@ -114,7 +124,7 @@
 	// More likely, we've got a reference to a Resources file by filename:
 	NSString *keyFilename = [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];
 	if (!keyFilename) { return nil; }
-	NSError *ignoreErr;
+	NSError *ignoreErr = nil;
 	return [NSString stringWithContentsOfFile:[bundle pathForResource:keyFilename ofType:nil] encoding:NSASCIIStringEncoding error: &ignoreErr];
 }
 
@@ -135,18 +145,14 @@
 
 - (id)objectForUserDefaultsKey:(NSString *)defaultName
 {
-	// Under Tiger, CFPreferencesCopyAppValue doesn't get values from NSRegistratioDomain, so anything
+	// Under Tiger, CFPreferencesCopyAppValue doesn't get values from NSRegistrationDomain, so anything
 	// passed into -[NSUserDefaults registerDefaults:] is ignored.  The following line falls
 	// back to using NSUserDefaults, but only if the host bundle is the main bundle.
 	if (bundle == [NSBundle mainBundle])
 		return [[NSUserDefaults standardUserDefaults] objectForKey:defaultName];
 	
 	CFPropertyListRef obj = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
-#if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4
-	return [NSMakeCollectable(obj) autorelease];
-#else
-	return [(id)obj autorelease];
-#endif	
+	return [(id)CFMakeCollectable(obj) autorelease];
 }
 
 - (void)setObject:(id)value forUserDefaultsKey:(NSString *)defaultName;
@@ -195,7 +201,7 @@
 }
 
 - (id)objectForKey:(NSString *)key {
-    return [self objectForUserDefaultsKey:key] ?: [self objectForInfoDictionaryKey:key];
+    return [self objectForUserDefaultsKey:key] ? [self objectForUserDefaultsKey:key] : [self objectForInfoDictionaryKey:key];
 }
 
 - (BOOL)boolForKey:(NSString *)key {

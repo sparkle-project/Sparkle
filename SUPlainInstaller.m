@@ -8,23 +8,24 @@
 
 #import "SUPlainInstaller.h"
 #import "SUPlainInstallerInternals.h"
+#import "SUHost.h"
 
-NSString *SUInstallerPathKey = @"SUInstallerPath";
-NSString *SUInstallerTargetPathKey = @"SUInstallerTargetPath";
-NSString *SUInstallerTempNameKey = @"SUInstallerTempName";
-NSString *SUInstallerHostKey = @"SUInstallerHost";
-NSString *SUInstallerDelegateKey = @"SUInstallerDelegate";
-NSString *SUInstallerResultKey = @"SUInstallerResult";
-NSString *SUInstallerErrorKey = @"SUInstallerError";
+static NSString * const SUInstallerPathKey = @"SUInstallerPath";
+static NSString * const SUInstallerTargetPathKey = @"SUInstallerTargetPath";
+static NSString * const SUInstallerTempNameKey = @"SUInstallerTempName";
+static NSString * const SUInstallerHostKey = @"SUInstallerHost";
+static NSString * const SUInstallerDelegateKey = @"SUInstallerDelegate";
+static NSString * const SUInstallerResultKey = @"SUInstallerResult";
+static NSString * const SUInstallerErrorKey = @"SUInstallerError";
 
 @implementation SUPlainInstaller
 
-+ (void)_finishInstallationWithInfo:(NSDictionary *)info
++ (void)finishInstallationWithInfo:(NSDictionary *)info
 {
-	[self _finishInstallationWithResult:[[info objectForKey:SUInstallerResultKey] boolValue] host:[info objectForKey:SUInstallerHostKey] error:[info objectForKey:SUInstallerErrorKey] delegate:[info objectForKey:SUInstallerDelegateKey]];
+	[self finishInstallationWithResult:[[info objectForKey:SUInstallerResultKey] boolValue] host:[info objectForKey:SUInstallerHostKey] error:[info objectForKey:SUInstallerErrorKey] delegate:[info objectForKey:SUInstallerDelegateKey]];
 }
 
-+ (void)_performInstallationWithInfo:(NSDictionary *)info
++ (void)performInstallationWithInfo:(NSDictionary *)info
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
@@ -36,7 +37,7 @@ NSString *SUInstallerErrorKey = @"SUInstallerError";
 	[mutableInfo setObject:[NSNumber numberWithBool:result] forKey:SUInstallerResultKey];
 	if (!result && error)
 		[mutableInfo setObject:error forKey:SUInstallerErrorKey];
-	[self performSelectorOnMainThread:@selector(_finishInstallationWithInfo:) withObject:mutableInfo waitUntilDone:NO];
+	[self performSelectorOnMainThread:@selector(finishInstallationWithInfo:) withObject:mutableInfo waitUntilDone:NO];
     
 	[pool drain];
 }
@@ -48,7 +49,7 @@ NSString *SUInstallerErrorKey = @"SUInstallerError";
 	{
 		NSString * errorMessage = [NSString stringWithFormat:@"Sparkle Updater: Possible attack in progress! Attempting to \"upgrade\" from %@ to %@. Aborting update.", [host version], [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:@"CFBundleVersion"]];
 		NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
-		[self _finishInstallationWithResult:NO host:host error:error delegate:delegate];
+		[self finishInstallationWithResult:NO host:host error:error delegate:delegate];
 		return;
 	}
     
@@ -56,9 +57,9 @@ NSString *SUInstallerErrorKey = @"SUInstallerError";
     NSString *tempName = [self temporaryNameForPath:targetPath];
 	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:path, SUInstallerPathKey, targetPath, SUInstallerTargetPathKey, tempName, SUInstallerTempNameKey, host, SUInstallerHostKey, delegate, SUInstallerDelegateKey, nil];
 	if (synchronously)
-		[self _performInstallationWithInfo:info];
+		[self performInstallationWithInfo:info];
 	else
-		[NSThread detachNewThreadSelector:@selector(_performInstallationWithInfo:) toTarget:self withObject:info];
+		[NSThread detachNewThreadSelector:@selector(performInstallationWithInfo:) toTarget:self withObject:info];
 }
 
 @end
