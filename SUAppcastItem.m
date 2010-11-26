@@ -180,7 +180,8 @@
             [self setDate:[dict objectForKey:@"pubDate"]];
             [self setItemDescription:[dict objectForKey:@"description"]];
             
-            [self setFileURL:[NSURL URLWithString:[[enclosure objectForKey:@"url"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+			NSString *fileURLString = [[[enclosure objectForKey:@"url"] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            [self setFileURL:[NSURL URLWithString:fileURLString]];
             [self setDSASignature:[enclosure objectForKey:@"sparkle:dsaSignature"]];		
             
             [self setVersionString:newVersion];
