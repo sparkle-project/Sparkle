@@ -1283,7 +1283,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
 			buildSettings = {
-				LIBRARY_SEARCH_PATHS = "";
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
 		};
@@ -1326,7 +1325,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
 			buildSettings = {
-				LIBRARY_SEARCH_PATHS = "";
 			};
 			name = Debug;
 		};
@@ -1334,7 +1332,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
 			buildSettings = {
-				LIBRARY_SEARCH_PATHS = "";
 			};
 			name = Release;
 		};
