@@ -37,7 +37,6 @@
 		6102FE4B0E07803800F85D09 /* SUDiskImageUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 6102FE490E07803800F85D09 /* SUDiskImageUnarchiver.m */; };
 		6102FE5B0E08C7EC00F85D09 /* SUUnarchiver_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6102FE590E08C7EC00F85D09 /* SUUnarchiver_Private.h */; settings = {ATTRIBUTES = (); }; };
 		6102FE5C0E08C7EC00F85D09 /* SUUnarchiver_Private.m in Sources */ = {isa = PBXBuildFile; fileRef = 6102FE5A0E08C7EC00F85D09 /* SUUnarchiver_Private.m */; };
-		610D5A1A0A1661B8004AAD9C /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; };
 		610D5A750A1670A4004AAD9C /* SUStatus.nib in Resources */ = {isa = PBXBuildFile; fileRef = 610D5A740A1670A4004AAD9C /* SUStatus.nib */; };
 		610EC1E00CF3A5FE00AE239E /* NTSynchronousTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 610EC1BF0CF3914D00AE239E /* NTSynchronousTask.m */; };
 		611142E910FB1BE5009810AA /* bspatch.h in Headers */ = {isa = PBXBuildFile; fileRef = 611142E810FB1BE5009810AA /* bspatch.h */; };
@@ -387,7 +386,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				61B5F90F09C4CF3A00B25A18 /* Sparkle.framework in Frameworks */,
-				610D5A1A0A1661B8004AAD9C /* Sparkle.framework in Frameworks */,
 				525A27A0133D6B9700FD8D70 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
