@@ -1231,7 +1231,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
-				GCC_DEBUGGING_SYMBOLS = full;
 			};
 			name = Release;
 		};
