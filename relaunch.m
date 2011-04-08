@@ -1,5 +1,5 @@
 
-#import <AppKit/AppKit.h>
+#import <Cocoa/Cocoa.h>
 
 #import <unistd.h>
 
