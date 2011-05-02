@@ -35,6 +35,11 @@
 		host = [aHost retain];
 		updateItem = [item retain];
 		[self setShouldCascadeWindows:NO];
+		
+		// Alex: This dummy line makes sure that the binary is linked against WebKit.
+		// The SUUpdateAlert.xib file contains a WebView and if we don't link against WebKit,
+		// we will get a runtime crash when decoding the NIB. It is better to get a link error.
+		[WebView MIMETypesShownAsHTML];
 	}
 	return self;
 }
