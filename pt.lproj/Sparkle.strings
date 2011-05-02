@@ -93,3 +93,8 @@
 
 /* No comment provided by engineer. */
 "You're up-to-date!" = "Você está atualizado!";
+
+/* Alternative name for "Install" button if we have a paid update or other update
+	without a download but with a URL. */
+
+"Learn More..." = "Learn More…";
