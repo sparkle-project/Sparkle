@@ -52,6 +52,10 @@
 	<string>Mac Pro (eight-core)</string>
 	<key>MacPro3,1</key>
 	<string>Mac Pro (January 2008 4- or 8- core &quot;Harpertown&quot;)</string>
+	<key>MacPro4,1</key>
+	<string>Mac Pro (March 2009)</string>
+	<key>MacPro5,1</key>
+	<string>Mac Pro (August 2010)</string>
 	<key>PowerBook1,1</key>
 	<string>PowerBook G3</string>
 	<key>PowerBook2,1</key>
