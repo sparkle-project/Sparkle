@@ -64,22 +64,22 @@
 		[delegate updateAlert:self finishedWithChoice:choice];
 }
 
-- (IBAction)installUpdate:sender
+- (IBAction)installUpdate: (id)sender
 {
 	[self endWithSelection:SUInstallUpdateChoice];
 }
 
-- (IBAction)openInfoURL:sender
+- (IBAction)openInfoURL: (id)sender
 {
 	[self endWithSelection:SUOpenInfoURLChoice];
 }
 
-- (IBAction)skipThisVersion:sender
+- (IBAction)skipThisVersion: (id)sender
 {
 	[self endWithSelection:SUSkipThisVersionChoice];
 }
 
-- (IBAction)remindMeLater:sender
+- (IBAction)remindMeLater: (id)sender
 {
 	[self endWithSelection:SURemindMeLaterChoice];
 }
@@ -171,6 +171,41 @@
 		boxFrame.size.height += 20;
 		[[[releaseNotesView superview] superview] setFrame:boxFrame];
 	}
+		
+	if( [updateItem fileURL] == nil )	// UK 2007-08-31 (whole if clause)
+	{
+		[installButton setTitle: SULocalizedString( @"Learn More...", @"Alternate title for 'Install Update' button when there's no download in RSS feed." )];
+		[installButton setAction: @selector(openInfoURL:)];
+	}
+	
+	// Make sure button widths are OK:
+	#define DISTANCE_BETWEEN_BUTTONS		3
+	#define DISTANCE_BETWEEN_BUTTON_GROUPS	12
+	
+	CGFloat				minimumWindowWidth = [[self window] frame].size.width -NSMaxX([installButton frame]) +NSMinX([skipButton frame]);	// Distance between contents and left/right edge.
+	NSDictionary*		attrs = [NSDictionary dictionaryWithObjectsAndKeys: [installButton font], NSFontAttributeName, nil];
+	NSSize				titleSize = [[installButton title] sizeWithAttributes: attrs];
+	titleSize.width += (16 + 8) * 2;	// 16 px for the end caps plus 8 px padding at each end or it'll look as ugly as calling -sizeToFit.
+	NSRect				installBtnBox = [installButton frame];
+	installBtnBox.origin.x += installBtnBox.size.width -titleSize.width;
+	installBtnBox.size.width = titleSize.width;
+	[installButton setFrame: installBtnBox];
+	minimumWindowWidth += titleSize.width;
+	
+	titleSize = [[laterButton title] sizeWithAttributes: attrs];
+	titleSize.width += (16 + 8) * 2;	// 16 px for the end caps plus 8 px padding at each end or it'll look as ugly as calling -sizeToFit.
+	NSRect				laterBtnBox = [installButton frame];
+	laterBtnBox.origin.x = installBtnBox.origin.x -DISTANCE_BETWEEN_BUTTONS -titleSize.width;
+	laterBtnBox.size.width = titleSize.width;
+	[laterButton setFrame: laterBtnBox];
+	minimumWindowWidth += DISTANCE_BETWEEN_BUTTONS +titleSize.width;
+	
+	titleSize = [[skipButton title] sizeWithAttributes: attrs];
+	titleSize.width += (16 + 8) * 2;	// 16 px for the end caps plus 8 px padding at each end or it'll look as ugly as calling -sizeToFit.
+	NSRect				skipBtnBox = [skipButton frame];
+	skipBtnBox.size.width = titleSize.width;
+	[skipButton setFrame: skipBtnBox];
+	minimumWindowWidth += DISTANCE_BETWEEN_BUTTON_GROUPS +titleSize.width;
 	
 	if( showReleaseNotes )	// UK 2007-09-18 (whole block)
 	{
@@ -195,7 +230,10 @@
 		}
 	}
 	
-	[[self window] setFrame:frame display:NO];
+	if( frame.size.width < minimumWindowWidth )
+		frame.size.width = minimumWindowWidth;
+
+	[[self window] setFrame: frame display: NO];
 	[[self window] center];
 	
 	if (showReleaseNotes)	// UK 2007-09-18
@@ -204,12 +242,7 @@
 	}
 	
 	[[[releaseNotesView superview] superview] setHidden: !showReleaseNotes];	// UK 2007-09-18
-	
-	if( [updateItem fileURL] == nil )	// UK 2007-08-31 (whole if clause)
-	{
-		[installButton setTitle: SULocalizedString( @"Learn More...", @"Alternate title for 'Install Update' button." )];
-		[installButton setAction: @selector(openInfoURL:)];
-	}
+
 }
 
 -(BOOL)showsReleaseNotesText
