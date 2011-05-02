@@ -161,7 +161,13 @@
 	{
 		// Resize the window to be appropriate for not having a huge release notes view.
 		frame.size.height -= [releaseNotesView frame].size.height + 40; // Extra 40 is for the release notes label and margin.
-		[[self window] setShowsResizeIndicator:NO];
+		
+		// Hiding the resize handles is not enough on 10.5, you can still click
+		//	where they would be, so we set the min/max sizes to be equal to
+		//	inhibit resizing completely:
+		[[self window] setShowsResizeIndicator: NO];
+		[[self window] setMinSize: frame.size];
+		[[self window] setMaxSize: frame.size];
 	}
 	
 	if (![self allowsAutomaticUpdates])
