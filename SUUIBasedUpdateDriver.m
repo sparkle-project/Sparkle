@@ -48,6 +48,7 @@
 {
 	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
 		[[updater delegate] updaterDidNotFindUpdate:updater];
+	
 	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"You're up-to-date!", nil) defaultButton:SULocalizedString(@"OK", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [host name], [host displayVersion]];
 	[self showModalAlert:alert];
 	[self abortUpdate];
@@ -206,12 +207,18 @@
 
 - (void)showModalAlert:(NSAlert *)alert
 {
+	if ([[updater delegate] respondsToSelector:@selector(updaterWillShowModalAlert:)])
+		[[updater delegate] updaterWillShowModalAlert: updater];
+
 	// When showing a modal alert we need to ensure that background applications
 	// are focused to inform the user since there is no dock icon to notify them.
 	if ([host isBackgroundApplication]) { [NSApp activateIgnoringOtherApps:YES]; }
 	
 	[alert setIcon:[host icon]];
 	[alert runModal];
+	
+	if ([[updater delegate] respondsToSelector:@selector(updaterDidShowModalAlert:)])
+		[[updater delegate] updaterDidShowModalAlert: updater];
 }
 
 @end

@@ -30,6 +30,10 @@
 - (void)unregisterAsObserver;
 - (void)updateDriverDidFinish:(NSNotification *)note;
 - (NSURL *)parameterizedFeedURL;
+
+-(void)	notifyWillShowAlert;
+-(void)	notifyDidShowAlert;
+
 @end
 
 @implementation SUUpdater
@@ -76,13 +80,18 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 #if !ENDANGER_USERS_WITH_INSECURE_UPDATES
 		// Saving-the-developer-from-a-stupid-mistake-check:
 		if (![[[self feedURL] scheme] isEqualToString:@"https"] && ![host publicDSAKey])
+		{
+			[self notifyWillShowModalAlert];
 			NSRunAlertPanel(@"Insecure update error!", @"For security reasons, you need to distribute your appcast over SSL or sign your updates. See Sparkle's documentation for more information.", @"OK", nil, nil);
+			[self notifyDidShowModalAlert];
+		}
 #endif
         // This runs the permission prompt if needed, but never before the app has finished launching because the runloop won't run before that
         [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:0];
 	}
 	return self;
 }
+
 
 // This will be used when the updater is instantiated in a nib such as MainMenu
 - (id)init
@@ -91,6 +100,21 @@ static NSString *SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObserv
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [host bundlePath], [host installationPath]]; }
+
+
+-(void)	notifyWillShowModalAlert
+{
+	if( [delegate respondsToSelector: @selector(updaterWillShowModalAlert:)] )
+		[delegate updaterWillShowModalAlert: self];
+}
+
+
+-(void)	notifyDidShowModalAlert
+{
+	if( [delegate respondsToSelector: @selector(updaterDidShowModalAlert:)] )
+		[delegate updaterDidShowModalAlert: self];
+}
+
 
 - (void)startUpdateCycle
 {

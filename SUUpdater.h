@@ -148,6 +148,11 @@
 // Returns the path which is used to relaunch the client after the update is installed. By default, the path of the host bundle.
 - (NSString *)pathToRelaunchForUpdater:(SUUpdater *)updater;
 
+// Called before resp. after an updater shows a modal alert window, to give the host
+//	the opportunity to hide attached windows etc. that may get in the way:
+-(void)	updaterWillShowModalAlert:(SUUpdater *)updater;
+-(void)	updaterDidShowModalAlert:(SUUpdater *)updater;
+
 @end
 
 
@@ -156,13 +161,13 @@
 // -----------------------------------------------------------------------------
 
 // Define some minimum intervals to avoid DOS-like checking attacks. These are in seconds.
-#ifdef DEBUG && 0
+#if DEBUG && 0
 #define SU_MIN_CHECK_INTERVAL 60
 #else
 #define SU_MIN_CHECK_INTERVAL 60*60
 #endif
 
-#ifdef DEBUG && 0
+#if DEBUG && 0
 #define SU_DEFAULT_CHECK_INTERVAL 60
 #else
 #define SU_DEFAULT_CHECK_INTERVAL 60*60*24
