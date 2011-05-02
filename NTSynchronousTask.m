@@ -148,7 +148,7 @@
     [super dealloc];
 }
 
-- (void)run:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input;
+- (void)run:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input
 {
 	BOOL success = NO;
 	
@@ -203,7 +203,7 @@
 	}
 }
 
-+ (NSData*)task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input;
++ (NSData*)task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input
 {
 	// we need this wacky pool here, otherwise we run out of pipes, the pipes are internally autoreleased
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -228,6 +228,40 @@
 	[result autorelease];
 	
     return result;
+}
+
+
++(int)	task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input output: (NSData**)outData
+{
+	// we need this wacky pool here, otherwise we run out of pipes, the pipes are internally autoreleased
+	NSAutoreleasePool *	pool = [[NSAutoreleasePool alloc] init];
+	int					taskResult = 0;
+	if( outData )
+		*outData = nil;
+	
+	NS_DURING
+	{
+		NTSynchronousTask* task = [[NTSynchronousTask alloc] init];
+		
+		[task run:toolPath directory:currentDirectory withArgs:args input:input];
+		
+		taskResult = [task result];
+		if( outData )
+			*outData = [[task output] retain];
+				
+		[task release];
+	}	
+	NS_HANDLER;
+		taskResult = errCppGeneral;
+	NS_ENDHANDLER;
+	
+	[pool drain];
+	
+	// retained above
+	if( outData )
+		[*outData autorelease];
+	
+    return taskResult;
 }
 
 @end

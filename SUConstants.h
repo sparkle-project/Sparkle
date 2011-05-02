@@ -26,6 +26,9 @@
 //	following on to always reset the name back to "MyApp":
 #define NORMALIZE_INSTALLED_APP_NAME				1
 
+
+#define TRY_TO_APPEND_VERSION_NUMBER				1
+
 // -----------------------------------------------------------------------------
 //	Notifications:
 // -----------------------------------------------------------------------------

@@ -21,6 +21,8 @@
 }
 
 - (void)showModalAlert:(NSAlert *)alert;
+- (IBAction)cancelDownload: (id)sender;
+- (void)installAndRestart: (id)sender;
 
 @end
 

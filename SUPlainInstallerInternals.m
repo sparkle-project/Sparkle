@@ -103,7 +103,8 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	UInt8			trashPath[MAXPATHLEN +1] = { 0 };
 	FSRef			trashRef, pathRef;
 	FSVolumeRefNum	vSrcRefNum = kFSInvalidVolumeRefNum;
-	FSCatalogInfo	catInfo = { 0 };
+	FSCatalogInfo	catInfo;
+	memset( &catInfo, 0, sizeof(catInfo) );
 	OSStatus err = FSPathMakeRef( (UInt8*) [path fileSystemRepresentation], &pathRef, NULL );
 	if( err == noErr )
 	{

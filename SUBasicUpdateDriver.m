@@ -263,18 +263,17 @@
 		[[updater delegate] updater:updater willInstallUpdate:updateItem];
 	
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
-	NSString *relaunchPathToCopy = [SPARKLE_BUNDLE pathForResource:@"relaunch" ofType:@""];
+	NSString *relaunchPathToCopy = [SPARKLE_BUNDLE pathForResource:@"finish_installation" ofType:@"app"];
 	NSString *targetPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
 	NSError *error = nil;
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	[[NSFileManager defaultManager] createDirectoryAtPath: [targetPath stringByDeletingLastPathComponent] attributes: [NSDictionary dictionary]];
 #else
-	[[NSFileManager defaultManager] createDirectoryAtPath: [targetPath stringByDeletingLastPathComponent] withIntermediateDirectories: YES attributes: [NSDictionary dictionary] error: NULL];
+	[[NSFileManager defaultManager] createDirectoryAtPath: [targetPath stringByDeletingLastPathComponent] withIntermediateDirectories: YES attributes: [NSDictionary dictionary] error: &error];
 #endif
 
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
-	NSError *error = nil;
 	if( [SUPlainInstaller copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath temporaryName: nil error: &error] )
 		relaunchPath = [targetPath retain];
 	else
@@ -293,8 +292,8 @@
 		static BOOL postponedOnce = NO;
 		if (!postponedOnce && [[updater delegate] respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
 		{
-			NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(relaunchHostApp)]];
-			[invocation setSelector:@selector(relaunchHostApp)];
+			NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installAndRelaunchWithTool)]];
+			[invocation setSelector:@selector(installAndRelaunchWithTool)];
 			[invocation setTarget:self];
 			postponedOnce = YES;
 			if ([[updater delegate] updater:updater shouldPostponeRelaunchForUpdate:updateItem untilInvoking:invocation])
