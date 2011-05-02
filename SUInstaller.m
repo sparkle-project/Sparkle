@@ -23,7 +23,7 @@ static NSString*	sUpdateFolder = nil;
 	return sUpdateFolder;
 }
 
-+ (BOOL)_isAliasFolderAtPath:(NSString *)path
++ (BOOL)isAliasFolderAtPath:(NSString *)path
 {
 	FSRef fileRef;
 	OSStatus err = noErr;
@@ -95,7 +95,7 @@ static NSString*	sUpdateFolder = nil;
 		}
 		
 		// Some DMGs have symlinks into /Applications! That's no good!
-		if ([self _isAliasFolderAtPath:currentPath])
+		if ([self isAliasFolderAtPath:currentPath])
 			[dirEnum skipDescendents];
 	}
 	
@@ -109,7 +109,7 @@ static NSString*	sUpdateFolder = nil;
 	
 	if (newAppDownloadPath == nil)
 	{
-		[self _finishInstallationWithResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find an appropriate update in the downloaded package." forKey:NSLocalizedDescriptionKey]] delegate:delegate];
+		[self finishInstallationWithResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find an appropriate update in the downloaded package." forKey:NSLocalizedDescriptionKey]] delegate:delegate];
 	}
 	else
 	{
@@ -117,7 +117,7 @@ static NSString*	sUpdateFolder = nil;
 	}
 }
 
-+ (void)_mdimportHost:(SUHost *)host
++ (void)mdimportHost:(SUHost *)host
 {
 	// *** GETS CALLED ON NON-MAIN THREAD!
 	
@@ -143,13 +143,11 @@ static NSString*	sUpdateFolder = nil;
 #define		SUNotifyDictErrorKey	@"SUNotifyDictError"
 #define		SUNotifyDictDelegateKey	@"SUNotifyDictDelegate"
 
-+ (void)_finishInstallationWithResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:delegate
++ (void)finishInstallationWithResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:delegate
 {
-	// *** GETS CALLED ON NON-MAIN THREAD!
-	
-	if (result == YES)
+	if (result)
 	{
-		[self _mdimportHost:host];
+		[self mdimportHost:host];
 		if ([delegate respondsToSelector:@selector(installerFinishedForHost:)])
 			[delegate performSelectorOnMainThread: @selector(installerFinishedForHost:) withObject: host waitUntilDone: NO];
 	}

@@ -15,6 +15,22 @@
 #import "SUConstants.h"
 #import "SULog.h"
 
+@interface NSXMLElement (SUAppcastExtensions)
+- (NSDictionary *)attributesAsDictionary;
+@end
+
+@implementation NSXMLElement (SUAppcastExtensions)
+- (NSDictionary *)attributesAsDictionary
+{
+	NSEnumerator *attributeEnum = [[self attributes] objectEnumerator];
+	NSXMLNode *attribute;
+	NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+
+	while ((attribute = [attributeEnum nextObject]))
+		[dictionary setObject:[attribute stringValue] forKey:[attribute name]];
+	return dictionary;
+}
+@end
 
 @interface SUAppcast (Private)
 - (void)reportError:(NSError *)error;
@@ -31,6 +47,8 @@
 	userAgentString = nil;
 	[downloadFilename release];
 	downloadFilename = nil;
+	[download release];
+	download = nil;
 	
 	[super dealloc];
 }
@@ -46,44 +64,50 @@
     if (userAgentString)
         [request setValue:userAgentString forHTTPHeaderField:@"User-Agent"];
             
-    NSURLDownload *download = [[[NSURLDownload alloc] initWithRequest:request delegate:self] autorelease];
-    CFRetain(download);
+    download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
 }
 
-- (void)download:(NSURLDownload *)download decideDestinationWithSuggestedFilename:(NSString *)filename
+- (void)download:(NSURLDownload *)aDownload decideDestinationWithSuggestedFilename:(NSString *)filename
 {
-    NSString *destinationFilename = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
-    [download setDestination:destinationFilename allowOverwrite:NO];
+	NSString* destinationFilename = NSTemporaryDirectory();
+	if (destinationFilename)
+	{
+		destinationFilename = [destinationFilename stringByAppendingPathComponent:filename];
+		[download setDestination:destinationFilename allowOverwrite:NO];
+	}
 }
 
-- (void)download:(NSURLDownload *)download didCreateDestination:(NSString *)path
+- (void)download:(NSURLDownload *)aDownload didCreateDestination:(NSString *)path
 {
     [downloadFilename release];
     downloadFilename = [path copy];
 }
 
-- (void)downloadDidFinish:(NSURLDownload *)download
-{
-	CFRelease(download);
-    
+- (void)downloadDidFinish:(NSURLDownload *)aDownload
+{    
 	NSError *error = nil;
-    NSXMLDocument *document = [[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:0 error:&error];
+	
+	NSXMLDocument *document = nil;
 	BOOL failed = NO;
 	NSArray *xmlItems = nil;
 	NSMutableArray *appcastItems = [NSMutableArray array];
-
-	#if DEBUG
-	NSString* debugXML = [NSString stringWithContentsOfFile: downloadFilename encoding: NSUTF8StringEncoding error: nil];
-	SULog(@"<<<< XML >>>>\n%@\n>>>> XML <<<<", debugXML);
-	#endif
+	
+	if (downloadFilename)
+	{
+		document = [[[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:0 error:&error] autorelease];
 	
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-    [[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
+		[[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
 #else
-    [[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:NULL];
+		[[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:nil];
 #endif
-    [downloadFilename release];
-    downloadFilename = nil;
+		[downloadFilename release];
+		downloadFilename = nil;
+	}
+	else
+	{
+		failed = YES;
+	}
     
     if (nil == document)
     {
@@ -137,12 +161,7 @@
 				if ([name isEqualToString:@"enclosure"])
 				{
 					// enclosure is flattened as a separate dictionary for some reason
-					NSEnumerator *attributeEnum = [[(NSXMLElement *)node attributes] objectEnumerator];
-					NSXMLNode *attribute;
-					NSMutableDictionary *encDict = [NSMutableDictionary dictionary];
-					
-					while ((attribute = [attributeEnum nextObject]))
-						[encDict setObject:[attribute stringValue] forKey:[attribute name]];
+					NSDictionary *encDict = [(NSXMLElement *)node attributesAsDictionary];
 					[dict setObject:encDict forKey:@"enclosure"];
 					
 				}
@@ -153,19 +172,29 @@
 					if (date)
 						[dict setObject:date forKey:name];
 				}
-                else if (name != nil)
-                {
+				else if ([name isEqualToString:@"sparkle:deltas"])
+				{
+					NSMutableArray *deltas = [NSMutableArray array];
+					NSEnumerator *childEnum = [[node children] objectEnumerator];
+					NSXMLNode *child;
+					while ((child = [childEnum nextObject])) {
+						if ([[child name] isEqualToString:@"enclosure"])
+							[deltas addObject:[(NSXMLElement *)child attributesAsDictionary]];
+					}
+					[dict setObject:deltas forKey:@"deltas"];
+				}
+				else if (name != nil)
+				{
 					// add all other values as strings
 					[dict setObject:[[node stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] forKey:name];
 				}
             }
             
 			NSString *errString;
-			SUAppcastItem *anItem = [[SUAppcastItem alloc] initWithDictionary:dict failureReason:&errString];
+			SUAppcastItem *anItem = [[[SUAppcastItem alloc] initWithDictionary:dict failureReason:&errString] autorelease];
             if (anItem)
             {
                 [appcastItems addObject:anItem];
-                [anItem release];
 			}
             else
             {
@@ -175,8 +204,6 @@
             [dict removeAllObjects];
 		}
 	}
-    
-	[document release];
 	
 	if ([appcastItems count])
     {
@@ -195,15 +222,14 @@
 	}
 }
 
-- (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
+- (void)download:(NSURLDownload *)aDownload didFailWithError:(NSError *)error
 {
-	CFRelease(download);
 	if (downloadFilename)
 	{
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 		[[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
 #else
-		[[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:NULL];
+		[[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:nil];
 #endif
 	}
     [downloadFilename release];
@@ -212,7 +238,7 @@
 	[self reportError:error];
 }
 
-- (NSURLRequest *)download:(NSURLDownload *)download willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse
+- (NSURLRequest *)download:(NSURLDownload *)aDownload willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse
 {
 	return request;
 }
@@ -237,7 +263,7 @@
     NSXMLElement *node;
     NSMutableArray *languages = [NSMutableArray array];
     NSString *lang;
-    NSInteger i;
+    NSUInteger i;
     while ((node = [nodeEnum nextObject]))
     {
         lang = [[node attributeForName:@"xml:lang"] stringValue];

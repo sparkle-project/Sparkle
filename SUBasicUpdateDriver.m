@@ -17,6 +17,7 @@
 #import "SULog.h"
 #import "SUPlainInstaller.h"
 #import "SUPlainInstallerInternals.h"
+#import "SUBinaryDeltaCommon.h"
 
 
 @implementation SUBasicUpdateDriver
@@ -39,7 +40,7 @@
 	[appcast fetchAppcastFromURL:URL];
 }
 
-- (id <SUVersionComparison>)_versionComparator
+- (id <SUVersionComparison>)versionComparator
 {
 	id <SUVersionComparison> comparator = nil;
 	
@@ -56,7 +57,7 @@
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui
 {
-	return [[self _versionComparator] compareVersion:[host version] toVersion:[ui versionString]] == NSOrderedAscending;
+	return [[self versionComparator] compareVersion:[host version] toVersion:[ui versionString]] == NSOrderedAscending;
 }
 
 - (BOOL)hostSupportsItem:(SUAppcastItem *)ui
@@ -69,7 +70,7 @@
 {
 	NSString *skippedVersion = [host objectForUserDefaultsKey:SUSkippedVersionKey];
 	if (skippedVersion == nil) { return NO; }
-	return [[self _versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
+	return [[self versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
 }
 
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
@@ -96,10 +97,18 @@
 		do {
 			item = [updateEnumerator nextObject];
 		} while (item && ![self hostSupportsItem:item]);
+
+		if (binaryDeltaSupported()) {        
+			SUAppcastItem *deltaUpdateItem = [[item deltaUpdates] objectForKey:[host version]];
+			if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem]) {
+				nonDeltaUpdateItem = [item retain];
+				item = deltaUpdateItem;
+			}
+		}
 	}
     
     updateItem = [item retain];
-	CFRelease(ac); // Remember that we're explicitly managing the memory of the appcast.
+	if (ac) { CFRelease(ac); } // Remember that we're explicitly managing the memory of the appcast.
 	if (updateItem == nil) { [self didNotFindUpdate]; return; }
 	
 	if ([self itemContainsValidUpdate:updateItem])
@@ -110,7 +119,7 @@
 
 - (void)appcast:(SUAppcast *)ac failedToLoadWithError:(NSError *)error
 {
-	CFRelease(ac); // Remember that we're explicitly managing the memory of the appcast.
+	if (ac) { CFRelease(ac); } // Remember that we're explicitly managing the memory of the appcast.
 	[self abortUpdateWithError:error];
 }
 
@@ -206,7 +215,7 @@
 
 - (void)extractUpdate
 {	
-	SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:downloadPath];
+	SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:downloadPath updatingHost:host];
 	if (!unarchiver)
 	{
 		SULog(@"Sparkle Error: No valid unarchiver for %@!", downloadPath);
@@ -218,6 +227,16 @@
 	[unarchiver start];
 }
 
+- (void)failedToApplyDeltaUpdate
+{
+	// When a delta update fails to apply we fall back on updating via a full install.
+	[updateItem release];
+	updateItem = nonDeltaUpdateItem;
+	nonDeltaUpdateItem = nil;
+
+	[self downloadUpdate];
+}
+
 - (void)unarchiverDidFinish:(SUUnarchiver *)ua
 {
 	if (ua) { CFRelease(ua); }
@@ -227,6 +246,12 @@
 - (void)unarchiverDidFail:(SUUnarchiver *)ua
 {
 	if (ua) { CFRelease(ua); }
+
+	if ([updateItem isDeltaUpdate]) {
+		[self failedToApplyDeltaUpdate];
+		return;
+	}
+
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:[NSDictionary dictionaryWithObject:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) forKey:NSLocalizedDescriptionKey]]];
 }
 
@@ -236,10 +261,12 @@
 {
 	if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdate:)])
 		[[updater delegate] updater:updater willInstallUpdate:updateItem];
+	
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
-	NSString *relaunchPathToCopy = [[NSBundle bundleForClass:[self class]] pathForResource:@"finish_installation" ofType:@"app"];
-	NSString *appSupportFolder = [[@"~/Library/Application Support/" stringByExpandingTildeInPath] stringByAppendingPathComponent: [host name]];
-	NSString *targetPath = [appSupportFolder stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
+	NSString *relaunchPathToCopy = [SPARKLE_BUNDLE pathForResource:@"relaunch" ofType:@""];
+	NSString *targetPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
+	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
+	NSError *error = nil;
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	[[NSFileManager defaultManager] createDirectoryAtPath: [targetPath stringByDeletingLastPathComponent] attributes: [NSDictionary dictionary]];
 #else
@@ -335,6 +362,7 @@
 - (void)dealloc
 {
 	[updateItem release];
+	[nonDeltaUpdateItem release];
 	[download release];
 	[downloadPath release];
 	[tempDir release];

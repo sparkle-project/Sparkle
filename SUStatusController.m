@@ -120,10 +120,10 @@
 
 - (void)setMaxProgressValue:(double)value
 {
-	if (value < 0) value = 0;
+	if (value < 0.0) value = 0.0;
 	maxProgressValue = value;
-	[self setProgressValue:0];
-	[progressBar setIndeterminate:(value == 0)];
+	[self setProgressValue:0.0];
+	[progressBar setIndeterminate:(value == 0.0)];
 	[progressBar startAnimation:self];
 	[progressBar setUsesThreadedAnimation: YES];
 }

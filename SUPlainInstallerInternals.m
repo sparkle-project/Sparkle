@@ -89,9 +89,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	NSString *prefix = [[path stringByDeletingPathExtension] stringByAppendingFormat:@" (%@)", postFix];
 	NSString *tempDir = [prefix stringByAppendingPathExtension:[path pathExtension]];
 	// Now let's make sure we get a unique path.
-	int cnt=2;
+	unsigned int cnt=2;
 	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
-		tempDir = [NSString stringWithFormat:@"%@ %d.%@", prefix, cnt++, [path pathExtension]];
+		tempDir = [NSString stringWithFormat:@"%@ %u.%@", prefix, cnt++, [path pathExtension]];
 	return [tempDir lastPathComponent];
 }
 
@@ -255,13 +255,13 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		{
 			// Something went wrong somewhere along the way, but we're not sure exactly where.
 			NSString *errorMessage = [NSString stringWithFormat:@"Authenticated file copy from %@ to %@ failed.", src, dst];
-			if (error != NULL)
+			if (error != nil)
 				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
 		}
 	}
 	else
 	{
-		if (error != NULL)
+		if (error != nil)
 			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:[NSDictionary dictionaryWithObject:@"Couldn't get permission to authenticate." forKey:NSLocalizedDescriptionKey]];
 	}
 	return res;
@@ -427,7 +427,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 + (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp error:(NSError **)error
 {
 	FSRef		srcRef, dstRef, dstDirRef, movedRef, tmpDirRef;
-	OSErr		err;
+	OSStatus	err;
 	BOOL		hadFileAtDest = NO, didFindTrash = NO;
 	NSString	*tmpPath = [self _temporaryCopyNameForPath: dst didFindTrash: &didFindTrash];
 	
@@ -498,9 +498,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 @end
 
-#include <dlfcn.h>
-#include <errno.h>
-#include <sys/xattr.h>
+#import <dlfcn.h>
+#import <errno.h>
+#import <sys/xattr.h>
 
 @implementation SUPlainInstaller (MMExtendedAttributes)
 
@@ -552,8 +552,11 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	
 	// Only recurse if it's actually a directory.  Don't recurse into a
 	// root-level symbolic link.
-	NSDictionary* rootAttributes =
-	[[NSFileManager defaultManager] fileAttributesAtPath:root traverseLink:NO];
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+	NSDictionary* rootAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:root traverseLink:NO];
+#else
+	NSDictionary* rootAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:root error:nil];
+#endif
 	NSString* rootType = [rootAttributes objectForKey:NSFileType];
 	
 	if (rootType == NSFileTypeDirectory) {

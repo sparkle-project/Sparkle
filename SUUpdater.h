@@ -30,6 +30,7 @@
 
 @interface SUUpdater : NSObject
 {
+@private
 	NSTimer *checkTimer;
 	SUUpdateDriver *driver;
 

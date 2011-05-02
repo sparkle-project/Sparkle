@@ -12,6 +12,7 @@
 
 @interface SUHost : NSObject
 {
+@private
 	NSBundle *bundle;
 }
 
