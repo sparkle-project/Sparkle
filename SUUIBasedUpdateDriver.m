@@ -125,7 +125,14 @@
 	[self abortUpdate];
 	if (tempDir != nil)	// tempDir contains downloadPath, so we implicitly delete both here.
 	{
-		if( ![[NSFileManager defaultManager] removeFileAtPath: tempDir handler: nil] )
+		BOOL		success = NO;
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+    success = [[NSFileManager defaultManager] removeFileAtPath: tempDir handler: nil]; // Clean up the copied relauncher
+#else
+	NSError	*	error = nil;
+	success = [[NSFileManager defaultManager] removeItemAtPath: tempDir error: &error]; // Clean up the copied relauncher
+#endif
+		if( !success )
 			[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[tempDir stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[tempDir lastPathComponent]] tag:NULL];
 	}
 }
