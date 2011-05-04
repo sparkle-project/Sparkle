@@ -9,6 +9,7 @@
 #import "SUUpdatePermissionPrompt.h"
 
 #import "SUHost.h"
+#import "SUConstants.h"
 
 @implementation SUUpdatePermissionPrompt
 

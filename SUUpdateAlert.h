@@ -10,12 +10,15 @@
 #define SUUPDATEALERT_H
 
 #import "SUWindowController.h"
+#import "SUVersionDisplayProtocol.h"
+
 
 typedef enum
 {
 	SUInstallUpdateChoice,
 	SURemindMeLaterChoice,
-	SUSkipThisVersionChoice
+	SUSkipThisVersionChoice,
+	SUOpenInfoURLChoice
 } SUUpdateAlertChoice;
 
 @class WebView, SUAppcastItem, SUHost;
@@ -23,9 +26,13 @@ typedef enum
 	SUAppcastItem *updateItem;
 	SUHost *host;
 	id delegate;
+	id<SUVersionDisplay>	versionDisplayer;
 	
 	IBOutlet WebView *releaseNotesView;
 	IBOutlet NSTextField *description;
+	IBOutlet NSButton *installButton;	// UK 2007-08-31.
+	IBOutlet NSButton *skipButton;
+	IBOutlet NSButton *laterButton;
 	NSProgressIndicator *releaseNotesSpinner;
 	BOOL webViewFinishedLoading;
 }
@@ -37,10 +44,13 @@ typedef enum
 - (IBAction)skipThisVersion:sender;
 - (IBAction)remindMeLater:sender;
 
+- (void)setVersionDisplayer: (id<SUVersionDisplay>)disp;
+
 @end
 
 @interface NSObject (SUUpdateAlertDelegate)
 - (void)updateAlert:(SUUpdateAlert *)updateAlert finishedWithChoice:(SUUpdateAlertChoice)updateChoice;
+- (void)updateAlert:(SUUpdateAlert *)updateAlert shouldAllowAutoUpdate: (BOOL*)shouldAllowAutoUpdate;
 @end
 
 #endif

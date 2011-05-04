@@ -19,6 +19,7 @@
 	
 	NSURLDownload *download;
 	NSString *downloadPath;
+	NSString *tempDir;
 	
 	NSString *relaunchPath;
 }
@@ -46,10 +47,9 @@
 - (void)failedToApplyDeltaUpdate;
 
 - (void)installUpdate;
-- (void)installerFinishedForHost:(SUHost *)host;
 - (void)installerForHost:(SUHost *)host failedWithError:(NSError *)error;
 
-- (void)relaunchHostApp;
+- (void)installAndRelaunchWithTool;
 - (void)cleanUp;
 
 - (void)abortUpdate;

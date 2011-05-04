@@ -7,7 +7,11 @@
 //
 
 #import "SUScheduledUpdateDriver.h"
-#import "Sparkle.h"
+#import "SUUpdater.h"
+
+#import "SUAppcast.h"
+#import "SUAppcastItem.h"
+#import "SUVersionComparisonProtocol.h"
 
 @implementation SUScheduledUpdateDriver
 

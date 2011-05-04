@@ -7,8 +7,12 @@
 
 #import "SUHost.h"
 
+#import "SUConstants.h"
 #import "SUSystemProfiler.h"
 #import <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
+#import "ThreadSafePreferences.h"
+#import "SULog.h"
+
 
 @implementation SUHost
 
@@ -19,7 +23,7 @@
 		if (aBundle == nil) aBundle = [NSBundle mainBundle];
         bundle = [aBundle retain];
 		if (![bundle bundleIdentifier])
-			NSLog(@"Sparkle Error: the bundle being updated at %@ has no CFBundleIdentifier! This will cause preference read/write to not work properly.", bundle);
+			SULog(@"Sparkle Error: the bundle being updated at %@ has no CFBundleIdentifier! This will cause preference read/write to not work properly.", bundle);
     }
     return self;
 }
@@ -30,7 +34,7 @@
 	[super dealloc];
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self bundlePath]]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self bundlePath], [self installationPath]]; }
 
 - (NSBundle *)bundle
 {
@@ -40,6 +44,15 @@
 - (NSString *)bundlePath
 {
     return [bundle bundlePath];
+}
+
+- (NSString *)installationPath
+{
+#if NORMALIZE_INSTALLED_APP_NAME
+    return [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.%@", [bundle objectForInfoDictionaryKey:@"CFBundleName"], [[bundle bundlePath] pathExtension]]];
+#else
+	return [bundle bundlePath];
+#endif
 }
 
 - (NSString *)name
@@ -151,7 +164,7 @@
 	if (bundle == [NSBundle mainBundle])
 		return [[NSUserDefaults standardUserDefaults] objectForKey:defaultName];
 	
-	CFPropertyListRef obj = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
+	CFPropertyListRef obj = ThreadSafePreferences_CopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
 	return [(id)CFMakeCollectable(obj) autorelease];
 }
 
@@ -164,8 +177,8 @@
 	}
 	else
 	{
-		CFPreferencesSetValue((CFStringRef)defaultName, value, (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
-		CFPreferencesSynchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		ThreadSafePreferences_SetValue((CFStringRef)defaultName, value, (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		ThreadSafePreferences_Synchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	}
 }
 
@@ -175,7 +188,7 @@
 		return [[NSUserDefaults standardUserDefaults] boolForKey:defaultName];
 	
 	BOOL value;
-	CFPropertyListRef plr = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
+	CFPropertyListRef plr = ThreadSafePreferences_CopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
 	if (plr == NULL)
 		value = NO;
 	else
@@ -195,8 +208,8 @@
 	}
 	else
 	{
-		CFPreferencesSetValue((CFStringRef)defaultName, (CFBooleanRef)[NSNumber numberWithBool:value], (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
-		CFPreferencesSynchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		ThreadSafePreferences_SetValue((CFStringRef)defaultName, (CFBooleanRef)[NSNumber numberWithBool:value], (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		ThreadSafePreferences_Synchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	}
 }
 

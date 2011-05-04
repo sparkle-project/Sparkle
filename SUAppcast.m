@@ -6,8 +6,14 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
+#import "SUUpdater.h"
+
 #import "SUAppcast.h"
+#import "SUAppcastItem.h"
+#import "SUVersionComparisonProtocol.h"
+#import "SUAppcast.h"
+#import "SUConstants.h"
+#import "SULog.h"
 
 @interface NSXMLElement (SUAppcastExtensions)
 - (NSDictionary *)attributesAsDictionary;
@@ -36,8 +42,14 @@
 - (void)dealloc
 {
 	[items release];
+	items = nil;
 	[userAgentString release];
+	userAgentString = nil;
+	[downloadFilename release];
+	downloadFilename = nil;
 	[download release];
+	download = nil;
+	
 	[super dealloc];
 }
 
@@ -186,7 +198,7 @@
 			}
             else
             {
-				NSLog(@"Sparkle Updater: Failed to parse appcast item: %@.\nAppcast dictionary was: %@", errString, dict);
+				SULog(@"Sparkle Updater: Failed to parse appcast item: %@.\nAppcast dictionary was: %@", errString, dict);
             }
             [nodesDict removeAllObjects];
             [dict removeAllObjects];

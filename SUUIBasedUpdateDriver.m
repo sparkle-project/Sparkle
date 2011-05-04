@@ -11,20 +11,19 @@
 #import "SUUpdateAlert.h"
 #import "SUHost.h"
 #import "SUStatusController.h"
+#import "SUConstants.h"
 
 @implementation SUUIBasedUpdateDriver
-
-- (IBAction)cancelDownload:sender
-{
-	if (download)
-		[download cancel];
-	[self abortUpdate];
-}
 
 - (void)didFindValidUpdate
 {
 	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem host:host];
 	[updateAlert setDelegate:self];
+	
+	id<SUVersionDisplay>	versDisp = nil;
+	if ([[updater delegate] respondsToSelector:@selector(versionDisplayerForUpdater:)])
+		versDisp = [[updater delegate] versionDisplayerForUpdater: updater];
+	[updateAlert setVersionDisplayer: versDisp];
 	
 	if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
 		[[updater delegate] updater:updater didFindValidUpdate:updateItem];
@@ -49,6 +48,7 @@
 {
 	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
 		[[updater delegate] updaterDidNotFindUpdate:updater];
+	
 	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"You're up-to-date!", nil) defaultButton:SULocalizedString(@"OK", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [host name], [host displayVersion]];
 	[self showModalAlert:alert];
 	[self abortUpdate];
@@ -73,9 +73,17 @@
 			[statusController showWindow:self];	
 			[self downloadUpdate];
 			break;
-			
+		
+		case SUOpenInfoURLChoice:
+			[[NSWorkspace sharedWorkspace] openURL: [updateItem infoURL]];
+			[self abortUpdate];
+			break;
+		
 		case SUSkipThisVersionChoice:
 			[host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+			[self abortUpdate];
+			break;
+			
 		case SURemindMeLaterChoice:
 			[self abortUpdate];
 			break;			
@@ -110,6 +118,25 @@
 		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self humanReadableSizeFromDouble:[statusController progressValue]]]];
 }
 
+- (IBAction)cancelDownload: (id)sender
+{
+	if (download)
+		[download cancel];
+	[self abortUpdate];
+	if (tempDir != nil)	// tempDir contains downloadPath, so we implicitly delete both here.
+	{
+		BOOL		success = NO;
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+    success = [[NSFileManager defaultManager] removeFileAtPath: tempDir handler: nil]; // Clean up the copied relauncher
+#else
+	NSError	*	error = nil;
+	success = [[NSFileManager defaultManager] removeItemAtPath: tempDir error: &error]; // Clean up the copied relauncher
+#endif
+		if( !success )
+			[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[tempDir stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[tempDir lastPathComponent]] tag:NULL];
+	}
+}
+
 - (void)extractUpdate
 {
 	// Now we have to extract the downloaded archive.
@@ -134,15 +161,20 @@
 	[statusController setProgressValue:[statusController progressValue] + (double)length];
 }
 
-- (void)installAndRestart:sender { [self installUpdate]; }
-
 - (void)unarchiverDidFinish:(SUUnarchiver *)ua
 {
 	[statusController beginActionWithTitle:SULocalizedString(@"Ready to Install", nil) maxProgressValue:1.0 statusText:nil];
 	[statusController setProgressValue:1.0]; // Fill the bar.
 	[statusController setButtonEnabled:YES];
 	[statusController setButtonTitle:SULocalizedString(@"Install and Relaunch", nil) target:self action:@selector(installAndRestart:) isDefault:YES];
+	[[statusController window] makeKeyAndOrderFront: self];
 	[NSApp requestUserAttention:NSInformationalRequest];	
+}
+
+- (void)installAndRestart: (id)sender
+{
+	if( [updater mayUpdateAndRestart] )
+		[self installUpdate];
 }
 
 - (void)installUpdate
@@ -185,12 +217,18 @@
 
 - (void)showModalAlert:(NSAlert *)alert
 {
+	if ([[updater delegate] respondsToSelector:@selector(updaterWillShowModalAlert:)])
+		[[updater delegate] updaterWillShowModalAlert: updater];
+
 	// When showing a modal alert we need to ensure that background applications
 	// are focused to inform the user since there is no dock icon to notify them.
 	if ([host isBackgroundApplication]) { [NSApp activateIgnoringOtherApps:YES]; }
 	
 	[alert setIcon:[host icon]];
 	[alert runModal];
+	
+	if ([[updater delegate] respondsToSelector:@selector(updaterDidShowModalAlert:)])
+		[[updater delegate] updaterDidShowModalAlert: updater];
 }
 
 @end

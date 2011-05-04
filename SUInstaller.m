@@ -9,9 +9,19 @@
 #import "SUInstaller.h"
 #import "SUPlainInstaller.h"
 #import "SUPackageInstaller.h"
-#import "SUHost.h" 
+#import "SUHost.h"
+#import "SUConstants.h"
+#import "SULog.h"
+
 
 @implementation SUInstaller
+
+static NSString*	sUpdateFolder = nil;
+
++(NSString*)	updateFolder
+{
+	return sUpdateFolder;
+}
 
 + (BOOL)isAliasFolderAtPath:(NSString *)path
 {
@@ -33,16 +43,23 @@
 }
 
 
-+ (void)installFromUpdateFolder:(NSString *)updateFolder overHost:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
++ (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
 {
 	// Search subdirectories for the application
-	NSString *currentFile, *newAppDownloadPath = nil, *bundleFileName = [[host bundlePath] lastPathComponent], *alternateBundleFileName = [[host name] stringByAppendingPathExtension:[[host bundlePath] pathExtension]];
+	NSString	*currentFile,
+				*newAppDownloadPath = nil,
+				*bundleFileName = [[host bundlePath] lastPathComponent],
+				*alternateBundleFileName = [[host name] stringByAppendingPathExtension:[[host bundlePath] pathExtension]];
 	BOOL isPackage = NO;
 	NSString *fallbackPackagePath = nil;
-	NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:updateFolder];
+	NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath: inUpdateFolder];
+	
+	[sUpdateFolder release];
+	sUpdateFolder = [inUpdateFolder retain];
+	
 	while ((currentFile = [dirEnum nextObject]))
 	{
-		NSString *currentPath = [updateFolder stringByAppendingPathComponent:currentFile];		
+		NSString *currentPath = [inUpdateFolder stringByAppendingPathComponent:currentFile];		
 		if ([[currentFile lastPathComponent] isEqualToString:bundleFileName] ||
 			[[currentFile lastPathComponent] isEqualToString:alternateBundleFileName]) // We found one!
 		{
@@ -81,7 +98,7 @@
 		if ([self isAliasFolderAtPath:currentPath])
 			[dirEnum skipDescendents];
 	}
-
+	
 	// We don't have a valid path. Try to use the fallback package.
 
 	if (newAppDownloadPath == nil && fallbackPackagePath != nil)
@@ -102,19 +119,29 @@
 
 + (void)mdimportHost:(SUHost *)host
 {
+	// *** GETS CALLED ON NON-MAIN THREAD!
+	
+	SULog( @"mdimporting" );
+	
 	NSTask *mdimport = [[[NSTask alloc] init] autorelease];
 	[mdimport setLaunchPath:@"/usr/bin/mdimport"];
-	[mdimport setArguments:[NSArray arrayWithObject:[host bundlePath]]];
+	[mdimport setArguments:[NSArray arrayWithObject:[host installationPath]]];
 	@try
 	{
 		[mdimport launch];
+		[mdimport waitUntilExit];
 	}
 	@catch (NSException * launchException)
 	{
 		// No big deal.
-		NSLog(@"Sparkle Error: %@", [launchException description]);
+		SULog(@"Sparkle Error: %@", [launchException description]);
 	}
 }
+
+
+#define		SUNotifyDictHostKey		@"SUNotifyDictHost"
+#define		SUNotifyDictErrorKey	@"SUNotifyDictError"
+#define		SUNotifyDictDelegateKey	@"SUNotifyDictDelegate"
 
 + (void)finishInstallationWithResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:delegate
 {
@@ -122,13 +149,19 @@
 	{
 		[self mdimportHost:host];
 		if ([delegate respondsToSelector:@selector(installerFinishedForHost:)])
-			[delegate installerFinishedForHost:host];
+			[delegate performSelectorOnMainThread: @selector(installerFinishedForHost:) withObject: host waitUntilDone: NO];
 	}
 	else
 	{
 		if ([delegate respondsToSelector:@selector(installerForHost:failedWithError:)])
-			[delegate installerForHost:host failedWithError:error];
+			[self performSelectorOnMainThread: @selector(notifyDelegateOfFailure:) withObject: [NSDictionary dictionaryWithObjectsAndKeys: host, SUNotifyDictHostKey, error, SUNotifyDictErrorKey, delegate, SUNotifyDictDelegateKey, nil] waitUntilDone: NO];
 	}		
+}
+
+
++(void)	notifyDelegateOfFailure: (NSDictionary*)dict
+{
+	[[dict objectForKey: SUNotifyDictDelegateKey] installerForHost: [dict objectForKey: SUNotifyDictHostKey] failedWithError: [dict objectForKey: SUNotifyDictErrorKey]];
 }
 
 @end
