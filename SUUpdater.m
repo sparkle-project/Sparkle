@@ -274,7 +274,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 }
 
 
--(BOOL)	mayUpdateAndRestart
+- (BOOL)mayUpdateAndRestart
 {
 	return( !delegate || ![delegate respondsToSelector: @selector(updaterShouldRelaunchApplication:)] || [delegate updaterShouldRelaunchApplication: self] );
 }

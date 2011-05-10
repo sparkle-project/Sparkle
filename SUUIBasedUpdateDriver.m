@@ -9,6 +9,7 @@
 #import "SUUIBasedUpdateDriver.h"
 
 #import "SUUpdateAlert.h"
+#import "SUUpdater_Private.h"
 #import "SUHost.h"
 #import "SUStatusController.h"
 #import "SUConstants.h"

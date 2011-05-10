@@ -18,6 +18,7 @@
 #import "SUPlainInstaller.h"
 #import "SUPlainInstallerInternals.h"
 #import "SUBinaryDeltaCommon.h"
+#import "SUUpdater_Private.h"
 
 
 @implementation SUBasicUpdateDriver
@@ -280,7 +281,7 @@
 
 - (void)installAndRelaunchWithTool
 {
-	BOOL	mayRelaunchAtAll = [updater mayUpdateAndRestart];
+	BOOL mayRelaunchAtAll = [updater mayUpdateAndRestart];
 
 	if( mayRelaunchAtAll )
 	{
