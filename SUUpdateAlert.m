@@ -256,12 +256,6 @@
 
 }
 
--(BOOL)showsReleaseNotesText
-{
-	return( [host objectForInfoDictionaryKey:SUFixedHTMLDisplaySizeKey] == nil );
-}
-
-
 - (BOOL)windowShouldClose:note
 {
 	[self endWithSelection:SURemindMeLaterChoice];
