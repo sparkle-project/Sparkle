@@ -24,7 +24,6 @@
 		55C14F0C136EF6EA00649790 /* SUHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 61EF67550E25B58D00F754E0 /* SUHost.m */; };
 		55C14F0D136EF6F200649790 /* SUInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5000DAE88B40026945C /* SUInstaller.m */; };
 		55C14F0F136EF73600649790 /* finish_installation.pch in Headers */ = {isa = PBXBuildFile; fileRef = 55C14F0E136EF73600649790 /* finish_installation.pch */; };
-		55C14F1C136EF77E00649790 /* ThreadSafePreferences.h in Headers */ = {isa = PBXBuildFile; fileRef = 55C14F1B136EF77E00649790 /* ThreadSafePreferences.h */; };
 		55C14F20136EF84300649790 /* SUStatusController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6196CFE409C71ADE000DC222 /* SUStatusController.m */; };
 		55C14F21136EF84D00649790 /* SUPlainInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5040DAE8AB80026945C /* SUPlainInstaller.m */; };
 		55C14F22136EF86000649790 /* SUStandardVersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */; };
@@ -253,7 +252,6 @@
 		55C14F04136EF6DB00649790 /* SULog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULog.h; sourceTree = "<group>"; };
 		55C14F05136EF6DB00649790 /* SULog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SULog.m; sourceTree = "<group>"; };
 		55C14F0E136EF73600649790 /* finish_installation.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = finish_installation.pch; sourceTree = "<group>"; };
-		55C14F1B136EF77E00649790 /* ThreadSafePreferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ThreadSafePreferences.h; path = Elgato/ThreadSafePreferences.h; sourceTree = "<group>"; };
 		55C14F31136EFC2400649790 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		5D06E8D00FD68C7C005AE3F6 /* BinaryDelta */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BinaryDelta; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */ = {isa = PBXFileReference; comments = "-Wno-shorten-64-to-32"; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bsdiff.c; sourceTree = "<group>"; };
@@ -534,14 +532,6 @@
 			name = "finish_installation tool";
 			sourceTree = "<group>";
 		};
-		55C14F1D136EF78000649790 /* Elgato */ = {
-			isa = PBXGroup;
-			children = (
-				55C14F1B136EF77E00649790 /* ThreadSafePreferences.h */,
-			);
-			name = Elgato;
-			sourceTree = "<group>";
-		};
 		5D06E8D90FD68C95005AE3F6 /* Binary Delta */ = {
 			isa = PBXGroup;
 			children = (
@@ -646,7 +636,6 @@
 				61299A5F09CA6EB100B7442F /* SUConstants.m */,
 				55C14F04136EF6DB00649790 /* SULog.h */,
 				55C14F05136EF6DB00649790 /* SULog.m */,
-				55C14F1D136EF78000649790 /* Elgato */,
 			);
 			includeInIndex = 1;
 			name = "Other Sources";
@@ -778,7 +767,6 @@
 				611142E910FB1BE5009810AA /* bspatch.h in Headers */,
 				55C14F06136EF6DB00649790 /* SULog.h in Headers */,
 				55C14F0F136EF73600649790 /* finish_installation.pch in Headers */,
-				55C14F1C136EF77E00649790 /* ThreadSafePreferences.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

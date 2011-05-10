@@ -10,7 +10,6 @@
 #import "SUConstants.h"
 #import "SUSystemProfiler.h"
 #import <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
-#import "ThreadSafePreferences.h"
 #import "SULog.h"
 
 
@@ -179,7 +178,7 @@
 	if (bundle == [NSBundle mainBundle])
 		return [[NSUserDefaults standardUserDefaults] objectForKey:defaultName];
 	
-	CFPropertyListRef obj = ThreadSafePreferences_CopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
+	CFPropertyListRef obj = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
 	return [(id)CFMakeCollectable(obj) autorelease];
 }
 
@@ -192,8 +191,8 @@
 	}
 	else
 	{
-		ThreadSafePreferences_SetValue((CFStringRef)defaultName, value, (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
-		ThreadSafePreferences_Synchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		CFPreferencesSetValue((CFStringRef)defaultName, value, (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		CFPreferencesSynchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	}
 }
 
@@ -203,7 +202,7 @@
 		return [[NSUserDefaults standardUserDefaults] boolForKey:defaultName];
 	
 	BOOL value;
-	CFPropertyListRef plr = ThreadSafePreferences_CopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
+	CFPropertyListRef plr = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
 	if (plr == NULL)
 		value = NO;
 	else
@@ -223,8 +222,8 @@
 	}
 	else
 	{
-		ThreadSafePreferences_SetValue((CFStringRef)defaultName, (CFBooleanRef)[NSNumber numberWithBool:value], (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
-		ThreadSafePreferences_Synchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		CFPreferencesSetValue((CFStringRef)defaultName, (CFBooleanRef)[NSNumber numberWithBool:value], (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		CFPreferencesSynchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	}
 }
 
