@@ -152,13 +152,6 @@
 			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = Sparkle;
 		};
-		61227AB90DB5C4BB00AB99EA /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 612279D80DB5470200AB99EA;
-			remoteInfo = "Sparkle Unit Tests";
-		};
 		61B5F91B09C4CF7200B25A18 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -850,7 +843,6 @@
 			);
 			dependencies = (
 				61B5F91C09C4CF7200B25A18 /* PBXTargetDependency */,
-				61227ABA0DB5C4BB00AB99EA /* PBXTargetDependency */,
 			);
 			name = "Sparkle Test App";
 			productName = "Test Application";
@@ -1162,11 +1154,6 @@
 			isa = PBXTargetDependency;
 			target = 8DC2EF4F0486A6940098B216 /* Sparkle */;
 			targetProxy = 5D06E8D50FD68C86005AE3F6 /* PBXContainerItemProxy */;
-		};
-		61227ABA0DB5C4BB00AB99EA /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 612279D80DB5470200AB99EA /* Sparkle Unit Tests */;
-			targetProxy = 61227AB90DB5C4BB00AB99EA /* PBXContainerItemProxy */;
 		};
 		61B5F91C09C4CF7200B25A18 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
