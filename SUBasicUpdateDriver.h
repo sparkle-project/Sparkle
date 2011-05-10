@@ -50,7 +50,7 @@
 - (void)installerForHost:(SUHost *)host failedWithError:(NSError *)error;
 
 - (void)installAndRelaunchWithTool;
-- (void)cleanUp;
+- (void)cleanUpDownload;
 
 - (void)abortUpdate;
 - (void)abortUpdateWithError:(NSError *)error;

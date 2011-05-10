@@ -150,17 +150,26 @@
 	if ([[name pathExtension] isEqualToString:@"txt"])
 		name = [name stringByDeletingPathExtension];
 	
-	// We create a temporary directory in /tmp and stick the file there.
-	// Not using a GUID here because hdiutil (for DMGs) for some reason chokes on GUIDs. Too long? I really have no idea.
-	NSString *prefix = [NSString stringWithFormat:@"%@ %@ Update", [host name], [updateItem versionString]];
-	NSString *desktopFolder = [@"~/Desktop" stringByExpandingTildeInPath];
+	NSString *downloadFileName = [NSString stringWithFormat:@"%@ %@", [host name], [updateItem versionString]];
+    
+    NSArray *appSupportPaths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+    NSString *appSupportPath = nil;
+    if (!appSupportPaths || [appSupportPaths count] == 0)
+    {
+        SULog(@"Failed to find app support directory! Using ~/Library/Application Support...");
+        appSupportPath = [@"~/Library/Application Support" stringByExpandingTildeInPath];
+    }
+    else
+        appSupportPath = [appSupportPaths objectAtIndex:0];
+    appSupportPath = [appSupportPath stringByAppendingPathComponent:[host name]];
+    
 	[tempDir release];
-	tempDir = [[desktopFolder stringByAppendingPathComponent:prefix] retain];
+	tempDir = [[appSupportPath stringByAppendingPathComponent:downloadFileName] retain];
 	int cnt=1;
 	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
 	{
 		[tempDir release];
-		tempDir = [[desktopFolder stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", prefix, cnt++]] retain];
+		tempDir = [[appSupportPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, cnt++]] retain];
 	}
 	
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
@@ -170,7 +179,7 @@
 #endif
 	if (!success)
 	{
-		// Okay, something's really broken with /tmp
+		// Okay, something's really broken with this user's file structure.
 		[download cancel];
 		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Can't make a temporary directory for the update download at %@.",tempDir] forKey:NSLocalizedDescriptionKey]]];
 	}
@@ -200,9 +209,6 @@
 
 - (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
 {
-	// Get rid of what we've downloaded so far, if anything.
-	if (tempDir != nil)	// tempDir contains downloadPath, so we implicitly delete both here.
-		[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[tempDir stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[tempDir lastPathComponent]] tag:NULL];
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while downloading the update. Please try again later.", nil), NSLocalizedDescriptionKey, [error localizedDescription], NSLocalizedFailureReasonErrorKey, nil]]];
 }
 
@@ -324,13 +330,20 @@
 		[self abortUpdate];
 }
 
-- (void)cleanUp
+- (void)cleanUpDownload
 {
+    if (tempDir != nil)	// tempDir contains downloadPath, so we implicitly delete both here.
+	{
+		BOOL		success = NO;
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-    [[NSFileManager defaultManager] removeFileAtPath: tempDir handler:nil];
+        success = [[NSFileManager defaultManager] removeFileAtPath: tempDir handler: nil]; // Clean up the copied relauncher
 #else
-	[[NSFileManager defaultManager] removeItemAtPath: tempDir error:NULL];
+        NSError	*	error = nil;
+        success = [[NSFileManager defaultManager] removeItemAtPath: tempDir error: &error]; // Clean up the copied relauncher
 #endif
+		if( !success )
+			[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[tempDir stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[tempDir lastPathComponent]] tag:NULL];
+	}
 }
 
 - (void)installerForHost:(SUHost *)aHost failedWithError:(NSError *)error
@@ -348,6 +361,7 @@
 - (void)abortUpdate
 {
 	[[self retain] autorelease];	// In case the notification center was the last one holding on to us.
+    [self cleanUpDownload];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super abortUpdate];
 }
