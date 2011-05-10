@@ -81,18 +81,9 @@
 		612DCBAF0D488BC60015DBEA /* SUUpdatePermissionPrompt.h in Headers */ = {isa = PBXBuildFile; fileRef = 612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */; settings = {ATTRIBUTES = (); }; };
 		612DCBB00D488BC60015DBEA /* SUUpdatePermissionPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */; };
 		61407C390A4099050009F71F /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; };
-		6158A1B91378F64700487EC1 /* SUUpdateAlert.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BF0136EF26100649790 /* SUUpdateAlert.xib */; };
-		6158A1BC1378F68200487EC1 /* SUAutomaticUpdateAlert.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BDA136EF20D00649790 /* SUAutomaticUpdateAlert.xib */; };
-		6158A1BD1378F68200487EC1 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
-		6158A1C11378F8BB00487EC1 /* SUUpdateAlert.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BF0136EF26100649790 /* SUUpdateAlert.xib */; };
-		6158A1C21378F8BB00487EC1 /* SUAutomaticUpdateAlert.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BDA136EF20D00649790 /* SUAutomaticUpdateAlert.xib */; };
-		6158A1C31378F8BB00487EC1 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
 		6158A1C5137904B300487EC1 /* SUUpdater_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6158A1C4137904B300487EC1 /* SUUpdater_Private.h */; };
 		615AE3D00D64DC40001CA7BD /* SUModelTranslation.plist in Resources */ = {isa = PBXBuildFile; fileRef = 615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */; };
 		6160E7E10D3B4A8800E9CD71 /* NTSynchronousTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 610EC1C00CF3914D00AE239E /* NTSynchronousTask.h */; settings = {ATTRIBUTES = (); }; };
-		6160FD88134ABCD5007FFC5F /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8DC2EF5A0486A6940098B216 /* Info.plist */; };
-		6160FD89134ABCD5007FFC5F /* SUModelTranslation.plist in Resources */ = {isa = PBXBuildFile; fileRef = 615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */; };
-		6160FD8A134ABCD5007FFC5F /* License.txt in Resources */ = {isa = PBXBuildFile; fileRef = 61C268090E2DB5D000175E6C /* License.txt */; };
 		61699BCC0DDB92BD005878A4 /* SUVersionComparisonTest.h in Headers */ = {isa = PBXBuildFile; fileRef = 61227A140DB548B800AB99EA /* SUVersionComparisonTest.h */; settings = {ATTRIBUTES = (); }; };
 		618E9CFD0E7328F1004646D8 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 618E9CFC0E7328F1004646D8 /* dsa_pub.pem */; };
 		618FA5010DAE88B40026945C /* SUInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 618FA4FF0DAE88B40026945C /* SUInstaller.h */; settings = {ATTRIBUTES = (); }; };
@@ -878,6 +869,9 @@
 /* Begin PBXProject section */
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0410;
+			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "Sparkle" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -969,20 +963,11 @@
 				61C2680A0E2DB5D000175E6C /* License.txt in Resources */,
 				61AAE8280A321A7F00D8810D /* Sparkle.strings in Resources */,
 				615AE3D00D64DC40001CA7BD /* SUModelTranslation.plist in Resources */,
-				6160FD88134ABCD5007FFC5F /* Info.plist in Resources */,
-				6160FD89134ABCD5007FFC5F /* SUModelTranslation.plist in Resources */,
-				6160FD8A134ABCD5007FFC5F /* License.txt in Resources */,
 				55C14BEE136EF20D00649790 /* SUAutomaticUpdateAlert.xib in Resources */,
 				55C14BEF136EF21700649790 /* SUStatus.xib in Resources */,
 				55C14C04136EF26100649790 /* SUUpdateAlert.xib in Resources */,
 				55C14C19136EF2C700649790 /* SUUpdatePermissionPrompt.xib in Resources */,
 				55C14F3B136EFCB300649790 /* finish_installation.app in Resources */,
-				6158A1B91378F64700487EC1 /* SUUpdateAlert.xib in Resources */,
-				6158A1BC1378F68200487EC1 /* SUAutomaticUpdateAlert.xib in Resources */,
-				6158A1BD1378F68200487EC1 /* SUStatus.xib in Resources */,
-				6158A1C11378F8BB00487EC1 /* SUUpdateAlert.xib in Resources */,
-				6158A1C21378F8BB00487EC1 /* SUAutomaticUpdateAlert.xib in Resources */,
-				6158A1C31378F8BB00487EC1 /* SUStatus.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1332,7 +1317,6 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1345,7 +1329,6 @@
 					"-framework",
 					AppKit,
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = finish_installation;
 			};
 			name = Debug;
@@ -1356,7 +1339,6 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = finish_installation.pch;
@@ -1368,7 +1350,6 @@
 					"-framework",
 					AppKit,
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = finish_installation;
 				ZERO_LINK = NO;
 			};
@@ -1378,7 +1359,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = finish_installation.pch;
@@ -1390,7 +1370,6 @@
 					"-framework",
 					AppKit,
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = finish_installation;
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
