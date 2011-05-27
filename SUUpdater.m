@@ -112,9 +112,14 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
         if ([host objectForUserDefaultsKey:SUEnableAutomaticChecksKeyOld])
             [self setAutomaticallyChecksForUpdates:[host boolForUserDefaultsKey:SUEnableAutomaticChecksKeyOld]];
         // Now, we don't want to ask the user for permission to do a weird thing on the first launch.
-        // We wait until the second launch.
-        else if ([host boolForUserDefaultsKey:SUHasLaunchedBeforeKey] == NO)
-            [host setBool:YES forUserDefaultsKey:SUHasLaunchedBeforeKey];
+        // We wait until the second launch, unless explicitly overridden via SUPromptUserOnFirstLaunchKey.
+        else if (![host objectForKey:SUPromptUserOnFirstLaunchKey])
+        {
+            if ([host boolForUserDefaultsKey:SUHasLaunchedBeforeKey] == NO)
+                [host setBool:YES forUserDefaultsKey:SUHasLaunchedBeforeKey];
+            else
+                shouldPrompt = YES;
+        }
         else
             shouldPrompt = YES;
     }
