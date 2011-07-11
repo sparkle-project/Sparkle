@@ -1285,6 +1285,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 61072EB20DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig */;
 			buildSettings = {
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
 		};
@@ -1337,6 +1338,48 @@
 			};
 			name = Release;
 		};
+		AA0B515313CB087E005FD3E2 /* Debug (GC dual-mode) */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = "Debug (GC dual-mode)";
+		};
+		AA0B515413CB087E005FD3E2 /* Debug (GC dual-mode) */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
+			buildSettings = {
+				GCC_ENABLE_OBJC_GC = supported;
+			};
+			name = "Debug (GC dual-mode)";
+		};
+		AA0B515513CB087E005FD3E2 /* Debug (GC dual-mode) */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */;
+			buildSettings = {
+			};
+			name = "Debug (GC dual-mode)";
+		};
+		AA0B515613CB087E005FD3E2 /* Debug (GC dual-mode) */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
+			buildSettings = {
+			};
+			name = "Debug (GC dual-mode)";
+		};
+		AA0B515713CB087E005FD3E2 /* Debug (GC dual-mode) */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */;
+			buildSettings = {
+			};
+			name = "Debug (GC dual-mode)";
+		};
+		AA0B515813CB087E005FD3E2 /* Debug (GC dual-mode) */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5D06E8F20FD68D21005AE3F6 /* ConfigBinaryDeltaDebug.xcconfig */;
+			buildSettings = {
+			};
+			name = "Debug (GC dual-mode)";
+		};
 		DAAEFC980DA571DF0051E0D0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
@@ -1358,6 +1401,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB91AE08733DA50010E9CD /* Debug */,
+				AA0B515413CB087E005FD3E2 /* Debug (GC dual-mode) */,
 				1DEB91AF08733DA50010E9CD /* Release */,
 				61072EAE0DF263BD008FE88B /* Release (GC dual-mode; 10.5-only) */,
 			);
@@ -1368,6 +1412,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB91B208733DA50010E9CD /* Debug */,
+				AA0B515313CB087E005FD3E2 /* Debug (GC dual-mode) */,
 				1DEB91B308733DA50010E9CD /* Release */,
 				61072EAD0DF263BD008FE88B /* Release (GC dual-mode; 10.5-only) */,
 			);
@@ -1378,6 +1423,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5D06E8D20FD68C7D005AE3F6 /* Debug */,
+				AA0B515813CB087E005FD3E2 /* Debug (GC dual-mode) */,
 				5D06E8D30FD68C7D005AE3F6 /* Release */,
 				5D06E8D40FD68C7D005AE3F6 /* Release (GC dual-mode; 10.5-only) */,
 			);
@@ -1388,6 +1434,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				612279DB0DB5470300AB99EA /* Debug */,
+				AA0B515713CB087E005FD3E2 /* Debug (GC dual-mode) */,
 				612279DC0DB5470300AB99EA /* Release */,
 				61072EB10DF263BD008FE88B /* Release (GC dual-mode; 10.5-only) */,
 			);
@@ -1398,6 +1445,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				61B5F90609C4CEE300B25A18 /* Debug */,
+				AA0B515513CB087E005FD3E2 /* Debug (GC dual-mode) */,
 				61B5F90709C4CEE300B25A18 /* Release */,
 				61072EAF0DF263BD008FE88B /* Release (GC dual-mode; 10.5-only) */,
 			);
@@ -1408,6 +1456,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DAAEFC980DA571DF0051E0D0 /* Debug */,
+				AA0B515613CB087E005FD3E2 /* Debug (GC dual-mode) */,
 				DAAEFC990DA571DF0051E0D0 /* Release */,
 				61072EB00DF263BD008FE88B /* Release (GC dual-mode; 10.5-only) */,
 			);
