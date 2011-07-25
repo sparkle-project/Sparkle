@@ -41,6 +41,10 @@
 
 - (void)awakeFromNib
 {
+    if ([host isBackgroundApplication]) {
+        [[self window] setLevel:NSFloatingWindowLevel];
+    }
+    
 	[[self window] center];
 	[[self window] setFrameAutosaveName:@"SUStatusFrame"];
 	[progressBar setUsesThreadedAnimation:YES];
