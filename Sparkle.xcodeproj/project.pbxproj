@@ -1232,6 +1232,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
+				SDKROOT = macosx10.6;
 			};
 			name = Debug;
 		};
@@ -1239,18 +1240,21 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
+				SDKROOT = macosx10.6;
 			};
 			name = Release;
 		};
 		1DEB91B208733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				SDKROOT = macosx10.6;
 			};
 			name = Debug;
 		};
 		1DEB91B308733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				SDKROOT = macosx10.6;
 			};
 			name = Release;
 		};
@@ -1278,6 +1282,7 @@
 		61072EAD0DF263BD008FE88B /* Release (GC dual-mode; 10.5-only) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				SDKROOT = macosx10.6;
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
 		};
@@ -1286,6 +1291,7 @@
 			baseConfigurationReference = 61072EB20DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig */;
 			buildSettings = {
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				SDKROOT = macosx10.6;
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
 		};
@@ -1300,6 +1306,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
 			buildSettings = {
+				SDKROOT = macosx10.6;
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
 		};
@@ -1341,6 +1348,7 @@
 		AA0B515313CB087E005FD3E2 /* Debug (GC dual-mode) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				SDKROOT = macosx10.6;
 			};
 			name = "Debug (GC dual-mode)";
 		};
@@ -1349,6 +1357,7 @@
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
 				GCC_ENABLE_OBJC_GC = supported;
+				SDKROOT = macosx10.6;
 			};
 			name = "Debug (GC dual-mode)";
 		};
@@ -1363,6 +1372,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
 			buildSettings = {
+				SDKROOT = macosx10.6;
 			};
 			name = "Debug (GC dual-mode)";
 		};
@@ -1384,6 +1394,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
 			buildSettings = {
+				SDKROOT = macosx10.6;
 			};
 			name = Debug;
 		};
@@ -1391,6 +1402,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
 			buildSettings = {
+				SDKROOT = macosx10.6;
 			};
 			name = Release;
 		};
