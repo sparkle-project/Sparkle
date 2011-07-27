@@ -43,7 +43,9 @@
 	}
 	while (noErr == FSPathMakeRefWithOptions((UInt8 *)[mountPoint fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &tmpRef, NULL));
 	
-	NSArray* arguments = [NSArray arrayWithObjects:@"attach", archivePath, @"-mountpoint", mountPoint, @"-noverify", @"-nobrowse", @"-noautoopen", nil];
+    // -noverify seems to make the process more flaky under Lion, crashes randomly in FSCopyObjectSync presumably because of some async behaviour
+    // can still crash this way too but it improves things greatly (tried random delays with no luck)
+	NSArray* arguments = [NSArray arrayWithObjects:@"attach", archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen", nil];
 	// set up a pipe and push "yes" (y works too), this will accept any license agreement crap
 	// not every .dmg needs this, but this will make sure it works with everyone
 	NSData* yesData = [[[NSData alloc] initWithBytes:"yes\n" length:4] autorelease];
