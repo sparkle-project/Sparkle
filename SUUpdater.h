@@ -161,6 +161,10 @@
 //	Constants:
 // -----------------------------------------------------------------------------
 
+#ifndef DEBUG
+#define DEBUG	0
+#endif
+
 // Define some minimum intervals to avoid DOS-like checking attacks. These are in seconds.
 #if DEBUG && 0
 #define SU_MIN_CHECK_INTERVAL 60
