@@ -203,53 +203,45 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 + (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp error:(NSError **)error
 {
-	FSRef srcRef, dstRef, targetRef, movedRef;
-	OSStatus err;
-	
-	err = FSPathMakeRefWithOptions((UInt8 *)[dst fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &dstRef, NULL);
-	if (err != noErr)
-	{
-		NSString *errorMessage = [NSString stringWithFormat:@"Couldn't copy %@ over %@ because there is no file at %@.", src, dst, dst];
-		if (error != nil)
-			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
-		return NO;
-	}
+	NSError *anError = nil;
+	NSFileManager *fm = [[NSFileManager alloc] init];
 	
 	NSString *tmpPath = [[dst stringByDeletingLastPathComponent] stringByAppendingPathComponent:tmp];
 	
-	if (0 != access([dst fileSystemRepresentation], W_OK) || 0 != access([[dst stringByDeletingLastPathComponent] fileSystemRepresentation], W_OK))
-		return [self copyPathWithForcedAuthentication:src toPath:dst temporaryPath:tmpPath error:error];
+	NSString *dstDir = [dst stringByDeletingLastPathComponent];
+	NSGarbageCollector *dc = [NSGarbageCollector defaultCollector];
+	[dc disableCollectorForPointer:dst];
+	[dc disableCollectorForPointer:dstDir];
+	{
+		if (0 != access([dst fileSystemRepresentation], W_OK) || 0 != access([dstDir fileSystemRepresentation], W_OK))
+		{
+			[dc enableCollectorForPointer:dst];
+			[dc enableCollectorForPointer:dstDir];
+			return [self copyPathWithForcedAuthentication:src toPath:dst temporaryPath:tmpPath error:error];
+		}
+	}	
+	[dc enableCollectorForPointer:dst];
+	[dc enableCollectorForPointer:dstDir];
 	
-	err = FSPathMakeRef((UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &targetRef, NULL);
-	if (err == noErr)
-		err = FSMoveObjectSync(&dstRef, &targetRef, (CFStringRef)tmp, &movedRef, 0);
-	if (err != noErr)
+	if (![fm moveItemAtPath:dst toPath:tmpPath error:&anError])
+		
 	{
 		if (error != nil)
 			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
-		return NO;			
+		return NO;	
 	}
-	err = FSPathMakeRef((UInt8 *)[src fileSystemRepresentation], &srcRef, NULL);
-	if (err == noErr)
-		err = FSCopyObjectSync(&srcRef, &targetRef, (CFStringRef)[dst lastPathComponent], NULL, 0);
-	if (err != noErr)
+	
+	if (![fm copyItemAtPath:src toPath:dst error:&anError])
 	{
 		// We better move the old version back to its old location
-		FSMoveObjectSync(&movedRef, &targetRef, (CFStringRef)[dst lastPathComponent], &movedRef, 0);
+		[fm moveItemAtPath:tmpPath toPath:dst error:NULL];
 		if (error != nil)
 			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't copy %@ to %@.", src, dst] forKey:NSLocalizedDescriptionKey]];
-		return NO;			
+		return NO;	
 	}
 	
 	// Trash the old copy of the app.
-#if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4
-	if (FSMoveObjectToTrashSync == NULL)
-		[self performSelectorOnMainThread:@selector(movePathToTrash:) withObject:tmpPath waitUntilDone:YES];
-	else if (noErr != FSMoveObjectToTrashSync(&movedRef, NULL, 0))
-		NSLog(@"Sparkle error: couldn't move %@ to the trash. This is often a sign of a permissions error.", tmpPath);
-#else
 	[self performSelectorOnMainThread:@selector(movePathToTrash:) withObject:tmpPath waitUntilDone:YES];
-#endif
 	
 	// If the currently-running application is trusted, the new
 	// version should be trusted as well.  Remove it from the

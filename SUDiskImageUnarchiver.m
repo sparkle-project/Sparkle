@@ -22,11 +22,15 @@
 {		
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	BOOL mountedSuccessfully = NO;
+	NSFileManager *fm = [[NSFileManager alloc] init];
+	NSGarbageCollector *dc = [NSGarbageCollector defaultCollector];
+	NSError *anError = nil;
 	
 	// get a unique mount point path
 	NSString *mountPointName = nil;
 	NSString *mountPoint = nil;
 	FSRef tmpRef;
+	BOOL cont = YES;
 	do
 	{
 		CFUUIDRef uuid = CFUUIDCreate(NULL);
@@ -40,8 +44,12 @@
 			}
 			CFRelease(uuid);
 		}
+		
+		[dc disableCollectorForPointer:mountPoint];
+		cont =  (noErr == FSPathMakeRefWithOptions((UInt8 *)[mountPoint fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &tmpRef, NULL));
+		[dc enableCollectorForPointer:mountPoint];
 	}
-	while (noErr == FSPathMakeRefWithOptions((UInt8 *)[mountPoint fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &tmpRef, NULL));
+	while (cont);
 	
 	NSArray* arguments = [NSArray arrayWithObjects:@"attach", archivePath, @"-mountpoint", mountPoint, @"-noverify", @"-nobrowse", @"-noautoopen", nil];
 	// set up a pipe and push "yes" (y works too), this will accept any license agreement crap
@@ -53,15 +61,9 @@
 	mountedSuccessfully = YES;
 	
 	// Now that we've mounted it, we need to copy out its contents.
-	FSRef srcRef, dstRef;
-	OSStatus err;
-	err = FSPathMakeRef((UInt8 *)[mountPoint fileSystemRepresentation], &srcRef, NULL);
-	if (err != noErr) goto reportError;
-	err = FSPathMakeRef((UInt8 *)[[archivePath stringByDeletingLastPathComponent] fileSystemRepresentation], &dstRef, NULL);
-	if (err != noErr) goto reportError;
-	
-	err = FSCopyObjectSync(&srcRef, &dstRef, (CFStringRef)mountPointName, NULL, kFSFileOperationSkipSourcePermissionErrors);
-	if (err != noErr) goto reportError;
+	NSString *dstPath = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:mountPointName];
+	if (![fm copyItemAtPath:mountPoint toPath:dstPath error:&anError])
+		goto reportError;
 	
 	[self performSelectorOnMainThread:@selector(notifyDelegateOfSuccess) withObject:nil waitUntilDone:NO];
 	goto finally;
