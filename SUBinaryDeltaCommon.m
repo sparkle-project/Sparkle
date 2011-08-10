@@ -43,7 +43,9 @@ NSString *temporaryFilename(NSString *base)
 {
     NSString *template = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.XXXXXXXXXX", base]];
     char buffer[MAXPATHLEN];
+	[[NSGarbageCollector defaultCollector] disableCollectorForPointer:template];
     strcpy(buffer, [template fileSystemRepresentation]);
+	[[NSGarbageCollector defaultCollector] enableCollectorForPointer:template];
     return [NSString stringWithUTF8String:mktemp(buffer)];
 }
 
@@ -110,8 +112,11 @@ NSData *hashOfFile(FTSENT *ent)
 
 NSString *hashOfTree(NSString *path)
 {
+	NSGarbageCollector *dc = [NSGarbageCollector defaultCollector];
+	[dc disableCollectorForPointer:path];
     const char *sourcePaths[] = {[path UTF8String], 0};
     FTS *fts = fts_open((char* const*)sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
+	[dc enableCollectorForPointer:path];
     if (!fts) {
         perror("fts_open");
         return nil;
@@ -131,7 +136,9 @@ NSString *hashOfTree(NSString *path)
 
         NSString *relativePath = pathRelativeToDirectory(path, [NSString stringWithUTF8String:ent->fts_path]);
         NSData *relativePathBytes = [relativePath dataUsingEncoding:NSUTF8StringEncoding];
+		[dc disableCollectorForPointer:relativePathBytes];
         CC_SHA1_Update(&hashContext, [relativePathBytes bytes], (uint32_t)[relativePathBytes length]);
+		[dc enableCollectorForPointer:relativePathBytes];
     }
     fts_close(fts);
 

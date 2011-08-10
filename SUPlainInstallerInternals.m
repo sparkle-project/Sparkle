@@ -87,6 +87,10 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 + (BOOL)copyPathWithForcedAuthentication:(NSString *)src toPath:(NSString *)dst temporaryPath:(NSString *)tmp error:(NSError **)error
 {
+	NSGarbageCollector *dc = [NSGarbageCollector defaultCollector];
+	[dc disableCollectorForPointer:src];
+	[dc disableCollectorForPointer:tmp];
+	[dc disableCollectorForPointer:dst];
 	const char* srcPath = [src fileSystemRepresentation];
 	const char* tmpPath = [tmp fileSystemRepresentation];
 	const char* dstPath = [dst fileSystemRepresentation];
@@ -182,6 +186,11 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		if (error != nil)
 			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:[NSDictionary dictionaryWithObject:@"Couldn't get permission to authenticate." forKey:NSLocalizedDescriptionKey]];
 	}
+	
+	[dc enableCollectorForPointer:src];
+	[dc enableCollectorForPointer:tmp];
+	[dc enableCollectorForPointer:dst];
+	
 	return res;
 }
 
@@ -281,6 +290,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		return -1;
 	}
 	
+	[[NSGarbageCollector defaultCollector] disableCollectorForPointer:file];
 	const char* path = NULL;
 	@try {
 		path = [file fileSystemRepresentation];
@@ -294,7 +304,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		return -1;
 	}
 	
-	return removexattr_func(path, name, options);
+	int res = removexattr_func(path, name, options);
+	[[NSGarbageCollector defaultCollector] enableCollectorForPointer:file];
+	return res;
 }
 
 + (void)releaseFromQuarantine:(NSString*)root

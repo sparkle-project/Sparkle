@@ -18,20 +18,30 @@
 static void applyBinaryDeltaToFile(xar_t x, xar_file_t file, NSString *sourceFilePath, NSString *destinationFilePath)
 {
     NSString *patchFile = temporaryFilename(@"apply-binary-delta");
+	[[NSGarbageCollector defaultCollector] disableCollectorForPointer:patchFile];
+	[[NSGarbageCollector defaultCollector] disableCollectorForPointer:destinationFilePath];
+	[[NSGarbageCollector defaultCollector] disableCollectorForPointer:sourceFilePath];
     xar_extract_tofile(x, file, [patchFile fileSystemRepresentation]);
     const char *argv[] = {"/usr/bin/bspatch", [sourceFilePath fileSystemRepresentation], [destinationFilePath fileSystemRepresentation], [patchFile fileSystemRepresentation]};
     bspatch(4, (char **)argv);
     unlink([patchFile fileSystemRepresentation]);
+	[[NSGarbageCollector defaultCollector] enableCollectorForPointer:patchFile];
+	[[NSGarbageCollector defaultCollector] enableCollectorForPointer:destinationFilePath];
+	[[NSGarbageCollector defaultCollector] enableCollectorForPointer:sourceFilePath];
 }
 
 int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFile)
 {
+	NSGarbageCollector *dc = [NSGarbageCollector defaultCollector];
+	[dc disableCollectorForPointer:patchFile];
     xar_t x = xar_open([patchFile UTF8String], READ);
     if (!x) {
         fprintf(stderr, "Unable to open %s. Giving up.\n", [patchFile UTF8String]);
+		[dc enableCollectorForPointer:patchFile];
         return 1;
     }
-
+	[dc enableCollectorForPointer:patchFile];
+	
     NSString *expectedBeforeHash = nil;
     NSString *expectedAfterHash = nil;
     xar_subdoc_t subdoc;
@@ -57,7 +67,11 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
     NSString *beforeHash = hashOfTree(source);
 
     if (![beforeHash isEqualToString:expectedBeforeHash]) {
+		[dc disableCollectorForPointer:expectedBeforeHash];
+		[dc disableCollectorForPointer:beforeHash];
         fprintf(stderr, "Source doesn't have expected hash (%s != %s).  Giving up.\n", [expectedBeforeHash UTF8String], [beforeHash UTF8String]);
+		[dc enableCollectorForPointer:expectedBeforeHash];
+		[dc enableCollectorForPointer:beforeHash];
         return 1;
     }
 
@@ -83,7 +97,11 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
         if (!xar_prop_get(file, "binary-delta", &value))
             applyBinaryDeltaToFile(x, file, sourceFilePath, destinationFilePath);
         else
-            xar_extract_tofile(x, file, [destinationFilePath fileSystemRepresentation]);
+		{
+			[[NSGarbageCollector defaultCollector] disableCollectorForPointer:destinationFilePath];
+			xar_extract_tofile(x, file, [destinationFilePath fileSystemRepresentation]);
+			[[NSGarbageCollector defaultCollector] enableCollectorForPointer:destinationFilePath];
+		}
     }
     xar_close(x);
 
@@ -91,7 +109,11 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
     NSString *afterHash = hashOfTree(destination);
 
     if (![afterHash isEqualToString:expectedAfterHash]) {
+		[dc disableCollectorForPointer:expectedAfterHash];
+		[dc disableCollectorForPointer:afterHash];
         fprintf(stderr, "Destination doesn't have expected hash (%s != %s).  Giving up.\n", [expectedAfterHash UTF8String], [afterHash UTF8String]);
+		[dc enableCollectorForPointer:afterHash];
+		[dc enableCollectorForPointer:expectedAfterHash];
         removeTree(destination);
         return 1;
     }

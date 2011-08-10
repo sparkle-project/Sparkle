@@ -100,7 +100,10 @@
 - (BOOL)isRunningOnReadOnlyVolume
 {	
 	struct statfs statfs_info;
-	statfs([[bundle bundlePath] fileSystemRepresentation], &statfs_info);
+	NSString *bundlePath = [bundle bundlePath];
+	[[NSGarbageCollector defaultCollector] disableCollectorForPointer:bundlePath];
+	statfs([bundlePath fileSystemRepresentation], &statfs_info);
+	[[NSGarbageCollector defaultCollector] enableCollectorForPointer:bundlePath];
 	return (statfs_info.f_flags & MNT_RDONLY);
 }
 
