@@ -20,8 +20,6 @@
 
 #ifdef __OBJC__
 
-#define ClassPrefix RRGM
-
 #ifdef ClassPrefix
 #define _ClassPrefix_CONCAT_2(c,d) c ## d
 #define _ClassPrefix_CONCAT(a,b) _ClassPrefix_CONCAT_2(a,b)
