@@ -176,10 +176,6 @@
 
 - (void)download:(NSURLDownload *)d decideDestinationWithSuggestedFilename:(NSString *)name
 {
-	// If name ends in .txt, the server probably has a stupid MIME configuration. We'll give the developer the benefit of the doubt and chop that off.
-	if ([[name pathExtension] isEqualToString:@"txt"])
-		name = [name stringByDeletingPathExtension];
-	
 	NSString *downloadFileName = [NSString stringWithFormat:@"%@ %@", [host name], [updateItem versionString]];
     
     
@@ -200,7 +196,7 @@
 		[download cancel];
 		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Can't make a temporary directory for the update download at %@.",tempDir] forKey:NSLocalizedDescriptionKey]]];
 	}
-	
+
 	downloadPath = [[tempDir stringByAppendingPathComponent:name] retain];
 	[download setDestination:downloadPath allowOverwrite:YES];
 }
@@ -349,8 +345,8 @@
         [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [host name]], NSLocalizedDescriptionKey, [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@)", relaunchPath], NSLocalizedFailureReasonErrorKey, nil]]];
         // We intentionally don't abandon the update here so that the host won't initiate another.
         return;
-    }		
-    
+    }
+
     NSString *pathToRelaunch = [host bundlePath];
     if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
         pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
