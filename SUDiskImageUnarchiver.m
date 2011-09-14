@@ -22,7 +22,7 @@
 {		
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	BOOL mountedSuccessfully = NO;
-	NSFileManager *fm = [[NSFileManager alloc] init];
+	NSFileManager *fm = [[[NSFileManager alloc] init] autorelease];
 	NSGarbageCollector *dc = [NSGarbageCollector defaultCollector];
 	NSError *anError = nil;
 	
