@@ -44,7 +44,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
 	sig_t oldSigChildHandler = signal(SIGCHLD, SIG_DFL);
 	BOOL returnValue = YES;
-
+    
 	if (AuthorizationExecuteWithPrivileges(authorization, executablePath, options, (char* const*)arguments, NULL) == errAuthorizationSuccess)
 	{
 		int status;
@@ -54,7 +54,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	}
 	else
 		returnValue = NO;
-		
+    
 	signal(SIGCHLD, oldSigChildHandler);
 	return returnValue;
 }
@@ -87,10 +87,6 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 + (BOOL)copyPathWithForcedAuthentication:(NSString *)src toPath:(NSString *)dst temporaryPath:(NSString *)tmp error:(NSError **)error
 {
-	NSGarbageCollector *dc = [NSGarbageCollector defaultCollector];
-	[dc disableCollectorForPointer:src];
-	[dc disableCollectorForPointer:tmp];
-	[dc disableCollectorForPointer:dst];
 	const char* srcPath = [src fileSystemRepresentation];
 	const char* tmpPath = [tmp fileSystemRepresentation];
 	const char* dstPath = [dst fileSystemRepresentation];
@@ -186,11 +182,6 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		if (error != nil)
 			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:[NSDictionary dictionaryWithObject:@"Couldn't get permission to authenticate." forKey:NSLocalizedDescriptionKey]];
 	}
-	
-	[dc enableCollectorForPointer:src];
-	[dc enableCollectorForPointer:tmp];
-	[dc enableCollectorForPointer:dst];
-	
 	return res;
 }
 
@@ -201,47 +192,171 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		NSLog(@"Sparkle error: couldn't move %@ to the trash. This is often a sign of a permissions error.", path);
 }
 
-+ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp error:(NSError **)error
++ (NSString *)temporaryInstallationPathForPath:(NSString *)path
 {
-	NSError *anError = nil;
-	NSFileManager *fm = [[[NSFileManager alloc] init] autorelease];
-	
-	NSString *tmpPath = [[dst stringByDeletingLastPathComponent] stringByAppendingPathComponent:tmp];
-	
-	NSString *dstDir = [dst stringByDeletingLastPathComponent];
-	NSGarbageCollector *dc = [NSGarbageCollector defaultCollector];
-	[dc disableCollectorForPointer:dst];
-	[dc disableCollectorForPointer:dstDir];
+	// Let's try to read the version number so the filename will be more meaningful.
+	NSString *postFix;
+	NSString *version;
+	if ((version = [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:@"CFBundleVersion"]) && ![version isEqualToString:@""])
 	{
-		if (0 != access([dst fileSystemRepresentation], W_OK) || 0 != access([dstDir fileSystemRepresentation], W_OK))
-		{
-			[dc enableCollectorForPointer:dst];
-			[dc enableCollectorForPointer:dstDir];
-			return [self copyPathWithForcedAuthentication:src toPath:dst temporaryPath:tmpPath error:error];
-		}
-	}	
-	[dc enableCollectorForPointer:dst];
-	[dc enableCollectorForPointer:dstDir];
+		// We'll clean it up a little for safety.
+		// The cast is necessary because of a bug in the headers in pre-10.5 SDKs
+		NSMutableCharacterSet *validCharacters = (id)[NSMutableCharacterSet alphanumericCharacterSet];
+		[validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
+		postFix = [version stringByTrimmingCharactersInSet:[validCharacters invertedSet]];
+	}
+	else
+		postFix = @"old";
+	NSString *prefix = [[path stringByDeletingPathExtension] stringByAppendingFormat:@" (%@)", postFix];
+	NSString *tempDir = [prefix stringByAppendingPathExtension:[path pathExtension]];
+	// Now let's make sure we get a unique path.
+	int cnt=2;
+	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
+		tempDir = [NSString stringWithFormat:@"%@ %d.%@", prefix, cnt++, [path pathExtension]];
+	return tempDir;
+}
+
++ (BOOL)copyPathWithForcedAuthentication:(NSString *)src toPath:(NSString *)dst error:(NSError **)error
+{
+	NSString *tmp = [self temporaryInstallationPathForPath:dst];
+	const char* srcPath = [src fileSystemRepresentation];
+	const char* tmpPath = [tmp fileSystemRepresentation];
+	const char* dstPath = [dst fileSystemRepresentation];
 	
-	if (![fm moveItemAtPath:dst toPath:tmpPath error:&anError])
+	struct stat dstSB;
+	stat(dstPath, &dstSB);
+	
+	AuthorizationRef auth = NULL;
+	OSStatus authStat = errAuthorizationDenied;
+	while (authStat == errAuthorizationDenied) {
+		authStat = AuthorizationCreate(NULL,
+									   kAuthorizationEmptyEnvironment,
+									   kAuthorizationFlagDefaults,
+									   &auth);
+	}
+	
+	BOOL res = NO;
+	if (authStat == errAuthorizationSuccess) {
+		res = YES;
 		
-	{
-		if (error != nil)
-			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
-		return NO;	
+		char uidgid[42];
+		snprintf(uidgid, sizeof(uidgid), "%d:%d",
+				 dstSB.st_uid, dstSB.st_gid);
+		
+		const char* executables[] = {
+			"/bin/rm",
+			"/bin/mv",
+			"/bin/mv",
+			"/bin/rm",
+			NULL,  // pause here and do some housekeeping before
+			// continuing
+			"/usr/sbin/chown",
+			NULL   // stop here for real
+		};
+		
+		// 4 is the maximum number of arguments to any command,
+		// including the NULL that signals the end of an argument
+		// list.
+		const char* const argumentLists[][4] = {
+			{ "-rf", tmpPath, NULL }, // make room for the temporary file... this is kinda unsafe; should probably do something better.
+			{ "-f", dstPath, tmpPath, NULL },  // mv
+			{ "-f", srcPath, dstPath, NULL },  // mv
+			{ "-rf", tmpPath, NULL },  // rm
+			{ NULL },  // pause
+			{ "-R", uidgid, dstPath, NULL },  // chown
+			{ NULL }  // stop
+		};
+		
+		// Process the commands up until the first NULL
+		int commandIndex = 0;
+		for (; executables[commandIndex] != NULL; ++commandIndex) {
+			if (res)
+				res = AuthorizationExecuteWithPrivilegesAndWait(auth, executables[commandIndex], kAuthorizationFlagDefaults, argumentLists[commandIndex]);
+		}
+		
+		// If the currently-running application is trusted, the new
+		// version should be trusted as well.  Remove it from the
+		// quarantine to avoid a delay at launch, and to avoid
+		// presenting the user with a confusing trust dialog.
+		//
+		// This needs to be done after the application is moved to its
+		// new home with "mv" in case it's moved across filesystems: if
+		// that happens, "mv" actually performs a copy and may result
+		// in the application being quarantined.  It also needs to be
+		// done before "chown" changes ownership, because the ownership
+		// change will almost certainly make it impossible to change
+		// attributes to release the files from the quarantine.
+		if (res) {
+			[self releaseFromQuarantine:dst];
+		}
+		
+		// Now move past the NULL we found and continue executing
+		// commands from the list.
+		++commandIndex;
+		
+		for (; executables[commandIndex] != NULL; ++commandIndex) {
+			if (res)
+				res = AuthorizationExecuteWithPrivilegesAndWait(auth, executables[commandIndex], kAuthorizationFlagDefaults, argumentLists[commandIndex]);
+		}
+		
+		AuthorizationFree(auth, 0);
+		
+		if (!res)
+		{
+			// Something went wrong somewhere along the way, but we're not sure exactly where.
+			NSString *errorMessage = [NSString stringWithFormat:@"Authenticated file copy from %@ to %@ failed.", src, dst];
+			if (error != NULL)
+				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
+		}
 	}
-	
-	if (![fm copyItemAtPath:src toPath:dst error:&anError])
+	else
 	{
-		// We better move the old version back to its old location
-		[fm moveItemAtPath:tmpPath toPath:dst error:NULL];
-		if (error != nil)
-			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't copy %@ to %@.", src, dst] forKey:NSLocalizedDescriptionKey]];
-		return NO;	
+		if (error != NULL)
+			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:[NSDictionary dictionaryWithObject:@"Couldn't get permission to authenticate." forKey:NSLocalizedDescriptionKey]];
 	}
+	return res;
+}
+
+
++ (BOOL)copyPathWithAuthenticationMainThread:(NSString *)src overPath:(NSString *)dst error:(NSError **)error
+{
+	if (![[NSFileManager defaultManager] fileExistsAtPath:dst])
+	{
+		NSString *errorMessage = [NSString stringWithFormat:@"Couldn't copy %@ over %@ because there is no file at %@.", src, dst, dst];
+		if (error != NULL)
+			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
+		return NO;
+	}
+    
+	if (![[NSFileManager defaultManager] isWritableFileAtPath:dst] || ![[NSFileManager defaultManager] isWritableFileAtPath:[dst stringByDeletingLastPathComponent]])
+		return [self copyPathWithForcedAuthentication:src toPath:dst error:error];
+    
+	NSString *tmpPath = [self temporaryInstallationPathForPath:dst];
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
+    if (![[NSFileManager defaultManager] movePath:dst toPath:tmpPath handler:nil])
+#else
+        if (![[NSFileManager defaultManager] moveItemAtPath:dst toPath:tmpPath error:NULL])
+#endif
+        {
+            if (error != NULL)
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
+            return NO;			
+        }
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5
+    if (![[NSFileManager defaultManager] copyPath:src toPath:dst handler:nil])
+#else
+        if (![[NSFileManager defaultManager] copyItemAtPath:src toPath:dst error:NULL])
+#endif
+        {
+            if (error != NULL)
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't copy %@ to %@.", src, dst] forKey:NSLocalizedDescriptionKey]];
+            return NO;			
+        }
 	
 	// Trash the old copy of the app.
-	[self performSelectorOnMainThread:@selector(movePathToTrash:) withObject:tmpPath waitUntilDone:YES];
+	NSInteger tag = 0;
+	if (![[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[tmpPath stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[tmpPath lastPathComponent]] tag:&tag])
+		NSLog(@"Sparkle error: couldn't move %@ to the trash. This is often a sign of a permissions error.", tmpPath);
 	
 	// If the currently-running application is trusted, the new
 	// version should be trusted as well.  Remove it from the
@@ -252,8 +367,81 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	// new home in case it's moved across filesystems: if that
 	// happens, the move is actually a copy, and it may result
 	// in the application being quarantined.
-	[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:dst waitUntilDone:YES];
+	[self releaseFromQuarantine:dst];
 	
+	return YES;
+}
+
++ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp error:(NSError **)error
+{
+    
+    // FSCopyObjectSync et al seem very flaky on Lion, don't use them
+    // have to use NSFileManager in main thread though
+    dispatch_sync(dispatch_get_main_queue(), ^{ 
+        [self copyPathWithAuthenticationMainThread:src overPath:dst error:error]; 
+    });
+    
+    /*
+     FSRef srcRef, dstRef, targetRef, movedRef;
+     OSStatus err;
+     
+     err = FSPathMakeRefWithOptions((UInt8 *)[dst fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &dstRef, NULL);
+     if (err != noErr)
+     {
+     NSString *errorMessage = [NSString stringWithFormat:@"Couldn't copy %@ over %@ because there is no file at %@.", src, dst, dst];
+     if (error != nil)
+     *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
+     return NO;
+     }
+     
+     NSString *tmpPath = [[dst stringByDeletingLastPathComponent] stringByAppendingPathComponent:tmp];
+     
+     if (0 != access([dst fileSystemRepresentation], W_OK) || 0 != access([[dst stringByDeletingLastPathComponent] fileSystemRepresentation], W_OK))
+     return [self copyPathWithForcedAuthentication:src toPath:dst temporaryPath:tmpPath error:error];
+     
+     err = FSPathMakeRef((UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &targetRef, NULL);
+     if (err == noErr)
+     err = FSMoveObjectSync(&dstRef, &targetRef, (CFStringRef)tmp, &movedRef, 0);
+     if (err != noErr)
+     {
+     if (error != nil)
+     *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
+     return NO;			
+     }
+     err = FSPathMakeRef((UInt8 *)[src fileSystemRepresentation], &srcRef, NULL);
+     if (err == noErr)
+     err = FSCopyObjectSync(&srcRef, &targetRef, (CFStringRef)[dst lastPathComponent], NULL, 0);
+     if (err != noErr)
+     {
+     // We better move the old version back to its old location
+     FSMoveObjectSync(&movedRef, &targetRef, (CFStringRef)[dst lastPathComponent], &movedRef, 0);
+     if (error != nil)
+     *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't copy %@ to %@.", src, dst] forKey:NSLocalizedDescriptionKey]];
+     return NO;			
+     }
+     
+     // Trash the old copy of the app.
+     #if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_4
+     if (FSMoveObjectToTrashSync == NULL)
+     [self performSelectorOnMainThread:@selector(movePathToTrash:) withObject:tmpPath waitUntilDone:YES];
+     else if (noErr != FSMoveObjectToTrashSync(&movedRef, NULL, 0))
+     NSLog(@"Sparkle error: couldn't move %@ to the trash. This is often a sign of a permissions error.", tmpPath);
+     #else
+     [self performSelectorOnMainThread:@selector(movePathToTrash:) withObject:tmpPath waitUntilDone:YES];
+     #endif
+     
+     // If the currently-running application is trusted, the new
+     // version should be trusted as well.  Remove it from the
+     // quarantine to avoid a delay at launch, and to avoid
+     // presenting the user with a confusing trust dialog.
+     //
+     // This needs to be done after the application is moved to its
+     // new home in case it's moved across filesystems: if that
+     // happens, the move is actually a copy, and it may result
+     // in the application being quarantined.
+     [self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:dst waitUntilDone:YES];
+     */
+    
 	return YES;
 }
 
@@ -282,7 +470,6 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		return -1;
 	}
 	
-	[[NSGarbageCollector defaultCollector] disableCollectorForPointer:file];
 	const char* path = NULL;
 	@try {
 		path = [file fileSystemRepresentation];
@@ -296,9 +483,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		return -1;
 	}
 	
-	int res = removexattr_func(path, name, options);
-	[[NSGarbageCollector defaultCollector] enableCollectorForPointer:file];
-	return res;
+	return removexattr_func(path, name, options);
 }
 
 + (void)releaseFromQuarantine:(NSString*)root
