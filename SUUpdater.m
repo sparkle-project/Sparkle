@@ -18,6 +18,7 @@
 
 @interface SUUpdater (Private)
 - initForBundle:(NSBundle *)bundle;
+- (void)delayedInit;
 - (void)startUpdateCycle;
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
 - (BOOL)automaticallyDownloadsUpdates;
@@ -73,13 +74,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
             sharedUpdaters = [[NSMutableDictionary alloc] init];
         [sharedUpdaters setObject:self forKey:[NSValue valueWithNonretainedObject:bundle]];
         host = [[SUHost alloc] initWithBundle:bundle];
-		
-		// Saving-the-developer-from-a-stupid-mistake-check:
-		if (![[[self feedURL] scheme] isEqualToString:@"https"] && ![host publicDSAKey])
-			NSRunAlertPanel(@"Insecure update error!", @"For security reasons, you need to distribute your appcast over SSL or sign your updates. See Sparkle's documentation for more information.", @"OK", nil, nil);
-		
+
         // This runs the permission prompt if needed, but never before the app has finished launching because the runloop won't run before that
-        [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:0];
+        [self performSelector:@selector(delayedInit) withObject:nil afterDelay:0];
 	}
 	return self;
 }
@@ -91,6 +88,20 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [host bundlePath]]; }
+
+- (void)delayedInit
+{
+    NSAssert( host, @"expected SUHost to be allocated");
+    
+    if( delegate && [delegate respondsToSelector:@selector(publicDSAKeyForUpdater:)] )
+        [host setPublicDSAKey:[delegate publicDSAKeyForUpdater:self]];
+
+    // Saving-the-developer-from-a-stupid-mistake-check:
+    if (![[[self feedURL] scheme] isEqualToString:@"https"] && ![host publicDSAKey] )
+        NSRunAlertPanel(@"Insecure update error!", @"For security reasons, you need to distribute your appcast over SSL or sign your updates. See Sparkle's documentation for more information.", @"OK", nil, nil);    
+    
+    [self startUpdateCycle];
+}
 
 - (void)startUpdateCycle
 {

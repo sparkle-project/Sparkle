@@ -27,6 +27,7 @@
 - (void)dealloc
 {
 	[bundle release];
+    [publicDSAKey release];
 	[super dealloc];
 }
 
@@ -115,8 +116,17 @@
 	return isElement;
 }
 
+- (void)setPublicDSAKey:(NSString *)dsaKey {
+    [dsaKey retain];
+    [publicDSAKey release];
+    publicDSAKey = dsaKey;
+}
+
 - (NSString *)publicDSAKey
 {
+    // Check if the key was manually set
+    if( publicDSAKey ) { return publicDSAKey; }
+
 	// Maybe the key is just a string in the Info.plist.
 	NSString *key = [bundle objectForInfoDictionaryKey:SUPublicDSAKeyKey];
 	if (key) { return key; }
@@ -207,6 +217,8 @@
 - (BOOL)boolForKey:(NSString *)key {
     return [self objectForUserDefaultsKey:key] ? [self boolForUserDefaultsKey:key] : [self boolForInfoDictionaryKey:key];
 }
+
+
 
 + (NSString *)systemVersionString
 {

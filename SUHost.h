@@ -11,6 +11,7 @@
 {
 @private
 	NSBundle *bundle;
+    NSString *publicDSAKey;
 }
 
 + (NSString *)systemVersionString;
@@ -35,4 +36,5 @@
 - (void)setBool:(BOOL)value forUserDefaultsKey:(NSString *)defaultName;
 - (id)objectForKey:(NSString *)key;
 - (BOOL)boolForKey:(NSString *)key;
+- (void)setPublicDSAKey:(NSString *)dsaKey;
 @end

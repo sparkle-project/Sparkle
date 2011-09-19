@@ -108,6 +108,9 @@
 // Returns the path which is used to relaunch the client after the update is installed. By default, the path of the host bundle.
 - (NSString *)pathToRelaunchForUpdater:(SUUpdater *)updater;
 
+// Returns the DSA public key used to validate the software release signatures
+- (NSString *)publicDSAKeyForUpdater:(SUUpdater *)updater;
+
 @end
 
 // Define some minimum intervals to avoid DOS-like checking attacks. These are in seconds.
