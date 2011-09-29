@@ -17,7 +17,7 @@
 #import "SUScheduledUpdateDriver.h"
 #import "SUConstants.h"
 #import "SULog.h"
-#include <SystemConfiguration/SCNetwork.h>	// UK 2007-04-27
+#include <SystemConfiguration/SystemConfiguration.h>
 
 
 @interface SUUpdater (Private)
@@ -232,7 +232,13 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 		// Don't perform automatic checks on unconnected laptops or dial-up connections that aren't online:
 		NSMutableDictionary*		theDict = [NSMutableDictionary dictionary];
 		[self performSelectorOnMainThread: @selector(putFeedURLIntoDictionary:) withObject: theDict waitUntilDone: YES];	// Get feed URL on main thread, it's not safe to call elsewhere.
-		if( SCNetworkCheckReachabilityByName( [[[theDict objectForKey: @"feedURL"] host] cStringUsingEncoding: NSUTF8StringEncoding], &flags ) )
+		
+		const char *hostname = [[[theDict objectForKey: @"feedURL"] host] cStringUsingEncoding: NSUTF8StringEncoding];
+		SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(NULL, hostname);
+		Boolean reachabilityResult = SCNetworkReachabilityGetFlags(reachability, &flags);
+		CFRelease(reachability);
+		
+		if( reachabilityResult )
 		{
 			BOOL reachable =	(flags & kSCNetworkFlagsReachable)				== kSCNetworkFlagsReachable;
 			BOOL automatic =	(flags & kSCNetworkFlagsConnectionAutomatic)	== kSCNetworkFlagsConnectionAutomatic;
