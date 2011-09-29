@@ -44,7 +44,7 @@
 	switch (choice)
 	{
 		case SUInstallNowChoice:
-			[self installUpdate];
+			[self installWithToolAndRelaunch:YES];
 			break;
 			
 		case SUInstallLaterChoice:
@@ -61,15 +61,15 @@
 
 - (BOOL)shouldInstallSynchronously { return postponingInstallation; }
 
-- (void)installUpdate
+- (void)installWithToolAndRelaunch:(BOOL)relaunch
 {
 	showErrors = YES;
-	[super installUpdate];
+	[super installWithToolAndRelaunch:relaunch];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)note
 {
-	[self installUpdate];
+	[self installWithToolAndRelaunch:NO];
 }
 
 - (void)abortUpdateWithError:(NSError *)error

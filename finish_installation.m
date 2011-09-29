@@ -21,6 +21,7 @@
 	NSTimer			*watchdogTimer;
 	NSTimer			*longInstallationTimer;
 	SUHost			*host;
+    BOOL            shouldRelaunch;
 }
 
 - (void) parentHasQuit;
@@ -35,7 +36,7 @@
 
 @implementation TerminationListener
 
-- (id) initWithExecutablePath:(const char *)execpath parentProcessId:(pid_t)ppid folderPath: (const char*)infolderpath
+- (id) initWithExecutablePath:(const char *)execpath parentProcessId:(pid_t)ppid folderPath: (const char*)infolderpath shouldRelaunch:(BOOL)relaunch
 		selfPath: (NSString*)inSelfPath
 {
 	if( !(self = [super init]) )
@@ -45,6 +46,7 @@
 	parentprocessid	= ppid;
 	folderpath		= infolderpath;
 	selfPath		= [inSelfPath retain];
+    shouldRelaunch  = relaunch;
 	
 	BOOL	alreadyTerminated = (getppid() == 1); // ppid is launchd (1) => parent terminated already
 	
@@ -105,23 +107,27 @@
 
 - (void) relaunch
 {
-	NSString	*appPath = nil;
-	if( !folderpath )
-		appPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:executablepath length:strlen(executablepath)];
-	else
-		appPath = [host installationPath];
-	[[NSWorkspace sharedWorkspace] openFile: appPath];
-	if( folderpath )
-	{
-		NSError*		theError = nil;
-    	if( ![SUPlainInstaller _removeFileAtPath: [SUInstaller updateFolder] error: &theError] )
-			SULog( @"Couldn't remove update folder: %@.", theError );
-	}
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-    [[NSFileManager defaultManager] removeFileAtPath: selfPath handler: nil];
-#else
-	[[NSFileManager defaultManager] removeItemAtPath: selfPath error: NULL];
-#endif
+    if (shouldRelaunch)
+    {
+        NSString	*appPath = nil;
+        if( !folderpath )
+            appPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:executablepath length:strlen(executablepath)];
+        else
+            appPath = [host installationPath];
+        [[NSWorkspace sharedWorkspace] openFile: appPath];
+        if( folderpath )
+        {
+            NSError*		theError = nil;
+            if( ![SUPlainInstaller _removeFileAtPath: [SUInstaller updateFolder] error: &theError] )
+                SULog( @"Couldn't remove update folder: %@.", theError );
+        }
+    #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+        [[NSFileManager defaultManager] removeFileAtPath: selfPath handler: nil];
+    #else
+        [[NSFileManager defaultManager] removeItemAtPath: selfPath error: NULL];
+    #endif
+    }
+    
 	exit(EXIT_SUCCESS);
 }
 
@@ -158,7 +164,7 @@
 
 int main (int argc, const char * argv[])
 {
-	if( argc < 3 || argc > 4 )
+	if( argc < 4 || argc > 5 )
 		return EXIT_FAILURE;
 	
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -182,9 +188,10 @@ int main (int argc, const char * argv[])
 	
 	[NSApplication sharedApplication];
 	[[[TerminationListener alloc] initWithExecutablePath: (argc > 1) ? argv[1] : NULL
-										parentProcessId: (argc > 2) ? atoi(argv[2]) : 0
-										folderPath: (argc > 3) ? argv[3] : NULL
-										selfPath: selfPath] autorelease];
+                                         parentProcessId: (argc > 2) ? atoi(argv[2]) : 0
+                                              folderPath: (argc > 3) ? argv[3] : NULL
+                                          shouldRelaunch: (argc > 4) ? atoi(argv[4]) : 1
+                                                selfPath: selfPath] autorelease];
 	[[NSApplication sharedApplication] run];
 	
 	[pool drain];

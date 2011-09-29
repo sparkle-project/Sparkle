@@ -162,15 +162,14 @@
 
 - (void)installAndRestart: (id)sender
 {
-	if( [updater mayUpdateAndRestart] )
-		[self installUpdate];
+    [self installWithToolAndRelaunch:YES];
 }
 
-- (void)installUpdate
+- (void)installWithToolAndRelaunch:(BOOL)relaunch
 {
 	[statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
 	[statusController setButtonEnabled:NO];
-	[super installUpdate];
+	[super installWithToolAndRelaunch:relaunch];
 	
 	
 	// if a user chooses to NOT relaunch the app (as is the case with WebKit
