@@ -235,8 +235,12 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 		
 		const char *hostname = [[[theDict objectForKey: @"feedURL"] host] cStringUsingEncoding: NSUTF8StringEncoding];
 		SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(NULL, hostname);
-		Boolean reachabilityResult = SCNetworkReachabilityGetFlags(reachability, &flags);
-		CFRelease(reachability);
+        Boolean reachabilityResult = NO;
+        // If the feed's using a file:// URL, we won't be able to use reachability.
+        if (reachability != NULL) {
+            SCNetworkReachabilityGetFlags(reachability, &flags);
+            CFRelease(reachability);
+        }
 		
 		if( reachabilityResult )
 		{
