@@ -478,7 +478,6 @@
 				0867D69AFE84028FC02AAC07 /* Apple Frameworks and Libraries */,
 				FA1941C40D94A6EA00DD942E /* Configurations */,
 				034768DFFF38A50411DB9C8B /* Products */,
-				55C14BB9136EEF1500649790 /* finish_installation-Info.plist */,
 			);
 			name = Sparkle;
 			sourceTree = "<group>";
@@ -520,6 +519,7 @@
 		55C14BD5136EEFD000649790 /* finish_installation tool */ = {
 			isa = PBXGroup;
 			children = (
+				55C14BB9136EEF1500649790 /* finish_installation-Info.plist */,
 				55C14BD3136EEFCE00649790 /* finish_installation.m */,
 				55C14F0E136EF73600649790 /* finish_installation.pch */,
 				550347001370023A00AE7681 /* Sparkle.icns */,
