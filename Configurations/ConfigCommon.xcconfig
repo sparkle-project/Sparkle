@@ -15,7 +15,7 @@ GCC_PRECOMPILE_PREFIX_HEADER = YES
 GCC_PREFIX_HEADER = $(SDKROOT)/System/Library/Frameworks/Cocoa.framework/Headers/Cocoa.h
 GCC_FAST_OBJC_DISPATCH = YES
 GCC_ENABLE_PASCAL_STRINGS = NO
-ARCHS = $(ARCHS_STANDARD_32_64_BIT)
+ARCHS = ppc i386 x86_64
 GCC_VERSION = com.apple.compilers.llvm.clang.1_0
 
 // Enable warnings
