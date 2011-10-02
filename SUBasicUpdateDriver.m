@@ -312,7 +312,19 @@
 	NSString *pathToRelaunch = [host bundlePath];
 	if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
 		pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
-	[NSTask launchedTaskWithLaunchPath:relaunchPath arguments:[NSArray arrayWithObjects:pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil]];
+    
+    // Launch relauncher in host's architecture
+    NSTask *task = [[NSTask alloc] init];
+    [task setLaunchPath:@"/usr/bin/arch"];
+    NSMutableArray * arguments = [[NSMutableArray arrayWithObjects:relaunchPath, pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], nil] autorelease];
+#if defined __ppc__ || defined __i368__
+    [arguments insertObject:@"-32" atIndex:0];
+#elif defined __ppc64__ || defined __x86_64__
+    [arguments insertObject:@"-64" atIndex:0];
+#endif
+    [task setArguments:arguments];
+    [task launch];
+    [task release];
 	
 	[self setValue:[NSNumber numberWithBool:YES] forKey:@"finished"];
 	[NSApp terminate:nil];
