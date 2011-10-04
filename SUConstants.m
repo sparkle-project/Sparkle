@@ -6,7 +6,11 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
+#import "SUUpdater.h"
+
+#import "SUAppcast.h"
+#import "SUAppcastItem.h"
+#import "SUVersionComparisonProtocol.h"
 #import "SUConstants.h"
 
 NSString *const SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotificationName";
@@ -29,6 +33,8 @@ NSString *const SUEnableAutomaticChecksKeyOld = @"SUCheckAtStartup";
 NSString *const SUSendProfileInfoKey = @"SUSendProfileInfo";
 NSString *const SULastProfileSubmitDateKey = @"SULastProfileSubmissionDate";
 NSString *const SUPromptUserOnFirstLaunchKey = @"SUPromptUserOnFirstLaunch";
+NSString *const SUFixedHTMLDisplaySizeKey = @"SUFixedHTMLDisplaySize";
+NSString *const SUKeepDownloadOnFailedInstallKey = @"SUKeepDownloadOnFailedInstall";
 
 NSString *const SUSparkleErrorDomain = @"SUSparkleErrorDomain";
 OSStatus SUAppcastParseError = 1000;

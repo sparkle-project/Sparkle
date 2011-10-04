@@ -9,6 +9,7 @@
 // DSA stuff adapted from code provided by Allan Odgaard. Thanks, Allan!
 
 #import "SUDSAVerifier.h"
+#import <Cocoa/Cocoa.h>
 
 #import <stdio.h>
 #import <openssl/evp.h>
@@ -16,6 +17,11 @@
 #import <openssl/pem.h>
 #import <openssl/rsa.h>
 #import <openssl/sha.h>
+
+// Alex: Avoid prototype warning
+static long b64decode(unsigned char* str);
+static EVP_PKEY* load_dsa_key(char *key);
+
 
 static long b64decode(unsigned char* str)
 {

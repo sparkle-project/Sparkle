@@ -7,8 +7,11 @@
 
 #import "SUHost.h"
 
+#import "SUConstants.h"
 #import "SUSystemProfiler.h"
 #import <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
+#import "SULog.h"
+
 
 @implementation SUHost
 
@@ -19,7 +22,7 @@
 		if (aBundle == nil) aBundle = [NSBundle mainBundle];
         bundle = [aBundle retain];
 		if (![bundle bundleIdentifier])
-			NSLog(@"Sparkle Error: the bundle being updated at %@ has no CFBundleIdentifier! This will cause preference read/write to not work properly.", bundle);
+			SULog(@"Sparkle Error: the bundle being updated at %@ has no CFBundleIdentifier! This will cause preference read/write to not work properly.", bundle);
     }
     return self;
 }
@@ -30,7 +33,7 @@
 	[super dealloc];
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self bundlePath]]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self bundlePath], [self installationPath]]; }
 
 - (NSBundle *)bundle
 {
@@ -40,6 +43,30 @@
 - (NSString *)bundlePath
 {
     return [bundle bundlePath];
+}
+
+- (NSString *)appSupportPath
+{
+    NSArray *appSupportPaths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+    NSString *appSupportPath = nil;
+    if (!appSupportPaths || [appSupportPaths count] == 0)
+    {
+        SULog(@"Failed to find app support directory! Using ~/Library/Application Support...");
+        appSupportPath = [@"~/Library/Application Support" stringByExpandingTildeInPath];
+    }
+    else
+        appSupportPath = [appSupportPaths objectAtIndex:0];
+    appSupportPath = [appSupportPath stringByAppendingPathComponent:[self name]];
+    return appSupportPath;
+}
+
+- (NSString *)installationPath
+{
+#if NORMALIZE_INSTALLED_APP_NAME
+    return [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.%@", [bundle objectForInfoDictionaryKey:@"CFBundleName"], [[bundle bundlePath] pathExtension]]];
+#else
+	return [bundle bundlePath];
+#endif
 }
 
 - (NSString *)name

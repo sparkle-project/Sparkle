@@ -9,6 +9,8 @@
 #ifndef SUSYSTEMPROFILER_H
 #define SUSYSTEMPROFILER_H
 
+#import <Cocoa/Cocoa.h>
+
 @class SUHost;
 @interface SUSystemProfiler : NSObject {}
 + (SUSystemProfiler *)sharedSystemProfiler;

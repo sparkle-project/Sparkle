@@ -5,7 +5,10 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
+#import "SUUpdater.h"
+#import "SUAppcast.h"
+#import "SUAppcastItem.h"
+#import "SUVersionComparisonProtocol.h"
 
 @interface SUHost : NSObject
 {
@@ -18,6 +21,8 @@
 - (id)initWithBundle:(NSBundle *)aBundle;
 - (NSBundle *)bundle;
 - (NSString *)bundlePath;
+- (NSString *)appSupportPath;
+- (NSString *)installationPath;
 - (NSString *)name;
 - (NSString *)version;
 - (NSString *)displayVersion;
