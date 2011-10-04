@@ -6,7 +6,8 @@
 @interface TerminationListener : NSObject
 {
 @private
-	const char *executablePath;
+	NSString *executablePath;
+    NSMutableArray *executableArguments;
 	pid_t parentProcessId;
 }
 
@@ -23,13 +24,23 @@
 		[self relaunch];
 }
 
-- (id) initWithExecutablePath:(const char *)execPath parentProcessId:(pid_t)ppid
+- (id) init
 {
 	self = [super init];
 	if (self != nil)
 	{
-		executablePath = execPath;
-		parentProcessId = ppid;
+        executableArguments = [[[NSMutableArray alloc] initWithArray:[[NSProcessInfo processInfo] arguments]] autorelease];
+        // Remove the first three arguments
+        if ([executableArguments count] >= 3) {
+            // Remove relaunch path
+            [executableArguments removeObjectAtIndex:0];
+            // Set and remove executablePath
+            executablePath = [executableArguments objectAtIndex:0];
+            [executableArguments removeObjectAtIndex:0];
+            // Set and remove parentProcessId
+            parentProcessId = (pid_t)[[executableArguments objectAtIndex:0] intValue];
+            [executableArguments removeObjectAtIndex:0];
+        }
 		if (getppid() == 1) // ppid is launchd (1) => parent terminated already
 			[self relaunch];
 		[NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(watchdog:) userInfo:nil repeats:YES];
@@ -38,8 +49,26 @@
 }
 
 - (void) relaunch
-{
-	[[NSWorkspace sharedWorkspace] openFile:[[NSFileManager defaultManager] stringWithFileSystemRepresentation:executablePath length:strlen(executablePath)]];
+{   
+    // Relaunch binary application
+    if ([[executablePath pathExtension] isEqualToString:@""]) {
+        NSTask *task = [[NSTask alloc] init];
+        [task setLaunchPath:@"/usr/bin/arch"];
+        [executableArguments insertObject:executablePath atIndex:0];
+#if defined __ppc__ || defined __i368__
+        [executableArguments insertObject:@"-32" atIndex:0];
+#elif defined __ppc64__ || defined __x86_64__
+        [executableArguments insertObject:@"-64" atIndex:0];
+#endif
+        [task setArguments:executableArguments];
+        [task launch];
+        [task release];
+    }
+    // Relaunch GUI application
+    else {
+        [[NSWorkspace sharedWorkspace] openFile:[[NSFileManager defaultManager] stringWithFileSystemRepresentation:[executablePath UTF8String] length:strlen([executablePath UTF8String])]];
+    }
+
 	NSString* path = NSTemporaryDirectory();
 	if (path)
 	{
@@ -57,15 +86,12 @@
 
 int main (int argc, const char * argv[])
 {
-	if (argc != 3) return EXIT_FAILURE;
-	
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
-	[NSApplication sharedApplication];
-	[[[TerminationListener alloc] initWithExecutablePath:argv[1] parentProcessId:atoi(argv[2])] autorelease];
+    [NSApplication sharedApplication];
+	[[[TerminationListener alloc] init] autorelease];
 	[[NSApplication sharedApplication] run];
-	
+
 	[pool drain];
-	
 	return EXIT_SUCCESS;
 }

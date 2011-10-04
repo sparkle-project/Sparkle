@@ -45,6 +45,7 @@
 - (void)extractArchivePipingDataToCommand:(NSString *)command
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	NSGarbageCollector *dc = [NSGarbageCollector defaultCollector];
 	FILE *fp = NULL, *cmdFP = NULL;
 	
 	// Get the file size.
@@ -60,8 +61,14 @@
 	fp = fopen([archivePath fileSystemRepresentation], "r");
 	if (!fp) goto reportError;
 	
-	setenv("DESTINATION", [[archivePath stringByDeletingLastPathComponent] fileSystemRepresentation], 1);
+	NSString *archiveDir = [archivePath stringByDeletingLastPathComponent];
+	[dc disableCollectorForPointer:archiveDir];
+	setenv("DESTINATION", [archiveDir fileSystemRepresentation], 1);
+	[dc enableCollectorForPointer:archiveDir];
+	
+	[dc disableCollectorForPointer:command];
 	cmdFP = popen([command fileSystemRepresentation], "w");
+	[dc enableCollectorForPointer:command];
 	size_t written;
 	if (!cmdFP) goto reportError;
 	

@@ -59,10 +59,6 @@
 		61407C390A4099050009F71F /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; };
 		615AE3D00D64DC40001CA7BD /* SUModelTranslation.plist in Resources */ = {isa = PBXBuildFile; fileRef = 615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */; };
 		6160E7E10D3B4A8800E9CD71 /* NTSynchronousTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 610EC1C00CF3914D00AE239E /* NTSynchronousTask.h */; settings = {ATTRIBUTES = (); }; };
-		6160FD84134ABCC8007FFC5F /* SUAutomaticUpdateAlert.nib in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8240A321A7F00D8810D /* SUAutomaticUpdateAlert.nib */; };
-		6160FD88134ABCD5007FFC5F /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8DC2EF5A0486A6940098B216 /* Info.plist */; };
-		6160FD89134ABCD5007FFC5F /* SUModelTranslation.plist in Resources */ = {isa = PBXBuildFile; fileRef = 615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */; };
-		6160FD8A134ABCD5007FFC5F /* License.txt in Resources */ = {isa = PBXBuildFile; fileRef = 61C268090E2DB5D000175E6C /* License.txt */; };
 		61699BCC0DDB92BD005878A4 /* SUVersionComparisonTest.h in Headers */ = {isa = PBXBuildFile; fileRef = 61227A140DB548B800AB99EA /* SUVersionComparisonTest.h */; settings = {ATTRIBUTES = (); }; };
 		618E9CFD0E7328F1004646D8 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 618E9CFC0E7328F1004646D8 /* dsa_pub.pem */; };
 		618FA5010DAE88B40026945C /* SUInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 618FA4FF0DAE88B40026945C /* SUInstaller.h */; settings = {ATTRIBUTES = (); }; };
@@ -835,6 +831,9 @@
 /* Begin PBXProject section */
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "Sparkle" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -920,10 +919,6 @@
 				61AAE82A0A321A8000D8810D /* SUUpdateAlert.nib in Resources */,
 				615AE3D00D64DC40001CA7BD /* SUModelTranslation.plist in Resources */,
 				61C46F340D9C54F300B06326 /* SUUpdatePermissionPrompt.nib in Resources */,
-				6160FD84134ABCC8007FFC5F /* SUAutomaticUpdateAlert.nib in Resources */,
-				6160FD88134ABCD5007FFC5F /* Info.plist in Resources */,
-				6160FD89134ABCD5007FFC5F /* SUModelTranslation.plist in Resources */,
-				6160FD8A134ABCD5007FFC5F /* License.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1232,6 +1227,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
+				"MACOSX_DEPLOYMENT_TARGET[arch=*]" = 10.5;
+				"MACOSX_DEPLOYMENT_TARGET[arch=i386]" = 10.5;
+				"MACOSX_DEPLOYMENT_TARGET[arch=ppc]" = 10.5;
 			};
 			name = Debug;
 		};
@@ -1239,6 +1237,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
+				"MACOSX_DEPLOYMENT_TARGET[arch=*]" = 10.5;
+				"MACOSX_DEPLOYMENT_TARGET[arch=i386]" = 10.5;
+				"MACOSX_DEPLOYMENT_TARGET[arch=ppc]" = 10.5;
 			};
 			name = Release;
 		};
@@ -1285,6 +1286,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 61072EB20DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig */;
 			buildSettings = {
+				"MACOSX_DEPLOYMENT_TARGET[arch=*]" = 10.5;
+				"MACOSX_DEPLOYMENT_TARGET[arch=i386]" = 10.5;
+				"MACOSX_DEPLOYMENT_TARGET[arch=ppc64]" = 10.5;
+				"MACOSX_DEPLOYMENT_TARGET[arch=ppc]" = 10.5;
+				"MACOSX_DEPLOYMENT_TARGET[arch=x86_64]" = 10.5;
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
 		};
