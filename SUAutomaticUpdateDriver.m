@@ -12,9 +12,12 @@
 #import "SUHost.h"
 #import "SUConstants.h"
 
+// If the user hasn't quit in a day, ask them if they want to relaunch to get the latest bits. It doesn't matter that this measure of "one day" is imprecise.
+static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 24;
+
 @implementation SUAutomaticUpdateDriver
 
-- (void)unarchiverDidFinish:(SUUnarchiver *)ua
+- (void)showUpdateAlert
 {
 	alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:updateItem host:host delegate:self];
 	
@@ -33,6 +36,39 @@
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];	
 }
 
+- (void)unarchiverDidFinish:(SUUnarchiver *)ua
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+    
+    showUpdateAlertTimer = [[NSTimer scheduledTimerWithTimeInterval:SUAutomaticUpdatePromptImpatienceTimer target:self selector:@selector(showUpdateAlert) userInfo:nil repeats:NO] retain];
+}
+
+- (void)stopUpdatingOnTermination
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
+}
+
+- (void)invalidateShowUpdateAlertTimer
+{
+    [showUpdateAlertTimer invalidate];
+    [showUpdateAlertTimer release];
+    showUpdateAlertTimer = nil;    
+}
+
+- (void)dealloc
+{
+    [self invalidateShowUpdateAlertTimer];
+    [alert release];
+    [super dealloc];
+}
+
+- (void)abortUpdate
+{
+    [self stopUpdatingOnTermination];
+    [self invalidateShowUpdateAlertTimer];
+    [super abortUpdate];
+}
+
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification
 {
 	[[alert window] makeKeyAndOrderFront:self];
@@ -44,12 +80,12 @@
 	switch (choice)
 	{
 		case SUInstallNowChoice:
+            [self stopUpdatingOnTermination];
 			[self installWithToolAndRelaunch:YES];
 			break;
 			
 		case SUInstallLaterChoice:
-			postponingInstallation = YES;
-			[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+            // No-op: we're already waiting on quit.
 			break;
 
 		case SUDoNotInstallChoice:
@@ -58,8 +94,6 @@
 			break;
 	}
 }
-
-- (BOOL)shouldInstallSynchronously { return postponingInstallation; }
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch
 {

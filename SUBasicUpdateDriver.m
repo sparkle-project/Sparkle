@@ -252,8 +252,6 @@
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:[NSDictionary dictionaryWithObject:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) forKey:NSLocalizedDescriptionKey]]];
 }
 
-- (BOOL)shouldInstallSynchronously { return NO; }
-
 - (void)installWithToolAndRelaunch:(BOOL)relaunch
 {
     if (![updater mayUpdateAndRestart])
