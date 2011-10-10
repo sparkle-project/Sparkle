@@ -259,10 +259,8 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 				isNetworkReachable = NO;
 		}
 		
-		if( isNetworkReachable )
-		{
-			[self performSelectorOnMainThread: @selector(checkForUpdatesWithDriver:) withObject: inDriver waitUntilDone: NO];
-		}
+        // If the network's not reachable, we pass a nil driver into checkForUpdatesWithDriver, which will then reschedule the next update so we try again later.    
+        [self performSelectorOnMainThread: @selector(checkForUpdatesWithDriver:) withObject: isNetworkReachable ? inDriver : nil waitUntilDone: NO];
 		
 		[pool release];
 	NS_HANDLER
@@ -274,12 +272,6 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 - (void)checkForUpdatesInBackground
 {
-	if( [delegate respondsToSelector: @selector(updaterMayCheckForUpdates:)] && ![delegate updaterMayCheckForUpdates: self] )
-	{
-		[self scheduleNextUpdateCheck];
-		return;
-	}
-	
 	// Background update checks should only happen if we have a network connection.
 	//	Wouldn't want to annoy users on dial-up by establishing a connection every
 	//	hour or so:
@@ -316,7 +308,21 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	[host setObject:[NSDate date] forUserDefaultsKey:SULastCheckTimeKey];
 	[self didChangeValueForKey:@"lastUpdateCheckDate"];
 	
-	driver = [d retain];
+    if( [delegate respondsToSelector: @selector(updaterMayCheckForUpdates:)] && ![delegate updaterMayCheckForUpdates: self] )
+	{
+		[self scheduleNextUpdateCheck];
+		return;
+	}
+    	
+    driver = [d retain];
+    
+    // If we're not given a driver at all, just schedule the next update check and bail.
+    if (!driver)
+    {
+        [self scheduleNextUpdateCheck];
+        return;
+    }
+    
 	NSURL*	theFeedURL = [self parameterizedFeedURL];
 	if( theFeedURL )	// Use a NIL URL to cancel quietly.
 		[driver checkForUpdatesAtURL: theFeedURL host:host];
