@@ -32,6 +32,7 @@ NSString *const SUEnableAutomaticChecksKey = @"SUEnableAutomaticChecks";
 NSString *const SUEnableAutomaticChecksKeyOld = @"SUCheckAtStartup";
 NSString *const SUSendProfileInfoKey = @"SUSendProfileInfo";
 NSString *const SULastProfileSubmitDateKey = @"SULastProfileSubmissionDate";
+NSString *const SUPromptUserOnFirstLaunchKey = @"SUPromptUserOnFirstLaunch";
 NSString *const SUFixedHTMLDisplaySizeKey = @"SUFixedHTMLDisplaySize";
 NSString *const SUKeepDownloadOnFailedInstallKey = @"SUKeepDownloadOnFailedInstall";
 

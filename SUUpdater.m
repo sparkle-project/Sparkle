@@ -17,7 +17,7 @@
 #import "SUScheduledUpdateDriver.h"
 #import "SUConstants.h"
 #import "SULog.h"
-#include <SystemConfiguration/SCNetwork.h>	// UK 2007-04-27
+#include <SystemConfiguration/SystemConfiguration.h>
 
 
 @interface SUUpdater (Private)
@@ -140,9 +140,14 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
         if ([host objectForUserDefaultsKey:SUEnableAutomaticChecksKeyOld])
             [self setAutomaticallyChecksForUpdates:[host boolForUserDefaultsKey:SUEnableAutomaticChecksKeyOld]];
         // Now, we don't want to ask the user for permission to do a weird thing on the first launch.
-        // We wait until the second launch.
-        else if ([host boolForUserDefaultsKey:SUHasLaunchedBeforeKey] == NO)
-            [host setBool:YES forUserDefaultsKey:SUHasLaunchedBeforeKey];
+        // We wait until the second launch, unless explicitly overridden via SUPromptUserOnFirstLaunchKey.
+        else if (![host objectForKey:SUPromptUserOnFirstLaunchKey])
+        {
+            if ([host boolForUserDefaultsKey:SUHasLaunchedBeforeKey] == NO)
+                [host setBool:YES forUserDefaultsKey:SUHasLaunchedBeforeKey];
+            else
+                shouldPrompt = YES;
+        }
         else
             shouldPrompt = YES;
     }
@@ -232,7 +237,17 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 		// Don't perform automatic checks on unconnected laptops or dial-up connections that aren't online:
 		NSMutableDictionary*		theDict = [NSMutableDictionary dictionary];
 		[self performSelectorOnMainThread: @selector(putFeedURLIntoDictionary:) withObject: theDict waitUntilDone: YES];	// Get feed URL on main thread, it's not safe to call elsewhere.
-		if( SCNetworkCheckReachabilityByName( [[[theDict objectForKey: @"feedURL"] host] cStringUsingEncoding: NSUTF8StringEncoding], &flags ) )
+		
+		const char *hostname = [[[theDict objectForKey: @"feedURL"] host] cStringUsingEncoding: NSUTF8StringEncoding];
+		SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(NULL, hostname);
+        Boolean reachabilityResult = NO;
+        // If the feed's using a file:// URL, we won't be able to use reachability.
+        if (reachability != NULL) {
+            SCNetworkReachabilityGetFlags(reachability, &flags);
+            CFRelease(reachability);
+        }
+		
+		if( reachabilityResult )
 		{
 			BOOL reachable =	(flags & kSCNetworkFlagsReachable)				== kSCNetworkFlagsReachable;
 			BOOL automatic =	(flags & kSCNetworkFlagsConnectionAutomatic)	== kSCNetworkFlagsConnectionAutomatic;
@@ -244,10 +259,8 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 				isNetworkReachable = NO;
 		}
 		
-		if( isNetworkReachable )
-		{
-			[self performSelectorOnMainThread: @selector(checkForUpdatesWithDriver:) withObject: inDriver waitUntilDone: NO];
-		}
+        // If the network's not reachable, we pass a nil driver into checkForUpdatesWithDriver, which will then reschedule the next update so we try again later.    
+        [self performSelectorOnMainThread: @selector(checkForUpdatesWithDriver:) withObject: isNetworkReachable ? inDriver : nil waitUntilDone: NO];
 		
 		[pool release];
 	NS_HANDLER
@@ -259,12 +272,6 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 - (void)checkForUpdatesInBackground
 {
-	if( [delegate respondsToSelector: @selector(updaterMayCheckForUpdates:)] && ![delegate updaterMayCheckForUpdates: self] )
-	{
-		[self scheduleNextUpdateCheck];
-		return;
-	}
-	
 	// Background update checks should only happen if we have a network connection.
 	//	Wouldn't want to annoy users on dial-up by establishing a connection every
 	//	hour or so:
@@ -274,7 +281,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 }
 
 
--(BOOL)	mayUpdateAndRestart
+- (BOOL)mayUpdateAndRestart
 {
 	return( !delegate || ![delegate respondsToSelector: @selector(updaterShouldRelaunchApplication:)] || [delegate updaterShouldRelaunchApplication: self] );
 }
@@ -301,7 +308,21 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	[host setObject:[NSDate date] forUserDefaultsKey:SULastCheckTimeKey];
 	[self didChangeValueForKey:@"lastUpdateCheckDate"];
 	
-	driver = [d retain];
+    if( [delegate respondsToSelector: @selector(updaterMayCheckForUpdates:)] && ![delegate updaterMayCheckForUpdates: self] )
+	{
+		[self scheduleNextUpdateCheck];
+		return;
+	}
+    	
+    driver = [d retain];
+    
+    // If we're not given a driver at all, just schedule the next update check and bail.
+    if (!driver)
+    {
+        [self scheduleNextUpdateCheck];
+        return;
+    }
+    
 	NSURL*	theFeedURL = [self parameterizedFeedURL];
 	if( theFeedURL )	// Use a NIL URL to cancel quietly.
 		[driver checkForUpdatesAtURL: theFeedURL host:host];

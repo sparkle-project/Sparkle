@@ -21,6 +21,7 @@
 - (id)initWithBundle:(NSBundle *)aBundle;
 - (NSBundle *)bundle;
 - (NSString *)bundlePath;
+- (NSString *)appSupportPath;
 - (NSString *)installationPath;
 - (NSString *)name;
 - (NSString *)version;

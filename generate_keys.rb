@@ -5,9 +5,10 @@
     exit
   end
 end
-`openssl dsaparam 1024 < /dev/urandom > dsaparam.pem`
-`openssl gendsa dsaparam.pem -out dsa_priv.pem`
-`openssl dsa -in dsa_priv.pem -pubout -out dsa_pub.pem`
+openssl = "/usr/bin/openssl"
+`#{openssl} dsaparam 1024 < /dev/urandom > dsaparam.pem`
+`#{openssl} gendsa dsaparam.pem -out dsa_priv.pem`
+`#{openssl} dsa -in dsa_priv.pem -pubout -out dsa_pub.pem`
 `rm dsaparam.pem`
 puts "\nGenerated private and public keys: dsa_priv.pem and dsa_pub.pem.\n
 BACK UP YOUR PRIVATE KEY AND KEEP IT SAFE!\n

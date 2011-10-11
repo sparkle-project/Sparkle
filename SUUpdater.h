@@ -9,24 +9,10 @@
 #ifndef SUUPDATER_H
 #define SUUPDATER_H
 
-// -----------------------------------------------------------------------------
-//	Headers:
-// -----------------------------------------------------------------------------
-
 #import "SUVersionComparisonProtocol.h"
 #import "SUVersionDisplayProtocol.h"
 
-
-// -----------------------------------------------------------------------------
-//	Forwards:
-// -----------------------------------------------------------------------------
-
 @class SUUpdateDriver, SUAppcastItem, SUHost, SUAppcast;
-
-
-// -----------------------------------------------------------------------------
-//	SUUpdater:
-// -----------------------------------------------------------------------------
 
 @interface SUUpdater : NSObject
 {
@@ -75,7 +61,7 @@
 // update is found, it will be downloaded and prepped for installation.
 - (void)checkForUpdatesInBackground;
 
-// Date of last update check. Returns null if no check has been performed.
+// Date of last update check. Returns nil if no check has been performed.
 - (NSDate*)lastUpdateCheckDate;
 
 // This begins a "probing" check for updates which will not actually offer to update to that version. The delegate methods, though,
@@ -86,8 +72,6 @@
 - (void)resetUpdateCycle;
 
 - (BOOL)updateInProgress;
-
--(BOOL)	mayUpdateAndRestart;	// If we can't restart, don't update, because that'd mean anything the old app (still running) reads from disk
 
 @end
 
@@ -104,8 +88,8 @@
 // This method allows you to add extra parameters to the appcast URL, potentially based on whether or not Sparkle will also be sending along the system profile. This method should return an array of dictionaries with keys: "key", "value", "displayKey", "displayValue", the latter two being specifically for display to the user.
 - (NSArray *)feedParametersForUpdater:(SUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
 
-// If you need to generate the whole URL:
--(NSString*)	feedURLStringForUpdater: (SUUpdater*)updater;
+// Override this to dynamically specify the entire URL.
+- (NSString*)feedURLStringForUpdater:(SUUpdater*)updater;
 
 // Use this to override the default behavior for Sparkle prompting the user about automatic update checks.
 - (BOOL)updaterShouldPromptForPermissionToCheckForUpdates:(SUUpdater *)bundle;
@@ -143,13 +127,13 @@
 - (id <SUVersionComparison>)versionComparatorForUpdater:(SUUpdater *)updater;
 
 // This method allows you to provide a custom version comparator.
-// If you don't implement this method or return nil, the standard version comparator will be used.
+// If you don't implement this method or return nil, the standard version displayer will be used.
 - (id <SUVersionDisplay>)versionDisplayerForUpdater:(SUUpdater *)updater;
 
 // Returns the path which is used to relaunch the client after the update is installed. By default, the path of the host bundle.
 - (NSString *)pathToRelaunchForUpdater:(SUUpdater *)updater;
 
-// Called before resp. after an updater shows a modal alert window, to give the host
+// Called before and after, respectively, an updater shows a modal alert window, to give the host
 //	the opportunity to hide attached windows etc. that may get in the way:
 -(void)	updaterWillShowModalAlert:(SUUpdater *)updater;
 -(void)	updaterDidShowModalAlert:(SUUpdater *)updater;
@@ -166,13 +150,13 @@
 #endif
 
 // Define some minimum intervals to avoid DOS-like checking attacks. These are in seconds.
-#if DEBUG && 0
+#if defined(DEBUG) && DEBUG && 0
 #define SU_MIN_CHECK_INTERVAL 60
 #else
 #define SU_MIN_CHECK_INTERVAL 60*60
 #endif
 
-#if DEBUG && 0
+#if defined(DEBUG) && DEBUG && 0
 #define SU_DEFAULT_CHECK_INTERVAL 60
 #else
 #define SU_DEFAULT_CHECK_INTERVAL 60*60*24

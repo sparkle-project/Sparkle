@@ -10,7 +10,6 @@
 #import "SUConstants.h"
 #import "SUSystemProfiler.h"
 #import <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
-#import "ThreadSafePreferences.h"
 #import "SULog.h"
 
 
@@ -44,6 +43,21 @@
 - (NSString *)bundlePath
 {
     return [bundle bundlePath];
+}
+
+- (NSString *)appSupportPath
+{
+    NSArray *appSupportPaths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+    NSString *appSupportPath = nil;
+    if (!appSupportPaths || [appSupportPaths count] == 0)
+    {
+        SULog(@"Failed to find app support directory! Using ~/Library/Application Support...");
+        appSupportPath = [@"~/Library/Application Support" stringByExpandingTildeInPath];
+    }
+    else
+        appSupportPath = [appSupportPaths objectAtIndex:0];
+    appSupportPath = [appSupportPath stringByAppendingPathComponent:[self name]];
+    return appSupportPath;
 }
 
 - (NSString *)installationPath
@@ -164,7 +178,7 @@
 	if (bundle == [NSBundle mainBundle])
 		return [[NSUserDefaults standardUserDefaults] objectForKey:defaultName];
 	
-	CFPropertyListRef obj = ThreadSafePreferences_CopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
+	CFPropertyListRef obj = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
 	return [(id)CFMakeCollectable(obj) autorelease];
 }
 
@@ -177,8 +191,8 @@
 	}
 	else
 	{
-		ThreadSafePreferences_SetValue((CFStringRef)defaultName, value, (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
-		ThreadSafePreferences_Synchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		CFPreferencesSetValue((CFStringRef)defaultName, value, (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		CFPreferencesSynchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	}
 }
 
@@ -188,7 +202,7 @@
 		return [[NSUserDefaults standardUserDefaults] boolForKey:defaultName];
 	
 	BOOL value;
-	CFPropertyListRef plr = ThreadSafePreferences_CopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
+	CFPropertyListRef plr = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
 	if (plr == NULL)
 		value = NO;
 	else
@@ -208,8 +222,8 @@
 	}
 	else
 	{
-		ThreadSafePreferences_SetValue((CFStringRef)defaultName, (CFBooleanRef)[NSNumber numberWithBool:value], (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
-		ThreadSafePreferences_Synchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		CFPreferencesSetValue((CFStringRef)defaultName, (CFBooleanRef)[NSNumber numberWithBool:value], (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		CFPreferencesSynchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	}
 }
 

@@ -46,11 +46,11 @@
 - (void)unarchiverDidFail:(SUUnarchiver *)ua;
 - (void)failedToApplyDeltaUpdate;
 
-- (void)installUpdate;
+- (void)installWithToolAndRelaunch:(BOOL)relaunch;
 - (void)installerForHost:(SUHost *)host failedWithError:(NSError *)error;
 
-- (void)installAndRelaunchWithTool;
-- (void)cleanUp;
+- (void)installWithToolAndRelaunch:(BOOL)relaunch;
+- (void)cleanUpDownload;
 
 - (void)abortUpdate;
 - (void)abortUpdateWithError:(NSError *)error;

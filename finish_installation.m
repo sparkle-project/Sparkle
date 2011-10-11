@@ -9,7 +9,7 @@
 
 #include <unistd.h>
 
-#define	LONG_INSTALLATION_TIME			1.2				// If the Installation takes longer than this time the Application Icon is shown in the Dock so that the user has some feedback.
+#define	LONG_INSTALLATION_TIME			5				// If the Installation takes longer than this time the Application Icon is shown in the Dock so that the user has some feedback.
 #define	CHECK_FOR_PARENT_TO_QUIT_TIME	.5				// Time this app uses to recheck if the parent has already died.
 										
 @interface TerminationListener : NSObject
@@ -21,6 +21,7 @@
 	NSTimer			*watchdogTimer;
 	NSTimer			*longInstallationTimer;
 	SUHost			*host;
+    BOOL            shouldRelaunch;
 }
 
 - (void) parentHasQuit;
@@ -35,7 +36,7 @@
 
 @implementation TerminationListener
 
-- (id) initWithExecutablePath:(const char *)execpath parentProcessId:(pid_t)ppid folderPath: (const char*)infolderpath
+- (id) initWithExecutablePath:(const char *)execpath parentProcessId:(pid_t)ppid folderPath: (const char*)infolderpath shouldRelaunch:(BOOL)relaunch
 		selfPath: (NSString*)inSelfPath
 {
 	if( !(self = [super init]) )
@@ -45,6 +46,7 @@
 	parentprocessid	= ppid;
 	folderpath		= infolderpath;
 	selfPath		= [inSelfPath retain];
+    shouldRelaunch  = relaunch;
 	
 	BOOL	alreadyTerminated = (getppid() == 1); // ppid is launchd (1) => parent terminated already
 	
@@ -105,23 +107,27 @@
 
 - (void) relaunch
 {
-	NSString	*appPath = nil;
-	if( !folderpath )
-		appPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:executablepath length:strlen(executablepath)];
-	else
-		appPath = [host installationPath];
-	[[NSWorkspace sharedWorkspace] openFile: appPath];
-	if( folderpath )
-	{
-		NSError*		theError = nil;
-    	if( ![SUPlainInstaller _removeFileAtPath: [SUInstaller updateFolder] error: &theError] )
-			SULog( @"Couldn't remove update folder: %@.", theError );
-	}
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-    [[NSFileManager defaultManager] removeFileAtPath: selfPath handler: nil];
-#else
-	[[NSFileManager defaultManager] removeItemAtPath: selfPath error: NULL];
-#endif
+    if (shouldRelaunch)
+    {
+        NSString	*appPath = nil;
+        if( !folderpath )
+            appPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:executablepath length:strlen(executablepath)];
+        else
+            appPath = [host installationPath];
+        [[NSWorkspace sharedWorkspace] openFile: appPath];
+        if( folderpath )
+        {
+            NSError*		theError = nil;
+            if( ![SUPlainInstaller _removeFileAtPath: [SUInstaller updateFolder] error: &theError] )
+                SULog( @"Couldn't remove update folder: %@.", theError );
+        }
+    #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
+        [[NSFileManager defaultManager] removeFileAtPath: selfPath handler: nil];
+    #else
+        [[NSFileManager defaultManager] removeItemAtPath: selfPath error: NULL];
+    #endif
+    }
+    
 	exit(EXIT_SUCCESS);
 }
 
@@ -131,11 +137,14 @@
 	NSBundle			*theBundle = [NSBundle bundleWithPath: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: executablepath length:strlen(executablepath)]];
 	host = [[SUHost alloc] initWithBundle: theBundle];
 	
-	SUStatusController*	statusCtl = [[SUStatusController alloc] initWithHost: host];	// We quit anyway after we've installed, so leak this for now.
-	[statusCtl setButtonTitle: SULocalizedString(@"Cancel Update",@"") target: nil action: Nil isDefault: NO];
-	[statusCtl beginActionWithTitle: SULocalizedString(@"Installing update...",@"")
-					maxProgressValue: 0 statusText: @""];
-	[statusCtl showWindow: self];
+    // Perhaps a poor assumption but: if we're not relaunching, we assume we shouldn't be showing any UI either. Because non-relaunching installations are kicked off without any user interaction, we shouldn't be interrupting them.
+    if (shouldRelaunch) {
+        SUStatusController*	statusCtl = [[SUStatusController alloc] initWithHost: host];	// We quit anyway after we've installed, so leak this for now.
+        [statusCtl setButtonTitle: SULocalizedString(@"Cancel Update",@"") target: nil action: Nil isDefault: NO];
+        [statusCtl beginActionWithTitle: SULocalizedString(@"Installing update...",@"")
+                        maxProgressValue: 0 statusText: @""];
+        [statusCtl showWindow: self];
+    }
 	
 	[SUInstaller installFromUpdateFolder: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: folderpath length: strlen(folderpath)]
 					overHost: host
@@ -150,7 +159,9 @@
 
 - (void) installerForHost:(SUHost *)host failedWithError:(NSError *)error
 {
-	NSRunAlertPanel( @"", @"%@", @"OK", @"", @"", [error localizedDescription] );
+    // Perhaps a poor assumption but: if we're not relaunching, we assume we shouldn't be showing any UI either. Because non-relaunching installations are kicked off without any user interaction, we shouldn't be interrupting them.
+    if (shouldRelaunch)
+        NSRunAlertPanel( @"", @"%@", @"OK", @"", @"", [error localizedDescription] );
 	exit(EXIT_FAILURE);
 }
 
@@ -158,7 +169,7 @@
 
 int main (int argc, const char * argv[])
 {
-	if( argc < 3 || argc > 4 )
+	if( argc < 4 || argc > 5 )
 		return EXIT_FAILURE;
 	
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -182,9 +193,10 @@ int main (int argc, const char * argv[])
 	
 	[NSApplication sharedApplication];
 	[[[TerminationListener alloc] initWithExecutablePath: (argc > 1) ? argv[1] : NULL
-										parentProcessId: (argc > 2) ? atoi(argv[2]) : 0
-										folderPath: (argc > 3) ? argv[3] : NULL
-										selfPath: selfPath] autorelease];
+                                         parentProcessId: (argc > 2) ? atoi(argv[2]) : 0
+                                              folderPath: (argc > 3) ? argv[3] : NULL
+                                          shouldRelaunch: (argc > 4) ? atoi(argv[4]) : 1
+                                                selfPath: selfPath] autorelease];
 	[[NSApplication sharedApplication] run];
 	
 	[pool drain];

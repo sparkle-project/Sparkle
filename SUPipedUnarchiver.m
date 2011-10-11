@@ -48,11 +48,12 @@
 {
 	// *** GETS CALLED ON NON-MAIN THREAD!!!
 	
-	SULog(@"Extracting %@ using '%@'",archivePath,command);
 
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	FILE *fp = NULL, *cmdFP = NULL;
 	
+	SULog(@"Extracting %@ using '%@'",archivePath,command);
+    
 	// Get the file size.
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	NSNumber *fs = [[[NSFileManager defaultManager] fileAttributesAtPath:archivePath traverseLink:NO] objectForKey:NSFileSize];
@@ -98,7 +99,7 @@ reportError:
 finally:
 	if (fp)
 		fclose(fp);
-	[pool drain];
+	[pool release];
 }
 
 - (void)extractTAR

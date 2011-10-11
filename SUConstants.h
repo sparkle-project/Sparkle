@@ -56,6 +56,7 @@ extern NSString *const SUEnableAutomaticChecksKeyOld;
 extern NSString *const SUEnableSystemProfilingKey;
 extern NSString *const SUSendProfileInfoKey;
 extern NSString *const SULastProfileSubmitDateKey;
+extern NSString *const SUPromptUserOnFirstLaunchKey;
 extern NSString *const SUFixedHTMLDisplaySizeKey;
 extern NSString *const SUKeepDownloadOnFailedInstallKey;
 

@@ -9,6 +9,7 @@
 #import "SUUIBasedUpdateDriver.h"
 
 #import "SUUpdateAlert.h"
+#import "SUUpdater_Private.h"
 #import "SUHost.h"
 #import "SUStatusController.h"
 #import "SUConstants.h"
@@ -123,18 +124,6 @@
 	if (download)
 		[download cancel];
 	[self abortUpdate];
-	if (tempDir != nil)	// tempDir contains downloadPath, so we implicitly delete both here.
-	{
-		BOOL		success = NO;
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-    success = [[NSFileManager defaultManager] removeFileAtPath: tempDir handler: nil]; // Clean up the copied relauncher
-#else
-	NSError	*	error = nil;
-	success = [[NSFileManager defaultManager] removeItemAtPath: tempDir error: &error]; // Clean up the copied relauncher
-#endif
-		if( !success )
-			[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[tempDir stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[tempDir lastPathComponent]] tag:NULL];
-	}
 }
 
 - (void)extractUpdate
@@ -173,15 +162,14 @@
 
 - (void)installAndRestart: (id)sender
 {
-	if( [updater mayUpdateAndRestart] )
-		[self installUpdate];
+    [self installWithToolAndRelaunch:YES];
 }
 
-- (void)installUpdate
+- (void)installWithToolAndRelaunch:(BOOL)relaunch
 {
 	[statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
 	[statusController setButtonEnabled:NO];
-	[super installUpdate];
+	[super installWithToolAndRelaunch:relaunch];
 	
 	
 	// if a user chooses to NOT relaunch the app (as is the case with WebKit
