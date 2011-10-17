@@ -461,26 +461,58 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	err = FSPathMakeRef((UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &dstDirRef, NULL);
 	
 	if (err == noErr && hadFileAtDest)
-	{
-		err = FSMoveObjectSync(&dstRef, &tmpDirRef, (CFStringRef)[tmpPath lastPathComponent], &movedRef, 0);
+	{ 
+		if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_5)
+		{
+			NSFileManager *manager = [[NSFileManager alloc] init];
+			BOOL success = [manager moveItemAtPath:dst toPath:tmpPath error:error];
+			if (!success && hadFileAtDest)
+			{
+				if (error != NULL)
+					*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
+				return NO;
+			}
+			
+		} else {
+			err = FSMoveObjectSync(&dstRef, &tmpDirRef, (CFStringRef)[tmpPath lastPathComponent], &movedRef, 0);
+			if (err != noErr && hadFileAtDest)
+			{
+				if (error != NULL)
+					*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
+				return NO;			
+			}
+		}
 	}
-	if (err != noErr && hadFileAtDest)
-	{
-		if (error != NULL)
-			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
-		return NO;			
-	}
+	
 	err = FSPathMakeRef((UInt8 *)[src fileSystemRepresentation], &srcRef, NULL);
 	if (err == noErr)
-		err = FSCopyObjectSync(&srcRef, &dstDirRef, (CFStringRef)[dst lastPathComponent], NULL, 0);
-	if (err != noErr)
 	{
-		// We better move the old version back to its old location
-		if( hadFileAtDest )
-			FSMoveObjectSync(&movedRef, &dstDirRef, (CFStringRef)[dst lastPathComponent], &movedRef, 0);
-		if (error != NULL)
-			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't copy %@ to %@.", src, dst] forKey:NSLocalizedDescriptionKey]];
-		return NO;			
+		if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_5)
+		{
+			NSFileManager *manager = [[NSFileManager alloc] init];
+			BOOL success = [manager copyItemAtPath:src toPath:dst error:error];
+			if (!success)
+			{
+				// We better move the old version back to its old location
+				if( hadFileAtDest )
+					success = [manager moveItemAtPath:tmpPath toPath:dst error:error];
+				if (error != NULL)
+					*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
+				return NO;
+
+			}
+		} else {
+			err = FSCopyObjectSync(&srcRef, &dstDirRef, (CFStringRef)[dst lastPathComponent], NULL, 0);
+			if (err != noErr)
+			{
+				// We better move the old version back to its old location
+				if( hadFileAtDest )
+					FSMoveObjectSync(&movedRef, &dstDirRef, (CFStringRef)[dst lastPathComponent], &movedRef, 0);
+				if (error != NULL)
+					*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't copy %@ to %@.", src, dst] forKey:NSLocalizedDescriptionKey]];
+				return NO;			
+			}
+		}
 	}
 		
 	// If the currently-running application is trusted, the new
