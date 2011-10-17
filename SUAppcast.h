@@ -10,7 +10,7 @@
 #define SUAPPCAST_H
 
 @class SUAppcastItem;
-@interface SUAppcast : NSObject
+@interface SUAppcast : NSObject<NSURLDownloadDelegate>
 {
 @private
 	NSArray *items;
