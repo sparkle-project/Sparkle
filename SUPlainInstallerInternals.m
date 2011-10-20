@@ -464,7 +464,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	{ 
 		if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_5)
 		{
-			NSFileManager *manager = [[NSFileManager alloc] init];
+			NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
 			BOOL success = [manager moveItemAtPath:dst toPath:tmpPath error:error];
 			if (!success && hadFileAtDest)
 			{
@@ -489,7 +489,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	{
 		if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_5)
 		{
-			NSFileManager *manager = [[NSFileManager alloc] init];
+			NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
 			BOOL success = [manager copyItemAtPath:src toPath:dst error:error];
 			if (!success)
 			{
