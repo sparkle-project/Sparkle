@@ -67,7 +67,7 @@
 	// Now that we've mounted it, we need to copy out its contents.
 	if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_5) {
 		// On 10.6 and later we don't want to use the File Manager API and instead want to use NSFileManager (fixes #827357).
-		NSFileManager *manager = [[NSFileManager alloc] init];
+		NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
 		if (![manager copyItemAtPath:mountPoint toPath:[archivePath stringByDeletingLastPathComponent] error:NULL]) {
 			goto reportError;
 		}
