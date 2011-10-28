@@ -76,10 +76,12 @@
             goto reportError;
         }
         
-        for (NSString *fileItem in contents)
+        NSEnumerator *contentsEnumerator = [contents objectEnumerator];
+        NSString *item;
+        while ((item = [contentsEnumerator nextObject]))
         {
-            NSString *fromPath = [mountPoint stringByAppendingPathComponent:fileItem];
-            NSString *toPath = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:fileItem];
+            NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
+            NSString *toPath = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:item];
             
             SULog(@"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
             
