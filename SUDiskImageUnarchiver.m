@@ -67,10 +67,28 @@
 	// Now that we've mounted it, we need to copy out its contents.
 	if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_5) {
 		// On 10.6 and later we don't want to use the File Manager API and instead want to use NSFileManager (fixes #827357).
-		NSFileManager *manager = [[NSFileManager alloc] init];
-		if (![manager copyItemAtPath:mountPoint toPath:[archivePath stringByDeletingLastPathComponent] error:NULL]) {
-			goto reportError;
-		}
+		NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
+        NSError *error = nil;
+        NSArray *contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
+        if (error)
+        {
+            SULog(@"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
+            goto reportError;
+        }
+        
+        for (NSString *fileItem in contents)
+        {
+            NSString *fromPath = [mountPoint stringByAppendingPathComponent:fileItem];
+            NSString *toPath = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:fileItem];
+            
+            SULog(@"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
+            
+            if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
+            {
+                SULog(@"Couldn't copy item: %@", error);
+                goto reportError;
+            }
+        }
 	}
 	else {
 		FSRef srcRef, dstRef;
