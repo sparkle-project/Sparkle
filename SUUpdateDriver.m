@@ -6,6 +6,7 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
+#import "SUUpdater.h"
 #import "SUUpdateDriver.h"
 #import "SUHost.h"
 
@@ -31,6 +32,8 @@ NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 {
 	[self setValue:[NSNumber numberWithBool:YES] forKey:@"finished"];	
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdateDriverFinishedNotification object:self];
+    if( [[updater delegate] respondsToSelector: @selector(updaterAborted)] )
+		[[updater delegate] updaterAborted];
 }
 
 - (BOOL)finished { return finished; }
