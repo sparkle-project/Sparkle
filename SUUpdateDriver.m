@@ -6,6 +6,7 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
+#import "SUUpdater.h"
 #import "SUUpdateDriver.h"
 #import "SUHost.h"
 

@@ -115,12 +115,21 @@
 //	restart.
 - (BOOL)updater:(SUUpdater *)updater shouldPostponeRelaunchForUpdate:(SUAppcastItem *)update untilInvoking:(NSInvocation *)invocation;
 
+// Some apps *can not* be installed in certain circumstances. They can use this method
+//	to prevent an install "hard":
+- (BOOL)updaterShouldInstallApplication:(SUUpdater *)updater;
+
+- (BOOL)updaterShouldPromptInstall:(SUUpdater *)updater;
+
 // Some apps *can not* be relaunched in certain circumstances. They can use this method
 //	to prevent a relaunch "hard":
 - (BOOL)updaterShouldRelaunchApplication:(SUUpdater *)updater;
 
 // Called immediately before relaunching.
 - (void)updaterWillRelaunchApplication:(SUUpdater *)updater;
+
+// Called if updater was aborted.
+- (void)updater:(SUUpdater *)updater didAbortWithError:(NSError *)error;
 
 // This method allows you to provide a custom version comparator.
 // If you don't implement this method or return nil, the standard version comparator will be used.
