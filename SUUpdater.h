@@ -129,7 +129,7 @@
 - (void)updaterWillRelaunchApplication:(SUUpdater *)updater;
 
 // Called if updater was aborted.
-- (void)updaterAborted;
+- (void)updater:(SUUpdater *)updater didAbortWithError:(NSError *)error;
 
 // This method allows you to provide a custom version comparator.
 // If you don't implement this method or return nil, the standard version comparator will be used.

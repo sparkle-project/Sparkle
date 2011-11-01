@@ -32,8 +32,6 @@ NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 {
 	[self setValue:[NSNumber numberWithBool:YES] forKey:@"finished"];	
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdateDriverFinishedNotification object:self];
-    if( [[updater delegate] respondsToSelector: @selector(updaterAborted)] )
-		[[updater delegate] updaterAborted];
 }
 
 - (BOOL)finished { return finished; }

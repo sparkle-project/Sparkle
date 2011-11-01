@@ -365,6 +365,8 @@
 		SULog(@"Sparkle Error (continued): %@", [error localizedFailureReason]);
 	if (download)
 		[download cancel];
+    if( [[updater delegate] respondsToSelector: @selector(updater:didAbortWithError:)] )
+		[[updater delegate] updater:updater didAbortWithError:error];
 	[self abortUpdate];
 }
 
