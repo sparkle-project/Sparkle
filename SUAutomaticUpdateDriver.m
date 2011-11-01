@@ -43,6 +43,15 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     {
         [self showUpdateAlert];
     }
+    else if ([[updater delegate] respondsToSelector:@selector(updaterShouldPromptInstall:)]) {
+        BOOL prompt = [[updater delegate] updaterShouldPromptInstall:updater];
+        if (prompt) {
+            [self showUpdateAlert];
+        }
+        else {
+            [self installWithToolAndRelaunch:NO];
+        }
+    }
     else
     {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
@@ -105,6 +114,8 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 - (void)installWithToolAndRelaunch:(BOOL)relaunch
 {
 	showErrors = YES;
+    if ([[updater delegate] respondsToSelector: @selector(updaterShouldRelaunchApplication:)])
+        relaunch = [[updater delegate] updaterShouldRelaunchApplication: updater];
 	[super installWithToolAndRelaunch:relaunch];
 }
 

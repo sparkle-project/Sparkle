@@ -115,6 +115,12 @@
 //	restart.
 - (BOOL)updater:(SUUpdater *)updater shouldPostponeRelaunchForUpdate:(SUAppcastItem *)update untilInvoking:(NSInvocation *)invocation;
 
+// Some apps *can not* be installed in certain circumstances. They can use this method
+//	to prevent an install "hard":
+- (BOOL)updaterShouldInstallApplication:(SUUpdater *)updater;
+
+- (BOOL)updaterShouldPromptInstall:(SUUpdater *)updater;
+
 // Some apps *can not* be relaunched in certain circumstances. They can use this method
 //	to prevent a relaunch "hard":
 - (BOOL)updaterShouldRelaunchApplication:(SUUpdater *)updater;

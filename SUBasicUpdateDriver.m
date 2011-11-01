@@ -254,8 +254,11 @@
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch
 {
-    if (![updater mayUpdateAndRestart])
-    {
+    BOOL install = YES;
+    if ([[updater delegate] respondsToSelector: @selector(updaterShouldInstallApplication:)])
+        install = [[updater delegate] updaterShouldInstallApplication: updater];
+    
+    if (!install) {
         [self abortUpdate];
         return;
     }
@@ -272,7 +275,6 @@
         if ([[updater delegate] updater:updater shouldPostponeRelaunchForUpdate:updateItem untilInvoking:invocation])
             return;
     }
-
     
 	if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdate:)])
 		[[updater delegate] updater:updater willInstallUpdate:updateItem];
@@ -310,8 +312,12 @@
     if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
         pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
     NSString *relaunchToolPath = [relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS/finish_installation"];
+    
+    if ([[updater delegate] respondsToSelector: @selector(updaterShouldRelaunchApplication:)])
+        relaunch = [[updater delegate] updaterShouldRelaunchApplication: updater];
+    
     [NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:[NSArray arrayWithObjects:pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], tempDir, relaunch ? @"1" : @"0", nil]];
-
+    
     [NSApp terminate:self];
 }
 
