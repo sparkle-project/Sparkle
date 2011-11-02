@@ -83,6 +83,10 @@
             NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
             NSString *toPath = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:item];
             
+            // We skip any files in the DMG which are not readable.
+            if (![manager isReadableFileAtPath:fromPath])
+                continue;
+            
             SULog(@"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
             
             if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
