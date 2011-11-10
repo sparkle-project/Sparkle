@@ -65,15 +65,48 @@
 	mountedSuccessfully = YES;
 	
 	// Now that we've mounted it, we need to copy out its contents.
-	FSRef srcRef, dstRef;
-	OSStatus err;
-	err = FSPathMakeRef((UInt8 *)[mountPoint fileSystemRepresentation], &srcRef, NULL);
-	if (err != noErr) goto reportError;
-	err = FSPathMakeRef((UInt8 *)[[archivePath stringByDeletingLastPathComponent] fileSystemRepresentation], &dstRef, NULL);
-	if (err != noErr) goto reportError;
-	
-	err = FSCopyObjectSync(&srcRef, &dstRef, (CFStringRef)mountPointName, NULL, kFSFileOperationSkipSourcePermissionErrors);
-	if (err != noErr) goto reportError;
+	if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_5) {
+		// On 10.6 and later we don't want to use the File Manager API and instead want to use NSFileManager (fixes #827357).
+		NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
+        NSError *error = nil;
+        NSArray *contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
+        if (error)
+        {
+            SULog(@"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
+            goto reportError;
+        }
+        
+        NSEnumerator *contentsEnumerator = [contents objectEnumerator];
+        NSString *item;
+        while ((item = [contentsEnumerator nextObject]))
+        {
+            NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
+            NSString *toPath = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:item];
+            
+            // We skip any files in the DMG which are not readable.
+            if (![manager isReadableFileAtPath:fromPath])
+                continue;
+            
+            SULog(@"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
+            
+            if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
+            {
+                SULog(@"Couldn't copy item: %@", error);
+                goto reportError;
+            }
+        }
+	}
+	else {
+		FSRef srcRef, dstRef;
+		OSStatus err;
+		err = FSPathMakeRef((UInt8 *)[mountPoint fileSystemRepresentation], &srcRef, NULL);
+		if (err != noErr) goto reportError;
+		err = FSPathMakeRef((UInt8 *)[[archivePath stringByDeletingLastPathComponent] fileSystemRepresentation], &dstRef, NULL);
+		if (err != noErr) goto reportError;
+		
+		err = FSCopyObjectSync(&srcRef, &dstRef, (CFStringRef)mountPointName, NULL, kFSFileOperationSkipSourcePermissionErrors);
+		if (err != noErr) goto reportError;
+	}
 	
 	[self performSelectorOnMainThread:@selector(notifyDelegateOfSuccess) withObject:nil waitUntilDone:NO];
 	goto finally;

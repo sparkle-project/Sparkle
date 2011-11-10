@@ -163,8 +163,17 @@
 		tempDir = [[[host appSupportPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, cnt++]] retain];
 	}
 	
+    // Create the temporary directory if necessary.
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-	BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir attributes:nil];
+	BOOL success = YES;
+    NSEnumerator *pathComponentEnumerator = [[tempDir pathComponents] objectEnumerator];
+    NSString *pathComponentAccumulator = @"";
+    NSString *currentPathComponent;
+    while ((currentPathComponent = [pathComponentEnumerator nextObject])) {
+        pathComponentAccumulator = [pathComponentAccumulator stringByAppendingPathComponent:currentPathComponent];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:pathComponentAccumulator]) continue;
+        success &= [[NSFileManager defaultManager] createDirectoryAtPath:pathComponentAccumulator attributes:nil];
+    }
 #else
 	BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir withIntermediateDirectories:YES attributes:nil error:NULL];
 #endif
