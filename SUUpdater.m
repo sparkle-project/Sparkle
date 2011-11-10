@@ -31,8 +31,8 @@
 - (void)updateDriverDidFinish:(NSNotification *)note;
 - (NSURL *)parameterizedFeedURL;
 
--(void)	notifyWillShowAlert;
--(void)	notifyDidShowAlert;
+-(void)	notifyWillShowModalAlert;
+-(void)	notifyDidShowModalAlert;
 
 @end
 
