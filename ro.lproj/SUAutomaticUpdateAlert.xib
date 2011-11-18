@@ -160,14 +160,14 @@
 						<object class="NSButton" id="265767855">
 							<reference key="NSNextResponder" ref="683629094"/>
 							<int key="NSvFlags">257</int>
-							<string key="NSFrame">{{435, 12}, {167, 32}}</string>
+							<string key="NSFrame">{{423, 12}, {192, 32}}</string>
 							<reference key="NSSuperview" ref="683629094"/>
 							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="5529083">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Install and Relaunch</string>
+								<string key="NSContents">Instalează și Relansează</string>
 								<object class="NSFont" key="NSSupport" id="957448308">
 									<string key="NSName">LucidaGrande</string>
 									<double key="NSSize">13</double>
@@ -186,7 +186,7 @@
 						<object class="NSButton" id="389094888">
 							<reference key="NSNextResponder" ref="683629094"/>
 							<int key="NSvFlags">257</int>
-							<string key="NSFrame">{{306, 12}, {129, 32}}</string>
+							<string key="NSFrame">{{266, 12}, {157, 32}}</string>
 							<reference key="NSSuperview" ref="683629094"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="265767855"/>
@@ -194,7 +194,7 @@
 							<object class="NSButtonCell" key="NSCell" id="285814029">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Install on Quit</string>
+								<string key="NSContents">Instalează la Iesire</string>
 								<reference key="NSSupport" ref="957448308"/>
 								<reference key="NSControlView" ref="389094888"/>
 								<int key="NSButtonFlags">-2038284033</int>
@@ -217,7 +217,7 @@
 							<object class="NSButtonCell" key="NSCell" id="368800735">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Don't Install</string>
+								<string key="NSContents">Nu instala</string>
 								<reference key="NSSupport" ref="957448308"/>
 								<reference key="NSControlView" ref="689081238"/>
 								<int key="NSButtonFlags">-2038284033</int>
@@ -242,7 +242,7 @@
 							<object class="NSButtonCell" key="NSCell" id="112350240">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">131072</int>
-								<string key="NSContents">Automatically download and install updates in the future</string>
+								<string key="NSContents">Descarcă și instalează automat actualizarile pe viitor</string>
 								<reference key="NSSupport" ref="26"/>
 								<reference key="NSControlView" ref="649646560"/>
 								<int key="NSButtonFlags">1211912703</int>
@@ -417,8 +417,8 @@
 							<reference ref="757978667"/>
 							<reference ref="649646560"/>
 							<reference ref="265767855"/>
-							<reference ref="389094888"/>
 							<reference ref="689081238"/>
+							<reference ref="389094888"/>
 						</object>
 						<reference key="parent" ref="26497398"/>
 					</object>
