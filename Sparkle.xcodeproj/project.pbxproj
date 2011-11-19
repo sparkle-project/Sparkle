@@ -126,6 +126,10 @@
 		61C2680A0E2DB5D000175E6C /* License.txt in Resources */ = {isa = PBXBuildFile; fileRef = 61C268090E2DB5D000175E6C /* License.txt */; };
 		61CFB3290E385186007A1735 /* Sparkle.pch in Headers */ = {isa = PBXBuildFile; fileRef = 61CFB3280E385186007A1735 /* Sparkle.pch */; };
 		61D85D6D0E10B2ED00F9B4A9 /* SUPipedUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 6129C0B90E0B79810062CE76 /* SUPipedUnarchiver.m */; };
+		61DEC1171477565C00931268 /* SUUpdatePermissionPrompt.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14C05136EF2C700649790 /* SUUpdatePermissionPrompt.xib */; };
+		61DEC1191477566800931268 /* SUUpdateAlert.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BF0136EF26100649790 /* SUUpdateAlert.xib */; };
+		61DEC11B1477567800931268 /* SUAutomaticUpdateAlert.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BDA136EF20D00649790 /* SUAutomaticUpdateAlert.xib */; };
+		61DEC11D1477568300931268 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
 		61EF67560E25B58D00F754E0 /* SUHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 61EF67550E25B58D00F754E0 /* SUHost.m */; };
 		61EF67590E25C5B400F754E0 /* SUHost.h in Headers */ = {isa = PBXBuildFile; fileRef = 61EF67580E25C5B400F754E0 /* SUHost.h */; };
 		61F83F720DBFE140006FDD30 /* SUBasicUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */; };
@@ -178,10 +182,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		002A1F0B14768705009AC698 /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = /Users/Gabe/Desktop/Projects/GitHub/Sparkle/ro.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<absolute>"; };
-		002A1F0C14768705009AC698 /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = /Users/Gabe/Desktop/Projects/GitHub/Sparkle/ro.lproj/SUUpdateAlert.xib; sourceTree = "<absolute>"; };
-		002A1F0D14768705009AC698 /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = /Users/Gabe/Desktop/Projects/GitHub/Sparkle/ro.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<absolute>"; };
-		002A1F1014768705009AC698 /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = /Users/Gabe/Desktop/Projects/GitHub/Sparkle/ro.lproj/Sparkle.strings; sourceTree = "<absolute>"; };
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
@@ -365,6 +365,10 @@
 		61BBDF810A49220C00378739 /* Sparkle.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Sparkle.icns; sourceTree = "<group>"; };
 		61C268090E2DB5D000175E6C /* License.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = License.txt; sourceTree = "<group>"; };
 		61CFB3280E385186007A1735 /* Sparkle.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sparkle.pch; sourceTree = "<group>"; };
+		61DEC1161477565C00931268 /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		61DEC1181477566800931268 /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = ro.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
+		61DEC11A1477567800931268 /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = ro.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
+		61DEC11C1477568300931268 /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = ro.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
 		61E31A80103299500051D188 /* pt_BR */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = pt_BR; path = pt_BR.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61EF67550E25B58D00F754E0 /* SUHost.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUHost.m; sourceTree = "<group>"; };
 		61EF67580E25C5B400F754E0 /* SUHost.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUHost.h; sourceTree = "<group>"; };
@@ -914,6 +918,7 @@
 				pt_BR,
 				pt_PT,
 				pt,
+				ro,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* Sparkle */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
@@ -970,6 +975,10 @@
 				55C14C04136EF26100649790 /* SUUpdateAlert.xib in Resources */,
 				55C14C19136EF2C700649790 /* SUUpdatePermissionPrompt.xib in Resources */,
 				55C14F3B136EFCB300649790 /* finish_installation.app in Resources */,
+				61DEC1171477565C00931268 /* SUUpdatePermissionPrompt.xib in Resources */,
+				61DEC1191477566800931268 /* SUUpdateAlert.xib in Resources */,
+				61DEC11B1477567800931268 /* SUAutomaticUpdateAlert.xib in Resources */,
+				61DEC11D1477568300931268 /* SUStatus.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1185,7 +1194,7 @@
 				55C14BED136EF20D00649790 /* zh_TW */,
 				6158A1BA1378F68100487EC1 /* pt_PT */,
 				6158A1BE1378F8BB00487EC1 /* tr */,
-				002A1F0B14768705009AC698 /* ro */,
+				61DEC11C1477568300931268 /* ro */,
 			);
 			name = SUAutomaticUpdateAlert.xib;
 			sourceTree = "<group>";
@@ -1213,7 +1222,7 @@
 				55C14C03136EF26100649790 /* zh_TW */,
 				6158A1BB1378F68100487EC1 /* pt_PT */,
 				6158A1BF1378F8BB00487EC1 /* tr */,
-				002A1F0C14768705009AC698 /* ro */,
+				61DEC11A1477567800931268 /* ro */,
 			);
 			name = SUUpdateAlert.xib;
 			sourceTree = "<group>";
@@ -1241,7 +1250,7 @@
 				55C14C18136EF2C700649790 /* zh_TW */,
 				6158A1B81378F64700487EC1 /* pt_PT */,
 				6158A1C01378F8BB00487EC1 /* tr */,
-				002A1F0D14768705009AC698 /* ro */,
+				61DEC1181477566800931268 /* ro */,
 			);
 			name = SUUpdatePermissionPrompt.xib;
 			sourceTree = "<group>";
@@ -1267,7 +1276,7 @@
 				615409C4103BBC4000125AF1 /* cs */,
 				6186554310D7484E00B1E074 /* pt_PT */,
 				6160FD85134ABCD5007FFC5F /* tr */,
-				002A1F1014768705009AC698 /* ro */,
+				61DEC1161477565C00931268 /* ro */,
 			);
 			name = Sparkle.strings;
 			sourceTree = "<group>";
