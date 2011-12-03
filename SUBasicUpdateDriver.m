@@ -27,18 +27,18 @@
 @implementation SUBasicUpdateDriver
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
-{	
+{
 	[super checkForUpdatesAtURL:URL host:aHost];
 	if ([aHost isRunningOnReadOnlyVolume])
 	{
 		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again.", nil), [aHost name]] forKey:NSLocalizedDescriptionKey]]];
 		return;
-	}	
-	
+	}
+
 	SUAppcast *appcast = [[SUAppcast alloc] init];
 	CFRetain(appcast); // We'll manage the appcast's memory ourselves so we don't have to make it an IV to support GC.
 	[appcast release];
-	
+
 	[appcast setDelegate:self];
 	[appcast setUserAgentString:[updater userAgentString]];
 	[appcast fetchAppcastFromURL:URL];
@@ -47,16 +47,16 @@
 - (id <SUVersionComparison>)versionComparator
 {
 	id <SUVersionComparison> comparator = nil;
-	
+
 	// Give the delegate a chance to provide a custom version comparator
 	if ([[updater delegate] respondsToSelector:@selector(versionComparatorForUpdater:)])
 		comparator = [[updater delegate] versionComparatorForUpdater:updater];
-	
+
 	// If we don't get a comparator from the delegate, use the default comparator
 	if (!comparator)
 		comparator = [SUStandardVersionComparator defaultComparator];
-	
-	return comparator;	
+
+	return comparator;
 }
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui
@@ -66,12 +66,12 @@
 
 - (BOOL)hostSupportsItem:(SUAppcastItem *)ui
 {
-	if (([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) && 
+	if (([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) &&
         ([ui maximumSystemVersion] == nil || [[ui maximumSystemVersion] isEqualToString:@""])) { return YES; }
-    
+
     BOOL minimumVersionOK = TRUE;
     BOOL maximumVersionOK = TRUE;
-    
+
     // Check minimum and maximum System Version
     if ([ui minimumSystemVersion] != nil && ![[ui minimumSystemVersion] isEqualToString:@""]) {
         minimumVersionOK = [[SUStandardVersionComparator defaultComparator] compareVersion:[ui minimumSystemVersion] toVersion:[SUHost systemVersionString]] != NSOrderedDescending;
@@ -79,7 +79,7 @@
     if ([ui maximumSystemVersion] != nil && ![[ui maximumSystemVersion] isEqualToString:@""]) {
         maximumVersionOK = [[SUStandardVersionComparator defaultComparator] compareVersion:[ui maximumSystemVersion] toVersion:[SUHost systemVersionString]] != NSOrderedAscending;
     }
-    
+
     return minimumVersionOK && maximumVersionOK;
 }
 
@@ -99,9 +99,9 @@
 {
 	if ([[updater delegate] respondsToSelector:@selector(updater:didFinishLoadingAppcast:)])
 		[[updater delegate] updater:updater didFinishLoadingAppcast:ac];
-    
+
     SUAppcastItem *item = nil;
-    
+
 	// Now we have to find the best valid update in the appcast.
 	if ([[updater delegate] respondsToSelector:@selector(bestValidUpdateInAppcast:forUpdater:)]) // Does the delegate want to handle it?
 	{
@@ -115,7 +115,7 @@
 			item = [updateEnumerator nextObject];
 		} while (item && ![self hostSupportsItem:item]);
 
-		if (binaryDeltaSupported()) {        
+		if (binaryDeltaSupported()) {
 			SUAppcastItem *deltaUpdateItem = [[item deltaUpdates] objectForKey:[host version]];
 			if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem]) {
 				nonDeltaUpdateItem = [item retain];
@@ -123,11 +123,11 @@
 			}
 		}
 	}
-    
+
     updateItem = [item retain];
 	if (ac) { CFRelease(ac); } // Remember that we're explicitly managing the memory of the appcast.
 	if (updateItem == nil) { [self didNotFindUpdate]; return; }
-	
+
 	if ([self itemContainsValidUpdate:updateItem])
 		[self didFindValidUpdate];
 	else
@@ -166,10 +166,10 @@
 	// If name ends in .txt, the server probably has a stupid MIME configuration. We'll give the developer the benefit of the doubt and chop that off.
 	if ([[name pathExtension] isEqualToString:@"txt"])
 		name = [name stringByDeletingPathExtension];
-	
+
 	NSString *downloadFileName = [NSString stringWithFormat:@"%@ %@", [host name], [updateItem versionString]];
-    
-    
+
+
 	[tempDir release];
 	tempDir = [[[host appSupportPath] stringByAppendingPathComponent:downloadFileName] retain];
 	int cnt=1;
@@ -178,7 +178,7 @@
 		[tempDir release];
 		tempDir = [[[host appSupportPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, cnt++]] retain];
 	}
-	
+
     // Create the temporary directory if necessary.
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	BOOL success = YES;
@@ -199,7 +199,7 @@
 		[download cancel];
 		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Can't make a temporary directory for the update download at %@.",tempDir] forKey:NSLocalizedDescriptionKey]]];
 	}
-	
+
 	downloadPath = [[tempDir stringByAppendingPathComponent:name] retain];
 	[download setDestination:downloadPath allowOverwrite:YES];
 }
@@ -216,12 +216,12 @@
             SULog(@"Code signature check on update failed: %@", error);
         }
     }
-    
+
     return [SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey];
 }
 
 - (void)downloadDidFinish:(NSURLDownload *)d
-{	
+{
 	[self extractUpdate];
 }
 
@@ -238,7 +238,7 @@
 }
 
 - (void)extractUpdate
-{	
+{
 	SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:downloadPath updatingHost:host];
 	if (!unarchiver)
 	{
@@ -290,13 +290,14 @@
         return;
 	}
 #endif
-    
+    relaunch = NO; // TOTALFINDER-related HACK to prevent relaunch, installer does relaunch automatically
+
     if (![updater mayUpdateAndRestart])
     {
         [self abortUpdate];
         return;
     }
-    
+
     // Give the host app an opportunity to postpone the install and relaunch.
     static BOOL postponedOnce = NO;
     if (!postponedOnce && [[updater delegate] respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
@@ -310,10 +311,10 @@
             return;
     }
 
-    
+
 	if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdate:)])
 		[[updater delegate] updater:updater willInstallUpdate:updateItem];
-	
+
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
 	NSString *relaunchPathToCopy = [SPARKLE_BUNDLE pathForResource:@"finish_installation" ofType:@"app"];
     NSString *targetPath = [[host appSupportPath] stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
@@ -330,7 +331,7 @@
 		relaunchPath = [targetPath retain];
 	else
 		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil), NSLocalizedDescriptionKey, [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", relaunchPathToCopy, targetPath, (error ? [error localizedDescription] : @"")], NSLocalizedFailureReasonErrorKey, nil]]];
-	
+
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
     if ([[updater delegate] respondsToSelector:@selector(updaterWillRelaunchApplication:)])
         [[updater delegate] updaterWillRelaunchApplication:updater];
@@ -341,8 +342,8 @@
         [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [host name]], NSLocalizedDescriptionKey, [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@)", relaunchPath], NSLocalizedFailureReasonErrorKey, nil]]];
         // We intentionally don't abandon the update here so that the host won't initiate another.
         return;
-    }		
-    
+    }
+
     NSString *pathToRelaunch = [host bundlePath];
     if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
         pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
