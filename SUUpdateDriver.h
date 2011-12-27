@@ -14,7 +14,7 @@
 extern NSString * const SUUpdateDriverFinishedNotification;
 
 @class SUHost, SUUpdater;
-@interface SUUpdateDriver : NSObject
+@interface SUUpdateDriver : NSObject<NSURLDownloadDelegate>
 {
 	SUHost *host;
 	SUUpdater *updater;

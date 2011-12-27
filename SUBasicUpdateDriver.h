@@ -13,7 +13,7 @@
 #import "SUUpdateDriver.h"
 
 @class SUAppcastItem, SUUnarchiver, SUAppcast, SUUnarchiver, SUHost;
-@interface SUBasicUpdateDriver : SUUpdateDriver {
+@interface SUBasicUpdateDriver : SUUpdateDriver<NSURLDownloadDelegate> {
 	SUAppcastItem *updateItem;
 	SUAppcastItem *nonDeltaUpdateItem;
 	
