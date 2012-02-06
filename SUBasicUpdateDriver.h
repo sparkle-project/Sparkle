@@ -33,6 +33,7 @@
 - (BOOL)hostSupportsItem:(SUAppcastItem *)ui;
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui;
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui;
+- (BOOL)itemContainsRequiredUpdate:(SUAppcastItem *)ui;
 - (void)didFindValidUpdate;
 - (void)didNotFindUpdate;
 
