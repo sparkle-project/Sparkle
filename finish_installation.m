@@ -14,6 +14,7 @@
 										
 @interface TerminationListener : NSObject
 {
+	const char		*hostpath;
 	const char		*executablepath;
 	pid_t			parentprocessid;
 	const char		*folderpath;
@@ -36,12 +37,13 @@
 
 @implementation TerminationListener
 
-- (id) initWithExecutablePath:(const char *)execpath parentProcessId:(pid_t)ppid folderPath: (const char*)infolderpath shouldRelaunch:(BOOL)relaunch
+- (id) initWithHostPath:(const char *)inhostpath executablePath:(const char *)execpath parentProcessId:(pid_t)ppid folderPath: (const char*)infolderpath shouldRelaunch:(BOOL)relaunch
 		selfPath: (NSString*)inSelfPath
 {
 	if( !(self = [super init]) )
 		return nil;
 	
+	hostpath		= inhostpath;
 	executablepath	= execpath;
 	parentprocessid	= ppid;
 	folderpath		= infolderpath;
@@ -110,7 +112,7 @@
     if (shouldRelaunch)
     {
         NSString	*appPath = nil;
-        if( !folderpath )
+        if( !folderpath || strcmp(executablepath, hostpath) != 0 )
             appPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:executablepath length:strlen(executablepath)];
         else
             appPath = [host installationPath];
@@ -134,7 +136,7 @@
 
 - (void) install
 {
-	NSBundle			*theBundle = [NSBundle bundleWithPath: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: executablepath length:strlen(executablepath)]];
+	NSBundle			*theBundle = [NSBundle bundleWithPath: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: hostpath length:strlen(hostpath)]];
 	host = [[SUHost alloc] initWithBundle: theBundle];
 	
     // Perhaps a poor assumption but: if we're not relaunching, we assume we shouldn't be showing any UI either. Because non-relaunching installations are kicked off without any user interaction, we shouldn't be interrupting them.
@@ -169,7 +171,7 @@
 
 int main (int argc, const char * argv[])
 {
-	if( argc < 4 || argc > 5 )
+	if( argc < 5 || argc > 6 )
 		return EXIT_FAILURE;
 	
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -192,11 +194,12 @@ int main (int argc, const char * argv[])
 	#endif
 	
 	[NSApplication sharedApplication];
-	[[[TerminationListener alloc] initWithExecutablePath: (argc > 1) ? argv[1] : NULL
-                                         parentProcessId: (argc > 2) ? atoi(argv[2]) : 0
-                                              folderPath: (argc > 3) ? argv[3] : NULL
-                                          shouldRelaunch: (argc > 4) ? atoi(argv[4]) : 1
-                                                selfPath: selfPath] autorelease];
+	[[[TerminationListener alloc] initWithHostPath: (argc > 1) ? argv[1] : NULL
+                                    executablePath: (argc > 2) ? argv[2] : NULL
+                                   parentProcessId: (argc > 3) ? atoi(argv[3]) : 0
+                                        folderPath: (argc > 4) ? argv[4] : NULL
+                                    shouldRelaunch: (argc > 5) ? atoi(argv[5]) : 1
+                                          selfPath: selfPath] autorelease];
 	[[NSApplication sharedApplication] run];
 	
 	[pool drain];
