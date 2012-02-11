@@ -59,6 +59,7 @@ extern NSString *const SULastProfileSubmitDateKey;
 extern NSString *const SUPromptUserOnFirstLaunchKey;
 extern NSString *const SUFixedHTMLDisplaySizeKey;
 extern NSString *const SUKeepDownloadOnFailedInstallKey;
+extern NSString *const SUDefaultsDomainKey;
 
 // -----------------------------------------------------------------------------
 //	Errors:

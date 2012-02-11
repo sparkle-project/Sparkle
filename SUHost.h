@@ -14,6 +14,8 @@
 {
 @private
 	NSBundle *bundle;
+	NSString *defaultsDomain;
+	BOOL usesStandardUserDefaults;
 }
 
 + (NSString *)systemVersionString;
