@@ -265,6 +265,12 @@
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch
 {
+	// Perhaps a poor assumption but: if we're not relaunching, we assume we shouldn't be showing any UI either. Because non-relaunching installations are kicked off without any user interaction, we shouldn't be interrupting them.
+	[self installWithToolAndRelaunch:relaunch displayingUserInterface:relaunch];
+}
+
+- (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
+{
     if (![updater mayUpdateAndRestart])
     {
         [self abortUpdate];
@@ -321,7 +327,14 @@
     if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
         pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
     NSString *relaunchToolPath = [relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS/finish_installation"];
-    [NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:[NSArray arrayWithObjects:[host bundlePath], pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], tempDir, relaunch ? @"1" : @"0", nil]];
+    [NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:[NSArray arrayWithObjects:
+																	[host bundlePath],
+																	pathToRelaunch,
+																	[NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]],
+																	tempDir,
+																	relaunch ? @"1" : @"0",
+																	showUI ? @"1" : @"0",
+																	nil]];
 
     [NSApp terminate:self];
 }
