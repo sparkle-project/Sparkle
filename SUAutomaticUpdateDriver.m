@@ -38,6 +38,8 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)ua
 {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+
     // If this is marked as a critical update, we'll prompt the user to install it right away. 
     if ([updateItem isCriticalUpdate])
     {
@@ -45,7 +47,6 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     }
     else
     {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
         showUpdateAlertTimer = [[NSTimer scheduledTimerWithTimeInterval:SUAutomaticUpdatePromptImpatienceTimer target:self selector:@selector(showUpdateAlert) userInfo:nil repeats:NO] retain];
     }
 }
@@ -64,6 +65,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)dealloc
 {
+    [self stopUpdatingOnTermination];
     [self invalidateShowUpdateAlertTimer];
     [alert release];
     [super dealloc];
