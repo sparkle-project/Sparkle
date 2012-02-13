@@ -40,6 +40,14 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
 
+    // Sudden termination is available on 10.6+
+    NSProcessInfo *processInfo = [NSProcessInfo processInfo];
+    if ([processInfo respondsToSelector:@selector(disableSuddenTermination)]) {
+        [processInfo disableSuddenTermination];
+    }
+
+    willUpdateOnTermination = YES;
+
     // If this is marked as a critical update, we'll prompt the user to install it right away. 
     if ([updateItem isCriticalUpdate])
     {
@@ -53,7 +61,15 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)stopUpdatingOnTermination
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
+    if (willUpdateOnTermination)
+    {
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
+        NSProcessInfo *processInfo = [NSProcessInfo processInfo];
+        if ([processInfo respondsToSelector:@selector(enableSuddenTermination)]) {
+            [processInfo enableSuddenTermination];
+        }
+        willUpdateOnTermination = NO;
+    }
 }
 
 - (void)invalidateShowUpdateAlertTimer
