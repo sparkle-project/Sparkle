@@ -23,12 +23,20 @@
         bundle = [aBundle retain];
 		if (![bundle bundleIdentifier])
 			SULog(@"Sparkle Error: the bundle being updated at %@ has no CFBundleIdentifier! This will cause preference read/write to not work properly.", bundle);
+
+		defaultsDomain = [[bundle objectForInfoDictionaryKey:SUDefaultsDomainKey] retain];
+		if (!defaultsDomain)
+			defaultsDomain = [[bundle bundleIdentifier] retain];
+
+		// If we're using the main bundle's defaults we'll use the standard user defaults mechanism, otherwise we have to get CF-y.
+		usesStandardUserDefaults = [defaultsDomain isEqualToString:[[NSBundle mainBundle] bundleIdentifier]];
     }
     return self;
 }
 
 - (void)dealloc
 {
+	[defaultsDomain release];
 	[bundle release];
 	[super dealloc];
 }
@@ -177,34 +185,33 @@
 	// Under Tiger, CFPreferencesCopyAppValue doesn't get values from NSRegistrationDomain, so anything
 	// passed into -[NSUserDefaults registerDefaults:] is ignored.  The following line falls
 	// back to using NSUserDefaults, but only if the host bundle is the main bundle.
-	if (bundle == [NSBundle mainBundle])
+	if (usesStandardUserDefaults)
 		return [[NSUserDefaults standardUserDefaults] objectForKey:defaultName];
 	
-	CFPropertyListRef obj = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
+	CFPropertyListRef obj = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)defaultsDomain);
 	return [(id)CFMakeCollectable(obj) autorelease];
 }
 
 - (void)setObject:(id)value forUserDefaultsKey:(NSString *)defaultName;
 {
-	// If we're using a .app, we'll use the standard user defaults mechanism; otherwise, we have to get CF-y.
-	if (bundle == [NSBundle mainBundle])
+	if (usesStandardUserDefaults)
 	{
 		[[NSUserDefaults standardUserDefaults] setObject:value forKey:defaultName];
 	}
 	else
 	{
-		CFPreferencesSetValue((CFStringRef)defaultName, value, (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
-		CFPreferencesSynchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		CFPreferencesSetValue((CFStringRef)defaultName, value, (CFStringRef)defaultsDomain,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		CFPreferencesSynchronize((CFStringRef)defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	}
 }
 
 - (BOOL)boolForUserDefaultsKey:(NSString *)defaultName
 {
-	if (bundle == [NSBundle mainBundle])
+	if (usesStandardUserDefaults)
 		return [[NSUserDefaults standardUserDefaults] boolForKey:defaultName];
 	
 	BOOL value;
-	CFPropertyListRef plr = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
+	CFPropertyListRef plr = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)defaultsDomain);
 	if (plr == NULL)
 		value = NO;
 	else
@@ -217,15 +224,14 @@
 
 - (void)setBool:(BOOL)value forUserDefaultsKey:(NSString *)defaultName
 {
-	// If we're using a .app, we'll use the standard user defaults mechanism; otherwise, we have to get CF-y.
-	if (bundle == [NSBundle mainBundle])
+	if (usesStandardUserDefaults)
 	{
 		[[NSUserDefaults standardUserDefaults] setBool:value forKey:defaultName];
 	}
 	else
 	{
-		CFPreferencesSetValue((CFStringRef)defaultName, (CFBooleanRef)[NSNumber numberWithBool:value], (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
-		CFPreferencesSynchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		CFPreferencesSetValue((CFStringRef)defaultName, (CFBooleanRef)[NSNumber numberWithBool:value], (CFStringRef)defaultsDomain,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		CFPreferencesSynchronize((CFStringRef)defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	}
 }
 
