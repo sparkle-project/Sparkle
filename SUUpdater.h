@@ -138,6 +138,11 @@
 -(void)	updaterWillShowModalAlert:(SUUpdater *)updater;
 -(void)	updaterDidShowModalAlert:(SUUpdater *)updater;
 
+// Called when an update is scheduled to be silently installed on quit.
+// The invocation can be used to trigger an immediate silent install and relaunch.
+- (void)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)update immediateInstallationInvocation:(NSInvocation *)invocation;
+- (void)updater:(SUUpdater *)updater didCancelInstallUpdateOnQuit:(SUAppcastItem *)update;
+
 @end
 
 
