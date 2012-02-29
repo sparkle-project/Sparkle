@@ -48,6 +48,19 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
     willUpdateOnTermination = YES;
 
+    if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)])
+    {
+        BOOL relaunch = YES;
+        BOOL showUI = NO;
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installWithToolAndRelaunch:displayingUserInterface:)]];
+        [invocation setSelector:@selector(installWithToolAndRelaunch:displayingUserInterface:)];
+        [invocation setArgument:&relaunch atIndex:2];
+        [invocation setArgument:&showUI atIndex:3];
+        [invocation setTarget:self];
+
+        [[updater delegate] updater:updater willInstallUpdateOnQuit:updateItem immediateInstallationInvocation:invocation];
+    }
+
     // If this is marked as a critical update, we'll prompt the user to install it right away. 
     if ([updateItem isCriticalUpdate])
     {
@@ -69,6 +82,9 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
             [processInfo enableSuddenTermination];
         }
         willUpdateOnTermination = NO;
+
+        if ([[updater delegate] respondsToSelector:@selector(updater:didCancelInstallUpdateOnQuit:)])
+            [[updater delegate] updater:updater didCancelInstallUpdateOnQuit:updateItem];
     }
 }
 
@@ -120,10 +136,13 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 	}
 }
 
-- (void)installWithToolAndRelaunch:(BOOL)relaunch
+- (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
 {
-	showErrors = YES;
-	[super installWithToolAndRelaunch:relaunch];
+    if (relaunch)
+        [self stopUpdatingOnTermination];
+
+    showErrors = YES;
+    [super installWithToolAndRelaunch:relaunch displayingUserInterface:showUI];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)note
