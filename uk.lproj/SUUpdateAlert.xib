@@ -57,9 +57,9 @@
 			<object class="NSWindowTemplate" id="191739834">
 				<int key="NSWindowStyleMask">15</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{248, 468}, {643, 375}}</string>
+				<string key="NSWindowRect">{{248, 468}, {612, 369}}</string>
 				<int key="NSWTFlags">-260571136</int>
-				<string key="NSWindowTitle">Обновление программного обеспечения</string>
+				<string key="NSWindowTitle">Оновлення програмного забезпечення</string>
 				<string key="NSWindowClass">NSWindow</string>
 				<object class="NSMutableString" key="NSViewClass">
 					<characters key="NS.bytes">View</characters>
@@ -86,9 +86,10 @@
 									<string>NeXT TIFF v4.0 pasteboard type</string>
 								</object>
 							</object>
-							<string key="NSFrame">{{24, 296}, {64, 64}}</string>
+							<string key="NSFrame">{{24, 290}, {64, 64}}</string>
 							<reference key="NSSuperview" ref="163075390"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="445247806"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="316088302">
 								<int key="NSCellFlags">130560</int>
@@ -107,9 +108,10 @@
 						<object class="NSTextField" id="445247806">
 							<reference key="NSNextResponder" ref="163075390"/>
 							<int key="NSvFlags">266</int>
-							<string key="NSFrame">{{106, 343}, {520, 17}}</string>
+							<string key="NSFrame">{{106, 337}, {489, 17}}</string>
 							<reference key="NSSuperview" ref="163075390"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="757142666"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="280112567">
 								<int key="NSCellFlags">67239424</int>
@@ -144,14 +146,15 @@
 						<object class="NSTextField" id="139815278">
 							<reference key="NSNextResponder" ref="163075390"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{106, 285}, {452, 14}}</string>
+							<string key="NSFrame">{{106, 276}, {452, 17}}</string>
 							<reference key="NSSuperview" ref="163075390"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="114370023"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="939178269">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">272629760</int>
-								<string key="NSContents">Заметки о выпуске:</string>
+								<string key="NSContents">Примітки про нову версію:</string>
 								<object class="NSFont" key="NSSupport">
 									<string key="NSName">LucidaGrande-Bold</string>
 									<double key="NSSize">11</double>
@@ -165,14 +168,15 @@
 						<object class="NSButton" id="919863842">
 							<reference key="NSNextResponder" ref="163075390"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{269, 12}, {162, 32}}</string>
+							<string key="NSFrame">{{261, 12}, {154, 32}}</string>
 							<reference key="NSSuperview" ref="163075390"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="111369817"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="114345631">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Напоминать позже</string>
+								<string key="NSContents">Нагадати пізніше</string>
 								<object class="NSFont" key="NSSupport" id="566596790">
 									<string key="NSName">LucidaGrande</string>
 									<double key="NSSize">13</double>
@@ -191,14 +195,15 @@
 						<object class="NSButton" id="77541259">
 							<reference key="NSNextResponder" ref="163075390"/>
 							<int key="NSvFlags">288</int>
-							<string key="NSFrame">{{72, 12}, {185, 32}}</string>
+							<string key="NSFrame">{{65, 12}, {188, 32}}</string>
 							<reference key="NSSuperview" ref="163075390"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="919863842"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="733656317">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Пропустить эту версию</string>
+								<string key="NSContents">Пропустити цю версію</string>
 								<reference key="NSSupport" ref="566596790"/>
 								<reference key="NSControlView" ref="77541259"/>
 								<int key="NSButtonFlags">-2038284033</int>
@@ -215,14 +220,14 @@
 						<object class="NSButton" id="111369817">
 							<reference key="NSNextResponder" ref="163075390"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{435, 12}, {194, 32}}</string>
+							<string key="NSFrame">{{415, 12}, {187, 32}}</string>
 							<reference key="NSSuperview" ref="163075390"/>
 							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="635120042">
 								<int key="NSCellFlags">-2080244224</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Установить обновление</string>
+								<string key="NSContents">Встановити оновлення</string>
 								<reference key="NSSupport" ref="566596790"/>
 								<reference key="NSControlView" ref="111369817"/>
 								<int key="NSButtonFlags">-2038284033</int>
@@ -268,7 +273,7 @@
 													<string>public.url-name</string>
 												</object>
 											</object>
-											<string key="NSFrame">{{-2, -1}, {513, 204}}</string>
+											<string key="NSFrame">{{-2, -1}, {482, 198}}</string>
 											<reference key="NSSuperview" ref="610445114"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView"/>
@@ -296,14 +301,16 @@
 											<bool key="AllowsUndo">YES</bool>
 										</object>
 									</object>
-									<string key="NSFrame">{{1, 1}, {511, 202}}</string>
+									<string key="NSFrame">{{1, 1}, {480, 196}}</string>
 									<reference key="NSSuperview" ref="114370023"/>
 									<reference key="NSWindow"/>
+									<reference key="NSNextKeyView" ref="139390623"/>
 								</object>
 							</object>
-							<string key="NSFrame">{{110, 76}, {513, 204}}</string>
+							<string key="NSFrame">{{110, 76}, {482, 198}}</string>
 							<reference key="NSSuperview" ref="163075390"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="610445114"/>
 							<string key="NSOffsets">{0, 0}</string>
 							<object class="NSTextFieldCell" key="NSTitleCell">
 								<int key="NSCellFlags">67239424</int>
@@ -337,9 +344,10 @@
 						<object class="NSTextField" id="757142666">
 							<reference key="NSNextResponder" ref="163075390"/>
 							<int key="NSvFlags">266</int>
-							<string key="NSFrame">{{106, 307}, {520, 28}}</string>
+							<string key="NSFrame">{{106, 301}, {489, 28}}</string>
 							<reference key="NSSuperview" ref="163075390"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="139815278"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="130527574">
 								<int key="NSCellFlags">67239424</int>
@@ -358,14 +366,15 @@
 						<object class="NSButton" id="61494929">
 							<reference key="NSNextResponder" ref="163075390"/>
 							<int key="NSvFlags">290</int>
-							<string key="NSFrame">{{106, 50}, {519, 18}}</string>
+							<string key="NSFrame">{{106, 50}, {488, 18}}</string>
 							<reference key="NSSuperview" ref="163075390"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="77541259"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="10388865">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">131072</int>
-								<string key="NSContents">Автоматически загружать и устанавливать обновления в будущем</string>
+								<string key="NSContents">Автоматично завантажувати та встановлювати оновлення у майбутньому</string>
 								<reference key="NSSupport" ref="26"/>
 								<reference key="NSControlView" ref="61494929"/>
 								<int key="NSButtonFlags">1211912703</int>
@@ -384,9 +393,10 @@
 							</object>
 						</object>
 					</object>
-					<string key="NSFrameSize">{643, 375}</string>
+					<string key="NSFrameSize">{612, 369}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
+					<reference key="NSNextKeyView" ref="998369947"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMinSize">{575, 392}</string>
