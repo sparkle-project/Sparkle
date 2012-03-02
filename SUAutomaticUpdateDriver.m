@@ -19,6 +19,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)showUpdateAlert
 {
+	isInterruptible = NO;
 	alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:updateItem host:host delegate:self];
 	
 	// If the app is a menubar app or the like, we need to focus it first and alter the
@@ -69,6 +70,9 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     else
     {
         showUpdateAlertTimer = [[NSTimer scheduledTimerWithTimeInterval:SUAutomaticUpdatePromptImpatienceTimer target:self selector:@selector(showUpdateAlert) userInfo:nil repeats:NO] retain];
+
+        // At this point the driver is idle, allow it to be interrupted for user-initiated update checks.
+        isInterruptible = YES;
     }
 }
 
@@ -126,7 +130,8 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 			break;
 			
 		case SUInstallLaterChoice:
-            // No-op: we're already waiting on quit.
+			// We're already waiting on quit, just indicate that we're idle.
+			isInterruptible = YES;
 			break;
 
 		case SUDoNotInstallChoice:
