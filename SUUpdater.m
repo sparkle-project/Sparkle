@@ -288,6 +288,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 - (IBAction)checkForUpdates: (id)sender
 {
+	if (driver && [driver isInterruptible])
+		[driver abortUpdate];
+
 	[self checkForUpdatesWithDriver:[[[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self] autorelease]];
 }
 
