@@ -116,6 +116,7 @@
             appPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:executablepath length:strlen(executablepath)];
         else
             appPath = [host installationPath];
+		
         [[NSWorkspace sharedWorkspace] openFile: appPath];
     }
 
