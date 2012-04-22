@@ -8,6 +8,8 @@
 
 #import "SUPipedUnarchiver.h"
 #import "SUUnarchiver_Private.h"
+#import "SULog.h"
+
 
 @implementation SUPipedUnarchiver
 
@@ -44,9 +46,14 @@
 // This method abstracts the types that use a command line tool piping data from stdin.
 - (void)extractArchivePipingDataToCommand:(NSString *)command
 {
+	// *** GETS CALLED ON NON-MAIN THREAD!!!
+	
+
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	FILE *fp = NULL, *cmdFP = NULL;
 	
+	SULog(@"Extracting %@ using '%@'",archivePath,command);
+    
 	// Get the file size.
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	NSNumber *fs = [[[NSFileManager defaultManager] fileAttributesAtPath:archivePath traverseLink:NO] objectForKey:NSFileSize];
@@ -92,26 +99,34 @@ reportError:
 finally:
 	if (fp)
 		fclose(fp);
-	[pool drain];
+	[pool release];
 }
 
 - (void)extractTAR
 {
+	// *** GETS CALLED ON NON-MAIN THREAD!!!
+	
 	return [self extractArchivePipingDataToCommand:@"tar -xC \"$DESTINATION\""];
 }
 
 - (void)extractTGZ
 {
+	// *** GETS CALLED ON NON-MAIN THREAD!!!
+	
 	return [self extractArchivePipingDataToCommand:@"tar -zxC \"$DESTINATION\""];
 }
 
 - (void)extractTBZ
 {
+	// *** GETS CALLED ON NON-MAIN THREAD!!!
+	
 	return [self extractArchivePipingDataToCommand:@"tar -jxC \"$DESTINATION\""];
 }
 
 - (void)extractZIP
 {
+	// *** GETS CALLED ON NON-MAIN THREAD!!!
+	
 	return [self extractArchivePipingDataToCommand:@"ditto -x -k - \"$DESTINATION\""];
 }
 

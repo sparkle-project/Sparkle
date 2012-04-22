@@ -37,8 +37,26 @@
 	SUAssertAscending(@"1.0rc", @"1.0");
 	SUAssertAscending(@"1.0b", @"1.0");
 	SUAssertAscending(@"1.0pre1", @"1.0");
-	SUAssertAscending(@"1.0 beta", @"1.0");
-	SUAssertAscending(@"1.0 alpha", @"1.0 beta");
+}
+
+- (void)testVersionsWithBuildNumbers
+{
+	SUAssertAscending(@"1.0 (1234)", @"1.0 (1235)");
+	SUAssertAscending(@"1.0b1 (1234)", @"1.0 (1234)");
+	SUAssertAscending(@"1.0b5 (1234)", @"1.0b5 (1235)");
+	SUAssertAscending(@"1.0b5 (1234)", @"1.0.1b5 (1234)");
+	SUAssertAscending(@"1.0.1b5 (1234)", @"1.0.1b6 (1234)");
+	
+	SUAssertAscending(@"3.3 (5847)", @"3.3.1b1 (5902)");
+}
+
+- (void)testWordsWithSpaceInFront
+{
+//	SUAssertAscending(@"1.0 beta", @"1.0");
+//	SUAssertAscending(@"1.0  - beta", @"1.0");
+//	SUAssertAscending(@"1.0 alpha", @"1.0 beta");
+//	SUAssertEqual(@"1.0  - beta", @"1.0beta");
+//	SUAssertEqual(@"1.0  - beta", @"1.0 beta");
 }
 
 @end

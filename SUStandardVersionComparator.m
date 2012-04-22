@@ -6,7 +6,11 @@
 //  Copyright 2007 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
+#import "SUUpdater.h"
+
+#import "SUAppcast.h"
+#import "SUAppcastItem.h"
+#import "SUVersionComparisonProtocol.h"
 #import "SUStandardVersionComparator.h"
 
 @implementation SUStandardVersionComparator
@@ -22,15 +26,19 @@
 typedef enum {
     kNumberType,
     kStringType,
-    kPeriodType
+    kSeparatorType,
 } SUCharacterType;
 
 - (SUCharacterType)typeOfCharacter:(NSString *)character
 {
     if ([character isEqualToString:@"."]) {
-        return kPeriodType;
+        return kSeparatorType;
     } else if ([[NSCharacterSet decimalDigitCharacterSet] characterIsMember:[character characterAtIndex:0]]) {
         return kNumberType;
+    } else if ([[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:[character characterAtIndex:0]]) {
+        return kSeparatorType;
+    } else if ([[NSCharacterSet punctuationCharacterSet] characterIsMember:[character characterAtIndex:0]]) {
+        return kSeparatorType;
     } else {
         return kStringType;
     }	
@@ -53,7 +61,7 @@ typedef enum {
     for (i = 1; i <= n; ++i) {
         character = [version substringWithRange:NSMakeRange(i, 1)];
         newType = [self typeOfCharacter:character];
-        if (oldType != newType || oldType == kPeriodType) {
+        if (oldType != newType || oldType == kSeparatorType) {
             // We've reached a new segment
 			NSString *aPart = [[[NSString alloc] initWithString:s] autorelease];
             [parts addObject:aPart];

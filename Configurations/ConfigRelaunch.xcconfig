@@ -1,3 +1,4 @@
 // Relaunch Tool only
 
-PRODUCT_NAME = relaunch
+PRODUCT_NAME = finish_installation
+SKIP_INSTALL = YES

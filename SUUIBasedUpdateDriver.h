@@ -13,12 +13,16 @@
 #import "SUBasicUpdateDriver.h"
 
 @class SUStatusController, SUUpdateAlert;
-@interface SUUIBasedUpdateDriver : SUBasicUpdateDriver {
+
+@interface SUUIBasedUpdateDriver : SUBasicUpdateDriver
+{
 	SUStatusController *statusController;
 	SUUpdateAlert *updateAlert;
 }
 
 - (void)showModalAlert:(NSAlert *)alert;
+- (IBAction)cancelDownload: (id)sender;
+- (void)installAndRestart: (id)sender;
 
 @end
 
