@@ -79,6 +79,7 @@
 							<string key="NSFrame">{{23, 73}, {64, 64}}</string>
 							<reference key="NSSuperview" ref="683629094"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="766768061"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSImageCell" key="NSCell" id="17541256">
 								<int key="NSCellFlags">130560</int>
@@ -100,6 +101,7 @@
 							<string key="NSFrame">{{105, 120}, {621, 17}}</string>
 							<reference key="NSSuperview" ref="683629094"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="757978667"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="86959214">
 								<int key="NSCellFlags">67239424</int>
@@ -137,6 +139,7 @@
 							<string key="NSFrame">{{105, 81}, {621, 31}}</string>
 							<reference key="NSSuperview" ref="683629094"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="649646560"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="7373583">
 								<int key="NSCellFlags">67239424</int>
@@ -155,14 +158,14 @@
 						<object class="NSButton" id="265767855">
 							<reference key="NSNextResponder" ref="683629094"/>
 							<int key="NSvFlags">257</int>
-							<string key="NSFrame">{{502, 12}, {226, 32}}</string>
+							<string key="NSFrame">{{491, 12}, {248, 32}}</string>
 							<reference key="NSSuperview" ref="683629094"/>
 							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="5529083">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Установить и перезапустить</string>
+								<string key="NSContents">Встановити та перезавантажити</string>
 								<object class="NSFont" key="NSSupport" id="957448308">
 									<string key="NSName">LucidaGrande</string>
 									<double key="NSSize">13</double>
@@ -181,14 +184,15 @@
 						<object class="NSButton" id="389094888">
 							<reference key="NSNextResponder" ref="683629094"/>
 							<int key="NSvFlags">257</int>
-							<string key="NSFrame">{{290, 12}, {207, 32}}</string>
+							<string key="NSFrame">{{289, 12}, {200, 32}}</string>
 							<reference key="NSSuperview" ref="683629094"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="265767855"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="285814029">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Установить при закрытии</string>
+								<string key="NSContents">Встановити при закритті</string>
 								<reference key="NSSupport" ref="957448308"/>
 								<reference key="NSControlView" ref="389094888"/>
 								<int key="NSButtonFlags">-2038284033</int>
@@ -203,14 +207,15 @@
 						<object class="NSButton" id="689081238">
 							<reference key="NSNextResponder" ref="683629094"/>
 							<int key="NSvFlags">256</int>
-							<string key="NSFrame">{{102, 12}, {157, 32}}</string>
+							<string key="NSFrame">{{102, 12}, {158, 32}}</string>
 							<reference key="NSSuperview" ref="683629094"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="389094888"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="368800735">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Не устанавливать</string>
+								<string key="NSContents">Не встановлювати</string>
 								<reference key="NSSupport" ref="957448308"/>
 								<reference key="NSControlView" ref="689081238"/>
 								<int key="NSButtonFlags">-2038284033</int>
@@ -230,11 +235,12 @@
 							<string key="NSFrame">{{105, 58}, {619, 18}}</string>
 							<reference key="NSSuperview" ref="683629094"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="689081238"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="112350240">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">131072</int>
-								<string key="NSContents">Автоматически загружать и устанавливать обновления в будущем</string>
+								<string key="NSContents">Автоматично завантажувати та встановлювати оновлення у майбутньому</string>
 								<reference key="NSSupport" ref="26"/>
 								<reference key="NSControlView" ref="649646560"/>
 								<int key="NSButtonFlags">1211912703</int>
@@ -256,6 +262,7 @@
 					<string key="NSFrameSize">{743, 152}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
+					<reference key="NSNextKeyView" ref="684391777"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMinSize">{511, 174}</string>
