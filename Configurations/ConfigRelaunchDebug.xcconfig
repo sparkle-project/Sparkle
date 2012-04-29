@@ -2,4 +2,4 @@
 #include "ConfigCommonDebug.xcconfig"
 #include "ConfigRelaunch.xcconfig"
 
-OTHER_CFLAGS = -fsingle-precision-constant -DDEBUG
+OTHER_CFLAGS = -DDEBUG
