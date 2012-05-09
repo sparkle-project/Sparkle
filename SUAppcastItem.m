@@ -212,6 +212,9 @@
 		[self setMinimumSystemVersion: [dict objectForKey:@"sparkle:minimumSystemVersion"]];
 		
 		NSString *shortVersionString = [enclosure objectForKey:@"sparkle:shortVersionString"];
+        if (nil == shortVersionString)
+            shortVersionString = [dict objectForKey:@"sparkle:shortVersionString"]; // fall back on the <item>
+        
 		if (shortVersionString)
 			[self setDisplayVersionString: shortVersionString];
 		else
