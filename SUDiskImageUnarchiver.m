@@ -49,19 +49,15 @@
 	}
 	while (noErr == FSPathMakeRefWithOptions((UInt8 *)[mountPoint fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &tmpRef, NULL));
 
-/* ASW_ADDITION */
-#pragma mark ASW_ADDITION
 	BOOL isEncrypted = NO;
 	NSData *result = [NTSynchronousTask task:@"/usr/bin/hdiutil" directory:@"/" withArgs:[NSArray arrayWithObjects: @"isencrypted", archivePath, nil] input:NULL];
 	if([self isEncrypted:result])
 		isEncrypted = YES;
-/* ASW_ADDITION */
 	
 	NSArray* arguments = [NSArray arrayWithObjects:@"attach", archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen", nil];
 	// set up a pipe and push "yes" (y works too), this will accept any license agreement crap
 	// not every .dmg needs this, but this will make sure it works with everyone
-/* ASW_ADDITION */
-#pragma mark ASW_ADDITION
+
 	NSData* promptData;
 	if(isEncrypted) {
 		SUPasswordPrompt *prompt = [[SUPasswordPrompt alloc] initWithHost:(SUHost*)[delegate host]];
@@ -83,7 +79,6 @@
 	}
 	else
 		promptData = [NSData dataWithBytes:"yes\n" length:4];
-/* ASW_ADDITION */
 	
     NSData *output = nil;
 	NSInteger taskResult = -1;
@@ -178,8 +173,6 @@ finally:
 	[self registerImplementation:self];
 }
 
-/* ASW_ADDITION */
-#pragma mark ASW_ADDITION
 - (BOOL)isEncrypted:(NSData*)resultData
 {
 	BOOL result = NO;
@@ -193,6 +186,5 @@ finally:
 	}
 	return result;
 }
-/* ASW_ADDITION */
 
 @end
