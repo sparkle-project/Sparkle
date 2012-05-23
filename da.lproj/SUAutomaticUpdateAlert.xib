@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">11A453</string>
-		<string key="IBDocument.InterfaceBuilderVersion">1553</string>
-		<string key="IBDocument.AppKitVersion">1120</string>
-		<string key="IBDocument.HIToolboxVersion">556.00</string>
+		<string key="IBDocument.SystemVersion">11E53</string>
+		<string key="IBDocument.InterfaceBuilderVersion">2182</string>
+		<string key="IBDocument.AppKitVersion">1138.47</string>
+		<string key="IBDocument.HIToolboxVersion">569.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">1553</string>
+			<string key="NS.object.0">2182</string>
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -45,7 +45,7 @@
 			<object class="NSWindowTemplate" id="26497398">
 				<int key="NSWindowStyleMask">1</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{114, 521}, {627, 152}}</string>
+				<string key="NSWindowRect">{{114, 521}, {618, 152}}</string>
 				<int key="NSWTFlags">1886912512</int>
 				<string key="NSWindowTitle"/>
 				<object class="NSMutableString" key="NSWindowClass">
@@ -158,15 +158,14 @@
 						<object class="NSButton" id="265767855">
 							<reference key="NSNextResponder" ref="683629094"/>
 							<int key="NSvFlags">257</int>
-							<string key="NSFrame">{{437, 12}, {175, 32}}</string>
+							<string key="NSFrame">{{436, 12}, {168, 32}}</string>
 							<reference key="NSSuperview" ref="683629094"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="5529083">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Installer og start igen</string>
+								<string key="NSContents">Installer og genstart</string>
 								<object class="NSFont" key="NSSupport" id="957448308">
 									<string key="NSName">LucidaGrande</string>
 									<double key="NSSize">13</double>
@@ -185,7 +184,7 @@
 						<object class="NSButton" id="389094888">
 							<reference key="NSNextResponder" ref="683629094"/>
 							<int key="NSvFlags">257</int>
-							<string key="NSFrame">{{252, 12}, {185, 32}}</string>
+							<string key="NSFrame">{{251, 12}, {185, 32}}</string>
 							<reference key="NSSuperview" ref="683629094"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="265767855"/>
@@ -241,7 +240,7 @@
 							<object class="NSButtonCell" key="NSCell" id="112350240">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">131072</int>
-								<string key="NSContents">Hent og installer automatisk opdateringer i fremtiden</string>
+								<string key="NSContents">Automatisk hent og installer opdateringer i fremtiden</string>
 								<reference key="NSSupport" ref="26"/>
 								<reference key="NSControlView" ref="649646560"/>
 								<int key="NSButtonFlags">1211912703</int>
@@ -260,12 +259,12 @@
 							</object>
 						</object>
 					</object>
-					<string key="NSFrameSize">{627, 152}</string>
+					<string key="NSFrameSize">{618, 152}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="684391777"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
 				<string key="NSMinSize">{511, 174}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
@@ -277,6 +276,38 @@
 		<object class="IBObjectContainer" key="IBDocument.Objects">
 			<object class="NSMutableArray" key="connectionRecords">
 				<bool key="EncodedWithXMLCoder">YES</bool>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">window</string>
+						<reference key="source" ref="1063113299"/>
+						<reference key="destination" ref="26497398"/>
+					</object>
+					<int key="connectionID">22</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">installNow:</string>
+						<reference key="source" ref="1063113299"/>
+						<reference key="destination" ref="265767855"/>
+					</object>
+					<int key="connectionID">33</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">installLater:</string>
+						<reference key="source" ref="1063113299"/>
+						<reference key="destination" ref="389094888"/>
+					</object>
+					<int key="connectionID">34</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">doNotInstall:</string>
+						<reference key="source" ref="1063113299"/>
+						<reference key="destination" ref="689081238"/>
+					</object>
+					<int key="connectionID">35</int>
+				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: applicationIcon</string>
@@ -340,38 +371,6 @@
 						</object>
 					</object>
 					<int key="connectionID">19</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">window</string>
-						<reference key="source" ref="1063113299"/>
-						<reference key="destination" ref="26497398"/>
-					</object>
-					<int key="connectionID">22</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">installNow:</string>
-						<reference key="source" ref="1063113299"/>
-						<reference key="destination" ref="265767855"/>
-					</object>
-					<int key="connectionID">33</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">installLater:</string>
-						<reference key="source" ref="1063113299"/>
-						<reference key="destination" ref="389094888"/>
-					</object>
-					<int key="connectionID">34</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">doNotInstall:</string>
-						<reference key="source" ref="1063113299"/>
-						<reference key="destination" ref="689081238"/>
-					</object>
-					<int key="connectionID">35</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -538,18 +537,14 @@
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="NSArray" key="dict.sortedKeys">
 					<bool key="EncodedWithXMLCoder">YES</bool>
+					<string>-1.IBPluginDependency</string>
+					<string>-2.IBPluginDependency</string>
 					<string>-3.IBPluginDependency</string>
-					<string>-3.ImportedFromIB2</string>
 					<string>15.IBPluginDependency</string>
-					<string>15.ImportedFromIB2</string>
 					<string>16.IBPluginDependency</string>
-					<string>16.ImportedFromIB2</string>
 					<string>17.IBPluginDependency</string>
-					<string>17.ImportedFromIB2</string>
 					<string>18.IBPluginDependency</string>
-					<string>18.ImportedFromIB2</string>
 					<string>30.IBPluginDependency</string>
-					<string>30.ImportedFromIB2</string>
 					<string>38.IBPluginDependency</string>
 					<string>39.IBPluginDependency</string>
 					<string>40.IBPluginDependency</string>
@@ -557,33 +552,24 @@
 					<string>42.IBPluginDependency</string>
 					<string>43.IBPluginDependency</string>
 					<string>44.IBPluginDependency</string>
-					<string>5.IBEditorWindowLastContentRect</string>
 					<string>5.IBPluginDependency</string>
 					<string>5.IBWindowTemplateEditedContentRect</string>
-					<string>5.ImportedFromIB2</string>
 					<string>6.IBPluginDependency</string>
-					<string>6.ImportedFromIB2</string>
 					<string>7.IBPluginDependency</string>
-					<string>7.ImportedFromIB2</string>
 					<string>8.IBPluginDependency</string>
-					<string>8.ImportedFromIB2</string>
 					<string>9.IBPluginDependency</string>
-					<string>9.ImportedFromIB2</string>
 				</object>
-				<object class="NSMutableArray" key="dict.values">
+				<object class="NSArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -593,16 +579,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>{{312, 947}, {743, 152}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{312, 947}, {743, 152}}</string>
-					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<boolean value="YES"/>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="unlocalizedProperties">
@@ -633,7 +612,7 @@
 							<string>installLater:</string>
 							<string>installNow:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>id</string>
 							<string>id</string>
@@ -648,7 +627,7 @@
 							<string>installLater:</string>
 							<string>installNow:</string>
 						</object>
-						<object class="NSMutableArray" key="dict.values">
+						<object class="NSArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBActionInfo">
 								<string key="name">doNotInstall:</string>
@@ -698,7 +677,7 @@
 				<string>NSApplicationIcon</string>
 				<string>NSSwitch</string>
 			</object>
-			<object class="NSMutableArray" key="dict.values">
+			<object class="NSArray" key="dict.values">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<string>{128, 128}</string>
 				<string>{15, 15}</string>
