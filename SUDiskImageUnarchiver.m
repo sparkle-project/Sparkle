@@ -11,7 +11,7 @@
 #import "NTSynchronousTask.h"
 #import "SULog.h"
 #import <CoreServices/CoreServices.h>
-
+#import "SUPasswordPrompt.h"
 
 @implementation SUDiskImageUnarchiver
 
@@ -48,18 +48,59 @@
 		}
 	}
 	while (noErr == FSPathMakeRefWithOptions((UInt8 *)[mountPoint fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &tmpRef, NULL));
+
+	BOOL isEncrypted = NO;
+	NSData *result = [NTSynchronousTask task:@"/usr/bin/hdiutil" directory:@"/" withArgs:[NSArray arrayWithObjects: @"isencrypted", archivePath, nil] input:NULL];
+	if([self isEncrypted:result])
+		isEncrypted = YES;
 	
 	NSArray* arguments = [NSArray arrayWithObjects:@"attach", archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen", nil];
 	// set up a pipe and push "yes" (y works too), this will accept any license agreement crap
 	// not every .dmg needs this, but this will make sure it works with everyone
-	NSData* yesData = [[[NSData alloc] initWithBytes:"yes\n" length:4] autorelease];
+
+	NSData* promptData;
+	if(isEncrypted) {
+		SUPasswordPrompt *prompt = [[SUPasswordPrompt alloc] initWithHost:(SUHost*)[delegate host]];
+		if([prompt run]) 
+		{
+			NSString *password = [prompt password];
+			if(![password length])
+				goto reportError;
+			NSString *data = [NSString stringWithFormat:@"%@\nyes\n", password];
+			const char *bytes = [data cStringUsingEncoding:NSUTF8StringEncoding];
+			NSUInteger length = [data lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
+			promptData = [NSData dataWithBytes:bytes length:length];
+		}
+		else 
+		{
+			goto reportError;
+		}
+		[prompt release];
+	}
+	else
+		promptData = [NSData dataWithBytes:"yes\n" length:4];
 	
-	NSData *output = nil;
-	int	returnCode = [NTSynchronousTask task:@"/usr/bin/hdiutil" directory:@"/" withArgs:arguments input:yesData output: &output];
-	if ( returnCode != 0 )
+    NSData *output = nil;
+	NSInteger taskResult = -1;
+	@try
+	{
+		NTSynchronousTask* task = [[NTSynchronousTask alloc] init];
+		
+		[task run:@"/usr/bin/hdiutil" directory:@"/" withArgs:arguments input:promptData];
+		
+		taskResult = [task result];
+		output = [[[task output] copy] autorelease];
+        [task release];
+	}
+	@catch (NSException *localException) 
+	{ 
+		goto reportError;
+	}
+	
+	if (taskResult != 0)
 	{
 		NSString*	resultStr = output ? [[[NSString alloc] initWithData: output encoding: NSUTF8StringEncoding] autorelease] : nil;
-		SULog( @"hdiutil failed with code: %d data: <<%@>>", returnCode, resultStr );
+		SULog( @"hdiutil failed with code: %d data: <<%@>>", taskResult, resultStr );
 		goto reportError;
 	}
 	mountedSuccessfully = YES;
@@ -130,6 +171,20 @@ finally:
 + (void)load
 {
 	[self registerImplementation:self];
+}
+
+- (BOOL)isEncrypted:(NSData*)resultData
+{
+	BOOL result = NO;
+	if(resultData)
+	{
+		NSString *data = [NSString stringWithCString:(char*)[resultData bytes] encoding:NSUTF8StringEncoding];
+		if (!NSEqualRanges([data rangeOfString:@"passphrase-count"], NSMakeRange(NSNotFound, 0))) 
+		{
+			result = YES;
+		}
+	}
+	return result;
 }
 
 @end
