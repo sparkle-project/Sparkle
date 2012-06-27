@@ -20,16 +20,7 @@
 }
 
 - (id)initWithHost:(SUHost *)aHost;
-- (void)awakeFromNib;
-- (void)setName:(NSString*)name;
-- (NSString*)name;
-- (void)setIcon:(NSImage*)icon;
-- (NSImage*)icon;
-- (NSString *)password;
-- (void)setPassword:(NSString*)password;
 - (NSInteger)run;
-- (IBAction)accept:(id)sender;
-- (IBAction)cancel:(id)sender;
-- (void)replaceTitle:(NSString*)name;
+- (NSString *)password;
 
 @end
