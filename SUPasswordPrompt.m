@@ -26,7 +26,6 @@
 
 - (void)awakeFromNib
 {
-	[self replaceTitle:[self name]];
 	[mIconView setImage:[self icon]];
 }
 
@@ -82,13 +81,6 @@
 {
 	[[self window] orderOut:self];
 	[NSApp stopModalWithCode:0];
-}
-
-- (void)replaceTitle:(NSString*)name
-{
-	NSString *textString = [mTextDescription stringValue];
-	NSString *replacementString = [textString stringByReplacingOccurrencesOfString:@"<APPLICATION>" withString:name];
-	[mTextDescription setStringValue:replacementString];
 }
 
 @end
