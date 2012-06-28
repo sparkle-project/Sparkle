@@ -65,8 +65,8 @@
 	mountedSuccessfully = YES;
 	
 	// Now that we've mounted it, we need to copy out its contents.
-	if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_5) {
-		// On 10.6 and later we don't want to use the File Manager API and instead want to use NSFileManager (fixes #827357).
+	if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6) {
+		// On 10.7 and later we don't want to use the File Manager API and instead want to use NSFileManager (fixes #827357).
 		NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
         NSError *error = nil;
         NSArray *contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
@@ -91,7 +91,7 @@
             
             if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
             {
-                SULog(@"Couldn't copy item: %@", error);
+                SULog(@"Couldn't copy item: %@ : %@", error, error.userInfo ? error.userInfo : @"");
                 goto reportError;
             }
         }
