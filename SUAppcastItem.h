@@ -20,6 +20,7 @@
 	
 	NSString *DSASignature;	
 	NSString *minimumSystemVersion;
+    NSString *maximumSystemVersion;
 	
 	NSURL *fileURL;
 	NSString *versionString;
@@ -45,6 +46,7 @@
 - (NSURL *)fileURL;
 - (NSString *)DSASignature;
 - (NSString *)minimumSystemVersion;
+- (NSString *)maximumSystemVersion;
 - (NSDictionary *)deltaUpdates;
 - (BOOL)isDeltaUpdate;
 
