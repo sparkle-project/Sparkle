@@ -387,7 +387,6 @@
 		93FB2778156BD80D001937C7 /* SUPasswordPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUPasswordPrompt.h; sourceTree = "<group>"; };
 		93FB2779156BD80D001937C7 /* SUPasswordPrompt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUPasswordPrompt.m; sourceTree = "<group>"; };
 		93FB277E156BD826001937C7 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/SUPasswordPrompt.xib; sourceTree = "<group>"; };
-		93FB2780156BE06F001937C7 /* ja */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ja; path = ja.lproj/SUPasswordPrompt.xib; sourceTree = "<group>"; };
 		FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigTestAppDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigCommonRelease.xcconfig; sourceTree = "<group>"; };
@@ -1324,7 +1323,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				93FB277E156BD826001937C7 /* en */,
-				93FB2780156BE06F001937C7 /* ja */,
 			);
 			name = SUPasswordPrompt.xib;
 			sourceTree = "<group>";
