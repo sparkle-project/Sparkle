@@ -97,8 +97,13 @@
 	if (taskResult != 0)
 	{
 		NSString*	resultStr = output ? [[[NSString alloc] initWithData: output encoding: NSUTF8StringEncoding] autorelease] : nil;
-		SULog( @"hdiutil failed with code: %d data: <<%@>>", taskResult, resultStr );
-		goto reportError;
+        if (password != nil && [resultStr rangeOfString:@"Authentication error"].location != NSNotFound && [delegate respondsToSelector:@selector(unarchiver:requiresPasswordReturnedViaInvocation:)]) {
+            [self performSelectorOnMainThread:@selector(requestPasswordFromDelegate) withObject:nil waitUntilDone:NO];
+            goto finally;
+        } else {
+            SULog( @"hdiutil failed with code: %d data: <<%@>>", taskResult, resultStr );
+            goto reportError;
+        }
 	}
 	mountedSuccessfully = YES;
 	
