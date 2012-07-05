@@ -14,6 +14,7 @@
 
 @class SUHost;
 @interface SUInstaller : NSObject { }
++ (NSString *)appPathInUpdateFolder:(NSString *)updateFolder forHost:(SUHost *)host;
 + (void)		installFromUpdateFolder:(NSString *)updateFolder overHost:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator;
 + (void)		finishInstallationWithResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:delegate;
 + (NSString*)	updateFolder;
