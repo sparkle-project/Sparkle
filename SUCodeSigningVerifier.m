@@ -72,11 +72,11 @@ finally:
     if (SecCodeCopySelf == NULL) return NO;
     
     OSStatus result;
-    SecCodeRef hostCode;
+    SecCodeRef hostCode = NULL;
     result = SecCodeCopySelf(kSecCSDefaultFlags, &hostCode);
     if (result != 0) return NO;
     
-    SecRequirementRef requirement;
+    SecRequirementRef requirement = NULL;
     result = SecCodeCopyDesignatedRequirement(hostCode, kSecCSDefaultFlags, &requirement);
     if (hostCode) CFRelease(hostCode);
     if (requirement) CFRelease(requirement);
