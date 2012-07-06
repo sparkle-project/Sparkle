@@ -13,6 +13,7 @@
 #import "SUHost.h"
 #import "SUStatusController.h"
 #import "SUConstants.h"
+#import "SUPasswordPrompt.h"
 
 @implementation SUUIBasedUpdateDriver
 
@@ -158,6 +159,19 @@
 	[statusController setButtonTitle:SULocalizedString(@"Install and Relaunch", nil) target:self action:@selector(installAndRestart:) isDefault:YES];
 	[[statusController window] makeKeyAndOrderFront: self];
 	[NSApp requestUserAttention:NSInformationalRequest];	
+}
+
+- (void)unarchiver:(SUUnarchiver *)unarchiver requiresPasswordReturnedViaInvocation:(NSInvocation *)invocation
+{
+    SUPasswordPrompt *prompt = [[SUPasswordPrompt alloc] initWithHost:host];
+    NSString *password = nil;
+    if([prompt run]) 
+    {
+        password = [prompt password];
+    }
+    [prompt release];
+    [invocation setArgument:&password atIndex:2];
+    [invocation invoke];
 }
 
 - (void)installAndRestart: (id)sender

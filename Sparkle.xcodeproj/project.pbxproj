@@ -131,6 +131,9 @@
 		61F83F720DBFE140006FDD30 /* SUBasicUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */; };
 		61F83F740DBFE141006FDD30 /* SUBasicUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
 		61FA52880E2D9EA400EF58AD /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (Required, ); }; };
+		93FB277A156BD80D001937C7 /* SUPasswordPrompt.h in Headers */ = {isa = PBXBuildFile; fileRef = 93FB2778156BD80D001937C7 /* SUPasswordPrompt.h */; };
+		93FB277B156BD80D001937C7 /* SUPasswordPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FB2779156BD80D001937C7 /* SUPasswordPrompt.m */; };
+		93FB277F156BD826001937C7 /* SUPasswordPrompt.xib in Resources */ = {isa = PBXBuildFile; fileRef = 93FB277D156BD826001937C7 /* SUPasswordPrompt.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -381,6 +384,9 @@
 		61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBasicUpdateDriver.m; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* Sparkle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Sparkle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		93FB2778156BD80D001937C7 /* SUPasswordPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUPasswordPrompt.h; sourceTree = "<group>"; };
+		93FB2779156BD80D001937C7 /* SUPasswordPrompt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUPasswordPrompt.m; sourceTree = "<group>"; };
+		93FB277E156BD826001937C7 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/SUPasswordPrompt.xib; sourceTree = "<group>"; };
 		FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigTestAppDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigCommonRelease.xcconfig; sourceTree = "<group>"; };
@@ -518,6 +524,7 @@
 				55C14BF0136EF26100649790 /* SUUpdateAlert.xib */,
 				55C14BDA136EF20D00649790 /* SUAutomaticUpdateAlert.xib */,
 				55C14BD8136EF00C00649790 /* SUStatus.xib */,
+				93FB277D156BD826001937C7 /* SUPasswordPrompt.xib */,
 			);
 			name = "Framework Resources";
 			sourceTree = "<group>";
@@ -608,6 +615,8 @@
 				612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */,
 				61180BC80D64138900B4E0D1 /* SUWindowController.h */,
 				61180BC90D64138900B4E0D1 /* SUWindowController.m */,
+				93FB2778156BD80D001937C7 /* SUPasswordPrompt.h */,
+				93FB2779156BD80D001937C7 /* SUPasswordPrompt.m */,
 			);
 			name = "User Interface";
 			sourceTree = "<group>";
@@ -772,6 +781,7 @@
 				55C14F06136EF6DB00649790 /* SULog.h in Headers */,
 				55C14F0F136EF73600649790 /* finish_installation.pch in Headers */,
 				6158A1C5137904B300487EC1 /* SUUpdater_Private.h in Headers */,
+				93FB277A156BD80D001937C7 /* SUPasswordPrompt.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -981,6 +991,7 @@
 				55C14C04136EF26100649790 /* SUUpdateAlert.xib in Resources */,
 				55C14C19136EF2C700649790 /* SUUpdatePermissionPrompt.xib in Resources */,
 				55C14F3B136EFCB300649790 /* finish_installation.app in Resources */,
+				93FB277F156BD826001937C7 /* SUPasswordPrompt.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1144,6 +1155,7 @@
 				5D06E8ED0FD68CE4005AE3F6 /* SUBinaryDeltaCommon.m in Sources */,
 				5D06E93A0FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m in Sources */,
 				55C14F07136EF6DB00649790 /* SULog.m in Sources */,
+				93FB277B156BD80D001937C7 /* SUPasswordPrompt.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1305,6 +1317,14 @@
 				61B5F92D09C4CFD800B25A18 /* English */,
 			);
 			name = MainMenu.nib;
+			sourceTree = "<group>";
+		};
+		93FB277D156BD826001937C7 /* SUPasswordPrompt.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				93FB277E156BD826001937C7 /* en */,
+			);
+			name = SUPasswordPrompt.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
