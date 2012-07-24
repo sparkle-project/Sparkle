@@ -26,10 +26,11 @@ extern OSStatus SecStaticCodeCheckValidityWithErrors(SecStaticCodeRef staticCode
     // This API didn't exist prior to 10.6.
     if (SecCodeCopySelf == NULL) return NO;
     
-    SecRequirementRef requirement = NULL;
     OSStatus result;
-    
+    SecRequirementRef requirement = NULL;
+    SecStaticCodeRef staticCode = NULL;
     SecCodeRef hostCode = NULL;
+    
     result = SecCodeCopySelf(kSecCSDefaultFlags, &hostCode);
     if (result != 0) {
         SULog(@"Failed to copy host code %d", result);
@@ -42,7 +43,6 @@ extern OSStatus SecStaticCodeCheckValidityWithErrors(SecStaticCodeRef staticCode
         goto finally;
     }
     
-    SecStaticCodeRef staticCode = NULL;
     NSBundle *newBundle = [NSBundle bundleWithPath:destinationPath];
     if (!newBundle) {
         SULog(@"Failed to load NSBundle for update");
