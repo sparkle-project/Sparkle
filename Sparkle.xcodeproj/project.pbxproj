@@ -136,6 +136,9 @@
 		61F83F720DBFE140006FDD30 /* SUBasicUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */; };
 		61F83F740DBFE141006FDD30 /* SUBasicUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
 		61FA52880E2D9EA400EF58AD /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (Required, ); }; };
+		769EDDF815C6F36C009EAF65 /* SUGuidedPackageInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 769EDDF615C6F36C009EAF65 /* SUGuidedPackageInstaller.h */; };
+		769EDDF915C6F36C009EAF65 /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 769EDDF715C6F36C009EAF65 /* SUGuidedPackageInstaller.m */; };
+		769EDDFA15C6F36C009EAF65 /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 769EDDF715C6F36C009EAF65 /* SUGuidedPackageInstaller.m */; };
 		93FB277A156BD80D001937C7 /* SUPasswordPrompt.h in Headers */ = {isa = PBXBuildFile; fileRef = 93FB2778156BD80D001937C7 /* SUPasswordPrompt.h */; };
 		93FB277B156BD80D001937C7 /* SUPasswordPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FB2779156BD80D001937C7 /* SUPasswordPrompt.m */; };
 		93FB277F156BD826001937C7 /* SUPasswordPrompt.xib in Resources */ = {isa = PBXBuildFile; fileRef = 93FB277D156BD826001937C7 /* SUPasswordPrompt.xib */; };
@@ -393,6 +396,8 @@
 		61F614540E24A12D009F47E7 /* it */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBasicUpdateDriver.h; sourceTree = "<group>"; };
 		61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBasicUpdateDriver.m; sourceTree = "<group>"; };
+		769EDDF615C6F36C009EAF65 /* SUGuidedPackageInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUGuidedPackageInstaller.h; sourceTree = "<group>"; };
+		769EDDF715C6F36C009EAF65 /* SUGuidedPackageInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUGuidedPackageInstaller.m; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* Sparkle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Sparkle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		93FB2778156BD80D001937C7 /* SUPasswordPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUPasswordPrompt.h; sourceTree = "<group>"; };
@@ -643,6 +648,8 @@
 				61B5F8E509C4CE3C00B25A18 /* SUPlainInstallerInternals.m */,
 				618FA5200DAE8E8A0026945C /* SUPackageInstaller.h */,
 				618FA5210DAE8E8A0026945C /* SUPackageInstaller.m */,
+				769EDDF615C6F36C009EAF65 /* SUGuidedPackageInstaller.h */,
+				769EDDF715C6F36C009EAF65 /* SUGuidedPackageInstaller.m */,
 			);
 			name = Installation;
 			sourceTree = "<group>";
@@ -793,6 +800,7 @@
 				55C14F0F136EF73600649790 /* finish_installation.pch in Headers */,
 				6158A1C5137904B300487EC1 /* SUUpdater_Private.h in Headers */,
 				93FB277A156BD80D001937C7 /* SUPasswordPrompt.h in Headers */,
+				769EDDF815C6F36C009EAF65 /* SUGuidedPackageInstaller.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1105,6 +1113,7 @@
 				55C14F24136EF86F00649790 /* SUPackageInstaller.m in Sources */,
 				55C14F2A136EF9A900649790 /* SUWindowController.m in Sources */,
 				55C14F7E136F005000649790 /* SUPlainInstallerInternals.m in Sources */,
+				769EDDFA15C6F36C009EAF65 /* SUGuidedPackageInstaller.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1172,6 +1181,7 @@
 				5D06E93A0FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m in Sources */,
 				55C14F07136EF6DB00649790 /* SULog.m in Sources */,
 				93FB277B156BD80D001937C7 /* SUPasswordPrompt.m in Sources */,
+				769EDDF915C6F36C009EAF65 /* SUGuidedPackageInstaller.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

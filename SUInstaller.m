@@ -9,10 +9,10 @@
 #import "SUInstaller.h"
 #import "SUPlainInstaller.h"
 #import "SUPackageInstaller.h"
+#import "SUGuidedPackageInstaller.h"
 #import "SUHost.h"
 #import "SUConstants.h"
 #import "SULog.h"
-
 
 @implementation SUInstaller
 
@@ -42,79 +42,107 @@ static NSString*	sUpdateFolder = nil;
 		return NO;	
 }
 
+// Search for and return any installer guide
++ (NSString *)installerGuideWithinUpdateFolder:(NSString *)updateFolder
+{
+	NSParameterAssert(updateFolder);
+	
+	NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:updateFolder];
+	NSString *currentFile;
+	while ((currentFile = [dirEnum nextObject]))
+	{
+		if ([[currentFile lastPathComponent] isEqualToString:SUInstallerGuidedInstallerFilename])
+		{
+			// Found an installer guide
+			return [updateFolder stringByAppendingPathComponent:currentFile];
+		}
+	}
+	
+	// No guide found
+	return nil;
+}
 
 + (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
 {
-	// Search subdirectories for the application
-	NSString	*currentFile,
-				*newAppDownloadPath = nil,
-				*bundleFileName = [[host bundlePath] lastPathComponent],
-				*alternateBundleFileName = [[host name] stringByAppendingPathExtension:[[host bundlePath] pathExtension]];
-	BOOL isPackage = NO;
-	NSString *fallbackPackagePath = nil;
-	NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath: inUpdateFolder];
-	
-	[sUpdateFolder release];
-	sUpdateFolder = [inUpdateFolder retain];
-	
-	while ((currentFile = [dirEnum nextObject]))
+    // Look for installer guide
+	NSString* installerGuide = [self installerGuideWithinUpdateFolder:inUpdateFolder];
+	if (installerGuide)
 	{
-		NSString *currentPath = [inUpdateFolder stringByAppendingPathComponent:currentFile];		
-		if ([[currentFile lastPathComponent] isEqualToString:bundleFileName] ||
-			[[currentFile lastPathComponent] isEqualToString:alternateBundleFileName]) // We found one!
-		{
-			isPackage = NO;
-			newAppDownloadPath = currentPath;
-			break;
-		}
-		else if ([[currentFile pathExtension] isEqualToString:@"pkg"] ||
-				 [[currentFile pathExtension] isEqualToString:@"mpkg"])
-		{
-			if ([[[currentFile lastPathComponent] stringByDeletingPathExtension] isEqualToString:[bundleFileName stringByDeletingPathExtension]])
-			{
-				isPackage = YES;
-				newAppDownloadPath = currentPath;
-				break;
-			}
-			else
-			{
-				// Remember any other non-matching packages we have seen should we need to use one of them as a fallback.
-				fallbackPackagePath = currentPath;
-			}
-		}
-		else
-		{
-			// Try matching on bundle identifiers in case the user has changed the name of the host app
-			NSBundle *incomingBundle = [NSBundle bundleWithPath:currentPath];
-			if(incomingBundle && [[incomingBundle bundleIdentifier] isEqualToString:[[host bundle] bundleIdentifier]])
-			{
-				isPackage = NO;
-				newAppDownloadPath = currentPath;
-				break;
-			}
-		}
-		
-		// Some DMGs have symlinks into /Applications! That's no good!
-		if ([self isAliasFolderAtPath:currentPath])
-			[dirEnum skipDescendents];
-	}
-	
-	// We don't have a valid path. Try to use the fallback package.
-
-	if (newAppDownloadPath == nil && fallbackPackagePath != nil)
-	{
-		isPackage = YES;
-		newAppDownloadPath = fallbackPackagePath;
-	}
-	
-	if (newAppDownloadPath == nil)
-	{
-		[self finishInstallationWithResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find an appropriate update in the downloaded package." forKey:NSLocalizedDescriptionKey]] delegate:delegate];
+		[SUGuidedPackageInstaller performInstallationWithPath:installerGuide host:host delegate:delegate synchronously:synchronously versionComparator:comparator];
 	}
 	else
 	{
-		[(isPackage ? [SUPackageInstaller class] : [SUPlainInstaller class]) performInstallationWithPath:newAppDownloadPath host:host delegate:delegate synchronously:synchronously versionComparator:comparator];
-	}
+        // Search subdirectories for the application
+        NSString	*currentFile,
+                    *newAppDownloadPath = nil,
+                    *bundleFileName = [[host bundlePath] lastPathComponent],
+                    *alternateBundleFileName = [[host name] stringByAppendingPathExtension:[[host bundlePath] pathExtension]];
+        BOOL isPackage = NO;
+        NSString *fallbackPackagePath = nil;
+        NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath: inUpdateFolder];
+        
+        [sUpdateFolder release];
+        sUpdateFolder = [inUpdateFolder retain];
+        
+        while ((currentFile = [dirEnum nextObject]))
+        {
+            NSString *currentPath = [inUpdateFolder stringByAppendingPathComponent:currentFile];		
+            if ([[currentFile lastPathComponent] isEqualToString:bundleFileName] ||
+                [[currentFile lastPathComponent] isEqualToString:alternateBundleFileName]) // We found one!
+            {
+                isPackage = NO;
+                newAppDownloadPath = currentPath;
+                break;
+            }
+            else if ([[currentFile pathExtension] isEqualToString:@"pkg"] ||
+                     [[currentFile pathExtension] isEqualToString:@"mpkg"])
+            {
+                if ([[[currentFile lastPathComponent] stringByDeletingPathExtension] isEqualToString:[bundleFileName stringByDeletingPathExtension]])
+                {
+                    isPackage = YES;
+                    newAppDownloadPath = currentPath;
+                    break;
+                }
+                else
+                {
+                    // Remember any other non-matching packages we have seen should we need to use one of them as a fallback.
+                    fallbackPackagePath = currentPath;
+                }
+            }
+            else
+            {
+                // Try matching on bundle identifiers in case the user has changed the name of the host app
+                NSBundle *incomingBundle = [NSBundle bundleWithPath:currentPath];
+                if(incomingBundle && [[incomingBundle bundleIdentifier] isEqualToString:[[host bundle] bundleIdentifier]])
+                {
+                    isPackage = NO;
+                    newAppDownloadPath = currentPath;
+                    break;
+                }
+            }
+            
+            // Some DMGs have symlinks into /Applications! That's no good!
+            if ([self isAliasFolderAtPath:currentPath])
+                [dirEnum skipDescendents];
+        }
+        
+        // We don't have a valid path. Try to use the fallback package.
+
+        if (newAppDownloadPath == nil && fallbackPackagePath != nil)
+        {
+            isPackage = YES;
+            newAppDownloadPath = fallbackPackagePath;
+        }
+        
+        if (newAppDownloadPath == nil)
+        {
+            [self finishInstallationWithResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find an appropriate update in the downloaded package." forKey:NSLocalizedDescriptionKey]] delegate:delegate];
+        }
+        else
+        {
+            [(isPackage ? [SUPackageInstaller class] : [SUPlainInstaller class]) performInstallationWithPath:newAppDownloadPath host:host delegate:delegate synchronously:synchronously versionComparator:comparator];
+        }
+    }
 }
 
 + (void)mdimportHost:(SUHost *)host
