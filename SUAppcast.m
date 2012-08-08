@@ -217,7 +217,7 @@
     {
 		NSSortDescriptor *sort = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
 		[appcastItems sortUsingDescriptors:[NSArray arrayWithObject:sort]];
-		items = [appcastItems copy];
+		items = [appcastItems retain];
 	}
 	
 	if (failed)
