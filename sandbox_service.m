@@ -29,7 +29,7 @@ static void peer_event_handler(xpc_connection_t peer, xpc_object_t event)
 		const char *identifier = xpc_dictionary_get_string(event, "id");
 		BOOL copyPath = strcmp(identifier, "copy_path") == 0;
 		BOOL launchTask = strcmp(identifier, "launch_task") == 0;
-		
+
 		if( copyPath )
 		{
 			const char *src = xpc_dictionary_get_string(event, "source");
@@ -41,10 +41,14 @@ static void peer_event_handler(xpc_connection_t peer, xpc_object_t event)
 			NSString *targetPath = dst ? [manager stringWithFileSystemRepresentation:dst length:strlen(dst)] : nil;
 			NSString *temporaryName = tmp ? [NSString stringWithUTF8String:tmp] : nil;
 			NSError *error = nil;
-			[SUPlainInstaller copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath temporaryName: temporaryName error: &error];
+			BOOL result = [SUPlainInstaller copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath temporaryName: temporaryName error: &error];
 			
 			// send response to indicate ok
 			xpc_object_t reply = xpc_dictionary_create_reply(event);
+            if (! result && error != nil) {
+                xpc_dictionary_set_int64(reply, "errorCode", [error code]);
+                xpc_dictionary_set_string(reply, "errorLocalizedDescription", [[error localizedDescription] cStringUsingEncoding:NSUTF8StringEncoding]);
+            }
 			xpc_connection_send_message(peer, reply);
 		}
 		else if( launchTask )

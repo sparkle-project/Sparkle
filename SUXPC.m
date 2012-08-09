@@ -12,15 +12,37 @@
 
 @implementation SUXPC
 
-+ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp error:(NSError **)error {
-	xpc_connection_t connection = xpc_connection_create("com.andymatuschak.Sparkle.SandboxService", NULL);
-	xpc_connection_set_event_handler(connection, ^(xpc_object_t event) {
-		xpc_dictionary_apply(event, ^bool(const char *key, xpc_object_t value) {
-			NSLog(@"XPC %s: %s", key, xpc_string_get_string_ptr(value));
-			return true;
-		});
-	});
-	xpc_connection_resume(connection);
++ (xpc_connection_t)getSandboxXPCService {
+    __block xpc_connection_t serviceConnection =
+    xpc_connection_create("com.andymatuschak.Sparkle.SandboxService", dispatch_get_main_queue());
+    
+    if (!serviceConnection) {
+        NSLog(@"Can't connect to XPC service");
+        return (NULL);
+    }
+    
+    xpc_connection_set_event_handler(serviceConnection, ^(xpc_object_t event) {
+        xpc_type_t type = xpc_get_type(event);
+        
+        if (type == XPC_TYPE_ERROR) {
+            
+            if (event == XPC_ERROR_CONNECTION_INVALID) {
+                // The service is invalid. Either the service name supplied to
+                // xpc_connection_create() is incorrect or we (this process) have
+                // canceled the service; we can do any cleanup of appliation
+                // state at this point.
+                xpc_release(serviceConnection);
+            }
+        }
+    });
+    
+    // Need to resume the service in order for it to process messages.
+    xpc_connection_resume(serviceConnection);
+    return (serviceConnection);
+}
+
++ (void)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp completionHandler:(void (^)(NSError *error))completionHandler {
+    xpc_connection_t connection = [self getSandboxXPCService];
 
 	xpc_object_t message = xpc_dictionary_create(NULL, NULL, 0);
 	xpc_dictionary_set_string(message, "id", "copy_path");
@@ -32,20 +54,25 @@
 	if( tmp )
 		xpc_dictionary_set_string(message, "tmp", [tmp UTF8String]);
 	
-	xpc_object_t response = xpc_connection_send_message_with_reply_sync(connection, message);
-	xpc_type_t type = xpc_get_type(response);
-	return type == XPC_TYPE_DICTIONARY;
+    xpc_connection_send_message_with_reply(connection, message, dispatch_get_main_queue(), ^(xpc_object_t response) {
+        const char *errorString = xpc_dictionary_get_string(response, "errorLocalizedDescription");
+        if (errorString != NULL)
+        {
+            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain
+                                                 code:SUXPCServiceError
+                                             userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithCString:errorString encoding:NSUTF8StringEncoding]
+                                                                                  forKey:NSLocalizedDescriptionKey]];
+            completionHandler(error);
+        }
+        else
+        {
+            completionHandler(nil);
+        }
+    });
 }
 
-+ (void)launchTaskWithLaunchPath:(NSString *)path arguments:(NSArray *)arguments {
-	xpc_connection_t connection = xpc_connection_create("com.andymatuschak.Sparkle.SandboxService", NULL);
-	xpc_connection_set_event_handler(connection, ^(xpc_object_t event) {
-		xpc_dictionary_apply(event, ^bool(const char *key, xpc_object_t value) {
-			NSLog(@"XPC %s: %s", key, xpc_string_get_string_ptr(value));
-			return true;
-		});
-	});
-	xpc_connection_resume(connection);
++ (void)launchTaskWithLaunchPath:(NSString *)path arguments:(NSArray *)arguments completionHandler: (void (^)(void))completionHandler {
+    xpc_connection_t connection = [self getSandboxXPCService];
 	
 	xpc_object_t message = xpc_dictionary_create(NULL, NULL, 0);
 	xpc_dictionary_set_string(message, "id", "launch_task");
@@ -60,13 +87,9 @@
 	
 	xpc_dictionary_set_value(message, "arguments", array);
 	
-	xpc_object_t response = xpc_connection_send_message_with_reply_sync(connection, message);
-	xpc_type_t type = xpc_get_type(response);
-	BOOL success = (type == XPC_TYPE_DICTIONARY);
-	
-	if (!success) {
-		NSLog(@"XPC launch error");
-	}
+    xpc_connection_send_message_with_reply(connection, message, dispatch_get_current_queue(), ^(xpc_object_t response) {
+        completionHandler();
+    });
 }
 
 @end

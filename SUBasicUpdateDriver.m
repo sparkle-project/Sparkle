@@ -266,6 +266,14 @@
 
 - (BOOL)shouldInstallSynchronously { return NO; }
 
+- (BOOL)shouldUseXPC
+{
+    BOOL running10_7 = floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6;
+	BOOL useXPC = running10_7 && [[NSFileManager defaultManager] fileExistsAtPath:
+								  [[host bundlePath] stringByAppendingPathComponent:@"Contents/XPCServices/com.andymatuschak.Sparkle.SandboxService.xpc"]];
+    return useXPC;
+}
+
 - (void)installWithToolAndRelaunch:(BOOL)relaunch
 {
     if (![updater mayUpdateAndRestart])
@@ -273,10 +281,6 @@
         [self abortUpdate];
         return;
     }
-	
-	BOOL running10_7 = floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6;
-	BOOL useXPC = running10_7 && [[NSFileManager defaultManager] fileExistsAtPath:
-								  [[host bundlePath] stringByAppendingPathComponent:@"Contents/XPCServices/com.andymatuschak.Sparkle.SandboxService.xpc"]];
     
     // Give the host app an opportunity to postpone the install and relaunch.
     static BOOL postponedOnce = NO;
@@ -307,11 +311,25 @@
 #endif
 
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
-	BOOL copiedRelaunchTool = FALSE;
-	if( useXPC )
-		copiedRelaunchTool = [SUXPC copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath temporaryName: nil error: &error];
-	else
-		copiedRelaunchTool = [SUPlainInstaller copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath temporaryName: nil error: &error];
+	if( [self shouldUseXPC] )
+    {
+        [SUXPC copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil completionHandler:^(NSError *xpcError) {
+            if (xpcError != nil)
+                NSLog(@"Error during asynchronous XPC call to copyPath: %@", xpcError);
+            [self finishRelaunchAfterSuccessfulCopying:(xpcError == nil) fromPath:relaunchPathToCopy toPath:targetPath relaunch:relaunch];
+        }];
+    }
+    else
+    {
+        BOOL copiedRelaunchTool = [SUPlainInstaller copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath temporaryName: nil error: &error];
+        [self finishRelaunchAfterSuccessfulCopying:copiedRelaunchTool fromPath:relaunchPathToCopy toPath:targetPath relaunch:relaunch];
+    }
+}
+
+- (void)finishRelaunchAfterSuccessfulCopying:(BOOL)copiedRelaunchTool fromPath:(NSString *)relaunchPathToCopy toPath:(NSString *)targetPath relaunch:(BOOL)relaunch
+{
+
+    NSError *error = nil;
 	if( copiedRelaunchTool )
 		relaunchPath = [targetPath retain];
 	else
@@ -334,12 +352,15 @@
         pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
     NSString *relaunchToolPath = [relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS/finish_installation"];
 	NSArray *arguments = [NSArray arrayWithObjects:[host bundlePath], pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], tempDir, relaunch ? @"1" : @"0", nil];
-	if( useXPC )
-		[SUXPC launchTaskWithLaunchPath: relaunchToolPath arguments:arguments];
+	if( [self shouldUseXPC] )
+		[SUXPC launchTaskWithLaunchPath: relaunchToolPath arguments:arguments completionHandler:^{
+            [NSApp terminate:self];
+        }];
 	else
+    {
 		[NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:arguments];
-
-    [NSApp terminate:self];
+        [NSApp terminate:self];
+    }
 }
 
 - (void)cleanUpDownload
