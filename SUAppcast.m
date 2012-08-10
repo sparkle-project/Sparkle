@@ -14,6 +14,7 @@
 #import "SUAppcast.h"
 #import "SUConstants.h"
 #import "SULog.h"
+#import "SUXPCURLDownload.h"
 
 @interface NSXMLElement (SUAppcastExtensions)
 - (NSDictionary *)attributesAsDictionary;
@@ -64,7 +65,11 @@
     if (userAgentString)
         [request setValue:userAgentString forHTTPHeaderField:@"User-Agent"];
             
-    download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
+    if ([SUUpdater shouldUseXPC]) {
+        download = (NSURLDownload *)[[SUXPCURLDownload alloc] initWithRequest:request delegate:self];
+    } else {
+        download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
+    }
 }
 
 - (void)download:(NSURLDownload *)aDownload decideDestinationWithSuggestedFilename:(NSString *)filename

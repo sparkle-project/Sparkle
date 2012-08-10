@@ -1,5 +1,5 @@
 // Sandbox Service only
 
-PRODUCT_NAME = com.andymatuschak.Sparkle.SandboxService
+PRODUCT_NAME = com.andymatuschak.Sparkle.install-service
 WRAPPER_EXTENSION = xpc
-MACH_O_TYPE = mh_execute
+MACH_O_TYPE = mh_execute‹

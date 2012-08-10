@@ -14,7 +14,7 @@
 
 + (xpc_connection_t)getSandboxXPCService {
     __block xpc_connection_t serviceConnection =
-    xpc_connection_create("com.andymatuschak.Sparkle.SandboxService", dispatch_get_main_queue());
+    xpc_connection_create("com.andymatuschak.Sparkle.install-service", dispatch_get_main_queue());
     
     if (!serviceConnection) {
         NSLog(@"Can't connect to XPC service");

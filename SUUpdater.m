@@ -547,4 +547,12 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - delegate { return delegate; }
 - (NSBundle *)hostBundle { return [host bundle]; }
 
++ (BOOL)shouldUseXPC
+{
+    BOOL running10_7 = floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6;
+	BOOL useXPC = running10_7 && [[NSFileManager defaultManager] fileExistsAtPath:
+								  [[[[SUUpdater sharedUpdater] hostBundle] bundlePath] stringByAppendingPathComponent:@"Contents/XPCServices/com.andymatuschak.Sparkle.install-service.xpc"]];
+    return useXPC;
+}
+
 @end

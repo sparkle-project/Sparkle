@@ -20,6 +20,7 @@
 #import "SUBinaryDeltaCommon.h"
 #import "SUUpdater_Private.h"
 #import "SUXPC.h"
+#import "SUXPCURLDownload.h"
 
 @interface SUBasicUpdateDriver () <NSURLDownloadDelegate>; @end
 
@@ -145,11 +146,21 @@
 {
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[updateItem fileURL]];
 	[request setValue:[updater userAgentString] forHTTPHeaderField:@"User-Agent"];
-	download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
+    if ([SUUpdater shouldUseXPC])
+        download = (NSURLDownload *)[[SUXPCURLDownload alloc] initWithRequest:request delegate:self];
+    else
+        download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
 }
 
 - (void)download:(NSURLDownload *)d decideDestinationWithSuggestedFilename:(NSString *)name
 {
+    if ([SUUpdater shouldUseXPC]) {
+        // The downloader will determine a file name, somewhere within our sandbox.
+        downloadPath = nil;
+        [d setDestination:name allowOverwrite:YES];
+        return;
+    }
+    
 	// If name ends in .txt, the server probably has a stupid MIME configuration. We'll give the developer the benefit of the doubt and chop that off.
 	if ([[name pathExtension] isEqualToString:@"txt"])
 		name = [name stringByDeletingPathExtension];
@@ -191,6 +202,13 @@
 	[download setDestination:downloadPath allowOverwrite:YES];
 }
 
+- (void)download:(NSURLDownload *)download didCreateDestination:(NSString *)path {
+    [downloadPath autorelease];
+    downloadPath = [path retain];
+    [tempDir autorelease];
+    tempDir = [[downloadPath stringByDeletingLastPathComponent] retain];
+}
+
 - (void)downloadDidFinish:(NSURLDownload *)d
 {
 	#if !ENDANGER_USERS_WITH_INSECURE_UPDATES
@@ -223,7 +241,7 @@
 }
 
 - (void)extractUpdate
-{	
+{
 	SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:downloadPath updatingHost:host];
 	if (!unarchiver)
 	{
@@ -266,14 +284,6 @@
 
 - (BOOL)shouldInstallSynchronously { return NO; }
 
-- (BOOL)shouldUseXPC
-{
-    BOOL running10_7 = floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6;
-	BOOL useXPC = running10_7 && [[NSFileManager defaultManager] fileExistsAtPath:
-								  [[host bundlePath] stringByAppendingPathComponent:@"Contents/XPCServices/com.andymatuschak.Sparkle.SandboxService.xpc"]];
-    return useXPC;
-}
-
 - (void)installWithToolAndRelaunch:(BOOL)relaunch
 {
     if (![updater mayUpdateAndRestart])
@@ -311,7 +321,7 @@
 #endif
 
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
-	if( [self shouldUseXPC] )
+	if( [SUUpdater shouldUseXPC] )
     {
         [SUXPC copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil completionHandler:^(NSError *xpcError) {
             if (xpcError != nil)
@@ -352,7 +362,7 @@
         pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
     NSString *relaunchToolPath = [relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS/finish_installation"];
 	NSArray *arguments = [NSArray arrayWithObjects:[host bundlePath], pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], tempDir, relaunch ? @"1" : @"0", nil];
-	if( [self shouldUseXPC] )
+	if( [SUUpdater shouldUseXPC] )
 		[SUXPC launchTaskWithLaunchPath: relaunchToolPath arguments:arguments completionHandler:^{
             [NSApp terminate:self];
         }];
