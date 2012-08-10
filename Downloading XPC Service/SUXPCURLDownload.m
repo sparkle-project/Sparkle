@@ -28,6 +28,13 @@
     return self;
 }
 
+- (void)dealloc {
+    [request release];
+    [delegate release];
+    
+    [super dealloc];
+}
+
 - (NSURLRequest *)request {
     return request;
 }
@@ -37,6 +44,8 @@
     // Send a message to download a specific url.
     if ([delegate respondsToSelector:@selector(download:decideDestinationWithSuggestedFilename:)] && destination == nil) {
         [delegate download:(NSURLDownload *)self decideDestinationWithSuggestedFilename:[url lastPathComponent]];
+    } else {
+        destination = [url lastPathComponent];
     }
     
     // ivar 'destination' now contains the destination URL.

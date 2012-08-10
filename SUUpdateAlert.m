@@ -16,7 +16,7 @@
 #import <WebKit/WebKit.h>
 
 #import "SUConstants.h"
-
+#import "SUXPCURLDownload.h"
 
 @interface WebView (SUTenFiveProperty)
 
@@ -50,6 +50,9 @@
 {
 	[updateItem release];
 	[host release];
+    [releaseNotesDownloader release];
+    [downloadedReleaseNotesPath release];
+    
 	[super dealloc];
 }
 
@@ -115,13 +118,30 @@
 		}
 		else
 		{
-			[[releaseNotesView mainFrame] loadRequest:[NSURLRequest requestWithURL:[updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30]];
+            NSURLRequest *request = [NSURLRequest requestWithURL:[updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
+            if ([SUUpdater shouldUseXPC]) {
+                releaseNotesDownloader = (NSURLDownload *)[[SUXPCURLDownload alloc] initWithRequest:request delegate:self];
+            } else {
+                [[releaseNotesView mainFrame] loadRequest:request];
+            }
 		}
 	}
 	else
 	{
 		[[releaseNotesView mainFrame] loadHTMLString:[updateItem itemDescription] baseURL:nil];
 	}	
+}
+
+- (void)download:(NSURLDownload *)aDownload didCreateDestination:(NSString *)path
+{
+    [downloadedReleaseNotesPath release];
+    downloadedReleaseNotesPath = [path copy];
+}
+
+- (void)downloadDidFinish:(NSURLDownload *)aDownload
+{
+    NSString *s = [NSString stringWithContentsOfFile:downloadedReleaseNotesPath encoding:NSUTF8StringEncoding error:nil];
+    [[releaseNotesView mainFrame] loadHTMLString:s baseURL:nil];
 }
 
 - (BOOL)showsReleaseNotes

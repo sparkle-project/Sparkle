@@ -98,6 +98,16 @@ fetch_download_file(const char *url, int fd, fetch_progress_ctx_t *ctx,
     if ((err = curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L)) != CURLE_OK)
         goto errout;
     
+    // Add Accept-Language
+    struct curl_slist *headers = NULL;
+    char *acceptedLanguages;
+    asprintf(&acceptedLanguages, "Accept-Language: %s", [[[NSLocale preferredLanguages] componentsJoinedByString:@","] cStringUsingEncoding:NSASCIIStringEncoding]);
+    asl_log(NULL, NULL, ASL_LEVEL_NOTICE, "%s",acceptedLanguages);
+    curl_slist_append(headers, acceptedLanguages);
+    if ((err = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers)));
+    curl_slist_free_all(headers);
+    free(acceptedLanguages);
+    
     // Perform file transfer.
     err = curl_easy_perform(curl);
     
