@@ -61,20 +61,15 @@ static void peer_event_handler(xpc_connection_t peer, xpc_object_t event)
 			NSFileManager *manager = [NSFileManager defaultManager];
 			NSString *relaunchToolPath = path ? [manager stringWithFileSystemRepresentation:path length:strlen(path)] : nil;;
 			NSMutableArray *arguments = [NSMutableArray array];
-			asl_log(NULL, NULL, ASL_LEVEL_NOTICE, "path: %s", path);
 			for (size_t i = 0; i < xpc_array_get_count(array); i++) {
 				[arguments addObject:
 				 [NSString stringWithUTF8String:xpc_array_get_string(array, i)]];
-                asl_log(NULL, NULL, ASL_LEVEL_NOTICE, "Argument: %s", xpc_array_get_string(array, i));
 			}
 			
-            NSTask *launchedTask = [NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:arguments];
+            [NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:arguments];
 			
 			// send response to indicate ok
 			xpc_object_t reply = xpc_dictionary_create_reply(event);
-            if (launchedTask == nil) {
-                asl_log(NULL, NULL, ASL_LEVEL_NOTICE, "Could not launch relaunchtool");
-            }
 			xpc_connection_send_message(peer, reply);
 		}
 	}
