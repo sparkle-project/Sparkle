@@ -94,7 +94,6 @@
 
 - (void)cancel {
     xpc_connection_cancel(connection);
-    xpc_release(connection);
 }
 
 - (xpc_connection_t)getSandboxXPCService {
@@ -123,7 +122,8 @@
                 // xpc_connection_create() is incorrect or we (this process) have
                 // canceled the service; we can do any cleanup of appliation
                 // state at this point.
-                xpc_release(connection);
+                xpc_connection_cancel(delegateConnection);
+                xpc_release(delegateConnection);
             }
         }
     });
