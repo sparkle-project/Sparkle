@@ -117,22 +117,22 @@ static NSString*	sUpdateFolder = nil;
     return isPackage ? nil : path;
 }
 
-+ (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
++ (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
 {
     BOOL isPackage = NO;
 	NSString *newAppDownloadPath = [self installSourcePathInUpdateFolder:inUpdateFolder forHost:host isPackage:&isPackage];
     
 	if (newAppDownloadPath == nil)
 	{
-		[self finishInstallationWithResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find an appropriate update in the downloaded package." forKey:NSLocalizedDescriptionKey]] delegate:delegate];
+		[self finishInstallationToPath:installationPath withResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find an appropriate update in the downloaded package." forKey:NSLocalizedDescriptionKey]] delegate:delegate];
 	}
 	else
 	{
-		[(isPackage ? [SUPackageInstaller class] : [SUPlainInstaller class]) performInstallationWithPath:newAppDownloadPath host:host delegate:delegate synchronously:synchronously versionComparator:comparator];
+		[(isPackage ? [SUPackageInstaller class] : [SUPlainInstaller class]) performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host delegate:delegate synchronously:synchronously versionComparator:comparator];
 	}
 }
 
-+ (void)mdimportHost:(SUHost *)host
++ (void)mdimportInstallationPath:(NSString *)installationPath
 {
 	// *** GETS CALLED ON NON-MAIN THREAD!
 	
@@ -140,7 +140,7 @@ static NSString*	sUpdateFolder = nil;
 	
 	NSTask *mdimport = [[[NSTask alloc] init] autorelease];
 	[mdimport setLaunchPath:@"/usr/bin/mdimport"];
-	[mdimport setArguments:[NSArray arrayWithObject:[host installationPath]]];
+	[mdimport setArguments:[NSArray arrayWithObject:installationPath]];
 	@try
 	{
 		[mdimport launch];
@@ -158,11 +158,11 @@ static NSString*	sUpdateFolder = nil;
 #define		SUNotifyDictErrorKey	@"SUNotifyDictError"
 #define		SUNotifyDictDelegateKey	@"SUNotifyDictDelegate"
 
-+ (void)finishInstallationWithResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:delegate
++ (void)finishInstallationToPath:(NSString *)installationPath withResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:delegate
 {
 	if (result)
 	{
-		[self mdimportHost:host];
+		[self mdimportInstallationPath:installationPath];
 		if ([delegate respondsToSelector:@selector(installerFinishedForHost:)])
 			[delegate performSelectorOnMainThread: @selector(installerFinishedForHost:) withObject: host waitUntilDone: NO];
 	}
