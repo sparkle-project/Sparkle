@@ -18,6 +18,7 @@ static NSString * const SUInstallerHostKey = @"SUInstallerHost";
 static NSString * const SUInstallerDelegateKey = @"SUInstallerDelegate";
 static NSString * const SUInstallerResultKey = @"SUInstallerResult";
 static NSString * const SUInstallerErrorKey = @"SUInstallerError";
+static NSString * const SUInstallerInstallationPathKey = @"SUInstallerInstallationPath";
 
 @implementation SUPlainInstaller
 
@@ -25,7 +26,7 @@ static NSString * const SUInstallerErrorKey = @"SUInstallerError";
 {
 	// *** GETS CALLED ON NON-MAIN THREAD!
 	
-	[self finishInstallationWithResult:[[info objectForKey:SUInstallerResultKey] boolValue] host:[info objectForKey:SUInstallerHostKey] error:[info objectForKey:SUInstallerErrorKey] delegate:[info objectForKey:SUInstallerDelegateKey]];
+	[self finishInstallationToPath:[info objectForKey:SUInstallerInstallationPathKey] withResult:[[info objectForKey:SUInstallerResultKey] boolValue] host:[info objectForKey:SUInstallerHostKey] error:[info objectForKey:SUInstallerErrorKey] delegate:[info objectForKey:SUInstallerDelegateKey]];
 }
 
 + (void)performInstallationWithInfo:(NSDictionary *)info
@@ -37,7 +38,7 @@ static NSString * const SUInstallerErrorKey = @"SUInstallerError";
 	NSError *error = nil;
 	
 	NSString	*	oldPath = [[info objectForKey:SUInstallerHostKey] bundlePath];
-	NSString	*	installationPath = [[info objectForKey:SUInstallerHostKey] installationPath];
+	NSString	*	installationPath = [info objectForKey:SUInstallerInstallationPathKey];
 	BOOL result = [self copyPathWithAuthentication:[info objectForKey:SUInstallerPathKey] overPath: installationPath temporaryName:[info objectForKey:SUInstallerTempNameKey] error:&error];
 	
 	if( result )
@@ -49,6 +50,7 @@ static NSString * const SUInstallerErrorKey = @"SUInstallerError";
 	}
 	NSMutableDictionary *mutableInfo = [[info mutableCopy] autorelease];
 	[mutableInfo setObject:[NSNumber numberWithBool:result] forKey:SUInstallerResultKey];
+    [mutableInfo setObject:installationPath forKey:SUInstallerInstallationPathKey];
 	if (!result && error)
 		[mutableInfo setObject:error forKey:SUInstallerErrorKey];
 	[self performSelectorOnMainThread:@selector(finishInstallationWithInfo:) withObject:mutableInfo waitUntilDone:NO];
@@ -56,7 +58,7 @@ static NSString * const SUInstallerErrorKey = @"SUInstallerError";
 	[pool drain];
 }
 
-+ (void)performInstallationWithPath:(NSString *)path host:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
++ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
 {
 	// Prevent malicious downgrades:
 	#if !PERMIT_AUTOMATED_DOWNGRADES
@@ -64,14 +66,14 @@ static NSString * const SUInstallerErrorKey = @"SUInstallerError";
 	{
 		NSString * errorMessage = [NSString stringWithFormat:@"Sparkle Updater: Possible attack in progress! Attempting to \"upgrade\" from %@ to %@. Aborting update.", [host version], [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:@"CFBundleVersion"]];
 		NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
-		[self finishInstallationWithResult:NO host:host error:error delegate:delegate];
+		[self finishInstallationToPath:installationPath withResult:NO host:host error:error delegate:delegate];
 		return;
 	}
 	#endif
     
     NSString *targetPath = [host installationPath];
     NSString *tempName = [self temporaryNameForPath:targetPath];
-	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:path, SUInstallerPathKey, targetPath, SUInstallerTargetPathKey, tempName, SUInstallerTempNameKey, host, SUInstallerHostKey, delegate, SUInstallerDelegateKey, nil];
+	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:path, SUInstallerPathKey, targetPath, SUInstallerTargetPathKey, tempName, SUInstallerTempNameKey, host, SUInstallerHostKey, delegate, SUInstallerDelegateKey, installationPath, SUInstallerInstallationPathKey, nil];
 	if (synchronously)
 		[self performInstallationWithInfo:info];
 	else
