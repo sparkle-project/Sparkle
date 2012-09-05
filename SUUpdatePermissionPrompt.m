@@ -53,8 +53,13 @@
 		NSRect frame = [[self window] frame];
 		frame.size.height -= [moreInfoButton frame].size.height;
 		[[self window] setFrame:frame display:YES];
-	}
+	} else {
+        // Set the table view's delegate so we can disable row selection.
+        [profileTableView setDelegate:(id)self];
+    }
 }
+
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row { return NO; }
 
 - (void)dealloc
 {
