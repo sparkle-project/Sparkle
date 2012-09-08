@@ -385,7 +385,7 @@
 		61E31A80103299500051D188 /* pt_BR */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = pt_BR; path = pt_BR.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61EF67550E25B58D00F754E0 /* SUHost.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUHost.m; sourceTree = "<group>"; };
 		61EF67580E25C5B400F754E0 /* SUHost.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUHost.h; sourceTree = "<group>"; };
-		61F3AC1215C22D4A00260CA2 /* th */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = th; path = th.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		61F3AC1215C22D4A00260CA2 /* th */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = th; path = th.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61F3AC1415C22D5900260CA2 /* th */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = th; path = th.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
 		61F3AC1515C22D5900260CA2 /* th */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = th; path = th.lproj/SUPasswordPrompt.xib; sourceTree = "<group>"; };
 		61F3AC1615C22D5900260CA2 /* th */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = th; path = th.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
