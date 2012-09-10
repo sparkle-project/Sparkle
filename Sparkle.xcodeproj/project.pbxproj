@@ -1078,7 +1078,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env ruby";
-			shellScript = "# Xcode auto-versioning script for Subversion\n# by Axel Andersson, modified by Daniel Jalkut to add\n# \"--revision HEAD\" to the svn info line, which allows\n# the latest revision to always be used.\n\nif ENV[\"BUILT_PRODUCTS_DIR\"].nil?\n\tSTDERR.print \"#{$0}: Must be run from Xcode!\"\n\texit(1)\nend\n\n# Get the current Git master hash and use it to set the CFBundleVersion value\nENV[\"PATH\"] = \"/bin:/sw/bin:/usr/local/git/bin:/usr/bin:/usr/local/bin:/sbin:/usr/sbin:/opt/local/bin\"\nexit(0) if `type git` == \"\"\nrev = `/usr/bin/env git show-ref --abbrev heads/master`\ninfo = \"#{ENV[\"BUILT_PRODUCTS_DIR\"]}/#{ENV[\"WRAPPER_NAME\"]}/Resources/Info.plist\"\nversion = rev.split(\" \")[0]\n\nif version.nil?\n\tSTDERR.print \"#{$0}: Can't find a Git hash!\"\n\texit(0)\nend\n\ninfo_contents = File.read(info)\nif info_contents.nil?\n\tSTDERR.print \"#{$0}: Can't read in the Info.plist file!\"\n\texit(1)\nend\n\ninfo_contents.sub!(/([\\t ]+<key>CFBundleVersion<\\/key>\\n[\\t ]+<string>).*?(<\\/string>)/, '\\1' + version + '\\2')\nSTDERR.print info_contents\nf = File.open(info, \"w\")\nf.write(info_contents)\nf.close";
+			shellScript = "# Xcode auto-versioning script for Subversion\n# by Axel Andersson, modified by Daniel Jalkut to add\n# \"--revision HEAD\" to the svn info line, which allows\n# the latest revision to always be used.\n\nif ENV[\"BUILT_PRODUCTS_DIR\"].nil?\n\tSTDERR.print \"#{$0}: Must be run from Xcode!\"\n\texit(1)\nend\n\n# Get the current Git master hash and use it to set the CFBundleVersion value\nENV[\"PATH\"] = \"/bin:/sw/bin:/usr/local/git/bin:/usr/bin:/usr/local/bin:/sbin:/usr/sbin:/opt/local/bin\"\nexit(0) if `type git` == \"\"\nrev = `/usr/bin/env git show-ref --abbrev heads/master`\ninfo = \"#{ENV[\"BUILT_PRODUCTS_DIR\"]}/#{ENV[\"WRAPPER_NAME\"]}/Resources/Info.plist\"\nversion = rev.split(\" \")[0]\n\nif version.nil?\n\tSTDERR.print \"#{$0}: Can't find a Git hash!\"\n\texit(0)\nend\n\ninfo_contents = File.read(info)\nif info_contents.nil?\n\tSTDERR.print \"#{$0}: Can't read in the Info.plist file!\"\n\texit(1)\nend\n\ninfo_contents.sub!(/([\\t ]+<key>CFBundleVersion<\\/key>\\n[\\t ]+<string>).*?(<\\/string>)/, '\\1' + version + '\\2')\n#STDERR.print info_contents\nf = File.open(info, \"w\")\nf.write(info_contents)\nf.close";
 			showEnvVarsInLog = 0;
 		};
 		6195D4B40E40505A00D41A50 /* Run Script: Link fr_CA to fr */ = {
@@ -1094,6 +1094,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env ruby";
 			shellScript = "resources = \"#{ENV[\"BUILT_PRODUCTS_DIR\"]}/#{ENV[\"WRAPPER_NAME\"]}/Resources\"\n`ln -sfh \"fr.lproj\" \"#{resources}/fr_CA.lproj\"`";
+			showEnvVarsInLog = 0;
 		};
 		61E31A85103299750051D188 /* Run Script: Link pt to pt_BR */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1108,6 +1109,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env ruby";
 			shellScript = "resources = \"#{ENV[\"BUILT_PRODUCTS_DIR\"]}/#{ENV[\"WRAPPER_NAME\"]}/Resources\"\n`ln -sfh \"pt_BR.lproj\" \"#{resources}/pt.lproj\"`";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
