@@ -1065,13 +1065,16 @@
 			files = (
 			);
 			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(WRAPPER_NAME)/Resources/fr.lproj",
 			);
 			name = "Run Script: Link fr_CA to fr";
 			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(WRAPPER_NAME)/Resources/fr_CA.lproj",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = "/usr/bin/env ruby";
-			shellScript = "resources = \"#{ENV[\"BUILT_PRODUCTS_DIR\"]}/#{ENV[\"WRAPPER_NAME\"]}/Resources\"\n`ln -sfh \"fr.lproj\" \"#{resources}/fr_CA.lproj\"`";
+			shellPath = "/usr/bin/env sh";
+			shellScript = "ln -sfh \"fr.lproj\" \"$BUILT_PRODUCTS_DIR/$WRAPPER_NAME/Resources/fr_CA.lproj\"";
+			showEnvVarsInLog = 0;
 		};
 		61E31A85103299750051D188 /* Run Script: Link pt to pt_BR */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1079,13 +1082,16 @@
 			files = (
 			);
 			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(WRAPPER_NAME)/Resources/pt_BR.lproj",
 			);
 			name = "Run Script: Link pt to pt_BR";
 			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(WRAPPER_NAME)/Resources/pt.lproj",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = "/usr/bin/env ruby";
-			shellScript = "resources = \"#{ENV[\"BUILT_PRODUCTS_DIR\"]}/#{ENV[\"WRAPPER_NAME\"]}/Resources\"\n`ln -sfh \"pt_BR.lproj\" \"#{resources}/pt.lproj\"`";
+			shellPath = "/usr/bin/env sh";
+			shellScript = "ln -sfh \"pt_BR.lproj\" \"$BUILT_PRODUCTS_DIR/$WRAPPER_NAME/Resources/pt.lproj\"";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
