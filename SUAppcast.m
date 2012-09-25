@@ -6,10 +6,33 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
-#import "SUAppcast.h"
+#import "SUUpdater.h"
 
-@interface SUAppcast (Private)
+#import "SUAppcast.h"
+#import "SUAppcastItem.h"
+#import "SUVersionComparisonProtocol.h"
+#import "SUAppcast.h"
+#import "SUConstants.h"
+#import "SULog.h"
+
+@interface NSXMLElement (SUAppcastExtensions)
+- (NSDictionary *)attributesAsDictionary;
+@end
+
+@implementation NSXMLElement (SUAppcastExtensions)
+- (NSDictionary *)attributesAsDictionary
+{
+	NSEnumerator *attributeEnum = [[self attributes] objectEnumerator];
+	NSXMLNode *attribute;
+	NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+
+	while ((attribute = [attributeEnum nextObject]))
+		[dictionary setObject:[attribute stringValue] forKey:[attribute name]];
+	return dictionary;
+}
+@end
+
+@interface SUAppcast () <NSURLDownloadDelegate>
 - (void)reportError:(NSError *)error;
 - (NSXMLNode *)bestNodeInNodes:(NSArray *)nodes;
 @end
@@ -19,8 +42,14 @@
 - (void)dealloc
 {
 	[items release];
+	items = nil;
 	[userAgentString release];
+	userAgentString = nil;
+	[downloadFilename release];
+	downloadFilename = nil;
 	[download release];
+	download = nil;
+	
 	[super dealloc];
 }
 
@@ -57,17 +86,36 @@
 - (void)downloadDidFinish:(NSURLDownload *)aDownload
 {    
 	NSError *error = nil;
-    NSXMLDocument *document = [[[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:0 error:&error] autorelease];
+	
+	NSXMLDocument *document = nil;
 	BOOL failed = NO;
 	NSArray *xmlItems = nil;
 	NSMutableArray *appcastItems = [NSMutableArray array];
+	
+	if (downloadFilename)
+	{
+        NSUInteger options = 0;
+        if (NSAppKitVersionNumber < NSAppKitVersionNumber10_7) {
+            // In order to avoid including external entities when parsing the appcast (a potential security vulnerability; see https://github.com/andymatuschak/Sparkle/issues/169), we ask NSXMLDocument to "tidy" the XML first. This happens to remove these external entities; it wouldn't be a future-proof approach, but it worked in these historical versions of OS X, and we have a more rigorous approach for 10.7+.
+            options = NSXMLDocumentTidyXML;
+        } else {
+            // In 10.7 and later, there's a real option for the behavior we desire.
+            options = NSXMLNodeLoadExternalEntitiesSameOriginOnly;
+        }
+		document = [[[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:options error:&error] autorelease];
+	
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-    [[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
+		[[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
 #else
-    [[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:nil];
+		[[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:nil];
 #endif
-    [downloadFilename release];
-    downloadFilename = nil;
+		[downloadFilename release];
+		downloadFilename = nil;
+	}
+	else
+	{
+		failed = YES;
+	}
     
     if (nil == document)
     {
@@ -121,12 +169,7 @@
 				if ([name isEqualToString:@"enclosure"])
 				{
 					// enclosure is flattened as a separate dictionary for some reason
-					NSEnumerator *attributeEnum = [[(NSXMLElement *)node attributes] objectEnumerator];
-					NSXMLNode *attribute;
-					NSMutableDictionary *encDict = [NSMutableDictionary dictionary];
-					
-					while ((attribute = [attributeEnum nextObject]))
-						[encDict setObject:[attribute stringValue] forKey:[attribute name]];
+					NSDictionary *encDict = [(NSXMLElement *)node attributesAsDictionary];
 					[dict setObject:encDict forKey:@"enclosure"];
 					
 				}
@@ -137,8 +180,19 @@
 					if (date)
 						[dict setObject:date forKey:name];
 				}
-                else if (name != nil)
-                {
+				else if ([name isEqualToString:@"sparkle:deltas"])
+				{
+					NSMutableArray *deltas = [NSMutableArray array];
+					NSEnumerator *childEnum = [[node children] objectEnumerator];
+					NSXMLNode *child;
+					while ((child = [childEnum nextObject])) {
+						if ([[child name] isEqualToString:@"enclosure"])
+							[deltas addObject:[(NSXMLElement *)child attributesAsDictionary]];
+					}
+					[dict setObject:deltas forKey:@"deltas"];
+				}
+				else if (name != nil)
+				{
 					// add all other values as strings
 					[dict setObject:[[node stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] forKey:name];
 				}
@@ -152,7 +206,7 @@
 			}
             else
             {
-				NSLog(@"Sparkle Updater: Failed to parse appcast item: %@.\nAppcast dictionary was: %@", errString, dict);
+				SULog(@"Sparkle Updater: Failed to parse appcast item: %@.\nAppcast dictionary was: %@", errString, dict);
             }
             [nodesDict removeAllObjects];
             [dict removeAllObjects];

@@ -20,14 +20,19 @@
 	
 	NSString *DSASignature;	
 	NSString *minimumSystemVersion;
+    NSString *maximumSystemVersion;
 	
 	NSURL *fileURL;
 	NSString *fileURLType; // what is being pointed at here? Could be a text/html for instance instead of an app.
 	 
 	NSString *versionString;
 	NSString *displayVersionString;
-	
+
+	NSDictionary *deltaUpdates;
+
 	NSDictionary *propertiesDictionary;
+	
+	NSURL *infoURL;	// UK 2007-08-31
 }
 
 // Initializes with data from a dictionary provided by the RSS class.
@@ -44,9 +49,14 @@
 - (NSString *)fileURLType;
 - (NSString *)DSASignature;
 - (NSString *)minimumSystemVersion;
+- (NSString *)maximumSystemVersion;
+- (NSDictionary *)deltaUpdates;
+- (BOOL)isDeltaUpdate;
 
 // Returns the dictionary provided in initWithDictionary; this might be useful later for extensions.
 - (NSDictionary *)propertiesDictionary;
+
+- (NSURL *)infoURL;						// UK 2007-08-31
 
 @end
 

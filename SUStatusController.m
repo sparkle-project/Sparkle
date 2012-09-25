@@ -6,8 +6,14 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
+#import "SUUpdater.h"
+
+#import "SUAppcast.h"
+#import "SUAppcastItem.h"
+#import "SUVersionComparisonProtocol.h"
 #import "SUStatusController.h"
+#import "SUHost.h"
+
 
 @implementation SUStatusController
 
@@ -31,10 +37,14 @@
 	[super dealloc];
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [host bundlePath]]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [host bundlePath], [host installationPath]]; }
 
 - (void)awakeFromNib
 {
+    if ([host isBackgroundApplication]) {
+        [[self window] setLevel:NSFloatingWindowLevel];
+    }
+    
 	[[self window] center];
 	[[self window] setFrameAutosaveName:@"SUStatusFrame"];
 	[progressBar setUsesThreadedAnimation:YES];
@@ -60,7 +70,7 @@
 	[self setStatusText:aStatusText];
 }
 
-- (void)setButtonTitle:(NSString *)aButtonTitle target:target action:(SEL)action isDefault:(BOOL)isDefault
+- (void)setButtonTitle:(NSString *)aButtonTitle target: (id)target action:(SEL)action isDefault:(BOOL)isDefault
 {
 	[self willChangeValueForKey:@"buttonTitle"];
 	if (buttonTitle != aButtonTitle)
@@ -82,6 +92,9 @@
 	[actionButton setTarget:target];
 	[actionButton setAction:action];
 	[actionButton setKeyEquivalent:isDefault ? @"\r" : @""];
+	
+	// 06/05/2008 Alex: Avoid a crash when cancelling during the extraction
+	[self setButtonEnabled: (target != nil)];
 }
 
 - (BOOL)progressBarShouldAnimate
@@ -116,6 +129,7 @@
 	[self setProgressValue:0.0];
 	[progressBar setIndeterminate:(value == 0.0)];
 	[progressBar startAnimation:self];
+	[progressBar setUsesThreadedAnimation: YES];
 }
 
 - (void)setStatusText:(NSString *)aStatusText

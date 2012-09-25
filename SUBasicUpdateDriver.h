@@ -15,9 +15,11 @@
 @class SUAppcastItem, SUUnarchiver, SUAppcast, SUUnarchiver, SUHost;
 @interface SUBasicUpdateDriver : SUUpdateDriver {
 	SUAppcastItem *updateItem;
+	SUAppcastItem *nonDeltaUpdateItem;
 	
 	NSURLDownload *download;
 	NSString *downloadPath;
+	NSString *tempDir;
 	
 	NSString *relaunchPath;
 }
@@ -42,13 +44,13 @@
 - (void)extractUpdate;
 - (void)unarchiverDidFinish:(SUUnarchiver *)ua;
 - (void)unarchiverDidFail:(SUUnarchiver *)ua;
+- (void)failedToApplyDeltaUpdate;
 
-- (void)installUpdate;
-- (void)installerFinishedForHost:(SUHost *)host;
+- (void)installWithToolAndRelaunch:(BOOL)relaunch;
 - (void)installerForHost:(SUHost *)host failedWithError:(NSError *)error;
 
-- (void)relaunchHostApp;
-- (void)cleanUp;
+- (void)installWithToolAndRelaunch:(BOOL)relaunch;
+- (void)cleanUpDownload;
 
 - (void)abortUpdate;
 - (void)abortUpdateWithError:(NSError *)error;

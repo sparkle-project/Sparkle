@@ -7,17 +7,20 @@
 //
 
 #import "SUPackageInstaller.h"
+#import <Cocoa/Cocoa.h>
+#import "SUConstants.h"
 
 NSString *SUPackageInstallerCommandKey = @"SUPackageInstallerCommand";
 NSString *SUPackageInstallerArgumentsKey = @"SUPackageInstallerArguments";
 NSString *SUPackageInstallerHostKey = @"SUPackageInstallerHost";
 NSString *SUPackageInstallerDelegateKey = @"SUPackageInstallerDelegate";
+NSString *SUPackageInstallerInstallationPathKey = @"SUPackageInstallerInstallationPathKey";
 
 @implementation SUPackageInstaller
 
 + (void)finishInstallationWithInfo:(NSDictionary *)info
 {
-	[self finishInstallationWithResult:YES host:[info objectForKey:SUPackageInstallerHostKey] error:nil delegate:[info objectForKey:SUPackageInstallerDelegateKey]];
+	[self finishInstallationToPath:[info objectForKey:SUPackageInstallerInstallationPathKey] withResult:YES host:[info objectForKey:SUPackageInstallerHostKey] error:nil delegate:[info objectForKey:SUPackageInstallerDelegateKey]];
 }
 
 + (void)performInstallationWithInfo:(NSDictionary *)info
@@ -33,14 +36,14 @@ NSString *SUPackageInstallerDelegateKey = @"SUPackageInstallerDelegate";
 	[pool drain];
 }
 
-+ (void)performInstallationWithPath:(NSString *)path host:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
++ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
 {
 	NSString *command;
 	NSArray *args;
 	
 	if (floor(NSAppKitVersionNumber) == NSAppKitVersionNumber10_4) {
 		// 10.4 uses Installer.app because the "open" command in 10.4 doesn't support -W and -n
-		command = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:@"com.apple.installer"];
+		command = [[NSBundle bundleWithIdentifier:@"com.apple.installer"] executablePath];
 		args = [NSArray arrayWithObjects:path, nil];
 	} else {
 		// 10.5 and later. Run installer using the "open" command to ensure it is launched in front of current application.
@@ -54,11 +57,11 @@ NSString *SUPackageInstallerDelegateKey = @"SUPackageInstallerDelegate";
 	if (![[NSFileManager defaultManager] fileExistsAtPath:command])
 	{
 		NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingInstallerToolError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find Apple's installer tool!" forKey:NSLocalizedDescriptionKey]];
-		[self finishInstallationWithResult:NO host:host error:error delegate:delegate];
+		[self finishInstallationToPath:installationPath withResult:NO host:host error:error delegate:delegate];
 	}
 	else 
 	{
-		NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:command, SUPackageInstallerCommandKey, args, SUPackageInstallerArgumentsKey, host, SUPackageInstallerHostKey, delegate, SUPackageInstallerDelegateKey, nil];
+		NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:command, SUPackageInstallerCommandKey, args, SUPackageInstallerArgumentsKey, host, SUPackageInstallerHostKey, delegate, SUPackageInstallerDelegateKey, installationPath, SUPackageInstallerInstallationPathKey, nil];
 		if (synchronously)
 			[self performInstallationWithInfo:info];
 		else
