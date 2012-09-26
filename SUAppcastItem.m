@@ -212,7 +212,19 @@
 		}
 		
 		if( enclosureURLString )
-			[self setFileURL: [NSURL URLWithString: [enclosureURLString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+		{
+			// Support an older Red Sweater style of specifying "info only" appcasts, where
+			// the presence of a text/html enclosure implied it should be treated as info-only.
+			if ([[enclosure objectForKey:@"type"] isEqualToString:@"text/html"])
+			{
+				[self setInfoURL: [NSURL URLWithString: [enclosureURLString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+			}
+			else
+			{
+				[self setFileURL: [NSURL URLWithString: [enclosureURLString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+			}
+		}
+		
 		if( enclosure )
 			[self setDSASignature:[enclosure objectForKey:@"sparkle:dsaSignature"]];		
 		
