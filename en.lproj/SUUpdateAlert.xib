@@ -228,7 +228,6 @@
 							<string key="NSFrame">{{426, 12}, {135, 32}}</string>
 							<reference key="NSSuperview" ref="163075390"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="635120042">
 								<int key="NSCellFlags">-2080374784</int>
@@ -567,22 +566,6 @@
 						</object>
 					</object>
 					<int key="connectionID">161</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
-						<string key="label">title: defaultButtonTitle</string>
-						<reference key="source" ref="111369817"/>
-						<reference key="destination" ref="364764635"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="111369817"/>
-							<reference key="NSDestination" ref="364764635"/>
-							<string key="NSLabel">title: defaultButtonTitle</string>
-							<string key="NSBinding">title</string>
-							<string key="NSKeyPath">defaultButtonTitle</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">179</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
