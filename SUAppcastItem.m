@@ -78,15 +78,6 @@
 }
 
 
-- (NSString *)fileURLType { return [[fileURLType retain] autorelease]; }
-
-- (void)setFileURLType:(NSString *)aFileURLType
-{
-    [fileURLType release];
-    fileURLType = [aFileURLType copy];
-}
-
-
 - (NSString *)versionString { return [[versionString retain] autorelease]; }
 
 - (void)setVersionString:(NSString *)s
@@ -192,12 +183,6 @@
 		[self setDate:[dict objectForKey:@"pubDate"]];
 		[self setItemDescription:[dict objectForKey:@"description"]];
 		
-<<<<<<< HEAD
-		[self setFileURL:[NSURL URLWithString:[[enclosure objectForKey:@"url"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
-		[self setFileURLType:[enclosure objectForKey:@"type"]];
-		
-		[self setDSASignature:[enclosure objectForKey:@"sparkle:dsaSignature"]];		
-=======
 		NSString*	theInfoURL = [dict objectForKey:@"link"];
 		if( theInfoURL )
 		{
@@ -206,7 +191,6 @@
 			else
 				[self setInfoURL:[NSURL URLWithString:theInfoURL]];
 		}
->>>>>>> upstream/master
 		
 		// Need an info URL or an enclosure URL. Former to show "More Info"
 		//	page, latter to download & install:
@@ -278,18 +262,6 @@
 
 - (void)dealloc
 {
-<<<<<<< HEAD
-	[title release];
-	[date release];
-	[itemDescription release];
-	[releaseNotesURL release];
-	[DSASignature release];
-	[minimumSystemVersion release];
-	[fileURL release];
-	[fileURLType release];
-	[versionString release];
-	[displayVersionString release];
-=======
     [self setTitle:nil];
     [self setDate:nil];
     [self setItemDescription:nil];
@@ -300,7 +272,6 @@
     [self setVersionString:nil];
 	[self setDisplayVersionString:nil];
 	[self setInfoURL:nil];
->>>>>>> upstream/master
 	[propertiesDictionary release];
     [super dealloc];
 }
