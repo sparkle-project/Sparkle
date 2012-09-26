@@ -1404,6 +1404,7 @@
 			baseConfigurationReference = 615409A8103BA09100125AF1 /* ConfigTestAppReleaseGCSupport.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PREFIX_HEADER = "";
 			};
 			name = "Release (GC dual-mode; 10.5+)";
 		};
@@ -1413,6 +1414,7 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PREFIX_HEADER = finish_installation.pch;
+				INFOPLIST_FILE = "finish_installation-Info.plist";
 				SDKROOT = macosx;
 			};
 			name = "Release (GC dual-mode; 10.5+)";
@@ -1423,6 +1425,7 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PREFIX_HEADER = finish_installation.pch;
+				INFOPLIST_FILE = "finish_installation-Info.plist";
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -1433,6 +1436,7 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PREFIX_HEADER = finish_installation.pch;
+				INFOPLIST_FILE = "finish_installation-Info.plist";
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -1442,6 +1446,7 @@
 			baseConfigurationReference = FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PREFIX_HEADER = "";
 			};
 			name = Debug;
 		};
@@ -1450,6 +1455,7 @@
 			baseConfigurationReference = FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				GCC_PREFIX_HEADER = "";
 			};
 			name = Release;
 		};
@@ -1474,6 +1480,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */;
 			buildSettings = {
+				GCC_PREFIX_HEADER = "";
 			};
 			name = "Release10.6+";
 		};
@@ -1491,6 +1498,7 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PREFIX_HEADER = finish_installation.pch;
+				INFOPLIST_FILE = "finish_installation-Info.plist";
 				SDKROOT = macosx;
 			};
 			name = "Release10.6+";

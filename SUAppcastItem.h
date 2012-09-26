@@ -46,7 +46,6 @@
 - (NSString *)itemDescription;
 - (NSURL *)releaseNotesURL;
 - (NSURL *)fileURL;
-- (NSString *)fileURLType;
 - (NSString *)DSASignature;
 - (NSString *)minimumSystemVersion;
 - (NSString *)maximumSystemVersion;
