@@ -185,7 +185,7 @@
 		[[[releaseNotesView superview] superview] setFrame:boxFrame];
 	}
 		
-	if( [updateItem fileURL] == nil )	// UK 2007-08-31 (whole if clause)
+	if([updateItem isInformationOnlyUpdate])	// UK 2007-08-31 (whole if clause)
 	{
 		[installButton setTitle: SULocalizedString( @"Learn More...", @"Alternate title for 'Install Update' button when there's no download in RSS feed." )];
 		[installButton setAction: @selector(openInfoURL:)];
@@ -292,7 +292,20 @@
     }
 	else
 		[versionDisplayer formatVersion: &updateItemVersion andVersion: &hostVersion];
-    return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", nil), [host name], updateItemVersion, hostVersion];
+
+	// We display a slightly different summary depending on if it's an "info-only" item or not
+	NSString* actionSentence = nil;
+	
+	if ([updateItem isInformationOnlyUpdate])
+	{
+		actionSentence = SULocalizedString(@"Would you like to learn more about this update on the web?", nil);
+	}
+	else
+	{
+		actionSentence = SULocalizedString(@"Would you like to download it now?", nil);
+	}
+
+    return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available (you have %@). %@", nil), [host name], updateItemVersion, hostVersion, actionSentence];
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:frame

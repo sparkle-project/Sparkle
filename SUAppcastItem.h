@@ -57,6 +57,12 @@
 
 - (NSURL *)infoURL;						// UK 2007-08-31
 
+// Used to inform the behavior of the UI e.g. when presenting news of an update
+// to the user. Here is where logic for what makes an update "informational only"
+// can be overridden to ensure that the user is presented with appropriate language,
+// that the button changes from "Install" to "Learn More..." etc.
+- (BOOL) isInformationOnlyUpdate;
+
 @end
 
 #endif
