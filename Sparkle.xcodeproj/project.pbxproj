@@ -1487,41 +1487,41 @@
 			};
 			name = "Debug (10.8)";
 		};
-		7D0E35F8162F1992006C5916 /* Debug (10.8) (AppStore) */ = {
+		7D0E35F8162F1992006C5916 /* Debug (AppStore) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 			};
-			name = "Debug (10.8) (AppStore)";
+			name = "Debug (AppStore)";
 		};
-		7D0E35F9162F1992006C5916 /* Debug (10.8) (AppStore) */ = {
+		7D0E35F9162F1992006C5916 /* Debug (AppStore) */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug (10.8) (AppStore)";
+			name = "Debug (AppStore)";
 		};
-		7D0E35FA162F1992006C5916 /* Debug (10.8) (AppStore) */ = {
+		7D0E35FA162F1992006C5916 /* Debug (AppStore) */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug (10.8) (AppStore)";
+			name = "Debug (AppStore)";
 		};
-		7D0E35FB162F1992006C5916 /* Debug (10.8) (AppStore) */ = {
+		7D0E35FB162F1992006C5916 /* Debug (AppStore) */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug (10.8) (AppStore)";
+			name = "Debug (AppStore)";
 		};
-		7D0E35FC162F1992006C5916 /* Debug (10.8) (AppStore) */ = {
+		7D0E35FC162F1992006C5916 /* Debug (AppStore) */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D06E8F20FD68D21005AE3F6 /* ConfigBinaryDeltaDebug.xcconfig */;
 			buildSettings = {
 			};
-			name = "Debug (10.8) (AppStore)";
+			name = "Debug (AppStore)";
 		};
-		7D0E35FD162F1992006C5916 /* Debug (10.8) (AppStore) */ = {
+		7D0E35FD162F1992006C5916 /* Debug (AppStore) */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
 			buildSettings = {
@@ -1542,7 +1542,7 @@
 				);
 				PRODUCT_NAME = finish_installation;
 			};
-			name = "Debug (10.8) (AppStore)";
+			name = "Debug (AppStore)";
 		};
 		7D0E35FE162F199F006C5916 /* Release (10.8) */ = {
 			isa = XCBuildConfiguration;
@@ -1721,7 +1721,7 @@
 		1DEB91AD08733DA50010E9CD /* Build configuration list for PBXNativeTarget "Sparkle" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7D0E35F9162F1992006C5916 /* Debug (10.8) (AppStore) */,
+				7D0E35F9162F1992006C5916 /* Debug (AppStore) */,
 				7D0E35F3162F1981006C5916 /* Debug (10.8) */,
 				7D0E35ED162F196C006C5916 /* Debug (10.8) (No Warnings) */,
 				7D0E360B162F19CA006C5916 /* Release (AppStore) */,
@@ -1734,7 +1734,7 @@
 		1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "Sparkle" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7D0E35F8162F1992006C5916 /* Debug (10.8) (AppStore) */,
+				7D0E35F8162F1992006C5916 /* Debug (AppStore) */,
 				7D0E35F2162F1981006C5916 /* Debug (10.8) */,
 				7D0E35EC162F196C006C5916 /* Debug (10.8) (No Warnings) */,
 				7D0E360A162F19CA006C5916 /* Release (AppStore) */,
@@ -1747,7 +1747,7 @@
 		55C14BBE136EEF1500649790 /* Build configuration list for PBXNativeTarget "finish_installation" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7D0E35FD162F1992006C5916 /* Debug (10.8) (AppStore) */,
+				7D0E35FD162F1992006C5916 /* Debug (AppStore) */,
 				7D0E35F7162F1981006C5916 /* Debug (10.8) */,
 				7D0E35F1162F196C006C5916 /* Debug (10.8) (No Warnings) */,
 				7D0E360F162F19CA006C5916 /* Release (AppStore) */,
@@ -1760,7 +1760,7 @@
 		5D06E8DA0FD68C95005AE3F6 /* Build configuration list for PBXNativeTarget "BinaryDelta" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7D0E35FC162F1992006C5916 /* Debug (10.8) (AppStore) */,
+				7D0E35FC162F1992006C5916 /* Debug (AppStore) */,
 				7D0E35F6162F1981006C5916 /* Debug (10.8) */,
 				7D0E35F0162F196C006C5916 /* Debug (10.8) (No Warnings) */,
 				7D0E360E162F19CA006C5916 /* Release (AppStore) */,
@@ -1773,7 +1773,7 @@
 		612279DD0DB5470300AB99EA /* Build configuration list for PBXNativeTarget "Sparkle Unit Tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7D0E35FB162F1992006C5916 /* Debug (10.8) (AppStore) */,
+				7D0E35FB162F1992006C5916 /* Debug (AppStore) */,
 				7D0E35F5162F1981006C5916 /* Debug (10.8) */,
 				7D0E35EF162F196C006C5916 /* Debug (10.8) (No Warnings) */,
 				7D0E360D162F19CA006C5916 /* Release (AppStore) */,
@@ -1786,7 +1786,7 @@
 		61B5F90509C4CEE300B25A18 /* Build configuration list for PBXNativeTarget "Sparkle Test App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7D0E35FA162F1992006C5916 /* Debug (10.8) (AppStore) */,
+				7D0E35FA162F1992006C5916 /* Debug (AppStore) */,
 				7D0E35F4162F1981006C5916 /* Debug (10.8) */,
 				7D0E35EE162F196C006C5916 /* Debug (10.8) (No Warnings) */,
 				7D0E360C162F19CA006C5916 /* Release (AppStore) */,
