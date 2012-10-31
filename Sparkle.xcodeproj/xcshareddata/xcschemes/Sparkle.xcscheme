@@ -33,6 +33,20 @@
                ReferencedContainer = "container:Sparkle.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "5D06E8CF0FD68C7C005AE3F6"
+               BuildableName = "BinaryDelta"
+               BlueprintName = "BinaryDelta"
+               ReferencedContainer = "container:Sparkle.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
