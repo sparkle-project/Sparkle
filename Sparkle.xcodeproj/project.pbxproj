@@ -1696,6 +1696,7 @@
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				INFOPLIST_FILE = SandboxService.plist;
+				OTHER_CFLAGS = "-DDEBUG";
 				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
