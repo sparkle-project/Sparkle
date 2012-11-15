@@ -462,7 +462,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 - (BOOL)sendsSystemProfile
 {
-	return [host boolForUserDefaultsKey:SUSendProfileInfoKey];
+	return [host boolForKey:SUSendProfileInfoKey];
 }
 
 - (NSURL *)parameterizedFeedURL
