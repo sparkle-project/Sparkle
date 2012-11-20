@@ -18,6 +18,7 @@
 #import "SUPlainInstaller.h"
 #import "SUPlainInstallerInternals.h"
 #import "SUBinaryDeltaCommon.h"
+#import "SUCodeSigningVerifier.h"
 #import "SUUpdater_Private.h"
 
 @interface SUBasicUpdateDriver () <NSURLDownloadDelegate>; @end
@@ -203,22 +204,23 @@
 	[download setDestination:downloadPath allowOverwrite:YES];
 }
 
-- (void)downloadDidFinish:(NSURLDownload *)d
+- (BOOL)validateUpdateDownloadedToPath:(NSString *)destinationPath extractedToPath:(NSString *)extractedPath DSASignature:(NSString *)DSASignature publicDSAKey:(NSString *)publicDSAKey
 {
-	#if !ENDANGER_USERS_WITH_INSECURE_UPDATES
-	// New in Sparkle 1.5: we're now checking signatures on all non-secure downloads, where "secure" is defined as both the appcast and the download being transmitted over SSL.
-	NSURL *downloadURL = [[d request] URL];
-	if (!(([[downloadURL scheme] isEqualToString:@"https"] && [[appcastURL scheme] isEqualToString:@"https"]) ||
-		  ([downloadURL isFileURL] && [appcastURL isFileURL])))
-	{
-		if (![host publicDSAKey] || ![SUDSAVerifier validatePath:downloadPath withEncodedDSASignature:[updateItem DSASignature] withPublicDSAKey:[host publicDSAKey]])
-		{
-			[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUSignatureError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil), NSLocalizedDescriptionKey, @"The update is improperly signed.", NSLocalizedFailureReasonErrorKey, nil]]];
-			return;
-		}
-	}
-	#endif
-	
+    NSString *newBundlePath = [SUInstaller appPathInUpdateFolder:extractedPath forHost:host];
+    if (!newBundlePath) return NO;
+    
+    NSError *error = nil;
+    if ([SUCodeSigningVerifier codeSignatureIsValidAtPath:newBundlePath error:&error]) {
+        return YES;
+    } else {
+        SULog(@"Code signature check on update failed: %@", error);
+    }
+    
+    return [SUDSAVerifier validatePath:destinationPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey];
+}
+
+- (void)downloadDidFinish:(NSURLDownload *)d
+{	
 	[self extractUpdate];
 }
 
@@ -280,6 +282,14 @@
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch
 {
+#if !ENDANGER_USERS_WITH_INSECURE_UPDATES
+    if (![self validateUpdateDownloadedToPath:downloadPath extractedToPath:tempDir DSASignature:[updateItem DSASignature] publicDSAKey:[host publicDSAKey]])
+    {
+        [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUSignatureError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil), NSLocalizedDescriptionKey, @"The update is improperly signed.", NSLocalizedFailureReasonErrorKey, nil]]];
+        return;
+	}
+#endif
+    
     if (![updater mayUpdateAndRestart])
     {
         [self abortUpdate];
