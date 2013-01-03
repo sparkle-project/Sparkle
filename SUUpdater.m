@@ -225,7 +225,15 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 -(void)	putFeedURLIntoDictionary: (NSMutableDictionary*)theDict	// You release this.
 {
-	[theDict setObject: [self feedURL] forKey: @"feedURL"];
+	NSURL *feedURL = [self feedURL];
+	if (feedURL != nil)
+	{
+		[theDict setObject:feedURL forKey: @"feedURL"];
+	}
+	else
+	{
+		NSLog(@"Cannot put feedURL into dictionary: feedURL is nil");
+	}
 }
 
 -(void)	checkForUpdatesInBgReachabilityCheckWithDriver: (SUUpdateDriver*)inDriver /* RUNS ON ITS OWN THREAD */
