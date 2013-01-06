@@ -105,7 +105,6 @@
 		61A2279D0D1CEE7600430CCD /* SUSystemProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A2279B0D1CEE7600430CCD /* SUSystemProfiler.m */; };
 		61A354550DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61A354530DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
 		61A354560DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A354540DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.m */; };
-		61AAE8280A321A7F00D8810D /* Sparkle.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8220A321A7F00D8810D /* Sparkle.strings */; };
 		61B078CE15A5FB6100600039 /* SUCodeSigningVerifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B078CC15A5FB6100600039 /* SUCodeSigningVerifier.h */; };
 		61B078CF15A5FB6100600039 /* SUCodeSigningVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B078CD15A5FB6100600039 /* SUCodeSigningVerifier.m */; };
 		61B5F8ED09C4CE3C00B25A18 /* SUUpdater.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B5F8E309C4CE3C00B25A18 /* SUUpdater.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -135,8 +134,6 @@
 		61D85D6D0E10B2ED00F9B4A9 /* SUPipedUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 6129C0B90E0B79810062CE76 /* SUPipedUnarchiver.m */; };
 		61EF67560E25B58D00F754E0 /* SUHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 61EF67550E25B58D00F754E0 /* SUHost.m */; };
 		61EF67590E25C5B400F754E0 /* SUHost.h in Headers */ = {isa = PBXBuildFile; fileRef = 61EF67580E25C5B400F754E0 /* SUHost.h */; };
-		61F3AC1315C22D4A00260CA2 /* Sparkle.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8220A321A7F00D8810D /* Sparkle.strings */; };
-		61F3AC1815C22D5900260CA2 /* Sparkle.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8220A321A7F00D8810D /* Sparkle.strings */; };
 		61F3AC1915C22D5900260CA2 /* SUUpdatePermissionPrompt.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14C05136EF2C700649790 /* SUUpdatePermissionPrompt.xib */; };
 		61F3AC1A15C22D5900260CA2 /* SUUpdateAlert.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BF0136EF26100649790 /* SUUpdateAlert.xib */; };
 		61F3AC1B15C22D5900260CA2 /* SUAutomaticUpdateAlert.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BDA136EF20D00649790 /* SUAutomaticUpdateAlert.xib */; };
@@ -541,10 +538,10 @@
 		089C1665FE841158C02AAC07 /* Framework Resources */ = {
 			isa = PBXGroup;
 			children = (
+				61AAE8220A321A7F00D8810D /* Sparkle.strings */,
 				8DC2EF5A0486A6940098B216 /* Info.plist */,
 				615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */,
 				61C268090E2DB5D000175E6C /* License.txt */,
-				61AAE8220A321A7F00D8810D /* Sparkle.strings */,
 				55C14C05136EF2C700649790 /* SUUpdatePermissionPrompt.xib */,
 				55C14BF0136EF26100649790 /* SUUpdateAlert.xib */,
 				55C14BDA136EF20D00649790 /* SUAutomaticUpdateAlert.xib */,
@@ -1013,7 +1010,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				61C2680A0E2DB5D000175E6C /* License.txt in Resources */,
-				61AAE8280A321A7F00D8810D /* Sparkle.strings in Resources */,
 				615AE3D00D64DC40001CA7BD /* SUModelTranslation.plist in Resources */,
 				55C14BEE136EF20D00649790 /* SUAutomaticUpdateAlert.xib in Resources */,
 				55C14BEF136EF21700649790 /* SUStatus.xib in Resources */,
@@ -1021,8 +1017,6 @@
 				55C14C19136EF2C700649790 /* SUUpdatePermissionPrompt.xib in Resources */,
 				55C14F3B136EFCB300649790 /* finish_installation.app in Resources */,
 				93FB277F156BD826001937C7 /* SUPasswordPrompt.xib in Resources */,
-				61F3AC1315C22D4A00260CA2 /* Sparkle.strings in Resources */,
-				61F3AC1815C22D5900260CA2 /* Sparkle.strings in Resources */,
 				61F3AC1915C22D5900260CA2 /* SUUpdatePermissionPrompt.xib in Resources */,
 				61F3AC1A15C22D5900260CA2 /* SUUpdateAlert.xib in Resources */,
 				61F3AC1B15C22D5900260CA2 /* SUAutomaticUpdateAlert.xib in Resources */,
