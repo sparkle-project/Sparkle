@@ -84,8 +84,8 @@ typedef enum {
     NSArray *partsB = [self splitVersionString:versionB];
     
     NSString *partA, *partB;
-    NSUInteger i, n;
-	int intA, intB;
+    int i, n;
+	long long valueA, valueB;
     SUCharacterType typeA, typeB;
 	
     n = MIN([partsA count], [partsB count]);
@@ -100,11 +100,11 @@ typedef enum {
         if (typeA == typeB) {
             // Same type; we can compare
             if (typeA == kNumberType) {
-                intA = [partA intValue];
-                intB = [partB intValue];
-                if (intA > intB) {
+                valueA = [partA longLongValue];
+                valueB = [partB longLongValue];
+                if (valueA > valueB) {
                     return NSOrderedDescending;
-                } else if (intA < intB) {
+                } else if (valueA < valueB) {
                     return NSOrderedAscending;
                 }
             } else if (typeA == kStringType) {

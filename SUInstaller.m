@@ -42,14 +42,13 @@ static NSString*	sUpdateFolder = nil;
 		return NO;	
 }
 
-
-+ (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
++ (NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr
 {
-	// Search subdirectories for the application
+    // Search subdirectories for the application
 	NSString	*currentFile,
-				*newAppDownloadPath = nil,
-				*bundleFileName = [[host bundlePath] lastPathComponent],
-				*alternateBundleFileName = [[host name] stringByAppendingPathExtension:[[host bundlePath] pathExtension]];
+    *newAppDownloadPath = nil,
+    *bundleFileName = [[host bundlePath] lastPathComponent],
+    *alternateBundleFileName = [[host name] stringByAppendingPathExtension:[[host bundlePath] pathExtension]];
 	BOOL isPackage = NO;
 	NSString *fallbackPackagePath = nil;
 	NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath: inUpdateFolder];
@@ -100,13 +99,29 @@ static NSString*	sUpdateFolder = nil;
 	}
 	
 	// We don't have a valid path. Try to use the fallback package.
-
+    
 	if (newAppDownloadPath == nil && fallbackPackagePath != nil)
 	{
 		isPackage = YES;
 		newAppDownloadPath = fallbackPackagePath;
 	}
-	
+
+    if (isPackagePtr) *isPackagePtr = isPackage;
+    return newAppDownloadPath;
+}
+
++ (NSString *)appPathInUpdateFolder:(NSString *)updateFolder forHost:(SUHost *)host
+{
+    BOOL isPackage = NO;
+    NSString *path = [self installSourcePathInUpdateFolder:updateFolder forHost:host isPackage:&isPackage];
+    return isPackage ? nil : path;
+}
+
++ (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
+{
+    BOOL isPackage = NO;
+	NSString *newAppDownloadPath = [self installSourcePathInUpdateFolder:inUpdateFolder forHost:host isPackage:&isPackage];
+    
 	if (newAppDownloadPath == nil)
 	{
 		[self finishInstallationToPath:installationPath withResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find an appropriate update in the downloaded package." forKey:NSLocalizedDescriptionKey]] delegate:delegate];

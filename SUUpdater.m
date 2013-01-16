@@ -17,6 +17,7 @@
 #import "SUScheduledUpdateDriver.h"
 #import "SUConstants.h"
 #import "SULog.h"
+#import "SUCodeSigningVerifier.h"
 #include <SystemConfiguration/SystemConfiguration.h>
 
 
@@ -83,12 +84,18 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 		
 #if !ENDANGER_USERS_WITH_INSECURE_UPDATES
 		// Saving-the-developer-from-a-stupid-mistake-check:
-		if (![[[self feedURL] scheme] isEqualToString:@"https"] && ![host publicDSAKey])
-		{
-			[self notifyWillShowModalAlert];
-			NSRunAlertPanel(@"Insecure update error!", @"For security reasons, you need to distribute your appcast over SSL or sign your updates. See Sparkle's documentation for more information.", @"OK", nil, nil);
-			[self notifyDidShowModalAlert];
-		}
+        BOOL hasPublicDSAKey = [host publicDSAKey] != nil;
+        BOOL isMainBundle = [bundle isEqualTo:[NSBundle mainBundle]];
+        BOOL hostIsCodeSigned = [SUCodeSigningVerifier hostApplicationIsCodeSigned];
+        if (!isMainBundle && !hasPublicDSAKey) {
+            [self notifyWillShowModalAlert];
+            NSRunAlertPanel(@"Insecure update error!", @"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information.", @"OK", nil, nil);
+            [self notifyDidShowModalAlert];
+        } else if (isMainBundle && !(hasPublicDSAKey || hostIsCodeSigned)) {
+            [self notifyWillShowModalAlert];
+            NSRunAlertPanel(@"Insecure update error!", @"For security reasons, you need to code sign your application or sign your updates with a DSA key. See Sparkle's documentation for more information.", @"OK", nil, nil);
+            [self notifyDidShowModalAlert];
+        }
 #endif
         // This runs the permission prompt if needed, but never before the app has finished launching because the runloop won't run before that
         [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:0];
