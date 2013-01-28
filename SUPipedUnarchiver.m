@@ -51,7 +51,7 @@
 
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	FILE *fp = NULL, *cmdFP = NULL;
-	char *oldDestinationString = NULL;
+    char *oldDestinationString = NULL;
 	
 	SULog(@"Extracting %@ using '%@'",archivePath,command);
     

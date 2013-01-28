@@ -50,13 +50,13 @@
 "Cancel Update" = "ยกเลิกอัพเดท";
 
 /* No comment provided by engineer. */
-"Checking for updates..." = "ตรวจสอบอัพเดท...";
+"Checking for updates..." = "ตรวจสอบอัพเดท…";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "กำลังดาวน์โหลดอัพเดท...";
+"Downloading update..." = "กำลังดาวน์โหลดอัพเดท…";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "กำลังแตกไฟล์อัพเดท...";
+"Extracting update..." = "กำลังแตกไฟล์อัพเดท…";
 
 /* the unit for gigabytes */
 "GB" = "GB";
