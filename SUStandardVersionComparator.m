@@ -84,7 +84,7 @@ typedef enum {
     NSArray *partsB = [self splitVersionString:versionB];
     
     NSString *partA, *partB;
-    int i, n;
+    NSUInteger i, n;
 	long long valueA, valueB;
     SUCharacterType typeA, typeB;
 	
