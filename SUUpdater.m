@@ -551,7 +551,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	return driver && ([driver finished] == NO);
 }
 
-- delegate { return delegate; }
+- (id)delegate { return delegate; }
 - (NSBundle *)hostBundle { return [host bundle]; }
 
 @end
