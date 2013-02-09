@@ -21,6 +21,11 @@
 #import "SUUpdater_Private.h"
 
 
+@interface SUBasicUpdateDriver () <NSURLDownloadDelegate>
+
+@end
+
+
 @implementation SUBasicUpdateDriver
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost

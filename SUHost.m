@@ -248,7 +248,7 @@
 	OSErr err3 = Gestalt(gestaltSystemVersionBugFix, &bugfix);
 	if (!err1 && !err2 && !err3)
 	{
-		verStr = [NSString stringWithFormat:@"%d.%d.%d", major, minor, bugfix];
+		verStr = [NSString stringWithFormat:@"%d.%d.%d", (int32_t)major, (int32_t)minor, (int32_t)bugfix];
 	}
 	else
 #endif

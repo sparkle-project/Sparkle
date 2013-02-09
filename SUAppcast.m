@@ -32,7 +32,7 @@
 }
 @end
 
-@interface SUAppcast (Private)
+@interface SUAppcast (Private) <NSURLDownloadDelegate>
 - (void)reportError:(NSError *)error;
 - (NSXMLNode *)bestNodeInNodes:(NSArray *)nodes;
 @end

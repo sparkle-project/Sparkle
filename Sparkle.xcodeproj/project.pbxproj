@@ -868,7 +868,7 @@
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0440;
 			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "Sparkle" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1287,6 +1287,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
+				OTHER_CFLAGS = "-DDEBUG";
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -1294,18 +1296,23 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
 		1DEB91B208733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
 		1DEB91B308733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -1322,6 +1329,7 @@
 				GCC_PREFIX_HEADER = finish_installation.pch;
 				INFOPLIST_FILE = "finish_installation-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_CFLAGS = "-DDEBUG";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -1329,6 +1337,7 @@
 					AppKit,
 				);
 				PRODUCT_NAME = finish_installation;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -1351,6 +1360,7 @@
 					AppKit,
 				);
 				PRODUCT_NAME = finish_installation;
+				SDKROOT = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1372,6 +1382,7 @@
 					AppKit,
 				);
 				PRODUCT_NAME = finish_installation;
+				SDKROOT = macosx;
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
 		};
@@ -1379,6 +1390,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D06E8F20FD68D21005AE3F6 /* ConfigBinaryDeltaDebug.xcconfig */;
 			buildSettings = {
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -1386,6 +1398,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D06E8F30FD68D21005AE3F6 /* ConfigBinaryDeltaRelease.xcconfig */;
 			buildSettings = {
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -1393,12 +1406,15 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D06E8F30FD68D21005AE3F6 /* ConfigBinaryDeltaRelease.xcconfig */;
 			buildSettings = {
+				SDKROOT = macosx;
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
 		};
 		61072EAD0DF263BD008FE88B /* Release (GC dual-mode; 10.5-only) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				SDKROOT = macosx;
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
 		};
@@ -1406,6 +1422,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 61072EB20DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig */;
 			buildSettings = {
+				SDKROOT = macosx;
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
 		};
@@ -1413,6 +1430,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 615409A8103BA09100125AF1 /* ConfigTestAppReleaseGCSupport.xcconfig */;
 			buildSettings = {
+				SDKROOT = macosx;
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
 		};
@@ -1420,6 +1438,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA302AFD109D13190060F891 /* ConfigUnitTestReleaseGCSupport.xcconfig */;
 			buildSettings = {
+				SDKROOT = macosx;
 			};
 			name = "Release (GC dual-mode; 10.5-only)";
 		};
@@ -1427,6 +1446,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */;
 			buildSettings = {
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -1434,6 +1454,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */;
 			buildSettings = {
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -1441,6 +1462,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */;
 			buildSettings = {
+				OTHER_CFLAGS = "-DDEBUG";
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -1448,6 +1471,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */;
 			buildSettings = {
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
