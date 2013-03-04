@@ -233,4 +233,22 @@
 		[[updater delegate] updaterDidShowModalAlert: updater];
 }
 
+- (void)willShowUpdateAlert:(SUUpdateAlert *)updateAlert
+{
+	// notify delegate method from SUUpdater directly
+	id delegate = [updater delegate];
+	if ([delegate respondsToSelector:@selector(updaterWillShowDialog:)]) {
+		[delegate updaterWillShowDialog: updater];
+	}
+}
+
+- (void)didShowUpdateAlert:(SUUpdateAlert *)updateAlert
+{
+	// notify delegate method from SUUpdater directly
+	id delegate = [updater delegate];
+	if ([delegate respondsToSelector:@selector(updaterDidShowDialog:)]) {
+		[delegate updaterDidShowDialog: updater];
+	}
+}
+
 @end

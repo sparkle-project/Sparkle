@@ -39,6 +39,7 @@ typedef enum
 
 - (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host;
 - (void)setDelegate:delegate;
+- (void)windowWillClose:(NSNotification *)notification;
 
 - (IBAction)installUpdate:sender;
 - (IBAction)skipThisVersion:sender;
@@ -51,6 +52,8 @@ typedef enum
 @interface NSObject (SUUpdateAlertDelegate)
 - (void)updateAlert:(SUUpdateAlert *)updateAlert finishedWithChoice:(SUUpdateAlertChoice)updateChoice;
 - (void)updateAlert:(SUUpdateAlert *)updateAlert shouldAllowAutoUpdate: (BOOL*)shouldAllowAutoUpdate;
+- (void)willShowUpdateAlert:(SUUpdateAlert *)updateAlert;
+- (void)didShowUpdateAlert:(SUUpdateAlert *)updateAlert;
 @end
 
 #endif

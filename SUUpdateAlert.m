@@ -267,6 +267,8 @@
 - (BOOL)windowShouldClose:note
 {
 	[self endWithSelection:SURemindMeLaterChoice];
+	if (delegate && [delegate respondsToSelector:@selector(didShowUpdateAlert:)])
+		[delegate didShowUpdateAlert:self];
 	return YES;
 }
 
@@ -351,6 +353,17 @@
 - (void)setDelegate:del
 {
 	delegate = del;
+}
+
+- (void)windowWillLoad {
+	if (delegate && [delegate respondsToSelector:@selector(willShowUpdateAlert:)])
+		[delegate willShowUpdateAlert:self];
+}
+
+- (void)windowWillClose:(NSNotification *)notification
+{
+	if (delegate && [delegate respondsToSelector:@selector(didShowUpdateAlert:)])
+		[delegate didShowUpdateAlert:self];
 }
 
 @end
