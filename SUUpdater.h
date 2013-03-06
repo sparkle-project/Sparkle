@@ -138,9 +138,9 @@
 -(void)	updaterWillShowModalAlert:(SUUpdater *)updater;
 -(void)	updaterDidShowModalAlert:(SUUpdater *)updater;
 // Called before the update window appears with the most recent app cast item
-- (void)updaterWillShowDialog:(SUUpdater *)updater;
+- (void)updaterDidStartProcess:(SUUpdater *)updater;
 // Called right after the update window is closed, either by activating a choice or by pressing close button
-- (void)updaterDidShowDialog:(SUUpdater *)updater;
+- (void)updaterWillFinishProcess:(SUUpdater *)updater;
 
 @end
 
