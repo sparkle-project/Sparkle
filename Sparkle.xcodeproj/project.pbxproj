@@ -1600,6 +1600,7 @@
 				);
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				INSTALL_PATH = "@rpath";
 			};
 			name = Debug;
 		};
@@ -1614,6 +1615,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				INSTALL_PATH = "@rpath";
 			};
 			name = Release;
 		};
@@ -1736,6 +1738,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				INSTALL_PATH = "@rpath";
 			};
 			name = "Release (GC dual-mode; 10.5+)";
 		};
