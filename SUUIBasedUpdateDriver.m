@@ -15,6 +15,10 @@
 #import "SUConstants.h"
 #import "SUPasswordPrompt.h"
 
+@interface SUUIBasedUpdateDriver(Private)
+- (void)notifyWillShowUpdateDialog;
+@end
+
 @implementation SUUIBasedUpdateDriver
 
 - (void)didFindValidUpdate
@@ -40,8 +44,10 @@
 	}
 	
 	// Only show the update alert if the app is active; otherwise, we'll wait until it is.
-	if ([NSApp isActive])
+	if ([NSApp isActive]) {
+		[self notifyWillShowUpdateDialog];
 		[[updateAlert window] makeKeyAndOrderFront:self];
+	}
 	else
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
@@ -58,6 +64,7 @@
 
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification
 {
+	[self notifyWillShowUpdateDialog];
 	[[updateAlert window] makeKeyAndOrderFront:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
 }
@@ -231,6 +238,13 @@
 	
 	if ([[updater delegate] respondsToSelector:@selector(updaterDidShowModalAlert:)])
 		[[updater delegate] updaterDidShowModalAlert: updater];
+}
+
+- (void)notifyWillShowUpdateDialog
+{
+	if ([[updater delegate] respondsToSelector:@selector(updaterDidStartProcess:)]) {
+		[[updater delegate] updaterDidStartProcess: updater];
+	}
 }
 
 @end

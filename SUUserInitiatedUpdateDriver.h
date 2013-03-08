@@ -21,4 +21,8 @@
 
 @end
 
+@interface NSObject (SUUserInitiatedUpdateDriverDelegate)
+- (void)willShowUpdateWindow;
+@end
+
 #endif

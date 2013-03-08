@@ -32,8 +32,9 @@
 - (void)updateDriverDidFinish:(NSNotification *)note;
 - (NSURL *)parameterizedFeedURL;
 
--(void)	notifyWillShowModalAlert;
--(void)	notifyDidShowModalAlert;
+- (void) notifyWillShowModalAlert;
+- (void) notifyDidShowModalAlert;
+- (void) notifyWillFinishUpdater;
 
 @end
 
@@ -81,7 +82,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
             sharedUpdaters = [[NSMutableDictionary alloc] init];
         [sharedUpdaters setObject:self forKey:[NSValue valueWithNonretainedObject:bundle]];
         host = [[SUHost alloc] initWithBundle:bundle];
-		
+
 #if !ENDANGER_USERS_WITH_INSECURE_UPDATES
 		// Saving-the-developer-from-a-stupid-mistake-check:
         BOOL hasPublicDSAKey = [host publicDSAKey] != nil;
@@ -119,13 +120,18 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 		[delegate updaterWillShowModalAlert: self];
 }
 
-
 -(void)	notifyDidShowModalAlert
 {
 	if( [delegate respondsToSelector: @selector(updaterDidShowModalAlert:)] )
 		[delegate updaterDidShowModalAlert: self];
 }
 
+- (void) notifyWillFinishUpdater
+{
+	if ([delegate respondsToSelector:@selector(updaterWillFinishProcess:)]) {
+		[delegate updaterWillFinishProcess: self];
+	}
+}
 
 - (void)startUpdateCycle
 {
@@ -188,6 +194,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	{
 		[driver release]; driver = nil;
 		[self scheduleNextUpdateCheck];
+		[self notifyWillFinishUpdater];
     }
 }
 
@@ -528,6 +535,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 - (void)dealloc
 {
+	[self notifyWillFinishUpdater];
 	[self unregisterAsObserver];
 	[host release];
 	if (checkTimer) { [checkTimer invalidate]; [checkTimer release]; checkTimer = nil; }		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.

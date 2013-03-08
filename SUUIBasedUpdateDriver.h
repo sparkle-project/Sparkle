@@ -26,4 +26,10 @@
 
 @end
 
+@interface NSObject (SUUIBasedUpdateDriverDelegate)
+
+- (void)updateWindowDidBecomeActive;
+
+@end
+
 #endif
