@@ -60,6 +60,8 @@
 #else
 	NSNumber *fs = [[[NSFileManager defaultManager] attributesOfItemAtPath:archivePath error:nil] objectForKey:NSFileSize];
 #endif
+    char *oldDestinationString = getenv("DESTINATION");
+
 	if (fs == nil) goto reportError;
 	
 	// Thank you, Allan Odgaard!
@@ -67,7 +69,6 @@
 	fp = fopen([archivePath fileSystemRepresentation], "r");
 	if (!fp) goto reportError;
 	
-    char *oldDestinationString = getenv("DESTINATION");
 	setenv("DESTINATION", [[archivePath stringByDeletingLastPathComponent] fileSystemRepresentation], 1);
 	cmdFP = popen([command fileSystemRepresentation], "w");
 	size_t written;
