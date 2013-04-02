@@ -1,3 +1,4 @@
+# Xcode
 build/*
 *.pbxuser
 !default.pbxuser
@@ -11,5 +12,8 @@ build/*
 !default.xcworkspace
 xcuserdata
 profile
+*.moved-aside
+
+## Ignore incredibly annoying .DS_Store files
 .DS_Store
 External/*/build/*

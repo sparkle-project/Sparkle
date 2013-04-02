@@ -50,13 +50,13 @@
 "Cancel Update" = "Prekliči posodabljanje";
 
 /* No comment provided by engineer. */
-"Checking for updates..." = "Iskanje posodobitev ...";
+"Checking for updates..." = "Iskanje posodobitev …";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "Prenašanje posodobitve ...";
+"Downloading update..." = "Prenašanje posodobitve …";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "Razpakiranje posodobitve ...";
+"Extracting update..." = "Razpakiranje posodobitve …";
 
 /* the unit for gigabytes */
 "GB" = "GB";
@@ -65,7 +65,7 @@
 "Install and Relaunch" = "Namesti in ponovno zaženi";
 
 /* Take care not to overflow the status window. */
-"Installing update..." = "Nameščanje posodobitve ...";
+"Installing update..." = "Nameščanje posodobitve …";
 
 /* the unit for kilobytes */
 "KB" = "KB";
