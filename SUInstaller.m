@@ -159,6 +159,7 @@ static NSString*	sUpdateFolder = nil;
 #if FUZZY_BUNDLE_IDENTIFIER_MATCHING
 	if (![[[host bundlePath] lastPathComponent] isEqualToString:[newAppDownloadPath lastPathComponent]]) {
 		finalInstallationPath = [[installationPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[newAppDownloadPath lastPathComponent]];
+		[host setRenamedInstallationPath:finalInstallationPath];
 	}
 #endif
     
