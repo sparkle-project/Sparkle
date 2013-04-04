@@ -15,6 +15,7 @@
 @private
 	NSBundle *bundle;
 	NSString *defaultsDomain;
+	NSString *renamedInstallationPath;
 	BOOL usesStandardUserDefaults;
 }
 
@@ -42,4 +43,5 @@
 - (void)setBool:(BOOL)value forUserDefaultsKey:(NSString *)defaultName;
 - (id)objectForKey:(NSString *)key;
 - (BOOL)boolForKey:(NSString *)key;
+- (void)setRenamedInstallationPath:(NSString *)path;
 @end
