@@ -375,6 +375,14 @@ NSArray *SUGetAllDevMateURLHosts(void)
     
 	if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdate:)])
 		[[updater delegate] updater:updater willInstallUpdate:updateItem];
+    
+    if ([[updater delegate] respondsToSelector:@selector(updater:overrideInstallUpdate:downloadPath:)])
+    {
+		if ([[updater delegate] updater:updater overrideInstallUpdate:updateItem downloadPath:tempDir])
+        {
+            return;
+        }
+    }
 	
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
 	NSString *relaunchPathToCopy = [SPARKLE_BUNDLE pathForResource:@"finish_installation" ofType:@"app"];

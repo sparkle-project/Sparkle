@@ -110,6 +110,9 @@
 // Sent immediately before installing the specified update.
 - (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)update;
 
+// Override to handle update manually
+- (BOOL)updater:(SUUpdater *)updater overrideInstallUpdate:(SUAppcastItem *)update downloadPath:(NSString *)downloadPath;
+
 // Return YES to delay the relaunch until you do some processing; invoke the given NSInvocation to continue.
 //	This is not called if the user didn't relaunch on the previous update, in that case it will immediately
 //	restart.
