@@ -14,16 +14,17 @@
 										
 @interface TerminationListener : NSObject
 {
-	const char		*hostpath;
-	const char		*executablepath;
-	pid_t			parentprocessid;
-	const char		*folderpath;
-	NSString		*selfPath;
-    NSString        *installationPath;
-	NSTimer			*watchdogTimer;
-	NSTimer			*longInstallationTimer;
-	SUHost			*host;
-    BOOL            shouldRelaunch;
+	const char          *hostpath;
+	const char          *executablepath;
+	pid_t               parentprocessid;
+	const char          *folderpath;
+	NSString            *selfPath;
+    NSString            *installationPath;
+	NSTimer             *watchdogTimer;
+	NSTimer             *longInstallationTimer;
+	SUHost              *host;
+    BOOL                shouldRelaunch;
+    SUStatusController  *statusController ;
 }
 
 - (void) parentHasQuit;
@@ -78,6 +79,9 @@
 
 	[host release];
 	host = nil;
+
+    [statusController release];
+    statusController = nil;
 	
 	[super dealloc];
 }
@@ -137,6 +141,12 @@
 	exit(EXIT_SUCCESS);
 }
 
+- (void) setStatusController:(SUStatusController*)newController
+{
+    [statusController release];
+    [newController retain];
+    statusController = newController;
+}
 
 - (void) install
 {
@@ -146,13 +156,16 @@
 	
     // Perhaps a poor assumption but: if we're not relaunching, we assume we shouldn't be showing any UI either. Because non-relaunching installations are kicked off without any user interaction, we shouldn't be interrupting them.
     if (shouldRelaunch) {
-        SUStatusController*	statusCtl = [[SUStatusController alloc] initWithHost: host];	// We quit anyway after we've installed, so leak this for now.
+        SUStatusController*	statusCtl = [[SUStatusController alloc] initWithHost: host];
         [statusCtl setButtonTitle: SULocalizedString(@"Cancel Update",@"") target: nil action: Nil isDefault: NO];
         [statusCtl beginActionWithTitle: SULocalizedString(@"Installing update...",@"")
                         maxProgressValue: 0 statusText: @""];
         [statusCtl showWindow: self];
+        [self setStatusController:statusCtl] ;
+        [statusCtl release] ;
     }
 	
+    
 	[SUInstaller installFromUpdateFolder: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: folderpath length: strlen(folderpath)]
 					overHost: host
             installationPath: installationPath
