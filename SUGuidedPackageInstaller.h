@@ -15,7 +15,7 @@
 extern NSString* SUInstallerGuidedInstallerFilename; // default filename for guided installer property list
 
 @interface SUGuidedPackageInstaller : SUInstaller { }
-+ (void)performInstallationWithPath:(NSString *)path host:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator;
++ (void)performInstallationToPath:(NSString *)path fromPath:(NSString *)installerGuide host:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator;
 @end
 
 #endif

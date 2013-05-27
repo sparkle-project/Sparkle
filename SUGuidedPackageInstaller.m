@@ -55,20 +55,21 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 @implementation SUGuidedPackageInstaller
 
-+ (void)performInstallationWithPath:(NSString *)path host:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
++ (void)performInstallationToPath:(NSString *)path fromPath:(NSString *)installerGuide host:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
 {
 #pragma unused(comparator)
+#pragma unused(path)
 	
-	NSParameterAssert(path);
+	NSParameterAssert(installerGuide);
 	NSParameterAssert(host);
 	
 	// Fetch the contents of the guide
-	NSDictionary* guide = [NSDictionary dictionaryWithContentsOfFile:path];
+	NSDictionary* guide = [NSDictionary dictionaryWithContentsOfFile:installerGuide];
 	if (guide == nil)
 	{
-		NSString* errorMessage = [NSString stringWithFormat:@"Sparkle Updater: Installer guide contents are malformed '%@'.",path];
+		NSString* errorMessage = [NSString stringWithFormat:@"Sparkle Updater: Installer guide contents are malformed '%@'.",installerGuide];
 		NSError* error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
-		[self finishInstallationWithResult:NO host:host error:error delegate:delegate];
+		[self finishInstallationToPath:installerGuide withResult:NO host:host error:error delegate:delegate];
 		return;	
 	}
 	
@@ -77,13 +78,13 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	{
 		NSString* errorMessage = [NSString stringWithFormat:@"Sparkle Updater: Installer guide is missing '%@' entry.",SUGuidedPackageInstallerGuideKeyPackage];
 		NSError* error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
-		[self finishInstallationWithResult:NO host:host error:error delegate:delegate];
+		[self finishInstallationToPath:installerGuide withResult:NO host:host error:error delegate:delegate];
 		return;	
 	}
 	
 	// Package up installation details to allow for synchronous installation
 	NSDictionary* info = [NSDictionary dictionaryWithObjectsAndKeys:
-						  path,SUGuidedPackageInstallerKeyGuidePath,
+						  installerGuide,SUGuidedPackageInstallerKeyGuidePath,
 						  guide,SUGuidedPackageInstallerKeyGuide,
 						  host,SUGuidedPackageInstallerKeyHost,
 						  delegate,SUGuidedPackageInstallerKeyDelegate,
@@ -247,10 +248,11 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
 	NSParameterAssert(theInfo);
 	
-	[self finishInstallationWithResult:[[theInfo objectForKey:SUGuidedPackageInstallerKeyResult] boolValue]
-								  host:[theInfo objectForKey:SUGuidedPackageInstallerKeyHost]
-								 error:[theInfo objectForKey:SUGuidedPackageInstallerKeyError]
-							  delegate:[theInfo objectForKey:SUGuidedPackageInstallerKeyDelegate]];
+	[self finishInstallationToPath:[theInfo objectForKey:SUGuidedPackageInstallerKeyGuidePath]
+						withResult:[[theInfo objectForKey:SUGuidedPackageInstallerKeyResult] boolValue]
+							  host:[theInfo objectForKey:SUGuidedPackageInstallerKeyHost]
+							 error:[theInfo objectForKey:SUGuidedPackageInstallerKeyError]
+						  delegate:[theInfo objectForKey:SUGuidedPackageInstallerKeyDelegate]];
 }
 
 @end
