@@ -55,6 +55,8 @@
 - (void)abortUpdate;
 - (void)abortUpdateWithError:(NSError *)error;
 
+- (NSString*)humanReadableSizeFromDouble: (double)value;
+
 @end
 
 #endif
