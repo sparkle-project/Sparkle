@@ -59,6 +59,27 @@
 	}
 }
 
+
+- (void)download:(NSURLDownload *)download didReceiveResponse:(NSURLResponse *)response
+{
+	if ([[updater delegate] respondsToSelector:@selector(setMaxProgressValue:)])
+		[[updater delegate] setMaxProgressValue:[response expectedContentLength]];
+}
+
+- (void)download:(NSURLDownload *)download didReceiveDataOfLength:(NSUInteger)length
+{
+    if ([[updater delegate] respondsToSelector:@selector(progressValue)] && [[updater delegate] respondsToSelector:@selector(setProgressValue:)]) {
+        [[updater delegate] setProgressValue:[[updater delegate] progressValue] + (double)length];
+    }
+    if ([[updater delegate] respondsToSelector:@selector(maxProgressValue)] && [[updater delegate] respondsToSelector:@selector(setStatusText:)]) {
+        if ([[updater delegate] maxProgressValue] > 0.0) {
+            [[updater delegate] setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [self humanReadableSizeFromDouble:[[updater delegate] progressValue]], [self humanReadableSizeFromDouble:[[updater delegate] maxProgressValue]]]];
+        } else {
+            [[updater delegate] setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self humanReadableSizeFromDouble:[[updater delegate] progressValue]]]];
+        }
+    }
+}
+
 - (BOOL)shouldInstallSynchronously { return postponingInstallation; }
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch
