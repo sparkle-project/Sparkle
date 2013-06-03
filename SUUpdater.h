@@ -140,6 +140,13 @@
 
 @end
 
+@protocol SUProgressDelegateInformalProtocol
+-(double) maxProgressValue;
+-(void) setMaxProgressValue:(double)value;
+-(double) progressValue;
+-(void) setProgressValue:(double)value;
+-(void) setStatusText:(NSString *)text;
+@end
 
 // -----------------------------------------------------------------------------
 //	Constants:
