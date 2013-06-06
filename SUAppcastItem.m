@@ -232,7 +232,7 @@
 		// Find the appropriate release notes URL.
 		if ([dict objectForKey:@"sparkle:releaseNotesLink"])
 			[self setReleaseNotesURL:[NSURL URLWithString:[dict objectForKey:@"sparkle:releaseNotesLink"]]];
-		else if ([[self itemDescription] hasPrefix:@"http://"]) // if the description starts with http://, use that.
+		else if ([[self itemDescription] hasPrefix:@"http://"] || [[self itemDescription] hasPrefix:@"https://"]) // if the description starts with http:// or https:// use that.
 			[self setReleaseNotesURL:[NSURL URLWithString:[self itemDescription]]];
 		else
 			[self setReleaseNotesURL:nil];
