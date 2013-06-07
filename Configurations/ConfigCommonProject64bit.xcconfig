@@ -1,0 +1,4 @@
+// Common
+
+ARCHS = x86_64
+VALID_ARCHS = x86_64
