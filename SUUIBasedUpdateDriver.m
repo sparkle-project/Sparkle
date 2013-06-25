@@ -143,7 +143,7 @@
 	[statusController beginActionWithTitle:SULocalizedString(@"Ready to Install", nil) maxProgressValue:1.0 statusText:nil];
 	[statusController setProgressValue:1.0]; // Fill the bar.
 	[statusController setButtonEnabled:YES];
-	[statusController setButtonTitle:SULocalizedString(@"Install and Relaunch", nil) target:self action:@selector(installAndRestart:) isDefault:YES];
+	[statusController setButtonTitle:SULocalizedString(@"Install", nil) target:self action:@selector(installAndRestart:) isDefault:YES];
 	[[statusController window] makeKeyAndOrderFront: self];
 	[NSApp requestUserAttention:NSInformationalRequest];	
 }
@@ -163,7 +163,7 @@
 
 - (void)installAndRestart: (id)sender
 {
-    [self installWithToolAndRelaunch:YES];
+    [self installWithToolAndRelaunch:NO];
 }
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch
