@@ -49,7 +49,6 @@
 - (void)installWithToolAndRelaunch:(BOOL)relaunch;
 - (void)installerForHost:(SUHost *)host failedWithError:(NSError *)error;
 
-- (void)installWithToolAndRelaunch:(BOOL)relaunch;
 - (void)cleanUpDownload;
 
 - (void)abortUpdate;

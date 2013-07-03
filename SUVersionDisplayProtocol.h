@@ -6,8 +6,10 @@
 //  Copyright 2009 Elgato Systems GmbH. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#ifndef SUVERSIONDISPLAYPROTOCOL_H
+#define SUVERSIONDISPLAYPROTOCOL_H
 
+#import <Cocoa/Cocoa.h>
 
 /*!
     @protocol
@@ -25,3 +27,5 @@
 -(void)	formatVersion: (NSString**)inOutVersionA andVersion: (NSString**)inOutVersionB; 
 
 @end
+
+#endif

@@ -73,6 +73,8 @@
 
 - (BOOL)updateInProgress;
 
+-(void)	checkForUpdatesInBgReachabilityCheckWithDriver: (SUUpdateDriver*)inDriver;
+
 @end
 
 
