@@ -239,7 +239,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 		
 		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 		SCNetworkConnectionFlags flags = 0;
-		BOOL isNetworkReachable = YES;
+		BOOL isNetworkReachable = NO;
 		
 		// Don't perform automatic checks on unconnected laptops or dial-up connections that aren't online:
 		NSMutableDictionary*		theDict = [NSMutableDictionary dictionary];
@@ -250,20 +250,21 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
         Boolean reachabilityResult = NO;
         // If the feed's using a file:// URL, we won't be able to use reachability.
         if (reachability != NULL) {
+            reachabilityResult = YES;
             SCNetworkReachabilityGetFlags(reachability, &flags);
             CFRelease(reachability);
         }
 		
 		if( reachabilityResult )
 		{
+      BOOL needsConnection = ((flags & kSCNetworkFlagsConnectionRequired) != 0);
 			BOOL reachable =	(flags & kSCNetworkFlagsReachable)				== kSCNetworkFlagsReachable;
-			BOOL automatic =	(flags & kSCNetworkFlagsConnectionAutomatic)	== kSCNetworkFlagsConnectionAutomatic;
 			BOOL local =		(flags & kSCNetworkFlagsIsLocalAddress)			== kSCNetworkFlagsIsLocalAddress;
 			
-			//NSLog(@"reachable = %s, automatic = %s, local = %s", (reachable?"YES":"NO"), (automatic?"YES":"NO"), (local?"YES":"NO"));
+			NSLog(@"reachable = %s, needsConnection = %s, local = %s", (reachable?"YES":"NO"), (needsConnection?"YES":"NO"), (local?"YES":"NO"));
 			
-			if( !(reachable || automatic || local) )
-				isNetworkReachable = NO;
+			if (local || (reachable && !needsConnection))
+				isNetworkReachable = YES;
 		}
 		
         // If the network's not reachable, we pass a nil driver into checkForUpdatesWithDriver, which will then reschedule the next update so we try again later.    
