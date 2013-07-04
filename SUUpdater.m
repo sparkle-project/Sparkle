@@ -261,7 +261,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 			BOOL reachable =	(flags & kSCNetworkFlagsReachable)				== kSCNetworkFlagsReachable;
 			BOOL local =		(flags & kSCNetworkFlagsIsLocalAddress)			== kSCNetworkFlagsIsLocalAddress;
 			
-			NSLog(@"reachable = %s, needsConnection = %s, local = %s", (reachable?"YES":"NO"), (needsConnection?"YES":"NO"), (local?"YES":"NO"));
+			// NSLog(@"reachable = %s, needsConnection = %s, local = %s", (reachable?"YES":"NO"), (needsConnection?"YES":"NO"), (local?"YES":"NO"));
 			
 			if (local || (reachable && !needsConnection))
 				isNetworkReachable = YES;
