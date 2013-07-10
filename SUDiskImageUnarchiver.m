@@ -12,6 +12,12 @@
 #import "SULog.h"
 #import <CoreServices/CoreServices.h>
 
+@interface SUDiskImageUnarchiver()
+- (BOOL)isEncrypted:(NSData*)resultData;
+- (void)extractDMGWithPassword:(NSString *)password;
+- (void)requestPasswordFromDelegate;
+- (void)continueWithPassword:(NSString *)password;
+@end
 @implementation SUDiskImageUnarchiver
 
 + (BOOL)canUnarchivePath:(NSString *)path

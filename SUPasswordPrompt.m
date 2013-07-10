@@ -8,6 +8,11 @@
 
 #import "SUPasswordPrompt.h"
 
+@interface SUPasswordPrompt()
+- (void)setName:(NSString*)name;
+- (void)setIcon:(NSImage*)icon;
+- (NSImage*)icon;
+@end
 
 @implementation SUPasswordPrompt
 
