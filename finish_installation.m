@@ -19,6 +19,7 @@
 	pid_t			parentprocessid;
 	const char		*folderpath;
 	NSString		*selfPath;
+    NSString        *installationPath;
 	NSTimer			*watchdogTimer;
 	NSTimer			*longInstallationTimer;
 	SUHost			*host;
@@ -69,6 +70,8 @@
 
 	[selfPath release];
 	selfPath = nil;
+    
+    [installationPath release];
 
 	[watchdogTimer release];
 	watchdogTimer = nil;
@@ -115,8 +118,7 @@
         if( !folderpath || strcmp(executablepath, hostpath) != 0 )
             appPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:executablepath length:strlen(executablepath)];
         else
-            appPath = [host installationPath];
-		
+            appPath = installationPath;
         [[NSWorkspace sharedWorkspace] openFile: appPath];
     }
 
@@ -140,6 +142,7 @@
 {
 	NSBundle			*theBundle = [NSBundle bundleWithPath: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: hostpath length:strlen(hostpath)]];
 	host = [[SUHost alloc] initWithBundle: theBundle];
+    installationPath = [[host installationPath] copy];
 	
     // Perhaps a poor assumption but: if we're not relaunching, we assume we shouldn't be showing any UI either. Because non-relaunching installations are kicked off without any user interaction, we shouldn't be interrupting them.
     if (shouldRelaunch) {
@@ -152,6 +155,7 @@
 	
 	[SUInstaller installFromUpdateFolder: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: folderpath length: strlen(folderpath)]
 					overHost: host
+            installationPath: installationPath
 					delegate: self synchronously: NO
 					versionComparator: [SUStandardVersionComparator defaultComparator]];
 }

@@ -51,6 +51,7 @@
 
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	FILE *fp = NULL, *cmdFP = NULL;
+    char *oldDestinationString = NULL;
 	
 	SULog(@"Extracting %@ using '%@'",archivePath,command);
     
@@ -67,6 +68,7 @@
 	fp = fopen([archivePath fileSystemRepresentation], "r");
 	if (!fp) goto reportError;
 	
+    oldDestinationString = getenv("DESTINATION");
 	setenv("DESTINATION", [[archivePath stringByDeletingLastPathComponent] fileSystemRepresentation], 1);
 	cmdFP = popen([command fileSystemRepresentation], "w");
 	size_t written;
@@ -99,6 +101,10 @@ reportError:
 finally:
 	if (fp)
 		fclose(fp);
+    if (oldDestinationString)
+        setenv("DESTINATION", oldDestinationString, 1);
+    else
+        unsetenv("DESTINATION");
 	[pool release];
 }
 

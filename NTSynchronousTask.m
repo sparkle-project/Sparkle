@@ -128,6 +128,7 @@
 		
 		[[self task] setStandardInput:[self inputPipe]];
 		[[self task] setStandardOutput:[self outputPipe]];
+		[[self task] setStandardError:[self outputPipe]];
 	}
 	
     return self;

@@ -106,6 +106,14 @@
 	minimumSystemVersion = [systemVersionString copy];
 }
 
+- (NSString *)maximumSystemVersion { return [[maximumSystemVersion retain] autorelease]; }
+- (void)setMaximumSystemVersion:(NSString *)systemVersionString
+{
+	if (maximumSystemVersion == systemVersionString) return;
+	[maximumSystemVersion release];
+	maximumSystemVersion = [systemVersionString copy];
+}
+
 
 - (NSURL *)infoURL	{ return [[infoURL retain] autorelease]; }	// UK 2007-08-31 (whole method)
 
@@ -210,8 +218,12 @@
 		
 		[self setVersionString: newVersion];
 		[self setMinimumSystemVersion: [dict objectForKey:@"sparkle:minimumSystemVersion"]];
+        [self setMaximumSystemVersion: [dict objectForKey:@"sparkle:maximumSystemVersion"]];
 		
 		NSString *shortVersionString = [enclosure objectForKey:@"sparkle:shortVersionString"];
+        if (nil == shortVersionString)
+            shortVersionString = [dict objectForKey:@"sparkle:shortVersionString"]; // fall back on the <item>
+        
 		if (shortVersionString)
 			[self setDisplayVersionString: shortVersionString];
 		else
@@ -220,7 +232,7 @@
 		// Find the appropriate release notes URL.
 		if ([dict objectForKey:@"sparkle:releaseNotesLink"])
 			[self setReleaseNotesURL:[NSURL URLWithString:[dict objectForKey:@"sparkle:releaseNotesLink"]]];
-		else if ([[self itemDescription] hasPrefix:@"http://"]) // if the description starts with http://, use that.
+		else if ([[self itemDescription] hasPrefix:@"http://"] || [[self itemDescription] hasPrefix:@"https://"]) // if the description starts with http:// or https:// use that.
 			[self setReleaseNotesURL:[NSURL URLWithString:[self itemDescription]]];
 		else
 			[self setReleaseNotesURL:nil];
