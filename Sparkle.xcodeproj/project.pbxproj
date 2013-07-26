@@ -418,6 +418,8 @@
 		FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigUnitTestRelease.xcconfig; sourceTree = "<group>"; };
 		FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigUnitTestDebug.xcconfig; sourceTree = "<group>"; };
 		FA3AAF3B1050B273004B3130 /* ConfigUnitTest.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigUnitTest.xcconfig; sourceTree = "<group>"; };
+		FE5536F517A2C6A7007CB333 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		FE5536F617A2C6AB007CB333 /* sk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sk; path = sk.lproj/Sparkle.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1327,6 +1329,8 @@
 				0263187214FEBB31005EBF43 /* uk */,
 				61F3AC1215C22D4A00260CA2 /* th */,
 				6149E6EA1601ABAC008A351E /* ar */,
+				FE5536F517A2C6A7007CB333 /* ko */,
+				FE5536F617A2C6AB007CB333 /* sk */,
 			);
 			name = Sparkle.strings;
 			sourceTree = "<group>";
