@@ -198,17 +198,12 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		// quarantine to avoid a delay at launch, and to avoid
 		// presenting the user with a confusing trust dialog.
 		//
-		// This needs to be done after the application is moved to its
-		// new home with "mv" in case it's moved across filesystems: if
-		// that happens, "mv" actually performs a copy and may result
-		// in the application being quarantined.  It also needs to be
-		// done before "chown" changes ownership, because the ownership
-		// change will almost certainly make it impossible to change
-		// attributes to release the files from the quarantine.
+		// This needs to be done before "chown" changes ownership,
+		// because the ownership change will fail if the file is quarantined.
 		if (res)
 		{
 			SULog(@"releaseFromQuarantine");
-			[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:dst waitUntilDone:YES];
+			[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:src waitUntilDone:YES];
 		}
 		
 		if( res )	// Set permissions while it's still in source, so we have it with working and correct perms when it arrives at destination.
@@ -252,6 +247,21 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		
 		AuthorizationFree(auth, 0);
 		
+		// If the currently-running application is trusted, the new
+		// version should be trusted as well.  Remove it from the
+		// quarantine to avoid a delay at launch, and to avoid
+		// presenting the user with a confusing trust dialog.
+		//
+		// This needs to be done after the application is moved to its
+		// new home with "mv" in case it's moved across filesystems: if
+		// that happens, "mv" actually performs a copy and may result
+		// in the application being quarantined.
+        if (res)
+		{
+			SULog(@"releaseFromQuarantine after installing");
+			[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:dst waitUntilDone:YES];
+		}
+
 		if (!res)
 		{
 			// Something went wrong somewhere along the way, but we're not sure exactly where.
@@ -455,7 +465,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	{
 		err = FSPathMakeRef((UInt8 *)[[tmpPath stringByDeletingLastPathComponent] fileSystemRepresentation], &tmpDirRef, NULL);
 		if (err != noErr)
-			err = FSPathMakeRef((UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &tmpDirRef, NULL);
+			FSPathMakeRef((UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &tmpDirRef, NULL);
 	}
 	
 	err = FSPathMakeRef((UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &dstDirRef, NULL);
@@ -495,7 +505,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 			{
 				// We better move the old version back to its old location
 				if( hadFileAtDest )
-					success = [manager moveItemAtPath:tmpPath toPath:dst error:error];
+					[manager moveItemAtPath:tmpPath toPath:dst error:error];
 				if (error != NULL)
 					*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
 				return NO;
@@ -524,7 +534,10 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	// new home in case it's moved across filesystems: if that
 	// happens, the move is actually a copy, and it may result
 	// in the application being quarantined.
-	[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:dst waitUntilDone:YES];
+	if ([NSThread isMultiThreaded])
+		[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:dst waitUntilDone:YES];
+	else
+		[self releaseFromQuarantine:dst];
 	
 	return YES;
 }
