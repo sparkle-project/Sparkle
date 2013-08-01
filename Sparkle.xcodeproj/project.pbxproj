@@ -158,6 +158,7 @@
 		93FB277A156BD80D001937C7 /* SUPasswordPrompt.h in Headers */ = {isa = PBXBuildFile; fileRef = 93FB2778156BD80D001937C7 /* SUPasswordPrompt.h */; };
 		93FB277B156BD80D001937C7 /* SUPasswordPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FB2779156BD80D001937C7 /* SUPasswordPrompt.m */; };
 		93FB277F156BD826001937C7 /* SUPasswordPrompt.xib in Resources */ = {isa = PBXBuildFile; fileRef = 93FB277D156BD826001937C7 /* SUPasswordPrompt.xib */; };
+		BEA931AD17AA3EF7007D20A6 /* SUDSDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = BEA931AC17AA3EF7007D20A6 /* SUDSDownloader.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -469,6 +470,9 @@
 		93FB2778156BD80D001937C7 /* SUPasswordPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUPasswordPrompt.h; sourceTree = "<group>"; };
 		93FB2779156BD80D001937C7 /* SUPasswordPrompt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUPasswordPrompt.m; sourceTree = "<group>"; };
 		93FB277E156BD826001937C7 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/SUPasswordPrompt.xib; sourceTree = "<group>"; };
+		BE9928D117A6AF1200B4523B /* SUDownloadServiceConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUDownloadServiceConstants.h; sourceTree = "<group>"; };
+		BEA931AB17AA3EF7007D20A6 /* SUDSDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUDSDownloader.h; sourceTree = "<group>"; };
+		BEA931AC17AA3EF7007D20A6 /* SUDSDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUDSDownloader.m; sourceTree = "<group>"; };
 		FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigTestAppDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigCommonRelease.xcconfig; sourceTree = "<group>"; };
@@ -583,9 +587,12 @@
 		03B5E63C15D399500038BB67 /* Downloading XPC Service */ = {
 			isa = PBXGroup;
 			children = (
-				03B5E64315D399500038BB67 /* download_service.m */,
 				03B5E64915D39CD90038BB67 /* SUXPCURLDownload.h */,
 				03B5E64A15D39CD90038BB67 /* SUXPCURLDownload.m */,
+				03B5E64315D399500038BB67 /* download_service.m */,
+				BEA931AB17AA3EF7007D20A6 /* SUDSDownloader.h */,
+				BEA931AC17AA3EF7007D20A6 /* SUDSDownloader.m */,
+				BE9928D117A6AF1200B4523B /* SUDownloadServiceConstants.h */,
 				03B5E63D15D399500038BB67 /* Supporting Files */,
 			);
 			path = "Downloading XPC Service";
@@ -1310,6 +1317,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				03B5E64415D399500038BB67 /* download_service.m in Sources */,
+				BEA931AD17AA3EF7007D20A6 /* SUDSDownloader.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
