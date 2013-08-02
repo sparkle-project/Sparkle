@@ -124,6 +124,17 @@ static void fetch_process_request(xpc_object_t request, xpc_object_t reply)
             xpc_release(message);
         };
         
+        callBacks.downloadShouldDecodeSourceData = ^BOOL(SUDSDownloader *downloader, NSString *MIMEType) {
+            xpc_object_t message = xpc_dictionary_create(NULL, NULL, 0);
+            xpc_dictionary_set_string(message, SUDownloadServiceMIMETypeToDecodeKey, [MIMEType cStringUsingEncoding:NSUTF8StringEncoding]);
+            xpc_object_t answer = xpc_connection_send_message_with_reply_sync(connection, message);
+            xpc_release(message);
+            
+            if (xpc_get_type(answer) == XPC_TYPE_DICTIONARY)
+                return (BOOL)xpc_dictionary_get_bool(answer, SUDownloadServiceShouldDecodeMIMETypeKey);
+            return NO;
+        };
+        
         [downloader setCallBacks:callBacks];
         
         [downloader startDownload];

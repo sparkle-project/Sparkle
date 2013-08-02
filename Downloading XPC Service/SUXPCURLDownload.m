@@ -346,6 +346,25 @@ static NSString * const kSUFetchFolderName = @"fetch.XXXXXXXX";
                             _downloadError = [error retain];
                         }
                     }
+                    else if (0 == strcmp(key, SUDownloadServiceMIMETypeToDecodeKey))
+                    {
+                        xpc_object_t answer = xpc_dictionary_create_reply(nevent);
+                        
+                        void (^block)(void) = ^{
+                            BOOL shouldDecode = NO;
+                            if ([_delegate respondsToSelector:@selector(download:shouldDecodeSourceDataOfMIMEType:)])
+                            {
+                                NSString *MIMEType = [NSString stringWithCString:xpc_dictionary_get_string(nevent, SUDownloadServiceMIMETypeToDecodeKey)
+                                                                        encoding:NSUTF8StringEncoding];
+                                shouldDecode = [_delegate download:(NSURLDownload *)self shouldDecodeSourceDataOfMIMEType:MIMEType];
+                            }
+                            xpc_dictionary_set_bool(answer, SUDownloadServiceShouldDecodeMIMETypeKey, YES);
+                        };
+                        [self performBlock:block onThread:_startedThread synchronous:YES];
+                        
+                        xpc_connection_send_message(peer, answer);
+                        xpc_release(answer);
+                    }
                     
                     [localPool release];
                     

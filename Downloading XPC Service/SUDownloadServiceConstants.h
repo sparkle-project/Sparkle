@@ -19,6 +19,8 @@ const char * SUDownloadServiceCreatedDestinationPathKey = "created_destination_p
 const char * SUDownloadServiceDidBeginDownloadingKey = "did_begin_downloading"; // bool 1
 const char * SUDownloadServiceDidFinishDownloadingKey = "did_finish_downloading"; // bool 1
 const char * SUDownloadServiceReceivedFailErrorKey = "received_fail_error"; // data of archived NSError
+const char * SUDownloadServiceMIMETypeToDecodeKey = "MIME_type_to_decode"; // c-string
+const char * SUDownloadServiceShouldDecodeMIMETypeKey = "should_decode_MIME_type"; // bool
 
 const char * SUDownloadServiceErrorCodeKey = "errcode"; // int64_t
 const char * SUDownloadServiceErrorMessageKey = "errmsg"; // c-string

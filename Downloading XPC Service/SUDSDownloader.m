@@ -24,6 +24,8 @@ SUDSDownloaderCallBacks SUDSCopyDownloaderCallBacks(SUDSDownloaderCallBacks call
         callBacksCopy.downloadDidCreateDestination = Block_copy(callBacks.downloadDidCreateDestination);
     if (callBacks.downloadDidReceiveResponse)
         callBacksCopy.downloadDidReceiveResponse = Block_copy(callBacks.downloadDidReceiveResponse);
+    if (callBacks.downloadShouldDecodeSourceData)
+        callBacksCopy.downloadShouldDecodeSourceData = Block_copy(callBacks.downloadShouldDecodeSourceData);
     
     return callBacksCopy;
 }
@@ -42,6 +44,8 @@ void SUDSReleaseDownloaderCallBacks(SUDSDownloaderCallBacks callBacks)
         Block_release(callBacks.downloadDidCreateDestination);
     if (callBacks.downloadDidReceiveResponse)
         Block_release(callBacks.downloadDidReceiveResponse);
+    if (callBacks.downloadShouldDecodeSourceData)
+        Block_release(callBacks.downloadShouldDecodeSourceData);
 }
 
 @implementation SUDSDownloader
@@ -188,6 +192,19 @@ void SUDSReleaseDownloaderCallBacks(SUDSDownloaderCallBacks callBacks)
         _callBacks.downloadDidFinish(self);
     
     [self stopDownload];
+}
+
+- (BOOL)download:(NSURLDownload *)download shouldDecodeSourceDataOfMIMEType:(NSString *)encodingType
+{
+    BOOL shouldDecode = NO;
+    
+#if DEBUG_LOGGING_ENABLED
+    NSLog(@"XPC Downloader wants decode source data of MIME type: %@", encodingType);
+#endif
+    if (_callBacks.downloadShouldDecodeSourceData)
+        shouldDecode = _callBacks.downloadShouldDecodeSourceData(self, encodingType);
+    
+    return shouldDecode;
 }
 
 @end

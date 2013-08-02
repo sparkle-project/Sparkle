@@ -18,6 +18,7 @@ typedef void (^SUDSDownloadDidFail)(SUDSDownloader *downloader, NSError *error);
 typedef void (^SUDSDownloadDidReceiveResponse)(SUDSDownloader *downloader, NSURLResponse *response);
 typedef void (^SUDSDownloadDidReceiveData)(SUDSDownloader *downloader, NSUInteger dataLength);
 typedef void (^SUDSDownloadDidCreateDestination)(SUDSDownloader *downloader, NSString *destinationPath);
+typedef BOOL (^SUDSDownloadShouldDecodeSourceData)(SUDSDownloader *downloader, NSString *MIMEType);
 
 typedef struct SUDSDownloaderCallBacks
 {
@@ -28,6 +29,8 @@ typedef struct SUDSDownloaderCallBacks
     SUDSDownloadDidReceiveResponse      downloadDidReceiveResponse;
     SUDSDownloadDidReceiveData          downloadDidReceiveData;
     SUDSDownloadDidCreateDestination    downloadDidCreateDestination;
+    
+    SUDSDownloadShouldDecodeSourceData  downloadShouldDecodeSourceData;
 } SUDSDownloaderCallBacks;
 
 FOUNDATION_EXTERN SUDSDownloaderCallBacks SUDSCopyDownloaderCallBacks(SUDSDownloaderCallBacks callBacks);
