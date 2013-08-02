@@ -20,7 +20,7 @@
 #import "SUBinaryDeltaCommon.h"
 #import "SUCodeSigningVerifier.h"
 #import "SUUpdater_Private.h"
-#import "SUXPC.h"
+#import "SUXPCInstaller.h"
 #import "SUXPCURLDownload.h"
 
 @interface SUBasicUpdateDriver () <NSURLDownloadDelegate>; @end
@@ -347,7 +347,7 @@
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
 	if( [SUUpdater shouldUseXPC] )
     {
-        [SUXPC copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil completionHandler:^(NSError *xpcError) {
+        [SUXPCInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil completionHandler:^(NSError *xpcError) {
             if (xpcError != nil)
                 NSLog(@"Error during asynchronous XPC call to copyPath: %@", xpcError);
             [self finishRelaunchAfterSuccessfulCopying:(xpcError == nil) fromPath:relaunchPathToCopy toPath:targetPath relaunch:relaunch];
@@ -387,7 +387,7 @@
     NSString *relaunchToolPath = [relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS/finish_installation"];
 	NSArray *arguments = [NSArray arrayWithObjects:[host bundlePath], pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], tempDir, relaunch ? @"1" : @"0", nil];
 	if( [SUUpdater shouldUseXPC] )
-		[SUXPC launchTaskWithLaunchPath: relaunchToolPath arguments:arguments completionHandler:^{
+		[SUXPCInstaller launchTaskWithLaunchPath: relaunchToolPath arguments:arguments completionHandler:^{
             [NSApp terminate:self];
         }];
 	else

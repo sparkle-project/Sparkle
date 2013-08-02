@@ -142,8 +142,8 @@
 		61F83F740DBFE141006FDD30 /* SUBasicUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
 		61FA52880E2D9EA400EF58AD /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		8B887B611517F3AC000BB292 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B887B601517F3AC000BB292 /* Foundation.framework */; };
-		8B887B7E1517F888000BB292 /* SUXPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B887B7C1517F888000BB292 /* SUXPC.h */; };
-		8B887B7F1517F888000BB292 /* SUXPC.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B887B7D1517F888000BB292 /* SUXPC.m */; };
+		8B887B7E1517F888000BB292 /* SUXPCInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B887B7C1517F888000BB292 /* SUXPCInstaller.h */; };
+		8B887B7F1517F888000BB292 /* SUXPCInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B887B7D1517F888000BB292 /* SUXPCInstaller.m */; };
 		8B887B811517FAA3000BB292 /* SUPlainInstallerInternals.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5F8E509C4CE3C00B25A18 /* SUPlainInstallerInternals.m */; };
 		8B887B821517FAA4000BB292 /* SUPlainInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5040DAE8AB80026945C /* SUPlainInstaller.m */; };
 		8B887B831517FAE9000BB292 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 55C14F31136EFC2400649790 /* SystemConfiguration.framework */; };
@@ -461,15 +461,16 @@
 		8B887B701517F447000BB292 /* ConfigService.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigService.xcconfig; sourceTree = "<group>"; };
 		8B887B711517F447000BB292 /* ConfigServiceDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigServiceDebug.xcconfig; sourceTree = "<group>"; };
 		8B887B721517F447000BB292 /* ConfigServiceRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigServiceRelease.xcconfig; sourceTree = "<group>"; };
-		8B887B7C1517F888000BB292 /* SUXPC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUXPC.h; sourceTree = SOURCE_ROOT; };
-		8B887B7D1517F888000BB292 /* SUXPC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUXPC.m; sourceTree = SOURCE_ROOT; };
-		8B887B8D15180767000BB292 /* install_service.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = install_service.m; sourceTree = SOURCE_ROOT; };
-		8B887B8F15180773000BB292 /* SandboxService.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SandboxService.plist; sourceTree = SOURCE_ROOT; };
+		8B887B7C1517F888000BB292 /* SUXPCInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUXPCInstaller.h; sourceTree = "<group>"; };
+		8B887B7D1517F888000BB292 /* SUXPCInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUXPCInstaller.m; sourceTree = "<group>"; };
+		8B887B8D15180767000BB292 /* install_service.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = install_service.m; sourceTree = "<group>"; };
+		8B887B8F15180773000BB292 /* SandboxService.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SandboxService.plist; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* Sparkle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Sparkle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		93FB2778156BD80D001937C7 /* SUPasswordPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUPasswordPrompt.h; sourceTree = "<group>"; };
 		93FB2779156BD80D001937C7 /* SUPasswordPrompt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUPasswordPrompt.m; sourceTree = "<group>"; };
 		93FB277E156BD826001937C7 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/SUPasswordPrompt.xib; sourceTree = "<group>"; };
+		BE18CC4F17ABAF5B004493DC /* SUInstallServiceConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUInstallServiceConstants.h; sourceTree = "<group>"; };
 		BE9928D117A6AF1200B4523B /* SUDownloadServiceConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUDownloadServiceConstants.h; sourceTree = "<group>"; };
 		BEA931AB17AA3EF7007D20A6 /* SUDSDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUDSDownloader.h; sourceTree = "<group>"; };
 		BEA931AC17AA3EF7007D20A6 /* SUDSDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUDSDownloader.m; sourceTree = "<group>"; };
@@ -861,15 +862,15 @@
 				8B887B801517F8B4000BB292 /* Service */,
 				8B887B631517F3AC000BB292 /* Interface */,
 			);
-			name = "Installation XPC Service";
-			path = Update;
+			path = "Installation XPC Service";
 			sourceTree = "<group>";
 		};
 		8B887B631517F3AC000BB292 /* Interface */ = {
 			isa = PBXGroup;
 			children = (
-				8B887B7C1517F888000BB292 /* SUXPC.h */,
-				8B887B7D1517F888000BB292 /* SUXPC.m */,
+				BE18CC4F17ABAF5B004493DC /* SUInstallServiceConstants.h */,
+				8B887B7C1517F888000BB292 /* SUXPCInstaller.h */,
+				8B887B7D1517F888000BB292 /* SUXPCInstaller.m */,
 			);
 			name = Interface;
 			sourceTree = "<group>";
@@ -962,7 +963,7 @@
 				55C14F06136EF6DB00649790 /* SULog.h in Headers */,
 				55C14F0F136EF73600649790 /* finish_installation.pch in Headers */,
 				6158A1C5137904B300487EC1 /* SUUpdater_Private.h in Headers */,
-				8B887B7E1517F888000BB292 /* SUXPC.h in Headers */,
+				8B887B7E1517F888000BB292 /* SUXPCInstaller.h in Headers */,
 				03B5E64B15D39CD90038BB67 /* SUXPCURLDownload.h in Headers */,
 				93FB277A156BD80D001937C7 /* SUPasswordPrompt.h in Headers */,
 				61B078CE15A5FB6100600039 /* SUCodeSigningVerifier.h in Headers */,
@@ -1417,7 +1418,7 @@
 				5D06E8ED0FD68CE4005AE3F6 /* SUBinaryDeltaCommon.m in Sources */,
 				5D06E93A0FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m in Sources */,
 				55C14F07136EF6DB00649790 /* SULog.m in Sources */,
-				8B887B7F1517F888000BB292 /* SUXPC.m in Sources */,
+				8B887B7F1517F888000BB292 /* SUXPCInstaller.m in Sources */,
 				03B5E65B15D3E0490038BB67 /* SUXPCURLDownload.m in Sources */,
 				93FB277B156BD80D001937C7 /* SUPasswordPrompt.m in Sources */,
 				61B078CF15A5FB6100600039 /* SUCodeSigningVerifier.m in Sources */,
@@ -1905,7 +1906,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8B887B711517F447000BB292 /* ConfigServiceDebug.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = SandboxService.plist;
+				INFOPLIST_FILE = "Installation XPC Service/SandboxService.plist";
 			};
 			name = Debug;
 		};
@@ -1913,7 +1914,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8B887B721517F447000BB292 /* ConfigServiceRelease.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = SandboxService.plist;
+				INFOPLIST_FILE = "Installation XPC Service/SandboxService.plist";
 			};
 			name = Release;
 		};
@@ -1921,7 +1922,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8B887B721517F447000BB292 /* ConfigServiceRelease.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = SandboxService.plist;
+				INFOPLIST_FILE = "Installation XPC Service/SandboxService.plist";
 			};
 			name = "Release (GC dual-mode; 10.5+)";
 		};
@@ -1993,7 +1994,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8B887B721517F447000BB292 /* ConfigServiceRelease.xcconfig */;
 			buildSettings = {
-				INFOPLIST_FILE = SandboxService.plist;
+				INFOPLIST_FILE = "Installation XPC Service/SandboxService.plist";
 			};
 			name = Deployment;
 		};

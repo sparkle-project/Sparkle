@@ -1,5 +1,5 @@
 //
-//  SUXPC.h
+//  SUXPCInstaller.h
 //  Sparkle
 //
 //  Created by Whitney Young on 3/19/12.
@@ -8,9 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
-@interface SUXPC : NSObject
+@interface SUXPCInstaller : NSObject
 
 + (void)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp completionHandler:(void (^)(NSError *error))completionHandler;
-+ (void)launchTaskWithLaunchPath:(NSString *)path arguments:(NSArray *)arguments completionHandler: (void (^)(void))completionHandler ;
++ (void)launchTaskWithLaunchPath:(NSString *)path arguments:(NSArray *)arguments completionHandler:(void (^)(void))completionHandler ;
 
 @end
