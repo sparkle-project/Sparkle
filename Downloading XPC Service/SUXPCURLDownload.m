@@ -92,7 +92,7 @@ static NSString * const kSUFetchFolderName = @"fetch.XXXXXXXX";
         {
             if ([_delegate respondsToSelector:@selector(download:didFailWithError:)])
             {
-#if DEBUG
+#ifdef DEBUG
                 const char *errMessage = xpc_dictionary_get_string(object, SUDownloadServiceErrorMessageKey);
                 if (errMessage != NULL)
                 {

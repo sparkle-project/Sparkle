@@ -90,7 +90,7 @@ static void peer_event_handler(xpc_connection_t peer, xpc_object_t event)
                 
             default:
             {
-#if DEBUG
+#ifdef DEBUG
                 NSLog(@"!!! Unknown XPC service task.");
 #endif
                 xpc_object_t reply = xpc_dictionary_create_reply(event);
