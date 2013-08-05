@@ -14,6 +14,7 @@
 @interface SUCodeSigningVerifier : NSObject
 + (BOOL)codeSignatureIsValidAtPath:(NSString *)destinationPath error:(NSError **)error;
 + (BOOL)hostApplicationIsCodeSigned;
++ (BOOL)hostApplicationIsSandboxed;
 @end
 
 #endif
