@@ -76,6 +76,12 @@ static NSString * const kSUFetchFolderName = @"fetch.XXXXXXXX";
     NSURL *tempFolder = [NSURL fileURLWithPath:NSTemporaryDirectory()];
     NSString *tempFileTemplate = [[tempFolder URLByAppendingPathComponent:kSUFetchFolderName] path];
     NSString *tempFilePath = [tempFileTemplate stringByAppendingPathComponent:[_destination lastPathComponent]];
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:tempFilePath])
+    {
+        [[NSFileManager defaultManager] removeItemAtPath:tempFilePath error:nil];
+        [[NSFileManager defaultManager] createDirectoryAtPath:tempFilePath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
     _connectionDestination = [tempFilePath copy];
     
     NSData *requestData = [NSKeyedArchiver archivedDataWithRootObject:urlRequest];
