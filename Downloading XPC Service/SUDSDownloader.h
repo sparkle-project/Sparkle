@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#define DEBUG_LOGGING_ENABLED defined(DEBUG) && 0
+#define DEBUG_LOGGING_ENABLED defined(DEBUG) && 1
 
 @class SUDSDownloader;
 
