@@ -78,8 +78,9 @@ static void fetch_process_request(xpc_object_t request, xpc_object_t reply)
         callBacks.downloadDidReceiveData = ^(SUDSDownloader *downloader, NSUInteger dataLength) {
             xpc_object_t message = xpc_dictionary_create(NULL, NULL, 0);
             xpc_dictionary_set_int64(message, SUDownloadServiceReceivedDataLengthKey, (int64_t)dataLength);
-            xpc_connection_send_message(connection, message);
+            xpc_object_t answer = xpc_connection_send_message_with_reply_sync(connection, message);
             xpc_release(message);
+            xpc_release(answer);
         };
         
         callBacks.downloadDidReceiveResponse = ^(SUDSDownloader *downloader, NSURLResponse *response) {
@@ -87,22 +88,25 @@ static void fetch_process_request(xpc_object_t request, xpc_object_t reply)
             
             xpc_object_t message = xpc_dictionary_create(NULL, NULL, 0);
             xpc_dictionary_set_data(message, SUDownloadServiceReceivedResponseDataKey, [responseData bytes], [responseData length]);
-            xpc_connection_send_message(connection, message);
+            xpc_object_t answer = xpc_connection_send_message_with_reply_sync(connection, message);
             xpc_release(message);
+            xpc_release(answer);
         };
         
         callBacks.downloadDidCreateDestination = ^(SUDSDownloader *downloader, NSString *destinationPath) {
             xpc_object_t message = xpc_dictionary_create(NULL, NULL, 0);
             xpc_dictionary_set_string(message, SUDownloadServiceCreatedDestinationPathKey, [destinationPath cStringUsingEncoding:NSUTF8StringEncoding]);
-            xpc_connection_send_message(connection, message);
+            xpc_object_t answer = xpc_connection_send_message_with_reply_sync(connection, message);
             xpc_release(message);
+            xpc_release(answer);
         };
         
         callBacks.downloadDidBegin = ^(SUDSDownloader *downloader) {
             xpc_object_t message = xpc_dictionary_create(NULL, NULL, 0);
             xpc_dictionary_set_bool(message, SUDownloadServiceDidBeginDownloadingKey, true);
-            xpc_connection_send_message(connection, message);
+            xpc_object_t answer = xpc_connection_send_message_with_reply_sync(connection, message);
             xpc_release(message);
+            xpc_release(answer);
         };
         
         callBacks.downloadDidFail = ^(SUDSDownloader *downloader, NSError *error) {
@@ -113,15 +117,17 @@ static void fetch_process_request(xpc_object_t request, xpc_object_t reply)
             
             xpc_object_t message = xpc_dictionary_create(NULL, NULL, 0);
             xpc_dictionary_set_data(message, SUDownloadServiceReceivedFailErrorKey, [errorData bytes], [errorData length]);
-            xpc_connection_send_message(connection, message);
+            xpc_object_t answer = xpc_connection_send_message_with_reply_sync(connection, message);
             xpc_release(message);
+            xpc_release(answer);
         };
         
         callBacks.downloadDidFinish = ^(SUDSDownloader *downloader) {
             xpc_object_t message = xpc_dictionary_create(NULL, NULL, 0);
             xpc_dictionary_set_bool(message, SUDownloadServiceDidFinishDownloadingKey, true);
-            xpc_connection_send_message(connection, message);
+            xpc_object_t answer = xpc_connection_send_message_with_reply_sync(connection, message);
             xpc_release(message);
+            xpc_release(answer);
         };
         
         callBacks.downloadShouldDecodeSourceData = ^BOOL(SUDSDownloader *downloader, NSString *MIMEType) {
@@ -130,9 +136,12 @@ static void fetch_process_request(xpc_object_t request, xpc_object_t reply)
             xpc_object_t answer = xpc_connection_send_message_with_reply_sync(connection, message);
             xpc_release(message);
             
+            BOOL result = NO;
             if (xpc_get_type(answer) == XPC_TYPE_DICTIONARY)
-                return (BOOL)xpc_dictionary_get_bool(answer, SUDownloadServiceShouldDecodeMIMETypeKey);
-            return NO;
+                result = (BOOL)xpc_dictionary_get_bool(answer, SUDownloadServiceShouldDecodeMIMETypeKey);
+            xpc_release(answer);
+            
+            return result;
         };
         
         [downloader setCallBacks:callBacks];
@@ -221,8 +230,6 @@ static void fetch_event_handler(xpc_connection_t peer)
     
     // Set the target queue for connection.
     xpc_connection_set_target_queue(peer, peer_event_queue);
-    xpc_connection_set_context(peer, peer_event_queue);
-    xpc_connection_set_finalizer_f(peer, (xpc_finalizer_t)&dispatch_release);
     
     // Set the handler block for connection.
     xpc_connection_set_event_handler(peer, ^(xpc_object_t event) {

@@ -205,8 +205,6 @@ static NSString * const kSUFetchFolderName = @"fetch.XXXXXXXX";
     assert(delegate_queue != NULL);
 
     _delegateConnection = xpc_connection_create(NULL, delegate_queue);
-    xpc_connection_set_context(_delegateConnection, delegate_queue);
-    xpc_connection_set_finalizer_f(_delegateConnection, (xpc_finalizer_t)&dispatch_release);
     xpc_connection_set_event_handler(_delegateConnection, ^(xpc_object_t event) {
         xpc_type_t type = xpc_get_type(event);
         
@@ -232,9 +230,6 @@ static NSString * const kSUFetchFolderName = @"fetch.XXXXXXXX";
             free(queue_name);
             
             xpc_connection_set_target_queue(peer, peer_event_queue);
-            xpc_connection_set_context(peer, peer_event_queue);
-            xpc_connection_set_finalizer_f(peer, (xpc_finalizer_t)&dispatch_release);
-            
             xpc_connection_set_event_handler(peer, ^(xpc_object_t nevent) {
                 xpc_type_t ntype = xpc_get_type(nevent);
                 
@@ -242,6 +237,8 @@ static NSString * const kSUFetchFolderName = @"fetch.XXXXXXXX";
                     dispatch_release(peer_event_queue);
                 if (ntype != XPC_TYPE_DICTIONARY)
                     return;
+                
+                __block xpc_object_t answer = xpc_dictionary_create_reply(nevent);
                 
                 xpc_dictionary_apply(nevent, ^bool(const char *key, xpc_object_t value) {
                     NSAutoreleasePool *localPool = [[NSAutoreleasePool alloc] init];
@@ -353,8 +350,6 @@ static NSString * const kSUFetchFolderName = @"fetch.XXXXXXXX";
                     }
                     else if (0 == strcmp(key, SUDownloadServiceMIMETypeToDecodeKey))
                     {
-                        xpc_object_t answer = xpc_dictionary_create_reply(nevent);
-                        
                         void (^block)(void) = ^{
                             BOOL shouldDecode = NO;
                             if ([_delegate respondsToSelector:@selector(download:shouldDecodeSourceDataOfMIMEType:)])
@@ -366,15 +361,15 @@ static NSString * const kSUFetchFolderName = @"fetch.XXXXXXXX";
                             xpc_dictionary_set_bool(answer, SUDownloadServiceShouldDecodeMIMETypeKey, YES);
                         };
                         [self performBlock:block onThread:_startedThread synchronous:YES];
-                        
-                        xpc_connection_send_message(peer, answer);
-                        xpc_release(answer);
                     }
                     
                     [localPool release];
                     
                     return true;
                 });
+                
+                xpc_connection_send_message(peer, answer);
+                xpc_release(answer);
             });
             xpc_connection_resume(peer);
         } 
