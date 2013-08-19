@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0305627915D2A73D00B43EF8 /* com.andymatuschak.Sparkle.install-service.xpc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B887B5E1517F3AB000BB292 /* com.andymatuschak.Sparkle.install-service.xpc */; };
+		03B5E64115D399500038BB67 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 03B5E63F15D399500038BB67 /* InfoPlist.strings */; };
+		03B5E64415D399500038BB67 /* download_service.m in Sources */ = {isa = PBXBuildFile; fileRef = 03B5E64315D399500038BB67 /* download_service.m */; };
+		03B5E64B15D39CD90038BB67 /* SUXPCURLDownload.h in Headers */ = {isa = PBXBuildFile; fileRef = 03B5E64915D39CD90038BB67 /* SUXPCURLDownload.h */; };
+		03B5E65A15D3DC3C0038BB67 /* com.andymatuschak.Sparkle.download-service.xpc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 03B5E63A15D399500038BB67 /* com.andymatuschak.Sparkle.download-service.xpc */; };
+		03B5E65B15D3E0490038BB67 /* SUXPCURLDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 03B5E64A15D39CD90038BB67 /* SUXPCURLDownload.m */; };
 		3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		525A2790133D6AE900FD8D70 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
 		525A27A0133D6B9700FD8D70 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
@@ -133,12 +139,34 @@
 		61F83F720DBFE140006FDD30 /* SUBasicUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */; };
 		61F83F740DBFE141006FDD30 /* SUBasicUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
 		61FA52880E2D9EA400EF58AD /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (Required, ); }; };
+		8B887B7E1517F888000BB292 /* SUXPCInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B887B7C1517F888000BB292 /* SUXPCInstaller.h */; };
+		8B887B7F1517F888000BB292 /* SUXPCInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B887B7D1517F888000BB292 /* SUXPCInstaller.m */; };
+		8B887B811517FAA3000BB292 /* SUPlainInstallerInternals.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5F8E509C4CE3C00B25A18 /* SUPlainInstallerInternals.m */; };
+		8B887B821517FAA4000BB292 /* SUPlainInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5040DAE8AB80026945C /* SUPlainInstaller.m */; };
+		8B887B831517FAE9000BB292 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 55C14F31136EFC2400649790 /* SystemConfiguration.framework */; };
+		8B887B841517FAEC000BB292 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6117796E0D1112E000749C97 /* IOKit.framework */; };
+		8B887B861517FAFE000BB292 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
+		8B887B881517FB1C000BB292 /* SUInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5000DAE88B40026945C /* SUInstaller.m */; };
+		8B887B891517FB3E000BB292 /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
+		8B887B8A1517FB43000BB292 /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
+		8B887B8B1517FB52000BB292 /* SUPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5210DAE8E8A0026945C /* SUPackageInstaller.m */; };
+		8B887B8C1517FB5D000BB292 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
+		8B887B8E15180767000BB292 /* install_service.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B887B8D15180767000BB292 /* install_service.m */; };
 		93FB277A156BD80D001937C7 /* SUPasswordPrompt.h in Headers */ = {isa = PBXBuildFile; fileRef = 93FB2778156BD80D001937C7 /* SUPasswordPrompt.h */; };
 		93FB277B156BD80D001937C7 /* SUPasswordPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FB2779156BD80D001937C7 /* SUPasswordPrompt.m */; };
 		93FB277F156BD826001937C7 /* SUPasswordPrompt.xib in Resources */ = {isa = PBXBuildFile; fileRef = 93FB277D156BD826001937C7 /* SUPasswordPrompt.xib */; };
+		BE98879117C264D7002311CF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
+		BEA931AD17AA3EF7007D20A6 /* SUDSDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = BEA931AC17AA3EF7007D20A6 /* SUDSDownloader.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		03B5E65C15D3E32A0038BB67 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 03B5E63915D399500038BB67;
+			remoteInfo = "Downloading XPC Service";
+		};
 		55C14F96136F044100649790 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -167,9 +195,27 @@
 			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = Sparkle;
 		};
+		8B887B731517F472000BB292 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B887B5D1517F3AB000BB292;
+			remoteInfo = Service;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		0305627015D2A70400B43EF8 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/XPCServices;
+			dstSubfolderSpec = 1;
+			files = (
+				0305627915D2A73D00B43EF8 /* com.andymatuschak.Sparkle.install-service.xpc in CopyFiles */,
+				03B5E65A15D3DC3C0038BB67 /* com.andymatuschak.Sparkle.download-service.xpc in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		61B5FB4D09C4E9FA00B25A18 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -189,6 +235,14 @@
 		0263187714FEBB42005EBF43 /* uk */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = uk; path = uk.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
 		02AC40CE1743CC23005207B1 /* ConfigCommonProject64bit.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigCommonProject64bit.xcconfig; sourceTree = "<group>"; };
 		02AC40CF1743CC23005207B1 /* ConfigCommonProjectUniversalBinary.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigCommonProjectUniversalBinary.xcconfig; sourceTree = "<group>"; };
+		0305626E15D2A68800B43EF8 /* Sparkle Test App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Sparkle Test App.entitlements"; sourceTree = "<group>"; };
+		03B5E63A15D399500038BB67 /* com.andymatuschak.Sparkle.download-service.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "com.andymatuschak.Sparkle.download-service.xpc"; sourceTree = BUILT_PRODUCTS_DIR; };
+		03B5E63E15D399500038BB67 /* Downloading XPC Service-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Downloading XPC Service-Info.plist"; sourceTree = "<group>"; };
+		03B5E64015D399500038BB67 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		03B5E64215D399500038BB67 /* Downloading XPC Service-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Downloading XPC Service-Prefix.pch"; sourceTree = "<group>"; };
+		03B5E64315D399500038BB67 /* download_service.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = download_service.m; sourceTree = "<group>"; };
+		03B5E64915D39CD90038BB67 /* SUXPCURLDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUXPCURLDownload.h; sourceTree = "<group>"; };
+		03B5E64A15D39CD90038BB67 /* SUXPCURLDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUXPCURLDownload.m; sourceTree = "<group>"; };
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
@@ -399,11 +453,23 @@
 		61F614540E24A12D009F47E7 /* it */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBasicUpdateDriver.h; sourceTree = "<group>"; };
 		61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBasicUpdateDriver.m; sourceTree = "<group>"; };
+		8B887B5E1517F3AB000BB292 /* com.andymatuschak.Sparkle.install-service.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "com.andymatuschak.Sparkle.install-service.xpc"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B887B701517F447000BB292 /* ConfigService.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigService.xcconfig; sourceTree = "<group>"; };
+		8B887B711517F447000BB292 /* ConfigServiceDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigServiceDebug.xcconfig; sourceTree = "<group>"; };
+		8B887B721517F447000BB292 /* ConfigServiceRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigServiceRelease.xcconfig; sourceTree = "<group>"; };
+		8B887B7C1517F888000BB292 /* SUXPCInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUXPCInstaller.h; sourceTree = "<group>"; };
+		8B887B7D1517F888000BB292 /* SUXPCInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUXPCInstaller.m; sourceTree = "<group>"; };
+		8B887B8D15180767000BB292 /* install_service.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = install_service.m; sourceTree = "<group>"; };
+		8B887B8F15180773000BB292 /* SandboxService.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SandboxService.plist; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* Sparkle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Sparkle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		93FB2778156BD80D001937C7 /* SUPasswordPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUPasswordPrompt.h; sourceTree = "<group>"; };
 		93FB2779156BD80D001937C7 /* SUPasswordPrompt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUPasswordPrompt.m; sourceTree = "<group>"; };
 		93FB277E156BD826001937C7 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/SUPasswordPrompt.xib; sourceTree = "<group>"; };
+		BE18CC4F17ABAF5B004493DC /* SUInstallServiceConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUInstallServiceConstants.h; sourceTree = "<group>"; };
+		BE9928D117A6AF1200B4523B /* SUDownloadServiceConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUDownloadServiceConstants.h; sourceTree = "<group>"; };
+		BEA931AB17AA3EF7007D20A6 /* SUDSDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUDSDownloader.h; sourceTree = "<group>"; };
+		BEA931AC17AA3EF7007D20A6 /* SUDSDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUDSDownloader.m; sourceTree = "<group>"; };
 		FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigTestAppDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigCommonRelease.xcconfig; sourceTree = "<group>"; };
@@ -423,6 +489,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		03B5E63715D399500038BB67 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BE98879117C264D7002311CF /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		55C14BB5136EEF1500649790 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -462,6 +536,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8B887B5B1517F3AB000BB292 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8B887B831517FAE9000BB292 /* SystemConfiguration.framework in Frameworks */,
+				8B887B841517FAEC000BB292 /* IOKit.framework in Frameworks */,
+				8B887B8C1517FB5D000BB292 /* AppKit.framework in Frameworks */,
+				8B887B861517FAFE000BB292 /* Security.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DC2EF560486A6940098B216 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -488,8 +573,34 @@
 				612279D90DB5470200AB99EA /* Sparkle Unit Tests.octest */,
 				5D06E8D00FD68C7C005AE3F6 /* BinaryDelta */,
 				55C14BB7136EEF1500649790 /* finish_installation.app */,
+				8B887B5E1517F3AB000BB292 /* com.andymatuschak.Sparkle.install-service.xpc */,
+				03B5E63A15D399500038BB67 /* com.andymatuschak.Sparkle.download-service.xpc */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		03B5E63C15D399500038BB67 /* Downloading XPC Service */ = {
+			isa = PBXGroup;
+			children = (
+				03B5E64915D39CD90038BB67 /* SUXPCURLDownload.h */,
+				03B5E64A15D39CD90038BB67 /* SUXPCURLDownload.m */,
+				03B5E64315D399500038BB67 /* download_service.m */,
+				BEA931AB17AA3EF7007D20A6 /* SUDSDownloader.h */,
+				BEA931AC17AA3EF7007D20A6 /* SUDSDownloader.m */,
+				BE9928D117A6AF1200B4523B /* SUDownloadServiceConstants.h */,
+				03B5E63D15D399500038BB67 /* Supporting Files */,
+			);
+			path = "Downloading XPC Service";
+			sourceTree = "<group>";
+		};
+		03B5E63D15D399500038BB67 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				03B5E63E15D399500038BB67 /* Downloading XPC Service-Info.plist */,
+				03B5E63F15D399500038BB67 /* InfoPlist.strings */,
+				03B5E64215D399500038BB67 /* Downloading XPC Service-Prefix.pch */,
+			);
+			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		0867D691FE84028FC02AAC07 /* Sparkle */ = {
@@ -501,6 +612,8 @@
 				55C14BD5136EEFD000649790 /* finish_installation tool */,
 				6101354A0DD25B7F0049ACDF /* Unarchiving */,
 				61299B3A09CB056100B7442F /* User Interface */,
+				8B887B621517F3AC000BB292 /* Installation XPC Service */,
+				03B5E63C15D399500038BB67 /* Downloading XPC Service */,
 				61B5F8F309C4CE5900B25A18 /* Other Sources */,
 				089C1665FE841158C02AAC07 /* Framework Resources */,
 				61227A100DB5484000AB99EA /* Tests */,
@@ -672,6 +785,7 @@
 		61B5F91D09C4CF7F00B25A18 /* Test Application Sources */ = {
 			isa = PBXGroup;
 			children = (
+				0305626E15D2A68800B43EF8 /* Sparkle Test App.entitlements */,
 				61BBDF810A49220C00378739 /* Sparkle.icns */,
 				61B5F92A09C4CFD800B25A18 /* InfoPlist.strings */,
 				61B5F92C09C4CFD800B25A18 /* MainMenu.nib */,
@@ -726,6 +840,34 @@
 			name = "Update Control";
 			sourceTree = "<group>";
 		};
+		8B887B621517F3AC000BB292 /* Installation XPC Service */ = {
+			isa = PBXGroup;
+			children = (
+				8B887B801517F8B4000BB292 /* Service */,
+				8B887B631517F3AC000BB292 /* Interface */,
+			);
+			path = "Installation XPC Service";
+			sourceTree = "<group>";
+		};
+		8B887B631517F3AC000BB292 /* Interface */ = {
+			isa = PBXGroup;
+			children = (
+				BE18CC4F17ABAF5B004493DC /* SUInstallServiceConstants.h */,
+				8B887B7C1517F888000BB292 /* SUXPCInstaller.h */,
+				8B887B7D1517F888000BB292 /* SUXPCInstaller.m */,
+			);
+			name = Interface;
+			sourceTree = "<group>";
+		};
+		8B887B801517F8B4000BB292 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				8B887B8D15180767000BB292 /* install_service.m */,
+				8B887B8F15180773000BB292 /* SandboxService.plist */,
+			);
+			name = Service;
+			sourceTree = "<group>";
+		};
 		FA1941C40D94A6EA00DD942E /* Configurations */ = {
 			isa = PBXGroup;
 			children = (
@@ -748,6 +890,9 @@
 				FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */,
 				FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */,
 				FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */,
+				8B887B701517F447000BB292 /* ConfigService.xcconfig */,
+				8B887B711517F447000BB292 /* ConfigServiceDebug.xcconfig */,
+				8B887B721517F447000BB292 /* ConfigServiceRelease.xcconfig */,
 				FA3AAF3B1050B273004B3130 /* ConfigUnitTest.xcconfig */,
 				FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */,
 				FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */,
@@ -802,6 +947,8 @@
 				55C14F06136EF6DB00649790 /* SULog.h in Headers */,
 				55C14F0F136EF73600649790 /* finish_installation.pch in Headers */,
 				6158A1C5137904B300487EC1 /* SUUpdater_Private.h in Headers */,
+				8B887B7E1517F888000BB292 /* SUXPCInstaller.h in Headers */,
+				03B5E64B15D39CD90038BB67 /* SUXPCURLDownload.h in Headers */,
 				93FB277A156BD80D001937C7 /* SUPasswordPrompt.h in Headers */,
 				61B078CE15A5FB6100600039 /* SUCodeSigningVerifier.h in Headers */,
 			);
@@ -810,6 +957,23 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		03B5E63915D399500038BB67 /* Downloading XPC Service */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 03B5E64515D399500038BB67 /* Build configuration list for PBXNativeTarget "Downloading XPC Service" */;
+			buildPhases = (
+				03B5E63615D399500038BB67 /* Sources */,
+				03B5E63715D399500038BB67 /* Frameworks */,
+				03B5E63815D399500038BB67 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Downloading XPC Service";
+			productName = "Downloading XPC Service";
+			productReference = 03B5E63A15D399500038BB67 /* com.andymatuschak.Sparkle.download-service.xpc */;
+			productType = "com.apple.product-type.bundle";
+		};
 		55C14BB6136EEF1500649790 /* finish_installation */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 55C14BBE136EEF1500649790 /* Build configuration list for PBXNativeTarget "finish_installation" */;
@@ -872,6 +1036,7 @@
 				61B5F8FF09C4CEE200B25A18 /* Sources */,
 				61B5F90009C4CEE200B25A18 /* Frameworks */,
 				61B5FB4D09C4E9FA00B25A18 /* CopyFiles */,
+				0305627015D2A70400B43EF8 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -882,6 +1047,23 @@
 			productName = "Test Application";
 			productReference = 61B5F90209C4CEE200B25A18 /* Sparkle Test App.app */;
 			productType = "com.apple.product-type.application";
+		};
+		8B887B5D1517F3AB000BB292 /* Installation XPC Service */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8B887B6E1517F3AC000BB292 /* Build configuration list for PBXNativeTarget "Installation XPC Service" */;
+			buildPhases = (
+				8B887B5A1517F3AB000BB292 /* Sources */,
+				8B887B5B1517F3AB000BB292 /* Frameworks */,
+				8B887B5C1517F3AB000BB292 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Installation XPC Service";
+			productName = Update;
+			productReference = 8B887B5E1517F3AB000BB292 /* com.andymatuschak.Sparkle.install-service.xpc */;
+			productType = "com.apple.product-type.bundle";
 		};
 		8DC2EF4F0486A6940098B216 /* Sparkle */ = {
 			isa = PBXNativeTarget;
@@ -899,6 +1081,8 @@
 			);
 			dependencies = (
 				55C14F97136F044100649790 /* PBXTargetDependency */,
+				8B887B741517F472000BB292 /* PBXTargetDependency */,
+				03B5E65D15D3E32A0038BB67 /* PBXTargetDependency */,
 			);
 			name = Sparkle;
 			productInstallPath = "$(HOME)/Library/Frameworks";
@@ -969,11 +1153,21 @@
 				612279D80DB5470200AB99EA /* Sparkle Unit Tests */,
 				5D06E8CF0FD68C7C005AE3F6 /* BinaryDelta */,
 				55C14BB6136EEF1500649790 /* finish_installation */,
+				8B887B5D1517F3AB000BB292 /* Installation XPC Service */,
+				03B5E63915D399500038BB67 /* Downloading XPC Service */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		03B5E63815D399500038BB67 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				03B5E64115D399500038BB67 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		55C14BB3136EEF1500649790 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -999,6 +1193,13 @@
 				61B5F92F09C4CFD800B25A18 /* MainMenu.nib in Resources */,
 				61BBDF820A49220C00378739 /* Sparkle.icns in Resources */,
 				618E9CFD0E7328F1004646D8 /* dsa_pub.pem in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8B887B5C1517F3AB000BB292 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1096,6 +1297,15 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		03B5E63615D399500038BB67 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				03B5E64415D399500038BB67 /* download_service.m in Sources */,
+				BEA931AD17AA3EF7007D20A6 /* SUDSDownloader.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		55C14BB4136EEF1500649790 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1140,6 +1350,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8B887B5A1517F3AB000BB292 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8B887B881517FB1C000BB292 /* SUInstaller.m in Sources */,
+				8B887B821517FAA4000BB292 /* SUPlainInstaller.m in Sources */,
+				8B887B811517FAA3000BB292 /* SUPlainInstallerInternals.m in Sources */,
+				8B887B8B1517FB52000BB292 /* SUPackageInstaller.m in Sources */,
+				8B887B8A1517FB43000BB292 /* SUConstants.m in Sources */,
+				8B887B891517FB3E000BB292 /* SULog.m in Sources */,
+				8B887B8E15180767000BB292 /* install_service.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DC2EF540486A6940098B216 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1178,6 +1402,8 @@
 				5D06E8ED0FD68CE4005AE3F6 /* SUBinaryDeltaCommon.m in Sources */,
 				5D06E93A0FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m in Sources */,
 				55C14F07136EF6DB00649790 /* SULog.m in Sources */,
+				8B887B7F1517F888000BB292 /* SUXPCInstaller.m in Sources */,
+				03B5E65B15D3E0490038BB67 /* SUXPCURLDownload.m in Sources */,
 				93FB277B156BD80D001937C7 /* SUPasswordPrompt.m in Sources */,
 				61B078CF15A5FB6100600039 /* SUCodeSigningVerifier.m in Sources */,
 			);
@@ -1186,6 +1412,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		03B5E65D15D3E32A0038BB67 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 03B5E63915D399500038BB67 /* Downloading XPC Service */;
+			targetProxy = 03B5E65C15D3E32A0038BB67 /* PBXContainerItemProxy */;
+		};
 		55C14F97136F044100649790 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 55C14BB6136EEF1500649790 /* finish_installation */;
@@ -1206,9 +1437,22 @@
 			target = 8DC2EF4F0486A6940098B216 /* Sparkle */;
 			targetProxy = 61FA528C0E2D9EB200EF58AD /* PBXContainerItemProxy */;
 		};
+		8B887B741517F472000BB292 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B887B5D1517F3AB000BB292 /* Installation XPC Service */;
+			targetProxy = 8B887B731517F472000BB292 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		03B5E63F15D399500038BB67 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				03B5E64015D399500038BB67 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		55C14BDA136EF20D00649790 /* SUAutomaticUpdateAlert.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1365,69 +1609,91 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		02AC40C31743C7B5005207B1 /* Deployment */ = {
+		03B5E64615D399500038BB67 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 02AC40CE1743CC23005207B1 /* ConfigCommonProject64bit.xcconfig */;
-			buildSettings = {
-			};
-			name = Deployment;
-		};
-		02AC40C41743C7B5005207B1 /* Deployment */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
-			buildSettings = {
-			};
-			name = Deployment;
-		};
-		02AC40C51743C7B5005207B1 /* Deployment */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */;
-			buildSettings = {
-			};
-			name = Deployment;
-		};
-		02AC40C61743C7B5005207B1 /* Deployment */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */;
-			buildSettings = {
-			};
-			name = Deployment;
-		};
-		02AC40C71743C7B5005207B1 /* Deployment */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5D06E8F30FD68D21005AE3F6 /* ConfigBinaryDeltaRelease.xcconfig */;
-			buildSettings = {
-			};
-			name = Deployment;
-		};
-		02AC40C81743C7B5005207B1 /* Deployment */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
+			baseConfigurationReference = 8B887B711517F447000BB292 /* ConfigServiceDebug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_MODEL_TUNING = G5;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = finish_installation.pch;
-				INFOPLIST_FILE = "finish_installation-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
+				GCC_PREFIX_HEADER = "Downloading XPC Service/Downloading XPC Service-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
 				);
-				PRODUCT_NAME = finish_installation;
-				ZERO_LINK = NO;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "Downloading XPC Service/Downloading XPC Service-Info.plist";
+				MACH_O_TYPE = mh_execute;
+				PRODUCT_NAME = "com.andymatuschak.Sparkle.download-service";
+				WRAPPER_EXTENSION = xpc;
 			};
-			name = Deployment;
+			name = Debug;
+		};
+		03B5E64715D399500038BB67 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8B887B721517F447000BB292 /* ConfigServiceRelease.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Downloading XPC Service/Downloading XPC Service-Prefix.pch";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "Downloading XPC Service/Downloading XPC Service-Info.plist";
+				MACH_O_TYPE = mh_execute;
+				PRODUCT_NAME = "com.andymatuschak.Sparkle.download-service";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Release;
+		};
+		03B5E64815D399500038BB67 /* Release (GC dual-mode; 10.5+) */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8B887B721517F447000BB292 /* ConfigServiceRelease.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Downloading XPC Service/Downloading XPC Service-Prefix.pch";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "Downloading XPC Service/Downloading XPC Service-Info.plist";
+				MACH_O_TYPE = mh_execute;
+				PRODUCT_NAME = "com.andymatuschak.Sparkle.download-service";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = "Release (GC dual-mode; 10.5+)";
 		};
 		1DEB91AE08733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 			};
 			name = Debug;
 		};
@@ -1436,6 +1702,7 @@
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 			};
 			name = Release;
 		};
@@ -1484,7 +1751,6 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = finish_installation.pch;
@@ -1555,6 +1821,7 @@
 			baseConfigurationReference = 61072EB20DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 			};
 			name = "Release (GC dual-mode; 10.5+)";
 		};
@@ -1562,6 +1829,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 615409A8103BA09100125AF1 /* ConfigTestAppReleaseGCSupport.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "Sparkle Test App.entitlements";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 			};
 			name = "Release (GC dual-mode; 10.5+)";
@@ -1594,6 +1863,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "Sparkle Test App.entitlements";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 			};
 			name = Debug;
@@ -1602,19 +1873,156 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "Sparkle Test App.entitlements";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 			};
 			name = Release;
 		};
+		8B887B6B1517F3AC000BB292 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8B887B711517F447000BB292 /* ConfigServiceDebug.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "Installation XPC Service/SandboxService.plist";
+				PRODUCT_NAME = "com.andymatuschak.Sparkle.install-service";
+			};
+			name = Debug;
+		};
+		8B887B6C1517F3AC000BB292 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8B887B721517F447000BB292 /* ConfigServiceRelease.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "Installation XPC Service/SandboxService.plist";
+				PRODUCT_NAME = "com.andymatuschak.Sparkle.install-service";
+			};
+			name = Release;
+		};
+		8B887B6D1517F3AC000BB292 /* Release (GC dual-mode; 10.5+) */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8B887B721517F447000BB292 /* ConfigServiceRelease.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "Installation XPC Service/SandboxService.plist";
+				PRODUCT_NAME = "com.andymatuschak.Sparkle.install-service";
+			};
+			name = "Release (GC dual-mode; 10.5+)";
+		};
+		BE2786B3179847A5000CA04E /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 02AC40CE1743CC23005207B1 /* ConfigCommonProject64bit.xcconfig */;
+			buildSettings = {
+			};
+			name = Deployment;
+		};
+		BE2786B4179847A5000CA04E /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+			};
+			name = Deployment;
+		};
+		BE2786B5179847A5000CA04E /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "Sparkle Test App.entitlements";
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				COMBINE_HIDPI_IMAGES = YES;
+			};
+			name = Deployment;
+		};
+		BE2786B6179847A5000CA04E /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+			};
+			name = Deployment;
+		};
+		BE2786B7179847A5000CA04E /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5D06E8F30FD68D21005AE3F6 /* ConfigBinaryDeltaRelease.xcconfig */;
+			buildSettings = {
+			};
+			name = Deployment;
+		};
+		BE2786B8179847A5000CA04E /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = finish_installation.pch;
+				INFOPLIST_FILE = "finish_installation-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PRODUCT_NAME = finish_installation;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		BE2786B9179847A5000CA04E /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8B887B721517F447000BB292 /* ConfigServiceRelease.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "Installation XPC Service/SandboxService.plist";
+				PRODUCT_NAME = "com.andymatuschak.Sparkle.install-service";
+			};
+			name = Deployment;
+		};
+		BE2786BA179847A5000CA04E /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8B887B721517F447000BB292 /* ConfigServiceRelease.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Downloading XPC Service/Downloading XPC Service-Prefix.pch";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "Downloading XPC Service/Downloading XPC Service-Info.plist";
+				MACH_O_TYPE = mh_execute;
+				PRODUCT_NAME = "com.andymatuschak.Sparkle.download-service";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Deployment;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		03B5E64515D399500038BB67 /* Build configuration list for PBXNativeTarget "Downloading XPC Service" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				03B5E64615D399500038BB67 /* Debug */,
+				03B5E64715D399500038BB67 /* Release */,
+				BE2786BA179847A5000CA04E /* Deployment */,
+				03B5E64815D399500038BB67 /* Release (GC dual-mode; 10.5+) */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		1DEB91AD08733DA50010E9CD /* Build configuration list for PBXNativeTarget "Sparkle" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB91AE08733DA50010E9CD /* Debug */,
 				1DEB91AF08733DA50010E9CD /* Release */,
-				02AC40C41743C7B5005207B1 /* Deployment */,
+				BE2786B4179847A5000CA04E /* Deployment */,
 				61072EAE0DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1625,7 +2033,7 @@
 			buildConfigurations = (
 				1DEB91B208733DA50010E9CD /* Debug */,
 				1DEB91B308733DA50010E9CD /* Release */,
-				02AC40C31743C7B5005207B1 /* Deployment */,
+				BE2786B3179847A5000CA04E /* Deployment */,
 				61072EAD0DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1636,7 +2044,7 @@
 			buildConfigurations = (
 				55C14BBB136EEF1500649790 /* Debug */,
 				55C14BBC136EEF1500649790 /* Release */,
-				02AC40C81743C7B5005207B1 /* Deployment */,
+				BE2786B8179847A5000CA04E /* Deployment */,
 				55C14BBD136EEF1500649790 /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1647,7 +2055,7 @@
 			buildConfigurations = (
 				5D06E8D20FD68C7D005AE3F6 /* Debug */,
 				5D06E8D30FD68C7D005AE3F6 /* Release */,
-				02AC40C71743C7B5005207B1 /* Deployment */,
+				BE2786B7179847A5000CA04E /* Deployment */,
 				5D06E8D40FD68C7D005AE3F6 /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1658,7 +2066,7 @@
 			buildConfigurations = (
 				612279DB0DB5470300AB99EA /* Debug */,
 				612279DC0DB5470300AB99EA /* Release */,
-				02AC40C61743C7B5005207B1 /* Deployment */,
+				BE2786B6179847A5000CA04E /* Deployment */,
 				61072EB10DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1669,8 +2077,19 @@
 			buildConfigurations = (
 				61B5F90609C4CEE300B25A18 /* Debug */,
 				61B5F90709C4CEE300B25A18 /* Release */,
-				02AC40C51743C7B5005207B1 /* Deployment */,
+				BE2786B5179847A5000CA04E /* Deployment */,
 				61072EAF0DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8B887B6E1517F3AC000BB292 /* Build configuration list for PBXNativeTarget "Installation XPC Service" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8B887B6B1517F3AC000BB292 /* Debug */,
+				8B887B6C1517F3AC000BB292 /* Release */,
+				BE2786B9179847A5000CA04E /* Deployment */,
+				8B887B6D1517F3AC000BB292 /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

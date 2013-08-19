@@ -20,6 +20,8 @@
 #import "SUBinaryDeltaCommon.h"
 #import "SUCodeSigningVerifier.h"
 #import "SUUpdater_Private.h"
+#import "SUXPCInstaller.h"
+#import "SUXPCURLDownload.h"
 
 @interface SUBasicUpdateDriver () <NSURLDownloadDelegate>; @end
 
@@ -158,11 +160,21 @@
 {
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[updateItem fileURL]];
 	[request setValue:[updater userAgentString] forHTTPHeaderField:@"User-Agent"];
-	download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
+    if ([SUUpdater shouldUseXPC])
+        download = (NSURLDownload *)[[SUXPCURLDownload alloc] initWithRequest:request delegate:self];
+    else
+        download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
 }
 
 - (void)download:(NSURLDownload *)d decideDestinationWithSuggestedFilename:(NSString *)name
 {
+    if ([SUUpdater shouldUseXPC]) {
+        // The downloader will determine a file name, somewhere within our sandbox.
+        downloadPath = nil;
+        [d setDestination:name allowOverwrite:YES];
+        return;
+    }
+    
 	// If name ends in .txt, the server probably has a stupid MIME configuration. We'll give the developer the benefit of the doubt and chop that off.
 	if ([[name pathExtension] isEqualToString:@"txt"])
 		name = [name stringByDeletingPathExtension];
@@ -204,6 +216,13 @@
 	[download setDestination:downloadPath allowOverwrite:YES];
 }
 
+- (void)download:(NSURLDownload *)download didCreateDestination:(NSString *)path {
+    [downloadPath autorelease];
+    downloadPath = [path retain];
+    [tempDir autorelease];
+    tempDir = [[downloadPath stringByDeletingLastPathComponent] retain];
+}
+
 - (BOOL)validateUpdateDownloadedToPath:(NSString *)downloadedPath extractedToPath:(NSString *)extractedPath DSASignature:(NSString *)DSASignature publicDSAKey:(NSString *)publicDSAKey
 {
     NSString *newBundlePath = [SUInstaller appPathInUpdateFolder:extractedPath forHost:host];
@@ -238,7 +257,7 @@
 }
 
 - (void)extractUpdate
-{	
+{
 	SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:downloadPath updatingHost:host];
 	if (!unarchiver)
 	{
@@ -326,7 +345,26 @@
 #endif
 
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
-	if( [SUPlainInstaller copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath temporaryName: nil error: &error] )
+	if( [SUUpdater shouldUseXPC] )
+    {
+        [SUXPCInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil completionHandler:^(NSError *xpcError) {
+            if (xpcError != nil)
+                NSLog(@"Error during asynchronous XPC call to copyPath: %@", xpcError);
+            [self finishRelaunchAfterSuccessfulCopying:(xpcError == nil) fromPath:relaunchPathToCopy toPath:targetPath relaunch:relaunch];
+        }];
+    }
+    else
+    {
+        BOOL copiedRelaunchTool = [SUPlainInstaller copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath temporaryName: nil error: &error];
+        [self finishRelaunchAfterSuccessfulCopying:copiedRelaunchTool fromPath:relaunchPathToCopy toPath:targetPath relaunch:relaunch];
+    }
+}
+
+- (void)finishRelaunchAfterSuccessfulCopying:(BOOL)copiedRelaunchTool fromPath:(NSString *)relaunchPathToCopy toPath:(NSString *)targetPath relaunch:(BOOL)relaunch
+{
+
+    NSError *error = nil;
+	if( copiedRelaunchTool )
 		relaunchPath = [targetPath retain];
 	else
 		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil), NSLocalizedDescriptionKey, [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", relaunchPathToCopy, targetPath, (error ? [error localizedDescription] : @"")], NSLocalizedFailureReasonErrorKey, nil]]];
@@ -347,9 +385,16 @@
     if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
         pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
     NSString *relaunchToolPath = [relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS/finish_installation"];
-    [NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:[NSArray arrayWithObjects:[host bundlePath], pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], tempDir, relaunch ? @"1" : @"0", nil]];
-
-    [NSApp terminate:self];
+	NSArray *arguments = [NSArray arrayWithObjects:[host bundlePath], pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], tempDir, relaunch ? @"1" : @"0", nil];
+	if( [SUUpdater shouldUseXPC] )
+		[SUXPCInstaller launchTaskWithLaunchPath: relaunchToolPath arguments:arguments completionHandler:^{
+            [NSApp terminate:self];
+        }];
+	else
+    {
+		[NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:arguments];
+        [NSApp terminate:self];
+    }
 }
 
 - (void)cleanUpDownload

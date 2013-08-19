@@ -22,7 +22,7 @@ typedef enum
 } SUUpdateAlertChoice;
 
 @class WebView, SUAppcastItem, SUHost;
-@interface SUUpdateAlert : SUWindowController {
+@interface SUUpdateAlert : SUWindowController <NSURLDownloadDelegate> {
 	SUAppcastItem *updateItem;
 	SUHost *host;
 	id delegate;
@@ -35,6 +35,9 @@ typedef enum
 	IBOutlet NSButton *laterButton;
 	NSProgressIndicator *releaseNotesSpinner;
 	BOOL webViewFinishedLoading;
+    
+    NSURLDownload *releaseNotesDownloader;
+    NSString *downloadedReleaseNotesPath;
 }
 
 - (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host;

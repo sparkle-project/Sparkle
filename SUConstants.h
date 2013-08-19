@@ -87,6 +87,7 @@ extern OSStatus SUMissingInstallerToolError;
 extern OSStatus SURelaunchError;
 extern OSStatus SUInstallationError;
 extern OSStatus SUDowngradeError;
+extern OSStatus SUXPCServiceError;
 
 
 // -----------------------------------------------------------------------------
