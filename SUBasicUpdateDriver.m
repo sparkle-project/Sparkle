@@ -379,7 +379,7 @@ NSArray *SUGetAllDevMateURLHosts(void)
     BOOL isAlreadyInstalled = NO;
     if ([[updater delegate] respondsToSelector:@selector(updater:overrideInstallUpdate:downloadPath:)])
     {
-        isAlreadyInstalled = [[updater delegate] updater:updater overrideInstallUpdate:updateItem downloadPath:tempDir]
+        isAlreadyInstalled = [[updater delegate] updater:updater overrideInstallUpdate:updateItem downloadPath:tempDir];
     }
 	
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
@@ -431,7 +431,7 @@ NSArray *SUGetAllDevMateURLHosts(void)
     if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
         pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
     NSString *relaunchToolPath = [relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS/finish_installation"];
-    NSArray *arguments = [NSArray arrayWithObjects:[host bundlePath], pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], tempDir, relaunch ? @"1" : @"0", isInstalled ? @"1" : @"0" nil];
+    NSArray *arguments = [NSArray arrayWithObjects:[host bundlePath], pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], tempDir, relaunch ? @"1" : @"0", isInstalled ? @"1" : @"0", nil];
 	if (SUShouldUseXPCInstaller())
     {
 		[SUXPCInstaller launchTaskWithLaunchPath:relaunchToolPath arguments:arguments completionHandler:^{
