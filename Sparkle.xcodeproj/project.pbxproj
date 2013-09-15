@@ -1439,27 +1439,6 @@
 			};
 			name = Release;
 		};
-		55C14BBD136EEF1500649790 /* Release (GC dual-mode; 10.5+) */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COMBINE_HIDPI_IMAGES = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = finish_installation.pch;
-				INFOPLIST_FILE = "finish_installation-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				PRODUCT_NAME = finish_installation;
-			};
-			name = "Release (GC dual-mode; 10.5+)";
-		};
 		5D06E8D20FD68C7D005AE3F6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D06E8F20FD68D21005AE3F6 /* ConfigBinaryDeltaDebug.xcconfig */;
@@ -1473,43 +1452,6 @@
 			buildSettings = {
 			};
 			name = Release;
-		};
-		5D06E8D40FD68C7D005AE3F6 /* Release (GC dual-mode; 10.5+) */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5D06E8F30FD68D21005AE3F6 /* ConfigBinaryDeltaRelease.xcconfig */;
-			buildSettings = {
-			};
-			name = "Release (GC dual-mode; 10.5+)";
-		};
-		61072EAD0DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-			};
-			name = "Release (GC dual-mode; 10.5+)";
-		};
-		61072EAE0DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 61072EB20DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig */;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-			};
-			name = "Release (GC dual-mode; 10.5+)";
-		};
-		61072EAF0DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 615409A8103BA09100125AF1 /* ConfigTestAppReleaseGCSupport.xcconfig */;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-			};
-			name = "Release (GC dual-mode; 10.5+)";
-		};
-		61072EB10DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA302AFD109D13190060F891 /* ConfigUnitTestReleaseGCSupport.xcconfig */;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-			};
-			name = "Release (GC dual-mode; 10.5+)";
 		};
 		612279DB0DB5470300AB99EA /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -1551,7 +1493,6 @@
 			buildConfigurations = (
 				1DEB91AE08733DA50010E9CD /* Debug */,
 				1DEB91AF08733DA50010E9CD /* Release */,
-				61072EAE0DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1561,7 +1502,6 @@
 			buildConfigurations = (
 				1DEB91B208733DA50010E9CD /* Debug */,
 				1DEB91B308733DA50010E9CD /* Release */,
-				61072EAD0DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1571,7 +1511,6 @@
 			buildConfigurations = (
 				55C14BBB136EEF1500649790 /* Debug */,
 				55C14BBC136EEF1500649790 /* Release */,
-				55C14BBD136EEF1500649790 /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1581,7 +1520,6 @@
 			buildConfigurations = (
 				5D06E8D20FD68C7D005AE3F6 /* Debug */,
 				5D06E8D30FD68C7D005AE3F6 /* Release */,
-				5D06E8D40FD68C7D005AE3F6 /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1591,7 +1529,6 @@
 			buildConfigurations = (
 				612279DB0DB5470300AB99EA /* Debug */,
 				612279DC0DB5470300AB99EA /* Release */,
-				61072EB10DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1601,7 +1538,6 @@
 			buildConfigurations = (
 				61B5F90609C4CEE300B25A18 /* Debug */,
 				61B5F90709C4CEE300B25A18 /* Release */,
-				61072EAF0DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
