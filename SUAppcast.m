@@ -6,8 +6,14 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
+#import "SUUpdater.h"
+
 #import "SUAppcast.h"
+#import "SUAppcastItem.h"
+#import "SUVersionComparisonProtocol.h"
+#import "SUAppcast.h"
+#import "SUConstants.h"
+#import "SULog.h"
 
 @interface NSXMLElement (SUAppcastExtensions)
 - (NSDictionary *)attributesAsDictionary;
@@ -26,7 +32,7 @@
 }
 @end
 
-@interface SUAppcast (Private)
+@interface SUAppcast () <NSURLDownloadDelegate>
 - (void)reportError:(NSError *)error;
 - (NSXMLNode *)bestNodeInNodes:(NSArray *)nodes;
 @end
@@ -36,8 +42,14 @@
 - (void)dealloc
 {
 	[items release];
+	items = nil;
 	[userAgentString release];
+	userAgentString = nil;
+	[downloadFilename release];
+	downloadFilename = nil;
 	[download release];
+	download = nil;
+	
 	[super dealloc];
 }
 
@@ -82,7 +94,15 @@
 	
 	if (downloadFilename)
 	{
-		document = [[[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:0 error:&error] autorelease];
+        NSUInteger options = 0;
+        if (NSAppKitVersionNumber < NSAppKitVersionNumber10_7) {
+            // In order to avoid including external entities when parsing the appcast (a potential security vulnerability; see https://github.com/andymatuschak/Sparkle/issues/169), we ask NSXMLDocument to "tidy" the XML first. This happens to remove these external entities; it wouldn't be a future-proof approach, but it worked in these historical versions of OS X, and we have a more rigorous approach for 10.7+.
+            options = NSXMLDocumentTidyXML;
+        } else {
+            // In 10.7 and later, there's a real option for the behavior we desire.
+            options = NSXMLNodeLoadExternalEntitiesSameOriginOnly;
+        }
+		document = [[[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:options error:&error] autorelease];
 	
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 		[[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
@@ -186,7 +206,7 @@
 			}
             else
             {
-				NSLog(@"Sparkle Updater: Failed to parse appcast item: %@.\nAppcast dictionary was: %@", errString, dict);
+				SULog(@"Sparkle Updater: Failed to parse appcast item: %@.\nAppcast dictionary was: %@", errString, dict);
             }
             [nodesDict removeAllObjects];
             [dict removeAllObjects];

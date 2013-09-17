@@ -28,6 +28,7 @@
 - (void)unarchiver:(SUUnarchiver *)unarchiver extractedLength:(unsigned long)length;
 - (void)unarchiverDidFinish:(SUUnarchiver *)unarchiver;
 - (void)unarchiverDidFail:(SUUnarchiver *)unarchiver;
+- (void)unarchiver:(SUUnarchiver *)unarchiver requiresPasswordReturnedViaInvocation:(NSInvocation *)invocation;
 @end
 
 #endif

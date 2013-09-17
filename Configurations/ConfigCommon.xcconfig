@@ -3,7 +3,7 @@
 PREBINDING = NO
 ZERO_LINK = NO
 CURRENT_PROJECT_VERSION = 1.5
-SDKROOT = $(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk
+SDKROOT = macosx10.7
 MACOSX_DEPLOYMENT_TARGET[arch=ppc] = 10.4
 MACOSX_DEPLOYMENT_TARGET[arch=ppc64] = 10.5
 MACOSX_DEPLOYMENT_TARGET[arch=i386] = 10.4
@@ -17,6 +17,7 @@ GCC_FAST_OBJC_DISPATCH = YES
 GCC_ENABLE_PASCAL_STRINGS = NO
 ARCHS = ppc i386 x86_64
 GCC_VERSION = com.apple.compilers.llvm.clang.1_0
+CLANG_LINK_OBJC_RUNTIME = NO
 
 // Enable warnings
 GCC_WARN_CHECK_SWITCH_STATEMENTS = YES
@@ -47,4 +48,4 @@ GCC_WARN_UNUSED_VALUE = YES
 GCC_WARN_UNUSED_PARAMETER = YES
 GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES
 GCC_WARN_UNDECLARED_SELECTOR = YES
-WARNING_CFLAGS = -Wall -Wno-unused-parameter -Werror -Wundef -Wendif-labels -Wpointer-arith -Wcast-align -Wwrite-strings -Wmissing-format-attribute -Wpacked -Wredundant-decls -Winline -Wdisabled-optimization -Wformat=2 -Winvalid-pch
+WARNING_CFLAGS = -Wall -Wno-unused-parameter -Werror -Wundef -Wendif-labels -Wpointer-arith -Wcast-align -Wwrite-strings -Wmissing-format-attribute -Wpacked -Wredundant-decls -Winline -Wdisabled-optimization -Winvalid-pch
