@@ -42,14 +42,13 @@ static NSString*	sUpdateFolder = nil;
 		return NO;	
 }
 
-
-+ (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
++ (NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr
 {
-	// Search subdirectories for the application
+    // Search subdirectories for the application
 	NSString	*currentFile,
-				*newAppDownloadPath = nil,
-				*bundleFileName = [[host bundlePath] lastPathComponent],
-				*alternateBundleFileName = [[host name] stringByAppendingPathExtension:[[host bundlePath] pathExtension]];
+    *newAppDownloadPath = nil,
+    *bundleFileName = [[host bundlePath] lastPathComponent],
+    *alternateBundleFileName = [[host name] stringByAppendingPathExtension:[[host bundlePath] pathExtension]];
 	BOOL isPackage = NO;
 	NSString *fallbackPackagePath = nil;
 	NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath: inUpdateFolder];
@@ -92,6 +91,40 @@ static NSString*	sUpdateFolder = nil;
 				newAppDownloadPath = currentPath;
 				break;
 			}
+#if FUZZY_BUNDLE_IDENTIFIER_MATCHING
+			// Try matching on the host's bundle identifier, suffixed with a single integer or a dash and a single integer.
+			// e.g. this will match if the host bundle identifier is com.company.yourapp and the incoming identifier is com.company.yourapp-2 or com.company.yourapp3
+			else if (incomingBundle)
+			{
+				// Find the root bundle identifer by stripping off trailing numbers and, if one exists, a dash
+				NSRange rootBundleRange = [[[host bundle] bundleIdentifier] rangeOfCharacterFromSet:[[NSCharacterSet characterSetWithCharactersInString:@"0123456789"] invertedSet] options:NSBackwardsSearch];
+				NSString *rootBundleIdentifier = [[[host bundle] bundleIdentifier] substringToIndex:(rootBundleRange.location + 1)];
+				if ([rootBundleIdentifier characterAtIndex:rootBundleRange.location] == '-') {
+					rootBundleIdentifier = [rootBundleIdentifier substringToIndex:rootBundleRange.location];
+				}
+
+				// Now check to see if the incoming bundle identifer shares the same root and has a suffix that's either all numbers or a dash followed by numbers
+				BOOL validIncomingBundleIdentifier = NO;
+				NSRange originalBundleRange = [[incomingBundle bundleIdentifier] rangeOfString:rootBundleIdentifier options:NSAnchoredSearch];
+				if (originalBundleRange.length == [[incomingBundle bundleIdentifier] length]) {
+					validIncomingBundleIdentifier = YES;
+				} else {
+					NSString *bundleSuffix = [[incomingBundle bundleIdentifier] substringFromIndex:originalBundleRange.length];
+					if ([bundleSuffix characterAtIndex:0] == '-') {
+						bundleSuffix = [bundleSuffix substringFromIndex:1];
+					}
+					if ([bundleSuffix rangeOfCharacterFromSet:[[NSCharacterSet characterSetWithCharactersInString:@"0123456789"] invertedSet]].location == NSNotFound) {
+						validIncomingBundleIdentifier = YES;
+					}
+				}
+				if (validIncomingBundleIdentifier == YES) {
+					isPackage = NO;
+					newAppDownloadPath = currentPath;
+					[host setRenamedInstallationPath:[[[host installationPath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[currentPath lastPathComponent]]];
+					break;
+				}
+			}
+#endif
 		}
 		
 		// Some DMGs have symlinks into /Applications! That's no good!
@@ -100,20 +133,43 @@ static NSString*	sUpdateFolder = nil;
 	}
 	
 	// We don't have a valid path. Try to use the fallback package.
-
+    
 	if (newAppDownloadPath == nil && fallbackPackagePath != nil)
 	{
 		isPackage = YES;
 		newAppDownloadPath = fallbackPackagePath;
 	}
-	
+
+    if (isPackagePtr) *isPackagePtr = isPackage;
+    return newAppDownloadPath;
+}
+
++ (NSString *)appPathInUpdateFolder:(NSString *)updateFolder forHost:(SUHost *)host
+{
+    BOOL isPackage = NO;
+    NSString *path = [self installSourcePathInUpdateFolder:updateFolder forHost:host isPackage:&isPackage];
+    return isPackage ? nil : path;
+}
+
++ (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
+{
+    BOOL isPackage = NO;
+	NSString *finalInstallationPath = installationPath;
+	NSString *newAppDownloadPath = [self installSourcePathInUpdateFolder:inUpdateFolder forHost:host isPackage:&isPackage];
+#if FUZZY_BUNDLE_IDENTIFIER_MATCHING
+	if (![[[host bundlePath] lastPathComponent] isEqualToString:[newAppDownloadPath lastPathComponent]]) {
+		finalInstallationPath = [[installationPath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[newAppDownloadPath lastPathComponent]];
+		[host setRenamedInstallationPath:finalInstallationPath];
+	}
+#endif
+    
 	if (newAppDownloadPath == nil)
 	{
 		[self finishInstallationToPath:installationPath withResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find an appropriate update in the downloaded package." forKey:NSLocalizedDescriptionKey]] delegate:delegate];
 	}
 	else
 	{
-		[(isPackage ? [SUPackageInstaller class] : [SUPlainInstaller class]) performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host delegate:delegate synchronously:synchronously versionComparator:comparator];
+		[(isPackage ? [SUPackageInstaller class] : [SUPlainInstaller class]) performInstallationToPath:finalInstallationPath fromPath:newAppDownloadPath host:host delegate:delegate synchronously:synchronously versionComparator:comparator];
 	}
 }
 

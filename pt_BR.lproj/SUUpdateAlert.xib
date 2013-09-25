@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
-		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">12C54</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2840</string>
+		<int key="IBDocument.SystemTarget">1070</int>
+		<string key="IBDocument.SystemVersion">12C3006</string>
+		<string key="IBDocument.InterfaceBuilderVersion">2844</string>
 		<string key="IBDocument.AppKitVersion">1187.34</string>
 		<string key="IBDocument.HIToolboxVersion">625.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
@@ -15,7 +15,7 @@
 			</object>
 			<object class="NSArray" key="dict.values">
 				<bool key="EncodedWithXMLCoder">YES</bool>
-				<string>2840</string>
+				<string>2844</string>
 				<string>1810</string>
 			</object>
 		</object>
@@ -57,7 +57,7 @@
 			<object class="NSWindowTemplate" id="458363610">
 				<int key="NSWindowStyleMask">15</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{412, 249}, {582, 375}}</string>
+				<string key="NSWindowRect">{{63, 446}, {582, 375}}</string>
 				<int key="NSWTFlags">-260571136</int>
 				<string key="NSWindowTitle">Atualização de Software</string>
 				<string key="NSWindowClass">NSWindow</string>
@@ -225,9 +225,10 @@
 						<object class="NSButton" id="757624277">
 							<reference key="NSNextResponder" ref="695557828"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{406, 12}, {164, 32}}</string>
+							<string key="NSFrame">{{408, 12}, {160, 32}}</string>
 							<reference key="NSSuperview" ref="695557828"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="372019711">
 								<int key="NSCellFlags">-2080374784</int>
@@ -373,7 +374,7 @@
 						<object class="NSButton" id="283879641">
 							<reference key="NSNextResponder" ref="695557828"/>
 							<int key="NSvFlags">256</int>
-							<string key="NSFrame">{{102, 48}, {451, 18}}</string>
+							<string key="NSFrame">{{102, 48}, {442, 18}}</string>
 							<reference key="NSSuperview" ref="695557828"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="233042967"/>
@@ -402,7 +403,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="874891435"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1366, 746}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMinSize">{586, 392}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName"/>
@@ -673,10 +674,10 @@
 							<reference ref="150256429"/>
 							<reference ref="919709958"/>
 							<reference ref="233042967"/>
+							<reference ref="757624277"/>
 							<reference ref="929668649"/>
 							<reference ref="921621640"/>
 							<reference ref="283879641"/>
-							<reference ref="757624277"/>
 						</object>
 						<reference key="parent" ref="458363610"/>
 					</object>
@@ -1004,7 +1005,7 @@
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
-			<real value="1050" key="NS.object.0"/>
+			<real value="1070" key="NS.object.0"/>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>

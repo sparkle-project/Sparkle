@@ -68,8 +68,18 @@
     return appSupportPath;
 }
 
+- (void)setRenamedInstallationPath:(NSString *)path
+{
+	if (renamedInstallationPath == path) return;
+    [renamedInstallationPath release];
+    renamedInstallationPath = [path copy];
+}
+
 - (NSString *)installationPath
 {
+#if FUZZY_BUNDLE_IDENTIFIER_MATCHING
+	if (renamedInstallationPath) return renamedInstallationPath;
+#endif
 #if NORMALIZE_INSTALLED_APP_NAME
     // We'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
     NSString *normalizedAppPath = [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.%@", [bundle objectForInfoDictionaryKey:@"CFBundleName"], [[bundle bundlePath] pathExtension]]];
@@ -256,7 +266,7 @@
 	OSErr err3 = Gestalt(gestaltSystemVersionBugFix, &bugfix);
 	if (!err1 && !err2 && !err3)
 	{
-		verStr = [NSString stringWithFormat:@"%ld.%ld.%ld", (long)major, (long)minor, (long)bugfix];
+		verStr = [NSString stringWithFormat:@"%ld.%ld.%ld", (long) major, (long) minor, (long) bugfix];
 	}
 	else
 #endif

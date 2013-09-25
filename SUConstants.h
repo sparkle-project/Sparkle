@@ -26,6 +26,22 @@
 //	following on to always reset the name back to "MyApp":
 #define NORMALIZE_INSTALLED_APP_NAME				0
 
+// When identifying updates to install from the downloaded update contents,
+//  Sparkle by default searches for a folder in the downloaded directory which
+//  matches the host app's file name, then looks for an installer package with
+//  the same basename as the host app, and finally looks for a bundle with the
+//  same identifier as the host app. There are some cases, however, when both
+//  the update's file name and bundle identifier will be different -- notably,
+//  when distributing an update that parallels what's just been made available
+//  in the Mac App Store, which requires that apps have different bundle
+//  identifiers and thus motivates changing both the app's name and
+//  identifier. For cases like that, Sparkle can be more lax on bundle id
+//  matching, and look for updates in the form of com.mycompany.myapp-2 or
+//  com.mycompany.myapp3, which will match as valid updates to
+//  com.mycompany.myapp. Turn the following on to allow for this more lax
+//  bundle identifier validation.
+#define FUZZY_BUNDLE_IDENTIFIER_MATCHING			1
+
 
 #define TRY_TO_APPEND_VERSION_NUMBER				1
 

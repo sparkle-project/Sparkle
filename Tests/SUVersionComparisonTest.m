@@ -59,4 +59,9 @@
 //	SUAssertEqual(@"1.0  - beta", @"1.0 beta");
 }
 
+- (void)testVersionsWithReverseDateBasedNumbers
+{
+    SUAssertAscending(@"201210251627", @"201211051041");
+}
+
 @end

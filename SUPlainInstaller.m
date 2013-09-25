@@ -72,7 +72,7 @@ static NSString * const SUInstallerInstallationPathKey = @"SUInstallerInstallati
 	#endif
     
     NSString *targetPath = [host installationPath];
-    NSString *tempName = [self temporaryNameForPath:targetPath];
+    NSString *tempName = [self temporaryNameForPath:[host bundlePath]];
 	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:path, SUInstallerPathKey, targetPath, SUInstallerTargetPathKey, tempName, SUInstallerTempNameKey, host, SUInstallerHostKey, delegate, SUInstallerDelegateKey, installationPath, SUInstallerInstallationPathKey, nil];
 	if (synchronously)
 		[self performInstallationWithInfo:info];
