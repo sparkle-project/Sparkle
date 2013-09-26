@@ -315,22 +315,25 @@
 		[[updater delegate] updater:updater willInstallUpdate:updateItem];
 	
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
-	NSString *relaunchPathToCopy = [SPARKLE_BUNDLE pathForResource:@"finish_installation" ofType:@"app"];
-    NSString *targetPath = [[host appSupportPath] stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
-	NSError *error = nil;
+	NSString *relaunchPathToCopy = [SPARKLE_BUNDLE pathForResource:@"finish_installation" ofType:@"app"];
+	if (relaunchPathToCopy != nil)
+	{
+		NSString *targetPath = [[host appSupportPath] stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
+		// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
+		NSError *error = nil;
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-	[[NSFileManager defaultManager] createDirectoryAtPath: [targetPath stringByDeletingLastPathComponent] attributes: [NSDictionary dictionary]];
+		[[NSFileManager defaultManager] createDirectoryAtPath: [targetPath stringByDeletingLastPathComponent] attributes: [NSDictionary dictionary]];
 #else
-	[[NSFileManager defaultManager] createDirectoryAtPath: [targetPath stringByDeletingLastPathComponent] withIntermediateDirectories: YES attributes: [NSDictionary dictionary] error: &error];
+		[[NSFileManager defaultManager] createDirectoryAtPath: [targetPath stringByDeletingLastPathComponent] withIntermediateDirectories: YES attributes: [NSDictionary dictionary] error: &error];
 #endif
 
-	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
-	if( [SUPlainInstaller copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath temporaryName: nil error: &error] )
-		relaunchPath = [targetPath retain];
-	else
-		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil), NSLocalizedDescriptionKey, [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", relaunchPathToCopy, targetPath, (error ? [error localizedDescription] : @"")], NSLocalizedFailureReasonErrorKey, nil]]];
-	
+		if( [SUPlainInstaller copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath temporaryName: nil error: &error] )
+			relaunchPath = [targetPath retain];
+		else
+			[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil), NSLocalizedDescriptionKey, [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", relaunchPathToCopy, targetPath, (error ? [error localizedDescription] : @"")], NSLocalizedFailureReasonErrorKey, nil]]];
+	}
+
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
     if ([[updater delegate] respondsToSelector:@selector(updaterWillRelaunchApplication:)])
         [[updater delegate] updaterWillRelaunchApplication:updater];
