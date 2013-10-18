@@ -168,7 +168,7 @@ static void fetch_process_request(xpc_object_t request, xpc_object_t reply)
     // Clean up and add errcode/errmsg to reply
     if (connection)
     {
-        xpc_connection_suspend(connection);
+        xpc_connection_cancel(connection);
         xpc_release(connection);
     }
 
@@ -218,6 +218,11 @@ static void fetch_peer_event_handler(xpc_connection_t peer, xpc_object_t event)
     }
 }
 
+static void release_dispatch_queue(void *queue)
+{
+    dispatch_release(queue);
+}
+
 static void fetch_event_handler(xpc_connection_t peer)
 {
     // Generate an unique name for the queue to handle messages from
@@ -230,6 +235,7 @@ static void fetch_event_handler(xpc_connection_t peer)
     
     // Set the target queue for connection.
     xpc_connection_set_target_queue(peer, peer_event_queue);
+    xpc_connection_set_finalizer_f(peer, release_dispatch_queue);
     
     // Set the handler block for connection.
     xpc_connection_set_event_handler(peer, ^(xpc_object_t event) {
