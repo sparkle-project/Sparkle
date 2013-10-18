@@ -235,6 +235,7 @@ static void fetch_event_handler(xpc_connection_t peer)
     
     // Set the target queue for connection.
     xpc_connection_set_target_queue(peer, peer_event_queue);
+    xpc_connection_set_context(peer, peer_event_queue);
     xpc_connection_set_finalizer_f(peer, release_dispatch_queue);
     
     // Set the handler block for connection.
