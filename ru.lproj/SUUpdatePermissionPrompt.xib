@@ -76,7 +76,7 @@ Gw
                         </connections>
                     </textField>
                     <button focusRingType="none" id="34">
-                        <rect key="frame" x="104" y="53" width="316" height="18"/>
+                        <rect key="frame" x="104" y="53" width="164" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="check" title="Включить отчет о системе" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" focusRingType="none" inset="2" id="180">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -105,8 +105,8 @@ Gw
                         </connections>
                     </imageView>
                     <button focusRingType="none" horizontalHuggingPriority="750" verticalHuggingPriority="750" id="71">
-                        <rect key="frame" x="102" y="50" width="27" height="26"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                        <rect key="frame" x="80" y="50" width="27" height="26"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" imagePosition="overlaps" alignment="center" borderStyle="border" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="182">
                             <behavior key="behavior" pushIn="YES" changeBackground="YES" changeGray="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
@@ -135,11 +135,11 @@ Gw
             </connections>
         </arrayController>
         <customView id="39" userLabel="MoreInfoView">
-            <rect key="frame" x="0.0" y="0.0" width="362" height="205"/>
+            <rect key="frame" x="0.0" y="0.0" width="384" height="205"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField verticalHuggingPriority="750" id="46">
-                    <rect key="frame" x="1" y="128" width="358" height="70"/>
+                    <rect key="frame" x="1" y="128" width="380" height="70"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="183">
                         <font key="font" metaFont="smallSystem"/>
@@ -151,14 +151,14 @@ Gw
                     </textFieldCell>
                 </textField>
                 <scrollView autohidesScrollers="YES" horizontalLineScroll="16" horizontalPageScroll="0.0" verticalLineScroll="16" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="40">
-                    <rect key="frame" x="4" y="5" width="355" height="115"/>
+                    <rect key="frame" x="4" y="5" width="377" height="115"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     <clipView key="contentView" id="aha-Oe-Az5">
-                        <rect key="frame" x="1" y="1" width="353" height="113"/>
+                        <rect key="frame" x="1" y="1" width="375" height="113"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="14" id="41">
-                                <rect key="frame" x="0.0" y="0.0" width="353" height="113"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="113"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -180,7 +180,7 @@ Gw
                                             <binding destination="24" name="value" keyPath="arrangedObjects.displayKey" id="174"/>
                                         </connections>
                                     </tableColumn>
-                                    <tableColumn editable="NO" width="219" minWidth="40" maxWidth="1000" id="44">
+                                    <tableColumn editable="NO" width="241" minWidth="40" maxWidth="1000" id="44">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
