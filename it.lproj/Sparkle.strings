@@ -1,38 +1,38 @@
 ﻿/* No comment provided by engineer. */
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ è stato scaricato ed è pronto per essere utilizzato! Desideri installare e riavviare  %1$@ ora?";
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ è stato scaricato ed è pronto per essere utilizzato! Desideri installare e riavviare %1$@ adesso?";
 
 /* No comment provided by engineer. */
-"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "Impossibile aggiornare %1$@ quando viene eseguito da un volume di sola lettura come un’immagine disco o un’unità ottica. Spostare %1$@ nella Cartella Applicazioni, riavviarlo e riprovare.";
+"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "%1$@ non può essere aggiornato se si trova su un volume o disco di sola lettura. Sposta %1$@ nella cartella Applicazioni e prova di nuovo.";
 
 /* No comment provided by engineer. */
-"%@ %@ is currently the newest version available." = "%1$@ %2$@ è la versione più recente attualmente disponibile.";
+"%@ %@ is currently the newest version available." = "%@ %@ è la versione più recente attualmente disponibile.";
 
 /* No comment provided by engineer. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ è disponbile; disponi della versione %3$@. Desideri eseguire l’aggiornamento ora?";
+"%@ %@ is now available--you have %@. Would you like to download it now?" = "%@ %@ è disponibile! La versione che stai usando è la %@. Desideri effettuare l'aggiornamento adesso?";
 
 /* No comment provided by engineer. */
-"%@ downloaded" = "%@ scaricato";
+"%@ downloaded" = "%@ scaricati";
 
 /* No comment provided by engineer. */
-"%@ of %@" = "%1$@ di %2$@";
+"%@ of %@" = "%@ di %@";
 
 /* No comment provided by engineer. */
-"A new version of %@ is available!" = "E’ disponibile una nuova versione di %@!";
+"A new version of %@ is available!" = "È disponibile una nuova versione di %@!";
 
 /* No comment provided by engineer. */
 "A new version of %@ is ready to install!" = "Una nuova versione di %@ è pronta per essere installata!";
 
 /* No comment provided by engineer. */
-"An error occurred in retrieving update information. Please try again later." = "Si è verificato un errore durante il recupero delle informazioni sull’aggiornamento. Riprova in seguito.";
+"An error occurred in retrieving update information. Please try again later." = "Si è verificato un errore durante il recupero delle informazioni sull'aggiornamento. Riprova in seguito.";
 
 /* No comment provided by engineer. */
-"An error occurred while downloading the update. Please try again later." = "Si è verificato un errore durante lo scaricamento dell’aggiornamento. Riprova in seguito.";
+"An error occurred while downloading the update. Please try again later." = "Si è verificato un errore durante il download dell'aggiornamento. Riprova in seguito.";
 
 /* No comment provided by engineer. */
-"An error occurred while extracting the archive. Please try again later." = "Si è verificato un errore durante l’estrazione dell’archivio. Riprova in seguito.";
+"An error occurred while extracting the archive. Please try again later." = "Si è verificato un errore durante l'estrazione dell'archivio. Riprova in seguito.";
 
 /* No comment provided by engineer. */
-"An error occurred while installing the update. Please try again later." = "Si è verificato un errore durante l’installazione dell’aggiornamento. Riprova in seguito.";
+"An error occurred while installing the update. Please try again later." = "Si è verificato un errore durante l'installazione dell'aggiornamento. Riprova in seguito.";
 
 /* No comment provided by engineer. */
 "An error occurred while parsing the update feed." = "Si è verificato un errore durante la lettura del feed di aggiornamento.";
@@ -47,22 +47,22 @@
 "Cancel" = "Annulla";
 
 /* No comment provided by engineer. */
-"Cancel Update" = "Annulla Aggiornamento";
+"Cancel Update" = "Annulla aggiornamento";
 
 /* No comment provided by engineer. */
 "Checking for updates..." = "Controllo aggiornamenti in corso…";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "Scaricamento dell’aggiornamento…";
+"Downloading update..." = "Scarico l'aggiornamento…";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "Estrazione dell’aggiornamento…";
+"Extracting update..." = "Estraggo l'aggiornamento…";
 
 /* the unit for gigabytes */
 "GB" = "GB";
 
 /* No comment provided by engineer. */
-"Install and Relaunch" = "Installa e Riavvia";
+"Install and Relaunch" = "Installa e riavvia";
 
 /* Take care not to overflow the status window. */
 "Installing update..." = "Installazione aggiornamento in corso…";
@@ -73,28 +73,28 @@
 /* the unit for megabytes */
 "MB" = "MB";
 
-/* No comment provided by engineer. */
+/* OK button. */
 "OK" = "OK";
 
-/* No comment provided by engineer. */
-"Ready to Install" = "Pronto per l’installazione";
+/* Status message on progress window once download has finished. */
+"Ready to Install" = "Pronto per l'installazione";
+
+/* Message that is optionally shown at startup to allow users to turn on/off update checks. */
+"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Desideri che %1$@ verifichi gli aggiornamenti automaticamente? Puoi effettuare la verifica manualmente dal menu %1$@.";
 
 /* No comment provided by engineer. */
-"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Desideri che %1$@ verifichi gli aggiornamenti automaticamente? Puoi effettuare la verifica manualmente dal menu di %1$@.";
-
-/* No comment provided by engineer. */
-"Update Error!" = "Errore di Aggiornamento!";
+"Update Error!" = "Errore nell'aggiornamento!";
 
 /* No comment provided by engineer. */
 "Updating %@" = "Aggiornamento di %@";
 
-/* No comment provided by engineer. */
+/* 'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI) */
 "You already have the newest version of %@." = "Disponi della versione più recente di %@.";
 
-/* No comment provided by engineer. */
+/* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
 "You're up-to-date!" = "La tua applicazione è aggiornata!";
 
-/* Alternative name for "Install" button if we have a paid update or other update
-	without a download but with a URL. */
-
+/* Alternative name for "Install" button if we have a paid update or other update 	without a download but with a URL. */
 "Learn More..." = "Ulteriori informazioni…";
+
+

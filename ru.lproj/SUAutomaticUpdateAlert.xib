@@ -94,8 +94,8 @@ Gw
                         </connections>
                     </button>
                     <button id="17">
-                        <rect key="frame" x="105" y="58" width="716" height="18"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
+                        <rect key="frame" x="105" y="58" width="404" height="18"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
                         <buttonCell key="cell" type="check" title="В дальнейшем загружать и устанавливать обновления автоматически" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="43">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="smallSystem"/>
