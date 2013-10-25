@@ -48,11 +48,17 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - (BOOL)isUpdateInProgress
 {
 	BOOL result = NO;
-	NSConnection *connection = [NSConnection connectionWithRegisteredName:[NSString stringWithFormat:@"Sparkle %@", [[host bundle] bundleIdentifier]] host:nil];
-	if (connection != nil)
+	@try
 	{
-		NSDistantObject *proxyBundle = [connection rootProxy];
-		result = proxyBundle != nil;
+		NSConnection *connection = [NSConnection connectionWithRegisteredName:[NSString stringWithFormat:@"Sparkle %@", [[host bundle] bundleIdentifier]] host:nil];
+		if (connection != nil)
+		{
+			NSDistantObject *proxyBundle = [connection rootProxy];
+			result = proxyBundle != nil;
+		}
+	}
+	@catch (NSException *exception)
+	{
 	}
 	
 	return result;
