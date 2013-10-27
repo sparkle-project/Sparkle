@@ -123,16 +123,22 @@
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"appVersion",@"Application Version", appVersion, appVersion,nil] forKeys:profileDictKeys]];
 	
 	// Number of displays?
+
 	// CPU speed
-	SInt32 gestaltInfo;
-	OSErr err = Gestalt(gestaltProcClkSpeedMHz,&gestaltInfo);
-	if (err == noErr)
-		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"cpuFreqMHz",@"CPU Speed (GHz)", [NSNumber numberWithInt:gestaltInfo], [NSNumber numberWithDouble:gestaltInfo/1000.0],nil] forKeys:profileDictKeys]];
+	unsigned long hz;
+	size_t hz_size = sizeof(unsigned long);
+	if (sysctlbyname("hw.cpufrequency", &hz, &hz_size, NULL, 0) == 0) {
+		unsigned long mhz = hz / 1000000;
+		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"cpuFreqMHz",@"CPU Speed (GHz)", @(mhz), @(mhz / 1000.)] forKeys:profileDictKeys]];
+	}
 	
 	// amount of RAM
-	err = Gestalt(gestaltPhysicalRAMSizeInMegabytes,&gestaltInfo);
-	if (err == noErr)
-		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"ramMB",@"Memory (MB)", [NSNumber numberWithInt:gestaltInfo], [NSNumber numberWithInt:gestaltInfo],nil] forKeys:profileDictKeys]];
+	unsigned long bytes;
+	size_t bytes_size = sizeof(unsigned long);
+	if (sysctlbyname("hw.memsize", &bytes, &bytes_size, NULL, 0) == 0) {
+		double megabytes = bytes / (1024.*1024.);
+		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"ramMB",@"Memory (MB)", @(megabytes), @(megabytes)] forKeys:profileDictKeys]];
+	}
 	
 	return profileArray;
 }
