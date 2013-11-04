@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4510" systemVersion="12F45" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="4514" systemVersion="13A603" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment version="1050" defaultVersion="1080" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4510"/>
+        <deployment version="1050" defaultVersion="1090" identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="4514"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUAutomaticUpdateAlert">
@@ -83,7 +83,7 @@ Gw
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="30">
-                        <rect key="frame" x="102" y="12" width="128" height="32"/>
+                        <rect key="frame" x="101" y="12" width="128" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
                         <buttonCell key="cell" type="push" title="Non installare" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="44">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -94,7 +94,7 @@ Gw
                         </connections>
                     </button>
                     <button id="17">
-                        <rect key="frame" x="105" y="58" width="354" height="18"/>
+                        <rect key="frame" x="104" y="58" width="354" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES"/>
                         <buttonCell key="cell" type="check" title="In futuro scarica e installa automaticamente gli aggiornamenti" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="43">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>

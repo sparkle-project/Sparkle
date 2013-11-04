@@ -291,6 +291,7 @@
 		6113C9D315BE1D3600C303E8 /* it */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it; path = it.lproj/SUPasswordPrompt.xib; sourceTree = "<group>"; };
 		6113C9D315BE1D3600C303E9 /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = de.lproj/SUPasswordPrompt.xib; sourceTree = "<group>"; };
 		6113C9D315BE1D3600C303EA /* ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ru; path = ru.lproj/SUPasswordPrompt.xib; sourceTree = "<group>"; };
+		6113C9D315BE1D3600C303EB /* sv */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = sv; path = sv.lproj/SUPasswordPrompt.xib; sourceTree = "<group>"; };
 		6117796E0D1112E000749C97 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		61180BC80D64138900B4E0D1 /* SUWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUWindowController.h; sourceTree = "<group>"; };
 		61180BC90D64138900B4E0D1 /* SUWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUWindowController.m; sourceTree = "<group>"; };
@@ -1362,6 +1363,7 @@
 				61F3AC1515C22D5900260CA2 /* th */,
 				6149E6EE1601ABAC008A351E /* ar */,
 				61B26BF817B2F76600F99C77 /* da */,
+				6113C9D315BE1D3600C303EB /* sv */,
 			);
 			name = SUPasswordPrompt.xib;
 			sourceTree = "<group>";
