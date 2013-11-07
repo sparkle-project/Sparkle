@@ -163,13 +163,17 @@
 
 - (void)unarchiver:(SUUnarchiver *)unarchiver requiresPasswordReturnedViaInvocation:(NSInvocation *)invocation
 {
-    SUPasswordPrompt *prompt = [[SUPasswordPrompt alloc] initWithHost:host];
-    NSString *password = nil;
-    if([prompt run]) 
-    {
-        password = [prompt password];
-    }
-    [prompt release];
+    NSString *password = @"";
+// some users reported sparkle is asking for password randomly
+// HACK: do not open prompt and pass empty string as a password
+//
+//    SUPasswordPrompt *prompt = [[SUPasswordPrompt alloc] initWithHost:host];
+//    NSString *password = nil;
+//    if([prompt run]) 
+//    {
+//        password = [prompt password];
+//    }
+//    [prompt release];
     [invocation setArgument:&password atIndex:2];
     [invocation invoke];
 }
