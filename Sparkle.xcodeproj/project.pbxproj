@@ -1523,7 +1523,6 @@
 					x86_64,
 				);
 				COMBINE_HIDPI_IMAGES = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				INSTALL_PATH = "@rpath";
 			};
 			name = Debug;
@@ -1537,7 +1536,6 @@
 					x86_64,
 				);
 				COMBINE_HIDPI_IMAGES = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				INSTALL_PATH = "@rpath";
 			};
