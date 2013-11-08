@@ -353,6 +353,7 @@
 		61AAE8710A321F7700D8810D /* nl */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61B078CC15A5FB6100600039 /* SUCodeSigningVerifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUCodeSigningVerifier.h; sourceTree = "<group>"; };
 		61B078CD15A5FB6100600039 /* SUCodeSigningVerifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUCodeSigningVerifier.m; sourceTree = "<group>"; };
+		61B26BF817B2F76600F99C77 /* da */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = da; path = da.lproj/SUPasswordPrompt.xib; sourceTree = "<group>"; };
 		61B5F8E309C4CE3C00B25A18 /* SUUpdater.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SUUpdater.h; sourceTree = "<group>"; };
 		61B5F8E409C4CE3C00B25A18 /* SUUpdater.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SUUpdater.m; sourceTree = "<group>"; };
 		61B5F8E509C4CE3C00B25A18 /* SUPlainInstallerInternals.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SUPlainInstallerInternals.m; sourceTree = "<group>"; };
@@ -1354,6 +1355,7 @@
 				6113C9D315BE1D3600C303E7 /* pt_BR */,
 				61F3AC1515C22D5900260CA2 /* th */,
 				6149E6EE1601ABAC008A351E /* ar */,
+				61B26BF817B2F76600F99C77 /* da */,
 			);
 			name = SUPasswordPrompt.xib;
 			sourceTree = "<group>";
