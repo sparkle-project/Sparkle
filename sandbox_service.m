@@ -60,8 +60,10 @@ static void peer_event_handler(xpc_connection_t peer, xpc_object_t event)
 				[arguments addObject:
 				 [NSString stringWithUTF8String:xpc_array_get_string(array, i)]];
 			}
-			
-			[NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:arguments];
+            
+            NSError *launchError = nil;
+            NSRunningApplication *runningApplication = [[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:relaunchToolPath] options:NSWorkspaceLaunchNewInstance configuration:@{NSWorkspaceLaunchConfigurationArguments:arguments} error:&launchError];
+            [runningApplication activateWithOptions:NSApplicationActivateIgnoringOtherApps];
 			
 			// send response to indicate ok
 			xpc_object_t reply = xpc_dictionary_create_reply(event);

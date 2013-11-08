@@ -119,7 +119,9 @@
             appPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:executablepath length:strlen(executablepath)];
         else
             appPath = [host installationPath];
-        [[NSWorkspace sharedWorkspace] openFile: appPath];
+        
+        NSRunningApplication *relaunchedApplication = [[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:appPath] options:NSWorkspaceLaunchDefault configuration:nil error:NULL];
+        [relaunchedApplication activateWithOptions:NSApplicationActivateIgnoringOtherApps];
     }
 
     if (folderpath)
@@ -184,6 +186,7 @@ int main (int argc, const char * argv[])
 	
 	//ProcessSerialNumber		psn = { 0, kCurrentProcess };
 	//TransformProcessType( &psn, kProcessTransformToForegroundApplication );
+    [[NSApplication sharedApplication] setActivationPolicy:NSApplicationActivationPolicyRegular];
 	[[NSApplication sharedApplication] activateIgnoringOtherApps: YES];
 		
 	#if 0	// Cmdline tool
