@@ -16,7 +16,7 @@
 	xpc_connection_t connection = xpc_connection_create("com.andymatuschak.Sparkle.SandboxService", NULL);
 	xpc_connection_set_event_handler(connection, ^(xpc_object_t event) {
 		xpc_dictionary_apply(event, ^bool(const char *key, xpc_object_t value) {
-			NSLog(@"XPC %s: %s", key, xpc_string_get_string_ptr(value));
+			NSLog(@"Sparkle Copy XPC %s: %s", key, xpc_string_get_string_ptr(value));
 			return true;
 		});
 	});
@@ -41,7 +41,7 @@
 	xpc_connection_t connection = xpc_connection_create("com.andymatuschak.Sparkle.SandboxService", NULL);
 	xpc_connection_set_event_handler(connection, ^(xpc_object_t event) {
 		xpc_dictionary_apply(event, ^bool(const char *key, xpc_object_t value) {
-			NSLog(@"XPC %s: %s", key, xpc_string_get_string_ptr(value));
+			NSLog(@"Sparkle Launch XPC %s: %s", key, xpc_string_get_string_ptr(value));
 			return true;
 		});
 	});

@@ -50,6 +50,7 @@
 {
 	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
 		[[updater delegate] updaterDidNotFindUpdate:updater];
+	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:updater];
 	
 	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"You're up-to-date!", nil) defaultButton:SULocalizedString(@"OK", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [host name], [host displayVersion]];
 	[self showModalAlert:alert];
