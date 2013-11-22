@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		22760C6E183F5EC70047AABB /* com.andymatuschak.Sparkle.SandboxService.xpc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B887B5E1517F3AB000BB292 /* com.andymatuschak.Sparkle.SandboxService.xpc */; };
 		3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		525A2790133D6AE900FD8D70 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
 		525A27A0133D6B9700FD8D70 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
@@ -191,6 +192,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		22760C6C183F5EB90047AABB /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
+			dstSubfolderSpec = 16;
+			files = (
+				22760C6E183F5EC70047AABB /* com.andymatuschak.Sparkle.SandboxService.xpc in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		61B5FB4D09C4E9FA00B25A18 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -962,6 +973,8 @@
 				61B5F8FF09C4CEE200B25A18 /* Sources */,
 				61B5F90009C4CEE200B25A18 /* Frameworks */,
 				61B5FB4D09C4E9FA00B25A18 /* CopyFiles */,
+				22760C6C183F5EB90047AABB /* CopyFiles */,
+				22760C6F183F78AB0047AABB /* Sign framework and XPC service */,
 			);
 			buildRules = (
 			);
@@ -1141,6 +1154,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		22760C6F183F78AB0047AABB /* Sign framework and XPC service */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Sign framework and XPC service";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "codesign --verbose=2 --deep --force --identifier org.andymatuschak.Sparkle $OTHER_CODE_SIGN_FLAGS --sign \"$CODE_SIGN_IDENTITY\" \"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/Sparkle.framework\"\n\ncodesign --verbose=2 --deep --force --identifier com.andymatuschak.Sparkle.SandboxService $OTHER_CODE_SIGN_FLAGS --sign \"$CODE_SIGN_IDENTITY\" \"$BUILT_PRODUCTS_DIR/$XPCSERVICES_FOLDER_PATH/com.andymatuschak.Sparkle.SandboxService.xpc\"\n\n\n";
+		};
 		5D06E90D0FD68DA3005AE3F6 /* Fix Install Name */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
