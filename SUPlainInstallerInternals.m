@@ -47,7 +47,8 @@
 @end
 
 // Authorization code based on generous contribution from Allan Odgaard. Thanks, Allan!
-
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations" // this is terrible; will fix later probably
 static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char* executablePath, AuthorizationFlags options, const char* const* arguments)
 {
 	// *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
@@ -68,6 +69,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	signal(SIGCHLD, oldSigChildHandler);
 	return returnValue;
 }
+#pragma clang diagnostic pop
 
 @implementation SUPlainInstaller (Internals)
 
