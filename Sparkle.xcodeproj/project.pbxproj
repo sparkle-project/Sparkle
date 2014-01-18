@@ -663,7 +663,6 @@
 				55C14F04136EF6DB00649790 /* SULog.h */,
 				55C14F05136EF6DB00649790 /* SULog.m */,
 			);
-			includeInIndex = 1;
 			name = "Other Sources";
 			sourceTree = "<group>";
 		};
