@@ -1,3 +1,5 @@
+# Warning: This fork is not being actively maintained.
+
 # Sparkle 
 is an easy-to-use software update framework for Cocoa developers.
 
