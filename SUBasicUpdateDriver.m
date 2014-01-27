@@ -23,6 +23,26 @@
 #import "SUXPCInstaller.h"
 #import "SUXPCURLDownload.h"
 
+#define SPARKLE_IS_COMPATIBLE_WITH_DEVMATE (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_7)
+
+#if SPARKLE_IS_COMPATIBLE_WITH_DEVMATE
+CF_EXPORT CFDictionaryRef DMCopyHTTPRequestHeaders(CFBundleRef appBundle, CFDataRef httpBodyData);
+
+NSArray *SUGetAllDevMateURLHosts(void);
+NSArray *SUGetAllDevMateURLHosts(void)
+{
+    static NSArray *sAllKnownDevMateURLHosts = nil;
+    if (nil == sAllKnownDevMateURLHosts)
+    {
+        sAllKnownDevMateURLHosts = [[NSArray alloc] initWithObjects:
+                                    @"updates.devmate.com",
+                                    nil];
+    }
+    
+    return sAllKnownDevMateURLHosts;
+}
+#endif
+
 @interface SUBasicUpdateDriver () <NSURLDownloadDelegate>; @end
 
 
@@ -43,6 +63,21 @@
 	
 	[appcast setDelegate:self];
 	[appcast setUserAgentString:[updater userAgentString]];
+    
+#if SPARKLE_IS_COMPATIBLE_WITH_DEVMATE
+    if ([SUGetAllDevMateURLHosts() containsObject:[URL host]])
+    {
+        CFBundleRef hostBundle = CFBundleCreate(kCFAllocatorDefault, (CFURLRef)[NSURL fileURLWithPath:[host bundlePath]]);
+        CFDictionaryRef devmateAppcastValues = DMCopyHTTPRequestHeaders(hostBundle, NULL);
+        [appcast setAllAppcastValues:(NSDictionary *)devmateAppcastValues];
+        
+        if (NULL != devmateAppcastValues)
+            CFRelease(devmateAppcastValues);
+        if (NULL != hostBundle)
+            CFRelease(hostBundle);
+    }
+#endif
+    
 	[appcast fetchAppcastFromURL:URL];
 }
 

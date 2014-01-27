@@ -13,6 +13,7 @@
 		03B5E64B15D39CD90038BB67 /* SUXPCURLDownload.h in Headers */ = {isa = PBXBuildFile; fileRef = 03B5E64915D39CD90038BB67 /* SUXPCURLDownload.h */; };
 		03B5E65A15D3DC3C0038BB67 /* com.andymatuschak.Sparkle.download-service.xpc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 03B5E63A15D399500038BB67 /* com.andymatuschak.Sparkle.download-service.xpc */; };
 		03B5E65B15D3E0490038BB67 /* SUXPCURLDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 03B5E64A15D39CD90038BB67 /* SUXPCURLDownload.m */; };
+		33D081831888446F00394A94 /* libDMCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33D081821888446E00394A94 /* libDMCore.a */; };
 		3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		525A2790133D6AE900FD8D70 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
 		525A27A0133D6B9700FD8D70 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
@@ -245,6 +246,7 @@
 		03B5E64A15D39CD90038BB67 /* SUXPCURLDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUXPCURLDownload.m; sourceTree = "<group>"; };
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		33D081821888446E00394A94 /* libDMCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libDMCore.a; path = External/libDMCore.a; sourceTree = "<group>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
 		525A278F133D6AE900FD8D70 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		550347001370023A00AE7681 /* Sparkle.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Sparkle.icns; sourceTree = "<group>"; };
@@ -559,6 +561,7 @@
 				5D1AF82B0FD768180065DB48 /* libz.dylib in Frameworks */,
 				525A2790133D6AE900FD8D70 /* Cocoa.framework in Frameworks */,
 				55C14F32136EFC2400649790 /* SystemConfiguration.framework in Frameworks */,
+				33D081831888446F00394A94 /* libDMCore.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -618,6 +621,7 @@
 				089C1665FE841158C02AAC07 /* Framework Resources */,
 				61227A100DB5484000AB99EA /* Tests */,
 				61B5F91D09C4CF7F00B25A18 /* Test Application Sources */,
+				33D081811888444000394A94 /* External Frameworks and Libraries */,
 				0867D69AFE84028FC02AAC07 /* Apple Frameworks and Libraries */,
 				FA1941C40D94A6EA00DD942E /* Configurations */,
 				034768DFFF38A50411DB9C8B /* Products */,
@@ -657,6 +661,14 @@
 				93FB277D156BD826001937C7 /* SUPasswordPrompt.xib */,
 			);
 			name = "Framework Resources";
+			sourceTree = "<group>";
+		};
+		33D081811888444000394A94 /* External Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				33D081821888446E00394A94 /* libDMCore.a */,
+			);
+			name = "External Frameworks and Libraries";
 			sourceTree = "<group>";
 		};
 		55C14BD5136EEFD000649790 /* finish_installation tool */ = {
@@ -1694,6 +1706,10 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/External",
+				);
 			};
 			name = Debug;
 		};
@@ -1703,6 +1719,10 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/External",
+				);
 			};
 			name = Release;
 		};
@@ -1822,6 +1842,10 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/External",
+				);
 			};
 			name = "Release (GC dual-mode; 10.5+)";
 		};
@@ -1830,7 +1854,6 @@
 			baseConfigurationReference = 615409A8103BA09100125AF1 /* ConfigTestAppReleaseGCSupport.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "Sparkle Test App.entitlements";
-				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 			};
 			name = "Release (GC dual-mode; 10.5+)";
@@ -1864,7 +1887,6 @@
 			baseConfigurationReference = FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "Sparkle Test App.entitlements";
-				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 			};
 			name = Debug;
@@ -1874,7 +1896,6 @@
 			baseConfigurationReference = FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "Sparkle Test App.entitlements";
-				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 			};
 			name = Release;
@@ -1919,6 +1940,10 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/External",
+				);
 			};
 			name = Deployment;
 		};
@@ -1927,7 +1952,6 @@
 			baseConfigurationReference = FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "Sparkle Test App.entitlements";
-				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 			};
 			name = Deployment;

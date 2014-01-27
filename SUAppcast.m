@@ -43,13 +43,9 @@
 - (void)dealloc
 {
 	[items release];
-	items = nil;
-	[userAgentString release];
-	userAgentString = nil;
+	[appcastValues release];
 	[downloadFilename release];
-	downloadFilename = nil;
 	[download release];
-	download = nil;
 	
 	[super dealloc];
 }
@@ -62,12 +58,15 @@
 - (void)fetchAppcastFromURL:(NSURL *)url
 {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
-    if (userAgentString)
-        [request setValue:userAgentString forHTTPHeaderField:@"User-Agent"];
-            
-    if ([SUUpdater shouldUseXPC]) {
+    if ([appcastValues count])
+        [request setAllHTTPHeaderFields:appcastValues];
+    
+    if ([SUUpdater shouldUseXPC])
+    {
         download = (NSURLDownload *)[[SUXPCURLDownload alloc] initWithRequest:request delegate:self];
-    } else {
+    }
+    else
+    {
         download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
     }
 }
@@ -291,11 +290,38 @@
 
 - (void)setUserAgentString:(NSString *)uas
 {
-	if (uas != userAgentString)
-	{
-		[userAgentString release];
-		userAgentString = [uas copy];
-	}
+    [self setAppcastValue:uas forKey:@"User-Agent"];
+}
+
+- (void)setAppcastValue:(NSString *)value forKey:(NSString *)key
+{
+    if (nil == key)
+        return;
+    
+    if (nil == appcastValues)
+        appcastValues = [[NSMutableDictionary alloc] init];
+    
+    if (nil == value)
+        [appcastValues removeObjectForKey:key];
+    else
+        [appcastValues setValue:[[value copy] autorelease] forKey:key];
+}
+
+- (void)setAllAppcastValues:(NSDictionary *)inAppcastValues
+{
+    if (0 == [inAppcastValues count])
+        return;
+    
+    NSEnumerator *keyEnumerator = [inAppcastValues keyEnumerator];
+    id key = nil;
+    while ((key = [keyEnumerator nextObject]))
+    {
+        id value = [inAppcastValues objectForKey:key];
+        if (![key isKindOfClass:[NSString class]] || ![value isKindOfClass:[NSString class]])
+            continue;
+        
+        [self setAppcastValue:value forKey:key];
+    }
 }
 
 - (void)setDelegate:del

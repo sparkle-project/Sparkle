@@ -14,15 +14,17 @@
 {
 @private
 	NSArray *items;
-	NSString *userAgentString;
+    NSMutableDictionary *appcastValues;
 	id delegate;
 	NSString *downloadFilename;
 	NSURLDownload *download;
 }
 
 - (void)fetchAppcastFromURL:(NSURL *)url;
-- (void)setDelegate:delegate;
+- (void)setDelegate:(id)delegate;
 - (void)setUserAgentString:(NSString *)userAgentString;
+- (void)setAppcastValue:(NSString *)value forKey:(NSString *)key;
+- (void)setAllAppcastValues:(NSDictionary *)inAppcastValues;
 
 - (NSArray *)items;
 

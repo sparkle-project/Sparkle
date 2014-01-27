@@ -18,6 +18,10 @@
 #define NSAppKitVersionNumber10_6 1038
 #endif 
 
+#ifndef NSAppKitVersionNumber10_7
+#define NSAppKitVersionNumber10_7 1138
+#endif
+
 #ifdef __OBJC__
 
 #define SPARKLE_BUNDLE [NSBundle bundleWithIdentifier:@"org.andymatuschak.Sparkle"]
