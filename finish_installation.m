@@ -151,6 +151,7 @@
         [statusCtl beginActionWithTitle: SULocalizedString(@"Installing update...",@"")
                         maxProgressValue: 0 statusText: @""];
         [statusCtl showWindow: self];
+		[statusCtl release];
     }
 	
 	[SUInstaller installFromUpdateFolder: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: folderpath length: strlen(folderpath)]

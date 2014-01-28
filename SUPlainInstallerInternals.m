@@ -198,8 +198,13 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		// quarantine to avoid a delay at launch, and to avoid
 		// presenting the user with a confusing trust dialog.
 		//
-		// This needs to be done before "chown" changes ownership,
-		// because the ownership change will fail if the file is quarantined.
+		// This needs to be done after the application is moved to its
+		// new home with "mv" in case it's moved across filesystems: if
+		// that happens, "mv" actually performs a copy and may result
+		// in the application being quarantined.  It also needs to be
+		// done before "chown" changes ownership, because the ownership
+		// change will almost certainly make it impossible to change
+		// attributes to release the files from the quarantine.
 		if (res)
 		{
 			SULog(@"releaseFromQuarantine");
