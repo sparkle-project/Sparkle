@@ -1368,6 +1368,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				OTHER_CFLAGS = "-DDEBUG";
 				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
@@ -1377,6 +1378,7 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
