@@ -15,7 +15,7 @@
 // -----------------------------------------------------------------------------
 
 // Turn off DSA signature check (practically invites man-in-the-middle attacks):
-#define ENDANGER_USERS_WITH_INSECURE_UPDATES		1
+#define ENDANGER_USERS_WITH_INSECURE_UPDATES		0
 
 // Sparkle usually doesn't allow downgrades as they're usually accidental, but
 //	if your app has a downgrade function or URL handler, turn this on:
