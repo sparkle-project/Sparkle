@@ -180,8 +180,9 @@ finally:
 	BOOL result = NO;
 	if(resultData)
 	{
-		NSString *data = [NSString stringWithCString:(char*)[resultData bytes] encoding:NSUTF8StringEncoding];
-		if (!NSEqualRanges([data rangeOfString:@"passphrase-count"], NSMakeRange(NSNotFound, 0))) 
+		NSString *data = [[[NSString alloc] initWithData:resultData encoding:NSUTF8StringEncoding] autorelease];
+        
+        if ((data != nil) && !NSEqualRanges([data rangeOfString:@"passphrase-count"], NSMakeRange(NSNotFound, 0)))
 		{
 			result = YES;
 		}
