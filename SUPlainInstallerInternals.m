@@ -506,7 +506,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 				// We better move the old version back to its old location
 				if( hadFileAtDest )
 					success = [manager moveItemAtPath:tmpPath toPath:dst error:error];
-				if (error != NULL)
+				if (!success && error != NULL)
 					*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
 				return NO;
 
