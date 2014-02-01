@@ -2,4 +2,3 @@
 #include "ConfigCommonDebug.xcconfig"
 #include "ConfigFramework.xcconfig"
 
-OTHER_CFLAGS = -DDEBUG

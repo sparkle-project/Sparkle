@@ -1408,12 +1408,9 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = finish_installation.pch;
 				INFOPLIST_FILE = "finish_installation-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
-				OTHER_CFLAGS = "-DDEBUG";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -1436,7 +1433,6 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = finish_installation.pch;
 				INFOPLIST_FILE = "finish_installation-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
