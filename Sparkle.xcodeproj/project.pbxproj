@@ -32,7 +32,7 @@
 		55C14F24136EF86F00649790 /* SUPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5210DAE8E8A0026945C /* SUPackageInstaller.m */; };
 		55C14F2A136EF9A900649790 /* SUWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 61180BC90D64138900B4E0D1 /* SUWindowController.m */; };
 		55C14F32136EFC2400649790 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 55C14F31136EFC2400649790 /* SystemConfiguration.framework */; };
-		55C14F3B136EFCB300649790 /* finish_installation.app in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BB7136EEF1500649790 /* finish_installation.app */; };
+		55C14F3B136EFCB300649790 /* Autoupdate.app in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BB7136EEF1500649790 /* Autoupdate.app */; };
 		55C14F7E136F005000649790 /* SUPlainInstallerInternals.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5F8E509C4CE3C00B25A18 /* SUPlainInstallerInternals.m */; };
 		55C14F9A136F045400649790 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
 		55C14FC7136F05E100649790 /* Sparkle.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8220A321A7F00D8810D /* Sparkle.strings */; };
@@ -199,7 +199,7 @@
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
 		525A278F133D6AE900FD8D70 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		550347001370023A00AE7681 /* Sparkle.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Sparkle.icns; sourceTree = "<group>"; };
-		55C14BB7136EEF1500649790 /* finish_installation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = finish_installation.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		55C14BB7136EEF1500649790 /* Autoupdate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Autoupdate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		55C14BB9136EEF1500649790 /* finish_installation-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "finish_installation-Info.plist"; sourceTree = "<group>"; };
 		55C14BD3136EEFCE00649790 /* finish_installation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = finish_installation.m; sourceTree = "<group>"; };
 		55C14BD8136EF00C00649790 /* SUStatus.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SUStatus.xib; sourceTree = "<group>"; };
@@ -488,7 +488,7 @@
 				61B5F90209C4CEE200B25A18 /* Sparkle Test App.app */,
 				612279D90DB5470200AB99EA /* Sparkle Unit Tests.octest */,
 				5D06E8D00FD68C7C005AE3F6 /* BinaryDelta */,
-				55C14BB7136EEF1500649790 /* finish_installation.app */,
+				55C14BB7136EEF1500649790 /* Autoupdate.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -819,8 +819,7 @@
 			dependencies = (
 			);
 			name = finish_installation;
-			productName = finish_installation;
-			productReference = 55C14BB7136EEF1500649790 /* finish_installation.app */;
+			productReference = 55C14BB7136EEF1500649790 /* Autoupdate.app */;
 			productType = "com.apple.product-type.application";
 		};
 		5D06E8CF0FD68C7C005AE3F6 /* BinaryDelta */ = {
@@ -1009,7 +1008,7 @@
 				55C14BEF136EF21700649790 /* SUStatus.xib in Resources */,
 				55C14C04136EF26100649790 /* SUUpdateAlert.xib in Resources */,
 				55C14C19136EF2C700649790 /* SUUpdatePermissionPrompt.xib in Resources */,
-				55C14F3B136EFCB300649790 /* finish_installation.app in Resources */,
+				55C14F3B136EFCB300649790 /* Autoupdate.app in Resources */,
 				93FB277F156BD826001937C7 /* SUPasswordPrompt.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1417,7 +1416,6 @@
 					"-framework",
 					AppKit,
 				);
-				PRODUCT_NAME = finish_installation;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -1439,7 +1437,6 @@
 					"-framework",
 					AppKit,
 				);
-				PRODUCT_NAME = finish_installation;
 				SDKROOT = macosx;
 			};
 			name = Release;

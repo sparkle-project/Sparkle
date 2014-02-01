@@ -8,6 +8,7 @@ is an easy-to-use software update framework for Cocoa developers.
 * Merged official Sparkle branch with truly automatic background updates (no UI at all) when user agreed to "Automatically download and install updates in the future."
 * Ability to mark updates as critical.
 * Progress and status notifications for the host app.
+* Name of finish_installation.app can be configured to match your app's name.
 
 ## Features
 

@@ -324,10 +324,15 @@
     
 	if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdate:)])
 		[[updater delegate] updater:updater willInstallUpdate:updateItem];
-	
+
+    // RELAUNCH_TOOL_PRODUCT_NAME expands to unquoted finish_install
+    #define NS_STRING_FROM_MACRO(s) NS_STRING_FROM_MACRO_QUOTE_(s)
+    #define NS_STRING_FROM_MACRO_QUOTE_(s) @"" #s
+    NSString *relaunchName = NS_STRING_FROM_MACRO(RELAUNCH_TOOL_PRODUCT_NAME);
+
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
-	NSString *relaunchPathToCopy = [SPARKLE_BUNDLE pathForResource:@"finish_installation" ofType:@"app"];
+	NSString *relaunchPathToCopy = [SPARKLE_BUNDLE pathForResource:relaunchName ofType:@"app"];
 	if (relaunchPathToCopy != nil)
 	{
 		NSString *targetPath = [[host appSupportPath] stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
@@ -356,7 +361,7 @@
     NSString *pathToRelaunch = [host bundlePath];
     if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
         pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
-    NSString *relaunchToolPath = [relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS/finish_installation"];
+    NSString *relaunchToolPath = [[relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS"] stringByAppendingPathComponent: relaunchName];
     [NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:[NSArray arrayWithObjects:
 																	[host bundlePath],
 																	pathToRelaunch,

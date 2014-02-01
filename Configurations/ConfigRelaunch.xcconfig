@@ -1,4 +1,4 @@
 // Relaunch Tool only
 
-PRODUCT_NAME = finish_installation
+PRODUCT_NAME = $(RELAUNCH_TOOL_PRODUCT_NAME)
 SKIP_INSTALL = YES
