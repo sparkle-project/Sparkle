@@ -1,6 +1,6 @@
 // Common
 
-CURRENT_PROJECT_VERSION = 1.5
+CURRENT_PROJECT_VERSION = 1.6
 GCC_PRECOMPILE_PREFIX_HEADER = YES
 GCC_PREFIX_HEADER = $(SDKROOT)/System/Library/Frameworks/Cocoa.framework/Headers/Cocoa.h
 ARCHS = i386 x86_64

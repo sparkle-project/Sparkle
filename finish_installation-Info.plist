@@ -15,15 +15,15 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>${CURRENT_PROJECT_VERSION}</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>${CURRENT_PROJECT_VERSION}</string>
 	<key>LSBackgroundOnly</key>
 	<string>1</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.4</string>
+	<string>10.6</string>
 	<key>LSUIElement</key>
 	<string>1</string>
 	<key>NSMainNibFile</key>
