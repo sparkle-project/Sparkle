@@ -33,6 +33,8 @@ NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdateDriverFinishedNotification object:self];
 }
 
+- (BOOL)isInterruptible { return isInterruptible; }
+
 - (BOOL)finished { return finished; }
 
 - (void)dealloc

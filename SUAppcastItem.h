@@ -29,7 +29,7 @@
 	NSDictionary *deltaUpdates;
 
 	NSDictionary *propertiesDictionary;
-	
+
 	NSURL *infoURL;	// UK 2007-08-31
 }
 
@@ -49,6 +49,7 @@
 - (NSString *)maximumSystemVersion;
 - (NSDictionary *)deltaUpdates;
 - (BOOL)isDeltaUpdate;
+- (BOOL)isCriticalUpdate;
 
 // Returns the dictionary provided in initWithDictionary; this might be useful later for extensions.
 - (NSDictionary *)propertiesDictionary;

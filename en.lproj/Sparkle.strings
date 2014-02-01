@@ -1,4 +1,7 @@
 /* No comment provided by engineer. */
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?";
+
+/* No comment provided by engineer. */
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?";
 
 /* No comment provided by engineer. */
@@ -39,6 +42,9 @@
 
 /* No comment provided by engineer. */
 "An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.";
+
+/* No comment provided by engineer. */
+"An important update to %@ is ready to install" = "An important update to %@ is ready to install";
 
 /* the unit for bytes */
 "B" = "B";

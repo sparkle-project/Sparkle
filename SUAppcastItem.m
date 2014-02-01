@@ -138,6 +138,11 @@
 	return [[propertiesDictionary objectForKey:@"enclosure"] objectForKey:@"sparkle:deltaFrom"] != nil;
 }
 
+- (BOOL)isCriticalUpdate
+{
+    return [[propertiesDictionary objectForKey:@"sparkle:tags"] containsObject:@"sparkle:criticalUpdate"];
+}
+
 - initWithDictionary:(NSDictionary *)dict
 {
 	return [self initWithDictionary:dict failureReason:nil];

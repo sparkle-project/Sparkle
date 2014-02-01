@@ -24,6 +24,7 @@
 	NSTimer			*longInstallationTimer;
 	SUHost			*host;
     BOOL            shouldRelaunch;
+	BOOL			shouldShowUI;
 }
 
 - (void) parentHasQuit;
@@ -38,8 +39,7 @@
 
 @implementation TerminationListener
 
-- (id) initWithHostPath:(const char *)inhostpath executablePath:(const char *)execpath parentProcessId:(pid_t)ppid folderPath: (const char*)infolderpath shouldRelaunch:(BOOL)relaunch
-		selfPath: (NSString*)inSelfPath
+- (id) initWithHostPath:(const char *)inhostpath executablePath:(const char *)execpath parentProcessId:(pid_t)ppid folderPath:(const char*)infolderpath shouldRelaunch:(BOOL)relaunch shouldShowUI:(BOOL)showUI selfPath:(NSString*)inSelfPath
 {
 	if( !(self = [super init]) )
 		return nil;
@@ -50,6 +50,7 @@
 	folderpath		= infolderpath;
 	selfPath		= [inSelfPath retain];
     shouldRelaunch  = relaunch;
+	shouldShowUI	= showUI;
 	
 	BOOL	alreadyTerminated = (getppid() == 1); // ppid is launchd (1) => parent terminated already
 	
@@ -144,8 +145,7 @@
 	host = [[SUHost alloc] initWithBundle: theBundle];
     installationPath = [[host installationPath] copy];
 	
-    // Perhaps a poor assumption but: if we're not relaunching, we assume we shouldn't be showing any UI either. Because non-relaunching installations are kicked off without any user interaction, we shouldn't be interrupting them.
-    if (shouldRelaunch) {
+    if (shouldShowUI) {
         SUStatusController*	statusCtl = [[SUStatusController alloc] initWithHost: host];	// We quit anyway after we've installed, so leak this for now.
         [statusCtl setButtonTitle: SULocalizedString(@"Cancel Update",@"") target: nil action: Nil isDefault: NO];
         [statusCtl beginActionWithTitle: SULocalizedString(@"Installing update...",@"")
@@ -168,8 +168,7 @@
 
 - (void) installerForHost:(SUHost *)host failedWithError:(NSError *)error
 {
-    // Perhaps a poor assumption but: if we're not relaunching, we assume we shouldn't be showing any UI either. Because non-relaunching installations are kicked off without any user interaction, we shouldn't be interrupting them.
-    if (shouldRelaunch)
+    if (shouldShowUI)
         NSRunAlertPanel( @"", @"%@", @"OK", @"", @"", [error localizedDescription] );
 	exit(EXIT_FAILURE);
 }
@@ -178,14 +177,13 @@
 
 int main (int argc, const char * argv[])
 {
-	if( argc < 5 || argc > 6 )
+	if( argc < 5 || argc > 7 )
 		return EXIT_FAILURE;
 	
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	//ProcessSerialNumber		psn = { 0, kCurrentProcess };
 	//TransformProcessType( &psn, kProcessTransformToForegroundApplication );
-	[[NSApplication sharedApplication] activateIgnoringOtherApps: YES];
 		
 	#if 0	// Cmdline tool
 	NSString*	selfPath = nil;
@@ -200,12 +198,19 @@ int main (int argc, const char * argv[])
 	NSString*	selfPath = [[NSBundle mainBundle] bundlePath];
 	#endif
 	
+	BOOL shouldShowUI = (argc > 6) ? atoi(argv[6]) : 1;
+	if (shouldShowUI)
+	{
+		[[NSApplication sharedApplication] activateIgnoringOtherApps: YES];
+	}
+	
 	[NSApplication sharedApplication];
 	[[[TerminationListener alloc] initWithHostPath: (argc > 1) ? argv[1] : NULL
                                     executablePath: (argc > 2) ? argv[2] : NULL
                                    parentProcessId: (argc > 3) ? atoi(argv[3]) : 0
                                         folderPath: (argc > 4) ? argv[4] : NULL
                                     shouldRelaunch: (argc > 5) ? atoi(argv[5]) : 1
+                                      shouldShowUI: shouldShowUI
                                           selfPath: selfPath] autorelease];
 	[[NSApplication sharedApplication] run];
 	

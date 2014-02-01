@@ -21,11 +21,13 @@ extern NSString * const SUUpdateDriverFinishedNotification;
 	NSURL *appcastURL;
 	
 	BOOL finished;
+	BOOL isInterruptible;
 }
 
 - initWithUpdater:(SUUpdater *)updater;
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
 - (void)abortUpdate;
+- (BOOL)isInterruptible;
 - (BOOL)finished;
 - (SUHost*)host;
 - (void)setHost:(SUHost*)newHost;
