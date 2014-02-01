@@ -62,7 +62,7 @@
 {
     if ([updateItem isCriticalUpdate])
     {
-        return [NSString stringWithFormat:SULocalizedString(@"An important update to %@ is ready to install", nil)];
+        return [NSString stringWithFormat:SULocalizedString(@"An important update to %@ is ready to install", nil), [host name]];
     }
     else
     {
