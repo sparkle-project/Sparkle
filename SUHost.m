@@ -65,6 +65,7 @@
     else
         appSupportPath = [appSupportPaths objectAtIndex:0];
     appSupportPath = [appSupportPath stringByAppendingPathComponent:[self name]];
+    appSupportPath = [appSupportPath stringByAppendingPathComponent:@".Sparkle"];
     return appSupportPath;
 }
 
