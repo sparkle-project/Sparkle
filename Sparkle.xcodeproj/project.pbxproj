@@ -109,7 +109,7 @@
 		61B5F8F709C4CEB300B25A18 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
 		61B5F90F09C4CF3A00B25A18 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; };
 		61B5F92E09C4CFD800B25A18 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61B5F92A09C4CFD800B25A18 /* InfoPlist.strings */; };
-		61B5F92F09C4CFD800B25A18 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 61B5F92C09C4CFD800B25A18 /* MainMenu.nib */; };
+		61B5F92F09C4CFD800B25A18 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 61B5F92C09C4CFD800B25A18 /* MainMenu.xib */; };
 		61B5F93009C4CFDC00B25A18 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5F92409C4CFC900B25A18 /* main.m */; };
 		61B5FBB709C4FAFF00B25A18 /* SUAppcast.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5FB9509C4F04600B25A18 /* SUAppcast.m */; };
 		61B5FC0D09C4FC8200B25A18 /* SUAppcast.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B5FB9409C4F04600B25A18 /* SUAppcast.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -189,7 +189,7 @@
 		004D573A1766A31600E4B27E /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = ro.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
 		004D573B1766A31600E4B27E /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = ro.lproj/SUPasswordPrompt.xib; sourceTree = "<group>"; };
 		004D573C1766A31600E4B27E /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		004D573D1766A31600E4B27E /* ro */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = ro; path = ro.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		004D573D1766A31600E4B27E /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = ro.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		0263187214FEBB31005EBF43 /* uk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		0263187514FEBB42005EBF43 /* uk */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = uk; path = uk.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
 		0263187614FEBB42005EBF43 /* uk */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = uk; path = uk.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
@@ -367,7 +367,7 @@
 		61B5F90409C4CEE200B25A18 /* Test Application-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Test Application-Info.plist"; path = "Test Application/Test Application-Info.plist"; sourceTree = "<group>"; };
 		61B5F92409C4CFC900B25A18 /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = main.m; path = "Test Application/main.m"; sourceTree = "<group>"; };
 		61B5F92B09C4CFD800B25A18 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = "Test Application/English.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
-		61B5F92D09C4CFD800B25A18 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = "Test Application/English.lproj/MainMenu.nib"; sourceTree = "<group>"; };
+		61B5F92D09C4CFD800B25A18 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = "Test Application/English.lproj/MainMenu.xib"; sourceTree = "<group>"; };
 		61B5FB9409C4F04600B25A18 /* SUAppcast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUAppcast.h; sourceTree = "<group>"; };
 		61B5FB9509C4F04600B25A18 /* SUAppcast.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUAppcast.m; sourceTree = "<group>"; };
 		61B5FC3F09C4FD4000B25A18 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
@@ -538,11 +538,11 @@
 				615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */,
 				61C268090E2DB5D000175E6C /* License.txt */,
 				61AAE8220A321A7F00D8810D /* Sparkle.strings */,
-				55C14C05136EF2C700649790 /* SUUpdatePermissionPrompt.xib */,
-				55C14BF0136EF26100649790 /* SUUpdateAlert.xib */,
 				55C14BDA136EF20D00649790 /* SUAutomaticUpdateAlert.xib */,
-				55C14BD8136EF00C00649790 /* SUStatus.xib */,
 				93FB277D156BD826001937C7 /* SUPasswordPrompt.xib */,
+				55C14BD8136EF00C00649790 /* SUStatus.xib */,
+				55C14BF0136EF26100649790 /* SUUpdateAlert.xib */,
+				55C14C05136EF2C700649790 /* SUUpdatePermissionPrompt.xib */,
 			);
 			name = "Framework Resources";
 			sourceTree = "<group>";
@@ -675,8 +675,8 @@
 			children = (
 				61BBDF810A49220C00378739 /* Sparkle.icns */,
 				61B5F92A09C4CFD800B25A18 /* InfoPlist.strings */,
-				61B5F92C09C4CFD800B25A18 /* MainMenu.nib */,
 				61B5F92409C4CFC900B25A18 /* main.m */,
+				61B5F92C09C4CFD800B25A18 /* MainMenu.xib */,
 				61B5F90409C4CEE200B25A18 /* Test Application-Info.plist */,
 				618E9CFC0E7328F1004646D8 /* dsa_pub.pem */,
 			);
@@ -992,7 +992,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				61B5F92E09C4CFD800B25A18 /* InfoPlist.strings in Resources */,
-				61B5F92F09C4CFD800B25A18 /* MainMenu.nib in Resources */,
+				61B5F92F09C4CFD800B25A18 /* MainMenu.xib in Resources */,
 				61BBDF820A49220C00378739 /* Sparkle.icns in Resources */,
 				618E9CFD0E7328F1004646D8 /* dsa_pub.pem in Resources */,
 			);
@@ -1342,13 +1342,13 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		61B5F92C09C4CFD800B25A18 /* MainMenu.nib */ = {
+		61B5F92C09C4CFD800B25A18 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				61B5F92D09C4CFD800B25A18 /* English */,
 				004D573D1766A31600E4B27E /* ro */,
 			);
-			name = MainMenu.nib;
+			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
 		93FB277D156BD826001937C7 /* SUPasswordPrompt.xib */ = {
