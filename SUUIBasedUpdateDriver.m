@@ -142,11 +142,7 @@
 	if ([statusController maxProgressValue] == 0.0)
 	{
 		NSDictionary * attributes;
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-		attributes = [[NSFileManager defaultManager] fileAttributesAtPath:downloadPath traverseLink:NO];
-#else
 		attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:downloadPath error:nil];
-#endif
 		[statusController setMaxProgressValue:[[attributes objectForKey:NSFileSize] doubleValue]];
 	}
 	[statusController setProgressValue:[statusController progressValue] + (double)length];

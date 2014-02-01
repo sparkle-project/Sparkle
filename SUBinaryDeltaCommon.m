@@ -148,18 +148,10 @@ NSString *hashOfTree(NSString *path)
 
 void removeTree(NSString *path)
 {
-#if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_4
-    [[NSFileManager defaultManager] removeItemAtPath:path error:0];
-#else
-    [[NSFileManager defaultManager] removeFileAtPath:path handler:nil];
-#endif
+    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
 }
 
 void copyTree(NSString *source, NSString *dest)
 {
-#if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_4
-    [[NSFileManager defaultManager] copyItemAtPath:source toPath:dest error:0];
-#else
-    [[NSFileManager defaultManager] copyPath:source toPath:dest handler:nil];
-#endif    
+    [[NSFileManager defaultManager] copyItemAtPath:source toPath:dest error:nil];
 }

@@ -409,11 +409,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 + (BOOL)_removeFileAtPath:(NSString *)path error: (NSError**)error
 {
 	BOOL	success = YES;
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-    if( ![[NSFileManager defaultManager] removeFileAtPath: path handler: nil] )
-#else
 	if( ![[NSFileManager defaultManager] removeItemAtPath: path error: NULL] )
-#endif
 	{
 		success = [self _removeFileAtPathWithForcedAuthentication: path error: error];
 	}
@@ -602,11 +598,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	
 	// Only recurse if it's actually a directory.  Don't recurse into a
 	// root-level symbolic link.
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-	NSDictionary* rootAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:root traverseLink:NO];
-#else
 	NSDictionary* rootAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:root error:nil];
-#endif
 	NSString* rootType = [rootAttributes objectForKey:NSFileType];
 	
 	if (rootType == NSFileTypeDirectory) {
