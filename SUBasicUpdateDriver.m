@@ -21,6 +21,15 @@
 #import "SUCodeSigningVerifier.h"
 #import "SUUpdater_Private.h"
 
+#ifdef FINISH_INSTALL_TOOL_NAME
+    // FINISH_INSTALL_TOOL_NAME expands to unquoted finish_install
+    #define QUOTE_NS_STRING2(str) @"" #str
+    #define QUOTE_NS_STRING1(str) QUOTE_NS_STRING2(str)
+    #define FINISH_INSTALL_TOOL_NAME_STRING QUOTE_NS_STRING1(FINISH_INSTALL_TOOL_NAME)
+#else
+    #error FINISH_INSTALL_TOOL_NAME not defined
+#endif
+
 @interface SUBasicUpdateDriver () <NSURLDownloadDelegate>; @end
 
 
@@ -325,14 +334,11 @@
 	if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdate:)])
 		[[updater delegate] updater:updater willInstallUpdate:updateItem];
 
-    // RELAUNCH_TOOL_PRODUCT_NAME expands to unquoted finish_install
-    #define NS_STRING_FROM_MACRO(s) NS_STRING_FROM_MACRO_QUOTE_(s)
-    #define NS_STRING_FROM_MACRO_QUOTE_(s) @"" #s
-    NSString *relaunchName = NS_STRING_FROM_MACRO(RELAUNCH_TOOL_PRODUCT_NAME);
+    NSString *const finishInstallToolName = FINISH_INSTALL_TOOL_NAME_STRING;
 
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
-	NSString *relaunchPathToCopy = [SPARKLE_BUNDLE pathForResource:relaunchName ofType:@"app"];
+	NSString *relaunchPathToCopy = [SPARKLE_BUNDLE pathForResource:finishInstallToolName ofType:@"app"];
 	if (relaunchPathToCopy != nil)
 	{
 		NSString *targetPath = [[host appSupportPath] stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
@@ -361,7 +367,7 @@
     NSString *pathToRelaunch = [host bundlePath];
     if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
         pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
-    NSString *relaunchToolPath = [[relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS"] stringByAppendingPathComponent: relaunchName];
+    NSString *relaunchToolPath = [[relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS"] stringByAppendingPathComponent: finishInstallToolName];
     [NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:[NSArray arrayWithObjects:
 																	[host bundlePath],
 																	pathToRelaunch,
