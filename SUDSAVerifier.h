@@ -11,7 +11,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface SUDSAVerifier : NSObject {}
+@interface SUDSAVerifier : NSObject
 + (BOOL)validatePath:(NSString *)path withEncodedDSASignature:(NSString *)encodedSignature withPublicDSAKey:(NSString *)pkeyString;
 @end
 

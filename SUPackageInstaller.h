@@ -16,7 +16,7 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SUPlainInstaller.h"
 
-@interface SUPackageInstaller : SUPlainInstaller { }
+@interface SUPackageInstaller : SUPlainInstaller
 @end
 
 #endif

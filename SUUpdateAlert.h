@@ -12,6 +12,7 @@
 #import "SUWindowController.h"
 #import "SUVersionDisplayProtocol.h"
 
+@protocol SUUpdateAlertDelegate;
 
 typedef enum
 {
@@ -25,7 +26,7 @@ typedef enum
 @interface SUUpdateAlert : SUWindowController {
 	SUAppcastItem *updateItem;
 	SUHost *host;
-	id delegate;
+	id<SUUpdateAlertDelegate> delegate;
 	id<SUVersionDisplay>	versionDisplayer;
 	
 	IBOutlet WebView *releaseNotesView;
@@ -36,9 +37,9 @@ typedef enum
 	NSProgressIndicator *releaseNotesSpinner;
 	BOOL webViewFinishedLoading;
 }
+@property (assign) id<SUUpdateAlertDelegate> delegate;
 
 - (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host;
-- (void)setDelegate:delegate;
 
 - (IBAction)installUpdate:sender;
 - (IBAction)skipThisVersion:sender;
@@ -48,7 +49,7 @@ typedef enum
 
 @end
 
-@interface NSObject (SUUpdateAlertDelegate)
+@protocol SUUpdateAlertDelegate <NSObject>
 - (void)updateAlert:(SUUpdateAlert *)updateAlert finishedWithChoice:(SUUpdateAlertChoice)updateChoice;
 - (void)updateAlert:(SUUpdateAlert *)updateAlert shouldAllowAutoUpdate: (BOOL*)shouldAllowAutoUpdate;
 @end

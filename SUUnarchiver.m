@@ -16,6 +16,7 @@
 #import "SUUnarchiver_Private.h"
 
 @implementation SUUnarchiver
+@synthesize delegate;
 
 + (SUUnarchiver *)unarchiverForPath:(NSString *)path updatingHost:(SUHost *)host
 {
@@ -30,11 +31,6 @@
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], archivePath]; }
-
-- (void)setDelegate:del
-{
-	delegate = del;
-}
 
 - (void)start
 {

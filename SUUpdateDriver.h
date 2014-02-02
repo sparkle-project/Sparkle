@@ -23,14 +23,13 @@ extern NSString * const SUUpdateDriverFinishedNotification;
 	BOOL finished;
 	BOOL isInterruptible;
 }
+@property (retain) SUHost *host;
 
 - initWithUpdater:(SUUpdater *)updater;
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
 - (void)abortUpdate;
 - (BOOL)isInterruptible;
 - (BOOL)finished;
-- (SUHost*)host;
-- (void)setHost:(SUHost*)newHost;
 
 @end
 

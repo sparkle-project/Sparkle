@@ -18,7 +18,7 @@
 #import "SUConstants.h"
 
 
-@interface WebView (SUTenFiveProperty)
+@interface WebView ()
 
 -(void)	setDrawsBackground: (BOOL)state;
 
@@ -26,6 +26,7 @@
 
 
 @implementation SUUpdateAlert
+@synthesize delegate;
 
 - (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost
 {
@@ -346,11 +347,6 @@
 	}
 	
 	return webViewMenuItems;
-}
-
-- (void)setDelegate:del
-{
-	delegate = del;
 }
 
 @end

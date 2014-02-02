@@ -17,11 +17,11 @@
 	NSString *defaultsDomain;
 	BOOL usesStandardUserDefaults;
 }
+@property (retain, readonly) NSBundle *bundle;
 
 + (NSString *)systemVersionString;
 
 - (id)initWithBundle:(NSBundle *)aBundle;
-- (NSBundle *)bundle;
 - (NSString *)bundlePath;
 - (NSString *)appSupportPath;
 - (NSString *)installationPath;

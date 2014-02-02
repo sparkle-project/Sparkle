@@ -12,15 +12,19 @@
 #import <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
 #import "SULog.h"
 
+@interface SUHost ()
+@property (retain, readwrite) NSBundle *bundle;
+@end
 
 @implementation SUHost
+@synthesize bundle;
 
 - (id)initWithBundle:(NSBundle *)aBundle
 {
 	if ((self = [super init]))
 	{
 		if (aBundle == nil) aBundle = [NSBundle mainBundle];
-        bundle = [aBundle retain];
+        self.bundle = aBundle;
 		if (![bundle bundleIdentifier])
 			SULog(@"Sparkle Error: the bundle being updated at %@ has no CFBundleIdentifier! This will cause preference read/write to not work properly.", bundle);
 
@@ -37,16 +41,11 @@
 - (void)dealloc
 {
 	[defaultsDomain release];
-	[bundle release];
+	self.bundle = nil;
 	[super dealloc];
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self bundlePath], [self installationPath]]; }
-
-- (NSBundle *)bundle
-{
-    return bundle;
-}
 
 - (NSString *)bundlePath
 {
