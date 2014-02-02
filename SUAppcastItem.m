@@ -94,9 +94,9 @@
 		}
         
 		propertiesDictionary = [[NSMutableDictionary alloc] initWithDictionary:dict];
-		[self setTitle:[dict objectForKey:@"title"]];
-		[self setDate:[dict objectForKey:@"pubDate"]];
-		[self setItemDescription:[dict objectForKey:@"description"]];
+		self.title = [dict objectForKey:@"title"];
+		self.date = [dict objectForKey:@"pubDate"];
+		self.itemDescription = [dict objectForKey:@"description"];
 		
 		NSString*	theInfoURL = [dict objectForKey:@"link"];
 		if( theInfoURL )
@@ -104,7 +104,7 @@
 			if( ![theInfoURL isKindOfClass: [NSString class]] )
 				SULog(@"SUAppcastItem -initWithDictionary: Info URL is not of valid type.");
 			else
-				[self setInfoURL:[NSURL URLWithString:theInfoURL]];
+				self.infoURL = [NSURL URLWithString:theInfoURL];
 		}
 		
 		// Need an info URL or an enclosure URL. Former to show "More Info"
@@ -127,40 +127,37 @@
 		}
 		
 		if( enclosureURLString )
-			[self setFileURL: [NSURL URLWithString: [enclosureURLString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+			self.fileURL =  [NSURL URLWithString: [enclosureURLString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
 		if( enclosure )
-			[self setDSASignature:[enclosure objectForKey:@"sparkle:dsaSignature"]];		
+			self.DSASignature = [enclosure objectForKey:@"sparkle:dsaSignature"];
 		
-		[self setVersionString: newVersion];
-		[self setMinimumSystemVersion: [dict objectForKey:@"sparkle:minimumSystemVersion"]];
-        [self setMaximumSystemVersion: [dict objectForKey:@"sparkle:maximumSystemVersion"]];
+		self.versionString = newVersion;
+		self.minimumSystemVersion = [dict objectForKey:@"sparkle:minimumSystemVersion"];
+        self.maximumSystemVersion = [dict objectForKey:@"sparkle:maximumSystemVersion"];
 		
 		NSString *shortVersionString = [enclosure objectForKey:@"sparkle:shortVersionString"];
         if (nil == shortVersionString)
             shortVersionString = [dict objectForKey:@"sparkle:shortVersionString"]; // fall back on the <item>
         
 		if (shortVersionString)
-			[self setDisplayVersionString: shortVersionString];
+			self.displayVersionString = shortVersionString;
 		else
-			[self setDisplayVersionString: [self versionString]];
+			self.displayVersionString = [self versionString];
 		
 		// Find the appropriate release notes URL.
 		if ([dict objectForKey:@"sparkle:releaseNotesLink"])
-			[self setReleaseNotesURL:[NSURL URLWithString:[dict objectForKey:@"sparkle:releaseNotesLink"]]];
-		else if ([[self itemDescription] hasPrefix:@"http://"] || [[self itemDescription] hasPrefix:@"https://"]) // if the description starts with http:// or https:// use that.
-			[self setReleaseNotesURL:[NSURL URLWithString:[self itemDescription]]];
+			self.releaseNotesURL = [NSURL URLWithString:[dict objectForKey:@"sparkle:releaseNotesLink"]];
+		else if ([self.itemDescription hasPrefix:@"http://"] || [self.itemDescription hasPrefix:@"https://"]) // if the description starts with http:// or https:// use that.
+			self.releaseNotesURL = [NSURL URLWithString:self.itemDescription];
 		else
-			[self setReleaseNotesURL:nil];
+			self.releaseNotesURL = nil;
 
         if ([dict objectForKey:@"deltas"])
 		{
             NSMutableDictionary *deltas = [NSMutableDictionary dictionary];
             NSArray *deltaDictionaries = [dict objectForKey:@"deltas"];
-            NSEnumerator *deltaDictionariesEnum = [deltaDictionaries objectEnumerator];
-            NSDictionary *deltaDictionary;
-            while ((deltaDictionary = [deltaDictionariesEnum nextObject]))
-			{
-                NSMutableDictionary *fakeAppCastDict = [dict mutableCopy];
+			for (NSDictionary *deltaDictionary in [deltaDictionaries objectEnumerator]) {
+				NSMutableDictionary *fakeAppCastDict = [dict mutableCopy];
                 [fakeAppCastDict removeObjectForKey:@"deltas"];
                 [fakeAppCastDict setObject:deltaDictionary forKey:@"enclosure"];
                 SUAppcastItem *deltaItem = [[[self class] alloc] initWithDictionary:fakeAppCastDict];
@@ -168,8 +165,8 @@
 
                 [deltas setObject:deltaItem forKey:[deltaDictionary objectForKey:@"sparkle:deltaFrom"]];
                 [deltaItem release];
-            }
-            [self setDeltaUpdates:deltas];
+			}
+            self.deltaUpdates = deltas;
         }
 	}
 	return self;
@@ -177,16 +174,16 @@
 
 - (void)dealloc
 {
-    [self setTitle:nil];
-    [self setDate:nil];
-    [self setItemDescription:nil];
-    [self setReleaseNotesURL:nil];
-    [self setDSASignature:nil];
-	[self setMinimumSystemVersion: nil];
-    [self setFileURL:nil];
-    [self setVersionString:nil];
-	[self setDisplayVersionString:nil];
-	[self setInfoURL:nil];
+	self.title = nil;
+	self.date = nil;
+	self.itemDescription = nil;
+	self.releaseNotesURL = nil;
+	self.DSASignature = nil;
+	self.minimumSystemVersion = nil;
+	self.fileURL = nil;
+	self.versionString = nil;
+	self.displayVersionString = nil;
+	self.infoURL = nil;
 	[propertiesDictionary release];
     [super dealloc];
 }
