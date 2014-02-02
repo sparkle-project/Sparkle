@@ -32,22 +32,23 @@
 
 	NSURL *infoURL;	// UK 2007-08-31
 }
+@property (copy, readonly) NSString *title;
+@property (copy, readonly) NSDate *date;
+@property (copy, readonly) NSString *itemDescription;
+@property (retain, readonly) NSURL *releaseNotesURL;
+@property (copy, readonly) NSString *DSASignature;
+@property (copy, readonly) NSString *minimumSystemVersion;
+@property (copy, readonly) NSString *maximumSystemVersion;
+@property (retain, readonly) NSURL *fileURL;
+@property (copy, readonly) NSString *versionString;
+@property (copy, readonly) NSString *displayVersionString;
+@property (copy, readonly) NSDictionary *deltaUpdates;
+@property (retain, readonly) NSURL *infoURL;
 
 // Initializes with data from a dictionary provided by the RSS class.
 - (id)initWithDictionary:(NSDictionary *)dict;
 - (id)initWithDictionary:(NSDictionary *)dict failureReason:(NSString**)error;
 
-- (NSString *)title;
-- (NSString *)versionString;
-- (NSString *)displayVersionString;
-- (NSDate *)date;
-- (NSString *)itemDescription;
-- (NSURL *)releaseNotesURL;
-- (NSURL *)fileURL;
-- (NSString *)DSASignature;
-- (NSString *)minimumSystemVersion;
-- (NSString *)maximumSystemVersion;
-- (NSDictionary *)deltaUpdates;
 - (BOOL)isDeltaUpdate;
 - (BOOL)isCriticalUpdate;
 

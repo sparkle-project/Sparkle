@@ -14,124 +14,34 @@
 #import "SUAppcastItem.h"
 #import "SULog.h"
 
+@interface SUAppcastItem ()
+@property (copy, readwrite) NSString *title;
+@property (copy, readwrite) NSDate *date;
+@property (copy, readwrite) NSString *itemDescription;
+@property (retain, readwrite) NSURL *releaseNotesURL;
+@property (copy, readwrite) NSString *DSASignature;
+@property (copy, readwrite) NSString *minimumSystemVersion;
+@property (copy, readwrite) NSString *maximumSystemVersion;
+@property (retain, readwrite) NSURL *fileURL;
+@property (copy, readwrite) NSString *versionString;
+@property (copy, readwrite) NSString *displayVersionString;
+@property (copy, readwrite) NSDictionary *deltaUpdates;
+@property (retain, readwrite) NSURL *infoURL;
+@end
+
 @implementation SUAppcastItem
-
-// Attack of accessors!
-
-- (NSString *)title { return [[title retain] autorelease]; }
-
-- (void)setTitle:(NSString *)aTitle
-{
-	if (title == aTitle) return;
-    [title release];
-    title = [aTitle copy];
-}
-
-
-- (NSDate *)date { return [[date retain] autorelease]; }
-
-- (void)setDate:(NSDate *)aDate
-{
-	if (date == aDate) return;
-    [date release];
-    date = [aDate copy];
-}
-
-
-- (NSString *)itemDescription { return [[itemDescription retain] autorelease]; }
-
-- (void)setItemDescription:(NSString *)anItemDescription
-{
-	if (itemDescription == anItemDescription) return;
-    [itemDescription release];
-    itemDescription = [anItemDescription copy];
-}
-
-
-- (NSURL *)releaseNotesURL { return [[releaseNotesURL retain] autorelease]; }
-
-- (void)setReleaseNotesURL:(NSURL *)aReleaseNotesURL
-{
-	if (releaseNotesURL == aReleaseNotesURL) return;
-    [releaseNotesURL release];
-    releaseNotesURL = [aReleaseNotesURL copy];
-}
-
-
-- (NSString *)DSASignature { return [[DSASignature retain] autorelease]; }
-
-- (void)setDSASignature:(NSString *)aDSASignature
-{
-	if (DSASignature == aDSASignature) return;
-    [DSASignature release];
-    DSASignature = [aDSASignature copy];
-}
-			
-
-- (NSURL *)fileURL { return [[fileURL retain] autorelease]; }
-
-- (void)setFileURL:(NSURL *)aFileURL
-{
-	if (fileURL == aFileURL) return;
-    [fileURL release];
-    fileURL = [aFileURL copy];
-}
-
-
-- (NSString *)versionString { return [[versionString retain] autorelease]; }
-
-- (void)setVersionString:(NSString *)s
-{
-	if (versionString == s) return;
-    [versionString release];
-    versionString = [s copy];
-}
-
-
-- (NSString *)displayVersionString { return [[displayVersionString retain] autorelease]; }
-
-- (void)setDisplayVersionString:(NSString *)s
-{
-	if (displayVersionString == s) return;
-    [displayVersionString release];
-    displayVersionString = [s copy];
-}
-
-
-- (NSString *)minimumSystemVersion { return [[minimumSystemVersion retain] autorelease]; }
-- (void)setMinimumSystemVersion:(NSString *)systemVersionString
-{
-	if (minimumSystemVersion == systemVersionString) return;
-	[minimumSystemVersion release];
-	minimumSystemVersion = [systemVersionString copy];
-}
-
-- (NSString *)maximumSystemVersion { return [[maximumSystemVersion retain] autorelease]; }
-- (void)setMaximumSystemVersion:(NSString *)systemVersionString
-{
-	if (maximumSystemVersion == systemVersionString) return;
-	[maximumSystemVersion release];
-	maximumSystemVersion = [systemVersionString copy];
-}
-
-
-- (NSURL *)infoURL	{ return [[infoURL retain] autorelease]; }	// UK 2007-08-31 (whole method)
-
-- (void)setInfoURL:(NSURL *)aFileURL	// UK 2007-08-31 (whole method)
-{
-	if( aFileURL == infoURL ) return;
-	[infoURL release];
-	infoURL = [aFileURL copy];
-}
-
-- (NSDictionary *)deltaUpdates { return [[deltaUpdates retain] autorelease]; }
-
-- (void)setDeltaUpdates:(NSDictionary *)updates
-{
-	if (deltaUpdates == updates) return;
-	[deltaUpdates release];
-	deltaUpdates = [updates copy];
-}
+@synthesize date;
+@synthesize deltaUpdates;
+@synthesize displayVersionString;
+@synthesize DSASignature;
+@synthesize fileURL;
+@synthesize infoURL;
+@synthesize itemDescription;
+@synthesize maximumSystemVersion;
+@synthesize minimumSystemVersion;
+@synthesize releaseNotesURL;
+@synthesize title;
+@synthesize versionString;
 
 - (BOOL)isDeltaUpdate
 {
