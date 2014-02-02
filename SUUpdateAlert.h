@@ -51,6 +51,7 @@ typedef enum
 
 @protocol SUUpdateAlertDelegate <NSObject>
 - (void)updateAlert:(SUUpdateAlert *)updateAlert finishedWithChoice:(SUUpdateAlertChoice)updateChoice;
+@optional
 - (void)updateAlert:(SUUpdateAlert *)updateAlert shouldAllowAutoUpdate: (BOOL*)shouldAllowAutoUpdate;
 @end
 

@@ -11,9 +11,10 @@
 
 #import <Cocoa/Cocoa.h>
 #import "SUUpdateDriver.h"
+#import "SUUnarchiver.h"
 
-@class SUAppcastItem, SUUnarchiver, SUAppcast, SUUnarchiver, SUHost;
-@interface SUBasicUpdateDriver : SUUpdateDriver<NSURLDownloadDelegate> {
+@class SUAppcastItem, SUAppcast, SUUnarchiver, SUHost;
+@interface SUBasicUpdateDriver : SUUpdateDriver<NSURLDownloadDelegate, SUUnarchiverDelegate> {
 	SUAppcastItem *updateItem;
 	SUAppcastItem *nonDeltaUpdateItem;
 	

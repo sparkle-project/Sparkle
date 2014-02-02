@@ -11,9 +11,9 @@
 
 #import <Cocoa/Cocoa.h>
 #import "SUBasicUpdateDriver.h"
+#import "SUAutomaticUpdateAlert.h"
 
-@class SUAutomaticUpdateAlert;
-@interface SUAutomaticUpdateDriver : SUBasicUpdateDriver
+@interface SUAutomaticUpdateDriver : SUBasicUpdateDriver <SUUnarchiverDelegate, SUAutomaticUpdateAlertDelegateProtocol>
 {
 @private
 	BOOL postponingInstallation, showErrors;
