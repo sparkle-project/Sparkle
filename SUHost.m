@@ -123,20 +123,15 @@
 	// Use a default icon if none is defined.
 	if (!icon) {
 		BOOL isMainBundle = (bundle == [NSBundle mainBundle]);
-		
-		// Starting with 10.6, iconForFileType: accepts a UTI.
-		NSString *fileType = nil;
-		if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_5)
-			fileType = isMainBundle ? NSFileTypeForHFSTypeCode(kGenericApplicationIcon) : @".bundle";
-		else
-			fileType = isMainBundle ? (NSString*)kUTTypeApplication : (NSString*)kUTTypeBundle;
+
+		NSString *fileType = isMainBundle ? (NSString*)kUTTypeApplication : (NSString*)kUTTypeBundle;
 		icon = [[NSWorkspace sharedWorkspace] iconForFileType:fileType];
 	}
 	return icon;
 }
 
 - (BOOL)isRunningOnReadOnlyVolume
-{	
+{
 	struct statfs statfs_info;
 	statfs([[bundle bundlePath] fileSystemRepresentation], &statfs_info);
 	return (statfs_info.f_flags & MNT_RDONLY);
