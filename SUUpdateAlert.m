@@ -100,6 +100,7 @@
     }
 	[prefs setStandardFontFamily:familyName];
 	[prefs setDefaultFontSize:(int)[NSFont systemFontSizeForControlSize:NSSmallControlSize]];
+    [prefs setPlugInsEnabled:NO];
 	[releaseNotesView setFrameLoadDelegate:self];
 	[releaseNotesView setPolicyDelegate:self];
 	
