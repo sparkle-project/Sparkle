@@ -20,6 +20,62 @@
 
 #ifdef __OBJC__
 
+#ifdef ClassPrefix
+#define _ClassPrefix_CONCAT_2(c,d) c ## d
+#define _ClassPrefix_CONCAT(a,b) _ClassPrefix_CONCAT_2(a,b)
+#define ClassPrefix_PREPEND(x) _ClassPrefix_CONCAT(ClassPrefix, x)
+
+//Update Control
+#define SUUpdater ClassPrefix_PREPEND(SUUpdater)
+//Drivers
+#define SUUpdateDriver ClassPrefix_PREPEND(SUUpdateDriver)
+#define SUBasicUpdateDriver ClassPrefix_PREPEND(SUBasicUpdateDriver)
+#define SUUIBasedUpdateDriver ClassPrefix_PREPEND(SUUIBasedUpdateDriver)
+#define SUAutomaticUpdateDriver ClassPrefix_PREPEND(SUAutomaticUpdateDriver)
+#define SUScheduledUpdateDriver ClassPrefix_PREPEND(SUScheduledUpdateDriver)
+#define SUProbingUpdateDriver ClassPrefix_PREPEND(SUProbingUpdateDriver)
+#define SUUserInitiatedUpdateDriver ClassPrefix_PREPEND(SUUserInitiatedUpdateDriver)
+//Support
+#define SUDSAVerifier ClassPrefix_PREPEND(SUDSAVerifier)
+
+//Appcast Support
+#define SUAppcast ClassPrefix_PREPEND(SUAppcast)
+#define SUAppcastExtensions ClassPrefix_PREPEND(SUAppcastExtensions)
+#define SUAppcastItem ClassPrefix_PREPEND(SUAppcastItem)
+#define SUSystemProfiler ClassPrefix_PREPEND(SUSystemProfiler)
+#define SUVersionComparison ClassPrefix_PREPEND(SUVersionComparison)
+#define SUStandardVersionComparator ClassPrefix_PREPEND(SUStandardVersionComparator)
+
+//Installation
+#define SUInstaller ClassPrefix_PREPEND(SUInstaller)
+#define SUPlainInstaller ClassPrefix_PREPEND(SUPlainInstaller)
+#define SUPlainInstallerInternals ClassPrefix_PREPEND(SUPlainInstallerInternals)
+#define SUPackageInstaller ClassPrefix_PREPEND(SUPackageInstaller)
+
+
+//Unarchiving
+//Binary Delta
+#define SUBinaryDeltaUnarchiver ClassPrefix_PREPEND(SUBinaryDeltaUnarchiver)
+
+#define SUUnarchiver ClassPrefix_PREPEND(SUUnarchiver)
+#define SUPipedUnarchiver ClassPrefix_PREPEND(SUPipedUnarchiver)
+#define SUDiskImageUnarchiver ClassPrefix_PREPEND(SUDiskImageUnarchiver)
+#define NTSynchronousTask ClassPrefix_PREPEND(NTSynchronousTask)
+
+
+//User Interface
+#define SUUpdateAlert ClassPrefix_PREPEND(SUUpdateAlert)
+#define SUAutomaticUpdateAlert ClassPrefix_PREPEND(SUAutomaticUpdateAlert)
+#define SUStatusController ClassPrefix_PREPEND(SUStatusController)
+#define SUUpdatePermissionPrompt ClassPrefix_PREPEND(SUUpdatePermissionPrompt)
+#define SUWindowController ClassPrefix_PREPEND(SUWindowController)
+
+
+//Other Sources
+#define SUHost ClassPrefix_PREPEND(SUHost)
+
+#endif
+
 #define SPARKLE_BUNDLE [NSBundle bundleWithIdentifier:@"org.andymatuschak.Sparkle"]
 #define SULocalizedString(key,comment) NSLocalizedStringFromTableInBundle(key, @"Sparkle", SPARKLE_BUNDLE, comment)
 #define SUAbstractFail() NSAssert2(nil, @"Can't call %@ on an instance of %@; this is an abstract method!", __PRETTY_FUNCTION__, [self class]);
