@@ -27,13 +27,14 @@
 
 @implementation SUUpdateAlert
 
-- (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost
+- (id)initWithAppcastItem:(SUAppcastItem *)item isRequired:(BOOL)required host:(SUHost *)aHost
 {
 	self = [super initWithHost:host windowNibName:@"SUUpdateAlert"];
 	if (self)
 	{
 		host = [aHost retain];
 		updateItem = [item retain];
+		updateRequired = required;
 		[self setShouldCascadeWindows:NO];
 		
 		// Alex: This dummy line makes sure that the binary is linked against WebKit.
@@ -153,6 +154,10 @@
 
 - (void)awakeFromNib
 {	
+	// Hide Skip/Later buttons if a minimum version is specified and the host version is not at least that version
+	[skipButton setHidden:updateRequired];
+	[laterButton setHidden:updateRequired];
+
 	NSString*	sizeStr = [host objectForInfoDictionaryKey:SUFixedHTMLDisplaySizeKey];
 
 	if( [host isBackgroundApplication] )
@@ -266,6 +271,10 @@
 
 - (BOOL)windowShouldClose:note
 {
+	// Quit on close window if update is required
+	if (updateRequired)
+		[[NSApplication sharedApplication] terminate:self];
+
 	[self endWithSelection:SURemindMeLaterChoice];
 	return YES;
 }

@@ -35,9 +35,10 @@ typedef enum
 	IBOutlet NSButton *laterButton;
 	NSProgressIndicator *releaseNotesSpinner;
 	BOOL webViewFinishedLoading;
+	BOOL updateRequired;
 }
 
-- (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host;
+- (id)initWithAppcastItem:(SUAppcastItem *)item isRequired:(BOOL)updateRequired host:(SUHost *)aHost;
 - (void)setDelegate:delegate;
 
 - (IBAction)installUpdate:sender;

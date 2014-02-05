@@ -95,6 +95,12 @@
 	return [self hostSupportsItem:ui] && [self isItemNewer:ui] && ![self itemContainsSkippedVersion:ui];
 }
 
+- (BOOL)itemContainsRequiredUpdate:(SUAppcastItem *)ui
+{
+	NSString *minimumHostVersion = [[[ui propertiesDictionary] objectForKey:@"enclosure"] objectForKey:@"sparkle:requiredVersion"];
+	return [[self versionComparator] compareVersion:[host version] toVersion:minimumHostVersion] == NSOrderedAscending;
+}
+
 - (void)appcastDidFinishLoading:(SUAppcast *)ac
 {
 	if ([[updater delegate] respondsToSelector:@selector(updater:didFinishLoadingAppcast:)])

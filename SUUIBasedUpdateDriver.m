@@ -19,7 +19,7 @@
 
 - (void)didFindValidUpdate
 {
-	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem host:host];
+	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem isRequired:[self itemContainsRequiredUpdate:updateItem] host:host];
 	[updateAlert setDelegate:self];
 	
 	id<SUVersionDisplay>	versDisp = nil;
