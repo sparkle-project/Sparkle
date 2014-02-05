@@ -189,6 +189,10 @@
 		0263187714FEBB42005EBF43 /* uk */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = uk; path = uk.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		228CB9D716762AA400DFF628 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		228CB9D816762AA400DFF628 /* nb */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nb; path = nb.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
+		228CB9D916762AA400DFF628 /* nb */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nb; path = nb.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
+		228CB9DA16762AA400DFF628 /* nb */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nb; path = nb.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
 		525A278F133D6AE900FD8D70 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		550347001370023A00AE7681 /* Sparkle.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Sparkle.icns; sourceTree = "<group>"; };
@@ -955,6 +959,7 @@
 				sl,
 				uk,
 				ar,
+				nb,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* Sparkle */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
@@ -1234,6 +1239,7 @@
 				0263187514FEBB42005EBF43 /* uk */,
 				61F3AC1415C22D5900260CA2 /* th */,
 				6149E6ED1601ABAC008A351E /* ar */,
+				228CB9DA16762AA400DFF628 /* nb */,
 			);
 			name = SUAutomaticUpdateAlert.xib;
 			sourceTree = "<group>";
@@ -1266,6 +1272,7 @@
 				0263187614FEBB42005EBF43 /* uk */,
 				61F3AC1615C22D5900260CA2 /* th */,
 				6149E6EF1601ABAC008A351E /* ar */,
+				228CB9D916762AA400DFF628 /* nb */,
 			);
 			name = SUUpdateAlert.xib;
 			sourceTree = "<group>";
@@ -1298,6 +1305,7 @@
 				0263187714FEBB42005EBF43 /* uk */,
 				61F3AC1715C22D5900260CA2 /* th */,
 				6149E6F01601ABAC008A351E /* ar */,
+				228CB9D816762AA400DFF628 /* nb */,
 			);
 			name = SUUpdatePermissionPrompt.xib;
 			sourceTree = "<group>";
@@ -1328,6 +1336,7 @@
 				0263187214FEBB31005EBF43 /* uk */,
 				61F3AC1215C22D4A00260CA2 /* th */,
 				6149E6EA1601ABAC008A351E /* ar */,
+				228CB9D716762AA400DFF628 /* nb */,
 			);
 			name = Sparkle.strings;
 			sourceTree = "<group>";
