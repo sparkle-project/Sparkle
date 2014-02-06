@@ -136,6 +136,8 @@
 		93FB277A156BD80D001937C7 /* SUPasswordPrompt.h in Headers */ = {isa = PBXBuildFile; fileRef = 93FB2778156BD80D001937C7 /* SUPasswordPrompt.h */; };
 		93FB277B156BD80D001937C7 /* SUPasswordPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FB2779156BD80D001937C7 /* SUPasswordPrompt.m */; };
 		93FB277F156BD826001937C7 /* SUPasswordPrompt.xib in Resources */ = {isa = PBXBuildFile; fileRef = 93FB277D156BD826001937C7 /* SUPasswordPrompt.xib */; };
+		DB5F8F9B178E13B400EE6031 /* TACustomComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5F8F9A178E13B400EE6031 /* TACustomComparator.m */; };
+		DB5F8F9E178E143F00EE6031 /* TAAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DB5F8F9D178E143F00EE6031 /* TAAppDelegate.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -402,6 +404,10 @@
 		93FB2778156BD80D001937C7 /* SUPasswordPrompt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUPasswordPrompt.h; sourceTree = "<group>"; };
 		93FB2779156BD80D001937C7 /* SUPasswordPrompt.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUPasswordPrompt.m; sourceTree = "<group>"; };
 		93FB277E156BD826001937C7 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/SUPasswordPrompt.xib; sourceTree = "<group>"; };
+		DB5F8F99178E13B400EE6031 /* TACustomComparator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TACustomComparator.h; path = "Test Application/TACustomComparator.h"; sourceTree = "<group>"; };
+		DB5F8F9A178E13B400EE6031 /* TACustomComparator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TACustomComparator.m; path = "Test Application/TACustomComparator.m"; sourceTree = "<group>"; };
+		DB5F8F9C178E143F00EE6031 /* TAAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TAAppDelegate.h; path = "Test Application/TAAppDelegate.h"; sourceTree = "<group>"; };
+		DB5F8F9D178E143F00EE6031 /* TAAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TAAppDelegate.m; path = "Test Application/TAAppDelegate.m"; sourceTree = "<group>"; };
 		FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigTestAppDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigCommonRelease.xcconfig; sourceTree = "<group>"; };
@@ -676,6 +682,10 @@
 				61B5F92409C4CFC900B25A18 /* main.m */,
 				61B5F90409C4CEE200B25A18 /* Test Application-Info.plist */,
 				618E9CFC0E7328F1004646D8 /* dsa_pub.pem */,
+				DB5F8F99178E13B400EE6031 /* TACustomComparator.h */,
+				DB5F8F9A178E13B400EE6031 /* TACustomComparator.m */,
+				DB5F8F9C178E143F00EE6031 /* TAAppDelegate.h */,
+				DB5F8F9D178E143F00EE6031 /* TAAppDelegate.m */,
 			);
 			name = "Test Application Sources";
 			sourceTree = "<group>";
@@ -1133,6 +1143,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				61B5F93009C4CFDC00B25A18 /* main.m in Sources */,
+				DB5F8F9B178E13B400EE6031 /* TACustomComparator.m in Sources */,
+				DB5F8F9E178E143F00EE6031 /* TAAppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

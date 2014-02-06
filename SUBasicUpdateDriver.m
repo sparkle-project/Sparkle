@@ -70,6 +70,14 @@
 
 - (BOOL)hostSupportsItem:(SUAppcastItem *)ui
 {
+    // First check the "sparkle:os" field on the enclosure
+    id enclosure = [[ui propertiesDictionary] objectForKey:@"enclosure"];
+    NSString *os = [enclosure objectForKey:@"sparkle:os"];
+    if (os != nil) {
+        BOOL valid = [os isEqualToString:@"osx"] || [os isEqualToString:@"mac"];
+        if (!valid) return NO;
+    }
+    
 	if (([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) && 
         ([ui maximumSystemVersion] == nil || [[ui maximumSystemVersion] isEqualToString:@""])) { return YES; }
     

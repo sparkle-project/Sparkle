@@ -8,26 +8,26 @@
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIconFile</key>
 	<string>Sparkle</string>
-	<key>CFBundleName</key>
-	<string>Sparkle Test App</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.andymatuschak.SparkleTestApp</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Sparkle Test App</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.5</string>
+	<string>0.8.3-blah</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>SUFeedURL</key>
-	<string>http://www.andymatuschak.org/files/sparkletestcast.xml</string>
 	<key>SUEnableSystemProfiling</key>
 	<true/>
+	<key>SUFeedURL</key>
+	<string>http://hubstaff.dev/appcast/debug.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
 </dict>
