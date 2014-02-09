@@ -503,9 +503,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	
 	// Build up the parameterized URL.
 	NSMutableArray *parameterStrings = [NSMutableArray array];
-	NSEnumerator *profileInfoEnumerator = [parameters objectEnumerator];
-	NSDictionary *currentProfileInfo;
-	while ((currentProfileInfo = [profileInfoEnumerator nextObject]))
+	for (NSDictionary *currentProfileInfo in parameters)
 		[parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", [[[currentProfileInfo objectForKey:@"key"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], [[[currentProfileInfo objectForKey:@"value"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
 	
 	NSString *separatorCharacter = @"?";

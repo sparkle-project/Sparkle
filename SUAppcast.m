@@ -23,11 +23,11 @@
 - (NSDictionary *)attributesAsDictionary
 {
 	NSEnumerator *attributeEnum = [[self attributes] objectEnumerator];
-	NSXMLNode *attribute;
 	NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
 
-	while ((attribute = [attributeEnum nextObject]))
+	for (NSXMLNode *attribute in attributeEnum) {
 		[dictionary setObject:[attribute stringValue] forKey:[attribute name]];
+	}
 	return dictionary;
 }
 @end
@@ -154,9 +154,7 @@
                 }
             }
             
-            NSEnumerator *nameEnum = [nodesDict keyEnumerator];
-            NSString *name;
-            while ((name = [nameEnum nextObject]))
+            for (NSString *name in nodesDict)
             {
                 node = [self bestNodeInNodes:[nodesDict objectForKey:name]];
 				if ([name isEqualToString:@"enclosure"])
@@ -177,8 +175,7 @@
 				{
 					NSMutableArray *deltas = [NSMutableArray array];
 					NSEnumerator *childEnum = [[node children] objectEnumerator];
-					NSXMLNode *child;
-					while ((child = [childEnum nextObject])) {
+					for (NSXMLNode *child in childEnum) {
 						if ([[child name] isEqualToString:@"enclosure"])
 							[deltas addObject:[(NSXMLElement *)child attributesAsDictionary]];
 					}
@@ -232,8 +229,7 @@
 	{
 		[[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:nil];
 	}
-    [downloadFilename release];
-    downloadFilename = nil;
+	self.downloadFilename = nil;
     
 	[self reportError:error];
 }
@@ -259,13 +255,10 @@
     else if ([nodes count] == 0)
         return nil;
     
-    NSEnumerator *nodeEnum = [nodes objectEnumerator];
-    NSXMLElement *node;
     NSMutableArray *languages = [NSMutableArray array];
     NSString *lang;
     NSUInteger i;
-    while ((node = [nodeEnum nextObject]))
-    {
+	for (NSXMLElement *node in nodes) {
         lang = [[node attributeForName:@"xml:lang"] stringValue];
         [languages addObject:(lang ? lang : @"")];
     }

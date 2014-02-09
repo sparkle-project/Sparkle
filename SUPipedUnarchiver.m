@@ -22,9 +22,7 @@
 								   @"extractTBZ", @".tar.bz2", @"extractTBZ", @".tbz", nil] retain];
 
 	NSString *lastPathComponent = [path lastPathComponent];
-	NSEnumerator *typeEnumerator = [typeSelectorDictionary keyEnumerator];
-	id currentType;
-	while ((currentType = [typeEnumerator nextObject]))
+	for (id currentType in typeSelectorDictionary)
 	{
 		if ([currentType length] > [lastPathComponent length]) continue;
 		if ([[lastPathComponent substringFromIndex:[lastPathComponent length] - [currentType length]] isEqualToString:currentType])

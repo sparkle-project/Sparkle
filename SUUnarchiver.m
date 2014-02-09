@@ -20,9 +20,7 @@
 
 + (SUUnarchiver *)unarchiverForPath:(NSString *)path updatingHost:(SUHost *)host
 {
-	NSEnumerator *implementationEnumerator = [[self unarchiverImplementations] objectEnumerator];
-	id current;
-	while ((current = [implementationEnumerator nextObject]))
+	for (id current in [self unarchiverImplementations])
 	{
 		if ([current canUnarchivePath:path])
 			return [[[current alloc] initWithPath:path host:host] autorelease];

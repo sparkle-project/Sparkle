@@ -145,10 +145,8 @@ static NSData *rawKeyData( NSString *key )
 	
 	// Remove whitespace around each line of the key.
 	NSMutableArray *pkeyTrimmedLines = [NSMutableArray array];
-	NSEnumerator *pkeyLinesEnumerator = [[t componentsSeparatedByString:@"\n"] objectEnumerator];
 	NSCharacterSet *whiteSet = [NSCharacterSet whitespaceCharacterSet];
-	NSString *pkeyLine;
-	while ((pkeyLine = [pkeyLinesEnumerator nextObject]) != nil)
+	for (NSString *pkeyLine in [t componentsSeparatedByString:@"\n"])
 	{
 		[pkeyTrimmedLines addObject:[pkeyLine stringByTrimmingCharactersInSet:whiteSet]];
 	}
