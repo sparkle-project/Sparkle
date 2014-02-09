@@ -13,97 +13,22 @@
 #import "SUVersionComparisonProtocol.h"
 #import "NTSynchronousTask.h"
 
+@interface NTSynchronousTask ()
+@property (retain) NSTask *task;
+@property (retain) NSPipe *outputPipe;
+@property (retain) NSPipe *inputPipe;
+@property (readwrite, retain) NSData *output;
+@property BOOL done;
+@property (readwrite) int result;
+@end
+
 @implementation NTSynchronousTask
-
-//---------------------------------------------------------- 
-//  task 
-//---------------------------------------------------------- 
-- (NSTask *)task
-{
-    return mv_task; 
-}
-
-- (void)setTask:(NSTask *)theTask
-{
-    if (mv_task != theTask) {
-        [mv_task release];
-        mv_task = [theTask retain];
-    }
-}
-
-//---------------------------------------------------------- 
-//  outputPipe 
-//---------------------------------------------------------- 
-- (NSPipe *)outputPipe
-{
-    return mv_outputPipe; 
-}
-
-- (void)setOutputPipe:(NSPipe *)theOutputPipe
-{
-    if (mv_outputPipe != theOutputPipe) {
-        [mv_outputPipe release];
-        mv_outputPipe = [theOutputPipe retain];
-    }
-}
-
-//---------------------------------------------------------- 
-//  inputPipe 
-//---------------------------------------------------------- 
-- (NSPipe *)inputPipe
-{
-    return mv_inputPipe; 
-}
-
-- (void)setInputPipe:(NSPipe *)theInputPipe
-{
-    if (mv_inputPipe != theInputPipe) {
-        [mv_inputPipe release];
-        mv_inputPipe = [theInputPipe retain];
-    }
-}
-
-//---------------------------------------------------------- 
-//  output 
-//---------------------------------------------------------- 
-- (NSData *)output
-{
-    return mv_output; 
-}
-
-- (void)setOutput:(NSData *)theOutput
-{
-    if (mv_output != theOutput) {
-        [mv_output release];
-        mv_output = [theOutput retain];
-    }
-}
-
-//---------------------------------------------------------- 
-//  done 
-//---------------------------------------------------------- 
-- (BOOL)done
-{
-    return mv_done;
-}
-
-- (void)setDone:(BOOL)flag
-{
-    mv_done = flag;
-}
-
-//---------------------------------------------------------- 
-//  result 
-//---------------------------------------------------------- 
-- (int)result
-{
-    return mv_result;
-}
-
-- (void)setResult:(int)theResult
-{
-    mv_result = theResult;
-}
+@synthesize output = mv_output;
+@synthesize result = mv_result;
+@synthesize task = mv_task;
+@synthesize outputPipe = mv_outputPipe;
+@synthesize inputPipe = mv_inputPipe;
+@synthesize done = mv_done;
 
 - (void)taskOutputAvailable:(NSNotification*)note
 {
@@ -141,10 +66,10 @@
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 
-    [mv_task release];
-    [mv_outputPipe release];
-    [mv_inputPipe release];
-	[mv_output release];
+    self.task = nil;
+    self.outputPipe = nil;
+    self.inputPipe = nil;
+	self.output = nil;
 
     [super dealloc];
 }
@@ -240,8 +165,7 @@
 	if( outData )
 		*outData = nil;
 	
-	NS_DURING
-	{
+	@try {
 		NTSynchronousTask* task = [[NTSynchronousTask alloc] init];
 		
 		[task run:toolPath directory:currentDirectory withArgs:args input:input];
@@ -251,10 +175,9 @@
 			*outData = [[task output] retain];
 				
 		[task release];
-	}	
-	NS_HANDLER;
+	} @catch (NSException *localException) {
 		taskResult = errCppGeneral;
-	NS_ENDHANDLER;
+	}
 	
 	[pool drain];
 	
