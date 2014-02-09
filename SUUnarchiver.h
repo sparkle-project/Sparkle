@@ -17,7 +17,7 @@
 	NSString *archivePath;
 	SUHost *updateHost;
 }
-@property (assign)id<SUUnarchiverDelegate> delegate;
+@property (assign) id<SUUnarchiverDelegate> delegate;
 
 + (SUUnarchiver *)unarchiverForPath:(NSString *)path updatingHost:(SUHost *)host;
 
