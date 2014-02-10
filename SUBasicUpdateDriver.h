@@ -12,9 +12,10 @@
 #import <Cocoa/Cocoa.h>
 #import "SUUpdateDriver.h"
 #import "SUUnarchiver.h"
+#import "SUAppcast.h"
 
-@class SUAppcastItem, SUAppcast, SUUnarchiver, SUHost;
-@interface SUBasicUpdateDriver : SUUpdateDriver<NSURLDownloadDelegate, SUUnarchiverDelegate> {
+@class SUAppcastItem, SUHost;
+@interface SUBasicUpdateDriver : SUUpdateDriver<NSURLDownloadDelegate, SUUnarchiverDelegate, SUAppcastDelegate> {
 	SUAppcastItem *updateItem;
 	SUAppcastItem *nonDeltaUpdateItem;
 	
@@ -26,9 +27,6 @@
 }
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
-
-- (void)appcastDidFinishLoading:(SUAppcast *)ac;
-- (void)appcast:(SUAppcast *)ac failedToLoadWithError:(NSError *)error;
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui;
 - (BOOL)hostSupportsItem:(SUAppcastItem *)ui;

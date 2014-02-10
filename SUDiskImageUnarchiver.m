@@ -119,9 +119,7 @@
             goto reportError;
         }
         
-        NSEnumerator *contentsEnumerator = [contents objectEnumerator];
-        NSString *item;
-        while ((item = [contentsEnumerator nextObject]))
+        for (NSString *item in contents)
         {
             NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
             NSString *toPath = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:item];

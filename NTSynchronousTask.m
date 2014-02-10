@@ -13,108 +13,33 @@
 #import "SUVersionComparisonProtocol.h"
 #import "NTSynchronousTask.h"
 
+@interface NTSynchronousTask ()
+@property (retain) NSTask *task;
+@property (retain) NSPipe *outputPipe;
+@property (retain) NSPipe *inputPipe;
+@property (readwrite, retain) NSData *output;
+@property (getter = isDone) BOOL done;
+@property (readwrite) int result;
+@end
+
 @implementation NTSynchronousTask
-
-//---------------------------------------------------------- 
-//  task 
-//---------------------------------------------------------- 
-- (NSTask *)task
-{
-    return mv_task; 
-}
-
-- (void)setTask:(NSTask *)theTask
-{
-    if (mv_task != theTask) {
-        [mv_task release];
-        mv_task = [theTask retain];
-    }
-}
-
-//---------------------------------------------------------- 
-//  outputPipe 
-//---------------------------------------------------------- 
-- (NSPipe *)outputPipe
-{
-    return mv_outputPipe; 
-}
-
-- (void)setOutputPipe:(NSPipe *)theOutputPipe
-{
-    if (mv_outputPipe != theOutputPipe) {
-        [mv_outputPipe release];
-        mv_outputPipe = [theOutputPipe retain];
-    }
-}
-
-//---------------------------------------------------------- 
-//  inputPipe 
-//---------------------------------------------------------- 
-- (NSPipe *)inputPipe
-{
-    return mv_inputPipe; 
-}
-
-- (void)setInputPipe:(NSPipe *)theInputPipe
-{
-    if (mv_inputPipe != theInputPipe) {
-        [mv_inputPipe release];
-        mv_inputPipe = [theInputPipe retain];
-    }
-}
-
-//---------------------------------------------------------- 
-//  output 
-//---------------------------------------------------------- 
-- (NSData *)output
-{
-    return mv_output; 
-}
-
-- (void)setOutput:(NSData *)theOutput
-{
-    if (mv_output != theOutput) {
-        [mv_output release];
-        mv_output = [theOutput retain];
-    }
-}
-
-//---------------------------------------------------------- 
-//  done 
-//---------------------------------------------------------- 
-- (BOOL)done
-{
-    return mv_done;
-}
-
-- (void)setDone:(BOOL)flag
-{
-    mv_done = flag;
-}
-
-//---------------------------------------------------------- 
-//  result 
-//---------------------------------------------------------- 
-- (int)result
-{
-    return mv_result;
-}
-
-- (void)setResult:(int)theResult
-{
-    mv_result = theResult;
-}
+@synthesize output = mv_output;
+@synthesize result = mv_result;
+@synthesize task = mv_task;
+@synthesize outputPipe = mv_outputPipe;
+@synthesize inputPipe = mv_inputPipe;
+@synthesize done = mv_done;
 
 - (void)taskOutputAvailable:(NSNotification*)note
 {
-	[self setOutput:[[note userInfo] objectForKey:NSFileHandleNotificationDataItem]];
+	self.output = [[note userInfo] objectForKey:NSFileHandleNotificationDataItem];
 	
-	[self setDone:YES];
+	self.done = YES;
 }
 
 - (void)taskDidTerminate:(NSNotification*)note
 {
-    [self setResult:[[self task] terminationStatus]];
+    self.result = [self.task terminationStatus];
 }
 
 - (id)init;
@@ -122,13 +47,13 @@
     self = [super init];
 	if (self)
 	{
-		[self setTask:[[[NSTask alloc] init] autorelease]];
-		[self setOutputPipe:[[[NSPipe alloc] init] autorelease]];
-		[self setInputPipe:[[[NSPipe alloc] init] autorelease]];
+		self.task = [[[NSTask alloc] init] autorelease];
+		self.outputPipe = [[[NSPipe alloc] init] autorelease];
+		self.inputPipe = [[[NSPipe alloc] init] autorelease];
 		
-		[[self task] setStandardInput:[self inputPipe]];
-		[[self task] setStandardOutput:[self outputPipe]];
-		[[self task] setStandardError:[self outputPipe]];
+		self.task.standardInput = self.inputPipe;
+		self.task.standardOutput = self.outputPipe;
+		self.task.standardError = self.outputPipe;
 	}
 	
     return self;
@@ -141,10 +66,10 @@
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 
-    [mv_task release];
-    [mv_outputPipe release];
-    [mv_inputPipe release];
-	[mv_output release];
+    self.task = nil;
+    self.outputPipe = nil;
+    self.inputPipe = nil;
+	self.output = nil;
 
     [super dealloc];
 }
@@ -154,10 +79,10 @@
 	BOOL success = NO;
 	
 	if (currentDirectory)
-		[[self task] setCurrentDirectoryPath: currentDirectory];
+		self.task.currentDirectoryPath = currentDirectory;
 	
-	[[self task] setLaunchPath:toolPath];
-	[[self task] setArguments:args];
+	self.task.launchPath = toolPath;
+	self.task.arguments = args;
 				
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(taskOutputAvailable:)
@@ -173,7 +98,7 @@
 	
 	@try
 	{
-		[[self task] launch];
+		[self.task launch];
 		success = YES;
 	}
 	@catch (NSException *localException) { }
@@ -183,12 +108,12 @@
 		if (input)
 		{
 			// feed the running task our input
-			[[[self inputPipe] fileHandleForWriting] writeData:input];
-			[[[self inputPipe] fileHandleForWriting] closeFile];
+			[[self.inputPipe fileHandleForWriting] writeData:input];
+			[[self.inputPipe fileHandleForWriting] closeFile];
 		}
 						
 		// loop until we are done receiving the data
-		if (![self done])
+		if (!self.done)
 		{
 			double resolution = 1;
 			BOOL isRunning;
@@ -199,7 +124,7 @@
 				
 				isRunning = [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
 													 beforeDate:next];
-			} while (isRunning && ![self done]);
+			} while (isRunning && !self.done);
 		}
 	}
 }
@@ -208,7 +133,7 @@
 {
 	// we need this wacky pool here, otherwise we run out of pipes, the pipes are internally autoreleased
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	NSData* result=nil;
+	NSData* result = nil;
 	
 	@try
 	{
@@ -240,8 +165,7 @@
 	if( outData )
 		*outData = nil;
 	
-	NS_DURING
-	{
+	@try {
 		NTSynchronousTask* task = [[NTSynchronousTask alloc] init];
 		
 		[task run:toolPath directory:currentDirectory withArgs:args input:input];
@@ -251,10 +175,9 @@
 			*outData = [[task output] retain];
 				
 		[task release];
-	}	
-	NS_HANDLER;
+	} @catch (NSException *localException) {
 		taskResult = errCppGeneral;
-	NS_ENDHANDLER;
+	}
 	
 	[pool drain];
 	

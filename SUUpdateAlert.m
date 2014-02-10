@@ -330,9 +330,7 @@
 	
 	if (webViewMenuItems)
 	{
-		NSEnumerator *itemEnumerator = [defaultMenuItems objectEnumerator];
-		NSMenuItem *menuItem = nil;
-		while ((menuItem = [itemEnumerator nextObject]))
+		for (NSMenuItem *menuItem in defaultMenuItems)
 		{
 			NSInteger tag = [menuItem tag];
 			
