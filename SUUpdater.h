@@ -142,6 +142,21 @@
 
 @end
 
+// -----------------------------------------------------------------------------
+//	SUUpdater Delegate: DevMate Interaction
+// -----------------------------------------------------------------------------
+
+// NOTE!!! Implemented delegate methods have higher priority than values saved in user preferences
+
+FOUNDATION_EXPORT NSString *const SUUpdaterChecksForBetaUpdatesPrefKey; // bool value
+FOUNDATION_EXPORT NSString *const SUUpdaterIsInTestModePrefKey; // bool value
+
+@interface NSObject (SUUpdaterDelegate_DevMateInteraction)
+
+- (BOOL)updaterShouldCheckForBetaUpdates:(SUUpdater *)updater;
+- (BOOL)isUpdaterInTestMode:(SUUpdater *)updater;
+
+@end
 
 // -----------------------------------------------------------------------------
 //	Constants:

@@ -479,7 +479,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	const NSTimeInterval oneWeek = 60 * 60 * 24 * 7;
 	sendingSystemProfile &= (-[lastSubmitDate timeIntervalSinceNow] >= oneWeek);
 
-	NSArray *parameters = [NSArray array];
+	NSArray *parameters = [self devmateFeedParameters];
 	if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)])
 		parameters = [parameters arrayByAddingObjectsFromArray:[delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile]];
 	if (sendingSystemProfile)
@@ -562,6 +562,38 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
     NSString *xpcServicePrefixPath = [[[SUUpdater sharedUpdater] hostBundle] bundlePath];
     NSString *xpcServiceSuffixPath = @"Contents/XPCServices/com.andymatuschak.Sparkle.install-service.xpc";
 	return [[NSFileManager defaultManager] fileExistsAtPath:[xpcServicePrefixPath stringByAppendingPathComponent:xpcServiceSuffixPath]];
+}
+
+#pragma mark - DevMate Interaction
+
+NSString *const SUUpdaterChecksForBetaUpdatesPrefKey = @"SUUpdaterChecksForBetaUpdates";
+NSString *const SUUpdaterIsInTestModePrefKey = @"SUUpdaterIsInTestMode";
+
+- (NSArray *)devmateFeedParameters
+{
+    NSMutableArray *parameters = [NSMutableArray array];
+    
+    BOOL isInTestMode = [host boolForUserDefaultsKey:SUUpdaterIsInTestModePrefKey];
+    if ([delegate respondsToSelector:@selector(isUpdaterInTestMode:)])
+    {
+        isInTestMode = [delegate isUpdaterInTestMode:self];
+    }
+    if (isInTestMode)
+    {
+        [parameters addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"test", @"key", @"1", @"value", nil]];
+    }
+    
+    BOOL shouldCheckBeta = [host boolForUserDefaultsKey:SUUpdaterChecksForBetaUpdatesPrefKey];
+    if ([delegate respondsToSelector:@selector(updaterShouldCheckForBetaUpdates:)])
+    {
+        shouldCheckBeta = [delegate updaterShouldCheckForBetaUpdates:self];
+    }
+    if (shouldCheckBeta)
+    {
+        [parameters addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"beta", @"key", @"1", @"value", nil]];
+    }
+    
+    return parameters;
 }
 
 @end
