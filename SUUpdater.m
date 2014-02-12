@@ -29,7 +29,7 @@ NSString *const SUUpdaterAppcastItemNotificationKey = @"SUUpdaterAppcastItemNoti
 NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotificationKey";
 
 @interface SUUpdater ()
-@property NSTimer *checkTimer;
+@property (retain) NSTimer *checkTimer;
 - (id)initForBundle:(NSBundle *)bundle;
 - (void)startUpdateCycle;
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
