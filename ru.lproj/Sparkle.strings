@@ -1,55 +1,38 @@
-/* No comment provided by engineer. */
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ загружен и готов к использованию! Хотите установить и перезапустить %1$@?";
 
-/* No comment provided by engineer. */
 "%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "Во время работы %1$@ с тома, предназначенного только для чтения, как например, образа диска или накопителя на оптических дисках, его невозможно обновить. Переместите %1$@ в Папку приложений, перезапустите его оттуда и повторите попытку.";
 
-/* No comment provided by engineer. */
 "%@ %@ is currently the newest version available." = "В настоящий момент %1$@ %2$@ является новейшей версией.";
 
-/* No comment provided by engineer. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ теперь доступен – вы имеете %3$@. Хотите загрузить его сейчас?";
 
-/* No comment provided by engineer. */
 "%@ downloaded" = "%@ загружено";
 
-/* No comment provided by engineer. */
 "%@ of %@" = "%1$@ из %2$@";
 
-/* No comment provided by engineer. */
 "A new version of %@ is available!" = "Имеется новая версия %@!";
 
-/* No comment provided by engineer. */
 "A new version of %@ is ready to install!" = "Новая версия %@ готова к установке!";
 
-/* No comment provided by engineer. */
 "An error occurred in retrieving update information. Please try again later." = "Произошла ошибка при извлечении информации обновления. Повторите попытку позже.";
 
-/* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Произошла ошибка при загрузке обновления. Повторите попытку позже.";
 
-/* No comment provided by engineer. */
 "An error occurred while extracting the archive. Please try again later." = "Произошла ошибка при извлечении архива. Повторите попытку позже.";
 
-/* No comment provided by engineer. */
 "An error occurred while installing the update. Please try again later." = "Произошла ошибка при установке обновления. Повторите попытку позже.";
 
-/* No comment provided by engineer. */
 "An error occurred while parsing the update feed." = "Ошибка произошла при извлечении канала обновления.";
 
-/* No comment provided by engineer. */
 "An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Произошла ошибка при перезапуске %1$@, но при последующем запуске %1$@ будет доступна новая версия.";
 
 /* the unit for bytes */
 "B" = "Б";
 
-/* No comment provided by engineer. */
 "Cancel" = "Отменить";
 
-/* No comment provided by engineer. */
 "Cancel Update" = "Отменить обновление";
 
-/* No comment provided by engineer. */
 "Checking for updates..." = "Проверяю наличие обновлений…";
 
 /* Take care not to overflow the status window. */
@@ -61,7 +44,6 @@
 /* the unit for gigabytes */
 "GB" = "ГБ";
 
-/* No comment provided by engineer. */
 "Install and Relaunch" = "Установить и перезапустить";
 
 /* Take care not to overflow the status window. */
@@ -73,25 +55,18 @@
 /* the unit for megabytes */
 "MB" = "МБ";
 
-/* No comment provided by engineer. */
 "OK" = "OK";
 
-/* No comment provided by engineer. */
 "Ready to Install" = "Готов к установке";
 
-/* No comment provided by engineer. */
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Должен ли %1$@ выполнять автоматическую проверку обновлений? Вы всегда можете выполнять проверку обновлений вручную в меню %1$@.";
 
-/* No comment provided by engineer. */
 "Update Error!" = "Ошибка при обновлении!";
 
-/* No comment provided by engineer. */
 "Updating %@" = "Обновляю %@";
 
-/* No comment provided by engineer. */
 "You already have the newest version of %@." = "Вы уже имеете самую новую версию %@.";
 
-/* No comment provided by engineer. */
 "You're up-to-date!" = "У вас все обновлено!";
 
 /* Alternative name for "Install" button if we have a paid update or other update

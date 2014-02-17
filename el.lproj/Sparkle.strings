@@ -1,55 +1,38 @@
-/* No comment provided by engineer. */
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "Το %1$@ %2$@ έχει ληφθεί και είναι έτοιμο προς χρήση! Θα θέλατε να το εγκαταστήσετε και να επανεκκινήσετε το %1$@ τώρα;";
 
-/* No comment provided by engineer. */
 "%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "Το %1$@ δεν μπορεί να ενημερωθεί όσο τρέχει από έναν δίσκο ανάγνωσης-μόνο ή έναν οπτικό δίσκο. Μεταφέρετε το %1$@ στον φάκελο εφαρμογών σας, επανεκκινήστε το από εκεί, και ξαναδοκιμάστε.";
 
-/* No comment provided by engineer. */
 "%@ %@ is currently the newest version available." = "Το %1$@ %2$@ είναι η τελευταία διαθέσιμη έκδοση.";
 
-/* No comment provided by engineer. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "Το %1$@ %2$@ είναι πλέον διαθέσιμο--έχετε το %3$@. Θέλετε να το κατεβάσετε τώρα;";
 
-/* No comment provided by engineer. */
 "%@ downloaded" = "%@ λήφθησαν";
 
-/* No comment provided by engineer. */
 "%@ of %@" = "%1$@ από %2$@";
 
-/* No comment provided by engineer. */
 "A new version of %@ is available!" = "Μία νέα έκδοση του %@ είναι διαθέσιμη!";
 
-/* No comment provided by engineer. */
 "A new version of %@ is ready to install!" = "Μία νέα έκδοση του %@ είναι έτοιμη για εγκατάσταση!";
 
-/* No comment provided by engineer. */
 "An error occurred in retrieving update information. Please try again later." = "Υπήρξε ένα σφάλμα κατά την ανάκτηση των πληροφοριών ενημέρωσης. Παρακαλώ δοκιμάστε αργότερα.";
 
-/* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Υπήρξε ένα σφάλμα κατά την λήψη της ενημέρωσης. Παρακαλώ δοκιμάστε αργότερα.";
 
-/* No comment provided by engineer. */
 "An error occurred while extracting the archive. Please try again later." = "Υπήρξε ένα σφάλμα κατά την εξαγωγή του αρχείου. Παρακαλώ δοκιμάστε αργότερα.";
 
-/* No comment provided by engineer. */
 "An error occurred while installing the update. Please try again later." = "Υπήρξε ένα σφάλμα κατά την εγκατάσταση της ενημέρωσης. Παρακαλώ δοκιμάστε αργότερα.";
 
-/* No comment provided by engineer. */
 "An error occurred while parsing the update feed." = "Υπήρξε ένα σφάλμα κατά την ανάλυση του feed ενημερώσεων.";
 
-/* No comment provided by engineer. */
 "An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Υπήρξε ένα σφάλμα κατά την επανεκκίνηση του %1$@, αλλά η νέα έκδοση θα είναι διαθέσιμη την επόμενη φορά που θα τρέξετε το %1$@.";
 
 /* the unit for bytes */
 "B" = "B";
 
-/* No comment provided by engineer. */
 "Cancel" = "Ακύρωση";
 
-/* No comment provided by engineer. */
 "Cancel Update" = "Ακύρωση Ενημέρωσης";
 
-/* No comment provided by engineer. */
 "Checking for updates..." = "Έλεγχος για ενημερώσεις...";
 
 /* Take care not to overflow the status window. */
@@ -61,7 +44,6 @@
 /* the unit for gigabytes */
 "GB" = "GB";
 
-/* No comment provided by engineer. */
 "Install and Relaunch" = "Εγκατάσταση και Επανεκκίνηση";
 
 /* Take care not to overflow the status window. */
@@ -73,24 +55,17 @@
 /* the unit for megabytes */
 "MB" = "MB";
 
-/* No comment provided by engineer. */
 "OK" = "OK";
 
-/* No comment provided by engineer. */
 "Ready to Install" = "Έτοιμο προς Εγκατάσταση";
 
-/* No comment provided by engineer. */
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Θέλετε το %1$@ να ελέγχει αυτόματα για ενημερώσεις; Μπορείτε πάντα να ελέγχετε για ενημερώσεις χειροκίνητα από το μενού %1$@.";
 
-/* No comment provided by engineer. */
 "Update Error!" = "Σφάλμα Ενημέρωσης!";
 
-/* No comment provided by engineer. */
 "Updating %@" = "Ενημέρωση %@";
 
-/* No comment provided by engineer. */
 "You already have the newest version of %@." = "Έχετε ήδη την τελευταία έκδοση του %@.";
 
-/* No comment provided by engineer. */
 "You're up-to-date!" = "Είστε ενημερωμένοι!";
 

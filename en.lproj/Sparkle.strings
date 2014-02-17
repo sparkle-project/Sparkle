@@ -1,61 +1,42 @@
-/* No comment provided by engineer. */
 "%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?";
 
-/* No comment provided by engineer. */
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?";
 
-/* No comment provided by engineer. */
 "%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "%1$@ can’t be updated when it’s running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again.";
 
-/* No comment provided by engineer. */
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ is currently the newest version available.";
 
-/* No comment provided by engineer. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ is now available—you have %3$@. Would you like to download it now?";
 
-/* No comment provided by engineer. */
 "%@ downloaded" = "%@ downloaded";
 
-/* No comment provided by engineer. */
 "%@ of %@" = "%1$@ of %2$@";
 
-/* No comment provided by engineer. */
 "A new version of %@ is available!" = "A new version of %@ is available!";
 
-/* No comment provided by engineer. */
 "A new version of %@ is ready to install!" = "A new version of %@ is ready to install!";
 
-/* No comment provided by engineer. */
 "An error occurred in retrieving update information. Please try again later." = "An error occurred in retrieving update information. Please try again later.";
 
-/* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "An error occurred while downloading the update. Please try again later.";
 
-/* No comment provided by engineer. */
 "An error occurred while extracting the archive. Please try again later." = "An error occurred while extracting the archive. Please try again later.";
 
-/* No comment provided by engineer. */
 "An error occurred while installing the update. Please try again later." = "An error occurred while installing the update. Please try again later.";
 
-/* No comment provided by engineer. */
 "An error occurred while parsing the update feed." = "An error occurred while parsing the update feed.";
 
-/* No comment provided by engineer. */
 "An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.";
 
-/* No comment provided by engineer. */
 "An important update to %@ is ready to install" = "An important update to %@ is ready to install";
 
 /* the unit for bytes */
 "B" = "B";
 
-/* No comment provided by engineer. */
 "Cancel" = "Cancel";
 
-/* No comment provided by engineer. */
 "Cancel Update" = "Cancel Update";
 
-/* No comment provided by engineer. */
 "Checking for updates..." = "Checking for updates…";
 
 /* Take care not to overflow the status window. */
@@ -67,7 +48,6 @@
 /* the unit for gigabytes */
 "GB" = "GB";
 
-/* No comment provided by engineer. */
 "Install and Relaunch" = "Install and Relaunch";
 
 /* Take care not to overflow the status window. */
@@ -88,10 +68,8 @@
 /* Message that is optionally shown at startup to allow users to turn on/off update checks. */
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu.";
 
-/* No comment provided by engineer. */
 "Update Error!" = "Update Error!";
 
-/* No comment provided by engineer. */
 "Updating %@" = "Updating %@";
 
 /* 'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI) */

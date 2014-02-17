@@ -1,55 +1,38 @@
-/* No comment provided by engineer. */
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ se han descargado y están listos para utilizar. ¿Le gustaría instalar e iniciar %1$@ ahora?";
 
-/* No comment provided by engineer. */
 "%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "%1$@ no se puede actualizar cuando se ejecuta desde un volumen de sólo lectura como imagen de disco o medio óptico. Mueva %1$@ a su carpeta de Aplicaciones y trate de iniciarlo desde allí.";
 
-/* No comment provided by engineer. */
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ es la última versión disponible.";
 
-/* No comment provided by engineer. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ está disponible (usted tiene la %3$@). ¿Desea descargarla ahora?";
 
-/* No comment provided by engineer. */
 "%@ downloaded" = "%@ descargado";
 
-/* No comment provided by engineer. */
 "%@ of %@" = "%1$@ de %2$@";
 
-/* No comment provided by engineer. */
 "A new version of %@ is available!" = "¡Hay una nueva versión de %@ !";
 
-/* No comment provided by engineer. */
 "A new version of %@ is ready to install!" = "¡Una versión nueva de %@ está lista para instalar!";
 
-/* No comment provided by engineer. */
 "An error occurred in retrieving update information. Please try again later." = "Ocurrió un error al recopilar información sobre la actualización. Por favor, inténtelo de nuevo más tarde.";
 
-/* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Ocurrió un error mientras se descargaba la actualización. Por favor intente de nuevo más tarde.";
 
-/* No comment provided by engineer. */
 "An error occurred while extracting the archive. Please try again later." = "Ocurrió un error al extraer el archivo. Por favor, inténtelo de nuevo más tarde.";
 
-/* No comment provided by engineer. */
 "An error occurred while installing the update. Please try again later." = "Ocurrió un error mientras se instalaba la actualización. Por favor intente de nuevo más tarde.";
 
-/* No comment provided by engineer. */
 "An error occurred while parsing the update feed." = "Ocurrió un error mientras se analizaba la entrada de la actualización.";
 
-/* No comment provided by engineer. */
 "An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Ocurrió un error mientras se re-iniciaba %1$@, pero la nueva versión estará disponible la próxima vez que ejecute %1$@.";
 
 /* the unit for bytes */
 "B" = "O";
 
-/* No comment provided by engineer. */
 "Cancel" = "Cancelar";
 
-/* No comment provided by engineer. */
 "Cancel Update" = "Cancelar actualización";
 
-/* No comment provided by engineer. */
 "Checking for updates..." = "Buscando actualizaciones …";
 
 /* Take care not to overflow the status window. */
@@ -61,7 +44,6 @@
 /* the unit for gigabytes */
 "GB" = "GO";
 
-/* No comment provided by engineer. */
 "Install and Relaunch" = "Instalar y volver a arrancar";
 
 /* Take care not to overflow the status window. */
@@ -73,25 +55,18 @@
 /* the unit for megabytes */
 "MB" = "MB";
 
-/* No comment provided by engineer. */
 "OK" = "OK";
 
-/* No comment provided by engineer. */
 "Ready to Install" = "Preparado para instalar";
 
-/* No comment provided by engineer. */
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "¿Debería automáticamente %1$@ buscar las actualizaciones? Puede hacerlo también manualmente desde el menú %1$@.";
 
-/* No comment provided by engineer. */
 "Update Error!" = "¡Error de actualización!";
 
-/* No comment provided by engineer. */
 "Updating %@" = "Actualizando %@";
 
-/* No comment provided by engineer. */
 "You already have the newest version of %@." = "Ya tiene la versión más reciente de %@.";
 
-/* No comment provided by engineer. */
 "You're up-to-date!" = "Ya tiene la versión más reciente";
 
 /* Alternative name for "Install" button if we have a paid update or other update

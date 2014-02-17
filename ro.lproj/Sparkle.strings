@@ -1,55 +1,38 @@
-/* No comment provided by engineer. */
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ a fost descărcat și este gata de utilizare! Doriți să îl instalați și să-l relansați %1$@ acum?";
 
-/* No comment provided by engineer. */
 "%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "%1$@ nu poate fii actualizată atunci când este pornită de pe un volum read-only ca o imagine disc sau o unitate optică. Mută %1$@ în directorul Applications, repornește-o de acolo și încearca din nou.";
 
-/* No comment provided by engineer. */
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ este în prezent cea mai nouă versiune disponibilă.";
 
-/* No comment provided by engineer. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ este disponibilă—-tu ai %3$@. Doriți să o descărcați acum?";
 
-/* No comment provided by engineer. */
 "%@ downloaded" = "%@ descărcat";
 
-/* No comment provided by engineer. */
 "%@ of %@" = "%1$@ din %2$@";
 
-/* No comment provided by engineer. */
 "A new version of %@ is available!" = "O nouă versiune %@ este disponibilă!";
 
-/* No comment provided by engineer. */
 "A new version of %@ is ready to install!" = "O nouă versiune %@ este gata de instalare!";
 
-/* No comment provided by engineer. */
 "An error occurred in retrieving update information. Please try again later." = "O eroare a avut loc în preluarea informaţiilor de actualizare. Vă rugăm să reîncercaţi mai târziu.";
 
-/* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "A apărut o eroare la descărcarea actualizării. Vă rugăm să reîncercaţi mai târziu.";
 
-/* No comment provided by engineer. */
 "An error occurred while extracting the archive. Please try again later." = "O eroare a avut loc în timpul dezarhivării arhivei. Vă rugăm să reîncercaţi mai târziu.";
 
-/* No comment provided by engineer. */
 "An error occurred while installing the update. Please try again later." = "A apărut o eroare la instalarea actualizării. Vă rugăm să reîncercaţi mai târziu.";
 
-/* No comment provided by engineer. */
 "An error occurred while parsing the update feed." = "A apărut o eroare la citirea feed-ului de actualizare.";
 
-/* No comment provided by engineer. */
 "An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "O eroare a avut loc în timpul relansării aplicației %1$@, dar noua versiune va fii disponibilă data viitoare când vei executa %1$@.";
 
 /* the unit for bytes */
 "B" = "B";
 
-/* No comment provided by engineer. */
 "Cancel" = "Anula";
 
-/* No comment provided by engineer. */
 "Cancel Update" = "Anulează actualizare";
 
-/* No comment provided by engineer. */
 "Checking for updates..." = "Verifică pentru actualizări…";
 
 /* Take care not to overflow the status window. */
@@ -61,7 +44,6 @@
 /* the unit for gigabytes */
 "GB" = "GB";
 
-/* No comment provided by engineer. */
 "Install and Relaunch" = "Instalează și Relansează";
 
 /* Take care not to overflow the status window. */
@@ -82,10 +64,8 @@
 /* Message that is optionally shown at startup to allow users to turn on/off update checks. */
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Ar trebui ca %1$@ să caute automat pentru actualizări? Puteți verifica mereu de actualizări din meniul %1$@.";
 
-/* No comment provided by engineer. */
 "Update Error!" = "Eroare actualizare!";
 
-/* No comment provided by engineer. */
 "Updating %@" = "Actualizează %@";
 
 /* 'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI) */

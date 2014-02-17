@@ -1,55 +1,38 @@
-/* No comment provided by engineer. */
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "O %1$@ %2$@ foi transferido e está pronto a instalar! Gostaria de o fazer agora e reiniciar o %1$@ posteriormente?";
 
-/* No comment provided by engineer. */
 "%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "O %1$@ não pode ser actualizado quando estiver a ser executado a partir de um volume apenas de leitura como uma imagem de disco ou disco óptico. Mova o %1$@ para a sua pasta Aplicações, reinicie-o aí e tente novamente.";
 
-/* No comment provided by engineer. */
 "%@ %@ is currently the newest version available." = "O %1$@ %2$@ é neste momento a versão mais recente disponível.";
 
-/* No comment provided by engineer. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "O %1$@ %2$@ está agora disponível e tem a versão %3$@. Gostaria de o transferir agora?";
 
-/* No comment provided by engineer. */
 "%@ downloaded" = "%@ transferido";
 
-/* No comment provided by engineer. */
 "%@ of %@" = "%1$@ de %2$@";
 
-/* No comment provided by engineer. */
 "A new version of %@ is available!" = "Uma nova versão do %@ está dísponível!";
 
-/* No comment provided by engineer. */
 "A new version of %@ is ready to install!" = "Uma nova versão do %@ está pronta a instalar!";
 
-/* No comment provided by engineer. */
 "An error occurred in retrieving update information. Please try again later." = "Ocorreu um erro ao recolher informação sobre as actualizações disponíveis. Por favor tente novamente mais tarde.";
 
-/* No comment provided by engineer. */
 "An error occurred while downloading the update. Please try again later." = "Ocorreu um erro ao transferir a actualização. Por favor novamente tente mais tarde.";
 
-/* No comment provided by engineer. */
 "An error occurred while extracting the archive. Please try again later." = "Ocorreu um erro ao extrair o arquivo. Por favor novamente tente mais tarde.";
 
-/* No comment provided by engineer. */
 "An error occurred while installing the update. Please try again later." = "Ocorreu um erro ao instalar a actualização. Por favor novamente tente mais tarde.";
 
-/* No comment provided by engineer. */
 "An error occurred while parsing the update feed." = "Ocorrer um erro ao processar o feed de actualização.";
 
-/* No comment provided by engineer. */
 "An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Ocorreu um erro ao reiniciar o %1$@, mas a nova versão estará disponível na próxima vez que iniciar o %1$@.";
 
 /* the unit for bytes */
 "B" = "B";
 
-/* No comment provided by engineer. */
 "Cancel" = "Cancelar";
 
-/* No comment provided by engineer. */
 "Cancel Update" = "Cancelar actualização";
 
-/* No comment provided by engineer. */
 "Checking for updates..." = "A procurar actualizações…";
 
 /* Take care not to overflow the status window. */
@@ -61,7 +44,6 @@
 /* the unit for gigabytes */
 "GB" = "GB";
 
-/* No comment provided by engineer. */
 "Install and Relaunch" = "Instalar e reiniciar";
 
 /* Take care not to overflow the status window. */
@@ -73,24 +55,17 @@
 /* the unit for megabytes */
 "MB" = "MB";
 
-/* No comment provided by engineer. */
 "OK" = "OK";
 
-/* No comment provided by engineer. */
 "Ready to Install" = "Pronto para instalar";
 
-/* No comment provided by engineer. */
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Deverá o %1$@ procurar por actualizações automaticamente? Pode sempre procurar actualizações manualmente a partir do menu do %1$@.";
 
-/* No comment provided by engineer. */
 "Update Error!" = "Erro na actualização!";
 
-/* No comment provided by engineer. */
 "Updating %@" = "A actualizar o %@";
 
-/* No comment provided by engineer. */
 "You already have the newest version of %@." = "Já tem a versão mais recente do %@.";
 
-/* No comment provided by engineer. */
 "You're up-to-date!" = "Está actualizado!";
 
