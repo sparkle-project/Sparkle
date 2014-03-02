@@ -22,6 +22,11 @@
 	SUHost *host;
 }
 
+@property (copy) NSString *statusText;
+@property double progressValue;
+@property (nonatomic) double maxProgressValue;
+@property (getter = isButtonEnabled) BOOL buttonEnabled;
+
 - (id)initWithHost:(SUHost *)host;
 
 // Pass 0 for the max progress value to get an indeterminate progress bar.
@@ -29,15 +34,7 @@
 - (void)beginActionWithTitle:(NSString *)title maxProgressValue:(double)maxProgressValue statusText:(NSString *)statusText;
 
 // If isDefault is YES, the button's key equivalent will be \r.
-- (void)setButtonTitle:(NSString *)buttonTitle target:target action:(SEL)action isDefault:(BOOL)isDefault;
-- (void)setButtonEnabled:(BOOL)enabled;
-
-- (double)progressValue;
-- (void)setProgressValue:(double)value;
-- (double)maxProgressValue;
-- (void)setMaxProgressValue:(double)value;
-
-- (void)setStatusText:(NSString *)statusText;
+- (void)setButtonTitle:(NSString *)buttonTitle target:(id)target action:(SEL)action isDefault:(BOOL)isDefault;
 
 @end
 
