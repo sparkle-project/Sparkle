@@ -27,6 +27,7 @@ extern NSString * const SUUpdateDriverFinishedNotification;
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
 - (void)abortUpdate;
 - (BOOL)finished;
+- (void)setFinished:(BOOL) finished;
 - (SUHost*)host;
 - (void)setHost:(SUHost*)newHost;
 

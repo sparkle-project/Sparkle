@@ -35,6 +35,10 @@ NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
 - (BOOL)finished { return finished; }
 
+- (void)setFinished:(BOOL) _finished {
+  finished = _finished;
+}
+
 - (void)dealloc
 {
     [host release];
