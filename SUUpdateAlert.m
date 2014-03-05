@@ -140,15 +140,17 @@
 
 - (BOOL)allowsAutomaticUpdates
 {
-	BOOL		allowAutoUpdates = YES;	// Defaults to YES.
-	if( [host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] )
-		allowAutoUpdates = [host boolForInfoDictionaryKey: SUAllowsAutomaticUpdatesKey];
-	
-	// UK 2007-08-31: Give delegate a chance to modify this choice:
-	if( delegate && [delegate respondsToSelector: @selector(updateAlert:shouldAllowAutoUpdate:)] )
-		[delegate updateAlert: self shouldAllowAutoUpdate: &allowAutoUpdates];
-	
-	return allowAutoUpdates;
+//	BOOL		allowAutoUpdates = YES;	// Defaults to YES.
+//	if( [host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] )
+//		allowAutoUpdates = [host boolForInfoDictionaryKey: SUAllowsAutomaticUpdatesKey];
+//	
+//	// UK 2007-08-31: Give delegate a chance to modify this choice:
+//	if( delegate && [delegate respondsToSelector: @selector(updateAlert:shouldAllowAutoUpdate:)] )
+//		[delegate updateAlert: self shouldAllowAutoUpdate: &allowAutoUpdates];
+//	
+//	return allowAutoUpdates;
+    
+    return NO; // HACK: darwin
 }
 
 - (void)awakeFromNib
