@@ -46,6 +46,8 @@
 	SUAssertAscending(@"1.0b5 (1234)", @"1.0b5 (1235)");
 	SUAssertAscending(@"1.0b5 (1234)", @"1.0.1b5 (1234)");
 	SUAssertAscending(@"1.0.1b5 (1234)", @"1.0.1b6 (1234)");
+	SUAssertAscending(@"2.0.0.2429", @"2.0.0.2430");
+	SUAssertAscending(@"1.1.1.1818", @"2.0.0.2430");
 	
 	SUAssertAscending(@"3.3 (5847)", @"3.3.1b1 (5902)");
 }
