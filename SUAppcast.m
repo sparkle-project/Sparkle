@@ -194,7 +194,10 @@
 				else if (name != nil)
 				{
 					// add all other values as strings
-					[dict setObject:[[node stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] forKey:name];
+                    if ([node stringValue])  // Added by Jerry to fix warning from Xcode 5
+                    {
+                        [dict setObject:[[node stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] forKey:name];
+                    }
 				}
             }
             
