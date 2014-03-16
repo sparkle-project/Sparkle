@@ -138,13 +138,7 @@
 
 - (BOOL)isBackgroundApplication
 {
-	ProcessSerialNumber PSN;
-	GetCurrentProcess(&PSN);
-	CFDictionaryRef processInfo = ProcessInformationCopyDictionary(&PSN, kProcessDictionaryIncludeAllInformationMask);
-	BOOL isElement = [[(NSDictionary *)processInfo objectForKey:@"LSUIElement"] boolValue];
-	if (processInfo)
-		CFRelease(processInfo);
-	return isElement;
+	return ([[NSApplication sharedApplication] activationPolicy] == NSApplicationActivationPolicyAccessory);
 }
 
 - (NSString *)publicDSAKey
