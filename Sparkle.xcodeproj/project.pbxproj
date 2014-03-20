@@ -122,6 +122,7 @@
 		61F83F720DBFE140006FDD30 /* SUBasicUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */; };
 		61F83F740DBFE141006FDD30 /* SUBasicUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
 		61FA52880E2D9EA400EF58AD /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (Required, ); }; };
+		651A06C418DB3F52002EB280 /* SUPlainInstallerInternalsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 651A06C318DB3F52002EB280 /* SUPlainInstallerInternalsTest.m */; };
 		8B887B611517F3AC000BB292 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B887B601517F3AC000BB292 /* Foundation.framework */; };
 		8B887B7E1517F888000BB292 /* SUXPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B887B7C1517F888000BB292 /* SUXPC.h */; };
 		8B887B7F1517F888000BB292 /* SUXPC.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B887B7D1517F888000BB292 /* SUXPC.m */; };
@@ -396,6 +397,7 @@
 		61F3AC1715C22D5900260CA2 /* th */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = th; path = th.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
 		61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBasicUpdateDriver.h; sourceTree = "<group>"; };
 		61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBasicUpdateDriver.m; sourceTree = "<group>"; };
+		651A06C318DB3F52002EB280 /* SUPlainInstallerInternalsTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUPlainInstallerInternalsTest.m; sourceTree = "<group>"; };
 		8B887B5E1517F3AB000BB292 /* com.andymatuschak.Sparkle.SandboxService.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.andymatuschak.Sparkle.SandboxService.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B887B601517F3AC000BB292 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		8B887B701517F447000BB292 /* ConfigService.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigService.xcconfig; sourceTree = "<group>"; };
@@ -651,6 +653,7 @@
 			children = (
 				61227A140DB548B800AB99EA /* SUVersionComparisonTest.h */,
 				61227A150DB548B800AB99EA /* SUVersionComparisonTest.m */,
+				651A06C318DB3F52002EB280 /* SUPlainInstallerInternalsTest.m */,
 				612279DA0DB5470200AB99EA /* Sparkle Unit Tests-Info.plist */,
 			);
 			name = Tests;
@@ -1250,6 +1253,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				651A06C418DB3F52002EB280 /* SUPlainInstallerInternalsTest.m in Sources */,
 				61227A160DB548B800AB99EA /* SUVersionComparisonTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

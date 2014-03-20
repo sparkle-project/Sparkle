@@ -460,7 +460,8 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 			return [self _copyPathWithForcedAuthentication:src toPath:dst temporaryPath:tmpPath error:error];
 		}
 	}
-	
+
+	// Get an FSRef for the temporary file's directory
 	if( hadFileAtDest )
 	{
 		err = FSPathMakeRef((UInt8 *)[[tmpPath stringByDeletingLastPathComponent] fileSystemRepresentation], &tmpDirRef, NULL);
@@ -505,9 +506,17 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 			{
 				// We better move the old version back to its old location
 				if( hadFileAtDest )
-					[manager moveItemAtPath:tmpPath toPath:dst error:error];
+				{
+					NSError* restoreError = nil;
+					[manager moveItemAtPath:tmpPath toPath:dst error:&restoreError];
+				}
+
+				// This error covers both the failure above to copy from src to dst, any error restoring the original above
+				// is not currently propagated as a separate error.
 				if (error != NULL)
-					*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
+				{
+					*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", src, dst] forKey:NSLocalizedDescriptionKey]];
+				}
 				return NO;
 
 			}
@@ -523,23 +532,27 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 				return NO;			
 			}
 		}
+
+		// If the currently-running application is trusted, the new
+		// version should be trusted as well.  Remove it from the
+		// quarantine to avoid a delay at launch, and to avoid
+		// presenting the user with a confusing trust dialog.
+		//
+		// This needs to be done after the application is moved to its
+		// new home in case it's moved across filesystems: if that
+		// happens, the move is actually a copy, and it may result
+		// in the application being quarantined.
+		if ([NSThread isMultiThreaded])
+			[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:dst waitUntilDone:YES];
+		else
+			[self releaseFromQuarantine:dst];
+
+		return YES;
 	}
-		
-	// If the currently-running application is trusted, the new
-	// version should be trusted as well.  Remove it from the
-	// quarantine to avoid a delay at launch, and to avoid
-	// presenting the user with a confusing trust dialog.
-	//
-	// This needs to be done after the application is moved to its
-	// new home in case it's moved across filesystems: if that
-	// happens, the move is actually a copy, and it may result
-	// in the application being quarantined.
-	if ([NSThread isMultiThreaded])
-		[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:dst waitUntilDone:YES];
 	else
-		[self releaseFromQuarantine:dst];
-	
-	return YES;
+	{
+		return NO;
+	}
 }
 
 @end
