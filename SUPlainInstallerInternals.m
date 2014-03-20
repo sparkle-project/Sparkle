@@ -71,30 +71,6 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 @implementation SUPlainInstaller (Internals)
 
-+ (NSString *)temporaryNameForPath:(NSString *)path
-{
-	// Let's try to read the version number so the filename will be more meaningful.
-	NSString *postFix;
-	NSString *version;
-	if ((version = [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:@"CFBundleVersion"]) && ![version isEqualToString:@""])
-	{
-		// We'll clean it up a little for safety.
-		// The cast is necessary because of a bug in the headers in pre-10.5 SDKs
-		NSMutableCharacterSet *validCharacters = (id)[NSMutableCharacterSet alphanumericCharacterSet];
-		[validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
-		postFix = [version stringByTrimmingCharactersInSet:[validCharacters invertedSet]];
-	}
-	else
-		postFix = @"old";
-	NSString *prefix = [[path stringByDeletingPathExtension] stringByAppendingFormat:@" (%@)", postFix];
-	NSString *tempDir = [prefix stringByAppendingPathExtension:[path pathExtension]];
-	// Now let's make sure we get a unique path.
-	unsigned int cnt=2;
-	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
-		tempDir = [NSString stringWithFormat:@"%@ %u.%@", prefix, cnt++, [path pathExtension]];
-	return [tempDir lastPathComponent];
-}
-
 + (NSString *)_temporaryCopyNameForPath:(NSString *)path didFindTrash: (BOOL*)outDidFindTrash
 {
 	// *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
@@ -471,7 +447,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	return userCanWrite;
 }
 
-+ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp error:(NSError **)error
++ (BOOL) copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst error:(NSError **)error
 {
 	BOOL success = NO;
 	BOOL didFindTrash = NO;

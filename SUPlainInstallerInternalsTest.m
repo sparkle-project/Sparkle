@@ -106,16 +106,16 @@
 	BOOL copySuccess = YES;
 
 	// Case: Bogus source and a bogus destination should fail
-	copySuccess = [SUPlainInstaller copyPathWithAuthentication:bogusSourceFilePath overPath:bogusTargetFilePath temporaryName:nil error:&errorDuringCopy];
+	copySuccess = [SUPlainInstaller copyPathWithAuthentication:bogusSourceFilePath overPath:bogusTargetFilePath error:&errorDuringCopy];
 	STAssertFalse(copySuccess, @"Copying with bogus source and destination should fail.");
 
 	// Case: Simple copy where the target does not already exist
-	copySuccess = [SUPlainInstaller copyPathWithAuthentication:sourceFile1 overPath:targetFilePath temporaryName:nil error:&errorDuringCopy];
+	copySuccess = [SUPlainInstaller copyPathWithAuthentication:sourceFile1 overPath:targetFilePath error:&errorDuringCopy];
 	STAssertTrue(copySuccess, @"Copying with no authentication required should succeed.");
 	STAssertTrue([self fileAtPath:sourceFile1 identicalToFileAtPath:targetFilePath], @"After copying the source and dst should appear identical");
 
 	// Case: Simple copy where the target *does* already exist ... just copy over it again with something else
-	copySuccess = [SUPlainInstaller copyPathWithAuthentication:sourceFile2 overPath:targetFilePath temporaryName:nil error:&errorDuringCopy];
+	copySuccess = [SUPlainInstaller copyPathWithAuthentication:sourceFile2 overPath:targetFilePath error:&errorDuringCopy];
 	STAssertTrue(copySuccess, @"Re-Copying with no authentication required should succeed.");
 	STAssertFalse([self fileAtPath:sourceFile1 identicalToFileAtPath:targetFilePath], @"After copying the old source and dst should NOT appear identical");
 	STAssertTrue([self fileAtPath:sourceFile2 identicalToFileAtPath:targetFilePath], @"After copying the NEW source and dst should appear identical");
@@ -124,12 +124,12 @@
 	// An easy scenario that exercises this is to have the source file be a valid path, but one that will fail during
 	// copy becuase of permissions errors.
 	// First restore the original case where the /bin/ls is copied to the target file path
-	copySuccess = [SUPlainInstaller copyPathWithAuthentication:sourceFile1 overPath:targetFilePath temporaryName:nil error:&errorDuringCopy];
+	copySuccess = [SUPlainInstaller copyPathWithAuthentication:sourceFile1 overPath:targetFilePath error:&errorDuringCopy];
 	STAssertTrue(copySuccess, @"Copying with no authentication required should succeed.");
 	
 	NSString* unreadableSourceFile = [testContainerPath stringByAppendingPathComponent:@"unreadable"];
 	[[NSFileManager defaultManager] createFileAtPath:unreadableSourceFile contents:[NSData dataWithBytes:"Hello" length:5] attributes:[self unreadableAttributes]];
-	copySuccess = [SUPlainInstaller copyPathWithAuthentication:unreadableSourceFile overPath:targetFilePath temporaryName:nil error:&errorDuringCopy];
+	copySuccess = [SUPlainInstaller copyPathWithAuthentication:unreadableSourceFile overPath:targetFilePath error:&errorDuringCopy];
 	STAssertFalse(copySuccess, @"Copy should fail when the source file is unreadable");
 
 	// This confirms the copying back of a file from the tmpPath location

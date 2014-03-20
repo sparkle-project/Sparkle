@@ -34,14 +34,12 @@ static void peer_event_handler(xpc_connection_t peer, xpc_object_t event)
 		{
 			const char *src = xpc_dictionary_get_string(event, "source");
 			const char *dst = xpc_dictionary_get_string(event, "destination");
-			const char *tmp = xpc_dictionary_get_string(event, "tmp");
-			
+
 			NSFileManager *manager = [NSFileManager defaultManager];
 			NSString *relaunchPathToCopy = src ? [manager stringWithFileSystemRepresentation:src length:strlen(src)] : nil;
 			NSString *targetPath = dst ? [manager stringWithFileSystemRepresentation:dst length:strlen(dst)] : nil;
-			NSString *temporaryName = tmp ? [NSString stringWithUTF8String:tmp] : nil;
 			NSError *error = nil;
-			[SUPlainInstaller copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath temporaryName: temporaryName error: &error];
+			[SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath error:&error];
 			
 			// send response to indicate ok
 			xpc_object_t reply = xpc_dictionary_create_reply(event);

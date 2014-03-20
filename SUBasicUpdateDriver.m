@@ -336,9 +336,9 @@
 		// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
 		BOOL copiedRelaunchTool = FALSE;
 		if( useXPC )
-			copiedRelaunchTool = [SUXPC copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath temporaryName: nil error: &error];
+			copiedRelaunchTool = [SUXPC copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath error: &error];
 		else
-			copiedRelaunchTool = [SUPlainInstaller copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath temporaryName: nil error: &error];
+			copiedRelaunchTool = [SUPlainInstaller copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath  error: &error];
 		if( copiedRelaunchTool )
 			relaunchPath = [targetPath retain];
 		else

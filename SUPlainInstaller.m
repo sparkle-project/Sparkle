@@ -13,7 +13,6 @@
 
 static NSString * const SUInstallerPathKey = @"SUInstallerPath";
 static NSString * const SUInstallerTargetPathKey = @"SUInstallerTargetPath";
-static NSString * const SUInstallerTempNameKey = @"SUInstallerTempName";
 static NSString * const SUInstallerHostKey = @"SUInstallerHost";
 static NSString * const SUInstallerDelegateKey = @"SUInstallerDelegate";
 static NSString * const SUInstallerResultKey = @"SUInstallerResult";
@@ -39,7 +38,7 @@ static NSString * const SUInstallerInstallationPathKey = @"SUInstallerInstallati
 	
 	NSString	*	oldPath = [[info objectForKey:SUInstallerHostKey] bundlePath];
 	NSString	*	installationPath = [info objectForKey:SUInstallerInstallationPathKey];
-	BOOL result = [self copyPathWithAuthentication:[info objectForKey:SUInstallerPathKey] overPath: installationPath temporaryName:[info objectForKey:SUInstallerTempNameKey] error:&error];
+	BOOL result = [self copyPathWithAuthentication:[info objectForKey:SUInstallerPathKey] overPath: installationPath error:&error];
 	
 	if( result )
 	{
@@ -72,8 +71,7 @@ static NSString * const SUInstallerInstallationPathKey = @"SUInstallerInstallati
 	#endif
     
     NSString *targetPath = [host installationPath];
-    NSString *tempName = [self temporaryNameForPath:[host bundlePath]];
-	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:path, SUInstallerPathKey, targetPath, SUInstallerTargetPathKey, tempName, SUInstallerTempNameKey, host, SUInstallerHostKey, delegate, SUInstallerDelegateKey, installationPath, SUInstallerInstallationPathKey, nil];
+	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:path, SUInstallerPathKey, targetPath, SUInstallerTargetPathKey, host, SUInstallerHostKey, delegate, SUInstallerDelegateKey, installationPath, SUInstallerInstallationPathKey, nil];
 	if (synchronously)
 		[self performInstallationWithInfo:info];
 	else

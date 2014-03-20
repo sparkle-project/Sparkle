@@ -12,7 +12,7 @@
 
 @implementation SUXPC
 
-+ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp error:(NSError **)error {
++ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst error:(NSError **)error {
 	xpc_connection_t connection = xpc_connection_create("com.andymatuschak.Sparkle.SandboxService", NULL);
 	xpc_connection_set_event_handler(connection, ^(xpc_object_t event) {
 		xpc_dictionary_apply(event, ^bool(const char *key, xpc_object_t value) {
@@ -29,8 +29,6 @@
 		xpc_dictionary_set_string(message, "source", [src fileSystemRepresentation]);
 	if( dst )
 		xpc_dictionary_set_string(message, "destination", [dst fileSystemRepresentation]);
-	if( tmp )
-		xpc_dictionary_set_string(message, "tmp", [tmp UTF8String]);
 	
 	xpc_object_t response = xpc_connection_send_message_with_reply_sync(connection, message);
 	xpc_type_t type = xpc_get_type(response);
