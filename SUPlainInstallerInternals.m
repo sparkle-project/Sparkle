@@ -435,124 +435,108 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		;//SULog(@"Moved %@ to the trash.", path);
 }
 
++ (BOOL) userHasWriteAccessToPath:(NSString*)thePath
+{
+	const char* posixPath = [thePath fileSystemRepresentation];
+	return (0 == access(posixPath, W_OK));
+}
+
++ (BOOL) userHasWriteAccessToFileAndParentFolder:(NSString*)theFilePath
+{
+	BOOL hasWriteAccess = NO;
+	NSString* theParentPath = [theFilePath stringByDeletingLastPathComponent];
+	if ([self userHasWriteAccessToPath:theFilePath] && [self userHasWriteAccessToPath:theParentPath])
+	{
+		hasWriteAccess = YES;
+	}
+
+	return hasWriteAccess;
+}
+
++ (BOOL) userHasPermissionToWriteToFileAtPath:(NSString*)theFilePath
+{
+	BOOL userCanWrite = NO;
+	BOOL targetFileExists = [[NSFileManager defaultManager] fileExistsAtPath:theFilePath];
+	if (targetFileExists)
+	{
+		userCanWrite = ([self userHasWriteAccessToFileAndParentFolder:theFilePath]);
+	}
+	else
+	{
+		// No file? We only need write access to the containing folder then
+		NSString* targetFolderPath = [theFilePath stringByDeletingLastPathComponent];
+		userCanWrite = [self userHasWriteAccessToPath:targetFolderPath];
+	}
+
+	return userCanWrite;
+}
+
 + (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp error:(NSError **)error
 {
-	FSRef		srcRef, dstRef, dstDirRef, movedRef, tmpDirRef;
-	OSStatus	err;
-	BOOL		hadFileAtDest = NO, didFindTrash = NO;
-	NSString	*tmpPath = [self _temporaryCopyNameForPath: dst didFindTrash: &didFindTrash];
-	
-	// Make FSRef for destination:
-	err = FSPathMakeRefWithOptions((UInt8 *)[dst fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &dstRef, NULL);
-	hadFileAtDest = (err == noErr);	// There is a file at the destination, move it aside. If we normalized the name, we might not get here, so don't error.
-	if( hadFileAtDest )
+	BOOL success = NO;
+	BOOL didFindTrash = NO;
+	NSString *tmpPath = [self _temporaryCopyNameForPath: dst didFindTrash: &didFindTrash];
+
+	// If we know we will need to escalate privileges, we take a complete different code path. Note that the
+	// "forced authentication" code path also performs the "releaseFromQuarantine:" stuff, so don't be alarmed
+	// that it will be skipped by taking this other code path.
+	if ([self userHasPermissionToWriteToFileAtPath:dst] == NO)
 	{
-		if (0 != access([dst fileSystemRepresentation], W_OK) || 0 != access([[dst stringByDeletingLastPathComponent] fileSystemRepresentation], W_OK))
-		{
-			return [self _copyPathWithForcedAuthentication:src toPath:dst temporaryPath:tmpPath error:error];
-		}
+		success = [self _copyPathWithForcedAuthentication:src toPath:dst temporaryPath:tmpPath error:error];
 	}
 	else
 	{
-		if (0 != access([[dst stringByDeletingLastPathComponent] fileSystemRepresentation], W_OK)
-			|| 0 != access([[[dst stringByDeletingLastPathComponent] stringByDeletingLastPathComponent] fileSystemRepresentation], W_OK))
-		{
-			return [self _copyPathWithForcedAuthentication:src toPath:dst temporaryPath:tmpPath error:error];
-		}
-	}
-
-	// Get an FSRef for the temporary file's directory
-	if( hadFileAtDest )
-	{
-		err = FSPathMakeRef((UInt8 *)[[tmpPath stringByDeletingLastPathComponent] fileSystemRepresentation], &tmpDirRef, NULL);
-		if (err != noErr)
-			FSPathMakeRef((UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &tmpDirRef, NULL);
-	}
-	
-	err = FSPathMakeRef((UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &dstDirRef, NULL);
-	
-	if (err == noErr && hadFileAtDest)
-	{ 
-		if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_5)
+		// If there is already a file at the destination, move it aside before we copy the other file in
+		BOOL replacingExistingFile = [[NSFileManager defaultManager] fileExistsAtPath:dst];
+		if (replacingExistingFile)
 		{
 			NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
-			BOOL success = [manager moveItemAtPath:dst toPath:tmpPath error:error];
-			if (!success && hadFileAtDest)
+			success = [manager moveItemAtPath:dst toPath:tmpPath error:error];
+			if (success == NO)
 			{
 				if (error != NULL)
 					*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
-				return NO;
-			}
-			
-		} else {
-			err = FSMoveObjectSync(&dstRef, &tmpDirRef, (CFStringRef)[tmpPath lastPathComponent], &movedRef, 0);
-			if (err != noErr && hadFileAtDest)
-			{
-				if (error != NULL)
-					*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
-				return NO;			
 			}
 		}
-	}
-	
-	err = FSPathMakeRef((UInt8 *)[src fileSystemRepresentation], &srcRef, NULL);
-	if (err == noErr)
-	{
-		if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_5)
+
+		// Copy the file in, replacing the original if we run into any error
+		NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
+		success = [manager copyItemAtPath:src toPath:dst error:error];
+		if (success == NO)
 		{
-			NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
-			BOOL success = [manager copyItemAtPath:src toPath:dst error:error];
-			if (!success)
+			// We better move the old version back to its old location
+			if (replacingExistingFile)
 			{
-				// We better move the old version back to its old location
-				if( hadFileAtDest )
-				{
-					NSError* restoreError = nil;
-					[manager moveItemAtPath:tmpPath toPath:dst error:&restoreError];
-				}
-
-				// This error covers both the failure above to copy from src to dst, any error restoring the original above
-				// is not currently propagated as a separate error.
-				if (error != NULL)
-				{
-					*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", src, dst] forKey:NSLocalizedDescriptionKey]];
-				}
-				return NO;
-
+				NSError* restoreError = nil;
+				[manager moveItemAtPath:tmpPath toPath:dst error:&restoreError];
 			}
-		} else {
-			err = FSCopyObjectSync(&srcRef, &dstDirRef, (CFStringRef)[dst lastPathComponent], NULL, 0);
-			if (err != noErr)
+
+			// This error covers both the failure above to copy from src to dst, any error restoring the original above
+			// is not currently propagated as a separate error.
+			if (error != NULL)
 			{
-				// We better move the old version back to its old location
-				if( hadFileAtDest )
-					FSMoveObjectSync(&movedRef, &dstDirRef, (CFStringRef)[dst lastPathComponent], &movedRef, 0);
-				if (error != NULL)
-					*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't copy %@ to %@.", src, dst] forKey:NSLocalizedDescriptionKey]];
-				return NO;			
+				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", src, dst] forKey:NSLocalizedDescriptionKey]];
 			}
 		}
-
-		// If the currently-running application is trusted, the new
-		// version should be trusted as well.  Remove it from the
-		// quarantine to avoid a delay at launch, and to avoid
-		// presenting the user with a confusing trust dialog.
-		//
-		// This needs to be done after the application is moved to its
-		// new home in case it's moved across filesystems: if that
-		// happens, the move is actually a copy, and it may result
-		// in the application being quarantined.
-		if ([NSThread isMultiThreaded])
-			[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:dst waitUntilDone:YES];
 		else
-			[self releaseFromQuarantine:dst];
+		{
+			// If the currently-running application is trusted, the new
+			// version should be trusted as well.  Remove it from the
+			// quarantine to avoid a delay at launch, and to avoid
+			// presenting the user with a confusing trust dialog.
+			//
+			// This needs to be done after the application is moved to its
+			// new home in case it's moved across filesystems: if that
+			// happens, the move is actually a copy, and it may result
+			// in the application being quarantined.
+			if ([NSThread isMultiThreaded])
+				[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:dst waitUntilDone:YES];
+			else
+				[self releaseFromQuarantine:dst];
+		}
+	}
 
-		return YES;
-	}
-	else
-	{
-		return NO;
-	}
+	return success;
 }
 
 @end
