@@ -93,10 +93,12 @@
 	NSString* writableTargetFolderPath = [testContainerPath stringByAppendingPathComponent:@"writable"];
 	[self createFolderAtPath:writableTargetFolderPath];
 
-	// Copy in a random file ... oh /bin/ls will do
-	NSString* sourceFilePath = @"/bin/ls";
-	NSString* otherSourceFilePath = @"/bin/rm";
-	NSString* targetFilePath = [writableTargetFolderPath stringByAppendingPathComponent:@"lscopy"];
+	// Set up basic source and destination files
+	NSString* sourceFile1 = [[self pathToTemporaryFolder] stringByAppendingPathComponent:@"sourceFile1"];
+	[[NSFileManager defaultManager] copyItemAtPath:@"/bin/ls" toPath:sourceFile1 error:nil];
+	NSString* sourceFile2 = [[self pathToTemporaryFolder] stringByAppendingPathComponent:@"sourceFile2"];
+	[[NSFileManager defaultManager] copyItemAtPath:@"/bin/rm" toPath:sourceFile2 error:nil];
+	NSString* targetFilePath = [writableTargetFolderPath stringByAppendingPathComponent:@"sourceCopy"];
 	NSString* bogusSourceFilePath = @"/bingle/ls";
 	NSString* bogusTargetFilePath = [testContainerPath stringByAppendingPathComponent:@"alksjdf"];
 
@@ -108,21 +110,21 @@
 	STAssertFalse(copySuccess, @"Copying with bogus source and destination should fail.");
 
 	// Case: Simple copy where the target does not already exist
-	copySuccess = [SUPlainInstaller copyPathWithAuthentication:sourceFilePath overPath:targetFilePath temporaryName:nil error:&errorDuringCopy];
+	copySuccess = [SUPlainInstaller copyPathWithAuthentication:sourceFile1 overPath:targetFilePath temporaryName:nil error:&errorDuringCopy];
 	STAssertTrue(copySuccess, @"Copying with no authentication required should succeed.");
-	STAssertTrue([self fileAtPath:sourceFilePath identicalToFileAtPath:targetFilePath], @"After copying the source and dst should appear identical");
+	STAssertTrue([self fileAtPath:sourceFile1 identicalToFileAtPath:targetFilePath], @"After copying the source and dst should appear identical");
 
 	// Case: Simple copy where the target *does* already exist ... just copy over it again with something else
-	copySuccess = [SUPlainInstaller copyPathWithAuthentication:otherSourceFilePath overPath:targetFilePath temporaryName:nil error:&errorDuringCopy];
+	copySuccess = [SUPlainInstaller copyPathWithAuthentication:sourceFile2 overPath:targetFilePath temporaryName:nil error:&errorDuringCopy];
 	STAssertTrue(copySuccess, @"Re-Copying with no authentication required should succeed.");
-	STAssertFalse([self fileAtPath:sourceFilePath identicalToFileAtPath:targetFilePath], @"After copying the old source and dst should NOT appear identical");
-	STAssertTrue([self fileAtPath:otherSourceFilePath identicalToFileAtPath:targetFilePath], @"After copying the NEW source and dst should appear identical");
+	STAssertFalse([self fileAtPath:sourceFile1 identicalToFileAtPath:targetFilePath], @"After copying the old source and dst should NOT appear identical");
+	STAssertTrue([self fileAtPath:sourceFile2 identicalToFileAtPath:targetFilePath], @"After copying the NEW source and dst should appear identical");
 
 	// Case: Exercise failure code path where the target folder is writable but the copy fails for some reason.
 	// An easy scenario that exercises this is to have the source file be a valid path, but one that will fail during
 	// copy becuase of permissions errors.
 	// First restore the original case where the /bin/ls is copied to the target file path
-	copySuccess = [SUPlainInstaller copyPathWithAuthentication:sourceFilePath overPath:targetFilePath temporaryName:nil error:&errorDuringCopy];
+	copySuccess = [SUPlainInstaller copyPathWithAuthentication:sourceFile1 overPath:targetFilePath temporaryName:nil error:&errorDuringCopy];
 	STAssertTrue(copySuccess, @"Copying with no authentication required should succeed.");
 	
 	NSString* unreadableSourceFile = [testContainerPath stringByAppendingPathComponent:@"unreadable"];
@@ -131,7 +133,7 @@
 	STAssertFalse(copySuccess, @"Copy should fail when the source file is unreadable");
 
 	// This confirms the copying back of a file from the tmpPath location
-	STAssertTrue([self fileAtPath:sourceFilePath identicalToFileAtPath:targetFilePath], @"After failing to copy a bogus source over it, original source and dst should appear identical");
+	STAssertTrue([self fileAtPath:sourceFile1 identicalToFileAtPath:targetFilePath], @"After failing to copy a bogus source over it, original source and dst should appear identical");
 
 	// Confirm the error is roughly meaningful
 	BOOL looksLikeCopyError = ([[errorDuringCopy localizedDescription] rangeOfString:@"Couldn't move"].location != NSNotFound);
@@ -148,7 +150,7 @@
 	NSString* unmovableTargetFile = [unwritableTargetFolder stringByAppendingPathComponent:@"unmovableTarget"];
 	[[NSFileManager defaultManager] createFileAtPath:unmovableTargetFile contents:[NSData dataWithBytes:"Hello" length:5] attributes:nil];
 	[[NSFileManager defaultManager] setAttributes:[self unwritableAttributes] ofItemAtPath:unwritableTargetFolder error:nil];
-	copySuccess = [SUPlainInstaller copyPathWithAuthentication:sourceFilePath overPath:unmovableTargetFile temporaryName:nil error:&errorDuringCopy];
+	copySuccess = [SUPlainInstaller copyPathWithAuthentication:sourceFile1 overPath:unmovableTargetFile temporaryName:nil error:&errorDuringCopy];
 	STAssertFalse(copySuccess, @"Copy should fail when the target file is unreadable and can't be moved to e.g. trash");
 	looksLikeCopyError = ([[errorDuringCopy localizedDescription] rangeOfString:@"Couldn't move"].location != NSNotFound);
 	STAssertTrue(looksLikeCopyError, @"After failing to copy over we should get a reasonable error.");
