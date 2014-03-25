@@ -23,7 +23,6 @@
     NSString *maximumSystemVersion;
 	
 	NSURL *fileURL;
-	NSString *fileURLType; // what is being pointed at here? Could be a text/html for instance instead of an app.
 	 
 	NSString *versionString;
 	NSString *displayVersionString;
