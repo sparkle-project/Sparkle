@@ -24,6 +24,7 @@
 	NSTimer			*longInstallationTimer;
 	SUHost			*host;
     BOOL            shouldRelaunch;
+	SUStatusController*	statusController;
 }
 
 - (void) parentHasQuit;
@@ -78,7 +79,9 @@
 
 	[host release];
 	host = nil;
-	
+
+	[statusController release];
+
 	[super dealloc];
 }
 
@@ -146,11 +149,11 @@
 	
     // Perhaps a poor assumption but: if we're not relaunching, we assume we shouldn't be showing any UI either. Because non-relaunching installations are kicked off without any user interaction, we shouldn't be interrupting them.
     if (shouldRelaunch) {
-        SUStatusController*	statusCtl = [[SUStatusController alloc] initWithHost: host];	// We quit anyway after we've installed, so leak this for now.
-        [statusCtl setButtonTitle: SULocalizedString(@"Cancel Update",@"") target: nil action: Nil isDefault: NO];
-        [statusCtl beginActionWithTitle: SULocalizedString(@"Installing update...",@"")
+        statusController = [[SUStatusController alloc] initWithHost: host];	// We quit anyway after we've installed, so leak this for now.
+        [statusController setButtonTitle: SULocalizedString(@"Cancel Update",@"") target: nil action: Nil isDefault: NO];
+        [statusController beginActionWithTitle: SULocalizedString(@"Installing update...",@"")
                         maxProgressValue: 0 statusText: @""];
-        [statusCtl showWindow: self];
+        [statusController showWindow: self];
     }
 	
 	[SUInstaller installFromUpdateFolder: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: folderpath length: strlen(folderpath)]

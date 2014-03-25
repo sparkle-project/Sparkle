@@ -166,35 +166,38 @@
             while ((name = [nameEnum nextObject]))
             {
                 node = [self bestNodeInNodes:[nodesDict objectForKey:name]];
-				if ([name isEqualToString:@"enclosure"])
+				if (node != nil)
 				{
-					// enclosure is flattened as a separate dictionary for some reason
-					NSDictionary *encDict = [(NSXMLElement *)node attributesAsDictionary];
-					[dict setObject:encDict forKey:@"enclosure"];
-					
-				}
-                else if ([name isEqualToString:@"pubDate"])
-                {
-					// pubDate is expected to be an NSDate by SUAppcastItem, but the RSS class was returning an NSString
-					NSDate *date = [NSDate dateWithNaturalLanguageString:[node stringValue]];
-					if (date)
-						[dict setObject:date forKey:name];
-				}
-				else if ([name isEqualToString:@"sparkle:deltas"])
-				{
-					NSMutableArray *deltas = [NSMutableArray array];
-					NSEnumerator *childEnum = [[node children] objectEnumerator];
-					NSXMLNode *child;
-					while ((child = [childEnum nextObject])) {
-						if ([[child name] isEqualToString:@"enclosure"])
-							[deltas addObject:[(NSXMLElement *)child attributesAsDictionary]];
+					if ([name isEqualToString:@"enclosure"])
+					{
+						// enclosure is flattened as a separate dictionary for some reason
+						NSDictionary *encDict = [(NSXMLElement *)node attributesAsDictionary];
+						[dict setObject:encDict forKey:@"enclosure"];
+						
 					}
-					[dict setObject:deltas forKey:@"deltas"];
-				}
-				else if (name != nil)
-				{
-					// add all other values as strings
-					[dict setObject:[[node stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] forKey:name];
+					else if ([name isEqualToString:@"pubDate"])
+					{
+						// pubDate is expected to be an NSDate by SUAppcastItem, but the RSS class was returning an NSString
+						NSDate *date = [NSDate dateWithNaturalLanguageString:[node stringValue]];
+						if (date)
+							[dict setObject:date forKey:name];
+					}
+					else if ([name isEqualToString:@"sparkle:deltas"])
+					{
+						NSMutableArray *deltas = [NSMutableArray array];
+						NSEnumerator *childEnum = [[node children] objectEnumerator];
+						NSXMLNode *child;
+						while ((child = [childEnum nextObject])) {
+							if ([[child name] isEqualToString:@"enclosure"])
+								[deltas addObject:[(NSXMLElement *)child attributesAsDictionary]];
+						}
+						[dict setObject:deltas forKey:@"deltas"];
+					}
+					else if (name != nil)
+					{
+						// add all other values as strings
+						[dict setObject:[[node stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] forKey:name];
+					}
 				}
             }
             
