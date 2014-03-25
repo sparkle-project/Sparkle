@@ -148,8 +148,8 @@
 
 // NOTE!!! Implemented delegate methods have higher priority than values saved in user preferences
 
-FOUNDATION_EXPORT NSString *const SUUpdaterChecksForBetaUpdatesPrefKey; // bool value
-FOUNDATION_EXPORT NSString *const SUUpdaterIsInTestModePrefKey; // bool value
+#define SUUpdaterChecksForBetaUpdatesPrefKey    @"SUUpdaterChecksForBetaUpdates" // bool value
+#define SUUpdaterIsInTestModePrefKey            @"SUUpdaterIsInTestMode" // bool value
 
 @interface NSObject (SUUpdaterDelegate_DevMateInteraction)
 

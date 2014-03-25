@@ -566,9 +566,6 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 #pragma mark - DevMate Interaction
 
-NSString *const SUUpdaterChecksForBetaUpdatesPrefKey = @"SUUpdaterChecksForBetaUpdates";
-NSString *const SUUpdaterIsInTestModePrefKey = @"SUUpdaterIsInTestMode";
-
 - (NSArray *)devmateFeedParameters
 {
     NSMutableArray *parameters = [NSMutableArray array];
