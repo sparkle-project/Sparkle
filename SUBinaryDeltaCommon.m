@@ -15,8 +15,7 @@
 #include <sys/mman.h>
 #include <sys/param.h>
 #include <sys/stat.h>
-
-extern int xar_close(void*) __attribute__((weak_import));
+#include <xar/xar.h>
     
 int binaryDeltaSupported(void)
 {
