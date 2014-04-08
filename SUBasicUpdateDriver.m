@@ -30,19 +30,6 @@
     #error FINISH_INSTALL_TOOL_NAME not defined
 #endif
 
-@interface SUBasicUpdateDriver () <NSURLDownloadDelegate>; @end
-
-
-@interface SUBasicUpdateDriver () <NSURLDownloadDelegate>
-
-@end
-
-
-@interface SUBasicUpdateDriver () <NSURLDownloadDelegate>
-
-@end
-
-
 @implementation SUBasicUpdateDriver
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
