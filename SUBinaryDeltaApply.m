@@ -8,12 +8,12 @@
 
 #import "SUBinaryDeltaApply.h"
 #import "SUBinaryDeltaCommon.h"
-#import <CommonCrypto/CommonDigest.h>
+#include <CommonCrypto/CommonDigest.h>
 #import <Foundation/Foundation.h>
-#import <bspatch.h>
-#import <stdio.h>
-#import <stdlib.h>
-#import <xar/xar.h>
+#include <bspatch.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <xar/xar.h>
 
 static void applyBinaryDeltaToFile(xar_t x, xar_file_t file, NSString *sourceFilePath, NSString *destinationFilePath)
 {

@@ -10,7 +10,7 @@
 #import "SUUnarchiver_Private.h"
 #import "NTSynchronousTask.h"
 #import "SULog.h"
-#import <CoreServices/CoreServices.h>
+#include <CoreServices/CoreServices.h>
 
 @implementation SUDiskImageUnarchiver
 

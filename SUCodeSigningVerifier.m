@@ -6,7 +6,7 @@
 //
 //
 
-#import <Security/CodeSigning.h>
+#include <Security/CodeSigning.h>
 #import "SUCodeSigningVerifier.h"
 #import "SULog.h"
 

@@ -9,7 +9,7 @@
 #import "SUDSAVerifier.h"
 #import <Cocoa/Cocoa.h>
 
-#import <Security/cssm.h>
+#include <Security/cssm.h>
 
 /* CDSA Specific */
 static CSSM_CSP_HANDLE cdsaInit( void );

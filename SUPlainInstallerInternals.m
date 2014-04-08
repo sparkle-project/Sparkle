@@ -15,13 +15,13 @@
 #import "SUConstants.h"
 #import "SULog.h"
 
-#import <CoreServices/CoreServices.h>
-#import <Security/Security.h>
-#import <sys/stat.h>
-#import <sys/wait.h>
-#import <dirent.h>
-#import <unistd.h>
-#import <sys/param.h>
+#include <CoreServices/CoreServices.h>
+#include <Security/Security.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <dirent.h>
+#include <unistd.h>
+#include <sys/param.h>
 
 
 @interface SUPlainInstaller (MMExtendedAttributes)
@@ -518,9 +518,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 @end
 
-#import <dlfcn.h>
-#import <errno.h>
-#import <sys/xattr.h>
+#include <dlfcn.h>
+#include <errno.h>
+#include <sys/xattr.h>
 
 @implementation SUPlainInstaller (MMExtendedAttributes)
 
