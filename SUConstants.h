@@ -88,26 +88,4 @@ extern OSStatus SURelaunchError;
 extern OSStatus SUInstallationError;
 extern OSStatus SUDowngradeError;
 
-
-// -----------------------------------------------------------------------------
-//	NSInteger fixer-upper:
-// -----------------------------------------------------------------------------
-
-// NSInteger is a type that was added to Leopard.
-// Here is some glue to ensure that NSInteger will work with pre-10.5 SDKs:
-#ifndef NSINTEGER_DEFINED
-	#ifdef NS_BUILD_32_LIKE_64
-		typedef long NSInteger;
-		typedef unsigned long NSUInteger;
-	#else
-		typedef int NSInteger;
-		typedef unsigned int NSUInteger;
-	#endif
-	#define NSIntegerMax    LONG_MAX
-	#define NSIntegerMin    LONG_MIN
-	#define NSUIntegerMax   ULONG_MAX
-	#define NSINTEGER_DEFINED 1
-#endif
-
-
 #endif

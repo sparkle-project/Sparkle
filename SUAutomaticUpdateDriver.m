@@ -43,9 +43,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
     // Sudden termination is available on 10.6+
     NSProcessInfo *processInfo = [NSProcessInfo processInfo];
-    if ([processInfo respondsToSelector:@selector(disableSuddenTermination)]) {
-        [processInfo disableSuddenTermination];
-    }
+    [processInfo disableSuddenTermination];
 
     willUpdateOnTermination = YES;
 
@@ -82,9 +80,8 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
         NSProcessInfo *processInfo = [NSProcessInfo processInfo];
-        if ([processInfo respondsToSelector:@selector(enableSuddenTermination)]) {
-            [processInfo enableSuddenTermination];
-        }
+        [processInfo enableSuddenTermination];
+        
         willUpdateOnTermination = NO;
 
         if ([[updater delegate] respondsToSelector:@selector(updater:didCancelInstallUpdateOnQuit:)])
