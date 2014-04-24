@@ -36,6 +36,7 @@ NSArray *SUGetAllDevMateURLHosts(void)
     {
         sAllKnownDevMateURLHosts = [[NSArray alloc] initWithObjects:
                                     @"updates.devmate.com",
+                                    @"test.updates.aws.devmate.vpn",
                                     nil];
     }
     
