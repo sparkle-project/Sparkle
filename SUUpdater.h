@@ -28,7 +28,7 @@
 
 + (SUUpdater *)sharedUpdater;
 + (SUUpdater *)updaterForBundle:(NSBundle *)bundle;
-- (id)initForBundle:(NSBundle *)bundle;
+- (instancetype)initForBundle:(NSBundle *)bundle;
 
 - (NSBundle *)hostBundle;
 
