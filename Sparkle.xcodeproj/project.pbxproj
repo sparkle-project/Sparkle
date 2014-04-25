@@ -1354,7 +1354,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
-				INSTALL_PATH = /Frameworks;
 			};
 			name = Debug;
 		};
