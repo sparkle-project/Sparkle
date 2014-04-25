@@ -53,7 +53,7 @@
 	FILE *fp = NULL, *cmdFP = NULL;
 	
 	SULog(@"Extracting %@ using '%@'",archivePath,command);
-    
+    char *oldDestinationString = nil;
 	// Get the file size.
 #if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	NSNumber *fs = [[[NSFileManager defaultManager] fileAttributesAtPath:archivePath traverseLink:NO] objectForKey:NSFileSize];
@@ -67,7 +67,7 @@
 	fp = fopen([archivePath fileSystemRepresentation], "r");
 	if (!fp) goto reportError;
 	
-    char *oldDestinationString = getenv("DESTINATION");
+    oldDestinationString = getenv("DESTINATION");
 	setenv("DESTINATION", [[archivePath stringByDeletingLastPathComponent] fileSystemRepresentation], 1);
 	cmdFP = popen([command fileSystemRepresentation], "w");
 	size_t written;
