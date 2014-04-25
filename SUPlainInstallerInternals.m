@@ -48,7 +48,7 @@
 
 // Authorization code based on generous contribution from Allan Odgaard. Thanks, Allan!
 
-static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char* executablePath, AuthorizationFlags options, const char* const* arguments)
+static BOOL SUAuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char* executablePath, AuthorizationFlags options, const char* const* arguments)
 {
 	// *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
@@ -67,6 +67,58 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		
 	signal(SIGCHLD, oldSigChildHandler);
 	return returnValue;
+}
+
+static void SUAuthorizationRelease(AuthorizationRef authorization)
+{
+    if (NULL == authorization)
+        return;
+    
+    AuthorizationFree(authorization, kAuthorizationFlagDefaults);
+}
+
+static AuthorizationRef SUAuthorizationCreate(OSStatus *outStatus)
+{
+	AuthorizationRef auth = NULL;
+    OSStatus authStat = errAuthorizationDenied;
+	while (errAuthorizationDenied == authStat)
+    {
+		authStat = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &auth);
+	}
+
+    if (errAuthorizationSuccess == authStat)
+    {
+        AuthorizationFlags theFlags = kAuthorizationFlagDefaults | kAuthorizationFlagPreAuthorize | kAuthorizationFlagInteractionAllowed | kAuthorizationFlagExtendRights;
+
+        AuthorizationItem rightsItems = {kAuthorizationRightExecute, 0, NULL, 0};
+        AuthorizationRights authRights = {1, &rightsItems};
+
+        AuthorizationItem envItems[1];
+        
+        envItems[0].name = kAuthorizationEnvironmentPrompt;
+        envItems[0].value = (void *)[SULocalizedString(@"The update requires administrative permissions to be completed.", nil) cStringUsingEncoding:NSUTF8StringEncoding];
+        envItems[0].valueLength = strlen((const char *)envItems[0].value);
+        envItems[0].flags = 0;
+        
+        AuthorizationEnvironment environment;
+        environment.count = sizeof(envItems) / sizeof(AuthorizationItem);
+        environment.items = envItems;
+        
+        authStat = AuthorizationCopyRights(auth, &authRights, &environment, theFlags, NULL);
+    }
+
+    if (errAuthorizationSuccess != authStat)
+    {
+        SUAuthorizationRelease(auth);
+        auth = NULL;
+    }
+    
+    if (NULL != outStatus)
+    {
+        *outStatus = authStat;
+    }
+    
+    return auth;
 }
 
 @implementation SUPlainInstaller (Internals)
@@ -176,17 +228,10 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		}
 	}
 	
-	AuthorizationRef auth = NULL;
-	OSStatus authStat = errAuthorizationDenied;
-	while (authStat == errAuthorizationDenied) {
-		authStat = AuthorizationCreate(NULL,
-									   kAuthorizationEmptyEnvironment,
-									   kAuthorizationFlagDefaults,
-									   &auth);
-	}
-	
+	AuthorizationRef auth = SUAuthorizationCreate(NULL);
 	BOOL res = NO;
-	if (authStat == errAuthorizationSuccess) {
+	if (NULL != auth)
+    {
 		res = YES;
 		
 		char uidgid[42];
@@ -209,7 +254,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		if( res )	// Set permissions while it's still in source, so we have it with working and correct perms when it arrives at destination.
 		{
 			const char* coParams[] = { "-R", uidgid, srcPath, NULL };
-			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/usr/sbin/chown", kAuthorizationFlagDefaults, coParams );
+			res = SUAuthorizationExecuteWithPrivilegesAndWait( auth, "/usr/sbin/chown", kAuthorizationFlagDefaults, coParams );
 			if( !res )
 				SULog( @"chown -R %s %s failed.", uidgid, srcPath );
 		}
@@ -218,7 +263,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		if( res && haveDst )	// If there's something at our tmp path (previous failed update or whatever) delete that first.
 		{
 			const char*	rmParams[] = { "-rf", tmpPath, NULL };
-			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams );
+			res = SUAuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams );
 			if( !res )
 				SULog( @"rm failed" );
 		}
@@ -226,7 +271,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		if( res && haveDst )	// Move old exe to tmp path.
 		{
 			const char* mvParams[] = { "-f", dstPath, tmpPath, NULL };
-			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/mv", kAuthorizationFlagDefaults, mvParams );
+			res = SUAuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/mv", kAuthorizationFlagDefaults, mvParams );
 			if( !res )
 				SULog( @"mv 1 failed" );
 		}
@@ -234,7 +279,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		if( res )	// Move new exe to old exe's path.
 		{
 			const char* mvParams2[] = { "-f", srcPath, dstPath, NULL };
-			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/mv", kAuthorizationFlagDefaults, mvParams2 );
+			res = SUAuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/mv", kAuthorizationFlagDefaults, mvParams2 );
 			if( !res )
 				SULog( @"mv 2 failed" );
 		}
@@ -242,10 +287,10 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 //		if( res && haveDst /*&& !foundTrash*/ )	// If we managed to put the old exe in the trash, leave it there for the user to delete or recover.
 //		{									// ...  Otherwise we better delete it, wouldn't want dozens of old versions lying around next to the new one.
 //			const char* rmParams2[] = { "-rf", tmpPath, NULL };
-//			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams2 );
+//			res = SUAuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams2 );
 //		}
 		
-		AuthorizationFree(auth, 0);
+		SUAuthorizationRelease(auth);
 		
 		// If the currently-running application is trusted, the new
 		// version should be trusted as well.  Remove it from the
@@ -289,18 +334,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	struct stat dstSB;
 	stat(dstContainerPath, &dstSB);
 	
-	AuthorizationRef auth = NULL;
-	OSStatus authStat = errAuthorizationDenied;
-	while( authStat == errAuthorizationDenied )
-	{
-		authStat = AuthorizationCreate(NULL,
-									   kAuthorizationEmptyEnvironment,
-									   kAuthorizationFlagDefaults,
-									   &auth);
-	}
-	
+	AuthorizationRef auth = SUAuthorizationCreate(NULL);
 	BOOL res = NO;
-	if (authStat == errAuthorizationSuccess)
+	if (NULL != auth)
 	{
 		res = YES;
 		
@@ -311,7 +347,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		if( res )	// Set permissions while it's still in source, so we have it with working and correct perms when it arrives at destination.
 		{
 			const char* coParams[] = { "-R", uidgid, srcPath, NULL };
-			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/usr/sbin/chown", kAuthorizationFlagDefaults, coParams );
+			res = SUAuthorizationExecuteWithPrivilegesAndWait( auth, "/usr/sbin/chown", kAuthorizationFlagDefaults, coParams );
 			if( !res )
 				SULog(@"Can't set permissions");
 		}
@@ -320,7 +356,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		if( res && haveDst )	// If there's something at our tmp path (previous failed update or whatever) delete that first.
 		{
 			const char*	rmParams[] = { "-rf", dstPath, NULL };
-			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams );
+			res = SUAuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams );
 			if( !res )
 				SULog(@"Can't remove destination file");
 		}
@@ -328,12 +364,12 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		if( res )	// Move!.
 		{
 			const char* mvParams[] = { "-f", srcPath, dstPath, NULL };
-			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/mv", kAuthorizationFlagDefaults, mvParams );
+			res = SUAuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/mv", kAuthorizationFlagDefaults, mvParams );
 			if( !res )
 				SULog(@"Can't move source file");
 		}
 		
-		AuthorizationFree(auth, 0);
+		SUAuthorizationRelease(auth);
 		
 		if (!res)
 		{
@@ -358,30 +394,21 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	
 	const char* srcPath = [src fileSystemRepresentation];
 	
-	AuthorizationRef auth = NULL;
-	OSStatus authStat = errAuthorizationDenied;
-	while( authStat == errAuthorizationDenied )
-	{
-		authStat = AuthorizationCreate(NULL,
-									   kAuthorizationEmptyEnvironment,
-									   kAuthorizationFlagDefaults,
-									   &auth);
-	}
-	
+	AuthorizationRef auth = SUAuthorizationCreate(NULL);
 	BOOL res = NO;
-	if (authStat == errAuthorizationSuccess)
+	if (NULL != auth)
 	{
 		res = YES;
 		
 		if( res )	// If there's something at our tmp path (previous failed update or whatever) delete that first.
 		{
 			const char*	rmParams[] = { "-rf", srcPath, NULL };
-			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams );
+			res = SUAuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams );
 			if( !res )
 				SULog(@"Can't remove destination file");
 		}
 		
-		AuthorizationFree(auth, 0);
+		SUAuthorizationRelease(auth);
 		
 		if (!res)
 		{

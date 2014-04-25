@@ -13,6 +13,7 @@
 		03B5E64B15D39CD90038BB67 /* SUXPCURLDownload.h in Headers */ = {isa = PBXBuildFile; fileRef = 03B5E64915D39CD90038BB67 /* SUXPCURLDownload.h */; };
 		03B5E65A15D3DC3C0038BB67 /* com.andymatuschak.Sparkle.download-service.xpc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 03B5E63A15D399500038BB67 /* com.andymatuschak.Sparkle.download-service.xpc */; };
 		03B5E65B15D3E0490038BB67 /* SUXPCURLDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 03B5E64A15D39CD90038BB67 /* SUXPCURLDownload.m */; };
+		3330768F190A5CB8005602B2 /* Sparkle.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8220A321A7F00D8810D /* Sparkle.strings */; };
 		33D081831888446F00394A94 /* libDMCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33D081821888446E00394A94 /* libDMCore.a */; };
 		3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		525A2790133D6AE900FD8D70 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
@@ -247,6 +248,7 @@
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		3329F06D18FBFBA800556010 /* ResourceRules.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = ResourceRules.plist; sourceTree = "<group>"; };
+		33307690190A5D8B005602B2 /* install_service.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = install_service.pch; sourceTree = "<group>"; };
 		33D081821888446E00394A94 /* libDMCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libDMCore.a; path = External/libDMCore.a; sourceTree = "<group>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
 		525A278F133D6AE900FD8D70 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
@@ -876,6 +878,7 @@
 		8B887B801517F8B4000BB292 /* Service */ = {
 			isa = PBXGroup;
 			children = (
+				33307690190A5D8B005602B2 /* install_service.pch */,
 				8B887B8D15180767000BB292 /* install_service.m */,
 				8B887B8F15180773000BB292 /* SandboxService.plist */,
 			);
@@ -1214,6 +1217,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3330768F190A5CB8005602B2 /* Sparkle.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1903,6 +1907,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8B887B711517F447000BB292 /* ConfigServiceDebug.xcconfig */;
 			buildSettings = {
+				GCC_PREFIX_HEADER = "Installation XPC Service/install_service.pch";
 				INFOPLIST_FILE = "Installation XPC Service/SandboxService.plist";
 				PRODUCT_NAME = "com.andymatuschak.Sparkle.install-service";
 			};
@@ -1912,6 +1917,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8B887B721517F447000BB292 /* ConfigServiceRelease.xcconfig */;
 			buildSettings = {
+				GCC_PREFIX_HEADER = "Installation XPC Service/install_service.pch";
 				INFOPLIST_FILE = "Installation XPC Service/SandboxService.plist";
 				PRODUCT_NAME = "com.andymatuschak.Sparkle.install-service";
 			};
@@ -1921,6 +1927,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8B887B721517F447000BB292 /* ConfigServiceRelease.xcconfig */;
 			buildSettings = {
+				GCC_PREFIX_HEADER = "Installation XPC Service/install_service.pch";
 				INFOPLIST_FILE = "Installation XPC Service/SandboxService.plist";
 				PRODUCT_NAME = "com.andymatuschak.Sparkle.install-service";
 			};
@@ -1997,6 +2004,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8B887B721517F447000BB292 /* ConfigServiceRelease.xcconfig */;
 			buildSettings = {
+				GCC_PREFIX_HEADER = "Installation XPC Service/install_service.pch";
 				INFOPLIST_FILE = "Installation XPC Service/SandboxService.plist";
 				PRODUCT_NAME = "com.andymatuschak.Sparkle.install-service";
 			};
