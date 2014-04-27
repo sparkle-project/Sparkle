@@ -23,8 +23,7 @@
 NSString *const SUUpdaterDidFinishLoadingAppCastNotification = @"SUUpdaterDidFinishLoadingAppCastNotification";
 NSString *const SUUpdaterDidFindValidUpdateNotification = @"SUUpdaterDidFindValidUpdateNotification";
 NSString *const SUUpdaterDidNotFindUpdateNotification = @"SUUpdaterDidNotFindUpdateNotification";
-NSString *const SUUpdaterWillInstallUpdateNotification = @"SUUpdaterWillInstallUpdateNotification";
-NSString *const SUUpdaterWillRelaunchApplicationNotification = @"SUUpdaterWillRelaunchApplicationNotification";
+NSString *const SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotificationName";
 NSString *const SUUpdaterAppcastItemNotificationKey = @"SUUpdaterAppcastItemNotificationKey";
 NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotificationKey";
 

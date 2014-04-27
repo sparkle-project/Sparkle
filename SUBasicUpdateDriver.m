@@ -154,7 +154,7 @@
 	if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
 		[[updater delegate] updater:updater didFindValidUpdate:updateItem];
 	NSDictionary *userInfo = (updateItem != nil) ? @{SUUpdaterAppcastItemNotificationKey : updateItem} : nil;
-	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:updater userInfo:userInfo];
+	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification object:updater userInfo:userInfo];
 	[self downloadUpdate];
 }
 
