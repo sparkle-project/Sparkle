@@ -130,9 +130,9 @@ usage:
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
     NSString *command = [NSString stringWithUTF8String:argv[1]];
-    NSString *oldPath = [NSString stringWithUTF8String:argv[2]];
-    NSString *newPath = [NSString stringWithUTF8String:argv[3]];
-    NSString *patchFile = [NSString stringWithUTF8String:argv[4]];
+    NSString *oldPath = stringWithFileSystemRepresentation(argv[2]);
+    NSString *newPath = stringWithFileSystemRepresentation(argv[3]);
+    NSString *patchFile = stringWithFileSystemRepresentation(argv[4]);
 
     if ([command isEqualToString:@"apply"]) {
         int result = applyBinaryDelta(oldPath, newPath, patchFile);
@@ -160,7 +160,7 @@ usage:
         if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D)
             continue;
 
-        NSString *key = pathRelativeToDirectory(oldPath, [NSString stringWithUTF8String:ent->fts_path]);
+        NSString *key = pathRelativeToDirectory(oldPath, stringWithFileSystemRepresentation(ent->fts_path));
         if (![key length])
             continue;
 
@@ -191,7 +191,7 @@ usage:
         if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D)
             continue;
 
-        NSString *key = pathRelativeToDirectory(newPath, [NSString stringWithUTF8String:ent->fts_path]);
+        NSString *key = pathRelativeToDirectory(newPath, stringWithFileSystemRepresentation(ent->fts_path));
         if (![key length])
             continue;
 

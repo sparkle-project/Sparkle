@@ -22,5 +22,5 @@ extern void removeTree(NSString *path);
 extern void copyTree(NSString *source, NSString *dest);
 extern NSString *pathRelativeToDirectory(NSString *directory, NSString *path);
 NSString *temporaryFilename(NSString *base);
-
+NSString *stringWithFileSystemRepresentation(const char*);
 #endif

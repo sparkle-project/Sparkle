@@ -38,12 +38,20 @@ NSString *pathRelativeToDirectory(NSString *directory, NSString *path)
     return path;
 }
 
+NSString *stringWithFileSystemRepresentation(const char *input) {
+    NSFileManager *fm = [NSFileManager defaultManager];
+    return [fm stringWithFileSystemRepresentation:input length:strlen(input)];
+}
+
 NSString *temporaryFilename(NSString *base)
 {
     NSString *template = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.XXXXXXXXXX", base]];
-    char buffer[MAXPATHLEN];
-    strcpy(buffer, [template fileSystemRepresentation]);
-    return [NSString stringWithUTF8String:mktemp(buffer)];
+    const char *fsrepr = [template fileSystemRepresentation];
+    char buffer[strlen(fsrepr)+1];
+    strcpy(buffer, fsrepr);
+
+    // mkstemp() can't be used, beause it returns a file descriptor, and XAR API requires a filename
+    return stringWithFileSystemRepresentation(mktemp(buffer));
 }
 
 static void _hashOfBuffer(unsigned char *hash, const char* buffer, size_t bufferLength)
@@ -109,7 +117,7 @@ NSData *hashOfFile(FTSENT *ent)
 
 NSString *hashOfTree(NSString *path)
 {
-    const char *sourcePaths[] = {[path UTF8String], 0};
+    const char *sourcePaths[] = {[path fileSystemRepresentation], 0};
     FTS *fts = fts_open((char* const*)sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
     if (!fts) {
         perror("fts_open");
@@ -128,9 +136,9 @@ NSString *hashOfTree(NSString *path)
         _hashOfFile(fileHash, ent);
         CC_SHA1_Update(&hashContext, fileHash, sizeof(fileHash));
 
-        NSString *relativePath = pathRelativeToDirectory(path, [NSString stringWithUTF8String:ent->fts_path]);
-        NSData *relativePathBytes = [relativePath dataUsingEncoding:NSUTF8StringEncoding];
-        CC_SHA1_Update(&hashContext, [relativePathBytes bytes], (uint32_t)[relativePathBytes length]);
+        NSString *relativePath = pathRelativeToDirectory(path, stringWithFileSystemRepresentation(ent->fts_path));
+        const char *relativePathBytes = [relativePath fileSystemRepresentation];
+        CC_SHA1_Update(&hashContext, relativePathBytes, (CC_LONG)strlen(relativePathBytes));
     }
     fts_close(fts);
 
