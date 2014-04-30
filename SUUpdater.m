@@ -213,8 +213,8 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	
 	// Now we want to figure out how long until we check again.
 	NSTimeInterval delayUntilCheck, updateCheckInterval = [self updateCheckInterval];
-	if (updateCheckInterval < SU_MIN_CHECK_INTERVAL)
-		updateCheckInterval = SU_MIN_CHECK_INTERVAL;
+	if (updateCheckInterval < 5 /*SU_MIN_CHECK_INTERVAL*/)
+		updateCheckInterval = 5 /*SU_MIN_CHECK_INTERVAL*/;
 	if (intervalSinceCheck < updateCheckInterval)
 		delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
 	else
