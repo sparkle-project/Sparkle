@@ -12,4 +12,6 @@
 
 - (BOOL)mayUpdateAndRestart;
 
++ (BOOL)shouldUseXPC;
+
 @end

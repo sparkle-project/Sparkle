@@ -6,7 +6,7 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "SUUpdater.h"
+#import "SUUpdater_Private.h"
 
 #import "SUAppcast.h"
 #import "SUAppcastItem.h"

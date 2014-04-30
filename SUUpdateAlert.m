@@ -15,6 +15,7 @@
 #import "SUHost.h"
 #import <WebKit/WebKit.h>
 
+#import "SUUpdater_Private.h"
 #import "SUConstants.h"
 #import "SUXPCURLDownload.h"
 

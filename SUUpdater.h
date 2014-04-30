@@ -73,8 +73,6 @@
 
 - (BOOL)updateInProgress;
 
-+ (BOOL)shouldUseXPC;
-
 @end
 
 
