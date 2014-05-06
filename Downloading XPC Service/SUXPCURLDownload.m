@@ -8,6 +8,8 @@
 
 #import "SUXPCURLDownload.h"
 #import "SUDownloadServiceConstants.h"
+#import "SUConstants.h"
+#import "SULog.h"
 
 static NSString * const kSUFetchFolderName = @"fetch.XXXXXXXX";
 
@@ -19,6 +21,28 @@ static NSString * const kSUFetchFolderName = @"fetch.XXXXXXXX";
 @end
 
 @implementation SUXPCURLDownload
+
++ (NSData *)sendSynchronousRequest:(NSURLRequest *)request delegate:(id <NSURLDownloadDelegate>)delegate
+{
+    __block SUXPCURLDownload *download = nil;
+    
+    static const char *sSynchronousDownloadQueueName = "com.devmate.SynchronousXPCDownloadQueue";
+    dispatch_queue_t queue = dispatch_queue_create(sSynchronousDownloadQueueName, NULL);
+    dispatch_sync(queue, ^{
+        download = [[SUXPCURLDownload alloc] initWithRequest:request delegate:delegate];
+    });
+
+    while (download && download->_isDownloading)
+    {
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5]];
+    }
+    
+    NSData *downloadData = (nil == download->_downloadError) ? [NSData dataWithContentsOfFile:download->_destination] : nil;
+    [download release];
+    dispatch_release(queue);
+    
+    return downloadData;
+}
 
 - (id)initWithRequest:(NSURLRequest *)request delegate:(id <NSURLDownloadDelegate>)delegate
 {
@@ -34,6 +58,8 @@ static NSString * const kSUFetchFolderName = @"fetch.XXXXXXXX";
         dispatch_async(dispatch_get_current_queue(), ^{
             [self startDownload:request];
         });
+        
+        _isDownloading = YES;
     }
     
     return self;
@@ -66,7 +92,7 @@ static NSString * const kSUFetchFolderName = @"fetch.XXXXXXXX";
         };
         [self performBlock:block onThread:_startedThread synchronous:YES];
     }
-    else
+    if (nil == _destination)
     {
         _destination = [[[urlRequest URL] lastPathComponent] copy];
     }
@@ -92,33 +118,49 @@ static NSString * const kSUFetchFolderName = @"fetch.XXXXXXXX";
     xpc_connection_send_message_with_reply(_connection, message, dispatch_get_main_queue(), ^(xpc_object_t object) {
         xpc_type_t type = xpc_get_type(object);
         
-        if (type == XPC_TYPE_ERROR ||
-            (type == XPC_TYPE_DICTIONARY && noErr != xpc_dictionary_get_int64(object, SUDownloadServiceErrorCodeKey)))
+        if (type == XPC_TYPE_ERROR && nil == _downloadError)
+        {
+            NSString *errMessage = @"";
+            if (object == XPC_ERROR_CONNECTION_INTERRUPTED)
+            {
+                errMessage = @"Got XPC_ERROR_CONNECTION_INTERRUPTED error.";
+            }
+            else if (object == XPC_ERROR_CONNECTION_INVALID)
+            {
+                errMessage = @"Got XPC_ERROR_CONNECTION_INVALID error.";
+            }
+            
+            NSDictionary *errInfo = [NSDictionary dictionaryWithObject:errMessage forKey:NSLocalizedDescriptionKey];
+            _downloadError = [[NSError alloc] initWithDomain:SUSparkleErrorDomain code:SUXPCServiceError userInfo:errInfo];
+        }
+        else if (type == XPC_TYPE_DICTIONARY && noErr != xpc_dictionary_get_int64(object, SUDownloadServiceErrorCodeKey) && nil == _downloadError)
+        {
+            NSInteger errCode = (NSInteger)xpc_dictionary_get_int64(object, SUDownloadServiceErrorCodeKey);
+            
+            const char *errDomainStr = xpc_dictionary_get_string(object, SUDownloadServiceErrorDomainKey);
+            NSString *errDomain = errDomainStr ? [NSString stringWithUTF8String:errDomainStr] : NSCocoaErrorDomain;
+            
+            const char *errMessage = xpc_dictionary_get_string(object, SUDownloadServiceErrorMessageKey) ? : "";
+            NSDictionary *errInfo = [NSDictionary dictionaryWithObject:[NSString stringWithUTF8String:errMessage]
+                                                                forKey:NSLocalizedDescriptionKey];
+            
+            _downloadError = [[NSError alloc] initWithDomain:errDomain code:errCode userInfo:errInfo];
+        }
+        
+        if (nil != _downloadError)
         {
             if ([_delegate respondsToSelector:@selector(download:didFailWithError:)])
             {
-#ifdef DEBUG
-                const char *errMessage = xpc_dictionary_get_string(object, SUDownloadServiceErrorMessageKey);
-                if (errMessage != NULL)
-                {
-                    NSLog(@"Error message: %s", errMessage);
-                }
-                else if (_downloadError != nil)
-                {
-                    NSLog(@"Error message: %@", [_downloadError description]);
-                }
-#endif
-                NSError *error = _downloadError;
-                if (nil == error)
-                {
-                    NSInteger errCode = (NSInteger)xpc_dictionary_get_int64(object, SUDownloadServiceErrorCodeKey);
-                    error = [NSError errorWithDomain:NSOSStatusErrorDomain code:errCode userInfo:nil];
-                }
-                
                 void (^block)(void) = ^{
-                    [_delegate download:(NSURLDownload *)self didFailWithError:error];
+                    [_delegate download:(NSURLDownload *)self didFailWithError:_downloadError];
+                    _isDownloading = NO;
                 };
                 [self performBlock:block onThread:_startedThread synchronous:NO];
+            }
+            else
+            {
+                SULog(@"SUXPCURLDownload: got download error (%d - %@)", [_downloadError code], [_downloadError localizedDescription]);
+                _isDownloading = NO;
             }
         }
     });
@@ -137,6 +179,7 @@ static NSString * const kSUFetchFolderName = @"fetch.XXXXXXXX";
 
 - (void)setDestination:(NSString *)path allowOverwrite:(BOOL)allowOverwrite
 {
+    [_destination release];
     _destination = [path copy];
     _allowOverwrite = allowOverwrite;
 }
@@ -299,7 +342,7 @@ static NSString * const kSUFetchFolderName = @"fetch.XXXXXXXX";
                         NSFileManager *fileManager = [NSFileManager defaultManager];
                         
                         NSString *destPath = _destination;
-                        if ([destPath isEqualToString:[destPath lastPathComponent]])
+                        if (nil == destPath || [destPath isEqualToString:[destPath lastPathComponent]])
                         {
                             destPath = _connectionDestination;
                         }
@@ -334,12 +377,16 @@ static NSString * const kSUFetchFolderName = @"fetch.XXXXXXXX";
                         
                         if (success)
                         {
+                            [self setDestination:destPath allowOverwrite:_allowOverwrite];
+                            
                             void (^block)(void) = ^ {
                                 if ([_delegate respondsToSelector:@selector(download:didCreateDestination:)])
                                     [_delegate download:(NSURLDownload *)self didCreateDestination:destPath];
                                 
                                 if ([_delegate respondsToSelector:@selector(downloadDidFinish:)])
                                     [_delegate downloadDidFinish:(NSURLDownload *)self];
+                                
+                                _isDownloading = NO;
                             };
                             [self performBlock:block onThread:_startedThread synchronous:NO];
                         }

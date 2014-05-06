@@ -59,7 +59,12 @@
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification
 {
 	[[updateAlert window] makeKeyAndOrderFront:self];
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
+}
+
+- (void)updateAlert:(SUUpdateAlert *)updateAlert willLoadReleaseNotesWithRequest:(NSMutableURLRequest *)request
+{
+    [self updateURLRequestIfNeeds:request];
 }
 
 - (void)updateAlert:(SUUpdateAlert *)alert finishedWithChoice:(SUUpdateAlertChoice)choice

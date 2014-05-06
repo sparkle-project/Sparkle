@@ -31,6 +31,7 @@
 @end
 
 @interface NSObject (SUAppcastDelegate)
+- (void)appcast:(SUAppcast *)appcast willFetchURLRequest:(NSMutableURLRequest *)request;
 - (void)appcastDidFinishLoading:(SUAppcast *)appcast;
 - (void)appcast:(SUAppcast *)appcast failedToLoadWithError:(NSError *)error;
 @end

@@ -24,5 +24,6 @@ const char * SUDownloadServiceShouldDecodeMIMETypeKey = "should_decode_MIME_type
 
 const char * SUDownloadServiceErrorCodeKey = "errcode"; // int64_t
 const char * SUDownloadServiceErrorMessageKey = "errmsg"; // c-string
+const char * SUDownloadServiceErrorDomainKey = "errdomain"; // c-string
 
 #endif

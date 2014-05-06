@@ -119,11 +119,21 @@
 		}
 		else
 		{
-            NSURLRequest *request = [NSURLRequest requestWithURL:[updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
-            if ([SUUpdater shouldUseXPC]) {
+            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[updateItem releaseNotesURL]
+                                                                   cachePolicy:NSURLRequestReloadIgnoringCacheData
+                                                               timeoutInterval:30];
+            if ([delegate respondsToSelector:@selector(updateAlert:willLoadReleaseNotesWithRequest:)])
+            {
+                [delegate updateAlert:self willLoadReleaseNotesWithRequest:request];
+            }
+            
+            if ([SUUpdater shouldUseXPC])
+            {
                 [releaseNotesDownloader release];
                 releaseNotesDownloader = (NSURLDownload *)[[SUXPCURLDownload alloc] initWithRequest:request delegate:self];
-            } else {
+            }
+            else
+            {
                 [[releaseNotesView mainFrame] loadRequest:request];
             }
 		}

@@ -22,6 +22,12 @@
 #define NSAppKitVersionNumber10_7 1138
 #endif
 
+#ifndef MAC_OS_X_VERSION_10_7
+#define MAC_OS_X_VERSION_10_7 1070
+#endif
+
+#define SPARKLE_IS_COMPATIBLE_WITH_DEVMATE (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_7)
+
 #ifdef __OBJC__
 
 #define SPARKLE_BUNDLE [NSBundle bundleWithIdentifier:@"org.andymatuschak.Sparkle"]

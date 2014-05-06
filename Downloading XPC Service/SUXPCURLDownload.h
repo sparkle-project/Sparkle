@@ -10,11 +10,13 @@
 
 @interface SUXPCURLDownload : NSObject
 {
+@private
     id <NSURLDownloadDelegate> _delegate; // weak ref
     xpc_connection_t _connection;
     xpc_connection_t _delegateConnection;
     NSURLRequest *_request;
     NSThread *_startedThread; // weak ref
+    BOOL _isDownloading;
     
     BOOL _allowOverwrite;
     NSString *_destination;
@@ -27,5 +29,8 @@
 
 - (id)initWithRequest:(NSURLRequest *)request delegate:(id <NSURLDownloadDelegate>)delegate;
 - (void)setDestination:(NSString *)path allowOverwrite:(BOOL)allowOverwrite;
+
+// Delegate methods for this method will be called from another thread.
++ (NSData *)sendSynchronousRequest:(NSURLRequest *)request delegate:(id <NSURLDownloadDelegate>)delegate;
 
 @end

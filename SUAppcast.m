@@ -61,6 +61,9 @@
     if ([appcastValues count])
         [request setAllHTTPHeaderFields:appcastValues];
     
+    if ([delegate respondsToSelector:@selector(appcast:willFetchURLRequest:)])
+        [delegate appcast:self willFetchURLRequest:request];
+    
     if ([SUUpdater shouldUseXPC])
     {
         download = (NSURLDownload *)[[SUXPCURLDownload alloc] initWithRequest:request delegate:self];

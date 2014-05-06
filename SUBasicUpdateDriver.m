@@ -23,8 +23,6 @@
 #import "SUXPCInstaller.h"
 #import "SUXPCURLDownload.h"
 
-#define SPARKLE_IS_COMPATIBLE_WITH_DEVMATE (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_7)
-
 #if SPARKLE_IS_COMPATIBLE_WITH_DEVMATE
 CF_EXPORT CFDictionaryRef DMCopyHTTPRequestHeaders(CFBundleRef appBundle, CFDataRef httpBodyData);
 
@@ -64,21 +62,6 @@ NSArray *SUGetAllDevMateURLHosts(void)
 	
 	[appcast setDelegate:self];
 	[appcast setUserAgentString:[updater userAgentString]];
-    
-#if SPARKLE_IS_COMPATIBLE_WITH_DEVMATE
-    if ([SUGetAllDevMateURLHosts() containsObject:[URL host]])
-    {
-        CFBundleRef hostBundle = CFBundleCreate(kCFAllocatorDefault, (CFURLRef)[NSURL fileURLWithPath:[host bundlePath]]);
-        CFDictionaryRef devmateAppcastValues = DMCopyHTTPRequestHeaders(hostBundle, NULL);
-        [appcast setAllAppcastValues:(NSDictionary *)devmateAppcastValues];
-        
-        if (NULL != devmateAppcastValues)
-            CFRelease(devmateAppcastValues);
-        if (NULL != hostBundle)
-            CFRelease(hostBundle);
-    }
-#endif
-    
 	[appcast fetchAppcastFromURL:URL];
 }
 
@@ -178,6 +161,27 @@ NSArray *SUGetAllDevMateURLHosts(void)
 	[self abortUpdateWithError:error];
 }
 
+- (void)appcast:(SUAppcast *)appcast willFetchURLRequest:(NSMutableURLRequest *)request
+{
+    [self updateURLRequestIfNeeds:request];
+}
+
+- (void)updateURLRequestIfNeeds:(NSMutableURLRequest *)request
+{
+#if SPARKLE_IS_COMPATIBLE_WITH_DEVMATE
+    if ([SUGetAllDevMateURLHosts() containsObject:[[request URL] host]])
+    {
+        CFBundleRef hostBundle = CFBundleCreate(kCFAllocatorDefault, (CFURLRef)[NSURL fileURLWithPath:[host bundlePath]]);
+        NSDictionary *devmateHeaders = (NSDictionary *)DMCopyHTTPRequestHeaders(hostBundle, NULL) ? : [NSDictionary new];
+        [request setAllHTTPHeaderFields:(NSDictionary *)devmateHeaders];
+
+        [devmateHeaders release];
+        if (NULL != hostBundle)
+            CFRelease(hostBundle);
+    }
+#endif
+}
+
 - (void)didFindValidUpdate
 {
 	if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
@@ -196,6 +200,8 @@ NSArray *SUGetAllDevMateURLHosts(void)
 {
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[updateItem fileURL]];
 	[request setValue:[updater userAgentString] forHTTPHeaderField:@"User-Agent"];
+    [self updateURLRequestIfNeeds:request];
+    
     if ([SUUpdater shouldUseXPC])
         download = (NSURLDownload *)[[SUXPCURLDownload alloc] initWithRequest:request delegate:self];
     else

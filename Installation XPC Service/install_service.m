@@ -12,6 +12,7 @@
 #import <Foundation/Foundation.h>
 #import "SUPlainInstallerInternals.h"
 #import "SUInstallServiceConstants.h"
+#import "SULog.h"
 
 static void peer_event_handler(xpc_connection_t peer, xpc_object_t event) 
 {
@@ -90,9 +91,8 @@ static void peer_event_handler(xpc_connection_t peer, xpc_object_t event)
                 
             default:
             {
-#ifdef DEBUG
-                NSLog(@"!!! Unknown XPC service task.");
-#endif
+                SULog(@"XPC Install Service: Unknown XPC service task %lld", (int64_t)task);
+                
                 xpc_object_t reply = xpc_dictionary_create_reply(event);
                 xpc_dictionary_set_int64(reply, SUInstallServiceErrorCodeKey, (int64_t)1);
                 xpc_dictionary_set_string(reply, SUInstallServiceErrorLocalizedDescriptionKey, "Unknown install cervice task.");

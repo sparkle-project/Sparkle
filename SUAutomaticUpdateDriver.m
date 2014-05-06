@@ -11,8 +11,49 @@
 #import "SUAutomaticUpdateAlert.h"
 #import "SUHost.h"
 #import "SUConstants.h"
+#import "SUUpdater_Private.h"
+#import "SUXPCURLDownload.h"
 
 @implementation SUAutomaticUpdateDriver
+
+// -------------------------------------------------------------------
+#if SPARKLE_IS_COMPATIBLE_WITH_DEVMATE
+
+static NSString * const kSUAutomaticUpdateParamName = @"autoupdate";
+
+- (void)downloadReleaseNotesAndWaitUntilDone
+{
+    NSURL *releaseNotesURL = [updateItem releaseNotesURL];
+    if (nil == releaseNotesURL || [releaseNotesURL isFileURL])
+        return;
+    
+    NSString *URLString = [releaseNotesURL absoluteString];
+    URLString = [URLString stringByAppendingFormat:@"%@%@=1", ([releaseNotesURL query] != nil) ? @"&" : @"?", kSUAutomaticUpdateParamName];
+    releaseNotesURL = [NSURL URLWithString:URLString];
+    
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:releaseNotesURL];
+    [request setCachePolicy:NSURLRequestReloadIgnoringCacheData];
+    [self updateURLRequestIfNeeds:request];
+    
+    if ([SUUpdater shouldUseXPC])
+    {
+        [SUXPCURLDownload sendSynchronousRequest:request delegate:nil];
+    }
+    else
+    {
+        [NSURLConnection sendSynchronousRequest:request returningResponse:NULL error:NULL];
+    }
+}
+
+- (void)didFindValidUpdate
+{
+    // For correct DevMate statistics need to send request for Release Notes.
+    [self downloadReleaseNotesAndWaitUntilDone];
+    [super didFindValidUpdate];
+}
+
+#endif // SPARKLE_IS_COMPATIBLE_WITH_DEVMATE
+// -------------------------------------------------------------------
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)ua
 {
@@ -36,7 +77,7 @@
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification
 {
 	[[alert window] makeKeyAndOrderFront:self];
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
 - (void)automaticUpdateAlert:(SUAutomaticUpdateAlert *)aua finishedWithChoice:(SUAutomaticInstallationChoice)choice;

@@ -14,6 +14,7 @@
 
 #import "SUDownloadServiceConstants.h"
 #import "SUDSDownloader.h"
+#import "SUConstants.h"
 
 static void fetch_process_request(xpc_object_t request, xpc_object_t reply);
 static void fetch_peer_event_handler(xpc_connection_t peer, xpc_object_t event);
@@ -25,8 +26,10 @@ static void fetch_event_handler(xpc_connection_t peer);
 // data, and build/return XPC reply.
 static void fetch_process_request(xpc_object_t request, xpc_object_t reply)
 {
-    __block int errcode = 0;
+    __block int32_t errcode = 0;
     __block const char *errmsg = NULL;
+    __block const char *errdomain = NULL;
+    
     xpc_connection_t connection = NULL;
 
     NSAutoreleasePool *localPool = [[NSAutoreleasePool alloc] init];
@@ -39,7 +42,8 @@ static void fetch_process_request(xpc_object_t request, xpc_object_t reply)
         NSURLRequest *urlRequest = [NSKeyedUnarchiver unarchiveObjectWithData:requestData];
         if (nil == urlRequest)
         {
-            errcode = EINVAL;
+            errcode = SUXPCServiceError;
+            errdomain = [SUSparkleErrorDomain cStringUsingEncoding:NSUTF8StringEncoding];
             errmsg = "Invalid URL request data";
             break;
         }
@@ -48,7 +52,8 @@ static void fetch_process_request(xpc_object_t request, xpc_object_t reply)
         connection = xpc_dictionary_create_connection(request, SUDownloadServiceDelegateConnectionKey);
         if (connection == NULL)
         {
-            errcode = EINVAL;
+            errcode = SUXPCServiceError;
+            errdomain = [SUSparkleErrorDomain cStringUsingEncoding:NSUTF8StringEncoding];
             errmsg = "Invalid XPC delegate connection";
             break;
         }
@@ -110,7 +115,8 @@ static void fetch_process_request(xpc_object_t request, xpc_object_t reply)
         };
         
         callBacks.downloadDidFail = ^(SUDSDownloader *downloader, NSError *error) {
-            errcode = (int)[error code];
+            errcode = (int32_t)[error code];
+            errdomain = [[error domain] cStringUsingEncoding:NSUTF8StringEncoding];
             errmsg = [[error localizedDescription] cStringUsingEncoding:NSUTF8StringEncoding];
             
             NSData *errorData = [NSKeyedArchiver archivedDataWithRootObject:error];
@@ -176,6 +182,10 @@ static void fetch_process_request(xpc_object_t request, xpc_object_t reply)
     if (errmsg)
     {
         xpc_dictionary_set_string(reply, SUDownloadServiceErrorMessageKey, errmsg);
+    }
+    if (errdomain)
+    {
+        xpc_dictionary_set_string(reply, SUDownloadServiceErrorDomainKey, errdomain);
     }
 }
 
