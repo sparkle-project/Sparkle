@@ -12,6 +12,7 @@
 
 - (BOOL)mayUpdateAndRestart;
 
-+ (BOOL)shouldUseXPC;
++ (BOOL)shouldUseXPCDownloader;
++ (BOOL)shouldUseXPCInstaller;
 
 @end

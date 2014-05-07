@@ -66,29 +66,47 @@ finally:
 
 + (BOOL)hostApplicationIsCodeSigned
 {
-    // This API didn't exist prior to 10.6.
-    if (SecCodeCopySelf == NULL) return NO;
+    static BOOL sIsCodesigned = NO;
     
-    OSStatus result;
-    SecCodeRef hostCode = NULL;
-    result = SecCodeCopySelf(kSecCSDefaultFlags, &hostCode);
-    if (result != 0) return NO;
+    static BOOL onceToken = NO;
+    while (!onceToken)
+    {
+        onceToken = YES;
+        
+        // This API didn't exist prior to 10.6.
+        if (SecCodeCopySelf == NULL)
+            break;
     
-    SecRequirementRef requirement = NULL;
-    result = SecCodeCopyDesignatedRequirement(hostCode, kSecCSDefaultFlags, &requirement);
-    if (hostCode) CFRelease(hostCode);
-    if (requirement) CFRelease(requirement);
-    return (result == 0);
+        SecCodeRef hostCode = NULL;
+        OSStatus result = SecCodeCopySelf(kSecCSDefaultFlags, &hostCode);
+        if (result != noErr)
+            break;
+    
+        SecRequirementRef requirement = NULL;
+        result = SecCodeCopyDesignatedRequirement(hostCode, kSecCSDefaultFlags, &requirement);
+        
+        if (hostCode) CFRelease(hostCode);
+        if (requirement) CFRelease(requirement);
+        
+        sIsCodesigned = (noErr == result);
+    }
+    
+    return sIsCodesigned;
 }
 
 + (BOOL)hostApplicationIsSandboxed
 {
-    // This API didn't exist prior to 10.6
-    if (SecCodeCopySelf == NULL) return NO;
+    static BOOL sIsAppSandboxed = NO;
     
-    BOOL isSandboxed = NO;
-    do
+    static BOOL onceToken = NO;
+    while (!onceToken)
     {
+        onceToken = YES;
+        
+        // This API didn't exist prior to 10.6
+        if (SecCodeCopySelf == NULL)
+            break;
+    
         SecCodeRef hostCode = NULL;
         SecRequirementRef hostRequirement = NULL;
         
@@ -116,14 +134,58 @@ finally:
         }
         
         status = SecCodeCheckValidity(hostCode, kSecCSDefaultFlags, hostRequirement);
-        if (noErr == status)
-            isSandboxed = YES;
-        
+        sIsAppSandboxed = (noErr == status);
         Cleanup();
     }
-    while (NO);
 
-    return isSandboxed;
+    return sIsAppSandboxed;
+}
+
++ (BOOL)hostAppAllowsNetworkOutgoingConnections
+{
+    static BOOL sIsAppAllowsOutgoingConnections = NO;
+    
+    static BOOL onceToken = NO;
+    while (!onceToken)
+    {
+        onceToken = YES;
+        
+        if (![self hostApplicationIsSandboxed])
+        {
+            sIsAppAllowsOutgoingConnections = YES;
+            break;
+        }
+        
+        SecCodeRef hostCode = NULL;
+        SecRequirementRef hostRequirement = NULL;
+        
+        #define Cleanup() \
+        { \
+            if (hostCode) CFRelease(hostCode); \
+            if (hostRequirement) CFRelease(hostRequirement); \
+        }
+        
+        OSStatus status = SecCodeCopySelf(kSecCSDefaultFlags, &hostCode);
+        if (status != noErr || hostCode == NULL)
+        {
+            Cleanup();
+            break;
+        }
+        
+        CFStringRef requirementString = CFSTR("entitlement[\"com.apple.security.network.client\"] exists");
+        status = SecRequirementCreateWithString(requirementString, kSecCSDefaultFlags, &hostRequirement);
+        if (status != noErr || hostRequirement == NULL)
+        {
+            Cleanup();
+            break;
+        }
+        
+        status = SecCodeCheckValidity(hostCode, kSecCSDefaultFlags, hostRequirement);
+        sIsAppAllowsOutgoingConnections = (noErr == status);
+        Cleanup();
+    }
+    
+    return sIsAppAllowsOutgoingConnections;
 }
 
 @end

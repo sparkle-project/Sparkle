@@ -202,7 +202,7 @@ NSArray *SUGetAllDevMateURLHosts(void)
 	[request setValue:[updater userAgentString] forHTTPHeaderField:@"User-Agent"];
     [self updateURLRequestIfNeeds:request];
     
-    if ([SUUpdater shouldUseXPC])
+    if ([SUUpdater shouldUseXPCDownloader])
         download = (NSURLDownload *)[[SUXPCURLDownload alloc] initWithRequest:request delegate:self];
     else
         download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
@@ -210,7 +210,7 @@ NSArray *SUGetAllDevMateURLHosts(void)
 
 - (void)download:(NSURLDownload *)d decideDestinationWithSuggestedFilename:(NSString *)name
 {
-    if ([SUUpdater shouldUseXPC]) {
+    if ([SUUpdater shouldUseXPCDownloader]) {
         // The downloader will determine a file name, somewhere within our sandbox.
         downloadPath = nil;
         [d setDestination:name allowOverwrite:YES];
@@ -387,7 +387,7 @@ NSArray *SUGetAllDevMateURLHosts(void)
 #endif
 
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
-	if( [SUUpdater shouldUseXPC] )
+	if( [SUUpdater shouldUseXPCInstaller] )
     {
         [SUXPCInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil completionHandler:^(NSError *xpcError) {
             if (xpcError != nil)
@@ -428,7 +428,7 @@ NSArray *SUGetAllDevMateURLHosts(void)
         pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
     NSString *relaunchToolPath = [relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS/finish_installation"];
 	NSArray *arguments = [NSArray arrayWithObjects:[host bundlePath], pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], tempDir, relaunch ? @"1" : @"0", nil];
-	if( [SUUpdater shouldUseXPC] )
+	if( [SUUpdater shouldUseXPCInstaller] )
 		[SUXPCInstaller launchTaskWithLaunchPath: relaunchToolPath arguments:arguments completionHandler:^{
             [NSApp terminate:self];
         }];

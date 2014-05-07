@@ -64,7 +64,7 @@
     if ([delegate respondsToSelector:@selector(appcast:willFetchURLRequest:)])
         [delegate appcast:self willFetchURLRequest:request];
     
-    if ([SUUpdater shouldUseXPC])
+    if ([SUUpdater shouldUseXPCDownloader])
     {
         download = (NSURLDownload *)[[SUXPCURLDownload alloc] initWithRequest:request delegate:self];
     }
