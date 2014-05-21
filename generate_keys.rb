@@ -6,7 +6,7 @@ for file in "dsaparam.pem" "dsa_priv.pem" "dsa_pub.pem"; do
   fi
 done
 openssl="/usr/bin/openssl"
-$openssl dsaparam 1024 < /dev/urandom > dsaparam.pem
+$openssl dsaparam 4096 < /dev/urandom > dsaparam.pem
 $openssl gendsa dsaparam.pem -out dsa_priv.pem
 chmod 0400 dsa_priv.pem
 $openssl dsa -in dsa_priv.pem -pubout -out dsa_pub.pem
