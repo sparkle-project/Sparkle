@@ -17,3 +17,5 @@ echo "
 Generated private and public keys: dsa_priv.pem and dsa_pub.pem.
 BACK UP YOUR PRIVATE KEY AND KEEP IT SAFE!
 If you lose it, your users will be unable to upgrade!"
+
+open -R dsa_priv.pem
