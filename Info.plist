@@ -19,9 +19,9 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.5</string>
+	<string>${DYLIB_CURRENT_VERSION}</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.5</string>
+	<string>${DYLIB_CURRENT_VERSION}</string>
 	<key>NSPrincipalClass</key>
 	<string></string>
 </dict>
