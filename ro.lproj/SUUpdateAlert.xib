@@ -57,9 +57,9 @@
 			<object class="NSWindowTemplate" id="191739834">
 				<int key="NSWindowStyleMask">15</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{346, 217}, {611, 370}}</string>
+				<string key="NSWindowRect">{{248, 468}, {575, 370}}</string>
 				<int key="NSWTFlags">-260571136</int>
-				<string key="NSWindowTitle">Actualizare Software</string>
+				<string key="NSWindowTitle">Actualizarea software-ului</string>
 				<string key="NSWindowClass">NSWindow</string>
 				<object class="NSMutableString" key="NSViewClass">
 					<characters key="NS.bytes">View</characters>
@@ -146,7 +146,7 @@
 						<object class="NSTextField" id="139815278">
 							<reference key="NSNextResponder" ref="163075390"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{106, 277}, {452, 17}}</string>
+							<string key="NSFrame">{{106, 280}, {452, 14}}</string>
 							<reference key="NSSuperview" ref="163075390"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="114370023"/>
@@ -154,7 +154,7 @@
 							<object class="NSTextFieldCell" key="NSCell" id="939178269">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">272629760</int>
-								<string key="NSContents">Note de editie:</string>
+								<string key="NSContents">Note de ediție:</string>
 								<object class="NSFont" key="NSSupport">
 									<string key="NSName">LucidaGrande-Bold</string>
 									<double key="NSSize">11</double>
@@ -168,7 +168,7 @@
 						<object class="NSButton" id="919863842">
 							<reference key="NSNextResponder" ref="163075390"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{218, 12}, {195, 32}}</string>
+							<string key="NSFrame">{{205, 12}, {185, 32}}</string>
 							<reference key="NSSuperview" ref="163075390"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="111369817"/>
@@ -195,7 +195,7 @@
 						<object class="NSButton" id="77541259">
 							<reference key="NSNextResponder" ref="163075390"/>
 							<int key="NSvFlags">288</int>
-							<string key="NSFrame">{{103, 12}, {114, 32}}</string>
+							<string key="NSFrame">{{103, 12}, {109, 32}}</string>
 							<reference key="NSSuperview" ref="163075390"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="919863842"/>
@@ -220,9 +220,10 @@
 						<object class="NSButton" id="111369817">
 							<reference key="NSNextResponder" ref="163075390"/>
 							<int key="NSvFlags">289</int>
-							<string key="NSFrame">{{413, 12}, {184, 32}}</string>
+							<string key="NSFrame">{{385, 12}, {176, 32}}</string>
 							<reference key="NSSuperview" ref="163075390"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="635120042">
 								<int key="NSCellFlags">-2080244224</int>
@@ -273,7 +274,7 @@
 													<string>public.url-name</string>
 												</object>
 											</object>
-											<string key="NSFrame">{{-2, -1}, {479, 199}}</string>
+											<string key="NSFrame">{{-2, -1}, {445, 199}}</string>
 											<reference key="NSSuperview" ref="610445114"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView"/>
@@ -301,13 +302,13 @@
 											<bool key="AllowsUndo">YES</bool>
 										</object>
 									</object>
-									<string key="NSFrame">{{1, 1}, {479, 197}}</string>
+									<string key="NSFrame">{{1, 1}, {443, 197}}</string>
 									<reference key="NSSuperview" ref="114370023"/>
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="139390623"/>
 								</object>
 							</object>
-							<string key="NSFrame">{{110, 76}, {481, 199}}</string>
+							<string key="NSFrame">{{110, 76}, {445, 199}}</string>
 							<reference key="NSSuperview" ref="163075390"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="610445114"/>
@@ -374,7 +375,7 @@
 							<object class="NSButtonCell" key="NSCell" id="10388865">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">131072</int>
-								<string key="NSContents">În viitor descarcă și instalează automat actualizările</string>
+								<string key="NSContents">În viitor descarcă și instalează în automat actualizările</string>
 								<reference key="NSSupport" ref="26"/>
 								<reference key="NSControlView" ref="61494929"/>
 								<int key="NSButtonFlags">1211912703</int>
@@ -389,12 +390,12 @@
 							</object>
 						</object>
 					</object>
-					<string key="NSFrameSize">{611, 370}</string>
+					<string key="NSFrameSize">{575, 370}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="998369947"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMinSize">{575, 392}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<string key="NSFrameAutosaveName"/>
@@ -669,7 +670,7 @@
 							<reference ref="163075390"/>
 						</object>
 						<reference key="parent" ref="0"/>
-						<string key="objectName">Update Alert (release notes)</string>
+						<string key="objectName">Alertă actualizare (note de ediție)</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">6</int>
@@ -679,12 +680,12 @@
 							<reference ref="998369947"/>
 							<reference ref="445247806"/>
 							<reference ref="139815278"/>
+							<reference ref="77541259"/>
 							<reference ref="114370023"/>
 							<reference ref="61494929"/>
 							<reference ref="757142666"/>
-							<reference ref="919863842"/>
-							<reference ref="77541259"/>
 							<reference ref="111369817"/>
+							<reference ref="919863842"/>
 						</object>
 						<reference key="parent" ref="191739834"/>
 					</object>
@@ -1013,10 +1014,6 @@
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
 			<integer value="1050" key="NS.object.0"/>
-		</object>
-		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
-			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
-			<real value="1070" key="NS.object.0"/>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDevelopmentDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.InterfaceBuilder3</string>
