@@ -59,7 +59,7 @@
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{248, 468}, {575, 370}}</string>
 				<int key="NSWTFlags">-260571136</int>
-				<string key="NSWindowTitle">Actualizarea software-ului</string>
+				<string key="NSWindowTitle">Actualizarea aplicației</string>
 				<string key="NSWindowClass">NSWindow</string>
 				<object class="NSMutableString" key="NSViewClass">
 					<characters key="NS.bytes">View</characters>
