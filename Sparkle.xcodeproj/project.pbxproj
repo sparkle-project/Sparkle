@@ -180,12 +180,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		004D57371766A31600E4B27E /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/Sparkle.strings; sourceTree = "<group>"; };
-		004D57381766A31600E4B27E /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = ro.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
-		004D57391766A31600E4B27E /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = ro.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
-		004D573A1766A31600E4B27E /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = ro.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
-		004D573C1766A31600E4B27E /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		004D573D1766A31600E4B27E /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = ro.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		004A8652192A492B00C9730D /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		004A8653192A492B00C9730D /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = ro.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
+		004A8654192A492B00C9730D /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = ro.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
+		004A8655192A492B00C9730D /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = ro.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
 		0263187214FEBB31005EBF43 /* uk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		0263187514FEBB42005EBF43 /* uk */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = uk; path = uk.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
 		0263187614FEBB42005EBF43 /* uk */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = uk; path = uk.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
@@ -474,7 +472,7 @@
 			isa = PBXGroup;
 			children = (
 				5D06E8D00FD68C7C005AE3F6 /* BinaryDelta */,
-				55C14BB7136EEF1500649790 /* finish_installation.app */,
+				55C14BB7136EEF1500649790 /* Autoupdate.app */,
 				61B5F90209C4CEE200B25A18 /* Sparkle Test App.app */,
 				612279D90DB5470200AB99EA /* Sparkle Unit Tests.octest */,
 				8DC2EF5B0486A6940098B216 /* Sparkle.framework */,
@@ -803,6 +801,7 @@
 			dependencies = (
 			);
 			name = finish_installation;
+			productName = finish_installation;
 			productReference = 55C14BB7136EEF1500649790 /* Autoupdate.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -985,7 +984,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				55C14F3B136EFCB300649790 /* finish_installation.app in Resources */,
+				55C14F3B136EFCB300649790 /* Autoupdate.app in Resources */,
 				61C2680A0E2DB5D000175E6C /* License.txt in Resources */,
 				61AAE8280A321A7F00D8810D /* Sparkle.strings in Resources */,
 				55C14BEE136EF20D00649790 /* SUAutomaticUpdateAlert.xib in Resources */,
@@ -1210,7 +1209,6 @@
 				55C14BE6136EF20D00649790 /* pl */,
 				55C14BE7136EF20D00649790 /* pt_BR */,
 				6158A1BA1378F68100487EC1 /* pt_PT */,
-				004D573A1766A31600E4B27E /* ro */,
 				55C14BE9136EF20D00649790 /* ru */,
 				55C14BEA136EF20D00649790 /* sk */,
 				61BA66DA14BDFC5500D02D86 /* sl */,
@@ -1220,6 +1218,7 @@
 				0263187514FEBB42005EBF43 /* uk */,
 				55C14BEC136EF20D00649790 /* zh_CN */,
 				55C14BED136EF20D00649790 /* zh_TW */,
+				004A8653192A492B00C9730D /* ro */,
 			);
 			name = SUAutomaticUpdateAlert.xib;
 			sourceTree = "<group>";
@@ -1242,7 +1241,6 @@
 				55C14BFC136EF26100649790 /* pl */,
 				55C14BFD136EF26100649790 /* pt_BR */,
 				6158A1BB1378F68100487EC1 /* pt_PT */,
-				004D57391766A31600E4B27E /* ro */,
 				55C14BFF136EF26100649790 /* ru */,
 				55C14C00136EF26100649790 /* sk */,
 				61BA66DB14BDFC5500D02D86 /* sl */,
@@ -1252,6 +1250,7 @@
 				0263187614FEBB42005EBF43 /* uk */,
 				55C14C02136EF26100649790 /* zh_CN */,
 				55C14C03136EF26100649790 /* zh_TW */,
+				004A8654192A492B00C9730D /* ro */,
 			);
 			name = SUUpdateAlert.xib;
 			sourceTree = "<group>";
@@ -1274,7 +1273,6 @@
 				55C14C11136EF2C700649790 /* pl */,
 				55C14C12136EF2C700649790 /* pt_BR */,
 				6158A1B81378F64700487EC1 /* pt_PT */,
-				004D57381766A31600E4B27E /* ro */,
 				55C14C14136EF2C700649790 /* ru */,
 				55C14C15136EF2C700649790 /* sk */,
 				61BA66DC14BDFC5500D02D86 /* sl */,
@@ -1284,6 +1282,7 @@
 				0263187714FEBB42005EBF43 /* uk */,
 				55C14C17136EF2C700649790 /* zh_CN */,
 				55C14C18136EF2C700649790 /* zh_TW */,
+				004A8655192A492B00C9730D /* ro */,
 			);
 			name = SUUpdatePermissionPrompt.xib;
 			sourceTree = "<group>";
@@ -1306,7 +1305,6 @@
 				611A904210240DD300CC659E /* pl */,
 				61E31A80103299500051D188 /* pt_BR */,
 				6186554310D7484E00B1E074 /* pt_PT */,
-				004D57371766A31600E4B27E /* ro */,
 				6195D4920E404AD700D41A50 /* ru */,
 				FE5536F617A2C6AB007CB333 /* sk */,
 				61BA66CC14BDFA0400D02D86 /* sl */,
@@ -1316,6 +1314,7 @@
 				0263187214FEBB31005EBF43 /* uk */,
 				61131A090F846D0A00E97AF6 /* zh_CN */,
 				61131A0A0F846D1100E97AF6 /* zh_TW */,
+				004A8652192A492B00C9730D /* ro */,
 			);
 			name = Sparkle.strings;
 			sourceTree = "<group>";
@@ -1324,7 +1323,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				61B5F92B09C4CFD800B25A18 /* English */,
-				004D573C1766A31600E4B27E /* ro */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1333,7 +1331,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				61B5F92D09C4CFD800B25A18 /* English */,
-				004D573D1766A31600E4B27E /* ro */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -1385,6 +1382,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = finish_installation.pch;
 				INFOPLIST_FILE = "finish_installation-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -1406,6 +1404,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = finish_installation.pch;
 				INFOPLIST_FILE = "finish_installation-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -1454,6 +1453,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 			};
 			name = Debug;
 		};
@@ -1461,6 +1461,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 			};
 			name = Release;
 		};
