@@ -1035,7 +1035,7 @@
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0600;
 				TargetAttributes = {
 					61B5F90109C4CEE200B25A18 = {
 						SystemCapabilities = {
