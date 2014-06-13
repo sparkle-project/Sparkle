@@ -3,7 +3,7 @@ is an easy-to-use software update framework for Cocoa developers.
 
 ## This fork
 
-* Up to date with 10.9 SDK and Xcode 5.1.
+* Up to date with 10.9 SDK and Xcode 5/6.
 * Merged bugfixes, security fixes and some features from multiple Sparkle forks.
 * Merged official Sparkle branch with truly automatic background updates (no UI at all) when user agreed to "Automatically download and install updates in the future."
 * Ability to mark updates as critical.
