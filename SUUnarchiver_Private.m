@@ -32,22 +32,25 @@
 	return NO;
 }
 
-- (void)notifyDelegateOfExtractedLength:(NSNumber *)length
+- (void)notifyDelegateOfExtractedLength:(size_t)length
 {
-	if ([delegate respondsToSelector:@selector(unarchiver:extractedLength:)])
-		[delegate unarchiver:self extractedLength:[length unsignedLongValue]];
+	if ([delegate respondsToSelector:@selector(unarchiver:extractedLength:)]) {
+		[delegate unarchiver:self extractedLength:length];
+	}
 }
 
 - (void)notifyDelegateOfSuccess
 {
-	if ([delegate respondsToSelector:@selector(unarchiverDidFinish:)])
-		[delegate performSelector:@selector(unarchiverDidFinish:) withObject:self];
+	if ([delegate respondsToSelector:@selector(unarchiverDidFinish:)]) {
+		[delegate unarchiverDidFinish:self];
+	}
 }
 
 - (void)notifyDelegateOfFailure
 {
-	if ([delegate respondsToSelector:@selector(unarchiverDidFail:)])
-		[delegate performSelector:@selector(unarchiverDidFail:) withObject:self];
+	if ([delegate respondsToSelector:@selector(unarchiverDidFail:)]) {
+		[delegate unarchiverDidFail:self];
+	}
 }
 
 static NSMutableArray *gUnarchiverImplementations;
