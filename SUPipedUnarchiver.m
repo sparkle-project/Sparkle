@@ -17,16 +17,16 @@
 {
 	static NSDictionary *typeSelectorDictionary;
 	if (!typeSelectorDictionary)
-		typeSelectorDictionary = [[NSDictionary dictionaryWithObjectsAndKeys:@"extractZIP", @".zip", @"extractTAR", @".tar",
-								   @"extractTGZ", @".tar.gz", @"extractTGZ", @".tgz",
-								   @"extractTBZ", @".tar.bz2", @"extractTBZ", @".tbz", nil] retain];
+		typeSelectorDictionary = [@{@".zip": @"extractZIP", @".tar": @"extractTAR",
+								   @".tar.gz": @"extractTGZ", @".tgz": @"extractTGZ",
+								   @".tar.bz2": @"extractTBZ", @".tbz": @"extractTBZ"} retain];
 
 	NSString *lastPathComponent = [path lastPathComponent];
 	for (id currentType in typeSelectorDictionary)
 	{
 		if ([currentType length] > [lastPathComponent length]) continue;
 		if ([[lastPathComponent substringFromIndex:[lastPathComponent length] - [currentType length]] isEqualToString:currentType])
-			return NSSelectorFromString([typeSelectorDictionary objectForKey:currentType]);
+			return NSSelectorFromString(typeSelectorDictionary[currentType]);
 	}
 	return NULL;
 }
@@ -54,7 +54,7 @@
 	SULog(@"Extracting %@ using '%@'",archivePath,command);
     
 	// Get the file size.
-	NSNumber *fs = [[[NSFileManager defaultManager] attributesOfItemAtPath:archivePath error:nil] objectForKey:NSFileSize];
+	NSNumber *fs = [[NSFileManager defaultManager] attributesOfItemAtPath:archivePath error:nil][NSFileSize];
 	if (fs == nil) goto reportError;
 	
 	// Thank you, Allan Odgaard!
@@ -79,7 +79,7 @@
 			goto reportError;
 		}
 			
-		[self performSelectorOnMainThread:@selector(notifyDelegateOfExtractedLength:) withObject:[NSNumber numberWithUnsignedLong:len] waitUntilDone:NO];
+		[self performSelectorOnMainThread:@selector(notifyDelegateOfExtractedLength:) withObject:@(len) waitUntilDone:NO];
 	}
 	pclose(cmdFP);
 	

@@ -32,7 +32,7 @@
 
 - (void)taskOutputAvailable:(NSNotification*)note
 {
-	self.output = [[note userInfo] objectForKey:NSFileHandleNotificationDataItem];
+	self.output = [note userInfo][NSFileHandleNotificationDataItem];
 	
 	self.done = YES;
 }
@@ -42,7 +42,7 @@
     self.result = [self.task terminationStatus];
 }
 
-- (id)init;
+- (instancetype)init;
 {
     self = [super init];
 	if (self)
@@ -94,7 +94,7 @@
 												 name:NSTaskDidTerminateNotification
 											   object:[self task]];	
 	
-	[[[self outputPipe] fileHandleForReading] readToEndOfFileInBackgroundAndNotifyForModes:[NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, NSEventTrackingRunLoopMode, nil]];
+	[[[self outputPipe] fileHandleForReading] readToEndOfFileInBackgroundAndNotifyForModes:@[NSDefaultRunLoopMode, NSModalPanelRunLoopMode, NSEventTrackingRunLoopMode]];
 	
 	@try
 	{

@@ -29,15 +29,15 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 @interface SUUpdater ()
 @property (retain) NSTimer *checkTimer;
-- (id)initForBundle:(NSBundle *)bundle;
+- (instancetype)initForBundle:(NSBundle *)bundle;
 - (void)startUpdateCycle;
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
-- (BOOL)automaticallyDownloadsUpdates;
+@property (readwrite) BOOL automaticallyDownloadsUpdates;
 - (void)scheduleNextUpdateCheck;
 - (void)registerAsObserver;
 - (void)unregisterAsObserver;
 - (void)updateDriverDidFinish:(NSNotification *)note;
-- (NSURL *)parameterizedFeedURL;
+@property (readonly, copy) NSURL *parameterizedFeedURL;
 
 -(void)	notifyWillShowModalAlert;
 -(void)	notifyDidShowModalAlert;
@@ -62,14 +62,14 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 + (SUUpdater *)updaterForBundle:(NSBundle *)bundle
 {
     if (bundle == nil) bundle = [NSBundle mainBundle];
-	id updater = [sharedUpdaters objectForKey:[NSValue valueWithNonretainedObject:bundle]];
+	id updater = sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]];
 	if (updater == nil)
 		updater = [[[[self class] alloc] initForBundle:bundle] autorelease];
 	return updater;
 }
 
 // This is the designated initializer for SUUpdater, important for subclasses
-- (id)initForBundle:(NSBundle *)bundle
+- (instancetype)initForBundle:(NSBundle *)bundle
 {
 	self = [super init];
     if (bundle == nil) bundle = [NSBundle mainBundle];
@@ -78,7 +78,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	if (self)
 		[self registerAsObserver];
 	
-	id updater = [sharedUpdaters objectForKey:[NSValue valueWithNonretainedObject:bundle]];
+	id updater = sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]];
     if (updater)
 	{
 		[self release];
@@ -88,7 +88,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	{
 		if (sharedUpdaters == nil)
             sharedUpdaters = [[NSMutableDictionary alloc] init];
-        [sharedUpdaters setObject:self forKey:[NSValue valueWithNonretainedObject:bundle]];
+        sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]] = self;
         host = [[SUHost alloc] initWithBundle:bundle];
 		
 #if !ENDANGER_USERS_WITH_INSECURE_UPDATES
@@ -114,7 +114,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 
 // This will be used when the updater is instantiated in a nib such as MainMenu
-- (id)init
+- (instancetype)init
 {
     return [self initForBundle:[NSBundle mainBundle]];
 }
@@ -233,7 +233,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 -(void)	putFeedURLIntoDictionary: (NSMutableDictionary*)theDict	// You release this.
 {
-	[theDict setObject: [self feedURL] forKey: @"feedURL"];
+	theDict[@"feedURL"] = [self feedURL];
 }
 
 -(void)	checkForUpdatesInBgReachabilityCheckWithDriver: (SUUpdateDriver*)inDriver /* RUNS ON ITS OWN THREAD */
@@ -253,7 +253,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 		NSMutableDictionary*		theDict = [NSMutableDictionary dictionary];
 		[self performSelectorOnMainThread: @selector(putFeedURLIntoDictionary:) withObject: theDict waitUntilDone: YES];	// Get feed URL on main thread, it's not safe to call elsewhere.
 		
-		const char *hostname = [[[theDict objectForKey: @"feedURL"] host] cStringUsingEncoding: NSUTF8StringEncoding];
+		const char *hostname = [[theDict[@"feedURL"] host] cStringUsingEncoding: NSUTF8StringEncoding];
 		SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(NULL, hostname);
         Boolean reachabilityResult = NO;
         // If the feed's using a file:// URL, we won't be able to use reachability.
@@ -490,7 +490,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	const NSTimeInterval oneWeek = 60 * 60 * 24 * 7;
 	sendingSystemProfile &= (-[lastSubmitDate timeIntervalSinceNow] >= oneWeek);
 
-	NSArray *parameters = [NSArray array];
+	NSArray *parameters = @[];
 	if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)])
 		parameters = [parameters arrayByAddingObjectsFromArray:[delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile]];
 	if (sendingSystemProfile)
@@ -503,7 +503,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	// Build up the parameterized URL.
 	NSMutableArray *parameterStrings = [NSMutableArray array];
 	for (NSDictionary *currentProfileInfo in parameters)
-		[parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", [[[currentProfileInfo objectForKey:@"key"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], [[[currentProfileInfo objectForKey:@"value"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+		[parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", [[currentProfileInfo[@"key"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], [[currentProfileInfo[@"value"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
 	
 	NSString *separatorCharacter = @"?";
 	if ([baseFeedURL query])
@@ -516,7 +516,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 - (void)setUpdateCheckInterval:(NSTimeInterval)updateCheckInterval
 {
-	[host setObject:[NSNumber numberWithDouble:updateCheckInterval] forUserDefaultsKey:SUScheduledCheckIntervalKey];
+	[host setObject:@(updateCheckInterval) forUserDefaultsKey:SUScheduledCheckIntervalKey];
 	if (updateCheckInterval == 0) // For compatibility with 1.1's settings.
 		[self setAutomaticallyChecksForUpdates:NO];
 	[[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];

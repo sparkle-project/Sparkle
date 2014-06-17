@@ -62,7 +62,7 @@
     NSData *promptData = nil;
     promptData = [NSData dataWithBytes:"yes\n" length:4];
 	
-    NSArray* arguments = [NSArray arrayWithObjects:@"attach", archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen", nil];
+    NSArray* arguments = @[@"attach", archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"];
     
     NSData *output = nil;
 	NSInteger taskResult = -1;
@@ -139,7 +139,7 @@ reportError:
 
 finally:
 	if (mountedSuccessfully)
-		[NSTask launchedTaskWithLaunchPath:@"/usr/bin/hdiutil" arguments:[NSArray arrayWithObjects:@"detach", mountPoint, @"-force", nil]];
+		[NSTask launchedTaskWithLaunchPath:@"/usr/bin/hdiutil" arguments:@[@"detach", mountPoint, @"-force"]];
 	else
 		SULog(@"Can't mount DMG %@",archivePath);
 	[pool drain];

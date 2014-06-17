@@ -27,7 +27,7 @@
 @property (nonatomic) double maxProgressValue;
 @property (getter = isButtonEnabled) BOOL buttonEnabled;
 
-- (id)initWithHost:(SUHost *)host;
+- (instancetype)initWithHost:(SUHost *)host;
 
 // Pass 0 for the max progress value to get an indeterminate progress bar.
 // Pass nil for the status text to not show it.

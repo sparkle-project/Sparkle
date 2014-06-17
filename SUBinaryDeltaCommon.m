@@ -150,7 +150,7 @@ NSString *hashOfTree(NSString *path)
     for (i = 0; i < CC_SHA1_DIGEST_LENGTH; i++)
         sprintf(hexHash + i * 2, "%02x", hash[i]);
 
-    return [NSString stringWithUTF8String:hexHash];
+    return @(hexHash);
 }
 
 void removeTree(NSString *path)

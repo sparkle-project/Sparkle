@@ -18,7 +18,7 @@
 	return [[host objectForInfoDictionaryKey:SUEnableSystemProfilingKey] boolValue];
 }
 
-- (id)initWithHost:(SUHost *)aHost systemProfile:(NSArray *)profile delegate:(id)d
+- (instancetype)initWithHost:(SUHost *)aHost systemProfile:(NSArray *)profile delegate:(id)d
 {
 	self = [super initWithHost:aHost windowNibName:@"SUUpdatePermissionPrompt"];
 	if (self)

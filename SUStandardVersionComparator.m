@@ -90,8 +90,8 @@ typedef enum {
 	
     n = MIN([partsA count], [partsB count]);
     for (i = 0; i < n; ++i) {
-        partA = [partsA objectAtIndex:i];
-        partB = [partsB objectAtIndex:i];
+        partA = partsA[i];
+        partB = partsB[i];
         
         typeA = [self typeOfCharacter:partA];
         typeB = [self typeOfCharacter:partB];
@@ -141,11 +141,11 @@ typedef enum {
 		NSComparisonResult shorterResult, largerResult;
         
         if ([partsA count] > [partsB count]) {
-            missingPart = [partsA objectAtIndex:n];
+            missingPart = partsA[n];
             shorterResult = NSOrderedAscending;
             largerResult = NSOrderedDescending;
         } else {
-            missingPart = [partsB objectAtIndex:n];
+            missingPart = partsB[n];
             shorterResult = NSOrderedDescending;
             largerResult = NSOrderedAscending;
         }

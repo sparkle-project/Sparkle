@@ -27,7 +27,7 @@ typedef enum
 	SUHost *host;
 }
 
-- (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)hostBundle delegate:(id<SUAutomaticUpdateAlertDelegateProtocol>)delegate;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)hostBundle delegate:(id<SUAutomaticUpdateAlertDelegateProtocol>)delegate;
 - (IBAction)installNow:sender;
 - (IBAction)installLater:sender;
 - (IBAction)doNotInstall:sender;

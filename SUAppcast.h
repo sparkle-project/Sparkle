@@ -26,7 +26,7 @@
 
 - (void)fetchAppcastFromURL:(NSURL *)url;
 
-- (NSArray *)items;
+@property (readonly, copy) NSArray *items;
 @end
 
 @protocol SUAppcastDelegate <NSObject>

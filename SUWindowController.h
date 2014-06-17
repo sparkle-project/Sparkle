@@ -14,7 +14,7 @@
 @class SUHost;
 @interface SUWindowController : NSWindowController { }
 // We use this instead of plain old NSWindowController initWithWindowNibName so that we'll be able to find the right path when running in a bundle loaded from another app.
-- (id)initWithHost:(SUHost *)host windowNibName:(NSString *)nibName;
+- (instancetype)initWithHost:(SUHost *)host windowNibName:(NSString *)nibName;
 @end
 
 #endif

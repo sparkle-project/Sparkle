@@ -39,7 +39,7 @@ typedef enum
 }
 @property (assign) id<SUUpdateAlertDelegate> delegate;
 
-- (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host;
 
 - (IBAction)installUpdate:sender;
 - (IBAction)skipThisVersion:sender;

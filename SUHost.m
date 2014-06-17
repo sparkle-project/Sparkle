@@ -19,7 +19,7 @@
 @implementation SUHost
 @synthesize bundle;
 
-- (id)initWithBundle:(NSBundle *)aBundle
+- (instancetype)initWithBundle:(NSBundle *)aBundle
 {
 	if ((self = [super init]))
 	{
@@ -62,7 +62,7 @@
         appSupportPath = [@"~/Library/Application Support" stringByExpandingTildeInPath];
     }
     else
-        appSupportPath = [appSupportPaths objectAtIndex:0];
+        appSupportPath = appSupportPaths[0];
     appSupportPath = [appSupportPath stringByAppendingPathComponent:[self name]];
     appSupportPath = [appSupportPath stringByAppendingPathComponent:@".Sparkle"];
     return appSupportPath;
@@ -219,7 +219,7 @@
 	}
 	else
 	{
-		CFPreferencesSetValue((CFStringRef)defaultName, (CFBooleanRef)[NSNumber numberWithBool:value], (CFStringRef)defaultsDomain,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		CFPreferencesSetValue((CFStringRef)defaultName, (CFBooleanRef)@(value), (CFStringRef)defaultsDomain,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
 		CFPreferencesSynchronize((CFStringRef)defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	}
 }
@@ -235,7 +235,7 @@
 + (NSString *)systemVersionString
 {
 	NSString *versionPlistPath = @"/System/Library/CoreServices/SystemVersion.plist";
-	return [[NSDictionary dictionaryWithContentsOfFile:versionPlistPath] objectForKey:@"ProductVersion"];
+	return [NSDictionary dictionaryWithContentsOfFile:versionPlistPath][@"ProductVersion"];
 }
 
 @end

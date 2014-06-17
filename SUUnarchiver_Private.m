@@ -10,7 +10,7 @@
 
 @implementation SUUnarchiver (Private)
 
-- (id)initWithPath:(NSString *)path host:(SUHost *)host
+- (instancetype)initWithPath:(NSString *)path host:(SUHost *)host
 {
 	if ((self = [super init]))
 	{

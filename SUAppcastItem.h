@@ -49,11 +49,11 @@
 - (instancetype)initWithDictionary:(NSDictionary *)dict;
 - (instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString**)error;
 
-- (BOOL)isDeltaUpdate;
-- (BOOL)isCriticalUpdate;
+@property (getter=isDeltaUpdate, readonly) BOOL deltaUpdate;
+@property (getter=isCriticalUpdate, readonly) BOOL criticalUpdate;
 
 // Returns the dictionary provided in initWithDictionary; this might be useful later for extensions.
-- (NSDictionary *)propertiesDictionary;
+@property (readonly, copy) NSDictionary *propertiesDictionary;
 
 - (NSURL *)infoURL;						// UK 2007-08-31
 

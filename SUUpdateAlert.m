@@ -28,7 +28,7 @@
 @implementation SUUpdateAlert
 @synthesize delegate;
 
-- (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost
 {
 	self = [super initWithHost:host windowNibName:@"SUUpdateAlert"];
 	if (self)
@@ -203,7 +203,7 @@
 	#define DISTANCE_BETWEEN_BUTTON_GROUPS	12
 	
 	CGFloat				minimumWindowWidth = [[self window] frame].size.width -NSMaxX([installButton frame]) +NSMinX([skipButton frame]);	// Distance between contents and left/right edge.
-	NSDictionary*		attrs = [NSDictionary dictionaryWithObjectsAndKeys: [installButton font], NSFontAttributeName, nil];
+	NSDictionary*		attrs = @{NSFontAttributeName: [installButton font]};
 	NSSize				titleSize = [[installButton title] sizeWithAttributes: attrs];
 	titleSize.width += (16 + 8) * 2;	// 16 px for the end caps plus 8 px padding at each end or it'll look as ugly as calling -sizeToFit.
 	NSRect				installBtnBox = [installButton frame];

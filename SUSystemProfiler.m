@@ -33,7 +33,7 @@
 	
 	// Gather profile information and append it to the URL.
 	NSMutableArray *profileArray = [NSMutableArray array];
-	NSArray *profileDictKeys = [NSArray arrayWithObjects:@"key", @"displayKey", @"value", @"displayValue", nil];
+	NSArray *profileDictKeys = @[@"key", @"displayKey", @"value", @"displayValue"];
 	int error = 0;
 	int value = 0;
 	size_t length = sizeof(value);
@@ -41,7 +41,7 @@
 	// OS version
 	NSString *currentSystemVersion = [SUHost systemVersionString];
 	if (currentSystemVersion != nil)
-		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"osVersion",@"OS Version",currentSystemVersion,currentSystemVersion,nil] forKeys:profileDictKeys]];
+		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"osVersion",@"OS Version",currentSystemVersion,currentSystemVersion] forKeys:profileDictKeys]];
 	
 	// CPU type (decoder info for values found here is in mach/machine.h)
 	error = sysctlbyname("hw.cputype", &value, &length, NULL, 0);
@@ -54,7 +54,7 @@
 			case CPU_TYPE_POWERPC:	visibleCPUType = @"PowerPC";	break;
 			default:				visibleCPUType = @"Unknown";	break;
 		}
-		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"cputype",@"CPU Type", [NSNumber numberWithInt:value], visibleCPUType,nil] forKeys:profileDictKeys]];
+		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"cputype",@"CPU Type", @(value), visibleCPUType] forKeys:profileDictKeys]];
 	}
 	error = sysctlbyname("hw.cpu64bit_capable", &value, &length, NULL, 0);
 	if(error != 0)
@@ -66,7 +66,7 @@
 	
 	if (error == 0) {
 		is64bit = value == 1;
-		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"cpu64bit", @"CPU is 64-Bit?", [NSNumber numberWithBool:is64bit], is64bit ? @"Yes" : @"No", nil] forKeys:profileDictKeys]];
+		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"cpu64bit", @"CPU is 64-Bit?", @(is64bit), is64bit ? @"Yes" : @"No"] forKeys:profileDictKeys]];
 	}
 	error = sysctlbyname("hw.cpusubtype", &value, &length, NULL, 0);
 	if (error == 0) {
@@ -85,7 +85,7 @@
 		} else {
 			visibleCPUSubType = @"Other";
 		}
-		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"cpusubtype",@"CPU Subtype", [NSNumber numberWithInt:value], visibleCPUSubType,nil] forKeys:profileDictKeys]];
+		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"cpusubtype",@"CPU Subtype", @(value), visibleCPUSubType] forKeys:profileDictKeys]];
 	}
 	error = sysctlbyname("hw.model", NULL, &length, NULL, 0);
 	if (error == 0) {
@@ -93,11 +93,11 @@
 		if (cpuModel != NULL) {
 			error = sysctlbyname("hw.model", cpuModel, &length, NULL, 0);
 			if (error == 0) {
-				NSString *rawModelName = [NSString stringWithUTF8String:cpuModel];
-				NSString *visibleModelName = [modelTranslation objectForKey:rawModelName];
+				NSString *rawModelName = @(cpuModel);
+				NSString *visibleModelName = modelTranslation[rawModelName];
 				if (visibleModelName == nil)
 					visibleModelName = rawModelName;
-				[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"model",@"Mac Model", rawModelName, visibleModelName, nil] forKeys:profileDictKeys]];
+				[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"model",@"Mac Model", rawModelName, visibleModelName] forKeys:profileDictKeys]];
 			}
 			free(cpuModel);
 		}
@@ -106,21 +106,21 @@
 	// Number of CPUs
 	error = sysctlbyname("hw.ncpu", &value, &length, NULL, 0);
 	if (error == 0)
-		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"ncpu",@"Number of CPUs", [NSNumber numberWithInt:value], [NSNumber numberWithInt:value],nil] forKeys:profileDictKeys]];
+		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"ncpu",@"Number of CPUs", @(value), @(value)] forKeys:profileDictKeys]];
 	
 	// User preferred language
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
 	NSArray *languages = [defs objectForKey:@"AppleLanguages"];
 	if ([languages count] > 0)
-		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"lang",@"Preferred Language", [languages objectAtIndex:0], [languages objectAtIndex:0],nil] forKeys:profileDictKeys]];
+		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"lang",@"Preferred Language", languages[0], languages[0]] forKeys:profileDictKeys]];
 	
 	// Application sending the request
 	NSString *appName = [host name];
 	if (appName)
-		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"appName",@"Application Name", appName, appName,nil] forKeys:profileDictKeys]];
+		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"appName",@"Application Name", appName, appName] forKeys:profileDictKeys]];
 	NSString *appVersion = [host version];
 	if (appVersion)
-		[profileArray addObject:[NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:@"appVersion",@"Application Version", appVersion, appVersion,nil] forKeys:profileDictKeys]];
+		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"appVersion",@"Application Version", appVersion, appVersion] forKeys:profileDictKeys]];
 	
 	// Number of displays?
 

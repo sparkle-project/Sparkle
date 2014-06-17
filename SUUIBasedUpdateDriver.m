@@ -142,7 +142,7 @@
 	{
 		NSDictionary * attributes;
 		attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:downloadPath error:nil];
-		[statusController setMaxProgressValue:[[attributes objectForKey:NSFileSize] doubleValue]];
+		[statusController setMaxProgressValue:[attributes[NSFileSize] doubleValue]];
 	}
 	[statusController setProgressValue:[statusController progressValue] + (double)length];
 }
