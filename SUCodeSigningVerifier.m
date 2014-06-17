@@ -87,7 +87,7 @@ finally:
         NSMutableDictionary* relevantInfo = [NSMutableDictionary new];
         for (NSString* key in keys)
             [relevantInfo setObject:[signingDict objectForKey:key] forKey:key];
-        NSDictionary* infoPlist = signingDict[@"info-plist"];
+        NSDictionary* infoPlist = [signingDict objectForKey:@"info-plist"];
         [relevantInfo setObject:[infoPlist objectForKey:@"CFBundleShortVersionString"] forKey:@"version"];
         [relevantInfo setObject:[infoPlist objectForKey:@"CFBundleVersion"] forKey:@"build"];
         CFRelease(signingInfo);
