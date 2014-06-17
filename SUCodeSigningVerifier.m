@@ -86,10 +86,10 @@ finally:
         NSArray* keys = @[@"format", @"identifier", @"requirements", @"teamid", @"signing-time"];
         NSMutableDictionary* relevantInfo = [NSMutableDictionary new];
         for (NSString* key in keys)
-            relevantInfo[key] = signingDict[key];
+            [relevantInfo setObject:[signingDict objectForKey:key] forKey:key];
         NSDictionary* infoPlist = signingDict[@"info-plist"];
-        relevantInfo[@"version"] = infoPlist[@"CFBundleShortVersionString"];
-        relevantInfo[@"build"] = infoPlist[@"CFBundleVersion"];
+        [relevantInfo setObject:[infoPlist objectForKey:@"CFBundleShortVersionString"] forKey:@"version"];
+        [relevantInfo setObject:[infoPlist objectForKey:@"CFBundleVersion"] forKey:@"build"];
         CFRelease(signingInfo);
         SULog(@"%@: %@", label, relevantInfo);
     }
