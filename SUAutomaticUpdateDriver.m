@@ -144,8 +144,9 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
 {
-    if (relaunch)
+	if (relaunch) {
         [self stopUpdatingOnTermination];
+	}
 
     showErrors = YES;
     [super installWithToolAndRelaunch:relaunch displayingUserInterface:showUI];

@@ -60,8 +60,9 @@
 - (void)fetchAppcastFromURL:(NSURL *)url
 {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
-    if (userAgentString)
+	if (userAgentString) {
         [request setValue:userAgentString forHTTPHeaderField:@"User-Agent"];
+	}
             
     self.download = [[[NSURLDownload alloc] initWithRequest:request delegate:self] autorelease];
 }
@@ -264,8 +265,9 @@
     }
     lang = [NSBundle preferredLocalizationsFromArray:languages][0];
     i = [languages indexOfObject:([languages containsObject:lang] ? lang : @"")];
-    if (i == NSNotFound)
+	if (i == NSNotFound) {
         i = 0;
+	}
     return nodes[i];
 }
 

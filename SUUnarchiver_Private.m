@@ -57,8 +57,9 @@ static NSMutableArray *gUnarchiverImplementations;
 
 + (void)registerImplementation:(Class)implementation
 {
-	if (!gUnarchiverImplementations)
+	if (!gUnarchiverImplementations) {
 		gUnarchiverImplementations = [[NSMutableArray alloc] init];
+	}
 	[gUnarchiverImplementations addObject:implementation];
 }
 

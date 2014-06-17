@@ -162,8 +162,9 @@
 {	
 	NSString*	sizeStr = [host objectForInfoDictionaryKey:SUFixedHTMLDisplaySizeKey];
 
-	if( [host isBackgroundApplication] )
+	if ([host isBackgroundApplication]) {
 		[[self window] setLevel:NSFloatingWindowLevel];	// This means the window will float over all other apps, if our app is switched out ?! UK 2007-09-04
+	}
 	[[self window] setFrameAutosaveName: sizeStr ? @"" : @"SUUpdateAlertFrame"];
 		
 	// We're gonna do some frame magic to match the window's size to the description field and the presence of the release notes view.
@@ -174,8 +175,9 @@
 		// Resize the window to be appropriate for not having a huge release notes view.
 		frame.size.height -= [releaseNotesView frame].size.height + 40; // Extra 40 is for the release notes label and margin.
         
-        if ([self allowsAutomaticUpdates])
+		if ([self allowsAutomaticUpdates]) {
             frame.size.height += 10; // Make room for the check box.
+		}
 		
 		// Hiding the resize handles is not enough on 10.5, you can still click
 		//	where they would be, so we set the min/max sizes to be equal to
@@ -250,8 +252,9 @@
 		}
 	}
 	
-	if( frame.size.width < minimumWindowWidth )
+	if (frame.size.width < minimumWindowWidth) {
 		frame.size.width = minimumWindowWidth;
+	}
 
 	[[self window] setFrame: frame display: NO];
 	[[self window] center];
@@ -297,8 +300,9 @@
         updateItemVersion = [updateItemVersion stringByAppendingFormat:@" (%@)", [updateItem versionString]];
         hostVersion = [hostVersion stringByAppendingFormat:@" (%@)", [host version]];
     }
-	else
+	else {
 		[versionDisplayer formatVersion: &updateItemVersion andVersion: &hostVersion];
+	}
     return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", nil), [host name], updateItemVersion, hostVersion];
 }
 

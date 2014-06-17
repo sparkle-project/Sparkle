@@ -24,8 +24,9 @@
 
 - (void)didNotFindUpdate
 {
-	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
+	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
 		[[updater delegate] updaterDidNotFindUpdate:updater];
+	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:updater];
 	
 	[self abortUpdate];

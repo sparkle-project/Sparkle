@@ -136,8 +136,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		[validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
 		postFix = [version stringByTrimmingCharactersInSet:[validCharacters invertedSet]];
 	}
-	else
+	else {
 		postFix = @"old";
+	}
 	NSString *prefix = [NSString stringWithFormat: @"%@ (%@)", [[path lastPathComponent] stringByDeletingPathExtension], postFix];
 	#else
 	NSString *prefix = [[path lastPathComponent] stringByDeletingPathExtension];
@@ -147,8 +148,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	
 	// Now let's make sure we get a unique path.
 	int cnt=2;
-	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 9999)
+	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 9999) {
 		tempDir = [[tempDir stringByDeletingLastPathComponent] stringByAppendingPathComponent: [NSString stringWithFormat:@"%@ %d.%@", prefix, cnt++, [path pathExtension]]];
+	}
 	
 	return tempDir;
 }
@@ -489,8 +491,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		if (!success)
 		{
 			// We better move the old version back to its old location
-			if( hadFileAtDest )
+			if (hadFileAtDest) {
 				success = [manager moveItemAtPath:tmpPath toPath:dst error:error];
+			}
 			if (!success && error != NULL)
 				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath]}];
 			return NO;

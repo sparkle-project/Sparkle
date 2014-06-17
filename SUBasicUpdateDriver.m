@@ -55,12 +55,14 @@
 	id <SUVersionComparison> comparator = nil;
 	
 	// Give the delegate a chance to provide a custom version comparator
-	if ([[updater delegate] respondsToSelector:@selector(versionComparatorForUpdater:)])
+	if ([[updater delegate] respondsToSelector:@selector(versionComparatorForUpdater:)]) {
 		comparator = [[updater delegate] versionComparatorForUpdater:updater];
+	}
 	
 	// If we don't get a comparator from the delegate, use the default comparator
-	if (!comparator)
+	if (!comparator) {
 		comparator = [SUStandardVersionComparator defaultComparator];
+	}
 	
 	return comparator;	
 }
@@ -103,8 +105,9 @@
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac
 {
-	if ([[updater delegate] respondsToSelector:@selector(updater:didFinishLoadingAppcast:)])
+	if ([[updater delegate] respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
 		[[updater delegate] updater:updater didFinishLoadingAppcast:ac];
+	}
 	
 	NSDictionary *userInfo = (ac != nil) ? @{SUUpdaterAppcastNotificationKey : ac} : nil;
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:updater userInfo:userInfo];
@@ -160,8 +163,9 @@
 
 - (void)didNotFindUpdate
 {
-	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
+	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
 		[[updater delegate] updaterDidNotFindUpdate:updater];
+	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:updater];
 	
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUNoUpdateError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"You already have the newest version of %@.", nil), [host name]]}]];
@@ -309,13 +313,15 @@
         [invocation setArgument:&relaunch atIndex:2];
         [invocation setTarget:self];
         postponedOnce = YES;
-        if ([[updater delegate] updater:updater shouldPostponeRelaunchForUpdate:updateItem untilInvoking:invocation])
+		if ([[updater delegate] updater:updater shouldPostponeRelaunchForUpdate:updateItem untilInvoking:invocation]) {
             return;
     }
+	}
 
     
-	if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdate:)])
+	if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdate:)]) {
 		[[updater delegate] updater:updater willInstallUpdate:updateItem];
+	}
 
     NSString *const finishInstallToolName = FINISH_INSTALL_TOOL_NAME_STRING;
 
@@ -348,8 +354,9 @@
     }
 
     NSString *pathToRelaunch = [host bundlePath];
-    if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
+	if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
         pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
+	}
     NSString *relaunchToolPath = [[relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS"] stringByAppendingPathComponent: finishInstallToolName];
     [NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:@[[host bundlePath],
 																	pathToRelaunch,
@@ -391,12 +398,15 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-	if ([error code] != SUNoUpdateError) // Let's not bother logging this.
+	if ([error code] != SUNoUpdateError) { // Let's not bother logging this.
 		SULog(@"Sparkle Error: %@", [error localizedDescription]);
-	if ([error localizedFailureReason])
+	}
+	if ([error localizedFailureReason]) {
 		SULog(@"Sparkle Error (continued): %@", [error localizedFailureReason]);
-	if (download)
+	}
+	if (download) {
 		[download cancel];
+	}
 	[self abortUpdate];
 }
 

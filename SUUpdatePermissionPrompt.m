@@ -125,8 +125,9 @@
 
 - (IBAction)finishPrompt:(id)sender
 {
-	if (![delegate respondsToSelector:@selector(updatePermissionPromptFinishedWithResult:)])
+	if (![delegate respondsToSelector:@selector(updatePermissionPromptFinishedWithResult:)]) {
 		[NSException raise:@"SUInvalidDelegate" format:@"SUUpdatePermissionPrompt's delegate (%@) doesn't respond to updatePermissionPromptFinishedWithResult:!", delegate];
+	}
 	[host setBool:shouldSendProfile forUserDefaultsKey:SUSendProfileInfoKey];
 	[delegate updatePermissionPromptFinishedWithResult:([sender tag] == 1 ? SUAutomaticallyCheck : SUDoNotAutomaticallyCheck)];
 	[[self window] close];

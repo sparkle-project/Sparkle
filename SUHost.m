@@ -25,12 +25,14 @@
 	{
 		if (aBundle == nil) aBundle = [NSBundle mainBundle];
         self.bundle = aBundle;
-		if (![bundle bundleIdentifier])
+		if (![bundle bundleIdentifier]) {
 			SULog(@"Sparkle Error: the bundle being updated at %@ has no CFBundleIdentifier! This will cause preference read/write to not work properly.", bundle);
+		}
 
 		defaultsDomain = [[bundle objectForInfoDictionaryKey:SUDefaultsDomainKey] retain];
-		if (!defaultsDomain)
+		if (!defaultsDomain) {
 			defaultsDomain = [[bundle bundleIdentifier] retain];
+		}
 
 		// If we're using the main bundle's defaults we'll use the standard user defaults mechanism, otherwise we have to get CF-y.
 		usesStandardUserDefaults = [defaultsDomain isEqualToString:[[NSBundle mainBundle] bundleIdentifier]];
@@ -61,8 +63,9 @@
         SULog(@"Failed to find app support directory! Using ~/Library/Application Support...");
         appSupportPath = [@"~/Library/Application Support" stringByExpandingTildeInPath];
     }
-    else
+	else {
         appSupportPath = appSupportPaths[0];
+	}
     appSupportPath = [appSupportPath stringByAppendingPathComponent:[self name]];
     appSupportPath = [appSupportPath stringByAppendingPathComponent:@".Sparkle"];
     return appSupportPath;
@@ -73,8 +76,9 @@
 #if NORMALIZE_INSTALLED_APP_NAME
     // We'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
     NSString *normalizedAppPath = [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.%@", [bundle objectForInfoDictionaryKey:@"CFBundleName"], [[bundle bundlePath] pathExtension]]];
-    if (![[NSFileManager defaultManager] fileExistsAtPath:[[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.%@", [bundle objectForInfoDictionaryKey:@"CFBundleName"], [[bundle bundlePath] pathExtension]]]])
+	if (![[NSFileManager defaultManager] fileExistsAtPath:[[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.%@", [bundle objectForInfoDictionaryKey:@"CFBundleName"], [[bundle bundlePath] pathExtension]]]]) {
         return normalizedAppPath;
+	}
 #endif
 	return [bundle bundlePath];
 }
@@ -116,8 +120,9 @@
 	// extension, although it may."
 	//
 	// However, if it *does* include the '.icns' the above method fails (tested on OS X 10.3.9) so we'll also try:
-	if (!iconPath)
+	if (!iconPath) {
 		iconPath = [bundle pathForResource:[bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType: nil];
+	}
 	NSImage *icon = [[[NSImage alloc] initWithContentsOfFile:iconPath] autorelease];
 	// Use a default icon if none is defined.
 	if (!icon) {
@@ -174,8 +179,9 @@
 	// Under Tiger, CFPreferencesCopyAppValue doesn't get values from NSRegistrationDomain, so anything
 	// passed into -[NSUserDefaults registerDefaults:] is ignored.  The following line falls
 	// back to using NSUserDefaults, but only if the host bundle is the main bundle.
-	if (usesStandardUserDefaults)
+	if (usesStandardUserDefaults) {
 		return [[NSUserDefaults standardUserDefaults] objectForKey:defaultName];
+	}
 	
 	CFPropertyListRef obj = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)defaultsDomain);
 	return [(id)CFMakeCollectable(obj) autorelease];
@@ -196,13 +202,15 @@
 
 - (BOOL)boolForUserDefaultsKey:(NSString *)defaultName
 {
-	if (usesStandardUserDefaults)
+	if (usesStandardUserDefaults) {
 		return [[NSUserDefaults standardUserDefaults] boolForKey:defaultName];
+	}
 	
 	BOOL value;
 	CFPropertyListRef plr = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)defaultsDomain);
-	if (plr == NULL)
+	if (plr == NULL) {
 		value = NO;
+	}
 	else
 	{
 		value = (BOOL)CFBooleanGetValue((CFBooleanRef)plr);

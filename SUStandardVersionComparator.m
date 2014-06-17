@@ -18,8 +18,9 @@
 + (SUStandardVersionComparator *)defaultComparator
 {
 	static SUStandardVersionComparator *defaultComparator = nil;
-	if (defaultComparator == nil)
+	if (defaultComparator == nil) {
 		defaultComparator = [[SUStandardVersionComparator alloc] init];
+	}
 	return defaultComparator;
 }
 

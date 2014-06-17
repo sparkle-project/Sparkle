@@ -23,8 +23,9 @@
 
 - (void)didNotFindUpdate
 {
-	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
+	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
 		[[updater delegate] updaterDidNotFindUpdate:updater];
+	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:updater];
 	
 	[self abortUpdate]; // Don't tell the user that no update was found; this was a scheduled update.

@@ -17,8 +17,9 @@ NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
 - (instancetype) initWithUpdater:(SUUpdater *)anUpdater
 {
-	if ((self = [super init]))
+	if ((self = [super init])) {
 		updater = anUpdater;
+	}
 	return self;
 }
 

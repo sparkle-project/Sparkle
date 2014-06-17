@@ -83,8 +83,9 @@
 	}
 	pclose(cmdFP);
 	
-	if( ferror( fp ) )
+	if (ferror(fp)) {
 		goto reportError;
+	}
 	
 	[self performSelectorOnMainThread:@selector(notifyDelegateOfSuccess) withObject:nil waitUntilDone:NO];
 	goto finally;

@@ -74,8 +74,9 @@ static NSDictionary *infoForFile(FTSENT *ent)
 {
     NSData *hash = hashOfFile(ent);
     NSNumber *size = nil;
-    if (ent->fts_info != FTS_D)
+	if (ent->fts_info != FTS_D) {
         size = [NSNumber numberWithUnsignedLongLong:ent->fts_statp->st_size];
+	}
     return [NSDictionary dictionaryWithObjectsAndKeys:hash, @"hash", [NSNumber numberWithUnsignedShort:ent->fts_info], @"type", size, @"size", nil];
 }
 
@@ -96,25 +97,30 @@ static NSString *temporaryPatchFile(NSString *patchFile)
 static BOOL shouldSkipDeltaCompression(NSString *key, NSDictionary* originalInfo, NSDictionary *newInfo)
 {
     unsigned long long fileSize = [[newInfo objectForKey:@"size"] unsignedLongLongValue];
-    if (fileSize < 4096)
+	if (fileSize < 4096) {
         return YES;
+	}
 
-    if (!originalInfo)
+	if (!originalInfo) {
         return YES;
+	}
 
-    if ([[originalInfo objectForKey:@"type"] unsignedShortValue] != [[newInfo objectForKey:@"type"] unsignedShortValue])
+	if ([[originalInfo objectForKey:@"type"] unsignedShortValue] != [[newInfo objectForKey:@"type"] unsignedShortValue]) {
         return YES;
+	}
 
     return NO;
 }
 
 static BOOL shouldDeleteThenExtract(NSString *key, NSDictionary* originalInfo, NSDictionary *newInfo)
 {
-    if (!originalInfo)
+	if (!originalInfo) {
         return NO;
+	}
 
-    if ([[originalInfo objectForKey:@"type"] unsignedShortValue] != [[newInfo objectForKey:@"type"] unsignedShortValue])
+	if ([[originalInfo objectForKey:@"type"] unsignedShortValue] != [[newInfo objectForKey:@"type"] unsignedShortValue]) {
         return YES;
+	}
 
     return NO;
 }
@@ -157,12 +163,14 @@ usage:
     fprintf(stderr, "Processing %s...", [oldPath UTF8String]);
     FTSENT *ent = 0;
     while ((ent = fts_read(fts))) {
-        if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D)
+		if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D) {
             continue;
+		}
 
         NSString *key = pathRelativeToDirectory(oldPath, stringWithFileSystemRepresentation(ent->fts_path));
-        if (![key length])
+		if (![key length]) {
             continue;
+		}
 
         NSDictionary *info = infoForFile(ent);
         [originalTreeState setObject:info forKey:key];
@@ -188,12 +196,14 @@ usage:
 
 
     while ((ent = fts_read(fts))) {
-        if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D)
+		if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D) {
             continue;
+		}
 
         NSString *key = pathRelativeToDirectory(newPath, stringWithFileSystemRepresentation(ent->fts_path));
-        if (![key length])
+		if (![key length]) {
             continue;
+		}
 
         NSDictionary *info = infoForFile(ent);
         NSDictionary *oldInfo = [originalTreeState objectForKey:key];
@@ -236,8 +246,9 @@ usage:
             NSString *path = [newPath stringByAppendingPathComponent:key];
             xar_file_t newFile = xar_add_frompath(x, 0, [key fileSystemRepresentation], [path fileSystemRepresentation]);
             assert(newFile);
-            if (shouldDeleteThenExtract(key, originalInfo, newInfo))
+			if (shouldDeleteThenExtract(key, originalInfo, newInfo)) {
                 xar_prop_set(newFile, "delete-then-extract", "true");
+			}
         } else {
             CreateBinaryDeltaOperation *operation = [[CreateBinaryDeltaOperation alloc] initWithRelativePath:key oldTree:oldPath newTree:newPath];
             [deltaQueue addOperation:operation];

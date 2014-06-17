@@ -120,8 +120,9 @@
 		NSString*	enclosureURLString = enclosure[@"url"];
 		if( !enclosureURLString && !theInfoURL )
 		{
-			if (error)
+			if (error) {
 				*error = @"Feed item's enclosure lacks URL";
+			}
 			[self release];
 			return nil;
 		}
@@ -130,16 +131,18 @@
 			NSString *fileURLString = [[enclosureURLString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 			self.fileURL = [NSURL URLWithString:fileURLString];
 		}
-		if( enclosure )
+		if (enclosure) {
 			self.DSASignature = enclosure[@"sparkle:dsaSignature"];
+		}
 		
 		self.versionString = newVersion;
 		self.minimumSystemVersion = dict[@"sparkle:minimumSystemVersion"];
         self.maximumSystemVersion = dict[@"sparkle:maximumSystemVersion"];
 		
 		NSString *shortVersionString = enclosure[@"sparkle:shortVersionString"];
-        if (nil == shortVersionString)
+		if (nil == shortVersionString) {
             shortVersionString = dict[@"sparkle:shortVersionString"]; // fall back on the <item>
+		}
         
 		if (shortVersionString)
 			self.displayVersionString = shortVersionString;

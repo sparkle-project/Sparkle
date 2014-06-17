@@ -63,8 +63,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 {
     if (bundle == nil) bundle = [NSBundle mainBundle];
 	id updater = sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]];
-	if (updater == nil)
+	if (updater == nil) {
 		updater = [[[[self class] alloc] initForBundle:bundle] autorelease];
+	}
 	return updater;
 }
 
@@ -75,8 +76,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
     if (bundle == nil) bundle = [NSBundle mainBundle];
 	
 	// Register as observer straight away to avoid exceptions on -dealloc when -unregisterAsObserver is called:
-	if (self)
+	if (self) {
 		[self registerAsObserver];
+	}
 	
 	id updater = sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]];
     if (updater)
@@ -86,8 +88,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	}
 	else if (self)
 	{
-		if (sharedUpdaters == nil)
+		if (sharedUpdaters == nil) {
             sharedUpdaters = [[NSMutableDictionary alloc] init];
+		}
         sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]] = self;
         host = [[SUHost alloc] initWithBundle:bundle];
 		
@@ -153,8 +156,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
     // Has he been asked already? And don't ask if the host has a default value set in its Info.plist.
     else if ([host objectForKey:SUEnableAutomaticChecksKey] == nil)
     {
-        if ([host objectForUserDefaultsKey:SUEnableAutomaticChecksKeyOld])
+		if ([host objectForUserDefaultsKey:SUEnableAutomaticChecksKeyOld]) {
             [self setAutomaticallyChecksForUpdates:[host boolForUserDefaultsKey:SUEnableAutomaticChecksKeyOld]];
+		}
         // Now, we don't want to ask the user for permission to do a weird thing on the first launch.
         // We wait until the second launch, unless explicitly overridden via SUPromptUserOnFirstLaunchKey.
         else if (![host objectForKey:SUPromptUserOnFirstLaunchKey])
@@ -172,8 +176,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
     {
 		NSArray *profileInfo = [host systemProfile];
 		// Always say we're sending the system profile here so that the delegate displays the parameters it would send.
-		if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) 
+		if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
 			profileInfo = [profileInfo arrayByAddingObjectsFromArray:[delegate feedParametersForUpdater:self sendingSystemProfile:YES]];
+		}
         [SUUpdatePermissionPrompt promptWithHost:host systemProfile:profileInfo delegate:self];
         // We start the update checks and register as observer for changes after the prompt finishes
 	}
@@ -303,8 +308,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 - (IBAction)checkForUpdates: (id)sender
 {
-	if (driver && [driver isInterruptible])
+	if (driver && [driver isInterruptible]) {
 		[driver abortUpdate];
+	}
 
 	[self checkForUpdatesWithDriver:[[[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self] autorelease]];
 }
@@ -395,8 +401,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	[host setBool:automaticallyCheckForUpdates forUserDefaultsKey:SUEnableAutomaticChecksKey];
 	// Hack to support backwards compatibility with older Sparkle versions, which supported
 	// disabling updates by setting the check interval to 0.
-    if (automaticallyCheckForUpdates && [self updateCheckInterval] == 0)
+	if (automaticallyCheckForUpdates && [self updateCheckInterval] == 0) {
         [self setUpdateCheckInterval:SU_DEFAULT_CHECK_INTERVAL];
+	}
     [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
 	// Provide a small delay in case multiple preferences are being updated simultaneously.
     [self performSelector:@selector(resetUpdateCycle) withObject:nil afterDelay:1];
@@ -405,8 +412,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - (BOOL)automaticallyChecksForUpdates
 {
 	// Don't automatically update when the check interval is 0, to be compatible with 1.1 settings.
-    if ([self updateCheckInterval] == 0)
+	if ([self updateCheckInterval] == 0) {
         return NO;	
+	}
 	return [host boolForKey:SUEnableAutomaticChecksKey];
 }
 
@@ -418,8 +426,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - (BOOL)automaticallyDownloadsUpdates
 {
 	// If the SUAllowsAutomaticUpdatesKey exists and is set to NO, return NO.
-	if ([host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] && [host boolForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] == NO)
+	if ([host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] && [host boolForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] == NO) {
 		return NO;
+	}
 	
 	// Otherwise, automatically downloading updates is allowed. Does the user want it?
 	return [host boolForUserDefaultsKey:SUAutomaticallyUpdateKey];
@@ -457,8 +466,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 - (NSString *)userAgentString
 {
-	if (customUserAgentString)
+	if (customUserAgentString) {
 		return customUserAgentString;
+	}
 
 	NSString *version = [SPARKLE_BUNDLE objectForInfoDictionaryKey:@"CFBundleVersion"];
 	NSString *userAgent = [NSString stringWithFormat:@"%@/%@ Sparkle/%@", [host name], [host displayVersion], version ? version : @"?"];
@@ -485,14 +495,16 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 	// Let's only send the system profiling information once per week at most, so we normalize daily-checkers vs. biweekly-checkers and the such.
 	NSDate *lastSubmitDate = [host objectForUserDefaultsKey:SULastProfileSubmitDateKey];
-	if(!lastSubmitDate)
+	if (!lastSubmitDate) {
 	    lastSubmitDate = [NSDate distantPast];
+	}
 	const NSTimeInterval oneWeek = 60 * 60 * 24 * 7;
 	sendingSystemProfile &= (-[lastSubmitDate timeIntervalSinceNow] >= oneWeek);
 
 	NSArray *parameters = @[];
-	if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)])
+	if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
 		parameters = [parameters arrayByAddingObjectsFromArray:[delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile]];
+	}
 	if (sendingSystemProfile)
 	{
 		parameters = [parameters arrayByAddingObjectsFromArray:[host systemProfile]];
@@ -502,12 +514,14 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	
 	// Build up the parameterized URL.
 	NSMutableArray *parameterStrings = [NSMutableArray array];
-	for (NSDictionary *currentProfileInfo in parameters)
+	for (NSDictionary *currentProfileInfo in parameters) {
 		[parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", [[currentProfileInfo[@"key"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], [[currentProfileInfo[@"value"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+	}
 	
 	NSString *separatorCharacter = @"?";
-	if ([baseFeedURL query])
+	if ([baseFeedURL query]) {
 		separatorCharacter = @"&"; // In case the URL is already http://foo.org/baz.xml?bat=4
+	}
 	NSString *appcastStringWithProfile = [NSString stringWithFormat:@"%@%@%@", [baseFeedURL absoluteString], separatorCharacter, [parameterStrings componentsJoinedByString:@"&"]];
 	
 	// Clean it up so it's a valid URL
@@ -517,8 +531,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - (void)setUpdateCheckInterval:(NSTimeInterval)updateCheckInterval
 {
 	[host setObject:@(updateCheckInterval) forUserDefaultsKey:SUScheduledCheckIntervalKey];
-	if (updateCheckInterval == 0) // For compatibility with 1.1's settings.
+	if (updateCheckInterval == 0) { // For compatibility with 1.1's settings.
 		[self setAutomaticallyChecksForUpdates:NO];
+	}
 	[[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
 	
 	// Provide a small delay in case multiple preferences are being updated simultaneously.
@@ -545,8 +560,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item
 {
-	if ([item action] == @selector(checkForUpdates:))
+	if ([item action] == @selector(checkForUpdates:)) {
 		return ![self updateInProgress];
+	}
 	return YES;
 }
 

@@ -41,8 +41,9 @@
 
 - (instancetype) initWithHostPath:(const char *)inhostpath executablePath:(const char *)execpath parentProcessId:(pid_t)ppid folderPath:(const char*)infolderpath shouldRelaunch:(BOOL)relaunch shouldShowUI:(BOOL)showUI selfPath:(NSString*)inSelfPath
 {
-	if( !(self = [super init]) )
+	if (!(self = [super init])) {
 		return nil;
+	}
 	
 	hostpath		= inhostpath;
 	executablepath	= execpath;
@@ -173,8 +174,9 @@
 
 int main (int argc, const char * argv[])
 {
-	if( argc < 5 || argc > 7 )
+	if (argc < 5 || argc > 7) {
 		return EXIT_FAILURE;
+	}
 	
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
@@ -183,8 +185,9 @@ int main (int argc, const char * argv[])
 		
 	#if 0	// Cmdline tool
 	NSString*	selfPath = nil;
-	if( argv[0][0] == '/' )
+	if (argv[0][0] == '/') {
 		selfPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation: argv[0] length: strlen(argv[0])];
+	}
 	else
 	{
 		selfPath = [[NSFileManager defaultManager] currentDirectoryPath];

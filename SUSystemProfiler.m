@@ -16,8 +16,9 @@
 + (SUSystemProfiler *)sharedSystemProfiler
 {
 	static SUSystemProfiler *sharedSystemProfiler = nil;
-	if (!sharedSystemProfiler)
+	if (!sharedSystemProfiler) {
 		sharedSystemProfiler = [[self alloc] init];
+	}
 	return sharedSystemProfiler;
 }
 
@@ -40,8 +41,9 @@
 	
 	// OS version
 	NSString *currentSystemVersion = [SUHost systemVersionString];
-	if (currentSystemVersion != nil)
+	if (currentSystemVersion != nil) {
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"osVersion",@"OS Version",currentSystemVersion,currentSystemVersion] forKeys:profileDictKeys]];
+	}
 	
 	// CPU type (decoder info for values found here is in mach/machine.h)
 	error = sysctlbyname("hw.cputype", &value, &length, NULL, 0);
@@ -57,10 +59,12 @@
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"cputype",@"CPU Type", @(value), visibleCPUType] forKeys:profileDictKeys]];
 	}
 	error = sysctlbyname("hw.cpu64bit_capable", &value, &length, NULL, 0);
-	if(error != 0)
+	if (error != 0) {
 		error = sysctlbyname("hw.optional.x86_64", &value, &length, NULL, 0); //x86 specific
-	if(error != 0)
+	}
+	if (error != 0) {
 		error = sysctlbyname("hw.optional.64bitops", &value, &length, NULL, 0); //PPC specific
+	}
 	
 	BOOL is64bit = NO;
 	
@@ -95,8 +99,9 @@
 			if (error == 0) {
 				NSString *rawModelName = @(cpuModel);
 				NSString *visibleModelName = modelTranslation[rawModelName];
-				if (visibleModelName == nil)
+				if (visibleModelName == nil) {
 					visibleModelName = rawModelName;
+				}
 				[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"model",@"Mac Model", rawModelName, visibleModelName] forKeys:profileDictKeys]];
 			}
 			free(cpuModel);
@@ -105,22 +110,26 @@
 	
 	// Number of CPUs
 	error = sysctlbyname("hw.ncpu", &value, &length, NULL, 0);
-	if (error == 0)
+	if (error == 0) {
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"ncpu",@"Number of CPUs", @(value), @(value)] forKeys:profileDictKeys]];
+	}
 	
 	// User preferred language
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
 	NSArray *languages = [defs objectForKey:@"AppleLanguages"];
-	if ([languages count] > 0)
+	if ([languages count] > 0) {
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"lang",@"Preferred Language", languages[0], languages[0]] forKeys:profileDictKeys]];
+	}
 	
 	// Application sending the request
 	NSString *appName = [host name];
-	if (appName)
+	if (appName) {
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"appName",@"Application Name", appName, appName] forKeys:profileDictKeys]];
+	}
 	NSString *appVersion = [host version];
-	if (appVersion)
+	if (appVersion) {
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"appVersion",@"Application Version", appVersion, appVersion] forKeys:profileDictKeys]];
+	}
 	
 	// Number of displays?
 
