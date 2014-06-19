@@ -42,7 +42,7 @@
 
 @property  BOOL sendsSystemProfile;
 
-@property (readonly) BOOL automaticallyDownloadsUpdates;
+@property  BOOL automaticallyDownloadsUpdates;
 
 // This IBAction is meant for a main menu item. Hook up any menu item to this action,
 // and Sparkle will check for updates and report back its findings verbosely.

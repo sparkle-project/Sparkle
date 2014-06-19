@@ -32,7 +32,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (instancetype)initForBundle:(NSBundle *)bundle;
 - (void)startUpdateCycle;
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
-@property (readwrite) BOOL automaticallyDownloadsUpdates;
 - (void)scheduleNextUpdateCheck;
 - (void)registerAsObserver;
 - (void)unregisterAsObserver;
