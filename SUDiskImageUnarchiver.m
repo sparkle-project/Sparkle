@@ -40,11 +40,12 @@
 	SULog(@"Extracting %@ as a DMG", archivePath);
 	
 	// get a unique mount point path
-	NSString *mountPointName = nil;
 	NSString *mountPoint = nil;
 	FSRef tmpRef;
 	do
 	{
+		// Using NSUUID would make creating UUIDs be done in Cocoa,
+		// and thus managed under ARC. Sadly, the class is in 10.8 and later.
 		CFUUIDRef uuid = CFUUIDCreate(NULL);
 		if (uuid)
 		{
@@ -90,8 +91,6 @@
 	mountedSuccessfully = YES;
 	
 	// Now that we've mounted it, we need to copy out its contents.
-	if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6) {
-		// On 10.7 and later we don't want to use the File Manager API and instead want to use NSFileManager (fixes #827357).
 		NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
         NSError *error = nil;
         NSArray *contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
@@ -119,18 +118,6 @@
                 goto reportError;
             }
         }
-	}
-	else {
-		FSRef srcRef, dstRef;
-		OSStatus err;
-		err = FSPathMakeRef((UInt8 *)[mountPoint fileSystemRepresentation], &srcRef, NULL);
-		if (err != noErr) goto reportError;
-		err = FSPathMakeRef((UInt8 *)[[archivePath stringByDeletingLastPathComponent] fileSystemRepresentation], &dstRef, NULL);
-		if (err != noErr) goto reportError;
-		
-		err = FSCopyObjectSync(&srcRef, &dstRef, (CFStringRef)mountPointName, NULL, kFSFileOperationSkipSourcePermissionErrors);
-		if (err != noErr) goto reportError;
-	}
 	
 	[self performSelectorOnMainThread:@selector(notifyDelegateOfSuccess) withObject:nil waitUntilDone:NO];
 	goto finally;
