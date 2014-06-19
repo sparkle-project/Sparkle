@@ -184,7 +184,7 @@
 	}
 	
 	CFPropertyListRef obj = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)defaultsDomain);
-	return [(id)CFMakeCollectable(obj) autorelease];
+	return CFBridgingRelease(obj);
 }
 
 - (void)setObject:(id)value forUserDefaultsKey:(NSString *)defaultName;

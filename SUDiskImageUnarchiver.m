@@ -49,11 +49,10 @@
 		CFUUIDRef uuid = CFUUIDCreate(NULL);
 		if (uuid)
 		{
-			CFStringRef uuidString = CFUUIDCreateString(NULL, uuid);
+			NSString *uuidString = CFBridgingRelease(CFUUIDCreateString(NULL, uuid));
 			if (uuidString)
 			{
-				mountPoint = [@"/Volumes" stringByAppendingPathComponent:(NSString*)uuidString];
-				CFRelease(uuidString);
+				mountPoint = [@"/Volumes" stringByAppendingPathComponent:uuidString];
 			}
 			CFRelease(uuid);
 		}

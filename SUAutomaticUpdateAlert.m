@@ -10,16 +10,25 @@
 
 #import "SUHost.h"
 
+@interface SUAutomaticUpdateAlert ()
+@property (retain) SUAppcastItem *updateItem;
+@property (assign) id<SUAutomaticUpdateAlertDelegateProtocol> delegate;
+@property (retain) SUHost *host;
+@end
+
 @implementation SUAutomaticUpdateAlert
+@synthesize delegate;
+@synthesize host;
+@synthesize updateItem;
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost delegate:(id<SUAutomaticUpdateAlertDelegateProtocol>)del
 {
 	self = [super initWithHost:aHost windowNibName:@"SUAutomaticUpdateAlert"];
 	if (self)
 	{
-		updateItem = [item retain];
-		delegate = del;
-		host = [aHost retain];
+		self.updateItem = item;
+		self.delegate = del;
+		self.host = aHost;
 		[self setShouldCascadeWindows:NO];	
 		[[self window] center];
 	}
@@ -28,8 +37,8 @@
 
 - (void)dealloc
 {
-	[host release];
-	[updateItem release];
+	self.host = nil;
+	self.updateItem = nil;
 	[super dealloc];
 }
 

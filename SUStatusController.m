@@ -26,6 +26,8 @@
 @synthesize title;
 @synthesize buttonTitle;
 @synthesize host;
+@synthesize actionButton;
+@synthesize progressBar;
 
 - (instancetype)initWithHost:(SUHost *)aHost
 {

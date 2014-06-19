@@ -13,14 +13,8 @@
 
 @class SUHost;
 @interface SUStatusController : SUWindowController
-{
-@private
-	double progressValue, maxProgressValue;
-	NSString *title, *statusText, *buttonTitle;
-	IBOutlet NSButton *actionButton;
-	IBOutlet NSProgressIndicator* progressBar;
-	SUHost *host;
-}
+@property (assign) IBOutlet NSButton *actionButton;
+@property (assign) IBOutlet NSProgressIndicator* progressBar;
 
 @property (copy) NSString *statusText;
 @property double progressValue;

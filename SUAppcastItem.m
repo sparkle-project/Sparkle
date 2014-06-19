@@ -27,6 +27,7 @@
 @property (copy, readwrite) NSString *displayVersionString;
 @property (copy, readwrite) NSDictionary *deltaUpdates;
 @property (retain, readwrite) NSURL *infoURL;
+@property (readwrite, copy) NSDictionary *propertiesDictionary;
 @end
 
 @implementation SUAppcastItem
@@ -42,6 +43,7 @@
 @synthesize releaseNotesURL;
 @synthesize title;
 @synthesize versionString;
+@synthesize propertiesDictionary;
 
 - (BOOL)isDeltaUpdate
 {
@@ -161,7 +163,7 @@
 		{
             NSMutableDictionary *deltas = [NSMutableDictionary dictionary];
             NSArray *deltaDictionaries = dict[@"deltas"];
-			for (NSDictionary *deltaDictionary in [deltaDictionaries objectEnumerator]) {
+			for (NSDictionary *deltaDictionary in deltaDictionaries) {
 				NSMutableDictionary *fakeAppCastDict = [dict mutableCopy];
                 [fakeAppCastDict removeObjectForKey:@"deltas"];
                 fakeAppCastDict[@"enclosure"] = deltaDictionary;
@@ -189,13 +191,8 @@
 	self.versionString = nil;
 	self.displayVersionString = nil;
 	self.infoURL = nil;
-	[propertiesDictionary release];
+	self.propertiesDictionary = nil;
     [super dealloc];
-}
-
-- (NSDictionary *)propertiesDictionary
-{
-	return propertiesDictionary;
 }
 
 @end

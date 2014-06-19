@@ -17,14 +17,11 @@
 @interface SUUpdater : NSObject
 {
 @private
-	NSTimer *checkTimer;
 	SUUpdateDriver *driver;
 
-	NSString *customUserAgentString;
 	SUHost *host;
-	IBOutlet id delegate;
 }
-@property (assign) id delegate;
+@property (assign) IBOutlet id delegate;
 
 + (SUUpdater *)sharedUpdater;
 + (SUUpdater *)updaterForBundle:(NSBundle *)bundle;
