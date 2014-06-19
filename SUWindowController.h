@@ -12,7 +12,7 @@
 #import <Cocoa/Cocoa.h>
 
 @class SUHost;
-@interface SUWindowController : NSWindowController { }
+@interface SUWindowController : NSWindowController
 // We use this instead of plain old NSWindowController initWithWindowNibName so that we'll be able to find the right path when running in a bundle loaded from another app.
 - (instancetype)initWithHost:(SUHost *)host windowNibName:(NSString *)nibName;
 @end

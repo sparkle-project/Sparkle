@@ -27,6 +27,7 @@
 
 @implementation SUUpdateAlert
 @synthesize delegate;
+@synthesize versionDisplayer;
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost
 {
@@ -52,11 +53,6 @@
 	[updateItem release];
 	[host release];
 	[super dealloc];
-}
-
-- (void)setVersionDisplayer: (id<SUVersionDisplay>)disp
-{
-	versionDisplayer = disp;
 }
 
 - (void)endWithSelection:(SUUpdateAlertChoice)choice

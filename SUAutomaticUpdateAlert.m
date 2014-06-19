@@ -35,19 +35,19 @@
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [host bundlePath], [host installationPath]]; }
 
-- (IBAction)installNow:sender
+- (IBAction)installNow:(id)sender
 {
 	[self close];
 	[delegate automaticUpdateAlert:self finishedWithChoice:SUInstallNowChoice];
 }
 
-- (IBAction)installLater:sender
+- (IBAction)installLater:(id)sender
 {
 	[self close];
 	[delegate automaticUpdateAlert:self finishedWithChoice:SUInstallLaterChoice];
 }
 
-- (IBAction)doNotInstall:sender
+- (IBAction)doNotInstall:(id)sender
 {
 	[self close];
 	[delegate automaticUpdateAlert:self finishedWithChoice:SUDoNotInstallChoice];

@@ -77,6 +77,7 @@
 		NSString *visibleCPUSubType;
 		if (cpuType == 7) {
 			// Intel
+			// TODO: other Intel processors, like Core i7, i5, i3, Xeon?
 			visibleCPUSubType = is64bit ? @"Intel Core 2" : @"Intel Core";	// If anyone knows how to tell a Core Duo from a Core Solo, please email tph@atomicbird.com
 		} else if (cpuType == 18) {
 			// PowerPC

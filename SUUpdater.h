@@ -38,7 +38,7 @@
 
 @property (copy) NSURL *feedURL;	// *** MUST BE CALLED ON MAIN THREAD ***
 
-@property (copy) NSString *userAgentString;
+@property (nonatomic, copy) NSString *userAgentString;
 
 @property  BOOL sendsSystemProfile;
 

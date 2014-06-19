@@ -27,7 +27,7 @@ NSString *const SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotific
 NSString *const SUUpdaterAppcastItemNotificationKey = @"SUUpdaterAppcastItemNotificationKey";
 NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotificationKey";
 
-@interface SUUpdater ()
+@interface SUUpdater () <SUUpdatePermissionPromptDelegateProtocol>
 @property (retain) NSTimer *checkTimer;
 - (instancetype)initForBundle:(NSBundle *)bundle;
 - (void)startUpdateCycle;
@@ -46,6 +46,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @implementation SUUpdater
 @synthesize delegate;
 @synthesize checkTimer;
+@synthesize userAgentString = customUserAgentString;
 
 #pragma mark Initialization
 
@@ -452,15 +453,6 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 		return nil;
 	else
 		return [NSURL URLWithString: castUrlStr];
-}
-
-- (void)setUserAgentString:(NSString *)userAgent
-{
-	if (customUserAgentString == userAgent)
-		return;
-
-	[customUserAgentString release];
-	customUserAgentString = [userAgent copy];
 }
 
 - (NSString *)userAgentString

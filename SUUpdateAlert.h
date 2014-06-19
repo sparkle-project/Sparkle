@@ -38,14 +38,13 @@ typedef enum
 	BOOL webViewFinishedLoading;
 }
 @property (assign) id<SUUpdateAlertDelegate> delegate;
+@property (assign) id<SUVersionDisplay> versionDisplayer;
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host;
 
 - (IBAction)installUpdate:sender;
 - (IBAction)skipThisVersion:sender;
 - (IBAction)remindMeLater:sender;
-
-- (void)setVersionDisplayer: (id<SUVersionDisplay>)disp;
 
 @end
 

@@ -91,33 +91,33 @@
 	mountedSuccessfully = YES;
 	
 	// Now that we've mounted it, we need to copy out its contents.
-		NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
-        NSError *error = nil;
-        NSArray *contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
-        if (error)
-        {
-            SULog(@"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
-            goto reportError;
-        }
-        
-        for (NSString *item in contents)
-        {
-            NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
-            NSString *toPath = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:item];
-            
-            // We skip any files in the DMG which are not readable.
-			if (![manager isReadableFileAtPath:fromPath]) {
-                continue;
-			}
-            
-            SULog(@"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
-            
-            if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
-            {
-                SULog(@"Couldn't copy item: %@ : %@", error, error.userInfo ? error.userInfo : @"");
-                goto reportError;
-            }
-        }
+	NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
+	NSError *error = nil;
+	NSArray *contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
+	if (error)
+	{
+		SULog(@"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
+		goto reportError;
+	}
+	
+	for (NSString *item in contents)
+	{
+		NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
+		NSString *toPath = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:item];
+		
+		// We skip any files in the DMG which are not readable.
+		if (![manager isReadableFileAtPath:fromPath]) {
+			continue;
+		}
+		
+		SULog(@"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
+		
+		if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
+		{
+			SULog(@"Couldn't copy item: %@ : %@", error, error.userInfo ? error.userInfo : @"");
+			goto reportError;
+		}
+	}
 	
 	[self performSelectorOnMainThread:@selector(notifyDelegateOfSuccess) withObject:nil waitUntilDone:NO];
 	goto finally;

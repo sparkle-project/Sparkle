@@ -12,8 +12,9 @@
 NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
 @implementation SUUpdateDriver
-
 @synthesize host;
+@synthesize interruptible = isInterruptible;
+@synthesize finished;
 
 - (instancetype) initWithUpdater:(SUUpdater *)anUpdater
 {
@@ -36,10 +37,6 @@ NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 	[self setValue:@YES forKey:@"finished"];
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdateDriverFinishedNotification object:self];
 }
-
-- (BOOL)isInterruptible { return isInterruptible; }
-
-- (BOOL)finished { return finished; }
 
 - (void)dealloc
 {
