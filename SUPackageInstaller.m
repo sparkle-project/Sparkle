@@ -30,7 +30,9 @@ NSString *SUPackageInstallerInstallationPathKey = @"SUPackageInstallerInstallati
 		[installer waitUntilExit];
 		
 		// Known bug: if the installation fails or is canceled, Sparkle goes ahead and restarts, thinking everything is fine.
-		[self performSelectorOnMainThread:@selector(finishInstallationWithInfo:) withObject:info waitUntilDone:NO];
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self finishInstallationWithInfo:info];
+		});
 	}
 }
 

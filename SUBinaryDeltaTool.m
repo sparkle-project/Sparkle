@@ -25,12 +25,6 @@
 extern int bsdiff(int argc, const char **argv);
 
 @interface CreateBinaryDeltaOperation : NSOperation
-{
-    NSString *_relativePath;
-    NSString *_fromPath;
-    NSString *_toPath;
-    NSString *_resultPath;
-}
 @property (copy) NSString *relativePath;
 @property (retain) NSString *resultPath;
 @property (retain) NSString *_fromPath;
@@ -39,8 +33,6 @@ extern int bsdiff(int argc, const char **argv);
 @end
 
 @implementation CreateBinaryDeltaOperation
-@synthesize relativePath = _relativePath;
-@synthesize resultPath = _resultPath;
 @synthesize _fromPath = _fromPath;
 @synthesize _toPath = _toPath;
 

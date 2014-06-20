@@ -18,7 +18,6 @@
 + (void)		installFromUpdateFolder:(NSString *)updateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator;
 + (void)		finishInstallationToPath:(NSString *)installationPath withResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:delegate;
 + (NSString*)	updateFolder;
-+ (void)		notifyDelegateOfFailure: (NSDictionary*)dict;
 @end
 
 @interface NSObject (SUInstallerDelegateInformalProtocol)

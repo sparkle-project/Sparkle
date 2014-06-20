@@ -256,7 +256,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 			
 			// Don't perform automatic checks on unconnected laptops or dial-up connections that aren't online:
 			NSMutableDictionary*		theDict = [NSMutableDictionary dictionary];
-			[self performSelectorOnMainThread: @selector(putFeedURLIntoDictionary:) withObject: theDict waitUntilDone: YES];	// Get feed URL on main thread, it's not safe to call elsewhere.
+			dispatch_sync(dispatch_get_main_queue(), ^{
+				[self putFeedURLIntoDictionary:theDict];	// Get feed URL on main thread, it's not safe to call elsewhere.
+			});
 			
 			const char *hostname = [[theDict[@"feedURL"] host] cStringUsingEncoding: NSUTF8StringEncoding];
 			SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(NULL, hostname);
@@ -280,7 +282,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 			}
 			
 			// If the network's not reachable, we pass a nil driver into checkForUpdatesWithDriver, which will then reschedule the next update so we try again later.
-			[self performSelectorOnMainThread: @selector(checkForUpdatesWithDriver:) withObject: isNetworkReachable ? inDriver : nil waitUntilDone: NO];
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self checkForUpdatesWithDriver: isNetworkReachable ? inDriver : nil];
+			});
 			
 		}
 	} @catch (NSException *localException) {

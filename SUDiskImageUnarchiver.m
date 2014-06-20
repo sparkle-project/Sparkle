@@ -114,11 +114,15 @@
 			}
 		}
 		
-		[self performSelectorOnMainThread:@selector(notifyDelegateOfSuccess) withObject:nil waitUntilDone:NO];
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self notifyDelegateOfSuccess];
+		});
 		goto finally;
 		
 	reportError:
-		[self performSelectorOnMainThread:@selector(notifyDelegateOfFailure) withObject:nil waitUntilDone:NO];
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self notifyDelegateOfFailure];
+		});
 		
 	finally:
 		if (mountedSuccessfully)
