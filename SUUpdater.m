@@ -243,50 +243,50 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 -(void)	checkForUpdatesInBgReachabilityCheckWithDriver: (SUUpdateDriver*)inDriver /* RUNS ON ITS OWN THREAD */
 {
-	NS_DURING
+	@try {
 		// This method *must* be called on its own thread. SCNetworkReachabilityCheckByName
 		//	can block, and it can be waiting a long time on slow networks, and we
 		//	wouldn't want to beachball the main thread for a background operation.
 		// We could use asynchronous reachability callbacks, but those aren't
 		//	reliable enough and can 'get lost' sometimes, which we don't want.
 		
-		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-		SCNetworkConnectionFlags flags = 0;
-		BOOL isNetworkReachable = YES;
-		
-		// Don't perform automatic checks on unconnected laptops or dial-up connections that aren't online:
-		NSMutableDictionary*		theDict = [NSMutableDictionary dictionary];
-		[self performSelectorOnMainThread: @selector(putFeedURLIntoDictionary:) withObject: theDict waitUntilDone: YES];	// Get feed URL on main thread, it's not safe to call elsewhere.
-		
-		const char *hostname = [[theDict[@"feedURL"] host] cStringUsingEncoding: NSUTF8StringEncoding];
-		SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(NULL, hostname);
-        Boolean reachabilityResult = NO;
-        // If the feed's using a file:// URL, we won't be able to use reachability.
-        if (reachability != NULL) {
-            SCNetworkReachabilityGetFlags(reachability, &flags);
-            CFRelease(reachability);
-        }
-		
-		if( reachabilityResult )
-		{
-			BOOL reachable =	(flags & kSCNetworkFlagsReachable)				== kSCNetworkFlagsReachable;
-			BOOL automatic =	(flags & kSCNetworkFlagsConnectionAutomatic)	== kSCNetworkFlagsConnectionAutomatic;
-			BOOL local =		(flags & kSCNetworkFlagsIsLocalAddress)			== kSCNetworkFlagsIsLocalAddress;
+		@autoreleasepool {
+			SCNetworkConnectionFlags flags = 0;
+			BOOL isNetworkReachable = YES;
 			
-			//NSLog(@"reachable = %s, automatic = %s, local = %s", (reachable?"YES":"NO"), (automatic?"YES":"NO"), (local?"YES":"NO"));
+			// Don't perform automatic checks on unconnected laptops or dial-up connections that aren't online:
+			NSMutableDictionary*		theDict = [NSMutableDictionary dictionary];
+			[self performSelectorOnMainThread: @selector(putFeedURLIntoDictionary:) withObject: theDict waitUntilDone: YES];	// Get feed URL on main thread, it's not safe to call elsewhere.
 			
-			if( !(reachable || automatic || local) )
-				isNetworkReachable = NO;
+			const char *hostname = [[theDict[@"feedURL"] host] cStringUsingEncoding: NSUTF8StringEncoding];
+			SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(NULL, hostname);
+			Boolean reachabilityResult = NO;
+			// If the feed's using a file:// URL, we won't be able to use reachability.
+			if (reachability != NULL) {
+				SCNetworkReachabilityGetFlags(reachability, &flags);
+				CFRelease(reachability);
+			}
+			
+			if( reachabilityResult )
+			{
+				BOOL reachable =	(flags & kSCNetworkFlagsReachable)				== kSCNetworkFlagsReachable;
+				BOOL automatic =	(flags & kSCNetworkFlagsConnectionAutomatic)	== kSCNetworkFlagsConnectionAutomatic;
+				BOOL local =		(flags & kSCNetworkFlagsIsLocalAddress)			== kSCNetworkFlagsIsLocalAddress;
+				
+				//NSLog(@"reachable = %s, automatic = %s, local = %s", (reachable?"YES":"NO"), (automatic?"YES":"NO"), (local?"YES":"NO"));
+				
+				if( !(reachable || automatic || local) )
+					isNetworkReachable = NO;
+			}
+			
+			// If the network's not reachable, we pass a nil driver into checkForUpdatesWithDriver, which will then reschedule the next update so we try again later.
+			[self performSelectorOnMainThread: @selector(checkForUpdatesWithDriver:) withObject: isNetworkReachable ? inDriver : nil waitUntilDone: NO];
+			
 		}
-		
-        // If the network's not reachable, we pass a nil driver into checkForUpdatesWithDriver, which will then reschedule the next update so we try again later.    
-        [self performSelectorOnMainThread: @selector(checkForUpdatesWithDriver:) withObject: isNetworkReachable ? inDriver : nil waitUntilDone: NO];
-		
-		[pool release];
-	NS_HANDLER
+	} @catch (NSException *localException) {
 		SULog(@"UNCAUGHT EXCEPTION IN UPDATE CHECK TIMER: %@",[localException reason]);
 		// Don't propagate the exception beyond here. In Carbon apps that would trash the stack.
-	NS_ENDHANDLER
+	}
 }
 
 
@@ -297,7 +297,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	//	hour or so:
 	SUUpdateDriver *	theUpdateDriver = [[[([self automaticallyDownloadsUpdates] ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class]) alloc] initWithUpdater:self] autorelease];
 	
-	[NSThread detachNewThreadSelector: @selector(checkForUpdatesInBgReachabilityCheckWithDriver:) toTarget: self withObject: theUpdateDriver];
+	dispatch_async(dispatch_get_global_queue(0, 0), ^{
+		[self checkForUpdatesInBgReachabilityCheckWithDriver:theUpdateDriver];
+	});
 }
 
 

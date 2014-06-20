@@ -25,15 +25,13 @@ NSString *SUPackageInstallerInstallationPathKey = @"SUPackageInstallerInstallati
 
 + (void)performInstallationWithInfo:(NSDictionary *)info
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
-	NSTask *installer = [NSTask launchedTaskWithLaunchPath:info[SUPackageInstallerCommandKey] arguments:info[SUPackageInstallerArgumentsKey]];
-	[installer waitUntilExit];
-	
-	// Known bug: if the installation fails or is canceled, Sparkle goes ahead and restarts, thinking everything is fine.
-	[self performSelectorOnMainThread:@selector(finishInstallationWithInfo:) withObject:info waitUntilDone:NO];
-	
-	[pool drain];
+	@autoreleasepool {
+		NSTask *installer = [NSTask launchedTaskWithLaunchPath:info[SUPackageInstallerCommandKey] arguments:info[SUPackageInstallerArgumentsKey]];
+		[installer waitUntilExit];
+		
+		// Known bug: if the installation fails or is canceled, Sparkle goes ahead and restarts, thinking everything is fine.
+		[self performSelectorOnMainThread:@selector(finishInstallationWithInfo:) withObject:info waitUntilDone:NO];
+	}
 }
 
 + (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
@@ -58,8 +56,11 @@ NSString *SUPackageInstallerInstallationPathKey = @"SUPackageInstallerInstallati
 		NSDictionary *info = @{SUPackageInstallerCommandKey: command, SUPackageInstallerArgumentsKey: args, SUPackageInstallerHostKey: host, SUPackageInstallerDelegateKey: delegate, SUPackageInstallerInstallationPathKey: installationPath};
 		if (synchronously)
 			[self performInstallationWithInfo:info];
-		else
-			[NSThread detachNewThreadSelector:@selector(performInstallationWithInfo:) toTarget:self withObject:info];
+		else {
+			dispatch_async(dispatch_get_global_queue(0, 0), ^{
+				[self performInstallationWithInfo:info];
+			});
+		}
 	}
 }
 

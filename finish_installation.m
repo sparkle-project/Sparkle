@@ -178,42 +178,41 @@ int main (int argc, const char * argv[])
 		return EXIT_FAILURE;
 	}
 	
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
-	//ProcessSerialNumber		psn = { 0, kCurrentProcess };
-	//TransformProcessType( &psn, kProcessTransformToForegroundApplication );
+	@autoreleasepool {
+		//ProcessSerialNumber		psn = { 0, kCurrentProcess };
+		//TransformProcessType( &psn, kProcessTransformToForegroundApplication );
 		
-	#if 0	// Cmdline tool
-	NSString*	selfPath = nil;
-	if (argv[0][0] == '/') {
-		selfPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation: argv[0] length: strlen(argv[0])];
+#if 0	// Cmdline tool
+		NSString*	selfPath = nil;
+		if (argv[0][0] == '/') {
+			selfPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation: argv[0] length: strlen(argv[0])];
+		}
+		else
+		{
+			selfPath = [[NSFileManager defaultManager] currentDirectoryPath];
+			selfPath = [selfPath stringByAppendingPathComponent: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: argv[0] length: strlen(argv[0])]];
+		}
+#else
+		NSString*	selfPath = [[NSBundle mainBundle] bundlePath];
+#endif
+		
+		BOOL shouldShowUI = (argc > 6) ? atoi(argv[6]) : 1;
+		if (shouldShowUI)
+		{
+			[[NSApplication sharedApplication] activateIgnoringOtherApps: YES];
+		}
+		
+		[NSApplication sharedApplication];
+		[[[TerminationListener alloc] initWithHostPath: (argc > 1) ? argv[1] : NULL
+										executablePath: (argc > 2) ? argv[2] : NULL
+									   parentProcessId: (argc > 3) ? atoi(argv[3]) : 0
+											folderPath: (argc > 4) ? argv[4] : NULL
+										shouldRelaunch: (argc > 5) ? atoi(argv[5]) : 1
+										  shouldShowUI: shouldShowUI
+											  selfPath: selfPath] autorelease];
+		[[NSApplication sharedApplication] run];
+		
 	}
-	else
-	{
-		selfPath = [[NSFileManager defaultManager] currentDirectoryPath];
-		selfPath = [selfPath stringByAppendingPathComponent: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: argv[0] length: strlen(argv[0])]];
-	}
-	#else
-	NSString*	selfPath = [[NSBundle mainBundle] bundlePath];
-	#endif
-	
-	BOOL shouldShowUI = (argc > 6) ? atoi(argv[6]) : 1;
-	if (shouldShowUI)
-	{
-		[[NSApplication sharedApplication] activateIgnoringOtherApps: YES];
-	}
-	
-	[NSApplication sharedApplication];
-	[[[TerminationListener alloc] initWithHostPath: (argc > 1) ? argv[1] : NULL
-                                    executablePath: (argc > 2) ? argv[2] : NULL
-                                   parentProcessId: (argc > 3) ? atoi(argv[3]) : 0
-                                        folderPath: (argc > 4) ? argv[4] : NULL
-                                    shouldRelaunch: (argc > 5) ? atoi(argv[5]) : 1
-                                      shouldShowUI: shouldShowUI
-                                          selfPath: selfPath] autorelease];
-	[[NSApplication sharedApplication] run];
-	
-	[pool drain];
 	
 	return EXIT_SUCCESS;
 }

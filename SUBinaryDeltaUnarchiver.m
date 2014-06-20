@@ -22,22 +22,29 @@
 
 - (void)applyBinaryDelta
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	NSString *sourcePath = [[updateHost bundle] bundlePath];
-	NSString *targetPath = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
-
-	int result = applyBinaryDelta(sourcePath, targetPath, archivePath);
-	if (!result)
-		[self performSelectorOnMainThread:@selector(notifyDelegateOfSuccess) withObject:nil waitUntilDone:NO];
-	else
-		[self performSelectorOnMainThread:@selector(notifyDelegateOfFailure) withObject:nil waitUntilDone:NO];
-
-	[pool drain];
+	@autoreleasepool {
+		NSString *sourcePath = [[updateHost bundle] bundlePath];
+		NSString *targetPath = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
+		
+		int result = applyBinaryDelta(sourcePath, targetPath, archivePath);
+		if (!result) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self notifyDelegateOfSuccess];
+			});
+		}
+		else {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self notifyDelegateOfFailure];
+			});
+		}
+	}
 }
 
 - (void)start
 {
-	[NSThread detachNewThreadSelector:@selector(applyBinaryDelta) toTarget:self withObject:nil];
+	dispatch_async(dispatch_get_global_queue(0, 0), ^{
+		[self applyBinaryDelta];
+	});
 }
 
 + (void)load
