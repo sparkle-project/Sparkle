@@ -11,9 +11,9 @@
 #import "SUHost.h"
 
 @interface SUAutomaticUpdateAlert ()
-@property (retain) SUAppcastItem *updateItem;
-@property (assign) id<SUAutomaticUpdateAlertDelegateProtocol> delegate;
-@property (retain) SUHost *host;
+@property (strong) SUAppcastItem *updateItem;
+@property (weak) id<SUAutomaticUpdateAlertDelegateProtocol> delegate;
+@property (strong) SUHost *host;
 @end
 
 @implementation SUAutomaticUpdateAlert
@@ -33,13 +33,6 @@
 		[[self window] center];
 	}
 	return self;
-}
-
-- (void)dealloc
-{
-	self.host = nil;
-	self.updateItem = nil;
-	[super dealloc];
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [host bundlePath], [host installationPath]]; }

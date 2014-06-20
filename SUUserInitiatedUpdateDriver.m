@@ -18,7 +18,6 @@
 	if (checkingController)
 	{
 		[[checkingController window] close];
-		[checkingController release];
 		checkingController = nil;
 	}
 }

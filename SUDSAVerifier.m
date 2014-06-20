@@ -33,19 +33,19 @@ static NSData *rawKeyData( NSString *str );
 	BOOL result = NO;
 	NSData *pathData = nil, *sigData = nil;
 	CFDataRef hashData = NULL;
-	CSSM_KEY_PTR pubKey = cdsaCreateKey((CFDataRef)rawKeyData(pkeyString)); // Create the DSA key
+	CSSM_KEY_PTR pubKey = cdsaCreateKey((__bridge CFDataRef)rawKeyData(pkeyString)); // Create the DSA key
 	CSSM_CSP_HANDLE cspHandle = CSSM_INVALID_HANDLE;
 	
 	if ( !pubKey ) return NO;
 	if ( (cspHandle = cdsaInit()) == CSSM_INVALID_HANDLE ) goto validate_end; // Init CDSA
 	if ( !cdsaVerifyKey(cspHandle, pubKey) ) goto validate_end; // Verify the key is valid
 	if ( (pathData = [NSData dataWithContentsOfFile:path]) == nil ) goto validate_end; // File data
-	if ( (hashData = cdsaCreateSHA1Digest(cspHandle, (CFDataRef)pathData)) == NULL ) goto validate_end; // Hash
+	if ( (hashData = cdsaCreateSHA1Digest(cspHandle, (__bridge CFDataRef)pathData)) == NULL ) goto validate_end; // Hash
 	
 	// Remove any line feeds from end of signature
 	// (Not likely needed, but the verify _can_ fail if there is, so...)
 	if ( [encodedSignature characterAtIndex:[encodedSignature length] - 1] == '\n' ) {
-		NSMutableString *sig = [[encodedSignature mutableCopy] autorelease];
+		NSMutableString *sig = [encodedSignature mutableCopy];
 		while ( [sig characterAtIndex:[sig length] - 1] == '\n' )
 			[sig deleteCharactersInRange:NSMakeRange([sig length] - 1, 1)];
 		encodedSignature = sig;
@@ -53,7 +53,7 @@ static NSData *rawKeyData( NSString *str );
 	if ( (sigData = b64decode(encodedSignature)) == nil ) goto validate_end; // Decode signature
 	
 	// Verify the signature on the file
-	result = cdsaVerifySignature( cspHandle, pubKey, hashData, (CFDataRef)sigData );
+	result = cdsaVerifySignature( cspHandle, pubKey, hashData, (__bridge CFDataRef)sigData );
 
 validate_end:
 	cdsaReleaseKey( pubKey );
@@ -126,7 +126,7 @@ static NSData *b64decode( NSString *str )
 static NSData *rawKeyData( NSString *key )
 {
 	if ( (key == nil) || ([key length] == 0) ) return nil;
-	NSMutableString *t = [[key mutableCopy] autorelease];
+	NSMutableString *t = [key mutableCopy];
 	
 	// Remove the PEM guards (if present)
 	[t replaceOccurrencesOfString:@"-" withString:@"" options:NSLiteralSearch range:NSMakeRange(0, [t length])];

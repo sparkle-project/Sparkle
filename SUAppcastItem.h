@@ -13,15 +13,15 @@
 @property (copy, readonly) NSString *title;
 @property (copy, readonly) NSDate *date;
 @property (copy, readonly) NSString *itemDescription;
-@property (retain, readonly) NSURL *releaseNotesURL;
+@property (strong, readonly) NSURL *releaseNotesURL;
 @property (copy, readonly) NSString *DSASignature;
 @property (copy, readonly) NSString *minimumSystemVersion;
 @property (copy, readonly) NSString *maximumSystemVersion;
-@property (retain, readonly) NSURL *fileURL;
+@property (strong, readonly) NSURL *fileURL;
 @property (copy, readonly) NSString *versionString;
 @property (copy, readonly) NSString *displayVersionString;
 @property (copy, readonly) NSDictionary *deltaUpdates;
-@property (retain, readonly) NSURL *infoURL;	// UK 2007-08-31
+@property (strong, readonly) NSURL *infoURL;	// UK 2007-08-31
 
 // Initializes with data from a dictionary provided by the RSS class.
 - (instancetype)initWithDictionary:(NSDictionary *)dict;

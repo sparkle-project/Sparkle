@@ -28,7 +28,7 @@ NSString *const SUUpdaterAppcastItemNotificationKey = @"SUUpdaterAppcastItemNoti
 NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotificationKey";
 
 @interface SUUpdater () <SUUpdatePermissionPromptDelegateProtocol>
-@property (retain) NSTimer *checkTimer;
+@property (strong) NSTimer *checkTimer;
 - (instancetype)initForBundle:(NSBundle *)bundle;
 - (void)startUpdateCycle;
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
@@ -64,7 +64,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
     if (bundle == nil) bundle = [NSBundle mainBundle];
 	id updater = sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]];
 	if (updater == nil) {
-		updater = [[[[self class] alloc] initForBundle:bundle] autorelease];
+		updater = [[[self class] alloc] initForBundle:bundle];
 	}
 	return updater;
 }
@@ -83,8 +83,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	id updater = sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]];
     if (updater)
 	{
-		[self release];
-		self = [updater retain];
+		self = updater;
 	}
 	else if (self)
 	{
@@ -200,7 +199,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 {
 	if ([note object] == driver && [driver finished])
 	{
-		[driver release]; driver = nil;
+		driver = nil;
 		[self scheduleNextUpdateCheck];
     }
 }
@@ -299,7 +298,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	// Background update checks should only happen if we have a network connection.
 	//	Wouldn't want to annoy users on dial-up by establishing a connection every
 	//	hour or so:
-	SUUpdateDriver *	theUpdateDriver = [[[([self automaticallyDownloadsUpdates] ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class]) alloc] initWithUpdater:self] autorelease];
+	SUUpdateDriver *	theUpdateDriver = [[([self automaticallyDownloadsUpdates] ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class]) alloc] initWithUpdater:self];
 	
 	dispatch_async(dispatch_get_global_queue(0, 0), ^{
 		[self checkForUpdatesInBgReachabilityCheckWithDriver:theUpdateDriver];
@@ -318,12 +317,12 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 		[driver abortUpdate];
 	}
 
-	[self checkForUpdatesWithDriver:[[[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self] autorelease]];
+	[self checkForUpdatesWithDriver:[[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self]];
 }
 
 - (void)checkForUpdateInformation
 {
-	[self checkForUpdatesWithDriver:[[[SUProbingUpdateDriver alloc] initWithUpdater:self] autorelease]];
+	[self checkForUpdatesWithDriver:[[SUProbingUpdateDriver alloc] initWithUpdater:self]];
 }
 
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)d
@@ -344,7 +343,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 		return;
 	}
     	
-    driver = [d retain];
+    driver = d;
     
     // If we're not given a driver at all, just schedule the next update check and bail.
     if (!driver)
@@ -363,8 +362,8 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - (void)registerAsObserver
 {
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDriverDidFinish:) name:SUUpdateDriverFinishedNotification object:nil];
-    [[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:[@"values." stringByAppendingString:SUScheduledCheckIntervalKey] options:0 context:SUUpdaterDefaultsObservationContext];
-    [[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:[@"values." stringByAppendingString:SUEnableAutomaticChecksKey] options:0 context:SUUpdaterDefaultsObservationContext];
+    [[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:[@"values." stringByAppendingString:SUScheduledCheckIntervalKey] options:0 context:(__bridge void *)(SUUpdaterDefaultsObservationContext)];
+    [[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:[@"values." stringByAppendingString:SUEnableAutomaticChecksKey] options:0 context:(__bridge void *)(SUUpdaterDefaultsObservationContext)];
 }
 
 - (void)unregisterAsObserver
@@ -383,7 +382,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-	if (context == SUUpdaterDefaultsObservationContext)
+	if (context == (__bridge void *)(SUUpdaterDefaultsObservationContext))
     {
         // Allow a small delay, because perhaps the user or developer wants to change both preferences. This allows the developer to interpret a zero check interval as a sign to disable automatic checking.
         // Or we may get this from the developer and from our own KVO observation, this will effectively coalesce them.
@@ -470,7 +469,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	NSString *version = [SPARKLE_BUNDLE objectForInfoDictionaryKey:@"CFBundleVersion"];
 	NSString *userAgent = [NSString stringWithFormat:@"%@/%@ Sparkle/%@", [host name], [host displayVersion], version ? version : @"?"];
 	NSData *cleanedAgent = [userAgent dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-	return [[[NSString alloc] initWithData:cleanedAgent encoding:NSASCIIStringEncoding] autorelease];
+	return [[NSString alloc] initWithData:cleanedAgent encoding:NSASCIIStringEncoding];
 }
 
 - (void)setSendsSystemProfile:(BOOL)sendsSystemProfile
@@ -550,9 +549,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - (void)dealloc
 {
 	[self unregisterAsObserver];
-	[host release];
-	if (checkTimer) { [checkTimer invalidate]; self.checkTimer = nil; }		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
-	[super dealloc];
+	if (checkTimer) { [checkTimer invalidate]; }		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item

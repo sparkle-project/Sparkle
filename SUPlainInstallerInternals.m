@@ -485,7 +485,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 	if (err == noErr && hadFileAtDest)
 	{
-        NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
+        NSFileManager *manager = [[NSFileManager alloc] init];
         BOOL success = [manager moveItemAtPath:dst toPath:tmpPath error:error];
         if (!success && hadFileAtDest)
         {
@@ -498,7 +498,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	err = FSPathMakeRef((UInt8 *)[src fileSystemRepresentation], &srcRef, NULL);
 	if (err == noErr)
 	{
-		NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
+		NSFileManager *manager = [[NSFileManager alloc] init];
 		BOOL success = [manager copyItemAtPath:src toPath:dst error:error];
 		if (!success)
 		{

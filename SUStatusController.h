@@ -13,8 +13,8 @@
 
 @class SUHost;
 @interface SUStatusController : SUWindowController
-@property (assign) IBOutlet NSButton *actionButton;
-@property (assign) IBOutlet NSProgressIndicator* progressBar;
+@property (weak) IBOutlet NSButton *actionButton;
+@property (weak) IBOutlet NSProgressIndicator* progressBar;
 
 @property (copy) NSString *statusText;
 @property double progressValue;

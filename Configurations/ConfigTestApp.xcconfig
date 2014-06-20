@@ -3,3 +3,4 @@
 INFOPLIST_FILE = Test Application/Test Application-Info.plist
 PRODUCT_NAME = Sparkle Test App
 WRAPPER_EXTENSION = app
+CLANG_ENABLE_OBJC_ARC = NO

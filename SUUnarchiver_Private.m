@@ -7,6 +7,7 @@
 //
 
 #import "SUUnarchiver_Private.h"
+#import "SUHost.h"
 
 @implementation SUUnarchiver (Private)
 
@@ -15,16 +16,9 @@
 	if ((self = [super init]))
 	{
 		archivePath = [path copy];
-		updateHost = [host retain];
+		updateHost = host;
 	}
 	return self;
-}
-
-- (void)dealloc
-{
-	[archivePath release];
-	[updateHost release];
-	[super dealloc];
 }
 
 + (BOOL)canUnarchivePath:(NSString *)path

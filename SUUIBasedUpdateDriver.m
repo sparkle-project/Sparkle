@@ -66,7 +66,7 @@
 
 - (void)updateAlert:(SUUpdateAlert *)alert finishedWithChoice:(SUUpdateAlertChoice)choice
 {
-	[updateAlert release]; updateAlert = nil;
+	updateAlert = nil;
 	[host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
 	switch (choice)
 	{
@@ -182,7 +182,6 @@
 	if (statusController)
 	{
 		[statusController close];
-		[statusController autorelease];
 		statusController = nil;
 	}
 }
@@ -199,7 +198,6 @@
 	if (statusController)
 	{
 		[statusController close];
-		[statusController autorelease];
 		statusController = nil;
 	}
 	[super abortUpdate];

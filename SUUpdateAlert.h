@@ -35,8 +35,8 @@ typedef enum
 	NSProgressIndicator *releaseNotesSpinner;
 	BOOL webViewFinishedLoading;
 }
-@property (assign) id<SUUpdateAlertDelegate> delegate;
-@property (assign) id<SUVersionDisplay> versionDisplayer;
+@property (weak) id<SUUpdateAlertDelegate> delegate;
+@property (weak) id<SUVersionDisplay> versionDisplayer;
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host;
 

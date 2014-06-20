@@ -21,7 +21,7 @@
 
 	SUHost *host;
 }
-@property (assign) IBOutlet id delegate;
+@property (weak) IBOutlet id delegate;
 
 + (SUUpdater *)sharedUpdater;
 + (SUUpdater *)updaterForBundle:(NSBundle *)bundle;

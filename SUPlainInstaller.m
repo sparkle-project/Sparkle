@@ -47,7 +47,7 @@ static NSString * const SUInstallerInstallationPathKey = @"SUInstallerInstallati
 			if( haveOld && differentFromNew )
 				[self _movePathToTrash: oldPath];	// On success, trash old copy if there's still one due to renaming.
 		}
-		NSMutableDictionary *mutableInfo = [[info mutableCopy] autorelease];
+		NSMutableDictionary *mutableInfo = [info mutableCopy];
 		mutableInfo[SUInstallerResultKey] = @(result);
 		mutableInfo[SUInstallerInstallationPathKey] = installationPath;
 		if (!result && error)
