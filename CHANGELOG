@@ -1,3 +1,11 @@
+# 1.7.0
+
+* Dropped support for Mac OS X 10.6. Sparkle now supports 10.7 and newer (including 10.10 Yosemite) on 64-bit Intel Macs (the last 32-bit Mac was released in 2006).
+* Removed use of deprecated functions (Zachary Waldowski)
+* Switched to modern Obj-C runtime and new literals syntax
+* Removed pre-10.7 code. (C.W. Betts)
+* Use more Blocks/libdispatch code. (C.W. Betts)
+* Cleaned up and improved security of `generate_keys`/`sign_update` scripts
 
 # 1.6.1
 
@@ -36,3 +44,4 @@
 * Prompts the user to update after a week (rather than a day) if he doesn't quit the app (Andy Matuschak)
 * Adding <sparkle:tags> appcast item element, <sparkle:criticalUpdate /> tag (Andy Matuschak)
 * We have this check box that says "Automatically download and install updates in the future." But we only download them automatically. We still ask permission again before installing them. (Andy Matuschak)
+
