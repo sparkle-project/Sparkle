@@ -6,10 +6,10 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 //  Includes code by Zach Waldowski on 10/18/13.
-//  Copyright (c) 2014 Big Nerd Ranch. All rights reserved.
+//  Copyright 2014 Big Nerd Ranch. Licensed under MIT.
 //
 //  Includes code from Plop by Mark Hamlin.
-//  Copyright (c) 2011 Mark Hamlin. All rights reserved.
+//  Copyright 2011 Mark Hamlin. Licensed under BSD.
 //
 
 #ifndef SUDSAVERIFIER_H
