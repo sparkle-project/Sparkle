@@ -51,7 +51,7 @@
 	CFArrayRef items = NULL;
 
 	OSStatus status = SecItemImport((__bridge CFDataRef)data, NULL, &format, &itemType, 0, &params, NULL, &items);
-	if (status || !items) {
+	if (status != errSecSuccess || !items) {
 		if (items) {
 			CFRelease(items);
 		}
@@ -115,10 +115,13 @@
 
 	SecTransformConnectTransforms(dataReadTransform, kSecTransformOutputAttributeName, dataDigestTransform, kSecTransformInputAttributeName, group, &error);
 	if (error) { return cleanup(); }
+
 	SecTransformConnectTransforms(dataDigestTransform, kSecTransformOutputAttributeName, dataVerifyTransform, kSecTransformInputAttributeName, group, &error);
 	if (error) { return cleanup(); }
 
-	NSNumber *result = CFBridgingRelease(SecTransformExecute(group, NULL));
+	NSNumber *result = CFBridgingRelease(SecTransformExecute(group, &error));
+	if (error) { return cleanup(); }
+
 	cleanup();
 	return result.boolValue;
 }
