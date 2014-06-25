@@ -51,7 +51,12 @@
 	CFArrayRef items = NULL;
 
 	OSStatus status = SecItemImport((__bridge CFDataRef)data, NULL, &format, &itemType, 0, &params, NULL, &items);
-	if (status || !items) { return (self = nil); }
+	if (status || !items) {
+		if (items) {
+			CFRelease(items);
+		}
+		return (self = nil);
+	}
 
 	if (format == kSecFormatOpenSSL && itemType == kSecItemTypePublicKey && CFArrayGetCount(items) == 1) {
 		_secKey = (SecKeyRef)CFRetain(CFArrayGetValueAtIndex(items, 0));
