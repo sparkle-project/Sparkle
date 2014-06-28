@@ -12,7 +12,7 @@
 #define	LONG_INSTALLATION_TIME			5				// If the Installation takes longer than this time the Application Icon is shown in the Dock so that the user has some feedback.
 #define	CHECK_FOR_PARENT_TO_QUIT_TIME	.5				// Time this app uses to recheck if the parent has already died.
 										
-@interface TerminationListener : NSObject
+@interface TerminationListener : NSObject <SUInstallerDelegate>
 {
 	const char		*hostpath;
 	const char		*executablepath;

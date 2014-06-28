@@ -116,7 +116,7 @@ static NSString*	sUpdateFolder = nil;
     return isPackage ? nil : path;
 }
 
-+ (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
++ (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath delegate:(id<SUInstallerDelegate>)delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
 {
     BOOL isPackage = NO;
 	NSString *newAppDownloadPath = [self installSourcePathInUpdateFolder:inUpdateFolder forHost:host isPackage:&isPackage];
@@ -157,7 +157,7 @@ static NSString*	sUpdateFolder = nil;
 #define		SUNotifyDictErrorKey	@"SUNotifyDictError"
 #define		SUNotifyDictDelegateKey	@"SUNotifyDictDelegate"
 
-+ (void)finishInstallationToPath:(NSString *)installationPath withResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:delegate
++ (void)finishInstallationToPath:(NSString *)installationPath withResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:(id<SUInstallerDelegate>)delegate
 {
 	if (result)
 	{

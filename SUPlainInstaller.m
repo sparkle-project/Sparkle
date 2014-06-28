@@ -58,7 +58,7 @@ static NSString * const SUInstallerInstallationPathKey = @"SUInstallerInstallati
 	}
 }
 
-+ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
++ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:(id<SUInstallerDelegate>)delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
 {
 	// Prevent malicious downgrades:
 	#if !PERMIT_AUTOMATED_DOWNGRADES
