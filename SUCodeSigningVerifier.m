@@ -49,10 +49,11 @@
     if (result != 0 && error) {
         if (result == errSecCSReqFailed) {
             CFStringRef requirementString = nil;
-            if (SecRequirementCopyString(requirement, kSecCSDefaultFlags, &requirementString) == noErr)
-            SULog(@"Failed requirement %@", requirementString);
-            CFRelease(requirementString);
-            
+            if (SecRequirementCopyString(requirement, kSecCSDefaultFlags, &requirementString) == noErr) {
+                SULog(@"Failed requirement %@", requirementString);
+                CFRelease(requirementString);
+            }
+
             [self logSigningInfoForCode:hostCode label:@"host info"];
             [self logSigningInfoForCode:staticCode label:@"new info"];
         }
@@ -72,10 +73,10 @@ finally:
     const SecCSFlags flags = kSecCSSigningInformation | kSecCSRequirementInformation | kSecCSDynamicInformation | kSecCSContentInformation;
     if (SecCodeCopySigningInformation(code, flags, &signingInfo) == noErr) {
         NSDictionary* signingDict = (NSDictionary*)signingInfo;
-        NSArray* keys = @[@"format", @"identifier", @"requirements", @"teamid", @"signing-time"];
         NSMutableDictionary* relevantInfo = [NSMutableDictionary new];
-        for (NSString* key in keys)
+        for (NSString* key in @[@"format", @"identifier", @"requirements", @"teamid", @"signing-time"]) {
             relevantInfo[key] = signingDict[key];
+        }
         NSDictionary* infoPlist = signingDict[@"info-plist"];
         relevantInfo[@"version"] = infoPlist[@"CFBundleShortVersionString"];
         relevantInfo[@"build"] = infoPlist[@"CFBundleVersion"];
