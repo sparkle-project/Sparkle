@@ -14,6 +14,8 @@
 
 @class SUUpdateDriver, SUAppcastItem, SUHost, SUAppcast;
 
+@protocol SUUpdaterDelegate;
+
 @interface SUUpdater : NSObject
 {
 @private
@@ -21,7 +23,7 @@
 
 	SUHost *host;
 }
-@property (assign) IBOutlet id delegate;
+@property (assign) IBOutlet id<SUUpdaterDelegate> delegate;
 
 + (SUUpdater *)sharedUpdater;
 + (SUUpdater *)updaterForBundle:(NSBundle *)bundle;
@@ -84,7 +86,8 @@ extern NSString *const SUUpdaterAppcastNotificationKey;
 //	SUUpdater Delegate:
 // -----------------------------------------------------------------------------
 
-@interface NSObject (SUUpdaterDelegateInformalProtocol)
+@protocol SUUpdaterDelegate <NSObject>
+@optional
 
 // Use this to keep Sparkle from popping up e.g. while your setup assistant is showing:
 - (BOOL)updaterMayCheckForUpdates:(SUUpdater *)bundle;
