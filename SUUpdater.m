@@ -27,7 +27,7 @@ NSString *const SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotific
 NSString *const SUUpdaterAppcastItemNotificationKey = @"SUUpdaterAppcastItemNotificationKey";
 NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotificationKey";
 
-@interface SUUpdater () <SUUpdatePermissionPromptDelegateProtocol>
+@interface SUUpdater () <SUUpdatePermissionPromptDelegate>
 @property (retain) NSTimer *checkTimer;
 - (instancetype)initForBundle:(NSBundle *)bundle;
 - (void)startUpdateCycle;

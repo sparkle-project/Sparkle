@@ -13,7 +13,7 @@
 #import "SUBasicUpdateDriver.h"
 #import "SUAutomaticUpdateAlert.h"
 
-@interface SUAutomaticUpdateDriver : SUBasicUpdateDriver <SUUnarchiverDelegate, SUAutomaticUpdateAlertDelegateProtocol>
+@interface SUAutomaticUpdateDriver : SUBasicUpdateDriver <SUUnarchiverDelegate, SUAutomaticUpdateAlertDelegate>
 {
 @private
 	BOOL postponingInstallation, showErrors;
