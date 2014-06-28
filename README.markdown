@@ -1,7 +1,7 @@
 # Sparkle <img src="Sparkle.png" width=48 height=48 alt="">
 is an easy-to-use software update framework for Cocoa developers.
 
-## This fork
+## Changes since 1.5
 
 * Up to date with 10.9 SDK and Xcode 5/6. Supports Mac OS X 10.7+.
 * Merged bugfixes, security fixes and some features from multiple Sparkle forks.
