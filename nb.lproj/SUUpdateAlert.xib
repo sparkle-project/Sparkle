@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5056" systemVersion="13D65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment version="1050" defaultVersion="1060" identifier="macosx"/>
+        <deployment defaultVersion="1060" identifier="macosx"/>
+        <development version="5100" identifier="xcode"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5056"/>
         <plugIn identifier="com.apple.WebKitIBPlugin" version="5056"/>
     </dependencies>
@@ -113,7 +114,9 @@ DQ
                                 <webView maintainsBackForwardList="NO" id="18">
                                     <rect key="frame" x="-2" y="-1" width="445" height="199"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <webPreferences key="preferences" defaultFontSize="12" defaultFixedFontSize="12"/>
+                                    <webPreferences key="preferences" defaultFontSize="12" defaultFixedFontSize="12">
+                                        <nil key="identifier"/>
+                                    </webPreferences>
                                     <connections>
                                         <binding destination="-2" name="hidden" keyPath="showsReleaseNotes" id="161">
                                             <dictionary key="options">
