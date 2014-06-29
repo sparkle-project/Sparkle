@@ -176,6 +176,10 @@
 
 - (id)objectForUserDefaultsKey:(NSString *)defaultName
 {
+    if (!defaultName || !defaultsDomain) {
+        return nil;
+    }
+
 	// Under Tiger, CFPreferencesCopyAppValue doesn't get values from NSRegistrationDomain, so anything
 	// passed into -[NSUserDefaults registerDefaults:] is ignored.  The following line falls
 	// back to using NSUserDefaults, but only if the host bundle is the main bundle.
