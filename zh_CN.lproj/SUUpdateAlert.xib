@@ -162,7 +162,7 @@ DQ
                             <constraint firstAttribute="height" priority="300" constant="28" id="H6E-te-Fog"/>
                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="14" id="KUO-Dw-g6s"/>
                         </constraints>
-                        <textFieldCell key="cell" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="left" id="174">
+                        <textFieldCell key="cell" allowsUndo="NO" sendsActionOnEndEditing="YES" id="174">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>

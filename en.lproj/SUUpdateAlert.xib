@@ -222,7 +222,6 @@ DQ
             <connections>
                 <outlet property="delegate" destination="-2" id="50"/>
             </connections>
-            <point key="canvasLocation" x="76" y="128"/>
         </window>
         <userDefaultsController representsSharedInstance="YES" id="93" userLabel="Shared Defaults"/>
     </objects>
