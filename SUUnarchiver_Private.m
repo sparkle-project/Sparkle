@@ -7,6 +7,7 @@
 //
 
 #import "SUUnarchiver_Private.h"
+#import "SUHost.h"
 
 @implementation SUUnarchiver (Private)
 
