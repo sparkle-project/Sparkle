@@ -311,7 +311,7 @@
     }
 }
 
-- (void)webView:sender decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:frame decisionListener:listener
+- (void)webView:sender decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:frame decisionListener:(id <WebPolicyDecisionListener>)listener
 {
     if (webViewFinishedLoading) {
         [[NSWorkspace sharedWorkspace] openURL:[request URL]];

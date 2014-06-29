@@ -37,7 +37,7 @@
 	return self;
 }
 
-+ (void)promptWithHost:(SUHost *)aHost systemProfile:(NSArray *)profile delegate:(id)d
++ (void)promptWithHost:(SUHost *)aHost systemProfile:(NSArray *)profile delegate:(id <SUUpdatePermissionPromptDelegate>)d
 {
 	// If this is a background application we need to focus it in order to bring the prompt
 	// to the user's attention. Otherwise the prompt would be hidden behind other applications and
