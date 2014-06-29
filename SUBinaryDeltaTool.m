@@ -72,7 +72,7 @@ extern int bsdiff(int argc, const char **argv);
 static NSDictionary *infoForFile(FTSENT *ent)
 {
     NSData *hash = hashOfFile(ent);
-    NSNumber *size = nil;
+    NSNumber *size = @0;
 	if (ent->fts_info != FTS_D) {
         size = @(ent->fts_statp->st_size);
 	}
