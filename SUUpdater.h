@@ -35,7 +35,12 @@
 
 @property  NSTimeInterval updateCheckInterval;
 
-@property (copy) NSURL *feedURL;	// *** MUST BE CALLED ON MAIN THREAD ***
+/*!
+ * The URL of the appcast used to download update information.
+ *
+ * This property must be called on the main thread.
+ */
+@property (copy) NSURL *feedURL;
 
 @property (nonatomic, copy) NSString *userAgentString;
 

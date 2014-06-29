@@ -441,17 +441,23 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 - (void)setFeedURL:(NSURL *)feedURL
 {
+    if (![NSThread isMainThread])
+        [NSException raise:@"SUThreadException" format:@"This method must be called on the main thread"];
+
 	[host setObject:[feedURL absoluteString] forUserDefaultsKey:SUFeedURLKey];
 }
 
-- (NSURL *)feedURL // *** MUST BE CALLED ON MAIN THREAD ***
+- (NSURL *)feedURL
 {
+    if (![NSThread isMainThread])
+        [NSException raise:@"SUThreadException" format:@"This method must be called on the main thread"];
+
 	// A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
 	NSString *appcastString = [host objectForKey:SUFeedURLKey];
 	if( [delegate respondsToSelector: @selector(feedURLStringForUpdater:)] )
 		appcastString = [delegate feedURLStringForUpdater: self];
 	if (!appcastString) // Can't find an appcast string!
-		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the SUFeedURL key in either the Info.plist or the user defaults!"];
+		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the %@ key in either the Info.plist or the user defaults!", SUFeedURLKey];
 	NSCharacterSet* quoteSet = [NSCharacterSet characterSetWithCharactersInString: @"\"\'"]; // Some feed publishers add quotes; strip 'em.
 	NSString*	castUrlStr = [appcastString stringByTrimmingCharactersInSet:quoteSet];
 	if( !castUrlStr || [castUrlStr length] == 0 )
