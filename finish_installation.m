@@ -105,7 +105,7 @@
 }
 }
 
-- (void)showAppIconInDock:(NSTimer *)aTimer;
+- (void)showAppIconInDock:(NSTimer *)aTimer
 {
 	ProcessSerialNumber		psn = { 0, kCurrentProcess };
 	TransformProcessType( &psn, kProcessTransformToForegroundApplication );

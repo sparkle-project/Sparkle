@@ -187,7 +187,7 @@
 	return CFBridgingRelease(obj);
 }
 
-- (void)setObject:(id)value forUserDefaultsKey:(NSString *)defaultName;
+- (void)setObject:(id)value forUserDefaultsKey:(NSString *)defaultName
 {
 	if (usesStandardUserDefaults)
 	{

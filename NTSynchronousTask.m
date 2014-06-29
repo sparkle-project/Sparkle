@@ -42,7 +42,7 @@
     self.result = [self.task terminationStatus];
 }
 
-- (instancetype)init;
+- (instancetype)init
 {
     self = [super init];
 	if (self)
