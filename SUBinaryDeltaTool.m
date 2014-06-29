@@ -33,6 +33,8 @@ extern int bsdiff(int argc, const char **argv);
 @end
 
 @implementation CreateBinaryDeltaOperation
+@synthesize relativePath = _relativePath;
+@synthesize resultPath = _resultPath;
 @synthesize _fromPath = _fromPath;
 @synthesize _toPath = _toPath;
 
@@ -72,7 +74,7 @@ static NSDictionary *infoForFile(FTSENT *ent)
     NSData *hash = hashOfFile(ent);
     NSNumber *size = nil;
 	if (ent->fts_info != FTS_D) {
-        size = [NSNumber numberWithUnsignedLongLong:ent->fts_statp->st_size];
+        size = [NSNumber numberWithLongLong:ent->fts_statp->st_size];
 	}
     return [NSDictionary dictionaryWithObjectsAndKeys:hash, @"hash", [NSNumber numberWithUnsignedShort:ent->fts_info], @"type", size, @"size", nil];
 }
