@@ -39,7 +39,7 @@
 		5D06E8D80FD68C8E005AE3F6 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; };
 		5D06E8E90FD68CDB005AE3F6 /* bsdiff.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */; settings = {COMPILER_FLAGS = "-Wno-shorten-64-to-32"; }; };
 		5D06E8EA0FD68CDB005AE3F6 /* SUBinaryDeltaTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E30FD68CC7005AE3F6 /* SUBinaryDeltaTool.m */; };
-		5D06E8EB0FD68CE4005AE3F6 /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; settings = {COMPILER_FLAGS = "-Wno-shorten-64-to-32"; }; };
+		5D06E8EB0FD68CE4005AE3F6 /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; settings = {COMPILER_FLAGS = "-Wno-shorten-64-to-32 -Wno-sign-conversion"; }; };
 		5D06E8EC0FD68CE4005AE3F6 /* SUBinaryDeltaApply.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E00FD68CC7005AE3F6 /* SUBinaryDeltaApply.m */; };
 		5D06E8ED0FD68CE4005AE3F6 /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E20FD68CC7005AE3F6 /* SUBinaryDeltaCommon.m */; };
 		5D06E8FD0FD68D6B005AE3F6 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */; };
