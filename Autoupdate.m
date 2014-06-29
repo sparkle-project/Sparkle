@@ -8,8 +8,15 @@
 
 #include <unistd.h>
 
-#define	LONG_INSTALLATION_TIME			5				// If the Installation takes longer than this time the Application Icon is shown in the Dock so that the user has some feedback.
-#define	CHECK_FOR_PARENT_TO_QUIT_TIME	.5				// Time this app uses to recheck if the parent has already died.
+/*!
+ * If the Installation takes longer than this time the Application Icon is shown in the Dock so that the user has some feedback.
+ */
+static const NSTimeInterval SUInstallationTimeLimit = 5;
+
+/*!
+ * Time this app uses to recheck if the parent has already died.
+ */
+static const NSTimeInterval SUParentQuitCheckInterval = .5;
 
 @interface TerminationListener : NSObject <SUInstallerDelegate>
 {
@@ -57,7 +64,7 @@
 	if( alreadyTerminated )
 		[self parentHasQuit];
 	else
-		watchdogTimer = [[NSTimer scheduledTimerWithTimeInterval:CHECK_FOR_PARENT_TO_QUIT_TIME target:self selector:@selector(watchdog:) userInfo:nil repeats:YES] retain];
+		watchdogTimer = [[NSTimer scheduledTimerWithTimeInterval:SUParentQuitCheckInterval target:self selector:@selector(watchdog:) userInfo:nil repeats:YES] retain];
 
 	return self;
 }
@@ -87,7 +94,7 @@
 -(void)	parentHasQuit
 {
 	[watchdogTimer invalidate];
-	longInstallationTimer = [[NSTimer scheduledTimerWithTimeInterval: LONG_INSTALLATION_TIME
+	longInstallationTimer = [[NSTimer scheduledTimerWithTimeInterval:SUInstallationTimeLimit
 								target: self selector: @selector(showAppIconInDock:)
 								userInfo:nil repeats:NO] retain];
 
