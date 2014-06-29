@@ -1545,6 +1545,16 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				SDKROOT = macosx;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Weverything",
+					"-Wno-empty-translation-unit",
+					"-Wno-unused-macros",
+					"-Wno-gnu-statement-expression",
+					"$(WARNING_CFLAGS_EXTRA)",
+					"-Wno-variadic-macros",
+					"-Wno-gnu-zero-variadic-macro-arguments",
+				);
 			};
 			name = Debug;
 		};
@@ -1554,6 +1564,16 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				SDKROOT = macosx;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Weverything",
+					"-Wno-empty-translation-unit",
+					"-Wno-unused-macros",
+					"-Wno-gnu-statement-expression",
+					"$(WARNING_CFLAGS_EXTRA)",
+					"-Wno-variadic-macros",
+					"-Wno-gnu-zero-variadic-macro-arguments",
+				);
 			};
 			name = Release;
 		};
