@@ -6,6 +6,24 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		1495005F195FB89400BC5B5B /* All */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 14950060195FB89500BC5B5B /* Build configuration list for PBXAggregateTarget "All" */;
+			buildPhases = (
+			);
+			dependencies = (
+				14950064195FB8A600BC5B5B /* PBXTargetDependency */,
+				14950066195FB8A600BC5B5B /* PBXTargetDependency */,
+				14950068195FB8A600BC5B5B /* PBXTargetDependency */,
+				1495006A195FB8A600BC5B5B /* PBXTargetDependency */,
+				1495006C195FB8A600BC5B5B /* PBXTargetDependency */,
+			);
+			name = All;
+			productName = All;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		525A2790133D6AE900FD8D70 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
@@ -135,6 +153,41 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		14950063195FB8A600BC5B5B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = Sparkle;
+		};
+		14950065195FB8A600BC5B5B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 61B5F90109C4CEE200B25A18;
+			remoteInfo = "Sparkle Test App";
+		};
+		14950067195FB8A600BC5B5B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 612279D80DB5470200AB99EA;
+			remoteInfo = "Sparkle Unit Tests";
+		};
+		14950069195FB8A600BC5B5B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5D06E8CF0FD68C7C005AE3F6;
+			remoteInfo = BinaryDelta;
+		};
+		1495006B195FB8A600BC5B5B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 55C14BB6136EEF1500649790;
+			remoteInfo = finish_installation;
+		};
 		55C14F96136F044100649790 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -950,6 +1003,7 @@
 				612279D80DB5470200AB99EA /* Sparkle Unit Tests */,
 				5D06E8CF0FD68C7C005AE3F6 /* BinaryDelta */,
 				55C14BB6136EEF1500649790 /* finish_installation */,
+				1495005F195FB89400BC5B5B /* All */,
 			);
 		};
 /* End PBXProject section */
@@ -1171,6 +1225,31 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		14950064195FB8A600BC5B5B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8DC2EF4F0486A6940098B216 /* Sparkle */;
+			targetProxy = 14950063195FB8A600BC5B5B /* PBXContainerItemProxy */;
+		};
+		14950066195FB8A600BC5B5B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 61B5F90109C4CEE200B25A18 /* Sparkle Test App */;
+			targetProxy = 14950065195FB8A600BC5B5B /* PBXContainerItemProxy */;
+		};
+		14950068195FB8A600BC5B5B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 612279D80DB5470200AB99EA /* Sparkle Unit Tests */;
+			targetProxy = 14950067195FB8A600BC5B5B /* PBXContainerItemProxy */;
+		};
+		1495006A195FB8A600BC5B5B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5D06E8CF0FD68C7C005AE3F6 /* BinaryDelta */;
+			targetProxy = 14950069195FB8A600BC5B5B /* PBXContainerItemProxy */;
+		};
+		1495006C195FB8A600BC5B5B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 55C14BB6136EEF1500649790 /* finish_installation */;
+			targetProxy = 1495006B195FB8A600BC5B5B /* PBXContainerItemProxy */;
+		};
 		55C14F97136F044100649790 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 55C14BB6136EEF1500649790 /* finish_installation */;
@@ -1345,6 +1424,20 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		14950061195FB89500BC5B5B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		14950062195FB89500BC5B5B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		1DEB91AE08733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
@@ -1475,6 +1568,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		14950060195FB89500BC5B5B /* Build configuration list for PBXAggregateTarget "All" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				14950061195FB89500BC5B5B /* Debug */,
+				14950062195FB89500BC5B5B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		1DEB91AD08733DA50010E9CD /* Build configuration list for PBXNativeTarget "Sparkle" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
