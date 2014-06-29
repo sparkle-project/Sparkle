@@ -47,11 +47,13 @@ NSString *temporaryFilename(NSString *base)
 {
     NSString *template = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.XXXXXXXXXX", base]];
     const char *fsrepr = [template fileSystemRepresentation];
-    char buffer[strlen(fsrepr)+1];
+    char *buffer = (char *)malloc(strlen(fsrepr) + 1);
     strcpy(buffer, fsrepr);
 
     // mkstemp() can't be used, beause it returns a file descriptor, and XAR API requires a filename
-    return stringWithFileSystemRepresentation(mktemp(buffer));
+    NSString *ret = stringWithFileSystemRepresentation(mktemp(buffer));
+    free(buffer);
+    return ret;
 }
 
 static void _hashOfBuffer(unsigned char *hash, const char* buffer, ssize_t bufferLength)
