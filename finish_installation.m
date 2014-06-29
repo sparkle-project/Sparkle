@@ -98,14 +98,14 @@
 		[self relaunch];
 }
 
-- (void) watchdog:(NSTimer *)aTimer
+- (void)watchdog:(NSTimer *) __unused aTimer
 {
 	if (![NSRunningApplication runningApplicationWithProcessIdentifier:parentprocessid]) {
 		[self parentHasQuit];
 }
 }
 
-- (void)showAppIconInDock:(NSTimer *)aTimer
+- (void)showAppIconInDock:(NSTimer *) __unused aTimer
 {
 	ProcessSerialNumber		psn = { 0, kCurrentProcess };
 	TransformProcessType( &psn, kProcessTransformToForegroundApplication );
@@ -158,12 +158,12 @@
 					versionComparator: [SUStandardVersionComparator defaultComparator]];
 }
 
-- (void) installerFinishedForHost:(SUHost *)aHost
+- (void)installerFinishedForHost:(SUHost *) __unused aHost
 {
 	[self relaunch];
 }
 
-- (void) installerForHost:(SUHost *)host failedWithError:(NSError *)error __attribute__((noreturn))
+- (void)installerForHost:(SUHost *) __unused host failedWithError:(NSError *)error __attribute__((noreturn))
 {
     if (shouldShowUI)
         NSRunAlertPanel( @"", @"%@", @"OK", @"", @"", [error localizedDescription] );

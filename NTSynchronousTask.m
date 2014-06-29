@@ -37,7 +37,7 @@
 	self.done = YES;
 }
 
-- (void)taskDidTerminate:(NSNotification*)note
+- (void)taskDidTerminate:(NSNotification *) __unused note
 {
     self.result = [self.task terminationStatus];
 }

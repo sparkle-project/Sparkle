@@ -91,7 +91,7 @@ static NSString *temporaryPatchFile(NSString *patchFile)
     return [NSString stringWithFormat:@"%@/.%@.tmp", directory, file];
 }
 
-static BOOL shouldSkipDeltaCompression(NSString *key, NSDictionary* originalInfo, NSDictionary *newInfo)
+static BOOL shouldSkipDeltaCompression(NSString * __unused key, NSDictionary* originalInfo, NSDictionary *newInfo)
 {
     unsigned long long fileSize = [[newInfo objectForKey:@"size"] unsignedLongLongValue];
 	if (fileSize < 4096) {
@@ -109,7 +109,7 @@ static BOOL shouldSkipDeltaCompression(NSString *key, NSDictionary* originalInfo
     return NO;
 }
 
-static BOOL shouldDeleteThenExtract(NSString *key, NSDictionary* originalInfo, NSDictionary *newInfo)
+static BOOL shouldDeleteThenExtract(NSString * __unused key, NSDictionary* originalInfo, NSDictionary *newInfo)
 {
 	if (!originalInfo) {
         return NO;

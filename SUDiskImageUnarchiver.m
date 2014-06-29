@@ -28,7 +28,7 @@
 }
 
 // Called on a non-main thread.
-- (void)extractDMGWithPassword:(NSString *)password
+- (void)extractDMGWithPassword:(NSString *) __unused password
 {
 	@autoreleasepool {
 		BOOL mountedSuccessfully = NO;

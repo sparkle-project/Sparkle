@@ -302,22 +302,22 @@ digest_end:
 }
 
 /* Memory Functions */
-static void *su_malloc( CSSM_SIZE size, void *ref )
+static void *su_malloc( CSSM_SIZE size, void * __unused ref )
 {
 	return malloc( size );
 }
 
-static void su_free( void *ptr, void *ref )
+static void su_free( void *ptr, void * __unused ref )
 {
 	free( ptr );
 }
 
-static void *su_realloc( void *ptr, CSSM_SIZE size, void *ref )
+static void *su_realloc( void *ptr, CSSM_SIZE size, void * __unused ref )
 {
 	return realloc( ptr, size );
 }
 
-static void *su_calloc( uint32 num, CSSM_SIZE size, void *ref )
+static void *su_calloc( uint32 num, CSSM_SIZE size, void * __unused ref )
 {
 	return calloc( num, size );
 }

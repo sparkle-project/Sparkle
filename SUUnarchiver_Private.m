@@ -28,7 +28,7 @@
 	[super dealloc];
 }
 
-+ (BOOL)canUnarchivePath:(NSString *)path
++ (BOOL)canUnarchivePath:(NSString *) __unused path
 {
 	return NO;
 }

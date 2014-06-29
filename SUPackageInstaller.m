@@ -36,7 +36,7 @@ static NSString * const SUPackageInstallerInstallationPathKey = @"SUPackageInsta
 	}
 }
 
-+ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:(id <SUInstallerDelegate>)delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
++ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:(id <SUInstallerDelegate>)delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>) __unused comparator
 {
 	NSString *command;
 	NSArray *args;

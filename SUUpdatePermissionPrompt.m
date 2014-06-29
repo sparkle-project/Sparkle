@@ -65,7 +65,7 @@
     }
 }
 
-- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row { return NO; }
+- (BOOL)tableView:(NSTableView *) __unused tableView shouldSelectRow:(NSInteger) __unused row { return NO; }
 
 - (void)dealloc
 {
@@ -84,7 +84,7 @@
 	return [NSString stringWithFormat:SULocalizedString(@"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu.", nil), [host name]];
 }
 
-- (IBAction)toggleMoreInfo:(id)sender
+- (IBAction)toggleMoreInfo:(id) __unused sender
 {
 	self.isShowingMoreInfo = !_isShowingMoreInfo;
 	

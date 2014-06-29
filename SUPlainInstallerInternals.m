@@ -448,7 +448,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		;//SULog(@"Moved %@ to the trash.", path);
 }
 
-+ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp error:(NSError **)error
++ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *) __unused tmp error:(NSError **)error
 {
 	FSRef		srcRef, dstRef, dstDirRef, tmpDirRef;
 	OSStatus	err;

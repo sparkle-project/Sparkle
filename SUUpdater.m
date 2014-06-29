@@ -311,7 +311,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	return( !delegate || ![delegate respondsToSelector: @selector(updaterShouldRelaunchApplication:)] || [delegate updaterShouldRelaunchApplication: self] );
 }
 
-- (IBAction)checkForUpdates: (id)sender
+- (IBAction)checkForUpdates:(id) __unused sender
 {
 	if (driver && [driver isInterruptible]) {
 		[driver abortUpdate];

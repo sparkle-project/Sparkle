@@ -66,22 +66,22 @@
 		[delegate updateAlert:self finishedWithChoice:choice];
 }
 
-- (IBAction)installUpdate: (id)sender
+- (IBAction)installUpdate:(id) __unused sender
 {
 	[self endWithSelection:SUInstallUpdateChoice];
 }
 
-- (IBAction)openInfoURL: (id)sender
+- (IBAction)openInfoURL:(id) __unused sender
 {
 	[self endWithSelection:SUOpenInfoURLChoice];
 }
 
-- (IBAction)skipThisVersion: (id)sender
+- (IBAction)skipThisVersion:(id) __unused sender
 {
 	[self endWithSelection:SUSkipThisVersionChoice];
 }
 
-- (IBAction)remindMeLater: (id)sender
+- (IBAction)remindMeLater:(id) __unused sender
 {
 	[self endWithSelection:SURemindMeLaterChoice];
 }
@@ -270,7 +270,7 @@
 }
 
 
-- (BOOL)windowShouldClose:note
+- (BOOL)windowShouldClose:(NSNotification *) __unused note
 {
 	[self endWithSelection:SURemindMeLaterChoice];
 	return YES;
@@ -311,7 +311,7 @@
     }
 }
 
-- (void)webView:sender decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:frame decisionListener:(id <WebPolicyDecisionListener>)listener
+- (void)webView:(WebView *) __unused sender decidePolicyForNavigationAction:(NSDictionary *) __unused actionInformation request:(NSURLRequest *)request frame:(WebFrame *) __unused frame decisionListener:(id <WebPolicyDecisionListener>)listener
 {
     if (webViewFinishedLoading) {
         [[NSWorkspace sharedWorkspace] openURL:[request URL]];
@@ -324,7 +324,7 @@
 }
 
 // Clean up the contextual menu.
-- (NSArray *)webView:(WebView *)sender contextMenuItemsForElement:(NSDictionary *)element defaultMenuItems:(NSArray *)defaultMenuItems
+- (NSArray *)webView:(WebView *) __unused sender contextMenuItemsForElement:(NSDictionary *) __unused element defaultMenuItems:(NSArray *)defaultMenuItems
 {
 	NSMutableArray *webViewMenuItems = [[defaultMenuItems mutableCopy] autorelease];
 	

@@ -178,7 +178,7 @@
 	download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
 }
 
-- (void)download:(NSURLDownload *)d decideDestinationWithSuggestedFilename:(NSString *)name
+- (void)download:(NSURLDownload *) __unused d decideDestinationWithSuggestedFilename:(NSString *)name
 {
 	NSString *downloadFileName = [NSString stringWithFormat:@"%@ %@", [host name], [updateItem versionString]];
     
@@ -221,17 +221,17 @@
     return [SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey];
 }
 
-- (void)downloadDidFinish:(NSURLDownload *)d
+- (void)downloadDidFinish:(NSURLDownload *) __unused d
 {	
 	[self extractUpdate];
 }
 
-- (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error
+- (void)download:(NSURLDownload *) __unused download didFailWithError:(NSError *)error
 {
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while downloading the update. Please try again later.", nil), NSLocalizedFailureReasonErrorKey: [error localizedDescription]}]];
 }
 
-- (BOOL)download:(NSURLDownload *)download shouldDecodeSourceDataOfMIMEType:(NSString *)encodingType
+- (BOOL)download:(NSURLDownload *) __unused download shouldDecodeSourceDataOfMIMEType:(NSString *)encodingType
 {
 	// We don't want the download system to extract our gzips.
 	// Note that we use a substring matching here instead of direct comparison because the docs say "application/gzip" but the system *uses* "application/x-gzip". This is a documentation bug.
