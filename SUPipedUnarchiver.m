@@ -114,28 +114,28 @@
 {
 	// *** GETS CALLED ON NON-MAIN THREAD!!!
 	
-	return [self extractArchivePipingDataToCommand:@"tar -xC \"$DESTINATION\""];
+	[self extractArchivePipingDataToCommand:@"tar -xC \"$DESTINATION\""];
 }
 
 - (void)extractTGZ
 {
 	// *** GETS CALLED ON NON-MAIN THREAD!!!
 	
-	return [self extractArchivePipingDataToCommand:@"tar -zxC \"$DESTINATION\""];
+	[self extractArchivePipingDataToCommand:@"tar -zxC \"$DESTINATION\""];
 }
 
 - (void)extractTBZ
 {
 	// *** GETS CALLED ON NON-MAIN THREAD!!!
 	
-	return [self extractArchivePipingDataToCommand:@"tar -jxC \"$DESTINATION\""];
+	[self extractArchivePipingDataToCommand:@"tar -jxC \"$DESTINATION\""];
 }
 
 - (void)extractZIP
 {
 	// *** GETS CALLED ON NON-MAIN THREAD!!!
 	
-	return [self extractArchivePipingDataToCommand:@"ditto -x -k - \"$DESTINATION\""];
+	[self extractArchivePipingDataToCommand:@"ditto -x -k - \"$DESTINATION\""];
 }
 
 + (void)load
