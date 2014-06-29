@@ -112,7 +112,7 @@
 }
 
 
-- (void) relaunch
+- (void) relaunch __attribute__((noreturn))
 {
     if (shouldRelaunch)
     {
@@ -163,7 +163,7 @@
 	[self relaunch];
 }
 
-- (void) installerForHost:(SUHost *)host failedWithError:(NSError *)error
+- (void) installerForHost:(SUHost *)host failedWithError:(NSError *)error __attribute__((noreturn))
 {
     if (shouldShowUI)
         NSRunAlertPanel( @"", @"%@", @"OK", @"", @"", [error localizedDescription] );
