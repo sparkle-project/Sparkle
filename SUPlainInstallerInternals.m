@@ -547,7 +547,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	@try {
 		path = [file fileSystemRepresentation];
 	}
-	@catch (id exception) {
+	@catch (id) {
 		// -[NSString fileSystemRepresentation] throws an exception if it's
 		// unable to convert the string to something suitable.  Map that to
 		// EDOM, "argument out of domain", which sort of conveys that there

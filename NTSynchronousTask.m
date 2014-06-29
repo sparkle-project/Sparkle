@@ -102,7 +102,7 @@
 		[self.task launch];
 		success = YES;
 	}
-	@catch (NSException *localException) { }
+	@catch (NSException *) { }
 	
 	if (success)
 	{
@@ -146,7 +146,7 @@
 			
 			[task release];
 		}
-		@catch (NSException *localException) { }
+		@catch (NSException *) { }
 		
 	}
 	
@@ -175,7 +175,7 @@
 			}
 			
 			[task release];
-		} @catch (NSException *localException) {
+		} @catch (NSException *) {
 			taskResult = errCppGeneral;
 		}
 		

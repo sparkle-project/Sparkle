@@ -374,7 +374,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 		[[NSUserDefaultsController sharedUserDefaultsController] removeObserver:self forKeyPath:[@"values." stringByAppendingString:SUScheduledCheckIntervalKey]];
 		[[NSUserDefaultsController sharedUserDefaultsController] removeObserver:self forKeyPath:[@"values." stringByAppendingString:SUEnableAutomaticChecksKey]];
 	}
-	@catch (NSException *e)
+	@catch (NSException *)
 	{
 		NSLog(@"Sparkle Error: [SUUpdater unregisterAsObserver] called, but the updater wasn't registered as an observer.");
 	}

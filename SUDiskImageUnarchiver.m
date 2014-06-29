@@ -72,7 +72,7 @@
 			output = [[[task output] copy] autorelease];
 			[task release];
 		}
-		@catch (NSException *localException)
+		@catch (NSException *)
 		{
 			goto reportError;
 		}
