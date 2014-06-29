@@ -53,7 +53,7 @@
 	self.userAgentString = nil;
 	self.downloadFilename = nil;
 	self.download = nil;
-	
+
 	[super dealloc];
 }
 
@@ -63,7 +63,7 @@
 	if (userAgentString) {
         [request setValue:userAgentString forHTTPHeaderField:@"User-Agent"];
 	}
-            
+
     self.download = [[[NSURLDownload alloc] initWithRequest:request delegate:self] autorelease];
 }
 
@@ -83,20 +83,20 @@
 }
 
 - (void)downloadDidFinish:(NSURLDownload *) __unused aDownload
-{    
+{
 	NSError *error = nil;
-	
+
 	NSXMLDocument *document = nil;
 	BOOL failed = NO;
 	NSArray *xmlItems = nil;
 	NSMutableArray *appcastItems = [NSMutableArray array];
-	
+
 	if (downloadFilename)
 	{
         NSUInteger options = 0;
 		options = NSXMLNodeLoadExternalEntitiesSameOriginOnly;
 		document = [[[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:options error:&error] autorelease];
-	
+
 		[[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:nil];
 		self.downloadFilename = nil;
 	}
@@ -104,7 +104,7 @@
 	{
 		failed = YES;
 	}
-    
+
     if (nil == document)
     {
         failed = YES;
@@ -117,15 +117,15 @@
             failed = YES;
         }
     }
-    
+
 	if (failed == NO)
     {
-		
+
 		NSEnumerator *nodeEnum = [xmlItems objectEnumerator];
 		NSXMLNode *node;
 		NSMutableDictionary *nodesDict = [NSMutableDictionary dictionary];
 		NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-		
+
 		while (failed == NO && (node = [nodeEnum nextObject]))
         {
 			// First, we'll "index" all the first-level children of this appcast item so we can pick them out by language later.
@@ -148,7 +148,7 @@
                     node = [node nextSibling];
                 }
             }
-            
+
             for (NSString *name in nodesDict)
             {
                 node = [self bestNodeInNodes:nodesDict[name]];
@@ -157,7 +157,7 @@
 					// enclosure is flattened as a separate dictionary for some reason
 					NSDictionary *encDict = [(NSXMLElement *)node attributesAsDictionary];
 					dict[@"enclosure"] = encDict;
-					
+
 				}
                 else if ([name isEqualToString:@"pubDate"])
                 {
@@ -185,7 +185,7 @@
 					}
 				}
             }
-            
+
 			NSString *errString;
 			SUAppcastItem *anItem = [[[SUAppcastItem alloc] initWithDictionary:dict failureReason:&errString] autorelease];
             if (anItem)
@@ -200,14 +200,14 @@
             [dict removeAllObjects];
 		}
 	}
-	
+
 	if ([appcastItems count])
     {
 		NSSortDescriptor *sort = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
 		[appcastItems sortUsingDescriptors:@[sort]];
 		self.items = appcastItems;
 	}
-	
+
 	if (failed)
     {
         [self reportError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:@{NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while parsing the update feed.", nil)}]];
@@ -225,7 +225,7 @@
 		[[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:nil];
 	}
 	self.downloadFilename = nil;
-    
+
 	[self reportError:error];
 }
 
@@ -249,7 +249,7 @@
         return nodes[0];
     else if ([nodes count] == 0)
         return nil;
-    
+
     NSMutableArray *languages = [NSMutableArray array];
     NSString *lang;
     NSUInteger i;

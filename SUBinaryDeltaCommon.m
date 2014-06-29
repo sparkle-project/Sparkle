@@ -16,7 +16,7 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <xar/xar.h>
-    
+
 int binaryDeltaSupported(void)
 {
     // OS X 10.4 didn't include libxar, so we link against it weakly.
@@ -92,7 +92,7 @@ static void _hashOfFile(unsigned char* hash, FTSENT *ent)
             close(fileDescriptor);
             return;
         }
-		
+
         void *buffer = mmap(0, (size_t)fileSize, PROT_READ, MAP_FILE | MAP_PRIVATE, fileDescriptor, 0);
         if (buffer == (void*)-1) {
             close(fileDescriptor);

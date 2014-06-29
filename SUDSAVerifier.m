@@ -35,13 +35,13 @@ static NSData *rawKeyData( NSString *str );
 	CFDataRef hashData = NULL;
 	CSSM_KEY_PTR pubKey = cdsaCreateKey((CFDataRef)rawKeyData(pkeyString)); // Create the DSA key
 	CSSM_CSP_HANDLE cspHandle = CSSM_INVALID_HANDLE;
-	
+
 	if ( !pubKey ) return NO;
 	if ( (cspHandle = cdsaInit()) == CSSM_INVALID_HANDLE ) goto validate_end; // Init CDSA
 	if ( !cdsaVerifyKey(cspHandle, pubKey) ) goto validate_end; // Verify the key is valid
 	if ( (pathData = [NSData dataWithContentsOfFile:path]) == nil ) goto validate_end; // File data
 	if ( (hashData = cdsaCreateSHA1Digest(cspHandle, (CFDataRef)pathData)) == NULL ) goto validate_end; // Hash
-	
+
 	// Remove any line feeds from end of signature
 	// (Not likely needed, but the verify _can_ fail if there is, so...)
 	if ( [encodedSignature characterAtIndex:[encodedSignature length] - 1] == '\n' ) {
@@ -51,7 +51,7 @@ static NSData *rawKeyData( NSString *str );
 		encodedSignature = sig;
 	}
 	if ( (sigData = b64decode(encodedSignature)) == nil ) goto validate_end; // Decode signature
-	
+
 	// Verify the signature on the file
 	result = cdsaVerifySignature( cspHandle, pubKey, hashData, (CFDataRef)sigData );
 
@@ -59,7 +59,7 @@ validate_end:
 	cdsaReleaseKey( pubKey );
 	cdsaRelease( cspHandle );
 	if ( hashData ) CFRelease( hashData );
-	
+
 	return result;
 }
 
@@ -94,12 +94,12 @@ static NSData *b64decode( NSString *str )
         99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,  /* E0-EF */
         99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99   /* F0-FF */
     };
-	
+
 	retval = [NSMutableData dataWithLength:size];
 	buf = [retval mutableBytes];
-	
+
 	if ( (a = calloc(4, sizeof(UInt8))) == NULL ) return nil;
-	
+
 	do {
 		size_t ai = 0;
 		a[0] = a[1] = a[2] = a[3] = 0;
@@ -116,10 +116,10 @@ static NSData *b64decode( NSString *str )
 		if ( ai >= 4 ) buf[j+2] = (UInt8)((a[2] << 6) | (a[3] >> 0));
 		j += ai-1;
 	} while ( i < len );
-	
+
 	free( a );
 	if ( j < size ) [retval setLength:j];
-	
+
 	return retval;
 }
 
@@ -127,22 +127,22 @@ static NSData *rawKeyData( NSString *key )
 {
 	if ( (key == nil) || ([key length] == 0) ) return nil;
 	NSMutableString *t = [[key mutableCopy] autorelease];
-	
+
 	// Remove the PEM guards (if present)
 	[t replaceOccurrencesOfString:@"-" withString:@"" options:NSLiteralSearch range:NSMakeRange(0, [t length])];
 	[t replaceOccurrencesOfString:@"BEGIN PUBLIC KEY" withString:@"" options:NSLiteralSearch range:NSMakeRange(0, [t length])];
 	[t replaceOccurrencesOfString:@"END PUBLIC KEY" withString:@"" options:NSLiteralSearch range:NSMakeRange(0, [t length])];
-	
+
 	// Remove any line feeds from the beginning of the key
 	while ( [t characterAtIndex:0] == '\n' ) {
 		[t deleteCharactersInRange:NSMakeRange(0, 1)];
 	}
-	
+
 	// Remove any line feeds at the end of the key
 	while ( [t characterAtIndex:[t length] - 1] == '\n' ) {
 		[t deleteCharactersInRange:NSMakeRange([t length] - 1, 1)];
 	}
-	
+
 	// Remove whitespace around each line of the key.
 	NSMutableArray *pkeyTrimmedLines = [NSMutableArray array];
 	NSCharacterSet *whiteSet = [NSCharacterSet whitespaceCharacterSet];
@@ -151,7 +151,7 @@ static NSData *rawKeyData( NSString *key )
 		[pkeyTrimmedLines addObject:[pkeyLine stringByTrimmingCharactersInSet:whiteSet]];
 	}
 	key = [pkeyTrimmedLines componentsJoinedByString:@"\n"]; // Put them back together.
-	
+
 	// Base64 decode to return the raw key bits (DER format rather than PEM)
 	return b64decode( key );
 }
@@ -188,20 +188,20 @@ static CSSM_CSP_HANDLE cdsaInit( void )
 {
 	CSSM_CSP_HANDLE cspHandle = CSSM_INVALID_HANDLE;
 	CSSM_RETURN crtn;
-	
+
 	if ( !cssmInited ) {
 		CSSM_PVC_MODE pvcPolicy = CSSM_PVC_NONE;
 		crtn = CSSM_Init( &vers, CSSM_PRIVILEGE_SCOPE_NONE, &su_guid, CSSM_KEY_HIERARCHY_NONE, &pvcPolicy, NULL );
 		if ( crtn ) return CSSM_INVALID_HANDLE;
 		cssmInited = CSSM_TRUE;
 	}
-	
+
 	crtn = CSSM_ModuleLoad( &gGuidAppleCSP, CSSM_KEY_HIERARCHY_NONE, NULL, NULL );
 	if ( crtn ) return CSSM_INVALID_HANDLE;
-	
+
 	crtn = CSSM_ModuleAttach( &gGuidAppleCSP, &vers, &SU_MemFuncs, 0, CSSM_SERVICE_CSP, 0, CSSM_KEY_HIERARCHY_NONE, NULL, 0, NULL, &cspHandle );
 	if ( crtn ) return CSSM_INVALID_HANDLE;
-	
+
 	return cspHandle;
 }
 
@@ -214,20 +214,20 @@ static void cdsaRelease( CSSM_CSP_HANDLE cspHandle )
 static CSSM_KEY_PTR cdsaCreateKey( CFDataRef rawKey )
 {
 	CSSM_KEY_PTR retval = NULL;
-	
+
 	if ( !rawKey || (CFDataGetLength(rawKey) == 0) ) return NULL;
-	
+
 	if ( (retval = su_malloc(sizeof(CSSM_KEY), NULL)) == NULL ) return NULL;
-	
+
 	if ( !su_copyBytesToData(&(retval->KeyData), (CSSM_SIZE)CFDataGetLength(rawKey), CFDataGetBytePtr(rawKey)) ) {
 		su_free( retval, NULL );
 		return NULL;
 	}
-	
+
 	CSSM_KEYHEADER_PTR hdr = &(retval->KeyHeader);
-	
+
 	memset( hdr, 0, sizeof(CSSM_KEYHEADER) );
-	
+
 	hdr->HeaderVersion = CSSM_KEYHEADER_VERSION;
 	hdr->CspId = su_guid;
 	hdr->BlobType = CSSM_KEYBLOB_RAW;
@@ -236,7 +236,7 @@ static CSSM_KEY_PTR cdsaCreateKey( CFDataRef rawKey )
 	hdr->KeyClass = CSSM_KEYCLASS_PUBLIC_KEY;
 	hdr->KeyAttr = CSSM_KEYATTR_EXTRACTABLE;
 	hdr->KeyUsage = CSSM_KEYUSE_ANY;
-	
+
 	return retval;
 }
 
@@ -253,7 +253,7 @@ BOOL cdsaVerifyKey( CSSM_CSP_HANDLE cspHandle, CSSM_KEY_PTR key )
 	if ( key->KeyHeader.LogicalKeySizeInBits == 0 ) {
 		CSSM_RETURN crtn;
 		CSSM_KEY_SIZE keySize;
-		
+
 		/* This will fail if the key isn't valid */
 		crtn = CSSM_QueryKeySizeInBits( cspHandle, CSSM_INVALID_HANDLE, key, &keySize );
 		if ( crtn ) return NO;
@@ -267,17 +267,17 @@ static BOOL cdsaVerifySignature( CSSM_CSP_HANDLE cspHandle, const CSSM_KEY_PTR k
 	CSSM_CC_HANDLE ccHandle = CSSM_INVALID_HANDLE;
 	CSSM_DATA_PTR plain = su_createData( msg ), cipher = su_createData( signature );
 	BOOL retval = NO;
-	
+
 	if ( !plain || !cipher || (CSSM_CSP_CreateSignatureContext(cspHandle, CSSM_ALGID_SHA1WithDSA, NULL, key, &ccHandle) != CSSM_OK) )
 		goto verify_end;
-	
+
 	retval = ( CSSM_VerifyData(ccHandle, plain, 1, CSSM_ALGID_NONE, cipher) == CSSM_OK );
-	
+
 verify_end:
 	su_freeData( plain, true );
 	su_freeData( cipher, true );
 	if ( ccHandle ) CSSM_DeleteContext( ccHandle );
-	
+
 	return retval;
 }
 
@@ -286,10 +286,10 @@ static CFDataRef cdsaCreateSHA1Digest( CSSM_CSP_HANDLE cspHandle, const CFDataRe
 	CSSM_CC_HANDLE ccHandle = CSSM_INVALID_HANDLE;
 	CSSM_DATA_PTR data = su_createData( bytes ), dgst = su_createData( NULL );
 	CFDataRef retval = NULL;
-	
+
 	if ( !data || !dgst || (CSSM_CSP_CreateDigestContext(cspHandle, CSSM_ALGID_SHA1, &ccHandle) != CSSM_OK) )
 		goto digest_end;
-	
+
 	if ( CSSM_DigestData(ccHandle, data, 1, dgst) == CSSM_OK )
 		retval = CFDataCreate( kCFAllocatorDefault, (const UInt8 *)dgst->Data, (CFIndex)dgst->Length );
 
@@ -297,7 +297,7 @@ digest_end:
 	su_freeData( data, true );
 	su_freeData( dgst, true );
 	if ( ccHandle ) CSSM_DeleteContext( ccHandle );
-	
+
 	return retval;
 }
 
@@ -351,5 +351,5 @@ static Boolean su_copyBytesToData( CSSM_DATA_PTR data, CSSM_SIZE size, const uin
 			retval = true;
 		}
 	}
-	return retval;	
+	return retval;
 }

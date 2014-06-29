@@ -31,20 +31,20 @@
 - (NSMutableArray *)systemProfileArrayForHost:(SUHost *)host
 {
 	NSDictionary *modelTranslation = [self modelTranslationTable];
-	
+
 	// Gather profile information and append it to the URL.
 	NSMutableArray *profileArray = [NSMutableArray array];
 	NSArray *profileDictKeys = @[@"key", @"displayKey", @"value", @"displayValue"];
 	int error = 0;
 	int value = 0;
 	size_t length = sizeof(value);
-	
+
 	// OS version
 	NSString *currentSystemVersion = [SUHost systemVersionString];
 	if (currentSystemVersion != nil) {
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"osVersion",@"OS Version",currentSystemVersion,currentSystemVersion] forKeys:profileDictKeys]];
 	}
-	
+
 	// CPU type (decoder info for values found here is in mach/machine.h)
 	error = sysctlbyname("hw.cputype", &value, &length, NULL, 0);
 	int cpuType = -1;
@@ -65,9 +65,9 @@
 	if (error != 0) {
 		error = sysctlbyname("hw.optional.64bitops", &value, &length, NULL, 0); //PPC specific
 	}
-	
+
 	BOOL is64bit = NO;
-	
+
 	if (error == 0) {
 		is64bit = value == 1;
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"cpu64bit", @"CPU is 64-Bit?", @(is64bit), is64bit ? @"Yes" : @"No"] forKeys:profileDictKeys]];
@@ -108,20 +108,20 @@
 			free(cpuModel);
 		}
 	}
-	
+
 	// Number of CPUs
 	error = sysctlbyname("hw.ncpu", &value, &length, NULL, 0);
 	if (error == 0) {
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"ncpu",@"Number of CPUs", @(value), @(value)] forKeys:profileDictKeys]];
 	}
-	
+
 	// User preferred language
 	NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
 	NSArray *languages = [defs objectForKey:@"AppleLanguages"];
 	if ([languages count] > 0) {
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"lang",@"Preferred Language", languages[0], languages[0]] forKeys:profileDictKeys]];
 	}
-	
+
 	// Application sending the request
 	NSString *appName = [host name];
 	if (appName) {
@@ -131,7 +131,7 @@
 	if (appVersion) {
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"appVersion",@"Application Version", appVersion, appVersion] forKeys:profileDictKeys]];
 	}
-	
+
 	// Number of displays?
 
 	// CPU speed
@@ -141,7 +141,7 @@
 		unsigned long mhz = hz / 1000000;
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"cpuFreqMHz",@"CPU Speed (GHz)", @(mhz), @(mhz / 1000.)] forKeys:profileDictKeys]];
 	}
-	
+
 	// amount of RAM
 	unsigned long bytes;
 	size_t bytes_size = sizeof(unsigned long);
@@ -149,7 +149,7 @@
 		double megabytes = bytes / (1024.*1024.);
 		[profileArray addObject:[NSDictionary dictionaryWithObjects:@[@"ramMB",@"Memory (MB)", @(megabytes), @(megabytes)] forKeys:profileDictKeys]];
 	}
-	
+
 	return profileArray;
 }
 

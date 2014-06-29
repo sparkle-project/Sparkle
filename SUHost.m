@@ -87,10 +87,10 @@
 {
 	NSString *name = [bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
 	if (name) return name;
-	
+
 	name = [self objectForInfoDictionaryKey:@"CFBundleName"];
 	if (name) return name;
-	
+
 	return [[[NSFileManager defaultManager] displayNameAtPath:[bundle bundlePath]] stringByDeletingPathExtension];
 }
 
@@ -151,7 +151,7 @@
 	// Maybe the key is just a string in the Info.plist.
 	NSString *key = [bundle objectForInfoDictionaryKey:SUPublicDSAKeyKey];
 	if (key) { return key; }
-	
+
 	// More likely, we've got a reference to a Resources file by filename:
 	NSString *keyFilename = [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];
 	if (!keyFilename) { return nil; }
@@ -182,7 +182,7 @@
 	if (usesStandardUserDefaults) {
 		return [[NSUserDefaults standardUserDefaults] objectForKey:defaultName];
 	}
-	
+
 	CFPropertyListRef obj = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)defaultsDomain);
 	return CFBridgingRelease(obj);
 }
@@ -205,7 +205,7 @@
 	if (usesStandardUserDefaults) {
 		return [[NSUserDefaults standardUserDefaults] boolForKey:defaultName];
 	}
-	
+
 	BOOL value;
 	CFPropertyListRef plr = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)defaultsDomain);
 	if (plr == NULL) {

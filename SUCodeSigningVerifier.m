@@ -19,32 +19,32 @@
     SecRequirementRef requirement = NULL;
     SecStaticCodeRef staticCode = NULL;
     SecCodeRef hostCode = NULL;
-    
+
     result = SecCodeCopySelf(kSecCSDefaultFlags, &hostCode);
     if (result != 0) {
         SULog(@"Failed to copy host code %d", result);
         goto finally;
     }
-    
+
     result = SecCodeCopyDesignatedRequirement(hostCode, kSecCSDefaultFlags, &requirement);
     if (result != 0) {
         SULog(@"Failed to copy designated requirement %d", result);
         goto finally;
     }
-    
+
     NSBundle *newBundle = [NSBundle bundleWithPath:destinationPath];
     if (!newBundle) {
         SULog(@"Failed to load NSBundle for update");
         result = -1;
         goto finally;
     }
-    
+
     result = SecStaticCodeCreateWithPath((CFURLRef)[newBundle executableURL], kSecCSDefaultFlags, &staticCode);
     if (result != 0) {
         SULog(@"Failed to get static code %d", result);
         goto finally;
     }
-    
+
     result = SecStaticCodeCheckValidityWithErrors(staticCode, kSecCSDefaultFlags | kSecCSCheckAllArchitectures, requirement, (CFErrorRef *)error);
     if (result != 0 && error) {
         if (result == errSecCSReqFailed) {
@@ -57,10 +57,10 @@
             [self logSigningInfoForCode:hostCode label:@"host info"];
             [self logSigningInfoForCode:staticCode label:@"new info"];
         }
-        
+
         [*error autorelease];
     }
-    
+
 finally:
     if (hostCode) CFRelease(hostCode);
     if (staticCode) CFRelease(staticCode);
@@ -91,7 +91,7 @@ finally:
     SecCodeRef hostCode = NULL;
     result = SecCodeCopySelf(kSecCSDefaultFlags, &hostCode);
     if (result != 0) return NO;
-    
+
     SecRequirementRef requirement = NULL;
     result = SecCodeCopyDesignatedRequirement(hostCode, kSecCSDefaultFlags, &requirement);
     if (hostCode) CFRelease(hostCode);

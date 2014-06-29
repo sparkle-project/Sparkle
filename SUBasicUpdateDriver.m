@@ -33,18 +33,18 @@
 @implementation SUBasicUpdateDriver
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
-{	
+{
 	[super checkForUpdatesAtURL:URL host:aHost];
 	if ([aHost isRunningOnReadOnlyVolume])
 	{
 		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again.", nil), [aHost name]]}]];
 		return;
-	}	
-	
+	}
+
 	SUAppcast *appcast = [[SUAppcast alloc] init];
 	CFRetain(appcast); // We'll manage the appcast's memory ourselves so we don't have to make it an IV to support GC.
 	[appcast release];
-	
+
 	[appcast setDelegate:self];
 	[appcast setUserAgentString:[updater userAgentString]];
 	[appcast fetchAppcastFromURL:URL];
@@ -53,18 +53,18 @@
 - (id <SUVersionComparison>)versionComparator
 {
 	id <SUVersionComparison> comparator = nil;
-	
+
 	// Give the delegate a chance to provide a custom version comparator
 	if ([[updater delegate] respondsToSelector:@selector(versionComparatorForUpdater:)]) {
 		comparator = [[updater delegate] versionComparatorForUpdater:updater];
 	}
-	
+
 	// If we don't get a comparator from the delegate, use the default comparator
 	if (!comparator) {
 		comparator = [SUStandardVersionComparator defaultComparator];
 	}
-	
-	return comparator;	
+
+	return comparator;
 }
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui
@@ -74,12 +74,12 @@
 
 - (BOOL)hostSupportsItem:(SUAppcastItem *)ui
 {
-	if (([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) && 
+	if (([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) &&
         ([ui maximumSystemVersion] == nil || [[ui maximumSystemVersion] isEqualToString:@""])) { return YES; }
-    
+
     BOOL minimumVersionOK = TRUE;
     BOOL maximumVersionOK = TRUE;
-    
+
     // Check minimum and maximum System Version
     if ([ui minimumSystemVersion] != nil && ![[ui minimumSystemVersion] isEqualToString:@""]) {
         minimumVersionOK = [[SUStandardVersionComparator defaultComparator] compareVersion:[ui minimumSystemVersion] toVersion:[SUHost systemVersionString]] != NSOrderedDescending;
@@ -87,7 +87,7 @@
     if ([ui maximumSystemVersion] != nil && ![[ui maximumSystemVersion] isEqualToString:@""]) {
         maximumVersionOK = [[SUStandardVersionComparator defaultComparator] compareVersion:[ui maximumSystemVersion] toVersion:[SUHost systemVersionString]] != NSOrderedAscending;
     }
-    
+
     return minimumVersionOK && maximumVersionOK;
 }
 
@@ -108,12 +108,12 @@
 	if ([[updater delegate] respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
 		[[updater delegate] updater:updater didFinishLoadingAppcast:ac];
 	}
-	
+
 	NSDictionary *userInfo = (ac != nil) ? @{SUUpdaterAppcastNotificationKey : ac} : nil;
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:updater userInfo:userInfo];
-    
+
     SUAppcastItem *item = nil;
-    
+
 	// Now we have to find the best valid update in the appcast.
 	if ([[updater delegate] respondsToSelector:@selector(bestValidUpdateInAppcast:forUpdater:)]) // Does the delegate want to handle it?
 	{
@@ -127,7 +127,7 @@
 			item = [updateEnumerator nextObject];
 		} while (item && ![self hostSupportsItem:item]);
 
-		if (binaryDeltaSupported()) {        
+		if (binaryDeltaSupported()) {
 			SUAppcastItem *deltaUpdateItem = [item deltaUpdates][[host version]];
 			if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem]) {
 				nonDeltaUpdateItem = [item retain];
@@ -135,11 +135,11 @@
 			}
 		}
 	}
-    
+
     updateItem = [item retain];
 	if (ac) { CFRelease(ac); } // Remember that we're explicitly managing the memory of the appcast.
 	if (updateItem == nil) { [self didNotFindUpdate]; return; }
-	
+
 	if ([self itemContainsValidUpdate:updateItem])
 		[self didFindValidUpdate];
 	else
@@ -167,7 +167,7 @@
 		[[updater delegate] updaterDidNotFindUpdate:updater];
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:updater];
-	
+
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUNoUpdateError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"You already have the newest version of %@.", nil), [host name]]}]];
 }
 
@@ -181,8 +181,8 @@
 - (void)download:(NSURLDownload *) __unused d decideDestinationWithSuggestedFilename:(NSString *)name
 {
 	NSString *downloadFileName = [NSString stringWithFormat:@"%@ %@", [host name], [updateItem versionString]];
-    
-    
+
+
 	[tempDir release];
 	tempDir = [[[host appSupportPath] stringByAppendingPathComponent:downloadFileName] retain];
 	int cnt=1;
@@ -191,7 +191,7 @@
 		[tempDir release];
 		tempDir = [[[host appSupportPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, cnt++]] retain];
 	}
-	
+
     // Create the temporary directory if necessary.
 	BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir withIntermediateDirectories:YES attributes:nil error:NULL];
 	if (!success)
@@ -217,12 +217,12 @@
             SULog(@"Code signature check on update failed: %@", error);
         }
     }
-    
+
     return [SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey];
 }
 
 - (void)downloadDidFinish:(NSURLDownload *) __unused d
-{	
+{
 	[self extractUpdate];
 }
 
@@ -239,7 +239,7 @@
 }
 
 - (void)extractUpdate
-{	
+{
 	SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:downloadPath updatingHost:host];
 	if (!unarchiver)
 	{
@@ -316,7 +316,7 @@
     }
 	}
 
-    
+
 	if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdate:)]) {
 		[[updater delegate] updater:updater willInstallUpdate:updateItem];
 	}

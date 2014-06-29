@@ -21,7 +21,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 {
 	isInterruptible = NO;
 	alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:updateItem host:host delegate:self];
-	
+
 	// If the app is a menubar app or the like, we need to focus it first and alter the
 	// update prompt to behave like a normal window. Otherwise if the window were hidden
 	// there may be no way for the application to be activated to make it visible again.
@@ -29,12 +29,12 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 	{
 		[[alert window] setHidesOnDeactivate:NO];
 		[NSApp activateIgnoringOtherApps:YES];
-	}		
-	
+	}
+
 	if ([NSApp isActive])
 		[[alert window] makeKeyAndOrderFront:self];
 	else
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];	
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
 - (void)unarchiverDidFinish:(SUUnarchiver *) __unused ua
@@ -60,7 +60,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         [[updater delegate] updater:updater willInstallUpdateOnQuit:updateItem immediateInstallationInvocation:invocation];
     }
 
-    // If this is marked as a critical update, we'll prompt the user to install it right away. 
+    // If this is marked as a critical update, we'll prompt the user to install it right away.
     if ([updateItem isCriticalUpdate])
     {
         [self showUpdateAlert];
@@ -81,7 +81,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
         NSProcessInfo *processInfo = [NSProcessInfo processInfo];
         [processInfo enableSuddenTermination];
-        
+
         willUpdateOnTermination = NO;
 
         if ([[updater delegate] respondsToSelector:@selector(updater:didCancelInstallUpdateOnQuit:)])
@@ -93,7 +93,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 {
     [showUpdateAlertTimer invalidate];
     [showUpdateAlertTimer release];
-    showUpdateAlertTimer = nil;    
+    showUpdateAlertTimer = nil;
 }
 
 - (void)dealloc
@@ -125,7 +125,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
             [self stopUpdatingOnTermination];
 			[self installWithToolAndRelaunch:YES];
 			break;
-			
+
 		case SUInstallLaterChoice:
 			postponingInstallation = YES;
 			[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];

@@ -28,7 +28,7 @@
 		[[updater delegate] updaterDidNotFindUpdate:updater];
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:updater];
-	
+
 	[self abortUpdate];
 }
 
