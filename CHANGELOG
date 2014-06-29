@@ -1,6 +1,6 @@
 # 1.7.0
 
-* Dropped support for Mac OS X 10.6. Sparkle now supports 10.7 and newer (including 10.10 Yosemite) on 64-bit Intel Macs (the last 32-bit Mac was released in 2006).
+* Dropped support for OS X 10.6. Sparkle now supports 10.7 and newer (including 10.10 Yosemite) on 64-bit Intel Macs (the last 32-bit Mac was released in 2006).
 * Removed use of deprecated functions (Zachary Waldowski)
 * Switched to modern Obj-C runtime and new literals syntax
 * Removed pre-10.7 code. (C.W. Betts)
