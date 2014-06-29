@@ -10,11 +10,11 @@
 #import <Cocoa/Cocoa.h>
 #import "SUConstants.h"
 
-NSString *SUPackageInstallerCommandKey = @"SUPackageInstallerCommand";
-NSString *SUPackageInstallerArgumentsKey = @"SUPackageInstallerArguments";
-NSString *SUPackageInstallerHostKey = @"SUPackageInstallerHost";
-NSString *SUPackageInstallerDelegateKey = @"SUPackageInstallerDelegate";
-NSString *SUPackageInstallerInstallationPathKey = @"SUPackageInstallerInstallationPathKey";
+static NSString * const SUPackageInstallerCommandKey = @"SUPackageInstallerCommand";
+static NSString * const SUPackageInstallerArgumentsKey = @"SUPackageInstallerArguments";
+static NSString * const SUPackageInstallerHostKey = @"SUPackageInstallerHost";
+static NSString * const SUPackageInstallerDelegateKey = @"SUPackageInstallerDelegate";
+static NSString * const SUPackageInstallerInstallationPathKey = @"SUPackageInstallerInstallationPathKey";
 
 @implementation SUPackageInstaller
 
