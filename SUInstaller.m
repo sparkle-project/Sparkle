@@ -27,7 +27,7 @@ static NSString*	sUpdateFolder = nil;
 {
 	FSRef fileRef;
 	OSStatus err = noErr;
-	Boolean aliasFileFlag, folderFlag;
+	Boolean aliasFileFlag = false, folderFlag = false;
 	NSURL *fileURL = [NSURL fileURLWithPath:path];
 	
 	if (FALSE == CFURLGetFSRef((CFURLRef)fileURL, &fileRef))
