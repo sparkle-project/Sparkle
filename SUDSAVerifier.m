@@ -111,9 +111,9 @@ static NSData *b64decode( NSString *str )
 				if ( ai == 4 ) break;
 			}
 		} while ( i < len );
-		if ( ai >= 2 ) buf[j] = (a[0] << 2) | (a[1] >> 4);
-		if ( ai >= 3 ) buf[j+1] = (a[1] << 4) | (a[2] >> 2);
-		if ( ai >= 4 ) buf[j+2] = (a[2] << 6) | a[3];
+		if ( ai >= 2 ) buf[j+0] = (UInt8)((a[0] << 2) | (a[1] >> 4));
+		if ( ai >= 3 ) buf[j+1] = (UInt8)((a[1] << 4) | (a[2] >> 2));
+		if ( ai >= 4 ) buf[j+2] = (UInt8)((a[2] << 6) | (a[3] >> 0));
 		j += ai-1;
 	} while ( i < len );
 	
@@ -219,7 +219,7 @@ static CSSM_KEY_PTR cdsaCreateKey( CFDataRef rawKey )
 	
 	if ( (retval = su_malloc(sizeof(CSSM_KEY), NULL)) == NULL ) return NULL;
 	
-	if ( !su_copyBytesToData(&(retval->KeyData), CFDataGetLength(rawKey), CFDataGetBytePtr(rawKey)) ) {
+	if ( !su_copyBytesToData(&(retval->KeyData), (CSSM_SIZE)CFDataGetLength(rawKey), CFDataGetBytePtr(rawKey)) ) {
 		su_free( retval, NULL );
 		return NULL;
 	}
@@ -329,7 +329,7 @@ static CSSM_DATA_PTR su_createData( CFDataRef bytes )
 	if ( !data ) return NULL;
 	data->Data = NULL;
 	data->Length = 0;
-	if ( bytes ) su_copyBytesToData( data, CFDataGetLength(bytes), CFDataGetBytePtr(bytes) );
+	if ( bytes ) su_copyBytesToData( data, (CSSM_SIZE)CFDataGetLength(bytes), CFDataGetBytePtr(bytes) );
 	return data;
 }
 
