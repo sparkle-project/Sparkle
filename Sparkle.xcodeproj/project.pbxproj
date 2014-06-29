@@ -29,7 +29,7 @@
 		525A2790133D6AE900FD8D70 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
 		525A27A0133D6B9700FD8D70 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
 		550347011370023A00AE7681 /* Sparkle.icns in Resources */ = {isa = PBXBuildFile; fileRef = 550347001370023A00AE7681 /* Sparkle.icns */; };
-		55C14BD4136EEFCE00649790 /* finish_installation.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14BD3136EEFCE00649790 /* finish_installation.m */; };
+		55C14BD4136EEFCE00649790 /* Autoupdate.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14BD3136EEFCE00649790 /* Autoupdate.m */; };
 		55C14BD9136EF00C00649790 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
 		55C14BEE136EF20D00649790 /* SUAutomaticUpdateAlert.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BDA136EF20D00649790 /* SUAutomaticUpdateAlert.xib */; };
 		55C14BEF136EF21700649790 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
@@ -42,7 +42,7 @@
 		55C14F08136EF6DB00649790 /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
 		55C14F0C136EF6EA00649790 /* SUHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 61EF67550E25B58D00F754E0 /* SUHost.m */; };
 		55C14F0D136EF6F200649790 /* SUInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5000DAE88B40026945C /* SUInstaller.m */; };
-		55C14F0F136EF73600649790 /* finish_installation.pch in Headers */ = {isa = PBXBuildFile; fileRef = 55C14F0E136EF73600649790 /* finish_installation.pch */; };
+		55C14F0F136EF73600649790 /* Autoupdate.pch in Headers */ = {isa = PBXBuildFile; fileRef = 55C14F0E136EF73600649790 /* Autoupdate.pch */; };
 		55C14F20136EF84300649790 /* SUStatusController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6196CFE409C71ADE000DC222 /* SUStatusController.m */; };
 		55C14F21136EF84D00649790 /* SUPlainInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5040DAE8AB80026945C /* SUPlainInstaller.m */; };
 		55C14F22136EF86000649790 /* SUStandardVersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */; };
@@ -186,14 +186,14 @@
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 55C14BB6136EEF1500649790;
-			remoteInfo = finish_installation;
+			remoteInfo = Autoupdate;
 		};
 		55C14F96136F044100649790 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 55C14BB6136EEF1500649790;
-			remoteInfo = finish_installation;
+			remoteInfo = Autoupdate;
 		};
 		5D06E8D50FD68C86005AE3F6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -250,8 +250,8 @@
 		525A278F133D6AE900FD8D70 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		550347001370023A00AE7681 /* Sparkle.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Sparkle.icns; sourceTree = "<group>"; };
 		55C14BB7136EEF1500649790 /* Autoupdate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Autoupdate.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		55C14BB9136EEF1500649790 /* finish_installation-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "finish_installation-Info.plist"; sourceTree = "<group>"; };
-		55C14BD3136EEFCE00649790 /* finish_installation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = finish_installation.m; sourceTree = "<group>"; };
+		55C14BB9136EEF1500649790 /* Autoupdate-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Autoupdate-Info.plist"; sourceTree = "<group>"; };
+		55C14BD3136EEFCE00649790 /* Autoupdate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Autoupdate.m; sourceTree = "<group>"; };
 		55C14BD8136EF00C00649790 /* SUStatus.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SUStatus.xib; sourceTree = "<group>"; };
 		55C14BDB136EF20D00649790 /* cs */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = cs; path = cs.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
 		55C14BDC136EF20D00649790 /* da */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = da; path = da.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
@@ -309,7 +309,7 @@
 		55C14C18136EF2C700649790 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = zh_TW; path = zh_TW.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
 		55C14F04136EF6DB00649790 /* SULog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULog.h; sourceTree = "<group>"; };
 		55C14F05136EF6DB00649790 /* SULog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SULog.m; sourceTree = "<group>"; };
-		55C14F0E136EF73600649790 /* finish_installation.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = finish_installation.pch; sourceTree = "<group>"; };
+		55C14F0E136EF73600649790 /* Autoupdate.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Autoupdate.pch; sourceTree = "<group>"; };
 		55C14F31136EFC2400649790 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		5AEF45D9189D1CC90030D7DC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		5D06E8D00FD68C7C005AE3F6 /* BinaryDelta */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BinaryDelta; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -538,14 +538,8 @@
 		0867D691FE84028FC02AAC07 /* Sparkle */ = {
 			isa = PBXGroup;
 			children = (
-				61F83F6E0DBFE07A006FDD30 /* Update Control */,
-				61299B3909CB055000B7442F /* Appcast Support */,
-				618FA6DB0DB485440026945C /* Installation */,
-				55C14BD5136EEFD000649790 /* finish_installation tool */,
-				6101354A0DD25B7F0049ACDF /* Unarchiving */,
-				61299B3A09CB056100B7442F /* User Interface */,
-				61B5F8F309C4CE5900B25A18 /* Other Sources */,
-				089C1665FE841158C02AAC07 /* Framework Resources */,
+				1495006D195FBBBD00BC5B5B /* Sparkle */,
+				55C14BD5136EEFD000649790 /* Autoupdate */,
 				61227A100DB5484000AB99EA /* Tests */,
 				61B5F91D09C4CF7F00B25A18 /* Test Application Sources */,
 				0867D69AFE84028FC02AAC07 /* Frameworks */,
@@ -588,15 +582,29 @@
 			name = "Framework Resources";
 			sourceTree = "<group>";
 		};
-		55C14BD5136EEFD000649790 /* finish_installation tool */ = {
+		1495006D195FBBBD00BC5B5B /* Sparkle */ = {
 			isa = PBXGroup;
 			children = (
-				55C14BB9136EEF1500649790 /* finish_installation-Info.plist */,
-				55C14BD3136EEFCE00649790 /* finish_installation.m */,
-				55C14F0E136EF73600649790 /* finish_installation.pch */,
+				61F83F6E0DBFE07A006FDD30 /* Update Control */,
+				61299B3909CB055000B7442F /* Appcast Support */,
+				618FA6DB0DB485440026945C /* Installation */,
+				6101354A0DD25B7F0049ACDF /* Unarchiving */,
+				61299B3A09CB056100B7442F /* User Interface */,
+				61B5F8F309C4CE5900B25A18 /* Other Sources */,
+				089C1665FE841158C02AAC07 /* Framework Resources */,
+			);
+			name = Sparkle;
+			sourceTree = "<group>";
+		};
+		55C14BD5136EEFD000649790 /* Autoupdate */ = {
+			isa = PBXGroup;
+			children = (
+				55C14BB9136EEF1500649790 /* Autoupdate-Info.plist */,
+				55C14BD3136EEFCE00649790 /* Autoupdate.m */,
+				55C14F0E136EF73600649790 /* Autoupdate.pch */,
 				550347001370023A00AE7681 /* Sparkle.icns */,
 			);
-			name = "finish_installation tool";
+			name = Autoupdate;
 			sourceTree = "<group>";
 		};
 		5D06E8D90FD68C95005AE3F6 /* Binary Delta */ = {
@@ -797,7 +805,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				611142E910FB1BE5009810AA /* bspatch.h in Headers */,
-				55C14F0F136EF73600649790 /* finish_installation.pch in Headers */,
+				55C14F0F136EF73600649790 /* Autoupdate.pch in Headers */,
 				6160E7E10D3B4A8800E9CD71 /* NTSynchronousTask.h in Headers */,
 				61299B3609CB04E000B7442F /* Sparkle.h in Headers */,
 				61CFB3290E385186007A1735 /* Sparkle.pch in Headers */,
@@ -841,9 +849,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		55C14BB6136EEF1500649790 /* finish_installation */ = {
+		55C14BB6136EEF1500649790 /* Autoupdate */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 55C14BBE136EEF1500649790 /* Build configuration list for PBXNativeTarget "finish_installation" */;
+			buildConfigurationList = 55C14BBE136EEF1500649790 /* Build configuration list for PBXNativeTarget "Autoupdate" */;
 			buildPhases = (
 				55C14BB3136EEF1500649790 /* Resources */,
 				55C14BB4136EEF1500649790 /* Sources */,
@@ -853,8 +861,8 @@
 			);
 			dependencies = (
 			);
-			name = finish_installation;
-			productName = finish_installation;
+			name = Autoupdate;
+			productName = Autoupdate;
 			productReference = 55C14BB7136EEF1500649790 /* Autoupdate.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -1002,7 +1010,7 @@
 				61B5F90109C4CEE200B25A18 /* Sparkle Test App */,
 				612279D80DB5470200AB99EA /* Sparkle Unit Tests */,
 				5D06E8CF0FD68C7C005AE3F6 /* BinaryDelta */,
-				55C14BB6136EEF1500649790 /* finish_installation */,
+				55C14BB6136EEF1500649790 /* Autoupdate */,
 				1495005F195FB89400BC5B5B /* All */,
 			);
 		};
@@ -1140,7 +1148,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				55C14BD4136EEFCE00649790 /* finish_installation.m in Sources */,
+				55C14BD4136EEFCE00649790 /* Autoupdate.m in Sources */,
 				55C14F00136EF6B700649790 /* SUConstants.m in Sources */,
 				55C14F0C136EF6EA00649790 /* SUHost.m in Sources */,
 				55C14F0D136EF6F200649790 /* SUInstaller.m in Sources */,
@@ -1247,12 +1255,12 @@
 		};
 		1495006C195FB8A600BC5B5B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 55C14BB6136EEF1500649790 /* finish_installation */;
+			target = 55C14BB6136EEF1500649790 /* Autoupdate */;
 			targetProxy = 1495006B195FB8A600BC5B5B /* PBXContainerItemProxy */;
 		};
 		55C14F97136F044100649790 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 55C14BB6136EEF1500649790 /* finish_installation */;
+			target = 55C14BB6136EEF1500649790 /* Autoupdate */;
 			targetProxy = 55C14F96136F044100649790 /* PBXContainerItemProxy */;
 		};
 		5D06E8D60FD68C86005AE3F6 /* PBXTargetDependency */ = {
@@ -1480,8 +1488,8 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = finish_installation.pch;
-				INFOPLIST_FILE = "finish_installation-Info.plist";
+				GCC_PREFIX_HEADER = Autoupdate.pch;
+				INFOPLIST_FILE = "Autoupdate-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -1502,8 +1510,8 @@
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = finish_installation.pch;
-				INFOPLIST_FILE = "finish_installation-Info.plist";
+				GCC_PREFIX_HEADER = Autoupdate.pch;
+				INFOPLIST_FILE = "Autoupdate-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -1595,7 +1603,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		55C14BBE136EEF1500649790 /* Build configuration list for PBXNativeTarget "finish_installation" */ = {
+		55C14BBE136EEF1500649790 /* Build configuration list for PBXNativeTarget "Autoupdate" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				55C14BBB136EEF1500649790 /* Debug */,

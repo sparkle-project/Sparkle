@@ -22,7 +22,7 @@
 #import "SUUpdater_Private.h"
 
 #ifdef FINISH_INSTALL_TOOL_NAME
-    // FINISH_INSTALL_TOOL_NAME expands to unquoted finish_install
+    // FINISH_INSTALL_TOOL_NAME expands to unquoted Autoupdate
     #define QUOTE_NS_STRING2(str) @"" #str
     #define QUOTE_NS_STRING1(str) QUOTE_NS_STRING2(str)
     #define FINISH_INSTALL_TOOL_NAME_STRING QUOTE_NS_STRING1(FINISH_INSTALL_TOOL_NAME)
