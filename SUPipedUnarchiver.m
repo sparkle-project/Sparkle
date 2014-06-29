@@ -17,12 +17,15 @@
 {
 	static NSDictionary *typeSelectorDictionary;
 	if (!typeSelectorDictionary)
-		typeSelectorDictionary = [@{@".zip": @"extractZIP", @".tar": @"extractTAR",
-								   @".tar.gz": @"extractTGZ", @".tgz": @"extractTGZ",
-								   @".tar.bz2": @"extractTBZ", @".tbz": @"extractTBZ"} retain];
+		typeSelectorDictionary = [@{@".zip": @"extractZIP",
+                                    @".tar": @"extractTAR",
+								    @".tar.gz": @"extractTGZ",
+                                    @".tgz": @"extractTGZ",
+								    @".tar.bz2": @"extractTBZ",
+                                    @".tbz": @"extractTBZ"} retain];
 
 	NSString *lastPathComponent = [path lastPathComponent];
-	for (id currentType in typeSelectorDictionary)
+	for (NSString *currentType in typeSelectorDictionary)
 	{
 		if ([currentType length] > [lastPathComponent length]) continue;
 		if ([[lastPathComponent substringFromIndex:[lastPathComponent length] - [currentType length]] isEqualToString:currentType])

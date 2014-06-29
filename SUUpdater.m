@@ -259,7 +259,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 				[self putFeedURLIntoDictionary:theDict];	// Get feed URL on main thread, it's not safe to call elsewhere.
 			});
 			
-			const char *hostname = [[theDict[@"feedURL"] host] cStringUsingEncoding: NSUTF8StringEncoding];
+			const char *hostname = [[(NSURL *)theDict[@"feedURL"] host] cStringUsingEncoding: NSUTF8StringEncoding];
 			SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(NULL, hostname);
 			Boolean reachabilityResult = NO;
 			// If the feed's using a file:// URL, we won't be able to use reachability.

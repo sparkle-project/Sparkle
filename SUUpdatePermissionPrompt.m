@@ -42,9 +42,9 @@
 	// If this is a background application we need to focus it in order to bring the prompt
 	// to the user's attention. Otherwise the prompt would be hidden behind other applications and
 	// the user would not know why the application was paused.
-	if ([aHost isBackgroundApplication]) { [NSApp activateIgnoringOtherApps:YES]; }
+	if ([aHost isBackgroundApplication]) { [[NSApplication sharedApplication] activateIgnoringOtherApps:YES]; }
 	
-	id prompt = [[[[self class] alloc] initWithHost:aHost systemProfile:profile delegate:d] autorelease];
+	SUUpdatePermissionPrompt *prompt = [[[[self class] alloc] initWithHost:aHost systemProfile:profile delegate:d] autorelease];
 	[NSApp runModalForWindow:[prompt window]];
 }
 
