@@ -8,7 +8,7 @@
 
 #ifdef __OBJC__
 
-#define SPARKLE_BUNDLE [NSBundle bundleWithIdentifier:@"org.andymatuschak.Sparkle"]
+#define SPARKLE_BUNDLE [NSBundle bundleWithIdentifier:@"org.sparkle-project.Sparkle"]
 #define SULocalizedString(key,comment) NSLocalizedStringFromTableInBundle(key, @"Sparkle", SPARKLE_BUNDLE, comment)
 #define SUAbstractFail() NSAssert2(nil, @"Can't call %@ on an instance of %@; this is an abstract method!", __PRETTY_FUNCTION__, [self class]);
 

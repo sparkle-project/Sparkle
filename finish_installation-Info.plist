@@ -9,7 +9,7 @@
 	<key>CFBundleIconFile</key>
 	<string>Sparkle</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.andymatuschak.sparkle.${PRODUCT_NAME:rfc1034identifier}</string>
+	<string>org.sparkle-project.Sparkle.${PRODUCT_NAME:rfc1034identifier}</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundlePackageType</key>
