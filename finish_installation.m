@@ -196,7 +196,7 @@ int main (int argc, const char * argv[])
 		NSString*	selfPath = [[NSBundle mainBundle] bundlePath];
 #endif
 		
-		BOOL shouldShowUI = (argc > 6) ? atoi(argv[6]) : 1;
+		BOOL shouldShowUI = (argc > 6) ? !!atoi(argv[6]) : YES;
 		if (shouldShowUI)
 		{
 			[[NSApplication sharedApplication] activateIgnoringOtherApps: YES];
@@ -207,7 +207,7 @@ int main (int argc, const char * argv[])
 										executablePath: (argc > 2) ? argv[2] : NULL
 									   parentProcessId: (argc > 3) ? atoi(argv[3]) : 0
 											folderPath: (argc > 4) ? argv[4] : NULL
-										shouldRelaunch: (argc > 5) ? atoi(argv[5]) : 1
+										shouldRelaunch: (argc > 5) ? !!atoi(argv[5]) : YES
 										  shouldShowUI: shouldShowUI
 											  selfPath: selfPath] autorelease];
 		[[NSApplication sharedApplication] run];
