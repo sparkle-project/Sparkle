@@ -74,9 +74,9 @@ static NSDictionary *infoForFile(FTSENT *ent)
     NSData *hash = hashOfFile(ent);
     NSNumber *size = nil;
 	if (ent->fts_info != FTS_D) {
-        size = [NSNumber numberWithLongLong:ent->fts_statp->st_size];
+        size = @(ent->fts_statp->st_size);
 	}
-    return [NSDictionary dictionaryWithObjectsAndKeys:hash, @"hash", [NSNumber numberWithUnsignedShort:ent->fts_info], @"type", size, @"size", nil];
+    return @{@"hash": hash, @"type": @(ent->fts_info), @"size": size};
 }
 
 static NSString *absolutePath(NSString *path)
@@ -95,7 +95,7 @@ static NSString *temporaryPatchFile(NSString *patchFile)
 
 static BOOL shouldSkipDeltaCompression(NSString * __unused key, NSDictionary* originalInfo, NSDictionary *newInfo)
 {
-    unsigned long long fileSize = [[newInfo objectForKey:@"size"] unsignedLongLongValue];
+    unsigned long long fileSize = [newInfo[@"size"] unsignedLongLongValue];
 	if (fileSize < 4096) {
         return YES;
 	}
@@ -104,7 +104,7 @@ static BOOL shouldSkipDeltaCompression(NSString * __unused key, NSDictionary* or
         return YES;
 	}
 
-	if ([[originalInfo objectForKey:@"type"] unsignedShortValue] != [[newInfo objectForKey:@"type"] unsignedShortValue]) {
+	if ([originalInfo[@"type"] unsignedShortValue] != [newInfo[@"type"] unsignedShortValue]) {
         return YES;
 	}
 
@@ -117,7 +117,7 @@ static BOOL shouldDeleteThenExtract(NSString * __unused key, NSDictionary* origi
         return NO;
 	}
 
-	if ([[originalInfo objectForKey:@"type"] unsignedShortValue] != [[newInfo objectForKey:@"type"] unsignedShortValue]) {
+	if ([originalInfo[@"type"] unsignedShortValue] != [newInfo[@"type"] unsignedShortValue]) {
         return YES;
 	}
 
@@ -133,7 +133,7 @@ int main(int argc, char **argv)
             exit(1);
         }
 
-        NSString *command = [NSString stringWithUTF8String:argv[1]];
+        NSString *command = @(argv[1]);
         NSString *oldPath = stringWithFileSystemRepresentation(argv[2]);
         NSString *newPath = stringWithFileSystemRepresentation(argv[3]);
         NSString *patchFile = stringWithFileSystemRepresentation(argv[4]);
@@ -168,7 +168,7 @@ int main(int argc, char **argv)
             }
 
             NSDictionary *info = infoForFile(ent);
-            [originalTreeState setObject:info forKey:key];
+            originalTreeState[key] = info;
         }
         fts_close(fts);
 
@@ -177,7 +177,7 @@ int main(int argc, char **argv)
         NSMutableDictionary *newTreeState = [NSMutableDictionary dictionary];
         for (NSString *key in originalTreeState)
         {
-            [newTreeState setObject:[NSNull null] forKey:key];
+            newTreeState[key] = [NSNull null];
         }
 
         fprintf(stderr, "\nProcessing %s...  ", [newPath UTF8String]);
@@ -200,12 +200,12 @@ int main(int argc, char **argv)
             }
 
             NSDictionary *info = infoForFile(ent);
-            NSDictionary *oldInfo = [originalTreeState objectForKey:key];
+            NSDictionary *oldInfo = originalTreeState[key];
 
             if ([info isEqual:oldInfo])
                 [newTreeState removeObjectForKey:key];
             else
-                [newTreeState setObject:info forKey:key];
+                newTreeState[key] = info;
         }
         fts_close(fts);
 
@@ -234,8 +234,8 @@ int main(int argc, char **argv)
                 continue;
             }
 
-            NSDictionary *originalInfo = [originalTreeState objectForKey:key];
-            NSDictionary *newInfo = [newTreeState objectForKey:key];
+            NSDictionary *originalInfo = originalTreeState[key];
+            NSDictionary *newInfo = newTreeState[key];
             if (shouldSkipDeltaCompression(key, originalInfo, newInfo)) {
                 NSString *path = [newPath stringByAppendingPathComponent:key];
                 xar_file_t newFile = xar_add_frompath(x, 0, [key fileSystemRepresentation], [path fileSystemRepresentation]);
