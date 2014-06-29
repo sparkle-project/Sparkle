@@ -406,7 +406,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	[host setBool:automaticallyCheckForUpdates forUserDefaultsKey:SUEnableAutomaticChecksKey];
 	// Hack to support backwards compatibility with older Sparkle versions, which supported
 	// disabling updates by setting the check interval to 0.
-	if (automaticallyCheckForUpdates && [self updateCheckInterval] == 0) {
+	if (automaticallyCheckForUpdates && (NSInteger)[self updateCheckInterval] == 0) {
         [self setUpdateCheckInterval:SU_DEFAULT_CHECK_INTERVAL];
 	}
     [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
@@ -417,7 +417,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - (BOOL)automaticallyChecksForUpdates
 {
 	// Don't automatically update when the check interval is 0, to be compatible with 1.1 settings.
-	if ([self updateCheckInterval] == 0) {
+	if ((NSInteger)[self updateCheckInterval] == 0) {
         return NO;	
 	}
 	return [host boolForKey:SUEnableAutomaticChecksKey];
@@ -527,7 +527,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - (void)setUpdateCheckInterval:(NSTimeInterval)updateCheckInterval
 {
 	[host setObject:@(updateCheckInterval) forUserDefaultsKey:SUScheduledCheckIntervalKey];
-	if (updateCheckInterval == 0) { // For compatibility with 1.1's settings.
+	if ((NSInteger)updateCheckInterval == 0) { // For compatibility with 1.1's settings.
 		[self setAutomaticallyChecksForUpdates:NO];
 	}
 	[[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
