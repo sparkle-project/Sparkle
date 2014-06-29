@@ -17,6 +17,8 @@
 
 @implementation SUUpdatePermissionPrompt
 
+@synthesize isShowingMoreInfo = _isShowingMoreInfo, shouldSendProfile = _shouldSendProfile;
+
 - (BOOL)shouldAskAboutProfile
 {
 	return [[host objectForInfoDictionaryKey:SUEnableSystemProfilingKey] boolValue];
