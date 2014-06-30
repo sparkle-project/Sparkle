@@ -12,7 +12,7 @@
 
 @implementation SUPackageInstaller
 
-+ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:(id<SUInstallerDelegate>)delegate synchronously:(BOOL)synchronously versionComparator:(id<SUVersionComparison>)__unused comparator
++ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:(id<SUInstallerDelegate>)delegate versionComparator:(id<SUVersionComparison>)__unused comparator
 {
     // Run installer using the "open" command to ensure it is launched in front of current application.
     // -W = wait until the app has quit.
@@ -27,21 +27,15 @@
         return;
     }
 
-    void (^performInstallation)() = ^void() {
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
         NSTask *installer = [NSTask launchedTaskWithLaunchPath:command arguments:args];
         [installer waitUntilExit];
 
         // Known bug: if the installation fails or is canceled, Sparkle goes ahead and restarts, thinking everything is fine.
-        dispatch_async(dispatch_get_main_queue(), ^ {
+        dispatch_async(dispatch_get_main_queue(), ^{
             [self finishInstallationToPath:installationPath withResult:YES host:host error:nil delegate:delegate];
         });
-    };
-
-    if (synchronously) {
-        performInstallation();
-    } else {
-        dispatch_async(dispatch_get_global_queue(0, 0), performInstallation);
-    }
+    });
 }
 
 @end

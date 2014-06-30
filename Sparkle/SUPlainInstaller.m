@@ -13,7 +13,7 @@
 
 @implementation SUPlainInstaller
 
-+ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:(id<SUInstallerDelegate>)delegate synchronously:(BOOL)synchronously versionComparator:(id<SUVersionComparison>)comparator
++ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:(id<SUInstallerDelegate>)delegate versionComparator:(id<SUVersionComparison>)comparator
 {
 	// Prevent malicious downgrades:
 	#if !PERMIT_AUTOMATED_DOWNGRADES
@@ -26,7 +26,7 @@
 	}
 	#endif
 
-    void (^performInstallation)() = ^void() {
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
         NSError *error = nil;
         NSString *oldPath = [host bundlePath];
         NSString *tempName = [self temporaryNameForPath:[host installationPath]];
@@ -41,16 +41,10 @@
             }
         }
 
-        dispatch_async(dispatch_get_main_queue(), ^ {
+        dispatch_async(dispatch_get_main_queue(), ^{
             [self finishInstallationToPath:installationPath withResult:result host:host error:error delegate:delegate];
         });
-    };
-
-    if (synchronously) {
-        performInstallation();
-    } else {
-        dispatch_async(dispatch_get_global_queue(0, 0), performInstallation);
-    }
+    });
 }
 
 @end
