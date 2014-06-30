@@ -258,7 +258,11 @@ typedef struct {
 + (NSString *)systemVersionString
 {
 #if __MAC_OS_X_VERSION_MIN_REQUIRED < 1090 // Present in 10.9 despite NS_AVAILABLE's claims
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wselector"
+    // Xcode 5.1.1: operatingSystemVersion is clearly declared, must warn due to a compiler bug?
     if (![NSProcessInfo instancesRespondToSelector:@selector(operatingSystemVersion)])
+#pragma clang diagnostic pop
     {
         NSURL *coreServices = [[NSFileManager defaultManager] URLForDirectory:NSCoreServiceDirectory inDomain:NSSystemDomainMask appropriateForURL:nil create:NO error:nil];
         return [NSDictionary dictionaryWithContentsOfURL:[coreServices URLByAppendingPathComponent:@"SystemVersion.plist"]][@"ProductVersion"];
