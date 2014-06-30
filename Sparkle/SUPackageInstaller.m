@@ -14,7 +14,7 @@ static NSString *const SUPackageInstallerCommandKey = @"SUPackageInstallerComman
 static NSString *const SUPackageInstallerArgumentsKey = @"SUPackageInstallerArguments";
 static NSString *const SUPackageInstallerHostKey = @"SUPackageInstallerHost";
 static NSString *const SUPackageInstallerDelegateKey = @"SUPackageInstallerDelegate";
-static NSString *const SUPackageInstallerInstallationPathKey = @"SUPackageInstallerInstallationPathKey";
+static NSString *const SUPackageInstallerInstallationPathKey = @"SUPackageInstallerInstallationPath";
 
 @implementation SUPackageInstaller
 
