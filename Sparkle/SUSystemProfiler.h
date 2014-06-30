@@ -12,9 +12,12 @@
 #import <Cocoa/Cocoa.h>
 
 @class SUHost;
+
 @interface SUSystemProfiler : NSObject
+
 + (SUSystemProfiler *)sharedSystemProfiler;
 - (NSMutableArray *)systemProfileArrayForHost:(SUHost *)host;
+
 @end
 
 #endif

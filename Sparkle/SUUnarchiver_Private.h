@@ -13,6 +13,7 @@
 #import "SUUnarchiver.h"
 
 @interface SUUnarchiver (Private)
+
 + (void)registerImplementation:(Class)implementation;
 + (NSArray *)unarchiverImplementations;
 + (BOOL)canUnarchivePath:(NSString *)path;
@@ -21,6 +22,7 @@
 - (void)notifyDelegateOfExtractedLength:(size_t)length;
 - (void)notifyDelegateOfSuccess;
 - (void)notifyDelegateOfFailure;
+
 @end
 
 #endif

@@ -14,6 +14,7 @@
 
 // This replaces the old SUStatusChecker.
 @interface SUProbingUpdateDriver : SUBasicUpdateDriver
+
 @end
 
 #endif

@@ -1,6 +1,6 @@
 //
 //  SUBasicUpdateDriver.h
-//  Sparkle,
+//  Sparkle
 //
 //  Created by Andy Matuschak on 4/23/08.
 //  Copyright 2008 Andy Matuschak. All rights reserved.
@@ -15,15 +15,17 @@
 #import "SUAppcast.h"
 
 @class SUAppcastItem, SUHost;
-@interface SUBasicUpdateDriver : SUUpdateDriver<NSURLDownloadDelegate, SUUnarchiverDelegate, SUAppcastDelegate> {
-	SUAppcastItem *updateItem;
-	SUAppcastItem *nonDeltaUpdateItem;
 
-	NSURLDownload *download;
-	NSString *downloadPath;
-	NSString *tempDir;
+@interface SUBasicUpdateDriver : SUUpdateDriver <NSURLDownloadDelegate, SUUnarchiverDelegate, SUAppcastDelegate>
+{
+    SUAppcastItem *updateItem;
+    SUAppcastItem *nonDeltaUpdateItem;
 
-	NSString *relaunchPath;
+    NSURLDownload *download;
+    NSString *downloadPath;
+    NSString *tempDir;
+
+    NSString *relaunchPath;
 }
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;

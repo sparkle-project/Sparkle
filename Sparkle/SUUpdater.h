@@ -19,10 +19,11 @@
 @interface SUUpdater : NSObject
 {
 @private
-	SUUpdateDriver *driver;
+    SUUpdateDriver *driver;
 
-	SUHost *host;
+    SUHost *host;
 }
+
 @property (assign) IBOutlet id<SUUpdaterDelegate> delegate;
 
 + (SUUpdater *)sharedUpdater;
@@ -31,9 +32,9 @@
 
 @property (readonly, strong) NSBundle *hostBundle;
 
-@property  BOOL automaticallyChecksForUpdates;
+@property BOOL automaticallyChecksForUpdates;
 
-@property  NSTimeInterval updateCheckInterval;
+@property NSTimeInterval updateCheckInterval;
 
 /*!
  * The URL of the appcast used to download update information.
@@ -44,9 +45,9 @@
 
 @property (nonatomic, copy) NSString *userAgentString;
 
-@property  BOOL sendsSystemProfile;
+@property BOOL sendsSystemProfile;
 
-@property  BOOL automaticallyDownloadsUpdates;
+@property BOOL automaticallyDownloadsUpdates;
 
 // This IBAction is meant for a main menu item. Hook up any menu item to this action,
 // and Sparkle will check for updates and report back its findings verbosely.
@@ -92,6 +93,7 @@ extern NSString *const SUUpdaterAppcastNotificationKey;
 // -----------------------------------------------------------------------------
 
 @protocol SUUpdaterDelegate <NSObject>
+
 @optional
 
 // Use this to keep Sparkle from popping up e.g. while your setup assistant is showing:
@@ -101,7 +103,7 @@ extern NSString *const SUUpdaterAppcastNotificationKey;
 - (NSArray *)feedParametersForUpdater:(SUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
 
 // Override this to dynamically specify the entire URL.
-- (NSString*)feedURLStringForUpdater:(SUUpdater*)updater;
+- (NSString *)feedURLStringForUpdater:(SUUpdater *)updater;
 
 // Use this to override the default behavior for Sparkle prompting the user about automatic update checks.
 - (BOOL)updaterShouldPromptForPermissionToCheckForUpdates:(SUUpdater *)bundle;
@@ -136,19 +138,19 @@ extern NSString *const SUUpdaterAppcastNotificationKey;
 
 // This method allows you to provide a custom version comparator.
 // If you don't implement this method or return nil, the standard version comparator will be used.
-- (id <SUVersionComparison>)versionComparatorForUpdater:(SUUpdater *)updater;
+- (id<SUVersionComparison>)versionComparatorForUpdater:(SUUpdater *)updater;
 
 // This method allows you to provide a custom version comparator.
 // If you don't implement this method or return nil, the standard version displayer will be used.
-- (id <SUVersionDisplay>)versionDisplayerForUpdater:(SUUpdater *)updater;
+- (id<SUVersionDisplay>)versionDisplayerForUpdater:(SUUpdater *)updater;
 
 // Returns the path which is used to relaunch the client after the update is installed. By default, the path of the host bundle.
 - (NSString *)pathToRelaunchForUpdater:(SUUpdater *)updater;
 
 // Called before and after, respectively, an updater shows a modal alert window, to give the host
 //	the opportunity to hide attached windows etc. that may get in the way:
--(void)	updaterWillShowModalAlert:(SUUpdater *)updater;
--(void)	updaterDidShowModalAlert:(SUUpdater *)updater;
+- (void)updaterWillShowModalAlert:(SUUpdater *)updater;
+- (void)updaterDidShowModalAlert:(SUUpdater *)updater;
 
 // Called when an update is scheduled to be silently installed on quit.
 // The invocation can be used to trigger an immediate silent install and relaunch.
@@ -156,7 +158,6 @@ extern NSString *const SUUpdaterAppcastNotificationKey;
 - (void)updater:(SUUpdater *)updater didCancelInstallUpdateOnQuit:(SUAppcastItem *)update;
 
 @end
-
 
 // -----------------------------------------------------------------------------
 //	Constants:
@@ -166,13 +167,13 @@ extern NSString *const SUUpdaterAppcastNotificationKey;
 #if defined(DEBUG) && DEBUG && 0
 #define SU_MIN_CHECK_INTERVAL 60
 #else
-#define SU_MIN_CHECK_INTERVAL 60*60
+#define SU_MIN_CHECK_INTERVAL 60 * 60
 #endif
 
 #if defined(DEBUG) && DEBUG && 0
 #define SU_DEFAULT_CHECK_INTERVAL 60
 #else
-#define SU_DEFAULT_CHECK_INTERVAL 60*60*24
+#define SU_DEFAULT_CHECK_INTERVAL 60 * 60 * 24
 #endif
 
 #endif

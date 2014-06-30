@@ -15,12 +15,13 @@
 
 typedef enum
 {
-	SUInstallNowChoice,
-	SUInstallLaterChoice,
-	SUDoNotInstallChoice
+    SUInstallNowChoice,
+    SUInstallLaterChoice,
+    SUDoNotInstallChoice
 } SUAutomaticInstallationChoice;
 
 @class SUAppcastItem, SUHost;
+
 @interface SUAutomaticUpdateAlert : SUWindowController
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)hostBundle delegate:(id<SUAutomaticUpdateAlertDelegate>)delegate;
@@ -31,7 +32,9 @@ typedef enum
 @end
 
 @protocol SUAutomaticUpdateAlertDelegate <NSObject>
+
 - (void)automaticUpdateAlert:(SUAutomaticUpdateAlert *)aua finishedWithChoice:(SUAutomaticInstallationChoice)choice;
+
 @end
 
 #endif

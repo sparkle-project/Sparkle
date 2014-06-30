@@ -12,23 +12,30 @@
 @class SUHost;
 @protocol SUUnarchiverDelegate;
 
-@interface SUUnarchiver : NSObject {
-	id<SUUnarchiverDelegate> delegate;
-	NSString *archivePath;
-	SUHost *updateHost;
+@interface SUUnarchiver : NSObject
+{
+    id<SUUnarchiverDelegate> delegate;
+    NSString *archivePath;
+    SUHost *updateHost;
 }
+
 @property (assign) id<SUUnarchiverDelegate> delegate;
 
 + (SUUnarchiver *)unarchiverForPath:(NSString *)path updatingHost:(SUHost *)host;
 
 - (void)start;
+
 @end
 
 @protocol SUUnarchiverDelegate <NSObject>
+
 - (void)unarchiverDidFinish:(SUUnarchiver *)unarchiver;
 - (void)unarchiverDidFail:(SUUnarchiver *)unarchiver;
+
 @optional
+
 - (void)unarchiver:(SUUnarchiver *)unarchiver extractedLength:(unsigned long)length;
+
 @end
 
 #endif

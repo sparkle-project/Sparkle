@@ -17,6 +17,7 @@
 #import "SUPlainInstaller.h"
 
 @interface SUPackageInstaller : SUPlainInstaller
+
 @end
 
 #endif
