@@ -1,3 +1,5 @@
+#include "ConfigCommon.xcconfig"
+
 // Release only
 
 GCC_OPTIMIZATION_LEVEL = s

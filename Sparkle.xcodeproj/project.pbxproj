@@ -27,6 +27,9 @@
 /* Begin PBXBuildFile section */
 		14732BBD1960F03B00593899 /* Sparkle.icns in Resources */ = {isa = PBXBuildFile; fileRef = 550347001370023A00AE7681 /* Sparkle.icns */; };
 		14732BC01960F2C200593899 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 14732BBF1960F0AC00593899 /* dsa_pub.pem */; };
+		14732BD019610A0D00593899 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
+		14732BD119610A1200593899 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
+		14732BD319610A1800593899 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14732BD219610A1800593899 /* XCTest.framework */; };
 		1495006E195FCE1100BC5B5B /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
 		1495006F195FCE1800BC5B5B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		14950070195FCE3A00BC5B5B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
@@ -268,6 +271,7 @@
 		14732BC31960F3FF00593899 /* generate_keys.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = generate_keys.sh; sourceTree = "<group>"; };
 		14732BC41960F3FF00593899 /* sign_update.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = sign_update.sh; sourceTree = "<group>"; };
 		14732BC91960F70A00593899 /* make-release-package.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "make-release-package.sh"; sourceTree = "<group>"; };
+		14732BD219610A1800593899 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		14950074195FDF5900BC5B5B /* SUUpdaterTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUUpdaterTest.m; path = Tests/SUUpdaterTest.m; sourceTree = "<group>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
 		4607BEA21948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Sparkle.strings; sourceTree = "<group>"; };
@@ -518,7 +522,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14732BD119610A1200593899 /* AppKit.framework in Frameworks */,
+				14732BD019610A0D00593899 /* Foundation.framework in Frameworks */,
 				61FA52880E2D9EA400EF58AD /* Sparkle.framework in Frameworks */,
+				14732BD319610A1800593899 /* XCTest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -581,6 +588,7 @@
 		0867D69AFE84028FC02AAC07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				14732BD219610A1800593899 /* XCTest.framework */,
 				0867D6A5FE840307C02AAC07 /* AppKit.framework */,
 				525A278F133D6AE900FD8D70 /* Cocoa.framework */,
 				0867D69BFE84028FC02AAC07 /* Foundation.framework */,
@@ -1576,7 +1584,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
-				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
@@ -1584,26 +1591,20 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
-				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
 		1DEB91B208733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941D00D94A70100DD942E /* ConfigCommon.xcconfig */;
+			baseConfigurationReference = FA1941CF0D94A70100DD942E /* ConfigCommonDebug.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
 		1DEB91B308733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941D00D94A70100DD942E /* ConfigCommon.xcconfig */;
+			baseConfigurationReference = FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -1611,19 +1612,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COMBINE_HIDPI_IMAGES = YES;
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -1631,19 +1619,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COMBINE_HIDPI_IMAGES = YES;
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -1651,7 +1626,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D06E8F20FD68D21005AE3F6 /* ConfigBinaryDeltaDebug.xcconfig */;
 			buildSettings = {
-				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -1659,7 +1633,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D06E8F30FD68D21005AE3F6 /* ConfigBinaryDeltaRelease.xcconfig */;
 			buildSettings = {
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -1667,19 +1640,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */;
 			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Sparkle.framework/Versions/A/Sparkle";
-				COMBINE_HIDPI_IMAGES = YES;
-				SDKROOT = macosx;
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Weverything",
-					"-Wno-empty-translation-unit",
-					"-Wno-unused-macros",
-					"-Wno-gnu-statement-expression",
-					"$(WARNING_CFLAGS_EXTRA)",
-					"-Wno-variadic-macros",
-					"-Wno-gnu-zero-variadic-macro-arguments",
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
 			};
 			name = Debug;
@@ -1688,19 +1651,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */;
 			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Sparkle.framework/Versions/A/Sparkle";
-				COMBINE_HIDPI_IMAGES = YES;
-				SDKROOT = macosx;
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Weverything",
-					"-Wno-empty-translation-unit",
-					"-Wno-unused-macros",
-					"-Wno-gnu-statement-expression",
-					"$(WARNING_CFLAGS_EXTRA)",
-					"-Wno-variadic-macros",
-					"-Wno-gnu-zero-variadic-macro-arguments",
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
 			};
 			name = Release;
@@ -1709,7 +1662,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
 			};
 			name = Debug;
 		};
@@ -1717,7 +1669,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
 			};
 			name = Release;
 		};
