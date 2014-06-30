@@ -17,13 +17,13 @@
 
 @interface SUUIBasedUpdateDriver : SUBasicUpdateDriver <SUUnarchiverDelegate, SUUpdateAlertDelegate>
 {
-	SUStatusController *statusController;
-	SUUpdateAlert *updateAlert;
+    SUStatusController *statusController;
+    SUUpdateAlert *updateAlert;
 }
 
 - (void)showModalAlert:(NSAlert *)alert;
-- (IBAction)cancelDownload: (id)sender;
-- (void)installAndRestart: (id)sender;
+- (IBAction)cancelDownload:(id)sender;
+- (void)installAndRestart:(id)sender;
 
 @end
 

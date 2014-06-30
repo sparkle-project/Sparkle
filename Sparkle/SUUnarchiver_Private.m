@@ -13,60 +13,64 @@
 
 - (instancetype)initWithPath:(NSString *)path host:(SUHost *)host
 {
-	if ((self = [super init]))
-	{
-		archivePath = [path copy];
-		updateHost = [host retain];
-	}
-	return self;
+    if ((self = [super init]))
+    {
+        archivePath = [path copy];
+        updateHost = [host retain];
+    }
+    return self;
 }
 
 - (void)dealloc
 {
-	[archivePath release];
-	[updateHost release];
-	[super dealloc];
+    [archivePath release];
+    [updateHost release];
+    [super dealloc];
 }
 
-+ (BOOL)canUnarchivePath:(NSString *) __unused path
++ (BOOL)canUnarchivePath:(NSString *)__unused path
 {
-	return NO;
+    return NO;
 }
 
 - (void)notifyDelegateOfExtractedLength:(size_t)length
 {
-	if ([delegate respondsToSelector:@selector(unarchiver:extractedLength:)]) {
-		[delegate unarchiver:self extractedLength:length];
-	}
+    if ([delegate respondsToSelector:@selector(unarchiver:extractedLength:)])
+    {
+        [delegate unarchiver:self extractedLength:length];
+    }
 }
 
 - (void)notifyDelegateOfSuccess
 {
-	if ([delegate respondsToSelector:@selector(unarchiverDidFinish:)]) {
-		[delegate unarchiverDidFinish:self];
-	}
+    if ([delegate respondsToSelector:@selector(unarchiverDidFinish:)])
+    {
+        [delegate unarchiverDidFinish:self];
+    }
 }
 
 - (void)notifyDelegateOfFailure
 {
-	if ([delegate respondsToSelector:@selector(unarchiverDidFail:)]) {
-		[delegate unarchiverDidFail:self];
-	}
+    if ([delegate respondsToSelector:@selector(unarchiverDidFail:)])
+    {
+        [delegate unarchiverDidFail:self];
+    }
 }
 
 static NSMutableArray *gUnarchiverImplementations;
 
 + (void)registerImplementation:(Class)implementation
 {
-	if (!gUnarchiverImplementations) {
-		gUnarchiverImplementations = [[NSMutableArray alloc] init];
-	}
-	[gUnarchiverImplementations addObject:implementation];
+    if (!gUnarchiverImplementations)
+    {
+        gUnarchiverImplementations = [[NSMutableArray alloc] init];
+    }
+    [gUnarchiverImplementations addObject:implementation];
 }
 
 + (NSArray *)unarchiverImplementations
 {
-	return [NSArray arrayWithArray:gUnarchiverImplementations];
+    return [NSArray arrayWithArray:gUnarchiverImplementations];
 }
 
 @end

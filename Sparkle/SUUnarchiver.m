@@ -6,7 +6,6 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-
 #import "SUUpdater.h"
 
 #import "SUAppcast.h"
@@ -20,20 +19,24 @@
 
 + (SUUnarchiver *)unarchiverForPath:(NSString *)path updatingHost:(SUHost *)host
 {
-	for (id current in [self unarchiverImplementations])
-	{
-		if ([current canUnarchivePath:path]) {
-			return [[[current alloc] initWithPath:path host:host] autorelease];
-		}
-	}
-	return nil;
+    for (id current in [self unarchiverImplementations])
+    {
+        if ([current canUnarchivePath:path])
+        {
+            return [[[current alloc] initWithPath:path host:host] autorelease];
+        }
+    }
+    return nil;
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], archivePath]; }
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"%@ <%@>", [self class], archivePath];
+}
 
 - (void)start
 {
-	// No-op
+    // No-op
 }
 
 @end

@@ -15,7 +15,7 @@
 @interface SUScheduledUpdateDriver : SUUIBasedUpdateDriver
 {
 @private
-	BOOL showErrors;
+    BOOL showErrors;
 }
 
 @end

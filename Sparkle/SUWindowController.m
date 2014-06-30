@@ -13,15 +13,15 @@
 
 - (instancetype)initWithHost:(SUHost *)host windowNibName:(NSString *)nibName
 {
-	NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:nibName ofType:@"nib"];
-	if (path == nil) // Slight hack to resolve issues with running Sparkle in debug configurations.
-	{
-		NSString *frameworkPath = [[[host bundle] sharedFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
-		NSBundle *framework = [NSBundle bundleWithPath:frameworkPath];
-		path = [framework pathForResource:nibName ofType:@"nib"];
-	}
-	self = [super initWithWindowNibPath:path owner:self];
-	return self;
+    NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:nibName ofType:@"nib"];
+    if (path == nil) // Slight hack to resolve issues with running Sparkle in debug configurations.
+    {
+        NSString *frameworkPath = [[[host bundle] sharedFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
+        NSBundle *framework = [NSBundle bundleWithPath:frameworkPath];
+        path = [framework pathForResource:nibName ofType:@"nib"];
+    }
+    self = [super initWithWindowNibPath:path owner:self];
+    return self;
 }
 
 @end

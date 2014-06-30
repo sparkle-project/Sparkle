@@ -38,7 +38,8 @@ NSString *pathRelativeToDirectory(NSString *directory, NSString *path)
     return path;
 }
 
-NSString *stringWithFileSystemRepresentation(const char *input) {
+NSString *stringWithFileSystemRepresentation(const char *input)
+{
     NSFileManager *fm = [NSFileManager defaultManager];
     return [fm stringWithFileSystemRepresentation:input length:strlen(input)];
 }
@@ -58,7 +59,7 @@ NSString *temporaryFilename(NSString *base)
     return ret;
 }
 
-static void _hashOfBuffer(unsigned char *hash, const char* buffer, ssize_t bufferLength)
+static void _hashOfBuffer(unsigned char *hash, const char *buffer, ssize_t bufferLength)
 {
     assert(bufferLength >= 0 && bufferLength <= UINT32_MAX);
     CC_SHA1_CTX hashContext;
@@ -67,12 +68,14 @@ static void _hashOfBuffer(unsigned char *hash, const char* buffer, ssize_t buffe
     CC_SHA1_Final(hash, &hashContext);
 }
 
-static void _hashOfFile(unsigned char* hash, FTSENT *ent)
+static void _hashOfFile(unsigned char *hash, FTSENT *ent)
 {
-    if (ent->fts_info == FTS_SL) {
+    if (ent->fts_info == FTS_SL)
+    {
         char linkDestination[MAXPATHLEN + 1];
         ssize_t linkDestinationLength = readlink(ent->fts_path, linkDestination, MAXPATHLEN);
-        if (linkDestinationLength < 0) {
+        if (linkDestinationLength < 0)
+        {
             perror("readlink");
             return;
         }
@@ -81,22 +84,26 @@ static void _hashOfFile(unsigned char* hash, FTSENT *ent)
         return;
     }
 
-    if (ent->fts_info == FTS_F) {
+    if (ent->fts_info == FTS_F)
+    {
         int fileDescriptor = open(ent->fts_path, O_RDONLY);
-        if (fileDescriptor == -1) {
+        if (fileDescriptor == -1)
+        {
             perror("open");
             return;
         }
 
         ssize_t fileSize = ent->fts_statp->st_size;
-        if (fileSize == 0) {
+        if (fileSize == 0)
+        {
             _hashOfBuffer(hash, NULL, 0);
             close(fileDescriptor);
             return;
         }
 
         void *buffer = mmap(0, (size_t)fileSize, PROT_READ, MAP_FILE | MAP_PRIVATE, fileDescriptor, 0);
-        if (buffer == (void*)-1) {
+        if (buffer == (void *)-1)
+        {
             close(fileDescriptor);
             perror("mmap");
             return;
@@ -121,9 +128,10 @@ NSData *hashOfFile(FTSENT *ent)
 
 NSString *hashOfTree(NSString *path)
 {
-    const char *sourcePaths[] = {[path fileSystemRepresentation], 0};
-    FTS *fts = fts_open((char* const*)sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
-    if (!fts) {
+    const char *sourcePaths[] = {[path fileSystemRepresentation], 0 };
+    FTS *fts = fts_open((char *const *)sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
+    if (!fts)
+    {
         perror("fts_open");
         return nil;
     }
@@ -132,7 +140,8 @@ NSString *hashOfTree(NSString *path)
     CC_SHA1_Init(&hashContext);
 
     FTSENT *ent = 0;
-    while ((ent = fts_read(fts))) {
+    while ((ent = fts_read(fts)))
+    {
         if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL)
             continue;
 

@@ -13,9 +13,10 @@
 @interface SUHost : NSObject
 {
 @private
-	NSString *defaultsDomain;
-	BOOL usesStandardUserDefaults;
+    NSString *defaultsDomain;
+    BOOL usesStandardUserDefaults;
 }
+
 @property (retain, readonly) NSBundle *bundle;
 
 + (NSString *)systemVersionString;
@@ -41,4 +42,5 @@
 - (void)setBool:(BOOL)value forUserDefaultsKey:(NSString *)defaultName;
 - (id)objectForKey:(NSString *)key;
 - (BOOL)boolForKey:(NSString *)key;
+
 @end

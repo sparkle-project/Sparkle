@@ -17,39 +17,42 @@
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
-	return binaryDeltaSupported() && [[path pathExtension] isEqualToString:@"delta"];
+    return binaryDeltaSupported() && [[path pathExtension] isEqualToString:@"delta"];
 }
 
 - (void)applyBinaryDelta
 {
-	@autoreleasepool {
-		NSString *sourcePath = [[updateHost bundle] bundlePath];
-		NSString *targetPath = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
+    @autoreleasepool
+    {
+        NSString *sourcePath = [[updateHost bundle] bundlePath];
+        NSString *targetPath = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
 
-		int result = applyBinaryDelta(sourcePath, targetPath, archivePath);
-		if (!result) {
-			dispatch_async(dispatch_get_main_queue(), ^{
+        int result = applyBinaryDelta(sourcePath, targetPath, archivePath);
+        if (!result)
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
 				[self notifyDelegateOfSuccess];
-			});
-		}
-		else {
-			dispatch_async(dispatch_get_main_queue(), ^{
+            });
+        }
+        else
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
 				[self notifyDelegateOfFailure];
-			});
-		}
-	}
+            });
+        }
+    }
 }
 
 - (void)start
 {
-	dispatch_async(dispatch_get_global_queue(0, 0), ^{
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
 		[self applyBinaryDelta];
-	});
+    });
 }
 
 + (void)load
 {
-	[self registerImplementation:self];
+    [self registerImplementation:self];
 }
 
 @end

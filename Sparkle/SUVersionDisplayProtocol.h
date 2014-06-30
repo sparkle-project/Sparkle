@@ -8,7 +8,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-
 /*!
     @protocol
     @abstract	Implement this protocol to apply special formatting to the two
@@ -22,6 +21,6 @@
     @discussion You get both so you can display important distinguishing
 				information, but leave out unnecessary/confusing parts.
 */
--(void)	formatVersion: (NSString**)inOutVersionA andVersion: (NSString**)inOutVersionB;
+- (void)formatVersion:(NSString **)inOutVersionA andVersion:(NSString **)inOutVersionB;
 
 @end

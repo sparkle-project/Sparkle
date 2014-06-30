@@ -10,28 +10,31 @@
 #define SUAPPCAST_H
 
 @protocol SUAppcastDelegate;
-
 @class SUAppcastItem;
-@interface SUAppcast : NSObject<NSURLDownloadDelegate>
+
+@interface SUAppcast : NSObject <NSURLDownloadDelegate>
 {
 @private
-	NSArray *items;
-	NSString *userAgentString;
-	id<SUAppcastDelegate> delegate;
-	NSString *downloadFilename;
-	NSURLDownload *download;
+    NSArray *items;
+    NSString *userAgentString;
+    id<SUAppcastDelegate> delegate;
+    NSString *downloadFilename;
+    NSURLDownload *download;
 }
+
 @property (assign) id<SUAppcastDelegate> delegate;
 @property (copy) NSString *userAgentString;
+@property (readonly, copy) NSArray *items;
 
 - (void)fetchAppcastFromURL:(NSURL *)url;
 
-@property (readonly, copy) NSArray *items;
 @end
 
 @protocol SUAppcastDelegate <NSObject>
+
 - (void)appcastDidFinishLoading:(SUAppcast *)appcast;
 - (void)appcast:(SUAppcast *)appcast failedToLoadWithError:(NSError *)error;
+
 @end
 
 #endif

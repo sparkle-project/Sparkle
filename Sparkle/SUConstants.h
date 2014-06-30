@@ -6,7 +6,6 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-
 #ifndef SUCONSTANTS_H
 #define SUCONSTANTS_H
 
@@ -16,15 +15,14 @@
 
 // Sparkle usually doesn't allow downgrades as they're usually accidental, but
 //	if your app has a downgrade function or URL handler, turn this on:
-#define PERMIT_AUTOMATED_DOWNGRADES					0
+#define PERMIT_AUTOMATED_DOWNGRADES 0
 
 // If your app file on disk is named "MyApp 1.1b4", Sparkle usually updates it
 //	in place, giving you an app named 1.1b4 that is actually 1.2. Turn the
 //	following on to always reset the name back to "MyApp":
-#define NORMALIZE_INSTALLED_APP_NAME				0
+#define NORMALIZE_INSTALLED_APP_NAME 0
 
-
-#define TRY_TO_APPEND_VERSION_NUMBER				1
+#define TRY_TO_APPEND_VERSION_NUMBER 1
 
 // -----------------------------------------------------------------------------
 //	Notifications:

@@ -15,8 +15,8 @@
 @interface SUUserInitiatedUpdateDriver : SUUIBasedUpdateDriver
 {
 @private
-	SUStatusController *checkingController;
-	BOOL isCanceled;
+    SUStatusController *checkingController;
+    BOOL isCanceled;
 }
 
 @end

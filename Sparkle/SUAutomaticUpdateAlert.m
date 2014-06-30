@@ -23,48 +23,51 @@
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost delegate:(id<SUAutomaticUpdateAlertDelegate>)del
 {
-	self = [super initWithHost:aHost windowNibName:@"SUAutomaticUpdateAlert"];
-	if (self)
-	{
-		self.updateItem = item;
-		self.delegate = del;
-		self.host = aHost;
-		[self setShouldCascadeWindows:NO];
-		[[self window] center];
-	}
-	return self;
+    self = [super initWithHost:aHost windowNibName:@"SUAutomaticUpdateAlert"];
+    if (self)
+    {
+        self.updateItem = item;
+        self.delegate = del;
+        self.host = aHost;
+        [self setShouldCascadeWindows:NO];
+        [[self window] center];
+    }
+    return self;
 }
 
 - (void)dealloc
 {
-	self.host = nil;
-	self.updateItem = nil;
-	[super dealloc];
+    self.host = nil;
+    self.updateItem = nil;
+    [super dealloc];
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [host bundlePath], [host installationPath]]; }
-
-- (IBAction)installNow:(id) __unused sender
+- (NSString *)description
 {
-	[self close];
-	[delegate automaticUpdateAlert:self finishedWithChoice:SUInstallNowChoice];
+    return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [host bundlePath], [host installationPath]];
 }
 
-- (IBAction)installLater:(id) __unused sender
+- (IBAction)installNow:(id)__unused sender
 {
-	[self close];
-	[delegate automaticUpdateAlert:self finishedWithChoice:SUInstallLaterChoice];
+    [self close];
+    [delegate automaticUpdateAlert:self finishedWithChoice:SUInstallNowChoice];
 }
 
-- (IBAction)doNotInstall:(id) __unused sender
+- (IBAction)installLater:(id)__unused sender
 {
-	[self close];
-	[delegate automaticUpdateAlert:self finishedWithChoice:SUDoNotInstallChoice];
+    [self close];
+    [delegate automaticUpdateAlert:self finishedWithChoice:SUInstallLaterChoice];
+}
+
+- (IBAction)doNotInstall:(id)__unused sender
+{
+    [self close];
+    [delegate automaticUpdateAlert:self finishedWithChoice:SUDoNotInstallChoice];
 }
 
 - (NSImage *)applicationIcon
 {
-	return [host icon];
+    return [host icon];
 }
 
 - (NSString *)titleText
