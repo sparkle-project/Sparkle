@@ -12,6 +12,17 @@
 #include <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
 #import "SULog.h"
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101000
+typedef struct {
+    NSInteger majorVersion;
+    NSInteger minorVersion;
+    NSInteger patchVersion;
+} NSOperatingSystemVersion;
+@interface NSProcessInfo ()
+- (NSOperatingSystemVersion)operatingSystemVersion;
+@end
+#endif
+
 @interface SUHost ()
 @property (retain, readwrite) NSBundle *bundle;
 @end
@@ -246,8 +257,15 @@
 
 + (NSString *)systemVersionString
 {
-	NSString *versionPlistPath = @"/System/Library/CoreServices/SystemVersion.plist";
-	return [NSDictionary dictionaryWithContentsOfFile:versionPlistPath][@"ProductVersion"];
+#if __MAC_OS_X_VERSION_MIN_REQUIRED < 1090 // Present in 10.9 despite NS_AVAILABLE's claims
+    if (![NSProcessInfo instancesRespondToSelector:@selector(operatingSystemVersion)])
+    {
+        NSURL *coreServices = [[NSFileManager defaultManager] URLForDirectory:NSCoreServiceDirectory inDomain:NSSystemDomainMask appropriateForURL:nil create:NO error:nil];
+        return [NSDictionary dictionaryWithContentsOfURL:[coreServices URLByAppendingPathComponent:@"SystemVersion.plist"]][@"ProductVersion"];
+    }
+#endif
+    NSOperatingSystemVersion version = [[NSProcessInfo processInfo] operatingSystemVersion];
+    return [NSString stringWithFormat:@"%ld.%ld.%ld", (long)version.majorVersion, (long)version.minorVersion, (long)version.patchVersion];
 }
 
 @end
