@@ -11,25 +11,27 @@
 
 #import <Cocoa/Cocoa.h>
 
-extern NSString * const SUUpdateDriverFinishedNotification;
+extern NSString *const SUUpdateDriverFinishedNotification;
 
 @class SUHost, SUUpdater;
-@interface SUUpdateDriver : NSObject<NSURLDownloadDelegate>
+
+@interface SUUpdateDriver : NSObject <NSURLDownloadDelegate>
 {
-	SUHost *host;
-	SUUpdater *updater; //assigned
-	NSURL *appcastURL;
+    SUHost *host;
+    SUUpdater *updater; //assigned
+    NSURL *appcastURL;
 
-	BOOL finished;
-	BOOL isInterruptible;
+    BOOL finished;
+    BOOL isInterruptible;
 }
-@property (retain) SUHost *host;
 
-- (instancetype) initWithUpdater:(SUUpdater *)updater;
-- (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
-- (void)abortUpdate;
+@property (retain) SUHost *host;
 @property (getter=isInterruptible, readonly) BOOL interruptible;
 @property (readonly) BOOL finished;
+
+- (instancetype)initWithUpdater:(SUUpdater *)updater;
+- (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
+- (void)abortUpdate;
 
 @end
 

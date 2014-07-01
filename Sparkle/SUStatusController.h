@@ -12,14 +12,16 @@
 #import "SUWindowController.h"
 
 @class SUHost;
+
 @interface SUStatusController : SUWindowController
+
 @property (assign) IBOutlet NSButton *actionButton;
-@property (assign) IBOutlet NSProgressIndicator* progressBar;
+@property (assign) IBOutlet NSProgressIndicator *progressBar;
 
 @property (copy) NSString *statusText;
 @property double progressValue;
 @property (nonatomic) double maxProgressValue;
-@property (getter = isButtonEnabled) BOOL buttonEnabled;
+@property (getter=isButtonEnabled) BOOL buttonEnabled;
 
 - (instancetype)initWithHost:(SUHost *)host;
 

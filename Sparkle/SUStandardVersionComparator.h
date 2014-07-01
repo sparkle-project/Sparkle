@@ -9,7 +9,6 @@
 #ifndef SUSTANDARDVERSIONCOMPARATOR_H
 #define SUSTANDARDVERSIONCOMPARATOR_H
 
-
 #import "SUVersionComparisonProtocol.h"
 
 /*!
@@ -31,6 +30,7 @@
 	@discussion	See the implementation for more details.
 */
 - (NSComparisonResult)compareVersion:(NSString *)versionA toVersion:(NSString *)versionB;
+
 @end
 
 #endif

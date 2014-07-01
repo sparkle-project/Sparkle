@@ -16,9 +16,9 @@
 @interface SUAutomaticUpdateDriver : SUBasicUpdateDriver <SUUnarchiverDelegate, SUAutomaticUpdateAlertDelegate>
 {
 @private
-	BOOL postponingInstallation, showErrors;
-	BOOL willUpdateOnTermination;
-	SUAutomaticUpdateAlert *alert;
+    BOOL postponingInstallation, showErrors;
+    BOOL willUpdateOnTermination;
+    SUAutomaticUpdateAlert *alert;
     NSTimer *showUpdateAlertTimer;
 }
 

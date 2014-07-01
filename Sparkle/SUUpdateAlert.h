@@ -16,25 +16,28 @@
 
 typedef enum
 {
-	SUInstallUpdateChoice,
-	SURemindMeLaterChoice,
-	SUSkipThisVersionChoice,
-	SUOpenInfoURLChoice
+    SUInstallUpdateChoice,
+    SURemindMeLaterChoice,
+    SUSkipThisVersionChoice,
+    SUOpenInfoURLChoice
 } SUUpdateAlertChoice;
 
 @class WebView, SUAppcastItem, SUHost;
-@interface SUUpdateAlert : SUWindowController {
-	SUAppcastItem *updateItem;
-	SUHost *host;
 
-	IBOutlet WebView *releaseNotesView;
-	IBOutlet NSTextField *description;
-	IBOutlet NSButton *installButton;	// UK 2007-08-31.
-	IBOutlet NSButton *skipButton;
-	IBOutlet NSButton *laterButton;
-	NSProgressIndicator *releaseNotesSpinner;
-	BOOL webViewFinishedLoading;
+@interface SUUpdateAlert : SUWindowController
+{
+    SUAppcastItem *updateItem;
+    SUHost *host;
+
+    IBOutlet WebView *releaseNotesView;
+    IBOutlet NSTextField *description;
+    IBOutlet NSButton *installButton; // UK 2007-08-31.
+    IBOutlet NSButton *skipButton;
+    IBOutlet NSButton *laterButton;
+    NSProgressIndicator *releaseNotesSpinner;
+    BOOL webViewFinishedLoading;
 }
+
 @property (assign) id<SUUpdateAlertDelegate> delegate;
 @property (assign) id<SUVersionDisplay> versionDisplayer;
 
@@ -47,9 +50,13 @@ typedef enum
 @end
 
 @protocol SUUpdateAlertDelegate <NSObject>
+
 - (void)updateAlert:(SUUpdateAlert *)updateAlert finishedWithChoice:(SUUpdateAlertChoice)updateChoice;
+
 @optional
-- (void)updateAlert:(SUUpdateAlert *)updateAlert shouldAllowAutoUpdate: (BOOL*)shouldAllowAutoUpdate;
+
+- (void)updateAlert:(SUUpdateAlert *)updateAlert shouldAllowAutoUpdate:(BOOL *)shouldAllowAutoUpdate;
+
 @end
 
 #endif

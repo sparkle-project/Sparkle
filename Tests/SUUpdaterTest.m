@@ -37,7 +37,7 @@
     [super tearDown];
 }
 
-- (NSString *)feedURLStringForUpdater:(SUUpdater *) __unused updater
+- (NSString *)feedURLStringForUpdater:(SUUpdater *)__unused updater
 {
     return @"";
 }

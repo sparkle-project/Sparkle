@@ -12,8 +12,10 @@
 #import <Foundation/Foundation.h>
 
 @interface SUCodeSigningVerifier : NSObject
+
 + (BOOL)codeSignatureIsValidAtPath:(NSString *)destinationPath error:(NSError **)error;
 + (BOOL)hostApplicationIsCodeSigned;
+
 @end
 
 #endif
