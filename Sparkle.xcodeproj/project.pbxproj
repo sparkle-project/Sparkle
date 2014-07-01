@@ -161,6 +161,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		1454BA1519637EDB00344E57 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 61B5F90109C4CEE200B25A18;
+			remoteInfo = "Sparkle Test App";
+		};
+		1454BA1719637EE900344E57 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1420DF491962329200203BB0;
+			remoteInfo = Documentation;
+		};
 		14732BCA1960F73500593899 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -267,6 +281,7 @@
 		1420DF4D196247B500203BB0 /* build-docs.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-docs.sh"; sourceTree = "<group>"; };
 		1420DF4E196247B500203BB0 /* Doxyfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Doxyfile; sourceTree = "<group>"; };
 		1420DF4F196247F900203BB0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		14732BB1195FF6B700593899 /* .clang-format */ = {isa = PBXFileReference; lastKnownFileType = text; path = ".clang-format"; sourceTree = SOURCE_ROOT; };
 		14732BB91960EEEE00593899 /* SampleAppcast.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SampleAppcast.xml; sourceTree = "<group>"; };
 		14732BBA1960EF7100593899 /* CHANGELOG */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CHANGELOG; sourceTree = SOURCE_ROOT; };
 		14732BBC1960EFB500593899 /* README.markdown */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.markdown; sourceTree = SOURCE_ROOT; };
@@ -277,7 +292,6 @@
 		14732BC41960F3FF00593899 /* sign_update.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = sign_update.sh; sourceTree = "<group>"; };
 		14732BC91960F70A00593899 /* make-release-package.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "make-release-package.sh"; sourceTree = "<group>"; };
 		14732BD219610A1800593899 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		14732BB1195FF6B700593899 /* .clang-format */ = {isa = PBXFileReference; lastKnownFileType = text; path = ".clang-format"; sourceTree = SOURCE_ROOT; };
 		14950074195FDF5900BC5B5B /* SUUpdaterTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUUpdaterTest.m; path = Tests/SUUpdaterTest.m; sourceTree = "<group>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
 		4607BEA21948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Sparkle.strings; sourceTree = "<group>"; };
@@ -977,7 +991,9 @@
 			buildWorkingDirectory = "";
 			dependencies = (
 				14732BCB1960F73500593899 /* PBXTargetDependency */,
+				1454BA1619637EDB00344E57 /* PBXTargetDependency */,
 				14732BCF1960F73500593899 /* PBXTargetDependency */,
+				1454BA1819637EE900344E57 /* PBXTargetDependency */,
 			);
 			name = Distribution;
 			passBuildSettingsInEnvironment = 1;
@@ -1379,6 +1395,16 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		1454BA1619637EDB00344E57 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 61B5F90109C4CEE200B25A18 /* Sparkle Test App */;
+			targetProxy = 1454BA1519637EDB00344E57 /* PBXContainerItemProxy */;
+		};
+		1454BA1819637EE900344E57 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1420DF491962329200203BB0 /* Documentation */;
+			targetProxy = 1454BA1719637EE900344E57 /* PBXContainerItemProxy */;
+		};
 		14732BCB1960F73500593899 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8DC2EF4F0486A6940098B216 /* Sparkle */;
