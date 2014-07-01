@@ -117,19 +117,19 @@ static NSString*	sUpdateFolder = nil;
     return isPackage ? nil : path;
 }
 
-+ (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath delegate:(id<SUInstallerDelegate>)delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
++ (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath delegate:(id<SUInstallerDelegate>)delegate versionComparator:(id<SUVersionComparison>)comparator
 {
     BOOL isPackage = NO;
-	NSString *newAppDownloadPath = [self installSourcePathInUpdateFolder:inUpdateFolder forHost:host isPackage:&isPackage];
+    NSString *newAppDownloadPath = [self installSourcePathInUpdateFolder:inUpdateFolder forHost:host isPackage:&isPackage];
 
-	if (newAppDownloadPath == nil)
-	{
-		[self finishInstallationToPath:installationPath withResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{NSLocalizedDescriptionKey: @"Couldn't find an appropriate update in the downloaded package."}] delegate:delegate];
-	}
-	else
-	{
-		[(isPackage ? [SUPackageInstaller class] : [SUPlainInstaller class]) performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host delegate:delegate synchronously:synchronously versionComparator:comparator];
-	}
+    if (newAppDownloadPath == nil)
+    {
+        [self finishInstallationToPath:installationPath withResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: @"Couldn't find an appropriate update in the downloaded package." }] delegate:delegate];
+    }
+    else
+    {
+        [(isPackage ? [SUPackageInstaller class] : [SUPlainInstaller class])performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host delegate:delegate versionComparator:comparator];
+    }
 }
 
 + (void)mdimportInstallationPath:(NSString *)installationPath
