@@ -25,11 +25,13 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-        1420DE301962082C00203BB0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DE2F1962082C00203BB0 /* Images.xcassets */; };
-        1420DE3119620A6600203BB0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DE2F1962082C00203BB0 /* Images.xcassets */; };
-        14732BC01960F2C200593899 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 14732BBF1960F0AC00593899 /* dsa_pub.pem */; };
-        14732BD019610A0D00593899 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
-        14732BD119610A1200593899 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
+		1420DE301962082C00203BB0 /* (null) in Resources */ = {isa = PBXBuildFile; };
+		1420DE3119620A6600203BB0 /* (null) in Resources */ = {isa = PBXBuildFile; };
+		1420DF50196247F900203BB0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DF4F196247F900203BB0 /* Images.xcassets */; };
+		1420DF51196247F900203BB0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DF4F196247F900203BB0 /* Images.xcassets */; };
+		14732BC01960F2C200593899 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 14732BBF1960F0AC00593899 /* dsa_pub.pem */; };
+		14732BD019610A0D00593899 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
+		14732BD119610A1200593899 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
 		14732BD319610A1800593899 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14732BD219610A1800593899 /* XCTest.framework */; };
 		1495006E195FCE1100BC5B5B /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
 		1495006F195FCE1800BC5B5B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
@@ -259,18 +261,15 @@
 		0263187214FEBB31005EBF43 /* uk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		0263187514FEBB42005EBF43 /* uk */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = uk; path = uk.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
 		0263187614FEBB42005EBF43 /* uk */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = uk; path = uk.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
-        0263187714FEBB42005EBF43 /* uk */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = uk; path = uk.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
-        0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-        0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
-ree = SDKROOT; };
-62082C00203BB0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-e = "<group>"; };
-62322200203BB0 /* build-docs.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-docs.sh"; sourceTree = "<group>"; };
-e = "<group>"; };
-62322200203BB0 /* Doxyfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Doxyfile; sourceTree = "<group>"; };
-        14732BB91960EEEE00593899 /* SampleAppcast.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SampleAppcast.xml; sourceTree = "<group>"; };
-        14732BBA1960EF7100593899 /* CHANGELOG */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CHANGELOG; sourceTree = SOURCE_ROOT; };
-        14732BBC1960EFB500593899 /* README.markdown */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.markdown; sourceTree = SOURCE_ROOT; };
+		0263187714FEBB42005EBF43 /* uk */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = uk; path = uk.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
+		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		1420DF4D196247B500203BB0 /* build-docs.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-docs.sh"; sourceTree = "<group>"; };
+		1420DF4E196247B500203BB0 /* Doxyfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Doxyfile; sourceTree = "<group>"; };
+		1420DF4F196247F900203BB0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		14732BB91960EEEE00593899 /* SampleAppcast.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SampleAppcast.xml; sourceTree = "<group>"; };
+		14732BBA1960EF7100593899 /* CHANGELOG */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CHANGELOG; sourceTree = SOURCE_ROOT; };
+		14732BBC1960EFB500593899 /* README.markdown */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.markdown; sourceTree = SOURCE_ROOT; };
 		14732BBE1960F0A600593899 /* dsa_priv.pem */ = {isa = PBXFileReference; lastKnownFileType = text; path = dsa_priv.pem; sourceTree = "<group>"; };
 		14732BBF1960F0AC00593899 /* dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		14732BC11960F3B200593899 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = SOURCE_ROOT; usesTabs = 1; };
@@ -583,7 +582,7 @@ e = "<group>"; };
 				61227A100DB5484000AB99EA /* Tests */,
 				61B5F91D09C4CF7F00B25A18 /* Test Application */,
 				14732BB51960ECBA00593899 /* Third Party */,
-                1420DE391962322200203BB0 /* Documentation */,
+				1420DE391962322200203BB0 /* Documentation */,
 				FA1941C40D94A6EA00DD942E /* Configurations */,
 				0867D69AFE84028FC02AAC07 /* Frameworks */,
 				034768DFFF38A50411DB9C8B /* Products */,
@@ -624,15 +623,15 @@ e = "<group>"; };
 			name = "Framework Resources";
 			sourceTree = "<group>";
 		};
-        1420DE391962322200203BB0 /* Documentation */ = {
-            isa = PBXGroup;
-            children = (
-                1420DE3B1962322200203BB0 /* build-docs.sh */,
-                1420DE3C1962322200203BB0 /* Doxyfile */,
-            );
-            path = Documentation;
-            sourceTree = "<group>";
-        };
+		1420DE391962322200203BB0 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				1420DF4D196247B500203BB0 /* build-docs.sh */,
+				1420DF4E196247B500203BB0 /* Doxyfile */,
+			);
+			path = Documentation;
+			sourceTree = "<group>";
+		};
 		14732BB51960ECBA00593899 /* Third Party */ = {
 			isa = PBXGroup;
 			children = (
@@ -668,13 +667,13 @@ e = "<group>"; };
 				14732BC21960F3FF00593899 /* bin */,
 				14732BBA1960EF7100593899 /* CHANGELOG */,
 				61C268090E2DB5D000175E6C /* LICENSE */,
-                14732BBC1960EFB500593899 /* README.markdown */,
-                14732BC11960F3B200593899 /* Makefile */,
-                14732BB91960EEEE00593899 /* SampleAppcast.xml */,
-                1420DE2F1962082C00203BB0 /* Images.xcassets */,
-                615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */,
-            );
-            path = Resources;
+				14732BBC1960EFB500593899 /* README.markdown */,
+				1420DF4F196247F900203BB0 /* Images.xcassets */,
+				14732BC11960F3B200593899 /* Makefile */,
+				14732BB91960EEEE00593899 /* SampleAppcast.xml */,
+				615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		14732BC21960F3FF00593899 /* bin */ = {
@@ -952,20 +951,20 @@ e = "<group>"; };
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXLegacyTarget section */
-        1420DF491962329200203BB0 /* Documentation */ = {
-            isa = PBXLegacyTarget;
-            buildArgumentsString = "\"$(SRCROOT)/Documentation/build-docs.sh\" $(ACTION)";
-            buildConfigurationList = 1420DF4A1962329200203BB0 /* Build configuration list for PBXLegacyTarget "Documentation" */;
-            buildPhases = (
-            );
-            buildToolPath = bash;
-            buildWorkingDirectory = "";
-            dependencies = (
-            );
-            name = Documentation;
-            passBuildSettingsInEnvironment = 1;
-            productName = Documentation;
-        };
+		1420DF491962329200203BB0 /* Documentation */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "\"$(SRCROOT)/Documentation/build-docs.sh\" $(ACTION)";
+			buildConfigurationList = 1420DF4A1962329200203BB0 /* Build configuration list for PBXLegacyTarget "Documentation" */;
+			buildPhases = (
+			);
+			buildToolPath = bash;
+			buildWorkingDirectory = "";
+			dependencies = (
+			);
+			name = Documentation;
+			passBuildSettingsInEnvironment = 1;
+			productName = Documentation;
+		};
 		14732BC51960F69300593899 /* Distribution */ = {
 			isa = PBXLegacyTarget;
 			buildArgumentsString = "$(SRCROOT)/Configurations/make-release-package.sh $(ACTION)";
@@ -1153,7 +1152,7 @@ e = "<group>"; };
 				5D06E8CF0FD68C7C005AE3F6 /* BinaryDelta */,
 				55C14BB6136EEF1500649790 /* Autoupdate */,
 				14732BC51960F69300593899 /* Distribution */,
-                1420DF491962329200203BB0 /* Documentation */,
+				1420DF491962329200203BB0 /* Documentation */,
 				1495005F195FB89400BC5B5B /* All */,
 			);
 		};
@@ -1161,13 +1160,14 @@ e = "<group>"; };
 
 /* Begin PBXResourcesBuildPhase section */
 		55C14BB3136EEF1500649790 /* Resources */ = {
-            isa = PBXResourcesBuildPhase;
-            buildActionMask = 2147483647;
-            files = (
-                1420DE3119620A6600203BB0 /* Images.xcassets in Resources */,
-                55C14FC7136F05E100649790 /* Sparkle.strings in Resources */,
-                55C14BD9136EF00C00649790 /* SUStatus.xib in Resources */,
-            );
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1420DE3119620A6600203BB0 /* (null) in Resources */,
+				1420DF51196247F900203BB0 /* Images.xcassets in Resources */,
+				55C14FC7136F05E100649790 /* Sparkle.strings in Resources */,
+				55C14BD9136EF00C00649790 /* SUStatus.xib in Resources */,
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		612279D40DB5470200AB99EA /* Resources */ = {
@@ -1179,13 +1179,14 @@ e = "<group>"; };
 		};
 		61B5F8FE09C4CEE200B25A18 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-            buildActionMask = 2147483647;
-            files = (
-                14732BC01960F2C200593899 /* dsa_pub.pem in Resources */,
-                1420DE301962082C00203BB0 /* Images.xcassets in Resources */,
-                61B5F92E09C4CFD800B25A18 /* InfoPlist.strings in Resources */,
-                61B5F92F09C4CFD800B25A18 /* MainMenu.xib in Resources */,
-            );
+			buildActionMask = 2147483647;
+			files = (
+				14732BC01960F2C200593899 /* dsa_pub.pem in Resources */,
+				1420DF50196247F900203BB0 /* Images.xcassets in Resources */,
+				1420DE301962082C00203BB0 /* (null) in Resources */,
+				61B5F92E09C4CFD800B25A18 /* InfoPlist.strings in Resources */,
+				61B5F92F09C4CFD800B25A18 /* MainMenu.xib in Resources */,
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		8DC2EF520486A6940098B216 /* Resources */ = {
@@ -1585,18 +1586,18 @@ e = "<group>"; };
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-        1420DF4B1962329200203BB0 /* Debug */ = {
-            isa = XCBuildConfiguration;
-            buildSettings = {
-            };
-            name = Debug;
-        };
-        1420DF4C1962329200203BB0 /* Release */ = {
-            isa = XCBuildConfiguration;
-            buildSettings = {
-            };
-            name = Release;
-        };
+		1420DF4B1962329200203BB0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		1420DF4C1962329200203BB0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
 		14732BC71960F69300593899 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1683,12 +1684,12 @@ e = "<group>"; };
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */;
 			buildSettings = {
-                BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Sparkle.framework/Versions/A/Sparkle";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Sparkle.framework/Versions/A/Sparkle";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
-                TEST_HOST = "$(BUNDLE_LOADER)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
 			};
 			name = Debug;
 		};
@@ -1696,12 +1697,12 @@ e = "<group>"; };
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */;
 			buildSettings = {
-                BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Sparkle.framework/Versions/A/Sparkle";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Sparkle.framework/Versions/A/Sparkle";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
-                TEST_HOST = "$(BUNDLE_LOADER)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
 			};
 			name = Release;
 		};
@@ -1722,25 +1723,26 @@ e = "<group>"; };
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-        1420DF4A1962329200203BB0 /* Build configuration list for PBXLegacyTarget "Documentation" */ = {
-            isa = XCConfigurationList;
-            buildConfigurations = (
-                1420DF4B1962329200203BB0 /* Debug */,
-                1420DF4C1962329200203BB0 /* Release */,
-            );
-            defaultConfigurationIsVisible = 0;
-        };
+		1420DF4A1962329200203BB0 /* Build configuration list for PBXLegacyTarget "Documentation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1420DF4B1962329200203BB0 /* Debug */,
+				1420DF4C1962329200203BB0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		14732BC61960F69300593899 /* Build configuration list for PBXLegacyTarget "Distribution" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				14732BC71960F69300593899 /* Debug */,
-                14732BC81960F69300593899 /* Release */,
-            );
-            defaultConfigurationIsVisible = 0;
-            defaultConfigurationName = Release;
-        };
-        14950060195FB89500BC5B5B /* Build configuration list for PBXAggregateTarget "All" */ = {
-            isa = XCConfigurationList;
+				14732BC81960F69300593899 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		14950060195FB89500BC5B5B /* Build configuration list for PBXAggregateTarget "All" */ = {
+			isa = XCConfigurationList;
 			buildConfigurations = (
 				14950061195FB89500BC5B5B /* Debug */,
 				14950062195FB89500BC5B5B /* Release */,
