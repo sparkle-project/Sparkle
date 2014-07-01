@@ -1,5 +1,5 @@
 PROJECT_NAME            = Sparkle
-PROJECT_NUMBER          = 1.7
+PROJECT_NUMBER          = 1.7.1
 PROJECT_BRIEF           = "A software update framework for OS X"
 PROJECT_LOGO            = Resources/Images.xcassets/AppIcon.appiconset/icon_32x32@2x.png
 
