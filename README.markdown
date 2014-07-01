@@ -1,4 +1,4 @@
-# Sparkle <img src="Sparkle.png" width=48 height=48 alt="">
+# Sparkle <img src="Resources/Sparkle.png" width=48 height=48 alt=""/>
 is an easy-to-use software update framework for Cocoa developers.
 
 ## Changes since 1.5
