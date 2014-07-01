@@ -25,8 +25,8 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-        1420DE301962082C00203BB0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DE2F1962082C00203BB0 /* Images.xcassets */; };
-        1420DE3119620A6600203BB0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DE2F1962082C00203BB0 /* Images.xcassets */; };
+		1420DE301962082C00203BB0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DE2F1962082C00203BB0 /* Images.xcassets */; };
+		1420DE3119620A6600203BB0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DE2F1962082C00203BB0 /* Images.xcassets */; };
 		14732BC01960F2C200593899 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 14732BBF1960F0AC00593899 /* dsa_pub.pem */; };
 		14732BD019610A0D00593899 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		14732BD119610A1200593899 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
@@ -262,8 +262,7 @@
 		0263187714FEBB42005EBF43 /* uk */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = uk; path = uk.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
-        1420DE2F1962082C00203BB0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-        14732BB1195FF6B700593899 /* .clang-format */ = {isa = PBXFileReference; lastKnownFileType = text; path = ".clang-format"; sourceTree = SOURCE_ROOT; };
+		1420DE2F1962082C00203BB0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		14732BB91960EEEE00593899 /* SampleAppcast.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SampleAppcast.xml; sourceTree = "<group>"; };
 		14732BBA1960EF7100593899 /* CHANGELOG */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CHANGELOG; sourceTree = SOURCE_ROOT; };
 		14732BBC1960EFB500593899 /* README.markdown */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.markdown; sourceTree = SOURCE_ROOT; };
@@ -585,6 +584,7 @@
 			);
 			name = Sparkle;
 			sourceTree = "<group>";
+			usesTabs = 0;
 		};
 		0867D69AFE84028FC02AAC07 /* Frameworks */ = {
 			isa = PBXGroup;
@@ -656,7 +656,7 @@
 				14732BBC1960EFB500593899 /* README.markdown */,
 				14732BC11960F3B200593899 /* Makefile */,
 				14732BB91960EEEE00593899 /* SampleAppcast.xml */,
-                1420DE2F1962082C00203BB0 /* Images.xcassets */,
+				1420DE2F1962082C00203BB0 /* Images.xcassets */,
 				615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */,
 			);
 			path = Resources;
@@ -1134,7 +1134,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-                1420DE3119620A6600203BB0 /* Images.xcassets in Resources */,
+				1420DE3119620A6600203BB0 /* Images.xcassets in Resources */,
 				55C14FC7136F05E100649790 /* Sparkle.strings in Resources */,
 				55C14BD9136EF00C00649790 /* SUStatus.xib in Resources */,
 			);
@@ -1152,7 +1152,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				14732BC01960F2C200593899 /* dsa_pub.pem in Resources */,
-                1420DE301962082C00203BB0 /* Images.xcassets in Resources */,
+				1420DE301962082C00203BB0 /* Images.xcassets in Resources */,
 				61B5F92E09C4CFD800B25A18 /* InfoPlist.strings in Resources */,
 				61B5F92F09C4CFD800B25A18 /* MainMenu.xib in Resources */,
 			);
@@ -1683,7 +1683,7 @@
 				14732BC81960F69300593899 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-            defaultConfigurationName = Release;
+			defaultConfigurationName = Release;
 		};
 		14950060195FB89500BC5B5B /* Build configuration list for PBXAggregateTarget "All" */ = {
 			isa = XCConfigurationList;
