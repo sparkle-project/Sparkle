@@ -61,8 +61,9 @@
 
             [self logSigningInfoForCode:hostCode label:@"host info"];
             [self logSigningInfoForCode:staticCode label:@"new info"];
-			*error = CFBridgingRelease(cfError);
         }
+
+        *error = CFBridgingRelease(cfError);
     }
 
 finally:
