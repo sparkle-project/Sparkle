@@ -143,7 +143,7 @@
 		[self didNotFindUpdate];
 }
 
-- (void)appcast:(SUAppcast *)ac failedToLoadWithError:(NSError *)error
+- (void)appcast:(SUAppcast *)__unused ac failedToLoadWithError:(NSError *)error
 {
 	[self abortUpdateWithError:error];
 }
@@ -256,12 +256,12 @@
 	[self downloadUpdate];
 }
 
-- (void)unarchiverDidFinish:(SUUnarchiver *)ua
+- (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
 {
 	[self installWithToolAndRelaunch:YES];
 }
 
-- (void)unarchiverDidFail:(SUUnarchiver *)ua
+- (void)unarchiverDidFail:(SUUnarchiver *)__unused ua
 {
 	if ([updateItem isDeltaUpdate]) {
 		[self failedToApplyDeltaUpdate];
