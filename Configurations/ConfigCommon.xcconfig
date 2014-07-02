@@ -56,7 +56,7 @@ GCC_WARN_UNUSED_PARAMETER = YES
 GCC_WARN_UNUSED_VARIABLE = YES
 
 // These should be removed once the conversion to ARC is complete
-WARNING_CFLAGS_EXTRA = -Wno-objc-interface-ivars -Wno-direct-ivar-access -Wno-custom-atomic-properties -Wno-implicit-atomic-properties
+WARNING_CFLAGS_EXTRA = -Wno-direct-ivar-access -Wno-custom-atomic-properties -Wno-implicit-atomic-properties
 
 // Turn on all warnings, then disable a few which are almost impossible to avoid
 WARNING_CFLAGS = -Wall -Weverything -Wno-empty-translation-unit -Wno-unused-macros -Wno-gnu-statement-expression -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak $(WARNING_CFLAGS_EXTRA)
