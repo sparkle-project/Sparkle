@@ -18,7 +18,7 @@
 
 - (void)didFindValidUpdate
 {
-	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem host:host];
+    updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem host:self.host];
 	[updateAlert setDelegate:self];
 
 	id<SUVersionDisplay>	versDisp = nil;
@@ -34,7 +34,7 @@
 	// If the app is a menubar app or the like, we need to focus it first and alter the
 	// update prompt to behave like a normal window. Otherwise if the window were hidden
 	// there may be no way for the application to be activated to make it visible again.
-	if ([host isBackgroundApplication])
+    if ([self.host isBackgroundApplication])
 	{
 		[[updateAlert window] setHidesOnDeactivate:NO];
 		[NSApp activateIgnoringOtherApps:YES];
@@ -57,7 +57,7 @@
                                      defaultButton:SULocalizedString(@"OK", nil)
                                    alternateButton:nil
                                        otherButton:nil
-                         informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [host name], [host displayVersion]];
+                         informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
     [self showModalAlert:alert];
     [self abortUpdate];
 }
@@ -71,11 +71,11 @@
 - (void)updateAlert:(SUUpdateAlert *) __unused alert finishedWithChoice:(SUUpdateAlertChoice)choice
 {
 	updateAlert = nil;
-	[host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
+    [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
 	switch (choice)
 	{
 		case SUInstallUpdateChoice:
-			statusController = [[SUStatusController alloc] initWithHost:host];
+            statusController = [[SUStatusController alloc] initWithHost:self.host];
 			[statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
 			[statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
 			[statusController showWindow:self];
@@ -88,7 +88,7 @@
 			break;
 
 		case SUSkipThisVersionChoice:
-			[host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+            [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
 			[self abortUpdate];
 			break;
 
@@ -215,9 +215,9 @@
 
 	// When showing a modal alert we need to ensure that background applications
 	// are focused to inform the user since there is no dock icon to notify them.
-	if ([host isBackgroundApplication]) { [NSApp activateIgnoringOtherApps:YES]; }
+    if ([self.host isBackgroundApplication]) { [NSApp activateIgnoringOtherApps:YES]; }
 
-	[alert setIcon:[host icon]];
+    [alert setIcon:[self.host icon]];
 	[alert runModal];
 
 	if ([[updater delegate] respondsToSelector:@selector(updaterDidShowModalAlert:)])

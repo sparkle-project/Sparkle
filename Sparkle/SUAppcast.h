@@ -15,9 +15,6 @@
 @interface SUAppcast : NSObject<NSURLDownloadDelegate>
 {
 @private
-	NSArray *items;
-	NSString *userAgentString;
-	id<SUAppcastDelegate> __weak delegate;
 	NSString *downloadFilename;
 	NSURLDownload *download;
 }

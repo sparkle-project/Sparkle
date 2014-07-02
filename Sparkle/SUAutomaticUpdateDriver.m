@@ -20,12 +20,12 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 - (void)showUpdateAlert
 {
 	isInterruptible = NO;
-	alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:updateItem host:host delegate:self];
+    alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:updateItem host:self.host delegate:self];
 
 	// If the app is a menubar app or the like, we need to focus it first and alter the
 	// update prompt to behave like a normal window. Otherwise if the window were hidden
 	// there may be no way for the application to be activated to make it visible again.
-	if ([host isBackgroundApplication])
+    if ([self.host isBackgroundApplication])
 	{
 		[[alert window] setHidesOnDeactivate:NO];
 		[NSApp activateIgnoringOtherApps:YES];
@@ -133,7 +133,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 			break;
 
 		case SUDoNotInstallChoice:
-			[host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+            [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
 			[self abortUpdate];
 			break;
 	}

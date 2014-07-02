@@ -28,22 +28,22 @@
 
 - (void)notifyDelegateOfExtractedLength:(size_t)length
 {
-	if ([delegate respondsToSelector:@selector(unarchiver:extractedLength:)]) {
-		[delegate unarchiver:self extractedLength:length];
+    if ([self.delegate respondsToSelector:@selector(unarchiver:extractedLength:)]) {
+        [self.delegate unarchiver:self extractedLength:length];
 	}
 }
 
 - (void)notifyDelegateOfSuccess
 {
-	if ([delegate respondsToSelector:@selector(unarchiverDidFinish:)]) {
-		[delegate unarchiverDidFinish:self];
+    if ([self.delegate respondsToSelector:@selector(unarchiverDidFinish:)]) {
+        [self.delegate unarchiverDidFinish:self];
 	}
 }
 
 - (void)notifyDelegateOfFailure
 {
-	if ([delegate respondsToSelector:@selector(unarchiverDidFail:)]) {
-		[delegate unarchiverDidFail:self];
+    if ([self.delegate respondsToSelector:@selector(unarchiverDidFail:)]) {
+        [self.delegate unarchiverDidFail:self];
 	}
 }
 
