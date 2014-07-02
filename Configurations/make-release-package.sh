@@ -3,7 +3,7 @@ set -e
 
 if [ "$ACTION" = "" ] ; then
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
-    rm -f "Sparkle-$CURRENT_PROJECT_VERSION.zip"
+    rm -f "Sparkle-$CURRENT_PROJECT_VERSION.tar.bz2"
 
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging"
     cp "$SRCROOT/CHANGELOG" "$SRCROOT/LICENSE" "$SRCROOT/Resources/SampleAppcast.xml" "$CONFIGURATION_BUILD_DIR/staging"
@@ -16,6 +16,7 @@ if [ "$ACTION" = "" ] ; then
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
 
     cd "$CONFIGURATION_BUILD_DIR/staging"
-    zip --symlinks -r "../Sparkle-$CURRENT_PROJECT_VERSION.zip" .
+    # Sorted file list groups similar files together, which improves tar compression
+    find . \! -type d | rev | sort | rev | tar cjvf "../Sparkle-$CURRENT_PROJECT_VERSION.tar.bz2" --files-from=-
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
 fi
