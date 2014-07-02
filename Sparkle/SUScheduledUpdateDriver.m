@@ -26,12 +26,12 @@
 
 - (void)didNotFindUpdate
 {
-    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
+    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
 
 	if ([updaterDelegate respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
-		[updaterDelegate updaterDidNotFindUpdate:updater];
+        [updaterDelegate updaterDidNotFindUpdate:self.updater];
 	}
-	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:updater];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
 	[self abortUpdate]; // Don't tell the user that no update was found; this was a scheduled update.
 }

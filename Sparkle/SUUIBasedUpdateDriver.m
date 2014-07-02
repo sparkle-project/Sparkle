@@ -22,17 +22,17 @@
 
 - (void)didFindValidUpdate
 {
-    updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem host:self.host];
+    updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host];
 	[updateAlert setDelegate:self];
 
 	id<SUVersionDisplay>	versDisp = nil;
-	if ([[updater delegate] respondsToSelector:@selector(versionDisplayerForUpdater:)]) {
-		versDisp = [[updater delegate] versionDisplayerForUpdater: updater];
+    if ([[self.updater delegate] respondsToSelector:@selector(versionDisplayerForUpdater:)]) {
+        versDisp = [[self.updater delegate] versionDisplayerForUpdater:self.updater];
 	}
 	[updateAlert setVersionDisplayer: versDisp];
 
-	if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
-		[[updater delegate] updater:updater didFindValidUpdate:updateItem];
+    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
+        [[self.updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
 	}
 
 	// If the app is a menubar app or the like, we need to focus it first and alter the
@@ -53,9 +53,9 @@
 
 - (void)didNotFindUpdate
 {
-	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
-		[[updater delegate] updaterDidNotFindUpdate:updater];
-	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:updater];
+    if ([[self.updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
+        [[self.updater delegate] updaterDidNotFindUpdate:self.updater];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
     NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.")
                                      defaultButton:SULocalizedString(@"OK", nil)
@@ -87,12 +87,12 @@
 			break;
 
 		case SUOpenInfoURLChoice:
-			[[NSWorkspace sharedWorkspace] openURL: [updateItem infoURL]];
+            [[NSWorkspace sharedWorkspace] openURL: [self.updateItem infoURL]];
 			[self abortUpdate];
 			break;
 
 		case SUSkipThisVersionChoice:
-            [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+            [self.host setObject:[self.updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
 			[self abortUpdate];
 			break;
 
@@ -135,8 +135,8 @@
 
 - (IBAction)cancelDownload:(id) __unused sender
 {
-	if (download)
-		[download cancel];
+    if (self.download)
+        [self.download cancel];
 	[self abortUpdate];
 }
 
@@ -154,7 +154,7 @@
 	if ([statusController maxProgressValue] == 0.0)
 	{
 		NSDictionary * attributes;
-		attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:downloadPath error:nil];
+        attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.downloadPath error:nil];
 		[statusController setMaxProgressValue:[attributes[NSFileSize] doubleValue]];
 	}
 	[statusController setProgressValue:[statusController progressValue] + (double)length];
@@ -213,8 +213,8 @@
 
 - (void)showModalAlert:(NSAlert *)alert
 {
-	if ([[updater delegate] respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
-		[[updater delegate] updaterWillShowModalAlert: updater];
+    if ([[self.updater delegate] respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
+        [[self.updater delegate] updaterWillShowModalAlert:self.updater];
 	}
 
 	// When showing a modal alert we need to ensure that background applications
@@ -224,8 +224,8 @@
     [alert setIcon:[self.host icon]];
 	[alert runModal];
 
-	if ([[updater delegate] respondsToSelector:@selector(updaterDidShowModalAlert:)])
-		[[updater delegate] updaterDidShowModalAlert: updater];
+    if ([[self.updater delegate] respondsToSelector:@selector(updaterDidShowModalAlert:)])
+        [[self.updater delegate] updaterDidShowModalAlert:self.updater];
 }
 
 @end

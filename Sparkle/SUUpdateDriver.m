@@ -16,6 +16,7 @@ NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
     NSURL *appcastURL;
 }
 
+@synthesize updater;
 @synthesize host;
 @synthesize interruptible = isInterruptible;
 @synthesize finished;
@@ -40,6 +41,11 @@ NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 {
 	[self setValue:@YES forKey:@"finished"];
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdateDriverFinishedNotification object:self];
+}
+
+- (void)setInterruptible:(BOOL)interruptible
+{
+    isInterruptible = interruptible;
 }
 
 @end

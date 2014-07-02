@@ -33,7 +33,7 @@
 	@autoreleasepool {
 		BOOL mountedSuccessfully = NO;
 
-		SULog(@"Extracting %@ as a DMG", archivePath);
+        SULog(@"Extracting %@ as a DMG", self.archivePath);
 
 		// get a unique mount point path
 		NSString *mountPoint = nil;
@@ -58,7 +58,7 @@
 		NSData *promptData = nil;
 		promptData = [NSData dataWithBytes:"yes\n" length:4];
 
-		NSArray* arguments = @[@"attach", archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"];
+        NSArray* arguments = @[@"attach", self.archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"];
 
 		NSData *output = nil;
 		NSInteger taskResult = -1;
@@ -98,7 +98,7 @@
 		for (NSString *item in contents)
 		{
 			NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
-			NSString *toPath = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:item];
+            NSString *toPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:item];
 
 			// We skip any files in the DMG which are not readable.
 			if (![manager isReadableFileAtPath:fromPath]) {
@@ -128,7 +128,7 @@
 		if (mountedSuccessfully)
 			[NSTask launchedTaskWithLaunchPath:@"/usr/bin/hdiutil" arguments:@[@"detach", mountPoint, @"-force"]];
 		else
-			SULog(@"Can't mount DMG %@",archivePath);
+            SULog(@"Can't mount DMG %@", self.archivePath);
 	}
 }
 

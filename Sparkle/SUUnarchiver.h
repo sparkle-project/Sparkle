@@ -12,10 +12,10 @@
 @class SUHost;
 @protocol SUUnarchiverDelegate;
 
-@interface SUUnarchiver : NSObject {
-	NSString *archivePath;
-	SUHost *updateHost;
-}
+@interface SUUnarchiver : NSObject
+
+@property (copy, readonly) NSString *archivePath;
+@property (weak, readonly) SUHost *updateHost;
 @property (weak) id<SUUnarchiverDelegate> delegate;
 
 + (SUUnarchiver *)unarchiverForPath:(NSString *)path updatingHost:(SUHost *)host;

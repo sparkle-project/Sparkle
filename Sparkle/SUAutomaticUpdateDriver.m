@@ -15,6 +15,12 @@
 // If the user hasn't quit in a week, ask them if they want to relaunch to get the latest bits. It doesn't matter that this measure of "one day" is imprecise.
 static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 24 * 7;
 
+@interface SUUpdateDriver ()
+
+- (void)setInterruptible:(BOOL)interruptible;
+
+@end
+
 @implementation SUAutomaticUpdateDriver
 {
     BOOL postponingInstallation, showErrors;
@@ -25,8 +31,8 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)showUpdateAlert
 {
-	isInterruptible = NO;
-    alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:updateItem host:self.host delegate:self];
+    self.interruptible = NO;
+    alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host delegate:self];
 
 	// If the app is a menubar app or the like, we need to focus it first and alter the
 	// update prompt to behave like a normal window. Otherwise if the window were hidden
@@ -53,7 +59,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
     willUpdateOnTermination = YES;
 
-    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
+    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
     if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)])
     {
         BOOL relaunch = YES;
@@ -64,11 +70,11 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         [invocation setArgument:&showUI atIndex:3];
         [invocation setTarget:self];
 
-        [updaterDelegate updater:updater willInstallUpdateOnQuit:updateItem immediateInstallationInvocation:invocation];
+        [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationInvocation:invocation];
     }
 
     // If this is marked as a critical update, we'll prompt the user to install it right away.
-    if ([updateItem isCriticalUpdate])
+    if ([self.updateItem isCriticalUpdate])
     {
         [self showUpdateAlert];
     }
@@ -77,7 +83,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         showUpdateAlertTimer = [NSTimer scheduledTimerWithTimeInterval:SUAutomaticUpdatePromptImpatienceTimer target:self selector:@selector(showUpdateAlert) userInfo:nil repeats:NO];
 
         // At this point the driver is idle, allow it to be interrupted for user-initiated update checks.
-        isInterruptible = YES;
+        self.interruptible = YES;
     }
 }
 
@@ -91,9 +97,9 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
         willUpdateOnTermination = NO;
 
-        id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
+        id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
         if ([updaterDelegate respondsToSelector:@selector(updater:didCancelInstallUpdateOnQuit:)])
-            [updaterDelegate updater:updater didCancelInstallUpdateOnQuit:updateItem];
+            [updaterDelegate updater:self.updater didCancelInstallUpdateOnQuit:self.updateItem];
     }
 }
 
@@ -135,11 +141,11 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 			postponingInstallation = YES;
 			[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
 			// We're already waiting on quit, just indicate that we're idle.
-			isInterruptible = YES;
+            self.interruptible = YES;
 			break;
 
 		case SUDoNotInstallChoice:
-            [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+            [self.host setObject:[self.updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
 			[self abortUpdate];
 			break;
 	}

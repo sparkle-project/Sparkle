@@ -37,6 +37,10 @@
     NSString *relaunchPath;
 }
 
+@synthesize updateItem;
+@synthesize download;
+@synthesize downloadPath;
+
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
 {
 	[super checkForUpdatesAtURL:URL host:aHost];
@@ -49,7 +53,7 @@
 	SUAppcast *appcast = [[SUAppcast alloc] init];
 
 	[appcast setDelegate:self];
-	[appcast setUserAgentString:[updater userAgentString]];
+    [appcast setUserAgentString:[self.updater userAgentString]];
 	[appcast fetchAppcastFromURL:URL];
 }
 
@@ -58,8 +62,8 @@
 	id <SUVersionComparison> comparator = nil;
 
 	// Give the delegate a chance to provide a custom version comparator
-	if ([[updater delegate] respondsToSelector:@selector(versionComparatorForUpdater:)]) {
-		comparator = [[updater delegate] versionComparatorForUpdater:updater];
+    if ([[self.updater delegate] respondsToSelector:@selector(versionComparatorForUpdater:)]) {
+        comparator = [[self.updater delegate] versionComparatorForUpdater:self.updater];
 	}
 
 	// If we don't get a comparator from the delegate, use the default comparator
@@ -108,19 +112,19 @@
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac
 {
-	if ([[updater delegate] respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
-		[[updater delegate] updater:updater didFinishLoadingAppcast:ac];
+    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
+        [[self.updater delegate] updater:self.updater didFinishLoadingAppcast:ac];
 	}
 
 	NSDictionary *userInfo = (ac != nil) ? @{SUUpdaterAppcastNotificationKey : ac} : nil;
-	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:updater userInfo:userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:self.updater userInfo:userInfo];
 
     SUAppcastItem *item = nil;
 
 	// Now we have to find the best valid update in the appcast.
-	if ([[updater delegate] respondsToSelector:@selector(bestValidUpdateInAppcast:forUpdater:)]) // Does the delegate want to handle it?
+    if ([[self.updater delegate] respondsToSelector:@selector(bestValidUpdateInAppcast:forUpdater:)]) // Does the delegate want to handle it?
 	{
-		item = [[updater delegate] bestValidUpdateInAppcast:ac forUpdater:updater];
+        item = [[self.updater delegate] bestValidUpdateInAppcast:ac forUpdater:self.updater];
 	}
 	else // If not, we'll take care of it ourselves.
 	{
@@ -155,19 +159,19 @@
 
 - (void)didFindValidUpdate
 {
-	if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
-		[[updater delegate] updater:updater didFindValidUpdate:updateItem];
+    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
+        [[self.updater delegate] updater:self.updater didFindValidUpdate:updateItem];
 	NSDictionary *userInfo = (updateItem != nil) ? @{SUUpdaterAppcastItemNotificationKey : updateItem} : nil;
-	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification object:updater userInfo:userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification object:self.updater userInfo:userInfo];
 	[self downloadUpdate];
 }
 
 - (void)didNotFindUpdate
 {
-	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
-		[[updater delegate] updaterDidNotFindUpdate:updater];
+    if ([[self.updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
+        [[self.updater delegate] updaterDidNotFindUpdate:self.updater];
 	}
-	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:updater];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUNoUpdateError userInfo:@{
         NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"You already have the newest version of %@.", "'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI)"), [self.host name]]
@@ -177,7 +181,7 @@
 - (void)downloadUpdate
 {
 	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[updateItem fileURL]];
-	[request setValue:[updater userAgentString] forHTTPHeaderField:@"User-Agent"];
+    [request setValue:[self.updater userAgentString] forHTTPHeaderField:@"User-Agent"];
 	download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
 }
 
@@ -296,7 +300,7 @@
         return;
 	}
 
-    if (![updater mayUpdateAndRestart])
+    if (![self.updater mayUpdateAndRestart])
     {
         [self abortUpdate];
         return;
@@ -304,7 +308,7 @@
 
     // Give the host app an opportunity to postpone the install and relaunch.
     static BOOL postponedOnce = NO;
-    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
+    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
     if (!postponedOnce && [updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
     {
         NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installWithToolAndRelaunch:)]];
@@ -312,14 +316,14 @@
         [invocation setArgument:&relaunch atIndex:2];
         [invocation setTarget:self];
         postponedOnce = YES;
-		if ([updaterDelegate updater:updater shouldPostponeRelaunchForUpdate:updateItem untilInvoking:invocation]) {
+        if ([updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:updateItem untilInvoking:invocation]) {
             return;
     }
 	}
 
 
 	if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdate:)]) {
-		[updaterDelegate updater:updater willInstallUpdate:updateItem];
+        [updaterDelegate updater:self.updater willInstallUpdate:updateItem];
 	}
 
     NSString *const finishInstallToolName = FINISH_INSTALL_TOOL_NAME_STRING;
@@ -342,7 +346,7 @@
 
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
     if ([updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)])
-        [updaterDelegate updaterWillRelaunchApplication:updater];
+        [updaterDelegate updaterWillRelaunchApplication:self.updater];
 
     if(!relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath])
     {
@@ -354,7 +358,7 @@
 
     NSString *pathToRelaunch = [self.host bundlePath];
 	if ([updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
-        pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:updater];
+        pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:self.updater];
 	}
     NSString *relaunchToolPath = [[relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS"] stringByAppendingPathComponent: finishInstallToolName];
     [NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:@[[self.host bundlePath],

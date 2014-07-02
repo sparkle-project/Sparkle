@@ -36,7 +36,7 @@
 
 - (void)start
 {
-	[NSThread detachNewThreadSelector:[[self class] selectorConformingToTypeOfPath:archivePath] toTarget:self withObject:nil];
+    [NSThread detachNewThreadSelector:[[self class] selectorConformingToTypeOfPath:self.archivePath] toTarget:self withObject:nil];
 }
 
 + (BOOL)canUnarchivePath:(NSString *)path
@@ -52,19 +52,19 @@
 		FILE *fp = NULL, *cmdFP = NULL;
 		char *oldDestinationString = NULL;
 
-		SULog(@"Extracting %@ using '%@'",archivePath,command);
+        SULog(@"Extracting %@ using '%@'", self.archivePath,command);
 
 		// Get the file size.
-		NSNumber *fs = [[NSFileManager defaultManager] attributesOfItemAtPath:archivePath error:nil][NSFileSize];
+        NSNumber *fs = [[NSFileManager defaultManager] attributesOfItemAtPath:self.archivePath error:nil][NSFileSize];
 		if (fs == nil) goto reportError;
 
 		// Thank you, Allan Odgaard!
 		// (who wrote the following extraction alg.)
-		fp = fopen([archivePath fileSystemRepresentation], "r");
+        fp = fopen([self.archivePath fileSystemRepresentation], "r");
 		if (!fp) goto reportError;
 
 		oldDestinationString = getenv("DESTINATION");
-		setenv("DESTINATION", [[archivePath stringByDeletingLastPathComponent] fileSystemRepresentation], 1);
+        setenv("DESTINATION", [[self.archivePath stringByDeletingLastPathComponent] fileSystemRepresentation], 1);
 		cmdFP = popen([command fileSystemRepresentation], "w");
 		size_t written;
 		if (!cmdFP) goto reportError;
