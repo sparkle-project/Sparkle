@@ -53,9 +53,13 @@
 		[[updater delegate] updaterDidNotFindUpdate:updater];
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:updater];
 
-	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"You're up-to-date!", nil) defaultButton:SULocalizedString(@"OK", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [host name], [host displayVersion]];
-	[self showModalAlert:alert];
-	[self abortUpdate];
+    NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.")
+                                     defaultButton:SULocalizedString(@"OK", nil)
+                                   alternateButton:nil
+                                       otherButton:nil
+                         informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [host name], [host displayVersion]];
+    [self showModalAlert:alert];
+    [self abortUpdate];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *) __unused aNotification
