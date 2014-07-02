@@ -60,7 +60,7 @@
     [queue waitUntilAllOperationsAreFinished];
 }
 
-- (void)setTestFeedURL
+- (void)testSetTestFeedURL
 {
     [updater setFeedURL:[NSURL URLWithString:@""]]; // this WON'T throw
 
