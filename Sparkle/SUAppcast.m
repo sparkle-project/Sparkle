@@ -41,6 +41,11 @@
 @end
 
 @implementation SUAppcast
+{
+    NSString *downloadFilename;
+    NSURLDownload *download;
+}
+
 @synthesize downloadFilename;
 @synthesize delegate;
 @synthesize userAgentString;

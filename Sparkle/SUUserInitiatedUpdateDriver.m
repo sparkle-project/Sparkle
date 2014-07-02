@@ -12,6 +12,10 @@
 #import "SUHost.h"
 
 @implementation SUUserInitiatedUpdateDriver
+{
+    SUStatusController *checkingController;
+    BOOL isCanceled;
+}
 
 - (void)closeCheckingWindow
 {

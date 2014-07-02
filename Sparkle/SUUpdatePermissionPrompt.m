@@ -16,6 +16,15 @@
 @end
 
 @implementation SUUpdatePermissionPrompt
+{
+    SUHost *host;
+    NSArray *systemProfileInformationArray;
+    id<SUUpdatePermissionPromptDelegate> delegate;
+    IBOutlet NSTextField *descriptionTextField;
+    IBOutlet NSView *moreInfoView;
+    IBOutlet NSButton *moreInfoButton;
+    IBOutlet NSTableView *profileTableView;
+}
 
 @synthesize isShowingMoreInfo = _isShowingMoreInfo, shouldSendProfile = _shouldSendProfile;
 

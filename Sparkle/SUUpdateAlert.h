@@ -23,18 +23,8 @@ typedef enum
 } SUUpdateAlertChoice;
 
 @class WebView, SUAppcastItem, SUHost;
-@interface SUUpdateAlert : SUWindowController {
-	SUAppcastItem *updateItem;
-	SUHost *host;
+@interface SUUpdateAlert : SUWindowController
 
-	IBOutlet WebView *releaseNotesView;
-	IBOutlet NSTextField *description;
-	IBOutlet NSButton *installButton;	// UK 2007-08-31.
-	IBOutlet NSButton *skipButton;
-	IBOutlet NSButton *laterButton;
-	NSProgressIndicator *releaseNotesSpinner;
-	BOOL webViewFinishedLoading;
-}
 @property (weak) id<SUUpdateAlertDelegate> delegate;
 @property (weak) id<SUVersionDisplay> versionDisplayer;
 

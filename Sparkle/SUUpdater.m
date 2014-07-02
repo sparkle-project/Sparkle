@@ -44,6 +44,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @end
 
 @implementation SUUpdater
+{
+    SUUpdateDriver *driver;
+    SUHost *host;
+}
+
 @synthesize delegate;
 @synthesize checkTimer;
 @synthesize userAgentString = customUserAgentString;

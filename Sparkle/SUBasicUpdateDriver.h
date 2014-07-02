@@ -16,14 +16,9 @@
 
 @class SUAppcastItem, SUHost;
 @interface SUBasicUpdateDriver : SUUpdateDriver<NSURLDownloadDelegate, SUUnarchiverDelegate, SUAppcastDelegate> {
-	SUAppcastItem *updateItem;
-	SUAppcastItem *nonDeltaUpdateItem;
-
-	NSURLDownload *download;
-	NSString *downloadPath;
-	NSString *tempDir;
-
-	NSString *relaunchPath;
+    SUAppcastItem *updateItem;
+    NSURLDownload *download;
+    NSString *downloadPath;
 }
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;

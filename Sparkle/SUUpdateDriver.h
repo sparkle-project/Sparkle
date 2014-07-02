@@ -17,7 +17,6 @@ extern NSString * const SUUpdateDriverFinishedNotification;
 @interface SUUpdateDriver : NSObject<NSURLDownloadDelegate>
 {
 	SUUpdater *updater; //assigned
-	NSURL *appcastURL;
     BOOL isInterruptible;
 }
 @property (strong) SUHost *host;

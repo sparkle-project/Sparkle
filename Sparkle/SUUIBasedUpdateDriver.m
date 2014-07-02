@@ -15,6 +15,10 @@
 #import "SUConstants.h"
 
 @implementation SUUIBasedUpdateDriver
+{
+    SUStatusController *statusController;
+    SUUpdateAlert *updateAlert;
+}
 
 - (void)didFindValidUpdate
 {

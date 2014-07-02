@@ -28,6 +28,11 @@ typedef struct {
 @end
 
 @implementation SUHost
+{
+    NSString *defaultsDomain;
+    BOOL usesStandardUserDefaults;
+}
+
 @synthesize bundle;
 
 - (instancetype)initWithBundle:(NSBundle *)aBundle

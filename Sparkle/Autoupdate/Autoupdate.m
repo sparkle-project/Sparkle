@@ -19,19 +19,6 @@ static const NSTimeInterval SUInstallationTimeLimit = 5;
 static const NSTimeInterval SUParentQuitCheckInterval = .5;
 
 @interface TerminationListener : NSObject <SUInstallerDelegate>
-{
-	const char		*hostpath;
-	const char		*executablepath;
-	pid_t			parentprocessid;
-	const char		*folderpath;
-	NSString		*selfPath;
-    NSString        *installationPath;
-	NSTimer			*watchdogTimer;
-	NSTimer			*longInstallationTimer;
-	SUHost			*host;
-    BOOL            shouldRelaunch;
-	BOOL			shouldShowUI;
-}
 
 - (void) parentHasQuit;
 
@@ -44,6 +31,19 @@ static const NSTimeInterval SUParentQuitCheckInterval = .5;
 @end
 
 @implementation TerminationListener
+{
+    const char		*hostpath;
+    const char		*executablepath;
+    pid_t			parentprocessid;
+    const char		*folderpath;
+    NSString		*selfPath;
+    NSString        *installationPath;
+    NSTimer			*watchdogTimer;
+    NSTimer			*longInstallationTimer;
+    SUHost			*host;
+    BOOL            shouldRelaunch;
+    BOOL			shouldShowUI;
+}
 
 - (instancetype) initWithHostPath:(const char *)inhostpath executablePath:(const char *)execpath parentProcessId:(pid_t)ppid folderPath:(const char*)infolderpath shouldRelaunch:(BOOL)relaunch shouldShowUI:(BOOL)showUI selfPath:(NSString*)inSelfPath
 {

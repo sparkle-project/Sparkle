@@ -13,11 +13,6 @@
 #import "SUUIBasedUpdateDriver.h"
 
 @interface SUUserInitiatedUpdateDriver : SUUIBasedUpdateDriver
-{
-@private
-	SUStatusController *checkingController;
-	BOOL isCanceled;
-}
 
 @end
 

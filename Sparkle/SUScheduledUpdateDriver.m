@@ -14,6 +14,9 @@
 #import "SUVersionComparisonProtocol.h"
 
 @implementation SUScheduledUpdateDriver
+{
+    BOOL showErrors;
+}
 
 - (void)didFindValidUpdate
 {

@@ -13,11 +13,7 @@
 
 @class SUAppcastItem;
 @interface SUAppcast : NSObject<NSURLDownloadDelegate>
-{
-@private
-	NSString *downloadFilename;
-	NSURLDownload *download;
-}
+
 @property (weak) id<SUAppcastDelegate> delegate;
 @property (copy) NSString *userAgentString;
 

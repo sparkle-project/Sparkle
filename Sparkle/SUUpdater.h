@@ -23,12 +23,7 @@
     and automatically schedule and control checks for updates.
  */
 @interface SUUpdater : NSObject
-{
-@private
-	SUUpdateDriver *driver;
 
-	SUHost *host;
-}
 @property (weak) IBOutlet id<SUUpdaterDelegate> delegate;
 
 + (SUUpdater *)sharedUpdater;

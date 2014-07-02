@@ -16,6 +16,12 @@
 static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 24 * 7;
 
 @implementation SUAutomaticUpdateDriver
+{
+    BOOL postponingInstallation, showErrors;
+    BOOL willUpdateOnTermination;
+    SUAutomaticUpdateAlert *alert;
+    NSTimer *showUpdateAlertTimer;
+}
 
 - (void)showUpdateAlert
 {

@@ -12,6 +12,10 @@
 NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
 @implementation SUUpdateDriver
+{
+    NSURL *appcastURL;
+}
+
 @synthesize host;
 @synthesize interruptible = isInterruptible;
 @synthesize finished;

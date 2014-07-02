@@ -31,6 +31,11 @@
 #endif
 
 @implementation SUBasicUpdateDriver
+{
+    SUAppcastItem *nonDeltaUpdateItem;
+    NSString *tempDir;
+    NSString *relaunchPath;
+}
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
 {
