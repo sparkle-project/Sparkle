@@ -299,21 +299,22 @@
 
     // Give the host app an opportunity to postpone the install and relaunch.
     static BOOL postponedOnce = NO;
-    if (!postponedOnce && [[updater delegate] respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
+    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
+    if (!postponedOnce && [updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
     {
         NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installWithToolAndRelaunch:)]];
         [invocation setSelector:@selector(installWithToolAndRelaunch:)];
         [invocation setArgument:&relaunch atIndex:2];
         [invocation setTarget:self];
         postponedOnce = YES;
-		if ([[updater delegate] updater:updater shouldPostponeRelaunchForUpdate:updateItem untilInvoking:invocation]) {
+		if ([updaterDelegate updater:updater shouldPostponeRelaunchForUpdate:updateItem untilInvoking:invocation]) {
             return;
     }
 	}
 
 
-	if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdate:)]) {
-		[[updater delegate] updater:updater willInstallUpdate:updateItem];
+	if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdate:)]) {
+		[updaterDelegate updater:updater willInstallUpdate:updateItem];
 	}
 
     NSString *const finishInstallToolName = FINISH_INSTALL_TOOL_NAME_STRING;
@@ -335,8 +336,8 @@
 	}
 
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-    if ([[updater delegate] respondsToSelector:@selector(updaterWillRelaunchApplication:)])
-        [[updater delegate] updaterWillRelaunchApplication:updater];
+    if ([updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)])
+        [updaterDelegate updaterWillRelaunchApplication:updater];
 
     if(!relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath])
     {
@@ -347,8 +348,8 @@
     }
 
     NSString *pathToRelaunch = [host bundlePath];
-	if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
-        pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
+	if ([updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
+        pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:updater];
 	}
     NSString *relaunchToolPath = [[relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS"] stringByAppendingPathComponent: finishInstallToolName];
     [NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:@[[host bundlePath],

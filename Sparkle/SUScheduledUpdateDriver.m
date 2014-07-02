@@ -23,8 +23,10 @@
 
 - (void)didNotFindUpdate
 {
-	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
-		[[updater delegate] updaterDidNotFindUpdate:updater];
+    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
+
+	if ([updaterDelegate respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
+		[updaterDelegate updaterDidNotFindUpdate:updater];
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:updater];
 

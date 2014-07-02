@@ -47,7 +47,8 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
     willUpdateOnTermination = YES;
 
-    if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)])
+    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
+    if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)])
     {
         BOOL relaunch = YES;
         BOOL showUI = NO;
@@ -57,7 +58,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         [invocation setArgument:&showUI atIndex:3];
         [invocation setTarget:self];
 
-        [[updater delegate] updater:updater willInstallUpdateOnQuit:updateItem immediateInstallationInvocation:invocation];
+        [updaterDelegate updater:updater willInstallUpdateOnQuit:updateItem immediateInstallationInvocation:invocation];
     }
 
     // If this is marked as a critical update, we'll prompt the user to install it right away.
@@ -84,8 +85,9 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
         willUpdateOnTermination = NO;
 
-        if ([[updater delegate] respondsToSelector:@selector(updater:didCancelInstallUpdateOnQuit:)])
-            [[updater delegate] updater:updater didCancelInstallUpdateOnQuit:updateItem];
+        id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
+        if ([updaterDelegate respondsToSelector:@selector(updater:didCancelInstallUpdateOnQuit:)])
+            [updaterDelegate updater:updater didCancelInstallUpdateOnQuit:updateItem];
     }
 }
 
