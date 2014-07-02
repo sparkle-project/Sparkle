@@ -53,8 +53,7 @@ static NSString*	sUpdateFolder = nil;
 	NSString *fallbackPackagePath = nil;
 	NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath: inUpdateFolder];
 
-	[sUpdateFolder release];
-	sUpdateFolder = [inUpdateFolder retain];
+	sUpdateFolder = inUpdateFolder;
 
 	while ((currentFile = [dirEnum nextObject]))
 	{
@@ -138,7 +137,7 @@ static NSString*	sUpdateFolder = nil;
 
 	SULog( @"mdimporting" );
 
-	NSTask *mdimport = [[[NSTask alloc] init] autorelease];
+	NSTask *mdimport = [[NSTask alloc] init];
 	[mdimport setLaunchPath:@"/usr/bin/mdimport"];
 	[mdimport setArguments:@[installationPath]];
 	@try

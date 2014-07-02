@@ -16,7 +16,7 @@
 
 @interface SUStatusController ()
 @property (copy) NSString *title, *buttonTitle;
-@property (retain) SUHost *host;
+@property (strong) SUHost *host;
 @end
 
 @implementation SUStatusController
@@ -38,15 +38,6 @@
 		[self setShouldCascadeWindows:NO];
 	}
 	return self;
-}
-
-- (void)dealloc
-{
-	self.host = nil;
-	self.title = nil;
-	self.statusText = nil;
-	self.buttonTitle = nil;
-	[super dealloc];
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [host bundlePath], [host installationPath]]; }

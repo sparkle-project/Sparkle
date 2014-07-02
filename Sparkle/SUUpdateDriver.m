@@ -29,20 +29,13 @@ NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)h
 {
 	appcastURL = [URL copy];
-	host = [h retain];
+	host = h;
 }
 
 - (void)abortUpdate
 {
 	[self setValue:@YES forKey:@"finished"];
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdateDriverFinishedNotification object:self];
-}
-
-- (void)dealloc
-{
-    self.host = nil;
-	[appcastURL release];
-    [super dealloc];
 }
 
 @end

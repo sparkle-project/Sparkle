@@ -67,7 +67,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     }
     else
     {
-        showUpdateAlertTimer = [[NSTimer scheduledTimerWithTimeInterval:SUAutomaticUpdatePromptImpatienceTimer target:self selector:@selector(showUpdateAlert) userInfo:nil repeats:NO] retain];
+        showUpdateAlertTimer = [NSTimer scheduledTimerWithTimeInterval:SUAutomaticUpdatePromptImpatienceTimer target:self selector:@selector(showUpdateAlert) userInfo:nil repeats:NO];
 
         // At this point the driver is idle, allow it to be interrupted for user-initiated update checks.
         isInterruptible = YES;
@@ -92,7 +92,6 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 - (void)invalidateShowUpdateAlertTimer
 {
     [showUpdateAlertTimer invalidate];
-    [showUpdateAlertTimer release];
     showUpdateAlertTimer = nil;
 }
 
@@ -100,8 +99,6 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 {
     [self stopUpdatingOnTermination];
     [self invalidateShowUpdateAlertTimer];
-    [alert release];
-    [super dealloc];
 }
 
 - (void)abortUpdate

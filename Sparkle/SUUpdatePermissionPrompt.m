@@ -29,11 +29,11 @@
 	self = [super initWithHost:aHost windowNibName:@"SUUpdatePermissionPrompt"];
 	if (self)
 	{
-		host = [aHost retain];
+		host = aHost;
 		delegate = d;
 		self.isShowingMoreInfo = NO;
 		self.shouldSendProfile = [self shouldAskAboutProfile];
-		systemProfileInformationArray = [profile retain];
+		systemProfileInformationArray = profile;
 		[self setShouldCascadeWindows:NO];
 	}
 	return self;
@@ -45,8 +45,8 @@
 	// to the user's attention. Otherwise the prompt would be hidden behind other applications and
 	// the user would not know why the application was paused.
 	if ([aHost isBackgroundApplication]) { [[NSApplication sharedApplication] activateIgnoringOtherApps:YES]; }
-
-	SUUpdatePermissionPrompt *prompt = [[[[self class] alloc] initWithHost:aHost systemProfile:profile delegate:d] autorelease];
+	
+	SUUpdatePermissionPrompt *prompt = [[[self class] alloc] initWithHost:aHost systemProfile:profile delegate:d];
 	[NSApp runModalForWindow:[prompt window]];
 }
 
@@ -67,12 +67,6 @@
 
 - (BOOL)tableView:(NSTableView *) __unused tableView shouldSelectRow:(NSInteger) __unused row { return NO; }
 
-- (void)dealloc
-{
-	[host release];
-	[systemProfileInformationArray release];
-	[super dealloc];
-}
 
 - (NSImage *)icon
 {

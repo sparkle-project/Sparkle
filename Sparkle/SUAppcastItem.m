@@ -18,15 +18,15 @@
 @property (copy, readwrite) NSString *title;
 @property (copy, readwrite) NSDate *date;
 @property (copy, readwrite) NSString *itemDescription;
-@property (retain, readwrite) NSURL *releaseNotesURL;
+@property (strong, readwrite) NSURL *releaseNotesURL;
 @property (copy, readwrite) NSString *DSASignature;
 @property (copy, readwrite) NSString *minimumSystemVersion;
 @property (copy, readwrite) NSString *maximumSystemVersion;
-@property (retain, readwrite) NSURL *fileURL;
+@property (strong, readwrite) NSURL *fileURL;
 @property (copy, readwrite) NSString *versionString;
 @property (copy, readwrite) NSString *displayVersionString;
 @property (copy, readwrite) NSDictionary *deltaUpdates;
-@property (retain, readwrite) NSURL *infoURL;
+@property (strong, readwrite) NSURL *infoURL;
 @property (readwrite, copy) NSDictionary *propertiesDictionary;
 @end
 
@@ -91,7 +91,6 @@
 		{
 			if (error)
 				*error = @"Feed item lacks sparkle:version attribute, and version couldn't be deduced from file name (would have used last component of a file name like AppName_1.3.4.zip)";
-			[self release];
 			return nil;
 		}
 
@@ -115,7 +114,6 @@
 		{
 			if (error)
 				*error = @"No enclosure in feed item";
-			[self release];
 			return nil;
 		}
 
@@ -125,7 +123,6 @@
 			if (error) {
 				*error = @"Feed item's enclosure lacks URL";
 			}
-			[self release];
 			return nil;
 		}
 
@@ -168,31 +165,13 @@
                 [fakeAppCastDict removeObjectForKey:@"deltas"];
                 fakeAppCastDict[@"enclosure"] = deltaDictionary;
                 SUAppcastItem *deltaItem = [[[self class] alloc] initWithDictionary:fakeAppCastDict];
-                [fakeAppCastDict release];
 
                 deltas[deltaDictionary[@"sparkle:deltaFrom"]] = deltaItem;
-                [deltaItem release];
 			}
             self.deltaUpdates = deltas;
         }
 	}
 	return self;
-}
-
-- (void)dealloc
-{
-	self.title = nil;
-	self.date = nil;
-	self.itemDescription = nil;
-	self.releaseNotesURL = nil;
-	self.DSASignature = nil;
-	self.minimumSystemVersion = nil;
-	self.fileURL = nil;
-	self.versionString = nil;
-	self.displayVersionString = nil;
-	self.infoURL = nil;
-	self.propertiesDictionary = nil;
-    [super dealloc];
 }
 
 @end

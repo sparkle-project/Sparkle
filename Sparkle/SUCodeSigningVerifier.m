@@ -19,6 +19,11 @@
     SecRequirementRef requirement = NULL;
     SecStaticCodeRef staticCode = NULL;
     SecCodeRef hostCode = NULL;
+    NSBundle *newBundle;
+    CFErrorRef cfError = NULL;
+    if (error) {
+        *error = nil;
+    }
 
     result = SecCodeCopySelf(kSecCSDefaultFlags, &hostCode);
     if (result != 0) {
@@ -32,20 +37,20 @@
         goto finally;
     }
 
-    NSBundle *newBundle = [NSBundle bundleWithPath:destinationPath];
+    newBundle = [NSBundle bundleWithPath:destinationPath];
     if (!newBundle) {
         SULog(@"Failed to load NSBundle for update");
         result = -1;
         goto finally;
     }
 
-    result = SecStaticCodeCreateWithPath((CFURLRef)[newBundle executableURL], kSecCSDefaultFlags, &staticCode);
+    result = SecStaticCodeCreateWithPath((__bridge CFURLRef)[newBundle executableURL], kSecCSDefaultFlags, &staticCode);
     if (result != 0) {
         SULog(@"Failed to get static code %d", result);
         goto finally;
     }
 
-    result = SecStaticCodeCheckValidityWithErrors(staticCode, kSecCSDefaultFlags | kSecCSCheckAllArchitectures, requirement, (CFErrorRef *)error);
+    result = SecStaticCodeCheckValidityWithErrors(staticCode, kSecCSDefaultFlags | kSecCSCheckAllArchitectures, requirement, &cfError);
     if (result != 0 && error) {
         if (result == errSecCSReqFailed) {
             CFStringRef requirementString = nil;
@@ -58,7 +63,7 @@
             [self logSigningInfoForCode:staticCode label:@"new info"];
         }
 
-        [*error autorelease];
+        *error = CFBridgingRelease(cfError);
     }
 
 finally:
@@ -72,7 +77,7 @@ finally:
     CFDictionaryRef signingInfo = nil;
     const SecCSFlags flags = kSecCSSigningInformation | kSecCSRequirementInformation | kSecCSDynamicInformation | kSecCSContentInformation;
     if (SecCodeCopySigningInformation(code, flags, &signingInfo) == noErr) {
-        NSDictionary* signingDict = (NSDictionary*)signingInfo;
+        NSDictionary* signingDict = CFBridgingRelease(signingInfo);
         NSMutableDictionary* relevantInfo = [NSMutableDictionary dictionary];
         for (NSString* key in @[@"format", @"identifier", @"requirements", @"teamid", @"signing-time"]) {
             relevantInfo[key] = signingDict[key];
@@ -80,7 +85,6 @@ finally:
         NSDictionary* infoPlist = signingDict[@"info-plist"];
         relevantInfo[@"version"] = infoPlist[@"CFBundleShortVersionString"];
         relevantInfo[@"build"] = infoPlist[@"CFBundleVersion"];
-        CFRelease(signingInfo);
         SULog(@"%@: %@", label, relevantInfo);
     }
 }

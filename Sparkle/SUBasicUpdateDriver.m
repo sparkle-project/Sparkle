@@ -42,8 +42,6 @@
 	}
 
 	SUAppcast *appcast = [[SUAppcast alloc] init];
-	CFRetain(appcast); // We'll manage the appcast's memory ourselves so we don't have to make it an IV to support GC.
-	[appcast release];
 
 	[appcast setDelegate:self];
 	[appcast setUserAgentString:[updater userAgentString]];
@@ -130,14 +128,13 @@
 		if (binaryDeltaSupported()) {
 			SUAppcastItem *deltaUpdateItem = [item deltaUpdates][[host version]];
 			if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem]) {
-				nonDeltaUpdateItem = [item retain];
+				nonDeltaUpdateItem = item;
 				item = deltaUpdateItem;
 			}
 		}
 	}
 
-    updateItem = [item retain];
-	if (ac) { CFRelease(ac); } // Remember that we're explicitly managing the memory of the appcast.
+    updateItem = item;
 	if (updateItem == nil) { [self didNotFindUpdate]; return; }
 
 	if ([self itemContainsValidUpdate:updateItem])
@@ -148,7 +145,6 @@
 
 - (void)appcast:(SUAppcast *)ac failedToLoadWithError:(NSError *)error
 {
-	if (ac) { CFRelease(ac); } // Remember that we're explicitly managing the memory of the appcast.
 	[self abortUpdateWithError:error];
 }
 
@@ -185,13 +181,11 @@
 	NSString *downloadFileName = [NSString stringWithFormat:@"%@ %@", [host name], [updateItem versionString]];
 
 
-	[tempDir release];
-	tempDir = [[[host appSupportPath] stringByAppendingPathComponent:downloadFileName] retain];
+	tempDir = [[host appSupportPath] stringByAppendingPathComponent:downloadFileName];
 	int cnt=1;
 	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
 	{
-		[tempDir release];
-		tempDir = [[[host appSupportPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, cnt++]] retain];
+		tempDir = [[host appSupportPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, cnt++]];
 	}
 
     // Create the temporary directory if necessary.
@@ -203,7 +197,7 @@
 		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Can't make a temporary directory for the update download at %@.",tempDir]}]];
 	}
 
-	downloadPath = [[tempDir stringByAppendingPathComponent:name] retain];
+	downloadPath = [tempDir stringByAppendingPathComponent:name];
 	[download setDestination:downloadPath allowOverwrite:YES];
 }
 
@@ -249,7 +243,6 @@
 		[self unarchiverDidFail:nil];
 		return;
 	}
-	CFRetain(unarchiver); // Manage this memory manually so we don't have to make it an IV.
 	[unarchiver setDelegate:self];
 	[unarchiver start];
 }
@@ -257,7 +250,6 @@
 - (void)failedToApplyDeltaUpdate
 {
 	// When a delta update fails to apply we fall back on updating via a full install.
-	[updateItem release];
 	updateItem = nonDeltaUpdateItem;
 	nonDeltaUpdateItem = nil;
 
@@ -266,14 +258,11 @@
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)ua
 {
-	if (ua) { CFRelease(ua); }
 	[self installWithToolAndRelaunch:YES];
 }
 
 - (void)unarchiverDidFail:(SUUnarchiver *)ua
 {
-	if (ua) { CFRelease(ua); }
-
 	if ([updateItem isDeltaUpdate]) {
 		[self failedToApplyDeltaUpdate];
 		return;
@@ -340,7 +329,7 @@
 		[[NSFileManager defaultManager] createDirectoryAtPath: [targetPath stringByDeletingLastPathComponent] withIntermediateDirectories: YES attributes: @{} error: &error];
 
 		if( [SUPlainInstaller copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath temporaryName: nil error: &error] )
-			relaunchPath = [targetPath retain];
+			relaunchPath = targetPath;
 		else
 			[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil), NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", relaunchPathToCopy, targetPath, (error ? [error localizedDescription] : @"")]}]];
 	}
@@ -394,7 +383,6 @@
 
 - (void)abortUpdate
 {
-	[[self retain] autorelease];	// In case the notification center was the last one holding on to us.
     [self cleanUpDownload];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[super abortUpdate];
@@ -412,17 +400,6 @@
 		[download cancel];
 	}
 	[self abortUpdate];
-}
-
-- (void)dealloc
-{
-	[updateItem release];
-	[nonDeltaUpdateItem release];
-	[download release];
-	[downloadPath release];
-	[tempDir release];
-	[relaunchPath release];
-	[super dealloc];
 }
 
 @end

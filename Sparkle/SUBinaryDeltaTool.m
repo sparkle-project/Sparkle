@@ -26,9 +26,9 @@ extern int bsdiff(int argc, const char **argv);
 
 @interface CreateBinaryDeltaOperation : NSOperation
 @property (copy) NSString *relativePath;
-@property (retain) NSString *resultPath;
-@property (retain) NSString *_fromPath;
-@property (retain) NSString *_toPath;
+@property (strong) NSString *resultPath;
+@property (strong) NSString *_fromPath;
+@property (strong) NSString *_toPath;
 - (id)initWithRelativePath:(NSString *)relativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree;
 @end
 
@@ -57,16 +57,6 @@ extern int bsdiff(int argc, const char **argv);
         self.resultPath = temporaryFile;
 }
 
-- (void)dealloc
-{
-    self.relativePath = nil;
-    self.resultPath = nil;
-    self._fromPath = nil;
-    self._toPath = nil;
-
-    [super dealloc];
-}
-
 @end
 
 static NSDictionary *infoForFile(FTSENT *ent)
@@ -81,7 +71,7 @@ static NSDictionary *infoForFile(FTSENT *ent)
 
 static NSString *absolutePath(NSString *path)
 {
-    NSURL *url = [[[NSURL alloc] initFileURLWithPath:path] autorelease];
+    NSURL *url = [[NSURL alloc] initFileURLWithPath:path];
     return  [[url absoluteURL] path];
 }
 
@@ -251,12 +241,10 @@ int main(int argc, char **argv)
                 CreateBinaryDeltaOperation *operation = [[CreateBinaryDeltaOperation alloc] initWithRelativePath:key oldTree:oldPath newTree:newPath];
                 [deltaQueue addOperation:operation];
                 [deltaOperations addObject:operation];
-                [operation release];
             }
         }
 
         [deltaQueue waitUntilAllOperationsAreFinished];
-        [deltaQueue release];
 
         for (CreateBinaryDeltaOperation *operation in deltaOperations) {
             NSString *resultPath = [operation resultPath];

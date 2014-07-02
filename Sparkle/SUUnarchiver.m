@@ -23,7 +23,7 @@
 	for (id current in [self unarchiverImplementations])
 	{
 		if ([current canUnarchivePath:path]) {
-			return [[[current alloc] initWithPath:path host:host] autorelease];
+			return [[current alloc] initWithPath:path host:host];
 		}
 	}
 	return nil;

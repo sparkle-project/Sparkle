@@ -11,7 +11,8 @@
 #import "SUUpdater.h"
 
 @interface SUUpdaterTest : XCTestCase <SUUpdaterDelegate>
-
+@property (strong) NSOperationQueue *queue;
+@property (strong) SUUpdater *updater;
 @end
 
 @implementation SUUpdaterTest
@@ -19,21 +20,21 @@
     NSOperationQueue *queue;
     SUUpdater *updater;
 }
+@synthesize queue;
+@synthesize updater;
 
 - (void)setUp
 {
     [super setUp];
-    queue = [[NSOperationQueue alloc] init];
-    updater = [[SUUpdater alloc] init];
+    self.queue = [[NSOperationQueue alloc] init];
+    self.updater = [[SUUpdater alloc] init];
     updater.delegate = self;
 }
 
 - (void)tearDown
 {
-    [updater release];
-    updater = nil;
-    [queue release];
-    queue = nil;
+    self.updater = nil;
+    self.queue = nil;
     [super tearDown];
 }
 

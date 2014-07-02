@@ -34,7 +34,7 @@
 
 @interface SUAppcast () <NSURLDownloadDelegate>
 @property (copy) NSString *downloadFilename;
-@property (retain) NSURLDownload *download;
+@property (strong) NSURLDownload *download;
 @property (copy) NSArray *items;
 - (void)reportError:(NSError *)error;
 - (NSXMLNode *)bestNodeInNodes:(NSArray *)nodes;
@@ -47,16 +47,6 @@
 @synthesize download;
 @synthesize items;
 
-- (void)dealloc
-{
-	self.items = nil;
-	self.userAgentString = nil;
-	self.downloadFilename = nil;
-	self.download = nil;
-
-	[super dealloc];
-}
-
 - (void)fetchAppcastFromURL:(NSURL *)url
 {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
@@ -64,7 +54,7 @@
         [request setValue:userAgentString forHTTPHeaderField:@"User-Agent"];
 	}
 
-    self.download = [[[NSURLDownload alloc] initWithRequest:request delegate:self] autorelease];
+    self.download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
 }
 
 - (void)download:(NSURLDownload *) __unused aDownload decideDestinationWithSuggestedFilename:(NSString *)filename
@@ -95,7 +85,7 @@
 	{
         NSUInteger options = 0;
 		options = NSXMLNodeLoadExternalEntitiesSameOriginOnly;
-		document = [[[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:options error:&error] autorelease];
+		document = [[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:options error:&error];
 
 		[[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:nil];
 		self.downloadFilename = nil;
@@ -187,7 +177,7 @@
             }
 
 			NSString *errString;
-			SUAppcastItem *anItem = [[[SUAppcastItem alloc] initWithDictionary:dict failureReason:&errString] autorelease];
+			SUAppcastItem *anItem = [[SUAppcastItem alloc] initWithDictionary:dict failureReason:&errString];
             if (anItem)
             {
                 [appcastItems addObject:anItem];
@@ -203,7 +193,7 @@
 
 	if ([appcastItems count])
     {
-		NSSortDescriptor *sort = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
+		NSSortDescriptor *sort = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO];
 		[appcastItems sortUsingDescriptors:@[sort]];
 		self.items = appcastItems;
 	}

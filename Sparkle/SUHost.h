@@ -16,7 +16,7 @@
 	NSString *defaultsDomain;
 	BOOL usesStandardUserDefaults;
 }
-@property (retain, readonly) NSBundle *bundle;
+@property (strong, readonly) NSBundle *bundle;
 
 + (NSString *)systemVersionString;
 

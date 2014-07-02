@@ -24,7 +24,7 @@ typedef struct {
 #endif
 
 @interface SUHost ()
-@property (retain, readwrite) NSBundle *bundle;
+@property (strong, readwrite) NSBundle *bundle;
 @end
 
 @implementation SUHost
@@ -40,9 +40,9 @@ typedef struct {
 			SULog(@"Sparkle Error: the bundle being updated at %@ has no CFBundleIdentifier! This will cause preference read/write to not work properly.", bundle);
 		}
 
-		defaultsDomain = [[bundle objectForInfoDictionaryKey:SUDefaultsDomainKey] retain];
+		defaultsDomain = [bundle objectForInfoDictionaryKey:SUDefaultsDomainKey];
 		if (!defaultsDomain) {
-			defaultsDomain = [[bundle bundleIdentifier] retain];
+			defaultsDomain = [bundle bundleIdentifier];
 		}
 
 		// If we're using the main bundle's defaults we'll use the standard user defaults mechanism, otherwise we have to get CF-y.
@@ -51,12 +51,6 @@ typedef struct {
     return self;
 }
 
-- (void)dealloc
-{
-	[defaultsDomain release];
-	self.bundle = nil;
-	[super dealloc];
-}
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self bundlePath], [self installationPath]]; }
 
@@ -134,7 +128,7 @@ typedef struct {
 	if (!iconPath) {
 		iconPath = [bundle pathForResource:[bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType: nil];
 	}
-	NSImage *icon = [[[NSImage alloc] initWithContentsOfFile:iconPath] autorelease];
+	NSImage *icon = [[NSImage alloc] initWithContentsOfFile:iconPath];
 	// Use a default icon if none is defined.
 	if (!icon) {
 		BOOL isMainBundle = (bundle == [NSBundle mainBundle]);
@@ -198,7 +192,7 @@ typedef struct {
 		return [[NSUserDefaults standardUserDefaults] objectForKey:defaultName];
 	}
 
-	CFPropertyListRef obj = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)defaultsDomain);
+	CFPropertyListRef obj = CFPreferencesCopyAppValue((__bridge CFStringRef)defaultName, (__bridge CFStringRef)defaultsDomain);
 	return CFBridgingRelease(obj);
 }
 
@@ -210,8 +204,8 @@ typedef struct {
 	}
 	else
 	{
-		CFPreferencesSetValue((CFStringRef)defaultName, value, (CFStringRef)defaultsDomain,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
-		CFPreferencesSynchronize((CFStringRef)defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		CFPreferencesSetValue((__bridge CFStringRef)defaultName, (__bridge CFPropertyListRef)(value), (__bridge CFStringRef)defaultsDomain,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		CFPreferencesSynchronize((__bridge CFStringRef)defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	}
 }
 
@@ -222,7 +216,7 @@ typedef struct {
 	}
 
 	BOOL value;
-	CFPropertyListRef plr = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)defaultsDomain);
+	CFPropertyListRef plr = CFPreferencesCopyAppValue((__bridge CFStringRef)defaultName, (__bridge CFStringRef)defaultsDomain);
 	if (plr == NULL) {
 		value = NO;
 	}
@@ -242,8 +236,8 @@ typedef struct {
 	}
 	else
 	{
-		CFPreferencesSetValue((CFStringRef)defaultName, (CFBooleanRef)@(value), (CFStringRef)defaultsDomain,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
-		CFPreferencesSynchronize((CFStringRef)defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		CFPreferencesSetValue((__bridge CFStringRef)defaultName, (__bridge CFBooleanRef)@(value), (__bridge CFStringRef)defaultsDomain,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		CFPreferencesSynchronize((__bridge CFStringRef)defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	}
 }
 
