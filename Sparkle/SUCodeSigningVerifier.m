@@ -51,7 +51,13 @@
     }
 
     result = SecStaticCodeCheckValidityWithErrors(staticCode, kSecCSDefaultFlags | kSecCSCheckAllArchitectures, requirement, &cfError);
-    if (result != 0 && error) {
+
+    if (cfError) {
+        NSError *tmpError = CFBridgingRelease(cfError);
+        if (error) *error = tmpError;
+    }
+
+    if (result != 0) {
         if (result == errSecCSReqFailed) {
             CFStringRef requirementString = nil;
             if (SecRequirementCopyString(requirement, kSecCSDefaultFlags, &requirementString) == noErr) {
@@ -62,8 +68,6 @@
             [self logSigningInfoForCode:hostCode label:@"host info"];
             [self logSigningInfoForCode:staticCode label:@"new info"];
         }
-
-        *error = CFBridgingRelease(cfError);
     }
 
 finally:
