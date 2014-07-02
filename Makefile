@@ -3,7 +3,7 @@
 builddir := $(shell mktemp -d "$(TMPDIR)/Sparkle.XXXXXX")
 
 localizable-strings:
-	rm Sparkle/en.lproj/Sparkle.strings || TRUE
+	rm -f Sparkle/en.lproj/Sparkle.strings
 	genstrings -o Sparkle/en.lproj -s SULocalizedString Sparkle/*.m Sparkle/*.h
 	iconv -f UTF-16 -t UTF-8 < Sparkle/en.lproj/Localizable.strings > Sparkle/en.lproj/Sparkle.strings
 	rm Sparkle/en.lproj/Localizable.strings
