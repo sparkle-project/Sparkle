@@ -26,13 +26,13 @@
     }
 
     result = SecCodeCopySelf(kSecCSDefaultFlags, &hostCode);
-    if (result != 0) {
+    if (result != noErr) {
         SULog(@"Failed to copy host code %d", result);
         goto finally;
     }
 
     result = SecCodeCopyDesignatedRequirement(hostCode, kSecCSDefaultFlags, &requirement);
-    if (result != 0) {
+    if (result != noErr) {
         SULog(@"Failed to copy designated requirement %d", result);
         goto finally;
     }
@@ -45,13 +45,19 @@
     }
 
     result = SecStaticCodeCreateWithPath((__bridge CFURLRef)[newBundle executableURL], kSecCSDefaultFlags, &staticCode);
-    if (result != 0) {
+    if (result != noErr) {
         SULog(@"Failed to get static code %d", result);
         goto finally;
     }
 
     result = SecStaticCodeCheckValidityWithErrors(staticCode, kSecCSDefaultFlags | kSecCSCheckAllArchitectures, requirement, &cfError);
-    if (result != 0 && error) {
+
+    if (cfError) {
+        NSError *tmpError = CFBridgingRelease(cfError);
+        if (error) *error = tmpError;
+    }
+
+    if (result != noErr) {
         if (result == errSecCSReqFailed) {
             CFStringRef requirementString = nil;
             if (SecRequirementCopyString(requirement, kSecCSDefaultFlags, &requirementString) == noErr) {
@@ -62,15 +68,13 @@
             [self logSigningInfoForCode:hostCode label:@"host info"];
             [self logSigningInfoForCode:staticCode label:@"new info"];
         }
-
-        *error = CFBridgingRelease(cfError);
     }
 
 finally:
     if (hostCode) CFRelease(hostCode);
     if (staticCode) CFRelease(staticCode);
     if (requirement) CFRelease(requirement);
-    return (result == 0);
+    return (result == noErr);
 }
 
 + (void)logSigningInfoForCode:(SecStaticCodeRef)code label:(NSString*)label {
