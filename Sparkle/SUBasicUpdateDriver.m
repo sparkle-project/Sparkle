@@ -30,16 +30,27 @@
     #error FINISH_INSTALL_TOOL_NAME not defined
 #endif
 
+@interface SUBasicUpdateDriver ()
+
+@property (weak) SUAppcastItem *updateItem;
+@property (strong) NSURLDownload *download;
+@property (copy) NSString *downloadPath;
+
+@property (strong) SUAppcastItem *nonDeltaUpdateItem;
+@property (copy) NSString *tempDir;
+@property (copy) NSString *relaunchPath;
+
+@end
+
 @implementation SUBasicUpdateDriver
-{
-    SUAppcastItem *nonDeltaUpdateItem;
-    NSString *tempDir;
-    NSString *relaunchPath;
-}
 
 @synthesize updateItem;
 @synthesize download;
 @synthesize downloadPath;
+
+@synthesize nonDeltaUpdateItem;
+@synthesize tempDir;
+@synthesize relaunchPath;
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
 {
@@ -137,16 +148,16 @@
 		if (binaryDeltaSupported()) {
             SUAppcastItem *deltaUpdateItem = [item deltaUpdates][[self.host version]];
 			if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem]) {
-				nonDeltaUpdateItem = item;
+				self.nonDeltaUpdateItem = item;
 				item = deltaUpdateItem;
 			}
 		}
 	}
 
-    updateItem = item;
-	if (updateItem == nil) { [self didNotFindUpdate]; return; }
+    self.updateItem = item;
+	if (self.updateItem == nil) { [self didNotFindUpdate]; return; }
 
-	if ([self itemContainsValidUpdate:updateItem])
+	if ([self itemContainsValidUpdate:self.updateItem])
 		[self didFindValidUpdate];
 	else
 		[self didNotFindUpdate];
@@ -160,8 +171,8 @@
 - (void)didFindValidUpdate
 {
     if ([[self.updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
-        [[self.updater delegate] updater:self.updater didFindValidUpdate:updateItem];
-	NSDictionary *userInfo = (updateItem != nil) ? @{SUUpdaterAppcastItemNotificationKey : updateItem} : nil;
+        [[self.updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
+	NSDictionary *userInfo = (self.updateItem != nil) ? @{SUUpdaterAppcastItemNotificationKey : self.updateItem} : nil;
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification object:self.updater userInfo:userInfo];
 	[self downloadUpdate];
 }
@@ -180,34 +191,34 @@
 
 - (void)downloadUpdate
 {
-	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[updateItem fileURL]];
+	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self.updateItem fileURL]];
     [request setValue:[self.updater userAgentString] forHTTPHeaderField:@"User-Agent"];
-	download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
+	self.download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
 }
 
 - (void)download:(NSURLDownload *) __unused d decideDestinationWithSuggestedFilename:(NSString *)name
 {
-    NSString *downloadFileName = [NSString stringWithFormat:@"%@ %@", [self.host name], [updateItem versionString]];
+    NSString *downloadFileName = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
 
 
-    tempDir = [[self.host appSupportPath] stringByAppendingPathComponent:downloadFileName];
+    self.tempDir = [[self.host appSupportPath] stringByAppendingPathComponent:downloadFileName];
 	int cnt=1;
-	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
+	while ([[NSFileManager defaultManager] fileExistsAtPath:self.tempDir] && cnt <= 999)
 	{
-        tempDir = [[self.host appSupportPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, cnt++]];
+        self.tempDir = [[self.host appSupportPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, cnt++]];
 	}
 
     // Create the temporary directory if necessary.
-	BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir withIntermediateDirectories:YES attributes:nil error:NULL];
+	BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:self.tempDir withIntermediateDirectories:YES attributes:nil error:NULL];
 	if (!success)
 	{
 		// Okay, something's really broken with this user's file structure.
-		[download cancel];
-		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Can't make a temporary directory for the update download at %@.",tempDir]}]];
+		[self.download cancel];
+		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Can't make a temporary directory for the update download at %@.",self.tempDir]}]];
 	}
 
-	downloadPath = [tempDir stringByAppendingPathComponent:name];
-	[download setDestination:downloadPath allowOverwrite:YES];
+	self.downloadPath = [self.tempDir stringByAppendingPathComponent:name];
+	[self.download setDestination:self.downloadPath allowOverwrite:YES];
 }
 
 - (BOOL)validateUpdateDownloadedToPath:(NSString *)downloadedPath extractedToPath:(NSString *)extractedPath DSASignature:(NSString *)DSASignature publicDSAKey:(NSString *)publicDSAKey
@@ -245,10 +256,10 @@
 
 - (void)extractUpdate
 {
-    SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:downloadPath updatingHost:self.host];
+    SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHost:self.host];
 	if (!unarchiver)
 	{
-		SULog(@"Sparkle Error: No valid unarchiver for %@!", downloadPath);
+		SULog(@"Sparkle Error: No valid unarchiver for %@!", self.downloadPath);
 		[self unarchiverDidFail:nil];
 		return;
 	}
@@ -259,8 +270,8 @@
 - (void)failedToApplyDeltaUpdate
 {
 	// When a delta update fails to apply we fall back on updating via a full install.
-	updateItem = nonDeltaUpdateItem;
-	nonDeltaUpdateItem = nil;
+	self.updateItem = self.nonDeltaUpdateItem;
+	self.nonDeltaUpdateItem = nil;
 
 	[self downloadUpdate];
 }
@@ -272,7 +283,7 @@
 
 - (void)unarchiverDidFail:(SUUnarchiver *)__unused ua
 {
-	if ([updateItem isDeltaUpdate]) {
+	if ([self.updateItem isDeltaUpdate]) {
 		[self failedToApplyDeltaUpdate];
 		return;
 	}
@@ -290,7 +301,7 @@
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
 {
-    if (![self validateUpdateDownloadedToPath:downloadPath extractedToPath:tempDir DSASignature:[updateItem DSASignature] publicDSAKey:[self.host publicDSAKey]])
+    if (![self validateUpdateDownloadedToPath:self.downloadPath extractedToPath:self.tempDir DSASignature:[self.updateItem DSASignature] publicDSAKey:[self.host publicDSAKey]])
     {
         NSDictionary *userInfo = @{
             NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil),
@@ -316,14 +327,14 @@
         [invocation setArgument:&relaunch atIndex:2];
         [invocation setTarget:self];
         postponedOnce = YES;
-        if ([updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:updateItem untilInvoking:invocation]) {
+        if ([updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:self.updateItem untilInvoking:invocation]) {
             return;
     }
 	}
 
 
 	if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdate:)]) {
-        [updaterDelegate updater:self.updater willInstallUpdate:updateItem];
+        [updaterDelegate updater:self.updater willInstallUpdate:self.updateItem];
 	}
 
     NSString *const finishInstallToolName = FINISH_INSTALL_TOOL_NAME_STRING;
@@ -339,7 +350,7 @@
 		[[NSFileManager defaultManager] createDirectoryAtPath: [targetPath stringByDeletingLastPathComponent] withIntermediateDirectories: YES attributes: @{} error: &error];
 
 		if( [SUPlainInstaller copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath temporaryName: nil error: &error] )
-			relaunchPath = targetPath;
+			self.relaunchPath = targetPath;
 		else
 			[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil), NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", relaunchPathToCopy, targetPath, (error ? [error localizedDescription] : @"")]}]];
 	}
@@ -348,10 +359,10 @@
     if ([updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)])
         [updaterDelegate updaterWillRelaunchApplication:self.updater];
 
-    if(!relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath])
+    if(!self.relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:self.relaunchPath])
     {
         // Note that we explicitly use the host app's name here, since updating plugin for Mail relaunches Mail, not just the plugin.
-        [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [self.host name]], NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@)", relaunchPath]}]];
+        [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [self.host name]], NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@)", self.relaunchPath]}]];
         // We intentionally don't abandon the update here so that the host won't initiate another.
         return;
     }
@@ -360,11 +371,11 @@
 	if ([updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
         pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:self.updater];
 	}
-    NSString *relaunchToolPath = [[relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS"] stringByAppendingPathComponent: finishInstallToolName];
+    NSString *relaunchToolPath = [[self.relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS"] stringByAppendingPathComponent: finishInstallToolName];
     [NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:@[[self.host bundlePath],
 																	pathToRelaunch,
 																	[NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]],
-																	tempDir,
+																	self.tempDir,
 																	relaunch ? @"1" : @"0",
 																	showUI ? @"1" : @"0"]];
 
@@ -373,13 +384,13 @@
 
 - (void)cleanUpDownload
 {
-    if (tempDir != nil)	// tempDir contains downloadPath, so we implicitly delete both here.
+    if (self.tempDir != nil)	// tempDir contains downloadPath, so we implicitly delete both here.
 	{
 		BOOL		success = NO;
         NSError	*	error = nil;
-        success = [[NSFileManager defaultManager] removeItemAtPath: tempDir error: &error]; // Clean up the copied relauncher
+        success = [[NSFileManager defaultManager] removeItemAtPath:self.tempDir error: &error]; // Clean up the copied relauncher
 		if( !success )
-			[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[tempDir stringByDeletingLastPathComponent] destination:@"" files:@[[tempDir lastPathComponent]] tag:NULL];
+			[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[self.tempDir stringByDeletingLastPathComponent] destination:@"" files:@[[self.tempDir lastPathComponent]] tag:NULL];
 	}
 }
 
@@ -387,7 +398,7 @@
 {
     if (aHost != self.host) { return; }
 	NSError	*	dontThrow = nil;
-	[[NSFileManager defaultManager] removeItemAtPath: relaunchPath error: &dontThrow]; // Clean up the copied relauncher
+	[[NSFileManager defaultManager] removeItemAtPath:self.relaunchPath error: &dontThrow]; // Clean up the copied relauncher
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while installing the update. Please try again later.", nil), NSLocalizedFailureReasonErrorKey: [error localizedDescription]}]];
 }
 
@@ -406,8 +417,8 @@
 	if ([error localizedFailureReason]) {
 		SULog(@"Sparkle Error (continued): %@", [error localizedFailureReason]);
 	}
-	if (download) {
-		[download cancel];
+	if (self.download) {
+		[self.download cancel];
 	}
 	[self abortUpdate];
 }

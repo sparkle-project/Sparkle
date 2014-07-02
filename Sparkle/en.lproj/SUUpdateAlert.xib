@@ -10,7 +10,7 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUUpdateAlert">
             <connections>
-                <outlet property="description" destination="101" id="105"/>
+                <outlet property="descriptionField" destination="101" id="9oA-2S-eXN"/>
                 <outlet property="installButton" destination="76" id="176"/>
                 <outlet property="laterButton" destination="22" id="177"/>
                 <outlet property="releaseNotesView" destination="18" id="32"/>

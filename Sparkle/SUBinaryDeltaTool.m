@@ -51,7 +51,7 @@ extern int bsdiff(int argc, const char **argv);
 - (void)main
 {
     NSString *temporaryFile = temporaryFilename(@"BinaryDelta");
-    const char *argv[] = {"/usr/bin/bsdiff", [_fromPath fileSystemRepresentation], [_toPath fileSystemRepresentation], [temporaryFile fileSystemRepresentation]};
+    const char *argv[] = {"/usr/bin/bsdiff", [self._fromPath fileSystemRepresentation], [self._toPath fileSystemRepresentation], [temporaryFile fileSystemRepresentation]};
     int result = bsdiff(4, argv);
     if (!result)
         self.resultPath = temporaryFile;

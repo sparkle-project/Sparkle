@@ -13,14 +13,19 @@
 #import "SUAppcastItem.h"
 #import "SUVersionComparisonProtocol.h"
 
+@interface SUScheduledUpdateDriver ()
+
+@property (assign) BOOL showErrors;
+
+@end
+
 @implementation SUScheduledUpdateDriver
-{
-    BOOL showErrors;
-}
+
+@synthesize showErrors;
 
 - (void)didFindValidUpdate
 {
-	showErrors = YES; // We only start showing errors after we present the UI for the first time.
+	self.showErrors = YES; // We only start showing errors after we present the UI for the first time.
 	[super didFindValidUpdate];
 }
 
@@ -38,7 +43,7 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-	if (showErrors)
+	if (self.showErrors)
 		[super abortUpdateWithError:error];
 	else
 		[self abortUpdate];

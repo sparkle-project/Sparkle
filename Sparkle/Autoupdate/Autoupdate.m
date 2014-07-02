@@ -20,6 +20,19 @@ static const NSTimeInterval SUParentQuitCheckInterval = .5;
 
 @interface TerminationListener : NSObject <SUInstallerDelegate>
 
+@property (assign) const char *hostpath;
+@property (assign) const char *executablepath;
+@property (assign) pid_t parentprocessid;
+@property (assign) const char *folderpath;
+
+@property (copy) NSString *selfPath;
+@property (copy) NSString *installationPath;
+@property (strong) NSTimer *watchdogTimer;
+@property (strong) NSTimer *longInstallationTimer;
+@property (strong) SUHost *host;
+@property (assign) BOOL shouldRelaunch;
+@property (assign) BOOL shouldShowUI;
+
 - (void) parentHasQuit;
 
 - (void) relaunch;
@@ -31,19 +44,19 @@ static const NSTimeInterval SUParentQuitCheckInterval = .5;
 @end
 
 @implementation TerminationListener
-{
-    const char		*hostpath;
-    const char		*executablepath;
-    pid_t			parentprocessid;
-    const char		*folderpath;
-    NSString		*selfPath;
-    NSString        *installationPath;
-    NSTimer			*watchdogTimer;
-    NSTimer			*longInstallationTimer;
-    SUHost			*host;
-    BOOL            shouldRelaunch;
-    BOOL			shouldShowUI;
-}
+
+@synthesize hostpath;
+@synthesize executablepath;
+@synthesize parentprocessid;
+@synthesize folderpath;
+
+@synthesize selfPath;
+@synthesize installationPath;
+@synthesize watchdogTimer;
+@synthesize longInstallationTimer;
+@synthesize host;
+@synthesize shouldRelaunch;
+@synthesize shouldShowUI;
 
 - (instancetype) initWithHostPath:(const char *)inhostpath executablePath:(const char *)execpath parentProcessId:(pid_t)ppid folderPath:(const char*)infolderpath shouldRelaunch:(BOOL)relaunch shouldShowUI:(BOOL)showUI selfPath:(NSString*)inSelfPath
 {
@@ -78,12 +91,12 @@ static const NSTimeInterval SUParentQuitCheckInterval = .5;
 
 -(void)	parentHasQuit
 {
-	[watchdogTimer invalidate];
-	longInstallationTimer = [NSTimer scheduledTimerWithTimeInterval:SUInstallationTimeLimit
+	[self.watchdogTimer invalidate];
+	self.longInstallationTimer = [NSTimer scheduledTimerWithTimeInterval:SUInstallationTimeLimit
 								target: self selector: @selector(showAppIconInDock:)
 								userInfo:nil repeats:NO];
 
-	if( folderpath )
+	if( self.folderpath )
 		[self install];
 	else
 		[self relaunch];
@@ -91,7 +104,7 @@ static const NSTimeInterval SUParentQuitCheckInterval = .5;
 
 - (void)watchdog:(NSTimer *) __unused aTimer
 {
-	if (![NSRunningApplication runningApplicationWithProcessIdentifier:parentprocessid]) {
+	if (![NSRunningApplication runningApplicationWithProcessIdentifier:self.parentprocessid]) {
 		[self parentHasQuit];
 }
 }
@@ -105,23 +118,23 @@ static const NSTimeInterval SUParentQuitCheckInterval = .5;
 
 - (void) relaunch __attribute__((noreturn))
 {
-    if (shouldRelaunch)
+    if (self.shouldRelaunch)
     {
         NSString	*appPath = nil;
-        if( !folderpath || strcmp(executablepath, hostpath) != 0 )
-            appPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:executablepath length:strlen(executablepath)];
+        if( !self.folderpath || strcmp(self.executablepath, self.hostpath) != 0 )
+            appPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:self.executablepath length:strlen(self.executablepath)];
         else
-            appPath = installationPath;
+            appPath = self.installationPath;
         [[NSWorkspace sharedWorkspace] openFile: appPath];
     }
 
-    if (folderpath)
+    if (self.folderpath)
     {
         NSError *theError = nil;
         if( ![SUPlainInstaller _removeFileAtPath: [SUInstaller updateFolder] error: &theError] )
             SULog( @"Couldn't remove update folder: %@.", theError );
     }
-    [[NSFileManager defaultManager] removeItemAtPath: selfPath error: NULL];
+    [[NSFileManager defaultManager] removeItemAtPath: self.selfPath error: NULL];
 
 	exit(EXIT_SUCCESS);
 }
@@ -129,21 +142,21 @@ static const NSTimeInterval SUParentQuitCheckInterval = .5;
 
 - (void) install
 {
-	NSBundle			*theBundle = [NSBundle bundleWithPath: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: hostpath length:strlen(hostpath)]];
-	host = [[SUHost alloc] initWithBundle: theBundle];
-    installationPath = [[host installationPath] copy];
+	NSBundle			*theBundle = [NSBundle bundleWithPath: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: self.hostpath length:strlen(self.hostpath)]];
+	self.host = [[SUHost alloc] initWithBundle: theBundle];
+    self.installationPath = [[self.host installationPath] copy];
 
-    if (shouldShowUI) {
-        SUStatusController*	statusCtl = [[SUStatusController alloc] initWithHost: host];	// We quit anyway after we've installed, so leak this for now.
+    if (self.shouldShowUI) {
+        SUStatusController*	statusCtl = [[SUStatusController alloc] initWithHost: self.host];	// We quit anyway after we've installed, so leak this for now.
         [statusCtl setButtonTitle: SULocalizedString(@"Cancel Update",@"") target: nil action: Nil isDefault: NO];
         [statusCtl beginActionWithTitle: SULocalizedString(@"Installing update...",@"")
                         maxProgressValue: 0 statusText: @""];
         [statusCtl showWindow: self];
     }
 
-    [SUInstaller installFromUpdateFolder:[[NSFileManager defaultManager] stringWithFileSystemRepresentation:folderpath length:strlen(folderpath)]
-                                overHost:host
-                        installationPath:installationPath
+    [SUInstaller installFromUpdateFolder:[[NSFileManager defaultManager] stringWithFileSystemRepresentation:self.folderpath length:strlen(self.folderpath)]
+                                overHost:self.host
+                        installationPath:self.installationPath
                                 delegate:self
                        versionComparator:[SUStandardVersionComparator defaultComparator]];
 }
@@ -155,7 +168,7 @@ static const NSTimeInterval SUParentQuitCheckInterval = .5;
 
 - (void)installerForHost:(SUHost *) __unused host failedWithError:(NSError *)error __attribute__((noreturn))
 {
-    if (shouldShowUI)
+    if (self.shouldShowUI)
         NSRunAlertPanel( @"", @"%@", @"OK", @"", @"", [error localizedDescription] );
 	exit(EXIT_FAILURE);
 }

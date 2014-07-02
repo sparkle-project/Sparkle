@@ -24,16 +24,18 @@ typedef struct {
 #endif
 
 @interface SUHost ()
+
 @property (strong, readwrite) NSBundle *bundle;
+@property (copy) NSString *defaultsDomain;
+@property (assign) BOOL usesStandardUserDefaults;
+
 @end
 
 @implementation SUHost
-{
-    NSString *defaultsDomain;
-    BOOL usesStandardUserDefaults;
-}
 
 @synthesize bundle;
+@synthesize defaultsDomain;
+@synthesize usesStandardUserDefaults;
 
 - (instancetype)initWithBundle:(NSBundle *)aBundle
 {
@@ -45,13 +47,13 @@ typedef struct {
 			SULog(@"Sparkle Error: the bundle being updated at %@ has no CFBundleIdentifier! This will cause preference read/write to not work properly.", self.bundle);
 		}
 
-		defaultsDomain = [self.bundle objectForInfoDictionaryKey:SUDefaultsDomainKey];
-		if (!defaultsDomain) {
-			defaultsDomain = [self.bundle bundleIdentifier];
+		self.defaultsDomain = [self.bundle objectForInfoDictionaryKey:SUDefaultsDomainKey];
+		if (!self.defaultsDomain) {
+			self.defaultsDomain = [self.bundle bundleIdentifier];
 		}
 
 		// If we're using the main bundle's defaults we'll use the standard user defaults mechanism, otherwise we have to get CF-y.
-		usesStandardUserDefaults = [defaultsDomain isEqualToString:[[NSBundle mainBundle] bundleIdentifier]];
+		usesStandardUserDefaults = [self.defaultsDomain isEqualToString:[[NSBundle mainBundle] bundleIdentifier]];
     }
     return self;
 }
@@ -186,42 +188,42 @@ typedef struct {
 
 - (id)objectForUserDefaultsKey:(NSString *)defaultName
 {
-    if (!defaultName || !defaultsDomain) {
+    if (!defaultName || !self.defaultsDomain) {
         return nil;
     }
 
 	// Under Tiger, CFPreferencesCopyAppValue doesn't get values from NSRegistrationDomain, so anything
 	// passed into -[NSUserDefaults registerDefaults:] is ignored.  The following line falls
 	// back to using NSUserDefaults, but only if the host bundle is the main bundle.
-	if (usesStandardUserDefaults) {
+	if (self.usesStandardUserDefaults) {
 		return [[NSUserDefaults standardUserDefaults] objectForKey:defaultName];
 	}
 
-	CFPropertyListRef obj = CFPreferencesCopyAppValue((__bridge CFStringRef)defaultName, (__bridge CFStringRef)defaultsDomain);
+	CFPropertyListRef obj = CFPreferencesCopyAppValue((__bridge CFStringRef)defaultName, (__bridge CFStringRef)self.defaultsDomain);
 	return CFBridgingRelease(obj);
 }
 
 - (void)setObject:(id)value forUserDefaultsKey:(NSString *)defaultName
 {
-	if (usesStandardUserDefaults)
+	if (self.usesStandardUserDefaults)
 	{
 		[[NSUserDefaults standardUserDefaults] setObject:value forKey:defaultName];
 	}
 	else
 	{
-		CFPreferencesSetValue((__bridge CFStringRef)defaultName, (__bridge CFPropertyListRef)(value), (__bridge CFStringRef)defaultsDomain,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
-		CFPreferencesSynchronize((__bridge CFStringRef)defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		CFPreferencesSetValue((__bridge CFStringRef)defaultName, (__bridge CFPropertyListRef)(value), (__bridge CFStringRef)self.defaultsDomain,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		CFPreferencesSynchronize((__bridge CFStringRef)self.defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	}
 }
 
 - (BOOL)boolForUserDefaultsKey:(NSString *)defaultName
 {
-	if (usesStandardUserDefaults) {
+	if (self.usesStandardUserDefaults) {
 		return [[NSUserDefaults standardUserDefaults] boolForKey:defaultName];
 	}
 
 	BOOL value;
-	CFPropertyListRef plr = CFPreferencesCopyAppValue((__bridge CFStringRef)defaultName, (__bridge CFStringRef)defaultsDomain);
+	CFPropertyListRef plr = CFPreferencesCopyAppValue((__bridge CFStringRef)defaultName, (__bridge CFStringRef)self.defaultsDomain);
 	if (plr == NULL) {
 		value = NO;
 	}
@@ -235,14 +237,14 @@ typedef struct {
 
 - (void)setBool:(BOOL)value forUserDefaultsKey:(NSString *)defaultName
 {
-	if (usesStandardUserDefaults)
+	if (self.usesStandardUserDefaults)
 	{
 		[[NSUserDefaults standardUserDefaults] setBool:value forKey:defaultName];
 	}
 	else
 	{
-		CFPreferencesSetValue((__bridge CFStringRef)defaultName, (__bridge CFBooleanRef)@(value), (__bridge CFStringRef)defaultsDomain,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
-		CFPreferencesSynchronize((__bridge CFStringRef)defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		CFPreferencesSetValue((__bridge CFStringRef)defaultName, (__bridge CFBooleanRef)@(value), (__bridge CFStringRef)self.defaultsDomain,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		CFPreferencesSynchronize((__bridge CFStringRef)self.defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	}
 }
 

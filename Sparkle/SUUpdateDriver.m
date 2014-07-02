@@ -11,20 +11,26 @@
 
 NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
+@interface SUUpdateDriver ()
+
+@property (weak) SUUpdater *updater;
+@property (copy) NSURL *appcastURL;
+@property (getter=isInterruptible) BOOL interruptible;
+
+@end
+
 @implementation SUUpdateDriver
-{
-    NSURL *appcastURL;
-}
 
 @synthesize updater;
 @synthesize host;
-@synthesize interruptible = isInterruptible;
+@synthesize interruptible;
 @synthesize finished;
+@synthesize appcastURL;
 
 - (instancetype) initWithUpdater:(SUUpdater *)anUpdater
 {
 	if ((self = [super init])) {
-		updater = anUpdater;
+		self.updater = anUpdater;
 	}
 	return self;
 }
@@ -33,7 +39,7 @@ NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)h
 {
-	appcastURL = [URL copy];
+	self.appcastURL = URL;
 	self.host = h;
 }
 
@@ -41,11 +47,6 @@ NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 {
 	[self setValue:@YES forKey:@"finished"];
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdateDriverFinishedNotification object:self];
-}
-
-- (void)setInterruptible:(BOOL)interruptible
-{
-    isInterruptible = interruptible;
 }
 
 @end

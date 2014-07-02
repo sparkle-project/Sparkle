@@ -17,34 +17,44 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 @interface SUUpdateDriver ()
 
-- (void)setInterruptible:(BOOL)interruptible;
+@property (getter=isInterruptible) BOOL interruptible;
+
+@end
+
+@interface SUAutomaticUpdateDriver ()
+
+@property (assign) BOOL postponingInstallation;
+@property (assign) BOOL showErrors;
+@property (assign) BOOL willUpdateOnTermination;
+@property (strong) SUAutomaticUpdateAlert *alert;
+@property (strong) NSTimer *showUpdateAlertTimer;
 
 @end
 
 @implementation SUAutomaticUpdateDriver
-{
-    BOOL postponingInstallation, showErrors;
-    BOOL willUpdateOnTermination;
-    SUAutomaticUpdateAlert *alert;
-    NSTimer *showUpdateAlertTimer;
-}
+
+@synthesize postponingInstallation;
+@synthesize showErrors;
+@synthesize willUpdateOnTermination;
+@synthesize alert;
+@synthesize showUpdateAlertTimer;
 
 - (void)showUpdateAlert
 {
     self.interruptible = NO;
-    alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host delegate:self];
+    self.alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host delegate:self];
 
 	// If the app is a menubar app or the like, we need to focus it first and alter the
 	// update prompt to behave like a normal window. Otherwise if the window were hidden
 	// there may be no way for the application to be activated to make it visible again.
     if ([self.host isBackgroundApplication])
 	{
-		[[alert window] setHidesOnDeactivate:NO];
+		[[self.alert window] setHidesOnDeactivate:NO];
 		[NSApp activateIgnoringOtherApps:YES];
 	}
 
 	if ([NSApp isActive])
-		[[alert window] makeKeyAndOrderFront:self];
+		[[self.alert window] makeKeyAndOrderFront:self];
 	else
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
@@ -57,7 +67,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     NSProcessInfo *processInfo = [NSProcessInfo processInfo];
     [processInfo disableSuddenTermination];
 
-    willUpdateOnTermination = YES;
+    self.willUpdateOnTermination = YES;
 
     id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
     if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)])
@@ -80,7 +90,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     }
     else
     {
-        showUpdateAlertTimer = [NSTimer scheduledTimerWithTimeInterval:SUAutomaticUpdatePromptImpatienceTimer target:self selector:@selector(showUpdateAlert) userInfo:nil repeats:NO];
+        self.showUpdateAlertTimer = [NSTimer scheduledTimerWithTimeInterval:SUAutomaticUpdatePromptImpatienceTimer target:self selector:@selector(showUpdateAlert) userInfo:nil repeats:NO];
 
         // At this point the driver is idle, allow it to be interrupted for user-initiated update checks.
         self.interruptible = YES;
@@ -89,13 +99,13 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)stopUpdatingOnTermination
 {
-    if (willUpdateOnTermination)
+    if (self.willUpdateOnTermination)
     {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
         NSProcessInfo *processInfo = [NSProcessInfo processInfo];
         [processInfo enableSuddenTermination];
 
-        willUpdateOnTermination = NO;
+        self.willUpdateOnTermination = NO;
 
         id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
         if ([updaterDelegate respondsToSelector:@selector(updater:didCancelInstallUpdateOnQuit:)])
@@ -105,8 +115,8 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)invalidateShowUpdateAlertTimer
 {
-    [showUpdateAlertTimer invalidate];
-    showUpdateAlertTimer = nil;
+    [self.showUpdateAlertTimer invalidate];
+    self.showUpdateAlertTimer = nil;
 }
 
 - (void)dealloc
@@ -124,7 +134,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)applicationDidBecomeActive:(NSNotification *) __unused aNotification
 {
-	[[alert window] makeKeyAndOrderFront:self];
+	[[self.alert window] makeKeyAndOrderFront:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
 }
 
@@ -138,7 +148,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 			break;
 
 		case SUInstallLaterChoice:
-			postponingInstallation = YES;
+			self.postponingInstallation = YES;
 			[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
 			// We're already waiting on quit, just indicate that we're idle.
             self.interruptible = YES;
@@ -151,7 +161,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 	}
 }
 
-- (BOOL)shouldInstallSynchronously { return postponingInstallation; }
+- (BOOL)shouldInstallSynchronously { return self.postponingInstallation; }
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
 {
@@ -159,7 +169,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         [self stopUpdatingOnTermination];
 	}
 
-    showErrors = YES;
+    self.showErrors = YES;
     [super installWithToolAndRelaunch:relaunch displayingUserInterface:showUI];
 }
 
@@ -170,7 +180,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-	if (showErrors)
+	if (self.showErrors)
 		[super abortUpdateWithError:error];
 	else
 		[self abortUpdate];

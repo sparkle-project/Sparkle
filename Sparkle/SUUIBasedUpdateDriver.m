@@ -14,22 +14,28 @@
 #import "SUStatusController.h"
 #import "SUConstants.h"
 
+@interface SUUIBasedUpdateDriver ()
+
+@property (strong) SUStatusController *statusController;
+@property (strong) SUUpdateAlert *updateAlert;
+
+@end
+
 @implementation SUUIBasedUpdateDriver
-{
-    SUStatusController *statusController;
-    SUUpdateAlert *updateAlert;
-}
+
+@synthesize statusController;
+@synthesize updateAlert;
 
 - (void)didFindValidUpdate
 {
-    updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host];
-	[updateAlert setDelegate:self];
+    self.updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host];
+	[self.updateAlert setDelegate:self];
 
 	id<SUVersionDisplay>	versDisp = nil;
     if ([[self.updater delegate] respondsToSelector:@selector(versionDisplayerForUpdater:)]) {
         versDisp = [[self.updater delegate] versionDisplayerForUpdater:self.updater];
 	}
-	[updateAlert setVersionDisplayer: versDisp];
+	[self.updateAlert setVersionDisplayer: versDisp];
 
     if ([[self.updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
         [[self.updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
@@ -40,13 +46,13 @@
 	// there may be no way for the application to be activated to make it visible again.
     if ([self.host isBackgroundApplication])
 	{
-		[[updateAlert window] setHidesOnDeactivate:NO];
+		[[self.updateAlert window] setHidesOnDeactivate:NO];
 		[NSApp activateIgnoringOtherApps:YES];
 	}
 
 	// Only show the update alert if the app is active; otherwise, we'll wait until it is.
 	if ([NSApp isActive])
-		[[updateAlert window] makeKeyAndOrderFront:self];
+		[[self.updateAlert window] makeKeyAndOrderFront:self];
 	else
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
@@ -68,21 +74,21 @@
 
 - (void)applicationDidBecomeActive:(NSNotification *) __unused aNotification
 {
-	[[updateAlert window] makeKeyAndOrderFront:self];
+	[[self.updateAlert window] makeKeyAndOrderFront:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
 }
 
 - (void)updateAlert:(SUUpdateAlert *) __unused alert finishedWithChoice:(SUUpdateAlertChoice)choice
 {
-	updateAlert = nil;
+	self.updateAlert = nil;
     [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
 	switch (choice)
 	{
 		case SUInstallUpdateChoice:
-            statusController = [[SUStatusController alloc] initWithHost:self.host];
-			[statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
-			[statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
-			[statusController showWindow:self];
+            self.statusController = [[SUStatusController alloc] initWithHost:self.host];
+			[self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
+			[self.statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
+			[self.statusController showWindow:self];
 			[self downloadUpdate];
 			break;
 
@@ -104,7 +110,7 @@
 
 - (void)download:(NSURLDownload *) __unused download didReceiveResponse:(NSURLResponse *)response
 {
-	[statusController setMaxProgressValue:[response expectedContentLength]];
+	[self.statusController setMaxProgressValue:[response expectedContentLength]];
 }
 
 - (NSString *)humanReadableSizeFromDouble:(double)value
@@ -126,11 +132,11 @@
 
 - (void)download:(NSURLDownload *) __unused download didReceiveDataOfLength:(NSUInteger)length
 {
-	[statusController setProgressValue:[statusController progressValue] + (double)length];
-	if ([statusController maxProgressValue] > 0.0)
-		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [self humanReadableSizeFromDouble:[statusController progressValue]], [self humanReadableSizeFromDouble:[statusController maxProgressValue]]]];
+	[self.statusController setProgressValue:[self.statusController progressValue] + (double)length];
+	if ([self.statusController maxProgressValue] > 0.0)
+		[self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [self humanReadableSizeFromDouble:[self.statusController progressValue]], [self humanReadableSizeFromDouble:[self.statusController maxProgressValue]]]];
 	else
-		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self humanReadableSizeFromDouble:[statusController progressValue]]]];
+		[self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self humanReadableSizeFromDouble:[self.statusController progressValue]]]];
 }
 
 - (IBAction)cancelDownload:(id) __unused sender
@@ -143,30 +149,30 @@
 - (void)extractUpdate
 {
 	// Now we have to extract the downloaded archive.
-	[statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
-	[statusController setButtonEnabled:NO];
+	[self.statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
+	[self.statusController setButtonEnabled:NO];
 	[super extractUpdate];
 }
 
 - (void)unarchiver:(SUUnarchiver *) __unused ua extractedLength:(unsigned long)length
 {
 	// We do this here instead of in extractUpdate so that we only have a determinate progress bar for archives with progress.
-	if ([statusController maxProgressValue] == 0.0)
+	if ([self.statusController maxProgressValue] == 0.0)
 	{
 		NSDictionary * attributes;
         attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.downloadPath error:nil];
-		[statusController setMaxProgressValue:[attributes[NSFileSize] doubleValue]];
+		[self.statusController setMaxProgressValue:[attributes[NSFileSize] doubleValue]];
 	}
-	[statusController setProgressValue:[statusController progressValue] + (double)length];
+	[self.statusController setProgressValue:[self.statusController progressValue] + (double)length];
 }
 
 - (void)unarchiverDidFinish:(SUUnarchiver *) __unused ua
 {
-	[statusController beginActionWithTitle:SULocalizedString(@"Ready to Install", nil) maxProgressValue:1.0 statusText:nil];
-	[statusController setProgressValue:1.0]; // Fill the bar.
-	[statusController setButtonEnabled:YES];
-	[statusController setButtonTitle:SULocalizedString(@"Install and Relaunch", nil) target:self action:@selector(installAndRestart:) isDefault:YES];
-	[[statusController window] makeKeyAndOrderFront: self];
+	[self.statusController beginActionWithTitle:SULocalizedString(@"Ready to Install", nil) maxProgressValue:1.0 statusText:nil];
+	[self.statusController setProgressValue:1.0]; // Fill the bar.
+	[self.statusController setButtonEnabled:YES];
+	[self.statusController setButtonTitle:SULocalizedString(@"Install and Relaunch", nil) target:self action:@selector(installAndRestart:) isDefault:YES];
+	[[self.statusController window] makeKeyAndOrderFront: self];
 	[NSApp requestUserAttention:NSInformationalRequest];
 }
 
@@ -177,8 +183,8 @@
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch
 {
-	[statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
-	[statusController setButtonEnabled:NO];
+	[self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
+	[self.statusController setButtonEnabled:NO];
 	[super installWithToolAndRelaunch:relaunch];
 
 
@@ -187,10 +193,10 @@
 	// tabs open), the status window still stays on the screen and obscures
 	// other windows; with this fix, it doesn't
 
-	if (statusController)
+	if (self.statusController)
 	{
-		[statusController close];
-		statusController = nil;
+		[self.statusController close];
+		self.statusController = nil;
 	}
 }
 
@@ -203,10 +209,10 @@
 
 - (void)abortUpdate
 {
-	if (statusController)
+	if (self.statusController)
 	{
-		[statusController close];
-		statusController = nil;
+		[self.statusController close];
+		self.statusController = nil;
 	}
 	[super abortUpdate];
 }
