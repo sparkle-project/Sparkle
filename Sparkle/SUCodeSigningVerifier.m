@@ -13,7 +13,7 @@
 
 @implementation SUCodeSigningVerifier
 
-+ (BOOL)codeSignatureIsValidAtPath:(NSString *)destinationPath error:(NSError **)error
++ (BOOL)codeSignatureIsValidAtPath:(NSString *)destinationPath error:(NSError *__autoreleasing *)error
 {
     OSStatus result;
     SecRequirementRef requirement = NULL;

@@ -144,7 +144,7 @@
 }
 
 
-+(int)	task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input output: (NSData**)outData
++(int)	task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input output: (NSData*__autoreleasing *)outData
 {
 	// we need this wacky pool here, otherwise we run out of pipes, the pipes are internally autoreleased
 	@autoreleasepool {

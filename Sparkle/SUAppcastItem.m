@@ -60,7 +60,7 @@
 	return [self initWithDictionary:dict failureReason:nil];
 }
 
-- (instancetype) initWithDictionary:(NSDictionary *)dict failureReason:(NSString**)error
+- (instancetype) initWithDictionary:(NSDictionary *)dict failureReason:(NSString*__autoreleasing *)error
 {
 	self = [super init];
 	if (self)
