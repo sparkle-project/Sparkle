@@ -17,12 +17,12 @@
 {
 	static NSDictionary *typeSelectorDictionary;
 	if (!typeSelectorDictionary)
-		typeSelectorDictionary = [@{@".zip": @"extractZIP",
+		typeSelectorDictionary = @{@".zip": @"extractZIP",
                                     @".tar": @"extractTAR",
 								    @".tar.gz": @"extractTGZ",
                                     @".tgz": @"extractTGZ",
 								    @".tar.bz2": @"extractTBZ",
-                                    @".tbz": @"extractTBZ"} retain];
+                                   @".tbz": @"extractTBZ"};
 
 	NSString *lastPathComponent = [path lastPathComponent];
 	for (NSString *currentType in typeSelectorDictionary)
@@ -51,6 +51,15 @@
 	@autoreleasepool {
 		FILE *fp = NULL, *cmdFP = NULL;
 		char *oldDestinationString = NULL;
+        // We have to declare these before a goto to prevent an error under ARC.
+        // No, we cannot have them in the dispatch_async calls, as the goto "jump enters
+        // lifetime of block which strongly captures a variable"
+        dispatch_block_t delegateSuccess = ^{
+            [self notifyDelegateOfSuccess];
+        };
+        dispatch_block_t delegateFailure = ^{
+            [self notifyDelegateOfFailure];
+        };
 
         SULog(@"Extracting %@ using '%@'", self.archivePath,command);
 
@@ -90,15 +99,11 @@
 			goto reportError;
 		}
 
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[self notifyDelegateOfSuccess];
-		});
+		dispatch_async(dispatch_get_main_queue(), delegateSuccess);
 		goto finally;
 
 	reportError:
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[self notifyDelegateOfFailure];
-		});
+		dispatch_async(dispatch_get_main_queue(), delegateFailure);
 
 	finally:
 		if (fp)

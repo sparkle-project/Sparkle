@@ -38,6 +38,18 @@
 		// get a unique mount point path
 		NSString *mountPoint = nil;
 		FSRef tmpRef;
+        NSFileManager *manager;
+        NSError *error;
+        NSArray *contents;
+        // We have to declare these before a goto to prevent an error under ARC.
+        // No, we cannot have them in the dispatch_async calls, as the goto "jump enters
+        // lifetime of block which strongly captures a variable"
+        dispatch_block_t delegateFailure = ^{
+            [self notifyDelegateOfFailure];
+        };
+        dispatch_block_t delegateSuccess =  ^{
+            [self notifyDelegateOfSuccess];
+        };
 		do
 		{
 			// Using NSUUID would make creating UUIDs be done in Cocoa,
@@ -69,8 +81,7 @@
 			[task run:@"/usr/bin/hdiutil" directory:@"/" withArgs:arguments input:promptData];
 
 			taskResult = [task result];
-			output = [[[task output] copy] autorelease];
-			[task release];
+            output = [[task output] copy];
 		}
 		@catch (NSException *)
 		{
@@ -79,16 +90,15 @@
 
 		if (taskResult != 0)
 		{
-			NSString*	resultStr = output ? [[[NSString alloc] initWithData: output encoding: NSUTF8StringEncoding] autorelease] : nil;
+            NSString*	resultStr = output ? [[NSString alloc] initWithData: output encoding: NSUTF8StringEncoding] : nil;
 			SULog( @"hdiutil failed with code: %ld data: <<%@>>", (long)taskResult, resultStr );
 			goto reportError;
 		}
 		mountedSuccessfully = YES;
 
 		// Now that we've mounted it, we need to copy out its contents.
-		NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
-		NSError *error = nil;
-		NSArray *contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
+        manager = [[NSFileManager alloc] init];
+        contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
 		if (error)
 		{
 			SULog(@"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
@@ -114,15 +124,11 @@
 			}
 		}
 
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[self notifyDelegateOfSuccess];
-		});
+		dispatch_async(dispatch_get_main_queue(), delegateSuccess);
 		goto finally;
 
 	reportError:
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[self notifyDelegateOfFailure];
-		});
+		dispatch_async(dispatch_get_main_queue(), delegateFailure);
 
 	finally:
 		if (mountedSuccessfully)
@@ -149,7 +155,7 @@
 	BOOL result = NO;
 	if(resultData)
 	{
-		NSString *data = [[[NSString alloc] initWithData:resultData encoding:NSUTF8StringEncoding] autorelease];
+		NSString *data = [[NSString alloc] initWithData:resultData encoding:NSUTF8StringEncoding];
 
         if ((data != nil) && !NSEqualRanges([data rangeOfString:@"passphrase-count"], NSMakeRange(NSNotFound, 0)))
 		{
