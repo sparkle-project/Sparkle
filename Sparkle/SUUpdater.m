@@ -130,15 +130,15 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 -(void)	notifyWillShowModalAlert
 {
-	if( [delegate respondsToSelector: @selector(updaterWillShowModalAlert:)] )
-		[delegate updaterWillShowModalAlert: self];
+	if ([self.delegate respondsToSelector: @selector(updaterWillShowModalAlert:)] )
+		[self.delegate updaterWillShowModalAlert: self];
 }
 
 
 -(void)	notifyDidShowModalAlert
 {
-	if( [delegate respondsToSelector: @selector(updaterDidShowModalAlert:)] )
-		[delegate updaterDidShowModalAlert: self];
+	if ([self.delegate respondsToSelector: @selector(updaterDidShowModalAlert:)] )
+		[self.delegate updaterDidShowModalAlert: self];
 }
 
 
@@ -152,9 +152,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
         shouldPrompt = NO;
     }
     // Does the delegate want to take care of the logic for when we should ask permission to update?
-    else if ([delegate respondsToSelector:@selector(updaterShouldPromptForPermissionToCheckForUpdates:)])
+    else if ([self.delegate respondsToSelector:@selector(updaterShouldPromptForPermissionToCheckForUpdates:)])
     {
-        shouldPrompt = [delegate updaterShouldPromptForPermissionToCheckForUpdates:self];
+        shouldPrompt = [self.delegate updaterShouldPromptForPermissionToCheckForUpdates:self];
     }
     // Has he been asked already? And don't ask if the host has a default value set in its Info.plist.
     else if ([host objectForKey:SUEnableAutomaticChecksKey] == nil)
@@ -179,8 +179,8 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
     {
 		NSArray *profileInfo = [host systemProfile];
 		// Always say we're sending the system profile here so that the delegate displays the parameters it would send.
-		if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
-			profileInfo = [profileInfo arrayByAddingObjectsFromArray:[delegate feedParametersForUpdater:self sendingSystemProfile:YES]];
+		if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
+			profileInfo = [profileInfo arrayByAddingObjectsFromArray:[self.delegate feedParametersForUpdater:self sendingSystemProfile:YES]];
 		}
         [SUUpdatePermissionPrompt promptWithHost:host systemProfile:profileInfo delegate:self];
         // We start the update checks and register as observer for changes after the prompt finishes
@@ -215,9 +215,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 - (void)scheduleNextUpdateCheck
 {
-	if (checkTimer)
+	if (self.checkTimer)
 	{
-		[checkTimer invalidate];
+		[self.checkTimer invalidate];
 		self.checkTimer = nil; // UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
 	}
 	if (![self automaticallyChecksForUpdates]) return;
@@ -312,7 +312,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 - (BOOL)mayUpdateAndRestart
 {
-	return( !delegate || ![delegate respondsToSelector: @selector(updaterShouldRelaunchApplication:)] || [delegate updaterShouldRelaunchApplication: self] );
+	return( !self.delegate || ![self.delegate respondsToSelector: @selector(updaterShouldRelaunchApplication:)] || [self.delegate updaterShouldRelaunchApplication: self] );
 }
 
 - (IBAction)checkForUpdates:(id) __unused sender
@@ -332,7 +332,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)d
 {
 	if ([self updateInProgress]) { return; }
-	if (checkTimer) { [checkTimer invalidate]; self.checkTimer = nil; }		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
+	if (self.checkTimer) { [self.checkTimer invalidate]; self.checkTimer = nil; }		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
 
 	SUClearLog();
 	SULog( @"===== %@ =====", [[NSFileManager defaultManager] displayNameAtPath: [[NSBundle mainBundle] bundlePath]] );
@@ -341,7 +341,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	[host setObject:[NSDate date] forUserDefaultsKey:SULastCheckTimeKey];
 	[self didChangeValueForKey:@"lastUpdateCheckDate"];
 
-    if( [delegate respondsToSelector: @selector(updaterMayCheckForUpdates:)] && ![delegate updaterMayCheckForUpdates: self] )
+    if( [self.delegate respondsToSelector: @selector(updaterMayCheckForUpdates:)] && ![self.delegate updaterMayCheckForUpdates: self] )
 	{
 		[self scheduleNextUpdateCheck];
 		return;
@@ -458,8 +458,8 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 	// A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
 	NSString *appcastString = [host objectForKey:SUFeedURLKey];
-	if( [delegate respondsToSelector: @selector(feedURLStringForUpdater:)] )
-		appcastString = [delegate feedURLStringForUpdater: self];
+	if( [self.delegate respondsToSelector: @selector(feedURLStringForUpdater:)] )
+		appcastString = [self.delegate feedURLStringForUpdater: self];
 	if (!appcastString) // Can't find an appcast string!
 		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the %@ key in either the Info.plist or the user defaults!", SUFeedURLKey];
 	NSCharacterSet* quoteSet = [NSCharacterSet characterSetWithCharactersInString: @"\"\'"]; // Some feed publishers add quotes; strip 'em.
@@ -508,8 +508,8 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	sendingSystemProfile &= (-[lastSubmitDate timeIntervalSinceNow] >= oneWeek);
 
 	NSArray *parameters = @[];
-	if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
-		parameters = [parameters arrayByAddingObjectsFromArray:[delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile]];
+	if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
+		parameters = [parameters arrayByAddingObjectsFromArray:[self.delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile]];
 	}
 	if (sendingSystemProfile)
 	{

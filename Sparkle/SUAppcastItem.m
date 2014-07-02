@@ -47,12 +47,12 @@
 
 - (BOOL)isDeltaUpdate
 {
-	return propertiesDictionary[@"enclosure"][@"sparkle:deltaFrom"] != nil;
+	return self.propertiesDictionary[@"enclosure"][@"sparkle:deltaFrom"] != nil;
 }
 
 - (BOOL)isCriticalUpdate
 {
-    return [propertiesDictionary[@"sparkle:tags"] containsObject:@"sparkle:criticalUpdate"];
+    return [self.propertiesDictionary[@"sparkle:tags"] containsObject:@"sparkle:criticalUpdate"];
 }
 
 - (instancetype) initWithDictionary:(NSDictionary *)dict

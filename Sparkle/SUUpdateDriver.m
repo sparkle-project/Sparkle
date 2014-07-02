@@ -29,12 +29,12 @@ NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 	return self;
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [host bundlePath], [host installationPath]]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self.host bundlePath], [self.host installationPath]]; }
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)h
 {
 	appcastURL = [URL copy];
-	host = h;
+	self.host = h;
 }
 
 - (void)abortUpdate

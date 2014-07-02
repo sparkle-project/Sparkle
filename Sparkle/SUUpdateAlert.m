@@ -69,8 +69,8 @@
 	[releaseNotesView setPolicyDelegate:nil];
 	[releaseNotesView removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
 	[self close];
-	if ([delegate respondsToSelector:@selector(updateAlert:finishedWithChoice:)])
-		[delegate updateAlert:self finishedWithChoice:choice];
+	if ([self.delegate respondsToSelector:@selector(updateAlert:finishedWithChoice:)])
+		[self.delegate updateAlert:self finishedWithChoice:choice];
 }
 
 - (IBAction)installUpdate:(id) __unused sender
@@ -155,8 +155,8 @@
 		allowAutoUpdates = [host boolForInfoDictionaryKey: SUAllowsAutomaticUpdatesKey];
 
 	// UK 2007-08-31: Give delegate a chance to modify this choice:
-	if( delegate && [delegate respondsToSelector: @selector(updateAlert:shouldAllowAutoUpdate:)] )
-		[delegate updateAlert: self shouldAllowAutoUpdate: &allowAutoUpdates];
+	if (self.delegate && [self.delegate respondsToSelector: @selector(updateAlert:shouldAllowAutoUpdate:)] )
+		[self.delegate updateAlert: self shouldAllowAutoUpdate: &allowAutoUpdates];
 
 	return allowAutoUpdates;
 }
@@ -298,13 +298,13 @@
 	NSString *updateItemVersion = [updateItem displayVersionString];
     NSString *hostVersion = [host displayVersion];
 	// Display more info if the version strings are the same; useful for betas.
-    if( !versionDisplayer && [updateItemVersion isEqualToString:hostVersion] )
+    if (!self.versionDisplayer && [updateItemVersion isEqualToString:hostVersion] )
 	{
         updateItemVersion = [updateItemVersion stringByAppendingFormat:@" (%@)", [updateItem versionString]];
         hostVersion = [hostVersion stringByAppendingFormat:@" (%@)", [host version]];
     }
 	else {
-		[versionDisplayer formatVersion: &updateItemVersion andVersion: &hostVersion];
+		[self.versionDisplayer formatVersion: &updateItemVersion andVersion: &hostVersion];
 	}
     return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", nil), [host name], updateItemVersion, hostVersion];
 }

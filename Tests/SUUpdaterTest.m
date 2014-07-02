@@ -16,10 +16,7 @@
 @end
 
 @implementation SUUpdaterTest
-{
-    NSOperationQueue *queue;
-    SUUpdater *updater;
-}
+
 @synthesize queue;
 @synthesize updater;
 
@@ -28,7 +25,7 @@
     [super setUp];
     self.queue = [[NSOperationQueue alloc] init];
     self.updater = [[SUUpdater alloc] init];
-    updater.delegate = self;
+    self.updater.delegate = self;
 }
 
 - (void)tearDown
@@ -45,36 +42,36 @@
 
 - (void)testFeedURL
 {
-    [updater feedURL]; // this WON'T throw
+    [self.updater feedURL]; // this WON'T throw
 
-    [queue addOperationWithBlock:^{
+    [self.queue addOperationWithBlock:^{
         XCTAssertTrue(![NSThread isMainThread]);
         @try {
-            [updater feedURL];
+            [self.updater feedURL];
             XCTFail(@"feedURL did not throw an exception when called on a secondary thread");
         }
         @catch (NSException *exception) {
             NSLog(@"%@", exception);
         }
     }];
-    [queue waitUntilAllOperationsAreFinished];
+    [self.queue waitUntilAllOperationsAreFinished];
 }
 
 - (void)testSetTestFeedURL
 {
-    [updater setFeedURL:[NSURL URLWithString:@""]]; // this WON'T throw
+    [self.updater setFeedURL:[NSURL URLWithString:@""]]; // this WON'T throw
 
-    [queue addOperationWithBlock:^{
+    [self.queue addOperationWithBlock:^{
         XCTAssertTrue(![NSThread isMainThread]);
         @try {
-            [updater setFeedURL:[NSURL URLWithString:@""]];
+            [self.updater setFeedURL:[NSURL URLWithString:@""]];
             XCTFail(@"setFeedURL: did not throw an exception when called on a secondary thread");
         }
         @catch (NSException *exception) {
             NSLog(@"%@", exception);
         }
     }];
-    [queue waitUntilAllOperationsAreFinished];
+    [self.queue waitUntilAllOperationsAreFinished];
 }
 
 @end
