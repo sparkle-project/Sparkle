@@ -131,8 +131,6 @@ int main(int argc, char **argv)
             exit(1);
         }
         
-        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-        
         NSString *command = [NSString stringWithUTF8String:argv[1]];
         NSString *oldPath = stringWithFileSystemRepresentation(argv[2]);
         NSString *newPath = stringWithFileSystemRepresentation(argv[3]);
@@ -140,11 +138,9 @@ int main(int argc, char **argv)
         
         if ([command isEqualToString:@"apply"]) {
             int result = applyBinaryDelta(oldPath, newPath, patchFile);
-            [pool drain];
             return result;
         }
         if (![command isEqualToString:@"create"]) {
-            [pool drain];
             goto usage;
         }
         
@@ -153,7 +149,6 @@ int main(int argc, char **argv)
         const char *sourcePaths[] = {[oldPath fileSystemRepresentation], 0};
         FTS *fts = fts_open((char* const*)sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
         if (!fts) {
-            [pool drain];
             perror("fts_open");
             return 1;
         }
@@ -187,7 +182,6 @@ int main(int argc, char **argv)
         sourcePaths[0] = [newPath fileSystemRepresentation];
         fts = fts_open((char* const*)sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
         if (!fts) {
-            [pool drain];
             perror("fts_open");
             return 1;
         }

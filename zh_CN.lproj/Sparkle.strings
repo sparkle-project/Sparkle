@@ -72,4 +72,4 @@
 /* Alternative name for "Install" button if we have a paid update or other update
 	without a download but with a URL. */
 
-"Learn More..." = "Learn More…";
+"Learn More..." = "下载更新包";

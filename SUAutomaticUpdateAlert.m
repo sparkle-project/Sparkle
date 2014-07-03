@@ -15,7 +15,7 @@
 
 @interface SUAutomaticUpdateAlert ()
 @property (retain) SUAppcastItem *updateItem;
-@property (assign) id<SUAutomaticUpdateAlertDelegateProtocol> delegate;
+@property (assign) id<SUAutomaticUpdateAlertDelegate> delegate;
 @property (retain) SUHost *host;
 @end
 
@@ -24,7 +24,7 @@
 @synthesize host;
 @synthesize updateItem;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost delegate:(id<SUAutomaticUpdateAlertDelegateProtocol>)del
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost delegate:(id<SUAutomaticUpdateAlertDelegate>)del
 {
 	self = [super initWithHost:aHost windowNibName:@"SUAutomaticUpdateAlert"];
 	if (self)
