@@ -5,6 +5,11 @@
 //  Created by Andy Matuschak on 3/12/06.
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
+// Additions by Yahoo:
+// Copyright 2014 Yahoo Inc. Licensed under the project's open source license.
+//
+// JSON format appcasts
+//
 
 #import "SUUpdater.h"
 
@@ -36,8 +41,12 @@
 @property (copy) NSString *downloadFilename;
 @property (retain) NSURLDownload *download;
 @property (copy) NSArray *items;
+
+
+
 - (void)reportError:(NSError *)error;
 - (NSXMLNode *)bestNodeInNodes:(NSArray *)nodes;
+- (void) parseJSON: (NSData*) receivedData;
 @end
 
 @implementation SUAppcast
@@ -57,12 +66,26 @@
 	[super dealloc];
 }
 
+- (void)setUseJSON:(bool)val
+{
+    useJSON = val;
+}
+
 - (void)fetchAppcastFromURL:(NSURL *)url
 {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
     if (userAgentString)
         [request setValue:userAgentString forHTTPHeaderField:@"User-Agent"];
-            
+    
+    SULog(@"Submitting a request for an AppCast with URL: %@", [url absoluteString]);
+    for (NSString* hdr in [[request allHTTPHeaderFields] allKeys])
+    {
+        SULog(@"%@ - %@", hdr, [[request allHTTPHeaderFields] valueForKey:hdr]);
+    }
+    
+    if  ( useJSON )
+        SULog(@"Using JSON to download the appcast");
+    
     self.download = [[[NSURLDownload alloc] initWithRequest:request delegate:self] autorelease];
 }
 
@@ -84,6 +107,14 @@
 - (void)downloadDidFinish:(NSURLDownload *)aDownload
 {    
 	NSError *error = nil;
+    
+	if ( useJSON )
+    {
+        NSUInteger options = 0;
+        NSData* rec = [[NSData dataWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:options error:&error] retain];
+        [self parseJSON: rec];
+        return;
+    }
 	
 	NSXMLDocument *document = nil;
 	BOOL failed = NO;
@@ -268,5 +299,65 @@
         i = 0;
     return [nodes objectAtIndex:i];
 }
+
+- (void) parseJSON: (NSData*) receivedData
+{
+    if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_6)
+    {
+        SULog(@"Error: parseJSON requires Mac OS X 10.7 or higher");
+        return;
+    }
+    
+    if ( self.items )
+    {
+        [self.items release];
+        self.items = nil;
+    }
+    
+    NSError* error = nil;
+    NSArray* json = [[NSJSONSerialization JSONObjectWithData:receivedData options:nil error:&error] retain];
+    
+    SULog(@"SUAppCast - found %ld update items in json: %@ (parseJSON)", (unsigned long)[json count], json );
+    if ( error != nil )
+    {
+        [self reportError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while parsing the update feed.", nil), NSLocalizedDescriptionKey, nil]]];
+    }
+    else
+    {
+        NSMutableArray* arr = [[[NSMutableArray alloc] init] retain];
+        for (NSDictionary* dict in json)
+        {
+            SUAppcastItem* nitem = [[SUAppcastItem alloc] init];
+            [nitem setFileURL: [NSURL URLWithString: [dict objectForKey:@"full"]]];
+            [nitem setVersionStringFromNumber: [dict objectForKey:@"build"]];
+            [nitem setDSASignature:[dict objectForKey:@"dsa"]];
+            
+            NSNumber* sz = [dict objectForKey:@"size"];
+            if ( sz == nil )
+                [nitem setFileSize:0];
+            else
+                [nitem setFileSize: [sz integerValue]];
+            
+            [arr addObject:nitem];
+            
+            SULog(@"Found update full=%@", [[nitem fileURL] absoluteString]);
+            [nitem release];
+        }
+        if ( [arr count] )
+        {
+            self.items = [NSArray arrayWithArray:arr];
+            SULog(@"SUAppCast - found %d items", [self.items count]);
+        }
+    }
+    [json release];
+    [receivedData release];
+    receivedData = nil;
+    
+    if ([delegate respondsToSelector:@selector(appcastDidFinishLoading:)])
+    {
+        [delegate appcastDidFinishLoading:self];
+	}
+}
+
 
 @end

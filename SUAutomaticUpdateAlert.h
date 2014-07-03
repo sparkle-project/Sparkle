@@ -5,6 +5,10 @@
 //  Created by Andy Matuschak on 3/18/06.
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
+// Additions by Yahoo:
+// Copyright 2014 Yahoo Inc. Licensed under the project's open source license.
+//
+//
 
 #ifndef SUAUTOMATICUPDATEALERT_H
 #define SUAUTOMATICUPDATEALERT_H
@@ -25,6 +29,9 @@ typedef enum
 	SUAppcastItem *updateItem;
 	id<SUAutomaticUpdateAlertDelegateProtocol> delegate;
 	SUHost *host;
+    
+    IBOutlet NSButton* cancelUpdate;
+    IBOutlet NSButton* automaticUpdatesCheck;
 }
 
 - (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)hostBundle delegate:(id<SUAutomaticUpdateAlertDelegateProtocol>)delegate;

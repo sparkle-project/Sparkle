@@ -5,6 +5,13 @@
 //  Created by Andy Matuschak on 1/4/06.
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
+// Additions by Yahoo:
+// Copyright 2014 Yahoo Inc. Licensed under the project's open source license.
+// added
+// - (void) updateStarted:(SUUpdater *)updater estimatedSize:(NSUInteger) estimatedSize;
+// - (void) dataReceived:(SUUpdater *)updater currLen:(NSUInteger)currLen;
+//
+
 
 #ifndef SUUPDATER_H
 #define SUUPDATER_H
@@ -70,6 +77,9 @@
 - (void)resetUpdateCycle;
 
 - (BOOL)updateInProgress;
+
+// due to SUClearLogsAutomatically we might need to have the main program clear the log
+- (void) clearLog;
 
 @end
 
@@ -154,6 +164,10 @@ extern NSString *const SUUpdaterAppcastNotificationKey;
 // The invocation can be used to trigger an immediate silent install and relaunch.
 - (void)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)update immediateInstallationInvocation:(NSInvocation *)invocation;
 - (void)updater:(SUUpdater *)updater didCancelInstallUpdateOnQuit:(SUAppcastItem *)update;
+
+// feedback on the item download start, estimated size and current downloaded size
+- (void) updateStarted:(SUUpdater *)updater estimatedSize:(NSUInteger) estimatedSize;
+- (void) dataReceived:(SUUpdater *)updater currLen:(NSUInteger)currLen;
 
 @end
 

@@ -5,6 +5,14 @@
 //  Created by Andy Matuschak on 3/16/06.
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
+// Additions by Yahoo:
+// Copyright 2014 Yahoo Inc. Licensed under the project's open source license.
+//
+// SUFileSizeError - optionally sending the file size and returning an error if the downlaoded file size doesn't match it
+//  (the old behavior will get an uncompress error)
+// SUClearLogsAutomatically - optionally clean or not the update logs
+// SUUseJSONAppCast - optionally use a JSON appcast instead of a XML one
+
 
 #import "SUUpdater.h"
 
@@ -55,3 +63,9 @@ OSStatus SUMissingInstallerToolError = 4003;
 OSStatus SURelaunchError = 4004;
 OSStatus SUInstallationError = 4005;
 OSStatus SUDowngradeError = 4006;
+
+OSStatus SUFileSizeError = 4007;
+
+NSString *const SUClearLogsAutomatically = @"SUClearLogsAutomatically";
+NSString *const SUUseJSONAppCast = @"SUUseJSONAppCast";
+

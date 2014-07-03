@@ -5,6 +5,10 @@
 //  Created by Andy Matuschak on 3/18/06.
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
+// Additions by Yahoo:
+// Copyright 2014 Yahoo Inc. Licensed under the project's open source license.
+//
+
 
 #import "SUAutomaticUpdateAlert.h"
 
@@ -20,7 +24,14 @@
 		updateItem = [item retain];
 		delegate = del;
 		host = [aHost retain];
-		[self setShouldCascadeWindows:NO];	
+        
+        if ( updateItem.mandatoryUpdate )
+        {
+            [automaticUpdatesCheck setHidden:TRUE];
+            [cancelUpdate setHidden:TRUE];
+        }
+        
+		[self setShouldCascadeWindows:NO];
 		[[self window] center];
 	}
 	return self;

@@ -5,6 +5,10 @@
 //  Created by Andy Matuschak on 4/23/08.
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
+// Additions by Yahoo:
+// Copyright 2014 Yahoo Inc. Licensed under the project's open source license.
+//
+
 
 #ifndef SUBASICUPDATEDRIVER_H
 #define SUBASICUPDATEDRIVER_H
@@ -24,6 +28,17 @@
 	NSString *tempDir;
 	
 	NSString *relaunchPath;
+    
+    NSURLConnection*    urlConnection;
+    NSMutableData*      downloadedData;
+    
+    NSString*           resumeDataFile;
+    
+    NSTimer*            downloadTimer;
+    NSUInteger          downloadRetryCounter;
+    NSUInteger          downloadRetryInterval;
+    NSUInteger          downloadMaxRetries;
+    
 }
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
@@ -36,9 +51,6 @@
 - (void)didNotFindUpdate;
 
 - (void)downloadUpdate;
-- (void)download:(NSURLDownload *)d decideDestinationWithSuggestedFilename:(NSString *)name;
-- (void)downloadDidFinish:(NSURLDownload *)d;
-- (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error;
 
 - (void)extractUpdate;
 - (void)unarchiverDidFinish:(SUUnarchiver *)ua;

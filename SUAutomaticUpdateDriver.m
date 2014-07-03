@@ -11,6 +11,7 @@
 #import "SUAutomaticUpdateAlert.h"
 #import "SUHost.h"
 #import "SUConstants.h"
+#import "SULog.h"
 
 // If the user hasn't quit in a week, ask them if they want to relaunch to get the latest bits. It doesn't matter that this measure of "one day" is imprecise.
 static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 24 * 7;
@@ -39,6 +40,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)ua
 {
+    SULog(@"unarchiverDidFinish for Automatic Update Driver");
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
 
     // Sudden termination is available on 10.6+
@@ -51,6 +53,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
     if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)])
     {
+        SULog(@"Sending an invocation to updater delegate");
         BOOL relaunch = YES;
         BOOL showUI = NO;
         NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installWithToolAndRelaunch:displayingUserInterface:)]];
@@ -65,11 +68,15 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     // If this is marked as a critical update, we'll prompt the user to install it right away. 
     if ([updateItem isCriticalUpdate])
     {
+        SULog(@"Found a critical update");
         [self showUpdateAlert];
     }
     else
     {
-        showUpdateAlertTimer = [[NSTimer scheduledTimerWithTimeInterval:SUAutomaticUpdatePromptImpatienceTimer target:self selector:@selector(showUpdateAlert) userInfo:nil repeats:NO] retain];
+        showUpdateAlertTimer = [[NSTimer scheduledTimerWithTimeInterval:SUAutomaticUpdatePromptImpatienceTimer
+                                                                 target:self
+                                                               selector:@selector(showUpdateAlert)
+                                                               userInfo:nil repeats:NO] retain];
 
         // At this point the driver is idle, allow it to be interrupted for user-initiated update checks.
         isInterruptible = YES;

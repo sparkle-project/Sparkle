@@ -5,6 +5,12 @@
 //  Created by Andy Matuschak on 3/16/06.
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
+// Additions by Yahoo:
+// Copyright 2014 Yahoo Inc. Licensed under the project's open source license.
+//
+// SUClearLogsAutomatically - optionally clean or not the update logs
+// SUUseJSONAppCast - optionally use a JSON appcast instead of a XML one
+// extern OSStatus SUFileSizeError
 
 
 #ifndef SUCONSTANTS_H
@@ -60,6 +66,8 @@ extern NSString *const SUPromptUserOnFirstLaunchKey;
 extern NSString *const SUFixedHTMLDisplaySizeKey;
 extern NSString *const SUKeepDownloadOnFailedInstallKey;
 extern NSString *const SUDefaultsDomainKey;
+extern NSString *const SUClearLogsAutomatically;
+extern NSString *const SUUseJSONAppCast;
 
 // -----------------------------------------------------------------------------
 //	Errors:
@@ -87,7 +95,7 @@ extern OSStatus SUMissingInstallerToolError;
 extern OSStatus SURelaunchError;
 extern OSStatus SUInstallationError;
 extern OSStatus SUDowngradeError;
-
+extern OSStatus SUFileSizeError;
 
 // -----------------------------------------------------------------------------
 //	NSInteger fixer-upper:

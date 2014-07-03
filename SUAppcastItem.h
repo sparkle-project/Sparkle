@@ -5,6 +5,11 @@
 //  Created by Andy Matuschak on 3/12/06.
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
+// Additions by Yahoo:
+// Copyright 2014 Yahoo Inc. Licensed under the project's open source license.
+//
+// file size
+//
 
 #ifndef SUAPPCASTITEM_H
 #define SUAPPCASTITEM_H
@@ -31,6 +36,9 @@
 	NSDictionary *propertiesDictionary;
 
 	NSURL *infoURL;	// UK 2007-08-31
+    
+    unsigned long   fileSize;
+    bool            mandatoryUpdate;
 }
 @property (copy, readonly) NSString *title;
 @property (copy, readonly) NSDate *date;
@@ -44,6 +52,8 @@
 @property (copy, readonly) NSString *displayVersionString;
 @property (copy, readonly) NSDictionary *deltaUpdates;
 @property (retain, readonly) NSURL *infoURL;
+@property (readonly) unsigned long fileSize;
+@property (readonly) bool mandatoryUpdate;
 
 // Initializes with data from a dictionary provided by the RSS class.
 - (id)initWithDictionary:(NSDictionary *)dict;
@@ -56,6 +66,15 @@
 - (NSDictionary *)propertiesDictionary;
 
 - (NSURL *)infoURL;						// UK 2007-08-31
+
+- (void)setVersionStringFromNumber:(NSNumber *)s;
+
+- (void)setFileURL:(NSURL *)aFileURL;
+- (void)setVersionString:(NSString *)s;
+- (void)setDSASignature:(NSString *)aDSASignature;
+
+- (unsigned long) getFileSize;
+- (void) setFileSize:(unsigned long) sz;
 
 @end
 

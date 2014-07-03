@@ -5,6 +5,12 @@
 //  Created by Andy Matuschak on 1/4/06.
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
+// Additions by Yahoo:
+// Copyright 2014 Yahoo Inc. Licensed under the project's open source license.
+//
+// SUClearLogsAutomatically - optionally clean or not the update logs
+// clearLog
+
 
 #import "SUUpdater.h"
 
@@ -320,7 +326,11 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	if ([self updateInProgress]) { return; }
 	if (checkTimer) { [checkTimer invalidate]; self.checkTimer = nil; }		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
 	
-	SUClearLog();
+    if ([host objectForKey:SUClearLogsAutomatically] && [host boolForKey:SUClearLogsAutomatically] == NO )
+        SULog( @"============================\n" );
+    else
+        SUClearLog();
+    
 	SULog( @"===== %@ =====", [[NSFileManager defaultManager] displayNameAtPath: [[NSBundle mainBundle] bundlePath]] );
 		
 	[self willChangeValueForKey:@"lastUpdateCheckDate"];
@@ -557,5 +567,10 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 }
 
 - (NSBundle *)hostBundle { return [host bundle]; }
+
+- (void) clearLog
+{
+    SUClearLog();
+}
 
 @end
