@@ -5,10 +5,6 @@
 //  Created by Andy Matuschak on 3/18/06.
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
-// Additions by Yahoo:
-// Copyright 2014 Yahoo Inc. Licensed under the project's open source license.
-//
-//
 
 #ifndef SUAUTOMATICUPDATEALERT_H
 #define SUAUTOMATICUPDATEALERT_H
@@ -25,14 +21,7 @@ typedef enum
 } SUAutomaticInstallationChoice;
 
 @class SUAppcastItem, SUHost;
-@interface SUAutomaticUpdateAlert : SUWindowController {
-	SUAppcastItem *updateItem;
-	id<SUAutomaticUpdateAlertDelegateProtocol> delegate;
-	SUHost *host;
-    
-    IBOutlet NSButton* cancelUpdate;
-    IBOutlet NSButton* automaticUpdatesCheck;
-}
+@interface SUAutomaticUpdateAlert : SUWindowController
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)hostBundle delegate:(id<SUAutomaticUpdateAlertDelegate>)delegate;
 - (IBAction)installNow:sender;

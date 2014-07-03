@@ -25,20 +25,6 @@
 @property (strong, readonly) NSURLDownload *download;
 @property (copy, readonly) NSString *downloadPath;
 
-	NSString *relaunchPath;
-    
-    NSURLConnection*    urlConnection;
-    NSMutableData*      downloadedData;
-    
-    NSString*           resumeDataFile;
-    
-    NSTimer*            downloadTimer;
-    NSUInteger          downloadRetryCounter;
-    NSUInteger          downloadRetryInterval;
-    NSUInteger          downloadMaxRetries;
-    
-}
-
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui;

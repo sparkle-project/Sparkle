@@ -17,7 +17,7 @@
 
 @implementation SUXPC
 
-+ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp error:(NSError **)error
++ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp error:(NSError *__autoreleasing *)__unused error
 {
 	xpc_connection_t connection = xpc_connection_create(XPC_NAME, NULL);
     

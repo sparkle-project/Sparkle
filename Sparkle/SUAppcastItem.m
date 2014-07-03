@@ -49,53 +49,9 @@
 
 - (void)setVersionStringFromNumber:(NSNumber *)s
 {
-    [versionString release];
-    versionString = [NSString stringWithFormat:@"%ld", (long)[s integerValue]];
-    [versionString retain];
-    
-    [self setDisplayVersionString:versionString];
+    self.versionString = [NSString stringWithFormat:@"%ld", (long)[s integerValue]];
+    [self setDisplayVersionString:self.versionString];
 }
-
-- (unsigned long) getFileSize
-{
-    return fileSize;
-}
-
-- (void) setFileSize:(unsigned long) sz
-{
-    SULog(@"File size set to %d", sz);
-    fileSize = sz;
-}
-
-- (NSString *)DSASignature { return [[DSASignature retain] autorelease]; }
-
-- (void)setDSASignature:(NSString *)aDSASignature
-{
-	if (DSASignature == aDSASignature) return;
-    [DSASignature release];
-    DSASignature = [aDSASignature copy];
-}
-
-
-- (NSURL *)fileURL { return [[fileURL retain] autorelease]; }
-
-- (void)setFileURL:(NSURL *)aFileURL
-{
-	if (fileURL == aFileURL) return;
-    [fileURL release];
-    fileURL = [aFileURL copy];
-}
-
-
-- (NSString *)versionString { return [[versionString retain] autorelease]; }
-
-- (void)setVersionString:(NSString *)s
-{
-	if (versionString == s) return;
-    [versionString release];
-    versionString = [s copy];
-}
-
 
 - (BOOL)isDeltaUpdate
 {
@@ -211,19 +167,11 @@
         // Optional sparkle:size attribute
         // to be able to verify if the download is complete and return a different error case
         // for the situation when somehow the update is truncated
-        NSNumber* num = [dict objectForKey:@"sparkle:size"];
-        if ( num )
-            fileSize = [num integerValue];
-        else
-            fileSize = 0;
+        fileSize = [(NSNumber *)[dict objectForKey:@"sparkle:size"] unsignedIntegerValue];
         
         // Optional sparkle:mandatory attribute
         // hides the option to cancel the update
-        NSNumber* mandatory = [dict objectForKey:@"sparkle:mandatory"];
-        if ( mandatory )
-            mandatoryUpdate = [mandatory boolValue];
-        else
-            mandatoryUpdate = false;
+        mandatoryUpdate = [(NSNumber *)[dict objectForKey:@"sparkle:mandatory"] boolValue];
 
         if (dict[@"deltas"])
 		{

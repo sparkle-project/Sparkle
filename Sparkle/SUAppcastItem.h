@@ -15,12 +15,6 @@
 #define SUAPPCASTITEM_H
 
 @interface SUAppcastItem : NSObject
-{
-@private
-   
-    unsigned long   fileSize;
-    bool            mandatoryUpdate;
-}
 @property (copy, readonly) NSString *title;
 @property (copy, readonly) NSDate *date;
 @property (copy, readonly) NSString *itemDescription;
@@ -33,8 +27,8 @@
 @property (copy, readonly) NSString *displayVersionString;
 @property (copy, readonly) NSDictionary *deltaUpdates;
 @property (strong, readonly) NSURL *infoURL;
-@property (readonly) unsigned long fileSize;
-@property (readonly) bool mandatoryUpdate;
+@property (readonly) NSUInteger fileSize;
+@property (readonly) BOOL mandatoryUpdate;
 
 // Initializes with data from a dictionary provided by the RSS class.
 - (instancetype)initWithDictionary:(NSDictionary *)dict;
@@ -47,9 +41,6 @@
 @property (readonly, copy) NSDictionary *propertiesDictionary;
 
 - (NSURL *)infoURL;						// UK 2007-08-31
-
-- (unsigned long) getFileSize;
-- (void) setFileSize:(unsigned long) sz;
 
 @end
 

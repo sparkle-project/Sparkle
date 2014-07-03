@@ -17,12 +17,18 @@
 @property (strong) SUAppcastItem *updateItem;
 @property (weak) id<SUAutomaticUpdateAlertDelegate> delegate;
 @property (strong) SUHost *host;
+
+@property (weak) IBOutlet NSButton* cancelUpdate;
+@property (weak) IBOutlet NSButton* automaticUpdatesCheck;
 @end
 
 @implementation SUAutomaticUpdateAlert
 @synthesize delegate;
 @synthesize host;
 @synthesize updateItem;
+
+@synthesize cancelUpdate;
+@synthesize automaticUpdatesCheck;
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost delegate:(id<SUAutomaticUpdateAlertDelegate>)del
 {
@@ -33,10 +39,10 @@
 		self.delegate = del;
 		self.host = aHost;
         
-        if ( updateItem.mandatoryUpdate )
+        if (self.updateItem.mandatoryUpdate)
         {
-            [automaticUpdatesCheck setHidden:TRUE];
-            [cancelUpdate setHidden:TRUE];
+            [self.automaticUpdatesCheck setHidden:YES];
+            [self.cancelUpdate setHidden:YES];
         }
         
 		[self setShouldCascadeWindows:NO];

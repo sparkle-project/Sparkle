@@ -50,6 +50,14 @@
 @property (copy) NSString *tempDir;
 @property (copy) NSString *relaunchPath;
 
+@property (strong) NSURLConnection *urlConnection;
+@property (strong) NSMutableData *downloadedData;
+@property (copy) NSString *resumeDataFile;
+@property (strong) NSTimer *downloadTimer;
+@property (assign) NSUInteger downloadRetryCounter;
+@property (assign) NSUInteger downloadRetryInterval;
+@property (assign) NSUInteger downloadMaxRetries;
+
 @end
 
 @implementation SUBasicUpdateDriver
@@ -62,15 +70,23 @@
 @synthesize tempDir;
 @synthesize relaunchPath;
 
-- initWithUpdater:(SUUpdater *)anUpdater
+@synthesize urlConnection;
+@synthesize downloadedData;
+@synthesize resumeDataFile;
+@synthesize downloadTimer;
+@synthesize downloadRetryCounter;
+@synthesize downloadRetryInterval;
+@synthesize downloadMaxRetries;
+
+- (instancetype)initWithUpdater:(SUUpdater *)anUpdater
 {
 	if ((self = [super initWithUpdater: anUpdater])) {
-        downloadedData = nil;
-        resumeDataFile = nil;
-        downloadRetryCounter = 0;
-        downloadTimer = nil;
-        downloadMaxRetries = 3;
-        downloadRetryInterval = 60; // 1minute default
+        self.downloadedData = nil;
+        self.resumeDataFile = nil;
+        self.downloadRetryCounter = 0;
+        self.downloadTimer = nil;
+        self.downloadMaxRetries = 3;
+        self.downloadRetryInterval = 60; // 1minute default
     }
 	return self;
 }
@@ -214,29 +230,27 @@
 
 - (void)downloadUpdate
 {
-	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[updateItem fileURL]];
-	[request setValue:[updater userAgentString] forHTTPHeaderField:@"User-Agent"];
+	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:self.updateItem.fileURL];
+	[request setValue:self.updater.userAgentString forHTTPHeaderField:@"User-Agent"];
 
     SULog(@"=====>Sparkle: Submitting a request for an Update");
-    for (NSString* hdr in [[request allHTTPHeaderFields] allKeys])
+    for (NSString *hdr in request.allHTTPHeaderFields.allKeys)
     {
-        SULog(@"%@ - %@", hdr, [[request allHTTPHeaderFields] valueForKey:hdr]);
+        SULog(@"%@ - %@", hdr, [request.allHTTPHeaderFields valueForKey:hdr]);
     }
 
     // ----------------------------------------------------------------
     // Yahoo - setting download file size
-    if ( tempDir != nil )
-        [tempDir release];
 
     NSString* dirNamePrefix = @"Sparkle";
 	//NSString *downloadFileName = [NSString stringWithFormat:@"%@ %@", [host name], [updateItem versionString]];
-	NSString *downloadFileName = [NSString stringWithFormat:@"%@ %@", dirNamePrefix, [updateItem versionString]];
-	tempDir = [[[host appSupportPath] stringByAppendingPathComponent:downloadFileName] retain];
+	NSString *downloadFileName = [NSString stringWithFormat:@"%@ %@", dirNamePrefix, self.updateItem.versionString];
+	self.tempDir = [self.host.appSupportPath stringByAppendingPathComponent:downloadFileName];
 
     // delete old files
     NSError* error = nil;
-    NSArray* appSupportContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[host appSupportPath] error:&error];
-    if ( ! error && appSupportContents != nil )
+    NSArray* appSupportContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:self.host.appSupportPath error:&error];
+    if (!error && appSupportContents)
     {
         for ( NSString* itemName in appSupportContents )
         {
@@ -245,7 +259,7 @@
             {
                 SULog(@"Removing old sparkle directory of %@", itemName);
                 error = nil;
-                [[NSFileManager defaultManager] removeItemAtPath:[[host appSupportPath] stringByAppendingPathComponent:itemName] error:&error];
+                [[NSFileManager defaultManager] removeItemAtPath:[self.host.appSupportPath stringByAppendingPathComponent:itemName] error:&error];
                 if ( error )
                 {
                     SULog(@"Error deleting %@ - %@", itemName, [error description]);
@@ -255,49 +269,44 @@
     }
 
     error = nil;
-    BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir withIntermediateDirectories:YES attributes:nil error:&error];
+    BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:self.tempDir withIntermediateDirectories:YES attributes:nil error:&error];
     if ( !success || error )
     {
         SULog(@"Error creating directory: %@", [error description]);
-		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Can't make a temporary directory for the update download at %@.",tempDir] forKey:NSLocalizedDescriptionKey]]];
+		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Can't make a temporary directory for the update download at %@.",self.tempDir] forKey:NSLocalizedDescriptionKey]]];
         return;
     }
-    SULog(@"Temporary download dir is %@", tempDir);
+    SULog(@"Temporary download dir is %@", self.tempDir);
 
-    if ( resumeDataFile != nil )
-    {
-        [resumeDataFile release];
-        resumeDataFile = nil;
-    }
-	resumeDataFile = [[tempDir stringByAppendingPathComponent:@"resume.dat"] retain];
-    SULog(@"Resume data file (if needed) will be %@", resumeDataFile);
+	self.resumeDataFile = [self.tempDir stringByAppendingPathComponent:@"resume.dat"];
+    SULog(@"Resume data file (if needed) will be %@", self.resumeDataFile);
 
     // TODO clear up old versions?
     //
 
     // Initialize downloaded data
-    if ( downloadedData == nil )
+    if (!self.downloadedData)
     {
-        downloadedData = [[NSMutableData dataWithCapacity: [updateItem getFileSize] ] retain];
+        self.downloadedData = [NSMutableData dataWithCapacity:self.updateItem.fileSize];
     }
 
-    if ( [[NSFileManager defaultManager] fileExistsAtPath: resumeDataFile] )
+    if ([[NSFileManager defaultManager] fileExistsAtPath:self.resumeDataFile])
     {
-        NSData* savedData = [[NSData dataWithContentsOfFile:resumeDataFile] retain];
-        [[NSFileManager defaultManager] removeItemAtPath:resumeDataFile error:&error];
-        [downloadedData appendData:savedData];
-        SULog(@"Loaded %lu bytes from a previous download", [downloadedData length]);
+        NSData* savedData = [NSData dataWithContentsOfFile:self.resumeDataFile];
+        [[NSFileManager defaultManager] removeItemAtPath:self.resumeDataFile error:&error];
+        [self.downloadedData appendData:savedData];
+        SULog(@"Loaded %lu bytes from a previous download", self.downloadedData.length);
     }
 
     // try resuming download
-    if ( [downloadedData length] > 0 )
+    if (self.downloadedData.length > 0)
     {
         NSString *range = @"bytes=";
-        range = [[range stringByAppendingString:[[NSNumber numberWithLongLong: [downloadedData length]] stringValue]] stringByAppendingString:@"-"];
+        range = [[range stringByAppendingString:[@(self.downloadedData.length) stringValue]] stringByAppendingString:@"-"];
         [request setValue:range forHTTPHeaderField:@"Range"];
     }
 
-    urlConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    self.urlConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(saveResumableData:)
@@ -307,35 +316,28 @@
     SULog(@"Download started");
 }
 
-- (void) downloadUpdateTimer:(NSTimer*) timer
+- (void)downloadUpdateTimer:(NSTimer *)__unused timer
 {
-    NSLog(@"Timer to start download was fired - number of retries %lu of maximum of %lu", (unsigned long)downloadRetryCounter, (unsigned long)downloadMaxRetries);
-    [downloadTimer invalidate];
-    [downloadTimer release];
-    downloadTimer = nil;
-    if ( downloadedData != nil )
-    {
-        [downloadedData release];
-        downloadedData = nil;
-    }
-    if ( urlConnection != nil )
-    {
-        [urlConnection release];
-        urlConnection = nil;
-    }
+    NSLog(@"Timer to start download was fired - number of retries %lu of maximum of %lu", (unsigned long)self.downloadRetryCounter, (unsigned long)self.downloadMaxRetries);
+    [self.downloadTimer invalidate];
+    self.downloadTimer = nil;
+    self.downloadedData = nil;
+
+    self.urlConnection = nil;
+
     [self downloadUpdate];
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
+- (void)connection:(NSURLConnection *)__unused connection didReceiveResponse:(NSURLResponse *)response
 
 {
     // This method is called when the server has determined that it
     // has enough information to create the NSURLResponse object.
-    SULog(@"Received response for download, content is %lu", [response expectedContentLength]);
+    SULog(@"Received response for download, content is %lld", response.expectedContentLength);
 
 
-	downloadPath = [[tempDir stringByAppendingPathComponent:[response suggestedFilename]] retain];
-    SULog(@"Downloaded file name is %@", downloadPath);
+	self.downloadPath = [self.tempDir stringByAppendingPathComponent:[response suggestedFilename]];
+    SULog(@"Downloaded file name is %@", self.downloadPath);
 
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*) response;
     for (NSString* hdr in [[httpResponse allHeaderFields] allKeys])
@@ -343,31 +345,30 @@
         SULog(@"%@ - %@", hdr, [[httpResponse allHeaderFields] valueForKey:hdr]);
     }
 
-	if ([[updater delegate] respondsToSelector:@selector(updateStarted:estimatedSize:)])
-		[[updater delegate] updateStarted:updater estimatedSize:  [updateItem getFileSize] ];
-
+	if ([[self.updater delegate] respondsToSelector:@selector(updateStarted:estimatedSize:)])
+		[[self.updater delegate] updateStarted:self.updater estimatedSize:self.updateItem.fileSize];
 }
 
 
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+- (void)connection:(NSURLConnection *)__unused connection didReceiveData:(NSData *)data
 
 {
     // Append the new data to receivedData.
-    [downloadedData appendData:data];
+    [self.downloadedData appendData:data];
 
     static int counter = 0;
-    if  (  ++ counter % 200 == 0 )
+    if (++counter % 200 == 0)
     {
-        SULog(@"Downlading -- %ld - total=%ld",[data length], [downloadedData length]);
+        SULog(@"Downlading -- %ld - total=%ld",[data length], [self.downloadedData length]);
 
-        if ([[updater delegate] respondsToSelector:@selector(dataReceived:currLen:)])
-            [[updater delegate] dataReceived:updater currLen:  [downloadedData length]];
+        if ([[self.updater delegate] respondsToSelector:@selector(dataReceived:currLen:)])
+            [[self.updater delegate] dataReceived:self.updater currLen:self.downloadedData.length];
     }
 }
 
 
 
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
+- (void)connection:(NSURLConnection *)__unused connection didFailWithError:(NSError *)error
 
 {
     // Release the connection and the data object
@@ -378,8 +379,7 @@
     // typically be replaced by code to iterate through
     // whatever data structures you are using.
 
-    [urlConnection release];
-    urlConnection = nil;
+    self.urlConnection = nil;
 
     // TODO? should we save the data for resume??
     //
@@ -395,10 +395,10 @@
 
 
 
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection
+- (void)connectionDidFinishLoading:(NSURLConnection *)__unused connection
 {
 
-    SULog(@"Succeeded! Received %d bytes of data",[downloadedData length]);
+    SULog(@"Succeeded! Received %lu bytes of data", (unsigned long)self.downloadedData.length);
 
     // Release the connection and the data object
     // by setting the properties (declared elsewhere)
@@ -408,14 +408,13 @@
     // typically be replaced by code to iterate through
     // whatever data structures you are using.
 
-    [urlConnection release];
-    urlConnection = nil;
+    self.urlConnection = nil;
 
-    if ( [updateItem getFileSize] > 0 )
+    if (self.updateItem.fileSize > 0)
     {
-        SULog(@"Expected file size was %ld - Actual Download size was %ld", [updateItem getFileSize], [downloadedData length]);
+        SULog(@"Expected file size was %ld - Actual Download size was %ld", self.updateItem.fileSize, self.downloadedData.length);
 
-        if ( [updateItem getFileSize] != [downloadedData length] )
+        if (self.updateItem.fileSize != self.downloadedData.length)
         {
             SULog(@"ERROR - downloaded file size different from what was expected");
 
@@ -429,9 +428,8 @@
 
 
     NSError* error = nil;
-    [downloadedData writeToFile:downloadPath options:nil error:&error];
-    [downloadedData release];
-    downloadedData = nil;
+    [self.downloadedData writeToFile:self.downloadPath options:(NSDataWritingOptions)0 error:&error];
+    self.downloadedData = nil;
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
 
     if ( error )
@@ -442,7 +440,7 @@
     else
     {
         // reseting download retries after success
-        downloadRetryCounter = 0;
+        self.downloadRetryCounter = 0;
         [self extractUpdate];
     }
 
@@ -534,7 +532,7 @@
     BOOL inSandbox = (nil != [environ objectForKey:@"APP_SANDBOX_CONTAINER_ID"]);
 	BOOL running10_7 = floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6;
 	BOOL useXPC = running10_7 && inSandbox &&
-    [[NSFileManager defaultManager] fileExistsAtPath: [[host bundlePath] stringByAppendingPathComponent:@"Contents/XPCServices/com.yahoo.Sparkle.SandboxService.xpc"]];
+    [[NSFileManager defaultManager] fileExistsAtPath: [[self.host bundlePath] stringByAppendingPathComponent:@"Contents/XPCServices/com.yahoo.Sparkle.SandboxService.xpc"]];
     SULog(@"installWithToolAndRelaunch - using xpc=%d", useXPC);
 
 
@@ -579,7 +577,7 @@
             copiedRelaunchTool = [SUPlainInstaller copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath temporaryName: nil error: &error];
 
 		if( copiedRelaunchTool )
-			relaunchPath = [targetPath retain];
+			self.relaunchPath = targetPath;
 		else
 			[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil), NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", relaunchPathToCopy, targetPath, (error ? [error localizedDescription] : @"")]}]];
 	}
@@ -600,11 +598,11 @@
 	if ([updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
         pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:self.updater];
 	}
-    NSString *relaunchToolPath = [[relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS"] stringByAppendingPathComponent: finishInstallToolName];
-    NSArray *arguments = @[[host bundlePath],
+    NSString *relaunchToolPath = [[self.relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS"] stringByAppendingPathComponent: finishInstallToolName];
+    NSArray *arguments = @[[self.host bundlePath],
                            pathToRelaunch,
                            [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]],
-                           tempDir,
+                           self.tempDir,
                            relaunch ? @"1" : @"0",
                            showUI ? @"1" : @"0"];
 
@@ -640,13 +638,12 @@
 - (void)abortUpdate
 {
     SULog(@"SUBasicUpdateDriver abort called");
-	[[self retain] autorelease];	// In case the notification center was the last one holding on to us.
 
-    if ( downloadedData != nil && [downloadedData length] > 0 )
+    if (self.downloadedData.length > 0)
         [self saveResumableData:nil];
 
     // don't remove download IF there is resume.dat file in there....
-    if ( ! [[NSFileManager defaultManager] fileExistsAtPath: resumeDataFile] )
+    if (![[NSFileManager defaultManager] fileExistsAtPath:self.resumeDataFile])
     {
         [self cleanUpDownload];
     }
@@ -655,7 +652,7 @@
         [self tryDownloadRetry ];
     }
 
-    if ( downloadTimer == nil )
+    if (!self.downloadTimer)
     {
         [[NSNotificationCenter defaultCenter] removeObserver:self];
         [super abortUpdate];
@@ -665,50 +662,44 @@
 {
     if ( aNotification != nil )
         SULog(@"saveResumableData received notification - %@", [aNotification name]);
-    if ( resumeDataFile == nil ) return;
+    if (!self.resumeDataFile) return;
 
-    SULog(@"application is ending/aborting download: saving resumable data to %@", resumeDataFile);
-    if ( urlConnection != nil )
-        [urlConnection cancel];
+    SULog(@"application is ending/aborting download: saving resumable data to %@", self.resumeDataFile);
+    if (self.urlConnection)
+        [self.urlConnection cancel];
 
-    if ( downloadedData != nil && [downloadedData length] > 0 )
+    if (self.downloadedData.length > 0)
     {
-        NSError* error = nil;
-        if ( resumeDataFile == nil )
-            resumeDataFile = [[tempDir stringByAppendingPathComponent:@"resume.dat"] retain];
-        [downloadedData writeToFile:resumeDataFile options:nil error:&error];
+        NSError *error = nil;
+        if (!self.resumeDataFile)
+            self.resumeDataFile = [self.tempDir stringByAppendingPathComponent:@"resume.dat"];
+        [self.downloadedData writeToFile:self.resumeDataFile options:(NSDataWritingOptions)0 error:&error];
 
         if ( error )
             SULog(@"Errortrying to save resumeData: %@", [error description]);
         else
-            SULog(@"Saved resume data to %@", resumeDataFile);
+            SULog(@"Saved resume data to %@", self.resumeDataFile);
 
-        [downloadedData release];
-        downloadedData = nil;
+        self.downloadedData = nil;
     }
 }
 
 - (void) tryDownloadRetry
 {
-    if ( downloadRetryCounter < downloadMaxRetries )
+    if (self.downloadRetryCounter < self.downloadMaxRetries)
     {
-        downloadRetryCounter ++;
+        self.downloadRetryCounter++;
 
-        SULog(@"Starting download timer - for trying to resume in %d seconds - max tries is %d", downloadRetryInterval, downloadMaxRetries);
-        downloadTimer =  [[NSTimer scheduledTimerWithTimeInterval:downloadRetryInterval target:self selector:@selector(downloadUpdateTimer:) userInfo:nil repeats:NO] retain];
+        SULog(@"Starting download timer - for trying to resume in %lu seconds - max tries is %lu", (unsigned long)self.downloadRetryInterval, (unsigned long)self.downloadMaxRetries);
+        self.downloadTimer = [NSTimer scheduledTimerWithTimeInterval:self.downloadRetryInterval target:self selector:@selector(downloadUpdateTimer:) userInfo:nil repeats:NO];
     }
     else
     {
         // reset retries counter BUT dont not start the timer
         // this allows for the next scheduled update to pick up full retries
-        downloadRetryCounter = 0;
-
-        if ( downloadTimer )
-        {
-            [downloadTimer release];
-            downloadTimer = nil;
-        }
-        SULog(@"Current retries (%d) are more then maximum configured", downloadRetryCounter, downloadMaxRetries);
+        self.downloadRetryCounter = 0;
+        self.downloadTimer = nil;
+        SULog(@"Current retries (%lu) are more then maximum configured (%lu)", (unsigned long)self.downloadRetryCounter, self.downloadMaxRetries);
     }
 }
 
@@ -723,16 +714,15 @@
     }
 
     // allow resumable downloads
-	if (urlConnection)
+	if (self.urlConnection)
     {
-        [urlConnection release];
-        urlConnection = nil;
+        self.urlConnection = nil;
 
         [self tryDownloadRetry];
 
-        if ( tempDir != nil )
+        if (self.tempDir)
         {
-            [self saveResumableData: nil];
+            [self saveResumableData:nil];
         }
     }
     else
