@@ -56,7 +56,7 @@
     if ([host isBackgroundApplication]) {
         [[self window] setLevel:NSFloatingWindowLevel];
     }
-    
+
 	[[self window] center];
 	[[self window] setFrameAutosaveName:@"SUStatusFrame"];
 	[progressBar setUsesThreadedAnimation:YES];
@@ -75,7 +75,7 @@
 - (void)beginActionWithTitle:(NSString *)aTitle maxProgressValue:(double)aMaxProgressValue statusText:(NSString *)aStatusText
 {
 	self.title = aTitle;
-	
+
 	self.maxProgressValue = aMaxProgressValue;
 	self.statusText = aStatusText;
 }
@@ -83,20 +83,20 @@
 - (void)setButtonTitle:(NSString *)aButtonTitle target:(id)target action:(SEL)action isDefault:(BOOL)isDefault
 {
 	self.buttonTitle = aButtonTitle;
-	
+
 	[self window];
 	[actionButton sizeToFit];
 	// Except we're going to add 15 px for padding.
 	[actionButton setFrameSize:NSMakeSize([actionButton frame].size.width + 15, [actionButton frame].size.height)];
 	// Now we have to move it over so that it's always 15px from the side of the window.
-	[actionButton setFrameOrigin:NSMakePoint([[self window] frame].size.width - 15 - [actionButton frame].size.width, [actionButton frame].origin.y)];	
+	[actionButton setFrameOrigin:NSMakePoint([[self window] frame].size.width - 15 - [actionButton frame].size.width, [actionButton frame].origin.y)];
 	// Redisplay superview to clean up artifacts
 	[[actionButton superview] display];
-	
+
 	[actionButton setTarget:target];
 	[actionButton setAction:action];
 	[actionButton setKeyEquivalent:isDefault ? @"\r" : @""];
-	
+
 	// 06/05/2008 Alex: Avoid a crash when cancelling during the extraction
 	[self setButtonEnabled: (target != nil)];
 }

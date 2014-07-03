@@ -1,4 +1,3 @@
-
 #import <AppKit/AppKit.h>
 #import "SUInstaller.h"
 #import "SUHost.h"
@@ -9,9 +8,16 @@
 
 #include <unistd.h>
 
-#define	LONG_INSTALLATION_TIME			5				// If the Installation takes longer than this time the Application Icon is shown in the Dock so that the user has some feedback.
-#define	CHECK_FOR_PARENT_TO_QUIT_TIME	.5				// Time this app uses to recheck if the parent has already died.
-										
+/*!
+ * If the Installation takes longer than this time the Application Icon is shown in the Dock so that the user has some feedback.
+ */
+static const NSTimeInterval SUInstallationTimeLimit = 5;
+
+/*!
+ * Time this app uses to recheck if the parent has already died.
+ */
+static const NSTimeInterval SUParentQuitCheckInterval = .5;
+
 @interface TerminationListener : NSObject <SUInstallerDelegate>
 {
 	const char		*hostpath;
@@ -44,7 +50,7 @@
 	if (!(self = [super init])) {
 		return nil;
 	}
-	
+
 	hostpath		= inhostpath;
 	executablepath	= execpath;
 	parentprocessid	= ppid;
@@ -52,13 +58,13 @@
 	selfPath		= [inSelfPath retain];
     shouldRelaunch  = relaunch;
 	shouldShowUI	= showUI;
-	
+
 	BOOL	alreadyTerminated = (getppid() == 1); // ppid is launchd (1) => parent terminated already
-	
+
 	if( alreadyTerminated )
 		[self parentHasQuit];
 	else
-		watchdogTimer = [[NSTimer scheduledTimerWithTimeInterval:CHECK_FOR_PARENT_TO_QUIT_TIME target:self selector:@selector(watchdog:) userInfo:nil repeats:YES] retain];
+		watchdogTimer = [[NSTimer scheduledTimerWithTimeInterval:SUParentQuitCheckInterval target:self selector:@selector(watchdog:) userInfo:nil repeats:YES] retain];
 
 	return self;
 }
@@ -72,7 +78,7 @@
 
 	[selfPath release];
 	selfPath = nil;
-    
+
     [installationPath release];
 
 	[watchdogTimer release];
@@ -80,7 +86,7 @@
 
 	[host release];
 	host = nil;
-	
+
 	[super dealloc];
 }
 
@@ -88,7 +94,7 @@
 -(void)	parentHasQuit
 {
 	[watchdogTimer invalidate];
-	longInstallationTimer = [[NSTimer scheduledTimerWithTimeInterval: LONG_INSTALLATION_TIME
+	longInstallationTimer = [[NSTimer scheduledTimerWithTimeInterval:SUInstallationTimeLimit
 								target: self selector: @selector(showAppIconInDock:)
 								userInfo:nil repeats:NO] retain];
 
@@ -141,7 +147,7 @@
 	NSBundle			*theBundle = [NSBundle bundleWithPath: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: hostpath length:strlen(hostpath)]];
 	host = [[SUHost alloc] initWithBundle: theBundle];
     installationPath = [[host installationPath] copy];
-	
+
     if (shouldShowUI) {
         SUStatusController*	statusCtl = [[SUStatusController alloc] initWithHost: host];	// We quit anyway after we've installed, so leak this for now.
         [statusCtl setButtonTitle: SULocalizedString(@"Cancel Update",@"") target: nil action: Nil isDefault: NO];
@@ -150,7 +156,7 @@
         [statusCtl showWindow: self];
 		[statusCtl release];
     }
-	
+
 	[SUInstaller installFromUpdateFolder: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: folderpath length: strlen(folderpath)]
 					overHost: host
             installationPath: installationPath
@@ -177,11 +183,11 @@ int main (int argc, const char * argv[])
 	if (argc < 5 || argc > 7) {
 		return EXIT_FAILURE;
 	}
-	
+
 	@autoreleasepool {
 		//ProcessSerialNumber		psn = { 0, kCurrentProcess };
 		//TransformProcessType( &psn, kProcessTransformToForegroundApplication );
-		
+
 #if 0	// Cmdline tool
 		NSString*	selfPath = nil;
 		if (argv[0][0] == '/') {
@@ -195,13 +201,13 @@ int main (int argc, const char * argv[])
 #else
 		NSString*	selfPath = [[NSBundle mainBundle] bundlePath];
 #endif
-		
+
 		BOOL shouldShowUI = (argc > 6) ? !!atoi(argv[6]) : YES;
 		if (shouldShowUI)
 		{
 			[[NSApplication sharedApplication] activateIgnoringOtherApps: YES];
 		}
-		
+
 		[NSApplication sharedApplication];
 		[[[TerminationListener alloc] initWithHostPath: (argc > 1) ? argv[1] : NULL
 										executablePath: (argc > 2) ? argv[2] : NULL
@@ -211,8 +217,8 @@ int main (int argc, const char * argv[])
 										  shouldShowUI: shouldShowUI
 											  selfPath: selfPath] autorelease];
 		[[NSApplication sharedApplication] run];
-		
+
 	}
-	
+
 	return EXIT_SUCCESS;
 }

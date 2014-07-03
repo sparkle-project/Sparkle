@@ -16,7 +16,7 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <xar/xar.h>
-    
+
 int binaryDeltaSupported(void)
 {
     // OS X 10.4 didn't include libxar, so we link against it weakly.
@@ -47,8 +47,10 @@ NSString *temporaryFilename(NSString *base)
 {
     NSString *template = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.XXXXXXXXXX", base]];
     const char *fsrepr = [template fileSystemRepresentation];
-    char *buffer = (char *)malloc(strlen(fsrepr) + 1);
-    strcpy(buffer, fsrepr);
+
+    const size_t buffer_len = strlen(fsrepr) + 1;
+    char *buffer = (char *)malloc(buffer_len);
+    strlcpy(buffer, fsrepr, buffer_len);
 
     // mkstemp() can't be used, beause it returns a file descriptor, and XAR API requires a filename
     NSString *ret = stringWithFileSystemRepresentation(mktemp(buffer));
@@ -92,7 +94,7 @@ static void _hashOfFile(unsigned char* hash, FTSENT *ent)
             close(fileDescriptor);
             return;
         }
-		
+
         void *buffer = mmap(0, (size_t)fileSize, PROT_READ, MAP_FILE | MAP_PRIVATE, fileDescriptor, 0);
         if (buffer == (void*)-1) {
             close(fileDescriptor);

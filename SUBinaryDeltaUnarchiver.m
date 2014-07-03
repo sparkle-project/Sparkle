@@ -25,7 +25,7 @@
 	@autoreleasepool {
 		NSString *sourcePath = [[updateHost bundle] bundlePath];
 		NSString *targetPath = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
-		
+
 		int result = applyBinaryDelta(sourcePath, targetPath, archivePath);
 		if (!result) {
 			dispatch_async(dispatch_get_main_queue(), ^{

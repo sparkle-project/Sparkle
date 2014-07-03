@@ -25,21 +25,21 @@ static NSString * const SUInstallerInstallationPathKey = @"SUInstallerInstallati
 + (void)finishInstallationWithInfo:(NSDictionary *)info
 {
 	// *** GETS CALLED ON NON-MAIN THREAD!
-	
+
 	[self finishInstallationToPath:info[SUInstallerInstallationPathKey] withResult:[info[SUInstallerResultKey] boolValue] host:info[SUInstallerHostKey] error:info[SUInstallerErrorKey] delegate:info[SUInstallerDelegateKey]];
 }
 
 + (void)performInstallationWithInfo:(NSDictionary *)info
 {
 	// *** GETS CALLED ON NON-MAIN THREAD!
-	
+
 	@autoreleasepool {
 		NSError *error = nil;
-		
+
 		NSString	*	oldPath = [info[SUInstallerHostKey] bundlePath];
 		NSString	*	installationPath = info[SUInstallerInstallationPathKey];
 		BOOL result = [self copyPathWithAuthentication:info[SUInstallerPathKey] overPath: installationPath temporaryName:info[SUInstallerTempNameKey] error:&error];
-		
+
 		if( result )
 		{
 			BOOL	haveOld = [[NSFileManager defaultManager] fileExistsAtPath: oldPath];
@@ -70,7 +70,7 @@ static NSString * const SUInstallerInstallationPathKey = @"SUInstallerInstallati
 		return;
 	}
 	#endif
-    
+
     NSString *targetPath = [host installationPath];
     NSString *tempName = [self temporaryNameForPath:targetPath];
 	NSDictionary *info = @{SUInstallerPathKey: path, SUInstallerTargetPathKey: targetPath, SUInstallerTempNameKey: tempName, SUInstallerHostKey: host, SUInstallerDelegateKey: delegate, SUInstallerInstallationPathKey: installationPath};

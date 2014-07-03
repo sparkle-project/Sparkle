@@ -45,7 +45,7 @@
 	// to the user's attention. Otherwise the prompt would be hidden behind other applications and
 	// the user would not know why the application was paused.
 	if ([aHost isBackgroundApplication]) { [[NSApplication sharedApplication] activateIgnoringOtherApps:YES]; }
-	
+
 	SUUpdatePermissionPrompt *prompt = [[[[self class] alloc] initWithHost:aHost systemProfile:profile delegate:d] autorelease];
 	[NSApp runModalForWindow:[prompt window]];
 }
@@ -87,15 +87,15 @@
 - (IBAction)toggleMoreInfo:(id) __unused sender
 {
 	self.isShowingMoreInfo = !_isShowingMoreInfo;
-	
+
 	NSView *contentView = [[self window] contentView];
 	NSRect contentViewFrame = [contentView frame];
 	NSRect windowFrame = [[self window] frame];
-	
+
 	NSRect profileMoreInfoViewFrame = [moreInfoView frame];
 	NSRect profileMoreInfoButtonFrame = [moreInfoButton frame];
 	NSRect descriptionFrame = [descriptionTextField frame];
-	
+
 	if (_isShowingMoreInfo)
 	{
 		// Add the subview
@@ -103,10 +103,10 @@
 		profileMoreInfoViewFrame.origin.y = profileMoreInfoButtonFrame.origin.y - profileMoreInfoViewFrame.size.height;
 		profileMoreInfoViewFrame.origin.x = descriptionFrame.origin.x;
 		profileMoreInfoViewFrame.size.width = descriptionFrame.size.width;
-		
+
 		windowFrame.size.height += profileMoreInfoViewFrame.size.height;
 		windowFrame.origin.y -= profileMoreInfoViewFrame.size.height;
-		
+
 		[moreInfoView setFrame:profileMoreInfoViewFrame];
 		[moreInfoView setHidden:YES];
 		[contentView addSubview:moreInfoView
@@ -117,7 +117,7 @@
 		[moreInfoView setHidden:NO];
 		[moreInfoView removeFromSuperview];
 		contentViewFrame.size.height -= profileMoreInfoViewFrame.size.height;
-		
+
 		windowFrame.size.height -= profileMoreInfoViewFrame.size.height;
 		windowFrame.origin.y += profileMoreInfoViewFrame.size.height;
 	}

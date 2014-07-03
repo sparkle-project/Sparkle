@@ -22,11 +22,11 @@
 @interface SUBasicUpdateDriver : SUUpdateDriver<NSURLDownloadDelegate, SUUnarchiverDelegate, SUAppcastDelegate> {
 	SUAppcastItem *updateItem;
 	SUAppcastItem *nonDeltaUpdateItem;
-	
+
 	NSURLDownload *download;
 	NSString *downloadPath;
 	NSString *tempDir;
-	
+
 	NSString *relaunchPath;
     
     NSURLConnection*    urlConnection;
