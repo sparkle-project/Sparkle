@@ -33,6 +33,8 @@ extern int bsdiff(int argc, const char **argv);
 @end
 
 @implementation CreateBinaryDeltaOperation
+@synthesize relativePath = _relativePath;
+@synthesize resultPath = _resultPath;
 @synthesize _fromPath = _fromPath;
 @synthesize _toPath = _toPath;
 
@@ -72,7 +74,7 @@ static NSDictionary *infoForFile(FTSENT *ent)
     NSData *hash = hashOfFile(ent);
     NSNumber *size = nil;
 	if (ent->fts_info != FTS_D) {
-        size = [NSNumber numberWithUnsignedLongLong:ent->fts_statp->st_size];
+        size = [NSNumber numberWithLongLong:ent->fts_statp->st_size];
 	}
     return [NSDictionary dictionaryWithObjectsAndKeys:hash, @"hash", [NSNumber numberWithUnsignedShort:ent->fts_info], @"type", size, @"size", nil];
 }
@@ -91,7 +93,7 @@ static NSString *temporaryPatchFile(NSString *patchFile)
     return [NSString stringWithFormat:@"%@/.%@.tmp", directory, file];
 }
 
-static BOOL shouldSkipDeltaCompression(NSString *key, NSDictionary* originalInfo, NSDictionary *newInfo)
+static BOOL shouldSkipDeltaCompression(NSString * __unused key, NSDictionary* originalInfo, NSDictionary *newInfo)
 {
     unsigned long long fileSize = [[newInfo objectForKey:@"size"] unsignedLongLongValue];
 	if (fileSize < 4096) {
@@ -109,7 +111,7 @@ static BOOL shouldSkipDeltaCompression(NSString *key, NSDictionary* originalInfo
     return NO;
 }
 
-static BOOL shouldDeleteThenExtract(NSString *key, NSDictionary* originalInfo, NSDictionary *newInfo)
+static BOOL shouldDeleteThenExtract(NSString * __unused key, NSDictionary* originalInfo, NSDictionary *newInfo)
 {
 	if (!originalInfo) {
         return NO;

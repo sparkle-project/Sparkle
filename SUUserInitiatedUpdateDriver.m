@@ -23,7 +23,7 @@
 	}
 }
 
-- (void)cancelCheckForUpdates:sender
+- (void)cancelCheckForUpdates:(id) __unused sender
 {
 	[self closeCheckingWindow];
 	isCanceled = YES;

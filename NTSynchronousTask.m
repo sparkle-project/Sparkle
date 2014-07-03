@@ -37,12 +37,12 @@
 	self.done = YES;
 }
 
-- (void)taskDidTerminate:(NSNotification*)note
+- (void)taskDidTerminate:(NSNotification *) __unused note
 {
     self.result = [self.task terminationStatus];
 }
 
-- (instancetype)init;
+- (instancetype)init
 {
     self = [super init];
 	if (self)
@@ -102,7 +102,7 @@
 		[self.task launch];
 		success = YES;
 	}
-	@catch (NSException *localException) { }
+	@catch (NSException *) { }
 	
 	if (success)
 	{
@@ -146,7 +146,7 @@
 			
 			[task release];
 		}
-		@catch (NSException *localException) { }
+		@catch (NSException *) { }
 		
 	}
 	
@@ -175,7 +175,7 @@
 			}
 			
 			[task release];
-		} @catch (NSException *localException) {
+		} @catch (NSException *) {
 			taskResult = errCppGeneral;
 		}
 		

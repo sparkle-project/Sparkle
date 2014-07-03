@@ -73,7 +73,7 @@ finally:
     const SecCSFlags flags = kSecCSSigningInformation | kSecCSRequirementInformation | kSecCSDynamicInformation | kSecCSContentInformation;
     if (SecCodeCopySigningInformation(code, flags, &signingInfo) == noErr) {
         NSDictionary* signingDict = (NSDictionary*)signingInfo;
-        NSMutableDictionary* relevantInfo = [NSMutableDictionary new];
+        NSMutableDictionary* relevantInfo = [NSMutableDictionary dictionary];
         for (NSString* key in @[@"format", @"identifier", @"requirements", @"teamid", @"signing-time"]) {
             relevantInfo[key] = signingDict[key];
         }

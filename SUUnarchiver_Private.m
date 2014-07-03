@@ -7,6 +7,7 @@
 //
 
 #import "SUUnarchiver_Private.h"
+#import "SUHost.h"
 
 @implementation SUUnarchiver (Private)
 
@@ -27,7 +28,7 @@
 	[super dealloc];
 }
 
-+ (BOOL)canUnarchivePath:(NSString *)path
++ (BOOL)canUnarchivePath:(NSString *) __unused path
 {
 	return NO;
 }

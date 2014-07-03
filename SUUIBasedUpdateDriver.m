@@ -58,13 +58,13 @@
 	[self abortUpdate];
 }
 
-- (void)applicationDidBecomeActive:(NSNotification *)aNotification
+- (void)applicationDidBecomeActive:(NSNotification *) __unused aNotification
 {
 	[[updateAlert window] makeKeyAndOrderFront:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
 }
 
-- (void)updateAlert:(SUUpdateAlert *)alert finishedWithChoice:(SUUpdateAlertChoice)choice
+- (void)updateAlert:(SUUpdateAlert *) __unused alert finishedWithChoice:(SUUpdateAlertChoice)choice
 {
 	[updateAlert release]; updateAlert = nil;
 	[host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
@@ -94,7 +94,7 @@
 	}			
 }
 
-- (void)download:(NSURLDownload *)download didReceiveResponse:(NSURLResponse *)response
+- (void)download:(NSURLDownload *) __unused download didReceiveResponse:(NSURLResponse *)response
 {
 	[statusController setMaxProgressValue:[response expectedContentLength]];
 }
@@ -116,7 +116,7 @@
 	return [NSString stringWithFormat:@"%.2lf %@", value / 1000.0 / 1000.0 / 1000.0, SULocalizedString(@"GB", @"the unit for gigabytes")];	
 }
 
-- (void)download:(NSURLDownload *)download didReceiveDataOfLength:(NSUInteger)length
+- (void)download:(NSURLDownload *) __unused download didReceiveDataOfLength:(NSUInteger)length
 {
 	[statusController setProgressValue:[statusController progressValue] + (double)length];
 	if ([statusController maxProgressValue] > 0.0)
@@ -125,7 +125,7 @@
 		[statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self humanReadableSizeFromDouble:[statusController progressValue]]]];
 }
 
-- (IBAction)cancelDownload: (id)sender
+- (IBAction)cancelDownload:(id) __unused sender
 {
 	if (download)
 		[download cancel];
@@ -140,7 +140,7 @@
 	[super extractUpdate];
 }
 
-- (void)unarchiver:(SUUnarchiver *)ua extractedLength:(unsigned long)length
+- (void)unarchiver:(SUUnarchiver *) __unused ua extractedLength:(unsigned long)length
 {
 	// We do this here instead of in extractUpdate so that we only have a determinate progress bar for archives with progress.
 	if ([statusController maxProgressValue] == 0.0)
@@ -152,7 +152,7 @@
 	[statusController setProgressValue:[statusController progressValue] + (double)length];
 }
 
-- (void)unarchiverDidFinish:(SUUnarchiver *)ua
+- (void)unarchiverDidFinish:(SUUnarchiver *) __unused ua
 {
 	[statusController beginActionWithTitle:SULocalizedString(@"Ready to Install", nil) maxProgressValue:1.0 statusText:nil];
 	[statusController setProgressValue:1.0]; // Fill the bar.
@@ -162,7 +162,7 @@
 	[NSApp requestUserAttention:NSInformationalRequest];	
 }
 
-- (void)installAndRestart: (id)sender
+- (void)installAndRestart:(id) __unused sender
 {
     [self installWithToolAndRelaunch:YES];
 }

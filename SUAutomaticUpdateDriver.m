@@ -38,7 +38,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];	
 }
 
-- (void)unarchiverDidFinish:(SUUnarchiver *)ua
+- (void)unarchiverDidFinish:(SUUnarchiver *) __unused ua
 {
     SULog(@"unarchiverDidFinish for Automatic Update Driver");
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
@@ -118,13 +118,13 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     [super abortUpdate];
 }
 
-- (void)applicationDidBecomeActive:(NSNotification *)aNotification
+- (void)applicationDidBecomeActive:(NSNotification *) __unused aNotification
 {
 	[[alert window] makeKeyAndOrderFront:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
 }
 
-- (void)automaticUpdateAlert:(SUAutomaticUpdateAlert *)aua finishedWithChoice:(SUAutomaticInstallationChoice)choice;
+- (void)automaticUpdateAlert:(SUAutomaticUpdateAlert *) __unused aua finishedWithChoice:(SUAutomaticInstallationChoice)choice
 {
 	switch (choice)
 	{
@@ -159,7 +159,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     [super installWithToolAndRelaunch:relaunch displayingUserInterface:showUI];
 }
 
-- (void)applicationWillTerminate:(NSNotification *)note
+- (void)applicationWillTerminate:(NSNotification *) __unused note
 {
 	[self installWithToolAndRelaunch:NO];
 }

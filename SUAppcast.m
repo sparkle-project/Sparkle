@@ -67,7 +67,7 @@
     self.download = [[[NSURLDownload alloc] initWithRequest:request delegate:self] autorelease];
 }
 
-- (void)download:(NSURLDownload *)aDownload decideDestinationWithSuggestedFilename:(NSString *)filename
+- (void)download:(NSURLDownload *) __unused aDownload decideDestinationWithSuggestedFilename:(NSString *)filename
 {
 	NSString* destinationFilename = NSTemporaryDirectory();
 	if (destinationFilename)
@@ -77,12 +77,12 @@
 	}
 }
 
-- (void)download:(NSURLDownload *)aDownload didCreateDestination:(NSString *)path
+- (void)download:(NSURLDownload *) __unused aDownload didCreateDestination:(NSString *)path
 {
     self.downloadFilename = path;
 }
 
-- (void)downloadDidFinish:(NSURLDownload *)aDownload
+- (void)downloadDidFinish:(NSURLDownload *) __unused aDownload
 {    
 	NSError *error = nil;
 	
@@ -218,7 +218,7 @@
 	}
 }
 
-- (void)download:(NSURLDownload *)aDownload didFailWithError:(NSError *)error
+- (void)download:(NSURLDownload *) __unused aDownload didFailWithError:(NSError *)error
 {
 	if (downloadFilename)
 	{
@@ -229,7 +229,7 @@
 	[self reportError:error];
 }
 
-- (NSURLRequest *)download:(NSURLDownload *)aDownload willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse
+- (NSURLRequest *)download:(NSURLDownload *) __unused aDownload willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *) __unused redirectResponse
 {
 	return request;
 }

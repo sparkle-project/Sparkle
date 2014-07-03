@@ -28,7 +28,7 @@
 }
 
 // Called on a non-main thread.
-- (void)extractDMGWithPassword:(NSString *)password
+- (void)extractDMGWithPassword:(NSString *) __unused password
 {
 	@autoreleasepool {
 		BOOL mountedSuccessfully = NO;
@@ -72,7 +72,7 @@
 			output = [[[task output] copy] autorelease];
 			[task release];
 		}
-		@catch (NSException *localException)
+		@catch (NSException *)
 		{
 			goto reportError;
 		}
@@ -80,7 +80,7 @@
 		if (taskResult != 0)
 		{
 			NSString*	resultStr = output ? [[[NSString alloc] initWithData: output encoding: NSUTF8StringEncoding] autorelease] : nil;
-			SULog( @"hdiutil failed with code: %d data: <<%@>>", taskResult, resultStr );
+			SULog( @"hdiutil failed with code: %ld data: <<%@>>", (long)taskResult, resultStr );
 			goto reportError;
 		}
 		mountedSuccessfully = YES;

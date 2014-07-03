@@ -98,21 +98,21 @@
 		[self relaunch];
 }
 
-- (void) watchdog:(NSTimer *)aTimer
+- (void)watchdog:(NSTimer *) __unused aTimer
 {
 	if (![NSRunningApplication runningApplicationWithProcessIdentifier:parentprocessid]) {
 		[self parentHasQuit];
 }
 }
 
-- (void)showAppIconInDock:(NSTimer *)aTimer;
+- (void)showAppIconInDock:(NSTimer *) __unused aTimer
 {
 	ProcessSerialNumber		psn = { 0, kCurrentProcess };
 	TransformProcessType( &psn, kProcessTransformToForegroundApplication );
 }
 
 
-- (void) relaunch
+- (void) relaunch __attribute__((noreturn))
 {
     if (shouldRelaunch)
     {
@@ -158,12 +158,12 @@
 					versionComparator: [SUStandardVersionComparator defaultComparator]];
 }
 
-- (void) installerFinishedForHost:(SUHost *)aHost
+- (void)installerFinishedForHost:(SUHost *) __unused aHost
 {
 	[self relaunch];
 }
 
-- (void) installerForHost:(SUHost *)host failedWithError:(NSError *)error
+- (void)installerForHost:(SUHost *) __unused host failedWithError:(NSError *)error __attribute__((noreturn))
 {
     if (shouldShowUI)
         NSRunAlertPanel( @"", @"%@", @"OK", @"", @"", [error localizedDescription] );
@@ -196,7 +196,7 @@ int main (int argc, const char * argv[])
 		NSString*	selfPath = [[NSBundle mainBundle] bundlePath];
 #endif
 		
-		BOOL shouldShowUI = (argc > 6) ? atoi(argv[6]) : 1;
+		BOOL shouldShowUI = (argc > 6) ? !!atoi(argv[6]) : YES;
 		if (shouldShowUI)
 		{
 			[[NSApplication sharedApplication] activateIgnoringOtherApps: YES];
@@ -207,7 +207,7 @@ int main (int argc, const char * argv[])
 										executablePath: (argc > 2) ? argv[2] : NULL
 									   parentProcessId: (argc > 3) ? atoi(argv[3]) : 0
 											folderPath: (argc > 4) ? argv[4] : NULL
-										shouldRelaunch: (argc > 5) ? atoi(argv[5]) : 1
+										shouldRelaunch: (argc > 5) ? !!atoi(argv[5]) : YES
 										  shouldShowUI: shouldShowUI
 											  selfPath: selfPath] autorelease];
 		[[NSApplication sharedApplication] run];

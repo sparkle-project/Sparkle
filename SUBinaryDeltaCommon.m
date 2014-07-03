@@ -47,16 +47,18 @@ NSString *temporaryFilename(NSString *base)
 {
     NSString *template = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.XXXXXXXXXX", base]];
     const char *fsrepr = [template fileSystemRepresentation];
-    char buffer[strlen(fsrepr)+1];
+    char *buffer = (char *)malloc(strlen(fsrepr) + 1);
     strcpy(buffer, fsrepr);
 
     // mkstemp() can't be used, beause it returns a file descriptor, and XAR API requires a filename
-    return stringWithFileSystemRepresentation(mktemp(buffer));
+    NSString *ret = stringWithFileSystemRepresentation(mktemp(buffer));
+    free(buffer);
+    return ret;
 }
 
-static void _hashOfBuffer(unsigned char *hash, const char* buffer, size_t bufferLength)
+static void _hashOfBuffer(unsigned char *hash, const char* buffer, ssize_t bufferLength)
 {
-    assert(bufferLength <= UINT32_MAX);
+    assert(bufferLength >= 0 && bufferLength <= UINT32_MAX);
     CC_SHA1_CTX hashContext;
     CC_SHA1_Init(&hashContext);
     CC_SHA1_Update(&hashContext, buffer, (CC_LONG)bufferLength);
@@ -84,14 +86,14 @@ static void _hashOfFile(unsigned char* hash, FTSENT *ent)
             return;
         }
 
-        size_t fileSize = (size_t)ent->fts_statp->st_size;
+        ssize_t fileSize = ent->fts_statp->st_size;
         if (fileSize == 0) {
             _hashOfBuffer(hash, NULL, 0);
             close(fileDescriptor);
             return;
         }
 		
-        void *buffer = mmap(0, fileSize, PROT_READ, MAP_FILE | MAP_PRIVATE, fileDescriptor, 0);
+        void *buffer = mmap(0, (size_t)fileSize, PROT_READ, MAP_FILE | MAP_PRIVATE, fileDescriptor, 0);
         if (buffer == (void*)-1) {
             close(fileDescriptor);
             perror("mmap");
@@ -99,7 +101,7 @@ static void _hashOfFile(unsigned char* hash, FTSENT *ent)
         }
 
         _hashOfBuffer(hash, buffer, fileSize);
-        munmap(buffer, fileSize);
+        munmap(buffer, (size_t)fileSize);
         close(fileDescriptor);
         return;
     }
