@@ -1,0 +1,6 @@
+INFOPLIST_FILE = sandbox_service/sandbox_service-Info.plist
+PRODUCT_NAME = $(SANDBOX_SERVICE_NAME)
+WRAPPER_EXTENSION = xpc
+MACH_O_TYPE = mh_execute
+SKIP_INSTALL = YES
+GCC_PREFIX_HEADER = sandbox_service/sandbox_service-Prefix.pch
