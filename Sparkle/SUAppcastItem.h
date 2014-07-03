@@ -24,15 +24,15 @@
 @property (copy, readonly) NSString *title;
 @property (copy, readonly) NSDate *date;
 @property (copy, readonly) NSString *itemDescription;
-@property (retain, readonly) NSURL *releaseNotesURL;
+@property (strong, readonly) NSURL *releaseNotesURL;
 @property (copy, readonly) NSString *DSASignature;
 @property (copy, readonly) NSString *minimumSystemVersion;
 @property (copy, readonly) NSString *maximumSystemVersion;
-@property (retain, readonly) NSURL *fileURL;
+@property (strong, readonly) NSURL *fileURL;
 @property (copy, readonly) NSString *versionString;
 @property (copy, readonly) NSString *displayVersionString;
 @property (copy, readonly) NSDictionary *deltaUpdates;
-@property (retain, readonly) NSURL *infoURL;
+@property (strong, readonly) NSURL *infoURL;
 @property (readonly) unsigned long fileSize;
 @property (readonly) bool mandatoryUpdate;
 

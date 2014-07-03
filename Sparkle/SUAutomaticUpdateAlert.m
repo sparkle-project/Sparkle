@@ -14,9 +14,9 @@
 #import "SUHost.h"
 
 @interface SUAutomaticUpdateAlert ()
-@property (retain) SUAppcastItem *updateItem;
-@property (assign) id<SUAutomaticUpdateAlertDelegate> delegate;
-@property (retain) SUHost *host;
+@property (strong) SUAppcastItem *updateItem;
+@property (weak) id<SUAutomaticUpdateAlertDelegate> delegate;
+@property (strong) SUHost *host;
 @end
 
 @implementation SUAutomaticUpdateAlert
@@ -45,59 +45,52 @@
 	return self;
 }
 
-- (void)dealloc
-{
-	self.host = nil;
-	self.updateItem = nil;
-	[super dealloc];
-}
-
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [host bundlePath], [host installationPath]]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self.host bundlePath], [self.host installationPath]]; }
 
 - (IBAction)installNow:(id) __unused sender
 {
 	[self close];
-	[delegate automaticUpdateAlert:self finishedWithChoice:SUInstallNowChoice];
+	[self.delegate automaticUpdateAlert:self finishedWithChoice:SUInstallNowChoice];
 }
 
 - (IBAction)installLater:(id) __unused sender
 {
 	[self close];
-	[delegate automaticUpdateAlert:self finishedWithChoice:SUInstallLaterChoice];
+	[self.delegate automaticUpdateAlert:self finishedWithChoice:SUInstallLaterChoice];
 }
 
 - (IBAction)doNotInstall:(id) __unused sender
 {
 	[self close];
-	[delegate automaticUpdateAlert:self finishedWithChoice:SUDoNotInstallChoice];
+	[self.delegate automaticUpdateAlert:self finishedWithChoice:SUDoNotInstallChoice];
 }
 
 - (NSImage *)applicationIcon
 {
-	return [host icon];
+	return [self.host icon];
 }
 
 - (NSString *)titleText
 {
-    if ([updateItem isCriticalUpdate])
+    if ([self.updateItem isCriticalUpdate])
     {
-        return [NSString stringWithFormat:SULocalizedString(@"An important update to %@ is ready to install", nil), [host name]];
+        return [NSString stringWithFormat:SULocalizedString(@"An important update to %@ is ready to install", nil), [self.host name]];
     }
     else
     {
-        return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is ready to install!", nil), [host name]];
+        return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is ready to install!", nil), [self.host name]];
     }
 }
 
 - (NSString *)descriptionText
 {
-    if ([updateItem isCriticalUpdate])
+    if ([self.updateItem isCriticalUpdate])
     {
-        return [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?", nil), [host name], [updateItem displayVersionString]];
+        return [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?", nil), [self.host name], [self.updateItem displayVersionString]];
     }
     else
     {
-        return [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?", nil), [host name], [updateItem displayVersionString]];
+        return [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?", nil), [self.host name], [self.updateItem displayVersionString]];
     }
 }
 

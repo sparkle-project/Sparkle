@@ -60,7 +60,7 @@ void	SULog( NSString* format, ... )
 {
 	va_list ap;
 	va_start(ap, format);
-	NSString*	theStr = [[[NSString alloc] initWithFormat: format arguments: ap] autorelease];
+	NSString*	theStr = [[NSString alloc] initWithFormat: format arguments: ap];
 	FILE*		logfile = fopen([[LOG_FILE_PATH stringByExpandingTildeInPath] fileSystemRepresentation],"a");
 	if( !logfile )
 		NSLog( @"%@",theStr );

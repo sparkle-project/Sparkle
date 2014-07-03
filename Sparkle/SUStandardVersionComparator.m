@@ -56,7 +56,7 @@ typedef enum {
         // Nothing to do here
         return parts;
     }
-    s = [[[version substringToIndex:1] mutableCopy] autorelease];
+    s = [[version substringToIndex:1] mutableCopy];
     oldType = [self typeOfCharacter:s];
     n = [version length] - 1;
     for (i = 1; i <= n; ++i) {
@@ -64,7 +64,7 @@ typedef enum {
         newType = [self typeOfCharacter:character];
         if (oldType != newType || oldType == kSeparatorType) {
             // We've reached a new segment
-			NSString *aPart = [[[NSString alloc] initWithString:s] autorelease];
+			NSString *aPart = [[NSString alloc] initWithString:s];
             [parts addObject:aPart];
             [s setString:character];
         } else {

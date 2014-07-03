@@ -11,29 +11,27 @@
 #import "SUUpdater.h"
 
 @interface SUUpdaterTest : XCTestCase <SUUpdaterDelegate>
-
+@property (strong) NSOperationQueue *queue;
+@property (strong) SUUpdater *updater;
 @end
 
 @implementation SUUpdaterTest
-{
-    NSOperationQueue *queue;
-    SUUpdater *updater;
-}
+
+@synthesize queue;
+@synthesize updater;
 
 - (void)setUp
 {
     [super setUp];
-    queue = [[NSOperationQueue alloc] init];
-    updater = [[SUUpdater alloc] init];
-    updater.delegate = self;
+    self.queue = [[NSOperationQueue alloc] init];
+    self.updater = [[SUUpdater alloc] init];
+    self.updater.delegate = self;
 }
 
 - (void)tearDown
 {
-    [updater release];
-    updater = nil;
-    [queue release];
-    queue = nil;
+    self.updater = nil;
+    self.queue = nil;
     [super tearDown];
 }
 
@@ -44,36 +42,36 @@
 
 - (void)testFeedURL
 {
-    [updater feedURL]; // this WON'T throw
+    [self.updater feedURL]; // this WON'T throw
 
-    [queue addOperationWithBlock:^{
+    [self.queue addOperationWithBlock:^{
         XCTAssertTrue(![NSThread isMainThread]);
         @try {
-            [updater feedURL];
+            [self.updater feedURL];
             XCTFail(@"feedURL did not throw an exception when called on a secondary thread");
         }
         @catch (NSException *exception) {
             NSLog(@"%@", exception);
         }
     }];
-    [queue waitUntilAllOperationsAreFinished];
+    [self.queue waitUntilAllOperationsAreFinished];
 }
 
-- (void)setTestFeedURL
+- (void)testSetTestFeedURL
 {
-    [updater setFeedURL:[NSURL URLWithString:@""]]; // this WON'T throw
+    [self.updater setFeedURL:[NSURL URLWithString:@""]]; // this WON'T throw
 
-    [queue addOperationWithBlock:^{
+    [self.queue addOperationWithBlock:^{
         XCTAssertTrue(![NSThread isMainThread]);
         @try {
-            [updater setFeedURL:[NSURL URLWithString:@""]];
+            [self.updater setFeedURL:[NSURL URLWithString:@""]];
             XCTFail(@"setFeedURL: did not throw an exception when called on a secondary thread");
         }
         @catch (NSException *exception) {
             NSLog(@"%@", exception);
         }
     }];
-    [queue waitUntilAllOperationsAreFinished];
+    [self.queue waitUntilAllOperationsAreFinished];
 }
 
 @end

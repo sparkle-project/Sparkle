@@ -15,19 +15,23 @@
 
 - (void)didFindValidUpdate
 {
-	if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
-		[[updater delegate] updater:updater didFindValidUpdate:updateItem];
-	NSDictionary *userInfo = (updateItem != nil) ? @{SUUpdaterAppcastItemNotificationKey : updateItem} : nil;
-	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification object:updater userInfo:userInfo];
+    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+
+	if ([updaterDelegate respondsToSelector:@selector(updater:didFindValidUpdate:)])
+        [updaterDelegate updater:self.updater didFindValidUpdate:self.updateItem];
+    NSDictionary *userInfo = (self.updateItem != nil) ? @{SUUpdaterAppcastItemNotificationKey : self.updateItem} : nil;
+    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification object:self.updater userInfo:userInfo];
 	[self abortUpdate];
 }
 
 - (void)didNotFindUpdate
 {
-	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
-		[[updater delegate] updaterDidNotFindUpdate:updater];
+    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+
+	if ([updaterDelegate respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
+        [updaterDelegate updaterDidNotFindUpdate:self.updater];
 	}
-	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:updater];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
 	[self abortUpdate];
 }

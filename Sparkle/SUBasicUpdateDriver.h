@@ -19,13 +19,11 @@
 #import "SUAppcast.h"
 
 @class SUAppcastItem, SUHost;
-@interface SUBasicUpdateDriver : SUUpdateDriver<NSURLDownloadDelegate, SUUnarchiverDelegate, SUAppcastDelegate> {
-	SUAppcastItem *updateItem;
-	SUAppcastItem *nonDeltaUpdateItem;
+@interface SUBasicUpdateDriver : SUUpdateDriver<NSURLDownloadDelegate, SUUnarchiverDelegate, SUAppcastDelegate>
 
-	NSURLDownload *download;
-	NSString *downloadPath;
-	NSString *tempDir;
+@property (weak, readonly) SUAppcastItem *updateItem;
+@property (strong, readonly) NSURLDownload *download;
+@property (copy, readonly) NSString *downloadPath;
 
 	NSString *relaunchPath;
     

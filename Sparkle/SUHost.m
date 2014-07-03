@@ -24,11 +24,18 @@ typedef struct {
 #endif
 
 @interface SUHost ()
-@property (retain, readwrite) NSBundle *bundle;
+
+@property (strong, readwrite) NSBundle *bundle;
+@property (copy) NSString *defaultsDomain;
+@property (assign) BOOL usesStandardUserDefaults;
+
 @end
 
 @implementation SUHost
+
 @synthesize bundle;
+@synthesize defaultsDomain;
+@synthesize usesStandardUserDefaults;
 
 - (instancetype)initWithBundle:(NSBundle *)aBundle
 {
@@ -36,33 +43,27 @@ typedef struct {
 	{
 		if (aBundle == nil) aBundle = [NSBundle mainBundle];
         self.bundle = aBundle;
-		if (![bundle bundleIdentifier]) {
-			SULog(@"Sparkle Error: the bundle being updated at %@ has no CFBundleIdentifier! This will cause preference read/write to not work properly.", bundle);
+		if (![self.bundle bundleIdentifier]) {
+			SULog(@"Sparkle Error: the bundle being updated at %@ has no CFBundleIdentifier! This will cause preference read/write to not work properly.", self.bundle);
 		}
 
-		defaultsDomain = [[bundle objectForInfoDictionaryKey:SUDefaultsDomainKey] retain];
-		if (!defaultsDomain) {
-			defaultsDomain = [[bundle bundleIdentifier] retain];
+		self.defaultsDomain = [self.bundle objectForInfoDictionaryKey:SUDefaultsDomainKey];
+		if (!self.defaultsDomain) {
+			self.defaultsDomain = [self.bundle bundleIdentifier];
 		}
 
 		// If we're using the main bundle's defaults we'll use the standard user defaults mechanism, otherwise we have to get CF-y.
-		usesStandardUserDefaults = [defaultsDomain isEqualToString:[[NSBundle mainBundle] bundleIdentifier]];
+		usesStandardUserDefaults = [self.defaultsDomain isEqualToString:[[NSBundle mainBundle] bundleIdentifier]];
     }
     return self;
 }
 
-- (void)dealloc
-{
-	[defaultsDomain release];
-	self.bundle = nil;
-	[super dealloc];
-}
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self bundlePath], [self installationPath]]; }
 
 - (NSString *)bundlePath
 {
-    return [bundle bundlePath];
+    return [self.bundle bundlePath];
 }
 
 - (NSString *)appSupportPath
@@ -85,28 +86,28 @@ typedef struct {
 {
 #if NORMALIZE_INSTALLED_APP_NAME
     // We'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
-    NSString *normalizedAppPath = [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.%@", [bundle objectForInfoDictionaryKey:@"CFBundleName"], [[bundle bundlePath] pathExtension]]];
-	if (![[NSFileManager defaultManager] fileExistsAtPath:[[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.%@", [bundle objectForInfoDictionaryKey:@"CFBundleName"], [[bundle bundlePath] pathExtension]]]]) {
+    NSString *normalizedAppPath = [[[self.bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.%@", [self.bundle objectForInfoDictionaryKey:@"CFBundleName"], [[self.bundle bundlePath] pathExtension]]];
+	if (![[NSFileManager defaultManager] fileExistsAtPath:[[[self.bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.%@", [self.bundle objectForInfoDictionaryKey:@"CFBundleName"], [[self.bundle bundlePath] pathExtension]]]]) {
         return normalizedAppPath;
 	}
 #endif
-	return [bundle bundlePath];
+	return [self.bundle bundlePath];
 }
 
 - (NSString *)name
 {
-	NSString *name = [bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+	NSString *name = [self.bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
 	if (name) return name;
 
 	name = [self objectForInfoDictionaryKey:@"CFBundleName"];
 	if (name) return name;
 
-	return [[[NSFileManager defaultManager] displayNameAtPath:[bundle bundlePath]] stringByDeletingPathExtension];
+	return [[[NSFileManager defaultManager] displayNameAtPath:[self.bundle bundlePath]] stringByDeletingPathExtension];
 }
 
 - (NSString *)version
 {
-	NSString *version = [bundle objectForInfoDictionaryKey:@"CFBundleVersion"];
+	NSString *version = [self.bundle objectForInfoDictionaryKey:@"CFBundleVersion"];
 	if (!version || [version isEqualToString:@""])
 		[NSException raise:@"SUNoVersionException" format:@"This host (%@) has no CFBundleVersion! This attribute is required.", [self bundlePath]];
 	return version;
@@ -114,7 +115,7 @@ typedef struct {
 
 - (NSString *)displayVersion
 {
-	NSString *shortVersionString = [bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+	NSString *shortVersionString = [self.bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
 	if (shortVersionString)
 		return shortVersionString;
 	else
@@ -124,19 +125,19 @@ typedef struct {
 - (NSImage *)icon
 {
 	// Cache the application icon.
-	NSString *iconPath = [bundle pathForResource:[bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType:@"icns"];
+	NSString *iconPath = [self.bundle pathForResource:[self.bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType:@"icns"];
 	// According to the OS X docs, "CFBundleIconFile - This key identifies the file containing
 	// the icon for the bundle. The filename you specify does not need to include the .icns
 	// extension, although it may."
 	//
 	// However, if it *does* include the '.icns' the above method fails (tested on OS X 10.3.9) so we'll also try:
 	if (!iconPath) {
-		iconPath = [bundle pathForResource:[bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType: nil];
+		iconPath = [self.bundle pathForResource:[self.bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType: nil];
 	}
-	NSImage *icon = [[[NSImage alloc] initWithContentsOfFile:iconPath] autorelease];
+	NSImage *icon = [[NSImage alloc] initWithContentsOfFile:iconPath];
 	// Use a default icon if none is defined.
 	if (!icon) {
-		BOOL isMainBundle = (bundle == [NSBundle mainBundle]);
+		BOOL isMainBundle = (self.bundle == [NSBundle mainBundle]);
 
 		NSString *fileType = isMainBundle ? (NSString*)kUTTypeApplication : (NSString*)kUTTypeBundle;
 		icon = [[NSWorkspace sharedWorkspace] iconForFileType:fileType];
@@ -147,7 +148,7 @@ typedef struct {
 - (BOOL)isRunningOnReadOnlyVolume
 {
 	struct statfs statfs_info;
-	statfs([[bundle bundlePath] fileSystemRepresentation], &statfs_info);
+	statfs([[self.bundle bundlePath] fileSystemRepresentation], &statfs_info);
 	return (statfs_info.f_flags & MNT_RDONLY);
 }
 
@@ -159,14 +160,14 @@ typedef struct {
 - (NSString *)publicDSAKey
 {
 	// Maybe the key is just a string in the Info.plist.
-	NSString *key = [bundle objectForInfoDictionaryKey:SUPublicDSAKeyKey];
+	NSString *key = [self.bundle objectForInfoDictionaryKey:SUPublicDSAKeyKey];
 	if (key) { return key; }
 
 	// More likely, we've got a reference to a Resources file by filename:
 	NSString *keyFilename = [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];
 	if (!keyFilename) { return nil; }
 	NSError *ignoreErr = nil;
-	return [NSString stringWithContentsOfFile:[bundle pathForResource:keyFilename ofType:nil] encoding:NSASCIIStringEncoding error: &ignoreErr];
+	return [NSString stringWithContentsOfFile:[self.bundle pathForResource:keyFilename ofType:nil] encoding:NSASCIIStringEncoding error: &ignoreErr];
 }
 
 - (NSArray *)systemProfile
@@ -176,7 +177,7 @@ typedef struct {
 
 - (id)objectForInfoDictionaryKey:(NSString *)key
 {
-    return [bundle objectForInfoDictionaryKey:key];
+    return [self.bundle objectForInfoDictionaryKey:key];
 }
 
 - (BOOL)boolForInfoDictionaryKey:(NSString *)key
@@ -186,42 +187,42 @@ typedef struct {
 
 - (id)objectForUserDefaultsKey:(NSString *)defaultName
 {
-    if (!defaultName || !defaultsDomain) {
+    if (!defaultName || !self.defaultsDomain) {
         return nil;
     }
 
 	// Under Tiger, CFPreferencesCopyAppValue doesn't get values from NSRegistrationDomain, so anything
 	// passed into -[NSUserDefaults registerDefaults:] is ignored.  The following line falls
 	// back to using NSUserDefaults, but only if the host bundle is the main bundle.
-	if (usesStandardUserDefaults) {
+	if (self.usesStandardUserDefaults) {
 		return [[NSUserDefaults standardUserDefaults] objectForKey:defaultName];
 	}
 
-	CFPropertyListRef obj = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)defaultsDomain);
+	CFPropertyListRef obj = CFPreferencesCopyAppValue((__bridge CFStringRef)defaultName, (__bridge CFStringRef)self.defaultsDomain);
 	return CFBridgingRelease(obj);
 }
 
 - (void)setObject:(id)value forUserDefaultsKey:(NSString *)defaultName
 {
-	if (usesStandardUserDefaults)
+	if (self.usesStandardUserDefaults)
 	{
 		[[NSUserDefaults standardUserDefaults] setObject:value forKey:defaultName];
 	}
 	else
 	{
-		CFPreferencesSetValue((CFStringRef)defaultName, value, (CFStringRef)defaultsDomain,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
-		CFPreferencesSynchronize((CFStringRef)defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		CFPreferencesSetValue((__bridge CFStringRef)defaultName, (__bridge CFPropertyListRef)(value), (__bridge CFStringRef)self.defaultsDomain,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		CFPreferencesSynchronize((__bridge CFStringRef)self.defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	}
 }
 
 - (BOOL)boolForUserDefaultsKey:(NSString *)defaultName
 {
-	if (usesStandardUserDefaults) {
+	if (self.usesStandardUserDefaults) {
 		return [[NSUserDefaults standardUserDefaults] boolForKey:defaultName];
 	}
 
 	BOOL value;
-	CFPropertyListRef plr = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)defaultsDomain);
+	CFPropertyListRef plr = CFPreferencesCopyAppValue((__bridge CFStringRef)defaultName, (__bridge CFStringRef)self.defaultsDomain);
 	if (plr == NULL) {
 		value = NO;
 	}
@@ -235,14 +236,14 @@ typedef struct {
 
 - (void)setBool:(BOOL)value forUserDefaultsKey:(NSString *)defaultName
 {
-	if (usesStandardUserDefaults)
+	if (self.usesStandardUserDefaults)
 	{
 		[[NSUserDefaults standardUserDefaults] setBool:value forKey:defaultName];
 	}
 	else
 	{
-		CFPreferencesSetValue((CFStringRef)defaultName, (CFBooleanRef)@(value), (CFStringRef)defaultsDomain,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
-		CFPreferencesSynchronize((CFStringRef)defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		CFPreferencesSetValue((__bridge CFStringRef)defaultName, (__bridge CFBooleanRef)@(value), (__bridge CFStringRef)self.defaultsDomain,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		CFPreferencesSynchronize((__bridge CFStringRef)self.defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	}
 }
 

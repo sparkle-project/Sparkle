@@ -34,37 +34,28 @@
 
 @interface SUAppcast () <NSURLDownloadDelegate>
 @property (copy) NSString *downloadFilename;
-@property (retain) NSURLDownload *download;
+@property (strong) NSURLDownload *download;
 @property (copy) NSArray *items;
 - (void)reportError:(NSError *)error;
 - (NSXMLNode *)bestNodeInNodes:(NSArray *)nodes;
 @end
 
 @implementation SUAppcast
+
 @synthesize downloadFilename;
 @synthesize delegate;
 @synthesize userAgentString;
 @synthesize download;
 @synthesize items;
 
-- (void)dealloc
-{
-	self.items = nil;
-	self.userAgentString = nil;
-	self.downloadFilename = nil;
-	self.download = nil;
-
-	[super dealloc];
-}
-
 - (void)fetchAppcastFromURL:(NSURL *)url
 {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
-	if (userAgentString) {
-        [request setValue:userAgentString forHTTPHeaderField:@"User-Agent"];
+	if (self.userAgentString) {
+        [request setValue:self.userAgentString forHTTPHeaderField:@"User-Agent"];
 	}
 
-    self.download = [[[NSURLDownload alloc] initWithRequest:request delegate:self] autorelease];
+    self.download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
 }
 
 - (void)download:(NSURLDownload *) __unused aDownload decideDestinationWithSuggestedFilename:(NSString *)filename
@@ -73,7 +64,7 @@
 	if (destinationFilename)
 	{
 		destinationFilename = [destinationFilename stringByAppendingPathComponent:filename];
-		[download setDestination:destinationFilename allowOverwrite:NO];
+		[self.download setDestination:destinationFilename allowOverwrite:NO];
 	}
 }
 
@@ -91,13 +82,13 @@
 	NSArray *xmlItems = nil;
 	NSMutableArray *appcastItems = [NSMutableArray array];
 
-	if (downloadFilename)
+	if (self.downloadFilename)
 	{
         NSUInteger options = 0;
 		options = NSXMLNodeLoadExternalEntitiesSameOriginOnly;
-		document = [[[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:options error:&error] autorelease];
+		document = [[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:self.downloadFilename] options:options error:&error];
 
-		[[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:nil];
+		[[NSFileManager defaultManager] removeItemAtPath:self.downloadFilename error:nil];
 		self.downloadFilename = nil;
 	}
 	else
@@ -187,7 +178,7 @@
             }
 
 			NSString *errString;
-			SUAppcastItem *anItem = [[[SUAppcastItem alloc] initWithDictionary:dict failureReason:&errString] autorelease];
+			SUAppcastItem *anItem = [[SUAppcastItem alloc] initWithDictionary:dict failureReason:&errString];
             if (anItem)
             {
                 [appcastItems addObject:anItem];
@@ -203,7 +194,7 @@
 
 	if ([appcastItems count])
     {
-		NSSortDescriptor *sort = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
+		NSSortDescriptor *sort = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO];
 		[appcastItems sortUsingDescriptors:@[sort]];
 		self.items = appcastItems;
 	}
@@ -212,17 +203,17 @@
     {
         [self reportError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:@{NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while parsing the update feed.", nil)}]];
 	}
-    else if ([delegate respondsToSelector:@selector(appcastDidFinishLoading:)])
+    else if ([self.delegate respondsToSelector:@selector(appcastDidFinishLoading:)])
     {
-        [delegate appcastDidFinishLoading:self];
+        [self.delegate appcastDidFinishLoading:self];
 	}
 }
 
 - (void)download:(NSURLDownload *) __unused aDownload didFailWithError:(NSError *)error
 {
-	if (downloadFilename)
+	if (self.downloadFilename)
 	{
-		[[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:nil];
+		[[NSFileManager defaultManager] removeItemAtPath:self.downloadFilename error:nil];
 	}
 	self.downloadFilename = nil;
 
@@ -236,9 +227,9 @@
 
 - (void)reportError:(NSError *)error
 {
-	if ([delegate respondsToSelector:@selector(appcast:failedToLoadWithError:)])
+	if ([self.delegate respondsToSelector:@selector(appcast:failedToLoadWithError:)])
 	{
-		[delegate appcast:self failedToLoadWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastError userInfo:@{NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil), NSLocalizedFailureReasonErrorKey: [error localizedDescription]}]];
+		[self.delegate appcast:self failedToLoadWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastError userInfo:@{NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil), NSLocalizedFailureReasonErrorKey: [error localizedDescription]}]];
 	}
 }
 

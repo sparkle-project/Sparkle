@@ -163,7 +163,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	return tempDir;
 }
 
-+ (BOOL)_copyPathWithForcedAuthentication:(NSString *)src toPath:(NSString *)dst temporaryPath:(NSString *)tmp error:(NSError **)error
++ (BOOL)_copyPathWithForcedAuthentication:(NSString *)src toPath:(NSString *)dst temporaryPath:(NSString *)tmp error:(NSError *__autoreleasing *)error
 {
 	// *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
@@ -295,7 +295,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	return res;
 }
 
-+ (BOOL)_movePathWithForcedAuthentication:(NSString *)src toPath:(NSString *)dst error:(NSError **)error
++ (BOOL)_movePathWithForcedAuthentication:(NSString *)src toPath:(NSString *)dst error:(NSError *__autoreleasing *)error
 {
 	// *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
@@ -369,7 +369,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 }
 
 
-+ (BOOL)_removeFileAtPathWithForcedAuthentication:(NSString *)src error:(NSError **)error
++ (BOOL)_removeFileAtPathWithForcedAuthentication:(NSString *)src error:(NSError *__autoreleasing *)error
 {
 	// *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
@@ -416,7 +416,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	return res;
 }
 
-+ (BOOL)_removeFileAtPath:(NSString *)path error: (NSError**)error
++ (BOOL)_removeFileAtPath:(NSString *)path error: (NSError*__autoreleasing *)error
 {
 	BOOL	success = YES;
 	if( ![[NSFileManager defaultManager] removeItemAtPath: path error: NULL] )
@@ -448,7 +448,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		;//SULog(@"Moved %@ to the trash.", path);
 }
 
-+ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *) __unused tmp error:(NSError **)error
++ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *) __unused tmp error:(NSError *__autoreleasing *)error
 {
 	FSRef		srcRef, dstRef, dstDirRef, tmpDirRef;
 	OSStatus	err;
@@ -485,7 +485,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 	if (err == noErr && hadFileAtDest)
 	{
-        NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
+        NSFileManager *manager = [[NSFileManager alloc] init];
         BOOL success = [manager moveItemAtPath:dst toPath:tmpPath error:error];
         if (!success && hadFileAtDest)
         {
@@ -498,7 +498,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	err = FSPathMakeRef((UInt8 *)[src fileSystemRepresentation], &srcRef, NULL);
 	if (err == noErr)
 	{
-		NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
+		NSFileManager *manager = [[NSFileManager alloc] init];
 		BOOL success = [manager copyItemAtPath:src toPath:dst error:error];
 		if (!success)
 		{

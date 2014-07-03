@@ -42,11 +42,25 @@
 - (void) saveResumableData:(NSNotification *)aNotification;
 - (void) tryDownloadRetry;
 
+@property (weak) SUAppcastItem *updateItem;
+@property (strong) NSURLDownload *download;
+@property (copy) NSString *downloadPath;
+
+@property (strong) SUAppcastItem *nonDeltaUpdateItem;
+@property (copy) NSString *tempDir;
+@property (copy) NSString *relaunchPath;
 
 @end
 
-
 @implementation SUBasicUpdateDriver
+
+@synthesize updateItem;
+@synthesize download;
+@synthesize downloadPath;
+
+@synthesize nonDeltaUpdateItem;
+@synthesize tempDir;
+@synthesize relaunchPath;
 
 - initWithUpdater:(SUUpdater *)anUpdater
 {
@@ -71,11 +85,9 @@
 	}
 
 	SUAppcast *appcast = [[SUAppcast alloc] init];
-	CFRetain(appcast); // We'll manage the appcast's memory ourselves so we don't have to make it an IV to support GC.
-	[appcast release];
 
 	[appcast setDelegate:self];
-	[appcast setUserAgentString:[updater userAgentString]];
+    [appcast setUserAgentString:[self.updater userAgentString]];
 	[appcast fetchAppcastFromURL:URL];
 }
 
@@ -84,8 +96,8 @@
 	id <SUVersionComparison> comparator = nil;
 
 	// Give the delegate a chance to provide a custom version comparator
-	if ([[updater delegate] respondsToSelector:@selector(versionComparatorForUpdater:)]) {
-		comparator = [[updater delegate] versionComparatorForUpdater:updater];
+    if ([[self.updater delegate] respondsToSelector:@selector(versionComparatorForUpdater:)]) {
+        comparator = [[self.updater delegate] versionComparatorForUpdater:self.updater];
 	}
 
 	// If we don't get a comparator from the delegate, use the default comparator
@@ -98,7 +110,7 @@
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui
 {
-	return [[self versionComparator] compareVersion:[host version] toVersion:[ui versionString]] == NSOrderedAscending;
+    return [[self versionComparator] compareVersion:[self.host version] toVersion:[ui versionString]] == NSOrderedAscending;
 }
 
 - (BOOL)hostSupportsItem:(SUAppcastItem *)ui
@@ -122,7 +134,7 @@
 
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui
 {
-	NSString *skippedVersion = [host objectForUserDefaultsKey:SUSkippedVersionKey];
+    NSString *skippedVersion = [self.host objectForUserDefaultsKey:SUSkippedVersionKey];
 	if (skippedVersion == nil) { return NO; }
 	return [[self versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
 }
@@ -134,19 +146,19 @@
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac
 {
-	if ([[updater delegate] respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
-		[[updater delegate] updater:updater didFinishLoadingAppcast:ac];
+    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
+        [[self.updater delegate] updater:self.updater didFinishLoadingAppcast:ac];
 	}
 
 	NSDictionary *userInfo = (ac != nil) ? @{SUUpdaterAppcastNotificationKey : ac} : nil;
-	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:updater userInfo:userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:self.updater userInfo:userInfo];
 
     SUAppcastItem *item = nil;
 
 	// Now we have to find the best valid update in the appcast.
-	if ([[updater delegate] respondsToSelector:@selector(bestValidUpdateInAppcast:forUpdater:)]) // Does the delegate want to handle it?
+    if ([[self.updater delegate] respondsToSelector:@selector(bestValidUpdateInAppcast:forUpdater:)]) // Does the delegate want to handle it?
 	{
-		item = [[updater delegate] bestValidUpdateInAppcast:ac forUpdater:updater];
+        item = [[self.updater delegate] bestValidUpdateInAppcast:ac forUpdater:self.updater];
 	}
 	else // If not, we'll take care of it ourselves.
 	{
@@ -157,47 +169,47 @@
 		} while (item && ![self hostSupportsItem:item]);
 
 		if (binaryDeltaSupported()) {
-			SUAppcastItem *deltaUpdateItem = [item deltaUpdates][[host version]];
+            SUAppcastItem *deltaUpdateItem = [item deltaUpdates][[self.host version]];
 			if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem]) {
-				nonDeltaUpdateItem = [item retain];
+				self.nonDeltaUpdateItem = item;
 				item = deltaUpdateItem;
 			}
 		}
 	}
 
-    updateItem = [item retain];
-	if (ac) { CFRelease(ac); } // Remember that we're explicitly managing the memory of the appcast.
-	if (updateItem == nil) { [self didNotFindUpdate]; return; }
+    self.updateItem = item;
+	if (self.updateItem == nil) { [self didNotFindUpdate]; return; }
 
-	if ([self itemContainsValidUpdate:updateItem])
+	if ([self itemContainsValidUpdate:self.updateItem])
 		[self didFindValidUpdate];
 	else
 		[self didNotFindUpdate];
 }
 
-- (void)appcast:(SUAppcast *)ac failedToLoadWithError:(NSError *)error
+- (void)appcast:(SUAppcast *)__unused ac failedToLoadWithError:(NSError *)error
 {
-	if (ac) { CFRelease(ac); } // Remember that we're explicitly managing the memory of the appcast.
 	[self abortUpdateWithError:error];
 }
 
 - (void)didFindValidUpdate
 {
-	if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
-		[[updater delegate] updater:updater didFindValidUpdate:updateItem];
-	NSDictionary *userInfo = (updateItem != nil) ? @{SUUpdaterAppcastItemNotificationKey : updateItem} : nil;
-	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification object:updater userInfo:userInfo];
+    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
+        [[self.updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
+	NSDictionary *userInfo = (self.updateItem != nil) ? @{SUUpdaterAppcastItemNotificationKey : self.updateItem} : nil;
+    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification object:self.updater userInfo:userInfo];
 	[self downloadUpdate];
 }
 
 - (void)didNotFindUpdate
 {
-	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
-		[[updater delegate] updaterDidNotFindUpdate:updater];
+    if ([[self.updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
+        [[self.updater delegate] updaterDidNotFindUpdate:self.updater];
 	}
-	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:updater];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
-	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUNoUpdateError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"You already have the newest version of %@.", nil), [host name]]}]];
+	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUNoUpdateError userInfo:@{
+        NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"You already have the newest version of %@.", "'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI)"), [self.host name]]
+    }]];
 }
 
 - (void)downloadUpdate
@@ -439,7 +451,7 @@
 
 - (BOOL)validateUpdateDownloadedToPath:(NSString *)downloadedPath extractedToPath:(NSString *)extractedPath DSASignature:(NSString *)DSASignature publicDSAKey:(NSString *)publicDSAKey
 {
-    NSString *newBundlePath = [SUInstaller appPathInUpdateFolder:extractedPath forHost:host];
+    NSString *newBundlePath = [SUInstaller appPathInUpdateFolder:extractedPath forHost:self.host];
     if (newBundlePath)
     {
         NSError *error = nil;
@@ -457,14 +469,13 @@
 
 - (void)extractUpdate
 {
-	SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:downloadPath updatingHost:host];
+    SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHost:self.host];
 	if (!unarchiver)
 	{
-		SULog(@"Sparkle Error: No valid unarchiver for %@!", downloadPath);
+		SULog(@"Sparkle Error: No valid unarchiver for %@!", self.downloadPath);
 		[self unarchiverDidFail:nil];
 		return;
 	}
-	CFRetain(unarchiver); // Manage this memory manually so we don't have to make it an IV.
 	[unarchiver setDelegate:self];
 	[unarchiver start];
 }
@@ -472,24 +483,20 @@
 - (void)failedToApplyDeltaUpdate
 {
 	// When a delta update fails to apply we fall back on updating via a full install.
-	[updateItem release];
-	updateItem = nonDeltaUpdateItem;
-	nonDeltaUpdateItem = nil;
+	self.updateItem = self.nonDeltaUpdateItem;
+	self.nonDeltaUpdateItem = nil;
 
 	[self downloadUpdate];
 }
 
-- (void)unarchiverDidFinish:(SUUnarchiver *)ua
+- (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
 {
-	if (ua) { CFRelease(ua); }
 	[self installWithToolAndRelaunch:YES];
 }
 
-- (void)unarchiverDidFail:(SUUnarchiver *)ua
+- (void)unarchiverDidFail:(SUUnarchiver *)__unused ua
 {
-	if (ua) { CFRelease(ua); }
-
-	if ([updateItem isDeltaUpdate]) {
+	if ([self.updateItem isDeltaUpdate]) {
 		[self failedToApplyDeltaUpdate];
 		return;
 	}
@@ -507,7 +514,7 @@
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
 {
-    if (![self validateUpdateDownloadedToPath:downloadPath extractedToPath:tempDir DSASignature:[updateItem DSASignature] publicDSAKey:[host publicDSAKey]])
+    if (![self validateUpdateDownloadedToPath:self.downloadPath extractedToPath:self.tempDir DSASignature:[self.updateItem DSASignature] publicDSAKey:[self.host publicDSAKey]])
     {
         NSDictionary *userInfo = @{
             NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil),
@@ -517,7 +524,7 @@
         return;
 	}
 
-    if (![updater mayUpdateAndRestart])
+    if (![self.updater mayUpdateAndRestart])
     {
         [self abortUpdate];
         return;
@@ -533,21 +540,22 @@
 
     // Give the host app an opportunity to postpone the install and relaunch.
     static BOOL postponedOnce = NO;
-    if (!postponedOnce && [[updater delegate] respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
+    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+    if (!postponedOnce && [updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
     {
         NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installWithToolAndRelaunch:)]];
         [invocation setSelector:@selector(installWithToolAndRelaunch:)];
         [invocation setArgument:&relaunch atIndex:2];
         [invocation setTarget:self];
         postponedOnce = YES;
-		if ([[updater delegate] updater:updater shouldPostponeRelaunchForUpdate:updateItem untilInvoking:invocation]) {
+        if ([updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:self.updateItem untilInvoking:invocation]) {
             return;
     }
 	}
 
 
-	if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdate:)]) {
-		[[updater delegate] updater:updater willInstallUpdate:updateItem];
+	if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdate:)]) {
+        [updaterDelegate updater:self.updater willInstallUpdate:self.updateItem];
 	}
 
     NSString *const finishInstallToolName = FINISH_INSTALL_TOOL_NAME_STRING;
@@ -557,7 +565,7 @@
 	NSString *relaunchPathToCopy = [SPARKLE_BUNDLE pathForResource:finishInstallToolName ofType:@"app"];
 	if (relaunchPathToCopy != nil)
 	{
-		NSString *targetPath = [[host appSupportPath] stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
+        NSString *targetPath = [[self.host appSupportPath] stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
 		// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
 		NSError *error = nil;
 		[[NSFileManager defaultManager] createDirectoryAtPath: [targetPath stringByDeletingLastPathComponent] withIntermediateDirectories: YES attributes: @{} error: &error];
@@ -577,20 +585,20 @@
 	}
 
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-    if ([[updater delegate] respondsToSelector:@selector(updaterWillRelaunchApplication:)])
-        [[updater delegate] updaterWillRelaunchApplication:updater];
+    if ([updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)])
+        [updaterDelegate updaterWillRelaunchApplication:self.updater];
 
-    if(!relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath])
+    if(!self.relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:self.relaunchPath])
     {
         // Note that we explicitly use the host app's name here, since updating plugin for Mail relaunches Mail, not just the plugin.
-        [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [host name]], NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@)", relaunchPath]}]];
+        [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [self.host name]], NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@)", self.relaunchPath]}]];
         // We intentionally don't abandon the update here so that the host won't initiate another.
         return;
     }
 
-    NSString *pathToRelaunch = [host bundlePath];
-	if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
-        pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
+    NSString *pathToRelaunch = [self.host bundlePath];
+	if ([updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
+        pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:self.updater];
 	}
     NSString *relaunchToolPath = [[relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS"] stringByAppendingPathComponent: finishInstallToolName];
     NSArray *arguments = @[[host bundlePath],
@@ -611,21 +619,21 @@
 
 - (void)cleanUpDownload
 {
-    if (tempDir != nil)	// tempDir contains downloadPath, so we implicitly delete both here.
+    if (self.tempDir != nil)	// tempDir contains downloadPath, so we implicitly delete both here.
 	{
 		BOOL		success = NO;
         NSError	*	error = nil;
-        success = [[NSFileManager defaultManager] removeItemAtPath: tempDir error: &error]; // Clean up the copied relauncher
+        success = [[NSFileManager defaultManager] removeItemAtPath:self.tempDir error: &error]; // Clean up the copied relauncher
 		if( !success )
-			[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[tempDir stringByDeletingLastPathComponent] destination:@"" files:@[[tempDir lastPathComponent]] tag:NULL];
+			[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[self.tempDir stringByDeletingLastPathComponent] destination:@"" files:@[[self.tempDir lastPathComponent]] tag:NULL];
 	}
 }
 
 - (void)installerForHost:(SUHost *)aHost failedWithError:(NSError *)error
 {
-	if (aHost != host) { return; }
+    if (aHost != self.host) { return; }
 	NSError	*	dontThrow = nil;
-	[[NSFileManager defaultManager] removeItemAtPath: relaunchPath error: &dontThrow]; // Clean up the copied relauncher
+	[[NSFileManager defaultManager] removeItemAtPath:self.relaunchPath error: &dontThrow]; // Clean up the copied relauncher
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while installing the update. Please try again later.", nil), NSLocalizedFailureReasonErrorKey: [error localizedDescription]}]];
 }
 
@@ -729,17 +737,6 @@
     }
     else
         [self abortUpdate];
-}
-
-- (void)dealloc
-{
-	[updateItem release];
-	[nonDeltaUpdateItem release];
-	[download release];
-	[downloadPath release];
-	[tempDir release];
-	[relaunchPath release];
-	[super dealloc];
 }
 
 @end

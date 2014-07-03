@@ -11,38 +11,42 @@
 
 NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
+@interface SUUpdateDriver ()
+
+@property (weak) SUUpdater *updater;
+@property (copy) NSURL *appcastURL;
+@property (getter=isInterruptible) BOOL interruptible;
+
+@end
+
 @implementation SUUpdateDriver
+
+@synthesize updater;
 @synthesize host;
-@synthesize interruptible = isInterruptible;
+@synthesize interruptible;
 @synthesize finished;
+@synthesize appcastURL;
 
 - (instancetype) initWithUpdater:(SUUpdater *)anUpdater
 {
 	if ((self = [super init])) {
-		updater = anUpdater;
+		self.updater = anUpdater;
 	}
 	return self;
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [host bundlePath], [host installationPath]]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self.host bundlePath], [self.host installationPath]]; }
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)h
 {
-	appcastURL = [URL copy];
-	host = [h retain];
+	self.appcastURL = URL;
+	self.host = h;
 }
 
 - (void)abortUpdate
 {
 	[self setValue:@YES forKey:@"finished"];
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdateDriverFinishedNotification object:self];
-}
-
-- (void)dealloc
-{
-    self.host = nil;
-	[appcastURL release];
-    [super dealloc];
 }
 
 @end
