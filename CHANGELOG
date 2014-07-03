@@ -1,0 +1,38 @@
+
+# 1.6.1
+
+* Removed archive password prompt (Kornel Lesiński)
+* (Re)fixes bug where URLs are naively double escaped (Andrew Madsen)
+* Fixed typo that caused crashes in BinaryDelta (Tamas Lustyik)
+* SUStandardVersionComparator.h is public (Vincent CARLIER)
+* Remove pre-10.6-specific code. (C.W. Betts)
+* Objective C 2 getters and setters. (C.W. Betts)
+* Define correct dependencies on locale scripts (Antonin Hildebrand)
+
+# 1.6.0
+
+* Cleaned up and deleted redundant strings files (Kornel Lesiński)
+* Modern Objective C syntax, properties where possible. (C.W. Betts)
+* Make SUAppcastDelegate a formal protocol. (C.W. Betts)
+* Fixed default font in release notes WebView (Kornel Lesiński)
+* Configurable name for finish_installation.app (Kornel Lesiński)
+* Removed code for 10.4 (Kornel Lesiński)
+* Convert all strings files to UTF-8 (UTF-16 must die) (Kornel Lesiński)
+* Removing GC target (Matt Thomas)
+* finish_installation.app and pkg files will not removed when we use *.pkg installer and restart system in the installer (Takayama Fumihiko)
+* Select Korean and Slovak for Sparkle.strings localization (Shon Frazier)
+* Updated the Romanian translation (Gabe)
+* pt-BR localization polishing (BR Lingo)
+* update zh_CN (61)
+* Shut up some warnings & make build with newer Xcode (Uli Kusterer)
+* Less unsafety with format strings (Uli Kusterer)
+* New icon (Rick Fillion)
+* fixed a 'content rectangle not entirely onscreen' warning (Simone Manganelli)
+* updated sends system profile to use info.plist if user defaults key isn't present (Jamie Pinkham)
+* Support for notifications on some updater events (Doug Russell)
+* Allow the delegate to trigger a silent install and relaunch (Matt Stevens)
+* Support silent relaunches (Matt Stevens)
+* Increment the sudden termination counter if installing on quit (Matt Stevens)
+* Prompts the user to update after a week (rather than a day) if he doesn't quit the app (Andy Matuschak)
+* Adding <sparkle:tags> appcast item element, <sparkle:criticalUpdate /> tag (Andy Matuschak)
+* We have this check box that says "Automatically download and install updates in the future." But we only download them automatically. We still ask permission again before installing them. (Andy Matuschak)

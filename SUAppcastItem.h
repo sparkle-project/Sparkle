@@ -56,8 +56,8 @@
 @property (readonly) bool mandatoryUpdate;
 
 // Initializes with data from a dictionary provided by the RSS class.
-- (id)initWithDictionary:(NSDictionary *)dict;
-- (id)initWithDictionary:(NSDictionary *)dict failureReason:(NSString**)error;
+- (instancetype)initWithDictionary:(NSDictionary *)dict;
+- (instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString**)error;
 
 - (BOOL)isDeltaUpdate;
 - (BOOL)isCriticalUpdate;

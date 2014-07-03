@@ -6,26 +6,15 @@
 //
 //
 
-#import <Security/CodeSigning.h>
+#include <Security/CodeSigning.h>
+#include <Security/SecCode.h>
 #import "SUCodeSigningVerifier.h"
 #import "SULog.h"
 
 @implementation SUCodeSigningVerifier
 
-extern OSStatus SecCodeCopySelf(SecCSFlags flags, SecCodeRef *self)  __attribute__((weak_import));
-
-extern OSStatus SecCodeCopyDesignatedRequirement(SecStaticCodeRef code, SecCSFlags flags, SecRequirementRef *requirement) __attribute__((weak_import));
-
-extern OSStatus SecStaticCodeCreateWithPath(CFURLRef path, SecCSFlags flags, SecStaticCodeRef *staticCode) __attribute__((weak_import));
-
-extern OSStatus SecStaticCodeCheckValidityWithErrors(SecStaticCodeRef staticCode, SecCSFlags flags, SecRequirementRef requirement, CFErrorRef *errors) __attribute__((weak_import));
-
-
 + (BOOL)codeSignatureIsValidAtPath:(NSString *)destinationPath error:(NSError **)error
 {
-    // This API didn't exist prior to 10.6.
-    if (SecCodeCopySelf == NULL) return NO;
-    
     OSStatus result;
     SecRequirementRef requirement = NULL;
     SecStaticCodeRef staticCode = NULL;
@@ -68,9 +57,6 @@ finally:
 
 + (BOOL)hostApplicationIsCodeSigned
 {
-    // This API didn't exist prior to 10.6.
-    if (SecCodeCopySelf == NULL) return NO;
-    
     OSStatus result;
     SecCodeRef hostCode = NULL;
     result = SecCodeCopySelf(kSecCSDefaultFlags, &hostCode);

@@ -9,7 +9,7 @@
 
 #import "SUConstants.h"
 #import "SUSystemProfiler.h"
-#import <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
+#include <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
 #import "SULog.h"
 
 @interface SUHost ()

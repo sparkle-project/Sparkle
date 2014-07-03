@@ -15,13 +15,13 @@
 #import "SUConstants.h"
 #import "SULog.h"
 
-#import <CoreServices/CoreServices.h>
-#import <Security/Security.h>
-#import <sys/stat.h>
-#import <sys/wait.h>
-#import <dirent.h>
-#import <unistd.h>
-#import <sys/param.h>
+#include <CoreServices/CoreServices.h>
+#include <Security/Security.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <dirent.h>
+#include <unistd.h>
+#include <sys/param.h>
 
 
 @interface SUPlainInstaller (MMExtendedAttributes)
@@ -47,14 +47,15 @@
 @end
 
 // Authorization code based on generous contribution from Allan Odgaard. Thanks, Allan!
-
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations" // this is terrible; will fix later probably
 static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char* executablePath, AuthorizationFlags options, const char* const* arguments)
 {
 	// *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
-    
+
 	sig_t oldSigChildHandler = signal(SIGCHLD, SIG_DFL);
 	BOOL returnValue = YES;
-    
+
 	if (AuthorizationExecuteWithPrivileges(authorization, executablePath, options, (char* const*)arguments, NULL) == errAuthorizationSuccess)
 	{
 		int status;
@@ -64,10 +65,11 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	}
 	else
 		returnValue = NO;
-    
+		
 	signal(SIGCHLD, oldSigChildHandler);
 	return returnValue;
 }
+#pragma clang diagnostic pop
 
 @implementation SUPlainInstaller (Internals)
 
@@ -78,9 +80,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	NSString *version;
 	if ((version = [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:@"CFBundleVersion"]) && ![version isEqualToString:@""])
 	{
-		// We'll clean it up a little for safety.
-		// The cast is necessary because of a bug in the headers in pre-10.5 SDKs
-		NSMutableCharacterSet *validCharacters = (id)[NSMutableCharacterSet alphanumericCharacterSet];
+		NSMutableCharacterSet *validCharacters = [NSMutableCharacterSet alphanumericCharacterSet];
 		[validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
 		postFix = [version stringByTrimmingCharactersInSet:[validCharacters invertedSet]];
 	}
@@ -127,23 +127,21 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		tempDir = [path stringByDeletingLastPathComponent];
 	
 	// Let's try to read the version number so the filename will be more meaningful.
-#if TRY_TO_APPEND_VERSION_NUMBER
+	#if TRY_TO_APPEND_VERSION_NUMBER
 	NSString *postFix = nil;
 	NSString *version = nil;
 	if ((version = [[NSBundle bundleWithPath: path] objectForInfoDictionaryKey:@"CFBundleVersion"]) && ![version isEqualToString:@""])
 	{
-		// We'll clean it up a little for safety.
-		// The cast is necessary because of a bug in the headers in pre-10.5 SDKs
-		NSMutableCharacterSet *validCharacters = (id)[NSMutableCharacterSet alphanumericCharacterSet];
+		NSMutableCharacterSet *validCharacters = [NSMutableCharacterSet alphanumericCharacterSet];
 		[validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
 		postFix = [version stringByTrimmingCharactersInSet:[validCharacters invertedSet]];
 	}
 	else
 		postFix = @"old";
 	NSString *prefix = [NSString stringWithFormat: @"%@ (%@)", [[path lastPathComponent] stringByDeletingPathExtension], postFix];
-#else
+	#else
 	NSString *prefix = [[path lastPathComponent] stringByDeletingPathExtension];
-#endif
+	#endif
 	NSString *tempName = [prefix stringByAppendingPathExtension: [path pathExtension]];
 	tempDir = [tempDir stringByAppendingPathComponent: tempName];
 	
@@ -198,8 +196,13 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		// quarantine to avoid a delay at launch, and to avoid
 		// presenting the user with a confusing trust dialog.
 		//
-		// This needs to be done before "chown" changes ownership,
-		// because the ownership change will fail if the file is quarantined.
+		// This needs to be done after the application is moved to its
+		// new home with "mv" in case it's moved across filesystems: if
+		// that happens, "mv" actually performs a copy and may result
+		// in the application being quarantined.  It also needs to be
+		// done before "chown" changes ownership, because the ownership
+		// change will almost certainly make it impossible to change
+		// attributes to release the files from the quarantine.
 		if (res)
 		{
 			SULog(@"releaseFromQuarantine");
@@ -230,7 +233,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 			if( !res )
 				SULog( @"mv 1 failed" );
 		}
-        
+				
 		if( res )	// Move new exe to old exe's path.
 		{
 			const char* mvParams2[] = { "-f", srcPath, dstPath, NULL };
@@ -239,11 +242,11 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 				SULog( @"mv 2 failed" );
 		}
 		
-        //		if( res && haveDst /*&& !foundTrash*/ )	// If we managed to put the old exe in the trash, leave it there for the user to delete or recover.
-        //		{									// ...  Otherwise we better delete it, wouldn't want dozens of old versions lying around next to the new one.
-        //			const char* rmParams2[] = { "-rf", tmpPath, NULL };
-        //			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams2 );
-        //		}
+//		if( res && haveDst /*&& !foundTrash*/ )	// If we managed to put the old exe in the trash, leave it there for the user to delete or recover.
+//		{									// ...  Otherwise we better delete it, wouldn't want dozens of old versions lying around next to the new one.
+//			const char* rmParams2[] = { "-rf", tmpPath, NULL };
+//			res = AuthorizationExecuteWithPrivilegesAndWait( auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams2 );
+//		}
 		
 		AuthorizationFree(auth, 0);
 		
@@ -261,7 +264,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 			SULog(@"releaseFromQuarantine after installing");
 			[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:dst waitUntilDone:YES];
 		}
-        
+
 		if (!res)
 		{
 			// Something went wrong somewhere along the way, but we're not sure exactly where.
@@ -402,14 +405,10 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 + (BOOL)_removeFileAtPath:(NSString *)path error: (NSError**)error
 {
 	BOOL	success = YES;
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-    if( ![[NSFileManager defaultManager] removeFileAtPath: path handler: nil] )
-#else
-        if( ![[NSFileManager defaultManager] removeItemAtPath: path error: NULL] )
-#endif
-        {
-            success = [self _removeFileAtPathWithForcedAuthentication: path error: error];
-        }
+	if( ![[NSFileManager defaultManager] removeItemAtPath: path error: NULL] )
+	{
+		success = [self _removeFileAtPathWithForcedAuthentication: path error: error];
+	}
 	
 	return success;
 }
@@ -437,7 +436,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 + (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp error:(NSError **)error
 {
-	FSRef		srcRef, dstRef, dstDirRef, movedRef, tmpDirRef;
+	FSRef		srcRef, dstRef, dstDirRef, tmpDirRef;
 	OSStatus	err;
 	BOOL		hadFileAtDest = NO, didFindTrash = NO;
 	NSString	*tmpPath = [self _temporaryCopyNameForPath: dst didFindTrash: &didFindTrash];
@@ -465,66 +464,40 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	{
 		err = FSPathMakeRef((UInt8 *)[[tmpPath stringByDeletingLastPathComponent] fileSystemRepresentation], &tmpDirRef, NULL);
 		if (err != noErr)
-			err = FSPathMakeRef((UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &tmpDirRef, NULL);
+			FSPathMakeRef((UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &tmpDirRef, NULL);
 	}
 	
 	err = FSPathMakeRef((UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &dstDirRef, NULL);
-	
+
 	if (err == noErr && hadFileAtDest)
 	{
-		if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_5)
-		{
-			NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
-			BOOL success = [manager moveItemAtPath:dst toPath:tmpPath error:error];
-			if (!success && hadFileAtDest)
-			{
-				if (error != NULL)
-					*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
-				return NO;
-			}
-			
-		} else {
-			err = FSMoveObjectSync(&dstRef, &tmpDirRef, (CFStringRef)[tmpPath lastPathComponent], &movedRef, 0);
-			if (err != noErr && hadFileAtDest)
-			{
-				if (error != NULL)
-					*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
-				return NO;
-			}
-		}
+        NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
+        BOOL success = [manager moveItemAtPath:dst toPath:tmpPath error:error];
+        if (!success && hadFileAtDest)
+        {
+            if (error != NULL)
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
+            return NO;
+        }
 	}
-	
+
 	err = FSPathMakeRef((UInt8 *)[src fileSystemRepresentation], &srcRef, NULL);
 	if (err == noErr)
 	{
-		if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_5)
+		NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
+		BOOL success = [manager copyItemAtPath:src toPath:dst error:error];
+		if (!success)
 		{
-			NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
-			BOOL success = [manager copyItemAtPath:src toPath:dst error:error];
-			if (!success)
-			{
-				// We better move the old version back to its old location
-				if( hadFileAtDest )
-					success = [manager moveItemAtPath:tmpPath toPath:dst error:error];
-				if (error != NULL)
-					*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
-				return NO;
-                
-			}
-		} else {
-			err = FSCopyObjectSync(&srcRef, &dstDirRef, (CFStringRef)[dst lastPathComponent], NULL, 0);
-			if (err != noErr)
-			{
-				// We better move the old version back to its old location
-				if( hadFileAtDest )
-					FSMoveObjectSync(&movedRef, &dstDirRef, (CFStringRef)[dst lastPathComponent], &movedRef, 0);
-				if (error != NULL)
-					*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't copy %@ to %@.", src, dst] forKey:NSLocalizedDescriptionKey]];
-				return NO;
-			}
+			// We better move the old version back to its old location
+			if( hadFileAtDest )
+				success = [manager moveItemAtPath:tmpPath toPath:dst error:error];
+			if (!success && error != NULL)
+				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
+			return NO;
+
 		}
 	}
-    
+
 	// If the currently-running application is trusted, the new
 	// version should be trusted as well.  Remove it from the
 	// quarantine to avoid a delay at launch, and to avoid
@@ -534,19 +507,16 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	// new home in case it's moved across filesystems: if that
 	// happens, the move is actually a copy, and it may result
 	// in the application being quarantined.
-	if ([NSThread isMultiThreaded])
-		[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:dst waitUntilDone:YES];
-	else
-		[self releaseFromQuarantine:dst];
+	[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:dst waitUntilDone:YES];
 	
 	return YES;
 }
 
 @end
 
-#import <dlfcn.h>
-#import <errno.h>
-#import <sys/xattr.h>
+#include <dlfcn.h>
+#include <errno.h>
+#include <sys/xattr.h>
 
 @implementation SUPlainInstaller (MMExtendedAttributes)
 
@@ -555,20 +525,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
            options:(int)options
 {
 	// *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
-    
-	typedef int (*removexattr_type)(const char*, const char*, int);
-	// Reference removexattr directly, it's in the SDK.
-	static removexattr_type removexattr_func = removexattr;
-	
-	// Make sure that the symbol is present.  This checks the deployment
-	// target instead of the SDK so that it's able to catch dlsym failures
-	// as well as the null symbol that would result from building with the
-	// 10.4 SDK and a lower deployment target, and running on 10.3.
-	if (!removexattr_func) {
-		errno = ENOSYS;
-		return -1;
-	}
-	
+
 	const char* path = NULL;
 	@try {
 		path = [file fileSystemRepresentation];
@@ -582,13 +539,13 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		return -1;
 	}
 	
-	return removexattr_func(path, name, options);
+	return removexattr(path, name, options);
 }
 
 + (void)releaseFromQuarantine:(NSString*)root
 {
 	// *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
-    
+
 	const char* quarantineAttribute = "com.apple.quarantine";
 	const int removeXAttrOptions = XATTR_NOFOLLOW;
 	
@@ -598,11 +555,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	
 	// Only recurse if it's actually a directory.  Don't recurse into a
 	// root-level symbolic link.
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-	NSDictionary* rootAttributes = [[NSFileManager defaultManager] fileAttributesAtPath:root traverseLink:NO];
-#else
 	NSDictionary* rootAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:root error:nil];
-#endif
 	NSString* rootType = [rootAttributes objectForKey:NSFileType];
 	
 	if (rootType == NSFileTypeDirectory) {

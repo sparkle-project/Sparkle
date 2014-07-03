@@ -10,7 +10,7 @@
 #import "SUSystemProfiler.h"
 
 #import "SUHost.h"
-#import <sys/sysctl.h>
+#include <sys/sysctl.h>
 
 @implementation SUSystemProfiler
 + (SUSystemProfiler *)sharedSystemProfiler
