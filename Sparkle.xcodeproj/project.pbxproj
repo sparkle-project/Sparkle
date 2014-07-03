@@ -497,10 +497,8 @@
 		61F614540E24A12D009F47E7 /* it */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBasicUpdateDriver.h; sourceTree = "<group>"; };
 		61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBasicUpdateDriver.m; sourceTree = "<group>"; };
-		6B74D85819217A74006F9DCA /* com.yahoo.Sparkle.SandboxService.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.yahoo.Sparkle.SandboxService.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
-		6B74D85A19217A74006F9DCA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		6B74D85819217A74006F9DCA /* org.sparkle-project.Sparkle.SandboxService.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "org.sparkle-project.Sparkle.SandboxService.xpc"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B74D85E19217A74006F9DCA /* sandbox_service-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "sandbox_service-Info.plist"; sourceTree = "<group>"; };
-		6B74D86019217A74006F9DCA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6B74D86219217A74006F9DCA /* sandbox_service-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "sandbox_service-Prefix.pch"; sourceTree = "<group>"; };
 		6B74D86319217A74006F9DCA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6B74D86819217B39006F9DCA /* SUXPC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUXPC.h; sourceTree = "<group>"; };
@@ -575,7 +573,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6B74D85B19217A74006F9DCA /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -606,7 +603,7 @@
 				61B5F90209C4CEE200B25A18 /* Sparkle Test App.app */,
 				612279D90DB5470200AB99EA /* Sparkle Unit Tests.xctest */,
 				8DC2EF5B0486A6940098B216 /* Sparkle.framework */,
-				6B74D85819217A74006F9DCA /* com.yahoo.Sparkle.SandboxService.xpc */,
+				6B74D85819217A74006F9DCA /* org.sparkle-project.Sparkle.SandboxService.xpc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -910,14 +907,6 @@
 			name = "Update Control";
 			sourceTree = "<group>";
 		};
-		6B74D85919217A74006F9DCA /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				6B74D85A19217A74006F9DCA /* Foundation.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		6B74D85C19217A74006F9DCA /* sandbox_service */ = {
 			isa = PBXGroup;
 			children = (
@@ -933,7 +922,6 @@
 			isa = PBXGroup;
 			children = (
 				6B74D85E19217A74006F9DCA /* sandbox_service-Info.plist */,
-				6B74D85F19217A74006F9DCA /* InfoPlist.strings */,
 				6B74D86219217A74006F9DCA /* sandbox_service-Prefix.pch */,
 			);
 			name = "Supporting Files";
@@ -1141,7 +1129,7 @@
 			);
 			name = sandbox_service;
 			productName = sandbox_service;
-			productReference = 6B74D85819217A74006F9DCA /* com.yahoo.Sparkle.SandboxService.xpc */;
+			productReference = 6B74D85819217A74006F9DCA /* org.sparkle-project.Sparkle.SandboxService.xpc */;
 			productType = "com.apple.product-type.bundle";
 		};
 		8DC2EF4F0486A6940098B216 /* Sparkle */ = {
@@ -1252,7 +1240,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1420DE3119620A6600203BB0 /* (null) in Resources */,
 				1420DF51196247F900203BB0 /* Images.xcassets in Resources */,
 				55C14FC7136F05E100649790 /* Sparkle.strings in Resources */,
 				55C14BD9136EF00C00649790 /* SUStatus.xib in Resources */,
@@ -1270,7 +1257,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1420DE301962082C00203BB0 /* (null) in Resources */,
 				14732BC01960F2C200593899 /* dsa_pub.pem in Resources */,
 				1420DF50196247F900203BB0 /* Images.xcassets in Resources */,
 				61B5F92E09C4CFD800B25A18 /* InfoPlist.strings in Resources */,
@@ -1282,7 +1268,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6B74D86119217A74006F9DCA /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1433,15 +1418,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6B74D87319217BFC006F9DCA /* SUPackageInstaller.m in Sources */,
-				6B74D87419217BFC006F9DCA /* SUConstants.m in Sources */,
-				6B74D86F19217BE6006F9DCA /* SUInstaller.m in Sources */,
-				6B74D87019217BE6006F9DCA /* SUPlainInstaller.m in Sources */,
-				6B74D87119217BE6006F9DCA /* SUPlainInstallerInternals.m in Sources */,
-				6B74D87219217BE6006F9DCA /* SULog.m in Sources */,
-				6BA4FB9B192AB6A200F04C5E /* SUCodeSigningVerifier.m in Sources */,
-				6BA4FB9C192AB6A500F04C5E /* SUDSAVerifier.m in Sources */,
-				6B74D86419217A74006F9DCA /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1886,7 +1862,7 @@
 				INFOPLIST_FILE = "sandbox_service/sandbox_service-Info.plist";
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				PRODUCT_NAME = com.yahoo.Sparkle.SandboxService;
+				PRODUCT_NAME = "org.sparkle-project.Sparkle.SandboxService";
 				WRAPPER_EXTENSION = xpc;
 			};
 			name = Debug;
@@ -1924,7 +1900,7 @@
 				INFOPLIST_FILE = "sandbox_service/sandbox_service-Info.plist";
 				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				PRODUCT_NAME = com.yahoo.Sparkle.SandboxService;
+				PRODUCT_NAME = "org.sparkle-project.Sparkle.SandboxService";
 				WRAPPER_EXTENSION = xpc;
 			};
 			name = Release;

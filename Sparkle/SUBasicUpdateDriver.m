@@ -532,7 +532,7 @@
     BOOL inSandbox = (nil != [environ objectForKey:@"APP_SANDBOX_CONTAINER_ID"]);
 	BOOL running10_7 = floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6;
 	BOOL useXPC = running10_7 && inSandbox &&
-    [[NSFileManager defaultManager] fileExistsAtPath: [[self.host bundlePath] stringByAppendingPathComponent:@"Contents/XPCServices/com.yahoo.Sparkle.SandboxService.xpc"]];
+    [[NSFileManager defaultManager] fileExistsAtPath: [[self.host bundlePath] stringByAppendingPathComponent:@"Contents/XPCServices/org.sparkle-project.Sparkle.SandboxService.xpc"]];
     SULog(@"installWithToolAndRelaunch - using xpc=%d", useXPC);
 
 

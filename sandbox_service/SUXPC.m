@@ -13,7 +13,7 @@
 #import "SUXPC.h"
 
 
-#define XPC_NAME    "com.yahoo.Sparkle.SandboxService"
+#define XPC_NAME    "org.sparkle-project.Sparkle.SandboxService"
 
 @implementation SUXPC
 
