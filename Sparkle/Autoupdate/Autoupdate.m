@@ -16,7 +16,7 @@ static const NSTimeInterval SUInstallationTimeLimit = 5;
 /*!
  * Time this app uses to recheck if the parent has already died.
  */
-static const NSTimeInterval SUParentQuitCheckInterval = .5;
+static const NSTimeInterval SUParentQuitCheckInterval = .25;
 
 @interface TerminationListener : NSObject <SUInstallerDelegate>
 
