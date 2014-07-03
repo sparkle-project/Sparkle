@@ -156,10 +156,10 @@ DQ
                             </binding>
                         </connections>
                     </box>
-                    <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="100" translatesAutoresizingMaskIntoConstraints="NO" id="101">
+                    <textField horizontalHuggingPriority="350" verticalHuggingPriority="999" horizontalCompressionResistancePriority="100" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="101">
                         <rect key="frame" x="106" y="316" width="544" height="14"/>
                         <constraints>
-                            <constraint firstAttribute="height" priority="300" constant="28" id="H6E-te-Fog"/>
+                            <constraint firstAttribute="height" relation="lessThanOrEqual" priority="300" constant="28" id="H6E-te-Fog"/>
                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="14" id="KUO-Dw-g6s"/>
                         </constraints>
                         <textFieldCell key="cell" allowsUndo="NO" sendsActionOnEndEditing="YES" id="174">

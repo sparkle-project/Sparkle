@@ -157,11 +157,11 @@ static const NSTimeInterval SUParentQuitCheckInterval = .5;
 		[statusCtl release];
     }
 
-	[SUInstaller installFromUpdateFolder: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: folderpath length: strlen(folderpath)]
-					overHost: host
-            installationPath: installationPath
-					delegate: self synchronously: NO
-					versionComparator: [SUStandardVersionComparator defaultComparator]];
+    [SUInstaller installFromUpdateFolder:[[NSFileManager defaultManager] stringWithFileSystemRepresentation:folderpath length:strlen(folderpath)]
+                                overHost:host
+                        installationPath:installationPath
+                                delegate:self
+                       versionComparator:[SUStandardVersionComparator defaultComparator]];
 }
 
 - (void)installerFinishedForHost:(SUHost *) __unused aHost

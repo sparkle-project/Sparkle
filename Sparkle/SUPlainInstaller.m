@@ -11,54 +11,9 @@
 #import "SUConstants.h"
 #import "SUHost.h"
 
-static NSString * const SUInstallerPathKey = @"SUInstallerPath";
-static NSString * const SUInstallerTargetPathKey = @"SUInstallerTargetPath";
-static NSString * const SUInstallerTempNameKey = @"SUInstallerTempName";
-static NSString * const SUInstallerHostKey = @"SUInstallerHost";
-static NSString * const SUInstallerDelegateKey = @"SUInstallerDelegate";
-static NSString * const SUInstallerResultKey = @"SUInstallerResult";
-static NSString * const SUInstallerErrorKey = @"SUInstallerError";
-static NSString * const SUInstallerInstallationPathKey = @"SUInstallerInstallationPath";
-
 @implementation SUPlainInstaller
 
-+ (void)finishInstallationWithInfo:(NSDictionary *)info
-{
-	// *** GETS CALLED ON NON-MAIN THREAD!
-
-	[self finishInstallationToPath:info[SUInstallerInstallationPathKey] withResult:[info[SUInstallerResultKey] boolValue] host:info[SUInstallerHostKey] error:info[SUInstallerErrorKey] delegate:info[SUInstallerDelegateKey]];
-}
-
-+ (void)performInstallationWithInfo:(NSDictionary *)info
-{
-	// *** GETS CALLED ON NON-MAIN THREAD!
-
-	@autoreleasepool {
-		NSError *error = nil;
-
-		NSString	*	oldPath = [info[SUInstallerHostKey] bundlePath];
-		NSString	*	installationPath = info[SUInstallerInstallationPathKey];
-		BOOL result = [self copyPathWithAuthentication:info[SUInstallerPathKey] overPath: installationPath temporaryName:info[SUInstallerTempNameKey] error:&error];
-
-		if( result )
-		{
-			BOOL	haveOld = [[NSFileManager defaultManager] fileExistsAtPath: oldPath];
-			BOOL	differentFromNew = ![oldPath isEqualToString: installationPath];
-			if( haveOld && differentFromNew )
-				[self _movePathToTrash: oldPath];	// On success, trash old copy if there's still one due to renaming.
-		}
-		NSMutableDictionary *mutableInfo = [[info mutableCopy] autorelease];
-		mutableInfo[SUInstallerResultKey] = @(result);
-		mutableInfo[SUInstallerInstallationPathKey] = installationPath;
-		if (!result && error)
-			mutableInfo[SUInstallerErrorKey] = error;
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[self finishInstallationWithInfo:mutableInfo];
-		});
-	}
-}
-
-+ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:(id<SUInstallerDelegate>)delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
++ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:(id<SUInstallerDelegate>)delegate versionComparator:(id<SUVersionComparison>)comparator
 {
 	// Prevent malicious downgrades:
 	#if !PERMIT_AUTOMATED_DOWNGRADES
@@ -71,16 +26,25 @@ static NSString * const SUInstallerInstallationPathKey = @"SUInstallerInstallati
 	}
 	#endif
 
-    NSString *targetPath = [host installationPath];
-    NSString *tempName = [self temporaryNameForPath:targetPath];
-	NSDictionary *info = @{SUInstallerPathKey: path, SUInstallerTargetPathKey: targetPath, SUInstallerTempNameKey: tempName, SUInstallerHostKey: host, SUInstallerDelegateKey: delegate, SUInstallerInstallationPathKey: installationPath};
-	if (synchronously)
-		[self performInstallationWithInfo:info];
-	else {
-		dispatch_async(dispatch_get_global_queue(0, 0), ^{
-			[self performInstallationWithInfo:info];
-		});
-	}
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSError *error = nil;
+        NSString *oldPath = [host bundlePath];
+        NSString *tempName = [self temporaryNameForPath:[host installationPath]];
+
+        BOOL result = [self copyPathWithAuthentication:path overPath:installationPath temporaryName:tempName error:&error];
+
+        if (result) {
+            BOOL haveOld = [[NSFileManager defaultManager] fileExistsAtPath:oldPath];
+            BOOL differentFromNew = ![oldPath isEqualToString:installationPath];
+            if (haveOld && differentFromNew) {
+                [self _movePathToTrash:oldPath];    // On success, trash old copy if there's still one due to renaming.
+            }
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self finishInstallationToPath:installationPath withResult:result host:host error:error delegate:delegate];
+        });
+    });
 }
 
 @end
