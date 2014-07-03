@@ -13,21 +13,15 @@
 
 @class SUHost;
 @interface SUStatusController : SUWindowController
-{
-@private
-	double progressValue, maxProgressValue;
-	NSString *title, *statusText, *buttonTitle;
-	IBOutlet NSButton *actionButton;
-	IBOutlet NSProgressIndicator* progressBar;
-	SUHost *host;
-}
+@property (assign) IBOutlet NSButton *actionButton;
+@property (assign) IBOutlet NSProgressIndicator* progressBar;
 
 @property (copy) NSString *statusText;
 @property double progressValue;
 @property (nonatomic) double maxProgressValue;
 @property (getter = isButtonEnabled) BOOL buttonEnabled;
 
-- (id)initWithHost:(SUHost *)host;
+- (instancetype)initWithHost:(SUHost *)host;
 
 // Pass 0 for the max progress value to get an indeterminate progress bar.
 // Pass nil for the status text to not show it.

@@ -5,11 +5,6 @@
 //  Created by Andy Matuschak on 3/12/06.
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
-// Additions by Yahoo:
-// Copyright 2014 Yahoo Inc. Licensed under the project's open source license.
-//
-// JSON format appcasts
-//
 
 #import "SUUpdater.h"
 
@@ -21,7 +16,7 @@
 #import "SULog.h"
 
 @interface NSXMLElement (SUAppcastExtensions)
-- (NSDictionary *)attributesAsDictionary;
+@property (readonly, copy) NSDictionary *attributesAsDictionary;
 @end
 
 @implementation NSXMLElement (SUAppcastExtensions)
@@ -31,7 +26,7 @@
 	NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
 
 	for (NSXMLNode *attribute in attributeEnum) {
-		[dictionary setObject:[attribute stringValue] forKey:[attribute name]];
+		dictionary[[attribute name]] = [attribute stringValue];
 	}
 	return dictionary;
 }
@@ -41,12 +36,8 @@
 @property (copy) NSString *downloadFilename;
 @property (retain) NSURLDownload *download;
 @property (copy) NSArray *items;
-
-
-
 - (void)reportError:(NSError *)error;
 - (NSXMLNode *)bestNodeInNodes:(NSArray *)nodes;
-- (void) parseJSON: (NSData*) receivedData;
 @end
 
 @implementation SUAppcast
@@ -66,26 +57,13 @@
 	[super dealloc];
 }
 
-- (void)setUseJSON:(bool)val
-{
-    useJSON = val;
-}
-
 - (void)fetchAppcastFromURL:(NSURL *)url
 {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
-    if (userAgentString)
+	if (userAgentString) {
         [request setValue:userAgentString forHTTPHeaderField:@"User-Agent"];
-    
-    SULog(@"Submitting a request for an AppCast with URL: %@", [url absoluteString]);
-    for (NSString* hdr in [[request allHTTPHeaderFields] allKeys])
-    {
-        SULog(@"%@ - %@", hdr, [[request allHTTPHeaderFields] valueForKey:hdr]);
-    }
-    
-    if  ( useJSON )
-        SULog(@"Using JSON to download the appcast");
-    
+	}
+            
     self.download = [[[NSURLDownload alloc] initWithRequest:request delegate:self] autorelease];
 }
 
@@ -107,14 +85,6 @@
 - (void)downloadDidFinish:(NSURLDownload *)aDownload
 {    
 	NSError *error = nil;
-    
-	if ( useJSON )
-    {
-        NSUInteger options = 0;
-        NSData* rec = [[NSData dataWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:options error:&error] retain];
-        [self parseJSON: rec];
-        return;
-    }
 	
 	NSXMLDocument *document = nil;
 	BOOL failed = NO;
@@ -124,13 +94,7 @@
 	if (downloadFilename)
 	{
         NSUInteger options = 0;
-        if (NSAppKitVersionNumber < NSAppKitVersionNumber10_7) {
-            // In order to avoid including external entities when parsing the appcast (a potential security vulnerability; see https://github.com/andymatuschak/Sparkle/issues/169), we ask NSXMLDocument to "tidy" the XML first. This happens to remove these external entities; it wouldn't be a future-proof approach, but it worked in these historical versions of OS X, and we have a more rigorous approach for 10.7+.
-            options = NSXMLDocumentTidyXML;
-        } else {
-            // In 10.7 and later, there's a real option for the behavior we desire.
-            options = NSXMLNodeLoadExternalEntitiesSameOriginOnly;
-        }
+		options = NSXMLNodeLoadExternalEntitiesSameOriginOnly;
 		document = [[[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:options error:&error] autorelease];
 	
 		[[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:nil];
@@ -173,11 +137,11 @@
                     NSString *name = [node name];
                     if (name)
                     {
-                        NSMutableArray *nodes = [nodesDict objectForKey:name];
+                        NSMutableArray *nodes = nodesDict[name];
                         if (nodes == nil)
                         {
                             nodes = [NSMutableArray array];
-                            [nodesDict setObject:nodes forKey:name];
+                            nodesDict[name] = nodes;
                         }
                         [nodes addObject:node];
                     }
@@ -187,12 +151,12 @@
             
             for (NSString *name in nodesDict)
             {
-                node = [self bestNodeInNodes:[nodesDict objectForKey:name]];
+                node = [self bestNodeInNodes:nodesDict[name]];
 				if ([name isEqualToString:@"enclosure"])
 				{
 					// enclosure is flattened as a separate dictionary for some reason
 					NSDictionary *encDict = [(NSXMLElement *)node attributesAsDictionary];
-					[dict setObject:encDict forKey:@"enclosure"];
+					dict[@"enclosure"] = encDict;
 					
 				}
                 else if ([name isEqualToString:@"pubDate"])
@@ -200,7 +164,7 @@
 					// pubDate is expected to be an NSDate by SUAppcastItem, but the RSS class was returning an NSString
 					NSDate *date = [NSDate dateWithNaturalLanguageString:[node stringValue]];
 					if (date)
-						[dict setObject:date forKey:name];
+						dict[name] = date;
 				}
 				else if ([name isEqualToString:@"sparkle:deltas"])
 				{
@@ -210,14 +174,14 @@
 						if ([[child name] isEqualToString:@"enclosure"])
 							[deltas addObject:[(NSXMLElement *)child attributesAsDictionary]];
 					}
-					[dict setObject:deltas forKey:@"deltas"];
+					dict[@"deltas"] = deltas;
 				}
 				else if (name != nil)
 				{
 					// add all other values as strings
 					NSString *theValue = [[node stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 					if (theValue != nil) {
-						[dict setObject:theValue forKey:name];
+						dict[name] = theValue;
 					}
 				}
             }
@@ -240,13 +204,13 @@
 	if ([appcastItems count])
     {
 		NSSortDescriptor *sort = [[[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO] autorelease];
-		[appcastItems sortUsingDescriptors:[NSArray arrayWithObject:sort]];
+		[appcastItems sortUsingDescriptors:@[sort]];
 		self.items = appcastItems;
 	}
 	
 	if (failed)
     {
-        [self reportError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while parsing the update feed.", nil), NSLocalizedDescriptionKey, nil]]];
+        [self reportError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:@{NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while parsing the update feed.", nil)}]];
 	}
     else if ([delegate respondsToSelector:@selector(appcastDidFinishLoading:)])
     {
@@ -274,7 +238,7 @@
 {
 	if ([delegate respondsToSelector:@selector(appcast:failedToLoadWithError:)])
 	{
-		[delegate appcast:self failedToLoadWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil), NSLocalizedDescriptionKey, [error localizedDescription], NSLocalizedFailureReasonErrorKey, nil]]];
+		[delegate appcast:self failedToLoadWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastError userInfo:@{NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil), NSLocalizedFailureReasonErrorKey: [error localizedDescription]}]];
 	}
 }
 
@@ -282,7 +246,7 @@
 {
 	// We use this method to pick out the localized version of a node when one's available.
     if ([nodes count] == 1)
-        return [nodes objectAtIndex:0];
+        return nodes[0];
     else if ([nodes count] == 0)
         return nil;
     
@@ -293,71 +257,12 @@
         lang = [[node attributeForName:@"xml:lang"] stringValue];
         [languages addObject:(lang ? lang : @"")];
     }
-    lang = [[NSBundle preferredLocalizationsFromArray:languages] objectAtIndex:0];
+    lang = [NSBundle preferredLocalizationsFromArray:languages][0];
     i = [languages indexOfObject:([languages containsObject:lang] ? lang : @"")];
-    if (i == NSNotFound)
+	if (i == NSNotFound) {
         i = 0;
-    return [nodes objectAtIndex:i];
-}
-
-- (void) parseJSON: (NSData*) receivedData
-{
-    if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_6)
-    {
-        SULog(@"Error: parseJSON requires Mac OS X 10.7 or higher");
-        return;
-    }
-    
-    if ( self.items )
-    {
-        [self.items release];
-        self.items = nil;
-    }
-    
-    NSError* error = nil;
-    NSArray* json = [[NSJSONSerialization JSONObjectWithData:receivedData options:nil error:&error] retain];
-    
-    SULog(@"SUAppCast - found %ld update items in json: %@ (parseJSON)", (unsigned long)[json count], json );
-    if ( error != nil )
-    {
-        [self reportError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while parsing the update feed.", nil), NSLocalizedDescriptionKey, nil]]];
-    }
-    else
-    {
-        NSMutableArray* arr = [[[NSMutableArray alloc] init] retain];
-        for (NSDictionary* dict in json)
-        {
-            SUAppcastItem* nitem = [[SUAppcastItem alloc] init];
-            [nitem setFileURL: [NSURL URLWithString: [dict objectForKey:@"full"]]];
-            [nitem setVersionStringFromNumber: [dict objectForKey:@"build"]];
-            [nitem setDSASignature:[dict objectForKey:@"dsa"]];
-            
-            NSNumber* sz = [dict objectForKey:@"size"];
-            if ( sz == nil )
-                [nitem setFileSize:0];
-            else
-                [nitem setFileSize: [sz integerValue]];
-            
-            [arr addObject:nitem];
-            
-            SULog(@"Found update full=%@", [[nitem fileURL] absoluteString]);
-            [nitem release];
-        }
-        if ( [arr count] )
-        {
-            self.items = [NSArray arrayWithArray:arr];
-            SULog(@"SUAppCast - found %d items", [self.items count]);
-        }
-    }
-    [json release];
-    [receivedData release];
-    receivedData = nil;
-    
-    if ([delegate respondsToSelector:@selector(appcastDidFinishLoading:)])
-    {
-        [delegate appcastDidFinishLoading:self];
 	}
+    return nodes[i];
 }
-
 
 @end

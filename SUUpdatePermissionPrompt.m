@@ -11,6 +11,10 @@
 #import "SUHost.h"
 #import "SUConstants.h"
 
+@interface SUUpdatePermissionPrompt ()
+@property BOOL isShowingMoreInfo, shouldSendProfile;
+@end
+
 @implementation SUUpdatePermissionPrompt
 
 - (BOOL)shouldAskAboutProfile
@@ -18,15 +22,15 @@
 	return [[host objectForInfoDictionaryKey:SUEnableSystemProfilingKey] boolValue];
 }
 
-- (id)initWithHost:(SUHost *)aHost systemProfile:(NSArray *)profile delegate:(id)d
+- (instancetype)initWithHost:(SUHost *)aHost systemProfile:(NSArray *)profile delegate:(id<SUUpdatePermissionPromptDelegateProtocol>)d
 {
 	self = [super initWithHost:aHost windowNibName:@"SUUpdatePermissionPrompt"];
 	if (self)
 	{
 		host = [aHost retain];
 		delegate = d;
-		isShowingMoreInfo = NO;
-		shouldSendProfile = [self shouldAskAboutProfile];
+		self.isShowingMoreInfo = NO;
+		self.shouldSendProfile = [self shouldAskAboutProfile];
 		systemProfileInformationArray = [profile retain];
 		[self setShouldCascadeWindows:NO];
 	}
@@ -80,9 +84,7 @@
 
 - (IBAction)toggleMoreInfo:(id)sender
 {
-	[self willChangeValueForKey:@"isShowingMoreInfo"];
-	isShowingMoreInfo = !isShowingMoreInfo;
-	[self didChangeValueForKey:@"isShowingMoreInfo"];
+	self.isShowingMoreInfo = !_isShowingMoreInfo;
 	
 	NSView *contentView = [[self window] contentView];
 	NSRect contentViewFrame = [contentView frame];
@@ -92,7 +94,7 @@
 	NSRect profileMoreInfoButtonFrame = [moreInfoButton frame];
 	NSRect descriptionFrame = [descriptionTextField frame];
 	
-	if (isShowingMoreInfo)
+	if (_isShowingMoreInfo)
 	{
 		// Add the subview
 		contentViewFrame.size.height += profileMoreInfoViewFrame.size.height;
@@ -120,14 +122,15 @@
 	[[self window] setFrame:windowFrame display:YES animate:YES];
 	[contentView setFrame:contentViewFrame];
 	[contentView setNeedsDisplay:YES];
-	[moreInfoView setHidden:(!isShowingMoreInfo)];
+	[moreInfoView setHidden:(!_isShowingMoreInfo)];
 }
 
 - (IBAction)finishPrompt:(id)sender
 {
-	if (![delegate respondsToSelector:@selector(updatePermissionPromptFinishedWithResult:)])
+	if (![delegate respondsToSelector:@selector(updatePermissionPromptFinishedWithResult:)]) {
 		[NSException raise:@"SUInvalidDelegate" format:@"SUUpdatePermissionPrompt's delegate (%@) doesn't respond to updatePermissionPromptFinishedWithResult:!", delegate];
-	[host setBool:shouldSendProfile forUserDefaultsKey:SUSendProfileInfoKey];
+	}
+	[host setBool:_shouldSendProfile forUserDefaultsKey:SUSendProfileInfoKey];
 	[delegate updatePermissionPromptFinishedWithResult:([sender tag] == 1 ? SUAutomaticallyCheck : SUDoNotAutomaticallyCheck)];
 	[[self window] close];
 	[NSApp stopModal];

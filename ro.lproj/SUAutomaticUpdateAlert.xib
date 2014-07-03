@@ -158,7 +158,7 @@
 						<object class="NSButton" id="265767855">
 							<reference key="NSNextResponder" ref="683629094"/>
 							<int key="NSvFlags">257</int>
-							<string key="NSFrame">{{411, 12}, {194, 32}}</string>
+							<string key="NSFrame">{{414, 12}, {191, 32}}</string>
 							<reference key="NSSuperview" ref="683629094"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView"/>
@@ -166,7 +166,7 @@
 							<object class="NSButtonCell" key="NSCell" id="5529083">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Instalează și Redeschide</string>
+								<string key="NSContents">Instalează și redeschide</string>
 								<object class="NSFont" key="NSSupport" id="957448308">
 									<string key="NSName">LucidaGrande</string>
 									<double key="NSSize">13</double>
@@ -185,7 +185,7 @@
 						<object class="NSButton" id="389094888">
 							<reference key="NSNextResponder" ref="683629094"/>
 							<int key="NSvFlags">257</int>
-							<string key="NSFrame">{{254, 12}, {157, 32}}</string>
+							<string key="NSFrame">{{257, 12}, {157, 32}}</string>
 							<reference key="NSSuperview" ref="683629094"/>
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="265767855"/>
@@ -193,7 +193,7 @@
 							<object class="NSButtonCell" key="NSCell" id="285814029">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Instalează la Ieșire</string>
+								<string key="NSContents">Instalează la ieșire</string>
 								<reference key="NSSupport" ref="957448308"/>
 								<reference key="NSControlView" ref="389094888"/>
 								<int key="NSButtonFlags">-2038284033</int>
@@ -241,7 +241,7 @@
 							<object class="NSButtonCell" key="NSCell" id="112350240">
 								<int key="NSCellFlags">67239424</int>
 								<int key="NSCellFlags2">131072</int>
-								<string key="NSContents">În viitor descarcă și instalează automat actualizările</string>
+								<string key="NSContents">În viitor descarcă și instalează în automat actualizările</string>
 								<reference key="NSSupport" ref="26"/>
 								<reference key="NSControlView" ref="649646560"/>
 								<int key="NSButtonFlags">1211912703</int>
@@ -261,7 +261,7 @@
 					<reference key="NSWindow"/>
 					<reference key="NSNextKeyView" ref="684391777"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
 				<string key="NSMinSize">{511, 174}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>

@@ -9,21 +9,29 @@
 // Copyright 2014 Yahoo Inc. Licensed under the project's open source license.
 //
 
-
 #import "SUAutomaticUpdateAlert.h"
 
 #import "SUHost.h"
 
-@implementation SUAutomaticUpdateAlert
+@interface SUAutomaticUpdateAlert ()
+@property (retain) SUAppcastItem *updateItem;
+@property (assign) id<SUAutomaticUpdateAlertDelegateProtocol> delegate;
+@property (retain) SUHost *host;
+@end
 
-- (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost delegate:(id<SUAutomaticUpdateAlertDelegateProtocol>)del
+@implementation SUAutomaticUpdateAlert
+@synthesize delegate;
+@synthesize host;
+@synthesize updateItem;
+
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost delegate:(id<SUAutomaticUpdateAlertDelegateProtocol>)del
 {
 	self = [super initWithHost:aHost windowNibName:@"SUAutomaticUpdateAlert"];
 	if (self)
 	{
-		updateItem = [item retain];
-		delegate = del;
-		host = [aHost retain];
+		self.updateItem = item;
+		self.delegate = del;
+		self.host = aHost;
         
         if ( updateItem.mandatoryUpdate )
         {
@@ -39,26 +47,26 @@
 
 - (void)dealloc
 {
-	[host release];
-	[updateItem release];
+	self.host = nil;
+	self.updateItem = nil;
 	[super dealloc];
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [host bundlePath], [host installationPath]]; }
 
-- (IBAction)installNow:sender
+- (IBAction)installNow:(id)sender
 {
 	[self close];
 	[delegate automaticUpdateAlert:self finishedWithChoice:SUInstallNowChoice];
 }
 
-- (IBAction)installLater:sender
+- (IBAction)installLater:(id)sender
 {
 	[self close];
 	[delegate automaticUpdateAlert:self finishedWithChoice:SUInstallLaterChoice];
 }
 
-- (IBAction)doNotInstall:sender
+- (IBAction)doNotInstall:(id)sender
 {
 	[self close];
 	[delegate automaticUpdateAlert:self finishedWithChoice:SUDoNotInstallChoice];

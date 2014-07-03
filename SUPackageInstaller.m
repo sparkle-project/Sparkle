@@ -20,20 +20,20 @@ NSString *SUPackageInstallerInstallationPathKey = @"SUPackageInstallerInstallati
 
 + (void)finishInstallationWithInfo:(NSDictionary *)info
 {
-	[self finishInstallationToPath:[info objectForKey:SUPackageInstallerInstallationPathKey] withResult:YES host:[info objectForKey:SUPackageInstallerHostKey] error:nil delegate:[info objectForKey:SUPackageInstallerDelegateKey]];
+	[self finishInstallationToPath:info[SUPackageInstallerInstallationPathKey] withResult:YES host:info[SUPackageInstallerHostKey] error:nil delegate:info[SUPackageInstallerDelegateKey]];
 }
 
 + (void)performInstallationWithInfo:(NSDictionary *)info
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
-	NSTask *installer = [NSTask launchedTaskWithLaunchPath:[info objectForKey:SUPackageInstallerCommandKey] arguments:[info objectForKey:SUPackageInstallerArgumentsKey]];
-	[installer waitUntilExit];
-	
-	// Known bug: if the installation fails or is canceled, Sparkle goes ahead and restarts, thinking everything is fine.
-	[self performSelectorOnMainThread:@selector(finishInstallationWithInfo:) withObject:info waitUntilDone:NO];
-	
-	[pool drain];
+	@autoreleasepool {
+		NSTask *installer = [NSTask launchedTaskWithLaunchPath:info[SUPackageInstallerCommandKey] arguments:info[SUPackageInstallerArgumentsKey]];
+		[installer waitUntilExit];
+		
+		// Known bug: if the installation fails or is canceled, Sparkle goes ahead and restarts, thinking everything is fine.
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self finishInstallationWithInfo:info];
+		});
+	}
 }
 
 + (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
@@ -46,20 +46,23 @@ NSString *SUPackageInstallerInstallationPathKey = @"SUPackageInstallerInstallati
 	// -n = Open another instance if already open.
 	// -b = app bundle identifier
 	command = @"/usr/bin/open";
-	args = [NSArray arrayWithObjects:@"-W", @"-n", @"-b", @"com.apple.installer", path, nil];
+	args = @[@"-W", @"-n", @"-b", @"com.apple.installer", path];
 	
 	if (![[NSFileManager defaultManager] fileExistsAtPath:command])
 	{
-		NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingInstallerToolError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find Apple's installer tool!" forKey:NSLocalizedDescriptionKey]];
+		NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingInstallerToolError userInfo:@{NSLocalizedDescriptionKey: @"Couldn't find Apple's installer tool!"}];
 		[self finishInstallationToPath:installationPath withResult:NO host:host error:error delegate:delegate];
 	}
 	else 
 	{
-		NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:command, SUPackageInstallerCommandKey, args, SUPackageInstallerArgumentsKey, host, SUPackageInstallerHostKey, delegate, SUPackageInstallerDelegateKey, installationPath, SUPackageInstallerInstallationPathKey, nil];
+		NSDictionary *info = @{SUPackageInstallerCommandKey: command, SUPackageInstallerArgumentsKey: args, SUPackageInstallerHostKey: host, SUPackageInstallerDelegateKey: delegate, SUPackageInstallerInstallationPathKey: installationPath};
 		if (synchronously)
 			[self performInstallationWithInfo:info];
-		else
-			[NSThread detachNewThreadSelector:@selector(performInstallationWithInfo:) toTarget:self withObject:info];
+		else {
+			dispatch_async(dispatch_get_global_queue(0, 0), ^{
+				[self performInstallationWithInfo:info];
+			});
+		}
 	}
 }
 

@@ -23,6 +23,14 @@
 #include <unistd.h>
 #include <sys/param.h>
 
+static inline void PerformOnMainThreadSync(dispatch_block_t theBlock)
+{
+	if ([NSThread isMainThread]) {
+		theBlock();
+	} else {
+		dispatch_sync(dispatch_get_main_queue(), theBlock);
+	}
+}
 
 @interface SUPlainInstaller (MMExtendedAttributes)
 // Removes the directory tree rooted at |root| from the file quarantine.
@@ -136,8 +144,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		[validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
 		postFix = [version stringByTrimmingCharactersInSet:[validCharacters invertedSet]];
 	}
-	else
+	else {
 		postFix = @"old";
+	}
 	NSString *prefix = [NSString stringWithFormat: @"%@ (%@)", [[path lastPathComponent] stringByDeletingPathExtension], postFix];
 	#else
 	NSString *prefix = [[path lastPathComponent] stringByDeletingPathExtension];
@@ -147,8 +156,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	
 	// Now let's make sure we get a unique path.
 	int cnt=2;
-	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 9999)
+	while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 9999) {
 		tempDir = [[tempDir stringByDeletingLastPathComponent] stringByAppendingPathComponent: [NSString stringWithFormat:@"%@ %d.%@", prefix, cnt++, [path pathExtension]]];
+	}
 	
 	return tempDir;
 }
@@ -169,7 +179,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		{
 			NSString *errorMessage = [NSString stringWithFormat:@"Stat on %@ during authenticated file copy failed.", dst];
 			if (error != NULL)
-				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
+				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
 			return NO;
 		}
 	}
@@ -206,7 +216,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		if (res)
 		{
 			SULog(@"releaseFromQuarantine");
-			[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:src waitUntilDone:YES];
+			PerformOnMainThreadSync(^{
+				[self releaseFromQuarantine:src];
+			});
 		}
 		
 		if( res )	// Set permissions while it's still in source, so we have it with working and correct perms when it arrives at destination.
@@ -262,7 +274,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         if (res)
 		{
 			SULog(@"releaseFromQuarantine after installing");
-			[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:dst waitUntilDone:YES];
+			PerformOnMainThreadSync(^{
+				[self releaseFromQuarantine:dst];
+			});
 		}
 
 		if (!res)
@@ -270,13 +284,13 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 			// Something went wrong somewhere along the way, but we're not sure exactly where.
 			NSString *errorMessage = [NSString stringWithFormat:@"Authenticated file copy from %@ to %@ failed.", src, dst];
 			if (error != nil)
-				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
+				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
 		}
 	}
 	else
 	{
 		if (error != nil)
-			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:[NSDictionary dictionaryWithObject:@"Couldn't get permission to authenticate." forKey:NSLocalizedDescriptionKey]];
+			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{NSLocalizedDescriptionKey: @"Couldn't get permission to authenticate."}];
 	}
 	return res;
 }
@@ -343,13 +357,13 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 			// Something went wrong somewhere along the way, but we're not sure exactly where.
 			NSString *errorMessage = [NSString stringWithFormat:@"Authenticated file move from %@ to %@ failed.", src, dst];
 			if (error != NULL)
-				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
+				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
 		}
 	}
 	else
 	{
 		if (error != NULL)
-			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:[NSDictionary dictionaryWithObject:@"Couldn't get permission to authenticate." forKey:NSLocalizedDescriptionKey]];
+			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{NSLocalizedDescriptionKey: @"Couldn't get permission to authenticate."}];
 	}
 	return res;
 }
@@ -391,13 +405,13 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 			// Something went wrong somewhere along the way, but we're not sure exactly where.
 			NSString *errorMessage = [NSString stringWithFormat:@"Authenticated file remove from %@ failed.", src];
 			if (error != NULL)
-				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
+				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
 		}
 	}
 	else
 	{
 		if (error != NULL)
-			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:[NSDictionary dictionaryWithObject:@"Couldn't get permission to authenticate." forKey:NSLocalizedDescriptionKey]];
+			*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{NSLocalizedDescriptionKey: @"Couldn't get permission to authenticate."}];
 	}
 	return res;
 }
@@ -417,7 +431,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
 	//SULog(@"Moving %@ to the trash.", path);
 	NSInteger tag = 0;
-	if (![[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[path stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[path lastPathComponent]] tag:&tag])
+	if (![[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[path stringByDeletingLastPathComponent] destination:@"" files:@[[path lastPathComponent]] tag:&tag])
 	{
 		BOOL		didFindTrash = NO;
 		NSString*	trashPath = [self _temporaryCopyNameForPath: path didFindTrash: &didFindTrash];
@@ -476,7 +490,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         if (!success && hadFileAtDest)
         {
             if (error != NULL)
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath]}];
             return NO;
         }
 	}
@@ -489,10 +503,11 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		if (!success)
 		{
 			// We better move the old version back to its old location
-			if( hadFileAtDest )
+			if (hadFileAtDest) {
 				success = [manager moveItemAtPath:tmpPath toPath:dst error:error];
+			}
 			if (!success && error != NULL)
-				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath] forKey:NSLocalizedDescriptionKey]];
+				*error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUFileCopyFailure userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Couldn't move %@ to %@.", dst, tmpPath]}];
 			return NO;
 
 		}
@@ -507,7 +522,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	// new home in case it's moved across filesystems: if that
 	// happens, the move is actually a copy, and it may result
 	// in the application being quarantined.
-	[self performSelectorOnMainThread:@selector(releaseFromQuarantine:) withObject:dst waitUntilDone:YES];
+	PerformOnMainThreadSync(^{
+		[self releaseFromQuarantine:dst];
+	});
 	
 	return YES;
 }
@@ -556,7 +573,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	// Only recurse if it's actually a directory.  Don't recurse into a
 	// root-level symbolic link.
 	NSDictionary* rootAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:root error:nil];
-	NSString* rootType = [rootAttributes objectForKey:NSFileType];
+	NSString* rootType = rootAttributes[NSFileType];
 	
 	if (rootType == NSFileTypeDirectory) {
 		// The NSDirectoryEnumerator will avoid recursing into any contained

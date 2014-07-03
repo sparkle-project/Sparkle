@@ -10,6 +10,6 @@
 
 @interface SUUpdater (Private)
 
-- (BOOL)mayUpdateAndRestart;
+@property (readonly) BOOL mayUpdateAndRestart;
 
 @end

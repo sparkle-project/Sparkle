@@ -39,8 +39,6 @@
 //	Notifications:
 // -----------------------------------------------------------------------------
 
-extern NSString *const SUUpdaterWillRestartNotification;
-
 extern NSString *const SUTechnicalErrorInformationKey;
 
 // -----------------------------------------------------------------------------

@@ -125,7 +125,7 @@ static NSString*	sUpdateFolder = nil;
     
 	if (newAppDownloadPath == nil)
 	{
-		[self finishInstallationToPath:installationPath withResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:[NSDictionary dictionaryWithObject:@"Couldn't find an appropriate update in the downloaded package." forKey:NSLocalizedDescriptionKey]] delegate:delegate];
+		[self finishInstallationToPath:installationPath withResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{NSLocalizedDescriptionKey: @"Couldn't find an appropriate update in the downloaded package."}] delegate:delegate];
 	}
 	else
 	{
@@ -141,7 +141,7 @@ static NSString*	sUpdateFolder = nil;
 	
 	NSTask *mdimport = [[[NSTask alloc] init] autorelease];
 	[mdimport setLaunchPath:@"/usr/bin/mdimport"];
-	[mdimport setArguments:[NSArray arrayWithObject:installationPath]];
+	[mdimport setArguments:@[installationPath]];
 	@try
 	{
 		[mdimport launch];
@@ -164,20 +164,20 @@ static NSString*	sUpdateFolder = nil;
 	if (result)
 	{
 		[self mdimportInstallationPath:installationPath];
-		if ([delegate respondsToSelector:@selector(installerFinishedForHost:)])
-			[delegate performSelectorOnMainThread: @selector(installerFinishedForHost:) withObject: host waitUntilDone: NO];
+		if ([delegate respondsToSelector:@selector(installerFinishedForHost:)]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[delegate installerFinishedForHost:host];
+			});
+		}
 	}
 	else
 	{
-		if ([delegate respondsToSelector:@selector(installerForHost:failedWithError:)])
-			[self performSelectorOnMainThread: @selector(notifyDelegateOfFailure:) withObject: [NSDictionary dictionaryWithObjectsAndKeys: host, SUNotifyDictHostKey, error, SUNotifyDictErrorKey, delegate, SUNotifyDictDelegateKey, nil] waitUntilDone: NO];
-	}		
-}
-
-
-+(void)	notifyDelegateOfFailure: (NSDictionary*)dict
-{
-	[[dict objectForKey: SUNotifyDictDelegateKey] installerForHost: [dict objectForKey: SUNotifyDictHostKey] failedWithError: [dict objectForKey: SUNotifyDictErrorKey]];
+		if ([delegate respondsToSelector:@selector(installerForHost:failedWithError:)]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[delegate installerForHost:host failedWithError:error];
+			});
+		}
+	}
 }
 
 @end

@@ -22,12 +22,14 @@
 	[updateAlert setDelegate:self];
 	
 	id<SUVersionDisplay>	versDisp = nil;
-	if ([[updater delegate] respondsToSelector:@selector(versionDisplayerForUpdater:)])
+	if ([[updater delegate] respondsToSelector:@selector(versionDisplayerForUpdater:)]) {
 		versDisp = [[updater delegate] versionDisplayerForUpdater: updater];
+	}
 	[updateAlert setVersionDisplayer: versDisp];
 	
-	if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
+	if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
 		[[updater delegate] updater:updater didFindValidUpdate:updateItem];
+	}
 
 	// If the app is a menubar app or the like, we need to focus it first and alter the
 	// update prompt to behave like a normal window. Otherwise if the window were hidden
@@ -99,14 +101,17 @@
 
 - (NSString *)humanReadableSizeFromDouble:(double)value
 {
-	if (value < 1000)
+	if (value < 1000) {
 		return [NSString stringWithFormat:@"%.0lf %@", value, SULocalizedString(@"B", @"the unit for bytes")];
+	}
 	
-	if (value < 1000 * 1000)
+	if (value < 1000 * 1000) {
 		return [NSString stringWithFormat:@"%.0lf %@", value / 1000.0, SULocalizedString(@"KB", @"the unit for kilobytes")];
+	}
 	
-	if (value < 1000 * 1000 * 1000)
+	if (value < 1000 * 1000 * 1000) {
 		return [NSString stringWithFormat:@"%.1lf %@", value / 1000.0 / 1000.0, SULocalizedString(@"MB", @"the unit for megabytes")];
+	}
 	
 	return [NSString stringWithFormat:@"%.2lf %@", value / 1000.0 / 1000.0 / 1000.0, SULocalizedString(@"GB", @"the unit for gigabytes")];	
 }
@@ -142,7 +147,7 @@
 	{
 		NSDictionary * attributes;
 		attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:downloadPath error:nil];
-		[statusController setMaxProgressValue:[[attributes objectForKey:NSFileSize] doubleValue]];
+		[statusController setMaxProgressValue:[attributes[NSFileSize] doubleValue]];
 	}
 	[statusController setProgressValue:[statusController progressValue] + (double)length];
 }
@@ -202,8 +207,9 @@
 
 - (void)showModalAlert:(NSAlert *)alert
 {
-	if ([[updater delegate] respondsToSelector:@selector(updaterWillShowModalAlert:)])
+	if ([[updater delegate] respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
 		[[updater delegate] updaterWillShowModalAlert: updater];
+	}
 
 	// When showing a modal alert we need to ensure that background applications
 	// are focused to inform the user since there is no dock icon to notify them.

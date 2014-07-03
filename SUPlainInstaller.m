@@ -26,36 +26,36 @@ static NSString * const SUInstallerInstallationPathKey = @"SUInstallerInstallati
 {
 	// *** GETS CALLED ON NON-MAIN THREAD!
 	
-	[self finishInstallationToPath:[info objectForKey:SUInstallerInstallationPathKey] withResult:[[info objectForKey:SUInstallerResultKey] boolValue] host:[info objectForKey:SUInstallerHostKey] error:[info objectForKey:SUInstallerErrorKey] delegate:[info objectForKey:SUInstallerDelegateKey]];
+	[self finishInstallationToPath:info[SUInstallerInstallationPathKey] withResult:[info[SUInstallerResultKey] boolValue] host:info[SUInstallerHostKey] error:info[SUInstallerErrorKey] delegate:info[SUInstallerDelegateKey]];
 }
 
 + (void)performInstallationWithInfo:(NSDictionary *)info
 {
 	// *** GETS CALLED ON NON-MAIN THREAD!
 	
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
-	NSError *error = nil;
-	
-	NSString	*	oldPath = [[info objectForKey:SUInstallerHostKey] bundlePath];
-	NSString	*	installationPath = [info objectForKey:SUInstallerInstallationPathKey];
-	BOOL result = [self copyPathWithAuthentication:[info objectForKey:SUInstallerPathKey] overPath: installationPath temporaryName:[info objectForKey:SUInstallerTempNameKey] error:&error];
-	
-	if( result )
-	{
-		BOOL	haveOld = [[NSFileManager defaultManager] fileExistsAtPath: oldPath];
-		BOOL	differentFromNew = ![oldPath isEqualToString: installationPath];
-		if( haveOld && differentFromNew )
-			[self _movePathToTrash: oldPath];	// On success, trash old copy if there's still one due to renaming.
+	@autoreleasepool {
+		NSError *error = nil;
+		
+		NSString	*	oldPath = [info[SUInstallerHostKey] bundlePath];
+		NSString	*	installationPath = info[SUInstallerInstallationPathKey];
+		BOOL result = [self copyPathWithAuthentication:info[SUInstallerPathKey] overPath: installationPath temporaryName:info[SUInstallerTempNameKey] error:&error];
+		
+		if( result )
+		{
+			BOOL	haveOld = [[NSFileManager defaultManager] fileExistsAtPath: oldPath];
+			BOOL	differentFromNew = ![oldPath isEqualToString: installationPath];
+			if( haveOld && differentFromNew )
+				[self _movePathToTrash: oldPath];	// On success, trash old copy if there's still one due to renaming.
+		}
+		NSMutableDictionary *mutableInfo = [[info mutableCopy] autorelease];
+		mutableInfo[SUInstallerResultKey] = @(result);
+		mutableInfo[SUInstallerInstallationPathKey] = installationPath;
+		if (!result && error)
+			mutableInfo[SUInstallerErrorKey] = error;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self finishInstallationWithInfo:mutableInfo];
+		});
 	}
-	NSMutableDictionary *mutableInfo = [[info mutableCopy] autorelease];
-	[mutableInfo setObject:[NSNumber numberWithBool:result] forKey:SUInstallerResultKey];
-    [mutableInfo setObject:installationPath forKey:SUInstallerInstallationPathKey];
-	if (!result && error)
-		[mutableInfo setObject:error forKey:SUInstallerErrorKey];
-	[self performSelectorOnMainThread:@selector(finishInstallationWithInfo:) withObject:mutableInfo waitUntilDone:NO];
-    
-	[pool drain];
 }
 
 + (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
@@ -65,7 +65,7 @@ static NSString * const SUInstallerInstallationPathKey = @"SUInstallerInstallati
 	if ([comparator compareVersion:[host version] toVersion:[[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:@"CFBundleVersion"]] == NSOrderedDescending)
 	{
 		NSString * errorMessage = [NSString stringWithFormat:@"Sparkle Updater: Possible attack in progress! Attempting to \"upgrade\" from %@ to %@. Aborting update.", [host version], [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:@"CFBundleVersion"]];
-		NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
+		NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
 		[self finishInstallationToPath:installationPath withResult:NO host:host error:error delegate:delegate];
 		return;
 	}
@@ -73,11 +73,14 @@ static NSString * const SUInstallerInstallationPathKey = @"SUInstallerInstallati
     
     NSString *targetPath = [host installationPath];
     NSString *tempName = [self temporaryNameForPath:targetPath];
-	NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:path, SUInstallerPathKey, targetPath, SUInstallerTargetPathKey, tempName, SUInstallerTempNameKey, host, SUInstallerHostKey, delegate, SUInstallerDelegateKey, installationPath, SUInstallerInstallationPathKey, nil];
+	NSDictionary *info = @{SUInstallerPathKey: path, SUInstallerTargetPathKey: targetPath, SUInstallerTempNameKey: tempName, SUInstallerHostKey: host, SUInstallerDelegateKey: delegate, SUInstallerInstallationPathKey: installationPath};
 	if (synchronously)
 		[self performInstallationWithInfo:info];
-	else
-		[NSThread detachNewThreadSelector:@selector(performInstallationWithInfo:) toTarget:self withObject:info];
+	else {
+		dispatch_async(dispatch_get_global_queue(0, 0), ^{
+			[self performInstallationWithInfo:info];
+		});
+	}
 }
 
 @end

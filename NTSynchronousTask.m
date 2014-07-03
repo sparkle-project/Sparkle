@@ -32,7 +32,7 @@
 
 - (void)taskOutputAvailable:(NSNotification*)note
 {
-	self.output = [[note userInfo] objectForKey:NSFileHandleNotificationDataItem];
+	self.output = [note userInfo][NSFileHandleNotificationDataItem];
 	
 	self.done = YES;
 }
@@ -42,7 +42,7 @@
     self.result = [self.task terminationStatus];
 }
 
-- (id)init;
+- (instancetype)init;
 {
     self = [super init];
 	if (self)
@@ -78,8 +78,9 @@
 {
 	BOOL success = NO;
 	
-	if (currentDirectory)
+	if (currentDirectory) {
 		self.task.currentDirectoryPath = currentDirectory;
+	}
 	
 	self.task.launchPath = toolPath;
 	self.task.arguments = args;
@@ -94,7 +95,7 @@
 												 name:NSTaskDidTerminateNotification
 											   object:[self task]];	
 	
-	[[[self outputPipe] fileHandleForReading] readToEndOfFileInBackgroundAndNotifyForModes:[NSArray arrayWithObjects:NSDefaultRunLoopMode, NSModalPanelRunLoopMode, NSEventTrackingRunLoopMode, nil]];
+	[[[self outputPipe] fileHandleForReading] readToEndOfFileInBackgroundAndNotifyForModes:@[NSDefaultRunLoopMode, NSModalPanelRunLoopMode, NSEventTrackingRunLoopMode]];
 	
 	@try
 	{
@@ -131,59 +132,58 @@
 
 + (NSData*)task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input
 {
-	// we need this wacky pool here, otherwise we run out of pipes, the pipes are internally autoreleased
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	NSData* result = nil;
-	
-	@try
-	{
-		NTSynchronousTask* task = [[NTSynchronousTask alloc] init];
+	// we need this wacky pool here, otherwise we run out of pipes, the pipes are internally autoreleased
+	@autoreleasepool {
+		@try {
+			NTSynchronousTask* task = [[NTSynchronousTask alloc] init];
+			
+			[task run:toolPath directory:currentDirectory withArgs:args input:input];
+			
+			if ([task result] == 0) {
+				result = [[task output] retain];
+			}
+			
+			[task release];
+		}
+		@catch (NSException *localException) { }
 		
-		[task run:toolPath directory:currentDirectory withArgs:args input:input];
-		
-		if ([task result] == 0)
-			result = [[task output] retain];
-				
-		[task release];
-	}	
-	@catch (NSException *localException) { }
-	
-	[pool drain];
+	}
 	
 	// retained above
-	[result autorelease];
-	
-    return result;
+    return [result autorelease];
 }
 
 
 +(int)	task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input output: (NSData**)outData
 {
+	int taskResult = 0;
 	// we need this wacky pool here, otherwise we run out of pipes, the pipes are internally autoreleased
-	NSAutoreleasePool *	pool = [[NSAutoreleasePool alloc] init];
-	int					taskResult = 0;
-	if( outData )
-		*outData = nil;
-	
-	@try {
-		NTSynchronousTask* task = [[NTSynchronousTask alloc] init];
+	@autoreleasepool {
+		if (outData) {
+			*outData = nil;
+		}
 		
-		[task run:toolPath directory:currentDirectory withArgs:args input:input];
+		@try {
+			NTSynchronousTask* task = [[NTSynchronousTask alloc] init];
+			
+			[task run:toolPath directory:currentDirectory withArgs:args input:input];
+			
+			taskResult = [task result];
+			if (outData) {
+				*outData = [[task output] retain];
+			}
+			
+			[task release];
+		} @catch (NSException *localException) {
+			taskResult = errCppGeneral;
+		}
 		
-		taskResult = [task result];
-		if( outData )
-			*outData = [[task output] retain];
-				
-		[task release];
-	} @catch (NSException *localException) {
-		taskResult = errCppGeneral;
 	}
-	
-	[pool drain];
-	
 	// retained above
-	if( outData )
+	if (outData) {
 		[*outData autorelease];
+	}
 	
     return taskResult;
 }

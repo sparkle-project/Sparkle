@@ -27,6 +27,7 @@
 @property (copy, readwrite) NSString *displayVersionString;
 @property (copy, readwrite) NSDictionary *deltaUpdates;
 @property (retain, readwrite) NSURL *infoURL;
+@property (readwrite, copy) NSDictionary *propertiesDictionary;
 @end
 
 @implementation SUAppcastItem
@@ -42,6 +43,7 @@
 @synthesize releaseNotesURL;
 @synthesize title;
 @synthesize versionString;
+@synthesize propertiesDictionary;
 @synthesize fileSize;
 @synthesize mandatoryUpdate;
 
@@ -97,25 +99,25 @@
 
 - (BOOL)isDeltaUpdate
 {
-	return [[propertiesDictionary objectForKey:@"enclosure"] objectForKey:@"sparkle:deltaFrom"] != nil;
+	return propertiesDictionary[@"enclosure"][@"sparkle:deltaFrom"] != nil;
 }
 
 - (BOOL)isCriticalUpdate
 {
-    return [[propertiesDictionary objectForKey:@"sparkle:tags"] containsObject:@"sparkle:criticalUpdate"];
+    return [propertiesDictionary[@"sparkle:tags"] containsObject:@"sparkle:criticalUpdate"];
 }
 
-- initWithDictionary:(NSDictionary *)dict
+- (instancetype) initWithDictionary:(NSDictionary *)dict
 {
 	return [self initWithDictionary:dict failureReason:nil];
 }
 
-- initWithDictionary:(NSDictionary *)dict failureReason:(NSString**)error
+- (instancetype) initWithDictionary:(NSDictionary *)dict failureReason:(NSString**)error
 {
 	self = [super init];
 	if (self)
 	{
-		id enclosure = [dict objectForKey:@"enclosure"];
+		id enclosure = dict[@"enclosure"];
 		
 		// Try to find a version string.
 		// Finding the new version number from the RSS feed is a little bit hacky. There are two ways:
@@ -125,14 +127,14 @@
 		//    underscore and the last period as the version number. So name your packages like this: APPNAME_VERSION.extension.
 		//    The big caveat with this is that you can't have underscores in your version strings, as that'll confuse Sparkle.
 		//    Feel free to change the separator string to a hyphen or something more suited to your needs if you like.
-		NSString *newVersion = [enclosure objectForKey:@"sparkle:version"];
+		NSString *newVersion = enclosure[@"sparkle:version"];
 		if( newVersion == nil )
-			newVersion = [dict objectForKey:@"sparkle:version"];	// UK 2007-08-31 Get version from the item, in case it's a download-less item (i.e. paid upgrade).
+			newVersion = dict[@"sparkle:version"];	// UK 2007-08-31 Get version from the item, in case it's a download-less item (i.e. paid upgrade).
 		if (newVersion == nil) // no sparkle:version attribute anywhere?
 		{
 			// Separate the url by underscores and take the last component, as that'll be closest to the end,
 			// then we remove the extension. Hopefully, this will be the version.
-			NSArray *fileComponents = [[enclosure objectForKey:@"url"] componentsSeparatedByString:@"_"];
+			NSArray *fileComponents = [enclosure[@"url"] componentsSeparatedByString:@"_"];
 			if ([fileComponents count] > 1)
 				newVersion = [[fileComponents lastObject] stringByDeletingPathExtension];
 		}
@@ -146,11 +148,11 @@
 		}
         
 		propertiesDictionary = [[NSMutableDictionary alloc] initWithDictionary:dict];
-		self.title = [dict objectForKey:@"title"];
-		self.date = [dict objectForKey:@"pubDate"];
-		self.itemDescription = [dict objectForKey:@"description"];
+		self.title = dict[@"title"];
+		self.date = dict[@"pubDate"];
+		self.itemDescription = dict[@"description"];
 		
-		NSString*	theInfoURL = [dict objectForKey:@"link"];
+		NSString*	theInfoURL = dict[@"link"];
 		if( theInfoURL )
 		{
 			if( ![theInfoURL isKindOfClass: [NSString class]] )
@@ -169,11 +171,12 @@
 			return nil;
 		}
 
-		NSString*	enclosureURLString = [enclosure objectForKey:@"url"];
+		NSString*	enclosureURLString = enclosure[@"url"];
 		if( !enclosureURLString && !theInfoURL )
 		{
-			if (error)
+			if (error) {
 				*error = @"Feed item's enclosure lacks URL";
+			}
 			[self release];
 			return nil;
 		}
@@ -182,16 +185,18 @@
 			NSString *fileURLString = [[enclosureURLString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 			self.fileURL = [NSURL URLWithString:fileURLString];
 		}
-		if( enclosure )
-			self.DSASignature = [enclosure objectForKey:@"sparkle:dsaSignature"];
+		if (enclosure) {
+			self.DSASignature = enclosure[@"sparkle:dsaSignature"];
+		}
 		
 		self.versionString = newVersion;
-		self.minimumSystemVersion = [dict objectForKey:@"sparkle:minimumSystemVersion"];
-        self.maximumSystemVersion = [dict objectForKey:@"sparkle:maximumSystemVersion"];
+		self.minimumSystemVersion = dict[@"sparkle:minimumSystemVersion"];
+        self.maximumSystemVersion = dict[@"sparkle:maximumSystemVersion"];
 		
-		NSString *shortVersionString = [enclosure objectForKey:@"sparkle:shortVersionString"];
-        if (nil == shortVersionString)
-            shortVersionString = [dict objectForKey:@"sparkle:shortVersionString"]; // fall back on the <item>
+		NSString *shortVersionString = enclosure[@"sparkle:shortVersionString"];
+		if (nil == shortVersionString) {
+            shortVersionString = dict[@"sparkle:shortVersionString"]; // fall back on the <item>
+		}
         
 		if (shortVersionString)
 			self.displayVersionString = shortVersionString;
@@ -199,8 +204,8 @@
 			self.displayVersionString = [self versionString];
 		
 		// Find the appropriate release notes URL.
-		if ([dict objectForKey:@"sparkle:releaseNotesLink"])
-			self.releaseNotesURL = [NSURL URLWithString:[dict objectForKey:@"sparkle:releaseNotesLink"]];
+		if (dict[@"sparkle:releaseNotesLink"])
+			self.releaseNotesURL = [NSURL URLWithString:dict[@"sparkle:releaseNotesLink"]];
 		else if ([self.itemDescription hasPrefix:@"http://"] || [self.itemDescription hasPrefix:@"https://"]) // if the description starts with http:// or https:// use that.
 			self.releaseNotesURL = [NSURL URLWithString:self.itemDescription];
 		else
@@ -222,19 +227,19 @@
             mandatoryUpdate = [mandatory boolValue];
         else
             mandatoryUpdate = false;
-        
-        if ([dict objectForKey:@"deltas"])
+
+        if (dict[@"deltas"])
 		{
             NSMutableDictionary *deltas = [NSMutableDictionary dictionary];
-            NSArray *deltaDictionaries = [dict objectForKey:@"deltas"];
-			for (NSDictionary *deltaDictionary in [deltaDictionaries objectEnumerator]) {
+            NSArray *deltaDictionaries = dict[@"deltas"];
+			for (NSDictionary *deltaDictionary in deltaDictionaries) {
 				NSMutableDictionary *fakeAppCastDict = [dict mutableCopy];
                 [fakeAppCastDict removeObjectForKey:@"deltas"];
-                [fakeAppCastDict setObject:deltaDictionary forKey:@"enclosure"];
+                fakeAppCastDict[@"enclosure"] = deltaDictionary;
                 SUAppcastItem *deltaItem = [[[self class] alloc] initWithDictionary:fakeAppCastDict];
                 [fakeAppCastDict release];
 
-                [deltas setObject:deltaItem forKey:[deltaDictionary objectForKey:@"sparkle:deltaFrom"]];
+                deltas[deltaDictionary[@"sparkle:deltaFrom"]] = deltaItem;
                 [deltaItem release];
 			}
             self.deltaUpdates = deltas;
@@ -255,13 +260,8 @@
 	self.versionString = nil;
 	self.displayVersionString = nil;
 	self.infoURL = nil;
-	[propertiesDictionary release];
+	self.propertiesDictionary = nil;
     [super dealloc];
-}
-
-- (NSDictionary *)propertiesDictionary
-{
-	return propertiesDictionary;
 }
 
 @end

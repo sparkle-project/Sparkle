@@ -17,26 +17,7 @@
 @interface SUAppcastItem : NSObject
 {
 @private
-	NSString *title;
-	NSDate *date;
-	NSString *itemDescription;
-	
-	NSURL *releaseNotesURL;
-	
-	NSString *DSASignature;	
-	NSString *minimumSystemVersion;
-    NSString *maximumSystemVersion;
-	
-	NSURL *fileURL;
-	NSString *versionString;
-	NSString *displayVersionString;
-
-	NSDictionary *deltaUpdates;
-
-	NSDictionary *propertiesDictionary;
-
-	NSURL *infoURL;	// UK 2007-08-31
-    
+   
     unsigned long   fileSize;
     bool            mandatoryUpdate;
 }
@@ -59,19 +40,13 @@
 - (instancetype)initWithDictionary:(NSDictionary *)dict;
 - (instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString**)error;
 
-- (BOOL)isDeltaUpdate;
-- (BOOL)isCriticalUpdate;
+@property (getter=isDeltaUpdate, readonly) BOOL deltaUpdate;
+@property (getter=isCriticalUpdate, readonly) BOOL criticalUpdate;
 
 // Returns the dictionary provided in initWithDictionary; this might be useful later for extensions.
-- (NSDictionary *)propertiesDictionary;
+@property (readonly, copy) NSDictionary *propertiesDictionary;
 
 - (NSURL *)infoURL;						// UK 2007-08-31
-
-- (void)setVersionStringFromNumber:(NSNumber *)s;
-
-- (void)setFileURL:(NSURL *)aFileURL;
-- (void)setVersionString:(NSString *)s;
-- (void)setDSASignature:(NSString *)aDSASignature;
 
 - (unsigned long) getFileSize;
 - (void) setFileSize:(unsigned long) sz;

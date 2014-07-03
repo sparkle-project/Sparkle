@@ -26,8 +26,6 @@ typedef enum
 @interface SUUpdateAlert : SUWindowController {
 	SUAppcastItem *updateItem;
 	SUHost *host;
-	id<SUUpdateAlertDelegate> delegate;
-	id<SUVersionDisplay>	versionDisplayer;
 	
 	IBOutlet WebView *releaseNotesView;
 	IBOutlet NSTextField *description;
@@ -38,14 +36,13 @@ typedef enum
 	BOOL webViewFinishedLoading;
 }
 @property (assign) id<SUUpdateAlertDelegate> delegate;
+@property (assign) id<SUVersionDisplay> versionDisplayer;
 
-- (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host;
 
 - (IBAction)installUpdate:sender;
 - (IBAction)skipThisVersion:sender;
 - (IBAction)remindMeLater:sender;
-
-- (void)setVersionDisplayer: (id<SUVersionDisplay>)disp;
 
 @end
 
