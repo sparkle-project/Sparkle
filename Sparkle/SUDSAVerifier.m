@@ -21,11 +21,15 @@
 
 + (BOOL)validatePath:(NSString *)path withEncodedDSASignature:(NSString *)encodedSignature withPublicDSAKey:(NSString *)pkeyString
 {
-	if (!encodedSignature || !path) return NO;
+    if (!encodedSignature || !path) {
+        return NO;
+    }
 
 	SUDSAVerifier *verifier = [[self alloc] initWithPublicKeyString:pkeyString];
 
-	if (!verifier) return NO;
+    if (!verifier) {
+        return NO;
+    }
 
 	NSString *strippedSignature = [encodedSignature stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
 	NSData *signature = [[NSData alloc] initWithBase64Encoding:strippedSignature];
@@ -80,14 +84,18 @@
 
 - (BOOL)verifyFileAtPath:(NSString *)path signature:(NSData *)signature
 {
-	if (!path.length) return NO;
+    if (!path.length) {
+        return NO;
+    }
 	NSInputStream *dataInputStream = [NSInputStream inputStreamWithFileAtPath:path];
 	return [self verifyStream:dataInputStream signature:signature];
 }
 
 - (BOOL)verifyStream:(NSInputStream *)stream signature:(NSData *)signature
 {
-	if (!stream || !signature) { return NO; }
+	if (!stream || !signature) {
+        return NO;
+    }
 
 	__block SecGroupTransformRef group = SecTransformCreateGroupTransform();
 	__block SecTransformRef dataReadTransform = NULL;
