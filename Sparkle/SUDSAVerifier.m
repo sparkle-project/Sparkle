@@ -38,10 +38,11 @@
 
 - (instancetype)initWithPublicKeyData:(NSData *)data
 {
-	if (!data.length) return (self = nil);
+    self = [super init];
 
-	self = [super init];
-	if (!self) return nil;
+    if (!self || !data.length) {
+        return nil;
+    }
 
 	SecExternalFormat format = kSecFormatOpenSSL;
 	SecExternalItemType itemType = kSecItemTypePublicKey;
@@ -52,7 +53,7 @@
 		if (items) {
 			CFRelease(items);
 		}
-		return (self = nil);
+		return nil;
 	}
 
 	if (format == kSecFormatOpenSSL && itemType == kSecItemTypePublicKey && CFArrayGetCount(items) == 1) {
