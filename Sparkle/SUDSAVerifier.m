@@ -25,7 +25,7 @@
         return NO;
     }
 
-	SUDSAVerifier *verifier = [[self alloc] initWithPublicKeyString:pkeyString];
+	SUDSAVerifier *verifier = [[self alloc] initWithPublicKeyData:[pkeyString dataUsingEncoding:NSUTF8StringEncoding]];
 
     if (!verifier) {
         return NO;
@@ -34,12 +34,6 @@
 	NSString *strippedSignature = [encodedSignature stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
 	NSData *signature = [[NSData alloc] initWithBase64Encoding:strippedSignature];
 	return [verifier verifyFileAtPath:path signature:signature];
-}
-
-- (instancetype)initWithPublicKeyString:(NSString *)string
-{
-	NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];
-	return (self = [self initWithPublicKeyData:data]);
 }
 
 - (instancetype)initWithPublicKeyData:(NSData *)data
