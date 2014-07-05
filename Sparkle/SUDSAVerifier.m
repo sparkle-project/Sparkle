@@ -69,12 +69,6 @@
 	if (_secKey) { CFRelease(_secKey); }
 }
 
-- (BOOL)verifyURL:(NSURL *)URL signature:(NSData *)signature
-{
-	NSInputStream *dataInputStream = [NSInputStream inputStreamWithURL:URL];
-	return [self verifyStream:dataInputStream signature:signature];
-}
-
 - (BOOL)verifyFileAtPath:(NSString *)path signature:(NSData *)signature
 {
     if (!path.length) {

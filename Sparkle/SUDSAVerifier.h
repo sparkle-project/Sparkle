@@ -23,7 +23,6 @@
 
 - (instancetype)initWithPublicKeyData:(NSData *)data;
 
-- (BOOL)verifyURL:(NSURL *)URL signature:(NSData *)signature;
 - (BOOL)verifyFileAtPath:(NSString *)path signature:(NSData *)signature;
 - (BOOL)verifyStream:(NSInputStream *)stream signature:(NSData *)signature;
 
