@@ -17,13 +17,6 @@
 
 #import "SUConstants.h"
 
-
-@interface WebView ()
-
--(void)	setDrawsBackground: (BOOL)state;
-
-@end
-
 @interface SUUpdateAlert ()
 
 @property (strong) SUAppcastItem *updateItem;
@@ -33,6 +26,7 @@
 @property (assign) BOOL webViewFinishedLoading;
 
 @property (weak) IBOutlet WebView *releaseNotesView;
+@property (weak) IBOutlet NSView *releaseNotesContainerView;
 @property (weak) IBOutlet NSTextField *descriptionField;
 @property (weak) IBOutlet NSButton *installButton;
 @property (weak) IBOutlet NSButton *skipButton;
@@ -52,6 +46,7 @@
 @synthesize webViewFinishedLoading;
 
 @synthesize releaseNotesView;
+@synthesize releaseNotesContainerView;
 @synthesize descriptionField;
 @synthesize installButton;
 @synthesize skipButton;
@@ -178,114 +173,27 @@
 
 - (void)awakeFromNib
 {
-	NSString*	sizeStr = [self.host objectForInfoDictionaryKey:SUFixedHTMLDisplaySizeKey];
+    if ([self.host isBackgroundApplication]) {
+        [self.window setLevel:NSFloatingWindowLevel]; // This means the window will float over all other apps, if our app is switched out ?!
+    }
 
-	if ([self.host isBackgroundApplication]) {
-		[[self window] setLevel:NSFloatingWindowLevel];	// This means the window will float over all other apps, if our app is switched out ?! UK 2007-09-04
-	}
-	[[self window] setFrameAutosaveName: sizeStr ? @"" : @"SUUpdateAlertFrame"];
+    if ([self.updateItem fileURL] == nil) {
+        [self.installButton setTitle:SULocalizedString(@"Learn More...", @"Alternate title for 'Install Update' button when there's no download in RSS feed.")];
+        [self.installButton setAction:@selector(openInfoURL:)];
+    }
 
-	// We're gonna do some frame magic to match the window's size to the description field and the presence of the release notes view.
-	NSRect	frame = [[self window] frame];
-	BOOL	showReleaseNotes = [self showsReleaseNotes];
-	if (!showReleaseNotes) {
-		// Resize the window to be appropriate for not having a huge release notes view.
-		frame.size.height -= [self.releaseNotesView frame].size.height + 40; // Extra 40 is for the release notes label and margin.
+    BOOL showReleaseNotes = [self showsReleaseNotes];
+    
+    if (showReleaseNotes) {
+        [self displayReleaseNotes];
+    }
 
-		if ([self allowsAutomaticUpdates]) {
-            frame.size.height += 10; // Make room for the check box.
-		}
+    [self.releaseNotesContainerView setHidden:!showReleaseNotes];
 
-		// Hiding the resize handles is not enough on 10.5, you can still click
-		//	where they would be, so we set the min/max sizes to be equal to
-		//	inhibit resizing completely:
-		[[self window] setShowsResizeIndicator: NO];
-		[[self window] setMinSize: frame.size];
-		[[self window] setMaxSize: frame.size];
-	}
-    else if (![self allowsAutomaticUpdates])
-	{
-		NSRect boxFrame = [[[self.releaseNotesView superview] superview] frame];
-		boxFrame.origin.y -= 20;
-		boxFrame.size.height += 20;
-		[[[self.releaseNotesView superview] superview] setFrame:boxFrame];
-	}
+    [self.window.contentView setNeedsLayout:YES]; // Prod autolayout to place everything
 
-	if( [self.updateItem fileURL] == nil ) {
-		[self.installButton setTitle: SULocalizedString( @"Learn More...", @"Alternate title for 'Install Update' button when there's no download in RSS feed." )];
-		[self.installButton setAction: @selector(openInfoURL:)];
-	}
-
-	// Make sure button widths are OK:
-	#define DISTANCE_BETWEEN_BUTTONS		3
-	#define DISTANCE_BETWEEN_BUTTON_GROUPS	12
-
-	CGFloat				minimumWindowWidth = [[self window] frame].size.width -NSMaxX([self.self.installButton frame]) +NSMinX([self.skipButton frame]);	// Distance between contents and left/right edge.
-	NSDictionary*		attrs = @{NSFontAttributeName: [self.installButton font]};
-	NSSize				titleSize = [[self.installButton title] sizeWithAttributes: attrs];
-	titleSize.width += (16 + 8) * 2;	// 16 px for the end caps plus 8 px padding at each end or it'll look as ugly as calling -sizeToFit.
-	NSRect				installBtnBox = [self.installButton frame];
-	installBtnBox.origin.x += installBtnBox.size.width -titleSize.width;
-	installBtnBox.size.width = titleSize.width;
-	[self.installButton setFrame: installBtnBox];
-	minimumWindowWidth += titleSize.width;
-
-	titleSize = [[self.laterButton title] sizeWithAttributes: attrs];
-	titleSize.width += (16 + 8) * 2;	// 16 px for the end caps plus 8 px padding at each end or it'll look as ugly as calling -sizeToFit.
-	NSRect				laterBtnBox = [self.installButton frame];
-	laterBtnBox.origin.x = installBtnBox.origin.x -DISTANCE_BETWEEN_BUTTONS -titleSize.width;
-	laterBtnBox.size.width = titleSize.width;
-	[self.laterButton setFrame: laterBtnBox];
-	minimumWindowWidth += DISTANCE_BETWEEN_BUTTONS +titleSize.width;
-
-	titleSize = [[self.skipButton title] sizeWithAttributes: attrs];
-	titleSize.width += (16 + 8) * 2;	// 16 px for the end caps plus 8 px padding at each end or it'll look as ugly as calling -sizeToFit.
-	NSRect				skipBtnBox = [self.skipButton frame];
-	skipBtnBox.size.width = titleSize.width;
-	[self.skipButton setFrame: skipBtnBox];
-	minimumWindowWidth += DISTANCE_BETWEEN_BUTTON_GROUPS +titleSize.width;
-
-	if( showReleaseNotes ) {
-		if( sizeStr ) {
-			NSSize		desiredSize = NSSizeFromString( sizeStr );
-			NSSize		sizeDiff = NSZeroSize;
-			// NSBox*		boxView = (NSBox*)[[releaseNotesView superview] superview];
-
-			//[boxView setBorderType: NSNoBorder];
-			[self.releaseNotesView setDrawsBackground: NO];
-
-			sizeDiff.width = desiredSize.width -[self.releaseNotesView frame].size.width;
-			sizeDiff.height = desiredSize.height -[self.releaseNotesView frame].size.height;
-			frame.size.width += sizeDiff.width;
-			frame.size.height += sizeDiff.height;
-
-			// No resizing:
-			[[self window] setShowsResizeIndicator:NO];
-			[[self window] setMinSize:frame.size];
-			[[self window] setMaxSize:frame.size];
-		}
-	}
-
-	if (frame.size.width < minimumWindowWidth) {
-		frame.size.width = minimumWindowWidth;
-	}
-
-	[[self window] setFrame: frame display: NO];
-	[[self window] center];
-
-	if (showReleaseNotes) {
-		[self displayReleaseNotes];
-	}
-
-	[[[self.releaseNotesView superview] superview] setHidden: !showReleaseNotes];
-
+    [self.window center];
 }
-
--(BOOL)showsReleaseNotesText
-{
-	return( [self.host objectForInfoDictionaryKey:SUFixedHTMLDisplaySizeKey] == nil );
-}
-
 
 - (BOOL)windowShouldClose:(NSNotification *) __unused note
 {
