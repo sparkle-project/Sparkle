@@ -220,7 +220,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	if (self.checkTimer)
 	{
 		[self.checkTimer invalidate];
-		self.checkTimer = nil; // UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
+		self.checkTimer = nil; // Timer is non-repeating, may have invalidated itself, so we had to retain it.
 	}
 	if (![self automaticallyChecksForUpdates]) return;
 
@@ -237,7 +237,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 		delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
 	else
 		delayUntilCheck = 0; // We're overdue! Run one now.
-	self.checkTimer = [NSTimer scheduledTimerWithTimeInterval:delayUntilCheck target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO];		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
+	self.checkTimer = [NSTimer scheduledTimerWithTimeInterval:delayUntilCheck target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO];		// Timer is non-repeating, may have invalidated itself, so we had to retain it.
 }
 
 
@@ -334,7 +334,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)d
 {
 	if ([self updateInProgress]) { return; }
-	if (self.checkTimer) { [self.checkTimer invalidate]; self.checkTimer = nil; }		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
+	if (self.checkTimer) { [self.checkTimer invalidate]; self.checkTimer = nil; }		// Timer is non-repeating, may have invalidated itself, so we had to retain it.
 
 	SUClearLog();
 	SULog( @"===== %@ =====", [[NSFileManager defaultManager] displayNameAtPath: [[NSBundle mainBundle] bundlePath]] );
@@ -561,7 +561,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - (void)dealloc
 {
 	[self unregisterAsObserver];
-	if (checkTimer) { [checkTimer invalidate]; }		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
+	if (checkTimer) { [checkTimer invalidate]; }		// Timer is non-repeating, may have invalidated itself, so we had to retain it.
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item

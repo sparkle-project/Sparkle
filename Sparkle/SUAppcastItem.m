@@ -77,7 +77,7 @@
 		//    Feel free to change the separator string to a hyphen or something more suited to your needs if you like.
 		NSString *newVersion = enclosure[@"sparkle:version"];
 		if( newVersion == nil )
-			newVersion = dict[@"sparkle:version"];	// UK 2007-08-31 Get version from the item, in case it's a download-less item (i.e. paid upgrade).
+			newVersion = dict[@"sparkle:version"];	// Get version from the item, in case it's a download-less item (i.e. paid upgrade).
 		if (newVersion == nil) // no sparkle:version attribute anywhere?
 		{
 			// Separate the url by underscores and take the last component, as that'll be closest to the end,

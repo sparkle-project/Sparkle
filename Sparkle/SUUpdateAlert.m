@@ -34,7 +34,7 @@
 
 @property (weak) IBOutlet WebView *releaseNotesView;
 @property (weak) IBOutlet NSTextField *descriptionField;
-@property (weak) IBOutlet NSButton *installButton;	// UK 2007-08-31.
+@property (weak) IBOutlet NSButton *installButton;
 @property (weak) IBOutlet NSButton *skipButton;
 @property (weak) IBOutlet NSButton *laterButton;
 
@@ -154,7 +154,7 @@
 	NSNumber *shouldShowReleaseNotes = [self.host objectForInfoDictionaryKey:SUShowReleaseNotesKey];
 	if (shouldShowReleaseNotes == nil)
 	{
-		// UK 2007-09-18: Don't show release notes if RSS item contains no description and no release notes URL:
+		// Don't show release notes if RSS item contains no description and no release notes URL:
 		return( ([self.updateItem itemDescription] != nil
 			&& [[[self.updateItem itemDescription] stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0)
 			|| [self.updateItem releaseNotesURL] != nil );
@@ -169,7 +169,7 @@
 	if( [self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] )
 		allowAutoUpdates = [self.host boolForInfoDictionaryKey: SUAllowsAutomaticUpdatesKey];
 
-	// UK 2007-08-31: Give delegate a chance to modify this choice:
+	// Give delegate a chance to modify this choice:
 	if (self.delegate && [self.delegate respondsToSelector: @selector(updateAlert:shouldAllowAutoUpdate:)] )
 		[self.delegate updateAlert: self shouldAllowAutoUpdate: &allowAutoUpdates];
 
@@ -187,9 +187,8 @@
 
 	// We're gonna do some frame magic to match the window's size to the description field and the presence of the release notes view.
 	NSRect	frame = [[self window] frame];
-	BOOL	showReleaseNotes = [self showsReleaseNotes];	// UK 2007-09-18
-	if (!showReleaseNotes)	// UK 2007-09-18
-	{
+	BOOL	showReleaseNotes = [self showsReleaseNotes];
+	if (!showReleaseNotes) {
 		// Resize the window to be appropriate for not having a huge release notes view.
 		frame.size.height -= [self.releaseNotesView frame].size.height + 40; // Extra 40 is for the release notes label and margin.
 
@@ -212,8 +211,7 @@
 		[[[self.releaseNotesView superview] superview] setFrame:boxFrame];
 	}
 
-	if( [self.updateItem fileURL] == nil )	// UK 2007-08-31 (whole if clause)
-	{
+	if( [self.updateItem fileURL] == nil ) {
 		[self.installButton setTitle: SULocalizedString( @"Learn More...", @"Alternate title for 'Install Update' button when there's no download in RSS feed." )];
 		[self.installButton setAction: @selector(openInfoURL:)];
 	}
@@ -247,10 +245,8 @@
 	[self.skipButton setFrame: skipBtnBox];
 	minimumWindowWidth += DISTANCE_BETWEEN_BUTTON_GROUPS +titleSize.width;
 
-	if( showReleaseNotes )	// UK 2007-09-18 (whole block)
-	{
-		if( sizeStr )
-		{
+	if( showReleaseNotes ) {
+		if( sizeStr ) {
 			NSSize		desiredSize = NSSizeFromString( sizeStr );
 			NSSize		sizeDiff = NSZeroSize;
 			// NSBox*		boxView = (NSBox*)[[releaseNotesView superview] superview];
@@ -277,12 +273,11 @@
 	[[self window] setFrame: frame display: NO];
 	[[self window] center];
 
-	if (showReleaseNotes)	// UK 2007-09-18
-	{
+	if (showReleaseNotes) {
 		[self displayReleaseNotes];
 	}
 
-	[[[self.releaseNotesView superview] superview] setHidden: !showReleaseNotes];	// UK 2007-09-18
+	[[[self.releaseNotesView superview] superview] setHidden: !showReleaseNotes];
 
 }
 
