@@ -55,6 +55,8 @@
         [request setValue:self.userAgentString forHTTPHeaderField:@"User-Agent"];
     }
 
+    [request setValue:@"application/rss+xml,*/*;q=0.1" forHTTPHeaderField:@"Accept"];
+
     self.download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
 }
 
