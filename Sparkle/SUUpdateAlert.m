@@ -173,6 +173,10 @@
 
 - (void)awakeFromNib
 {
+    BOOL showReleaseNotes = [self showsReleaseNotes];
+
+    [self.window setFrameAutosaveName: showReleaseNotes ? @"SUUpdateAlert" : @"SUUpdateAlertSmall" ];
+
     if ([self.host isBackgroundApplication]) {
         [self.window setLevel:NSFloatingWindowLevel]; // This means the window will float over all other apps, if our app is switched out ?!
     }
@@ -182,8 +186,6 @@
         [self.installButton setAction:@selector(openInfoURL:)];
     }
 
-    BOOL showReleaseNotes = [self showsReleaseNotes];
-    
     if (showReleaseNotes) {
         [self displayReleaseNotes];
     }
