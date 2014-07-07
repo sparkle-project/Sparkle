@@ -25,7 +25,7 @@
 //	Prototypes:
 // -----------------------------------------------------------------------------
 
-void	SUClearLog( void );
-void	SULog( NSString* format, ... ) NS_FORMAT_FUNCTION(1,2);
+void SUClearLog(void);
+void SULog(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
 
 

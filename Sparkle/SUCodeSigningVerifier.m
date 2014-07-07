@@ -81,12 +81,12 @@ finally:
     CFDictionaryRef signingInfo = nil;
     const SecCSFlags flags = kSecCSSigningInformation | kSecCSRequirementInformation | kSecCSDynamicInformation | kSecCSContentInformation;
     if (SecCodeCopySigningInformation(code, flags, &signingInfo) == noErr) {
-        NSDictionary* signingDict = CFBridgingRelease(signingInfo);
-        NSMutableDictionary* relevantInfo = [NSMutableDictionary dictionary];
-        for (NSString* key in @[@"format", @"identifier", @"requirements", @"teamid", @"signing-time"]) {
+        NSDictionary *signingDict = CFBridgingRelease(signingInfo);
+        NSMutableDictionary *relevantInfo = [NSMutableDictionary dictionary];
+        for (NSString *key in @[@"format", @"identifier", @"requirements", @"teamid", @"signing-time"]) {
             relevantInfo[key] = signingDict[key];
         }
-        NSDictionary* infoPlist = signingDict[@"info-plist"];
+        NSDictionary *infoPlist = signingDict[@"info-plist"];
         relevantInfo[@"version"] = infoPlist[@"CFBundleShortVersionString"];
         relevantInfo[@"build"] = infoPlist[@"CFBundleVersion"];
         SULog(@"%@: %@", label, relevantInfo);

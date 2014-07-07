@@ -18,7 +18,7 @@
 //	Constants:
 // -----------------------------------------------------------------------------
 
-#define LOG_FILE_PATH	@"~/Library/Logs/SparkleUpdateLog.log"
+#define LOG_FILE_PATH @"~/Library/Logs/SparkleUpdateLog.log"
 
 
 // -----------------------------------------------------------------------------
@@ -36,13 +36,13 @@
 //		result	-	same here.
 // -----------------------------------------------------------------------------
 
-void	SUClearLog( void )
+void SUClearLog(void)
 {
-	FILE*		logfile = fopen([[LOG_FILE_PATH stringByExpandingTildeInPath] fileSystemRepresentation],"w");
-	if( logfile )
-		fclose(logfile);
-	else
-		NSLog(@"----- Sparkle Log -----");
+    FILE *logfile = fopen([[LOG_FILE_PATH stringByExpandingTildeInPath] fileSystemRepresentation], "w");
+    if (logfile)
+        fclose(logfile);
+    else
+        NSLog(@"----- Sparkle Log -----");
 }
 
 
@@ -56,25 +56,25 @@ void	SUClearLog( void )
 //		...		-	More parameters depending on format string's contents.
 // -----------------------------------------------------------------------------
 
-void	SULog( NSString* format, ... )
+void SULog(NSString *format, ...)
 {
-	va_list ap;
-	va_start(ap, format);
-	NSString*	theStr = [[NSString alloc] initWithFormat: format arguments: ap];
-	FILE*		logfile = fopen([[LOG_FILE_PATH stringByExpandingTildeInPath] fileSystemRepresentation],"a");
-	if( !logfile )
-		NSLog( @"%@",theStr );
+    va_list ap;
+    va_start(ap, format);
+    NSString *theStr = [[NSString alloc] initWithFormat:format arguments:ap];
+    FILE *logfile = fopen([[LOG_FILE_PATH stringByExpandingTildeInPath] fileSystemRepresentation], "a");
+    if (!logfile)
+        NSLog(@"%@", theStr);
 	else
 	{
-		theStr = [NSString stringWithFormat: @"%@: %@", [NSDate date], theStr];
-		NSData*		theData = [theStr dataUsingEncoding: NSUTF8StringEncoding];
-		char		newlineChar = '\n';
-		fwrite( [theData bytes], 1, [theData length], logfile );
-		fwrite( &newlineChar, 1, 1, logfile );	// Append a newline.
-		fclose( logfile );
-		logfile = NULL;
-	}
-	va_end(ap);
+        theStr = [NSString stringWithFormat:@"%@: %@", [NSDate date], theStr];
+        NSData *theData = [theStr dataUsingEncoding:NSUTF8StringEncoding];
+        char newlineChar = '\n';
+        fwrite([theData bytes], 1, [theData length], logfile);
+        fwrite(&newlineChar, 1, 1, logfile); // Append a newline.
+        fclose(logfile);
+        logfile = NULL;
+    }
+    va_end(ap);
 }
 
 

@@ -23,41 +23,41 @@
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost delegate:(id<SUAutomaticUpdateAlertDelegate>)del
 {
-	self = [super initWithHost:aHost windowNibName:@"SUAutomaticUpdateAlert"];
+    self = [super initWithHost:aHost windowNibName:@"SUAutomaticUpdateAlert"];
 	if (self)
 	{
-		self.updateItem = item;
-		self.delegate = del;
-		self.host = aHost;
-		[self setShouldCascadeWindows:NO];
-		[[self window] center];
-	}
-	return self;
+        self.updateItem = item;
+        self.delegate = del;
+        self.host = aHost;
+        [self setShouldCascadeWindows:NO];
+        [[self window] center];
+    }
+    return self;
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self.host bundlePath], [self.host installationPath]]; }
 
-- (IBAction)installNow:(id) __unused sender
+- (IBAction)installNow:(id)__unused sender
 {
-	[self close];
-	[self.delegate automaticUpdateAlert:self finishedWithChoice:SUInstallNowChoice];
+    [self close];
+    [self.delegate automaticUpdateAlert:self finishedWithChoice:SUInstallNowChoice];
 }
 
-- (IBAction)installLater:(id) __unused sender
+- (IBAction)installLater:(id)__unused sender
 {
-	[self close];
-	[self.delegate automaticUpdateAlert:self finishedWithChoice:SUInstallLaterChoice];
+    [self close];
+    [self.delegate automaticUpdateAlert:self finishedWithChoice:SUInstallLaterChoice];
 }
 
-- (IBAction)doNotInstall:(id) __unused sender
+- (IBAction)doNotInstall:(id)__unused sender
 {
-	[self close];
-	[self.delegate automaticUpdateAlert:self finishedWithChoice:SUDoNotInstallChoice];
+    [self close];
+    [self.delegate automaticUpdateAlert:self finishedWithChoice:SUDoNotInstallChoice];
 }
 
 - (NSImage *)applicationIcon
 {
-	return [self.host icon];
+    return [self.host icon];
 }
 
 - (NSString *)titleText

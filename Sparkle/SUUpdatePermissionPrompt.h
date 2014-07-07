@@ -12,8 +12,8 @@
 #import "SUWindowController.h"
 
 typedef enum {
-	SUAutomaticallyCheck,
-	SUDoNotAutomaticallyCheck
+    SUAutomaticallyCheck,
+    SUDoNotAutomaticallyCheck
 } SUPermissionPromptResult;
 
 @protocol SUUpdatePermissionPromptDelegate;

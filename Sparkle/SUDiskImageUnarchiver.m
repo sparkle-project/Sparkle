@@ -16,28 +16,28 @@
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
-	return [[path pathExtension] isEqualToString:@"dmg"];
+    return [[path pathExtension] isEqualToString:@"dmg"];
 }
 
 // Called on a non-main thread.
 - (void)extractDMG
 {
 	@autoreleasepool {
-		[self extractDMGWithPassword:nil];
-	}
+        [self extractDMGWithPassword:nil];
+    }
 }
 
 // Called on a non-main thread.
-- (void)extractDMGWithPassword:(NSString *) __unused password
+- (void)extractDMGWithPassword:(NSString *)__unused password
 {
 	@autoreleasepool {
-		BOOL mountedSuccessfully = NO;
+        BOOL mountedSuccessfully = NO;
 
         SULog(@"Extracting %@ as a DMG", self.archivePath);
 
-		// get a unique mount point path
-		NSString *mountPoint = nil;
-		FSRef tmpRef;
+        // get a unique mount point path
+        NSString *mountPoint = nil;
+        FSRef tmpRef;
         NSFileManager *manager;
         NSError *error;
         NSArray *contents;
@@ -47,122 +47,122 @@
         dispatch_block_t delegateFailure = ^{
             [self notifyDelegateOfFailure];
         };
-        dispatch_block_t delegateSuccess =  ^{
+        dispatch_block_t delegateSuccess = ^{
             [self notifyDelegateOfSuccess];
         };
 		do
 		{
-			// Using NSUUID would make creating UUIDs be done in Cocoa,
-			// and thus managed under ARC. Sadly, the class is in 10.8 and later.
-			CFUUIDRef uuid = CFUUIDCreate(NULL);
+            // Using NSUUID would make creating UUIDs be done in Cocoa,
+            // and thus managed under ARC. Sadly, the class is in 10.8 and later.
+            CFUUIDRef uuid = CFUUIDCreate(NULL);
 			if (uuid)
 			{
-				NSString *uuidString = CFBridgingRelease(CFUUIDCreateString(NULL, uuid));
+                NSString *uuidString = CFBridgingRelease(CFUUIDCreateString(NULL, uuid));
 				if (uuidString)
 				{
-					mountPoint = [@"/Volumes" stringByAppendingPathComponent:uuidString];
-				}
-				CFRelease(uuid);
-			}
+                    mountPoint = [@"/Volumes" stringByAppendingPathComponent:uuidString];
+                }
+                CFRelease(uuid);
+            }
 		}
 		while (noErr == FSPathMakeRefWithOptions((UInt8 *)[mountPoint fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &tmpRef, NULL));
 
-		NSData *promptData = nil;
-		promptData = [NSData dataWithBytes:"yes\n" length:4];
+        NSData *promptData = nil;
+        promptData = [NSData dataWithBytes:"yes\n" length:4];
 
-        NSArray* arguments = @[@"attach", self.archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"];
+        NSArray *arguments = @[@"attach", self.archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"];
 
-		NSData *output = nil;
-		NSInteger taskResult = -1;
+        NSData *output = nil;
+        NSInteger taskResult = -1;
 		@try
 		{
-			NTSynchronousTask* task = [[NTSynchronousTask alloc] init];
+            NTSynchronousTask *task = [[NTSynchronousTask alloc] init];
 
-			[task run:@"/usr/bin/hdiutil" directory:@"/" withArgs:arguments input:promptData];
+            [task run:@"/usr/bin/hdiutil" directory:@"/" withArgs:arguments input:promptData];
 
-			taskResult = [task result];
+            taskResult = [task result];
             output = [[task output] copy];
-		}
-		@catch (NSException *)
-		{
-			goto reportError;
-		}
+        }
+        @catch (NSException *)
+        {
+            goto reportError;
+        }
 
 		if (taskResult != 0)
 		{
-            NSString*	resultStr = output ? [[NSString alloc] initWithData: output encoding: NSUTF8StringEncoding] : nil;
-			SULog( @"hdiutil failed with code: %ld data: <<%@>>", (long)taskResult, resultStr );
-			goto reportError;
-		}
-		mountedSuccessfully = YES;
+            NSString *resultStr = output ? [[NSString alloc] initWithData:output encoding:NSUTF8StringEncoding] : nil;
+            SULog(@"hdiutil failed with code: %ld data: <<%@>>", (long)taskResult, resultStr);
+            goto reportError;
+        }
+        mountedSuccessfully = YES;
 
-		// Now that we've mounted it, we need to copy out its contents.
+        // Now that we've mounted it, we need to copy out its contents.
         manager = [[NSFileManager alloc] init];
         contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
 		if (error)
 		{
-			SULog(@"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
-			goto reportError;
-		}
+            SULog(@"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
+            goto reportError;
+        }
 
 		for (NSString *item in contents)
 		{
-			NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
+            NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
             NSString *toPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:item];
 
-			// We skip any files in the DMG which are not readable.
-			if (![manager isReadableFileAtPath:fromPath]) {
-				continue;
-			}
+            // We skip any files in the DMG which are not readable.
+            if (![manager isReadableFileAtPath:fromPath]) {
+                continue;
+            }
 
-			SULog(@"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
+            SULog(@"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
 
 			if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
 			{
-				SULog(@"Couldn't copy item: %@ : %@", error, error.userInfo ? error.userInfo : @"");
-				goto reportError;
-			}
-		}
+                SULog(@"Couldn't copy item: %@ : %@", error, error.userInfo ? error.userInfo : @"");
+                goto reportError;
+            }
+        }
 
-		dispatch_async(dispatch_get_main_queue(), delegateSuccess);
-		goto finally;
+        dispatch_async(dispatch_get_main_queue(), delegateSuccess);
+        goto finally;
 
-	reportError:
-		dispatch_async(dispatch_get_main_queue(), delegateFailure);
+    reportError:
+        dispatch_async(dispatch_get_main_queue(), delegateFailure);
 
-	finally:
-		if (mountedSuccessfully)
-			[NSTask launchedTaskWithLaunchPath:@"/usr/bin/hdiutil" arguments:@[@"detach", mountPoint, @"-force"]];
-		else
+    finally:
+        if (mountedSuccessfully)
+            [NSTask launchedTaskWithLaunchPath:@"/usr/bin/hdiutil" arguments:@[@"detach", mountPoint, @"-force"]];
+        else
             SULog(@"Can't mount DMG %@", self.archivePath);
-	}
+    }
 }
 
 - (void)start
 {
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		[self extractDMG];
-	});
+    });
 }
 
 + (void)load
 {
-	[self registerImplementation:self];
+    [self registerImplementation:self];
 }
 
-- (BOOL)isEncrypted:(NSData*)resultData
+- (BOOL)isEncrypted:(NSData *)resultData
 {
-	BOOL result = NO;
+    BOOL result = NO;
 	if(resultData)
 	{
-		NSString *data = [[NSString alloc] initWithData:resultData encoding:NSUTF8StringEncoding];
+        NSString *data = [[NSString alloc] initWithData:resultData encoding:NSUTF8StringEncoding];
 
         if ((data != nil) && !NSEqualRanges([data rangeOfString:@"passphrase-count"], NSMakeRange(NSNotFound, 0)))
 		{
-			result = YES;
-		}
-	}
-	return result;
+            result = YES;
+        }
+    }
+    return result;
 }
 
 @end

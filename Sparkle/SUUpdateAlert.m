@@ -59,19 +59,19 @@
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost
 {
-	self = [super initWithHost:host windowNibName:@"SUUpdateAlert"];
+    self = [super initWithHost:host windowNibName:@"SUUpdateAlert"];
 	if (self)
 	{
-		host = aHost;
-		updateItem = item;
-		[self setShouldCascadeWindows:NO];
+        host = aHost;
+        updateItem = item;
+        [self setShouldCascadeWindows:NO];
 
-		// Alex: This dummy line makes sure that the binary is linked against WebKit.
-		// The SUUpdateAlert.xib file contains a WebView and if we don't link against WebKit,
-		// we will get a runtime crash when decoding the NIB. It is better to get a link error.
-		[WebView MIMETypesShownAsHTML];
-	}
-	return self;
+        // Alex: This dummy line makes sure that the binary is linked against WebKit.
+        // The SUUpdateAlert.xib file contains a WebView and if we don't link against WebKit,
+        // we will get a runtime crash when decoding the NIB. It is better to get a link error.
+        [WebView MIMETypesShownAsHTML];
+    }
+    return self;
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
@@ -79,101 +79,101 @@
 
 - (void)endWithSelection:(SUUpdateAlertChoice)choice
 {
-	[self.releaseNotesView stopLoading:self];
-	[self.releaseNotesView setFrameLoadDelegate:nil];
-	[self.releaseNotesView setPolicyDelegate:nil];
-	[self.releaseNotesView removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
-	[self close];
-	if ([self.delegate respondsToSelector:@selector(updateAlert:finishedWithChoice:)])
-		[self.delegate updateAlert:self finishedWithChoice:choice];
+    [self.releaseNotesView stopLoading:self];
+    [self.releaseNotesView setFrameLoadDelegate:nil];
+    [self.releaseNotesView setPolicyDelegate:nil];
+    [self.releaseNotesView removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
+    [self close];
+    if ([self.delegate respondsToSelector:@selector(updateAlert:finishedWithChoice:)])
+        [self.delegate updateAlert:self finishedWithChoice:choice];
 }
 
-- (IBAction)installUpdate:(id) __unused sender
+- (IBAction)installUpdate:(id)__unused sender
 {
-	[self endWithSelection:SUInstallUpdateChoice];
+    [self endWithSelection:SUInstallUpdateChoice];
 }
 
-- (IBAction)openInfoURL:(id) __unused sender
+- (IBAction)openInfoURL:(id)__unused sender
 {
-	[self endWithSelection:SUOpenInfoURLChoice];
+    [self endWithSelection:SUOpenInfoURLChoice];
 }
 
-- (IBAction)skipThisVersion:(id) __unused sender
+- (IBAction)skipThisVersion:(id)__unused sender
 {
-	[self endWithSelection:SUSkipThisVersionChoice];
+    [self endWithSelection:SUSkipThisVersionChoice];
 }
 
-- (IBAction)remindMeLater:(id) __unused sender
+- (IBAction)remindMeLater:(id)__unused sender
 {
-	[self endWithSelection:SURemindMeLaterChoice];
+    [self endWithSelection:SURemindMeLaterChoice];
 }
 
 - (void)displayReleaseNotes
 {
-	// Set the default font
-	[self.releaseNotesView setPreferencesIdentifier:[SPARKLE_BUNDLE bundleIdentifier]];
+    // Set the default font
+    [self.releaseNotesView setPreferencesIdentifier:[SPARKLE_BUNDLE bundleIdentifier]];
     WebPreferences *prefs = [self.releaseNotesView preferences];
     NSString *familyName = [[NSFont systemFontOfSize:8] familyName];
     if ([familyName hasPrefix:@"."]) { // 10.9 returns ".Lucida Grande UI", which isn't a valid name for the WebView
         familyName = @"Lucida Grande";
     }
-	[prefs setStandardFontFamily:familyName];
-	[prefs setDefaultFontSize:(int)[NSFont systemFontSizeForControlSize:NSSmallControlSize]];
+    [prefs setStandardFontFamily:familyName];
+    [prefs setDefaultFontSize:(int)[NSFont systemFontSizeForControlSize:NSSmallControlSize]];
     [prefs setPlugInsEnabled:NO];
-	[self.releaseNotesView setFrameLoadDelegate:self];
-	[self.releaseNotesView setPolicyDelegate:self];
+    [self.releaseNotesView setFrameLoadDelegate:self];
+    [self.releaseNotesView setPolicyDelegate:self];
 
-	// Stick a nice big spinner in the middle of the web view until the page is loaded.
-	NSRect frame = [[self.releaseNotesView superview] frame];
-	self.releaseNotesSpinner = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(NSMidX(frame)-16, NSMidY(frame)-16, 32, 32)];
-	[self.releaseNotesSpinner setStyle:NSProgressIndicatorSpinningStyle];
-	[self.releaseNotesSpinner startAnimation:self];
-	self.webViewFinishedLoading = NO;
-	[[self.releaseNotesView superview] addSubview:self.releaseNotesSpinner];
+    // Stick a nice big spinner in the middle of the web view until the page is loaded.
+    NSRect frame = [[self.releaseNotesView superview] frame];
+    self.releaseNotesSpinner = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(NSMidX(frame) - 16, NSMidY(frame) - 16, 32, 32)];
+    [self.releaseNotesSpinner setStyle:NSProgressIndicatorSpinningStyle];
+    [self.releaseNotesSpinner startAnimation:self];
+    self.webViewFinishedLoading = NO;
+    [[self.releaseNotesView superview] addSubview:self.releaseNotesSpinner];
 
-	// If there's a release notes URL, load it; otherwise, just stick the contents of the description into the web view.
+    // If there's a release notes URL, load it; otherwise, just stick the contents of the description into the web view.
 	if ([self.updateItem releaseNotesURL])
 	{
 		if ([[self.updateItem releaseNotesURL] isFileURL])
 		{
-			[[self.releaseNotesView mainFrame] loadHTMLString:@"Release notes with file:// URLs are not supported for security reasons&mdash;Javascript would be able to read files on your file system." baseURL:nil];
+            [[self.releaseNotesView mainFrame] loadHTMLString:@"Release notes with file:// URLs are not supported for security reasons&mdash;Javascript would be able to read files on your file system." baseURL:nil];
 		}
 		else
 		{
-			[[self.releaseNotesView mainFrame] loadRequest:[NSURLRequest requestWithURL:[self.updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30]];
-		}
+            [[self.releaseNotesView mainFrame] loadRequest:[NSURLRequest requestWithURL:[self.updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30]];
+        }
 	}
 	else
 	{
-		[[self.releaseNotesView mainFrame] loadHTMLString:[self.updateItem itemDescription] baseURL:nil];
-	}
+        [[self.releaseNotesView mainFrame] loadHTMLString:[self.updateItem itemDescription] baseURL:nil];
+    }
 }
 
 - (BOOL)showsReleaseNotes
 {
-	NSNumber *shouldShowReleaseNotes = [self.host objectForInfoDictionaryKey:SUShowReleaseNotesKey];
+    NSNumber *shouldShowReleaseNotes = [self.host objectForInfoDictionaryKey:SUShowReleaseNotesKey];
 	if (shouldShowReleaseNotes == nil)
 	{
-		// Don't show release notes if RSS item contains no description and no release notes URL:
-		return( ([self.updateItem itemDescription] != nil
-			&& [[[self.updateItem itemDescription] stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0)
-			|| [self.updateItem releaseNotesURL] != nil );
+        // Don't show release notes if RSS item contains no description and no release notes URL:
+        return (([self.updateItem itemDescription] != nil
+                 && [[[self.updateItem itemDescription] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0)
+                || [self.updateItem releaseNotesURL] != nil);
 	}
 	else
-		return [shouldShowReleaseNotes boolValue];
+        return [shouldShowReleaseNotes boolValue];
 }
 
 - (BOOL)allowsAutomaticUpdates
 {
-	BOOL		allowAutoUpdates = YES;	// Defaults to YES.
-	if( [self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] )
-		allowAutoUpdates = [self.host boolForInfoDictionaryKey: SUAllowsAutomaticUpdatesKey];
+    BOOL allowAutoUpdates = YES; // Defaults to YES.
+    if ([self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey])
+        allowAutoUpdates = [self.host boolForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
 
-	// Give delegate a chance to modify this choice:
-	if (self.delegate && [self.delegate respondsToSelector: @selector(updateAlert:shouldAllowAutoUpdate:)] )
-		[self.delegate updateAlert: self shouldAllowAutoUpdate: &allowAutoUpdates];
+    // Give delegate a chance to modify this choice:
+    if (self.delegate && [self.delegate respondsToSelector:@selector(updateAlert:shouldAllowAutoUpdate:)])
+        [self.delegate updateAlert:self shouldAllowAutoUpdate:&allowAutoUpdates];
 
-	return allowAutoUpdates;
+    return allowAutoUpdates;
 }
 
 - (void)awakeFromNib
@@ -295,27 +295,27 @@
 
 - (NSImage *)applicationIcon
 {
-	return [self.host icon];
+    return [self.host icon];
 }
 
 - (NSString *)titleText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is available!", nil), [self.host name]];
+    return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is available!", nil), [self.host name]];
 }
 
 - (NSString *)descriptionText
 {
-	NSString *updateItemVersion = [self.updateItem displayVersionString];
+    NSString *updateItemVersion = [self.updateItem displayVersionString];
     NSString *hostVersion = [self.host displayVersion];
-	// Display more info if the version strings are the same; useful for betas.
+    // Display more info if the version strings are the same; useful for betas.
     if (!self.versionDisplayer && [updateItemVersion isEqualToString:hostVersion] )
 	{
         updateItemVersion = [updateItemVersion stringByAppendingFormat:@" (%@)", [self.updateItem versionString]];
         hostVersion = [hostVersion stringByAppendingFormat:@" (%@)", [self.host version]];
     }
 	else {
-		[self.versionDisplayer formatVersion: &updateItemVersion andVersion: &hostVersion];
-	}
+        [self.versionDisplayer formatVersion:&updateItemVersion andVersion:&hostVersion];
+    }
     return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", nil), [self.host name], updateItemVersion, hostVersion];
 }
 
@@ -323,12 +323,12 @@
 {
     if ([frame parentFrame] == nil) {
         self.webViewFinishedLoading = YES;
-		[self.releaseNotesSpinner setHidden:YES];
-		[sender display]; // necessary to prevent weird scroll bar artifacting
+        [self.releaseNotesSpinner setHidden:YES];
+        [sender display]; // necessary to prevent weird scroll bar artifacting
     }
 }
 
-- (void)webView:(WebView *) __unused sender decidePolicyForNavigationAction:(NSDictionary *) __unused actionInformation request:(NSURLRequest *)request frame:(WebFrame *) __unused frame decisionListener:(id <WebPolicyDecisionListener>)listener
+- (void)webView:(WebView *)__unused sender decidePolicyForNavigationAction:(NSDictionary *)__unused actionInformation request:(NSURLRequest *)request frame:(WebFrame *)__unused frame decisionListener:(id<WebPolicyDecisionListener>)listener
 {
     if (self.webViewFinishedLoading) {
         [[NSWorkspace sharedWorkspace] openURL:[request URL]];
@@ -341,33 +341,33 @@
 }
 
 // Clean up the contextual menu.
-- (NSArray *)webView:(WebView *) __unused sender contextMenuItemsForElement:(NSDictionary *) __unused element defaultMenuItems:(NSArray *)defaultMenuItems
+- (NSArray *)webView:(WebView *)__unused sender contextMenuItemsForElement:(NSDictionary *)__unused element defaultMenuItems:(NSArray *)defaultMenuItems
 {
-	NSMutableArray *webViewMenuItems = [defaultMenuItems mutableCopy];
+    NSMutableArray *webViewMenuItems = [defaultMenuItems mutableCopy];
 
 	if (webViewMenuItems)
 	{
 		for (NSMenuItem *menuItem in defaultMenuItems)
 		{
-			NSInteger tag = [menuItem tag];
+            NSInteger tag = [menuItem tag];
 
 			switch (tag)
 			{
-				case WebMenuItemTagOpenLinkInNewWindow:
-				case WebMenuItemTagDownloadLinkToDisk:
-				case WebMenuItemTagOpenImageInNewWindow:
-				case WebMenuItemTagDownloadImageToDisk:
-				case WebMenuItemTagOpenFrameInNewWindow:
-				case WebMenuItemTagGoBack:
-				case WebMenuItemTagGoForward:
-				case WebMenuItemTagStop:
-				case WebMenuItemTagReload:
-					[webViewMenuItems removeObjectIdenticalTo: menuItem];
-			}
-		}
-	}
+                case WebMenuItemTagOpenLinkInNewWindow:
+                case WebMenuItemTagDownloadLinkToDisk:
+                case WebMenuItemTagOpenImageInNewWindow:
+                case WebMenuItemTagDownloadImageToDisk:
+                case WebMenuItemTagOpenFrameInNewWindow:
+                case WebMenuItemTagGoBack:
+                case WebMenuItemTagGoForward:
+                case WebMenuItemTagStop:
+                case WebMenuItemTagReload:
+                    [webViewMenuItems removeObjectIdenticalTo:menuItem];
+            }
+        }
+    }
 
-	return webViewMenuItems;
+    return webViewMenuItems;
 }
 
 @end

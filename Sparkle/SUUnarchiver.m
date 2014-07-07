@@ -25,18 +25,18 @@
 {
 	for (id current in [self unarchiverImplementations])
 	{
-		if ([current canUnarchivePath:path]) {
-			return [[current alloc] initWithPath:path host:host];
-		}
-	}
-	return nil;
+        if ([current canUnarchivePath:path]) {
+            return [[current alloc] initWithPath:path host:host];
+        }
+    }
+    return nil;
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], self.archivePath]; }
 
 - (void)start
 {
-	// No-op
+    // No-op
 }
 
 - (instancetype)initWithPath:(NSString *)path host:(SUHost *)host
@@ -49,7 +49,7 @@
     return self;
 }
 
-+ (BOOL)canUnarchivePath:(NSString *) __unused path
++ (BOOL)canUnarchivePath:(NSString *)__unused path
 {
     return NO;
 }

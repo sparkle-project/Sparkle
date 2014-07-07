@@ -25,28 +25,28 @@
 
 - (void)didFindValidUpdate
 {
-	self.showErrors = YES; // We only start showing errors after we present the UI for the first time.
-	[super didFindValidUpdate];
+    self.showErrors = YES; // We only start showing errors after we present the UI for the first time.
+    [super didFindValidUpdate];
 }
 
 - (void)didNotFindUpdate
 {
     id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
 
-	if ([updaterDelegate respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
+    if ([updaterDelegate respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
         [updaterDelegate updaterDidNotFindUpdate:self.updater];
-	}
+    }
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
-	[self abortUpdate]; // Don't tell the user that no update was found; this was a scheduled update.
+    [self abortUpdate]; // Don't tell the user that no update was found; this was a scheduled update.
 }
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-	if (self.showErrors)
-		[super abortUpdateWithError:error];
-	else
-		[self abortUpdate];
+    if (self.showErrors)
+        [super abortUpdateWithError:error];
+    else
+        [self abortUpdate];
 }
 
 @end

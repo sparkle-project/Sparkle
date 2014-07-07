@@ -16,10 +16,10 @@
 
 typedef enum
 {
-	SUInstallUpdateChoice,
-	SURemindMeLaterChoice,
-	SUSkipThisVersionChoice,
-	SUOpenInfoURLChoice
+    SUInstallUpdateChoice,
+    SURemindMeLaterChoice,
+    SUSkipThisVersionChoice,
+    SUOpenInfoURLChoice
 } SUUpdateAlertChoice;
 
 @class WebView, SUAppcastItem, SUHost;
@@ -39,7 +39,7 @@ typedef enum
 @protocol SUUpdateAlertDelegate <NSObject>
 - (void)updateAlert:(SUUpdateAlert *)updateAlert finishedWithChoice:(SUUpdateAlertChoice)updateChoice;
 @optional
-- (void)updateAlert:(SUUpdateAlert *)updateAlert shouldAllowAutoUpdate: (BOOL*)shouldAllowAutoUpdate;
+- (void)updateAlert:(SUUpdateAlert *)updateAlert shouldAllowAutoUpdate:(BOOL *)shouldAllowAutoUpdate;
 @end
 
 #endif

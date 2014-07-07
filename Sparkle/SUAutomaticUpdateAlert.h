@@ -15,9 +15,9 @@
 
 typedef enum
 {
-	SUInstallNowChoice,
-	SUInstallLaterChoice,
-	SUDoNotInstallChoice
+    SUInstallNowChoice,
+    SUInstallLaterChoice,
+    SUDoNotInstallChoice
 } SUAutomaticInstallationChoice;
 
 @class SUAppcastItem, SUHost;

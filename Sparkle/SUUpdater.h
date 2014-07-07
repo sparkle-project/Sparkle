@@ -32,9 +32,9 @@
 
 @property (readonly, strong) NSBundle *hostBundle;
 
-@property  BOOL automaticallyChecksForUpdates;
+@property BOOL automaticallyChecksForUpdates;
 
-@property  NSTimeInterval updateCheckInterval;
+@property NSTimeInterval updateCheckInterval;
 
 /*!
  * The URL of the appcast used to download update information.
@@ -45,9 +45,9 @@
 
 @property (nonatomic, copy) NSString *userAgentString;
 
-@property  BOOL sendsSystemProfile;
+@property BOOL sendsSystemProfile;
 
-@property  BOOL automaticallyDownloadsUpdates;
+@property BOOL automaticallyDownloadsUpdates;
 
 /*!
     Explicitly checks for updates and displays a progress dialog while doing so.
@@ -157,7 +157,7 @@ extern NSString *const SUUpdaterAppcastNotificationKey;
 
     \param updater The SUUpdater instance.
  */
-- (NSString*)feedURLStringForUpdater:(SUUpdater*)updater;
+- (NSString *)feedURLStringForUpdater:(SUUpdater *)updater;
 
 /*!
     Returns whether Sparkle should prompt the user about automatic update checks.
@@ -255,7 +255,7 @@ extern NSString *const SUUpdaterAppcastNotificationKey;
 
     \param updater The SUUpdater instance.
  */
-- (id <SUVersionComparison>)versionComparatorForUpdater:(SUUpdater *)updater;
+- (id<SUVersionComparison>)versionComparatorForUpdater:(SUUpdater *)updater;
 
 /*!
     Returns an object that formats version numbers for display to the user.
@@ -267,7 +267,7 @@ extern NSString *const SUUpdaterAppcastNotificationKey;
 
     \param updater The SUUpdater instance.
  */
-- (id <SUVersionDisplay>)versionDisplayerForUpdater:(SUUpdater *)updater;
+- (id<SUVersionDisplay>)versionDisplayerForUpdater:(SUUpdater *)updater;
 
 /*!
     Returns the path which is used to relaunch the client after the update is installed.
@@ -284,7 +284,7 @@ extern NSString *const SUUpdaterAppcastNotificationKey;
 
     \param updater The SUUpdater instance.
  */
--(void)	updaterWillShowModalAlert:(SUUpdater *)updater;
+- (void)updaterWillShowModalAlert:(SUUpdater *)updater;
 
 /*!
     Called after an updater shows a modal alert window,
@@ -292,7 +292,7 @@ extern NSString *const SUUpdaterAppcastNotificationKey;
 
     \param updater The SUUpdater instance.
  */
--(void)	updaterDidShowModalAlert:(SUUpdater *)updater;
+- (void)updaterDidShowModalAlert:(SUUpdater *)updater;
 
 /*!
     Called when an update is scheduled to be silently installed on quit.
@@ -322,13 +322,13 @@ extern NSString *const SUUpdaterAppcastNotificationKey;
 #if defined(DEBUG) && DEBUG && 0
 #define SU_MIN_CHECK_INTERVAL 60
 #else
-#define SU_MIN_CHECK_INTERVAL 60*60
+#define SU_MIN_CHECK_INTERVAL 60 * 60
 #endif
 
 #if defined(DEBUG) && DEBUG && 0
 #define SU_DEFAULT_CHECK_INTERVAL 60
 #else
-#define SU_DEFAULT_CHECK_INTERVAL 60*60*24
+#define SU_DEFAULT_CHECK_INTERVAL 60 * 60 * 24
 #endif
 
 #endif

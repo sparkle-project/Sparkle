@@ -12,7 +12,7 @@
 @protocol SUAppcastDelegate;
 
 @class SUAppcastItem;
-@interface SUAppcast : NSObject<NSURLDownloadDelegate>
+@interface SUAppcast : NSObject <NSURLDownloadDelegate>
 
 @property (weak) id<SUAppcastDelegate> delegate;
 @property (copy) NSString *userAgentString;
