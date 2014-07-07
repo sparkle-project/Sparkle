@@ -188,9 +188,9 @@
 
     if (showReleaseNotes) {
         [self displayReleaseNotes];
+    } else {
+        [self.releaseNotesContainerView removeFromSuperview];
     }
-
-    [self.releaseNotesContainerView setHidden:!showReleaseNotes];
 
     [self.window.contentView setNeedsLayout:YES]; // Prod autolayout to place everything
 
