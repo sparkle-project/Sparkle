@@ -298,6 +298,10 @@
 		4607BEA41948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nb; path = nb.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
 		4607BEA51948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nb; path = nb.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
 		525A278F133D6AE900FD8D70 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		555CF29A196C52330000B31E /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		555CF29B196C523E0000B31E /* el */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = el; path = el.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
+		555CF29C196C52460000B31E /* el */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = el; path = el.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
+		555CF29D196C524C0000B31E /* el */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = el; path = el.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
 		55C14BB7136EEF1500649790 /* Autoupdate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Autoupdate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		55C14BB9136EEF1500649790 /* Autoupdate-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Autoupdate-Info.plist"; sourceTree = "<group>"; };
 		55C14BD3136EEFCE00649790 /* Autoupdate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Autoupdate.m; sourceTree = "<group>"; };
@@ -1155,6 +1159,7 @@
 				uk,
 				ar,
 				nb,
+				el,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* Sparkle */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
@@ -1466,6 +1471,7 @@
 				55C14BDB136EF20D00649790 /* cs */,
 				55C14BDC136EF20D00649790 /* da */,
 				55C14BDD136EF20D00649790 /* de */,
+				555CF29B196C523E0000B31E /* el */,
 				55C14BDE136EF20D00649790 /* en */,
 				55C14BDF136EF20D00649790 /* es */,
 				55C14BE0136EF20D00649790 /* fr */,
@@ -1499,6 +1505,7 @@
 				55C14BF1136EF26100649790 /* cs */,
 				55C14BF2136EF26100649790 /* da */,
 				55C14BF3136EF26100649790 /* de */,
+				555CF29C196C52460000B31E /* el */,
 				55C14BF4136EF26100649790 /* en */,
 				55C14BF5136EF26100649790 /* es */,
 				55C14BF6136EF26100649790 /* fr */,
@@ -1532,6 +1539,7 @@
 				55C14C06136EF2C700649790 /* cs */,
 				55C14C07136EF2C700649790 /* da */,
 				55C14C08136EF2C700649790 /* de */,
+				555CF29D196C524C0000B31E /* el */,
 				55C14C09136EF2C700649790 /* en */,
 				55C14C0A136EF2C700649790 /* es */,
 				55C14C0B136EF2C700649790 /* fr */,
@@ -1565,6 +1573,7 @@
 				615409C4103BBC4000125AF1 /* cs */,
 				61131A050F846CE600E97AF6 /* da */,
 				619B17200E1E9D0800E72754 /* de */,
+				555CF29A196C52330000B31E /* el */,
 				61AAE8230A321A7F00D8810D /* en */,
 				61AAE84F0A321AF700D8810D /* es */,
 				61AAE8590A321B0400D8810D /* fr */,
