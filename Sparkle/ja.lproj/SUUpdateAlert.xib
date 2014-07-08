@@ -24,7 +24,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="998" y="728" width="640" height="370"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1578"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1028"/>
             <value key="minSize" type="size" width="550" height="150"/>
             <value key="maxSize" type="size" width="700" height="600"/>
             <view key="contentView" id="6">
@@ -58,11 +58,11 @@
                         </connections>
                     </textField>
                     <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="17">
-                        <rect key="frame" x="106" y="294" width="84" height="14"/>
+                        <rect key="frame" x="106" y="294" width="92" height="14"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="100" constant="100" id="gkn-FW-9aC"/>
                         </constraints>
-                        <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" title="リリースノート:" usesSingleLineMode="YES" id="170">
+                        <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" title="リリースノート：" usesSingleLineMode="YES" id="170">
                             <font key="font" metaFont="smallSystemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -222,7 +222,6 @@ DQ
             <connections>
                 <outlet property="delegate" destination="-2" id="50"/>
             </connections>
-            <point key="canvasLocation" x="155" y="147"/>
         </window>
         <userDefaultsController representsSharedInstance="YES" id="93" userLabel="Shared Defaults"/>
     </objects>
