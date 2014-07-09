@@ -28,7 +28,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" tag="1" id="13">
-                        <rect key="frame" x="300" y="12" width="105" height="32"/>
+                        <rect key="frame" x="318" y="12" width="105" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                         <buttonCell key="cell" type="push" title="自動で確認" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" tag="1" inset="2" id="176">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -42,7 +42,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="14">
-                        <rect key="frame" x="162" y="12" width="105" height="32"/>
+                        <rect key="frame" x="213" y="12" width="105" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                         <buttonCell key="cell" type="push" title="確認しない" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="177">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -58,7 +58,7 @@ Gw
                     <textField verticalHuggingPriority="750" id="32">
                         <rect key="frame" x="104" y="114" width="289" height="34"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="アップデートを自動で確認させますか?" id="178">
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="アップデートを自動で確認しますか？" id="178">
                             <font key="font" size="13" name="AquaKana-Bold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
