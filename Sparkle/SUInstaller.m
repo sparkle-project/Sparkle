@@ -9,6 +9,7 @@
 #import "SUInstaller.h"
 #import "SUPlainInstaller.h"
 #import "SUPackageInstaller.h"
+#import "SUGuidedPackageInstaller.h"
 #import "SUHost.h"
 #import "SUConstants.h"
 #import "SULog.h"
@@ -118,17 +119,26 @@ static NSString *sUpdateFolder = nil;
 
 + (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath delegate:(id<SUInstallerDelegate>)delegate versionComparator:(id<SUVersionComparison>)comparator
 {
-    BOOL isPackage = NO;
-    NSString *newAppDownloadPath = [self installSourcePathInUpdateFolder:inUpdateFolder forHost:host isPackage:&isPackage];
+	// Look for installer guide
+	NSString* installerGuide = [SUGuidedPackageInstaller installerGuideWithinUpdateFolder:inUpdateFolder];
+	if (installerGuide)
+	{
+		[SUGuidedPackageInstaller performInstallationToPath:installationPath fromPath:installerGuide host:host delegate:delegate synchronously:NO versionComparator:comparator];
+	}
+	else
+	{
+		BOOL isPackage = NO;
+		NSString *newAppDownloadPath = [self installSourcePathInUpdateFolder:inUpdateFolder forHost:host isPackage:&isPackage];
 
-    if (newAppDownloadPath == nil)
-    {
-        [self finishInstallationToPath:installationPath withResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: @"Couldn't find an appropriate update in the downloaded package." }] delegate:delegate];
-    }
-    else
-    {
-        [(isPackage ? [SUPackageInstaller class] : [SUPlainInstaller class])performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host delegate:delegate versionComparator:comparator];
-    }
+		if (newAppDownloadPath == nil)
+		{
+			[self finishInstallationToPath:installationPath withResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: @"Couldn't find an appropriate update in the downloaded package." }] delegate:delegate];
+		}
+		else
+		{
+			[(isPackage ? [SUPackageInstaller class] : [SUPlainInstaller class])performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host delegate:delegate versionComparator:comparator];
+		}
+	}
 }
 
 + (void)mdimportInstallationPath:(NSString *)installationPath
