@@ -388,19 +388,16 @@ NSArray *SUGetAllDevMateURLHosts(void)
 #endif
 
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
-	if( [SUUpdater shouldUseXPCInstaller] )
+    BOOL copiedRelaunchTool = NO;
+	if (SUShouldUseXPCInstaller())
     {
-        [SUXPCInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil completionHandler:^(NSError *xpcError) {
-            if (xpcError != nil)
-                NSLog(@"Error during asynchronous XPC call to copyPath: %@", xpcError);
-            [self finishRelaunchAfterSuccessfulCopying:(xpcError == nil) fromPath:relaunchPathToCopy toPath:targetPath relaunch:relaunch];
-        }];
+        copiedRelaunchTool = [SUXPCInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil error:&error];
     }
     else
     {
-        BOOL copiedRelaunchTool = [SUPlainInstaller copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath temporaryName: nil error: &error];
-        [self finishRelaunchAfterSuccessfulCopying:copiedRelaunchTool fromPath:relaunchPathToCopy toPath:targetPath relaunch:relaunch];
+        copiedRelaunchTool = [SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil error:&error];
     }
+    [self finishRelaunchAfterSuccessfulCopying:copiedRelaunchTool fromPath:relaunchPathToCopy toPath:targetPath relaunch:relaunch];
 }
 
 - (void)finishRelaunchAfterSuccessfulCopying:(BOOL)copiedRelaunchTool fromPath:(NSString *)relaunchPathToCopy toPath:(NSString *)targetPath relaunch:(BOOL)relaunch
