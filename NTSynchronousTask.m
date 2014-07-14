@@ -6,12 +6,8 @@
 //  Copyright 2005 Steve Gehrman. All rights reserved.
 //
 
-#import "SUUpdater.h"
-
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
-#import "SUVersionComparisonProtocol.h"
 #import "NTSynchronousTask.h"
+#import <AppKit/NSApplication.h>
 
 @implementation NTSynchronousTask
 
@@ -232,7 +228,7 @@
 }
 
 
-+(int)	task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input output: (NSData**)outData
++ (int)task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input output:(NSData**)outData
 {
 	// we need this wacky pool here, otherwise we run out of pipes, the pipes are internally autoreleased
 	NSAutoreleasePool *	pool = [[NSAutoreleasePool alloc] init];

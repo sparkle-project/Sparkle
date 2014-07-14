@@ -9,6 +9,8 @@
 #ifndef NTSYNCHRONOUSTASK_H
 #define NTSYNCHRONOUSTASK_H
 
+#import <Foundation/Foundation.h>
+
 @interface NTSynchronousTask : NSObject
 {
 @private
@@ -23,9 +25,9 @@
 
 // pass nil for directory if not needed
 // returns the result
-+(int)	task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input output: (NSData**)outData;
++ (int)task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input output:(NSData**)outData;
 
-+(NSData*)task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input;
++ (NSData*)task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input;
 
 - (void)run:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input;
 - (int)result;

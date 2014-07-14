@@ -11,7 +11,6 @@
 #import "SUBinaryDeltaApply.h"
 #import "SUUnarchiver_Private.h"
 #import "SUHost.h"
-#import "NTSynchronousTask.h"
 
 @implementation SUBinaryDeltaUnarchiver
 
