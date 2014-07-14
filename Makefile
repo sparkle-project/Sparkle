@@ -11,3 +11,6 @@ localizable-strings:
 release:
 	xcodebuild -scheme Distribution -configuration Release -derivedDataPath "$(BUILDDIR)"
 	open -R "$(BUILDDIR)/Build/Products/Release/Sparkle-"*.tar.bz2
+
+travis:
+	xcodebuild clean build
