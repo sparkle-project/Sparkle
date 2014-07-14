@@ -22,7 +22,7 @@
 #import <dirent.h>
 #import <unistd.h>
 #import <sys/param.h>
-
+#import <dlfcn.h>
 
 @interface SUPlainInstaller (MMExtendedAttributes)
 // Removes the directory tree rooted at |root| from the file quarantine.
@@ -55,15 +55,40 @@ static BOOL SUAuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authori
 	sig_t oldSigChildHandler = signal(SIGCHLD, SIG_DFL);
 	BOOL returnValue = YES;
 
-	if (AuthorizationExecuteWithPrivileges(authorization, executablePath, options, (char* const*)arguments, NULL) == errAuthorizationSuccess)
+    // Create func pointer to AuthorizationExecuteWithPrivileges in case it doesn't exist
+    // in this version of MacOS
+    static OSStatus (*_AuthExecuteWithPrivilegesFunc)(AuthorizationRef authorization,
+                                                      const char *pathToTool,
+                                                      AuthorizationFlags options,
+                                                      char * const *arguments,
+                                                      FILE **communicationsPipe) = NULL;
+    
+    // Check to see if we have the correct function in our loaded libraries
+    if (NULL == _AuthExecuteWithPrivilegesFunc)
+    {
+        // On 10.7, AuthorizationExecuteWithPrivileges is deprecated. We want
+        // to still use it since there's no good alternative (without requiring
+        // code signing). We'll look up the function through dyld and fail if
+        // it is no longer accessible. If Apple removes the function entirely
+        // this will fail gracefully. If they keep the function and throw some
+        // sort of exception, this won't fail gracefully, but that's a risk
+        // we'll have to take for now.
+        // Pattern by Andy Kim from Potion Factory LLC
+        _AuthExecuteWithPrivilegesFunc = dlsym(RTLD_DEFAULT, "AuthorizationExecuteWithPrivileges");
+    }
+
+	if (NULL != _AuthExecuteWithPrivilegesFunc &&
+        errAuthorizationSuccess == _AuthExecuteWithPrivilegesFunc(authorization, executablePath, options, (char* const*)arguments, NULL))
 	{
-		int status;
+		int status = 0;
 		pid_t pid = wait(&status);
 		if (pid == -1 || !WIFEXITED(status) || WEXITSTATUS(status) != 0)
 			returnValue = NO;
 	}
 	else
+    {
 		returnValue = NO;
+    }
 		
 	signal(SIGCHLD, oldSigChildHandler);
 	return returnValue;
