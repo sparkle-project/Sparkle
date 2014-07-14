@@ -202,7 +202,7 @@ NSArray *SUGetAllDevMateURLHosts(void)
 	[request setValue:[updater userAgentString] forHTTPHeaderField:@"User-Agent"];
     [self updateURLRequestIfNeeds:request];
     
-    if ([SUUpdater shouldUseXPCDownloader])
+    if (SUShouldUseXPCDownloader())
         download = (NSURLDownload *)[[SUXPCURLDownload alloc] initWithRequest:request delegate:self];
     else
         download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
@@ -210,7 +210,8 @@ NSArray *SUGetAllDevMateURLHosts(void)
 
 - (void)download:(NSURLDownload *)d decideDestinationWithSuggestedFilename:(NSString *)name
 {
-    if ([SUUpdater shouldUseXPCDownloader]) {
+    if (SUShouldUseXPCDownloader())
+    {
         // The downloader will determine a file name, somewhere within our sandbox.
         downloadPath = nil;
         [d setDestination:name allowOverwrite:YES];
@@ -428,13 +429,15 @@ NSArray *SUGetAllDevMateURLHosts(void)
         pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
     NSString *relaunchToolPath = [relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS/finish_installation"];
 	NSArray *arguments = [NSArray arrayWithObjects:[host bundlePath], pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], tempDir, relaunch ? @"1" : @"0", nil];
-	if( [SUUpdater shouldUseXPCInstaller] )
-		[SUXPCInstaller launchTaskWithLaunchPath: relaunchToolPath arguments:arguments completionHandler:^{
+	if (SUShouldUseXPCInstaller())
+    {
+		[SUXPCInstaller launchTaskWithLaunchPath:relaunchToolPath arguments:arguments completionHandler:^{
             [NSApp terminate:self];
         }];
+    }
 	else
     {
-		[NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:arguments];
+		[NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:arguments];
         [NSApp terminate:self];
     }
 }

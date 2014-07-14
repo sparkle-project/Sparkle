@@ -554,26 +554,6 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - (id)delegate { return delegate; }
 - (NSBundle *)hostBundle { return [host bundle]; }
 
-+ (BOOL)shouldUseXPCDownloader
-{
-    if ([SUCodeSigningVerifier hostAppAllowsNetworkOutgoingConnections])
-        return NO;
-    
-    NSString *xpcServicePrefixPath = [[[SUUpdater sharedUpdater] hostBundle] bundlePath];
-    NSString *xpcServiceSuffixPath = @"Contents/XPCServices/com.andymatuschak.Sparkle.download-service.xpc";
-	return [[NSFileManager defaultManager] fileExistsAtPath:[xpcServicePrefixPath stringByAppendingPathComponent:xpcServiceSuffixPath]];
-}
-
-+ (BOOL)shouldUseXPCInstaller
-{
-    if (![SUCodeSigningVerifier hostApplicationIsSandboxed])
-        return NO;
-    
-    NSString *xpcServicePrefixPath = [[[SUUpdater sharedUpdater] hostBundle] bundlePath];
-    NSString *xpcServiceSuffixPath = @"Contents/XPCServices/com.andymatuschak.Sparkle.install-service.xpc";
-	return [[NSFileManager defaultManager] fileExistsAtPath:[xpcServicePrefixPath stringByAppendingPathComponent:xpcServiceSuffixPath]];
-}
-
 #pragma mark - DevMate Interaction
 
 - (NSArray *)devmateFeedParameters

@@ -127,7 +127,7 @@
                 [delegate updateAlert:self willLoadReleaseNotesWithRequest:request];
             }
             
-            if ([SUUpdater shouldUseXPCDownloader])
+            if (SUShouldUseXPCDownloader())
             {
                 [releaseNotesDownloader release];
                 releaseNotesDownloader = (NSURLDownload *)[[SUXPCURLDownload alloc] initWithRequest:request delegate:self];

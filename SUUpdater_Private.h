@@ -7,12 +7,10 @@
 //
 
 #import "SUUpdater.h"
+#import "SUCodeSigningVerifier.h"
 
 @interface SUUpdater (Private)
 
 - (BOOL)mayUpdateAndRestart;
-
-+ (BOOL)shouldUseXPCDownloader;
-+ (BOOL)shouldUseXPCInstaller;
 
 @end

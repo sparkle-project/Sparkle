@@ -21,4 +21,7 @@
 
 @end
 
+FOUNDATION_EXTERN BOOL SUShouldUseXPCDownloader(void);
+FOUNDATION_EXTERN BOOL SUShouldUseXPCInstaller(void);
+
 #endif

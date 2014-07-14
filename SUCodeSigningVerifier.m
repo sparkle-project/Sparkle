@@ -189,3 +189,26 @@ finally:
 }
 
 @end
+
+#pragma mark -
+
+BOOL SUShouldUseXPCDownloader(void)
+{
+    if ([SUCodeSigningVerifier hostAppAllowsNetworkOutgoingConnections])
+        return NO;
+    
+    NSString *xpcServicePrefixPath = [[NSBundle mainBundle] bundlePath];
+    NSString *xpcServiceSuffixPath = @"Contents/XPCServices/com.andymatuschak.Sparkle.download-service.xpc";
+	return [[NSFileManager defaultManager] fileExistsAtPath:[xpcServicePrefixPath stringByAppendingPathComponent:xpcServiceSuffixPath]];
+}
+
+BOOL SUShouldUseXPCInstaller(void)
+{
+    if (![SUCodeSigningVerifier hostApplicationIsSandboxed])
+        return NO;
+    
+    NSString *xpcServicePrefixPath = [[NSBundle mainBundle] bundlePath];
+    NSString *xpcServiceSuffixPath = @"Contents/XPCServices/com.andymatuschak.Sparkle.install-service.xpc";
+	return [[NSFileManager defaultManager] fileExistsAtPath:[xpcServicePrefixPath stringByAppendingPathComponent:xpcServiceSuffixPath]];
+}
+

@@ -35,7 +35,7 @@ static NSString * const kSUAutomaticUpdateParamName = @"autoupdate";
     [request setCachePolicy:NSURLRequestReloadIgnoringCacheData];
     [self updateURLRequestIfNeeds:request];
     
-    if ([SUUpdater shouldUseXPCDownloader])
+    if (SUShouldUseXPCDownloader())
     {
         [SUXPCURLDownload sendSynchronousRequest:request delegate:nil];
     }
