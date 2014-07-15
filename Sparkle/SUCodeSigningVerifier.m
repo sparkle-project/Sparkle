@@ -84,7 +84,10 @@ finally:
         NSDictionary *signingDict = CFBridgingRelease(signingInfo);
         NSMutableDictionary *relevantInfo = [NSMutableDictionary dictionary];
         for (NSString *key in @[@"format", @"identifier", @"requirements", @"teamid", @"signing-time"]) {
-            relevantInfo[key] = signingDict[key];
+            id value = nil;
+            if ((value = signingDict[key])) {
+                relevantInfo[key] = value;
+            }
         }
         NSDictionary *infoPlist = signingDict[@"info-plist"];
         relevantInfo[@"version"] = infoPlist[@"CFBundleShortVersionString"];
