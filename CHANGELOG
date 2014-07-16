@@ -1,3 +1,25 @@
+
+* New SUDSAVerifier based on up-to-date OS X APIs (Zachary Waldowski)
+* Converted Sparkle to ARC (C.W. Betts)
+* Converted ivars to properties. (Jake Petroules)
+* Updated Japanese localization (1024jp)
+* Added Greek localization
+
+# 1.7.1
+
+* Removed option to install unverified updates (Kornel Lesiński)
+* Added detailed log when code signing verification fails (Sam Deane)
+* Restored original Sparkle icon. (Jake Petroules)
+* Switched SUUpdateAlert.xib to AutoLayout (Kornel Lesiński)
+* Replace references to andymatuschak.org with sparkle-project.org. (Jake Petroules)
+* Several code cleanups, modernizations, fixed warnings and improved code formatting (Jake Petroules)
+* Make the repository significantly more organized. (Jake Petroules)
+* Xcode project: set organization name and class prefix. (Jake Petroules)
+* Link to Foundation and AppKit instead of Cocoa. (Jake Petroules)
+* Use new operatingSystemVersion API when available. (Jake Petroules)
+* Add .clang-format configuration file for source code formatting. (Jake Petroules)
+* Add a target to build Sparkle API documentation using Doxygen. (Jake Petroules)
+
 # 1.7.0
 
 * Dropped support for OS X 10.6. Sparkle now supports 10.7 and newer (including 10.10 Yosemite) on 64-bit Intel Macs (the last 32-bit Mac was released in 2006).
