@@ -586,31 +586,31 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         }
     } else {
 #endif
-    NSString *const quarantineAttribute = (NSString*)kLSItemQuarantineProperties;
-    const int removeXAttrOptions = XATTR_NOFOLLOW;
+        NSString *const quarantineAttribute = (NSString*)kLSItemQuarantineProperties;
+        const int removeXAttrOptions = XATTR_NOFOLLOW;
 
-    [self removeXAttr:quarantineAttribute
-             fromFile:root
-              options:removeXAttrOptions];
+        [self removeXAttr:quarantineAttribute
+                 fromFile:root
+                  options:removeXAttrOptions];
 
-    // Only recurse if it's actually a directory.  Don't recurse into a
-    // root-level symbolic link.
-    NSDictionary *rootAttributes = [manager attributesOfItemAtPath:root error:nil];
-    NSString *rootType = rootAttributes[NSFileType];
+        // Only recurse if it's actually a directory.  Don't recurse into a
+        // root-level symbolic link.
+        NSDictionary *rootAttributes = [manager attributesOfItemAtPath:root error:nil];
+        NSString *rootType = rootAttributes[NSFileType];
 
-    if (rootType == NSFileTypeDirectory) {
-        // The NSDirectoryEnumerator will avoid recursing into any contained
-        // symbolic links, so no further type checks are needed.
-        NSDirectoryEnumerator *directoryEnumerator = [manager enumeratorAtPath:root];
-        NSString *file = nil;
-        while ((file = [directoryEnumerator nextObject])) {
-            [self removeXAttr:quarantineAttribute
-                     fromFile:[root stringByAppendingPathComponent:file]
-                      options:removeXAttrOptions];
+        if (rootType == NSFileTypeDirectory) {
+            // The NSDirectoryEnumerator will avoid recursing into any contained
+            // symbolic links, so no further type checks are needed.
+            NSDirectoryEnumerator *directoryEnumerator = [manager enumeratorAtPath:root];
+            NSString *file = nil;
+            while ((file = [directoryEnumerator nextObject])) {
+                [self removeXAttr:quarantineAttribute
+                         fromFile:[root stringByAppendingPathComponent:file]
+                          options:removeXAttrOptions];
+            }
         }
-    }
 #if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_9
-}
+    }
 #endif
 }
 
