@@ -564,6 +564,28 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
     // *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
+    NSFileManager *manager = [NSFileManager defaultManager];
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_9
+    if (&NSURLQuarantinePropertiesKey) {
+        NSURL *rootURL = [NSURL fileURLWithPath:root];
+        [rootURL setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:NULL];
+
+        // Only recurse if it's actually a directory.  Don't recurse into a
+        // root-level symbolic link.
+        NSDictionary *rootAttributes = [manager attributesOfItemAtPath:root error:nil];
+        NSString *rootType = rootAttributes[NSFileType];
+
+        if (rootType == NSFileTypeDirectory) {
+            // The NSDirectoryEnumerator will avoid recursing into any contained
+            // symbolic links, so no further type checks are needed.
+            NSDirectoryEnumerator *directoryEnumerator = [manager enumeratorAtURL:rootURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
+
+            for (NSURL *file in directoryEnumerator) {
+                [file setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:NULL];
+            }
+        }
+    } else {
+#endif
     NSString *const quarantineAttribute = (NSString*)kLSItemQuarantineProperties;
     const int removeXAttrOptions = XATTR_NOFOLLOW;
 
@@ -573,13 +595,13 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
     // Only recurse if it's actually a directory.  Don't recurse into a
     // root-level symbolic link.
-    NSDictionary *rootAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:root error:nil];
+    NSDictionary *rootAttributes = [manager attributesOfItemAtPath:root error:nil];
     NSString *rootType = rootAttributes[NSFileType];
 
     if (rootType == NSFileTypeDirectory) {
         // The NSDirectoryEnumerator will avoid recursing into any contained
         // symbolic links, so no further type checks are needed.
-        NSDirectoryEnumerator *directoryEnumerator = [[NSFileManager defaultManager] enumeratorAtPath:root];
+        NSDirectoryEnumerator *directoryEnumerator = [manager enumeratorAtPath:root];
         NSString *file = nil;
         while ((file = [directoryEnumerator nextObject])) {
             [self removeXAttr:quarantineAttribute
@@ -587,6 +609,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
                       options:removeXAttrOptions];
         }
     }
+#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_9
+}
+#endif
 }
 
 @end
