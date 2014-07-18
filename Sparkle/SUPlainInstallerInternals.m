@@ -537,13 +537,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 @implementation SUPlainInstaller (MMExtendedAttributes)
 
-+ (int)removeXAttr:(const char *)name
++ (int)removeXAttr:(NSString *)name
           fromFile:(NSString *)file
            options:(int)options
 {
     // *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
     const char *path = NULL;
+    const char *attr = [name cStringUsingEncoding:NSASCIIStringEncoding];
     @try {
         path = [file fileSystemRepresentation];
     }
@@ -556,14 +557,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         return -1;
     }
 
-    return removexattr(path, name, options);
+    return removexattr(path, attr, options);
 }
 
 + (void)releaseFromQuarantine:(NSString *)root
 {
     // *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
-    const char *quarantineAttribute = "com.apple.quarantine";
+    NSString *const quarantineAttribute = (NSString*)kLSItemQuarantineProperties;
     const int removeXAttrOptions = XATTR_NOFOLLOW;
 
     [self removeXAttr:quarantineAttribute
