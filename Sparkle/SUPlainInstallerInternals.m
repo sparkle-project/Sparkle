@@ -23,6 +23,10 @@
 #include <unistd.h>
 #include <sys/param.h>
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 10100
+extern NSString *const NSURLQuarantinePropertiesKey WEAK_IMPORT_ATTRIBUTE;
+#endif
+
 static inline void PerformOnMainThreadSync(dispatch_block_t theBlock)
 {
     if ([NSThread isMainThread]) {
@@ -565,7 +569,6 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     // *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
     NSFileManager *manager = [NSFileManager defaultManager];
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_9
     if (&NSURLQuarantinePropertiesKey) {
         NSURL *rootURL = [NSURL fileURLWithPath:root];
         [rootURL setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:NULL];
@@ -585,7 +588,6 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
             }
         }
     } else {
-#endif
         NSString *const quarantineAttribute = (NSString*)kLSItemQuarantineProperties;
         const int removeXAttrOptions = XATTR_NOFOLLOW;
 
@@ -609,9 +611,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
                           options:removeXAttrOptions];
             }
         }
-#if __MAC_OS_X_VERSION_MAX_ALLOWED > __MAC_10_9
     }
-#endif
 }
 
 @end
