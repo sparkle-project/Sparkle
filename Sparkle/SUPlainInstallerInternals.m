@@ -23,7 +23,7 @@
 #include <unistd.h>
 #include <sys/param.h>
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED < 10100
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101000
 extern NSString *const NSURLQuarantinePropertiesKey WEAK_IMPORT_ATTRIBUTE;
 #endif
 
