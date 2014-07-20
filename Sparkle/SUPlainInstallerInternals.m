@@ -614,7 +614,6 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
             [file setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:NULL];
         }
     }
-    return;
 }
 
 @end
