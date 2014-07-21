@@ -23,6 +23,10 @@
 #include <unistd.h>
 #include <sys/param.h>
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101000
+extern NSString *const NSURLQuarantinePropertiesKey WEAK_IMPORT_ATTRIBUTE;
+#endif
+
 static inline void PerformOnMainThreadSync(dispatch_block_t theBlock)
 {
     if ([NSThread isMainThread]) {
@@ -537,13 +541,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 @implementation SUPlainInstaller (MMExtendedAttributes)
 
-+ (int)removeXAttr:(const char *)name
++ (int)removeXAttr:(NSString *)name
           fromFile:(NSString *)file
            options:(int)options
 {
     // *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
     const char *path = NULL;
+    const char *attr = [name cStringUsingEncoding:NSASCIIStringEncoding];
     @try {
         path = [file fileSystemRepresentation];
     }
@@ -556,34 +561,57 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         return -1;
     }
 
-    return removexattr(path, name, options);
+    return removexattr(path, attr, options);
 }
 
 + (void)releaseFromQuarantine:(NSString *)root
 {
     // *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
-    const char *quarantineAttribute = "com.apple.quarantine";
-    const int removeXAttrOptions = XATTR_NOFOLLOW;
+    NSFileManager *manager = [NSFileManager defaultManager];
+#if __MAC_OS_X_VERSION_MIN_REQUIRED < 101000
+    if (!&NSURLQuarantinePropertiesKey) {
+        NSString *const quarantineAttribute = (NSString*)kLSItemQuarantineProperties;
+        const int removeXAttrOptions = XATTR_NOFOLLOW;
 
-    [self removeXAttr:quarantineAttribute
-             fromFile:root
-              options:removeXAttrOptions];
+        [self removeXAttr:quarantineAttribute
+                 fromFile:root
+                  options:removeXAttrOptions];
 
+        // Only recurse if it's actually a directory.  Don't recurse into a
+        // root-level symbolic link.
+        NSDictionary *rootAttributes = [manager attributesOfItemAtPath:root error:nil];
+        NSString *rootType = rootAttributes[NSFileType];
+
+        if (rootType == NSFileTypeDirectory) {
+            // The NSDirectoryEnumerator will avoid recursing into any contained
+            // symbolic links, so no further type checks are needed.
+            NSDirectoryEnumerator *directoryEnumerator = [manager enumeratorAtPath:root];
+            NSString *file = nil;
+            while ((file = [directoryEnumerator nextObject])) {
+                [self removeXAttr:quarantineAttribute
+                         fromFile:[root stringByAppendingPathComponent:file]
+                          options:removeXAttrOptions];
+            }
+        }
+        return;
+    }
+#endif
+    NSURL *rootURL = [NSURL fileURLWithPath:root];
+    [rootURL setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:NULL];
+    
     // Only recurse if it's actually a directory.  Don't recurse into a
     // root-level symbolic link.
-    NSDictionary *rootAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:root error:nil];
+    NSDictionary *rootAttributes = [manager attributesOfItemAtPath:root error:nil];
     NSString *rootType = rootAttributes[NSFileType];
 
     if (rootType == NSFileTypeDirectory) {
         // The NSDirectoryEnumerator will avoid recursing into any contained
         // symbolic links, so no further type checks are needed.
-        NSDirectoryEnumerator *directoryEnumerator = [[NSFileManager defaultManager] enumeratorAtPath:root];
-        NSString *file = nil;
-        while ((file = [directoryEnumerator nextObject])) {
-            [self removeXAttr:quarantineAttribute
-                     fromFile:[root stringByAppendingPathComponent:file]
-                      options:removeXAttrOptions];
+        NSDirectoryEnumerator *directoryEnumerator = [manager enumeratorAtURL:rootURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
+
+        for (NSURL *file in directoryEnumerator) {
+            [file setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:NULL];
         }
     }
 }
