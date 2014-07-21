@@ -2,6 +2,7 @@
 
 FINISH_INSTALL_TOOL_NAME = Autoupdate
 SANDBOX_SERVICE_NAME = org.sparkle-project.Sparkle.SandboxService
+SANDBOX_SERVICE_NAME_STR = "org.sparkle-project.Sparkle.SandboxService"
 
 SPARKLE_VERSION_MAJOR = 1
 SPARKLE_VERSION_MINOR = 7
