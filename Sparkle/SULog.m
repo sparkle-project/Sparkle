@@ -64,13 +64,10 @@ void SULog(NSString *format, ...)
 
     FILE *logfile = fopen([[LOG_FILE_PATH stringByExpandingTildeInPath] fileSystemRepresentation], "a");
     if (logfile) {
-        theStr = [NSString stringWithFormat:@"%@: %@", [NSDate date], theStr];
+        theStr = [NSString stringWithFormat:@"%@: %@\n", [NSDate date], theStr];
         NSData *theData = [theStr dataUsingEncoding:NSUTF8StringEncoding];
-        char newlineChar = '\n';
         fwrite([theData bytes], 1, [theData length], logfile);
-        fwrite(&newlineChar, 1, 1, logfile); // Append a newline.
         fclose(logfile);
-        logfile = NULL;
     }
     va_end(ap);
 }
