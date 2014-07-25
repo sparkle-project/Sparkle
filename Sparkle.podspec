@@ -10,12 +10,14 @@ Pod::Spec.new do |s|
   }
   s.authors     = {
     'Andy Matuschak' => 'andy@andymatuschak.org',
-    'Kornel' => 'pornel@pornel.net'
+    'Kornel Lesiński' => 'pornel@pornel.net',
+    'C.W. Betts' => 'computers57@hotmail.com',
+    'Jake Petroules' => 'jake.petroules@petroules.com',
   }
 
   s.platform = :osx
   s.source   = { :http => "https://github.com/sparkle-project/Sparkle/releases/download/#{s.version}/Sparkle-#{s.version}.zip" }
-  
+
   s.public_header_files = 'Sparkle.framework/Headers/*.h'
   s.vendored_framework  = 'Sparkle.framework'
   s.resources           = 'Sparkle.framework'
