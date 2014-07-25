@@ -1,4 +1,4 @@
-.PHONY: all localizable-strings
+.PHONY: all localizable-strings release build test travis
 
 BUILDDIR := $(shell mktemp -d "$(TMPDIR)/Sparkle.XXXXXX")
 
@@ -12,5 +12,10 @@ release:
 	xcodebuild -scheme Distribution -configuration Release -derivedDataPath "$(BUILDDIR)"
 	open -R "$(BUILDDIR)/Build/Products/Release/Sparkle-"*.tar.bz2
 
-travis:
+build:
 	xcodebuild clean build
+
+test:
+	xcodebuild -target 'Sparkle Unit Tests' -scheme 'Sparkle' test
+
+travis: test
