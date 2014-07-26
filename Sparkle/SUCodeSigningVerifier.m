@@ -64,7 +64,7 @@
         if (result == errSecCSReqFailed) {
             CFStringRef requirementString = nil;
             if (SecRequirementCopyString(requirement, kSecCSDefaultFlags, &requirementString) == noErr) {
-                SULog(@"Failed requirement %@", requirementString);
+                SULog(@"Code signature of the new version doesn't match the old version: %@. Please ensure that old and new app is signed using exactly the same certificate.", requirementString);
                 CFRelease(requirementString);
             }
 
