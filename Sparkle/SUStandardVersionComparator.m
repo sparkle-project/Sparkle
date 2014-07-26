@@ -24,7 +24,7 @@
     return defaultComparator;
 }
 
-typedef NS_ENUM(char, SUCharacterType) {
+typedef NS_ENUM(NSInteger, SUCharacterType) {
     kNumberType,
     kStringType,
     kSeparatorType,
