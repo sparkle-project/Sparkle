@@ -11,10 +11,10 @@
 
 #import "SUWindowController.h"
 
-typedef enum {
+typedef NS_ENUM(NSInteger, SUPermissionPromptResult) {
     SUAutomaticallyCheck,
     SUDoNotAutomaticallyCheck
-} SUPermissionPromptResult;
+};
 
 @protocol SUUpdatePermissionPromptDelegate;
 

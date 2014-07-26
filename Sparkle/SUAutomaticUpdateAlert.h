@@ -13,12 +13,11 @@
 
 @protocol SUAutomaticUpdateAlertDelegate;
 
-typedef enum
-{
+typedef NS_ENUM(NSInteger, SUAutomaticInstallationChoice) {
     SUInstallNowChoice,
     SUInstallLaterChoice,
     SUDoNotInstallChoice
-} SUAutomaticInstallationChoice;
+};
 
 @class SUAppcastItem, SUHost;
 @interface SUAutomaticUpdateAlert : SUWindowController
