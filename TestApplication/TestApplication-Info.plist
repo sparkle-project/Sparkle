@@ -27,6 +27,6 @@
 	<key>SUFeedURL</key>
 	<string>http://sparkle-project.org/files/sparkletestcast.xml</string>
 	<key>SUPublicDSAKeyFile</key>
-	<string>dsa_pub.pem</string>
+	<string>test_app_only_dsa_pub.pem</string>
 </dict>
 </plist>
