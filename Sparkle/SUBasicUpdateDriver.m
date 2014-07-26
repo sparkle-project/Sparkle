@@ -32,7 +32,7 @@
 
 @interface SUBasicUpdateDriver ()
 
-@property (weak) SUAppcastItem *updateItem;
+@property (strong) SUAppcastItem *updateItem;
 @property (strong) NSURLDownload *download;
 @property (copy) NSString *downloadPath;
 
@@ -118,7 +118,7 @@
 
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
 {
-    return [self hostSupportsItem:ui] && [self isItemNewer:ui] && ![self itemContainsSkippedVersion:ui];
+    return ui && [self hostSupportsItem:ui] && [self isItemNewer:ui] && ![self itemContainsSkippedVersion:ui];
 }
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac
@@ -154,13 +154,13 @@
         }
     }
 
-    self.updateItem = item;
-	if (self.updateItem == nil) { [self didNotFindUpdate]; return; }
-
-    if ([self itemContainsValidUpdate:self.updateItem])
+    if ([self itemContainsValidUpdate:item]) {
+        self.updateItem = item;
         [self didFindValidUpdate];
-    else
+    } else {
+        self.updateItem = nil;
         [self didNotFindUpdate];
+    }
 }
 
 - (void)appcast:(SUAppcast *)__unused ac failedToLoadWithError:(NSError *)error
@@ -170,10 +170,15 @@
 
 - (void)didFindValidUpdate
 {
-    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
+    assert(self.updateItem);
+
+    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
         [[self.updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
-    NSDictionary *userInfo = (self.updateItem != nil) ? @{ SUUpdaterAppcastItemNotificationKey: self.updateItem } : nil;
-    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification object:self.updater userInfo:userInfo];
+    }
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
+                                                        object:self.updater
+                                                      userInfo:@{ SUUpdaterAppcastItemNotificationKey: self.updateItem }];
     [self downloadUpdate];
 }
 
@@ -182,11 +187,14 @@
     if ([[self.updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
         [[self.updater delegate] updaterDidNotFindUpdate:self.updater];
     }
+
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
-    [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUNoUpdateError userInfo:@{
-                                   NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"You already have the newest version of %@.", "'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI)"), [self.host name]]
-                               }]];
+    [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain
+                                                   code:SUNoUpdateError
+                                               userInfo:@{
+                                                   NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"You already have the newest version of %@.", "'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI)"), self.host.name]
+                                               }]];
 }
 
 - (void)downloadUpdate
@@ -248,6 +256,8 @@
 
 - (void)downloadDidFinish:(NSURLDownload *)__unused d
 {
+    assert(self.updateItem);
+
     [self extractUpdate];
 }
 
@@ -287,6 +297,8 @@
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
 {
+    assert(self.updateItem);
+
     [self installWithToolAndRelaunch:YES];
 }
 
@@ -310,7 +322,9 @@
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
 {
-    if (![self validateUpdateDownloadedToPath:self.downloadPath extractedToPath:self.tempDir DSASignature:[self.updateItem DSASignature] publicDSAKey:[self.host publicDSAKey]])
+    assert(self.updateItem);
+
+    if (![self validateUpdateDownloadedToPath:self.downloadPath extractedToPath:self.tempDir DSASignature:self.updateItem.DSASignature publicDSAKey:self.host.publicDSAKey])
     {
         NSDictionary *userInfo = @{
             NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil),
@@ -419,6 +433,7 @@
 {
     [self cleanUpDownload];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    self.updateItem = nil;
     [super abortUpdate];
 }
 
