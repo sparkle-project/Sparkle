@@ -14,7 +14,7 @@
 
 @protocol SUUpdateAlertDelegate;
 
-typedef NS_ENUM(int, SUUpdateAlertChoice) {
+typedef NS_ENUM(NSInteger, SUUpdateAlertChoice) {
     SUInstallUpdateChoice,
     SURemindMeLaterChoice,
     SUSkipThisVersionChoice,

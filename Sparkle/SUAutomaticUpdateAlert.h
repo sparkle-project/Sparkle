@@ -13,7 +13,7 @@
 
 @protocol SUAutomaticUpdateAlertDelegate;
 
-typedef NS_ENUM(int, SUAutomaticInstallationChoice) {
+typedef NS_ENUM(NSInteger, SUAutomaticInstallationChoice) {
     SUInstallNowChoice,
     SUInstallLaterChoice,
     SUDoNotInstallChoice

@@ -11,7 +11,7 @@
 
 #import "SUWindowController.h"
 
-typedef NS_ENUM(int, SUPermissionPromptResult) {
+typedef NS_ENUM(NSInteger, SUPermissionPromptResult) {
     SUAutomaticallyCheck,
     SUDoNotAutomaticallyCheck
 };
