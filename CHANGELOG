@@ -1,7 +1,11 @@
+# 1.8.0
 
 * New SUDSAVerifier based on up-to-date OS X APIs (Zachary Waldowski)
+* Detailed error log for failed signature checks (Kornel Lesiński)
 * Converted Sparkle to ARC (C.W. Betts)
 * Converted ivars to properties. (Jake Petroules)
+* Cocoapod support (Xhacker Liu)
+* Quarantine removal on OS X 10.10 (C.W. Betts)
 * Updated Japanese localization (1024jp)
 * Added Greek localization
 
