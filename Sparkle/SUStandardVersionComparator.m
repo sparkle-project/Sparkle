@@ -24,11 +24,11 @@
     return defaultComparator;
 }
 
-typedef enum {
+typedef NS_ENUM(char, SUCharacterType) {
     kNumberType,
     kStringType,
     kSeparatorType,
-} SUCharacterType;
+};
 
 - (SUCharacterType)typeOfCharacter:(NSString *)character
 {
