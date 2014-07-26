@@ -224,17 +224,26 @@
 - (BOOL)validateUpdateDownloadedToPath:(NSString *)downloadedPath extractedToPath:(NSString *)extractedPath DSASignature:(NSString *)DSASignature publicDSAKey:(NSString *)publicDSAKey
 {
     NSString *newBundlePath = [SUInstaller appPathInUpdateFolder:extractedPath forHost:self.host];
-    if (newBundlePath)
-    {
-        NSError *error = nil;
-        if ([SUCodeSigningVerifier codeSignatureIsValidAtPath:newBundlePath error:&error]) {
-            return YES;
+
+    if (newBundlePath) {
+        if ([SUCodeSigningVerifier hostApplicationIsCodeSigned]) {
+            NSError *error = nil;
+            if ([SUCodeSigningVerifier codeSignatureIsValidAtPath:newBundlePath error:&error]) {
+                return YES;
+            } else {
+                SULog(@"Code signature check on update failed: %@. Sparkle will use DSA signature instead.", error);
+            }
         } else {
-            SULog(@"Code signature check on update failed: %@", error);
+            SULog(@"The host app is not signed using Apple Code Signing, and therefore cannot verify updates this way. Sparkle will use DSA signature instead.");
         }
     }
 
-    return [SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey];
+    if (DSASignature) {
+        return [SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey];
+    } else {
+        SULog(@"The appcast item for the update has no DSA signature. The update will be rejected, because both DSA and Apple Code Signing verification failed.");
+        return NO;
+    }
 }
 
 - (void)downloadDidFinish:(NSURLDownload *)__unused d

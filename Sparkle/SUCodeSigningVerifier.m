@@ -33,7 +33,7 @@
 
     result = SecCodeCopyDesignatedRequirement(hostCode, kSecCSDefaultFlags, &requirement);
     if (result != noErr) {
-        SULog(@"Failed to copy designated requirement %d", result);
+        SULog(@"Failed to copy designated requirement. Code Signing OSStatus code: %d", result);
         goto finally;
     }
 
@@ -58,6 +58,9 @@
     }
 
     if (result != noErr) {
+        if (result == errSecCSUnsigned) {
+            SULog(@"The host app is signed, but the new version of the app is not signed using Apple Code Signing. Please ensure that the new app is signed and that archiving did not corrupt the signature.");
+        }
         if (result == errSecCSReqFailed) {
             CFStringRef requirementString = nil;
             if (SecRequirementCopyString(requirement, kSecCSDefaultFlags, &requirementString) == noErr) {
