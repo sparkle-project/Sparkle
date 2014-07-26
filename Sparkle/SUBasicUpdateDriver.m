@@ -378,7 +378,11 @@
                                                                     self.tempDir,
                                                                     relaunch ? @"1" : @"0",
                                                                     showUI ? @"1" : @"0"]];
+    [self terminateApp];
+}
 
+- (void)terminateApp
+{
     [NSApp terminate:self];
 }
 

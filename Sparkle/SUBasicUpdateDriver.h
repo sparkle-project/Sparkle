@@ -48,6 +48,7 @@
 
 - (void)abortUpdate;
 - (void)abortUpdateWithError:(NSError *)error;
+- (void)terminateApp;
 
 @end
 
