@@ -77,6 +77,10 @@ finally:
     return (result == noErr);
 }
 
+static id valueOrNSNull(id value) {
+    return value ? value : [NSNull null];
+}
+
 + (void)logSigningInfoForCode:(SecStaticCodeRef)code label:(NSString*)label {
     CFDictionaryRef signingInfo = nil;
     const SecCSFlags flags = kSecCSSigningInformation | kSecCSRequirementInformation | kSecCSDynamicInformation | kSecCSContentInformation;
@@ -84,14 +88,11 @@ finally:
         NSDictionary *signingDict = CFBridgingRelease(signingInfo);
         NSMutableDictionary *relevantInfo = [NSMutableDictionary dictionary];
         for (NSString *key in @[@"format", @"identifier", @"requirements", @"teamid", @"signing-time"]) {
-            id value = nil;
-            if ((value = signingDict[key])) {
-                relevantInfo[key] = value;
-            }
+            relevantInfo[key] = valueOrNSNull(signingDict[key]);
         }
         NSDictionary *infoPlist = signingDict[@"info-plist"];
-        relevantInfo[@"version"] = infoPlist[@"CFBundleShortVersionString"];
-        relevantInfo[@"build"] = infoPlist[@"CFBundleVersion"];
+        relevantInfo[@"version"] = valueOrNSNull(infoPlist[@"CFBundleShortVersionString"]);
+        relevantInfo[@"build"] = valueOrNSNull(infoPlist[@"CFBundleVersion"]);
         SULog(@"%@: %@", label, relevantInfo);
     }
 }
