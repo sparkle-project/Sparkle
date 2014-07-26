@@ -280,8 +280,6 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
                 BOOL automatic = (flags & kSCNetworkFlagsConnectionAutomatic) == kSCNetworkFlagsConnectionAutomatic;
                 BOOL local = (flags & kSCNetworkFlagsIsLocalAddress) == kSCNetworkFlagsIsLocalAddress;
 
-                //NSLog(@"reachable = %s, automatic = %s, local = %s", (reachable?"YES":"NO"), (automatic?"YES":"NO"), (local?"YES":"NO"));
-
                 if (!(reachable || automatic || local))
                     isNetworkReachable = NO;
             }
@@ -382,7 +380,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     }
     @catch (NSException *)
     {
-        NSLog(@"Sparkle Error: [SUUpdater unregisterAsObserver] called, but the updater wasn't registered as an observer.");
+        SULog(@"Error: [SUUpdater unregisterAsObserver] called, but the updater wasn't registered as an observer.");
     }
 }
 

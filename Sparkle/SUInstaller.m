@@ -148,7 +148,7 @@ static NSString *sUpdateFolder = nil;
     @catch (NSException *launchException)
     {
         // No big deal.
-        SULog(@"Sparkle Error: %@", [launchException description]);
+        SULog(@"Error: %@", [launchException description]);
     }
 }
 

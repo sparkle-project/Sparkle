@@ -259,7 +259,7 @@
     SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHost:self.host];
 	if (!unarchiver)
 	{
-        SULog(@"Sparkle Error: No valid unarchiver for %@!", self.downloadPath);
+        SULog(@"Error: No valid unarchiver for %@!", self.downloadPath);
         [self unarchiverDidFail:nil];
         return;
     }
@@ -416,10 +416,7 @@
 - (void)abortUpdateWithError:(NSError *)error
 {
     if ([error code] != SUNoUpdateError) { // Let's not bother logging this.
-        SULog(@"Sparkle Error: %@", [error localizedDescription]);
-    }
-    if ([error localizedFailureReason]) {
-        SULog(@"Sparkle Error (continued): %@", [error localizedFailureReason]);
+        SULog(@"Error: %@ %@", [error localizedDescription], [error localizedFailureReason]);
     }
     if (self.download) {
         [self.download cancel];

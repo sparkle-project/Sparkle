@@ -442,14 +442,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		if( didFindTrash )
 		{
             NSError *err = nil;
-            if (![self _movePathWithForcedAuthentication:path toPath:trashPath error:&err])
-                SULog(@"Sparkle error: couldn't move %@ to the trash (%@). %@", path, trashPath, err);
+            if (![self _movePathWithForcedAuthentication:path toPath:trashPath error:&err]) {
+                SULog(@"Error: couldn't move %@ to the trash (%@). %@", path, trashPath, err);
+            }
 		}
-		else
-            SULog(@"Sparkle error: couldn't move %@ to the trash. This is often a sign of a permissions error.", path);
+        else {
+            SULog(@"Error: couldn't move %@ to the trash. This is often a sign of a permissions error.", path);
+        }
 	}
-	else
-        ; //SULog(@"Moved %@ to the trash.", path);
 }
 
 + (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)__unused tmp error:(NSError *__autoreleasing *)error
