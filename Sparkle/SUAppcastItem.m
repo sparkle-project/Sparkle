@@ -63,8 +63,7 @@
 - (instancetype)initWithDictionary:(NSDictionary *)dict failureReason:(NSString *__autoreleasing *)error
 {
     self = [super init];
-	if (self)
-	{
+    if (self) {
         id enclosure = dict[@"enclosure"];
 
         // Try to find a version string.
@@ -76,8 +75,9 @@
         //    The big caveat with this is that you can't have underscores in your version strings, as that'll confuse Sparkle.
         //    Feel free to change the separator string to a hyphen or something more suited to your needs if you like.
         NSString *newVersion = enclosure[@"sparkle:version"];
-        if (newVersion == nil)
+        if (newVersion == nil) {
             newVersion = dict[@"sparkle:version"]; // Get version from the item, in case it's a download-less item (i.e. paid upgrade).
+        }
         if (newVersion == nil) // no sparkle:version attribute anywhere?
         {
             SULog(@"warning: <enclosure> for URL '%@' is missing sparkle:version attribute. Version comparison may be unreliable. Please always specify sparkle:version", enclosure[@"url"]);
@@ -85,14 +85,15 @@
             // Separate the url by underscores and take the last component, as that'll be closest to the end,
             // then we remove the extension. Hopefully, this will be the version.
             NSArray *fileComponents = [enclosure[@"url"] componentsSeparatedByString:@"_"];
-            if ([fileComponents count] > 1)
+            if ([fileComponents count] > 1) {
                 newVersion = [[fileComponents lastObject] stringByDeletingPathExtension];
+            }
         }
 
-		if(!newVersion )
-		{
-            if (error)
+        if (!newVersion) {
+            if (error) {
                 *error = @"Feed item lacks sparkle:version attribute, and version couldn't be deduced from file name (would have used last component of a file name like AppName_1.3.4.zip)";
+            }
             return nil;
         }
 
@@ -102,26 +103,25 @@
         self.itemDescription = dict[@"description"];
 
         NSString *theInfoURL = dict[@"link"];
-		if( theInfoURL )
-		{
-            if (![theInfoURL isKindOfClass:[NSString class]])
+        if (theInfoURL) {
+            if (![theInfoURL isKindOfClass:[NSString class]]) {
                 SULog(@"SUAppcastItem -initWithDictionary: Info URL is not of valid type.");
-            else
+            } else {
                 self.infoURL = [NSURL URLWithString:theInfoURL];
+            }
         }
 
         // Need an info URL or an enclosure URL. Former to show "More Info"
         //	page, latter to download & install:
-		if( !enclosure && !theInfoURL )
-		{
-            if (error)
+        if (!enclosure && !theInfoURL) {
+            if (error) {
                 *error = @"No enclosure in feed item";
+            }
             return nil;
         }
 
         NSString *enclosureURLString = enclosure[@"url"];
-		if( !enclosureURLString && !theInfoURL )
-		{
+        if (!enclosureURLString && !theInfoURL) {
             if (error) {
                 *error = @"Feed item's enclosure lacks URL";
             }
@@ -145,21 +145,22 @@
             shortVersionString = dict[@"sparkle:shortVersionString"]; // fall back on the <item>
         }
 
-        if (shortVersionString)
+        if (shortVersionString) {
             self.displayVersionString = shortVersionString;
-        else
-            self.displayVersionString = [self versionString];
+        } else {
+            self.displayVersionString = self.versionString;
+        }
 
         // Find the appropriate release notes URL.
-        if (dict[@"sparkle:releaseNotesLink"])
+        if (dict[@"sparkle:releaseNotesLink"]) {
             self.releaseNotesURL = [NSURL URLWithString:dict[@"sparkle:releaseNotesLink"]];
-        else if ([self.itemDescription hasPrefix:@"http://"] || [self.itemDescription hasPrefix:@"https://"]) // if the description starts with http:// or https:// use that.
+        } else if ([self.itemDescription hasPrefix:@"http://"] || [self.itemDescription hasPrefix:@"https://"]) { // if the description starts with http:// or https:// use that.
             self.releaseNotesURL = [NSURL URLWithString:self.itemDescription];
-        else
+        } else {
             self.releaseNotesURL = nil;
+        }
 
-        if (dict[@"deltas"])
-		{
+        if (dict[@"deltas"]) {
             NSMutableDictionary *deltas = [NSMutableDictionary dictionary];
             NSArray *deltaDictionaries = dict[@"deltas"];
             for (NSDictionary *deltaDictionary in deltaDictionaries) {
