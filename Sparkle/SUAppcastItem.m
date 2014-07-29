@@ -80,6 +80,8 @@
             newVersion = dict[@"sparkle:version"]; // Get version from the item, in case it's a download-less item (i.e. paid upgrade).
         if (newVersion == nil) // no sparkle:version attribute anywhere?
         {
+            SULog(@"warning: <enclosure> for URL '%@' is missing sparkle:version attribute. Version comparison may be unreliable. Please always specify sparkle:version", enclosure[@"url"]);
+
             // Separate the url by underscores and take the last component, as that'll be closest to the end,
             // then we remove the extension. Hopefully, this will be the version.
             NSArray *fileComponents = [enclosure[@"url"] componentsSeparatedByString:@"_"];
