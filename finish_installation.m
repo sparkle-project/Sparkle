@@ -32,6 +32,8 @@
 - (void) relaunch;
 - (void) install;
 
+- (SUHost *) host;
+
 - (void) showAppIconInDock:(NSTimer *)aTimer;
 - (void) watchdog:(NSTimer *)aTimer;
 
@@ -174,6 +176,11 @@ selfPath: (NSString*)inSelfPath alreadyInstalled:(BOOL)inalreadyInstalled
 	exit(EXIT_FAILURE);
 }
 
+- (SUHost *) host
+{
+	return host;
+}
+
 @end
 
 int main (int argc, const char * argv[])
@@ -201,13 +208,22 @@ int main (int argc, const char * argv[])
 	#endif
 
 	[NSApplication sharedApplication];
-	[[[TerminationListener alloc] initWithHostPath: (argc > 1) ? argv[1] : NULL
+	
+	NSConnection *connection = [[[NSConnection alloc] init] autorelease];
+	TerminationListener *listener = [[[TerminationListener alloc] initWithHostPath: (argc > 1) ? argv[1] : NULL
                                     executablePath: (argc > 2) ? argv[2] : NULL
                                    parentProcessId: (argc > 3) ? atoi(argv[3]) : 0
                                         folderPath: (argc > 4) ? argv[4] : NULL
                                     shouldRelaunch: (argc > 5) ? atoi(argv[5]) : 1
                                           selfPath: selfPath
                                   alreadyInstalled: (argc > 6) ? atoi(argv[6]) : 0] autorelease];
+	
+	[connection setRootObject:listener];
+	if (![connection registerName:[NSString stringWithFormat:@"Sparkle %@", [[[listener host] bundle] bundleIdentifier]]])
+	{
+		NSLog(@"%s server: could not register server.  Is one already running?\n", argv[0]);
+	}
+	
 	[[NSApplication sharedApplication] run];
 	
 	[pool drain];

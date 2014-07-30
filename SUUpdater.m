@@ -44,6 +44,20 @@
 static NSMutableDictionary *sharedUpdaters = nil;
 static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
 
+
+- (BOOL)isUpdateInProgress
+{
+	BOOL result = NO;
+	NSConnection *connection = [NSConnection connectionWithRegisteredName:[NSString stringWithFormat:@"Sparkle %@", [[host bundle] bundleIdentifier]] host:nil];
+	if (connection != nil)
+	{
+		NSDistantObject *proxyBundle = [connection rootProxy];
+		result = proxyBundle != nil;
+	}
+	
+	return result;
+}
+
 + (SUUpdater *)sharedUpdater
 {
 	return [self updaterForBundle:[NSBundle mainBundle]];
