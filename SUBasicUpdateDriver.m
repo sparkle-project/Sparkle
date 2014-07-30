@@ -376,12 +376,10 @@ NSArray *SUGetAllDevMateURLHosts(void)
 	if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdate:)])
 		[[updater delegate] updater:updater willInstallUpdate:updateItem];
     
+    BOOL isAlreadyInstalled = NO;
     if ([[updater delegate] respondsToSelector:@selector(updater:overrideInstallUpdate:downloadPath:)])
     {
-		if ([[updater delegate] updater:updater overrideInstallUpdate:updateItem downloadPath:tempDir])
-        {
-            return;
-        }
+        isAlreadyInstalled = [[updater delegate] updater:updater overrideInstallUpdate:updateItem downloadPath:tempDir]
     }
 	
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
@@ -405,10 +403,10 @@ NSArray *SUGetAllDevMateURLHosts(void)
     {
         copiedRelaunchTool = [SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil error:&error];
     }
-    [self finishRelaunchAfterSuccessfulCopying:copiedRelaunchTool fromPath:relaunchPathToCopy toPath:targetPath relaunch:relaunch];
+    [self finishRelaunchAfterSuccessfulCopying:copiedRelaunchTool fromPath:relaunchPathToCopy toPath:targetPath isInstalled:isAlreadyInstalled relaunch:relaunch];
 }
 
-- (void)finishRelaunchAfterSuccessfulCopying:(BOOL)copiedRelaunchTool fromPath:(NSString *)relaunchPathToCopy toPath:(NSString *)targetPath relaunch:(BOOL)relaunch
+- (void)finishRelaunchAfterSuccessfulCopying:(BOOL)copiedRelaunchTool fromPath:(NSString *)relaunchPathToCopy toPath:(NSString *)targetPath isInstalled:(BOOL)isInstalled relaunch:(BOOL)relaunch
 {
 
     NSError *error = nil;
@@ -433,7 +431,7 @@ NSArray *SUGetAllDevMateURLHosts(void)
     if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
         pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
     NSString *relaunchToolPath = [relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS/finish_installation"];
-	NSArray *arguments = [NSArray arrayWithObjects:[host bundlePath], pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], tempDir, relaunch ? @"1" : @"0", nil];
+    NSArray *arguments = [NSArray arrayWithObjects:[host bundlePath], pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], tempDir, relaunch ? @"1" : @"0", isInstalled ? @"1" : @"0" nil];
 	if (SUShouldUseXPCInstaller())
     {
 		[SUXPCInstaller launchTaskWithLaunchPath:relaunchToolPath arguments:arguments completionHandler:^{

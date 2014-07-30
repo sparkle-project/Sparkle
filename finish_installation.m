@@ -24,6 +24,7 @@
 	NSTimer			*longInstallationTimer;
 	SUHost			*host;
     BOOL            shouldRelaunch;
+    BOOL            alreadyInstalled;
 }
 
 - (void) parentHasQuit;
@@ -39,17 +40,17 @@
 @implementation TerminationListener
 
 - (id) initWithHostPath:(const char *)inhostpath executablePath:(const char *)execpath parentProcessId:(pid_t)ppid folderPath: (const char*)infolderpath shouldRelaunch:(BOOL)relaunch
-		selfPath: (NSString*)inSelfPath
+selfPath: (NSString*)inSelfPath alreadyInstalled:(BOOL)inalreadyInstalled
 {
 	if( !(self = [super init]) )
 		return nil;
-	
 	hostpath		= inhostpath;
 	executablepath	= execpath;
 	parentprocessid	= ppid;
 	folderpath		= infolderpath;
 	selfPath		= [inSelfPath retain];
     shouldRelaunch  = relaunch;
+    alreadyInstalled = inalreadyInstalled;
 	
 	BOOL	alreadyTerminated = (getppid() == 1); // ppid is launchd (1) => parent terminated already
 	
@@ -90,7 +91,7 @@
 								target: self selector: @selector(showAppIconInDock:)
 								userInfo:nil repeats:NO] retain];
 
-	if( folderpath )
+	if( folderpath && !alreadyInstalled )
 		[self install];
 	else
 		[self relaunch];
@@ -177,7 +178,7 @@
 
 int main (int argc, const char * argv[])
 {
-	if( argc < 5 || argc > 6 )
+	if( argc < 5 || argc > 7 )
 		return EXIT_FAILURE;
 	
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -198,14 +199,15 @@ int main (int argc, const char * argv[])
 	#else
 	NSString*	selfPath = [[NSBundle mainBundle] bundlePath];
 	#endif
-	
+
 	[NSApplication sharedApplication];
 	[[[TerminationListener alloc] initWithHostPath: (argc > 1) ? argv[1] : NULL
                                     executablePath: (argc > 2) ? argv[2] : NULL
                                    parentProcessId: (argc > 3) ? atoi(argv[3]) : 0
                                         folderPath: (argc > 4) ? argv[4] : NULL
                                     shouldRelaunch: (argc > 5) ? atoi(argv[5]) : 1
-                                          selfPath: selfPath] autorelease];
+                                          selfPath: selfPath
+                                  alreadyInstalled: (argc > 6) ? atoi(argv[6]) : 0] autorelease];
 	[[NSApplication sharedApplication] run];
 	
 	[pool drain];
