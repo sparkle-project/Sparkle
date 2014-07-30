@@ -232,7 +232,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	}
 	else
 	{
-		NSLog(@"Cannot put feedURL into dictionary: feedURL is nil");
+		SULog(@"Cannot put feedURL into dictionary: feedURL is nil");
 	}
 }
 
