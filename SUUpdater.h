@@ -73,7 +73,7 @@
 
 - (BOOL)updateInProgress;
 
-- (BOOL)isUpdateInProgress;
+- (BOOL)installationInProgress;
 
 @end
 

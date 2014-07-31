@@ -45,7 +45,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
 static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
 
 
-- (BOOL)isUpdateInProgress
+- (BOOL)installationInProgress
 {
 	BOOL result = NO;
 	@try

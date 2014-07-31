@@ -54,6 +54,13 @@ selfPath: (NSString*)inSelfPath alreadyInstalled:(BOOL)inalreadyInstalled
     shouldRelaunch  = relaunch;
     alreadyInstalled = inalreadyInstalled;
 	
+    if (NULL != hostpath)
+    {
+        NSString *bundlePath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:hostpath length:strlen(hostpath)];
+        NSBundle *theBundle = [NSBundle bundleWithPath:bundlePath];
+        host = [[SUHost alloc] initWithBundle: theBundle];
+    }
+
 	BOOL	alreadyTerminated = (getppid() == 1); // ppid is launchd (1) => parent terminated already
 	
 	if( alreadyTerminated )
@@ -143,8 +150,6 @@ selfPath: (NSString*)inSelfPath alreadyInstalled:(BOOL)inalreadyInstalled
 
 - (void) install
 {
-	NSBundle			*theBundle = [NSBundle bundleWithPath: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: hostpath length:strlen(hostpath)]];
-	host = [[SUHost alloc] initWithBundle: theBundle];
     installationPath = [[host installationPath] copy];
 	
     // Perhaps a poor assumption but: if we're not relaunching, we assume we shouldn't be showing any UI either. Because non-relaunching installations are kicked off without any user interaction, we shouldn't be interrupting them.
