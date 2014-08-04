@@ -318,7 +318,7 @@ extern NSString *const SUUpdaterAppcastNotificationKey;
 //	Constants:
 // -----------------------------------------------------------------------------
 
-// Define some minimum intervals to avoid DOS-like checking attacks. These are in seconds.
+// Define some minimum intervals to avoid DoS-like checking attacks. These are in seconds.
 #if defined(DEBUG) && DEBUG && 0
 #define SU_MIN_CHECK_INTERVAL 60
 #else
