@@ -17,6 +17,11 @@
 
 @implementation SUUIBasedUpdateDriver
 
+- (BOOL)shouldShowUI
+{
+    return YES;
+}
+
 - (void)didFindValidUpdate
 {
 	updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem host:host];
@@ -53,7 +58,7 @@
 	
 	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"You're up-to-date!", nil) defaultButton:SULocalizedString(@"OK", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [host name], [host displayVersion]];
 	[self showModalAlert:alert];
-	[self abortUpdate];
+    [self abortUpdate:SUUpdateAbortDidNotFind];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification
@@ -83,16 +88,16 @@
 		
 		case SUOpenInfoURLChoice:
 			[[NSWorkspace sharedWorkspace] openURL: [updateItem infoURL]];
-			[self abortUpdate];
+            [self abortUpdate:SUUpdateAbortCanceledByUser];
 			break;
 		
 		case SUSkipThisVersionChoice:
 			[host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
-			[self abortUpdate];
+            [self abortUpdate:SUUpdateAbortCanceledByUser];
 			break;
 			
 		case SURemindMeLaterChoice:
-			[self abortUpdate];
+            [self abortUpdate:SUUpdateAbortCanceledByUser];
 			break;			
 	}			
 }
@@ -129,7 +134,7 @@
 {
 	if (download)
 		[download cancel];
-	[self abortUpdate];
+    [self abortUpdate:SUUpdateAbortCanceledByUser];
 }
 
 - (void)extractUpdate
@@ -206,6 +211,7 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
+    abortReason = SUUpdateAbortGotError;
 	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"Update Error!", nil)
                                      defaultButton:SULocalizedString(@"Cancel Update", nil)
                                    alternateButton:nil
@@ -215,7 +221,7 @@
 	[super abortUpdateWithError:error];
 }
 
-- (void)abortUpdate
+- (void)abortUpdate:(SUUpdateAbortReason)reason
 {
 	if (statusController)
 	{
@@ -223,11 +229,18 @@
 		[statusController autorelease];
 		statusController = nil;
 	}
-	[super abortUpdate];
+    [super abortUpdate:reason];
 }
 
 - (void)showModalAlert:(NSAlert *)alert
 {
+    if ([[updater delegate] respondsToSelector:@selector(updater:mayShowModalAlert:)] &&
+        ![[updater delegate] updater:updater mayShowModalAlert:alert])
+    {
+        // delegate forbids to show this alert!
+        return;
+    }
+    
 	if ([[updater delegate] respondsToSelector:@selector(updaterWillShowModalAlert:)])
 		[[updater delegate] updaterWillShowModalAlert: updater];
 

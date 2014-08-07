@@ -23,17 +23,31 @@ NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)h
 {
+    abortReason = SUUpdateAbortUndefined;
 	appcastURL = [URL copy];
 	host = [h retain];
 }
 
-- (void)abortUpdate
+- (void)abortUpdate:(SUUpdateAbortReason)reason
 {
-	[self setValue:[NSNumber numberWithBool:YES] forKey:@"finished"];	
+    abortReason = reason;
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdateDriverFinishedNotification object:self];
 }
 
-- (BOOL)finished { return finished; }
+- (BOOL)finished
+{
+    return abortReason != SUUpdateAbortUndefined;
+}
+
+- (SUUpdateAbortReason)abortReason
+{
+    return abortReason;
+}
+
+- (BOOL)shouldShowUI
+{
+    return NO;
+}
 
 - (void)dealloc
 {

@@ -55,8 +55,14 @@ static NSString * const kSUAutomaticUpdateParamName = @"autoupdate";
 #endif // SPARKLE_IS_COMPATIBLE_WITH_DEVMATE
 // -------------------------------------------------------------------
 
+- (BOOL)shouldShowUI
+{
+    return showErrors;
+}
+
 - (void)unarchiverDidFinish:(SUUnarchiver *)ua
 {
+    showErrors = YES;
 	alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:updateItem host:host delegate:self];
 	
 	// If the app is a menubar app or the like, we need to focus it first and alter the
@@ -95,18 +101,12 @@ static NSString * const kSUAutomaticUpdateParamName = @"autoupdate";
 
 		case SUDoNotInstallChoice:
 			[host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
-			[self abortUpdate];
+            [self abortUpdate:SUUpdateAbortCanceledByUser];
 			break;
 	}
 }
 
 - (BOOL)shouldInstallSynchronously { return postponingInstallation; }
-
-- (void)installWithToolAndRelaunch:(BOOL)relaunch
-{
-	showErrors = YES;
-	[super installWithToolAndRelaunch:relaunch];
-}
 
 - (void)applicationWillTerminate:(NSNotification *)note
 {
@@ -118,7 +118,7 @@ static NSString * const kSUAutomaticUpdateParamName = @"autoupdate";
 	if (showErrors)
 		[super abortUpdateWithError:error];
 	else
-		[self abortUpdate];
+        [self abortUpdate:SUUpdateAbortGotError];
 }
 
 @end

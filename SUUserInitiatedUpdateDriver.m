@@ -50,7 +50,7 @@
 {
 	if (isCanceled)
 	{
-		[self abortUpdate];
+        [self abortUpdate:SUUpdateAbortCanceledByUser];
 		return;
 	}
 	[self closeCheckingWindow];
@@ -63,17 +63,17 @@
 	[super abortUpdateWithError:error];
 }
 
-- (void)abortUpdate
+- (void)abortUpdate:(SUUpdateAbortReason)reason
 {
 	[self closeCheckingWindow];
-	[super abortUpdate];
+    [super abortUpdate:reason];
 }
 
 - (void)appcast:(SUAppcast *)ac failedToLoadWithError:(NSError *)error
 {
 	if (isCanceled)
 	{
-		[self abortUpdate];
+        [self abortUpdate:SUUpdateAbortCanceledByUser];
 		return;
 	}
 	[super appcast:ac failedToLoadWithError:error];

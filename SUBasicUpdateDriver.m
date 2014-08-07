@@ -355,7 +355,7 @@ NSArray *SUGetAllDevMateURLHosts(void)
     
     if (![updater mayUpdateAndRestart])
     {
-        [self abortUpdate];
+        [self abortUpdate:SUUpdateAbortForbiddenByDelegate];
         return;
     }
     
@@ -376,22 +376,35 @@ NSArray *SUGetAllDevMateURLHosts(void)
 	if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdate:)])
 		[[updater delegate] updater:updater willInstallUpdate:updateItem];
     
-    BOOL isAlreadyInstalled = NO;
-    if ([[updater delegate] respondsToSelector:@selector(updater:overrideInstallUpdate:downloadPath:)])
+    SUFinishUpdateTask finishTasks = SUFinishUpdateWithDefaultInstallation;
+    
+    BOOL shouldRelaunch = YES;
+    if ([[updater delegate] respondsToSelector:@selector(updater:overrideInstallUpdate:downloadPath:shouldRelaunch:)] &&
+        [[updater delegate] updater:updater overrideInstallUpdate:updateItem downloadPath:tempDir shouldRelaunch:&shouldRelaunch])
     {
-        isAlreadyInstalled = [[updater delegate] updater:updater overrideInstallUpdate:updateItem downloadPath:tempDir];
+        finishTasks = finishTasks & (~SUFinishUpdateWithInstall);
+        relaunch = relaunch && shouldRelaunch;
+    }
+    if (!relaunch)
+    {
+        finishTasks = finishTasks & (~SUFinishUpdateWithRelaunch);
     }
 	
+    if (SUFinishUpdateAbort == finishTasks)
+    {
+        [self abortUpdate:SUUpdateAbortTasksFinished];
+        return;
+    }
+    
 	// Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
 	NSString *relaunchPathToCopy = [SPARKLE_BUNDLE pathForResource:@"finish_installation" ofType:@"app"];
     NSString *targetPath = [[host appSupportPath] stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
 	NSError *error = nil;
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-	[[NSFileManager defaultManager] createDirectoryAtPath: [targetPath stringByDeletingLastPathComponent] attributes: [NSDictionary dictionary]];
-#else
-	[[NSFileManager defaultManager] createDirectoryAtPath: [targetPath stringByDeletingLastPathComponent] withIntermediateDirectories: YES attributes: [NSDictionary dictionary] error: &error];
-#endif
+	[[NSFileManager defaultManager] createDirectoryAtPath:[targetPath stringByDeletingLastPathComponent]
+                              withIntermediateDirectories:YES
+                                               attributes:[NSDictionary dictionary]
+                                                    error:&error];
 
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
     BOOL copiedRelaunchTool = NO;
@@ -403,21 +416,37 @@ NSArray *SUGetAllDevMateURLHosts(void)
     {
         copiedRelaunchTool = [SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil error:&error];
     }
-    [self finishRelaunchAfterSuccessfulCopying:copiedRelaunchTool fromPath:relaunchPathToCopy toPath:targetPath isInstalled:isAlreadyInstalled relaunch:relaunch];
+    [self finishRelaunchAfterSuccessfulCopying:copiedRelaunchTool fromPath:relaunchPathToCopy toPath:targetPath finishTaskMask:finishTasks];
 }
 
-- (void)finishRelaunchAfterSuccessfulCopying:(BOOL)copiedRelaunchTool fromPath:(NSString *)relaunchPathToCopy toPath:(NSString *)targetPath isInstalled:(BOOL)isInstalled relaunch:(BOOL)relaunch
+- (void)finishRelaunchAfterSuccessfulCopying:(BOOL)copiedRelaunchTool fromPath:(NSString *)relaunchPathToCopy toPath:(NSString *)targetPath finishTaskMask:(SUFinishUpdateTask)taskMask
 {
-
     NSError *error = nil;
-	if( copiedRelaunchTool )
+	if (copiedRelaunchTool)
+    {
 		relaunchPath = [targetPath retain];
+    }
 	else
+    {
 		[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil), NSLocalizedDescriptionKey, [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", relaunchPathToCopy, targetPath, (error ? [error localizedDescription] : @"")], NSLocalizedFailureReasonErrorKey, nil]]];
+    }
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-    if ([[updater delegate] respondsToSelector:@selector(updaterWillRelaunchApplication:)])
-        [[updater delegate] updaterWillRelaunchApplication:updater];
+    NSString *pathToRelaunch = @"";
+    BOOL shouldFinishUpdateWithRelaunch = (taskMask & SUFinishUpdateWithRelaunch) != 0;
+    if (shouldFinishUpdateWithRelaunch)
+    {
+        [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
+        if ([[updater delegate] respondsToSelector:@selector(updaterWillRelaunchApplication:)])
+        {
+            [[updater delegate] updaterWillRelaunchApplication:updater];
+        }
+    
+        pathToRelaunch = [host bundlePath];
+        if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
+        {
+            pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
+        }
+    }
 
     if(!relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath])
     {
@@ -425,23 +454,29 @@ NSArray *SUGetAllDevMateURLHosts(void)
         [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [host name]], NSLocalizedDescriptionKey, [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@)", relaunchPath], NSLocalizedFailureReasonErrorKey, nil]]];
         // We intentionally don't abandon the update here so that the host won't initiate another.
         return;
-    }		
-    
-    NSString *pathToRelaunch = [host bundlePath];
-    if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)])
-        pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
+    }
+
     NSString *relaunchToolPath = [relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS/finish_installation"];
-    NSArray *arguments = [NSArray arrayWithObjects:[host bundlePath], pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], tempDir, relaunch ? @"1" : @"0", isInstalled ? @"1" : @"0", nil];
+    NSArray *arguments = [NSArray arrayWithObjects:
+                          [host bundlePath],
+                          pathToRelaunch,
+                          [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]],
+                          tempDir,
+                          [NSString stringWithFormat:@"%lu", taskMask],
+                          nil];
+    
 	if (SUShouldUseXPCInstaller())
     {
-		[SUXPCInstaller launchTaskWithLaunchPath:relaunchToolPath arguments:arguments completionHandler:^{
-            [NSApp terminate:self];
-        }];
+        [SUXPCInstaller launchTaskWithLaunchPath:relaunchToolPath arguments:arguments];
     }
 	else
     {
 		[NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:arguments];
-        [NSApp terminate:self];
+    }
+    
+    if (shouldFinishUpdateWithRelaunch)
+    {
+        [NSApp terminate:nil];
     }
 }
 
@@ -473,12 +508,12 @@ NSArray *SUGetAllDevMateURLHosts(void)
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while installing the update. Please try again later.", nil), NSLocalizedDescriptionKey, [error localizedDescription], NSLocalizedFailureReasonErrorKey, nil]]];
 }
 
-- (void)abortUpdate
+- (void)abortUpdate:(SUUpdateAbortReason)reason
 {
 	[[self retain] autorelease];	// In case the notification center was the last one holding on to us.
     [self cleanUpDownload];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[super abortUpdate];
+    [super abortUpdate:reason];
 }
 
 - (void)abortUpdateWithError:(NSError *)error
@@ -489,7 +524,7 @@ NSArray *SUGetAllDevMateURLHosts(void)
 		SULog(@"Sparkle Error (continued): %@", [error localizedFailureReason]);
 	if (download)
 		[download cancel];
-	[self abortUpdate];
+    [self abortUpdate:SUUpdateAbortGotError];
 }
 
 - (void)dealloc

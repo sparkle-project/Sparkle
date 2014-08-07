@@ -15,6 +15,11 @@
 
 @implementation SUScheduledUpdateDriver
 
+- (BOOL)shouldShowUI
+{
+    return showErrors;
+}
+
 - (void)didFindValidUpdate
 {
 	showErrors = YES; // We only start showing errors after we present the UI for the first time.
@@ -25,7 +30,7 @@
 {
 	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
 		[[updater delegate] updaterDidNotFindUpdate:updater];
-	[self abortUpdate]; // Don't tell the user that no update was found; this was a scheduled update.
+    [self abortUpdate:SUUpdateAbortDidNotFind]; // Don't tell the user that no update was found; this was a scheduled update.
 }
 
 - (void)abortUpdateWithError:(NSError *)error
@@ -33,7 +38,7 @@
 	if (showErrors)
 		[super abortUpdateWithError:error];
 	else
-		[self abortUpdate];
+        [self abortUpdate:SUUpdateAbortGotError];
 }
 
 @end

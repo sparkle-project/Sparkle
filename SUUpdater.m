@@ -7,6 +7,7 @@
 //
 
 #import "SUUpdater.h"
+#import "SUUpdater_Private.h"
 
 #import "SUHost.h"
 #import "SUUpdatePermissionPrompt.h"
@@ -21,7 +22,8 @@
 #include <SystemConfiguration/SystemConfiguration.h>
 
 
-@interface SUUpdater (Private)
+@interface SUUpdater ()
+
 - (id)initForBundle:(NSBundle *)bundle;
 - (void)startUpdateCycle;
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
@@ -32,8 +34,8 @@
 - (void)updateDriverDidFinish:(NSNotification *)note;
 - (NSURL *)parameterizedFeedURL;
 
--(void)	notifyWillShowModalAlert;
--(void)	notifyDidShowModalAlert;
+-(void)notifyWillShowModalAlert;
+-(void)notifyDidShowModalAlert;
 
 @end
 
@@ -107,13 +109,30 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
         BOOL hasPublicDSAKey = [host publicDSAKey] != nil;
         BOOL isMainBundle = [bundle isEqualTo:[NSBundle mainBundle]];
         BOOL hostIsCodeSigned = [SUCodeSigningVerifier hostApplicationIsCodeSigned];
-        if (!isMainBundle && !hasPublicDSAKey) {
+        NSAlert *warnAlert = nil;
+        if (!isMainBundle && !hasPublicDSAKey)
+        {
+            warnAlert = [NSAlert alertWithMessageText:SULocalizedString(@"Insecure update error!", nil)
+                                        defaultButton:SULocalizedString(@"OK", nil)
+                                      alternateButton:nil
+                                          otherButton:nil
+                            informativeTextWithFormat:SULocalizedString(@"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information.", nil)];
+        }
+        else if (isMainBundle && !(hasPublicDSAKey || hostIsCodeSigned))
+        {
+            warnAlert = [NSAlert alertWithMessageText:SULocalizedString(@"Insecure update error!", nil)
+                                        defaultButton:SULocalizedString(@"OK", nil)
+                                      alternateButton:nil
+                                          otherButton:nil
+                            informativeTextWithFormat:SULocalizedString(@"For security reasons, you need to code sign your application or sign your updates with a DSA key. See Sparkle's documentation for more information.", nil)];
+        }
+        
+        if (warnAlert != nil &&
+            (![[self delegate] respondsToSelector:@selector(updater:mayShowModalAlert:)] ||
+             [[self delegate] updater:self mayShowModalAlert:warnAlert]))
+        {
             [self notifyWillShowModalAlert];
-            NSRunAlertPanel(@"Insecure update error!", @"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information.", @"OK", nil, nil);
-            [self notifyDidShowModalAlert];
-        } else if (isMainBundle && !(hasPublicDSAKey || hostIsCodeSigned)) {
-            [self notifyWillShowModalAlert];
-            NSRunAlertPanel(@"Insecure update error!", @"For security reasons, you need to code sign your application or sign your updates with a DSA key. See Sparkle's documentation for more information.", @"OK", nil, nil);
+            [warnAlert runModal];
             [self notifyDidShowModalAlert];
         }
 #endif
@@ -204,9 +223,15 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 - (void)updateDriverDidFinish:(NSNotification *)note
 {
-	if ([note object] == driver && [driver finished])
+	if ([note object] == driver && (!driver || [driver finished]))
 	{
-		[driver release]; driver = nil;
+        if ([[self delegate] respondsToSelector:@selector(updaterDidEndUpdateProcess:)])
+        {
+            [[self delegate] updaterDidEndUpdateProcess:self];
+        }
+
+		[driver release];
+        driver = nil;
 		[self scheduleNextUpdateCheck];
     }
 }
@@ -336,6 +361,11 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	if ([self updateInProgress]) { return; }
 	if (checkTimer) { [checkTimer invalidate]; [checkTimer release]; checkTimer = nil; }		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
 	
+    if ([[self delegate] respondsToSelector:@selector(updaterWillStartUpdateProcess:)])
+    {
+        [[self delegate] updaterWillStartUpdateProcess:self];
+    }
+    
 	SUClearLog();
 	SULog( @"===== %@ =====", [[NSFileManager defaultManager] displayNameAtPath: [[NSBundle mainBundle] bundlePath]] );
 		
@@ -345,7 +375,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	
     if( [delegate respondsToSelector: @selector(updaterMayCheckForUpdates:)] && ![delegate updaterMayCheckForUpdates: self] )
 	{
-		[self scheduleNextUpdateCheck];
+		[self updateDriverDidFinish:nil];
 		return;
 	}
     	
@@ -354,7 +384,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
     // If we're not given a driver at all, just schedule the next update check and bail.
     if (!driver)
     {
-        [self scheduleNextUpdateCheck];
+        [self updateDriverDidFinish:nil];
         return;
     }
     
@@ -362,7 +392,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	if( theFeedURL )	// Use a NIL URL to cancel quietly.
 		[driver checkForUpdatesAtURL: theFeedURL host:host];
 	else
-		[driver abortUpdate];
+        [driver abortUpdate:SUUpdateAbortGotError];
 }
 
 - (void)registerAsObserver
@@ -580,7 +610,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 }
 
 - (id)delegate { return delegate; }
+- (SUHost *)host { return host; }
 - (NSBundle *)hostBundle { return [host bundle]; }
+- (SUBasicUpdateDriver *)driver { return (SUBasicUpdateDriver *)driver; }
 
 #pragma mark - DevMate Interaction
 
