@@ -216,7 +216,7 @@
     NSMutableArray *updaters = self.updaters;
     @synchronized (updaters)
     {
-        //if (![updaters containsObject:updater])
+        if (![updaters containsObject:updater])
         {
             [self updateUpdaterDelegate:updater];
             [updater addObserver:self forKeyPath:@"delegate" options:NSKeyValueObservingOptionNew context:NULL];
