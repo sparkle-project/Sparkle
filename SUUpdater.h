@@ -73,6 +73,8 @@
 
 - (BOOL)updateInProgress;
 
+- (BOOL)installationInProgress;
+
 @end
 
 
@@ -83,7 +85,7 @@
 @interface NSObject (SUUpdaterDelegateInformalProtocol)
 
 // Use this to keep Sparkle from popping up e.g. while your setup assistant is showing:
-- (BOOL)updaterMayCheckForUpdates:(SUUpdater *)bundle;
+- (BOOL)updaterMayCheckForUpdates:(SUUpdater *)updater;
 
 // This method allows you to add extra parameters to the appcast URL, potentially based on whether or not Sparkle will also be sending along the system profile. This method should return an array of dictionaries with keys: "key", "value", "displayKey", "displayValue", the latter two being specifically for display to the user.
 - (NSArray *)feedParametersForUpdater:(SUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
@@ -107,8 +109,17 @@
 // Sent when a valid update is not found.
 - (void)updaterDidNotFindUpdate:(SUUpdater *)update;
 
+// For cases when updater automatically downloads updates
+- (BOOL)updater:(SUUpdater *)updater canAutomaticallyInstallUpdate:(SUAppcastItem *)update;
+
 // Sent immediately before installing the specified update.
 - (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)update;
+
+// Sent immediately after installing the specified update in case when relaunch was forbidden.
+- (void)updater:(SUUpdater *)updater didInstallUpdate:(SUAppcastItem *)update;
+
+// Override to handle update manually
+- (BOOL)updater:(SUUpdater *)updater overrideInstallUpdate:(SUAppcastItem *)update downloadPath:(NSString *)downloadPath shouldRelaunch:(BOOL *)outShouldRelaunch;
 
 // Return YES to delay the relaunch until you do some processing; invoke the given NSInvocation to continue.
 //	This is not called if the user didn't relaunch on the previous update, in that case it will immediately
@@ -135,8 +146,9 @@
 
 // Called before and after, respectively, an updater shows a modal alert window, to give the host
 //	the opportunity to hide attached windows etc. that may get in the way:
--(void)	updaterWillShowModalAlert:(SUUpdater *)updater;
--(void)	updaterDidShowModalAlert:(SUUpdater *)updater;
+- (BOOL)updater:(SUUpdater *)updater mayShowModalAlert:(NSAlert *)alertToShow;
+- (void)updaterWillShowModalAlert:(SUUpdater *)updater;
+- (void)updaterDidShowModalAlert:(SUUpdater *)updater;
 
 @end
 

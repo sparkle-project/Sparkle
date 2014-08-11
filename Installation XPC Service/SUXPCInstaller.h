@@ -15,7 +15,7 @@
 
 + (BOOL)copyPathContent:(NSString *)src toDirectory:(NSString *)dstDir error:(NSError **)outError; // dstDir will be created if absent
 
-+ (void)launchTaskWithLaunchPath:(NSString *)path arguments:(NSArray *)arguments completionHandler:(void (^)(void))completionHandler;
++ (void)launchTaskWithLaunchPath:(NSString *)path arguments:(NSArray *)arguments;
 
 + (void)launchTaskWithPath:(NSString *)launchPath
                  arguments:(NSArray *)arguments

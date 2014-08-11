@@ -17,14 +17,14 @@
 {
 	if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)])
 		[[updater delegate] updater:updater didFindValidUpdate:updateItem];
-	[self abortUpdate];
+    [self abortUpdate:SUUpdateAbortTasksFinished];
 }
 
 - (void)didNotFindUpdate
 {
 	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
 		[[updater delegate] updaterDidNotFindUpdate:updater];
-	[self abortUpdate];
+    [self abortUpdate:SUUpdateAbortDidNotFind];
 }
 
 @end

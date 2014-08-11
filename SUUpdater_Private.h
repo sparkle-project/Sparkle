@@ -8,9 +8,19 @@
 
 #import "SUUpdater.h"
 #import "SUCodeSigningVerifier.h"
+#import "SUBasicUpdateDriver.h"
 
 @interface SUUpdater (Private)
 
 - (BOOL)mayUpdateAndRestart;
+- (SUHost *)host;
+- (SUBasicUpdateDriver *)driver;
+
+@end
+
+@interface NSObject (SUPrivateUpdaterDelegateInformalProtocol)
+
+- (void)updaterWillStartUpdateProcess:(SUUpdater *)updater;
+- (void)updaterDidEndUpdateProcess:(SUUpdater *)updater;
 
 @end

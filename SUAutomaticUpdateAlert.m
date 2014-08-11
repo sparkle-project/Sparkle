@@ -35,6 +35,12 @@
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [host bundlePath], [host installationPath]]; }
 
+- (IBAction)toggleAutomaticallyDownloadUpdate:(id)sender
+{
+    BOOL shouldUpdateAutomatically = NSOnState == [automaticUpdateButton state] ? YES : NO;
+    [host setBool:shouldUpdateAutomatically forUserDefaultsKey:SUAutomaticallyUpdateKey];
+}
+
 - (IBAction)installNow:sender
 {
 	[self close];
@@ -66,6 +72,11 @@
 - (NSString *)descriptionText
 {
 	return [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?", nil), [host name], [updateItem displayVersionString]];
+}
+
+- (void)awakeFromNib
+{
+    [automaticUpdateButton setState:[host boolForUserDefaultsKey:SUAutomaticallyUpdateKey] ? NSOnState : NSOffState];
 }
 
 @end

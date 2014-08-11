@@ -23,12 +23,14 @@ typedef enum
 	SUAppcastItem *updateItem;
 	id delegate;
 	SUHost *host;
+    IBOutlet NSButton *automaticUpdateButton;
 }
 
 - (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)hostBundle delegate:delegate;
 - (IBAction)installNow:sender;
 - (IBAction)installLater:sender;
 - (IBAction)doNotInstall:sender;
+- (IBAction)toggleAutomaticallyDownloadUpdate:(id)sender;
 
 @end
 

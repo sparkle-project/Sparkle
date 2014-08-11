@@ -30,6 +30,7 @@ typedef enum
 	
 	IBOutlet WebView *releaseNotesView;
 	IBOutlet NSTextField *description;
+    IBOutlet NSButton *automaticUpdateButton;
 	IBOutlet NSButton *installButton;	// UK 2007-08-31.
 	IBOutlet NSButton *skipButton;
 	IBOutlet NSButton *laterButton;
@@ -43,6 +44,7 @@ typedef enum
 - (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host;
 - (void)setDelegate:delegate;
 
+- (IBAction)toggleAutomaticallyDownloadUpdate:(id)sender;
 - (IBAction)installUpdate:sender;
 - (IBAction)skipThisVersion:sender;
 - (IBAction)remindMeLater:sender;

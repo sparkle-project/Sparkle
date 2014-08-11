@@ -73,6 +73,12 @@
 		[delegate updateAlert:self finishedWithChoice:choice];
 }
 
+- (IBAction)toggleAutomaticallyDownloadUpdate:(id)sender
+{
+    BOOL shouldUpdateAutomatically = NSOnState == [automaticUpdateButton state] ? YES : NO;
+    [host setBool:shouldUpdateAutomatically forUserDefaultsKey:SUAutomaticallyUpdateKey];
+}
+
 - (IBAction)installUpdate: (id)sender
 {
 	[self endWithSelection:SUInstallUpdateChoice];
@@ -222,6 +228,9 @@
 		[installButton setTitle: SULocalizedString( @"Learn More...", @"Alternate title for 'Install Update' button when there's no download in RSS feed." )];
 		[installButton setAction: @selector(openInfoURL:)];
 	}
+    
+    [automaticUpdateButton setHidden:![self allowsAutomaticUpdates]];
+    [automaticUpdateButton setState:[host boolForUserDefaultsKey:SUAutomaticallyUpdateKey] ? NSOnState : NSOffState];
 	
 	// Make sure button widths are OK:
 	#define DISTANCE_BETWEEN_BUTTONS		3

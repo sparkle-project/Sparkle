@@ -20,15 +20,17 @@ extern NSString * const SUUpdateDriverFinishedNotification;
 	SUUpdater *updater;
 	NSURL *appcastURL;
 	
-	BOOL finished;
+	SUUpdateAbortReason abortReason;
 }
 
-- initWithUpdater:(SUUpdater *)updater;
+- (id)initWithUpdater:(SUUpdater *)updater;
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
-- (void)abortUpdate;
+- (void)abortUpdate:(SUUpdateAbortReason)reason;
 - (BOOL)finished;
 - (SUHost*)host;
 - (void)setHost:(SUHost*)newHost;
+- (SUUpdateAbortReason)abortReason;
+- (BOOL)shouldShowUI; // can change it's value
 
 @end
 

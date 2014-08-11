@@ -154,17 +154,16 @@
     return (nil == error);
 }
 
-+ (void)launchTaskWithLaunchPath:(NSString *)path arguments:(NSArray *)arguments completionHandler:(void (^)(void))completionHandler
++ (void)launchTaskWithLaunchPath:(NSString *)path arguments:(NSArray *)arguments
 {
-    void (^handler)(int, NSData *) = completionHandler != nil ? ^(int r, NSData *d) { completionHandler(); } : nil;
     [self launchTaskWithPath:path
                    arguments:arguments
                  environment:nil
         currentDirectoryPath:nil
                    inputData:nil
            waitForTaskResult:NO
-               waitUntilDone:NO
-           completionHandler:handler];
+               waitUntilDone:YES
+           completionHandler:nil];
 }
 
 + (void)launchTaskWithPath:(NSString *)launchPath

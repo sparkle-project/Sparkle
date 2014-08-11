@@ -40,6 +40,28 @@ extern NSString *const SUUpdaterWillRestartNotification;
 extern NSString *const SUTechnicalErrorInformationKey;
 
 // -----------------------------------------------------------------------------
+//	Typedefs:
+// -----------------------------------------------------------------------------
+
+typedef NS_OPTIONS(NSUInteger, SUFinishUpdateTask)
+{
+    SUFinishUpdateAbort                         = 0,
+    SUFinishUpdateWithInstall                   = 1 << 0,
+    SUFinishUpdateWithRelaunch                  = 1 << 1,
+    SUFinishUpdateWithDefaultInstallation       = SUFinishUpdateWithInstall | SUFinishUpdateWithRelaunch
+};
+
+typedef NS_ENUM(NSUInteger, SUUpdateAbortReason)
+{
+    SUUpdateAbortUndefined = 0,
+    SUUpdateAbortForbiddenByDelegate,
+    SUUpdateAbortTasksFinished,
+    SUUpdateAbortCanceledByUser,
+    SUUpdateAbortDidNotFind,
+    SUUpdateAbortGotError
+};
+
+// -----------------------------------------------------------------------------
 //	PList keys::
 // -----------------------------------------------------------------------------
 

@@ -13,6 +13,7 @@
 // (unless there are any name-space collisions) so we can list all of them to start with:
 
 #import <Sparkle/SUUpdater.h>
+#import <Sparkle/SUUpdaterQueue.h>
 
 #import <Sparkle/SUAppcast.h>
 #import <Sparkle/SUAppcastItem.h>
