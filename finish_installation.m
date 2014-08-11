@@ -67,7 +67,7 @@
 
 	BOOL alreadyTerminated = (getppid() == 1); // ppid is launchd (1) => parent terminated already
 	
-	if (alreadyTerminated)
+	if (alreadyTerminated || 0 == (finishTasks & SUFinishUpdateWithRelaunch))
     {
 		[self parentHasQuit];
     }
