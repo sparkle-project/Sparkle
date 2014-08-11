@@ -106,6 +106,8 @@
 @property (assign) BOOL shouldContinueCheck;
 @property (nonatomic, retain) NSMutableArray *resultUIDrivers;
 
+@property (assign, getter=isProcessingUpdatersCheck) BOOL processingUpdatersCheck;
+
 @end
 
 @implementation SUUpdaterQueue
@@ -261,6 +263,11 @@
 
 - (void)performCheckForUpdates:(NSString *)selectorName
 {
+    if (self.isProcessingUpdatersCheck)
+        return;
+    
+    self.processingUpdatersCheck = YES;
+    
     NSUInteger index = 0;
     self.shouldContinueCheck = YES;
     self.resultUIDrivers = [NSMutableArray array];
@@ -308,6 +315,8 @@
         [driver performSelectorOnMainThread:@selector(didNotFindUpdate) withObject:nil waitUntilDone:YES];
     }
     self.resultUIDrivers = nil;
+    
+    self.processingUpdatersCheck = NO;
 }
 
 - (void)checkForUpdates
