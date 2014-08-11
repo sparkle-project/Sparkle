@@ -109,8 +109,14 @@
 // Sent when a valid update is not found.
 - (void)updaterDidNotFindUpdate:(SUUpdater *)update;
 
+// For cases when updater automatically downloads updates
+- (BOOL)updater:(SUUpdater *)updater canAutomaticallyInstallUpdate:(SUAppcastItem *)update;
+
 // Sent immediately before installing the specified update.
 - (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)update;
+
+// Sent immediately after installing the specified update in case when relaunch was forbidden.
+- (void)updater:(SUUpdater *)updater didInstallUpdate:(SUAppcastItem *)update;
 
 // Override to handle update manually
 - (BOOL)updater:(SUUpdater *)updater overrideInstallUpdate:(SUAppcastItem *)update downloadPath:(NSString *)downloadPath shouldRelaunch:(BOOL *)outShouldRelaunch;

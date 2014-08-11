@@ -62,22 +62,33 @@ static NSString * const kSUAutomaticUpdateParamName = @"autoupdate";
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)ua
 {
-    showErrors = YES;
-	alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:updateItem host:host delegate:self];
-	
-	// If the app is a menubar app or the like, we need to focus it first and alter the
-	// update prompt to behave like a normal window. Otherwise if the window were hidden
-	// there may be no way for the application to be activated to make it visible again.
-	if ([host isBackgroundApplication])
-	{
-		[[alert window] setHidesOnDeactivate:NO];
-		[NSApp activateIgnoringOtherApps:YES];
-	}		
-	
-	if ([NSApp isActive])
-		[[alert window] makeKeyAndOrderFront:self];
-	else
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];	
+    BOOL canAutomaticallyInstallUpdate = NO;
+    if ([[updater delegate] respondsToSelector:@selector(updater:canAutomaticallyInstallUpdate:)])
+        canAutomaticallyInstallUpdate = [[updater delegate] updater:updater canAutomaticallyInstallUpdate:updateItem];
+    
+    if (!canAutomaticallyInstallUpdate)
+    {
+        showErrors = YES;
+        alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:updateItem host:host delegate:self];
+        
+        // If the app is a menubar app or the like, we need to focus it first and alter the
+        // update prompt to behave like a normal window. Otherwise if the window were hidden
+        // there may be no way for the application to be activated to make it visible again.
+        if ([host isBackgroundApplication])
+        {
+            [[alert window] setHidesOnDeactivate:NO];
+            [NSApp activateIgnoringOtherApps:YES];
+        }		
+        
+        if ([NSApp isActive])
+            [[alert window] makeKeyAndOrderFront:self];
+        else
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
+    }
+    else
+    {
+        [self automaticUpdateAlert:nil finishedWithChoice:SUInstallNowChoice];
+    }
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification

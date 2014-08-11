@@ -55,7 +55,7 @@ typedef NS_ENUM(NSUInteger, SUUpdateAbortReason)
 {
     SUUpdateAbortUndefined = 0,
     SUUpdateAbortForbiddenByDelegate,
-    SUUpdateAbortTasksFinished, // installed and relaunched by delegate
+    SUUpdateAbortTasksFinished,
     SUUpdateAbortCanceledByUser,
     SUUpdateAbortDidNotFind,
     SUUpdateAbortGotError

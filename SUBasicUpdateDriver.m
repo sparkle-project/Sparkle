@@ -393,6 +393,10 @@ NSArray *SUGetAllDevMateURLHosts(void)
     if (SUFinishUpdateAbort == finishTasks)
     {
         [self abortUpdate:SUUpdateAbortTasksFinished];
+
+        if ([[updater delegate] respondsToSelector:@selector(updater:didInstallUpdate:)])
+            [[updater delegate] updater:updater didInstallUpdate:updateItem];
+
         return;
     }
     
@@ -467,16 +471,33 @@ NSArray *SUGetAllDevMateURLHosts(void)
     
 	if (SUShouldUseXPCInstaller())
     {
-        [SUXPCInstaller launchTaskWithLaunchPath:relaunchToolPath arguments:arguments];
+        [SUXPCInstaller launchTaskWithPath:relaunchToolPath
+                                 arguments:arguments
+                               environment:nil
+                      currentDirectoryPath:nil
+                                 inputData:nil
+                         waitForTaskResult:!shouldFinishUpdateWithRelaunch
+                             waitUntilDone:YES
+                         completionHandler:nil];
     }
 	else
     {
-		[NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:arguments];
+		NSTask *task = [NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:arguments];
+        
+        if (!shouldFinishUpdateWithRelaunch)
+            [task waitUntilExit];
     }
     
     if (shouldFinishUpdateWithRelaunch)
     {
         [NSApp terminate:nil];
+    }
+    else
+    {
+        [self abortUpdate:SUUpdateAbortTasksFinished];
+        
+        if ([[updater delegate] respondsToSelector:@selector(updater:didInstallUpdate:)])
+            [[updater delegate] updater:updater didInstallUpdate:updateItem];
     }
 }
 

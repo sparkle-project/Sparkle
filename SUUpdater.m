@@ -27,7 +27,6 @@
 - (id)initForBundle:(NSBundle *)bundle;
 - (void)startUpdateCycle;
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
-- (BOOL)automaticallyDownloadsUpdates;
 - (void)scheduleNextUpdateCheck;
 - (void)registerAsObserver;
 - (void)unregisterAsObserver;
