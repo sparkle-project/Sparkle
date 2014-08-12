@@ -252,7 +252,6 @@
 		03B5E64A15D39CD90038BB67 /* SUXPCURLDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUXPCURLDownload.m; sourceTree = "<group>"; };
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
-		3329F06D18FBFBA800556010 /* ResourceRules.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = ResourceRules.plist; sourceTree = "<group>"; };
 		33307690190A5D8B005602B2 /* install_service.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = install_service.pch; sourceTree = "<group>"; };
 		33C07AAB198B887F0039242D /* SUAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUAppDelegate.h; sourceTree = "<group>"; };
 		33C07AAC198B887F0039242D /* SUAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUAppDelegate.m; sourceTree = "<group>"; };
@@ -664,7 +663,6 @@
 		089C1665FE841158C02AAC07 /* Framework Resources */ = {
 			isa = PBXGroup;
 			children = (
-				3329F06D18FBFBA800556010 /* ResourceRules.plist */,
 				8DC2EF5A0486A6940098B216 /* Info.plist */,
 				615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */,
 				61C268090E2DB5D000175E6C /* License.txt */,
@@ -1727,7 +1725,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_RESOURCE_RULES_PATH = ResourceRules.plist;
 				COMBINE_HIDPI_IMAGES = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1740,7 +1737,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_RESOURCE_RULES_PATH = ResourceRules.plist;
 				COMBINE_HIDPI_IMAGES = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1863,7 +1859,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 61072EB20DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_RESOURCE_RULES_PATH = ResourceRules.plist;
 				COMBINE_HIDPI_IMAGES = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1964,7 +1959,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_RESOURCE_RULES_PATH = ResourceRules.plist;
 				COMBINE_HIDPI_IMAGES = YES;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
