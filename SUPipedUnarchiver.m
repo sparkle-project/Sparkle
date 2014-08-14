@@ -61,6 +61,7 @@
 #else
 	NSNumber *fs = [[[NSFileManager defaultManager] attributesOfItemAtPath:archivePath error:nil] objectForKey:NSFileSize];
 #endif
+    
 	if (fs == nil) goto reportError;
 	
 	// Thank you, Allan Odgaard!

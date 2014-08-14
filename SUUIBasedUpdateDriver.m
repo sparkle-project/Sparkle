@@ -201,7 +201,7 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-	NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"Update Error!", nil)
+    NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"Update Error!", nil)
                                      defaultButton:SULocalizedString(@"Cancel Update", nil)
                                    alternateButton:nil
                                        otherButton:nil

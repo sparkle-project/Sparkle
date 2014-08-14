@@ -7,6 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		290DE127188D912F00434ED0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 290DE126188D912F00434ED0 /* Foundation.framework */; };
+		290DE134188D914500434ED0 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 55C14F31136EFC2400649790 /* SystemConfiguration.framework */; };
+		290DE136188D914E00434ED0 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 290DE135188D914E00434ED0 /* IOKit.framework */; };
+		290DE138188D915800434ED0 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 290DE137188D915800434ED0 /* AppKit.framework */; };
+		290DE13A188D916600434ED0 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 290DE139188D916600434ED0 /* Security.framework */; };
+		290DE13F188D938F00434ED0 /* SUInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5000DAE88B40026945C /* SUInstaller.m */; };
+		290DE140188D93AC00434ED0 /* SUPlainInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5040DAE8AB80026945C /* SUPlainInstaller.m */; };
+		290DE141188D93B300434ED0 /* SUPlainInstallerInternals.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5F8E509C4CE3C00B25A18 /* SUPlainInstallerInternals.m */; };
+		290DE142188D93C800434ED0 /* SUPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5210DAE8E8A0026945C /* SUPackageInstaller.m */; };
+		290DE143188D93EB00434ED0 /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
+		290DE144188D93FA00434ED0 /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
 		3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		525A2790133D6AE900FD8D70 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
 		525A27A0133D6B9700FD8D70 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
@@ -79,7 +90,7 @@
 		61299B3609CB04E000B7442F /* Sparkle.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299B3509CB04E000B7442F /* Sparkle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		612DCBAF0D488BC60015DBEA /* SUUpdatePermissionPrompt.h in Headers */ = {isa = PBXBuildFile; fileRef = 612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */; settings = {ATTRIBUTES = (); }; };
 		612DCBB00D488BC60015DBEA /* SUUpdatePermissionPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */; };
-		61407C390A4099050009F71F /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		61407C390A4099050009F71F /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; };
 		6158A1C5137904B300487EC1 /* SUUpdater_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6158A1C4137904B300487EC1 /* SUUpdater_Private.h */; };
 		615AE3D00D64DC40001CA7BD /* SUModelTranslation.plist in Resources */ = {isa = PBXBuildFile; fileRef = 615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */; };
 		6160E7E10D3B4A8800E9CD71 /* NTSynchronousTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 610EC1C00CF3914D00AE239E /* NTSynchronousTask.h */; settings = {ATTRIBUTES = (); }; };
@@ -133,6 +144,9 @@
 		61F83F720DBFE140006FDD30 /* SUBasicUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */; };
 		61F83F740DBFE141006FDD30 /* SUBasicUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
 		61FA52880E2D9EA400EF58AD /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (Required, ); }; };
+		7C41C954188E954400EBFECB /* sandbox_service.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C41C950188E954400EBFECB /* sandbox_service.m */; };
+		7C41C95B188E96BC00EBFECB /* SUXPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 7C41C959188E96BC00EBFECB /* SUXPC.h */; };
+		7C41C95C188E96BC00EBFECB /* SUXPC.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C41C95A188E96BC00EBFECB /* SUXPC.m */; };
 		93FB277A156BD80D001937C7 /* SUPasswordPrompt.h in Headers */ = {isa = PBXBuildFile; fileRef = 93FB2778156BD80D001937C7 /* SUPasswordPrompt.h */; };
 		93FB277B156BD80D001937C7 /* SUPasswordPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 93FB2779156BD80D001937C7 /* SUPasswordPrompt.m */; };
 		93FB277F156BD826001937C7 /* SUPasswordPrompt.xib in Resources */ = {isa = PBXBuildFile; fileRef = 93FB277D156BD826001937C7 /* SUPasswordPrompt.xib */; };
@@ -167,6 +181,13 @@
 			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = Sparkle;
 		};
+		7C41C944188E936F00EBFECB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 290DE123188D912E00434ED0;
+			remoteInfo = SandboxService;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -189,6 +210,14 @@
 		0263187714FEBB42005EBF43 /* uk */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = uk; path = uk.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		290DE0FD188D84A700434ED0 /* ConfigService.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigService.xcconfig; sourceTree = "<group>"; };
+		290DE0FE188D84D300434ED0 /* ConfigServiceDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigServiceDebug.xcconfig; sourceTree = "<group>"; };
+		290DE0FF188D84F300434ED0 /* ConfigServiceRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigServiceRelease.xcconfig; sourceTree = "<group>"; };
+		290DE124188D912E00434ED0 /* com.andymatuschak.Sparkle.SandboxService.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.andymatuschak.Sparkle.SandboxService.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+		290DE126188D912F00434ED0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		290DE135188D914E00434ED0 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		290DE137188D915800434ED0 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		290DE139188D916600434ED0 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
 		525A278F133D6AE900FD8D70 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		550347001370023A00AE7681 /* Sparkle.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Sparkle.icns; sourceTree = "<group>"; };
@@ -403,6 +432,11 @@
 		61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBasicUpdateDriver.h; sourceTree = "<group>"; };
 		61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBasicUpdateDriver.m; sourceTree = "<group>"; };
 		7C2258B9187D86C300638F7C /* es */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = es; path = es.lproj/SUPasswordPrompt.xib; sourceTree = "<group>"; };
+		7C41C950188E954400EBFECB /* sandbox_service.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = sandbox_service.m; sourceTree = "<group>"; };
+		7C41C951188E954400EBFECB /* SandboxService.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = SandboxService.plist; sourceTree = "<group>"; };
+		7C41C957188E95D500EBFECB /* SandboxService-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SandboxService-Prefix.pch"; sourceTree = "<group>"; };
+		7C41C959188E96BC00EBFECB /* SUXPC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUXPC.h; sourceTree = "<group>"; };
+		7C41C95A188E96BC00EBFECB /* SUXPC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUXPC.m; sourceTree = "<group>"; };
 		7CE02099187E7F0100D88621 /* pl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = pl; path = pl.lproj/SUPasswordPrompt.xib; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* Sparkle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Sparkle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -428,6 +462,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		290DE121188D912E00434ED0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				290DE13A188D916600434ED0 /* Security.framework in Frameworks */,
+				290DE138188D915800434ED0 /* AppKit.framework in Frameworks */,
+				290DE136188D914E00434ED0 /* IOKit.framework in Frameworks */,
+				290DE134188D914500434ED0 /* SystemConfiguration.framework in Frameworks */,
+				290DE127188D912F00434ED0 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		55C14BB5136EEF1500649790 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -493,6 +539,7 @@
 				612279D90DB5470200AB99EA /* Sparkle Unit Tests.octest */,
 				5D06E8D00FD68C7C005AE3F6 /* BinaryDelta */,
 				55C14BB7136EEF1500649790 /* finish_installation.app */,
+				290DE124188D912E00434ED0 /* com.andymatuschak.Sparkle.SandboxService.xpc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -500,6 +547,7 @@
 		0867D691FE84028FC02AAC07 /* Sparkle */ = {
 			isa = PBXGroup;
 			children = (
+				7C41C94F188E954400EBFECB /* Sandbox Service */,
 				61F83F6E0DBFE07A006FDD30 /* Update Control */,
 				61299B3909CB055000B7442F /* Appcast Support */,
 				618FA6DB0DB485440026945C /* Installation */,
@@ -512,6 +560,7 @@
 				61B5F91D09C4CF7F00B25A18 /* Test Application Sources */,
 				0867D69AFE84028FC02AAC07 /* Apple Frameworks and Libraries */,
 				FA1941C40D94A6EA00DD942E /* Configurations */,
+				290DE125188D912E00434ED0 /* Frameworks */,
 				034768DFFF38A50411DB9C8B /* Products */,
 			);
 			name = Sparkle;
@@ -549,6 +598,17 @@
 				93FB277D156BD826001937C7 /* SUPasswordPrompt.xib */,
 			);
 			name = "Framework Resources";
+			sourceTree = "<group>";
+		};
+		290DE125188D912E00434ED0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				290DE139188D916600434ED0 /* Security.framework */,
+				290DE137188D915800434ED0 /* AppKit.framework */,
+				290DE135188D914E00434ED0 /* IOKit.framework */,
+				290DE126188D912F00434ED0 /* Foundation.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		55C14BD5136EEFD000649790 /* finish_installation tool */ = {
@@ -722,13 +782,25 @@
 		61F83F6E0DBFE07A006FDD30 /* Update Control */ = {
 			isa = PBXGroup;
 			children = (
-				61B5F8E309C4CE3C00B25A18 /* SUUpdater.h */,
-				6158A1C4137904B300487EC1 /* SUUpdater_Private.h */,
-				61B5F8E409C4CE3C00B25A18 /* SUUpdater.m */,
+				7C41C959188E96BC00EBFECB /* SUXPC.h */,
+				7C41C95A188E96BC00EBFECB /* SUXPC.m */,
 				61CFB2C20E38496B007A1735 /* Drivers */,
 				61CFB2C10E384958007A1735 /* Support */,
+				61B5F8E309C4CE3C00B25A18 /* SUUpdater.h */,
+				61B5F8E409C4CE3C00B25A18 /* SUUpdater.m */,
+				6158A1C4137904B300487EC1 /* SUUpdater_Private.h */,
 			);
 			name = "Update Control";
+			sourceTree = "<group>";
+		};
+		7C41C94F188E954400EBFECB /* Sandbox Service */ = {
+			isa = PBXGroup;
+			children = (
+				7C41C957188E95D500EBFECB /* SandboxService-Prefix.pch */,
+				7C41C950188E954400EBFECB /* sandbox_service.m */,
+				7C41C951188E954400EBFECB /* SandboxService.plist */,
+			);
+			path = "Sandbox Service";
 			sourceTree = "<group>";
 		};
 		FA1941C40D94A6EA00DD942E /* Configurations */ = {
@@ -744,13 +816,16 @@
 				FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */,
 				FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */,
 				61072EB20DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig */,
+				FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */,
+				FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */,
+				FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */,
+				290DE0FD188D84A700434ED0 /* ConfigService.xcconfig */,
+				290DE0FE188D84D300434ED0 /* ConfigServiceDebug.xcconfig */,
+				290DE0FF188D84F300434ED0 /* ConfigServiceRelease.xcconfig */,
 				FA1941CD0D94A70100DD942E /* ConfigTestApp.xcconfig */,
 				FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */,
 				FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */,
 				615409A8103BA09100125AF1 /* ConfigTestAppReleaseGCSupport.xcconfig */,
-				FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */,
-				FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */,
-				FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */,
 				FA3AAF3B1050B273004B3130 /* ConfigUnitTest.xcconfig */,
 				FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */,
 				FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */,
@@ -766,6 +841,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7C41C95B188E96BC00EBFECB /* SUXPC.h in Headers */,
 				61B5F8ED09C4CE3C00B25A18 /* SUUpdater.h in Headers */,
 				3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */,
 				61B5FC0D09C4FC8200B25A18 /* SUAppcast.h in Headers */,
@@ -813,6 +889,23 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		290DE123188D912E00434ED0 /* SandboxService */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 290DE131188D912F00434ED0 /* Build configuration list for PBXNativeTarget "SandboxService" */;
+			buildPhases = (
+				290DE120188D912E00434ED0 /* Sources */,
+				290DE121188D912E00434ED0 /* Frameworks */,
+				290DE122188D912E00434ED0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SandboxService;
+			productName = SandboxService;
+			productReference = 290DE124188D912E00434ED0 /* com.andymatuschak.Sparkle.SandboxService.xpc */;
+			productType = "com.apple.product-type.bundle";
+		};
 		55C14BB6136EEF1500649790 /* finish_installation */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 55C14BBE136EEF1500649790 /* Build configuration list for PBXNativeTarget "finish_installation" */;
@@ -865,7 +958,7 @@
 			name = "Sparkle Unit Tests";
 			productName = "Sparkle Unit Tests";
 			productReference = 612279D90DB5470200AB99EA /* Sparkle Unit Tests.octest */;
-			productType = "com.apple.product-type.bundle.ocunit-test";
+			productType = "com.apple.product-type.bundle";
 		};
 		61B5F90109C4CEE200B25A18 /* Sparkle Test App */ = {
 			isa = PBXNativeTarget;
@@ -901,6 +994,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				7C41C945188E936F00EBFECB /* PBXTargetDependency */,
 				55C14F97136F044100649790 /* PBXTargetDependency */,
 			);
 			name = Sparkle;
@@ -915,7 +1009,7 @@
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0600;
+				LastUpgradeCheck = 0500;
 			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "Sparkle" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -972,11 +1066,19 @@
 				612279D80DB5470200AB99EA /* Sparkle Unit Tests */,
 				5D06E8CF0FD68C7C005AE3F6 /* BinaryDelta */,
 				55C14BB6136EEF1500649790 /* finish_installation */,
+				290DE123188D912E00434ED0 /* SandboxService */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		290DE122188D912E00434ED0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		55C14BB3136EEF1500649790 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1099,6 +1201,20 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		290DE120188D912E00434ED0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				290DE141188D93B300434ED0 /* SUPlainInstallerInternals.m in Sources */,
+				290DE140188D93AC00434ED0 /* SUPlainInstaller.m in Sources */,
+				7C41C954188E954400EBFECB /* sandbox_service.m in Sources */,
+				290DE13F188D938F00434ED0 /* SUInstaller.m in Sources */,
+				290DE144188D93FA00434ED0 /* SULog.m in Sources */,
+				290DE143188D93EB00434ED0 /* SUConstants.m in Sources */,
+				290DE142188D93C800434ED0 /* SUPackageInstaller.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		55C14BB4136EEF1500649790 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1149,6 +1265,7 @@
 			files = (
 				61B5F8EE09C4CE3C00B25A18 /* SUUpdater.m in Sources */,
 				61B5F8EF09C4CE3C00B25A18 /* SUPlainInstallerInternals.m in Sources */,
+				7C41C95C188E96BC00EBFECB /* SUXPC.m in Sources */,
 				61B5FBB709C4FAFF00B25A18 /* SUAppcast.m in Sources */,
 				61B5FC6F09C51F4900B25A18 /* SUAppcastItem.m in Sources */,
 				61B5FCDE09C52A9F00B25A18 /* SUUpdateAlert.m in Sources */,
@@ -1208,6 +1325,11 @@
 			isa = PBXTargetDependency;
 			target = 8DC2EF4F0486A6940098B216 /* Sparkle */;
 			targetProxy = 61FA528C0E2D9EB200EF58AD /* PBXContainerItemProxy */;
+		};
+		7C41C945188E936F00EBFECB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 290DE123188D912E00434ED0 /* SandboxService */;
+			targetProxy = 7C41C944188E936F00EBFECB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1379,7 +1501,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				COMBINE_HIDPI_IMAGES = YES;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -1388,7 +1512,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				COMBINE_HIDPI_IMAGES = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -1396,7 +1523,9 @@
 		1DEB91B208733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ONLY_ACTIVE_ARCH = YES;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx;
 				VALID_ARCHS = x86_64;
 			};
@@ -1405,8 +1534,90 @@
 		1DEB91B308733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx;
 				VALID_ARCHS = x86_64;
+			};
+			name = Release;
+		};
+		290DE132188D912F00434ED0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Sandbox Service/SandboxService-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "Sandbox Service/SandboxService.plist";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_NAME = "com.andymatuschak.Sparkle.$(TARGET_NAME:rfc1034identifier)";
+				WRAPPER_EXTENSION = xpc;
+			};
+			name = Debug;
+		};
+		290DE133188D912F00434ED0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Sandbox Service/SandboxService-Prefix.pch";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "Sandbox Service/SandboxService.plist";
+				MACH_O_TYPE = mh_execute;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_NAME = "com.andymatuschak.Sparkle.$(TARGET_NAME:rfc1034identifier)";
+				WRAPPER_EXTENSION = xpc;
 			};
 			name = Release;
 		};
@@ -1415,6 +1626,7 @@
 			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1422,6 +1634,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = finish_installation.pch;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				INFOPLIST_FILE = "finish_installation-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_LDFLAGS = (
@@ -1440,12 +1653,15 @@
 			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = finish_installation.pch;
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				INFOPLIST_FILE = "finish_installation-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_LDFLAGS = (
@@ -1460,32 +1676,11 @@
 			};
 			name = Release;
 		};
-		55C14BBD136EEF1500649790 /* Release (GC dual-mode; 10.5+) */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COMBINE_HIDPI_IMAGES = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = finish_installation.pch;
-				INFOPLIST_FILE = "finish_installation-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				PRODUCT_NAME = finish_installation;
-				SDKROOT = macosx;
-			};
-			name = "Release (GC dual-mode; 10.5+)";
-		};
 		5D06E8D20FD68C7D005AE3F6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D06E8F20FD68D21005AE3F6 /* ConfigBinaryDeltaDebug.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -1494,60 +1689,17 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D06E8F30FD68D21005AE3F6 /* ConfigBinaryDeltaRelease.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
 				SDKROOT = macosx;
 			};
 			name = Release;
-		};
-		5D06E8D40FD68C7D005AE3F6 /* Release (GC dual-mode; 10.5+) */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5D06E8F30FD68D21005AE3F6 /* ConfigBinaryDeltaRelease.xcconfig */;
-			buildSettings = {
-				SDKROOT = macosx;
-			};
-			name = "Release (GC dual-mode; 10.5+)";
-		};
-		61072EAD0DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				SDKROOT = macosx;
-				VALID_ARCHS = x86_64;
-			};
-			name = "Release (GC dual-mode; 10.5+)";
-		};
-		61072EAE0DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 61072EB20DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig */;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				GCC_ENABLE_OBJC_GC = unsupported;
-				SDKROOT = macosx;
-			};
-			name = "Release (GC dual-mode; 10.5+)";
-		};
-		61072EAF0DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 615409A8103BA09100125AF1 /* ConfigTestAppReleaseGCSupport.xcconfig */;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				GCC_ENABLE_OBJC_GC = unsupported;
-				SDKROOT = macosx;
-			};
-			name = "Release (GC dual-mode; 10.5+)";
-		};
-		61072EB10DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA302AFD109D13190060F891 /* ConfigUnitTestReleaseGCSupport.xcconfig */;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				GCC_ENABLE_OBJC_GC = unsupported;
-				SDKROOT = macosx;
-			};
-			name = "Release (GC dual-mode; 10.5+)";
 		};
 		612279DB0DB5470300AB99EA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				COMBINE_HIDPI_IMAGES = YES;
 				SDKROOT = macosx;
 			};
@@ -1557,7 +1709,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				COMBINE_HIDPI_IMAGES = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -1566,6 +1720,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				COMBINE_HIDPI_IMAGES = YES;
 				SDKROOT = macosx;
 			};
@@ -1575,7 +1730,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				COMBINE_HIDPI_IMAGES = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -1588,7 +1745,6 @@
 			buildConfigurations = (
 				1DEB91AE08733DA50010E9CD /* Debug */,
 				1DEB91AF08733DA50010E9CD /* Release */,
-				61072EAE0DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1598,7 +1754,15 @@
 			buildConfigurations = (
 				1DEB91B208733DA50010E9CD /* Debug */,
 				1DEB91B308733DA50010E9CD /* Release */,
-				61072EAD0DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		290DE131188D912F00434ED0 /* Build configuration list for PBXNativeTarget "SandboxService" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				290DE132188D912F00434ED0 /* Debug */,
+				290DE133188D912F00434ED0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1608,7 +1772,6 @@
 			buildConfigurations = (
 				55C14BBB136EEF1500649790 /* Debug */,
 				55C14BBC136EEF1500649790 /* Release */,
-				55C14BBD136EEF1500649790 /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1618,7 +1781,6 @@
 			buildConfigurations = (
 				5D06E8D20FD68C7D005AE3F6 /* Debug */,
 				5D06E8D30FD68C7D005AE3F6 /* Release */,
-				5D06E8D40FD68C7D005AE3F6 /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1628,7 +1790,6 @@
 			buildConfigurations = (
 				612279DB0DB5470300AB99EA /* Debug */,
 				612279DC0DB5470300AB99EA /* Release */,
-				61072EB10DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1638,7 +1799,6 @@
 			buildConfigurations = (
 				61B5F90609C4CEE300B25A18 /* Debug */,
 				61B5F90709C4CEE300B25A18 /* Release */,
-				61072EAF0DF263BD008FE88B /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
