@@ -480,10 +480,18 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 {
 	// A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
 	NSString *appcastString = [host objectForKey:SUFeedURLKey];
-	if( [delegate respondsToSelector: @selector(feedURLStringForUpdater:)] )
+	if ([delegate respondsToSelector: @selector(feedURLStringForUpdater:)])
+    {
 		appcastString = [delegate feedURLStringForUpdater: self];
+    }
+    
 	if (!appcastString) // Can't find an appcast string!
-		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the SUFeedURL key in either the Info.plist or the user defaults!"];
+    {
+        static NSString * const sDevMateFeedURLBase = @"http://updates.devmate.com/";
+        NSString *bundleId = [[host bundle] bundleIdentifier] ? : @"";
+        NSString *feedURLComponent = [bundleId stringByAppendingPathExtension:@"xml"];
+        appcastString = [sDevMateFeedURLBase stringByAppendingPathComponent:feedURLComponent];
+    }
 	NSCharacterSet* quoteSet = [NSCharacterSet characterSetWithCharactersInString: @"\"\'"]; // Some feed publishers add quotes; strip 'em.
 	NSString*	castUrlStr = [appcastString stringByTrimmingCharactersInSet:quoteSet];
 	if( !castUrlStr || [castUrlStr length] == 0 )
