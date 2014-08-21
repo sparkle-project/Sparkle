@@ -352,11 +352,10 @@
     }
 
     NSBundle *sparkleBundle = [NSBundle bundleWithIdentifier:SUBundleIdentifier];
-    NSString *const finishInstallToolName = [[sparkleBundle infoDictionary] objectForKey:SURelaunchToolNameKey];
 
     // Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
     // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
-    NSString *relaunchPathToCopy = [sparkleBundle pathForResource:finishInstallToolName ofType:@"app"];
+    NSString *const relaunchPathToCopy = [sparkleBundle pathForResource:[[sparkleBundle infoDictionary] objectForKey:SURelaunchToolNameKey] ofType:@"app"];
 	if (relaunchPathToCopy != nil)
 	{
         NSString *targetPath = [[self.host appSupportPath] stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
@@ -386,7 +385,7 @@
     if ([updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
         pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:self.updater];
     }
-    NSString *relaunchToolPath = [[self.relaunchPath stringByAppendingPathComponent:@"/Contents/MacOS"] stringByAppendingPathComponent:finishInstallToolName];
+    NSString *relaunchToolPath = [[NSBundle bundleWithPath:self.relaunchPath] executablePath];
     [NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:@[[self.host bundlePath],
                                                                     pathToRelaunch,
                                                                     [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]],
