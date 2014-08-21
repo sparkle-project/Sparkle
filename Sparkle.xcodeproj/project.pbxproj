@@ -28,6 +28,7 @@
 		1420DF50196247F900203BB0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DF4F196247F900203BB0 /* Images.xcassets */; };
 		1420DF51196247F900203BB0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DF4F196247F900203BB0 /* Images.xcassets */; };
 		142E0E0019A6954400E4312B /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		142E0E0219A6A14700E4312B /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		14732BC01960F2C200593899 /* test_app_only_dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 14732BBF1960F0AC00593899 /* test_app_only_dsa_pub.pem */; };
 		14732BD019610A0D00593899 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		14732BD119610A1200593899 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
@@ -253,6 +254,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		142E0E0119A6A13300E4312B /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				142E0E0219A6A14700E4312B /* Sparkle.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		61B5FB4D09C4E9FA00B25A18 /* Copy Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1028,7 +1039,6 @@
 			buildPhases = (
 				5D06E8CD0FD68C7C005AE3F6 /* Sources */,
 				5D06E8CE0FD68C7C005AE3F6 /* Frameworks */,
-				5D06E90D0FD68DA3005AE3F6 /* Fix Install Name */,
 			);
 			buildRules = (
 			);
@@ -1044,9 +1054,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 612279DD0DB5470300AB99EA /* Build configuration list for PBXNativeTarget "Sparkle Unit Tests" */;
 			buildPhases = (
-				612279D40DB5470200AB99EA /* Resources */,
 				612279D50DB5470200AB99EA /* Sources */,
 				612279D60DB5470200AB99EA /* Frameworks */,
+				142E0E0119A6A13300E4312B /* CopyFiles */,
 				612279D70DB5470200AB99EA /* ShellScript */,
 			);
 			buildRules = (
@@ -1191,13 +1201,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		612279D40DB5470200AB99EA /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		61B5F8FE09C4CEE200B25A18 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1226,21 +1229,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		5D06E90D0FD68DA3005AE3F6 /* Fix Install Name */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Fix Install Name";
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(EXECUTABLE_PATH)",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "install_name_tool -change \"@loader_path/../Frameworks/Sparkle.framework/Versions/A/Sparkle\" \"@loader_path/Sparkle.framework/Versions/A/Sparkle\" \"$BUILT_PRODUCTS_DIR/$EXECUTABLE_PATH\"";
-		};
 		612279D70DB5470200AB99EA /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
