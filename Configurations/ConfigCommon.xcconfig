@@ -3,6 +3,17 @@
 SPARKLE_BUNDLE_IDENTIFIER = org.andymatuschak.Sparkle
 SPARKLE_RELAUNCH_TOOL_NAME = Autoupdate
 
+SPARKLE_APPEND_VERSION_NUMBER = 1
+
+// Sparkle usually doesn't allow downgrades as they're usually accidental, but
+// if your app has a downgrade function or URL handler, turn this on
+SPARKLE_AUTOMATED_DOWNGRADES = 0
+
+// If your app file on disk is named "MyApp 1.1b4", Sparkle usually updates it
+// in place, giving you an app named 1.1b4 that is actually 1.2. Turn the
+// following on to always reset the name back to "MyApp":
+SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME = 0
+
 SPARKLE_VERSION_MAJOR = 1
 SPARKLE_VERSION_MINOR = 8
 SPARKLE_VERSION_PATCH = 0

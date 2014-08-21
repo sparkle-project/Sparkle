@@ -37,6 +37,10 @@ NSString *const SUPromptUserOnFirstLaunchKey = @"SUPromptUserOnFirstLaunch";
 NSString *const SUFixedHTMLDisplaySizeKey = @"SUFixedHTMLDisplaySize";
 NSString *const SUKeepDownloadOnFailedInstallKey = @"SUKeepDownloadOnFailedInstall";
 NSString *const SUDefaultsDomainKey = @"SUDefaultsDomain";
+
+NSString *const SUAppendVersionNumberKey = @"SUAppendVersionNumber";
+NSString *const SUEnableAutomatedDowngradesKey = @"SUEnableAutomatedDowngrades";
+NSString *const SUNormalizeInstalledApplicationNameKey = @"SUNormalizeInstalledApplicationName";
 NSString *const SURelaunchToolNameKey = @"SURelaunchToolName";
 
 NSString *const SUSparkleErrorDomain = @"SUSparkleErrorDomain";
