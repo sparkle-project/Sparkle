@@ -5,3 +5,4 @@ PRODUCT_NAME = Sparkle Unit Tests
 WRAPPER_EXTENSION = xctest
 OTHER_CFLAGS = $(inherited) -iframework"$(DEVELOPER_FRAMEWORKS_DIR)" -iframework"$(PLATFORM_DIR)/Developer/Library/Frameworks"
 WARNING_CFLAGS = $(inherited) -Wno-variadic-macros -Wno-gnu-zero-variadic-macro-arguments
+FRAMEWORK_SEARCH_PATHS = $(inherited) $(DEVELOPER_FRAMEWORKS_DIR)
