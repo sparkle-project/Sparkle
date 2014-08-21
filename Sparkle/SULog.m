@@ -18,7 +18,7 @@
 //	Constants:
 // -----------------------------------------------------------------------------
 
-#define LOG_FILE_PATH @"~/Library/Logs/SparkleUpdateLog.log"
+static NSString *const SULogFilePath = @"~/Library/Logs/SparkleUpdateLog.log";
 
 
 // -----------------------------------------------------------------------------
@@ -38,7 +38,7 @@
 
 void SUClearLog(void)
 {
-    FILE *logfile = fopen([[LOG_FILE_PATH stringByExpandingTildeInPath] fileSystemRepresentation], "w");
+    FILE *logfile = fopen([[SULogFilePath stringByExpandingTildeInPath] fileSystemRepresentation], "w");
     if (logfile) {
         fclose(logfile);
     }
@@ -62,7 +62,7 @@ void SULog(NSString *format, ...)
     NSString *theStr = [[NSString alloc] initWithFormat:format arguments:ap];
     NSLog(@"Sparkle: %@", theStr);
 
-    FILE *logfile = fopen([[LOG_FILE_PATH stringByExpandingTildeInPath] fileSystemRepresentation], "a");
+    FILE *logfile = fopen([[SULogFilePath stringByExpandingTildeInPath] fileSystemRepresentation], "a");
     if (logfile) {
         theStr = [NSString stringWithFormat:@"%@: %@\n", [NSDate date], theStr];
         NSData *theData = [theStr dataUsingEncoding:NSUTF8StringEncoding];

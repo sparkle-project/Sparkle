@@ -152,11 +152,6 @@ static NSString *sUpdateFolder = nil;
     }
 }
 
-
-#define SUNotifyDictHostKey @"SUNotifyDictHost"
-#define SUNotifyDictErrorKey @"SUNotifyDictError"
-#define SUNotifyDictDelegateKey @"SUNotifyDictDelegate"
-
 + (void)finishInstallationToPath:(NSString *)installationPath withResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:(id<SUInstallerDelegate>)delegate
 {
 	if (result)

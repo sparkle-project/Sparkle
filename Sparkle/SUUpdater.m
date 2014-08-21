@@ -231,8 +231,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
     // Now we want to figure out how long until we check again.
     NSTimeInterval delayUntilCheck, updateCheckInterval = [self updateCheckInterval];
-    if (updateCheckInterval < SU_MIN_CHECK_INTERVAL)
-        updateCheckInterval = SU_MIN_CHECK_INTERVAL;
+    if (updateCheckInterval < SUMinimumUpdateCheckInterval)
+        updateCheckInterval = SUMinimumUpdateCheckInterval;
     if (intervalSinceCheck < updateCheckInterval)
         delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
     else
@@ -411,7 +411,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     // Hack to support backwards compatibility with older Sparkle versions, which supported
     // disabling updates by setting the check interval to 0.
     if (automaticallyCheckForUpdates && (NSInteger)[self updateCheckInterval] == 0) {
-        [self setUpdateCheckInterval:SU_DEFAULT_CHECK_INTERVAL];
+        [self setUpdateCheckInterval:SUDefaultUpdateCheckInterval];
     }
     [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
     // Provide a small delay in case multiple preferences are being updated simultaneously.
@@ -553,7 +553,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     if (intervalValue)
         return [intervalValue doubleValue];
     else
-        return SU_DEFAULT_CHECK_INTERVAL;
+        return SUDefaultUpdateCheckInterval;
 }
 
 - (void)dealloc

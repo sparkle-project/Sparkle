@@ -14,6 +14,9 @@
 //	Misc:
 // -----------------------------------------------------------------------------
 
+extern const NSTimeInterval SUMinimumUpdateCheckInterval;
+extern const NSTimeInterval SUDefaultUpdateCheckInterval;
+
 extern NSString *const SUBundleIdentifier;
 
 // -----------------------------------------------------------------------------
