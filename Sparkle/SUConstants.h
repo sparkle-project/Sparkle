@@ -27,6 +27,12 @@
 #define TRY_TO_APPEND_VERSION_NUMBER 1
 
 // -----------------------------------------------------------------------------
+//	Misc:
+// -----------------------------------------------------------------------------
+
+extern NSString *const SUBundleIdentifier;
+
+// -----------------------------------------------------------------------------
 //	Notifications:
 // -----------------------------------------------------------------------------
 
@@ -55,6 +61,7 @@ extern NSString *const SULastProfileSubmitDateKey;
 extern NSString *const SUPromptUserOnFirstLaunchKey;
 extern NSString *const SUKeepDownloadOnFailedInstallKey;
 extern NSString *const SUDefaultsDomainKey;
+extern NSString *const SURelaunchToolNameKey;
 extern NSString *const SUFixedHTMLDisplaySizeKey __attribute__((deprecated("This key is obsolete and has no effect.")));
 
 // -----------------------------------------------------------------------------

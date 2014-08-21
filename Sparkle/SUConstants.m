@@ -13,6 +13,8 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SUConstants.h"
 
+NSString *const SUBundleIdentifier = @SPARKLE_BUNDLE_IDENTIFIER;
+
 NSString *const SUTechnicalErrorInformationKey = @"SUTechnicalErrorInformation";
 
 NSString *const SUHasLaunchedBeforeKey = @"SUHasLaunchedBefore";
@@ -35,6 +37,7 @@ NSString *const SUPromptUserOnFirstLaunchKey = @"SUPromptUserOnFirstLaunch";
 NSString *const SUFixedHTMLDisplaySizeKey = @"SUFixedHTMLDisplaySize";
 NSString *const SUKeepDownloadOnFailedInstallKey = @"SUKeepDownloadOnFailedInstall";
 NSString *const SUDefaultsDomainKey = @"SUDefaultsDomain";
+NSString *const SURelaunchToolNameKey = @"SURelaunchToolName";
 
 NSString *const SUSparkleErrorDomain = @"SUSparkleErrorDomain";
 OSStatus SUAppcastParseError = 1000;

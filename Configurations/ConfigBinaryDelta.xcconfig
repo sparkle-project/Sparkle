@@ -1,5 +1,4 @@
 // BinaryDelta tool only
 
 PRODUCT_NAME = BinaryDelta
-GCC_PREFIX_HEADER =
 LD_RUNPATH_SEARCH_PATHS = @executable_path/
