@@ -182,23 +182,6 @@ int main(int argc, const char *argv[])
     }
 
 	@autoreleasepool {
-//ProcessSerialNumber		psn = { 0, kCurrentProcess };
-//TransformProcessType( &psn, kProcessTransformToForegroundApplication );
-
-#if 0 // Cmdline tool
-		NSString*	selfPath = nil;
-		if (argv[0][0] == '/') {
-			selfPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation: argv[0] length: strlen(argv[0])];
-		}
-		else
-		{
-			selfPath = [[NSFileManager defaultManager] currentDirectoryPath];
-			selfPath = [selfPath stringByAppendingPathComponent: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: argv[0] length: strlen(argv[0])]];
-		}
-#else
-        NSString *selfPath = [[NSBundle mainBundle] bundlePath];
-#endif
-
         BOOL shouldShowUI = (argc > 6) ? !!atoi(argv[6]) : YES;
 		if (shouldShowUI)
 		{
@@ -212,7 +195,7 @@ int main(int argc, const char *argv[])
                                                                              folderPath:(argc > 4) ? argv[4] : NULL
                                                                          shouldRelaunch:(argc > 5) ? !!atoi(argv[5]) : YES
                                                                            shouldShowUI:shouldShowUI
-                                                                               selfPath:selfPath];
+                                                                               selfPath:[[NSBundle mainBundle] bundlePath]];
 
         [termListen class];
         [[NSApplication sharedApplication] run];
