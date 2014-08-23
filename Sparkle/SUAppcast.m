@@ -159,7 +159,7 @@
                     if (date)
                         dict[name] = date;
 				}
-				else if ([name isEqualToString:@"sparkle:deltas"])
+				else if ([name isEqualToString:SUAppcastDeltasKey])
 				{
                     NSMutableArray *deltas = [NSMutableArray array];
                     NSEnumerator *childEnum = [[node children] objectEnumerator];

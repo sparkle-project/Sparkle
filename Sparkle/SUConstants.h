@@ -56,6 +56,21 @@ extern NSString *const SUNormalizeInstalledApplicationNameKey;
 extern NSString *const SURelaunchToolNameKey;
 
 // -----------------------------------------------------------------------------
+//	Appcast keys::
+// -----------------------------------------------------------------------------
+
+extern NSString *const SUAppcastCriticalUpdateKey;
+extern NSString *const SUAppcastDeltasKey;
+extern NSString *const SUAppcastDeltaFromKey;
+extern NSString *const SUAppcastDSASignatureKey;
+extern NSString *const SUAppcastMinimumSystemVersionKey;
+extern NSString *const SUAppcastMaximumSystemVersionKey;
+extern NSString *const SUAppcastReleaseNotesLinkKey;
+extern NSString *const SUAppcastShortVersionStringKey;
+extern NSString *const SUAppcastTagsKey;
+extern NSString *const SUAppcastVersionKey;
+
+// -----------------------------------------------------------------------------
 //	Errors:
 // -----------------------------------------------------------------------------
 

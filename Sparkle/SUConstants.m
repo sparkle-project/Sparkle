@@ -51,6 +51,17 @@ NSString *const SUEnableAutomatedDowngradesKey = @"SUEnableAutomatedDowngrades";
 NSString *const SUNormalizeInstalledApplicationNameKey = @"SUNormalizeInstalledApplicationName";
 NSString *const SURelaunchToolNameKey = @"SURelaunchToolName";
 
+NSString *const SUAppcastCriticalUpdateKey = @"sparkle:criticalUpdate";
+NSString *const SUAppcastDeltasKey = @"sparkle:deltas";
+NSString *const SUAppcastDeltaFromKey = @"sparkle:deltaFrom";
+NSString *const SUAppcastDSASignatureKey = @"sparkle:dsaSignature";
+NSString *const SUAppcastMinimumSystemVersionKey = @"sparkle:minimumSystemVersion";
+NSString *const SUAppcastMaximumSystemVersionKey = @"sparkle:maximumSystemVersion";
+NSString *const SUAppcastReleaseNotesLinkKey = @"sparkle:releaseNotesLink";
+NSString *const SUAppcastShortVersionStringKey = @"sparkle:shortVersionString";
+NSString *const SUAppcastTagsKey = @"sparkle:tags";
+NSString *const SUAppcastVersionKey = @"sparkle:version";
+
 NSString *const SUSparkleErrorDomain = @"SUSparkleErrorDomain";
 OSStatus SUAppcastParseError = 1000;
 OSStatus SUNoUpdateError = 1001;

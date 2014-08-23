@@ -47,12 +47,12 @@
 
 - (BOOL)isDeltaUpdate
 {
-    return self.propertiesDictionary[@"enclosure"][@"sparkle:deltaFrom"] != nil;
+    return self.propertiesDictionary[@"enclosure"][SUAppcastDeltaFromKey] != nil;
 }
 
 - (BOOL)isCriticalUpdate
 {
-    return [self.propertiesDictionary[@"sparkle:tags"] containsObject:@"sparkle:criticalUpdate"];
+    return [self.propertiesDictionary[SUAppcastTagsKey] containsObject:SUAppcastCriticalUpdateKey];
 }
 
 - (instancetype)initWithDictionary:(NSDictionary *)dict
@@ -74,9 +74,9 @@
         //    underscore and the last period as the version number. So name your packages like this: APPNAME_VERSION.extension.
         //    The big caveat with this is that you can't have underscores in your version strings, as that'll confuse Sparkle.
         //    Feel free to change the separator string to a hyphen or something more suited to your needs if you like.
-        NSString *newVersion = enclosure[@"sparkle:version"];
+        NSString *newVersion = enclosure[SUAppcastVersionKey];
         if (newVersion == nil) {
-            newVersion = dict[@"sparkle:version"]; // Get version from the item, in case it's a download-less item (i.e. paid upgrade).
+            newVersion = dict[SUAppcastVersionKey]; // Get version from the item, in case it's a download-less item (i.e. paid upgrade).
         }
         if (newVersion == nil) // no sparkle:version attribute anywhere?
         {
@@ -133,16 +133,16 @@
             self.fileURL = [NSURL URLWithString:fileURLString];
         }
         if (enclosure) {
-            self.DSASignature = enclosure[@"sparkle:dsaSignature"];
+            self.DSASignature = enclosure[SUAppcastDSASignatureKey];
         }
 
         self.versionString = newVersion;
-        self.minimumSystemVersion = dict[@"sparkle:minimumSystemVersion"];
-        self.maximumSystemVersion = dict[@"sparkle:maximumSystemVersion"];
+        self.minimumSystemVersion = dict[SUAppcastMinimumSystemVersionKey];
+        self.maximumSystemVersion = dict[SUAppcastMaximumSystemVersionKey];
 
-        NSString *shortVersionString = enclosure[@"sparkle:shortVersionString"];
+        NSString *shortVersionString = enclosure[SUAppcastShortVersionStringKey];
         if (nil == shortVersionString) {
-            shortVersionString = dict[@"sparkle:shortVersionString"]; // fall back on the <item>
+            shortVersionString = dict[SUAppcastShortVersionStringKey]; // fall back on the <item>
         }
 
         if (shortVersionString) {
@@ -152,8 +152,8 @@
         }
 
         // Find the appropriate release notes URL.
-        if (dict[@"sparkle:releaseNotesLink"]) {
-            self.releaseNotesURL = [NSURL URLWithString:dict[@"sparkle:releaseNotesLink"]];
+        if (dict[SUAppcastReleaseNotesLinkKey]) {
+            self.releaseNotesURL = [NSURL URLWithString:dict[SUAppcastReleaseNotesLinkKey]];
         } else if ([self.itemDescription hasPrefix:@"http://"] || [self.itemDescription hasPrefix:@"https://"]) { // if the description starts with http:// or https:// use that.
             self.releaseNotesURL = [NSURL URLWithString:self.itemDescription];
         } else {
@@ -169,7 +169,7 @@
                 fakeAppCastDict[@"enclosure"] = deltaDictionary;
                 SUAppcastItem *deltaItem = [[[self class] alloc] initWithDictionary:fakeAppCastDict];
 
-                deltas[deltaDictionary[@"sparkle:deltaFrom"]] = deltaItem;
+                deltas[deltaDictionary[SUAppcastDeltaFromKey]] = deltaItem;
             }
             self.deltaUpdates = deltas;
         }
