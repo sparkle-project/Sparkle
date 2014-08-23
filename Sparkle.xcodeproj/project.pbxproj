@@ -302,6 +302,7 @@
 		1420DF4E196247B500203BB0 /* Doxyfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Doxyfile; sourceTree = "<group>"; };
 		1420DF4F196247F900203BB0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		142E0E0819A83AAC00E4312B /* SUBinaryDeltaTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUBinaryDeltaTest.m; path = Tests/SUBinaryDeltaTest.m; sourceTree = "<group>"; };
+		14652F7919A93E5F00959E44 /* set-git-version-info.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "set-git-version-info.sh"; sourceTree = "<group>"; };
 		146EC84E19A68CF8004A50C5 /* Sparkle.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = Sparkle.podspec; sourceTree = SOURCE_ROOT; };
 		14732BB1195FF6B700593899 /* .clang-format */ = {isa = PBXFileReference; lastKnownFileType = text; path = ".clang-format"; sourceTree = SOURCE_ROOT; };
 		14732BB91960EEEE00593899 /* SampleAppcast.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SampleAppcast.xml; sourceTree = "<group>"; };
@@ -934,6 +935,7 @@
 				FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */,
 				FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */,
 				14732BC91960F70A00593899 /* make-release-package.sh */,
+				14652F7919A93E5F00959E44 /* set-git-version-info.sh */,
 				146EC84E19A68CF8004A50C5 /* Sparkle.podspec */,
 			);
 			path = Configurations;
@@ -1032,6 +1034,7 @@
 				55C14BB3136EEF1500649790 /* Resources */,
 				55C14BB4136EEF1500649790 /* Sources */,
 				55C14BB5136EEF1500649790 /* Frameworks */,
+				14652F7B19A945D600959E44 /* Run Script: Set Git Version Info */,
 			);
 			buildRules = (
 			);
@@ -1106,7 +1109,7 @@
 				142E0E0319A6A24100E4312B /* CopyFiles */,
 				8DC2EF540486A6940098B216 /* Sources */,
 				8DC2EF560486A6940098B216 /* Frameworks */,
-				6131B1910DDCDE32005215F0 /* Run Script: Set git Version Info */,
+				6131B1910DDCDE32005215F0 /* Run Script: Set Git Version Info */,
 				6195D4B40E40505A00D41A50 /* Run Script: Link fr_CA to fr */,
 				61E31A85103299750051D188 /* Run Script: Link pt to pt_BR */,
 			);
@@ -1238,6 +1241,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		14652F7B19A945D600959E44 /* Run Script: Set Git Version Info */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script: Set Git Version Info";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/Configurations/set-git-version-info.sh\"";
+			showEnvVarsInLog = 0;
+		};
 		612279D70DB5470200AB99EA /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1252,19 +1270,19 @@
 			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
 			showEnvVarsInLog = 0;
 		};
-		6131B1910DDCDE32005215F0 /* Run Script: Set git Version Info */ = {
+		6131B1910DDCDE32005215F0 /* Run Script: Set Git Version Info */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 12;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Run Script: Set git Version Info";
+			name = "Run Script: Set Git Version Info";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = "/usr/bin/env ruby";
-			shellScript = "# Xcode auto-versioning script for Subversion\n# by Axel Andersson, modified by Daniel Jalkut to add\n# \"--revision HEAD\" to the svn info line, which allows\n# the latest revision to always be used.\n\nif ENV[\"BUILT_PRODUCTS_DIR\"].nil?\n\tSTDERR.print \"#{$0}: Must be run from Xcode!\"\n\texit(1)\nend\n\n# Get the current Git master hash and use it to set the CFBundleVersion value\nENV[\"PATH\"] = \"/bin:/sw/bin:/usr/local/git/bin:/usr/bin:/usr/local/bin:/sbin:/usr/sbin:/opt/local/bin\"\nexit(0) if `type git` == \"\"\nrev = `/usr/bin/env git show-ref --abbrev heads/master`\ninfo = \"#{ENV[\"BUILT_PRODUCTS_DIR\"]}/#{ENV[\"WRAPPER_NAME\"]}/Resources/Info.plist\"\nversion = rev.split(\" \")[0]\n\nif version.nil?\n\tSTDERR.print \"#{$0}: Can't find a Git hash!\"\n\texit(0)\nend\n\ninfo_contents = File.read(info)\nif info_contents.nil?\n\tSTDERR.print \"#{$0}: Can't read in the Info.plist file!\"\n\texit(1)\nend\n\ninfo_contents.sub!(/([\\t ]+<key>CFBundleVersion<\\/key>\\n[\\t ]+<string>).*?(<\\/string>)/, '\\1' + version + '\\2')\nSTDERR.print info_contents\nf = File.open(info, \"w\")\nf.write(info_contents)\nf.close";
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/Configurations/set-git-version-info.sh\"";
 			showEnvVarsInLog = 0;
 		};
 		6195D4B40E40505A00D41A50 /* Run Script: Link fr_CA to fr */ = {
