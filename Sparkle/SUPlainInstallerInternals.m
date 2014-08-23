@@ -90,7 +90,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     // Let's try to read the version number so the filename will be more meaningful.
     NSString *postFix;
     NSString *version;
-	if ((version = [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:@"CFBundleVersion"]) && ![version isEqualToString:@""])
+	if ((version = [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]) && ![version isEqualToString:@""])
 	{
         NSMutableCharacterSet *validCharacters = [NSMutableCharacterSet alphanumericCharacterSet];
         [validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
@@ -143,7 +143,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     if ([[[NSBundle bundleWithIdentifier:SUBundleIdentifier] infoDictionary][SUAppendVersionNumberKey] boolValue]) {
         NSString *postFix = nil;
         NSString *version = nil;
-        if ((version = [[NSBundle bundleWithPath: path] objectForInfoDictionaryKey:@"CFBundleVersion"]) && ![version isEqualToString:@""])
+        if ((version = [[NSBundle bundleWithPath: path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]) && ![version isEqualToString:@""])
         {
             NSMutableCharacterSet *validCharacters = [NSMutableCharacterSet alphanumericCharacterSet];
             [validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];

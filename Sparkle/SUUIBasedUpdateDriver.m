@@ -75,7 +75,7 @@
 - (void)applicationDidBecomeActive:(NSNotification *)__unused aNotification
 {
     [[self.updateAlert window] makeKeyAndOrderFront:self];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
 - (void)updateAlert:(SUUpdateAlert *)__unused alert finishedWithChoice:(SUUpdateAlertChoice)choice

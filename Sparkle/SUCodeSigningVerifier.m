@@ -95,7 +95,7 @@ static id valueOrNSNull(id value) {
         }
         NSDictionary *infoPlist = signingDict[@"info-plist"];
         relevantInfo[@"version"] = valueOrNSNull(infoPlist[@"CFBundleShortVersionString"]);
-        relevantInfo[@"build"] = valueOrNSNull(infoPlist[@"CFBundleVersion"]);
+        relevantInfo[@"build"] = valueOrNSNull(infoPlist[(__bridge NSString *)kCFBundleVersionKey]);
         SULog(@"%@: %@", label, relevantInfo);
     }
 }

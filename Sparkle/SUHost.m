@@ -87,8 +87,8 @@ typedef struct {
 {
     if ([[[NSBundle bundleWithIdentifier:SUBundleIdentifier] infoDictionary][SUNormalizeInstalledApplicationNameKey] boolValue]) {
         // We'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
-        NSString *normalizedAppPath = [[[self.bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [self.bundle objectForInfoDictionaryKey:@"CFBundleName"], [[self.bundle bundlePath] pathExtension]]];
-        if (![[NSFileManager defaultManager] fileExistsAtPath:[[[self.bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [self.bundle objectForInfoDictionaryKey:@"CFBundleName"], [[self.bundle bundlePath] pathExtension]]]]) {
+        NSString *normalizedAppPath = [[[self.bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[self.bundle bundlePath] pathExtension]]];
+        if (![[NSFileManager defaultManager] fileExistsAtPath:[[[self.bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[self.bundle bundlePath] pathExtension]]]]) {
             return normalizedAppPath;
         }
     }
@@ -100,7 +100,7 @@ typedef struct {
     NSString *name = [self.bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
 	if (name) return name;
 
-    name = [self objectForInfoDictionaryKey:@"CFBundleName"];
+    name = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey];
 	if (name) return name;
 
     return [[[NSFileManager defaultManager] displayNameAtPath:[self.bundle bundlePath]] stringByDeletingPathExtension];
@@ -108,9 +108,9 @@ typedef struct {
 
 - (NSString *)version
 {
-    NSString *version = [self.bundle objectForInfoDictionaryKey:@"CFBundleVersion"];
+    NSString *version = [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     if (!version || [version isEqualToString:@""])
-        [NSException raise:@"SUNoVersionException" format:@"This host (%@) has no CFBundleVersion! This attribute is required.", [self bundlePath]];
+        [NSException raise:@"SUNoVersionException" format:@"This host (%@) has no %@! This attribute is required.", [self bundlePath], (__bridge NSString *)kCFBundleVersionKey];
     return version;
 }
 
