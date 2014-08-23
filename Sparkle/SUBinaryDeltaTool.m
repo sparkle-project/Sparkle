@@ -114,19 +114,33 @@ static BOOL shouldDeleteThenExtract(NSString * __unused key, NSDictionary* origi
     return NO;
 }
 
-int main(int argc, char **argv)
+int main(int __unused argc, char __unused *argv[])
 {
     @autoreleasepool {
-        if (argc != 5) {
+        NSArray *args = [[NSProcessInfo processInfo] arguments];
+        if (args.count != 5) {
         usage:
             fprintf(stderr, "Usage: BinaryDelta [create | apply] before-tree after-tree patch-file\n");
-            exit(1);
+            return 1;
         }
 
-        NSString *command = @(argv[1]);
-        NSString *oldPath = stringWithFileSystemRepresentation(argv[2]);
-        NSString *newPath = stringWithFileSystemRepresentation(argv[3]);
-        NSString *patchFile = stringWithFileSystemRepresentation(argv[4]);
+        NSString *command = args[1];
+        NSString *oldPath = args[2];
+        NSString *newPath = args[3];
+        NSString *patchFile = args[4];
+
+        BOOL isDirectory;
+        [[NSFileManager defaultManager] fileExistsAtPath:oldPath isDirectory:&isDirectory];
+        if (!isDirectory) {
+            fprintf(stderr, "Usage: before-tree must be a directory\n");
+            return 1;
+        }
+
+        [[NSFileManager defaultManager] fileExistsAtPath:newPath isDirectory:&isDirectory];
+        if (!isDirectory) {
+            fprintf(stderr, "Usage: after-tree must be a directory\n");
+            return 1;
+        }
 
         if ([command isEqualToString:@"apply"]) {
             int result = applyBinaryDelta(oldPath, newPath, patchFile);
