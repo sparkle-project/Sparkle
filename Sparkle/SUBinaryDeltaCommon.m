@@ -39,23 +39,28 @@ NSString *pathRelativeToDirectory(NSString *directory, NSString *path)
 }
 
 NSString *stringWithFileSystemRepresentation(const char *input) {
-    NSFileManager *fm = [NSFileManager defaultManager];
-    return [fm stringWithFileSystemRepresentation:input length:strlen(input)];
+    return [[NSFileManager defaultManager] stringWithFileSystemRepresentation:input length:strlen(input)];
 }
 
 NSString *temporaryFilename(NSString *base)
 {
     NSString *template = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.XXXXXXXXXX", base]];
-    const char *fsrepr = [template fileSystemRepresentation];
+    NSMutableData *data = [NSMutableData data];
+    [data appendBytes:template.fileSystemRepresentation length:strlen(template.fileSystemRepresentation) + 1];
 
-    const size_t buffer_len = strlen(fsrepr) + 1;
-    char *buffer = (char *)malloc(buffer_len);
-    strlcpy(buffer, fsrepr, buffer_len);
+    char *buffer = data.mutableBytes;
+    int fd = mkstemp(buffer);
+    if (fd == -1) {
+        perror("mkstemp");
+        return nil;
+    }
 
-    // mkstemp() can't be used, beause it returns a file descriptor, and XAR API requires a filename
-    NSString *ret = stringWithFileSystemRepresentation(mktemp(buffer));
-    free(buffer);
-    return ret;
+    if (close(fd) != 0) {
+        perror("close");
+        return nil;
+    }
+
+    return stringWithFileSystemRepresentation(buffer);
 }
 
 static void _hashOfBuffer(unsigned char *hash, const char* buffer, ssize_t bufferLength)
