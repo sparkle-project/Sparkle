@@ -63,20 +63,3 @@ NSString *const SUAppcastTagsKey = @"sparkle:tags";
 NSString *const SUAppcastVersionKey = @"sparkle:version";
 
 NSString *const SUSparkleErrorDomain = @"SUSparkleErrorDomain";
-OSStatus SUAppcastParseError = 1000;
-OSStatus SUNoUpdateError = 1001;
-OSStatus SUAppcastError = 1002;
-OSStatus SURunningFromDiskImageError = 1003;
-
-OSStatus SUTemporaryDirectoryError = 2000;
-
-OSStatus SUUnarchivingError = 3000;
-OSStatus SUSignatureError = 3001;
-
-OSStatus SUFileCopyFailure = 4000;
-OSStatus SUAuthenticationFailure = 4001;
-OSStatus SUMissingUpdateError = 4002;
-OSStatus SUMissingInstallerToolError = 4003;
-OSStatus SURelaunchError = 4004;
-OSStatus SUInstallationError = 4005;
-OSStatus SUDowngradeError = 4006;

@@ -75,26 +75,28 @@ extern NSString *const SUAppcastVersionKey;
 // -----------------------------------------------------------------------------
 
 extern NSString *const SUSparkleErrorDomain;
-// Appcast phase errors.
-extern OSStatus SUAppcastParseError;
-extern OSStatus SUNoUpdateError;
-extern OSStatus SUAppcastError;
-extern OSStatus SURunningFromDiskImageError;
+typedef NS_ENUM(OSStatus, SUError) {
+    // Appcast phase errors.
+    SUAppcastParseError = 1000,
+    SUNoUpdateError = 1001,
+    SUAppcastError = 1002,
+    SURunningFromDiskImageError = 1003,
 
-// Downlaod phase errors.
-extern OSStatus SUTemporaryDirectoryError;
+    // Downlaod phase errors.
+    SUTemporaryDirectoryError = 2000,
 
-// Extraction phase errors.
-extern OSStatus SUUnarchivingError;
-extern OSStatus SUSignatureError;
+    // Extraction phase errors.
+    SUUnarchivingError = 3000,
+    SUSignatureError = 3001,
 
-// Installation phase errors.
-extern OSStatus SUFileCopyFailure;
-extern OSStatus SUAuthenticationFailure;
-extern OSStatus SUMissingUpdateError;
-extern OSStatus SUMissingInstallerToolError;
-extern OSStatus SURelaunchError;
-extern OSStatus SUInstallationError;
-extern OSStatus SUDowngradeError;
+    // Installation phase errors.
+    SUFileCopyFailure = 4000,
+    SUAuthenticationFailure = 4001,
+    SUMissingUpdateError = 4002,
+    SUMissingInstallerToolError = 4003,
+    SURelaunchError = 4004,
+    SUInstallationError = 4005,
+    SUDowngradeError = 4006
+};
 
 #endif
