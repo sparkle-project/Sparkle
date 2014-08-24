@@ -17,7 +17,7 @@
 #define DEBUG 0
 #endif
 
-// Define some minimum intervals to avoid DOS-like checking attacks
+// Define some minimum intervals to avoid DoS-like checking attacks
 const NSTimeInterval SUMinimumUpdateCheckInterval = DEBUG ? 60 : (60 * 60);
 const NSTimeInterval SUDefaultUpdateCheckInterval = DEBUG ? 60 : (60 * 60 * 24);
 
