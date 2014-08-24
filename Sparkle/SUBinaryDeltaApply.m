@@ -10,7 +10,7 @@
 #import "SUBinaryDeltaCommon.h"
 #include <CommonCrypto/CommonDigest.h>
 #import <Foundation/Foundation.h>
-#include <bspatch.h>
+#include "bspatch.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <xar/xar.h>

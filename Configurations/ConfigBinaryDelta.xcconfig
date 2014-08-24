@@ -1,4 +1,3 @@
 // BinaryDelta tool only
 
 PRODUCT_NAME = BinaryDelta
-LD_RUNPATH_SEARCH_PATHS = @executable_path/

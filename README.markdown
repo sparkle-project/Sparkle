@@ -28,3 +28,12 @@ is an easy-to-use software update framework for Cocoa developers.
 * Optionally sends system information to the server when checking for updates.
 * Supports bundles, preference panes, plugins, and other non-.app software. Can install .pkg files for more complicated products.
 * Supports branches due to minimum OS version requirements.
+
+## Developers
+
+Building Sparkle requires Xcode 5 or above.
+
+### API
+
+Sparkle is built with `-fvisibility=hidden -fvisibility-inlines-hidden` which means no symbols are exported by default.
+If you are adding a symbol to the public API you must decorate the declaration with the `SU_EXPORT` macro (grep the source code for examples).
