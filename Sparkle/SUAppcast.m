@@ -169,6 +169,14 @@
                     }
                     dict[@"deltas"] = deltas;
 				}
+                else if ([name isEqualToString:SUAppcastTagsKey]) {
+                    NSMutableArray *tags = [NSMutableArray array];
+                    NSEnumerator *childEnum = [[node children] objectEnumerator];
+                    for (NSXMLNode *child in childEnum) {
+                        [tags addObject:[child name]];
+                    }
+                    dict[name] = tags;
+                }
 				else if (name != nil)
 				{
                     // add all other values as strings
