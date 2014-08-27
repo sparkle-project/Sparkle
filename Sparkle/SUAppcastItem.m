@@ -160,12 +160,12 @@
             self.releaseNotesURL = nil;
         }
 
-        if (dict[@"deltas"]) {
+        NSArray *deltaDictionaries = dict[SUAppcastDeltasKey];
+        if (deltaDictionaries) {
             NSMutableDictionary *deltas = [NSMutableDictionary dictionary];
-            NSArray *deltaDictionaries = dict[@"deltas"];
             for (NSDictionary *deltaDictionary in deltaDictionaries) {
                 NSMutableDictionary *fakeAppCastDict = [dict mutableCopy];
-                [fakeAppCastDict removeObjectForKey:@"deltas"];
+                [fakeAppCastDict removeObjectForKey:SUAppcastDeltasKey];
                 fakeAppCastDict[@"enclosure"] = deltaDictionary;
                 SUAppcastItem *deltaItem = [[[self class] alloc] initWithDictionary:fakeAppCastDict];
 

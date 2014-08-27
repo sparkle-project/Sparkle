@@ -167,7 +167,7 @@
                         if ([[child name] isEqualToString:@"enclosure"])
                             [deltas addObject:[(NSXMLElement *)child attributesAsDictionary]];
                     }
-                    dict[@"deltas"] = deltas;
+                    dict[name] = deltas;
 				}
                 else if ([name isEqualToString:SUAppcastTagsKey]) {
                     NSMutableArray *tags = [NSMutableArray array];
