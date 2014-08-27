@@ -175,7 +175,7 @@
                     for (NSXMLNode *child in childEnum) {
                         [tags addObject:[child name]];
                     }
-                    dict[@"tags"] = tags;
+                    dict[SUAppcastTagsKey] = tags;
                 }
 				else if (name != nil)
 				{

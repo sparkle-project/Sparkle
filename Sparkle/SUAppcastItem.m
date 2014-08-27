@@ -52,7 +52,7 @@
 
 - (BOOL)isCriticalUpdate
 {
-    return [self.propertiesDictionary[@"tags"] containsObject:SUAppcastCriticalUpdateKey];
+    return [self.propertiesDictionary[SUAppcastTagsKey] containsObject:SUAppcastCriticalUpdateKey];
 }
 
 - (instancetype)initWithDictionary:(NSDictionary *)dict
