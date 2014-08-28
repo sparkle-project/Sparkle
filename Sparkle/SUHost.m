@@ -44,7 +44,7 @@ typedef struct {
 		if (aBundle == nil) aBundle = [NSBundle mainBundle];
         self.bundle = aBundle;
         if (![self.bundle bundleIdentifier]) {
-            SULog(@"Error: the bundle being updated at %@ has no CFBundleIdentifier! This will cause preference read/write to not work properly.", self.bundle);
+            SULog(@"Error: the bundle being updated at %@ has no %@! This will cause preference read/write to not work properly.", self.bundle, kCFBundleIdentifierKey);
         }
 
         self.defaultsDomain = [self.bundle objectForInfoDictionaryKey:SUDefaultsDomainKey];

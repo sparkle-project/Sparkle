@@ -105,7 +105,7 @@
         NSString *theInfoURL = dict[SURSSElementLink];
         if (theInfoURL) {
             if (![theInfoURL isKindOfClass:[NSString class]]) {
-                SULog(@"SUAppcastItem -initWithDictionary: Info URL is not of valid type.");
+                SULog(@"%@ -%@ Info URL is not of valid type.", NSStringFromClass([self class]), NSStringFromSelector(_cmd));
             } else {
                 self.infoURL = [NSURL URLWithString:theInfoURL];
             }
