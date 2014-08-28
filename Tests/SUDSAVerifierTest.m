@@ -11,19 +11,18 @@
 #import "SUDSAVerifier.h"
 
 @interface SUDSAVerifierTest : XCTestCase
-@property NSString *testDir, *testFile, *pubKeyFile;
+@property NSString *testFile, *pubKeyFile;
 @end
 
 @implementation SUDSAVerifierTest
-@synthesize testDir, testFile, pubKeyFile;
+@synthesize testFile, pubKeyFile;
 
 - (void)setUp
 {
     [super setUp];
 
-    self.testDir = [@"" __FILE__ stringByDeletingLastPathComponent];
-    self.testFile = [self.testDir stringByAppendingPathComponent:@"/signed_test_file"];
-    self.pubKeyFile = [self.testDir stringByAppendingPathComponent:@"test_pubkey"];
+    self.testFile = [[NSBundle bundleForClass:[self class]] pathForResource:@"signed-test-file" ofType:@"txt"];
+    self.pubKeyFile = [[NSBundle bundleForClass:[self class]] pathForResource:@"test-pubkey" ofType:@"pem"];
 }
 
 - (void)testVerifyFileAtPath
