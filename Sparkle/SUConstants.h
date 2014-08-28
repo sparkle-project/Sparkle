@@ -71,6 +71,14 @@ extern NSString *const SUAppcastElementMaximumSystemVersion;
 extern NSString *const SUAppcastElementReleaseNotesLink;
 extern NSString *const SUAppcastElementTags;
 
+extern NSString *const SURSSAttributeURL;
+
+extern NSString *const SURSSElementDescription;
+extern NSString *const SURSSElementEnclosure;
+extern NSString *const SURSSElementLink;
+extern NSString *const SURSSElementPubDate;
+extern NSString *const SURSSElementTitle;
+
 // -----------------------------------------------------------------------------
 //	Errors:
 // -----------------------------------------------------------------------------
