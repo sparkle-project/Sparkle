@@ -64,6 +64,7 @@ static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
         cpuType = value;
         NSString *visibleCPUType;
         switch (value) {
+            case CPU_TYPE_ARM:      visibleCPUType = @"ARM";        break;
 			case CPU_TYPE_X86:		visibleCPUType = @"Intel";		break;
 			case CPU_TYPE_POWERPC:	visibleCPUType = @"PowerPC";	break;
 			default:				visibleCPUType = @"Unknown";	break;
