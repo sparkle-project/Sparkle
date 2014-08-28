@@ -9,13 +9,13 @@ localizable-strings:
 	rm Sparkle/en.lproj/Localizable.strings
 
 release:
-	xcodebuild -scheme Distribution -configuration Release -derivedDataPath "$(BUILDDIR)"
+	xcodebuild -scheme Distribution -configuration Release -derivedDataPath "$(BUILDDIR)" build
 	open -R "$(BUILDDIR)/Build/Products/Release/Sparkle-"*.tar.bz2
 
 build:
 	xcodebuild clean build
 
 test:
-	xcodebuild -target 'Sparkle Unit Tests' -scheme 'Sparkle' test
+	xcodebuild -scheme Distribution -configuration Debug test
 
 travis: test
