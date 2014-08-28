@@ -59,16 +59,17 @@ extern NSString *const SURelaunchToolNameKey;
 //	Appcast keys::
 // -----------------------------------------------------------------------------
 
-extern NSString *const SUAppcastCriticalUpdateKey;
-extern NSString *const SUAppcastDeltasKey;
-extern NSString *const SUAppcastDeltaFromKey;
-extern NSString *const SUAppcastDSASignatureKey;
-extern NSString *const SUAppcastMinimumSystemVersionKey;
-extern NSString *const SUAppcastMaximumSystemVersionKey;
-extern NSString *const SUAppcastReleaseNotesLinkKey;
-extern NSString *const SUAppcastShortVersionStringKey;
-extern NSString *const SUAppcastTagsKey;
-extern NSString *const SUAppcastVersionKey;
+extern NSString *const SUAppcastAttributeDeltaFrom;
+extern NSString *const SUAppcastAttributeDSASignature;
+extern NSString *const SUAppcastAttributeShortVersionString;
+extern NSString *const SUAppcastAttributeVersion;
+
+extern NSString *const SUAppcastElementCriticalUpdate;
+extern NSString *const SUAppcastElementDeltas;
+extern NSString *const SUAppcastElementMinimumSystemVersion;
+extern NSString *const SUAppcastElementMaximumSystemVersion;
+extern NSString *const SUAppcastElementReleaseNotesLink;
+extern NSString *const SUAppcastElementTags;
 
 // -----------------------------------------------------------------------------
 //	Errors:

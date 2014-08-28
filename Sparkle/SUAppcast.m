@@ -159,7 +159,7 @@
                     if (date)
                         dict[name] = date;
 				}
-				else if ([name isEqualToString:SUAppcastDeltasKey])
+				else if ([name isEqualToString:SUAppcastElementDeltas])
 				{
                     NSMutableArray *deltas = [NSMutableArray array];
                     NSEnumerator *childEnum = [[node children] objectEnumerator];
@@ -169,7 +169,7 @@
                     }
                     dict[name] = deltas;
 				}
-                else if ([name isEqualToString:SUAppcastTagsKey]) {
+                else if ([name isEqualToString:SUAppcastElementTags]) {
                     NSMutableArray *tags = [NSMutableArray array];
                     NSEnumerator *childEnum = [[node children] objectEnumerator];
                     for (NSXMLNode *child in childEnum) {

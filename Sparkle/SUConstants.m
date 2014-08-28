@@ -45,21 +45,21 @@ NSString *const SUPromptUserOnFirstLaunchKey = @"SUPromptUserOnFirstLaunch";
 NSString *const SUFixedHTMLDisplaySizeKey = @"SUFixedHTMLDisplaySize";
 NSString *const SUKeepDownloadOnFailedInstallKey = @"SUKeepDownloadOnFailedInstall";
 NSString *const SUDefaultsDomainKey = @"SUDefaultsDomain";
+NSString *const SUSparkleErrorDomain = @"SUSparkleErrorDomain";
 
 NSString *const SUAppendVersionNumberKey = @"SUAppendVersionNumber";
 NSString *const SUEnableAutomatedDowngradesKey = @"SUEnableAutomatedDowngrades";
 NSString *const SUNormalizeInstalledApplicationNameKey = @"SUNormalizeInstalledApplicationName";
 NSString *const SURelaunchToolNameKey = @"SURelaunchToolName";
 
-NSString *const SUAppcastCriticalUpdateKey = @"sparkle:criticalUpdate";
-NSString *const SUAppcastDeltasKey = @"sparkle:deltas";
-NSString *const SUAppcastDeltaFromKey = @"sparkle:deltaFrom";
-NSString *const SUAppcastDSASignatureKey = @"sparkle:dsaSignature";
-NSString *const SUAppcastMinimumSystemVersionKey = @"sparkle:minimumSystemVersion";
-NSString *const SUAppcastMaximumSystemVersionKey = @"sparkle:maximumSystemVersion";
-NSString *const SUAppcastReleaseNotesLinkKey = @"sparkle:releaseNotesLink";
-NSString *const SUAppcastShortVersionStringKey = @"sparkle:shortVersionString";
-NSString *const SUAppcastTagsKey = @"sparkle:tags";
-NSString *const SUAppcastVersionKey = @"sparkle:version";
+NSString *const SUAppcastAttributeDeltaFrom = @"sparkle:deltaFrom";
+NSString *const SUAppcastAttributeDSASignature = @"sparkle:dsaSignature";
+NSString *const SUAppcastAttributeShortVersionString = @"sparkle:shortVersionString";
+NSString *const SUAppcastAttributeVersion = @"sparkle:version";
 
-NSString *const SUSparkleErrorDomain = @"SUSparkleErrorDomain";
+NSString *const SUAppcastElementCriticalUpdate = @"sparkle:criticalUpdate";
+NSString *const SUAppcastElementDeltas = @"sparkle:deltas";
+NSString *const SUAppcastElementMinimumSystemVersion = @"sparkle:minimumSystemVersion";
+NSString *const SUAppcastElementMaximumSystemVersion = @"sparkle:maximumSystemVersion";
+NSString *const SUAppcastElementReleaseNotesLink = @"sparkle:releaseNotesLink";
+NSString *const SUAppcastElementTags = @"sparkle:tags";

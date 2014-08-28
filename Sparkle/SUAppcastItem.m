@@ -47,12 +47,12 @@
 
 - (BOOL)isDeltaUpdate
 {
-    return self.propertiesDictionary[@"enclosure"][SUAppcastDeltaFromKey] != nil;
+    return self.propertiesDictionary[@"enclosure"][SUAppcastAttributeDeltaFrom] != nil;
 }
 
 - (BOOL)isCriticalUpdate
 {
-    return [self.propertiesDictionary[SUAppcastTagsKey] containsObject:SUAppcastCriticalUpdateKey];
+    return [self.propertiesDictionary[SUAppcastElementTags] containsObject:SUAppcastElementCriticalUpdate];
 }
 
 - (instancetype)initWithDictionary:(NSDictionary *)dict
@@ -74,9 +74,9 @@
         //    underscore and the last period as the version number. So name your packages like this: APPNAME_VERSION.extension.
         //    The big caveat with this is that you can't have underscores in your version strings, as that'll confuse Sparkle.
         //    Feel free to change the separator string to a hyphen or something more suited to your needs if you like.
-        NSString *newVersion = enclosure[SUAppcastVersionKey];
+        NSString *newVersion = enclosure[SUAppcastAttributeVersion];
         if (newVersion == nil) {
-            newVersion = dict[SUAppcastVersionKey]; // Get version from the item, in case it's a download-less item (i.e. paid upgrade).
+            newVersion = dict[SUAppcastAttributeVersion]; // Get version from the item, in case it's a download-less item (i.e. paid upgrade).
         }
         if (newVersion == nil) // no sparkle:version attribute anywhere?
         {
@@ -133,16 +133,16 @@
             self.fileURL = [NSURL URLWithString:fileURLString];
         }
         if (enclosure) {
-            self.DSASignature = enclosure[SUAppcastDSASignatureKey];
+            self.DSASignature = enclosure[SUAppcastAttributeDSASignature];
         }
 
         self.versionString = newVersion;
-        self.minimumSystemVersion = dict[SUAppcastMinimumSystemVersionKey];
-        self.maximumSystemVersion = dict[SUAppcastMaximumSystemVersionKey];
+        self.minimumSystemVersion = dict[SUAppcastElementMinimumSystemVersion];
+        self.maximumSystemVersion = dict[SUAppcastElementMaximumSystemVersion];
 
-        NSString *shortVersionString = enclosure[SUAppcastShortVersionStringKey];
+        NSString *shortVersionString = enclosure[SUAppcastAttributeShortVersionString];
         if (nil == shortVersionString) {
-            shortVersionString = dict[SUAppcastShortVersionStringKey]; // fall back on the <item>
+            shortVersionString = dict[SUAppcastAttributeShortVersionString]; // fall back on the <item>
         }
 
         if (shortVersionString) {
@@ -152,24 +152,24 @@
         }
 
         // Find the appropriate release notes URL.
-        if (dict[SUAppcastReleaseNotesLinkKey]) {
-            self.releaseNotesURL = [NSURL URLWithString:dict[SUAppcastReleaseNotesLinkKey]];
+        if (dict[SUAppcastElementReleaseNotesLink]) {
+            self.releaseNotesURL = [NSURL URLWithString:dict[SUAppcastElementReleaseNotesLink]];
         } else if ([self.itemDescription hasPrefix:@"http://"] || [self.itemDescription hasPrefix:@"https://"]) { // if the description starts with http:// or https:// use that.
             self.releaseNotesURL = [NSURL URLWithString:self.itemDescription];
         } else {
             self.releaseNotesURL = nil;
         }
 
-        NSArray *deltaDictionaries = dict[SUAppcastDeltasKey];
+        NSArray *deltaDictionaries = dict[SUAppcastElementDeltas];
         if (deltaDictionaries) {
             NSMutableDictionary *deltas = [NSMutableDictionary dictionary];
             for (NSDictionary *deltaDictionary in deltaDictionaries) {
                 NSMutableDictionary *fakeAppCastDict = [dict mutableCopy];
-                [fakeAppCastDict removeObjectForKey:SUAppcastDeltasKey];
+                [fakeAppCastDict removeObjectForKey:SUAppcastElementDeltas];
                 fakeAppCastDict[@"enclosure"] = deltaDictionary;
                 SUAppcastItem *deltaItem = [[[self class] alloc] initWithDictionary:fakeAppCastDict];
 
-                deltas[deltaDictionary[SUAppcastDeltaFromKey]] = deltaItem;
+                deltas[deltaDictionary[SUAppcastAttributeDeltaFrom]] = deltaItem;
             }
             self.deltaUpdates = deltas;
         }
