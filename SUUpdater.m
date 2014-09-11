@@ -490,7 +490,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
         static NSString * const sDevMateFeedURLBase = @"http://updates.devmate.com/";
         NSString *bundleId = [[host bundle] bundleIdentifier] ? : @"";
         NSString *feedURLComponent = [bundleId stringByAppendingPathExtension:@"xml"];
-        appcastString = [sDevMateFeedURLBase stringByAppendingPathComponent:feedURLComponent];
+        appcastString = [sDevMateFeedURLBase stringByAppendingString:feedURLComponent];
     }
 	NSCharacterSet* quoteSet = [NSCharacterSet characterSetWithCharactersInString: @"\"\'"]; // Some feed publishers add quotes; strip 'em.
 	NSString*	castUrlStr = [appcastString stringByTrimmingCharactersInSet:quoteSet];
