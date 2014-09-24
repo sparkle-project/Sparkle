@@ -1,3 +1,14 @@
+# 1.9.0
+
+Only export public symbols. (Jake Petroules)
+Use Info.plist keys instead of macros (Jake Petroules)
+Properly set install names and rpaths for targets (Jake Petroules)
+Fixed Sparkle tags parsing (Tamás Lustyik)
+Replace typedef enums with typedef NS_ENUM to make Swift happier (C.W. Betts)
+Prefer string constants to strings (Jake Petroules)
+BinaryDelta: avoid crash with bad paths (Jake Petroules)
+
+
 # 1.8.0
 
 * New SUDSAVerifier based on up-to-date OS X APIs (Zachary Waldowski)
