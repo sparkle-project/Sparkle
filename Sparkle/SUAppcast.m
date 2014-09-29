@@ -145,30 +145,38 @@
             for (NSString *name in nodesDict)
             {
                 node = [self bestNodeInNodes:nodesDict[name]];
-				if ([name isEqualToString:@"enclosure"])
+                if ([name isEqualToString:SURSSElementEnclosure])
 				{
                     // enclosure is flattened as a separate dictionary for some reason
                     NSDictionary *encDict = [(NSXMLElement *)node attributesAsDictionary];
-                    dict[@"enclosure"] = encDict;
+                    dict[name] = encDict;
 
 				}
-                else if ([name isEqualToString:@"pubDate"])
+                else if ([name isEqualToString:SURSSElementPubDate])
                 {
                     // pubDate is expected to be an NSDate by SUAppcastItem, but the RSS class was returning an NSString
                     NSDate *date = [NSDate dateWithNaturalLanguageString:[node stringValue]];
                     if (date)
                         dict[name] = date;
 				}
-				else if ([name isEqualToString:@"sparkle:deltas"])
+				else if ([name isEqualToString:SUAppcastElementDeltas])
 				{
                     NSMutableArray *deltas = [NSMutableArray array];
                     NSEnumerator *childEnum = [[node children] objectEnumerator];
                     for (NSXMLNode *child in childEnum) {
-                        if ([[child name] isEqualToString:@"enclosure"])
+                        if ([[child name] isEqualToString:SURSSElementEnclosure])
                             [deltas addObject:[(NSXMLElement *)child attributesAsDictionary]];
                     }
-                    dict[@"deltas"] = deltas;
+                    dict[name] = deltas;
 				}
+                else if ([name isEqualToString:SUAppcastElementTags]) {
+                    NSMutableArray *tags = [NSMutableArray array];
+                    NSEnumerator *childEnum = [[node children] objectEnumerator];
+                    for (NSXMLNode *child in childEnum) {
+                        [tags addObject:[child name]];
+                    }
+                    dict[name] = tags;
+                }
 				else if (name != nil)
 				{
                     // add all other values as strings
@@ -196,7 +204,11 @@
 
 	if ([appcastItems count])
     {
-        NSSortDescriptor *sort = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wselector"
+        // @selector(date) is from SUAppcastItem
+        NSSortDescriptor *sort = [[NSSortDescriptor alloc] initWithKey:NSStringFromSelector(@selector(date)) ascending:NO];
+#pragma clang diagnostic pop
         [appcastItems sortUsingDescriptors:@[sort]];
         self.items = appcastItems;
     }

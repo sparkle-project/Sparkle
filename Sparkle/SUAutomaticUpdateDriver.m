@@ -135,7 +135,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 - (void)applicationDidBecomeActive:(NSNotification *)__unused aNotification
 {
     [[self.alert window] makeKeyAndOrderFront:self];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
 - (void)automaticUpdateAlert:(SUAutomaticUpdateAlert *)__unused aua finishedWithChoice:(SUAutomaticInstallationChoice)choice

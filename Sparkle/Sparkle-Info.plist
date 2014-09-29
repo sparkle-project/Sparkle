@@ -9,7 +9,7 @@
 	<key>CFBundleIconFile</key>
 	<string></string>
 	<key>CFBundleIdentifier</key>
-	<string>org.andymatuschak.Sparkle</string>
+	<string>${SPARKLE_BUNDLE_IDENTIFIER}</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -17,12 +17,20 @@
 	<key>CFBundlePackageType</key>
 	<string>FMWK</string>
 	<key>CFBundleShortVersionString</key>
-	<string>${CURRENT_PROJECT_VERSION} git</string>
+	<string>${CURRENT_PROJECT_VERSION}</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>${CURRENT_PROJECT_VERSION}</string>
 	<key>NSPrincipalClass</key>
 	<string></string>
+	<key>SUAppendVersionNumber</key>
+	<string>${SPARKLE_APPEND_VERSION_NUMBER}</string>
+	<key>SUEnableAutomatedDowngrades</key>
+	<string>${SPARKLE_AUTOMATED_DOWNGRADES}</string>
+	<key>SUNormalizeInstalledApplicationName</key>
+	<string>${SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME}</string>
+	<key>SURelaunchToolName</key>
+	<string>${SPARKLE_RELAUNCH_TOOL_NAME}</string>
 </dict>
 </plist>

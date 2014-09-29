@@ -9,10 +9,12 @@
 #ifndef SUAPPCAST_H
 #define SUAPPCAST_H
 
+#import "SUExport.h"
+
 @protocol SUAppcastDelegate;
 
 @class SUAppcastItem;
-@interface SUAppcast : NSObject <NSURLDownloadDelegate>
+SU_EXPORT @interface SUAppcast : NSObject <NSURLDownloadDelegate>
 
 @property (weak) id<SUAppcastDelegate> delegate;
 @property (copy) NSString *userAgentString;

@@ -15,16 +15,16 @@
 
 + (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:(id<SUInstallerDelegate>)delegate versionComparator:(id<SUVersionComparison>)comparator
 {
-// Prevent malicious downgrades:
-#if !PERMIT_AUTOMATED_DOWNGRADES
-	if ([comparator compareVersion:[host version] toVersion:[[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:@"CFBundleVersion"]] == NSOrderedDescending)
-	{
-        NSString *errorMessage = [NSString stringWithFormat:@"Sparkle Updater: Possible attack in progress! Attempting to \"upgrade\" from %@ to %@. Aborting update.", [host version], [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:@"CFBundleVersion"]];
-        NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
-        [self finishInstallationToPath:installationPath withResult:NO host:host error:error delegate:delegate];
-        return;
+    // Prevent malicious downgrades
+    if (![[[NSBundle bundleWithIdentifier:SUBundleIdentifier] infoDictionary][SUEnableAutomatedDowngradesKey] boolValue]) {
+        if ([comparator compareVersion:[host version] toVersion:[[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]] == NSOrderedDescending)
+        {
+            NSString *errorMessage = [NSString stringWithFormat:@"Sparkle Updater: Possible attack in progress! Attempting to \"upgrade\" from %@ to %@. Aborting update.", [host version], [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
+            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
+            [self finishInstallationToPath:installationPath withResult:NO host:host error:error delegate:delegate];
+            return;
+        }
     }
-#endif
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSError *error = nil;

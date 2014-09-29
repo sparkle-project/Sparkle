@@ -17,7 +17,7 @@
 @class SUAppcastItem, SUHost;
 @interface SUBasicUpdateDriver : SUUpdateDriver <NSURLDownloadDelegate, SUUnarchiverDelegate, SUAppcastDelegate>
 
-@property (weak, readonly) SUAppcastItem *updateItem;
+@property (strong, readonly) SUAppcastItem *updateItem;
 @property (strong, readonly) NSURLDownload *download;
 @property (copy, readonly) NSString *downloadPath;
 
@@ -48,6 +48,7 @@
 
 - (void)abortUpdate;
 - (void)abortUpdateWithError:(NSError *)error;
+- (void)terminateApp;
 
 @end
 

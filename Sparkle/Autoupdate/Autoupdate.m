@@ -20,10 +20,10 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
 
 @interface TerminationListener : NSObject <SUInstallerDelegate>
 
-@property (assign) const char *hostpath;
-@property (assign) const char *executablepath;
+@property (copy) NSString *hostpath;
+@property (copy) NSString *executablepath;
 @property (assign) pid_t parentprocessid;
-@property (assign) const char *folderpath;
+@property (copy) NSString *folderpath;
 
 @property (copy) NSString *selfPath;
 @property (copy) NSString *installationPath;
@@ -58,26 +58,26 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
 @synthesize shouldRelaunch;
 @synthesize shouldShowUI;
 
-- (instancetype)initWithHostPath:(const char *)inhostpath executablePath:(const char *)execpath parentProcessId:(pid_t)ppid folderPath:(const char *)infolderpath shouldRelaunch:(BOOL)relaunch shouldShowUI:(BOOL)showUI selfPath:(NSString *)inSelfPath
+- (instancetype)initWithHostPath:(NSString *)inhostpath executablePath:(NSString *)execpath parentProcessId:(pid_t)ppid folderPath:(NSString *)infolderpath shouldRelaunch:(BOOL)relaunch shouldShowUI:(BOOL)showUI selfPath:(NSString *)inSelfPath
 {
     if (!(self = [super init])) {
         return nil;
     }
 
-    hostpath = inhostpath;
-    executablepath = execpath;
-    parentprocessid = ppid;
-    folderpath = infolderpath;
-    selfPath = inSelfPath;
-    shouldRelaunch = relaunch;
-    shouldShowUI = showUI;
+    self.hostpath = inhostpath;
+    self.executablepath = execpath;
+    self.parentprocessid = ppid;
+    self.folderpath = infolderpath;
+    self.selfPath = inSelfPath;
+    self.shouldRelaunch = relaunch;
+    self.shouldShowUI = showUI;
 
     BOOL alreadyTerminated = (getppid() == 1); // ppid is launchd (1) => parent terminated already
 
     if (alreadyTerminated)
         [self parentHasQuit];
     else
-        watchdogTimer = [NSTimer scheduledTimerWithTimeInterval:SUParentQuitCheckInterval target:self selector:@selector(watchdog:) userInfo:nil repeats:YES];
+        self.watchdogTimer = [NSTimer scheduledTimerWithTimeInterval:SUParentQuitCheckInterval target:self selector:@selector(watchdog:) userInfo:nil repeats:YES];
 
     return self;
 }
@@ -85,7 +85,7 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
 
 - (void)dealloc
 {
-    [longInstallationTimer invalidate];
+    [self.longInstallationTimer invalidate];
 }
 
 
@@ -121,8 +121,8 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
     if (self.shouldRelaunch)
     {
         NSString *appPath = nil;
-        if (!self.folderpath || strcmp(self.executablepath, self.hostpath) != 0)
-            appPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation:self.executablepath length:strlen(self.executablepath)];
+        if (!self.folderpath || ![self.executablepath isEqualToString:self.hostpath])
+            appPath = self.executablepath;
         else
             appPath = self.installationPath;
         [[NSWorkspace sharedWorkspace] openFile:appPath];
@@ -142,7 +142,7 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
 
 - (void)install
 {
-    NSBundle *theBundle = [NSBundle bundleWithPath:[[NSFileManager defaultManager] stringWithFileSystemRepresentation:self.hostpath length:strlen(self.hostpath)]];
+    NSBundle *theBundle = [NSBundle bundleWithPath:self.hostpath];
     self.host = [[SUHost alloc] initWithBundle:theBundle];
     self.installationPath = [[self.host installationPath] copy];
 
@@ -154,7 +154,7 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
         [statusCtl showWindow:self];
     }
 
-    [SUInstaller installFromUpdateFolder:[[NSFileManager defaultManager] stringWithFileSystemRepresentation:self.folderpath length:strlen(self.folderpath)]
+    [SUInstaller installFromUpdateFolder:self.folderpath
                                 overHost:self.host
                         installationPath:self.installationPath
                                 delegate:self
@@ -175,44 +175,28 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
 
 @end
 
-int main(int argc, const char *argv[])
+int main(int __unused argc, const char __unused *argv[])
 {
-    if (argc < 5 || argc > 7) {
-        return EXIT_FAILURE;
-    }
-
 	@autoreleasepool {
-//ProcessSerialNumber		psn = { 0, kCurrentProcess };
-//TransformProcessType( &psn, kProcessTransformToForegroundApplication );
+        NSArray *args = [[NSProcessInfo processInfo] arguments];
+        if (args.count < 5 || args.count > 7) {
+            return EXIT_FAILURE;
+        }
 
-#if 0 // Cmdline tool
-		NSString*	selfPath = nil;
-		if (argv[0][0] == '/') {
-			selfPath = [[NSFileManager defaultManager] stringWithFileSystemRepresentation: argv[0] length: strlen(argv[0])];
-		}
-		else
-		{
-			selfPath = [[NSFileManager defaultManager] currentDirectoryPath];
-			selfPath = [selfPath stringByAppendingPathComponent: [[NSFileManager defaultManager] stringWithFileSystemRepresentation: argv[0] length: strlen(argv[0])]];
-		}
-#else
-        NSString *selfPath = [[NSBundle mainBundle] bundlePath];
-#endif
-
-        BOOL shouldShowUI = (argc > 6) ? !!atoi(argv[6]) : YES;
+        BOOL shouldShowUI = (args.count > 6) ? [args[6] boolValue] : YES;
 		if (shouldShowUI)
 		{
             [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
         }
 
         [NSApplication sharedApplication];
-        TerminationListener *termListen = [[TerminationListener alloc] initWithHostPath:(argc > 1) ? argv[1] : NULL
-                                                                         executablePath:(argc > 2) ? argv[2] : NULL
-                                                                        parentProcessId:(argc > 3) ? atoi(argv[3]) : 0
-                                                                             folderPath:(argc > 4) ? argv[4] : NULL
-                                                                         shouldRelaunch:(argc > 5) ? !!atoi(argv[5]) : YES
+        TerminationListener *termListen = [[TerminationListener alloc] initWithHostPath:args[1]
+                                                                         executablePath:args[2]
+                                                                        parentProcessId:[args[3] intValue]
+                                                                             folderPath:args[4]
+                                                                         shouldRelaunch:(args.count > 5) ? [args[5] boolValue] : YES
                                                                            shouldShowUI:shouldShowUI
-                                                                               selfPath:selfPath];
+                                                                               selfPath:[[NSBundle mainBundle] bundlePath]];
 
         [termListen class];
         [[NSApplication sharedApplication] run];

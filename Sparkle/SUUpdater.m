@@ -231,8 +231,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
     // Now we want to figure out how long until we check again.
     NSTimeInterval delayUntilCheck, updateCheckInterval = [self updateCheckInterval];
-    if (updateCheckInterval < SU_MIN_CHECK_INTERVAL)
-        updateCheckInterval = SU_MIN_CHECK_INTERVAL;
+    if (updateCheckInterval < SUMinimumUpdateCheckInterval)
+        updateCheckInterval = SUMinimumUpdateCheckInterval;
     if (intervalSinceCheck < updateCheckInterval)
         delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
     else
@@ -279,8 +279,6 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
                 BOOL reachable = (flags & kSCNetworkFlagsReachable) == kSCNetworkFlagsReachable;
                 BOOL automatic = (flags & kSCNetworkFlagsConnectionAutomatic) == kSCNetworkFlagsConnectionAutomatic;
                 BOOL local = (flags & kSCNetworkFlagsIsLocalAddress) == kSCNetworkFlagsIsLocalAddress;
-
-                //NSLog(@"reachable = %s, automatic = %s, local = %s", (reachable?"YES":"NO"), (automatic?"YES":"NO"), (local?"YES":"NO"));
 
                 if (!(reachable || automatic || local))
                     isNetworkReachable = NO;
@@ -382,7 +380,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     }
     @catch (NSException *)
     {
-        NSLog(@"Sparkle Error: [SUUpdater unregisterAsObserver] called, but the updater wasn't registered as an observer.");
+        SULog(@"Error: [SUUpdater unregisterAsObserver] called, but the updater wasn't registered as an observer.");
     }
 }
 
@@ -413,7 +411,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     // Hack to support backwards compatibility with older Sparkle versions, which supported
     // disabling updates by setting the check interval to 0.
     if (automaticallyCheckForUpdates && (NSInteger)[self updateCheckInterval] == 0) {
-        [self setUpdateCheckInterval:SU_DEFAULT_CHECK_INTERVAL];
+        [self setUpdateCheckInterval:SUDefaultUpdateCheckInterval];
     }
     [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
     // Provide a small delay in case multiple preferences are being updated simultaneously.
@@ -478,7 +476,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         return customUserAgentString;
     }
 
-    NSString *version = [SPARKLE_BUNDLE objectForInfoDictionaryKey:@"CFBundleVersion"];
+    NSString *version = [[NSBundle bundleWithIdentifier:SUBundleIdentifier] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     NSString *userAgent = [NSString stringWithFormat:@"%@/%@ Sparkle/%@", [self.host name], [self.host displayVersion], version ? version : @"?"];
     NSData *cleanedAgent = [userAgent dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
     return [[NSString alloc] initWithData:cleanedAgent encoding:NSASCIIStringEncoding];
@@ -555,7 +553,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     if (intervalValue)
         return [intervalValue doubleValue];
     else
-        return SU_DEFAULT_CHECK_INTERVAL;
+        return SUDefaultUpdateCheckInterval;
 }
 
 - (void)dealloc

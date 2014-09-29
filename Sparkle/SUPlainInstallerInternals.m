@@ -23,6 +23,10 @@
 #include <unistd.h>
 #include <sys/param.h>
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101000
+extern NSString *const NSURLQuarantinePropertiesKey WEAK_IMPORT_ATTRIBUTE;
+#endif
+
 static inline void PerformOnMainThreadSync(dispatch_block_t theBlock)
 {
     if ([NSThread isMainThread]) {
@@ -86,7 +90,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     // Let's try to read the version number so the filename will be more meaningful.
     NSString *postFix;
     NSString *version;
-	if ((version = [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:@"CFBundleVersion"]) && ![version isEqualToString:@""])
+	if ((version = [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]) && ![version isEqualToString:@""])
 	{
         NSMutableCharacterSet *validCharacters = [NSMutableCharacterSet alphanumericCharacterSet];
         [validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
@@ -134,23 +138,24 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     if (!tempDir)
         tempDir = [path stringByDeletingLastPathComponent];
 
-// Let's try to read the version number so the filename will be more meaningful.
-#if TRY_TO_APPEND_VERSION_NUMBER
-    NSString *postFix = nil;
-    NSString *version = nil;
-	if ((version = [[NSBundle bundleWithPath: path] objectForInfoDictionaryKey:@"CFBundleVersion"]) && ![version isEqualToString:@""])
-	{
-        NSMutableCharacterSet *validCharacters = [NSMutableCharacterSet alphanumericCharacterSet];
-        [validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
-        postFix = [version stringByTrimmingCharactersInSet:[validCharacters invertedSet]];
-	}
-	else {
-        postFix = @"old";
+    // Let's try to read the version number so the filename will be more meaningful
+    NSString *prefix;
+    if ([[[NSBundle bundleWithIdentifier:SUBundleIdentifier] infoDictionary][SUAppendVersionNumberKey] boolValue]) {
+        NSString *postFix = nil;
+        NSString *version = nil;
+        if ((version = [[NSBundle bundleWithPath: path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]) && ![version isEqualToString:@""])
+        {
+            NSMutableCharacterSet *validCharacters = [NSMutableCharacterSet alphanumericCharacterSet];
+            [validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
+            postFix = [version stringByTrimmingCharactersInSet:[validCharacters invertedSet]];
+        }
+        else {
+            postFix = @"old";
+        }
+        prefix = [NSString stringWithFormat:@"%@ (%@)", [[path lastPathComponent] stringByDeletingPathExtension], postFix];
+    } else {
+        prefix = [[path lastPathComponent] stringByDeletingPathExtension];
     }
-    NSString *prefix = [NSString stringWithFormat:@"%@ (%@)", [[path lastPathComponent] stringByDeletingPathExtension], postFix];
-#else
-    NSString *prefix = [[path lastPathComponent] stringByDeletingPathExtension];
-#endif
     NSString *tempName = [prefix stringByAppendingPathExtension:[path pathExtension]];
     tempDir = [tempDir stringByAppendingPathComponent:tempName];
 
@@ -438,14 +443,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		if( didFindTrash )
 		{
             NSError *err = nil;
-            if (![self _movePathWithForcedAuthentication:path toPath:trashPath error:&err])
-                SULog(@"Sparkle error: couldn't move %@ to the trash (%@). %@", path, trashPath, err);
+            if (![self _movePathWithForcedAuthentication:path toPath:trashPath error:&err]) {
+                SULog(@"Error: couldn't move %@ to the trash (%@). %@", path, trashPath, err);
+            }
 		}
-		else
-            SULog(@"Sparkle error: couldn't move %@ to the trash. This is often a sign of a permissions error.", path);
+        else {
+            SULog(@"Error: couldn't move %@ to the trash. This is often a sign of a permissions error.", path);
+        }
 	}
-	else
-        ; //SULog(@"Moved %@ to the trash.", path);
 }
 
 + (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)__unused tmp error:(NSError *__autoreleasing *)error
@@ -537,13 +542,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 @implementation SUPlainInstaller (MMExtendedAttributes)
 
-+ (int)removeXAttr:(const char *)name
++ (int)removeXAttr:(NSString *)name
           fromFile:(NSString *)file
            options:(int)options
 {
     // *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
     const char *path = NULL;
+    const char *attr = [name cStringUsingEncoding:NSASCIIStringEncoding];
     @try {
         path = [file fileSystemRepresentation];
     }
@@ -556,34 +562,57 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         return -1;
     }
 
-    return removexattr(path, name, options);
+    return removexattr(path, attr, options);
 }
 
 + (void)releaseFromQuarantine:(NSString *)root
 {
     // *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
-    const char *quarantineAttribute = "com.apple.quarantine";
-    const int removeXAttrOptions = XATTR_NOFOLLOW;
+    NSFileManager *manager = [NSFileManager defaultManager];
+#if __MAC_OS_X_VERSION_MIN_REQUIRED < 101000
+    if (!&NSURLQuarantinePropertiesKey) {
+        NSString *const quarantineAttribute = (NSString*)kLSItemQuarantineProperties;
+        const int removeXAttrOptions = XATTR_NOFOLLOW;
 
-    [self removeXAttr:quarantineAttribute
-             fromFile:root
-              options:removeXAttrOptions];
+        [self removeXAttr:quarantineAttribute
+                 fromFile:root
+                  options:removeXAttrOptions];
 
+        // Only recurse if it's actually a directory.  Don't recurse into a
+        // root-level symbolic link.
+        NSDictionary *rootAttributes = [manager attributesOfItemAtPath:root error:nil];
+        NSString *rootType = rootAttributes[NSFileType];
+
+        if (rootType == NSFileTypeDirectory) {
+            // The NSDirectoryEnumerator will avoid recursing into any contained
+            // symbolic links, so no further type checks are needed.
+            NSDirectoryEnumerator *directoryEnumerator = [manager enumeratorAtPath:root];
+            NSString *file = nil;
+            while ((file = [directoryEnumerator nextObject])) {
+                [self removeXAttr:quarantineAttribute
+                         fromFile:[root stringByAppendingPathComponent:file]
+                          options:removeXAttrOptions];
+            }
+        }
+        return;
+    }
+#endif
+    NSURL *rootURL = [NSURL fileURLWithPath:root];
+    [rootURL setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:NULL];
+    
     // Only recurse if it's actually a directory.  Don't recurse into a
     // root-level symbolic link.
-    NSDictionary *rootAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:root error:nil];
+    NSDictionary *rootAttributes = [manager attributesOfItemAtPath:root error:nil];
     NSString *rootType = rootAttributes[NSFileType];
 
     if (rootType == NSFileTypeDirectory) {
         // The NSDirectoryEnumerator will avoid recursing into any contained
         // symbolic links, so no further type checks are needed.
-        NSDirectoryEnumerator *directoryEnumerator = [[NSFileManager defaultManager] enumeratorAtPath:root];
-        NSString *file = nil;
-        while ((file = [directoryEnumerator nextObject])) {
-            [self removeXAttr:quarantineAttribute
-                     fromFile:[root stringByAppendingPathComponent:file]
-                      options:removeXAttrOptions];
+        NSDirectoryEnumerator *directoryEnumerator = [manager enumeratorAtURL:rootURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
+
+        for (NSURL *file in directoryEnumerator) {
+            [file setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:NULL];
         }
     }
 }

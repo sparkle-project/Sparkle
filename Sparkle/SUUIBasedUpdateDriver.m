@@ -75,7 +75,7 @@
 - (void)applicationDidBecomeActive:(NSNotification *)__unused aNotification
 {
     [[self.updateAlert window] makeKeyAndOrderFront:self];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
 - (void)updateAlert:(SUUpdateAlert *)__unused alert finishedWithChoice:(SUUpdateAlertChoice)choice
@@ -186,18 +186,21 @@
     [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
     [self.statusController setButtonEnabled:NO];
     [super installWithToolAndRelaunch:relaunch];
+}
 
-
+- (void)terminateApp
+{
     // if a user chooses to NOT relaunch the app (as is the case with WebKit
     // when it asks you if you are sure you want to close the app with multiple
     // tabs open), the status window still stays on the screen and obscures
     // other windows; with this fix, it doesn't
 
-	if (self.statusController)
-	{
+    if (self.statusController) {
         [self.statusController close];
         self.statusController = nil;
     }
+
+    [super terminateApp];
 }
 
 - (void)abortUpdateWithError:(NSError *)error

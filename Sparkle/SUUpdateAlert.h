@@ -14,13 +14,12 @@
 
 @protocol SUUpdateAlertDelegate;
 
-typedef enum
-{
+typedef NS_ENUM(NSInteger, SUUpdateAlertChoice) {
     SUInstallUpdateChoice,
     SURemindMeLaterChoice,
     SUSkipThisVersionChoice,
     SUOpenInfoURLChoice
-} SUUpdateAlertChoice;
+};
 
 @class WebView, SUAppcastItem, SUHost;
 @interface SUUpdateAlert : SUWindowController

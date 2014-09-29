@@ -148,14 +148,9 @@ static NSString *sUpdateFolder = nil;
     @catch (NSException *launchException)
     {
         // No big deal.
-        SULog(@"Sparkle Error: %@", [launchException description]);
+        SULog(@"Error: %@", [launchException description]);
     }
 }
-
-
-#define SUNotifyDictHostKey @"SUNotifyDictHost"
-#define SUNotifyDictErrorKey @"SUNotifyDictError"
-#define SUNotifyDictDelegateKey @"SUNotifyDictDelegate"
 
 + (void)finishInstallationToPath:(NSString *)installationPath withResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:(id<SUInstallerDelegate>)delegate
 {

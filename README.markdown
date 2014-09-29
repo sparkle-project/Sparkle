@@ -1,5 +1,8 @@
-# Sparkle <img src="Resources/Sparkle.png" width=48 height=48 alt=""/>
-is an easy-to-use software update framework for Cocoa developers.
+# Sparkle [![Build Status](https://travis-ci.org/sparkle-project/Sparkle.svg?branch=master)](https://travis-ci.org/sparkle-project/Sparkle)
+
+An easy-to-use software update framework for Cocoa developers.
+
+![Screenshot](Resources/Screenshot.png)
 
 ## Changes since 1.5b
 
@@ -13,19 +16,31 @@ is an easy-to-use software update framework for Cocoa developers.
 
 ## Features
 
-* True self-updating—no work required from the user.
-* Displays release notes to the user via WebKit.
+* True self-updating—the user can choose to automatically download and install all updates.
 * Displays a detailed progress window to the user.
 * Supports authentication for installing in secure locations.
-* Really, really easy to install.
-* Uses appcasts for release information.
-* The user can choose to automatically download and install all updates.
-* Seamless integration—there's no mention of Sparkle; your icons and app name are used.
 * Supports Apple code signing and DSA signatures for ultra-secure updates.
-* Sparkle requires no code in your app, so it's trivial to upgrade or remove the module.
-* Optionally sends user demographic information to the server when checking for updates.
+* Easy to install. Sparkle requires no code in your app, so it's trivial to upgrade or remove the framework.
+* Uses appcasts for release information. Appcasts are supported by 3rd party update-tracking programs and websites.
+* Displays release notes to the user via WebKit.
 * Sparkle doesn't bug the user until second launch for better first impressions.
-* Sparkle can install .pkg files for more complicated products.
-* Supports bundles, preference panes, plugins, and other non-.app software.
-* Supports branches due to minimum OS version requirements.
+* Seamless integration—there's no mention of Sparkle; your icons and app name are used.
 * Deep delegate support to make Sparkle work exactly as you need.
+* Optionally sends system information to the server when checking for updates.
+* Supports bundles, preference panes, plugins, and other non-.app software. Can install .pkg files for more complicated products.
+* Supports branches due to minimum OS version requirements.
+
+## Developers
+
+Building Sparkle requires Xcode 5 or above.
+
+### API
+
+Sparkle is built with `-fvisibility=hidden -fvisibility-inlines-hidden` which means no symbols are exported by default.
+If you are adding a symbol to the public API you must decorate the declaration with the `SU_EXPORT` macro (grep the source code for examples).
+
+### Building the distribution package
+
+`cd` to the root of the Sparkle source tree and run `make release`. Sparkle-*VERSION*.tar.bz2 will be created in a temporary directory and revealed in Finder after the build has completed.
+
+Alternatively, build the Distribution scheme in the Xcode UI.

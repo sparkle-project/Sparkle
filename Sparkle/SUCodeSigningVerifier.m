@@ -33,7 +33,7 @@
 
     result = SecCodeCopyDesignatedRequirement(hostCode, kSecCSDefaultFlags, &requirement);
     if (result != noErr) {
-        SULog(@"Failed to copy designated requirement %d", result);
+        SULog(@"Failed to copy designated requirement. Code Signing OSStatus code: %d", result);
         goto finally;
     }
 
@@ -58,10 +58,13 @@
     }
 
     if (result != noErr) {
+        if (result == errSecCSUnsigned) {
+            SULog(@"The host app is signed, but the new version of the app is not signed using Apple Code Signing. Please ensure that the new app is signed and that archiving did not corrupt the signature.");
+        }
         if (result == errSecCSReqFailed) {
             CFStringRef requirementString = nil;
             if (SecRequirementCopyString(requirement, kSecCSDefaultFlags, &requirementString) == noErr) {
-                SULog(@"Failed requirement %@", requirementString);
+                SULog(@"Code signature of the new version doesn't match the old version: %@. Please ensure that old and new app is signed using exactly the same certificate.", requirementString);
                 CFRelease(requirementString);
             }
 
@@ -77,6 +80,10 @@ finally:
     return (result == noErr);
 }
 
+static id valueOrNSNull(id value) {
+    return value ? value : [NSNull null];
+}
+
 + (void)logSigningInfoForCode:(SecStaticCodeRef)code label:(NSString*)label {
     CFDictionaryRef signingInfo = nil;
     const SecCSFlags flags = kSecCSSigningInformation | kSecCSRequirementInformation | kSecCSDynamicInformation | kSecCSContentInformation;
@@ -84,14 +91,11 @@ finally:
         NSDictionary *signingDict = CFBridgingRelease(signingInfo);
         NSMutableDictionary *relevantInfo = [NSMutableDictionary dictionary];
         for (NSString *key in @[@"format", @"identifier", @"requirements", @"teamid", @"signing-time"]) {
-            id value = nil;
-            if ((value = signingDict[key])) {
-                relevantInfo[key] = value;
-            }
+            relevantInfo[key] = valueOrNSNull(signingDict[key]);
         }
         NSDictionary *infoPlist = signingDict[@"info-plist"];
-        relevantInfo[@"version"] = infoPlist[@"CFBundleShortVersionString"];
-        relevantInfo[@"build"] = infoPlist[@"CFBundleVersion"];
+        relevantInfo[@"version"] = valueOrNSNull(infoPlist[@"CFBundleShortVersionString"]);
+        relevantInfo[@"build"] = valueOrNSNull(infoPlist[(__bridge NSString *)kCFBundleVersionKey]);
         SULog(@"%@: %@", label, relevantInfo);
     }
 }

@@ -65,8 +65,11 @@
     // the user would not know why the application was paused.
 	if ([aHost isBackgroundApplication]) { [[NSApplication sharedApplication] activateIgnoringOtherApps:YES]; }
 
-    SUUpdatePermissionPrompt *prompt = [[[self class] alloc] initWithHost:aHost systemProfile:profile delegate:d];
-    [NSApp runModalForWindow:[prompt window]];
+    if( ![NSApp modalWindow]) // do not prompt if there is is another modal window on screen
+    {
+        SUUpdatePermissionPrompt *prompt = [[[self class] alloc] initWithHost:aHost systemProfile:profile delegate:d];
+        [NSApp runModalForWindow:[prompt window]];
+    }
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }

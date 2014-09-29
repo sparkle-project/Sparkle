@@ -106,7 +106,7 @@
 - (void)displayReleaseNotes
 {
     // Set the default font
-    [self.releaseNotesView setPreferencesIdentifier:[SPARKLE_BUNDLE bundleIdentifier]];
+    [self.releaseNotesView setPreferencesIdentifier:SUBundleIdentifier];
     WebPreferences *prefs = [self.releaseNotesView preferences];
     NSString *familyName = [[NSFont systemFontOfSize:8] familyName];
     if ([familyName hasPrefix:@"."]) { // 10.9 returns ".Lucida Grande UI", which isn't a valid name for the WebView
