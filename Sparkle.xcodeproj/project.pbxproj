@@ -1435,7 +1435,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "RESOURCES_PATH=\"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\nmv -f \"${RESOURCES_PATH}/pt_BR.lproj\" \"${RESOURCES_PATH}/pt-BR.lproj\"\nmv -f \"${RESOURCES_PATH}/zh_CN.lproj\" \"${RESOURCES_PATH}/zh-Hans.lproj\"\nmv -f \"${RESOURCES_PATH}/zh_TW.lproj\" \"${RESOURCES_PATH}/zh-Hant-TW.lproj\"\n";
+			shellScript = "RESOURCES_PATH=\"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\n\nrm -Rf \"${RESOURCES_PATH}/pt-BR.lproj\"\nmv -f \"${RESOURCES_PATH}/pt_BR.lproj\" \"${RESOURCES_PATH}/pt-BR.lproj\"\n\nrm -Rf \"${RESOURCES_PATH}/zh-Hans.lproj\"\nmv -f \"${RESOURCES_PATH}/zh_CN.lproj\" \"${RESOURCES_PATH}/zh-Hans.lproj\"\n\nrm -Rf \"${RESOURCES_PATH}/zh-Hant-TW.lproj\"\nmv -f \"${RESOURCES_PATH}/zh_TW.lproj\" \"${RESOURCES_PATH}/zh-Hant-TW.lproj\"\n";
 		};
 		5D06E90D0FD68DA3005AE3F6 /* Fix Install Name */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2511,6 +2511,7 @@
 				33C7DE0519DB0333009887CD /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		33C7DE4119DB05A9009887CD /* Build configuration list for PBXNativeTarget "Sparkle_lib_resources" */ = {
 			isa = XCConfigurationList;
@@ -2521,6 +2522,7 @@
 				33C7DE4519DB05A9009887CD /* Release (GC dual-mode; 10.5+) */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		55C14BBE136EEF1500649790 /* Build configuration list for PBXNativeTarget "finish_installation" */ = {
 			isa = XCConfigurationList;
