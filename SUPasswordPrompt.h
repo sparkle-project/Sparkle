@@ -7,7 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "Sparkle/SUWindowController.h"
+#import "SUWindowController.h"
 
 @interface SUPasswordPrompt : SUWindowController 
 {

@@ -9,11 +9,6 @@
 #ifndef SUPLAININSTALLER_H
 #define SUPLAININSTALLER_H
 
-#import "SUUpdater.h"
-
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
-#import "SUVersionComparisonProtocol.h"
 #import "SUInstaller.h"
 #import "SUVersionComparisonProtocol.h"
 

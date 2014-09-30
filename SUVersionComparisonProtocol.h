@@ -9,8 +9,6 @@
 #ifndef SUVERSIONCOMPARISONPROTOCOL_H
 #define SUVERSIONCOMPARISONPROTOCOL_H
 
-#import <Cocoa/Cocoa.h>
-
 /*!
     @protocol
     @abstract    Implement this protocol to provide version comparison facilities for Sparkle.

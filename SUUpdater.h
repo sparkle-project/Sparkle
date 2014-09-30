@@ -9,10 +9,8 @@
 #ifndef SUUPDATER_H
 #define SUUPDATER_H
 
-#import "SUVersionComparisonProtocol.h"
-#import "SUVersionDisplayProtocol.h"
-
 @class SUUpdateDriver, SUAppcastItem, SUHost, SUAppcast;
+@protocol SUVersionComparison, SUVersionDisplay;
 
 @interface SUUpdater : NSObject
 {

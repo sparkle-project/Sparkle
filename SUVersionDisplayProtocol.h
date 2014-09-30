@@ -6,8 +6,6 @@
 //  Copyright 2009 Elgato Systems GmbH. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
-
 
 /*!
     @protocol
