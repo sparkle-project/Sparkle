@@ -30,7 +30,11 @@
 
 #ifdef __OBJC__
 
-#define SPARKLE_BUNDLE [NSBundle bundleForClass:NSClassFromString(@"SUUpdater")]
+#ifndef SPARKLE_MAIN_CLASS
+#define SPARKLE_MAIN_CLASS @"SUUpdater"
+#endif
+
+#define SPARKLE_BUNDLE [NSBundle bundleForClass:NSClassFromString(SPARKLE_MAIN_CLASS)]
 #define SULocalizedString(key,comment) NSLocalizedStringFromTableInBundle(key, @"Sparkle", SPARKLE_BUNDLE, comment)
 #define SUAbstractFail() NSAssert2(nil, @"Can't call %@ on an instance of %@; this is an abstract method!", __PRETTY_FUNCTION__, [self class]);
 

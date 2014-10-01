@@ -70,9 +70,9 @@
 		33C7DE5019DB0760009887CD /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		33C7DE5119DB0766009887CD /* SUAppcast.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B5FB9409C4F04600B25A18 /* SUAppcast.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		33C7DE5219DB076F009887CD /* SUAppcastItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B5FC5309C5182000B25A18 /* SUAppcastItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		33C7DE5319DB077D009887CD /* Sparkle.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299B3509CB04E000B7442F /* Sparkle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		33C7DE5419DB0785009887CD /* SUVersionComparisonProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 61A2259C0D1C495D00430CCD /* SUVersionComparisonProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		33C7DE5519DB078C009887CD /* SUUpdaterQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 33C3934A198A825600C29D9D /* SUUpdaterQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		33C7DE9619DBF387009887CD /* DevMateSparkle.h in Headers */ = {isa = PBXBuildFile; fileRef = 33C7DE9419DBF27B009887CD /* DevMateSparkle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		33D081831888446F00394A94 /* libDMCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33D081821888446E00394A94 /* libDMCore.a */; };
 		3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		525A2790133D6AE900FD8D70 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
@@ -339,8 +339,10 @@
 		33C07AAC198B887F0039242D /* SUAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUAppDelegate.m; sourceTree = "<group>"; };
 		33C3934A198A825600C29D9D /* SUUpdaterQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdaterQueue.h; sourceTree = "<group>"; };
 		33C3934B198A825600C29D9D /* SUUpdaterQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterQueue.m; sourceTree = "<group>"; };
-		33C7DDF119DB0333009887CD /* libSparkle.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSparkle.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		33C7DE3D19DB05A9009887CD /* Sparkle_Resources */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Sparkle_Resources; sourceTree = BUILT_PRODUCTS_DIR; };
+		33C7DDF119DB0333009887CD /* libDevMateSparkle.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDevMateSparkle.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		33C7DE3D19DB05A9009887CD /* DevMateSparkle_Resources */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DevMateSparkle_Resources; sourceTree = BUILT_PRODUCTS_DIR; };
+		33C7DE9419DBF27B009887CD /* DevMateSparkle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DevMateSparkle.h; sourceTree = "<group>"; };
+		33C7DE9519DBF31A009887CD /* DevMateSparkle.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DevMateSparkle.pch; sourceTree = "<group>"; };
 		33CE69761934D1F8009D5956 /* ReleaseNotes.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = ReleaseNotes.rtf; sourceTree = "<group>"; };
 		33D081821888446E00394A94 /* libDMCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libDMCore.a; path = External/libDMCore.a; sourceTree = "<group>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
@@ -681,8 +683,8 @@
 				55C14BB7136EEF1500649790 /* finish_installation.app */,
 				8B887B5E1517F3AB000BB292 /* com.andymatuschak.Sparkle.install-service.xpc */,
 				03B5E63A15D399500038BB67 /* com.andymatuschak.Sparkle.download-service.xpc */,
-				33C7DDF119DB0333009887CD /* libSparkle.a */,
-				33C7DE3D19DB05A9009887CD /* Sparkle_Resources */,
+				33C7DDF119DB0333009887CD /* libDevMateSparkle.a */,
+				33C7DE3D19DB05A9009887CD /* DevMateSparkle_Resources */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -895,6 +897,8 @@
 				61299A5F09CA6EB100B7442F /* SUConstants.m */,
 				55C14F04136EF6DB00649790 /* SULog.h */,
 				55C14F05136EF6DB00649790 /* SULog.m */,
+				33C7DE9419DBF27B009887CD /* DevMateSparkle.h */,
+				33C7DE9519DBF31A009887CD /* DevMateSparkle.pch */,
 			);
 			includeInIndex = 1;
 			name = "Other Sources";
@@ -1034,10 +1038,10 @@
 				33C7DE5219DB076F009887CD /* SUAppcastItem.h in Headers */,
 				33C7DE5119DB0766009887CD /* SUAppcast.h in Headers */,
 				33C7DE5419DB0785009887CD /* SUVersionComparisonProtocol.h in Headers */,
-				33C7DE5319DB077D009887CD /* Sparkle.h in Headers */,
 				33C7DE5019DB0760009887CD /* SUVersionDisplayProtocol.h in Headers */,
 				33C7DE5519DB078C009887CD /* SUUpdaterQueue.h in Headers */,
 				33C7DE4F19DB0754009887CD /* SUUpdater.h in Headers */,
+				33C7DE9619DBF387009887CD /* DevMateSparkle.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1112,9 +1116,9 @@
 			productReference = 03B5E63A15D399500038BB67 /* com.andymatuschak.Sparkle.download-service.xpc */;
 			productType = "com.apple.product-type.bundle";
 		};
-		33C7DDF019DB0333009887CD /* Sparkle_lib */ = {
+		33C7DDF019DB0333009887CD /* DevMateSparkle_lib */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 33C7DE0A19DB0333009887CD /* Build configuration list for PBXNativeTarget "Sparkle_lib" */;
+			buildConfigurationList = 33C7DE0A19DB0333009887CD /* Build configuration list for PBXNativeTarget "DevMateSparkle_lib" */;
 			buildPhases = (
 				33C7DDED19DB0333009887CD /* Sources */,
 				33C7DDEE19DB0333009887CD /* Frameworks */,
@@ -1124,14 +1128,14 @@
 			dependencies = (
 				33C7DE5719DB0B05009887CD /* PBXTargetDependency */,
 			);
-			name = Sparkle_lib;
+			name = DevMateSparkle_lib;
 			productName = Sparkle_lib;
-			productReference = 33C7DDF119DB0333009887CD /* libSparkle.a */;
+			productReference = 33C7DDF119DB0333009887CD /* libDevMateSparkle.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		33C7DE3C19DB05A9009887CD /* Sparkle_lib_resources */ = {
+		33C7DE3C19DB05A9009887CD /* DevMateSparkle_lib_resources */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 33C7DE4119DB05A9009887CD /* Build configuration list for PBXNativeTarget "Sparkle_lib_resources" */;
+			buildConfigurationList = 33C7DE4119DB05A9009887CD /* Build configuration list for PBXNativeTarget "DevMateSparkle_lib_resources" */;
 			buildPhases = (
 				33C7DE3B19DB05A9009887CD /* Resources */,
 				33C7DE4619DB06E9009887CD /* Headers */,
@@ -1144,9 +1148,9 @@
 				33C7DE5D19DB0C1A009887CD /* PBXTargetDependency */,
 				33C7DE5919DB0BF4009887CD /* PBXTargetDependency */,
 			);
-			name = Sparkle_lib_resources;
+			name = DevMateSparkle_lib_resources;
 			productName = Sparkle_lib_resources;
-			productReference = 33C7DE3D19DB05A9009887CD /* Sparkle_Resources */;
+			productReference = 33C7DE3D19DB05A9009887CD /* DevMateSparkle_Resources */;
 			productType = "com.apple.product-type.bundle";
 		};
 		55C14BB6136EEF1500649790 /* finish_installation */ = {
@@ -1338,8 +1342,8 @@
 				55C14BB6136EEF1500649790 /* finish_installation */,
 				8B887B5D1517F3AB000BB292 /* Installation XPC Service */,
 				03B5E63915D399500038BB67 /* Downloading XPC Service */,
-				33C7DDF019DB0333009887CD /* Sparkle_lib */,
-				33C7DE3C19DB05A9009887CD /* Sparkle_lib_resources */,
+				33C7DDF019DB0333009887CD /* DevMateSparkle_lib */,
+				33C7DE3C19DB05A9009887CD /* DevMateSparkle_lib_resources */,
 			);
 		};
 /* End PBXProject section */
@@ -1684,7 +1688,7 @@
 		};
 		33C7DE5719DB0B05009887CD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 33C7DE3C19DB05A9009887CD /* Sparkle_lib_resources */;
+			target = 33C7DE3C19DB05A9009887CD /* DevMateSparkle_lib_resources */;
 			targetProxy = 33C7DE5619DB0B05009887CD /* PBXContainerItemProxy */;
 		};
 		33C7DE5919DB0BF4009887CD /* PBXTargetDependency */ = {
@@ -2013,6 +2017,8 @@
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
+				GCC_PREFIX_HEADER = DevMateSparkle.pch;
+				PRODUCT_NAME = DevMateSparkle;
 			};
 			name = Debug;
 		};
@@ -2021,6 +2027,8 @@
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
+				GCC_PREFIX_HEADER = DevMateSparkle.pch;
+				PRODUCT_NAME = DevMateSparkle;
 			};
 			name = Release;
 		};
@@ -2029,6 +2037,8 @@
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
+				GCC_PREFIX_HEADER = DevMateSparkle.pch;
+				PRODUCT_NAME = DevMateSparkle;
 			};
 			name = Deployment;
 		};
@@ -2037,6 +2047,8 @@
 			baseConfigurationReference = 61072EB20DF2640C008FE88B /* ConfigFrameworkReleaseGCSupport.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "";
+				GCC_PREFIX_HEADER = DevMateSparkle.pch;
+				PRODUCT_NAME = DevMateSparkle;
 			};
 			name = "Release (GC dual-mode; 10.5+)";
 		};
@@ -2071,7 +2083,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "";
-				PRODUCT_NAME = Sparkle_Resources;
+				PRODUCT_NAME = DevMateSparkle_Resources;
 				WRAPPER_SUFFIX = "";
 			};
 			name = Debug;
@@ -2105,7 +2117,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "";
-				PRODUCT_NAME = Sparkle_Resources;
+				PRODUCT_NAME = DevMateSparkle_Resources;
 				WRAPPER_SUFFIX = "";
 			};
 			name = Release;
@@ -2139,7 +2151,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "";
-				PRODUCT_NAME = Sparkle_Resources;
+				PRODUCT_NAME = DevMateSparkle_Resources;
 				WRAPPER_SUFFIX = "";
 			};
 			name = Deployment;
@@ -2173,7 +2185,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "";
-				PRODUCT_NAME = Sparkle_Resources;
+				PRODUCT_NAME = DevMateSparkle_Resources;
 				WRAPPER_SUFFIX = "";
 			};
 			name = "Release (GC dual-mode; 10.5+)";
@@ -2502,7 +2514,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		33C7DE0A19DB0333009887CD /* Build configuration list for PBXNativeTarget "Sparkle_lib" */ = {
+		33C7DE0A19DB0333009887CD /* Build configuration list for PBXNativeTarget "DevMateSparkle_lib" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				33C7DE0219DB0333009887CD /* Debug */,
@@ -2513,7 +2525,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		33C7DE4119DB05A9009887CD /* Build configuration list for PBXNativeTarget "Sparkle_lib_resources" */ = {
+		33C7DE4119DB05A9009887CD /* Build configuration list for PBXNativeTarget "DevMateSparkle_lib_resources" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				33C7DE4219DB05A9009887CD /* Debug */,
