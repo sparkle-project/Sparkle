@@ -47,6 +47,8 @@
 #define SUScheduledUpdateDriver                 DM_SUScheduledUpdateDriver
 #define SUDiskImageUnarchiver                   DM_SUDiskImageUnarchiver
 #define NTSynchronousTask                       DM_NTSynchronousTask
+#define SUUpdaterWorking                        DM_SUUpdater // Used in SUUpdaterLoader.m file
+#define SUUpdaterLoader                         DM_SUUpdaterLoader
 
 #import "Sparkle.pch"
 

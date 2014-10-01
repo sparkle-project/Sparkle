@@ -73,6 +73,7 @@
 		33C7DE5419DB0785009887CD /* SUVersionComparisonProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 61A2259C0D1C495D00430CCD /* SUVersionComparisonProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		33C7DE5519DB078C009887CD /* SUUpdaterQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 33C3934A198A825600C29D9D /* SUUpdaterQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		33C7DE9619DBF387009887CD /* DevMateSparkle.h in Headers */ = {isa = PBXBuildFile; fileRef = 33C7DE9419DBF27B009887CD /* DevMateSparkle.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		33C7DE9F19DC0C8E009887CD /* SUUpdaterLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 33C7DE9E19DC0C8E009887CD /* SUUpdaterLoader.m */; };
 		33D081831888446F00394A94 /* libDMCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33D081821888446E00394A94 /* libDMCore.a */; };
 		3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		525A2790133D6AE900FD8D70 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
@@ -343,6 +344,7 @@
 		33C7DE3D19DB05A9009887CD /* DevMateSparkle_Resources */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DevMateSparkle_Resources; sourceTree = BUILT_PRODUCTS_DIR; };
 		33C7DE9419DBF27B009887CD /* DevMateSparkle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DevMateSparkle.h; sourceTree = "<group>"; };
 		33C7DE9519DBF31A009887CD /* DevMateSparkle.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DevMateSparkle.pch; sourceTree = "<group>"; };
+		33C7DE9E19DC0C8E009887CD /* SUUpdaterLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterLoader.m; sourceTree = "<group>"; };
 		33CE69761934D1F8009D5956 /* ReleaseNotes.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = ReleaseNotes.rtf; sourceTree = "<group>"; };
 		33D081821888446E00394A94 /* libDMCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libDMCore.a; path = External/libDMCore.a; sourceTree = "<group>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
@@ -958,6 +960,7 @@
 				61B5F8E309C4CE3C00B25A18 /* SUUpdater.h */,
 				6158A1C4137904B300487EC1 /* SUUpdater_Private.h */,
 				61B5F8E409C4CE3C00B25A18 /* SUUpdater.m */,
+				33C7DE9E19DC0C8E009887CD /* SUUpdaterLoader.m */,
 				33C3934A198A825600C29D9D /* SUUpdaterQueue.h */,
 				33C3934B198A825600C29D9D /* SUUpdaterQueue.m */,
 				61CFB2C20E38496B007A1735 /* Drivers */,
@@ -1557,6 +1560,7 @@
 				33C7DE1D19DB0496009887CD /* SUAppcast.m in Sources */,
 				33C7DE2F19DB04CD009887CD /* SUStatusController.m in Sources */,
 				33C7DE3519DB04CD009887CD /* SUHost.m in Sources */,
+				33C7DE9F19DC0C8E009887CD /* SUUpdaterLoader.m in Sources */,
 				33C7DE2A19DB04CD009887CD /* SUPipedUnarchiver.m in Sources */,
 				33C7DE1219DB0460009887CD /* SUUpdater.m in Sources */,
 				33C7DE3719DB04CD009887CD /* SULog.m in Sources */,
