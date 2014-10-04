@@ -436,6 +436,13 @@
     if (self.download) {
         [self.download cancel];
     }
+
+    // Notify host app that update has aborted
+    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+    if ([updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
+        [updaterDelegate updater:self.updater didAbortWithError:error];
+    }
+
     [self abortUpdate];
 }
 
