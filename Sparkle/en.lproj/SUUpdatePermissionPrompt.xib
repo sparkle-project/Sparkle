@@ -44,7 +44,7 @@ DQ
                     <button verticalHuggingPriority="750" id="14">
                         <rect key="frame" x="138" y="12" width="117" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
-                        <buttonCell key="cell" type="push" title="Don't Check" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="177">
+                        <buttonCell key="cell" type="push" title="Don’t Check" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="177">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
