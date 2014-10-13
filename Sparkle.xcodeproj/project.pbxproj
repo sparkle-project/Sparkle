@@ -1442,7 +1442,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "RESOURCES_PATH=\"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\n\nrm -Rf \"${RESOURCES_PATH}/pt-BR.lproj\"\nmv -f \"${RESOURCES_PATH}/pt_BR.lproj\" \"${RESOURCES_PATH}/pt-BR.lproj\"\n\nrm -Rf \"${RESOURCES_PATH}/zh-Hans.lproj\"\nmv -f \"${RESOURCES_PATH}/zh_CN.lproj\" \"${RESOURCES_PATH}/zh-Hans.lproj\"\n\nrm -Rf \"${RESOURCES_PATH}/zh-Hant-TW.lproj\"\nmv -f \"${RESOURCES_PATH}/zh_TW.lproj\" \"${RESOURCES_PATH}/zh-Hant-TW.lproj\"\n";
+			shellScript = "RESOURCES_PATH=\"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\n\nrm -Rf \"${RESOURCES_PATH}/pt-BR.lproj\"\nmv -f \"${RESOURCES_PATH}/pt_BR.lproj\" \"${RESOURCES_PATH}/pt-BR.lproj\"\n\nrm -Rf \"${RESOURCES_PATH}/zh-Hans.lproj\"\nmv -f \"${RESOURCES_PATH}/zh_CN.lproj\" \"${RESOURCES_PATH}/zh-Hans.lproj\"\n\nrm -Rf \"${RESOURCES_PATH}/zh-Hant-TW.lproj\"\nmv -f \"${RESOURCES_PATH}/zh_TW.lproj\" \"${RESOURCES_PATH}/zh-Hant-TW.lproj\"\n\nRESOURCES_PATH=\"${RESOURCES_PATH}/finish_installation.app/Contents/Resources\"\n\nrm -Rf \"${RESOURCES_PATH}/pt-BR.lproj\"\nmv -f \"${RESOURCES_PATH}/pt_BR.lproj\" \"${RESOURCES_PATH}/pt-BR.lproj\"\n\nrm -Rf \"${RESOURCES_PATH}/zh-Hans.lproj\"\nmv -f \"${RESOURCES_PATH}/zh_CN.lproj\" \"${RESOURCES_PATH}/zh-Hans.lproj\"\n\nrm -Rf \"${RESOURCES_PATH}/zh-Hant-TW.lproj\"\nmv -f \"${RESOURCES_PATH}/zh_TW.lproj\" \"${RESOURCES_PATH}/zh-Hant-TW.lproj\"\n";
 		};
 		5D06E90D0FD68DA3005AE3F6 /* Fix Install Name */ = {
 			isa = PBXShellScriptBuildPhase;
