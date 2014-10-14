@@ -10,6 +10,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "SUConstants.h"
+#import "SUErrors.h"
 
 #define SULocalizedString(key, comment) NSLocalizedStringFromTableInBundle(key, @"Sparkle", [NSBundle bundleWithIdentifier:SUBundleIdentifier] ? [NSBundle bundleWithIdentifier:SUBundleIdentifier] : [NSBundle mainBundle], comment)
 

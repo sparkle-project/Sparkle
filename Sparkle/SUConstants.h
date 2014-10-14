@@ -79,33 +79,4 @@ extern NSString *const SURSSElementLink;
 extern NSString *const SURSSElementPubDate;
 extern NSString *const SURSSElementTitle;
 
-// -----------------------------------------------------------------------------
-//	Errors:
-// -----------------------------------------------------------------------------
-
-extern NSString *const SUSparkleErrorDomain;
-typedef NS_ENUM(OSStatus, SUError) {
-    // Appcast phase errors.
-    SUAppcastParseError = 1000,
-    SUNoUpdateError = 1001,
-    SUAppcastError = 1002,
-    SURunningFromDiskImageError = 1003,
-
-    // Downlaod phase errors.
-    SUTemporaryDirectoryError = 2000,
-
-    // Extraction phase errors.
-    SUUnarchivingError = 3000,
-    SUSignatureError = 3001,
-
-    // Installation phase errors.
-    SUFileCopyFailure = 4000,
-    SUAuthenticationFailure = 4001,
-    SUMissingUpdateError = 4002,
-    SUMissingInstallerToolError = 4003,
-    SURelaunchError = 4004,
-    SUInstallationError = 4005,
-    SUDowngradeError = 4006
-};
-
 #endif
