@@ -250,13 +250,6 @@
 			remoteGlobalIDString = 8B887B5D1517F3AB000BB292;
 			remoteInfo = "Installation XPC Service";
 		};
-		33C7DE5C19DB0C1A009887CD /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 03B5E63915D399500038BB67;
-			remoteInfo = "Downloading XPC Service";
-		};
 		55C14F96136F044100649790 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -1148,7 +1141,6 @@
 			);
 			dependencies = (
 				33C7DE5B19DB0C1A009887CD /* PBXTargetDependency */,
-				33C7DE5D19DB0C1A009887CD /* PBXTargetDependency */,
 				33C7DE5919DB0BF4009887CD /* PBXTargetDependency */,
 			);
 			name = DevMateSparkle_lib_resources;
@@ -1704,11 +1696,6 @@
 			isa = PBXTargetDependency;
 			target = 8B887B5D1517F3AB000BB292 /* Installation XPC Service */;
 			targetProxy = 33C7DE5A19DB0C1A009887CD /* PBXContainerItemProxy */;
-		};
-		33C7DE5D19DB0C1A009887CD /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 03B5E63915D399500038BB67 /* Downloading XPC Service */;
-			targetProxy = 33C7DE5C19DB0C1A009887CD /* PBXContainerItemProxy */;
 		};
 		55C14F97136F044100649790 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
