@@ -13,7 +13,7 @@
 
 // If you are using your own copy of Sparkle.framework just define
 // USED_CUSTOM_SPARKLE_FRAMEWORK macro.
-#ifndef  USED_CUSTOM_SPARKLE_FRAMEWORK
+#ifndef USED_CUSTOM_SPARKLE_FRAMEWORK
 
 #define SUUpdater                               DM_SUUpdater
 #define SUUpdaterQueue                          DM_SUUpdaterQueue
