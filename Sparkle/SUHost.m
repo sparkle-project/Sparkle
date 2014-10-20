@@ -66,21 +66,26 @@ typedef struct {
     return [self.bundle bundlePath];
 }
 
-- (NSString *)appSupportPath
+- (NSString *)appCachePath
 {
-    NSArray *appSupportPaths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
-    NSString *appSupportPath = nil;
-    if (!appSupportPaths || [appSupportPaths count] == 0)
-    {
-        SULog(@"Failed to find app support directory! Using ~/Library/Application Support...");
-        appSupportPath = [@"~/Library/Application Support" stringByExpandingTildeInPath];
+    NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *cachePath = nil;
+    if ([cachePaths count]) {
+        cachePath = cachePaths[0];
     }
-	else {
-        appSupportPath = appSupportPaths[0];
+    if (!cachePath) {
+        SULog(@"Failed to find user's cache directory! Using system default");
+        cachePath = NSTemporaryDirectory();
     }
-    appSupportPath = [appSupportPath stringByAppendingPathComponent:[self name]];
-    appSupportPath = [appSupportPath stringByAppendingPathComponent:@".Sparkle"];
-    return appSupportPath;
+
+    NSString *name = [self.bundle bundleIdentifier];
+    if (!name) {
+        name = [self name];
+    }
+
+    cachePath = [cachePath stringByAppendingPathComponent:name];
+    cachePath = [cachePath stringByAppendingPathComponent:@"Sparkle"];
+    return cachePath;
 }
 
 - (NSString *)installationPath

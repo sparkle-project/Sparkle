@@ -200,11 +200,11 @@
     NSString *downloadFileName = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
 
 
-    self.tempDir = [[self.host appSupportPath] stringByAppendingPathComponent:downloadFileName];
+    self.tempDir = [self.host.appCachePath stringByAppendingPathComponent:downloadFileName];
     int cnt = 1;
 	while ([[NSFileManager defaultManager] fileExistsAtPath:self.tempDir] && cnt <= 999)
 	{
-        self.tempDir = [[self.host appSupportPath] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, cnt++]];
+        self.tempDir = [self.host.appCachePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, cnt++]];
     }
 
     // Create the temporary directory if necessary.
@@ -358,7 +358,7 @@
     NSString *const relaunchPathToCopy = [sparkleBundle pathForResource:[[sparkleBundle infoDictionary] objectForKey:SURelaunchToolNameKey] ofType:@"app"];
 	if (relaunchPathToCopy != nil)
 	{
-        NSString *targetPath = [[self.host appSupportPath] stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
+        NSString *targetPath = [self.host.appCachePath stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
         // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
         NSError *error = nil;
         [[NSFileManager defaultManager] createDirectoryAtPath:[targetPath stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:@{} error:&error];
