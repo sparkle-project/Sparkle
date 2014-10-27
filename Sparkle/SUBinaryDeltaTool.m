@@ -227,11 +227,7 @@ int main(int __unused argc, char __unused *argv[])
         NSOperationQueue *deltaQueue = [[NSOperationQueue alloc] init];
         NSMutableArray *deltaOperations = [NSMutableArray array];
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wselector"
-        // Xcode 5.1.1: compare: is clearly declared, must warn due to a compiler bug?
         NSArray *keys = [[newTreeState allKeys] sortedArrayUsingSelector:@selector(compare:)];
-#pragma clang diagnostic pop
         for (NSString* key in keys) {
             id value = [newTreeState valueForKey:key];
 
