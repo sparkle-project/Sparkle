@@ -204,11 +204,7 @@
 
 	if ([appcastItems count])
     {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wselector"
-        // @selector(date) is from SUAppcastItem
-        NSSortDescriptor *sort = [[NSSortDescriptor alloc] initWithKey:NSStringFromSelector(@selector(date)) ascending:NO];
-#pragma clang diagnostic pop
+        NSSortDescriptor *sort = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO];
         [appcastItems sortUsingDescriptors:@[sort]];
         self.items = appcastItems;
     }
