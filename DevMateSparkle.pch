@@ -6,7 +6,7 @@
 //
 //
 
-#define SPARKLE_MAIN_CLASS @"DM_SUSparkle"
+#define SPARKLE_MAIN_CLASS @"DM_SUUpdater"
 
 #define SUUpdater                               DM_SUUpdater
 #define SUUpdaterQueue                          DM_SUUpdaterQueue
