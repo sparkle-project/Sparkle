@@ -30,10 +30,6 @@ static NSString *const SULogFilePath = @"~/Library/Logs/SparkleUpdateLog.log";
 //
 //	TAKES:
 //		sender	-	Object that sent this message, typically of type X.
-//
-//	GIVES:
-//		param	-	who owns the returned value?
-//		result	-	same here.
 // -----------------------------------------------------------------------------
 
 void SUClearLog(void)

@@ -55,8 +55,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize driver;
 @synthesize host;
 
-#pragma mark Initialization
-
 static NSMutableDictionary *sharedUpdaters = nil;
 static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
 

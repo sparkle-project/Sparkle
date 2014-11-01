@@ -12,7 +12,8 @@
 	Your tech support will hug you if you tell them about this.
 */
 
-#pragma once
+#ifndef SULOG_H
+#define SULOG_H
 
 // -----------------------------------------------------------------------------
 //	Headers:
@@ -28,4 +29,4 @@
 void SUClearLog(void);
 void SULog(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
 
-
+#endif

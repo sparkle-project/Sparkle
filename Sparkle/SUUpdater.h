@@ -312,6 +312,14 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  */
 - (void)updater:(SUUpdater *)updater didCancelInstallUpdateOnQuit:(SUAppcastItem *)item;
 
+/*!
+    Called after an update is aborted due to an error.
+
+    \param updater The SUUpdater instance.
+    \param error The error that caused the abort
+ */
+- (void)updater:(SUUpdater *)updater didAbortWithError:(NSError *)error;
+
 @end
 
 #endif
