@@ -14,7 +14,7 @@
 
 "A new version of %@ is ready to install!" = "新版本的 %@ 已準備安裝！";
 
-"An error occurred in retrieving update information. Please try again later." = "擷取更新資訊時發生錯誤。請稍後再試一次。請稍後再試一次。";
+"An error occurred in retrieving update information. Please try again later." = "擷取更新資訊時發生錯誤。請稍後再試一次。";
 
 "An error occurred while downloading the update. Please try again later." = "下載更新項目時發生錯誤。請稍後再試一次。";
 
