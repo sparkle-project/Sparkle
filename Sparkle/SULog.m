@@ -37,6 +37,7 @@ void SUClearLog(void)
     FILE *logfile = fopen([[SULogFilePath stringByExpandingTildeInPath] fileSystemRepresentation], "w");
     if (logfile) {
         fclose(logfile);
+        SULog(@"===== %@ =====", [[NSFileManager defaultManager] displayNameAtPath:[[NSBundle mainBundle] bundlePath]]);
     }
 }
 
@@ -53,6 +54,12 @@ void SUClearLog(void)
 
 void SULog(NSString *format, ...)
 {
+    static BOOL loggedYet = NO;
+    if (!loggedYet) {
+        loggedYet = YES;
+        SUClearLog();
+    }
+
     va_list ap;
     va_start(ap, format);
     NSString *theStr = [[NSString alloc] initWithFormat:format arguments:ap];
