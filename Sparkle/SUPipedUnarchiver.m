@@ -22,7 +22,10 @@
                                     @".tar.gz": @"extractTGZ",
                                     @".tgz": @"extractTGZ",
                                     @".tar.bz2": @"extractTBZ",
-                                    @".tbz": @"extractTBZ" };
+                                    @".tbz": @"extractTBZ",
+                                    @".tar.xz": @"extractTXZ",
+                                    @".txz": @"extractTXZ",
+                                    @".tar.lzma": @"extractTXZ"};
 
     NSString *lastPathComponent = [path lastPathComponent];
 	for (NSString *currentType in typeSelectorDictionary)
@@ -141,6 +144,13 @@
     // *** GETS CALLED ON NON-MAIN THREAD!!!
 
     [self extractArchivePipingDataToCommand:@"ditto -x -k - \"$DESTINATION\""];
+}
+
+- (void)extractTXZ
+{
+    // *** GETS CALLED ON NON-MAIN THREAD!!!
+
+    [self extractArchivePipingDataToCommand:@"tar -zxC \"$DESTINATION\""];
 }
 
 + (void)load
