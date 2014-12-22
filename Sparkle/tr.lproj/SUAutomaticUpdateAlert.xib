@@ -57,7 +57,7 @@
                     <button verticalHuggingPriority="750" id="15">
                         <rect key="frame" x="502" y="12" width="164" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
-                        <buttonCell key="cell" type="push" title="Kur ve tekrar başlat" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="41">
+                        <buttonCell key="cell" type="push" title="Kur ve yeniden başlat" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="41">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
@@ -96,7 +96,7 @@ Gw
                     <button id="17">
                         <rect key="frame" x="105" y="58" width="419" height="18"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <buttonCell key="cell" type="check" title="Bundan sonra Güncellemeleri otomatik olarak indir ve kur" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="43">
+                        <buttonCell key="cell" type="check" title="Bundan sonra güncellemeleri kendiliğinden indir ve kur" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="43">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                         </buttonCell>
