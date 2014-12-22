@@ -30,7 +30,7 @@
                     <button verticalHuggingPriority="750" tag="1" id="13">
                         <rect key="frame" x="256" y="12" width="168" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
-                        <buttonCell key="cell" type="push" title="Otomatik olarak Ara" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" tag="1" inset="2" id="163">
+                        <buttonCell key="cell" type="push" title="Otomatik olarak ara" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" tag="1" inset="2" id="163">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
@@ -58,7 +58,7 @@ Gw
                     <textField verticalHuggingPriority="750" id="32">
                         <rect key="frame" x="104" y="114" width="315" height="34"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Otomatik olarak güncelleme Aransınmı?" id="165">
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Güncellemeler kendiliğinden aransın mı?" id="165">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -79,7 +79,7 @@ Gw
                     <button focusRingType="none" id="34">
                         <rect key="frame" x="104" y="53" width="278" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="check" title="isimsiz Sistem-Bilgilerini ulaştır" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" focusRingType="none" inset="2" id="167">
+                        <buttonCell key="cell" type="check" title="Sistem bilgilerini anonim olarak gönder" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" focusRingType="none" inset="2" id="167">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                         </buttonCell>
@@ -142,9 +142,7 @@ Gw
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="170">
                         <font key="font" metaFont="smallSystem"/>
-                        <string key="title">Gönderdiğiniz isimsiz Sistem-Bilgileri bu Programın gelişimi için kullanılmatadır. Bu konu hakkında daha fazla Bilgi edinmek için, bizimle bağlantıya geçiniz.
-
-Göndereceğiniz Bilgiler:</string>
+                        <string key="title">Gönderdiğiniz anonim sistem bilgileri bu yazılımın geliştirilmesi için kullanılacaktır. Konu ile ilgili ayrıntılı bilgi için lütfen bizimle bağlantıya geçiniz. Göndereceğiniz Bilgiler:</string>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
