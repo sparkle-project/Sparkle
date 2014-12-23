@@ -18,7 +18,7 @@
 
 - (instancetype)initWithBundle:(NSBundle *)aBundle;
 @property (readonly, copy) NSString *bundlePath;
-@property (readonly, copy) NSString *appSupportPath;
+@property (readonly, copy) NSString *appCachePath;
 @property (readonly, copy) NSString *installationPath;
 @property (readonly, copy) NSString *name;
 @property (readonly, copy) NSString *version;
