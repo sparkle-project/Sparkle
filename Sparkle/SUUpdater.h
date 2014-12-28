@@ -25,7 +25,7 @@
  */
 SU_EXPORT @interface SUUpdater : NSObject
 
-@property (weak) IBOutlet id<SUUpdaterDelegate> delegate;
+@property (unsafe_unretained) IBOutlet id<SUUpdaterDelegate> delegate;
 
 + (SUUpdater *)sharedUpdater;
 + (SUUpdater *)updaterForBundle:(NSBundle *)bundle;
