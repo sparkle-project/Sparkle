@@ -45,7 +45,7 @@
 
 - (instancetype)initWithHost:(SUHost *)aHost systemProfile:(NSArray *)profile delegate:(id<SUUpdatePermissionPromptDelegate>)d
 {
-    self = [super initWithHost:aHost windowNibName:@"SUUpdatePermissionPrompt"];
+    self = [super initWithWindowNibName:@"SUUpdatePermissionPrompt"];
 	if (self)
 	{
         host = aHost;
