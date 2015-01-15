@@ -58,6 +58,7 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
 @synthesize host;
 @synthesize shouldRelaunch;
 @synthesize shouldShowUI;
+@synthesize statusController;
 
 - (instancetype)initWithHostPath:(NSString *)inhostpath executablePath:(NSString *)execpath parentProcessId:(pid_t)ppid folderPath:(NSString *)infolderpath shouldRelaunch:(BOOL)relaunch shouldShowUI:(BOOL)showUI selfPath:(NSString *)inSelfPath
 {
