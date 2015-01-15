@@ -1,13 +1,25 @@
 # 1.9.0
 
-Only export public symbols. (Jake Petroules)
-Use Info.plist keys instead of macros (Jake Petroules)
-Properly set install names and rpaths for targets (Jake Petroules)
-Fixed Sparkle tags parsing (Tamás Lustyik)
-Replace typedef enums with typedef NS_ENUM to make Swift happier (C.W. Betts)
-Prefer string constants to strings (Jake Petroules)
-BinaryDelta: avoid crash with bad paths (Jake Petroules)
-
+* Added SUUpdater delegate method for failures. (Benjamin Gordon)
+* Make the error definitions public (C.W. Betts)
+* Add support for lzma compressed tarballs (Kyle Fuller)
+* Back to SKIP_INSTALL=YES by default (Tony Arnold)
+* Properly set install names and rpaths for targets (Jake Petroules)
+* Use Library/Caches rather than app support directory (Kornel Lesiński)
+* Check for a modal window being onscreen before trying to put up the Sparkle prompt (Alf Watt)
+* Fixed crashes on 10.7 (Chris Campbell, Ger Teunis)
+* Fixed Sparkle tags parsing (Tamás Lustyik)
+* SULog code cleanups (Kevin Wojniak)
+* Make sure CFBundleVersion is a semantic version number. (Jake Petroules)
+* Replace typedef enums with typedef NS_ENUM to make Swift happier (C.W. Betts)
+* Fix warnings under Xcode 6.1 relating the SUUpdateAlert XIB (Tony Arnold)
+* Prefer string constants to strings (Jake Petroules)
+* Use Info.plist keys instead of macros (Jake Petroules)
+* Only export public symbols. (Jake Petroules)
+* BinaryDelta: avoid crash with bad paths (Jake Petroules)
+* Fixing Swedish translations (Erik Vikström)
+* Turkish localization fixes (Emir)
+* Proofing of Ukrainian localization (Vera Tkachenko)
 
 # 1.8.0
 
