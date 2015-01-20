@@ -1722,6 +1722,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
+				DEFINES_MODULE = YES;
 			};
 			name = Debug;
 		};
@@ -1729,6 +1730,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
+				DEFINES_MODULE = YES;
 			};
 			name = Release;
 		};
@@ -1736,6 +1738,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CF0D94A70100DD942E /* ConfigCommonDebug.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 			};
 			name = Debug;
 		};
@@ -1743,6 +1746,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 			};
 			name = Release;
 		};
@@ -1750,6 +1754,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = NO;
 			};
 			name = Debug;
 		};
@@ -1757,6 +1762,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = NO;
 			};
 			name = Release;
 		};
