@@ -74,7 +74,6 @@
 		33C7DE5519DB078C009887CD /* SUUpdaterQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 33C3934A198A825600C29D9D /* SUUpdaterQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		33C7DE9619DBF387009887CD /* DevMateSparkle.h in Headers */ = {isa = PBXBuildFile; fileRef = 33C7DE9419DBF27B009887CD /* DevMateSparkle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		33C7DE9F19DC0C8E009887CD /* SUUpdaterLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 33C7DE9E19DC0C8E009887CD /* SUUpdaterLoader.m */; };
-		33C81FB01A0BD90400E7A8DC /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 33C81FAF1A0BD90400E7A8DC /* libsqlite3.dylib */; };
 		33D081831888446F00394A94 /* libDMCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33D081821888446E00394A94 /* libDMCore.a */; };
 		3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		525A2790133D6AE900FD8D70 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
@@ -339,7 +338,6 @@
 		33C7DE9419DBF27B009887CD /* DevMateSparkle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DevMateSparkle.h; sourceTree = "<group>"; };
 		33C7DE9519DBF31A009887CD /* DevMateSparkle.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DevMateSparkle.pch; sourceTree = "<group>"; };
 		33C7DE9E19DC0C8E009887CD /* SUUpdaterLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterLoader.m; sourceTree = "<group>"; };
-		33C81FAF1A0BD90400E7A8DC /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/usr/lib/libsqlite3.dylib; sourceTree = DEVELOPER_DIR; };
 		33CE69761934D1F8009D5956 /* ReleaseNotes.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = ReleaseNotes.rtf; sourceTree = "<group>"; };
 		33D081821888446E00394A94 /* libDMCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libDMCore.a; path = External/libDMCore.a; sourceTree = "<group>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
@@ -655,7 +653,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				33C81FB01A0BD90400E7A8DC /* libsqlite3.dylib in Frameworks */,
 				61B5F8F709C4CEB300B25A18 /* Security.framework in Frameworks */,
 				61B5FC4C09C4FD5E00B25A18 /* WebKit.framework in Frameworks */,
 				61177A1F0D1112E900749C97 /* IOKit.framework in Frameworks */,
@@ -743,7 +740,6 @@
 				61B5F8F609C4CEB300B25A18 /* Security.framework */,
 				0867D6A5FE840307C02AAC07 /* AppKit.framework */,
 				0867D69BFE84028FC02AAC07 /* Foundation.framework */,
-				33C81FAF1A0BD90400E7A8DC /* libsqlite3.dylib */,
 				5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */,
 				5D1AF58F0FD767AD0065DB48 /* libxml2.dylib */,
 				5D1AF5890FD7678C0065DB48 /* libxar.1.dylib */,
