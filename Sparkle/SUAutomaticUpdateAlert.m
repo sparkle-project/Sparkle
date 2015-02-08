@@ -23,7 +23,7 @@
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost delegate:(id<SUAutomaticUpdateAlertDelegate>)del
 {
-    self = [super initWithHost:aHost windowNibName:@"SUAutomaticUpdateAlert"];
+    self = [super initWithWindowNibName:@"SUAutomaticUpdateAlert"];
 	if (self)
 	{
         self.updateItem = item;

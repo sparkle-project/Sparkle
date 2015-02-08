@@ -31,7 +31,7 @@
 
 - (instancetype)initWithHost:(SUHost *)aHost
 {
-    self = [super initWithHost:aHost windowNibName:@"SUStatus"];
+    self = [super initWithWindowNibName:@"SUStatus"];
 	if (self)
 	{
         self.host = aHost;

@@ -54,7 +54,7 @@
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost
 {
-    self = [super initWithHost:host windowNibName:@"SUUpdateAlert"];
+    self = [super initWithWindowNibName:@"SUUpdateAlert"];
 	if (self)
 	{
         host = aHost;
