@@ -145,38 +145,28 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (void)startUpdateCycle
 {
     BOOL shouldPrompt = NO;
+    BOOL hasLaunchedBefore = [self.host boolForUserDefaultsKey:SUHasLaunchedBeforeKey];
 
     // If the user has been asked about automatic checks, don't bother prompting
-	if ([self.host objectForUserDefaultsKey:SUEnableAutomaticChecksKey])
-    {
+    if ([self.host objectForUserDefaultsKey:SUEnableAutomaticChecksKey]) {
         shouldPrompt = NO;
     }
     // Does the delegate want to take care of the logic for when we should ask permission to update?
-    else if ([self.delegate respondsToSelector:@selector(updaterShouldPromptForPermissionToCheckForUpdates:)])
-    {
+    else if ([self.delegate respondsToSelector:@selector(updaterShouldPromptForPermissionToCheckForUpdates:)]) {
         shouldPrompt = [self.delegate updaterShouldPromptForPermissionToCheckForUpdates:self];
     }
     // Has he been asked already? And don't ask if the host has a default value set in its Info.plist.
-    else if ([self.host objectForKey:SUEnableAutomaticChecksKey] == nil)
-    {
-        if ([self.host objectForUserDefaultsKey:SUEnableAutomaticChecksKeyOld]) {
-            [self setAutomaticallyChecksForUpdates:[self.host boolForUserDefaultsKey:SUEnableAutomaticChecksKeyOld]];
-        }
+    else if ([self.host objectForKey:SUEnableAutomaticChecksKey] == nil) {
         // Now, we don't want to ask the user for permission to do a weird thing on the first launch.
         // We wait until the second launch, unless explicitly overridden via SUPromptUserOnFirstLaunchKey.
-        else if (![self.host objectForKey:SUPromptUserOnFirstLaunchKey])
-        {
-            if ([self.host boolForUserDefaultsKey:SUHasLaunchedBeforeKey] == NO)
-                [self.host setBool:YES forUserDefaultsKey:SUHasLaunchedBeforeKey];
-            else
-                shouldPrompt = YES;
-        }
-        else
-            shouldPrompt = YES;
+        shouldPrompt = [self.host objectForKey:SUPromptUserOnFirstLaunchKey] || hasLaunchedBefore;
     }
 
-    if (shouldPrompt)
-    {
+    if (!hasLaunchedBefore) {
+        [self.host setBool:YES forUserDefaultsKey:SUHasLaunchedBeforeKey];
+    }
+
+    if (shouldPrompt) {
         NSArray *profileInfo = [self.host systemProfile];
         // Always say we're sending the system profile here so that the delegate displays the parameters it would send.
         if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
@@ -184,9 +174,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         }
         [SUUpdatePermissionPrompt promptWithHost:self.host systemProfile:profileInfo delegate:self];
         // We start the update checks and register as observer for changes after the prompt finishes
-	}
-    else
-    {
+    } else {
         // We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
         [self scheduleNextUpdateCheck];
     }
