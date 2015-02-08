@@ -102,7 +102,13 @@ typedef struct {
 
 - (NSString *)name
 {
-    NSString *name = [self.bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+    NSString *name;
+
+    // Allow host bundle to provide a custom name
+    name = [self objectForInfoDictionaryKey:@"SUBundleName"];
+    if (name) return name;
+
+    name = [self.bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
 	if (name) return name;
 
     name = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey];
