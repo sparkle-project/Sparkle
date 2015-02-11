@@ -198,7 +198,7 @@ BOOL SUShouldUseXPCDownloader(void)
         return NO;
     
     NSString *xpcServicePrefixPath = [[NSBundle mainBundle] bundlePath];
-    NSString *xpcServiceSuffixPath = @"Contents/XPCServices/com.andymatuschak.Sparkle.download-service.xpc";
+    NSString *xpcServiceSuffixPath = @"Contents/XPCServices/com.devmate.UpdateDownloader.xpc";
 	return [[NSFileManager defaultManager] fileExistsAtPath:[xpcServicePrefixPath stringByAppendingPathComponent:xpcServiceSuffixPath]];
 }
 
@@ -208,7 +208,7 @@ BOOL SUShouldUseXPCInstaller(void)
         return NO;
     
     NSString *xpcServicePrefixPath = [[NSBundle mainBundle] bundlePath];
-    NSString *xpcServiceSuffixPath = @"Contents/XPCServices/com.andymatuschak.Sparkle.install-service.xpc";
+    NSString *xpcServiceSuffixPath = @"Contents/XPCServices/com.devmate.UpdateInstaller.xpc";
 	return [[NSFileManager defaultManager] fileExistsAtPath:[xpcServicePrefixPath stringByAppendingPathComponent:xpcServiceSuffixPath]];
 }
 

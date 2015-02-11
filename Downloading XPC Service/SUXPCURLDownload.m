@@ -206,7 +206,7 @@ static NSString * const kSUFetchFolderName = @"fetch.XXXXXXXX";
     // and another to listen for incoming connections for progress and file creation
     // notifications.
     
-    _connection = xpc_connection_create("com.andymatuschak.Sparkle.download-service", dispatch_get_main_queue());
+    _connection = xpc_connection_create("com.devmate.UpdateDownloader", dispatch_get_main_queue());
     if (!_connection)
     {
         NSLog(@"Can't connect to XPC service");
@@ -244,7 +244,7 @@ static NSString * const kSUFetchFolderName = @"fetch.XXXXXXXX";
         }
     });
 
-    dispatch_queue_t delegate_queue = dispatch_queue_create("com.andymatuschak.Sparkle.download-service-delegate", NULL);
+    dispatch_queue_t delegate_queue = dispatch_queue_create("com.devmate.UpdateDownloader.delegate", NULL);
     assert(delegate_queue != NULL);
 
     _delegateConnection = xpc_connection_create(NULL, delegate_queue);

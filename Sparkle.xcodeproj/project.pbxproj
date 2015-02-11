@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0305627915D2A73D00B43EF8 /* com.andymatuschak.Sparkle.install-service.xpc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B887B5E1517F3AB000BB292 /* com.andymatuschak.Sparkle.install-service.xpc */; };
+		0305627915D2A73D00B43EF8 /* com.devmate.UpdateInstaller.xpc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B887B5E1517F3AB000BB292 /* com.devmate.UpdateInstaller.xpc */; };
 		03B5E64115D399500038BB67 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 03B5E63F15D399500038BB67 /* InfoPlist.strings */; };
 		03B5E64415D399500038BB67 /* download_service.m in Sources */ = {isa = PBXBuildFile; fileRef = 03B5E64315D399500038BB67 /* download_service.m */; };
 		03B5E64B15D39CD90038BB67 /* SUXPCURLDownload.h in Headers */ = {isa = PBXBuildFile; fileRef = 03B5E64915D39CD90038BB67 /* SUXPCURLDownload.h */; };
-		03B5E65A15D3DC3C0038BB67 /* com.andymatuschak.Sparkle.download-service.xpc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 03B5E63A15D399500038BB67 /* com.andymatuschak.Sparkle.download-service.xpc */; };
+		03B5E65A15D3DC3C0038BB67 /* com.devmate.UpdateDownloader.xpc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 03B5E63A15D399500038BB67 /* com.devmate.UpdateDownloader.xpc */; };
 		03B5E65B15D3E0490038BB67 /* SUXPCURLDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 03B5E64A15D39CD90038BB67 /* SUXPCURLDownload.m */; };
 		3330768F190A5CB8005602B2 /* Sparkle.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8220A321A7F00D8810D /* Sparkle.strings */; };
 		338A79F11919191500EDD837 /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
@@ -294,8 +294,8 @@
 			dstPath = Contents/XPCServices;
 			dstSubfolderSpec = 1;
 			files = (
-				0305627915D2A73D00B43EF8 /* com.andymatuschak.Sparkle.install-service.xpc in CopyFiles */,
-				03B5E65A15D3DC3C0038BB67 /* com.andymatuschak.Sparkle.download-service.xpc in CopyFiles */,
+				0305627915D2A73D00B43EF8 /* com.devmate.UpdateInstaller.xpc in CopyFiles */,
+				03B5E65A15D3DC3C0038BB67 /* com.devmate.UpdateDownloader.xpc in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -319,7 +319,7 @@
 		02AC40CE1743CC23005207B1 /* ConfigCommonProject64bit.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigCommonProject64bit.xcconfig; sourceTree = "<group>"; };
 		02AC40CF1743CC23005207B1 /* ConfigCommonProjectUniversalBinary.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigCommonProjectUniversalBinary.xcconfig; sourceTree = "<group>"; };
 		0305626E15D2A68800B43EF8 /* Sparkle Test App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Sparkle Test App.entitlements"; sourceTree = "<group>"; };
-		03B5E63A15D399500038BB67 /* com.andymatuschak.Sparkle.download-service.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "com.andymatuschak.Sparkle.download-service.xpc"; sourceTree = BUILT_PRODUCTS_DIR; };
+		03B5E63A15D399500038BB67 /* com.devmate.UpdateDownloader.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.devmate.UpdateDownloader.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		03B5E63E15D399500038BB67 /* Downloading XPC Service-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Downloading XPC Service-Info.plist"; sourceTree = "<group>"; };
 		03B5E64015D399500038BB67 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		03B5E64215D399500038BB67 /* Downloading XPC Service-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Downloading XPC Service-Prefix.pch"; sourceTree = "<group>"; };
@@ -548,7 +548,7 @@
 		61F614540E24A12D009F47E7 /* it */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBasicUpdateDriver.h; sourceTree = "<group>"; };
 		61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBasicUpdateDriver.m; sourceTree = "<group>"; };
-		8B887B5E1517F3AB000BB292 /* com.andymatuschak.Sparkle.install-service.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "com.andymatuschak.Sparkle.install-service.xpc"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B887B5E1517F3AB000BB292 /* com.devmate.UpdateInstaller.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = com.devmate.UpdateInstaller.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B887B701517F447000BB292 /* ConfigService.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigService.xcconfig; sourceTree = "<group>"; };
 		8B887B711517F447000BB292 /* ConfigServiceDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigServiceDebug.xcconfig; sourceTree = "<group>"; };
 		8B887B721517F447000BB292 /* ConfigServiceRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigServiceRelease.xcconfig; sourceTree = "<group>"; };
@@ -676,8 +676,8 @@
 				612279D90DB5470200AB99EA /* Sparkle Unit Tests.octest */,
 				5D06E8D00FD68C7C005AE3F6 /* BinaryDelta */,
 				55C14BB7136EEF1500649790 /* finish_installation.app */,
-				8B887B5E1517F3AB000BB292 /* com.andymatuschak.Sparkle.install-service.xpc */,
-				03B5E63A15D399500038BB67 /* com.andymatuschak.Sparkle.download-service.xpc */,
+				8B887B5E1517F3AB000BB292 /* com.devmate.UpdateInstaller.xpc */,
+				03B5E63A15D399500038BB67 /* com.devmate.UpdateDownloader.xpc */,
 				33C7DDF119DB0333009887CD /* libDevMateSparkle.a */,
 				33C7DE3D19DB05A9009887CD /* DevMateSparkle_Resources */,
 			);
@@ -1109,7 +1109,7 @@
 			);
 			name = "Downloading XPC Service";
 			productName = "Downloading XPC Service";
-			productReference = 03B5E63A15D399500038BB67 /* com.andymatuschak.Sparkle.download-service.xpc */;
+			productReference = 03B5E63A15D399500038BB67 /* com.devmate.UpdateDownloader.xpc */;
 			productType = "com.apple.product-type.bundle";
 		};
 		33C7DDF019DB0333009887CD /* DevMateSparkle_lib */ = {
@@ -1236,7 +1236,7 @@
 			);
 			name = "Installation XPC Service";
 			productName = Update;
-			productReference = 8B887B5E1517F3AB000BB292 /* com.andymatuschak.Sparkle.install-service.xpc */;
+			productReference = 8B887B5E1517F3AB000BB292 /* com.devmate.UpdateInstaller.xpc */;
 			productType = "com.apple.product-type.bundle";
 		};
 		8DC2EF4F0486A6940098B216 /* Sparkle */ = {
@@ -1914,7 +1914,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "Downloading XPC Service/Downloading XPC Service-Info.plist";
 				MACH_O_TYPE = mh_execute;
-				PRODUCT_NAME = "com.andymatuschak.Sparkle.download-service";
+				PRODUCT_NAME = com.devmate.UpdateDownloader;
 				WRAPPER_EXTENSION = xpc;
 			};
 			name = Debug;
@@ -1937,7 +1937,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "Downloading XPC Service/Downloading XPC Service-Info.plist";
 				MACH_O_TYPE = mh_execute;
-				PRODUCT_NAME = "com.andymatuschak.Sparkle.download-service";
+				PRODUCT_NAME = com.devmate.UpdateDownloader;
 				WRAPPER_EXTENSION = xpc;
 			};
 			name = Release;
@@ -1960,7 +1960,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "Downloading XPC Service/Downloading XPC Service-Info.plist";
 				MACH_O_TYPE = mh_execute;
-				PRODUCT_NAME = "com.andymatuschak.Sparkle.download-service";
+				PRODUCT_NAME = com.devmate.UpdateDownloader;
 				WRAPPER_EXTENSION = xpc;
 			};
 			name = "Release (GC dual-mode; 10.5+)";
@@ -2346,7 +2346,7 @@
 			buildSettings = {
 				GCC_PREFIX_HEADER = "Installation XPC Service/install_service.pch";
 				INFOPLIST_FILE = "Installation XPC Service/SandboxService.plist";
-				PRODUCT_NAME = "com.andymatuschak.Sparkle.install-service";
+				PRODUCT_NAME = com.devmate.UpdateInstaller;
 			};
 			name = Debug;
 		};
@@ -2356,7 +2356,7 @@
 			buildSettings = {
 				GCC_PREFIX_HEADER = "Installation XPC Service/install_service.pch";
 				INFOPLIST_FILE = "Installation XPC Service/SandboxService.plist";
-				PRODUCT_NAME = "com.andymatuschak.Sparkle.install-service";
+				PRODUCT_NAME = com.devmate.UpdateInstaller;
 			};
 			name = Release;
 		};
@@ -2366,7 +2366,7 @@
 			buildSettings = {
 				GCC_PREFIX_HEADER = "Installation XPC Service/install_service.pch";
 				INFOPLIST_FILE = "Installation XPC Service/SandboxService.plist";
-				PRODUCT_NAME = "com.andymatuschak.Sparkle.install-service";
+				PRODUCT_NAME = com.devmate.UpdateInstaller;
 			};
 			name = "Release (GC dual-mode; 10.5+)";
 		};
@@ -2442,7 +2442,7 @@
 			buildSettings = {
 				GCC_PREFIX_HEADER = "Installation XPC Service/install_service.pch";
 				INFOPLIST_FILE = "Installation XPC Service/SandboxService.plist";
-				PRODUCT_NAME = "com.andymatuschak.Sparkle.install-service";
+				PRODUCT_NAME = com.devmate.UpdateInstaller;
 			};
 			name = Deployment;
 		};
@@ -2464,7 +2464,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "Downloading XPC Service/Downloading XPC Service-Info.plist";
 				MACH_O_TYPE = mh_execute;
-				PRODUCT_NAME = "com.andymatuschak.Sparkle.download-service";
+				PRODUCT_NAME = com.devmate.UpdateDownloader;
 				WRAPPER_EXTENSION = xpc;
 			};
 			name = Deployment;

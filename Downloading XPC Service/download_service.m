@@ -238,7 +238,7 @@ static void fetch_event_handler(xpc_connection_t peer)
     // Generate an unique name for the queue to handle messages from
     // this peer and create a new dispatch queue for it.
     char *queue_name = NULL;
-    asprintf(&queue_name, "%s-peer-%d", "com.andymatuschak.Sparkle.download-service", xpc_connection_get_pid(peer));
+    asprintf(&queue_name, "%s-peer-%d", "com.devmate.UpdateDownloader", xpc_connection_get_pid(peer));
     dispatch_queue_t peer_event_queue = dispatch_queue_create(queue_name, DISPATCH_QUEUE_SERIAL);
     assert(peer_event_queue != NULL);
     free(queue_name);
