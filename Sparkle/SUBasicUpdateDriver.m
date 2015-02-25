@@ -56,6 +56,7 @@
 
     [appcast setDelegate:self];
     [appcast setUserAgentString:[self.updater userAgentString]];
+    [appcast setHttpHeaders:[self.updater httpHeaders]];
     [appcast fetchAppcastFromURL:URL];
 }
 

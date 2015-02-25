@@ -19,6 +19,7 @@ SU_EXPORT @interface SUAppcast : NSObject <NSURLDownloadDelegate>
 
 @property (weak) id<SUAppcastDelegate> delegate;
 @property (copy) NSString *userAgentString;
+@property (copy) NSDictionary *httpHeaders;
 
 - (void)fetchAppcastFromURL:(NSURL *)url;
 
