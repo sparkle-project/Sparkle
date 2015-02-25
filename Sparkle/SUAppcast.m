@@ -57,7 +57,10 @@
     }
 
     if (self.httpHeaders) {
-        [request setValuesForKeysWithDictionary:self.httpHeaders];
+        for (NSString *key in self.httpHeaders) {
+            id value = [self.httpHeaders objectForKey:key];
+            [request setValue:value forHTTPHeaderField:key];
+        }
     }
 
     [request setValue:@"application/rss+xml,*/*;q=0.1" forHTTPHeaderField:@"Accept"];
