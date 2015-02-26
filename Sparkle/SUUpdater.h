@@ -46,6 +46,8 @@ SU_EXPORT @interface SUUpdater : NSObject
 
 @property (nonatomic, copy) NSString *userAgentString;
 
+@property (copy) NSDictionary *httpHeaders;
+
 @property BOOL sendsSystemProfile;
 
 @property BOOL automaticallyDownloadsUpdates;

@@ -51,7 +51,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize delegate;
 @synthesize checkTimer;
 @synthesize userAgentString = customUserAgentString;
-
+@synthesize httpHeaders;
 @synthesize driver;
 @synthesize host;
 

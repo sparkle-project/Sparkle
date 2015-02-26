@@ -45,6 +45,7 @@
 @synthesize downloadFilename;
 @synthesize delegate;
 @synthesize userAgentString;
+@synthesize httpHeaders;
 @synthesize download;
 @synthesize items;
 
@@ -53,6 +54,13 @@
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
     if (self.userAgentString) {
         [request setValue:self.userAgentString forHTTPHeaderField:@"User-Agent"];
+    }
+
+    if (self.httpHeaders) {
+        for (NSString *key in self.httpHeaders) {
+            id value = [self.httpHeaders objectForKey:key];
+            [request setValue:value forHTTPHeaderField:key];
+        }
     }
 
     [request setValue:@"application/rss+xml,*/*;q=0.1" forHTTPHeaderField:@"Accept"];
