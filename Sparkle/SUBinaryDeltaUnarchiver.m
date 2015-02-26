@@ -17,7 +17,7 @@
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
-	return binaryDeltaSupported() && [[path pathExtension] isEqualToString:@"delta"];
+	return [[path pathExtension] isEqualToString:@"delta"];
 }
 
 - (void)applyBinaryDelta
