@@ -14,7 +14,6 @@
 @class NSString;
 @class NSData;
 
-extern int binaryDeltaSupported(void);
 extern int compareFiles(const FTSENT **a, const FTSENT **b);
 extern NSData *hashOfFile(FTSENT *ent);
 extern NSString *hashOfTree(NSString *path);
