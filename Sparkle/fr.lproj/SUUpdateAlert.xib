@@ -173,7 +173,7 @@ DQ
                     </textField>
                     <button translatesAutoresizingMaskIntoConstraints="NO" id="117">
                         <rect key="frame" x="106" y="49" width="495" height="18"/>
-                        <buttonCell key="cell" type="check" title="Automatiquement télécharger et installer les mises à jour à l’avenir" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="175">
+                        <buttonCell key="cell" type="check" title="Télécharger et installer automatiquement les mises à jour" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="175">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                         </buttonCell>
