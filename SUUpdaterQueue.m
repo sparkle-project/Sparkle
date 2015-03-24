@@ -102,7 +102,7 @@
 @property (readonly) NSMutableArray *updaters;
 @property (readonly) NSMutableDictionary *delegatesMap;
 @property (retain) SUUpdater *currentUpdater;
-@property (assign) BOOL currentUpdaterInProcess;
+@property (assign) dispatch_semaphore_t currentUpdaterSema;
 @property (assign) BOOL shouldContinueCheck;
 @property (nonatomic, retain) NSMutableArray *resultUIDrivers;
 
@@ -232,7 +232,7 @@
     if (nil == updater)
         return;
     
-    if (updater == self.currentUpdater && self.currentUpdaterInProcess)
+    if (updater == self.currentUpdater && self.currentUpdaterSema)
     {
         NSLog(@"Could not remove updater while it's in progress.");
         return;
@@ -274,9 +274,15 @@
     do
     {
         // in case if some of queued updaters is already in process
-        while (self.currentUpdaterInProcess)
+        if (self.currentUpdaterSema)
         {
-            [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.5f]];
+            dispatch_semaphore_wait(self.currentUpdaterSema, DISPATCH_TIME_FOREVER);
+            @synchronized (self)
+            {
+                if (self.currentUpdaterSema)
+                    dispatch_release(self.currentUpdaterSema);
+                self.currentUpdaterSema = nil;
+            }
         }
         
         if (!self.shouldContinueCheck)
@@ -291,7 +297,7 @@
         if (nil == self.currentUpdater)
             break;
 
-        self.currentUpdaterInProcess = YES;
+        self.currentUpdaterSema = dispatch_semaphore_create(0);
         [self.currentUpdater performSelectorOnMainThread:NSSelectorFromString(selectorName)
                                               withObject:nil
                                            waitUntilDone:YES];
@@ -339,7 +345,10 @@
         (self.currentUpdater == updater))
     {
         self.currentUpdater = updater;
-        self.currentUpdaterInProcess = YES;
+        if (nil == self.currentUpdaterSema)
+        {
+            self.currentUpdaterSema = dispatch_semaphore_create(0);
+        }
     }
 }
 
@@ -348,7 +357,17 @@
     if (self.currentUpdater == updater)
     {
         self.currentUpdater = nil;
-        self.currentUpdaterInProcess = NO;
+
+        if (self.currentUpdaterSema)
+        {
+            dispatch_semaphore_signal(self.currentUpdaterSema);
+            @synchronized (self)
+            {
+                if (self.currentUpdaterSema)
+                    dispatch_release(self.currentUpdaterSema);
+                self.currentUpdaterSema = nil;
+            }
+        }
         
         SUBasicUpdateDriver *driver = [updater driver];
         do
