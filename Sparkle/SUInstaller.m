@@ -164,7 +164,7 @@ static NSString *sUpdateFolder = nil;
 
 + (void)registerWithLaunchServices:(NSString *)installationPath
 {
-    NSURL* installationURL = [NSURL fileURLWithPath:(NSString*)installationPath];
+    NSURL* installationURL = [NSURL fileURLWithPath:installationPath];
     if (installationURL != nil)
     {
         OSStatus registerStatus = LSRegisterURL((__bridge CFURLRef)installationURL,true);
