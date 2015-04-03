@@ -227,7 +227,16 @@ int main(int __unused argc, char __unused *argv[])
         NSOperationQueue *deltaQueue = [[NSOperationQueue alloc] init];
         NSMutableArray *deltaOperations = [NSMutableArray array];
 
-        NSArray *keys = [[newTreeState allKeys] sortedArrayUsingSelector:@selector(compare:)];
+        // Sort the keys by preferring the ones from the original tree to appear first
+        // We want to enforce deleting before extracting in the case paths differ only by case
+        NSArray *keys = [[newTreeState allKeys] sortedArrayUsingComparator:^NSComparisonResult(NSString *key1, NSString *key2) {
+            NSComparisonResult insensitiveCompareResult = [key1 caseInsensitiveCompare:key2];
+            if (insensitiveCompareResult != NSOrderedSame) {
+                return insensitiveCompareResult;
+            }
+
+            return originalTreeState[key1] ? NSOrderedAscending : NSOrderedDescending;
+        }];
         for (NSString* key in keys) {
             id value = [newTreeState valueForKey:key];
 
