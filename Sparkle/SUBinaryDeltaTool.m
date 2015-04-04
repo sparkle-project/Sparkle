@@ -212,13 +212,13 @@ int main(int __unused argc, char __unused *argv[])
                 newTreeState[key] = info;
                 
                 if (oldInfo && [oldInfo[@"type"] unsignedShortValue] == FTS_D && [info[@"type"] unsignedShortValue] != FTS_D) {
-                    NSArray *pathComponents = key.pathComponents;
+                    NSArray *parentPathComponents = key.pathComponents;
 
-                    for (NSString *subpath in originalTreeState) {
-                        NSArray *subpathComponents = subpath.pathComponents;
-                        if (subpathComponents.count > pathComponents.count &&
-                            [pathComponents isEqualToArray:[subpathComponents subarrayWithRange:NSMakeRange(0, pathComponents.count)]]) {
-                            [newTreeState removeObjectForKey:subpath];
+                    for (NSString *childPath in originalTreeState) {
+                        NSArray *childPathComponents = childPath.pathComponents;
+                        if (childPathComponents.count > parentPathComponents.count &&
+                            [parentPathComponents isEqualToArray:[childPathComponents subarrayWithRange:NSMakeRange(0, parentPathComponents.count)]]) {
+                            [newTreeState removeObjectForKey:childPath];
                         }
                     }
                 }
