@@ -206,10 +206,23 @@ int main(int __unused argc, char __unused *argv[])
             NSDictionary *info = infoForFile(ent);
             NSDictionary *oldInfo = originalTreeState[key];
 
-            if ([info isEqual:oldInfo])
+            if ([info isEqual:oldInfo]) {
                 [newTreeState removeObjectForKey:key];
-            else
+            } else {
                 newTreeState[key] = info;
+                
+                if (oldInfo && [oldInfo[@"type"] unsignedShortValue] == FTS_D && [info[@"type"] unsignedShortValue] != FTS_D) {
+                    NSArray *parentPathComponents = key.pathComponents;
+
+                    for (NSString *childPath in originalTreeState) {
+                        NSArray *childPathComponents = childPath.pathComponents;
+                        if (childPathComponents.count > parentPathComponents.count &&
+                            [parentPathComponents isEqualToArray:[childPathComponents subarrayWithRange:NSMakeRange(0, parentPathComponents.count)]]) {
+                            [newTreeState removeObjectForKey:childPath];
+                        }
+                    }
+                }
+            }
         }
         fts_close(fts);
 
