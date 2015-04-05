@@ -102,7 +102,8 @@
 @property (readonly) NSMutableArray *updaters;
 @property (readonly) NSMutableDictionary *delegatesMap;
 @property (retain) SUUpdater *currentUpdater;
-@property (assign) dispatch_semaphore_t currentUpdaterSema;
+@property (atomic, assign) dispatch_semaphore_t currentUpdaterSema;
+@property (nonatomic, retain) NSObject *semaphoreSynchronizer;
 @property (assign) BOOL shouldContinueCheck;
 @property (nonatomic, retain) NSMutableArray *resultUIDrivers;
 
@@ -112,6 +113,16 @@
 
 @implementation SUUpdaterQueue
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self)
+    {
+        self.semaphoreSynchronizer = [[NSObject alloc] init];
+    }
+    return self;
+}
+
 - (void)dealloc
 {
     for (SUUpdater *updater in self.updaters)
@@ -120,6 +131,17 @@
     }
     [_updaters release];
     [_delegatesMap release];
+    
+    @synchronized (self.semaphoreSynchronizer)
+    {
+        if (!self.currentUpdater && self.currentUpdaterSema)
+        {
+            dispatch_release(self.currentUpdaterSema);
+            self.currentUpdaterSema = nil;
+        }
+    }
+    self.semaphoreSynchronizer = nil;
+    
     self.currentUpdater = nil;
     self.resultUIDrivers = nil;
     
@@ -274,13 +296,12 @@
     do
     {
         // in case if some of queued updaters is already in process
-        if (self.currentUpdaterSema)
+        if (self.currentUpdater && self.currentUpdaterSema)
         {
             dispatch_semaphore_wait(self.currentUpdaterSema, DISPATCH_TIME_FOREVER);
-            @synchronized (self)
+            @synchronized (self.semaphoreSynchronizer)
             {
-                if (self.currentUpdaterSema)
-                    dispatch_release(self.currentUpdaterSema);
+                dispatch_release(self.currentUpdaterSema);
                 self.currentUpdaterSema = nil;
             }
         }
@@ -297,7 +318,11 @@
         if (nil == self.currentUpdater)
             break;
 
-        self.currentUpdaterSema = dispatch_semaphore_create(0);
+        @synchronized (self.semaphoreSynchronizer)
+        {
+            if (nil == self.currentUpdaterSema)
+                self.currentUpdaterSema = dispatch_semaphore_create(0);
+        }
         [self.currentUpdater performSelectorOnMainThread:NSSelectorFromString(selectorName)
                                               withObject:nil
                                            waitUntilDone:YES];
@@ -345,9 +370,10 @@
         (self.currentUpdater == updater))
     {
         self.currentUpdater = updater;
-        if (nil == self.currentUpdaterSema)
+        @synchronized (self.semaphoreSynchronizer)
         {
-            self.currentUpdaterSema = dispatch_semaphore_create(0);
+            if (nil == self.currentUpdaterSema)
+                self.currentUpdaterSema = dispatch_semaphore_create(0);
         }
     }
 }
@@ -357,16 +383,10 @@
     if (self.currentUpdater == updater)
     {
         self.currentUpdater = nil;
-
-        if (self.currentUpdaterSema)
+        @synchronized (self.semaphoreSynchronizer)
         {
-            dispatch_semaphore_signal(self.currentUpdaterSema);
-            @synchronized (self)
-            {
-                if (self.currentUpdaterSema)
-                    dispatch_release(self.currentUpdaterSema);
-                self.currentUpdaterSema = nil;
-            }
+            if (self.currentUpdaterSema)
+                dispatch_semaphore_signal(self.currentUpdaterSema);
         }
         
         SUBasicUpdateDriver *driver = [updater driver];
