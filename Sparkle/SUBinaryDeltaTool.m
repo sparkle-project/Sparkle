@@ -159,7 +159,7 @@ int main(int __unused argc, char __unused *argv[])
             return 1;
         }
 
-        fprintf(stderr, "Processing %s...", [oldPath UTF8String]);
+        fprintf(stdout, "Processing %s...", [oldPath UTF8String]);
         FTSENT *ent = 0;
         while ((ent = fts_read(fts))) {
             if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D) {
@@ -184,7 +184,7 @@ int main(int __unused argc, char __unused *argv[])
             newTreeState[key] = [NSNull null];
         }
 
-        fprintf(stderr, "\nProcessing %s...  ", [newPath UTF8String]);
+        fprintf(stdout, "\nProcessing %s...  ", [newPath UTF8String]);
         sourcePaths[0] = [newPath fileSystemRepresentation];
         fts = fts_open((char* const*)sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
         if (!fts) {
@@ -228,7 +228,7 @@ int main(int __unused argc, char __unused *argv[])
 
         NSString *afterHash = hashOfTree(newPath);
 
-        fprintf(stderr, "\nGenerating delta...  ");
+        fprintf(stdout, "\nGenerating delta...  ");
 
         NSString *temporaryFile = temporaryPatchFile(patchFile);
         xar_t x = xar_open([temporaryFile fileSystemRepresentation], WRITE);
@@ -291,7 +291,7 @@ int main(int __unused argc, char __unused *argv[])
         unlink([patchFile fileSystemRepresentation]);
         link([temporaryFile fileSystemRepresentation], [patchFile fileSystemRepresentation]);
         unlink([temporaryFile fileSystemRepresentation]);
-        fprintf(stderr, "Done!\n");
+        fprintf(stdout, "Done!\n");
 
         return 0;
     }

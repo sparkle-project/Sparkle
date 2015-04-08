@@ -53,7 +53,7 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
         return 1;
     }
 
-    fprintf(stderr, "Verifying source...  ");
+    fprintf(stdout, "Verifying source...  ");
     NSString *beforeHash = hashOfTree(source);
 
     if (![beforeHash isEqualToString:expectedBeforeHash]) {
@@ -61,11 +61,11 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
         return 1;
     }
 
-    fprintf(stderr, "\nCopying files...  ");
+    fprintf(stdout, "\nCopying files...  ");
     removeTree(destination);
     copyTree(source, destination);
 
-    fprintf(stderr, "\nPatching... ");
+    fprintf(stdout, "\nPatching... ");
     xar_file_t file;
     xar_iter_t iter = xar_iter_new();
     for (file = xar_file_first(x, iter); file; file = xar_file_next(iter)) {
@@ -87,7 +87,7 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
     }
     xar_close(x);
 
-    fprintf(stderr, "\nVerifying destination...  ");
+    fprintf(stdout, "\nVerifying destination...  ");
     NSString *afterHash = hashOfTree(destination);
 
     if (![afterHash isEqualToString:expectedAfterHash]) {
@@ -96,6 +96,6 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
         return 1;
     }
 
-    fprintf(stderr, "\nDone!\n");
+    fprintf(stdout, "\nDone!\n");
     return 0;
 }
