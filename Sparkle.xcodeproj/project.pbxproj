@@ -168,6 +168,7 @@
 		61F83F740DBFE141006FDD30 /* SUBasicUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
 		61FA52880E2D9EA400EF58AD /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		7223E7631AD1AEFF008E3161 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
+		7268AC631AD634C200C3E0C1 /* SUBinaryDeltaCreate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7268AC621AD634C200C3E0C1 /* SUBinaryDeltaCreate.m */; };
 		767B61AC1972D488004E0C3C /* SUGuidedPackageInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 767B61AA1972D488004E0C3C /* SUGuidedPackageInstaller.h */; };
 		767B61AD1972D488004E0C3C /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */; };
 		767B61AE1972D488004E0C3C /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */; };
@@ -537,6 +538,8 @@
 		61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBasicUpdateDriver.m; sourceTree = "<group>"; };
 		7223E7611AD1AEFF008E3161 /* sais.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sais.c; sourceTree = "<group>"; };
 		7223E7621AD1AEFF008E3161 /* sais.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sais.h; sourceTree = "<group>"; };
+		7268AC621AD634C200C3E0C1 /* SUBinaryDeltaCreate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBinaryDeltaCreate.m; sourceTree = "<group>"; };
+		7268AC641AD634E400C3E0C1 /* SUBinaryDeltaCreate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBinaryDeltaCreate.h; sourceTree = "<group>"; };
 		767B61AA1972D488004E0C3C /* SUGuidedPackageInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUGuidedPackageInstaller.h; sourceTree = "<group>"; };
 		767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUGuidedPackageInstaller.m; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Sparkle-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Sparkle-Info.plist"; sourceTree = "<group>"; };
@@ -787,6 +790,8 @@
 			children = (
 				5D06E8DF0FD68CC7005AE3F6 /* SUBinaryDeltaApply.h */,
 				5D06E8E00FD68CC7005AE3F6 /* SUBinaryDeltaApply.m */,
+				7268AC641AD634E400C3E0C1 /* SUBinaryDeltaCreate.h */,
+				7268AC621AD634C200C3E0C1 /* SUBinaryDeltaCreate.m */,
 				5D06E8E10FD68CC7005AE3F6 /* SUBinaryDeltaCommon.h */,
 				5D06E8E20FD68CC7005AE3F6 /* SUBinaryDeltaCommon.m */,
 				5D06E8E30FD68CC7005AE3F6 /* SUBinaryDeltaTool.m */,
@@ -1400,6 +1405,7 @@
 				5D06E8E90FD68CDB005AE3F6 /* bsdiff.c in Sources */,
 				14652F7E19A9728A00959E44 /* bspatch.c in Sources */,
 				14652F7D19A9726700959E44 /* SUBinaryDeltaApply.m in Sources */,
+				7268AC631AD634C200C3E0C1 /* SUBinaryDeltaCreate.m in Sources */,
 				7223E7631AD1AEFF008E3161 /* sais.c in Sources */,
 				14652F7C19A9725300959E44 /* SUBinaryDeltaCommon.m in Sources */,
 				5D06E8EA0FD68CDB005AE3F6 /* SUBinaryDeltaTool.m in Sources */,
