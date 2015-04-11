@@ -273,7 +273,7 @@ static NSString *temporaryDirectory(NSString *base)
 
 /*
 // This fails in the hash equality check
-// The delta tool also fails at file permission changes
+// The delta tool also fails at doing file permission changes, though this test won't be able to detect it
 - (void)testFilePermissionChangedWithHashCheck
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
@@ -425,7 +425,7 @@ static NSString *temporaryDirectory(NSString *base)
     }];
 }
 
-// Opposite of the test method above
+// Opposite of the test method testDirectoryToSymlinkChange
 - (void)testSymlinkToDirectoryChange
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
