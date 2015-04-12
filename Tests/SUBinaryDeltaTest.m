@@ -56,13 +56,13 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         beforeDiffHandler(fileManager, sourceDirectory, destinationDirectory);
     }
     
-    XCTAssertEqual(0, createBinaryDelta(sourceDirectory, destinationDirectory, diffFile));
+    BOOL createdDiff = (createBinaryDelta(sourceDirectory, destinationDirectory, diffFile) == 0);
     
-    if (afterDiffHandler != nil) {
+    if (createdDiff && afterDiffHandler != nil) {
         afterDiffHandler(fileManager, sourceDirectory, destinationDirectory);
     }
     
-    BOOL appliedDiff = (applyBinaryDelta(sourceDirectory, patchDirectory, diffFile) == 0);
+    BOOL appliedDiff = (createdDiff && applyBinaryDelta(sourceDirectory, patchDirectory, diffFile) == 0);
     
     XCTAssertTrue([fileManager removeItemAtPath:sourceDirectory error:nil]);
     XCTAssertTrue([fileManager removeItemAtPath:destinationDirectory error:nil]);
@@ -308,6 +308,49 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         
         NSError *error = nil;
         if (![fileManager setAttributes:@{NSFilePosixPermissions : @0755} ofItemAtPath:destinationFile error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        // This would fail for version 1.0
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testInvalidPermissionsInAfterTree
+{
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        NSData *data = [NSData dataWithBytes:"loltest" length:7];
+        XCTAssertTrue([data writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([data writeToFile:destinationFile atomically:YES]);
+        
+        NSError *error = nil;
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0777} ofItemAtPath:destinationFile error:&error]) {
+            NSLog(@"Change Permission Error: %@", error);
+            XCTFail(@"Failed setting file permissions");
+        }
+        
+        // This would fail for version 1.0
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    } afterDiffHandler:nil];
+    XCTAssertFalse(success);
+}
+
+- (void)testBadPermissionsInBeforeTree
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        NSData *data = [NSData dataWithBytes:"loltest" length:7];
+        XCTAssertTrue([data writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([data writeToFile:destinationFile atomically:YES]);
+        
+        NSError *error = nil;
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0777} ofItemAtPath:sourceFile error:&error]) {
             NSLog(@"Change Permission Error: %@", error);
             XCTFail(@"Failed setting file permissions");
         }

@@ -11,9 +11,10 @@
 
 #include <fts.h>
 
-// Only track executable bits, which is what VCS's like git and hg do as well
-// Other permission bits might be too sketchy to track
-#define EXECUTABLE_PERMISSIONS (S_IXUSR | S_IXGRP | S_IXOTH)
+#define PERMISSION_FLAGS (S_IRWXU | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX)
+
+#define IS_VALID_PERMISSIONS(mode) \
+    (((mode & PERMISSION_FLAGS) == 0755) || ((mode & PERMISSION_FLAGS) == 0644))
 
 #define DIFF_VERSION_IS_AT_LEAST(actualMajor, actualMinor, expectedMajor, expectedMinor) \
     ((actualMajor > expectedMajor) || (actualMajor == expectedMajor && actualMinor >= expectedMinor))

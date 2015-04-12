@@ -17,6 +17,10 @@
 #include <sys/stat.h>
 #include <xar/xar.h>
 
+// Only track executable bits for tree hashing, which is what VCS's like git and hg do as well
+// Other permission bits might be too sketchy to track
+#define EXECUTABLE_PERMISSIONS (S_IXUSR | S_IXGRP | S_IXOTH)
+
 int compareFiles(const FTSENT **a, const FTSENT **b)
 {
     return strcoll((*a)->fts_name, (*b)->fts_name);

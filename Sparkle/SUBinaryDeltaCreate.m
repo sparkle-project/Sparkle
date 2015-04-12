@@ -59,7 +59,7 @@ extern int bsdiff(int argc, const char **argv);
 
 #define INFO_HASH_KEY @"hash"
 #define INFO_TYPE_KEY @"type"
-#define INFO_EXECUTABLE_PERMISSIONS_KEY @"executable_permissions"
+#define INFO_PERMISSIONS_KEY @"permissions"
 #define INFO_SIZE_KEY @"size"
 
 static NSDictionary *infoForFile(FTSENT *ent)
@@ -73,10 +73,9 @@ static NSDictionary *infoForFile(FTSENT *ent)
     
     assert(ent->fts_statp != NULL);
     
-    mode_t mode = ent->fts_statp->st_mode;
-    mode_t executablePermissions = mode & EXECUTABLE_PERMISSIONS;
+    mode_t permissions = ent->fts_statp->st_mode & PERMISSION_FLAGS;
     
-    return @{INFO_HASH_KEY: hash, INFO_TYPE_KEY: @(ent->fts_info), INFO_EXECUTABLE_PERMISSIONS_KEY : @(executablePermissions), INFO_SIZE_KEY: @(size)};
+    return @{INFO_HASH_KEY: hash, INFO_TYPE_KEY: @(ent->fts_info), INFO_PERMISSIONS_KEY : @(permissions), INFO_SIZE_KEY: @(size)};
 }
 
 static NSString *absolutePath(NSString *path)
@@ -110,7 +109,7 @@ static BOOL shouldSkipDeltaCompression(NSDictionary* originalInfo, NSDictionary 
         return YES;
     }
     
-    if ([originalInfo[INFO_EXECUTABLE_PERMISSIONS_KEY] unsignedShortValue] != [newInfo[INFO_EXECUTABLE_PERMISSIONS_KEY] unsignedShortValue]) {
+    if ([originalInfo[INFO_PERMISSIONS_KEY] unsignedShortValue] != [newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]) {
         return YES;
     }
 
@@ -127,7 +126,7 @@ static BOOL shouldDeleteThenExtract(NSDictionary* originalInfo, NSDictionary *ne
         return YES;
     }
     
-    if ([originalInfo[INFO_EXECUTABLE_PERMISSIONS_KEY] unsignedShortValue] != [newInfo[INFO_EXECUTABLE_PERMISSIONS_KEY] unsignedShortValue]) {
+    if ([originalInfo[INFO_PERMISSIONS_KEY] unsignedShortValue] != [newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]) {
         return YES;
     }
 
@@ -207,6 +206,13 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             fprintf(stderr, "Failed to retrieve info from file %s", ent->fts_path);
             return 1;
         }
+        
+        mode_t permissions = [info[INFO_PERMISSIONS_KEY] unsignedShortValue];
+        if (!IS_VALID_PERMISSIONS(permissions)) {
+            fprintf(stderr, "Invalid file permissions after tree on file %s\nOnly permissions with modes 0755 and 0644 are supported", ent->fts_path);
+            return 1;
+        }
+        
         NSDictionary *oldInfo = originalTreeState[key];
 
         if ([info isEqual:oldInfo]) {
