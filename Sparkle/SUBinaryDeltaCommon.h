@@ -9,8 +9,6 @@
 #ifndef SUBINARYDELTACOMMON_H
 #define SUBINARYDELTACOMMON_H
 
-#define _DARWIN_NO_64_BIT_INODE 1
-
 #include <fts.h>
 
 // Only track executable bits, which is what VCS's like git and hg do as well
