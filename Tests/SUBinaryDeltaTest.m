@@ -16,6 +16,8 @@
 
 @end
 
+typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory);
+
 @implementation SUBinaryDeltaTest
 
 - (void)testTemporaryDirectory
@@ -36,7 +38,7 @@
     XCTAssert(YES, @"Pass");
 }
 
-- (void)createAndApplyPatchWithHandler:(void (^)(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory))handler
+- (BOOL)createAndApplyPatchWithBeforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler
 {
     NSString *sourceDirectory = temporaryDirectory(@"Sparkle_temp1");
     NSString *destinationDirectory = temporaryDirectory(@"Sparkle_temp2");
@@ -50,15 +52,30 @@
     
     NSFileManager *fileManager = [[NSFileManager alloc] init];
     
-    handler(fileManager, sourceDirectory, destinationDirectory);
+    if (beforeDiffHandler != nil) {
+        beforeDiffHandler(fileManager, sourceDirectory, destinationDirectory);
+    }
     
     XCTAssertEqual(0, createBinaryDelta(sourceDirectory, destinationDirectory, diffFile));
-    XCTAssertEqual(0, applyBinaryDelta(sourceDirectory, patchDirectory, diffFile));
+    
+    if (afterDiffHandler != nil) {
+        afterDiffHandler(fileManager, sourceDirectory, destinationDirectory);
+    }
+    
+    BOOL appliedDiff = (applyBinaryDelta(sourceDirectory, patchDirectory, diffFile) == 0);
     
     XCTAssertTrue([fileManager removeItemAtPath:sourceDirectory error:nil]);
     XCTAssertTrue([fileManager removeItemAtPath:destinationDirectory error:nil]);
     XCTAssertTrue([fileManager removeItemAtPath:patchDirectory error:nil]);
     XCTAssertTrue([fileManager removeItemAtPath:diffFile error:nil]);
+    
+    return appliedDiff;
+}
+
+- (void)createAndApplyPatchWithHandler:(SUDeltaHandler)handler
+{
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:handler afterDiffHandler:nil];
+    XCTAssertTrue(success);
 }
 
 - (BOOL)testDirectoryHashEqualityWithSource:(NSString *)source destination:(NSString *)destination
@@ -100,6 +117,24 @@
         
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
+}
+
+- (void)testInvalidSource
+{
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([[NSData data] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[NSData dataWithBytes:"loltest" length:7] writeToFile:destinationFile atomically:YES]);
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    } afterDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([[NSData dataWithBytes:"testt" length:5] writeToFile:sourceFile atomically:YES]);
+    }];
+    XCTAssertFalse(success);
 }
 
 - (NSData *)bigData1
