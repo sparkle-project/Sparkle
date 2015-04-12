@@ -6,8 +6,6 @@
 //  Copyright (c) 2015 Sparkle Project. All rights reserved.
 //
 
-#define _DARWIN_NO_64_BIT_INODE 1
-
 #import "SUBinaryDeltaCreate.h"
 #import <Foundation/Foundation.h>
 #include "SUBinaryDeltaCommon.h"
@@ -59,14 +57,26 @@ extern int bsdiff(int argc, const char **argv);
 
 @end
 
+#define INFO_HASH_KEY @"hash"
+#define INFO_TYPE_KEY @"type"
+#define INFO_EXECUTABLE_PERMISSIONS_KEY @"executable_permissions"
+#define INFO_SIZE_KEY @"size"
+
 static NSDictionary *infoForFile(FTSENT *ent)
 {
-    NSData *hash = hashOfFile(ent);
-    NSNumber *size = @0;
-    if (ent->fts_info != FTS_D) {
-        size = @(ent->fts_statp->st_size);
+    NSData *hash = hashOfFileContents(ent);
+    if (!hash) {
+        return nil;
     }
-    return @{@"hash": hash, @"type": @(ent->fts_info), @"size": size};
+    
+    off_t size = (ent->fts_info != FTS_D) ? ent->fts_statp->st_size : 0;
+    
+    assert(ent->fts_statp != NULL);
+    
+    mode_t mode = ent->fts_statp->st_mode;
+    mode_t executablePermissions = mode & EXECUTABLE_PERMISSIONS;
+    
+    return @{INFO_HASH_KEY: hash, INFO_TYPE_KEY: @(ent->fts_info), INFO_EXECUTABLE_PERMISSIONS_KEY : @(executablePermissions), INFO_SIZE_KEY: @(size)};
 }
 
 static NSString *absolutePath(NSString *path)
@@ -83,10 +93,12 @@ static NSString *temporaryPatchFile(NSString *patchFile)
     return [NSString stringWithFormat:@"%@/.%@.tmp", directory, file];
 }
 
-static BOOL shouldSkipDeltaCompression(NSString * __unused key, NSDictionary* originalInfo, NSDictionary *newInfo)
+#define MIN_FILE_SIZE_FOR_CREATING_DELTA 4096
+
+static BOOL shouldSkipDeltaCompression(NSDictionary* originalInfo, NSDictionary *newInfo)
 {
-    unsigned long long fileSize = [newInfo[@"size"] unsignedLongLongValue];
-    if (fileSize < 4096) {
+    unsigned long long fileSize = [newInfo[INFO_SIZE_KEY] unsignedLongLongValue];
+    if (fileSize < MIN_FILE_SIZE_FOR_CREATING_DELTA) {
         return YES;
     }
 
@@ -94,20 +106,28 @@ static BOOL shouldSkipDeltaCompression(NSString * __unused key, NSDictionary* or
         return YES;
     }
 
-    if ([originalInfo[@"type"] unsignedShortValue] != [newInfo[@"type"] unsignedShortValue]) {
+    if ([originalInfo[INFO_TYPE_KEY] unsignedShortValue] != [newInfo[INFO_TYPE_KEY] unsignedShortValue]) {
+        return YES;
+    }
+    
+    if ([originalInfo[INFO_EXECUTABLE_PERMISSIONS_KEY] unsignedShortValue] != [newInfo[INFO_EXECUTABLE_PERMISSIONS_KEY] unsignedShortValue]) {
         return YES;
     }
 
     return NO;
 }
 
-static BOOL shouldDeleteThenExtract(NSString * __unused key, NSDictionary* originalInfo, NSDictionary *newInfo)
+static BOOL shouldDeleteThenExtract(NSDictionary* originalInfo, NSDictionary *newInfo)
 {
     if (!originalInfo) {
         return NO;
     }
 
-    if ([originalInfo[@"type"] unsignedShortValue] != [newInfo[@"type"] unsignedShortValue]) {
+    if ([originalInfo[INFO_TYPE_KEY] unsignedShortValue] != [newInfo[INFO_TYPE_KEY] unsignedShortValue]) {
+        return YES;
+    }
+    
+    if ([originalInfo[INFO_EXECUTABLE_PERMISSIONS_KEY] unsignedShortValue] != [newInfo[INFO_EXECUTABLE_PERMISSIONS_KEY] unsignedShortValue]) {
         return YES;
     }
 
@@ -125,7 +145,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         return 1;
     }
 
-    fprintf(stdout, "Processing %s...", [source UTF8String]);
+    fprintf(stdout, "Processing %s...", [source fileSystemRepresentation]);
     FTSENT *ent = 0;
     while ((ent = fts_read(fts))) {
         if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D) {
@@ -138,11 +158,24 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         }
 
         NSDictionary *info = infoForFile(ent);
+        if (!info) {
+            fprintf(stderr, "Failed to retrieve info for file %s", ent->fts_path);
+            return 1;
+        }
         originalTreeState[key] = info;
     }
     fts_close(fts);
 
-    NSString *beforeHash = hashOfTree(source);
+    NSString *beforeHashv1_0 = hashOfTreeWithVersion(source, 1, 0);
+    if (!beforeHashv1_0) {
+        fprintf(stderr, "Failed to generate version 1.0 hash for tree %s ; this patch won't be apply-able from older versions", [source fileSystemRepresentation]);
+    }
+    
+    NSString *beforeHashv1_1 = hashOfTree(source);
+    if (!beforeHashv1_1) {
+        fprintf(stderr, "Failed to generate latest hash for tree %s", [source fileSystemRepresentation]);
+        return 1;
+    }
 
     NSMutableDictionary *newTreeState = [NSMutableDictionary dictionary];
     for (NSString *key in originalTreeState)
@@ -150,7 +183,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         newTreeState[key] = [NSNull null];
     }
 
-    fprintf(stdout, "\nProcessing %s...  ", [destination UTF8String]);
+    fprintf(stdout, "\nProcessing %s...  ", [destination fileSystemRepresentation]);
     sourcePaths[0] = [destination fileSystemRepresentation];
     fts = fts_open((char* const*)sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
     if (!fts) {
@@ -170,6 +203,10 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         }
 
         NSDictionary *info = infoForFile(ent);
+        if (!info) {
+            fprintf(stderr, "Failed to retrieve info from file %s", ent->fts_path);
+            return 1;
+        }
         NSDictionary *oldInfo = originalTreeState[key];
 
         if ([info isEqual:oldInfo]) {
@@ -177,7 +214,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         } else {
             newTreeState[key] = info;
             
-            if (oldInfo && [oldInfo[@"type"] unsignedShortValue] == FTS_D && [info[@"type"] unsignedShortValue] != FTS_D) {
+            if (oldInfo && [oldInfo[INFO_TYPE_KEY] unsignedShortValue] == FTS_D && [info[INFO_TYPE_KEY] unsignedShortValue] != FTS_D) {
                 NSArray *parentPathComponents = key.pathComponents;
 
                 for (NSString *childPath in originalTreeState) {
@@ -192,16 +229,37 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     }
     fts_close(fts);
 
-    NSString *afterHash = hashOfTree(destination);
+    NSString *afterHashv1_0 = hashOfTreeWithVersion(destination, 1, 0);
+    if (!afterHashv1_0) {
+        fprintf(stderr, "Failed to generate version 1.0 hash for tree %s ; this patch won't be apply-able from older versions", [destination fileSystemRepresentation]);
+    }
+    
+    NSString *afterHashv1_1 = hashOfTree(destination);
+    if (!afterHashv1_1) {
+        fprintf(stderr, "Failed to generate latest hash for tree %s", [destination fileSystemRepresentation]);
+        return 1;
+    }
 
     fprintf(stdout, "\nGenerating delta...  ");
 
     NSString *temporaryFile = temporaryPatchFile(patchFile);
     xar_t x = xar_open([temporaryFile fileSystemRepresentation], WRITE);
     xar_opt_set(x, XAR_OPT_COMPRESSION, "bzip2");
+    
     xar_subdoc_t attributes = xar_subdoc_new(x, "binary-delta-attributes");
-    xar_subdoc_prop_set(attributes, "before-sha1", [beforeHash UTF8String]);
-    xar_subdoc_prop_set(attributes, "after-sha1", [afterHash UTF8String]);
+    
+    xar_subdoc_prop_set(attributes, "major-version", LATEST_DELTA_DIFF_MAJOR_VERSION_STR);
+    xar_subdoc_prop_set(attributes, "minor-version", LATEST_DELTA_DIFF_MINOR_VERSION_STR);
+    
+    if (beforeHashv1_0) {
+        xar_subdoc_prop_set(attributes, "before-sha1", [beforeHashv1_0 UTF8String]);
+    }
+    if (afterHashv1_0) {
+        xar_subdoc_prop_set(attributes, "after-sha1", [afterHashv1_0 UTF8String]);
+    }
+    
+    xar_subdoc_prop_set(attributes, "before-sha1-v1.1", [beforeHashv1_1 UTF8String]);
+    xar_subdoc_prop_set(attributes, "after-sha1-v1.1", [afterHashv1_1 UTF8String]);
 
     NSOperationQueue *deltaQueue = [[NSOperationQueue alloc] init];
     NSMutableArray *deltaOperations = [NSMutableArray array];
@@ -228,11 +286,11 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
 
         NSDictionary *originalInfo = originalTreeState[key];
         NSDictionary *newInfo = newTreeState[key];
-        if (shouldSkipDeltaCompression(key, originalInfo, newInfo)) {
+        if (shouldSkipDeltaCompression(originalInfo, newInfo)) {
             NSString *path = [destination stringByAppendingPathComponent:key];
             xar_file_t newFile = xar_add_frompath(x, 0, [key fileSystemRepresentation], [path fileSystemRepresentation]);
             assert(newFile);
-            if (shouldDeleteThenExtract(key, originalInfo, newInfo)) {
+            if (shouldDeleteThenExtract(originalInfo, newInfo)) {
                 xar_prop_set(newFile, "delete-then-extract", "true");
             }
         } else {
@@ -246,6 +304,10 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
 
     for (CreateBinaryDeltaOperation *operation in deltaOperations) {
         NSString *resultPath = [operation resultPath];
+        if (!resultPath) {
+            fprintf(stderr, "Failed to create patch from source %s and destination %s\n", [[operation relativePath] fileSystemRepresentation], [resultPath fileSystemRepresentation]);
+            return 1;
+        }
         xar_file_t newFile = xar_add_frompath(x, 0, [[operation relativePath] fileSystemRepresentation], [resultPath fileSystemRepresentation]);
         assert(newFile);
         xar_prop_set(newFile, "binary-delta", "true");

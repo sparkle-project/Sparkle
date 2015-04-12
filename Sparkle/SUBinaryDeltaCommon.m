@@ -56,6 +56,22 @@ NSString *temporaryFilename(NSString *base)
     return stringWithFileSystemRepresentation(buffer);
 }
 
+NSString *temporaryDirectory(NSString *base)
+{
+    NSString *template = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.XXXXXXXXXX", base]];
+    NSMutableData *data = [NSMutableData data];
+    [data appendBytes:template.fileSystemRepresentation length:strlen(template.fileSystemRepresentation) + 1];
+    
+    char *buffer = data.mutableBytes;
+    char *templateResult = mkdtemp(buffer);
+    if (templateResult == NULL) {
+        perror("mkdtemp");
+        return nil;
+    }
+    
+    return stringWithFileSystemRepresentation(templateResult);
+}
+
 static void _hashOfBuffer(unsigned char *hash, const char* buffer, ssize_t bufferLength)
 {
     assert(bufferLength >= 0 && bufferLength <= UINT32_MAX);
@@ -65,59 +81,57 @@ static void _hashOfBuffer(unsigned char *hash, const char* buffer, ssize_t buffe
     CC_SHA1_Final(hash, &hashContext);
 }
 
-static void _hashOfFile(unsigned char* hash, FTSENT *ent)
+static BOOL _hashOfFileContents(unsigned char* hash, FTSENT *ent)
 {
     if (ent->fts_info == FTS_SL) {
         char linkDestination[MAXPATHLEN + 1];
         ssize_t linkDestinationLength = readlink(ent->fts_path, linkDestination, MAXPATHLEN);
         if (linkDestinationLength < 0) {
             perror("readlink");
-            return;
+            return NO;
         }
 
         _hashOfBuffer(hash, linkDestination, linkDestinationLength);
-        return;
-    }
-
-    if (ent->fts_info == FTS_F) {
+    } else if (ent->fts_info == FTS_F) {
         int fileDescriptor = open(ent->fts_path, O_RDONLY);
         if (fileDescriptor == -1) {
             perror("open");
-            return;
+            return NO;
         }
 
         ssize_t fileSize = ent->fts_statp->st_size;
         if (fileSize == 0) {
             _hashOfBuffer(hash, NULL, 0);
-            close(fileDescriptor);
-            return;
+        } else {
+            void *buffer = mmap(0, (size_t)fileSize, PROT_READ, MAP_FILE | MAP_PRIVATE, fileDescriptor, 0);
+            if (buffer == (void*)-1) {
+                close(fileDescriptor);
+                perror("mmap");
+                return NO;
+            }
+            
+            _hashOfBuffer(hash, buffer, fileSize);
+            munmap(buffer, (size_t)fileSize);
         }
-
-        void *buffer = mmap(0, (size_t)fileSize, PROT_READ, MAP_FILE | MAP_PRIVATE, fileDescriptor, 0);
-        if (buffer == (void*)-1) {
-            close(fileDescriptor);
-            perror("mmap");
-            return;
-        }
-
-        _hashOfBuffer(hash, buffer, fileSize);
-        munmap(buffer, (size_t)fileSize);
         close(fileDescriptor);
-        return;
-    }
-
-    if (ent->fts_info == FTS_D)
+    } else if (ent->fts_info == FTS_D) {
         memset(hash, 0xdd, CC_SHA1_DIGEST_LENGTH);
+    } else {
+        return NO;
+    }
+    return YES;
 }
 
-NSData *hashOfFile(FTSENT *ent)
+NSData *hashOfFileContents(FTSENT *ent)
 {
     unsigned char fileHash[CC_SHA1_DIGEST_LENGTH];
-    _hashOfFile(fileHash, ent);
+    if (!_hashOfFileContents(fileHash, ent)) {
+        return nil;
+    }
     return [NSData dataWithBytes:fileHash length:CC_SHA1_DIGEST_LENGTH];
 }
 
-NSString *hashOfTree(NSString *path)
+NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion, uint16_t minorVersion)
 {
     const char *sourcePaths[] = {[path fileSystemRepresentation], 0};
     FTS *fts = fts_open((char* const*)sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
@@ -135,12 +149,24 @@ NSString *hashOfTree(NSString *path)
             continue;
 
         unsigned char fileHash[CC_SHA1_DIGEST_LENGTH];
-        _hashOfFile(fileHash, ent);
+        _hashOfFileContents(fileHash, ent);
+        if (!_hashOfFileContents(fileHash, ent)) {
+            return nil;
+        }
         CC_SHA1_Update(&hashContext, fileHash, sizeof(fileHash));
 
         NSString *relativePath = pathRelativeToDirectory(path, stringWithFileSystemRepresentation(ent->fts_path));
         const char *relativePathBytes = [relativePath fileSystemRepresentation];
         CC_SHA1_Update(&hashContext, relativePathBytes, (CC_LONG)strlen(relativePathBytes));
+        
+        if (DIFF_VERSION_IS_AT_LEAST(majorVersion, minorVersion, 1, 1)) {
+            uint16_t mode = ent->fts_statp->st_mode;
+            uint16_t type = ent->fts_info;
+            uint16_t executablePermissions = mode & EXECUTABLE_PERMISSIONS;
+            
+            CC_SHA1_Update(&hashContext, &type, sizeof(type));
+            CC_SHA1_Update(&hashContext, &executablePermissions, sizeof(executablePermissions));
+        }
     }
     fts_close(fts);
 
@@ -155,12 +181,18 @@ NSString *hashOfTree(NSString *path)
     return @(hexHash);
 }
 
-void removeTree(NSString *path)
+extern NSString *hashOfTree(NSString *path)
 {
-    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+    return hashOfTreeWithVersion(path, LATEST_DELTA_DIFF_MAJOR_VERSION, LATEST_DELTA_DIFF_MINOR_VERSION);
 }
 
-void copyTree(NSString *source, NSString *dest)
+BOOL removeTree(NSString *path)
 {
-    [[NSFileManager defaultManager] copyItemAtPath:source toPath:dest error:nil];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    return ![fileManager fileExistsAtPath:path] ? YES : [fileManager removeItemAtPath:path error:nil];
+}
+
+BOOL copyTree(NSString *source, NSString *dest)
+{
+    return [[NSFileManager defaultManager] copyItemAtPath:source toPath:dest error:nil];
 }

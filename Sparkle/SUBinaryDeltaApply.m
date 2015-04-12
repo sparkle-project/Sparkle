@@ -15,38 +15,84 @@
 #include <stdlib.h>
 #include <xar/xar.h>
 
-static void applyBinaryDeltaToFile(xar_t x, xar_file_t file, NSString *sourceFilePath, NSString *destinationFilePath)
+static BOOL applyBinaryDeltaToFile(xar_t x, xar_file_t file, NSString *sourceFilePath, NSString *destinationFilePath)
 {
     NSString *patchFile = temporaryFilename(@"apply-binary-delta");
     xar_extract_tofile(x, file, [patchFile fileSystemRepresentation]);
     const char *argv[] = {"/usr/bin/bspatch", [sourceFilePath fileSystemRepresentation], [destinationFilePath fileSystemRepresentation], [patchFile fileSystemRepresentation]};
-    bspatch(4, (char **)argv);
+    BOOL success = (bspatch(4, (char **)argv) == 0);
     unlink([patchFile fileSystemRepresentation]);
+    return success;
 }
 
 int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFile)
 {
-    xar_t x = xar_open([patchFile UTF8String], READ);
+    xar_t x = xar_open([patchFile fileSystemRepresentation], READ);
     if (!x) {
-        fprintf(stderr, "Unable to open %s. Giving up.\n", [patchFile UTF8String]);
+        fprintf(stderr, "Unable to open %s. Giving up.\n", [patchFile fileSystemRepresentation]);
         return 1;
     }
+    
+    uint16_t majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
+    uint16_t minorDiffVersion = FIRST_DELTA_DIFF_MINOR_VERSION;
 
-    NSString *expectedBeforeHash = nil;
-    NSString *expectedAfterHash = nil;
+    NSString *expectedBeforeHashv1_0 = nil;
+    NSString *expectedAfterHashv1_0 = nil;
+    
+    NSString *expectedBeforeHashv1_1 = nil;
+    NSString *expectedAfterHashv1_1 = nil;
+    
     xar_subdoc_t subdoc;
     for (subdoc = xar_subdoc_first(x); subdoc; subdoc = xar_subdoc_next(subdoc)) {
         if (!strcmp(xar_subdoc_name(subdoc), "binary-delta-attributes")) {
             const char *value = 0;
+            
+            // only available in version 1.1 or later
+            xar_subdoc_prop_get(subdoc, "major-version", &value);
+            if (value)
+                majorDiffVersion = (uint16_t)[@(value) intValue];
+            
+            // only available in version 1.1 or later
+            xar_subdoc_prop_get(subdoc, "minor-version", &value);
+            if (value)
+                minorDiffVersion = (uint16_t)[@(value) intValue];
+            
+            // deprecated since version 1.1
             xar_subdoc_prop_get(subdoc, "before-sha1", &value);
             if (value)
-                expectedBeforeHash = @(value);
+                expectedBeforeHashv1_0 = @(value);
 
+            // deprecated since version 1.1
             xar_subdoc_prop_get(subdoc, "after-sha1", &value);
             if (value)
-                expectedAfterHash = @(value);
+                expectedAfterHashv1_0 = @(value);
+            
+            // only available in version 1.1 or later
+            xar_subdoc_prop_get(subdoc, "before-sha1-v1.1", &value);
+            if (value)
+                expectedBeforeHashv1_1 = @(value);
+            
+            // only available in version 1.1 or later
+            xar_subdoc_prop_get(subdoc, "after-sha1-v1.1", &value);
+            if (value)
+                expectedAfterHashv1_1 = @(value);
         }
     }
+    
+    if (majorDiffVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {
+        fprintf(stderr, "Unable to identify diff-version %u in delta.  Giving up.\n", majorDiffVersion);
+        return 1;
+    }
+    
+    if (majorDiffVersion > LATEST_DELTA_DIFF_MAJOR_VERSION) {
+        fprintf(stderr, "A later version is needed to apply this patch (on major version %u, but patch requests version %u).\n", LATEST_DELTA_DIFF_MAJOR_VERSION, majorDiffVersion);
+        return 1;
+    }
+    
+    BOOL usesPatch1_1 = DIFF_VERSION_IS_AT_LEAST(majorDiffVersion, minorDiffVersion, 1, 1);
+    
+    NSString *expectedBeforeHash = usesPatch1_1 ? expectedBeforeHashv1_1 : expectedBeforeHashv1_0;
+    NSString *expectedAfterHash = usesPatch1_1 ? expectedAfterHashv1_1 : expectedAfterHashv1_0;
 
     if (!expectedBeforeHash || !expectedAfterHash) {
         fprintf(stderr, "Unable to find before-sha1 or after-sha1 metadata in delta.  Giving up.\n");
@@ -54,7 +100,11 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
     }
 
     fprintf(stdout, "Verifying source...  ");
-    NSString *beforeHash = hashOfTree(source);
+    NSString *beforeHash = hashOfTreeWithVersion(source, majorDiffVersion, minorDiffVersion);
+    if (!beforeHash) {
+        fprintf(stderr, "Unable to calculate hash of tree %s\n", [source fileSystemRepresentation]);
+        return 1;
+    }
 
     if (![beforeHash isEqualToString:expectedBeforeHash]) {
         fprintf(stderr, "Source doesn't have expected hash (%s != %s).  Giving up.\n", [expectedBeforeHash UTF8String], [beforeHash UTF8String]);
@@ -62,8 +112,14 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
     }
 
     fprintf(stdout, "\nCopying files...  ");
-    removeTree(destination);
-    copyTree(source, destination);
+    if (!removeTree(destination)) {
+        fprintf(stderr, "Failed to remove %s\n", [destination fileSystemRepresentation]);
+        return 1;
+    }
+    if (!copyTree(source, destination)) {
+        fprintf(stderr, "Failed to copy %s to %s\n", [source fileSystemRepresentation], [destination fileSystemRepresentation]);
+        return 1;
+    }
 
     fprintf(stdout, "\nPatching... ");
     xar_file_t file;
@@ -80,15 +136,26 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
                 continue;
         }
 
-        if (!xar_prop_get(file, "binary-delta", &value))
-            applyBinaryDeltaToFile(x, file, sourceFilePath, destinationFilePath);
-        else
-            xar_extract_tofile(x, file, [destinationFilePath fileSystemRepresentation]);
+        if (!xar_prop_get(file, "binary-delta", &value)) {
+            if (!applyBinaryDeltaToFile(x, file, sourceFilePath, destinationFilePath)) {
+                fprintf(stderr, "Unable to patch %s to destination %s\n", [sourceFilePath fileSystemRepresentation], [destinationFilePath fileSystemRepresentation]);
+                return 1;
+            }
+        } else {
+            if (xar_extract_tofile(x, file, [destinationFilePath fileSystemRepresentation]) != 0) {
+                fprintf(stderr, "Unable to extract file to %s\n", [destinationFilePath fileSystemRepresentation]);
+                return 1;
+            }
+        }
     }
     xar_close(x);
 
     fprintf(stdout, "\nVerifying destination...  ");
-    NSString *afterHash = hashOfTree(destination);
+    NSString *afterHash = hashOfTreeWithVersion(destination, majorDiffVersion, minorDiffVersion);
+    if (!afterHash) {
+        fprintf(stderr, "Unable to calculate hash of tree %s\n", [destination fileSystemRepresentation]);
+        return 1;
+    }
 
     if (![afterHash isEqualToString:expectedAfterHash]) {
         fprintf(stderr, "Destination doesn't have expected hash (%s != %s).  Giving up.\n", [expectedAfterHash UTF8String], [afterHash UTF8String]);

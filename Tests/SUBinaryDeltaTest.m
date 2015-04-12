@@ -18,22 +18,6 @@
 
 @implementation SUBinaryDeltaTest
 
-static NSString *temporaryDirectory(NSString *base)
-{
-    NSString *template = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.XXXXXXXXXX", base]];
-    NSMutableData *data = [NSMutableData data];
-    [data appendBytes:template.fileSystemRepresentation length:strlen(template.fileSystemRepresentation) + 1];
-    
-    char *buffer = data.mutableBytes;
-    char *templateResult = mkdtemp(buffer);
-    if (templateResult == NULL) {
-        perror("mkdtemp");
-        return nil;
-    }
-    
-    return stringWithFileSystemRepresentation(templateResult);
-}
-
 - (void)testTemporaryDirectory
 {
     NSString *tmp1 = temporaryDirectory(@"Sparkle");
@@ -82,7 +66,13 @@ static NSString *temporaryDirectory(NSString *base)
     XCTAssertNotNil(source);
     XCTAssertNotNil(destination);
     
-    return [hashOfTree(source) isEqualToString:hashOfTree(destination)];
+    NSString *beforeHash = hashOfTree(source);
+    NSString *afterHash = hashOfTree(destination);
+    
+    XCTAssertNotNil(beforeHash);
+    XCTAssertNotNil(afterHash);
+    
+    return [beforeHash isEqualToString:afterHash];
 }
 
 - (void)testEmptyDataDiff
@@ -271,10 +261,7 @@ static NSString *temporaryDirectory(NSString *base)
     }];
 }
 
-/*
-// This fails in the hash equality check
-// The delta tool also fails at doing file permission changes, though this test won't be able to detect it
-- (void)testFilePermissionChangedWithHashCheck
+- (void)testExecutableFilePermissionChangedWithHashCheck
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
@@ -285,15 +272,15 @@ static NSString *temporaryDirectory(NSString *base)
         XCTAssertTrue([data writeToFile:destinationFile atomically:YES]);
         
         NSError *error = nil;
-        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0777} ofItemAtPath:destinationFile error:&error]) {
+        if (![fileManager setAttributes:@{NSFilePosixPermissions : @0755} ofItemAtPath:destinationFile error:&error]) {
             NSLog(@"Change Permission Error: %@", error);
             XCTFail(@"Failed setting file permissions");
         }
         
+        // This would fail for version 1.0
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
- */
 
 - (void)testRegularFileToSymlinkChange
 {
@@ -304,7 +291,7 @@ static NSString *temporaryDirectory(NSString *base)
         NSString *destinationFile1 = [destinationDirectory stringByAppendingPathComponent:@"A"];
         NSString *destinationFile2 = [destinationDirectory stringByAppendingPathComponent:@"B"];
         
-        NSData *data = [NSData dataWithBytes:"loltest" length:7];
+        NSData *data = [NSData dataWithBytes:"A" length:1];
         
         XCTAssertTrue([data writeToFile:sourceFile1 atomically:YES]);
         XCTAssertTrue([data writeToFile:sourceFile2 atomically:YES]);
@@ -317,6 +304,7 @@ static NSString *temporaryDirectory(NSString *base)
             XCTFail(@"Failed to create symlink");
         }
         
+        // This would fail with version 1.0
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
