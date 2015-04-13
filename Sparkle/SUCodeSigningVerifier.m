@@ -13,7 +13,7 @@
 
 @implementation SUCodeSigningVerifier
 
-+ (BOOL)codeSignatureIsValidAtPath:(NSString *)destinationPath error:(NSError *__autoreleasing *)error
++ (BOOL)codeSignatureMatchesHostAndIsValidAtPath:(NSString *)applicationPath error:(NSError *__autoreleasing *)error
 {
     OSStatus result;
     SecRequirementRef requirement = NULL;
@@ -37,7 +37,7 @@
         goto finally;
     }
 
-    newBundle = [NSBundle bundleWithPath:destinationPath];
+    newBundle = [NSBundle bundleWithPath:applicationPath];
     if (!newBundle) {
         SULog(@"Failed to load NSBundle for update");
         result = -1;
