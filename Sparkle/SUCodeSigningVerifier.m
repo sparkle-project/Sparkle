@@ -114,4 +114,35 @@ static id valueOrNSNull(id value) {
     return (result == 0);
 }
 
++ (BOOL)applicationAtPathIsCodeSigned:(NSString *)applicationPath
+{
+    OSStatus result;
+    SecStaticCodeRef staticCode = NULL;
+    NSBundle *newBundle;
+
+    newBundle = [NSBundle bundleWithPath:applicationPath];
+    if (!newBundle) {
+        SULog(@"Failed to load NSBundle");
+    	return NO;
+    }
+
+    result = SecStaticCodeCreateWithPath((__bridge CFURLRef)[newBundle bundleURL], kSecCSDefaultFlags, &staticCode);
+    if (result == errSecCSUnsigned) {
+    	return NO;
+    }
+
+    SecRequirementRef requirement = NULL;
+    result = SecCodeCopyDesignatedRequirement(staticCode, kSecCSDefaultFlags, &requirement);
+    if (staticCode) {
+        CFRelease(staticCode);
+    }
+    if (requirement) {
+        CFRelease(requirement);
+    }
+    if (result == errSecCSUnsigned) {
+    	return NO;
+    }
+    return (result == 0);
+}
+
 @end
