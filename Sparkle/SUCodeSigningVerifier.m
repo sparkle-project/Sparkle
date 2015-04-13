@@ -50,7 +50,8 @@
         goto finally;
     }
 
-    result = SecStaticCodeCheckValidityWithErrors(staticCode, kSecCSDefaultFlags | kSecCSCheckAllArchitectures, requirement, &cfError);
+	SecCSFlags flags = kSecCSDefaultFlags | kSecCSCheckAllArchitectures | kSecCSCheckNestedCode;
+    result = SecStaticCodeCheckValidityWithErrors(staticCode, flags, requirement, &cfError);
 
     if (cfError) {
         NSError *tmpError = CFBridgingRelease(cfError);
