@@ -133,6 +133,23 @@ static BOOL shouldDeleteThenExtract(NSDictionary* originalInfo, NSDictionary *ne
     return NO;
 }
 
+static BOOL shouldSkipExtracting(NSDictionary *originalInfo, NSDictionary *newInfo)
+{
+    if (!originalInfo) {
+        return NO;
+    }
+    
+    if ([originalInfo[INFO_TYPE_KEY] unsignedShortValue] != [newInfo[INFO_TYPE_KEY] unsignedShortValue]) {
+        return NO;
+    }
+    
+    if (![originalInfo[INFO_HASH_KEY] isEqual:newInfo[INFO_HASH_KEY]]) {
+        return NO;
+    }
+    
+    return YES;
+}
+
 static BOOL shouldChangePermissions(NSDictionary *originalInfo, NSDictionary *newInfo)
 {
     if (!originalInfo) {
@@ -310,10 +327,12 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         NSDictionary *originalInfo = originalTreeState[key];
         NSDictionary *newInfo = newTreeState[key];
         if (shouldSkipDeltaCompression(originalInfo, newInfo)) {
-            if (shouldChangePermissions(originalInfo, newInfo)) {
-                xar_file_t newFile = xar_add_frombuffer(x, 0, [key fileSystemRepresentation], (char *)"", 1);
-                assert(newFile);
-                xar_prop_set(newFile, "mod-permissions", [[NSString stringWithFormat:@"%u", [newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]] UTF8String]);
+            if (shouldSkipExtracting(originalInfo, newInfo)) {
+                if (shouldChangePermissions(originalInfo, newInfo)) {
+                    xar_file_t newFile = xar_add_frombuffer(x, 0, [key fileSystemRepresentation], (char *)"", 1);
+                    assert(newFile);
+                    xar_prop_set(newFile, "mod-permissions", [[NSString stringWithFormat:@"%u", [newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]] UTF8String]);
+                }
             } else {
                 NSString *path = [destination stringByAppendingPathComponent:key];
                 xar_file_t newFile = xar_add_frompath(x, 0, [key fileSystemRepresentation], [path fileSystemRepresentation]);
