@@ -44,7 +44,7 @@
         goto finally;
     }
 
-    result = SecStaticCodeCreateWithPath((__bridge CFURLRef)[newBundle executableURL], kSecCSDefaultFlags, &staticCode);
+    result = SecStaticCodeCreateWithPath((__bridge CFURLRef)[newBundle bundleURL], kSecCSDefaultFlags, &staticCode);
     if (result != noErr) {
         SULog(@"Failed to get static code %d", result);
         goto finally;
