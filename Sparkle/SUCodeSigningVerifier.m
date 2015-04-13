@@ -80,6 +80,51 @@ finally:
     return (result == noErr);
 }
 
++ (BOOL)codeSignatureIsValidAtPath:(NSString *)applicationPath error:(NSError *__autoreleasing *)error
+{
+    OSStatus result;
+    SecStaticCodeRef staticCode = NULL;
+    NSBundle *newBundle;
+    CFErrorRef cfError = NULL;
+    if (error) {
+        *error = nil;
+    }
+
+    newBundle = [NSBundle bundleWithPath:applicationPath];
+    if (!newBundle) {
+        SULog(@"Failed to load NSBundle");
+        result = -1;
+        goto finally;
+    }
+
+    result = SecStaticCodeCreateWithPath((__bridge CFURLRef)[newBundle bundleURL], kSecCSDefaultFlags, &staticCode);
+    if (result != noErr) {
+        SULog(@"Failed to get static code %d", result);
+        goto finally;
+    }
+
+	SecCSFlags flags = kSecCSDefaultFlags | kSecCSCheckAllArchitectures | kSecCSCheckNestedCode;
+    result = SecStaticCodeCheckValidityWithErrors(staticCode, flags, NULL, &cfError);
+
+    if (cfError) {
+        NSError *tmpError = CFBridgingRelease(cfError);
+        if (error) *error = tmpError;
+    }
+
+    if (result != noErr) {
+        if (result == errSecCSUnsigned) {
+            SULog(@"Error: The app is not signed using Apple Code Signing. %@", applicationPath);
+        }
+        if (result == errSecCSReqFailed) {
+            [self logSigningInfoForCode:staticCode label:@"new info"];
+        }
+    }
+
+finally:
+    if (staticCode) CFRelease(staticCode);
+    return (result == noErr);
+}
+
 static id valueOrNSNull(id value) {
     return value ? value : [NSNull null];
 }
