@@ -25,21 +25,24 @@ extern int bsdiff(int argc, const char **argv);
 @interface CreateBinaryDeltaOperation : NSOperation
 @property (copy) NSString *relativePath;
 @property (strong) NSString *resultPath;
+@property (strong) NSNumber *permissions;
 @property (strong) NSString *_fromPath;
 @property (strong) NSString *_toPath;
-- (id)initWithRelativePath:(NSString *)relativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree;
+- (id)initWithRelativePath:(NSString *)relativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree permissions:(NSNumber *)permissions;
 @end
 
 @implementation CreateBinaryDeltaOperation
 @synthesize relativePath = _relativePath;
 @synthesize resultPath = _resultPath;
+@synthesize permissions = _permissions;
 @synthesize _fromPath = _fromPath;
 @synthesize _toPath = _toPath;
 
-- (id)initWithRelativePath:(NSString *)relativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree
+- (id)initWithRelativePath:(NSString *)relativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree permissions:(NSNumber *)permissions
 {
     if ((self = [super init])) {
         self.relativePath = relativePath;
+        self.permissions = permissions;
         self._fromPath = [oldTree stringByAppendingPathComponent:relativePath];
         self._toPath = [newTree stringByAppendingPathComponent:relativePath];
     }
@@ -109,7 +112,8 @@ static BOOL shouldSkipDeltaCompression(NSDictionary* originalInfo, NSDictionary 
         return YES;
     }
     
-    if ([originalInfo[INFO_PERMISSIONS_KEY] unsignedShortValue] != [newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]) {
+    if ([originalInfo[INFO_HASH_KEY] isEqual:newInfo[INFO_HASH_KEY]]) {
+        // this is possible if just the permissions have changed
         return YES;
     }
 
@@ -125,12 +129,25 @@ static BOOL shouldDeleteThenExtract(NSDictionary* originalInfo, NSDictionary *ne
     if ([originalInfo[INFO_TYPE_KEY] unsignedShortValue] != [newInfo[INFO_TYPE_KEY] unsignedShortValue]) {
         return YES;
     }
-    
-    if ([originalInfo[INFO_PERMISSIONS_KEY] unsignedShortValue] != [newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]) {
-        return YES;
-    }
 
     return NO;
+}
+
+static BOOL shouldChangePermissions(NSDictionary *originalInfo, NSDictionary *newInfo)
+{
+    if (!originalInfo) {
+        return NO;
+    }
+    
+    if ([originalInfo[INFO_TYPE_KEY] unsignedShortValue] != [newInfo[INFO_TYPE_KEY] unsignedShortValue]) {
+        return NO;
+    }
+    
+    if ([originalInfo[INFO_PERMISSIONS_KEY] unsignedShortValue] == [newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]) {
+        return NO;
+    }
+    
+    return YES;
 }
 
 int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile)
@@ -293,14 +310,22 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         NSDictionary *originalInfo = originalTreeState[key];
         NSDictionary *newInfo = newTreeState[key];
         if (shouldSkipDeltaCompression(originalInfo, newInfo)) {
-            NSString *path = [destination stringByAppendingPathComponent:key];
-            xar_file_t newFile = xar_add_frompath(x, 0, [key fileSystemRepresentation], [path fileSystemRepresentation]);
-            assert(newFile);
-            if (shouldDeleteThenExtract(originalInfo, newInfo)) {
-                xar_prop_set(newFile, "delete-then-extract", "true");
+            if (shouldChangePermissions(originalInfo, newInfo)) {
+                xar_file_t newFile = xar_add_frombuffer(x, 0, [key fileSystemRepresentation], (char *)"", 1);
+                assert(newFile);
+                xar_prop_set(newFile, "mod-permissions", [[NSString stringWithFormat:@"%u", [newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]] UTF8String]);
+            } else {
+                NSString *path = [destination stringByAppendingPathComponent:key];
+                xar_file_t newFile = xar_add_frompath(x, 0, [key fileSystemRepresentation], [path fileSystemRepresentation]);
+                assert(newFile);
+                
+                if (shouldDeleteThenExtract(originalInfo, newInfo)) {
+                    xar_prop_set(newFile, "delete-then-extract", "true");
+                }
             }
         } else {
-            CreateBinaryDeltaOperation *operation = [[CreateBinaryDeltaOperation alloc] initWithRelativePath:key oldTree:source newTree:destination];
+            NSNumber *permissions = shouldChangePermissions(originalInfo, newInfo) ? newInfo[INFO_PERMISSIONS_KEY] : nil;
+            CreateBinaryDeltaOperation *operation = [[CreateBinaryDeltaOperation alloc] initWithRelativePath:key oldTree:source newTree:destination permissions:permissions];
             [deltaQueue addOperation:operation];
             [deltaOperations addObject:operation];
         }
@@ -318,6 +343,10 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         assert(newFile);
         xar_prop_set(newFile, "binary-delta", "true");
         unlink([resultPath fileSystemRepresentation]);
+        
+        if (operation.permissions) {
+            xar_prop_set(newFile, "mod-permissions", [[NSString stringWithFormat:@"%u", [operation.permissions unsignedShortValue]] UTF8String]);
+        }
     }
 
     xar_close(x);

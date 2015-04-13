@@ -141,9 +141,16 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
                 fprintf(stderr, "Unable to patch %s to destination %s\n", [sourceFilePath fileSystemRepresentation], [destinationFilePath fileSystemRepresentation]);
                 return 1;
             }
-        } else {
+        } else if (xar_prop_get(file, "mod-permissions", &value)) {
             if (xar_extract_tofile(x, file, [destinationFilePath fileSystemRepresentation]) != 0) {
                 fprintf(stderr, "Unable to extract file to %s\n", [destinationFilePath fileSystemRepresentation]);
+                return 1;
+            }
+        }
+        
+        if (!xar_prop_get(file, "mod-permissions", &value)) {
+            if (!modifyPermissions(destinationFilePath, (mode_t)[[NSString stringWithUTF8String:value] intValue])) {
+                fprintf(stderr, "Unable to modify permissions (%s) on file %s\n", value, [destinationFilePath fileSystemRepresentation]);
                 return 1;
             }
         }

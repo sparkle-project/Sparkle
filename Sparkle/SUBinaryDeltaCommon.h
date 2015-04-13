@@ -41,6 +41,7 @@ extern NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion, ui
 extern NSString *hashOfTree(NSString *path);
 extern BOOL removeTree(NSString *path);
 extern BOOL copyTree(NSString *source, NSString *dest);
+extern BOOL modifyPermissions(NSString *path, mode_t desiredPermissions);
 extern NSString *pathRelativeToDirectory(NSString *directory, NSString *path);
 NSString *temporaryFilename(NSString *base);
 NSString *temporaryDirectory(NSString *base);

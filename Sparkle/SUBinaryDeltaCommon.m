@@ -200,3 +200,21 @@ BOOL copyTree(NSString *source, NSString *dest)
 {
     return [[NSFileManager defaultManager] copyItemAtPath:source toPath:dest error:nil];
 }
+
+BOOL modifyPermissions(NSString *path, mode_t desiredPermissions)
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSDictionary *attributes = [fileManager attributesOfItemAtPath:path error:nil];
+    if (!attributes) {
+        return NO;
+    }
+    NSNumber *permissions = attributes[NSFilePosixPermissions];
+    if (!permissions) {
+        return NO;
+    }
+    mode_t newMode = ([permissions unsignedShortValue] & ~PERMISSION_FLAGS) | desiredPermissions;
+    if (![fileManager setAttributes:@{NSFilePosixPermissions : @(newMode)} ofItemAtPath:path error:nil]) {
+        return NO;
+    }
+    return YES;
+}
