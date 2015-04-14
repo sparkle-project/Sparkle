@@ -107,6 +107,20 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
+- (void)testDifferentlyNamedEmptyDataDiff
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSData *emptyData = [NSData data];
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"B"];
+        
+        XCTAssertTrue([emptyData writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([emptyData writeToFile:destinationFile atomically:YES]);
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
 - (void)testEmptyDirectoryDiff
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
