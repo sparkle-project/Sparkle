@@ -158,7 +158,7 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
 
         [self.statusController close]; // If there's an existing status controller, close it before we release our strong reference to it.
         self.statusController = statusCtl; // Keep a strong reference to the status controller, or else it might get prematurely deallocated.
-}
+    }
 
     [SUInstaller installFromUpdateFolder:self.folderpath
                                 overHost:self.host
@@ -174,8 +174,9 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
 
 - (void)installerForHost:(SUHost *)__unused host failedWithError:(NSError *)error __attribute__((noreturn))
 {
-    if (self.shouldShowUI)
+    if (self.shouldShowUI) {
         NSRunAlertPanel(@"", @"%@", @"OK", @"", @"", [error localizedDescription]);
+    }
     exit(EXIT_FAILURE);
 }
 
