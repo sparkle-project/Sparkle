@@ -17,10 +17,6 @@
 #include <sys/stat.h>
 #include <xar/xar.h>
 
-// Only track executable bits for tree hashing, which is what VCS's like git and hg do as well
-// Other permission bits might be too sketchy to track
-#define EXECUTABLE_PERMISSIONS (S_IXUSR | S_IXGRP | S_IXOTH)
-
 int compareFiles(const FTSENT **a, const FTSENT **b)
 {
     return strcoll((*a)->fts_name, (*b)->fts_name);
@@ -172,7 +168,7 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion, uint16_t 
         if (DIFF_VERSION_IS_AT_LEAST(majorVersion, minorVersion, 1, 1)) {
             uint16_t mode = ent->fts_statp->st_mode;
             uint16_t type = ent->fts_info;
-            uint16_t executablePermissions = mode & EXECUTABLE_PERMISSIONS;
+            uint16_t executablePermissions = mode & PERMISSION_FLAGS;
             
             CC_SHA1_Update(&hashContext, &type, sizeof(type));
             CC_SHA1_Update(&hashContext, &executablePermissions, sizeof(executablePermissions));
