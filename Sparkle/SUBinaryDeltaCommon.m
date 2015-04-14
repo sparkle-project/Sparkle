@@ -149,17 +149,23 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion, uint16_t 
 
     FTSENT *ent = 0;
     while ((ent = fts_read(fts))) {
-        if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL)
+        if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D)
+            continue;
+        
+        if (ent->fts_info == FTS_D && !DIFF_VERSION_IS_AT_LEAST(majorVersion, minorVersion, 1, 1)) {
+            continue;
+        }
+        
+        NSString *relativePath = pathRelativeToDirectory(path, stringWithFileSystemRepresentation(ent->fts_path));
+        if (relativePath.length == 0)
             continue;
 
         unsigned char fileHash[CC_SHA1_DIGEST_LENGTH];
-        _hashOfFileContents(fileHash, ent);
         if (!_hashOfFileContents(fileHash, ent)) {
             return nil;
         }
         CC_SHA1_Update(&hashContext, fileHash, sizeof(fileHash));
 
-        NSString *relativePath = pathRelativeToDirectory(path, stringWithFileSystemRepresentation(ent->fts_path));
         const char *relativePathBytes = [relativePath fileSystemRepresentation];
         CC_SHA1_Update(&hashContext, relativePathBytes, (CC_LONG)strlen(relativePathBytes));
         
