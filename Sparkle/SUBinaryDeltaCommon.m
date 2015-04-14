@@ -215,7 +215,8 @@ BOOL modifyPermissions(NSString *path, mode_t desiredPermissions)
         return NO;
     }
     mode_t newMode = ([permissions unsignedShortValue] & ~PERMISSION_FLAGS) | desiredPermissions;
-    if (![fileManager setAttributes:@{NSFilePosixPermissions : @(newMode)} ofItemAtPath:path error:nil]) {
+    int (*changeModeFunc)(const char *, mode_t) = [attributes[NSFileType] isEqualToString:NSFileTypeSymbolicLink] ? lchmod : chmod;
+    if (changeModeFunc([path fileSystemRepresentation], newMode) != 0) {
         return NO;
     }
     return YES;
