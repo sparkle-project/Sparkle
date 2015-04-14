@@ -116,12 +116,12 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSError *error = nil;
         if (![fileManager createDirectoryAtPath:sourceFile withIntermediateDirectories:NO attributes:nil error:&error]) {
             NSLog(@"Failed creating directory with error: %@", error);
-            XCTAssertFalse("Failed to create directory");
+            XCTFail("Failed to create directory");
         }
         
         if (![fileManager createDirectoryAtPath:destinationFile withIntermediateDirectories:NO attributes:nil error:&error]) {
             NSLog(@"Failed creating directory with error: %@", error);
-            XCTAssertFalse("Failed to create directory");
+            XCTFail("Failed to create directory");
         }
         
         XCTAssertTrue([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
@@ -138,12 +138,12 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSError *error = nil;
         if (![fileManager createDirectoryAtPath:sourceFile withIntermediateDirectories:NO attributes:nil error:&error]) {
             NSLog(@"Failed creating directory with error: %@", error);
-            XCTAssertFalse("Failed to create directory");
+            XCTFail("Failed to create directory");
         }
         
         if (![fileManager createDirectoryAtPath:destinationFile withIntermediateDirectories:NO attributes:nil error:&error]) {
             NSLog(@"Failed creating directory with error: %@", error);
-            XCTAssertFalse("Failed to create directory");
+            XCTFail("Failed to create directory");
         }
         
         // This would fail for version 1.0
@@ -260,7 +260,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSError *error = nil;
         if (![fileManager createDirectoryAtPath:destinationFile2 withIntermediateDirectories:NO attributes:nil error:&error]) {
             NSLog(@"Failed creating directory with error: %@", error);
-            XCTAssertFalse("Failed to create directory");
+            XCTFail("Failed to create directory");
         }
         
         XCTAssertTrue([[self bigData2] writeToFile:destinationFile3 atomically:YES]);
@@ -298,7 +298,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSError *error = nil;
         if (![fileManager createDirectoryAtPath:sourceFile2 withIntermediateDirectories:NO attributes:nil error:&error]) {
             NSLog(@"Failed creating directory with error: %@", error);
-            XCTAssertFalse("Failed to create directory");
+            XCTFail("Failed to create directory");
         }
         
         XCTAssertTrue([[self bigData2] writeToFile:sourceFile3 atomically:YES]);
@@ -435,12 +435,12 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSError *error = nil;
         if (![fileManager createDirectoryAtPath:sourceFile1 withIntermediateDirectories:NO attributes:nil error:&error]) {
             NSLog(@"Failed creating directory with error: %@", error);
-            XCTAssertFalse("Failed to create directory");
+            XCTFail("Failed to create directory");
         }
         
         if (![fileManager createDirectoryAtPath:destinationFile1 withIntermediateDirectories:NO attributes:nil error:&error]) {
             NSLog(@"Failed creating directory with error: %@", error);
-            XCTAssertFalse("Failed to create directory");
+            XCTFail("Failed to create directory");
         }
         
         XCTAssertTrue([[self bigData1] writeToFile:sourceFile2 atomically:YES]);
@@ -569,7 +569,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSError *error = nil;
         if (![fileManager createDirectoryAtPath:destinationFile withIntermediateDirectories:NO attributes:nil error:&error]) {
             NSLog(@"Failed creating directory with error: %@", error);
-            XCTAssertFalse("Failed to create directory");
+            XCTFail("Failed to create directory");
         }
         
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
@@ -585,7 +585,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSError *error = nil;
         if (![fileManager createDirectoryAtPath:sourceFile withIntermediateDirectories:NO attributes:nil error:&error]) {
             NSLog(@"Failed creating directory with error: %@", error);
-            XCTAssertFalse("Failed to create directory");
+            XCTFail("Failed to create directory");
         }
         
         NSData *data = [NSData dataWithBytes:"loltest" length:7];
@@ -610,17 +610,17 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSError *error = nil;
         if (![fileManager createDirectoryAtPath:sourceFile1 withIntermediateDirectories:NO attributes:nil error:&error]) {
             NSLog(@"Failed creating directory with error: %@", error);
-            XCTAssertFalse("Failed to create directory A in source");
+            XCTFail("Failed to create directory A in source");
         }
         
         if (![fileManager createDirectoryAtPath:sourceFile2 withIntermediateDirectories:NO attributes:nil error:&error]) {
             NSLog(@"Failed creating directory with error: %@", error);
-            XCTAssertFalse("Failed to create directory Current in source");
+            XCTFail("Failed to create directory Current in source");
         }
         
         if (![fileManager createDirectoryAtPath:destinationFile1 withIntermediateDirectories:NO attributes:nil error:&error]) {
             NSLog(@"Failed creating directory with error: %@", error);
-            XCTAssertFalse("Failed to create directory A in destination");
+            XCTFail("Failed to create directory A in destination");
         }
         
         if (![fileManager createSymbolicLinkAtPath:destinationFile3 withDestinationPath:@"A/" error:&error]) {
@@ -650,17 +650,17 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         NSError *error = nil;
         if (![fileManager createDirectoryAtPath:sourceFile1 withIntermediateDirectories:NO attributes:nil error:&error]) {
             NSLog(@"Failed creating directory with error: %@", error);
-            XCTAssertFalse("Failed to create directory A in source");
+            XCTFail("Failed to create directory A in source");
         }
         
         if (![fileManager createDirectoryAtPath:destinationFile1 withIntermediateDirectories:NO attributes:nil error:&error]) {
             NSLog(@"Failed creating directory with error: %@", error);
-            XCTAssertFalse("Failed to create directory A in destination");
+            XCTFail("Failed to create directory A in destination");
         }
         
         if (![fileManager createDirectoryAtPath:destinationFile2 withIntermediateDirectories:NO attributes:nil error:&error]) {
             NSLog(@"Failed creating directory with error: %@", error);
-            XCTAssertFalse("Failed to create directory Current in destination");
+            XCTFail("Failed to create directory Current in destination");
         }
         
         if (![fileManager createSymbolicLinkAtPath:sourceFile3 withDestinationPath:@"A/" error:&error]) {
