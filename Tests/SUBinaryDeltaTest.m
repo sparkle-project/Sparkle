@@ -11,6 +11,7 @@
 #import "SUBinaryDeltaCommon.h"
 #import "SUBinaryDeltaCreate.h"
 #import "SUBinaryDeltaApply.h"
+#import <sys/stat.h>
 
 @interface SUBinaryDeltaTest : XCTestCase
 
@@ -147,6 +148,77 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         }
         
         // This would fail for version 1.0
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testSameNonexistantSymlinkDiff
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSData *emptyData = [NSData data];
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        NSError *error = nil;
+        if (![fileManager createSymbolicLinkAtPath:sourceFile withDestinationPath:@"B" error:&error]) {
+            NSLog(@"Failed creating empty symlink with error: %@", error);
+            XCTFail("Failed to create empty symlink");
+        }
+        
+        if (![fileManager createSymbolicLinkAtPath:destinationFile withDestinationPath:@"B" error:&error]) {
+            NSLog(@"Failed creating empty symlink with error: %@", error);
+            XCTFail("Failed to create empty symlink");
+        }
+        
+        XCTAssertTrue([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testDifferentNonexistantSymlinkDiff
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSData *emptyData = [NSData data];
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        NSError *error = nil;
+        if (![fileManager createSymbolicLinkAtPath:sourceFile withDestinationPath:@"B" error:&error]) {
+            NSLog(@"Failed creating empty symlink with error: %@", error);
+            XCTFail("Failed to create empty symlink");
+        }
+        
+        if (![fileManager createSymbolicLinkAtPath:destinationFile withDestinationPath:@"C" error:&error]) {
+            NSLog(@"Failed creating empty symlink with error: %@", error);
+            XCTFail("Failed to create empty symlink");
+        }
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testNonexistantSymlinkPermissionDiff
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSData *emptyData = [NSData data];
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        NSError *error = nil;
+        if (![fileManager createSymbolicLinkAtPath:sourceFile withDestinationPath:@"B" error:&error]) {
+            NSLog(@"Failed creating empty symlink to source with error: %@", error);
+            XCTFail("Failed to create empty symlink");
+        }
+        
+        if (![fileManager createSymbolicLinkAtPath:destinationFile withDestinationPath:@"B" error:&error]) {
+            NSLog(@"Failed creating empty symlink to destination with error: %@", error);
+            XCTFail("Failed to create empty symlink");
+        }
+        
+        if (lchmod([sourceFile fileSystemRepresentation], 0777) != 0) {
+            NSLog(@"Change Permission Error..");
+            XCTFail(@"Failed setting file permissions");
+        }
+        
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
