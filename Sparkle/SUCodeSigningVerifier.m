@@ -50,7 +50,9 @@
         goto finally;
     }
 
-	SecCSFlags flags = kSecCSDefaultFlags | kSecCSCheckAllArchitectures | kSecCSCheckNestedCode;
+    // Note that kSecCSCheckNestedCode may not work with pre-Mavericks code signing.
+    // See https://github.com/sparkle-project/Sparkle/issues/376#issuecomment-48824267 and https://developer.apple.com/library/mac/technotes/tn2206
+	SecCSFlags flags = kSecCSDefaultFlags | kSecCSCheckAllArchitectures;
     result = SecStaticCodeCheckValidityWithErrors(staticCode, flags, requirement, &cfError);
 
     if (cfError) {
@@ -104,7 +106,9 @@ finally:
         goto finally;
     }
 
-	SecCSFlags flags = kSecCSDefaultFlags | kSecCSCheckAllArchitectures | kSecCSCheckNestedCode;
+    // Note that kSecCSCheckNestedCode may not work with pre-Mavericks code signing.
+    // See https://github.com/sparkle-project/Sparkle/issues/376#issuecomment-48824267 and https://developer.apple.com/library/mac/technotes/tn2206
+	SecCSFlags flags = kSecCSDefaultFlags | kSecCSCheckAllArchitectures;
     result = SecStaticCodeCheckValidityWithErrors(staticCode, flags, NULL, &cfError);
 
     if (cfError) {
