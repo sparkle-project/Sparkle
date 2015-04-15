@@ -131,7 +131,10 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
 
         const char *value;
         if (!xar_prop_get(file, "delete", &value) || !xar_prop_get(file, "delete-then-extract", &value)) {
-            removeTree(destinationFilePath);
+            if (!removeTree(destinationFilePath)) {
+                fprintf(stderr, "delete or delete-then-extract: failed to remove %s\n", [destination fileSystemRepresentation]);
+                return 1;
+            }
             if (!xar_prop_get(file, "delete", &value))
                 continue;
         }
