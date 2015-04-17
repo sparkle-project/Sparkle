@@ -168,10 +168,10 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion, uint16_t 
         if (DIFF_VERSION_IS_AT_LEAST(majorVersion, minorVersion, 1, 1)) {
             uint16_t mode = ent->fts_statp->st_mode;
             uint16_t type = ent->fts_info;
-            uint16_t executablePermissions = mode & PERMISSION_FLAGS;
+            uint16_t permissions = mode & PERMISSION_FLAGS;
             
             CC_SHA1_Update(&hashContext, &type, sizeof(type));
-            CC_SHA1_Update(&hashContext, &executablePermissions, sizeof(executablePermissions));
+            CC_SHA1_Update(&hashContext, &permissions, sizeof(permissions));
         }
     }
     fts_close(fts);
