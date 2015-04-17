@@ -81,6 +81,23 @@ static NSDictionary *infoForFile(FTSENT *ent)
     return @{INFO_HASH_KEY: hash, INFO_TYPE_KEY: @(ent->fts_info), INFO_PERMISSIONS_KEY : @(permissions), INFO_SIZE_KEY: @(size)};
 }
 
+static bool aclExists(const FTSENT *ent)
+{
+    // OS X does not currently support ACLs for symlinks
+    if (ent->fts_info == FTS_SL) {
+        return NO;
+    }
+    
+    acl_t acl = acl_get_link_np(ent->fts_path, ACL_TYPE_EXTENDED);
+    if (acl != NULL) {
+        acl_entry_t entry;
+        int result = acl_get_entry(acl, ACL_FIRST_ENTRY, &entry);
+        assert(acl_free((void *)acl) == 0);
+        return (result == 0);
+    }
+    return false;
+}
+
 static NSString *absolutePath(NSString *path)
 {
     NSURL *url = [[NSURL alloc] initFileURLWithPath:path];
@@ -196,6 +213,11 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             return 1;
         }
         originalTreeState[key] = info;
+        
+        if (aclExists(ent)) {
+            fprintf(stderr, "Diffing ACLs are not supported. Detected ACL in before-tree on file %s", ent->fts_path);
+            return 1;
+        }
     }
     fts_close(fts);
 
@@ -243,7 +265,12 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         
         mode_t permissions = [info[INFO_PERMISSIONS_KEY] unsignedShortValue];
         if (!IS_VALID_PERMISSIONS(permissions)) {
-            fprintf(stderr, "Invalid file permissions after tree on file %s\nOnly permissions with modes 0755 and 0644 are supported", ent->fts_path);
+            fprintf(stderr, "Invalid file permissions after-tree on file %s\nOnly permissions with modes 0755 and 0644 are supported", ent->fts_path);
+            return 1;
+        }
+        
+        if (aclExists(ent)) {
+            fprintf(stderr, "Diffing ACLs are not supported. Detected ACL in after-tree on file %s", ent->fts_path);
             return 1;
         }
         

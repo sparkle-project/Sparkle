@@ -597,6 +597,107 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
+- (void)testInvalidRegularFileWithACLInBeforeTree
+{
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString * __unused destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([[NSData dataWithBytes:"loltest" length:7] writeToFile:sourceFile atomically:YES]);
+        
+        acl_t acl = acl_init(1);
+        
+        acl_entry_t entry;
+        XCTAssertEqual(0, acl_create_entry(&acl, &entry));
+        
+        acl_permset_t permset;
+        XCTAssertEqual(0, acl_get_permset(entry, &permset));
+        
+        XCTAssertEqual(0, acl_add_perm(permset, ACL_SEARCH));
+        
+        XCTAssertEqual(0, acl_set_link_np([sourceFile fileSystemRepresentation], ACL_TYPE_EXTENDED, acl));
+        
+        XCTAssertEqual(0, acl_free(acl));
+    } afterDiffHandler:nil];
+    
+    XCTAssertFalse(success);
+}
+
+- (void)testInvalidRegularFileWithACLInAfterTree
+{
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *__unused fileManager, NSString *__unused sourceDirectory, NSString *destinationDirectory) {
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([[NSData dataWithBytes:"loltest" length:7] writeToFile:destinationFile atomically:YES]);
+        
+        acl_t acl = acl_init(1);
+        
+        acl_entry_t entry;
+        XCTAssertEqual(0, acl_create_entry(&acl, &entry));
+        
+        acl_permset_t permset;
+        XCTAssertEqual(0, acl_get_permset(entry, &permset));
+        
+        XCTAssertEqual(0, acl_add_perm(permset, ACL_SEARCH));
+        
+        XCTAssertEqual(0, acl_set_link_np([destinationFile fileSystemRepresentation], ACL_TYPE_EXTENDED, acl));
+        
+        XCTAssertEqual(0, acl_free(acl));
+        
+    } afterDiffHandler:nil];
+    
+    XCTAssertFalse(success);
+}
+
+- (void)testInvalidDirectoryWithACLInBeforeTree
+{
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString * __unused destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([fileManager createDirectoryAtPath:sourceFile withIntermediateDirectories:NO attributes:nil error:nil]);
+        
+        acl_t acl = acl_init(1);
+        
+        acl_entry_t entry;
+        XCTAssertEqual(0, acl_create_entry(&acl, &entry));
+        
+        acl_permset_t permset;
+        XCTAssertEqual(0, acl_get_permset(entry, &permset));
+        
+        XCTAssertEqual(0, acl_add_perm(permset, ACL_SEARCH));
+        
+        XCTAssertEqual(0, acl_set_link_np([sourceFile fileSystemRepresentation], ACL_TYPE_EXTENDED, acl));
+        
+        XCTAssertEqual(0, acl_free(acl));
+    } afterDiffHandler:nil];
+    
+    XCTAssertFalse(success);
+}
+
+- (void)testInvalidDirectoryWithACLInAfterTree
+{
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *fileManager, NSString * __unused sourceDirectory, NSString *destinationDirectory) {
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([fileManager createDirectoryAtPath:destinationFile withIntermediateDirectories:NO attributes:nil error:nil]);
+        
+        acl_t acl = acl_init(1);
+        
+        acl_entry_t entry;
+        XCTAssertEqual(0, acl_create_entry(&acl, &entry));
+        
+        acl_permset_t permset;
+        XCTAssertEqual(0, acl_get_permset(entry, &permset));
+        
+        XCTAssertEqual(0, acl_add_perm(permset, ACL_SEARCH));
+        
+        XCTAssertEqual(0, acl_set_link_np([destinationFile fileSystemRepresentation], ACL_TYPE_EXTENDED, acl));
+        
+        XCTAssertEqual(0, acl_free(acl));
+    } afterDiffHandler:nil];
+    
+    XCTAssertFalse(success);
+}
+
 - (void)testRegularFileToSymlinkChange
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
