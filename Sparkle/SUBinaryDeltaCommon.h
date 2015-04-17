@@ -16,28 +16,31 @@
 #define IS_VALID_PERMISSIONS(mode) \
     (((mode & PERMISSION_FLAGS) == 0755) || ((mode & PERMISSION_FLAGS) == 0644))
 
-#define DIFF_VERSION_IS_AT_LEAST(actualMajor, actualMinor, expectedMajor, expectedMinor) \
-    ((actualMajor > expectedMajor) || (actualMajor == expectedMajor && actualMinor >= expectedMinor))
+#define MAJOR_VERSION_IS_AT_LEAST(actualMajor, expectedMajor) (actualMajor >= expectedMajor)
+#define LATEST_MINOR_VERSION_FOR_MAJOR_VERSION(major) \
+    (major == AZURE_MAJOR_VERSION ? AZURE_MINOR_VERSION : BEIGE_MINOR_VERSION)
+
+// Each major version will be assigned a name of a color
+// Changes that break backwards compatibility will have different major versions
+// Changes that affect creating but not applying patches will have different minor versions
+
+#define AZURE_MAJOR_VERSION 1
+#define AZURE_MINOR_VERSION 0
+
+#define BEIGE_MAJOR_VERSION 2
+#define BEIGE_MINOR_VERSION 0
 
 #define FIRST_DELTA_DIFF_MAJOR_VERSION 1
 #define FIRST_DELTA_DIFF_MINOR_VERSION 0
 
-#define LATEST_DELTA_DIFF_MAJOR_VERSION 1
-#define LATEST_DELTA_DIFF_MAJOR_VERSION_STR _LATEST_DELTA_DIFF_VERSION_STR(LATEST_DELTA_DIFF_MAJOR_VERSION)
-
-#define LATEST_DELTA_DIFF_MINOR_VERSION 1
-#define LATEST_DELTA_DIFF_MINOR_VERSION_STR _LATEST_DELTA_DIFF_VERSION_STR(LATEST_DELTA_DIFF_MINOR_VERSION)
-
-// See https://gcc.gnu.org/onlinedocs/cpp/Stringification.html#Stringification
-#define __LATEST_DELTA_DIFF_VERSION_STR(s) #s
-#define _LATEST_DELTA_DIFF_VERSION_STR(s) __LATEST_DELTA_DIFF_VERSION_STR(s)
+#define LATEST_DELTA_DIFF_MAJOR_VERSION BEIGE_MAJOR_VERSION
 
 @class NSString;
 @class NSData;
 
 extern int compareFiles(const FTSENT **a, const FTSENT **b);
 extern NSData *hashOfFileContents(FTSENT *ent);
-extern NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion, uint16_t minorVersion);
+extern NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion);
 extern NSString *hashOfTree(NSString *path);
 extern BOOL removeTree(NSString *path);
 extern BOOL copyTree(NSString *source, NSString *dest);

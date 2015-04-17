@@ -131,7 +131,7 @@ NSData *hashOfFileContents(FTSENT *ent)
     return [NSData dataWithBytes:fileHash length:CC_SHA1_DIGEST_LENGTH];
 }
 
-NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion, uint16_t minorVersion)
+NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
 {
     const char *sourcePaths[] = {[path fileSystemRepresentation], 0};
     FTS *fts = fts_open((char* const*)sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
@@ -148,7 +148,7 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion, uint16_t 
         if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D)
             continue;
         
-        if (ent->fts_info == FTS_D && !DIFF_VERSION_IS_AT_LEAST(majorVersion, minorVersion, 1, 1)) {
+        if (ent->fts_info == FTS_D && !MAJOR_VERSION_IS_AT_LEAST(majorVersion, BEIGE_MAJOR_VERSION)) {
             continue;
         }
         
@@ -165,7 +165,7 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion, uint16_t 
         const char *relativePathBytes = [relativePath fileSystemRepresentation];
         CC_SHA1_Update(&hashContext, relativePathBytes, (CC_LONG)strlen(relativePathBytes));
         
-        if (DIFF_VERSION_IS_AT_LEAST(majorVersion, minorVersion, 1, 1)) {
+        if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, BEIGE_MAJOR_VERSION)) {
             uint16_t mode = ent->fts_statp->st_mode;
             uint16_t type = ent->fts_info;
             uint16_t permissions = mode & PERMISSION_FLAGS;
@@ -189,7 +189,7 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion, uint16_t 
 
 extern NSString *hashOfTree(NSString *path)
 {
-    return hashOfTreeWithVersion(path, LATEST_DELTA_DIFF_MAJOR_VERSION, LATEST_DELTA_DIFF_MINOR_VERSION);
+    return hashOfTreeWithVersion(path, LATEST_DELTA_DIFF_MAJOR_VERSION);
 }
 
 BOOL removeTree(NSString *path)

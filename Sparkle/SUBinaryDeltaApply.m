@@ -36,46 +36,46 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
     uint16_t majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
     uint16_t minorDiffVersion = FIRST_DELTA_DIFF_MINOR_VERSION;
 
-    NSString *expectedBeforeHashv1_0 = nil;
-    NSString *expectedAfterHashv1_0 = nil;
+    NSString *expectedBeforeHashv1 = nil;
+    NSString *expectedAfterHashv1 = nil;
     
-    NSString *expectedBeforeHashv1_1 = nil;
-    NSString *expectedAfterHashv1_1 = nil;
+    NSString *expectedNewBeforeHash = nil;
+    NSString *expectedNewAfterHash = nil;
     
     xar_subdoc_t subdoc;
     for (subdoc = xar_subdoc_first(x); subdoc; subdoc = xar_subdoc_next(subdoc)) {
         if (!strcmp(xar_subdoc_name(subdoc), "binary-delta-attributes")) {
             const char *value = 0;
             
-            // only available in version 1.1 or later
+            // only available in version 2.0 or later
             xar_subdoc_prop_get(subdoc, "major-version", &value);
             if (value)
                 majorDiffVersion = (uint16_t)[@(value) intValue];
             
-            // only available in version 1.1 or later
+            // only available in version 2.0 or later
             xar_subdoc_prop_get(subdoc, "minor-version", &value);
             if (value)
                 minorDiffVersion = (uint16_t)[@(value) intValue];
             
-            // deprecated since version 1.1
+            // deprecated since version 2.0
             xar_subdoc_prop_get(subdoc, "before-sha1", &value);
             if (value)
-                expectedBeforeHashv1_0 = @(value);
+                expectedBeforeHashv1 = @(value);
 
-            // deprecated since version 1.1
+            // deprecated since version 2.0
             xar_subdoc_prop_get(subdoc, "after-sha1", &value);
             if (value)
-                expectedAfterHashv1_0 = @(value);
+                expectedAfterHashv1 = @(value);
             
-            // only available in version 1.1 or later
-            xar_subdoc_prop_get(subdoc, "before-sha1-v1.1", &value);
+            // only available in version 2.0 or later
+            xar_subdoc_prop_get(subdoc, "before-tree-sha1", &value);
             if (value)
-                expectedBeforeHashv1_1 = @(value);
+                expectedNewBeforeHash = @(value);
             
-            // only available in version 1.1 or later
-            xar_subdoc_prop_get(subdoc, "after-sha1-v1.1", &value);
+            // only available in version 2.0 or later
+            xar_subdoc_prop_get(subdoc, "after-tree-sha1", &value);
             if (value)
-                expectedAfterHashv1_1 = @(value);
+                expectedNewAfterHash = @(value);
         }
     }
     
@@ -89,10 +89,10 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
         return 1;
     }
     
-    BOOL usesPatch1_1 = DIFF_VERSION_IS_AT_LEAST(majorDiffVersion, minorDiffVersion, 1, 1);
+    BOOL usesNewTreeHash = MAJOR_VERSION_IS_AT_LEAST(majorDiffVersion, BEIGE_MAJOR_VERSION);
     
-    NSString *expectedBeforeHash = usesPatch1_1 ? expectedBeforeHashv1_1 : expectedBeforeHashv1_0;
-    NSString *expectedAfterHash = usesPatch1_1 ? expectedAfterHashv1_1 : expectedAfterHashv1_0;
+    NSString *expectedBeforeHash = usesNewTreeHash ? expectedNewBeforeHash : expectedBeforeHashv1;
+    NSString *expectedAfterHash = usesNewTreeHash ? expectedNewAfterHash : expectedAfterHashv1;
 
     if (!expectedBeforeHash || !expectedAfterHash) {
         fprintf(stderr, "Unable to find before-sha1 or after-sha1 metadata in delta.  Giving up.\n");
@@ -100,7 +100,7 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
     }
 
     fprintf(stdout, "Verifying source...  ");
-    NSString *beforeHash = hashOfTreeWithVersion(source, majorDiffVersion, minorDiffVersion);
+    NSString *beforeHash = hashOfTreeWithVersion(source, majorDiffVersion);
     if (!beforeHash) {
         fprintf(stderr, "Unable to calculate hash of tree %s\n", [source fileSystemRepresentation]);
         return 1;
@@ -161,7 +161,7 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
     xar_close(x);
 
     fprintf(stdout, "\nVerifying destination...  ");
-    NSString *afterHash = hashOfTreeWithVersion(destination, majorDiffVersion, minorDiffVersion);
+    NSString *afterHash = hashOfTreeWithVersion(destination, majorDiffVersion);
     if (!afterHash) {
         fprintf(stderr, "Unable to calculate hash of tree %s\n", [destination fileSystemRepresentation]);
         return 1;

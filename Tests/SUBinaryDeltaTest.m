@@ -57,7 +57,8 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         beforeDiffHandler(fileManager, sourceDirectory, destinationDirectory);
     }
     
-    BOOL createdDiff = (createBinaryDelta(sourceDirectory, destinationDirectory, diffFile) == 0);
+    BOOL createdDiff =
+        (createBinaryDelta(sourceDirectory, destinationDirectory, diffFile, LATEST_DELTA_DIFF_MAJOR_VERSION) == 0);
     
     if (createdDiff && afterDiffHandler != nil) {
         afterDiffHandler(fileManager, sourceDirectory, destinationDirectory);

@@ -10,6 +10,6 @@
 #define SUBINARYDELTACREATE_H
 
 @class NSString;
-int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile);
+int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, uint16_t majorVersion);
 
 #endif

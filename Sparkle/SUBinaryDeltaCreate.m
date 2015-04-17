@@ -184,8 +184,20 @@ static BOOL shouldChangePermissions(NSDictionary *originalInfo, NSDictionary *ne
     return YES;
 }
 
-int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile)
+int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, uint16_t majorVersion)
 {
+    if (majorVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {
+        fprintf(stderr, "Version provided (%u) is not valid", majorVersion);
+        return 1;
+    }
+    
+    if (majorVersion > LATEST_DELTA_DIFF_MAJOR_VERSION) {
+        fprintf(stderr, "This program is too old to apply version %u", majorVersion);
+        return 1;
+    }
+    
+    uint16_t minorVersion = LATEST_MINOR_VERSION_FOR_MAJOR_VERSION(majorVersion);
+    
     NSMutableDictionary *originalTreeState = [NSMutableDictionary dictionary];
 
     const char *sourcePaths[] = {[source fileSystemRepresentation], 0};
@@ -220,15 +232,11 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         }
     }
     fts_close(fts);
-
-    NSString *beforeHashv1_0 = hashOfTreeWithVersion(source, 1, 0);
-    if (!beforeHashv1_0) {
-        fprintf(stderr, "Failed to generate version 1.0 hash for tree %s ; this patch won't be apply-able from older versions", [source fileSystemRepresentation]);
-    }
     
-    NSString *beforeHashv1_1 = hashOfTree(source);
-    if (!beforeHashv1_1) {
-        fprintf(stderr, "Failed to generate latest hash for tree %s", [source fileSystemRepresentation]);
+    NSString *beforeHash = hashOfTreeWithVersion(source, majorVersion);
+
+    if (!beforeHash) {
+        fprintf(stderr, "Failed to generate hash for tree %s", [source fileSystemRepresentation]);
         return 1;
     }
 
@@ -263,6 +271,9 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             return 1;
         }
         
+        // We should validate permissions and ACLs even if we don't store the info in the diff in the case of ACLs,
+        // or in the case of permissions if the patch version is 1
+        
         mode_t permissions = [info[INFO_PERMISSIONS_KEY] unsignedShortValue];
         if (!IS_VALID_PERMISSIONS(permissions)) {
             fprintf(stderr, "Invalid file permissions after-tree on file %s\nOnly permissions with modes 0755 and 0644 are supported", ent->fts_path);
@@ -296,17 +307,12 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     }
     fts_close(fts);
 
-    NSString *afterHashv1_0 = hashOfTreeWithVersion(destination, 1, 0);
-    if (!afterHashv1_0) {
-        fprintf(stderr, "Failed to generate version 1.0 hash for tree %s ; this patch won't be apply-able from older versions", [destination fileSystemRepresentation]);
-    }
-    
-    NSString *afterHashv1_1 = hashOfTree(destination);
-    if (!afterHashv1_1) {
-        fprintf(stderr, "Failed to generate latest hash for tree %s", [destination fileSystemRepresentation]);
+    NSString *afterHash = hashOfTreeWithVersion(destination, majorVersion);
+    if (!afterHash) {
+        fprintf(stderr, "Failed to generate hash for tree %s", [destination fileSystemRepresentation]);
         return 1;
     }
-
+    
     fprintf(stdout, "\nGenerating delta...  ");
 
     NSString *temporaryFile = temporaryPatchFile(patchFile);
@@ -315,18 +321,15 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     
     xar_subdoc_t attributes = xar_subdoc_new(x, "binary-delta-attributes");
     
-    xar_subdoc_prop_set(attributes, "major-version", LATEST_DELTA_DIFF_MAJOR_VERSION_STR);
-    xar_subdoc_prop_set(attributes, "minor-version", LATEST_DELTA_DIFF_MINOR_VERSION_STR);
+    xar_subdoc_prop_set(attributes, "major-version", [[NSString stringWithFormat:@"%u", majorVersion] UTF8String]);
+    xar_subdoc_prop_set(attributes, "minor-version", [[NSString stringWithFormat:@"%u", minorVersion] UTF8String]);
     
-    if (beforeHashv1_0) {
-        xar_subdoc_prop_set(attributes, "before-sha1", [beforeHashv1_0 UTF8String]);
-    }
-    if (afterHashv1_0) {
-        xar_subdoc_prop_set(attributes, "after-sha1", [afterHashv1_0 UTF8String]);
-    }
+    // Version 1 patches don't have a major or minor version field, so we need to differentiate between the hash keys
+    const char *beforeHashKey = MAJOR_VERSION_IS_AT_LEAST(majorVersion, BEIGE_MAJOR_VERSION) ? "before-tree-sha1" : "before-sha1";
+    const char *afterHashKey = MAJOR_VERSION_IS_AT_LEAST(majorVersion, BEIGE_MAJOR_VERSION) ? "after-tree-sha1" : "after-sha1";
     
-    xar_subdoc_prop_set(attributes, "before-sha1-v1.1", [beforeHashv1_1 UTF8String]);
-    xar_subdoc_prop_set(attributes, "after-sha1-v1.1", [afterHashv1_1 UTF8String]);
+    xar_subdoc_prop_set(attributes, beforeHashKey, [beforeHash UTF8String]);
+    xar_subdoc_prop_set(attributes, afterHashKey, [afterHash UTF8String]);
 
     NSOperationQueue *deltaQueue = [[NSOperationQueue alloc] init];
     NSMutableArray *deltaOperations = [NSMutableArray array];
@@ -354,7 +357,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         NSDictionary *originalInfo = originalTreeState[key];
         NSDictionary *newInfo = newTreeState[key];
         if (shouldSkipDeltaCompression(originalInfo, newInfo)) {
-            if (shouldSkipExtracting(originalInfo, newInfo)) {
+            if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, BEIGE_MAJOR_VERSION) && shouldSkipExtracting(originalInfo, newInfo)) {
                 if (shouldChangePermissions(originalInfo, newInfo)) {
                     xar_file_t newFile = xar_add_frombuffer(x, 0, [key fileSystemRepresentation], (char *)"", 1);
                     assert(newFile);
@@ -370,7 +373,10 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 }
             }
         } else {
-            NSNumber *permissions = shouldChangePermissions(originalInfo, newInfo) ? newInfo[INFO_PERMISSIONS_KEY] : nil;
+            NSNumber *permissions =
+                (MAJOR_VERSION_IS_AT_LEAST(majorVersion, BEIGE_MAJOR_VERSION) && shouldChangePermissions(originalInfo, newInfo)) ?
+                newInfo[INFO_PERMISSIONS_KEY] :
+                nil;
             CreateBinaryDeltaOperation *operation = [[CreateBinaryDeltaOperation alloc] initWithRelativePath:key oldTree:source newTree:destination permissions:permissions];
             [deltaQueue addOperation:operation];
             [deltaOperations addObject:operation];
