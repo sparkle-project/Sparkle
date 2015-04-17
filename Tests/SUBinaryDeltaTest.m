@@ -106,6 +106,20 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
+- (void)testNoFilesDiffWithInvalidLowVersion
+{
+    XCTAssertFalse([self createAndApplyPatchUsingVersion:(SUBinaryDeltaMajorVersion)0 beforeDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        XCTAssertTrue([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    } afterDiffHandler:nil]);
+}
+
+- (void)testNoFilesDiffWithInvalidHighVersion
+{
+    XCTAssertFalse([self createAndApplyPatchUsingVersion:(SUBinaryDeltaMajorVersion)9999 beforeDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        XCTAssertTrue([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    } afterDiffHandler:nil]);
+}
+
 - (void)testEmptyDataDiff
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
