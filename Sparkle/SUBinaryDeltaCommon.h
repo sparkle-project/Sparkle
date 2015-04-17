@@ -45,7 +45,7 @@ typedef NS_ENUM(uint16_t, SUBinaryDeltaMajorVersion)
 // Only keep track of the latest minor version for each major version
 typedef NS_ENUM(uint16_t, SUBinaryDeltaMinorVersion)
 {
-    SUAzureMinorVersion = 0,
+    SUAzureMinorVersion = 1,
     SUBeigeMinorVersion = 0,
 };
 
