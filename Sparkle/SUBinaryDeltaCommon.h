@@ -28,7 +28,7 @@
 
 // Properties no longer used in new patches
 #define BEFORE_TREE_SHA1_OLD_KEY "before-sha1"
-#define AFTER_TREE_SHA1_OLD_KEY "before-sha1"
+#define AFTER_TREE_SHA1_OLD_KEY "after-sha1"
 
 #define MAJOR_VERSION_IS_AT_LEAST(actualMajor, expectedMajor) (actualMajor >= expectedMajor)
 
