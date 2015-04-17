@@ -45,7 +45,7 @@ int main(int __unused argc, char __unused *argv[])
                 return 1;
             }
             // Ignore minor version if it's supplied
-            patchVersion = (uint16_t)[[versionComponents[1] componentsSeparatedByString:@"."][0] intValue];
+            patchVersion = (SUBinaryDeltaMajorVersion)[[versionComponents[1] componentsSeparatedByString:@"."][0] intValue];
         }
         
         NSString *oldPath = args[args.count - 3];
