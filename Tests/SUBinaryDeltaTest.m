@@ -132,7 +132,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 - (void)testEmptyDirectoryDiff
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
-        NSData *emptyData = [NSData data];
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
         NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
         
@@ -154,7 +153,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 - (void)testDifferentlyNamedEmptyDirectoryDiff
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
-        NSData *emptyData = [NSData data];
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
         NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"B"];
         
