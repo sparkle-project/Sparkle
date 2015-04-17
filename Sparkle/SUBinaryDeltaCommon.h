@@ -31,23 +31,28 @@
 #define AFTER_TREE_SHA1_OLD_KEY "before-sha1"
 
 #define MAJOR_VERSION_IS_AT_LEAST(actualMajor, expectedMajor) (actualMajor >= expectedMajor)
-#define LATEST_MINOR_VERSION_FOR_MAJOR_VERSION(major) \
-    (major == AZURE_MAJOR_VERSION ? AZURE_MINOR_VERSION : BEIGE_MINOR_VERSION)
 
 // Each major version will be assigned a name of a color
 // Changes that break backwards compatibility will have different major versions
 // Changes that affect creating but not applying patches will have different minor versions
 
-#define AZURE_MAJOR_VERSION 1
-#define AZURE_MINOR_VERSION 0
+typedef NS_ENUM(uint16_t, SUBinaryDeltaMajorVersion)
+{
+    SUAzureMajorVersion = 1,
+    SUBeigeMajorVersion = 2
+};
 
-#define BEIGE_MAJOR_VERSION 2
-#define BEIGE_MINOR_VERSION 0
+// Only keep track of the latest minor version for each major version
+typedef NS_ENUM(uint16_t, SUBinaryDeltaMinorVersion)
+{
+    SUAzureMinorVersion = 0,
+    SUBeigeMinorVersion = 0,
+};
 
-#define FIRST_DELTA_DIFF_MAJOR_VERSION 1
-#define FIRST_DELTA_DIFF_MINOR_VERSION 0
+#define FIRST_DELTA_DIFF_MAJOR_VERSION SUAzureMajorVersion
+#define FIRST_DELTA_DIFF_MINOR_VERSION SUAzureMinorVersion
 
-#define LATEST_DELTA_DIFF_MAJOR_VERSION BEIGE_MAJOR_VERSION
+#define LATEST_DELTA_DIFF_MAJOR_VERSION SUBeigeMajorVersion
 
 @class NSString;
 @class NSData;
@@ -63,4 +68,5 @@ extern NSString *pathRelativeToDirectory(NSString *directory, NSString *path);
 NSString *temporaryFilename(NSString *base);
 NSString *temporaryDirectory(NSString *base);
 NSString *stringWithFileSystemRepresentation(const char*);
+SUBinaryDeltaMinorVersion latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion);
 #endif

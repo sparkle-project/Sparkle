@@ -33,8 +33,8 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
         return 1;
     }
     
-    uint16_t majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
-    uint16_t minorDiffVersion = FIRST_DELTA_DIFF_MINOR_VERSION;
+    SUBinaryDeltaMajorVersion majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
+    SUBinaryDeltaMinorVersion minorDiffVersion = FIRST_DELTA_DIFF_MINOR_VERSION;
 
     NSString *expectedBeforeHashv1 = nil;
     NSString *expectedAfterHashv1 = nil;
@@ -50,12 +50,12 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
             // available in version 2.0 or later
             xar_subdoc_prop_get(subdoc, MAJOR_DIFF_VERSION_KEY, &value);
             if (value)
-                majorDiffVersion = (uint16_t)[@(value) intValue];
+                majorDiffVersion = (SUBinaryDeltaMajorVersion)[@(value) intValue];
             
             // available in version 2.0 or later
             xar_subdoc_prop_get(subdoc, MINOR_DIFF_VERSION_KEY, &value);
             if (value)
-                minorDiffVersion = (uint16_t)[@(value) intValue];
+                minorDiffVersion = (SUBinaryDeltaMinorVersion)[@(value) intValue];
             
             // available in version 2.0 or later
             xar_subdoc_prop_get(subdoc, BEFORE_TREE_SHA1_KEY, &value);
@@ -89,7 +89,7 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
         return 1;
     }
     
-    BOOL usesNewTreeHash = MAJOR_VERSION_IS_AT_LEAST(majorDiffVersion, BEIGE_MAJOR_VERSION);
+    BOOL usesNewTreeHash = MAJOR_VERSION_IS_AT_LEAST(majorDiffVersion, SUBeigeMajorVersion);
     
     NSString *expectedBeforeHash = usesNewTreeHash ? expectedNewBeforeHash : expectedBeforeHashv1;
     NSString *expectedAfterHash = usesNewTreeHash ? expectedNewAfterHash : expectedAfterHashv1;

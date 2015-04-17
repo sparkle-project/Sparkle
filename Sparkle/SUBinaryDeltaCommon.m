@@ -35,6 +35,17 @@ NSString *stringWithFileSystemRepresentation(const char *input) {
     return [[NSFileManager defaultManager] stringWithFileSystemRepresentation:input length:strlen(input)];
 }
 
+SUBinaryDeltaMinorVersion latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion)
+{
+    switch (majorVersion) {
+        case SUAzureMajorVersion:
+            return SUAzureMinorVersion;
+        case SUBeigeMajorVersion:
+            return SUBeigeMinorVersion;
+    }
+    return 0;
+}
+
 NSString *temporaryFilename(NSString *base)
 {
     NSString *template = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.XXXXXXXXXX", base]];
@@ -148,7 +159,7 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
         if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D)
             continue;
         
-        if (ent->fts_info == FTS_D && !MAJOR_VERSION_IS_AT_LEAST(majorVersion, BEIGE_MAJOR_VERSION)) {
+        if (ent->fts_info == FTS_D && !MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion)) {
             continue;
         }
         
@@ -165,7 +176,7 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
         const char *relativePathBytes = [relativePath fileSystemRepresentation];
         CC_SHA1_Update(&hashContext, relativePathBytes, (CC_LONG)strlen(relativePathBytes));
         
-        if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, BEIGE_MAJOR_VERSION)) {
+        if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion)) {
             uint16_t mode = ent->fts_statp->st_mode;
             uint16_t type = ent->fts_info;
             uint16_t permissions = mode & PERMISSION_FLAGS;

@@ -184,7 +184,7 @@ static BOOL shouldChangePermissions(NSDictionary *originalInfo, NSDictionary *ne
     return YES;
 }
 
-int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, uint16_t majorVersion)
+int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, SUBinaryDeltaMajorVersion majorVersion)
 {
     if (majorVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {
         fprintf(stderr, "Version provided (%u) is not valid", majorVersion);
@@ -196,7 +196,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         return 1;
     }
     
-    uint16_t minorVersion = LATEST_MINOR_VERSION_FOR_MAJOR_VERSION(majorVersion);
+    SUBinaryDeltaMinorVersion minorVersion = latestMinorVersionForMajorVersion(majorVersion);
     
     NSMutableDictionary *originalTreeState = [NSMutableDictionary dictionary];
 
@@ -326,9 +326,9 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     
     // Version 1 patches don't have a major or minor version field, so we need to differentiate between the hash keys
     const char *beforeHashKey =
-        MAJOR_VERSION_IS_AT_LEAST(majorVersion, BEIGE_MAJOR_VERSION) ? BEFORE_TREE_SHA1_KEY : BEFORE_TREE_SHA1_OLD_KEY;
+        MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion) ? BEFORE_TREE_SHA1_KEY : BEFORE_TREE_SHA1_OLD_KEY;
     const char *afterHashKey =
-        MAJOR_VERSION_IS_AT_LEAST(majorVersion, BEIGE_MAJOR_VERSION) ? AFTER_TREE_SHA1_KEY : AFTER_TREE_SHA1_OLD_KEY;
+        MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion) ? AFTER_TREE_SHA1_KEY : AFTER_TREE_SHA1_OLD_KEY;
     
     xar_subdoc_prop_set(attributes, beforeHashKey, [beforeHash UTF8String]);
     xar_subdoc_prop_set(attributes, afterHashKey, [afterHash UTF8String]);
@@ -359,7 +359,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         NSDictionary *originalInfo = originalTreeState[key];
         NSDictionary *newInfo = newTreeState[key];
         if (shouldSkipDeltaCompression(originalInfo, newInfo)) {
-            if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, BEIGE_MAJOR_VERSION) && shouldSkipExtracting(originalInfo, newInfo)) {
+            if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion) && shouldSkipExtracting(originalInfo, newInfo)) {
                 if (shouldChangePermissions(originalInfo, newInfo)) {
                     xar_file_t newFile = xar_add_frombuffer(x, 0, [key fileSystemRepresentation], (char *)"", 1);
                     assert(newFile);
@@ -376,7 +376,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             }
         } else {
             NSNumber *permissions =
-                (MAJOR_VERSION_IS_AT_LEAST(majorVersion, BEIGE_MAJOR_VERSION) && shouldChangePermissions(originalInfo, newInfo)) ?
+                (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion) && shouldChangePermissions(originalInfo, newInfo)) ?
                 newInfo[INFO_PERMISSIONS_KEY] :
                 nil;
             CreateBinaryDeltaOperation *operation = [[CreateBinaryDeltaOperation alloc] initWithRelativePath:key oldTree:source newTree:destination permissions:permissions];

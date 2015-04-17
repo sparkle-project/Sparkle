@@ -34,7 +34,7 @@ int main(int __unused argc, char __unused *argv[])
             return 1;
         }
         
-        uint16_t patchVersion = 0;
+        SUBinaryDeltaMajorVersion patchVersion;
         NSString *versionField = ([command isEqualToString:@"create"] && args.count == 6) ? args[2] : nil;
         if (!versionField) {
             patchVersion = LATEST_DELTA_DIFF_MAJOR_VERSION;

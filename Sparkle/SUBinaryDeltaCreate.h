@@ -9,7 +9,9 @@
 #ifndef SUBINARYDELTACREATE_H
 #define SUBINARYDELTACREATE_H
 
+#import "SUBinaryDeltaCommon.h"
+
 @class NSString;
-int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, uint16_t majorVersion);
+int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, SUBinaryDeltaMajorVersion majorVersion);
 
 #endif
