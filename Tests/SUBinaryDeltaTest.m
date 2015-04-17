@@ -39,7 +39,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     XCTAssert(YES, @"Pass");
 }
 
-- (BOOL)createAndApplyPatchWithBeforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler
+- (BOOL)createAndApplyPatchUsingVersion:(SUBinaryDeltaMajorVersion)majorVersion beforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler
 {
     NSString *sourceDirectory = temporaryDirectory(@"Sparkle_temp1");
     NSString *destinationDirectory = temporaryDirectory(@"Sparkle_temp2");
@@ -58,7 +58,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }
     
     BOOL createdDiff =
-        (createBinaryDelta(sourceDirectory, destinationDirectory, diffFile, LATEST_DELTA_DIFF_MAJOR_VERSION) == 0);
+    (createBinaryDelta(sourceDirectory, destinationDirectory, diffFile, majorVersion) == 0);
     
     if (createdDiff && afterDiffHandler != nil) {
         afterDiffHandler(fileManager, sourceDirectory, destinationDirectory);
@@ -72,6 +72,11 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     XCTAssertTrue([fileManager removeItemAtPath:diffFile error:nil]);
     
     return appliedDiff;
+}
+
+- (BOOL)createAndApplyPatchWithBeforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler
+{
+    return [self createAndApplyPatchUsingVersion:LATEST_DELTA_DIFF_MAJOR_VERSION beforeDiffHandler:beforeDiffHandler afterDiffHandler:afterDiffHandler];
 }
 
 - (void)createAndApplyPatchWithHandler:(SUDeltaHandler)handler
@@ -335,6 +340,22 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
+}
+
+// Make sure old version patches still work for simple cases
+- (void)testRegularFileAddedWithAzureVersion
+{
+    XCTAssertTrue([self createAndApplyPatchUsingVersion:SUAzureMajorVersion beforeDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile2 = [destinationDirectory stringByAppendingPathComponent:@"B"];
+        
+        XCTAssertTrue([[NSData data] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[NSData dataWithBytes:"loltest" length:7] writeToFile:destinationFile atomically:YES]);
+        XCTAssertTrue([[NSData dataWithBytes:"lol" length:3] writeToFile:destinationFile2 atomically:YES]);
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    } afterDiffHandler:nil]);
 }
 
 - (void)testDirectoryAdded
