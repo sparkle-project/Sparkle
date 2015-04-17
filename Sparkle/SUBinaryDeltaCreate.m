@@ -319,14 +319,16 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     xar_t x = xar_open([temporaryFile fileSystemRepresentation], WRITE);
     xar_opt_set(x, XAR_OPT_COMPRESSION, "bzip2");
     
-    xar_subdoc_t attributes = xar_subdoc_new(x, "binary-delta-attributes");
+    xar_subdoc_t attributes = xar_subdoc_new(x, BINARY_DELTA_ATTRIBUTES_KEY);
     
-    xar_subdoc_prop_set(attributes, "major-version", [[NSString stringWithFormat:@"%u", majorVersion] UTF8String]);
-    xar_subdoc_prop_set(attributes, "minor-version", [[NSString stringWithFormat:@"%u", minorVersion] UTF8String]);
+    xar_subdoc_prop_set(attributes, MAJOR_DIFF_VERSION_KEY, [[NSString stringWithFormat:@"%u", majorVersion] UTF8String]);
+    xar_subdoc_prop_set(attributes, MINOR_DIFF_VERSION_KEY, [[NSString stringWithFormat:@"%u", minorVersion] UTF8String]);
     
     // Version 1 patches don't have a major or minor version field, so we need to differentiate between the hash keys
-    const char *beforeHashKey = MAJOR_VERSION_IS_AT_LEAST(majorVersion, BEIGE_MAJOR_VERSION) ? "before-tree-sha1" : "before-sha1";
-    const char *afterHashKey = MAJOR_VERSION_IS_AT_LEAST(majorVersion, BEIGE_MAJOR_VERSION) ? "after-tree-sha1" : "after-sha1";
+    const char *beforeHashKey =
+        MAJOR_VERSION_IS_AT_LEAST(majorVersion, BEIGE_MAJOR_VERSION) ? BEFORE_TREE_SHA1_KEY : BEFORE_TREE_SHA1_OLD_KEY;
+    const char *afterHashKey =
+        MAJOR_VERSION_IS_AT_LEAST(majorVersion, BEIGE_MAJOR_VERSION) ? AFTER_TREE_SHA1_KEY : AFTER_TREE_SHA1_OLD_KEY;
     
     xar_subdoc_prop_set(attributes, beforeHashKey, [beforeHash UTF8String]);
     xar_subdoc_prop_set(attributes, afterHashKey, [afterHash UTF8String]);
@@ -350,7 +352,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         if ([value isEqual:[NSNull null]]) {
             xar_file_t newFile = xar_add_frombuffer(x, 0, [key fileSystemRepresentation], (char *)"", 1);
             assert(newFile);
-            xar_prop_set(newFile, "delete", "true");
+            xar_prop_set(newFile, DELETE_KEY, "true");
             continue;
         }
 
@@ -361,7 +363,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 if (shouldChangePermissions(originalInfo, newInfo)) {
                     xar_file_t newFile = xar_add_frombuffer(x, 0, [key fileSystemRepresentation], (char *)"", 1);
                     assert(newFile);
-                    xar_prop_set(newFile, "mod-permissions", [[NSString stringWithFormat:@"%u", [newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]] UTF8String]);
+                    xar_prop_set(newFile, MODIFY_PERMISSIONS_KEY, [[NSString stringWithFormat:@"%u", [newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]] UTF8String]);
                 }
             } else {
                 NSString *path = [destination stringByAppendingPathComponent:key];
@@ -369,7 +371,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 assert(newFile);
                 
                 if (shouldDeleteThenExtract(originalInfo, newInfo)) {
-                    xar_prop_set(newFile, "delete-then-extract", "true");
+                    xar_prop_set(newFile, DELETE_THEN_EXTRACT_KEY, "true");
                 }
             }
         } else {
@@ -393,11 +395,11 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         }
         xar_file_t newFile = xar_add_frompath(x, 0, [[operation relativePath] fileSystemRepresentation], [resultPath fileSystemRepresentation]);
         assert(newFile);
-        xar_prop_set(newFile, "binary-delta", "true");
+        xar_prop_set(newFile, BINARY_DELTA_KEY, "true");
         unlink([resultPath fileSystemRepresentation]);
         
         if (operation.permissions) {
-            xar_prop_set(newFile, "mod-permissions", [[NSString stringWithFormat:@"%u", [operation.permissions unsignedShortValue]] UTF8String]);
+            xar_prop_set(newFile, MODIFY_PERMISSIONS_KEY, [[NSString stringWithFormat:@"%u", [operation.permissions unsignedShortValue]] UTF8String]);
         }
     }
 

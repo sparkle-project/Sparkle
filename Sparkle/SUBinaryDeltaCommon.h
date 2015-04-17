@@ -16,6 +16,20 @@
 #define IS_VALID_PERMISSIONS(mode) \
     (((mode & PERMISSION_FLAGS) == 0755) || ((mode & PERMISSION_FLAGS) == 0644))
 
+#define BINARY_DELTA_ATTRIBUTES_KEY "binary-delta-attributes"
+#define MAJOR_DIFF_VERSION_KEY "major-version"
+#define MINOR_DIFF_VERSION_KEY "minor-version"
+#define BEFORE_TREE_SHA1_KEY "before-tree-sha1"
+#define AFTER_TREE_SHA1_KEY "after-tree-sha1"
+#define DELETE_KEY "delete"
+#define DELETE_THEN_EXTRACT_KEY "delete-then-extract"
+#define BINARY_DELTA_KEY "binary-delta"
+#define MODIFY_PERMISSIONS_KEY "mod-permissions"
+
+// Properties no longer used in new patches
+#define BEFORE_TREE_SHA1_OLD_KEY "before-sha1"
+#define AFTER_TREE_SHA1_OLD_KEY "before-sha1"
+
 #define MAJOR_VERSION_IS_AT_LEAST(actualMajor, expectedMajor) (actualMajor >= expectedMajor)
 #define LATEST_MINOR_VERSION_FOR_MAJOR_VERSION(major) \
     (major == AZURE_MAJOR_VERSION ? AZURE_MINOR_VERSION : BEIGE_MINOR_VERSION)

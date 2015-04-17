@@ -44,38 +44,38 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
     
     xar_subdoc_t subdoc;
     for (subdoc = xar_subdoc_first(x); subdoc; subdoc = xar_subdoc_next(subdoc)) {
-        if (!strcmp(xar_subdoc_name(subdoc), "binary-delta-attributes")) {
+        if (!strcmp(xar_subdoc_name(subdoc), BINARY_DELTA_ATTRIBUTES_KEY)) {
             const char *value = 0;
             
             // available in version 2.0 or later
-            xar_subdoc_prop_get(subdoc, "major-version", &value);
+            xar_subdoc_prop_get(subdoc, MAJOR_DIFF_VERSION_KEY, &value);
             if (value)
                 majorDiffVersion = (uint16_t)[@(value) intValue];
             
             // available in version 2.0 or later
-            xar_subdoc_prop_get(subdoc, "minor-version", &value);
+            xar_subdoc_prop_get(subdoc, MINOR_DIFF_VERSION_KEY, &value);
             if (value)
                 minorDiffVersion = (uint16_t)[@(value) intValue];
             
-            // only available in version 1.0
-            xar_subdoc_prop_get(subdoc, "before-sha1", &value);
-            if (value)
-                expectedBeforeHashv1 = @(value);
-
-            // only available in version 1.0
-            xar_subdoc_prop_get(subdoc, "after-sha1", &value);
-            if (value)
-                expectedAfterHashv1 = @(value);
-            
             // available in version 2.0 or later
-            xar_subdoc_prop_get(subdoc, "before-tree-sha1", &value);
+            xar_subdoc_prop_get(subdoc, BEFORE_TREE_SHA1_KEY, &value);
             if (value)
                 expectedNewBeforeHash = @(value);
             
             // available in version 2.0 or later
-            xar_subdoc_prop_get(subdoc, "after-tree-sha1", &value);
+            xar_subdoc_prop_get(subdoc, AFTER_TREE_SHA1_KEY, &value);
             if (value)
                 expectedNewAfterHash = @(value);
+            
+            // only available in version 1.0
+            xar_subdoc_prop_get(subdoc, BEFORE_TREE_SHA1_OLD_KEY, &value);
+            if (value)
+                expectedBeforeHashv1 = @(value);
+            
+            // only available in version 1.0
+            xar_subdoc_prop_get(subdoc, AFTER_TREE_SHA1_OLD_KEY, &value);
+            if (value)
+                expectedAfterHashv1 = @(value);
         }
     }
     
@@ -130,28 +130,28 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
         NSString *destinationFilePath = [destination stringByAppendingPathComponent:path];
 
         const char *value;
-        if (!xar_prop_get(file, "delete", &value) || !xar_prop_get(file, "delete-then-extract", &value)) {
+        if (!xar_prop_get(file, DELETE_KEY, &value) || !xar_prop_get(file, DELETE_THEN_EXTRACT_KEY, &value)) {
             if (!removeTree(destinationFilePath)) {
-                fprintf(stderr, "delete or delete-then-extract: failed to remove %s\n", [destination fileSystemRepresentation]);
+                fprintf(stderr, "%s or %s: failed to remove %s\n", DELETE_KEY, DELETE_THEN_EXTRACT_KEY, [destination fileSystemRepresentation]);
                 return 1;
             }
-            if (!xar_prop_get(file, "delete", &value))
+            if (!xar_prop_get(file, DELETE_KEY, &value))
                 continue;
         }
 
-        if (!xar_prop_get(file, "binary-delta", &value)) {
+        if (!xar_prop_get(file, BINARY_DELTA_KEY, &value)) {
             if (!applyBinaryDeltaToFile(x, file, sourceFilePath, destinationFilePath)) {
                 fprintf(stderr, "Unable to patch %s to destination %s\n", [sourceFilePath fileSystemRepresentation], [destinationFilePath fileSystemRepresentation]);
                 return 1;
             }
-        } else if (xar_prop_get(file, "mod-permissions", &value)) {
+        } else if (xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value)) {
             if (xar_extract_tofile(x, file, [destinationFilePath fileSystemRepresentation]) != 0) {
                 fprintf(stderr, "Unable to extract file to %s\n", [destinationFilePath fileSystemRepresentation]);
                 return 1;
             }
         }
         
-        if (!xar_prop_get(file, "mod-permissions", &value)) {
+        if (!xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value)) {
             if (!modifyPermissions(destinationFilePath, (mode_t)[[NSString stringWithUTF8String:value] intValue])) {
                 fprintf(stderr, "Unable to modify permissions (%s) on file %s\n", value, [destinationFilePath fileSystemRepresentation]);
                 return 1;
