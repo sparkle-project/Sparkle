@@ -194,7 +194,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 - (void)testSameNonexistantSymlinkDiff
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
-        NSData *emptyData = [NSData data];
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
         NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
         
@@ -216,7 +215,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 - (void)testDifferentNonexistantSymlinkDiff
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
-        NSData *emptyData = [NSData data];
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
         NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
         
@@ -238,7 +236,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 - (void)testNonexistantSymlinkPermissionDiff
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
-        NSData *emptyData = [NSData data];
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
         NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
         
@@ -285,7 +282,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         XCTAssertTrue([[NSData dataWithBytes:"loltest" length:7] writeToFile:destinationFile atomically:YES]);
         
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
-    } afterDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+    } afterDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *__unused destinationDirectory) {
         NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
         
         XCTAssertTrue([[NSData dataWithBytes:"testt" length:5] writeToFile:sourceFile atomically:YES]);
