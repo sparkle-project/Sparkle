@@ -47,32 +47,32 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
         if (!strcmp(xar_subdoc_name(subdoc), "binary-delta-attributes")) {
             const char *value = 0;
             
-            // only available in version 2.0 or later
+            // available in version 2.0 or later
             xar_subdoc_prop_get(subdoc, "major-version", &value);
             if (value)
                 majorDiffVersion = (uint16_t)[@(value) intValue];
             
-            // only available in version 2.0 or later
+            // available in version 2.0 or later
             xar_subdoc_prop_get(subdoc, "minor-version", &value);
             if (value)
                 minorDiffVersion = (uint16_t)[@(value) intValue];
             
-            // deprecated since version 2.0
+            // only available in version 1.0
             xar_subdoc_prop_get(subdoc, "before-sha1", &value);
             if (value)
                 expectedBeforeHashv1 = @(value);
 
-            // deprecated since version 2.0
+            // only available in version 1.0
             xar_subdoc_prop_get(subdoc, "after-sha1", &value);
             if (value)
                 expectedAfterHashv1 = @(value);
             
-            // only available in version 2.0 or later
+            // available in version 2.0 or later
             xar_subdoc_prop_get(subdoc, "before-tree-sha1", &value);
             if (value)
                 expectedNewBeforeHash = @(value);
             
-            // only available in version 2.0 or later
+            // available in version 2.0 or later
             xar_subdoc_prop_get(subdoc, "after-tree-sha1", &value);
             if (value)
                 expectedNewAfterHash = @(value);
