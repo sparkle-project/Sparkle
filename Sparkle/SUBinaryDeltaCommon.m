@@ -195,7 +195,11 @@ extern NSString *hashOfTree(NSString *path)
 BOOL removeTree(NSString *path)
 {
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    return ![fileManager fileExistsAtPath:path] ? YES : [fileManager removeItemAtPath:path error:nil];
+    // Don't use fileExistsForPath: because it will try to follow symbolic links
+    if (![fileManager attributesOfItemAtPath:path error:nil]) {
+        return YES;
+    }
+    return [fileManager removeItemAtPath:path error:nil];
 }
 
 BOOL copyTree(NSString *source, NSString *dest)

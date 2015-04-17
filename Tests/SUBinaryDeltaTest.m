@@ -434,6 +434,36 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }];
 }
 
+- (void)testRemovingSymlink
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        
+        NSError *error = nil;
+        if (![fileManager createSymbolicLinkAtPath:sourceFile withDestinationPath:@"B" error:&error]) {
+            NSLog(@"Error in creating symlink: %@", error);
+            XCTFail(@"Failed to create symlink");
+        }
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
+- (void)testAddingSymlink
+{
+    [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        NSError *error = nil;
+        if (![fileManager createSymbolicLinkAtPath:destinationFile withDestinationPath:@"B" error:&error]) {
+            NSLog(@"Error in creating symlink: %@", error);
+            XCTFail(@"Failed to create symlink");
+        }
+        
+        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+    }];
+}
+
 - (void)testSmallFilePermissionChangeWithNoContentChange
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
