@@ -205,9 +205,9 @@ int main(int __unused argc, const char __unused *argv[])
                                                                            shouldShowUI:shouldShowUI
                                                                                selfPath:[[NSBundle mainBundle] bundlePath]];
 
-        [termListen class];
         [[NSApplication sharedApplication] run];
-
+        // Ensure termListen is not deallocated by ARC before caling -[NSApplication run]
+        [termListen class];
     }
 
     return EXIT_SUCCESS;
