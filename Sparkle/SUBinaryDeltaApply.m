@@ -120,6 +120,8 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
         fprintf(stderr, "Failed to copy %s to %s\n", [source fileSystemRepresentation], [destination fileSystemRepresentation]);
         return 1;
     }
+    
+    BOOL hasExtractKeyAvailable = MAJOR_VERSION_IS_AT_LEAST(majorDiffVersion, SUBeigeMajorVersion);
 
     fprintf(stdout, "\nPatching... ");
     xar_file_t file;
@@ -130,12 +132,13 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
         NSString *destinationFilePath = [destination stringByAppendingPathComponent:path];
 
         const char *value;
-        if (!xar_prop_get(file, DELETE_KEY, &value) || !xar_prop_get(file, DELETE_THEN_EXTRACT_KEY, &value)) {
+        if (!xar_prop_get(file, DELETE_KEY, &value) ||
+            (!hasExtractKeyAvailable && !xar_prop_get(file, DELETE_THEN_EXTRACT_OLD_KEY, &value))) {
             if (!removeTree(destinationFilePath)) {
-                fprintf(stderr, "%s or %s: failed to remove %s\n", DELETE_KEY, DELETE_THEN_EXTRACT_KEY, [destination fileSystemRepresentation]);
+                fprintf(stderr, "%s or %s: failed to remove %s\n", DELETE_KEY, DELETE_THEN_EXTRACT_OLD_KEY, [destination fileSystemRepresentation]);
                 return 1;
             }
-            if (!xar_prop_get(file, DELETE_KEY, &value))
+            if (!hasExtractKeyAvailable && !xar_prop_get(file, DELETE_KEY, &value))
                 continue;
         }
 
@@ -144,7 +147,8 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
                 fprintf(stderr, "Unable to patch %s to destination %s\n", [sourceFilePath fileSystemRepresentation], [destinationFilePath fileSystemRepresentation]);
                 return 1;
             }
-        } else if (xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value)) {
+        } else if ((hasExtractKeyAvailable && !xar_prop_get(file, EXTRACT_KEY, &value)) ||
+                   (!hasExtractKeyAvailable && xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value))) { // extract and permission modifications don't coexist
             if (xar_extract_tofile(x, file, [destinationFilePath fileSystemRepresentation]) != 0) {
                 fprintf(stderr, "Unable to extract file to %s\n", [destinationFilePath fileSystemRepresentation]);
                 return 1;

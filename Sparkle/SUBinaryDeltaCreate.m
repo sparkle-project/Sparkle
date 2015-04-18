@@ -371,7 +371,15 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 assert(newFile);
                 
                 if (shouldDeleteThenExtract(originalInfo, newInfo)) {
-                    xar_prop_set(newFile, DELETE_THEN_EXTRACT_KEY, "true");
+                    if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion)) {
+                        xar_prop_set(newFile, DELETE_KEY, "true");
+                    } else {
+                        xar_prop_set(newFile, DELETE_THEN_EXTRACT_OLD_KEY, "true");
+                    }
+                }
+                
+                if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion)) {
+                    xar_prop_set(newFile, EXTRACT_KEY, "true");
                 }
             }
         } else {

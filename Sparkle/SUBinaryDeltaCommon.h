@@ -22,11 +22,12 @@
 #define BEFORE_TREE_SHA1_KEY "before-tree-sha1"
 #define AFTER_TREE_SHA1_KEY "after-tree-sha1"
 #define DELETE_KEY "delete"
-#define DELETE_THEN_EXTRACT_KEY "delete-then-extract"
+#define EXTRACT_KEY "extract"
 #define BINARY_DELTA_KEY "binary-delta"
 #define MODIFY_PERMISSIONS_KEY "mod-permissions"
 
 // Properties no longer used in new patches
+#define DELETE_THEN_EXTRACT_OLD_KEY "delete-then-extract"
 #define BEFORE_TREE_SHA1_OLD_KEY "before-sha1"
 #define AFTER_TREE_SHA1_OLD_KEY "after-sha1"
 
