@@ -141,6 +141,7 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
         NSString *sourceFilePath = [source stringByAppendingPathComponent:path];
         NSString *destinationFilePath = [destination stringByAppendingPathComponent:path];
 
+        // Don't use -[NSFileManager fileExistsAtPath:] because it will follow symbolic links
         BOOL fileExisted = verbose && [fileManager attributesOfItemAtPath:destinationFilePath error:nil];
         BOOL removedFile = NO;
         
