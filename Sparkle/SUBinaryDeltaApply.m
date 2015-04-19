@@ -153,7 +153,7 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
             }
             if (!hasExtractKeyAvailable && !xar_prop_get(file, DELETE_KEY, &value)) {
                 if (verbose) {
-                    fprintf(stderr, "\n❌  %s (Removed)", [path fileSystemRepresentation]);
+                    fprintf(stderr, "\n❌  %s %s", VERBOSE_DELETED, [path fileSystemRepresentation]);
                 }
                 continue;
             }
@@ -168,7 +168,7 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
             }
             
             if (verbose) {
-                fprintf(stderr, "\n🔨  %s (Delta)", [path fileSystemRepresentation]);
+                fprintf(stderr, "\n🔨  %s %s", VERBOSE_PATCHED, [path fileSystemRepresentation]);
             }
         } else if ((hasExtractKeyAvailable && !xar_prop_get(file, EXTRACT_KEY, &value)) ||
                    (!hasExtractKeyAvailable && xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value))) { // extract and permission modifications don't coexist
@@ -180,13 +180,13 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
             
             if (verbose) {
                 if (fileExisted) {
-                    fprintf(stderr, "\n✏️  %s (Replaced)", [path fileSystemRepresentation]);
+                    fprintf(stderr, "\n✏️  %s %s", VERBOSE_UPDATED, [path fileSystemRepresentation]);
                 } else {
-                    fprintf(stderr, "\n✅  %s (Added)", [path fileSystemRepresentation]);
+                    fprintf(stderr, "\n✅  %s %s", VERBOSE_ADDED, [path fileSystemRepresentation]);
                 }
             }
         } else if (verbose && removedFile) {
-            fprintf(stderr, "\n❌  %s (Removed)", [path fileSystemRepresentation]);
+            fprintf(stderr, "\n❌  %s %s", VERBOSE_DELETED, [path fileSystemRepresentation]);
         }
         
         if (!xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value)) {
@@ -197,7 +197,7 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
             }
             
             if (verbose) {
-                fprintf(stderr, "\n👮  %s (Mode: 0%o)", [path fileSystemRepresentation], mode);
+                fprintf(stderr, "\n👮  %s %s (0%o)", VERBOSE_MODIFIED, [path fileSystemRepresentation], mode);
             }
         }
     }

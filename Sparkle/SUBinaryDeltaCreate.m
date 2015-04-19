@@ -367,7 +367,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             xar_prop_set(newFile, DELETE_KEY, "true");
             
             if (verbose) {
-                fprintf(stderr, "\n❌  %s (Removed)", [key fileSystemRepresentation]);
+                fprintf(stderr, "\n❌  %s %s", VERBOSE_REMOVED, [key fileSystemRepresentation]);
             }
             continue;
         }
@@ -382,7 +382,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                     xar_prop_set(newFile, MODIFY_PERMISSIONS_KEY, [[NSString stringWithFormat:@"%u", [newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]] UTF8String]);
                     
                     if (verbose) {
-                        fprintf(stderr, "\n👮  %s (Mode: 0%o -> 0%o)", [key fileSystemRepresentation], [originalInfo[INFO_PERMISSIONS_KEY] unsignedShortValue], [newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]);
+                        fprintf(stderr, "\n👮  %s %s (0%o -> 0%o)", VERBOSE_MODIFIED, [key fileSystemRepresentation], [originalInfo[INFO_PERMISSIONS_KEY] unsignedShortValue], [newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]);
                     }
                 }
             } else {
@@ -404,9 +404,9 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 
                 if (verbose) {
                     if (originalInfo) {
-                        fprintf(stderr, "\n✏️  %s (Replaced)", [key fileSystemRepresentation]);
+                        fprintf(stderr, "\n✏️  %s %s", VERBOSE_UPDATED, [key fileSystemRepresentation]);
                     } else {
-                        fprintf(stderr, "\n✅  %s (Added)", [key fileSystemRepresentation]);
+                        fprintf(stderr, "\n✅  %s (%s)", VERBOSE_ADDED, [key fileSystemRepresentation]);
                     }
                 }
             }
@@ -431,7 +431,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         }
         
         if (verbose) {
-            fprintf(stderr, "\n🔨  %s (Delta)", [[operation relativePath] fileSystemRepresentation]);
+            fprintf(stderr, "\n🔨  %s %s", VERBOSE_DIFFED, [[operation relativePath] fileSystemRepresentation]);
         }
         
         xar_file_t newFile = xar_add_frompath(x, 0, [[operation relativePath] fileSystemRepresentation], [resultPath fileSystemRepresentation]);
@@ -443,7 +443,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             xar_prop_set(newFile, MODIFY_PERMISSIONS_KEY, [[NSString stringWithFormat:@"%u", [operation.permissions unsignedShortValue]] UTF8String]);
             
             if (verbose) {
-                fprintf(stderr, "\n👮  %s (Mode: 0%o -> 0%o)", [[operation relativePath] fileSystemRepresentation], operation.oldPermissions.unsignedShortValue, operation.permissions.unsignedShortValue);
+                fprintf(stderr, "\n👮  %s %s (0%o -> 0%o)", VERBOSE_MODIFIED, [[operation relativePath] fileSystemRepresentation], operation.oldPermissions.unsignedShortValue, operation.permissions.unsignedShortValue);
             }
         }
     }
