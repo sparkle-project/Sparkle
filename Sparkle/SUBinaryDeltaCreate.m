@@ -25,23 +25,26 @@ extern int bsdiff(int argc, const char **argv);
 @interface CreateBinaryDeltaOperation : NSOperation
 @property (copy) NSString *relativePath;
 @property (strong) NSString *resultPath;
+@property (strong) NSNumber *oldPermissions;
 @property (strong) NSNumber *permissions;
 @property (strong) NSString *_fromPath;
 @property (strong) NSString *_toPath;
-- (id)initWithRelativePath:(NSString *)relativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree permissions:(NSNumber *)permissions;
+- (id)initWithRelativePath:(NSString *)relativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree oldPermissions:(NSNumber *)oldPermissions newPermissions:(NSNumber *)permissions;
 @end
 
 @implementation CreateBinaryDeltaOperation
 @synthesize relativePath = _relativePath;
 @synthesize resultPath = _resultPath;
+@synthesize oldPermissions = _oldPermissions;
 @synthesize permissions = _permissions;
 @synthesize _fromPath = _fromPath;
 @synthesize _toPath = _toPath;
 
-- (id)initWithRelativePath:(NSString *)relativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree permissions:(NSNumber *)permissions
+- (id)initWithRelativePath:(NSString *)relativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree oldPermissions:(NSNumber *)oldPermissions newPermissions:(NSNumber *)permissions
 {
     if ((self = [super init])) {
         self.relativePath = relativePath;
+        self.oldPermissions = oldPermissions;
         self.permissions = permissions;
         self._fromPath = [oldTree stringByAppendingPathComponent:relativePath];
         self._toPath = [newTree stringByAppendingPathComponent:relativePath];
@@ -224,13 +227,13 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
 
         NSDictionary *info = infoForFile(ent);
         if (!info) {
-            fprintf(stderr, "Failed to retrieve info for file %s\n", ent->fts_path);
+            fprintf(stderr, "\nFailed to retrieve info for file %s\n", ent->fts_path);
             return 1;
         }
         originalTreeState[key] = info;
         
         if (aclExists(ent)) {
-            fprintf(stderr, "Diffing ACLs are not supported. Detected ACL in before-tree on file %s\n", ent->fts_path);
+            fprintf(stderr, "\nDiffing ACLs are not supported. Detected ACL in before-tree on file %s\n", ent->fts_path);
             return 1;
         }
     }
@@ -239,7 +242,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     NSString *beforeHash = hashOfTreeWithVersion(source, majorVersion);
 
     if (!beforeHash) {
-        fprintf(stderr, "Failed to generate hash for tree %s\n", [source fileSystemRepresentation]);
+        fprintf(stderr, "\nFailed to generate hash for tree %s\n", [source fileSystemRepresentation]);
         return 1;
     }
 
@@ -273,7 +276,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
 
         NSDictionary *info = infoForFile(ent);
         if (!info) {
-            fprintf(stderr, "Failed to retrieve info from file %s\n", ent->fts_path);
+            fprintf(stderr, "\nFailed to retrieve info from file %s\n", ent->fts_path);
             return 1;
         }
         
@@ -282,12 +285,12 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         
         mode_t permissions = [info[INFO_PERMISSIONS_KEY] unsignedShortValue];
         if (!IS_VALID_PERMISSIONS(permissions)) {
-            fprintf(stderr, "Invalid file permissions after-tree on file %s\nOnly permissions with modes 0755 and 0644 are supported\n", ent->fts_path);
+            fprintf(stderr, "\nInvalid file permissions after-tree on file %s\nOnly permissions with modes 0755 and 0644 are supported\n", ent->fts_path);
             return 1;
         }
         
         if (aclExists(ent)) {
-            fprintf(stderr, "Diffing ACLs are not supported. Detected ACL in after-tree on file %s\n", ent->fts_path);
+            fprintf(stderr, "\nDiffing ACLs are not supported. Detected ACL in after-tree on file %s\n", ent->fts_path);
             return 1;
         }
         
@@ -315,7 +318,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
 
     NSString *afterHash = hashOfTreeWithVersion(destination, majorVersion);
     if (!afterHash) {
-        fprintf(stderr, "Failed to generate hash for tree %s\n", [destination fileSystemRepresentation]);
+        fprintf(stderr, "\nFailed to generate hash for tree %s\n", [destination fileSystemRepresentation]);
         return 1;
     }
     
@@ -361,6 +364,10 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             xar_file_t newFile = xar_add_frombuffer(x, 0, [key fileSystemRepresentation], (char *)"", 1);
             assert(newFile);
             xar_prop_set(newFile, DELETE_KEY, "true");
+            
+            if (verbose) {
+                fprintf(stderr, "\n❌  %s (Removed)", [key fileSystemRepresentation]);
+            }
             continue;
         }
 
@@ -372,6 +379,10 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                     xar_file_t newFile = xar_add_frombuffer(x, 0, [key fileSystemRepresentation], (char *)"", 1);
                     assert(newFile);
                     xar_prop_set(newFile, MODIFY_PERMISSIONS_KEY, [[NSString stringWithFormat:@"%u", [newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]] UTF8String]);
+                    
+                    if (verbose) {
+                        fprintf(stderr, "\n👮  %s (Mode: 0%o -> 0%o)", [key fileSystemRepresentation], [originalInfo[INFO_PERMISSIONS_KEY] unsignedShortValue], [newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]);
+                    }
                 }
             } else {
                 NSString *path = [destination stringByAppendingPathComponent:key];
@@ -389,13 +400,21 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion)) {
                     xar_prop_set(newFile, EXTRACT_KEY, "true");
                 }
+                
+                if (verbose) {
+                    if (originalInfo) {
+                        fprintf(stderr, "\n✏️  %s (Replaced)", [key fileSystemRepresentation]);
+                    } else {
+                        fprintf(stderr, "\n✅  %s (Added)", [key fileSystemRepresentation]);
+                    }
+                }
             }
         } else {
             NSNumber *permissions =
                 (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion) && shouldChangePermissions(originalInfo, newInfo)) ?
                 newInfo[INFO_PERMISSIONS_KEY] :
                 nil;
-            CreateBinaryDeltaOperation *operation = [[CreateBinaryDeltaOperation alloc] initWithRelativePath:key oldTree:source newTree:destination permissions:permissions];
+            CreateBinaryDeltaOperation *operation = [[CreateBinaryDeltaOperation alloc] initWithRelativePath:key oldTree:source newTree:destination oldPermissions:originalInfo[INFO_PERMISSIONS_KEY] newPermissions:permissions];
             [deltaQueue addOperation:operation];
             [deltaOperations addObject:operation];
         }
@@ -406,9 +425,14 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     for (CreateBinaryDeltaOperation *operation in deltaOperations) {
         NSString *resultPath = [operation resultPath];
         if (!resultPath) {
-            fprintf(stderr, "Failed to create patch from source %s and destination %s\n", [[operation relativePath] fileSystemRepresentation], [resultPath fileSystemRepresentation]);
+            fprintf(stderr, "\nFailed to create patch from source %s and destination %s\n", [[operation relativePath] fileSystemRepresentation], [resultPath fileSystemRepresentation]);
             return 1;
         }
+        
+        if (verbose) {
+            fprintf(stderr, "\n🔨  %s (Delta)", [[operation relativePath] fileSystemRepresentation]);
+        }
+        
         xar_file_t newFile = xar_add_frompath(x, 0, [[operation relativePath] fileSystemRepresentation], [resultPath fileSystemRepresentation]);
         assert(newFile);
         xar_prop_set(newFile, BINARY_DELTA_KEY, "true");
@@ -416,6 +440,10 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         
         if (operation.permissions) {
             xar_prop_set(newFile, MODIFY_PERMISSIONS_KEY, [[NSString stringWithFormat:@"%u", [operation.permissions unsignedShortValue]] UTF8String]);
+            
+            if (verbose) {
+                fprintf(stderr, "\n👮  %s (Mode: 0%o -> 0%o)", [[operation relativePath] fileSystemRepresentation], operation.oldPermissions.unsignedShortValue, operation.permissions.unsignedShortValue);
+            }
         }
     }
 
@@ -426,7 +454,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     unlink([temporaryFile fileSystemRepresentation]);
     
     if (verbose) {
-        fprintf(stderr, "Done!\n");
+        fprintf(stderr, "\nDone!\n");
     }
 
     return 0;
