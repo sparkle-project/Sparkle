@@ -184,15 +184,15 @@ static BOOL shouldChangePermissions(NSDictionary *originalInfo, NSDictionary *ne
     return YES;
 }
 
-int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, SUBinaryDeltaMajorVersion majorVersion)
+int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, SUBinaryDeltaMajorVersion majorVersion, BOOL verbose)
 {
     if (majorVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {
-        fprintf(stderr, "Version provided (%u) is not valid", majorVersion);
+        fprintf(stderr, "Version provided (%u) is not valid\n", majorVersion);
         return 1;
     }
     
     if (majorVersion > LATEST_DELTA_DIFF_MAJOR_VERSION) {
-        fprintf(stderr, "This program is too old to apply version %u", majorVersion);
+        fprintf(stderr, "This program is too old to create a version %u patch, or the version number provided is invalid\n", majorVersion);
         return 1;
     }
     
@@ -207,7 +207,10 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         return 1;
     }
 
-    fprintf(stdout, "Processing %s...", [source fileSystemRepresentation]);
+    if (verbose) {
+        fprintf(stderr, "Processing %s...", [source fileSystemRepresentation]);
+    }
+    
     FTSENT *ent = 0;
     while ((ent = fts_read(fts))) {
         if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D) {
@@ -221,13 +224,13 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
 
         NSDictionary *info = infoForFile(ent);
         if (!info) {
-            fprintf(stderr, "Failed to retrieve info for file %s", ent->fts_path);
+            fprintf(stderr, "Failed to retrieve info for file %s\n", ent->fts_path);
             return 1;
         }
         originalTreeState[key] = info;
         
         if (aclExists(ent)) {
-            fprintf(stderr, "Diffing ACLs are not supported. Detected ACL in before-tree on file %s", ent->fts_path);
+            fprintf(stderr, "Diffing ACLs are not supported. Detected ACL in before-tree on file %s\n", ent->fts_path);
             return 1;
         }
     }
@@ -236,7 +239,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     NSString *beforeHash = hashOfTreeWithVersion(source, majorVersion);
 
     if (!beforeHash) {
-        fprintf(stderr, "Failed to generate hash for tree %s", [source fileSystemRepresentation]);
+        fprintf(stderr, "Failed to generate hash for tree %s\n", [source fileSystemRepresentation]);
         return 1;
     }
 
@@ -246,7 +249,10 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         newTreeState[key] = [NSNull null];
     }
 
-    fprintf(stdout, "\nProcessing %s...  ", [destination fileSystemRepresentation]);
+    if (verbose) {
+        fprintf(stderr, "\nProcessing %s...", [destination fileSystemRepresentation]);
+    }
+    
     sourcePaths[0] = [destination fileSystemRepresentation];
     fts = fts_open((char* const*)sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
     if (!fts) {
@@ -267,7 +273,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
 
         NSDictionary *info = infoForFile(ent);
         if (!info) {
-            fprintf(stderr, "Failed to retrieve info from file %s", ent->fts_path);
+            fprintf(stderr, "Failed to retrieve info from file %s\n", ent->fts_path);
             return 1;
         }
         
@@ -276,12 +282,12 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         
         mode_t permissions = [info[INFO_PERMISSIONS_KEY] unsignedShortValue];
         if (!IS_VALID_PERMISSIONS(permissions)) {
-            fprintf(stderr, "Invalid file permissions after-tree on file %s\nOnly permissions with modes 0755 and 0644 are supported", ent->fts_path);
+            fprintf(stderr, "Invalid file permissions after-tree on file %s\nOnly permissions with modes 0755 and 0644 are supported\n", ent->fts_path);
             return 1;
         }
         
         if (aclExists(ent)) {
-            fprintf(stderr, "Diffing ACLs are not supported. Detected ACL in after-tree on file %s", ent->fts_path);
+            fprintf(stderr, "Diffing ACLs are not supported. Detected ACL in after-tree on file %s\n", ent->fts_path);
             return 1;
         }
         
@@ -309,11 +315,13 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
 
     NSString *afterHash = hashOfTreeWithVersion(destination, majorVersion);
     if (!afterHash) {
-        fprintf(stderr, "Failed to generate hash for tree %s", [destination fileSystemRepresentation]);
+        fprintf(stderr, "Failed to generate hash for tree %s\n", [destination fileSystemRepresentation]);
         return 1;
     }
     
-    fprintf(stdout, "\nGenerating delta...  ");
+    if (verbose) {
+        fprintf(stderr, "\nGenerating delta...");
+    }
 
     NSString *temporaryFile = temporaryPatchFile(patchFile);
     xar_t x = xar_open([temporaryFile fileSystemRepresentation], WRITE);
@@ -416,7 +424,10 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     unlink([patchFile fileSystemRepresentation]);
     link([temporaryFile fileSystemRepresentation], [patchFile fileSystemRepresentation]);
     unlink([temporaryFile fileSystemRepresentation]);
-    fprintf(stdout, "Done!\n");
+    
+    if (verbose) {
+        fprintf(stderr, "Done!\n");
+    }
 
     return 0;
 }

@@ -25,7 +25,7 @@ static BOOL applyBinaryDeltaToFile(xar_t x, xar_file_t file, NSString *sourceFil
     return success;
 }
 
-int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFile)
+int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, BOOL verbose)
 {
     xar_t x = xar_open([patchFile fileSystemRepresentation], READ);
     if (!x) {
@@ -99,7 +99,10 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
         return 1;
     }
 
-    fprintf(stdout, "Verifying source...  ");
+    if (verbose) {
+        fprintf(stderr, "Verifying source...");
+    }
+    
     NSString *beforeHash = hashOfTreeWithVersion(source, majorDiffVersion);
     if (!beforeHash) {
         fprintf(stderr, "Unable to calculate hash of tree %s\n", [source fileSystemRepresentation]);
@@ -111,7 +114,10 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
         return 1;
     }
 
-    fprintf(stdout, "\nCopying files...  ");
+    if (verbose) {
+        fprintf(stderr, "\nCopying files...");
+    }
+    
     if (!removeTree(destination)) {
         fprintf(stderr, "Failed to remove %s\n", [destination fileSystemRepresentation]);
         return 1;
@@ -123,7 +129,9 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
     
     BOOL hasExtractKeyAvailable = MAJOR_VERSION_IS_AT_LEAST(majorDiffVersion, SUBeigeMajorVersion);
 
-    fprintf(stdout, "\nPatching... ");
+    if (verbose) {
+        fprintf(stderr, "\nPatching...");
+    }
     xar_file_t file;
     xar_iter_t iter = xar_iter_new();
     for (file = xar_file_first(x, iter); file; file = xar_file_next(iter)) {
@@ -164,7 +172,9 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
     }
     xar_close(x);
 
-    fprintf(stdout, "\nVerifying destination...  ");
+    if (verbose) {
+        fprintf(stderr, "\nVerifying destination...");
+    }
     NSString *afterHash = hashOfTreeWithVersion(destination, majorDiffVersion);
     if (!afterHash) {
         fprintf(stderr, "Unable to calculate hash of tree %s\n", [destination fileSystemRepresentation]);
@@ -177,6 +187,8 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
         return 1;
     }
 
-    fprintf(stdout, "\nDone!\n");
+    if (verbose) {
+        fprintf(stderr, "\nDone!\n");
+    }
     return 0;
 }
