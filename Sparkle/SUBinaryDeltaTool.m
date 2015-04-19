@@ -23,7 +23,7 @@
 static void printUsage(NSString *programName)
 {
     fprintf(stderr, "Usage:\n");
-    fprintf(stderr, "%s create [--verbose --version=<version>] <before-tree> <after-tree> <patch-file>\n", [programName UTF8String]);
+    fprintf(stderr, "%s create [--verbose] [--version=<version>] <before-tree> <after-tree> <patch-file>\n", [programName UTF8String]);
     fprintf(stderr, "%s apply [--verbose] <before-tree> <after-tree> <patch-file>\n", [programName UTF8String]);
     fprintf(stderr, "%s version [<patch-file>]\n", [programName UTF8String]);
 }
