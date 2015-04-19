@@ -211,6 +211,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     }
 
     if (verbose) {
+        fprintf(stderr, "Creating version %u.%u patch...\n", majorVersion, minorVersion);
         fprintf(stderr, "Processing %s...", [source fileSystemRepresentation]);
     }
     

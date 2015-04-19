@@ -100,6 +100,7 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
     }
 
     if (verbose) {
+        fprintf(stderr, "Applying version %u.%u patch...\n", majorDiffVersion, minorDiffVersion);
         fprintf(stderr, "Verifying source...");
     }
     
