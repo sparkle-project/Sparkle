@@ -39,13 +39,13 @@ static int runCreateCommand(NSArray *args)
     }
     
     BOOL verbose =
-        ((args.count == 4 && [args[0] isEqualToString:VERBOSE_FLAG]) ||
-        (args.count == 5 && [args[1] isEqualToString:VERBOSE_FLAG]));
+        ((args.count >= 4 && [args[0] isEqualToString:VERBOSE_FLAG]) ||
+        (args.count >= 5 && [args[1] isEqualToString:VERBOSE_FLAG]));
     
     NSString *versionField = nil;
-    if (args.count == 4 && [args[0] hasPrefix:VERSION_FLAG]) {
+    if (args.count >= 4 && [args[0] hasPrefix:VERSION_FLAG]) {
         versionField = args[0];
-    } else if (args.count == 5 && [args[1] hasPrefix:VERSION_FLAG]) {
+    } else if (args.count >= 5 && [args[1] hasPrefix:VERSION_FLAG]) {
         versionField = args[1];
     }
     
