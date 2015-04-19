@@ -406,7 +406,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                     if (originalInfo) {
                         fprintf(stderr, "\n✏️  %s %s", VERBOSE_UPDATED, [key fileSystemRepresentation]);
                     } else {
-                        fprintf(stderr, "\n✅  %s (%s)", VERBOSE_ADDED, [key fileSystemRepresentation]);
+                        fprintf(stderr, "\n✅  %s %s", VERBOSE_ADDED, [key fileSystemRepresentation]);
                     }
                 }
             }
