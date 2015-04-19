@@ -35,26 +35,30 @@ static int runCreateCommand(NSString *programName, NSArray *args)
         return 1;
     }
     
-    if (args.count == 4 && ![args[0] isEqualToString:VERBOSE_FLAG] && ![args[0] hasPrefix:VERSION_FLAG]) {
+    NSUInteger numberOflagsFound = 0;
+    NSUInteger verboseIndex = [args indexOfObject:VERBOSE_FLAG];
+    NSUInteger versionIndex = NSNotFound;
+    for (NSUInteger argumentIndex = 0; argumentIndex < args.count; ++argumentIndex) {
+        if ([args[argumentIndex] hasPrefix:VERSION_FLAG]) {
+            versionIndex = argumentIndex;
+            break;
+        }
+    }
+    
+    if (verboseIndex != NSNotFound) {
+        ++numberOflagsFound;
+    }
+    if (versionIndex != NSNotFound) {
+        ++numberOflagsFound;
+    }
+    
+    if (args.count - numberOflagsFound < 3) {
         printUsage(programName);
         return 1;
     }
     
-    if (args.count == 5 && ![args[1] isEqualToString:VERBOSE_FLAG] && ![args[1] hasPrefix:VERSION_FLAG]) {
-        printUsage(programName);
-        return 1;
-    }
-    
-    BOOL verbose =
-        ((args.count >= 4 && [args[0] isEqualToString:VERBOSE_FLAG]) ||
-        (args.count >= 5 && [args[1] isEqualToString:VERBOSE_FLAG]));
-    
-    NSString *versionField = nil;
-    if (args.count >= 4 && [args[0] hasPrefix:VERSION_FLAG]) {
-        versionField = args[0];
-    } else if (args.count >= 5 && [args[1] hasPrefix:VERSION_FLAG]) {
-        versionField = args[1];
-    }
+    BOOL verbose = (verboseIndex != NSNotFound);
+    NSString *versionField = (versionIndex != NSNotFound) ? args[versionIndex] : nil;
     
     NSArray *versionComponents = nil;
     if (versionField) {
@@ -70,16 +74,28 @@ static int runCreateCommand(NSString *programName, NSArray *args)
         LATEST_DELTA_DIFF_MAJOR_VERSION :
         (SUBinaryDeltaMajorVersion)[[versionComponents[1] componentsSeparatedByString:@"."][0] intValue]; // ignore minor version if provided
 
-    NSArray *fileArgs = [args subarrayWithRange:NSMakeRange(args.count - 3, 3)];
+    NSMutableArray *fileArgs = [NSMutableArray array];
+    for (NSString *argument in args) {
+        if (![argument hasPrefix:VERSION_FLAG] && ![argument isEqualToString:VERBOSE_FLAG]) {
+            [fileArgs addObject:argument];
+        }
+    }
+    
+    if (fileArgs.count != 3) {
+        printUsage(programName);
+        return 1;
+    }
     
     BOOL isDirectory;
     if (![[NSFileManager defaultManager] fileExistsAtPath:fileArgs[0] isDirectory:&isDirectory] || !isDirectory) {
-        fprintf(stderr, "Usage: before-tree must be a directory\n");
+        printUsage(programName);
+        fprintf(stderr, "Error: before-tree must be a directory\n");
         return 1;
     }
     
     if (![[NSFileManager defaultManager] fileExistsAtPath:fileArgs[1] isDirectory:&isDirectory] || !isDirectory) {
-        fprintf(stderr, "Usage: after-tree must be a directory\n");
+        printUsage(programName);
+        fprintf(stderr, "Error: after-tree must be a directory\n");
         return 1;
     }
     
@@ -93,23 +109,35 @@ static int runApplyCommand(NSString *programName, NSArray *args)
         return 1;
     }
     
-    if (args.count == 4 && ![args[0] isEqualToString:VERBOSE_FLAG]) {
+    BOOL verbose = [args containsObject:VERBOSE_FLAG];
+    
+    if (args.count == 4 && !verbose) {
         printUsage(programName);
         return 1;
     }
     
-    BOOL verbose = (args.count == 4 && [args[0] isEqualToString:VERBOSE_FLAG]);
+    NSMutableArray *fileArgs = [NSMutableArray array];
+    for (NSString *argument in args) {
+        if (![argument isEqualToString:VERBOSE_FLAG]) {
+            [fileArgs addObject:argument];
+        }
+    }
     
-    NSArray *fileArgs = [args subarrayWithRange:NSMakeRange(args.count - 3, 3)];
+    if (fileArgs.count != 3) {
+        printUsage(programName);
+        return 1;
+    }
     
     BOOL isDirectory;
     if (![[NSFileManager defaultManager] fileExistsAtPath:fileArgs[0] isDirectory:&isDirectory] || !isDirectory) {
-        fprintf(stderr, "Usage: before-tree must be a directory\n");
+        printUsage(programName);
+        fprintf(stderr, "Error: before-tree must be a directory\n");
         return 1;
     }
     
     if (![[NSFileManager defaultManager] fileExistsAtPath:fileArgs[2] isDirectory:&isDirectory] || isDirectory) {
-        fprintf(stderr, "Usage: patch-file must be a file %d\n", isDirectory);
+        printUsage(programName);
+        fprintf(stderr, "Error: patch-file must be a file %d\n", isDirectory);
         return 1;
     }
     
