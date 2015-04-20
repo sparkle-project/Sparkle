@@ -31,6 +31,14 @@
 #define BEFORE_TREE_SHA1_OLD_KEY "before-sha1"
 #define AFTER_TREE_SHA1_OLD_KEY "after-sha1"
 
+#define VERBOSE_DELETED "Deleted" // file is deleted from the file system when applying a patch
+#define VERBOSE_REMOVED "Removed" // file is set to be removed when creating a patch
+#define VERBOSE_ADDED "Added" // file is added to the patch or file system
+#define VERBOSE_DIFFED "Diffed" // file is diffed when creating a patch
+#define VERBOSE_PATCHED "Patched" // file is patched when applying a patch
+#define VERBOSE_UPDATED "Updated" // file's contents are updated
+#define VERBOSE_MODIFIED "Modified" // file's metadata is modified
+
 #define MAJOR_VERSION_IS_AT_LEAST(actualMajor, expectedMajor) (actualMajor >= expectedMajor)
 
 // Each major version will be assigned a name of a color

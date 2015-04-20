@@ -58,13 +58,13 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     }
     
     BOOL createdDiff =
-    (createBinaryDelta(sourceDirectory, destinationDirectory, diffFile, majorVersion) == 0);
+    (createBinaryDelta(sourceDirectory, destinationDirectory, diffFile, majorVersion, NO) == 0);
     
     if (createdDiff && afterDiffHandler != nil) {
         afterDiffHandler(fileManager, sourceDirectory, destinationDirectory);
     }
     
-    BOOL appliedDiff = (createdDiff && applyBinaryDelta(sourceDirectory, patchDirectory, diffFile) == 0);
+    BOOL appliedDiff = (createdDiff && applyBinaryDelta(sourceDirectory, patchDirectory, diffFile, NO) == 0);
     
     XCTAssertTrue([fileManager removeItemAtPath:sourceDirectory error:nil]);
     XCTAssertTrue([fileManager removeItemAtPath:destinationDirectory error:nil]);
