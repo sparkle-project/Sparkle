@@ -265,14 +265,13 @@
 
 - (void)extractUpdate
 {
-    SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHost:self.host];
-	if (!unarchiver)
-	{
+    SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:[[self.host bundle] bundlePath]];
+    if (!unarchiver) {
         SULog(@"Error: No valid unarchiver for %@!", self.downloadPath);
         [self unarchiverDidFail:nil];
         return;
     }
-    [unarchiver setDelegate:self];
+    unarchiver.delegate = self;
     [unarchiver start];
 }
 

@@ -50,11 +50,11 @@
     NSFileManager *fm = [NSFileManager defaultManager];
     NSString *testFile = [tempDestDir stringByAppendingPathComponent:@"extracted file.txt"];
     [fm removeItemAtPath:testFile error:nil];
-    
+
     XCTAssertFalse([fm fileExistsAtPath:testFile isDirectory:nil]);
     XCTAssertTrue([fm copyItemAtPath:originalArchivePath toPath:tempArchivePath error:nil]);
 
-    SUUnarchiver *unarc = [SUUnarchiver unarchiverForPath:tempArchivePath updatingHost:nil];
+    SUUnarchiver *unarc = [SUUnarchiver unarchiverForPath:tempArchivePath updatingHostBundlePath:nil];
 
     XCTAssertTrue([unarc isKindOfClass:[SUPipedUnarchiver class]]);
 

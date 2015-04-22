@@ -23,7 +23,7 @@
 - (void)applyBinaryDelta
 {
 	@autoreleasepool {
-        NSString *sourcePath = [[self.updateHost bundle] bundlePath];
+        NSString *sourcePath = self.updateHostBundlePath;
         NSString *targetPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
 
         int result = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO);
