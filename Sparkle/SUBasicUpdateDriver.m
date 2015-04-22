@@ -226,7 +226,7 @@
     if (newBundlePath) {
         if ([SUCodeSigningVerifier hostApplicationIsCodeSigned]) {
             NSError *error = nil;
-            if ([SUCodeSigningVerifier codeSignatureIsValidAtPath:newBundlePath error:&error]) {
+            if ([SUCodeSigningVerifier codeSignatureMatchesHostAndIsValidAtPath:newBundlePath error:&error]) {
                 return YES;
             } else {
                 SULog(@"Code signature check on update failed: %@. Sparkle will use DSA signature instead.", error);

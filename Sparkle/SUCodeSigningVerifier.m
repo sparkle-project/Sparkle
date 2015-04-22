@@ -13,7 +13,7 @@
 
 @implementation SUCodeSigningVerifier
 
-+ (BOOL)codeSignatureIsValidAtPath:(NSString *)destinationPath error:(NSError *__autoreleasing *)error
++ (BOOL)codeSignatureMatchesHostAndIsValidAtPath:(NSString *)applicationPath error:(NSError *__autoreleasing *)error
 {
     OSStatus result;
     SecRequirementRef requirement = NULL;
@@ -37,20 +37,23 @@
         goto finally;
     }
 
-    newBundle = [NSBundle bundleWithPath:destinationPath];
+    newBundle = [NSBundle bundleWithPath:applicationPath];
     if (!newBundle) {
         SULog(@"Failed to load NSBundle for update");
         result = -1;
         goto finally;
     }
 
-    result = SecStaticCodeCreateWithPath((__bridge CFURLRef)[newBundle executableURL], kSecCSDefaultFlags, &staticCode);
+    result = SecStaticCodeCreateWithPath((__bridge CFURLRef)[newBundle bundleURL], kSecCSDefaultFlags, &staticCode);
     if (result != noErr) {
         SULog(@"Failed to get static code %d", result);
         goto finally;
     }
 
-    result = SecStaticCodeCheckValidityWithErrors(staticCode, kSecCSDefaultFlags | kSecCSCheckAllArchitectures, requirement, &cfError);
+    // Note that kSecCSCheckNestedCode may not work with pre-Mavericks code signing.
+    // See https://github.com/sparkle-project/Sparkle/issues/376#issuecomment-48824267 and https://developer.apple.com/library/mac/technotes/tn2206
+	SecCSFlags flags = kSecCSDefaultFlags | kSecCSCheckAllArchitectures;
+    result = SecStaticCodeCheckValidityWithErrors(staticCode, flags, requirement, &cfError);
 
     if (cfError) {
         NSError *tmpError = CFBridgingRelease(cfError);
@@ -77,6 +80,53 @@ finally:
     if (hostCode) CFRelease(hostCode);
     if (staticCode) CFRelease(staticCode);
     if (requirement) CFRelease(requirement);
+    return (result == noErr);
+}
+
++ (BOOL)codeSignatureIsValidAtPath:(NSString *)applicationPath error:(NSError *__autoreleasing *)error
+{
+    OSStatus result;
+    SecStaticCodeRef staticCode = NULL;
+    NSBundle *newBundle;
+    CFErrorRef cfError = NULL;
+    if (error) {
+        *error = nil;
+    }
+
+    newBundle = [NSBundle bundleWithPath:applicationPath];
+    if (!newBundle) {
+        SULog(@"Failed to load NSBundle");
+        result = -1;
+        goto finally;
+    }
+
+    result = SecStaticCodeCreateWithPath((__bridge CFURLRef)[newBundle bundleURL], kSecCSDefaultFlags, &staticCode);
+    if (result != noErr) {
+        SULog(@"Failed to get static code %d", result);
+        goto finally;
+    }
+
+    // Note that kSecCSCheckNestedCode may not work with pre-Mavericks code signing.
+    // See https://github.com/sparkle-project/Sparkle/issues/376#issuecomment-48824267 and https://developer.apple.com/library/mac/technotes/tn2206
+	SecCSFlags flags = kSecCSDefaultFlags | kSecCSCheckAllArchitectures;
+    result = SecStaticCodeCheckValidityWithErrors(staticCode, flags, NULL, &cfError);
+
+    if (cfError) {
+        NSError *tmpError = CFBridgingRelease(cfError);
+        if (error) *error = tmpError;
+    }
+
+    if (result != noErr) {
+        if (result == errSecCSUnsigned) {
+            SULog(@"Error: The app is not signed using Apple Code Signing. %@", applicationPath);
+        }
+        if (result == errSecCSReqFailed) {
+            [self logSigningInfoForCode:staticCode label:@"new info"];
+        }
+    }
+
+finally:
+    if (staticCode) CFRelease(staticCode);
     return (result == noErr);
 }
 
@@ -111,6 +161,37 @@ static id valueOrNSNull(id value) {
     result = SecCodeCopyDesignatedRequirement(hostCode, kSecCSDefaultFlags, &requirement);
     if (hostCode) CFRelease(hostCode);
     if (requirement) CFRelease(requirement);
+    return (result == 0);
+}
+
++ (BOOL)applicationAtPathIsCodeSigned:(NSString *)applicationPath
+{
+    OSStatus result;
+    SecStaticCodeRef staticCode = NULL;
+    NSBundle *newBundle;
+
+    newBundle = [NSBundle bundleWithPath:applicationPath];
+    if (!newBundle) {
+        SULog(@"Failed to load NSBundle");
+    	return NO;
+    }
+
+    result = SecStaticCodeCreateWithPath((__bridge CFURLRef)[newBundle bundleURL], kSecCSDefaultFlags, &staticCode);
+    if (result == errSecCSUnsigned) {
+    	return NO;
+    }
+
+    SecRequirementRef requirement = NULL;
+    result = SecCodeCopyDesignatedRequirement(staticCode, kSecCSDefaultFlags, &requirement);
+    if (staticCode) {
+        CFRelease(staticCode);
+    }
+    if (requirement) {
+        CFRelease(requirement);
+    }
+    if (result == errSecCSUnsigned) {
+    	return NO;
+    }
     return (result == 0);
 }
 
