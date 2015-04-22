@@ -154,16 +154,13 @@
     [super extractUpdate];
 }
 
-- (void)unarchiver:(SUUnarchiver *)__unused ua extractedLength:(unsigned long)length
+- (void)unarchiver:(SUUnarchiver *)__unused ua extractedProgress:(double)progress
 {
     // We do this here instead of in extractUpdate so that we only have a determinate progress bar for archives with progress.
-	if ([self.statusController maxProgressValue] == 0.0)
-	{
-        NSDictionary *attributes;
-        attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.downloadPath error:nil];
-        [self.statusController setMaxProgressValue:[attributes[NSFileSize] doubleValue]];
+	if ([self.statusController maxProgressValue] == 0.0) {
+        [self.statusController setMaxProgressValue:1];
     }
-    [self.statusController setProgressValue:[self.statusController progressValue] + (double)length];
+    [self.statusController setProgressValue:progress];
 }
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua

@@ -54,10 +54,10 @@
     return NO;
 }
 
-- (void)notifyDelegateOfExtractedLength:(size_t)length
+- (void)notifyDelegateOfProgress:(double)progress
 {
-    if ([self.delegate respondsToSelector:@selector(unarchiver:extractedLength:)]) {
-        [self.delegate unarchiver:self extractedLength:length];
+    if ([self.delegate respondsToSelector:@selector(unarchiver:extractedProgress:)]) {
+        [self.delegate unarchiver:self extractedProgress:progress];
     }
 }
 
