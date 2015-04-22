@@ -162,24 +162,10 @@ static NSString *sUpdateFolder = nil;
     }
 }
 
-+ (void)registerWithLaunchServices:(NSString *)installationPath
-{
-    NSURL* installationURL = [NSURL fileURLWithPath:installationPath];
-    if (installationURL != nil)
-    {
-        OSStatus registerStatus = LSRegisterURL((__bridge CFURLRef)installationURL,true);
-        if (registerStatus != noErr)
-        {
-            SULog(@"Error: LSRegisterURL returned %d", registerStatus);
-        }
-    }
-}
-
 + (void)finishInstallationToPath:(NSString *)installationPath withResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:(id<SUInstallerDelegate>)delegate
 {
 	if (result)
 	{
-        [self registerWithLaunchServices:installationPath];
         [self mdimportInstallationPath:installationPath];
         if ([delegate respondsToSelector:@selector(installerFinishedForHost:)]) {
             dispatch_async(dispatch_get_main_queue(), ^{
