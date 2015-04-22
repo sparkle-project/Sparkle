@@ -124,7 +124,7 @@ int bsdiff(int argc, char *argv[])
     off_t oldsize, newsize;     /* length of old, new files */
     off_t *I,*V;                /* arrays used for suffix sort; I is ordering */
     off_t scan;                 /* position of current match in old file */
-    off_t pos;                  /* position of current match in new file */
+    off_t pos = 0;              /* position of current match in new file */
     off_t len;                  /* length of current match */
     off_t lastscan;             /* position of previous match in old file */
     off_t lastpos;              /* position of previous match in new file */
