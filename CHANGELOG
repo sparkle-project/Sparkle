@@ -1,3 +1,19 @@
+# 1.10.0
+
+* Massive improvements to the BinaryDelta tool (Zorg)
+  - Ability to track file permissions (Zorg)
+  - Nicely formatted log output (Zorg)
+  - Numerous bug fixes in handling of symlinks, empty directories, case-insensitive names, etc. (Zorg)
+  - Refactored and modernized code (Zorg)
+  - libxar is no longer weak-linked (C.W. Betts)
+* Double-check the code signature of the the app after installation (Isaac Wankerl)
+* Added headless guided package installation (Graham Miln)
+* Added ability to inject custom HTTP headers in appcast request (Mattias Gunneras)
+* Changes to make unarching more reliable (Zorg, Kornel Lesiński)
+* Have Sparkle build a framework module (C.W. Betts)
+* Stdout used for non error outputs (JDuquennoy)
+* French locale update (Kent Sutherland)
+
 # 1.9.0
 
 * Added SUUpdater delegate method for failures. (Benjamin Gordon)
