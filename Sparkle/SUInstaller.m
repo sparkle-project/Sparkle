@@ -44,6 +44,9 @@ static NSString *sUpdateFolder = nil;
 
 + (NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr isGuided:(BOOL *)isGuidedPtr
 {
+    NSParameterAssert(inUpdateFolder);
+    NSParameterAssert(host);
+
     // Search subdirectories for the application
     NSString *currentFile,
         *newAppDownloadPath = nil,
@@ -111,6 +114,10 @@ static NSString *sUpdateFolder = nil;
         *isPackagePtr = isPackage;
     if (isGuidedPtr)
         *isGuidedPtr = isGuided;
+
+    if (!newAppDownloadPath) {
+        SULog(@"Searched %@ for %@.(app|pkg)", inUpdateFolder, bundleFileNameNoExtension);
+    }
     return newAppDownloadPath;
 }
 
