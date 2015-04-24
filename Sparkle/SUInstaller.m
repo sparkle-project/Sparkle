@@ -128,7 +128,7 @@ static NSString *sUpdateFolder = nil;
     NSString *newAppDownloadPath = [self installSourcePathInUpdateFolder:inUpdateFolder forHost:host isPackage:&isPackage isGuided:&isGuided];
 
     if (newAppDownloadPath == nil) {
-        [self finishInstallationToPath:installationPath withResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: @"Couldn't find an appropriate update in the downloaded package." }] completionHandler:completionHandler];
+        [self finishInstallationToPath:installationPath withResult:NO error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: @"Couldn't find an appropriate update in the downloaded package." }] completionHandler:completionHandler];
     } else {
         if (isPackage && isGuided) {
             [SUGuidedPackageInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host versionComparator:comparator completionHandler:completionHandler];
@@ -160,7 +160,7 @@ static NSString *sUpdateFolder = nil;
     }
 }
 
-+ (void)finishInstallationToPath:(NSString *)installationPath withResult:(BOOL)result host:(SUHost *)host error:(NSError *)error completionHandler:(void (^)(NSError *))completionHandler
++ (void)finishInstallationToPath:(NSString *)installationPath withResult:(BOOL)result error:(NSError *)error completionHandler:(void (^)(NSError *))completionHandler
 {
     if (result) {
         [self mdimportInstallationPath:installationPath];
@@ -168,6 +168,9 @@ static NSString *sUpdateFolder = nil;
             completionHandler(nil);
         });
     } else {
+        if (!error) {
+            error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:nil];
+        }
         dispatch_async(dispatch_get_main_queue(), ^{
             completionHandler(error);
         });

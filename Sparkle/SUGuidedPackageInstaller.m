@@ -90,10 +90,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 @implementation SUGuidedPackageInstaller
 
-+ (void)performInstallationToPath:(NSString *)destinationPath fromPath:(NSString *)packagePath host:(SUHost *)host versionComparator:(id<SUVersionComparison>)__unused comparator completionHandler:(void (^)(NSError *))completionHandler
++ (void)performInstallationToPath:(NSString *)destinationPath fromPath:(NSString *)packagePath host:(SUHost *)__unused host versionComparator:(id<SUVersionComparison>)__unused comparator completionHandler:(void (^)(NSError *))completionHandler
 {
     NSParameterAssert(packagePath);
-    NSParameterAssert(host);
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 
@@ -130,7 +129,6 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         dispatch_async(dispatch_get_main_queue(), ^{
             [self finishInstallationToPath:destinationPath
                                 withResult:validInstallation
-                                      host:host
                                      error:error
                          completionHandler:completionHandler];
 
