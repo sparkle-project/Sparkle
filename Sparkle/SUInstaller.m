@@ -121,21 +121,21 @@ static NSString *sUpdateFolder = nil;
     return isPackage ? nil : path;
 }
 
-+ (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath delegate:(id<SUInstallerDelegate>)delegate versionComparator:(id<SUVersionComparison>)comparator
++ (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler
 {
     BOOL isPackage = NO;
     BOOL isGuided = NO;
     NSString *newAppDownloadPath = [self installSourcePathInUpdateFolder:inUpdateFolder forHost:host isPackage:&isPackage isGuided:&isGuided];
 
     if (newAppDownloadPath == nil) {
-        [self finishInstallationToPath:installationPath withResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: @"Couldn't find an appropriate update in the downloaded package." }] delegate:delegate];
+        [self finishInstallationToPath:installationPath withResult:NO host:host error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: @"Couldn't find an appropriate update in the downloaded package." }] completionHandler:completionHandler];
     } else {
         if (isPackage && isGuided) {
-            [SUGuidedPackageInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host delegate:delegate versionComparator:comparator];
+            [SUGuidedPackageInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host versionComparator:comparator completionHandler:completionHandler];
         } else if (isPackage) {
-            [SUPackageInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host delegate:delegate versionComparator:comparator];
+            [SUPackageInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host versionComparator:comparator completionHandler:completionHandler];
         } else {
-            [SUPlainInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host delegate:delegate versionComparator:comparator];
+            [SUPlainInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host versionComparator:comparator completionHandler:completionHandler];
         }
     }
 }
@@ -149,8 +149,7 @@ static NSString *sUpdateFolder = nil;
     NSTask *mdimport = [[NSTask alloc] init];
     [mdimport setLaunchPath:@"/usr/bin/mdimport"];
     [mdimport setArguments:@[installationPath]];
-	@try
-	{
+    @try {
         [mdimport launch];
         [mdimport waitUntilExit];
     }
@@ -161,24 +160,17 @@ static NSString *sUpdateFolder = nil;
     }
 }
 
-+ (void)finishInstallationToPath:(NSString *)installationPath withResult:(BOOL)result host:(SUHost *)host error:(NSError *)error delegate:(id<SUInstallerDelegate>)delegate
++ (void)finishInstallationToPath:(NSString *)installationPath withResult:(BOOL)result host:(SUHost *)host error:(NSError *)error completionHandler:(void (^)(NSError *))completionHandler
 {
-	if (result)
-	{
+    if (result) {
         [self mdimportInstallationPath:installationPath];
-        if ([delegate respondsToSelector:@selector(installerFinishedForHost:)]) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-				[delegate installerFinishedForHost:host];
-            });
-        }
-	}
-	else
-	{
-        if ([delegate respondsToSelector:@selector(installerForHost:failedWithError:)]) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-				[delegate installerForHost:host failedWithError:error];
-            });
-        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(nil);
+        });
+    } else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(error);
+        });
     }
 }
 

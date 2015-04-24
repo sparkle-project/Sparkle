@@ -29,7 +29,7 @@ A guided installation can be started by applications other than the application 
 }
 
 /*! Perform the guided installation */
-+ (void)performInstallationToPath:(NSString *)path fromPath:(NSString *)installerGuide host:(SUHost *)host delegate:delegate versionComparator:(id<SUVersionComparison>)comparator;
++ (void)performInstallationToPath:(NSString *)path fromPath:(NSString *)installerGuide host:(SUHost *)host versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler;
 @end
 
 #endif
