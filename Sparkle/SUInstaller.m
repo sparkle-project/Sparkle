@@ -53,23 +53,27 @@ static NSString *sUpdateFolder = nil;
     BOOL isPackage = NO;
     NSString *fallbackPackagePath = nil;
     NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:inUpdateFolder];
-
+    NSString *bundleFileNameNoExtension = [bundleFileName stringByDeletingPathExtension];
+    
     sUpdateFolder = inUpdateFolder;
 
 	while ((currentFile = [dirEnum nextObject]))
 	{
         NSString *currentPath = [inUpdateFolder stringByAppendingPathComponent:currentFile];
-        if ([[currentFile lastPathComponent] isEqualToString:bundleFileName] ||
-            [[currentFile lastPathComponent] isEqualToString:alternateBundleFileName]) // We found one!
+        NSString *currentFilename = [currentFile lastPathComponent];
+        NSString *currentExtension = [currentFile pathExtension];
+        NSString *currentFilenameNoExtension = [currentFilename stringByDeletingPathExtension];
+        if ([currentFilename isEqualToString:bundleFileName] ||
+            [currentFilename isEqualToString:alternateBundleFileName]) // We found one!
         {
             isPackage = NO;
             newAppDownloadPath = currentPath;
             break;
 		}
-		else if ([[currentFile pathExtension] isEqualToString:@"pkg"] ||
-				 [[currentFile pathExtension] isEqualToString:@"mpkg"])
+		else if ([currentExtension isEqualToString:@"pkg"] ||
+				 [currentExtension isEqualToString:@"mpkg"])
 		{
-			if ([[[currentFile lastPathComponent] stringByDeletingPathExtension] isEqualToString:[bundleFileName stringByDeletingPathExtension]])
+			if ([currentFilenameNoExtension isEqualToString:bundleFileNameNoExtension])
 			{
                 isPackage = YES;
                 newAppDownloadPath = currentPath;
