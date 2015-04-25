@@ -15,7 +15,7 @@
 #import "SUAppcast.h"
 
 @class SUAppcastItem, SUHost;
-@interface SUBasicUpdateDriver : SUUpdateDriver <NSURLDownloadDelegate, SUUnarchiverDelegate, SUAppcastDelegate>
+@interface SUBasicUpdateDriver : SUUpdateDriver <NSURLDownloadDelegate, SUUnarchiverDelegate>
 
 @property (strong, readonly) SUAppcastItem *updateItem;
 @property (strong, readonly) NSURLDownload *download;

@@ -24,21 +24,14 @@ typedef NS_ENUM(NSInteger, SUUpdateAlertChoice) {
 @class WebView, SUAppcastItem, SUHost;
 @interface SUUpdateAlert : SUWindowController
 
-@property (weak) id<SUUpdateAlertDelegate> delegate;
 @property (weak) id<SUVersionDisplay> versionDisplayer;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host completionBlock:(void(^)(SUUpdateAlertChoice))c;
 
 - (IBAction)installUpdate:sender;
 - (IBAction)skipThisVersion:sender;
 - (IBAction)remindMeLater:sender;
 
-@end
-
-@protocol SUUpdateAlertDelegate <NSObject>
-- (void)updateAlert:(SUUpdateAlert *)updateAlert finishedWithChoice:(SUUpdateAlertChoice)updateChoice;
-@optional
-- (void)updateAlert:(SUUpdateAlert *)updateAlert shouldAllowAutoUpdate:(BOOL *)shouldAllowAutoUpdate;
 @end
 
 #endif

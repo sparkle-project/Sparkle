@@ -15,11 +15,12 @@
 
 @class SUStatusController;
 
-@interface SUUIBasedUpdateDriver : SUBasicUpdateDriver <SUUnarchiverDelegate, SUUpdateAlertDelegate>
+@interface SUUIBasedUpdateDriver : SUBasicUpdateDriver <SUUnarchiverDelegate>
 
 - (void)showModalAlert:(NSAlert *)alert;
 - (IBAction)cancelDownload:(id)sender;
 - (void)installAndRestart:(id)sender;
+- (void)appcastDidFinishLoading:(SUAppcast *)ac;
 
 @end
 

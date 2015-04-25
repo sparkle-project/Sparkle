@@ -28,8 +28,9 @@
 
 - (void)didFindValidUpdate
 {
-    self.updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host];
-    [self.updateAlert setDelegate:self];
+    self.updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host completionBlock:^(SUUpdateAlertChoice choice) {
+        [self updateAlertFinishedWithChoice:choice];
+    }];
 
     id<SUVersionDisplay> versDisp = nil;
     if ([[self.updater delegate] respondsToSelector:@selector(versionDisplayerForUpdater:)]) {
@@ -44,8 +45,7 @@
     // If the app is a menubar app or the like, we need to focus it first and alter the
     // update prompt to behave like a normal window. Otherwise if the window were hidden
     // there may be no way for the application to be activated to make it visible again.
-    if ([self.host isBackgroundApplication])
-	{
+    if ([self.host isBackgroundApplication]) {
         [[self.updateAlert window] setHidesOnDeactivate:NO];
         [NSApp activateIgnoringOtherApps:YES];
     }
@@ -78,12 +78,11 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
-- (void)updateAlert:(SUUpdateAlert *)__unused alert finishedWithChoice:(SUUpdateAlertChoice)choice
+- (void)updateAlertFinishedWithChoice:(SUUpdateAlertChoice)choice
 {
     self.updateAlert = nil;
     [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
-	switch (choice)
-	{
+    switch (choice) {
         case SUInstallUpdateChoice:
             self.statusController = [[SUStatusController alloc] initWithHost:self.host];
             [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];

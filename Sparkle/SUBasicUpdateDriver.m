@@ -54,10 +54,15 @@
 
     SUAppcast *appcast = [[SUAppcast alloc] init];
 
-    [appcast setDelegate:self];
     [appcast setUserAgentString:[self.updater userAgentString]];
     [appcast setHttpHeaders:[self.updater httpHeaders]];
-    [appcast fetchAppcastFromURL:URL];
+    [appcast fetchAppcastFromURL:URL completionBlock:^(NSError *error) {
+        if (error) {
+            [self abortUpdateWithError:error];
+        } else {
+            [self appcastDidFinishLoading:appcast];
+        }
+    }];
 }
 
 - (id<SUVersionComparison>)versionComparator
@@ -151,11 +156,6 @@
         self.updateItem = nil;
         [self didNotFindUpdate];
     }
-}
-
-- (void)appcast:(SUAppcast *)__unused ac failedToLoadWithError:(NSError *)error
-{
-    [self abortUpdateWithError:error];
 }
 
 - (void)didFindValidUpdate
