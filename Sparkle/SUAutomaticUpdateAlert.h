@@ -11,8 +11,6 @@
 
 #import "SUWindowController.h"
 
-@protocol SUAutomaticUpdateAlertDelegate;
-
 typedef NS_ENUM(NSInteger, SUAutomaticInstallationChoice) {
     SUInstallNowChoice,
     SUInstallLaterChoice,
