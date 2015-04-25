@@ -21,6 +21,7 @@
 
 @property (strong) SUAppcastItem *updateItem;
 @property (strong) SUHost *host;
+@property (strong) void(^completionBlock)(SUUpdateAlertChoice);
 
 @property (strong) NSProgressIndicator *releaseNotesSpinner;
 @property (assign) BOOL webViewFinishedLoading;
@@ -36,7 +37,7 @@
 
 @implementation SUUpdateAlert
 
-@synthesize delegate;
+@synthesize completionBlock;
 @synthesize versionDisplayer;
 
 @synthesize updateItem;
@@ -52,11 +53,12 @@
 @synthesize skipButton;
 @synthesize laterButton;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUUpdateAlertChoice))block
 {
     self = [super initWithWindowNibName:@"SUUpdateAlert"];
 	if (self)
 	{
+        self.completionBlock = block;
         host = aHost;
         updateItem = item;
         [self setShouldCascadeWindows:NO];
@@ -79,8 +81,8 @@
     [self.releaseNotesView setPolicyDelegate:nil];
     [self.releaseNotesView removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
     [self close];
-    if ([self.delegate respondsToSelector:@selector(updateAlert:finishedWithChoice:)])
-        [self.delegate updateAlert:self finishedWithChoice:choice];
+    self.completionBlock(choice);
+    self.completionBlock = nil;
 }
 
 - (IBAction)installUpdate:(id)__unused sender
@@ -163,10 +165,6 @@
     BOOL allowAutoUpdates = YES; // Defaults to YES.
     if ([self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey])
         allowAutoUpdates = [self.host boolForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
-
-    // Give delegate a chance to modify this choice:
-    if (self.delegate && [self.delegate respondsToSelector:@selector(updateAlert:shouldAllowAutoUpdate:)])
-        [self.delegate updateAlert:self shouldAllowAutoUpdate:&allowAutoUpdates];
 
     return allowAutoUpdates;
 }
