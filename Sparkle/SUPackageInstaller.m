@@ -12,7 +12,7 @@
 
 @implementation SUPackageInstaller
 
-+ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:(id<SUInstallerDelegate>)delegate versionComparator:(id<SUVersionComparison>)__unused comparator
++ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)__unused host versionComparator:(id<SUVersionComparison>)__unused comparator completionHandler:(void (^)(NSError *))completionHandler
 {
     // Run installer using the "open" command to ensure it is launched in front of current application.
     // -W = wait until the app has quit.
@@ -23,7 +23,7 @@
 
     if (![[NSFileManager defaultManager] fileExistsAtPath:command]) {
         NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingInstallerToolError userInfo:@{ NSLocalizedDescriptionKey: @"Couldn't find Apple's installer tool!" }];
-        [self finishInstallationToPath:installationPath withResult:NO host:host error:error delegate:delegate];
+        [self finishInstallationToPath:installationPath withResult:NO error:error completionHandler:completionHandler];
         return;
     }
 
@@ -33,7 +33,7 @@
 
         // Known bug: if the installation fails or is canceled, Sparkle goes ahead and restarts, thinking everything is fine.
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self finishInstallationToPath:installationPath withResult:YES host:host error:nil delegate:delegate];
+            [self finishInstallationToPath:installationPath withResult:YES error:nil completionHandler:completionHandler];
         });
     });
 }

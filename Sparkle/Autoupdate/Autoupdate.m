@@ -18,7 +18,7 @@ static const NSTimeInterval SUInstallationTimeLimit = 5;
  */
 static const NSTimeInterval SUParentQuitCheckInterval = .25;
 
-@interface TerminationListener : NSObject <SUInstallerDelegate>
+@interface TerminationListener : NSObject
 
 @property (copy) NSString *hostpath;
 @property (copy) NSString *executablepath;
@@ -163,36 +163,32 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
     [SUInstaller installFromUpdateFolder:self.folderpath
                                 overHost:self.host
                         installationPath:self.installationPath
-                                delegate:self
-                       versionComparator:[SUStandardVersionComparator defaultComparator]];
-}
-
-- (void)installerFinishedForHost:(SUHost *)__unused aHost
-{
-    [self relaunch];
-}
-
-- (void)installerForHost:(SUHost *)__unused host failedWithError:(NSError *)error __attribute__((noreturn))
-{
-    if (self.shouldShowUI) {
-        NSRunAlertPanel(@"", @"%@", @"OK", @"", @"", [error localizedDescription]);
-    }
-    exit(EXIT_FAILURE);
+                       versionComparator:[SUStandardVersionComparator defaultComparator]
+                       completionHandler:^(NSError *error) {
+                           if (error) {
+                               if (self.shouldShowUI) {
+                                   NSRunAlertPanel(@"", @"%@", @"OK", @"", @"", [error localizedDescription]);
+                               }
+                               exit(EXIT_FAILURE);
+                           } else {
+                               [self relaunch];
+                           }
+                       }];
 }
 
 @end
 
 int main(int __unused argc, const char __unused *argv[])
 {
-	@autoreleasepool {
+    @autoreleasepool
+    {
         NSArray *args = [[NSProcessInfo processInfo] arguments];
         if (args.count < 5 || args.count > 7) {
             return EXIT_FAILURE;
         }
 
         BOOL shouldShowUI = (args.count > 6) ? [args[6] boolValue] : YES;
-		if (shouldShowUI)
-		{
+        if (shouldShowUI) {
             [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
         }
 
