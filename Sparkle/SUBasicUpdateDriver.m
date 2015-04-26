@@ -231,7 +231,8 @@
         return (DSASignature != nil);
     }
     
-    BOOL canValidateByCodeSignature = [SUCodeSigningVerifier hostApplicationIsCodeSigned] && [SUCodeSigningVerifier applicationAtPathIsCodeSigned:newBundlePath];
+    BOOL isAppCodeSigned = [SUCodeSigningVerifier applicationAtPathIsCodeSigned:newBundlePath];
+    BOOL canValidateByCodeSignature = isAppCodeSigned && [SUCodeSigningVerifier hostApplicationIsCodeSigned];
 
     if (!DSASignature && !canValidateByCodeSignature) {
         SULog(@"The appcast item for the update has no DSA signature. The update will be rejected, because both DSA and Apple Code Signing verification failed.");
@@ -241,7 +242,7 @@
     NSError *error = nil;
     
     if (DSASignature) {
-        if (canValidateByCodeSignature && ![SUCodeSigningVerifier codeSignatureIsValidAtPath:newBundlePath error:&error]) {
+        if (isAppCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtPath:newBundlePath error:&error]) {
             SULog(@"The application to update has an invalid code signature: %@. The update will be rejected.", error);
             return NO;
         }
