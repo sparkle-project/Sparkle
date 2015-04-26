@@ -221,27 +221,38 @@
 
 - (BOOL)validateUpdateDownloadedToPath:(NSString *)downloadedPath extractedToPath:(NSString *)extractedPath DSASignature:(NSString *)DSASignature publicDSAKey:(NSString *)publicDSAKey
 {
-    NSString *newBundlePath = [SUInstaller appPathInUpdateFolder:extractedPath forHost:self.host];
-
-    if (newBundlePath) {
-        if ([SUCodeSigningVerifier hostApplicationIsCodeSigned]) {
-            NSError *error = nil;
-            if ([SUCodeSigningVerifier codeSignatureMatchesHostAndIsValidAtPath:newBundlePath error:&error]) {
-                return YES;
-            } else {
-                SULog(@"Code signature check on update failed: %@. Sparkle will use DSA signature instead.", error);
-            }
-        } else {
-            SULog(@"The host app is not signed using Apple Code Signing, and therefore cannot verify updates this way. Sparkle will use DSA signature instead.");
-        }
+    if (DSASignature && ![SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey]) {
+        SULog(@"The provided DSA signature is not valid. The update will be rejected.");
+        return NO;
     }
+    
+    NSString *newBundlePath = [SUInstaller appPathInUpdateFolder:extractedPath forHost:self.host];
+    if (!newBundlePath) {
+        return (DSASignature != nil);
+    }
+    
+    BOOL canValidateByCodeSignature = [SUCodeSigningVerifier hostApplicationIsCodeSigned] && [SUCodeSigningVerifier applicationAtPathIsCodeSigned:newBundlePath];
 
-    if (DSASignature) {
-        return [SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey];
-    } else {
+    if (!DSASignature && !canValidateByCodeSignature) {
         SULog(@"The appcast item for the update has no DSA signature. The update will be rejected, because both DSA and Apple Code Signing verification failed.");
         return NO;
     }
+    
+    NSError *error = nil;
+    
+    if (DSASignature) {
+        if (canValidateByCodeSignature && ![SUCodeSigningVerifier codeSignatureIsValidAtPath:newBundlePath error:&error]) {
+            SULog(@"The application to update has an invalid code signature: %@. The update will be rejected.", error);
+            return NO;
+        }
+    } else {
+        if (![SUCodeSigningVerifier codeSignatureMatchesHostAndIsValidAtPath:newBundlePath error:&error]) {
+            SULog(@"The update will be rejected, because DSA verification failed and the code signature from the original and updated application failed to match: %@", error);
+            return NO;
+        }
+    }
+    
+    return YES;
 }
 
 - (void)downloadDidFinish:(NSURLDownload *)__unused d
