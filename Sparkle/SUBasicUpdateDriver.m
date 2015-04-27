@@ -221,27 +221,29 @@
 
 - (BOOL)validateUpdateDownloadedToPath:(NSString *)downloadedPath extractedToPath:(NSString *)extractedPath DSASignature:(NSString *)DSASignature publicDSAKey:(NSString *)publicDSAKey
 {
-    if (DSASignature && ![SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey]) {
+    BOOL canValidateByDSASignature = DSASignature && publicDSAKey;
+    
+    if (canValidateByDSASignature && ![SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey]) {
         SULog(@"The provided DSA signature is not valid. The update will be rejected.");
         return NO;
     }
     
     NSString *newBundlePath = [SUInstaller appPathInUpdateFolder:extractedPath forHost:self.host];
     if (!newBundlePath) {
-        return (DSASignature != nil);
+        return canValidateByDSASignature;
     }
     
     BOOL isAppCodeSigned = [SUCodeSigningVerifier applicationAtPathIsCodeSigned:newBundlePath];
     BOOL canValidateByCodeSignature = isAppCodeSigned && [SUCodeSigningVerifier hostApplicationIsCodeSigned];
 
-    if (!DSASignature && !canValidateByCodeSignature) {
+    if (!canValidateByDSASignature && !canValidateByCodeSignature) {
         SULog(@"The appcast item for the update has no DSA signature. The update will be rejected, because both DSA and Apple Code Signing verification failed.");
         return NO;
     }
     
     NSError *error = nil;
     
-    if (DSASignature) {
+    if (canValidateByDSASignature) {
         if (isAppCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtPath:newBundlePath error:&error]) {
             SULog(@"The application to update has an invalid code signature: %@. The update will be rejected.", error);
             return NO;
