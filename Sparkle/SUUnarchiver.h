@@ -15,7 +15,7 @@
 @interface SUUnarchiver : NSObject
 
 @property (copy, readonly) NSString *archivePath;
-@property (weak, readonly) NSString *updateHostBundlePath;
+@property (copy, readonly) NSString *updateHostBundlePath;
 @property (weak) id<SUUnarchiverDelegate> delegate;
 
 + (SUUnarchiver *)unarchiverForPath:(NSString *)path updatingHostBundlePath:(NSString *)host;
