@@ -42,7 +42,7 @@
     [unarchived fulfill];
 }
 
-- (void)testBlah {
+- (void)testZipExtract {
     NSString *originalArchivePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"test archive" ofType:@"zip"];
     NSString *tempDestDir = NSTemporaryDirectory();
     NSString *tempArchivePath = [[tempDestDir stringByAppendingPathComponent:[NSUUID UUID].UUIDString] stringByAppendingPathExtension:@"zip"];
