@@ -20,7 +20,6 @@
 - (void)showModalAlert:(NSAlert *)alert;
 - (IBAction)cancelDownload:(id)sender;
 - (void)installAndRestart:(id)sender;
-- (void)appcastDidFinishLoading:(SUAppcast *)ac;
 
 @end
 
