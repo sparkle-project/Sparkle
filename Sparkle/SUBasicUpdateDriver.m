@@ -229,8 +229,8 @@
     }
     
     BOOL isPackage = NO;
-    NSString *newBundlePath = [SUInstaller installSourcePathInUpdateFolder:extractedPath forHost:self.host isPackage:&isPackage isGuided:NULL];
-    if (!newBundlePath) {
+    NSString *installSourcePath = [SUInstaller installSourcePathInUpdateFolder:extractedPath forHost:self.host isPackage:&isPackage isGuided:NULL];
+    if (!installSourcePath) {
         SULog(@"No suitable install is found in the update. The update will be rejected.");
         return NO;
     }
@@ -239,7 +239,7 @@
         return canValidateByDSASignature;
     }
     
-    BOOL isAppCodeSigned = [SUCodeSigningVerifier applicationAtPathIsCodeSigned:newBundlePath];
+    BOOL isAppCodeSigned = [SUCodeSigningVerifier applicationAtPathIsCodeSigned:installSourcePath];
     BOOL canValidateByCodeSignature = isAppCodeSigned && [SUCodeSigningVerifier hostApplicationIsCodeSigned];
 
     if (!canValidateByDSASignature && !canValidateByCodeSignature) {
@@ -250,12 +250,12 @@
     NSError *error = nil;
     
     if (canValidateByDSASignature) {
-        if (isAppCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtPath:newBundlePath error:&error]) {
+        if (isAppCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtPath:installSourcePath error:&error]) {
             SULog(@"The application to update has an invalid code signature: %@. The update will be rejected.", error);
             return NO;
         }
     } else {
-        if (![SUCodeSigningVerifier codeSignatureMatchesHostAndIsValidAtPath:newBundlePath error:&error]) {
+        if (![SUCodeSigningVerifier codeSignatureMatchesHostAndIsValidAtPath:installSourcePath error:&error]) {
             SULog(@"The update will be rejected, because DSA verification failed and the code signature from the original and updated application failed to match: %@", error);
             return NO;
         }
