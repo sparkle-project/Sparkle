@@ -121,13 +121,6 @@ static NSString *sUpdateFolder = nil;
     return newAppDownloadPath;
 }
 
-+ (NSString *)appPathInUpdateFolder:(NSString *)updateFolder forHost:(SUHost *)host
-{
-    BOOL isPackage = NO;
-    NSString *path = [self installSourcePathInUpdateFolder:updateFolder forHost:host isPackage:&isPackage isGuided:nil];
-    return isPackage ? nil : path;
-}
-
 + (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler
 {
     BOOL isPackage = NO;

@@ -228,8 +228,14 @@
         return NO;
     }
     
-    NSString *newBundlePath = [SUInstaller appPathInUpdateFolder:extractedPath forHost:self.host];
+    BOOL isPackage = NO;
+    NSString *newBundlePath = [SUInstaller installSourcePathInUpdateFolder:extractedPath forHost:self.host isPackage:&isPackage isGuided:NULL];
     if (!newBundlePath) {
+        SULog(@"No suitable install is found in the update. The update will be rejected.");
+        return NO;
+    }
+    
+    if (isPackage) {
         return canValidateByDSASignature;
     }
     
