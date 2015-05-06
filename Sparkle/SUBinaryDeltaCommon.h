@@ -16,6 +16,10 @@
 #define IS_VALID_PERMISSIONS(mode) \
     (((mode & PERMISSION_FLAGS) == 0755) || ((mode & PERMISSION_FLAGS) == 0644))
 
+#define APPLE_CODE_SIGN_XATTR_CODE_DIRECTORY_KEY "com.apple.cs.CodeDirectory"
+#define APPLE_CODE_SIGN_XATTR_CODE_REQUIREMENTS_KEY "com.apple.cs.CodeRequirements"
+#define APPLE_CODE_SIGN_XATTR_CODE_SIGNATURE_KEY "com.apple.cs.CodeSignature"
+
 #define BINARY_DELTA_ATTRIBUTES_KEY "binary-delta-attributes"
 #define MAJOR_DIFF_VERSION_KEY "major-version"
 #define MINOR_DIFF_VERSION_KEY "minor-version"

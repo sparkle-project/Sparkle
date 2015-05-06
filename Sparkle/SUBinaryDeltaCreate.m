@@ -121,9 +121,9 @@ static bool codeSignatureExtendedAttributeExists(const FTSENT *ent)
         if (buffer[characterIndex] == '\0') {
             char *attribute = &buffer[startCharacterIndex];
             size_t length = characterIndex - startCharacterIndex;
-            if (strncmp("com.apple.cs.CodeDirectory", attribute, length) == 0 ||
-                strncmp("com.apple.cs.CodeRequirements", attribute, length) == 0 ||
-                strncmp("com.apple.cs.CodeSignature", attribute, length) == 0) {
+            if (strncmp(APPLE_CODE_SIGN_XATTR_CODE_DIRECTORY_KEY, attribute, length) == 0 ||
+                strncmp(APPLE_CODE_SIGN_XATTR_CODE_REQUIREMENTS_KEY, attribute, length) == 0 ||
+                strncmp(APPLE_CODE_SIGN_XATTR_CODE_SIGNATURE_KEY, attribute, length) == 0) {
                 free(buffer);
                 return true;
             }
