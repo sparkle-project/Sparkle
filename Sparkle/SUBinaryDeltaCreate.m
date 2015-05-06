@@ -18,6 +18,7 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <sys/xattr.h>
 #include <xar/xar.h>
 
 extern int bsdiff(int argc, const char **argv);
@@ -98,6 +99,38 @@ static bool aclExists(const FTSENT *ent)
         assert(acl_free((void *)acl) == 0);
         return (result == 0);
     }
+    return false;
+}
+
+static bool codeSignatureExtendedAttributeExists(const FTSENT *ent)
+{
+    const int options = XATTR_NOFOLLOW;
+    ssize_t listSize = listxattr(ent->fts_path, NULL, 0, options);
+    if (listSize == -1) {
+        return false;
+    }
+    
+    char *buffer = malloc((size_t)listSize);
+    assert(buffer != NULL);
+    
+    ssize_t sizeBack = listxattr(ent->fts_path, buffer, (size_t)listSize, options);
+    assert(sizeBack == listSize);
+    
+    size_t startCharacterIndex = 0;
+    for (size_t characterIndex = 0; characterIndex < (size_t)listSize; characterIndex++) {
+        if (buffer[characterIndex] == '\0') {
+            char *attribute = &buffer[startCharacterIndex];
+            size_t length = characterIndex - startCharacterIndex;
+            if (strncmp("com.apple.cs.CodeDirectory", attribute, length) == 0 ||
+                strncmp("com.apple.cs.CodeRequirements", attribute, length) == 0 ||
+                strncmp("com.apple.cs.CodeSignature", attribute, length) == 0) {
+                return true;
+            }
+            startCharacterIndex = characterIndex + 1;
+        }
+    }
+    
+    free(buffer);
     return false;
 }
 
@@ -237,6 +270,11 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             fprintf(stderr, "\nDiffing ACLs are not supported. Detected ACL in before-tree on file %s\n", ent->fts_path);
             return 1;
         }
+        
+        if (codeSignatureExtendedAttributeExists(ent)) {
+            fprintf(stderr, "\nDiffing code signed extended attributes is not supported yet. Detected extended attribute in before-tree on file %s\n", ent->fts_path);
+            return 1;
+        }
     }
     fts_close(fts);
     
@@ -292,6 +330,11 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         
         if (aclExists(ent)) {
             fprintf(stderr, "\nDiffing ACLs are not supported. Detected ACL in after-tree on file %s\n", ent->fts_path);
+            return 1;
+        }
+        
+        if (codeSignatureExtendedAttributeExists(ent)) {
+            fprintf(stderr, "\nDiffing code signed extended attributes is not supported yet. Detected extended attribute in after-tree on file %s\n", ent->fts_path);
             return 1;
         }
         
