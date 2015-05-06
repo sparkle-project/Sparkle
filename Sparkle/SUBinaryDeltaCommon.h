@@ -55,7 +55,7 @@ typedef NS_ENUM(uint16_t, SUBinaryDeltaMajorVersion)
 typedef NS_ENUM(uint16_t, SUBinaryDeltaMinorVersion)
 {
     SUAzureMinorVersion = 1,
-    SUBeigeMinorVersion = 0,
+    SUBeigeMinorVersion = 1,
 };
 
 #define FIRST_DELTA_DIFF_MAJOR_VERSION SUAzureMajorVersion
