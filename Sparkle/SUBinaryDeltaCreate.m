@@ -273,7 +273,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         }
         
         if (codeSignatureExtendedAttributeExists(ent)) {
-            fprintf(stderr, "\nDiffing code signed extended attributes is not supported yet. Detected extended attribute in before-tree on file %s\n", ent->fts_path);
+            fprintf(stderr, "\nDiffing code signed extended attributes are not supported. Detected extended attribute in before-tree on file %s\n", ent->fts_path);
             return 1;
         }
     }
@@ -335,7 +335,7 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         }
         
         if (codeSignatureExtendedAttributeExists(ent)) {
-            fprintf(stderr, "\nDiffing code signed extended attributes is not supported yet. Detected extended attribute in after-tree on file %s\n", ent->fts_path);
+            fprintf(stderr, "\nDiffing code signed extended attributes are not supported. Detected extended attribute in after-tree on file %s\n", ent->fts_path);
             return 1;
         }
         
