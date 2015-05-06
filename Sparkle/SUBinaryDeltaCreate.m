@@ -323,6 +323,9 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         // We should validate permissions and ACLs even if we don't store the info in the diff in the case of ACLs,
         // or in the case of permissions if the patch version is 1
         
+        // We should also not allow files with code signed extended attributes since Apple doesn't recommend inserting these
+        // inside an application, and since we don't preserve extended attribitutes anyway
+        
         mode_t permissions = [info[INFO_PERMISSIONS_KEY] unsignedShortValue];
         if (!IS_VALID_PERMISSIONS(permissions)) {
             fprintf(stderr, "\nInvalid file permissions after-tree on file %s\nOnly permissions with modes 0755 and 0644 are supported\n", ent->fts_path);
