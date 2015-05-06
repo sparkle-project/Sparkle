@@ -124,6 +124,7 @@ static bool codeSignatureExtendedAttributeExists(const FTSENT *ent)
             if (strncmp("com.apple.cs.CodeDirectory", attribute, length) == 0 ||
                 strncmp("com.apple.cs.CodeRequirements", attribute, length) == 0 ||
                 strncmp("com.apple.cs.CodeSignature", attribute, length) == 0) {
+                free(buffer);
                 return true;
             }
             startCharacterIndex = characterIndex + 1;
