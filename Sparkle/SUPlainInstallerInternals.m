@@ -599,7 +599,11 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     }
 #endif
     NSURL *rootURL = [NSURL fileURLWithPath:root];
-    [rootURL setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:NULL];
+    id rootResourceValue = nil;
+    [rootURL getResourceValue:&rootResourceValue forKey:NSURLQuarantinePropertiesKey error:NULL];
+    if (rootResourceValue) {
+        [rootURL setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:NULL];
+    }
     
     // Only recurse if it's actually a directory.  Don't recurse into a
     // root-level symbolic link.
@@ -612,7 +616,11 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         NSDirectoryEnumerator *directoryEnumerator = [manager enumeratorAtURL:rootURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
 
         for (NSURL *file in directoryEnumerator) {
-            [file setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:NULL];
+            id fileResourceValue = nil;
+            [file getResourceValue:&fileResourceValue forKey:NSURLQuarantinePropertiesKey error:NULL];
+            if (fileResourceValue) {
+                [file setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:NULL];
+            }
         }
     }
 }
