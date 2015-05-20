@@ -97,7 +97,7 @@ Gw
                     <button id="17">
                         <rect key="frame" x="105" y="58" width="382" height="18"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <buttonCell key="cell" type="check" title="Sempre baixar e instalar atualizações automaticamente" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="43">
+                        <buttonCell key="cell" type="check" title="Transferir e instalar atualizações futuras automaticamente" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="43">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                         </buttonCell>
