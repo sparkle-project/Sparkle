@@ -244,10 +244,13 @@
 
 - (void)reportError:(NSError *)error
 {
+    NSURL *failingUrl = error.userInfo[NSURLErrorFailingURLErrorKey];
+
     self.completionBlock([NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastError userInfo:@{
         NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil),
         NSLocalizedFailureReasonErrorKey: [error localizedDescription],
         NSUnderlyingErrorKey: error,
+        NSURLErrorFailingURLErrorKey: failingUrl ? failingUrl : [NSNull null],
     }]);
     self.completionBlock = nil;
 }
