@@ -92,6 +92,7 @@ finally:
         [relevantInfo setObject:[infoPlist objectForKey:@"CFBundleVersion"] forKey:@"build"];
         CFRelease(signingInfo);
         SULog(@"%@: %@", label, relevantInfo);
+        [relevantInfo release];
     }
 }
 
