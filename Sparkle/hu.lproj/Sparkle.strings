@@ -1,0 +1,52 @@
+"%@ of %@" = "%1$@ of %2$@";
+
+"%@ %@ has been installed and will be ready to use next time %@ starts! Would you like to relaunch now?" = "%1$@ %2$@ has been installed and will be ready to use next time %3$@ starts! Would you like to relaunch now?";
+
+"%@ %@ is currently the newest version available." = "%1$@ %2$@ is currently the newest version available.";
+
+"%@ %@ is now available (you have %@). Would you like to download it now?" = "%1$@ %2$@ is now available (you have %3$@). Would you like to download it now?";
+
+"%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help." = "%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help.";
+
+"A new version of %@ has been installed!" = "A new version of %@ has been installed!";
+
+"A new version of %@ is available!" = "A new version of %@ is available!";
+
+"An error occurred during installation. Please try again later." = "An error occurred during installation. Please try again later.";
+
+"An error occurred in retrieving update information. Please try again later." = "An error occurred in retrieving update information. Please try again later.";
+
+"An error occurred while extracting the archive. Please try again later." = "An error occurred while extracting the archive. Please try again later.";
+
+"An error occurred while trying to download the file. Please try again later." = "An error occurred while trying to download the file. Please try again later.";
+
+"An update is already in progress!" = "An update is already in progress!";
+
+"Cancel" = "Cancel";
+
+"Check for updates on startup?" = "Check for updates on startup?";
+
+"Downloading update..." = "Downloading update…";
+
+"Extracting update..." = "Extracting update…";
+
+"Install and Relaunch" = "Install and Relaunch";
+
+"Installing update..." = "Installing update…";
+
+"No" = "No";
+
+"OK" = "OK";
+
+"Ready to Install" = "Ready to Install";
+
+"Update Error!" = "Update Error!";
+
+"Updating %@" = "Updating %@";
+
+"Would you like %@ to check for updates on startup? If not, you can initiate the check manually from the application menu." = "Would you like %@ to check for updates on startup? If not, you can initiate the check manually from the application menu.";
+
+"Yes" = "Yes";
+
+"You're up to date!" = "You're up to date!";
+

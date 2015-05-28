@@ -1,10 +1,10 @@
 // Unit Test only
 
-INFOPLIST_FILE = Tests/Sparkle Unit Tests-Info.plist
-OTHER_LDFLAGS = -framework Cocoa -framework SenTestingKit
+INFOPLIST_FILE = Tests/SparkleTests-Info.plist
 PRODUCT_NAME = Sparkle Unit Tests
-WRAPPER_EXTENSION = octest
-FRAMEWORK_SEARCH_PATHS = $(DEVELOPER_LIBRARY_DIR)/Frameworks
-GCC_PREFIX_HEADER = $(SYSTEM_LIBRARY_DIR)/Frameworks/Cocoa.framework/Headers/Cocoa.h
-GCC_PRECOMPILE_PREFIX_HEADER = YES
-MACOSX_DEPLOYMENT_TARGET = 10.6
+WRAPPER_EXTENSION = xctest
+OTHER_CFLAGS = $(inherited) -iframework"$(DEVELOPER_FRAMEWORKS_DIR)" -iframework"$(PLATFORM_DIR)/Developer/Library/Frameworks"
+GCC_SYMBOLS_PRIVATE_EXTERN = NO
+WARNING_CFLAGS = $(inherited) -Wno-variadic-macros -Wno-gnu-zero-variadic-macro-arguments
+FRAMEWORK_SEARCH_PATHS = $(inherited) $(DEVELOPER_FRAMEWORKS_DIR)
+LD_RUNPATH_SEARCH_PATHS = @loader_path/../Frameworks
