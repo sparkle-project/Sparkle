@@ -25,21 +25,6 @@
 
 #if SPARKLE_IS_COMPATIBLE_WITH_DEVMATE
 CF_EXPORT CFDictionaryRef DMCopyHTTPRequestHeaders(CFBundleRef appBundle, CFDataRef httpBodyData);
-
-NSArray *SUGetAllDevMateURLHosts(void);
-NSArray *SUGetAllDevMateURLHosts(void)
-{
-    static NSArray *sAllKnownDevMateURLHosts = nil;
-    if (nil == sAllKnownDevMateURLHosts)
-    {
-        sAllKnownDevMateURLHosts = [[NSArray alloc] initWithObjects:
-                                    @"updates.devmate.com",
-                                    @"test.updates.aws.devmate.vpn",
-                                    nil];
-    }
-    
-    return sAllKnownDevMateURLHosts;
-}
 #endif
 
 @interface SUBasicUpdateDriver () <NSURLDownloadDelegate>; @end
@@ -169,16 +154,13 @@ NSArray *SUGetAllDevMateURLHosts(void)
 - (void)updateURLRequestIfNeeds:(NSMutableURLRequest *)request
 {
 #if SPARKLE_IS_COMPATIBLE_WITH_DEVMATE
-    if ([SUGetAllDevMateURLHosts() containsObject:[[request URL] host]])
-    {
-        CFBundleRef hostBundle = CFBundleCreate(kCFAllocatorDefault, (CFURLRef)[NSURL fileURLWithPath:[host bundlePath]]);
-        NSDictionary *devmateHeaders = (NSDictionary *)DMCopyHTTPRequestHeaders(hostBundle, NULL) ? : [NSDictionary new];
-        [request setAllHTTPHeaderFields:(NSDictionary *)devmateHeaders];
+    CFBundleRef hostBundle = CFBundleCreate(kCFAllocatorDefault, (CFURLRef)[NSURL fileURLWithPath:[host bundlePath]]);
+    NSDictionary *devmateHeaders = (NSDictionary *)DMCopyHTTPRequestHeaders(hostBundle, NULL) ? : [NSDictionary new];
+    [request setAllHTTPHeaderFields:(NSDictionary *)devmateHeaders];
 
-        [devmateHeaders release];
-        if (NULL != hostBundle)
-            CFRelease(hostBundle);
-    }
+    [devmateHeaders release];
+    if (NULL != hostBundle)
+        CFRelease(hostBundle);
 #endif
 }
 
