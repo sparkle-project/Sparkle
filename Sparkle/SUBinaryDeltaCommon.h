@@ -9,6 +9,8 @@
 #ifndef SUBINARYDELTACOMMON_H
 #define SUBINARYDELTACOMMON_H
 
+#import <Foundation/Foundation.h>
+
 #include <fts.h>
 
 #define PERMISSION_FLAGS (S_IRWXU | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID | S_ISVTX)
@@ -62,9 +64,6 @@ typedef NS_ENUM(uint16_t, SUBinaryDeltaMinorVersion)
 #define FIRST_DELTA_DIFF_MINOR_VERSION 0
 
 #define LATEST_DELTA_DIFF_MAJOR_VERSION SUBeigeMajorVersion
-
-@class NSString;
-@class NSData;
 
 extern int compareFiles(const FTSENT **a, const FTSENT **b);
 extern NSData *hashOfFileContents(FTSENT *ent);

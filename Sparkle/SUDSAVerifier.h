@@ -15,6 +15,8 @@
 #ifndef SUDSAVERIFIER_H
 #define SUDSAVERIFIER_H
 
+#import <Foundation/Foundation.h>
+
 @interface SUDSAVerifier : NSObject
 
 + (BOOL)validatePath:(NSString *)path withEncodedDSASignature:(NSString *)encodedSignature withPublicDSAKey:(NSString *)pkeyString;

@@ -5,6 +5,7 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
+#import <Foundation/Foundation.h>
 #import "SUUpdater.h"
 #import "SUAppcast.h"
 #import "SUAppcastItem.h"

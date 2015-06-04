@@ -9,6 +9,8 @@
 #ifndef SUPLAININSTALLER_H
 #define SUPLAININSTALLER_H
 
+#import <Foundation/Foundation.h>
+
 #import "SUUpdater.h"
 
 #import "SUAppcast.h"

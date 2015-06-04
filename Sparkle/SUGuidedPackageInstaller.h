@@ -22,11 +22,11 @@ A guided installation can be started by applications other than the application 
 #ifndef SUGUIDEDPACKAGEINSTALLER_H
 #define SUGUIDEDPACKAGEINSTALLER_H
 
+#import <Foundation/Foundation.h>
 #import "Sparkle.h"
 #import "SUInstaller.h"
 
-@interface SUGuidedPackageInstaller : SUInstaller {
-}
+@interface SUGuidedPackageInstaller : SUInstaller
 
 /*! Perform the guided installation */
 + (void)performInstallationToPath:(NSString *)path fromPath:(NSString *)installerGuide host:(SUHost *)host versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler;
