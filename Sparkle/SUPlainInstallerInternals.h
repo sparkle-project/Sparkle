@@ -9,6 +9,8 @@
 #ifndef SUPLAININSTALLERINTERNALS_H
 #define SUPLAININSTALLERINTERNALS_H
 
+#import <Foundation/Foundation.h>
+
 #import "SUPlainInstaller.h"
 
 @interface SUPlainInstaller (Internals)

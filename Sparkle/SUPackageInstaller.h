@@ -9,6 +9,8 @@
 #ifndef SUPACKAGEINSTALLER_H
 #define SUPACKAGEINSTALLER_H
 
+#import <Foundation/Foundation.h>
+
 #import "SUUpdater.h"
 
 #import "SUAppcast.h"
