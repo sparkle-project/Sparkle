@@ -249,11 +249,6 @@
     NSString *newPublicDSAKey = newHost.publicDSAKey;
     
     if (newPublicDSAKey != nil) {
-        if (DSASignature == nil) {
-            SULog(@"No DSA signature is found in the appcast item. The update will be rejected.");
-            return NO;
-        }
-        
         if (![SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey]) {
             SULog(@"DSA signature validation failed. The update will be rejected.");
             return NO;
