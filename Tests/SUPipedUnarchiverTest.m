@@ -55,7 +55,7 @@
 {
     NSString *originalArchivePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"test archive" ofType:@"zip"];
     NSString *tempDestDir = NSTemporaryDirectory();
-    NSString *tempArchivePath = [[tempDestDir stringByAppendingPathComponent:[NSUUID UUID].UUIDString] stringByAppendingPathExtension:@"zip"];
+    NSString *tempArchivePath = [[tempDestDir stringByAppendingPathComponent:[[NSUUID UUID] UUIDString]] stringByAppendingPathExtension:@"zip"];
 
     NSFileManager *fm = [NSFileManager defaultManager];
     NSString *testFile = [tempDestDir stringByAppendingPathComponent:@"extracted file.txt"];
