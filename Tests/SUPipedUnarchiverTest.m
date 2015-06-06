@@ -11,38 +11,48 @@
 #import "SUUnarchiver.h"
 #import "SUPipedUnarchiver.h"
 
-@interface SUPipedUnarchiverTest : XCTestCase<SUUnarchiverDelegate>
+@interface SUPipedUnarchiverTest : XCTestCase <SUUnarchiverDelegate>
+
+@property (nonatomic, strong) XCTestExpectation *unarchived;
+@property (nonatomic, assign) BOOL result;
+
 @end
 
-@implementation SUPipedUnarchiverTest {
-    XCTestExpectation *unarchived;
-    BOOL result;
-}
+@implementation SUPipedUnarchiverTest
 
-- (void)setUp {
+@synthesize unarchived;
+@synthesize result;
+
+- (void)setUp
+{
     [super setUp];
-    unarchived = [self expectationWithDescription:@"unarchived"];
+    self.unarchived = [self expectationWithDescription:@"unarchived"];
 }
 
-- (void)tearDown {
+- (void)tearDown
+{
     // Put teardown code here. This method is called after the invocation of each test method in the class.
     [super tearDown];
 }
 
-- (void) unarchiver:(SUUnarchiver *)unarchiver extractedProgress:(double)_unused {
+- (void)unarchiver:(SUUnarchiver *)__unused unarchiver extractedProgress:(double)__unused progress
+{
 }
 
-- (void) unarchiverDidFail:(SUUnarchiver *)_unused {
-    result = NO;
-    [unarchived fulfill];
+- (void)unarchiverDidFail:(SUUnarchiver *)__unused unarchiver
+{
+    self.result = NO;
+    [self.unarchived fulfill];
 }
 
-- (void) unarchiverDidFinish:(SUUnarchiver *)_unused {
-    result = YES;
-    [unarchived fulfill];
+- (void)unarchiverDidFinish:(SUUnarchiver *)__unused unarchiver
+{
+    self.result = YES;
+    [self.unarchived fulfill];
 }
 
-- (void)testZipExtract {
+- (void)testZipExtract
+{
     NSString *originalArchivePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"test archive" ofType:@"zip"];
     NSString *tempDestDir = NSTemporaryDirectory();
     NSString *tempArchivePath = [[tempDestDir stringByAppendingPathComponent:[NSUUID UUID].UUIDString] stringByAppendingPathExtension:@"zip"];
@@ -63,7 +73,7 @@
 
     [self waitForExpectationsWithTimeout:5.0 handler:nil];
 
-    XCTAssertTrue(result);
+    XCTAssertTrue(self.result);
     XCTAssertTrue([fm fileExistsAtPath:testFile isDirectory:nil]);
 }
 
