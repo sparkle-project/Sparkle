@@ -17,6 +17,12 @@
 
 #import <Foundation/Foundation.h>
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 1090
+@interface NSData (SUDSAVerifier)
+- (id)initWithBase64Encoding:(NSString *)base64String;
+@end
+#endif
+
 @interface SUDSAVerifier : NSObject
 
 + (BOOL)validatePath:(NSString *)path withEncodedDSASignature:(NSString *)encodedSignature withPublicDSAKey:(NSString *)pkeyString;
