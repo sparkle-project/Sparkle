@@ -264,7 +264,7 @@
         }
     } else {
         if (![SUCodeSigningVerifier hostApplicationIsCodeSigned] || ![SUCodeSigningVerifier applicationAtPathIsCodeSigned:installSourcePath]) {
-            SULog(@"Public DSA keys differ and both apps are not code signed. The update will be rejected.");
+            SULog(@"Public DSA keys differ or are absent, and both apps are not code signed. The update will be rejected.");
             return NO;
         }
         
