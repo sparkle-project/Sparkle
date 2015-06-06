@@ -249,7 +249,7 @@
     NSString *newPublicDSAKey = newHost.publicDSAKey;
     
     if (newPublicDSAKey != nil) {
-        if (![SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey]) {
+        if (![SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:newPublicDSAKey]) {
             SULog(@"DSA signature validation failed. The update will be rejected.");
             return NO;
         }
