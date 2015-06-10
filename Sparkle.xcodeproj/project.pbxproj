@@ -1035,7 +1035,7 @@
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0610;
+				LastUpgradeCheck = 0700;
 				TargetAttributes = {
 					61B5F90109C4CEE200B25A18 = {
 						SystemCapabilities = {
@@ -1560,6 +1560,7 @@
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				INSTALL_PATH = "@rpath";
+				PRODUCT_BUNDLE_IDENTIFIER = org.andymatuschak.Sparkle;
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -1571,6 +1572,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				INSTALL_PATH = "@rpath";
+				PRODUCT_BUNDLE_IDENTIFIER = org.andymatuschak.Sparkle;
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -1578,6 +1580,7 @@
 		1DEB91B208733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ENABLE_TESTABILITY = YES;
 				ONLY_ACTIVE_ARCH = YES;
 			};
 			name = Debug;
@@ -1608,6 +1611,7 @@
 					"-framework",
 					AppKit,
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "org.andymatuschak.sparkle.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = finish_installation;
 			};
 			name = Debug;
@@ -1631,6 +1635,7 @@
 					"-framework",
 					AppKit,
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "org.andymatuschak.sparkle.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = finish_installation;
 				ZERO_LINK = NO;
 			};
@@ -1655,6 +1660,7 @@
 			baseConfigurationReference = FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourcompany.${PRODUCT_NAME:identifier}";
 			};
 			name = Debug;
 		};
@@ -1663,6 +1669,7 @@
 			baseConfigurationReference = FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourcompany.${PRODUCT_NAME:identifier}";
 			};
 			name = Release;
 		};
@@ -1673,6 +1680,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Sparkle Test App.entitlements";
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.andymatuschak.SparkleTestApp;
 			};
 			name = Debug;
 		};
@@ -1683,6 +1691,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Sparkle Test App.entitlements";
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.andymatuschak.SparkleTestApp;
 			};
 			name = Release;
 		};
@@ -1694,6 +1703,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				INFOPLIST_FILE = SandboxService.plist;
 				OTHER_CFLAGS = "-DDEBUG";
+				PRODUCT_BUNDLE_IDENTIFIER = "${EXECUTABLE_NAME}";
 				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
@@ -1705,6 +1715,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				INFOPLIST_FILE = SandboxService.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = "${EXECUTABLE_NAME}";
 				VALID_ARCHS = x86_64;
 			};
 			name = Release;
