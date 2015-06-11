@@ -120,7 +120,7 @@
         else
             appPath = [host installationPath];
         
-        NSRunningApplication *relaunchedApplication = [[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:appPath] options:NSWorkspaceLaunchDefault configuration:nil error:NULL];
+        NSRunningApplication *relaunchedApplication = [[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:appPath] options:NSWorkspaceLaunchDefault configuration:@{} error:NULL];
         [relaunchedApplication activateWithOptions:NSApplicationActivateIgnoringOtherApps];
     }
 
