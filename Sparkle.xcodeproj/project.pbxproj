@@ -907,7 +907,7 @@
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0620;
+				LastUpgradeCheck = 0700;
 			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "Sparkle" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1371,6 +1371,7 @@
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.binaryage.sparkle;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -1382,6 +1383,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.binaryage.sparkle;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -1391,6 +1393,7 @@
 			buildSettings = {
 				CLANG_ANALYZER_DEADCODE_DEADSTORES = NO;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_MKSTEMP = NO;
+				ENABLE_TESTABILITY = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 			};
@@ -1425,6 +1428,7 @@
 					"-framework",
 					AppKit,
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "org.andymatuschak.sparkle.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = finish_installation;
 				SDKROOT = macosx;
 			};
@@ -1450,6 +1454,7 @@
 					"-framework",
 					AppKit,
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "org.andymatuschak.sparkle.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = finish_installation;
 				SDKROOT = macosx;
 				ZERO_LINK = NO;
@@ -1477,6 +1482,7 @@
 			baseConfigurationReference = FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourcompany.${PRODUCT_NAME:identifier}";
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -1486,6 +1492,7 @@
 			baseConfigurationReference = FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourcompany.${PRODUCT_NAME:identifier}";
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -1495,6 +1502,7 @@
 			baseConfigurationReference = FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.andymatuschak.SparkleTestApp;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -1504,6 +1512,7 @@
 			baseConfigurationReference = FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.andymatuschak.SparkleTestApp;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -1524,6 +1533,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.binaryage.sparkle;
 				SDKROOT = macosx;
 			};
 			name = ReleaseLogging;
@@ -1533,6 +1543,7 @@
 			baseConfigurationReference = FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.andymatuschak.SparkleTestApp;
 				SDKROOT = macosx;
 			};
 			name = ReleaseLogging;
@@ -1542,6 +1553,7 @@
 			baseConfigurationReference = FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yourcompany.${PRODUCT_NAME:identifier}";
 				SDKROOT = macosx;
 			};
 			name = ReleaseLogging;
@@ -1574,6 +1586,7 @@
 					"-framework",
 					AppKit,
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "org.andymatuschak.sparkle.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = finish_installation;
 				SDKROOT = macosx;
 				ZERO_LINK = NO;
