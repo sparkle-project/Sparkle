@@ -151,7 +151,7 @@ typedef struct {
     if (!icon) {
         BOOL isMainBundle = (self.bundle == [NSBundle mainBundle]);
 
-        NSString *fileType = isMainBundle ? (NSString *)kUTTypeApplication : (NSString *)kUTTypeBundle;
+        NSString *fileType = isMainBundle ? (__bridge NSString *)kUTTypeApplication : (__bridge NSString *)kUTTypeBundle;
         icon = [[NSWorkspace sharedWorkspace] iconForFileType:fileType];
     }
     return icon;

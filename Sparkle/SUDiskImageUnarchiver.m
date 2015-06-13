@@ -65,7 +65,7 @@
                 CFRelease(uuid);
             }
 		}
-		while (noErr == FSPathMakeRefWithOptions((UInt8 *)[mountPoint fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &tmpRef, NULL));
+		while (noErr == FSPathMakeRefWithOptions((const UInt8 *)[mountPoint fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &tmpRef, NULL));
 
         NSData *promptData = nil;
         promptData = [NSData dataWithBytes:"yes\n" length:4];
