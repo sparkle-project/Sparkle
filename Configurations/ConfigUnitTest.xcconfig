@@ -1,7 +1,6 @@
 // Unit Test only
 
 INFOPLIST_FILE = Tests/SparkleTests-Info.plist
-PRODUCT_NAME = Sparkle Unit Tests
 WRAPPER_EXTENSION = xctest
 OTHER_CFLAGS = $(inherited) -iframework"$(DEVELOPER_FRAMEWORKS_DIR)" -iframework"$(PLATFORM_DIR)/Developer/Library/Frameworks"
 GCC_SYMBOLS_PRIVATE_EXTERN = NO
