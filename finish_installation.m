@@ -128,11 +128,7 @@
         if( ![SUPlainInstaller _removeFileAtPath: [SUInstaller updateFolder] error: &theError] )
             SULog( @"Couldn't remove update folder: %@.", theError );
     }
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-    [[NSFileManager defaultManager] removeFileAtPath: selfPath handler: nil];
-#else
     [[NSFileManager defaultManager] removeItemAtPath: selfPath error: NULL];
-#endif
 
 	exit(EXIT_SUCCESS);
 }

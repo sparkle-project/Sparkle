@@ -104,11 +104,7 @@
         }
 		document = [[[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:downloadFilename] options:options error:&error] autorelease];
 	
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-		[[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
-#else
 		[[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:nil];
-#endif
 		[downloadFilename release];
 		downloadFilename = nil;
 	}
@@ -234,11 +230,7 @@
 {
 	if (downloadFilename)
 	{
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-		[[NSFileManager defaultManager] removeFileAtPath:downloadFilename handler:nil];
-#else
 		[[NSFileManager defaultManager] removeItemAtPath:downloadFilename error:nil];
-#endif
 	}
     [downloadFilename release];
     downloadFilename = nil;

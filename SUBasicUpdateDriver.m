@@ -180,19 +180,7 @@
 	}
 
     // Create the temporary directory if necessary.
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-	BOOL success = YES;
-    NSEnumerator *pathComponentEnumerator = [[tempDir pathComponents] objectEnumerator];
-    NSString *pathComponentAccumulator = @"";
-    NSString *currentPathComponent;
-    while ((currentPathComponent = [pathComponentEnumerator nextObject])) {
-        pathComponentAccumulator = [pathComponentAccumulator stringByAppendingPathComponent:currentPathComponent];
-        if ([[NSFileManager defaultManager] fileExistsAtPath:pathComponentAccumulator]) continue;
-        success &= [[NSFileManager defaultManager] createDirectoryAtPath:pathComponentAccumulator attributes:nil];
-    }
-#else
 	BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir withIntermediateDirectories:YES attributes:nil error:NULL];
-#endif
 	if (!success)
 	{
 		// Okay, something's really broken with this user's file structure.
@@ -320,11 +308,7 @@
     NSString *targetPath = [[host appSupportPath] stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
 	NSError *error = nil;
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-	[[NSFileManager defaultManager] createDirectoryAtPath: [targetPath stringByDeletingLastPathComponent] attributes: [NSDictionary dictionary]];
-#else
 	[[NSFileManager defaultManager] createDirectoryAtPath: [targetPath stringByDeletingLastPathComponent] withIntermediateDirectories: YES attributes: [NSDictionary dictionary] error: &error];
-#endif
 
 	// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
 	if( [SUPlainInstaller copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath temporaryName: nil error: &error] )
@@ -372,12 +356,8 @@
 - (void)installerForHost:(SUHost *)aHost failedWithError:(NSError *)error
 {
 	if (aHost != host) { return; }
-#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
-    [[NSFileManager defaultManager] removeFileAtPath: relaunchPath handler: nil]; // Clean up the copied relauncher
-#else
 	NSError	*	dontThrow = nil;
 	[[NSFileManager defaultManager] removeItemAtPath: relaunchPath error: &dontThrow]; // Clean up the copied relauncher
-#endif
 	[self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:SULocalizedString(@"An error occurred while installing the update. Please try again later.", nil), NSLocalizedDescriptionKey, [error localizedDescription], NSLocalizedFailureReasonErrorKey, nil]]];
 }
 
