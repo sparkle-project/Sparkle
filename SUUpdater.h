@@ -156,8 +156,8 @@
 
 // NOTE!!! Implemented delegate methods have higher priority than values saved in user preferences
 
-#define SUUpdaterChecksForBetaUpdatesPrefKey    @"SUUpdaterChecksForBetaUpdates" // bool value
-#define SUUpdaterIsInTestModePrefKey            @"SUUpdaterIsInTestMode" // bool value
+static NSString * const SUUpdaterChecksForBetaUpdatesPrefKey = @"SUUpdaterChecksForBetaUpdates"; // bool value
+static NSString * const SUUpdaterIsInTestModePrefKey = @"SUUpdaterIsInTestMode"; // bool value
 
 @interface NSObject (SUUpdaterDelegate_DevMateInteraction)
 
