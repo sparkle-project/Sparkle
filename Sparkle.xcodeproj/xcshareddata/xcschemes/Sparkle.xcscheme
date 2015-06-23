@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0600"
-   version = "1.3">
+   LastUpgradeVersion = "0630"
+   version = "2.0">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
@@ -20,48 +20,20 @@
                ReferencedContainer = "container:Sparkle.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "61B5F90109C4CEE200B25A18"
-               BuildableName = "Sparkle Test App.app"
-               BlueprintName = "Sparkle Test App"
-               ReferencedContainer = "container:Sparkle.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "5D06E8CF0FD68C7C005AE3F6"
-               BuildableName = "BinaryDelta"
-               BlueprintName = "BinaryDelta"
-               ReferencedContainer = "container:Sparkle.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES"
-      buildConfiguration = "Release">
+      buildConfiguration = "Debug">
       <Testables>
          <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "612279D80DB5470200AB99EA"
-               BuildableName = "Sparkle Unit Tests.octest"
+               BuildableName = "Sparkle Unit Tests.xctest"
                BlueprintName = "Sparkle Unit Tests"
                ReferencedContainer = "container:Sparkle.xcodeproj">
             </BuildableReference>
@@ -70,31 +42,32 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "61B5F90109C4CEE200B25A18"
-            BuildableName = "Sparkle Test App.app"
-            BlueprintName = "Sparkle Test App"
+            BlueprintIdentifier = "8DC2EF4F0486A6940098B216"
+            BuildableName = "Sparkle.framework"
+            BlueprintName = "Sparkle"
             ReferencedContainer = "container:Sparkle.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
    <LaunchAction
-      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
-      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      selectedDebuggerIdentifier = ""
+      selectedLauncherIdentifier = "Xcode.IDEFoundation.Launcher.PosixSpawn"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
-      buildConfiguration = "Release"
-      ignoresPersistentStateOnLaunch = "YES"
+      buildConfiguration = "Debug"
+      ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
+      debugXPCServices = "NO"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable>
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "61B5F90109C4CEE200B25A18"
-            BuildableName = "Sparkle Test App.app"
-            BlueprintName = "Sparkle Test App"
+            BlueprintIdentifier = "8DC2EF4F0486A6940098B216"
+            BuildableName = "Sparkle.framework"
+            BlueprintName = "Sparkle"
             ReferencedContainer = "container:Sparkle.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -103,8 +76,16 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
-      ignoresPersistentStateOnLaunch = "YES"
       debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "8DC2EF4F0486A6940098B216"
+            BuildableName = "Sparkle.framework"
+            BlueprintName = "Sparkle"
+            ReferencedContainer = "container:Sparkle.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

@@ -1,3 +1,0 @@
-#include "ConfigCommon.xcconfig"
-#include "ConfigCommonRelease.xcconfig"
-#include "ConfigService.xcconfig"

@@ -1,5 +1,1 @@
-#include "ConfigCommon.xcconfig"
-#include "ConfigCommonDebug.xcconfig"
 #include "ConfigRelaunch.xcconfig"
-
-OTHER_CFLAGS = -DDEBUG
