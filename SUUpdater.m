@@ -487,7 +487,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
     
 	if (!appcastString) // Can't find an appcast string!
     {
-        static NSString * const sDevMateFeedURLBase = @"http://updates.devmate.com/";
+        static NSString * const sDevMateFeedURLBase = @"https://updates.devmate.com/";
         NSString *bundleId = [[host bundle] bundleIdentifier] ? : @"";
         NSString *feedURLComponent = [bundleId stringByAppendingPathExtension:@"xml"];
         appcastString = [sDevMateFeedURLBase stringByAppendingString:feedURLComponent];
