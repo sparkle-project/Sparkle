@@ -11,7 +11,7 @@
 
 #import "SUGuidedPackageInstaller.h"
 
-static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char* executablePath, AuthorizationFlags options, const char* const* arguments)
+static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char* executablePath, AuthorizationFlags options, char* const* arguments)
 {
 	sig_t oldSigChildHandler = signal(SIGCHLD, SIG_DFL);
 	BOOL returnValue = YES;
@@ -19,7 +19,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     /* AuthorizationExecuteWithPrivileges used to support 10.4+; should be replaced with XPC or external process */
-	if (AuthorizationExecuteWithPrivileges(authorization, executablePath, options, (char* const*)arguments, NULL) == errAuthorizationSuccess)
+	if (AuthorizationExecuteWithPrivileges(authorization, executablePath, options, arguments, NULL) == errAuthorizationSuccess)
 #pragma clang diagnostic pop
 	{
 		int status = 0;
