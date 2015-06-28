@@ -55,11 +55,11 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		const char* executableFileSystemRepresentation = [executablePath fileSystemRepresentation];
 		
 		// Prepare a right allowing script to execute with privileges
-		AuthorizationItem right;
-		memset(&right,0,sizeof(right));
-		right.name = kAuthorizationRightExecute;
-		right.value = (void*) executableFileSystemRepresentation;
-		right.valueLength = strlen(executableFileSystemRepresentation);
+        AuthorizationItem right = {
+            .name = kAuthorizationRightExecute,
+            .value = (char*)executableFileSystemRepresentation,
+            .valueLength = strlen(executableFileSystemRepresentation),
+        };
 		
 		// Package up the single right
 		AuthorizationRights rights;
