@@ -12,6 +12,6 @@
 #import "SUConstants.h"
 #import "SUErrors.h"
 
-#define SULocalizedString(key, comment) NSLocalizedStringFromTableInBundle(key, @"Sparkle", [NSBundle bundleWithIdentifier:SUBundleIdentifier] ? [NSBundle bundleWithIdentifier:SUBundleIdentifier] : [NSBundle mainBundle], comment)
+#define SULocalizedString(key, comment) NSLocalizedStringFromTableInBundle(key, @"Sparkle", (NSBundle *__nonnull)([NSBundle bundleWithIdentifier:SUBundleIdentifier] ? [NSBundle bundleWithIdentifier:SUBundleIdentifier] : [NSBundle mainBundle]), comment)
 
 #endif

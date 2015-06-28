@@ -100,7 +100,7 @@ typedef struct {
     return [self.bundle bundlePath];
 }
 
-- (NSString *)name
+- (NSString *__nonnull)name
 {
     NSString *name;
 
@@ -117,7 +117,7 @@ typedef struct {
     return [[[NSFileManager defaultManager] displayNameAtPath:[self.bundle bundlePath]] stringByDeletingPathExtension];
 }
 
-- (NSString *)version
+- (NSString *__nonnull)version
 {
     NSString *version = [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     if (!version || [version isEqualToString:@""])
@@ -125,7 +125,7 @@ typedef struct {
     return version;
 }
 
-- (NSString *)displayVersion
+- (NSString *__nonnull)displayVersion
 {
     NSString *shortVersionString = [self.bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     if (shortVersionString)
@@ -134,7 +134,7 @@ typedef struct {
         return [self version]; // Fall back on the normal version string.
 }
 
-- (NSImage *)icon
+- (NSImage *__nonnull)icon
 {
     // Cache the application icon.
     NSString *iconPath = [self.bundle pathForResource:[self.bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType:@"icns"];

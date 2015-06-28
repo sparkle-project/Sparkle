@@ -34,7 +34,7 @@
     return self;
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self.host bundlePath], [self.host installationPath]]; }
+- (NSString *__nonnull)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self.host bundlePath], [self.host installationPath]]; }
 
 - (IBAction)installNow:(id)__unused sender
 {
@@ -57,12 +57,12 @@
     self.completionBlock = nil;
 }
 
-- (NSImage *)applicationIcon
+- (NSImage *__nonnull)applicationIcon
 {
     return [self.host icon];
 }
 
-- (NSString *)titleText
+- (NSString *__nonnull)titleText
 {
     if ([self.updateItem isCriticalUpdate])
     {
