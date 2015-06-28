@@ -30,9 +30,13 @@
     NSString *lastPathComponent = [path lastPathComponent];
 	for (NSString *currentType in typeSelectorDictionary)
 	{
+        NSString *value = typeSelectorDictionary[currentType];
+        assert(value);
+
 		if ([currentType length] > [lastPathComponent length]) continue;
-        if ([[lastPathComponent substringFromIndex:[lastPathComponent length] - [currentType length]] isEqualToString:currentType])
-            return NSSelectorFromString(typeSelectorDictionary[currentType]);
+        if ([[lastPathComponent substringFromIndex:[lastPathComponent length] - [currentType length]] isEqualToString:currentType]) {
+            return NSSelectorFromString(value);
+        }
     }
     return NULL;
 }

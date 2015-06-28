@@ -169,17 +169,25 @@ typedef struct {
     return ([[NSApplication sharedApplication] activationPolicy] == NSApplicationActivationPolicyAccessory);
 }
 
-- (NSString *)publicDSAKey
+- (NSString *__nullable)publicDSAKey
 {
     // Maybe the key is just a string in the Info.plist.
     NSString *key = [self.bundle objectForInfoDictionaryKey:SUPublicDSAKeyKey];
-	if (key) { return key; }
+	if (key) {
+        return key;
+    }
 
     // More likely, we've got a reference to a Resources file by filename:
     NSString *keyFilename = [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];
-	if (!keyFilename) { return nil; }
-    NSError *ignoreErr = nil;
-    return [NSString stringWithContentsOfFile:[self.bundle pathForResource:keyFilename ofType:nil] encoding:NSASCIIStringEncoding error:&ignoreErr];
+	if (!keyFilename) {
+        return nil;
+    }
+
+    NSString *keyPath = [self.bundle pathForResource:keyFilename ofType:nil];
+    if (!keyPath) {
+        return nil;
+    }
+    return [NSString stringWithContentsOfFile:keyPath encoding:NSASCIIStringEncoding error:nil];
 }
 
 - (NSArray *)systemProfile

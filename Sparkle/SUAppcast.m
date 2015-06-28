@@ -26,7 +26,11 @@
     NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
 
     for (NSXMLNode *attribute in attributeEnum) {
-        dictionary[[attribute name]] = [attribute stringValue];
+        NSString *attrName = [attribute name];
+        if (!attrName) {
+            continue;
+        }
+        dictionary[attrName] = [attribute stringValue];
     }
     return dictionary;
 }

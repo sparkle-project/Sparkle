@@ -164,12 +164,15 @@
         if (deltaDictionaries) {
             NSMutableDictionary *deltas = [NSMutableDictionary dictionary];
             for (NSDictionary *deltaDictionary in deltaDictionaries) {
+                NSString *deltaFrom = deltaDictionary[SUAppcastAttributeDeltaFrom];
+                if (!deltaFrom) continue;
+
                 NSMutableDictionary *fakeAppCastDict = [dict mutableCopy];
                 [fakeAppCastDict removeObjectForKey:SUAppcastElementDeltas];
                 fakeAppCastDict[SURSSElementEnclosure] = deltaDictionary;
                 SUAppcastItem *deltaItem = [[SUAppcastItem alloc] initWithDictionary:fakeAppCastDict];
 
-                deltas[deltaDictionary[SUAppcastAttributeDeltaFrom]] = deltaItem;
+                deltas[deltaFrom] = deltaItem;
             }
             self.deltaUpdates = deltas;
         }
