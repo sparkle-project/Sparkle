@@ -104,11 +104,17 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         BOOL hostIsCodeSigned = [SUCodeSigningVerifier hostApplicationIsCodeSigned];
         if (!isMainBundle && !hasPublicDSAKey) {
             [self notifyWillShowModalAlert];
-            NSRunAlertPanel(@"Insecure update error!", @"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information.", @"OK", nil, nil);
+            NSAlert *alert = [[NSAlert alloc] init];
+            alert.messageText = @"Insecure update error!";
+            alert.informativeText = @"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information.";
+            [alert runModal];
             [self notifyDidShowModalAlert];
         } else if (isMainBundle && !(hasPublicDSAKey || hostIsCodeSigned)) {
             [self notifyWillShowModalAlert];
-            NSRunAlertPanel(@"Insecure update error!", @"For security reasons, you need to code sign your application or sign your updates with a DSA key. See Sparkle's documentation for more information.", @"OK", nil, nil);
+            NSAlert *alert = [[NSAlert alloc] init];
+            alert.messageText = @"Insecure update error!";
+            alert.informativeText = @"For security reasons, you need to code sign your application or sign your updates with a DSA key. See Sparkle's documentation for more information.";
+            [alert runModal];
             [self notifyDidShowModalAlert];
         }
 
