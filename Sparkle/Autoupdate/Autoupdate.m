@@ -167,7 +167,10 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
                        completionHandler:^(NSError *error) {
                            if (error) {
                                if (self.shouldShowUI) {
-                                   NSRunAlertPanel(@"", @"%@", @"OK", @"", @"", [error localizedDescription]);
+                                   NSAlert *alert = [[NSAlert alloc] init];
+                                   alert.messageText = @"";
+                                   alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
+                                   [alert runModal];
                                }
                                exit(EXIT_FAILURE);
                            } else {
