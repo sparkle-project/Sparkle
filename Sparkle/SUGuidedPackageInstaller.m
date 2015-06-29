@@ -11,7 +11,7 @@
 
 #import "SUGuidedPackageInstaller.h"
 
-static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char* executablePath, AuthorizationFlags options, const char* const* arguments)
+static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char* executablePath, AuthorizationFlags options, char* const* arguments)
 {
 	sig_t oldSigChildHandler = signal(SIGCHLD, SIG_DFL);
 	BOOL returnValue = YES;
@@ -19,7 +19,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     /* AuthorizationExecuteWithPrivileges used to support 10.4+; should be replaced with XPC or external process */
-	if (AuthorizationExecuteWithPrivileges(authorization, executablePath, options, (char* const*)arguments, NULL) == errAuthorizationSuccess)
+	if (AuthorizationExecuteWithPrivileges(authorization, executablePath, options, arguments, NULL) == errAuthorizationSuccess)
 #pragma clang diagnostic pop
 	{
 		int status = 0;
@@ -55,11 +55,11 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		const char* executableFileSystemRepresentation = [executablePath fileSystemRepresentation];
 		
 		// Prepare a right allowing script to execute with privileges
-		AuthorizationItem right;
-		memset(&right,0,sizeof(right));
-		right.name = kAuthorizationRightExecute;
-		right.value = (void*) executableFileSystemRepresentation;
-		right.valueLength = strlen(executableFileSystemRepresentation);
+        AuthorizationItem right = {
+            .name = kAuthorizationRightExecute,
+            .value = (char*)executableFileSystemRepresentation,
+            .valueLength = strlen(executableFileSystemRepresentation),
+        };
 		
 		// Package up the single right
 		AuthorizationRights rights;

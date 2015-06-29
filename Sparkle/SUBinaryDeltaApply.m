@@ -20,7 +20,7 @@ static BOOL applyBinaryDeltaToFile(xar_t x, xar_file_t file, NSString *sourceFil
     NSString *patchFile = temporaryFilename(@"apply-binary-delta");
     xar_extract_tofile(x, file, [patchFile fileSystemRepresentation]);
     const char *argv[] = {"/usr/bin/bspatch", [sourceFilePath fileSystemRepresentation], [destinationFilePath fileSystemRepresentation], [patchFile fileSystemRepresentation]};
-    BOOL success = (bspatch(4, (char **)argv) == 0);
+    BOOL success = (bspatch(4, argv) == 0);
     unlink([patchFile fileSystemRepresentation]);
     return success;
 }
