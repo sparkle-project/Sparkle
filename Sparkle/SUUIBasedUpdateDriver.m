@@ -63,11 +63,10 @@
         [[self.updater delegate] updaterDidNotFindUpdate:self.updater];
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
-    NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.")
-                                     defaultButton:SULocalizedString(@"OK", nil)
-                                   alternateButton:nil
-                                       otherButton:nil
-                         informativeTextWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.messageText = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
+    alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
+    [alert addButtonWithTitle:SULocalizedString(@"OK", nil)];
     [self showModalAlert:alert];
     [self abortUpdate];
 }
@@ -201,7 +200,10 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    NSAlert *alert = [NSAlert alertWithMessageText:SULocalizedString(@"Update Error!", nil) defaultButton:SULocalizedString(@"Cancel Update", nil) alternateButton:nil otherButton:nil informativeTextWithFormat:@"%@", [error localizedDescription]];
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.messageText = SULocalizedString(@"Update Error!", nil);
+    alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
+    [alert addButtonWithTitle:SULocalizedString(@"Cancel Update", nil)];
     [self showModalAlert:alert];
     [super abortUpdateWithError:error];
 }
