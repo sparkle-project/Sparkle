@@ -28,5 +28,18 @@
 	<string>http://sparkle-project.org/files/sparkletestcast.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>test_app_only_dsa_pub.pem</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>sparkle-project.org</key>
+			<dict>
+			  <key>NSIncludesSubdomains</key>
+			  <false/>
+			  <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+			  <true/>
+			</dict>
+		</dict>
+	</dict>
 </dict>
 </plist>
