@@ -281,7 +281,7 @@
 
         NSString *dsaStatus = newPublicDSAKey ? @"has a new DSA key that doesn't match the previous one" : (publicDSAKey ? @"removes the DSA key" : @"isn't signed with a DSA key");
         if (!hostIsCodeSigned || !updateIsCodeSigned) {
-            NSString *acsStatus = hostIsCodeSigned ? @"old app hasn't been signed with Apple Code Signing" : @"update isn't signed with Apple Code Signing";
+            NSString *acsStatus = !hostIsCodeSigned ? @"old app hasn't been signed with Apple Code Signing" : @"update isn't signed with Apple Code Signing";
             SULog(@"The update %@, and the %@. At least one method of signature verification must be valid. The update will be rejected.", dsaStatus, acsStatus);
             return NO;
         }
