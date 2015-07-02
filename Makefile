@@ -1,6 +1,8 @@
 .PHONY: all localizable-strings release build test travis
 
-BUILDDIR := $(shell mktemp -d "$(TMPDIR)/Sparkle.XXXXXX")
+ifndef BUILDDIR
+    BUILDDIR := $(shell mktemp -d "$(TMPDIR)/Sparkle.XXXXXX")
+endif
 
 localizable-strings:
 	rm -f Sparkle/en.lproj/Sparkle.strings
