@@ -19,7 +19,7 @@ An easy-to-use software update framework for Cocoa developers.
 * True self-updating—the user can choose to automatically download and install all updates.
 * Displays a detailed progress window to the user.
 * Supports authentication for installing in secure locations.
-* Supports Apple code signing and DSA signatures for ultra-secure updates.
+* Supports Apple Code Signing and DSA signatures for ultra-secure updates.
 * Easy to install. Sparkle requires no code in your app, so it's trivial to upgrade or remove the framework.
 * Uses appcasts for release information. Appcasts are supported by 3rd party update-tracking programs and websites.
 * Displays release notes to the user via WebKit.
