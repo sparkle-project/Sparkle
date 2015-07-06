@@ -107,18 +107,16 @@
 
 - (void)displayReleaseNotes
 {
-    // Set the default font
-    [self.releaseNotesView setPreferencesIdentifier:SUBundleIdentifier];
+    self.releaseNotesView.preferencesIdentifier = SUBundleIdentifier;
     WebPreferences *prefs = [self.releaseNotesView preferences];
-    NSString *familyName = [[NSFont systemFontOfSize:8] familyName];
-    if ([familyName hasPrefix:@"."]) { // 10.9 returns ".Lucida Grande UI", which isn't a valid name for the WebView
-        familyName = @"Lucida Grande";
-    }
-    [prefs setStandardFontFamily:familyName];
-    [prefs setDefaultFontSize:(int)[NSFont systemFontSizeForControlSize:NSSmallControlSize]];
-    [prefs setPlugInsEnabled:NO];
-    [self.releaseNotesView setFrameLoadDelegate:self];
-    [self.releaseNotesView setPolicyDelegate:self];
+    prefs.plugInsEnabled = NO;
+    self.releaseNotesView.frameLoadDelegate = self;
+    self.releaseNotesView.policyDelegate = self;
+    
+    // Set the default font
+    // "-apple-system-font" is a reference to the system UI font on OS X. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
+    prefs.standardFontFamily = @"-apple-system-font";
+    prefs.defaultFontSize = (int)[NSFont systemFontSize];
 
     // Stick a nice big spinner in the middle of the web view until the page is loaded.
     NSRect frame = [[self.releaseNotesView superview] frame];
