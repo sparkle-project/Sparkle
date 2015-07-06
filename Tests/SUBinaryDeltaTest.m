@@ -12,6 +12,7 @@
 #import "SUBinaryDeltaCreate.h"
 #import "SUBinaryDeltaApply.h"
 #import <sys/stat.h>
+#include <sys/xattr.h>
 
 @interface SUBinaryDeltaTest : XCTestCase
 
@@ -928,6 +929,44 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
+}
+
+- (void)testInvalidCodeSignatureExtendedAttributeInBeforeTree
+{
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([[NSData data] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[NSData dataWithBytes:"loltest" length:7] writeToFile:destinationFile atomically:YES]);
+        
+        // the actual data doesn't matter for testing purposes
+        const char xattrValue[] = "hello";
+        
+        XCTAssertEqual(0, setxattr([sourceFile fileSystemRepresentation], APPLE_CODE_SIGN_XATTR_CODE_DIRECTORY_KEY, xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
+        XCTAssertEqual(0, setxattr([sourceFile fileSystemRepresentation], APPLE_CODE_SIGN_XATTR_CODE_REQUIREMENTS_KEY, xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
+        XCTAssertEqual(0, setxattr([sourceFile fileSystemRepresentation], APPLE_CODE_SIGN_XATTR_CODE_SIGNATURE_KEY, xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
+    } afterDiffHandler:nil];
+    XCTAssertFalse(success);
+}
+
+- (void)testInvalidCodeSignatureExtendedAttributeInAfterTree
+{
+    BOOL success = [self createAndApplyPatchWithBeforeDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
+        
+        XCTAssertTrue([[NSData data] writeToFile:sourceFile atomically:YES]);
+        XCTAssertTrue([[NSData dataWithBytes:"loltest" length:7] writeToFile:destinationFile atomically:YES]);
+        
+        // the actual data doesn't matter for testing purposes
+        const char xattrValue[] = "hello";
+        
+        XCTAssertEqual(0, setxattr([destinationFile fileSystemRepresentation], APPLE_CODE_SIGN_XATTR_CODE_DIRECTORY_KEY, xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
+        XCTAssertEqual(0, setxattr([destinationFile fileSystemRepresentation], APPLE_CODE_SIGN_XATTR_CODE_REQUIREMENTS_KEY, xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
+        XCTAssertEqual(0, setxattr([destinationFile fileSystemRepresentation], APPLE_CODE_SIGN_XATTR_CODE_SIGNATURE_KEY, xattrValue, sizeof(xattrValue), 0, XATTR_CREATE));
+    } afterDiffHandler:nil];
+    XCTAssertFalse(success);
 }
 
 @end

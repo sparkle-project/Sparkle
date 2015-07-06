@@ -18,6 +18,7 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <sys/xattr.h>
 #include <xar/xar.h>
 
 extern int bsdiff(int argc, const char **argv);
@@ -98,6 +99,39 @@ static bool aclExists(const FTSENT *ent)
         assert(acl_free((void *)acl) == 0);
         return (result == 0);
     }
+    return false;
+}
+
+static bool codeSignatureExtendedAttributeExists(const FTSENT *ent)
+{
+    const int options = XATTR_NOFOLLOW;
+    ssize_t listSize = listxattr(ent->fts_path, NULL, 0, options);
+    if (listSize == -1) {
+        return false;
+    }
+    
+    char *buffer = malloc((size_t)listSize);
+    assert(buffer != NULL);
+    
+    ssize_t sizeBack = listxattr(ent->fts_path, buffer, (size_t)listSize, options);
+    assert(sizeBack == listSize);
+    
+    size_t startCharacterIndex = 0;
+    for (size_t characterIndex = 0; characterIndex < (size_t)listSize; characterIndex++) {
+        if (buffer[characterIndex] == '\0') {
+            char *attribute = &buffer[startCharacterIndex];
+            size_t length = characterIndex - startCharacterIndex;
+            if (strncmp(APPLE_CODE_SIGN_XATTR_CODE_DIRECTORY_KEY, attribute, length) == 0 ||
+                strncmp(APPLE_CODE_SIGN_XATTR_CODE_REQUIREMENTS_KEY, attribute, length) == 0 ||
+                strncmp(APPLE_CODE_SIGN_XATTR_CODE_SIGNATURE_KEY, attribute, length) == 0) {
+                free(buffer);
+                return true;
+            }
+            startCharacterIndex = characterIndex + 1;
+        }
+    }
+    
+    free(buffer);
     return false;
 }
 
@@ -237,6 +271,11 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             fprintf(stderr, "\nDiffing ACLs are not supported. Detected ACL in before-tree on file %s\n", ent->fts_path);
             return 1;
         }
+        
+        if (codeSignatureExtendedAttributeExists(ent)) {
+            fprintf(stderr, "\nDiffing code signed extended attributes are not supported. Detected extended attribute in before-tree on file %s\n", ent->fts_path);
+            return 1;
+        }
     }
     fts_close(fts);
     
@@ -284,6 +323,9 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         // We should validate permissions and ACLs even if we don't store the info in the diff in the case of ACLs,
         // or in the case of permissions if the patch version is 1
         
+        // We should also not allow files with code signed extended attributes since Apple doesn't recommend inserting these
+        // inside an application, and since we don't preserve extended attribitutes anyway
+        
         mode_t permissions = [info[INFO_PERMISSIONS_KEY] unsignedShortValue];
         if (!IS_VALID_PERMISSIONS(permissions)) {
             fprintf(stderr, "\nInvalid file permissions after-tree on file %s\nOnly permissions with modes 0755 and 0644 are supported\n", ent->fts_path);
@@ -292,6 +334,11 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         
         if (aclExists(ent)) {
             fprintf(stderr, "\nDiffing ACLs are not supported. Detected ACL in after-tree on file %s\n", ent->fts_path);
+            return 1;
+        }
+        
+        if (codeSignatureExtendedAttributeExists(ent)) {
+            fprintf(stderr, "\nDiffing code signed extended attributes are not supported. Detected extended attribute in after-tree on file %s\n", ent->fts_path);
             return 1;
         }
         
