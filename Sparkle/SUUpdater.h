@@ -325,4 +325,33 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 
 @end
 
+// -----------------------------------------------------------------------------
+//	SUUpdater Delegate: DevMate Interaction
+// -----------------------------------------------------------------------------
+
+// NOTE!!! Implemented delegate methods have higher priority than values saved in user preferences
+static NSString * const SUUpdaterChecksForBetaUpdatesPrefKey = @"SUUpdaterChecksForBetaUpdates"; // bool value
+static NSString * const SUUpdaterIsInTestModePrefKey = @"SUUpdaterIsInTestMode"; // bool value
+
+@protocol SUUpdaterDelegate_DevMateInteraction <SUUpdaterDelegate>
+@optional
+
+/*!
+    Calls right before updates checking request to look for beta ones on DevMate.
+ 
+    \param updater The SUUpdater instance.
+    \return YES if need also check beta updates, NO otherwise.
+ */
+- (BOOL)updaterShouldCheckForBetaUpdates:(SUUpdater *)updater;
+
+/*!
+ Calls right before updates checking request to look for updates in test mode on DevMate.
+ 
+ \param updater The SUUpdater instance.
+ \return YES if need to check updates that are in test mode, NO otherwise.
+ */
+- (BOOL)isUpdaterInTestMode:(SUUpdater *)updater;
+
+@end
+
 #endif

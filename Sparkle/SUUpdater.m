@@ -448,7 +448,14 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     // A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
     NSString *appcastString = [self.host objectForKey:SUFeedURLKey];
     if ([self.delegate respondsToSelector:@selector(feedURLStringForUpdater:)])
+    {
         appcastString = [self.delegate feedURLStringForUpdater:self];
+    }
+    if (0 == appcastString.length)
+    {
+        appcastString = @"https://updates.devmate.com/";
+    }
+    
     if (!appcastString) // Can't find an appcast string!
         [NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the %@ key in either the Info.plist or the user defaults!", SUFeedURLKey];
     NSCharacterSet *quoteSet = [NSCharacterSet characterSetWithCharactersInString:@"\"\'"]; // Some feed publishers add quotes; strip 'em.
@@ -496,7 +503,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     const NSTimeInterval oneWeek = 60 * 60 * 24 * 7;
     sendingSystemProfile &= (-[lastSubmitDate timeIntervalSinceNow] >= oneWeek);
 
-    NSArray *parameters = @[];
+    NSArray *parameters = [self devmateFeedParameters];
     if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
         parameters = [parameters arrayByAddingObjectsFromArray:[self.delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile]];
     }
@@ -565,5 +572,34 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 }
 
 - (NSBundle *)hostBundle { return [self.host bundle]; }
+
+#pragma mark - DevMate Interaction
+
+- (NSArray *)devmateFeedParameters
+{
+    NSMutableArray *parameters = [NSMutableArray array];
+    
+    BOOL isInTestMode = [self.host boolForUserDefaultsKey:SUUpdaterIsInTestModePrefKey];
+    if ([self.delegate respondsToSelector:@selector(isUpdaterInTestMode:)])
+    {
+        isInTestMode = [(id<SUUpdaterDelegate_DevMateInteraction>)self.delegate isUpdaterInTestMode:self];
+    }
+    if (isInTestMode)
+    {
+        [parameters addObject:@{ @"key" : @"test", @"value" : @"1"}];
+    }
+    
+    BOOL shouldCheckBeta = [self.host boolForUserDefaultsKey:SUUpdaterChecksForBetaUpdatesPrefKey];
+    if ([self.delegate respondsToSelector:@selector(updaterShouldCheckForBetaUpdates:)])
+    {
+        shouldCheckBeta = [(id<SUUpdaterDelegate_DevMateInteraction>)self.delegate updaterShouldCheckForBetaUpdates:self];
+    }
+    if (shouldCheckBeta)
+    {
+        [parameters addObject:@{ @"key" : @"beta", @"value" : @"1"}];
+    }
+    
+    return parameters;
+}
 
 @end
