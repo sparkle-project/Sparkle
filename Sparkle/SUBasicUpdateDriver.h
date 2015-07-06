@@ -31,6 +31,7 @@
 - (void)didFindValidUpdate;
 - (void)didNotFindUpdate;
 
+- (void)updateURLRequestHTTPHeaders:(NSMutableURLRequest *)request;
 - (void)downloadUpdate;
 - (void)download:(NSURLDownload *)d decideDestinationWithSuggestedFilename:(NSString *)name;
 - (void)downloadDidFinish:(NSURLDownload *)d;

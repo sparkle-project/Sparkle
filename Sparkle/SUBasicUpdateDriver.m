@@ -22,6 +22,8 @@
 #import "SUUpdater_Private.h"
 #import "SUXPCInstaller.h"
 
+CF_EXPORT CFDictionaryRef DMCopyHTTPRequestHeaders(CFBundleRef appBundle, CFDataRef httpBodyData);
+
 @interface SUBasicUpdateDriver ()
 
 @property (strong) SUAppcastItem *updateItem;
@@ -53,10 +55,14 @@
         return;
     }
 
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
+    request.allHTTPHeaderFields = [self.updater httpHeaders];
+    [self updateURLRequestHTTPHeaders:request];
+    
     SUAppcast *appcast = [[SUAppcast alloc] init];
 
     [appcast setUserAgentString:[self.updater userAgentString]];
-    [appcast setHttpHeaders:[self.updater httpHeaders]];
+    [appcast setHttpHeaders:request.allHTTPHeaderFields];
     [appcast fetchAppcastFromURL:URL completionBlock:^(NSError *error) {
         if (error) {
             [self abortUpdateWithError:error];
@@ -188,10 +194,26 @@
                                                }]];
 }
 
+- (void)updateURLRequestHTTPHeaders:(NSMutableURLRequest *)request
+{
+    CFBundleRef hostBundle = CFBundleCreate(kCFAllocatorDefault, (__bridge CFURLRef)[NSURL fileURLWithPath:self.host.bundlePath]);
+    NSDictionary *devmateHeaders = (__bridge_transfer NSDictionary *)DMCopyHTTPRequestHeaders(hostBundle, NULL);
+    if (devmateHeaders.count)
+    {
+        [request setAllHTTPHeaderFields:devmateHeaders];
+    }
+    
+    if (NULL != hostBundle)
+    {
+        CFRelease(hostBundle);
+    }
+}
+
 - (void)downloadUpdate
 {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self.updateItem fileURL]];
     [request setValue:[self.updater userAgentString] forHTTPHeaderField:@"User-Agent"];
+    [self updateURLRequestHTTPHeaders:request];
     self.download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
 }
 

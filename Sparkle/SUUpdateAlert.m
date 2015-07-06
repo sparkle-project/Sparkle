@@ -135,7 +135,14 @@
 		}
 		else
 		{
-            [[self.releaseNotesView mainFrame] loadRequest:[NSURLRequest requestWithURL:[self.updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30]];
+            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:self.updateItem.releaseNotesURL
+                                                                   cachePolicy:NSURLRequestReloadIgnoringCacheData
+                                                               timeoutInterval:30];
+            if (self.releaseNotesRequestModifier != nil)
+            {
+                self.releaseNotesRequestModifier(request);
+            }
+            [[self.releaseNotesView mainFrame] loadRequest:request];
         }
 	}
 	else

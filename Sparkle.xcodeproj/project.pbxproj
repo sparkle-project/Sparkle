@@ -49,6 +49,7 @@
 		14950073195FCE4E00BC5B5B /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
 		14958C6E19AEBC950061B14F /* signed-test-file.txt in Resources */ = {isa = PBXBuildFile; fileRef = 14958C6B19AEBC530061B14F /* signed-test-file.txt */; };
 		14958C6F19AEBC980061B14F /* test-pubkey.pem in Resources */ = {isa = PBXBuildFile; fileRef = 14958C6C19AEBC610061B14F /* test-pubkey.pem */; };
+		331726611B4ABAEB008B2D77 /* libDMCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 331726601B4ABABD008B2D77 /* libDMCore.a */; };
 		33545B8D1B4679080059250D /* com.devmate.UpdateInstaller.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 33545B811B4679080059250D /* com.devmate.UpdateInstaller.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		33545B921B4679810059250D /* install_service.m in Sources */ = {isa = PBXBuildFile; fileRef = 33545B771B46774D0059250D /* install_service.m */; };
 		33545B931B4687CD0059250D /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
@@ -371,6 +372,7 @@
 		14950074195FDF5900BC5B5B /* SUUpdaterTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterTest.m; sourceTree = "<group>"; usesTabs = 0; };
 		14958C6B19AEBC530061B14F /* signed-test-file.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "signed-test-file.txt"; sourceTree = "<group>"; };
 		14958C6C19AEBC610061B14F /* test-pubkey.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "test-pubkey.pem"; sourceTree = "<group>"; };
+		331726601B4ABABD008B2D77 /* libDMCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libDMCore.a; path = External/libDMCore.a; sourceTree = "<group>"; };
 		33545B771B46774D0059250D /* install_service.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = install_service.m; sourceTree = "<group>"; };
 		33545B781B46774D0059250D /* install_service.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = install_service.pch; sourceTree = "<group>"; };
 		33545B791B46774D0059250D /* SandboxService.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SandboxService.plist; sourceTree = "<group>"; };
@@ -682,6 +684,7 @@
 				61B5F8F709C4CEB300B25A18 /* Security.framework in Frameworks */,
 				55C14F32136EFC2400649790 /* SystemConfiguration.framework in Frameworks */,
 				61B5FC4C09C4FD5E00B25A18 /* WebKit.framework in Frameworks */,
+				331726611B4ABAEB008B2D77 /* libDMCore.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -722,6 +725,7 @@
 		0867D69AFE84028FC02AAC07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				331726601B4ABABD008B2D77 /* libDMCore.a */,
 				0867D6A5FE840307C02AAC07 /* AppKit.framework */,
 				525A278F133D6AE900FD8D70 /* Cocoa.framework */,
 				0867D69BFE84028FC02AAC07 /* Foundation.framework */,
@@ -1891,6 +1895,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/External",
+				);
 			};
 			name = Debug;
 		};
@@ -1898,6 +1906,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/External",
+				);
 			};
 			name = Release;
 		};

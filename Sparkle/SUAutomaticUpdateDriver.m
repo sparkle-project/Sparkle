@@ -60,6 +60,31 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
+- (void)downloadReleaseNotesAndWaitUntilDone
+{
+    NSURL *releaseNotesURL = self.updateItem.releaseNotesURL;
+    if (nil == releaseNotesURL || [releaseNotesURL isFileURL])
+        return;
+    
+    static NSString * const kSUAutomaticUpdateParamName = @"autoupdate";
+
+    NSString *URLString = releaseNotesURL.absoluteString;
+    URLString = [URLString stringByAppendingFormat:@"%@%@=1", (releaseNotesURL.query != nil) ? @"&" : @"?", kSUAutomaticUpdateParamName];
+    releaseNotesURL = [NSURL URLWithString:URLString];
+    
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:releaseNotesURL];
+    [request setCachePolicy:NSURLRequestReloadIgnoringCacheData];
+    [self updateURLRequestHTTPHeaders:request];
+    [NSURLConnection sendSynchronousRequest:request returningResponse:NULL error:NULL];
+}
+
+- (void)didFindValidUpdate
+{
+    // For correct DevMate statistics need to send request for Release Notes.
+    [self downloadReleaseNotesAndWaitUntilDone];
+    [super didFindValidUpdate];
+}
+
 - (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];

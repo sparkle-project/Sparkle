@@ -32,6 +32,11 @@
         [self updateAlertFinishedWithChoice:choice];
     }];
 
+    __weak SUUIBasedUpdateDriver *weakSelf = self;
+    self.updateAlert.releaseNotesRequestModifier = ^(NSMutableURLRequest *request) {
+        [weakSelf updateURLRequestHTTPHeaders:request];
+    };
+    
     id<SUVersionDisplay> versDisp = nil;
     if ([[self.updater delegate] respondsToSelector:@selector(versionDisplayerForUpdater:)]) {
         versDisp = [[self.updater delegate] versionDisplayerForUpdater:self.updater];

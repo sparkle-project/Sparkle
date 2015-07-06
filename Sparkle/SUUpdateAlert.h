@@ -25,6 +25,7 @@ typedef NS_ENUM(NSInteger, SUUpdateAlertChoice) {
 @interface SUUpdateAlert : SUWindowController
 
 @property (weak) id<SUVersionDisplay> versionDisplayer;
+@property (copy) void (^releaseNotesRequestModifier)(NSMutableURLRequest *request);
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host completionBlock:(void(^)(SUUpdateAlertChoice))c;
 
