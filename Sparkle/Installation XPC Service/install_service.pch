@@ -1,0 +1,14 @@
+//
+//  install_service.pch
+//  Sparkle
+//
+//  Created by Dmytro Tretiakov on 4/25/14.
+//
+//
+
+#define SPARKLE_BUNDLE [NSBundle mainBundle]
+#define SULocalizedString(key,comment) NSLocalizedStringFromTableInBundle(key, @"Sparkle", SPARKLE_BUNDLE, comment)
+
+#import "SUErrors.h"
+#import "SUConstants.h"
+#import "SULog.h"

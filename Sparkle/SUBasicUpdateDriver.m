@@ -20,6 +20,7 @@
 #import "SUBinaryDeltaCommon.h"
 #import "SUCodeSigningVerifier.h"
 #import "SUUpdater_Private.h"
+#import "SUXPCInstaller.h"
 
 @interface SUBasicUpdateDriver ()
 
@@ -419,7 +420,16 @@
         NSError *error = nil;
         [[NSFileManager defaultManager] createDirectoryAtPath:[targetPath stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:@{} error:&error];
 
-        if ([SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil error:&error]) {
+        BOOL copySuccess = NO;
+        if (SUShouldUseXPCInstaller())
+        {
+            copySuccess = [SUXPCInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil error:&error];
+        }
+        else
+        {
+            copySuccess = [SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil error:&error];
+        }
+        if (copySuccess) {
             self.relaunchPath = targetPath;
         } else {
             [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{
@@ -448,12 +458,20 @@
         pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:self.updater];
     }
     NSString *relaunchToolPath = [[NSBundle bundleWithPath:self.relaunchPath] executablePath];
-    [NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:@[[self.host bundlePath],
-                                                                    pathToRelaunch,
-                                                                    [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]],
-                                                                    self.tempDir,
-                                                                    relaunch ? @"1" : @"0",
-                                                                    showUI ? @"1" : @"0"]];
+    NSArray *arguments = @[[self.host bundlePath],
+                           pathToRelaunch,
+                           [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]],
+                           self.tempDir,
+                           relaunch ? @"1" : @"0",
+                           showUI ? @"1" : @"0"];
+    if (SUShouldUseXPCInstaller())
+    {
+        [SUXPCInstaller launchTaskWithPath:relaunchToolPath arguments:arguments environment:nil currentDirectoryPath:nil inputData:nil waitForTaskResult:NO waitUntilDone:NO completionHandler:nil];
+    }
+    else
+    {
+        [NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:arguments];
+    }
     [self terminateApp];
 }
 

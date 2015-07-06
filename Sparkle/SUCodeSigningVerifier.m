@@ -164,6 +164,44 @@ static id valueOrNSNull(id value) {
     return (result == 0);
 }
 
++ (BOOL)hostApplicationIsSandboxed
+{
+    static BOOL sIsAppSandboxed = NO;
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        __block SecCodeRef hostCode = NULL;
+        __block SecRequirementRef hostRequirement = NULL;
+        
+        void (^Cleanup)(void) = ^ {
+            if (hostCode) { CFRelease(hostCode); hostCode = NULL; }
+            if (hostRequirement) { CFRelease(hostRequirement); hostRequirement = NULL; }
+        };
+        
+        OSStatus status = SecCodeCopySelf(kSecCSDefaultFlags, &hostCode);
+        if (status != noErr || hostCode == NULL)
+        {
+            Cleanup();
+            return;
+        }
+        
+        CFStringRef requirementString = CFSTR("entitlement[\"com.apple.security.app-sandbox\"] exists");
+        status = SecRequirementCreateWithString(requirementString, kSecCSDefaultFlags, &hostRequirement);
+        
+        if (status != noErr || hostRequirement == NULL)
+        {
+            Cleanup();
+            return;
+        }
+        
+        status = SecCodeCheckValidity(hostCode, kSecCSDefaultFlags, hostRequirement);
+        sIsAppSandboxed = (noErr == status);
+        Cleanup();
+    });
+    
+    return sIsAppSandboxed;
+}
+
 + (BOOL)applicationAtPathIsCodeSigned:(NSString *)applicationPath
 {
     OSStatus result;

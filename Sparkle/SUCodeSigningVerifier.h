@@ -16,6 +16,7 @@
 + (BOOL)codeSignatureIsValidAtPath:(NSString *)applicationPath error:(NSError **)error;
 + (BOOL)hostApplicationIsCodeSigned;
 + (BOOL)applicationAtPathIsCodeSigned:(NSString *)applicationPath;
++ (BOOL)hostApplicationIsSandboxed;
 @end
 
 #endif

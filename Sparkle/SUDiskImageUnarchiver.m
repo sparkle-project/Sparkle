@@ -11,6 +11,7 @@
 #import "NTSynchronousTask.h"
 #import "SULog.h"
 #include <CoreServices/CoreServices.h>
+#import "SUXPCInstaller.h"
 
 @implementation SUDiskImageUnarchiver
 
@@ -35,12 +36,6 @@
 
         SULog(@"Extracting %@ as a DMG", self.archivePath);
 
-        // get a unique mount point path
-        NSString *mountPoint = nil;
-        FSRef tmpRef;
-        NSFileManager *manager;
-        NSError *error;
-        NSArray *contents;
         // We have to declare these before a goto to prevent an error under ARC.
         // No, we cannot have them in the dispatch_async calls, as the goto "jump enters
         // lifetime of block which strongly captures a variable"
@@ -50,7 +45,10 @@
         dispatch_block_t delegateSuccess = ^{
             [self notifyDelegateOfSuccess];
         };
-		do
+
+        // get a unique mount point path
+        NSString *mountPoint = nil;
+        do
 		{
             // Using NSUUID would make creating UUIDs be done in Cocoa,
             // and thus managed under ARC. Sadly, the class is in 10.8 and later.
@@ -65,23 +63,37 @@
                 CFRelease(uuid);
             }
 		}
-		while (noErr == FSPathMakeRefWithOptions((const UInt8 *)[mountPoint fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &tmpRef, NULL));
+		while ([[NSFileManager defaultManager] fileExistsAtPath:mountPoint]);
 
         NSData *promptData = nil;
         promptData = [NSData dataWithBytes:"yes\n" length:4];
 
+        NSString *hdiutilPath = @"/usr/bin/hdiutil";
         NSArray *arguments = @[@"attach", self.archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"];
+        NSString *currentDirPath = @"/";
 
-        NSData *output = nil;
-        NSInteger taskResult = -1;
+        BOOL shouldUseXPC = SUShouldUseXPCInstaller();
+        
+        __block NSData *output = nil;
+        __block NSInteger taskResult = -1;
 		@try
 		{
-            NTSynchronousTask *task = [[NTSynchronousTask alloc] init];
+            if (shouldUseXPC)
+            {
+                [SUXPCInstaller launchTaskWithPath:hdiutilPath arguments:arguments environment:nil currentDirectoryPath:currentDirPath inputData:promptData waitForTaskResult:YES waitUntilDone:YES completionHandler:^(int result, NSData *outputData) {
+                    taskResult = (NSInteger)result;
+                    output = [outputData copy];
+                }];
+            }
+            else
+            {
+                NTSynchronousTask *task = [[NTSynchronousTask alloc] init];
 
-            [task run:@"/usr/bin/hdiutil" directory:@"/" withArgs:arguments input:promptData];
+                [task run:hdiutilPath directory:currentDirPath withArgs:arguments input:promptData];
 
-            taskResult = [task result];
-            output = [[task output] copy];
+                taskResult = [task result];
+                output = [[task output] copy];
+            }
         }
         @catch (NSException *)
         {
@@ -97,30 +109,45 @@
         mountedSuccessfully = YES;
 
         // Now that we've mounted it, we need to copy out its contents.
-        manager = [[NSFileManager alloc] init];
-        contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
-		if (error)
-		{
-            SULog(@"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
-            goto reportError;
+        if (shouldUseXPC)
+        {
+            NSError *error = nil;
+            [SUXPCInstaller copyPathContent:mountPoint toDirectory:[self.archivePath stringByDeletingLastPathComponent] error:&error];
+            
+            if (nil != error)
+            {
+                SULog(@"Couldn't copy volume content: %ld - %@", error.code, error.localizedDescription);
+                goto reportError;
+            }
         }
-
-		for (NSString *item in contents)
-		{
-            NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
-            NSString *toPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:item];
-
-            // We skip any files in the DMG which are not readable.
-            if (![manager isReadableFileAtPath:fromPath]) {
-                continue;
+        else
+        {
+            NSFileManager *manager = [[NSFileManager alloc] init];
+            NSError *error = nil;
+            NSArray *contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
+            if (error)
+            {
+                SULog(@"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
+                goto reportError;
             }
 
-            SULog(@"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
+            for (NSString *item in contents)
+            {
+                NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
+                NSString *toPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:item];
 
-			if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
-			{
-                SULog(@"Couldn't copy item: %@ : %@", error, error.userInfo ? error.userInfo : @"");
-                goto reportError;
+                // We skip any files in the DMG which are not readable.
+                if (![manager isReadableFileAtPath:fromPath]) {
+                    continue;
+                }
+
+                SULog(@"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
+
+                if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
+                {
+                    SULog(@"Couldn't copy item: %@ : %@", error, error.userInfo ? error.userInfo : @"");
+                    goto reportError;
+                }
             }
         }
 
@@ -132,9 +159,21 @@
 
     finally:
         if (mountedSuccessfully)
-            [NSTask launchedTaskWithLaunchPath:@"/usr/bin/hdiutil" arguments:@[@"detach", mountPoint, @"-force"]];
+        {
+            arguments = @[@"detach", mountPoint, @"-force"];
+            if (shouldUseXPC)
+            {
+                [SUXPCInstaller launchTaskWithPath:hdiutilPath arguments:arguments environment:nil currentDirectoryPath:nil inputData:nil waitForTaskResult:NO waitUntilDone:NO completionHandler:nil];
+            }
+            else
+            {
+                [NSTask launchedTaskWithLaunchPath:hdiutilPath arguments:arguments];
+            }
+        }
         else
+        {
             SULog(@"Can't mount DMG %@", self.archivePath);
+        }
     }
 }
 
