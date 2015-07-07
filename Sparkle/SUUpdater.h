@@ -105,6 +105,8 @@ SU_EXPORT @interface SUUpdater : NSObject
 
 @property (readonly) BOOL updateInProgress;
 
+@property (readonly) BOOL installationInProgress;
+
 @end
 
 // -----------------------------------------------------------------------------

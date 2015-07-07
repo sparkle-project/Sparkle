@@ -196,6 +196,7 @@ int main(int __unused argc, const char __unused *argv[])
         }
 
         [NSApplication sharedApplication];
+        NSConnection *connection = [[NSConnection alloc] init];
         TerminationListener *termListen = [[TerminationListener alloc] initWithHostPath:args[1]
                                                                          executablePath:args[2]
                                                                         parentProcessId:[args[3] intValue]
@@ -203,10 +204,15 @@ int main(int __unused argc, const char __unused *argv[])
                                                                          shouldRelaunch:(args.count > 5) ? [args[5] boolValue] : YES
                                                                            shouldShowUI:shouldShowUI
                                                                                selfPath:[[NSBundle mainBundle] bundlePath]];
+        [connection setRootObject:termListen];
+        if (![connection registerName:[NSString stringWithFormat:@"Sparkle-%@", termListen.host.bundle.bundleIdentifier]])
+        {
+            NSLog(@"%@ server: could not register server. Is one already running?\n", args.firstObject);
+        }
 
         [[NSApplication sharedApplication] run];
-        // Ensure termListen is not deallocated by ARC before caling -[NSApplication run]
-        [termListen class];
+        // Ensure connection is not deallocated by ARC before caling -[NSApplication run]
+        [connection class];
     }
 
     return EXIT_SUCCESS;

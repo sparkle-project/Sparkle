@@ -571,6 +571,25 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     return self.driver && ([self.driver finished] == NO);
 }
 
+- (BOOL)installationInProgress
+{
+    BOOL result = NO;
+    @try
+    {
+        NSConnection *connection = [NSConnection connectionWithRegisteredName:[NSString stringWithFormat:@"Sparkle-%@", self.host.bundle.bundleIdentifier] host:nil];
+        if (connection != nil)
+        {
+            NSDistantObject *proxyBundle = [connection rootProxy];
+            result = proxyBundle != nil;
+        }
+    }
+    @catch (NSException *)
+    {
+    }
+    
+    return result;
+}
+
 - (NSBundle *)hostBundle { return [self.host bundle]; }
 
 #pragma mark - DevMate Interaction
