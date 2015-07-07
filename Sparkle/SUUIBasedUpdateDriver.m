@@ -26,6 +26,11 @@
 @synthesize statusController;
 @synthesize updateAlert;
 
+- (BOOL)shouldShowUI
+{
+    return YES;
+}
+
 - (void)didFindValidUpdate
 {
     self.updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host completionBlock:^(SUUpdateAlertChoice choice) {
@@ -73,7 +78,7 @@
     alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
     [alert addButtonWithTitle:SULocalizedString(@"OK", nil)];
     [self showModalAlert:alert];
-    [self abortUpdate];
+    [self abortUpdate:SUUpdateAbortDidNotFind];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)__unused aNotification
@@ -97,16 +102,16 @@
 
         case SUOpenInfoURLChoice:
             [[NSWorkspace sharedWorkspace] openURL:[self.updateItem infoURL]];
-            [self abortUpdate];
+            [self abortUpdate:SUUpdateAbortCanceledByUser];
             break;
 
         case SUSkipThisVersionChoice:
             [self.host setObject:[self.updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
-            [self abortUpdate];
+            [self abortUpdate:SUUpdateAbortCanceledByUser];
             break;
 
         case SURemindMeLaterChoice:
-            [self abortUpdate];
+            [self abortUpdate:SUUpdateAbortCanceledByUser];
             break;
     }
 }
@@ -146,7 +151,7 @@
 {
     if (self.download)
         [self.download cancel];
-    [self abortUpdate];
+    [self abortUpdate:SUUpdateAbortCanceledByUser];
 }
 
 - (void)extractUpdate
@@ -213,18 +218,25 @@
     [super abortUpdateWithError:error];
 }
 
-- (void)abortUpdate
+- (void)abortUpdate:(SUUpdateAbortReason)reason
 {
 	if (self.statusController)
 	{
         [self.statusController close];
         self.statusController = nil;
     }
-    [super abortUpdate];
+    [super abortUpdate:reason];
 }
 
 - (void)showModalAlert:(NSAlert *)alert
 {
+    if ([self.updater.delegate respondsToSelector:@selector(updater:mayShowModalAlert:)] &&
+        ![self.updater.delegate updater:self.updater mayShowModalAlert:alert])
+    {
+        // delegate forbids to show this alert!
+        return;
+    }
+
     if ([[self.updater delegate] respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
         [[self.updater delegate] updaterWillShowModalAlert:self.updater];
     }

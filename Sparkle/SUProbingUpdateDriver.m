@@ -21,7 +21,7 @@
         [updaterDelegate updater:self.updater didFindValidUpdate:self.updateItem];
     NSDictionary *userInfo = (self.updateItem != nil) ? @{ SUUpdaterAppcastItemNotificationKey: self.updateItem } : nil;
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification object:self.updater userInfo:userInfo];
-    [self abortUpdate];
+    [self abortUpdate:SUUpdateAbortTasksFinished];
 }
 
 - (void)didNotFindUpdate
@@ -33,7 +33,7 @@
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
-    [self abortUpdate];
+    [self abortUpdate:SUUpdateAbortDidNotFind];
 }
 
 @end

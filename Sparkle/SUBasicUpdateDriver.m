@@ -407,7 +407,7 @@ CF_EXPORT CFDictionaryRef DMCopyHTTPRequestHeaders(CFBundleRef appBundle, CFData
 
     if (![self.updater mayUpdateAndRestart])
     {
-        [self abortUpdate];
+        [self abortUpdate:SUUpdateAbortForbiddenByDelegate];
         return;
     }
 
@@ -528,12 +528,12 @@ CF_EXPORT CFDictionaryRef DMCopyHTTPRequestHeaders(CFBundleRef appBundle, CFData
     }]];
 }
 
-- (void)abortUpdate
+- (void)abortUpdate:(SUUpdateAbortReason)reason
 {
     [self cleanUpDownload];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     self.updateItem = nil;
-    [super abortUpdate];
+    [super abortUpdate:reason];
 }
 
 - (void)abortUpdateWithError:(NSError *)error
@@ -551,7 +551,7 @@ CF_EXPORT CFDictionaryRef DMCopyHTTPRequestHeaders(CFBundleRef appBundle, CFData
         [updaterDelegate updater:self.updater didAbortWithError:error];
     }
 
-    [self abortUpdate];
+    [self abortUpdate:SUUpdateAbortGotError];
 }
 
 @end

@@ -21,9 +21,13 @@ extern NSString *const SUUpdateDriverFinishedNotification;
 
 - (instancetype)initWithUpdater:(SUUpdater *)updater;
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
-- (void)abortUpdate;
+- (void)abortUpdate:(SUUpdateAbortReason)reason;
 @property (getter=isInterruptible, readonly) BOOL interruptible;
 @property (readonly) BOOL finished;
+@property (readonly) SUUpdateAbortReason abortReason;
+
+@property (nonatomic, readonly) BOOL shouldShowUI; // can change it's value during lifetime
+
 
 @end
 

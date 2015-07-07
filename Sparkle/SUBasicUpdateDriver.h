@@ -48,7 +48,7 @@
 
 - (void)cleanUpDownload;
 
-- (void)abortUpdate;
+- (void)abortUpdate:(SUUpdateAbortReason)reason;
 - (void)abortUpdateWithError:(NSError *)error;
 - (void)terminateApp;
 

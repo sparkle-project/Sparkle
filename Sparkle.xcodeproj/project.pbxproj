@@ -50,6 +50,8 @@
 		14958C6E19AEBC950061B14F /* signed-test-file.txt in Resources */ = {isa = PBXBuildFile; fileRef = 14958C6B19AEBC530061B14F /* signed-test-file.txt */; };
 		14958C6F19AEBC980061B14F /* test-pubkey.pem in Resources */ = {isa = PBXBuildFile; fileRef = 14958C6C19AEBC610061B14F /* test-pubkey.pem */; };
 		331726611B4ABAEB008B2D77 /* libDMCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 331726601B4ABABD008B2D77 /* libDMCore.a */; };
+		3317266D1B4BDE4F008B2D77 /* SUUpdaterQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 3317266B1B4BDE4F008B2D77 /* SUUpdaterQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3317266E1B4BDE4F008B2D77 /* SUUpdaterQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3317266C1B4BDE4F008B2D77 /* SUUpdaterQueue.m */; };
 		33545B8D1B4679080059250D /* com.devmate.UpdateInstaller.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 33545B811B4679080059250D /* com.devmate.UpdateInstaller.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		33545B921B4679810059250D /* install_service.m in Sources */ = {isa = PBXBuildFile; fileRef = 33545B771B46774D0059250D /* install_service.m */; };
 		33545B931B4687CD0059250D /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
@@ -373,6 +375,8 @@
 		14958C6B19AEBC530061B14F /* signed-test-file.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "signed-test-file.txt"; sourceTree = "<group>"; };
 		14958C6C19AEBC610061B14F /* test-pubkey.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "test-pubkey.pem"; sourceTree = "<group>"; };
 		331726601B4ABABD008B2D77 /* libDMCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libDMCore.a; path = External/libDMCore.a; sourceTree = "<group>"; };
+		3317266B1B4BDE4F008B2D77 /* SUUpdaterQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdaterQueue.h; sourceTree = "<group>"; };
+		3317266C1B4BDE4F008B2D77 /* SUUpdaterQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterQueue.m; sourceTree = "<group>"; };
 		33545B771B46774D0059250D /* install_service.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = install_service.m; sourceTree = "<group>"; };
 		33545B781B46774D0059250D /* install_service.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = install_service.pch; sourceTree = "<group>"; };
 		33545B791B46774D0059250D /* SandboxService.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SandboxService.plist; sourceTree = "<group>"; };
@@ -1038,6 +1042,8 @@
 				61B5F8E309C4CE3C00B25A18 /* SUUpdater.h */,
 				61B5F8E409C4CE3C00B25A18 /* SUUpdater.m */,
 				6158A1C4137904B300487EC1 /* SUUpdater_Private.h */,
+				3317266B1B4BDE4F008B2D77 /* SUUpdaterQueue.h */,
+				3317266C1B4BDE4F008B2D77 /* SUUpdaterQueue.m */,
 			);
 			name = "Update Control";
 			sourceTree = "<group>";
@@ -1090,6 +1096,7 @@
 				5D06E9390FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.h in Headers */,
 				61B078CE15A5FB6100600039 /* SUCodeSigningVerifier.h in Headers */,
 				61299A5C09CA6D4500B7442F /* SUConstants.h in Headers */,
+				3317266D1B4BDE4F008B2D77 /* SUUpdaterQueue.h in Headers */,
 				6102FE4A0E07803800F85D09 /* SUDiskImageUnarchiver.h in Headers */,
 				61299A2F09CA2DAB00B7442F /* SUDSAVerifier.h in Headers */,
 				55E6F33319EC9F6C00005E76 /* SUErrors.h in Headers */,
@@ -1618,6 +1625,7 @@
 				61B5FCDE09C52A9F00B25A18 /* SUUpdateAlert.m in Sources */,
 				610134740DD250470049ACDF /* SUUpdateDriver.m in Sources */,
 				612DCBB00D488BC60015DBEA /* SUUpdatePermissionPrompt.m in Sources */,
+				3317266E1B4BDE4F008B2D77 /* SUUpdaterQueue.m in Sources */,
 				61B5F8EE09C4CE3C00B25A18 /* SUUpdater.m in Sources */,
 				61A354560DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.m in Sources */,
 				61180BCB0D64138900B4E0D1 /* SUWindowController.m in Sources */,

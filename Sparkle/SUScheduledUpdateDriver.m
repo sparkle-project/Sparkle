@@ -23,6 +23,11 @@
 
 @synthesize showErrors;
 
+- (BOOL)shouldShowUI
+{
+    return self.showErrors;
+}
+
 - (void)didFindValidUpdate
 {
     self.showErrors = YES; // We only start showing errors after we present the UI for the first time.
@@ -38,7 +43,7 @@
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
-    [self abortUpdate]; // Don't tell the user that no update was found; this was a scheduled update.
+    [self abortUpdate:SUUpdateAbortDidNotFind]; // Don't tell the user that no update was found; this was a scheduled update.
 }
 
 - (void)abortUpdateWithError:(NSError *)error
@@ -53,7 +58,7 @@
             [updaterDelegate updater:self.updater didAbortWithError:error];
         }
 
-        [self abortUpdate];
+        [self abortUpdate:SUUpdateAbortGotError];
     }
 }
 

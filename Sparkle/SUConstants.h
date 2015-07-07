@@ -13,6 +13,21 @@
 #import <Foundation/Foundation.h>
 
 // -----------------------------------------------------------------------------
+//	Typedefs:
+// -----------------------------------------------------------------------------
+
+typedef NS_ENUM(NSUInteger, SUUpdateAbortReason)
+{
+    SUUpdateAbortUndefined = 0,
+    SUUpdateAbortForbiddenByDelegate,
+    SUUpdateAbortTasksFinished,
+    SUUpdateAbortCanceledByUser,
+    SUUpdateAbortDidNotFind,
+    SUUpdateAbortInterrupred,
+    SUUpdateAbortGotError
+};
+
+// -----------------------------------------------------------------------------
 //	Misc:
 // -----------------------------------------------------------------------------
 

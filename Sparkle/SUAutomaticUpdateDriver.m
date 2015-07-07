@@ -39,6 +39,11 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 @synthesize alert;
 @synthesize showUpdateAlertTimer;
 
+- (BOOL)shouldShowUI
+{
+    return self.showErrors;
+}
+
 - (void)showUpdateAlert
 {
     self.interruptible = NO;
@@ -151,11 +156,11 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     [self invalidateShowUpdateAlertTimer];
 }
 
-- (void)abortUpdate
+- (void)abortUpdate:(SUUpdateAbortReason)reason
 {
     [self stopUpdatingOnTermination];
     [self invalidateShowUpdateAlertTimer];
-    [super abortUpdate];
+    [super abortUpdate:reason];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)__unused aNotification
@@ -182,7 +187,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
         case SUDoNotInstallChoice:
             [self.host setObject:[self.updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
-            [self abortUpdate];
+            [self abortUpdate:SUUpdateAbortCanceledByUser];
             break;
     }
 }
@@ -214,7 +219,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
             [updaterDelegate updater:self.updater didAbortWithError:error];
         }
 
-        [self abortUpdate];
+        [self abortUpdate:SUUpdateAbortGotError];
     }
 }
 

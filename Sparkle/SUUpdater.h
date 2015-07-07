@@ -285,6 +285,14 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (NSString *)pathToRelaunchForUpdater:(SUUpdater *)updater;
 
 /*!
+    Returns whether to allow Sparkle to show a modal alert window.
+ 
+    \param updater The SUUpdater instance.
+    \param alert The modal alert that proposes to be shown.
+ */
+- (BOOL)updater:(SUUpdater *)updater mayShowModalAlert:(NSAlert *)alert;
+
+/*!
     Called before an updater shows a modal alert window,
     to give the host the opportunity to hide attached windows that may get in the way.
 

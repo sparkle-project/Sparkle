@@ -7,6 +7,7 @@
 //
 
 #import "SUUpdater.h"
+#import "SUUpdater_Private.h"
 
 #import "SUHost.h"
 #import "SUUpdatePermissionPrompt.h"
@@ -102,18 +103,25 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         BOOL hasPublicDSAKey = [host publicDSAKey] != nil;
         BOOL isMainBundle = [bundle isEqualTo:[NSBundle mainBundle]];
         BOOL hostIsCodeSigned = [SUCodeSigningVerifier hostApplicationIsCodeSigned];
+        NSAlert *alert = nil;
         if (!isMainBundle && !hasPublicDSAKey) {
-            [self notifyWillShowModalAlert];
-            NSAlert *alert = [[NSAlert alloc] init];
+            alert = [[NSAlert alloc] init];
             alert.messageText = @"Insecure update error!";
             alert.informativeText = @"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information.";
-            [alert runModal];
-            [self notifyDidShowModalAlert];
         } else if (isMainBundle && !(hasPublicDSAKey || hostIsCodeSigned)) {
-            [self notifyWillShowModalAlert];
-            NSAlert *alert = [[NSAlert alloc] init];
+            alert = [[NSAlert alloc] init];
             alert.messageText = @"Insecure update error!";
             alert.informativeText = @"For security reasons, you need to code sign your application or sign your updates with a DSA key. See Sparkle's documentation for more information.";
+        }
+        
+        BOOL shouldShowAlert = alert != nil;
+        if (shouldShowAlert && [self.delegate respondsToSelector:@selector(updater:mayShowModalAlert:)])
+        {
+            shouldShowAlert = [self.delegate updater:self mayShowModalAlert:alert];
+        }
+        if (shouldShowAlert)
+        {
+            [self notifyWillShowModalAlert];
             [alert runModal];
             [self notifyDidShowModalAlert];
         }
@@ -195,8 +203,13 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 - (void)updateDriverDidFinish:(NSNotification *)note
 {
-	if ([note object] == self.driver && [self.driver finished])
+	if ([note object] == self.driver && (nil == self.driver || [self.driver finished]))
 	{
+        if ([self.delegate respondsToSelector:@selector(updaterDidEndUpdateProcess:)])
+        {
+            [(id<SUPrivateUpdaterDelegate>)self.delegate updaterDidEndUpdateProcess:self];
+        }
+
         self.driver = nil;
         [self scheduleNextUpdateCheck];
     }
@@ -310,7 +323,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (IBAction)checkForUpdates:(id)__unused sender
 {
     if (self.driver && [self.driver isInterruptible]) {
-        [self.driver abortUpdate];
+        [self.driver abortUpdate:SUUpdateAbortInterrupred];
     }
 
     [self checkForUpdatesWithDriver:[[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self]];
@@ -326,6 +339,11 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 	if ([self updateInProgress]) { return; }
 	if (self.checkTimer) { [self.checkTimer invalidate]; self.checkTimer = nil; }		// Timer is non-repeating, may have invalidated itself, so we had to retain it.
 
+    if ([self.delegate respondsToSelector:@selector(updaterWillStartUpdateProcess:)])
+    {
+        [(id<SUPrivateUpdaterDelegate>)self.delegate updaterWillStartUpdateProcess:self];
+    }
+    
     [self willChangeValueForKey:@"lastUpdateCheckDate"];
     [self.host setObject:[NSDate date] forUserDefaultsKey:SULastCheckTimeKey];
     [self didChangeValueForKey:@"lastUpdateCheckDate"];
@@ -349,7 +367,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     if (theFeedURL) // Use a NIL URL to cancel quietly.
         [self.driver checkForUpdatesAtURL:theFeedURL host:self.host];
     else
-        [self.driver abortUpdate];
+        [self.driver abortUpdate:SUUpdateAbortGotError];
 }
 
 - (void)registerAsObserver
@@ -588,6 +606,11 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     }
     
     return result;
+}
+
+- (SUBasicUpdateDriver *)basicDriver
+{
+    return [self.driver isKindOfClass:[SUBasicUpdateDriver class]] ? (SUBasicUpdateDriver *)self.driver : nil;
 }
 
 - (NSBundle *)hostBundle { return [self.host bundle]; }

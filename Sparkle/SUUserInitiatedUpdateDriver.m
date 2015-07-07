@@ -59,7 +59,7 @@
 {
 	if (self.isCanceled)
 	{
-        [self abortUpdate];
+        [self abortUpdate:SUUpdateAbortCanceledByUser];
         return;
     }
     [self closeCheckingWindow];
@@ -72,10 +72,10 @@
     [super abortUpdateWithError:error];
 }
 
-- (void)abortUpdate
+- (void)abortUpdate:(SUUpdateAbortReason)reason
 {
     [self closeCheckingWindow];
-    [super abortUpdate];
+    [super abortUpdate:reason];
 }
 
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui

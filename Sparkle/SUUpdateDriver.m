@@ -16,6 +16,7 @@ NSString *const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 @property (weak) SUUpdater *updater;
 @property (copy) NSURL *appcastURL;
 @property (getter=isInterruptible) BOOL interruptible;
+@property (assign) SUUpdateAbortReason abortReason;
 
 @end
 
@@ -26,6 +27,7 @@ NSString *const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 @synthesize interruptible;
 @synthesize finished;
 @synthesize appcastURL;
+@synthesize abortReason;
 
 - (instancetype)initWithUpdater:(SUUpdater *)anUpdater
 {
@@ -43,10 +45,16 @@ NSString *const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
     self.host = h;
 }
 
-- (void)abortUpdate
+- (void)abortUpdate:(SUUpdateAbortReason)reason
 {
+    self.abortReason = reason;
     [self setValue:@YES forKey:@"finished"];
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdateDriverFinishedNotification object:self];
+}
+
+- (BOOL)shouldShowUI
+{
+    return NO;
 }
 
 @end
