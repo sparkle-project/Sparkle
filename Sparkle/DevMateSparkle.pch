@@ -1,0 +1,50 @@
+//
+//  DevMateSparkle.pch
+//  Sparkle
+//
+//  Created by Dmytro Tretiakov on 10/1/14.
+//
+//
+
+#define SUUpdater                               DM_SUUpdater
+#define SUUpdaterQueue                          DM_SUUpdaterQueue
+#define SUAppcast                               DM_SUAppcast
+#define SUAppcastItem                           DM_SUAppcastItem
+#define SUUpdaterDelegate                       DM_SUUpdaterDelegate
+#define SUUpdaterDelegate_DevMateInteraction    DM_SUUpdaterDelegate_DevMateInteraction
+#define SUVersionComparison                     DM_SUVersionComparison
+#define SUStandardVersionComparator             DM_SUStandardVersionComparator
+#define SUVersionDisplay                        DM_SUVersionDisplay
+
+#define SUPackageInstaller                      DM_SUPackageInstaller
+#define SUDSAVerifier                           DM_SUDSAVerifier
+#define SUUpdateAlert                           DM_SUUpdateAlert
+#define SUUIBasedUpdateDriver                   DM_SUUIBasedUpdateDriver
+#define SUSystemProfiler                        DM_SUSystemProfiler
+#define SUXPCInstaller                          DM_SUXPCInstaller
+#define SUPlainInstaller                        DM_SUPlainInstaller
+#define SUUpdatePermissionPrompt                DM_SUUpdatePermissionPrompt
+#define SUUnarchiver                            DM_SUUnarchiver
+#define SUUserInitiatedUpdateDriver             DM_SUUserInitiatedUpdateDriver
+#define SUUpdateDriver                          DM_SUUpdateDriver
+#define SUProbingUpdateDriver                   DM_SUProbingUpdateDriver
+#define SUAutomaticUpdateAlert                  DM_SUAutomaticUpdateAlert
+#define SUBasicUpdateDriver                     DM_SUBasicUpdateDriver
+#define SUWindowController                      DM_SUWindowController
+#define SUStatusController                      DM_SUStatusController
+#define SUHost                                  DM_SUHost
+#define SUPipedUnarchiver                       DM_SUPipedUnarchiver
+#define SUAutomaticUpdateDriver                 DM_SUAutomaticUpdateDriver
+#define SUCodeSigningVerifier                   DM_SUCodeSigningVerifier
+#define SUBinaryDeltaUnarchiver                 DM_SUBinaryDeltaUnarchiver
+#define SUDelegateProxy                         DM_SUDelegateProxy
+#define SUInstaller                             DM_SUInstaller
+#define SUScheduledUpdateDriver                 DM_SUScheduledUpdateDriver
+#define SUDiskImageUnarchiver                   DM_SUDiskImageUnarchiver
+#define SUGuidedPackageInstaller                DM_SUGuidedPackageInstaller
+#define NTSynchronousTask                       DM_NTSynchronousTask
+#define SUUpdaterWorking                        DM_SUUpdater // Used in SUUpdaterLoader.m file
+#define SUUpdaterLoader                         DM_SUUpdaterLoader
+
+#import "Sparkle.pch"
+

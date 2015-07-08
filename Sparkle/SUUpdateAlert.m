@@ -53,6 +53,8 @@
 @synthesize skipButton;
 @synthesize laterButton;
 
+@synthesize releaseNotesRequestModifier;
+
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUUpdateAlertChoice))block
 {
     self = [super initWithWindowNibName:@"SUUpdateAlert"];

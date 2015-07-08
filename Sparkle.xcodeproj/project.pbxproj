@@ -53,6 +53,61 @@
 		3317266D1B4BDE4F008B2D77 /* SUUpdaterQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 3317266B1B4BDE4F008B2D77 /* SUUpdaterQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3317266E1B4BDE4F008B2D77 /* SUUpdaterQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3317266C1B4BDE4F008B2D77 /* SUUpdaterQueue.m */; };
 		331726701B4D0FCD008B2D77 /* Sparkle.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8220A321A7F00D8810D /* Sparkle.strings */; };
+		331726801B4D3740008B2D77 /* SUModelTranslation.plist in Resources */ = {isa = PBXBuildFile; fileRef = 615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */; };
+		331726811B4D374F008B2D77 /* SUAutomaticUpdateAlert.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BDA136EF20D00649790 /* SUAutomaticUpdateAlert.xib */; };
+		331726821B4D374F008B2D77 /* SUUpdateAlert.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BF0136EF26100649790 /* SUUpdateAlert.xib */; };
+		331726831B4D374F008B2D77 /* SUUpdatePermissionPrompt.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14C05136EF2C700649790 /* SUUpdatePermissionPrompt.xib */; };
+		331726841B4D3752008B2D77 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
+		331726851B4D3758008B2D77 /* Sparkle.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8220A321A7F00D8810D /* Sparkle.strings */; };
+		331726861B4D379B008B2D77 /* Autoupdate.app in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BB7136EEF1500649790 /* Autoupdate.app */; };
+		331726891B4D37D7008B2D77 /* SUAppcast.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B5FB9409C4F04600B25A18 /* SUAppcast.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3317268A1B4D37D7008B2D77 /* SUAppcastItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B5FC5309C5182000B25A18 /* SUAppcastItem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3317268B1B4D37D7008B2D77 /* SUUpdaterQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 3317266B1B4BDE4F008B2D77 /* SUUpdaterQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3317268C1B4D37D7008B2D77 /* SUErrors.h in Headers */ = {isa = PBXBuildFile; fileRef = 55E6F33219EC9F6C00005E76 /* SUErrors.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3317268D1B4D37D7008B2D77 /* SUExport.h in Headers */ = {isa = PBXBuildFile; fileRef = 14652F8319A9759F00959E44 /* SUExport.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3317268E1B4D37D7008B2D77 /* SUStandardVersionComparator.h in Headers */ = {isa = PBXBuildFile; fileRef = 61A225A20D1C4AC000430CCD /* SUStandardVersionComparator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3317268F1B4D37D7008B2D77 /* SUUpdater.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B5F8E309C4CE3C00B25A18 /* SUUpdater.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		331726901B4D37D7008B2D77 /* SUVersionComparisonProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 61A2259C0D1C495D00430CCD /* SUVersionComparisonProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		331726911B4D37D7008B2D77 /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		331726B91B4D620C008B2D77 /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		331726BA1B4D6214008B2D77 /* NTSynchronousTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 610EC1BF0CF3914D00AE239E /* NTSynchronousTask.m */; };
+		331726BB1B4D6225008B2D77 /* SUAppcast.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5FB9509C4F04600B25A18 /* SUAppcast.m */; };
+		331726BC1B4D6225008B2D77 /* SUAppcastItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5FC5409C5182000B25A18 /* SUAppcastItem.m */; };
+		331726BD1B4D6225008B2D77 /* SUAutomaticUpdateAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 6120721109CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.m */; };
+		331726BE1B4D6225008B2D77 /* SUAutomaticUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B93B260DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.m */; };
+		331726BF1B4D624D008B2D77 /* SUBasicUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */; };
+		331726C01B4D624D008B2D77 /* SUBinaryDeltaApply.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E00FD68CC7005AE3F6 /* SUBinaryDeltaApply.m */; };
+		331726C11B4D624D008B2D77 /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E20FD68CC7005AE3F6 /* SUBinaryDeltaCommon.m */; };
+		331726C21B4D624D008B2D77 /* SUBinaryDeltaUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E9380FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m */; };
+		331726C31B4D624D008B2D77 /* SUCodeSigningVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B078CD15A5FB6100600039 /* SUCodeSigningVerifier.m */; };
+		331726C41B4D624D008B2D77 /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
+		331726C51B4D624D008B2D77 /* SUDiskImageUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 6102FE490E07803800F85D09 /* SUDiskImageUnarchiver.m */; };
+		331726C61B4D624D008B2D77 /* SUDSAVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A2E09CA2DAB00B7442F /* SUDSAVerifier.m */; };
+		331726C71B4D624D008B2D77 /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */; };
+		331726C81B4D625A008B2D77 /* SUHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 61EF67550E25B58D00F754E0 /* SUHost.m */; };
+		331726C91B4D625A008B2D77 /* SUInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5000DAE88B40026945C /* SUInstaller.m */; };
+		331726CA1B4D625A008B2D77 /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
+		331726CB1B4D625A008B2D77 /* SUPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5210DAE8E8A0026945C /* SUPackageInstaller.m */; };
+		331726CC1B4D625A008B2D77 /* SUPipedUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 6129C0B90E0B79810062CE76 /* SUPipedUnarchiver.m */; };
+		331726CD1B4D625A008B2D77 /* SUXPCInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 33545B7C1B46774D0059250D /* SUXPCInstaller.m */; };
+		331726CE1B4D625A008B2D77 /* SUPlainInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5040DAE8AB80026945C /* SUPlainInstaller.m */; };
+		331726CF1B4D625A008B2D77 /* SUPlainInstallerInternals.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5F8E509C4CE3C00B25A18 /* SUPlainInstallerInternals.m */; };
+		331726D01B4D625A008B2D77 /* SUProbingUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 6101347A0DD2541A0049ACDF /* SUProbingUpdateDriver.m */; };
+		331726D11B4D625A008B2D77 /* SUScheduledUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B93C080DD112FF00DCD2F8 /* SUScheduledUpdateDriver.m */; };
+		331726D21B4D625A008B2D77 /* SUStandardVersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */; };
+		331726D31B4D625A008B2D77 /* SUStatusController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6196CFE409C71ADE000DC222 /* SUStatusController.m */; };
+		331726D41B4D625A008B2D77 /* SUSystemProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A2279B0D1CEE7600430CCD /* SUSystemProfiler.m */; };
+		331726D51B4D625A008B2D77 /* SUUIBasedUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B93A3A0DD02D6400DCD2F8 /* SUUIBasedUpdateDriver.m */; };
+		331726D61B4D625A008B2D77 /* SUUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A8C09CA790200B7442F /* SUUnarchiver.m */; };
+		331726D71B4D625A008B2D77 /* SUUpdateAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5FCA109C5228F00B25A18 /* SUUpdateAlert.m */; };
+		331726D81B4D625A008B2D77 /* SUUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 610134720DD250470049ACDF /* SUUpdateDriver.m */; };
+		331726D91B4D625A008B2D77 /* SUUpdatePermissionPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */; };
+		331726DA1B4D625A008B2D77 /* SUUpdaterQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3317266C1B4BDE4F008B2D77 /* SUUpdaterQueue.m */; };
+		331726DB1B4D625A008B2D77 /* SUUpdater.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5F8E409C4CE3C00B25A18 /* SUUpdater.m */; };
+		331726DC1B4D625A008B2D77 /* SUUserInitiatedUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A354540DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.m */; };
+		331726DD1B4D625A008B2D77 /* SUWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 61180BC90D64138900B4E0D1 /* SUWindowController.m */; };
+		331726E21B4D66EE008B2D77 /* DevMateSparkle.h in Headers */ = {isa = PBXBuildFile; fileRef = 331726DF1B4D6438008B2D77 /* DevMateSparkle.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		331726E31B4D697E008B2D77 /* SUUpdaterLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 331726E11B4D65AA008B2D77 /* SUUpdaterLoader.m */; };
 		33545B8D1B4679080059250D /* com.devmate.UpdateInstaller.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 33545B811B4679080059250D /* com.devmate.UpdateInstaller.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		33545B921B4679810059250D /* install_service.m in Sources */ = {isa = PBXBuildFile; fileRef = 33545B771B46774D0059250D /* install_service.m */; };
 		33545B931B4687CD0059250D /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
@@ -262,6 +317,27 @@
 			remoteGlobalIDString = 55C14BB6136EEF1500649790;
 			remoteInfo = Autoupdate;
 		};
+		3317267C1B4D3704008B2D77 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 55C14BB6136EEF1500649790;
+			remoteInfo = Autoupdate;
+		};
+		3317267E1B4D3704008B2D77 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 33545B801B4679080059250D;
+			remoteInfo = "Installation XPC Service";
+		};
+		331726B71B4D61A8008B2D77 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 331726741B4D36F2008B2D77;
+			remoteInfo = DevMateSparkle_lib_resources;
+		};
 		33545B8B1B4679080059250D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -378,6 +454,11 @@
 		331726601B4ABABD008B2D77 /* libDMCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libDMCore.a; path = External/libDMCore.a; sourceTree = "<group>"; };
 		3317266B1B4BDE4F008B2D77 /* SUUpdaterQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdaterQueue.h; sourceTree = "<group>"; };
 		3317266C1B4BDE4F008B2D77 /* SUUpdaterQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterQueue.m; sourceTree = "<group>"; };
+		331726751B4D36F2008B2D77 /* DevMateSparkle_Resources */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DevMateSparkle_Resources; sourceTree = BUILT_PRODUCTS_DIR; };
+		331726971B4D5F27008B2D77 /* libDevMateSparkle.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libDevMateSparkle.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		331726DF1B4D6438008B2D77 /* DevMateSparkle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DevMateSparkle.h; sourceTree = "<group>"; };
+		331726E01B4D6438008B2D77 /* DevMateSparkle.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DevMateSparkle.pch; sourceTree = "<group>"; };
+		331726E11B4D65AA008B2D77 /* SUUpdaterLoader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterLoader.m; sourceTree = "<group>"; };
 		33545B771B46774D0059250D /* install_service.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = install_service.m; sourceTree = "<group>"; };
 		33545B781B46774D0059250D /* install_service.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = install_service.pch; sourceTree = "<group>"; };
 		33545B791B46774D0059250D /* SandboxService.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SandboxService.plist; sourceTree = "<group>"; };
@@ -623,6 +704,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		331726721B4D36F2008B2D77 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		331726941B4D5F27008B2D77 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		33545B7E1B4679080059250D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -705,6 +800,8 @@
 				612279D90DB5470200AB99EA /* Sparkle Unit Tests.xctest */,
 				8DC2EF5B0486A6940098B216 /* Sparkle.framework */,
 				33545B811B4679080059250D /* com.devmate.UpdateInstaller.xpc */,
+				331726751B4D36F2008B2D77 /* DevMateSparkle_Resources */,
+				331726971B4D5F27008B2D77 /* libDevMateSparkle.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -836,6 +933,7 @@
 				6101354A0DD25B7F0049ACDF /* Unarchiving */,
 				61F83F6E0DBFE07A006FDD30 /* Update Control */,
 				61299B3A09CB056100B7442F /* User Interface */,
+				331726DE1B4D6403008B2D77 /* DevMate */,
 			);
 			path = Sparkle;
 			sourceTree = "<group>";
@@ -850,6 +948,16 @@
 				5AF6C74E1AEA46D10014A3AB /* test.sparkle_guided.pkg */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		331726DE1B4D6403008B2D77 /* DevMate */ = {
+			isa = PBXGroup;
+			children = (
+				331726DF1B4D6438008B2D77 /* DevMateSparkle.h */,
+				331726E01B4D6438008B2D77 /* DevMateSparkle.pch */,
+				331726E11B4D65AA008B2D77 /* SUUpdaterLoader.m */,
+			);
+			name = DevMate;
 			sourceTree = "<group>";
 		};
 		33545B761B46774D0059250D /* Installation XPC Service */ = {
@@ -1081,6 +1189,30 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		331726871B4D37B6008B2D77 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3317268D1B4D37D7008B2D77 /* SUExport.h in Headers */,
+				331726E21B4D66EE008B2D77 /* DevMateSparkle.h in Headers */,
+				3317268B1B4D37D7008B2D77 /* SUUpdaterQueue.h in Headers */,
+				331726901B4D37D7008B2D77 /* SUVersionComparisonProtocol.h in Headers */,
+				3317268C1B4D37D7008B2D77 /* SUErrors.h in Headers */,
+				331726891B4D37D7008B2D77 /* SUAppcast.h in Headers */,
+				3317268A1B4D37D7008B2D77 /* SUAppcastItem.h in Headers */,
+				3317268F1B4D37D7008B2D77 /* SUUpdater.h in Headers */,
+				331726911B4D37D7008B2D77 /* SUVersionDisplayProtocol.h in Headers */,
+				3317268E1B4D37D7008B2D77 /* SUStandardVersionComparator.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		331726951B4D5F27008B2D77 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DC2EF500486A6940098B216 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -1168,6 +1300,45 @@
 /* End PBXLegacyTarget section */
 
 /* Begin PBXNativeTarget section */
+		331726741B4D36F2008B2D77 /* DevMateSparkle_lib_resources */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 331726791B4D36F2008B2D77 /* Build configuration list for PBXNativeTarget "DevMateSparkle_lib_resources" */;
+			buildPhases = (
+				331726711B4D36F2008B2D77 /* Sources */,
+				331726721B4D36F2008B2D77 /* Frameworks */,
+				331726731B4D36F2008B2D77 /* Resources */,
+				331726871B4D37B6008B2D77 /* Headers */,
+				331726921B4D37FA008B2D77 /* Run Script: Update Locales */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3317267D1B4D3704008B2D77 /* PBXTargetDependency */,
+				3317267F1B4D3704008B2D77 /* PBXTargetDependency */,
+			);
+			name = DevMateSparkle_lib_resources;
+			productName = DevMateSparkle_lib_resources;
+			productReference = 331726751B4D36F2008B2D77 /* DevMateSparkle_Resources */;
+			productType = "com.apple.product-type.bundle";
+		};
+		331726961B4D5F27008B2D77 /* DevMateSparkle_lib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 331726A81B4D5F28008B2D77 /* Build configuration list for PBXNativeTarget "DevMateSparkle_lib" */;
+			buildPhases = (
+				331726931B4D5F27008B2D77 /* Sources */,
+				331726941B4D5F27008B2D77 /* Frameworks */,
+				331726951B4D5F27008B2D77 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				331726B81B4D61A8008B2D77 /* PBXTargetDependency */,
+			);
+			name = DevMateSparkle_lib;
+			productName = DevMateSparkle_lib;
+			productReference = 331726971B4D5F27008B2D77 /* libDevMateSparkle.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		33545B801B4679080059250D /* Installation XPC Service */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 33545B8E1B4679080059250D /* Build configuration list for PBXNativeTarget "Installation XPC Service" */;
@@ -1295,6 +1466,12 @@
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Sparkle Project";
 				TargetAttributes = {
+					331726741B4D36F2008B2D77 = {
+						CreatedOnToolsVersion = 6.4;
+					};
+					331726961B4D5F27008B2D77 = {
+						CreatedOnToolsVersion = 6.4;
+					};
 					33545B801B4679080059250D = {
 						CreatedOnToolsVersion = 6.3.2;
 					};
@@ -1371,6 +1548,8 @@
 				14732BC51960F69300593899 /* Distribution */,
 				1420DF491962329200203BB0 /* Documentation */,
 				1495005F195FB89400BC5B5B /* All */,
+				331726741B4D36F2008B2D77 /* DevMateSparkle_lib_resources */,
+				331726961B4D5F27008B2D77 /* DevMateSparkle_lib */,
 			);
 		};
 /* End PBXProject section */
@@ -1385,6 +1564,20 @@
 				5AF6C1E91AE86E270014A3AB /* test archive.zip in Resources */,
 				14958C6F19AEBC980061B14F /* test-pubkey.pem in Resources */,
 				5AF6C74F1AEA46D10014A3AB /* test.sparkle_guided.pkg in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		331726731B4D36F2008B2D77 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				331726801B4D3740008B2D77 /* SUModelTranslation.plist in Resources */,
+				331726811B4D374F008B2D77 /* SUAutomaticUpdateAlert.xib in Resources */,
+				331726841B4D3752008B2D77 /* SUStatus.xib in Resources */,
+				331726821B4D374F008B2D77 /* SUUpdateAlert.xib in Resources */,
+				331726831B4D374F008B2D77 /* SUUpdatePermissionPrompt.xib in Resources */,
+				331726851B4D3758008B2D77 /* Sparkle.strings in Resources */,
+				331726861B4D379B008B2D77 /* Autoupdate.app in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1447,6 +1640,20 @@
 			shellPath = /bin/sh;
 			shellScript = "\"$SRCROOT/Configurations/set-git-version-info.sh\"";
 			showEnvVarsInLog = 0;
+		};
+		331726921B4D37FA008B2D77 /* Run Script: Update Locales */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script: Update Locales";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "IFS=$(echo -en \"\\n\\b\")\nRESOURCES_PATHS=(\n    \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\n    \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/${SPARKLE_RELAUNCH_TOOL_NAME}.app/Contents/Resources\"\n    \"${BUILT_PRODUCTS_DIR}/com.devmate.UpdateInstaller.xpc/Contents/Resources\")\n\nfor RESOURCES_PATH in \"${RESOURCES_PATHS[@]}\"\ndo\n    echo \"Correcting... ${RESOURCES_PATH}\"\n    if [ -e \"${RESOURCES_PATH}/pt_BR.lproj\" ]; then\n        rm -Rf \"${RESOURCES_PATH}/pt-BR.lproj\"\n        mv -f \"${RESOURCES_PATH}/pt_BR.lproj\" \"${RESOURCES_PATH}/pt-BR.lproj\"\n    fi\n\n    if [ -e \"${RESOURCES_PATH}/zh_CN.lproj\" ]; then\n        rm -Rf \"${RESOURCES_PATH}/zh-Hans.lproj\"\n        mv -f \"${RESOURCES_PATH}/zh_CN.lproj\" \"${RESOURCES_PATH}/zh-Hans.lproj\"\n    fi\n\n    if [ -e \"${RESOURCES_PATH}/zh_TW.lproj\" ]; then\n        rm -Rf \"${RESOURCES_PATH}/zh-Hant-TW.lproj\"\n        mv -f \"${RESOURCES_PATH}/zh_TW.lproj\" \"${RESOURCES_PATH}/zh-Hant-TW.lproj\"\n    fi\ndone\n\n";
 		};
 		612279D70DB5470200AB99EA /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1514,6 +1721,58 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		331726711B4D36F2008B2D77 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		331726931B4D5F27008B2D77 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				331726CA1B4D625A008B2D77 /* SULog.m in Sources */,
+				331726DC1B4D625A008B2D77 /* SUUserInitiatedUpdateDriver.m in Sources */,
+				331726D51B4D625A008B2D77 /* SUUIBasedUpdateDriver.m in Sources */,
+				331726D81B4D625A008B2D77 /* SUUpdateDriver.m in Sources */,
+				331726CB1B4D625A008B2D77 /* SUPackageInstaller.m in Sources */,
+				331726D01B4D625A008B2D77 /* SUProbingUpdateDriver.m in Sources */,
+				331726C11B4D624D008B2D77 /* SUBinaryDeltaCommon.m in Sources */,
+				331726BD1B4D6225008B2D77 /* SUAutomaticUpdateAlert.m in Sources */,
+				331726BB1B4D6225008B2D77 /* SUAppcast.m in Sources */,
+				331726CE1B4D625A008B2D77 /* SUPlainInstaller.m in Sources */,
+				331726C71B4D624D008B2D77 /* SUGuidedPackageInstaller.m in Sources */,
+				331726D11B4D625A008B2D77 /* SUScheduledUpdateDriver.m in Sources */,
+				331726BF1B4D624D008B2D77 /* SUBasicUpdateDriver.m in Sources */,
+				331726CC1B4D625A008B2D77 /* SUPipedUnarchiver.m in Sources */,
+				331726DB1B4D625A008B2D77 /* SUUpdater.m in Sources */,
+				331726CF1B4D625A008B2D77 /* SUPlainInstallerInternals.m in Sources */,
+				331726CD1B4D625A008B2D77 /* SUXPCInstaller.m in Sources */,
+				331726C61B4D624D008B2D77 /* SUDSAVerifier.m in Sources */,
+				331726BC1B4D6225008B2D77 /* SUAppcastItem.m in Sources */,
+				331726C41B4D624D008B2D77 /* SUConstants.m in Sources */,
+				331726C01B4D624D008B2D77 /* SUBinaryDeltaApply.m in Sources */,
+				331726D41B4D625A008B2D77 /* SUSystemProfiler.m in Sources */,
+				331726DD1B4D625A008B2D77 /* SUWindowController.m in Sources */,
+				331726D21B4D625A008B2D77 /* SUStandardVersionComparator.m in Sources */,
+				331726C91B4D625A008B2D77 /* SUInstaller.m in Sources */,
+				331726C81B4D625A008B2D77 /* SUHost.m in Sources */,
+				331726BA1B4D6214008B2D77 /* NTSynchronousTask.m in Sources */,
+				331726BE1B4D6225008B2D77 /* SUAutomaticUpdateDriver.m in Sources */,
+				331726DA1B4D625A008B2D77 /* SUUpdaterQueue.m in Sources */,
+				331726D71B4D625A008B2D77 /* SUUpdateAlert.m in Sources */,
+				331726D61B4D625A008B2D77 /* SUUnarchiver.m in Sources */,
+				331726D91B4D625A008B2D77 /* SUUpdatePermissionPrompt.m in Sources */,
+				331726D31B4D625A008B2D77 /* SUStatusController.m in Sources */,
+				331726C31B4D624D008B2D77 /* SUCodeSigningVerifier.m in Sources */,
+				331726E31B4D697E008B2D77 /* SUUpdaterLoader.m in Sources */,
+				331726C21B4D624D008B2D77 /* SUBinaryDeltaUnarchiver.m in Sources */,
+				331726B91B4D620C008B2D77 /* bspatch.c in Sources */,
+				331726C51B4D624D008B2D77 /* SUDiskImageUnarchiver.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		33545B7D1B4679080059250D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1681,6 +1940,21 @@
 			isa = PBXTargetDependency;
 			target = 55C14BB6136EEF1500649790 /* Autoupdate */;
 			targetProxy = 1495006B195FB8A600BC5B5B /* PBXContainerItemProxy */;
+		};
+		3317267D1B4D3704008B2D77 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 55C14BB6136EEF1500649790 /* Autoupdate */;
+			targetProxy = 3317267C1B4D3704008B2D77 /* PBXContainerItemProxy */;
+		};
+		3317267F1B4D3704008B2D77 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 33545B801B4679080059250D /* Installation XPC Service */;
+			targetProxy = 3317267E1B4D3704008B2D77 /* PBXContainerItemProxy */;
+		};
+		331726B81B4D61A8008B2D77 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 331726741B4D36F2008B2D77 /* DevMateSparkle_lib_resources */;
+			targetProxy = 331726B71B4D61A8008B2D77 /* PBXContainerItemProxy */;
 		};
 		33545B8C1B4679080059250D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1937,6 +2211,42 @@
 			};
 			name = Release;
 		};
+		3317267A1B4D36F2008B2D77 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CONTENTS_FOLDER_PATH = "$(FULL_PRODUCT_NAME)";
+				PRODUCT_NAME = DevMateSparkle_Resources;
+				WRAPPER_SUFFIX = "";
+			};
+			name = Debug;
+		};
+		3317267B1B4D36F2008B2D77 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CONTENTS_FOLDER_PATH = "$(FULL_PRODUCT_NAME)";
+				PRODUCT_NAME = DevMateSparkle_Resources;
+				WRAPPER_SUFFIX = "";
+			};
+			name = Release;
+		};
+		331726A91B4D5F28008B2D77 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREFIX_HEADER = Sparkle/DevMateSparkle.pch;
+				PRODUCT_NAME = DevMateSparkle;
+				SPARKLE_BUNDLE_IDENTIFIER = com.devmate.DevMateKit;
+			};
+			name = Debug;
+		};
+		331726AA1B4D5F28008B2D77 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREFIX_HEADER = Sparkle/DevMateSparkle.pch;
+				PRODUCT_NAME = DevMateSparkle;
+				SPARKLE_BUNDLE_IDENTIFIER = com.devmate.DevMateKit;
+			};
+			name = Release;
+		};
 		33545B8F1B4679080059250D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2106,6 +2416,24 @@
 			buildConfigurations = (
 				1DEB91B208733DA50010E9CD /* Debug */,
 				1DEB91B308733DA50010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		331726791B4D36F2008B2D77 /* Build configuration list for PBXNativeTarget "DevMateSparkle_lib_resources" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3317267A1B4D36F2008B2D77 /* Debug */,
+				3317267B1B4D36F2008B2D77 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		331726A81B4D5F28008B2D77 /* Build configuration list for PBXNativeTarget "DevMateSparkle_lib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				331726A91B4D5F28008B2D77 /* Debug */,
+				331726AA1B4D5F28008B2D77 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
