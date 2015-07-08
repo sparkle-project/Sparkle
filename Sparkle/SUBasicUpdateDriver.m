@@ -214,6 +214,11 @@ CF_EXPORT CFDictionaryRef DMCopyHTTPRequestHeaders(CFBundleRef appBundle, CFData
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self.updateItem fileURL]];
     [request setValue:[self.updater userAgentString] forHTTPHeaderField:@"User-Agent"];
     [self updateURLRequestHTTPHeaders:request];
+    if ([[self.updater delegate] respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
+        [[self.updater delegate] updater:self.updater
+                      willDownloadUpdate:self.updateItem
+                             withRequest:request];
+    }
     self.download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
 }
 
@@ -331,6 +336,12 @@ CF_EXPORT CFDictionaryRef DMCopyHTTPRequestHeaders(CFBundleRef appBundle, CFData
     NSURL *failingUrl = error.userInfo[NSURLErrorFailingURLErrorKey];
     if (!failingUrl) {
         failingUrl = [self.updateItem fileURL];
+    }
+    
+    if ([[self.updater delegate] respondsToSelector:@selector(updater:failedToDownloadUpdate:error:)]) {
+        [[self.updater delegate] updater:self.updater
+                  failedToDownloadUpdate:self.updateItem
+                                   error:error];
     }
 
     [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{
