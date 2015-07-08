@@ -52,6 +52,7 @@
 		331726611B4ABAEB008B2D77 /* libDMCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 331726601B4ABABD008B2D77 /* libDMCore.a */; };
 		3317266D1B4BDE4F008B2D77 /* SUUpdaterQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 3317266B1B4BDE4F008B2D77 /* SUUpdaterQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3317266E1B4BDE4F008B2D77 /* SUUpdaterQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3317266C1B4BDE4F008B2D77 /* SUUpdaterQueue.m */; };
+		331726701B4D0FCD008B2D77 /* Sparkle.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8220A321A7F00D8810D /* Sparkle.strings */; };
 		33545B8D1B4679080059250D /* com.devmate.UpdateInstaller.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 33545B811B4679080059250D /* com.devmate.UpdateInstaller.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		33545B921B4679810059250D /* install_service.m in Sources */ = {isa = PBXBuildFile; fileRef = 33545B771B46774D0059250D /* install_service.m */; };
 		33545B931B4687CD0059250D /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
@@ -1391,6 +1392,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				331726701B4D0FCD008B2D77 /* Sparkle.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
