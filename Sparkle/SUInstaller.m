@@ -44,8 +44,8 @@ static NSString *sUpdateFolder = nil;
 
 + (NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr isGuided:(BOOL *)isGuidedPtr
 {
-    NSParameterAssert(inUpdateFolder);
-    NSParameterAssert(host);
+    SUParameterAssert(inUpdateFolder);
+    SUParameterAssert(host);
 
     // Search subdirectories for the application
     NSString *currentFile,

@@ -38,7 +38,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 + (AuthorizationRef)authorizationForExecutable:(NSString*)executablePath
 {
-	NSParameterAssert(executablePath);
+	SUParameterAssert(executablePath);
 	
 	// Get authorization using advice in Apple's Technical Q&A1172
 	
@@ -93,7 +93,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 + (void)performInstallationToPath:(NSString *)destinationPath fromPath:(NSString *)packagePath host:(SUHost *)__unused host versionComparator:(id<SUVersionComparison>)__unused comparator completionHandler:(void (^)(NSError *))completionHandler
 {
-    NSParameterAssert(packagePath);
+    SUParameterAssert(packagePath);
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 

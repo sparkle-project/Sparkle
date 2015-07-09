@@ -231,7 +231,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
             const char *coParams[] = { "-R", uidgid, srcPath, NULL };
             res = AuthorizationExecuteWithPrivilegesAndWait(auth, "/usr/sbin/chown", kAuthorizationFlagDefaults, coParams);
             if (!res)
-                SULog(@"chown -R %s %s failed.", uidgid, srcPath);
+                SULog(@"chown -R %@ %@ failed.", @(uidgid), @(srcPath));
         }
 
         BOOL haveDst = [[NSFileManager defaultManager] fileExistsAtPath:dst];

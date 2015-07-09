@@ -76,4 +76,4 @@ GCC_WARN_UNUSED_VARIABLE = YES
 WARNING_CFLAGS_EXTRA = -Wno-custom-atomic-properties -Wno-implicit-atomic-properties
 
 // Turn on all warnings, then disable a few which are almost impossible to avoid
-WARNING_CFLAGS = -Wall -Weverything -Wno-empty-translation-unit -Wno-unused-macros -Wno-gnu-statement-expression -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wno-auto-import -Wno-cstring-format-directive $(WARNING_CFLAGS_EXTRA)
+WARNING_CFLAGS = -Wall -Weverything -Wno-unused-macros -Wno-gnu-statement-expression -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wno-auto-import $(WARNING_CFLAGS_EXTRA)

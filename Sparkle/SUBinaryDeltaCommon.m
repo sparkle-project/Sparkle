@@ -43,7 +43,7 @@ SUBinaryDeltaMinorVersion latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVe
         case SUBeigeMajorVersion:
             return SUBeigeMinorVersion;
     }
-    return 0;
+    return (SUBinaryDeltaMinorVersion)0;
 }
 
 NSString *temporaryFilename(NSString *base)
