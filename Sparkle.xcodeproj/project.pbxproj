@@ -2233,6 +2233,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PREFIX_HEADER = Sparkle/DevMateSparkle.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"BUILDING_SPARKLE=1",
+				);
 				PRODUCT_NAME = DevMateSparkle;
 				SPARKLE_BUNDLE_IDENTIFIER = com.devmate.DevMateKit;
 			};
@@ -2242,6 +2246,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PREFIX_HEADER = Sparkle/DevMateSparkle.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"BUILDING_SPARKLE=1",
+				);
 				PRODUCT_NAME = DevMateSparkle;
 				SPARKLE_BUNDLE_IDENTIFIER = com.devmate.DevMateKit;
 			};
