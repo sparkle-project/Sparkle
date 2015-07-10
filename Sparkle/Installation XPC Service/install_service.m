@@ -304,9 +304,8 @@ static void peer_event_handler(xpc_connection_t peer, xpc_object_t event)
     else if (type == XPC_TYPE_DICTIONARY)
     {
 		// Handle the message.
-		SUInstallServiceTask task = (SUInstallServiceTask)xpc_dictionary_get_int64(event, SUInstallServiceTaskTypeKey);
-        
-        NSLog(@"XPC Installer: should start task with id = %lld", (int64_t)task);
+		int64_t task = xpc_dictionary_get_int64(event, SUInstallServiceTaskTypeKey);
+        NSLog(@"XPC Installer: will do the task %lld", (int64_t)task);
         
         xpc_object_t reply = NULL;
 
@@ -334,7 +333,7 @@ static void peer_event_handler(xpc_connection_t peer, xpc_object_t event)
                     
                 default:
                 {
-                    SULog(@"XPC Install Service: Unknown XPC service task %lld", (int64_t)task);
+                    SULog(@"XPC Install Service: Unknown XPC service task %lld", task);
                     
                     reply = xpc_dictionary_create_reply(event);
                     xpc_dictionary_set_int64(reply, SUInstallServiceErrorCodeKey, (int64_t)SUXPCServiceError);

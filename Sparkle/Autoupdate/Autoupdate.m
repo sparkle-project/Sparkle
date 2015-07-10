@@ -128,7 +128,15 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
             appPath = self.executablepath;
         else
             appPath = self.installationPath;
-        [[NSWorkspace sharedWorkspace] openFile:appPath];
+        
+        NSError *error = nil;
+        [[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:appPath]
+                                                      options:NSWorkspaceLaunchNewInstance
+                                                configuration:nil error:&error];
+        if (error.code != noErr)
+        {
+            SULog(@"%ld - %@", error.code, error.localizedDescription);
+        }
     }
 
     if (self.folderpath)
