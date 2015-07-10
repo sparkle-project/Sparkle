@@ -1,16 +1,20 @@
 import Foundation
 
+func die(msg: String) {
+    println("ERROR: \(msg)")
+    exit(1)
+}
+
 func escapeHTML(str: String) -> String {
     if let node = NSXMLNode.textWithStringValue(str) as? NSXMLNode {
         return node.XMLString
     }
-    return ""
+    die("NSXMLNode failure"); return ""
 }
 
 let args = NSProcessInfo.processInfo().arguments
 if args.count < 3 {
-    println("ERROR: Missing arguments.")
-    exit(1)
+    die("Missing arguments")
 }
 let sparkleRoot = args[1] as! String
 let htmlPath = args[2] as! String
@@ -18,8 +22,7 @@ let htmlPath = args[2] as! String
 let enStringsPath = sparkleRoot + "/Sparkle/en.lproj/Sparkle.strings"
 let enStringsDict = NSDictionary(contentsOfFile: enStringsPath)
 if enStringsDict == nil {
-    println("ERROR: Invalid English strings.")
-    exit(1)
+    die("Invalid English strings")
 }
 let enStringsDictKeys = enStringsDict!.allKeys
 
@@ -44,7 +47,7 @@ for dirEntry in dirContents {
     let stringsPath = dirPath.stringByAppendingPathComponent(dirEntry).stringByAppendingPathComponent("Sparkle.strings")
     let stringsDict = NSDictionary(contentsOfFile: stringsPath)
     if stringsDict == nil {
-        println("  ERROR: Invalid strings file \(dirEntry)")
+        die("Invalid strings file \(dirEntry)")
         continue
     }
     
@@ -91,6 +94,5 @@ html += "</body></html>"
 
 var err: NSError?
 if !html.writeToFile(htmlPath, atomically: true, encoding: NSUTF8StringEncoding, error: &err) {
-    println("ERROR: Can't write report: \(err)")
-    exit(1)
+    die("Can't write report: \(err)")
 }
