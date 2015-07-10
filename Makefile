@@ -1,4 +1,4 @@
-.PHONY: all localizable-strings release build test travis
+.PHONY: all localizable-strings release build test ci
 
 ifndef BUILDDIR
     BUILDDIR := $(shell mktemp -d "$(TMPDIR)/Sparkle.XXXXXX")
@@ -20,4 +20,4 @@ build:
 test:
 	xcodebuild -scheme Distribution -configuration Debug test
 
-travis: test
+ci: test
