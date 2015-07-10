@@ -84,7 +84,8 @@ static NSString *sUpdateFolder = nil;
         } else {
             // Try matching on bundle identifiers in case the user has changed the name of the host app
             NSBundle *incomingBundle = [NSBundle bundleWithPath:currentPath];
-            if (incomingBundle && [[incomingBundle bundleIdentifier] isEqualToString:[[host bundle] bundleIdentifier]]) {
+            NSString *hostBundleIdentifier = host.bundle.bundleIdentifier;
+            if (incomingBundle && [incomingBundle.bundleIdentifier isEqualToString:hostBundleIdentifier]) {
                 isPackage = NO;
                 newAppDownloadPath = currentPath;
                 break;

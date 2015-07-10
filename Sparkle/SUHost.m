@@ -53,7 +53,8 @@ typedef struct {
         }
 
         // If we're using the main bundle's defaults we'll use the standard user defaults mechanism, otherwise we have to get CF-y.
-        usesStandardUserDefaults = !self.defaultsDomain || [self.defaultsDomain isEqualToString:[[NSBundle mainBundle] bundleIdentifier]];
+        NSString *mainBundleIdentifier = NSBundle.mainBundle.bundleIdentifier;
+        usesStandardUserDefaults = !self.defaultsDomain || [self.defaultsDomain isEqualToString:mainBundleIdentifier];
     }
     return self;
 }

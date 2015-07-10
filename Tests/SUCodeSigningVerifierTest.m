@@ -30,8 +30,9 @@
     [super setUp];
 
     NSBundle *unitTestBundle = [NSBundle bundleForClass:[self class]];
+    NSString *unitTestBundleIdentifier = unitTestBundle.bundleIdentifier;
     NSString *zippedAppPath = [unitTestBundle pathForResource:@"SparkleTestCodeSignApp" ofType:@"zip"];
-    NSString *tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:[unitTestBundle bundleIdentifier]];
+    NSString *tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:unitTestBundleIdentifier];
     NSError *error = nil;
     if ([[NSFileManager defaultManager] createDirectoryAtPath:tempDir withIntermediateDirectories:YES attributes:nil error:&error]) {
         if ([self unzip:zippedAppPath toPath:tempDir]) {

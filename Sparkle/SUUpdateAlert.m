@@ -237,7 +237,10 @@
 - (void)webView:(WebView *)__unused sender decidePolicyForNavigationAction:(NSDictionary *)__unused actionInformation request:(NSURLRequest *)request frame:(WebFrame *)__unused frame decisionListener:(id<WebPolicyDecisionListener>)listener
 {
     if (self.webViewFinishedLoading) {
-        [[NSWorkspace sharedWorkspace] openURL:[request URL]];
+        NSURL *requestURL = request.URL;
+        if (requestURL) {
+            [[NSWorkspace sharedWorkspace] openURL:requestURL];
+        }
 
         [listener ignore];
     }
