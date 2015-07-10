@@ -20,4 +20,9 @@ build:
 test:
 	xcodebuild -scheme Distribution -configuration Debug test
 
-ci: test
+ci:
+	for i in {7..11} ; do \
+		if xcrun --sdk "macosx10.$$i" --show-sdk-path ; then \
+			xcodebuild -sdk "macosx10.$$i" -scheme Distribution -configuration Debug test ; \
+		fi ; \
+	done
