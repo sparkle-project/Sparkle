@@ -26,3 +26,8 @@ ci:
 			xcodebuild -sdk "macosx10.$$i" -scheme Distribution -configuration Debug test ; \
 		fi ; \
 	done
+
+check-localizations:
+	xcrun swiftc -sdk `xcrun --show-sdk-path` -o "$(TMPDIR)/CheckLocalizations" Sparkle/CheckLocalizations.swift
+	"$(TMPDIR)/CheckLocalizations" . "$(TMPDIR)/LocalizationsReport.htm"
+	open "$(TMPDIR)/LocalizationsReport.htm"
