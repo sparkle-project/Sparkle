@@ -16,7 +16,7 @@
 
 + (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler
 {
-    NSParameterAssert(host);
+    SUParameterAssert(host);
 
     // Prevent malicious downgrades
     if (![[[NSBundle bundleWithIdentifier:SUBundleIdentifier] infoDictionary][SUEnableAutomatedDowngradesKey] boolValue]) {

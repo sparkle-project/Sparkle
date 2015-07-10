@@ -1,2 +1,2 @@
 language: objective-c
-script: make travis
+script: make ci

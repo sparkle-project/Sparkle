@@ -237,8 +237,11 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     
     NSMutableDictionary *originalTreeState = [NSMutableDictionary dictionary];
 
-    const char *sourcePaths[] = {[source fileSystemRepresentation], 0};
-    FTS *fts = fts_open((char* const*)sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
+    char pathBuffer[PATH_MAX] = {0};
+    [source getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)];
+
+    char *sourcePaths[] = {pathBuffer, 0};
+    FTS *fts = fts_open(sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
     if (!fts) {
         perror("fts_open");
         return 1;
@@ -295,9 +298,12 @@ int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     if (verbose) {
         fprintf(stderr, "\nProcessing %s...", [destination fileSystemRepresentation]);
     }
+
+    pathBuffer[0] = 0;
+    [destination getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)];
     
-    sourcePaths[0] = [destination fileSystemRepresentation];
-    fts = fts_open((char* const*)sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
+    sourcePaths[0] = pathBuffer;
+    fts = fts_open(sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
     if (!fts) {
         perror("fts_open");
         return 1;

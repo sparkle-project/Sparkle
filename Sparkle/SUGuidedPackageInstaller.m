@@ -38,7 +38,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 + (AuthorizationRef)authorizationForExecutable:(NSString*)executablePath
 {
-	NSParameterAssert(executablePath);
+	SUParameterAssert(executablePath);
 	
 	// Get authorization using advice in Apple's Technical Q&A1172
 	
@@ -52,12 +52,13 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	if ((validAuth == errAuthorizationSuccess) &&
 		(auth != NULL))
 	{		
-		const char* executableFileSystemRepresentation = [executablePath fileSystemRepresentation];
+        char executableFileSystemRepresentation[PATH_MAX];
+        [executablePath getFileSystemRepresentation:executableFileSystemRepresentation maxLength:sizeof(executableFileSystemRepresentation)];
 		
 		// Prepare a right allowing script to execute with privileges
         AuthorizationItem right = {
             .name = kAuthorizationRightExecute,
-            .value = (char*)executableFileSystemRepresentation,
+            .value = executableFileSystemRepresentation,
             .valueLength = strlen(executableFileSystemRepresentation),
         };
 		
@@ -93,7 +94,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 + (void)performInstallationToPath:(NSString *)destinationPath fromPath:(NSString *)packagePath host:(SUHost *)__unused host versionComparator:(id<SUVersionComparison>)__unused comparator completionHandler:(void (^)(NSError *))completionHandler
 {
-    NSParameterAssert(packagePath);
+    SUParameterAssert(packagePath);
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 
@@ -106,10 +107,13 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         AuthorizationRef auth = [self authorizationForExecutable:installerPath];
         if (auth != NULL)
         {
+            char pathBuffer[PATH_MAX] = {0};
+            [packagePath getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)];
+
             // Permission was granted to execute the installer with privileges
-            const char* const arguments[] = {
+            char * const arguments[] = {
                 "-pkg",
-                [packagePath fileSystemRepresentation],
+                pathBuffer,
                 "-target",
                 "/",
                 NULL

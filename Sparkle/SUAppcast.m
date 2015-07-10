@@ -170,9 +170,12 @@
                 else if ([name isEqualToString:SURSSElementPubDate])
                 {
                     // pubDate is expected to be an NSDate by SUAppcastItem, but the RSS class was returning an NSString
-                    NSDate *date = [NSDate dateWithNaturalLanguageString:[node stringValue]];
-                    if (date)
-                        dict[name] = date;
+                    NSString *string = node.stringValue;
+                    if (string) {
+                        NSDate *date = [NSDate dateWithNaturalLanguageString:string];
+                        if (date)
+                            dict[name] = date;
+                    }
 				}
 				else if ([name isEqualToString:SUAppcastElementDeltas])
 				{
@@ -188,7 +191,9 @@
                     NSMutableArray *tags = [NSMutableArray array];
                     NSEnumerator *childEnum = [[node children] objectEnumerator];
                     for (NSXMLNode *child in childEnum) {
-                        [tags addObject:[child name]];
+                        NSString *childName = child.name;
+                        if (childName)
+                            [tags addObject:childName];
                     }
                     dict[name] = tags;
                 }

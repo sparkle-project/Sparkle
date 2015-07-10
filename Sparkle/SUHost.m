@@ -41,7 +41,7 @@ typedef struct {
 {
 	if ((self = [super init]))
 	{
-        NSParameterAssert(aBundle);
+        SUParameterAssert(aBundle);
         self.bundle = aBundle;
         if (![self.bundle bundleIdentifier]) {
             SULog(@"Error: the bundle being updated at %@ has no %@! This will cause preference read/write to not work properly.", self.bundle, kCFBundleIdentifierKey);
@@ -53,7 +53,8 @@ typedef struct {
         }
 
         // If we're using the main bundle's defaults we'll use the standard user defaults mechanism, otherwise we have to get CF-y.
-        usesStandardUserDefaults = !self.defaultsDomain || [self.defaultsDomain isEqualToString:[[NSBundle mainBundle] bundleIdentifier]];
+        NSString *mainBundleIdentifier = NSBundle.mainBundle.bundleIdentifier;
+        usesStandardUserDefaults = !self.defaultsDomain || [self.defaultsDomain isEqualToString:mainBundleIdentifier];
     }
     return self;
 }

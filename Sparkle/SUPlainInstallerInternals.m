@@ -61,14 +61,14 @@ static inline void PerformOnMainThreadSync(dispatch_block_t theBlock)
 // Authorization code based on generous contribution from Allan Odgaard. Thanks, Allan!
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations" // this is terrible; will fix later probably
-static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char *executablePath, AuthorizationFlags options, const char *const *arguments)
+static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char *executablePath, AuthorizationFlags options, char *const *arguments)
 {
     // *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
     sig_t oldSigChildHandler = signal(SIGCHLD, SIG_DFL);
     BOOL returnValue = YES;
 
-	if (AuthorizationExecuteWithPrivileges(authorization, executablePath, options, (char* const*)arguments, NULL) == errAuthorizationSuccess)
+	if (AuthorizationExecuteWithPrivileges(authorization, executablePath, options, arguments, NULL) == errAuthorizationSuccess)
 	{
         int status;
         pid_t pid = wait(&status);
@@ -172,9 +172,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
     // *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
-    const char *srcPath = [src fileSystemRepresentation];
-    const char *tmpPath = [tmp fileSystemRepresentation];
-    const char *dstPath = [dst fileSystemRepresentation];
+    char srcPath[PATH_MAX] = {0};
+    [src getFileSystemRepresentation:srcPath maxLength:sizeof(srcPath)];
+
+    char tmpPath[PATH_MAX] = {0};
+    [tmp getFileSystemRepresentation:tmpPath maxLength:sizeof(tmpPath)];
+
+    char dstPath[PATH_MAX] = {0};
+    [dst getFileSystemRepresentation:dstPath maxLength:sizeof(dstPath)];
 
     struct stat dstSB;
     if (stat(dstPath, &dstSB) != 0) // Doesn't exist yet, try containing folder.
@@ -228,16 +233,16 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
         if (res) // Set permissions while it's still in source, so we have it with working and correct perms when it arrives at destination.
         {
-            const char *coParams[] = { "-R", uidgid, srcPath, NULL };
+            char *coParams[] = { "-R", uidgid, srcPath, NULL };
             res = AuthorizationExecuteWithPrivilegesAndWait(auth, "/usr/sbin/chown", kAuthorizationFlagDefaults, coParams);
             if (!res)
-                SULog(@"chown -R %s %s failed.", uidgid, srcPath);
+                SULog(@"chown -R %@ %@ failed.", @(uidgid), @(srcPath));
         }
 
         BOOL haveDst = [[NSFileManager defaultManager] fileExistsAtPath:dst];
         if (res && haveDst) // If there's something at our tmp path (previous failed update or whatever) delete that first.
         {
-            const char *rmParams[] = { "-rf", tmpPath, NULL };
+            char *rmParams[] = { "-rf", tmpPath, NULL };
             res = AuthorizationExecuteWithPrivilegesAndWait(auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams);
             if (!res)
                 SULog(@"rm failed");
@@ -245,7 +250,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
         if (res && haveDst) // Move old exe to tmp path.
         {
-            const char *mvParams[] = { "-f", dstPath, tmpPath, NULL };
+            char *mvParams[] = { "-f", dstPath, tmpPath, NULL };
             res = AuthorizationExecuteWithPrivilegesAndWait(auth, "/bin/mv", kAuthorizationFlagDefaults, mvParams);
             if (!res)
                 SULog(@"mv 1 failed");
@@ -253,7 +258,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
         if (res) // Move new exe to old exe's path.
         {
-            const char *mvParams2[] = { "-f", srcPath, dstPath, NULL };
+            char *mvParams2[] = { "-f", srcPath, dstPath, NULL };
             res = AuthorizationExecuteWithPrivilegesAndWait(auth, "/bin/mv", kAuthorizationFlagDefaults, mvParams2);
             if (!res)
                 SULog(@"mv 2 failed");
@@ -304,9 +309,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
     // *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
-    const char *srcPath = [src fileSystemRepresentation];
-    const char *dstPath = [dst fileSystemRepresentation];
-    const char *dstContainerPath = [[dst stringByDeletingLastPathComponent] fileSystemRepresentation];
+    char srcPath[PATH_MAX] = {0};
+    [src getFileSystemRepresentation:srcPath maxLength:sizeof(srcPath)];
+
+    char dstPath[PATH_MAX] = {0};
+    [dst getFileSystemRepresentation:dstPath maxLength:sizeof(dstPath)];
+
+    char dstContainerPath[PATH_MAX] = {0};
+    [dst.stringByDeletingLastPathComponent getFileSystemRepresentation:dstContainerPath maxLength:sizeof(dstContainerPath)];
 
     struct stat dstSB;
     stat(dstContainerPath, &dstSB);
@@ -332,7 +342,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
         if (res) // Set permissions while it's still in source, so we have it with working and correct perms when it arrives at destination.
         {
-            const char *coParams[] = { "-R", uidgid, srcPath, NULL };
+            char *coParams[] = { "-R", uidgid, srcPath, NULL };
             res = AuthorizationExecuteWithPrivilegesAndWait(auth, "/usr/sbin/chown", kAuthorizationFlagDefaults, coParams);
             if (!res)
                 SULog(@"Can't set permissions");
@@ -341,7 +351,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         BOOL haveDst = [[NSFileManager defaultManager] fileExistsAtPath:dst];
         if (res && haveDst) // If there's something at our tmp path (previous failed update or whatever) delete that first.
         {
-            const char *rmParams[] = { "-rf", dstPath, NULL };
+            char *rmParams[] = { "-rf", dstPath, NULL };
             res = AuthorizationExecuteWithPrivilegesAndWait(auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams);
             if (!res)
                 SULog(@"Can't remove destination file");
@@ -349,7 +359,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
         if (res) // Move!.
         {
-            const char *mvParams[] = { "-f", srcPath, dstPath, NULL };
+            char *mvParams[] = { "-f", srcPath, dstPath, NULL };
             res = AuthorizationExecuteWithPrivilegesAndWait(auth, "/bin/mv", kAuthorizationFlagDefaults, mvParams);
             if (!res)
                 SULog(@"Can't move source file");
@@ -378,7 +388,8 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
     // *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
-    const char *srcPath = [src fileSystemRepresentation];
+    char srcPath[PATH_MAX] = {0};
+    [src getFileSystemRepresentation:srcPath maxLength:sizeof(srcPath)];
 
     AuthorizationRef auth = NULL;
     OSStatus authStat = errAuthorizationDenied;
@@ -397,7 +408,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
         if (res) // If there's something at our tmp path (previous failed update or whatever) delete that first.
         {
-            const char *rmParams[] = { "-rf", srcPath, NULL };
+            char *rmParams[] = { "-rf", srcPath, NULL };
             res = AuthorizationExecuteWithPrivilegesAndWait(auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams);
             if (!res)
                 SULog(@"Can't remove destination file");
