@@ -11,6 +11,7 @@
 #import "SUUnarchiver.h"
 #import "SUPipedUnarchiver.h"
 
+#if __clang_major__ >= 6
 @interface SUPipedUnarchiverTest : XCTestCase <SUUnarchiverDelegate>
 
 @property (nonatomic, strong) XCTestExpectation *unarchived;
@@ -78,3 +79,4 @@
 }
 
 @end
+#endif

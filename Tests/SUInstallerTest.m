@@ -30,6 +30,7 @@
     [super tearDown];
 }
 
+#if __clang_major__ >= 6
 - (void)testInstallIfRoot
 {
     uid_t uid = getuid();
@@ -61,5 +62,6 @@
     [self waitForExpectationsWithTimeout:40 handler:nil];
     [fm removeItemAtPath:expectedDestination error:nil];
 }
+#endif
 
 @end
