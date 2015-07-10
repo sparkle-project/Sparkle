@@ -40,7 +40,7 @@
 
 #define SAIS_MYMALLOC(_num, _type) ((_type *)malloc((_num) * sizeof(_type)))
 #define SAIS_MYFREE(_ptr, _num, _type) free((_ptr))
-#define chr(_a) (cs == sizeof(sais_index_type) ? ((sais_index_type *)T)[(_a)] : ((unsigned char *)T)[(_a)])
+#define chr(_a) (cs == sizeof(sais_index_type) ? ((const sais_index_type *)T)[(_a)] : ((const unsigned char *)T)[(_a)])
 
 /* find the start or end of each bucket */
 static

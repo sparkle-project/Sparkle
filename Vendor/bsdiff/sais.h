@@ -24,8 +24,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _SAIS_H
-#define _SAIS_H 1
+#ifndef SAIS_H
+#define SAIS_H 1
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,4 +56,4 @@ sais_int_bwt(const sais_index_type *T, sais_index_type *U, sais_index_type *A, i
 } /* extern "C" */
 #endif /* __cplusplus */
 
-#endif /* _SAIS_H */
+#endif /* SAIS_H */
