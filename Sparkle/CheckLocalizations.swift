@@ -12,21 +12,21 @@ func escapeHTML(str: String) -> String {
     die("NSXMLNode failure"); return ""
 }
 
-let args = NSProcessInfo.processInfo().arguments
-if args.count < 3 {
+let ud = NSUserDefaults.standardUserDefaults()
+let sparkleRoot = ud.objectForKey("root") as? String
+let htmlPath = ud.objectForKey("htmlPath") as? String
+if sparkleRoot == nil || htmlPath == nil {
     die("Missing arguments")
 }
-let sparkleRoot = args[1] as! String
-let htmlPath = args[2] as! String
 
-let enStringsPath = sparkleRoot + "/Sparkle/en.lproj/Sparkle.strings"
+let enStringsPath = sparkleRoot! + "/Sparkle/en.lproj/Sparkle.strings"
 let enStringsDict = NSDictionary(contentsOfFile: enStringsPath)
 if enStringsDict == nil {
     die("Invalid English strings")
 }
 let enStringsDictKeys = enStringsDict!.allKeys
 
-let dirPath = sparkleRoot + "/Sparkle"
+let dirPath = sparkleRoot! + "/Sparkle"
 let dirContents = NSFileManager.defaultManager().contentsOfDirectoryAtPath(dirPath, error: nil) as! [String]
 let css =
     "body { font-family: sans-serif; font-size: 10pt; }" +
@@ -93,6 +93,6 @@ for dirEntry in dirContents {
 html += "</body></html>"
 
 var err: NSError?
-if !html.writeToFile(htmlPath, atomically: true, encoding: NSUTF8StringEncoding, error: &err) {
+if !html.writeToFile(htmlPath!, atomically: true, encoding: NSUTF8StringEncoding, error: &err) {
     die("Can't write report: \(err)")
 }
