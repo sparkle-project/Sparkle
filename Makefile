@@ -28,6 +28,5 @@ ci:
 	done
 
 check-localizations:
-	xcrun swiftc -sdk `xcrun --show-sdk-path` -o "$(TMPDIR)/CheckLocalizations" Sparkle/CheckLocalizations.swift
-	"$(TMPDIR)/CheckLocalizations" -root . -htmlPath "$(TMPDIR)/LocalizationsReport.htm"
+	./Sparkle/CheckLocalizations.swift -root . -htmlPath "$(TMPDIR)/LocalizationsReport.htm"
 	open "$(TMPDIR)/LocalizationsReport.htm"

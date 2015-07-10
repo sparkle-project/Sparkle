@@ -1,3 +1,5 @@
+#!/usr/bin/xcrun swift
+
 import Foundation
 
 func die(msg: String) {
