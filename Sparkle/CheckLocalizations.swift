@@ -1,5 +1,12 @@
 import Foundation
 
+func escapeHTML(str: String) -> String {
+    if let node = NSXMLNode.textWithStringValue(str) as? NSXMLNode {
+        return node.XMLString
+    }
+    return ""
+}
+
 let args = NSProcessInfo.processInfo().arguments
 if args.count < 3 {
     println("ERROR: Missing arguments.")
@@ -71,13 +78,13 @@ for dirEntry in dirContents {
     unused.sort(sorter)
     
     for key in missing {
-        html += "<span class=\"missing\">Missing \"\(key)\"</span><br/>\n"
+        html += "<span class=\"missing\">Missing \"\(escapeHTML(key))\"</span><br/>\n"
     }
     for key in unlocalized {
-        html += "<span class=\"unlocalized\">Unlocalized \"\(key)\"</span><br/>\n"
+        html += "<span class=\"unlocalized\">Unlocalized \"\(escapeHTML(key))\"</span><br/>\n"
     }
     for key in unused {
-        html += "<span class=\"unused\">Unused \"\(key)\"</span><br/>\n"
+        html += "<span class=\"unused\">Unused \"\(escapeHTML(key))\"</span><br/>\n"
     }
 }
 html += "</body></html>"
