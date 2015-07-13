@@ -444,7 +444,8 @@
     if ([updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)])
         [updaterDelegate updaterWillRelaunchApplication:self.updater];
 
-    if (!self.relaunchPath || ![[NSFileManager defaultManager] fileExistsAtPath:self.relaunchPath]) {
+    NSString *relaunchToolPath = [[NSBundle bundleWithPath:self.relaunchPath] executablePath];
+    if (!relaunchToolPath || ![[NSFileManager defaultManager] fileExistsAtPath:self.relaunchPath]) {
         // Note that we explicitly use the host app's name here, since updating plugin for Mail relaunches Mail, not just the plugin.
         [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{
             NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [self.host name]],
@@ -458,7 +459,6 @@
     if ([updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
         pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:self.updater];
     }
-    NSString *relaunchToolPath = [[NSBundle bundleWithPath:self.relaunchPath] executablePath];
     [NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:@[[self.host bundlePath],
                                                                     pathToRelaunch,
                                                                     [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]],
