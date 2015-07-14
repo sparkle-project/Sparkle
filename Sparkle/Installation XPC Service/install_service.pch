@@ -6,9 +6,5 @@
 //
 //
 
-#define SPARKLE_BUNDLE [NSBundle mainBundle]
-#define SULocalizedString(key,comment) NSLocalizedStringFromTableInBundle(key, @"Sparkle", SPARKLE_BUNDLE, comment)
-
-#import "SUErrors.h"
-#import "SUConstants.h"
+#import "Sparkle.pch"
 #import "SULog.h"
