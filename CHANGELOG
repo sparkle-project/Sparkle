@@ -1,3 +1,20 @@
+# 1.11.0
+
+* Big improvements to code signing and DSA verification
+   - Sparkle now checks not only whether an update is correctly signed, but also whether the updated version will be able to verify future updates. Updates now must either use DSA keys correctly, or not try to use them at all. Same goes for Apple Code Signing.
+   - Rely on code signing and the DSA key in the new app instead of appcast. If the new app has a public DSA key, then the appcast item must have a DSA signature for the app, even if the app is code signed. (Zorg)
+* More verbose error message when DSA keys don't match (Kornel Lesiński)
+* Added delegate methods for pre-download and immediately post-failed-download (Isaac Greenspan)
+* Fix Lucida Grande is always used for release notes (LIU Dongyuan / 柳东原)
+* Only remove quarantine with setResourceValue: when it's present. Fixes "Unable to quarantine: 93" messages from showing up in the console. (Zorg)
+* Fixed const and nullability warnings (Jake Petroules, Kornel Lesiński)
+* Replaced deprecated NSRunAlertPanel/alertWithMessageText (Kevin Wojniak)
+* Imported the Foundation umbrella header in all the public headers (C.W. Betts)
+* pt-BR localization update (Victor Figueiredo)
+* Reject unsupported code-signing xattrs in binary delta (Zorg)
+* Fixed crash while applying delta update (antonc27)
+* Added logging of appcast/download URL on error (Kornel Lesiński)
+
 # 1.10.0
 
 * Massive improvements to the BinaryDelta tool (Zorg)
