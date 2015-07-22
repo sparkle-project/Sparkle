@@ -24,13 +24,5 @@
 	<string>${CURRENT_PROJECT_VERSION}</string>
 	<key>NSPrincipalClass</key>
 	<string></string>
-	<key>SUAppendVersionNumber</key>
-	<string>${SPARKLE_APPEND_VERSION_NUMBER}</string>
-	<key>SUEnableAutomatedDowngrades</key>
-	<string>${SPARKLE_AUTOMATED_DOWNGRADES}</string>
-	<key>SUNormalizeInstalledApplicationName</key>
-	<string>${SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME}</string>
-	<key>SURelaunchToolName</key>
-	<string>${SPARKLE_RELAUNCH_TOOL_NAME}</string>
 </dict>
 </plist>
