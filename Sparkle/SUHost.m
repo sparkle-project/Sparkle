@@ -25,7 +25,7 @@ typedef struct {
 
 @interface SUHost ()
 
-@property (strong, readwrite) NSBundle *bundle;
+@property (strong, readwrite) NSBundle *bundle, *sparkleBundle;
 @property (copy) NSString *defaultsDomain;
 @property (assign) BOOL usesStandardUserDefaults;
 
@@ -33,7 +33,7 @@ typedef struct {
 
 @implementation SUHost
 
-@synthesize bundle;
+@synthesize bundle, sparkleBundle;
 @synthesize defaultsDomain;
 @synthesize usesStandardUserDefaults;
 
@@ -45,6 +45,12 @@ typedef struct {
         self.bundle = aBundle;
         if (![self.bundle bundleIdentifier]) {
             SULog(@"Error: the bundle being updated at %@ has no %@! This will cause preference read/write to not work properly.", self.bundle, kCFBundleIdentifierKey);
+        }
+
+        self.sparkleBundle = [NSBundle bundleForClass:[self class]];
+        if (!self.sparkleBundle) {
+            SULog(@"Error: SUHost can't find Sparkle.framework it belongs to");
+            return nil;
         }
 
         self.defaultsDomain = [self.bundle objectForInfoDictionaryKey:SUDefaultsDomainKey];
@@ -91,7 +97,7 @@ typedef struct {
 
 - (NSString *)installationPath
 {
-    if ([[[NSBundle bundleWithIdentifier:SUBundleIdentifier] infoDictionary][SUNormalizeInstalledApplicationNameKey] boolValue]) {
+    if ([[self.sparkleBundle infoDictionary][SUNormalizeInstalledApplicationNameKey] boolValue]) {
         // We'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
         NSString *normalizedAppPath = [[[self.bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[self.bundle bundlePath] pathExtension]]];
         if (![[NSFileManager defaultManager] fileExistsAtPath:[[[self.bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[self.bundle bundlePath] pathExtension]]]]) {
