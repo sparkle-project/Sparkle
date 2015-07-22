@@ -11,8 +11,9 @@
 
 #import "SUWindowController.h"
 #import "SUVersionDisplayProtocol.h"
+#import <WebKit/WebKit.h>
 
-@protocol SUUpdateAlertDelegate;
+@protocol SUUpdateAlertDelegate, WebPolicyDelegate, WebFrameLoadDelegate;
 
 typedef NS_ENUM(NSInteger, SUUpdateAlertChoice) {
     SUInstallUpdateChoice,
@@ -22,7 +23,7 @@ typedef NS_ENUM(NSInteger, SUUpdateAlertChoice) {
 };
 
 @class WebView, SUAppcastItem, SUHost;
-@interface SUUpdateAlert : SUWindowController
+@interface SUUpdateAlert : SUWindowController<WebPolicyDelegate, WebFrameLoadDelegate>
 
 @property (weak) id<SUVersionDisplay> versionDisplayer;
 
