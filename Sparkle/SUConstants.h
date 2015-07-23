@@ -51,11 +51,10 @@ extern NSString *const SUPromptUserOnFirstLaunchKey;
 extern NSString *const SUKeepDownloadOnFailedInstallKey;
 extern NSString *const SUDefaultsDomainKey;
 extern NSString *const SUFixedHTMLDisplaySizeKey __attribute__((deprecated("This key is obsolete and has no effect.")));
-
-extern NSString *const SUAppendVersionNumberKey;
-extern NSString *const SUEnableAutomatedDowngradesKey;
-extern NSString *const SUNormalizeInstalledApplicationNameKey;
-extern NSString *const SURelaunchToolNameKey;
+extern NSString *const SUAppendVersionNumberKey __attribute__((deprecated("This key is obsolete. See SPARKLE_APPEND_VERSION_NUMBER.")));
+extern NSString *const SUEnableAutomatedDowngradesKey __attribute__((deprecated("This key is obsolete. See SPARKLE_AUTOMATED_DOWNGRADES.")));
+extern NSString *const SUNormalizeInstalledApplicationNameKey __attribute__((deprecated("This key is obsolete. SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME.")));
+extern NSString *const SURelaunchToolNameKey __attribute__((deprecated("This key is obsolete. SPARKLE_RELAUNCH_TOOL_NAME.")));
 
 // -----------------------------------------------------------------------------
 //	Appcast keys::

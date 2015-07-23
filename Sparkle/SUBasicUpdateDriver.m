@@ -419,19 +419,19 @@
         [updaterDelegate updater:self.updater willInstallUpdate:self.updateItem];
     }
 
-    NSBundle *sparkleBundle = self.host.sparkleBundle;
+    NSBundle *sparkleBundle = self.updater.sparkleBundle;
 
     // Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
     // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
-    NSString *const relaunchPathToCopy = [sparkleBundle pathForResource:[[sparkleBundle infoDictionary] objectForKey:SURelaunchToolNameKey] ofType:@"app"];
+    NSString *const relaunchToolName = @"" SPARKLE_RELAUNCH_TOOL_NAME;
+    NSString *const relaunchPathToCopy = [sparkleBundle pathForResource:relaunchToolName ofType:@"app"];
     if (relaunchPathToCopy != nil) {
         NSString *targetPath = [self.host.appCachePath stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
         // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
         NSError *error = nil;
         [[NSFileManager defaultManager] createDirectoryAtPath:[targetPath stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:@{} error:&error];
-        
-        BOOL appendVersion = [[sparkleBundle infoDictionary][SUAppendVersionNumberKey] boolValue];
-        if ([SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil appendVersion:appendVersion error:&error]) {
+                
+        if ([SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil appendVersion:SPARKLE_APPEND_VERSION_NUMBER error:&error]) {
             self.relaunchPath = targetPath;
         } else {
             [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{
