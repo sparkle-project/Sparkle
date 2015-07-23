@@ -25,7 +25,7 @@ typedef struct {
 
 @interface SUHost ()
 
-@property (strong, readwrite) NSBundle *bundle, *sparkleBundle;
+@property (strong, readwrite) NSBundle *bundle;
 @property (copy) NSString *defaultsDomain;
 @property (assign) BOOL usesStandardUserDefaults;
 
@@ -33,7 +33,7 @@ typedef struct {
 
 @implementation SUHost
 
-@synthesize bundle, sparkleBundle;
+@synthesize bundle;
 @synthesize defaultsDomain;
 @synthesize usesStandardUserDefaults;
 
@@ -45,12 +45,6 @@ typedef struct {
         self.bundle = aBundle;
         if (![self.bundle bundleIdentifier]) {
             SULog(@"Error: the bundle being updated at %@ has no %@! This will cause preference read/write to not work properly.", self.bundle, kCFBundleIdentifierKey);
-        }
-
-        self.sparkleBundle = [NSBundle bundleForClass:[self class]];
-        if (!self.sparkleBundle) {
-            SULog(@"Error: SUHost can't find Sparkle.framework it belongs to");
-            return nil;
         }
 
         self.defaultsDomain = [self.bundle objectForInfoDictionaryKey:SUDefaultsDomainKey];

@@ -14,7 +14,6 @@
 @interface SUHost : NSObject
 
 @property (strong, readonly) NSBundle *bundle;
-@property (strong, readonly) NSBundle *sparkleBundle;
 
 + (NSString *)systemVersionString;
 
