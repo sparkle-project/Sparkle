@@ -15,8 +15,6 @@
 #import "SUUnarchiver.h"
 #import "SUConstants.h"
 #import "SULog.h"
-#import "SUPlainInstaller.h"
-#import "SUPlainInstallerInternals.h"
 #import "SUBinaryDeltaCommon.h"
 #import "SUCodeSigningVerifier.h"
 #import "SUUpdater_Private.h"
@@ -420,17 +418,30 @@
     }
 
     NSBundle *sparkleBundle = [NSBundle bundleWithIdentifier:SUBundleIdentifier];
-
     // Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
     // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
     NSString *const relaunchPathToCopy = [sparkleBundle pathForResource:[[sparkleBundle infoDictionary] objectForKey:SURelaunchToolNameKey] ofType:@"app"];
     if (relaunchPathToCopy != nil) {
         NSString *targetPath = [self.host.appCachePath stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
-        // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
+        
+        NSFileManager *fileManager = [[NSFileManager alloc] init];
+        
+        BOOL shouldAbortUpdate = NO;
         NSError *error = nil;
-        [[NSFileManager defaultManager] createDirectoryAtPath:[targetPath stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:@{} error:&error];
-
-        if ([SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil error:&error]) {
+        if ([fileManager fileExistsAtPath:targetPath]) {
+            if (![fileManager removeItemAtPath:targetPath error:&error]) {
+                shouldAbortUpdate = YES;
+            }
+        } else {
+            if (![fileManager createDirectoryAtPath:[targetPath stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:@{} error:&error]) {
+                shouldAbortUpdate = YES;
+            }
+        }
+        
+        // We only need to run our copy of the app by spawning a task
+        // Since we are copying the app to a directory that is write-accessible, we don't need to muck with owner/group IDs
+        // And since we spawn a task, we don't need to clear the quarantine bits
+        if (!shouldAbortUpdate && [fileManager copyItemAtPath:relaunchPathToCopy toPath:targetPath error:&error]) {
             self.relaunchPath = targetPath;
         } else {
             [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{
