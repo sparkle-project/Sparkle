@@ -377,6 +377,31 @@
     [self installWithToolAndRelaunch:relaunch displayingUserInterface:relaunch];
 }
 
+// Creates intermediate directories up until targetPath if they don't already exist,
+// and removes the directory at targetPath if one already exists there
+- (BOOL)preparePathForRelaunchTool:(NSString *)targetPath error:(NSError * __autoreleasing *)error
+{
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    if ([fileManager fileExistsAtPath:targetPath]) {
+        NSError *removeError = nil;
+        if (![fileManager removeItemAtPath:targetPath error:&removeError]) {
+            if (error != NULL) {
+                *error = removeError;
+            }
+            return NO;
+        }
+    } else {
+        NSError *createDirectoryError = nil;
+        if (![fileManager createDirectoryAtPath:[targetPath stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:@{} error:&createDirectoryError]) {
+            if (error != NULL) {
+                *error = createDirectoryError;
+            }
+            return NO;
+        }
+    }
+    return YES;
+}
+
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
 {
     assert(self.updateItem);
@@ -425,23 +450,12 @@
         NSString *targetPath = [self.host.appCachePath stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
         
         NSFileManager *fileManager = [[NSFileManager alloc] init];
-        
-        BOOL shouldAbortUpdate = NO;
         NSError *error = nil;
-        if ([fileManager fileExistsAtPath:targetPath]) {
-            if (![fileManager removeItemAtPath:targetPath error:&error]) {
-                shouldAbortUpdate = YES;
-            }
-        } else {
-            if (![fileManager createDirectoryAtPath:[targetPath stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:@{} error:&error]) {
-                shouldAbortUpdate = YES;
-            }
-        }
         
         // We only need to run our copy of the app by spawning a task
         // Since we are copying the app to a directory that is write-accessible, we don't need to muck with owner/group IDs
         // And since we spawn a task, we don't need to clear the quarantine bits
-        if (!shouldAbortUpdate && [fileManager copyItemAtPath:relaunchPathToCopy toPath:targetPath error:&error]) {
+        if ([self preparePathForRelaunchTool:targetPath error:&error] && [fileManager copyItemAtPath:relaunchPathToCopy toPath:targetPath error:&error]) {
             self.relaunchPath = targetPath;
         } else {
             [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{
