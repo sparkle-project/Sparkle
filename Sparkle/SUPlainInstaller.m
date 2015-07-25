@@ -15,7 +15,23 @@
 
 @implementation SUPlainInstaller
 
-+ (BOOL)performInstallationToURL:(NSURL *)installationURL withOldURL:(NSURL *)oldURL newURL:(NSURL *)newURL error:(NSError * __autoreleasing *)error
+// Returns the bundle version from the specified host that is appropriate to use as a filename, or nil if we're unable to retrieve one
++ (NSString *)bundleVersionAppropriateForFilenameFromHost:(SUHost *)host
+{
+    NSString *bundleVersion = [host objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
+    NSString *trimmedVersion = @"";
+    
+    if (bundleVersion != nil) {
+        NSMutableCharacterSet *validCharacters = [NSMutableCharacterSet alphanumericCharacterSet];
+        [validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
+        
+        trimmedVersion = [bundleVersion stringByTrimmingCharactersInSet:[validCharacters invertedSet]];
+    }
+    
+    return trimmedVersion.length > 0 ? trimmedVersion : nil;
+}
+
++ (BOOL)performInstallationToURL:(NSURL *)installationURL fromUpdateAtURL:(NSURL *)newURL withHost:(SUHost *)host error:(NSError * __autoreleasing *)error
 {
     SUFileManager *fileManager = [[SUFileManager alloc] init];
     
@@ -44,12 +60,29 @@
         SULog(@"Failed to release quarantine at %@ with error %@", newTempURL.path, quarantineError);
     }
     
+    NSURL *oldURL = [NSURL fileURLWithPath:host.bundlePath];
     if (![fileManager changeOwnerAndGroupOfItemAtRootURL:newTempURL toMatchURL:oldURL error:error]) {
         // But this is big enough of a deal to fail
         SULog(@"Failed to change owner and group of new app at %@ to match old app at %@", newTempURL.path, oldURL.path);
         [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
         return NO;
     }
+    
+    // Decide on a destination name we should use for the older app when we move it around the file system
+    // TODO: will need to merge finding sparkle bundle this with newer code
+    NSBundle *sparkleBundle = [NSBundle bundleWithIdentifier:SUBundleIdentifier];
+    BOOL appendVersion = [[sparkleBundle infoDictionary][SUAppendVersionNumberKey] boolValue];
+    
+    NSString *oldDestinationName = nil;
+    if (appendVersion) {
+        NSString *oldBundleVersion = [self bundleVersionAppropriateForFilenameFromHost:host];
+        
+        oldDestinationName = [oldURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingFormat:@" (%@)", oldBundleVersion != nil ? oldBundleVersion : @"old"];
+    } else {
+        oldDestinationName = oldURL.lastPathComponent.stringByDeletingPathExtension;
+    }
+    
+    NSString *oldDestinationNameWithPathExtension = [oldDestinationName stringByAppendingPathExtension:oldURL.pathExtension];
     
     // If the installation and old URL differ, the sooner we can install our new app
     // because we won't have to move the old app out of the way first
@@ -69,12 +102,12 @@
         
         // Create a temporary directory for our old app that resides on its volume
         NSError *makeOldTempDirectoryError = nil;
-        NSURL *tempOldDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:oldURL.lastPathComponent.stringByDeletingPathExtension appropriateForDirectoryURL:oldURL.URLByDeletingLastPathComponent error:&makeOldTempDirectoryError];
+        NSURL *tempOldDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:oldDestinationName appropriateForDirectoryURL:oldURL.URLByDeletingLastPathComponent error:&makeOldTempDirectoryError];
         if (tempOldDirectoryURL == nil) {
             SULog(@"Failed to create temporary directory for old app at %@ after finishing installation. This is not a fatal error. Error: %@", oldURL.path, makeOldTempDirectoryError);
         } else {
             // Move the old app to the temporary directory
-            NSURL *oldTempURL = [tempOldDirectoryURL URLByAppendingPathComponent:oldURL.lastPathComponent];
+            NSURL *oldTempURL = [tempOldDirectoryURL URLByAppendingPathComponent:oldDestinationNameWithPathExtension];
             NSError *moveOldAppError = nil;
             if (![fileManager moveItemAtURL:oldURL toURL:oldTempURL error:&moveOldAppError]) {
                 SULog(@"Failed to move the old app at %@ to a temporary location at %@. This is not a fatal error. Error: %@", oldURL.path, oldTempURL.path, moveOldAppError);
@@ -90,7 +123,7 @@
         }
     } else {
         // Create a temporary directory for our old app that resides on its volume
-        NSURL *tempOldDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:oldURL.lastPathComponent.stringByDeletingPathExtension appropriateForDirectoryURL:oldURL.URLByDeletingLastPathComponent error:error];
+        NSURL *tempOldDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:oldDestinationName appropriateForDirectoryURL:oldURL.URLByDeletingLastPathComponent error:error];
         if (tempOldDirectoryURL == nil) {
             SULog(@"Failed to create temporary directory for old app at %@", oldURL.path);
             [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
@@ -98,7 +131,7 @@
         }
         
         // Move the old app to the temporary directory
-        NSURL *oldTempURL = [tempOldDirectoryURL URLByAppendingPathComponent:oldURL.lastPathComponent];
+        NSURL *oldTempURL = [tempOldDirectoryURL URLByAppendingPathComponent:oldDestinationNameWithPathExtension];
         if (![fileManager moveItemAtURL:oldURL toURL:oldTempURL error:error]) {
             SULog(@"Failed to move the old app at %@ to a temporary location at %@", oldURL.path, oldTempURL.path);
             
@@ -153,11 +186,7 @@
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSError *error = nil;
-        NSURL *oldURL = [NSURL fileURLWithPath:[host bundlePath]];
-        NSURL *newURL = [NSURL fileURLWithPath:path];
-        NSURL *installationURL = [NSURL fileURLWithPath:installationPath];
-        
-        BOOL result = [self performInstallationToURL:installationURL withOldURL:oldURL newURL:newURL error:&error];
+        BOOL result = [self performInstallationToURL:[NSURL fileURLWithPath:installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:path] withHost:host error:&error];
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [self finishInstallationToPath:installationPath withResult:result error:error completionHandler:completionHandler];
