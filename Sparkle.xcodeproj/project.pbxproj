@@ -175,6 +175,12 @@
 		7223E7631AD1AEFF008E3161 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
 		7268AC631AD634C200C3E0C1 /* SUBinaryDeltaCreate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7268AC621AD634C200C3E0C1 /* SUBinaryDeltaCreate.m */; };
 		72D4DAA11AD7632900B211E2 /* SUBinaryDeltaCreate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7268AC621AD634C200C3E0C1 /* SUBinaryDeltaCreate.m */; };
+		72E45CF31B640CDD005C701A /* SUTestApplicationDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E45CF21B640CDD005C701A /* SUTestApplicationDelegate.m */; };
+		72E45CF71B640DAE005C701A /* SUUpdateSettingsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E45CF51B640DAE005C701A /* SUUpdateSettingsWindowController.m */; };
+		72E45CF81B640DAE005C701A /* SUUpdateSettingsWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */; };
+		72E45CFC1B641961005C701A /* sparkletestcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CFB1B641961005C701A /* sparkletestcast.xml */; };
+		72E45CFE1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CFD1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem */; };
+		72E45D001B642354005C701A /* sign_update.sh in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CFF1B642354005C701A /* sign_update.sh */; };
 		767B61AC1972D488004E0C3C /* SUGuidedPackageInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 767B61AA1972D488004E0C3C /* SUGuidedPackageInstaller.h */; };
 		767B61AD1972D488004E0C3C /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */; };
 		767B61AE1972D488004E0C3C /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */; };
@@ -553,6 +559,14 @@
 		7223E7621AD1AEFF008E3161 /* sais.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sais.h; sourceTree = "<group>"; };
 		7268AC621AD634C200C3E0C1 /* SUBinaryDeltaCreate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBinaryDeltaCreate.m; sourceTree = "<group>"; };
 		7268AC641AD634E400C3E0C1 /* SUBinaryDeltaCreate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBinaryDeltaCreate.h; sourceTree = "<group>"; };
+		72E45CF11B640CDD005C701A /* SUTestApplicationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUTestApplicationDelegate.h; sourceTree = "<group>"; };
+		72E45CF21B640CDD005C701A /* SUTestApplicationDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUTestApplicationDelegate.m; sourceTree = "<group>"; };
+		72E45CF41B640DAE005C701A /* SUUpdateSettingsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdateSettingsWindowController.h; sourceTree = "<group>"; };
+		72E45CF51B640DAE005C701A /* SUUpdateSettingsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdateSettingsWindowController.m; sourceTree = "<group>"; };
+		72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SUUpdateSettingsWindowController.xib; sourceTree = "<group>"; };
+		72E45CFB1B641961005C701A /* sparkletestcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = sparkletestcast.xml; sourceTree = "<group>"; };
+		72E45CFD1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test_app_only_dsa_priv_dont_ever_do_this_for_real.pem; sourceTree = "<group>"; };
+		72E45CFF1B642354005C701A /* sign_update.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = sign_update.sh; path = bin/sign_update.sh; sourceTree = SOURCE_ROOT; };
 		767B61AA1972D488004E0C3C /* SUGuidedPackageInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUGuidedPackageInstaller.h; sourceTree = "<group>"; };
 		767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUGuidedPackageInstaller.m; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Sparkle-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Sparkle-Info.plist"; sourceTree = "<group>"; };
@@ -926,7 +940,15 @@
 			children = (
 				61B5F92A09C4CFD800B25A18 /* InfoPlist.strings */,
 				61B5F92409C4CFC900B25A18 /* main.m */,
+				72E45CF11B640CDD005C701A /* SUTestApplicationDelegate.h */,
+				72E45CF21B640CDD005C701A /* SUTestApplicationDelegate.m */,
+				72E45CF41B640DAE005C701A /* SUUpdateSettingsWindowController.h */,
+				72E45CF51B640DAE005C701A /* SUUpdateSettingsWindowController.m */,
+				72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */,
 				61B5F92C09C4CFD800B25A18 /* MainMenu.xib */,
+				72E45CFF1B642354005C701A /* sign_update.sh */,
+				72E45CFB1B641961005C701A /* sparkletestcast.xml */,
+				72E45CFD1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem */,
 				14732BBF1960F0AC00593899 /* test_app_only_dsa_pub.pem */,
 				61B5F90409C4CEE200B25A18 /* TestApplication-Info.plist */,
 			);
@@ -1302,8 +1324,12 @@
 			files = (
 				1420DF50196247F900203BB0 /* Images.xcassets in Resources */,
 				61B5F92E09C4CFD800B25A18 /* InfoPlist.strings in Resources */,
+				72E45D001B642354005C701A /* sign_update.sh in Resources */,
 				61B5F92F09C4CFD800B25A18 /* MainMenu.xib in Resources */,
+				72E45CFC1B641961005C701A /* sparkletestcast.xml in Resources */,
 				14732BC01960F2C200593899 /* test_app_only_dsa_pub.pem in Resources */,
+				72E45CF81B640DAE005C701A /* SUUpdateSettingsWindowController.xib in Resources */,
+				72E45CFE1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1461,6 +1487,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				61B5F93009C4CFDC00B25A18 /* main.m in Sources */,
+				72E45CF31B640CDD005C701A /* SUTestApplicationDelegate.m in Sources */,
+				72E45CF71B640DAE005C701A /* SUUpdateSettingsWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1842,6 +1870,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Weverything",
+					"-Wno-unused-macros",
+					"-Wno-gnu-statement-expression",
+					"-Wno-receiver-is-weak",
+					"-Wno-arc-repeated-use-of-weak",
+					"-Wno-objc-missing-property-synthesis",
+					"-Wno-auto-import",
+					"$(WARNING_CFLAGS_EXTRA)",
+				);
 			};
 			name = Debug;
 		};
@@ -1849,6 +1889,18 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Weverything",
+					"-Wno-unused-macros",
+					"-Wno-gnu-statement-expression",
+					"-Wno-receiver-is-weak",
+					"-Wno-arc-repeated-use-of-weak",
+					"-Wno-objc-missing-property-synthesis",
+					"-Wno-auto-import",
+					"$(WARNING_CFLAGS_EXTRA)",
+				);
 			};
 			name = Release;
 		};
