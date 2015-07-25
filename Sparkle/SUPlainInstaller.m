@@ -36,7 +36,7 @@
     SUFileManager *fileManager = [[SUFileManager alloc] init];
     
     // Create a temporary directory for our new app that resides on our destination's volume
-    NSURL *tempNewDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:[installationURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingString:@" (Incomplete)"] appropriateForDirectoryURL:installationURL.URLByDeletingLastPathComponent error:error];
+    NSURL *tempNewDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:[installationURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingString:@" (Incomplete Update)"] appropriateForDirectoryURL:installationURL.URLByDeletingLastPathComponent error:error];
     if (tempNewDirectoryURL == nil) {
         SULog(@"Failed to make new temp directory");
         return NO;

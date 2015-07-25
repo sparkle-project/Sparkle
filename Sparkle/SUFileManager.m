@@ -74,7 +74,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     OSStatus status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &_auth);
     if (status != errAuthorizationSuccess) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed creating authorization reference with status code %d", status] }];
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed creating authorization reference with status code %d.", status] }];
         }
         _auth = NULL;
         return NO;
@@ -131,7 +131,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
     if (![_fileManager fileExistsAtPath:@(XATTR_UTILITY_PATH)]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"%@ does not exist", @(XATTR_UTILITY_PATH)] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: @"xattr utility does not exist on this system." }];
         }
         return NO;
     }
@@ -139,7 +139,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     char path[PATH_MAX] = {0};
     if (![rootURL.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"%@ is not a valid file system representation", rootURL.path] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"File to remove (%@) cannot be represented as a valid file name.", rootURL.path.lastPathComponent] }];
         }
         return NO;
     }
@@ -147,7 +147,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     const char *xattrName = [name cStringUsingEncoding:NSASCIIStringEncoding];
     if (xattrName == NULL) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteInapplicableStringEncodingError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"%@ is not a valid ASCII convertible string", name] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteInapplicableStringEncodingError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Extended attribute %@ is not a valid ASCII convertible string.", name] }];
         }
         return NO;
     }
@@ -159,7 +159,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, XATTR_UTILITY_PATH, kAuthorizationFlagDefaults, (char *[]){ "-s", "-r", "-d", (char *)xattrName, path, NULL });
     
     if (!success && error != NULL) {
-        NSString *errorMessage = [NSString stringWithFormat:@"Authenticated xattr deletion for attribute %@ failed on %@", name, rootURL.path];
+        NSString *errorMessage = [NSString stringWithFormat:@"Authenticated extended attribute deletion for %@ failed on %@.", name, rootURL.path.lastPathComponent];
         *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey:errorMessage }];
     }
     
@@ -254,7 +254,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
                 return [self removeXAttrWithAuthentication:APPLE_QUARANTINE_IDENTIFIER fromRootURL:rootURL error:error];
             } else {
                 if (error != NULL) {
-                    *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove xattr %@ on %@", APPLE_QUARANTINE_IDENTIFIER, root] }];
+                    *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove file quarantine on %@.", root.lastPathComponent] }];
                 }
                 // Fail, but still try to release other items from quarantine
                 success = NO;
@@ -281,7 +281,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
                     } else {
                         // Make sure we haven't already run into an error
                         if (success && error != NULL) {
-                            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove xattr %@ on %@", APPLE_QUARANTINE_IDENTIFIER, filePath] }];
+                            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove file quarantine on %@.", filePath.lastPathComponent] }];
                         }
                         // Fail, but still try to release other items from quarantine
                         success = NO;
@@ -298,14 +298,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
     if (![_fileManager fileExistsAtPath:sourceURL.path]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source %@ does not exist", sourceURL.path] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source file to move (%@) does not exist.", sourceURL.path.lastPathComponent] }];
         }
         return NO;
     }
     
     if ([_fileManager fileExistsAtPath:destinationURL.path]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination %@ already exists", destinationURL.path] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination file to move (%@) already exists.", destinationURL.path.lastPathComponent] }];
         }
         return NO;
     }
@@ -329,7 +329,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     char sourcePath[PATH_MAX] = {0};
     if (![sourceURL.path getFileSystemRepresentation:sourcePath maxLength:sizeof(sourcePath)]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"%@ is not a valid file system representation", sourceURL.path] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"File to move (%@) cannot be represented as a valid file name.", sourceURL.path.lastPathComponent] }];
         }
         return NO;
     }
@@ -337,14 +337,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     char destinationPath[PATH_MAX] = {0};
     if (![destinationURL.path getFileSystemRepresentation:destinationPath maxLength:sizeof(destinationPath)]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"%@ is not a valid file system representation", destinationURL.path] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination (%@) cannot be represented as a valid file name.", destinationURL.path.lastPathComponent] }];
         }
         return NO;
     }
     
     if (!AuthorizationExecuteWithPrivilegesAndWait(_auth, "/bin/mv", kAuthorizationFlagDefaults, (char *[]){ "-f", sourcePath, destinationPath, NULL })) {
         if (error != NULL) {
-            NSString *errorMessage = [NSString stringWithFormat:@"Authenticated file move from %@ to %@ failed.", sourceURL, destinationURL];
+            NSString *errorMessage = [NSString stringWithFormat:@"Failed to perform authenticated file move for %@.", sourceURL.lastPathComponent];
             *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey:errorMessage }];
         }
         return NO;
@@ -357,14 +357,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
     if (![_fileManager fileExistsAtPath:targetURL.path]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Item at target %@ does not exist", targetURL.path] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to change owner & group IDs because %@ does not exist.", targetURL.path.lastPathComponent] }];
         }
         return NO;
     }
     
     if (![_fileManager fileExistsAtPath:matchURL.path]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Item at URL to match %@ does not exist", matchURL.path] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to match owner & group IDs because %@ does not exist.", matchURL.path.lastPathComponent] }];
         }
         return NO;
     }
@@ -391,7 +391,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     if (ownerID == nil) {
         // shouldn't be possible to error here, but just in case
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoPermissionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"owner ID could not be read from %@", matchURL.path] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoPermissionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Owner ID could not be read from %@.", matchURL.path.lastPathComponent] }];
         }
         return NO;
     }
@@ -400,7 +400,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     if (groupID == nil) {
         // shouldn't be possible to error here, but just in case
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoPermissionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"group ID could not be read from %@", matchURL.path] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoPermissionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Group ID could not be read from %@.", matchURL.path.lastPathComponent] }];
         }
         return NO;
     }
@@ -417,7 +417,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         char path[PATH_MAX] = {0};
         if (![url.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
             if (error != NULL) {
-                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"%@ is not a valid file system representation", url.path] }];
+                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"File to change owner & group (%@) cannot be represented as a valid file name.", url.path.lastPathComponent] }];
             }
             return NO;
         }
@@ -428,7 +428,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
                 break;
             } else {
                 if (error != NULL) {
-                    *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to chown %@ with owner ID %u and group ID %u", url.path, ownerID.unsignedIntValue, groupID.unsignedIntValue] }];
+                    *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to change owner & group for %@ with owner ID %u and group ID %u.", url.path.lastPathComponent, ownerID.unsignedIntValue, groupID.unsignedIntValue] }];
                 }
                 return NO;
             }
@@ -442,7 +442,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     char targetPath[PATH_MAX] = {0};
     if (![targetURL.path getFileSystemRepresentation:targetPath maxLength:sizeof(targetPath)]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"%@ is not a valid file system representation", targetURL.path] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Target file (%@) cannot be represented as a valid file name.", targetURL.path.lastPathComponent] }];
         }
         return NO;
     }
@@ -451,7 +451,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     const char *userAndGroup = [formattedUserAndGroupIDs cStringUsingEncoding:NSASCIIStringEncoding];
     if (userAndGroup == NULL) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFormattingError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Owner ID %u and Group ID %u could not be formatted", ownerID.unsignedIntValue, groupID.unsignedIntValue] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFormattingError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Owner ID %u and Group ID %u could not be formatted.", ownerID.unsignedIntValue, groupID.unsignedIntValue] }];
         }
         return NO;
     }
@@ -462,7 +462,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     
     BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, "/usr/sbin/chown", kAuthorizationFlagDefaults, (char *[]){ "-R", (char *)userAndGroup, targetPath, NULL });
     if (!success && error != NULL) {
-        NSString *errorMessage = [NSString stringWithFormat:@"Failed to chown -R \"%@\" \"%@\" with authentication", formattedUserAndGroupIDs, targetURL.path];
+        NSString *errorMessage = [NSString stringWithFormat:@"Failed to change owner:group %@ on %@ with authentication.", formattedUserAndGroupIDs, targetURL.path.lastPathComponent];
         *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
     }
     
@@ -475,7 +475,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
     if ([_fileManager fileExistsAtPath:url.path]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Item at %@ already exists", url.path] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create directory because file %@ already exists.", url.path.lastPathComponent] }];
         }
         return NO;
     }
@@ -484,7 +484,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     BOOL isParentADirectory = NO;
     if (![_fileManager fileExistsAtPath:parentURL.path isDirectory:&isParentADirectory] || !isParentADirectory) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Directory at %@ does not exist", parentURL.path] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create directory because parent directory %@ does not exist.", parentURL.path.lastPathComponent] }];
         }
         return NO;
     }
@@ -504,7 +504,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     char path[PATH_MAX] = {0};
     if (![url.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"%@ is not a valid file system representation", url.path] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Directory to create (%@) cannot be represented as a valid file name.", url.path.lastPathComponent] }];
         }
         return NO;
     }
@@ -515,7 +515,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     
     BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, "/bin/mkdir", kAuthorizationFlagDefaults, (char *[]){ path, NULL });
     if (!success && error != NULL) {
-        NSString *errorMessage = [NSString stringWithFormat:@"Failed to make directory %@ with authentication", url.path];
+        NSString *errorMessage = [NSString stringWithFormat:@"Failed to make directory %@ with authentication.", url.path.lastPathComponent];
         *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
     }
     return success;
@@ -546,7 +546,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
     if (![_fileManager fileExistsAtPath:url.path]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Item at %@ does not exist", url.path] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove file %@ because it does not exist.", url.path.lastPathComponent] }];
         }
         return NO;
     }
@@ -570,14 +570,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     char path[PATH_MAX] = {0};
     if (![url.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"%@ is not a valid file system representation", url.path] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"File to remove (%@) cannot be represented as a valid file name.", url.path.lastPathComponent] }];
         }
         return NO;
     }
     
     BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, "/bin/rm", kAuthorizationFlagDefaults, (char *[]){ "-rf", path, NULL });
     if (!success && error != NULL) {
-        *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to rm -rf \"%@\" with authentication", url.path] }];
+        *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove %@ with authentication.", url.path.lastPathComponent] }];
     }
     return success;
 }
@@ -586,7 +586,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
     if (![_fileManager fileExistsAtPath:url.path]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Item at %@ does not exist", url.path] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move %@ to the trash because the file does not exist.", url.path.lastPathComponent] }];
         }
         return NO;
     }
@@ -609,15 +609,15 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     
     if (trashURL == nil) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: @"User's Trash directory was not found" }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to locate the user's trash folder." }];
         }
         return NO;
     }
     
-    // In the rare worst case scenario, our temporary directory will be labeled with "Incomplete" and be in the user's trash directory,
+    // In the rare worst case scenario, our temporary directory will be labeled incomplete and be in the user's trash directory,
     // indicating that whatever inside of there is not yet completely moved.
     // Regardless, we want the item to be in our Volume before we try moving it to the trash
-    NSString *preferredName = [url.lastPathComponent.stringByDeletingPathExtension stringByAppendingString:@" (Incomplete)"];
+    NSString *preferredName = [url.lastPathComponent.stringByDeletingPathExtension stringByAppendingString:@" (Incomplete Files)"];
     NSURL *tempDirectory = [self makeTemporaryDirectoryWithPreferredName:preferredName appropriateForDirectoryURL:trashURL error:error];
     if (tempDirectory == nil) {
         return NO;
@@ -644,7 +644,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     if (!canUseNewTrashAPI) {
         success = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:tempItemURL.URLByDeletingLastPathComponent.path destination:@"" files:@[tempItemURL.lastPathComponent] tag:NULL];
         if (!success && error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to move file into the trash" }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move file %@ into the trash.", tempItemURL.lastPathComponent] }];
         }
     }
 #endif
