@@ -582,7 +582,6 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     return success;
 }
 
-// TODO: Fix or address that this method only runs on 10.8 or later
 - (BOOL)moveItemAtURLToTrash:(NSURL *)url error:(NSError *__autoreleasing *)error
 {
     if (![_fileManager fileExistsAtPath:url.path]) {
@@ -592,8 +591,22 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         return NO;
     }
     
-    // TODO: address NSTrashDirectory being only available in 10.8 or later
-    NSURL *trashURL = [[_fileManager URLsForDirectory:NSTrashDirectory inDomains:NSUserDomainMask] firstObject];
+    NSURL *trashURL = nil;
+    BOOL canUseNewTrashAPI = YES;
+#if __MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_8
+    canUseNewTrashAPI = [_fileManager respondsToSelector:@selector(trashItemAtURL:resultingItemURL:error:)];
+    if (!canUseNewTrashAPI) {
+        FSRef trashRef;
+        if (FSFindFolder(kUserDomain, kTrashFolderType, kDontCreateFolder, &trashRef) == noErr) {
+            trashURL = CFBridgingRelease(CFURLCreateFromFSRef(kCFAllocatorDefault, &trashRef));
+        }
+    }
+#endif
+    
+    if (canUseNewTrashAPI) {
+        trashURL = [[_fileManager URLsForDirectory:NSTrashDirectory inDomains:NSUserDomainMask] firstObject];
+    }
+    
     if (trashURL == nil) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: @"User's Trash directory was not found" }];
@@ -625,11 +638,23 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     }
     
     // If we get here, we should be able to trash the item normally without authentication
-    // TODO: address -[NSFileManager trashItemAtURL: resultingItemURL: error:] being 10.8+ only
-    NSError *trashError = nil;
-    BOOL success = [_fileManager trashItemAtURL:tempItemURL resultingItemURL:NULL error:&trashError];
-    if (!success && error != NULL) {
-        *error = trashError;
+    
+    BOOL success = NO;
+#if __MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_8
+    if (!canUseNewTrashAPI) {
+        success = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:tempItemURL.URLByDeletingLastPathComponent.path destination:@"" files:@[tempItemURL.lastPathComponent] tag:NULL];
+        if (!success && error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to move file into the trash" }];
+        }
+    }
+#endif
+    
+    if (canUseNewTrashAPI) {
+        NSError *trashError = nil;
+        success = [_fileManager trashItemAtURL:tempItemURL resultingItemURL:NULL error:&trashError];
+        if (!success && error != NULL) {
+            *error = trashError;
+        }
     }
     
     [self removeItemAtURL:tempDirectory error:NULL];
