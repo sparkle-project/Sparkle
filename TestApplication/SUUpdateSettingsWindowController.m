@@ -17,6 +17,8 @@
 
 @implementation SUUpdateSettingsWindowController
 
+@synthesize updater = _updater;
+
 - (NSString *)windowNibName
 {
     return NSStringFromClass([self class]);
