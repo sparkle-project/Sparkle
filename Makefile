@@ -1,7 +1,6 @@
 .PHONY: all localizable-strings
 
 localizable-strings:
-	rm en.lproj/Sparkle.strings || TRUE
-	genstrings -o en.lproj -s SULocalizedString *.m *.h
-	mv en.lproj/Localizable.strings en.lproj/Sparkle.strings
-
+	rm Sparkle/en.lproj/Sparkle.strings || TRUE
+	genstrings -o Sparkle/en.lproj -s SULocalizedString Sparkle/*.m Sparkle/*.h
+	mv Sparkle/en.lproj/Localizable.strings Sparkle/en.lproj/Sparkle.strings

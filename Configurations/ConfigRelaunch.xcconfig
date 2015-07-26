@@ -1,4 +1,6 @@
 // Relaunch Tool only
 
+INFOPLIST_FILE = Sparkle/Autoupdate/Autoupdate-Info.plist
 PRODUCT_NAME = $(FINISH_INSTALL_TOOL_NAME)
 SKIP_INSTALL = YES
+GCC_PREFIX_HEADER = Sparkle/Autoupdate/Autoupdate.pch

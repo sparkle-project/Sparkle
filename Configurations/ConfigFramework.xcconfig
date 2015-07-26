@@ -6,5 +6,5 @@ DYLIB_CURRENT_VERSION = 1.7
 PRODUCT_NAME = Sparkle
 WRAPPER_EXTENSION = framework
 FRAMEWORK_VERSION = A
-INFOPLIST_FILE = Info.plist
-GCC_PREFIX_HEADER = Sparkle.pch
+INFOPLIST_FILE = Sparkle/Sparkle-Info.plist
+GCC_PREFIX_HEADER = Sparkle/Sparkle.pch

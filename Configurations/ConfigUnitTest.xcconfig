@@ -1,6 +1,6 @@
 // Unit Test only
 
-INFOPLIST_FILE = Tests/Sparkle Unit Tests-Info.plist
+INFOPLIST_FILE = Tests/SparkleTests-Info.plist
 OTHER_LDFLAGS = -framework Cocoa -framework XCTest
 PRODUCT_NAME = Sparkle Unit Tests
 WRAPPER_EXTENSION = xctest
