@@ -21,7 +21,7 @@
 @synthesize updateSettingsWindowController = _updateSettingsWindowController;
 @synthesize serverTask = _serverTask;
 
-#define UPDATED_VERSION @"2.0"
+static NSString * const UPDATED_VERSION = @"2.0";
 
 - (void)applicationDidFinishLaunching:(NSNotification * __unused)notification
 {
