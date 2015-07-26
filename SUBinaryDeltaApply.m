@@ -8,12 +8,12 @@
 
 #import "SUBinaryDeltaApply.h"
 #import "SUBinaryDeltaCommon.h"
-#import <CommonCrypto/CommonDigest.h>
+#include <CommonCrypto/CommonDigest.h>
 #import <Foundation/Foundation.h>
-#import <bspatch.h>
-#import <stdio.h>
-#import <stdlib.h>
-#import <xar/xar.h>
+#include <bspatch.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <xar/xar.h>
 
 static void applyBinaryDeltaToFile(xar_t x, xar_file_t file, NSString *sourceFilePath, NSString *destinationFilePath)
 {
@@ -40,11 +40,11 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
             const char *value = 0;
             xar_subdoc_prop_get(subdoc, "before-sha1", &value);
             if (value)
-                expectedBeforeHash = [NSString stringWithUTF8String:value];
+                expectedBeforeHash = @(value);
 
             xar_subdoc_prop_get(subdoc, "after-sha1", &value);
             if (value)
-                expectedAfterHash = [NSString stringWithUTF8String:value];
+                expectedAfterHash = @(value);
         }
     }
 
@@ -69,7 +69,7 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
     xar_file_t file;
     xar_iter_t iter = xar_iter_new();
     for (file = xar_file_first(x, iter); file; file = xar_file_next(iter)) {
-        NSString *path = [NSString stringWithUTF8String:xar_get_path(file)];
+        NSString *path = @(xar_get_path(file));
         NSString *sourceFilePath = [source stringByAppendingPathComponent:path];
         NSString *destinationFilePath = [destination stringByAppendingPathComponent:path];
 

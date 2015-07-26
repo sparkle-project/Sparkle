@@ -12,10 +12,15 @@
 NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
 @implementation SUUpdateDriver
-- initWithUpdater:(SUUpdater *)anUpdater
+@synthesize host;
+@synthesize interruptible = isInterruptible;
+@synthesize finished;
+
+- (instancetype) initWithUpdater:(SUUpdater *)anUpdater
 {
-	if ((self = [super init]))
+	if ((self = [super init])) {
 		updater = anUpdater;
+	}
 	return self;
 }
 
@@ -29,28 +34,15 @@ NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
 - (void)abortUpdate
 {
-	[self setValue:[NSNumber numberWithBool:YES] forKey:@"finished"];	
+	[self setValue:@YES forKey:@"finished"];
 	[[NSNotificationCenter defaultCenter] postNotificationName:SUUpdateDriverFinishedNotification object:self];
 }
 
-- (BOOL)finished { return finished; }
-
 - (void)dealloc
 {
-    [host release];
+    self.host = nil;
 	[appcastURL release];
     [super dealloc];
-}
-
-- (SUHost*)host
-{
-    return host;
-}
-
-- (void)setHost:(SUHost*)newHost
-{
-    [host release];
-    host = [newHost retain];
 }
 
 @end

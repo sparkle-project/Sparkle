@@ -10,16 +10,8 @@
 #define NTSYNCHRONOUSTASK_H
 
 @interface NTSynchronousTask : NSObject
-{
-@private
-    NSTask *mv_task;
-    NSPipe *mv_outputPipe;
-    NSPipe *mv_inputPipe;
-	
-	NSData* mv_output;
-	BOOL mv_done;
-	int mv_result;
-}
+@property (readonly, retain) NSData *output;
+@property (readonly) int result;
 
 // pass nil for directory if not needed
 // returns the result
@@ -28,8 +20,6 @@
 +(NSData*)task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input;
 
 - (void)run:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input;
-- (int)result;
-- (NSData *)output;
 
 @end
 

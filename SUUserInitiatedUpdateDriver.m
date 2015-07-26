@@ -23,7 +23,7 @@
 	}
 }
 
-- (void)cancelCheckForUpdates:sender
+- (void)cancelCheckForUpdates:(id) __unused sender
 {
 	[self closeCheckingWindow];
 	isCanceled = YES;
@@ -37,7 +37,7 @@
 	[checkingController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
 	[checkingController showWindow:self];
 	[super checkForUpdatesAtURL:URL host:aHost];
-	
+
 	// For background applications, obtain focus.
 	// Useful if the update check is requested from another app like System Preferences.
 	if ([aHost isBackgroundApplication])

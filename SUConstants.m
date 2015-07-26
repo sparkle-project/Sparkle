@@ -13,7 +13,6 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SUConstants.h"
 
-NSString *const SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotificationName";
 NSString *const SUTechnicalErrorInformationKey = @"SUTechnicalErrorInformation";
 
 NSString *const SUHasLaunchedBeforeKey = @"SUHasLaunchedBefore";

@@ -15,9 +15,8 @@
 #include <sys/mman.h>
 #include <sys/param.h>
 #include <sys/stat.h>
+#include <xar/xar.h>
 
-extern int xar_close(void*) __attribute__((weak_import));
-    
 int binaryDeltaSupported(void)
 {
     // OS X 10.4 didn't include libxar, so we link against it weakly.
@@ -39,17 +38,29 @@ NSString *pathRelativeToDirectory(NSString *directory, NSString *path)
     return path;
 }
 
+NSString *stringWithFileSystemRepresentation(const char *input) {
+    NSFileManager *fm = [NSFileManager defaultManager];
+    return [fm stringWithFileSystemRepresentation:input length:strlen(input)];
+}
+
 NSString *temporaryFilename(NSString *base)
 {
     NSString *template = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.XXXXXXXXXX", base]];
-    char buffer[MAXPATHLEN];
-    strcpy(buffer, [template fileSystemRepresentation]);
-    return [NSString stringWithUTF8String:mktemp(buffer)];
+    const char *fsrepr = [template fileSystemRepresentation];
+
+    const size_t buffer_len = strlen(fsrepr) + 1;
+    char *buffer = (char *)malloc(buffer_len);
+    strlcpy(buffer, fsrepr, buffer_len);
+
+    // mkstemp() can't be used, beause it returns a file descriptor, and XAR API requires a filename
+    NSString *ret = stringWithFileSystemRepresentation(mktemp(buffer));
+    free(buffer);
+    return ret;
 }
 
-static void _hashOfBuffer(unsigned char *hash, const char* buffer, size_t bufferLength)
+static void _hashOfBuffer(unsigned char *hash, const char* buffer, ssize_t bufferLength)
 {
-    assert(bufferLength <= UINT32_MAX);
+    assert(bufferLength >= 0 && bufferLength <= UINT32_MAX);
     CC_SHA1_CTX hashContext;
     CC_SHA1_Init(&hashContext);
     CC_SHA1_Update(&hashContext, buffer, (CC_LONG)bufferLength);
@@ -77,14 +88,14 @@ static void _hashOfFile(unsigned char* hash, FTSENT *ent)
             return;
         }
 
-        size_t fileSize = (size_t)ent->fts_statp->st_size;
+        ssize_t fileSize = ent->fts_statp->st_size;
         if (fileSize == 0) {
             _hashOfBuffer(hash, NULL, 0);
             close(fileDescriptor);
             return;
         }
-		
-        void *buffer = mmap(0, fileSize, PROT_READ, MAP_FILE | MAP_PRIVATE, fileDescriptor, 0);
+
+        void *buffer = mmap(0, (size_t)fileSize, PROT_READ, MAP_FILE | MAP_PRIVATE, fileDescriptor, 0);
         if (buffer == (void*)-1) {
             close(fileDescriptor);
             perror("mmap");
@@ -92,7 +103,7 @@ static void _hashOfFile(unsigned char* hash, FTSENT *ent)
         }
 
         _hashOfBuffer(hash, buffer, fileSize);
-        munmap(buffer, fileSize);
+        munmap(buffer, (size_t)fileSize);
         close(fileDescriptor);
         return;
     }
@@ -110,7 +121,7 @@ NSData *hashOfFile(FTSENT *ent)
 
 NSString *hashOfTree(NSString *path)
 {
-    const char *sourcePaths[] = {[path UTF8String], 0};
+    const char *sourcePaths[] = {[path fileSystemRepresentation], 0};
     FTS *fts = fts_open((char* const*)sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
     if (!fts) {
         perror("fts_open");
@@ -129,9 +140,9 @@ NSString *hashOfTree(NSString *path)
         _hashOfFile(fileHash, ent);
         CC_SHA1_Update(&hashContext, fileHash, sizeof(fileHash));
 
-        NSString *relativePath = pathRelativeToDirectory(path, [NSString stringWithUTF8String:ent->fts_path]);
-        NSData *relativePathBytes = [relativePath dataUsingEncoding:NSUTF8StringEncoding];
-        CC_SHA1_Update(&hashContext, [relativePathBytes bytes], (uint32_t)[relativePathBytes length]);
+        NSString *relativePath = pathRelativeToDirectory(path, stringWithFileSystemRepresentation(ent->fts_path));
+        const char *relativePathBytes = [relativePath fileSystemRepresentation];
+        CC_SHA1_Update(&hashContext, relativePathBytes, (CC_LONG)strlen(relativePathBytes));
     }
     fts_close(fts);
 
@@ -143,23 +154,15 @@ NSString *hashOfTree(NSString *path)
     for (i = 0; i < CC_SHA1_DIGEST_LENGTH; i++)
         sprintf(hexHash + i * 2, "%02x", hash[i]);
 
-    return [NSString stringWithUTF8String:hexHash];
+    return @(hexHash);
 }
 
 void removeTree(NSString *path)
 {
-#if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_4
-    [[NSFileManager defaultManager] removeItemAtPath:path error:0];
-#else
-    [[NSFileManager defaultManager] removeFileAtPath:path handler:nil];
-#endif
+    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
 }
 
 void copyTree(NSString *source, NSString *dest)
 {
-#if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_4
-    [[NSFileManager defaultManager] copyItemAtPath:source toPath:dest error:0];
-#else
-    [[NSFileManager defaultManager] copyPath:source toPath:dest handler:nil];
-#endif    
+    [[NSFileManager defaultManager] copyItemAtPath:source toPath:dest error:nil];
 }

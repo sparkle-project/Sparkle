@@ -17,11 +17,11 @@
 @protocol SUVersionDisplay
 
 /*!
-    @method     
+    @method
     @abstract   An abstract method to format two version strings.
     @discussion You get both so you can display important distinguishing
 				information, but leave out unnecessary/confusing parts.
 */
--(void)	formatVersion: (NSString**)inOutVersionA andVersion: (NSString**)inOutVersionB; 
+-(void)	formatVersion: (NSString**)inOutVersionA andVersion: (NSString**)inOutVersionB;
 
 @end

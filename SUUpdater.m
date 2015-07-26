@@ -20,17 +20,23 @@
 #import "SUCodeSigningVerifier.h"
 #include <SystemConfiguration/SystemConfiguration.h>
 
+NSString *const SUUpdaterDidFinishLoadingAppCastNotification = @"SUUpdaterDidFinishLoadingAppCastNotification";
+NSString *const SUUpdaterDidFindValidUpdateNotification = @"SUUpdaterDidFindValidUpdateNotification";
+NSString *const SUUpdaterDidNotFindUpdateNotification = @"SUUpdaterDidNotFindUpdateNotification";
+NSString *const SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotificationName";
+NSString *const SUUpdaterAppcastItemNotificationKey = @"SUUpdaterAppcastItemNotificationKey";
+NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotificationKey";
 
-@interface SUUpdater (Private)
-- (id)initForBundle:(NSBundle *)bundle;
+@interface SUUpdater () <SUUpdatePermissionPromptDelegate>
+@property (retain) NSTimer *checkTimer;
+- (instancetype)initForBundle:(NSBundle *)bundle;
 - (void)startUpdateCycle;
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
-- (BOOL)automaticallyDownloadsUpdates;
 - (void)scheduleNextUpdateCheck;
 - (void)registerAsObserver;
 - (void)unregisterAsObserver;
 - (void)updateDriverDidFinish:(NSNotification *)note;
-- (NSURL *)parameterizedFeedURL;
+@property (readonly, copy) NSURL *parameterizedFeedURL;
 
 -(void)	notifyWillShowModalAlert;
 -(void)	notifyDidShowModalAlert;
@@ -38,6 +44,9 @@
 @end
 
 @implementation SUUpdater
+@synthesize delegate;
+@synthesize checkTimer;
+@synthesize userAgentString = customUserAgentString;
 
 #pragma mark Initialization
 
@@ -53,23 +62,25 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 + (SUUpdater *)updaterForBundle:(NSBundle *)bundle
 {
     if (bundle == nil) bundle = [NSBundle mainBundle];
-	id updater = [sharedUpdaters objectForKey:[NSValue valueWithNonretainedObject:bundle]];
-	if (updater == nil)
+	id updater = sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]];
+	if (updater == nil) {
 		updater = [[[[self class] alloc] initForBundle:bundle] autorelease];
+	}
 	return updater;
 }
 
 // This is the designated initializer for SUUpdater, important for subclasses
-- (id)initForBundle:(NSBundle *)bundle
+- (instancetype)initForBundle:(NSBundle *)bundle
 {
 	self = [super init];
     if (bundle == nil) bundle = [NSBundle mainBundle];
-	
+
 	// Register as observer straight away to avoid exceptions on -dealloc when -unregisterAsObserver is called:
-	if (self)
+	if (self) {
 		[self registerAsObserver];
-	
-	id updater = [sharedUpdaters objectForKey:[NSValue valueWithNonretainedObject:bundle]];
+	}
+
+	id updater = sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]];
     if (updater)
 	{
 		[self release];
@@ -77,12 +88,12 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	}
 	else if (self)
 	{
-		if (sharedUpdaters == nil)
+		if (sharedUpdaters == nil) {
             sharedUpdaters = [[NSMutableDictionary alloc] init];
-        [sharedUpdaters setObject:self forKey:[NSValue valueWithNonretainedObject:bundle]];
+		}
+        sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]] = self;
         host = [[SUHost alloc] initWithBundle:bundle];
-		
-#if !ENDANGER_USERS_WITH_INSECURE_UPDATES
+
 		// Saving-the-developer-from-a-stupid-mistake-check:
         BOOL hasPublicDSAKey = [host publicDSAKey] != nil;
         BOOL isMainBundle = [bundle isEqualTo:[NSBundle mainBundle]];
@@ -96,7 +107,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
             NSRunAlertPanel(@"Insecure update error!", @"For security reasons, you need to code sign your application or sign your updates with a DSA key. See Sparkle's documentation for more information.", @"OK", nil, nil);
             [self notifyDidShowModalAlert];
         }
-#endif
+
         // This runs the permission prompt if needed, but never before the app has finished launching because the runloop won't run before that
         [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:0];
 	}
@@ -105,7 +116,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 
 // This will be used when the updater is instantiated in a nib such as MainMenu
-- (id)init
+- (instancetype)init
 {
     return [self initForBundle:[NSBundle mainBundle]];
 }
@@ -130,7 +141,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - (void)startUpdateCycle
 {
     BOOL shouldPrompt = NO;
-    
+
 	// If the user has been asked about automatic checks, don't bother prompting
 	if ([host objectForUserDefaultsKey:SUEnableAutomaticChecksKey])
     {
@@ -140,12 +151,13 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
     else if ([delegate respondsToSelector:@selector(updaterShouldPromptForPermissionToCheckForUpdates:)])
     {
         shouldPrompt = [delegate updaterShouldPromptForPermissionToCheckForUpdates:self];
-    }	
+    }
     // Has he been asked already? And don't ask if the host has a default value set in its Info.plist.
     else if ([host objectForKey:SUEnableAutomaticChecksKey] == nil)
     {
-        if ([host objectForUserDefaultsKey:SUEnableAutomaticChecksKeyOld])
+		if ([host objectForUserDefaultsKey:SUEnableAutomaticChecksKeyOld]) {
             [self setAutomaticallyChecksForUpdates:[host boolForUserDefaultsKey:SUEnableAutomaticChecksKeyOld]];
+		}
         // Now, we don't want to ask the user for permission to do a weird thing on the first launch.
         // We wait until the second launch, unless explicitly overridden via SUPromptUserOnFirstLaunchKey.
         else if (![host objectForKey:SUPromptUserOnFirstLaunchKey])
@@ -158,17 +170,18 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
         else
             shouldPrompt = YES;
     }
-    
+
     if (shouldPrompt)
     {
 		NSArray *profileInfo = [host systemProfile];
 		// Always say we're sending the system profile here so that the delegate displays the parameters it would send.
-		if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) 
+		if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
 			profileInfo = [profileInfo arrayByAddingObjectsFromArray:[delegate feedParametersForUpdater:self sendingSystemProfile:YES]];
+		}
         [SUUpdatePermissionPrompt promptWithHost:host systemProfile:profileInfo delegate:self];
         // We start the update checks and register as observer for changes after the prompt finishes
 	}
-    else 
+    else
     {
         // We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
         [self scheduleNextUpdateCheck];
@@ -197,20 +210,19 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 }
 
 - (void)scheduleNextUpdateCheck
-{	
+{
 	if (checkTimer)
 	{
 		[checkTimer invalidate];
-		[checkTimer release];		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
-		checkTimer = nil;
+		self.checkTimer = nil; // UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
 	}
 	if (![self automaticallyChecksForUpdates]) return;
-	
+
 	// How long has it been since last we checked for an update?
 	NSDate *lastCheckDate = [self lastUpdateCheckDate];
 	if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
 	NSTimeInterval intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
-	
+
 	// Now we want to figure out how long until we check again.
 	NSTimeInterval delayUntilCheck, updateCheckInterval = [self updateCheckInterval];
 	if (updateCheckInterval < SU_MIN_CHECK_INTERVAL)
@@ -219,61 +231,65 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 		delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
 	else
 		delayUntilCheck = 0; // We're overdue! Run one now.
-	checkTimer = [[NSTimer scheduledTimerWithTimeInterval:delayUntilCheck target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO] retain];		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
+	self.checkTimer = [NSTimer scheduledTimerWithTimeInterval:delayUntilCheck target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO];		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
 }
 
 
 -(void)	putFeedURLIntoDictionary: (NSMutableDictionary*)theDict	// You release this.
 {
-	[theDict setObject: [self feedURL] forKey: @"feedURL"];
+	theDict[@"feedURL"] = [self feedURL];
 }
 
 -(void)	checkForUpdatesInBgReachabilityCheckWithDriver: (SUUpdateDriver*)inDriver /* RUNS ON ITS OWN THREAD */
 {
-	NS_DURING
+	@try {
 		// This method *must* be called on its own thread. SCNetworkReachabilityCheckByName
 		//	can block, and it can be waiting a long time on slow networks, and we
 		//	wouldn't want to beachball the main thread for a background operation.
 		// We could use asynchronous reachability callbacks, but those aren't
 		//	reliable enough and can 'get lost' sometimes, which we don't want.
-		
-		NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-		SCNetworkConnectionFlags flags = 0;
-		BOOL isNetworkReachable = YES;
-		
-		// Don't perform automatic checks on unconnected laptops or dial-up connections that aren't online:
-		NSMutableDictionary*		theDict = [NSMutableDictionary dictionary];
-		[self performSelectorOnMainThread: @selector(putFeedURLIntoDictionary:) withObject: theDict waitUntilDone: YES];	// Get feed URL on main thread, it's not safe to call elsewhere.
-		
-		const char *hostname = [[[theDict objectForKey: @"feedURL"] host] cStringUsingEncoding: NSUTF8StringEncoding];
-		SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(NULL, hostname);
-        Boolean reachabilityResult = NO;
-        // If the feed's using a file:// URL, we won't be able to use reachability.
-        if (reachability != NULL) {
-            SCNetworkReachabilityGetFlags(reachability, &flags);
-            CFRelease(reachability);
-        }
-		
-		if( reachabilityResult )
-		{
-			BOOL reachable =	(flags & kSCNetworkFlagsReachable)				== kSCNetworkFlagsReachable;
-			BOOL automatic =	(flags & kSCNetworkFlagsConnectionAutomatic)	== kSCNetworkFlagsConnectionAutomatic;
-			BOOL local =		(flags & kSCNetworkFlagsIsLocalAddress)			== kSCNetworkFlagsIsLocalAddress;
-			
-			//NSLog(@"reachable = %s, automatic = %s, local = %s", (reachable?"YES":"NO"), (automatic?"YES":"NO"), (local?"YES":"NO"));
-			
-			if( !(reachable || automatic || local) )
-				isNetworkReachable = NO;
+
+		@autoreleasepool {
+			SCNetworkConnectionFlags flags = 0;
+			BOOL isNetworkReachable = YES;
+
+			// Don't perform automatic checks on unconnected laptops or dial-up connections that aren't online:
+			NSMutableDictionary*		theDict = [NSMutableDictionary dictionary];
+			dispatch_sync(dispatch_get_main_queue(), ^{
+				[self putFeedURLIntoDictionary:theDict];	// Get feed URL on main thread, it's not safe to call elsewhere.
+			});
+
+			const char *hostname = [[(NSURL *)theDict[@"feedURL"] host] cStringUsingEncoding: NSUTF8StringEncoding];
+			SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(NULL, hostname);
+			Boolean reachabilityResult = NO;
+			// If the feed's using a file:// URL, we won't be able to use reachability.
+			if (reachability != NULL) {
+				SCNetworkReachabilityGetFlags(reachability, &flags);
+				CFRelease(reachability);
+			}
+
+			if( reachabilityResult )
+			{
+				BOOL reachable =	(flags & kSCNetworkFlagsReachable)				== kSCNetworkFlagsReachable;
+				BOOL automatic =	(flags & kSCNetworkFlagsConnectionAutomatic)	== kSCNetworkFlagsConnectionAutomatic;
+				BOOL local =		(flags & kSCNetworkFlagsIsLocalAddress)			== kSCNetworkFlagsIsLocalAddress;
+
+				//NSLog(@"reachable = %s, automatic = %s, local = %s", (reachable?"YES":"NO"), (automatic?"YES":"NO"), (local?"YES":"NO"));
+
+				if( !(reachable || automatic || local) )
+					isNetworkReachable = NO;
+			}
+
+			// If the network's not reachable, we pass a nil driver into checkForUpdatesWithDriver, which will then reschedule the next update so we try again later.
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self checkForUpdatesWithDriver: isNetworkReachable ? inDriver : nil];
+			});
+
 		}
-		
-        // If the network's not reachable, we pass a nil driver into checkForUpdatesWithDriver, which will then reschedule the next update so we try again later.    
-        [self performSelectorOnMainThread: @selector(checkForUpdatesWithDriver:) withObject: isNetworkReachable ? inDriver : nil waitUntilDone: NO];
-		
-		[pool release];
-	NS_HANDLER
+	} @catch (NSException *localException) {
 		SULog(@"UNCAUGHT EXCEPTION IN UPDATE CHECK TIMER: %@",[localException reason]);
 		// Don't propagate the exception beyond here. In Carbon apps that would trash the stack.
-	NS_ENDHANDLER
+	}
 }
 
 
@@ -283,8 +299,10 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	//	Wouldn't want to annoy users on dial-up by establishing a connection every
 	//	hour or so:
 	SUUpdateDriver *	theUpdateDriver = [[[([self automaticallyDownloadsUpdates] ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class]) alloc] initWithUpdater:self] autorelease];
-	
-	[NSThread detachNewThreadSelector: @selector(checkForUpdatesInBgReachabilityCheckWithDriver:) toTarget: self withObject: theUpdateDriver];
+
+	dispatch_async(dispatch_get_global_queue(0, 0), ^{
+		[self checkForUpdatesInBgReachabilityCheckWithDriver:theUpdateDriver];
+	});
 }
 
 - (BOOL)mayUpdateAndRestart
@@ -292,8 +310,12 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	return( !delegate || ![delegate respondsToSelector: @selector(updaterShouldRelaunchApplication:)] || [delegate updaterShouldRelaunchApplication: self] );
 }
 
-- (IBAction)checkForUpdates: (id)sender
+- (IBAction)checkForUpdates:(id) __unused sender
 {
+	if (driver && [driver isInterruptible]) {
+		[driver abortUpdate];
+	}
+
 	[self checkForUpdatesWithDriver:[[[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self] autorelease]];
 }
 
@@ -305,30 +327,30 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)d
 {
 	if ([self updateInProgress]) { return; }
-	if (checkTimer) { [checkTimer invalidate]; [checkTimer release]; checkTimer = nil; }		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
-	
+	if (checkTimer) { [checkTimer invalidate]; self.checkTimer = nil; }		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
+
 	SUClearLog();
 	SULog( @"===== %@ =====", [[NSFileManager defaultManager] displayNameAtPath: [[NSBundle mainBundle] bundlePath]] );
-		
+
 	[self willChangeValueForKey:@"lastUpdateCheckDate"];
 	[host setObject:[NSDate date] forUserDefaultsKey:SULastCheckTimeKey];
 	[self didChangeValueForKey:@"lastUpdateCheckDate"];
-	
+
     if( [delegate respondsToSelector: @selector(updaterMayCheckForUpdates:)] && ![delegate updaterMayCheckForUpdates: self] )
 	{
 		[self scheduleNextUpdateCheck];
 		return;
 	}
-    	
+
     driver = [d retain];
-    
+
     // If we're not given a driver at all, just schedule the next update check and bail.
     if (!driver)
     {
         [self scheduleNextUpdateCheck];
         return;
     }
-    
+
 	NSURL*	theFeedURL = [self parameterizedFeedURL];
 	if( theFeedURL )	// Use a NIL URL to cancel quietly.
 		[driver checkForUpdatesAtURL: theFeedURL host:host];
@@ -339,8 +361,8 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - (void)registerAsObserver
 {
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDriverDidFinish:) name:SUUpdateDriverFinishedNotification object:nil];
-    [[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:[@"values." stringByAppendingString:SUScheduledCheckIntervalKey] options:0 context:SUUpdaterDefaultsObservationContext];
-    [[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:[@"values." stringByAppendingString:SUEnableAutomaticChecksKey] options:0 context:SUUpdaterDefaultsObservationContext];
+    [[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:[@"values." stringByAppendingString:SUScheduledCheckIntervalKey] options:(NSKeyValueObservingOptions)0 context:SUUpdaterDefaultsObservationContext];
+    [[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:[@"values." stringByAppendingString:SUEnableAutomaticChecksKey] options:(NSKeyValueObservingOptions)0 context:SUUpdaterDefaultsObservationContext];
 }
 
 - (void)unregisterAsObserver
@@ -351,7 +373,7 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 		[[NSUserDefaultsController sharedUserDefaultsController] removeObserver:self forKeyPath:[@"values." stringByAppendingString:SUScheduledCheckIntervalKey]];
 		[[NSUserDefaultsController sharedUserDefaultsController] removeObserver:self forKeyPath:[@"values." stringByAppendingString:SUEnableAutomaticChecksKey]];
 	}
-	@catch (NSException *e)
+	@catch (NSException *)
 	{
 		NSLog(@"Sparkle Error: [SUUpdater unregisterAsObserver] called, but the updater wasn't registered as an observer.");
 	}
@@ -383,8 +405,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	[host setBool:automaticallyCheckForUpdates forUserDefaultsKey:SUEnableAutomaticChecksKey];
 	// Hack to support backwards compatibility with older Sparkle versions, which supported
 	// disabling updates by setting the check interval to 0.
-    if (automaticallyCheckForUpdates && [self updateCheckInterval] == 0)
+	if (automaticallyCheckForUpdates && (NSInteger)[self updateCheckInterval] == 0) {
         [self setUpdateCheckInterval:SU_DEFAULT_CHECK_INTERVAL];
+	}
     [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
 	// Provide a small delay in case multiple preferences are being updated simultaneously.
     [self performSelector:@selector(resetUpdateCycle) withObject:nil afterDelay:1];
@@ -393,8 +416,9 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - (BOOL)automaticallyChecksForUpdates
 {
 	// Don't automatically update when the check interval is 0, to be compatible with 1.1 settings.
-    if ([self updateCheckInterval] == 0)
-        return NO;	
+	if ((NSInteger)[self updateCheckInterval] == 0) {
+        return NO;
+	}
 	return [host boolForKey:SUEnableAutomaticChecksKey];
 }
 
@@ -406,26 +430,33 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 - (BOOL)automaticallyDownloadsUpdates
 {
 	// If the SUAllowsAutomaticUpdatesKey exists and is set to NO, return NO.
-	if ([host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] && [host boolForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] == NO)
+	if ([host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] && [host boolForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] == NO) {
 		return NO;
-	
+	}
+
 	// Otherwise, automatically downloading updates is allowed. Does the user want it?
 	return [host boolForUserDefaultsKey:SUAutomaticallyUpdateKey];
 }
 
 - (void)setFeedURL:(NSURL *)feedURL
 {
+    if (![NSThread isMainThread])
+        [NSException raise:@"SUThreadException" format:@"This method must be called on the main thread"];
+
 	[host setObject:[feedURL absoluteString] forUserDefaultsKey:SUFeedURLKey];
 }
 
-- (NSURL *)feedURL // *** MUST BE CALLED ON MAIN THREAD ***
+- (NSURL *)feedURL
 {
+    if (![NSThread isMainThread])
+        [NSException raise:@"SUThreadException" format:@"This method must be called on the main thread"];
+
 	// A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
 	NSString *appcastString = [host objectForKey:SUFeedURLKey];
 	if( [delegate respondsToSelector: @selector(feedURLStringForUpdater:)] )
 		appcastString = [delegate feedURLStringForUpdater: self];
 	if (!appcastString) // Can't find an appcast string!
-		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the SUFeedURL key in either the Info.plist or the user defaults!"];
+		[NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the %@ key in either the Info.plist or the user defaults!", SUFeedURLKey];
 	NSCharacterSet* quoteSet = [NSCharacterSet characterSetWithCharactersInString: @"\"\'"]; // Some feed publishers add quotes; strip 'em.
 	NSString*	castUrlStr = [appcastString stringByTrimmingCharactersInSet:quoteSet];
 	if( !castUrlStr || [castUrlStr length] == 0 )
@@ -434,19 +465,11 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 		return [NSURL URLWithString: castUrlStr];
 }
 
-- (void)setUserAgentString:(NSString *)userAgent
-{
-	if (customUserAgentString == userAgent)
-		return;
-
-	[customUserAgentString release];
-	customUserAgentString = [userAgent copy];
-}
-
 - (NSString *)userAgentString
 {
-	if (customUserAgentString)
+	if (customUserAgentString) {
 		return customUserAgentString;
+	}
 
 	NSString *version = [SPARKLE_BUNDLE objectForInfoDictionaryKey:@"CFBundleVersion"];
 	NSString *userAgent = [NSString stringWithFormat:@"%@/%@ Sparkle/%@", [host name], [host displayVersion], version ? version : @"?"];
@@ -461,56 +484,59 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 
 - (BOOL)sendsSystemProfile
 {
-	return [host boolForUserDefaultsKey:SUSendProfileInfoKey];
+	return [host boolForKey:SUSendProfileInfoKey];
 }
 
 - (NSURL *)parameterizedFeedURL
 {
 	NSURL *baseFeedURL = [self feedURL];
-	
+
 	// Determine all the parameters we're attaching to the base feed URL.
 	BOOL sendingSystemProfile = [self sendsSystemProfile];
 
 	// Let's only send the system profiling information once per week at most, so we normalize daily-checkers vs. biweekly-checkers and the such.
 	NSDate *lastSubmitDate = [host objectForUserDefaultsKey:SULastProfileSubmitDateKey];
-	if(!lastSubmitDate)
+	if (!lastSubmitDate) {
 	    lastSubmitDate = [NSDate distantPast];
+	}
 	const NSTimeInterval oneWeek = 60 * 60 * 24 * 7;
 	sendingSystemProfile &= (-[lastSubmitDate timeIntervalSinceNow] >= oneWeek);
 
-	NSArray *parameters = [NSArray array];
-	if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)])
+	NSArray *parameters = @[];
+	if ([delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
 		parameters = [parameters arrayByAddingObjectsFromArray:[delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile]];
+	}
 	if (sendingSystemProfile)
 	{
 		parameters = [parameters arrayByAddingObjectsFromArray:[host systemProfile]];
 		[host setObject:[NSDate date] forUserDefaultsKey:SULastProfileSubmitDateKey];
 	}
 	if ([parameters count] == 0) { return baseFeedURL; }
-	
+
 	// Build up the parameterized URL.
 	NSMutableArray *parameterStrings = [NSMutableArray array];
-	NSEnumerator *profileInfoEnumerator = [parameters objectEnumerator];
-	NSDictionary *currentProfileInfo;
-	while ((currentProfileInfo = [profileInfoEnumerator nextObject]))
-		[parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", [[[currentProfileInfo objectForKey:@"key"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], [[[currentProfileInfo objectForKey:@"value"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
-	
+	for (NSDictionary *currentProfileInfo in parameters) {
+		[parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", [[currentProfileInfo[@"key"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], [[currentProfileInfo[@"value"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+	}
+
 	NSString *separatorCharacter = @"?";
-	if ([baseFeedURL query])
+	if ([baseFeedURL query]) {
 		separatorCharacter = @"&"; // In case the URL is already http://foo.org/baz.xml?bat=4
+	}
 	NSString *appcastStringWithProfile = [NSString stringWithFormat:@"%@%@%@", [baseFeedURL absoluteString], separatorCharacter, [parameterStrings componentsJoinedByString:@"&"]];
-	
+
 	// Clean it up so it's a valid URL
 	return [NSURL URLWithString:appcastStringWithProfile];
 }
 
 - (void)setUpdateCheckInterval:(NSTimeInterval)updateCheckInterval
 {
-	[host setObject:[NSNumber numberWithDouble:updateCheckInterval] forUserDefaultsKey:SUScheduledCheckIntervalKey];
-	if (updateCheckInterval == 0) // For compatibility with 1.1's settings.
+	[host setObject:@(updateCheckInterval) forUserDefaultsKey:SUScheduledCheckIntervalKey];
+	if ((NSInteger)updateCheckInterval == 0) { // For compatibility with 1.1's settings.
 		[self setAutomaticallyChecksForUpdates:NO];
+	}
 	[[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
-	
+
 	// Provide a small delay in case multiple preferences are being updated simultaneously.
 	[self performSelector:@selector(resetUpdateCycle) withObject:nil afterDelay:1];
 }
@@ -529,20 +555,16 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 {
 	[self unregisterAsObserver];
 	[host release];
-	if (checkTimer) { [checkTimer invalidate]; [checkTimer release]; checkTimer = nil; }		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
+	if (checkTimer) { [checkTimer invalidate]; self.checkTimer = nil; }		// UK 2009-03-16 Timer is non-repeating, may have invalidated itself, so we had to retain it.
 	[super dealloc];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item
 {
-	if ([item action] == @selector(checkForUpdates:))
+	if ([item action] == @selector(checkForUpdates:)) {
 		return ![self updateInProgress];
+	}
 	return YES;
-}
-
-- (void)setDelegate:aDelegate
-{
-	delegate = aDelegate;
 }
 
 - (BOOL)updateInProgress
@@ -550,7 +572,6 @@ static NSString * const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefault
 	return driver && ([driver finished] == NO);
 }
 
-- (id)delegate { return delegate; }
 - (NSBundle *)hostBundle { return [host bundle]; }
 
 @end

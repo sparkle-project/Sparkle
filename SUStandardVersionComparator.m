@@ -18,8 +18,9 @@
 + (SUStandardVersionComparator *)defaultComparator
 {
 	static SUStandardVersionComparator *defaultComparator = nil;
-	if (defaultComparator == nil)
+	if (defaultComparator == nil) {
 		defaultComparator = [[SUStandardVersionComparator alloc] init];
+	}
 	return defaultComparator;
 }
 
@@ -41,7 +42,7 @@ typedef enum {
         return kSeparatorType;
     } else {
         return kStringType;
-    }	
+    }
 }
 
 - (NSArray *)splitVersionString:(NSString *)version
@@ -72,30 +73,30 @@ typedef enum {
         }
         oldType = newType;
     }
-    
+
     // Add the last part onto the array
     [parts addObject:[NSString stringWithString:s]];
     return parts;
 }
 
-- (NSComparisonResult)compareVersion:(NSString *)versionA toVersion:(NSString *)versionB;
+- (NSComparisonResult)compareVersion:(NSString *)versionA toVersion:(NSString *)versionB
 {
 	NSArray *partsA = [self splitVersionString:versionA];
     NSArray *partsB = [self splitVersionString:versionB];
-    
+
     NSString *partA, *partB;
     NSUInteger i, n;
 	long long valueA, valueB;
     SUCharacterType typeA, typeB;
-	
+
     n = MIN([partsA count], [partsB count]);
     for (i = 0; i < n; ++i) {
-        partA = [partsA objectAtIndex:i];
-        partB = [partsB objectAtIndex:i];
-        
+        partA = partsA[i];
+        partB = partsB[i];
+
         typeA = [self typeOfCharacter:partA];
         typeB = [self typeOfCharacter:partB];
-        
+
         // Compare types
         if (typeA == typeB) {
             // Same type; we can compare
@@ -139,17 +140,17 @@ typedef enum {
         NSString *missingPart;
         SUCharacterType missingType;
 		NSComparisonResult shorterResult, largerResult;
-        
+
         if ([partsA count] > [partsB count]) {
-            missingPart = [partsA objectAtIndex:n];
+            missingPart = partsA[n];
             shorterResult = NSOrderedAscending;
             largerResult = NSOrderedDescending;
         } else {
-            missingPart = [partsB objectAtIndex:n];
+            missingPart = partsB[n];
             shorterResult = NSOrderedDescending;
             largerResult = NSOrderedAscending;
         }
-        
+
         missingType = [self typeOfCharacter:missingPart];
         // Check the type
         if (missingType == kStringType) {
@@ -160,7 +161,7 @@ typedef enum {
             return largerResult;
         }
     }
-    
+
     // The 2 strings are identical
     return NSOrderedSame;
 }

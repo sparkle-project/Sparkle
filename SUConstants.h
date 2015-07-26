@@ -14,9 +14,6 @@
 //	Preprocessor flags:
 // -----------------------------------------------------------------------------
 
-// Turn off DSA signature check (practically invites man-in-the-middle attacks):
-#define ENDANGER_USERS_WITH_INSECURE_UPDATES		0
-
 // Sparkle usually doesn't allow downgrades as they're usually accidental, but
 //	if your app has a downgrade function or URL handler, turn this on:
 #define PERMIT_AUTOMATED_DOWNGRADES					0
@@ -49,8 +46,6 @@
 //	Notifications:
 // -----------------------------------------------------------------------------
 
-extern NSString *const SUUpdaterWillRestartNotification;
-
 extern NSString *const SUTechnicalErrorInformationKey;
 
 // -----------------------------------------------------------------------------
@@ -63,6 +58,7 @@ extern NSString *const SUShowReleaseNotesKey;
 extern NSString *const SUSkippedVersionKey;
 extern NSString *const SUScheduledCheckIntervalKey;
 extern NSString *const SULastCheckTimeKey;
+extern NSString *const SUExpectsDSASignatureKey;
 extern NSString *const SUPublicDSAKeyKey;
 extern NSString *const SUPublicDSAKeyFileKey;
 extern NSString *const SUAutomaticallyUpdateKey;
@@ -103,27 +99,5 @@ extern OSStatus SUMissingInstallerToolError;
 extern OSStatus SURelaunchError;
 extern OSStatus SUInstallationError;
 extern OSStatus SUDowngradeError;
-
-
-// -----------------------------------------------------------------------------
-//	NSInteger fixer-upper:
-// -----------------------------------------------------------------------------
-
-// NSInteger is a type that was added to Leopard.
-// Here is some glue to ensure that NSInteger will work with pre-10.5 SDKs:
-#ifndef NSINTEGER_DEFINED
-	#ifdef NS_BUILD_32_LIKE_64
-		typedef long NSInteger;
-		typedef unsigned long NSUInteger;
-	#else
-		typedef int NSInteger;
-		typedef unsigned int NSUInteger;
-	#endif
-	#define NSIntegerMax    LONG_MAX
-	#define NSIntegerMin    LONG_MIN
-	#define NSUIntegerMax   ULONG_MAX
-	#define NSINTEGER_DEFINED 1
-#endif
-
 
 #endif

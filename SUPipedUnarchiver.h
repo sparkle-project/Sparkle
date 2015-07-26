@@ -12,9 +12,7 @@
 #import <Cocoa/Cocoa.h>
 #import "SUUnarchiver.h"
 
-@interface SUPipedUnarchiver : SUUnarchiver {
-
-}
+@interface SUPipedUnarchiver : SUUnarchiver
 
 @end
 

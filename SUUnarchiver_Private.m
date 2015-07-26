@@ -7,10 +7,11 @@
 //
 
 #import "SUUnarchiver_Private.h"
+#import "SUHost.h"
 
 @implementation SUUnarchiver (Private)
 
-- (id)initWithPath:(NSString *)path host:(SUHost *)host
+- (instancetype)initWithPath:(NSString *)path host:(SUHost *)host
 {
 	if ((self = [super init]))
 	{
@@ -27,35 +28,39 @@
 	[super dealloc];
 }
 
-+ (BOOL)canUnarchivePath:(NSString *)path
++ (BOOL)canUnarchivePath:(NSString *) __unused path
 {
 	return NO;
 }
 
-- (void)notifyDelegateOfExtractedLength:(NSNumber *)length
+- (void)notifyDelegateOfExtractedLength:(size_t)length
 {
-	if ([delegate respondsToSelector:@selector(unarchiver:extractedLength:)])
-		[delegate unarchiver:self extractedLength:[length unsignedLongValue]];
+	if ([delegate respondsToSelector:@selector(unarchiver:extractedLength:)]) {
+		[delegate unarchiver:self extractedLength:length];
+	}
 }
 
 - (void)notifyDelegateOfSuccess
 {
-	if ([delegate respondsToSelector:@selector(unarchiverDidFinish:)])
-		[delegate performSelector:@selector(unarchiverDidFinish:) withObject:self];
+	if ([delegate respondsToSelector:@selector(unarchiverDidFinish:)]) {
+		[delegate unarchiverDidFinish:self];
+	}
 }
 
 - (void)notifyDelegateOfFailure
 {
-	if ([delegate respondsToSelector:@selector(unarchiverDidFail:)])
-		[delegate performSelector:@selector(unarchiverDidFail:) withObject:self];
+	if ([delegate respondsToSelector:@selector(unarchiverDidFail:)]) {
+		[delegate unarchiverDidFail:self];
+	}
 }
 
 static NSMutableArray *gUnarchiverImplementations;
 
 + (void)registerImplementation:(Class)implementation
 {
-	if (!gUnarchiverImplementations)
+	if (!gUnarchiverImplementations) {
 		gUnarchiverImplementations = [[NSMutableArray alloc] init];
+	}
 	[gUnarchiverImplementations addObject:implementation];
 }
 

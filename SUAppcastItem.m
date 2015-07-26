@@ -14,142 +14,59 @@
 #import "SUAppcastItem.h"
 #import "SULog.h"
 
+@interface SUAppcastItem ()
+@property (copy, readwrite) NSString *title;
+@property (copy, readwrite) NSDate *date;
+@property (copy, readwrite) NSString *itemDescription;
+@property (retain, readwrite) NSURL *releaseNotesURL;
+@property (copy, readwrite) NSString *DSASignature;
+@property (copy, readwrite) NSString *minimumSystemVersion;
+@property (copy, readwrite) NSString *maximumSystemVersion;
+@property (retain, readwrite) NSURL *fileURL;
+@property (copy, readwrite) NSString *versionString;
+@property (copy, readwrite) NSString *displayVersionString;
+@property (copy, readwrite) NSDictionary *deltaUpdates;
+@property (retain, readwrite) NSURL *infoURL;
+@property (readwrite, copy) NSDictionary *propertiesDictionary;
+@end
+
 @implementation SUAppcastItem
-
-// Attack of accessors!
-
-- (NSString *)title { return [[title retain] autorelease]; }
-
-- (void)setTitle:(NSString *)aTitle
-{
-	if (title == aTitle) return;
-    [title release];
-    title = [aTitle copy];
-}
-
-
-- (NSDate *)date { return [[date retain] autorelease]; }
-
-- (void)setDate:(NSDate *)aDate
-{
-	if (date == aDate) return;
-    [date release];
-    date = [aDate copy];
-}
-
-
-- (NSString *)itemDescription { return [[itemDescription retain] autorelease]; }
-
-- (void)setItemDescription:(NSString *)anItemDescription
-{
-	if (itemDescription == anItemDescription) return;
-    [itemDescription release];
-    itemDescription = [anItemDescription copy];
-}
-
-
-- (NSURL *)releaseNotesURL { return [[releaseNotesURL retain] autorelease]; }
-
-- (void)setReleaseNotesURL:(NSURL *)aReleaseNotesURL
-{
-	if (releaseNotesURL == aReleaseNotesURL) return;
-    [releaseNotesURL release];
-    releaseNotesURL = [aReleaseNotesURL copy];
-}
-
-
-- (NSString *)DSASignature { return [[DSASignature retain] autorelease]; }
-
-- (void)setDSASignature:(NSString *)aDSASignature
-{
-	if (DSASignature == aDSASignature) return;
-    [DSASignature release];
-    DSASignature = [aDSASignature copy];
-}
-			
-
-- (NSURL *)fileURL { return [[fileURL retain] autorelease]; }
-
-- (void)setFileURL:(NSURL *)aFileURL
-{
-	if (fileURL == aFileURL) return;
-    [fileURL release];
-    fileURL = [aFileURL copy];
-}
-
-
-- (NSString *)versionString { return [[versionString retain] autorelease]; }
-
-- (void)setVersionString:(NSString *)s
-{
-	if (versionString == s) return;
-    [versionString release];
-    versionString = [s copy];
-}
-
-
-- (NSString *)displayVersionString { return [[displayVersionString retain] autorelease]; }
-
-- (void)setDisplayVersionString:(NSString *)s
-{
-	if (displayVersionString == s) return;
-    [displayVersionString release];
-    displayVersionString = [s copy];
-}
-
-
-- (NSString *)minimumSystemVersion { return [[minimumSystemVersion retain] autorelease]; }
-- (void)setMinimumSystemVersion:(NSString *)systemVersionString
-{
-	if (minimumSystemVersion == systemVersionString) return;
-	[minimumSystemVersion release];
-	minimumSystemVersion = [systemVersionString copy];
-}
-
-- (NSString *)maximumSystemVersion { return [[maximumSystemVersion retain] autorelease]; }
-- (void)setMaximumSystemVersion:(NSString *)systemVersionString
-{
-	if (maximumSystemVersion == systemVersionString) return;
-	[maximumSystemVersion release];
-	maximumSystemVersion = [systemVersionString copy];
-}
-
-
-- (NSURL *)infoURL	{ return [[infoURL retain] autorelease]; }	// UK 2007-08-31 (whole method)
-
-- (void)setInfoURL:(NSURL *)aFileURL	// UK 2007-08-31 (whole method)
-{
-	if( aFileURL == infoURL ) return;
-	[infoURL release];
-	infoURL = [aFileURL copy];
-}
-
-- (NSDictionary *)deltaUpdates { return [[deltaUpdates retain] autorelease]; }
-
-- (void)setDeltaUpdates:(NSDictionary *)updates
-{
-	if (deltaUpdates == updates) return;
-	[deltaUpdates release];
-	deltaUpdates = [updates copy];
-}
+@synthesize date;
+@synthesize deltaUpdates;
+@synthesize displayVersionString;
+@synthesize DSASignature;
+@synthesize fileURL;
+@synthesize infoURL;
+@synthesize itemDescription;
+@synthesize maximumSystemVersion;
+@synthesize minimumSystemVersion;
+@synthesize releaseNotesURL;
+@synthesize title;
+@synthesize versionString;
+@synthesize propertiesDictionary;
 
 - (BOOL)isDeltaUpdate
 {
-	return [[propertiesDictionary objectForKey:@"enclosure"] objectForKey:@"sparkle:deltaFrom"] != nil;
+	return propertiesDictionary[@"enclosure"][@"sparkle:deltaFrom"] != nil;
 }
 
-- initWithDictionary:(NSDictionary *)dict
+- (BOOL)isCriticalUpdate
+{
+    return [propertiesDictionary[@"sparkle:tags"] containsObject:@"sparkle:criticalUpdate"];
+}
+
+- (instancetype) initWithDictionary:(NSDictionary *)dict
 {
 	return [self initWithDictionary:dict failureReason:nil];
 }
 
-- initWithDictionary:(NSDictionary *)dict failureReason:(NSString**)error
+- (instancetype) initWithDictionary:(NSDictionary *)dict failureReason:(NSString**)error
 {
 	self = [super init];
 	if (self)
 	{
-		id enclosure = [dict objectForKey:@"enclosure"];
-		
+		id enclosure = dict[@"enclosure"];
+
 		// Try to find a version string.
 		// Finding the new version number from the RSS feed is a little bit hacky. There are two ways:
 		// 1. A "sparkle:version" attribute on the enclosure tag, an extension from the RSS spec.
@@ -158,18 +75,18 @@
 		//    underscore and the last period as the version number. So name your packages like this: APPNAME_VERSION.extension.
 		//    The big caveat with this is that you can't have underscores in your version strings, as that'll confuse Sparkle.
 		//    Feel free to change the separator string to a hyphen or something more suited to your needs if you like.
-		NSString *newVersion = [enclosure objectForKey:@"sparkle:version"];
+		NSString *newVersion = enclosure[@"sparkle:version"];
 		if( newVersion == nil )
-			newVersion = [dict objectForKey:@"sparkle:version"];	// UK 2007-08-31 Get version from the item, in case it's a download-less item (i.e. paid upgrade).
+			newVersion = dict[@"sparkle:version"];	// UK 2007-08-31 Get version from the item, in case it's a download-less item (i.e. paid upgrade).
 		if (newVersion == nil) // no sparkle:version attribute anywhere?
 		{
 			// Separate the url by underscores and take the last component, as that'll be closest to the end,
 			// then we remove the extension. Hopefully, this will be the version.
-			NSArray *fileComponents = [[enclosure objectForKey:@"url"] componentsSeparatedByString:@"_"];
+			NSArray *fileComponents = [enclosure[@"url"] componentsSeparatedByString:@"_"];
 			if ([fileComponents count] > 1)
 				newVersion = [[fileComponents lastObject] stringByDeletingPathExtension];
 		}
-		
+
 		if(!newVersion )
 		{
 			if (error)
@@ -177,21 +94,21 @@
 			[self release];
 			return nil;
 		}
-        
+
 		propertiesDictionary = [[NSMutableDictionary alloc] initWithDictionary:dict];
-		[self setTitle:[dict objectForKey:@"title"]];
-		[self setDate:[dict objectForKey:@"pubDate"]];
-		[self setItemDescription:[dict objectForKey:@"description"]];
-		
-		NSString*	theInfoURL = [dict objectForKey:@"link"];
+		self.title = dict[@"title"];
+		self.date = dict[@"pubDate"];
+		self.itemDescription = dict[@"description"];
+
+		NSString*	theInfoURL = dict[@"link"];
 		if( theInfoURL )
 		{
 			if( ![theInfoURL isKindOfClass: [NSString class]] )
 				SULog(@"SUAppcastItem -initWithDictionary: Info URL is not of valid type.");
 			else
-				[self setInfoURL:[NSURL URLWithString:theInfoURL]];
+				self.infoURL = [NSURL URLWithString:theInfoURL];
 		}
-		
+
 		// Need an info URL or an enclosure URL. Former to show "More Info"
 		//	page, latter to download & install:
 		if( !enclosure && !theInfoURL )
@@ -202,71 +119,61 @@
 			return nil;
 		}
 
-		NSString*	enclosureURLString = [enclosure objectForKey:@"url"];
+		NSString*	enclosureURLString = enclosure[@"url"];
 		if( !enclosureURLString && !theInfoURL )
 		{
-			if (error)
+			if (error) {
 				*error = @"Feed item's enclosure lacks URL";
+			}
 			[self release];
 			return nil;
 		}
-		
-		if( enclosureURLString )
-		{
-			// Support an older Red Sweater style of specifying "info only" appcasts, where
-			// the presence of a text/html enclosure implied it should be treated as info-only.
-			if ([[enclosure objectForKey:@"type"] isEqualToString:@"text/html"])
-			{
-				[self setInfoURL: [NSURL URLWithString: [enclosureURLString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
-			}
-			else
-			{
-				[self setFileURL: [NSURL URLWithString: [enclosureURLString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
-			}
-		}
-		
-		if( enclosure )
-			[self setDSASignature:[enclosure objectForKey:@"sparkle:dsaSignature"]];		
-		
-		[self setVersionString: newVersion];
-		[self setMinimumSystemVersion: [dict objectForKey:@"sparkle:minimumSystemVersion"]];
-        [self setMaximumSystemVersion: [dict objectForKey:@"sparkle:maximumSystemVersion"]];
-		
-		NSString *shortVersionString = [enclosure objectForKey:@"sparkle:shortVersionString"];
-        if (nil == shortVersionString)
-            shortVersionString = [dict objectForKey:@"sparkle:shortVersionString"]; // fall back on the <item>
-        
-		if (shortVersionString)
-			[self setDisplayVersionString: shortVersionString];
-		else
-			[self setDisplayVersionString: [self versionString]];
-		
-		// Find the appropriate release notes URL.
-		if ([dict objectForKey:@"sparkle:releaseNotesLink"])
-			[self setReleaseNotesURL:[NSURL URLWithString:[dict objectForKey:@"sparkle:releaseNotesLink"]]];
-		else if ([[self itemDescription] hasPrefix:@"http://"] || [[self itemDescription] hasPrefix:@"https://"]) // if the description starts with http:// or https:// use that.
-			[self setReleaseNotesURL:[NSURL URLWithString:[self itemDescription]]];
-		else
-			[self setReleaseNotesURL:nil];
 
-        if ([dict objectForKey:@"deltas"])
+		if( enclosureURLString ) {
+			NSString *fileURLString = [[enclosureURLString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+			self.fileURL = [NSURL URLWithString:fileURLString];
+		}
+		if (enclosure) {
+			self.DSASignature = enclosure[@"sparkle:dsaSignature"];
+		}
+
+		self.versionString = newVersion;
+		self.minimumSystemVersion = dict[@"sparkle:minimumSystemVersion"];
+        self.maximumSystemVersion = dict[@"sparkle:maximumSystemVersion"];
+
+		NSString *shortVersionString = enclosure[@"sparkle:shortVersionString"];
+		if (nil == shortVersionString) {
+            shortVersionString = dict[@"sparkle:shortVersionString"]; // fall back on the <item>
+		}
+
+		if (shortVersionString)
+			self.displayVersionString = shortVersionString;
+		else
+			self.displayVersionString = [self versionString];
+
+		// Find the appropriate release notes URL.
+		if (dict[@"sparkle:releaseNotesLink"])
+			self.releaseNotesURL = [NSURL URLWithString:dict[@"sparkle:releaseNotesLink"]];
+		else if ([self.itemDescription hasPrefix:@"http://"] || [self.itemDescription hasPrefix:@"https://"]) // if the description starts with http:// or https:// use that.
+			self.releaseNotesURL = [NSURL URLWithString:self.itemDescription];
+		else
+			self.releaseNotesURL = nil;
+
+        if (dict[@"deltas"])
 		{
             NSMutableDictionary *deltas = [NSMutableDictionary dictionary];
-            NSArray *deltaDictionaries = [dict objectForKey:@"deltas"];
-            NSEnumerator *deltaDictionariesEnum = [deltaDictionaries objectEnumerator];
-            NSDictionary *deltaDictionary;
-            while ((deltaDictionary = [deltaDictionariesEnum nextObject]))
-			{
-                NSMutableDictionary *fakeAppCastDict = [dict mutableCopy];
+            NSArray *deltaDictionaries = dict[@"deltas"];
+			for (NSDictionary *deltaDictionary in deltaDictionaries) {
+				NSMutableDictionary *fakeAppCastDict = [dict mutableCopy];
                 [fakeAppCastDict removeObjectForKey:@"deltas"];
-                [fakeAppCastDict setObject:deltaDictionary forKey:@"enclosure"];
+                fakeAppCastDict[@"enclosure"] = deltaDictionary;
                 SUAppcastItem *deltaItem = [[[self class] alloc] initWithDictionary:fakeAppCastDict];
                 [fakeAppCastDict release];
 
-                [deltas setObject:deltaItem forKey:[deltaDictionary objectForKey:@"sparkle:deltaFrom"]];
+                deltas[deltaDictionary[@"sparkle:deltaFrom"]] = deltaItem;
                 [deltaItem release];
-            }
-            [self setDeltaUpdates:deltas];
+			}
+            self.deltaUpdates = deltas;
         }
 	}
 	return self;
@@ -274,17 +181,17 @@
 
 - (void)dealloc
 {
-    [self setTitle:nil];
-    [self setDate:nil];
-    [self setItemDescription:nil];
-    [self setReleaseNotesURL:nil];
-    [self setDSASignature:nil];
-	[self setMinimumSystemVersion: nil];
-    [self setFileURL:nil];
-    [self setVersionString:nil];
-	[self setDisplayVersionString:nil];
-	[self setInfoURL:nil];
-	[propertiesDictionary release];
+	self.title = nil;
+	self.date = nil;
+	self.itemDescription = nil;
+	self.releaseNotesURL = nil;
+	self.DSASignature = nil;
+	self.minimumSystemVersion = nil;
+	self.fileURL = nil;
+	self.versionString = nil;
+	self.displayVersionString = nil;
+	self.infoURL = nil;
+	self.propertiesDictionary = nil;
     [super dealloc];
 }
 

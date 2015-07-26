@@ -11,10 +11,11 @@
 
 #import <Cocoa/Cocoa.h>
 #import "SUBasicUpdateDriver.h"
+#import "SUUpdateAlert.h"
 
-@class SUStatusController, SUUpdateAlert;
+@class SUStatusController;
 
-@interface SUUIBasedUpdateDriver : SUBasicUpdateDriver
+@interface SUUIBasedUpdateDriver : SUBasicUpdateDriver <SUUnarchiverDelegate, SUUpdateAlertDelegate>
 {
 	SUStatusController *statusController;
 	SUUpdateAlert *updateAlert;

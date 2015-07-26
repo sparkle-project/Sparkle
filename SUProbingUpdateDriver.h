@@ -13,7 +13,7 @@
 #import "SUBasicUpdateDriver.h"
 
 // This replaces the old SUStatusChecker.
-@interface SUProbingUpdateDriver : SUBasicUpdateDriver { }
+@interface SUProbingUpdateDriver : SUBasicUpdateDriver
 @end
 
 #endif

@@ -2,4 +2,3 @@
 #include "ConfigCommonDebug.xcconfig"
 #include "ConfigBinaryDelta.xcconfig"
 
-OTHER_CFLAGS = -DDEBUG

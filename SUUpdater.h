@@ -14,43 +14,39 @@
 
 @class SUUpdateDriver, SUAppcastItem, SUHost, SUAppcast;
 
+@protocol SUUpdaterDelegate;
+
 @interface SUUpdater : NSObject
 {
 @private
-	NSTimer *checkTimer;
 	SUUpdateDriver *driver;
 
-	NSString *customUserAgentString;
 	SUHost *host;
-	IBOutlet id delegate;
 }
+@property (assign) IBOutlet id<SUUpdaterDelegate> delegate;
 
 + (SUUpdater *)sharedUpdater;
 + (SUUpdater *)updaterForBundle:(NSBundle *)bundle;
-- (id)initForBundle:(NSBundle *)bundle;
+- (instancetype)initForBundle:(NSBundle *)bundle;
 
-- (NSBundle *)hostBundle;
+@property (readonly, strong) NSBundle *hostBundle;
 
-- (void)setDelegate:(id)delegate;
-- (id)delegate;
+@property  BOOL automaticallyChecksForUpdates;
 
-- (void)setAutomaticallyChecksForUpdates:(BOOL)automaticallyChecks;
-- (BOOL)automaticallyChecksForUpdates;
+@property  NSTimeInterval updateCheckInterval;
 
-- (void)setUpdateCheckInterval:(NSTimeInterval)interval;
-- (NSTimeInterval)updateCheckInterval;
+/*!
+ * The URL of the appcast used to download update information.
+ *
+ * This property must be called on the main thread.
+ */
+@property (copy) NSURL *feedURL;
 
-- (void)setFeedURL:(NSURL *)feedURL;
-- (NSURL *)feedURL;	// *** MUST BE CALLED ON MAIN THREAD ***
+@property (nonatomic, copy) NSString *userAgentString;
 
-- (void)setUserAgentString:(NSString *)userAgent;
-- (NSString *)userAgentString;
+@property  BOOL sendsSystemProfile;
 
-- (void)setSendsSystemProfile:(BOOL)sendsSystemProfile;
-- (BOOL)sendsSystemProfile;
-
-- (void)setAutomaticallyDownloadsUpdates:(BOOL)automaticallyDownloadsUpdates;
-- (BOOL)automaticallyDownloadsUpdates;
+@property  BOOL automaticallyDownloadsUpdates;
 
 // This IBAction is meant for a main menu item. Hook up any menu item to this action,
 // and Sparkle will check for updates and report back its findings verbosely.
@@ -62,7 +58,7 @@
 - (void)checkForUpdatesInBackground;
 
 // Date of last update check. Returns nil if no check has been performed.
-- (NSDate*)lastUpdateCheckDate;
+@property (readonly, copy) NSDate *lastUpdateCheckDate;
 
 // This begins a "probing" check for updates which will not actually offer to update to that version. The delegate methods, though,
 // (up to updater:didFindValidUpdate: and updaterDidNotFindUpdate:), are called, so you can use that information in your UI.
@@ -71,16 +67,32 @@
 // Call this to appropriately schedule or cancel the update checking timer according to the preferences for time interval and automatic checks. This call does not change the date of the next check, but only the internal NSTimer.
 - (void)resetUpdateCycle;
 
-- (BOOL)updateInProgress;
+@property (readonly) BOOL updateInProgress;
 
 @end
 
+// -----------------------------------------------------------------------------
+// SUUpdater Notifications for events that might be interesting to more than just the delegate
+// The updater will be the notification object
+// -----------------------------------------------------------------------------
+extern NSString *const SUUpdaterDidFinishLoadingAppCastNotification;
+extern NSString *const SUUpdaterDidFindValidUpdateNotification;
+extern NSString *const SUUpdaterDidNotFindUpdateNotification;
+extern NSString *const SUUpdaterWillRestartNotification;
+#define SUUpdaterWillRelaunchApplicationNotification SUUpdaterWillRestartNotification;
+#define SUUpdaterWillInstallUpdateNotification SUUpdaterWillRestartNotification;
+
+// Key for the SUAppcastItem object in the SUUpdaterDidFindValidUpdateNotification userInfo
+extern NSString *const SUUpdaterAppcastItemNotificationKey;
+// Key for the SUAppcast object in the SUUpdaterDidFinishLoadingAppCastNotification userInfo
+extern NSString *const SUUpdaterAppcastNotificationKey;
 
 // -----------------------------------------------------------------------------
 //	SUUpdater Delegate:
 // -----------------------------------------------------------------------------
 
-@interface NSObject (SUUpdaterDelegateInformalProtocol)
+@protocol SUUpdaterDelegate <NSObject>
+@optional
 
 // Use this to keep Sparkle from popping up e.g. while your setup assistant is showing:
 - (BOOL)updaterMayCheckForUpdates:(SUUpdater *)bundle;
@@ -137,6 +149,11 @@
 //	the opportunity to hide attached windows etc. that may get in the way:
 -(void)	updaterWillShowModalAlert:(SUUpdater *)updater;
 -(void)	updaterDidShowModalAlert:(SUUpdater *)updater;
+
+// Called when an update is scheduled to be silently installed on quit.
+// The invocation can be used to trigger an immediate silent install and relaunch.
+- (void)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)update immediateInstallationInvocation:(NSInvocation *)invocation;
+- (void)updater:(SUUpdater *)updater didCancelInstallUpdateOnQuit:(SUAppcastItem *)update;
 
 @end
 

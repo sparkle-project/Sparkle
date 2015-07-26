@@ -12,8 +12,7 @@
 #import <Cocoa/Cocoa.h>
 #import "SUUnarchiver.h"
 
-@interface SUBinaryDeltaUnarchiver : SUUnarchiver {
-}
+@interface SUBinaryDeltaUnarchiver : SUUnarchiver
 
 @end
 
