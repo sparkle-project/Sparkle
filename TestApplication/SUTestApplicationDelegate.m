@@ -37,7 +37,7 @@
         [[NSApplication sharedApplication] terminate:nil];
     }
     
-    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
     
     // Locate user's cache directory
     NSError *cacheError = nil;
