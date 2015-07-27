@@ -9,7 +9,7 @@
 #ifndef SUSYSTEMPROFILER_H
 #define SUSYSTEMPROFILER_H
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
 @class SUHost;
 @interface SUSystemProfiler : NSObject

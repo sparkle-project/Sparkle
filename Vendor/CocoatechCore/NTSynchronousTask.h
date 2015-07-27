@@ -10,7 +10,7 @@
 #define NTSYNCHRONOUSTASK_H
 
 @interface NTSynchronousTask : NSObject
-@property (readonly, retain) NSData *output;
+@property (readonly, strong) NSData *output;
 @property (readonly) int result;
 
 // pass nil for directory if not needed

@@ -72,6 +72,10 @@
 /* the unit for kilobytes */
 "KB" = "KB";
 
+/* Alternative name for "Install" button if we have a paid update or other update
+	without a download but with a URL. */
+"Learn More..." = "Learn More…";
+
 /* the unit for megabytes */
 "MB" = "MB";
 
@@ -84,8 +88,9 @@
 /* Message that is optionally shown at startup to allow users to turn on/off update checks. */
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu.";
 
-/* No comment provided by engineer. */
-"Update Error!" = "Update Error.";
+"The update is improperly signed." = "The update is improperly signed.";
+
+"Update Error!" = "Update Error!";
 
 "Updating %@" = "Updating %@";
 

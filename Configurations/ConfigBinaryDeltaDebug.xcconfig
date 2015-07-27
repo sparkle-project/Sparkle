@@ -1,4 +1,2 @@
-#include "ConfigCommon.xcconfig"
-#include "ConfigCommonDebug.xcconfig"
 #include "ConfigBinaryDelta.xcconfig"
 

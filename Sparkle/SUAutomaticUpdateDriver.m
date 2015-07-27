@@ -15,29 +15,52 @@
 // If the user hasn't quit in a week, ask them if they want to relaunch to get the latest bits. It doesn't matter that this measure of "one day" is imprecise.
 static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 24 * 7;
 
+@interface SUUpdateDriver ()
+
+@property (getter=isInterruptible) BOOL interruptible;
+
+@end
+
+@interface SUAutomaticUpdateDriver ()
+
+@property (assign) BOOL postponingInstallation;
+@property (assign) BOOL showErrors;
+@property (assign) BOOL willUpdateOnTermination;
+@property (strong) SUAutomaticUpdateAlert *alert;
+@property (strong) NSTimer *showUpdateAlertTimer;
+
+@end
+
 @implementation SUAutomaticUpdateDriver
+
+@synthesize postponingInstallation;
+@synthesize showErrors;
+@synthesize willUpdateOnTermination;
+@synthesize alert;
+@synthesize showUpdateAlertTimer;
 
 - (void)showUpdateAlert
 {
-	isInterruptible = NO;
-	alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:updateItem host:host delegate:self];
+    self.interruptible = NO;
+    self.alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host completionBlock:^(SUAutomaticInstallationChoice choice) {
+        [self automaticUpdateAlertFinishedWithChoice:choice];
+    }];
 
-	// If the app is a menubar app or the like, we need to focus it first and alter the
-	// update prompt to behave like a normal window. Otherwise if the window were hidden
-	// there may be no way for the application to be activated to make it visible again.
-	if ([host isBackgroundApplication])
-	{
-		[[alert window] setHidesOnDeactivate:NO];
-		[NSApp activateIgnoringOtherApps:YES];
-	}
+    // If the app is a menubar app or the like, we need to focus it first and alter the
+    // update prompt to behave like a normal window. Otherwise if the window were hidden
+    // there may be no way for the application to be activated to make it visible again.
+    if ([self.host isBackgroundApplication]) {
+        [[self.alert window] setHidesOnDeactivate:NO];
+        [NSApp activateIgnoringOtherApps:YES];
+    }
 
-	if ([NSApp isActive])
-		[[alert window] makeKeyAndOrderFront:self];
-	else
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
+    if ([NSApp isActive])
+        [[self.alert window] makeKeyAndOrderFront:self];
+    else
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
-- (void)unarchiverDidFinish:(SUUnarchiver *) __unused ua
+- (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
 
@@ -45,9 +68,10 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     NSProcessInfo *processInfo = [NSProcessInfo processInfo];
     [processInfo disableSuddenTermination];
 
-    willUpdateOnTermination = YES;
+    self.willUpdateOnTermination = YES;
 
-    if ([[updater delegate] respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)])
+    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+    if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)])
     {
         BOOL relaunch = YES;
         BOOL showUI = NO;
@@ -57,51 +81,49 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         [invocation setArgument:&showUI atIndex:3];
         [invocation setTarget:self];
 
-        [[updater delegate] updater:updater willInstallUpdateOnQuit:updateItem immediateInstallationInvocation:invocation];
+        [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationInvocation:invocation];
     }
 
     // If this is marked as a critical update, we'll prompt the user to install it right away.
-    if ([updateItem isCriticalUpdate])
+    if ([self.updateItem isCriticalUpdate])
     {
         [self showUpdateAlert];
     }
     else
     {
-        showUpdateAlertTimer = [[NSTimer scheduledTimerWithTimeInterval:SUAutomaticUpdatePromptImpatienceTimer target:self selector:@selector(showUpdateAlert) userInfo:nil repeats:NO] retain];
+        self.showUpdateAlertTimer = [NSTimer scheduledTimerWithTimeInterval:SUAutomaticUpdatePromptImpatienceTimer target:self selector:@selector(showUpdateAlert) userInfo:nil repeats:NO];
 
         // At this point the driver is idle, allow it to be interrupted for user-initiated update checks.
-        isInterruptible = YES;
+        self.interruptible = YES;
     }
 }
 
 - (void)stopUpdatingOnTermination
 {
-    if (willUpdateOnTermination)
+    if (self.willUpdateOnTermination)
     {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
         NSProcessInfo *processInfo = [NSProcessInfo processInfo];
         [processInfo enableSuddenTermination];
 
-        willUpdateOnTermination = NO;
+        self.willUpdateOnTermination = NO;
 
-        if ([[updater delegate] respondsToSelector:@selector(updater:didCancelInstallUpdateOnQuit:)])
-            [[updater delegate] updater:updater didCancelInstallUpdateOnQuit:updateItem];
+        id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+        if ([updaterDelegate respondsToSelector:@selector(updater:didCancelInstallUpdateOnQuit:)])
+            [updaterDelegate updater:self.updater didCancelInstallUpdateOnQuit:self.updateItem];
     }
 }
 
 - (void)invalidateShowUpdateAlertTimer
 {
-    [showUpdateAlertTimer invalidate];
-    [showUpdateAlertTimer release];
-    showUpdateAlertTimer = nil;
+    [self.showUpdateAlertTimer invalidate];
+    self.showUpdateAlertTimer = nil;
 }
 
 - (void)dealloc
 {
     [self stopUpdatingOnTermination];
     [self invalidateShowUpdateAlertTimer];
-    [alert release];
-    [super dealloc];
 }
 
 - (void)abortUpdate
@@ -111,58 +133,64 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     [super abortUpdate];
 }
 
-- (void)applicationDidBecomeActive:(NSNotification *) __unused aNotification
+- (void)applicationDidBecomeActive:(NSNotification *)__unused aNotification
 {
-	[[alert window] makeKeyAndOrderFront:self];
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:@"NSApplicationDidBecomeActiveNotification" object:NSApp];
+    [[self.alert window] makeKeyAndOrderFront:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
-- (void)automaticUpdateAlert:(SUAutomaticUpdateAlert *) __unused aua finishedWithChoice:(SUAutomaticInstallationChoice)choice
+- (void)automaticUpdateAlertFinishedWithChoice:(SUAutomaticInstallationChoice)choice
 {
 	switch (choice)
 	{
-		case SUInstallNowChoice:
+        case SUInstallNowChoice:
             [self stopUpdatingOnTermination];
-			[self installWithToolAndRelaunch:YES];
-			break;
+            [self installWithToolAndRelaunch:YES];
+            break;
 
-		case SUInstallLaterChoice:
-			postponingInstallation = YES;
-			[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
-			// We're already waiting on quit, just indicate that we're idle.
-			isInterruptible = YES;
-			break;
+        case SUInstallLaterChoice:
+            self.postponingInstallation = YES;
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+            // We're already waiting on quit, just indicate that we're idle.
+            self.interruptible = YES;
+            break;
 
-		case SUDoNotInstallChoice:
-			[host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
-			[self abortUpdate];
-			break;
-	}
+        case SUDoNotInstallChoice:
+            [self.host setObject:[self.updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+            [self abortUpdate];
+            break;
+    }
 }
-
-- (BOOL)shouldInstallSynchronously { return postponingInstallation; }
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
 {
-	if (relaunch) {
+    if (relaunch) {
         [self stopUpdatingOnTermination];
-	}
+    }
 
-    showErrors = YES;
+    self.showErrors = YES;
     [super installWithToolAndRelaunch:relaunch displayingUserInterface:showUI];
 }
 
-- (void)applicationWillTerminate:(NSNotification *) __unused note
+- (void)applicationWillTerminate:(NSNotification *)__unused note
 {
-	[self installWithToolAndRelaunch:NO];
+    [self installWithToolAndRelaunch:NO];
 }
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-	if (showErrors)
-		[super abortUpdateWithError:error];
-	else
-		[self abortUpdate];
+    if (self.showErrors) {
+        [super abortUpdateWithError:error];
+    } else {
+        // Call delegate separately here because otherwise it won't know we stopped.
+        // Normally this gets called by the superclass
+        id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+        if ([updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
+            [updaterDelegate updater:self.updater didAbortWithError:error];
+        }
+
+        [self abortUpdate];
+    }
 }
 
 @end

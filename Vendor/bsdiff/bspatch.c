@@ -28,7 +28,7 @@
 __FBSDID("$FreeBSD: src/usr.bin/bsdiff/bspatch/bspatch.c,v 1.1 2005/08/06 01:59:06 cperciva Exp $");
 #endif
 
-#include <bspatch.h>
+#include "bspatch.h"
 #include <bzlib.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -123,7 +123,7 @@ static off_t offtin(u_char *buf)
 	return y;
 }
 
-int bspatch(int argc,char * argv[])
+int bspatch(int argc,const char * const argv[])
 {
 	FILE * f, * cpf, * dpf, * epf;
 	stream_t cstream, dstream, estream;

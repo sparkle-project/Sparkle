@@ -13,10 +13,6 @@
 #import "SUUIBasedUpdateDriver.h"
 
 @interface SUScheduledUpdateDriver : SUUIBasedUpdateDriver
-{
-@private
-	BOOL showErrors;
-}
 
 @end
 

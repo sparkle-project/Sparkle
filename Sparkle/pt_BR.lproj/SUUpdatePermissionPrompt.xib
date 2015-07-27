@@ -140,13 +140,13 @@ Gw
             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField verticalHuggingPriority="750" id="46">
-                    <rect key="frame" x="1" y="128" width="358" height="70"/>
+                    <rect key="frame" x="1" y="128" width="355" height="70"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="183">
                         <font key="font" metaFont="smallSystem"/>
-                        <string key="title">Informações anônimas do sistema são utilizadas para nos ajudar a planejar o desenvolvimento futuro do aplicativo. Caso você tenha dúvidas sobre esse procedimento, por favor contate-nos.
+                        <string key="title">As informações anônimas do sistema são usadas para nos ajudar a planejar o desenvolvimento futuro do aplicativo. Contate-nos caso tenha dúvidas sobre este procedimento.
 
-A seguinte informação seria enviada:</string>
+As seguintes informações seriam enviadas:</string>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -156,7 +156,7 @@ A seguinte informação seria enviada:</string>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     <clipView key="contentView" id="Xyl-4B-4C7">
                         <rect key="frame" x="1" y="1" width="353" height="113"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="14" id="41">
                                 <rect key="frame" x="0.0" y="0.0" width="353" height="113"/>

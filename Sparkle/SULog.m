@@ -18,7 +18,7 @@
 //	Constants:
 // -----------------------------------------------------------------------------
 
-#define LOG_FILE_PATH	@"~/Library/Logs/SparkleUpdateLog.log"
+static NSString *const SULogFilePath = @"~/Library/Logs/SparkleUpdateLog.log";
 
 
 // -----------------------------------------------------------------------------
@@ -30,19 +30,15 @@
 //
 //	TAKES:
 //		sender	-	Object that sent this message, typically of type X.
-//
-//	GIVES:
-//		param	-	who owns the returned value?
-//		result	-	same here.
 // -----------------------------------------------------------------------------
 
-void	SUClearLog( void )
+void SUClearLog(void)
 {
-	FILE*		logfile = fopen([[LOG_FILE_PATH stringByExpandingTildeInPath] fileSystemRepresentation],"w");
-	if( logfile )
-		fclose(logfile);
-	else
-		NSLog(@"----- Sparkle Log -----");
+    FILE *logfile = fopen([[SULogFilePath stringByExpandingTildeInPath] fileSystemRepresentation], "w");
+    if (logfile) {
+        fclose(logfile);
+        SULog(@"===== %@ =====", [[NSFileManager defaultManager] displayNameAtPath:[[NSBundle mainBundle] bundlePath]]);
+    }
 }
 
 
@@ -56,25 +52,27 @@ void	SUClearLog( void )
 //		...		-	More parameters depending on format string's contents.
 // -----------------------------------------------------------------------------
 
-void	SULog( NSString* format, ... )
+void SULog(NSString *format, ...)
 {
-	va_list ap;
-	va_start(ap, format);
-	NSString*	theStr = [[[NSString alloc] initWithFormat: format arguments: ap] autorelease];
-	FILE*		logfile = fopen([[LOG_FILE_PATH stringByExpandingTildeInPath] fileSystemRepresentation],"a");
-	if( !logfile )
-		NSLog( @"%@",theStr );
-	else
-	{
-		theStr = [NSString stringWithFormat: @"%@: %@", [NSDate date], theStr];
-		NSData*		theData = [theStr dataUsingEncoding: NSUTF8StringEncoding];
-		char		newlineChar = '\n';
-		fwrite( [theData bytes], 1, [theData length], logfile );
-		fwrite( &newlineChar, 1, 1, logfile );	// Append a newline.
-		fclose( logfile );
-		logfile = NULL;
-	}
-	va_end(ap);
+    static BOOL loggedYet = NO;
+    if (!loggedYet) {
+        loggedYet = YES;
+        SUClearLog();
+    }
+
+    va_list ap;
+    va_start(ap, format);
+    NSString *theStr = [[NSString alloc] initWithFormat:format arguments:ap];
+    NSLog(@"Sparkle: %@", theStr);
+
+    FILE *logfile = fopen([[SULogFilePath stringByExpandingTildeInPath] fileSystemRepresentation], "a");
+    if (logfile) {
+        theStr = [NSString stringWithFormat:@"%@: %@\n", [NSDate date], theStr];
+        NSData *theData = [theStr dataUsingEncoding:NSUTF8StringEncoding];
+        fwrite([theData bytes], 1, [theData length], logfile);
+        fclose(logfile);
+    }
+    va_end(ap);
 }
 
 

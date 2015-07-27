@@ -58,11 +58,11 @@
                         </connections>
                     </textField>
                     <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="17">
-                        <rect key="frame" x="106" y="294" width="84" height="14"/>
+                        <rect key="frame" x="106" y="294" width="92" height="14"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="100" constant="100" id="gkn-FW-9aC"/>
                         </constraints>
-                        <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" title="リリースノート:" usesSingleLineMode="YES" id="170">
+                        <textFieldCell key="cell" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" title="リリースノート：" usesSingleLineMode="YES" id="170">
                             <font key="font" metaFont="smallSystemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -156,10 +156,10 @@ DQ
                             </binding>
                         </connections>
                     </box>
-                    <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="100" translatesAutoresizingMaskIntoConstraints="NO" id="101">
+                    <textField horizontalHuggingPriority="350" verticalHuggingPriority="999" horizontalCompressionResistancePriority="100" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="101">
                         <rect key="frame" x="106" y="316" width="514" height="14"/>
                         <constraints>
-                            <constraint firstAttribute="height" priority="300" constant="28" id="H6E-te-Fog"/>
+                            <constraint firstAttribute="height" relation="lessThanOrEqual" priority="300" constant="28" id="H6E-te-Fog"/>
                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="14" id="KUO-Dw-g6s"/>
                         </constraints>
                         <textFieldCell key="cell" allowsUndo="NO" sendsActionOnEndEditing="YES" id="174">
@@ -222,7 +222,6 @@ DQ
             <connections>
                 <outlet property="delegate" destination="-2" id="50"/>
             </connections>
-            <point key="canvasLocation" x="155" y="147"/>
         </window>
         <userDefaultsController representsSharedInstance="YES" id="93" userLabel="Shared Defaults"/>
     </objects>

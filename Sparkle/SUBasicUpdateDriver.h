@@ -15,16 +15,11 @@
 #import "SUAppcast.h"
 
 @class SUAppcastItem, SUHost;
-@interface SUBasicUpdateDriver : SUUpdateDriver<NSURLDownloadDelegate, SUUnarchiverDelegate, SUAppcastDelegate> {
-	SUAppcastItem *updateItem;
-	SUAppcastItem *nonDeltaUpdateItem;
+@interface SUBasicUpdateDriver : SUUpdateDriver <NSURLDownloadDelegate, SUUnarchiverDelegate>
 
-	NSURLDownload *download;
-	NSString *downloadPath;
-	NSString *tempDir;
-
-	NSString *relaunchPath;
-}
+@property (strong, readonly) SUAppcastItem *updateItem;
+@property (strong, readonly) NSURLDownload *download;
+@property (copy, readonly) NSString *downloadPath;
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
 
@@ -32,6 +27,7 @@
 - (BOOL)hostSupportsItem:(SUAppcastItem *)ui;
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui;
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui;
+- (void)appcastDidFinishLoading:(SUAppcast *)ac;
 - (void)didFindValidUpdate;
 - (void)didNotFindUpdate;
 
@@ -53,6 +49,7 @@
 
 - (void)abortUpdate;
 - (void)abortUpdateWithError:(NSError *)error;
+- (void)terminateApp;
 
 @end
 

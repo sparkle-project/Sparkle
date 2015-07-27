@@ -17,258 +17,182 @@
 
 #import "SUConstants.h"
 
+@interface SUUpdateAlert ()
 
-@interface WebView ()
+@property (strong) SUAppcastItem *updateItem;
+@property (strong) SUHost *host;
+@property (strong) void(^completionBlock)(SUUpdateAlertChoice);
 
--(void)	setDrawsBackground: (BOOL)state;
+@property (strong) NSProgressIndicator *releaseNotesSpinner;
+@property (assign) BOOL webViewFinishedLoading;
+
+@property (weak) IBOutlet WebView *releaseNotesView;
+@property (weak) IBOutlet NSView *releaseNotesContainerView;
+@property (weak) IBOutlet NSTextField *descriptionField;
+@property (weak) IBOutlet NSButton *installButton;
+@property (weak) IBOutlet NSButton *skipButton;
+@property (weak) IBOutlet NSButton *laterButton;
 
 @end
 
-
 @implementation SUUpdateAlert
-@synthesize delegate;
+
+@synthesize completionBlock;
 @synthesize versionDisplayer;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost
+@synthesize updateItem;
+@synthesize host;
+
+@synthesize releaseNotesSpinner;
+@synthesize webViewFinishedLoading;
+
+@synthesize releaseNotesView;
+@synthesize releaseNotesContainerView;
+@synthesize descriptionField;
+@synthesize installButton;
+@synthesize skipButton;
+@synthesize laterButton;
+
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUUpdateAlertChoice))block
 {
-	self = [super initWithHost:host windowNibName:@"SUUpdateAlert"];
+    self = [super initWithWindowNibName:@"SUUpdateAlert"];
 	if (self)
 	{
-		host = [aHost retain];
-		updateItem = [item retain];
-		[self setShouldCascadeWindows:NO];
+        self.completionBlock = block;
+        host = aHost;
+        updateItem = item;
+        [self setShouldCascadeWindows:NO];
 
-		// Alex: This dummy line makes sure that the binary is linked against WebKit.
-		// The SUUpdateAlert.xib file contains a WebView and if we don't link against WebKit,
-		// we will get a runtime crash when decoding the NIB. It is better to get a link error.
-		[WebView MIMETypesShownAsHTML];
-	}
-	return self;
+        // Alex: This dummy line makes sure that the binary is linked against WebKit.
+        // The SUUpdateAlert.xib file contains a WebView and if we don't link against WebKit,
+        // we will get a runtime crash when decoding the NIB. It is better to get a link error.
+        [WebView MIMETypesShownAsHTML];
+    }
+    return self;
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [host bundlePath]]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
 
-- (void)dealloc
-{
-	[updateItem release];
-	[host release];
-	[super dealloc];
-}
 
 - (void)endWithSelection:(SUUpdateAlertChoice)choice
 {
-	[releaseNotesView stopLoading:self];
-	[releaseNotesView setFrameLoadDelegate:nil];
-	[releaseNotesView setPolicyDelegate:nil];
-	[releaseNotesView removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
-	[self close];
-	if ([delegate respondsToSelector:@selector(updateAlert:finishedWithChoice:)])
-		[delegate updateAlert:self finishedWithChoice:choice];
+    [self.releaseNotesView stopLoading:self];
+    [self.releaseNotesView setFrameLoadDelegate:nil];
+    [self.releaseNotesView setPolicyDelegate:nil];
+    [self.releaseNotesView removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
+    [self close];
+    self.completionBlock(choice);
+    self.completionBlock = nil;
 }
 
-- (IBAction)installUpdate:(id) __unused sender
+- (IBAction)installUpdate:(id)__unused sender
 {
-	[self endWithSelection:SUInstallUpdateChoice];
+    [self endWithSelection:SUInstallUpdateChoice];
 }
 
-- (IBAction)openInfoURL:(id) __unused sender
+- (IBAction)openInfoURL:(id)__unused sender
 {
-	[self endWithSelection:SUOpenInfoURLChoice];
+    [self endWithSelection:SUOpenInfoURLChoice];
 }
 
-- (IBAction)skipThisVersion:(id) __unused sender
+- (IBAction)skipThisVersion:(id)__unused sender
 {
-	[self endWithSelection:SUSkipThisVersionChoice];
+    [self endWithSelection:SUSkipThisVersionChoice];
 }
 
-- (IBAction)remindMeLater:(id) __unused sender
+- (IBAction)remindMeLater:(id)__unused sender
 {
-	[self endWithSelection:SURemindMeLaterChoice];
+    [self endWithSelection:SURemindMeLaterChoice];
 }
 
 - (void)displayReleaseNotes
 {
-	// Set the default font
-	[releaseNotesView setPreferencesIdentifier:[SPARKLE_BUNDLE bundleIdentifier]];
-    WebPreferences *prefs = [releaseNotesView preferences];
-    NSString *familyName = [[NSFont systemFontOfSize:8] familyName];
-    if ([familyName hasPrefix:@"."]) { // 10.9 returns ".Lucida Grande UI", which isn't a valid name for the WebView
-        familyName = @"Lucida Grande";
-    }
-	[prefs setStandardFontFamily:familyName];
-	[prefs setDefaultFontSize:(int)[NSFont systemFontSizeForControlSize:NSSmallControlSize]];
-    [prefs setPlugInsEnabled:NO];
-	[releaseNotesView setFrameLoadDelegate:self];
-	[releaseNotesView setPolicyDelegate:self];
+    self.releaseNotesView.preferencesIdentifier = SUBundleIdentifier;
+    WebPreferences *prefs = [self.releaseNotesView preferences];
+    prefs.plugInsEnabled = NO;
+    self.releaseNotesView.frameLoadDelegate = self;
+    self.releaseNotesView.policyDelegate = self;
+    
+    // Set the default font
+    // "-apple-system-font" is a reference to the system UI font on OS X. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
+    prefs.standardFontFamily = @"-apple-system-font";
+    prefs.defaultFontSize = (int)[NSFont systemFontSize];
 
-	// Stick a nice big spinner in the middle of the web view until the page is loaded.
-	NSRect frame = [[releaseNotesView superview] frame];
-	releaseNotesSpinner = [[[NSProgressIndicator alloc] initWithFrame:NSMakeRect(NSMidX(frame)-16, NSMidY(frame)-16, 32, 32)] autorelease];
-	[releaseNotesSpinner setStyle:NSProgressIndicatorSpinningStyle];
-	[releaseNotesSpinner startAnimation:self];
-	webViewFinishedLoading = NO;
-	[[releaseNotesView superview] addSubview:releaseNotesSpinner];
+    // Stick a nice big spinner in the middle of the web view until the page is loaded.
+    NSRect frame = [[self.releaseNotesView superview] frame];
+    self.releaseNotesSpinner = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(NSMidX(frame) - 16, NSMidY(frame) - 16, 32, 32)];
+    [self.releaseNotesSpinner setStyle:NSProgressIndicatorSpinningStyle];
+    [self.releaseNotesSpinner startAnimation:self];
+    self.webViewFinishedLoading = NO;
+    [[self.releaseNotesView superview] addSubview:self.releaseNotesSpinner];
 
-	// If there's a release notes URL, load it; otherwise, just stick the contents of the description into the web view.
-	if ([updateItem releaseNotesURL])
+    // If there's a release notes URL, load it; otherwise, just stick the contents of the description into the web view.
+	if ([self.updateItem releaseNotesURL])
 	{
-		if ([[updateItem releaseNotesURL] isFileURL])
+		if ([[self.updateItem releaseNotesURL] isFileURL])
 		{
-			[[releaseNotesView mainFrame] loadHTMLString:@"Release notes with file:// URLs are not supported for security reasons&mdash;Javascript would be able to read files on your file system." baseURL:nil];
+            [[self.releaseNotesView mainFrame] loadHTMLString:@"Release notes with file:// URLs are not supported for security reasons&mdash;Javascript would be able to read files on your file system." baseURL:nil];
 		}
 		else
 		{
-			[[releaseNotesView mainFrame] loadRequest:[NSURLRequest requestWithURL:[updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30]];
-		}
+            [[self.releaseNotesView mainFrame] loadRequest:[NSURLRequest requestWithURL:[self.updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30]];
+        }
 	}
 	else
 	{
-		[[releaseNotesView mainFrame] loadHTMLString:[updateItem itemDescription] baseURL:nil];
-	}
+        [[self.releaseNotesView mainFrame] loadHTMLString:[self.updateItem itemDescription] baseURL:nil];
+    }
 }
 
 - (BOOL)showsReleaseNotes
 {
-	NSNumber *shouldShowReleaseNotes = [host objectForInfoDictionaryKey:SUShowReleaseNotesKey];
+    NSNumber *shouldShowReleaseNotes = [self.host objectForInfoDictionaryKey:SUShowReleaseNotesKey];
 	if (shouldShowReleaseNotes == nil)
 	{
-		// UK 2007-09-18: Don't show release notes if RSS item contains no description and no release notes URL:
-		return( ([updateItem itemDescription] != nil
-			&& [[[updateItem itemDescription] stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0)
-			|| [updateItem releaseNotesURL] != nil );
+        // Don't show release notes if RSS item contains no description and no release notes URL:
+        return (([self.updateItem itemDescription] != nil
+                 && [[[self.updateItem itemDescription] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] > 0)
+                || [self.updateItem releaseNotesURL] != nil);
 	}
 	else
-		return [shouldShowReleaseNotes boolValue];
+        return [shouldShowReleaseNotes boolValue];
 }
 
 - (BOOL)allowsAutomaticUpdates
 {
-	BOOL		allowAutoUpdates = YES;	// Defaults to YES.
-	if( [host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] )
-		allowAutoUpdates = [host boolForInfoDictionaryKey: SUAllowsAutomaticUpdatesKey];
+    BOOL allowAutoUpdates = YES; // Defaults to YES.
+    if ([self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey])
+        allowAutoUpdates = [self.host boolForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
 
-	// UK 2007-08-31: Give delegate a chance to modify this choice:
-	if( delegate && [delegate respondsToSelector: @selector(updateAlert:shouldAllowAutoUpdate:)] )
-		[delegate updateAlert: self shouldAllowAutoUpdate: &allowAutoUpdates];
-
-	return allowAutoUpdates;
+    return allowAutoUpdates;
 }
 
 - (void)awakeFromNib
 {
-	NSString*	sizeStr = [host objectForInfoDictionaryKey:SUFixedHTMLDisplaySizeKey];
+    BOOL showReleaseNotes = [self showsReleaseNotes];
 
-	if ([host isBackgroundApplication]) {
-		[[self window] setLevel:NSFloatingWindowLevel];	// This means the window will float over all other apps, if our app is switched out ?! UK 2007-09-04
-	}
-	[[self window] setFrameAutosaveName: sizeStr ? @"" : @"SUUpdateAlertFrame"];
+    [self.window setFrameAutosaveName: showReleaseNotes ? @"SUUpdateAlert" : @"SUUpdateAlertSmall" ];
 
-	// We're gonna do some frame magic to match the window's size to the description field and the presence of the release notes view.
-	NSRect	frame = [[self window] frame];
-	BOOL	showReleaseNotes = [self showsReleaseNotes];	// UK 2007-09-18
-	if (!showReleaseNotes)	// UK 2007-09-18
-	{
-		// Resize the window to be appropriate for not having a huge release notes view.
-		frame.size.height -= [releaseNotesView frame].size.height + 40; // Extra 40 is for the release notes label and margin.
+    if ([self.host isBackgroundApplication]) {
+        [self.window setLevel:NSFloatingWindowLevel]; // This means the window will float over all other apps, if our app is switched out ?!
+    }
 
-		if ([self allowsAutomaticUpdates]) {
-            frame.size.height += 10; // Make room for the check box.
-		}
+    #warning isInformationOnlyUpdate is more explicit - make a pull request for this
+	if ([updateItem isInformationOnlyUpdate]) { 
+        [self.installButton setTitle:SULocalizedString(@"Learn More...", @"Alternate title for 'Install Update' button when there's no download in RSS feed.")];
+        [self.installButton setAction:@selector(openInfoURL:)];
+    }
 
-		// Hiding the resize handles is not enough on 10.5, you can still click
-		//	where they would be, so we set the min/max sizes to be equal to
-		//	inhibit resizing completely:
-		[[self window] setShowsResizeIndicator: NO];
-		[[self window] setMinSize: frame.size];
-		[[self window] setMaxSize: frame.size];
-	}
-    else if (![self allowsAutomaticUpdates])
-	{
-		NSRect boxFrame = [[[releaseNotesView superview] superview] frame];
-		boxFrame.origin.y -= 20;
-		boxFrame.size.height += 20;
-		[[[releaseNotesView superview] superview] setFrame:boxFrame];
-	}
-#warning isInformationOnlyUpdate is more explicit - make a pull request for this
-	if([updateItem isInformationOnlyUpdate])	// UK 2007-08-31 (whole if clause)
-	{
-		[installButton setTitle: SULocalizedString( @"Learn More...", @"Alternate title for 'Install Update' button when there's no download in RSS feed." )];
-		[installButton setAction: @selector(openInfoURL:)];
-	}
+    if (showReleaseNotes) {
+        [self displayReleaseNotes];
+    } else {
+        [self.releaseNotesContainerView removeFromSuperview];
+    }
 
-	// Make sure button widths are OK:
-	#define DISTANCE_BETWEEN_BUTTONS		3
-	#define DISTANCE_BETWEEN_BUTTON_GROUPS	12
+    [self.window.contentView setNeedsLayout:YES]; // Prod autolayout to place everything
 
-	CGFloat				minimumWindowWidth = [[self window] frame].size.width -NSMaxX([installButton frame]) +NSMinX([skipButton frame]);	// Distance between contents and left/right edge.
-	NSDictionary*		attrs = @{NSFontAttributeName: [installButton font]};
-	NSSize				titleSize = [[installButton title] sizeWithAttributes: attrs];
-	titleSize.width += (16 + 8) * 2;	// 16 px for the end caps plus 8 px padding at each end or it'll look as ugly as calling -sizeToFit.
-	NSRect				installBtnBox = [installButton frame];
-	installBtnBox.origin.x += installBtnBox.size.width -titleSize.width;
-	installBtnBox.size.width = titleSize.width;
-	[installButton setFrame: installBtnBox];
-	minimumWindowWidth += titleSize.width;
-
-	titleSize = [[laterButton title] sizeWithAttributes: attrs];
-	titleSize.width += (16 + 8) * 2;	// 16 px for the end caps plus 8 px padding at each end or it'll look as ugly as calling -sizeToFit.
-	NSRect				laterBtnBox = [installButton frame];
-	laterBtnBox.origin.x = installBtnBox.origin.x -DISTANCE_BETWEEN_BUTTONS -titleSize.width;
-	laterBtnBox.size.width = titleSize.width;
-	[laterButton setFrame: laterBtnBox];
-	minimumWindowWidth += DISTANCE_BETWEEN_BUTTONS +titleSize.width;
-
-	titleSize = [[skipButton title] sizeWithAttributes: attrs];
-	titleSize.width += (16 + 8) * 2;	// 16 px for the end caps plus 8 px padding at each end or it'll look as ugly as calling -sizeToFit.
-	NSRect				skipBtnBox = [skipButton frame];
-	skipBtnBox.size.width = titleSize.width;
-	[skipButton setFrame: skipBtnBox];
-	minimumWindowWidth += DISTANCE_BETWEEN_BUTTON_GROUPS +titleSize.width;
-
-	if( showReleaseNotes )	// UK 2007-09-18 (whole block)
-	{
-		if( sizeStr )
-		{
-			NSSize		desiredSize = NSSizeFromString( sizeStr );
-			NSSize		sizeDiff = NSZeroSize;
-			// NSBox*		boxView = (NSBox*)[[releaseNotesView superview] superview];
-
-			//[boxView setBorderType: NSNoBorder];
-			[releaseNotesView setDrawsBackground: NO];
-
-			sizeDiff.width = desiredSize.width -[releaseNotesView frame].size.width;
-			sizeDiff.height = desiredSize.height -[releaseNotesView frame].size.height;
-			frame.size.width += sizeDiff.width;
-			frame.size.height += sizeDiff.height;
-
-			// No resizing:
-			[[self window] setShowsResizeIndicator:NO];
-			[[self window] setMinSize:frame.size];
-			[[self window] setMaxSize:frame.size];
-		}
-	}
-
-	if (frame.size.width < minimumWindowWidth) {
-		frame.size.width = minimumWindowWidth;
-	}
-
-	[[self window] setFrame: frame display: NO];
-	[[self window] center];
-
-	if (showReleaseNotes)	// UK 2007-09-18
-	{
-		[self displayReleaseNotes];
-	}
-
-	[[[releaseNotesView superview] superview] setHidden: !showReleaseNotes];	// UK 2007-09-18
-
+    [self.window center];
 }
-
--(BOOL)showsReleaseNotesText
-{
-	return( [host objectForInfoDictionaryKey:SUFixedHTMLDisplaySizeKey] == nil );
-}
-
 
 - (BOOL)windowShouldClose:(NSNotification *) __unused note
 {
@@ -278,55 +202,46 @@
 
 - (NSImage *)applicationIcon
 {
-	return [host icon];
+    return [self.host icon];
 }
 
 - (NSString *)titleText
 {
-	return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is available!", nil), [host name]];
+    return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is available!", nil), [self.host name]];
 }
 
 - (NSString *)descriptionText
 {
-	NSString *updateItemVersion = [updateItem displayVersionString];
-    NSString *hostVersion = [host displayVersion];
-	// Display more info if the version strings are the same; useful for betas.
-    if( !versionDisplayer && [updateItemVersion isEqualToString:hostVersion] )
+    NSString *updateItemVersion = [self.updateItem displayVersionString];
+    NSString *hostVersion = [self.host displayVersion];
+    // Display more info if the version strings are the same; useful for betas.
+    if (!self.versionDisplayer && [updateItemVersion isEqualToString:hostVersion] )
 	{
-        updateItemVersion = [updateItemVersion stringByAppendingFormat:@" (%@)", [updateItem versionString]];
-        hostVersion = [hostVersion stringByAppendingFormat:@" (%@)", [host version]];
+        updateItemVersion = [updateItemVersion stringByAppendingFormat:@" (%@)", [self.updateItem versionString]];
+        hostVersion = [hostVersion stringByAppendingFormat:@" (%@)", [self.host version]];
     }
 	else {
-		[versionDisplayer formatVersion: &updateItemVersion andVersion: &hostVersion];
-
-	// We display a slightly different summary depending on if it's an "info-only" item or not
-	NSString* actionSentence = nil;
-	
-	if ([updateItem isInformationOnlyUpdate])
-	{
-		actionSentence = SULocalizedString(@"Would you like to learn more about this update on the web?", nil);
-	}
-	else
-	{
-		actionSentence = SULocalizedString(@"Would you like to download it now?", nil);
-	}
-
-    return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", nil), [host name], updateItemVersion, hostVersion, actionSentence];
+        [self.versionDisplayer formatVersion:&updateItemVersion andVersion:&hostVersion];
+    }
+    return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", nil), [self.host name], updateItemVersion, hostVersion];
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:frame
 {
     if ([frame parentFrame] == nil) {
-        webViewFinishedLoading = YES;
-		[releaseNotesSpinner setHidden:YES];
-		[sender display]; // necessary to prevent weird scroll bar artifacting
+        self.webViewFinishedLoading = YES;
+        [self.releaseNotesSpinner setHidden:YES];
+        [sender display]; // necessary to prevent weird scroll bar artifacting
     }
 }
 
-- (void)webView:(WebView *) __unused sender decidePolicyForNavigationAction:(NSDictionary *) __unused actionInformation request:(NSURLRequest *)request frame:(WebFrame *) __unused frame decisionListener:(id <WebPolicyDecisionListener>)listener
+- (void)webView:(WebView *)__unused sender decidePolicyForNavigationAction:(NSDictionary *)__unused actionInformation request:(NSURLRequest *)request frame:(WebFrame *)__unused frame decisionListener:(id<WebPolicyDecisionListener>)listener
 {
-    if (webViewFinishedLoading) {
-        [[NSWorkspace sharedWorkspace] openURL:[request URL]];
+    if (self.webViewFinishedLoading) {
+        NSURL *requestURL = request.URL;
+        if (requestURL) {
+            [[NSWorkspace sharedWorkspace] openURL:requestURL];
+        }
 
         [listener ignore];
     }
@@ -336,33 +251,33 @@
 }
 
 // Clean up the contextual menu.
-- (NSArray *)webView:(WebView *) __unused sender contextMenuItemsForElement:(NSDictionary *) __unused element defaultMenuItems:(NSArray *)defaultMenuItems
+- (NSArray *)webView:(WebView *)__unused sender contextMenuItemsForElement:(NSDictionary *)__unused element defaultMenuItems:(NSArray *)defaultMenuItems
 {
-	NSMutableArray *webViewMenuItems = [[defaultMenuItems mutableCopy] autorelease];
+    NSMutableArray *webViewMenuItems = [defaultMenuItems mutableCopy];
 
 	if (webViewMenuItems)
 	{
 		for (NSMenuItem *menuItem in defaultMenuItems)
 		{
-			NSInteger tag = [menuItem tag];
+            NSInteger tag = [menuItem tag];
 
 			switch (tag)
 			{
-				case WebMenuItemTagOpenLinkInNewWindow:
-				case WebMenuItemTagDownloadLinkToDisk:
-				case WebMenuItemTagOpenImageInNewWindow:
-				case WebMenuItemTagDownloadImageToDisk:
-				case WebMenuItemTagOpenFrameInNewWindow:
-				case WebMenuItemTagGoBack:
-				case WebMenuItemTagGoForward:
-				case WebMenuItemTagStop:
-				case WebMenuItemTagReload:
-					[webViewMenuItems removeObjectIdenticalTo: menuItem];
-			}
-		}
-	}
+                case WebMenuItemTagOpenLinkInNewWindow:
+                case WebMenuItemTagDownloadLinkToDisk:
+                case WebMenuItemTagOpenImageInNewWindow:
+                case WebMenuItemTagDownloadImageToDisk:
+                case WebMenuItemTagOpenFrameInNewWindow:
+                case WebMenuItemTagGoBack:
+                case WebMenuItemTagGoForward:
+                case WebMenuItemTagStop:
+                case WebMenuItemTagReload:
+                    [webViewMenuItems removeObjectIdenticalTo:menuItem];
+            }
+        }
+    }
 
-	return webViewMenuItems;
+    return webViewMenuItems;
 }
 
 @end

@@ -16,24 +16,78 @@
 #import "SUUnarchiver_Private.h"
 
 @implementation SUUnarchiver
+
+@synthesize archivePath;
+@synthesize updateHostBundlePath;
 @synthesize delegate;
 
-+ (SUUnarchiver *)unarchiverForPath:(NSString *)path updatingHost:(SUHost *)host
++ (SUUnarchiver *)unarchiverForPath:(NSString *)path updatingHostBundlePath:(NSString *)hostPath
 {
 	for (id current in [self unarchiverImplementations])
 	{
-		if ([current canUnarchivePath:path]) {
-			return [[[current alloc] initWithPath:path host:host] autorelease];
-		}
-	}
-	return nil;
+        if ([current canUnarchivePath:path]) {
+            return [[current alloc] initWithPath:path hostBundlePath:hostPath];
+        }
+    }
+    return nil;
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], archivePath]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], self.archivePath]; }
 
 - (void)start
 {
-	// No-op
+    // No-op
+}
+
+- (instancetype)initWithPath:(NSString *)path hostBundlePath:(NSString *)hostPath
+{
+    if ((self = [super init]))
+    {
+        archivePath = [path copy];
+        updateHostBundlePath = hostPath;
+    }
+    return self;
+}
+
++ (BOOL)canUnarchivePath:(NSString *)__unused path
+{
+    return NO;
+}
+
+- (void)notifyDelegateOfProgress:(double)progress
+{
+    if ([self.delegate respondsToSelector:@selector(unarchiver:extractedProgress:)]) {
+        [self.delegate unarchiver:self extractedProgress:progress];
+    }
+}
+
+- (void)notifyDelegateOfSuccess
+{
+    if ([self.delegate respondsToSelector:@selector(unarchiverDidFinish:)]) {
+        [self.delegate unarchiverDidFinish:self];
+    }
+}
+
+- (void)notifyDelegateOfFailure
+{
+    if ([self.delegate respondsToSelector:@selector(unarchiverDidFail:)]) {
+        [self.delegate unarchiverDidFail:self];
+    }
+}
+
+static NSMutableArray *gUnarchiverImplementations;
+
++ (void)registerImplementation:(Class)implementation
+{
+    if (!gUnarchiverImplementations) {
+        gUnarchiverImplementations = [[NSMutableArray alloc] init];
+    }
+    [gUnarchiverImplementations addObject:implementation];
+}
+
++ (NSArray *)unarchiverImplementations
+{
+    return [NSArray arrayWithArray:gUnarchiverImplementations];
 }
 
 @end

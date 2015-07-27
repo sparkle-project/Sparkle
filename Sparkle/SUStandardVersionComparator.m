@@ -17,18 +17,18 @@
 
 + (SUStandardVersionComparator *)defaultComparator
 {
-	static SUStandardVersionComparator *defaultComparator = nil;
-	if (defaultComparator == nil) {
-		defaultComparator = [[SUStandardVersionComparator alloc] init];
-	}
-	return defaultComparator;
+    static SUStandardVersionComparator *defaultComparator = nil;
+    if (defaultComparator == nil) {
+        defaultComparator = [[SUStandardVersionComparator alloc] init];
+    }
+    return defaultComparator;
 }
 
-typedef enum {
+typedef NS_ENUM(NSInteger, SUCharacterType) {
     kNumberType,
     kStringType,
     kSeparatorType,
-} SUCharacterType;
+};
 
 - (SUCharacterType)typeOfCharacter:(NSString *)character
 {
@@ -50,13 +50,13 @@ typedef enum {
     NSString *character;
     NSMutableString *s;
     NSUInteger i, n;
-	SUCharacterType oldType, newType;
+    SUCharacterType oldType, newType;
     NSMutableArray *parts = [NSMutableArray array];
     if ([version length] == 0) {
         // Nothing to do here
         return parts;
     }
-    s = [[[version substringToIndex:1] mutableCopy] autorelease];
+    s = [[version substringToIndex:1] mutableCopy];
     oldType = [self typeOfCharacter:s];
     n = [version length] - 1;
     for (i = 1; i <= n; ++i) {
@@ -64,7 +64,7 @@ typedef enum {
         newType = [self typeOfCharacter:character];
         if (oldType != newType || oldType == kSeparatorType) {
             // We've reached a new segment
-			NSString *aPart = [[[NSString alloc] initWithString:s] autorelease];
+            NSString *aPart = [[NSString alloc] initWithString:s];
             [parts addObject:aPart];
             [s setString:character];
         } else {
@@ -81,12 +81,12 @@ typedef enum {
 
 - (NSComparisonResult)compareVersion:(NSString *)versionA toVersion:(NSString *)versionB
 {
-	NSArray *partsA = [self splitVersionString:versionA];
+    NSArray *partsA = [self splitVersionString:versionA];
     NSArray *partsB = [self splitVersionString:versionB];
 
     NSString *partA, *partB;
     NSUInteger i, n;
-	long long valueA, valueB;
+    long long valueA, valueB;
     SUCharacterType typeA, typeB;
 
     n = MIN([partsA count], [partsB count]);
@@ -139,7 +139,7 @@ typedef enum {
         // n holds the index of the part we want.
         NSString *missingPart;
         SUCharacterType missingType;
-		NSComparisonResult shorterResult, largerResult;
+        NSComparisonResult shorterResult, largerResult;
 
         if ([partsA count] > [partsB count]) {
             missingPart = partsA[n];

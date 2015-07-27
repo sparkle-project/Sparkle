@@ -17,16 +17,16 @@
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
-	return binaryDeltaSupported() && [[path pathExtension] isEqualToString:@"delta"];
+	return [[path pathExtension] isEqualToString:@"delta"];
 }
 
 - (void)applyBinaryDelta
 {
 	@autoreleasepool {
-		NSString *sourcePath = [[updateHost bundle] bundlePath];
-		NSString *targetPath = [[archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
+        NSString *sourcePath = self.updateHostBundlePath;
+        NSString *targetPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
 
-		int result = applyBinaryDelta(sourcePath, targetPath, archivePath);
+        int result = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO);
 		if (!result) {
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[self notifyDelegateOfSuccess];
@@ -42,7 +42,7 @@
 
 - (void)start
 {
-	dispatch_async(dispatch_get_global_queue(0, 0), ^{
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		[self applyBinaryDelta];
 	});
 }

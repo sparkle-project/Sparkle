@@ -1,3 +1,86 @@
+# 1.11.0
+
+* Big improvements to code signing and DSA verification
+   - Sparkle now checks not only whether an update is correctly signed, but also whether the updated version will be able to verify future updates. Updates now must either use DSA keys correctly, or not try to use them at all. Same goes for Apple Code Signing.
+   - Rely on code signing and the DSA key in the new app instead of appcast. If the new app has a public DSA key, then the appcast item must have a DSA signature for the app, even if the app is code signed. (Zorg)
+* More verbose error message when DSA keys don't match (Kornel Lesiński)
+* Added delegate methods for pre-download and immediately post-failed-download (Isaac Greenspan)
+* Fix Lucida Grande is always used for release notes (LIU Dongyuan / 柳东原)
+* Only remove quarantine with setResourceValue: when it's present. Fixes "Unable to quarantine: 93" messages from showing up in the console. (Zorg)
+* Fixed const and nullability warnings (Jake Petroules, Kornel Lesiński)
+* Replaced deprecated NSRunAlertPanel/alertWithMessageText (Kevin Wojniak)
+* Imported the Foundation umbrella header in all the public headers (C.W. Betts)
+* pt-BR localization update (Victor Figueiredo)
+* Reject unsupported code-signing xattrs in binary delta (Zorg)
+* Fixed crash while applying delta update (antonc27)
+* Added logging of appcast/download URL on error (Kornel Lesiński)
+* More robust reading of Autoupdate.app path from Sparkle bundle
+
+# 1.10.0
+
+* Massive improvements to the BinaryDelta tool (Zorg)
+  - Ability to track file permissions (Zorg)
+  - Nicely formatted log output (Zorg)
+  - Numerous bug fixes in handling of symlinks, empty directories, case-insensitive names, etc. (Zorg)
+  - Refactored and modernized code (Zorg)
+  - libxar is no longer weak-linked (C.W. Betts)
+* Double-check the code signature of the the app after installation (Isaac Wankerl)
+* Added headless guided package installation (Graham Miln)
+* Added ability to inject custom HTTP headers in appcast request (Mattias Gunneras)
+* Changes to make unarching more reliable (Zorg, Kornel Lesiński)
+* Have Sparkle build a framework module (C.W. Betts)
+* Stdout used for non error outputs (JDuquennoy)
+* French locale update (Kent Sutherland)
+
+# 1.9.0
+
+* Added SUUpdater delegate method for failures. (Benjamin Gordon)
+* Make the error definitions public (C.W. Betts)
+* Add support for lzma compressed tarballs (Kyle Fuller)
+* Back to SKIP_INSTALL=YES by default (Tony Arnold)
+* Properly set install names and rpaths for targets (Jake Petroules)
+* Use Library/Caches rather than app support directory (Kornel Lesiński)
+* Check for a modal window being onscreen before trying to put up the Sparkle prompt (Alf Watt)
+* Fixed crashes on 10.7 (Chris Campbell, Ger Teunis)
+* Fixed Sparkle tags parsing (Tamás Lustyik)
+* SULog code cleanups (Kevin Wojniak)
+* Make sure CFBundleVersion is a semantic version number. (Jake Petroules)
+* Replace typedef enums with typedef NS_ENUM to make Swift happier (C.W. Betts)
+* Fix warnings under Xcode 6.1 relating the SUUpdateAlert XIB (Tony Arnold)
+* Prefer string constants to strings (Jake Petroules)
+* Use Info.plist keys instead of macros (Jake Petroules)
+* Only export public symbols. (Jake Petroules)
+* BinaryDelta: avoid crash with bad paths (Jake Petroules)
+* Fixing Swedish translations (Erik Vikström)
+* Turkish localization fixes (Emir)
+* Proofing of Ukrainian localization (Vera Tkachenko)
+
+# 1.8.0
+
+* New SUDSAVerifier based on up-to-date OS X APIs (Zachary Waldowski)
+* Detailed error log for failed signature checks (Kornel Lesiński)
+* Converted Sparkle to ARC (C.W. Betts)
+* Converted ivars to properties. (Jake Petroules)
+* Cocoapod support (Xhacker Liu)
+* Quarantine removal on OS X 10.10 (C.W. Betts)
+* Updated Japanese localization (1024jp)
+* Added Greek localization
+
+# 1.7.1
+
+* Removed option to install unverified updates (Kornel Lesiński)
+* Added detailed log when code signing verification fails (Sam Deane)
+* Restored original Sparkle icon. (Jake Petroules)
+* Switched SUUpdateAlert.xib to AutoLayout (Kornel Lesiński)
+* Replace references to andymatuschak.org with sparkle-project.org. (Jake Petroules)
+* Several code cleanups, modernizations, fixed warnings and improved code formatting (Jake Petroules)
+* Make the repository significantly more organized. (Jake Petroules)
+* Xcode project: set organization name and class prefix. (Jake Petroules)
+* Link to Foundation and AppKit instead of Cocoa. (Jake Petroules)
+* Use new operatingSystemVersion API when available. (Jake Petroules)
+* Add .clang-format configuration file for source code formatting. (Jake Petroules)
+* Add a target to build Sparkle API documentation using Doxygen. (Jake Petroules)
+
 # 1.7.0
 
 * Dropped support for OS X 10.6. Sparkle now supports 10.7 and newer (including 10.10 Yosemite) on 64-bit Intel Macs (the last 32-bit Mac was released in 2006).

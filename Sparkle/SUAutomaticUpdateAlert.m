@@ -11,83 +11,78 @@
 #import "SUHost.h"
 
 @interface SUAutomaticUpdateAlert ()
-@property (retain) SUAppcastItem *updateItem;
-@property (assign) id<SUAutomaticUpdateAlertDelegate> delegate;
-@property (retain) SUHost *host;
+@property (strong) void(^completionBlock)(SUAutomaticInstallationChoice);
+@property (strong) SUAppcastItem *updateItem;
+@property (strong) SUHost *host;
 @end
 
 @implementation SUAutomaticUpdateAlert
-@synthesize delegate;
 @synthesize host;
 @synthesize updateItem;
+@synthesize completionBlock;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost delegate:(id<SUAutomaticUpdateAlertDelegate>)del
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUAutomaticInstallationChoice))block
 {
-	self = [super initWithHost:aHost windowNibName:@"SUAutomaticUpdateAlert"];
-	if (self)
-	{
-		self.updateItem = item;
-		self.delegate = del;
-		self.host = aHost;
-		[self setShouldCascadeWindows:NO];
-		[[self window] center];
-	}
-	return self;
+    self = [super initWithWindowNibName:@"SUAutomaticUpdateAlert"];
+    if (self) {
+        self.updateItem = item;
+        self.completionBlock = block;
+        self.host = aHost;
+        [self setShouldCascadeWindows:NO];
+        [[self window] center];
+    }
+    return self;
 }
 
-- (void)dealloc
+- (NSString *__nonnull)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self.host bundlePath], [self.host installationPath]]; }
+
+- (IBAction)installNow:(id)__unused sender
 {
-	self.host = nil;
-	self.updateItem = nil;
-	[super dealloc];
+    [self close];
+    self.completionBlock(SUInstallNowChoice);
+    self.completionBlock = nil;
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [host bundlePath], [host installationPath]]; }
-
-- (IBAction)installNow:(id) __unused sender
+- (IBAction)installLater:(id)__unused sender
 {
-	[self close];
-	[delegate automaticUpdateAlert:self finishedWithChoice:SUInstallNowChoice];
+    [self close];
+    self.completionBlock(SUInstallLaterChoice);
+    self.completionBlock = nil;
 }
 
-- (IBAction)installLater:(id) __unused sender
+- (IBAction)doNotInstall:(id)__unused sender
 {
-	[self close];
-	[delegate automaticUpdateAlert:self finishedWithChoice:SUInstallLaterChoice];
+    [self close];
+    self.completionBlock(SUDoNotInstallChoice);
+    self.completionBlock = nil;
 }
 
-- (IBAction)doNotInstall:(id) __unused sender
+- (NSImage *__nonnull)applicationIcon
 {
-	[self close];
-	[delegate automaticUpdateAlert:self finishedWithChoice:SUDoNotInstallChoice];
+    return [self.host icon];
 }
 
-- (NSImage *)applicationIcon
+- (NSString *__nonnull)titleText
 {
-	return [host icon];
-}
-
-- (NSString *)titleText
-{
-    if ([updateItem isCriticalUpdate])
+    if ([self.updateItem isCriticalUpdate])
     {
-        return [NSString stringWithFormat:SULocalizedString(@"An important update to %@ is ready to install", nil), [host name]];
+        return [NSString stringWithFormat:SULocalizedString(@"An important update to %@ is ready to install", nil), [self.host name]];
     }
     else
     {
-        return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is ready to install!", nil), [host name]];
+        return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is ready to install!", nil), [self.host name]];
     }
 }
 
 - (NSString *)descriptionText
 {
-    if ([updateItem isCriticalUpdate])
+    if ([self.updateItem isCriticalUpdate])
     {
-        return [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?", nil), [host name], [updateItem displayVersionString]];
+        return [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?", nil), [self.host name], [self.updateItem displayVersionString]];
     }
     else
     {
-        return [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?", nil), [host name], [updateItem displayVersionString]];
+        return [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?", nil), [self.host name], [self.updateItem displayVersionString]];
     }
 }
 

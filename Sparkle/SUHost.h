@@ -5,25 +5,21 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
+#import <Foundation/Foundation.h>
 #import "SUUpdater.h"
 #import "SUAppcast.h"
 #import "SUAppcastItem.h"
 #import "SUVersionComparisonProtocol.h"
 
 @interface SUHost : NSObject
-{
-@private
-	NSString *defaultsDomain;
-	NSString *renamedInstallationPath;
-	BOOL usesStandardUserDefaults;
-}
-@property (retain, readonly) NSBundle *bundle;
+
+@property (strong, readonly) NSBundle *bundle;
 
 + (NSString *)systemVersionString;
 
 - (instancetype)initWithBundle:(NSBundle *)aBundle;
 @property (readonly, copy) NSString *bundlePath;
-@property (readonly, copy) NSString *appSupportPath;
+@property (readonly, copy) NSString *appCachePath;
 @property (readonly, copy) NSString *installationPath;
 @property (readonly, copy) NSString *name;
 @property (readonly, copy) NSString *version;

@@ -8,79 +8,53 @@
 
 #import "SUPlainInstaller.h"
 #import "SUPlainInstallerInternals.h"
+#import "SUCodeSigningVerifier.h"
 #import "SUConstants.h"
 #import "SUHost.h"
 
-static NSString * const SUInstallerPathKey = @"SUInstallerPath";
-static NSString * const SUInstallerTargetPathKey = @"SUInstallerTargetPath";
-static NSString * const SUInstallerTempNameKey = @"SUInstallerTempName";
-static NSString * const SUInstallerHostKey = @"SUInstallerHost";
-static NSString * const SUInstallerDelegateKey = @"SUInstallerDelegate";
-static NSString * const SUInstallerResultKey = @"SUInstallerResult";
-static NSString * const SUInstallerErrorKey = @"SUInstallerError";
-static NSString * const SUInstallerInstallationPathKey = @"SUInstallerInstallationPath";
-
 @implementation SUPlainInstaller
 
-+ (void)finishInstallationWithInfo:(NSDictionary *)info
++ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler
 {
-	// *** GETS CALLED ON NON-MAIN THREAD!
+    SUParameterAssert(host);
 
-	[self finishInstallationToPath:info[SUInstallerInstallationPathKey] withResult:[info[SUInstallerResultKey] boolValue] host:info[SUInstallerHostKey] error:info[SUInstallerErrorKey] delegate:info[SUInstallerDelegateKey]];
-}
+    BOOL allowDowngrades = SPARKLE_AUTOMATED_DOWNGRADES;
 
-+ (void)performInstallationWithInfo:(NSDictionary *)info
-{
-	// *** GETS CALLED ON NON-MAIN THREAD!
+    // Prevent malicious downgrades
+    if (!allowDowngrades) {
+        if ([comparator compareVersion:[host version] toVersion:[[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]] == NSOrderedDescending) {
+            NSString *errorMessage = [NSString stringWithFormat:@"Sparkle Updater: Possible attack in progress! Attempting to \"upgrade\" from %@ to %@. Aborting update.", [host version], [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
+            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
+            [self finishInstallationToPath:installationPath withResult:NO error:error completionHandler:completionHandler];
+            return;
+        }
+    }
 
-	@autoreleasepool {
-		NSError *error = nil;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSError *error = nil;
+        NSString *oldPath = [host bundlePath];
+        NSString *tempName = [self temporaryNameForPath:[host installationPath]];
 
-		NSString	*	oldPath = [info[SUInstallerHostKey] bundlePath];
-		NSString	*	installationPath = info[SUInstallerInstallationPathKey];
-		BOOL result = [self copyPathWithAuthentication:info[SUInstallerPathKey] overPath: installationPath temporaryName:info[SUInstallerTempNameKey] error:&error];
+        BOOL result = [self copyPathWithAuthentication:path overPath:installationPath temporaryName:tempName appendVersion:SPARKLE_APPEND_VERSION_NUMBER error:&error];
 
-		if( result )
-		{
-			BOOL	haveOld = [[NSFileManager defaultManager] fileExistsAtPath: oldPath];
-			BOOL	differentFromNew = ![oldPath isEqualToString: installationPath];
-			if( haveOld && differentFromNew )
-				[self _movePathToTrash: oldPath];	// On success, trash old copy if there's still one due to renaming.
-		}
-		NSMutableDictionary *mutableInfo = [[info mutableCopy] autorelease];
-		mutableInfo[SUInstallerResultKey] = @(result);
-		mutableInfo[SUInstallerInstallationPathKey] = installationPath;
-		if (!result && error)
-			mutableInfo[SUInstallerErrorKey] = error;
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[self finishInstallationWithInfo:mutableInfo];
-		});
-	}
-}
+        if (result) {
+            if ([SUCodeSigningVerifier applicationAtPathIsCodeSigned:installationPath]) {
+                result = [SUCodeSigningVerifier codeSignatureIsValidAtPath:installationPath error:&error];
+            }
+        }
 
-+ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:(id<SUInstallerDelegate>)delegate synchronously:(BOOL)synchronously versionComparator:(id <SUVersionComparison>)comparator
-{
-	// Prevent malicious downgrades:
-	#if !PERMIT_AUTOMATED_DOWNGRADES
-	if ([comparator compareVersion:[host version] toVersion:[[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:@"CFBundleVersion"]] == NSOrderedDescending)
-	{
-		NSString * errorMessage = [NSString stringWithFormat:@"Sparkle Updater: Possible attack in progress! Attempting to \"upgrade\" from %@ to %@. Aborting update.", [host version], [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:@"CFBundleVersion"]];
-		NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{NSLocalizedDescriptionKey: errorMessage}];
-		[self finishInstallationToPath:installationPath withResult:NO host:host error:error delegate:delegate];
-		return;
-	}
-	#endif
+        if (result) {
+            BOOL haveOld = [[NSFileManager defaultManager] fileExistsAtPath:oldPath];
+            BOOL differentFromNew = ![oldPath isEqualToString:installationPath];
+            if (haveOld && differentFromNew) {
+                [self _movePathToTrash:oldPath appendVersion:SPARKLE_APPEND_VERSION_NUMBER];    // On success, trash old copy if there's still one due to renaming.
+            }
+        }
 
-    NSString *targetPath = [host installationPath];
-    NSString *tempName = [self temporaryNameForPath:targetPath];
-	NSDictionary *info = @{SUInstallerPathKey: path, SUInstallerTargetPathKey: targetPath, SUInstallerTempNameKey: tempName, SUInstallerHostKey: host, SUInstallerDelegateKey: delegate, SUInstallerInstallationPathKey: installationPath};
-	if (synchronously)
-		[self performInstallationWithInfo:info];
-	else {
-		dispatch_async(dispatch_get_global_queue(0, 0), ^{
-			[self performInstallationWithInfo:info];
-		});
-	}
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self finishInstallationToPath:installationPath withResult:result error:error completionHandler:completionHandler];
+        });
+    });
 }
 
 @end

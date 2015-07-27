@@ -1,4 +1,1 @@
 // BinaryDelta tool only
-
-PRODUCT_NAME = BinaryDelta
-GCC_PREFIX_HEADER =

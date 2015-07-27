@@ -9,12 +9,15 @@
 #ifndef SUPLAININSTALLERINTERNALS_H
 #define SUPLAININSTALLERINTERNALS_H
 
+#import <Foundation/Foundation.h>
+
 #import "SUPlainInstaller.h"
 
 @interface SUPlainInstaller (Internals)
-+ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst error:(NSError **)error;
-+ (void)_movePathToTrash:(NSString *)path;
-+ (BOOL)_removeFileAtPath:(NSString *)path error: (NSError**)error;
++ (NSString *)temporaryNameForPath:(NSString *)path;
++ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp appendVersion:(BOOL)a error:(NSError **)error;
++ (void)_movePathToTrash:(NSString *)path appendVersion:(BOOL)a;
++ (BOOL)_removeFileAtPath:(NSString *)path error:(NSError **)error;
 + (BOOL)_removeFileAtPathWithForcedAuthentication:(NSString *)src error:(NSError **)error;
 @end
 
