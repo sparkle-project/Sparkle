@@ -169,6 +169,20 @@
 		61FA52880E2D9EA400EF58AD /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		65CA25EF1B667C2800A79420 /* SUXPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 65CA25EA1B667BFF00A79420 /* SUXPC.h */; };
 		65CA25F01B667C2800A79420 /* SUXPC.m in Sources */ = {isa = PBXBuildFile; fileRef = 65CA25EB1B667BFF00A79420 /* SUXPC.m */; };
+		65CA25F61B669F5A00A79420 /* SUInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5000DAE88B40026945C /* SUInstaller.m */; };
+		65CA25F71B669F6100A79420 /* SUPlainInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5040DAE8AB80026945C /* SUPlainInstaller.m */; };
+		65CA25F81B669F6700A79420 /* SUPlainInstallerInternals.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5F8E509C4CE3C00B25A18 /* SUPlainInstallerInternals.m */; };
+		65CA25F91B669F6E00A79420 /* SUPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5210DAE8E8A0026945C /* SUPackageInstaller.m */; };
+		65CA25FA1B669F7500A79420 /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
+		65CA25FB1B669F7D00A79420 /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
+		65CA25FC1B669F8300A79420 /* sandbox_service.m in Sources */ = {isa = PBXBuildFile; fileRef = 65CA25ED1B667BFF00A79420 /* sandbox_service.m */; };
+		65CA25FE1B66A12300A79420 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
+		65CA25FF1B66A12800A79420 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 55C14F31136EFC2400649790 /* SystemConfiguration.framework */; };
+		65CA26001B66A12C00A79420 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6117796E0D1112E000749C97 /* IOKit.framework */; };
+		65CA26011B66A13600A79420 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
+		65CA26021B66A13A00A79420 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
+		65CA26061B66A5D800A79420 /* SUCodeSigningVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B078CD15A5FB6100600039 /* SUCodeSigningVerifier.m */; };
+		65CA26071B66A5E100A79420 /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */; };
 		721CF1A71AD7643600D9AC09 /* bsdiff.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		721CF1A81AD7644100D9AC09 /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		721CF1A91AD7644C00D9AC09 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; settings = {COMPILER_FLAGS = "-w"; }; };
@@ -562,7 +576,10 @@
 		65CA25EB1B667BFF00A79420 /* SUXPC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SUXPC.m; sourceTree = "<group>"; };
 		65CA25ED1B667BFF00A79420 /* sandbox_service.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = sandbox_service.m; sourceTree = "<group>"; };
 		65CA25EE1B667BFF00A79420 /* SandboxService.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SandboxService.plist; sourceTree = "<group>"; };
-		65CA25F21B667E7A00A79420 /* sandbox_service.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = sandbox_service.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		65CA25F21B667E7A00A79420 /* com.red-sweater.Sparkle.SandboxService.xpc */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "com.red-sweater.Sparkle.SandboxService.xpc"; sourceTree = BUILT_PRODUCTS_DIR; };
+		65CA26031B66A45900A79420 /* ConfigService.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigService.xcconfig; sourceTree = "<group>"; };
+		65CA26041B66A45900A79420 /* ConfigServiceDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigServiceDebug.xcconfig; sourceTree = "<group>"; };
+		65CA26051B66A45900A79420 /* ConfigServiceRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigServiceRelease.xcconfig; sourceTree = "<group>"; };
 		7223E7611AD1AEFF008E3161 /* sais.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sais.c; sourceTree = "<group>"; };
 		7223E7621AD1AEFF008E3161 /* sais.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sais.h; sourceTree = "<group>"; };
 		7268AC621AD634C200C3E0C1 /* SUBinaryDeltaCreate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBinaryDeltaCreate.m; sourceTree = "<group>"; };
@@ -639,6 +656,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		65CA25FD1B66A04F00A79420 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65CA26021B66A13A00A79420 /* Security.framework in Frameworks */,
+				65CA26011B66A13600A79420 /* AppKit.framework in Frameworks */,
+				65CA26001B66A12C00A79420 /* IOKit.framework in Frameworks */,
+				65CA25FF1B66A12800A79420 /* SystemConfiguration.framework in Frameworks */,
+				65CA25FE1B66A12300A79420 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DC2EF560486A6940098B216 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -666,7 +695,7 @@
 				61B5F90209C4CEE200B25A18 /* Sparkle Test App.app */,
 				612279D90DB5470200AB99EA /* Sparkle Unit Tests.xctest */,
 				8DC2EF5B0486A6940098B216 /* Sparkle.framework */,
-				65CA25F21B667E7A00A79420 /* sandbox_service.bundle */,
+				65CA25F21B667E7A00A79420 /* com.red-sweater.Sparkle.SandboxService.xpc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1037,6 +1066,9 @@
 				FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */,
 				FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */,
 				FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */,
+				65CA26031B66A45900A79420 /* ConfigService.xcconfig */,
+				65CA26041B66A45900A79420 /* ConfigServiceDebug.xcconfig */,
+				65CA26051B66A45900A79420 /* ConfigServiceRelease.xcconfig */,
 				FA1941CD0D94A70100DD942E /* ConfigTestApp.xcconfig */,
 				FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */,
 				FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */,
@@ -1218,6 +1250,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8B887B6E1517F3AC000BB292 /* Build configuration list for PBXNativeTarget "sandbox_service" */;
 			buildPhases = (
+				65CA25F51B669F5400A79420 /* Sources */,
+				65CA25FD1B66A04F00A79420 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1225,7 +1259,7 @@
 			);
 			name = sandbox_service;
 			productName = Update;
-			productReference = 65CA25F21B667E7A00A79420 /* sandbox_service.bundle */;
+			productReference = 65CA25F21B667E7A00A79420 /* com.red-sweater.Sparkle.SandboxService.xpc */;
 			productType = "com.apple.product-type.bundle";
 		};
 		8DC2EF4F0486A6940098B216 /* Sparkle */ = {
@@ -1521,6 +1555,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				61B5F93009C4CFDC00B25A18 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		65CA25F51B669F5400A79420 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65CA26061B66A5D800A79420 /* SUCodeSigningVerifier.m in Sources */,
+				65CA25FB1B669F7D00A79420 /* SULog.m in Sources */,
+				65CA25F81B669F6700A79420 /* SUPlainInstallerInternals.m in Sources */,
+				65CA26071B66A5E100A79420 /* SUGuidedPackageInstaller.m in Sources */,
+				65CA25FC1B669F8300A79420 /* sandbox_service.m in Sources */,
+				65CA25F91B669F6E00A79420 /* SUPackageInstaller.m in Sources */,
+				65CA25FA1B669F7500A79420 /* SUConstants.m in Sources */,
+				65CA25F61B669F5A00A79420 /* SUInstaller.m in Sources */,
+				65CA25F71B669F6100A79420 /* SUPlainInstaller.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1920,24 +1970,30 @@
 		};
 		8B887B6B1517F3AC000BB292 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 65CA26041B66A45900A79420 /* ConfigServiceDebug.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = NO;
 				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				INFOPLIST_FILE = "Sparkle/Sandbox Service/Service/SandboxService.plist";
 				OTHER_CFLAGS = "-DDEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = "${EXECUTABLE_NAME}";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.red-sweater.Sparkle.${PRODUCT_NAME:rfc1034identifier}";
 				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
 		};
 		8B887B6C1517F3AC000BB292 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 65CA26051B66A45900A79420 /* ConfigServiceRelease.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				INFOPLIST_FILE = "Sparkle/Sandbox Service/Service/SandboxService.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = "${EXECUTABLE_NAME}";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.red-sweater.Sparkle.${PRODUCT_NAME:rfc1034identifier}";
 				VALID_ARCHS = x86_64;
 			};
 			name = Release;

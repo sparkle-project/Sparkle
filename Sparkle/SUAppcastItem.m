@@ -181,11 +181,6 @@
     return self;
 }
 
-- (NSDictionary *)propertiesDictionary
-{
-	return propertiesDictionary;
-}
-
 - (BOOL) isInformationOnlyUpdate
 {
 	return (([self infoURL] != nil) && ([self fileURL] == nil));

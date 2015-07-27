@@ -39,7 +39,7 @@ static void peer_event_handler(xpc_connection_t peer, xpc_object_t event)
 			NSString *relaunchPathToCopy = src ? [manager stringWithFileSystemRepresentation:src length:strlen(src)] : nil;
 			NSString *targetPath = dst ? [manager stringWithFileSystemRepresentation:dst length:strlen(dst)] : nil;
 			NSError *error = nil;
-			[SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath error:&error];
+			[SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil appendVersion:SPARKLE_APPEND_VERSION_NUMBER error:&error];
 			
 			// send response to indicate ok
 			xpc_object_t reply = xpc_dictionary_create_reply(event);
@@ -55,8 +55,8 @@ static void peer_event_handler(xpc_connection_t peer, xpc_object_t event)
 			NSMutableArray *arguments = [NSMutableArray array];
 			
 			for (size_t i = 0; i < xpc_array_get_count(array); i++) {
-				[arguments addObject:
-				 [NSString stringWithUTF8String:xpc_array_get_string(array, i)]];
+                NSString* thisString = [NSString stringWithUTF8String:xpc_array_get_string(array, i)];
+				[arguments addObject:thisString];
 			}
 			
 			[NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:arguments];
@@ -82,8 +82,7 @@ static void event_handler(xpc_connection_t peer)
 	xpc_connection_resume(peer);
 }
 
-int main(int argc, const char *argv[])
+int main(__unused int argc, __unused const char *argv[])
 {
 	xpc_main(event_handler);
-	return 0;
 }

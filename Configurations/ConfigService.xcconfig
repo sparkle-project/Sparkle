@@ -1,5 +1,8 @@
 // Sandbox Service only
 
-PRODUCT_NAME = com.andymatuschak.Sparkle.SandboxService
+// I use com.red-sweater because I don't have the authority to use either org.andymatuschak
+// or org.sparkle-project. Anybody forking this for their own use should probably create and
+// use an XPC service with their own unique name.
+PRODUCT_NAME = com.red-sweater.Sparkle.SandboxService
 WRAPPER_EXTENSION = xpc
 MACH_O_TYPE = mh_execute

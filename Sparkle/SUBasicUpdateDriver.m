@@ -437,7 +437,7 @@
 
 		BOOL copiedRelaunchTool = FALSE;
 		if( useXPC ) {
-			copiedRelaunchTool = [SUXPC copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath error: &error];
+			copiedRelaunchTool = [SUXPC copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath];
 		} else {
 			copiedRelaunchTool = [SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil appendVersion:SPARKLE_APPEND_VERSION_NUMBER error:&error];
 		}

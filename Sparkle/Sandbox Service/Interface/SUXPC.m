@@ -9,14 +9,19 @@
 #import <xpc/xpc.h>
 #import "SUXPC.h"
 
+// Must match the product name for the built sandbox_service product
+static const char* kSandboxServiceName = "com.red-sweater.Sparkle.SandboxService";
 
 @implementation SUXPC
 
-+ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst error:(NSError **)error {
-	xpc_connection_t connection = xpc_connection_create("com.andymatuschak.Sparkle.SandboxService", NULL);
++ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst {
+	xpc_connection_t connection = xpc_connection_create(kSandboxServiceName, NULL);
 	xpc_connection_set_event_handler(connection, ^(xpc_object_t event) {
 		xpc_dictionary_apply(event, ^bool(const char *key, xpc_object_t value) {
-			NSLog(@"XPC %s: %s", key, xpc_string_get_string_ptr(value));
+            // Work around warnings about %s in NSLog format string.
+            NSString* safeKey = [NSString stringWithUTF8String:key];
+            NSString* safeValue = [NSString stringWithUTF8String:xpc_string_get_string_ptr(value)];
+			NSLog(@"XPC %@: %@", safeKey, safeValue);
 			return true;
 		});
 	});
@@ -36,10 +41,13 @@
 }
 
 + (void)launchTaskWithLaunchPath:(NSString *)path arguments:(NSArray *)arguments {
-	xpc_connection_t connection = xpc_connection_create("com.andymatuschak.Sparkle.SandboxService", NULL);
+	xpc_connection_t connection = xpc_connection_create(kSandboxServiceName, NULL);
 	xpc_connection_set_event_handler(connection, ^(xpc_object_t event) {
 		xpc_dictionary_apply(event, ^bool(const char *key, xpc_object_t value) {
-			NSLog(@"XPC %s: %s", key, xpc_string_get_string_ptr(value));
+            // Work around warnings about %s in NSLog format string.
+            NSString* safeKey = [NSString stringWithUTF8String:key];
+            NSString* safeValue = [NSString stringWithUTF8String:xpc_string_get_string_ptr(value)];
+			NSLog(@"XPC %@: %@", safeKey, safeValue);
 			return true;
 		});
 	});
