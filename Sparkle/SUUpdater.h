@@ -33,6 +33,7 @@ SU_EXPORT @interface SUUpdater : NSObject
 - (instancetype)initForBundle:(NSBundle *)bundle;
 
 @property (readonly, strong) NSBundle *hostBundle;
+@property (strong, readonly) NSBundle *sparkleBundle;
 
 @property BOOL automaticallyChecksForUpdates;
 

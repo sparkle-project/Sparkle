@@ -69,12 +69,8 @@
     }
     
     // Decide on a destination name we should use for the older app when we move it around the file system
-    // TODO: will need to merge finding sparkle bundle this with newer code
-    NSBundle *sparkleBundle = [NSBundle bundleWithIdentifier:SUBundleIdentifier];
-    BOOL appendVersion = [[sparkleBundle infoDictionary][SUAppendVersionNumberKey] boolValue];
-    
     NSString *oldDestinationName = nil;
-    if (appendVersion) {
+    if (SPARKLE_APPEND_VERSION_NUMBER) {
         NSString *oldBundleVersion = [self bundleVersionAppropriateForFilenameFromHost:host];
         
         oldDestinationName = [oldURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingFormat:@" (%@)", oldBundleVersion != nil ? oldBundleVersion : @"old"];
@@ -174,8 +170,10 @@
 {
     SUParameterAssert(host);
 
+    BOOL allowDowngrades = SPARKLE_AUTOMATED_DOWNGRADES;
+
     // Prevent malicious downgrades
-    if (![[[NSBundle bundleWithIdentifier:SUBundleIdentifier] infoDictionary][SUEnableAutomatedDowngradesKey] boolValue]) {
+    if (!allowDowngrades) {
         if ([comparator compareVersion:[host version] toVersion:[[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]] == NSOrderedDescending) {
             NSString *errorMessage = [NSString stringWithFormat:@"Sparkle Updater: Possible attack in progress! Attempting to \"upgrade\" from %@ to %@. Aborting update.", [host version], [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
             NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];

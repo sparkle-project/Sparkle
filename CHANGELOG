@@ -14,6 +14,7 @@
 * Reject unsupported code-signing xattrs in binary delta (Zorg)
 * Fixed crash while applying delta update (antonc27)
 * Added logging of appcast/download URL on error (Kornel Lesiński)
+* More robust reading of Autoupdate.app path from Sparkle bundle
 
 # 1.10.0
 
