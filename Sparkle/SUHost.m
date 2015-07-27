@@ -89,13 +89,6 @@ typedef struct {
     return cachePath;
 }
 
-- (void)setRenamedInstallationPath:(NSString *)path
-{
-	if (renamedInstallationPath == path) return;
-    [renamedInstallationPath release];
-    renamedInstallationPath = [path copy];
-}
-
 - (NSString *)installationPath
 {
     if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
