@@ -180,7 +180,7 @@
 		72E45CF81B640DAE005C701A /* SUUpdateSettingsWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */; };
 		72E45CFC1B641961005C701A /* sparkletestcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CFB1B641961005C701A /* sparkletestcast.xml */; };
 		72E45CFE1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CFD1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem */; };
-		72E45D001B642354005C701A /* sign_update.sh in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CFF1B642354005C701A /* sign_update.sh */; };
+		72E45DDD1B65C3BD005C701A /* sign_update in Resources */ = {isa = PBXBuildFile; fileRef = 72E45DDC1B65C3BD005C701A /* sign_update */; };
 		767B61AC1972D488004E0C3C /* SUGuidedPackageInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 767B61AA1972D488004E0C3C /* SUGuidedPackageInstaller.h */; };
 		767B61AD1972D488004E0C3C /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */; };
 		767B61AE1972D488004E0C3C /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */; };
@@ -341,8 +341,8 @@
 		14732BBC1960EFB500593899 /* README.markdown */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.markdown; sourceTree = SOURCE_ROOT; };
 		14732BBF1960F0AC00593899 /* test_app_only_dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; path = test_app_only_dsa_pub.pem; sourceTree = "<group>"; };
 		14732BC11960F3B200593899 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = SOURCE_ROOT; usesTabs = 1; };
-		14732BC31960F3FF00593899 /* generate_keys.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = generate_keys.sh; sourceTree = "<group>"; };
-		14732BC41960F3FF00593899 /* sign_update.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = sign_update.sh; sourceTree = "<group>"; };
+		14732BC31960F3FF00593899 /* generate_keys */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = generate_keys; sourceTree = "<group>"; };
+		14732BC41960F3FF00593899 /* sign_update */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = sign_update; sourceTree = "<group>"; };
 		14732BC91960F70A00593899 /* make-release-package.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "make-release-package.sh"; sourceTree = "<group>"; };
 		14732BD219610A1800593899 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		14950074195FDF5900BC5B5B /* SUUpdaterTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterTest.m; sourceTree = "<group>"; usesTabs = 0; };
@@ -566,7 +566,7 @@
 		72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SUUpdateSettingsWindowController.xib; sourceTree = "<group>"; };
 		72E45CFB1B641961005C701A /* sparkletestcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = sparkletestcast.xml; sourceTree = "<group>"; };
 		72E45CFD1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test_app_only_dsa_priv_dont_ever_do_this_for_real.pem; sourceTree = "<group>"; };
-		72E45CFF1B642354005C701A /* sign_update.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = sign_update.sh; path = bin/sign_update.sh; sourceTree = SOURCE_ROOT; };
+		72E45DDC1B65C3BD005C701A /* sign_update */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = sign_update; path = bin/sign_update; sourceTree = SOURCE_ROOT; };
 		767B61AA1972D488004E0C3C /* SUGuidedPackageInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUGuidedPackageInstaller.h; sourceTree = "<group>"; };
 		767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUGuidedPackageInstaller.m; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Sparkle-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Sparkle-Info.plist"; sourceTree = "<group>"; };
@@ -777,8 +777,8 @@
 		14732BC21960F3FF00593899 /* bin */ = {
 			isa = PBXGroup;
 			children = (
-				14732BC31960F3FF00593899 /* generate_keys.sh */,
-				14732BC41960F3FF00593899 /* sign_update.sh */,
+				14732BC31960F3FF00593899 /* generate_keys */,
+				14732BC41960F3FF00593899 /* sign_update */,
 			);
 			path = bin;
 			sourceTree = SOURCE_ROOT;
@@ -938,6 +938,7 @@
 		61B5F91D09C4CF7F00B25A18 /* Test Application */ = {
 			isa = PBXGroup;
 			children = (
+				72E45DDC1B65C3BD005C701A /* sign_update */,
 				61B5F92A09C4CFD800B25A18 /* InfoPlist.strings */,
 				61B5F92409C4CFC900B25A18 /* main.m */,
 				72E45CF11B640CDD005C701A /* SUTestApplicationDelegate.h */,
@@ -946,7 +947,6 @@
 				72E45CF51B640DAE005C701A /* SUUpdateSettingsWindowController.m */,
 				72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */,
 				61B5F92C09C4CFD800B25A18 /* MainMenu.xib */,
-				72E45CFF1B642354005C701A /* sign_update.sh */,
 				72E45CFB1B641961005C701A /* sparkletestcast.xml */,
 				72E45CFD1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem */,
 				14732BBF1960F0AC00593899 /* test_app_only_dsa_pub.pem */,
@@ -1324,11 +1324,11 @@
 			files = (
 				1420DF50196247F900203BB0 /* Images.xcassets in Resources */,
 				61B5F92E09C4CFD800B25A18 /* InfoPlist.strings in Resources */,
-				72E45D001B642354005C701A /* sign_update.sh in Resources */,
 				61B5F92F09C4CFD800B25A18 /* MainMenu.xib in Resources */,
 				72E45CFC1B641961005C701A /* sparkletestcast.xml in Resources */,
 				14732BC01960F2C200593899 /* test_app_only_dsa_pub.pem in Resources */,
 				72E45CF81B640DAE005C701A /* SUUpdateSettingsWindowController.xib in Resources */,
+				72E45DDD1B65C3BD005C701A /* sign_update in Resources */,
 				72E45CFE1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
