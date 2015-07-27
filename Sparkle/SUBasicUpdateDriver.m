@@ -399,10 +399,9 @@
         [self abortUpdate];
         return;
     }
-	
-	BOOL running10_7 = floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6;
-	BOOL useXPC = running10_7 && [[NSFileManager defaultManager] fileExistsAtPath:
-								  [[host bundlePath] stringByAppendingPathComponent:@"Contents/XPCServices/com.andymatuschak.Sparkle.SandboxService.xpc"]];
+
+	BOOL useXPC = [[NSFileManager defaultManager] fileExistsAtPath:
+								  [self.host.bundlePath stringByAppendingPathComponent:@"Contents/XPCServices/com.andymatuschak.Sparkle.SandboxService.xpc"]];
     
     // Give the host app an opportunity to postpone the install and relaunch.
     static BOOL postponedOnce = NO;
@@ -435,32 +434,22 @@
         // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
         NSError *error = nil;
         [[NSFileManager defaultManager] createDirectoryAtPath:[targetPath stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:@{} error:&error];
-                
-        if ([SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil appendVersion:SPARKLE_APPEND_VERSION_NUMBER error:&error]) {
-            self.relaunchPath = targetPath;
+
+		BOOL copiedRelaunchTool = FALSE;
+		if( useXPC ) {
+			copiedRelaunchTool = [SUXPC copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath error: &error];
+		} else {
+			copiedRelaunchTool = [SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil appendVersion:SPARKLE_APPEND_VERSION_NUMBER error:&error];
+		}
+
+		if( copiedRelaunchTool ) {
+			self.relaunchPath = targetPath;
         } else {
             [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{
                 NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil),
                 NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", relaunchPathToCopy, targetPath, (error ? [error localizedDescription] : @"")]
             }]];
         }
-    }
-
-		// Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
-		BOOL copiedRelaunchTool = FALSE;
-		if( useXPC )
-			copiedRelaunchTool = [SUXPC copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath error: &error];
-		} else {
-			copiedRelaunchTool = [SUPlainInstaller copyPathWithAuthentication: relaunchPathToCopy overPath: targetPath  error: &error];
-		}
-		if( copiedRelaunchTool ) {
-			self.relaunchPath = [targetPath retain];
-		} else {
-            [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{
-                NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil),
-                NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", relaunchPathToCopy, targetPath, (error ? [error localizedDescription] : @"")]
-            }]];
-		}
 	}
 
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
@@ -478,32 +467,26 @@
         return;
     }
 
-    NSString *pathToRelaunch = [host bundlePath];
-	if ([[updater delegate] respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
-        pathToRelaunch = [[updater delegate] pathToRelaunchForUpdater:updater];
-#warning restore XPC support here
-#if mine    
-NSString *relaunchToolPath = [relaunchPath stringByAppendingPathComponent: @"/Contents/MacOS/finish_installation"];
-	NSArray *arguments = [NSArray arrayWithObjects:[host bundlePath], pathToRelaunch, [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]], tempDir, relaunch ? @"1" : @"0", nil];
-	if( useXPC )
-		[SUXPC launchTaskWithLaunchPath: relaunchToolPath arguments:arguments];
-	else
-		[NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:arguments];
-	}
-#else
     NSString *pathToRelaunch = [self.host bundlePath];
     if ([updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
         pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:self.updater];
     }
-    [NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:@[[self.host bundlePath],
-                                                                    pathToRelaunch,
-                                                                    [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]],
-                                                                    self.tempDir,
-                                                                    relaunch ? @"1" : @"0",
-                                                                    showUI ? @"1" : @"0"]];
+
+	NSArray *relaunchToolArguments = @[[self.host bundlePath],
+                            pathToRelaunch,
+                            [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]],
+                            self.tempDir,
+                            relaunch ? @"1" : @"0",
+                            showUI ? @"1" : @"0"];
+	if( useXPC ) {
+		[SUXPC launchTaskWithLaunchPath: relaunchToolPath arguments:relaunchToolArguments];
+	} else {
+		[NSTask launchedTaskWithLaunchPath: relaunchToolPath arguments:relaunchToolArguments];
+	}
+
     [self terminateApp];
 }
-#endif
+
 
 - (void)terminateApp
 {

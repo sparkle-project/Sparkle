@@ -500,11 +500,11 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	return userCanWrite;
 }
 
-+ (BOOL) copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst error:(NSError **)error
++ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)__unused tmp appendVersion:(BOOL)appendVersion error:(NSError *__autoreleasing *)error
 {
 	BOOL success = NO;
 	BOOL didFindTrash = NO;
-	NSString *tmpPath = [self _temporaryCopyNameForPath: dst didFindTrash: &didFindTrash];
+	NSString *tmpPath = [self _temporaryCopyNameForPath: dst appendVersion:appendVersion didFindTrash: &didFindTrash];
 
 	// If we know we will need to escalate privileges, we take a complete different code path. Note that the
 	// "forced authentication" code path also performs the "releaseFromQuarantine:" stuff, so don't be alarmed
@@ -519,7 +519,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		BOOL replacingExistingFile = [[NSFileManager defaultManager] fileExistsAtPath:dst];
 		if (replacingExistingFile)
 		{
-			NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
+			NSFileManager *manager = [[NSFileManager alloc] init];
 			success = [manager moveItemAtPath:dst toPath:tmpPath error:error];
 			if (success == NO)
 			{
@@ -529,7 +529,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 		}
 
 		// Copy the file in, replacing the original if we run into any error
-		NSFileManager *manager = [[[NSFileManager alloc] init] autorelease];
+		NSFileManager *manager = [[NSFileManager alloc] init];
 		success = [manager copyItemAtPath:src toPath:dst error:error];
 		if (success == NO)
 		{
