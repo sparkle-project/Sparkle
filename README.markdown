@@ -2,6 +2,21 @@
 
 An easy-to-use software update framework for Cocoa developers.
 
+## Important: About This Fork
+
+This fork by Daniel Jalkut of Red Sweater Software deviates from the canonical sparkle-project repository in a few important ways:
+
+* Rudimentary support for sandboxing is supported through the use of an XPC tool to kick off the install/relaunch process. (Courtesy tumult and wbyoung).
+* Various changes to Sparkle.strings are made to (IMHO) lighten the tone of the language to be less excited and more professional.
+
+**Do not use this code as is.**
+
+The state of this project *right now* is "not tested." I have just on July 27, 2015 finished a merge with sparkle-project but have not yet tested that all the expected XPC-based stuff is working as expected. When the state of this project is once again "stable" I will update this readme to remove this line and replace it with something more encouraging. :)
+
+**If you do use this code.**
+
+If you decide to use this code and test its functionality etc., one caveat you should be aware of is that the XPC service is built with a "red sweater" based reverse domain style name. You probably want to change this to your own organization's ID namespace. Search the project for "com.red-sweater" to find any references along these lines.
+
 <img src="Resources/Screenshot.png" width="715" alt="Sparkle shows familiar update window with release notes">
 
 ## Changes since 1.5b
