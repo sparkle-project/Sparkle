@@ -55,7 +55,7 @@
     SecExternalItemType itemType = kSecItemTypePublicKey;
     CFArrayRef items = NULL;
 
-    OSStatus status = SecItemImport((__bridge CFDataRef)data, NULL, &format, &itemType, 0, NULL, NULL, &items);
+    OSStatus status = SecItemImport((__bridge CFDataRef)data, NULL, &format, &itemType, (SecItemImportExportFlags)0, NULL, NULL, &items);
     if (status != errSecSuccess || !items) {
         if (items) {
             CFRelease(items);
