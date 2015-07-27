@@ -55,6 +55,11 @@
     return [self.propertiesDictionary[SUAppcastElementTags] containsObject:SUAppcastElementCriticalUpdate];
 }
 
+- (BOOL)isInformationOnlyUpdate
+{
+	return (([self infoURL] != nil) && ([self fileURL] == nil));
+}
+
 - (instancetype)initWithDictionary:(NSDictionary *)dict
 {
     return [self initWithDictionary:dict failureReason:nil];
