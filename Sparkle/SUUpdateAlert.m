@@ -186,7 +186,7 @@
         [self.window setLevel:NSFloatingWindowLevel]; // This means the window will float over all other apps, if our app is switched out ?!
     }
 
-    if ([self.updateItem fileURL] == nil) {
+    if (self.updateItem.isInformationOnlyUpdate) {
         [self.installButton setTitle:SULocalizedString(@"Learn More...", @"Alternate title for 'Install Update' button when there's no download in RSS feed.")];
         [self.installButton setAction:@selector(openInfoURL:)];
     }
