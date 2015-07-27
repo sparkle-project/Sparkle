@@ -57,7 +57,7 @@
 
 - (BOOL)isInformationOnlyUpdate
 {
-	return (([self infoURL] != nil) && ([self fileURL] == nil));
+    return self.infoURL && !self.fileURL;
 }
 
 - (instancetype)initWithDictionary:(NSDictionary *)dict
