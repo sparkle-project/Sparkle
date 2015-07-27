@@ -231,7 +231,20 @@
 	else {
         [self.versionDisplayer formatVersion:&updateItemVersion andVersion:&hostVersion];
     }
-    return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", nil), [self.host name], updateItemVersion, hostVersion];
+
+	// We display a slightly different summary depending on if it's an "info-only" item or not
+	NSString* actionSentence = nil;
+
+	if ([self.updateItem isInformationOnlyUpdate])
+	{
+		actionSentence = SULocalizedString(@"Would you like to learn more about this update on the web?", @"Final portion of descriptionText when the update informational with no download.");
+	}
+	else
+	{
+		actionSentence = SULocalizedString(@"Would you like to download it now?", @"Final portion of descriptionText when the update is downloadable.");
+	}
+
+    return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. %@", @"Description text for SUUpdateAlert. The final placeholder %4$@ will be substituted with one of the two strings below, depending on whether it's an informational or download update."), [self.host name], updateItemVersion, hostVersion, actionSentence];
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:frame
