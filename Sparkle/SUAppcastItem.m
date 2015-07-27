@@ -186,9 +186,4 @@
     return self;
 }
 
-- (BOOL) isInformationOnlyUpdate
-{
-	return (([self infoURL] != nil) && ([self fileURL] == nil));
-}
-
 @end
