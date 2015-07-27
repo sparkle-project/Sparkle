@@ -2,10 +2,8 @@
 
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ has been downloaded. Would you like to install it and reopen %1$@ now?";
 
-/* No comment provided by engineer. */
 "%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "%1$@ can’t be updated when it’s running from a read-only volume such as a disk image or optical drive. Move %1$@ to your Applications folder, reopen it, and try again.";
 
-/* No comment provided by engineer. */
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ is the latest version available.";
 
 /* descriptionText from SUUpdateAlert. */
@@ -17,19 +15,14 @@
 /* Final portion of descriptionText when the update is a web page with more info. */
 "Would you like to see more info on the web?" = "Would you like to see more info on the web?";
 
-/* No comment provided by engineer. */
 "%@ downloaded" = "%@ downloaded";
 
-/* No comment provided by engineer. */
 "%@ of %@" = "%1$@ of %2$@";
 
-/* No comment provided by engineer. */
 "A new version of %@ is available!" = "An updated version of %@ is available.";
 
-/* No comment provided by engineer. */
 "A new version of %@ is ready to install!" = "An updated version of %@ is ready to install.";
 
-/* No comment provided by engineer. */
 "An error occurred in retrieving update information. Please try again later." = "An error occurred while checking for updates. Please try again later.";
 
 "An error occurred while downloading the update. Please try again later." = "An error occurred while downloading the update. Please try again later.";
@@ -38,10 +31,8 @@
 
 "An error occurred while installing the update. Please try again later." = "An error occurred while installing the update. Please try again later.";
 
-/* No comment provided by engineer. */
 "An error occurred while parsing the update feed." = "An error occurred while processing update information. Please update to the latest version of this application by visiting our web page.";
 
-/* No comment provided by engineer. */
 "An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "An error occurred while reopening %1$@, but the updated version will be available the next time you open %1$@.";
 
 "An important update to %@ is ready to install" = "An important update to %@ is ready to install";
