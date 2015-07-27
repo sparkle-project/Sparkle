@@ -341,6 +341,9 @@
 		14732BC91960F70A00593899 /* make-release-package.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "make-release-package.sh"; sourceTree = "<group>"; };
 		14732BD219610A1800593899 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		147D6D9E1B66DC3C006607AB /* CheckLocalizations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CheckLocalizations.swift; path = Sparkle/CheckLocalizations.swift; sourceTree = SOURCE_ROOT; };
+		147D6DA71B66EC1C006607AB /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		147D6DA91B66EC22006607AB /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		147D6DAA1B66EC25006607AB /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		14950074195FDF5900BC5B5B /* SUUpdaterTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterTest.m; sourceTree = "<group>"; usesTabs = 0; };
 		14958C6B19AEBC530061B14F /* signed-test-file.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "signed-test-file.txt"; sourceTree = "<group>"; };
 		14958C6C19AEBC610061B14F /* test-pubkey.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "test-pubkey.pem"; sourceTree = "<group>"; };
@@ -1697,6 +1700,9 @@
 				0263187214FEBB31005EBF43 /* uk */,
 				61131A090F846D0A00E97AF6 /* zh_CN */,
 				61131A0A0F846D1100E97AF6 /* zh_TW */,
+				147D6DA71B66EC1C006607AB /* ca */,
+				147D6DA91B66EC22006607AB /* fi */,
+				147D6DAA1B66EC25006607AB /* he */,
 			);
 			name = Sparkle.strings;
 			sourceTree = "<group>";
