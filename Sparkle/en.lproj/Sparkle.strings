@@ -15,8 +15,6 @@
 /* Final portion of descriptionText when the update informational with no download. */
 "Would you like to learn more about this update on the web?" = "Would you like to learn more about this update on the web?";
 
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ is now available—you have %3$@. Would you like to download it now?";
-
 "%@ downloaded" = "%@ downloaded";
 
 "%@ of %@" = "%1$@ of %2$@";
