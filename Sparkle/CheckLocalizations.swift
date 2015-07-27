@@ -7,11 +7,11 @@ func die(msg: String) {
     exit(1)
 }
 
-func escapeHTML(str: String) -> String {
-    if let node = NSXMLNode.textWithStringValue(str) as? NSXMLNode {
-        return node.XMLString
+extension NSXMLElement {
+    convenience init(name: String, attributes: [String: String], stringValue string: String? = nil) {
+        self.init(name: name, stringValue: string)
+        setAttributesWithDictionary(attributes)
     }
-    die("NSXMLNode failure"); return ""
 }
 
 let ud = NSUserDefaults.standardUserDefaults()
@@ -32,31 +32,43 @@ let dirPath = sparkleRoot! + "/Sparkle"
 let dirContents = NSFileManager.defaultManager().contentsOfDirectoryAtPath(dirPath, error: nil) as! [String]
 let css =
     "body { font-family: sans-serif; font-size: 10pt; }" +
-    "h1 { font-size: 12pt; }"  +
-    ".missing { background-color: #FFBABA; color: #D6010E; }"  +
-    ".unused { background-color: #BDE5F8; color: #00529B; }" +
-    ".unlocalized { background-color: #FEEFB3; color: #9F6000; }"
-var html = "<!DOCTYPE html>\n<html><head><meta charset=\"UTF-8\">\n<title>Localizations</title>\n<style>\(css)</style>\n</head><body>\n"
+    "h1 { font-size: 12pt; }" +
+    ".missing { background-color: #FFBABA; color: #D6010E; white-space: pre; }" +
+    ".unused { background-color: #BDE5F8; color: #00529B; white-space: pre; }" +
+    ".unlocalized { background-color: #FEEFB3; color: #9F6000; white-space: pre; }"
+var html = NSXMLDocument(rootElement: NSXMLElement(name: "html"))
+html.DTD = NSXMLDTD()
+html.DTD!.name = html.rootElement()!.name
+html.characterEncoding = "UTF-8"
+html.documentContentKind = NSXMLDocumentContentKind.XHTMLKind
+var body = NSXMLElement(name: "body")
+var head = NSXMLElement(name: "head")
+html.rootElement()!.addChild(head)
+html.rootElement()!.addChild(body)
+head.addChild(NSXMLElement(name: "meta", attributes: ["charset": html.characterEncoding!]))
+head.addChild(NSXMLElement(name: "title", stringValue: "Sparkle Localizations Report"))
+head.addChild(NSXMLElement(name: "style", stringValue: css))
+
 let locale = NSLocale.currentLocale()
 for dirEntry in dirContents {
     if dirEntry.pathExtension != "lproj" || dirEntry == "en.lproj" {
         continue
     }
-    
+
     let lang = locale.displayNameForKey(NSLocaleLanguageCode, value: dirEntry.stringByDeletingPathExtension)
-    html += "<h1>\(dirEntry) (\(lang!))</h1>\n"
-    
+    body.addChild(NSXMLElement(name: "h1", stringValue: "\(dirEntry) (\(lang!))"))
+
     let stringsPath = dirPath.stringByAppendingPathComponent(dirEntry).stringByAppendingPathComponent("Sparkle.strings")
     let stringsDict = NSDictionary(contentsOfFile: stringsPath)
     if stringsDict == nil {
         die("Invalid strings file \(dirEntry)")
         continue
     }
-    
+
     var missing: [String] = []
     var unlocalized: [String] = []
     var unused: [String] = []
-    
+
     for key in enStringsDictKeys {
         let str = stringsDict?.objectForKey(key) as? String
         if str == nil {
@@ -74,27 +86,30 @@ for dirEntry in dirContents {
             unused.append(key as! String)
         }
     }
-    
+
     let sorter = { (s1: String, s2: String) -> Bool in
         return s1 < s2
     }
     missing.sort(sorter)
     unlocalized.sort(sorter)
     unused.sort(sorter)
-    
+
+    let addRow = { (prefix: String, cssClass: String, key: String) -> Void in
+        body.addChild(NSXMLElement(name: "span", attributes: ["class": cssClass], stringValue: " ".join([prefix, key]) + "\n"))
+    }
+
     for key in missing {
-        html += "<span class=\"missing\">Missing \"\(escapeHTML(key))\"</span><br/>\n"
+        addRow("Missing", "missing", key)
     }
     for key in unlocalized {
-        html += "<span class=\"unlocalized\">Unlocalized \"\(escapeHTML(key))\"</span><br/>\n"
+        addRow("Unlocalized", "unlocalized", key)
     }
     for key in unused {
-        html += "<span class=\"unused\">Unused \"\(escapeHTML(key))\"</span><br/>\n"
+        addRow("Unused", "unused", key)
     }
 }
-html += "</body></html>"
 
 var err: NSError?
-if !html.writeToFile(htmlPath!, atomically: true, encoding: NSUTF8StringEncoding, error: &err) {
+if !html.XMLData.writeToFile(htmlPath!, atomically: true) {
     die("Can't write report: \(err)")
 }
