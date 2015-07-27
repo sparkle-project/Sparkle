@@ -11,5 +11,6 @@ OTHER_CFLAGS = $(SPARKLE_EXTRA_DEBUG)
 ONLY_ACTIVE_ARCH = YES
 COPY_PHASE_STRIP = NO
 
-// For Debug builds, we don't require timestamping because Apple's server may be down or we may be off-network
+// For Debug builds, we don't require timestamping because Apple's
+// server may be down or we may be off-network
 OTHER_CODE_SIGN_FLAGS = --timestamp=none

@@ -39,7 +39,7 @@ static void peer_event_handler(xpc_connection_t peer, xpc_object_t event)
 			NSString *relaunchPathToCopy = src ? [manager stringWithFileSystemRepresentation:src length:strlen(src)] : nil;
 			NSString *targetPath = dst ? [manager stringWithFileSystemRepresentation:dst length:strlen(dst)] : nil;
 			NSError *error = nil;
-			[SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil appendVersion:SPARKLE_APPEND_VERSION_NUMBER error:&error];
+			[SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath appendVersion:SPARKLE_APPEND_VERSION_NUMBER error:&error];
 			
 			// send response to indicate ok
 			xpc_object_t reply = xpc_dictionary_create_reply(event);
