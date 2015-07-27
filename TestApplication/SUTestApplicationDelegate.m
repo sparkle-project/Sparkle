@@ -112,8 +112,9 @@ static NSString * const UPDATED_VERSION = @"2.0";
     
     // Sign our update
     NSTask *signUpdateTask = [[NSTask alloc] init];
-    signUpdateTask.launchPath = [mainBundle pathForResource:@"sign_update" ofType:@""];
-    assert(signUpdateTask.launchPath != nil);
+    NSString *signUpdatePath = [mainBundle pathForResource:@"sign_update" ofType:@""];
+    assert(signUpdatePath != nil);
+    signUpdateTask.launchPath = signUpdatePath;
     
     NSURL *archiveURL = [serverDirectoryURL URLByAppendingPathComponent:zipName];
     signUpdateTask.arguments = @[archiveURL, privateKeyPath];
