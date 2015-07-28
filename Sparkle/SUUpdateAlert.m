@@ -223,28 +223,22 @@
     NSString *updateItemVersion = [self.updateItem displayVersionString];
     NSString *hostVersion = [self.host displayVersion];
     // Display more info if the version strings are the same; useful for betas.
-    if (!self.versionDisplayer && [updateItemVersion isEqualToString:hostVersion] )
-	{
+    if (!self.versionDisplayer && [updateItemVersion isEqualToString:hostVersion] ) {
         updateItemVersion = [updateItemVersion stringByAppendingFormat:@" (%@)", [self.updateItem versionString]];
-        hostVersion = [hostVersion stringByAppendingFormat:@" (%@)", [self.host version]];
-    }
-	else {
+        hostVersion = [hostVersion stringByAppendingFormat:@" (%@)", self.host.version];
+    } else {
         [self.versionDisplayer formatVersion:&updateItemVersion andVersion:&hostVersion];
     }
 
     // We display a slightly different summary depending on if it's an "info-only" item or not
-    NSString *actionSentence = nil;
+    NSString *finalString = nil;
 
-    if (self.updateItem.isInformationOnlyUpdate)
-    {
-        actionSentence = SULocalizedString(@"Would you like to learn more about this update on the web?", @"Final portion of descriptionText when the update informational with no download.");
+    if (self.updateItem.isInformationOnlyUpdate) {
+        finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?", @"Description text for SUUpdateAlert when the update informational with no download."), self.host.name, updateItemVersion, hostVersion];
+    } else {
+        finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", @"Description text for SUUpdateAlert when the update is downloadable."), self.host.name, updateItemVersion, hostVersion];
     }
-    else
-    {
-        actionSentence = SULocalizedString(@"Would you like to download it now?", @"Final portion of descriptionText when the update is downloadable.");
-    }
-
-    return [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. %@", @"Description text for SUUpdateAlert. The final placeholder %4$@ will be substituted with one of the two strings below, depending on whether it's an informational or download update."), [self.host name], updateItemVersion, hostVersion, actionSentence];
+    return finalString;
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:frame
