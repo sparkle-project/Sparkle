@@ -6,7 +6,11 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ は現在入手できる最新バージョンです。";
 
+/* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ が入手できます（使用中のバージョンは %3$@ です）。今すぐダウンロードしますか？";
+
+/* Description text for SUUpdateAlert when the update informational with no download. */
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
 
 "%@ downloaded" = "%@ ダウンロード済み";
 
