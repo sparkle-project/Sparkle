@@ -33,9 +33,8 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSError *error = nil;
         NSString *oldPath = [host bundlePath];
-        NSString *tempName = [self temporaryNameForPath:[host installationPath]];
 
-        BOOL result = [self copyPathWithAuthentication:path overPath:installationPath temporaryName:tempName appendVersion:SPARKLE_APPEND_VERSION_NUMBER error:&error];
+        BOOL result = [self copyPathWithAuthentication:path overPath:installationPath appendVersion:SPARKLE_APPEND_VERSION_NUMBER error:&error];
 
         if (result) {
             if ([SUCodeSigningVerifier applicationAtPathIsCodeSigned:installationPath]) {

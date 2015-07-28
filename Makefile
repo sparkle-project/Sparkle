@@ -26,3 +26,7 @@ ci:
 			xcodebuild -sdk "macosx10.$$i" -scheme Distribution -configuration Debug test ; \
 		fi ; \
 	done
+
+check-localizations:
+	./Sparkle/CheckLocalizations.swift -root . -htmlPath "$(TMPDIR)/LocalizationsReport.htm"
+	open "$(TMPDIR)/LocalizationsReport.htm"
