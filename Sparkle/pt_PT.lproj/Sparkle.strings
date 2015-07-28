@@ -4,7 +4,11 @@
 
 "%@ %@ is currently the newest version available." = "O %1$@ %2$@ é neste momento a versão mais recente disponível.";
 
+/* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "O %1$@ %2$@ está agora disponível e tem a versão %3$@. Gostaria de o transferir agora?";
+
+/* Description text for SUUpdateAlert when the update informational with no download. */
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
 
 "%@ downloaded" = "%@ transferido";
 

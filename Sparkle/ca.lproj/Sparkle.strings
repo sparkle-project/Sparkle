@@ -6,7 +6,11 @@
 
 "%@ %@ is currently the newest version available." = "%@ %@ és la versió disponible més actual.";
 
-"%@ %@ is now available (you have %@). Would you like to download it now?" = "%@ %@ està disponible (ara teniu %@). Voleu actualitzar?";
+/* Description text for SUUpdateAlert when the update is downloadable. */
+"%@ %@ is now available--you have %@. Would you like to download it now?" = "%@ %@ està disponible (ara teniu %@). Voleu actualitzar?";
+
+/* Description text for SUUpdateAlert when the update informational with no download. */
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
 
 "%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help." = "%@ no té permís per escriure al directori d'aplicacions! Esteu executant el programa des d'un disc d'imatge? Si no és així, demaneu ajuda al vostre administrador.";
 
