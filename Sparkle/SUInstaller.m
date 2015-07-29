@@ -25,21 +25,11 @@ static NSString *sUpdateFolder = nil;
 
 + (BOOL)isAliasFolderAtPath:(NSString *)path
 {
-    FSRef fileRef;
-    OSStatus err = noErr;
-    Boolean aliasFileFlag = false, folderFlag = false;
-    NSURL *fileURL = [NSURL fileURLWithPath:path];
-
-    if (FALSE == CFURLGetFSRef((CFURLRef)fileURL, &fileRef))
-        err = coreFoundationUnknownErr;
-
-    if (noErr == err)
-        err = FSIsAliasFile(&fileRef, &aliasFileFlag, &folderFlag);
-
-    if (noErr == err)
-        return !!(aliasFileFlag && folderFlag);
-    else
-        return NO;
+    NSNumber *aliasFlag = nil;
+    [[NSURL fileURLWithPath:path] getResourceValue:&aliasFlag forKey:NSURLIsAliasFileKey error:nil];
+    NSNumber *directoryFlag = nil;
+    [[NSURL fileURLWithPath:path] getResourceValue:&directoryFlag forKey:NSURLIsDirectoryKey error:nil];
+    return aliasFlag.boolValue && directoryFlag.boolValue;
 }
 
 + (NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr isGuided:(BOOL *)isGuidedPtr
