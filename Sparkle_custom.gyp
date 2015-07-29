@@ -1,5 +1,4 @@
-# Copyright (c) 2011 House of Life Property ltd.
-# Copyright (c) 2011 Crystalnix <vgachkaylo@crystalnix.com>
+# Copyright (c) 2015 BitTorrent, Inc. <ben@bittorrent.com>
 
 {
   'conditions': [
