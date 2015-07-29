@@ -120,7 +120,9 @@ typedef struct {
 
 - (NSString *__nonnull)version
 {
-    NSString *version = [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
+    NSString *version = [self.bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];  // bt_browser added.  prefer long version string
+    if (!version || [version isEqualToString:@""])  // bt_browser fall back to CFBundleVersion
+        version = [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     if (!version || [version isEqualToString:@""])
         [NSException raise:@"SUNoVersionException" format:@"This host (%@) has no %@! This attribute is required.", [self bundlePath], (__bridge NSString *)kCFBundleVersionKey];
     return version;
