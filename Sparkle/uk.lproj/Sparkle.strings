@@ -14,15 +14,15 @@
 
 "A new version of %@ is ready to install!" = "Нова версія %@ готова до встановлення!";
 
-"An error occurred in retrieving update information. Please try again later." = "Виникла помилка при отриманні інформації про оновлення. Спробуйте ще пізніше.";
+"An error occurred in retrieving update information. Please try again later." = "Виникла помилка при отриманні інформації про оновлення. Спробуйте ще раз пізніше.";
 
-"An error occurred while downloading the update. Please try again later." = "Виникла помилка при завантаження оновлення. Спробуйте ще пізніше.";
+"An error occurred while downloading the update. Please try again later." = "Виникла помилка при завантаження оновлення. Спробуйте ще раз пізніше.";
 
-"An error occurred while extracting the archive. Please try again later." = "Виникла помилка при розпаковуванні архіву. Спробуйте ще пізніше.";
+"An error occurred while extracting the archive. Please try again later." = "Виникла помилка при розпаковуванні архіву. Спробуйте ще раз пізніше.";
 
-"An error occurred while installing the update. Please try again later." = "Виникла помилка при встановленні оновлення. Спробуйте ще пізніше.";
+"An error occurred while installing the update. Please try again later." = "Виникла помилка при встановленні оновлення. Спробуйте ще раз пізніше.";
 
-"An error occurred while parsing the update feed." = "Виникла помилка при розборі фіду оновлень.";
+"An error occurred while parsing the update feed." = "Виникла помилка розбору каналу оновлень.";
 
 "An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Виникла помилка при перезавантаженні %1$@, але наступного разу при завантаження %1$@ буде доступна нова версія.";
 
@@ -33,7 +33,7 @@
 
 "Cancel Update" = "Відмінити оновлення";
 
-"Checking for updates..." = "Перевіря наявність оновлень…";
+"Checking for updates..." = "Перевіряю наявність оновлень…";
 
 /* Take care not to overflow the status window. */
 "Downloading update..." = "Завантажую оновлення…";
@@ -65,7 +65,7 @@
 
 "Updating %@" = "Оновлюю %@";
 
-"You already have the newest version of %@." = "Ви вже маєте саму останню версію программи %@.";
+"You already have the newest version of %@." = "Ви вже користуєтесь останньою версією програми %@.";
 
 "You're up-to-date!" = "У вас остання версія!";
 

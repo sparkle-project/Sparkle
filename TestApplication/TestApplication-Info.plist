@@ -7,7 +7,7 @@
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.sparkle-project.SparkleTestApp</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -28,5 +28,18 @@
 	<string>http://sparkle-project.org/files/sparkletestcast.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>test_app_only_dsa_pub.pem</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>sparkle-project.org</key>
+			<dict>
+			  <key>NSIncludesSubdomains</key>
+			  <false/>
+			  <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+			  <true/>
+			</dict>
+		</dict>
+	</dict>
 </dict>
 </plist>

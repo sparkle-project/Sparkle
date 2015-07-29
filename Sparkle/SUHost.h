@@ -5,20 +5,30 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
+#import <Foundation/Foundation.h>
 #import "SUUpdater.h"
 #import "SUAppcast.h"
 #import "SUAppcastItem.h"
 #import "SUVersionComparisonProtocol.h"
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101000
+typedef struct {
+    NSInteger majorVersion;
+    NSInteger minorVersion;
+    NSInteger patchVersion;
+} NSOperatingSystemVersion;
+#endif
+
 @interface SUHost : NSObject
 
 @property (strong, readonly) NSBundle *bundle;
 
++ (NSOperatingSystemVersion)operatingSystemVersion;
 + (NSString *)systemVersionString;
 
 - (instancetype)initWithBundle:(NSBundle *)aBundle;
 @property (readonly, copy) NSString *bundlePath;
-@property (readonly, copy) NSString *appSupportPath;
+@property (readonly, copy) NSString *appCachePath;
 @property (readonly, copy) NSString *installationPath;
 @property (readonly, copy) NSString *name;
 @property (readonly, copy) NSString *version;

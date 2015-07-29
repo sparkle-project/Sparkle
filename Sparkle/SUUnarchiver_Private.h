@@ -16,9 +16,9 @@
 + (void)registerImplementation:(Class)implementation;
 + (NSArray *)unarchiverImplementations;
 + (BOOL)canUnarchivePath:(NSString *)path;
-- (instancetype)initWithPath:(NSString *)path host:(SUHost *)host;
+- (instancetype)initWithPath:(NSString *)archive hostBundlePath:(NSString *)host;
 
-- (void)notifyDelegateOfExtractedLength:(size_t)length;
+- (void)notifyDelegateOfProgress:(double)progress;
 - (void)notifyDelegateOfSuccess;
 - (void)notifyDelegateOfFailure;
 @end

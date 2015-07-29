@@ -152,8 +152,9 @@
         }
 
         // Find the appropriate release notes URL.
-        if (dict[SUAppcastElementReleaseNotesLink]) {
-            self.releaseNotesURL = [NSURL URLWithString:dict[SUAppcastElementReleaseNotesLink]];
+        NSString *releaseNotesString = dict[SUAppcastElementReleaseNotesLink];
+        if (releaseNotesString) {
+            self.releaseNotesURL = [NSURL URLWithString:releaseNotesString];
         } else if ([self.itemDescription hasPrefix:@"http://"] || [self.itemDescription hasPrefix:@"https://"]) { // if the description starts with http:// or https:// use that.
             self.releaseNotesURL = [NSURL URLWithString:self.itemDescription];
         } else {
@@ -164,12 +165,15 @@
         if (deltaDictionaries) {
             NSMutableDictionary *deltas = [NSMutableDictionary dictionary];
             for (NSDictionary *deltaDictionary in deltaDictionaries) {
+                NSString *deltaFrom = deltaDictionary[SUAppcastAttributeDeltaFrom];
+                if (!deltaFrom) continue;
+
                 NSMutableDictionary *fakeAppCastDict = [dict mutableCopy];
                 [fakeAppCastDict removeObjectForKey:SUAppcastElementDeltas];
                 fakeAppCastDict[SURSSElementEnclosure] = deltaDictionary;
-                SUAppcastItem *deltaItem = [[[self class] alloc] initWithDictionary:fakeAppCastDict];
+                SUAppcastItem *deltaItem = [[SUAppcastItem alloc] initWithDictionary:fakeAppCastDict];
 
-                deltas[deltaDictionary[SUAppcastAttributeDeltaFrom]] = deltaItem;
+                deltas[deltaFrom] = deltaItem;
             }
             self.deltaUpdates = deltas;
         }

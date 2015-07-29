@@ -123,7 +123,7 @@ static off_t offtin(u_char *buf)
 	return y;
 }
 
-int bspatch(int argc,char * argv[])
+int bspatch(int argc,const char * const argv[])
 {
 	FILE * f, * cpf, * dpf, * epf;
 	stream_t cstream, dstream, estream;

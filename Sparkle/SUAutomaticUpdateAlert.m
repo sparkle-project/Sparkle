@@ -11,23 +11,22 @@
 #import "SUHost.h"
 
 @interface SUAutomaticUpdateAlert ()
+@property (strong) void(^completionBlock)(SUAutomaticInstallationChoice);
 @property (strong) SUAppcastItem *updateItem;
-@property (weak) id<SUAutomaticUpdateAlertDelegate> delegate;
 @property (strong) SUHost *host;
 @end
 
 @implementation SUAutomaticUpdateAlert
-@synthesize delegate;
 @synthesize host;
 @synthesize updateItem;
+@synthesize completionBlock;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost delegate:(id<SUAutomaticUpdateAlertDelegate>)del
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUAutomaticInstallationChoice))block
 {
-    self = [super initWithHost:aHost windowNibName:@"SUAutomaticUpdateAlert"];
-	if (self)
-	{
+    self = [super initWithWindowNibName:@"SUAutomaticUpdateAlert"];
+    if (self) {
         self.updateItem = item;
-        self.delegate = del;
+        self.completionBlock = block;
         self.host = aHost;
         [self setShouldCascadeWindows:NO];
         [[self window] center];
@@ -35,32 +34,35 @@
     return self;
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self.host bundlePath], [self.host installationPath]]; }
+- (NSString *__nonnull)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self.host bundlePath], [self.host installationPath]]; }
 
 - (IBAction)installNow:(id)__unused sender
 {
     [self close];
-    [self.delegate automaticUpdateAlert:self finishedWithChoice:SUInstallNowChoice];
+    self.completionBlock(SUInstallNowChoice);
+    self.completionBlock = nil;
 }
 
 - (IBAction)installLater:(id)__unused sender
 {
     [self close];
-    [self.delegate automaticUpdateAlert:self finishedWithChoice:SUInstallLaterChoice];
+    self.completionBlock(SUInstallLaterChoice);
+    self.completionBlock = nil;
 }
 
 - (IBAction)doNotInstall:(id)__unused sender
 {
     [self close];
-    [self.delegate automaticUpdateAlert:self finishedWithChoice:SUDoNotInstallChoice];
+    self.completionBlock(SUDoNotInstallChoice);
+    self.completionBlock = nil;
 }
 
-- (NSImage *)applicationIcon
+- (NSImage *__nonnull)applicationIcon
 {
     return [self.host icon];
 }
 
-- (NSString *)titleText
+- (NSString *__nonnull)titleText
 {
     if ([self.updateItem isCriticalUpdate])
     {

@@ -42,13 +42,13 @@
 
 "Ready to Install" = "A punt per instal·lar";
 
+"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Voleu que %1$@ comprovi si hi ha noves actualitzacions al iniciar? Si no, podeu inciar la comprovació manualment des del menú %1$@.";
+
 "Update Error!" = "Error d'actualització!";
 
 "Updating %@" = "Actualitzant %@";
 
-"Would you like %@ to check for updates on startup? If not, you can initiate the check manually from the %@ menu." = "Voleu que %@ comprovi si hi ha noves actualitzacions al iniciar? Si no, podeu inciar la comprovació manualment des del menú @.";
-
 "Yes" = "Sí";
 
-"You're up to date!" = "Ja esteu al dia!";
+"You're up-to-date!" = "Ja esteu al dia!";
 

@@ -9,4 +9,4 @@
 
 // So that we can use this method in SUBinaryDeltaApply.m.
 // Silences the GCC warning that the prototype doesn't exist.
-int bspatch(int argc, char * argv[]);
+int bspatch(int argc, const char * const argv[]);

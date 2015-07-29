@@ -61,14 +61,14 @@ static inline void PerformOnMainThreadSync(dispatch_block_t theBlock)
 // Authorization code based on generous contribution from Allan Odgaard. Thanks, Allan!
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations" // this is terrible; will fix later probably
-static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char *executablePath, AuthorizationFlags options, const char *const *arguments)
+static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char *executablePath, AuthorizationFlags options, char *const *arguments)
 {
     // *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
     sig_t oldSigChildHandler = signal(SIGCHLD, SIG_DFL);
     BOOL returnValue = YES;
 
-	if (AuthorizationExecuteWithPrivileges(authorization, executablePath, options, (char* const*)arguments, NULL) == errAuthorizationSuccess)
+	if (AuthorizationExecuteWithPrivileges(authorization, executablePath, options, arguments, NULL) == errAuthorizationSuccess)
 	{
         int status;
         pid_t pid = wait(&status);
@@ -85,29 +85,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 @implementation SUPlainInstaller (Internals)
 
-+ (NSString *)temporaryNameForPath:(NSString *)path
-{
-    // Let's try to read the version number so the filename will be more meaningful.
-    NSString *postFix;
-    NSString *version;
-	if ((version = [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]) && ![version isEqualToString:@""])
-	{
-        NSMutableCharacterSet *validCharacters = [NSMutableCharacterSet alphanumericCharacterSet];
-        [validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
-        postFix = [version stringByTrimmingCharactersInSet:[validCharacters invertedSet]];
-	}
-	else
-        postFix = @"old";
-    NSString *prefix = [[path stringByDeletingPathExtension] stringByAppendingFormat:@" (%@)", postFix];
-    NSString *tempDir = [prefix stringByAppendingPathExtension:[path pathExtension]];
-    // Now let's make sure we get a unique path.
-    unsigned int cnt = 2;
-    while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
-        tempDir = [NSString stringWithFormat:@"%@ %u.%@", prefix, cnt++, [path pathExtension]];
-    return [tempDir lastPathComponent];
-}
-
-+ (NSString *)_temporaryCopyNameForPath:(NSString *)path didFindTrash:(BOOL *)outDidFindTrash
++ (NSString *)_temporaryCopyNameForPath:(NSString *)path appendVersion:(BOOL)appendVersion didFindTrash:(BOOL *)outDidFindTrash
 {
     // *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
     NSString *tempDir = nil;
@@ -117,7 +95,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     FSVolumeRefNum vSrcRefNum = kFSInvalidVolumeRefNum;
     FSCatalogInfo catInfo;
     memset(&catInfo, 0, sizeof(catInfo));
-    OSStatus err = FSPathMakeRef((UInt8 *)[path fileSystemRepresentation], &pathRef, NULL);
+    OSStatus err = FSPathMakeRef((const UInt8 *)[path fileSystemRepresentation], &pathRef, NULL);
 	if( err == noErr )
 	{
         err = FSGetCatalogInfo(&pathRef, kFSCatInfoVolume, &catInfo, NULL, NULL, NULL);
@@ -140,7 +118,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
     // Let's try to read the version number so the filename will be more meaningful
     NSString *prefix;
-    if ([[[NSBundle bundleWithIdentifier:SUBundleIdentifier] infoDictionary][SUAppendVersionNumberKey] boolValue]) {
+    if (appendVersion) {
         NSString *postFix = nil;
         NSString *version = nil;
         if ((version = [[NSBundle bundleWithPath: path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]) && ![version isEqualToString:@""])
@@ -172,9 +150,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
     // *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
-    const char *srcPath = [src fileSystemRepresentation];
-    const char *tmpPath = [tmp fileSystemRepresentation];
-    const char *dstPath = [dst fileSystemRepresentation];
+    char srcPath[PATH_MAX] = {0};
+    [src getFileSystemRepresentation:srcPath maxLength:sizeof(srcPath)];
+
+    char tmpPath[PATH_MAX] = {0};
+    [tmp getFileSystemRepresentation:tmpPath maxLength:sizeof(tmpPath)];
+
+    char dstPath[PATH_MAX] = {0};
+    [dst getFileSystemRepresentation:dstPath maxLength:sizeof(dstPath)];
 
     struct stat dstSB;
     if (stat(dstPath, &dstSB) != 0) // Doesn't exist yet, try containing folder.
@@ -228,16 +211,16 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
         if (res) // Set permissions while it's still in source, so we have it with working and correct perms when it arrives at destination.
         {
-            const char *coParams[] = { "-R", uidgid, srcPath, NULL };
+            char *coParams[] = { "-R", uidgid, srcPath, NULL };
             res = AuthorizationExecuteWithPrivilegesAndWait(auth, "/usr/sbin/chown", kAuthorizationFlagDefaults, coParams);
             if (!res)
-                SULog(@"chown -R %s %s failed.", uidgid, srcPath);
+                SULog(@"chown -R %@ %@ failed.", @(uidgid), @(srcPath));
         }
 
         BOOL haveDst = [[NSFileManager defaultManager] fileExistsAtPath:dst];
         if (res && haveDst) // If there's something at our tmp path (previous failed update or whatever) delete that first.
         {
-            const char *rmParams[] = { "-rf", tmpPath, NULL };
+            char *rmParams[] = { "-rf", tmpPath, NULL };
             res = AuthorizationExecuteWithPrivilegesAndWait(auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams);
             if (!res)
                 SULog(@"rm failed");
@@ -245,7 +228,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
         if (res && haveDst) // Move old exe to tmp path.
         {
-            const char *mvParams[] = { "-f", dstPath, tmpPath, NULL };
+            char *mvParams[] = { "-f", dstPath, tmpPath, NULL };
             res = AuthorizationExecuteWithPrivilegesAndWait(auth, "/bin/mv", kAuthorizationFlagDefaults, mvParams);
             if (!res)
                 SULog(@"mv 1 failed");
@@ -253,7 +236,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
         if (res) // Move new exe to old exe's path.
         {
-            const char *mvParams2[] = { "-f", srcPath, dstPath, NULL };
+            char *mvParams2[] = { "-f", srcPath, dstPath, NULL };
             res = AuthorizationExecuteWithPrivilegesAndWait(auth, "/bin/mv", kAuthorizationFlagDefaults, mvParams2);
             if (!res)
                 SULog(@"mv 2 failed");
@@ -304,9 +287,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
     // *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
-    const char *srcPath = [src fileSystemRepresentation];
-    const char *dstPath = [dst fileSystemRepresentation];
-    const char *dstContainerPath = [[dst stringByDeletingLastPathComponent] fileSystemRepresentation];
+    char srcPath[PATH_MAX] = {0};
+    [src getFileSystemRepresentation:srcPath maxLength:sizeof(srcPath)];
+
+    char dstPath[PATH_MAX] = {0};
+    [dst getFileSystemRepresentation:dstPath maxLength:sizeof(dstPath)];
+
+    char dstContainerPath[PATH_MAX] = {0};
+    [dst.stringByDeletingLastPathComponent getFileSystemRepresentation:dstContainerPath maxLength:sizeof(dstContainerPath)];
 
     struct stat dstSB;
     stat(dstContainerPath, &dstSB);
@@ -332,7 +320,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
         if (res) // Set permissions while it's still in source, so we have it with working and correct perms when it arrives at destination.
         {
-            const char *coParams[] = { "-R", uidgid, srcPath, NULL };
+            char *coParams[] = { "-R", uidgid, srcPath, NULL };
             res = AuthorizationExecuteWithPrivilegesAndWait(auth, "/usr/sbin/chown", kAuthorizationFlagDefaults, coParams);
             if (!res)
                 SULog(@"Can't set permissions");
@@ -341,7 +329,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         BOOL haveDst = [[NSFileManager defaultManager] fileExistsAtPath:dst];
         if (res && haveDst) // If there's something at our tmp path (previous failed update or whatever) delete that first.
         {
-            const char *rmParams[] = { "-rf", dstPath, NULL };
+            char *rmParams[] = { "-rf", dstPath, NULL };
             res = AuthorizationExecuteWithPrivilegesAndWait(auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams);
             if (!res)
                 SULog(@"Can't remove destination file");
@@ -349,7 +337,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
         if (res) // Move!.
         {
-            const char *mvParams[] = { "-f", srcPath, dstPath, NULL };
+            char *mvParams[] = { "-f", srcPath, dstPath, NULL };
             res = AuthorizationExecuteWithPrivilegesAndWait(auth, "/bin/mv", kAuthorizationFlagDefaults, mvParams);
             if (!res)
                 SULog(@"Can't move source file");
@@ -378,7 +366,8 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
     // *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
 
-    const char *srcPath = [src fileSystemRepresentation];
+    char srcPath[PATH_MAX] = {0};
+    [src getFileSystemRepresentation:srcPath maxLength:sizeof(srcPath)];
 
     AuthorizationRef auth = NULL;
     OSStatus authStat = errAuthorizationDenied;
@@ -397,7 +386,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
         if (res) // If there's something at our tmp path (previous failed update or whatever) delete that first.
         {
-            const char *rmParams[] = { "-rf", srcPath, NULL };
+            char *rmParams[] = { "-rf", srcPath, NULL };
             res = AuthorizationExecuteWithPrivilegesAndWait(auth, "/bin/rm", kAuthorizationFlagDefaults, rmParams);
             if (!res)
                 SULog(@"Can't remove destination file");
@@ -432,14 +421,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     return success;
 }
 
-+ (void)_movePathToTrash:(NSString *)path
++ (void)_movePathToTrash:(NSString *)path appendVersion:(BOOL)appendVersion
 {
     //SULog(@"Moving %@ to the trash.", path);
     NSInteger tag = 0;
 	if (![[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[path stringByDeletingLastPathComponent] destination:@"" files:@[[path lastPathComponent]] tag:&tag])
 	{
         BOOL didFindTrash = NO;
-        NSString *trashPath = [self _temporaryCopyNameForPath:path didFindTrash:&didFindTrash];
+        NSString *trashPath = [self _temporaryCopyNameForPath:path appendVersion:appendVersion didFindTrash:&didFindTrash];
 		if( didFindTrash )
 		{
             NSError *err = nil;
@@ -453,15 +442,15 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	}
 }
 
-+ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)__unused tmp error:(NSError *__autoreleasing *)error
++ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst appendVersion:(BOOL)appendVersion error:(NSError *__autoreleasing *)error
 {
     FSRef srcRef, dstRef, dstDirRef, tmpDirRef;
     OSStatus err;
     BOOL hadFileAtDest = NO, didFindTrash = NO;
-    NSString *tmpPath = [self _temporaryCopyNameForPath:dst didFindTrash:&didFindTrash];
+    NSString *tmpPath = [self _temporaryCopyNameForPath:dst appendVersion:appendVersion didFindTrash:&didFindTrash];
 
     // Make FSRef for destination:
-    err = FSPathMakeRefWithOptions((UInt8 *)[dst fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &dstRef, NULL);
+    err = FSPathMakeRefWithOptions((const UInt8 *)[dst fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &dstRef, NULL);
     hadFileAtDest = (err == noErr); // There is a file at the destination, move it aside. If we normalized the name, we might not get here, so don't error.
 	if( hadFileAtDest )
 	{
@@ -481,12 +470,12 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 	if( hadFileAtDest )
 	{
-        err = FSPathMakeRef((UInt8 *)[[tmpPath stringByDeletingLastPathComponent] fileSystemRepresentation], &tmpDirRef, NULL);
+        err = FSPathMakeRef((const UInt8 *)[[tmpPath stringByDeletingLastPathComponent] fileSystemRepresentation], &tmpDirRef, NULL);
         if (err != noErr)
-            FSPathMakeRef((UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &tmpDirRef, NULL);
+            FSPathMakeRef((const UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &tmpDirRef, NULL);
     }
 
-    err = FSPathMakeRef((UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &dstDirRef, NULL);
+    err = FSPathMakeRef((const UInt8 *)[[dst stringByDeletingLastPathComponent] fileSystemRepresentation], &dstDirRef, NULL);
 
 	if (err == noErr && hadFileAtDest)
 	{
@@ -500,7 +489,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         }
     }
 
-    err = FSPathMakeRef((UInt8 *)[src fileSystemRepresentation], &srcRef, NULL);
+    err = FSPathMakeRef((const UInt8 *)[src fileSystemRepresentation], &srcRef, NULL);
 	if (err == noErr)
 	{
         NSFileManager *manager = [[NSFileManager alloc] init];
@@ -572,7 +561,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     NSFileManager *manager = [NSFileManager defaultManager];
 #if __MAC_OS_X_VERSION_MIN_REQUIRED < 101000
     if (!&NSURLQuarantinePropertiesKey) {
-        NSString *const quarantineAttribute = (NSString*)kLSItemQuarantineProperties;
+        NSString *const quarantineAttribute = (__bridge NSString *)kLSItemQuarantineProperties;
         const int removeXAttrOptions = XATTR_NOFOLLOW;
 
         [self removeXAttr:quarantineAttribute
@@ -599,7 +588,11 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     }
 #endif
     NSURL *rootURL = [NSURL fileURLWithPath:root];
-    [rootURL setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:NULL];
+    id rootResourceValue = nil;
+    [rootURL getResourceValue:&rootResourceValue forKey:NSURLQuarantinePropertiesKey error:NULL];
+    if (rootResourceValue) {
+        [rootURL setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:NULL];
+    }
     
     // Only recurse if it's actually a directory.  Don't recurse into a
     // root-level symbolic link.
@@ -612,7 +605,11 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         NSDirectoryEnumerator *directoryEnumerator = [manager enumeratorAtURL:rootURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
 
         for (NSURL *file in directoryEnumerator) {
-            [file setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:NULL];
+            id fileResourceValue = nil;
+            [file getResourceValue:&fileResourceValue forKey:NSURLQuarantinePropertiesKey error:NULL];
+            if (fileResourceValue) {
+                [file setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:NULL];
+            }
         }
     }
 }

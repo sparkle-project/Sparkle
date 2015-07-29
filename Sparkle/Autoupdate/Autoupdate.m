@@ -18,7 +18,7 @@ static const NSTimeInterval SUInstallationTimeLimit = 5;
  */
 static const NSTimeInterval SUParentQuitCheckInterval = .25;
 
-@interface TerminationListener : NSObject <SUInstallerDelegate>
+@interface TerminationListener : NSObject
 
 @property (copy) NSString *hostpath;
 @property (copy) NSString *executablepath;
@@ -32,6 +32,7 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
 @property (strong) SUHost *host;
 @property (assign) BOOL shouldRelaunch;
 @property (assign) BOOL shouldShowUI;
+@property (strong) SUStatusController *statusController;
 
 - (void)parentHasQuit;
 
@@ -57,6 +58,7 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
 @synthesize host;
 @synthesize shouldRelaunch;
 @synthesize shouldShowUI;
+@synthesize statusController;
 
 - (instancetype)initWithHostPath:(NSString *)inhostpath executablePath:(NSString *)execpath parentProcessId:(pid_t)ppid folderPath:(NSString *)infolderpath shouldRelaunch:(BOOL)relaunch shouldShowUI:(BOOL)showUI selfPath:(NSString *)inSelfPath
 {
@@ -86,6 +88,7 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
 - (void)dealloc
 {
     [self.longInstallationTimer invalidate];
+    [self.statusController close];
 }
 
 
@@ -152,40 +155,43 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
         [statusCtl beginActionWithTitle:SULocalizedString(@"Installing update...", @"")
                         maxProgressValue: 0 statusText: @""];
         [statusCtl showWindow:self];
+
+        [self.statusController close]; // If there's an existing status controller, close it before we release our strong reference to it.
+        self.statusController = statusCtl; // Keep a strong reference to the status controller, or else it might get prematurely deallocated.
     }
 
     [SUInstaller installFromUpdateFolder:self.folderpath
                                 overHost:self.host
                         installationPath:self.installationPath
-                                delegate:self
-                       versionComparator:[SUStandardVersionComparator defaultComparator]];
-}
-
-- (void)installerFinishedForHost:(SUHost *)__unused aHost
-{
-    [self relaunch];
-}
-
-- (void)installerForHost:(SUHost *)__unused host failedWithError:(NSError *)error __attribute__((noreturn))
-{
-    if (self.shouldShowUI)
-        NSRunAlertPanel(@"", @"%@", @"OK", @"", @"", [error localizedDescription]);
-    exit(EXIT_FAILURE);
+                       versionComparator:[SUStandardVersionComparator defaultComparator]
+                       completionHandler:^(NSError *error) {
+                           if (error) {
+                               if (self.shouldShowUI) {
+                                   NSAlert *alert = [[NSAlert alloc] init];
+                                   alert.messageText = @"";
+                                   alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
+                                   [alert runModal];
+                               }
+                               exit(EXIT_FAILURE);
+                           } else {
+                               [self relaunch];
+                           }
+                       }];
 }
 
 @end
 
 int main(int __unused argc, const char __unused *argv[])
 {
-	@autoreleasepool {
+    @autoreleasepool
+    {
         NSArray *args = [[NSProcessInfo processInfo] arguments];
         if (args.count < 5 || args.count > 7) {
             return EXIT_FAILURE;
         }
 
         BOOL shouldShowUI = (args.count > 6) ? [args[6] boolValue] : YES;
-		if (shouldShowUI)
-		{
+        if (shouldShowUI) {
             [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
         }
 
@@ -198,9 +204,9 @@ int main(int __unused argc, const char __unused *argv[])
                                                                            shouldShowUI:shouldShowUI
                                                                                selfPath:[[NSBundle mainBundle] bundlePath]];
 
-        [termListen class];
         [[NSApplication sharedApplication] run];
-
+        // Ensure termListen is not deallocated by ARC before caling -[NSApplication run]
+        [termListen class];
     }
 
     return EXIT_SUCCESS;

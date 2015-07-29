@@ -21,7 +21,7 @@ ContinuationIndentWidth: 4
 Cpp11BracedListStyle: false
 #DerivePointerAlignment: false
 DisableFormat: false
-ForEachMacros: foreach,Q_FOREACH
+#ForEachMacros: foreach,Q_FOREACH
 IndentCaseLabels: true
 IndentFunctionDeclarationAfterType: true
 IndentWidth: 4

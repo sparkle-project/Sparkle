@@ -17,10 +17,20 @@
 
 #import "SUConstants.h"
 
-@interface SUUpdateAlert ()
+// WebKit protocols are not explicitly declared until 10.11 SDK, so
+// declare dummy protocols to keep the build working on earlier SDKs.
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101100
+@protocol WebFrameLoadDelegate <NSObject>
+@end
+@protocol WebPolicyDelegate <NSObject>
+@end
+#endif
+
+@interface SUUpdateAlert () <WebFrameLoadDelegate, WebPolicyDelegate>
 
 @property (strong) SUAppcastItem *updateItem;
 @property (strong) SUHost *host;
+@property (strong) void(^completionBlock)(SUUpdateAlertChoice);
 
 @property (strong) NSProgressIndicator *releaseNotesSpinner;
 @property (assign) BOOL webViewFinishedLoading;
@@ -36,7 +46,7 @@
 
 @implementation SUUpdateAlert
 
-@synthesize delegate;
+@synthesize completionBlock;
 @synthesize versionDisplayer;
 
 @synthesize updateItem;
@@ -52,11 +62,12 @@
 @synthesize skipButton;
 @synthesize laterButton;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUUpdateAlertChoice))block
 {
-    self = [super initWithHost:host windowNibName:@"SUUpdateAlert"];
+    self = [super initWithWindowNibName:@"SUUpdateAlert"];
 	if (self)
 	{
+        self.completionBlock = block;
         host = aHost;
         updateItem = item;
         [self setShouldCascadeWindows:NO];
@@ -79,8 +90,8 @@
     [self.releaseNotesView setPolicyDelegate:nil];
     [self.releaseNotesView removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
     [self close];
-    if ([self.delegate respondsToSelector:@selector(updateAlert:finishedWithChoice:)])
-        [self.delegate updateAlert:self finishedWithChoice:choice];
+    self.completionBlock(choice);
+    self.completionBlock = nil;
 }
 
 - (IBAction)installUpdate:(id)__unused sender
@@ -105,18 +116,16 @@
 
 - (void)displayReleaseNotes
 {
-    // Set the default font
-    [self.releaseNotesView setPreferencesIdentifier:SUBundleIdentifier];
+    self.releaseNotesView.preferencesIdentifier = SUBundleIdentifier;
     WebPreferences *prefs = [self.releaseNotesView preferences];
-    NSString *familyName = [[NSFont systemFontOfSize:8] familyName];
-    if ([familyName hasPrefix:@"."]) { // 10.9 returns ".Lucida Grande UI", which isn't a valid name for the WebView
-        familyName = @"Lucida Grande";
-    }
-    [prefs setStandardFontFamily:familyName];
-    [prefs setDefaultFontSize:(int)[NSFont systemFontSizeForControlSize:NSSmallControlSize]];
-    [prefs setPlugInsEnabled:NO];
-    [self.releaseNotesView setFrameLoadDelegate:self];
-    [self.releaseNotesView setPolicyDelegate:self];
+    prefs.plugInsEnabled = NO;
+    self.releaseNotesView.frameLoadDelegate = self;
+    self.releaseNotesView.policyDelegate = self;
+    
+    // Set the default font
+    // "-apple-system-font" is a reference to the system UI font on OS X. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
+    prefs.standardFontFamily = @"-apple-system-font";
+    prefs.defaultFontSize = (int)[NSFont systemFontSize];
 
     // Stick a nice big spinner in the middle of the web view until the page is loaded.
     NSRect frame = [[self.releaseNotesView superview] frame];
@@ -163,10 +172,6 @@
     BOOL allowAutoUpdates = YES; // Defaults to YES.
     if ([self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey])
         allowAutoUpdates = [self.host boolForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
-
-    // Give delegate a chance to modify this choice:
-    if (self.delegate && [self.delegate respondsToSelector:@selector(updateAlert:shouldAllowAutoUpdate:)])
-        [self.delegate updateAlert:self shouldAllowAutoUpdate:&allowAutoUpdates];
 
     return allowAutoUpdates;
 }
@@ -241,7 +246,10 @@
 - (void)webView:(WebView *)__unused sender decidePolicyForNavigationAction:(NSDictionary *)__unused actionInformation request:(NSURLRequest *)request frame:(WebFrame *)__unused frame decisionListener:(id<WebPolicyDecisionListener>)listener
 {
     if (self.webViewFinishedLoading) {
-        [[NSWorkspace sharedWorkspace] openURL:[request URL]];
+        NSURL *requestURL = request.URL;
+        if (requestURL) {
+            [[NSWorkspace sharedWorkspace] openURL:requestURL];
+        }
 
         [listener ignore];
     }

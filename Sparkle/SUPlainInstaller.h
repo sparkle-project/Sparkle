@@ -9,6 +9,8 @@
 #ifndef SUPLAININSTALLER_H
 #define SUPLAININSTALLER_H
 
+#import <Foundation/Foundation.h>
+
 #import "SUUpdater.h"
 
 #import "SUAppcast.h"
@@ -21,7 +23,7 @@
 
 @interface SUPlainInstaller : SUInstaller
 
-+ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host delegate:(id<SUInstallerDelegate>)delegate versionComparator:(id<SUVersionComparison>)comparator;
++ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler;
 
 @end
 

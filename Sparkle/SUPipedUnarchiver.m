@@ -22,14 +22,21 @@
                                     @".tar.gz": @"extractTGZ",
                                     @".tgz": @"extractTGZ",
                                     @".tar.bz2": @"extractTBZ",
-                                    @".tbz": @"extractTBZ" };
+                                    @".tbz": @"extractTBZ",
+                                    @".tar.xz": @"extractTXZ",
+                                    @".txz": @"extractTXZ",
+                                    @".tar.lzma": @"extractTXZ"};
 
     NSString *lastPathComponent = [path lastPathComponent];
 	for (NSString *currentType in typeSelectorDictionary)
 	{
+        NSString *value = typeSelectorDictionary[currentType];
+        assert(value);
+
 		if ([currentType length] > [lastPathComponent length]) continue;
-        if ([[lastPathComponent substringFromIndex:[lastPathComponent length] - [currentType length]] isEqualToString:currentType])
-            return NSSelectorFromString(typeSelectorDictionary[currentType]);
+        if ([[lastPathComponent substringFromIndex:[lastPathComponent length] - [currentType length]] isEqualToString:currentType]) {
+            return NSSelectorFromString(value);
+        }
     }
     return NULL;
 }
@@ -45,73 +52,69 @@
 }
 
 // This method abstracts the types that use a command line tool piping data from stdin.
-- (void)extractArchivePipingDataToCommand:(NSString *)command
+- (void)extractArchivePipingDataToCommand:(NSString *)command args:(NSArray*)args
 {
     // *** GETS CALLED ON NON-MAIN THREAD!!!
 	@autoreleasepool {
-        FILE *fp = NULL, *cmdFP = NULL;
-        char *oldDestinationString = NULL;
-        // We have to declare these before a goto to prevent an error under ARC.
-        // No, we cannot have them in the dispatch_async calls, as the goto "jump enters
-        // lifetime of block which strongly captures a variable"
-        dispatch_block_t delegateSuccess = ^{
-            [self notifyDelegateOfSuccess];
-        };
-        dispatch_block_t delegateFailure = ^{
-            [self notifyDelegateOfFailure];
-        };
 
-        SULog(@"Extracting %@ using '%@'", self.archivePath, command);
+        NSString *destination = [self.archivePath stringByDeletingLastPathComponent];
+        
+        SULog(@"Extracting using '%@' '%@' < '%@' '%@'", command, [args componentsJoinedByString:@"' '"], self.archivePath, destination);
 
         // Get the file size.
-        NSNumber *fs = [[NSFileManager defaultManager] attributesOfItemAtPath:self.archivePath error:nil][NSFileSize];
-		if (fs == nil) goto reportError;
+        NSUInteger expectedLength = [[[NSFileManager defaultManager] attributesOfItemAtPath:self.archivePath error:nil][NSFileSize] unsignedIntegerValue];
+        if (expectedLength > 0) {
+            NSFileHandle *archiveInput = [NSFileHandle fileHandleForReadingAtPath:self.archivePath];
 
-        // Thank you, Allan Odgaard!
-        // (who wrote the following extraction alg.)
-        fp = fopen([self.archivePath fileSystemRepresentation], "r");
-		if (!fp) goto reportError;
+            NSPipe *pipe = [NSPipe pipe];
+            NSFileHandle *archiveOutput = [pipe fileHandleForWriting];
 
-        oldDestinationString = getenv("DESTINATION");
-        setenv("DESTINATION", [[self.archivePath stringByDeletingLastPathComponent] fileSystemRepresentation], 1);
-        cmdFP = popen([command fileSystemRepresentation], "w");
-        size_t written;
-		if (!cmdFP) goto reportError;
+            NSTask *task = [[NSTask alloc] init];
+            [task setStandardInput:[pipe fileHandleForReading]];
+            [task setStandardError:[NSFileHandle fileHandleWithStandardError]];
+            [task setStandardOutput:[NSFileHandle fileHandleWithStandardOutput]];
+            [task setLaunchPath:command];
+            [task setArguments:[args arrayByAddingObject:destination]];
+            [task launch];
 
-        char buf[32 * 1024];
-        size_t len;
-		while((len = fread(buf, 1, 32*1024, fp)))
-		{
-            written = fwrite(buf, 1, len, cmdFP);
-			if( written < len )
-			{
-                pclose(cmdFP);
-                goto reportError;
+            NSUInteger bytesRead = 0;
+            do {
+                NSData *data = [archiveInput readDataOfLength:256*1024];
+                NSUInteger len = [data length];
+                if (!len) {
+                    break;
+                }
+                bytesRead += len;
+                [archiveOutput writeData:data];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self notifyDelegateOfProgress:(double)bytesRead / (double)expectedLength];
+                });
             }
+            while(bytesRead < expectedLength);
+            
+            [archiveOutput closeFile];
 
-            dispatch_async(dispatch_get_main_queue(), ^{
-				[self notifyDelegateOfExtractedLength:len];
-            });
+            [task waitUntilExit];
+            
+            if ([task terminationStatus] == 0) {
+                if (bytesRead == expectedLength) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self notifyDelegateOfSuccess];
+                    });
+                    return;
+                } else {
+                    SULog(@"Extraction failed, command '%@' got only %ld of %ld bytes", command, (long)bytesRead, (long)expectedLength);
+                }
+            } else {
+                SULog(@"Extraction failed, command '%@' returned %d", command, [task terminationStatus]);
+            }
+        } else {
+            SULog(@"Extraction failed, archive '%@' is empty", self.archivePath);
         }
-        pclose(cmdFP);
 
-        if (ferror(fp)) {
-            goto reportError;
-        }
-
-        dispatch_async(dispatch_get_main_queue(), delegateSuccess);
-        goto finally;
-
-    reportError:
-        dispatch_async(dispatch_get_main_queue(), delegateFailure);
-
-    finally:
-        if (fp)
-            fclose(fp);
-        if (oldDestinationString)
-            setenv("DESTINATION", oldDestinationString, 1);
-        else
-            unsetenv("DESTINATION");
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self notifyDelegateOfFailure];
+        });
     }
 }
 
@@ -119,28 +122,35 @@
 {
     // *** GETS CALLED ON NON-MAIN THREAD!!!
 
-    [self extractArchivePipingDataToCommand:@"tar -xC \"$DESTINATION\""];
+    [self extractArchivePipingDataToCommand:@"/usr/bin/tar" args:@[@"-xC"]];
 }
 
 - (void)extractTGZ
 {
     // *** GETS CALLED ON NON-MAIN THREAD!!!
 
-    [self extractArchivePipingDataToCommand:@"tar -zxC \"$DESTINATION\""];
+    [self extractArchivePipingDataToCommand:@"/usr/bin/tar" args:@[@"-zxC"]];
 }
 
 - (void)extractTBZ
 {
     // *** GETS CALLED ON NON-MAIN THREAD!!!
 
-    [self extractArchivePipingDataToCommand:@"tar -jxC \"$DESTINATION\""];
+    [self extractArchivePipingDataToCommand:@"/usr/bin/tar" args:@[@"-jxC"]];
 }
 
 - (void)extractZIP
 {
     // *** GETS CALLED ON NON-MAIN THREAD!!!
 
-    [self extractArchivePipingDataToCommand:@"ditto -x -k - \"$DESTINATION\""];
+    [self extractArchivePipingDataToCommand:@"/usr/bin/ditto" args:@[@"-x",@"-k",@"-"]];
+}
+
+- (void)extractTXZ
+{
+    // *** GETS CALLED ON NON-MAIN THREAD!!!
+
+    [self extractArchivePipingDataToCommand:@"/usr/bin/tar" args:@[@"-zxC"]];
 }
 
 + (void)load

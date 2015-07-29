@@ -29,6 +29,7 @@ __FBSDID("$FreeBSD: src/usr.bin/bsdiff/bsdiff/bsdiff.c, v 1.1 2005/08/06 01:59:0
 #endif
 
 #include <sys/types.h>
+#include "sais.h"
 
 #include <err.h>
 #include <fcntl.h>
@@ -38,138 +39,6 @@ __FBSDID("$FreeBSD: src/usr.bin/bsdiff/bsdiff/bsdiff.c, v 1.1 2005/08/06 01:59:0
 #include <unistd.h>
 
 #define MIN(x, y) (((x)<(y)) ? (x) : (y))
-
-static void split(off_t *I, off_t *V, off_t start, off_t len, off_t h)
-{
-    off_t i, j, k, x, tmp, jj, kk;
-
-    if (len < 16) {
-        for (k = start; k < start + len; k += j) {
-            j = 1; x = V[I[k] + h];
-            for (i = 1; k + i < start + len; i++) {
-                if (V[I[k + i] + h] < x) {
-                    x = V[I[k + i] + h];
-                    j = 0;
-                };
-                if (V[I[k + i] + h] == x) {
-                    tmp = I[k + j]; I[k + j] = I[k + i]; I[k + i] = tmp;
-                    j++;
-                };
-            };
-            for (i = 0; i < j; i++)
-                V[I[k + i]] = k + j - 1;
-            if (j == 1)
-                I[k] = -1;
-        };
-        return;
-    };
-
-    x = V[I[start + len/2] + h];
-    jj = 0; kk = 0;
-    for (i = start; i < start + len; i++) {
-        if (V[I[i] + h] < x)
-            jj++;
-        if (V[I[i] + h] == x)
-            kk++;
-    };
-    jj += start; kk += jj;
-
-    i = start; j = 0; k = 0;
-    while (i < jj) {
-        if (V[I[i] + h] < x) {
-            i++;
-        } else if (V[I[i] + h] == x) {
-            tmp = I[i]; I[i] = I[jj + j]; I[jj + j] = tmp;
-            j++;
-        } else {
-            tmp = I[i]; I[i] = I[kk + k]; I[kk + k] = tmp;
-            k++;
-        };
-    };
-
-    while (jj + j < kk) {
-        if (V[I[jj + j] + h] == x) {
-            j++;
-        } else {
-            tmp = I[jj + j]; I[jj + j] = I[kk + k]; I[kk + k] = tmp;
-            k++;
-        };
-    };
-
-    if (jj > start)
-        split(I, V, start, jj - start, h);
-
-    for (i = 0; i < kk - jj; i++)
-        V[I[jj + i]] = kk - 1;
-    if (jj == kk - 1)
-        I[jj] = -1;
-
-    if (start + len > kk)
-        split(I, V, kk, start + len - kk, h);
-}
-
-/* qsufsort(I, V, old, oldsize)
- *
- * Computes the suffix sort of the string at 'old' and stores the resulting
- * indices in 'I', using 'V' as a temporary array for the computation. */
-static void qsufsort(off_t *I, off_t *V, u_char *old, off_t oldsize)
-{
-    off_t buckets[256];
-    off_t i, h, len;
-
-    /* count number of each byte  */
-    for (i = 0; i < 256; i++)
-        buckets[i] = 0;
-    for (i = 0; i < oldsize; i++)
-        buckets[old[i]]++;
-    /* make buckets cumulative */
-    for (i = 1; i < 256; i++)
-        buckets[i] += buckets[i - 1];
-    /* shift right by one */
-    for (i = 255; i > 0; i--)
-        buckets[i] = buckets[i - 1];
-    buckets[0] = 0;
-    /* at this point, buckets[c] is the number of bytes in the old file with
-     * value less than c. */
-
-    /* set up the sort order of the suffixes based solely on the first
-     * character */
-    for (i = 0; i < oldsize; i++)
-        I[++buckets[old[i]]] = i;
-    I[0] = oldsize;
-    /* ? */
-    for (i = 0; i < oldsize; i++)
-        V[i] = buckets[old[i]];
-    V[oldsize] = 0;
-    /* forward any entries in the ordering which have the same initial
-     * character */
-    for (i = 1; i < 256; i++) {
-        if (buckets[i] == buckets[i - 1] + 1)
-            I[buckets[i]] = -1;
-    }
-    I[0] = -1;
-
-    for (h = 1; I[0] != -(oldsize + 1); h += h) {
-        len = 0;
-        for (i = 0; i < oldsize + 1;) {
-            if (I[i] < 0) {
-                len -= I[i];
-                i -= I[i];
-            } else {
-                if (len)
-                    I[i - len] = -len;
-                len = V[I[i]] + 1 - i;
-                split(I, V, i, len, h);
-                i += len;
-                len = 0;
-            }
-        }
-        if (len)
-            I[i - len] = -len;
-    };
-
-    for (i = 0; i < oldsize + 1; i++) I[V[i]] = i;
-}
 
 /* matchlen(old, oldsize, new, newsize)
  *
@@ -255,7 +124,7 @@ int bsdiff(int argc, char *argv[])
     off_t oldsize, newsize;     /* length of old, new files */
     off_t *I,*V;                /* arrays used for suffix sort; I is ordering */
     off_t scan;                 /* position of current match in old file */
-    off_t pos;                  /* position of current match in new file */
+    off_t pos = 0;              /* position of current match in new file */
     off_t len;                  /* length of current match */
     off_t lastscan;             /* position of previous match in old file */
     off_t lastpos;              /* position of previous match in new file */
@@ -288,7 +157,7 @@ int bsdiff(int argc, char *argv[])
         err(1, NULL);
 
     /* Do a suffix sort on the old file. */
-    qsufsort(I, V, old, oldsize);
+    I[0] = oldsize; sais(old, I+1, oldsize);
 
     free(V);
 

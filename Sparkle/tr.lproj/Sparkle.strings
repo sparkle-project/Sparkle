@@ -4,7 +4,7 @@
 
 /* de_DE v0.1 - No comment provided by engineer. */
 
-"%1$@ can't be updated when it's running from a disk image. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "%1$@ uygulaması disk kalıbı içerisindeyken güncellenemez. Lütfen %1$@ uygulamasını Uygulamalar dizinine kopyalayıp yeniden başlatınız.";
+"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "%1$@ uygulaması disk kalıbı içerisindeyken güncellenemez. Lütfen %1$@ uygulamasını Uygulamalar dizinine kopyalayıp yeniden başlatınız.";
 
 /* de_DE v0.1 - No comment provided by engineer. */
 
@@ -67,7 +67,7 @@
 
 /* de_DE v0.1 - No comment provided by engineer. */
 
-"Cancel Update" = "Güncellemeyi İptal Et";
+"Cancel Update" = "Güncellemeyi iptal et";
 
 /* de_DE v0.1 - No comment provided by engineer. */
 
@@ -87,7 +87,7 @@
 
 /* de_DE v0.1 - No comment provided by engineer. */
 
-"Install and Relaunch" = "Kur ve Yeniden Başlat";
+"Install and Relaunch" = "Kur ve yeniden başlat";
 
 
 "Installing update..." = "Güncelleme kuruluyor...";
@@ -104,13 +104,13 @@
 "OK" = "Tamam";
 
 
-"Ready to Install" = "Kuruluma Hazır";
+"Ready to Install" = "Kuruluma hazır";
 
 
 "Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "%1$@ uygulaması için güncellemeler otomatik olarak aransın mı? Güncelleme işlemini el ile uygulama menüsünden de başlatabilirsiniz.";
 
 
-"Update Error!" = "Güncelleme Hatası.";
+"Update Error!" = "Güncelleme hatası.";
 
 
 "Updating %@" = "%@ güncelleniyor";
@@ -119,5 +119,5 @@
 "You already have the newest version of %@." = "%@ uygulamasının en güncel sürümü sizde mevcut.";
 
 
-"You're up to date!" = "Güncellemeye gerek yok.";
+"You're up-to-date!" = "Uygulama güncel!";
 
