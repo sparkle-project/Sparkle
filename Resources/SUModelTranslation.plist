@@ -16,6 +16,8 @@
 	<string>iMac (Core 2 Duo, 17 inch, Combo Drive)</string>
 	<key>iMac6,1</key>
 	<string>iMac (Core 2 Duo, 24 inch, SuperDrive)</string>
+	<key>iMac7,1</key>
+	<string>iMac Intel Core 2 Duo (aluminum enclosure)</string>
 	<key>iMac8,1</key>
 	<string>iMac (Core 2 Duo, 20 or 24 inch, Early 2008 )</string>
 	<key>iMac9,1</key>
@@ -25,7 +27,7 @@
 	<key>iMac11,1</key>
 	<string>iMac (Core i5 or i7, 27 inch Late 2009)</string>
 	<key>iMac11,2</key>
-	<string>iMac (Core i3 or i5, 27 inch Mid 2010)</string>
+	<string>21.5&quot; iMac (mid 2010)</string>
 	<key>iMac11,3</key>
 	<string>iMac (Core i5 or i7, 27 inch Mid 2010)</string>
 	<key>iMac12,1</key>
@@ -42,6 +44,10 @@
 	<string>iMac (Core i5 or i7, 27 inch Late 2013)</string>
 	<key>iMac14,3</key>
 	<string>iMac (Core i5 or i7, 21.5 inch Late 2013)</string>
+	<key>MacBookPro11,2</key>
+	<string>MacBook Pro (Retina, 15-inch, Late 2013)</string>
+	<key>MacBookPro11,3</key>
+	<string>MacBook Pro (Retina, 15-inch, Late 2013)</string>
 	<key>MacBook1,1</key>
 	<string>MacBook (Core Duo)</string>
 	<key>MacBook2,1</key>
@@ -90,8 +96,54 @@
 	<string>MacBook Pro Core 2 Duo (17-inch HD, Core 2 Duo)</string>
 	<key>MacBookPro4,1</key>
 	<string>MacBook Pro (Core 2 Duo Feb 2008)</string>
+	<key>MacBookPro5,1</key>
+	<string>MacBook Pro Intel Core 2 Duo (aluminum unibody)</string>
+	<key>MacBookPro5,2</key>
+	<string>MacBook Pro Intel Core 2 Duo (aluminum unibody)</string>
+	<key>MacBookPro5,3</key>
+	<string>MacBook Pro Intel Core 2 Duo (aluminum unibody)</string>
+	<key>MacBookPro5,4</key>
+	<string>MacBook Pro Intel Core 2 Duo (aluminum unibody)</string>
+	<key>MacBookPro5,5</key>
+	<string>MacBook Pro Intel Core 2 Duo (aluminum unibody)</string>
+	<key>MacBookPro6,1</key>
+	<string>MacBook Pro Intel Core i5, Intel Core i7 (mid 2010)</string>
+	<key>MacBookPro6,2</key>
+	<string>MacBook Pro Intel Core i5, Intel Core i7 (mid 2010)</string>
+	<key>MacBookPro7,1</key>
+	<string>MacBook Pro Intel Core 2 Duo (mid 2010)</string>
+	<key>MacBookPro8,1</key>
+	<string>MacBook Pro Intel Core i5, Intel Core i7, 13&quot; (early 2011)</string>
+	<key>MacBookPro8,2</key>
+	<string>MacBook Pro Intel Core i7, 15&quot; (early 2011)</string>
+	<key>MacBookPro8,3</key>
+	<string>MacBook Pro Intel Core i7, 17&quot; (early 2011)</string>
+	<key>MacBookPro9,1</key>
+	<string>MacBook Pro (15-inch, Mid 2012)</string>
+	<key>MacBookPro9,2</key>
+	<string>MacBook Pro (13-inch, Mid 2012)</string>
+	<key>MacBookPro10,1</key>
+	<string>MacBook Pro (Retina, Mid 2012)</string>
+	<key>MacBookPro10,2</key>
+	<string>MacBook Pro (Retina, 13-inch, Late 2012)</string>
+	<key>MacBookPro11,1</key>
+	<string>MacBook Pro (Retina, 13-inch, Late 2013)</string>
+	<key>MacbookPro11,4</key>
+	<string>MacBook Pro (Retina, 15-inch, Mid 2015)</string>
+	<key>MacbookPro11,5</key>
+	<string>MacBook Pro (Retina, 15-inch, Mid 2015)</string>
+	<key>MacbookPro12,1 </key>
+	<string>MacBook Pro (Retina, 13-inch, Early 2015)</string>
 	<key>Macmini1,1</key>
 	<string>Mac Mini (Core Solo/Duo)</string>
+	<key>Macmini2,1</key>
+	<string>Mac mini Intel Core</string>
+	<key>Macmini3,1</key>
+	<string>Mac mini Intel Core</string>
+	<key>Macmini4,1</key>
+	<string>Mac mini Intel Core (mid 2010)</string>
+	<key>MacPro1,1,Quad</key>
+	<string>Mac Pro</string>
 	<key>MacPro1,1</key>
 	<string>Mac Pro (four-core)</string>
 	<key>MacPro2,1</key>
@@ -198,6 +250,8 @@
 	<string>iMac G4 (17-inch Flat Panel)</string>
 	<key>PowerMac5,1</key>
 	<string>Power Macintosh G4 Cube</string>
+	<key>PowerMac5,2</key>
+	<string>Power Mac G4 Cube</string>
 	<key>PowerMac6,1</key>
 	<string>iMac G4 (USB 2.0)</string>
 	<key>PowerMac6,3</key>
@@ -224,5 +278,7 @@
 	<string>Xserve (Intel Xeon)</string>
 	<key>Xserve2,1</key>
 	<string>Xserve (January 2008 quad-core)</string>
+	<key>Xserve3,1</key>
+	<string>Xserve (early 2009)</string>
 </dict>
 </plist>
