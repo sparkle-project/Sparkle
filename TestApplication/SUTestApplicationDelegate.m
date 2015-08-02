@@ -45,12 +45,11 @@ static NSString * const UPDATED_VERSION = @"2.0";
     
     if (cacheDirectoryURL == nil) {
         NSLog(@"Failed to locate cache directory with error: %@", cacheError);
-        assert(cacheDirectoryURL != nil);
+        assert(NO);
     }
     
     NSString *bundleIdentifier = mainBundle.bundleIdentifier;
     assert(bundleIdentifier != nil);
-    
     
     // Create a directory that'll be used for our web server listing
     NSURL *serverDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
@@ -65,7 +64,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     NSError *createDirectoryError = nil;
     if (![fileManager createDirectoryAtURL:serverDirectoryURL withIntermediateDirectories:YES attributes:nil error:&createDirectoryError]) {
         NSLog(@"Failed creating directory at %@ with error %@", serverDirectoryURL.path, createDirectoryError);
-        assert(createDirectoryError != nil);
+        assert(NO);
     }
     
     NSURL *bundleURL = mainBundle.bundleURL;
@@ -82,16 +81,19 @@ static NSString * const UPDATED_VERSION = @"2.0";
     // Update bundle's version keys to latest version
     NSURL *infoURL = [[destinationBundleURL URLByAppendingPathComponent:@"Contents"] URLByAppendingPathComponent:@"Info.plist"];
     
-    assert([fileManager fileExistsAtPath:infoURL.path]);
+    BOOL infoFileExists = [fileManager fileExistsAtPath:infoURL.path];
+    assert(infoFileExists);
     
     NSMutableDictionary *infoDictionary = [[NSMutableDictionary alloc] initWithContentsOfURL:infoURL];
     infoDictionary[(NSString *)kCFBundleVersionKey] = UPDATED_VERSION;
     infoDictionary[@"CFBundleShortVersionString"] = UPDATED_VERSION;
     
-    assert([infoDictionary writeToURL:infoURL atomically:NO]);
+    BOOL wroteInfoFile = [infoDictionary writeToURL:infoURL atomically:NO];
+    assert(wroteInfoFile);
     
     // Change current working directory so web server knows where to list files
-    assert([fileManager changeCurrentDirectoryPath:serverDirectoryURL.path]);
+    BOOL changedCurrentWorkingDirectory = [fileManager changeCurrentDirectoryPath:serverDirectoryURL.path];
+    assert(changedCurrentWorkingDirectory);
     
     // Create the archive for our update
     NSString *zipName = @"Sparkle_Test_App.zip";
