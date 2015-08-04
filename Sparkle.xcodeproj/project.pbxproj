@@ -28,7 +28,7 @@
 		1420DF50196247F900203BB0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DF4F196247F900203BB0 /* Images.xcassets */; };
 		1420DF51196247F900203BB0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DF4F196247F900203BB0 /* Images.xcassets */; };
 		142E0E0019A6954400E4312B /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		142E0E0219A6A14700E4312B /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		142E0E0219A6A14700E4312B /* Sparkle.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		142E0E0419A6A26F00E4312B /* Autoupdate.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 55C14BB7136EEF1500649790 /* Autoupdate.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		142E0E0919A83AAC00E4312B /* SUBinaryDeltaTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 142E0E0819A83AAC00E4312B /* SUBinaryDeltaTest.m */; };
 		14652F7C19A9725300959E44 /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E20FD68CC7005AE3F6 /* SUBinaryDeltaCommon.m */; };
@@ -376,14 +376,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		142E0E0119A6A13300E4312B /* CopyFiles */ = {
+		142E0E0119A6A13300E4312B /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				142E0E0219A6A14700E4312B /* Sparkle.framework in CopyFiles */,
+				142E0E0219A6A14700E4312B /* Sparkle.framework in Copy Files */,
 			);
+			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		142E0E0319A6A24100E4312B /* CopyFiles */ = {
@@ -444,10 +445,14 @@
 		14732BBC1960EFB500593899 /* README.markdown */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.markdown; sourceTree = SOURCE_ROOT; };
 		14732BBF1960F0AC00593899 /* test_app_only_dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; path = test_app_only_dsa_pub.pem; sourceTree = "<group>"; };
 		14732BC11960F3B200593899 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = SOURCE_ROOT; usesTabs = 1; };
-		14732BC31960F3FF00593899 /* generate_keys.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = generate_keys.sh; sourceTree = "<group>"; };
-		14732BC41960F3FF00593899 /* sign_update.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = sign_update.sh; sourceTree = "<group>"; };
+		14732BC31960F3FF00593899 /* generate_keys */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = generate_keys; sourceTree = "<group>"; };
+		14732BC41960F3FF00593899 /* sign_update */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = sign_update; sourceTree = "<group>"; };
 		14732BC91960F70A00593899 /* make-release-package.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "make-release-package.sh"; sourceTree = "<group>"; };
 		14732BD219610A1800593899 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		147D6D9E1B66DC3C006607AB /* CheckLocalizations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CheckLocalizations.swift; path = Sparkle/CheckLocalizations.swift; sourceTree = SOURCE_ROOT; };
+		147D6DA71B66EC1C006607AB /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		147D6DA91B66EC22006607AB /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		147D6DAA1B66EC25006607AB /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		14950074195FDF5900BC5B5B /* SUUpdaterTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterTest.m; sourceTree = "<group>"; usesTabs = 0; };
 		14958C6B19AEBC530061B14F /* signed-test-file.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "signed-test-file.txt"; sourceTree = "<group>"; };
 		14958C6C19AEBC610061B14F /* test-pubkey.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "test-pubkey.pem"; sourceTree = "<group>"; };
@@ -901,6 +906,7 @@
 			isa = PBXGroup;
 			children = (
 				14732BC21960F3FF00593899 /* bin */,
+				147D6D9E1B66DC3C006607AB /* CheckLocalizations.swift */,
 				14732BBA1960EF7100593899 /* CHANGELOG */,
 				61C268090E2DB5D000175E6C /* LICENSE */,
 				14732BC11960F3B200593899 /* Makefile */,
@@ -915,8 +921,8 @@
 		14732BC21960F3FF00593899 /* bin */ = {
 			isa = PBXGroup;
 			children = (
-				14732BC31960F3FF00593899 /* generate_keys.sh */,
-				14732BC41960F3FF00593899 /* sign_update.sh */,
+				14732BC31960F3FF00593899 /* generate_keys */,
+				14732BC41960F3FF00593899 /* sign_update */,
 			);
 			path = bin;
 			sourceTree = SOURCE_ROOT;
@@ -1398,8 +1404,7 @@
 				612279D50DB5470200AB99EA /* Sources */,
 				612279D60DB5470200AB99EA /* Frameworks */,
 				14958C6D19AEBC890061B14F /* Resources */,
-				142E0E0119A6A13300E4312B /* CopyFiles */,
-				612279D70DB5470200AB99EA /* ShellScript */,
+				142E0E0119A6A13300E4312B /* Copy Files */,
 			);
 			buildRules = (
 			);
@@ -1654,20 +1659,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "IFS=$(echo -en \"\\n\\b\")\nRESOURCES_PATHS=(\n    \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\n    \"${BUILT_PRODUCTS_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/${SPARKLE_RELAUNCH_TOOL_NAME}.app/Contents/Resources\"\n    \"${BUILT_PRODUCTS_DIR}/com.devmate.UpdateInstaller.xpc/Contents/Resources\")\n\nfor RESOURCES_PATH in \"${RESOURCES_PATHS[@]}\"\ndo\n    echo \"Correcting... ${RESOURCES_PATH}\"\n    if [ -e \"${RESOURCES_PATH}/pt_BR.lproj\" ]; then\n        rm -Rf \"${RESOURCES_PATH}/pt-BR.lproj\"\n        mv -f \"${RESOURCES_PATH}/pt_BR.lproj\" \"${RESOURCES_PATH}/pt-BR.lproj\"\n    fi\n\n    if [ -e \"${RESOURCES_PATH}/zh_CN.lproj\" ]; then\n        rm -Rf \"${RESOURCES_PATH}/zh-Hans.lproj\"\n        mv -f \"${RESOURCES_PATH}/zh_CN.lproj\" \"${RESOURCES_PATH}/zh-Hans.lproj\"\n    fi\n\n    if [ -e \"${RESOURCES_PATH}/zh_TW.lproj\" ]; then\n        rm -Rf \"${RESOURCES_PATH}/zh-Hant-TW.lproj\"\n        mv -f \"${RESOURCES_PATH}/zh_TW.lproj\" \"${RESOURCES_PATH}/zh-Hant-TW.lproj\"\n    fi\ndone\n\n";
-		};
-		612279D70DB5470200AB99EA /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
-			showEnvVarsInLog = 0;
 		};
 		6131B1910DDCDE32005215F0 /* Run Script: Set Git Version Info */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2116,6 +2107,9 @@
 				0263187214FEBB31005EBF43 /* uk */,
 				61131A090F846D0A00E97AF6 /* zh_CN */,
 				61131A0A0F846D1100E97AF6 /* zh_TW */,
+				147D6DA71B66EC1C006607AB /* ca */,
+				147D6DA91B66EC22006607AB /* fi */,
+				147D6DAA1B66EC25006607AB /* he */,
 			);
 			name = Sparkle.strings;
 			sourceTree = "<group>";

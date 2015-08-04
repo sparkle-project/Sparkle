@@ -13,11 +13,6 @@
 #import "SULog.h"
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED < 101000
-typedef struct {
-    NSInteger majorVersion;
-    NSInteger minorVersion;
-    NSInteger patchVersion;
-} NSOperatingSystemVersion;
 @interface NSProcessInfo ()
 - (NSOperatingSystemVersion)operatingSystemVersion;
 @end
@@ -91,7 +86,7 @@ typedef struct {
 
 - (NSString *)installationPath
 {
-    if ([[[NSBundle bundleWithIdentifier:SUBundleIdentifier] infoDictionary][SUNormalizeInstalledApplicationNameKey] boolValue]) {
+    if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
         // We'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
         NSString *normalizedAppPath = [[[self.bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[self.bundle bundlePath] pathExtension]]];
         if (![[NSFileManager defaultManager] fileExistsAtPath:[[[self.bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[self.bundle bundlePath] pathExtension]]]]) {
@@ -276,7 +271,7 @@ typedef struct {
     return [self objectForUserDefaultsKey:key] ? [self boolForUserDefaultsKey:key] : [self boolForInfoDictionaryKey:key];
 }
 
-+ (NSString *)systemVersionString
++ (NSOperatingSystemVersion)operatingSystemVersion
 {
 #if __MAC_OS_X_VERSION_MIN_REQUIRED < 1090 // Present in 10.9 despite NS_AVAILABLE's claims
 #pragma clang diagnostic push
@@ -285,11 +280,21 @@ typedef struct {
     if (![NSProcessInfo instancesRespondToSelector:@selector(operatingSystemVersion)])
 #pragma clang diagnostic pop
     {
+        NSOperatingSystemVersion version = { 0, 0, 0 };
         NSURL *coreServices = [[NSFileManager defaultManager] URLForDirectory:NSCoreServiceDirectory inDomain:NSSystemDomainMask appropriateForURL:nil create:NO error:nil];
-        return [NSDictionary dictionaryWithContentsOfURL:[coreServices URLByAppendingPathComponent:@"SystemVersion.plist"]][@"ProductVersion"];
+        NSArray *components = [[NSDictionary dictionaryWithContentsOfURL:[coreServices URLByAppendingPathComponent:@"SystemVersion.plist"]][@"ProductVersion"] componentsSeparatedByString:@"."];
+        version.majorVersion = components.count > 0 ? [components[0] integerValue] : 0;
+        version.minorVersion = components.count > 1 ? [components[1] integerValue] : 0;
+        version.patchVersion = components.count > 2 ? [components[2] integerValue] : 0;
+        return version;
     }
 #endif
-    NSOperatingSystemVersion version = [[NSProcessInfo processInfo] operatingSystemVersion];
+    return [[NSProcessInfo processInfo] operatingSystemVersion];
+}
+
++ (NSString *)systemVersionString
+{
+    NSOperatingSystemVersion version = self.operatingSystemVersion;
     return [NSString stringWithFormat:@"%ld.%ld.%ld", (long)version.majorVersion, (long)version.minorVersion, (long)version.patchVersion];
 }
 

@@ -23,6 +23,10 @@ test:
 ci:
 	for i in {7..11} ; do \
 		if xcrun --sdk "macosx10.$$i" --show-sdk-path 2> /dev/null ; then \
-			xcodebuild -sdk "macosx10.$$i" -scheme Distribution -configuration Debug test ; \
+			xcodebuild -sdk "macosx10.$$i" -scheme Distribution -configuration Debug test || exit 1 ; \
 		fi ; \
 	done
+
+check-localizations:
+	./Sparkle/CheckLocalizations.swift -root . -htmlPath "$(TMPDIR)/LocalizationsReport.htm"
+	open "$(TMPDIR)/LocalizationsReport.htm"

@@ -85,29 +85,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 @implementation SUPlainInstaller (Internals)
 
-+ (NSString *)temporaryNameForPath:(NSString *)path
-{
-    // Let's try to read the version number so the filename will be more meaningful.
-    NSString *postFix;
-    NSString *version;
-	if ((version = [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]) && ![version isEqualToString:@""])
-	{
-        NSMutableCharacterSet *validCharacters = [NSMutableCharacterSet alphanumericCharacterSet];
-        [validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
-        postFix = [version stringByTrimmingCharactersInSet:[validCharacters invertedSet]];
-	}
-	else
-        postFix = @"old";
-    NSString *prefix = [[path stringByDeletingPathExtension] stringByAppendingFormat:@" (%@)", postFix];
-    NSString *tempDir = [prefix stringByAppendingPathExtension:[path pathExtension]];
-    // Now let's make sure we get a unique path.
-    unsigned int cnt = 2;
-    while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && cnt <= 999)
-        tempDir = [NSString stringWithFormat:@"%@ %u.%@", prefix, cnt++, [path pathExtension]];
-    return [tempDir lastPathComponent];
-}
-
-+ (NSString *)_temporaryCopyNameForPath:(NSString *)path didFindTrash:(BOOL *)outDidFindTrash
++ (NSString *)_temporaryCopyNameForPath:(NSString *)path appendVersion:(BOOL)appendVersion didFindTrash:(BOOL *)outDidFindTrash
 {
     // *** MUST BE SAFE TO CALL ON NON-MAIN THREAD!
     NSString *tempDir = nil;
@@ -140,7 +118,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
     // Let's try to read the version number so the filename will be more meaningful
     NSString *prefix;
-    if ([[[NSBundle bundleWithIdentifier:SUBundleIdentifier] infoDictionary][SUAppendVersionNumberKey] boolValue]) {
+    if (appendVersion) {
         NSString *postFix = nil;
         NSString *version = nil;
         if ((version = [[NSBundle bundleWithPath: path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]) && ![version isEqualToString:@""])
@@ -443,14 +421,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     return success;
 }
 
-+ (void)_movePathToTrash:(NSString *)path
++ (void)_movePathToTrash:(NSString *)path appendVersion:(BOOL)appendVersion
 {
     //SULog(@"Moving %@ to the trash.", path);
     NSInteger tag = 0;
 	if (![[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[path stringByDeletingLastPathComponent] destination:@"" files:@[[path lastPathComponent]] tag:&tag])
 	{
         BOOL didFindTrash = NO;
-        NSString *trashPath = [self _temporaryCopyNameForPath:path didFindTrash:&didFindTrash];
+        NSString *trashPath = [self _temporaryCopyNameForPath:path appendVersion:appendVersion didFindTrash:&didFindTrash];
 		if( didFindTrash )
 		{
             NSError *err = nil;
@@ -464,12 +442,12 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	}
 }
 
-+ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)__unused tmp error:(NSError *__autoreleasing *)error
++ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst appendVersion:(BOOL)appendVersion error:(NSError *__autoreleasing *)error
 {
     FSRef srcRef, dstRef, dstDirRef, tmpDirRef;
     OSStatus err;
     BOOL hadFileAtDest = NO, didFindTrash = NO;
-    NSString *tmpPath = [self _temporaryCopyNameForPath:dst didFindTrash:&didFindTrash];
+    NSString *tmpPath = [self _temporaryCopyNameForPath:dst appendVersion:appendVersion didFindTrash:&didFindTrash];
 
     // Make FSRef for destination:
     err = FSPathMakeRefWithOptions((const UInt8 *)[dst fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &dstRef, NULL);

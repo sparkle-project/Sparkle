@@ -17,7 +17,16 @@
 
 #import "SUConstants.h"
 
-@interface SUUpdateAlert ()
+// WebKit protocols are not explicitly declared until 10.11 SDK, so
+// declare dummy protocols to keep the build working on earlier SDKs.
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101100
+@protocol WebFrameLoadDelegate <NSObject>
+@end
+@protocol WebPolicyDelegate <NSObject>
+@end
+#endif
+
+@interface SUUpdateAlert () <WebFrameLoadDelegate, WebPolicyDelegate>
 
 @property (strong) SUAppcastItem *updateItem;
 @property (strong) SUHost *host;
@@ -29,6 +38,7 @@
 @property (weak) IBOutlet WebView *releaseNotesView;
 @property (weak) IBOutlet NSView *releaseNotesContainerView;
 @property (weak) IBOutlet NSTextField *descriptionField;
+@property (weak) IBOutlet NSButton *automaticallyInstallUpdatesButton;
 @property (weak) IBOutlet NSButton *installButton;
 @property (weak) IBOutlet NSButton *skipButton;
 @property (weak) IBOutlet NSButton *laterButton;
@@ -49,6 +59,7 @@
 @synthesize releaseNotesView;
 @synthesize releaseNotesContainerView;
 @synthesize descriptionField;
+@synthesize automaticallyInstallUpdatesButton;
 @synthesize installButton;
 @synthesize skipButton;
 @synthesize laterButton;
@@ -194,10 +205,12 @@
     if (showReleaseNotes) {
         [self displayReleaseNotes];
     } else {
+        NSLayoutConstraint *automaticallyInstallUpdatesButtonToDescriptionFieldConstraint = [NSLayoutConstraint constraintWithItem:self.automaticallyInstallUpdatesButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.descriptionField attribute:NSLayoutAttributeBottom multiplier:1.0 constant:8.0];
+        
+        [self.window.contentView addConstraint:automaticallyInstallUpdatesButtonToDescriptionFieldConstraint];
+        
         [self.releaseNotesContainerView removeFromSuperview];
     }
-
-    [self.window.contentView setNeedsLayout:YES]; // Prod autolayout to place everything
 
     [self.window center];
 }

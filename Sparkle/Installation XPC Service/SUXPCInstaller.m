@@ -54,7 +54,7 @@ BOOL SUShouldUseXPCInstaller(void)
     return (serviceConnection);
 }
 
-+ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp error:(NSError * __autoreleasing*)outError
++ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst appendVersion:(BOOL)appendVersion error:(NSError *__autoreleasing *)outError
 {
     xpc_connection_t connection = [self getSandboxXPCService];
 
@@ -65,8 +65,7 @@ BOOL SUShouldUseXPCInstaller(void)
 		xpc_dictionary_set_string(message, SUInstallServiceSourcePathKey, [src fileSystemRepresentation]);
 	if (dst)
 		xpc_dictionary_set_string(message, SUInstallServiceDestinationPathKey, [dst fileSystemRepresentation]);
-	if (tmp)
-		xpc_dictionary_set_string(message, SUInstallServiceTempNameKey, [tmp UTF8String]);
+    xpc_dictionary_set_bool(message, SUInstallServiceAppendVersionKey, appendVersion ? true : false);
 	
     __block BOOL xpcDidReply = NO;
     __block NSError *error = nil;

@@ -442,11 +442,12 @@ CF_EXPORT CFDictionaryRef DMCopyHTTPRequestHeaders(CFBundleRef appBundle, CFData
         [updaterDelegate updater:self.updater willInstallUpdate:self.updateItem];
     }
 
-    NSBundle *sparkleBundle = [NSBundle bundleWithIdentifier:SUBundleIdentifier];
+    NSBundle *sparkleBundle = self.updater.sparkleBundle;
 
     // Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
     // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
-    NSString *const relaunchPathToCopy = [sparkleBundle pathForResource:[[sparkleBundle infoDictionary] objectForKey:SURelaunchToolNameKey] ofType:@"app"];
+    NSString *const relaunchToolName = @"" SPARKLE_RELAUNCH_TOOL_NAME;
+    NSString *const relaunchPathToCopy = [sparkleBundle pathForResource:relaunchToolName ofType:@"app"];
     if (relaunchPathToCopy != nil) {
         NSString *targetPath = [self.host.appCachePath stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
         // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
@@ -456,11 +457,11 @@ CF_EXPORT CFDictionaryRef DMCopyHTTPRequestHeaders(CFBundleRef appBundle, CFData
         BOOL copySuccess = NO;
         if (SUShouldUseXPCInstaller())
         {
-            copySuccess = [SUXPCInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil error:&error];
+            copySuccess = [SUXPCInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath appendVersion:SPARKLE_APPEND_VERSION_NUMBER error:&error];
         }
         else
         {
-            copySuccess = [SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:nil error:&error];
+            copySuccess = [SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath appendVersion:SPARKLE_APPEND_VERSION_NUMBER error:&error];
         }
         if (copySuccess) {
             self.relaunchPath = targetPath;

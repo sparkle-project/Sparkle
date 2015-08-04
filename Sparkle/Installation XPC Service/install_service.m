@@ -126,14 +126,13 @@ static xpc_object_t SUISCopyPathWithAuthentication(xpc_object_t message)
     
     const char *src = xpc_dictionary_get_string(message, SUInstallServiceSourcePathKey);
     const char *dst = xpc_dictionary_get_string(message, SUInstallServiceDestinationPathKey);
-    const char *tmp = xpc_dictionary_get_string(message, SUInstallServiceTempNameKey);
+    bool appendVersion = xpc_dictionary_get_bool(message, SUInstallServiceAppendVersionKey);
     
     NSFileManager *manager = [NSFileManager defaultManager];
     NSString *relaunchPathToCopy = src ? [manager stringWithFileSystemRepresentation:src length:strlen(src)] : nil;
     NSString *targetPath = dst ? [manager stringWithFileSystemRepresentation:dst length:strlen(dst)] : nil;
-    NSString *temporaryName = tmp ? [NSString stringWithUTF8String:tmp] : nil;
     NSError *error = nil;
-    BOOL result = [SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath temporaryName:temporaryName error:&error];
+    BOOL result = [SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath appendVersion:appendVersion error:&error];
     
     // send response to indicate ok
     xpc_object_t reply = xpc_dictionary_create_reply(message);

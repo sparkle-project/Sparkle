@@ -11,9 +11,9 @@
 
 @interface SUXPCInstaller : NSObject
 
-+ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst temporaryName:(NSString *)tmp error:(NSError **)outError;
++ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst appendVersion:(BOOL)appendVersion error:(NSError *__autoreleasing *)outError;
 
-+ (BOOL)copyPathContent:(NSString *)src toDirectory:(NSString *)dstDir error:(NSError **)outError; // dstDir will be created if absent
++ (BOOL)copyPathContent:(NSString *)src toDirectory:(NSString *)dstDir error:(NSError *__autoreleasing *)outError; // dstDir will be created if absent
 
 + (void)launchTaskWithLaunchPath:(NSString *)path arguments:(NSArray *)arguments;
 

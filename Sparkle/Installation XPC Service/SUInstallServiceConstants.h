@@ -22,7 +22,7 @@ static const char * SUInstallServiceTaskTypeKey = "task_type"; // int64_t
 // SUInstallServiceTaskCopyPath & SUInstallServiceTaskAuthCopyPath keys
 static const char * SUInstallServiceSourcePathKey = "source_path"; // c-string
 static const char * SUInstallServiceDestinationPathKey = "destination_path"; // c-string
-static const char * SUInstallServiceTempNameKey = "tmp_name"; // c-string
+static const char * SUInstallServiceAppendVersionKey = "append_version"; // bool
 
 // SUInstallServiceTaskLaunchTask keys
 static const char * SUInstallServiceLaunchTaksPathKey = "launch_task_path";
