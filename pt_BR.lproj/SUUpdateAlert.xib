@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="8121.17" systemVersion="15A178w" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="8173.3" systemVersion="15A244d" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8121.17"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="8121.17"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8173.3"/>
+        <plugIn identifier="com.apple.WebKitIBPlugin" version="8173.3"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -16,19 +16,19 @@
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Atualização de Software" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="5" userLabel="Update Alert (release notes)">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="63" y="446" width="582" height="375"/>
+            <rect key="contentRect" x="63" y="446" width="583" height="376"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
-            <value key="minSize" type="size" width="586" height="370"/>
+            <value key="minSize" type="size" width="582" height="375"/>
             <view key="contentView" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="582" height="375"/>
+                <rect key="frame" x="0.0" y="0.0" width="583" height="376"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView id="7">
-                        <rect key="frame" x="20" y="291" width="64" height="64"/>
+                        <rect key="frame" x="20" y="292" width="64" height="64"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <animations/>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSApplicationIcon" id="168"/>
@@ -37,7 +37,7 @@
                         </connections>
                     </imageView>
                     <textField verticalHuggingPriority="750" id="10">
-                        <rect key="frame" x="102" y="338" width="443" height="17"/>
+                        <rect key="frame" x="102" y="339" width="443" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                         <animations/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="169">
@@ -50,7 +50,7 @@
                         </connections>
                     </textField>
                     <textField verticalHuggingPriority="750" id="17">
-                        <rect key="frame" x="102" y="277" width="443" height="17"/>
+                        <rect key="frame" x="102" y="278" width="443" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <animations/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Sobre a atualização:" id="170">
@@ -67,7 +67,7 @@
                         </connections>
                     </textField>
                     <button verticalHuggingPriority="750" id="22">
-                        <rect key="frame" x="303" y="12" width="109" height="32"/>
+                        <rect key="frame" x="303" y="13" width="109" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                         <animations/>
                         <buttonCell key="cell" type="push" title="Mais Tarde" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="171">
@@ -82,7 +82,7 @@ Gw
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="23">
-                        <rect key="frame" x="99" y="12" width="149" height="32"/>
+                        <rect key="frame" x="99" y="13" width="149" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
                         <animations/>
                         <buttonCell key="cell" type="push" title="Pular Esta Versão" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="172">
@@ -94,7 +94,7 @@ Gw
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="76">
-                        <rect key="frame" x="408" y="12" width="160" height="32"/>
+                        <rect key="frame" x="408" y="13" width="160" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                         <animations/>
                         <buttonCell key="cell" type="push" title="Instalar Atualização" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" inset="2" id="173">
@@ -109,7 +109,7 @@ DQ
                         </connections>
                     </button>
                     <box boxType="oldStyle" borderType="line" titlePosition="noTitle" id="89">
-                        <rect key="frame" x="105" y="76" width="457" height="199"/>
+                        <rect key="frame" x="105" y="77" width="457" height="199"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <view key="contentView" id="mDe-la-OH4">
                             <rect key="frame" x="1" y="1" width="455" height="197"/>
@@ -119,7 +119,9 @@ DQ
                                     <rect key="frame" x="-1" y="0.0" width="456" height="197"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <animations/>
-                                    <webPreferences key="preferences" defaultFontSize="12" defaultFixedFontSize="12"/>
+                                    <webPreferences key="preferences" defaultFontSize="12" defaultFixedFontSize="12">
+                                        <nil key="identifier"/>
+                                    </webPreferences>
                                     <connections>
                                         <binding destination="-2" name="hidden" keyPath="showsReleaseNotes" id="161">
                                             <dictionary key="options">
@@ -143,7 +145,7 @@ DQ
                         </connections>
                     </box>
                     <textField verticalHuggingPriority="750" id="101">
-                        <rect key="frame" x="102" y="302" width="463" height="28"/>
+                        <rect key="frame" x="102" y="303" width="463" height="28"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <animations/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" id="174">
@@ -156,7 +158,7 @@ DQ
                         </connections>
                     </textField>
                     <button id="117">
-                        <rect key="frame" x="102" y="48" width="442" height="18"/>
+                        <rect key="frame" x="102" y="49" width="442" height="18"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <animations/>
                         <buttonCell key="cell" type="check" title="Sempre baixar e instalar atualizações automaticamente" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="175">
