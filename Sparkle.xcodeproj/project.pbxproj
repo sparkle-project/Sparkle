@@ -347,6 +347,8 @@
 		14950074195FDF5900BC5B5B /* SUUpdaterTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterTest.m; sourceTree = "<group>"; usesTabs = 0; };
 		14958C6B19AEBC530061B14F /* signed-test-file.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "signed-test-file.txt"; sourceTree = "<group>"; };
 		14958C6C19AEBC610061B14F /* test-pubkey.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "test-pubkey.pem"; sourceTree = "<group>"; };
+		149B78631B7D3A0C00D7D62C /* ConfigCommonCoverage.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigCommonCoverage.xcconfig; sourceTree = "<group>"; };
+		149B78641B7D3A4800D7D62C /* ConfigUnitTestCoverage.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUnitTestCoverage.xcconfig; sourceTree = "<group>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
 		4607BEA21948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		4607BEA31948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nb; path = nb.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
@@ -992,6 +994,7 @@
 				5D06E8F20FD68D21005AE3F6 /* ConfigBinaryDeltaDebug.xcconfig */,
 				5D06E8F30FD68D21005AE3F6 /* ConfigBinaryDeltaRelease.xcconfig */,
 				FA1941D00D94A70100DD942E /* ConfigCommon.xcconfig */,
+				149B78631B7D3A0C00D7D62C /* ConfigCommonCoverage.xcconfig */,
 				FA1941CF0D94A70100DD942E /* ConfigCommonDebug.xcconfig */,
 				FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */,
 				FA1941D10D94A70100DD942E /* ConfigFramework.xcconfig */,
@@ -1004,6 +1007,7 @@
 				FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */,
 				FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */,
 				FA3AAF3B1050B273004B3130 /* ConfigUnitTest.xcconfig */,
+				149B78641B7D3A4800D7D62C /* ConfigUnitTestCoverage.xcconfig */,
 				FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */,
 				FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */,
 				14732BC91960F70A00593899 /* make-release-package.sh */,
@@ -1762,6 +1766,66 @@
 			};
 			name = Release;
 		};
+		149B785A1B7D398100D7D62C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 149B78631B7D3A0C00D7D62C /* ConfigCommonCoverage.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		149B785B1B7D398100D7D62C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		149B785C1B7D398100D7D62C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		149B785D1B7D398100D7D62C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 149B78641B7D3A4800D7D62C /* ConfigUnitTestCoverage.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		149B785E1B7D398100D7D62C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5D06E8F20FD68D21005AE3F6 /* ConfigBinaryDeltaDebug.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		149B785F1B7D398100D7D62C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		149B78601B7D398100D7D62C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		149B78611B7D398100D7D62C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		149B78621B7D398100D7D62C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
 		1DEB91AE08733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
@@ -1853,6 +1917,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1420DF4B1962329200203BB0 /* Debug */,
+				149B78611B7D398100D7D62C /* Coverage */,
 				1420DF4C1962329200203BB0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1862,6 +1927,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				14732BC71960F69300593899 /* Debug */,
+				149B78601B7D398100D7D62C /* Coverage */,
 				14732BC81960F69300593899 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1871,6 +1937,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				14950061195FB89500BC5B5B /* Debug */,
+				149B78621B7D398100D7D62C /* Coverage */,
 				14950062195FB89500BC5B5B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1880,6 +1947,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB91AE08733DA50010E9CD /* Debug */,
+				149B785B1B7D398100D7D62C /* Coverage */,
 				1DEB91AF08733DA50010E9CD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1889,6 +1957,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB91B208733DA50010E9CD /* Debug */,
+				149B785A1B7D398100D7D62C /* Coverage */,
 				1DEB91B308733DA50010E9CD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1898,6 +1967,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				55C14BBB136EEF1500649790 /* Debug */,
+				149B785F1B7D398100D7D62C /* Coverage */,
 				55C14BBC136EEF1500649790 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1907,6 +1977,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5D06E8D20FD68C7D005AE3F6 /* Debug */,
+				149B785E1B7D398100D7D62C /* Coverage */,
 				5D06E8D30FD68C7D005AE3F6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1916,6 +1987,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				612279DB0DB5470300AB99EA /* Debug */,
+				149B785D1B7D398100D7D62C /* Coverage */,
 				612279DC0DB5470300AB99EA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -1925,6 +1997,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				61B5F90609C4CEE300B25A18 /* Debug */,
+				149B785C1B7D398100D7D62C /* Coverage */,
 				61B5F90709C4CEE300B25A18 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
