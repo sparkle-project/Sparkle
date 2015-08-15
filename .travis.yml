@@ -9,4 +9,4 @@ before_install:
   - pip install cpp-coveralls
   - pyenv rehash
 script: make ci
-after_success: coveralls --gcov-options '\-lp'
+after_success: coveralls --exclude build --gcov-options '\-lp'
