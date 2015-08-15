@@ -89,6 +89,27 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     }
 }
 
+// -[NSFileManager attributesOfItemAtPath:error:] won't follow symbolic links
+
+- (BOOL)itemExistsAtURL:(NSURL *)fileURL
+{
+    return [_fileManager attributesOfItemAtPath:fileURL.path error:NULL] != nil;
+}
+
+- (BOOL)itemExistsAtURL:(NSURL *)fileURL isDirectory:(BOOL *)isDirectory
+{
+    NSDictionary *attributes = [_fileManager attributesOfItemAtPath:fileURL.path error:NULL];
+    if (attributes == nil) {
+        return NO;
+    }
+    
+    if (isDirectory != NULL) {
+        *isDirectory = [attributes[NSFileType] isEqualToString:NSFileTypeDirectory];
+    }
+    
+    return YES;
+}
+
 // Wrapper around getxattr()
 - (ssize_t)getXAttr:(NSString *)nameString fromFile:(NSString *)file options:(int)options
 {
@@ -129,6 +150,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 // Recursively remove an xattr at a specified root URL with authentication
 - (BOOL)removeXAttrWithAuthentication:(NSString *)name fromRootURL:(NSURL *)rootURL error:(NSError *__autoreleasing *)error
 {
+    // Because this is a system utility, it's fine to follow the symbolic link if one exists
     if (![_fileManager fileExistsAtPath:@(XATTR_UTILITY_PATH)]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: @"xattr utility does not exist on this system." }];
@@ -296,14 +318,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 - (BOOL)moveItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError *__autoreleasing *)error
 {
-    if (![_fileManager fileExistsAtPath:sourceURL.path]) {
+    if (![self itemExistsAtURL:sourceURL]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source file to move (%@) does not exist.", sourceURL.path.lastPathComponent] }];
         }
         return NO;
     }
     
-    if ([_fileManager fileExistsAtPath:destinationURL.path]) {
+    if ([self itemExistsAtURL:destinationURL]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination file to move (%@) already exists.", destinationURL.path.lastPathComponent] }];
         }
@@ -355,14 +377,14 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 - (BOOL)changeOwnerAndGroupOfItemAtRootURL:(NSURL *)targetURL toMatchURL:(NSURL *)matchURL error:(NSError * __autoreleasing *)error
 {
-    if (![_fileManager fileExistsAtPath:targetURL.path]) {
+    if (![self itemExistsAtURL:targetURL]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to change owner & group IDs because %@ does not exist.", targetURL.path.lastPathComponent] }];
         }
         return NO;
     }
     
-    if (![_fileManager fileExistsAtPath:matchURL.path]) {
+    if (![self itemExistsAtURL:matchURL]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to match owner & group IDs because %@ does not exist.", matchURL.path.lastPathComponent] }];
         }
@@ -473,7 +495,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 // An item cannot already exist at the url, but the parent must be a directory that exists
 - (BOOL)makeDirectoryAtURL:(NSURL *)url error:(NSError * __autoreleasing *)error
 {
-    if ([_fileManager fileExistsAtPath:url.path]) {
+    if ([self itemExistsAtURL:url]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create directory because file %@ already exists.", url.path.lastPathComponent] }];
         }
@@ -482,7 +504,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     
     NSURL *parentURL = [url URLByDeletingLastPathComponent];
     BOOL isParentADirectory = NO;
-    if (![_fileManager fileExistsAtPath:parentURL.path isDirectory:&isParentADirectory] || !isParentADirectory) {
+    if (![self itemExistsAtURL:parentURL isDirectory:&isParentADirectory] || !isParentADirectory) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create directory because parent directory %@ does not exist.", parentURL.path.lastPathComponent] }];
         }
@@ -535,7 +557,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     
     NSURL *desiredURL = [directoryURL URLByAppendingPathComponent:preferredName];
     NSUInteger tagIndex = 1;
-    while ([_fileManager fileExistsAtPath:desiredURL.path] && tagIndex <= 9999) {
+    while ([self itemExistsAtURL:desiredURL] && tagIndex <= 9999) {
         desiredURL = [directoryURL URLByAppendingPathComponent:[preferredName stringByAppendingFormat:@" (%lu)", (unsigned long)++tagIndex]];
     }
     
@@ -544,7 +566,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 - (BOOL)removeItemAtURL:(NSURL *)url error:(NSError * __autoreleasing *)error
 {
-    if (![_fileManager fileExistsAtPath:url.path]) {
+    if (![self itemExistsAtURL:url]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove file %@ because it does not exist.", url.path.lastPathComponent] }];
         }
@@ -584,7 +606,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 - (BOOL)moveItemAtURLToTrash:(NSURL *)url error:(NSError *__autoreleasing *)error
 {
-    if (![_fileManager fileExistsAtPath:url.path]) {
+    if (![self itemExistsAtURL:url]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move %@ to the trash because the file does not exist.", url.path.lastPathComponent] }];
         }
