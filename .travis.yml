@@ -1,2 +1,12 @@
 language: objective-c
+before_install:
+  - brew update
+  - brew list pyenv || brew install pyenv
+  - eval "$(pyenv init -)"
+  - pyenv install 2.7.6
+  - pyenv global 2.7.6
+  - pyenv rehash
+  - pip install cpp-coveralls
+  - pyenv rehash
 script: make ci
+after_success: coveralls --gcov-options '\-lp'

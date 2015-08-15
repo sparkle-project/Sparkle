@@ -18,6 +18,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1.5</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.5</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
@@ -25,21 +27,13 @@
 	<key>SUEnableSystemProfiling</key>
 	<true/>
 	<key>SUFeedURL</key>
-	<string>http://sparkle-project.org/files/sparkletestcast.xml</string>
+	<string>http://0.0.0.0:1337/sparkletestcast.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>test_app_only_dsa_pub.pem</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSExceptionDomains</key>
-		<dict>
-			<key>sparkle-project.org</key>
-			<dict>
-			  <key>NSIncludesSubdomains</key>
-			  <false/>
-			  <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-			  <true/>
-			</dict>
-		</dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
 	</dict>
 </dict>
 </plist>
