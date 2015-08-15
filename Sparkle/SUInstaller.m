@@ -16,13 +16,6 @@
 
 @implementation SUInstaller
 
-static NSString *sUpdateFolder = nil;
-
-+ (NSString *)updateFolder
-{
-    return sUpdateFolder;
-}
-
 + (BOOL)isAliasFolderAtPath:(NSString *)path
 {
     NSNumber *aliasFlag = nil;
@@ -47,8 +40,6 @@ static NSString *sUpdateFolder = nil;
     NSString *fallbackPackagePath = nil;
     NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:inUpdateFolder];
     NSString *bundleFileNameNoExtension = [bundleFileName stringByDeletingPathExtension];
-
-    sUpdateFolder = inUpdateFolder;
 
     while ((currentFile = [dirEnum nextObject])) {
         NSString *currentPath = [inUpdateFolder stringByAppendingPathComponent:currentFile];
