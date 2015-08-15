@@ -97,4 +97,9 @@
  */
 - (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError **)error;
 
+/**
+ * Behaves as -releaseItemFromQuarantineAtRootURL:error: does, except without the capability of authenticating when permission is denied
+ */
+- (BOOL)releaseItemFromQuarantineWithoutAuthenticationAtRootURL:(NSURL *)rootURL error:(NSError **)error;
+
 @end

@@ -18,6 +18,7 @@
 #import "SUBinaryDeltaCommon.h"
 #import "SUCodeSigningVerifier.h"
 #import "SUUpdater_Private.h"
+#import "SUFileManager.h"
 
 @interface SUBasicUpdateDriver ()
 
@@ -456,8 +457,13 @@
         
         // We only need to run our copy of the app by spawning a task
         // Since we are copying the app to a directory that is write-accessible, we don't need to muck with owner/group IDs
-        // And since we spawn a task, we don't need to clear the quarantine bits
         if ([self preparePathForRelaunchTool:targetPath error:&error] && [fileManager copyItemAtPath:relaunchPathToCopy toPath:targetPath error:&error]) {
+            // We probably don't need to release the quarantine, but we'll do it just in case it's necessary.
+            // Perhaps in a sandboxed environment this matters more. Note that this may not be a fatal error.
+            NSError *quarantineError = nil;
+            if (![[[SUFileManager alloc] init] releaseItemFromQuarantineWithoutAuthenticationAtRootURL:[NSURL fileURLWithPath:targetPath] error:&quarantineError]) {
+                SULog(@"Failed to release quarantine on %@ with error %@", targetPath, quarantineError);
+            }
             self.relaunchPath = targetPath;
         } else {
             [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{

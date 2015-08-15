@@ -198,11 +198,11 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 // If |root| is not a directory, then it alone is removed from the quarantine.
 // Symbolic links, including |root| if it is a symbolic link, will not be
 // traversed.
-- (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError * __autoreleasing *)error
+- (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL allowingAuthentication:(BOOL)allowsAuthentication error:(NSError * __autoreleasing *)error
 {
 #if __MAC_OS_X_VERSION_MIN_REQUIRED < 101000 /* MAC_OS_X_VERSION_10_10 */
     if (!&NSURLQuarantinePropertiesKey) {
-        return [self releaseItemUsingOldMethodFromQuarantineAtRootURL:rootURL error:error];
+        return [self releaseItemUsingOldMethodFromQuarantineAtRootURL:rootURL allowingAuthentication:allowsAuthentication error:error];
     }
 #endif
     
@@ -211,7 +211,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     if ([rootURL getResourceValue:&rootResourceValue forKey:NSURLQuarantinePropertiesKey error:NULL] && rootResourceValue != nil) {
         NSError *setResourceError = nil;
         if (![rootURL setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:&setResourceError]) {
-            if (NS_HAS_PERMISSION_ERROR(setResourceError)) {
+            if (allowsAuthentication && NS_HAS_PERMISSION_ERROR(setResourceError)) {
                 return [self removeXAttrWithAuthentication:APPLE_QUARANTINE_IDENTIFIER fromRootURL:rootURL error:error];
             } else {
                 if (error != NULL) {
@@ -238,7 +238,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
             if ([file getResourceValue:&fileResourceValue forKey:NSURLQuarantinePropertiesKey error:NULL] && fileResourceValue != nil) {
                 NSError *setResourceError = nil;
                 if (![file setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:&setResourceError]) {
-                    if (NS_HAS_PERMISSION_ERROR(setResourceError)) {
+                    if (allowsAuthentication && NS_HAS_PERMISSION_ERROR(setResourceError)) {
                         return [self removeXAttrWithAuthentication:APPLE_QUARANTINE_IDENTIFIER fromRootURL:rootURL error:error];
                     } else {
                         // Make sure we haven't already run into an error
@@ -264,7 +264,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 // that the quarantine is implemented in part by setting an extended attribute,
 // "com.apple.quarantine", on affected files.  Removing this attribute is
 // sufficient to remove files from the quarantine.
-- (BOOL)releaseItemUsingOldMethodFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError *__autoreleasing *)error
+- (BOOL)releaseItemUsingOldMethodFromQuarantineAtRootURL:(NSURL *)rootURL allowingAuthentication:(BOOL)allowsAuthentication error:(NSError *__autoreleasing *)error
 {
     BOOL success = YES;
     NSString *root = rootURL.path;
@@ -298,7 +298,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
             NSString *filePath = [root stringByAppendingPathComponent:file];
             if ([self getXAttr:APPLE_QUARANTINE_IDENTIFIER fromFile:filePath options:removeXAttrOptions] >= 0) {
                 if ([self removeXAttr:APPLE_QUARANTINE_IDENTIFIER fromFile:filePath options:removeXAttrOptions] != 0) {
-                    if (errno == EACCES) {
+                    if (allowsAuthentication && errno == EACCES) {
                         return [self removeXAttrWithAuthentication:APPLE_QUARANTINE_IDENTIFIER fromRootURL:rootURL error:error];
                     } else {
                         // Make sure we haven't already run into an error
@@ -314,6 +314,16 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     }
     
     return success;
+}
+
+- (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError * __autoreleasing *)error
+{
+    return [self releaseItemFromQuarantineAtRootURL:rootURL allowingAuthentication:YES error:error];
+}
+
+- (BOOL)releaseItemFromQuarantineWithoutAuthenticationAtRootURL:(NSURL *)rootURL error:(NSError * __autoreleasing *)error
+{
+    return [self releaseItemFromQuarantineAtRootURL:rootURL allowingAuthentication:NO error:error];
 }
 
 - (BOOL)moveItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError *__autoreleasing *)error
