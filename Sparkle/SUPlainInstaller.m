@@ -80,86 +80,47 @@
     
     NSString *oldDestinationNameWithPathExtension = [oldDestinationName stringByAppendingPathExtension:oldURL.pathExtension];
     
-    // If the installation and old URL differ, the sooner we can install our new app
-    // because we won't have to move the old app out of the way first
-    // increasing our chances of having it installed in case something goes wrong
-    if (![installationURL isEqual:oldURL]) {
-        // Move the new app to its final destination
-        if (![fileManager moveItemAtURL:newTempURL toURL:installationURL error:error]) {
-            SULog(@"Failed to move new app at %@ to final destination %@ (with installationURL != oldURL)", newTempURL.path, installationURL.path);
-            [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
-            return NO;
-        }
-        
-        // Cleanup: move the old app to the trash
-        // We will first have to move the app to a temporary location that the user may not care about
-        // This is necessary because the operation could fail mid-way through
-        // Nothing past here will be a fatal error because we already installed the new app
-        
-        // Create a temporary directory for our old app that resides on its volume
-        NSError *makeOldTempDirectoryError = nil;
-        NSURL *tempOldDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:oldDestinationName appropriateForDirectoryURL:oldURL.URLByDeletingLastPathComponent error:&makeOldTempDirectoryError];
-        if (tempOldDirectoryURL == nil) {
-            SULog(@"Failed to create temporary directory for old app at %@ after finishing installation. This is not a fatal error. Error: %@", oldURL.path, makeOldTempDirectoryError);
-        } else {
-            // Move the old app to the temporary directory
-            NSURL *oldTempURL = [tempOldDirectoryURL URLByAppendingPathComponent:oldDestinationNameWithPathExtension];
-            NSError *moveOldAppError = nil;
-            if (![fileManager moveItemAtURL:oldURL toURL:oldTempURL error:&moveOldAppError]) {
-                SULog(@"Failed to move the old app at %@ to a temporary location at %@. This is not a fatal error. Error: %@", oldURL.path, oldTempURL.path, moveOldAppError);
-            } else {
-                // Finally try to trash our old app
-                NSError *trashError = nil;
-                if (![fileManager moveItemAtURLToTrash:oldTempURL error:&trashError]) {
-                    SULog(@"Failed to move %@ to trash. This is not a fatal error. Error: %@", oldURL, trashError);
-                }
-            }
-            
-            [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
-        }
-    } else {
-        // Create a temporary directory for our old app that resides on its volume
-        NSURL *tempOldDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:oldDestinationName appropriateForDirectoryURL:oldURL.URLByDeletingLastPathComponent error:error];
-        if (tempOldDirectoryURL == nil) {
-            SULog(@"Failed to create temporary directory for old app at %@", oldURL.path);
-            [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
-            return NO;
-        }
-        
-        // Move the old app to the temporary directory
-        NSURL *oldTempURL = [tempOldDirectoryURL URLByAppendingPathComponent:oldDestinationNameWithPathExtension];
-        if (![fileManager moveItemAtURL:oldURL toURL:oldTempURL error:error]) {
-            SULog(@"Failed to move the old app at %@ to a temporary location at %@", oldURL.path, oldTempURL.path);
-            
-            // Just forget about our updated app on failure
-            [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
-            [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
-            
-            return NO;
-        }
-        
-        // Move the new app to its final destination
-        if (![fileManager moveItemAtURL:newTempURL toURL:installationURL error:error]) {
-            SULog(@"Failed to move new app at %@ to final destination %@", newTempURL.path, installationURL.path);
-            
-            // Forget about our updated app on failure
-            [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
-            
-            // Attempt to restore our old app back the way it was on failure
-            [fileManager moveItemAtURL:oldTempURL toURL:oldURL error:NULL];
-            [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
-            
-            return NO;
-        }
-        
-        // Cleanup: move the old app to the trash
-        NSError *trashError = nil;
-        if (![fileManager moveItemAtURLToTrash:oldTempURL error:&trashError]) {
-            SULog(@"Failed to move %@ to trash with error %@", oldTempURL, trashError);
-        }
-        
-        [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
+    // Create a temporary directory for our old app that resides on its volume
+    NSURL *tempOldDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:oldDestinationName appropriateForDirectoryURL:oldURL.URLByDeletingLastPathComponent error:error];
+    if (tempOldDirectoryURL == nil) {
+        SULog(@"Failed to create temporary directory for old app at %@", oldURL.path);
+        [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
+        return NO;
     }
+    
+    // Move the old app to the temporary directory
+    NSURL *oldTempURL = [tempOldDirectoryURL URLByAppendingPathComponent:oldDestinationNameWithPathExtension];
+    if (![fileManager moveItemAtURL:oldURL toURL:oldTempURL error:error]) {
+        SULog(@"Failed to move the old app at %@ to a temporary location at %@", oldURL.path, oldTempURL.path);
+        
+        // Just forget about our updated app on failure
+        [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
+        [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
+        
+        return NO;
+    }
+    
+    // Move the new app to its final destination
+    if (![fileManager moveItemAtURL:newTempURL toURL:installationURL error:error]) {
+        SULog(@"Failed to move new app at %@ to final destination %@", newTempURL.path, installationURL.path);
+        
+        // Forget about our updated app on failure
+        [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
+        
+        // Attempt to restore our old app back the way it was on failure
+        [fileManager moveItemAtURL:oldTempURL toURL:oldURL error:NULL];
+        [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
+        
+        return NO;
+    }
+    
+    // Cleanup: move the old app to the trash
+    NSError *trashError = nil;
+    if (![fileManager moveItemAtURLToTrash:oldTempURL error:&trashError]) {
+        SULog(@"Failed to move %@ to trash with error %@", oldTempURL, trashError);
+    }
+    
+    [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
     
     [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
     
