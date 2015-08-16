@@ -188,8 +188,15 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     return success;
 }
 
-- (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL usingMethod:(BOOL (^)(NSURL *, BOOL *, BOOL *))releasingQuarantineRequiredAuthentication
+- (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL usingMethod:(BOOL (^)(NSURL *, BOOL *, BOOL *))releasingQuarantineRequiredAuthentication error:(NSError * __autoreleasing *)error
 {
+    if (![self itemExistsAtURL:rootURL]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove quarantine because %@ does not exist.", rootURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
     BOOL success = YES;
     
     BOOL releasedRootQuarantine = NO;
@@ -265,7 +272,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         }
         
         return attemptedAuthentication;
-    }];
+    } error:error];
 }
 
 // Ordinarily, the quarantine is managed by calling LSSetItemAttribute
@@ -310,7 +317,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         }
         
         return attemptedAuthentication;
-    }];
+    } error:error];
 }
 
 - (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError * __autoreleasing *)error
