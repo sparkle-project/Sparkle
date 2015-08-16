@@ -206,21 +206,40 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     }
 #endif
     
-    BOOL success = YES;
-    id rootResourceValue = nil;
-    if ([rootURL getResourceValue:&rootResourceValue forKey:NSURLQuarantinePropertiesKey error:NULL] && rootResourceValue != nil) {
-        NSError *setResourceError = nil;
-        if (![rootURL setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:&setResourceError]) {
-            if (allowsAuthentication && NS_HAS_PERMISSION_ERROR(setResourceError)) {
-                return [self removeXAttrWithAuthentication:APPLE_QUARANTINE_IDENTIFIER fromRootURL:rootURL error:error];
-            } else {
-                if (error != NULL) {
-                    *error = setResourceError;
+    __block BOOL success = YES;
+    
+    BOOL (^releasingQuarantineRequiredAuthentication)(NSURL *, BOOL *) = ^(NSURL *fileURL, BOOL *didReleaseQuarantine){
+        BOOL removedQuarantine = NO;
+        BOOL attemptedAuthentication = NO;
+        
+        id resourceValue = nil;
+        if ([fileURL getResourceValue:&resourceValue forKey:NSURLQuarantinePropertiesKey error:NULL] && resourceValue != nil) {
+            NSError *setResourceError = nil;
+            if (![fileURL setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:&setResourceError]) {
+                if (allowsAuthentication && NS_HAS_PERMISSION_ERROR(setResourceError)) {
+                    attemptedAuthentication = YES;
+                    return [self removeXAttrWithAuthentication:APPLE_QUARANTINE_IDENTIFIER fromRootURL:rootURL error:error];
+                } else {
+                    // Make sure we haven't already run into an error
+                    if (success && error != NULL) {
+                        *error = setResourceError;
+                    }
+                    // Fail, but still try to release other items from quarantine
+                    success = NO;
                 }
-                // Fail, but still try to release other items from quarantine
-                success = NO;
             }
         }
+        
+        if (didReleaseQuarantine != NULL) {
+            *didReleaseQuarantine = removedQuarantine;
+        }
+        
+        return attemptedAuthentication;
+    };
+    
+    BOOL releasedRootQuarantine = NO;
+    if (releasingQuarantineRequiredAuthentication(rootURL, &releasedRootQuarantine)) {
+        return releasedRootQuarantine;
     }
     
     // Only recurse if it's actually a directory.  Don't recurse into a
@@ -234,21 +253,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         NSDirectoryEnumerator *directoryEnumerator = [_fileManager enumeratorAtURL:rootURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
         
         for (NSURL *file in directoryEnumerator) {
-            id fileResourceValue = nil;
-            if ([file getResourceValue:&fileResourceValue forKey:NSURLQuarantinePropertiesKey error:NULL] && fileResourceValue != nil) {
-                NSError *setResourceError = nil;
-                if (![file setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:&setResourceError]) {
-                    if (allowsAuthentication && NS_HAS_PERMISSION_ERROR(setResourceError)) {
-                        return [self removeXAttrWithAuthentication:APPLE_QUARANTINE_IDENTIFIER fromRootURL:rootURL error:error];
-                    } else {
-                        // Make sure we haven't already run into an error
-                        if (success && error != NULL) {
-                            *error = setResourceError;
-                        }
-                        // Fail, but still try to release other items from quarantine
-                        success = NO;
-                    }
-                }
+            BOOL releasedQuarantine = NO;
+            if (releasingQuarantineRequiredAuthentication(file, &releasedQuarantine)) {
+                return releasedQuarantine;
             }
         }
     }
@@ -264,24 +271,45 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 // that the quarantine is implemented in part by setting an extended attribute,
 // "com.apple.quarantine", on affected files.  Removing this attribute is
 // sufficient to remove files from the quarantine.
+
 - (BOOL)releaseItemUsingOldMethodFromQuarantineAtRootURL:(NSURL *)rootURL allowingAuthentication:(BOOL)allowsAuthentication error:(NSError *__autoreleasing *)error
 {
-    BOOL success = YES;
+    __block BOOL success = YES;
     NSString *root = rootURL.path;
     const int removeXAttrOptions = XATTR_NOFOLLOW;
     
-    if ([self getXAttr:APPLE_QUARANTINE_IDENTIFIER fromFile:root options:removeXAttrOptions] >= 0) {
-        if ([self removeXAttr:APPLE_QUARANTINE_IDENTIFIER fromFile:root options:removeXAttrOptions] != 0) {
-            if (errno == EACCES) {
-                return [self removeXAttrWithAuthentication:APPLE_QUARANTINE_IDENTIFIER fromRootURL:rootURL error:error];
+    BOOL (^releasingQuarantineRequiredAuthentication)(NSString *, BOOL *) = ^(NSString *path, BOOL *didReleaseQuarantine){
+        BOOL removedQuarantine = NO;
+        BOOL attemptedAuthentication = NO;
+        
+        if ([self getXAttr:APPLE_QUARANTINE_IDENTIFIER fromFile:path options:removeXAttrOptions] >= 0) {
+            if ([self removeXAttr:APPLE_QUARANTINE_IDENTIFIER fromFile:path options:removeXAttrOptions] == 0) {
+                removedQuarantine = YES;
             } else {
-                if (error != NULL) {
-                    *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove file quarantine on %@.", root.lastPathComponent] }];
+                if (allowsAuthentication && errno == EACCES) {
+                    attemptedAuthentication = YES;
+                    removedQuarantine = [self removeXAttrWithAuthentication:APPLE_QUARANTINE_IDENTIFIER fromRootURL:rootURL error:error];
+                } else {
+                    // Make sure we haven't already run into an error
+                    if (success && error != NULL) {
+                        *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove file quarantine on %@.", path.lastPathComponent] }];
+                    }
+                    // Fail, but still try to release other items from quarantine
+                    success = NO;
                 }
-                // Fail, but still try to release other items from quarantine
-                success = NO;
             }
         }
+        
+        if (didReleaseQuarantine != NULL) {
+            *didReleaseQuarantine = removedQuarantine;
+        }
+        
+        return attemptedAuthentication;
+    };
+    
+    BOOL releasedRootQuarantine = NO;
+    if (releasingQuarantineRequiredAuthentication(root, &releasedRootQuarantine)) {
+        return releasedRootQuarantine;
     }
     
     // Only recurse if it's actually a directory.  Don't recurse into a
@@ -296,19 +324,10 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         NSString *file = nil;
         while ((file = [directoryEnumerator nextObject])) {
             NSString *filePath = [root stringByAppendingPathComponent:file];
-            if ([self getXAttr:APPLE_QUARANTINE_IDENTIFIER fromFile:filePath options:removeXAttrOptions] >= 0) {
-                if ([self removeXAttr:APPLE_QUARANTINE_IDENTIFIER fromFile:filePath options:removeXAttrOptions] != 0) {
-                    if (allowsAuthentication && errno == EACCES) {
-                        return [self removeXAttrWithAuthentication:APPLE_QUARANTINE_IDENTIFIER fromRootURL:rootURL error:error];
-                    } else {
-                        // Make sure we haven't already run into an error
-                        if (success && error != NULL) {
-                            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove file quarantine on %@.", filePath.lastPathComponent] }];
-                        }
-                        // Fail, but still try to release other items from quarantine
-                        success = NO;
-                    }
-                }
+            
+            BOOL releasedQuarantine = NO;
+            if (releasingQuarantineRequiredAuthentication(filePath, &releasedQuarantine)) {
+                return releasedQuarantine;
             }
         }
     }
