@@ -188,6 +188,36 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     return success;
 }
 
+- (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL usingMethod:(BOOL (^)(NSURL *, BOOL *, BOOL *))releasingQuarantineRequiredAuthentication
+{
+    BOOL success = YES;
+    
+    BOOL releasedRootQuarantine = NO;
+    if (releasingQuarantineRequiredAuthentication(rootURL, &releasedRootQuarantine, &success)) {
+        return releasedRootQuarantine;
+    }
+    
+    // Only recurse if it's actually a directory.  Don't recurse into a
+    // root-level symbolic link.
+    NSDictionary *rootAttributes = [_fileManager attributesOfItemAtPath:rootURL.path error:nil];
+    NSString *rootType = rootAttributes[NSFileType];
+    
+    if ([rootType isEqualToString:NSFileTypeDirectory]) {
+        // The NSDirectoryEnumerator will avoid recursing into any contained
+        // symbolic links, so no further type checks are needed.
+        NSDirectoryEnumerator *directoryEnumerator = [_fileManager enumeratorAtURL:rootURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
+        
+        for (NSURL *file in directoryEnumerator) {
+            BOOL releasedQuarantine = NO;
+            if (releasingQuarantineRequiredAuthentication(file, &releasedQuarantine, &success)) {
+                return releasedQuarantine;
+            }
+        }
+    }
+    
+    return success;
+}
+
 #define APPLE_QUARANTINE_IDENTIFIER @"com.apple.quarantine"
 
 // Removes the directory tree rooted at |root| from the file quarantine.
@@ -206,9 +236,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     }
 #endif
     
-    __block BOOL success = YES;
-    
-    BOOL (^releasingQuarantineRequiredAuthentication)(NSURL *, BOOL *) = ^(NSURL *fileURL, BOOL *didReleaseQuarantine){
+    return [self releaseItemFromQuarantineAtRootURL:rootURL usingMethod:^BOOL(NSURL *fileURL, BOOL *didReleaseQuarantine, BOOL *success) {
         BOOL removedQuarantine = NO;
         BOOL attemptedAuthentication = NO;
         
@@ -218,14 +246,16 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
             if (![fileURL setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:&setResourceError]) {
                 if (allowsAuthentication && NS_HAS_PERMISSION_ERROR(setResourceError)) {
                     attemptedAuthentication = YES;
-                    return [self removeXAttrWithAuthentication:APPLE_QUARANTINE_IDENTIFIER fromRootURL:rootURL error:error];
+                    removedQuarantine = [self removeXAttrWithAuthentication:APPLE_QUARANTINE_IDENTIFIER fromRootURL:rootURL error:error];
                 } else {
-                    // Make sure we haven't already run into an error
-                    if (success && error != NULL) {
-                        *error = setResourceError;
+                    if (success != NULL) {
+                        // Make sure we haven't already run into an error
+                        if (*success && error != NULL) {
+                            *error = setResourceError;
+                        }
+                        // Fail, but still try to release other items from quarantine
+                        *success = NO;
                     }
-                    // Fail, but still try to release other items from quarantine
-                    success = NO;
                 }
             }
         }
@@ -235,32 +265,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         }
         
         return attemptedAuthentication;
-    };
-    
-    BOOL releasedRootQuarantine = NO;
-    if (releasingQuarantineRequiredAuthentication(rootURL, &releasedRootQuarantine)) {
-        return releasedRootQuarantine;
-    }
-    
-    // Only recurse if it's actually a directory.  Don't recurse into a
-    // root-level symbolic link.
-    NSDictionary *rootAttributes = [_fileManager attributesOfItemAtPath:rootURL.path error:nil];
-    NSString *rootType = rootAttributes[NSFileType];
-    
-    if (rootType == NSFileTypeDirectory) {
-        // The NSDirectoryEnumerator will avoid recursing into any contained
-        // symbolic links, so no further type checks are needed.
-        NSDirectoryEnumerator *directoryEnumerator = [_fileManager enumeratorAtURL:rootURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
-        
-        for (NSURL *file in directoryEnumerator) {
-            BOOL releasedQuarantine = NO;
-            if (releasingQuarantineRequiredAuthentication(file, &releasedQuarantine)) {
-                return releasedQuarantine;
-            }
-        }
-    }
-    
-    return success;
+    }];
 }
 
 // Ordinarily, the quarantine is managed by calling LSSetItemAttribute
@@ -274,28 +279,28 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 - (BOOL)releaseItemUsingOldMethodFromQuarantineAtRootURL:(NSURL *)rootURL allowingAuthentication:(BOOL)allowsAuthentication error:(NSError *__autoreleasing *)error
 {
-    __block BOOL success = YES;
-    NSString *root = rootURL.path;
-    const int removeXAttrOptions = XATTR_NOFOLLOW;
+    static const int removeXAttrOptions = XATTR_NOFOLLOW;
     
-    BOOL (^releasingQuarantineRequiredAuthentication)(NSString *, BOOL *) = ^(NSString *path, BOOL *didReleaseQuarantine){
+    return [self releaseItemFromQuarantineAtRootURL:rootURL usingMethod:^BOOL(NSURL *fileURL, BOOL *didReleaseQuarantine, BOOL *success) {
         BOOL removedQuarantine = NO;
         BOOL attemptedAuthentication = NO;
         
-        if ([self getXAttr:APPLE_QUARANTINE_IDENTIFIER fromFile:path options:removeXAttrOptions] >= 0) {
-            if ([self removeXAttr:APPLE_QUARANTINE_IDENTIFIER fromFile:path options:removeXAttrOptions] == 0) {
+        if ([self getXAttr:APPLE_QUARANTINE_IDENTIFIER fromFile:fileURL.path options:removeXAttrOptions] >= 0) {
+            if ([self removeXAttr:APPLE_QUARANTINE_IDENTIFIER fromFile:fileURL.path options:removeXAttrOptions] == 0) {
                 removedQuarantine = YES;
             } else {
                 if (allowsAuthentication && errno == EACCES) {
                     attemptedAuthentication = YES;
                     removedQuarantine = [self removeXAttrWithAuthentication:APPLE_QUARANTINE_IDENTIFIER fromRootURL:rootURL error:error];
                 } else {
-                    // Make sure we haven't already run into an error
-                    if (success && error != NULL) {
-                        *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove file quarantine on %@.", path.lastPathComponent] }];
+                    if (success != NULL) {
+                        // Make sure we haven't already run into an error
+                        if (*success && error != NULL) {
+                            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove file quarantine on %@.", fileURL.lastPathComponent] }];
+                        }
+                        // Fail, but still try to release other items from quarantine
+                        *success = NO;
                     }
-                    // Fail, but still try to release other items from quarantine
-                    success = NO;
                 }
             }
         }
@@ -305,34 +310,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         }
         
         return attemptedAuthentication;
-    };
-    
-    BOOL releasedRootQuarantine = NO;
-    if (releasingQuarantineRequiredAuthentication(root, &releasedRootQuarantine)) {
-        return releasedRootQuarantine;
-    }
-    
-    // Only recurse if it's actually a directory.  Don't recurse into a
-    // root-level symbolic link.
-    NSDictionary *rootAttributes = [_fileManager attributesOfItemAtPath:root error:nil];
-    NSString *rootType = rootAttributes[NSFileType];
-    
-    if ([rootType isEqualToString:NSFileTypeDirectory]) {
-        // The NSDirectoryEnumerator will avoid recursing into any contained
-        // symbolic links, so no further type checks are needed.
-        NSDirectoryEnumerator *directoryEnumerator = [_fileManager enumeratorAtPath:root];
-        NSString *file = nil;
-        while ((file = [directoryEnumerator nextObject])) {
-            NSString *filePath = [root stringByAppendingPathComponent:file];
-            
-            BOOL releasedQuarantine = NO;
-            if (releasingQuarantineRequiredAuthentication(filePath, &releasedQuarantine)) {
-                return releasedQuarantine;
-            }
-        }
-    }
-    
-    return success;
+    }];
 }
 
 - (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError * __autoreleasing *)error
