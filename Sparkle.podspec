@@ -21,6 +21,9 @@ Pod::Spec.new do |s|
   s.public_header_files = 'Sparkle.framework/Versions/A/Headers/*.h'
   s.vendored_framework  = 'Sparkle.framework'
   s.resources           = 'Sparkle.framework'
-  s.xcconfig            = { 'FRAMEWORK_SEARCH_PATHS' => '"${PODS_ROOT}/Sparkle"' }
+  s.xcconfig            = {
+    'FRAMEWORK_SEARCH_PATHS' => '"${PODS_ROOT}/Sparkle"',
+    'LD_RUNPATH_SEARCH_PATHS' => '@loader_path/../Frameworks'
+  }
   s.requires_arc        = true
 end
