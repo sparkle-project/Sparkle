@@ -462,6 +462,8 @@
 		14950074195FDF5900BC5B5B /* SUUpdaterTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterTest.m; sourceTree = "<group>"; usesTabs = 0; };
 		14958C6B19AEBC530061B14F /* signed-test-file.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "signed-test-file.txt"; sourceTree = "<group>"; };
 		14958C6C19AEBC610061B14F /* test-pubkey.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "test-pubkey.pem"; sourceTree = "<group>"; };
+		149B78631B7D3A0C00D7D62C /* ConfigCommonCoverage.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigCommonCoverage.xcconfig; sourceTree = "<group>"; };
+		149B78641B7D3A4800D7D62C /* ConfigUnitTestCoverage.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUnitTestCoverage.xcconfig; sourceTree = "<group>"; };
 		331726601B4ABABD008B2D77 /* libDMCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libDMCore.a; path = External/libDMCore.a; sourceTree = "<group>"; };
 		3317266B1B4BDE4F008B2D77 /* SUUpdaterQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdaterQueue.h; sourceTree = "<group>"; };
 		3317266C1B4BDE4F008B2D77 /* SUUpdaterQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterQueue.m; sourceTree = "<group>"; };
@@ -478,8 +480,6 @@
 		33545B7C1B46774D0059250D /* SUXPCInstaller.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SUXPCInstaller.m; sourceTree = "<group>"; };
 		33545B811B4679080059250D /* com.devmate.UpdateInstaller.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = com.devmate.UpdateInstaller.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		33545B9B1B469BE60059250D /* Sparkle Test App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Sparkle Test App.entitlements"; sourceTree = "<group>"; };
-		149B78631B7D3A0C00D7D62C /* ConfigCommonCoverage.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigCommonCoverage.xcconfig; sourceTree = "<group>"; };
-		149B78641B7D3A4800D7D62C /* ConfigUnitTestCoverage.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUnitTestCoverage.xcconfig; sourceTree = "<group>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
 		4607BEA21948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		4607BEA31948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nb; path = nb.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
@@ -2205,6 +2205,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 149B78631B7D3A0C00D7D62C /* ConfigCommonCoverage.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
 			};
 			name = Coverage;
 		};
@@ -2287,6 +2288,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CF0D94A70100DD942E /* ConfigCommonDebug.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
 			};
 			name = Debug;
 		};
@@ -2294,12 +2296,14 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Developer ID Application";
 			};
 			name = Release;
 		};
 		3317267A1B4D36F2008B2D77 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
 				CONTENTS_FOLDER_PATH = "$(FULL_PRODUCT_NAME)";
 				PRODUCT_NAME = DevMateSparkle_Resources;
 				WRAPPER_SUFFIX = "";
@@ -2309,6 +2313,7 @@
 		3317267B1B4D36F2008B2D77 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
 				CONTENTS_FOLDER_PATH = "$(FULL_PRODUCT_NAME)";
 				PRODUCT_NAME = DevMateSparkle_Resources;
 				WRAPPER_SUFFIX = "";
@@ -2318,6 +2323,7 @@
 		331726A91B4D5F28008B2D77 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = Sparkle/DevMateSparkle.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -2331,6 +2337,7 @@
 		331726AA1B4D5F28008B2D77 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = Sparkle/DevMateSparkle.pch;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -2344,7 +2351,6 @@
 		33545B8F1B4679080059250D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
 				GCC_PREFIX_HEADER = "Sparkle/Installation XPC Service/install_service.pch";
 				INFOPLIST_FILE = "Sparkle/Installation XPC Service/SandboxService.plist";
 				PRODUCT_NAME = com.devmate.UpdateInstaller;
@@ -2354,12 +2360,34 @@
 		33545B901B4679080059250D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer";
 				GCC_PREFIX_HEADER = "Sparkle/Installation XPC Service/install_service.pch";
 				INFOPLIST_FILE = "Sparkle/Installation XPC Service/SandboxService.plist";
 				PRODUCT_NAME = com.devmate.UpdateInstaller;
 			};
 			name = Release;
+		};
+		33E0CFB81B835C99003B201B /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "Installation XPC Service";
+			};
+			name = Coverage;
+		};
+		33E0CFB91B835C99003B201B /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				PRODUCT_NAME = DevMateSparkle_lib_resources;
+			};
+			name = Coverage;
+		};
+		33E0CFBA1B835C99003B201B /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				PRODUCT_NAME = DevMateSparkle_lib;
+			};
+			name = Coverage;
 		};
 		55C14BBB136EEF1500649790 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -2407,7 +2435,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer: Dmytro Tretiakov (425KC2B4DX)";
 			};
 			name = Debug;
 		};
@@ -2415,7 +2442,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "Mac Developer: Dmytro Tretiakov (425KC2B4DX)";
 			};
 			name = Release;
 		};
@@ -2477,6 +2503,7 @@
 			buildConfigurations = (
 				3317267A1B4D36F2008B2D77 /* Debug */,
 				3317267B1B4D36F2008B2D77 /* Release */,
+				33E0CFB91B835C99003B201B /* Coverage */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2486,6 +2513,7 @@
 			buildConfigurations = (
 				331726A91B4D5F28008B2D77 /* Debug */,
 				331726AA1B4D5F28008B2D77 /* Release */,
+				33E0CFBA1B835C99003B201B /* Coverage */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2495,6 +2523,7 @@
 			buildConfigurations = (
 				33545B8F1B4679080059250D /* Debug */,
 				33545B901B4679080059250D /* Release */,
+				33E0CFB81B835C99003B201B /* Coverage */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
