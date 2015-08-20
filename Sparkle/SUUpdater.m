@@ -480,7 +480,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     }
     if (0 == appcastString.length)
     {
-        appcastString = [NSString stringWithFormat:@"http://updates.devmate.com/%@.xml", self.hostBundle.bundleIdentifier];
+        appcastString = [NSString stringWithFormat:@"https://updates.devmate.com/%@.xml", self.hostBundle.bundleIdentifier];
     }
     
     if (!appcastString) // Can't find an appcast string!
