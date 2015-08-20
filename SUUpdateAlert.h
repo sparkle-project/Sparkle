@@ -23,7 +23,12 @@ typedef enum
 } SUUpdateAlertChoice;
 
 @class WebView, SUAppcastItem, SUHost;
-@interface SUUpdateAlert : SUWindowController<WebFrameLoadDelegate, WebPolicyDelegate> {
+
+@interface SUUpdateAlert : SUWindowController
+#ifdef __MAC_10_11
+<WebFrameLoadDelegate, WebPolicyDelegate>
+#endif
+{
 	SUAppcastItem *updateItem;
 	SUHost *host;
 	id delegate;
