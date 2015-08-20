@@ -13,7 +13,6 @@
 #import "SUUpdateAlert.h"
 
 #import "SUHost.h"
-#import <WebKit/WebKit.h>
 
 #import "SUConstants.h"
 
