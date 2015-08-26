@@ -63,7 +63,11 @@ void SULog(NSString *format, ...)
     va_list ap;
     va_start(ap, format);
     NSString *theStr = [[NSString alloc] initWithFormat:format arguments:ap];
+    va_end(ap);
+
+#ifdef DEBUG
     NSLog(@"Sparkle: %@", theStr);
+#endif
 
     FILE *logfile = fopen([[SULogFilePath stringByExpandingTildeInPath] fileSystemRepresentation], "a");
     if (logfile) {
@@ -72,7 +76,6 @@ void SULog(NSString *format, ...)
         fwrite([theData bytes], 1, [theData length], logfile);
         fclose(logfile);
     }
-    va_end(ap);
 }
 
 

@@ -232,7 +232,7 @@ int main(int __unused argc, const char __unused *argv[])
         [connection setRootObject:appInstaller];
         if (![connection registerName:[NSString stringWithFormat:@"Sparkle-%@", [NSBundle bundleWithPath:appInstaller.hostPath].bundleIdentifier]])
         {
-            NSLog(@"%@ server: could not register server. Is one already running?\n", args.firstObject);
+            SULog(@"%@ server: could not register server. Is one already running?\n", args.firstObject);
         }
 
         [application setDelegate:appInstaller];
