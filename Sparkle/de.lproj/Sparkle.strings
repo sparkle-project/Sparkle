@@ -33,13 +33,13 @@
 
 "Cancel Update" = "Aktualisierung abbrechen";
 
-"Checking for updates..." = "Suche nach Aktualisierungen…";
+"Checking for updates..." = "Suche nach Aktualisierungen …";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "Aktualisierung wird heruntergeladen…";
+"Downloading update..." = "Aktualisierung wird heruntergeladen …";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "Aktualisierung entpacken…";
+"Extracting update..." = "Aktualisierung entpacken …";
 
 /* the unit for gigabytes */
 "GB" = "GB";
@@ -47,7 +47,7 @@
 "Install and Relaunch" = "Installieren und erneut starten";
 
 /* Take care not to overflow the status window. */
-"Installing update..." = "Aktualisierung installieren…";
+"Installing update..." = "Aktualisierung installieren …";
 
 /* the unit for kilobytes */
 "KB" = "KB";
@@ -72,4 +72,4 @@
 /* Alternative name for "Install" button if we have a paid update or other update
 	without a download but with a URL. */
 
-"Learn More..." = "Mehr über…";
+"Learn More..." = "Mehr über …";
