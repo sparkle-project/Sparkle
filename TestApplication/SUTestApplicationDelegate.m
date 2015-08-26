@@ -9,6 +9,13 @@
 #import "SUTestApplicationDelegate.h"
 #import "SUUpdateSettingsWindowController.h"
 
+#define MACROSTRING(x) #x
+#define NSSTRING_MACRO(x) @MACROSTRING(x)
+
+#ifndef CODE_SIGN_IDENTITY
+#define CODE_SIGN_IDENTITY
+#endif
+
 @interface SUTestApplicationDelegate ()
 
 @property (nonatomic) SUUpdateSettingsWindowController *updateSettingsWindowController;
@@ -22,6 +29,7 @@
 @synthesize serverTask = _serverTask;
 
 static NSString * const UPDATED_VERSION = @"2.0";
+static NSString * const CODE_SIGN_ID = NSSTRING_MACRO(CODE_SIGN_IDENTITY);
 
 - (void)applicationDidFinishLaunching:(NSNotification * __unused)notification
 {
@@ -90,6 +98,17 @@ static NSString * const UPDATED_VERSION = @"2.0";
     
     BOOL wroteInfoFile = [infoDictionary writeToURL:infoURL atomically:NO];
     assert(wroteInfoFile);
+    
+    if ([CODE_SIGN_ID length])
+    {
+        NSTask *codesignTask = [[NSTask alloc] init];
+        codesignTask.launchPath = @"/usr/bin/codesign";
+        codesignTask.arguments = @[@"-s", CODE_SIGN_ID, @"-fv", destinationBundleURL.path];
+        [codesignTask launch];
+        [codesignTask waitUntilExit];
+        
+        assert(codesignTask.terminationStatus == 0);
+    }
     
     // Change current working directory so web server knows where to list files
     BOOL changedCurrentWorkingDirectory = [fileManager changeCurrentDirectoryPath:serverDirectoryURL.path];
