@@ -259,69 +259,76 @@ CF_EXPORT CFDictionaryRef DMCopyHTTPRequestHeaders(CFBundleRef appBundle, CFData
  */
 - (BOOL)validateUpdateDownloadedToPath:(NSString *)downloadedPath extractedToPath:(NSString *)extractedPath DSASignature:(NSString *)DSASignature publicDSAKey:(NSString *)publicDSAKey
 {
-    BOOL isPackage = NO;
-    NSString *installSourcePath = [SUInstaller installSourcePathInUpdateFolder:extractedPath forHost:self.host isPackage:&isPackage isGuided:NULL];
-    if (installSourcePath == nil) {
-        SULog(@"No suitable install is found in the update. The update will be rejected.");
-        return NO;
-    }
+    BOOL isUpdateValid = NO;
     
-    // Modern packages are not distributed as bundles and are code signed differently than regular applications
-    if (isPackage) {
-        BOOL packageValidated = [SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey];
-
-        if (!packageValidated) {
-            SULog(@"DSA signature validation of the package failed. The update will be rejected.");
+    do
+    {
+        BOOL isPackage = NO;
+        NSString *installSourcePath = [SUInstaller installSourcePathInUpdateFolder:extractedPath forHost:self.host isPackage:&isPackage isGuided:NULL];
+        if (installSourcePath == nil)
+        {
+            SULog(@"No suitable install is found in the update. The update will be rejected.");
+            break;
+        }
+    
+        // Modern packages are not distributed as bundles and are code signed differently than regular applications
+        if (isPackage)
+        {
+            isUpdateValid = [SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey];
+            if (!isUpdateValid)
+            {
+                SULog(@"DSA signature validation of the package failed. The update will be rejected.");
+            }
+            
+            break;
+        }
+    
+        NSBundle *newBundle = [NSBundle bundleWithPath:installSourcePath];
+        if (newBundle == nil)
+        {
+            SULog(@"No suitable bundle is found in the update. The update will be rejected.");
+            break;
+        }
+    
+        // Check Code Signing equality
+        NSError *error = nil;
+        BOOL updateIsCodeSigned = [SUCodeSigningVerifier applicationAtPathIsCodeSigned:installSourcePath];
+        updateIsCodeSigned = updateIsCodeSigned && [SUCodeSigningVerifier codeSignatureIsValidAtPath:installSourcePath error:&error];
+        if (!updateIsCodeSigned)
+        {
+            SULog(@"Update has no valid Code Signing (%ld - %@)", error.code, error.localizedDescription);
         }
         
-        return packageValidated;
-    }
-    
-    NSBundle *newBundle = [NSBundle bundleWithPath:installSourcePath];
-    if (newBundle == nil) {
-        SULog(@"No suitable bundle is found in the update. The update will be rejected.");
-        return NO;
-    }
-    
-    SUHost *newHost = [[SUHost alloc] initWithBundle:newBundle];
-    NSString *newPublicDSAKey = newHost.publicDSAKey;
-    
-    BOOL dsaKeysMatch = (publicDSAKey == nil || newPublicDSAKey == nil) ? NO : [publicDSAKey isEqualToString:newPublicDSAKey];
-    
-    if (newPublicDSAKey != nil) {
-        if (![SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:newPublicDSAKey]) {
-            SULog(@"DSA signature validation failed. The update has a public DSA key and is signed with a DSA key, but the %@ doesn't match the signature. The update will be rejected.",
-                  dsaKeysMatch ? @"public key" : @"new public key shipped with the update");
-            return NO;
+        BOOL shouldCheckCodeSignEquality = updateIsCodeSigned ? [SUCodeSigningVerifier hostApplicationIsCodeSigned] : NO;
+        if (shouldCheckCodeSignEquality && [SUCodeSigningVerifier codeSignatureMatchesHostAndIsValidAtPath:installSourcePath error:&error])
+        {
+            isUpdateValid = YES;
+            break;
         }
-    }
-    
-    BOOL updateIsCodeSigned = [SUCodeSigningVerifier applicationAtPathIsCodeSigned:installSourcePath];
-
-    if (dsaKeysMatch) {
-        NSError *error = nil;
-        if (updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtPath:installSourcePath error:&error]) {
-            SULog(@"The update archive has a valid DSA signature, but the app is also signed with Code Signing, which is corrupted: %@. The update will be rejected.", error);
-            return NO;
+        else
+        {
+            SULog(@"Code signatures differs in application and update (%ld - %@)", error.code, error.localizedDescription);
         }
-    } else {
-        BOOL hostIsCodeSigned = [SUCodeSigningVerifier hostApplicationIsCodeSigned];
-
-        NSString *dsaStatus = newPublicDSAKey ? @"has a new DSA key that doesn't match the previous one" : (publicDSAKey ? @"removes the DSA key" : @"isn't signed with a DSA key");
-        if (!hostIsCodeSigned || !updateIsCodeSigned) {
-            NSString *acsStatus = !hostIsCodeSigned ? @"old app hasn't been signed with app Code Signing" : @"new app isn't signed with app Code Signing";
-            SULog(@"The update archive %@, and the %@. At least one method of signature verification must be valid. The update will be rejected.", dsaStatus, acsStatus);
-            return NO;
+    
+        // Check DSA signature
+        SUHost *newHost = [[SUHost alloc] initWithBundle:newBundle];
+        NSString *newPublicDSAKey = newHost.publicDSAKey;
+        
+        BOOL dsaKeysMatch = (publicDSAKey == nil || newPublicDSAKey == nil) ? NO : [publicDSAKey isEqualToString:newPublicDSAKey];
+        if (!dsaKeysMatch)
+        {
+            SULog(@"DSA keys are different for update and application.");
         }
 
-        NSError *error = nil;
-        if (![SUCodeSigningVerifier codeSignatureMatchesHostAndIsValidAtPath:installSourcePath error:&error]) {
-            SULog(@"The update archive %@, and the app is signed with a new Code Signing identity that doesn't match code signing of the original app: %@. At least one method of signature verification must be valid. The update will be rejected.", dsaStatus, error);
-            return NO;
+        isUpdateValid = dsaKeysMatch && [SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:newPublicDSAKey];
+        if (!isUpdateValid)
+        {
+            SULog(@"DSA signature validation failed. The update has a public DSA key and is signed with a DSA key, but the %@ doesn't match the signature. The update will be rejected.", dsaKeysMatch ? @"public key" : @"new public key shipped with the update");
         }
     }
-
-    return YES;
+    while (NO);
+    
+    return isUpdateValid;
 }
 
 - (void)downloadDidFinish:(NSURLDownload *)__unused d
