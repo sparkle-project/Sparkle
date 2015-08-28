@@ -1,5 +1,4 @@
-# Xcode
-build/*
+build/
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -8,11 +7,30 @@ build/*
 !default.mode2v3
 *.perspectivev3
 !default.perspectivev3
-*.xcworkspace
-!default.xcworkspace
-xcuserdata/
-profile
+xcuserdata
+*.xccheckout
 *.moved-aside
+DerivedData
+*.xcuserstate
 
-## Ignore incredibly annoying .DS_Store files
 .DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk

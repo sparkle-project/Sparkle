@@ -1,5 +1,4 @@
-#include "ConfigCommon.xcconfig"
-#include "ConfigCommonDebug.xcconfig"
 #include "ConfigFramework.xcconfig"
 
-OTHER_CFLAGS = -DDEBUG
+// Unit tests need access to non-public classes
+GCC_SYMBOLS_PRIVATE_EXTERN = NO

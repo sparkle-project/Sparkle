@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0610"
+   LastUpgradeVersion = "0640"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "33C7DDF019DB0333009887CD"
+               BlueprintIdentifier = "331726961B4D5F27008B2D77"
                BuildableName = "libDevMateSparkle.a"
                BlueprintName = "DevMateSparkle_lib"
                ReferencedContainer = "container:Sparkle.xcodeproj">
@@ -28,9 +28,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "33C7DDFA19DB0333009887CD"
-               BuildableName = "Sparkle_libTests.xctest"
-               BlueprintName = "Sparkle_libTests"
+               BlueprintIdentifier = "331726A01B4D5F27008B2D77"
+               BuildableName = "DevMateSparkle_libTests.xctest"
+               BlueprintName = "DevMateSparkle_libTests"
                ReferencedContainer = "container:Sparkle.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -42,21 +42,11 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "33C7DDFA19DB0333009887CD"
-               BuildableName = "Sparkle_libTests.xctest"
-               BlueprintName = "Sparkle_libTests"
-               ReferencedContainer = "container:Sparkle.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "33C7DDF019DB0333009887CD"
+            BlueprintIdentifier = "331726961B4D5F27008B2D77"
             BuildableName = "libDevMateSparkle.a"
             BlueprintName = "DevMateSparkle_lib"
             ReferencedContainer = "container:Sparkle.xcodeproj">
@@ -75,7 +65,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "33C7DDF019DB0333009887CD"
+            BlueprintIdentifier = "331726961B4D5F27008B2D77"
             BuildableName = "libDevMateSparkle.a"
             BlueprintName = "DevMateSparkle_lib"
             ReferencedContainer = "container:Sparkle.xcodeproj">
@@ -93,7 +83,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "33C7DDF019DB0333009887CD"
+            BlueprintIdentifier = "331726961B4D5F27008B2D77"
             BuildableName = "libDevMateSparkle.a"
             BlueprintName = "DevMateSparkle_lib"
             ReferencedContainer = "container:Sparkle.xcodeproj">
