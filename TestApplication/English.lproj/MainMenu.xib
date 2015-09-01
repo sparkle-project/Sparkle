@@ -1,131 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="5037.3" systemVersion="13C44" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
         <development version="5000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="5037.3"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="NSApplication"/>
+        <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
+            <connections>
+                <outlet property="delegate" destination="iTs-bN-9SB" id="w0I-XO-wWG"/>
+            </connections>
+        </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application"/>
-        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="21" userLabel="Window">
-            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
-            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="447" y="824" width="313" height="173"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1028"/>
-            <value key="minSize" type="size" width="213" height="107"/>
-            <view key="contentView" id="2">
-                <rect key="frame" x="0.0" y="0.0" width="313" height="173"/>
-                <autoresizingMask key="autoresizingMask"/>
-                <subviews>
-                    <button id="210">
-                        <rect key="frame" x="21" y="112" width="225" height="18"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="check" title="Automatically check for updates" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="248">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <binding destination="206" name="value" keyPath="automaticallyChecksForUpdates" id="257"/>
-                        </connections>
-                    </button>
-                    <button id="216">
-                        <rect key="frame" x="21" y="92" width="228" height="18"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="check" title="Automatically download updates" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="249">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <binding destination="206" name="value" keyPath="automaticallyDownloadsUpdates" id="259"/>
-                        </connections>
-                    </button>
-                    <button id="220">
-                        <rect key="frame" x="21" y="72" width="224" height="18"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="check" title="Send system profile information" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="250">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <binding destination="206" name="value" keyPath="sendsSystemProfile" id="261"/>
-                        </connections>
-                    </button>
-                    <button id="222">
-                        <rect key="frame" x="21" y="52" width="152" height="18"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="check" title="Has launched before" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="251">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <binding destination="212" name="value" keyPath="values.SUHasLaunchedBefore" id="225"/>
-                        </connections>
-                    </button>
-                    <textField verticalHuggingPriority="750" id="227">
-                        <rect key="frame" x="20" y="136" width="106" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Debug options:" id="252">
-                            <font key="font" metaFont="systemBold"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <textField verticalHuggingPriority="750" id="238">
-                        <rect key="frame" x="17" y="20" width="157" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Check for updates every" id="253">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <textField verticalHuggingPriority="750" id="242">
-                        <rect key="frame" x="240" y="20" width="56" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="seconds" id="255">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <textField verticalHuggingPriority="750" id="240">
-                        <rect key="frame" x="179" y="18" width="56" height="22"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="254">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                        <connections>
-                            <binding destination="206" name="value" keyPath="updateCheckInterval" id="263"/>
-                        </connections>
-                    </textField>
-                </subviews>
-            </view>
-        </window>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <menu title="MainMenu" systemMenu="main" id="29" userLabel="MainMenu">
             <items>
-                <menuItem title="NewApplication" id="56">
-                    <menu key="submenu" title="NewApplication" systemMenu="apple" id="57">
+                <menuItem title="Sparkle Test App" id="56">
+                    <menu key="submenu" title="Sparkle Test App" systemMenu="apple" id="57">
                         <items>
-                            <menuItem title="About NewApplication" id="58">
+                            <menuItem title="About Sparkle Test App" id="58">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="orderFrontStandardAboutPanel:" target="-2" id="142"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Check for Updates..." keyEquivalent="u" id="207">
+                            <menuItem title="Check for Updates…" keyEquivalent="u" id="207">
                                 <connections>
-                                    <action selector="checkForUpdates:" target="206" id="208"/>
+                                    <action selector="checkForUpdates:" target="-1" id="yqv-bK-pBA"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="196">
-                                <modifierMask key="keyEquivalentModifierMask" command="YES"/>
-                            </menuItem>
-                            <menuItem title="Preferences…" keyEquivalent="," id="129"/>
-                            <menuItem isSeparatorItem="YES" id="143">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
                             <menuItem title="Services" id="131">
@@ -134,7 +38,7 @@
                             <menuItem isSeparatorItem="YES" id="144">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Hide NewApplication" keyEquivalent="h" id="134">
+                            <menuItem title="Hide Sparkle Test App" keyEquivalent="h" id="134">
                                 <connections>
                                     <action selector="hide:" target="-2" id="152"/>
                                 </connections>
@@ -153,7 +57,7 @@
                             <menuItem isSeparatorItem="YES" id="149">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Quit NewApplication" keyEquivalent="q" id="136">
+                            <menuItem title="Quit Sparkle Test App" keyEquivalent="q" id="136">
                                 <connections>
                                     <action selector="terminate:" target="-2" id="139"/>
                                 </connections>
@@ -338,7 +242,7 @@
                 <menuItem title="Help" id="103">
                     <menu key="submenu" title="Help" id="106">
                         <items>
-                            <menuItem title="NewApplication Help" keyEquivalent="?" id="111">
+                            <menuItem title="Sparkle Test App Help" keyEquivalent="?" id="111">
                                 <connections>
                                     <action selector="showHelp:" target="-1" id="122"/>
                                 </connections>
@@ -348,7 +252,6 @@
                 </menuItem>
             </items>
         </menu>
-        <customObject id="206" userLabel="SUUpdater" customClass="SUUpdater"/>
-        <userDefaultsController representsSharedInstance="YES" id="212" userLabel="Shared User Defaults Controller"/>
+        <customObject id="iTs-bN-9SB" customClass="SUTestApplicationDelegate"/>
     </objects>
 </document>

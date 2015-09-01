@@ -128,9 +128,7 @@
 
 - (NSString *)localizedStringFromByteCount:(long long)value
 {
-    SInt32 minor = 0;
-    Gestalt(gestaltSystemVersionMinor, &minor);
-    if (minor < 8) {
+    if (SUHost.operatingSystemVersion.minorVersion < 8) {
         if (value < 1000) {
             return [NSString stringWithFormat:@"%.0lf %@", value / 1.0,
                     SULocalizedString(@"B", @"the unit for bytes")];

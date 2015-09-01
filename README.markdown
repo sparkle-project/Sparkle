@@ -1,4 +1,4 @@
-# Sparkle [![Build Status](https://travis-ci.org/sparkle-project/Sparkle.svg?branch=master)](https://travis-ci.org/sparkle-project/Sparkle) <a href='https://app.ship.io/dashboard#/jobs/8814/history' target='_blank'><img src='https://app.ship.io/jobs/V3PoCLcN5ft5Pnq0/build_status.png' height='20' /></a>
+# Sparkle [![Build Status](https://travis-ci.org/sparkle-project/Sparkle.svg?branch=master)](https://travis-ci.org/sparkle-project/Sparkle) <a href='https://app.ship.io/dashboard#/jobs/8814/history' target='_blank'><img src='https://app.ship.io/jobs/V3PoCLcN5ft5Pnq0/build_status.png' height='20' /></a> [![Coverage Status](https://coveralls.io/repos/sparkle-project/Sparkle/badge.svg?branch=master&service=github)](https://coveralls.io/github/sparkle-project/Sparkle?branch=master)
 
 An easy-to-use software update framework for Cocoa developers.
 

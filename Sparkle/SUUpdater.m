@@ -111,6 +111,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         BOOL hasPublicDSAKey = [host publicDSAKey] != nil;
         BOOL isMainBundle = [bundle isEqualTo:[NSBundle mainBundle]];
         BOOL hostIsCodeSigned = [SUCodeSigningVerifier hostApplicationIsCodeSigned];
+        BOOL servingOverHttps = [[[[self feedURL] scheme] lowercaseString] isEqualToString:@"https"];
         if (!isMainBundle && !hasPublicDSAKey) {
             [self notifyWillShowModalAlert];
             NSAlert *alert = [[NSAlert alloc] init];
@@ -125,6 +126,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
             alert.informativeText = @"For security reasons, you need to code sign your application or sign your updates with a DSA key. See Sparkle's documentation for more information.";
             [alert runModal];
             [self notifyDidShowModalAlert];
+        } else if (isMainBundle && !hasPublicDSAKey && !servingOverHttps) {
+            SULog(@"WARNING: Serving updates over http without signing them with a DSA key is deprecated and may not be possible in a future release. Please serve your updates over https, or sign them with a DSA key, or do both. See Sparkle's documentation for more information.");
         }
 
         // This runs the permission prompt if needed, but never before the app has finished launching because the runloop won't run before that

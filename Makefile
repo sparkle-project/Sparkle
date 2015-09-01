@@ -23,7 +23,7 @@ test:
 ci:
 	for i in {7..11} ; do \
 		if xcrun --sdk "macosx10.$$i" --show-sdk-path 2> /dev/null ; then \
-			xcodebuild -sdk "macosx10.$$i" -scheme Distribution -configuration Debug test ; \
+			( rm -rf build && xcodebuild -sdk "macosx10.$$i" -scheme Distribution -configuration Coverage -derivedDataPath build test ) || exit 1 ; \
 		fi ; \
 	done
 
