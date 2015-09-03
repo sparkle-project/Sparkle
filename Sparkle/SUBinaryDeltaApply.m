@@ -114,7 +114,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     
     NSString *beforeHash = hashOfTreeWithVersion(source, majorDiffVersion);
     if (!beforeHash) {
-        if (verbose) fprintf(stderr, "\n");
+        if (verbose) {
+            fprintf(stderr, "\n");
+        }
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to calculate hash of tree %@", source] }];
         }
@@ -122,7 +124,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     }
 
     if (![beforeHash isEqualToString:expectedBeforeHash]) {
-        if (verbose) fprintf(stderr, "\n");
+        if (verbose) {
+            fprintf(stderr, "\n");
+        }
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source doesn't have expected hash (%@ != %@).  Giving up.", expectedBeforeHash, beforeHash] }];
         }
@@ -134,14 +138,18 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     }
     
     if (!removeTree(destination)) {
-        if (verbose) fprintf(stderr, "\n");
+        if (verbose) {
+            fprintf(stderr, "\n");
+        }
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove %@", destination] }];
         }
         return NO;
     }
     if (!copyTree(source, destination)) {
-        if (verbose) fprintf(stderr, "\n");
+        if (verbose) {
+            fprintf(stderr, "\n");
+        }
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to copy %@ to %@", source, destination] }];
         }
@@ -169,7 +177,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         if (!xar_prop_get(file, DELETE_KEY, &value) ||
             (!hasExtractKeyAvailable && !xar_prop_get(file, DELETE_THEN_EXTRACT_OLD_KEY, &value))) {
             if (!removeTree(destinationFilePath)) {
-                if (verbose) fprintf(stderr, "\n");
+                if (verbose) {
+                    fprintf(stderr, "\n");
+                }
                 if (error != NULL) {
                     *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"%@ or %@: failed to remove %@", @DELETE_KEY, @DELETE_THEN_EXTRACT_OLD_KEY, destination] }];
                 }
@@ -187,7 +197,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
 
         if (!xar_prop_get(file, BINARY_DELTA_KEY, &value)) {
             if (!applyBinaryDeltaToFile(x, file, sourceFilePath, destinationFilePath)) {
-                if (verbose) fprintf(stderr, "\n");
+                if (verbose) {
+                    fprintf(stderr, "\n");
+                }
                 if (error != NULL) {
                     *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to patch %@ to destination %@", sourceFilePath, destinationFilePath] }];
                 }
@@ -201,7 +213,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                    (!hasExtractKeyAvailable && xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value))) { // extract and permission modifications don't coexist
             
             if (xar_extract_tofile(x, file, [destinationFilePath fileSystemRepresentation]) != 0) {
-                if (verbose) fprintf(stderr, "\n");
+                if (verbose) {
+                    fprintf(stderr, "\n");
+                }
                 if (error != NULL) {
                     *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to extract file to %@", destinationFilePath] }];
                 }
@@ -222,7 +236,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         if (!xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value)) {
             mode_t mode = (mode_t)[[NSString stringWithUTF8String:value] intValue];
             if (!modifyPermissions(destinationFilePath, mode)) {
-                if (verbose) fprintf(stderr, "\n");
+                if (verbose) {
+                    fprintf(stderr, "\n");
+                }
                 if (error != NULL) {
                     *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteNoPermissionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to modify permissions (%@) on file %@", @(value), destinationFilePath] }];
                 }
@@ -241,7 +257,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     }
     NSString *afterHash = hashOfTreeWithVersion(destination, majorDiffVersion);
     if (!afterHash) {
-        if (verbose) fprintf(stderr, "\n");
+        if (verbose) {
+            fprintf(stderr, "\n");
+        }
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to calculate hash of tree %@", destination] }];
         }
@@ -249,7 +267,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     }
 
     if (![afterHash isEqualToString:expectedAfterHash]) {
-        if (verbose) fprintf(stderr, "\n");
+        if (verbose) {
+            fprintf(stderr, "\n");
+        }
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination doesn't have expected hash (%@ != %@).  Giving up.", expectedAfterHash, afterHash] }];
         }
