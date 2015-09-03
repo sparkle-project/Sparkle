@@ -28,11 +28,11 @@ static void printUsage(NSString *programName)
     fprintf(stderr, "%s version [<patch-file>]\n", [programName UTF8String]);
 }
 
-static int runCreateCommand(NSString *programName, NSArray *args)
+static BOOL runCreateCommand(NSString *programName, NSArray *args)
 {
     if (args.count < 3 || args.count > 5) {
         printUsage(programName);
-        return 1;
+        return NO;
     }
     
     NSUInteger numberOflagsFound = 0;
@@ -54,7 +54,7 @@ static int runCreateCommand(NSString *programName, NSArray *args)
     
     if (args.count - numberOflagsFound < 3) {
         printUsage(programName);
-        return 1;
+        return NO;
     }
     
     BOOL verbose = (verboseIndex != NSNotFound);
@@ -65,7 +65,7 @@ static int runCreateCommand(NSString *programName, NSArray *args)
         versionComponents = [versionField componentsSeparatedByString:@"="];
         if (versionComponents.count != 2) {
             printUsage(programName);
-            return 1;
+            return NO;
         }
     }
     
@@ -73,6 +73,16 @@ static int runCreateCommand(NSString *programName, NSArray *args)
         !versionComponents ?
         LATEST_DELTA_DIFF_MAJOR_VERSION :
         (SUBinaryDeltaMajorVersion)[[versionComponents[1] componentsSeparatedByString:@"."][0] intValue]; // ignore minor version if provided
+    
+    if (patchVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {
+        fprintf(stderr, "Version provided (%u) is not valid\n", patchVersion);
+        return NO;
+    }
+    
+    if (patchVersion > LATEST_DELTA_DIFF_MAJOR_VERSION) {
+        fprintf(stderr, "This program is too old to create a version %u patch, or the version number provided is invalid\n", patchVersion);
+        return NO;
+    }
 
     NSMutableArray *fileArgs = [NSMutableArray array];
     for (NSString *argument in args) {
@@ -83,37 +93,43 @@ static int runCreateCommand(NSString *programName, NSArray *args)
     
     if (fileArgs.count != 3) {
         printUsage(programName);
-        return 1;
+        return NO;
     }
     
     BOOL isDirectory;
     if (![[NSFileManager defaultManager] fileExistsAtPath:fileArgs[0] isDirectory:&isDirectory] || !isDirectory) {
         printUsage(programName);
         fprintf(stderr, "Error: before-tree must be a directory\n");
-        return 1;
+        return NO;
     }
     
     if (![[NSFileManager defaultManager] fileExistsAtPath:fileArgs[1] isDirectory:&isDirectory] || !isDirectory) {
         printUsage(programName);
         fprintf(stderr, "Error: after-tree must be a directory\n");
-        return 1;
+        return NO;
     }
     
-    return createBinaryDelta(fileArgs[0], fileArgs[1], fileArgs[2], patchVersion, verbose);
+    NSError *createDiffError = nil;
+    if (!createBinaryDelta(fileArgs[0], fileArgs[1], fileArgs[2], patchVersion, verbose, &createDiffError)) {
+        fprintf(stderr, "%s\n", [createDiffError.localizedDescription UTF8String]);
+        return NO;
+    }
+    
+    return YES;
 }
 
-static int runApplyCommand(NSString *programName, NSArray *args)
+static BOOL runApplyCommand(NSString *programName, NSArray *args)
 {
     if (args.count < 3 || args.count > 4) {
         printUsage(programName);
-        return 1;
+        return NO;
     }
     
     BOOL verbose = [args containsObject:VERBOSE_FLAG];
     
     if (args.count == 4 && !verbose) {
         printUsage(programName);
-        return 1;
+        return NO;
     }
     
     NSMutableArray *fileArgs = [NSMutableArray array];
@@ -125,30 +141,36 @@ static int runApplyCommand(NSString *programName, NSArray *args)
     
     if (fileArgs.count != 3) {
         printUsage(programName);
-        return 1;
+        return NO;
     }
     
     BOOL isDirectory;
     if (![[NSFileManager defaultManager] fileExistsAtPath:fileArgs[0] isDirectory:&isDirectory] || !isDirectory) {
         printUsage(programName);
         fprintf(stderr, "Error: before-tree must be a directory\n");
-        return 1;
+        return NO;
     }
     
     if (![[NSFileManager defaultManager] fileExistsAtPath:fileArgs[2] isDirectory:&isDirectory] || isDirectory) {
         printUsage(programName);
         fprintf(stderr, "Error: patch-file must be a file %d\n", isDirectory);
-        return 1;
+        return NO;
     }
     
-    return applyBinaryDelta(fileArgs[0], fileArgs[1], fileArgs[2], verbose);
+    NSError *applyDiffError = nil;
+    if (!applyBinaryDelta(fileArgs[0], fileArgs[1], fileArgs[2], verbose, &applyDiffError)) {
+        fprintf(stderr, "%s\n", [applyDiffError.localizedDescription UTF8String]);
+        return NO;
+    }
+    
+    return YES;
 }
 
-static int runVersionCommand(NSString *programName, NSArray *args)
+static BOOL runVersionCommand(NSString *programName, NSArray *args)
 {
     if (args.count > 1) {
         printUsage(programName);
-        return 1;
+        return NO;
     }
     
     if (args.count == 0) {
@@ -158,7 +180,7 @@ static int runVersionCommand(NSString *programName, NSArray *args)
         xar_t x = xar_open([patchFile fileSystemRepresentation], READ);
         if (!x) {
             fprintf(stderr, "Unable to open patch %s\n", [patchFile fileSystemRepresentation]);
-            return 1;
+            return NO;
         }
         
         SUBinaryDeltaMajorVersion majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
@@ -184,7 +206,7 @@ static int runVersionCommand(NSString *programName, NSArray *args)
         fprintf(stdout, "%u.%u\n", majorDiffVersion, minorDiffVersion);
     }
     
-    return 0;
+    return YES;
 }
 
 int main(int __unused argc, char __unused *argv[])
@@ -201,7 +223,7 @@ int main(int __unused argc, char __unused *argv[])
         NSString *command = args[1];
         NSArray *commandArguments = [args subarrayWithRange:NSMakeRange(2, args.count - 2)];
         
-        int result;
+        BOOL result;
         if ([command isEqualToString:CREATE_COMMAND]) {
             result = runCreateCommand(programName, commandArguments);
         } else if ([command isEqualToString:APPLY_COMMAND]) {
@@ -209,10 +231,10 @@ int main(int __unused argc, char __unused *argv[])
         } else if ([command isEqualToString:VERSION_COMMAND] || [command isEqualToString:VERSION_ALTERNATE_COMMAND]) {
             result = runVersionCommand(programName, commandArguments);
         } else {
-            result = 1;
+            result = NO;
             printUsage(programName);
         }
         
-        return result;
+        return result ? 0 : 1;
     }
 }

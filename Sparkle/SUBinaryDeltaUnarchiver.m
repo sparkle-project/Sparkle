@@ -11,6 +11,7 @@
 #import "SUBinaryDeltaApply.h"
 #import "SUUnarchiver_Private.h"
 #import "SUHost.h"
+#import "SULog.h"
 #import "NTSynchronousTask.h"
 
 @implementation SUBinaryDeltaUnarchiver
@@ -26,13 +27,15 @@
         NSString *sourcePath = self.updateHostBundlePath;
         NSString *targetPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
 
-        int result = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO);
-		if (!result) {
+        NSError *applyDiffError = nil;
+        BOOL success = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO, &applyDiffError);
+		if (success) {
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[self notifyDelegateOfSuccess];
 			});
 		}
 		else {
+            SULog(@"Applying delta patch failed with error: %@", applyDiffError);
 			dispatch_async(dispatch_get_main_queue(), ^{
 				[self notifyDelegateOfFailure];
 			});
