@@ -103,13 +103,13 @@
 
     // Allow host bundle to provide a custom name
     name = [self objectForInfoDictionaryKey:@"SUBundleName"];
-    if (name && ![name isEqualToString:@""]) return name;
+    if (name && name.length > 0) return name;
 
     name = [self.bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
-	if (name && ![name isEqualToString:@""]) return name;
+	if (name && name.length > 0) return name;
 
     name = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey];
-	if (name && ![name isEqualToString:@""]) return name;
+	if (name && name.length > 0) return name;
 
     return [[[NSFileManager defaultManager] displayNameAtPath:[self.bundle bundlePath]] stringByDeletingPathExtension];
 }
