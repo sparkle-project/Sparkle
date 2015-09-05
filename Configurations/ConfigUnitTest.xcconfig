@@ -1,4 +1,5 @@
 // Unit Test only
+#include "ConfigUnitTestDeployment.xcconfig"
 
 INFOPLIST_FILE = Tests/SparkleTests-Info.plist
 WRAPPER_EXTENSION = xctest
