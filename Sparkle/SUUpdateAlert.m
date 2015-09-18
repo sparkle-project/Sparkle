@@ -178,7 +178,7 @@
     return allowAutoUpdates;
 }
 
-- (void)awakeFromNib
+- (void)windowDidLoad
 {
     BOOL showReleaseNotes = [self showsReleaseNotes];
 
