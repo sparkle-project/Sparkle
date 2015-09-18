@@ -25,12 +25,14 @@ static BOOL applyBinaryDeltaToFile(xar_t x, xar_file_t file, NSString *sourceFil
     return success;
 }
 
-int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, BOOL verbose)
+BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, BOOL verbose, NSError * __autoreleasing *error)
 {
     xar_t x = xar_open([patchFile fileSystemRepresentation], READ);
     if (!x) {
-        fprintf(stderr, "Unable to open %s. Giving up.\n", [patchFile fileSystemRepresentation]);
-        return 1;
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to open %@. Giving up.", patchFile] }];
+        }
+        return NO;
     }
     
     SUBinaryDeltaMajorVersion majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
@@ -80,13 +82,17 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
     }
     
     if (majorDiffVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {
-        fprintf(stderr, "Unable to identify diff-version %u in delta.  Giving up.\n", majorDiffVersion);
-        return 1;
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to identify diff-version %u in delta.  Giving up.", majorDiffVersion] }];
+        }
+        return NO;
     }
     
     if (majorDiffVersion > LATEST_DELTA_DIFF_MAJOR_VERSION) {
-        fprintf(stderr, "A later version is needed to apply this patch (on major version %u, but patch requests version %u).\n", LATEST_DELTA_DIFF_MAJOR_VERSION, majorDiffVersion);
-        return 1;
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"A later version is needed to apply this patch (on major version %u, but patch requests version %u).", LATEST_DELTA_DIFF_MAJOR_VERSION, majorDiffVersion] }];
+        }
+        return NO;
     }
     
     BOOL usesNewTreeHash = MAJOR_VERSION_IS_AT_LEAST(majorDiffVersion, SUBeigeMajorVersion);
@@ -95,8 +101,10 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
     NSString *expectedAfterHash = usesNewTreeHash ? expectedNewAfterHash : expectedAfterHashv1;
 
     if (!expectedBeforeHash || !expectedAfterHash) {
-        fprintf(stderr, "Unable to find before-sha1 or after-sha1 metadata in delta.  Giving up.\n");
-        return 1;
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:@{ NSLocalizedDescriptionKey: @"Unable to find before-sha1 or after-sha1 metadata in delta.  Giving up." }];
+        }
+        return NO;
     }
 
     if (verbose) {
@@ -106,13 +114,23 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
     
     NSString *beforeHash = hashOfTreeWithVersion(source, majorDiffVersion);
     if (!beforeHash) {
-        fprintf(stderr, "\nUnable to calculate hash of tree %s\n", [source fileSystemRepresentation]);
-        return 1;
+        if (verbose) {
+            fprintf(stderr, "\n");
+        }
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to calculate hash of tree %@", source] }];
+        }
+        return NO;
     }
 
     if (![beforeHash isEqualToString:expectedBeforeHash]) {
-        fprintf(stderr, "\nSource doesn't have expected hash (%s != %s).  Giving up.\n", [expectedBeforeHash UTF8String], [beforeHash UTF8String]);
-        return 1;
+        if (verbose) {
+            fprintf(stderr, "\n");
+        }
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source doesn't have expected hash (%@ != %@).  Giving up.", expectedBeforeHash, beforeHash] }];
+        }
+        return NO;
     }
 
     if (verbose) {
@@ -120,12 +138,22 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
     }
     
     if (!removeTree(destination)) {
-        fprintf(stderr, "\nFailed to remove %s\n", [destination fileSystemRepresentation]);
-        return 1;
+        if (verbose) {
+            fprintf(stderr, "\n");
+        }
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove %@", destination] }];
+        }
+        return NO;
     }
     if (!copyTree(source, destination)) {
-        fprintf(stderr, "\nFailed to copy %s to %s\n", [source fileSystemRepresentation], [destination fileSystemRepresentation]);
-        return 1;
+        if (verbose) {
+            fprintf(stderr, "\n");
+        }
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to copy %@ to %@", source, destination] }];
+        }
+        return NO;
     }
     
     BOOL hasExtractKeyAvailable = MAJOR_VERSION_IS_AT_LEAST(majorDiffVersion, SUBeigeMajorVersion);
@@ -149,8 +177,13 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
         if (!xar_prop_get(file, DELETE_KEY, &value) ||
             (!hasExtractKeyAvailable && !xar_prop_get(file, DELETE_THEN_EXTRACT_OLD_KEY, &value))) {
             if (!removeTree(destinationFilePath)) {
-                fprintf(stderr, "\n%s or %s: failed to remove %s\n", DELETE_KEY, DELETE_THEN_EXTRACT_OLD_KEY, [destination fileSystemRepresentation]);
-                return 1;
+                if (verbose) {
+                    fprintf(stderr, "\n");
+                }
+                if (error != NULL) {
+                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"%@ or %@: failed to remove %@", @DELETE_KEY, @DELETE_THEN_EXTRACT_OLD_KEY, destination] }];
+                }
+                return NO;
             }
             if (!hasExtractKeyAvailable && !xar_prop_get(file, DELETE_KEY, &value)) {
                 if (verbose) {
@@ -164,8 +197,13 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
 
         if (!xar_prop_get(file, BINARY_DELTA_KEY, &value)) {
             if (!applyBinaryDeltaToFile(x, file, sourceFilePath, destinationFilePath)) {
-                fprintf(stderr, "\nUnable to patch %s to destination %s\n", [sourceFilePath fileSystemRepresentation], [destinationFilePath fileSystemRepresentation]);
-                return 1;
+                if (verbose) {
+                    fprintf(stderr, "\n");
+                }
+                if (error != NULL) {
+                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to patch %@ to destination %@", sourceFilePath, destinationFilePath] }];
+                }
+                return NO;
             }
             
             if (verbose) {
@@ -175,8 +213,13 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
                    (!hasExtractKeyAvailable && xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value))) { // extract and permission modifications don't coexist
             
             if (xar_extract_tofile(x, file, [destinationFilePath fileSystemRepresentation]) != 0) {
-                fprintf(stderr, "\nUnable to extract file to %s\n", [destinationFilePath fileSystemRepresentation]);
-                return 1;
+                if (verbose) {
+                    fprintf(stderr, "\n");
+                }
+                if (error != NULL) {
+                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to extract file to %@", destinationFilePath] }];
+                }
+                return NO;
             }
             
             if (verbose) {
@@ -193,8 +236,13 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
         if (!xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value)) {
             mode_t mode = (mode_t)[[NSString stringWithUTF8String:value] intValue];
             if (!modifyPermissions(destinationFilePath, mode)) {
-                fprintf(stderr, "\nUnable to modify permissions (%s) on file %s\n", value, [destinationFilePath fileSystemRepresentation]);
-                return 1;
+                if (verbose) {
+                    fprintf(stderr, "\n");
+                }
+                if (error != NULL) {
+                    *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteNoPermissionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to modify permissions (%@) on file %@", @(value), destinationFilePath] }];
+                }
+                return NO;
             }
             
             if (verbose) {
@@ -209,18 +257,28 @@ int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFil
     }
     NSString *afterHash = hashOfTreeWithVersion(destination, majorDiffVersion);
     if (!afterHash) {
-        fprintf(stderr, "\nUnable to calculate hash of tree %s\n", [destination fileSystemRepresentation]);
-        return 1;
+        if (verbose) {
+            fprintf(stderr, "\n");
+        }
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to calculate hash of tree %@", destination] }];
+        }
+        return NO;
     }
 
     if (![afterHash isEqualToString:expectedAfterHash]) {
-        fprintf(stderr, "\nDestination doesn't have expected hash (%s != %s).  Giving up.\n", [expectedAfterHash UTF8String], [afterHash UTF8String]);
+        if (verbose) {
+            fprintf(stderr, "\n");
+        }
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination doesn't have expected hash (%@ != %@).  Giving up.", expectedAfterHash, afterHash] }];
+        }
         removeTree(destination);
-        return 1;
+        return NO;
     }
 
     if (verbose) {
         fprintf(stderr, "\nDone!\n");
     }
-    return 0;
+    return YES;
 }

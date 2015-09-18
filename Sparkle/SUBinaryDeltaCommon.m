@@ -145,7 +145,9 @@ NSData *hashOfFileContents(FTSENT *ent)
 NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
 {
     char pathBuffer[PATH_MAX] = {0};
-    [path getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)];
+    if (![path getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)]) {
+        return nil;
+    }
 
     char * const sourcePaths[] = {pathBuffer, 0};
     FTS *fts = fts_open(sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);

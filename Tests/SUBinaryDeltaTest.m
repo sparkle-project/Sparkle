@@ -58,14 +58,23 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
         beforeDiffHandler(fileManager, sourceDirectory, destinationDirectory);
     }
     
-    BOOL createdDiff =
-    (createBinaryDelta(sourceDirectory, destinationDirectory, diffFile, majorVersion, NO) == 0);
-    
-    if (createdDiff && afterDiffHandler != nil) {
+    NSError *createDiffError = nil;
+    BOOL createdDiff = createBinaryDelta(sourceDirectory, destinationDirectory, diffFile, majorVersion, NO, &createDiffError);
+    if (!createdDiff) {
+        NSLog(@"Creating binary diff failed with error: %@", createDiffError);
+    } else if (afterDiffHandler != nil) {
         afterDiffHandler(fileManager, sourceDirectory, destinationDirectory);
     }
     
-    BOOL appliedDiff = (createdDiff && applyBinaryDelta(sourceDirectory, patchDirectory, diffFile, NO) == 0);
+    NSError *applyDiffError = nil;
+    BOOL appliedDiff = NO;
+    if (createdDiff) {
+        if (applyBinaryDelta(sourceDirectory, patchDirectory, diffFile, NO, &applyDiffError)) {
+            appliedDiff = YES;
+        } else {
+            NSLog(@"Applying binary diff failed with error: %@", applyDiffError);
+        }
+    }
     
     XCTAssertTrue([fileManager removeItemAtPath:sourceDirectory error:nil]);
     XCTAssertTrue([fileManager removeItemAtPath:destinationDirectory error:nil]);
@@ -105,20 +114,6 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     [self createAndApplyPatchWithHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
         XCTAssertTrue([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
-}
-
-- (void)testNoFilesDiffWithInvalidLowVersion
-{
-    XCTAssertFalse([self createAndApplyPatchUsingVersion:(SUBinaryDeltaMajorVersion)0 beforeDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
-        XCTAssertTrue([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
-    } afterDiffHandler:nil]);
-}
-
-- (void)testNoFilesDiffWithInvalidHighVersion
-{
-    XCTAssertFalse([self createAndApplyPatchUsingVersion:(SUBinaryDeltaMajorVersion)9999 beforeDiffHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
-        XCTAssertTrue([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
-    } afterDiffHandler:nil]);
 }
 
 - (void)testEmptyDataDiff
