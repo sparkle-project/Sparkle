@@ -78,7 +78,7 @@
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
 
-- (void)awakeFromNib
+- (void)windowDidLoad
 {
 	if (![self shouldAskAboutProfile])
 	{
