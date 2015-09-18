@@ -1,12 +1,6 @@
 language: objective-c
 before_install:
   - brew update
-  - brew list pyenv || brew install pyenv
-  - eval "$(pyenv init -)"
-  - pyenv install 2.7.6
-  - pyenv global 2.7.6
-  - pyenv rehash
-  - pip install cpp-coveralls
-  - pyenv rehash
+  - brew install macmade/tap/xcode-coveralls
 script: make ci
-after_success: coveralls --gcov-options '\-lp'
+after_success: xcode-coveralls --exclude /Applications --exclude Tests --exclude Vendor build/Build/Intermediates/Sparkle.build/Coverage/Sparkle.build/Objects-normal/x86_64

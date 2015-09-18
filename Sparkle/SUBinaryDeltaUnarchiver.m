@@ -11,45 +11,48 @@
 #import "SUBinaryDeltaApply.h"
 #import "SUUnarchiver_Private.h"
 #import "SUHost.h"
+#import "SULog.h"
 #import "NTSynchronousTask.h"
 
 @implementation SUBinaryDeltaUnarchiver
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
-	return [[path pathExtension] isEqualToString:@"delta"];
+    return [[path pathExtension] isEqualToString:@"delta"];
 }
 
 - (void)applyBinaryDelta
 {
-	@autoreleasepool {
+    @autoreleasepool {
         NSString *sourcePath = self.updateHostBundlePath;
         NSString *targetPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
 
-        int result = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO);
-		if (!result) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				[self notifyDelegateOfSuccess];
-			});
-		}
-		else {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				[self notifyDelegateOfFailure];
-			});
-		}
-	}
+        NSError *applyDiffError = nil;
+        BOOL success = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO, &applyDiffError);
+        if (success) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self notifyDelegateOfSuccess];
+            });
+        }
+        else {
+            SULog(@"Applying delta patch failed with error: %@", applyDiffError);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self notifyDelegateOfFailure];
+            });
+        }
+    }
 }
 
 - (void)start
 {
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		[self applyBinaryDelta];
-	});
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [self applyBinaryDelta];
+    });
 }
 
 + (void)load
 {
-	[self registerImplementation:self];
+    [self registerImplementation:self];
 }
 
 @end

@@ -4,7 +4,11 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ ist zur Zeit die neueste verfügbare Version.";
 
+/* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ ist verfügbar (Sie verwenden Version %3$@). Möchten Sie die neue Version jetzt herunterladen?";
+
+/* Description text for SUUpdateAlert when the update informational with no download. */
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
 
 "%@ downloaded" = "%@ heruntergeladen";
 
@@ -33,13 +37,13 @@
 
 "Cancel Update" = "Aktualisierung abbrechen";
 
-"Checking for updates..." = "Suche nach Aktualisierungen…";
+"Checking for updates..." = "Suche nach Aktualisierungen …";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "Aktualisierung wird heruntergeladen…";
+"Downloading update..." = "Aktualisierung wird heruntergeladen …";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "Aktualisierung entpacken…";
+"Extracting update..." = "Aktualisierung entpacken …";
 
 /* the unit for gigabytes */
 "GB" = "GB";
@@ -47,7 +51,7 @@
 "Install and Relaunch" = "Installieren und erneut starten";
 
 /* Take care not to overflow the status window. */
-"Installing update..." = "Aktualisierung installieren…";
+"Installing update..." = "Aktualisierung installieren …";
 
 /* the unit for kilobytes */
 "KB" = "KB";
@@ -72,4 +76,4 @@
 /* Alternative name for "Install" button if we have a paid update or other update
 	without a download but with a URL. */
 
-"Learn More..." = "Mehr über…";
+"Learn More..." = "Mehr über …";
