@@ -1,2 +1,1 @@
 #include "ConfigUnitTest.xcconfig"
-SWIFT_OPTIMIZATION_LEVEL = -Ofast
