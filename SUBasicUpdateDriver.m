@@ -196,7 +196,7 @@
     while ((currentPathComponent = [pathComponentEnumerator nextObject])) {
         pathComponentAccumulator = [pathComponentAccumulator stringByAppendingPathComponent:currentPathComponent];
         if ([[NSFileManager defaultManager] fileExistsAtPath:pathComponentAccumulator]) continue;
-        success &= [[NSFileManager defaultManager] createDirectoryAtPath:pathComponentAccumulator attributes:nil];
+        success &= [[NSFileManager defaultManager] createDirectoryAtPath:pathComponentAccumulator attributes:@{}];
     }
 #else
 	BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir withIntermediateDirectories:YES attributes:nil error:NULL];
