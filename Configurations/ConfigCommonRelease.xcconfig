@@ -6,3 +6,8 @@ GCC_GENERATE_DEBUGGING_SYMBOLS = NO
 DEAD_CODE_STRIPPING = YES
 GCC_TREAT_WARNINGS_AS_ERRORS = YES
 GCC_WARN_UNINITIALIZED_AUTOS = YES
+
+// disabled notices and warnings for IB in release, since our continuous integration scripts
+// pick these up from the log and complain about them; someone should really fix these warnings, but that's beyond our scope right now
+IBC_NOTICES = NO
+IBC_WARNINGS = NO
