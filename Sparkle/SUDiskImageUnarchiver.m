@@ -80,7 +80,7 @@
 		{
             if (shouldUseXPC)
             {
-                [SUXPCInstaller launchTaskWithPath:hdiutilPath arguments:arguments environment:nil currentDirectoryPath:currentDirPath inputData:promptData waitForTaskResult:YES waitUntilDone:YES completionHandler:^(int result, NSData *outputData) {
+                [SUXPCInstaller launchTaskWithPath:hdiutilPath arguments:arguments environment:nil currentDirectoryPath:currentDirPath inputData:promptData waitUntilDone:YES completionHandler:^(int result, NSData *outputData) {
                     taskResult = (NSInteger)result;
                     output = [outputData copy];
                 }];
@@ -163,7 +163,7 @@
             arguments = @[@"detach", mountPoint, @"-force"];
             if (shouldUseXPC)
             {
-                [SUXPCInstaller launchTaskWithPath:hdiutilPath arguments:arguments environment:nil currentDirectoryPath:nil inputData:nil waitForTaskResult:NO waitUntilDone:NO completionHandler:nil];
+                [SUXPCInstaller launchTaskWithPath:hdiutilPath arguments:arguments environment:nil currentDirectoryPath:nil inputData:nil waitUntilDone:NO completionHandler:nil];
             }
             else
             {

@@ -168,8 +168,7 @@ BOOL SUShouldUseXPCInstaller(void)
                  environment:nil
         currentDirectoryPath:nil
                    inputData:nil
-           waitForTaskResult:NO
-               waitUntilDone:YES
+               waitUntilDone:NO
            completionHandler:nil];
 }
 
@@ -178,7 +177,6 @@ BOOL SUShouldUseXPCInstaller(void)
                environment:(NSDictionary *)environment
       currentDirectoryPath:(NSString *)currentDirPath
                  inputData:(NSData *)inputData
-         waitForTaskResult:(BOOL)waitForTaskResult
              waitUntilDone:(BOOL)waitUntilDone
          completionHandler:(void (^)(int result, NSData *outputData))completionHandler
 {
@@ -231,7 +229,8 @@ BOOL SUShouldUseXPCInstaller(void)
         xpc_dictionary_set_data(message, SUInstallServiceLaunchTaskInputDataKey, [inputData bytes], [inputData length]);
     }
     
-    xpc_dictionary_set_bool(message, SUInstallServiceLaunchTaskReplyImmediatelyKey, waitForTaskResult ? false : true);
+    BOOL replyImmediately = (waitUntilDone || completionHandler != nil) ? NO : YES;
+    xpc_dictionary_set_bool(message, SUInstallServiceLaunchTaskReplyImmediatelyKey, replyImmediately);
     
     __block BOOL xpcTaskDidReply = NO;
     xpc_connection_send_message_with_reply(connection, message, dispatch_get_current_queue(), ^(xpc_object_t response) {
@@ -264,11 +263,11 @@ BOOL SUShouldUseXPCInstaller(void)
     });
     xpc_release(message);
     
-    if (waitUntilDone)
+    if (replyImmediately || waitUntilDone)
     {
         while (NO == xpcTaskDidReply)
         {
-            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
         }
     }
 }

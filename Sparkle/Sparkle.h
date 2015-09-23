@@ -21,5 +21,6 @@
 #import <Sparkle/SUVersionComparisonProtocol.h>
 #import <Sparkle/SUVersionDisplayProtocol.h>
 #import <Sparkle/SUErrors.h>
+#import <Sparkle/SUUpdaterQueue.h>
 
 #endif

@@ -507,7 +507,7 @@ CF_EXPORT CFDictionaryRef DMCopyHTTPRequestHeaders(CFBundleRef appBundle, CFData
                            showUI ? @"1" : @"0"];
     if (SUShouldUseXPCInstaller())
     {
-        [SUXPCInstaller launchTaskWithPath:relaunchToolPath arguments:arguments environment:nil currentDirectoryPath:nil inputData:nil waitForTaskResult:NO waitUntilDone:NO completionHandler:nil];
+        [SUXPCInstaller launchTaskWithPath:relaunchToolPath arguments:arguments environment:nil currentDirectoryPath:nil inputData:nil waitUntilDone:NO completionHandler:nil];
     }
     else
     {

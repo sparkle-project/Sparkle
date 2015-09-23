@@ -22,8 +22,7 @@
                environment:(NSDictionary *)environment
       currentDirectoryPath:(NSString *)currentDirPath
                  inputData:(NSData *)inputData
-         waitForTaskResult:(BOOL)waitForTaskResult
-             waitUntilDone:(BOOL)waitUntilDone // for sync/async logic
+             waitUntilDone:(BOOL)waitUntilDone
          completionHandler:(void (^)(int result, NSData *outputData))completionHandler;
 
 @end
