@@ -28,7 +28,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     NSBundle *mainBundle = [NSBundle mainBundle];
     
     // Check if we are already up to date
-    if ([[mainBundle objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey] isEqualToString:UPDATED_VERSION]) {
+    if ([[mainBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey] isEqualToString:UPDATED_VERSION]) {
         NSAlert *alreadyUpdatedAlert = [[NSAlert alloc] init];
         alreadyUpdatedAlert.messageText = @"Update succeeded!";
         alreadyUpdatedAlert.informativeText = @"This is the updated version of Sparkle Test App.\n\nDelete and rebuild the app to test updates again.";
@@ -85,7 +85,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     assert(infoFileExists);
     
     NSMutableDictionary *infoDictionary = [[NSMutableDictionary alloc] initWithContentsOfURL:infoURL];
-    infoDictionary[(NSString *)kCFBundleVersionKey] = UPDATED_VERSION;
+    infoDictionary[(__bridge NSString *)kCFBundleVersionKey] = UPDATED_VERSION;
     infoDictionary[@"CFBundleShortVersionString"] = UPDATED_VERSION;
     
     BOOL wroteInfoFile = [infoDictionary writeToURL:infoURL atomically:NO];
