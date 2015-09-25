@@ -31,9 +31,10 @@ An easy-to-use software update framework for Cocoa developers.
 * Supports bundles, preference panes, plugins, and other non-.app software. Can install .pkg files for more complicated products.
 * Supports branches due to minimum OS version requirements.
 
-## Developers
+## Requirements
 
-Building Sparkle requires Xcode 5 or above.
+* OS X 10.7+
+* Xcode 5+ to build from source
 
 ### API
 
