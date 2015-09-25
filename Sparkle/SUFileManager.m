@@ -645,7 +645,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 #endif
     
     if (canUseNewTrashAPI) {
-        trashURL = [[_fileManager URLsForDirectory:NSTrashDirectory inDomains:NSUserDomainMask] firstObject];
+        trashURL = [_fileManager URLForDirectory:NSTrashDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:nil];
     }
     
     if (trashURL == nil) {
