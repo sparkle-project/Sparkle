@@ -46,7 +46,6 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
 {
     [self.watchdogTimer invalidate];
     completionBlock();
-    completionBlock = nil;
 }
 
 - (void)startListeningWithCompletion:(void (^)(void))completionBlock
