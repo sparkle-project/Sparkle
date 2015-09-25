@@ -129,11 +129,13 @@ static const NSTimeInterval SUInstallationTimeLimit = 5;
     [self.terminationListener startListeningWithCompletion:^{
         self.terminationListener = nil;
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUInstallationTimeLimit * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            // Show app icon in the dock
-            ProcessSerialNumber psn = { 0, kCurrentProcess };
-            TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-        });
+        if (self.shouldShowUI) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUInstallationTimeLimit * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                // Show app icon in the dock
+                ProcessSerialNumber psn = { 0, kCurrentProcess };
+                TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+            });
+        }
         
          [self install];
     }];
