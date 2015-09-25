@@ -33,8 +33,8 @@ An easy-to-use software update framework for Cocoa developers.
 
 ## Requirements
 
-* OS X 10.7+
-* Xcode 5+ to build from source
+* Runtime: OS X 10.7 or greater
+* Build: Xcode 5 and 10.8 SDK or greater
 
 ### API
 
