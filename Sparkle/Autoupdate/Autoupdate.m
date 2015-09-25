@@ -3,7 +3,6 @@
 #import "SUHost.h"
 #import "SUStandardVersionComparator.h"
 #import "SUStatusController.h"
-#import "SUPlainInstallerInternals.h"
 #import "SULog.h"
 
 #include <unistd.h>
@@ -46,7 +45,6 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
 {
     [self.watchdogTimer invalidate];
     completionBlock();
-    completionBlock = nil;
 }
 
 - (void)startListeningWithCompletion:(void (^)(void))completionBlock
@@ -139,14 +137,16 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 {
     [self.terminationListener startListeningWithCompletion:^{
         self.terminationListener = nil;
-        
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUInstallationTimeLimit * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            if (!self.isTerminating) {
-                // Show app icon in the dock
-                ProcessSerialNumber psn = { 0, kCurrentProcess };
-                TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-            }
-        });
+		
+        if (self.shouldShowUI) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUInstallationTimeLimit * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+				if (!self.isTerminating) {
+					// Show app icon in the dock
+					ProcessSerialNumber psn = { 0, kCurrentProcess };
+					TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+				}
+            });
+        }
         
         [self install];
     }];
@@ -199,7 +199,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     
     dispatch_block_t cleanupAndExit = ^{
         NSError *theError = nil;
-        if (![SUPlainInstaller _removeFileAtPath:self.updateFolderPath error:&theError]) {
+        if (![[NSFileManager defaultManager] removeItemAtPath:self.updateFolderPath error:&theError]) {
             SULog(@"Couldn't remove update folder: %@.", theError);
         }
         
