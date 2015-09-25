@@ -214,7 +214,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         // (Or it does become frontmost, but the OS backgrounds it afterwards.. It's some kind of timing/activation issue that doesn't occur all the time)
         // The only remedy I've been able to find is waiting an arbitrary delay before exiting our application
         
-        if (![[NSWorkspace sharedWorkspace] launchApplication:relaunchPath]) {
+        // Don't use -launchApplication: because we may not be launching an application. Eg: it could be a system prefpane
+        if (![[NSWorkspace sharedWorkspace] openFile:relaunchPath]) {
             SULog(@"Failed to launch %@", relaunchPath);
         }
         
