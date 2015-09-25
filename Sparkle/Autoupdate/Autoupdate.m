@@ -3,7 +3,6 @@
 #import "SUHost.h"
 #import "SUStandardVersionComparator.h"
 #import "SUStatusController.h"
-#import "SUPlainInstallerInternals.h"
 #import "SULog.h"
 
 #include <unistd.h>
@@ -191,7 +190,7 @@ static const NSTimeInterval SUInstallationTimeLimit = 5;
     }
     
     NSError *theError = nil;
-    if (![SUPlainInstaller _removeFileAtPath:self.updateFolderPath error:&theError])
+    if (![[NSFileManager defaultManager] removeItemAtPath:self.updateFolderPath error:&theError])
         SULog(@"Couldn't remove update folder: %@.", theError);
     
     [[NSFileManager defaultManager] removeItemAtPath:[[NSBundle mainBundle] bundlePath] error:NULL];
