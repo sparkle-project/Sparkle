@@ -287,7 +287,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 // "com.apple.quarantine", on affected files.  Removing this attribute is
 // sufficient to remove files from the quarantine.
 
-// This works be removing the quarantine extended attribute for every file we come across.
+// This works by removing the quarantine extended attribute for every file we come across.
 // We used to have code similar to the method below that used -[NSURL getResourceValue:forKey:error:] and -[NSURL setResourceValue:forKey:error:]
 // However, those methods *really suck* - you can't rely on the return value from getting the resource value and if you set the resource value
 // when the key isn't present, errors are spewed out to the console
