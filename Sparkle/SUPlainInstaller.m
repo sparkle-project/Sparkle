@@ -18,7 +18,7 @@
 // Returns the bundle version from the specified host that is appropriate to use as a filename, or nil if we're unable to retrieve one
 + (NSString *)bundleVersionAppropriateForFilenameFromHost:(SUHost *)host
 {
-    NSString *bundleVersion = [host objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
+    NSString *bundleVersion = [host objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     NSString *trimmedVersion = @"";
     
     if (bundleVersion != nil) {
@@ -33,6 +33,15 @@
 
 + (BOOL)performInstallationToURL:(NSURL *)installationURL fromUpdateAtURL:(NSURL *)newURL withHost:(SUHost *)host error:(NSError * __autoreleasing *)error
 {
+    if (installationURL == nil || newURL == nil) {
+        // this really shouldn't happen but just in case
+        SULog(@"Failed to perform installation because either installation URL (%@) or new URL (%@) is nil", installationURL, newURL);
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to perform installation because the paths to install at and from are not valid" }];
+        }
+        return NO;
+    }
+    
     SUFileManager *fileManager = [[SUFileManager alloc] init];
     
     // Create a temporary directory for our new app that resides on our destination's volume
@@ -43,7 +52,8 @@
     }
     
     // Move the new app to our temporary directory
-    NSURL *newTempURL = [tempNewDirectoryURL URLByAppendingPathComponent:newURL.lastPathComponent];
+    NSString *newURLLastPathComponent = newURL.lastPathComponent;
+    NSURL *newTempURL = [tempNewDirectoryURL URLByAppendingPathComponent:newURLLastPathComponent];
     if (![fileManager moveItemAtURL:newURL toURL:newTempURL error:error]) {
         SULog(@"Failed to move the new app from %@ to its temp directory at %@", newURL.path, newTempURL.path);
         [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
@@ -61,6 +71,15 @@
     }
     
     NSURL *oldURL = [NSURL fileURLWithPath:host.bundlePath];
+    if (oldURL == nil) {
+        // this really shouldn't happen but just in case
+        SULog(@"Failed to construct URL from bundle path: %@", host.bundlePath);
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to perform installation because a path could not be constructed for the old installation" }];
+        }
+        return NO;
+    }
+    
     if (![fileManager changeOwnerAndGroupOfItemAtRootURL:newTempURL toMatchURL:oldURL error:error]) {
         // But this is big enough of a deal to fail
         SULog(@"Failed to change owner and group of new app at %@ to match old app at %@", newTempURL.path, oldURL.path);
@@ -78,7 +97,8 @@
         oldDestinationName = oldURL.lastPathComponent.stringByDeletingPathExtension;
     }
     
-    NSString *oldDestinationNameWithPathExtension = [oldDestinationName stringByAppendingPathExtension:oldURL.pathExtension];
+    NSString *oldURLExtension = oldURL.pathExtension;
+    NSString *oldDestinationNameWithPathExtension = [oldDestinationName stringByAppendingPathExtension:oldURLExtension];
     
     // Create a temporary directory for our old app that resides on its volume
     NSURL *tempOldDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:oldDestinationName appropriateForDirectoryURL:oldURL.URLByDeletingLastPathComponent error:error];

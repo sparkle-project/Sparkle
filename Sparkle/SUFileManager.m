@@ -95,12 +95,21 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 - (BOOL)_itemExistsAtURL:(NSURL *)fileURL
 {
-    return [_fileManager attributesOfItemAtPath:fileURL.path error:NULL] != nil;
+    NSString *path = fileURL.path;
+    if (path == nil) {
+        return NO;
+    }
+    return [_fileManager attributesOfItemAtPath:path error:NULL] != nil;
 }
 
 - (BOOL)_itemExistsAtURL:(NSURL *)fileURL isDirectory:(BOOL *)isDirectory
 {
-    NSDictionary *attributes = [_fileManager attributesOfItemAtPath:fileURL.path error:NULL];
+    NSString *path = fileURL.path;
+    if (path == nil) {
+        return NO;
+    }
+    
+    NSDictionary *attributes = [_fileManager attributesOfItemAtPath:path error:NULL];
     if (attributes == nil) {
         return NO;
     }
@@ -240,7 +249,8 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     
     // Only recurse if it's actually a directory.  Don't recurse into a
     // root-level symbolic link.
-    NSDictionary *rootAttributes = [_fileManager attributesOfItemAtPath:rootURL.path error:nil];
+    NSString *rootURLPath = rootURL.path;
+    NSDictionary *rootAttributes = [_fileManager attributesOfItemAtPath:rootURLPath error:nil];
     NSString *rootType = rootAttributes[NSFileType];
     
     if ([rootType isEqualToString:NSFileTypeDirectory]) {
@@ -418,7 +428,8 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     }
     
     NSError *matchFileAttributesError = nil;
-    NSDictionary *matchFileAttributes = [_fileManager attributesOfItemAtPath:matchURL.path error:&matchFileAttributesError];
+    NSString *matchURLPath = matchURL.path;
+    NSDictionary *matchFileAttributes = [_fileManager attributesOfItemAtPath:matchURLPath error:&matchFileAttributesError];
     if (matchFileAttributes == nil) {
         if (error != NULL) {
             *error = matchFileAttributesError;
@@ -427,7 +438,8 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     }
     
     NSError *targetFileAttributesError = nil;
-    NSDictionary *targetFileAttributes = [_fileManager attributesOfItemAtPath:targetURL.path error:&targetFileAttributesError];
+    NSString *targetURLPath = targetURL.path;
+    NSDictionary *targetFileAttributes = [_fileManager attributesOfItemAtPath:targetURLPath error:&targetFileAttributesError];
     if (targetFileAttributes == nil) {
         if (error != NULL) {
             *error = targetFileAttributesError;
@@ -453,7 +465,10 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         return NO;
     }
     
-    if ([ownerID isEqualToNumber:targetFileAttributes[NSFileOwnerAccountID]] && [groupID isEqualToNumber:targetFileAttributes[NSFileGroupOwnerAccountID]]) {
+    NSNumber *targetOwnerID = targetFileAttributes[NSFileOwnerAccountID];
+    NSNumber *targetGroupID = targetFileAttributes[NSFileGroupOwnerAccountID];
+    
+    if ((targetOwnerID != nil && [ownerID isEqualToNumber:targetOwnerID]) && (targetGroupID != nil && [groupID isEqualToNumber:targetGroupID])) {
         // Assume they're the same even if we don't check every file recursively
         // Speeds up the common case
         return YES;
@@ -666,7 +681,8 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         return NO;
     }
     
-    NSURL *tempItemURL = [tempDirectory URLByAppendingPathComponent:url.lastPathComponent];
+    NSString *urlLastPathComponent = url.lastPathComponent;
+    NSURL *tempItemURL = [tempDirectory URLByAppendingPathComponent:urlLastPathComponent];
     if (![self moveItemAtURL:url toURL:tempItemURL error:error]) {
         // If we can't move the item at url, just remove it completely; chances are it's not going to be missed
         [self removeItemAtURL:url error:NULL];
@@ -685,7 +701,8 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     BOOL success = NO;
 #if __MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_8
     if (!canUseNewTrashAPI) {
-        success = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:tempItemURL.URLByDeletingLastPathComponent.path destination:@"" files:@[tempItemURL.lastPathComponent] tag:NULL];
+        NSString *tempParentPath = tempItemURL.URLByDeletingLastPathComponent.path;
+        success = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:tempParentPath destination:@"" files:@[tempItemURL.lastPathComponent] tag:NULL];
         if (!success && error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move file %@ into the trash.", tempItemURL.lastPathComponent] }];
         }
