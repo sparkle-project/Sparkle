@@ -11,9 +11,11 @@
 #include <sys/xattr.h>
 #include <sys/errno.h>
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101000 /* MAC_OS_X_VERSION_10_10 */
-extern NSString *const NSURLQuarantinePropertiesKey WEAK_IMPORT_ATTRIBUTE;
-#endif
+#pragma clang diagnostic push
+// This is a private constant but it's referenced from our unit tests
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+NSString *SUAppleQuarantineIdentifier = @"com.apple.quarantine";
+#pragma clang diagnostic pop
 
 // Authorization code based on generous contribution from Allan Odgaard. Thanks, Allan!
 static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char *executablePath, AuthorizationFlags options, char *const *arguments)
@@ -64,7 +66,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 }
 
 // Acquires an authorization reference which is intended to be used for future authorized file operations
-- (BOOL)acquireAuthorizationWithError:(NSError *__autoreleasing *)error
+- (BOOL)_acquireAuthorizationWithError:(NSError *__autoreleasing *)error
 {
     // No need to continue if we already acquired an authorization reference
     if (_auth != NULL) {
@@ -91,12 +93,12 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 // -[NSFileManager attributesOfItemAtPath:error:] won't follow symbolic links
 
-- (BOOL)itemExistsAtURL:(NSURL *)fileURL
+- (BOOL)_itemExistsAtURL:(NSURL *)fileURL
 {
     return [_fileManager attributesOfItemAtPath:fileURL.path error:NULL] != nil;
 }
 
-- (BOOL)itemExistsAtURL:(NSURL *)fileURL isDirectory:(BOOL *)isDirectory
+- (BOOL)_itemExistsAtURL:(NSURL *)fileURL isDirectory:(BOOL *)isDirectory
 {
     NSDictionary *attributes = [_fileManager attributesOfItemAtPath:fileURL.path error:NULL];
     if (attributes == nil) {
@@ -111,7 +113,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 }
 
 // Wrapper around getxattr()
-- (ssize_t)getXAttr:(NSString *)nameString fromFile:(NSString *)file options:(int)options
+- (ssize_t)_getXAttr:(NSString *)nameString fromFile:(NSString *)file options:(int)options
 {
     char path[PATH_MAX] = {0};
     if (![file getFileSystemRepresentation:path maxLength:sizeof(path)]) {
@@ -129,7 +131,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 }
 
 // Wrapper around removexattr()
-- (int)removeXAttr:(NSString *)name fromFile:(NSString *)file options:(int)options
+- (int)_removeXAttr:(NSString *)name fromFile:(NSString *)file options:(int)options
 {
     char path[PATH_MAX] = {0};
     if (![file getFileSystemRepresentation:path maxLength:sizeof(path)]) {
@@ -148,7 +150,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 #define XATTR_UTILITY_PATH "/usr/bin/xattr"
 // Recursively remove an xattr at a specified root URL with authentication
-- (BOOL)removeXAttrWithAuthentication:(NSString *)name fromRootURL:(NSURL *)rootURL error:(NSError *__autoreleasing *)error
+- (BOOL)_removeXAttrWithAuthentication:(NSString *)name fromRootURL:(NSURL *)rootURL error:(NSError *__autoreleasing *)error
 {
     // Because this is a system utility, it's fine to follow the symbolic link if one exists
     if (![_fileManager fileExistsAtPath:@(XATTR_UTILITY_PATH)]) {
@@ -174,7 +176,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         return NO;
     }
     
-    if (![self acquireAuthorizationWithError:error]) {
+    if (![self _acquireAuthorizationWithError:error]) {
         return NO;
     }
     
@@ -188,11 +190,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     return success;
 }
 
-#define APPLE_QUARANTINE_IDENTIFIER @"com.apple.quarantine"
-
-- (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL allowingAuthentication:(BOOL)allowsAuthentication withQuarantineRetrieval:(BOOL (^)(NSURL *))quarantineRetrieval quarantineRemoval:(BOOL (^)(NSURL *, NSError * __autoreleasing *))quarantineRemoval isAccessError:(BOOL (^)(NSError *))isAccessError error:(NSError * __autoreleasing *)error
+- (BOOL)_releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL allowingAuthentication:(BOOL)allowsAuthentication withQuarantineRetrieval:(BOOL (^)(NSURL *))quarantineRetrieval quarantineRemoval:(BOOL (^)(NSURL *, NSError * __autoreleasing *))quarantineRemoval isAccessError:(BOOL (^)(NSError *))isAccessError error:(NSError * __autoreleasing *)error
 {
-    if (![self itemExistsAtURL:rootURL]) {
+    if (![self _itemExistsAtURL:rootURL]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove quarantine because %@ does not exist.", rootURL.path.lastPathComponent] }];
         }
@@ -209,7 +209,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
                 removedQuarantine = YES;
             } else {
                 if (allowsAuthentication && isAccessError(removalError)) {
-                    removedQuarantine = [self removeXAttrWithAuthentication:APPLE_QUARANTINE_IDENTIFIER fromRootURL:rootURL error:error];
+                    removedQuarantine = [self _removeXAttrWithAuthentication:SUAppleQuarantineIdentifier fromRootURL:rootURL error:error];
                     attemptedAuthentication = YES;
                 } else {
                     if (success != NULL) {
@@ -267,30 +267,6 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 // If |root| is not a directory, then it alone is removed from the quarantine.
 // Symbolic links, including |root| if it is a symbolic link, will not be
 // traversed.
-- (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL allowingAuthentication:(BOOL)allowsAuthentication error:(NSError * __autoreleasing *)error
-{
-#if __MAC_OS_X_VERSION_MIN_REQUIRED < 101000 /* MAC_OS_X_VERSION_10_10 */
-    if (!&NSURLQuarantinePropertiesKey) {
-        return [self releaseItemUsingOldMethodFromQuarantineAtRootURL:rootURL allowingAuthentication:allowsAuthentication error:error];
-    }
-#endif
-    
-    return
-    [self
-     releaseItemFromQuarantineAtRootURL:rootURL
-     allowingAuthentication:allowsAuthentication
-     withQuarantineRetrieval:^BOOL(NSURL *fileURL) {
-         id resourceValue = nil;
-         return ([fileURL getResourceValue:&resourceValue forKey:NSURLQuarantinePropertiesKey error:NULL] && resourceValue != nil);
-     }
-     quarantineRemoval:^BOOL(NSURL *fileURL, NSError *__autoreleasing *removalError) {
-         return [fileURL setResourceValue:[NSNull null] forKey:NSURLQuarantinePropertiesKey error:removalError];
-     }
-     isAccessError:^BOOL(NSError *removalError) {
-         return NS_HAS_PERMISSION_ERROR(removalError);
-     }
-     error:error];
-}
 
 // Ordinarily, the quarantine is managed by calling LSSetItemAttribute
 // to set the kLSItemQuarantineProperties attribute to a dictionary specifying
@@ -301,19 +277,23 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 // "com.apple.quarantine", on affected files.  Removing this attribute is
 // sufficient to remove files from the quarantine.
 
-- (BOOL)releaseItemUsingOldMethodFromQuarantineAtRootURL:(NSURL *)rootURL allowingAuthentication:(BOOL)allowsAuthentication error:(NSError *__autoreleasing *)error
+// This works be removing the quarantine extended attribute for every file we come across.
+// We used to have code similar to the method below that used -[NSURL getResourceValue:forKey:error:] and -[NSURL setResourceValue:forKey:error:]
+// However, those methods *really suck* - you can't rely on the return value from getting the resource value and if you set the resource value
+// when the key isn't present, errors are spewed out to the console
+- (BOOL)_releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL allowingAuthentication:(BOOL)allowsAuthentication error:(NSError *__autoreleasing *)error
 {
     static const int removeXAttrOptions = XATTR_NOFOLLOW;
     
     return
     [self
-     releaseItemFromQuarantineAtRootURL:rootURL
+     _releaseItemFromQuarantineAtRootURL:rootURL
      allowingAuthentication:allowsAuthentication
      withQuarantineRetrieval:^BOOL(NSURL *fileURL) {
-         return ([self getXAttr:APPLE_QUARANTINE_IDENTIFIER fromFile:fileURL.path options:removeXAttrOptions] >= 0);
+         return ([self _getXAttr:SUAppleQuarantineIdentifier fromFile:fileURL.path options:removeXAttrOptions] >= 0);
      }
      quarantineRemoval:^BOOL(NSURL *fileURL, NSError * __autoreleasing *removalError) {
-         BOOL removedQuarantine = ([self removeXAttr:APPLE_QUARANTINE_IDENTIFIER fromFile:fileURL.path options:removeXAttrOptions] == 0);
+         BOOL removedQuarantine = ([self _removeXAttr:SUAppleQuarantineIdentifier fromFile:fileURL.path options:removeXAttrOptions] == 0);
          if (!removedQuarantine && removalError != NULL) {
              *removalError = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove file quarantine on %@.", fileURL.lastPathComponent] }];
          }
@@ -327,24 +307,24 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 - (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError * __autoreleasing *)error
 {
-    return [self releaseItemFromQuarantineAtRootURL:rootURL allowingAuthentication:YES error:error];
+    return [self _releaseItemFromQuarantineAtRootURL:rootURL allowingAuthentication:YES error:error];
 }
 
 - (BOOL)releaseItemFromQuarantineWithoutAuthenticationAtRootURL:(NSURL *)rootURL error:(NSError * __autoreleasing *)error
 {
-    return [self releaseItemFromQuarantineAtRootURL:rootURL allowingAuthentication:NO error:error];
+    return [self _releaseItemFromQuarantineAtRootURL:rootURL allowingAuthentication:NO error:error];
 }
 
 - (BOOL)moveItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError *__autoreleasing *)error
 {
-    if (![self itemExistsAtURL:sourceURL]) {
+    if (![self _itemExistsAtURL:sourceURL]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source file to move (%@) does not exist.", sourceURL.path.lastPathComponent] }];
         }
         return NO;
     }
     
-    if ([self itemExistsAtURL:destinationURL]) {
+    if ([self _itemExistsAtURL:destinationURL]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination file to move (%@) already exists.", destinationURL.path.lastPathComponent] }];
         }
@@ -363,7 +343,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         return NO;
     }
     
-    if (![self acquireAuthorizationWithError:error]) {
+    if (![self _acquireAuthorizationWithError:error]) {
         return NO;
     }
     
@@ -394,16 +374,43 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     return YES;
 }
 
+- (BOOL)_changeOwnerAndGroupOfItemAtURL:(NSURL *)targetURL ownerID:(NSNumber *)ownerID groupID:(NSNumber *)groupID needsAuth:(BOOL *)needsAuth error:(NSError * __autoreleasing *)error
+{
+    char path[PATH_MAX] = {0};
+    if (![targetURL.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"File to change owner & group (%@) cannot be represented as a valid file name.", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    if (chown(path, ownerID.unsignedIntValue, groupID.unsignedIntValue) != 0) {
+        if (errno == EPERM) {
+            if (needsAuth != NULL) {
+                *needsAuth = YES;
+            }
+        } else {
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to change owner & group for %@ with owner ID %u and group ID %u.", targetURL.path.lastPathComponent, ownerID.unsignedIntValue, groupID.unsignedIntValue] }];
+            }
+            return NO;
+        }
+    }
+    
+    return YES;
+}
+
 - (BOOL)changeOwnerAndGroupOfItemAtRootURL:(NSURL *)targetURL toMatchURL:(NSURL *)matchURL error:(NSError * __autoreleasing *)error
 {
-    if (![self itemExistsAtURL:targetURL]) {
+    BOOL isTargetADirectory = NO;
+    if (![self _itemExistsAtURL:targetURL isDirectory:&isTargetADirectory]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to change owner & group IDs because %@ does not exist.", targetURL.path.lastPathComponent] }];
         }
         return NO;
     }
     
-    if (![self itemExistsAtURL:matchURL]) {
+    if (![self _itemExistsAtURL:matchURL]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to match owner & group IDs because %@ does not exist.", matchURL.path.lastPathComponent] }];
         }
@@ -452,26 +459,21 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         return YES;
     }
     
-    NSDirectoryEnumerator *directoryEnumerator = [_fileManager enumeratorAtURL:targetURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
     BOOL needsAuth = NO;
-    for (NSURL *url in directoryEnumerator) {
-        char path[PATH_MAX] = {0};
-        if (![url.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
-            if (error != NULL) {
-                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"File to change owner & group (%@) cannot be represented as a valid file name.", url.path.lastPathComponent] }];
-            }
-            return NO;
-        }
-        
-        if (chown(path, ownerID.unsignedIntValue, groupID.unsignedIntValue) != 0) {
-            if (errno == EPERM) {
-                needsAuth = YES;
-                break;
-            } else {
-                if (error != NULL) {
-                    *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to change owner & group for %@ with owner ID %u and group ID %u.", url.path.lastPathComponent, ownerID.unsignedIntValue, groupID.unsignedIntValue] }];
-                }
+    
+    if (![self _changeOwnerAndGroupOfItemAtURL:targetURL ownerID:ownerID groupID:groupID needsAuth:&needsAuth error:error]) {
+        return NO;
+    }
+    
+    if (isTargetADirectory) {
+        NSDirectoryEnumerator *directoryEnumerator = [_fileManager enumeratorAtURL:targetURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
+        for (NSURL *url in directoryEnumerator) {
+            if (![self _changeOwnerAndGroupOfItemAtURL:url ownerID:ownerID groupID:groupID needsAuth:&needsAuth error:error]) {
                 return NO;
+            }
+            
+            if (needsAuth) {
+                break;
             }
         }
     }
@@ -497,7 +499,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         return NO;
     }
     
-    if (![self acquireAuthorizationWithError:error]) {
+    if (![self _acquireAuthorizationWithError:error]) {
         return NO;
     }
     
@@ -512,9 +514,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 // Creates a directory at the item pointed by url
 // An item cannot already exist at the url, but the parent must be a directory that exists
-- (BOOL)makeDirectoryAtURL:(NSURL *)url error:(NSError * __autoreleasing *)error
+- (BOOL)_makeDirectoryAtURL:(NSURL *)url error:(NSError * __autoreleasing *)error
 {
-    if ([self itemExistsAtURL:url]) {
+    if ([self _itemExistsAtURL:url]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create directory because file %@ already exists.", url.path.lastPathComponent] }];
         }
@@ -523,7 +525,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     
     NSURL *parentURL = [url URLByDeletingLastPathComponent];
     BOOL isParentADirectory = NO;
-    if (![self itemExistsAtURL:parentURL isDirectory:&isParentADirectory] || !isParentADirectory) {
+    if (![self _itemExistsAtURL:parentURL isDirectory:&isParentADirectory] || !isParentADirectory) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create directory because parent directory %@ does not exist.", parentURL.path.lastPathComponent] }];
         }
@@ -550,7 +552,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         return NO;
     }
     
-    if (![self acquireAuthorizationWithError:error]) {
+    if (![self _acquireAuthorizationWithError:error]) {
         return NO;
     }
     
@@ -576,16 +578,16 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     
     NSURL *desiredURL = [directoryURL URLByAppendingPathComponent:preferredName];
     NSUInteger tagIndex = 1;
-    while ([self itemExistsAtURL:desiredURL] && tagIndex <= 9999) {
+    while ([self _itemExistsAtURL:desiredURL] && tagIndex <= 9999) {
         desiredURL = [directoryURL URLByAppendingPathComponent:[preferredName stringByAppendingFormat:@" (%lu)", (unsigned long)++tagIndex]];
     }
     
-    return [self makeDirectoryAtURL:desiredURL error:error] ? desiredURL : nil;
+    return [self _makeDirectoryAtURL:desiredURL error:error] ? desiredURL : nil;
 }
 
 - (BOOL)removeItemAtURL:(NSURL *)url error:(NSError * __autoreleasing *)error
 {
-    if (![self itemExistsAtURL:url]) {
+    if (![self _itemExistsAtURL:url]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove file %@ because it does not exist.", url.path.lastPathComponent] }];
         }
@@ -604,7 +606,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         return NO;
     }
     
-    if (![self acquireAuthorizationWithError:error]) {
+    if (![self _acquireAuthorizationWithError:error]) {
         return NO;
     }
     
@@ -625,7 +627,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 - (BOOL)moveItemAtURLToTrash:(NSURL *)url error:(NSError *__autoreleasing *)error
 {
-    if (![self itemExistsAtURL:url]) {
+    if (![self _itemExistsAtURL:url]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move %@ to the trash because the file does not exist.", url.path.lastPathComponent] }];
         }
