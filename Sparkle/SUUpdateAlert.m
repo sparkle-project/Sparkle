@@ -171,11 +171,7 @@
 
 - (BOOL)allowsAutomaticUpdates
 {
-    BOOL allowAutoUpdates = YES; // Defaults to YES.
-    if ([self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey])
-        allowAutoUpdates = [self.host boolForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
-
-    return allowAutoUpdates;
+    return self.host.allowsAutomaticUpdates;
 }
 
 - (void)windowDidLoad
@@ -201,6 +197,16 @@
         [self.window.contentView addConstraint:automaticallyInstallUpdatesButtonToDescriptionFieldConstraint];
         
         [self.releaseNotesContainerView removeFromSuperview];
+    }
+    
+    // When we show release notes, it looks ugly if the install buttons are not closer to the release notes view
+    // However when we don't show release notes, it looks ugly if the install buttons are too close to the description field. Shrugs.
+    if (showReleaseNotes && ![self allowsAutomaticUpdates]) {
+        NSLayoutConstraint *skipButtonToReleaseNotesContainerConstraint = [NSLayoutConstraint constraintWithItem:self.skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.releaseNotesContainerView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:12.0];
+        
+        [self.window.contentView addConstraint:skipButtonToReleaseNotesContainerConstraint];
+        
+        [self.automaticallyInstallUpdatesButton removeFromSuperview];
     }
 
     [self.window center];

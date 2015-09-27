@@ -435,8 +435,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 - (BOOL)automaticallyDownloadsUpdates
 {
-    // If the SUAllowsAutomaticUpdatesKey exists and is set to NO, return NO.
-    if ([self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] && [self.host boolForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] == NO) {
+    // If the host doesn't allow automatic updates, don't ever let them happen
+    if (!self.host.allowsAutomaticUpdates) {
         return NO;
     }
 
