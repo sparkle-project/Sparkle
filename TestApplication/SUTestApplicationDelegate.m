@@ -106,7 +106,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     
     assert(dittoTask.terminationStatus == 0);
     
-    [[NSFileManager defaultManager] removeItemAtURL:destinationBundleURL error:NULL];
+    [fileManager removeItemAtURL:destinationBundleURL error:NULL];
     
     // Don't ever do this at home, kids (seriously)
     // (that is, including the private key inside of your application)
@@ -178,7 +178,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     // Finally start the server
     NSTask *serverTask = [[NSTask alloc] init];
     serverTask.launchPath = @"/usr/bin/python";
-    assert([[NSFileManager defaultManager] fileExistsAtPath:serverTask.launchPath]);
+    assert([fileManager fileExistsAtPath:serverTask.launchPath]);
     serverTask.arguments = @[@"-m", @"SimpleHTTPServer", @"1337"];
     serverTask.currentDirectoryPath = serverDirectoryPath;
     [serverTask launch];
