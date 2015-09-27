@@ -172,6 +172,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
                        versionComparator:[SUStandardVersionComparator defaultComparator]
                        completionHandler:^(NSError *error) {
                            if (error) {
+                               SULog(@"Installation Error: %@", error);
                                if (self.shouldShowUI) {
                                    NSAlert *alert = [[NSAlert alloc] init];
                                    alert.messageText = @"";

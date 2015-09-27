@@ -10,6 +10,7 @@
 
 #include <sys/xattr.h>
 #include <sys/errno.h>
+#include <sys/time.h>
 
 #pragma clang diagnostic push
 // This is a private constant but it's referenced from our unit tests
@@ -521,6 +522,53 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, "/usr/sbin/chown", kAuthorizationFlagDefaults, (char *[]){ "-R", (char *)userAndGroup, targetPath, NULL });
     if (!success && error != NULL) {
         NSString *errorMessage = [NSString stringWithFormat:@"Failed to change owner:group %@ on %@ with authentication.", formattedUserAndGroupIDs, targetURL.path.lastPathComponent];
+        *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
+    }
+    
+    return success;
+}
+
+// /usr/bin/touch can be used to update an application, as described in:
+// https://developer.apple.com/library/mac/documentation/Carbon/Conceptual/LaunchServicesConcepts/LSCConcepts/LSCConcepts.html
+// The document says LSRegisterURL() can be used as well but this hasn't worked out well for me in practice
+// Anyway, updating the modification time of the application is important because the system will be aware a new version of your app is available,
+// Finder will report the correct file size and other metadata for it, URL schemes your app may register will be updated, etc.
+// Behind the scenes, touch calls to utimes() which is what we use here - unless we need to authenticate
+- (BOOL)updateModificationAndAccessTimeOfItemAtURL:(NSURL *)targetURL error:(NSError * __autoreleasing *)error
+{
+    if (![self _itemExistsAtURL:targetURL]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to update modification & access time because %@ does not exist.", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    char path[PATH_MAX] = {0};
+    if (![targetURL.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"File to update modification & access time (%@) cannot be represented as a valid file name.", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    if (utimes(path, NULL) == 0) {
+        return YES;
+    }
+    
+    if (errno != EACCES) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to update modification & access time for %@", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    if (![self _acquireAuthorizationWithError:error]) {
+        return NO;
+    }
+    
+    BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, "/usr/bin/touch", kAuthorizationFlagDefaults, (char *[]){ path, NULL });
+    if (!success && error != NULL) {
+        NSString *errorMessage = [NSString stringWithFormat:@"Failed to update modification & access time on %@ with authentication.", targetURL.path.lastPathComponent];
         *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
     }
     

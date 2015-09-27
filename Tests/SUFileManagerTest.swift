@@ -169,6 +169,27 @@ class SUFileManagerTest: XCTestCase
         }
     }
     
+    func testUpdateFileModificationTime()
+    {
+        makeTempFiles() { fileManager, rootURL, ordinaryFileURL, directoryURL, fileInDirectoryURL in
+            XCTAssertNil(try? fileManager.updateModificationAndAccessTimeOfItemAtURL(rootURL.URLByAppendingPathComponent("does not exist")))
+            
+            let oldOrdinaryFileAttributes = try! NSFileManager.defaultManager().attributesOfItemAtPath(ordinaryFileURL.path!)
+            let oldDirectoryAttributes = try! NSFileManager.defaultManager().attributesOfItemAtPath(directoryURL.path!)
+            
+            sleep(1); // wait for clock to advance
+            
+            try! fileManager.updateModificationAndAccessTimeOfItemAtURL(ordinaryFileURL)
+            try! fileManager.updateModificationAndAccessTimeOfItemAtURL(directoryURL)
+            
+            let newOrdinaryFileAttributes = try! NSFileManager.defaultManager().attributesOfItemAtPath(ordinaryFileURL.path!)
+            XCTAssertGreaterThan((newOrdinaryFileAttributes[NSFileModificationDate] as! NSDate).timeIntervalSinceDate(oldOrdinaryFileAttributes[NSFileModificationDate] as! NSDate), 0)
+            
+            let newDirectoryAttributes = try! NSFileManager.defaultManager().attributesOfItemAtPath(directoryURL.path!)
+            XCTAssertGreaterThan((newDirectoryAttributes[NSFileModificationDate] as! NSDate).timeIntervalSinceDate(oldDirectoryAttributes[NSFileModificationDate] as! NSDate), 0)
+        }
+    }
+    
     func testFileExists()
     {
         makeTempFiles() { fileManager, rootURL, ordinaryFileURL, directoryURL, fileInDirectoryURL in

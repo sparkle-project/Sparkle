@@ -60,7 +60,7 @@
         return NO;
     }
     
-    // Release our new app from quarantine and fix its owner and group IDs while it's at our temporary destination
+    // Release our new app from quarantine, fix its owner and group IDs, and update its modification time while it's at our temporary destination
     // We must leave moving the app to its destination as the final step in installing it, so that
     // it's not possible our new app can be left in an incomplete state at the final destination
     
@@ -85,6 +85,11 @@
         SULog(@"Failed to change owner and group of new app at %@ to match old app at %@", newTempURL.path, oldURL.path);
         [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
         return NO;
+    }
+    
+    if (![fileManager updateModificationAndAccessTimeOfItemAtURL:newTempURL error:error]) {
+        // Not a fatal error, but a pretty unfortunate one
+        SULog(@"Failed to update modification and access time of new app at %@", newTempURL.path);
     }
     
     // Decide on a destination name we should use for the older app when we move it around the file system

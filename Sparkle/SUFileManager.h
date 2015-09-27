@@ -80,6 +80,19 @@
 - (BOOL)changeOwnerAndGroupOfItemAtRootURL:(NSURL *)targetURL toMatchURL:(NSURL *)matchURL error:(NSError **)error;
 
 /**
+ * Updates the modification and access time of an item at a specified target URL to the current time
+ * @param targetURL A URL pointing to the target item whose modification and access time to update. The item at this URL must exist.
+ * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
+ * @return YES if the target item's modification and access times have been updated, otherwise NO along with a populated error object
+ *
+ * This method updates the modification and access time of an item to the current time, ideal for letting the system know we installed a new file or
+ * application.
+ *
+ * This is not an atomic operation.
+ */
+- (BOOL)updateModificationAndAccessTimeOfItemAtURL:(NSURL *)targetURL error:(NSError **)error;
+
+/**
  * Releases Apple's quarantine extended attribute from the item at the specified root URL
  * @param rootURL A URL pointing to the item to release from Apple's quarantine. This will be applied recursively if the item is a directory. The item at this URL must exist.
  * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
