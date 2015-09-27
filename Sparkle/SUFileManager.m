@@ -7,6 +7,7 @@
 //
 
 #import "SUFileManager.h"
+#import "SUHost.h"
 
 #include <sys/xattr.h>
 #include <sys/errno.h>
@@ -699,8 +700,8 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     
     NSURL *trashURL = nil;
     BOOL canUseNewTrashAPI = YES;
-#if __MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_8
-    canUseNewTrashAPI = [_fileManager respondsToSelector:@selector(trashItemAtURL:resultingItemURL:error:)];
+#if __MAC_OS_X_VERSION_MIN_REQUIRED < 1080
+    canUseNewTrashAPI = [SUHost isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 8, 0}];
     if (!canUseNewTrashAPI) {
         FSRef trashRef;
         if (FSFindFolder(kUserDomain, kTrashFolderType, kDontCreateFolder, &trashRef) == noErr) {
@@ -747,7 +748,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     // If we get here, we should be able to trash the item normally without authentication
     
     BOOL success = NO;
-#if __MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_8
+#if __MAC_OS_X_VERSION_MIN_REQUIRED < 1080
     if (!canUseNewTrashAPI) {
         NSString *tempParentPath = tempItemURL.URLByDeletingLastPathComponent.path;
         success = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:tempParentPath destination:@"" files:@[tempItemURL.lastPathComponent] tag:NULL];

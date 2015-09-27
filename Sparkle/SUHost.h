@@ -24,6 +24,7 @@ typedef struct {
 @property (strong, readonly) NSBundle *bundle;
 
 + (NSOperatingSystemVersion)operatingSystemVersion;
++ (BOOL)isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion)version;
 + (NSString *)systemVersionString;
 
 - (instancetype)initWithBundle:(NSBundle *)aBundle;
