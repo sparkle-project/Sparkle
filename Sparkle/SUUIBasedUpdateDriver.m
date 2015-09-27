@@ -128,7 +128,7 @@
 
 - (NSString *)localizedStringFromByteCount:(long long)value
 {
-    if (SUHost.operatingSystemVersion.minorVersion < 8) {
+    if (![NSByteCountFormatter class]) {
         if (value < 1000) {
             return [NSString stringWithFormat:@"%.0lf %@", value / 1.0,
                     SULocalizedString(@"B", @"the unit for bytes")];
