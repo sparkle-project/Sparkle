@@ -178,9 +178,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         }
         return NO;
     }
-    
-    const char *xattrName = [name cStringUsingEncoding:NSASCIIStringEncoding];
-    if (xattrName == NULL) {
+
+    char xattrName[PATH_MAX] = {0};
+    if (![name getFileSystemRepresentation:xattrName maxLength:sizeof(xattrName)]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteInapplicableStringEncodingError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Extended attribute %@ is not a valid ASCII convertible string.", name] }];
         }
@@ -191,7 +191,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         return NO;
     }
     
-    BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, XATTR_UTILITY_PATH, kAuthorizationFlagDefaults, (char *[]){ "-s", "-r", "-d", (char *)xattrName, path, NULL });
+    BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, XATTR_UTILITY_PATH, kAuthorizationFlagDefaults, (char *[]){ "-s", "-r", "-d", xattrName, path, NULL });
     
     if (!success && error != NULL) {
         NSString *errorMessage = [NSString stringWithFormat:@"Authenticated extended attribute deletion for %@ failed on %@.", name, rootURL.path.lastPathComponent];
@@ -508,8 +508,8 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     }
     
     NSString *formattedUserAndGroupIDs = [NSString stringWithFormat:@"%u:%u", ownerID.unsignedIntValue, groupID.unsignedIntValue];
-    const char *userAndGroup = [formattedUserAndGroupIDs cStringUsingEncoding:NSASCIIStringEncoding];
-    if (userAndGroup == NULL) {
+    char userAndGroup[PATH_MAX] = {0};
+    if (![formattedUserAndGroupIDs getFileSystemRepresentation:userAndGroup maxLength:sizeof(userAndGroup)]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFormattingError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Owner ID %u and Group ID %u could not be formatted.", ownerID.unsignedIntValue, groupID.unsignedIntValue] }];
         }
@@ -520,7 +520,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         return NO;
     }
     
-    BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, "/usr/sbin/chown", kAuthorizationFlagDefaults, (char *[]){ "-R", (char *)userAndGroup, targetPath, NULL });
+    BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, "/usr/sbin/chown", kAuthorizationFlagDefaults, (char *[]){ "-R", userAndGroup, targetPath, NULL });
     if (!success && error != NULL) {
         NSString *errorMessage = [NSString stringWithFormat:@"Failed to change owner:group %@ on %@ with authentication.", formattedUserAndGroupIDs, targetURL.path.lastPathComponent];
         *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
