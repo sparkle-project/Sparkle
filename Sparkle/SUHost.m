@@ -286,7 +286,7 @@
 
 + (NSOperatingSystemVersion)operatingSystemVersion
 {
-#if __MAC_OS_X_VERSION_MIN_REQUIRED < 1090 // Present in 10.9 despite NS_AVAILABLE's claims
+#if __MAC_OS_X_VERSION_MIN_REQUIRED < 101000
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wselector"
     // Xcode 5.1.1: operatingSystemVersion is clearly declared, must warn due to a compiler bug?
