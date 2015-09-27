@@ -62,6 +62,17 @@
     return [self.bundle bundlePath];
 }
 
+- (BOOL)allowsAutomaticUpdates
+{
+    // Can we automatically update in the background without bugging the user (e.g, with a administrator password prompt)?
+    BOOL isWritableAtBundle = [[NSFileManager defaultManager] isWritableFileAtPath:self.bundlePath];
+    
+    // Does the developer want us to disable automatic updates?
+    NSNumber *developerAllowsAutomaticUpdates = [self objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
+    
+    return isWritableAtBundle && (developerAllowsAutomaticUpdates == nil || developerAllowsAutomaticUpdates.boolValue);
+}
+
 - (NSString *)appCachePath
 {
     NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
