@@ -53,7 +53,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     
     // Create a directory that'll be used for our web server listing
     NSURL *serverDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
-    if ([fileManager fileExistsAtPath:serverDirectoryURL.path]) {
+    if ([serverDirectoryURL checkResourceIsReachableAndReturnError:nil]) {
         NSError *removeServerDirectoryError = nil;
         
         if (![fileManager removeItemAtURL:serverDirectoryURL error:&removeServerDirectoryError]) {
@@ -81,7 +81,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     // Update bundle's version keys to latest version
     NSURL *infoURL = [[destinationBundleURL URLByAppendingPathComponent:@"Contents"] URLByAppendingPathComponent:@"Info.plist"];
     
-    BOOL infoFileExists = [fileManager fileExistsAtPath:infoURL.path];
+    BOOL infoFileExists = [infoURL checkResourceIsReachableAndReturnError:nil];
     assert(infoFileExists);
     
     NSMutableDictionary *infoDictionary = [[NSMutableDictionary alloc] initWithContentsOfURL:infoURL];
