@@ -92,14 +92,15 @@ static NSString * const UPDATED_VERSION = @"2.0";
     assert(wroteInfoFile);
     
     // Change current working directory so web server knows where to list files
-    BOOL changedCurrentWorkingDirectory = [fileManager changeCurrentDirectoryPath:serverDirectoryURL.path];
-    assert(changedCurrentWorkingDirectory);
+    NSString *serverDirectoryPath = serverDirectoryURL.path;
+    assert(serverDirectoryPath != nil);
     
     // Create the archive for our update
     NSString *zipName = @"Sparkle_Test_App.zip";
     NSTask *dittoTask = [[NSTask alloc] init];
     dittoTask.launchPath = @"/usr/bin/ditto";
     dittoTask.arguments = @[@"-c", @"-k", @"--sequesterRsrc", @"--keepParent", destinationBundleURL.lastPathComponent, zipName];
+    dittoTask.currentDirectoryPath = serverDirectoryPath;
     [dittoTask launch];
     [dittoTask waitUntilExit];
     
@@ -175,7 +176,13 @@ static NSString * const UPDATED_VERSION = @"2.0";
     }
     
     // Finally start the server
-    self.serverTask = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/python" arguments:@[@"-m", @"SimpleHTTPServer", @"1337"]];
+    NSTask *serverTask = [[NSTask alloc] init];
+    serverTask.launchPath = @"/usr/bin/python";
+    assert([[NSFileManager defaultManager] fileExistsAtPath:serverTask.launchPath]);
+    serverTask.arguments = @[@"-m", @"SimpleHTTPServer", @"1337"];
+    serverTask.currentDirectoryPath = serverDirectoryPath;
+    [serverTask launch];
+    self.serverTask = serverTask;
     
     // Show the Settings window
     self.updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] init];
