@@ -13,11 +13,7 @@
 #include <sys/errno.h>
 #include <sys/time.h>
 
-#pragma clang diagnostic push
-// This is a private constant but it's referenced from our unit tests
-#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-NSString *SUAppleQuarantineIdentifier = @"com.apple.quarantine";
-#pragma clang diagnostic pop
+static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
 
 // Authorization code based on generous contribution from Allan Odgaard. Thanks, Allan!
 static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char *executablePath, AuthorizationFlags options, char *const *arguments)
@@ -124,16 +120,10 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 }
 
 // Wrapper around getxattr()
-- (ssize_t)_getXAttr:(NSString *)nameString fromFile:(NSString *)file options:(int)options
+- (ssize_t)_getXAttr:(const char *)name fromFile:(NSString *)file options:(int)options
 {
     char path[PATH_MAX] = {0};
     if (![file getFileSystemRepresentation:path maxLength:sizeof(path)]) {
-        errno = 0;
-        return -1;
-    }
-    
-    const char *name = [nameString cStringUsingEncoding:NSASCIIStringEncoding];
-    if (name == NULL) {
         errno = 0;
         return -1;
     }
@@ -142,16 +132,10 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 }
 
 // Wrapper around removexattr()
-- (int)_removeXAttr:(NSString *)name fromFile:(NSString *)file options:(int)options
+- (int)_removeXAttr:(const char *)attr fromFile:(NSString *)file options:(int)options
 {
     char path[PATH_MAX] = {0};
     if (![file getFileSystemRepresentation:path maxLength:sizeof(path)]) {
-        errno = 0;
-        return -1;
-    }
-    
-    const char *attr = [name cStringUsingEncoding:NSASCIIStringEncoding];
-    if (attr == NULL) {
         errno = 0;
         return -1;
     }
@@ -161,7 +145,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 #define XATTR_UTILITY_PATH "/usr/bin/xattr"
 // Recursively remove an xattr at a specified root URL with authentication
-- (BOOL)_removeXAttrWithAuthentication:(NSString *)name fromRootURL:(NSURL *)rootURL error:(NSError *__autoreleasing *)error
+- (BOOL)_removeXAttrWithAuthentication:(char *__nonnull)xattrName fromRootURL:(NSURL *)rootURL error:(NSError *__autoreleasing *)error
 {
     // Because this is a system utility, it's fine to follow the symbolic link if one exists
     if (![_fileManager fileExistsAtPath:@(XATTR_UTILITY_PATH)]) {
@@ -178,14 +162,6 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         }
         return NO;
     }
-
-    char xattrName[PATH_MAX] = {0};
-    if (![name getFileSystemRepresentation:xattrName maxLength:sizeof(xattrName)]) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteInapplicableStringEncodingError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Extended attribute %@ is not a valid ASCII convertible string.", name] }];
-        }
-        return NO;
-    }
     
     if (![self _acquireAuthorizationWithError:error]) {
         return NO;
@@ -194,7 +170,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, XATTR_UTILITY_PATH, kAuthorizationFlagDefaults, (char *[]){ "-s", "-r", "-d", xattrName, path, NULL });
     
     if (!success && error != NULL) {
-        NSString *errorMessage = [NSString stringWithFormat:@"Authenticated extended attribute deletion for %@ failed on %@.", name, rootURL.path.lastPathComponent];
+        NSString *errorMessage = [NSString stringWithFormat:@"Authenticated extended attribute deletion for %@ failed on %@.", [NSString stringWithUTF8String:xattrName], rootURL.path.lastPathComponent];
         *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey:errorMessage }];
     }
     

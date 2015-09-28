@@ -7,7 +7,8 @@
 #import "SUBinaryDeltaCommon.h"
 #import "SUFileManager.h"
 
-extern NSString *SUAppleQuarantineIdentifier;
+// Duplicated to avoid exporting a private symbol from SUFileManager
+static const char *SUAppleQuarantineIdentifier = "com.apple.quarantine";
 
 @interface SUFileManager (Private)
 
