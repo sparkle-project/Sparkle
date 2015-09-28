@@ -483,13 +483,10 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         return NO;
     }
     
-    NSString *formattedUserAndGroupIDs = [NSString stringWithFormat:@"%u:%u", ownerID.unsignedIntValue, groupID.unsignedIntValue];
-    char userAndGroup[PATH_MAX] = {0};
-    if (![formattedUserAndGroupIDs getFileSystemRepresentation:userAndGroup maxLength:sizeof(userAndGroup)]) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFormattingError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Owner ID %u and Group ID %u could not be formatted.", ownerID.unsignedIntValue, groupID.unsignedIntValue] }];
-        }
-        return NO;
+    char userAndGroup[100];
+    int written = snprintf(userAndGroup, sizeof(userAndGroup), "%u:%u", ownerID.unsignedIntValue, groupID.unsignedIntValue);
+    if (written < 0 || written >= 100) {
+        return NO; // No custom error, because it's too unlikely to ever happen
     }
     
     if (![self _acquireAuthorizationWithError:error]) {
@@ -498,7 +495,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     
     BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, "/usr/sbin/chown", kAuthorizationFlagDefaults, (char *[]){ "-R", userAndGroup, targetPath, NULL });
     if (!success && error != NULL) {
-        NSString *errorMessage = [NSString stringWithFormat:@"Failed to change owner:group %@ on %@ with authentication.", formattedUserAndGroupIDs, targetURL.path.lastPathComponent];
+        NSString *errorMessage = [NSString stringWithFormat:@"Failed to change owner:group %@ on %@ with authentication.", [NSString stringWithUTF8String:userAndGroup], targetURL.path.lastPathComponent];
         *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
     }
     
