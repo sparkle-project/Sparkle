@@ -1,4 +1,4 @@
-# Sparkle [![Build Status](https://travis-ci.org/sparkle-project/Sparkle.svg?branch=master)](https://travis-ci.org/sparkle-project/Sparkle) <a href='https://app.ship.io/dashboard#/jobs/8814/history' target='_blank'><img src='https://app.ship.io/jobs/V3PoCLcN5ft5Pnq0/build_status.png' height='20' /></a> [![Coverage Status](https://coveralls.io/repos/sparkle-project/Sparkle/badge.svg?branch=master&service=github)](https://coveralls.io/github/sparkle-project/Sparkle?branch=master)
+# Sparkle [![Build Status](https://travis-ci.org/sparkle-project/Sparkle.svg?branch=master)](https://travis-ci.org/sparkle-project/Sparkle) <a href='https://app.ship.io/dashboard#/jobs/8814/history' target='_blank'><img src='https://app.ship.io/jobs/V3PoCLcN5ft5Pnq0/build_status.png' height='20' /></a> [![Coverage Status](https://coveralls.io/repos/sparkle-project/Sparkle/badge.svg?branch=master&service=github)](https://coveralls.io/github/sparkle-project/Sparkle?branch=master) <a href="https://www.bandwidthhog.com/?utm_source=sparkle-github&amp;utm_medium=badge&amp;utm_campaign=readme"><img src="https://img.shields.io/badge/sponsored%20by-Bandwidth%20Hog-orange.svg" alt="sponsored by: bandwidth hog"></a>
 
 An easy-to-use software update framework for Cocoa developers.
 
@@ -46,3 +46,8 @@ If you are adding a symbol to the public API you must decorate the declaration w
 `cd` to the root of the Sparkle source tree and run `make release`. Sparkle-*VERSION*.tar.bz2 will be created in a temporary directory and revealed in Finder after the build has completed.
 
 Alternatively, build the Distribution scheme in the Xcode UI.
+
+### Project Sponsor
+
+[Bandwidth Hog](https://www.bandwidthhog.com/?utm_source=sparkle-github&utm_medium=link&utm_campaign=readme-footer) is a service from MaxCDN
+that allows you to push software updates to your customers for only 1¢ a gigabyte. Best part is there are no contracts, it is all Pay-as-you-Go.
