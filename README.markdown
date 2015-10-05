@@ -36,18 +36,18 @@ An easy-to-use software update framework for Cocoa developers.
 * Runtime: OS X 10.7 or greater
 * Build: Xcode 5 and 10.8 SDK or greater
 
-### API
+## API
 
 Sparkle is built with `-fvisibility=hidden -fvisibility-inlines-hidden` which means no symbols are exported by default.
 If you are adding a symbol to the public API you must decorate the declaration with the `SU_EXPORT` macro (grep the source code for examples).
 
-### Building the distribution package
+## Building the distribution package
 
 `cd` to the root of the Sparkle source tree and run `make release`. Sparkle-*VERSION*.tar.bz2 will be created in a temporary directory and revealed in Finder after the build has completed.
 
 Alternatively, build the Distribution scheme in the Xcode UI.
 
-### Project Sponsor
+## Project Sponsor
 
 [Bandwidth Hog](https://www.bandwidthhog.com/?utm_source=sparkle-github&utm_medium=link&utm_campaign=readme-footer) is a service from MaxCDN
 that allows you to push software updates to your customers for only 1¢ a gigabyte. Best part is there are no contracts, it is all Pay-as-you-Go.
