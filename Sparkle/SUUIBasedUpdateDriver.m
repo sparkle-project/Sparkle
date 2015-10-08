@@ -51,6 +51,10 @@
 
 - (void)didFindValidUpdate
 {
+    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
+        [[self.updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
+    }
+
     if (self.automaticallyInstallUpdates) {
         [self updateAlertFinishedWithChoice:SUInstallUpdateChoice];
         return;
@@ -65,10 +69,6 @@
         versDisp = [[self.updater delegate] versionDisplayerForUpdater:self.updater];
     }
     [self.updateAlert setVersionDisplayer:versDisp];
-
-    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
-        [[self.updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
-    }
 
     // If the app is a menubar app or the like, we need to focus it first and alter the
     // update prompt to behave like a normal window. Otherwise if the window were hidden
