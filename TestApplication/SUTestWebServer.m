@@ -138,7 +138,7 @@
     assert(_dataToWrite != nil);
     if (_numBytesToWrite == 0) {
         // nothing more to write, we're done.
-        _dataToWrite = 0;
+        _dataToWrite = nil;
         _numBytesToWrite = -1;
     } else if (_outputStream.hasSpaceAvailable) {
         [self writeNow];
@@ -165,7 +165,7 @@
 
 @interface SUTestWebServer () <SUTestWebServerConnectionDelegate> {
     NSMutableArray *_connections;
-    NSString* _workingDirectory;
+    NSString *_workingDirectory;
     CFSocketRef _socket;
 }
 
