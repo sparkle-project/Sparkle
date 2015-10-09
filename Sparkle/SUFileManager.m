@@ -52,13 +52,15 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
     AuthorizationRef _auth;
     NSFileManager *_fileManager;
+    BOOL _allowsAuthorization;
 }
 
-- (id)init
+- (id)initAllowingAuthorization:(BOOL)allowsAuthorization
 {
     self = [super init];
     if (self != nil) {
         _fileManager = [[NSFileManager alloc] init];
+        _allowsAuthorization = allowsAuthorization;
     }
     return self;
 }
@@ -69,6 +71,13 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     // No need to continue if we already acquired an authorization reference
     if (_auth != NULL) {
         return YES;
+    }
+    
+    if (!_allowsAuthorization) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: @"Unable to grant authorization to perform action because it is explicitly turned off" }];
+        }
+        return NO;
     }
     
     OSStatus status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &_auth);
@@ -177,7 +186,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     return success;
 }
 
-- (BOOL)_releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL allowingAuthentication:(BOOL)allowsAuthentication withQuarantineRetrieval:(BOOL (^)(NSURL *))quarantineRetrieval quarantineRemoval:(BOOL (^)(NSURL *, NSError * __autoreleasing *))quarantineRemoval isAccessError:(BOOL (^)(NSError *))isAccessError error:(NSError * __autoreleasing *)error
+- (BOOL)_releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL withQuarantineRetrieval:(BOOL (^)(NSURL *))quarantineRetrieval quarantineRemoval:(BOOL (^)(NSURL *, NSError * __autoreleasing *))quarantineRemoval isAccessError:(BOOL (^)(NSError *))isAccessError error:(NSError * __autoreleasing *)error
 {
     if (![self _itemExistsAtURL:rootURL]) {
         if (error != NULL) {
@@ -195,7 +204,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
             if (quarantineRemoval(fileURL, &removalError)) {
                 removedQuarantine = YES;
             } else {
-                if (allowsAuthentication && isAccessError(removalError)) {
+                if (isAccessError(removalError)) {
                     removedQuarantine = [self _removeXAttrWithAuthentication:SUAppleQuarantineIdentifier fromRootURL:rootURL error:error];
                     attemptedAuthentication = YES;
                 } else {
@@ -269,14 +278,13 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 // We used to have code similar to the method below that used -[NSURL getResourceValue:forKey:error:] and -[NSURL setResourceValue:forKey:error:]
 // However, those methods *really suck* - you can't rely on the return value from getting the resource value and if you set the resource value
 // when the key isn't present, errors are spewed out to the console
-- (BOOL)_releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL allowingAuthentication:(BOOL)allowsAuthentication error:(NSError *__autoreleasing *)error
+- (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError *__autoreleasing *)error
 {
     static const int removeXAttrOptions = XATTR_NOFOLLOW;
     
     return
     [self
      _releaseItemFromQuarantineAtRootURL:rootURL
-     allowingAuthentication:allowsAuthentication
      withQuarantineRetrieval:^BOOL(NSURL *fileURL) {
          return ([self _getXAttr:SUAppleQuarantineIdentifier fromFile:fileURL.path options:removeXAttrOptions] >= 0);
      }
@@ -291,16 +299,6 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
          return (removalError.code == EACCES);
      }
      error:error];
-}
-
-- (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError * __autoreleasing *)error
-{
-    return [self _releaseItemFromQuarantineAtRootURL:rootURL allowingAuthentication:YES error:error];
-}
-
-- (BOOL)releaseItemFromQuarantineWithoutAuthenticationAtRootURL:(NSURL *)rootURL error:(NSError * __autoreleasing *)error
-{
-    return [self _releaseItemFromQuarantineAtRootURL:rootURL allowingAuthentication:NO error:error];
 }
 
 - (BOOL)moveItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError *__autoreleasing *)error

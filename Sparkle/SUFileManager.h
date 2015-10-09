@@ -9,11 +9,21 @@
 #import <Foundation/Foundation.h>
 
 /**
- * A class used for performing file operations that may also perform authentication if permission is denied when trying to
+ * A class used for performing file operations that may also perform authentication if allowed and if permission is denied when trying to
  * perform them normally as the running user. All operations on this class may be used on thread other than the main thread.
  * This class provides basic file operations and stays away from including much application-level logic.
  */
 @interface SUFileManager : NSObject
+
+/**
+ * Initializes a file manager
+ * @param allowsAuthorization Specifies whether operations invoked on this instance are allowed to acquire authorization in order
+ *  to perform file operations when read or write access is denied
+ * @return A new file manager instance
+ * 
+ * This method just initializes the file manager. It doesn't acquire authorization immediately if allowsAuthorization is YES
+ */
+- (id)initAllowingAuthorization:(BOOL)allowsAuthorization;
 
 /**
  * Creates a temporary directory on the same volume as a provided URL
@@ -109,10 +119,5 @@
  * This is not an atomic operation.
  */
 - (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError **)error;
-
-/**
- * Behaves as -releaseItemFromQuarantineAtRootURL:error: does, except without the capability of authenticating when permission is denied
- */
-- (BOOL)releaseItemFromQuarantineWithoutAuthenticationAtRootURL:(NSURL *)rootURL error:(NSError **)error;
 
 @end
