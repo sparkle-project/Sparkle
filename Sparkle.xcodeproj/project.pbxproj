@@ -176,6 +176,9 @@
 		726F2CE71BC9C3E2001971A4 /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		726F2CE81BC9C48F001971A4 /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
 		726F2CE91BC9C499001971A4 /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
+		726F2CEA1BC9C708001971A4 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
+		726F2CEB1BC9C733001971A4 /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
+		726F2CEC1BC9C74F001971A4 /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		7275F9C11B5F1F2900B1D19E /* SUFileManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 7275F9BF1B5F1F2900B1D19E /* SUFileManager.h */; };
 		7275F9C21B5F1F2900B1D19E /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
 		7275F9C31B5F1F2900B1D19E /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
@@ -1521,6 +1524,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				726F2CEC1BC9C74F001971A4 /* SUOperatingSystem.m in Sources */,
+				726F2CEB1BC9C733001971A4 /* SUConstants.m in Sources */,
+				726F2CEA1BC9C708001971A4 /* SUFileManager.m in Sources */,
 				61B5F93009C4CFDC00B25A18 /* main.m in Sources */,
 				72E45CF31B640CDD005C701A /* SUTestApplicationDelegate.m in Sources */,
 				72E45CF71B640DAE005C701A /* SUUpdateSettingsWindowController.m in Sources */,
