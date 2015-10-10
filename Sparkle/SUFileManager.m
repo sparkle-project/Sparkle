@@ -317,6 +317,13 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         return NO;
     }
     
+    if (![self _itemExistsAtURL:destinationURL.URLByDeletingLastPathComponent]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination parent directory to copy into (%@) does not exist.", destinationURL.URLByDeletingLastPathComponent.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
     if ([self _itemExistsAtURL:destinationURL]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination file to copy to (%@) already exists.", destinationURL.lastPathComponent] }];
@@ -444,14 +451,21 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
     if (![self _itemExistsAtURL:sourceURL]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source file to move (%@) does not exist.", sourceURL.path.lastPathComponent] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source file to move (%@) does not exist.", sourceURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    if (![self _itemExistsAtURL:destinationURL.URLByDeletingLastPathComponent]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination parent directory to move into (%@) does not exist.", destinationURL.URLByDeletingLastPathComponent.lastPathComponent] }];
         }
         return NO;
     }
     
     if ([self _itemExistsAtURL:destinationURL]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination file to move (%@) already exists.", destinationURL.path.lastPathComponent] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination file to move (%@) already exists.", destinationURL.lastPathComponent] }];
         }
         return NO;
     }

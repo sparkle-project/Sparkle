@@ -36,6 +36,7 @@ class SUFileManagerTest: XCTestCase
     {
         makeTempFiles() { fileManager, rootURL, ordinaryFileURL, directoryURL, fileInDirectoryURL in
             XCTAssertNil(try? fileManager.moveItemAtURL(ordinaryFileURL, toURL: directoryURL))
+            XCTAssertNil(try? fileManager.moveItemAtURL(ordinaryFileURL, toURL: directoryURL.URLByAppendingPathComponent("foo").URLByAppendingPathComponent("bar")))
             XCTAssertNil(try? fileManager.moveItemAtURL(rootURL.URLByAppendingPathComponent("does not exist"), toURL: directoryURL))
             
             let newFileURL = (ordinaryFileURL.URLByDeletingLastPathComponent?.URLByAppendingPathComponent("new file"))!
@@ -82,6 +83,7 @@ class SUFileManagerTest: XCTestCase
     {
         makeTempFiles() { fileManager, rootURL, ordinaryFileURL, directoryURL, fileInDirectoryURL in
             XCTAssertNil(try? fileManager.copyItemAtURL(ordinaryFileURL, toURL: directoryURL))
+            XCTAssertNil(try? fileManager.copyItemAtURL(ordinaryFileURL, toURL: directoryURL.URLByAppendingPathComponent("foo").URLByAppendingPathComponent("bar")))
             XCTAssertNil(try? fileManager.copyItemAtURL(rootURL.URLByAppendingPathComponent("does not exist"), toURL: directoryURL))
             
             let newFileURL = (ordinaryFileURL.URLByDeletingLastPathComponent?.URLByAppendingPathComponent("new file"))!
