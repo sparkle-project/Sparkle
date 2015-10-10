@@ -16,14 +16,14 @@
 @interface SUFileManager : NSObject
 
 /**
- * Initializes a file manager
+ * Creates a file manager that allows or disallows authorizing for file operations
  * @param allowsAuthorization Specifies whether operations invoked on this instance are allowed to acquire authorization in order
  *  to perform file operations when read or write access is denied
  * @return A new file manager instance
  * 
- * This method just initializes the file manager. It doesn't acquire authorization immediately if allowsAuthorization is YES
+ * This method just creates the file manager. It doesn't acquire authorization immediately if allowsAuthorization is YES
  */
-- (id)initAllowingAuthorization:(BOOL)allowsAuthorization;
++ (instancetype)fileManagerAllowingAuthorization:(BOOL)allowsAuthorization;
 
 /**
  * Creates a temporary directory on the same volume as a provided URL

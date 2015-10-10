@@ -55,7 +55,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     BOOL _allowsAuthorization;
 }
 
-- (id)initAllowingAuthorization:(BOOL)allowsAuthorization
+- (instancetype)initAllowingAuthorization:(BOOL)allowsAuthorization
 {
     self = [super init];
     if (self != nil) {
@@ -63,6 +63,12 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         _allowsAuthorization = allowsAuthorization;
     }
     return self;
+}
+
+
++ (instancetype)fileManagerAllowingAuthorization:(BOOL)allowsAuthorization
+{
+    return [[self alloc] initAllowingAuthorization:allowsAuthorization];
 }
 
 // Acquires an authorization reference which is intended to be used for future authorized file operations
