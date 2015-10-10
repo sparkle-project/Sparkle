@@ -11,6 +11,7 @@
 #import "SUSystemProfiler.h"
 
 #import "SUHost.h"
+#import "SUOperatingSystem.h"
 #include <sys/sysctl.h>
 
 static NSString *const SUSystemProfilerApplicationNameKey = @"appName";
@@ -53,7 +54,7 @@ static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
     size_t length = sizeof(value);
 
     // OS version
-    NSString *currentSystemVersion = [SUHost systemVersionString];
+    NSString *currentSystemVersion = [SUOperatingSystem systemVersionString];
     if (currentSystemVersion != nil) {
         [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerOperatingSystemVersionKey, @"OS Version", currentSystemVersion, currentSystemVersion] forKeys:profileDictKeys]];
     }

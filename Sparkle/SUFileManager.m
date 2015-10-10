@@ -7,7 +7,7 @@
 //
 
 #import "SUFileManager.h"
-#import "SUHost.h"
+#import "SUOperatingSystem.h"
 
 #include <sys/xattr.h>
 #include <sys/errno.h>
@@ -846,7 +846,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     NSURL *trashURL = nil;
     BOOL canUseNewTrashAPI = YES;
 #if __MAC_OS_X_VERSION_MIN_REQUIRED < 1080
-    canUseNewTrashAPI = [SUHost isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 8, 0}];
+    canUseNewTrashAPI = [SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 8, 0}];
     if (!canUseNewTrashAPI) {
         FSRef trashRef;
         if (FSFindFolder(kUserDomain, kTrashFolderType, kDontCreateFolder, &trashRef) == noErr) {
