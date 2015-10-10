@@ -452,16 +452,19 @@
     if (relaunchPathToCopy != nil) {
         NSString *targetPath = [self.host.appCachePath stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
         
-        NSFileManager *fileManager = [[NSFileManager alloc] init];
+        SUFileManager *fileManager = [[SUFileManager alloc] initAllowingAuthorization:NO];
         NSError *error = nil;
+        
+        NSURL *relaunchURLToCopy = [NSURL fileURLWithPath:relaunchPathToCopy];
+        NSURL *targetURL = [NSURL fileURLWithPath:targetPath];
         
         // We only need to run our copy of the app by spawning a task
         // Since we are copying the app to a directory that is write-accessible, we don't need to muck with owner/group IDs
-        if ([self preparePathForRelaunchTool:targetPath error:&error] && [fileManager copyItemAtPath:relaunchPathToCopy toPath:targetPath error:&error]) {
+        if ([self preparePathForRelaunchTool:targetPath error:&error] && [fileManager copyItemAtURL:relaunchURLToCopy toURL:targetURL error:&error]) {
             // We probably don't need to release the quarantine, but we'll do it just in case it's necessary.
             // Perhaps in a sandboxed environment this matters more. Note that this may not be a fatal error.
             NSError *quarantineError = nil;
-            if (![[[SUFileManager alloc] initAllowingAuthorization:NO] releaseItemFromQuarantineAtRootURL:[NSURL fileURLWithPath:targetPath] error:&quarantineError]) {
+            if (![fileManager releaseItemFromQuarantineAtRootURL:targetURL error:&quarantineError]) {
                 SULog(@"Failed to release quarantine on %@ with error %@", targetPath, quarantineError);
             }
             self.relaunchPath = targetPath;

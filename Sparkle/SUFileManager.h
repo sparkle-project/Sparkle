@@ -50,6 +50,17 @@
 - (BOOL)moveItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError **)error;
 
 /**
+ * Copies an item from a source to a destination
+ * @param sourceURL A URL pointing to the item to move. The item at this URL must exist.
+ * @param destinationURL A URL pointing to the destination the item will be moved at. An item must not already exist at this URL.
+ * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
+ * @return YES if the item was copied successfully, otherwise NO along with a populated error object
+ *
+ * This is not an atomic operation.
+ */
+- (BOOL)copyItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError **)error;
+
+/**
  * Moves an item at a specified URL to the running user's trash directory
  * @param url A URL pointing to the item to move to the trash. The item at this URL must exist.
  * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.

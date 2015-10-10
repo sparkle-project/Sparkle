@@ -77,6 +77,26 @@ class SUFileManagerTest: XCTestCase
             try! fileManager.removeItemAtURL(directoryTrashURL)
         }
     }
+    
+    func testCopyFiles()
+    {
+        makeTempFiles() { fileManager, rootURL, ordinaryFileURL, directoryURL, fileInDirectoryURL in
+            XCTAssertNil(try? fileManager.copyItemAtURL(ordinaryFileURL, toURL: directoryURL))
+            XCTAssertNil(try? fileManager.copyItemAtURL(rootURL.URLByAppendingPathComponent("does not exist"), toURL: directoryURL))
+            
+            let newFileURL = (ordinaryFileURL.URLByDeletingLastPathComponent?.URLByAppendingPathComponent("new file"))!
+            try! fileManager.copyItemAtURL(ordinaryFileURL, toURL: newFileURL)
+            XCTAssertTrue(fileManager._itemExistsAtURL(ordinaryFileURL))
+            XCTAssertTrue(fileManager._itemExistsAtURL(newFileURL))
+            
+            let newDirectoryURL = (ordinaryFileURL.URLByDeletingLastPathComponent?.URLByAppendingPathComponent("new directory"))!
+            try! fileManager.copyItemAtURL(directoryURL, toURL: newDirectoryURL)
+            XCTAssertTrue(fileManager._itemExistsAtURL(directoryURL))
+            XCTAssertTrue(fileManager._itemExistsAtURL(newDirectoryURL))
+            XCTAssertTrue(fileManager._itemExistsAtURL(fileInDirectoryURL))
+            XCTAssertTrue(fileManager._itemExistsAtURL(newDirectoryURL.URLByAppendingPathComponent(fileInDirectoryURL.lastPathComponent!)))
+        }
+    }
 
     func testRemoveFiles()
     {
