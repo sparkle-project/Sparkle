@@ -120,7 +120,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     signUpdateTask.launchPath = signUpdatePath;
     
     NSURL *archiveURL = [serverDirectoryURL URLByAppendingPathComponent:zipName];
-    signUpdateTask.arguments = @[archiveURL, privateKeyPath];
+    signUpdateTask.arguments = @[archiveURL.path, privateKeyPath];
     
     NSPipe *outputPipe = [NSPipe pipe];
     signUpdateTask.standardOutput = outputPipe;
