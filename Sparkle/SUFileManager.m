@@ -310,9 +310,10 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 /*
  * Copies an item from one location to another
  * This intentionally does *not* use copyfile() or any API that uses it such as NSFileManager's copy item method
- * This is because copyfile() fails to copy symbolic links from one network mount to another, which will affect copying apps
- * This failure has been reproduced on 10.11.0 and a VM running 10.8, so the issue has existed for a while.
- * For more info, see the bug report at http://openradar.appspot.com/radar?id=4925873463492608
+ * This is because copyfile() can fail to copy symbolic links from one network mount to another, which will affect copying apps
+ * This failure occurs because the system may think symbolic links on a SMB mount are zero bytes in size
+ * For more info, see bug reports at http://openradar.appspot.com/radar?id=4925873463492608
+ * and http://openradar.appspot.com/radar?id=5024037222744064
  */
 - (BOOL)copyItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError * __autoreleasing *)error
 {
