@@ -83,7 +83,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     self = [super init];
     if (bundle == nil) bundle = [NSBundle mainBundle];
 
-    self.sparkleBundle = [NSBundle bundleForClass:[self class]];
+    self.sparkleBundle = [NSBundle bundleForClass:[SUUpdater class]];
     if (!self.sparkleBundle) {
         SULog(@"Error: SUUpdater can't find Sparkle.framework it belongs to");
         return nil;
