@@ -12,6 +12,7 @@
 #import "SUAppcast.h"
 #import "SUAppcastItem.h"
 #import "SUVersionComparisonProtocol.h"
+#import "SULog.h"
 
 @interface SUScheduledUpdateDriver ()
 
@@ -54,6 +55,12 @@
         }
 
         [self abortUpdate];
+        if ([error code] != SUNoUpdateError) {
+            SULog(@"Error: %@ %@ (URL %@)",
+                  error.localizedDescription,
+                  error.localizedFailureReason,
+                  error.userInfo[NSURLErrorFailingURLErrorKey]);
+        }
     }
 }
 

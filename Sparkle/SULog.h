@@ -27,6 +27,9 @@
 // -----------------------------------------------------------------------------
 
 void SUClearLog(void);
+void SULoadLogSettingsFromBundle(NSBundle *bundle);
 void SULog(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
+void SULogTrace(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
+void SUMaybeTrimLogFile(void);
 
 #endif

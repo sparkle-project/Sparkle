@@ -260,6 +260,8 @@ int main(int __unused argc, const char __unused *argv[])
                                                                shouldShowUI:shouldShowUI];
         [application setDelegate:appInstaller];
         [application run];
+        
+        SUMaybeTrimLogFile();
     }
 
     return EXIT_SUCCESS;
