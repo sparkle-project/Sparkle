@@ -254,6 +254,17 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)item;
 
 /*!
+ Called immediately before installing the specified update.
+ 
+ Delegates can use this call to perform post-processing on the downloaded content.
+ 
+ \param updater The SUUpdater instance.
+ \param item The appcast item corresponding to the update that is proposed to be installed.
+ \param path The temporary location the product was downloaded into.
+ */
+- (void)updater:(SUUpdater *)updater didDownloadUpdate:(SUAppcastItem *)item tempPath:(NSString *)path;
+
+/*!
     Returns whether the relaunch should be delayed in order to perform other tasks.
 
     This is not called if the user didn't relaunch on the previous update,

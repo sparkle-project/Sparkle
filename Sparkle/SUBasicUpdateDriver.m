@@ -417,6 +417,13 @@
         return;
     }
 
+    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+    if ([updaterDelegate respondsToSelector:@selector(updater:didDownloadUpdate:tempPath:)])
+    {
+        NSString *installSourcePath = [SUInstaller installSourcePathInUpdateFolder:self.tempDir forHost:self.host isPackage:NULL isGuided:NULL];
+        [updaterDelegate updater:self.updater didDownloadUpdate:self.updateItem tempPath:installSourcePath];
+    }
+    
     if (![self.updater mayUpdateAndRestart])
     {
         [self abortUpdate];
@@ -425,7 +432,6 @@
 
     // Give the host app an opportunity to postpone the install and relaunch.
     static BOOL postponedOnce = NO;
-    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
     if (!postponedOnce && [updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
     {
         NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installWithToolAndRelaunch:)]];
