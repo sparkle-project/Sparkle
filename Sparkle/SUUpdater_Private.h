@@ -8,7 +8,7 @@
 
 #import "SUUpdater.h"
 
-@class SUBasicUpdateDriver;
+@class SUBasicUpdateDriver, SUHost;
 
 @interface SUUpdater (Private)
 
