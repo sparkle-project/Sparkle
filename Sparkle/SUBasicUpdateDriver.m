@@ -196,7 +196,8 @@ CF_EXPORT CFDictionaryRef DMCopyHTTPRequestHeaders(CFBundleRef appBundle, CFData
 
 - (void)updateURLRequestHTTPHeaders:(NSMutableURLRequest *)request
 {
-    CFBundleRef hostBundle = CFBundleCreate(kCFAllocatorDefault, (__bridge CFURLRef)[NSURL fileURLWithPath:self.host.bundlePath]);
+    NSURL *hostBundleURL = self.host.bundlePath.length ? [NSURL fileURLWithPath:self.host.bundlePath] : nil;
+    CFBundleRef hostBundle = hostBundleURL ? CFBundleCreate(kCFAllocatorDefault, (__bridge CFURLRef)hostBundleURL) : NULL;
     NSDictionary *devmateHeaders = (__bridge_transfer NSDictionary *)DMCopyHTTPRequestHeaders(hostBundle, NULL);
     if (devmateHeaders.count)
     {
@@ -499,10 +500,10 @@ CF_EXPORT CFDictionaryRef DMCopyHTTPRequestHeaders(CFBundleRef appBundle, CFData
     if ([updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
         pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:self.updater];
     }
-    NSArray *arguments = @[[self.host bundlePath],
-                           pathToRelaunch,
+    NSArray *arguments = @[[self.host bundlePath] ?: @"",
+                           pathToRelaunch ?: @"",
                            [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]],
-                           self.tempDir,
+                           self.tempDir ?: @"",
                            relaunch ? @"1" : @"0",
                            showUI ? @"1" : @"0"];
     if (SUShouldUseXPCInstaller())
