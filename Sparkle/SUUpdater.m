@@ -85,7 +85,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     
     SULoadLogSettingsFromBundle(bundle);
 
-    self.sparkleBundle = [NSBundle bundleForClass:[self class]];
+    // Use explicit class to use the correct bundle even when subclassed
+    self.sparkleBundle = [NSBundle bundleForClass:[SUUpdater class]];
     if (!self.sparkleBundle) {
         SULog(@"Error: SUUpdater can't find Sparkle.framework it belongs to");
         return nil;
