@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="8191" systemVersion="14F27" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="7706"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="8191"/>
+        <plugIn identifier="com.apple.WebKitIBPlugin" version="8191"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
     </dependencies>
@@ -26,7 +26,7 @@
         <window identifier="SUUpdateAlert" title="Software Update" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="SUUpdateAlert" animationBehavior="default" id="5" userLabel="Update Alert (release notes)">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="998" y="728" width="620" height="370"/>
+            <rect key="contentRect" x="746" y="229" width="620" height="370"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1366" height="745"/>
             <value key="minSize" type="size" width="550" height="150"/>
             <value key="maxSize" type="size" width="700" height="600"/>
@@ -118,7 +118,7 @@
                                 </connections>
                             </box>
                             <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="17">
-                                <rect key="frame" x="-2" y="220" width="89" height="14"/>
+                                <rect key="frame" x="-2" y="220" width="85" height="14"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="100" constant="100" id="gkn-FW-9aC"/>
                                 </constraints>
@@ -138,7 +138,7 @@
                         </subviews>
                         <constraints>
                             <constraint firstItem="89" firstAttribute="top" secondItem="17" secondAttribute="bottom" constant="6" id="1H8-33-yNF"/>
-                            <constraint firstAttribute="width" secondItem="89" secondAttribute="width" id="3y1-1h-gd7"/>
+                            <constraint firstAttribute="trailing" secondItem="89" secondAttribute="trailing" id="Bv8-Jz-SXd"/>
                             <constraint firstAttribute="bottom" secondItem="89" secondAttribute="bottom" id="E4h-VA-0Xt"/>
                             <constraint firstItem="17" firstAttribute="top" secondItem="fKC-QA-GZa" secondAttribute="top" id="P9G-6a-y7j"/>
                             <constraint firstItem="89" firstAttribute="leading" secondItem="fKC-QA-GZa" secondAttribute="leading" id="e5T-q1-kq1"/>
@@ -239,7 +239,7 @@ DQ
             <connections>
                 <outlet property="delegate" destination="-2" id="50"/>
             </connections>
-            <point key="canvasLocation" x="701" y="301"/>
+            <point key="canvasLocation" x="466" y="290"/>
         </window>
         <userDefaultsController representsSharedInstance="YES" id="93" userLabel="Shared Defaults"/>
     </objects>

@@ -62,6 +62,18 @@
     return [self.bundle bundlePath];
 }
 
+- (BOOL)allowsAutomaticUpdates
+{
+    // Does the developer want us to disable automatic updates?
+    NSNumber *developerAllowsAutomaticUpdates = [self objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
+    if (developerAllowsAutomaticUpdates != nil && !developerAllowsAutomaticUpdates.boolValue) {
+        return NO;
+    }
+    
+    // Can we automatically update in the background without bugging the user (e.g, with a administrator password prompt)?
+    return [[NSFileManager defaultManager] isWritableFileAtPath:self.bundlePath];
+}
+
 - (NSString *)appCachePath
 {
     NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
@@ -89,7 +101,8 @@
     if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
         // We'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
         NSString *normalizedAppPath = [[[self.bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[self.bundle bundlePath] pathExtension]]];
-        if (![[NSFileManager defaultManager] fileExistsAtPath:[[[self.bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[self.bundle bundlePath] pathExtension]]]]) {
+
+        if (![[NSFileManager defaultManager] fileExistsAtPath:normalizedAppPath]) {
             return normalizedAppPath;
         }
     }
@@ -102,13 +115,13 @@
 
     // Allow host bundle to provide a custom name
     name = [self objectForInfoDictionaryKey:@"SUBundleName"];
-    if (name) return name;
+    if (name && name.length > 0) return name;
 
     name = [self.bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
-	if (name) return name;
+	if (name && name.length > 0) return name;
 
     name = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey];
-	if (name) return name;
+	if (name && name.length > 0) return name;
 
     return [[[NSFileManager defaultManager] displayNameAtPath:[self.bundle bundlePath]] stringByDeletingPathExtension];
 }
@@ -157,7 +170,7 @@
 {
     struct statfs statfs_info;
     statfs([[self.bundle bundlePath] fileSystemRepresentation], &statfs_info);
-    return (statfs_info.f_flags & MNT_RDONLY);
+    return (statfs_info.f_flags & MNT_RDONLY) != 0;
 }
 
 - (BOOL)isBackgroundApplication
@@ -273,7 +286,7 @@
 
 + (NSOperatingSystemVersion)operatingSystemVersion
 {
-#if __MAC_OS_X_VERSION_MIN_REQUIRED < 1090 // Present in 10.9 despite NS_AVAILABLE's claims
+#if __MAC_OS_X_VERSION_MIN_REQUIRED < 101000
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wselector"
     // Xcode 5.1.1: operatingSystemVersion is clearly declared, must warn due to a compiler bug?
@@ -290,6 +303,18 @@
     }
 #endif
     return [[NSProcessInfo processInfo] operatingSystemVersion];
+}
+
++ (BOOL)isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion)version
+{
+    const NSOperatingSystemVersion systemVersion = self.operatingSystemVersion;
+    if (systemVersion.majorVersion == version.majorVersion) {
+        if (systemVersion.minorVersion == version.minorVersion) {
+            return systemVersion.patchVersion >= version.patchVersion;
+        }
+        return systemVersion.minorVersion >= version.minorVersion;
+    }
+    return systemVersion.majorVersion >= version.majorVersion;
 }
 
 + (NSString *)systemVersionString

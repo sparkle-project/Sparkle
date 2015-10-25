@@ -1,3 +1,38 @@
+
+# 1.12.0
+
+* Rewrote file operations for updating an app (Zorg)
+  - Ensuring atomic move operations, robust error handling.
+  - Faster.
+  - Using modern APIs where possible (no FSPathMakeRef, FSGetCatalogInfo, FSFindFolder, etc.)
+  - Strong documentation, easier to read code.
+* Deprecated serving over http without DSA (Zorg)
+* Disallowed automatic updates when user can't write to the bundle (Zorg)
+* Improved Autoupdate application (Zorg)
+    * Do all the installation work after the runloop is set up
+    * TerminationListener only does termination listening now
+    * Handle cases where host path is not installation path and host path is not desired executable path
+* Removed extensions from shell scripts (Jake Petroules)
+* Rewritten test app so it works again, and from a local web server (Zorg)
+* Set LD_RUNPATH_SEARCH_PATHS in Podspec. (Jake Petroules)
+* Don't install automatic updates if the system might shut off (Zorg)
+* Don't show Autoupdate dock icon if we shouldn't show UI (Zorg)
+* Updated layout constraints when removing release notes (Zorg)
+* Improved BinaryDelta error handling & logging (Zorg)
+* Refactored quarantine removal (Zorg)
+* Fixed German localization (1024jp)
+* Updated zh_CN translation (LIU Dongyuan / 柳东原)
+* Updated Mac models list until July 2015 (Gabriel Ulici)
+* Updated Polish translation (Kornel Lesiński)
+* Updated Xcode project languages for which we have translations (Jake Petroules)
+* Use NSByteCountFormatter if available (Jake Petroules)
+* Declared protocols on SUUpdateAlert for the 10.11 SDK (Daniel Jalkut)
+* Silenced warning about casting away const-ness and -Wassign-enum (Daniel Jalkut)
+* Added script to generate a report comparing the Sparkle.strings files (Kevin Wojniak)
+* Check for empty strings (as well as nil) in SUHost's -name method (Karl Moskowski)
+* Don't follow symlinks for checking file existence (Zorg)
+* Unit tests in Swift (Zorg, Jake Petroules)
+
 # 1.11.0
 
 * Big improvements to code signing and DSA verification

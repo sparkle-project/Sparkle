@@ -12,6 +12,6 @@
 #import "SUBinaryDeltaCommon.h"
 
 @class NSString;
-int createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, SUBinaryDeltaMajorVersion majorVersion, BOOL verbose);
+BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, SUBinaryDeltaMajorVersion majorVersion, BOOL verbose, NSError * __autoreleasing *error);
 
 #endif

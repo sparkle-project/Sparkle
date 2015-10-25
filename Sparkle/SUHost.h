@@ -24,10 +24,12 @@ typedef struct {
 @property (strong, readonly) NSBundle *bundle;
 
 + (NSOperatingSystemVersion)operatingSystemVersion;
++ (BOOL)isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion)version;
 + (NSString *)systemVersionString;
 
 - (instancetype)initWithBundle:(NSBundle *)aBundle;
 @property (readonly, copy) NSString *bundlePath;
+@property (readonly) BOOL allowsAutomaticUpdates;
 @property (readonly, copy) NSString *appCachePath;
 @property (readonly, copy) NSString *installationPath;
 @property (readonly, copy) NSString *name;
