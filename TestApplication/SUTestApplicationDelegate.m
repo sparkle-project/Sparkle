@@ -9,18 +9,19 @@
 #import "SUTestApplicationDelegate.h"
 #import "SUUpdateSettingsWindowController.h"
 #import "SUFileManager.h"
+#import "SUTestWebServer.h"
 
 @interface SUTestApplicationDelegate ()
 
 @property (nonatomic) SUUpdateSettingsWindowController *updateSettingsWindowController;
-@property (nonatomic) NSTask *serverTask;
+@property (nonatomic) SUTestWebServer *webServer;
 
 @end
 
 @implementation SUTestApplicationDelegate
 
 @synthesize updateSettingsWindowController = _updateSettingsWindowController;
-@synthesize serverTask = _serverTask;
+@synthesize webServer = _webServer;
 
 static NSString * const UPDATED_VERSION = @"2.0";
 
@@ -177,13 +178,12 @@ static NSString * const UPDATED_VERSION = @"2.0";
     }
     
     // Finally start the server
-    NSTask *serverTask = [[NSTask alloc] init];
-    serverTask.launchPath = @"/usr/bin/python";
-    assert([[NSFileManager defaultManager] fileExistsAtPath:serverTask.launchPath]);
-    serverTask.arguments = @[@"-m", @"SimpleHTTPServer", @"1337"];
-    serverTask.currentDirectoryPath = serverDirectoryPath;
-    [serverTask launch];
-    self.serverTask = serverTask;
+    SUTestWebServer *webServer = [[SUTestWebServer alloc] initWithPort:1337 workingDirectory:serverDirectoryPath];
+    if (!webServer) {
+        NSLog(@"Failed to create the web server");
+        assert(NO);
+    }
+    self.webServer = webServer;
     
     // Show the Settings window
     self.updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] init];
@@ -192,7 +192,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
 
 - (void)applicationWillTerminate:(NSNotification * __unused)notification
 {
-    [self.serverTask terminate];
+    [self.webServer close];
 }
 
 @end
