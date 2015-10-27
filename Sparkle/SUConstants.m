@@ -52,6 +52,12 @@ NSString *const SUEnableAutomatedDowngradesKey = @"SUEnableAutomatedDowngrades";
 NSString *const SUNormalizeInstalledApplicationNameKey = @"SUNormalizeInstalledApplicationName";
 NSString *const SURelaunchToolNameKey = @"SURelaunchToolName";
 
+NSString *const SULogClearAtLaunchKey = @"SULogClearAtLaunch";
+NSString *const SULogMaxFileSizeKey = @"SULogMaxFileSize";
+NSString *const SULogPersonalLogFileKey = @"SULogPersonalLogFile";
+NSString *const SULogTraceLoggingKey = @"SULogTraceLogging";
+NSString *const SULogTrimMaxFileSizeCoefficientKey = @"SULogTrimMaxFileSizeCoefficient";
+
 NSString *const SUAppcastAttributeDeltaFrom = @"sparkle:deltaFrom";
 NSString *const SUAppcastAttributeDSASignature = @"sparkle:dsaSignature";
 NSString *const SUAppcastAttributeShortVersionString = @"sparkle:shortVersionString";

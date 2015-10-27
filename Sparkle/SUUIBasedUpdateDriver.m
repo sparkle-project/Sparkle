@@ -13,6 +13,7 @@
 #import "SUHost.h"
 #import "SUStatusController.h"
 #import "SUConstants.h"
+#import "SULog.h"
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED < 1080
 @interface NSByteCountFormatter : NSFormatter {
@@ -113,6 +114,7 @@
     [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
     switch (choice) {
         case SUInstallUpdateChoice:
+            SULogTrace(@"User chose: update");
             self.statusController = [[SUStatusController alloc] initWithHost:self.host];
             [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
             [self.statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
@@ -121,16 +123,19 @@
             break;
 
         case SUOpenInfoURLChoice:
+            SULogTrace(@"User chose: see info");
             [[NSWorkspace sharedWorkspace] openURL:[self.updateItem infoURL]];
             [self abortUpdate];
             break;
 
         case SUSkipThisVersionChoice:
+            SULogTrace(@"User chose: skip this version");
             [self.host setObject:[self.updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
             [self abortUpdate];
             break;
 
         case SURemindMeLaterChoice:
+            SULogTrace(@"User chose: remind later");
             [self abortUpdate];
             break;
     }
