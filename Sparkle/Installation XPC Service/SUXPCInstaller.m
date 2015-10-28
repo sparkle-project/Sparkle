@@ -83,7 +83,8 @@ BOOL SUShouldUseXPCInstaller(void)
             const char *errorString = xpc_dictionary_get_string(response, SUInstallServiceErrorLocalizedDescriptionKey);
             if (errorString != NULL)
             {
-                NSDictionary *errorInfo = [NSDictionary dictionaryWithObject:[NSString stringWithCString:errorString encoding:NSUTF8StringEncoding]
+                NSString *errorStr = [NSString stringWithCString:errorString encoding:NSUTF8StringEncoding];
+                NSDictionary *errorInfo = [NSDictionary dictionaryWithObject:errorStr ? errorStr : @""
                                                                       forKey:NSLocalizedDescriptionKey];
                 error = [[NSError alloc] initWithDomain:SUSparkleErrorDomain code:SUXPCServiceError userInfo:errorInfo];
             }
@@ -136,7 +137,8 @@ BOOL SUShouldUseXPCInstaller(void)
             const char *errorString = xpc_dictionary_get_string(response, SUInstallServiceErrorLocalizedDescriptionKey);
             if (errorString != NULL)
             {
-                NSDictionary *errorInfo = [NSDictionary dictionaryWithObject:[NSString stringWithCString:errorString encoding:NSUTF8StringEncoding]
+                NSString *errorStr = [NSString stringWithCString:errorString encoding:NSUTF8StringEncoding];
+                NSDictionary *errorInfo = [NSDictionary dictionaryWithObject:errorStr ? errorStr : @""
                                                                       forKey:NSLocalizedDescriptionKey];
                 error = [[NSError alloc] initWithDomain:SUSparkleErrorDomain code:SUXPCServiceError userInfo:errorInfo];
             }

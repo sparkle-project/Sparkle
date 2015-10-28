@@ -162,7 +162,8 @@ static xpc_object_t SUISLaunchTask(xpc_object_t message)
         NSMutableArray *mutableArgs = [NSMutableArray arrayWithCapacity:count];
         for (size_t i = 0; i < count; i++)
         {
-            [mutableArgs addObject:[NSString stringWithUTF8String:xpc_array_get_string(array, i)]];
+            NSString *argument = [NSString stringWithUTF8String:xpc_array_get_string(array, i)];
+            [mutableArgs addObject: argument ? argument : @""];
         }
         
         arguments = mutableArgs;
