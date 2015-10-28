@@ -13,51 +13,92 @@
 
 @implementation SUCodeSigningVerifier
 
-+ (BOOL)codeSignatureMatchesHostAndIsValidAtPath:(NSString *)applicationPath error:(NSError *__autoreleasing *)error
++ (BOOL)codeSignatureAtPath:(NSString *)hostPath matchesSignatureAtPath:(NSString *)otherAppPath error:(NSError *__autoreleasing *)error
 {
     OSStatus result;
     SecRequirementRef requirement = NULL;
-    SecStaticCodeRef staticCode = NULL;
-    SecCodeRef hostCode = NULL;
-    NSBundle *newBundle;
-    CFErrorRef cfError = NULL;
+    SecStaticCodeRef staticHostCode = NULL;
+    SecStaticCodeRef staticAppCode = NULL;
+
     if (error) {
         *error = nil;
     }
 
-    result = SecCodeCopySelf(kSecCSDefaultFlags, &hostCode);
-    if (result != noErr) {
-        SULog(@"Failed to copy host code %d", result);
-        goto finally;
+    if (0 == hostPath.length) {
+        SecCodeRef hostCode = NULL;
+        result = SecCodeCopySelf(kSecCSDefaultFlags, &hostCode);
+        if (result != noErr) {
+            SULog(@"Failed to copy host code %d", result);
+            goto finally;
+        }
+        
+        result = SecCodeCopyStaticCode(hostCode, kSecCSDefaultFlags, &staticHostCode);
+        CFRelease(hostCode);
+        if (result != noErr) {
+            SULog(@"Failed to copy host code %d", result);
+            goto finally;
+        }
+    } else {
+        NSBundle *hostAppBundle = [NSBundle bundleWithPath:hostPath];
+        if (nil == hostAppBundle) {
+            SULog(@"Failed to create bundle at path %@", hostPath);
+            result = -1;
+            goto finally;
+        }
+        
+        result = SecStaticCodeCreateWithPath((__bridge CFURLRef)hostAppBundle.bundleURL, kSecCSDefaultFlags, &staticHostCode);
+        if (result != noErr) {
+            SULog(@"Failed to copy host code %d", result);
+            goto finally;
+        }
     }
-
-    result = SecCodeCopyDesignatedRequirement(hostCode, kSecCSDefaultFlags, &requirement);
+    
+    result = SecCodeCopyDesignatedRequirement(staticHostCode, kSecCSDefaultFlags, &requirement);
     if (result != noErr) {
         SULog(@"Failed to copy designated requirement. Code Signing OSStatus code: %d", result);
         goto finally;
     }
 
-    newBundle = [NSBundle bundleWithPath:applicationPath];
-    if (!newBundle) {
-        SULog(@"Failed to load NSBundle for update");
-        result = -1;
-        goto finally;
-    }
-
-    result = SecStaticCodeCreateWithPath((__bridge CFURLRef)[newBundle bundleURL], kSecCSDefaultFlags, &staticCode);
-    if (result != noErr) {
-        SULog(@"Failed to get static code %d", result);
-        goto finally;
+    if (0 == otherAppPath.length) {
+        SecCodeRef hostCode = NULL;
+        result = SecCodeCopySelf(kSecCSDefaultFlags, &hostCode);
+        if (result != noErr) {
+            SULog(@"Failed to copy other app code %d", result);
+            goto finally;
+        }
+        
+        result = SecCodeCopyStaticCode(hostCode, kSecCSDefaultFlags, &staticAppCode);
+        CFRelease(hostCode);
+        if (result != noErr) {
+            SULog(@"Failed to copy other app code %d", result);
+            goto finally;
+        }
+    } else {
+        NSBundle *otherAppBundle = [NSBundle bundleWithPath:otherAppPath];
+        if (nil == otherAppBundle) {
+            SULog(@"Failed to create bundle at path %@", otherAppPath);
+            result = -1;
+            goto finally;
+        }
+        
+        result = SecStaticCodeCreateWithPath((__bridge CFURLRef)otherAppBundle.bundleURL, kSecCSDefaultFlags, &staticAppCode);
+        if (result != noErr) {
+            SULog(@"Failed to copy other app code %d", result);
+            goto finally;
+        }
     }
 
     // Note that kSecCSCheckNestedCode may not work with pre-Mavericks code signing.
     // See https://github.com/sparkle-project/Sparkle/issues/376#issuecomment-48824267 and https://developer.apple.com/library/mac/technotes/tn2206
+    CFErrorRef cfError = NULL;
 	SecCSFlags flags = (SecCSFlags) (kSecCSDefaultFlags | kSecCSCheckAllArchitectures);
-    result = SecStaticCodeCheckValidityWithErrors(staticCode, flags, requirement, &cfError);
+    result = SecStaticCodeCheckValidityWithErrors(staticAppCode, flags, requirement, &cfError);
 
     if (cfError) {
         NSError *tmpError = CFBridgingRelease(cfError);
-        if (error) *error = tmpError;
+        if (error) {
+            *error = tmpError;
+        }
     }
 
     if (result != noErr) {
@@ -71,14 +112,14 @@
                 CFRelease(requirementString);
             }
 
-            [self logSigningInfoForCode:hostCode label:@"host info"];
-            [self logSigningInfoForCode:staticCode label:@"new info"];
+            [self logSigningInfoForCode:staticHostCode label:@"host info"];
+            [self logSigningInfoForCode:staticAppCode label:@"new info"];
         }
     }
 
 finally:
-    if (hostCode) CFRelease(hostCode);
-    if (staticCode) CFRelease(staticCode);
+    if (staticHostCode) CFRelease(staticHostCode);
+    if (staticAppCode) CFRelease(staticAppCode);
     if (requirement) CFRelease(requirement);
     return (result == noErr);
 }
@@ -148,20 +189,6 @@ static id valueOrNSNull(id value) {
         relevantInfo[@"build"] = valueOrNSNull(infoPlist[(__bridge NSString *)kCFBundleVersionKey]);
         SULog(@"%@: %@", label, relevantInfo);
     }
-}
-
-+ (BOOL)hostApplicationIsCodeSigned
-{
-    OSStatus result;
-    SecCodeRef hostCode = NULL;
-    result = SecCodeCopySelf(kSecCSDefaultFlags, &hostCode);
-    if (result != 0) return NO;
-
-    SecRequirementRef requirement = NULL;
-    result = SecCodeCopyDesignatedRequirement(hostCode, kSecCSDefaultFlags, &requirement);
-    if (hostCode) CFRelease(hostCode);
-    if (requirement) CFRelease(requirement);
-    return (result == 0);
 }
 
 + (BOOL)hostApplicationIsSandboxed

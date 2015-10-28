@@ -111,7 +111,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         // Saving-the-developer-from-a-stupid-mistake-check:
         BOOL hasPublicDSAKey = [host publicDSAKey] != nil;
         BOOL isMainBundle = [bundle isEqualTo:[NSBundle mainBundle]];
-        BOOL hostIsCodeSigned = [SUCodeSigningVerifier hostApplicationIsCodeSigned];
+        BOOL hostIsCodeSigned = [SUCodeSigningVerifier applicationAtPathIsCodeSigned:host.bundlePath];
         BOOL servingOverHttps = [[[[self feedURL] scheme] lowercaseString] isEqualToString:@"https"];
         NSAlert *alert = nil;
         if (!isMainBundle && !hasPublicDSAKey) {

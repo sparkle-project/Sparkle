@@ -300,8 +300,8 @@ CF_EXPORT CFDictionaryRef DMCopyHTTPRequestHeaders(CFBundleRef appBundle, CFData
             SULog(@"Update has no valid Code Signing (%ld - %@)", error.code, error.localizedDescription);
         }
         
-        BOOL shouldCheckCodeSignEquality = updateIsCodeSigned ? [SUCodeSigningVerifier hostApplicationIsCodeSigned] : NO;
-        if (shouldCheckCodeSignEquality && [SUCodeSigningVerifier codeSignatureMatchesHostAndIsValidAtPath:installSourcePath error:&error])
+        BOOL shouldCheckCodeSignEquality = updateIsCodeSigned ? [SUCodeSigningVerifier applicationAtPathIsCodeSigned:self.host.bundlePath] : NO;
+        if (shouldCheckCodeSignEquality && [SUCodeSigningVerifier codeSignatureAtPath:self.host.bundlePath matchesSignatureAtPath:installSourcePath error:&error])
         {
             isUpdateValid = YES;
             break;

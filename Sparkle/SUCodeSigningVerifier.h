@@ -12,9 +12,9 @@
 #import <Foundation/Foundation.h>
 
 @interface SUCodeSigningVerifier : NSObject
-+ (BOOL)codeSignatureMatchesHostAndIsValidAtPath:(NSString *)applicationPath error:(NSError **)error;
+// pass nil as an application path to check a host one
++ (BOOL)codeSignatureAtPath:(NSString *)hostPath matchesSignatureAtPath:(NSString *)otherAppPath error:(NSError **)error;
 + (BOOL)codeSignatureIsValidAtPath:(NSString *)applicationPath error:(NSError **)error;
-+ (BOOL)hostApplicationIsCodeSigned;
 + (BOOL)applicationAtPathIsCodeSigned:(NSString *)applicationPath;
 + (BOOL)hostApplicationIsSandboxed;
 @end
