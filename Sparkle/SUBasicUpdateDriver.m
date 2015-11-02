@@ -500,10 +500,10 @@ CF_EXPORT CFDictionaryRef DMCopyHTTPRequestHeaders(CFBundleRef appBundle, CFData
     if ([updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
         pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:self.updater];
     }
-    NSArray *arguments = @[[self.host bundlePath] ?: @"",
-                           pathToRelaunch ?: @"",
+    NSArray *arguments = @[self.host.bundlePath.length ? self.host.bundlePath: @"",
+                           pathToRelaunch.length ? pathToRelaunch : @"",
                            [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]],
-                           self.tempDir ?: @"",
+                           self.tempDir.length ? self.tempDir : @"",
                            relaunch ? @"1" : @"0",
                            showUI ? @"1" : @"0"];
     if (SUShouldUseXPCInstaller())

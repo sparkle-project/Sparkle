@@ -187,7 +187,7 @@ static const NSTimeInterval SUInstallationTimeLimit = 5;
         NSError *error = nil;
         [[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:relaunchPath]
                                                       options:NSWorkspaceLaunchNewInstance
-                                                configuration:nil
+                                                configuration:@{}
                                                         error:&error];
         if (error.code != noErr)
         {
