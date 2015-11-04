@@ -16,30 +16,13 @@
 
 @implementation SUInstaller
 
-static NSString *sUpdateFolder = nil;
-
-+ (NSString *)updateFolder
-{
-    return sUpdateFolder;
-}
-
 + (BOOL)isAliasFolderAtPath:(NSString *)path
 {
-    FSRef fileRef;
-    OSStatus err = noErr;
-    Boolean aliasFileFlag = false, folderFlag = false;
-    NSURL *fileURL = [NSURL fileURLWithPath:path];
-
-    if (FALSE == CFURLGetFSRef((CFURLRef)fileURL, &fileRef))
-        err = coreFoundationUnknownErr;
-
-    if (noErr == err)
-        err = FSIsAliasFile(&fileRef, &aliasFileFlag, &folderFlag);
-
-    if (noErr == err)
-        return !!(aliasFileFlag && folderFlag);
-    else
-        return NO;
+    NSNumber *aliasFlag = nil;
+    [[NSURL fileURLWithPath:path] getResourceValue:&aliasFlag forKey:NSURLIsAliasFileKey error:nil];
+    NSNumber *directoryFlag = nil;
+    [[NSURL fileURLWithPath:path] getResourceValue:&directoryFlag forKey:NSURLIsDirectoryKey error:nil];
+    return aliasFlag.boolValue && directoryFlag.boolValue;
 }
 
 + (NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr isGuided:(BOOL *)isGuidedPtr
@@ -57,8 +40,6 @@ static NSString *sUpdateFolder = nil;
     NSString *fallbackPackagePath = nil;
     NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:inUpdateFolder];
     NSString *bundleFileNameNoExtension = [bundleFileName stringByDeletingPathExtension];
-
-    sUpdateFolder = inUpdateFolder;
 
     while ((currentFile = [dirEnum nextObject])) {
         NSString *currentPath = [inUpdateFolder stringByAppendingPathComponent:currentFile];

@@ -10,6 +10,6 @@
 #define SUBINARYDELTAAPPLY_H
 
 @class NSString;
-int applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, BOOL verbose);
+BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, BOOL verbose, NSError * __autoreleasing *error);
 
 #endif

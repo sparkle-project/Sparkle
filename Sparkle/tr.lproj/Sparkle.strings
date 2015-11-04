@@ -4,7 +4,7 @@
 
 /* de_DE v0.1 - No comment provided by engineer. */
 
-"%1$@ can't be updated when it's running from a disk image. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "%1$@ uygulaması disk kalıbı içerisindeyken güncellenemez. Lütfen %1$@ uygulamasını Uygulamalar dizinine kopyalayıp yeniden başlatınız.";
+"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "%1$@ uygulaması disk kalıbı içerisindeyken güncellenemez. Lütfen %1$@ uygulamasını Uygulamalar dizinine kopyalayıp yeniden başlatınız.";
 
 /* de_DE v0.1 - No comment provided by engineer. */
 
@@ -12,8 +12,11 @@
 
 /* de_DE v0.1 - No comment provided by engineer. */
 
+/* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ çıktı (Kullandığınız Sürüm: %3$@). Şimdi yeni sürümü indirmek ister misiniz?";
 
+/* Description text for SUUpdateAlert when the update informational with no download. */
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
 
 "%@ downloaded" = "%@ indirildi";
 
@@ -119,5 +122,5 @@
 "You already have the newest version of %@." = "%@ uygulamasının en güncel sürümü sizde mevcut.";
 
 
-"You're up to date!" = "Uygulama güncel!";
+"You're up-to-date!" = "Uygulama güncel!";
 

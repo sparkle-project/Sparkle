@@ -37,7 +37,8 @@ static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
 
 - (NSDictionary *)modelTranslationTable
 {
-    NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"SUModelTranslation" ofType:@"plist"];
+    // Use explicit class to use the correct bundle even when subclassed
+    NSString *path = [[NSBundle bundleForClass:[SUSystemProfiler class]] pathForResource:@"SUModelTranslation" ofType:@"plist"];
     return [[NSDictionary alloc] initWithContentsOfFile:path];
 }
 

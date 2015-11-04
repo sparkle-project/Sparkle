@@ -55,7 +55,7 @@
     SecExternalItemType itemType = kSecItemTypePublicKey;
     CFArrayRef items = NULL;
 
-    OSStatus status = SecItemImport((__bridge CFDataRef)data, NULL, &format, &itemType, 0, NULL, NULL, &items);
+    OSStatus status = SecItemImport((__bridge CFDataRef)data, NULL, &format, &itemType, (SecItemImportExportFlags)0, NULL, NULL, &items);
     if (status != errSecSuccess || !items) {
         if (items) {
             CFRelease(items);
@@ -65,7 +65,13 @@
     }
 
     if (format == kSecFormatOpenSSL && itemType == kSecItemTypePublicKey && CFArrayGetCount(items) == 1) {
+        // Seems silly, but we can't quiet the warning about dropping CFTypeRef's const qualifier through
+        // any manner of casting I've tried, including interim explicit cast to void*. The -Wcast-qual
+        // warning is on by default with -Weverything and apparently became more noisy as of Xcode 7.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcast-qual"
         _secKey = (SecKeyRef)CFRetain(CFArrayGetValueAtIndex(items, 0));
+#pragma clang diagnostic pop
     }
 
     CFRelease(items);
