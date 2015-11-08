@@ -7,7 +7,7 @@
 //
 
 #import "SUFileManager.h"
-#import "SUHost.h"
+#import "SUOperatingSystem.h"
 
 #include <sys/xattr.h>
 #include <sys/errno.h>
@@ -52,15 +52,23 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 {
     AuthorizationRef _auth;
     NSFileManager *_fileManager;
+    BOOL _allowsAuthorization;
 }
 
-- (id)init
+- (instancetype)initAllowingAuthorization:(BOOL)allowsAuthorization
 {
     self = [super init];
     if (self != nil) {
         _fileManager = [[NSFileManager alloc] init];
+        _allowsAuthorization = allowsAuthorization;
     }
     return self;
+}
+
+
++ (instancetype)fileManagerAllowingAuthorization:(BOOL)allowsAuthorization
+{
+    return [[self alloc] initAllowingAuthorization:allowsAuthorization];
 }
 
 // Acquires an authorization reference which is intended to be used for future authorized file operations
@@ -69,6 +77,13 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     // No need to continue if we already acquired an authorization reference
     if (_auth != NULL) {
         return YES;
+    }
+    
+    if (!_allowsAuthorization) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: @"Unable to grant authorization to perform action because it is explicitly turned off" }];
+        }
+        return NO;
     }
     
     OSStatus status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &_auth);
@@ -177,7 +192,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     return success;
 }
 
-- (BOOL)_releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL allowingAuthentication:(BOOL)allowsAuthentication withQuarantineRetrieval:(BOOL (^)(NSURL *))quarantineRetrieval quarantineRemoval:(BOOL (^)(NSURL *, NSError * __autoreleasing *))quarantineRemoval isAccessError:(BOOL (^)(NSError *))isAccessError error:(NSError * __autoreleasing *)error
+- (BOOL)_releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL withQuarantineRetrieval:(BOOL (^)(NSURL *))quarantineRetrieval quarantineRemoval:(BOOL (^)(NSURL *, NSError * __autoreleasing *))quarantineRemoval isAccessError:(BOOL (^)(NSError *))isAccessError error:(NSError * __autoreleasing *)error
 {
     if (![self _itemExistsAtURL:rootURL]) {
         if (error != NULL) {
@@ -195,7 +210,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
             if (quarantineRemoval(fileURL, &removalError)) {
                 removedQuarantine = YES;
             } else {
-                if (allowsAuthentication && isAccessError(removalError)) {
+                if (isAccessError(removalError)) {
                     removedQuarantine = [self _removeXAttrWithAuthentication:SUAppleQuarantineIdentifier fromRootURL:rootURL error:error];
                     attemptedAuthentication = YES;
                 } else {
@@ -269,14 +284,13 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 // We used to have code similar to the method below that used -[NSURL getResourceValue:forKey:error:] and -[NSURL setResourceValue:forKey:error:]
 // However, those methods *really suck* - you can't rely on the return value from getting the resource value and if you set the resource value
 // when the key isn't present, errors are spewed out to the console
-- (BOOL)_releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL allowingAuthentication:(BOOL)allowsAuthentication error:(NSError *__autoreleasing *)error
+- (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError *__autoreleasing *)error
 {
     static const int removeXAttrOptions = XATTR_NOFOLLOW;
     
     return
     [self
      _releaseItemFromQuarantineAtRootURL:rootURL
-     allowingAuthentication:allowsAuthentication
      withQuarantineRetrieval:^BOOL(NSURL *fileURL) {
          return ([self _getXAttr:SUAppleQuarantineIdentifier fromFile:fileURL.path options:removeXAttrOptions] >= 0);
      }
@@ -293,30 +307,189 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
      error:error];
 }
 
-- (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError * __autoreleasing *)error
-{
-    return [self _releaseItemFromQuarantineAtRootURL:rootURL allowingAuthentication:YES error:error];
-}
-
-- (BOOL)releaseItemFromQuarantineWithoutAuthenticationAtRootURL:(NSURL *)rootURL error:(NSError * __autoreleasing *)error
-{
-    return [self _releaseItemFromQuarantineAtRootURL:rootURL allowingAuthentication:NO error:error];
-}
-
-- (BOOL)moveItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError *__autoreleasing *)error
+/*
+ * Copies an item from one location to another
+ * This intentionally does *not* use copyfile() or any API that uses it such as NSFileManager's copy item method
+ * This is because copyfile() can fail to copy symbolic links from one network mount to another, which will affect copying apps
+ * This failure occurs because the system may think symbolic links on a SMB mount are zero bytes in size
+ * For more info, see bug reports at http://openradar.appspot.com/radar?id=4925873463492608
+ * and http://openradar.appspot.com/radar?id=5024037222744064
+ */
+- (BOOL)copyItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError * __autoreleasing *)error
 {
     if (![self _itemExistsAtURL:sourceURL]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source file to move (%@) does not exist.", sourceURL.path.lastPathComponent] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source file to copy (%@) does not exist.", sourceURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    if (![self _itemExistsAtURL:destinationURL.URLByDeletingLastPathComponent]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination parent directory to copy into (%@) does not exist.", destinationURL.URLByDeletingLastPathComponent.lastPathComponent] }];
         }
         return NO;
     }
     
     if ([self _itemExistsAtURL:destinationURL]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination file to move (%@) already exists.", destinationURL.path.lastPathComponent] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination file to copy to (%@) already exists.", destinationURL.lastPathComponent] }];
         }
         return NO;
+    }
+    
+    char sourcePath[PATH_MAX] = {0};
+    if (![sourceURL.path getFileSystemRepresentation:sourcePath maxLength:sizeof(sourcePath)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"File to copy (%@) cannot be represented as a valid file name.", sourceURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    FSRef sourceRef;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    OSStatus makeSourceResult = FSPathMakeRefWithOptions((const UInt8 *)sourcePath, kFSPathMakeRefDoNotFollowLeafSymlink, &sourceRef, NULL);
+#pragma clang diagnostic pop
+    if (makeSourceResult != noErr) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:makeSourceResult userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create file system reference for source %@.", sourceURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    char destinationParentPath[PATH_MAX] = {0};
+    if (![destinationURL.URLByDeletingLastPathComponent.path getFileSystemRepresentation:destinationParentPath maxLength:sizeof(destinationParentPath)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination parent directory to copy file into (%@) cannot be represented as a valid file name.", destinationURL.URLByDeletingLastPathComponent.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    FSRef destinationParentRef;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    OSStatus makeDestinationParentResult = FSPathMakeRefWithOptions((const UInt8 *)destinationParentPath, kFSPathMakeRefDoNotFollowLeafSymlink, &destinationParentRef, NULL);
+#pragma clang diagnostic pop
+    if (makeDestinationParentResult != noErr) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:makeDestinationParentResult userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create file system reference for parent directory %@.", destinationURL.URLByDeletingLastPathComponent.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    OSStatus copyResult = FSCopyObjectSync(&sourceRef, &destinationParentRef, (__bridge CFStringRef)(destinationURL.lastPathComponent), NULL, kFSFileOperationDefaultOptions);
+#pragma clang diagnostic pop
+    if (copyResult == noErr) {
+        return YES;
+    }
+    
+    if (copyResult != permErr) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:copyResult userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to copy file (%@)", sourceURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    if (![self _acquireAuthorizationWithError:error]) {
+        return NO;
+    }
+    
+    char destinationPath[PATH_MAX] = {0};
+    if (![destinationURL.path getFileSystemRepresentation:destinationPath maxLength:sizeof(destinationPath)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination to copy file to (%@) cannot be represented as a valid file name.", destinationURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    if (!AuthorizationExecuteWithPrivilegesAndWait(_auth, "/bin/cp", kAuthorizationFlagDefaults, (char *[]){ "-Rf", sourcePath, destinationPath, NULL })) {
+        if (error != NULL) {
+            NSString *errorMessage = [NSString stringWithFormat:@"Failed to perform authenticated file copy for %@.", sourceURL.lastPathComponent];
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey:errorMessage }];
+        }
+        return NO;
+    }
+    
+    return YES;
+}
+
+/*
+ * Retrieves the volume ID that a particular url resides on
+ * The url must point to a file that exists
+ * There is no cocoa equivalent for obtaining the volume ID
+ * Although NSURLVolumeURLForRemountingKey exists as a resource key for NSURL,
+ * that will not return a URL if the mount is not re-mountable and I otherwise don't trust the API
+ */
+- (BOOL)_getVolumeID:(FSVolumeRefNum *)volumeID ofItemAtURL:(NSURL *)url
+{
+    char path[PATH_MAX] = {0};
+    if (![url.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
+        return NO;
+    }
+    
+    FSRef pathRef;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    if (FSPathMakeRefWithOptions((const UInt8*)path, kFSPathMakeRefDoNotFollowLeafSymlink, &pathRef, NULL) != noErr) {
+#pragma clang diagnostic pop
+        return NO;
+    }
+    
+    FSCatalogInfo catalogInfo;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    OSErr catalogError = FSGetCatalogInfo(&pathRef, kFSCatInfoVolume, &catalogInfo, NULL, NULL, NULL);
+#pragma clang diagnostic pop
+    if (catalogError != noErr) {
+        return NO;
+    }
+    
+    if (volumeID != NULL) {
+        *volumeID = catalogInfo.volume;
+    }
+    
+    return YES;
+}
+
+- (BOOL)moveItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError *__autoreleasing *)error
+{
+    if (![self _itemExistsAtURL:sourceURL]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source file to move (%@) does not exist.", sourceURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    if (![self _itemExistsAtURL:destinationURL.URLByDeletingLastPathComponent]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination parent directory to move into (%@) does not exist.", destinationURL.URLByDeletingLastPathComponent.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    if ([self _itemExistsAtURL:destinationURL]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination file to move (%@) already exists.", destinationURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    // If the source and destination are on different volumes, we should not do a move;
+    // from my experience a move may fail when moving particular files from
+    // one network mount to another one. This is possibly related to the fact that
+    // moving a file will try to preserve ownership but copying won't
+    
+    FSVolumeRefNum sourceVolume = 0;
+    BOOL foundSourceVolume = [self _getVolumeID:&sourceVolume ofItemAtURL:sourceURL];
+    
+    FSVolumeRefNum destinationVolume = 0;
+    BOOL foundDestinationVolume = [self _getVolumeID:&destinationVolume ofItemAtURL:destinationURL.URLByDeletingLastPathComponent];
+    
+    if (foundSourceVolume && foundDestinationVolume && sourceVolume != destinationVolume) {
+        return ([self copyItemAtURL:sourceURL toURL:destinationURL error:error] && [self removeItemAtURL:sourceURL error:error]);
     }
     
     NSError *moveError = nil;
@@ -674,7 +847,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     NSURL *trashURL = nil;
     BOOL canUseNewTrashAPI = YES;
 #if __MAC_OS_X_VERSION_MIN_REQUIRED < 1080
-    canUseNewTrashAPI = [SUHost isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 8, 0}];
+    canUseNewTrashAPI = [SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 8, 0}];
     if (!canUseNewTrashAPI) {
         FSRef trashRef;
         if (FSFindFolder(kUserDomain, kTrashFolderType, kDontCreateFolder, &trashRef) == noErr) {
