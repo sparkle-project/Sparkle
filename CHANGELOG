@@ -1,3 +1,7 @@
+# 1.11.1
+
+* Don't install automatic updates when system is about to shut down
+
 # 1.11.0
 
 * Big improvements to code signing and DSA verification
