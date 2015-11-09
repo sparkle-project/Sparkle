@@ -41,21 +41,21 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
 
-    char sourcePath[PATH_MAX] = {0};
-    if (![url.path getFileSystemRepresentation:sourcePath maxLength:sizeof(sourcePath)]) {
+    char path[PATH_MAX] = {0};
+    if (![url.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"File to copy (%@) cannot be represented as a valid file name.", url.lastPathComponent] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"URL of the file (%@) cannot be represented as a file path", url.lastPathComponent] }];
         }
         return NO;
     }
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    OSStatus makeResult = FSPathMakeRefWithOptions((const UInt8 *)sourcePath, kFSPathMakeRefDoNotFollowLeafSymlink, ref, NULL);
+    OSStatus makeResult = FSPathMakeRefWithOptions((const UInt8 *)path, kFSPathMakeRefDoNotFollowLeafSymlink, ref, NULL);
 #pragma clang diagnostic pop
     if (makeResult != noErr) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:makeResult userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create file system reference for source %@.", url.lastPathComponent] }];
+            *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:makeResult userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create file system reference for %@", url.lastPathComponent] }];
         }
         return NO;
     }
