@@ -9,7 +9,7 @@
                 <outlet property="descriptionTextField" destination="33" id="133"/>
                 <outlet property="moreInfoButton" destination="71" id="132"/>
                 <outlet property="moreInfoView" destination="39" id="127"/>
-                <outlet property="profileTableView" destination="41" id="186"/>
+                <outlet property="profileTableView" destination="41" id="187"/>
                 <outlet property="window" destination="5" id="126"/>
             </connections>
         </customObject>
@@ -60,7 +60,7 @@ Gw
                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                         <animations/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="ตรวจสอบอัพเดทอัตโนมัติ?" id="178">
-                            <font key="font" size="13" name="Thonburi-Bold"/>
+                            <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
@@ -146,7 +146,7 @@ Gw
             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField verticalHuggingPriority="750" id="46">
-                    <rect key="frame" x="1" y="142" width="358" height="56"/>
+                    <rect key="frame" x="1" y="128" width="358" height="70"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <animations/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="183">
@@ -159,10 +159,10 @@ Gw
                     </textFieldCell>
                 </textField>
                 <scrollView autohidesScrollers="YES" horizontalLineScroll="16" horizontalPageScroll="0.0" verticalLineScroll="16" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="40">
-                    <rect key="frame" x="4" y="5" width="355" height="130"/>
+                    <rect key="frame" x="4" y="5" width="355" height="115"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                    <clipView key="contentView" id="pCg-b2-1dm">
-                        <rect key="frame" x="1" y="1" width="353" height="128"/>
+                    <clipView key="contentView" id="sbp-rk-wxX">
+                        <rect key="frame" x="1" y="1" width="353" height="113"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="14" id="41">

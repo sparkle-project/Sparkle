@@ -9,7 +9,7 @@
                 <outlet property="descriptionTextField" destination="33" id="133"/>
                 <outlet property="moreInfoButton" destination="71" id="132"/>
                 <outlet property="moreInfoView" destination="39" id="127"/>
-                <outlet property="profileTableView" destination="41" id="186"/>
+                <outlet property="profileTableView" destination="41" id="187"/>
                 <outlet property="window" destination="5" id="126"/>
             </connections>
         </customObject>
@@ -26,7 +26,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" tag="1" id="13">
-                        <rect key="frame" x="287" y="12" width="137" height="32"/>
+                        <rect key="frame" x="255" y="12" width="169" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                         <animations/>
                         <buttonCell key="cell" type="push" title="Kanna sjálfkrafa" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" tag="1" inset="2" id="176">
@@ -41,7 +41,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="14">
-                        <rect key="frame" x="170" y="12" width="117" height="32"/>
+                        <rect key="frame" x="138" y="12" width="117" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                         <animations/>
                         <buttonCell key="cell" type="push" title="Ekki kanna" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="177">
@@ -111,7 +111,7 @@ Gw
                     </imageView>
                     <button focusRingType="none" horizontalHuggingPriority="750" verticalHuggingPriority="750" id="71">
                         <rect key="frame" x="80" y="50" width="27" height="26"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                         <animations/>
                         <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" imagePosition="overlaps" alignment="center" borderStyle="border" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="182">
                             <behavior key="behavior" pushIn="YES" changeBackground="YES" changeGray="YES" lightByContents="YES"/>
@@ -161,7 +161,7 @@ Gw
                 <scrollView autohidesScrollers="YES" horizontalLineScroll="16" horizontalPageScroll="0.0" verticalLineScroll="16" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="40">
                     <rect key="frame" x="4" y="5" width="355" height="115"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                    <clipView key="contentView" id="hHT-5r-ql1">
+                    <clipView key="contentView" id="sbp-rk-wxX">
                         <rect key="frame" x="1" y="1" width="353" height="113"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>

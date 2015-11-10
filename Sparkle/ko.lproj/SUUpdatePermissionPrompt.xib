@@ -9,7 +9,7 @@
                 <outlet property="descriptionTextField" destination="33" id="133"/>
                 <outlet property="moreInfoButton" destination="71" id="132"/>
                 <outlet property="moreInfoView" destination="39" id="127"/>
-                <outlet property="profileTableView" destination="41" id="186"/>
+                <outlet property="profileTableView" destination="41" id="187"/>
                 <outlet property="window" destination="5" id="126"/>
             </connections>
         </customObject>
@@ -26,7 +26,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" tag="1" id="13">
-                        <rect key="frame" x="302" y="12" width="122" height="32"/>
+                        <rect key="frame" x="255" y="12" width="169" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                         <animations/>
                         <buttonCell key="cell" type="push" title="자동으로 확인" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" tag="1" inset="2" id="176">
@@ -41,7 +41,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="14">
-                        <rect key="frame" x="236" y="12" width="66" height="32"/>
+                        <rect key="frame" x="138" y="12" width="117" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                         <animations/>
                         <buttonCell key="cell" type="push" title="취소" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="177">
@@ -79,7 +79,7 @@ Gw
                         </connections>
                     </textField>
                     <button focusRingType="none" id="34">
-                        <rect key="frame" x="104" y="53" width="278" height="19"/>
+                        <rect key="frame" x="104" y="53" width="278" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                         <animations/>
                         <buttonCell key="cell" type="check" title="익명 시스템 정보 포함" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" focusRingType="none" inset="2" id="180">
@@ -111,7 +111,7 @@ Gw
                     </imageView>
                     <button focusRingType="none" horizontalHuggingPriority="750" verticalHuggingPriority="750" id="71">
                         <rect key="frame" x="80" y="50" width="27" height="26"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                         <animations/>
                         <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" imagePosition="overlaps" alignment="center" borderStyle="border" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="182">
                             <behavior key="behavior" pushIn="YES" changeBackground="YES" changeGray="YES" lightByContents="YES"/>
@@ -146,7 +146,7 @@ Gw
             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField verticalHuggingPriority="750" id="46">
-                    <rect key="frame" x="1" y="142" width="358" height="56"/>
+                    <rect key="frame" x="1" y="128" width="358" height="70"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <animations/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="183">
@@ -159,10 +159,10 @@ Gw
                     </textFieldCell>
                 </textField>
                 <scrollView autohidesScrollers="YES" horizontalLineScroll="16" horizontalPageScroll="0.0" verticalLineScroll="16" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="40">
-                    <rect key="frame" x="4" y="5" width="355" height="130"/>
+                    <rect key="frame" x="4" y="5" width="355" height="115"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                    <clipView key="contentView" id="MYV-WF-Ebg">
-                        <rect key="frame" x="1" y="1" width="353" height="128"/>
+                    <clipView key="contentView" id="sbp-rk-wxX">
+                        <rect key="frame" x="1" y="1" width="353" height="113"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="14" id="41">

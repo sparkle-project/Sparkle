@@ -11,14 +11,14 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="5" userLabel="Window">
+        <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="SUAutomaticUpdateAlert" animationBehavior="default" id="5" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="114" y="521" width="743" height="152"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
+            <rect key="contentRect" x="114" y="521" width="616" height="152"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
             <value key="minSize" type="size" width="511" height="152"/>
             <view key="contentView" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="743" height="152"/>
+                <rect key="frame" x="0.0" y="0.0" width="616" height="152"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView id="7">
@@ -31,7 +31,7 @@
                         </connections>
                     </imageView>
                     <textField verticalHuggingPriority="750" id="8">
-                        <rect key="frame" x="105" y="120" width="621" height="17"/>
+                        <rect key="frame" x="105" y="120" width="497" height="17"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <animations/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="39">
@@ -44,7 +44,7 @@
                         </connections>
                     </textField>
                     <textField verticalHuggingPriority="750" id="9">
-                        <rect key="frame" x="105" y="81" width="621" height="31"/>
+                        <rect key="frame" x="105" y="81" width="497" height="31"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <animations/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="40">
@@ -57,7 +57,7 @@
                         </connections>
                     </textField>
                     <button verticalHuggingPriority="750" id="15">
-                        <rect key="frame" x="502" y="12" width="226" height="32"/>
+                        <rect key="frame" x="435" y="12" width="167" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                         <animations/>
                         <buttonCell key="cell" type="push" title="Установить и перезапустить" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="41">
@@ -72,7 +72,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="16">
-                        <rect key="frame" x="290" y="12" width="207" height="32"/>
+                        <rect key="frame" x="306" y="12" width="129" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                         <animations/>
                         <buttonCell key="cell" type="push" title="Установить при закрытии" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="42">
@@ -87,7 +87,7 @@ Gw
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="30">
-                        <rect key="frame" x="102" y="12" width="157" height="32"/>
+                        <rect key="frame" x="102" y="12" width="116" height="32"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <animations/>
                         <buttonCell key="cell" type="push" title="Не устанавливать" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="44">
