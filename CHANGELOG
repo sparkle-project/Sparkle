@@ -1,20 +1,25 @@
 
 # 1.12.0
 
-* Rewrote file operations for updating an app (Zorg)
+* Rewritten file operations for updating an app (Zorg)
   - Ensuring atomic move operations, robust error handling.
   - Faster.
   - Using modern APIs where possible (no FSPathMakeRef, FSGetCatalogInfo, FSFindFolder, etc.)
   - Strong documentation, easier to read code.
-* Deprecated serving over http without DSA (Zorg)
-* Disallowed automatic updates when user can't write to the bundle (Zorg)
+* Automatic updates won't be installed if the system is about to shut off (Zorg)
+* Deprecated serving over HTTP without DSA (Zorg)
+  - Note that Apple has deprecated insecure HTTP in OS X 10.11
 * Improved Autoupdate application (Zorg)
     * Do all the installation work after the runloop is set up
     * TerminationListener only does termination listening now
     * Handle cases where host path is not installation path and host path is not desired executable path
+    * Don't show Autoupdate dock icon if we shouldn't show UI
+    * Update modification & access time for new update
+* Added installUpdatesIfAvailable (Ian Langworth)
 * Removed extensions from shell scripts (Jake Petroules)
 * Rewritten test app so it works again, and from a local web server (Zorg)
-* Set LD_RUNPATH_SEARCH_PATHS in Podspec. (Jake Petroules)
+* Replaced use of Python with built-in web server (Kevin Wojniak)
+* Set LD_RUNPATH_SEARCH_PATHS in Podspec (Jake Petroules)
 * Don't install automatic updates if the system might shut off (Zorg)
 * Don't show Autoupdate dock icon if we shouldn't show UI (Zorg)
 * Updated layout constraints when removing release notes (Zorg)
@@ -25,6 +30,7 @@
 * Updated Mac models list until July 2015 (Gabriel Ulici)
 * Updated Polish translation (Kornel Lesiński)
 * Updated Xcode project languages for which we have translations (Jake Petroules)
+* Updated XIB files (Kornel Lesiński)
 * Use NSByteCountFormatter if available (Jake Petroules)
 * Declared protocols on SUUpdateAlert for the 10.11 SDK (Daniel Jalkut)
 * Silenced warning about casting away const-ness and -Wassign-enum (Daniel Jalkut)
@@ -32,6 +38,10 @@
 * Check for empty strings (as well as nil) in SUHost's -name method (Karl Moskowski)
 * Don't follow symlinks for checking file existence (Zorg)
 * Unit tests in Swift (Zorg, Jake Petroules)
+* Fixed framework imports (Felix Schulze)
+* Fixed issues with copying files from different mounted drives (Zorg)
+* Disallowed automatic updates when user can't write to the bundle (Zorg)
+* Set the task working directories instead of changing the process working directory (Kevin Wojniak)
 
 # 1.11.0
 
