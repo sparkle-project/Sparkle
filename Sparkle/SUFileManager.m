@@ -386,7 +386,9 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
         return YES;
     }
     
-    if (copyResult != permErr) {
+    // Note: I have recieved afpAccessDenied error in testing even when not copying from/to an AFP mount,
+    // when the error should have been a normal permission denied one
+    if (copyResult != permErr && copyResult != afpAccessDenied) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:copyResult userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to copy file (%@)", sourceURL.lastPathComponent] }];
         }
