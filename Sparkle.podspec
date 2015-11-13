@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name        = "Sparkle"
-  s.version     = "1.11.0"
+  s.version     = "1.11.1"
   s.summary     = "A software update framework for OS X"
   s.description = "Sparkle is an easy-to-use software update framework for Cocoa developers."
   s.homepage    = "http://sparkle-project.org"
@@ -13,6 +13,7 @@ Pod::Spec.new do |s|
     'Kornel Lesiński' => 'pornel@pornel.net',
     'C.W. Betts' => 'computers57@hotmail.com',
     'Jake Petroules' => 'jake.petroules@petroules.com',
+    'Mayur Pawashe' => 'zorgiepoo@gmail.com',
   }
 
   s.platform = :osx, '10.7'
