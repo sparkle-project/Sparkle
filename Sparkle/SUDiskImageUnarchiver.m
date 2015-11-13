@@ -70,8 +70,21 @@
         NSData *promptData = nil;
         promptData = [NSData dataWithBytes:"yes\n" length:4];
 
-        NSArray *arguments = @[@"attach", self.archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"];
-
+        NSMutableArray *arguments = [@[@"attach", self.archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"] mutableCopy];
+    
+        if (self.decryptionPassword) {
+            NSMutableData *passwordData = [[self.decryptionPassword dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
+            // From the hdiutil docs:
+            // read a null-terminated passphrase from standard input
+            //
+            // Add the null terminator, then the newline
+            [passwordData appendData:[NSData dataWithBytes:"\0\n" length:1]];
+            [passwordData appendData:promptData];
+            promptData = passwordData;
+            
+            [arguments addObject:@"-stdinpass"];
+        }
+    
         NSData *output = nil;
         NSInteger taskResult = -1;
 		@try
