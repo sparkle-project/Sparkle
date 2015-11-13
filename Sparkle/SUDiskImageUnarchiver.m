@@ -78,7 +78,7 @@
             // read a null-terminated passphrase from standard input
             //
             // Add the null terminator, then the newline
-            [passwordData appendData:[NSData dataWithBytes:"\0\n" length:1]];
+            [passwordData appendData:[NSData dataWithBytes:"\0" length:1]];
             [passwordData appendData:promptData];
             promptData = passwordData;
             
