@@ -47,7 +47,13 @@
 	<key>iMac14,4</key>
 	<string>iMac (Core i5, 21.5 inch Mid 2014)</string>
 	<key>iMac15,1</key>
-	<string>iMac (Retina 5K Core i5 or i7, 27 inch 2014 or 2015)</string>
+	<string>iMac (Retina 5K Core i5 or i7, 27 inch Late 2014 or Mid 2015)</string>
+	<key>iMac16,1</key>
+	<string>iMac (Core i5, 21,5 inch Late 2015)</string>
+	<key>iMac16,2</key>
+	<string>iMac (Retina 4K Core i5 or i7, 21.5 inch Late 2015)</string>
+	<key>iMac17,1</key>
+	<string>iMac (Retina 5K Core i5 or i7, 27 inch Late 2015)</string>
 	<key>MacBook1,1</key>
 	<string>MacBook (Core Duo)</string>
 	<key>MacBook2,1</key>

@@ -9,11 +9,21 @@
 #import <Foundation/Foundation.h>
 
 /**
- * A class used for performing file operations that may also perform authentication if permission is denied when trying to
+ * A class used for performing file operations that may also perform authentication if allowed and if permission is denied when trying to
  * perform them normally as the running user. All operations on this class may be used on thread other than the main thread.
  * This class provides basic file operations and stays away from including much application-level logic.
  */
 @interface SUFileManager : NSObject
+
+/**
+ * Creates a file manager that allows or disallows authorizing for file operations
+ * @param allowsAuthorization Specifies whether operations invoked on this instance are allowed to acquire authorization in order
+ *  to perform file operations when read or write access is denied
+ * @return A new file manager instance
+ * 
+ * This method just creates the file manager. It doesn't acquire authorization immediately if allowsAuthorization is YES
+ */
++ (instancetype)fileManagerAllowingAuthorization:(BOOL)allowsAuthorization;
 
 /**
  * Creates a temporary directory on the same volume as a provided URL
@@ -38,6 +48,17 @@
  * Otherwise this will be equivalent to a copy & remove which will be a nonatomic operation.
  */
 - (BOOL)moveItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError **)error;
+
+/**
+ * Copies an item from a source to a destination
+ * @param sourceURL A URL pointing to the item to move. The item at this URL must exist.
+ * @param destinationURL A URL pointing to the destination the item will be moved at. An item must not already exist at this URL.
+ * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
+ * @return YES if the item was copied successfully, otherwise NO along with a populated error object
+ *
+ * This is not an atomic operation.
+ */
+- (BOOL)copyItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError **)error;
 
 /**
  * Moves an item at a specified URL to the running user's trash directory
@@ -109,10 +130,5 @@
  * This is not an atomic operation.
  */
 - (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError **)error;
-
-/**
- * Behaves as -releaseItemFromQuarantineAtRootURL:error: does, except without the capability of authenticating when permission is denied
- */
-- (BOOL)releaseItemFromQuarantineWithoutAuthenticationAtRootURL:(NSURL *)rootURL error:(NSError **)error;
 
 @end

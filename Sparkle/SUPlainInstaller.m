@@ -42,7 +42,7 @@
         return NO;
     }
     
-    SUFileManager *fileManager = [[SUFileManager alloc] init];
+    SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:YES];
     
     // Create a temporary directory for our new app that resides on our destination's volume
     NSURL *tempNewDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:[installationURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingString:@" (Incomplete Update)"] appropriateForDirectoryURL:installationURL.URLByDeletingLastPathComponent error:error];

@@ -11,6 +11,7 @@
 #import "SUUpdateAlert.h"
 #import "SUUpdater_Private.h"
 #import "SUHost.h"
+#import "SUOperatingSystem.h"
 #import "SUStatusController.h"
 #import "SUConstants.h"
 
@@ -143,7 +144,7 @@
 
 - (NSString *)localizedStringFromByteCount:(long long)value
 {
-    if (![SUHost isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 8, 0}]) {
+    if (![SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 8, 0}]) {
         if (value < 1000) {
             return [NSString stringWithFormat:@"%.0lf %@", value / 1.0,
                     SULocalizedString(@"B", @"the unit for bytes")];

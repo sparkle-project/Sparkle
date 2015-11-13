@@ -12,7 +12,7 @@ class SUFileManagerTest: XCTestCase
 {
     func makeTempFiles(testBlock: (SUFileManager, NSURL, NSURL, NSURL, NSURL) -> Void)
     {
-        let fileManager = SUFileManager()
+        let fileManager = SUFileManager(allowingAuthorization: false)
         
         let tempDirectoryURL = try! fileManager.makeTemporaryDirectoryWithPreferredName("Sparkle Unit Test Data", appropriateForDirectoryURL: NSURL(fileURLWithPath: NSHomeDirectory()))
         
@@ -36,6 +36,7 @@ class SUFileManagerTest: XCTestCase
     {
         makeTempFiles() { fileManager, rootURL, ordinaryFileURL, directoryURL, fileInDirectoryURL in
             XCTAssertNil(try? fileManager.moveItemAtURL(ordinaryFileURL, toURL: directoryURL))
+            XCTAssertNil(try? fileManager.moveItemAtURL(ordinaryFileURL, toURL: directoryURL.URLByAppendingPathComponent("foo").URLByAppendingPathComponent("bar")))
             XCTAssertNil(try? fileManager.moveItemAtURL(rootURL.URLByAppendingPathComponent("does not exist"), toURL: directoryURL))
             
             let newFileURL = (ordinaryFileURL.URLByDeletingLastPathComponent?.URLByAppendingPathComponent("new file"))!
@@ -77,6 +78,27 @@ class SUFileManagerTest: XCTestCase
             try! fileManager.removeItemAtURL(directoryTrashURL)
         }
     }
+    
+    func testCopyFiles()
+    {
+        makeTempFiles() { fileManager, rootURL, ordinaryFileURL, directoryURL, fileInDirectoryURL in
+            XCTAssertNil(try? fileManager.copyItemAtURL(ordinaryFileURL, toURL: directoryURL))
+            XCTAssertNil(try? fileManager.copyItemAtURL(ordinaryFileURL, toURL: directoryURL.URLByAppendingPathComponent("foo").URLByAppendingPathComponent("bar")))
+            XCTAssertNil(try? fileManager.copyItemAtURL(rootURL.URLByAppendingPathComponent("does not exist"), toURL: directoryURL))
+            
+            let newFileURL = (ordinaryFileURL.URLByDeletingLastPathComponent?.URLByAppendingPathComponent("new file"))!
+            try! fileManager.copyItemAtURL(ordinaryFileURL, toURL: newFileURL)
+            XCTAssertTrue(fileManager._itemExistsAtURL(ordinaryFileURL))
+            XCTAssertTrue(fileManager._itemExistsAtURL(newFileURL))
+            
+            let newDirectoryURL = (ordinaryFileURL.URLByDeletingLastPathComponent?.URLByAppendingPathComponent("new directory"))!
+            try! fileManager.copyItemAtURL(directoryURL, toURL: newDirectoryURL)
+            XCTAssertTrue(fileManager._itemExistsAtURL(directoryURL))
+            XCTAssertTrue(fileManager._itemExistsAtURL(newDirectoryURL))
+            XCTAssertTrue(fileManager._itemExistsAtURL(fileInDirectoryURL))
+            XCTAssertTrue(fileManager._itemExistsAtURL(newDirectoryURL.URLByAppendingPathComponent(fileInDirectoryURL.lastPathComponent!)))
+        }
+    }
 
     func testRemoveFiles()
     {
@@ -95,8 +117,8 @@ class SUFileManagerTest: XCTestCase
     func testReleaseFilesFromQuarantine()
     {
         makeTempFiles() { fileManager, rootURL, ordinaryFileURL, directoryURL, fileInDirectoryURL in
-            try! fileManager.releaseItemFromQuarantineWithoutAuthenticationAtRootURL(ordinaryFileURL)
-            try! fileManager.releaseItemFromQuarantineWithoutAuthenticationAtRootURL(directoryURL)
+            try! fileManager.releaseItemFromQuarantineAtRootURL(ordinaryFileURL)
+            try! fileManager.releaseItemFromQuarantineAtRootURL(directoryURL)
             
             let quarantineData = "does not really matter what is here".cStringUsingEncoding(NSUTF8StringEncoding)!
             let quarantineDataLength = Int(strlen(quarantineData))
@@ -104,7 +126,7 @@ class SUFileManagerTest: XCTestCase
             XCTAssertEqual(0, setxattr(ordinaryFileURL.path!, SUAppleQuarantineIdentifier, quarantineData, quarantineDataLength, 0, XATTR_CREATE))
             XCTAssertGreaterThan(getxattr(ordinaryFileURL.path!, SUAppleQuarantineIdentifier, nil, 0, 0, XATTR_NOFOLLOW), 0)
             
-            try! fileManager.releaseItemFromQuarantineWithoutAuthenticationAtRootURL(ordinaryFileURL)
+            try! fileManager.releaseItemFromQuarantineAtRootURL(ordinaryFileURL)
             XCTAssertEqual(-1, getxattr(ordinaryFileURL.path!, SUAppleQuarantineIdentifier, nil, 0, 0, XATTR_NOFOLLOW))
             
             XCTAssertEqual(0, setxattr(directoryURL.path!, SUAppleQuarantineIdentifier, quarantineData, quarantineDataLength, 0, XATTR_CREATE))
@@ -113,7 +135,7 @@ class SUFileManagerTest: XCTestCase
             XCTAssertEqual(0, setxattr(fileInDirectoryURL.path!, SUAppleQuarantineIdentifier, quarantineData, quarantineDataLength, 0, XATTR_CREATE))
             XCTAssertGreaterThan(getxattr(fileInDirectoryURL.path!, SUAppleQuarantineIdentifier, nil, 0, 0, XATTR_NOFOLLOW), 0)
             
-            try! fileManager.releaseItemFromQuarantineWithoutAuthenticationAtRootURL(directoryURL)
+            try! fileManager.releaseItemFromQuarantineAtRootURL(directoryURL)
             
             XCTAssertEqual(-1, getxattr(directoryURL.path!, SUAppleQuarantineIdentifier, nil, 0, 0, XATTR_NOFOLLOW))
             XCTAssertEqual(-1, getxattr(fileInDirectoryURL.path!, SUAppleQuarantineIdentifier, nil, 0, 0, XATTR_NOFOLLOW))
@@ -244,7 +266,13 @@ class SUFileManagerTest: XCTestCase
     // This alone shouldn't prompt a password dialog and should always succeed
     func testAcquireAuthorization()
     {
-        let fileManager = SUFileManager()
+        let fileManager = SUFileManager(allowingAuthorization: true)
         try! fileManager._acquireAuthorization()
+    }
+    
+    func testAcquireBadAuthorization()
+    {
+        let fileManager = SUFileManager(allowingAuthorization: false)
+        XCTAssertNil(try? fileManager._acquireAuthorization())
     }
 }
