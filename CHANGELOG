@@ -43,6 +43,10 @@
 * Disallowed automatic updates when user can't write to the bundle (Zorg)
 * Set the task working directories instead of changing the process working directory (Kevin Wojniak)
 
+# 1.11.1
+
+* Don't install automatic updates when system is about to shut down
+
 # 1.11.0
 
 * Big improvements to code signing and DSA verification
