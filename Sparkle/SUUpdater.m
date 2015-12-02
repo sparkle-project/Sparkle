@@ -22,6 +22,7 @@
 
 NSString *const SUUpdaterDidFinishLoadingAppCastNotification = @"SUUpdaterDidFinishLoadingAppCastNotification";
 NSString *const SUUpdaterDidFindValidUpdateNotification = @"SUUpdaterDidFindValidUpdateNotification";
+NSString *const SUUpdaterDidFindUpdateRequiringNewerOSNotification = @"SUUpdaterDidFindUpdateRequiringNewerOSNotification";
 NSString *const SUUpdaterDidNotFindUpdateNotification = @"SUUpdaterDidNotFindUpdateNotification";
 NSString *const SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotificationName";
 NSString *const SUUpdaterAppcastItemNotificationKey = @"SUUpdaterAppcastItemNotificationKey";
@@ -438,6 +439,16 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         return NO;
     }
     return [self.host boolForKey:SUEnableAutomaticChecksKey];
+}
+
+- (void)setShouldAlertForUpdatesRequiringNewerOS:(BOOL)shouldAlert
+{
+    [self.host setBool:shouldAlert forUserDefaultsKey:SUShouldAlertForUpdatesRequiringNewerOSKey];
+}
+
+- (BOOL)shouldAlertForUpdatesRequiringNewerOS
+{
+    return [self.host boolForKey:SUShouldAlertForUpdatesRequiringNewerOSKey];
 }
 
 - (void)setAutomaticallyDownloadsUpdates:(BOOL)automaticallyUpdates

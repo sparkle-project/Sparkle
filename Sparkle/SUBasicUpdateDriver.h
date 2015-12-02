@@ -18,6 +18,7 @@
 @interface SUBasicUpdateDriver : SUUpdateDriver <NSURLDownloadDelegate, SUUnarchiverDelegate>
 
 @property (strong, readonly) SUAppcastItem *updateItem;
+@property (strong, readonly) SUAppcastItem *updateItemRequiringNewerOS;
 @property (strong, readonly) NSURLDownload *download;
 @property (copy, readonly) NSString *downloadPath;
 
@@ -29,6 +30,7 @@
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui;
 - (void)appcastDidFinishLoading:(SUAppcast *)ac;
 - (void)didFindValidUpdate;
+- (void)didFindUpdateRequiringNewerOS;
 - (void)didNotFindUpdate;
 
 - (void)downloadUpdate;
