@@ -8,7 +8,7 @@
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ ist verfügbar (Sie verwenden Version %3$@). Möchten Sie die neue Version jetzt herunterladen?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ ist verfügbar (Sie verwenden Version %3$@). Möchten Sie mehr über dieses Update erfahren?";
 
 "%@ downloaded" = "%@ heruntergeladen";
 
@@ -38,6 +38,11 @@
 "Cancel Update" = "Aktualisierung abbrechen";
 
 "Checking for updates..." = "Suche nach Aktualisierungen …";
+
+/* Status message shown when the user checks for updates and one is available, but the user needs to update their operating system to be eligible. */
+"Update available!" = "Aktualisierung verfügbar!";
+
+"%@ %@ is now available, but it requires Mac OS X %@--you are running %@.\nPlease update your Mac and check for updates again." = "%1$@ %2$@ ist verfügbar, setzt jedoch Mac OS X %3$@ voraus (Sie verwenden %4$@).\nBitte aktualisieren Sie ihren Mac und suchen Sie erneut nach updates.";
 
 /* Take care not to overflow the status window. */
 "Downloading update..." = "Aktualisierung wird heruntergeladen …";
