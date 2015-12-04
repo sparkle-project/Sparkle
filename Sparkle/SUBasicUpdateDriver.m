@@ -37,6 +37,7 @@
 @implementation SUBasicUpdateDriver
 
 @synthesize updateItem;
+@synthesize updateItemRequiringNewerOS;
 @synthesize download;
 @synthesize downloadPath;
 
@@ -140,6 +141,11 @@
     return ui && [self hostSupportsItem:ui] && [self isItemNewer:ui] && ![self itemContainsSkippedVersion:ui];
 }
 
+- (BOOL)itemContainsApplicableUpdateRequiringNewerOS:(SUAppcastItem *)ui
+{
+    return ![self hostSatisfiesMinimumSystemVersionForItem:ui] && [self isItemNewer:ui] && ![self itemContainsVersionSkippedBecauseMinimumOSWasTooLow:ui];
+}
+
 - (void)appcastDidFinishLoading:(SUAppcast *)ac
 {
     if ([[self.updater delegate] respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
@@ -180,13 +186,11 @@
             item = deltaUpdateItem;
         }
     }
-    
-    
 
     if ([self itemContainsValidUpdate:item]) {
         self.updateItem = item;
         [self didFindValidUpdate];
-    } else if (self.updater.shouldAlertForUpdatesRequiringNewerOS && itemRequiringNewOS && [self isItemNewer:itemRequiringNewOS] && ![self itemContainsVersionSkippedBecauseMinimumOSWasTooLow:itemRequiringNewOS]) {
+    } else if (self.updater.shouldAlertForUpdatesRequiringNewerOS && itemRequiringNewOS && [self itemContainsApplicableUpdateRequiringNewerOS:itemRequiringNewOS]) {
         self.updateItemRequiringNewerOS = itemRequiringNewOS;
         [self didFindUpdateRequiringNewerOS];
     } else {

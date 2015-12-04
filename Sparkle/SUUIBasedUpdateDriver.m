@@ -95,7 +95,7 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindUpdateRequiringNewerOSNotification object:self.updater];
 
     if (self.updater.shouldAlertForUpdatesRequiringNewerOS) {
-        [self.host setObject:[self.updateItemRequiringNewerOS versionString] forUserDefaultsKey:SUSkippedVersionKey];
+        [self.host setObject:[self.updateItemRequiringNewerOS versionString] forUserDefaultsKey:SUSkippedVersionBecauseMinimumOSWasTooLowKey];
 
         NSString *requiredOSVersion = self.updateItemRequiringNewerOS.minimumSystemVersion;
         NSString * currentOSVersion = [[NSProcessInfo processInfo] operatingSystemVersionString];
