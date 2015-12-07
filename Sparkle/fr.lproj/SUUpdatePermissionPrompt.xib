@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9046" systemVersion="15C27e" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9060" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9046"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9060"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUUpdatePermissionPrompt">
@@ -26,7 +27,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" tag="1" id="13">
-                        <rect key="frame" x="255" y="12" width="169" height="32"/>
+                        <rect key="frame" x="230" y="12" width="194" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                         <animations/>
                         <buttonCell key="cell" type="push" title="Vérifier automatiquement" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" tag="1" inset="2" id="176">
@@ -41,7 +42,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="14">
-                        <rect key="frame" x="138" y="12" width="117" height="32"/>
+                        <rect key="frame" x="102" y="12" width="128" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                         <animations/>
                         <buttonCell key="cell" type="push" title="Ne pas vérifier" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="177">
@@ -55,16 +56,6 @@ Gw
                             <action selector="finishPrompt:" target="-2" id="145"/>
                         </connections>
                     </button>
-                    <textField verticalHuggingPriority="750" id="32">
-                        <rect key="frame" x="104" y="114" width="289" height="34"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                        <animations/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Rechercher automatiquement les mises à jour ?" id="178">
-                            <font key="font" metaFont="systemBold"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
                     <textField verticalHuggingPriority="750" id="33">
                         <rect key="frame" x="104" y="81" width="315" height="42"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
@@ -126,6 +117,16 @@ Gw
                             </binding>
                         </connections>
                     </button>
+                    <textField verticalHuggingPriority="750" id="32">
+                        <rect key="frame" x="104" y="131" width="310" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                        <animations/>
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Rechercher automatiquement les mises à jour ?" id="178">
+                            <font key="font" metaFont="systemBold"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
                 </subviews>
                 <animations/>
             </view>
