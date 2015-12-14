@@ -109,8 +109,18 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         host = [[SUHost alloc] initWithBundle:bundle];
 
         // Saving-the-developer-from-a-stupid-mistake-check:
-        BOOL hasPublicDSAKey = [host publicDSAKey] != nil;
-        BOOL isMainBundle = [bundle isEqualTo:[NSBundle mainBundle]];
+        [self checkIfConfiguredProperly];
+
+
+        // This runs the permission prompt if needed, but never before the app has finished launching because the runloop won't run before that
+        [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:0];
+    }
+    return self;
+}
+
+-(void)checkIfConfiguredProperly {
+        BOOL hasPublicDSAKey = [self.host publicDSAKey] != nil;
+        BOOL isMainBundle = [self.host.bundle isEqualTo:[NSBundle mainBundle]];
         BOOL hostIsCodeSigned = [SUCodeSigningVerifier hostApplicationIsCodeSigned];
         BOOL servingOverHttps = [[[[self feedURL] scheme] lowercaseString] isEqualToString:@"https"];
         if (!isMainBundle && !hasPublicDSAKey) {
@@ -130,11 +140,6 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         } else if (isMainBundle && !hasPublicDSAKey && !servingOverHttps) {
             SULog(@"WARNING: Serving updates over http without signing them with a DSA key is deprecated and may not be possible in a future release. Please serve your updates over https, or sign them with a DSA key, or do both. See Sparkle's documentation for more information.");
         }
-
-        // This runs the permission prompt if needed, but never before the app has finished launching because the runloop won't run before that
-        [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:0];
-    }
-    return self;
 }
 
 
