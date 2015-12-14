@@ -145,9 +145,12 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101100
     BOOL atsExceptionsExist = nil != [self.host objectForInfoDictionaryKey:@"NSAppTransportSecurity"];
-    if (!servingOverHttps && !atsExceptionsExist) {
+    if (isMainBundle && !servingOverHttps && !atsExceptionsExist) {
         [self showModalAlertText:@"Insecure feed URL is blocked in OS X 10.11"
                  informativeText:[NSString stringWithFormat:@"You must change the feed URL (%@) to use HTTPS or disable App Transport Security.\n\nFor more information:\nhttp://sparkle-project.org/documentation/app-transport-security/", [feedURL absoluteString]]];
+    }
+    if (!isMainBundle && !servingOverHttps) {
+        SULog(@"WARNING: Serving updates over HTTP may be blocked in OS X 10.11. Please change the feed URL (%@) to use HTTPS. For more information:\nhttp://sparkle-project.org/documentation/app-transport-security/", feedURL);
     }
 #endif
 }
