@@ -118,28 +118,30 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     return self;
 }
 
+-(void)showModalAlertText:(NSString *)text informativeText:(NSString *)informativeText {
+    [self notifyWillShowModalAlert];
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.messageText = text;
+    alert.informativeText = informativeText;
+    [alert runModal];
+    [self notifyDidShowModalAlert];
+}
+
 -(void)checkIfConfiguredProperly {
-        BOOL hasPublicDSAKey = [self.host publicDSAKey] != nil;
-        BOOL isMainBundle = [self.host.bundle isEqualTo:[NSBundle mainBundle]];
-        BOOL hostIsCodeSigned = [SUCodeSigningVerifier hostApplicationIsCodeSigned];
-        BOOL servingOverHttps = [[[[self feedURL] scheme] lowercaseString] isEqualToString:@"https"];
-        if (!isMainBundle && !hasPublicDSAKey) {
-            [self notifyWillShowModalAlert];
-            NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = @"Insecure update error!";
-            alert.informativeText = @"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information.";
-            [alert runModal];
-            [self notifyDidShowModalAlert];
-        } else if (isMainBundle && !(hasPublicDSAKey || hostIsCodeSigned)) {
-            [self notifyWillShowModalAlert];
-            NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = @"Insecure update error!";
-            alert.informativeText = @"For security reasons, you need to code sign your application or sign your updates with a DSA key. See Sparkle's documentation for more information.";
-            [alert runModal];
-            [self notifyDidShowModalAlert];
-        } else if (isMainBundle && !hasPublicDSAKey && !servingOverHttps) {
-            SULog(@"WARNING: Serving updates over http without signing them with a DSA key is deprecated and may not be possible in a future release. Please serve your updates over https, or sign them with a DSA key, or do both. See Sparkle's documentation for more information.");
-        }
+    BOOL hasPublicDSAKey = [self.host publicDSAKey] != nil;
+    BOOL isMainBundle = [self.host.bundle isEqualTo:[NSBundle mainBundle]];
+    BOOL hostIsCodeSigned = [SUCodeSigningVerifier hostApplicationIsCodeSigned];
+    NSURL *feedURL = [self feedURL];
+    BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
+    if (!isMainBundle && !hasPublicDSAKey) {
+        [self showModalAlertText:@"Insecure update error!"
+                 informativeText:@"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information."];
+    } else if (isMainBundle && !(hasPublicDSAKey || hostIsCodeSigned)) {
+        [self showModalAlertText:@"Insecure update error!"
+                 informativeText:@"For security reasons, you need to code sign your application or sign your updates with a DSA key. See Sparkle's documentation for more information."];
+    } else if (isMainBundle && !hasPublicDSAKey && !servingOverHttps) {
+        SULog(@"WARNING: Serving updates over HTTP without signing them with a DSA key is deprecated and may not be possible in a future release. Please serve your updates over https, or sign them with a DSA key, or do both. See Sparkle's documentation for more information.");
+    }
 }
 
 
