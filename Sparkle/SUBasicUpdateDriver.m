@@ -137,15 +137,19 @@
 	else // If not, we'll take care of it ourselves.
     {
         // Find the first update we can actually use.
-        NSEnumerator *updateEnumerator = [[ac items] objectEnumerator];
-        do {
-            item = [updateEnumerator nextObject];
-        } while (item && ![self hostSupportsItem:item]);
+        for(SUAppcastItem *i in ac.items) {
+            if ([self hostSupportsItem:i]) {
+                item = i;
+                break;
+            }
+        }
 
-        SUAppcastItem *deltaUpdateItem = [item deltaUpdates][[self.host version]];
-        if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem]) {
-            self.nonDeltaUpdateItem = item;
-            item = deltaUpdateItem;
+        if (item) {            
+            SUAppcastItem *deltaUpdateItem = [item deltaUpdates][[self.host version]];
+            if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem]) {
+                self.nonDeltaUpdateItem = item;
+                item = deltaUpdateItem;
+            }
         }
     }
 
