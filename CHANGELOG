@@ -1,4 +1,8 @@
 
+# 1.13.0
+
+* Changed framework's bundle ID from `org.andymatuschak.Sparkle` to `org.sparkle-project.Sparkle`.
+
 # 1.12.0
 
 * Rewritten file operations for updating an app (Zorg)
