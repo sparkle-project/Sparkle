@@ -287,4 +287,16 @@
     return nodes[i];
 }
 
+- (SUAppcast *)copyWithoutDeltaUpdates {
+    SUAppcast *other = [SUAppcast new];
+    NSMutableArray *nonDeltaItems = [NSMutableArray new];
+
+    for(SUAppcastItem *item in self.items) {
+        if (![item isDeltaUpdate]) [nonDeltaItems addObject:item];
+    }
+
+    other.items = nonDeltaItems;
+    return other;
+}
+
 @end
