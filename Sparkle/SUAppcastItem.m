@@ -134,7 +134,8 @@
         }
 
         if (enclosureURLString) {
-            NSString *fileURLString = [[enclosureURLString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            // Sparkle used to always URL-encode, so for backwards compatibility spaces in URLs must be forgiven.
+            NSString *fileURLString = [enclosureURLString stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
             self.fileURL = [NSURL URLWithString:fileURLString];
         }
         if (enclosure) {
