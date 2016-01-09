@@ -13,8 +13,12 @@ chmod 0400 dsa_priv.pem
 $openssl dsa -in dsa_priv.pem -pubout -out dsa_pub.pem
 
 echo "
-Generated private and public keys: dsa_priv.pem and dsa_pub.pem.
+Generated two files:
+dsa_priv.pem: your private key. Keep it secret and don't share it!
+dsa_pub.pem: public counterpart to include in the app bundle.
+
 BACK UP YOUR PRIVATE KEY AND KEEP IT SAFE!
-If you lose it, your users will be unable to upgrade!"
+If you lose it, your users will be unable to upgrade!
+"
 
 open -R dsa_priv.pem
