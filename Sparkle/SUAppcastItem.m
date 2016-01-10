@@ -160,7 +160,12 @@
         // Find the appropriate release notes URL.
         NSString *releaseNotesString = dict[SUAppcastElementReleaseNotesLink];
         if (releaseNotesString) {
-            self.releaseNotesURL = [NSURL URLWithString:releaseNotesString];
+            NSURL *url = [NSURL URLWithString:releaseNotesString];
+            if ([url isFileURL]) {
+                SULog(@"Release notes with file:// URLs are not supported");
+            } else {
+                self.releaseNotesURL = url;
+            }
         } else if ([self.itemDescription hasPrefix:@"http://"] || [self.itemDescription hasPrefix:@"https://"]) { // if the description starts with http:// or https:// use that.
             self.releaseNotesURL = [NSURL URLWithString:self.itemDescription];
         } else {
