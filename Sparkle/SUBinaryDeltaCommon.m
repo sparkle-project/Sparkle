@@ -7,6 +7,7 @@
 //
 
 #include "SUBinaryDeltaCommon.h"
+#import "SUFileManager.h"
 #include <CommonCrypto/CommonDigest.h>
 #include <Foundation/Foundation.h>
 #include <fcntl.h>
@@ -145,7 +146,9 @@ NSData *hashOfFileContents(FTSENT *ent)
 NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
 {
     char pathBuffer[PATH_MAX] = {0};
-    [path getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)];
+    if (![path getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)]) {
+        return nil;
+    }
 
     char * const sourcePaths[] = {pathBuffer, 0};
     FTS *fts = fts_open(sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
@@ -218,7 +221,7 @@ BOOL removeTree(NSString *path)
 
 BOOL copyTree(NSString *source, NSString *dest)
 {
-    return [[NSFileManager defaultManager] copyItemAtPath:source toPath:dest error:nil];
+    return [[SUFileManager fileManagerAllowingAuthorization:NO] copyItemAtURL:[NSURL fileURLWithPath:source] toURL:[NSURL fileURLWithPath:dest] error:NULL];
 }
 
 BOOL modifyPermissions(NSString *path, mode_t desiredPermissions)

@@ -6,11 +6,6 @@
 //  Copyright 2005 Steve Gehrman. All rights reserved.
 //
 
-#import "SUUpdater.h"
-
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
-#import "SUVersionComparisonProtocol.h"
 #import "NTSynchronousTask.h"
 
 @interface NTSynchronousTask ()

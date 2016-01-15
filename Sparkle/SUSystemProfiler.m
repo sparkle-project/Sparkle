@@ -11,6 +11,7 @@
 #import "SUSystemProfiler.h"
 
 #import "SUHost.h"
+#import "SUOperatingSystem.h"
 #include <sys/sysctl.h>
 
 static NSString *const SUSystemProfilerApplicationNameKey = @"appName";
@@ -37,7 +38,8 @@ static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
 
 - (NSDictionary *)modelTranslationTable
 {
-    NSString *path = [[NSBundle bundleForClass:[self class]] pathForResource:@"SUModelTranslation" ofType:@"plist"];
+    // Use explicit class to use the correct bundle even when subclassed
+    NSString *path = [[NSBundle bundleForClass:[SUSystemProfiler class]] pathForResource:@"SUModelTranslation" ofType:@"plist"];
     return [[NSDictionary alloc] initWithContentsOfFile:path];
 }
 
@@ -53,7 +55,7 @@ static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
     size_t length = sizeof(value);
 
     // OS version
-    NSString *currentSystemVersion = [SUHost systemVersionString];
+    NSString *currentSystemVersion = [SUOperatingSystem systemVersionString];
     if (currentSystemVersion != nil) {
         [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerOperatingSystemVersionKey, @"OS Version", currentSystemVersion, currentSystemVersion] forKeys:profileDictKeys]];
     }

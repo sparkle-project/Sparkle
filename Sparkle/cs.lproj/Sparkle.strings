@@ -4,7 +4,11 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ je nejnovější dostupná verze";
 
+/* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "Je k dispozici %1$@ %2$@ - máte %3$@. Přejete si nyní zkopírovat aktualizaci?";
+
+/* Description text for SUUpdateAlert when the update informational with no download. */
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
 
 "%@ downloaded" = "zkopírováno %@";
 
@@ -67,5 +71,5 @@
 
 "You already have the newest version of %@." = "Máte nainstalovanou nejnovější verzi aplikace @.";
 
-"You're up to date!" = "Vaše verze je aktuální!";
+"You're up-to-date!" = "Vaše verze je aktuální!";
 

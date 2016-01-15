@@ -21,7 +21,7 @@ typedef NS_ENUM(NSInteger, SUUpdateAlertChoice) {
     SUOpenInfoURLChoice
 };
 
-@class WebView, SUAppcastItem, SUHost;
+@class SUAppcastItem, SUHost;
 @interface SUUpdateAlert : SUWindowController
 
 @property (weak) id<SUVersionDisplay> versionDisplayer;

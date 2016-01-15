@@ -13,11 +13,6 @@
 #import "SULog.h"
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED < 101000
-typedef struct {
-    NSInteger majorVersion;
-    NSInteger minorVersion;
-    NSInteger patchVersion;
-} NSOperatingSystemVersion;
 @interface NSProcessInfo ()
 - (NSOperatingSystemVersion)operatingSystemVersion;
 @end
@@ -67,6 +62,18 @@ typedef struct {
     return [self.bundle bundlePath];
 }
 
+- (BOOL)allowsAutomaticUpdates
+{
+    // Does the developer want us to disable automatic updates?
+    NSNumber *developerAllowsAutomaticUpdates = [self objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
+    if (developerAllowsAutomaticUpdates != nil && !developerAllowsAutomaticUpdates.boolValue) {
+        return NO;
+    }
+    
+    // Can we automatically update in the background without bugging the user (e.g, with a administrator password prompt)?
+    return [[NSFileManager defaultManager] isWritableFileAtPath:self.bundlePath];
+}
+
 - (NSString *)appCachePath
 {
     NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
@@ -94,7 +101,8 @@ typedef struct {
     if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
         // We'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
         NSString *normalizedAppPath = [[[self.bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[self.bundle bundlePath] pathExtension]]];
-        if (![[NSFileManager defaultManager] fileExistsAtPath:[[[self.bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[self.bundle bundlePath] pathExtension]]]]) {
+
+        if (![[NSFileManager defaultManager] fileExistsAtPath:normalizedAppPath]) {
             return normalizedAppPath;
         }
     }
@@ -107,13 +115,13 @@ typedef struct {
 
     // Allow host bundle to provide a custom name
     name = [self objectForInfoDictionaryKey:@"SUBundleName"];
-    if (name) return name;
+    if (name && name.length > 0) return name;
 
     name = [self.bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
-	if (name) return name;
+	if (name && name.length > 0) return name;
 
     name = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey];
-	if (name) return name;
+	if (name && name.length > 0) return name;
 
     return [[[NSFileManager defaultManager] displayNameAtPath:[self.bundle bundlePath]] stringByDeletingPathExtension];
 }
@@ -162,7 +170,7 @@ typedef struct {
 {
     struct statfs statfs_info;
     statfs([[self.bundle bundlePath] fileSystemRepresentation], &statfs_info);
-    return (statfs_info.f_flags & MNT_RDONLY);
+    return (statfs_info.f_flags & MNT_RDONLY) != 0;
 }
 
 - (BOOL)isBackgroundApplication
@@ -274,23 +282,6 @@ typedef struct {
 
 - (BOOL)boolForKey:(NSString *)key {
     return [self objectForUserDefaultsKey:key] ? [self boolForUserDefaultsKey:key] : [self boolForInfoDictionaryKey:key];
-}
-
-+ (NSString *)systemVersionString
-{
-#if __MAC_OS_X_VERSION_MIN_REQUIRED < 1090 // Present in 10.9 despite NS_AVAILABLE's claims
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wselector"
-    // Xcode 5.1.1: operatingSystemVersion is clearly declared, must warn due to a compiler bug?
-    if (![NSProcessInfo instancesRespondToSelector:@selector(operatingSystemVersion)])
-#pragma clang diagnostic pop
-    {
-        NSURL *coreServices = [[NSFileManager defaultManager] URLForDirectory:NSCoreServiceDirectory inDomain:NSSystemDomainMask appropriateForURL:nil create:NO error:nil];
-        return [NSDictionary dictionaryWithContentsOfURL:[coreServices URLByAppendingPathComponent:@"SystemVersion.plist"]][@"ProductVersion"];
-    }
-#endif
-    NSOperatingSystemVersion version = [[NSProcessInfo processInfo] operatingSystemVersion];
-    return [NSString stringWithFormat:@"%ld.%ld.%ld", (long)version.majorVersion, (long)version.minorVersion, (long)version.patchVersion];
 }
 
 @end
