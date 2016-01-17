@@ -14,7 +14,7 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SUVersionDisplayProtocol.h"
 
-@class SUUpdateDriver, SUAppcastItem, SUHost, SUAppcast;
+@class SUAppcastItem, SUAppcast;
 
 @protocol SUUpdaterDelegate;
 
