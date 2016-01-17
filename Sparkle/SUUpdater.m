@@ -105,10 +105,6 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]] = self;
         host = [[SUHost alloc] initWithBundle:bundle];
 
-        // Saving-the-developer-from-a-stupid-mistake-check:
-        // The check is async to give time to set a delegate, so that potentially-overriden feedURL works
-        [self performSelector:@selector(checkIfConfiguredProperly) withObject:nil afterDelay:0];
-
         // This runs the permission prompt if needed, but never before the app has finished launching because the runloop won't run before that
         [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:0];
     }
@@ -366,6 +362,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         [self scheduleNextUpdateCheck];
         return;
     }
+
+    [self checkIfConfiguredProperly];
 
     NSURL *theFeedURL = [self parameterizedFeedURL];
     if (theFeedURL) // Use a NIL URL to cancel quietly.
