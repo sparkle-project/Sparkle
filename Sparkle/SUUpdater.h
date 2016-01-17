@@ -54,6 +54,8 @@ SU_EXPORT @interface SUUpdater : NSObject
 
 @property BOOL automaticallyDownloadsUpdates;
 
+@property (nonatomic, copy) NSString *decryptionPassword;
+
 /*!
     Explicitly checks for updates and displays a progress dialog while doing so.
 
