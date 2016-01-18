@@ -40,9 +40,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (void)updateDriverDidFinish:(NSNotification *)note;
 @property (readonly, copy) NSURL *parameterizedFeedURL;
 
-- (void)notifyWillShowModalAlert;
-- (void)notifyDidShowModalAlert;
-
 @property (strong) SUUpdateDriver *driver;
 @property (strong) SUHost *host;
 
@@ -109,23 +106,17 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]] = self;
         host = [[SUHost alloc] initWithBundle:bundle];
 
-        // Saving-the-developer-from-a-stupid-mistake-check:
-        // The check is async to give time to set a delegate, so that potentially-overriden feedURL works
-        [self performSelector:@selector(checkIfConfiguredProperly) withObject:nil afterDelay:0];
-
         // This runs the permission prompt if needed, but never before the app has finished launching because the runloop won't run before that
         [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:0];
     }
     return self;
 }
 
--(void)showModalAlertText:(NSString *)text informativeText:(NSString *)informativeText {
-    [self notifyWillShowModalAlert];
+-(void)showAlertText:(NSString *)text informativeText:(NSString *)informativeText {
     NSAlert *alert = [[NSAlert alloc] init];
     alert.messageText = text;
     alert.informativeText = informativeText;
-    [alert runModal];
-    [self notifyDidShowModalAlert];
+    [self.driver showAlert:alert];
 }
 
 -(void)checkIfConfiguredProperly {
@@ -135,10 +126,10 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     NSURL *feedURL = [self feedURL];
     BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
     if (!isMainBundle && !hasPublicDSAKey) {
-        [self showModalAlertText:@"Insecure update error!"
+        [self showAlertText:@"Insecure update error!"
                  informativeText:@"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information."];
     } else if (isMainBundle && !(hasPublicDSAKey || hostIsCodeSigned)) {
-        [self showModalAlertText:@"Insecure update error!"
+        [self showAlertText:@"Insecure update error!"
                  informativeText:@"For security reasons, you need to code sign your application or sign your updates with a DSA key. See Sparkle's documentation for more information."];
     } else if (isMainBundle && !hasPublicDSAKey && !servingOverHttps) {
         SULog(@"WARNING: Serving updates over HTTP without signing them with a DSA key is deprecated and may not be possible in a future release. Please serve your updates over https, or sign them with a DSA key, or do both. See Sparkle's documentation for more information.");
@@ -147,7 +138,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101100
     BOOL atsExceptionsExist = nil != [self.host objectForInfoDictionaryKey:@"NSAppTransportSecurity"];
     if (isMainBundle && !servingOverHttps && !atsExceptionsExist) {
-        [self showModalAlertText:@"Insecure feed URL is blocked in OS X 10.11"
+        [self showAlertText:@"Insecure feed URL is blocked in OS X 10.11"
                  informativeText:[NSString stringWithFormat:@"You must change the feed URL (%@) to use HTTPS or disable App Transport Security.\n\nFor more information:\nhttp://sparkle-project.org/documentation/app-transport-security/", [feedURL absoluteString]]];
     }
     if (!isMainBundle && !servingOverHttps) {
@@ -164,21 +155,6 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self.host bundlePath], [self.host installationPath]]; }
-
-
-- (void)notifyWillShowModalAlert
-{
-    if ([self.delegate respondsToSelector:@selector(updaterWillShowModalAlert:)])
-        [self.delegate updaterWillShowModalAlert:self];
-}
-
-
-- (void)notifyDidShowModalAlert
-{
-    if ([self.delegate respondsToSelector:@selector(updaterDidShowModalAlert:)])
-        [self.delegate updaterDidShowModalAlert:self];
-}
-
 
 - (void)startUpdateCycle
 {
@@ -387,6 +363,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         [self scheduleNextUpdateCheck];
         return;
     }
+
+    [self checkIfConfiguredProperly];
 
     NSURL *theFeedURL = [self parameterizedFeedURL];
     if (theFeedURL) // Use a NIL URL to cancel quietly.

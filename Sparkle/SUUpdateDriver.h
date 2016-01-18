@@ -22,6 +22,9 @@ extern NSString *const SUUpdateDriverFinishedNotification;
 - (instancetype)initWithUpdater:(SUUpdater *)updater;
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
 - (void)abortUpdate;
+
+- (void)showAlert:(NSAlert *)alert;
+
 @property (getter=isInterruptible, readonly) BOOL interruptible;
 @property (readonly) BOOL finished;
 @property BOOL automaticallyInstallUpdates;
