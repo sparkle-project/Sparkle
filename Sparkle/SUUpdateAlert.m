@@ -16,6 +16,7 @@
 #import <WebKit/WebKit.h>
 
 #import "SUConstants.h"
+#import "SULog.h"
 
 // WebKit protocols are not explicitly declared until 10.11 SDK, so
 // declare dummy protocols to keep the build working on earlier SDKs.
@@ -261,6 +262,7 @@
 
     // Do not allow redirects to dangerous protocols such as file://
     if (!whitelistedSafe) {
+        SULog(@"Blocked display of %@ URL which may be dangerous", scheme);
         [listener ignore];
         return;
     }
