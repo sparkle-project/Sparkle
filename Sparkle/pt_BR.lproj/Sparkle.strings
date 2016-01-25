@@ -8,7 +8,7 @@
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ está disponível – sua versão é %3$@. Deseja transferi-lo agora?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ está disponível – sua versão é %3$@. Deseja saber mais sobre esta atualização na web?";
 
 "%@ downloaded" = "%@ transferidos";
 
@@ -18,17 +18,17 @@
 
 "A new version of %@ is ready to install!" = "Uma nova versão do %@ está pronta para ser instalada!";
 
-"An error occurred in retrieving update information. Please try again later." = "Ocorreu um erro ao obter informações da  atualização. Tente novamente mais tarde.";
+"An error occurred in retrieving update information. Please try again later." = "Ocorreu um erro ao obter informações da atualização. Tente novamente mais tarde.";
 
 "An error occurred while downloading the update. Please try again later." = "Ocorreu um erro ao transferir a atualização. Tente novamente mais tarde.";
 
-"An error occurred while extracting the archive. Please try again later." = "Ocorreu um erro ao extrair o arquivo. Tente novamente mais tarde.";
+"An error occurred while extracting the archive. Please try again later." = "Ocorreu um erro ao extrair o arquivo comprimido. Tente novamente mais tarde.";
 
 "An error occurred while installing the update. Please try again later." = "Ocorreu um erro ao instalar a atualização. Tente novamente mais tarde.";
 
 "An error occurred while parsing the update feed." = "Ocorreu um erro ao analisar o feed de atualização.";
 
-"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Ocorreu um erro ao reiniciar o %1$@. A nova versão estará disponível da próxima vez que você abrir o %1$@.";
+"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Ocorreu um erro ao reabrir o %1$@. A nova versão estará disponível da próxima vez que você abrir o %1$@.";
 
 /* the unit for bytes */
 "B" = "B";
@@ -48,7 +48,7 @@
 /* the unit for gigabytes */
 "GB" = "GB";
 
-"Install and Relaunch" = "Instalar e Reiniciar";
+"Install and Relaunch" = "Instalar e Reabrir";
 
 /* Take care not to overflow the status window. */
 "Installing update..." = "Instalando atualização…";
