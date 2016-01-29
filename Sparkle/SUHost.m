@@ -62,6 +62,18 @@
     return [self.bundle bundlePath];
 }
 
+- (BOOL)allowsAutomaticUpdates
+{
+    // Does the developer want us to disable automatic updates?
+    NSNumber *developerAllowsAutomaticUpdates = [self objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
+    if (developerAllowsAutomaticUpdates != nil && !developerAllowsAutomaticUpdates.boolValue) {
+        return NO;
+    }
+    
+    // Can we automatically update in the background without bugging the user (e.g, with a administrator password prompt)?
+    return [[NSFileManager defaultManager] isWritableFileAtPath:self.bundlePath];
+}
+
 - (NSString *)appCachePath
 {
     NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
@@ -270,33 +282,6 @@
 
 - (BOOL)boolForKey:(NSString *)key {
     return [self objectForUserDefaultsKey:key] ? [self boolForUserDefaultsKey:key] : [self boolForInfoDictionaryKey:key];
-}
-
-+ (NSOperatingSystemVersion)operatingSystemVersion
-{
-#if __MAC_OS_X_VERSION_MIN_REQUIRED < 1090 // Present in 10.9 despite NS_AVAILABLE's claims
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wselector"
-    // Xcode 5.1.1: operatingSystemVersion is clearly declared, must warn due to a compiler bug?
-    if (![NSProcessInfo instancesRespondToSelector:@selector(operatingSystemVersion)])
-#pragma clang diagnostic pop
-    {
-        NSOperatingSystemVersion version = { 0, 0, 0 };
-        NSURL *coreServices = [[NSFileManager defaultManager] URLForDirectory:NSCoreServiceDirectory inDomain:NSSystemDomainMask appropriateForURL:nil create:NO error:nil];
-        NSArray *components = [[NSDictionary dictionaryWithContentsOfURL:[coreServices URLByAppendingPathComponent:@"SystemVersion.plist"]][@"ProductVersion"] componentsSeparatedByString:@"."];
-        version.majorVersion = components.count > 0 ? [components[0] integerValue] : 0;
-        version.minorVersion = components.count > 1 ? [components[1] integerValue] : 0;
-        version.patchVersion = components.count > 2 ? [components[2] integerValue] : 0;
-        return version;
-    }
-#endif
-    return [[NSProcessInfo processInfo] operatingSystemVersion];
-}
-
-+ (NSString *)systemVersionString
-{
-    NSOperatingSystemVersion version = self.operatingSystemVersion;
-    return [NSString stringWithFormat:@"%ld.%ld.%ld", (long)version.majorVersion, (long)version.minorVersion, (long)version.patchVersion];
 }
 
 @end

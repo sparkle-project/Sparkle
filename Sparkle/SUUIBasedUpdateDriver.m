@@ -11,6 +11,7 @@
 #import "SUUpdateAlert.h"
 #import "SUUpdater_Private.h"
 #import "SUHost.h"
+#import "SUOperatingSystem.h"
 #import "SUStatusController.h"
 #import "SUConstants.h"
 
@@ -41,6 +42,14 @@
 @synthesize statusController;
 @synthesize updateAlert;
 
+- (instancetype)initWithUpdater:(SUUpdater *)anUpdater
+{
+    if ((self = [super initWithUpdater:anUpdater])) {
+        self.automaticallyInstallUpdates = NO;
+    }
+    return self;
+}
+
 - (BOOL)shouldShowUI
 {
     return YES;
@@ -48,6 +57,15 @@
 
 - (void)didFindValidUpdate
 {
+    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
+        [[self.updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
+    }
+
+    if (self.automaticallyInstallUpdates) {
+        [self updateAlertFinishedWithChoice:SUInstallUpdateChoice];
+        return;
+    }
+
     self.updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host completionBlock:^(SUUpdateAlertChoice choice) {
         [self updateAlertFinishedWithChoice:choice];
     }];
@@ -62,10 +80,6 @@
         versDisp = [[self.updater delegate] versionDisplayerForUpdater:self.updater];
     }
     [self.updateAlert setVersionDisplayer:versDisp];
-
-    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
-        [[self.updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
-    }
 
     // If the app is a menubar app or the like, we need to focus it first and alter the
     // update prompt to behave like a normal window. Otherwise if the window were hidden
@@ -88,12 +102,14 @@
         [[self.updater delegate] updaterDidNotFindUpdate:self.updater];
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
-    NSAlert *alert = [[NSAlert alloc] init];
-    alert.messageText = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
-    alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
-    [alert addButtonWithTitle:SULocalizedString(@"OK", nil)];
-    [self showModalAlert:alert];
-    [self abortUpdate:SUUpdateAbortDidNotFind];
+    if (!self.automaticallyInstallUpdates) {
+        NSAlert *alert = [[NSAlert alloc] init];
+        alert.messageText = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
+        alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
+        [alert addButtonWithTitle:SULocalizedString(@"OK", nil)];
+        [self showModalAlert:alert];
+        [self abortUpdate:SUUpdateAbortDidNotFind];
+    }
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)__unused aNotification
@@ -138,7 +154,7 @@
 
 - (NSString *)localizedStringFromByteCount:(long long)value
 {
-    if (SUHost.operatingSystemVersion.minorVersion < 8) {
+    if (![SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 8, 0}]) {
         if (value < 1000) {
             return [NSString stringWithFormat:@"%.0lf %@", value / 1.0,
                     SULocalizedString(@"B", @"the unit for bytes")];
@@ -173,8 +189,12 @@
 
 - (IBAction)cancelDownload:(id)__unused sender
 {
-    if (self.download)
+    if (self.download) {
         [self.download cancel];
+        if ([[self.updater delegate] respondsToSelector:@selector(userDidCancelDownload:)]) {
+            [[self.updater delegate] userDidCancelDownload:self.updater];
+        }
+    }
     [self abortUpdate:SUUpdateAbortCanceledByUser];
 }
 
@@ -197,6 +217,11 @@
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
 {
+    if (self.automaticallyInstallUpdates) {
+        [self installWithToolAndRelaunch:YES];
+        return;
+    }
+
     [self.statusController beginActionWithTitle:SULocalizedString(@"Ready to Install", nil) maxProgressValue:1.0 statusText:nil];
     [self.statusController setProgressValue:1.0]; // Fill the bar.
     [self.statusController setButtonEnabled:YES];

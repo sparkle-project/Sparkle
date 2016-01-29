@@ -93,6 +93,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 - (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(systemWillPowerOff:) name:NSWorkspaceWillPowerOffNotification object:nil];
 
     // Sudden termination is available on 10.6+
     NSProcessInfo *processInfo = [NSProcessInfo processInfo];
@@ -133,6 +134,8 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     if (self.willUpdateOnTermination)
     {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
+        [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self name:NSWorkspaceWillPowerOffNotification object:nil];
+
         NSProcessInfo *processInfo = [NSProcessInfo processInfo];
         [processInfo enableSuddenTermination];
 
@@ -181,6 +184,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         case SUInstallLaterChoice:
             self.postponingInstallation = YES;
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+            [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(systemWillPowerOff:) name:NSWorkspaceWillPowerOffNotification object:nil];
             // We're already waiting on quit, just indicate that we're idle.
             self.interruptible = YES;
             break;
@@ -200,6 +204,13 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
     self.showErrors = YES;
     [super installWithToolAndRelaunch:relaunch displayingUserInterface:showUI];
+}
+
+- (void)systemWillPowerOff:(NSNotification *)__unused note
+{
+    [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUSystemPowerOffError userInfo:@{
+        NSLocalizedDescriptionKey: SULocalizedString(@"The update will not be installed because the user requested for the system to power off", nil)
+    }]];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)__unused note

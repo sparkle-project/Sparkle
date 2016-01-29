@@ -84,7 +84,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     self = [super init];
     if (bundle == nil) bundle = [NSBundle mainBundle];
 
-    self.sparkleBundle = [NSBundle bundleForClass:[self class]];
+    // Use explicit class to use the correct bundle even when subclassed
+    self.sparkleBundle = [NSBundle bundleForClass:[SUUpdater class]];
     if (!self.sparkleBundle) {
         SULog(@"Error: SUUpdater can't find Sparkle.framework it belongs to");
         return nil;
@@ -346,6 +347,17 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     [self checkForUpdatesWithDriver:[[SUProbingUpdateDriver alloc] initWithUpdater:self]];
 }
 
+- (void)installUpdatesIfAvailable
+{
+    if (self.driver && [self.driver isInterruptible]) {
+        [self.driver abortUpdate:SUUpdateAbortInterrupred];
+    }
+
+    SUUIBasedUpdateDriver *theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self];
+    theUpdateDriver.automaticallyInstallUpdates = YES;
+    [self checkForUpdatesWithDriver:theUpdateDriver];
+}
+
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)d
 {
 	if ([self updateInProgress]) { return; }
@@ -453,8 +465,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 - (BOOL)automaticallyDownloadsUpdates
 {
-    // If the SUAllowsAutomaticUpdatesKey exists and is set to NO, return NO.
-    if ([self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] && [self.host boolForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey] == NO) {
+    // If the host doesn't allow automatic updates, don't ever let them happen
+    if (!self.host.allowsAutomaticUpdates) {
         return NO;
     }
 

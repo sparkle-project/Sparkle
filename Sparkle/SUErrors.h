@@ -40,7 +40,10 @@ typedef NS_ENUM(OSStatus, SUError) {
     SUInstallationError = 4005,
     SUDowngradeError = 4006,
     
-    SUXPCServiceError = 4007
+    SUXPCServiceError = 4007,
+
+    // System phase errors
+    SUSystemPowerOffError = 5000
 };
 
 #endif

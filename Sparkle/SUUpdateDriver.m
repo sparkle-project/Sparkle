@@ -27,6 +27,7 @@ NSString *const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 @synthesize interruptible;
 @synthesize finished;
 @synthesize appcastURL;
+@synthesize automaticallyInstallUpdates;
 @synthesize abortReason;
 
 - (instancetype)initWithUpdater:(SUUpdater *)anUpdater

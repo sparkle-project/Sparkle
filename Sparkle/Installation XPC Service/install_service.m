@@ -10,7 +10,7 @@
 #include <asl.h>
 
 #import <Foundation/Foundation.h>
-#import "SUPlainInstallerInternals.h"
+//#import "SUPlainInstaller.h"
 #import "SUInstallServiceConstants.h"
 
 static xpc_object_t SUSICopyPathContent(xpc_object_t message)
@@ -119,32 +119,32 @@ static xpc_object_t SUSICopyPathContent(xpc_object_t message)
     return reply;
 }
 
-static xpc_object_t SUISCopyPathWithAuthentication(xpc_object_t message)
-{
-    if (NULL == message)
-        return NULL;
-    
-    const char *src = xpc_dictionary_get_string(message, SUInstallServiceSourcePathKey);
-    const char *dst = xpc_dictionary_get_string(message, SUInstallServiceDestinationPathKey);
-    bool appendVersion = xpc_dictionary_get_bool(message, SUInstallServiceAppendVersionKey);
-    
-    NSFileManager *manager = [NSFileManager defaultManager];
-    NSString *relaunchPathToCopy = src ? [manager stringWithFileSystemRepresentation:src length:strlen(src)] : nil;
-    NSString *targetPath = dst ? [manager stringWithFileSystemRepresentation:dst length:strlen(dst)] : nil;
-    NSError *error = nil;
-    BOOL result = [SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath appendVersion:appendVersion error:&error];
-    
-    // send response to indicate ok
-    xpc_object_t reply = xpc_dictionary_create_reply(message);
-    if (!result && error != nil)
-    {
-        xpc_dictionary_set_int64(reply, SUInstallServiceErrorCodeKey, (int64_t)[error code]);
-        const char *errorMsg = [[error localizedDescription] length] ? [[error localizedDescription] UTF8String] : "";
-        xpc_dictionary_set_string(reply, SUInstallServiceErrorLocalizedDescriptionKey, errorMsg);
-    }
-    
-    return reply;
-}
+//static xpc_object_t SUISCopyPathWithAuthentication(xpc_object_t message)
+//{
+//    if (NULL == message)
+//        return NULL;
+//    
+//    const char *src = xpc_dictionary_get_string(message, SUInstallServiceSourcePathKey);
+//    const char *dst = xpc_dictionary_get_string(message, SUInstallServiceDestinationPathKey);
+//    bool appendVersion = xpc_dictionary_get_bool(message, SUInstallServiceAppendVersionKey);
+//    
+//    NSFileManager *manager = [NSFileManager defaultManager];
+//    NSString *relaunchPathToCopy = src ? [manager stringWithFileSystemRepresentation:src length:strlen(src)] : nil;
+//    NSString *targetPath = dst ? [manager stringWithFileSystemRepresentation:dst length:strlen(dst)] : nil;
+//    NSError *error = nil;
+//    BOOL result = [SUPlainInstaller copyPathWithAuthentication:relaunchPathToCopy overPath:targetPath appendVersion:appendVersion error:&error];
+//    
+//    // send response to indicate ok
+//    xpc_object_t reply = xpc_dictionary_create_reply(message);
+//    if (!result && error != nil)
+//    {
+//        xpc_dictionary_set_int64(reply, SUInstallServiceErrorCodeKey, (int64_t)[error code]);
+//        const char *errorMsg = [[error localizedDescription] length] ? [[error localizedDescription] UTF8String] : "";
+//        xpc_dictionary_set_string(reply, SUInstallServiceErrorLocalizedDescriptionKey, errorMsg);
+//    }
+//    
+//    return reply;
+//}
 
 static xpc_object_t SUISLaunchTask(xpc_object_t message)
 {
@@ -319,11 +319,11 @@ static void peer_event_handler(xpc_connection_t peer, xpc_object_t event)
                     break;
                 }
                     
-                case SUInstallServiceTaskAuthCopyPath:
-                {
-                    reply = SUISCopyPathWithAuthentication(event);
-                    break;
-                }
+//                case SUInstallServiceTaskAuthCopyPath:
+//                {
+//                    reply = SUISCopyPathWithAuthentication(event);
+//                    break;
+//                }
                     
                 case SUInstallServiceTaskLaunchTask:
                 {

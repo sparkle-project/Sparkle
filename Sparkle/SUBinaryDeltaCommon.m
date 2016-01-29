@@ -7,6 +7,7 @@
 //
 
 #include "SUBinaryDeltaCommon.h"
+#import "SUFileManager.h"
 #include <CommonCrypto/CommonDigest.h>
 #include <Foundation/Foundation.h>
 #include <fcntl.h>
@@ -220,7 +221,7 @@ BOOL removeTree(NSString *path)
 
 BOOL copyTree(NSString *source, NSString *dest)
 {
-    return [[NSFileManager defaultManager] copyItemAtPath:source toPath:dest error:nil];
+    return [[SUFileManager fileManagerAllowingAuthorization:NO] copyItemAtURL:[NSURL fileURLWithPath:source] toURL:[NSURL fileURLWithPath:dest] error:NULL];
 }
 
 BOOL modifyPermissions(NSString *path, mode_t desiredPermissions)

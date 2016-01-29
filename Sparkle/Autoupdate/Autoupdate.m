@@ -3,7 +3,6 @@
 #import "SUHost.h"
 #import "SUStandardVersionComparator.h"
 #import "SUStatusController.h"
-#import "SUPlainInstallerInternals.h"
 #import "SULog.h"
 
 #include <unistd.h>
@@ -46,7 +45,6 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
 {
     [self.watchdogTimer invalidate];
     completionBlock();
-    completionBlock = nil;
 }
 
 - (void)startListeningWithCompletion:(void (^)(void))completionBlock
@@ -71,6 +69,13 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
  * If the Installation takes longer than this time the Application Icon is shown in the Dock so that the user has some feedback.
  */
 static const NSTimeInterval SUInstallationTimeLimit = 5;
+
+/*!
+ * Terminate the application after a delay from launching the new update to avoid OS activation issues
+ * This delay should be be high enough to increase the likelihood that our updated app will be launched up front,
+ * but should be low enough so that the user doesn't ponder why the updater hasn't finished terminating yet
+ */
+static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 
 @interface AppInstaller : NSObject <NSApplicationDelegate>
 
@@ -97,6 +102,8 @@ static const NSTimeInterval SUInstallationTimeLimit = 5;
 @property (nonatomic, assign) BOOL shouldRelaunch;
 @property (nonatomic, assign) BOOL shouldShowUI;
 
+@property (nonatomic, assign) BOOL isTerminating;
+
 @end
 
 @implementation AppInstaller
@@ -108,6 +115,7 @@ static const NSTimeInterval SUInstallationTimeLimit = 5;
 @synthesize relaunchPath = _relaunchPath;
 @synthesize shouldRelaunch = _shouldRelaunch;
 @synthesize shouldShowUI = _shouldShowUI;
+@synthesize isTerminating = _isTerminating;
 
 - (instancetype)initWithHostPath:(NSString *)hostPath relaunchPath:(NSString *)relaunchPath parentProcessId:(pid_t)parentProcessId updateFolderPath:(NSString *)updateFolderPath shouldRelaunch:(BOOL)shouldRelaunch shouldShowUI:(BOOL)shouldShowUI
 {
@@ -129,12 +137,16 @@ static const NSTimeInterval SUInstallationTimeLimit = 5;
 {
     [self.terminationListener startListeningWithCompletion:^{
         self.terminationListener = nil;
-        
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUInstallationTimeLimit * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            // Show app icon in the dock
-            ProcessSerialNumber psn = { 0, kCurrentProcess };
-            TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-        });
+		
+        if (self.shouldShowUI) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUInstallationTimeLimit * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+				if (!self.isTerminating) {
+					// Show app icon in the dock
+					ProcessSerialNumber psn = { 0, kCurrentProcess };
+					TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+				}
+            });
+        }
         
         [self install];
     }];
@@ -150,7 +162,7 @@ static const NSTimeInterval SUInstallationTimeLimit = 5;
         self.statusController = [[SUStatusController alloc] initWithHost:host];
         [self.statusController setButtonTitle:SULocalizedString(@"Cancel Update", @"") target:nil action:Nil isDefault:NO];
         [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"")
-                       maxProgressValue: 0 statusText: @""];
+                                   maxProgressValue: 0 statusText: @""];
         [self.statusController showWindow:self];
     }
     
@@ -160,6 +172,7 @@ static const NSTimeInterval SUInstallationTimeLimit = 5;
                        versionComparator:[SUStandardVersionComparator defaultComparator]
                        completionHandler:^(NSError *error) {
                            if (error) {
+                               SULog(@"Installation Error: %@", error);
                                if (self.shouldShowUI) {
                                    NSAlert *alert = [[NSAlert alloc] init];
                                    alert.messageText = @"";
@@ -181,27 +194,44 @@ static const NSTimeInterval SUInstallationTimeLimit = 5;
                        }];
 }
 
-- (void)cleanupAndTerminateWithPathToRelaunch:(NSString *)relaunchPath __attribute__((noreturn))
+- (void)cleanupAndTerminateWithPathToRelaunch:(NSString *)relaunchPath
 {
-    if (self.shouldRelaunch) {
-        NSError *error = nil;
-        [[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:relaunchPath]
-                                                      options:NSWorkspaceLaunchNewInstance
-                                                configuration:@{}
-                                                        error:&error];
-        if (error.code != noErr)
-        {
-            SULog(@"%ld - %@", error.code, error.localizedDescription);
+    self.isTerminating = YES;
+    
+    dispatch_block_t cleanupAndExit = ^{
+        NSError *theError = nil;
+        if (![[NSFileManager defaultManager] removeItemAtPath:self.updateFolderPath error:&theError]) {
+            SULog(@"Couldn't remove update folder: %@.", theError);
         }
+        
+        [[NSFileManager defaultManager] removeItemAtPath:[[NSBundle mainBundle] bundlePath] error:NULL];
+        
+        exit(EXIT_SUCCESS);
+    };
+    
+    if (self.shouldRelaunch) {
+        // The auto updater can terminate before the newly updated app is finished launching
+        // If that happens, the OS may not make the updated app active and frontmost
+        // (Or it does become frontmost, but the OS backgrounds it afterwards.. It's some kind of timing/activation issue that doesn't occur all the time)
+        // The only remedy I've been able to find is waiting an arbitrary delay before exiting our application
+        
+        // Don't use -launchApplication: because we may not be launching an application. Eg: it could be a system prefpane
+        if (![[NSWorkspace sharedWorkspace] openFile:relaunchPath]) {
+            SULog(@"Failed to launch %@", relaunchPath);
+        }
+        
+        [self.statusController close];
+        
+        // Don't even think about hiding the app icon from the dock if we've already shown it
+        // Transforming the app back to a background one has a backfiring effect, decreasing the likelihood
+        // that the updated app will be brought up front
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUTerminationTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            cleanupAndExit();
+        });
+    } else {
+        cleanupAndExit();
     }
-    
-    NSError *theError = nil;
-    if (![SUPlainInstaller _removeFileAtPath:self.updateFolderPath error:&theError])
-        SULog(@"Couldn't remove update folder: %@.", theError);
-    
-    [[NSFileManager defaultManager] removeItemAtPath:[[NSBundle mainBundle] bundlePath] error:NULL];
-    
-    exit(EXIT_SUCCESS);
 }
 
 @end
@@ -225,7 +255,7 @@ int main(int __unused argc, const char __unused *argv[])
         AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostPath:args[1]
                                                                relaunchPath:args[2]
                                                             parentProcessId:[args[3] intValue]
-                                                                 updateFolderPath:args[4]
+                                                           updateFolderPath:args[4]
                                                              shouldRelaunch:(args.count > 5) ? [args[5] boolValue] : YES
                                                                shouldShowUI:shouldShowUI];
         NSConnection *connection = [[NSConnection alloc] init];

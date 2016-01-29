@@ -24,10 +24,10 @@ extern NSString *const SUUpdateDriverFinishedNotification;
 - (void)abortUpdate:(SUUpdateAbortReason)reason;
 @property (getter=isInterruptible, readonly) BOOL interruptible;
 @property (readonly) BOOL finished;
+@property BOOL automaticallyInstallUpdates;
 @property (readonly) SUUpdateAbortReason abortReason;
 
 @property (nonatomic, readonly) BOOL shouldShowUI; // can change it's value during lifetime
-
 
 @end
 
