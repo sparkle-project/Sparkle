@@ -69,8 +69,21 @@
         promptData = [NSData dataWithBytes:"yes\n" length:4];
 
         NSString *hdiutilPath = @"/usr/bin/hdiutil";
-        NSArray *arguments = @[@"attach", self.archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"];
         NSString *currentDirPath = @"/";
+        NSArray *arguments = @[@"attach", self.archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"];
+
+        if (self.decryptionPassword) {
+            NSMutableData *passwordData = [[self.decryptionPassword dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
+            // From the hdiutil docs:
+            // read a null-terminated passphrase from standard input
+            //
+            // Add the null terminator, then the newline
+            [passwordData appendData:[NSData dataWithBytes:"\0" length:1]];
+            [passwordData appendData:promptData];
+            promptData = passwordData;
+
+            arguments = [arguments arrayByAddingObject:@"-stdinpass"];
+        }
 
         BOOL shouldUseXPC = SUShouldUseXPCInstaller();
         

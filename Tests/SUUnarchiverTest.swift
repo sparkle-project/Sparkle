@@ -10,6 +10,7 @@ import XCTest
 
 class SUUnarchiverTest: XCTestCase, SUUnarchiverDelegate
 {
+    var password: String? = nil
     var unarchivedExpectation: XCTestExpectation? = nil
     var unarchivedResult: Bool = false
     
@@ -48,7 +49,7 @@ class SUUnarchiverTest: XCTestCase, SUUnarchiverDelegate
         
         self.unarchivedExpectation = super.expectationWithDescription("Unarchived Application (format: \(archiveExtension))")
         
-        let unarchiver = SUUnarchiver(forPath: tempArchiveURL.path!, updatingHostBundlePath: nil)
+        let unarchiver = SUUnarchiver(forPath: tempArchiveURL.path!, updatingHostBundlePath: nil, withPassword: self.password)
 
         unarchiver.delegate = self
         unarchiver.start()
@@ -89,5 +90,11 @@ class SUUnarchiverTest: XCTestCase, SUUnarchiverDelegate
     func testUnarchivingDmg()
     {
         self.unarchiveTestAppWithExtension("dmg")
+    }
+
+    func testUnarchivingEncryptedDmg()
+    {
+        self.password = "testpass";
+        self.unarchiveTestAppWithExtension("enc.dmg")
     }
 }

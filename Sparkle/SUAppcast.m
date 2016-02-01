@@ -102,7 +102,7 @@
 	if (self.downloadFilename)
 	{
         NSUInteger options = 0;
-        options = NSXMLNodeLoadExternalEntitiesSameOriginOnly;
+        options = NSXMLNodeLoadExternalEntitiesNever; // Prevent inclusion from file://
         document = [[NSXMLDocument alloc] initWithContentsOfURL:[NSURL fileURLWithPath:self.downloadFilename] options:options error:&error];
 
         [[NSFileManager defaultManager] removeItemAtPath:self.downloadFilename error:nil];
@@ -285,6 +285,18 @@
         i = 0;
     }
     return nodes[i];
+}
+
+- (SUAppcast *)copyWithoutDeltaUpdates {
+    SUAppcast *other = [SUAppcast new];
+    NSMutableArray *nonDeltaItems = [NSMutableArray new];
+
+    for(SUAppcastItem *item in self.items) {
+        if (![item isDeltaUpdate]) [nonDeltaItems addObject:item];
+    }
+
+    other.items = nonDeltaItems;
+    return other;
 }
 
 @end
