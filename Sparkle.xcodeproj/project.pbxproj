@@ -119,6 +119,8 @@
 		33545B991B468AD60059250D /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */; };
 		33545B9A1B468AE30059250D /* SUPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5210DAE8E8A0026945C /* SUPackageInstaller.m */; };
 		33545B9C1B46A5430059250D /* SUXPCInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 33545B7C1B46774D0059250D /* SUXPCInstaller.m */; };
+		335698EA1C5FC8A600CE0FD4 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
+		335698EB1C5FC8AF00CE0FD4 /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		336475CE1C5B980500813E67 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
 		336475CF1C5B980C00813E67 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
 		336475D01C5B982900813E67 /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
@@ -1929,6 +1931,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				61B5F93009C4CFDC00B25A18 /* main.m in Sources */,
+				335698EB1C5FC8AF00CE0FD4 /* SUOperatingSystem.m in Sources */,
+				335698EA1C5FC8A600CE0FD4 /* SUFileManager.m in Sources */,
 				726F2CEB1BC9C733001971A4 /* SUConstants.m in Sources */,
 				72E45CF31B640CDD005C701A /* SUTestApplicationDelegate.m in Sources */,
 				A5BF4F1D1BC7668B007A052A /* SUTestWebServer.m in Sources */,
