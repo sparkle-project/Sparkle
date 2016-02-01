@@ -501,7 +501,13 @@ CF_EXPORT CFDictionaryRef DMCopyHTTPRequestHeaders(CFBundleRef appBundle, CFData
             // We probably don't need to release the quarantine, but we'll do it just in case it's necessary.
             // Perhaps in a sandboxed environment this matters more. Note that this may not be a fatal error.
             NSError *quarantineError = nil;
-            if (![fileManager releaseItemFromQuarantineAtRootURL:targetURL error:&quarantineError]) {
+            if (SUShouldUseXPCInstaller()) {
+                [SUXPCInstaller releaseItemFromQuarantineAtRootURL:targetURL allowsAuthorization:fileManager.allowsAuthorization error:&quarantineError];
+            } else {
+                [fileManager releaseItemFromQuarantineAtRootURL:targetURL error:&quarantineError];
+            }
+            
+            if (quarantineError != nil) {
                 SULog(@"Failed to release quarantine on %@ with error %@", targetPath, quarantineError);
             }
             self.relaunchPath = targetPath;

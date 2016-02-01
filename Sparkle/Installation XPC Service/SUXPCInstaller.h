@@ -11,7 +11,7 @@
 
 @interface SUXPCInstaller : NSObject
 
-//+ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst appendVersion:(BOOL)appendVersion error:(NSError *__autoreleasing *)outError;
++ (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL allowsAuthorization:(BOOL)flag error:(NSError *__autoreleasing *)error;
 
 + (BOOL)copyPathContent:(NSString *)src toDirectory:(NSString *)dstDir error:(NSError *__autoreleasing *)outError; // dstDir will be created if absent
 

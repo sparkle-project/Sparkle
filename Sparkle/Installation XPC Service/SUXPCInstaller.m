@@ -54,60 +54,56 @@ BOOL SUShouldUseXPCInstaller(void)
     return (serviceConnection);
 }
 
-//+ (BOOL)copyPathWithAuthentication:(NSString *)src overPath:(NSString *)dst appendVersion:(BOOL)appendVersion error:(NSError *__autoreleasing *)outError
-//{
-//    xpc_connection_t connection = [self getSandboxXPCService];
-//
-//	xpc_object_t message = xpc_dictionary_create(NULL, NULL, 0);
-//	xpc_dictionary_set_int64(message, SUInstallServiceTaskTypeKey, (int64_t)SUInstallServiceTaskAuthCopyPath);
-//	
-//	if (src)
-//		xpc_dictionary_set_string(message, SUInstallServiceSourcePathKey, [src fileSystemRepresentation]);
-//	if (dst)
-//		xpc_dictionary_set_string(message, SUInstallServiceDestinationPathKey, [dst fileSystemRepresentation]);
-//    xpc_dictionary_set_bool(message, SUInstallServiceAppendVersionKey, appendVersion ? true : false);
-//	
-//    __block BOOL xpcDidReply = NO;
-//    __block NSError *error = nil;
-//    
-//    dispatch_queue_t queue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
-//    xpc_connection_send_message_with_reply(connection, message, queue, ^(xpc_object_t response) {
-//        if (XPC_TYPE_ERROR == xpc_get_type(response))
-//        {
-//            NSDictionary *errorInfo = [NSDictionary dictionaryWithObject:@"Internal XPC error."
-//                                                                  forKey:NSLocalizedDescriptionKey];
-//            error = [[NSError alloc] initWithDomain:SUSparkleErrorDomain code:SUXPCServiceError userInfo:errorInfo];
-//        }
-//        else if (XPC_TYPE_DICTIONARY == xpc_get_type(response))
-//        {
-//            const char *errorString = xpc_dictionary_get_string(response, SUInstallServiceErrorLocalizedDescriptionKey);
-//            if (errorString != NULL)
-//            {
-//                NSString *errorStr = [NSString stringWithCString:errorString encoding:NSUTF8StringEncoding];
-//                NSDictionary *errorInfo = [NSDictionary dictionaryWithObject:errorStr ? errorStr : @""
-//                                                                      forKey:NSLocalizedDescriptionKey];
-//                error = [[NSError alloc] initWithDomain:SUSparkleErrorDomain code:SUXPCServiceError userInfo:errorInfo];
-//            }
-//        }
-//        
-//        xpcDidReply = YES;
-//    });
-//    
-//    while (NO == xpcDidReply)
-//    {
-//        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
-//    }
-//    
-//    xpc_release(message);
-//    dispatch_release(queue);
-//    
-//    if (nil != error && NULL != outError)
-//    {
-//        *outError = error;
-//    }
-//    
-//    return (nil == error);
-//}
++ (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL allowsAuthorization:(BOOL)flag error:(NSError *__autoreleasing *)outError
+{
+    xpc_connection_t connection = [self getSandboxXPCService];
+
+	xpc_object_t message = xpc_dictionary_create(NULL, NULL, 0);
+	xpc_dictionary_set_int64(message, SUInstallServiceTaskTypeKey, (int64_t)SUInstallServiceTaskAuthReleaseFromQuarantine);
+	
+	if (rootURL)
+		xpc_dictionary_set_string(message, SUInstallServiceSourcePathKey, rootURL.path.fileSystemRepresentation);
+    xpc_dictionary_set_bool(message, SUInslallServiceAllowsAuthKey, flag ? true : false);
+	
+    __block BOOL xpcDidReply = NO;
+    __block NSError *error = nil;
+    
+    dispatch_queue_t queue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
+    xpc_connection_send_message_with_reply(connection, message, queue, ^(xpc_object_t response) {
+        if (XPC_TYPE_ERROR == xpc_get_type(response))
+        {
+            NSDictionary *errorInfo = @{NSLocalizedDescriptionKey : @"Internal XPC error."};
+            error = [[NSError alloc] initWithDomain:SUSparkleErrorDomain code:SUXPCServiceError userInfo:errorInfo];
+        }
+        else if (XPC_TYPE_DICTIONARY == xpc_get_type(response))
+        {
+            const char *errorString = xpc_dictionary_get_string(response, SUInstallServiceErrorLocalizedDescriptionKey);
+            if (errorString != NULL)
+            {
+                NSString *errorStr = [NSString stringWithCString:errorString encoding:NSUTF8StringEncoding];
+                NSDictionary *errorInfo = @{NSLocalizedDescriptionKey : errorStr ? errorStr : @""};
+                error = [[NSError alloc] initWithDomain:SUSparkleErrorDomain code:SUXPCServiceError userInfo:errorInfo];
+            }
+        }
+        
+        xpcDidReply = YES;
+    });
+    
+    while (NO == xpcDidReply)
+    {
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
+    }
+    
+    xpc_release(message);
+    dispatch_release(queue);
+    
+    if (nil != error && NULL != outError)
+    {
+        *outError = error;
+    }
+    
+    return (nil == error);
+}
 
 + (BOOL)copyPathContent:(NSString *)src toDirectory:(NSString *)dstDir error:(NSError * __autoreleasing*)outError
 {

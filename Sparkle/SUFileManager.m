@@ -94,6 +94,11 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     return [[self alloc] initAllowingAuthorization:allowsAuthorization];
 }
 
+- (BOOL)allowsAuthorization
+{
+    return _allowsAuthorization;
+}
+
 // Acquires an authorization reference which is intended to be used for future authorized file operations
 - (BOOL)_acquireAuthorizationWithError:(NSError *__autoreleasing *)error
 {

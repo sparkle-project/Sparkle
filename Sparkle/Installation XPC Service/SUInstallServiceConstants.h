@@ -11,10 +11,10 @@
 
 typedef NS_ENUM(UInt64, SUInstallServiceTask)
 {
-    SUInstallServiceTaskUnknown         = 0,
-    SUInstallServiceTaskCopyPath        = 1LL,
-    SUInstallServiceTaskAuthCopyPath    = 2LL,
-    SUInstallServiceTaskLaunchTask      = 3LL
+    SUInstallServiceTaskUnknown                     = 0,
+    SUInstallServiceTaskCopyPath                    = 1LL,
+    SUInstallServiceTaskAuthReleaseFromQuarantine   = 2LL,
+    SUInstallServiceTaskLaunchTask                  = 3LL
 };
 
 static const char * SUInstallServiceTaskTypeKey = "task_type"; // int64_t
@@ -22,7 +22,7 @@ static const char * SUInstallServiceTaskTypeKey = "task_type"; // int64_t
 // SUInstallServiceTaskCopyPath & SUInstallServiceTaskAuthCopyPath keys
 static const char * SUInstallServiceSourcePathKey = "source_path"; // c-string
 static const char * SUInstallServiceDestinationPathKey = "destination_path"; // c-string
-static const char * SUInstallServiceAppendVersionKey = "append_version"; // bool
+static const char * SUInslallServiceAllowsAuthKey = "allows_authorization"; // bool
 
 // SUInstallServiceTaskLaunchTask keys
 static const char * SUInstallServiceLaunchTaksPathKey = "launch_task_path";
