@@ -503,17 +503,19 @@
         return;
     }
 
-    NSString *pathToRelaunch = [self.host bundlePath];
+    //This is a hack to work for Imagine Learning purposes. As sparkle is located in a unity plugin, but we want to update the entire app, not just the plugin bundle. So we go up 3 directories and pass in the Imagine Learning app bundle instead of the plugin bundle to the Autoupdate app.
+    NSString *pathToRelaunch = [[[[self.host bundlePath] stringByDeletingLastPathComponent] stringByDeletingLastPathComponent]stringByDeletingLastPathComponent];
     if ([updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
         pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:self.updater];
     }
-    [NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:@[[self.host bundlePath],
+    [NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:@[[[[[self.host bundlePath] stringByDeletingLastPathComponent] stringByDeletingLastPathComponent]stringByDeletingLastPathComponent],
                                                                     pathToRelaunch,
                                                                     [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]],
                                                                     self.tempDir,
                                                                     relaunch ? @"1" : @"0",
                                                                     showUI ? @"1" : @"0"]];
     [self terminateApp];
+
 }
 
 - (void)terminateApp
