@@ -558,7 +558,12 @@
 - (void)abortUpdateWithError:(NSError *)error
 {
     if ([error code] != SUNoUpdateError) { // Let's not bother logging this.
-        SULog(@"Error: %@ %@ (URL %@)", error.localizedDescription, error.localizedFailureReason, error.userInfo[NSURLErrorFailingURLErrorKey]);
+        NSError *errorToDisplay = error;
+        int finiteRecursion=5;
+        do {
+            SULog(@"Error: %@ %@ (URL %@)", errorToDisplay.localizedDescription, errorToDisplay.localizedFailureReason, errorToDisplay.userInfo[NSURLErrorFailingURLErrorKey]);
+            errorToDisplay = errorToDisplay.userInfo[NSUnderlyingErrorKey];
+        } while(--finiteRecursion && errorToDisplay);
     }
     if (self.download) {
         [self.download cancel];

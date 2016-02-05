@@ -229,7 +229,11 @@
     }
 
     if (failed) {
-        [self reportError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastParseError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while parsing the update feed.", nil) }]];
+        [self reportError:[NSError errorWithDomain:SUSparkleErrorDomain
+                                              code:SUAppcastParseError
+                                          userInfo:@{
+                                                     NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while parsing the update feed.", nil),
+                                                     NSUnderlyingErrorKey: error ? error : [NSNull null]}]];
     } else {
         self.completionBlock(nil);
         self.completionBlock = nil;
