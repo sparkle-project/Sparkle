@@ -1,3 +1,21 @@
+# 1.14.0
+
+* URL-encoding of appcast URLs is preserved (Kornel Lesiński)
+* Delegate is asked for fallback updates if delta update fails (Kornel Lesiński)
+* Fixed check of feed URL before delegate had a chance to set it (Kornel Lesiński)
+* Re-added support for password-protected dmg images (Andrew K. Boyd)
+* Added warning about ATS blocking (Kornel Lesiński)
+* Translation fixes for pt-BR. (vitu)
+* Add some Japanese lozalized strings (1024jp)
+* Made test app available in all languages #695 (LIU Dongyuan / 柳东原)
+* Removed a test resource from the framework bundle (Karl Moskowski)
+
+# 1.13.1 (Jan 31, 2016)
+
+Important security fixes:
+
+* Prevent inclusion of local files via file:// XML entities
+* Disable redirects to non-HTTP URLs in release notes webview
 
 # 1.13.0 (Dec 18, 2015)
 
