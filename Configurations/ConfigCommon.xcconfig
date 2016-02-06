@@ -1,6 +1,6 @@
 // Common
 
-SPARKLE_BUNDLE_IDENTIFIER = org.sparkle-project.Sparkle
+SPARKLE_BUNDLE_IDENTIFIER = com.binaryage.sparkle
 SPARKLE_RELAUNCH_TOOL_NAME = Autoupdate
 
 SPARKLE_APPEND_VERSION_NUMBER = 1
@@ -27,7 +27,7 @@ GCC_PREFIX_HEADER = Sparkle/Sparkle.pch
 GCC_SYMBOLS_PRIVATE_EXTERN = YES
 GCC_INLINES_ARE_PRIVATE_EXTERN = YES
 ARCHS = $(ARCHS_STANDARD)
-MACOSX_DEPLOYMENT_TARGET = 10.7
+MACOSX_DEPLOYMENT_TARGET = 10.9
 PRODUCT_NAME = ${TARGET_NAME}
 PRODUCT_BUNDLE_IDENTIFIER = org.sparkle-project.Sparkle.${PRODUCT_NAME:rfc1034identifier}
 
@@ -87,4 +87,4 @@ CLANG_ENABLE_MODULES[sdk=macosx10.8] = NO
 WARNING_CFLAGS_EXTRA = -Wno-custom-atomic-properties -Wno-implicit-atomic-properties
 
 // Turn on all warnings, then disable a few which are almost impossible to avoid
-WARNING_CFLAGS = -Wall -Weverything -Wno-unused-macros -Wno-gnu-statement-expression -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wno-auto-import $(WARNING_CFLAGS_EXTRA)
+WARNING_CFLAGS = -Wall -Weverything -Wno-unused-macros -Wno-gnu-statement-expression -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wno-auto-import -Wno-partial-availability $(WARNING_CFLAGS_EXTRA)

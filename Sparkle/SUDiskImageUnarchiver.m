@@ -65,7 +65,10 @@
                 CFRelease(uuid);
             }
 		}
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 		while (noErr == FSPathMakeRefWithOptions((const UInt8 *)[mountPoint fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &tmpRef, NULL));
+#pragma clang diagnostic pop
 
         NSData *promptData = nil;
         promptData = [NSData dataWithBytes:"yes\n" length:4];
