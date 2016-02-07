@@ -14,6 +14,14 @@ class SUTestApplicationTest: XCTestCase
     var testApplicationBackupURL: NSURL? = nil
     var tempDirectoryURL: NSURL? = nil
     
+    func runningTestApplication() -> NSRunningApplication
+    {
+        // TODO: don't hardcode bundle ID?
+        let runningApplications = NSRunningApplication.runningApplicationsWithBundleIdentifier("org.sparkle-project.SparkleTestApp")
+        XCTAssertEqual(runningApplications.count, 1, "More than one or zero running instances of the Test Application are found")
+        return runningApplications[0]
+    }
+    
     override func setUp()
     {
         super.setUp()
@@ -25,10 +33,7 @@ class SUTestApplicationTest: XCTestCase
         
         // We need to grab the app URL so we can back up the app
         // When a successful test is over we'll revert the update
-        // TODO: don't hardcode bundle ID?
-        let runningApplications = NSRunningApplication.runningApplicationsWithBundleIdentifier("org.sparkle-project.SparkleTestApp")
-        XCTAssertEqual(runningApplications.count, 1, "More than one running instance of the Test Application is found")
-        let testApplicationURL = runningApplications[0].bundleURL!
+        let testApplicationURL = self.runningTestApplication().bundleURL!
         
         let tempDirectoryURL = try! NSFileManager.defaultManager().URLForDirectory(.ItemReplacementDirectory, inDomain: NSSearchPathDomainMask.UserDomainMask, appropriateForURL: testApplicationURL, create: true)
         
@@ -81,7 +86,13 @@ class SUTestApplicationTest: XCTestCase
         app.dialogs["SUUpdateAlert"].buttons["Install Update"].click()
         app.buttons["Install and Relaunch"].click()
         
-        // Our new updated app should be launched now
+        // Wait for the new updated app to finish launching so we can test if it's the frontmost app
+        sleep(3)
+        
+        // Our new updated app should be launched now. Test if it's the active app
+        // We used to run into timing issues where the updated app sometimes may not show up as the frontmost one
+        XCTAssertTrue(self.runningTestApplication().active)
+        
         // Grab another XCUIApplication instance rather than using the old one, just in case
         let updatedApp = XCUIApplication()
         
