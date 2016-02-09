@@ -37,7 +37,7 @@
 
 - (NSString *)feedURLStringForUpdater:(SUUpdater *) __unused updater
 {
-    return @"";
+    return @"https://test.example.com";
 }
 
 - (void)testFeedURL

@@ -13,9 +13,9 @@
 
 "%@ of %@" = "%1$@ / %2$@";
 
-"A new version of %@ is available!" = "新版本的 %@ 已经提供下载了！";
+"A new version of %@ is available!" = "新版本的 %@ 已经发布";
 
-"A new version of %@ is ready to install!" = "新版本的 %@ 可以安装了！";
+"A new version of %@ is ready to install!" = "新版本的 %@ 可以安装了";
 
 "An error occurred in retrieving update information. Please try again later." = "获取升级信息时出现错误，请稍后再试。";
 
