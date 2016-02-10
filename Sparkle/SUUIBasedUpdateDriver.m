@@ -103,7 +103,7 @@
         alert.messageText = SULocalizedString(@"Update available!", "Status message shown when the user checks for updates and one is available, but the user needs to update their operating system to be eligible.");
         alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available, but it requires Mac OS X %@--you are running %@.\nPlease update your Mac and check for updates again.", nil), [self.host name], [self.host displayVersion], requiredOSVersion, currentOSVersion];
         [alert addButtonWithTitle:SULocalizedString(@"OK", nil)];
-        [self showModalAlert:alert];
+        [self showAlert:alert];
         [self abortUpdate];
     }
 }
