@@ -14,7 +14,7 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SUVersionDisplayProtocol.h"
 
-@class SUAppcastItem, SUAppcast;
+@class SUAppcastItem, SUAppcast, SUHost, SUUpdatePermissionPromptResult;
 
 @protocol SUUpdaterDelegate;
 
@@ -360,6 +360,8 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
     \param error The error that caused the abort
  */
 - (void)updater:(SUUpdater *)updater didAbortWithError:(NSError *)error;
+
+- (BOOL)handlePermissionForUpdater:(SUUpdater *)updater host:(SUHost *)host systemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply;
 
 @end
 

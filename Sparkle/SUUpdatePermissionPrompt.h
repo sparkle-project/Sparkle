@@ -11,23 +11,14 @@
 
 #import "SUWindowController.h"
 
-typedef NS_ENUM(NSInteger, SUPermissionPromptResult) {
-    SUAutomaticallyCheck,
-    SUDoNotAutomaticallyCheck
-};
+@class SUHost, SUUpdatePermissionPromptResult;
 
-@protocol SUUpdatePermissionPromptDelegate;
-
-@class SUHost;
 @interface SUUpdatePermissionPrompt : SUWindowController
 
-+ (void)promptWithHost:(SUHost *)aHost systemProfile:(NSArray *)profile delegate:(id<SUUpdatePermissionPromptDelegate>)d;
++ (void)promptWithHost:(SUHost *)host systemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply;
+
 - (IBAction)toggleMoreInfo:(id)sender;
 - (IBAction)finishPrompt:(id)sender;
-@end
-
-@protocol SUUpdatePermissionPromptDelegate <NSObject>
-- (void)updatePermissionPromptFinishedWithResult:(SUPermissionPromptResult)result;
 @end
 
 #endif

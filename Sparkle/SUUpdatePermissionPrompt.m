@@ -7,6 +7,7 @@
 //
 
 #import "SUUpdatePermissionPrompt.h"
+#import "SUUpdatePermissionPromptResult.h"
 
 #import "SUHost.h"
 #import "SUConstants.h"
@@ -18,62 +19,63 @@
 
 @property (strong) SUHost *host;
 @property (strong) NSArray *systemProfileInformationArray;
-@property (weak) id<SUUpdatePermissionPromptDelegate> delegate;
 @property (weak) IBOutlet NSTextField *descriptionTextField;
 @property (weak) IBOutlet NSView *moreInfoView;
 @property (weak) IBOutlet NSButton *moreInfoButton;
 @property (weak) IBOutlet NSTableView *profileTableView;
 
+@property (nonatomic, readonly) void (^reply)(SUUpdatePermissionPromptResult *);
+
 @end
 
 @implementation SUUpdatePermissionPrompt
 
+@synthesize reply = _reply;
 @synthesize isShowingMoreInfo = _isShowingMoreInfo;
 @synthesize shouldSendProfile = _shouldSendProfile;
 @synthesize host;
 @synthesize systemProfileInformationArray;
-@synthesize delegate;
 @synthesize descriptionTextField;
 @synthesize moreInfoView;
 @synthesize moreInfoButton;
 @synthesize profileTableView;
 
-- (BOOL)shouldAskAboutProfile
-{
-    return [[self.host objectForInfoDictionaryKey:SUEnableSystemProfilingKey] boolValue];
-}
-
-- (instancetype)initWithHost:(SUHost *)aHost systemProfile:(NSArray *)profile delegate:(id<SUUpdatePermissionPromptDelegate>)d
+- (instancetype)initPromptWithHost:(SUHost *)theHost systemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply
 {
     self = [super initWithWindowNibName:@"SUUpdatePermissionPrompt"];
-	if (self)
-	{
-        host = aHost;
-        delegate = d;
+    if (self)
+    {
+        _reply = reply;
+        self.host = theHost;
         self.isShowingMoreInfo = NO;
         self.shouldSendProfile = [self shouldAskAboutProfile];
-        systemProfileInformationArray = profile;
+        self.systemProfileInformationArray = systemProfile;
         [self setShouldCascadeWindows:NO];
     }
     return self;
 }
 
-+ (void)promptWithHost:(SUHost *)aHost systemProfile:(NSArray *)profile delegate:(id<SUUpdatePermissionPromptDelegate>)d
++ (void)promptWithHost:(SUHost *)host systemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply
 {
     // If this is a background application we need to focus it in order to bring the prompt
     // to the user's attention. Otherwise the prompt would be hidden behind other applications and
     // the user would not know why the application was paused.
-	if ([aHost isBackgroundApplication]) {
+    if ([host isBackgroundApplication]) {
         [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
     }
-
+    
     if (![NSApp modalWindow]) { // do not prompt if there is is another modal window on screen
-        SUUpdatePermissionPrompt *prompt = [[[self class] alloc] initWithHost:aHost systemProfile:profile delegate:d];
+        SUUpdatePermissionPrompt *prompt = [[[self class] alloc] initPromptWithHost:host systemProfile:systemProfile reply:reply];
         NSWindow *window = [prompt window];
         if (window) {
             [NSApp runModalForWindow:window];
         }
     }
+}
+
+- (BOOL)shouldAskAboutProfile
+{
+    return [[self.host objectForInfoDictionaryKey:SUEnableSystemProfilingKey] boolValue];
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
@@ -149,11 +151,8 @@
 
 - (IBAction)finishPrompt:(id)sender
 {
-    if (![self.delegate respondsToSelector:@selector(updatePermissionPromptFinishedWithResult:)]) {
-        [NSException raise:@"SUInvalidDelegate" format:@"SUUpdatePermissionPrompt's delegate (%@) doesn't respond to updatePermissionPromptFinishedWithResult:!", self.delegate];
-    }
-    [self.host setBool:self.shouldSendProfile forUserDefaultsKey:SUSendProfileInfoKey];
-    [self.delegate updatePermissionPromptFinishedWithResult:([sender tag] == 1 ? SUAutomaticallyCheck : SUDoNotAutomaticallyCheck)];
+    self.reply([SUUpdatePermissionPromptResult updatePermissionPromptResultWithChoice:([sender tag] == 1 ? SUAutomaticallyCheck : SUDoNotAutomaticallyCheck) shouldSendProfile:self.shouldSendProfile]);
+    
     [[self window] close];
     [NSApp stopModal];
 }

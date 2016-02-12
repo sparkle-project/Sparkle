@@ -186,6 +186,8 @@
 		7275F9C11B5F1F2900B1D19E /* SUFileManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 7275F9BF1B5F1F2900B1D19E /* SUFileManager.h */; };
 		7275F9C21B5F1F2900B1D19E /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
 		7275F9C31B5F1F2900B1D19E /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
+		72A450531C69A68900D67EEA /* SUUpdatePermissionPromptResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 72A450511C69A68900D67EEA /* SUUpdatePermissionPromptResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		72A450541C69A68900D67EEA /* SUUpdatePermissionPromptResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 72A450521C69A68900D67EEA /* SUUpdatePermissionPromptResult.m */; };
 		72A4A2401BB6567D00E7820D /* SUFileManagerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A4A23F1BB6567D00E7820D /* SUFileManagerTest.swift */; };
 		72AC6B261B9AAC8800F62325 /* SparkleTestCodeSignApp.tar.gz in Resources */ = {isa = PBXBuildFile; fileRef = 72AC6B251B9AAC8800F62325 /* SparkleTestCodeSignApp.tar.gz */; };
 		72AC6B281B9AAD6700F62325 /* SparkleTestCodeSignApp.tar in Resources */ = {isa = PBXBuildFile; fileRef = 72AC6B271B9AAD6700F62325 /* SparkleTestCodeSignApp.tar */; };
@@ -635,6 +637,8 @@
 		729F10FE1C65A9B500DFCCC5 /* ConfigUITestCoverage.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestCoverage.xcconfig; sourceTree = "<group>"; };
 		729F10FF1C65A9B500DFCCC5 /* ConfigUITestDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestDebug.xcconfig; sourceTree = "<group>"; };
 		729F11001C65A9B500DFCCC5 /* ConfigUITestRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestRelease.xcconfig; sourceTree = "<group>"; };
+		72A450511C69A68900D67EEA /* SUUpdatePermissionPromptResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdatePermissionPromptResult.h; sourceTree = "<group>"; };
+		72A450521C69A68900D67EEA /* SUUpdatePermissionPromptResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdatePermissionPromptResult.m; sourceTree = "<group>"; };
 		72A4A23F1BB6567D00E7820D /* SUFileManagerTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUFileManagerTest.swift; sourceTree = "<group>"; };
 		72AC6B251B9AAC8800F62325 /* SparkleTestCodeSignApp.tar.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = SparkleTestCodeSignApp.tar.gz; sourceTree = "<group>"; };
 		72AC6B271B9AAD6700F62325 /* SparkleTestCodeSignApp.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = SparkleTestCodeSignApp.tar; sourceTree = "<group>"; };
@@ -995,6 +999,8 @@
 				6196CFE409C71ADE000DC222 /* SUStatusController.m */,
 				61B5FCA009C5228F00B25A18 /* SUUpdateAlert.h */,
 				61B5FCA109C5228F00B25A18 /* SUUpdateAlert.m */,
+				72A450511C69A68900D67EEA /* SUUpdatePermissionPromptResult.h */,
+				72A450521C69A68900D67EEA /* SUUpdatePermissionPromptResult.m */,
 				612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */,
 				612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */,
 				61180BC80D64138900B4E0D1 /* SUWindowController.h */,
@@ -1158,6 +1164,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72A450531C69A68900D67EEA /* SUUpdatePermissionPromptResult.h in Headers */,
 				611142E910FB1BE5009810AA /* bspatch.h in Headers */,
 				6160E7E10D3B4A8800E9CD71 /* NTSynchronousTask.h in Headers */,
 				61299B3609CB04E000B7442F /* Sparkle.h in Headers */,
@@ -1679,6 +1686,7 @@
 				61299A6009CA6EB100B7442F /* SUConstants.m in Sources */,
 				6102FE4B0E07803800F85D09 /* SUDiskImageUnarchiver.m in Sources */,
 				61299A3009CA2DAB00B7442F /* SUDSAVerifier.m in Sources */,
+				72A450541C69A68900D67EEA /* SUUpdatePermissionPromptResult.m in Sources */,
 				7275F9C21B5F1F2900B1D19E /* SUFileManager.m in Sources */,
 				767B61AD1972D488004E0C3C /* SUGuidedPackageInstaller.m in Sources */,
 				61EF67560E25B58D00F754E0 /* SUHost.m in Sources */,
