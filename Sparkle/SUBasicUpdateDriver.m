@@ -510,17 +510,40 @@
     if ([updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
         pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:self.updater];
     }
-    [NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:@[[self.host bundlePath],
-                                                                    pathToRelaunch,
-                                                                    [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]],
-                                                                    self.tempDir,
-                                                                    relaunch ? @"1" : @"0",
-                                                                    showUI ? @"1" : @"0"]];
+    
+#warning Review this code later..
+    pid_t processIdentifier = [[NSProcessInfo processInfo] processIdentifier];
+    for (NSRunningApplication *runningApplication in [[NSWorkspace sharedWorkspace] runningApplications]) {
+        if ([runningApplication.bundleURL.path isEqual:self.host.bundlePath]) {
+            processIdentifier = runningApplication.processIdentifier;
+            break;
+        }
+    }
+    
+    NSArray *launchArguments = @[[self.host bundlePath],
+                                 pathToRelaunch,
+                                 [NSString stringWithFormat:@"%d", processIdentifier],
+                                 self.tempDir,
+                                 relaunch ? @"1" : @"0",
+                                 showUI ? @"1" : @"0"];
+    
+    // Don't launch the app via a NSTask; it may be terminated prematurely if we are in a XPC service currently
+    NSError *launchError = nil;
+    if ([[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:relaunchToolPath] options:NSWorkspaceLaunchDefault configuration:@{NSWorkspaceLaunchConfigurationArguments : launchArguments} error:&launchError] == nil) {
+        SULog(@"Failed to launch autoupdate app: %@", launchError);
+    }
+    
     [self terminateApp];
 }
 
 - (void)terminateApp
 {
+    for (NSRunningApplication *runningApplication in [[NSWorkspace sharedWorkspace] runningApplications]) {
+        if ([runningApplication.bundleURL.path isEqual:self.host.bundlePath]) {
+            [runningApplication terminate];
+        }
+    }
+    
     [NSApp terminate:self];
 }
 

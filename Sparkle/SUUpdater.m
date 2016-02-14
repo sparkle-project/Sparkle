@@ -114,10 +114,13 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 }
 
 -(void)showAlertText:(NSString *)text informativeText:(NSString *)informativeText {
-    NSAlert *alert = [[NSAlert alloc] init];
-    alert.messageText = text;
-    alert.informativeText = informativeText;
-    [self.driver showAlert:alert];
+#warning create a delegate for this
+    
+    SULog(@"Failed to check requirements.. %@; %@", text, informativeText);
+//    NSAlert *alert = [[NSAlert alloc] init];
+//    alert.messageText = text;
+//    alert.informativeText = informativeText;
+//    [self.driver showAlert:alert];
 }
 
 -(void)checkIfConfiguredProperly {

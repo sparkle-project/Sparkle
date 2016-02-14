@@ -49,7 +49,10 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
 
 - (void)startListeningWithCompletion:(void (^)(void))completionBlock
 {
-    BOOL alreadyTerminated = (getppid() == 1); // ppid is launchd (1) => parent terminated already
+#warning Review this code later as well
+    // Parent process may not be the app we're installing, so don't rely on that
+    //BOOL alreadyTerminated = (getppid() == 1); // ppid is launchd (1) => parent terminated already
+    BOOL alreadyTerminated = (kill(self.processIdentifier, 0) != 0);
     if (alreadyTerminated)
         [self cleanupWithCompletion:completionBlock];
     else
