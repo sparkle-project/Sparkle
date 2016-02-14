@@ -21,5 +21,6 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SUVersionDisplayProtocol.h"
 #import "SUErrors.h"
+#import "SUUpdatePermissionPromptResult.h"
 
 #endif

@@ -11,15 +11,9 @@
 
 #import "SUWindowController.h"
 #import "SUVersionDisplayProtocol.h"
+#import "SUUpdateAlertChoice.h"
 
 @protocol SUUpdateAlertDelegate;
-
-typedef NS_ENUM(NSInteger, SUUpdateAlertChoice) {
-    SUInstallUpdateChoice,
-    SURemindMeLaterChoice,
-    SUSkipThisVersionChoice,
-    SUOpenInfoURLChoice
-};
 
 @class SUAppcastItem, SUHost;
 @interface SUUpdateAlert : SUWindowController

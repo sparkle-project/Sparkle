@@ -25,7 +25,12 @@
 
 - (void)closeCheckingWindow
 {
-	if (self.checkingController)
+    BOOL delegateHandledUpdaterCheck = NO;
+    if ([self.updater.delegate respondsToSelector:@selector(stopUserInitiatedUpdateCheckWithUpdater:host:)]) {
+        delegateHandledUpdaterCheck = [self.updater.delegate stopUserInitiatedUpdateCheckWithUpdater:self.updater host:self.host];
+    }
+    
+	if (!delegateHandledUpdaterCheck && self.checkingController)
 	{
         [[self.checkingController window] close];
         self.checkingController = nil;
@@ -40,16 +45,26 @@
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
 {
-    self.checkingController = [[SUStatusController alloc] initWithHost:aHost];
-    [[self.checkingController window] center]; // Force the checking controller to load its window.
-    [self.checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates...", nil) maxProgressValue:0.0 statusText:nil];
-    [self.checkingController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
-    [self.checkingController showWindow:self];
+    BOOL delegateHandledUpdaterCheck = NO;
+    if ([self.updater.delegate respondsToSelector:@selector(startUserInitiatedUpdateCheckWithUpdater:host:cancelUpdateCheck:)]) {
+        delegateHandledUpdaterCheck = [self.updater.delegate startUserInitiatedUpdateCheckWithUpdater:self.updater host:self.host cancelUpdateCheck:^{
+            [self cancelCheckForUpdates:nil];
+        }];
+    }
+    
+    if (!delegateHandledUpdaterCheck) {
+        self.checkingController = [[SUStatusController alloc] initWithHost:aHost];
+        [[self.checkingController window] center]; // Force the checking controller to load its window.
+        [self.checkingController beginActionWithTitle:SULocalizedString(@"Checking for updates...", nil) maxProgressValue:0.0 statusText:nil];
+        [self.checkingController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelCheckForUpdates:) isDefault:NO];
+        [self.checkingController showWindow:self];
+    }
+    
     [super checkForUpdatesAtURL:URL host:aHost];
 
     // For background applications, obtain focus.
     // Useful if the update check is requested from another app like System Preferences.
-	if ([aHost isBackgroundApplication])
+	if (!delegateHandledUpdaterCheck && [aHost isBackgroundApplication])
 	{
         [NSApp activateIgnoringOtherApps:YES];
     }
