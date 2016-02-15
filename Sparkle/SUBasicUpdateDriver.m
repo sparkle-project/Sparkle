@@ -31,6 +31,8 @@
 @property (copy) NSString *tempDir;
 @property (copy) NSString *relaunchPath;
 
+@property (nonatomic) BOOL postponedOnce;
+
 @end
 
 @implementation SUBasicUpdateDriver
@@ -42,6 +44,8 @@
 @synthesize nonDeltaUpdateItem;
 @synthesize tempDir;
 @synthesize relaunchPath;
+
+@synthesize postponedOnce;
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
 {
@@ -436,22 +440,19 @@
     }
 
     // Give the host app an opportunity to postpone the install and relaunch.
-#warning this code is broken and uses a static local instead of ivar, and uses installWithToolAndRelaunch: instead of installWithToolAndRelaunch:displayingUserInterface:
     id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
     
-//    static BOOL postponedOnce = NO;
-//    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
-//    if (!postponedOnce && [updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
-//    {
-//        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installWithToolAndRelaunch:)]];
-//        [invocation setSelector:@selector(installWithToolAndRelaunch:)];
-//        [invocation setArgument:&relaunch atIndex:2];
-//        [invocation setTarget:self];
-//        postponedOnce = YES;
-//        if ([updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:self.updateItem untilInvoking:invocation]) {
-//            return;
-//        }
-//    }
+    if (!self.postponedOnce && [updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
+    {
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installWithToolAndRelaunch:)]];
+        [invocation setSelector:@selector(installWithToolAndRelaunch:)];
+        [invocation setArgument:&relaunch atIndex:2];
+        [invocation setTarget:self];
+        self.postponedOnce = YES;
+        if ([updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:self.updateItem untilInvoking:invocation]) {
+            return;
+        }
+    }
 
 
     if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdate:)]) {
