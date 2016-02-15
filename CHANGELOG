@@ -9,6 +9,9 @@
 * Add some Japanese lozalized strings (1024jp)
 * Made test app available in all languages #695 (LIU Dongyuan / 柳东原)
 * Removed a test resource from the framework bundle (Karl Moskowski)
+* Czech localizations update (Frantisek Erben)
+* Test if the updated app is the frontmost one (Zorg)
+* UI Tests for the Test Application (Zorg)
 
 # 1.13.1 (Jan 31, 2016)
 
