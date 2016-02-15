@@ -24,5 +24,6 @@
 #import "SUUpdatePermissionPromptResult.h"
 #import "SUUserUpdaterDriver.h"
 #import "SUHost.h"
+#import "SUSparkleUserUpdaterDriver.h"
 
 #endif

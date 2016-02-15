@@ -176,7 +176,7 @@
 		721CF1AB1AD764EB00D9AC09 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */; };
 		7223E7631AD1AEFF008E3161 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
 		725CB9571C7120410064365A /* SUUserUpdaterDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 725CB9561C7120410064365A /* SUUserUpdaterDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		725CB95A1C7121830064365A /* SUSparkleUserUpdaterDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 725CB9581C7121830064365A /* SUSparkleUserUpdaterDriver.h */; };
+		725CB95A1C7121830064365A /* SUSparkleUserUpdaterDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 725CB9581C7121830064365A /* SUSparkleUserUpdaterDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		725CB95B1C7121830064365A /* SUSparkleUserUpdaterDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 725CB9591C7121830064365A /* SUSparkleUserUpdaterDriver.m */; };
 		7268AC631AD634C200C3E0C1 /* SUBinaryDeltaCreate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7268AC621AD634C200C3E0C1 /* SUBinaryDeltaCreate.m */; };
 		726F2CDE1BC9BE5B001971A4 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
@@ -1176,6 +1176,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				725CB95A1C7121830064365A /* SUSparkleUserUpdaterDriver.h in Headers */,
 				61EF67590E25C5B400F754E0 /* SUHost.h in Headers */,
 				725CB9571C7120410064365A /* SUUserUpdaterDriver.h in Headers */,
 				72A450561C6FC10400D67EEA /* SUUpdateAlertChoice.h in Headers */,
@@ -1183,7 +1184,6 @@
 				611142E910FB1BE5009810AA /* bspatch.h in Headers */,
 				6160E7E10D3B4A8800E9CD71 /* NTSynchronousTask.h in Headers */,
 				61299B3609CB04E000B7442F /* Sparkle.h in Headers */,
-				725CB95A1C7121830064365A /* SUSparkleUserUpdaterDriver.h in Headers */,
 				61CFB3290E385186007A1735 /* Sparkle.pch in Headers */,
 				61B5FC0D09C4FC8200B25A18 /* SUAppcast.h in Headers */,
 				61B5FC7009C51F4A00B25A18 /* SUAppcastItem.h in Headers */,
