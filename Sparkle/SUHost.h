@@ -10,7 +10,7 @@
 #import "SUAppcastItem.h"
 #import "SUVersionComparisonProtocol.h"
 
-@interface SUHost : NSObject
+@interface SUHost : NSObject<NSSecureCoding>
 
 @property (strong, readonly) NSBundle *bundle;
 

@@ -197,7 +197,9 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         }
         
         [self.userUpdaterDriver requestUpdatePermissionWithSystemProfile:profileInfo reply:^(SUUpdatePermissionPromptResult *result) {
-            [self updatePermissionPromptFinishedWithResult:result];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self updatePermissionPromptFinishedWithResult:result];
+            });
         }];
         
         // We start the update checks and register as observer for changes after the prompt finishes

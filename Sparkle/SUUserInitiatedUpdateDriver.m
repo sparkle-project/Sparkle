@@ -31,21 +31,16 @@
     self.canceled = YES;
 }
 
+#warning assign user driver's host in a superclass of this method, possibly the UI driver.. IDK
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
 {
     [self.updater.userUpdaterDriver showUserInitiatedUpdateCheckWithCancelCallback:^{
-        [self cancelCheckForUpdates:nil];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self cancelCheckForUpdates:nil];
+        });
     }];
     
     [super checkForUpdatesAtURL:URL host:aHost];
-
-#warning Figure out how to deal with this scenario
-    // For background applications, obtain focus.
-    // Useful if the update check is requested from another app like System Preferences.
-	if ([aHost isBackgroundApplication])
-	{
-        [NSApp activateIgnoringOtherApps:YES];
-    }
 }
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac

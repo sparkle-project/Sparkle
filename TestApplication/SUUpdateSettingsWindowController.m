@@ -132,7 +132,7 @@
 
 - (void)windowDidLoad
 {
-    self.updater.userUpdaterDriver = [[SULoggerUpdateDriver alloc] initWithHost:[[SUHost alloc] initWithBundle:[NSBundle mainBundle]]];
+    self.updater.userUpdaterDriver = [[/* SUSparkleUserUpdaterDriver */ SULoggerUpdateDriver alloc] initWithHost:[[SUHost alloc] initWithBundle:[NSBundle mainBundle]]];
 }
 
 - (NSString *)windowNibName

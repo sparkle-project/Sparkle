@@ -45,6 +45,89 @@
 @synthesize versionString;
 @synthesize propertiesDictionary;
 
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)decoder
+{
+    self = [super init];
+    
+    if (self != nil) {
+        //self.date = [decoder decodeObjectOfClass:[NSDate class] forKey:@"date"];
+        self.deltaUpdates = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSArray class], [NSDictionary class], [NSString class]]] forKey:@"deltaUpdates"];
+        self.displayVersionString = [decoder decodeObjectOfClass:[NSString class] forKey:@"displayVersionString"];
+        self.DSASignature = [decoder decodeObjectOfClass:[NSString class] forKey:@"DSASignature"];
+        self.fileURL = [decoder decodeObjectOfClass:[NSURL class] forKey:@"fileURL"];
+        self.infoURL = [decoder decodeObjectOfClass:[NSURL class] forKey:@"infoURL"];
+        self.itemDescription = [decoder decodeObjectOfClass:[NSString class] forKey:@"itemDescription"];
+        self.maximumSystemVersion = [decoder decodeObjectOfClass:[NSString class] forKey:@"maximumSystemVersion"];
+        self.minimumSystemVersion = [decoder decodeObjectOfClass:[NSString class] forKey:@"minimumSystemVersion"];
+        self.releaseNotesURL = [decoder decodeObjectOfClass:[NSURL class] forKey:@"releaseNotesURL"];
+        self.title = [decoder decodeObjectOfClass:[NSString class] forKey:@"title"];
+        self.versionString = [decoder decodeObjectOfClass:[NSString class] forKey:@"versionString"];
+        self.propertiesDictionary = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [NSString class], [NSDate class], [NSArray class]]] forKey:@"propertiesDictionary"];
+    }
+    
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)encoder
+{
+//    if (self.date != nil) {
+//        [encoder encodeObject:self.date forKey:@"date"];
+//    }
+    
+    if (self.deltaUpdates != nil) {
+        [encoder encodeObject:self.deltaUpdates forKey:@"deltaUpdates"];
+    }
+    
+    if (self.displayVersionString != nil) {
+        [encoder encodeObject:self.displayVersionString forKey:@"displayVersionString"];
+    }
+    
+    if (self.DSASignature != nil) {
+        [encoder encodeObject:self.DSASignature forKey:@"DSASignature"];
+    }
+    
+    if (self.fileURL != nil) {
+        [encoder encodeObject:self.fileURL forKey:@"fileURL"];
+    }
+    
+    if (self.infoURL != nil) {
+        [encoder encodeObject:self.infoURL forKey:@"infoURL"];
+    }
+    
+    if (self.itemDescription != nil) {
+        [encoder encodeObject:self.itemDescription forKey:@"itemDescription"];
+    }
+    
+    if (self.maximumSystemVersion != nil) {
+        [encoder encodeObject:self.maximumSystemVersion forKey:@"maximumSystemVersion"];
+    }
+    
+    if (self.minimumSystemVersion != nil) {
+        [encoder encodeObject:self.minimumSystemVersion forKey:@"minimumSystemVersion"];
+    }
+    
+    if (self.releaseNotesURL != nil) {
+        [encoder encodeObject:self.releaseNotesURL forKey:@"releaseNotesURL"];
+    }
+    
+    if (self.title != nil) {
+        [encoder encodeObject:self.title forKey:@"title"];
+    }
+    
+    if (self.versionString != nil) {
+        [encoder encodeObject:self.versionString forKey:@"versionString"];
+    }
+    
+    if (self.propertiesDictionary != nil) {
+        [encoder encodeObject:self.propertiesDictionary forKey:@"propertiesDictionary"];
+    }
+}
+
 - (BOOL)isDeltaUpdate
 {
     return self.propertiesDictionary[SURSSElementEnclosure][SUAppcastAttributeDeltaFrom] != nil;

@@ -11,7 +11,6 @@
 #import "SUUpdater_Private.h"
 #import "SUHost.h"
 #import "SUOperatingSystem.h"
-#import "SUStatusController.h"
 #import "SUConstants.h"
 
 @implementation SUUIBasedUpdateDriver
@@ -41,7 +40,9 @@
     }
     
     [self.updater.userUpdaterDriver showUpdateFoundWithAppcastItem:self.updateItem versionDisplayer:versDisp reply:^(SUUpdateAlertChoice choice) {
-        [self updateAlertFinishedWithChoice:choice];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self updateAlertFinishedWithChoice:choice];
+        });
     }];
 }
 
@@ -67,13 +68,15 @@
         case SUInstallUpdateChoice:
         {
             [self.updater.userUpdaterDriver showDownloadInitiatedWithCancelCallback:^{
-                if (self.download) {
-                    [self.download cancel];
-                    if ([[self.updater delegate] respondsToSelector:@selector(userDidCancelDownload:)]) {
-                        [[self.updater delegate] userDidCancelDownload:self.updater];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (self.download) {
+                        [self.download cancel];
+                        if ([[self.updater delegate] respondsToSelector:@selector(userDidCancelDownload:)]) {
+                            [[self.updater delegate] userDidCancelDownload:self.updater];
+                        }
                     }
-                }
-                [self abortUpdate];
+                    [self abortUpdate];
+                });
             }];
             
             [self downloadUpdate];
@@ -130,7 +133,9 @@
     }
     
     [self.updater.userUpdaterDriver showExtractionFinishedAndReadyToInstallAndRelaunch:^{
-        [self installWithToolAndRelaunch:YES];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self installWithToolAndRelaunch:YES];
+        });
     }];
 }
 

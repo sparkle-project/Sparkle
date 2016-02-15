@@ -172,7 +172,9 @@
                     // pubDate is expected to be an NSDate by SUAppcastItem, but the RSS class was returning an NSString
                     NSString *string = node.stringValue;
                     if (string) {
-                        NSDate *date = [NSDate dateWithNaturalLanguageString:string];
+#warning This NSDate method is deprecated and doesn't supporte NSSecureCoding... replace it, don't use the date at all, or change the encode/decoding. sigh
+                        //NSDate *date = [NSDate dateWithNaturalLanguageString:string];
+                        NSDate *date = nil;
                         if (date)
                             dict[name] = date;
                     }

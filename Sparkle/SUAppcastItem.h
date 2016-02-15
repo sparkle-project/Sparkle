@@ -12,7 +12,7 @@
 #import <Foundation/Foundation.h>
 #import "SUExport.h"
 
-SU_EXPORT @interface SUAppcastItem : NSObject
+SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 @property (copy, readonly) NSString *title;
 @property (copy, readonly) NSDate *date;
 @property (copy, readonly) NSString *itemDescription;
