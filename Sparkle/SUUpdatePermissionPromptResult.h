@@ -13,7 +13,7 @@ typedef NS_ENUM(NSInteger, SUCheckUpdatesChoice) {
     SUDoNotAutomaticallyCheck
 };
 
-@interface SUUpdatePermissionPromptResult : NSObject
+@interface SUUpdatePermissionPromptResult : NSObject<NSSecureCoding>
 
 + (instancetype)updatePermissionPromptResultWithChoice:(SUCheckUpdatesChoice)choice shouldSendProfile:(BOOL)shouldSendProfile;
 

@@ -13,6 +13,24 @@
 @synthesize choice = _choice;
 @synthesize shouldSendProfile = _shouldSendProfile;
 
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)decoder
+{
+    NSInteger choice = [decoder decodeIntegerForKey:@"choice"];
+    BOOL shouldSendProfile = [decoder decodeBoolForKey:@"shouldSendProfile"];
+    return [[self class] updatePermissionPromptResultWithChoice:choice shouldSendProfile:shouldSendProfile];
+}
+
+- (void)encodeWithCoder:(NSCoder *)encoder
+{
+    [encoder encodeInteger:self.choice forKey:@"choice"];
+    [encoder encodeBool:self.shouldSendProfile forKey:@"shouldSendProfile"];
+}
+
 - (instancetype)initWithCheckUpdatesChoice:(SUCheckUpdatesChoice)choice shouldSendProfile:(BOOL)shouldSendProfile
 {
     self = [super init];

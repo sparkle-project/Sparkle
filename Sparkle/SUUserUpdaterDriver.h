@@ -17,6 +17,7 @@
 
 - (instancetype)initWithHost:(SUHost *)host;
 
+#warning might need to whitelist class types for systemProfile.. need to test this
 - (void)requestUpdatePermissionWithSystemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply;
 
 - (void)openInfoURLForAppcastItem:(SUAppcastItem *)appcastItem;
