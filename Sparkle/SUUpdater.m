@@ -8,6 +8,8 @@
 
 #import "SUUpdater.h"
 
+#import "SUSparkleUserUpdaterDriver.h"
+
 #import "SUHost.h"
 #import "SUUpdatePermissionPrompt.h"
 #import "SUUpdatePermissionPromptResult.h"
@@ -49,6 +51,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @implementation SUUpdater
 
 @synthesize delegate;
+@synthesize userUpdaterDriver = _userUpdaterDriver;
 @synthesize checkTimer;
 @synthesize userAgentString = customUserAgentString;
 @synthesize httpHeaders;
@@ -106,6 +109,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         }
         sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]] = self;
         host = [[SUHost alloc] initWithBundle:bundle];
+        
+        _userUpdaterDriver = [[SUSparkleUserUpdaterDriver alloc] initWithHost:host];
 
         // This runs the permission prompt if needed, but never before the app has finished launching because the runloop won't run before that
         [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:0];
@@ -114,7 +119,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 }
 
 -(void)showAlertText:(NSString *)text informativeText:(NSString *)informativeText {
-#warning create a delegate for this
+#warning do something about this.. it's probably not a great idea that these are alerts in the first place to be honest
     
     SULog(@"Failed to check requirements.. %@; %@", text, informativeText);
 //    NSAlert *alert = [[NSAlert alloc] init];
@@ -191,18 +196,9 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
             profileInfo = [profileInfo arrayByAddingObjectsFromArray:[self.delegate feedParametersForUpdater:self sendingSystemProfile:YES]];
         }
         
-        BOOL handledPermissionPrompt = NO;
-        if ([self.delegate respondsToSelector:@selector(handlePermissionForUpdater:host:systemProfile:reply:)]) {
-            handledPermissionPrompt = [self.delegate handlePermissionForUpdater:self host:self.host systemProfile:profileInfo reply:^(SUUpdatePermissionPromptResult *result) {
-                [self updatePermissionPromptFinishedWithResult:result];
-            }];
-        }
-        
-        if (!handledPermissionPrompt) {
-            [SUUpdatePermissionPrompt promptWithHost:self.host systemProfile:profileInfo reply:^(SUUpdatePermissionPromptResult *result) {
-                [self updatePermissionPromptFinishedWithResult:result];
-            }];
-        }
+        [self.userUpdaterDriver requestUpdatePermissionWithSystemProfile:profileInfo reply:^(SUUpdatePermissionPromptResult *result) {
+            [self updatePermissionPromptFinishedWithResult:result];
+        }];
         
         // We start the update checks and register as observer for changes after the prompt finishes
     } else {

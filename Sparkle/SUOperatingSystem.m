@@ -7,6 +7,12 @@
 
 #import "SUOperatingSystem.h"
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101000
+@interface NSProcessInfo ()
+- (NSOperatingSystemVersion)operatingSystemVersion;
+@end
+#endif
+
 @implementation SUOperatingSystem
 
 + (NSOperatingSystemVersion)operatingSystemVersion

@@ -22,5 +22,7 @@
 #import "SUVersionDisplayProtocol.h"
 #import "SUErrors.h"
 #import "SUUpdatePermissionPromptResult.h"
+#import "SUUserUpdaterDriver.h"
+#import "SUHost.h"
 
 #endif

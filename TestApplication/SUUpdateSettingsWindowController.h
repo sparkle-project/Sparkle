@@ -7,8 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import <Sparkle/Sparkle.h>
 
-@interface SUUpdateSettingsWindowController : NSWindowController<SUUpdaterDelegate>
+@interface SUUpdateSettingsWindowController : NSWindowController
 
 @end

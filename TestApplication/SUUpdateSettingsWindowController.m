@@ -7,6 +7,118 @@
 //
 
 #import "SUUpdateSettingsWindowController.h"
+#import <Sparkle/Sparkle.h>
+
+#import "SUUserUpdaterDriver.h"
+
+@interface SULoggerUpdateDriver : NSObject<SUUserUpdaterDriver>
+
+@property (nonatomic, readonly) SUHost *host;
+
+@end
+
+@implementation SULoggerUpdateDriver
+
+@synthesize host = _host;
+
+- (instancetype)initWithHost:(SUHost *)host
+{
+    self = [super init];
+    if (self != nil) {
+        _host = host;
+    }
+    return self;
+}
+
+- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply
+{
+    NSLog(@"Giving permission to automatically install updates!");
+    reply([SUUpdatePermissionPromptResult updatePermissionPromptResultWithChoice:SUAutomaticallyCheck shouldSendProfile:YES]);
+}
+
+- (void)openInfoURLForAppcastItem:(SUAppcastItem *)appcastItem
+{
+    NSLog(@"Hah, you want to open info URL? That's funny!");
+}
+
+- (void)showUserInitiatedUpdateCheckWithCancelCallback:(void (^)(void))cancelUpdateCheck
+{
+    NSLog(@"Evil user initiated an update check!");
+}
+
+- (void)dismissUserInitiatedUpdateCheck
+{
+    NSLog(@"Update check is done!");
+}
+
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem versionDisplayer:(id<SUVersionDisplay>)versionDisplayer reply:(void (^)(SUUpdateAlertChoice))reply
+{
+    NSLog(@"OMG new update was found! Let's install it!");
+    reply(SUInstallUpdateChoice);
+}
+
+- (void)showUpdateNotFound
+{
+    NSLog(@":( there was no new update");
+}
+
+- (BOOL)showsUpdateNotFoundModally
+{
+    return NO;
+}
+
+- (void)showUpdaterError:(NSError *)error
+{
+    NSLog(@"Update error: %@", error);
+}
+
+- (BOOL)showsUpdateErrorModally
+{
+    return NO;
+}
+
+- (void)showDownloadInitiatedWithCancelCallback:(void (^)(void))cancelDownload
+{
+    NSLog(@"Downloading update...");
+}
+
+- (void)showDownloadDidReceiveResponse:(NSURLResponse *)response
+{
+    NSLog(@"Download recieved length: %lld", response.expectedContentLength);
+}
+
+- (void)showDownloadDidReceiveDataOfLength:(NSUInteger)length
+{
+    NSLog(@"Download received progress: %lu", length);
+}
+
+- (void)showDownloadFinishedAndStartedExtractingUpdate
+{
+    NSLog(@"Download finished.. Extracting..");
+}
+
+- (void)showExtractionReceivedProgress:(double)progress
+{
+    NSLog(@"Extracting progress: %f", progress);
+}
+
+- (void)showExtractionFinishedAndReadyToInstallAndRelaunch:(void (^)(void))installUpdateAndRelaunch
+{
+    NSLog(@"Extracting finished.. Letting it install & relaunch..");
+    installUpdateAndRelaunch();
+}
+
+- (void)showInstallingUpdate
+{
+    NSLog(@"Installing update...");
+}
+
+- (void)dismissUpdateInstallation
+{
+    NSLog(@"Dismissing the installation.");
+}
+
+@end
 
 @interface SUUpdateSettingsWindowController ()
 
@@ -20,7 +132,7 @@
 
 - (void)windowDidLoad
 {
-    self.updater.delegate = self;
+    self.updater.userUpdaterDriver = [[SULoggerUpdateDriver alloc] initWithHost:[[SUHost alloc] initWithBundle:[NSBundle mainBundle]]];
 }
 
 - (NSString *)windowNibName
@@ -31,109 +143,6 @@
 - (IBAction)checkForUpdates:(id __unused)sender
 {
     [self.updater checkForUpdates:nil];
-}
-
-- (BOOL)handlePermissionForUpdater:(SUUpdater *)updater host:(SUHost *)host systemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply
-{
-    NSLog(@"App is asking us for permission!! Replying YES");
-    reply([SUUpdatePermissionPromptResult updatePermissionPromptResultWithChoice:SUAutomaticallyCheck shouldSendProfile:NO]);
-    
-    return YES;
-}
-
-- (BOOL)startUserInitiatedUpdateCheckWithUpdater:(SUUpdater *)updater host:(SUHost *)host cancelUpdateCheck:(void (^)(void))cancelUpdateCheck
-{
-    NSLog(@"USER INITIATED THE UPDATE!");
-    
-    return YES;
-}
-
-- (BOOL)stopUserInitiatedUpdateCheckWithUpdater:(SUUpdater *)updater host:(SUHost *)host
-{
-    NSLog(@"User Initiated update is finished!!");
-    
-    return YES;
-}
-
-- (BOOL)handlePresentingError:(NSError *)error toUserWithUpdater:(SUUpdater *)updater
-{
-    NSLog(@"Ran into bad error with updater :(. Error: %@", error);
-    
-    return YES;
-}
-
-- (BOOL)handlePresentingNoUpdateFoundWithUpdater:(SUUpdater *)updater
-{
-    NSLog(@"No new update is available right now you know");
-    
-    return YES;
-}
-
-- (BOOL)handleUpdateFoundWithUpdater:(SUUpdater *)updater host:(SUHost *)host appcastItem:(SUAppcastItem *)appcastItem versionDisplayer:(id<SUVersionDisplay>)versionDisplayer reply:(void (^)(SUUpdateAlertChoice))reply
-{
-    NSLog(@"Update was found! GOING TO SAY YES %@", appcastItem);
-    
-    reply(SUInstallUpdateChoice);
-    
-	return YES;
-}
-
-- (BOOL)handlePresentingDownloadInitiatedWithUpdater:(SUUpdater *)updater host:(SUHost *)host cancelDownload:(void (^)(void))cancelDownload
-{
-    NSLog(@"Download yerself an update!");
-    
-	return YES;
-}
-
-- (BOOL)handleOpeningInfoURLWithUpdater:(SUUpdater *)updater appcastItem:(SUAppcastItem *)appcastItem
-{
-    NSLog(@"User wanted to open info url %@ .. whatever", appcastItem.infoURL);
-    
-	return YES;
-}
-
-- (BOOL)handleDownloadDidReceiveResponse:(NSURLResponse *)response withUpdater:(SUUpdater *)updater
-{
-    NSLog(@"Download has started 'cos it recieved a response!");
-    
-	return YES;
-}
-
-- (BOOL)handleDownloadDidReceiveDataOfLength:(NSUInteger)length withUpdater:(SUUpdater *)updater
-{
-    NSLog(@"Download received data of length %lu !", length);
-    
-	return YES;
-}
-
-- (BOOL)handleStartExtractingUpdateWithUpdater:(SUUpdater *)updater
-{
-    NSLog(@"Extracting the update!!");
-    
-	return YES;
-}
-
-- (BOOL)handleExtractionDidReceiveProgress:(double)progress withUpdater:(SUUpdater *)updater
-{
-    NSLog(@"Extracting the update with progress: %f!!", progress);
-    
-	return YES;
-}
-
-- (BOOL)handleExtractionDidFinishExtractingWithUpdater:(SUUpdater *)updater installUpdate:(void (^)(void))installUpdate
-{
-    NSLog(@"Extraction finished!! Installing update yes!");
-    
-    installUpdate();
-    
-	return YES;
-}
-
-- (BOOL)handleInstallingUpdateWithUpdater:(SUUpdater *)updater
-{
-    NSLog(@"The update is going to install any second now!");
-    
-	return YES;
 }
 
 @end

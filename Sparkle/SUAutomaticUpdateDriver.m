@@ -8,6 +8,7 @@
 
 #import "SUAutomaticUpdateDriver.h"
 
+#import "SUUpdater.h"
 #import "SUAutomaticUpdateAlert.h"
 #import "SUHost.h"
 #import "SUConstants.h"

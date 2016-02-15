@@ -14,6 +14,7 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SUVersionDisplayProtocol.h"
 #import "SUUpdateAlertChoice.h"
+#import "SUUserUpdaterDriver.h"
 
 @class SUAppcastItem, SUAppcast, SUHost, SUUpdatePermissionPromptResult;
 
@@ -28,6 +29,7 @@
 SU_EXPORT @interface SUUpdater : NSObject
 
 @property (unsafe_unretained) IBOutlet id<SUUpdaterDelegate> delegate;
+@property (nonatomic) id<SUUserUpdaterDriver> userUpdaterDriver;
 
 + (SUUpdater *)sharedUpdater;
 + (SUUpdater *)updaterForBundle:(NSBundle *)bundle;
@@ -361,36 +363,6 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
     \param error The error that caused the abort
  */
 - (void)updater:(SUUpdater *)updater didAbortWithError:(NSError *)error;
-
-// custom update driver calls
-
-- (BOOL)handlePermissionForUpdater:(SUUpdater *)updater host:(SUHost *)host systemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply;
-
-- (BOOL)startUserInitiatedUpdateCheckWithUpdater:(SUUpdater *)updater host:(SUHost *)host cancelUpdateCheck:(void (^)(void))cancelUpdateCheck;
-
-- (BOOL)stopUserInitiatedUpdateCheckWithUpdater:(SUUpdater *)updater host:(SUHost *)host;
-
-- (BOOL)handlePresentingError:(NSError *)error toUserWithUpdater:(SUUpdater *)updater;
-
-- (BOOL)handlePresentingNoUpdateFoundWithUpdater:(SUUpdater *)updater;
-
-- (BOOL)handleUpdateFoundWithUpdater:(SUUpdater *)updater host:(SUHost *)host appcastItem:(SUAppcastItem *)appcastItem versionDisplayer:(id<SUVersionDisplay>)versionDisplayer reply:(void (^)(SUUpdateAlertChoice))reply;
-
-- (BOOL)handlePresentingDownloadInitiatedWithUpdater:(SUUpdater *)updater host:(SUHost *)host cancelDownload:(void (^)(void))cancelDownload;
-
-- (BOOL)handleOpeningInfoURLWithUpdater:(SUUpdater *)updater appcastItem:(SUAppcastItem *)appcastItem;
-
-- (BOOL)handleDownloadDidReceiveResponse:(NSURLResponse *)response withUpdater:(SUUpdater *)updater;
-
-- (BOOL)handleDownloadDidReceiveDataOfLength:(NSUInteger)length withUpdater:(SUUpdater *)updater;
-
-- (BOOL)handleStartExtractingUpdateWithUpdater:(SUUpdater *)updater;
-
-- (BOOL)handleExtractionDidReceiveProgress:(double)progress withUpdater:(SUUpdater *)updater;
-
-- (BOOL)handleExtractionDidFinishExtractingWithUpdater:(SUUpdater *)updater installUpdate:(void (^)(void))installUpdate;
-
-- (BOOL)handleInstallingUpdateWithUpdater:(SUUpdater *)updater;
 
 @end
 
