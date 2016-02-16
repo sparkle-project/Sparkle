@@ -52,19 +52,21 @@ static void peer_event_handler(xpc_connection_t peer, xpc_object_t event)
 			const char *path = xpc_dictionary_get_string(event, "path");
 			xpc_object_t array = xpc_dictionary_get_value(event, "arguments");
 
-			NSFileManager *manager = [NSFileManager defaultManager];
-			NSString *relaunchToolPath = path ? [manager stringWithFileSystemRepresentation:path length:strlen(path)] : nil;;
-			NSMutableArray *arguments = [NSMutableArray array];
-			
-			for (size_t i = 0; i < xpc_array_get_count(array); i++) {
-				[arguments addObject:
-				 [NSString stringWithUTF8String:xpc_array_get_string(array, i)]];
-			}
-            
-            NSError *launchError = nil;
-            NSRunningApplication *runningApplication = [[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:relaunchToolPath] options:NSWorkspaceLaunchNewInstance configuration:@{NSWorkspaceLaunchConfigurationArguments:arguments} error:&launchError];
-            [runningApplication activateWithOptions:NSApplicationActivateIgnoringOtherApps];
-			
+            if (path) {
+                NSFileManager *manager = [NSFileManager defaultManager];
+                NSString *relaunchToolPath = [manager stringWithFileSystemRepresentation:path length:strlen(path)];
+                NSMutableArray *arguments = [NSMutableArray array];
+
+                for (size_t i = 0; i < xpc_array_get_count(array); i++) {
+                    [arguments addObject:
+                     [NSString stringWithUTF8String:xpc_array_get_string(array, i)]];
+                }
+                
+                NSError *launchError = nil;
+                NSRunningApplication *runningApplication = [[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:relaunchToolPath] options:NSWorkspaceLaunchNewInstance configuration:@{NSWorkspaceLaunchConfigurationArguments:arguments} error:&launchError];
+                [runningApplication activateWithOptions:NSApplicationActivateIgnoringOtherApps];
+            }
+
 			// send response to indicate ok
 			xpc_object_t reply = xpc_dictionary_create_reply(event);
 			xpc_connection_send_message(peer, reply);

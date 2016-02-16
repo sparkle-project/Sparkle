@@ -164,9 +164,11 @@
 
 - (void)downloadUpdate
 {
-	NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[updateItem fileURL]];
-	[request setValue:[updater userAgentString] forHTTPHeaderField:@"User-Agent"];
-	download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
+    if (updateItem) {
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[updateItem fileURL]];
+        [request setValue:[updater userAgentString] forHTTPHeaderField:@"User-Agent"];
+        download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
+    }
 }
 
 - (void)download:(NSURLDownload *)d decideDestinationWithSuggestedFilename:(NSString *)name
