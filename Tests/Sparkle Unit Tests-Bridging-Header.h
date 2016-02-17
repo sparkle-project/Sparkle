@@ -25,10 +25,6 @@ static const char *SUAppleQuarantineIdentifier = "com.apple.quarantine";
 
 
 @interface SUAppcast (Private)
-@property (strong) void (^completionBlock)(NSError *);
-@property (copy) NSString *downloadFilename;
-@property (readonly, copy) NSArray *items;
-
-- (void)parse;
+- (NSArray *)parseAppcastItemsFromXMLFile:(NSURL *)appcastFile error:(NSError *__autoreleasing*)errorp;
 @end
 

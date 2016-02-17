@@ -18,11 +18,7 @@ class SUAppcastTest: XCTestCase {
         XCTAssertNotNil(testFileUrl);
         
         do {
-            appcast.completionBlock = {err -> () in};
-            appcast.downloadFilename = testFile;
-            
-            appcast.parse();
-            let items = appcast.items as! [SUAppcastItem];
+            let items = try appcast.parseAppcastItemsFromXMLFile(testFileUrl) as! [SUAppcastItem];
             
             XCTAssertEqual(2, items.count);
             XCTAssertEqual("Version 3.0", items[0].title);
