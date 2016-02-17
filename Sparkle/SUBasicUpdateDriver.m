@@ -136,11 +136,15 @@
 	}
 	else // If not, we'll take care of it ourselves.
     {
-        // Find the first update we can actually use.
-        NSEnumerator *updateEnumerator = [[ac items] objectEnumerator];
-        do {
-            item = [updateEnumerator nextObject];
-        } while (item && ![self hostSupportsItem:item]);
+        // Find the best supported update
+        id<SUVersionComparison> comparator = [self versionComparator];
+        for(SUAppcastItem *candidate in ac.items) {
+            if ([self hostSupportsItem:candidate]) {
+                if (!item || [comparator compareVersion:item.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
+                    item = candidate;
+                }
+            }
+        }
 
         SUAppcastItem *deltaUpdateItem = [item deltaUpdates][[self.host version]];
         if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem]) {
