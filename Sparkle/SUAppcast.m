@@ -135,14 +135,14 @@
         return nil;
     }
 
-    NSEnumerator *nodeEnum = [xmlItems objectEnumerator];
-
-    NSXMLNode *node;
-    NSMutableDictionary *nodesDict = [NSMutableDictionary dictionary];
-    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     NSMutableArray *appcastItems = [NSMutableArray array];
+    NSEnumerator *nodeEnum = [xmlItems objectEnumerator];
+    NSXMLNode *node;
 
 	while((node = [nodeEnum nextObject])) {
+        NSMutableDictionary *nodesDict = [NSMutableDictionary dictionary];
+        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+
         // First, we'll "index" all the first-level children of this appcast item so we can pick them out by language later.
         if ([[node children] count]) {
             node = [node childAtIndex:0];
