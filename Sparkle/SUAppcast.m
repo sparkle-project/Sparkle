@@ -92,6 +92,10 @@
 
 - (void)downloadDidFinish:(NSURLDownload *)__unused aDownload
 {
+    [self parse];
+}
+
+- (void) parse {
     NSError *error = nil;
 
     NSXMLDocument *document = nil;
