@@ -104,6 +104,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 
 @property (nonatomic, assign) BOOL isTerminating;
 
+@property (nonatomic, strong) NSConnection *installationBeacon;
+
 @end
 
 @implementation AppInstaller
@@ -129,6 +131,18 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     self.updateFolderPath = updateFolderPath;
     self.shouldRelaunch = shouldRelaunch;
     self.shouldShowUI = shouldShowUI;
+    
+    NSConnection *connection = [[NSConnection alloc] init];
+    [connection setRootObject:self];
+    NSString *connectionName = [NSString stringWithFormat:@"Sparkle-%@", [NSBundle bundleWithPath:hostPath].bundleIdentifier];
+    if ([connection registerName:connectionName])
+    {
+        self.installationBeacon = connection;
+    }
+    else
+    {
+        SULog(@"%@ server: could not register server. Is one already running?\n", [NSProcessInfo processInfo].processName);
+    }
     
     return self;
 }
@@ -221,6 +235,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         }
         
         [self.statusController close];
+        self.installationBeacon.rootObject = nil;
+        self.installationBeacon = nil;
         
         // Don't even think about hiding the app icon from the dock if we've already shown it
         // Transforming the app back to a background one has a backfiring effect, decreasing the likelihood
@@ -258,18 +274,11 @@ int main(int __unused argc, const char __unused *argv[])
                                                            updateFolderPath:args[4]
                                                              shouldRelaunch:(args.count > 5) ? [args[5] boolValue] : YES
                                                                shouldShowUI:shouldShowUI];
-        NSConnection *connection = [[NSConnection alloc] init];
-        [connection setRootObject:appInstaller];
-        if (![connection registerName:[NSString stringWithFormat:@"Sparkle-%@", [NSBundle bundleWithPath:appInstaller.hostPath].bundleIdentifier]])
-        {
-            SULog(@"%@ server: could not register server. Is one already running?\n", args.firstObject);
-        }
-
-        [application setDelegate:appInstaller];
+        application.delegate = appInstaller;
         [application run];
         
-        // Ensure connection is not deallocated by ARC before caling -[NSApplication run]
-        [connection class];
+        // to avoid releaseing appInstaller by ARC
+        [appInstaller class];
     }
 
     return EXIT_SUCCESS;
