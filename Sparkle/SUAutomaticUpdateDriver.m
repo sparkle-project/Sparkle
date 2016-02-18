@@ -26,6 +26,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 @property (assign) BOOL postponingInstallation;
 @property (assign) BOOL showErrors;
 @property (assign) BOOL willUpdateOnTermination;
+@property (assign) BOOL isTerminating;
 @property (strong) SUAutomaticUpdateAlert *alert;
 @property (strong) NSTimer *showUpdateAlertTimer;
 
@@ -36,6 +37,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 @synthesize postponingInstallation;
 @synthesize showErrors;
 @synthesize willUpdateOnTermination;
+@synthesize isTerminating;
 @synthesize alert;
 @synthesize showUpdateAlertTimer;
 
@@ -131,6 +133,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)abortUpdate
 {
+    self.isTerminating = NO;
     [self stopUpdatingOnTermination];
     [self invalidateShowUpdateAlertTimer];
     [super abortUpdate];
@@ -185,7 +188,20 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)applicationWillTerminate:(NSNotification *)__unused note
 {
+    // We don't want to terminate the app if the user or someone else initiated a termination
+    // Use a property instead of passing an argument to installWithToolAndRelaunch:
+    // because we give the delegate an invocation to our install methods and
+    // this code was added later :|
+    self.isTerminating = YES;
+    
     [self installWithToolAndRelaunch:NO];
+}
+
+- (void)terminateApp
+{
+    if (!self.isTerminating) {
+        [super terminateApp];
+    }
 }
 
 - (void)abortUpdateWithError:(NSError *)error
