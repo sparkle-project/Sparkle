@@ -20,14 +20,24 @@ class SUAppcastTest: XCTestCase {
         do {
             let items = try appcast.parseAppcastItemsFromXMLFile(testFileUrl) as! [SUAppcastItem];
             
-            XCTAssertEqual(2, items.count);
+            XCTAssertEqual(4, items.count);
             
             XCTAssertEqual("Version 2.0", items[0].title);
             XCTAssertEqual("desc", items[0].itemDescription);
             
+            // This is the best release matching our system version
             XCTAssertEqual("Version 3.0", items[1].title);
             XCTAssertNil(items[1].itemDescription);
             
+            XCTAssertEqual("Version 4.0", items[2].title);
+            XCTAssertNil(items[2].itemDescription);
+            
+            XCTAssertEqual("Version 5.0", items[3].title);
+            XCTAssertNil(items[3].itemDescription);
+            
+            let bestAppcastItem = SUBasicUpdateDriver.bestAppcastItemFromAppcastItems(items, withComparator: SUStandardVersionComparator.defaultComparator())
+            
+            XCTAssertEqual(bestAppcastItem, items[1])
         } catch let err as NSError {
             NSLog("%@", err);
             XCTFail(err.localizedDescription);

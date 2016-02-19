@@ -82,12 +82,20 @@
     return comparator;
 }
 
-- (BOOL)isItemNewer:(SUAppcastItem *)ui
++ (SUAppcastItem *)bestAppcastItemFromAppcastItems:(NSArray *)appcastItems withComparator:(id<SUVersionComparison>)comparator
 {
-    return [[self versionComparator] compareVersion:[self.host version] toVersion:[ui versionString]] == NSOrderedAscending;
+    SUAppcastItem *item = nil;
+    for(SUAppcastItem *candidate in appcastItems) {
+        if ([[self class] hostSupportsItem:candidate]) {
+            if (!item || [comparator compareVersion:item.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
+                item = candidate;
+            }
+        }
+    }
+    return item;
 }
 
-- (BOOL)hostSupportsItem:(SUAppcastItem *)ui
++ (BOOL)hostSupportsItem:(SUAppcastItem *)ui
 {
 	if (([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) &&
         ([ui maximumSystemVersion] == nil || [[ui maximumSystemVersion] isEqualToString:@""])) { return YES; }
@@ -106,6 +114,11 @@
     return minimumVersionOK && maximumVersionOK;
 }
 
+- (BOOL)isItemNewer:(SUAppcastItem *)ui
+{
+    return [[self versionComparator] compareVersion:[self.host version] toVersion:[ui versionString]] == NSOrderedAscending;
+}
+
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui
 {
     NSString *skippedVersion = [self.host objectForUserDefaultsKey:SUSkippedVersionKey];
@@ -115,7 +128,7 @@
 
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
 {
-    return ui && [self hostSupportsItem:ui] && [self isItemNewer:ui] && ![self itemContainsSkippedVersion:ui];
+    return ui && [[self class] hostSupportsItem:ui] && [self isItemNewer:ui] && ![self itemContainsSkippedVersion:ui];
 }
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac
@@ -140,18 +153,11 @@
 	else // If not, we'll take care of it ourselves.
     {
         // Find the best supported update
-        id<SUVersionComparison> comparator = [self versionComparator];
-        for(SUAppcastItem *candidate in ac.items) {
-            if ([self hostSupportsItem:candidate]) {
-                if (!item || [comparator compareVersion:item.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
-                    item = candidate;
-                }
-            }
-        }
+        item = [[self class] bestAppcastItemFromAppcastItems:ac.items withComparator:[self versionComparator]];
 
         if (item) {            
             SUAppcastItem *deltaUpdateItem = [item deltaUpdates][[self.host version]];
-            if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem]) {
+            if (deltaUpdateItem && [[self class] hostSupportsItem:deltaUpdateItem]) {
                 self.nonDeltaUpdateItem = item;
                 item = deltaUpdateItem;
             }
