@@ -24,16 +24,20 @@ class SUAppcastTest: XCTestCase {
             
             XCTAssertEqual("Version 2.0", items[0].title);
             XCTAssertEqual("desc", items[0].itemDescription);
+            XCTAssertEqual("Sat, 26 Jul 2014 15:20:11 +0000", items[0].dateString)
             
             // This is the best release matching our system version
             XCTAssertEqual("Version 3.0", items[1].title);
             XCTAssertNil(items[1].itemDescription);
+            XCTAssertNil(items[1].dateString)
             
             XCTAssertEqual("Version 4.0", items[2].title);
             XCTAssertNil(items[2].itemDescription);
+            XCTAssertEqual("Sat, 26 Jul 2014 15:20:13 +0000", items[2].dateString)
             
             XCTAssertEqual("Version 5.0", items[3].title);
             XCTAssertNil(items[3].itemDescription);
+            XCTAssertNil(items[3].dateString)
             
             let bestAppcastItem = SUBasicUpdateDriver.bestAppcastItemFromAppcastItems(items, withComparator: SUStandardVersionComparator.defaultComparator())
             

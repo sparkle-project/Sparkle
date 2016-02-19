@@ -11,7 +11,6 @@
     <!-- The best chosen release -->
     <item>
         <title>Version 3.0</title>
-        <pubDate>Sat, 26 Jul 2014 15:20:12 +0000</pubDate>
         <enclosure url="http://0.0.0.0:1337/Sparkle_Test_App.zip" sparkle:version="3.0" />
     </item>
     <!-- A release testing minimumSystemVersion -->
@@ -24,7 +23,6 @@
     <!-- A joke release testing maximumSystemVersion -->
     <item>
         <title>Version 5.0</title>
-        <pubDate>Sat, 26 Jul 2014 15:20:14 +0000</pubDate>
         <enclosure url="http://0.0.0.0:1337/Sparkle_Test_App.zip" sparkle:version="5.0" />
         <sparkle:maximumSystemVersion>2.0.0</sparkle:maximumSystemVersion>
     </item>
