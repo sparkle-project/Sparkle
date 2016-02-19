@@ -1,6 +1,6 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ byl instalován a je připraven k použití po příštím spuštění. Přejete si aplikaci %1$@ nyní nainstalovat a znovu spustit?";
 
-"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "Aplikace %1$@ nemůže být aktualizována, protože je spuštěna z nezapisovatelného média. Může to být CD/DVD-ROM, obraz disku nebo jen nemáte právo zápisu na disk. Přesuňte aplikaci %1$@ do vaší složky Aplikace, spusťte ji z tohoto umístěni znovu.";
+"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "Aplikace %1$@ nemůže být aktualizována, protože je spuštěna z média na které nelze zapisovat. Může to být CD/DVD-ROM, obraz disku nebo jen nemáte právo zápisu na disk. Přesuňte aplikaci %1$@ do vaší složky Aplikace, spusťte ji z tohoto umístěni znovu.";
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ je nejnovější dostupná verze";
 
@@ -8,7 +8,7 @@
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "Je k dispozici %1$@ %2$@ - máte %3$@. Přejete si nyní zkopírovat aktualizaci?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ je nyní k dispozici – vy máte %3$@. Přejete si zobrazit o této aktualizaci další informace?";
 
 "%@ downloaded" = "zkopírováno %@";
 
@@ -24,7 +24,7 @@
 
 "An error occurred while extracting the archive. Please try again later." = "Při rozbalování archivu se vyskytla chyba. Zkuste to prosím později.";
 
-"An error occurred while installing the update. Please try again later." = "Při instalování aktualizace se vyskytla chyba. Zkuste to prosím později.";
+"An error occurred while installing the update. Please try again later." = "Při instalaci aktualizace se vyskytla chyba. Zkuste to prosím později.";
 
 "An error occurred while parsing the update feed." = "Při zpracovávání údajů o aktualizaci se vyskytla chyba. Zkuste to prosím později.";
 

@@ -6,6 +6,8 @@
 #import "SUPipedUnarchiver.h"
 #import "SUBinaryDeltaCommon.h"
 #import "SUFileManager.h"
+#import "SUAppcast.h"
+#import "SUAppcastItem.h"
 
 // Duplicated to avoid exporting a private symbol from SUFileManager
 static const char *SUAppleQuarantineIdentifier = "com.apple.quarantine";
@@ -20,3 +22,9 @@ static const char *SUAppleQuarantineIdentifier = "com.apple.quarantine";
 - (BOOL)_makeDirectoryAtURL:(NSURL *)url error:(NSError * __autoreleasing *)error;
 
 @end
+
+
+@interface SUAppcast (Private)
+- (NSArray *)parseAppcastItemsFromXMLFile:(NSURL *)appcastFile error:(NSError *__autoreleasing*)errorp;
+@end
+

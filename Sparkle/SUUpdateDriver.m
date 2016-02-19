@@ -8,6 +8,7 @@
 
 #import "SUUpdateDriver.h"
 #import "SUHost.h"
+#import "SULog.h"
 
 NSString *const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
@@ -48,6 +49,12 @@ NSString *const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 {
     [self setValue:@YES forKey:@"finished"];
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdateDriverFinishedNotification object:self];
+}
+
+
+- (void)showAlert:(NSAlert *)alert {
+    // Only UI-based subclass shows the actual alert
+    SULog(@"ALERT: %@\n%@", alert.messageText, alert.informativeText);
 }
 
 @end
