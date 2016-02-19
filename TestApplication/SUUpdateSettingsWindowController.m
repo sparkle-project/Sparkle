@@ -11,24 +11,10 @@
 
 #import "SUUserUpdaterDriver.h"
 
-@interface SULoggerUpdateDriver : NSObject<SUUserUpdaterDriver>
-
-@property (nonatomic, readonly) SUHost *host;
-
+@interface SULoggerUpdateDriver : NSObject <SUUserUpdaterDriver>
 @end
 
 @implementation SULoggerUpdateDriver
-
-@synthesize host = _host;
-
-- (instancetype)initWithHost:(SUHost *)host
-{
-    self = [super init];
-    if (self != nil) {
-        _host = host;
-    }
-    return self;
-}
 
 - (void)requestUpdatePermissionWithSystemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply
 {
@@ -132,7 +118,8 @@
 
 - (void)windowDidLoad
 {
-    self.updater.userUpdaterDriver = [[/* SUSparkleUserUpdaterDriver */ SULoggerUpdateDriver alloc] initWithHost:[[SUHost alloc] initWithBundle:[NSBundle mainBundle]]];
+    //self.updater.userUpdaterDriver = [[SUSparkleUserUpdaterDriver alloc] initWithHost:[[SUHost alloc] initWithBundle:[NSBundle mainBundle]]];
+    self.updater.userUpdaterDriver = [[SULoggerUpdateDriver alloc] init];
 }
 
 - (NSString *)windowNibName

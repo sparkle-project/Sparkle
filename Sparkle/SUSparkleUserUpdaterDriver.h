@@ -9,6 +9,10 @@
 #import <Foundation/Foundation.h>
 #import "SUUserUpdaterDriver.h"
 
+@class SUHost;
+
 @interface SUSparkleUserUpdaterDriver : NSObject <SUUserUpdaterDriver>
+
+- (instancetype)initWithHost:(SUHost *)host;
 
 @end
