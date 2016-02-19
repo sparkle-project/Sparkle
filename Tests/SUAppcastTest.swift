@@ -21,11 +21,13 @@ class SUAppcastTest: XCTestCase {
             let items = try appcast.parseAppcastItemsFromXMLFile(testFileUrl) as! [SUAppcastItem];
             
             XCTAssertEqual(2, items.count);
-            XCTAssertEqual("Version 3.0", items[0].title);
-            XCTAssertNil(items[0].itemDescription);
             
-            XCTAssertEqual("Version 2.0", items[1].title);
-            XCTAssertEqual("desc", items[1].itemDescription);
+            XCTAssertEqual("Version 2.0", items[0].title);
+            XCTAssertEqual("desc", items[0].itemDescription);
+            
+            XCTAssertEqual("Version 3.0", items[1].title);
+            XCTAssertNil(items[1].itemDescription);
+            
         } catch let err as NSError {
             NSLog("%@", err);
             XCTFail(err.localizedDescription);
