@@ -82,7 +82,7 @@
     return comparator;
 }
 
-+ (SUAppcastItem *)bestAppcastItemFromAppcastItems:(NSArray *)appcastItems withComparator:(id<SUVersionComparison>)comparator
++ (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator
 {
     SUAppcastItem *item = nil;
     for(SUAppcastItem *candidate in appcastItems) {
@@ -92,6 +92,14 @@
             }
         }
     }
+    
+    if (item && deltaItem) {
+        SUAppcastItem *deltaUpdateItem = [item deltaUpdates][hostVersion];
+        if (deltaUpdateItem && [[self class] hostSupportsItem:deltaUpdateItem]) {
+            *deltaItem = deltaUpdateItem;
+        }
+    }
+    
     return item;
 }
 
@@ -153,14 +161,12 @@
 	else // If not, we'll take care of it ourselves.
     {
         // Find the best supported update
-        item = [[self class] bestAppcastItemFromAppcastItems:ac.items withComparator:[self versionComparator]];
-
-        if (item) {            
-            SUAppcastItem *deltaUpdateItem = [item deltaUpdates][[self.host version]];
-            if (deltaUpdateItem && [[self class] hostSupportsItem:deltaUpdateItem]) {
-                self.nonDeltaUpdateItem = item;
-                item = deltaUpdateItem;
-            }
+        SUAppcastItem *deltaUpdateItem = nil;
+        item = [[self class] bestItemFromAppcastItems:ac.items getDeltaItem:&deltaUpdateItem withHostVersion:self.host.version comparator:[self versionComparator]];
+        
+        if (item && deltaUpdateItem) {
+            self.nonDeltaUpdateItem = item;
+            item = deltaUpdateItem;
         }
     }
 

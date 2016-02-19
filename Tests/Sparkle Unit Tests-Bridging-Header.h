@@ -28,7 +28,7 @@ static const char *SUAppleQuarantineIdentifier = "com.apple.quarantine";
 
 @interface SUBasicUpdateDriver (Private)
 
-+ (SUAppcastItem *)bestAppcastItemFromAppcastItems:(NSArray *)appcastItems withComparator:(id<SUVersionComparison>)comparator;
++ (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator;
 
 @end
 

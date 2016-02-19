@@ -39,9 +39,24 @@ class SUAppcastTest: XCTestCase {
             XCTAssertNil(items[3].itemDescription);
             XCTAssertNil(items[3].dateString)
             
-            let bestAppcastItem = SUBasicUpdateDriver.bestAppcastItemFromAppcastItems(items, withComparator: SUStandardVersionComparator.defaultComparator())
-            
+            // Test best appcast item & a delta update item
+            var deltaItem: SUAppcastItem? = nil
+            let bestAppcastItem = SUBasicUpdateDriver.bestItemFromAppcastItems(items, getDeltaItem: &deltaItem, withHostVersion: "1.0", comparator: SUStandardVersionComparator.defaultComparator())
+
             XCTAssertEqual(bestAppcastItem, items[1])
+            XCTAssertEqual(deltaItem!.fileURL.lastPathComponent, "3.0_from_1.0.patch")
+            
+            // Test latest delta update item available
+            var latestDeltaItem: SUAppcastItem? = nil
+            SUBasicUpdateDriver.bestItemFromAppcastItems(items, getDeltaItem: &latestDeltaItem, withHostVersion: "2.0", comparator: SUStandardVersionComparator.defaultComparator())
+            
+            XCTAssertEqual(latestDeltaItem!.fileURL.lastPathComponent, "3.0_from_2.0.patch")
+            
+            // Test a delta item that does not exist
+            var nonexistantDeltaItem: SUAppcastItem? = nil
+            SUBasicUpdateDriver.bestItemFromAppcastItems(items, getDeltaItem: &nonexistantDeltaItem, withHostVersion: "2.1", comparator: SUStandardVersionComparator.defaultComparator())
+            
+            XCTAssertNil(nonexistantDeltaItem)
         } catch let err as NSError {
             NSLog("%@", err);
             XCTFail(err.localizedDescription);
