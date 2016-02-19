@@ -511,6 +511,7 @@
     if ([updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
         pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:self.updater];
     }
+    
     [NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:@[[self.host bundlePath],
                                                                     pathToRelaunch,
                                                                     [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]],
@@ -520,6 +521,7 @@
     [self terminateApp];
 }
 
+// Note: this is overridden by the automatic update driver to not terminate in some cases
 - (void)terminateApp
 {
     [NSApp terminate:self];
