@@ -235,13 +235,6 @@
     }
 }
 
-- (void)openInfoURLForAppcastItem:(SUAppcastItem *)appcastItem
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSWorkspace sharedWorkspace] openURL:[appcastItem infoURL]];
-    });
-}
-
 - (void)showDownloadDidReceiveResponse:(NSURLResponse *)response
 {
     dispatch_async(dispatch_get_main_queue(), ^{
