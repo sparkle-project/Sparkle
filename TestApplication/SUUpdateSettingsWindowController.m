@@ -22,11 +22,6 @@
     reply([SUUpdatePermissionPromptResult updatePermissionPromptResultWithChoice:SUAutomaticallyCheck shouldSendProfile:YES]);
 }
 
-- (void)openInfoURLForAppcastItem:(SUAppcastItem *)appcastItem
-{
-    NSLog(@"Hah, you want to open info URL? That's funny!");
-}
-
 - (void)showUserInitiatedUpdateCheckWithCancelCallback:(void (^)(void))cancelUpdateCheck
 {
     NSLog(@"Evil user initiated an update check!");

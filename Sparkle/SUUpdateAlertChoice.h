@@ -12,8 +12,7 @@
 typedef NS_ENUM(NSInteger, SUUpdateAlertChoice) {
     SUInstallUpdateChoice,
     SURemindMeLaterChoice,
-    SUSkipThisVersionChoice,
-    SUOpenInfoURLChoice
+    SUSkipThisVersionChoice
 };
 
 #endif /* SUUpdateAlertChoice_h */

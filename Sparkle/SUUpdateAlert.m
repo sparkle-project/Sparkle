@@ -104,7 +104,9 @@
 
 - (IBAction)openInfoURL:(id)__unused sender
 {
-    [self endWithSelection:SUOpenInfoURLChoice];
+    [[NSWorkspace sharedWorkspace] openURL:self.updateItem.infoURL];
+    
+    [self endWithSelection:SURemindMeLaterChoice];
 }
 
 - (IBAction)skipThisVersion:(id)__unused sender

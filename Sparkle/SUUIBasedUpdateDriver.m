@@ -83,14 +83,6 @@
             break;
         }
 
-        case SUOpenInfoURLChoice:
-        {
-            [self.updater.userUpdaterDriver openInfoURLForAppcastItem:self.updateItem];
-            
-            [self abortUpdate];
-            break;
-        }
-
         case SUSkipThisVersionChoice:
             [self.host setObject:[self.updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
             [self abortUpdate];
