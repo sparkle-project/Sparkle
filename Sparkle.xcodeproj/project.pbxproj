@@ -1103,6 +1103,7 @@
 		61CFB2C20E38496B007A1735 /* Drivers */ = {
 			isa = PBXGroup;
 			children = (
+				725CB9561C7120410064365A /* SUUserUpdaterDriver.h */,
 				61B93B250DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.h */,
 				61B93B260DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.m */,
 				61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */,
@@ -1111,7 +1112,6 @@
 				6101347A0DD2541A0049ACDF /* SUProbingUpdateDriver.m */,
 				61B93C070DD112FF00DCD2F8 /* SUScheduledUpdateDriver.h */,
 				61B93C080DD112FF00DCD2F8 /* SUScheduledUpdateDriver.m */,
-				725CB9561C7120410064365A /* SUUserUpdaterDriver.h */,
 				61B93A390DD02D6400DCD2F8 /* SUUIBasedUpdateDriver.h */,
 				61B93A3A0DD02D6400DCD2F8 /* SUUIBasedUpdateDriver.m */,
 				610134710DD250470049ACDF /* SUUpdateDriver.h */,

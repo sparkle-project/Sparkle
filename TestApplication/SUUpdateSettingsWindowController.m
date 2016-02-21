@@ -43,6 +43,12 @@
     reply(SUInstallUpdateChoice);
 }
 
+- (void)showAutomaticUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUAutomaticInstallationChoice))reply
+{
+    NSLog(@"OK, requested automatic update permission.. replying..");
+    reply(SUInstallLaterChoice);
+}
+
 - (void)showUpdateNotFound
 {
     NSLog(@":( there was no new update");
@@ -99,23 +105,19 @@
     NSLog(@"Installing update...");
 }
 
-- (void)dismissUpdateInstallation
+- (void)registerForAppTermination:(void (^)(void))applicationWillTerminate
 {
-    NSLog(@"Dismissing the installation.");
-}
-
-- (void)requestAutomaticUpdatePermissionWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUAutomaticInstallationChoice))reply
-{
-    NSLog(@"OK, requested automatic update permission.. replying..");
-    reply(SUInstallLaterChoice);
-}
-
-- (void)startListeningForTermination:(void (^)(void))applicationWillTerminate
-{
-    NSLog(@"Start listening for termination, eh?");
+    NSLog(@"Registered for termination, eh?");
     self.applicationWillTerminate = applicationWillTerminate;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+}
+
+- (void)unregisterForAppTermination
+{
+    self.applicationWillTerminate = nil;
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)__unused note
@@ -124,14 +126,18 @@
     if (self.applicationWillTerminate) {
         NSLog(@"App will terminate");
         self.applicationWillTerminate();
-        self.applicationWillTerminate = nil;
     }
 }
 
-- (void)dismissAutomaticUpdateInstallation
+- (void)dismissUpdateInstallation:(SUUpdateInstallationType)installationType
 {
-    NSLog(@"Done with automatic update installation");
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
+    NSLog(@"Dismissing the installation.");
+    switch (installationType) {
+        case SUManualInstallationType:
+            break;
+        case SUAutomaticInstallationType:
+            break;
+    }
 }
 
 @end

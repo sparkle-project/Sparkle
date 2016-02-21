@@ -114,6 +114,18 @@
     });
 }
 
+- (void)showAutomaticUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUAutomaticInstallationChoice))reply
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        SUAutomaticUpdateAlert *updateAlert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host completionBlock:^(SUAutomaticInstallationChoice choice) {
+            reply(choice);
+            self.activeUpdateAlert = nil;
+        }];
+        
+        [self setupActiveFocusForWindow:updateAlert];
+    });
+}
+
 - (void)showExtractionFinishedAndReadyToInstallAndRelaunch:(void (^)(void))installUpdateAndRelaunch
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -315,30 +327,7 @@
     });
 }
 
-- (void)dismissUpdateInstallation
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.statusController)
-        {
-            [self.statusController close];
-            self.statusController = nil;
-        }
-    });
-}
-
-- (void)requestAutomaticUpdatePermissionWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUAutomaticInstallationChoice))reply
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        SUAutomaticUpdateAlert *updateAlert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host completionBlock:^(SUAutomaticInstallationChoice choice) {
-            reply(choice);
-            self.activeUpdateAlert = nil;
-        }];
-        
-        [self setupActiveFocusForWindow:updateAlert];
-    });
-}
-
-- (void)startListeningForTermination:(void (^)(void))applicationWillTerminate
+- (void)registerForAppTermination:(void (^)(void))applicationWillTerminate
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         // Sudden termination is available on 10.6+
@@ -350,20 +339,37 @@
     });
 }
 
+- (void)unregisterForAppTermination
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSProcessInfo processInfo] enableSuddenTermination];
+        
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
+        self.applicationWillTerminate = nil;
+    });
+}
+
 - (void)applicationWillTerminate:(NSNotification *)__unused note
 {
     if (self.applicationWillTerminate) {
         self.applicationWillTerminate();
-        self.applicationWillTerminate = nil;
     }
 }
 
-- (void)dismissAutomaticUpdateInstallation
+- (void)dismissUpdateInstallation:(SUUpdateInstallationType)installationType
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSProcessInfo processInfo] enableSuddenTermination];
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
-        self.applicationWillTerminate = nil;
+        switch (installationType) {
+            case SUManualInstallationType:
+                if (self.statusController)
+                {
+                    [self.statusController close];
+                    self.statusController = nil;
+                }
+                break;
+            case SUAutomaticInstallationType:
+                break;
+        }
     });
 }
 

@@ -43,14 +43,14 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 {
     self.interruptible = NO;
     
-    [self.updater.userUpdaterDriver requestAutomaticUpdatePermissionWithAppcastItem:self.updateItem reply:^(SUAutomaticInstallationChoice choice) {
+    [self.updater.userUpdaterDriver showAutomaticUpdateFoundWithAppcastItem:self.updateItem reply:^(SUAutomaticInstallationChoice choice) {
         [self automaticUpdateAlertFinishedWithChoice:choice];
     }];
 }
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
 {
-    [self.updater.userUpdaterDriver startListeningForTermination:^{
+    [self.updater.userUpdaterDriver registerForAppTermination:^{
         // We don't want to terminate the app if the user or someone else initiated a termination
         // Use a property instead of passing an argument to installWithToolAndRelaunch:
         // because we give the delegate an invocation to our install methods and
@@ -96,7 +96,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 {
     if (self.willUpdateOnTermination)
     {
-        [self.updater.userUpdaterDriver dismissAutomaticUpdateInstallation];
+        [self.updater.userUpdaterDriver unregisterForAppTermination];
         
         [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self name:NSWorkspaceWillPowerOffNotification object:nil];
 
@@ -125,6 +125,9 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     self.isTerminating = NO;
     [self stopUpdatingOnTermination];
     [self invalidateShowUpdateAlertTimer];
+    
+    [self.updater.userUpdaterDriver dismissUpdateInstallation:SUAutomaticInstallationType];
+    
     [super abortUpdate];
 }
 

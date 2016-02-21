@@ -14,6 +14,12 @@
 
 @protocol SUVersionDisplay;
 
+#warning Is this really helpful and needed?
+typedef NS_ENUM(NSUInteger, SUUpdateInstallationType) {
+    SUManualInstallationType,
+    SUAutomaticInstallationType
+};
+
 @protocol SUUserUpdaterDriver <NSObject>
 
 #warning might need to whitelist class types for systemProfile.. need to test this
@@ -23,6 +29,9 @@
 - (void)dismissUserInitiatedUpdateCheck;
 
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem versionDisplayer:(id<SUVersionDisplay>)versionDisplayer reply:(void (^)(SUUpdateAlertChoice))reply;
+
+#warning maybe this should take a versionDisplayer too?
+- (void)showAutomaticUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUAutomaticInstallationChoice))reply;
 
 - (void)showUpdateNotFound;
 - (BOOL)showsUpdateNotFoundModally;
@@ -39,12 +48,9 @@
 
 - (void)showInstallingUpdate;
 
-- (void)dismissUpdateInstallation;
+- (void)registerForAppTermination:(void (^)(void))applicationWillTerminate;
+- (void)unregisterForAppTermination;
 
-#warning Automatic Installation stuff, should probably be put in a separate driver maybe? Hard to tell
-
-- (void)requestAutomaticUpdatePermissionWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUAutomaticInstallationChoice))reply;
-- (void)startListeningForTermination:(void (^)(void))applicationWillTerminate;
-- (void)dismissAutomaticUpdateInstallation;
+- (void)dismissUpdateInstallation:(SUUpdateInstallationType)installationType;
 
 @end
