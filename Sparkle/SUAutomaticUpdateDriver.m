@@ -117,8 +117,6 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     [self stopUpdatingOnTermination];
     [self invalidateShowUpdateAlertTimer];
     
-    [self.updater.userUpdaterDriver dismissUpdateInstallation];
-    
     [super abortUpdate];
 }
 

@@ -575,6 +575,8 @@
 
 - (void)abortUpdate
 {
+    [self.updater.userUpdaterDriver dismissUpdateInstallation];
+    
     [self cleanUpDownload];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     self.updateItem = nil;

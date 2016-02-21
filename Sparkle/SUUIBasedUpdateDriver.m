@@ -159,13 +159,6 @@
     [super abortUpdateWithError:error];
 }
 
-- (void)abortUpdate
-{
-    [self.updater.userUpdaterDriver dismissUpdateInstallation];
-    
-    [super abortUpdate];
-}
-
 - (void)showNoticeModally:(BOOL)modally noticeHandler:(void (^)(void))noticeHandler
 {
     if (modally && [[self.updater delegate] respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
