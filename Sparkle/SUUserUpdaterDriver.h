@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "SUUpdateAlertChoice.h"
+#import "SUAutomaticInstallationChoice.h"
 
 @class SUUpdatePermissionPromptResult, SUAppcastItem;
 
@@ -39,5 +40,11 @@
 - (void)showInstallingUpdate;
 
 - (void)dismissUpdateInstallation;
+
+#warning Automatic Installation stuff, should probably be put in a separate driver maybe? Hard to tell
+
+- (void)requestAutomaticUpdatePermissionWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUAutomaticInstallationChoice))reply;
+- (void)startListeningForTermination:(void (^)(void))applicationWillTerminate;
+- (void)dismissAutomaticUpdateInstallation;
 
 @end

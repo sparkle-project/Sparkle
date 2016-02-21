@@ -12,9 +12,14 @@
 #import "SUUserUpdaterDriver.h"
 
 @interface SULoggerUpdateDriver : NSObject <SUUserUpdaterDriver>
+
+@property (nonatomic, copy) void (^applicationWillTerminate)(void);
+
 @end
 
 @implementation SULoggerUpdateDriver
+
+@synthesize applicationWillTerminate = _applicationWillTerminate;
 
 - (void)requestUpdatePermissionWithSystemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply
 {
@@ -97,6 +102,36 @@
 - (void)dismissUpdateInstallation
 {
     NSLog(@"Dismissing the installation.");
+}
+
+- (void)requestAutomaticUpdatePermissionWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUAutomaticInstallationChoice))reply
+{
+    NSLog(@"OK, requested automatic update permission.. replying..");
+    reply(SUInstallLaterChoice);
+}
+
+- (void)startListeningForTermination:(void (^)(void))applicationWillTerminate
+{
+    NSLog(@"Start listening for termination, eh?");
+    self.applicationWillTerminate = applicationWillTerminate;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+}
+
+- (void)applicationWillTerminate:(NSNotification *)__unused note
+{
+    NSLog(@"Terminating app..");
+    if (self.applicationWillTerminate) {
+        NSLog(@"App will terminate");
+        self.applicationWillTerminate();
+        self.applicationWillTerminate = nil;
+    }
+}
+
+- (void)dismissAutomaticUpdateInstallation
+{
+    NSLog(@"Done with automatic update installation");
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
 }
 
 @end

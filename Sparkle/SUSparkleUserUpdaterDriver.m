@@ -10,10 +10,10 @@
 #import "SUAppcastItem.h"
 #import "SUVersionDisplayProtocol.h"
 #import "SUHost.h"
-
 #import "SUUpdatePermissionPrompt.h"
 #import "SUStatusController.h"
 #import "SUUpdateAlert.h"
+#import "SUAutomaticUpdateAlert.h"
 #import "SUOperatingSystem.h"
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED < 1080
@@ -44,6 +44,10 @@
 @property (nonatomic, copy) void (^cancelDownload)(void); // temporary
 @property (nonatomic, copy) void (^installAndRestart)(void); // temporary
 
+@property (nonatomic) SUAutomaticUpdateAlert *automaticUpdateAlert;
+
+@property (nonatomic, copy) void (^applicationWillTerminate)(void);
+
 @end
 
 @implementation SUSparkleUserUpdaterDriver
@@ -55,6 +59,8 @@
 @synthesize statusController = _statusController;
 @synthesize cancelDownload = _cancelDownload;
 @synthesize installAndRestart = _installAndRestart;
+@synthesize automaticUpdateAlert = _automaticUpdateAlert;
+@synthesize applicationWillTerminate = _applicationWillTerminate;
 
 - (instancetype)initWithHost:(SUHost *)host
 {
@@ -314,6 +320,60 @@
             [self.statusController close];
             self.statusController = nil;
         }
+    });
+}
+
+- (void)requestAutomaticUpdatePermissionWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUAutomaticInstallationChoice))reply
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.automaticUpdateAlert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host completionBlock:reply];
+        
+        // If the app is a menubar app or the like, we need to focus it first and alter the
+        // update prompt to behave like a normal window. Otherwise if the window were hidden
+        // there may be no way for the application to be activated to make it visible again.
+        if ([self.host isBackgroundApplication]) {
+            [[self.automaticUpdateAlert window] setHidesOnDeactivate:NO];
+            [NSApp activateIgnoringOtherApps:YES];
+        }
+        
+        if ([NSApp isActive])
+            [[self.automaticUpdateAlert window] makeKeyAndOrderFront:self];
+        else
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(automaticApplicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
+    });
+}
+
+- (void)automaticApplicationDidBecomeActive:(NSNotification *)__unused notification
+{
+    [[self.automaticUpdateAlert window] makeKeyAndOrderFront:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
+}
+
+- (void)startListeningForTermination:(void (^)(void))applicationWillTerminate
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // Sudden termination is available on 10.6+
+        [[NSProcessInfo processInfo] disableSuddenTermination];
+        
+        self.applicationWillTerminate = applicationWillTerminate;
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+    });
+}
+
+- (void)applicationWillTerminate:(NSNotification *)__unused note
+{
+    if (self.applicationWillTerminate) {
+        self.applicationWillTerminate();
+        self.applicationWillTerminate = nil;
+    }
+}
+
+- (void)dismissAutomaticUpdateInstallation
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSProcessInfo processInfo] enableSuddenTermination];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
     });
 }
 

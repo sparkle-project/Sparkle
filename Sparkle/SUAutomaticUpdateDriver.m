@@ -9,7 +9,6 @@
 #import "SUAutomaticUpdateDriver.h"
 
 #import "SUUpdater.h"
-#import "SUAutomaticUpdateAlert.h"
 #import "SUHost.h"
 #import "SUConstants.h"
 
@@ -28,7 +27,6 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 @property (assign) BOOL showErrors;
 @property (assign) BOOL willUpdateOnTermination;
 @property (assign) BOOL isTerminating;
-@property (strong) SUAutomaticUpdateAlert *alert;
 @property (strong) NSTimer *showUpdateAlertTimer;
 
 @end
@@ -39,38 +37,30 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 @synthesize showErrors;
 @synthesize willUpdateOnTermination;
 @synthesize isTerminating;
-@synthesize alert;
 @synthesize showUpdateAlertTimer;
 
 - (void)showUpdateAlert
 {
     self.interruptible = NO;
-    self.alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host completionBlock:^(SUAutomaticInstallationChoice choice) {
+    
+    [self.updater.userUpdaterDriver requestAutomaticUpdatePermissionWithAppcastItem:self.updateItem reply:^(SUAutomaticInstallationChoice choice) {
         [self automaticUpdateAlertFinishedWithChoice:choice];
     }];
-
-    // If the app is a menubar app or the like, we need to focus it first and alter the
-    // update prompt to behave like a normal window. Otherwise if the window were hidden
-    // there may be no way for the application to be activated to make it visible again.
-    if ([self.host isBackgroundApplication]) {
-        [[self.alert window] setHidesOnDeactivate:NO];
-        [NSApp activateIgnoringOtherApps:YES];
-    }
-
-    if ([NSApp isActive])
-        [[self.alert window] makeKeyAndOrderFront:self];
-    else
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
 {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+    [self.updater.userUpdaterDriver startListeningForTermination:^{
+        // We don't want to terminate the app if the user or someone else initiated a termination
+        // Use a property instead of passing an argument to installWithToolAndRelaunch:
+        // because we give the delegate an invocation to our install methods and
+        // this code was added later :|
+        self.isTerminating = YES;
+        
+        [self installWithToolAndRelaunch:NO];
+    }];
+    
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(systemWillPowerOff:) name:NSWorkspaceWillPowerOffNotification object:nil];
-
-    // Sudden termination is available on 10.6+
-    NSProcessInfo *processInfo = [NSProcessInfo processInfo];
-    [processInfo disableSuddenTermination];
 
     self.willUpdateOnTermination = YES;
 
@@ -106,11 +96,9 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 {
     if (self.willUpdateOnTermination)
     {
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
+        [self.updater.userUpdaterDriver dismissAutomaticUpdateInstallation];
+        
         [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self name:NSWorkspaceWillPowerOffNotification object:nil];
-
-        NSProcessInfo *processInfo = [NSProcessInfo processInfo];
-        [processInfo enableSuddenTermination];
 
         self.willUpdateOnTermination = NO;
 
@@ -138,12 +126,6 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     [self stopUpdatingOnTermination];
     [self invalidateShowUpdateAlertTimer];
     [super abortUpdate];
-}
-
-- (void)applicationDidBecomeActive:(NSNotification *)__unused aNotification
-{
-    [[self.alert window] makeKeyAndOrderFront:self];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
 - (void)automaticUpdateAlertFinishedWithChoice:(SUAutomaticInstallationChoice)choice
@@ -184,17 +166,6 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUSystemPowerOffError userInfo:@{
         NSLocalizedDescriptionKey: SULocalizedString(@"The update will not be installed because the user requested for the system to power off", nil)
     }]];
-}
-
-- (void)applicationWillTerminate:(NSNotification *)__unused note
-{
-    // We don't want to terminate the app if the user or someone else initiated a termination
-    // Use a property instead of passing an argument to installWithToolAndRelaunch:
-    // because we give the delegate an invocation to our install methods and
-    // this code was added later :|
-    self.isTerminating = YES;
-    
-    [self installWithToolAndRelaunch:NO];
 }
 
 - (void)terminateApp

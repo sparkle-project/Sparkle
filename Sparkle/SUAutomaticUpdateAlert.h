@@ -10,12 +10,7 @@
 #define SUAUTOMATICUPDATEALERT_H
 
 #import "SUWindowController.h"
-
-typedef NS_ENUM(NSInteger, SUAutomaticInstallationChoice) {
-    SUInstallNowChoice,
-    SUInstallLaterChoice,
-    SUDoNotInstallChoice
-};
+#import "SUAutomaticInstallationChoice.h"
 
 @class SUAppcastItem, SUHost;
 @interface SUAutomaticUpdateAlert : SUWindowController
