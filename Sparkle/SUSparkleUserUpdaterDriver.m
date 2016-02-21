@@ -38,7 +38,7 @@
 @property (nonatomic) SUStatusController *checkingController;
 @property (nonatomic, copy) void (^cancelUpdateCheck)(void);
 
-@property (nonatomic, weak) SUWindowController *activeUpdateAlert;
+@property (nonatomic) SUWindowController *activeUpdateAlert;
 
 @property (nonatomic) SUStatusController *statusController;
 @property (nonatomic, copy) void (^cancelDownload)(void);
