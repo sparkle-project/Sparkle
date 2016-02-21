@@ -34,6 +34,7 @@
 @interface SUSparkleUserUpdaterDriver ()
 
 @property (nonatomic, readonly) SUHost *host;
+@property (nonatomic, readonly) BOOL handlesTermination;
 
 @property (nonatomic) SUStatusController *checkingController;
 @property (nonatomic, copy) void (^cancelUpdateCheck)(void);
@@ -45,12 +46,14 @@
 @property (nonatomic, copy) void (^installAndRestart)(void);
 
 @property (nonatomic, copy) void (^applicationWillTerminate)(void);
+@property (nonatomic, copy) void (^finishTermination)(void);
 
 @end
 
 @implementation SUSparkleUserUpdaterDriver
 
 @synthesize host = _host;
+@synthesize handlesTermination = _handlesTermination;
 @synthesize checkingController = _checkingController;
 @synthesize cancelUpdateCheck = _cancelUpdateCheck;
 @synthesize activeUpdateAlert = _activeUpdateAlert;
@@ -58,14 +61,21 @@
 @synthesize cancelDownload = _cancelDownload;
 @synthesize installAndRestart = _installAndRestart;
 @synthesize applicationWillTerminate = _applicationWillTerminate;
+@synthesize finishTermination = _finishTermination;
 
-- (instancetype)initWithHost:(SUHost *)host
+- (instancetype)initWithHost:(SUHost *)host handlesTermination:(BOOL)handlesTermination
 {
     self = [super init];
     if (self != nil) {
         _host = host;
+        _handlesTermination = handlesTermination;
     }
     return self;
+}
+
+- (instancetype)initWithHost:(SUHost *)host
+{
+    return [self initWithHost:host handlesTermination:YES];
 }
 
 - (void)requestUpdatePermissionWithSystemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply
@@ -332,7 +342,9 @@
         
         self.applicationWillTerminate = applicationWillTerminate;
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+        if (self.handlesTermination) {
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+        }
     });
 }
 
@@ -341,16 +353,44 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSProcessInfo processInfo] enableSuddenTermination];
         
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
+        if (self.handlesTermination) {
+            [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
+        }
+        
         self.applicationWillTerminate = nil;
     });
 }
 
 - (void)applicationWillTerminate:(NSNotification *)__unused note
 {
+    // Pass an empty block instead of nil to indicate the app
+    // has already initiated termination
+    [self sendTerminationSignalWithCompletion:^{}];
+}
+
+- (BOOL)isInstallingOnTermination
+{
+    return (self.applicationWillTerminate != nil);
+}
+
+- (void)sendTerminationSignalWithCompletion:(void (^)(void))finishTermination
+{
+    self.finishTermination = finishTermination;
+    
     if (self.applicationWillTerminate) {
         self.applicationWillTerminate();
     }
+}
+
+- (void)terminateApplication
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.finishTermination) {
+            self.finishTermination();
+        } else {
+            [NSApp terminate:nil];
+        }
+    });
 }
 
 - (void)dismissUpdateInstallation

@@ -26,7 +26,6 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 @property (assign) BOOL postponingInstallation;
 @property (assign) BOOL showErrors;
 @property (assign) BOOL willUpdateOnTermination;
-@property (assign) BOOL isTerminating;
 @property (strong) NSTimer *showUpdateAlertTimer;
 
 @end
@@ -36,7 +35,6 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 @synthesize postponingInstallation;
 @synthesize showErrors;
 @synthesize willUpdateOnTermination;
-@synthesize isTerminating;
 @synthesize showUpdateAlertTimer;
 
 - (void)showUpdateAlert
@@ -51,12 +49,6 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 - (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
 {
     [self.updater.userUpdaterDriver registerForAppTermination:^{
-        // We don't want to terminate the app if the user or someone else initiated a termination
-        // Use a property instead of passing an argument to installWithToolAndRelaunch:
-        // because we give the delegate an invocation to our install methods and
-        // this code was added later :|
-        self.isTerminating = YES;
-        
         [self installWithToolAndRelaunch:NO];
     }];
     
@@ -122,7 +114,6 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)abortUpdate
 {
-    self.isTerminating = NO;
     [self stopUpdatingOnTermination];
     [self invalidateShowUpdateAlertTimer];
     
@@ -169,13 +160,6 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUSystemPowerOffError userInfo:@{
         NSLocalizedDescriptionKey: SULocalizedString(@"The update will not be installed because the user requested for the system to power off", nil)
     }]];
-}
-
-- (void)terminateApp
-{
-    if (!self.isTerminating) {
-        [super terminateApp];
-    }
 }
 
 - (void)abortUpdateWithError:(NSError *)error

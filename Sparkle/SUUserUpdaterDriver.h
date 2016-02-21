@@ -44,6 +44,7 @@
 
 - (void)registerForAppTermination:(void (^)(void))applicationWillTerminate;
 - (void)unregisterForAppTermination;
+- (void)terminateApplication;
 
 - (void)dismissUpdateInstallation;
 

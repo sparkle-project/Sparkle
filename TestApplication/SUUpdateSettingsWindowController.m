@@ -129,6 +129,11 @@
     }
 }
 
+- (void)terminateApplication
+{
+    [NSApp terminate:nil];
+}
+
 - (void)dismissUpdateInstallation
 {
     NSLog(@"Dismissing the installation.");
@@ -148,8 +153,8 @@
 
 - (void)windowDidLoad
 {
-    //self.updater.userUpdaterDriver = [[SUSparkleUserUpdaterDriver alloc] initWithHost:[[SUHost alloc] initWithBundle:[NSBundle mainBundle]]];
-    self.updater.userUpdaterDriver = [[SULoggerUpdateDriver alloc] init];
+    self.updater.userUpdaterDriver = [[SUSparkleUserUpdaterDriver alloc] initWithHost:[[SUHost alloc] initWithBundle:[NSBundle mainBundle]]];
+    //self.updater.userUpdaterDriver = [[SULoggerUpdateDriver alloc] init];
 }
 
 - (NSString *)windowNibName

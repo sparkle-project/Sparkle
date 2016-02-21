@@ -544,13 +544,7 @@
 // Note: this is overridden by the automatic update driver to not terminate in some cases
 - (void)terminateApp
 {
-    for (NSRunningApplication *runningApplication in [[NSWorkspace sharedWorkspace] runningApplications]) {
-        if ([runningApplication.bundleURL.path isEqual:self.host.bundlePath]) {
-            [runningApplication terminate];
-        }
-    }
-    
-    [NSApp terminate:self];
+    [self.updater.userUpdaterDriver terminateApplication];
 }
 
 - (void)cleanUpDownload
