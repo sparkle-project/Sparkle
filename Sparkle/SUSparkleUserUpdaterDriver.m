@@ -363,6 +363,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSProcessInfo processInfo] enableSuddenTermination];
         [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
+        self.applicationWillTerminate = nil;
     });
 }
 
