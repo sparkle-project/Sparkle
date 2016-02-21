@@ -36,13 +36,13 @@
 @property (nonatomic, readonly) SUHost *host;
 
 @property (nonatomic) SUStatusController *checkingController;
-@property (nonatomic, copy) void (^cancelUpdateCheck)(void); // temporary
+@property (nonatomic, copy) void (^cancelUpdateCheck)(void);
 
 @property (nonatomic, weak) SUWindowController *activeUpdateAlert;
 
 @property (nonatomic) SUStatusController *statusController;
-@property (nonatomic, copy) void (^cancelDownload)(void); // temporary
-@property (nonatomic, copy) void (^installAndRestart)(void); // temporary
+@property (nonatomic, copy) void (^cancelDownload)(void);
+@property (nonatomic, copy) void (^installAndRestart)(void);
 
 @property (nonatomic, copy) void (^applicationWillTerminate)(void);
 
@@ -75,7 +75,7 @@
     });
 }
 
-- (void)setupActiveFocusForWindow:(SUWindowController *)updateAlert
+- (void)setUpActiveFocusForWindow:(SUWindowController *)updateAlert
 {
     // If the app is a menubar app or the like, we need to focus it first and alter the
     // update prompt to behave like a normal window. Otherwise if the window were hidden
@@ -110,7 +110,7 @@
             self.activeUpdateAlert = nil;
         }];
         [updateAlert setVersionDisplayer:versionDisplayer];
-        [self setupActiveFocusForWindow:updateAlert];
+        [self setUpActiveFocusForWindow:updateAlert];
     });
 }
 
@@ -122,7 +122,7 @@
             self.activeUpdateAlert = nil;
         }];
         
-        [self setupActiveFocusForWindow:updateAlert];
+        [self setUpActiveFocusForWindow:updateAlert];
     });
 }
 
@@ -140,8 +140,7 @@
     });
 }
 
-// temporary
-- (void)installAndRestart:(id)sender
+- (void)installAndRestart:(id)__unused sender
 {
     if (self.installAndRestart != nil) {
         self.installAndRestart();
@@ -169,7 +168,6 @@
     });
 }
 
-// temporary...
 - (void)cancelCheckForUpdates:(id)__unused sender
 {
     if (self.cancelUpdateCheck != nil) {
@@ -247,8 +245,7 @@
     });
 }
 
-// temporary
-- (void)cancelDownload:(id)sender
+- (void)cancelDownload:(id)__unused sender
 {
     if (self.cancelDownload != nil) {
         self.cancelDownload();
@@ -356,20 +353,22 @@
     }
 }
 
-- (void)dismissUpdateInstallation:(SUUpdateInstallationType)installationType
+- (void)dismissUpdateInstallation
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        switch (installationType) {
-            case SUManualInstallationType:
-                if (self.statusController)
-                {
-                    [self.statusController close];
-                    self.statusController = nil;
-                }
-                break;
-            case SUAutomaticInstallationType:
-                break;
+        if (self.statusController) {
+            [self.statusController close];
+            self.statusController = nil;
         }
+        
+        if (self.activeUpdateAlert) {
+            [self.activeUpdateAlert close];
+            self.activeUpdateAlert = nil;
+        }
+        
+        self.installAndRestart = nil;
+        self.cancelDownload = nil;
+        self.cancelUpdateCheck = nil;
     });
 }
 

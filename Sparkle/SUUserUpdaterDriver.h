@@ -14,12 +14,6 @@
 
 @protocol SUVersionDisplay;
 
-#warning Is this really helpful and needed?
-typedef NS_ENUM(NSUInteger, SUUpdateInstallationType) {
-    SUManualInstallationType,
-    SUAutomaticInstallationType
-};
-
 @protocol SUUserUpdaterDriver <NSObject>
 
 #warning might need to whitelist class types for systemProfile.. need to test this
@@ -51,6 +45,6 @@ typedef NS_ENUM(NSUInteger, SUUpdateInstallationType) {
 - (void)registerForAppTermination:(void (^)(void))applicationWillTerminate;
 - (void)unregisterForAppTermination;
 
-- (void)dismissUpdateInstallation:(SUUpdateInstallationType)installationType;
+- (void)dismissUpdateInstallation;
 
 @end

@@ -145,7 +145,7 @@
     // tabs open), the status window still stays on the screen and obscures
     // other windows; with this fix, it doesn't
 
-    [self.updater.userUpdaterDriver dismissUpdateInstallation:SUManualInstallationType];
+    [self.updater.userUpdaterDriver dismissUpdateInstallation];
 
     [super terminateApp];
 }
@@ -161,7 +161,7 @@
 
 - (void)abortUpdate
 {
-    [self.updater.userUpdaterDriver dismissUpdateInstallation:SUManualInstallationType];
+    [self.updater.userUpdaterDriver dismissUpdateInstallation];
     
     [super abortUpdate];
 }

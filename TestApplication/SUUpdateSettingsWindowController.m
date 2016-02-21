@@ -21,13 +21,13 @@
 
 @synthesize applicationWillTerminate = _applicationWillTerminate;
 
-- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply
+- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply
 {
     NSLog(@"Giving permission to automatically install updates!");
     reply([SUUpdatePermissionPromptResult updatePermissionPromptResultWithChoice:SUAutomaticallyCheck shouldSendProfile:YES]);
 }
 
-- (void)showUserInitiatedUpdateCheckWithCancelCallback:(void (^)(void))cancelUpdateCheck
+- (void)showUserInitiatedUpdateCheckWithCancelCallback:(void (^)(void))__unused cancelUpdateCheck
 {
     NSLog(@"Evil user initiated an update check!");
 }
@@ -37,13 +37,13 @@
     NSLog(@"Update check is done!");
 }
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem versionDisplayer:(id<SUVersionDisplay>)versionDisplayer reply:(void (^)(SUUpdateAlertChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem versionDisplayer:(id<SUVersionDisplay>)__unused versionDisplayer reply:(void (^)(SUUpdateAlertChoice))reply
 {
     NSLog(@"OMG new update was found! Let's install it!");
     reply(SUInstallUpdateChoice);
 }
 
-- (void)showAutomaticUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUAutomaticInstallationChoice))reply
+- (void)showAutomaticUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem reply:(void (^)(SUAutomaticInstallationChoice))reply
 {
     NSLog(@"OK, requested automatic update permission.. replying..");
     reply(SUInstallLaterChoice);
@@ -69,7 +69,7 @@
     return NO;
 }
 
-- (void)showDownloadInitiatedWithCancelCallback:(void (^)(void))cancelDownload
+- (void)showDownloadInitiatedWithCancelCallback:(void (^)(void))__unused cancelDownload
 {
     NSLog(@"Downloading update...");
 }
@@ -129,15 +129,9 @@
     }
 }
 
-- (void)dismissUpdateInstallation:(SUUpdateInstallationType)installationType
+- (void)dismissUpdateInstallation
 {
     NSLog(@"Dismissing the installation.");
-    switch (installationType) {
-        case SUManualInstallationType:
-            break;
-        case SUAutomaticInstallationType:
-            break;
-    }
 }
 
 @end
