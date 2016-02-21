@@ -38,13 +38,11 @@
 @property (nonatomic) SUStatusController *checkingController;
 @property (nonatomic, copy) void (^cancelUpdateCheck)(void); // temporary
 
-@property (nonatomic) SUUpdateAlert *updateAlert;
+@property (nonatomic, weak) SUWindowController *activeUpdateAlert;
 
 @property (nonatomic) SUStatusController *statusController;
 @property (nonatomic, copy) void (^cancelDownload)(void); // temporary
 @property (nonatomic, copy) void (^installAndRestart)(void); // temporary
-
-@property (nonatomic) SUAutomaticUpdateAlert *automaticUpdateAlert;
 
 @property (nonatomic, copy) void (^applicationWillTerminate)(void);
 
@@ -55,11 +53,10 @@
 @synthesize host = _host;
 @synthesize checkingController = _checkingController;
 @synthesize cancelUpdateCheck = _cancelUpdateCheck;
-@synthesize updateAlert = _updateAlert;
+@synthesize activeUpdateAlert = _activeUpdateAlert;
 @synthesize statusController = _statusController;
 @synthesize cancelDownload = _cancelDownload;
 @synthesize installAndRestart = _installAndRestart;
-@synthesize automaticUpdateAlert = _automaticUpdateAlert;
 @synthesize applicationWillTerminate = _applicationWillTerminate;
 
 - (instancetype)initWithHost:(SUHost *)host
@@ -78,37 +75,43 @@
     });
 }
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem versionDisplayer:(id<SUVersionDisplay>)versionDisplayer reply:(void (^)(SUUpdateAlertChoice))reply
+- (void)setupActiveFocusForWindow:(SUWindowController *)updateAlert
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host completionBlock:^(SUUpdateAlertChoice choice) {
-            reply(choice);
-            self.updateAlert = nil;
-        }];
+    // If the app is a menubar app or the like, we need to focus it first and alter the
+    // update prompt to behave like a normal window. Otherwise if the window were hidden
+    // there may be no way for the application to be activated to make it visible again.
+    if ([self.host isBackgroundApplication]) {
+        [updateAlert.window setHidesOnDeactivate:NO];
         
-        [self.updateAlert setVersionDisplayer:versionDisplayer];
-        
-        // If the app is a menubar app or the like, we need to focus it first and alter the
-        // update prompt to behave like a normal window. Otherwise if the window were hidden
-        // there may be no way for the application to be activated to make it visible again.
-        if ([self.host isBackgroundApplication]) {
-            [[self.updateAlert window] setHidesOnDeactivate:NO];
-            
-            [NSApp activateIgnoringOtherApps:YES];
-        }
-        
-        // Only show the update alert if the app is active; otherwise, we'll wait until it is.
-        if ([NSApp isActive])
-            [[self.updateAlert window] makeKeyAndOrderFront:self];
-        else
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
-    });
+        [NSApp activateIgnoringOtherApps:YES];
+    }
+    
+    // We also need to keep the window controller alive until the user makes their decision anyway
+    self.activeUpdateAlert = updateAlert;
+    
+    // Only show the update alert if the app is active; otherwise, we'll wait until it is.
+    if ([NSApp isActive])
+        [updateAlert.window makeKeyAndOrderFront:self];
+    else
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)__unused aNotification
 {
-    [[self.updateAlert window] makeKeyAndOrderFront:self];
+    [self.activeUpdateAlert.window makeKeyAndOrderFront:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
+}
+
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem versionDisplayer:(id<SUVersionDisplay>)versionDisplayer reply:(void (^)(SUUpdateAlertChoice))reply
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        SUUpdateAlert *updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host completionBlock:^(SUUpdateAlertChoice choice) {
+            reply(choice);
+            self.activeUpdateAlert = nil;
+        }];
+        [updateAlert setVersionDisplayer:versionDisplayer];
+        [self setupActiveFocusForWindow:updateAlert];
+    });
 }
 
 - (void)showExtractionFinishedAndReadyToInstallAndRelaunch:(void (^)(void))installUpdateAndRelaunch
@@ -326,27 +329,13 @@
 - (void)requestAutomaticUpdatePermissionWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUAutomaticInstallationChoice))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.automaticUpdateAlert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host completionBlock:reply];
+        SUAutomaticUpdateAlert *updateAlert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host completionBlock:^(SUAutomaticInstallationChoice choice) {
+            reply(choice);
+            self.activeUpdateAlert = nil;
+        }];
         
-        // If the app is a menubar app or the like, we need to focus it first and alter the
-        // update prompt to behave like a normal window. Otherwise if the window were hidden
-        // there may be no way for the application to be activated to make it visible again.
-        if ([self.host isBackgroundApplication]) {
-            [[self.automaticUpdateAlert window] setHidesOnDeactivate:NO];
-            [NSApp activateIgnoringOtherApps:YES];
-        }
-        
-        if ([NSApp isActive])
-            [[self.automaticUpdateAlert window] makeKeyAndOrderFront:self];
-        else
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(automaticApplicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
+        [self setupActiveFocusForWindow:updateAlert];
     });
-}
-
-- (void)automaticApplicationDidBecomeActive:(NSNotification *)__unused notification
-{
-    [[self.automaticUpdateAlert window] makeKeyAndOrderFront:self];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
 - (void)startListeningForTermination:(void (^)(void))applicationWillTerminate
