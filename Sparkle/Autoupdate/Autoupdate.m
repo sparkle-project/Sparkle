@@ -8,9 +8,14 @@
 #include <unistd.h>
 
 /*!
- * Time this app uses to recheck if the parent has already died.
+ * Time this app uses to recheck if the host app has already died.
  */
 static const NSTimeInterval SUParentQuitCheckInterval = .25;
+
+/*!
+ * Timeout to wait until the host app has died.
+ */
+static const NSTimeInterval SUParentQuitTimeoutInterval = 30.0;
 
 @interface TerminationListener : NSObject
 
@@ -22,6 +27,7 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
 
 @property (nonatomic, assign) pid_t processIdentifier;
 @property (nonatomic, strong) NSTimer *watchdogTimer;
+@property (nonatomic, strong) NSTimer *timeoutTimer;
 
 @end
 
@@ -29,6 +35,7 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
 
 @synthesize processIdentifier = _processIdentifier;
 @synthesize watchdogTimer = _watchdogTimer;
+@synthesize timeoutTimer = _timeoutTimer;
 
 - (instancetype)initWithProcessId:(pid_t)pid
 {
@@ -41,28 +48,40 @@ static const NSTimeInterval SUParentQuitCheckInterval = .25;
     return self;
 }
 
-- (void)cleanupWithCompletion:(void (^)(void))completionBlock
+- (void)cleanupWithSuccess:(BOOL)success completion:(void (^)(BOOL))completionBlock
 {
     [self.watchdogTimer invalidate];
-    completionBlock();
+    [self.timeoutTimer invalidate];
+    
+    completionBlock(success);
 }
 
-- (void)startListeningWithCompletion:(void (^)(void))completionBlock
+- (void)startListeningWithCompletion:(void (^)(BOOL))completionBlock
 {
 #warning Review this code later as well
     // Parent process may not be the app we're installing, so don't rely on that
     //BOOL alreadyTerminated = (getppid() == 1); // ppid is launchd (1) => parent terminated already
     BOOL alreadyTerminated = (kill(self.processIdentifier, 0) != 0);
-    if (alreadyTerminated)
-        [self cleanupWithCompletion:completionBlock];
-    else
+    if (alreadyTerminated) {
+        [self cleanupWithSuccess:YES completion:completionBlock];
+    } else {
         self.watchdogTimer = [NSTimer scheduledTimerWithTimeInterval:SUParentQuitCheckInterval target:self selector:@selector(watchdog:) userInfo:completionBlock repeats:YES];
+        
+        self.timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:SUParentQuitTimeoutInterval target:self selector:@selector(timeout:) userInfo:completionBlock repeats:NO];
+    }
 }
 
 - (void)watchdog:(NSTimer *)timer
 {
     if (![NSRunningApplication runningApplicationWithProcessIdentifier:self.processIdentifier]) {
-        [self cleanupWithCompletion:timer.userInfo];
+        [self cleanupWithSuccess:YES completion:timer.userInfo];
+    }
+}
+
+- (void)timeout:(NSTimer *)timer
+{
+    if (self.watchdogTimer.valid) {
+        [self cleanupWithSuccess:NO completion:timer.userInfo];
     }
 }
 
@@ -138,20 +157,26 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 
 - (void)applicationDidFinishLaunching:(NSNotification __unused *)notification
 {
-    [self.terminationListener startListeningWithCompletion:^{
+    [self.terminationListener startListeningWithCompletion:^(BOOL success){
         self.terminationListener = nil;
-		
-        if (self.shouldShowUI) {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUInstallationTimeLimit * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-				if (!self.isTerminating) {
-					// Show app icon in the dock
-					ProcessSerialNumber psn = { 0, kCurrentProcess };
-					TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-				}
-            });
-        }
         
-        [self install];
+        if (!success) {
+            // We should just give up now - should we show an alert though??
+            SULog(@"Timed out waiting for target to terminate. Target path is %@", self.hostPath);
+            [self cleanupAndExit];
+        } else {
+            if (self.shouldShowUI) {
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUInstallationTimeLimit * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    if (!self.isTerminating) {
+                        // Show app icon in the dock
+                        ProcessSerialNumber psn = { 0, kCurrentProcess };
+                        TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+                    }
+                });
+            }
+            
+            [self install];
+        }
     }];
 }
 
@@ -197,20 +222,21 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
                        }];
 }
 
+- (void)cleanupAndExit __attribute__((noreturn))
+{
+    NSError *theError = nil;
+    if (![[NSFileManager defaultManager] removeItemAtPath:self.updateFolderPath error:&theError]) {
+        SULog(@"Couldn't remove update folder: %@.", theError);
+    }
+    
+    [[NSFileManager defaultManager] removeItemAtPath:[[NSBundle mainBundle] bundlePath] error:NULL];
+    
+    exit(EXIT_SUCCESS);
+}
+
 - (void)cleanupAndTerminateWithPathToRelaunch:(NSString *)relaunchPath
 {
     self.isTerminating = YES;
-    
-    dispatch_block_t cleanupAndExit = ^{
-        NSError *theError = nil;
-        if (![[NSFileManager defaultManager] removeItemAtPath:self.updateFolderPath error:&theError]) {
-            SULog(@"Couldn't remove update folder: %@.", theError);
-        }
-        
-        [[NSFileManager defaultManager] removeItemAtPath:[[NSBundle mainBundle] bundlePath] error:NULL];
-        
-        exit(EXIT_SUCCESS);
-    };
     
     if (self.shouldRelaunch) {
         // The auto updater can terminate before the newly updated app is finished launching
@@ -230,10 +256,10 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         // that the updated app will be brought up front
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUTerminationTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            cleanupAndExit();
+            [self cleanupAndExit];
         });
     } else {
-        cleanupAndExit();
+        [self cleanupAndExit];
     }
 }
 
