@@ -118,6 +118,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 @synthesize shouldRelaunch = _shouldRelaunch;
 @synthesize shouldShowUI = _shouldShowUI;
 @synthesize isTerminating = _isTerminating;
+@synthesize installationBeacon = _installationBeacon;
 
 - (instancetype)initWithHostPath:(NSString *)hostPath relaunchPath:(NSString *)relaunchPath parentProcessId:(pid_t)parentProcessId updateFolderPath:(NSString *)updateFolderPath shouldRelaunch:(BOOL)shouldRelaunch shouldShowUI:(BOOL)shouldShowUI
 {
