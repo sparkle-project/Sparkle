@@ -15,10 +15,25 @@ BOOL SUShouldUseXPCInstaller(void)
 {
     if (![SUCodeSigningVerifier hostApplicationIsSandboxed])
         return NO;
+ 
+    NSDirectoryEnumerator *enumerator = [[NSFileManager defaultManager] enumeratorAtURL:[NSBundle mainBundle].bundleURL
+                                                             includingPropertiesForKeys:nil
+                                                                                options:NSDirectoryEnumerationSkipsHiddenFiles
+                                                                           errorHandler:nil];
+    BOOL hasXPC = NO;
+    for (NSURL *URL in enumerator)
+    {
+        if (![URL.lastPathComponent isEqualToString:@"com.devmate.UpdateInstaller.xpc"])
+            continue;
+        
+        if (![[URL URLByDeletingLastPathComponent].lastPathComponent isEqualToString:@"XPCServices"])
+            continue;
+        
+        hasXPC = YES;
+        break;
+    }
     
-    NSString *xpcServicePrefixPath = [[NSBundle mainBundle] bundlePath];
-    NSString *xpcServiceSuffixPath = @"Contents/XPCServices/com.devmate.UpdateInstaller.xpc";
-    return [[NSFileManager defaultManager] fileExistsAtPath:[xpcServicePrefixPath stringByAppendingPathComponent:xpcServiceSuffixPath]];
+    return hasXPC;
 }
 
 @implementation SUXPCInstaller

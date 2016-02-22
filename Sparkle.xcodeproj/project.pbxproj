@@ -108,11 +108,11 @@
 		331726DD1B4D625A008B2D77 /* SUWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 61180BC90D64138900B4E0D1 /* SUWindowController.m */; };
 		331726E21B4D66EE008B2D77 /* DevMateSparkle.h in Headers */ = {isa = PBXBuildFile; fileRef = 331726DF1B4D6438008B2D77 /* DevMateSparkle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		331726E31B4D697E008B2D77 /* SUUpdaterLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 331726E11B4D65AA008B2D77 /* SUUpdaterLoader.m */; };
-		33545B8D1B4679080059250D /* com.devmate.UpdateInstaller.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 33545B811B4679080059250D /* com.devmate.UpdateInstaller.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3329D9C41C7B03B800F1B058 /* com.devmate.UpdateInstaller.xpc in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33545B811B4679080059250D /* com.devmate.UpdateInstaller.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3329D9C61C7B217C00F1B058 /* com.devmate.UpdateInstaller.xpc in Copy XPC services */ = {isa = PBXBuildFile; fileRef = 33545B811B4679080059250D /* com.devmate.UpdateInstaller.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		33545B921B4679810059250D /* install_service.m in Sources */ = {isa = PBXBuildFile; fileRef = 33545B771B46774D0059250D /* install_service.m */; };
 		33545B931B4687CD0059250D /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
 		33545B941B468A160059250D /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
-		33545B951B468A280059250D /* (null) in Sources */ = {isa = PBXBuildFile; };
 		33545B961B468A730059250D /* SUPlainInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5040DAE8AB80026945C /* SUPlainInstaller.m */; };
 		33545B971B468ABB0059250D /* SUCodeSigningVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B078CD15A5FB6100600039 /* SUCodeSigningVerifier.m */; };
 		33545B981B468AC80059250D /* SUInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5000DAE88B40026945C /* SUInstaller.m */; };
@@ -367,7 +367,7 @@
 			remoteGlobalIDString = 331726741B4D36F2008B2D77;
 			remoteInfo = DevMateSparkle_lib_resources;
 		};
-		33545B8B1B4679080059250D /* PBXContainerItemProxy */ = {
+		3329D9C11C7B03A700F1B058 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
@@ -426,15 +426,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		33545B911B4679080059250D /* Embed XPC Services */ = {
+		3329D9C31C7B03AD00F1B058 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
 			dstSubfolderSpec = 16;
 			files = (
-				33545B8D1B4679080059250D /* com.devmate.UpdateInstaller.xpc in Embed XPC Services */,
+				3329D9C41C7B03B800F1B058 /* com.devmate.UpdateInstaller.xpc in CopyFiles */,
 			);
-			name = "Embed XPC Services";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3329D9C51C7B216500F1B058 /* Copy XPC services */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
+			dstSubfolderSpec = 16;
+			files = (
+				3329D9C61C7B217C00F1B058 /* com.devmate.UpdateInstaller.xpc in Copy XPC services */,
+			);
+			name = "Copy XPC services";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		61B5FB4D09C4E9FA00B25A18 /* Copy Frameworks */ = {
@@ -1387,6 +1397,7 @@
 				331726731B4D36F2008B2D77 /* Resources */,
 				331726871B4D37B6008B2D77 /* Headers */,
 				331726921B4D37FA008B2D77 /* Run Script: Update Locales */,
+				3329D9C51C7B216500F1B058 /* Copy XPC services */,
 			);
 			buildRules = (
 			);
@@ -1496,13 +1507,11 @@
 				61B5F8FF09C4CEE200B25A18 /* Sources */,
 				61B5F90009C4CEE200B25A18 /* Frameworks */,
 				61B5FB4D09C4E9FA00B25A18 /* Copy Frameworks */,
-				33545B911B4679080059250D /* Embed XPC Services */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				61B5F91C09C4CF7200B25A18 /* PBXTargetDependency */,
-				33545B8C1B4679080059250D /* PBXTargetDependency */,
 			);
 			name = "Sparkle Test App";
 			productName = "Test Application";
@@ -1521,10 +1530,12 @@
 				6131B1910DDCDE32005215F0 /* Run Script: Set Git Version Info */,
 				6195D4B40E40505A00D41A50 /* Run Script: Link fr_CA to fr */,
 				61E31A85103299750051D188 /* Run Script: Link pt to pt_BR */,
+				3329D9C31C7B03AD00F1B058 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				3329D9C21C7B03A700F1B058 /* PBXTargetDependency */,
 				55C14F97136F044100649790 /* PBXTargetDependency */,
 			);
 			name = Sparkle;
@@ -1857,7 +1868,6 @@
 				336475D11C5B984200813E67 /* SUOperatingSystem.m in Sources */,
 				33545B991B468AD60059250D /* SUGuidedPackageInstaller.m in Sources */,
 				33545B9A1B468AE30059250D /* SUPackageInstaller.m in Sources */,
-				33545B951B468A280059250D /* (null) in Sources */,
 				33545B961B468A730059250D /* SUPlainInstaller.m in Sources */,
 				33545B941B468A160059250D /* SULog.m in Sources */,
 				33545B921B4679810059250D /* install_service.m in Sources */,
@@ -2048,10 +2058,10 @@
 			target = 331726741B4D36F2008B2D77 /* DevMateSparkle_lib_resources */;
 			targetProxy = 331726B71B4D61A8008B2D77 /* PBXContainerItemProxy */;
 		};
-		33545B8C1B4679080059250D /* PBXTargetDependency */ = {
+		3329D9C21C7B03A700F1B058 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 33545B801B4679080059250D /* Installation XPC Service */;
-			targetProxy = 33545B8B1B4679080059250D /* PBXContainerItemProxy */;
+			targetProxy = 3329D9C11C7B03A700F1B058 /* PBXContainerItemProxy */;
 		};
 		55C14F97136F044100649790 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
