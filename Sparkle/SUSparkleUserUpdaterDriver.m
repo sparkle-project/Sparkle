@@ -210,11 +210,6 @@
     });
 }
 
-- (BOOL)showsUpdateErrorModally
-{
-    return YES;
-}
-
 - (void)showUpdateNotFound
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -224,11 +219,6 @@
         [alert addButtonWithTitle:SULocalizedString(@"OK", nil)];
         [self showAlert:alert];
     });
-}
-
-- (BOOL)showsUpdateNotFoundModally
-{
-    return YES;
 }
 
 - (void)showAlert:(NSAlert *)alert
