@@ -28,10 +28,7 @@
 - (void)showAutomaticUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUAutomaticInstallationChoice))reply;
 
 - (void)showUpdateNotFound;
-- (BOOL)showsUpdateNotFoundModally;
-
 - (void)showUpdaterError:(NSError *)error;
-- (BOOL)showsUpdateErrorModally;
 
 - (void)showDownloadInitiatedWithCancelCallback:(void (^)(void))cancelDownload;
 - (void)showDownloadDidReceiveResponse:(NSURLResponse *)response;

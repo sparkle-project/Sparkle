@@ -54,19 +54,9 @@
     NSLog(@":( there was no new update");
 }
 
-- (BOOL)showsUpdateNotFoundModally
-{
-    return NO;
-}
-
 - (void)showUpdaterError:(NSError *)error
 {
     NSLog(@"Update error: %@", error);
-}
-
-- (BOOL)showsUpdateErrorModally
-{
-    return NO;
 }
 
 - (void)showDownloadInitiatedWithCancelCallback:(void (^)(void))__unused cancelDownload
