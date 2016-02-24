@@ -221,7 +221,11 @@
 - (void)showAlert:(NSAlert *)alert
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.delegate userUpdaterDriverWillShowModalAlert:self];
+        id <SUModalAlertDelegate> delegate = self.delegate;
+        
+        if ([delegate respondsToSelector:@selector(userUpdaterDriverWillShowModalAlert:)]) {
+            [delegate userUpdaterDriverWillShowModalAlert:self];
+        }
         
         // When showing a modal alert we need to ensure that background applications
         // are focused to inform the user since there is no dock icon to notify them.
@@ -230,7 +234,9 @@
         [alert setIcon:[self.host icon]];
         [alert runModal];
         
-        [self.delegate userUpdaterDriverDidShowModalAlert:self];
+        if ([delegate respondsToSelector:@selector(userUpdaterDriverDidShowModalAlert:)]) {
+            [delegate userUpdaterDriverDidShowModalAlert:self];
+        }
     });
 }
 
