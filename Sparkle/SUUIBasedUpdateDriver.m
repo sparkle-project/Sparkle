@@ -53,7 +53,9 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
     if (!self.automaticallyInstallUpdates) {
-        [self.updater.userUpdaterDriver showUpdateNotFound];
+        [self showNotice:^{
+            [self.updater.userUpdaterDriver showUpdateNotFound];
+        }];
         
         [self abortUpdate];
     }
@@ -150,9 +152,25 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    [self.updater.userUpdaterDriver showUpdaterError:error];
+    [self showNotice:^{
+        [self.updater.userUpdaterDriver showUpdaterError:error];
+    }];
     
     [super abortUpdateWithError:error];
+}
+
+// Calling deprecated modal alert methods just to preserve backwards compatibility
+- (void)showNotice:(void (^)(void))noticeHandler
+{
+    if ([[self.updater delegate] respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
+        [[self.updater delegate] updaterWillShowModalAlert:self.updater];
+    }
+    
+    noticeHandler();
+    
+    if ([[self.updater delegate] respondsToSelector:@selector(updaterDidShowModalAlert:)]) {
+        [[self.updater delegate] updaterDidShowModalAlert:self.updater];
+    }
 }
 
 @end
