@@ -54,6 +54,7 @@
 
 @synthesize host = _host;
 @synthesize handlesTermination = _handlesTermination;
+@synthesize delegate = _delegate;
 @synthesize checkingController = _checkingController;
 @synthesize cancelUpdateCheck = _cancelUpdateCheck;
 @synthesize activeUpdateAlert = _activeUpdateAlert;
@@ -63,19 +64,15 @@
 @synthesize applicationWillTerminate = _applicationWillTerminate;
 @synthesize finishTermination = _finishTermination;
 
-- (instancetype)initWithHost:(SUHost *)host handlesTermination:(BOOL)handlesTermination
+- (instancetype)initWithHost:(SUHost *)host handlesTermination:(BOOL)handlesTermination delegate:(id<SUModalAlertDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
         _host = host;
         _handlesTermination = handlesTermination;
+        _delegate = delegate;
     }
     return self;
-}
-
-- (instancetype)initWithHost:(SUHost *)host
-{
-    return [self initWithHost:host handlesTermination:YES];
 }
 
 - (void)requestUpdatePermissionWithSystemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply
@@ -224,12 +221,16 @@
 - (void)showAlert:(NSAlert *)alert
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self.delegate userUpdaterDriverWillShowModalAlert:self];
+        
         // When showing a modal alert we need to ensure that background applications
         // are focused to inform the user since there is no dock icon to notify them.
         if ([self.host isBackgroundApplication]) { [NSApp activateIgnoringOtherApps:YES]; }
         
         [alert setIcon:[self.host icon]];
         [alert runModal];
+        
+        [self.delegate userUpdaterDriverDidShowModalAlert:self];
     });
 }
 

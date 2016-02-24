@@ -324,22 +324,6 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (NSString *)pathToRelaunchForUpdater:(SUUpdater *)updater;
 
 /*!
-    Called before an updater shows a modal alert window,
-    to give the host the opportunity to hide attached windows that may get in the way.
-
-    \param updater The SUUpdater instance.
- */
-- (void)updaterWillShowModalAlert:(SUUpdater *)updater;
-
-/*!
-    Called after an updater shows a modal alert window,
-    to give the host the opportunity to hide attached windows that may get in the way.
-
-    \param updater The SUUpdater instance.
- */
-- (void)updaterDidShowModalAlert:(SUUpdater *)updater;
-
-/*!
     Called when an update is scheduled to be silently installed on quit.
 
     \param updater The SUUpdater instance.

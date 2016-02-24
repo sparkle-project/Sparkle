@@ -143,7 +143,7 @@
 
 - (void)windowDidLoad
 {
-    self.updater.userUpdaterDriver = [[SUSparkleUserUpdaterDriver alloc] initWithHost:[[SUHost alloc] initWithBundle:[NSBundle mainBundle]]];
+    self.updater.userUpdaterDriver = [[SUSparkleUserUpdaterDriver alloc] initWithHost:[[SUHost alloc] initWithBundle:[NSBundle mainBundle]] handlesTermination:YES delegate:nil];
     //self.updater.userUpdaterDriver = [[SULoggerUpdateDriver alloc] init];
 }
 

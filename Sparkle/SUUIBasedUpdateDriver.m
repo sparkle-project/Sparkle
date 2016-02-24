@@ -53,9 +53,7 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
     if (!self.automaticallyInstallUpdates) {
-        [self showNotice:^{
-            [self.updater.userUpdaterDriver showUpdateNotFound];
-        }];
+        [self.updater.userUpdaterDriver showUpdateNotFound];
         
         [self abortUpdate];
     }
@@ -152,31 +150,9 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    [self showNotice:^{
-        [self.updater.userUpdaterDriver showUpdaterError:error];
-    }];
+    [self.updater.userUpdaterDriver showUpdaterError:error];
     
     [super abortUpdateWithError:error];
-}
-
-#warning think of a proper solution..
-// These delegate methods to show a modal alert are troublesome
-// The user driver may not actually show a modal alert (although our default provided one does)
-// We also don't want the user driver to have a reference to the delegate because the user driver
-// can live in a separate process, so that's no good either. The user driver methods all need to be
-// async and have void return types for XPC, so asking the user driver if it will show an alert modally can get complex
-// Furthermore it's possible the user driver can bring up a modal alert in other scenarios out of our control
-- (void)showNotice:(void (^)(void))noticeHandler
-{
-    if ([[self.updater delegate] respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
-        [[self.updater delegate] updaterWillShowModalAlert:self.updater];
-    }
-    
-    noticeHandler();
-    
-    if ([[self.updater delegate] respondsToSelector:@selector(updaterDidShowModalAlert:)]) {
-        [[self.updater delegate] updaterDidShowModalAlert:self.updater];
-    }
 }
 
 @end

@@ -11,11 +11,21 @@
 
 @class SUHost;
 
+@protocol SUModalAlertDelegate <NSObject>
+
+@optional
+
+- (void)userUpdaterDriverWillShowModalAlert:(id <SUUserUpdaterDriver>)userUpdaterDriver;
+
+- (void)userUpdaterDriverDidShowModalAlert:(id <SUUserUpdaterDriver>)userUpdaterDriver;
+
+@end
+
 @interface SUSparkleUserUpdaterDriver : NSObject <SUUserUpdaterDriver>
 
-- (instancetype)initWithHost:(SUHost *)host handlesTermination:(BOOL)handlesTermination;
-- (instancetype)initWithHost:(SUHost *)host;
+- (instancetype)initWithHost:(SUHost *)host handlesTermination:(BOOL)handlesTermination delegate:(id <SUModalAlertDelegate>)delegate;
 
+@property (nonatomic, readonly, weak) id <SUModalAlertDelegate> delegate;
 @property (nonatomic, readonly, getter = isInstallingOnTermination) BOOL installingOnTermination;
 
 - (void)sendTerminationSignalWithCompletion:(void (^)(void))finishTermination;
