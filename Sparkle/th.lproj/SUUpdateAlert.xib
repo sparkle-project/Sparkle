@@ -41,7 +41,7 @@
                             <constraint firstAttribute="height" priority="800" constant="64" id="aXh-vN-k5u"/>
                         </constraints>
                         <animations/>
-                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSApplicationIcon" id="168"/>
+                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="NSApplicationIcon" id="168"/>
                         <connections>
                             <binding destination="-2" name="value" keyPath="applicationIcon" id="9"/>
                         </connections>
