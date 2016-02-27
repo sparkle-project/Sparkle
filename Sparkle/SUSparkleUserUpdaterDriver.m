@@ -36,6 +36,9 @@
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly) BOOL handlesTermination;
 
+@property (nonatomic) NSTimer *checkUpdateTimer;
+@property (nonatomic, copy) void (^checkForUpdatesReply)(SUUpdateCheckTimerStatus);
+
 @property (nonatomic) SUStatusController *checkingController;
 @property (nonatomic, copy) void (^updateCheckStatusCompletion)(SUUserInitiatedCheckStatus);
 
@@ -57,6 +60,8 @@
 @synthesize host = _host;
 @synthesize handlesTermination = _handlesTermination;
 @synthesize delegate = _delegate;
+@synthesize checkUpdateTimer = _checkUpdateTimer;
+@synthesize checkForUpdatesReply = _checkForUpdatesReply;
 @synthesize checkingController = _checkingController;
 @synthesize updateCheckStatusCompletion = _updateCheckStatusCompletion;
 @synthesize activeUpdateAlert = _activeUpdateAlert;
@@ -78,6 +83,44 @@
         _delegate = delegate;
     }
     return self;
+}
+
+#pragma mark Check Updates Timer
+
+- (void)checkForUpdates:(NSTimer *)__unused timer
+{
+    if (self.checkForUpdatesReply != nil) {
+        self.checkForUpdatesReply(SUCheckForUpdateNow);
+        self.checkForUpdatesReply = nil;
+    }
+}
+
+- (void)startUpdateCheckTimerWithNextTimeInterval:(NSTimeInterval)timeInterval reply:(void (^)(SUUpdateCheckTimerStatus))reply
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.checkForUpdatesReply = reply;
+        self.checkUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:timeInterval target:self selector:@selector(checkForUpdates:) userInfo:nil repeats:NO];
+    });
+}
+
+- (void)_invalidateUpdateCheckTimer
+{
+    if (self.checkUpdateTimer != nil) {
+        [self.checkUpdateTimer invalidate];
+        self.checkUpdateTimer = nil;
+        
+        if (self.checkForUpdatesReply != nil) {
+            self.checkForUpdatesReply(SUCheckForUpdateWillOccurLater);
+            self.checkForUpdatesReply = nil;
+        }
+    }
+}
+
+- (void)invalidateUpdateCheckTimer
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self _invalidateUpdateCheckTimer];
+    });
 }
 
 #pragma mark Update Permission
@@ -464,6 +507,8 @@
 - (void)dismissUpdateInstallation
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self _invalidateUpdateCheckTimer];
+        
         [self cancelCheckForUpdates];
         [self cancelDownload];
         

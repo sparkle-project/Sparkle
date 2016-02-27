@@ -31,7 +31,6 @@ NSString *const SUUpdaterAppcastItemNotificationKey = @"SUUpdaterAppcastItemNoti
 NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotificationKey";
 
 @interface SUUpdater ()
-@property (strong) NSTimer *checkTimer;
 @property (strong) NSBundle *sparkleBundle;
 
 - (instancetype)initForBundle:(NSBundle *)bundle;
@@ -52,7 +51,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 @synthesize delegate;
 @synthesize userUpdaterDriver = _userUpdaterDriver;
-@synthesize checkTimer;
 @synthesize userAgentString = customUserAgentString;
 @synthesize httpHeaders;
 @synthesize driver;
@@ -220,11 +218,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 - (void)scheduleNextUpdateCheck
 {
-	if (self.checkTimer)
-	{
-        [self.checkTimer invalidate];
-        self.checkTimer = nil; // Timer is non-repeating, may have invalidated itself, so we had to retain it.
-    }
+    [self.userUpdaterDriver invalidateUpdateCheckTimer];
 	if (![self automaticallyChecksForUpdates]) return;
 
     // How long has it been since last we checked for an update?
@@ -233,14 +227,24 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     NSTimeInterval intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
 
     // Now we want to figure out how long until we check again.
-    NSTimeInterval delayUntilCheck, updateCheckInterval = [self updateCheckInterval];
+    NSTimeInterval updateCheckInterval = [self updateCheckInterval];
     if (updateCheckInterval < SUMinimumUpdateCheckInterval)
         updateCheckInterval = SUMinimumUpdateCheckInterval;
-    if (intervalSinceCheck < updateCheckInterval)
-        delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
-    else
-        delayUntilCheck = 0; // We're overdue! Run one now.
-    self.checkTimer = [NSTimer scheduledTimerWithTimeInterval:delayUntilCheck target:self selector:@selector(checkForUpdatesInBackground) userInfo:nil repeats:NO]; // Timer is non-repeating, may have invalidated itself, so we had to retain it.
+    if (intervalSinceCheck < updateCheckInterval) {
+        NSTimeInterval delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
+        [self.userUpdaterDriver startUpdateCheckTimerWithNextTimeInterval:delayUntilCheck reply:^(SUUpdateCheckTimerStatus checkTimerStatus) {
+            switch (checkTimerStatus) {
+                case SUCheckForUpdateNow:
+                    [self checkForUpdatesInBackground];
+                    break;
+                case SUCheckForUpdateWillOccurLater:
+                    break;
+            }
+        }];
+    } else {
+        // We're overdue! Run one now.
+        [self checkForUpdatesInBackground];
+    }
 }
 
 
@@ -346,7 +350,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (void)checkForUpdatesWithDriver:(SUUpdateDriver *)d
 {
 	if ([self updateInProgress]) { return; }
-	if (self.checkTimer) { [self.checkTimer invalidate]; self.checkTimer = nil; }		// Timer is non-repeating, may have invalidated itself, so we had to retain it.
+    
+    [self.userUpdaterDriver invalidateUpdateCheckTimer];
 
     [self willChangeValueForKey:@"lastUpdateCheckDate"];
     [self.host setObject:[NSDate date] forUserDefaultsKey:SULastCheckTimeKey];
@@ -572,7 +577,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (void)dealloc
 {
     [self unregisterAsObserver];
-	if (checkTimer) { [checkTimer invalidate]; }		// Timer is non-repeating, may have invalidated itself, so we had to retain it.
+    [self.userUpdaterDriver invalidateUpdateCheckTimer];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item

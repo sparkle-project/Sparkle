@@ -14,6 +14,11 @@
 
 @protocol SUVersionDisplay;
 
+typedef NS_ENUM(NSUInteger, SUUpdateCheckTimerStatus) {
+    SUCheckForUpdateNow,
+    SUCheckForUpdateWillOccurLater
+};
+
 typedef NS_ENUM(NSUInteger, SUUserInitiatedCheckStatus) {
     SUUserInitiatedCheckDone,
     SUUserInitiatedCheckCancelled
@@ -35,6 +40,9 @@ typedef NS_ENUM(NSUInteger, SUInstallUpdateStatus) {
 };
 
 @protocol SUUserUpdaterDriver <NSObject>
+
+- (void)startUpdateCheckTimerWithNextTimeInterval:(NSTimeInterval)timeInterval reply:(void (^)(SUUpdateCheckTimerStatus))reply;
+- (void)invalidateUpdateCheckTimer;
 
 #warning might need to whitelist class types for systemProfile.. need to test this
 - (void)requestUpdatePermissionWithSystemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply;
