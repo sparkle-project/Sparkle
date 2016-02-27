@@ -74,7 +74,7 @@
 
 #pragma mark Birth
 
-- (instancetype)initWithHost:(SUHost *)host handlesTermination:(BOOL)handlesTermination delegate:(id<SUModalAlertDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host handlesTermination:(BOOL)handlesTermination delegate:(id<SUSparkleUserUpdaterDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -87,18 +87,40 @@
 
 #pragma mark Check Updates Timer
 
+- (BOOL)isDelegateResponsibleForUpdateChecking
+{
+    BOOL result = NO;
+    if ([self.delegate respondsToSelector:@selector(responsibleForInitiatingUpdateCheckForUserDriver:)]) {
+        result = [self.delegate responsibleForInitiatingUpdateCheckForUserDriver:self];
+    }
+    return result;
+}
+
 - (void)checkForUpdates:(NSTimer *)__unused timer
 {
-    if (self.checkForUpdatesReply != nil) {
-        self.checkForUpdatesReply(SUCheckForUpdateNow);
-        self.checkForUpdatesReply = nil;
+    if ([self isDelegateResponsibleForUpdateChecking]) {
+        if ([self.delegate respondsToSelector:@selector(initiateUpdateCheckForUserDriver:)]) {
+            [self.delegate initiateUpdateCheckForUserDriver:self];
+        } else {
+            NSLog(@"Error: Delegate %@ for user driver %@ must implement initiateUpdateCheckForUserDriver: because it returned YES from responsibleForInitiatingUpdateCheckForUserDriver:", self.delegate, self);
+        }
+    } else {
+        if (self.checkForUpdatesReply != nil) {
+            self.checkForUpdatesReply(SUCheckForUpdateNow);
+            self.checkForUpdatesReply = nil;
+        }
     }
 }
 
 - (void)startUpdateCheckTimerWithNextTimeInterval:(NSTimeInterval)timeInterval reply:(void (^)(SUUpdateCheckTimerStatus))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.checkForUpdatesReply = reply;
+        if ([self isDelegateResponsibleForUpdateChecking]) {
+            reply(SUCheckForUpdateWillOccurLater);
+        } else {
+            self.checkForUpdatesReply = reply;
+        }
+        
         self.checkUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:timeInterval target:self selector:@selector(checkForUpdates:) userInfo:nil repeats:NO];
     });
 }
@@ -308,7 +330,7 @@
 - (void)showAlert:(NSAlert *)alert
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        id <SUModalAlertDelegate> delegate = self.delegate;
+        id <SUSparkleUserUpdaterDriverDelegate> delegate = self.delegate;
         
         if ([delegate respondsToSelector:@selector(userUpdaterDriverWillShowModalAlert:)]) {
             [delegate userUpdaterDriverWillShowModalAlert:self];
