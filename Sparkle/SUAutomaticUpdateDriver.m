@@ -42,7 +42,9 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     self.interruptible = NO;
     
     [self.updater.userUpdaterDriver showAutomaticUpdateFoundWithAppcastItem:self.updateItem reply:^(SUAutomaticInstallationChoice choice) {
-        [self automaticUpdateAlertFinishedWithChoice:choice];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self automaticUpdateAlertFinishedWithChoice:choice];
+        });
     }];
 }
 

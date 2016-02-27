@@ -234,10 +234,12 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         NSTimeInterval delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
         [self.userUpdaterDriver startUpdateCheckTimerWithNextTimeInterval:delayUntilCheck reply:^(SUUpdateCheckTimerStatus checkTimerStatus) {
             switch (checkTimerStatus) {
-                case SUCheckForUpdateNow:
-                    [self checkForUpdatesInBackground];
-                    break;
                 case SUCheckForUpdateWillOccurLater:
+                    break;
+                case SUCheckForUpdateNow:
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self checkForUpdatesInBackground];
+                    });
                     break;
             }
         }];
