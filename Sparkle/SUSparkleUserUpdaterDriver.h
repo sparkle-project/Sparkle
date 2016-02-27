@@ -26,7 +26,7 @@
 - (instancetype)initWithHost:(SUHost *)host handlesTermination:(BOOL)handlesTermination delegate:(id <SUModalAlertDelegate>)delegate;
 
 @property (nonatomic, readonly, weak) id <SUModalAlertDelegate> delegate;
-@property (nonatomic, readonly, getter = isInstallingOnTermination) BOOL installingOnTermination;
+@property (nonatomic, readonly, getter = isInstallingUpdateOnTermination) BOOL installingUpdateOnTermination;
 
 - (void)sendTerminationSignalWithCompletion:(void (^)(void))finishTermination;
 

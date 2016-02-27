@@ -14,12 +14,32 @@
 
 @protocol SUVersionDisplay;
 
+typedef NS_ENUM(NSUInteger, SUUserInitiatedCheckStatus) {
+    SUUserInitiatedCheckDone,
+    SUUserInitiatedCheckCancelled
+};
+
+typedef NS_ENUM(NSUInteger, SUDownloadUpdateStatus) {
+    SUDownloadUpdateDone,
+    SUDownloadUpdateCancelled
+};
+
+typedef NS_ENUM(NSUInteger, SUApplicationTerminationStatus) {
+    SUApplicationWillTerminate,
+    SUApplicationStoppedObservingTermination
+};
+
+typedef NS_ENUM(NSUInteger, SUInstallUpdateStatus) {
+    SUInstallAndRelaunchUpdateNow,
+    SUCancelUpdateInstallation
+};
+
 @protocol SUUserUpdaterDriver <NSObject>
 
 #warning might need to whitelist class types for systemProfile.. need to test this
 - (void)requestUpdatePermissionWithSystemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply;
 
-- (void)showUserInitiatedUpdateCheckWithCancelCallback:(void (^)(void))cancelUpdateCheck;
+- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SUUserInitiatedCheckStatus))updateCheckStatusCompletion;
 - (void)dismissUserInitiatedUpdateCheck;
 
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem versionDisplayer:(id<SUVersionDisplay>)versionDisplayer reply:(void (^)(SUUpdateAlertChoice))reply;
@@ -30,17 +50,17 @@
 - (void)showUpdateNotFound;
 - (void)showUpdaterError:(NSError *)error;
 
-- (void)showDownloadInitiatedWithCancelCallback:(void (^)(void))cancelDownload;
+- (void)showDownloadInitiatedWithCompletion:(void (^)(SUDownloadUpdateStatus))downloadUpdateStatusCompletion;
 - (void)showDownloadDidReceiveResponse:(NSURLResponse *)response;
 - (void)showDownloadDidReceiveDataOfLength:(NSUInteger)length;
 - (void)showDownloadFinishedAndStartedExtractingUpdate;
 - (void)showExtractionReceivedProgress:(double)progress;
-- (void)showExtractionFinishedAndReadyToInstallAndRelaunch:(void (^)(void))installUpdateAndRelaunch;
+- (void)showExtractionFinishedAndReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))installUpdateHandler;
 
 - (void)showInstallingUpdate;
 
-- (void)registerForAppTermination:(void (^)(void))applicationWillTerminate;
-- (void)unregisterForAppTermination;
+- (void)registerApplicationTermination:(void (^)(SUApplicationTerminationStatus))applicationTerminationHandler;
+- (void)unregisterApplicationTermination;
 - (void)terminateApplication;
 
 - (void)dismissUpdateInstallation;

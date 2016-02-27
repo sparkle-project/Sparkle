@@ -46,10 +46,30 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     }];
 }
 
+- (void)installUpdateWithTerminationStatus:(NSNumber *)terminationStatus
+{
+    switch ((SUApplicationTerminationStatus)(terminationStatus.integerValue)) {
+        case SUApplicationStoppedObservingTermination:
+            if (self.willUpdateOnTermination) {
+                [self abortUpdate];
+            }
+            break;
+        case SUApplicationWillTerminate:
+            if (self.willUpdateOnTermination) {
+                [self installWithToolAndRelaunch:NO];
+            }
+            break;
+    }
+}
+
 - (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
 {
-    [self.updater.userUpdaterDriver registerForAppTermination:^{
-        [self installWithToolAndRelaunch:NO];
+    [self.updater.userUpdaterDriver registerApplicationTermination:^(SUApplicationTerminationStatus terminationStatus) {
+        // We use -performSelectorOnMainThread:withObject:waitUntilDone: rather than GCD because if we are on the main thread already,
+        // we don't want to run the operation asynchronously. It's also possible we aren't on the main thread (say due to IPC through a XPC service).
+        // Anyway, if we're on the main thread in a single process without the app delegate delaying termination,
+        // we could be terminating *really soon* - so we want to install the update quickly
+        [self performSelectorOnMainThread:@selector(installUpdateWithTerminationStatus:) withObject:@(terminationStatus) waitUntilDone:YES];
     }];
     
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(systemWillPowerOff:) name:NSWorkspaceWillPowerOffNotification object:nil];
@@ -88,11 +108,11 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 {
     if (self.willUpdateOnTermination)
     {
-        [self.updater.userUpdaterDriver unregisterForAppTermination];
+        self.willUpdateOnTermination = NO;
+        
+        [self.updater.userUpdaterDriver unregisterApplicationTermination];
         
         [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self name:NSWorkspaceWillPowerOffNotification object:nil];
-
-        self.willUpdateOnTermination = NO;
 
         id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
         if ([updaterDelegate respondsToSelector:@selector(updater:didCancelInstallUpdateOnQuit:)])

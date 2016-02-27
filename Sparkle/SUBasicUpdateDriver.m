@@ -228,11 +228,13 @@
 	{
         // Okay, something's really broken with this user's file structure.
         [self.download cancel];
+        self.download = nil;
+        
         [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Can't make a temporary directory for the update download at %@.", self.tempDir] }]];
+    } else {
+        self.downloadPath = [self.tempDir stringByAppendingPathComponent:name];
+        [self.download setDestination:self.downloadPath allowOverwrite:YES];
     }
-
-    self.downloadPath = [self.tempDir stringByAppendingPathComponent:name];
-    [self.download setDestination:self.downloadPath allowOverwrite:YES];
 }
 
 /**
@@ -321,7 +323,10 @@
 {
     assert(self.updateItem);
 
-    [self extractUpdate];
+    if (self.download != nil && self.downloadPath != nil) {
+        self.download = nil;
+        [self extractUpdate];
+    }
 }
 
 - (void)download:(NSURLDownload *)__unused download didFailWithError:(NSError *)error
@@ -558,6 +563,12 @@
         if (!success)
             [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[self.tempDir stringByDeletingLastPathComponent] destination:@"" files:@[[self.tempDir lastPathComponent]] tag:NULL];
     }
+    
+    if (self.download != nil) {
+        [self.download cancel];
+        self.download = nil;
+    }
+    self.downloadPath = nil;
 }
 
 - (void)installerForHost:(SUHost *)aHost failedWithError:(NSError *)error
@@ -593,9 +604,6 @@
             SULog(@"Error: %@ %@ (URL %@)", errorToDisplay.localizedDescription, errorToDisplay.localizedFailureReason, errorToDisplay.userInfo[NSURLErrorFailingURLErrorKey]);
             errorToDisplay = errorToDisplay.userInfo[NSUnderlyingErrorKey];
         } while(--finiteRecursion && errorToDisplay);
-    }
-    if (self.download) {
-        [self.download cancel];
     }
 
     // Notify host app that update has aborted

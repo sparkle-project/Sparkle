@@ -67,16 +67,22 @@
     switch (choice) {
         case SUInstallUpdateChoice:
         {
-            [self.updater.userUpdaterDriver showDownloadInitiatedWithCancelCallback:^{
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (self.download) {
-                        [self.download cancel];
-                        if ([[self.updater delegate] respondsToSelector:@selector(userDidCancelDownload:)]) {
-                            [[self.updater delegate] userDidCancelDownload:self.updater];
-                        }
-                    }
-                    [self abortUpdate];
-                });
+            [self.updater.userUpdaterDriver showDownloadInitiatedWithCompletion:^(SUDownloadUpdateStatus downloadCompletionStatus) {
+                switch (downloadCompletionStatus) {
+                    case SUDownloadUpdateDone:
+                        break;
+                    case SUDownloadUpdateCancelled:
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (self.download != nil) {
+                                if ([[self.updater delegate] respondsToSelector:@selector(userDidCancelDownload:)]) {
+                                    [[self.updater delegate] userDidCancelDownload:self.updater];
+                                }
+                                
+                                [self abortUpdate];
+                            }
+                        });
+                        break;
+                }
             }];
             
             [self downloadUpdate];
@@ -124,9 +130,16 @@
         return;
     }
     
-    [self.updater.userUpdaterDriver showExtractionFinishedAndReadyToInstallAndRelaunch:^{
+    [self.updater.userUpdaterDriver showExtractionFinishedAndReadyToInstallAndRelaunch:^(SUInstallUpdateStatus installUpdateStatus) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self installWithToolAndRelaunch:YES];
+            switch (installUpdateStatus) {
+                case SUCancelUpdateInstallation:
+                    [self abortUpdate];
+                    break;
+                case SUInstallAndRelaunchUpdateNow:
+                    [self installWithToolAndRelaunch:YES];
+                    break;
+            }
         });
     }];
 }

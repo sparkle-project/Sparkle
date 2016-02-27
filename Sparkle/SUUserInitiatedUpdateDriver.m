@@ -20,24 +20,32 @@
 
 @synthesize canceled;
 
-- (void)closeCheckingWindow
+- (void)dismissCheckingForUpdates
 {
     [self.updater.userUpdaterDriver dismissUserInitiatedUpdateCheck];
 }
 
 - (void)cancelCheckForUpdates:(id)__unused sender
 {
-    [self closeCheckingWindow];
-    self.canceled = YES;
+    if (!self.canceled) {
+        [self dismissCheckingForUpdates];
+        self.canceled = YES;
+    }
 }
 
 #warning assign user driver's host in a superclass of this method, possibly the UI driver.. IDK
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
 {
-    [self.updater.userUpdaterDriver showUserInitiatedUpdateCheckWithCancelCallback:^{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self cancelCheckForUpdates:nil];
-        });
+    [self.updater.userUpdaterDriver showUserInitiatedUpdateCheckWithCompletion:^(SUUserInitiatedCheckStatus completionStatus) {
+        switch (completionStatus) {
+            case SUUserInitiatedCheckDone:
+                break;
+            case SUUserInitiatedCheckCancelled:
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self cancelCheckForUpdates:nil];
+                });
+                break;
+        }
     }];
     
     [super checkForUpdatesAtURL:URL host:aHost];
@@ -50,19 +58,19 @@
         [self abortUpdate];
         return;
     }
-    [self closeCheckingWindow];
+    [self dismissCheckingForUpdates];
     [super appcastDidFinishLoading:ac];
 }
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    [self closeCheckingWindow];
+    [self dismissCheckingForUpdates];
     [super abortUpdateWithError:error];
 }
 
 - (void)abortUpdate
 {
-    [self closeCheckingWindow];
+    [self dismissCheckingForUpdates];
     [super abortUpdate];
 }
 

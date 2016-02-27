@@ -37,16 +37,18 @@
 @property (nonatomic, readonly) BOOL handlesTermination;
 
 @property (nonatomic) SUStatusController *checkingController;
-@property (nonatomic, copy) void (^cancelUpdateCheck)(void);
+@property (nonatomic, copy) void (^updateCheckStatusCompletion)(SUUserInitiatedCheckStatus);
 
 @property (nonatomic) SUWindowController *activeUpdateAlert;
 
 @property (nonatomic) SUStatusController *statusController;
-@property (nonatomic, copy) void (^cancelDownload)(void);
-@property (nonatomic, copy) void (^installAndRestart)(void);
+@property (nonatomic, copy) void (^downloadStatusCompletion)(SUDownloadUpdateStatus);
+@property (nonatomic, copy) void (^installUpdateHandler)(SUInstallUpdateStatus);
 
-@property (nonatomic, copy) void (^applicationWillTerminate)(void);
+@property (nonatomic, copy) void (^applicationTerminationHandler)(SUApplicationTerminationStatus);
 @property (nonatomic, copy) void (^finishTermination)(void);
+
+@property (nonatomic) BOOL installingUpdateOnTermination;
 
 @end
 
@@ -56,13 +58,16 @@
 @synthesize handlesTermination = _handlesTermination;
 @synthesize delegate = _delegate;
 @synthesize checkingController = _checkingController;
-@synthesize cancelUpdateCheck = _cancelUpdateCheck;
+@synthesize updateCheckStatusCompletion = _updateCheckStatusCompletion;
 @synthesize activeUpdateAlert = _activeUpdateAlert;
 @synthesize statusController = _statusController;
-@synthesize cancelDownload = _cancelDownload;
-@synthesize installAndRestart = _installAndRestart;
-@synthesize applicationWillTerminate = _applicationWillTerminate;
+@synthesize downloadStatusCompletion = _downloadStatusCompletion;
+@synthesize installUpdateHandler = _installUpdateHandler;
+@synthesize applicationTerminationHandler = _applicationTerminationHandler;
 @synthesize finishTermination = _finishTermination;
+@synthesize installingUpdateOnTermination = _installingUpdateOnTermination;
+
+#pragma mark Birth
 
 - (instancetype)initWithHost:(SUHost *)host handlesTermination:(BOOL)handlesTermination delegate:(id<SUModalAlertDelegate>)delegate
 {
@@ -75,6 +80,8 @@
     return self;
 }
 
+#pragma mark Update Permission
+
 - (void)requestUpdatePermissionWithSystemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -84,6 +91,8 @@
         [SUUpdatePermissionPrompt promptWithHost:self.host systemProfile:systemProfile reply:reply];
     });
 }
+
+#pragma mark Update Alert Focus
 
 - (void)setUpFocusForActiveUpdateAlert
 {
@@ -108,6 +117,8 @@
     [self.activeUpdateAlert.window makeKeyAndOrderFront:self];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
+
+#pragma mark Update Found
 
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem versionDisplayer:(id<SUVersionDisplay>)versionDisplayer reply:(void (^)(SUUpdateAlertChoice))reply
 {
@@ -138,7 +149,9 @@
     });
 }
 
-- (void)showExtractionFinishedAndReadyToInstallAndRelaunch:(void (^)(void))installUpdateAndRelaunch
+#pragma mark Install & Relaunch Update
+
+- (void)showExtractionFinishedAndReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))installUpdateHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.statusController beginActionWithTitle:SULocalizedString(@"Ready to Install", nil) maxProgressValue:1.0 statusText:nil];
@@ -148,22 +161,32 @@
         [[self.statusController window] makeKeyAndOrderFront:self];
         [NSApp requestUserAttention:NSInformationalRequest];
         
-        self.installAndRestart = installUpdateAndRelaunch;
+        self.installUpdateHandler = installUpdateHandler;
     });
 }
 
 - (void)installAndRestart:(id)__unused sender
 {
-    if (self.installAndRestart != nil) {
-        self.installAndRestart();
-        self.installAndRestart = nil;
+    if (self.installUpdateHandler != nil) {
+        self.installUpdateHandler(SUInstallAndRelaunchUpdateNow);
+        self.installUpdateHandler = nil;
     }
 }
 
-- (void)showUserInitiatedUpdateCheckWithCancelCallback:(void (^)(void))cancelUpdateCheck
+- (void)cancelInstallAndRestart
+{
+    if (self.installUpdateHandler != nil) {
+        self.installUpdateHandler(SUCancelUpdateInstallation);
+        self.installUpdateHandler = nil;
+    }
+}
+
+#pragma mark Check for Updates
+
+- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SUUserInitiatedCheckStatus))updateCheckStatusCompletion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.cancelUpdateCheck = cancelUpdateCheck;
+        self.updateCheckStatusCompletion = updateCheckStatusCompletion;
         
         self.checkingController = [[SUStatusController alloc] initWithHost:self.host];
         [[self.checkingController window] center]; // Force the checking controller to load its window.
@@ -180,18 +203,32 @@
     });
 }
 
+- (void)cancelCheckForUpdates
+{
+    if (self.updateCheckStatusCompletion != nil) {
+        self.updateCheckStatusCompletion(SUUserInitiatedCheckCancelled);
+        self.updateCheckStatusCompletion = nil;
+    }
+    
+    if (self.checkingController != nil)
+    {
+        [[self.checkingController window] close];
+        self.checkingController = nil;
+    }
+}
+
 - (void)cancelCheckForUpdates:(id)__unused sender
 {
-    if (self.cancelUpdateCheck != nil) {
-        self.cancelUpdateCheck();
-        self.cancelUpdateCheck = nil;
-    }
+    [self cancelCheckForUpdates];
 }
 
 - (void)dismissUserInitiatedUpdateCheck
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.cancelUpdateCheck = nil;
+        if (self.updateCheckStatusCompletion != nil) {
+            self.updateCheckStatusCompletion(SUUserInitiatedCheckDone);
+            self.updateCheckStatusCompletion = nil;
+        }
         
         if (self.checkingController != nil)
         {
@@ -200,6 +237,8 @@
         }
     });
 }
+
+#pragma mark Update Errors
 
 - (void)showUpdaterError:(NSError *)error
 {
@@ -245,10 +284,12 @@
     });
 }
 
-- (void)showDownloadInitiatedWithCancelCallback:(void (^)(void))cancelDownload
+#pragma mark Download & Install Updates
+
+- (void)showDownloadInitiatedWithCompletion:(void (^)(SUDownloadUpdateStatus))downloadUpdateStatusCompletion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.cancelDownload = cancelDownload;
+        self.downloadStatusCompletion = downloadUpdateStatusCompletion;
         
         self.statusController = [[SUStatusController alloc] initWithHost:self.host];
         [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
@@ -257,12 +298,17 @@
     });
 }
 
+- (void)cancelDownload
+{
+    if (self.downloadStatusCompletion != nil) {
+        self.downloadStatusCompletion(SUDownloadUpdateCancelled);
+        self.downloadStatusCompletion = nil;
+    }
+}
+
 - (void)cancelDownload:(id)__unused sender
 {
-    if (self.cancelDownload != nil) {
-        self.cancelDownload();
-        self.cancelDownload = nil;
-    }
+    [self cancelDownload];
 }
 
 - (void)showDownloadDidReceiveResponse:(NSURLResponse *)response
@@ -312,6 +358,11 @@
 - (void)showDownloadFinishedAndStartedExtractingUpdate
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.downloadStatusCompletion != nil) {
+            self.downloadStatusCompletion(SUDownloadUpdateDone);
+            self.downloadStatusCompletion = nil;
+        }
+        
         [self.statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
         [self.statusController setButtonEnabled:NO];
     });
@@ -336,13 +387,17 @@
     });
 }
 
-- (void)registerForAppTermination:(void (^)(void))applicationWillTerminate
+#pragma mark Application Death
+
+- (void)registerApplicationTermination:(void (^)(SUApplicationTerminationStatus))applicationTerminationHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        self.installingUpdateOnTermination = YES;
+        
         // Sudden termination is available on 10.6+
         [[NSProcessInfo processInfo] disableSuddenTermination];
         
-        self.applicationWillTerminate = applicationWillTerminate;
+        self.applicationTerminationHandler = applicationTerminationHandler;
         
         if (self.handlesTermination) {
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
@@ -350,54 +405,68 @@
     });
 }
 
-- (void)unregisterForAppTermination
+- (void)cancelObservingApplicationTermination
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
+    if (self.installingUpdateOnTermination) {
         [[NSProcessInfo processInfo] enableSuddenTermination];
         
         if (self.handlesTermination) {
             [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
         }
         
-        self.applicationWillTerminate = nil;
+        if (self.applicationTerminationHandler != nil) {
+            self.applicationTerminationHandler(SUApplicationStoppedObservingTermination);
+            self.applicationTerminationHandler = nil;
+        }
+        
+        self.installingUpdateOnTermination = NO;
+    }
+}
+
+- (void)unregisterApplicationTermination
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self cancelObservingApplicationTermination];
     });
 }
 
 - (void)applicationWillTerminate:(NSNotification *)__unused note
 {
-    // Pass an empty block instead of nil to indicate the app
-    // has already initiated termination
     [self sendTerminationSignalWithCompletion:^{}];
-}
-
-- (BOOL)isInstallingOnTermination
-{
-    return (self.applicationWillTerminate != nil);
 }
 
 - (void)sendTerminationSignalWithCompletion:(void (^)(void))finishTermination
 {
     self.finishTermination = finishTermination;
     
-    if (self.applicationWillTerminate) {
-        self.applicationWillTerminate();
+    if (self.applicationTerminationHandler != nil) {
+        self.applicationTerminationHandler(SUApplicationWillTerminate);
+        self.applicationTerminationHandler = nil;
     }
 }
 
 - (void)terminateApplication
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.finishTermination) {
-            self.finishTermination();
+        if (self.installingUpdateOnTermination && !self.handlesTermination) {
+            if (self.finishTermination != nil) {
+                self.finishTermination();
+                self.finishTermination = nil;
+            }
         } else {
             [NSApp terminate:nil];
         }
     });
 }
 
+#pragma mark Aborting Update
+
 - (void)dismissUpdateInstallation
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self cancelCheckForUpdates];
+        [self cancelDownload];
+        
         if (self.statusController) {
             [self.statusController close];
             self.statusController = nil;
@@ -408,9 +477,10 @@
             self.activeUpdateAlert = nil;
         }
         
-        self.installAndRestart = nil;
-        self.cancelDownload = nil;
-        self.cancelUpdateCheck = nil;
+        [self cancelObservingApplicationTermination];
+        [self cancelInstallAndRestart];
+        
+        self.finishTermination = nil;
     });
 }
 
