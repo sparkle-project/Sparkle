@@ -78,6 +78,9 @@
 - (void)requestUpdatePermissionWithSystemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        // This shows a modal alert dialog which unlike other alerts cannot be closed until the user makes a decision
+        // This means that we can never programatically close the dialog if something goes horribly wrong
+        // But this dialog should only show up once in the application's lifetime so this may be an OK decision
         [SUUpdatePermissionPrompt promptWithHost:self.host systemProfile:systemProfile reply:reply];
     });
 }
