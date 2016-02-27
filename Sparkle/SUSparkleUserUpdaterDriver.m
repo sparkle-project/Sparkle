@@ -85,23 +85,20 @@
     });
 }
 
-- (void)setUpActiveFocusForWindow:(SUWindowController *)updateAlert
+- (void)setUpFocusForActiveUpdateAlert
 {
     // If the app is a menubar app or the like, we need to focus it first and alter the
     // update prompt to behave like a normal window. Otherwise if the window were hidden
     // there may be no way for the application to be activated to make it visible again.
     if ([self.host isBackgroundApplication]) {
-        [updateAlert.window setHidesOnDeactivate:NO];
+        [self.activeUpdateAlert.window setHidesOnDeactivate:NO];
         
         [NSApp activateIgnoringOtherApps:YES];
     }
     
-    // We also need to keep the window controller alive until the user makes their decision anyway
-    self.activeUpdateAlert = updateAlert;
-    
     // Only show the update alert if the app is active; otherwise, we'll wait until it is.
     if ([NSApp isActive])
-        [updateAlert.window makeKeyAndOrderFront:self];
+        [self.activeUpdateAlert.window makeKeyAndOrderFront:self];
     else
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
@@ -115,24 +112,29 @@
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem versionDisplayer:(id<SUVersionDisplay>)versionDisplayer reply:(void (^)(SUUpdateAlertChoice))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        __weak SUSparkleUserUpdaterDriver *weakSelf = self;
         SUUpdateAlert *updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host completionBlock:^(SUUpdateAlertChoice choice) {
             reply(choice);
-            self.activeUpdateAlert = nil;
+            weakSelf.activeUpdateAlert = nil;
         }];
+        
         [updateAlert setVersionDisplayer:versionDisplayer];
-        [self setUpActiveFocusForWindow:updateAlert];
+        self.activeUpdateAlert = updateAlert;
+        
+        [self setUpFocusForActiveUpdateAlert];
     });
 }
 
 - (void)showAutomaticUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUAutomaticInstallationChoice))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        SUAutomaticUpdateAlert *updateAlert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host completionBlock:^(SUAutomaticInstallationChoice choice) {
+        __weak SUSparkleUserUpdaterDriver *weakSelf = self;
+        self.activeUpdateAlert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host completionBlock:^(SUAutomaticInstallationChoice choice) {
             reply(choice);
-            self.activeUpdateAlert = nil;
+            weakSelf.activeUpdateAlert = nil;
         }];
         
-        [self setUpActiveFocusForWindow:updateAlert];
+        [self setUpFocusForActiveUpdateAlert];
     });
 }
 
