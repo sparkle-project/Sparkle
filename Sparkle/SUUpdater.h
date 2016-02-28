@@ -29,11 +29,9 @@
 SU_EXPORT @interface SUUpdater : NSObject
 
 @property (unsafe_unretained) IBOutlet id<SUUpdaterDelegate> delegate;
-@property (nonatomic) id<SUUserUpdaterDriver> userUpdaterDriver;
+@property (nonatomic, readonly) id<SUUserUpdaterDriver> userUpdaterDriver;
 
-+ (SUUpdater *)sharedUpdater;
-+ (SUUpdater *)updaterForBundle:(NSBundle *)bundle;
-- (instancetype)initForBundle:(NSBundle *)bundle;
+- (instancetype)initWithHostBundle:(NSBundle *)bundle userUpdaterDriver:(id <SUUserUpdaterDriver>)userUpdaterDriver;
 
 @property (readonly, strong) NSBundle *hostBundle;
 @property (strong, readonly) NSBundle *sparkleBundle;

@@ -14,6 +14,8 @@
 #import "SUAppcast.h"
 #import "SUConstants.h"
 #import "SULog.h"
+#import "SUErrors.h"
+#import "SULocalizations.h"
 
 @interface NSXMLElement (SUAppcastExtensions)
 @property (readonly, copy) NSDictionary *attributesAsDictionary;

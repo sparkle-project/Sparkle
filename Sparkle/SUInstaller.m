@@ -13,6 +13,7 @@
 #import "SUHost.h"
 #import "SUConstants.h"
 #import "SULog.h"
+#import "SUParameterAssert.h"
 
 @implementation SUInstaller
 

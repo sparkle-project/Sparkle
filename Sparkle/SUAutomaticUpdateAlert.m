@@ -9,6 +9,7 @@
 #import "SUAutomaticUpdateAlert.h"
 
 #import "SUHost.h"
+#import "SULocalizations.h"
 
 @interface SUAutomaticUpdateAlert ()
 @property (strong) void(^completionBlock)(SUAutomaticInstallationChoice);

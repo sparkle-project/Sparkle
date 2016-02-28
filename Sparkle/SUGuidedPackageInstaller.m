@@ -8,7 +8,7 @@
 
 #import <sys/stat.h>
 #import <Security/Security.h>
-
+#import "SUParameterAssert.h"
 #import "SUGuidedPackageInstaller.h"
 
 static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char* executablePath, AuthorizationFlags options, char* const* arguments)

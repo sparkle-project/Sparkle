@@ -12,6 +12,8 @@
 #import "SUConstants.h"
 #import "SUHost.h"
 #import "SULog.h"
+#import "SUErrors.h"
+#import "SUParameterAssert.h"
 
 @implementation SUPlainInstaller
 

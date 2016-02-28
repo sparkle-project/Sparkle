@@ -9,6 +9,8 @@
 #ifndef NTSYNCHRONOUSTASK_H
 #define NTSYNCHRONOUSTASK_H
 
+#import <Cocoa/Cocoa.h>
+
 @interface NTSynchronousTask : NSObject
 @property (readonly, strong) NSData *output;
 @property (readonly) int result;

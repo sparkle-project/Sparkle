@@ -7,7 +7,8 @@
 //
 
 #import "SUFileManager.h"
-#import "SUOperatingSystem.h"
+#import <Foundation/Foundation.h>
+#import "SUErrors.h"
 
 #include <sys/xattr.h>
 #include <sys/errno.h>
@@ -841,21 +842,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         return NO;
     }
 
-    NSURL *trashURL = nil;
-    BOOL canUseNewTrashAPI = YES;
-#if __MAC_OS_X_VERSION_MIN_REQUIRED < 1080
-    canUseNewTrashAPI = [SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 8, 0}];
-    if (!canUseNewTrashAPI) {
-        FSRef trashRef;
-        if (FSFindFolder(kUserDomain, kTrashFolderType, kDontCreateFolder, &trashRef) == noErr) {
-            trashURL = CFBridgingRelease(CFURLCreateFromFSRef(kCFAllocatorDefault, &trashRef));
-        }
-    }
-#endif
-
-    if (canUseNewTrashAPI) {
-        trashURL = [_fileManager URLForDirectory:NSTrashDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:nil];
-    }
+    NSURL *trashURL = [_fileManager URLForDirectory:NSTrashDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:nil];
 
     if (trashURL == nil) {
         if (error != NULL) {
@@ -889,24 +876,10 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     }
 
     // If we get here, we should be able to trash the item normally without authentication
-
-    BOOL success = NO;
-#if __MAC_OS_X_VERSION_MIN_REQUIRED < 1080
-    if (!canUseNewTrashAPI) {
-        NSString *tempParentPath = tempItemURL.URLByDeletingLastPathComponent.path;
-        success = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:tempParentPath destination:@"" files:@[tempItemURL.lastPathComponent] tag:NULL];
-        if (!success && error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move file %@ into the trash.", tempItemURL.lastPathComponent] }];
-        }
-    }
-#endif
-
-    if (canUseNewTrashAPI) {
-        NSError *trashError = nil;
-        success = [_fileManager trashItemAtURL:tempItemURL resultingItemURL:NULL error:&trashError];
-        if (!success && error != NULL) {
-            *error = trashError;
-        }
+    NSError *trashError = nil;
+    BOOL success = [_fileManager trashItemAtURL:tempItemURL resultingItemURL:NULL error:&trashError];
+    if (!success && error != NULL) {
+        *error = trashError;
     }
 
     [self removeItemAtURL:tempDirectory error:NULL];

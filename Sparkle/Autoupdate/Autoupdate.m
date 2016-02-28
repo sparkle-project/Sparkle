@@ -4,6 +4,7 @@
 #import "SUStandardVersionComparator.h"
 #import "SUStatusController.h"
 #import "SULog.h"
+#import "SULocalizations.h"
 
 #include <unistd.h>
 

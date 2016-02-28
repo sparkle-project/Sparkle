@@ -13,6 +13,7 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SUStatusController.h"
 #import "SUHost.h"
+#import "SULocalizations.h"
 
 @interface SUStatusController ()
 @property (copy) NSString *title, *buttonTitle;

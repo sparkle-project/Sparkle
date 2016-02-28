@@ -12,6 +12,7 @@
 #import "SUAppcastItem.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SUConstants.h"
+#import "SUErrors.h"
 
 #ifndef DEBUG
 #define DEBUG 0

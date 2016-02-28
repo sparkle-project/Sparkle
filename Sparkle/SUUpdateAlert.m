@@ -17,6 +17,7 @@
 
 #import "SUConstants.h"
 #import "SULog.h"
+#import "SULocalizations.h"
 
 // WebKit protocols are not explicitly declared until 10.11 SDK, so
 // declare dummy protocols to keep the build working on earlier SDKs.

@@ -15,6 +15,7 @@
 #import "SUUpdateAlert.h"
 #import "SUAutomaticUpdateAlert.h"
 #import "SUOperatingSystem.h"
+#import "SULocalizations.h"
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED < 1080
 @interface NSByteCountFormatter : NSFormatter {

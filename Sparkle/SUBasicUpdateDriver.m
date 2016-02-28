@@ -20,6 +20,8 @@
 #import "SUCodeSigningVerifier.h"
 #import "SUUpdater_Private.h"
 #import "SUFileManager.h"
+#import "SUErrors.h"
+#import "SULocalizations.h"
 
 @interface SUBasicUpdateDriver ()
 

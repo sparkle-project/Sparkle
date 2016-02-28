@@ -8,6 +8,7 @@
 
 #import "SUUpdatePermissionPrompt.h"
 #import "SUUpdatePermissionPromptResult.h"
+#import "SULocalizations.h"
 
 #import "SUHost.h"
 #import "SUConstants.h"

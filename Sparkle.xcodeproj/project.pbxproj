@@ -171,6 +171,8 @@
 		720B16441C66433D006985FB /* UITests-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 720B16421C66433D006985FB /* UITests-Info.plist */; };
 		720B16451C66433D006985FB /* SUTestApplicationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720B16431C66433D006985FB /* SUTestApplicationTest.swift */; };
 		7210C7681B9A9A1500EB90AC /* SUUnarchiverTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */; };
+		72162B061C82C8B30013C1C5 /* SUParameterAssert.h in Headers */ = {isa = PBXBuildFile; fileRef = 72162B051C82C8B30013C1C5 /* SUParameterAssert.h */; };
+		72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */ = {isa = PBXBuildFile; fileRef = 72162B071C82C9600013C1C5 /* SULocalizations.h */; };
 		721CF1A71AD7643600D9AC09 /* bsdiff.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		721CF1A81AD7644100D9AC09 /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		721CF1A91AD7644C00D9AC09 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; settings = {COMPILER_FLAGS = "-w"; }; };
@@ -633,6 +635,8 @@
 		720B16421C66433D006985FB /* UITests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "UITests-Info.plist"; path = "UITests/UITests-Info.plist"; sourceTree = SOURCE_ROOT; };
 		720B16431C66433D006985FB /* SUTestApplicationTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SUTestApplicationTest.swift; path = UITests/SUTestApplicationTest.swift; sourceTree = SOURCE_ROOT; };
 		7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUUnarchiverTest.swift; sourceTree = "<group>"; };
+		72162B051C82C8B30013C1C5 /* SUParameterAssert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUParameterAssert.h; sourceTree = "<group>"; };
+		72162B071C82C9600013C1C5 /* SULocalizations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULocalizations.h; sourceTree = "<group>"; };
 		7223E7611AD1AEFF008E3161 /* sais.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sais.c; sourceTree = "<group>"; };
 		7223E7621AD1AEFF008E3161 /* sais.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sais.h; sourceTree = "<group>"; };
 		725CB9561C7120410064365A /* SUUserUpdaterDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUserUpdaterDriver.h; sourceTree = "<group>"; };
@@ -1051,6 +1055,8 @@
 			children = (
 				61299B3509CB04E000B7442F /* Sparkle.h */,
 				61CFB3280E385186007A1735 /* Sparkle.pch */,
+				72162B071C82C9600013C1C5 /* SULocalizations.h */,
+				72162B051C82C8B30013C1C5 /* SUParameterAssert.h */,
 				61299A5B09CA6D4500B7442F /* SUConstants.h */,
 				61299A5F09CA6EB100B7442F /* SUConstants.m */,
 				55E6F33219EC9F6C00005E76 /* SUErrors.h */,
@@ -1189,12 +1195,14 @@
 				725CB95A1C7121830064365A /* SUSparkleUserUpdaterDriver.h in Headers */,
 				61EF67590E25C5B400F754E0 /* SUHost.h in Headers */,
 				725CB9571C7120410064365A /* SUUserUpdaterDriver.h in Headers */,
+				72162B061C82C8B30013C1C5 /* SUParameterAssert.h in Headers */,
 				72A450561C6FC10400D67EEA /* SUUpdateAlertChoice.h in Headers */,
 				72A450531C69A68900D67EEA /* SUUpdatePermissionPromptResult.h in Headers */,
 				611142E910FB1BE5009810AA /* bspatch.h in Headers */,
 				6160E7E10D3B4A8800E9CD71 /* NTSynchronousTask.h in Headers */,
 				61299B3609CB04E000B7442F /* Sparkle.h in Headers */,
 				61CFB3290E385186007A1735 /* Sparkle.pch in Headers */,
+				72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */,
 				61B5FC0D09C4FC8200B25A18 /* SUAppcast.h in Headers */,
 				61B5FC7009C51F4A00B25A18 /* SUAppcastItem.h in Headers */,
 				6120721209CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.h in Headers */,

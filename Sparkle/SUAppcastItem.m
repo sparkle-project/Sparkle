@@ -13,6 +13,7 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SUAppcastItem.h"
 #import "SULog.h"
+#import "SUConstants.h"
 
 @interface SUAppcastItem ()
 @property (copy, readwrite) NSString *title;

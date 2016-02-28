@@ -6,7 +6,7 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 #import "SUUpdateAlertChoice.h"
 #import "SUAutomaticInstallationChoice.h"
 

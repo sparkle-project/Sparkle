@@ -11,6 +11,7 @@
 #import "SUSystemProfiler.h"
 #include <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
 #import "SULog.h"
+#import "SUParameterAssert.h"
 
 @interface SUHost ()
 
