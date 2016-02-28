@@ -20,13 +20,11 @@ static const NSTimeInterval SUParentQuitTimeoutInterval = 30.0;
 
 @interface TerminationListener : NSObject
 
-- (instancetype)initWithProcessId:(pid_t)pid;
-
 @end
 
 @interface TerminationListener ()
 
-@property (nonatomic, assign) pid_t processIdentifier;
+@property (nonatomic, strong) NSNumber *processIdentifier;
 @property (nonatomic, strong) NSTimer *watchdogTimer;
 @property (nonatomic, strong) NSTimer *timeoutTimer;
 
@@ -38,13 +36,13 @@ static const NSTimeInterval SUParentQuitTimeoutInterval = 30.0;
 @synthesize watchdogTimer = _watchdogTimer;
 @synthesize timeoutTimer = _timeoutTimer;
 
-- (instancetype)initWithProcessId:(pid_t)pid
+- (instancetype)initWithProcessIdentifier:(NSNumber *)processIdentifier
 {
     if (!(self = [super init])) {
         return nil;
     }
 
-    self.processIdentifier = pid;
+    self.processIdentifier = processIdentifier;
 
     return self;
 }
@@ -59,10 +57,7 @@ static const NSTimeInterval SUParentQuitTimeoutInterval = 30.0;
 
 - (void)startListeningWithCompletion:(void (^)(BOOL))completionBlock
 {
-#warning Review this code later as well
-    // Parent process may not be the app we're installing, so don't rely on that
-    //BOOL alreadyTerminated = (getppid() == 1); // ppid is launchd (1) => parent terminated already
-    BOOL alreadyTerminated = (kill(self.processIdentifier, 0) != 0);
+    BOOL alreadyTerminated = (self.processIdentifier == nil || (kill(self.processIdentifier.intValue, 0) != 0));
     if (alreadyTerminated) {
         [self cleanupWithSuccess:YES completion:completionBlock];
     } else {
@@ -74,7 +69,7 @@ static const NSTimeInterval SUParentQuitTimeoutInterval = 30.0;
 
 - (void)watchdog:(NSTimer *)timer
 {
-    if (![NSRunningApplication runningApplicationWithProcessIdentifier:self.processIdentifier]) {
+    if ([NSRunningApplication runningApplicationWithProcessIdentifier:self.processIdentifier.intValue] == nil) {
         [self cleanupWithSuccess:YES completion:timer.userInfo];
     }
 }
@@ -101,16 +96,6 @@ static const NSTimeInterval SUInstallationTimeLimit = 5;
 static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 
 @interface AppInstaller : NSObject <NSApplicationDelegate>
-
-/*
- * hostPath - path to host (original) application
- * relaunchPath - path to what the host wants to relaunch (default is same as hostPath)
- * parentProcessId - process identifier of the host before launching us
- * updateFolderPath - path to update folder (i.e, temporary directory containing the new update)
- * shouldRelaunch - indicates if the new installed app should re-launched
- * shouldShowUI - indicates if we should show the status window when installing the update
- */
-- (instancetype)initWithHostPath:(NSString *)hostPath relaunchPath:(NSString *)relaunchPath parentProcessId:(pid_t)parentProcessId updateFolderPath:(NSString *)updateFolderPath shouldRelaunch:(BOOL)shouldRelaunch shouldShowUI:(BOOL)shouldShowUI;
 
 @end
 
@@ -140,7 +125,15 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 @synthesize shouldShowUI = _shouldShowUI;
 @synthesize isTerminating = _isTerminating;
 
-- (instancetype)initWithHostPath:(NSString *)hostPath relaunchPath:(NSString *)relaunchPath parentProcessId:(pid_t)parentProcessId updateFolderPath:(NSString *)updateFolderPath shouldRelaunch:(BOOL)shouldRelaunch shouldShowUI:(BOOL)shouldShowUI
+/*
+ * hostPath - path to host (original) application
+ * relaunchPath - path to what the host wants to relaunch (default is same as hostPath)
+ * hostProcessIdentifier - process identifier of the host before launching us
+ * updateFolderPath - path to update folder (i.e, temporary directory containing the new update)
+ * shouldRelaunch - indicates if the new installed app should re-launched
+ * shouldShowUI - indicates if we should show the status window when installing the update
+ */
+- (instancetype)initWithHostPath:(NSString *)hostPath relaunchPath:(NSString *)relaunchPath hostProcessIdentifier:(NSNumber *)hostProcessIdentifier updateFolderPath:(NSString *)updateFolderPath shouldRelaunch:(BOOL)shouldRelaunch shouldShowUI:(BOOL)shouldShowUI
 {
     if (!(self = [super init])) {
         return nil;
@@ -148,7 +141,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     
     self.hostPath = hostPath;
     self.relaunchPath = relaunchPath;
-    self.terminationListener = [[TerminationListener alloc] initWithProcessId:parentProcessId];
+    self.terminationListener = [[TerminationListener alloc] initWithProcessIdentifier:hostProcessIdentifier];
     self.updateFolderPath = updateFolderPath;
     self.shouldRelaunch = shouldRelaunch;
     self.shouldShowUI = shouldShowUI;
@@ -282,9 +275,19 @@ int main(int __unused argc, const char __unused *argv[])
             [application activateIgnoringOtherApps:YES];
         }
         
+        NSString *hostBundlePath = args[3];
+        
+        NSNumber *activeProcessIdentifier = nil;
+        for (NSRunningApplication *runningApplication in [[NSWorkspace sharedWorkspace] runningApplications]) {
+            if ([runningApplication.bundleURL.path isEqual:hostBundlePath]) {
+                activeProcessIdentifier = @(runningApplication.processIdentifier);
+                break;
+            }
+        }
+        
         AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostPath:args[1]
                                                                relaunchPath:args[2]
-                                                            parentProcessId:[args[3] intValue]
+                                                            hostProcessIdentifier:activeProcessIdentifier
                                                            updateFolderPath:args[4]
                                                              shouldRelaunch:(args.count > 5) ? [args[5] boolValue] : YES
                                                                shouldShowUI:shouldShowUI];

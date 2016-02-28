@@ -8,7 +8,7 @@
 
 #import "SUBasicUpdateDriver.h"
 
-#import <Cocoa/Cocoa.h> // Needed by NSWorkspace and NSRunningApplication unfortunately
+#import <Foundation/Foundation.h>
 
 #import "SUHost.h"
 #import "SUOperatingSystem.h"
@@ -511,7 +511,8 @@
     if ([updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)])
         [updaterDelegate updaterWillRelaunchApplication:self.updater];
 
-    NSString *relaunchToolPath = [[NSBundle bundleWithPath:self.relaunchPath] executablePath];
+    NSBundle *relaunchToolBundle = [NSBundle bundleWithPath:self.relaunchPath];
+    NSString *relaunchToolPath = [relaunchToolBundle executablePath];
     if (!relaunchToolPath || ![[NSFileManager defaultManager] fileExistsAtPath:self.relaunchPath]) {
         // Note that we explicitly use the host app's name here, since updating plugin for Mail relaunches Mail, not just the plugin.
         [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{
@@ -527,27 +528,16 @@
         pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:self.updater];
     }
     
-#warning Review this code later..
-    pid_t processIdentifier = [[NSProcessInfo processInfo] processIdentifier];
-    for (NSRunningApplication *runningApplication in [[NSWorkspace sharedWorkspace] runningApplications]) {
-        if ([runningApplication.bundleURL.path isEqual:self.host.bundlePath]) {
-            processIdentifier = runningApplication.processIdentifier;
-            break;
-        }
-    }
-    
     NSArray *launchArguments = @[[self.host bundlePath],
                                  pathToRelaunch,
-                                 [NSString stringWithFormat:@"%d", processIdentifier],
+                                 self.host.bundlePath,
                                  self.tempDir,
                                  relaunch ? @"1" : @"0",
                                  showUI ? @"1" : @"0"];
     
-    // Don't launch the app via a NSTask; it may be terminated prematurely if we are in a XPC service currently
-    NSError *launchError = nil;
-    if ([[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:relaunchToolPath] options:NSWorkspaceLaunchDefault configuration:@{NSWorkspaceLaunchConfigurationArguments : launchArguments} error:&launchError] == nil) {
-        SULog(@"Failed to launch autoupdate app: %@", launchError);
-    }
+    // Make sure the launched task finishes. If this is a XPC process, and we don't wait for it to finish, we risk the task terminating prematurely
+    NSTask *launchedTask = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/open" arguments:[@[@"-n", relaunchToolBundle.bundlePath, @"--args"] arrayByAddingObjectsFromArray:launchArguments]];
+    [launchedTask waitUntilExit];
     
     [self terminateApp];
 }
