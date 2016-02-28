@@ -170,15 +170,12 @@
                 dict[name] = encDict;
 			}
             else if ([name isEqualToString:SURSSElementPubDate]) {
-                // pubDate is expected to be an NSDate by SUAppcastItem, but the RSS class was returning an NSString
-                NSString *string = node.stringValue;
-                if (string) {
-                    #warning This NSDate method is deprecated and doesn't supporte NSSecureCoding... replace it, don't use the date at all, or change the encode/decoding. sigh
-                    NSDate *date = nil;
-                    //NSDate *date = [NSDate dateWithNaturalLanguageString:string];
-                    if (date) {
-                        dict[name] = date;
-                    }
+                // We don't want to parse and create a NSDate instance -
+                // that's a risk we can avoid. We don't use the date anywhere other
+                // than it being accessible from SUAppcastItem
+                NSString *dateString = node.stringValue;
+                if (dateString) {
+                    dict[name] = dateString;
                 }
 			}
 			else if ([name isEqualToString:SUAppcastElementDeltas]) {
@@ -224,11 +221,8 @@
             return nil;
         }
     }
-
-    if ([appcastItems count]) {
-        NSSortDescriptor *sort = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO];
-        [appcastItems sortUsingDescriptors:@[sort]];
-    }
+    
+    self.items = appcastItems;
 
     return appcastItems;
 }
