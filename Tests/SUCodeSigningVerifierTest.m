@@ -69,6 +69,10 @@
     NSError *error = nil;
     NSString *tempDir = [self.notSignedAppPath stringByDeletingLastPathComponent];
     NSString *signedAndValid = [tempDir stringByAppendingPathComponent:@"valid-signed.app"];
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:signedAndValid]) {
+        [[NSFileManager defaultManager] removeItemAtPath:signedAndValid error:NULL];
+    }
     if ([[NSFileManager defaultManager] copyItemAtPath:self.notSignedAppPath toPath:signedAndValid error:&error]) {
         self.validSignedAppPath = signedAndValid;
         if (![self codesignAppPath:self.validSignedAppPath]) {
@@ -85,6 +89,10 @@
     NSError *error = nil;
     NSString *tempDir = [self.notSignedAppPath stringByDeletingLastPathComponent];
     NSString *signedAndInvalid = [tempDir stringByAppendingPathComponent:@"invalid-signed.app"];
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:signedAndInvalid]) {
+        [[NSFileManager defaultManager] removeItemAtPath:signedAndInvalid error:NULL];
+    }
     if ([[NSFileManager defaultManager] copyItemAtPath:self.notSignedAppPath toPath:signedAndInvalid error:&error]) {
         self.invalidSignedAppPath = signedAndInvalid;
         if ([self codesignAppPath:self.invalidSignedAppPath]) {
