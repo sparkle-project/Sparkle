@@ -6,7 +6,7 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "SUUpdateAlertChoice.h"
 #import "SUAutomaticInstallationChoice.h"
 
@@ -81,7 +81,6 @@ typedef NS_ENUM(NSUInteger, SUInstallUpdateStatus) {
 
 - (void)showInstallingUpdate;
 
-- (NSApplicationTerminateReply)sendApplicationTerminationSignal;
 - (void)registerApplicationTermination:(void (^)(SUApplicationTerminationStatus))applicationTerminationHandler;
 - (void)unregisterApplicationTermination;
 - (void)terminateApplication;

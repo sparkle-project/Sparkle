@@ -9,7 +9,7 @@
 #ifndef SUBINARYDELTAUNARCHIVER_H
 #define SUBINARYDELTAUNARCHIVER_H
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "SUUnarchiver.h"
 
 @interface SUBinaryDeltaUnarchiver : SUUnarchiver

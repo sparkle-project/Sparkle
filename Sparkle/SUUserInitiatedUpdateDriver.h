@@ -9,7 +9,7 @@
 #ifndef SUUSERINITIATEDUPDATEDRIVER_H
 #define SUUSERINITIATEDUPDATEDRIVER_H
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "SUUIBasedUpdateDriver.h"
 
 @interface SUUserInitiatedUpdateDriver : SUUIBasedUpdateDriver

@@ -9,7 +9,7 @@
 #ifndef SUBASICUPDATEDRIVER_H
 #define SUBASICUPDATEDRIVER_H
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "SUUpdateDriver.h"
 #import "SUUnarchiver.h"
 #import "SUAppcast.h"

@@ -9,7 +9,7 @@
 #ifndef SUINSTALLER_H
 #define SUINSTALLER_H
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "SUVersionComparisonProtocol.h"
 
 @class SUHost;

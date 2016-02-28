@@ -9,7 +9,7 @@
 #ifndef SUAUTOMATICUPDATEDRIVER_H
 #define SUAUTOMATICUPDATEDRIVER_H
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "SUBasicUpdateDriver.h"
 #import "SUAutomaticUpdateAlert.h"
 

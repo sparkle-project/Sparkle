@@ -9,7 +9,7 @@
 #ifndef SUPIPEDUNARCHIVER_H
 #define SUPIPEDUNARCHIVER_H
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "SUUnarchiver.h"
 
 @interface SUPipedUnarchiver : SUUnarchiver

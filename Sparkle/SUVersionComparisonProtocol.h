@@ -9,7 +9,7 @@
 #ifndef SUVERSIONCOMPARISONPROTOCOL_H
 #define SUVERSIONCOMPARISONPROTOCOL_H
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "SUExport.h"
 
 /*!

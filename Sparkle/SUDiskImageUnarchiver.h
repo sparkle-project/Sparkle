@@ -9,7 +9,7 @@
 #ifndef SUDISKIMAGEUNARCHIVER_H
 #define SUDISKIMAGEUNARCHIVER_H
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "SUUnarchiver.h"
 
 @interface SUDiskImageUnarchiver : SUUnarchiver

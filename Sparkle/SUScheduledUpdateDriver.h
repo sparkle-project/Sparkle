@@ -9,7 +9,7 @@
 #ifndef SUSCHEDULEDUPDATEDRIVER_H
 #define SUSCHEDULEDUPDATEDRIVER_H
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "SUUIBasedUpdateDriver.h"
 
 @interface SUScheduledUpdateDriver : SUUIBasedUpdateDriver

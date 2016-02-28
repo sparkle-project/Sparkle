@@ -8,6 +8,8 @@
 
 #import "SUBasicUpdateDriver.h"
 
+#import <Cocoa/Cocoa.h> // Needed by NSWorkspace and NSRunningApplication unfortunately
+
 #import "SUHost.h"
 #import "SUOperatingSystem.h"
 #import "SUDSAVerifier.h"

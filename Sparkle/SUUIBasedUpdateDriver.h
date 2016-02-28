@@ -9,7 +9,7 @@
 #ifndef SUUIBASEDUPDATEDRIVER_H
 #define SUUIBASEDUPDATEDRIVER_H
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "SUBasicUpdateDriver.h"
 #import "SUUpdateAlert.h"
 

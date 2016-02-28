@@ -9,7 +9,7 @@
 #ifndef SUUNARCHIVER_PRIVATE_H
 #define SUUNARCHIVER_PRIVATE_H
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "SUUnarchiver.h"
 
 @interface SUUnarchiver (Private)
