@@ -213,7 +213,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 // RUNS ON ITS OWN THREAD
 // updater should be passed as a weak reference
-static void SUCheckForUpdatesInBgReachabilityCheck(SUUpdater *updater, SUUpdateDriver *inDriver)
+static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SUUpdateDriver *inDriver)
 {
     @try {
         // This method *must* be called on its own thread. SCNetworkReachabilityCheckByName
