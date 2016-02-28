@@ -71,8 +71,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     _userUpdaterDriver = userUpdaterDriver;
     
-    // This runs the permission prompt if needed, but never before the app has finished launching because the runloop won't run before that
-    [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:0];
+    [self startUpdateCycle];
     
     return self;
 }
