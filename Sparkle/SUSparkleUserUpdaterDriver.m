@@ -49,7 +49,6 @@
 @property (nonatomic, copy) void (^installUpdateHandler)(SUInstallUpdateStatus);
 
 @property (nonatomic, copy) void (^applicationTerminationHandler)(SUApplicationTerminationStatus);
-@property (nonatomic, copy) void (^finishTermination)(void);
 
 @property (nonatomic) BOOL installingUpdateOnTermination;
 
@@ -69,7 +68,6 @@
 @synthesize downloadStatusCompletion = _downloadStatusCompletion;
 @synthesize installUpdateHandler = _installUpdateHandler;
 @synthesize applicationTerminationHandler = _applicationTerminationHandler;
-@synthesize finishTermination = _finishTermination;
 @synthesize installingUpdateOnTermination = _installingUpdateOnTermination;
 
 #pragma mark Birth
@@ -550,8 +548,6 @@
         
         [self cancelObservingApplicationTermination];
         [self cancelInstallAndRestart];
-        
-        self.finishTermination = nil;
     });
 }
 
