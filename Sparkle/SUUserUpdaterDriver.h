@@ -59,7 +59,6 @@ typedef NS_ENUM(NSUInteger, SUInstallUpdateStatus) {
 - (void)startUpdateCheckTimerWithNextTimeInterval:(NSTimeInterval)timeInterval reply:(void (^)(SUUpdateCheckTimerStatus))reply;
 - (void)invalidateUpdateCheckTimer;
 
-#warning might need to whitelist class types for systemProfile.. need to test this
 - (void)requestUpdatePermissionWithSystemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply;
 
 - (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SUUserInitiatedCheckStatus))updateCheckStatusCompletion;
