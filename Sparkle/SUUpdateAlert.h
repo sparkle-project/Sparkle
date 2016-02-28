@@ -9,14 +9,14 @@
 #ifndef SUUPDATEALERT_H
 #define SUUPDATEALERT_H
 
-#import "SUWindowController.h"
+#import <Cocoa/Cocoa.h>
 #import "SUVersionDisplayProtocol.h"
 #import "SUUpdateAlertChoice.h"
 
 @protocol SUUpdateAlertDelegate;
 
 @class SUAppcastItem, SUHost;
-@interface SUUpdateAlert : SUWindowController
+@interface SUUpdateAlert : NSWindowController
 
 @property (weak) id<SUVersionDisplay> versionDisplayer;
 

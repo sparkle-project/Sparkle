@@ -9,11 +9,11 @@
 #ifndef SUUPDATEPERMISSIONPROMPT_H
 #define SUUPDATEPERMISSIONPROMPT_H
 
-#import "SUWindowController.h"
+#import <Cocoa/Cocoa.h>
 
 @class SUHost, SUUpdatePermissionPromptResult;
 
-@interface SUUpdatePermissionPrompt : SUWindowController
+@interface SUUpdatePermissionPrompt : NSWindowController
 
 + (void)promptWithHost:(SUHost *)host systemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply;
 

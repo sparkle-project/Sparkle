@@ -44,7 +44,7 @@
 @property (nonatomic) SUStatusController *checkingController;
 @property (nonatomic, copy) void (^updateCheckStatusCompletion)(SUUserInitiatedCheckStatus);
 
-@property (nonatomic) SUWindowController *activeUpdateAlert;
+@property (nonatomic) NSWindowController *activeUpdateAlert;
 
 @property (nonatomic) SUStatusController *statusController;
 @property (nonatomic, copy) void (^downloadStatusCompletion)(SUDownloadUpdateStatus);
