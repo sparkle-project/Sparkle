@@ -23,7 +23,6 @@
 @property (getter=isRunningOnReadOnlyVolume, readonly) BOOL runningOnReadOnlyVolume;
 @property (getter=isBackgroundApplication, readonly) BOOL backgroundApplication;
 @property (readonly, copy) NSString *publicDSAKey;
-@property (readonly, copy) NSArray *systemProfile;
 
 - (id)objectForInfoDictionaryKey:(NSString *)key;
 - (BOOL)boolForInfoDictionaryKey:(NSString *)key;

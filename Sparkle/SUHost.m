@@ -8,7 +8,6 @@
 #import "SUHost.h"
 
 #import "SUConstants.h"
-#import "SUSystemProfiler.h"
 #include <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
 #import "SULog.h"
 #import "SUParameterAssert.h"
@@ -219,11 +218,6 @@
         return nil;
     }
     return [NSString stringWithContentsOfFile:keyPath encoding:NSASCIIStringEncoding error:nil];
-}
-
-- (NSArray *)systemProfile
-{
-    return [[SUSystemProfiler sharedSystemProfiler] systemProfileArrayForHost:self];
 }
 
 - (id)objectForInfoDictionaryKey:(NSString *)key

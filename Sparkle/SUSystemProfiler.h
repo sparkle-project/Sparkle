@@ -13,8 +13,9 @@
 
 @class SUHost;
 @interface SUSystemProfiler : NSObject
-+ (SUSystemProfiler *)sharedSystemProfiler;
-- (NSMutableArray *)systemProfileArrayForHost:(SUHost *)host;
+
++ (NSMutableArray *)systemProfileArrayForHost:(SUHost *)host;
+
 @end
 
 #endif

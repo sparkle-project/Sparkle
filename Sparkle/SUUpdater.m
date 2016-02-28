@@ -21,6 +21,7 @@
 #import "SUConstants.h"
 #import "SULog.h"
 #import "SUCodeSigningVerifier.h"
+#import "SUSystemProfiler.h"
 #include <SystemConfiguration/SystemConfiguration.h>
 
 NSString *const SUUpdaterDidFinishLoadingAppCastNotification = @"SUUpdaterDidFinishLoadingAppCastNotification";
@@ -128,7 +129,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
 
     if (shouldPrompt) {
-        NSArray *profileInfo = [self.host systemProfile];
+        NSArray *profileInfo = [SUSystemProfiler systemProfileArrayForHost:self.host];
         // Always say we're sending the system profile here so that the delegate displays the parameters it would send.
         if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
             profileInfo = [profileInfo arrayByAddingObjectsFromArray:[self.delegate feedParametersForUpdater:self sendingSystemProfile:YES]];
@@ -461,7 +462,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(SUUpdater *updater, SUUpdateD
     }
 	if (sendingSystemProfile)
 	{
-        parameters = [parameters arrayByAddingObjectsFromArray:[self.host systemProfile]];
+        parameters = [parameters arrayByAddingObjectsFromArray:[SUSystemProfiler systemProfileArrayForHost:self.host]];
         [self.host setObject:[NSDate date] forUserDefaultsKey:SULastProfileSubmitDateKey];
     }
 	if ([parameters count] == 0) { return baseFeedURL; }

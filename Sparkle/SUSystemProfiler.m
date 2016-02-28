@@ -27,23 +27,15 @@ static NSString *const SUSystemProfilerOperatingSystemVersionKey = @"osVersion";
 static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
 
 @implementation SUSystemProfiler
-+ (SUSystemProfiler *)sharedSystemProfiler
-{
-    static SUSystemProfiler *sharedSystemProfiler = nil;
-    if (!sharedSystemProfiler) {
-        sharedSystemProfiler = [[self alloc] init];
-    }
-    return sharedSystemProfiler;
-}
 
-- (NSDictionary *)modelTranslationTable
++ (NSDictionary *)modelTranslationTable
 {
     // Use explicit class to use the correct bundle even when subclassed
     NSString *path = [[NSBundle bundleForClass:[SUSystemProfiler class]] pathForResource:@"SUModelTranslation" ofType:@"plist"];
     return [[NSDictionary alloc] initWithContentsOfFile:path];
 }
 
-- (NSMutableArray *)systemProfileArrayForHost:(SUHost *)host
++ (NSMutableArray *)systemProfileArrayForHost:(SUHost *)host
 {
     NSDictionary *modelTranslation = [self modelTranslationTable];
 
