@@ -28,26 +28,6 @@
 @synthesize defaultsDomain;
 @synthesize usesStandardUserDefaults;
 
-- (instancetype)initWithCoder:(NSCoder *)decoder
-{
-    NSURL *bundleURL = [decoder decodeObjectOfClass:[NSURL class] forKey:@"bundleURL"];
-    if (bundleURL == nil) {
-        return nil;
-    }
-    
-    NSBundle *aBundle = [NSBundle bundleWithURL:bundleURL];
-    if (aBundle == nil) {
-        return nil;
-    }
-    
-    return [[[self class] alloc] initWithBundle:aBundle];
-}
-
-- (void)encodeWithCoder:(NSCoder *)encoder
-{
-    [encoder encodeObject:self.bundle.bundleURL forKey:@"bundleURL"];
-}
-
 - (instancetype)initWithBundle:(NSBundle *)aBundle
 {
 	if ((self = [super init]))
