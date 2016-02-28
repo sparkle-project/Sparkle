@@ -16,7 +16,9 @@
 @property (nonatomic, copy) void (^downloadUpdateStatusCompletion)(SUDownloadUpdateStatus);
 @property (nonatomic, copy) void (^updateCheckStatusCompletion)(SUUserInitiatedCheckStatus);
 @property (nonatomic, copy) void (^applicationTerminationHandler)(SUApplicationTerminationStatus);
+@property (nonatomic, copy) void (^checkForUpdateReply)(SUUpdateCheckTimerStatus);
 
+@property (nonatomic) NSTimer *checkUpdateTimer;
 @property (nonatomic) BOOL registeredApplicationTermination;
 
 @end
@@ -26,104 +28,170 @@
 @synthesize downloadUpdateStatusCompletion = _downloadUpdateStatusCompletion;
 @synthesize updateCheckStatusCompletion = _updateCheckStatusCompletion;
 @synthesize applicationTerminationHandler = _applicationTerminationHandler;
+@synthesize checkUpdateTimer = _checkUpdateTimer;
+@synthesize checkForUpdateReply = _checkForUpdateReply;
 @synthesize registeredApplicationTermination = _registeredApplicationTermination;
+
+- (void)startUpdateCheckTimerWithNextTimeInterval:(NSTimeInterval)timeInterval reply:(void (^)(SUUpdateCheckTimerStatus))reply
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.checkForUpdateReply = reply;
+        self.checkUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:timeInterval target:self selector:@selector(checkForUpdates:) userInfo:nil repeats:NO];
+    });
+}
+
+- (void)checkForUpdates:(NSTimer *)__unused timer
+{
+    if (self.checkForUpdateReply != nil) {
+        self.checkForUpdateReply(SUCheckForUpdateNow);
+        self.checkForUpdateReply = nil;
+    }
+}
+
+- (void)_invalidateUpdateCheckTimer
+{
+    [self.checkUpdateTimer invalidate];
+    self.checkUpdateTimer = nil;
+    
+    if (self.checkForUpdateReply != nil) {
+        self.checkForUpdateReply(SUCheckForUpdateWillOccurLater);
+        self.checkForUpdateReply = nil;
+    }
+}
+
+- (void)invalidateUpdateCheckTimer
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self _invalidateUpdateCheckTimer];
+    });
+}
 
 - (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply
 {
-    NSLog(@"Giving permission to automatically install updates!");
-    reply([SUUpdatePermissionPromptResult updatePermissionPromptResultWithChoice:SUAutomaticallyCheck shouldSendProfile:YES]);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"Giving permission to automatically install updates!");
+        reply([SUUpdatePermissionPromptResult updatePermissionPromptResultWithChoice:SUAutomaticallyCheck shouldSendProfile:YES]);
+    });
 }
 
 - (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SUUserInitiatedCheckStatus))completionStatusCheck
 {
-    NSLog(@"Evil user initiated an update check!");
-    self.updateCheckStatusCompletion = completionStatusCheck;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"Evil user initiated an update check!");
+        self.updateCheckStatusCompletion = completionStatusCheck;
+    });
 }
 
 - (void)dismissUserInitiatedUpdateCheck
 {
-    if (self.updateCheckStatusCompletion != nil) {
-        self.updateCheckStatusCompletion(SUUserInitiatedCheckDone);
-        self.updateCheckStatusCompletion = nil;
-    }
-    NSLog(@"Update check is done!");
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.updateCheckStatusCompletion != nil) {
+            self.updateCheckStatusCompletion(SUUserInitiatedCheckDone);
+            self.updateCheckStatusCompletion = nil;
+        }
+        NSLog(@"Update check is done!");
+    });
 }
 
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem versionDisplayer:(id<SUVersionDisplay>)__unused versionDisplayer reply:(void (^)(SUUpdateAlertChoice))reply
 {
-    NSLog(@"OMG new update was found! Let's install it!");
-    reply(SUInstallUpdateChoice);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"OMG new update was found! Let's install it!");
+        reply(SUInstallUpdateChoice);
+    });
 }
 
 - (void)showAutomaticUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem reply:(void (^)(SUAutomaticInstallationChoice))reply
 {
-    NSLog(@"OK, requested automatic update permission.. replying..");
-    reply(SUInstallLaterChoice);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"OK, requested automatic update permission.. replying..");
+        reply(SUInstallLaterChoice);
+    });
 }
 
 - (void)showUpdateNotFound
 {
-    NSLog(@":( there was no new update");
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@":( there was no new update");
+    });
 }
 
 - (void)showUpdaterError:(NSError *)error
 {
-    NSLog(@"Update error: %@", error);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"Update error: %@", error);
+    });
 }
 
 - (void)showDownloadInitiatedWithCompletion:(void (^)(SUDownloadUpdateStatus))downloadUpdateStatusCompletion
 {
     NSLog(@"Downloading update...");
-    self.downloadUpdateStatusCompletion = downloadUpdateStatusCompletion;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.downloadUpdateStatusCompletion = downloadUpdateStatusCompletion;
+    });
 }
 
 - (void)showDownloadDidReceiveResponse:(NSURLResponse *)response
 {
-    NSLog(@"Download recieved length: %lld", response.expectedContentLength);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"Download recieved length: %lld", response.expectedContentLength);
+    });
 }
 
 - (void)showDownloadDidReceiveDataOfLength:(NSUInteger)length
 {
-    NSLog(@"Download received progress: %lu", length);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"Download received progress: %lu", length);
+    });
 }
 
 - (void)showDownloadFinishedAndStartedExtractingUpdate
 {
-    if (self.downloadUpdateStatusCompletion != nil) {
-        self.downloadUpdateStatusCompletion(SUDownloadUpdateDone);
-        self.downloadUpdateStatusCompletion = nil;
-    }
-    
-    NSLog(@"Download finished.. Extracting..");
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.downloadUpdateStatusCompletion != nil) {
+            self.downloadUpdateStatusCompletion(SUDownloadUpdateDone);
+            self.downloadUpdateStatusCompletion = nil;
+        }
+        
+        NSLog(@"Download finished.. Extracting..");
+    });
 }
 
 - (void)showExtractionReceivedProgress:(double)progress
 {
-    NSLog(@"Extracting progress: %f", progress);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"Extracting progress: %f", progress);
+    });
 }
 
 - (void)showExtractionFinishedAndReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))installUpdateHandler
 {
-    NSLog(@"Extracting finished.. Letting it install & relaunch..");
-    installUpdateHandler(SUInstallAndRelaunchUpdateNow);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"Extracting finished.. Letting it install & relaunch..");
+        installUpdateHandler(SUInstallAndRelaunchUpdateNow);
+    });
 }
 
 - (void)showInstallingUpdate
 {
-    NSLog(@"Installing update...");
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"Installing update...");
+    });
 }
 
 - (void)registerApplicationTermination:(void (^)(SUApplicationTerminationStatus))applicationTerminationHandler
 {
-    self.registeredApplicationTermination = YES;
-    
-    NSLog(@"Registered for termination, eh?");
-    self.applicationTerminationHandler = applicationTerminationHandler;
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.registeredApplicationTermination = YES;
+        
+        NSLog(@"Registered for termination, eh?");
+        self.applicationTerminationHandler = applicationTerminationHandler;
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
+    });
 }
 
-- (void)unregisterApplicationTermination
+- (void)_unregisterApplicationTermination
 {
     if (self.registeredApplicationTermination) {
         if (self.applicationTerminationHandler != nil) {
@@ -135,6 +203,13 @@
         
         self.registeredApplicationTermination = NO;
     }
+}
+
+- (void)unregisterApplicationTermination
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self _unregisterApplicationTermination];
+    });
 }
 
 - (void)applicationWillTerminate:(NSNotification *)__unused note
@@ -149,24 +224,30 @@
 
 - (void)terminateApplication
 {
-    [NSApp terminate:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSApp terminate:nil];
+    });
 }
 
 - (void)dismissUpdateInstallation
 {
-    NSLog(@"Dismissing the installation.");
-    
-    if (self.updateCheckStatusCompletion != nil) {
-        self.updateCheckStatusCompletion(SUUserInitiatedCheckCancelled);
-        self.updateCheckStatusCompletion = nil;
-    }
-    
-    if (self.downloadUpdateStatusCompletion != nil) {
-        self.downloadUpdateStatusCompletion(SUDownloadUpdateCancelled);
-        self.downloadUpdateStatusCompletion = nil;
-    }
-    
-    [self unregisterApplicationTermination];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"Dismissing the installation.");
+        
+        [self _invalidateUpdateCheckTimer];
+        
+        if (self.updateCheckStatusCompletion != nil) {
+            self.updateCheckStatusCompletion(SUUserInitiatedCheckCancelled);
+            self.updateCheckStatusCompletion = nil;
+        }
+        
+        if (self.downloadUpdateStatusCompletion != nil) {
+            self.downloadUpdateStatusCompletion(SUDownloadUpdateCancelled);
+            self.downloadUpdateStatusCompletion = nil;
+        }
+        
+        [self _unregisterApplicationTermination];
+    });
 }
 
 @end
