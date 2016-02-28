@@ -8,7 +8,6 @@
 
 #import "SUDiskImageUnarchiver.h"
 #import "SUUnarchiver_Private.h"
-#import "NTSynchronousTask.h"
 #import "SULog.h"
 #include <CoreServices/CoreServices.h>
 
@@ -89,12 +88,26 @@
         NSInteger taskResult = -1;
 		@try
 		{
-            NTSynchronousTask *task = [[NTSynchronousTask alloc] init];
-
-            [task run:@"/usr/bin/hdiutil" directory:@"/" withArgs:arguments input:promptData];
-
-            taskResult = [task result];
-            output = [[task output] copy];
+            NSTask *task = [[NSTask alloc] init];
+            task.launchPath = @"/usr/bin/hdiutil";
+            task.currentDirectoryPath = @"/";
+            task.arguments = arguments;
+            
+            NSPipe *inputPipe = [NSPipe pipe];
+            NSPipe *outputPipe = [NSPipe pipe];
+            
+            task.standardInput = inputPipe;
+            task.standardOutput = outputPipe;
+            
+            [task launch];
+            
+            [inputPipe.fileHandleForWriting writeData:promptData];
+            [inputPipe.fileHandleForWriting closeFile];
+            
+            [task waitUntilExit];
+            
+            output = [outputPipe.fileHandleForReading readDataToEndOfFile];
+            taskResult = task.terminationStatus;
         }
         @catch (NSException *)
         {
