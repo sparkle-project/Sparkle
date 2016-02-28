@@ -8,7 +8,6 @@
 
 #import <Cocoa/Cocoa.h>
 #import <XCTest/XCTest.h>
-#import "NTSynchronousTask.h"
 #import "SUCodeSigningVerifier.h"
 
 @interface SUCodeSigningVerifierTest : XCTestCase
@@ -115,10 +114,14 @@
     BOOL success = NO;
     @try
     {
-        NTSynchronousTask *task = [[NTSynchronousTask alloc] init];
-        NSArray *arguments = @[ zipPath ];
-        [task run:@"/usr/bin/unzip" directory:destPath withArgs:arguments input:nil];
-        success = ([task result] == 0);
+        NSTask *task = [[NSTask alloc] init];
+        task.launchPath = @"/usr/bin/unzip";
+        task.currentDirectoryPath = destPath;
+        task.arguments = @[zipPath];
+        
+        [task launch];
+        [task waitUntilExit];
+        success = (task.terminationStatus == 0);
     }
     @catch (NSException *exception)
     {
@@ -134,9 +137,9 @@
     {
         // ad-hoc signing with the dash
         NSArray *arguments = @[ @"--force", @"--deep", @"--sign", @"-", appPath ];
-        NTSynchronousTask *task = [[NTSynchronousTask alloc] init];
-        [task run:@"/usr/bin/codesign" directory:nil withArgs:arguments input:nil];
-        success = ([task result] == 0);
+        NSTask *task = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/codesign" arguments:arguments];
+        [task waitUntilExit];
+        success = (task.terminationStatus == 0);
     }
     @catch (NSException *exception)
     {
