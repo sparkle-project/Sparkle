@@ -529,6 +529,9 @@
 - (void)dismissUpdateInstallation
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        // Make sure everything we call here does not dispatch async to main queue
+        // because we are already on the main queue (and I've been bitten in the past by this before)
+        
         [self _invalidateUpdateCheckTimer];
         
         [self cancelCheckForUpdates];
