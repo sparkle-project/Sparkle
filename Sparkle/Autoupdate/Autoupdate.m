@@ -186,6 +186,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"")
                                    maxProgressValue: 0 statusText: @""];
         [self.statusController showWindow:self];
+        [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
     }
     
     [SUInstaller installFromUpdateFolder:self.updateFolderPath
@@ -271,9 +272,6 @@ int main(int __unused argc, const char __unused *argv[])
         NSApplication *application = [NSApplication sharedApplication];
 
         BOOL shouldShowUI = (args.count > 6) ? [args[6] boolValue] : YES;
-        if (shouldShowUI) {
-            [application activateIgnoringOtherApps:YES];
-        }
         
         NSString *hostBundlePath = args[3];
         
