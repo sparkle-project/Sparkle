@@ -565,8 +565,12 @@
         BOOL success = NO;
         NSError *error = nil;
         success = [[NSFileManager defaultManager] removeItemAtPath:self.tempDir error:&error]; // Clean up the copied relauncher
-        if (!success)
-            [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[self.tempDir stringByDeletingLastPathComponent] destination:@"" files:@[[self.tempDir lastPathComponent]] tag:NULL];
+        if (!success) {
+            NSURL *tempDirURL = [NSURL fileURLWithPath:self.tempDir];
+            if (tempDirURL != nil) {
+                [[SUFileManager fileManagerAllowingAuthorization:NO] moveItemAtURLToTrash:tempDirURL error:NULL];
+            }
+        }
     }
     
     if (self.download != nil) {
