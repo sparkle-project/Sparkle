@@ -265,15 +265,47 @@ int main(int __unused argc, const char __unused *argv[])
     @autoreleasepool
     {
         NSArray *args = [[NSProcessInfo processInfo] arguments];
-        if (args.count < 5 || args.count > 7) {
+        if (args.count != 8) {
             return EXIT_FAILURE;
         }
         
-        NSApplication *application = [NSApplication sharedApplication];
-
-        BOOL shouldShowUI = (args.count > 6) ? [args[6] boolValue] : YES;
-        
+        NSString *hostPath = args[1];
+        NSString *relaunchPath = args[2];
         NSString *hostBundlePath = args[3];
+        NSString *updateDirectoryPath = args[4];
+        BOOL shouldRelaunchApp = [args[5] boolValue];
+        BOOL shouldShowUI = [args[6] boolValue];
+        BOOL shouldRelaunchTool = [args[7] boolValue];
+        
+        if (shouldRelaunchTool) {
+            NSURL *mainBundleURL = [[NSBundle mainBundle] bundleURL];
+            
+            if (mainBundleURL == nil) {
+                SULog(@"Error: No bundle path located found for main bundle!");
+                return EXIT_FAILURE;
+            }
+            
+            NSMutableArray *launchArguments = [args mutableCopy];
+            [launchArguments removeObjectAtIndex:0]; // argv[0] is not important
+            launchArguments[launchArguments.count - 1] = @"0"; // we don't want to relaunch the tool this time
+            
+            // We want to launch our tool through LaunchServices, not through a NSTask instance
+            // This has a few advantages: one being that we don't inherit the privileges of the parent owner.
+            // Another is if we try to spawn a task, it may be prematurely terminated if the parent is like a XPC service,
+            // which is what the shouldRelaunchTool flag exists to prevent. Thus, a caller may specify to relaunch the tool again and
+            // wait until we exit. When we exit the first time, the caller will be notified, and we can launch a second instance through LS.
+            // The caller may not have AppKit available which is why it may not launch through LS itself.
+            NSError *launchError = nil;
+            NSRunningApplication *newRunningApplication = [[NSWorkspace sharedWorkspace] launchApplicationAtURL:mainBundleURL options:(NSWorkspaceLaunchOptions)(NSWorkspaceLaunchDefault | NSWorkspaceLaunchNewInstance) configuration:@{NSWorkspaceLaunchConfigurationArguments : [launchArguments copy]} error:&launchError];
+            
+            if (newRunningApplication == nil) {
+                SULog(@"Failed to create second instance of tool with error: %@", launchError);
+            }
+            
+            return EXIT_SUCCESS;
+        }
+        
+        NSApplication *application = [NSApplication sharedApplication];
         
         NSNumber *activeProcessIdentifier = nil;
         for (NSRunningApplication *runningApplication in [[NSWorkspace sharedWorkspace] runningApplications]) {
@@ -283,11 +315,11 @@ int main(int __unused argc, const char __unused *argv[])
             }
         }
         
-        AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostPath:args[1]
-                                                               relaunchPath:args[2]
+        AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostPath:hostPath
+                                                               relaunchPath:relaunchPath
                                                             hostProcessIdentifier:activeProcessIdentifier
-                                                           updateFolderPath:args[4]
-                                                             shouldRelaunch:(args.count > 5) ? [args[5] boolValue] : YES
+                                                           updateFolderPath:updateDirectoryPath
+                                                             shouldRelaunch:shouldRelaunchApp
                                                                shouldShowUI:shouldShowUI];
         [application setDelegate:appInstaller];
         [application run];

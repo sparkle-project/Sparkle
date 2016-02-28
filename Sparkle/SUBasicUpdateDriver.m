@@ -525,8 +525,7 @@
     if ([updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)])
         [updaterDelegate updaterWillRelaunchApplication:self.updater];
 
-    NSBundle *relaunchToolBundle = [NSBundle bundleWithPath:self.relaunchPath];
-    NSString *relaunchToolPath = [relaunchToolBundle executablePath];
+    NSString *relaunchToolPath = [[NSBundle bundleWithPath:self.relaunchPath] executablePath];
     if (!relaunchToolPath || ![[NSFileManager defaultManager] fileExistsAtPath:self.relaunchPath]) {
         // Note that we explicitly use the host app's name here, since updating plugin for Mail relaunches Mail, not just the plugin.
         [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{
@@ -547,13 +546,36 @@
                                  self.host.bundlePath,
                                  self.tempDir,
                                  relaunch ? @"1" : @"0",
-                                 showUI ? @"1" : @"0"];
+                                 showUI ? @"1" : @"0",
+                                 @"1"]; // last one signifies the relaunch tool should exit & reply back to us immediately
     
-    // Make sure the launched task finishes. If this is a XPC process, and we don't wait for it to finish, we risk the task terminating prematurely
-    NSTask *launchedTask = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/open" arguments:[@[@"-n", relaunchToolBundle.bundlePath, @"--args"] arrayByAddingObjectsFromArray:launchArguments]];
-    [launchedTask waitUntilExit];
+    // Make sure the launched task finishes & replies back.
+    // If it succeeds, it will have launched a second instance of the tool through LaunchServices
+    // This is necessary if we are a XPC process, because otherwise we risk exiting prematurely
+    // Further, we don't launch through LS here because we don't want to reference AppKit here
+    int terminationStatus = 0;
+    BOOL taskDidLaunch = NO;
+    @try {
+        NSTask *launchedTask = [NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:launchArguments];
+        [launchedTask waitUntilExit];
+        taskDidLaunch = YES;
+        terminationStatus = launchedTask.terminationStatus;
+    } @catch (NSException *exception) {
+        SULog(@"Raised exception when launching update tool: %@", exception);
+    }
     
-    [self terminateApp];
+    if (!taskDidLaunch || terminationStatus != 0) {
+        if (taskDidLaunch) {
+            SULog(@"Update tool failed with exit code: %d", terminationStatus);
+        }
+        
+        [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{
+                        NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while launching the updater. Please try again later.", nil),
+                        NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't launch relauncher at %@", relaunchToolPath]
+                    }]];
+    } else {
+        [self terminateApp];
+    }
 }
 
 // Note: this is overridden by the automatic update driver to not terminate in some cases
