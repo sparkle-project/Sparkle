@@ -29,20 +29,20 @@ NSString *const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 @synthesize appcastURL;
 @synthesize automaticallyInstallUpdates;
 
-- (instancetype)initWithUpdater:(SUUpdater *)anUpdater
+- (instancetype)initWithUpdater:(SUUpdater *)anUpdater host:(SUHost *)aHost
 {
     if ((self = [super init])) {
         self.updater = anUpdater;
+        self.host = aHost;
     }
     return self;
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self.host bundlePath], [self.host installationPath]]; }
 
-- (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)h
+- (void)checkForUpdatesAtURL:(NSURL *)URL
 {
     self.appcastURL = URL;
-    self.host = h;
 }
 
 - (void)abortUpdate

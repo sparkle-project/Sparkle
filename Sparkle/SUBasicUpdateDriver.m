@@ -49,12 +49,12 @@
 
 @synthesize postponedOnce;
 
-- (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
+- (void)checkForUpdatesAtURL:(NSURL *)URL
 {
-    [super checkForUpdatesAtURL:URL host:aHost];
-	if ([aHost isRunningOnReadOnlyVolume])
+    [super checkForUpdatesAtURL:URL];
+	if ([self.host isRunningOnReadOnlyVolume])
 	{
-        [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again.", nil), [aHost name]] }]];
+        [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again.", nil), [self.host name]] }]];
         return;
     }
 

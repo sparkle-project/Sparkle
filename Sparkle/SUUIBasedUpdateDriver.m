@@ -15,9 +15,9 @@
 
 @implementation SUUIBasedUpdateDriver
 
-- (instancetype)initWithUpdater:(SUUpdater *)anUpdater
+- (instancetype)initWithUpdater:(SUUpdater *)anUpdater host:(SUHost *)aHost
 {
-    if ((self = [super initWithUpdater:anUpdater])) {
+    if ((self = [super initWithUpdater:anUpdater host:aHost])) {
         self.automaticallyInstallUpdates = NO;
     }
     return self;

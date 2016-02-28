@@ -275,7 +275,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(SUUpdater *updater, SUUpdateD
     // Background update checks should only happen if we have a network connection.
     //	Wouldn't want to annoy users on dial-up by establishing a connection every
     //	hour or so:
-    SUUpdateDriver *theUpdateDriver = [[([self automaticallyDownloadsUpdates] ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class])alloc] initWithUpdater:self];
+    SUUpdateDriver *theUpdateDriver = [[([self automaticallyDownloadsUpdates] ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class])alloc] initWithUpdater:self host:self.host];
 
     // We don't want the rechability check to act on the driver if the updater is going near death
     __weak SUUpdater *updater = self;
@@ -296,12 +296,12 @@ static void SUCheckForUpdatesInBgReachabilityCheck(SUUpdater *updater, SUUpdateD
         [self.driver abortUpdate];
     }
 
-    [self checkForUpdatesWithDriver:[[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self]];
+    [self checkForUpdatesWithDriver:[[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self host:self.host]];
 }
 
 - (void)checkForUpdateInformation
 {
-    [self checkForUpdatesWithDriver:[[SUProbingUpdateDriver alloc] initWithUpdater:self]];
+    [self checkForUpdatesWithDriver:[[SUProbingUpdateDriver alloc] initWithUpdater:self host:self.host]];
 }
 
 - (void)installUpdatesIfAvailable
@@ -310,7 +310,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(SUUpdater *updater, SUUpdateD
         [self.driver abortUpdate];
     }
 
-    SUUserInitiatedUpdateDriver *theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self];
+    SUUserInitiatedUpdateDriver *theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self host:self.host];
     theUpdateDriver.automaticallyInstallUpdates = YES;
     [self checkForUpdatesWithDriver:theUpdateDriver];
 }
@@ -342,7 +342,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(SUUpdater *updater, SUUpdateD
 
     NSURL *theFeedURL = [self parameterizedFeedURL];
     if (theFeedURL) // Use a NIL URL to cancel quietly.
-        [self.driver checkForUpdatesAtURL:theFeedURL host:self.host];
+        [self.driver checkForUpdatesAtURL:theFeedURL];
     else
         [self.driver abortUpdate];
 }

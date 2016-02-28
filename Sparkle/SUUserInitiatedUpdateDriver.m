@@ -33,8 +33,7 @@
     }
 }
 
-#warning assign user driver's host in a superclass of this method, possibly the UI driver.. IDK
-- (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
+- (void)checkForUpdatesAtURL:(NSURL *)URL
 {
     [self.updater.userUpdaterDriver showUserInitiatedUpdateCheckWithCompletion:^(SUUserInitiatedCheckStatus completionStatus) {
         switch (completionStatus) {
@@ -48,7 +47,7 @@
         }
     }];
     
-    [super checkForUpdatesAtURL:URL host:aHost];
+    [super checkForUpdatesAtURL:URL];
 }
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac

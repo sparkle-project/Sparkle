@@ -21,7 +21,7 @@
 @property (strong, readonly) NSURLDownload *download;
 @property (copy, readonly) NSString *downloadPath;
 
-- (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
+- (void)checkForUpdatesAtURL:(NSURL *)URL;
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui;
 - (BOOL)hostSupportsItem:(SUAppcastItem *)ui;

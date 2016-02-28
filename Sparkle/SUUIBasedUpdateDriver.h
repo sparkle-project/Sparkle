@@ -17,7 +17,7 @@
 
 @interface SUUIBasedUpdateDriver : SUBasicUpdateDriver <SUUnarchiverDelegate>
 
-- (instancetype)initWithUpdater:(SUUpdater *)updater;
+- (instancetype)initWithUpdater:(SUUpdater *)updater host:(SUHost *)host;
 
 @end
 
