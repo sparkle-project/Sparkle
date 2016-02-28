@@ -255,7 +255,7 @@
 
 @interface SUUpdateSettingsWindowController ()
 
-@property (nonatomic) IBOutlet SUUpdater *updater;
+@property (nonatomic) SUUpdater *updater;
 
 @end
 
@@ -265,7 +265,11 @@
 
 - (void)windowDidLoad
 {
-    self.updater.userUpdaterDriver = [[SUSparkleUserUpdaterDriver alloc] initWithHost:[[SUHost alloc] initWithBundle:[NSBundle mainBundle]] handlesTermination:YES delegate:nil];
+#warning update object still doesn't quite work right with regards to, eg, bindings
+    id <SUUserUpdaterDriver> userUpdaterDriver = [[SUSparkleUserUpdaterDriver alloc] initWithHost:[[SUHost alloc] initWithBundle:[NSBundle mainBundle]] handlesTermination:YES delegate:nil];
+    self.updater = [[SUUpdater alloc] initWithHostBundle:[NSBundle mainBundle] userUpdaterDriver:userUpdaterDriver];
+    
+    //self.updater.userUpdaterDriver = [[SUSparkleUserUpdaterDriver alloc] initWithHost:[[SUHost alloc] initWithBundle:[NSBundle mainBundle]] handlesTermination:YES delegate:nil];
     //self.updater.userUpdaterDriver = [[SULoggerUpdateDriver alloc] init];
 }
 
