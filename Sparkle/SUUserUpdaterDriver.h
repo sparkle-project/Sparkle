@@ -13,6 +13,7 @@
 @class SUUpdatePermissionPromptResult, SUAppcastItem;
 
 @protocol SUVersionDisplay;
+@protocol SUUserUpdaterDriver;
 
 typedef NS_ENUM(NSUInteger, SUUpdateCheckTimerStatus) {
     SUCheckForUpdateNow,
@@ -39,7 +40,21 @@ typedef NS_ENUM(NSUInteger, SUInstallUpdateStatus) {
     SUCancelUpdateInstallation
 };
 
+@protocol SUUserUpdaterDriverDelegate <NSObject>
+
+@optional
+
+- (BOOL)responsibleForInitiatingUpdateCheckForUserDriver:(id <SUUserUpdaterDriver>)userUpdaterDriver;
+- (void)initiateUpdateCheckForUserDriver:(id <SUUserUpdaterDriver>)userUpdaterDriver;
+
+- (void)userUpdaterDriverWillShowModalAlert:(id <SUUserUpdaterDriver>)userUpdaterDriver;
+- (void)userUpdaterDriverDidShowModalAlert:(id <SUUserUpdaterDriver>)userUpdaterDriver;
+
+@end
+
 @protocol SUUserUpdaterDriver <NSObject>
+
+@property (nonatomic, readonly, weak) id <SUUserUpdaterDriverDelegate> delegate;
 
 - (void)startUpdateCheckTimerWithNextTimeInterval:(NSTimeInterval)timeInterval reply:(void (^)(SUUpdateCheckTimerStatus))reply;
 - (void)invalidateUpdateCheckTimer;

@@ -25,6 +25,7 @@
 
 @implementation SULoggerUpdateDriver
 
+@synthesize delegate = _delegate;
 @synthesize downloadUpdateStatusCompletion = _downloadUpdateStatusCompletion;
 @synthesize updateCheckStatusCompletion = _updateCheckStatusCompletion;
 @synthesize applicationTerminationHandler = _applicationTerminationHandler;
