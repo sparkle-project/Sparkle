@@ -10,6 +10,7 @@
 
 #import "SUHost.h"
 #import "SULocalizations.h"
+#import "SUAppcastItem.h"
 
 @interface SUAutomaticUpdateAlert ()
 @property (strong) void(^completionBlock)(SUAutomaticInstallationChoice);

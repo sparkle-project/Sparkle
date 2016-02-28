@@ -22,6 +22,7 @@
 #import "SUFileManager.h"
 #import "SUErrors.h"
 #import "SULocalizations.h"
+#import "SUAppcastItem.h"
 
 @interface SUBasicUpdateDriver ()
 

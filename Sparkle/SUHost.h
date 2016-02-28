@@ -5,12 +5,9 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
-#import "SUVersionComparisonProtocol.h"
+#import <Cocoa/Cocoa.h>
 
-@interface SUHost : NSObject<NSSecureCoding>
+@interface SUHost : NSObject
 
 @property (strong, readonly) NSBundle *bundle;
 

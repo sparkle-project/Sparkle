@@ -12,6 +12,7 @@
 #import "SUHost.h"
 #import "SUOperatingSystem.h"
 #import "SUConstants.h"
+#import "SUAppcastItem.h"
 
 @implementation SUUIBasedUpdateDriver
 
