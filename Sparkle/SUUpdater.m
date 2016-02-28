@@ -32,12 +32,8 @@ NSString *const SUUpdaterAppcastItemNotificationKey = @"SUUpdaterAppcastItemNoti
 NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotificationKey";
 
 @interface SUUpdater ()
-@property (strong) NSBundle *sparkleBundle;
 
-- (void)startUpdateCycle;
-- (void)checkForUpdatesWithDriver:(SUUpdateDriver *)updateDriver;
-- (void)scheduleNextUpdateCheck;
-- (void)updateDriverDidFinish:(NSNotification *)note;
+@property (strong) NSBundle *sparkleBundle;
 @property (readonly, copy) NSURL *parameterizedFeedURL;
 
 @property (strong) SUUpdateDriver *driver;
