@@ -26,11 +26,6 @@
 @synthesize defaultsDomain;
 @synthesize usesStandardUserDefaults;
 
-+ (BOOL)supportsSecureCoding
-{
-    return YES;
-}
-
 - (instancetype)initWithCoder:(NSCoder *)decoder
 {
     NSURL *bundleURL = [decoder decodeObjectOfClass:[NSURL class] forKey:@"bundleURL"];
