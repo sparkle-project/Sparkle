@@ -497,27 +497,28 @@
 
 - (void)applicationWillTerminate:(NSNotification *)__unused note
 {
-    [self sendTerminationSignalWithCompletion:^{}];
+    [self sendApplicationTerminationSignal];
 }
 
-- (void)sendTerminationSignalWithCompletion:(void (^)(void))finishTermination
+- (NSApplicationTerminateReply)sendApplicationTerminationSignal
 {
-    self.finishTermination = finishTermination;
-    
-    if (self.applicationTerminationHandler != nil) {
-        self.applicationTerminationHandler(SUApplicationWillTerminate);
-        self.applicationTerminationHandler = nil;
+    if (self.installingUpdateOnTermination) {
+        if (self.applicationTerminationHandler != nil) {
+            self.applicationTerminationHandler(SUApplicationWillTerminate);
+            self.applicationTerminationHandler = nil;
+        }
+        
+        return NSTerminateLater;
     }
+    
+    return NSTerminateNow;
 }
 
 - (void)terminateApplication
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.installingUpdateOnTermination && !self.handlesTermination) {
-            if (self.finishTermination != nil) {
-                self.finishTermination();
-                self.finishTermination = nil;
-            }
+            [NSApp replyToApplicationShouldTerminate:YES];
         } else {
             [NSApp terminate:nil];
         }

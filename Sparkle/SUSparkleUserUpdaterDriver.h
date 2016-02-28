@@ -15,8 +15,4 @@
 
 - (instancetype)initWithHost:(SUHost *)host handlesTermination:(BOOL)handlesTermination delegate:(id <SUUserUpdaterDriverDelegate>)delegate;
 
-@property (nonatomic, readonly, getter = isInstallingUpdateOnTermination) BOOL installingUpdateOnTermination;
-
-- (void)sendTerminationSignalWithCompletion:(void (^)(void))finishTermination;
-
 @end

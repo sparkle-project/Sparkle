@@ -81,6 +81,7 @@ typedef NS_ENUM(NSUInteger, SUInstallUpdateStatus) {
 
 - (void)showInstallingUpdate;
 
+- (NSApplicationTerminateReply)sendApplicationTerminationSignal;
 - (void)registerApplicationTermination:(void (^)(SUApplicationTerminationStatus))applicationTerminationHandler;
 - (void)unregisterApplicationTermination;
 - (void)terminateApplication;
