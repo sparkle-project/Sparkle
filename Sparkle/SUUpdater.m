@@ -207,6 +207,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 	if ([note object] == self.driver && [self.driver finished])
 	{
         self.driver = nil;
+        [self updateLastUpdateCheckDate];
         [self scheduleNextUpdateCheck];
     }
 }
@@ -214,6 +215,13 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (NSDate *)lastUpdateCheckDate
 {
     return [self.host objectForUserDefaultsKey:SULastCheckTimeKey];
+}
+
+- (void)updateLastUpdateCheckDate
+{
+    [self willChangeValueForKey:@"lastUpdateCheckDate"];
+    [self.host setObject:[NSDate date] forUserDefaultsKey:SULastCheckTimeKey];
+    [self didChangeValueForKey:@"lastUpdateCheckDate"];
 }
 
 - (void)scheduleNextUpdateCheck
@@ -355,9 +363,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     
     [self.userUpdaterDriver invalidateUpdateCheckTimer];
 
-    [self willChangeValueForKey:@"lastUpdateCheckDate"];
-    [self.host setObject:[NSDate date] forUserDefaultsKey:SULastCheckTimeKey];
-    [self didChangeValueForKey:@"lastUpdateCheckDate"];
+    [self updateLastUpdateCheckDate];
 
     if( [self.delegate respondsToSelector: @selector(updaterMayCheckForUpdates:)] && ![self.delegate updaterMayCheckForUpdates: self] )
 	{
