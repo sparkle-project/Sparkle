@@ -11,6 +11,7 @@
 #import "SUHost.h"
 #import "SULocalizations.h"
 #import "SUAppcastItem.h"
+#import "SUApplicationInfo.h"
 
 @interface SUAutomaticUpdateAlert ()
 @property (strong) void(^completionBlock)(SUAutomaticInstallationChoice);
@@ -61,7 +62,7 @@
 
 - (NSImage *__nonnull)applicationIcon
 {
-    return [self.host icon];
+    return [SUApplicationInfo bestIconForBundle:self.host.bundle];
 }
 
 - (NSString *__nonnull)titleText

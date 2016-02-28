@@ -5,7 +5,7 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
 @interface SUHost : NSObject
 
@@ -19,9 +19,7 @@
 @property (readonly, copy) NSString *name;
 @property (readonly, copy) NSString *version;
 @property (readonly, copy) NSString *displayVersion;
-@property (readonly, copy) NSImage *icon;
 @property (getter=isRunningOnReadOnlyVolume, readonly) BOOL runningOnReadOnlyVolume;
-@property (getter=isBackgroundApplication, readonly) BOOL backgroundApplication;
 @property (readonly, copy) NSString *publicDSAKey;
 
 - (id)objectForInfoDictionaryKey:(NSString *)key;

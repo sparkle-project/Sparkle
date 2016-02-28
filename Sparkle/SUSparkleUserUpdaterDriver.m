@@ -16,6 +16,7 @@
 #import "SUAutomaticUpdateAlert.h"
 #import "SUOperatingSystem.h"
 #import "SULocalizations.h"
+#import "SUApplicationInfo.h"
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED < 1080
 @interface NSByteCountFormatter : NSFormatter {
@@ -163,7 +164,7 @@
     // If the app is a menubar app or the like, we need to focus it first and alter the
     // update prompt to behave like a normal window. Otherwise if the window were hidden
     // there may be no way for the application to be activated to make it visible again.
-    if ([self.host isBackgroundApplication]) {
+    if ([SUApplicationInfo isBackgroundApplication:NSApp]) {
         [self.activeUpdateAlert.window setHidesOnDeactivate:NO];
         
         [NSApp activateIgnoringOtherApps:YES];
@@ -260,7 +261,7 @@
         
         // For background applications, obtain focus.
         // Useful if the update check is requested from another app like System Preferences.
-        if ([self.host isBackgroundApplication])
+        if ([SUApplicationInfo isBackgroundApplication:NSApp])
         {
             [NSApp activateIgnoringOtherApps:YES];
         }
@@ -337,9 +338,9 @@
         
         // When showing a modal alert we need to ensure that background applications
         // are focused to inform the user since there is no dock icon to notify them.
-        if ([self.host isBackgroundApplication]) { [NSApp activateIgnoringOtherApps:YES]; }
+        if ([SUApplicationInfo isBackgroundApplication:NSApp]) { [NSApp activateIgnoringOtherApps:YES]; }
         
-        [alert setIcon:[self.host icon]];
+        [alert setIcon:[SUApplicationInfo bestIconForBundle:self.host.bundle]];
         [alert runModal];
         
         if ([delegate respondsToSelector:@selector(userUpdaterDriverDidShowModalAlert:)]) {

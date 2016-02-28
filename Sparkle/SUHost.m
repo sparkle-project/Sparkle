@@ -7,6 +7,8 @@
 
 #import "SUHost.h"
 
+// This is a "core" class and thus should NOT import Cocoa/AppKit
+
 #import "SUConstants.h"
 #include <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
 #import "SULog.h"
@@ -157,41 +159,11 @@
         return [self version]; // Fall back on the normal version string.
 }
 
-- (NSImage *__nonnull)icon
-{
-    // Cache the application icon.
-    NSString *iconPath = [self.bundle pathForResource:[self.bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType:@"icns"];
-    // According to the OS X docs, "CFBundleIconFile - This key identifies the file containing
-    // the icon for the bundle. The filename you specify does not need to include the .icns
-    // extension, although it may."
-    //
-    // However, if it *does* include the '.icns' the above method fails (tested on OS X 10.3.9) so we'll also try:
-    if (!iconPath) {
-        iconPath = [self.bundle pathForResource:[self.bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType:nil];
-    }
-    NSImage *icon = [[NSImage alloc] initWithContentsOfFile:iconPath];
-    // Use a default icon if none is defined.
-    if (!icon) {
-        // this asumption may not be correct (eg. even though we're not the main bundle, it could be still be a regular app)
-        // but still better than nothing if no icon was included
-        BOOL isMainBundle = (self.bundle == [NSBundle mainBundle]);
-
-        NSString *fileType = isMainBundle ? (__bridge NSString *)kUTTypeApplication : (__bridge NSString *)kUTTypeBundle;
-        icon = [[NSWorkspace sharedWorkspace] iconForFileType:fileType];
-    }
-    return icon;
-}
-
 - (BOOL)isRunningOnReadOnlyVolume
 {
     struct statfs statfs_info;
     statfs([[self.bundle bundlePath] fileSystemRepresentation], &statfs_info);
     return (statfs_info.f_flags & MNT_RDONLY) != 0;
-}
-
-- (BOOL)isBackgroundApplication
-{
-    return ([[NSApplication sharedApplication] activationPolicy] == NSApplicationActivationPolicyAccessory);
 }
 
 - (NSString *__nullable)publicDSAKey
