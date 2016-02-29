@@ -13,7 +13,6 @@
 #import "SUExport.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SUVersionDisplayProtocol.h"
-#import "SUUpdateAlertChoice.h"
 #import "SUUserUpdaterDriver.h"
 
 @class SUAppcastItem, SUAppcast, SUHost, SUUpdatePermissionPromptResult;

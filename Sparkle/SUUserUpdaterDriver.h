@@ -7,43 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SUUpdateAlertChoice.h"
-#import "SUAutomaticInstallationChoice.h"
+#import "SUStatusCompletionResults.h"
 
 @class SUUpdatePermissionPromptResult, SUAppcastItem;
 
 @protocol SUVersionDisplay;
 @protocol SUUserUpdaterDriver;
-
-typedef NS_ENUM(NSUInteger, SUUpdateCheckTimerStatus) {
-    SUCheckForUpdateNow,
-    SUCheckForUpdateWillOccurLater
-};
-
-typedef NS_ENUM(NSUInteger, SUUserInitiatedCheckStatus) {
-    SUUserInitiatedCheckDone,
-    SUUserInitiatedCheckCancelled
-};
-
-typedef NS_ENUM(NSUInteger, SUDownloadUpdateStatus) {
-    SUDownloadUpdateDone,
-    SUDownloadUpdateCancelled
-};
-
-typedef NS_ENUM(NSUInteger, SUApplicationTerminationStatus) {
-    SUApplicationWillTerminate,
-    SUApplicationStoppedObservingTermination
-};
-
-typedef NS_ENUM(NSUInteger, SUSystemPowerOffStatus) {
-    SUSystemWillPowerOff,
-    SUStoppedObservingSystemPowerOff
-};
-
-typedef NS_ENUM(NSUInteger, SUInstallUpdateStatus) {
-    SUInstallAndRelaunchUpdateNow,
-    SUCancelUpdateInstallation
-};
 
 @protocol SUUserUpdaterDriverDelegate <NSObject>
 

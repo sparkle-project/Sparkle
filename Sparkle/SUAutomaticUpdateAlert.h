@@ -10,7 +10,7 @@
 #define SUAUTOMATICUPDATEALERT_H
 
 #import <Cocoa/Cocoa.h>
-#import "SUAutomaticInstallationChoice.h"
+#import "SUStatusCompletionResults.h"
 
 @class SUAppcastItem, SUHost;
 @interface SUAutomaticUpdateAlert : NSWindowController
