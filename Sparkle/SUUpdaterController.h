@@ -6,7 +6,7 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 
 // Note this class is not intended for XPC or sandboxing (or not yet?)
 // It's meant to be droppable via Interface Builder as a custom NSObject subclass
@@ -15,6 +15,9 @@
 
 @interface SUUpdaterController : NSObject
 
+/*!
+ Accessible property for the updater. Some properties on the updater can be binded via KVO
+ */
 @property (nonatomic, readonly) SUUpdater *updater;
 
 /*!
@@ -26,5 +29,10 @@
  when it is invoked.
  */
 - (IBAction)checkForUpdates:(id)sender;
+
+/*!
+ Validates if the menu item for checkForUpdates: can be invoked or not
+ */
+- (BOOL)validateMenuItem:(NSMenuItem *)item;
 
 @end
