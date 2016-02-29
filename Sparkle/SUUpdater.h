@@ -59,13 +59,8 @@ SU_EXPORT @interface SUUpdater : NSObject
 
 /*!
     Explicitly checks for updates and displays a progress dialog while doing so.
-
-    This method is meant for a main menu item.
-    Connect any menu item to this action in Interface Builder,
-    and Sparkle will check for updates and report back its findings verbosely
-    when it is invoked.
  */
-- (IBAction)checkForUpdates:(id)sender;
+- (void)checkForUpdates;
 
 /*!
     Checks for updates, but does not display any UI unless an update is found.
@@ -116,6 +111,8 @@ SU_EXPORT @interface SUUpdater : NSObject
     but only the internal NSTimer.
  */
 - (void)resetUpdateCycle;
+
+- (void)resetUpdateCycleAfterDelay:(NSTimeInterval)delay;
 
 @property (readonly) BOOL updateInProgress;
 

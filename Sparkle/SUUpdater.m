@@ -289,7 +289,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
     return (!self.delegate || ![self.delegate respondsToSelector:@selector(updaterShouldRelaunchApplication:)] || [self.delegate updaterShouldRelaunchApplication:self]);
 }
 
-- (IBAction)checkForUpdates:(id)__unused sender
+- (void)checkForUpdates
 {
     if (self.driver && [self.driver isInterruptible]) {
         [self.driver abortUpdate];
@@ -350,6 +350,12 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
 {
     [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
     [self scheduleNextUpdateCheck];
+}
+
+- (void)resetUpdateCycleAfterDelay:(NSTimeInterval)delay
+{
+    [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
+    [self performSelector:@selector(resetUpdateCycle) withObject:nil afterDelay:delay];
 }
 
 - (void)setAutomaticallyChecksForUpdates:(BOOL)automaticallyCheckForUpdates
