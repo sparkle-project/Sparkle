@@ -67,6 +67,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     _userUpdaterDriver = userUpdaterDriver;
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDriverDidFinish:) name:SUUpdateDriverFinishedNotification object:nil];
+    
     [self startUpdateCycle];
     
     return self;
@@ -503,6 +505,8 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
 
 - (void)dealloc
 {
+    // Remove updater did finish notification
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self.userUpdaterDriver invalidateUpdateCheckTimer];
 }
 
