@@ -1009,8 +1009,6 @@
 				6196CFE409C71ADE000DC222 /* SUStatusController.m */,
 				61B5FCA009C5228F00B25A18 /* SUUpdateAlert.h */,
 				61B5FCA109C5228F00B25A18 /* SUUpdateAlert.m */,
-				72A450511C69A68900D67EEA /* SUUpdatePermissionPromptResult.h */,
-				72A450521C69A68900D67EEA /* SUUpdatePermissionPromptResult.m */,
 				612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */,
 				612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */,
 				725602D31C83551C00DAA70E /* SUApplicationInfo.h */,
@@ -1053,6 +1051,8 @@
 				55C14F05136EF6DB00649790 /* SULog.m */,
 				726F2CE31BC9C33D001971A4 /* SUOperatingSystem.h */,
 				726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */,
+				72A450511C69A68900D67EEA /* SUUpdatePermissionPromptResult.h */,
+				72A450521C69A68900D67EEA /* SUUpdatePermissionPromptResult.m */,
 			);
 			includeInIndex = 1;
 			name = "Other Sources";

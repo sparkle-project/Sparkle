@@ -8,6 +8,10 @@
 
 #import "SUUpdatePermissionPromptResult.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 @implementation SUUpdatePermissionPromptResult
 
 @synthesize choice = _choice;
