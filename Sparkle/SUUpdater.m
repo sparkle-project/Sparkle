@@ -74,6 +74,12 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     return self;
 }
 
+- (instancetype)init
+{
+    [NSException raise:@"SUUpdaterInitNotImplemented" format:@"-[SUUpdater init] is not implemented. If you want to drop an updater into a nib, see SUUpdaterController"];
+    return nil;
+}
+
 -(void)checkIfConfiguredProperly {
     BOOL hasPublicDSAKey = [self.host publicDSAKey] != nil;
     BOOL isMainBundle = [self.host.bundle isEqualTo:[NSBundle mainBundle]];
