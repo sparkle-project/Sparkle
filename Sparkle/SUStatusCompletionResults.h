@@ -9,6 +9,8 @@
 #ifndef SUStatusCompletionResults_h
 #define SUStatusCompletionResults_h
 
+#import <Foundation/Foundation.h>
+
 typedef NS_ENUM(NSUInteger, SUUpdateCheckTimerStatus) {
     SUCheckForUpdateNow,
     SUCheckForUpdateWillOccurLater
