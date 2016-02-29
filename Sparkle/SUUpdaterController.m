@@ -60,7 +60,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (BOOL)validateMenuItem:(NSMenuItem *)item
 {
     if ([item action] == @selector(checkForUpdates:)) {
-        return !self.updater.updateInProgress;
+        return (self.updater != nil && !self.updater.updateInProgress);
     }
     return YES;
 }
