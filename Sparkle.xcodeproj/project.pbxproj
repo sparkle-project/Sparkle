@@ -72,8 +72,6 @@
 		55C14FC7136F05E100649790 /* Sparkle.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8220A321A7F00D8810D /* Sparkle.strings */; };
 		55E6F33319EC9F6C00005E76 /* SUErrors.h in Headers */ = {isa = PBXBuildFile; fileRef = 55E6F33219EC9F6C00005E76 /* SUErrors.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A4094481C74EA5200983BE0 /* SUAppcastTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA4DCD01C73E5510078F128 /* SUAppcastTest.swift */; };
-		5A6D31EE1BF53245009C5157 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
-		5A6D31EF1BF5325F009C5157 /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		5AD0FA7F1C73F2E2004BCEFF /* testappcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5AD0FA7E1C73F2E2004BCEFF /* testappcast.xml */; };
 		5AE459001C34118500E3BB47 /* SUUpdaterTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 14950074195FDF5900BC5B5B /* SUUpdaterTest.m */; };
 		5AE459021C34118500E3BB47 /* SUVersionComparisonTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 61227A150DB548B800AB99EA /* SUVersionComparisonTest.m */; };
@@ -1679,8 +1677,6 @@
 			files = (
 				61B5F93009C4CFDC00B25A18 /* main.m in Sources */,
 				726F2CEB1BC9C733001971A4 /* SUConstants.m in Sources */,
-				5A6D31EE1BF53245009C5157 /* SUFileManager.m in Sources */,
-				5A6D31EF1BF5325F009C5157 /* SUOperatingSystem.m in Sources */,
 				72E45CF31B640CDD005C701A /* SUTestApplicationDelegate.m in Sources */,
 				A5BF4F1D1BC7668B007A052A /* SUTestWebServer.m in Sources */,
 				72E45CF71B640DAE005C701A /* SUUpdateSettingsWindowController.m in Sources */,
