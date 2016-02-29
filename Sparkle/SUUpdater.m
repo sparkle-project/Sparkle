@@ -165,6 +165,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 	if ([note object] == self.driver && [self.driver finished])
 	{
         self.driver = nil;
+        [self.userUpdaterDriver showUpdateInProgress:NO];
         [self updateLastUpdateCheckDate];
         [self scheduleNextUpdateCheck];
     }
@@ -342,6 +343,8 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
         [self scheduleNextUpdateCheck];
         return;
     }
+    
+    [self.userUpdaterDriver showUpdateInProgress:YES];
 
     [self checkIfConfiguredProperly];
 

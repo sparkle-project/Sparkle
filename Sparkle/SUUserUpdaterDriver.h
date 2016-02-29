@@ -56,6 +56,8 @@ typedef NS_ENUM(NSUInteger, SUInstallUpdateStatus) {
 
 @property (nonatomic, readonly, weak) id <SUUserUpdaterDriverDelegate> delegate;
 
+- (void)showUpdateInProgress:(BOOL)isUpdateInProgress;
+
 - (void)startUpdateCheckTimerWithNextTimeInterval:(NSTimeInterval)timeInterval reply:(void (^)(SUUpdateCheckTimerStatus))reply;
 - (void)invalidateUpdateCheckTimer;
 

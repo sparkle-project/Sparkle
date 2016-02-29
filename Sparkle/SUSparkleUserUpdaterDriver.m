@@ -38,6 +38,8 @@
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly) BOOL handlesTermination;
 
+@property (nonatomic) BOOL updaterInProgress;
+
 @property (nonatomic) NSTimer *checkUpdateTimer;
 @property (nonatomic, copy) void (^checkForUpdatesReply)(SUUpdateCheckTimerStatus);
 
@@ -61,6 +63,7 @@
 @synthesize host = _host;
 @synthesize handlesTermination = _handlesTermination;
 @synthesize delegate = _delegate;
+@synthesize updaterInProgress = _updaterInProgress;
 @synthesize checkUpdateTimer = _checkUpdateTimer;
 @synthesize checkForUpdatesReply = _checkForUpdatesReply;
 @synthesize checkingController = _checkingController;
@@ -83,6 +86,15 @@
         _delegate = delegate;
     }
     return self;
+}
+
+#pragma mark Is Update Busy?
+
+- (void)showUpdateInProgress:(BOOL)isUpdateInProgress
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.updaterInProgress = isUpdateInProgress;
+    });
 }
 
 #pragma mark Check Updates Timer
@@ -532,6 +544,8 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         // Make sure everything we call here does not dispatch async to main queue
         // because we are already on the main queue (and I've been bitten in the past by this before)
+        
+        self.updaterInProgress = NO;
         
         [self _invalidateUpdateCheckTimer];
         

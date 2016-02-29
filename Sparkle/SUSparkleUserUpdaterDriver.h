@@ -15,6 +15,8 @@
 
 - (instancetype)initWithHost:(SUHost *)host handlesTermination:(BOOL)handlesTermination delegate:(id <SUUserUpdaterDriverDelegate>)delegate;
 
+@property (nonatomic, readonly, getter=isUpdateInProgress) BOOL updateInProgress;
+
 - (NSApplicationTerminateReply)sendApplicationTerminationSignal;
 
 @end
