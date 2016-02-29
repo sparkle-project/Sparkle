@@ -15,7 +15,7 @@
 #import "SUVersionDisplayProtocol.h"
 #import "SUUserUpdaterDriver.h"
 
-@class SUAppcastItem, SUAppcast, SUHost, SUUpdatePermissionPromptResult;
+@class SUAppcastItem, SUAppcast;
 
 @protocol SUUpdaterDelegate;
 
