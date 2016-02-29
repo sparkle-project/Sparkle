@@ -340,7 +340,7 @@
         userInfo[NSURLErrorFailingURLErrorKey] = failingUrl;
     }
 
-    [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:userInfo]];
+    [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo]];
 }
 
 - (BOOL)download:(NSURLDownload *)__unused download shouldDecodeSourceDataOfMIMEType:(NSString *)encodingType
