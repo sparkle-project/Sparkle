@@ -8,7 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-// Note this class is not intended for XPC or sandboxing (or not yet?)
+// Note this class is not intended for XPC or sandboxing
 // It's meant to be droppable via Interface Builder as a custom NSObject subclass
 
 @class SUUpdater;
