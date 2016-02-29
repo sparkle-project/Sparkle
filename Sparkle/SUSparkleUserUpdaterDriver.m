@@ -18,21 +18,6 @@
 #import "SULocalizations.h"
 #import "SUApplicationInfo.h"
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED < 1080
-@interface NSByteCountFormatter : NSFormatter {
-@private
-    unsigned int _allowedUnits;
-    char _countStyle;
-    BOOL _allowsNonnumericFormatting, _includesUnit, _includesCount, _includesActualByteCount,
-    _adaptive, _zeroPadsFractionDigits;
-    int _formattingContext;
-    int _reserved[5];
-}
-+ (NSString *)stringFromByteCount:(long long)byteCount
-                       countStyle:(NSByteCountFormatterCountStyle)countStyle;
-@end
-#endif
-
 @interface SUSparkleUserUpdaterDriver ()
 
 @property (nonatomic, readonly) SUHost *host;
@@ -415,26 +400,6 @@
 
 - (NSString *)localizedStringFromByteCount:(long long)value
 {
-    if (![SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 8, 0}]) {
-        if (value < 1000) {
-            return [NSString stringWithFormat:@"%.0lf %@", value / 1.0,
-                    SULocalizedString(@"B", @"the unit for bytes")];
-        }
-        
-        if (value < 1000 * 1000) {
-            return [NSString stringWithFormat:@"%.0lf %@", value / 1000.0,
-                    SULocalizedString(@"KB", @"the unit for kilobytes")];
-        }
-        
-        if (value < 1000 * 1000 * 1000) {
-            return [NSString stringWithFormat:@"%.1lf %@", value / 1000.0 / 1000.0,
-                    SULocalizedString(@"MB", @"the unit for megabytes")];
-        }
-        
-        return [NSString stringWithFormat:@"%.2lf %@", value / 1000.0 / 1000.0 / 1000.0,
-                SULocalizedString(@"GB", @"the unit for gigabytes")];
-    }
-    
     return [NSByteCountFormatter stringFromByteCount:value
                                           countStyle:NSByteCountFormatterCountStyleFile];
 }
