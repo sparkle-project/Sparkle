@@ -13,7 +13,7 @@
 
 @interface SUSparkleUserUpdaterDriver : NSObject <SUUserUpdaterDriver>
 
-- (instancetype)initWithHost:(SUHost *)host handlesTermination:(BOOL)handlesTermination delegate:(id <SUUserUpdaterDriverDelegate>)delegate;
+- (instancetype)initWithHost:(SUHost *)host delegate:(id <SUUserUpdaterDriverDelegate>)delegate;
 
 @property (nonatomic, readonly, getter=isUpdateInProgress) BOOL updateInProgress;
 

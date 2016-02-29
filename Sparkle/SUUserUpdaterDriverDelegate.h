@@ -17,6 +17,8 @@
 - (BOOL)responsibleForInitiatingUpdateCheckForUserDriver:(id <SUUserUpdaterDriver>)userUpdaterDriver;
 - (void)initiateUpdateCheckForUserDriver:(id <SUUserUpdaterDriver>)userUpdaterDriver;
 
+- (BOOL)responsibleForSignalingApplicationTerminationForUserDriver:(id <SUUserUpdaterDriver>)userUpdaterDriver;
+
 - (void)userUpdaterDriverWillShowModalAlert:(id <SUUserUpdaterDriver>)userUpdaterDriver;
 - (void)userUpdaterDriverDidShowModalAlert:(id <SUUserUpdaterDriver>)userUpdaterDriver;
 

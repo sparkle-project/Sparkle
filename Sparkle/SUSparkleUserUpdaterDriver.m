@@ -36,6 +36,8 @@
 @interface SUSparkleUserUpdaterDriver ()
 
 @property (nonatomic, readonly) SUHost *host;
+
+@property (nonatomic) BOOL askedHandlingTermination;
 @property (nonatomic, readonly) BOOL handlesTermination;
 
 @property (nonatomic) BOOL updateInProgress;
@@ -64,6 +66,7 @@
 
 @synthesize host = _host;
 @synthesize handlesTermination = _handlesTermination;
+@synthesize askedHandlingTermination = _askedHandlingTermination;
 @synthesize delegate = _delegate;
 @synthesize updateInProgress = _updateInProgress;
 @synthesize checkUpdateTimer = _checkUpdateTimer;
@@ -80,12 +83,11 @@
 
 #pragma mark Birth
 
-- (instancetype)initWithHost:(SUHost *)host handlesTermination:(BOOL)handlesTermination delegate:(id<SUUserUpdaterDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host delegate:(id<SUUserUpdaterDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
         _host = host;
-        _handlesTermination = handlesTermination;
         _delegate = delegate;
     }
     return self;
@@ -98,6 +100,19 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         self.updateInProgress = isUpdateInProgress;
     });
+}
+
+- (BOOL)handlesTermination
+{
+    if (!self.askedHandlingTermination) {
+        if ([self.delegate respondsToSelector:@selector(responsibleForSignalingApplicationTerminationForUserDriver:)]) {
+            _handlesTermination = ![self.delegate responsibleForSignalingApplicationTerminationForUserDriver:self];
+        } else {
+            _handlesTermination = YES;
+        }
+        self.askedHandlingTermination = YES;
+    }
+    return _handlesTermination;
 }
 
 #pragma mark Check Updates Timer

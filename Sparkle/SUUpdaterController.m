@@ -43,7 +43,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     NSBundle *bundle = [NSBundle mainBundle];
     SUHost *host = [[SUHost alloc] initWithBundle:bundle];
     
-    id <SUUserUpdaterDriver> driver = [[SUSparkleUserUpdaterDriver alloc] initWithHost:host handlesTermination:YES delegate:nil];
+    id <SUUserUpdaterDriver> driver = [[SUSparkleUserUpdaterDriver alloc] initWithHost:host delegate:nil];
     self.updater = [[SUUpdater alloc] initWithHostBundle:bundle userUpdaterDriver:driver];
 }
 
