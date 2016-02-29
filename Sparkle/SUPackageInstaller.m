@@ -10,6 +10,10 @@
 #import "SUConstants.h"
 #import "SUErrors.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 @implementation SUPackageInstaller
 
 + (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)__unused host versionComparator:(id<SUVersionComparison>)__unused comparator completionHandler:(void (^)(NSError *))completionHandler

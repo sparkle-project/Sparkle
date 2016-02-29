@@ -10,6 +10,11 @@
 #import <Security/Security.h>
 #import "SUParameterAssert.h"
 #import "SUGuidedPackageInstaller.h"
+#import "SUErrors.h"
+
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
 
 static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char* executablePath, AuthorizationFlags options, char* const* arguments)
 {

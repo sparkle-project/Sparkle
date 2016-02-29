@@ -9,6 +9,10 @@
 #import "SUProbingUpdateDriver.h"
 #import "SUUpdater.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 @implementation SUProbingUpdateDriver
 
 // Stop as soon as we have an answer! Since the superclass implementations are not called, we are responsible for notifying the delegate.

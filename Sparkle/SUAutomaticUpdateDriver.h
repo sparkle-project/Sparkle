@@ -11,7 +11,6 @@
 
 #import <Foundation/Foundation.h>
 #import "SUBasicUpdateDriver.h"
-#import "SUAutomaticUpdateAlert.h"
 
 @interface SUAutomaticUpdateDriver : SUBasicUpdateDriver <SUUnarchiverDelegate>
 

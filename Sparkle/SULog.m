@@ -13,6 +13,10 @@
 
 #include "SULog.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" implementation and should NOT import AppKit
+#endif
+
 
 // -----------------------------------------------------------------------------
 //	Constants:

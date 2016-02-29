@@ -13,6 +13,10 @@
 #import "SUAppcastItem.h"
 #import "SUVersionComparisonProtocol.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 @interface SUScheduledUpdateDriver ()
 
 @property (assign) BOOL showErrors;

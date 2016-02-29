@@ -15,6 +15,10 @@
 #import "SUErrors.h"
 #import "SUParameterAssert.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 @implementation SUPlainInstaller
 
 // Returns the bundle version from the specified host that is appropriate to use as a filename, or nil if we're unable to retrieve one

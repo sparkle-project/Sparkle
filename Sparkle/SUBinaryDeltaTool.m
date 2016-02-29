@@ -12,6 +12,10 @@
 #include <Foundation/Foundation.h>
 #include <xar/xar.h>
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 #define VERBOSE_FLAG @"--verbose"
 #define VERSION_FLAG @"--version"
 

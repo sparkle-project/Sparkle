@@ -13,6 +13,11 @@
 #import "SUConstants.h"
 #import "SUErrors.h"
 #import "SUAppcastItem.h"
+#import "SULog.h"
+
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
 
 // If the user hasn't quit in a week, ask them if they want to relaunch to get the latest bits. It doesn't matter that this measure of "one day" is imprecise.
 static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 24 * 7;
@@ -52,7 +57,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)installUpdateWithTerminationStatus:(NSNumber *)terminationStatus
 {
-    switch ((SUApplicationTerminationStatus)(terminationStatus.integerValue)) {
+    switch ((SUApplicationTerminationStatus)(terminationStatus.unsignedIntegerValue)) {
         case SUApplicationStoppedObservingTermination:
             if (self.willUpdateOnTermination) {
                 [self abortUpdate];
@@ -76,7 +81,10 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         [self performSelectorOnMainThread:@selector(installUpdateWithTerminationStatus:) withObject:@(terminationStatus) waitUntilDone:YES];
     }];
     
-    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(systemWillPowerOff:) name:NSWorkspaceWillPowerOffNotification object:nil];
+    [self.updater.userUpdaterDriver registerSystemPowerOff:^(SUSystemPowerOffStatus systemPowerOffStatus) {
+        // See above comment for why we use -performSelectorOnMainThread:withObject:waitUntilDone:
+        [self performSelectorOnMainThread:@selector(systemWillPowerOff:) withObject:@(systemPowerOffStatus) waitUntilDone:YES];
+    }];
 
     self.willUpdateOnTermination = YES;
 
@@ -115,8 +123,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         self.willUpdateOnTermination = NO;
         
         [self.updater.userUpdaterDriver unregisterApplicationTermination];
-        
-        [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self name:NSWorkspaceWillPowerOffNotification object:nil];
+        [self.updater.userUpdaterDriver unregisterSystemPowerOff];
 
         id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
         if ([updaterDelegate respondsToSelector:@selector(updater:didCancelInstallUpdateOnQuit:)])
@@ -177,11 +184,19 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     [super installWithToolAndRelaunch:relaunch displayingUserInterface:showUI];
 }
 
-- (void)systemWillPowerOff:(NSNotification *)__unused note
+- (void)systemWillPowerOff:(NSNumber *)systemPowerOffStatus
 {
-    [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUSystemPowerOffError userInfo:@{
-        NSLocalizedDescriptionKey: SULocalizedString(@"The update will not be installed because the user requested for the system to power off", nil)
-    }]];
+    if (self.willUpdateOnTermination) {
+        switch ((SUSystemPowerOffStatus)(systemPowerOffStatus.unsignedIntegerValue)) {
+            case SUStoppedObservingSystemPowerOff:
+                [self abortUpdate];
+                break;
+            case SUSystemWillPowerOff:
+                [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUSystemPowerOffError userInfo:@{
+                    NSLocalizedDescriptionKey: SULocalizedString(@"The update will not be installed because the user requested for the system to power off", nil) }]];
+                break;
+        }
+    }
 }
 
 - (void)abortUpdateWithError:(NSError *)error

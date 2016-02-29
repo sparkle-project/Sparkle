@@ -11,6 +11,10 @@
 #import "SULog.h"
 #include <CoreServices/CoreServices.h>
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 @implementation SUDiskImageUnarchiver
 
 + (BOOL)canUnarchivePath:(NSString *)path

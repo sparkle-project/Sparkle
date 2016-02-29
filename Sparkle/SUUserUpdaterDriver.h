@@ -35,6 +35,11 @@ typedef NS_ENUM(NSUInteger, SUApplicationTerminationStatus) {
     SUApplicationStoppedObservingTermination
 };
 
+typedef NS_ENUM(NSUInteger, SUSystemPowerOffStatus) {
+    SUSystemWillPowerOff,
+    SUStoppedObservingSystemPowerOff
+};
+
 typedef NS_ENUM(NSUInteger, SUInstallUpdateStatus) {
     SUInstallAndRelaunchUpdateNow,
     SUCancelUpdateInstallation
@@ -86,6 +91,9 @@ typedef NS_ENUM(NSUInteger, SUInstallUpdateStatus) {
 - (void)registerApplicationTermination:(void (^)(SUApplicationTerminationStatus))applicationTerminationHandler;
 - (void)unregisterApplicationTermination;
 - (void)terminateApplication;
+
+- (void)registerSystemPowerOff:(void (^)(SUSystemPowerOffStatus))systemPowerOffHandler;
+- (void)unregisterSystemPowerOff;
 
 - (void)dismissUpdateInstallation;
 

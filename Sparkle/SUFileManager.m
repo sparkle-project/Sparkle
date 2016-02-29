@@ -14,6 +14,10 @@
 #include <sys/errno.h>
 #include <sys/time.h>
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
 
 // Authorization code based on generous contribution from Allan Odgaard. Thanks, Allan!

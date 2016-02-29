@@ -14,6 +14,10 @@
 #import "SUConstants.h"
 #import "SUAppcastItem.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 @implementation SUUIBasedUpdateDriver
 
 - (instancetype)initWithUpdater:(SUUpdater *)anUpdater host:(SUHost *)aHost

@@ -54,6 +54,8 @@
 
 @property (nonatomic, copy) void (^applicationTerminationHandler)(SUApplicationTerminationStatus);
 
+@property (nonatomic, copy) void (^systemPowerOffHandler)(SUSystemPowerOffStatus);
+
 @property (nonatomic) BOOL installingUpdateOnTermination;
 
 @end
@@ -73,6 +75,7 @@
 @synthesize downloadStatusCompletion = _downloadStatusCompletion;
 @synthesize installUpdateHandler = _installUpdateHandler;
 @synthesize applicationTerminationHandler = _applicationTerminationHandler;
+@synthesize systemPowerOffHandler = _systemPowerOffHandler;
 @synthesize installingUpdateOnTermination = _installingUpdateOnTermination;
 
 #pragma mark Birth
@@ -537,6 +540,42 @@
     });
 }
 
+#pragma mark System Death
+
+- (void)registerSystemPowerOff:(void (^)(SUSystemPowerOffStatus))systemPowerOffHandler
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.systemPowerOffHandler = systemPowerOffHandler;
+        
+        [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(systemWillPowerOff:) name:NSWorkspaceWillPowerOffNotification object:nil];
+    });
+}
+
+- (void)cancelObservingSystemPowerOff
+{
+    if (self.systemPowerOffHandler != nil) {
+        self.systemPowerOffHandler(SUStoppedObservingSystemPowerOff);
+        self.systemPowerOffHandler = nil;
+        
+        [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self name:NSWorkspaceWillPowerOffNotification object:nil];
+    }
+}
+
+- (void)unregisterSystemPowerOff
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self cancelObservingSystemPowerOff];
+    });
+}
+
+- (void)systemWillPowerOff:(NSNotification *)__unused notification
+{
+    if (self.systemPowerOffHandler != nil) {
+        self.systemPowerOffHandler(SUSystemWillPowerOff);
+        self.systemPowerOffHandler = nil;
+    }
+}
+
 #pragma mark Aborting Update
 
 - (void)dismissUpdateInstallation
@@ -563,6 +602,7 @@
         }
         
         [self cancelObservingApplicationTermination];
+        [self cancelObservingSystemPowerOff];
         [self cancelInstallAndRestart];
     });
 }

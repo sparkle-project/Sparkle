@@ -10,6 +10,10 @@
 #import "SUUpdater.h"
 #import "SUHost.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 @interface SUUserInitiatedUpdateDriver ()
 
 @property (assign, getter=isCanceled) BOOL canceled;

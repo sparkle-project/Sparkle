@@ -10,6 +10,10 @@
 #import "SUHost.h"
 #import "SULog.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 NSString *const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
 @interface SUUpdateDriver ()

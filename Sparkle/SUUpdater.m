@@ -8,10 +8,7 @@
 
 #import "SUUpdater.h"
 
-#import "SUSparkleUserUpdaterDriver.h"
-
 #import "SUHost.h"
-#import "SUUpdatePermissionPrompt.h"
 #import "SUUpdatePermissionPromptResult.h"
 
 #import "SUAutomaticUpdateDriver.h"
@@ -23,6 +20,10 @@
 #import "SUCodeSigningVerifier.h"
 #import "SUSystemProfiler.h"
 #include <SystemConfiguration/SystemConfiguration.h>
+
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
 
 NSString *const SUUpdaterDidFinishLoadingAppCastNotification = @"SUUpdaterDidFinishLoadingAppCastNotification";
 NSString *const SUUpdaterDidFindValidUpdateNotification = @"SUUpdaterDidFindValidUpdateNotification";
