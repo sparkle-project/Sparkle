@@ -83,11 +83,11 @@
 
 #pragma mark Birth
 
-- (instancetype)initWithHost:(SUHost *)host delegate:(id<SUUserUpdaterDriverDelegate>)delegate
+- (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(id<SUUserUpdaterDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
-        _host = host;
+        _host = [[SUHost alloc] initWithBundle:hostBundle];
         _delegate = delegate;
     }
     return self;

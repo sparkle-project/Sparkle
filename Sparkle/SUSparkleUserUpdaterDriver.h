@@ -9,11 +9,9 @@
 #import <Cocoa/Cocoa.h>
 #import "SUUserUpdaterDriver.h"
 
-@class SUHost;
-
 @interface SUSparkleUserUpdaterDriver : NSObject <SUUserUpdaterDriver>
 
-- (instancetype)initWithHost:(SUHost *)host delegate:(id <SUUserUpdaterDriverDelegate>)delegate;
+- (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(id <SUUserUpdaterDriverDelegate>)delegate;
 
 @property (nonatomic, readonly, getter=isUpdateInProgress) BOOL updateInProgress;
 
