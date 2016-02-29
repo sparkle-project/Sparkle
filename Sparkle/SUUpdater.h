@@ -112,7 +112,7 @@ SU_EXPORT @interface SUUpdater : NSObject
  */
 - (void)resetUpdateCycle;
 
-- (void)resetUpdateCycleAfterDelay:(NSTimeInterval)delay;
+- (void)resetUpdateCycleAfterShortDelay;
 
 @property (readonly) BOOL updateInProgress;
 

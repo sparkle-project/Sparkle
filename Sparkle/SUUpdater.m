@@ -352,10 +352,10 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
     [self scheduleNextUpdateCheck];
 }
 
-- (void)resetUpdateCycleAfterDelay:(NSTimeInterval)delay
+- (void)resetUpdateCycleAfterShortDelay
 {
     [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
-    [self performSelector:@selector(resetUpdateCycle) withObject:nil afterDelay:delay];
+    [self performSelector:@selector(resetUpdateCycle) withObject:nil afterDelay:1];
 }
 
 - (void)setAutomaticallyChecksForUpdates:(BOOL)automaticallyCheckForUpdates

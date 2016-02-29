@@ -87,7 +87,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     if (context == (__bridge void *)(SUUpdaterDefaultsObservationContext)) {
         // Allow a small delay, because perhaps the user or developer wants to change both preferences. This allows the developer to interpret a zero check interval as a sign to disable automatic checking.
         // Or we may get this from the developer and from our own KVO observation, this will effectively coalesce them.
-        [self.updater resetUpdateCycleAfterDelay:1];
+        [self.updater resetUpdateCycleAfterShortDelay];
     } else {
         if ([super respondsToSelector:@selector(observeValueForKeyPath:ofObject:change:context:)]) {
             [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
