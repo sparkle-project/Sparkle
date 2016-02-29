@@ -7,24 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SUUserUpdaterDriverDelegate.h"
 #import "SUStatusCompletionResults.h"
 
 @class SUUpdatePermissionPromptResult, SUAppcastItem;
-
 @protocol SUVersionDisplay;
-@protocol SUUserUpdaterDriver;
-
-@protocol SUUserUpdaterDriverDelegate <NSObject>
-
-@optional
-
-- (BOOL)responsibleForInitiatingUpdateCheckForUserDriver:(id <SUUserUpdaterDriver>)userUpdaterDriver;
-- (void)initiateUpdateCheckForUserDriver:(id <SUUserUpdaterDriver>)userUpdaterDriver;
-
-- (void)userUpdaterDriverWillShowModalAlert:(id <SUUserUpdaterDriver>)userUpdaterDriver;
-- (void)userUpdaterDriverDidShowModalAlert:(id <SUUserUpdaterDriver>)userUpdaterDriver;
-
-@end
 
 @protocol SUUserUpdaterDriver <NSObject>
 
