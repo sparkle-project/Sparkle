@@ -267,7 +267,7 @@
  *
  * @param systemPowerOffHandler A reply of SUSystemWillPowerOff should be used when the system is about to power off. This has the side effect of Sparkle
  * aborting any updates it has automatically downloaded already. A reply of SUStoppedObservingSystemPowerOff can be used to cancel observing power off.
- * Note this has the same side effect of cancelling an in-progress update.
+ * Note this has the same side effect of cancelling an in-progress update, except a different error is propagated.
  *
  * This can be called from any thread
  */
@@ -292,7 +292,7 @@
  * Invalidate the update next check if it's running.
  * Basically, stop everything that could have been started. Sparkle may invoke this when aborting or finishing an update.
  *
- * This can be called from any thread
+ * This can be called from any thread, and could be called multiple times in succession.
  */
 - (void)dismissUpdateInstallation;
 
