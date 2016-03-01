@@ -180,6 +180,8 @@
 // Calling deprecated modal alert methods just to preserve backwards compatibility
 - (void)showNotice:(void (^)(void))noticeHandler
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     if ([[self.updater delegate] respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
         [[self.updater delegate] updaterWillShowModalAlert:self.updater];
     }
@@ -189,6 +191,7 @@
     if ([[self.updater delegate] respondsToSelector:@selector(updaterDidShowModalAlert:)]) {
         [[self.updater delegate] updaterDidShowModalAlert:self.updater];
     }
+#pragma clang diagnostic pop
 }
 
 @end
