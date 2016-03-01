@@ -7,15 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SUUserUpdaterDriverDelegate.h"
 #import "SUStatusCompletionResults.h"
 
 @class SUUpdatePermissionPromptResult, SUAppcastItem;
 @protocol SUVersionDisplay;
 
 @protocol SUUserUpdaterDriver <NSObject>
-
-@property (nonatomic, readonly, weak) id <SUUserUpdaterDriverDelegate> delegate;
 
 - (void)showUpdateInProgress:(BOOL)isUpdateInProgress;
 

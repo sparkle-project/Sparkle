@@ -68,7 +68,7 @@
 
 #pragma mark Birth
 
-- (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(id<SUUserUpdaterDriverDelegate>)delegate
+- (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(id<SUSparkleUserUpdaterDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -345,7 +345,7 @@
 - (void)showAlert:(NSAlert *)alert
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        id <SUUserUpdaterDriverDelegate> delegate = self.delegate;
+        id <SUSparkleUserUpdaterDriverDelegate> delegate = self.delegate;
         
         if ([delegate respondsToSelector:@selector(userUpdaterDriverWillShowModalAlert:)]) {
             [delegate userUpdaterDriverWillShowModalAlert:self];
