@@ -107,7 +107,7 @@
  * @param allowsAutomaticUpdates Indicates whether the user is allowed to use automatic updates.
  * A user interface may use this to give the user an option to enable automatic updates.
  * @param reply A reply of SUInstallUpdateChoice installs the new update immediately. A reply of
- * SURemindMeLaterChoice reminds the user later of the update, which can act as a "do nothing" option.
+ * SUInstallLaterChoice reminds the user later of the update, which can act as a "do nothing" option.
  * Lastly, SUSkipThisVersionChoice skips this particular version and won't bother the user again
  * (unless they initiate an update check themselves).
  *
@@ -121,14 +121,14 @@
  * Let the user know a new update is found and ask them what they want to do.
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update
- * @param reply A reply of SUInstallNowChoice installs the new update immediately. A reply of
+ * @param reply A reply of SUInstallUpdateChoice installs the new update immediately. A reply of
  * SUInstallLaterChoice will attempt to install the update when the application terminates; this can act as a
- * "do nothing" option. Lastly, SUDoNotInstallChoice skips this particular version and won't bother the user again
+ * "do nothing" option. Lastly, SUSkipThisVersionChoice skips this particular version and won't bother the user again
  * (unless they initiate an update check themselves).
  *
  * This can be called from any thread
  */
-- (void)showAutomaticUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUAutomaticInstallationChoice))reply;
+- (void)showAutomaticUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply;
 
 /*!
  * Show the user a new update was not found

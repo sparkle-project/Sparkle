@@ -15,7 +15,7 @@
 @class SUAppcastItem, SUHost;
 @interface SUAutomaticUpdateAlert : NSWindowController
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)hostBundle completionBlock:(void (^)(SUAutomaticInstallationChoice))c;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)hostBundle completionBlock:(void (^)(SUUpdateAlertChoice))c;
 - (IBAction)installNow:sender;
 - (IBAction)installLater:sender;
 - (IBAction)doNotInstall:sender;

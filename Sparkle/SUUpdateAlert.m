@@ -112,7 +112,7 @@
 {
     [[NSWorkspace sharedWorkspace] openURL:self.updateItem.infoURL];
     
-    [self endWithSelection:SURemindMeLaterChoice];
+    [self endWithSelection:SUInstallLaterChoice];
 }
 
 - (IBAction)skipThisVersion:(id)__unused sender
@@ -122,7 +122,7 @@
 
 - (IBAction)remindMeLater:(id)__unused sender
 {
-    [self endWithSelection:SURemindMeLaterChoice];
+    [self endWithSelection:SUInstallLaterChoice];
 }
 
 - (void)displayReleaseNotes
@@ -213,7 +213,7 @@
 
 - (BOOL)windowShouldClose:(NSNotification *) __unused note
 {
-	[self endWithSelection:SURemindMeLaterChoice];
+	[self endWithSelection:SUInstallLaterChoice];
 	return YES;
 }
 

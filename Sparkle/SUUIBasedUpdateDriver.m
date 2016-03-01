@@ -99,7 +99,7 @@
             [self abortUpdate];
             break;
 
-        case SURemindMeLaterChoice:
+        case SUInstallLaterChoice:
             [self abortUpdate];
             break;
     }

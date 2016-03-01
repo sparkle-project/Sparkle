@@ -48,7 +48,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 {
     self.interruptible = NO;
     
-    [self.updater.userUpdaterDriver showAutomaticUpdateFoundWithAppcastItem:self.updateItem reply:^(SUAutomaticInstallationChoice choice) {
+    [self.updater.userUpdaterDriver showAutomaticUpdateFoundWithAppcastItem:self.updateItem reply:^(SUUpdateAlertChoice choice) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self automaticUpdateAlertFinishedWithChoice:choice];
         });
@@ -151,11 +151,11 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     [super abortUpdate];
 }
 
-- (void)automaticUpdateAlertFinishedWithChoice:(SUAutomaticInstallationChoice)choice
+- (void)automaticUpdateAlertFinishedWithChoice:(SUUpdateAlertChoice)choice
 {
 	switch (choice)
 	{
-        case SUInstallNowChoice:
+        case SUInstallUpdateChoice:
             [self stopUpdatingOnTermination];
             [self installWithToolAndRelaunch:YES];
             break;
@@ -166,7 +166,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
             self.interruptible = YES;
             break;
 
-        case SUDoNotInstallChoice:
+        case SUSkipThisVersionChoice:
             [self.host setObject:[self.updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
             [self abortUpdate];
             break;

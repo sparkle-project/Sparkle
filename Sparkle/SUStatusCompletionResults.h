@@ -43,14 +43,8 @@ typedef NS_ENUM(NSUInteger, SUInstallUpdateStatus) {
 
 typedef NS_ENUM(NSInteger, SUUpdateAlertChoice) {
     SUInstallUpdateChoice,
-    SURemindMeLaterChoice,
-    SUSkipThisVersionChoice
-};
-
-typedef NS_ENUM(NSInteger, SUAutomaticInstallationChoice) {
-    SUInstallNowChoice,
     SUInstallLaterChoice,
-    SUDoNotInstallChoice
+    SUSkipThisVersionChoice
 };
 
 #endif /* SUStatusCompletionResults_h */

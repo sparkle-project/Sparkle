@@ -14,7 +14,7 @@
 #import "SUApplicationInfo.h"
 
 @interface SUAutomaticUpdateAlert ()
-@property (strong) void(^completionBlock)(SUAutomaticInstallationChoice);
+@property (strong) void(^completionBlock)(SUUpdateAlertChoice);
 @property (strong) SUAppcastItem *updateItem;
 @property (strong) SUHost *host;
 @end
@@ -24,7 +24,7 @@
 @synthesize updateItem;
 @synthesize completionBlock;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUAutomaticInstallationChoice))block
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUUpdateAlertChoice))block
 {
     self = [super initWithWindowNibName:@"SUAutomaticUpdateAlert"];
     if (self) {
@@ -42,7 +42,7 @@
 - (IBAction)installNow:(id)__unused sender
 {
     [self close];
-    self.completionBlock(SUInstallNowChoice);
+    self.completionBlock(SUInstallUpdateChoice);
     self.completionBlock = nil;
 }
 
@@ -56,7 +56,7 @@
 - (IBAction)doNotInstall:(id)__unused sender
 {
     [self close];
-    self.completionBlock(SUDoNotInstallChoice);
+    self.completionBlock(SUSkipThisVersionChoice);
     self.completionBlock = nil;
 }
 
