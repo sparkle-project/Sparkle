@@ -356,15 +356,20 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
         [self.driver abortUpdate];
 }
 
-- (void)resetUpdateCycle
+- (void)cancelNextUpdateCycle
 {
     [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
+}
+
+- (void)resetUpdateCycle
+{
+    [self cancelNextUpdateCycle];
     [self scheduleNextUpdateCheck];
 }
 
 - (void)resetUpdateCycleAfterShortDelay
 {
-    [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
+    [self cancelNextUpdateCycle];
     [self performSelector:@selector(resetUpdateCycle) withObject:nil afterDelay:1];
 }
 
@@ -376,7 +381,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
     if (automaticallyCheckForUpdates && (NSInteger)[self updateCheckInterval] == 0) {
         [self setUpdateCheckInterval:SUDefaultUpdateCheckInterval];
     }
-    [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
+    [self cancelNextUpdateCycle];
     // Provide a small delay in case multiple preferences are being updated simultaneously.
     [self performSelector:@selector(resetUpdateCycle) withObject:nil afterDelay:1];
 }
@@ -515,7 +520,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
     if ((NSInteger)updateCheckInterval == 0) { // For compatibility with 1.1's settings.
         [self setAutomaticallyChecksForUpdates:NO];
     }
-    [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
+    [self cancelNextUpdateCycle];
 
     // Provide a small delay in case multiple preferences are being updated simultaneously.
     [self performSelector:@selector(resetUpdateCycle) withObject:nil afterDelay:1];
@@ -535,7 +540,18 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
 {
     // Remove updater did finish notification
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
+    // Stop checking for updates
+    [self cancelNextUpdateCycle];
     [self.userUpdaterDriver invalidateUpdateCheckTimer];
+    
+    // Abort any on-going updates
+    // A driver could be retained by another object (eg: a timer),
+    // so not aborting could mean it stays alive longer than we'd want
+    if ([self updateInProgress]) {
+        [self.driver abortUpdate];
+        self.driver = nil;
+    }
 }
 
 - (BOOL)updateInProgress
