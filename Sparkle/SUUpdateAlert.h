@@ -20,7 +20,7 @@
 
 @property (weak) id<SUVersionDisplay> versionDisplayer;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host completionBlock:(void(^)(SUUpdateAlertChoice))c;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates completionBlock:(void(^)(SUUpdateAlertChoice))c;
 
 - (IBAction)installUpdate:sender;
 - (IBAction)skipThisVersion:sender;

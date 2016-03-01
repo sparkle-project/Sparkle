@@ -44,7 +44,7 @@
         versDisp = [[self.updater delegate] versionDisplayerForUpdater:self.updater];
     }
     
-    [self.updater.userUpdaterDriver showUpdateFoundWithAppcastItem:self.updateItem versionDisplayer:versDisp reply:^(SUUpdateAlertChoice choice) {
+    [self.updater.userUpdaterDriver showUpdateFoundWithAppcastItem:self.updateItem versionDisplayer:versDisp allowsAutomaticUpdates:self.updater.allowsAutomaticUpdates reply:^(SUUpdateAlertChoice choice) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self updateAlertFinishedWithChoice:choice];
         });

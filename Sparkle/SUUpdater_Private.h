@@ -12,4 +12,6 @@
 
 @property (readonly) BOOL mayUpdateAndRestart;
 
+@property (readonly, nonatomic) BOOL allowsAutomaticUpdates;
+
 @end

@@ -18,6 +18,10 @@
 #error This is a "core" class and should NOT import AppKit
 #endif
 
+// This class should also be process independent
+// For example, it should not have code that tests writabilty to somewhere on disk,
+// as that may depend on the privileges of the process owner
+
 @interface SUHost ()
 
 @property (strong, readwrite) NSBundle *bundle;
@@ -62,16 +66,12 @@
     return [self.bundle bundlePath];
 }
 
+// We can't determine whether or not the updater has sufficient privilleges to install automatic updates without interrupting the user
+// To find that out, ask the SUUpdater which has responsibility for that
 - (BOOL)allowsAutomaticUpdates
 {
-    // Does the developer want us to disable automatic updates?
     NSNumber *developerAllowsAutomaticUpdates = [self objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
-    if (developerAllowsAutomaticUpdates != nil && !developerAllowsAutomaticUpdates.boolValue) {
-        return NO;
-    }
-    
-    // Can we automatically update in the background without bugging the user (e.g, with a administrator password prompt)?
-    return [[NSFileManager defaultManager] isWritableFileAtPath:self.bundlePath];
+    return (developerAllowsAutomaticUpdates == nil || developerAllowsAutomaticUpdates.boolValue);
 }
 
 - (NSString *)appCachePath

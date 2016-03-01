@@ -401,9 +401,21 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
     if (!self.host.allowsAutomaticUpdates) {
         return NO;
     }
+    
+    // Can we automatically update in the background without bugging the user (e.g, with a administrator password prompt)?
+    if (![[NSFileManager defaultManager] isWritableFileAtPath:self.host.bundlePath]) {
+        return NO;
+    }
 
     // Otherwise, automatically downloading updates is allowed. Does the user want it?
     return [self.host boolForUserDefaultsKey:SUAutomaticallyUpdateKey];
+}
+
+- (BOOL)allowsAutomaticUpdates
+{
+    // Make sure the host allows automatic updates and
+    // make sure we can automatically update in the background without bugging the user (e.g, with a administrator password prompt)
+    return (self.host.allowsAutomaticUpdates && [[NSFileManager defaultManager] isWritableFileAtPath:self.host.bundlePath]);
 }
 
 - (void)setFeedURL:(NSURL *)feedURL

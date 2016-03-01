@@ -34,6 +34,7 @@
 
 @property (strong) SUAppcastItem *updateItem;
 @property (strong) SUHost *host;
+@property (nonatomic) BOOL allowsAutomaticUpdates;
 @property (strong) void(^completionBlock)(SUUpdateAlertChoice);
 
 @property (strong) NSProgressIndicator *releaseNotesSpinner;
@@ -56,6 +57,7 @@
 
 @synthesize updateItem;
 @synthesize host;
+@synthesize allowsAutomaticUpdates = _allowsAutomaticUpdates;
 
 @synthesize releaseNotesSpinner;
 @synthesize webViewFinishedLoading;
@@ -68,7 +70,7 @@
 @synthesize skipButton;
 @synthesize laterButton;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUUpdateAlertChoice))block
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates completionBlock:(void (^)(SUUpdateAlertChoice))block
 {
     self = [super initWithWindowNibName:@"SUUpdateAlert"];
 	if (self)
@@ -76,6 +78,7 @@
         self.completionBlock = block;
         host = aHost;
         updateItem = item;
+        _allowsAutomaticUpdates = allowsAutomaticUpdates;
         [self setShouldCascadeWindows:NO];
 
         // Alex: This dummy line makes sure that the binary is linked against WebKit.
@@ -168,11 +171,6 @@
 	}
 	else
         return [shouldShowReleaseNotes boolValue];
-}
-
-- (BOOL)allowsAutomaticUpdates
-{
-    return self.host.allowsAutomaticUpdates;
 }
 
 - (void)windowDidLoad

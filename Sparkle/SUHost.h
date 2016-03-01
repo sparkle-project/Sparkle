@@ -13,6 +13,7 @@
 
 - (instancetype)initWithBundle:(NSBundle *)aBundle;
 @property (readonly, copy) NSString *bundlePath;
+// Even if automatic updates are allowed, this does not indicate that the user has writable permissions to do so conveniently
 @property (readonly) BOOL allowsAutomaticUpdates;
 @property (readonly, copy) NSString *appCachePath;
 @property (readonly, copy) NSString *installationPath;
