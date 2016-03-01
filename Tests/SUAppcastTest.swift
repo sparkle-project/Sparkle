@@ -11,7 +11,7 @@ import Sparkle;
 
 class SUAppcastTest: XCTestCase {
 
-    func testExample() {
+    func testParseAppcast() {
         let appcast = SUAppcast();
         let testFile = NSBundle(forClass: SUAppcastTest.self).pathForResource("testappcast", ofType: "xml")!;
         let testFileUrl = NSURL(fileURLWithPath: testFile);
@@ -26,6 +26,7 @@ class SUAppcastTest: XCTestCase {
             
             XCTAssertEqual("Version 2.0", items[1].title);
             XCTAssertEqual("desc", items[1].itemDescription);
+            XCTAssertEqual("https://sparkle-project.org/#works", items[0].releaseNotesURL!.absoluteString);
         } catch let err as NSError {
             NSLog("%@", err);
             XCTFail(err.localizedDescription);

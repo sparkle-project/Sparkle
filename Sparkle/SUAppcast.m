@@ -19,23 +19,6 @@
 @property (readonly, copy) NSDictionary *attributesAsDictionary;
 @end
 
-@implementation NSXMLElement (SUAppcastExtensions)
-- (NSDictionary *)attributesAsDictionary
-{
-    NSEnumerator *attributeEnum = [[self attributes] objectEnumerator];
-    NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
-
-    for (NSXMLNode *attribute in attributeEnum) {
-        NSString *attrName = [attribute name];
-        if (!attrName) {
-            continue;
-        }
-        dictionary[attrName] = [attribute stringValue];
-    }
-    return dictionary;
-}
-@end
-
 @interface SUAppcast () <NSURLDownloadDelegate>
 @property (strong) void (^completionBlock)(NSError *);
 @property (copy) NSString *downloadFilename;
@@ -115,6 +98,31 @@
     }
 }
 
+- (NSDictionary *)attributesOfNode:(NSXMLElement *)node
+{
+    NSEnumerator *attributeEnum = [[node attributes] objectEnumerator];
+    NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+
+    for (NSXMLNode *attribute in attributeEnum) {
+        NSString *attrName = [self sparkleNamespacedNameOfNode:attribute];
+        if (!attrName) {
+            continue;
+        }
+        dictionary[attrName] = [attribute stringValue];
+    }
+    return dictionary;
+}
+
+-(NSString *)sparkleNamespacedNameOfNode:(NSXMLNode *)node {
+    // XML namespace prefix is semantically meaningless, so compare namespace URI
+    if ([[node URI] isEqualToString:@"http://www.andymatuschak.org/xml-namespaces/sparkle"]) {
+        NSString *localName = [node localName]; assert(localName);
+        return [@"sparkle:" stringByAppendingString:localName];
+    } else {
+        return [node name]; // Backwards compatibility
+    }
+}
+
 -(NSArray *)parseAppcastItemsFromXMLFile:(NSURL *)appcastFile error:(NSError *__autoreleasing*)errorp {
     if (errorp) {
         *errorp = nil;
@@ -147,7 +155,7 @@
         if ([[node children] count]) {
             node = [node childAtIndex:0];
             while (nil != node) {
-                NSString *name = [node name];
+                NSString *name = [self sparkleNamespacedNameOfNode:node];
                 if (name) {
                     NSMutableArray *nodes = nodesDict[name];
                     if (nodes == nil) {
@@ -164,7 +172,7 @@
             node = [self bestNodeInNodes:nodesDict[name]];
             if ([name isEqualToString:SURSSElementEnclosure]) {
                 // enclosure is flattened as a separate dictionary for some reason
-                NSDictionary *encDict = [(NSXMLElement *)node attributesAsDictionary];
+                NSDictionary *encDict = [self attributesOfNode:(NSXMLElement *)node];
                 dict[name] = encDict;
 			}
             else if ([name isEqualToString:SURSSElementPubDate]) {
@@ -182,7 +190,7 @@
                 NSEnumerator *childEnum = [[node children] objectEnumerator];
                 for (NSXMLNode *child in childEnum) {
                     if ([[child name] isEqualToString:SURSSElementEnclosure]) {
-                        [deltas addObject:[(NSXMLElement *)child attributesAsDictionary]];
+                        [deltas addObject:[self attributesOfNode:(NSXMLElement *)child]];
                     }
                 }
                 dict[name] = deltas;
