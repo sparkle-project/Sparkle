@@ -81,6 +81,14 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     return self;
 }
 
+// To prevent subclasses from doing something bad based on older Sparkle code
+- (instancetype)initForBundle:(NSBundle *)__unused bundle
+{
+    [NSException raise:@"SUUpdaterInitForBundleNotImplemented" format:@"-[SUUpdater initForBundle:] is not implemented anymore."];
+    return nil;
+}
+
+// To prevent trying to stick an SUUpdater in a nib or initializing it in an incorrect way
 - (instancetype)init
 {
     [NSException raise:@"SUUpdaterInitNotImplemented" format:@"-[SUUpdater init] is not implemented. If you want to drop an updater into a nib, see SUUpdaterController"];
