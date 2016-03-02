@@ -11,9 +11,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol SUVersionDisplay;
+@protocol SUSparkleUserDriverUIDelegate;
 
-@protocol SUSparkleUserDriverDelegate <NSObject>
+@protocol SUSparkleUserDriverDelegate <NSObject, SUSparkleUserDriverUIDelegate>
 
 @optional
 
@@ -21,11 +21,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)initiateUpdateCheckForUserDriver:(id <SUUserDriver>)userDriver;
 
 - (BOOL)responsibleForSignalingApplicationTerminationForUserDriver:(id <SUUserDriver>)userDriver;
-
-- (void)userUpdaterDriverWillShowModalAlert:(id <SUUserDriver>)userDriver;
-- (void)userUpdaterDriverDidShowModalAlert:(id <SUUserDriver>)userDriver;
-
-- (_Nullable id <SUVersionDisplay>)versionDisplayerForUserDriver:(id <SUUserDriver>)userDriver;
 
 @end
 

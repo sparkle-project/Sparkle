@@ -7,6 +7,7 @@
 //
 
 #import "SUSparkleUserDriver.h"
+#import "SUSparkleUserDriverUIDelegate.h"
 #import "SUAppcastItem.h"
 #import "SUVersionDisplayProtocol.h"
 #import "SUHost.h"
@@ -347,10 +348,10 @@
 - (void)showAlert:(NSAlert *)alert
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        id <SUSparkleUserDriverDelegate> delegate = self.delegate;
+        id <SUSparkleUserDriverUIDelegate> delegate = self.delegate;
         
-        if ([delegate respondsToSelector:@selector(userUpdaterDriverWillShowModalAlert:)]) {
-            [delegate userUpdaterDriverWillShowModalAlert:self];
+        if ([delegate respondsToSelector:@selector(userDriverWillShowModalAlert:)]) {
+            [delegate userDriverWillShowModalAlert:self];
         }
         
         // When showing a modal alert we need to ensure that background applications
@@ -360,8 +361,8 @@
         [alert setIcon:[SUApplicationInfo bestIconForBundle:self.host.bundle]];
         [alert runModal];
         
-        if ([delegate respondsToSelector:@selector(userUpdaterDriverDidShowModalAlert:)]) {
-            [delegate userUpdaterDriverDidShowModalAlert:self];
+        if ([delegate respondsToSelector:@selector(userDriverDidShowModalAlert:)]) {
+            [delegate userDriverDidShowModalAlert:self];
         }
     });
 }
