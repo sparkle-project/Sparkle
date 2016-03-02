@@ -17,6 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @protocol SUSparkleUserDriverRemoteDelegate <NSObject>
 
+@optional
+
 /*!
  Asks whether or not the delegate is responsible for initiating updater checks.
  

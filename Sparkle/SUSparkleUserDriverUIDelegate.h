@@ -17,6 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @protocol SUSparkleUserDriverUIDelegate <NSObject>
 
+@optional
+
 /*!
  Called before showing a modal alert window,
  to give the opportunity to hide attached windows that may get in the way.
