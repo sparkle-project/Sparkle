@@ -181,7 +181,8 @@
 		725CB95B1C7121830064365A /* SUSparkleUserDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 725CB9591C7121830064365A /* SUSparkleUserDriver.m */; };
 		7268AC631AD634C200C3E0C1 /* SUBinaryDeltaCreate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7268AC621AD634C200C3E0C1 /* SUBinaryDeltaCreate.m */; };
 		726DF88E1C84277600188804 /* SUStatusCompletionResults.h in Headers */ = {isa = PBXBuildFile; fileRef = 726DF88D1C84277500188804 /* SUStatusCompletionResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		726E4A0E1C86881600C57C6A /* SUSparkleUserDriverDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E4A0D1C86881600C57C6A /* SUSparkleUserDriverDelegate.h */; };
+		726E4A0E1C86881600C57C6A /* SUSparkleUserDriverUIDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E4A0D1C86881600C57C6A /* SUSparkleUserDriverUIDelegate.h */; };
+		726E4A101C86B5A200C57C6A /* SUSparkleUserDriverRemoteDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E4A0F1C86B5A200C57C6A /* SUSparkleUserDriverRemoteDelegate.h */; };
 		726F2CDE1BC9BE5B001971A4 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
 		726F2CE51BC9C33D001971A4 /* SUOperatingSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 726F2CE31BC9C33D001971A4 /* SUOperatingSystem.h */; };
 		726F2CE61BC9C33D001971A4 /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
@@ -643,7 +644,8 @@
 		7268AC641AD634E400C3E0C1 /* SUBinaryDeltaCreate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBinaryDeltaCreate.h; sourceTree = "<group>"; };
 		726B2B5D1C645FC900388755 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		726DF88D1C84277500188804 /* SUStatusCompletionResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStatusCompletionResults.h; sourceTree = "<group>"; };
-		726E4A0D1C86881600C57C6A /* SUSparkleUserDriverDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUSparkleUserDriverDelegate.h; sourceTree = "<group>"; };
+		726E4A0D1C86881600C57C6A /* SUSparkleUserDriverUIDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUSparkleUserDriverUIDelegate.h; sourceTree = "<group>"; };
+		726E4A0F1C86B5A200C57C6A /* SUSparkleUserDriverRemoteDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUSparkleUserDriverRemoteDelegate.h; sourceTree = "<group>"; };
 		726F2CE31BC9C33D001971A4 /* SUOperatingSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUOperatingSystem.h; sourceTree = "<group>"; };
 		726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUOperatingSystem.m; sourceTree = "<group>"; };
 		7275F9BF1B5F1F2900B1D19E /* SUFileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUFileManager.h; sourceTree = "<group>"; };
@@ -1000,7 +1002,8 @@
 			children = (
 				7246E0A11C83B685003B4E75 /* SUUpdaterController.h */,
 				7246E0A21C83B685003B4E75 /* SUUpdaterController.m */,
-				726E4A0D1C86881600C57C6A /* SUSparkleUserDriverDelegate.h */,
+				726E4A0D1C86881600C57C6A /* SUSparkleUserDriverUIDelegate.h */,
+				726E4A0F1C86B5A200C57C6A /* SUSparkleUserDriverRemoteDelegate.h */,
 				725CB9581C7121830064365A /* SUSparkleUserDriver.h */,
 				725CB9591C7121830064365A /* SUSparkleUserDriver.m */,
 				6120721009CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.h */,
@@ -1184,6 +1187,7 @@
 				72162B061C82C8B30013C1C5 /* SUParameterAssert.h in Headers */,
 				726DF88E1C84277600188804 /* SUStatusCompletionResults.h in Headers */,
 				72A450531C69A68900D67EEA /* SUUpdatePermissionPromptResult.h in Headers */,
+				726E4A101C86B5A200C57C6A /* SUSparkleUserDriverRemoteDelegate.h in Headers */,
 				611142E910FB1BE5009810AA /* bspatch.h in Headers */,
 				61299B3609CB04E000B7442F /* Sparkle.h in Headers */,
 				61CFB3290E385186007A1735 /* Sparkle.pch in Headers */,
@@ -1225,7 +1229,7 @@
 				61B5F8ED09C4CE3C00B25A18 /* SUUpdater.h in Headers */,
 				6158A1C5137904B300487EC1 /* SUUpdater_Private.h in Headers */,
 				61A354550DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.h in Headers */,
-				726E4A0E1C86881600C57C6A /* SUSparkleUserDriverDelegate.h in Headers */,
+				726E4A0E1C86881600C57C6A /* SUSparkleUserDriverUIDelegate.h in Headers */,
 				61A2259E0D1C495D00430CCD /* SUVersionComparisonProtocol.h in Headers */,
 				3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */,
 			);

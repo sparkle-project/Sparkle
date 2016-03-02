@@ -7,7 +7,8 @@
 //
 
 #import "SUSparkleUserDriver.h"
-#import "SUSparkleUserDriverDelegate.h"
+#import "SUSparkleUserDriverUIDelegate.h"
+#import "SUSparkleUserDriverRemoteDelegate.h"
 #import "SUAppcastItem.h"
 #import "SUVersionDisplayProtocol.h"
 #import "SUHost.h"
