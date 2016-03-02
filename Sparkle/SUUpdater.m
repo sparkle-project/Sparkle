@@ -56,25 +56,27 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)theDelegate
 {
     self = [super init];
-
-    // Use explicit class to use the correct bundle even when subclassed
-    self.sparkleBundle = [NSBundle bundleForClass:[SUUpdater class]];
-    if (!self.sparkleBundle) {
-        SULog(@"Error: SUUpdater can't find Sparkle.framework it belongs to");
-        return nil;
+    
+    if (self != nil) {
+        // Use explicit class to use the correct bundle even when subclassed
+        self.sparkleBundle = [NSBundle bundleForClass:[SUUpdater class]];
+        if (!self.sparkleBundle) {
+            SULog(@"Error: SUUpdater can't find Sparkle.framework it belongs to");
+            return nil;
+        }
+        
+        host = [[SUHost alloc] initWithBundle:bundle];
+        
+        _userDriver = userDriver;
+        
+        delegate = theDelegate;
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDriverDidFinish:) name:SUUpdateDriverFinishedNotification object:nil];
+        
+        // This runs the permission prompt if needed, but never before the app has finished launching because the runloop may not have ran before that
+        // We will also take precaussions if a developer instantiates an updater themselves where the application may not be completely finished launching yet
+        [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:1];
     }
-
-    host = [[SUHost alloc] initWithBundle:bundle];
-    
-    _userDriver = userDriver;
-    
-    delegate = theDelegate;
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDriverDidFinish:) name:SUUpdateDriverFinishedNotification object:nil];
-    
-    // This runs the permission prompt if needed, but never before the app has finished launching because the runloop may not have ran before that
-    // We will also take precaussions if a developer instantiates an updater themselves where the application may not be completely finished launching yet
-    [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:1];
     
     return self;
 }
