@@ -17,10 +17,10 @@ NS_ASSUME_NONNULL_BEGIN
  A controller class that instantiates a SUUpdater and allows binding UI to it.
  
  This controller's updater targets the application's main bundle, and uses Sparkle's standard user interface.
- Thus it is only suitable under these circumstances. Typically, this class is used by sticking it as a custom NSObject in an Interface Builder nib (probably in MainMenu).
- The controller then kicks off creating an SUUpdater instance and allows hooking up the check for updates action and menu item validation.
+ Thus it is only suitable under these circumstances. Typically, this class is used by sticking it as a custom NSObject subclass in an Interface Builder nib (probably in MainMenu).
+ The controller creates an SUUpdater instance and allows hooking up the check for updates action and menu item validation.
  
- There may be several reasons why this class may not be suitable for you:
+ This controller class may not be valuable to you if:
  * You want to control or defer the instantiation of an SUUpdater, or don't want to be tied into a nib's instantiation, or don't want to use a nib
  * You want to separate Sparkle's updater and user interface into separate processes
  * You want to provide a custom user interface, or perhaps one that provides little-to-none
