@@ -81,8 +81,12 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         [self performSelectorOnMainThread:@selector(installUpdateWithTerminationStatus:) withObject:@(terminationStatus) waitUntilDone:YES];
     }];
     
+    // At first, it may seem like we should register for system power off ourselves rather than the user updater driver
+    // This is a bad idea for a couple reasons. One is it may require linkage to AppKit, or some complex IOKit code
+    // Another is that we would be making the assumption that the user updater driver is on the same system as the updater,
+    // which is something we would be better off not assuming!
     [self.updater.userUpdaterDriver registerSystemPowerOff:^(SUSystemPowerOffStatus systemPowerOffStatus) {
-        // See above comment for why we use -performSelectorOnMainThread:withObject:waitUntilDone:
+        // See above for why we use -performSelectorOnMainThread:withObject:waitUntilDone:
         [self performSelectorOnMainThread:@selector(systemWillPowerOff:) withObject:@(systemPowerOffStatus) waitUntilDone:YES];
     }];
 
