@@ -53,7 +53,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize sparkleBundle;
 @synthesize decryptionPassword;
 
-- (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SUUserDriver>)userDriver
+- (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)theDelegate
 {
     self = [super init];
 
@@ -67,6 +67,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     host = [[SUHost alloc] initWithBundle:bundle];
     
     _userDriver = userDriver;
+    
+    delegate = theDelegate;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDriverDidFinish:) name:SUUpdateDriverFinishedNotification object:nil];
     

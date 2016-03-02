@@ -33,21 +33,22 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         
         // We don't want the updater to start its updating cycle before the app has finished launching
         // If this is instantiated in a nib, the runloop may not be ready
+        // Furthermore, this delay allows setting the updater and user driver delegates before the updater initializes
         [self performSelector:@selector(instantiateUpdater) withObject:nil afterDelay:0];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    [self unregisterAsObserver];
 }
 
 - (void)instantiateUpdater
 {
     NSBundle *hostBundle = [NSBundle mainBundle];
     id <SUUserDriver> driver = [[SUSparkleUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
-    self.updater = [[SUUpdater alloc] initWithHostBundle:hostBundle userDriver:driver];
-}
-
-- (void)dealloc
-{
-    [self unregisterAsObserver];
+    self.updater = [[SUUpdater alloc] initWithHostBundle:hostBundle userDriver:driver delegate:nil];
 }
 
 - (IBAction)checkForUpdates:(id)__unused sender
