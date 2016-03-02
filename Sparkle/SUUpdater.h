@@ -26,7 +26,24 @@
  */
 SU_EXPORT @interface SUUpdater : NSObject
 
-- (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)delegate;
+/*!
+ * Initializes a new SUUpdater instance
+ *
+ * Update checks will start a short delay after initialization. This is to prevent the updater starting work before an application may have finished launching.
+ *
+ * Note that this is a normal initializer and doesn't implement the singleton pattern (i.e, instances aren't cached, so no surprises)
+ * Hence you shouldn't create multiple live instances that target the same bundle.
+ * However, this also means that updater instances can be deallocated, and that they will be torn down properly
+ *
+ * Related: See SUUpdaterController which wraps a SUUpdater instance and is suitable for instantiating in nib files
+ *
+ * @param hostBundle The bundle that should be targetted for updating. This must not be nil.
+ * @param userDriver The user driver that Sparkle uses for user update interaction
+ * @param delegate The delegate for SUUpdater. This may be nil.
+ *
+ * This must be called on the main thread.
+ */
+- (instancetype)initWithHostBundle:(NSBundle *)hostBundle userDriver:(id <SUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)delegate;
 
 @property (weak) id<SUUpdaterDelegate> delegate;
 @property (nonatomic, readonly) id<SUUserDriver> userDriver;
