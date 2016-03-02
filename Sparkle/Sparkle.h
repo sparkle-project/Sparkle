@@ -23,5 +23,7 @@
 #import "SUUpdatePermissionPromptResult.h"
 #import "SUUserDriver.h"
 #import "SUSparkleUserDriver.h"
+#import "SUSparkleUserDriverUIDelegate.h"
+#import "SUSparkleUserDriverRemoteDelegate.h"
 
 #endif
