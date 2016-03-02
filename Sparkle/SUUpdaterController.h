@@ -60,7 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  Validates if the menu item for checkForUpdates: can be invoked or not
  
- This validates the menu item by invoking -[SUUpdater updateInProgress]
+ This validates the menu item by checking -[SUSparkleUserDriver updateInProgress]
  */
 - (BOOL)validateMenuItem:(NSMenuItem *)item;
 
