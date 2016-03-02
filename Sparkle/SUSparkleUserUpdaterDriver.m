@@ -200,17 +200,19 @@
 
 #pragma mark Update Found
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem versionDisplayer:(id<SUVersionDisplay>)versionDisplayer allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates reply:(void (^)(SUUpdateAlertChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates reply:(void (^)(SUUpdateAlertChoice))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        id <SUVersionDisplay> versionDisplayer = nil;
+        if ([self.delegate respondsToSelector:@selector(versionDisplayerForUserDriver:)]) {
+            versionDisplayer = [self.delegate versionDisplayerForUserDriver:self];
+        }
+        
         __weak SUSparkleUserUpdaterDriver *weakSelf = self;
-        SUUpdateAlert *updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host allowsAutomaticUpdates:allowsAutomaticUpdates completionBlock:^(SUUpdateAlertChoice choice) {
+        self.activeUpdateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host versionDisplayer:versionDisplayer allowsAutomaticUpdates:allowsAutomaticUpdates completionBlock:^(SUUpdateAlertChoice choice) {
             reply(choice);
             weakSelf.activeUpdateAlert = nil;
         }];
-        
-        [updateAlert setVersionDisplayer:versionDisplayer];
-        self.activeUpdateAlert = updateAlert;
         
         [self setUpFocusForActiveUpdateAlert];
     });

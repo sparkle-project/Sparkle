@@ -12,7 +12,6 @@
 #import <Foundation/Foundation.h>
 #import "SUExport.h"
 #import "SUVersionComparisonProtocol.h"
-#import "SUVersionDisplayProtocol.h"
 #import "SUUserUpdaterDriver.h"
 
 @class SUAppcastItem, SUAppcast;
@@ -310,16 +309,10 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (id<SUVersionComparison>)versionComparatorForUpdater:(SUUpdater *)updater;
 
 /*!
-    Returns an object that formats version numbers for display to the user.
-
-    If you don't implement this method or return \c nil,
-    the standard version formatter will be used.
-
-    \sa SUUpdateAlert
-
-    \param updater The SUUpdater instance.
+    @deprecated This method is no longer used. See SUSparkleUserUpdaterDriver delegate instead.
  */
-- (id<SUVersionDisplay>)versionDisplayerForUpdater:(SUUpdater *)updater;
+// Don't specify SUVersionDisplay in the return type, otherwise we'd have to forward declare a protocol that isn't used here anymore
+- (id)versionDisplayerForUpdater:(SUUpdater *)updater __deprecated;
 
 /*!
     Returns the path which is used to relaunch the client after the update is installed.

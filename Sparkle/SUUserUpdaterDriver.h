@@ -12,7 +12,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class SUUpdatePermissionPromptResult, SUAppcastItem;
-@protocol SUVersionDisplay;
 
 /*!
  The API in Sparkle for controlling the user update interaction.
@@ -105,7 +104,6 @@ NS_ASSUME_NONNULL_BEGIN
  * Let the user know a new update is found and ask them what they want to do.
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update
- * @param versionDisplayer The custom version displayer for showing the update's version string - this may be nil.
  * @param allowsAutomaticUpdates Indicates whether the user is allowed to use automatic updates.
  * A user interface may use this to give the user an option to enable automatic updates.
  * @param reply A reply of SUInstallUpdateChoice installs the new update immediately. A reply of
@@ -115,7 +113,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * This can be called from any thread
  */
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem versionDisplayer:(_Nullable id <SUVersionDisplay>)versionDisplayer allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates reply:(void (^)(SUUpdateAlertChoice))reply;
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates reply:(void (^)(SUUpdateAlertChoice))reply;
 
 /*!
  * Show the user a new update that was already automatically downloaded is available

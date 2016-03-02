@@ -39,12 +39,7 @@
         return;
     }
     
-    id<SUVersionDisplay> versDisp = nil;
-    if ([[self.updater delegate] respondsToSelector:@selector(versionDisplayerForUpdater:)]) {
-        versDisp = [[self.updater delegate] versionDisplayerForUpdater:self.updater];
-    }
-    
-    [self.updater.userUpdaterDriver showUpdateFoundWithAppcastItem:self.updateItem versionDisplayer:versDisp allowsAutomaticUpdates:self.updater.allowsAutomaticUpdates reply:^(SUUpdateAlertChoice choice) {
+    [self.updater.userUpdaterDriver showUpdateFoundWithAppcastItem:self.updateItem allowsAutomaticUpdates:self.updater.allowsAutomaticUpdates reply:^(SUUpdateAlertChoice choice) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self updateAlertFinishedWithChoice:choice];
         });

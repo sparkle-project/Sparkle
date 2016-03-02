@@ -989,7 +989,6 @@
 				61A2279A0D1CEE7600430CCD /* SUSystemProfiler.h */,
 				61A2279B0D1CEE7600430CCD /* SUSystemProfiler.m */,
 				61A2259C0D1C495D00430CCD /* SUVersionComparisonProtocol.h */,
-				3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */,
 			);
 			name = "Appcast Support";
 			sourceTree = "<group>";
@@ -1009,6 +1008,7 @@
 				61B5FCA109C5228F00B25A18 /* SUUpdateAlert.m */,
 				612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */,
 				612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */,
+				3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */,
 				725602D31C83551C00DAA70E /* SUApplicationInfo.h */,
 				725602D41C83551C00DAA70E /* SUApplicationInfo.m */,
 			);

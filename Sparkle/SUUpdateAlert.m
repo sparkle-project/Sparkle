@@ -70,7 +70,7 @@
 @synthesize skipButton;
 @synthesize laterButton;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates completionBlock:(void (^)(SUUpdateAlertChoice))block
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates completionBlock:(void (^)(SUUpdateAlertChoice))block
 {
     self = [super initWithWindowNibName:@"SUUpdateAlert"];
 	if (self)
@@ -78,6 +78,7 @@
         self.completionBlock = block;
         host = aHost;
         updateItem = item;
+        versionDisplayer = aVersionDisplayer;
         _allowsAutomaticUpdates = allowsAutomaticUpdates;
         [self setShouldCascadeWindows:NO];
 
