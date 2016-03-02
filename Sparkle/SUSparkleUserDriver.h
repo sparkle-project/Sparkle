@@ -11,18 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol SUSparkleUserDriverUIDelegate;
-
-@protocol SUSparkleUserDriverDelegate <NSObject, SUSparkleUserDriverUIDelegate>
-
-@optional
-
-- (BOOL)responsibleForInitiatingUpdateCheckForUserDriver:(id <SUUserDriver>)userDriver;
-- (void)initiateUpdateCheckForUserDriver:(id <SUUserDriver>)userDriver;
-
-- (BOOL)responsibleForSignalingApplicationTerminationForUserDriver:(id <SUUserDriver>)userDriver;
-
-@end
+@protocol SUSparkleUserDriverDelegate;
 
 @interface SUSparkleUserDriver : NSObject <SUUserDriver>
 

@@ -7,7 +7,7 @@
 //
 
 #import "SUSparkleUserDriver.h"
-#import "SUSparkleUserDriverUIDelegate.h"
+#import "SUSparkleUserDriverDelegate.h"
 #import "SUAppcastItem.h"
 #import "SUVersionDisplayProtocol.h"
 #import "SUHost.h"
@@ -348,7 +348,7 @@
 - (void)showAlert:(NSAlert *)alert
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        id <SUSparkleUserDriverUIDelegate> delegate = self.delegate;
+        id <SUSparkleUserDriverDelegate> delegate = self.delegate;
         
         if ([delegate respondsToSelector:@selector(userDriverWillShowModalAlert:)]) {
             [delegate userDriverWillShowModalAlert:self];

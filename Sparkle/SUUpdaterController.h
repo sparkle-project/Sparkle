@@ -11,6 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class SUUpdater;
+@class SUSparkleUserDriver;
 
 /*!
  A controller class that instantiates a SUUpdater and allows binding UI to it.
@@ -38,6 +39,11 @@ NS_ASSUME_NONNULL_BEGIN
  Accessible property for the updater. Some properties on the updater can be binded via KVO
  */
 @property (nonatomic, readonly) SUUpdater *updater;
+
+/*!
+ Accessible property for the updater's user driver.
+ */
+@property (nonatomic, readonly) SUSparkleUserDriver *userDriver;
 
 /*!
  Explicitly checks for updates and displays a progress dialog while doing so.
