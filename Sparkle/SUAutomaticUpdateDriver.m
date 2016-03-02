@@ -48,7 +48,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 {
     self.interruptible = NO;
     
-    [self.updater.userUpdaterDriver showAutomaticUpdateFoundWithAppcastItem:self.updateItem reply:^(SUUpdateAlertChoice choice) {
+    [self.updater.userDriver showAutomaticUpdateFoundWithAppcastItem:self.updateItem reply:^(SUUpdateAlertChoice choice) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self automaticUpdateAlertFinishedWithChoice:choice];
         });
@@ -73,7 +73,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
 {
-    [self.updater.userUpdaterDriver registerApplicationTermination:^(SUApplicationTerminationStatus terminationStatus) {
+    [self.updater.userDriver registerApplicationTermination:^(SUApplicationTerminationStatus terminationStatus) {
         // We use -performSelectorOnMainThread:withObject:waitUntilDone: rather than GCD because if we are on the main thread already,
         // we don't want to run the operation asynchronously. It's also possible we aren't on the main thread (say due to IPC through a XPC service).
         // Anyway, if we're on the main thread in a single process without the app delegate delaying termination,
@@ -81,11 +81,11 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         [self performSelectorOnMainThread:@selector(installUpdateWithTerminationStatus:) withObject:@(terminationStatus) waitUntilDone:YES];
     }];
     
-    // At first, it may seem like we should register for system power off ourselves rather than the user updater driver
+    // At first, it may seem like we should register for system power off ourselves rather than the user driver
     // This is a bad idea for a couple reasons. One is it may require linkage to AppKit, or some complex IOKit code
-    // Another is that we would be making the assumption that the user updater driver is on the same system as the updater,
+    // Another is that we would be making the assumption that the user driver is on the same system as the updater,
     // which is something we would be better off not assuming!
-    [self.updater.userUpdaterDriver registerSystemPowerOff:^(SUSystemPowerOffStatus systemPowerOffStatus) {
+    [self.updater.userDriver registerSystemPowerOff:^(SUSystemPowerOffStatus systemPowerOffStatus) {
         // See above for why we use -performSelectorOnMainThread:withObject:waitUntilDone:
         [self performSelectorOnMainThread:@selector(systemWillPowerOff:) withObject:@(systemPowerOffStatus) waitUntilDone:YES];
     }];
@@ -126,8 +126,8 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     {
         self.willUpdateOnTermination = NO;
         
-        [self.updater.userUpdaterDriver unregisterApplicationTermination];
-        [self.updater.userUpdaterDriver unregisterSystemPowerOff];
+        [self.updater.userDriver unregisterApplicationTermination];
+        [self.updater.userDriver unregisterSystemPowerOff];
 
         id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
         if ([updaterDelegate respondsToSelector:@selector(updater:didCancelInstallUpdateOnQuit:)])

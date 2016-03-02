@@ -39,7 +39,7 @@
         return;
     }
     
-    [self.updater.userUpdaterDriver showUpdateFoundWithAppcastItem:self.updateItem allowsAutomaticUpdates:self.updater.allowsAutomaticUpdates reply:^(SUUpdateAlertChoice choice) {
+    [self.updater.userDriver showUpdateFoundWithAppcastItem:self.updateItem allowsAutomaticUpdates:self.updater.allowsAutomaticUpdates reply:^(SUUpdateAlertChoice choice) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self updateAlertFinishedWithChoice:choice];
         });
@@ -54,7 +54,7 @@
 
     if (!self.automaticallyInstallUpdates) {
         [self showNotice:^{
-            [self.updater.userUpdaterDriver showUpdateNotFound];
+            [self.updater.userDriver showUpdateNotFound];
         }];
         
         [self abortUpdate];
@@ -67,7 +67,7 @@
     switch (choice) {
         case SUInstallUpdateChoice:
         {
-            [self.updater.userUpdaterDriver showDownloadInitiatedWithCompletion:^(SUDownloadUpdateStatus downloadCompletionStatus) {
+            [self.updater.userDriver showDownloadInitiatedWithCompletion:^(SUDownloadUpdateStatus downloadCompletionStatus) {
                 switch (downloadCompletionStatus) {
                     case SUDownloadUpdateDone:
                         break;
@@ -102,25 +102,25 @@
 
 - (void)download:(NSURLDownload *)__unused download didReceiveResponse:(NSURLResponse *)response
 {
-    [self.updater.userUpdaterDriver showDownloadDidReceiveResponse:response];
+    [self.updater.userDriver showDownloadDidReceiveResponse:response];
 }
 
 - (void)download:(NSURLDownload *)__unused download didReceiveDataOfLength:(NSUInteger)length
 {
-    [self.updater.userUpdaterDriver showDownloadDidReceiveDataOfLength:length];
+    [self.updater.userDriver showDownloadDidReceiveDataOfLength:length];
 }
 
 - (void)extractUpdate
 {
     // Now we have to extract the downloaded archive.
-    [self.updater.userUpdaterDriver showDownloadFinishedAndStartedExtractingUpdate];
+    [self.updater.userDriver showDownloadFinishedAndStartedExtractingUpdate];
     
     [super extractUpdate];
 }
 
 - (void)unarchiver:(SUUnarchiver *)__unused ua extractedProgress:(double)progress
 {
-    [self.updater.userUpdaterDriver showExtractionReceivedProgress:progress];
+    [self.updater.userDriver showExtractionReceivedProgress:progress];
 }
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
@@ -130,7 +130,7 @@
         return;
     }
     
-    [self.updater.userUpdaterDriver showExtractionFinishedAndReadyToInstallAndRelaunch:^(SUInstallUpdateStatus installUpdateStatus) {
+    [self.updater.userDriver showExtractionFinishedAndReadyToInstallAndRelaunch:^(SUInstallUpdateStatus installUpdateStatus) {
         dispatch_async(dispatch_get_main_queue(), ^{
             switch (installUpdateStatus) {
                 case SUCancelUpdateInstallation:
@@ -146,7 +146,7 @@
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch
 {
-    [self.updater.userUpdaterDriver showInstallingUpdate];
+    [self.updater.userDriver showInstallingUpdate];
     
     [super installWithToolAndRelaunch:relaunch];
 }
@@ -158,7 +158,7 @@
     // tabs open), the status window still stays on the screen and obscures
     // other windows; with this fix, it doesn't
 
-    [self.updater.userUpdaterDriver dismissUpdateInstallation];
+    [self.updater.userDriver dismissUpdateInstallation];
 
     [super terminateApp];
 }
@@ -166,7 +166,7 @@
 - (void)abortUpdateWithError:(NSError *)error
 {
     [self showNotice:^{
-        [self.updater.userUpdaterDriver showUpdaterError:error];
+        [self.updater.userDriver showUpdaterError:error];
     }];
     
     [super abortUpdateWithError:error];

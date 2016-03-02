@@ -1,5 +1,5 @@
 //
-//  SUUserUpdaterDriver.h
+//  SUUserDriver.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 2/14/16.
@@ -14,13 +14,13 @@ NS_ASSUME_NONNULL_BEGIN
 @class SUUpdatePermissionPromptResult, SUAppcastItem;
 
 /*!
- The API in Sparkle for controlling the user update interaction.
+ The API in Sparkle for controlling the user interaction.
  
  This protocol is used for implementing a user interface for the Sparkle updater. Sparkle's internal drivers tell
  an object that implements this protocol what actions to take and show to the user.
  
  Every method in this protocol has a void return type and can optionally take a single parameter block, which waits for
- a response back from the user updater driver. Note that every parameter block, or reply, *must* be responded to eventually -
+ a response back from the user driver. Note that every parameter block, or reply, *must* be responded to eventually -
  that is, none can be ignored. Furthermore, they can only be replied to *once* - a reply or completion block should be considered
  invalidated after it's once used. The faster a reply can be made, the more Sparkle may be able to idle, and so the better.
  Lastly, every method in this protocol can be called from any thread. Thus, an implementor may choose to always
@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
  An implementor of this protocol should act defensively. For example, it may be possible for an action that says to
  invalidate or dismiss something to be called multiple times in succession, and the implementor may choose to ignore further requests.
  */
-@protocol SUUserUpdaterDriver <NSObject>
+@protocol SUUserDriver <NSObject>
 
 /*!
  * Show that an update is or is not in progress.
@@ -230,7 +230,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * This is necessary for Sparkle's automatic updates. An implementor should listen for when an application terminates and reply back when it is happening.
  * An implementor may also want to decide if they want to delay the application's termination until -terminateApplication is invoked, which will be
- * necessary if the updater and user updater driver are in separate processes.
+ * necessary if the updater and user driver are in separate processes.
  *
  * @param applicationTerminationHandler A reply of SUApplicationWillTerminate should be used when the application is about to terminate. A reply of
  * SUApplicationStoppedObservingTermination can be used to cancel observing application termination. Note this would have the side effect of cancelling

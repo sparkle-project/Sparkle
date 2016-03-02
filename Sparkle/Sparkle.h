@@ -21,7 +21,7 @@
 #import "SUVersionDisplayProtocol.h"
 #import "SUErrors.h"
 #import "SUUpdatePermissionPromptResult.h"
-#import "SUUserUpdaterDriver.h"
-#import "SUSparkleUserUpdaterDriver.h"
+#import "SUUserDriver.h"
+#import "SUSparkleUserDriver.h"
 
 #endif

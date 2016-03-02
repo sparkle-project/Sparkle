@@ -26,7 +26,7 @@
 
 - (void)dismissCheckingForUpdates
 {
-    [self.updater.userUpdaterDriver dismissUserInitiatedUpdateCheck];
+    [self.updater.userDriver dismissUserInitiatedUpdateCheck];
 }
 
 - (void)cancelCheckForUpdates:(id)__unused sender
@@ -39,7 +39,7 @@
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL
 {
-    [self.updater.userUpdaterDriver showUserInitiatedUpdateCheckWithCompletion:^(SUUserInitiatedCheckStatus completionStatus) {
+    [self.updater.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SUUserInitiatedCheckStatus completionStatus) {
         switch (completionStatus) {
             case SUUserInitiatedCheckDone:
                 break;

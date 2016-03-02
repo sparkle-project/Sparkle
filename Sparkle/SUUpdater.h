@@ -12,7 +12,7 @@
 #import <Foundation/Foundation.h>
 #import "SUExport.h"
 #import "SUVersionComparisonProtocol.h"
-#import "SUUserUpdaterDriver.h"
+#import "SUUserDriver.h"
 
 @class SUAppcastItem, SUAppcast;
 
@@ -27,9 +27,9 @@
 SU_EXPORT @interface SUUpdater : NSObject
 
 @property (unsafe_unretained) id<SUUpdaterDelegate> delegate;
-@property (nonatomic, readonly) id<SUUserUpdaterDriver> userUpdaterDriver;
+@property (nonatomic, readonly) id<SUUserDriver> userDriver;
 
-- (instancetype)initWithHostBundle:(NSBundle *)bundle userUpdaterDriver:(id <SUUserUpdaterDriver>)userUpdaterDriver;
+- (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SUUserDriver>)userDriver;
 
 @property (readonly, strong) NSBundle *hostBundle;
 @property (strong, readonly) NSBundle *sparkleBundle;

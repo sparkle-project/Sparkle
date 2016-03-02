@@ -9,7 +9,7 @@
 #import "SUUpdaterController.h"
 #import "SUUpdater.h"
 #import "SUHost.h"
-#import "SUSparkleUserUpdaterDriver.h"
+#import "SUSparkleUserDriver.h"
 #import "SUConstants.h"
 #import "SULog.h"
 
@@ -41,8 +41,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (void)instantiateUpdater
 {
     NSBundle *hostBundle = [NSBundle mainBundle];
-    id <SUUserUpdaterDriver> driver = [[SUSparkleUserUpdaterDriver alloc] initWithHostBundle:hostBundle delegate:nil];
-    self.updater = [[SUUpdater alloc] initWithHostBundle:hostBundle userUpdaterDriver:driver];
+    id <SUUserDriver> driver = [[SUSparkleUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
+    self.updater = [[SUUpdater alloc] initWithHostBundle:hostBundle userDriver:driver];
 }
 
 - (void)dealloc

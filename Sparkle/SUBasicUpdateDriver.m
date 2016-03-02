@@ -585,7 +585,7 @@
 // Note: this is overridden by the automatic update driver to not terminate in some cases
 - (void)terminateApp
 {
-    [self.updater.userUpdaterDriver terminateApplication];
+    [self.updater.userDriver terminateApplication];
 }
 
 - (void)cleanUpDownload
@@ -626,7 +626,7 @@
 
 - (void)abortUpdate
 {
-    [self.updater.userUpdaterDriver dismissUpdateInstallation];
+    [self.updater.userDriver dismissUpdateInstallation];
     
     [self cleanUpDownload];
     [[NSNotificationCenter defaultCenter] removeObserver:self];

@@ -45,7 +45,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @implementation SUUpdater
 
 @synthesize delegate;
-@synthesize userUpdaterDriver = _userUpdaterDriver;
+@synthesize userDriver = _userDriver;
 @synthesize userAgentString = customUserAgentString;
 @synthesize httpHeaders;
 @synthesize driver;
@@ -53,7 +53,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize sparkleBundle;
 @synthesize decryptionPassword;
 
-- (instancetype)initWithHostBundle:(NSBundle *)bundle userUpdaterDriver:(id <SUUserUpdaterDriver>)userUpdaterDriver
+- (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SUUserDriver>)userDriver
 {
     self = [super init];
 
@@ -66,7 +66,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
     host = [[SUHost alloc] initWithBundle:bundle];
     
-    _userUpdaterDriver = userUpdaterDriver;
+    _userDriver = userDriver;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDriverDidFinish:) name:SUUpdateDriverFinishedNotification object:nil];
     
@@ -140,7 +140,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             profileInfo = [profileInfo arrayByAddingObjectsFromArray:[self.delegate feedParametersForUpdater:self sendingSystemProfile:YES]];
         }
         
-        [self.userUpdaterDriver requestUpdatePermissionWithSystemProfile:profileInfo reply:^(SUUpdatePermissionPromptResult *result) {
+        [self.userDriver requestUpdatePermissionWithSystemProfile:profileInfo reply:^(SUUpdatePermissionPromptResult *result) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self updatePermissionPromptFinishedWithResult:result];
             });
@@ -166,7 +166,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 	if ([note object] == self.driver && [self.driver finished])
 	{
         self.driver = nil;
-        [self.userUpdaterDriver showUpdateInProgress:NO];
+        [self.userDriver showUpdateInProgress:NO];
         [self updateLastUpdateCheckDate];
         [self scheduleNextUpdateCheck];
     }
@@ -186,7 +186,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)scheduleNextUpdateCheck
 {
-    [self.userUpdaterDriver invalidateUpdateCheckTimer];
+    [self.userDriver invalidateUpdateCheckTimer];
 	if (![self automaticallyChecksForUpdates]) return;
 
     // How long has it been since last we checked for an update?
@@ -200,7 +200,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         updateCheckInterval = SUMinimumUpdateCheckInterval;
     if (intervalSinceCheck < updateCheckInterval) {
         NSTimeInterval delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
-        [self.userUpdaterDriver startUpdateCheckTimerWithNextTimeInterval:delayUntilCheck reply:^(SUUpdateCheckTimerStatus checkTimerStatus) {
+        [self.userDriver startUpdateCheckTimerWithNextTimeInterval:delayUntilCheck reply:^(SUUpdateCheckTimerStatus checkTimerStatus) {
             switch (checkTimerStatus) {
                 case SUCheckForUpdateWillOccurLater:
                     break;
@@ -326,7 +326,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
 {
 	if ([self updateInProgress]) { return; }
     
-    [self.userUpdaterDriver invalidateUpdateCheckTimer];
+    [self.userDriver invalidateUpdateCheckTimer];
 
     [self updateLastUpdateCheckDate];
 
@@ -345,7 +345,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
         return;
     }
     
-    [self.userUpdaterDriver showUpdateInProgress:YES];
+    [self.userDriver showUpdateInProgress:YES];
 
     [self checkIfConfiguredProperly];
 
@@ -543,7 +543,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
     
     // Stop checking for updates
     [self cancelNextUpdateCycle];
-    [self.userUpdaterDriver invalidateUpdateCheckTimer];
+    [self.userDriver invalidateUpdateCheckTimer];
     
     // Abort any on-going updates
     // A driver could be retained by another object (eg: a timer),

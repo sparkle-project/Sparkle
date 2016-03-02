@@ -1,12 +1,12 @@
 //
-//  SUSparkleUserUpdaterDriver.m
+//  SUSparkleUserDriver.m
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 2/14/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SUSparkleUserUpdaterDriver.h"
+#import "SUSparkleUserDriver.h"
 #import "SUAppcastItem.h"
 #import "SUVersionDisplayProtocol.h"
 #import "SUHost.h"
@@ -18,7 +18,7 @@
 #import "SULocalizations.h"
 #import "SUApplicationInfo.h"
 
-@interface SUSparkleUserUpdaterDriver ()
+@interface SUSparkleUserDriver ()
 
 @property (nonatomic, readonly) SUHost *host;
 
@@ -47,7 +47,7 @@
 
 @end
 
-@implementation SUSparkleUserUpdaterDriver
+@implementation SUSparkleUserDriver
 
 @synthesize host = _host;
 @synthesize handlesTermination = _handlesTermination;
@@ -68,7 +68,7 @@
 
 #pragma mark Birth
 
-- (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(id<SUSparkleUserUpdaterDriverDelegate>)delegate
+- (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(id<SUSparkleUserDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -208,7 +208,7 @@
             versionDisplayer = [self.delegate versionDisplayerForUserDriver:self];
         }
         
-        __weak SUSparkleUserUpdaterDriver *weakSelf = self;
+        __weak SUSparkleUserDriver *weakSelf = self;
         self.activeUpdateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host versionDisplayer:versionDisplayer allowsAutomaticUpdates:allowsAutomaticUpdates completionBlock:^(SUUpdateAlertChoice choice) {
             reply(choice);
             weakSelf.activeUpdateAlert = nil;
@@ -221,7 +221,7 @@
 - (void)showAutomaticUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        __weak SUSparkleUserUpdaterDriver *weakSelf = self;
+        __weak SUSparkleUserDriver *weakSelf = self;
         self.activeUpdateAlert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host completionBlock:^(SUUpdateAlertChoice choice) {
             reply(choice);
             weakSelf.activeUpdateAlert = nil;
@@ -347,7 +347,7 @@
 - (void)showAlert:(NSAlert *)alert
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        id <SUSparkleUserUpdaterDriverDelegate> delegate = self.delegate;
+        id <SUSparkleUserDriverDelegate> delegate = self.delegate;
         
         if ([delegate respondsToSelector:@selector(userUpdaterDriverWillShowModalAlert:)]) {
             [delegate userUpdaterDriverWillShowModalAlert:self];
