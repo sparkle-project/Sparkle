@@ -8,30 +8,41 @@
 
 #import <Cocoa/Cocoa.h>
 
-// Note this class is not intended for XPC or sandboxing
-// It's meant to be droppable via Interface Builder as a custom NSObject subclass
+NS_ASSUME_NONNULL_BEGIN
 
 @class SUUpdater;
 
 /*!
- A controller class that instantiates a SUUpdater and allows binding UI actions and outlets to it.
+ A controller class that instantiates a SUUpdater and allows binding UI to it.
  
  This controller's updater targets the application's main bundle, and uses Sparkle's standard user interface.
  Thus it is only suitable under these circumstances. Typically, this class is used by sticking it as a custom NSObject in an Interface Builder nib (probably in MainMenu).
- The controller then kicks off creating an SUUpdater instance and allows hooking up various actions and outlets.
+ The controller then kicks off creating an SUUpdater instance and allows hooking up the check for updates action and menu item validation.
  
- There may be several reasons why this class may not be very suitable for you:
- * You want to defer the instantiation of an SUUpdater, or don't want to be tied into a nib's instantiation, or don't want to use a nib
+ There may be several reasons why this class may not be suitable for you:
+ * You want to control or defer the instantiation of an SUUpdater, or don't want to be tied into a nib's instantiation, or don't want to use a nib
  * You want to separate Sparkle's updater and user interface into separate processes
+ * You want to provide a custom user interface, or perhaps one that provides little-to-none
  * You don't want to use a convenience class that provides very little glue ;)
  
   */
 @interface SUUpdaterController : NSObject
 
 /*!
- Accessible property for the updater. Some properties on the updater can be binded via KVO
+ Initializes a new updater controller instance. Typically this class is instantiated in a nib, thus this
+ method is not usually called directly by the developer.
+ 
+ Note that this defers instantiation of its SUUpdater to the next cycle in Cocoa's runloop.
+ This is to prevent starting the updater cycle when the application may not be ready yet.
  */
-@property (nonatomic, readonly) SUUpdater *updater;
+- (instancetype)init;
+
+/*!
+ Accessible property for the updater. Some properties on the updater can be binded via KVO
+ 
+ The updater may be nil, which means its instantiation is deferred to the next runloop cycle.
+ */
+@property (nonatomic, readonly, nullable) SUUpdater *updater;
 
 /*!
  Explicitly checks for updates and displays a progress dialog while doing so.
@@ -43,7 +54,7 @@
  
  This action checks updates by invoking -[SUUpdater checkForUpdates]
  */
-- (IBAction)checkForUpdates:(id)sender;
+- (IBAction)checkForUpdates:(_Nullable id)sender;
 
 /*!
  Validates if the menu item for checkForUpdates: can be invoked or not
@@ -53,3 +64,5 @@
 - (BOOL)validateMenuItem:(NSMenuItem *)item;
 
 @end
+
+NS_ASSUME_NONNULL_END
