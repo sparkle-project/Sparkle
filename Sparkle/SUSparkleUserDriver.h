@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(_Nullable id <SUSparkleUserDriverDelegate>)delegate;
 
-@property (nonatomic, readonly, weak, nullable) id <SUSparkleUserDriverDelegate> delegate;
+@property (nonatomic, weak, nullable) id <SUSparkleUserDriverDelegate> delegate;
 
 @property (nonatomic, readonly, getter=isUpdateInProgress) BOOL updateInProgress;
 

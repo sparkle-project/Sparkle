@@ -31,18 +31,13 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  Initializes a new updater controller instance. Typically this class is instantiated in a nib, thus this
  method is not usually called directly by the developer.
- 
- Note that this defers instantiation of its SUUpdater to the next cycle in Cocoa's runloop.
- This is to prevent starting the updater cycle when the application may not be ready yet.
  */
 - (instancetype)init;
 
 /*!
  Accessible property for the updater. Some properties on the updater can be binded via KVO
- 
- The updater may be nil, which means its instantiation is deferred to the next runloop cycle.
  */
-@property (nonatomic, readonly, nullable) SUUpdater *updater;
+@property (nonatomic, readonly) SUUpdater *updater;
 
 /*!
  Explicitly checks for updates and displays a progress dialog while doing so.

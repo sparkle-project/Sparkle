@@ -72,7 +72,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDriverDidFinish:) name:SUUpdateDriverFinishedNotification object:nil];
     
-    [self startUpdateCycle];
+    // This runs the permission prompt if needed, but never before the app has finished launching because the runloop may not have ran before that
+    // We will also take precaussions if a developer instantiates an updater themselves where the application may not be completely finished launching yet
+    [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:1];
     
     return self;
 }

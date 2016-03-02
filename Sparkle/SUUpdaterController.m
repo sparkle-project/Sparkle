@@ -31,10 +31,9 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     if (self != nil) {
         [self registerAsObserver];
         
-        // We don't want the updater to start its updating cycle before the app has finished launching
-        // If this is instantiated in a nib, the runloop may not be ready
-        // Furthermore, this delay allows setting the updater and user driver delegates before the updater initializes
-        [self performSelector:@selector(instantiateUpdater) withObject:nil afterDelay:0];
+        NSBundle *hostBundle = [NSBundle mainBundle];
+        id <SUUserDriver> driver = [[SUSparkleUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
+        self.updater = [[SUUpdater alloc] initWithHostBundle:hostBundle userDriver:driver delegate:nil];
     }
     return self;
 }
@@ -42,13 +41,6 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (void)dealloc
 {
     [self unregisterAsObserver];
-}
-
-- (void)instantiateUpdater
-{
-    NSBundle *hostBundle = [NSBundle mainBundle];
-    id <SUUserDriver> driver = [[SUSparkleUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
-    self.updater = [[SUUpdater alloc] initWithHostBundle:hostBundle userDriver:driver delegate:nil];
 }
 
 - (IBAction)checkForUpdates:(id)__unused sender
@@ -59,7 +51,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (BOOL)validateMenuItem:(NSMenuItem *)item
 {
     if ([item action] == @selector(checkForUpdates:)) {
-        return (self.updater != nil && !self.updater.updateInProgress);
+        return !self.updater.updateInProgress;
     }
     return YES;
 }
