@@ -9,6 +9,8 @@
 #import <Cocoa/Cocoa.h>
 #import "SUUserUpdaterDriver.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol SUSparkleUserUpdaterDriverDelegate <NSObject>
 
 @optional
@@ -25,12 +27,14 @@
 
 @interface SUSparkleUserUpdaterDriver : NSObject <SUUserUpdaterDriver>
 
-- (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(id <SUSparkleUserUpdaterDriverDelegate>)delegate;
+- (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(_Nullable id <SUSparkleUserUpdaterDriverDelegate>)delegate;
 
-@property (nonatomic, readonly, weak) id <SUSparkleUserUpdaterDriverDelegate> delegate;
+@property (nonatomic, readonly, weak, nullable) id <SUSparkleUserUpdaterDriverDelegate> delegate;
 
 @property (nonatomic, readonly, getter=isUpdateInProgress) BOOL updateInProgress;
 
 - (NSApplicationTerminateReply)sendApplicationTerminationSignal;
 
 @end
+
+NS_ASSUME_NONNULL_END
