@@ -1,5 +1,5 @@
 //
-//  SUSparkleUserDriver.h
+//  SUStandardUserDriver.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 2/14/16.
@@ -11,21 +11,21 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol SUSparkleUserDriverUIDelegate, SUSparkleUserDriverRemoteDelegate;
+@protocol SUStandardUserDriverUIDelegate, SUStandardUserDriverRemoteDelegate;
 
 /*!
- A protocol for Sparkle's user driver's delegate
+ A protocol for Sparkle's standard user driver's delegate
  
- If you are interested in UI interactions, check out SUSparkleUserDriverUIDelegate
- If you are interested in XPC or remote process communications for efficiency and reliability, check out SUSparkleUserDriverRemoteDelegate
+ If you are interested in UI interactions, check out SUStandardUserDriverUIDelegate
+ If you are interested in XPC or remote process communications for efficiency and reliability, check out SUStandardUserDriverRemoteDelegate
  */
-@protocol SUSparkleUserDriverDelegate <SUSparkleUserDriverUIDelegate, SUSparkleUserDriverRemoteDelegate>
+@protocol SUStandardUserDriverDelegate <SUStandardUserDriverUIDelegate, SUStandardUserDriverRemoteDelegate>
 @end
 
 /*!
- Sparkle's standard built-in driver for user updater interactions
+ Sparkle's standard built-in user driver for updater interactions
  */
-@interface SUSparkleUserDriver : NSObject <SUUserDriver>
+@interface SUStandardUserDriver : NSObject <SUUserDriver>
 
 /*!
  Initializes a Sparkle's standard user driver for user update interactions
@@ -33,12 +33,12 @@ NS_ASSUME_NONNULL_BEGIN
  @param hostBundle The target bundle of the host that is being updated
  @param delegate The delegate to this user driver. Pass nil if you don't want to provide one.
  */
-- (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(_Nullable id <SUSparkleUserDriverDelegate>)delegate;
+- (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(_Nullable id <SUStandardUserDriverDelegate>)delegate;
 
 /*!
  Readable and writable property for this user driver's delegate
  */
-@property (nonatomic, weak, nullable) id <SUSparkleUserDriverDelegate> delegate;
+@property (nonatomic, weak, nullable) id <SUStandardUserDriverDelegate> delegate;
 
 /*!
  Indicates whether or not an update is in progress as far as the user is concerned

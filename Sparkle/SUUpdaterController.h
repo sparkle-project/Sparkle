@@ -11,7 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class SUUpdater;
-@class SUSparkleUserDriver;
+@class SUStandardUserDriver;
 
 /*!
  A controller class that instantiates a SUUpdater and allows binding UI to it.
@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  Accessible property for the updater's user driver.
  */
-@property (nonatomic, readonly) SUSparkleUserDriver *userDriver;
+@property (nonatomic, readonly) SUStandardUserDriver *userDriver;
 
 /*!
  Explicitly checks for updates and displays a progress dialog while doing so.
@@ -60,7 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  Validates if the menu item for checkForUpdates: can be invoked or not
  
- This validates the menu item by checking -[SUSparkleUserDriver updateInProgress]
+ This validates the menu item by checking -[SUStandardUserDriver updateInProgress]
  */
 - (BOOL)validateMenuItem:(NSMenuItem *)item;
 

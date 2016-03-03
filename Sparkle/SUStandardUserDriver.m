@@ -1,14 +1,14 @@
 //
-//  SUSparkleUserDriver.m
+//  SUStandardUserDriver.m
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 2/14/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SUSparkleUserDriver.h"
-#import "SUSparkleUserDriverUIDelegate.h"
-#import "SUSparkleUserDriverRemoteDelegate.h"
+#import "SUStandardUserDriver.h"
+#import "SUStandardUserDriverUIDelegate.h"
+#import "SUStandardUserDriverRemoteDelegate.h"
 #import "SUAppcastItem.h"
 #import "SUVersionDisplayProtocol.h"
 #import "SUHost.h"
@@ -20,7 +20,7 @@
 #import "SULocalizations.h"
 #import "SUApplicationInfo.h"
 
-@interface SUSparkleUserDriver ()
+@interface SUStandardUserDriver ()
 
 @property (nonatomic, readonly) SUHost *host;
 
@@ -49,7 +49,7 @@
 
 @end
 
-@implementation SUSparkleUserDriver
+@implementation SUStandardUserDriver
 
 @synthesize host = _host;
 @synthesize handlesTermination = _handlesTermination;
@@ -70,7 +70,7 @@
 
 #pragma mark Birth
 
-- (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(id<SUSparkleUserDriverDelegate>)delegate
+- (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(id<SUStandardUserDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -210,7 +210,7 @@
             versionDisplayer = [self.delegate versionDisplayerForUserDriver:self];
         }
         
-        __weak SUSparkleUserDriver *weakSelf = self;
+        __weak SUStandardUserDriver *weakSelf = self;
         self.activeUpdateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host versionDisplayer:versionDisplayer allowsAutomaticUpdates:allowsAutomaticUpdates completionBlock:^(SUUpdateAlertChoice choice) {
             reply(choice);
             weakSelf.activeUpdateAlert = nil;
@@ -223,7 +223,7 @@
 - (void)showAutomaticUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        __weak SUSparkleUserDriver *weakSelf = self;
+        __weak SUStandardUserDriver *weakSelf = self;
         self.activeUpdateAlert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host completionBlock:^(SUUpdateAlertChoice choice) {
             reply(choice);
             weakSelf.activeUpdateAlert = nil;
@@ -349,7 +349,7 @@
 - (void)showAlert:(NSAlert *)alert
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        id <SUSparkleUserDriverDelegate> delegate = self.delegate;
+        id <SUStandardUserDriverDelegate> delegate = self.delegate;
         
         if ([delegate respondsToSelector:@selector(userDriverWillShowModalAlert:)]) {
             [delegate userDriverWillShowModalAlert:self];

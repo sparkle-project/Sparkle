@@ -12,7 +12,7 @@
 @interface SURemoteUpdateSettingsWindowController ()
 
 @property (nonatomic) NSXPCConnection *connection;
-@property (nonatomic) SUSparkleUserDriver *userDriver;
+@property (nonatomic) SUStandardUserDriver *userDriver;
 
 @property (nonatomic) IBOutlet NSButton *automaticallyChecksForUpdatesButton;
 @property (nonatomic) IBOutlet NSButton *automaticallyDownloadUpdatesButton;
@@ -39,7 +39,7 @@
         self.connection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.TestAppHelper"];
         
         self.connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUUserDriver)];
-        self.userDriver = [[SUSparkleUserDriver alloc] initWithHostBundle:[NSBundle mainBundle] delegate:self];
+        self.userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:[NSBundle mainBundle] delegate:self];
         self.connection.exportedObject = self.userDriver;
         
         self.connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(TestAppHelperProtocol)];

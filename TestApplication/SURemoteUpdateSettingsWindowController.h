@@ -9,9 +9,9 @@
 #import <Cocoa/Cocoa.h>
 #import <Sparkle/Sparkle.h>
 
-@protocol SUSparkleUserDriverDelegate;
+@protocol SUStandardUserDriverDelegate;
 
-@interface SURemoteUpdateSettingsWindowController : NSWindowController <SUSparkleUserDriverDelegate>
+@interface SURemoteUpdateSettingsWindowController : NSWindowController <SUStandardUserDriverDelegate>
 
 - (NSApplicationTerminateReply)sendTerminationSignal;
 

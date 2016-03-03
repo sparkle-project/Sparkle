@@ -326,7 +326,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (id<SUVersionComparison>)versionComparatorForUpdater:(SUUpdater *)updater;
 
 /*!
-    @deprecated This method is no longer used. See SUSparkleUserUpdaterDriver delegate instead.
+    @deprecated This method is no longer used. See SUStandardUserUpdaterDriver delegate instead.
  */
 // Don't specify SUVersionDisplay in the return type, otherwise we'd have to forward declare a protocol that isn't used here anymore
 - (id)versionDisplayerForUpdater:(SUUpdater *)updater __deprecated;
@@ -346,7 +346,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 
     \param updater The SUUpdater instance.
  
-    @deprecated See SUSparkleUserUpdaterDriver delegate instead
+    @deprecated See SUStandardUserUpdaterDriver delegate instead
  */
 - (void)updaterWillShowModalAlert:(SUUpdater *)updater __deprecated;
 
@@ -356,7 +356,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 
     \param updater The SUUpdater instance.
  
-    @deprecated See SUSparkleUserUpdaterDriver delegate instead
+    @deprecated See SUStandardUserUpdaterDriver delegate instead
  */
 - (void)updaterDidShowModalAlert:(SUUpdater *)updater __deprecated;
 

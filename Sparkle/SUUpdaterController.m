@@ -9,17 +9,17 @@
 #import "SUUpdaterController.h"
 #import "SUUpdater.h"
 #import "SUHost.h"
-#import "SUSparkleUserDriver.h"
+#import "SUStandardUserDriver.h"
 #import "SUConstants.h"
 #import "SULog.h"
-#import "SUSparkleUserDriver.h"
+#import "SUStandardUserDriver.h"
 
 static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
 
 @interface SUUpdaterController ()
 
 @property (nonatomic) SUUpdater *updater;
-@property (nonatomic) SUSparkleUserDriver *userDriver;
+@property (nonatomic) SUStandardUserDriver *userDriver;
 
 @end
 
@@ -35,7 +35,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         [self registerAsObserver];
         
         NSBundle *hostBundle = [NSBundle mainBundle];
-        _userDriver = [[SUSparkleUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
+        _userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
         _updater = [[SUUpdater alloc] initWithHostBundle:hostBundle userDriver:_userDriver delegate:nil];
     }
     return self;

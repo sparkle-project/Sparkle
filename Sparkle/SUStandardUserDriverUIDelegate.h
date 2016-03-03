@@ -1,5 +1,5 @@
 //
-//  SUSparkleUserDriverUIDelegate.h
+//  SUStandardUserDriverUIDelegate.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/1/16.
@@ -13,9 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol SUUserDriver, SUVersionDisplay;
 
 /*!
- A delegate protocol for Sparkle's user driver related to user interactions
+ A delegate protocol for Sparkle's standard user driver related to user interactions
  */
-@protocol SUSparkleUserDriverUIDelegate <NSObject>
+@protocol SUStandardUserDriverUIDelegate <NSObject>
 
 @optional
 

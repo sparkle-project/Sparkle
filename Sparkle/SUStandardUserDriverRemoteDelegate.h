@@ -1,5 +1,5 @@
 //
-//  SUSparkleUserDriverRemoteDelegate.h
+//  SUStandardUserDriverRemoteDelegate.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/2/16.
@@ -13,9 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol SUUserDriver;
 
 /*!
- A delegate protocol for Sparkle's user driver related to efficiency and reliablity when Sparkle's updater lives in a separate process
+ A delegate protocol for Sparkle's standard user driver related to efficiency and reliablity when Sparkle's updater lives in a separate process
  */
-@protocol SUSparkleUserDriverRemoteDelegate <NSObject>
+@protocol SUStandardUserDriverRemoteDelegate <NSObject>
 
 @optional
 
@@ -53,7 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  This is necessary to implement when automatic updates are possible and when the updater and user driver live in separate processes.
  
- See -[SUSparkleUserDriver sendApplicationTerminationSignal] for more details on how to follow up
+ See -[SUStandardUserDriver sendApplicationTerminationSignal] for more details on how to follow up
  
  @param userDriver The user driver instance.
  */
