@@ -8,12 +8,14 @@
 
 #import "SUTestApplicationDelegate.h"
 #import "SUUpdateSettingsWindowController.h"
+#import "SURemoteUpdateSettingsWindowController.h"
 #import "SUFileManager.h"
 #import "SUTestWebServer.h"
 
 @interface SUTestApplicationDelegate ()
 
 @property (nonatomic) SUUpdateSettingsWindowController *updateSettingsWindowController;
+@property (nonatomic) SURemoteUpdateSettingsWindowController *remoteUpdateSettingsWindowController;
 @property (nonatomic) SUTestWebServer *webServer;
 
 @end
@@ -21,6 +23,7 @@
 @implementation SUTestApplicationDelegate
 
 @synthesize updateSettingsWindowController = _updateSettingsWindowController;
+@synthesize remoteUpdateSettingsWindowController = _remoteUpdateSettingsWindowController;
 @synthesize webServer = _webServer;
 
 static NSString * const UPDATED_VERSION = @"2.0";
@@ -186,8 +189,17 @@ static NSString * const UPDATED_VERSION = @"2.0";
     self.webServer = webServer;
     
     // Show the Settings window
-    self.updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] init];
-    [self.updateSettingsWindowController showWindow:nil];
+    
+    // SURemoteUpdateSettingsWindowController will show its window by itself
+    self.remoteUpdateSettingsWindowController = [[SURemoteUpdateSettingsWindowController alloc] init];
+    
+    //self.updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] init];
+    //[self.updateSettingsWindowController showWindow:nil];
+}
+
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)__unused sender
+{
+    return (self.remoteUpdateSettingsWindowController == nil ? NSTerminateNow : [self.remoteUpdateSettingsWindowController sendTerminationSignal]);
 }
 
 - (void)applicationWillTerminate:(NSNotification * __unused)notification

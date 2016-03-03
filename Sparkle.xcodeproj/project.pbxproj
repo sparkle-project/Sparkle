@@ -183,6 +183,13 @@
 		726DF88E1C84277600188804 /* SUStatusCompletionResults.h in Headers */ = {isa = PBXBuildFile; fileRef = 726DF88D1C84277500188804 /* SUStatusCompletionResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		726E4A0E1C86881600C57C6A /* SUSparkleUserDriverUIDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E4A0D1C86881600C57C6A /* SUSparkleUserDriverUIDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		726E4A101C86B5A200C57C6A /* SUSparkleUserDriverRemoteDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E4A0F1C86B5A200C57C6A /* SUSparkleUserDriverRemoteDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		726E4A1B1C86C88F00C57C6A /* TestAppHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E4A1A1C86C88F00C57C6A /* TestAppHelper.m */; };
+		726E4A1D1C86C88F00C57C6A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E4A1C1C86C88F00C57C6A /* main.m */; };
+		726E4A211C86C88F00C57C6A /* TestAppHelper.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 726E4A161C86C88F00C57C6A /* TestAppHelper.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		726E4A2B1C87D56200C57C6A /* SUTestWebServer.m in Sources */ = {isa = PBXBuildFile; fileRef = A5BF4F1C1BC7668B007A052A /* SUTestWebServer.m */; };
+		726E4A301C87DC1700C57C6A /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; };
+		726E4A341C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E4A321C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.m */; };
+		726E4A351C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726E4A331C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.xib */; };
 		726F2CDE1BC9BE5B001971A4 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
 		726F2CE51BC9C33D001971A4 /* SUOperatingSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 726F2CE31BC9C33D001971A4 /* SUOperatingSystem.h */; };
 		726F2CE61BC9C33D001971A4 /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
@@ -211,7 +218,6 @@
 		767B61AC1972D488004E0C3C /* SUGuidedPackageInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 767B61AA1972D488004E0C3C /* SUGuidedPackageInstaller.h */; };
 		767B61AD1972D488004E0C3C /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */; };
 		767B61AE1972D488004E0C3C /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */; };
-		A5BF4F1D1BC7668B007A052A /* SUTestWebServer.m in Sources */ = {isa = PBXBuildFile; fileRef = A5BF4F1C1BC7668B007A052A /* SUTestWebServer.m */; };
 		C23E885B1BE7B24F0050BB73 /* SparkleTestCodeSignApp.enc.dmg in Resources */ = {isa = PBXBuildFile; fileRef = C23E88591BE7AF890050BB73 /* SparkleTestCodeSignApp.enc.dmg */; };
 		F8761EB11ADC5068000C9034 /* SUCodeSigningVerifierTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */; };
 		F8761EB31ADC50EB000C9034 /* SparkleTestCodeSignApp.zip in Resources */ = {isa = PBXBuildFile; fileRef = F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */; };
@@ -317,6 +323,13 @@
 			remoteGlobalIDString = 61B5F90109C4CEE200B25A18;
 			remoteInfo = "Sparkle Test App";
 		};
+		726E4A1F1C86C88F00C57C6A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 726E4A151C86C88F00C57C6A;
+			remoteInfo = TestAppHelper;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -350,6 +363,17 @@
 				142E0E0019A6954400E4312B /* Sparkle.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		726E4A261C86C88F00C57C6A /* Embed XPC Services */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
+			dstSubfolderSpec = 16;
+			files = (
+				726E4A211C86C88F00C57C6A /* TestAppHelper.xpc in Embed XPC Services */,
+			);
+			name = "Embed XPC Services";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -646,6 +670,19 @@
 		726DF88D1C84277500188804 /* SUStatusCompletionResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStatusCompletionResults.h; sourceTree = "<group>"; };
 		726E4A0D1C86881600C57C6A /* SUSparkleUserDriverUIDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUSparkleUserDriverUIDelegate.h; sourceTree = "<group>"; };
 		726E4A0F1C86B5A200C57C6A /* SUSparkleUserDriverRemoteDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUSparkleUserDriverRemoteDelegate.h; sourceTree = "<group>"; };
+		726E4A111C86C44A00C57C6A /* Sparkle-Test-App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Sparkle-Test-App.entitlements"; sourceTree = "<group>"; };
+		726E4A161C86C88F00C57C6A /* TestAppHelper.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = TestAppHelper.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+		726E4A181C86C88F00C57C6A /* TestAppHelperProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestAppHelperProtocol.h; sourceTree = "<group>"; };
+		726E4A191C86C88F00C57C6A /* TestAppHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestAppHelper.h; sourceTree = "<group>"; };
+		726E4A1A1C86C88F00C57C6A /* TestAppHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestAppHelper.m; sourceTree = "<group>"; };
+		726E4A1C1C86C88F00C57C6A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		726E4A1E1C86C88F00C57C6A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		726E4A271C86CAB500C57C6A /* ConfigTestAppDebugHelper.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigTestAppDebugHelper.xcconfig; sourceTree = "<group>"; };
+		726E4A281C86CAB500C57C6A /* ConfigTestAppHelper.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigTestAppHelper.xcconfig; sourceTree = "<group>"; };
+		726E4A291C86CAB500C57C6A /* ConfigTestAppReleaseHelper.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigTestAppReleaseHelper.xcconfig; sourceTree = "<group>"; };
+		726E4A311C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SURemoteUpdateSettingsWindowController.h; sourceTree = "<group>"; };
+		726E4A321C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SURemoteUpdateSettingsWindowController.m; sourceTree = "<group>"; };
+		726E4A331C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SURemoteUpdateSettingsWindowController.xib; sourceTree = "<group>"; };
 		726F2CE31BC9C33D001971A4 /* SUOperatingSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUOperatingSystem.h; sourceTree = "<group>"; };
 		726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUOperatingSystem.m; sourceTree = "<group>"; };
 		7275F9BF1B5F1F2900B1D19E /* SUFileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUFileManager.h; sourceTree = "<group>"; };
@@ -753,6 +790,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		726E4A131C86C88F00C57C6A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				726E4A301C87DC1700C57C6A /* Sparkle.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DC2EF560486A6940098B216 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -780,6 +825,7 @@
 				612279D90DB5470200AB99EA /* Sparkle Unit Tests.xctest */,
 				8DC2EF5B0486A6940098B216 /* Sparkle.framework */,
 				726B2B5D1C645FC900388755 /* UI Tests.xctest */,
+				726E4A161C86C88F00C57C6A /* TestAppHelper.xpc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1065,6 +1111,8 @@
 		61B5F91D09C4CF7F00B25A18 /* Test Application */ = {
 			isa = PBXGroup;
 			children = (
+				726E4A171C86C88F00C57C6A /* TestAppHelper */,
+				726E4A111C86C44A00C57C6A /* Sparkle-Test-App.entitlements */,
 				72E45DDC1B65C3BD005C701A /* sign_update */,
 				61B5F92A09C4CFD800B25A18 /* InfoPlist.strings */,
 				61B5F92409C4CFC900B25A18 /* main.m */,
@@ -1077,6 +1125,9 @@
 				72E45CF41B640DAE005C701A /* SUUpdateSettingsWindowController.h */,
 				72E45CF51B640DAE005C701A /* SUUpdateSettingsWindowController.m */,
 				72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */,
+				726E4A311C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.h */,
+				726E4A321C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.m */,
+				726E4A331C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.xib */,
 				72E45CFD1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem */,
 				14732BBF1960F0AC00593899 /* test_app_only_dsa_pub.pem */,
 				61B5F90409C4CEE200B25A18 /* TestApplication-Info.plist */,
@@ -1140,6 +1191,19 @@
 			path = "UI Tests";
 			sourceTree = "<group>";
 		};
+		726E4A171C86C88F00C57C6A /* TestAppHelper */ = {
+			isa = PBXGroup;
+			children = (
+				726E4A181C86C88F00C57C6A /* TestAppHelperProtocol.h */,
+				726E4A191C86C88F00C57C6A /* TestAppHelper.h */,
+				726E4A1A1C86C88F00C57C6A /* TestAppHelper.m */,
+				726E4A1C1C86C88F00C57C6A /* main.m */,
+				726E4A1E1C86C88F00C57C6A /* Info.plist */,
+			);
+			name = TestAppHelper;
+			path = ../TestAppHelper;
+			sourceTree = "<group>";
+		};
 		FA1941C40D94A6EA00DD942E /* Configurations */ = {
 			isa = PBXGroup;
 			children = (
@@ -1160,6 +1224,9 @@
 				FA1941CD0D94A70100DD942E /* ConfigTestApp.xcconfig */,
 				FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */,
 				FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */,
+				726E4A281C86CAB500C57C6A /* ConfigTestAppHelper.xcconfig */,
+				726E4A271C86CAB500C57C6A /* ConfigTestAppDebugHelper.xcconfig */,
+				726E4A291C86CAB500C57C6A /* ConfigTestAppReleaseHelper.xcconfig */,
 				FA3AAF3B1050B273004B3130 /* ConfigUnitTest.xcconfig */,
 				149B78641B7D3A4800D7D62C /* ConfigUnitTestCoverage.xcconfig */,
 				FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */,
@@ -1335,11 +1402,13 @@
 				61B5F8FF09C4CEE200B25A18 /* Sources */,
 				61B5F90009C4CEE200B25A18 /* Frameworks */,
 				61B5FB4D09C4E9FA00B25A18 /* Copy Frameworks */,
+				726E4A261C86C88F00C57C6A /* Embed XPC Services */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				61B5F91C09C4CF7200B25A18 /* PBXTargetDependency */,
+				726E4A201C86C88F00C57C6A /* PBXTargetDependency */,
 			);
 			name = "Sparkle Test App";
 			productName = "Test Application";
@@ -1363,6 +1432,23 @@
 			productName = "UI Tests";
 			productReference = 726B2B5D1C645FC900388755 /* UI Tests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		726E4A151C86C88F00C57C6A /* TestAppHelper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 726E4A221C86C88F00C57C6A /* Build configuration list for PBXNativeTarget "TestAppHelper" */;
+			buildPhases = (
+				726E4A121C86C88F00C57C6A /* Sources */,
+				726E4A131C86C88F00C57C6A /* Frameworks */,
+				726E4A141C86C88F00C57C6A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TestAppHelper;
+			productName = TestAppHelper;
+			productReference = 726E4A161C86C88F00C57C6A /* TestAppHelper.xpc */;
+			productType = "com.apple.product-type.xpc-service";
 		};
 		8DC2EF4F0486A6940098B216 /* Sparkle */ = {
 			isa = PBXNativeTarget;
@@ -1402,9 +1488,19 @@
 					612279D80DB5470200AB99EA = {
 						TestTargetID = 8DC2EF4F0486A6940098B216;
 					};
+					61B5F90109C4CEE200B25A18 = {
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 1;
+							};
+						};
+					};
 					726B2B5C1C645FC900388755 = {
 						CreatedOnToolsVersion = 7.2.1;
 						TestTargetID = 61B5F90109C4CEE200B25A18;
+					};
+					726E4A151C86C88F00C57C6A = {
+						CreatedOnToolsVersion = 7.2.1;
 					};
 				};
 			};
@@ -1467,6 +1563,7 @@
 			targets = (
 				8DC2EF4F0486A6940098B216 /* Sparkle */,
 				61B5F90109C4CEE200B25A18 /* Sparkle Test App */,
+				726E4A151C86C88F00C57C6A /* TestAppHelper */,
 				612279D80DB5470200AB99EA /* Sparkle Unit Tests */,
 				5D06E8CF0FD68C7C005AE3F6 /* BinaryDelta */,
 				55C14BB6136EEF1500649790 /* Autoupdate */,
@@ -1511,6 +1608,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				726E4A351C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.xib in Resources */,
 				1420DF50196247F900203BB0 /* Images.xcassets in Resources */,
 				61B5F92E09C4CFD800B25A18 /* InfoPlist.strings in Resources */,
 				61B5F92F09C4CFD800B25A18 /* MainMenu.xib in Resources */,
@@ -1527,6 +1625,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				720B16441C66433D006985FB /* UITests-Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		726E4A141C86C88F00C57C6A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1677,10 +1782,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				726E4A2B1C87D56200C57C6A /* SUTestWebServer.m in Sources */,
+				726E4A341C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.m in Sources */,
 				61B5F93009C4CFDC00B25A18 /* main.m in Sources */,
 				726F2CEB1BC9C733001971A4 /* SUConstants.m in Sources */,
 				72E45CF31B640CDD005C701A /* SUTestApplicationDelegate.m in Sources */,
-				A5BF4F1D1BC7668B007A052A /* SUTestWebServer.m in Sources */,
 				72E45CF71B640DAE005C701A /* SUUpdateSettingsWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1690,6 +1796,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				720B16451C66433D006985FB /* SUTestApplicationTest.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		726E4A121C86C88F00C57C6A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				726E4A1D1C86C88F00C57C6A /* main.m in Sources */,
+				726E4A1B1C86C88F00C57C6A /* TestAppHelper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1810,6 +1925,11 @@
 			isa = PBXTargetDependency;
 			target = 61B5F90109C4CEE200B25A18 /* Sparkle Test App */;
 			targetProxy = 726B2B621C645FC900388755 /* PBXContainerItemProxy */;
+		};
+		726E4A201C86C88F00C57C6A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 726E4A151C86C88F00C57C6A /* TestAppHelper */;
+			targetProxy = 726E4A1F1C86C88F00C57C6A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2215,6 +2335,27 @@
 			};
 			name = Release;
 		};
+		726E4A231C86C88F00C57C6A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 726E4A271C86CAB500C57C6A /* ConfigTestAppDebugHelper.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		726E4A241C86C88F00C57C6A /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 726E4A271C86CAB500C57C6A /* ConfigTestAppDebugHelper.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		726E4A251C86C88F00C57C6A /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 726E4A291C86CAB500C57C6A /* ConfigTestAppReleaseHelper.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2314,6 +2455,16 @@
 				726B2B641C645FC900388755 /* Debug */,
 				726B2B651C645FC900388755 /* Coverage */,
 				726B2B661C645FC900388755 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		726E4A221C86C88F00C57C6A /* Build configuration list for PBXNativeTarget "TestAppHelper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				726E4A231C86C88F00C57C6A /* Debug */,
+				726E4A241C86C88F00C57C6A /* Coverage */,
+				726E4A251C86C88F00C57C6A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
