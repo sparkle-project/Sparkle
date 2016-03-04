@@ -61,6 +61,16 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (NSApplicationTerminateReply)sendApplicationTerminationSignal;
 
+/*!
+ Dismiss the current update installation
+ 
+ This is appropriate to call when the connection to the updater has been interrupted or invalidated
+ before trying to resume or establish a new connection.
+ 
+ Note this is also a part of the SUUserDriver protocol that this class implements
+ */
+- (void)dismissUpdateInstallation;
+
 @end
 
 NS_ASSUME_NONNULL_END
