@@ -4,4 +4,3 @@ INFOPLIST_FILE = TestAppHelper/Info.plist
 WRAPPER_EXTENSION = xpc
 LD_RUNPATH_SEARCH_PATHS = @executable_path/../../../../Frameworks
 PRODUCT_BUNDLE_IDENTIFIER = org.sparkle-project.TestAppHelper
-CODE_SIGN_IDENTITY = -
