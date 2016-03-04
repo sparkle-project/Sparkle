@@ -59,6 +59,8 @@ NS_ASSUME_NONNULL_BEGIN
  For this user driver's delegate, invoking this is appropriate when the application's termination has been delayed, and the connection
  to the updater has been invalidated or interrupted -- in which case the updater can no longer tell the user driver when to finish terminating.
  
+ This implementation will be dispatched on the main queue.
+ 
  Note this is also a part of the SUUserDriver protocol that this class implements
  */
 - (void)terminateApplication;
@@ -68,6 +70,8 @@ NS_ASSUME_NONNULL_BEGIN
  
  This is appropriate to call when the connection to the updater has been interrupted or invalidated
  before trying to resume or establish a new connection.
+ 
+ This implementation will be dispatched on the main queue.
  
  Note this is also a part of the SUUserDriver protocol that this class implements
  */
