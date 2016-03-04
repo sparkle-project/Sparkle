@@ -7,6 +7,7 @@
 //
 
 #import "SUStandardUserDriver.h"
+#import "SUStandardUserDriverDelegate.h"
 #import "SUStandardUserDriverUIDelegate.h"
 #import "SUStandardUserDriverRemoteDelegate.h"
 #import "SUAppcastItem.h"

@@ -23,6 +23,7 @@
 #import "SUUpdatePermissionPromptResult.h"
 #import "SUUserDriver.h"
 #import "SUStandardUserDriver.h"
+#import "SUStandardUserDriverDelegate.h"
 #import "SUStandardUserDriverUIDelegate.h"
 #import "SUStandardUserDriverRemoteDelegate.h"
 

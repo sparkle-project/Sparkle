@@ -190,6 +190,7 @@
 		726E4A301C87DC1700C57C6A /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; };
 		726E4A341C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E4A321C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.m */; };
 		726E4A351C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 726E4A331C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.xib */; };
+		726E4A371C89116000C57C6A /* SUStandardUserDriverDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E4A361C89116000C57C6A /* SUStandardUserDriverDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		726F2CDE1BC9BE5B001971A4 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
 		726F2CE51BC9C33D001971A4 /* SUOperatingSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 726F2CE31BC9C33D001971A4 /* SUOperatingSystem.h */; };
 		726F2CE61BC9C33D001971A4 /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
@@ -683,6 +684,7 @@
 		726E4A311C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SURemoteUpdateSettingsWindowController.h; sourceTree = "<group>"; };
 		726E4A321C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SURemoteUpdateSettingsWindowController.m; sourceTree = "<group>"; };
 		726E4A331C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SURemoteUpdateSettingsWindowController.xib; sourceTree = "<group>"; };
+		726E4A361C89116000C57C6A /* SUStandardUserDriverDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStandardUserDriverDelegate.h; sourceTree = "<group>"; };
 		726F2CE31BC9C33D001971A4 /* SUOperatingSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUOperatingSystem.h; sourceTree = "<group>"; };
 		726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUOperatingSystem.m; sourceTree = "<group>"; };
 		7275F9BF1B5F1F2900B1D19E /* SUFileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUFileManager.h; sourceTree = "<group>"; };
@@ -1048,6 +1050,7 @@
 			children = (
 				7246E0A11C83B685003B4E75 /* SUUpdaterController.h */,
 				7246E0A21C83B685003B4E75 /* SUUpdaterController.m */,
+				726E4A361C89116000C57C6A /* SUStandardUserDriverDelegate.h */,
 				726E4A0D1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h */,
 				726E4A0F1C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h */,
 				725CB9581C7121830064365A /* SUStandardUserDriver.h */,
@@ -1249,6 +1252,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				726E4A371C89116000C57C6A /* SUStandardUserDriverDelegate.h in Headers */,
 				726E4A0E1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h in Headers */,
 				726E4A101C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h in Headers */,
 				725CB95A1C7121830064365A /* SUStandardUserDriver.h in Headers */,
