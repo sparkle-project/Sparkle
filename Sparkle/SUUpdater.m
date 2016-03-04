@@ -141,8 +141,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         // We wait until the second launch, unless explicitly overridden via SUPromptUserOnFirstLaunchKey.
         shouldPrompt = [self.host objectForKey:SUPromptUserOnFirstLaunchKey] || hasLaunchedBefore;
     }
-
-#warning the logic for having launched before needs to be more intelligent now that Sparkle can through an XPC service and is re-entrant
+    
     if (!hasLaunchedBefore) {
         [self.host setBool:YES forUserDefaultsKey:SUHasLaunchedBeforeKey];
     }
@@ -151,7 +150,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         NSArray *profileInfo = [SUSystemProfiler systemProfileArrayForHost:self.host];
         // Always say we're sending the system profile here so that the delegate displays the parameters it would send.
         if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
-            profileInfo = [profileInfo arrayByAddingObjectsFromArray:[self.delegate feedParametersForUpdater:self sendingSystemProfile:YES]];
+            NSArray *feedParameters = [self.delegate feedParametersForUpdater:self sendingSystemProfile:YES];
+            if (feedParameters != nil) {
+                profileInfo = [profileInfo arrayByAddingObjectsFromArray:feedParameters];
+            }
         }
         
         [self.userDriver requestUpdatePermissionWithSystemProfile:profileInfo reply:^(SUUpdatePermissionPromptResult *result) {
@@ -503,7 +505,10 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
 
     NSArray *parameters = @[];
     if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
-        parameters = [parameters arrayByAddingObjectsFromArray:[self.delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile]];
+        NSArray *feedParameters = [self.delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile];
+        if (feedParameters != nil) {
+            parameters = [parameters arrayByAddingObjectsFromArray:feedParameters];
+        }
     }
 	if (sendingSystemProfile)
 	{

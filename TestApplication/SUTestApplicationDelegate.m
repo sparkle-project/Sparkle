@@ -76,7 +76,8 @@ static NSString * const UPDATED_VERSION = @"2.0";
     assert(bundleURL != nil);
     
     // Copy main bundle into server directory
-    NSURL *destinationBundleURL = [serverDirectoryURL URLByAppendingPathComponent:bundleURL.lastPathComponent];
+    NSString *lastBundleURLComponent = bundleURL.lastPathComponent;
+    NSURL *destinationBundleURL = [serverDirectoryURL URLByAppendingPathComponent:lastBundleURLComponent];
     NSError *copyBundleError = nil;
     if (![fileManager copyItemAtURL:bundleURL toURL:destinationBundleURL error:&copyBundleError]) {
         NSLog(@"Failed to copy main bundle into server directory with error %@", copyBundleError);
@@ -142,7 +143,9 @@ static NSString * const UPDATED_VERSION = @"2.0";
     
     // Obtain the file attributes to get the file size of our update later
     NSError *fileAttributesError = nil;
-    NSDictionary *archiveFileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:archiveURL.path error:&fileAttributesError];
+    NSString *archiveURLPath = archiveURL.path;
+    assert(archiveURLPath != nil);
+    NSDictionary *archiveFileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:archiveURLPath error:&fileAttributesError];
     if (archiveFileAttributes == nil) {
         NSLog(@"Failed to retrieve file attributes from archive with error %@", fileAttributesError);
         assert(NO);
