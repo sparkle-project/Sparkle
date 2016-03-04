@@ -27,7 +27,7 @@ GCC_PREFIX_HEADER = Sparkle/Sparkle.pch
 GCC_SYMBOLS_PRIVATE_EXTERN = YES
 GCC_INLINES_ARE_PRIVATE_EXTERN = YES
 ARCHS = $(ARCHS_STANDARD)
-MACOSX_DEPLOYMENT_TARGET = 10.7
+MACOSX_DEPLOYMENT_TARGET = 10.8
 PRODUCT_NAME = ${TARGET_NAME}
 PRODUCT_BUNDLE_IDENTIFIER = org.sparkle-project.Sparkle.${PRODUCT_NAME:rfc1034identifier}
 
@@ -80,7 +80,6 @@ GCC_WARN_UNUSED_PARAMETER = YES
 GCC_WARN_UNUSED_VARIABLE = YES
 
 // Fixes a strange issue where the compiler thinks references to some enums are ambiguous
-CLANG_ENABLE_MODULES[sdk=macosx10.7] = NO
 CLANG_ENABLE_MODULES[sdk=macosx10.8] = NO
 
 // These should be removed once the conversion to ARC is complete
