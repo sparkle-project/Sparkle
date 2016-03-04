@@ -66,10 +66,17 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         case SUApplicationWillTerminate:
             if (self.willUpdateOnTermination) {
                 [self installWithToolAndRelaunch:NO];
+                
+                // We could finish successfully or abort the update due to an error, so make sure we tell the user driver
+                // to terminate in both cases since they are waiting on us to signal termination
+                [self.updater.userDriver terminateApplication];
             }
             break;
     }
 }
+
+// Overridden to do nothing: see -installUpdateWithTerminationStatus: as to why
+- (void)terminateApp { }
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
 {

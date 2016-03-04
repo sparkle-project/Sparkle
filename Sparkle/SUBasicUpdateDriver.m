@@ -582,6 +582,7 @@
     }
 }
 
+// Note: this is overridden by the automatic update driver to do nothing
 - (void)terminateApp
 {
     [self.updater.userDriver terminateApplication];

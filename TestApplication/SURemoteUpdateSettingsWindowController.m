@@ -14,6 +14,8 @@
 @property (nonatomic) NSXPCConnection *connection;
 @property (nonatomic) SUStandardUserDriver *userDriver;
 
+@property (nonatomic) BOOL isTerminating;
+
 @property (nonatomic) IBOutlet NSButton *automaticallyChecksForUpdatesButton;
 @property (nonatomic) IBOutlet NSButton *automaticallyDownloadUpdatesButton;
 @property (nonatomic) IBOutlet NSButton *sendsSystemProfileButton;
@@ -25,6 +27,7 @@
 
 @synthesize connection = _connection;
 @synthesize userDriver = _userDriver;
+@synthesize isTerminating = _isTerminating;
 @synthesize automaticallyChecksForUpdatesButton = _automaticallyChecksForUpdatesButton;
 @synthesize automaticallyDownloadUpdatesButton = _automaticallyDownloadUpdatesButton;
 @synthesize sendsSystemProfileButton = _sendsSystemProfileButton;
@@ -62,6 +65,12 @@
     self.connection.interruptionHandler = ^{
         NSLog(@"Connection is interrupted! Sending another message to get it back..");
         
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (weakSelf.isTerminating) {
+                [weakSelf.userDriver terminateApplication];
+            }
+        });
+        
         // This method dispatches on the main queue
         [weakSelf.userDriver dismissUpdateInstallation];
         
@@ -75,6 +84,12 @@
     self.connection.invalidationHandler = ^{
         const uint64_t delay = 10;
         NSLog(@"Connection is invalidated! Rebooting connection in %llu seconds..", delay);
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (weakSelf.isTerminating) {
+                [weakSelf.userDriver terminateApplication];
+            }
+        });
         
         // This method dispatches on the main queue
         [weakSelf.userDriver dismissUpdateInstallation];
@@ -170,7 +185,9 @@
 
 - (NSApplicationTerminateReply)sendTerminationSignal
 {
-    return [self.userDriver sendApplicationTerminationSignal];
+    NSApplicationTerminateReply reply = [self.userDriver sendApplicationTerminationSignal];
+    self.isTerminating = (reply == NSTerminateLater);
+    return reply;
 }
 
 #pragma mark Update Checks

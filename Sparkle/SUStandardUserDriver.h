@@ -53,6 +53,17 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSApplicationTerminateReply)sendApplicationTerminationSignal;
 
 /*!
+ Terminate the current application after sending a termination signal
+ 
+ This should only be invoked by the user driver's delegate if the -sendApplicationTerminationSignal message has been sent prior.
+ For this user driver's delegate, invoking this is appropriate when the application's termination has been delayed, and the connection
+ to the updater has been invalidated or interrupted -- in which case the updater can no longer tell the user driver when to finish terminating.
+ 
+ Note this is also a part of the SUUserDriver protocol that this class implements
+ */
+- (void)terminateApplication;
+
+/*!
  Dismiss the current update installation
  
  This is appropriate to call when the connection to the updater has been interrupted or invalidated
