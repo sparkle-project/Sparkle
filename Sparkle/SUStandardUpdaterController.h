@@ -11,7 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class SUUpdater;
-@class SUStandardUserDriver;
+@protocol SUStandardUserDriver;
 
 /*!
  A controller class that instantiates a SUUpdater and allows binding UI to it.
@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  Accessible property for the updater's user driver.
  */
-@property (nonatomic, readonly) SUStandardUserDriver *userDriver;
+@property (nonatomic, readonly) id <SUStandardUserDriver> userDriver;
 
 /*!
  Explicitly checks for updates and displays a progress dialog while doing so.

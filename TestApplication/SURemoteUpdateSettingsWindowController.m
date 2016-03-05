@@ -8,11 +8,12 @@
 
 #import "SURemoteUpdateSettingsWindowController.h"
 #import "TestAppHelperProtocol.h"
+#import "SUPopUpTitlebarUserDriver.h"
 
 @interface SURemoteUpdateSettingsWindowController ()
 
 @property (nonatomic) NSXPCConnection *connection;
-@property (nonatomic) SUStandardUserDriver *userDriver;
+@property (nonatomic) id<SUStandardUserDriver> userDriver;
 
 @property (nonatomic) BOOL isTerminating;
 
@@ -54,7 +55,10 @@
     self.connection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.TestAppHelper"];
     
     self.connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUUserDriver)];
-    self.userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:[NSBundle mainBundle] delegate:self];
+    
+    self.userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:self.window delegate:self];
+    //self.userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:[NSBundle mainBundle] delegate:self];
+    
     self.connection.exportedObject = self.userDriver;
     
     self.connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(TestAppHelperProtocol)];

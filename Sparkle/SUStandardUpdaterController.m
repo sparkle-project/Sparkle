@@ -19,7 +19,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 @interface SUStandardUpdaterController ()
 
 @property (nonatomic) SUUpdater *updater;
-@property (nonatomic) SUStandardUserDriver *userDriver;
+@property (nonatomic) id <SUStandardUserDriver> userDriver;
 
 @end
 
@@ -35,8 +35,10 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         [self registerAsObserver];
         
         NSBundle *hostBundle = [NSBundle mainBundle];
-        _userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
-        _updater = [[SUUpdater alloc] initWithHostBundle:hostBundle userDriver:_userDriver delegate:nil];
+        
+        id <SUUserDriver, SUStandardUserDriver> userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
+        _updater = [[SUUpdater alloc] initWithHostBundle:hostBundle userDriver:userDriver delegate:nil];
+        _userDriver = userDriver;
     }
     return self;
 }

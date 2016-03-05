@@ -184,6 +184,10 @@
 		725F977C1C8A896F00265BE4 /* SUUserDriverCoreComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 725F977A1C8A896F00265BE4 /* SUUserDriverCoreComponent.m */; };
 		725F977F1C8A93D700265BE4 /* SUUserDriverUIComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 725F977D1C8A93D700265BE4 /* SUUserDriverUIComponent.h */; };
 		725F97801C8A93D700265BE4 /* SUUserDriverUIComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 725F977E1C8A93D700265BE4 /* SUUserDriverUIComponent.m */; };
+		725F97841C8AA90000265BE4 /* SUPopUpTitlebarUserDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 725F97831C8AA90000265BE4 /* SUPopUpTitlebarUserDriver.m */; };
+		725F97A51C8B304D00265BE4 /* SUInstallUpdateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 725F97A31C8B304D00265BE4 /* SUInstallUpdateViewController.m */; };
+		725F97A61C8B304D00265BE4 /* SUInstallUpdateViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 725F97A41C8B304D00265BE4 /* SUInstallUpdateViewController.xib */; };
+		725F97A81C8B42D700265BE4 /* SUStandardUserDriverProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 725F97A71C8B42D700265BE4 /* SUStandardUserDriverProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7268AC631AD634C200C3E0C1 /* SUBinaryDeltaCreate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7268AC621AD634C200C3E0C1 /* SUBinaryDeltaCreate.m */; };
 		726DF88E1C84277600188804 /* SUStatusCompletionResults.h in Headers */ = {isa = PBXBuildFile; fileRef = 726DF88D1C84277500188804 /* SUStatusCompletionResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		726E4A0E1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E4A0D1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -676,6 +680,12 @@
 		725F977A1C8A896F00265BE4 /* SUUserDriverCoreComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUserDriverCoreComponent.m; sourceTree = "<group>"; };
 		725F977D1C8A93D700265BE4 /* SUUserDriverUIComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUserDriverUIComponent.h; sourceTree = "<group>"; };
 		725F977E1C8A93D700265BE4 /* SUUserDriverUIComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUserDriverUIComponent.m; sourceTree = "<group>"; };
+		725F97821C8AA90000265BE4 /* SUPopUpTitlebarUserDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUPopUpTitlebarUserDriver.h; sourceTree = "<group>"; };
+		725F97831C8AA90000265BE4 /* SUPopUpTitlebarUserDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUPopUpTitlebarUserDriver.m; sourceTree = "<group>"; };
+		725F97A21C8B304D00265BE4 /* SUInstallUpdateViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUInstallUpdateViewController.h; sourceTree = "<group>"; };
+		725F97A31C8B304D00265BE4 /* SUInstallUpdateViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUInstallUpdateViewController.m; sourceTree = "<group>"; };
+		725F97A41C8B304D00265BE4 /* SUInstallUpdateViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SUInstallUpdateViewController.xib; sourceTree = "<group>"; };
+		725F97A71C8B42D700265BE4 /* SUStandardUserDriverProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStandardUserDriverProtocol.h; sourceTree = "<group>"; };
 		7268AC621AD634C200C3E0C1 /* SUBinaryDeltaCreate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBinaryDeltaCreate.m; sourceTree = "<group>"; };
 		7268AC641AD634E400C3E0C1 /* SUBinaryDeltaCreate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBinaryDeltaCreate.h; sourceTree = "<group>"; };
 		726B2B5D1C645FC900388755 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1138,6 +1148,11 @@
 				726E4A311C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.h */,
 				726E4A321C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.m */,
 				726E4A331C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.xib */,
+				725F97821C8AA90000265BE4 /* SUPopUpTitlebarUserDriver.h */,
+				725F97831C8AA90000265BE4 /* SUPopUpTitlebarUserDriver.m */,
+				725F97A21C8B304D00265BE4 /* SUInstallUpdateViewController.h */,
+				725F97A31C8B304D00265BE4 /* SUInstallUpdateViewController.m */,
+				725F97A41C8B304D00265BE4 /* SUInstallUpdateViewController.xib */,
 				72E45CFD1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem */,
 				14732BBF1960F0AC00593899 /* test_app_only_dsa_pub.pem */,
 				61B5F90409C4CEE200B25A18 /* TestApplication-Info.plist */,
@@ -1161,6 +1176,8 @@
 			isa = PBXGroup;
 			children = (
 				725CB9561C7120410064365A /* SUUserDriver.h */,
+				725F97791C8A896F00265BE4 /* SUUserDriverCoreComponent.h */,
+				725F977A1C8A896F00265BE4 /* SUUserDriverCoreComponent.m */,
 				726DF88D1C84277500188804 /* SUStatusCompletionResults.h */,
 				61B93B250DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.h */,
 				61B93B260DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.m */,
@@ -1200,10 +1217,9 @@
 				726E4A361C89116000C57C6A /* SUStandardUserDriverDelegate.h */,
 				726E4A0D1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h */,
 				726E4A0F1C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h */,
+				725F97A71C8B42D700265BE4 /* SUStandardUserDriverProtocol.h */,
 				725CB9581C7121830064365A /* SUStandardUserDriver.h */,
 				725CB9591C7121830064365A /* SUStandardUserDriver.m */,
-				725F97791C8A896F00265BE4 /* SUUserDriverCoreComponent.h */,
-				725F977A1C8A896F00265BE4 /* SUUserDriverCoreComponent.m */,
 				725F977D1C8A93D700265BE4 /* SUUserDriverUIComponent.h */,
 				725F977E1C8A93D700265BE4 /* SUUserDriverUIComponent.m */,
 			);
@@ -1279,6 +1295,7 @@
 			files = (
 				726E4A371C89116000C57C6A /* SUStandardUserDriverDelegate.h in Headers */,
 				726E4A0E1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h in Headers */,
+				725F97A81C8B42D700265BE4 /* SUStandardUserDriverProtocol.h in Headers */,
 				726E4A101C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h in Headers */,
 				725CB95A1C7121830064365A /* SUStandardUserDriver.h in Headers */,
 				725CB9571C7120410064365A /* SUUserDriver.h in Headers */,
@@ -1640,6 +1657,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				726E4A351C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.xib in Resources */,
+				725F97A61C8B304D00265BE4 /* SUInstallUpdateViewController.xib in Resources */,
 				1420DF50196247F900203BB0 /* Images.xcassets in Resources */,
 				61B5F92E09C4CFD800B25A18 /* InfoPlist.strings in Resources */,
 				61B5F92F09C4CFD800B25A18 /* MainMenu.xib in Resources */,
@@ -1813,8 +1831,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				725F97841C8AA90000265BE4 /* SUPopUpTitlebarUserDriver.m in Sources */,
 				726E4A2B1C87D56200C57C6A /* SUTestWebServer.m in Sources */,
 				726E4A341C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.m in Sources */,
+				725F97A51C8B304D00265BE4 /* SUInstallUpdateViewController.m in Sources */,
 				61B5F93009C4CFDC00B25A18 /* main.m in Sources */,
 				726F2CEB1BC9C733001971A4 /* SUConstants.m in Sources */,
 				72E45CF31B640CDD005C701A /* SUTestApplicationDelegate.m in Sources */,
