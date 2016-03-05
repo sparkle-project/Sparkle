@@ -236,7 +236,7 @@
 - (void)showUpdaterError:(NSError *)error
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self addUpdateButtonWithTitle:@"Update Failed"];
+        // Too lazy to show an alert; the update installation will be dismissed shortly
         NSLog(@"Error: %@", error);
     });
 }
@@ -244,7 +244,8 @@
 - (void)showUpdateNotFound
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self addUpdateButtonWithTitle:@"No Update Found"];
+        // Too lazy to show an alert; the update installation will be dismissed shortly
+        NSLog(@"No Update Found");
     });
 }
 
