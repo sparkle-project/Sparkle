@@ -7,9 +7,10 @@
 //
 
 #import "SUStandardUserDriver.h"
+#import "SUUserDriverCoreComponent.h"
+#import "SUUserDriverUIComponent.h"
 #import "SUStandardUserDriverDelegate.h"
 #import "SUStandardUserDriverUIDelegate.h"
-#import "SUStandardUserDriverRemoteDelegate.h"
 #import "SUAppcastItem.h"
 #import "SUVersionDisplayProtocol.h"
 #import "SUHost.h"
@@ -17,7 +18,6 @@
 #import "SUStatusController.h"
 #import "SUUpdateAlert.h"
 #import "SUAutomaticUpdateAlert.h"
-#import "SUOperatingSystem.h"
 #import "SULocalizations.h"
 #import "SUApplicationInfo.h"
 
@@ -25,51 +25,24 @@
 
 @property (nonatomic, readonly) SUHost *host;
 
-@property (nonatomic) BOOL askedHandlingTermination;
-@property (nonatomic, readonly) BOOL handlesTermination;
-
-@property (nonatomic) BOOL idlesOnUpdateChecks;
-@property (nonatomic) BOOL updateInProgress;
-
-@property (nonatomic) NSTimer *checkUpdateTimer;
-@property (nonatomic, copy) void (^checkForUpdatesReply)(SUUpdateCheckTimerStatus);
+@property (nonatomic, readonly) SUUserDriverCoreComponent *coreComponent;
+@property (nonatomic, readonly) SUUserDriverUIComponent *uiComponent;
 
 @property (nonatomic) SUStatusController *checkingController;
-@property (nonatomic, copy) void (^updateCheckStatusCompletion)(SUUserInitiatedCheckStatus);
-
 @property (nonatomic) NSWindowController *activeUpdateAlert;
-
 @property (nonatomic) SUStatusController *statusController;
-@property (nonatomic, copy) void (^downloadStatusCompletion)(SUDownloadUpdateStatus);
-@property (nonatomic, copy) void (^installUpdateHandler)(SUInstallUpdateStatus);
-
-@property (nonatomic, copy) void (^applicationTerminationHandler)(SUApplicationTerminationStatus);
-
-@property (nonatomic, copy) void (^systemPowerOffHandler)(SUSystemPowerOffStatus);
-
-@property (nonatomic) BOOL installingUpdateOnTermination;
 
 @end
 
 @implementation SUStandardUserDriver
 
 @synthesize host = _host;
-@synthesize handlesTermination = _handlesTermination;
-@synthesize askedHandlingTermination = _askedHandlingTermination;
+@synthesize coreComponent = _coreComponent;
+@synthesize uiComponent = _uiComponent;
 @synthesize delegate = _delegate;
-@synthesize idlesOnUpdateChecks = _idlesOnUpdateChecks;
-@synthesize updateInProgress = _updateInProgress;
-@synthesize checkUpdateTimer = _checkUpdateTimer;
-@synthesize checkForUpdatesReply = _checkForUpdatesReply;
 @synthesize checkingController = _checkingController;
-@synthesize updateCheckStatusCompletion = _updateCheckStatusCompletion;
 @synthesize activeUpdateAlert = _activeUpdateAlert;
 @synthesize statusController = _statusController;
-@synthesize downloadStatusCompletion = _downloadStatusCompletion;
-@synthesize installUpdateHandler = _installUpdateHandler;
-@synthesize applicationTerminationHandler = _applicationTerminationHandler;
-@synthesize systemPowerOffHandler = _systemPowerOffHandler;
-@synthesize installingUpdateOnTermination = _installingUpdateOnTermination;
 
 #pragma mark Birth
 
@@ -79,6 +52,8 @@
     if (self != nil) {
         _host = [[SUHost alloc] initWithBundle:hostBundle];
         _delegate = delegate;
+        _coreComponent = [[SUUserDriverCoreComponent alloc] initWithUserDriver:self delegate:delegate];
+        _uiComponent = [[SUUserDriverUIComponent alloc] initWithUserDriver:self delegate:delegate];
     }
     return self;
 }
@@ -87,93 +62,46 @@
 
 - (void)idleOnUpdateChecks:(BOOL)shouldIdleOnUpdateChecks
 {
-    self.idlesOnUpdateChecks = shouldIdleOnUpdateChecks;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.coreComponent idleOnUpdateChecks:shouldIdleOnUpdateChecks];
+    });
+}
+
+- (BOOL)idlesOnUpdateChecks
+{
+    return self.coreComponent.idlesOnUpdateChecks;
 }
 
 - (void)showUpdateInProgress:(BOOL)isUpdateInProgress
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.updateInProgress = isUpdateInProgress;
+        [self.coreComponent showUpdateInProgress:isUpdateInProgress];
     });
 }
 
-- (BOOL)handlesTermination
+- (BOOL)isUpdateInProgress
 {
-    if (!self.askedHandlingTermination) {
-        if ([self.delegate respondsToSelector:@selector(responsibleForSignalingApplicationTerminationForUserDriver:)]) {
-            _handlesTermination = ![self.delegate responsibleForSignalingApplicationTerminationForUserDriver:self];
-        } else {
-            _handlesTermination = YES;
-        }
-        self.askedHandlingTermination = YES;
-    }
-    return _handlesTermination;
+    return self.coreComponent.updateInProgress;
 }
 
 #pragma mark Check Updates Timer
 
-- (BOOL)isDelegateResponsibleForUpdateChecking
-{
-    BOOL result = NO;
-    if ([self.delegate respondsToSelector:@selector(responsibleForInitiatingUpdateCheckForUserDriver:)]) {
-        result = [self.delegate responsibleForInitiatingUpdateCheckForUserDriver:self];
-    }
-    return result;
-}
-
 - (BOOL)willInitiateNextUpdateCheck
 {
-    return (self.checkUpdateTimer != nil);
-}
-
-- (void)checkForUpdates:(NSTimer *)__unused timer
-{
-    if ([self isDelegateResponsibleForUpdateChecking]) {
-        if ([self.delegate respondsToSelector:@selector(initiateUpdateCheckForUserDriver:)]) {
-            [self.delegate initiateUpdateCheckForUserDriver:self];
-        } else {
-            NSLog(@"Error: Delegate %@ for user driver %@ must implement initiateUpdateCheckForUserDriver: because it returned YES from responsibleForInitiatingUpdateCheckForUserDriver:", self.delegate, self);
-        }
-    } else {
-        if (self.checkForUpdatesReply != nil) {
-            self.checkForUpdatesReply(SUCheckForUpdateNow);
-            self.checkForUpdatesReply = nil;
-        }
-    }
-    
-    [self _invalidateUpdateCheckTimer];
+    return [self.coreComponent willInitiateNextUpdateCheck];
 }
 
 - (void)startUpdateCheckTimerWithNextTimeInterval:(NSTimeInterval)timeInterval reply:(void (^)(SUUpdateCheckTimerStatus))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self isDelegateResponsibleForUpdateChecking]) {
-            reply(SUCheckForUpdateWillOccurLater);
-        } else {
-            self.checkForUpdatesReply = reply;
-        }
-        
-        self.checkUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:timeInterval target:self selector:@selector(checkForUpdates:) userInfo:nil repeats:NO];
+        [self.coreComponent startUpdateCheckTimerWithNextTimeInterval:timeInterval reply:reply];
     });
-}
-
-- (void)_invalidateUpdateCheckTimer
-{
-    if (self.checkUpdateTimer != nil) {
-        [self.checkUpdateTimer invalidate];
-        self.checkUpdateTimer = nil;
-        
-        if (self.checkForUpdatesReply != nil) {
-            self.checkForUpdatesReply(SUCheckForUpdateWillOccurLater);
-            self.checkForUpdatesReply = nil;
-        }
-    }
 }
 
 - (void)invalidateUpdateCheckTimer
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self _invalidateUpdateCheckTimer];
+        [self.coreComponent invalidateUpdateCheckTimer];
     });
 }
 
@@ -260,24 +188,13 @@
         [[self.statusController window] makeKeyAndOrderFront:self];
         [NSApp requestUserAttention:NSInformationalRequest];
         
-        self.installUpdateHandler = installUpdateHandler;
+        [self.coreComponent registerInstallUpdateHandler:installUpdateHandler];
     });
 }
 
 - (void)installAndRestart:(id)__unused sender
 {
-    if (self.installUpdateHandler != nil) {
-        self.installUpdateHandler(SUInstallAndRelaunchUpdateNow);
-        self.installUpdateHandler = nil;
-    }
-}
-
-- (void)cancelInstallAndRestart
-{
-    if (self.installUpdateHandler != nil) {
-        self.installUpdateHandler(SUCancelUpdateInstallation);
-        self.installUpdateHandler = nil;
-    }
+    [self.coreComponent installAndRestart];
 }
 
 #pragma mark Check for Updates
@@ -285,7 +202,7 @@
 - (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SUUserInitiatedCheckStatus))updateCheckStatusCompletion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.updateCheckStatusCompletion = updateCheckStatusCompletion;
+        [self.coreComponent registerUpdateCheckStatusHandler:updateCheckStatusCompletion];
         
         self.checkingController = [[SUStatusController alloc] initWithHost:self.host];
         [[self.checkingController window] center]; // Force the checking controller to load its window.
@@ -302,13 +219,8 @@
     });
 }
 
-- (void)cancelCheckForUpdates
+- (void)closeCheckingWindow
 {
-    if (self.updateCheckStatusCompletion != nil) {
-        self.updateCheckStatusCompletion(SUUserInitiatedCheckCancelled);
-        self.updateCheckStatusCompletion = nil;
-    }
-    
     if (self.checkingController != nil)
     {
         [[self.checkingController window] close];
@@ -318,22 +230,15 @@
 
 - (void)cancelCheckForUpdates:(id)__unused sender
 {
-    [self cancelCheckForUpdates];
+    [self.coreComponent cancelUpdateCheckStatus];
+    [self closeCheckingWindow];
 }
 
 - (void)dismissUserInitiatedUpdateCheck
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.updateCheckStatusCompletion != nil) {
-            self.updateCheckStatusCompletion(SUUserInitiatedCheckDone);
-            self.updateCheckStatusCompletion = nil;
-        }
-        
-        if (self.checkingController != nil)
-        {
-            [[self.checkingController window] close];
-            self.checkingController = nil;
-        }
+        [self.coreComponent completeUpdateCheckStatus];
+        [self closeCheckingWindow];
     });
 }
 
@@ -388,7 +293,7 @@
 - (void)showDownloadInitiatedWithCompletion:(void (^)(SUDownloadUpdateStatus))downloadUpdateStatusCompletion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.downloadStatusCompletion = downloadUpdateStatusCompletion;
+        [self.coreComponent registerDownloadStatusHandler:downloadUpdateStatusCompletion];
         
         self.statusController = [[SUStatusController alloc] initWithHost:self.host];
         [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
@@ -397,17 +302,9 @@
     });
 }
 
-- (void)cancelDownload
-{
-    if (self.downloadStatusCompletion != nil) {
-        self.downloadStatusCompletion(SUDownloadUpdateCancelled);
-        self.downloadStatusCompletion = nil;
-    }
-}
-
 - (void)cancelDownload:(id)__unused sender
 {
-    [self cancelDownload];
+    [self.coreComponent cancelDownloadStatus];
 }
 
 - (void)showDownloadDidReceiveResponse:(NSURLResponse *)response
@@ -437,10 +334,7 @@
 - (void)showDownloadFinishedAndStartedExtractingUpdate
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.downloadStatusCompletion != nil) {
-            self.downloadStatusCompletion(SUDownloadUpdateDone);
-            self.downloadStatusCompletion = nil;
-        }
+        [self.coreComponent completeDownloadStatus];
         
         [self.statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
         [self.statusController setButtonEnabled:NO];
@@ -450,7 +344,6 @@
 - (void)showExtractionReceivedProgress:(double)progress
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        // We do this here instead of in extractUpdate so that we only have a determinate progress bar for archives with progress.
         if ([self.statusController maxProgressValue] == 0.0) {
             [self.statusController setMaxProgressValue:1];
         }
@@ -471,71 +364,26 @@
 - (void)registerApplicationTermination:(void (^)(SUApplicationTerminationStatus))applicationTerminationHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.installingUpdateOnTermination = YES;
-        
-        // Sudden termination is available on 10.6+
-        [[NSProcessInfo processInfo] disableSuddenTermination];
-        
-        self.applicationTerminationHandler = applicationTerminationHandler;
-        
-        if (self.handlesTermination) {
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
-        }
+        [self.uiComponent registerApplicationTermination:applicationTerminationHandler];
     });
-}
-
-- (void)cancelObservingApplicationTermination
-{
-    if (self.installingUpdateOnTermination) {
-        [[NSProcessInfo processInfo] enableSuddenTermination];
-        
-        if (self.handlesTermination) {
-            [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
-        }
-        
-        if (self.applicationTerminationHandler != nil) {
-            self.applicationTerminationHandler(SUApplicationStoppedObservingTermination);
-            self.applicationTerminationHandler = nil;
-        }
-        
-        self.installingUpdateOnTermination = NO;
-    }
 }
 
 - (void)unregisterApplicationTermination
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self cancelObservingApplicationTermination];
+        [self.uiComponent unregisterApplicationTermination];
     });
-}
-
-- (void)applicationWillTerminate:(NSNotification *)__unused note
-{
-    [self sendApplicationTerminationSignal];
 }
 
 - (NSApplicationTerminateReply)sendApplicationTerminationSignal
 {
-    if (self.installingUpdateOnTermination) {
-        if (self.applicationTerminationHandler != nil) {
-            self.applicationTerminationHandler(SUApplicationWillTerminate);
-            self.applicationTerminationHandler = nil;
-        }
-        
-        return NSTerminateLater;
-    }
-    
-    return NSTerminateNow;
+    return [self.uiComponent sendApplicationTerminationSignal];
 }
 
 - (void)terminateApplication
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.installingUpdateOnTermination && !self.handlesTermination) {
-            [NSApp replyToApplicationShouldTerminate:YES];
-        } else {
-            [NSApp terminate:nil];
-        }
+        [self.uiComponent terminateApplication];
     });
 }
 
@@ -544,35 +392,15 @@
 - (void)registerSystemPowerOff:(void (^)(SUSystemPowerOffStatus))systemPowerOffHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.systemPowerOffHandler = systemPowerOffHandler;
-        
-        [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(systemWillPowerOff:) name:NSWorkspaceWillPowerOffNotification object:nil];
+        [self.uiComponent registerSystemPowerOff:systemPowerOffHandler];
     });
-}
-
-- (void)cancelObservingSystemPowerOff
-{
-    if (self.systemPowerOffHandler != nil) {
-        self.systemPowerOffHandler(SUStoppedObservingSystemPowerOff);
-        self.systemPowerOffHandler = nil;
-        
-        [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self name:NSWorkspaceWillPowerOffNotification object:nil];
-    }
 }
 
 - (void)unregisterSystemPowerOff
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self cancelObservingSystemPowerOff];
+        [self.uiComponent unregisterSystemPowerOff];
     });
-}
-
-- (void)systemWillPowerOff:(NSNotification *)__unused notification
-{
-    if (self.systemPowerOffHandler != nil) {
-        self.systemPowerOffHandler(SUSystemWillPowerOff);
-        self.systemPowerOffHandler = nil;
-    }
 }
 
 #pragma mark Aborting Everything
@@ -582,14 +410,10 @@
     // Make sure everything we call here does not dispatch async to main queue
     // because we are already on the main queue (and I've been bitten in the past by this before)
     
-    // Note: self.idlesOnUpdateChecks is intentionally not touched in case this instance is re-used
+    [self.coreComponent dismissUpdateInstallation];
+    [self.uiComponent dismissUpdateInstallation];
     
-    self.updateInProgress = NO;
-    
-    [self _invalidateUpdateCheckTimer];
-    
-    [self cancelCheckForUpdates];
-    [self cancelDownload];
+    [self closeCheckingWindow];
     
     if (self.statusController) {
         [self.statusController close];
@@ -600,10 +424,6 @@
         [self.activeUpdateAlert close];
         self.activeUpdateAlert = nil;
     }
-    
-    [self cancelObservingApplicationTermination];
-    [self cancelObservingSystemPowerOff];
-    [self cancelInstallAndRestart];
 }
 
 - (void)dismissUpdateInstallation
@@ -616,12 +436,8 @@
 - (void)invalidate
 {
     // Make sure any remote handlers will not be invoked
-    self.applicationTerminationHandler = nil;
-    self.systemPowerOffHandler = nil;
-    self.installUpdateHandler = nil;
-    self.checkForUpdatesReply = nil;
-    self.updateCheckStatusCompletion = nil;
-    self.downloadStatusCompletion = nil;
+    [self.coreComponent invalidate];
+    [self.uiComponent invalidate];
     
     // Dismiss the installation normally
     [self _dismissUpdateInstallation];
