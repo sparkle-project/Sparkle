@@ -203,7 +203,13 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (void)scheduleNextUpdateCheck
 {
     [self.userDriver invalidateUpdateCheckTimer];
-	if (![self automaticallyChecksForUpdates]) return;
+    
+    if (![self automaticallyChecksForUpdates]) {
+        [self.userDriver idleOnUpdateChecks:YES];
+        return;
+    } else {
+        [self.userDriver idleOnUpdateChecks:NO];
+    }
 
     // How long has it been since last we checked for an update?
     NSDate *lastCheckDate = [self lastUpdateCheckDate];

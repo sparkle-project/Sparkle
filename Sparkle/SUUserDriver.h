@@ -42,6 +42,18 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showUpdateInProgress:(BOOL)isUpdateInProgress;
 
 /*!
+ * Idle on timed updater checks.
+ *
+ * If the user driver should idle on update checks, then it shouldn't have to schedule any update checks.
+ * If we can idle on update checks, this means the updater just determined that automatic update checks were disabled
+ *
+ * @param shouldIdleOnUpdateChecks Indicates if the user driver should idle on updater checks
+ *
+ * This can be called from any thread.
+ */
+- (void)idleOnUpdateChecks:(BOOL)shouldIdleOnUpdateChecks;
+
+/*!
  * Start the next scheduled update check timer.
  *
  * @param timeInterval The time interval or delay since now that should be used to initiate the next update check.

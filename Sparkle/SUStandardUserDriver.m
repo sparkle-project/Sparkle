@@ -28,6 +28,7 @@
 @property (nonatomic) BOOL askedHandlingTermination;
 @property (nonatomic, readonly) BOOL handlesTermination;
 
+@property (nonatomic) BOOL idlesOnUpdateChecks;
 @property (nonatomic) BOOL updateInProgress;
 
 @property (nonatomic) NSTimer *checkUpdateTimer;
@@ -56,6 +57,7 @@
 @synthesize handlesTermination = _handlesTermination;
 @synthesize askedHandlingTermination = _askedHandlingTermination;
 @synthesize delegate = _delegate;
+@synthesize idlesOnUpdateChecks = _idlesOnUpdateChecks;
 @synthesize updateInProgress = _updateInProgress;
 @synthesize checkUpdateTimer = _checkUpdateTimer;
 @synthesize checkForUpdatesReply = _checkForUpdatesReply;
@@ -82,6 +84,11 @@
 }
 
 #pragma mark Is Update Busy?
+
+- (void)idleOnUpdateChecks:(BOOL)shouldIdleOnUpdateChecks
+{
+    self.idlesOnUpdateChecks = shouldIdleOnUpdateChecks;
+}
 
 - (void)showUpdateInProgress:(BOOL)isUpdateInProgress
 {
@@ -114,6 +121,11 @@
     return result;
 }
 
+- (BOOL)willInitiateNextUpdateCheck
+{
+    return (self.checkUpdateTimer != nil);
+}
+
 - (void)checkForUpdates:(NSTimer *)__unused timer
 {
     if ([self isDelegateResponsibleForUpdateChecking]) {
@@ -128,6 +140,8 @@
             self.checkForUpdatesReply = nil;
         }
     }
+    
+    [self _invalidateUpdateCheckTimer];
 }
 
 - (void)startUpdateCheckTimerWithNextTimeInterval:(NSTimeInterval)timeInterval reply:(void (^)(SUUpdateCheckTimerStatus))reply
@@ -561,35 +575,56 @@
     }
 }
 
-#pragma mark Aborting Update
+#pragma mark Aborting Everything
+
+- (void)_dismissUpdateInstallation
+{
+    // Make sure everything we call here does not dispatch async to main queue
+    // because we are already on the main queue (and I've been bitten in the past by this before)
+    
+    // Note: self.idlesOnUpdateChecks is intentionally not touched in case this instance is re-used
+    
+    self.updateInProgress = NO;
+    
+    [self _invalidateUpdateCheckTimer];
+    
+    [self cancelCheckForUpdates];
+    [self cancelDownload];
+    
+    if (self.statusController) {
+        [self.statusController close];
+        self.statusController = nil;
+    }
+    
+    if (self.activeUpdateAlert) {
+        [self.activeUpdateAlert close];
+        self.activeUpdateAlert = nil;
+    }
+    
+    [self cancelObservingApplicationTermination];
+    [self cancelObservingSystemPowerOff];
+    [self cancelInstallAndRestart];
+}
 
 - (void)dismissUpdateInstallation
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        // Make sure everything we call here does not dispatch async to main queue
-        // because we are already on the main queue (and I've been bitten in the past by this before)
-        
-        self.updateInProgress = NO;
-        
-        [self _invalidateUpdateCheckTimer];
-        
-        [self cancelCheckForUpdates];
-        [self cancelDownload];
-        
-        if (self.statusController) {
-            [self.statusController close];
-            self.statusController = nil;
-        }
-        
-        if (self.activeUpdateAlert) {
-            [self.activeUpdateAlert close];
-            self.activeUpdateAlert = nil;
-        }
-        
-        [self cancelObservingApplicationTermination];
-        [self cancelObservingSystemPowerOff];
-        [self cancelInstallAndRestart];
+        [self _dismissUpdateInstallation];
     });
+}
+
+- (void)invalidate
+{
+    // Make sure any remote handlers will not be invoked
+    self.applicationTerminationHandler = nil;
+    self.systemPowerOffHandler = nil;
+    self.installUpdateHandler = nil;
+    self.checkForUpdatesReply = nil;
+    self.updateCheckStatusCompletion = nil;
+    self.downloadStatusCompletion = nil;
+    
+    // Dismiss the installation normally
+    [self _dismissUpdateInstallation];
 }
 
 @end

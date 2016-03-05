@@ -63,48 +63,62 @@
     
     // Try killing the TestAppHelper process to test this (might not want a debugger attached)
     self.connection.interruptionHandler = ^{
-        NSLog(@"Connection is interrupted! Sending another message to get it back..");
+        NSLog(@"Connection is interrupted..!");
         
         dispatch_async(dispatch_get_main_queue(), ^{
             if (weakSelf.isTerminating) {
+                NSLog(@"Terminating app..");
+                // This will be dispatched on main queue again
                 [weakSelf.userDriver terminateApplication];
             }
-        });
-        
-        // This method dispatches on the main queue
-        [weakSelf.userDriver dismissUpdateInstallation];
-        
-        // I want this to be sent after dismissing update installation is done
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [weakSelf.connection.remoteObjectProxy startSparkle];
+            
+            // Attempt to do work only if we haven't terminated yet
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (!weakSelf.userDriver.willInitiateNextUpdateCheck) {
+                    NSLog(@"Invalidating installation..");
+                    [weakSelf.userDriver invalidate];
+                }
+                
+                // No need to do anything if we will be sending a message later anyway
+                // or if we won't have to send a message immediately anyway
+                if (!weakSelf.userDriver.willInitiateNextUpdateCheck && !weakSelf.userDriver.idlesOnUpdateChecks) {
+                    NSLog(@"Starting up Sparkle again");
+                    [weakSelf.connection.remoteObjectProxy startSparkle];
+                } else {
+                    NSLog(@"Update checker is in progress or doesn't have to be; no need to panic");
+                }
+            });
         });
     };
     
     // Try testing this by using the Invalidate Connection menu item
     self.connection.invalidationHandler = ^{
-        const uint64_t delay = 10;
+        const uint64_t delay = 60;
         NSLog(@"Connection is invalidated! Rebooting connection in %llu seconds..", delay);
         
         dispatch_async(dispatch_get_main_queue(), ^{
             if (weakSelf.isTerminating) {
+                // This will dispatch on the main queue again
                 [weakSelf.userDriver terminateApplication];
             }
-        });
-        
-        // This method dispatches on the main queue
-        [weakSelf.userDriver dismissUpdateInstallation];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            weakSelf.userDriver = nil;
-            weakSelf.connection = nil;
             
-            // This must be called on main queue
-            // Because the connection was invalidated, it might mean creating a new one will not be easy, so let's wait a bit in our example
-            // Note this is a "stupid" implementation. Perhaps a better one increases the time exponentially on each re-try until a certain limit is reached
-            // And that could be cleared out after a certain amount of idle time. Would require some thinking.
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                NSLog(@"Rebooting connection..");
-                [weakSelf setUpConnection];
+            // Attempt to do work only if we haven't terminated yet
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf.userDriver invalidate];
+                
+                weakSelf.userDriver = nil;
+                weakSelf.connection = nil;
+                
+                // Because the connection was invalidated, it might mean creating a new one will not be easy, so let's wait a bit in our example
+                // (Unless the user forces the connection to be created again in our test app, by eg, playing around with the checkboxes)
+                // Note this is probably a "dumb" implementation. Perhaps a better one increases the time exponentially on each re-try until a certain limit is reached
+                // And that could be cleared out after a certain amount of idle time. Plenty of ways to approach this..
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    NSLog(@"Rebooting connection..");
+                    if (weakSelf != nil && weakSelf.connection == nil) {
+                        [weakSelf setUpConnection];
+                    }
+                });
             });
         });
     };
