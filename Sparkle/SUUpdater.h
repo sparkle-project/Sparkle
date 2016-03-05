@@ -73,7 +73,9 @@ SU_EXPORT @interface SUUpdater : NSObject
 @property (nonatomic, copy) NSString *decryptionPassword;
 
 /*!
-    Explicitly checks for updates and displays a progress dialog while doing so.
+    Checks for updates, and displays progress while doing so
+ 
+    This is meant for users initiating an update check
  */
 - (void)checkForUpdates;
 
@@ -123,7 +125,7 @@ SU_EXPORT @interface SUUpdater : NSObject
     the preferences for time interval and automatic checks.
 
     This call does not change the date of the next check,
-    but only the internal NSTimer.
+    but only the internal timer.
  */
 - (void)resetUpdateCycle;
 
