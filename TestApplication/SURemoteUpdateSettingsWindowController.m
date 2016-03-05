@@ -15,7 +15,7 @@
 @property (nonatomic) NSXPCConnection *connection;
 @property (nonatomic) id<SUStandardUserDriver> userDriver;
 
-@property (nonatomic) BOOL isTerminating;
+@property (nonatomic) BOOL isTerminationDelayed;
 
 @property (nonatomic) IBOutlet NSButton *automaticallyChecksForUpdatesButton;
 @property (nonatomic) IBOutlet NSButton *automaticallyDownloadUpdatesButton;
@@ -28,7 +28,7 @@
 
 @synthesize connection = _connection;
 @synthesize userDriver = _userDriver;
-@synthesize isTerminating = _isTerminating;
+@synthesize isTerminationDelayed = _isTerminationDelayed;
 @synthesize automaticallyChecksForUpdatesButton = _automaticallyChecksForUpdatesButton;
 @synthesize automaticallyDownloadUpdatesButton = _automaticallyDownloadUpdatesButton;
 @synthesize sendsSystemProfileButton = _sendsSystemProfileButton;
@@ -70,7 +70,7 @@
         NSLog(@"Connection is interrupted..!");
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (weakSelf.isTerminating) {
+            if (weakSelf.isTerminationDelayed) {
                 NSLog(@"Terminating app..");
                 // This will be dispatched on main queue again
                 [weakSelf.userDriver terminateApplication];
@@ -101,7 +101,7 @@
         NSLog(@"Connection is invalidated! Rebooting connection in %llu seconds..", delay);
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (weakSelf.isTerminating) {
+            if (weakSelf.isTerminationDelayed) {
                 // This will dispatch on the main queue again
                 [weakSelf.userDriver terminateApplication];
             }
@@ -203,8 +203,8 @@
 
 - (NSApplicationTerminateReply)sendTerminationSignal
 {
-    NSApplicationTerminateReply reply = [self.userDriver sendApplicationTerminationSignal];
-    self.isTerminating = (reply == NSTerminateLater);
+    NSApplicationTerminateReply reply = (self.userDriver != nil) ? [self.userDriver sendApplicationTerminationSignal] : NSTerminateNow;
+    self.isTerminationDelayed = (reply == NSTerminateLater);
     return reply;
 }
 
