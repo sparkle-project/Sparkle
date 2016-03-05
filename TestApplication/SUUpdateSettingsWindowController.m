@@ -11,7 +11,7 @@
 
 @interface SUUpdateSettingsWindowController ()
 
-@property (nonatomic) IBOutlet SUUpdaterController *updaterController;
+@property (nonatomic) IBOutlet SUStandardUpdaterController *updaterController;
 
 @end
 

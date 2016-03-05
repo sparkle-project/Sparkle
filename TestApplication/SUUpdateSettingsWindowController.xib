@@ -103,6 +103,6 @@
             </view>
             <point key="canvasLocation" x="233" y="324.5"/>
         </window>
-        <customObject id="Krg-xk-XXS" userLabel="Updater Controller" customClass="SUUpdaterController"/>
+        <customObject id="Krg-xk-XXS" userLabel="Updater Controller" customClass="SUStandardUpdaterController"/>
     </objects>
 </document>

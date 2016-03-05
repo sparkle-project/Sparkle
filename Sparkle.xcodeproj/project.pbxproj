@@ -171,8 +171,8 @@
 		721CF1AA1AD7647000D9AC09 /* libxar.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5890FD7678C0065DB48 /* libxar.1.dylib */; };
 		721CF1AB1AD764EB00D9AC09 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */; };
 		7223E7631AD1AEFF008E3161 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
-		7246E0A31C83B685003B4E75 /* SUUpdaterController.h in Headers */ = {isa = PBXBuildFile; fileRef = 7246E0A11C83B685003B4E75 /* SUUpdaterController.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		7246E0A41C83B685003B4E75 /* SUUpdaterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7246E0A21C83B685003B4E75 /* SUUpdaterController.m */; };
+		7246E0A31C83B685003B4E75 /* SUStandardUpdaterController.h in Headers */ = {isa = PBXBuildFile; fileRef = 7246E0A11C83B685003B4E75 /* SUStandardUpdaterController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7246E0A41C83B685003B4E75 /* SUStandardUpdaterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7246E0A21C83B685003B4E75 /* SUStandardUpdaterController.m */; };
 		725602D51C83551C00DAA70E /* SUApplicationInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 725602D31C83551C00DAA70E /* SUApplicationInfo.h */; };
 		725602D61C83551C00DAA70E /* SUApplicationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 725602D41C83551C00DAA70E /* SUApplicationInfo.m */; };
 		725602D71C83576100DAA70E /* SUApplicationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 725602D41C83551C00DAA70E /* SUApplicationInfo.m */; };
@@ -658,8 +658,8 @@
 		72162B071C82C9600013C1C5 /* SULocalizations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULocalizations.h; sourceTree = "<group>"; };
 		7223E7611AD1AEFF008E3161 /* sais.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sais.c; sourceTree = "<group>"; };
 		7223E7621AD1AEFF008E3161 /* sais.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sais.h; sourceTree = "<group>"; };
-		7246E0A11C83B685003B4E75 /* SUUpdaterController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdaterController.h; sourceTree = "<group>"; };
-		7246E0A21C83B685003B4E75 /* SUUpdaterController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterController.m; sourceTree = "<group>"; };
+		7246E0A11C83B685003B4E75 /* SUStandardUpdaterController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStandardUpdaterController.h; sourceTree = "<group>"; };
+		7246E0A21C83B685003B4E75 /* SUStandardUpdaterController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUStandardUpdaterController.m; sourceTree = "<group>"; };
 		725602D31C83551C00DAA70E /* SUApplicationInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUApplicationInfo.h; sourceTree = "<group>"; };
 		725602D41C83551C00DAA70E /* SUApplicationInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUApplicationInfo.m; sourceTree = "<group>"; };
 		725CB9561C7120410064365A /* SUUserDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUserDriver.h; sourceTree = "<group>"; };
@@ -1048,8 +1048,8 @@
 		61299B3A09CB056100B7442F /* User Interface */ = {
 			isa = PBXGroup;
 			children = (
-				7246E0A11C83B685003B4E75 /* SUUpdaterController.h */,
-				7246E0A21C83B685003B4E75 /* SUUpdaterController.m */,
+				7246E0A11C83B685003B4E75 /* SUStandardUpdaterController.h */,
+				7246E0A21C83B685003B4E75 /* SUStandardUpdaterController.m */,
 				726E4A361C89116000C57C6A /* SUStandardUserDriverDelegate.h */,
 				726E4A0D1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h */,
 				726E4A0F1C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h */,
@@ -1265,7 +1265,7 @@
 				61CFB3290E385186007A1735 /* Sparkle.pch in Headers */,
 				72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */,
 				61B5FC0D09C4FC8200B25A18 /* SUAppcast.h in Headers */,
-				7246E0A31C83B685003B4E75 /* SUUpdaterController.h in Headers */,
+				7246E0A31C83B685003B4E75 /* SUStandardUpdaterController.h in Headers */,
 				61B5FC7009C51F4A00B25A18 /* SUAppcastItem.h in Headers */,
 				6120721209CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.h in Headers */,
 				61B93B270DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.h in Headers */,
@@ -1847,7 +1847,7 @@
 				6196CFFA09C72149000DC222 /* SUStatusController.m in Sources */,
 				61A2279D0D1CEE7600430CCD /* SUSystemProfiler.m in Sources */,
 				61B93A3D0DD02D7000DCD2F8 /* SUUIBasedUpdateDriver.m in Sources */,
-				7246E0A41C83B685003B4E75 /* SUUpdaterController.m in Sources */,
+				7246E0A41C83B685003B4E75 /* SUStandardUpdaterController.m in Sources */,
 				61299A8E09CA790200B7442F /* SUUnarchiver.m in Sources */,
 				61B5FCDE09C52A9F00B25A18 /* SUUpdateAlert.m in Sources */,
 				610134740DD250470049ACDF /* SUUpdateDriver.m in Sources */,

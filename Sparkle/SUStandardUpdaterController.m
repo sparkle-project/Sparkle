@@ -1,12 +1,12 @@
 //
-//  SUUpdaterController.m
+//  SUStandardUpdaterController.m
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 2/28/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SUUpdaterController.h"
+#import "SUStandardUpdaterController.h"
 #import "SUUpdater.h"
 #import "SUHost.h"
 #import "SUStandardUserDriver.h"
@@ -16,14 +16,14 @@
 
 static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
 
-@interface SUUpdaterController ()
+@interface SUStandardUpdaterController ()
 
 @property (nonatomic) SUUpdater *updater;
 @property (nonatomic) SUStandardUserDriver *userDriver;
 
 @end
 
-@implementation SUUpdaterController
+@implementation SUStandardUpdaterController
 
 @synthesize updater = _updater;
 @synthesize userDriver = _userDriver;

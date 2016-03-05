@@ -1,5 +1,5 @@
 //
-//  SUUpdaterController.h
+//  SUStandardUpdaterController.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 2/28/16.
@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
  * You don't want to use a convenience class that provides very little glue ;)
  
   */
-@interface SUUpdaterController : NSObject
+@interface SUStandardUpdaterController : NSObject
 
 /*!
  Initializes a new updater controller instance. Typically this class is instantiated in a nib, thus this
