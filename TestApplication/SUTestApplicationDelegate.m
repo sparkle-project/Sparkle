@@ -11,6 +11,7 @@
 #import "SURemoteUpdateSettingsWindowController.h"
 #import "SUFileManager.h"
 #import "SUTestWebServer.h"
+#import "TestAppHelperProtocol.h"
 
 @interface SUTestApplicationDelegate ()
 
@@ -97,107 +98,119 @@ static NSString * const UPDATED_VERSION = @"2.0";
     BOOL wroteInfoFile = [infoDictionary writeToURL:infoURL atomically:NO];
     assert(wroteInfoFile);
     
-    // Change current working directory so web server knows where to list files
-    NSString *serverDirectoryPath = serverDirectoryURL.path;
-    assert(serverDirectoryPath != nil);
+    // This is unfortunately necessary for testing sandboxing
+    NSXPCConnection *codeSignConnection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.TestAppHelper"];
+    codeSignConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(TestAppHelperProtocol)];
+    [codeSignConnection resume];
     
-    // Create the archive for our update
-    NSString *zipName = @"Sparkle_Test_App.zip";
-    NSTask *dittoTask = [[NSTask alloc] init];
-    dittoTask.launchPath = @"/usr/bin/ditto";
-    dittoTask.arguments = @[@"-c", @"-k", @"--sequesterRsrc", @"--keepParent", destinationBundleURL.lastPathComponent, zipName];
-    dittoTask.currentDirectoryPath = serverDirectoryPath;
-    [dittoTask launch];
-    [dittoTask waitUntilExit];
-    
-    assert(dittoTask.terminationStatus == 0);
-    
-    [fileManager removeItemAtURL:destinationBundleURL error:NULL];
-    
-    // Don't ever do this at home, kids (seriously)
-    // (that is, including the private key inside of your application)
-    NSString *privateKeyPath = [mainBundle pathForResource:@"test_app_only_dsa_priv_dont_ever_do_this_for_real" ofType:@"pem"];
-    assert(privateKeyPath != nil);
-    
-    // Sign our update
-    NSTask *signUpdateTask = [[NSTask alloc] init];
-    NSString *signUpdatePath = [mainBundle pathForResource:@"sign_update" ofType:@""];
-    assert(signUpdatePath != nil);
-    signUpdateTask.launchPath = signUpdatePath;
-    
-    NSURL *archiveURL = [serverDirectoryURL URLByAppendingPathComponent:zipName];
-    signUpdateTask.arguments = @[archiveURL.path, privateKeyPath];
-    
-    NSPipe *outputPipe = [NSPipe pipe];
-    signUpdateTask.standardOutput = outputPipe;
-    
-    [signUpdateTask launch];
-    [signUpdateTask waitUntilExit];
-    
-    assert(signUpdateTask.terminationStatus == 0);
-    
-    NSData *signatureData = [outputPipe.fileHandleForReading readDataToEndOfFile];
-    NSString *signature = [[[NSString alloc] initWithData:signatureData encoding:NSUTF8StringEncoding] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    
-    assert(signature != nil);
-    
-    // Obtain the file attributes to get the file size of our update later
-    NSError *fileAttributesError = nil;
-    NSString *archiveURLPath = archiveURL.path;
-    assert(archiveURLPath != nil);
-    NSDictionary *archiveFileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:archiveURLPath error:&fileAttributesError];
-    if (archiveFileAttributes == nil) {
-        NSLog(@"Failed to retrieve file attributes from archive with error %@", fileAttributesError);
-        assert(NO);
-    }
-    
-    NSString * const appcastName = @"sparkletestcast";
-    NSString * const appcastExtension = @"xml";
-    
-    // Copy our appcast over to the server directory
-    NSURL *appcastDestinationURL = [[serverDirectoryURL URLByAppendingPathComponent:appcastName] URLByAppendingPathExtension:appcastExtension];
-    NSError *copyAppcastError = nil;
-    if (![fileManager copyItemAtURL:[mainBundle URLForResource:appcastName withExtension:appcastExtension] toURL:appcastDestinationURL error:&copyAppcastError]) {
-        NSLog(@"Failed to copy appcast into cache directory with error %@", copyAppcastError);
-        assert(NO);
-    }
-    
-    // Update the appcast with the file size and signature of the update archive
-    // We could be using some sort of XML parser instead of doing string substitutions, but for now, this is easier
-    NSError *appcastError = nil;
-    NSMutableString *appcastContents = [[NSMutableString alloc] initWithContentsOfURL:appcastDestinationURL encoding:NSUTF8StringEncoding error:&appcastError];
-    if (appcastContents == nil) {
-        NSLog(@"Failed to load appcast contents with error %@", appcastError);
-        assert(NO);
-    }
-    
-    NSUInteger numberOfLengthReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_ARCHIVE_LENGTH" withString:[NSString stringWithFormat:@"%llu", archiveFileAttributes.fileSize] options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
-    assert(numberOfLengthReplacements == 1);
-    
-    NSUInteger numberOfSignatureReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_DSA_SIGNATURE" withString:signature options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
-    assert(numberOfSignatureReplacements == 1);
-    
-    NSError *writeAppcastError = nil;
-    if (![appcastContents writeToURL:appcastDestinationURL atomically:NO encoding:NSUTF8StringEncoding error:&writeAppcastError]) {
-        NSLog(@"Failed to write updated appcast with error %@", writeAppcastError);
-        assert(NO);
-    }
-    
-    // Finally start the server
-    SUTestWebServer *webServer = [[SUTestWebServer alloc] initWithPort:1337 workingDirectory:serverDirectoryPath];
-    if (!webServer) {
-        NSLog(@"Failed to create the web server");
-        assert(NO);
-    }
-    self.webServer = webServer;
-    
-    // Show the Settings window
-    
-    // SURemoteUpdateSettingsWindowController will show its window by itself
-    self.remoteUpdateSettingsWindowController = [[SURemoteUpdateSettingsWindowController alloc] init];
-    
-    //self.updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] init];
-    //[self.updateSettingsWindowController showWindow:nil];
+    [codeSignConnection.remoteObjectProxy codeSignApplicationAtPath:destinationBundleURL.path reply:^(BOOL success) {
+        assert(success);
+        [codeSignConnection invalidate];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            // Change current working directory so web server knows where to list files
+            NSString *serverDirectoryPath = serverDirectoryURL.path;
+            assert(serverDirectoryPath != nil);
+            
+            // Create the archive for our update
+            NSString *zipName = @"Sparkle_Test_App.zip";
+            NSTask *dittoTask = [[NSTask alloc] init];
+            dittoTask.launchPath = @"/usr/bin/ditto";
+            dittoTask.arguments = @[@"-c", @"-k", @"--sequesterRsrc", @"--keepParent", destinationBundleURL.lastPathComponent, zipName];
+            dittoTask.currentDirectoryPath = serverDirectoryPath;
+            [dittoTask launch];
+            [dittoTask waitUntilExit];
+            
+            assert(dittoTask.terminationStatus == 0);
+            
+            [fileManager removeItemAtURL:destinationBundleURL error:NULL];
+            
+            // Don't ever do this at home, kids (seriously)
+            // (that is, including the private key inside of your application)
+            NSString *privateKeyPath = [mainBundle pathForResource:@"test_app_only_dsa_priv_dont_ever_do_this_for_real" ofType:@"pem"];
+            assert(privateKeyPath != nil);
+            
+            // Sign our update
+            NSTask *signUpdateTask = [[NSTask alloc] init];
+            NSString *signUpdatePath = [mainBundle pathForResource:@"sign_update" ofType:@""];
+            assert(signUpdatePath != nil);
+            signUpdateTask.launchPath = signUpdatePath;
+            
+            NSURL *archiveURL = [serverDirectoryURL URLByAppendingPathComponent:zipName];
+            signUpdateTask.arguments = @[archiveURL.path, privateKeyPath];
+            
+            NSPipe *outputPipe = [NSPipe pipe];
+            signUpdateTask.standardOutput = outputPipe;
+            
+            [signUpdateTask launch];
+            [signUpdateTask waitUntilExit];
+            
+            assert(signUpdateTask.terminationStatus == 0);
+            
+            NSData *signatureData = [outputPipe.fileHandleForReading readDataToEndOfFile];
+            NSString *signature = [[[NSString alloc] initWithData:signatureData encoding:NSUTF8StringEncoding] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            
+            assert(signature != nil);
+            
+            // Obtain the file attributes to get the file size of our update later
+            NSError *fileAttributesError = nil;
+            NSString *archiveURLPath = archiveURL.path;
+            assert(archiveURLPath != nil);
+            NSDictionary *archiveFileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:archiveURLPath error:&fileAttributesError];
+            if (archiveFileAttributes == nil) {
+                NSLog(@"Failed to retrieve file attributes from archive with error %@", fileAttributesError);
+                assert(NO);
+            }
+            
+            NSString * const appcastName = @"sparkletestcast";
+            NSString * const appcastExtension = @"xml";
+            
+            // Copy our appcast over to the server directory
+            NSURL *appcastDestinationURL = [[serverDirectoryURL URLByAppendingPathComponent:appcastName] URLByAppendingPathExtension:appcastExtension];
+            NSError *copyAppcastError = nil;
+            if (![fileManager copyItemAtURL:[mainBundle URLForResource:appcastName withExtension:appcastExtension] toURL:appcastDestinationURL error:&copyAppcastError]) {
+                NSLog(@"Failed to copy appcast into cache directory with error %@", copyAppcastError);
+                assert(NO);
+            }
+            
+            // Update the appcast with the file size and signature of the update archive
+            // We could be using some sort of XML parser instead of doing string substitutions, but for now, this is easier
+            NSError *appcastError = nil;
+            NSMutableString *appcastContents = [[NSMutableString alloc] initWithContentsOfURL:appcastDestinationURL encoding:NSUTF8StringEncoding error:&appcastError];
+            if (appcastContents == nil) {
+                NSLog(@"Failed to load appcast contents with error %@", appcastError);
+                assert(NO);
+            }
+            
+            NSUInteger numberOfLengthReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_ARCHIVE_LENGTH" withString:[NSString stringWithFormat:@"%llu", archiveFileAttributes.fileSize] options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
+            assert(numberOfLengthReplacements == 1);
+            
+            NSUInteger numberOfSignatureReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_DSA_SIGNATURE" withString:signature options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
+            assert(numberOfSignatureReplacements == 1);
+            
+            NSError *writeAppcastError = nil;
+            if (![appcastContents writeToURL:appcastDestinationURL atomically:NO encoding:NSUTF8StringEncoding error:&writeAppcastError]) {
+                NSLog(@"Failed to write updated appcast with error %@", writeAppcastError);
+                assert(NO);
+            }
+            
+            // Finally start the server
+            SUTestWebServer *webServer = [[SUTestWebServer alloc] initWithPort:1337 workingDirectory:serverDirectoryPath];
+            if (!webServer) {
+                NSLog(@"Failed to create the web server");
+                assert(NO);
+            }
+            self.webServer = webServer;
+            
+            // Show the Settings window
+            
+            // SURemoteUpdateSettingsWindowController will show its window by itself
+            self.remoteUpdateSettingsWindowController = [[SURemoteUpdateSettingsWindowController alloc] init];
+            
+            //self.updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] init];
+            //[self.updateSettingsWindowController showWindow:nil];
+        });
+    }];
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)__unused sender

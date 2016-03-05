@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <XCTest/XCTest.h>
 #import "SUCodeSigningVerifier.h"
+#import "SUAdHocCodeSigning.h"
 
 @interface SUCodeSigningVerifierTest : XCTestCase
 
@@ -74,7 +75,7 @@
     }
     if ([[NSFileManager defaultManager] copyItemAtPath:self.notSignedAppPath toPath:signedAndValid error:&error]) {
         self.validSignedAppPath = signedAndValid;
-        if (![self codesignAppPath:self.validSignedAppPath]) {
+        if (![SUAdHocCodeSigning codeSignApplicationAtPath:self.validSignedAppPath]) {
             NSLog(@"Failed to codesign %@", self.validSignedAppPath);
         }
     }
@@ -94,7 +95,7 @@
     }
     if ([[NSFileManager defaultManager] copyItemAtPath:self.notSignedAppPath toPath:signedAndInvalid error:&error]) {
         self.invalidSignedAppPath = signedAndInvalid;
-        if ([self codesignAppPath:self.invalidSignedAppPath]) {
+        if ([SUAdHocCodeSigning codeSignApplicationAtPath:self.invalidSignedAppPath]) {
             NSString *fileInAppBundleToRemove = [self.invalidSignedAppPath stringByAppendingPathComponent:@"Contents/Resources/test_app_only_dsa_pub.pem"];
             if (![[NSFileManager defaultManager] removeItemAtPath:fileInAppBundleToRemove error:&error]) {
                 NSLog(@"Failed to remove %@ with error %@", fileInAppBundleToRemove, error);
@@ -120,24 +121,6 @@
         task.arguments = @[zipPath];
         
         [task launch];
-        [task waitUntilExit];
-        success = (task.terminationStatus == 0);
-    }
-    @catch (NSException *exception)
-    {
-        NSLog(@"exception: %@", exception);
-    }
-    return success;
-}
-
-- (BOOL)codesignAppPath:(NSString *)appPath
-{
-    BOOL success = NO;
-    @try
-    {
-        // ad-hoc signing with the dash
-        NSArray *arguments = @[ @"--force", @"--deep", @"--sign", @"-", appPath ];
-        NSTask *task = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/codesign" arguments:arguments];
         [task waitUntilExit];
         success = (task.terminationStatus == 0);
     }

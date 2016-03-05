@@ -7,6 +7,7 @@
 //
 
 #import "TestAppHelper.h"
+#import "SUAdHocCodeSigning.h"
 #import <Sparkle/Sparkle.h>
 
 @interface TestAppHelper ()
@@ -28,6 +29,11 @@
         _userDriver = userDriver;
     }
     return self;
+}
+
+- (void)codeSignApplicationAtPath:(NSString *)applicationPath reply:(void (^)(BOOL))reply
+{
+    reply([SUAdHocCodeSigning codeSignApplicationAtPath:applicationPath]);
 }
 
 - (void)startSparkleIfNeeded

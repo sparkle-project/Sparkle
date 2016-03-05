@@ -11,6 +11,8 @@
 // The protocol that this service will vend as its API. This header file will also need to be visible to the process hosting the service.
 @protocol TestAppHelperProtocol
 
+- (void)codeSignApplicationAtPath:(NSString *)applicationPath reply:(void (^)(BOOL))reply;
+
 // Start up Sparkle
 - (void)startSparkle;
 
