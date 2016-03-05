@@ -150,9 +150,11 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Let the user know a new update was not found after they tried initiating an update check.
  *
+ * @param acknowledgement Acknowledge to the updater that no update found was shown.
+ *
  * This can be called from any thread
  */
-- (void)showUpdateNotFound;
+- (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))acknowledgement;
 
 /*!
  * Show the user an update error occurred
@@ -160,9 +162,11 @@ NS_ASSUME_NONNULL_BEGIN
  * Let the user know that the updater failed with an error. This will not be invoked without the user having been
  * aware that an update was in progress.
  *
+ * @param acknowledgement Acknowledge to the updater that the error was shown.
+ *
  * This can be called from any thread
  */
-- (void)showUpdaterError:(NSError *)error;
+- (void)showUpdaterError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement;
 
 /*!
  * Show the user that downloading the new update initiated

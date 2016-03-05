@@ -28,6 +28,7 @@
 @property (nonatomic, copy) void (^installUpdateHandler)(SUInstallUpdateStatus);
 @property (nonatomic, copy) void (^updateCheckStatusCompletion)(SUUserInitiatedCheckStatus);
 @property (nonatomic, copy) void (^downloadStatusCompletion)(SUDownloadUpdateStatus);
+@property (nonatomic, copy) void (^acknowledgement)(void);
 
 @end
 
@@ -42,6 +43,7 @@
 @synthesize installUpdateHandler = _installUpdateHandler;
 @synthesize updateCheckStatusCompletion = _updateCheckStatusCompletion;
 @synthesize downloadStatusCompletion = _downloadStatusCompletion;
+@synthesize acknowledgement = _acknowledgement;
 
 #pragma mark Birth
 
@@ -194,6 +196,21 @@
     }
 }
 
+#pragma mark Simple Acknoledgments
+
+- (void)registerAcknowledgement:(void (^)(void))acknowledgement
+{
+    self.acknowledgement = acknowledgement;
+}
+
+- (void)acceptAcknowledgement
+{
+    if (self.acknowledgement != nil) {
+        self.acknowledgement();
+        self.acknowledgement = nil;
+    }
+}
+
 #pragma mark Aborting Everything
 
 - (void)dismissUpdateInstallation
@@ -202,6 +219,7 @@
     
     self.updateInProgress = NO;
     
+    [self acceptAcknowledgement];
     [self cancelUpdateCheckStatus];
     [self cancelDownloadStatus];
     [self cancelInstallAndRestart];
@@ -211,6 +229,7 @@
 - (void)invalidate
 {
     // Make sure any remote handlers will not be invoked
+    self.acknowledgement = nil;
     self.checkForUpdatesReply = nil;
     self.downloadStatusCompletion = nil;
     self.installUpdateHandler = nil;

@@ -54,10 +54,12 @@
 
     if (!self.automaticallyInstallUpdates) {
         [self showNotice:^{
-            [self.updater.userDriver showUpdateNotFound];
+            [self.updater.userDriver showUpdateNotFoundWithAcknowledgement:^{
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self abortUpdate];
+                });
+            }];
         }];
-        
-        [self abortUpdate];
     }
 }
 
@@ -166,10 +168,12 @@
 - (void)abortUpdateWithError:(NSError *)error
 {
     [self showNotice:^{
-        [self.updater.userDriver showUpdaterError:error];
+        [self.updater.userDriver showUpdaterError:error acknowledgement:^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [super abortUpdateWithError:error];
+            });
+        }];
     }];
-    
-    [super abortUpdateWithError:error];
 }
 
 // Calling deprecated modal alert methods just to preserve backwards compatibility

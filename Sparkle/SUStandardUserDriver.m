@@ -244,25 +244,33 @@
 
 #pragma mark Update Errors
 
-- (void)showUpdaterError:(NSError *)error
+- (void)showUpdaterError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self.coreComponent registerAcknowledgement:acknowledgement];
+        
         NSAlert *alert = [[NSAlert alloc] init];
         alert.messageText = SULocalizedString(@"Update Error!", nil);
         alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
         [alert addButtonWithTitle:SULocalizedString(@"Cancel Update", nil)];
         [self showAlert:alert];
+        
+        [self.coreComponent acceptAcknowledgement];
     });
 }
 
-- (void)showUpdateNotFound
+- (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))acknowledgement
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self.coreComponent registerAcknowledgement:acknowledgement];
+        
         NSAlert *alert = [[NSAlert alloc] init];
         alert.messageText = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
         alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
         [alert addButtonWithTitle:SULocalizedString(@"OK", nil)];
         [self showAlert:alert];
+        
+        [self.coreComponent acceptAcknowledgement];
     });
 }
 

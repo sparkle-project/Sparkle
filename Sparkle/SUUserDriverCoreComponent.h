@@ -42,6 +42,9 @@
 - (void)cancelDownloadStatus;
 - (void)completeDownloadStatus;
 
+- (void)registerAcknowledgement:(void (^)(void))acknowledgement;
+- (void)acceptAcknowledgement;
+
 - (void)dismissUpdateInstallation;
 
 - (void)invalidate;

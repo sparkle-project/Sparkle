@@ -233,19 +233,32 @@
 
 #pragma mark Update Errors
 
-- (void)showUpdaterError:(NSError *)error
+- (void)showUpdaterError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        // Too lazy to show an alert; the update installation will be dismissed shortly
+        [self.coreComponent registerAcknowledgement:acknowledgement];
+        
         NSLog(@"Error: %@", error);
+        [self addUpdateButtonWithTitle:@"Update Errored!" action:nil];
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            // Installation will be dismissed shortly after this
+            [self.coreComponent acceptAcknowledgement];
+        });
     });
 }
 
-- (void)showUpdateNotFound
+- (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))acknowledgement
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        // Too lazy to show an alert; the update installation will be dismissed shortly
-        NSLog(@"No Update Found");
+        [self.coreComponent registerAcknowledgement:acknowledgement];
+        
+        [self addUpdateButtonWithTitle:@"No Update Available" action:nil];
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            // Installation will be dismissed shortly after this
+            [self.coreComponent acceptAcknowledgement];
+        });
     });
 }
 
