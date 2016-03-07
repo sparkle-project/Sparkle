@@ -20,7 +20,7 @@
 /*!
  Readable and writable property for this user driver's delegate
  */
-@property (nonatomic, weak, nullable) id <SUStandardUserDriverDelegate> delegate;
+@property (nonatomic, weak, nullable, readonly) id <SUStandardUserDriverDelegate> delegate;
 
 /*!
  Indicates whether or not an update is in progress as far as the user's perspective is concerned

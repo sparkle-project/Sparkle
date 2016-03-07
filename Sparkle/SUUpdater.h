@@ -45,7 +45,7 @@ SU_EXPORT @interface SUUpdater : NSObject
  */
 - (instancetype)initWithHostBundle:(NSBundle *)hostBundle userDriver:(id <SUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)delegate;
 
-@property (weak) id<SUUpdaterDelegate> delegate;
+@property (weak, readonly) id<SUUpdaterDelegate> delegate;
 @property (nonatomic, readonly) id<SUUserDriver> userDriver;
 
 @property (readonly, strong) NSBundle *hostBundle;

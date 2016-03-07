@@ -20,6 +20,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 @property (nonatomic) SUUpdater *updater;
 @property (nonatomic) id <SUStandardUserDriver> userDriver;
+@property (nonatomic) BOOL awokeFromNib;
 
 @end
 
@@ -27,20 +28,45 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 @synthesize updater = _updater;
 @synthesize userDriver = _userDriver;
+@synthesize updaterDelegate = _updaterDelegate;
+@synthesize userDriverDelegate = _userDriverDelegate;
+@synthesize awokeFromNib = _awokeFromNib;
 
+- (instancetype)initWithUpdater:(SUUpdater *)updater userDriver:(id<SUUserDriver, SUStandardUserDriver>)userDriver
+{
+    self = [self init]; // note: call our own init here rather than super's
+    if (self != nil) {
+        self.updater = updater;
+        self.userDriver = userDriver;
+    }
+    return self;
+}
+
+// Invoked from being instantiated in a nib
 - (instancetype)init
 {
     self = [super init];
     if (self != nil) {
+        // Register as an observer here to match unregistering in -dealloc
         [self registerAsObserver];
+    }
+    return self;
+}
+
+- (void)awakeFromNib
+{
+    // awakeFromNib might be called more than once; guard against that
+    // We have to use awakeFromNib otherwise the delegate outlets may not be connected yet,
+    // and we aren't a proper window or view controller or anything like that
+    if (!self.awokeFromNib) {
+        self.awokeFromNib = YES;
         
         NSBundle *hostBundle = [NSBundle mainBundle];
         
-        id <SUUserDriver, SUStandardUserDriver> userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
-        _updater = [[SUUpdater alloc] initWithHostBundle:hostBundle userDriver:userDriver delegate:nil];
-        _userDriver = userDriver;
+        id <SUUserDriver, SUStandardUserDriver> userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:self.userDriverDelegate];
+        self.updater = [[SUUpdater alloc] initWithHostBundle:hostBundle userDriver:userDriver delegate:self.updaterDelegate];
+        self.userDriver = userDriver;
     }
-    return self;
 }
 
 - (void)dealloc
