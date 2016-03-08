@@ -38,7 +38,6 @@
 
 @property (strong) SUAppcastItem *nonDeltaUpdateItem;
 @property (copy) NSString *tempDir;
-@property (copy) NSString *relaunchPath;
 
 @property (nonatomic) BOOL postponedOnce;
 
@@ -52,7 +51,6 @@
 
 @synthesize nonDeltaUpdateItem;
 @synthesize tempDir;
-@synthesize relaunchPath;
 
 @synthesize postponedOnce;
 
@@ -495,6 +493,8 @@
     }
 
     NSBundle *sparkleBundle = self.updater.sparkleBundle;
+    
+    NSString *relaunchPath = nil;
 
     // Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
     // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
@@ -518,7 +518,7 @@
             if (![fileManager releaseItemFromQuarantineAtRootURL:targetURL error:&quarantineError]) {
                 SULog(@"Failed to release quarantine on %@ with error %@", targetPath, quarantineError);
             }
-            self.relaunchPath = targetPath;
+            relaunchPath = targetPath;
         } else {
             [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{
                 NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil),
@@ -531,12 +531,12 @@
     if ([updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)])
         [updaterDelegate updaterWillRelaunchApplication:self.updater];
 
-    NSString *relaunchToolPath = [[NSBundle bundleWithPath:self.relaunchPath] executablePath];
-    if (!relaunchToolPath || ![[NSFileManager defaultManager] fileExistsAtPath:self.relaunchPath]) {
+    NSString *relaunchToolPath = [[NSBundle bundleWithPath:relaunchPath] executablePath];
+    if (!relaunchToolPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath]) {
         // Note that we explicitly use the host app's name here, since updating plugin for Mail relaunches Mail, not just the plugin.
         [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{
             NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [self.host name]],
-            NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@)", self.relaunchPath]
+            NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@)", relaunchPath]
         }]];
         // We intentionally don't abandon the update here so that the host won't initiate another.
         return;
@@ -610,20 +610,6 @@
         self.download = nil;
     }
     self.downloadPath = nil;
-}
-
-- (void)installerForHost:(SUHost *)aHost failedWithError:(NSError *)error
-{
-    if (aHost != self.host) {
-        return;
-    }
-    NSError *dontThrow = nil;
-    [[NSFileManager defaultManager] removeItemAtPath:self.relaunchPath error:&dontThrow]; // Clean up the copied relauncher
-    [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{
-        NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while installing the update. Please try again later.", nil),
-        NSLocalizedFailureReasonErrorKey: [error localizedDescription],
-        NSUnderlyingErrorKey: error,
-    }]];
 }
 
 - (void)abortUpdate

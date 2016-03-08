@@ -43,7 +43,6 @@
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch;
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI;
-- (void)installerForHost:(SUHost *)host failedWithError:(NSError *)error;
 
 - (void)cleanUpDownload;
 
