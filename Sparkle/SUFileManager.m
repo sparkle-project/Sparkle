@@ -267,7 +267,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     // root-level symbolic link.
     NSString *rootURLPath = rootURL.path;
     NSDictionary *rootAttributes = [_fileManager attributesOfItemAtPath:rootURLPath error:nil];
-    NSString *rootType = rootAttributes[NSFileType];
+    NSString *rootType = [rootAttributes objectForKey:NSFileType]; // 10.7 can't subscript this
 
     if ([rootType isEqualToString:NSFileTypeDirectory]) {
         // The NSDirectoryEnumerator will avoid recursing into any contained
