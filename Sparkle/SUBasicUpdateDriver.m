@@ -270,14 +270,16 @@
  *  * old and new Code Signing identity are the same and valid
  *
  */
-- (BOOL)validateUpdateDownloadedToPath:(NSString *)downloadedPath extractedToPath:(NSString *)extractedPath DSASignature:(NSString *)DSASignature publicDSAKey:(NSString *)publicDSAKey
+- (BOOL)validateUpdateForHost:(SUHost *)host downloadedToPath:(NSString *)downloadedPath extractedToPath:(NSString *)extractedPath DSASignature:(NSString *)DSASignature
 {
     BOOL isPackage = NO;
-    NSString *installSourcePath = [SUInstaller installSourcePathInUpdateFolder:extractedPath forHost:self.host isPackage:&isPackage isGuided:NULL];
+    NSString *installSourcePath = [SUInstaller installSourcePathInUpdateFolder:extractedPath forHost:host isPackage:&isPackage isGuided:NULL];
     if (installSourcePath == nil) {
         SULog(@"No suitable install is found in the update. The update will be rejected.");
         return NO;
     }
+    
+    NSString *publicDSAKey = host.publicDSAKey;
     
     // Modern packages are not distributed as bundles and are code signed differently than regular applications
     if (isPackage) {
@@ -322,7 +324,7 @@
             return NO;
         }
     } else {
-        NSString *hostBundlePath = self.updater.hostBundle.bundlePath;
+        NSString *hostBundlePath = host.bundlePath;
         BOOL hostIsCodeSigned = [SUCodeSigningVerifier applicationAtPathIsCodeSigned:hostBundlePath];
 
         NSString *dsaStatus = newPublicDSAKey ? @"has a new DSA key that doesn't match the previous one" : (publicDSAKey ? @"removes the DSA key" : @"isn't signed with a DSA key");
@@ -456,7 +458,7 @@
 {
     assert(self.updateItem);
 
-    if (![self validateUpdateDownloadedToPath:self.downloadPath extractedToPath:self.tempDir DSASignature:self.updateItem.DSASignature publicDSAKey:self.host.publicDSAKey])
+    if (![self validateUpdateForHost:self.host downloadedToPath:self.downloadPath extractedToPath:self.tempDir DSASignature:self.updateItem.DSASignature])
     {
         NSDictionary *userInfo = @{
             NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil),
