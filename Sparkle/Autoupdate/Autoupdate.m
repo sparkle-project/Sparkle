@@ -33,17 +33,16 @@ int main(int __unused argc, const char __unused *argv[])
     @autoreleasepool
     {
         NSArray *args = [[NSProcessInfo processInfo] arguments];
-        if (args.count != 8) {
+        if (args.count != 7) {
             return EXIT_FAILURE;
         }
         
-        NSString *hostPath = args[1];
-        NSString *relaunchPath = args[2];
-        NSString *hostBundlePath = args[3];
-        NSString *updateDirectoryPath = args[4];
-        BOOL shouldRelaunchApp = [args[5] boolValue];
-        BOOL shouldShowUI = [args[6] boolValue];
-        BOOL shouldRelaunchTool = [args[7] boolValue];
+        NSString *relaunchPath = args[1];
+        NSString *hostBundlePath = args[2];
+        NSString *updateDirectoryPath = args[3];
+        BOOL shouldRelaunchApp = [args[4] boolValue];
+        BOOL shouldShowUI = [args[5] boolValue];
+        BOOL shouldRelaunchTool = [args[6] boolValue];
         
         if (shouldRelaunchTool) {
             NSURL *mainBundleURL = [[NSBundle mainBundle] bundleURL];
@@ -84,7 +83,7 @@ int main(int __unused argc, const char __unused *argv[])
             }
         }
         
-        AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostPath:hostPath
+        AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostPath:hostBundlePath
                                                                relaunchPath:relaunchPath
                                                             hostProcessIdentifier:activeProcessIdentifier
                                                            updateFolderPath:updateDirectoryPath

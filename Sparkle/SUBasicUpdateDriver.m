@@ -547,7 +547,7 @@
         pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:self.updater];
     }
     
-    NSArray *launchArguments = @[[self.host bundlePath],
+    NSArray *launchArguments = @[
                                  pathToRelaunch,
                                  self.host.bundlePath,
                                  self.tempDir,
