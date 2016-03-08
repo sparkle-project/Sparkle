@@ -5,6 +5,7 @@
 #import "SUStatusController.h"
 #import "SULog.h"
 #import "SULocalizations.h"
+#import "SUFileManager.h"
 
 #include <unistd.h>
 
@@ -300,6 +301,7 @@ int main(int __unused argc, const char __unused *argv[])
             
             if (newRunningApplication == nil) {
                 SULog(@"Failed to create second instance of tool with error: %@", launchError);
+                return EXIT_FAILURE;
             }
             
             return EXIT_SUCCESS;
