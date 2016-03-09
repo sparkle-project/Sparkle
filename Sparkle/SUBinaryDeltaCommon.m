@@ -231,12 +231,12 @@ BOOL modifyPermissions(NSString *path, mode_t desiredPermissions)
     if (!attributes) {
         return NO;
     }
-    NSNumber *permissions = attributes[NSFilePosixPermissions];
+    NSNumber *permissions = [attributes objectForKey:NSFilePosixPermissions];
     if (!permissions) {
         return NO;
     }
     mode_t newMode = ([permissions unsignedShortValue] & ~PERMISSION_FLAGS) | desiredPermissions;
-    int (*changeModeFunc)(const char *, mode_t) = [attributes[NSFileType] isEqualToString:NSFileTypeSymbolicLink] ? lchmod : chmod;
+    int (*changeModeFunc)(const char *, mode_t) = [[attributes objectForKey:NSFileType] isEqualToString:NSFileTypeSymbolicLink] ? lchmod : chmod;
     if (changeModeFunc([path fileSystemRepresentation], newMode) != 0) {
         return NO;
     }
