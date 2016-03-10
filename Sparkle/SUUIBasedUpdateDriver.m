@@ -120,12 +120,17 @@
     [super extractUpdate];
 }
 
-- (void)unarchiver:(SUUnarchiver *)__unused ua extractedProgress:(double)progress
+- (void)unarchiverExtractedProgress:(double)progress
 {
     [self.updater.userDriver showExtractionReceivedProgress:progress];
 }
 
-- (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
+- (void)installerDidStart
+{
+    [self.updater.userDriver showInstallingUpdate];
+}
+
+- (void)installerIsReadyForRelaunch
 {
     if (self.automaticallyInstallUpdates) {
         [self installWithToolAndRelaunch:YES];
@@ -148,8 +153,7 @@
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch
 {
-    [self.updater.userDriver showInstallingUpdate];
-    
+    //[self.updater.userDriver showInstallingUpdate];
     [super installWithToolAndRelaunch:relaunch];
 }
 

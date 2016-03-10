@@ -23,7 +23,8 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification __unused *)notification
 {
-    [self.appInstaller installAfterHostTermination];
+    //[self.appInstaller installAfterHostTermination];
+    [self.appInstaller extractUpdate];
 }
 
 @end
@@ -40,8 +41,8 @@ int main(int __unused argc, const char __unused *argv[])
         NSString *relaunchPath = args[1];
         NSString *hostBundlePath = args[2];
         NSString *updateDirectoryPath = args[3];
-        BOOL shouldRelaunchApp = [args[4] boolValue];
-        BOOL shouldShowUI = [args[5] boolValue];
+        NSString *downloadPath = args[4];
+        NSString *dsaSignature = args[5];
         BOOL shouldRelaunchTool = [args[6] boolValue];
         
         if (shouldRelaunchTool) {
@@ -83,12 +84,14 @@ int main(int __unused argc, const char __unused *argv[])
             }
         }
         
-        AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostPath:hostBundlePath
-                                                               relaunchPath:relaunchPath
-                                                            hostProcessIdentifier:activeProcessIdentifier
-                                                           updateFolderPath:updateDirectoryPath
-                                                             shouldRelaunch:shouldRelaunchApp
-                                                               shouldShowUI:shouldShowUI];
+        AppInstaller *appInstaller =
+        [[AppInstaller alloc]
+         initWithHostPath:hostBundlePath
+         relaunchPath:relaunchPath
+         hostProcessIdentifier:activeProcessIdentifier
+         updateFolderPath:updateDirectoryPath
+         downloadPath:downloadPath
+         dsaSignature:dsaSignature];
         
         AppDelegate *delegate = [[AppDelegate alloc] initWithAppInstaller:appInstaller];
         [application setDelegate:delegate];

@@ -14,6 +14,10 @@
 #import "SUHost.h"
 #import "SULocalizations.h"
 #import "SUStandardVersionComparator.h"
+#import "SUDSAVerifier.h"
+#import "SUCodeSigningVerifier.h"
+#import "SURemoteMessagePort.h"
+#import "SULocalMessagePort.h"
 
 /*!
  * If the Installation takes longer than this time the Application Icon is shown in the Dock so that the user has some feedback.
@@ -32,8 +36,12 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 @property (nonatomic, strong) TerminationListener *terminationListener;
 @property (nonatomic, strong) SUStatusController *statusController;
 
+@property (nonatomic) SUHost *host;
+@property (nonatomic) SULocalMessagePort *localPort;
+@property (nonatomic) SURemoteMessagePort *remotePort;
 @property (nonatomic, copy) NSString *updateFolderPath;
-@property (nonatomic, copy) NSString *hostPath;
+@property (nonatomic, copy) NSString *downloadPath;
+@property (nonatomic, copy) NSString *dsaSignature;
 @property (nonatomic, copy) NSString *relaunchPath;
 @property (nonatomic, assign) BOOL shouldRelaunch;
 @property (nonatomic, assign) BOOL shouldShowUI;
@@ -46,8 +54,12 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 
 @synthesize terminationListener = _terminationListener;
 @synthesize statusController = _statusController;
+@synthesize localPort = _localPort;
+@synthesize remotePort = _remotePort;
+@synthesize host = _host;
 @synthesize updateFolderPath = _updateFolderPath;
-@synthesize hostPath = _hostPath;
+@synthesize downloadPath = _downloadPath;
+@synthesize dsaSignature = _dsaSignature;
 @synthesize relaunchPath = _relaunchPath;
 @synthesize shouldRelaunch = _shouldRelaunch;
 @synthesize shouldShowUI = _shouldShowUI;
@@ -57,24 +69,231 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
  * hostPath - path to host (original) application
  * relaunchPath - path to what the host wants to relaunch (default is same as hostPath)
  * hostProcessIdentifier - process identifier of the host before launching us
- * updateFolderPath - path to update folder (i.e, temporary directory containing the new update)
+ * updateFolderPath - path to update folder (i.e, temporary directory containing the new update archive)
+ * downloadPath - path to new downloaded update archive
  * shouldRelaunch - indicates if the new installed app should re-launched
  * shouldShowUI - indicates if we should show the status window when installing the update
  */
-- (instancetype)initWithHostPath:(NSString *)hostPath relaunchPath:(NSString *)relaunchPath hostProcessIdentifier:(NSNumber *)hostProcessIdentifier updateFolderPath:(NSString *)updateFolderPath shouldRelaunch:(BOOL)shouldRelaunch shouldShowUI:(BOOL)shouldShowUI
+- (instancetype)initWithHostPath:(NSString *)hostPath relaunchPath:(NSString *)relaunchPath hostProcessIdentifier:(NSNumber *)hostProcessIdentifier updateFolderPath:(NSString *)updateFolderPath downloadPath:(NSString *)downloadPath dsaSignature:(NSString *)dsaSignature
 {
     if (!(self = [super init])) {
         return nil;
     }
     
-    self.hostPath = hostPath;
+    NSBundle *bundle = [NSBundle bundleWithPath:hostPath];
+    self.host = [[SUHost alloc] initWithBundle:bundle];
+    
     self.relaunchPath = relaunchPath;
     self.terminationListener = [[TerminationListener alloc] initWithProcessIdentifier:hostProcessIdentifier];
     self.updateFolderPath = updateFolderPath;
-    self.shouldRelaunch = shouldRelaunch;
-    self.shouldShowUI = shouldShowUI;
+    self.downloadPath = downloadPath;
+    self.dsaSignature = dsaSignature;
+    
+    NSBundle *hostBundle = [NSBundle bundleWithPath:hostPath];
+    NSString *serviceName = [NSString stringWithFormat:@"%@-sparkle-updater", hostBundle.bundleIdentifier];
+    
+    self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:serviceName invalidationCallback:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (self.remotePort != nil) {
+                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            }
+        });
+    }];
+    
+    if (self.remotePort == nil) {
+        SULog(@"We have failed you!!");
+        [self cleanupAndExitWithStatus:EXIT_FAILURE];
+    }
     
     return self;
+}
+
+/**
+ * If the update is a package, then it must be signed using DSA. No other verification is done.
+ *
+ * If the update is a bundle, then it must meet any one of:
+ *
+ *  * old and new DSA public keys are the same and valid (it allows change of Code Signing identity), or
+ *
+ *  * old and new Code Signing identity are the same and valid
+ *
+ */
+- (BOOL)validateUpdateForHost:(SUHost *)host downloadedToPath:(NSString *)downloadedPath extractedToPath:(NSString *)extractedPath DSASignature:(NSString *)DSASignature
+{
+    BOOL isPackage = NO;
+    NSString *installSourcePath = [SUInstaller installSourcePathInUpdateFolder:extractedPath forHost:host isPackage:&isPackage isGuided:NULL];
+    if (installSourcePath == nil) {
+        SULog(@"No suitable install is found in the update. The update will be rejected.");
+        return NO;
+    }
+    
+    NSString *publicDSAKey = host.publicDSAKey;
+    
+    // Modern packages are not distributed as bundles and are code signed differently than regular applications
+    if (isPackage) {
+        if (nil == publicDSAKey) {
+            SULog(@"The existing app bundle does not have a DSA key, so it can't verify installer packages.");
+        }
+        
+        BOOL packageValidated = [SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey];
+        
+        if (!packageValidated) {
+            SULog(@"DSA signature validation of the package failed. The update contains an installer package, and valid DSA signatures are mandatory for all installer packages. The update will be rejected. Sign the installer with a valid DSA key or use an .app bundle update instead.");
+        }
+        
+        return packageValidated;
+    }
+    
+    NSBundle *newBundle = [NSBundle bundleWithPath:installSourcePath];
+    if (newBundle == nil) {
+        SULog(@"No suitable bundle is found in the update. The update will be rejected.");
+        return NO;
+    }
+    
+    SUHost *newHost = [[SUHost alloc] initWithBundle:newBundle];
+    NSString *newPublicDSAKey = newHost.publicDSAKey;
+    
+    BOOL dsaKeysMatch = (publicDSAKey == nil || newPublicDSAKey == nil) ? NO : [publicDSAKey isEqualToString:newPublicDSAKey];
+    
+    if (newPublicDSAKey != nil) {
+        if (![SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:newPublicDSAKey]) {
+            SULog(@"DSA signature validation failed. The update has a public DSA key and is signed with a DSA key, but the %@ doesn't match the signature. The update will be rejected.",
+                  dsaKeysMatch ? @"public key" : @"new public key shipped with the update");
+            return NO;
+        }
+    }
+    
+    BOOL updateIsCodeSigned = [SUCodeSigningVerifier applicationAtPathIsCodeSigned:installSourcePath];
+    
+    if (dsaKeysMatch) {
+        NSError *error = nil;
+        if (updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtPath:installSourcePath error:&error]) {
+            SULog(@"The update archive has a valid DSA signature, but the app is also signed with Code Signing, which is corrupted: %@. The update will be rejected.", error);
+            return NO;
+        }
+    } else {
+        NSString *hostBundlePath = host.bundlePath;
+        BOOL hostIsCodeSigned = [SUCodeSigningVerifier applicationAtPathIsCodeSigned:hostBundlePath];
+        
+        NSString *dsaStatus = newPublicDSAKey ? @"has a new DSA key that doesn't match the previous one" : (publicDSAKey ? @"removes the DSA key" : @"isn't signed with a DSA key");
+        if (!hostIsCodeSigned || !updateIsCodeSigned) {
+            NSString *acsStatus = !hostIsCodeSigned ? @"old app hasn't been signed with app Code Signing" : @"new app isn't signed with app Code Signing";
+            SULog(@"The update archive %@, and the %@. At least one method of signature verification must be valid. The update will be rejected.", dsaStatus, acsStatus);
+            return NO;
+        }
+        
+        NSError *error = nil;
+        if (![SUCodeSigningVerifier codeSignatureAtPath:hostBundlePath matchesSignatureAtPath:installSourcePath error:&error]) {
+            SULog(@"The update archive %@, and the app is signed with a new Code Signing identity that doesn't match code signing of the original app: %@. At least one method of signature verification must be valid. The update will be rejected.", dsaStatus, error);
+            return NO;
+        }
+    }
+    
+    return YES;
+}
+
+- (void)extractUpdate
+{
+#warning passing nothing for password atm
+    SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:self.host.bundlePath withPassword:nil];
+    
+    if (!unarchiver) {
+        SULog(@"Error: No valid unarchiver for %@!", self.downloadPath);
+        [self unarchiverDidFail:nil];
+    } else {
+        unarchiver.delegate = self;
+        [unarchiver start];
+    }
+}
+
+- (void)unarchiver:(SUUnarchiver *)__unused unarchiver extractedProgress:(double)progress
+{
+    NSData *data = [NSData dataWithBytes:&progress length:sizeof(progress)];
+    if (![self.remotePort sendMessageWithIdentifier:1 data:data]) {
+        NSLog(@"Error sending extracted progress");
+    }
+}
+
+- (void)unarchiverDidFail:(SUUnarchiver *)__unused unarchiver
+{
+    NSLog(@"Unarchiving completely failed!");
+    if (![self.remotePort sendMessageWithIdentifier:3 data:[NSData data]]) {
+        NSLog(@"Error sending extracted progress");
+    }
+}
+
+- (void)unarchiverDidFinish:(SUUnarchiver *)__unused unarchiver
+{
+    BOOL validationSuccess = [self validateUpdateForHost:self.host downloadedToPath:self.downloadPath extractedToPath:self.updateFolderPath DSASignature:self.dsaSignature];
+    uint8_t success = (uint8_t)validationSuccess;
+    
+    NSData *validationData = [NSData dataWithBytes:&success length:sizeof(success)];
+    if (![self.remotePort sendMessageWithIdentifier:2 data:validationData]) {
+        NSLog(@"Error sending validation success");
+    }
+    
+    if (!validationSuccess) {
+        [self cleanupAndExitWithStatus:EXIT_FAILURE];
+    } else {
+        // start listening now
+        NSString *serviceName = [NSString stringWithFormat:@"%@-sparkle-installer", self.host.bundle.bundleIdentifier];
+        
+        self.localPort =
+        [[SULocalMessagePort alloc]
+         initWithServiceName:serviceName
+         messageCallback:^(int32_t identifier, NSData * _Nonnull data) {
+             dispatch_async(dispatch_get_main_queue(), ^{
+                 [self handleMessageWithIdentifier:identifier data:data];
+             });
+         }
+         invalidationCallback:^{
+             dispatch_async(dispatch_get_main_queue(), ^{
+                 if (self.localPort != nil) {
+                     [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                 }
+             });
+         }];
+        
+        if (self.localPort == nil) {
+            SULog(@"We failed to create local port!");
+            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+        }
+        
+        if (![self.remotePort sendMessageWithIdentifier:4 data:[NSData data]]) {
+            NSLog(@"Error sending wait-reply");
+            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+        } else {
+            [self.remotePort invalidate];
+            self.remotePort = nil;
+        }
+    }
+}
+
+- (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
+{
+    BOOL shouldExit = YES;
+    
+    if (identifier == 1 && data.length == sizeof(uint8_t) * 3) {
+        uint8_t response = *(const uint8_t *)data.bytes;
+        if (response == 1) {
+            shouldExit = NO;
+            
+            [self.localPort invalidate];
+            self.localPort = nil;
+            
+            uint8_t relaunch = *((const uint8_t *)data.bytes + 1);
+            uint8_t showsUI = *((const uint8_t *)data.bytes + 2);
+            
+            self.shouldRelaunch = (BOOL)relaunch;
+            self.shouldShowUI = (BOOL)showsUI;
+            
+            [self installAfterHostTermination];
+        }
+    }
+    
+    if (shouldExit) {
+        [self cleanupAndExitWithStatus:EXIT_FAILURE];
+    }
 }
 
 - (void)installAfterHostTermination
@@ -84,18 +303,18 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         
         if (!success) {
             // We should just give up now - should we show an alert though??
-            SULog(@"Timed out waiting for target to terminate. Target path is %@", self.hostPath);
-            [self cleanupAndExit];
+            SULog(@"Timed out waiting for target to terminate. Target path is %@", self.host.bundlePath);
+            [self cleanupAndExitWithStatus:EXIT_FAILURE];
         } else {
-            if (self.shouldShowUI) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUInstallationTimeLimit * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    if (!self.isTerminating) {
-                        // Show app icon in the dock
-                        ProcessSerialNumber psn = { 0, kCurrentProcess };
-                        TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-                    }
-                });
-            }
+//            if (self.shouldShowUI) {
+//                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUInstallationTimeLimit * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//                    if (!self.isTerminating) {
+//                        // Show app icon in the dock
+//                        ProcessSerialNumber psn = { 0, kCurrentProcess };
+//                        TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+//                    }
+//                });
+//            }
             
             [self install];
         }
@@ -104,39 +323,37 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 
 - (void)install
 {
-    NSBundle *theBundle = [NSBundle bundleWithPath:self.hostPath];
-    SUHost *host = [[SUHost alloc] initWithBundle:theBundle];
-    NSString *installationPath = [[host installationPath] copy];
+    NSString *installationPath = [[self.host installationPath] copy];
     
-    if (self.shouldShowUI) {
-        self.statusController = [[SUStatusController alloc] initWithHost:host];
-        [self.statusController setButtonTitle:SULocalizedString(@"Cancel Update", @"") target:nil action:Nil isDefault:NO];
-        [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"")
-                                   maxProgressValue: 0 statusText: @""];
-        [self.statusController showWindow:self];
-        [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
-    }
+//    if (self.shouldShowUI) {
+//        self.statusController = [[SUStatusController alloc] initWithHost:self.host];
+//        [self.statusController setButtonTitle:SULocalizedString(@"Cancel Update", @"") target:nil action:Nil isDefault:NO];
+//        [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"")
+//                                   maxProgressValue: 0 statusText: @""];
+//        [self.statusController showWindow:self];
+//        [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+//    }
     
     [SUInstaller
      installFromUpdateFolder:self.updateFolderPath
-     overHost:host
+     overHost:self.host
      installationPath:installationPath
      versionComparator:[SUStandardVersionComparator defaultComparator]
      completionHandler:^(NSError *error) {
          if (error) {
              SULog(@"Installation Error: %@", error);
-             if (self.shouldShowUI) {
-                 NSAlert *alert = [[NSAlert alloc] init];
-                 alert.messageText = @"";
-                 alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
-                 [alert runModal];
-             }
-             exit(EXIT_FAILURE);
+//             if (self.shouldShowUI) {
+//                 NSAlert *alert = [[NSAlert alloc] init];
+//                 alert.messageText = @"";
+//                 alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
+//                 [alert runModal];
+//             }
+             [self cleanupAndExitWithStatus:EXIT_FAILURE];
          } else {
              NSString *pathToRelaunch = nil;
              // If the installation path differs from the host path, we give higher precedence for it than
              // if the desired relaunch path differs from the host path
-             if (![installationPath.pathComponents isEqualToArray:self.hostPath.pathComponents] || [self.relaunchPath.pathComponents isEqualToArray:self.hostPath.pathComponents]) {
+             if (![installationPath.pathComponents isEqualToArray:self.host.bundlePath.pathComponents] || [self.relaunchPath.pathComponents isEqualToArray:self.host.bundlePath.pathComponents]) {
                  pathToRelaunch = installationPath;
              } else {
                  pathToRelaunch = self.relaunchPath;
@@ -146,8 +363,16 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
      }];
 }
 
-- (void)cleanupAndExit __attribute__((noreturn))
+- (void)cleanupAndExitWithStatus:(int)status __attribute__((noreturn))
 {
+    // It's nice to tell the other end we're invalidating
+    
+    [self.localPort invalidate];
+    self.localPort = nil;
+    
+    [self.remotePort invalidate];
+    self.remotePort = nil;
+    
     NSError *theError = nil;
     if (![[NSFileManager defaultManager] removeItemAtPath:self.updateFolderPath error:&theError]) {
         SULog(@"Couldn't remove update folder: %@.", theError);
@@ -155,7 +380,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     
     [[NSFileManager defaultManager] removeItemAtPath:[[NSBundle mainBundle] bundlePath] error:NULL];
     
-    exit(EXIT_SUCCESS);
+    exit(status);
 }
 
 - (void)cleanupAndTerminateWithPathToRelaunch:(NSString *)relaunchPath
@@ -180,10 +405,10 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         // that the updated app will be brought up front
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUTerminationTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self cleanupAndExit];
+            [self cleanupAndExitWithStatus:EXIT_SUCCESS];
         });
     } else {
-        [self cleanupAndExit];
+        [self cleanupAndExitWithStatus:EXIT_SUCCESS];
     }
 }
 

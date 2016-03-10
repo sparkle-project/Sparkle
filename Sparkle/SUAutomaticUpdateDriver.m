@@ -78,7 +78,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 // Overridden to do nothing: see -installUpdateWithTerminationStatus: as to why
 - (void)terminateApp { }
 
-- (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
+- (void)installerIsReadyForRelaunch
 {
     [self.updater.userDriver registerApplicationTermination:^(SUApplicationTerminationStatus terminationStatus) {
         // We use -performSelectorOnMainThread:withObject:waitUntilDone: rather than GCD because if we are on the main thread already,

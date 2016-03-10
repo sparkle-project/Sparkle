@@ -12,7 +12,7 @@
 #import <Foundation/Foundation.h>
 #import "SUBasicUpdateDriver.h"
 
-@interface SUAutomaticUpdateDriver : SUBasicUpdateDriver <SUUnarchiverDelegate>
+@interface SUAutomaticUpdateDriver : SUBasicUpdateDriver
 
 @end
 

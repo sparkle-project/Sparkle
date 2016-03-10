@@ -14,7 +14,7 @@
 
 @class SUStatusController;
 
-@interface SUUIBasedUpdateDriver : SUBasicUpdateDriver <SUUnarchiverDelegate>
+@interface SUUIBasedUpdateDriver : SUBasicUpdateDriver
 
 - (instancetype)initWithUpdater:(SUUpdater *)updater host:(SUHost *)host;
 
