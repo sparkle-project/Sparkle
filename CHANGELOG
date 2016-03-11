@@ -1,15 +1,17 @@
-# 1.14.0
+# 1.14.0 (Mar 11, 2016)
 
+* Disable javascript by default and make it opt-in (Zorg)
 * URL-encoding of appcast URLs is preserved (Kornel Lesiński)
 * Delegate is asked for fallback updates if delta update fails (Kornel Lesiński)
+* Fixed crash on 10.7 - subscript operator not available (kleuter)
 * Fixed check of feed URL before delegate had a chance to set it (Kornel Lesiński)
 * Re-added support for password-protected dmg images (Andrew K. Boyd)
 * Added warning about ATS blocking (Kornel Lesiński)
 * Translation fixes for pt-BR. (vitu)
 * Add some Japanese lozalized strings (1024jp)
 * Made test app available in all languages #695 (LIU Dongyuan / 柳东原)
-* Removed a test resource from the framework bundle (Karl Moskowski)
 * Czech localizations update (Frantisek Erben)
+* Removed a test resource from the framework bundle (Karl Moskowski)
 * Test if the updated app is the frontmost one (Zorg)
 * UI Tests for the Test Application (Zorg)
 
