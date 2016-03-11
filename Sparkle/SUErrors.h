@@ -25,9 +25,10 @@ typedef NS_ENUM(OSStatus, SUError) {
     SURunningFromDiskImageError = 1003,
     SUUpdateRequiresNewerOSError = 1004,
 
-    // Downlaod phase errors.
+    // Download phase errors.
     SUTemporaryDirectoryError = 2000,
-    
+    SUDownloadError = 2001,
+
     // Extraction phase errors.
     SUUnarchivingError = 3000,
     SUSignatureError = 3001,
