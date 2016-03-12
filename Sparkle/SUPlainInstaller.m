@@ -13,6 +13,7 @@
 #import "SULog.h"
 #import "SUErrors.h"
 #import "SUParameterAssert.h"
+#import "SUVersionComparisonProtocol.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit

@@ -7,6 +7,8 @@
 //
 
 #import "SUPackageInstaller.h"
+#import "SUVersionComparisonProtocol.h"
+#import "SUHost.h"
 #import "SUConstants.h"
 #import "SUErrors.h"
 #import "SULog.h"

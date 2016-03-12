@@ -8,22 +8,11 @@
 
 #import <Foundation/Foundation.h>
 #import "SUVersionComparisonProtocol.h"
+#import "SUInstallerProtocol.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class SUHost;
-
-@protocol SUInstaller <NSObject>
-
-- (instancetype)initWithHost:(SUHost *)host sourcePath:(NSString *)sourcePath installationPath:(NSString *)installationPath versionComparator:(id <SUVersionComparison>)comparator;
-
-- (BOOL)startInstallation:(NSError **)error;
-
-- (BOOL)resumeInstallation:(NSError **)error;
-
-- (void)cleanup;
-
-@end
 
 @interface SUInstaller : NSObject
 

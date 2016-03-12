@@ -20,7 +20,7 @@ A guided installation can be started by applications other than the application 
 */
 
 #import <Foundation/Foundation.h>
-#import "SUInstaller.h"
+#import "SUInstallerProtocol.h"
 
 @interface SUGuidedPackageInstaller : NSObject <SUInstaller>
 

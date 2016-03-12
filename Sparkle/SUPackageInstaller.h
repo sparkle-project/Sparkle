@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SUInstaller.h"
+#import "SUInstallerProtocol.h"
 
 @interface SUPackageInstaller : NSObject <SUInstaller>
 
