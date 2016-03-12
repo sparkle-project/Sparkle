@@ -9,6 +9,7 @@
 #import <XCTest/XCTest.h>
 #import "SUConstants.h"
 #import "SUUpdater.h"
+#import "SUStandardUserDriver.h"
 
 @interface SUUpdaterTest : XCTestCase <SUUpdaterDelegate>
 @property (strong) NSOperationQueue *queue;
@@ -24,8 +25,10 @@
 {
     [super setUp];
     self.queue = [[NSOperationQueue alloc] init];
-    self.updater = [[SUUpdater alloc] init];
-    self.updater.delegate = self;
+    
+    NSBundle *mainBundle = [NSBundle mainBundle];
+    id <SUUserDriver> userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:mainBundle delegate:nil];
+    self.updater = [[SUUpdater alloc] initWithHostBundle:mainBundle userDriver:userDriver delegate:self];
 }
 
 - (void)tearDown

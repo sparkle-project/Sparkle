@@ -10,6 +10,7 @@
 #import <XCTest/XCTest.h>
 #import "SUHost.h"
 #import "SUInstaller.h"
+#import "SUInstallerProtocol.h"
 #import <unistd.h>
 
 @interface SUInstallerTest : XCTestCase
@@ -45,21 +46,38 @@
     [fm removeItemAtPath:expectedDestination error:nil];
     XCTAssertFalse([fm fileExistsAtPath:expectedDestination isDirectory:nil]);
 
-    XCTestExpectation *done = [self expectationWithDescription:@"install finished"];
+//    XCTestExpectation *done = [self expectationWithDescription:@"install finished"];
 
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     NSString *path = [bundle pathForResource:@"test.sparkle_guided" ofType:@"pkg"];
     XCTAssertNotNil(path);
 
     SUHost *host = [[SUHost alloc] initWithBundle:bundle];
-
-    [SUInstaller installFromUpdateFolder:[path stringByDeletingLastPathComponent] overHost:host installationPath:@"/tmp" versionComparator:nil completionHandler:^(NSError *error) {
-        XCTAssertNil(error);
-        XCTAssertTrue([fm fileExistsAtPath:expectedDestination isDirectory:nil]);
-        [done fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:40 handler:nil];
+    
+    NSError *installerError = nil;
+    id<SUInstaller> installer = [SUInstaller installerForHost:host updateDirectory:[path stringByDeletingLastPathComponent] versionComparator:nil error:&installerError];
+    
+    if (installer == nil) {
+        XCTFail("Installer is nil with error: %@", installerError);
+        return;
+    }
+    
+    NSError *startInstallationError = nil;
+    if (![installer startInstallation:&startInstallationError]) {
+        XCTFail("Starting installation failed with error: %@", startInstallationError);
+        return;
+    }
+    
+    NSError *resumeInstallationError = nil;
+    if (![installer resumeInstallation:&resumeInstallationError]) {
+        XCTFail("Resuming installation failed with error: %@", resumeInstallationError);
+        return;
+    }
+    
+    [installer cleanup];
+    
+    XCTAssertTrue([fm fileExistsAtPath:expectedDestination isDirectory:nil]);
+    
     [fm removeItemAtPath:expectedDestination error:nil];
 }
 #endif
