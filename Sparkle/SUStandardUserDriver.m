@@ -52,8 +52,8 @@
     if (self != nil) {
         _host = [[SUHost alloc] initWithBundle:hostBundle];
         _delegate = delegate;
-        _coreComponent = [[SUUserDriverCoreComponent alloc] initWithUserDriver:self delegate:delegate];
-        _uiComponent = [[SUUserDriverUIComponent alloc] initWithUserDriver:self delegate:delegate];
+        _coreComponent = [[SUUserDriverCoreComponent alloc] initWithDelegate:delegate];
+        _uiComponent = [[SUUserDriverUIComponent alloc] initWithDelegate:delegate];
     }
     return self;
 }
@@ -149,8 +149,8 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         id <SUVersionDisplay> versionDisplayer = nil;
-        if ([self.delegate respondsToSelector:@selector(versionDisplayerForUserDriver:)]) {
-            versionDisplayer = [self.delegate versionDisplayerForUserDriver:self];
+        if ([self.delegate respondsToSelector:@selector(versionDisplayer)]) {
+            versionDisplayer = [self.delegate versionDisplayer];
         }
         
         __weak SUStandardUserDriver *weakSelf = self;
@@ -279,8 +279,8 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         id <SUStandardUserDriverDelegate> delegate = self.delegate;
         
-        if ([delegate respondsToSelector:@selector(userDriverWillShowModalAlert:)]) {
-            [delegate userDriverWillShowModalAlert:self];
+        if ([delegate respondsToSelector:@selector(userDriverWillShowModalAlert)]) {
+            [delegate userDriverWillShowModalAlert];
         }
         
         // When showing a modal alert we need to ensure that background applications
@@ -290,8 +290,8 @@
         [alert setIcon:[SUApplicationInfo bestIconForBundle:self.host.bundle]];
         [alert runModal];
         
-        if ([delegate respondsToSelector:@selector(userDriverDidShowModalAlert:)]) {
-            [delegate userDriverDidShowModalAlert:self];
+        if ([delegate respondsToSelector:@selector(userDriverDidShowModalAlert)]) {
+            [delegate userDriverDidShowModalAlert];
         }
     });
 }

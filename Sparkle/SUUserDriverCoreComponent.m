@@ -9,15 +9,12 @@
 #import "SUUserDriverCoreComponent.h"
 #import "SUStandardUserDriverDelegate.h"
 #import "SUStandardUserDriverRemoteDelegate.h"
-#import "SUUserDriver.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
 #endif
 
 @interface SUUserDriverCoreComponent ()
-
-@property (nonatomic, weak, readonly) id<SUUserDriver> userDriver;
 
 @property (nonatomic) BOOL idlesOnUpdateChecks;
 @property (nonatomic) BOOL updateInProgress;
@@ -34,7 +31,6 @@
 
 @implementation SUUserDriverCoreComponent
 
-@synthesize userDriver = _userDriver;
 @synthesize delegate = _delegate;
 @synthesize idlesOnUpdateChecks = _idlesOnUpdateChecks;
 @synthesize updateInProgress = _updateInProgress;
@@ -47,11 +43,10 @@
 
 #pragma mark Birth
 
-- (instancetype)initWithUserDriver:(id<SUUserDriver>)userDriver delegate:(id<SUStandardUserDriverDelegate>)delegate
+- (instancetype)initWithDelegate:(id<SUStandardUserDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
-        _userDriver = userDriver;
         _delegate = delegate;
     }
     return self;
@@ -74,8 +69,8 @@
 - (BOOL)isDelegateResponsibleForUpdateChecking
 {
     BOOL result = NO;
-    if ([self.delegate respondsToSelector:@selector(responsibleForInitiatingUpdateCheckForUserDriver:)]) {
-        result = [self.delegate responsibleForInitiatingUpdateCheckForUserDriver:self.userDriver];
+    if ([self.delegate respondsToSelector:@selector(responsibleForInitiatingUpdateCheck)]) {
+        result = [self.delegate responsibleForInitiatingUpdateCheck];
     }
     return result;
 }
@@ -88,10 +83,10 @@
 - (void)checkForUpdates:(NSTimer *)__unused timer
 {
     if ([self isDelegateResponsibleForUpdateChecking]) {
-        if ([self.delegate respondsToSelector:@selector(initiateUpdateCheckForUserDriver:)]) {
-            [self.delegate initiateUpdateCheckForUserDriver:self.userDriver];
+        if ([self.delegate respondsToSelector:@selector(initiateUpdateCheck)]) {
+            [self.delegate initiateUpdateCheck];
         } else {
-            NSLog(@"Error: Delegate %@ for user driver %@ must implement initiateUpdateCheckForUserDriver: because it returned YES from responsibleForInitiatingUpdateCheckForUserDriver:", self.delegate, self);
+            NSLog(@"Error: Delegate %@ for user driver %@ must implement initiateUpdateCheck because it returned YES from responsibleForInitiatingUpdateCheck", self.delegate, self);
         }
     } else {
         if (self.checkForUpdatesReply != nil) {

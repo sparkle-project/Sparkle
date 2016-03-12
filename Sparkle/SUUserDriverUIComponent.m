@@ -9,11 +9,8 @@
 #import "SUUserDriverUIComponent.h"
 #import "SUStandardUserDriverDelegate.h"
 #import "SUStandardUserDriverRemoteDelegate.h"
-#import "SUUserDriver.h"
 
 @interface SUUserDriverUIComponent ()
-
-@property (nonatomic, weak, readonly) id<SUUserDriver> userDriver;
 
 @property (nonatomic) BOOL installingUpdateOnTermination;
 @property (nonatomic) BOOL askedHandlingTermination;
@@ -26,7 +23,6 @@
 
 @implementation SUUserDriverUIComponent
 
-@synthesize userDriver = _userDriver;
 @synthesize delegate = _delegate;
 @synthesize installingUpdateOnTermination = _installingUpdateOnTermination;
 @synthesize askedHandlingTermination = _askedHandlingTermination;
@@ -36,11 +32,10 @@
 
 #pragma mark Birth
 
-- (instancetype)initWithUserDriver:(id<SUUserDriver>)userDriver delegate:(id<SUStandardUserDriverDelegate>)delegate
+- (instancetype)initWithDelegate:(id<SUStandardUserDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
-        _userDriver = userDriver;
         _delegate = delegate;
     }
     return self;
@@ -51,8 +46,8 @@
 - (BOOL)handlesTermination
 {
     if (!self.askedHandlingTermination) {
-        if ([self.delegate respondsToSelector:@selector(responsibleForSignalingApplicationTerminationForUserDriver:)]) {
-            _handlesTermination = ![self.delegate responsibleForSignalingApplicationTerminationForUserDriver:self.userDriver];
+        if ([self.delegate respondsToSelector:@selector(responsibleForSignalingApplicationTermination)]) {
+            _handlesTermination = ![self.delegate responsibleForSignalingApplicationTermination];
         } else {
             _handlesTermination = YES;
         }

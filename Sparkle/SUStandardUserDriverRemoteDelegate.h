@@ -10,8 +10,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol SUUserDriver;
-
 /*!
  A delegate protocol for Sparkle's standard user driver related to efficiency and reliablity when Sparkle's updater lives in a separate process
  */
@@ -28,25 +26,21 @@ NS_ASSUME_NONNULL_BEGIN
  having a delegate implement this can be more efficient for the system and therefore is encouraged.
  
  @return Returns if the delegate is responsible for initiating update checks. If the delegate returns YES,
- then the delegate must also implement -initiateUpdateCheckForUserDriver: which is when the delegate should
+ then the delegate must also implement -initiateUpdateCheck which is when the delegate should
  initiate update checks.
- 
- @param userDriver The user driver instance.
  */
-- (BOOL)responsibleForInitiatingUpdateCheckForUserDriver:(id <SUUserDriver>)userDriver;
+- (BOOL)responsibleForInitiatingUpdateCheck;
 
 /*!
  Called when user driver tells the delegate to initiate an update check
  
- This is called if the delegate returned YES from -responsibleForInitiatingUpdateCheckForUserDriver:
+ This is called if the delegate returned YES from -responsibleForInitiatingUpdateCheck
  
  The delegate will have to find a pathway to tell the SUUpdater instance to check for updates, that
- does not go through the user driver. See -responsibleForInitiatingUpdateCheckForUserDriver: as to why
+ does not go through the user driver. See -responsibleForInitiatingUpdateCheck as to why
  a delegate may want to implement this.
- 
- @param userDriver The user driver instance.
  */
-- (void)initiateUpdateCheckForUserDriver:(id <SUUserDriver>)userDriver;
+- (void)initiateUpdateCheck;
 
 /*!
  Asks whether or not the delegate is responsible for letting the user driver know when the application is about to terminate
@@ -54,10 +48,8 @@ NS_ASSUME_NONNULL_BEGIN
  This is necessary to implement when automatic updates are possible and when the updater and user driver live in separate processes.
  
  See -[SUStandardUserDriver sendApplicationTerminationSignal] for more details on how to follow up
- 
- @param userDriver The user driver instance.
  */
-- (BOOL)responsibleForSignalingApplicationTerminationForUserDriver:(id <SUUserDriver>)userDriver;
+- (BOOL)responsibleForSignalingApplicationTermination;
 
 @end
 

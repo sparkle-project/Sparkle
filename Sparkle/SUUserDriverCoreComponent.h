@@ -10,11 +10,10 @@
 #import "SUStatusCompletionResults.h"
 
 @protocol SUStandardUserDriverDelegate;
-@protocol SUUserDriver;
 
 @interface SUUserDriverCoreComponent : NSObject
 
-- (instancetype)initWithUserDriver:(id<SUUserDriver>)userDriver delegate:(id<SUStandardUserDriverDelegate>)delegate;
+- (instancetype)initWithDelegate:(id<SUStandardUserDriverDelegate>)delegate;
 
 @property (nonatomic, readonly, weak) id<SUStandardUserDriverDelegate> delegate;
 

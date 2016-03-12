@@ -10,8 +10,6 @@
 #import "SUStandardUserDriverDelegate.h"
 #import "SUUserDriverCoreComponent.h"
 #import "SUUserDriverUIComponent.h"
-#import "SUUserDriverCoreComponent.h"
-#import "SUUserDriverUIComponent.h"
 #import "SUInstallUpdateViewController.h"
 
 @interface SUPopUpTitlebarUserDriver()
@@ -47,8 +45,8 @@
     if (self != nil) {
         _window = window;
         _delegate = delegate;
-        _coreComponent = [[SUUserDriverCoreComponent alloc] initWithUserDriver:self delegate:delegate];
-        _uiComponent = [[SUUserDriverUIComponent alloc] initWithUserDriver:self delegate:delegate];
+        _coreComponent = [[SUUserDriverCoreComponent alloc] initWithDelegate:delegate];
+        _uiComponent = [[SUUserDriverUIComponent alloc] initWithDelegate:delegate];
     }
     return self;
 }

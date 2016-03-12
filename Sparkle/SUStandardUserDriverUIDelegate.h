@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol SUUserDriver, SUVersionDisplay;
+@protocol SUVersionDisplay;
 
 /*!
  A delegate protocol for Sparkle's standard user driver related to user interactions
@@ -22,26 +22,21 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  Called before showing a modal alert window,
  to give the opportunity to hide attached windows that may get in the way.
- 
- @param userDriver The user driver instance.
  */
-- (void)userDriverWillShowModalAlert:(id <SUUserDriver>)userDriver;
+- (void)userDriverWillShowModalAlert;
 
 /*!
  Called after showing a modal alert window,
  to give the opportunity to hide attached windows that may get in the way.
- 
- @param userDriver The user driver instance.
  */
-- (void)userDriverDidShowModalAlert:(id <SUUserDriver>)userDriver;
+- (void)userDriverDidShowModalAlert;
 
 /*!
  Returns an object that formats version numbers for display to the user.
  If you don't implement this method or return \c nil,
  the standard version formatter will be used.
- \param userDriver The user driver instance.
  */
-- (_Nullable id <SUVersionDisplay>)versionDisplayerForUserDriver:(id <SUUserDriver>)userDriver;
+- (_Nullable id <SUVersionDisplay>)versionDisplayer;
 
 @end
 

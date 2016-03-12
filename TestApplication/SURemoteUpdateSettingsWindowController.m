@@ -196,7 +196,7 @@
 
 #pragma mark App Termination
 
-- (BOOL)responsibleForSignalingApplicationTerminationForUserDriver:(id <SUUserDriver>)__unused userDriver
+- (BOOL)responsibleForSignalingApplicationTermination
 {
     return YES;
 }
@@ -210,12 +210,12 @@
 
 #pragma mark Update Checks
 
-- (BOOL)responsibleForInitiatingUpdateCheckForUserDriver:(id <SUUserDriver>)__unused userDriver
+- (BOOL)responsibleForInitiatingUpdateCheck
 {
     return YES;
 }
 
-- (void)initiateUpdateCheckForUserDriver:(id <SUUserDriver>)__unused userDriver
+- (void)initiateUpdateCheck
 {
     [self.connection.remoteObjectProxy checkForUpdates];
 }
