@@ -16,7 +16,7 @@
 
 @interface SUAppcastItem ()
 @property (copy, readwrite) NSString *title;
-@property (copy, readwrite) NSDate *date;
+@property (copy, readwrite) NSString *dateString;
 @property (copy, readwrite) NSString *itemDescription;
 @property (strong, readwrite) NSURL *releaseNotesURL;
 @property (copy, readwrite) NSString *DSASignature;
@@ -31,7 +31,7 @@
 @end
 
 @implementation SUAppcastItem
-@synthesize date;
+@synthesize dateString;
 @synthesize deltaUpdates;
 @synthesize displayVersionString;
 @synthesize DSASignature;
@@ -104,7 +104,7 @@
 
         propertiesDictionary = [[NSMutableDictionary alloc] initWithDictionary:dict];
         self.title = dict[SURSSElementTitle];
-        self.date = dict[SURSSElementPubDate];
+        self.dateString = dict[SURSSElementPubDate];
         self.itemDescription = dict[SURSSElementDescription];
 
         NSString *theInfoURL = dict[SURSSElementLink];
