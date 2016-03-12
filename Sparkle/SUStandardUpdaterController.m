@@ -62,8 +62,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     if (!self.initializedUpdater) {
         self.initializedUpdater = YES;
         
-        // We may not be living in the same bundle as the main bundle so we can't use that
-        // We also can't self [self class] because somebody could subclass us and could live elsewhere
+        // We may not be the same bundle as the main bundle so we can't use that
+        // We also can't use [self class] because somebody could subclass us and could live elsewhere
         NSBundle *hostBundle = [NSBundle bundleForClass:[SUStandardUpdaterController class]];
         
         id <SUUserDriver, SUStandardUserDriver> userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:self.userDriverDelegate];
