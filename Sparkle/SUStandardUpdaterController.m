@@ -61,7 +61,9 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     if (!self.awokeFromNib) {
         self.awokeFromNib = YES;
         
-        NSBundle *hostBundle = [NSBundle mainBundle];
+        // We may not be living in the same bundle as the main bundle so we can't use that
+        // We also can't self [self class] because somebody could subclass us and could live elsewhere
+        NSBundle *hostBundle = [NSBundle bundleForClass:[SUStandardUpdaterController class]];
         
         id <SUUserDriver, SUStandardUserDriver> userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:self.userDriverDelegate];
         self.updater = [[SUUpdater alloc] initWithHostBundle:hostBundle userDriver:userDriver delegate:self.updaterDelegate];
