@@ -20,7 +20,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 @property (nonatomic) SUUpdater *updater;
 @property (nonatomic) id <SUStandardUserDriver> userDriver;
-@property (nonatomic) BOOL awokeFromNib;
+@property (nonatomic) BOOL initializedUpdater;
 
 @end
 
@@ -30,7 +30,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 @synthesize userDriver = _userDriver;
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize userDriverDelegate = _userDriverDelegate;
-@synthesize awokeFromNib = _awokeFromNib;
+@synthesize initializedUpdater = _initializedUpdater;
 
 - (instancetype)initWithUpdater:(SUUpdater *)updater userDriver:(id<SUUserDriver, SUStandardUserDriver>)userDriver
 {
@@ -38,6 +38,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     if (self != nil) {
         self.updater = updater;
         self.userDriver = userDriver;
+        self.initializedUpdater = YES;
     }
     return self;
 }
@@ -57,9 +58,9 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 {
     // awakeFromNib might be called more than once; guard against that
     // We have to use awakeFromNib otherwise the delegate outlets may not be connected yet,
-    // and we aren't a proper window or view controller or anything like that
-    if (!self.awokeFromNib) {
-        self.awokeFromNib = YES;
+    // and we aren't a proper window or view controller, so we don't have a proper "did load" point
+    if (!self.initializedUpdater) {
+        self.initializedUpdater = YES;
         
         // We may not be living in the same bundle as the main bundle so we can't use that
         // We also can't self [self class] because somebody could subclass us and could live elsewhere
