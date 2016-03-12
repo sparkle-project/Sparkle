@@ -11,6 +11,7 @@
 #import "SUHost.h"
 #import "SUInstaller.h"
 #import "SUInstallerProtocol.h"
+#import "SUStandardVersionComparator.h"
 #import <unistd.h>
 
 @interface SUInstallerTest : XCTestCase
@@ -46,8 +47,6 @@
     [fm removeItemAtPath:expectedDestination error:nil];
     XCTAssertFalse([fm fileExistsAtPath:expectedDestination isDirectory:nil]);
 
-//    XCTestExpectation *done = [self expectationWithDescription:@"install finished"];
-
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     NSString *path = [bundle pathForResource:@"test.sparkle_guided" ofType:@"pkg"];
     XCTAssertNotNil(path);
@@ -55,7 +54,7 @@
     SUHost *host = [[SUHost alloc] initWithBundle:bundle];
     
     NSError *installerError = nil;
-    id<SUInstaller> installer = [SUInstaller installerForHost:host updateDirectory:[path stringByDeletingLastPathComponent] versionComparator:nil error:&installerError];
+    id<SUInstaller> installer = [SUInstaller installerForHost:host updateDirectory:[path stringByDeletingLastPathComponent] versionComparator:[SUStandardVersionComparator defaultComparator] error:&installerError];
     
     if (installer == nil) {
         XCTFail("Installer is nil with error: %@", installerError);

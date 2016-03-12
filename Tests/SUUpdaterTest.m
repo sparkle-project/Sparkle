@@ -11,6 +11,63 @@
 #import "SUUpdater.h"
 #import "SUStandardUserDriver.h"
 
+// This user driver does nothing
+@interface SUUselessUserDriver : NSObject <SUUserDriver>
+
+@end
+
+@implementation SUUselessUserDriver
+
+- (void)showUpdateInProgress:(BOOL)__unused isUpdateInProgress {}
+
+- (void)idleOnUpdateChecks:(BOOL)__unused shouldIdleOnUpdateChecks {}
+
+- (void)startUpdateCheckTimerWithNextTimeInterval:(NSTimeInterval)__unused timeInterval reply:(void (^)(SUUpdateCheckTimerStatus))__unused reply {}
+
+- (void)invalidateUpdateCheckTimer {}
+
+- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))__unused reply {}
+
+- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SUUserInitiatedCheckStatus))__unused updateCheckStatusCompletion {}
+
+- (void)dismissUserInitiatedUpdateCheck {}
+
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem allowsAutomaticUpdates:(BOOL)__unused allowsAutomaticUpdates reply:(void (^)(SUUpdateAlertChoice))__unused reply {}
+
+- (void)showAutomaticUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem reply:(void (^)(SUUpdateAlertChoice))__unused reply {}
+
+- (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))__unused acknowledgement {}
+
+- (void)showUpdaterError:(NSError *)__unused error acknowledgement:(void (^)(void))__unused acknowledgement {}
+
+- (void)showDownloadInitiatedWithCompletion:(void (^)(SUDownloadUpdateStatus))__unused downloadUpdateStatusCompletion {}
+
+- (void)showDownloadDidReceiveResponse:(NSURLResponse *)__unused response {}
+
+- (void)showDownloadDidReceiveDataOfLength:(NSUInteger)__unused length {}
+
+- (void)showDownloadFinishedAndStartedExtractingUpdate {}
+
+- (void)showExtractionReceivedProgress:(double)__unused progress {}
+
+- (void)showExtractionFinishedAndReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))__unused installUpdateHandler {}
+
+- (void)showInstallingUpdate {}
+
+- (void)registerApplicationTermination:(void (^)(SUApplicationTerminationStatus))__unused applicationTerminationHandler {}
+
+- (void)unregisterApplicationTermination {}
+
+- (void)terminateApplication {}
+
+- (void)registerSystemPowerOff:(void (^)(SUSystemPowerOffStatus))__unused systemPowerOffHandler {}
+
+- (void)unregisterSystemPowerOff {}
+
+- (void)dismissUpdateInstallation {}
+
+@end
+
 @interface SUUpdaterTest : XCTestCase <SUUpdaterDelegate>
 @property (strong) NSOperationQueue *queue;
 @property (strong) SUUpdater *updater;
@@ -25,10 +82,7 @@
 {
     [super setUp];
     self.queue = [[NSOperationQueue alloc] init];
-    
-    NSBundle *mainBundle = [NSBundle mainBundle];
-    id <SUUserDriver> userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:mainBundle delegate:nil];
-    self.updater = [[SUUpdater alloc] initWithHostBundle:mainBundle userDriver:userDriver delegate:self];
+    self.updater = [[SUUpdater alloc] initWithHostBundle:[NSBundle bundleForClass:[self class]] userDriver:[[SUUselessUserDriver alloc] init] delegate:self];
 }
 
 - (void)tearDown
