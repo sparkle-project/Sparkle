@@ -6,19 +6,9 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
-#ifndef SUPACKAGEINSTALLER_H
-#define SUPACKAGEINSTALLER_H
-
 #import <Foundation/Foundation.h>
+#import "SUInstaller.h"
 
-#import "SUUpdater.h"
+@interface SUPackageInstaller : NSObject <SUInstaller>
 
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
-#import "SUVersionComparisonProtocol.h"
-#import "SUPlainInstaller.h"
-
-@interface SUPackageInstaller : SUPlainInstaller
 @end
-
-#endif

@@ -6,19 +6,33 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
-#ifndef SUINSTALLER_H
-#define SUINSTALLER_H
-
 #import <Foundation/Foundation.h>
 #import "SUVersionComparisonProtocol.h"
 
-@class SUHost;
-@interface SUInstaller : NSObject
+NS_ASSUME_NONNULL_BEGIN
 
-+ (NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr isGuided:(BOOL *)isGuidedPtr;
-+ (void)installFromUpdateFolder:(NSString *)updateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler;
-+ (void)finishInstallationToPath:(NSString *)installationPath withResult:(BOOL)result error:(NSError *)error completionHandler:(void (^)(NSError *))completionHandler;
+@class SUHost;
+
+@protocol SUInstaller <NSObject>
+
+- (instancetype)initWithHost:(SUHost *)host sourcePath:(NSString *)sourcePath installationPath:(NSString *)installationPath versionComparator:(id <SUVersionComparison>)comparator;
+
+- (BOOL)startInstallation:(NSError **)error;
+
+- (BOOL)resumeInstallation:(NSError **)error;
+
+- (void)cleanup;
 
 @end
 
-#endif
+@interface SUInstaller : NSObject
+
++ (nullable id<SUInstaller>)installerForHost:(SUHost *)host updateDirectory:(NSString *)updateDirectory versionComparator:(id <SUVersionComparison>)comparator error:(NSError **)error;
+
++ (NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr isGuided:(nullable BOOL *)isGuidedPtr;
+
++ (void)mdimportInstallationPath:(NSString *)installationPath;
+
+@end
+
+NS_ASSUME_NONNULL_END

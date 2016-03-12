@@ -212,6 +212,9 @@
 		729746451C91212400FC134E /* SURemoteMessagePort.h in Headers */ = {isa = PBXBuildFile; fileRef = 729746431C91212400FC134E /* SURemoteMessagePort.h */; };
 		729746461C91212400FC134E /* SURemoteMessagePort.m in Sources */ = {isa = PBXBuildFile; fileRef = 729746441C91212400FC134E /* SURemoteMessagePort.m */; };
 		729746471C91212400FC134E /* SURemoteMessagePort.m in Sources */ = {isa = PBXBuildFile; fileRef = 729746441C91212400FC134E /* SURemoteMessagePort.m */; };
+		729746571C936D5E00FC134E /* SUMessageTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 729746551C936D5E00FC134E /* SUMessageTypes.h */; };
+		729746581C936D5E00FC134E /* SUMessageTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 729746561C936D5E00FC134E /* SUMessageTypes.m */; };
+		729746591C936D5E00FC134E /* SUMessageTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 729746561C936D5E00FC134E /* SUMessageTypes.m */; };
 		72A450531C69A68900D67EEA /* SUUpdatePermissionPromptResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 72A450511C69A68900D67EEA /* SUUpdatePermissionPromptResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72A450541C69A68900D67EEA /* SUUpdatePermissionPromptResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 72A450521C69A68900D67EEA /* SUUpdatePermissionPromptResult.m */; };
 		72A4A2401BB6567D00E7820D /* SUFileManagerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A4A23F1BB6567D00E7820D /* SUFileManagerTest.swift */; };
@@ -719,6 +722,8 @@
 		7297463F1C9119F300FC134E /* SULocalMessagePort.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SULocalMessagePort.m; path = Sparkle/SULocalMessagePort.m; sourceTree = SOURCE_ROOT; };
 		729746431C91212400FC134E /* SURemoteMessagePort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SURemoteMessagePort.h; path = ../SURemoteMessagePort.h; sourceTree = "<group>"; };
 		729746441C91212400FC134E /* SURemoteMessagePort.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SURemoteMessagePort.m; path = ../SURemoteMessagePort.m; sourceTree = "<group>"; };
+		729746551C936D5E00FC134E /* SUMessageTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUMessageTypes.h; sourceTree = "<group>"; };
+		729746561C936D5E00FC134E /* SUMessageTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUMessageTypes.m; sourceTree = "<group>"; };
 		729F10FD1C65A9B500DFCCC5 /* ConfigUITest.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITest.xcconfig; sourceTree = "<group>"; };
 		729F10FE1C65A9B500DFCCC5 /* ConfigUITestCoverage.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestCoverage.xcconfig; sourceTree = "<group>"; };
 		729F10FF1C65A9B500DFCCC5 /* ConfigUITestDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestDebug.xcconfig; sourceTree = "<group>"; };
@@ -1106,14 +1111,14 @@
 			children = (
 				7275F9BF1B5F1F2900B1D19E /* SUFileManager.h */,
 				7275F9C01B5F1F2900B1D19E /* SUFileManager.m */,
-				767B61AA1972D488004E0C3C /* SUGuidedPackageInstaller.h */,
-				767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */,
 				618FA4FF0DAE88B40026945C /* SUInstaller.h */,
 				618FA5000DAE88B40026945C /* SUInstaller.m */,
-				618FA5200DAE8E8A0026945C /* SUPackageInstaller.h */,
-				618FA5210DAE8E8A0026945C /* SUPackageInstaller.m */,
 				618FA5030DAE8AB80026945C /* SUPlainInstaller.h */,
 				618FA5040DAE8AB80026945C /* SUPlainInstaller.m */,
+				618FA5200DAE8E8A0026945C /* SUPackageInstaller.h */,
+				618FA5210DAE8E8A0026945C /* SUPackageInstaller.m */,
+				767B61AA1972D488004E0C3C /* SUGuidedPackageInstaller.h */,
+				767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */,
 			);
 			name = Installation;
 			path = ..;
@@ -1272,6 +1277,8 @@
 				7297463F1C9119F300FC134E /* SULocalMessagePort.m */,
 				729746431C91212400FC134E /* SURemoteMessagePort.h */,
 				729746441C91212400FC134E /* SURemoteMessagePort.m */,
+				729746551C936D5E00FC134E /* SUMessageTypes.h */,
+				729746561C936D5E00FC134E /* SUMessageTypes.m */,
 			);
 			name = IPC;
 			sourceTree = "<group>";
@@ -1328,6 +1335,7 @@
 				725CB95A1C7121830064365A /* SUStandardUserDriver.h in Headers */,
 				725CB9571C7120410064365A /* SUUserDriver.h in Headers */,
 				72162B061C82C8B30013C1C5 /* SUParameterAssert.h in Headers */,
+				729746571C936D5E00FC134E /* SUMessageTypes.h in Headers */,
 				726DF88E1C84277600188804 /* SUStatusCompletionResults.h in Headers */,
 				72A450531C69A68900D67EEA /* SUUpdatePermissionPromptResult.h in Headers */,
 				611142E910FB1BE5009810AA /* bspatch.h in Headers */,
@@ -1828,6 +1836,7 @@
 				55C14F20136EF84300649790 /* SUStatusController.m in Sources */,
 				729746421C9119F300FC134E /* SULocalMessagePort.m in Sources */,
 				55C14F23136EF86700649790 /* SUSystemProfiler.m in Sources */,
+				729746591C936D5E00FC134E /* SUMessageTypes.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1938,6 +1947,7 @@
 				61B5F8EE09C4CE3C00B25A18 /* SUUpdater.m in Sources */,
 				61A354560DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.m in Sources */,
 				729746461C91212400FC134E /* SURemoteMessagePort.m in Sources */,
+				729746581C936D5E00FC134E /* SUMessageTypes.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

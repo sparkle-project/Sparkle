@@ -16,6 +16,7 @@
 #error This is a "core" class and should NOT import AppKit
 #endif
 
+#warning Remove this code - it's duplicated from SUFileManager.m; probably create another file that both classes share in common
 static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char* executablePath, AuthorizationFlags options, char* const* arguments)
 {
 	sig_t oldSigChildHandler = signal(SIGCHLD, SIG_DFL);
@@ -23,7 +24,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 	
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    /* AuthorizationExecuteWithPrivileges used to support 10.4+; should be replaced with XPC or external process */
+    // See SUFileManager.m for more details on why this deprecated function is being used
 	if (AuthorizationExecuteWithPrivileges(authorization, executablePath, options, arguments, NULL) == errAuthorizationSuccess)
 #pragma clang diagnostic pop
 	{
@@ -41,7 +42,7 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 @implementation SUGuidedPackageInstaller (SUGuidedPackageInstallerAuthentication)
 
-+ (AuthorizationRef)authorizationForExecutable:(NSString*)executablePath
+- (AuthorizationRef)authorizationForExecutable:(NSString*)executablePath
 {
 	SUParameterAssert(executablePath);
 	
@@ -95,55 +96,75 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 @end
 
+@interface SUGuidedPackageInstaller ()
+
+@property (nonatomic, readonly, copy) NSString *packagePath;
+
+@end
+
 @implementation SUGuidedPackageInstaller
 
-+ (void)performInstallationToPath:(NSString *)destinationPath fromPath:(NSString *)packagePath host:(SUHost *)__unused host versionComparator:(id<SUVersionComparison>)__unused comparator completionHandler:(void (^)(NSError *))completionHandler
+@synthesize packagePath = _packagePath;
+
+- (instancetype)initWithHost:(SUHost *)__unused host sourcePath:(NSString *)sourcePath installationPath:(NSString *)__unused installationPath versionComparator:(id <SUVersionComparison>)__unused comparator
 {
-    SUParameterAssert(packagePath);
+    self = [super init];
+    if (self != nil) {
+        _packagePath = [sourcePath copy];
+    }
+    return self;
+}
 
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+- (BOOL)startInstallation:(NSError * __autoreleasing *)__unused error
+{
+    return YES;
+}
 
-        // Preflight
-        NSString* installerPath = @"/usr/sbin/installer"; // Mac OS X 10.2+ command line installer tool
-        NSError* error = nil;
-
-        // Create authorization for installer executable
-        BOOL validInstallation = NO;
-        AuthorizationRef auth = [self authorizationForExecutable:installerPath];
-        if (auth != NULL)
-        {
-            char pathBuffer[PATH_MAX] = {0};
-            [packagePath getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)];
-
-            // Permission was granted to execute the installer with privileges
-            char * const arguments[] = {
-                "-pkg",
-                pathBuffer,
-                "-target",
-                "/",
-                NULL
-            };
-            validInstallation = AuthorizationExecuteWithPrivilegesAndWait(auth,
-                                                                          [installerPath fileSystemRepresentation],
-                                                                          kAuthorizationFlagDefaults,
-                                                                          arguments);
-            // TODO: wait for communications pipe to close via fileno & CFSocketCreateWithNative
-            AuthorizationFree(auth,kAuthorizationFlagDefaults);
+- (BOOL)resumeInstallation:(NSError * __autoreleasing *)error
+{
+    // Preflight
+    NSString* installerPath = @"/usr/sbin/installer"; // Mac OS X 10.2+ command line installer tool
+    
+    // Create authorization for installer executable
+    NSString *errorMessage = nil;
+    BOOL validInstallation = NO;
+    AuthorizationRef auth = [self authorizationForExecutable:installerPath];
+    if (auth != NULL)
+    {
+        char pathBuffer[PATH_MAX] = {0};
+        [self.packagePath getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)];
+        
+        // Permission was granted to execute the installer with privileges
+        char * const arguments[] = {
+            "-pkg",
+            pathBuffer,
+            "-target",
+            "/",
+            NULL
+        };
+        validInstallation = AuthorizationExecuteWithPrivilegesAndWait(auth,
+                                                                      [installerPath fileSystemRepresentation],
+                                                                      kAuthorizationFlagDefaults,
+                                                                      arguments);
+        // TODO: wait for communications pipe to close via fileno & CFSocketCreateWithNative
+        AuthorizationFree(auth,kAuthorizationFlagDefaults);
+        
+        if (!validInstallation) {
+            errorMessage = @"Sparkle Updater: Script authorization denied.";
         }
-        else
-        {
-            NSString* errorMessage = [NSString stringWithFormat:@"Sparkle Updater: Script authorization denied."];
-            error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
-        }
+    }
+    else
+    {
+        errorMessage = @"Sparkle Updater: Script authorization reference failed to be created.";
+    }
+    if (!validInstallation && error != NULL) {
+        *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:[NSDictionary dictionaryWithObject:errorMessage forKey:NSLocalizedDescriptionKey]];
+    }
+    return validInstallation;
+}
 
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self finishInstallationToPath:destinationPath
-                                withResult:validInstallation
-                                     error:error
-                         completionHandler:completionHandler];
-
-        });
-    });
+- (void)cleanup
+{
 }
 
 @end

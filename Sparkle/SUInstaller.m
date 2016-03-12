@@ -109,23 +109,29 @@
     return newAppDownloadPath;
 }
 
-+ (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler
++ (nullable id<SUInstaller>)installerForHost:(SUHost *)host updateDirectory:(NSString *)updateDirectory versionComparator:(id <SUVersionComparison>)comparator error:(NSError * __autoreleasing *)error
 {
     BOOL isPackage = NO;
     BOOL isGuided = NO;
-    NSString *newAppDownloadPath = [self installSourcePathInUpdateFolder:inUpdateFolder forHost:host isPackage:&isPackage isGuided:&isGuided];
-
+    NSString *newAppDownloadPath = [self installSourcePathInUpdateFolder:updateDirectory forHost:host isPackage:&isPackage isGuided:&isGuided];
+    
     if (newAppDownloadPath == nil) {
-        [self finishInstallationToPath:installationPath withResult:NO error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: @"Couldn't find an appropriate update in the downloaded package." }] completionHandler:completionHandler];
-    } else {
-        if (isPackage && isGuided) {
-            [SUGuidedPackageInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host versionComparator:comparator completionHandler:completionHandler];
-        } else if (isPackage) {
-            [SUPackageInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host versionComparator:comparator completionHandler:completionHandler];
-        } else {
-            [SUPlainInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host versionComparator:comparator completionHandler:completionHandler];
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: @"Couldn't find an appropriate update in the downloaded package." }];
         }
+        return nil;
     }
+    
+    id <SUInstaller> installer = nil;
+    if (isPackage && isGuided) {
+        installer = [SUGuidedPackageInstaller alloc];
+    } else if (isPackage) {
+        installer = [SUPackageInstaller alloc];
+    } else {
+        installer = [SUPlainInstaller alloc];
+    }
+    
+    return [installer initWithHost:host sourcePath:newAppDownloadPath installationPath:host.installationPath versionComparator:comparator];
 }
 
 + (void)mdimportInstallationPath:(NSString *)installationPath
@@ -145,23 +151,6 @@
     {
         // No big deal.
         SULog(@"Error: %@", [launchException description]);
-    }
-}
-
-+ (void)finishInstallationToPath:(NSString *)installationPath withResult:(BOOL)result error:(NSError *)error completionHandler:(void (^)(NSError *))completionHandler
-{
-    if (result) {
-        [self mdimportInstallationPath:installationPath];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            completionHandler(nil);
-        });
-    } else {
-        if (!error) {
-            error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:nil];
-        }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            completionHandler(error);
-        });
     }
 }
 

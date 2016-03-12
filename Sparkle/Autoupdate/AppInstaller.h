@@ -13,8 +13,6 @@
 
 - (instancetype)initWithHostPath:(NSString *)hostPath relaunchPath:(NSString *)relaunchPath hostProcessIdentifier:(NSNumber *)hostProcessIdentifier updateFolderPath:(NSString *)updateFolderPath downloadPath:(NSString *)downloadPath dsaSignature:(NSString *)dsaSignature;
 
-- (void)installAfterHostTermination;
-
-- (void)extractUpdate;
+- (void)extractAndInstallUpdate;
 
 @end

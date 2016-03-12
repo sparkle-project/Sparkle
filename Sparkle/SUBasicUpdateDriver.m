@@ -23,6 +23,7 @@
 #import "SUAppcastItem.h"
 #import "SULocalMessagePort.h"
 #import "SURemoteMessagePort.h"
+#import "SUMessageTypes.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -311,43 +312,34 @@
 
 - (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
 {
-    if (identifier == 1) {
+    if (identifier == SUExtractedArchiveWithProgress) {
         if (data.length == sizeof(double)) {
             double progress = *(const double *)data.bytes;
             [self unarchiverExtractedProgress:progress];
         }
-    } else if (identifier == 2) {
-        BOOL success = NO;
-        if (data.length == sizeof(uint8_t)) {
-            success = (BOOL)*(const uint8_t *)data.bytes;
+    } else if (identifier == SUInstallationStartedPreparation) {
+        [self installerDidStart];
+    } else if (identifier == SUArchiveExtractionFailed) {
+        if ([self.updateItem isDeltaUpdate]) {
+            [self failedToApplyDeltaUpdate];
+            return;
         }
         
-        if (success) {
-            [self installerDidStart];
-        } else {
-#warning put in a custom error
-            [self abortUpdate];
-        }
-    } else if (identifier == 3) {
-        [self extractingInstallDidFail];
-    } else if (identifier == 4) {
-        [self.localPort invalidate];
-        self.localPort = nil;
-        
-        NSString *serviceName = [NSString stringWithFormat:@"%@-sparkle-installer", self.host.bundle.bundleIdentifier];
-        __weak SUBasicUpdateDriver *weakSelf = self;
-        self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:serviceName invalidationCallback:^{
+        [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) }]];
+    } else if (identifier == SUInstallationFinishedPreparation) {
+        self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForHost(self.host) invalidationCallback:^{
             dispatch_async(dispatch_get_main_queue(), ^{
 #warning put in a custom error for connection closed
-                if (weakSelf.remotePort != nil) {
-                    [weakSelf abortUpdate];
+                if (self.remotePort != nil) {
+                    SULog(@"Aborting remote port");
+                    [self abortUpdate];
                 }
             });
         }];
         
         if (self.remotePort == nil) {
+            SULog(@"Remote port creation failed?!");
 #warning put in a custom error
-            SULog(@"We have failed creating remote port you!!");
             [self abortUpdate];
         } else {
             [self installerIsReadyForRelaunch];
@@ -357,34 +349,30 @@
 
 - (void)extractUpdate
 {
-    NSError *error = nil;
-    if (![self launchAutoUpdate:&error]) {
-        [self abortUpdateWithError:error];
+    self.localPort =
+    [[SULocalMessagePort alloc]
+     initWithServiceName:SUUpdateDriverServiceNameForHost(self.host)
+     messageCallback:^(int32_t identifier, NSData * _Nonnull data) {
+         dispatch_async(dispatch_get_main_queue(), ^{
+             [self handleMessageWithIdentifier:identifier data:data];
+         });
+     }
+     invalidationCallback:^{
+         dispatch_async(dispatch_get_main_queue(), ^{
+             if (self.localPort != nil) {
+#warning use a custom error
+                 [self abortUpdate];
+             }
+         });
+     }];
+    
+    if (self.localPort == nil) {
+#warning use a custom error
+        [self abortUpdate];
     } else {
-        NSString *serviceName = [NSString stringWithFormat:@"%@-sparkle-updater", self.host.bundle.bundleIdentifier];
-        
-        __weak SUBasicUpdateDriver *weakSelf = self;
-        self.localPort =
-        [[SULocalMessagePort alloc]
-         initWithServiceName:serviceName
-         messageCallback:^(int32_t identifier, NSData * _Nonnull data) {
-             dispatch_async(dispatch_get_main_queue(), ^{
-                 // Note: should not use weakSelf here
-                 [self handleMessageWithIdentifier:identifier data:data];
-             });
-         }
-         invalidationCallback:^{
-             dispatch_async(dispatch_get_main_queue(), ^{
-                 if (weakSelf.localPort != nil) {
-#warning use a custom error
-                     [weakSelf abortUpdate];
-                 }
-             });
-         }];
-        
-        if (self.localPort == nil) {
-#warning use a custom error
-            [self abortUpdate];
+        NSError *error = nil;
+        if (![self launchAutoUpdate:&error]) {
+            [self abortUpdateWithError:error];
         }
     }
 }
@@ -396,16 +384,6 @@
     self.nonDeltaUpdateItem = nil;
 
     [self downloadUpdate];
-}
-
-- (void)extractingInstallDidFail
-{
-    if ([self.updateItem isDeltaUpdate]) {
-        [self failedToApplyDeltaUpdate];
-        return;
-    }
-    
-    [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) }]];
 }
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch
@@ -581,11 +559,13 @@
     
     uint8_t response[3] = {1, (uint8_t)relaunch, (uint8_t)showUI};
     NSData *responseData = [NSData dataWithBytes:&response length:sizeof(response)];
-    if (![self.remotePort sendMessageWithIdentifier:1 data:responseData]) {
-        NSLog(@"Message failed!!");
+    if (![self.remotePort sendMessageWithIdentifier:SUResumeInstallationOnTermination data:responseData]) {
 #warning put in a custom error
         [self abortUpdate];
     } else {
+        [self.localPort invalidate];
+        self.localPort = nil;
+        
         [self.remotePort invalidate];
         self.remotePort = nil;
         

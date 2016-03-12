@@ -19,16 +19,9 @@ A guided installation can be started by applications other than the application 
 - Replace the use of `AuthorizationExecuteWithPrivilegesAndWait`. This method remains because it is well supported and tested. Ideally a helper tool or XPC would be used.
 */
 
-#ifndef SUGUIDEDPACKAGEINSTALLER_H
-#define SUGUIDEDPACKAGEINSTALLER_H
-
 #import <Foundation/Foundation.h>
 #import "SUInstaller.h"
 
-@interface SUGuidedPackageInstaller : SUInstaller
+@interface SUGuidedPackageInstaller : NSObject <SUInstaller>
 
-/*! Perform the guided installation */
-+ (void)performInstallationToPath:(NSString *)path fromPath:(NSString *)installerGuide host:(SUHost *)host versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler;
 @end
-
-#endif

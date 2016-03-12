@@ -23,8 +23,7 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification __unused *)notification
 {
-    //[self.appInstaller installAfterHostTermination];
-    [self.appInstaller extractUpdate];
+    [self.appInstaller extractAndInstallUpdate];
 }
 
 @end

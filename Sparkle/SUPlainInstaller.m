@@ -8,7 +8,6 @@
 
 #import "SUPlainInstaller.h"
 #import "SUFileManager.h"
-#import "SUCodeSigningVerifier.h"
 #import "SUConstants.h"
 #import "SUHost.h"
 #import "SULog.h"
@@ -19,10 +18,38 @@
 #error This is a "core" class and should NOT import AppKit
 #endif
 
+@interface SUPlainInstaller ()
+
+@property (nonatomic, readonly) SUHost *host;
+@property (nonatomic, readonly) id <SUVersionComparison> comparator;
+@property (nonatomic, copy, readonly) NSString *applicationPath;
+@property (nonatomic, copy, readonly) NSString *installationPath;
+
+// Properties that carry over from starting installation to resuming to cleaning up
+@property (nonatomic) SUFileManager *fileManager;
+@property (nonatomic) NSURL *installationNewTempURL; // I would name this newTempURL, but compiler warning complains at prefixing with 'new'
+@property (nonatomic) NSURL *tempOldDirectoryURL;
+@property (nonatomic) NSURL *tempNewDirectoryURL;
+@property (nonatomic) NSURL *oldURL;
+@property (nonatomic) NSURL *oldTempURL;
+
+@end
+
 @implementation SUPlainInstaller
 
+@synthesize host = _host;
+@synthesize comparator = _comparator;
+@synthesize applicationPath = _applicationPath;
+@synthesize installationPath = _installationPath;
+@synthesize fileManager = _fileManager;
+@synthesize installationNewTempURL = _installationNewTempURL;
+@synthesize tempOldDirectoryURL = _tempOldDirectoryURL;
+@synthesize tempNewDirectoryURL = _tempNewDirectoryURL;
+@synthesize oldURL = _oldURL;
+@synthesize oldTempURL = _oldTempURL;
+
 // Returns the bundle version from the specified host that is appropriate to use as a filename, or nil if we're unable to retrieve one
-+ (NSString *)bundleVersionAppropriateForFilenameFromHost:(SUHost *)host
+- (NSString *)bundleVersionAppropriateForFilenameFromHost:(SUHost *)host
 {
     NSString *bundleVersion = [host objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     NSString *trimmedVersion = @"";
@@ -37,7 +64,7 @@
     return trimmedVersion.length > 0 ? trimmedVersion : nil;
 }
 
-+ (BOOL)performInstallationToURL:(NSURL *)installationURL fromUpdateAtURL:(NSURL *)newURL withHost:(SUHost *)host error:(NSError * __autoreleasing *)error
+- (BOOL)startInstallationToURL:(NSURL *)installationURL fromUpdateAtURL:(NSURL *)newURL withHost:(SUHost *)host error:(NSError * __autoreleasing *)error
 {
     if (installationURL == nil || newURL == nil) {
         // this really shouldn't happen but just in case
@@ -93,6 +120,22 @@
         return NO;
     }
     
+    // To carry over when we resume the installation
+    self.fileManager = fileManager;
+    self.oldURL = oldURL;
+    self.installationNewTempURL = newTempURL;
+    self.tempNewDirectoryURL = tempNewDirectoryURL;
+    
+    return YES;
+}
+
+- (BOOL)resumeInstallationToURL:(NSURL *)installationURL withHost:(SUHost *)host error:(NSError * __autoreleasing *)error
+{
+    SUFileManager *fileManager = self.fileManager;
+    NSURL *newTempURL = self.installationNewTempURL;
+    NSURL *tempNewDirectoryURL = self.tempNewDirectoryURL;
+    NSURL *oldURL = self.oldURL;
+    
     if (![fileManager updateModificationAndAccessTimeOfItemAtURL:newTempURL error:error]) {
         // Not a fatal error, but a pretty unfortunate one
         SULog(@"Failed to update modification and access time of new app at %@", newTempURL.path);
@@ -145,6 +188,60 @@
         return NO;
     }
     
+    // To carry over when we clean up the installation
+    self.tempOldDirectoryURL = tempOldDirectoryURL;
+    self.oldTempURL = oldTempURL;
+    
+    return YES;
+}
+
+- (instancetype)initWithHost:(SUHost *)host sourcePath:(NSString *)sourcePath installationPath:(NSString *)installationPath versionComparator:(id <SUVersionComparison>)comparator
+{
+    self = [super init];
+    if (self != nil) {
+        _host = host;
+        _applicationPath = [sourcePath copy];
+        _installationPath = [installationPath copy];
+        _comparator = comparator;
+    }
+    return self;
+}
+
+- (BOOL)startInstallation:(NSError * __autoreleasing *)error
+{
+    BOOL allowDowngrades = SPARKLE_AUTOMATED_DOWNGRADES;
+    
+    // Prevent malicious downgrades
+    // Note that we may not be able to do this for package installations, hence this code being done here
+    if (!allowDowngrades) {
+        NSBundle *bundle = [NSBundle bundleWithPath:self.applicationPath];
+        
+        if ([self.comparator compareVersion:self.host.version toVersion:[bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]] == NSOrderedDescending) {
+            if (error != NULL) {
+                NSString *errorMessage = [NSString stringWithFormat:@"Sparkle Updater: Possible attack in progress! Attempting to \"upgrade\" from %@ to %@. Aborting update.", self.host.version, [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
+                
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
+            }
+            
+            return NO;
+        }
+    }
+    
+    return [self startInstallationToURL:[NSURL fileURLWithPath:self.installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:self.applicationPath] withHost:self.host error:error];
+}
+
+- (BOOL)resumeInstallation:(NSError * __autoreleasing *)error
+{
+    return [self resumeInstallationToURL:[NSURL fileURLWithPath:self.installationPath] withHost:self.host error:error];
+}
+
+- (void)cleanup
+{
+    SUFileManager *fileManager = self.fileManager;
+    NSURL *oldTempURL = self.oldTempURL;
+    NSURL *tempOldDirectoryURL = self.tempOldDirectoryURL;
+    NSURL *tempNewDirectoryURL = self.tempNewDirectoryURL;
+    
     // Cleanup: move the old app to the trash
     NSError *trashError = nil;
     if (![fileManager moveItemAtURLToTrash:oldTempURL error:&trashError]) {
@@ -154,34 +251,6 @@
     [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
     
     [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
-    
-    return YES;
-}
-
-+ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler
-{
-    SUParameterAssert(host);
-
-    BOOL allowDowngrades = SPARKLE_AUTOMATED_DOWNGRADES;
-
-    // Prevent malicious downgrades
-    if (!allowDowngrades) {
-        if ([comparator compareVersion:[host version] toVersion:[[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]] == NSOrderedDescending) {
-            NSString *errorMessage = [NSString stringWithFormat:@"Sparkle Updater: Possible attack in progress! Attempting to \"upgrade\" from %@ to %@. Aborting update.", [host version], [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
-            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
-            [self finishInstallationToPath:installationPath withResult:NO error:error completionHandler:completionHandler];
-            return;
-        }
-    }
-
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSError *error = nil;
-        BOOL result = [self performInstallationToURL:[NSURL fileURLWithPath:installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:path] withHost:host error:&error];
-
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self finishInstallationToPath:installationPath withResult:result error:error completionHandler:completionHandler];
-        });
-    });
 }
 
 @end
