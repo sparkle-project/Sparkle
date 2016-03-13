@@ -559,8 +559,7 @@
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
 {
     assert(self.updateItem);
-
-#warning should we try to really tell the installer to abort? If so, I need to handle this
+    
     if (![self mayUpdateAndRestart])
     {
         [self abortUpdate];
