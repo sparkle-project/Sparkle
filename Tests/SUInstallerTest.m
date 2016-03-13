@@ -39,7 +39,7 @@
 
     if (uid) {
         NSLog(@"Test must be run as root: sudo xctest -XCTest SUInstallerTest 'Sparkle Unit Tests.xctest'");
-        return;
+        return; // or just comment this line out and enter password when the auth. prompt comes up
     }
 
     NSString *expectedDestination = @"/tmp/sparklepkgtest.app";
@@ -57,19 +57,25 @@
     id<SUInstaller> installer = [SUInstaller installerForHost:host updateDirectory:[path stringByDeletingLastPathComponent] versionComparator:[SUStandardVersionComparator defaultComparator] error:&installerError];
     
     if (installer == nil) {
-        XCTFail("Installer is nil with error: %@", installerError);
+        XCTFail(@"Installer is nil with error: %@", installerError);
         return;
     }
     
-    NSError *startInstallationError = nil;
-    if (![installer startInstallation:&startInstallationError]) {
-        XCTFail("Starting installation failed with error: %@", startInstallationError);
+    NSError *firstStageError = nil;
+    if (![installer performFirstStage:&firstStageError]) {
+        XCTFail(@"First Stage failed with error: %@", firstStageError);
         return;
     }
     
-    NSError *resumeInstallationError = nil;
-    if (![installer resumeInstallation:&resumeInstallationError]) {
-        XCTFail("Resuming installation failed with error: %@", resumeInstallationError);
+    NSError *secondStageError = nil;
+    if (![installer performSecondStageAllowingUI:YES error:&secondStageError]) {
+        XCTFail(@"Second Stage failed with error: %@", secondStageError);
+        return;
+    }
+    
+    NSError *thirdStageError = nil;
+    if (![installer performThirdStage:&thirdStageError]) {
+        XCTFail(@"Third Stage failed with error: %@", thirdStageError);
         return;
     }
     
