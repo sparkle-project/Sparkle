@@ -8,10 +8,14 @@
 
 #import <Cocoa/Cocoa.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface TerminationListener : NSObject
 
-- (instancetype)initWithProcessIdentifier:(NSNumber *)processIdentifier;
+- (instancetype)initWithBundle:(NSBundle *)bundle;
 
 - (void)startListeningWithCompletion:(void (^)(BOOL))completionBlock;
 
 @end
+
+NS_ASSUME_NONNULL_END

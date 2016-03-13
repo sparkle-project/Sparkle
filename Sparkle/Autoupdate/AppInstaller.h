@@ -11,7 +11,7 @@
 
 @interface AppInstaller : NSObject <SUUnarchiverDelegate>
 
-- (instancetype)initWithHostPath:(NSString *)hostPath relaunchPath:(NSString *)relaunchPath hostProcessIdentifier:(NSNumber *)hostProcessIdentifier updateFolderPath:(NSString *)updateFolderPath downloadPath:(NSString *)downloadPath dsaSignature:(NSString *)dsaSignature;
+- (instancetype)initWithHostPath:(NSString *)hostPath relaunchPath:(NSString *)relaunchPath updateFolderPath:(NSString *)updateFolderPath downloadPath:(NSString *)downloadPath dsaSignature:(NSString *)dsaSignature;
 
 - (void)extractAndInstallUpdate;
 

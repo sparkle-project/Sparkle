@@ -8,55 +8,67 @@
 
 #import "TerminationListener.h"
 
-/*!
- * Time this app uses to recheck if the host app has already died.
- */
-static const NSTimeInterval SUParentQuitCheckInterval = .25;
-
 @interface TerminationListener ()
 
-@property (nonatomic, strong) NSNumber *processIdentifier;
-@property (nonatomic, strong) NSTimer *watchdogTimer;
+@property (nonatomic, readonly) NSRunningApplication *runningApplication;
+@property (nonatomic, copy) void (^completionBlock)(BOOL);
 
 @end
 
 @implementation TerminationListener
 
-@synthesize processIdentifier = _processIdentifier;
-@synthesize watchdogTimer = _watchdogTimer;
+@synthesize runningApplication = _runningApplication;
+@synthesize completionBlock = _completionBlock;
 
-- (instancetype)initWithProcessIdentifier:(NSNumber *)processIdentifier
+- (instancetype)initWithBundle:(NSBundle *)bundle
 {
     if (!(self = [super init])) {
         return nil;
     }
     
-    self.processIdentifier = processIdentifier;
+    NSString *bundlePath = bundle.bundlePath;
+    NSString *bundleIdentifier = bundle.bundleIdentifier;
+    
+    NSArray *runningApplications =
+        (bundleIdentifier != nil) ?
+        [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleIdentifier] :
+        [[NSWorkspace sharedWorkspace] runningApplications];
+    
+        for (NSRunningApplication *runningApplication in runningApplications) {
+            // Comparing the URLs hasn't worked well for me in practice, so I'm comparing the file paths instead
+            if ([runningApplication.bundleURL.path isEqualToString:bundlePath]) {
+                _runningApplication = runningApplication;
+                break;
+            }
+        }
     
     return self;
 }
 
 - (void)cleanupWithSuccess:(BOOL)success completion:(void (^)(BOOL))completionBlock
 {
-    [self.watchdogTimer invalidate];
-    
     completionBlock(success);
 }
 
 - (void)startListeningWithCompletion:(void (^)(BOOL))completionBlock
 {
-    BOOL alreadyTerminated = (self.processIdentifier == nil || (kill(self.processIdentifier.intValue, 0) != 0));
+    BOOL alreadyTerminated = (self.runningApplication == nil || self.runningApplication.isTerminated);
     if (alreadyTerminated) {
         [self cleanupWithSuccess:YES completion:completionBlock];
     } else {
-        self.watchdogTimer = [NSTimer scheduledTimerWithTimeInterval:SUParentQuitCheckInterval target:self selector:@selector(watchdog:) userInfo:completionBlock repeats:YES];
+        self.completionBlock = completionBlock;
+        [self.runningApplication addObserver:self forKeyPath:NSStringFromSelector(@selector(isTerminated)) options:NSKeyValueObservingOptionNew context:NULL];
     }
 }
 
-- (void)watchdog:(NSTimer *)timer
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)__unused change context:(void *)__unused context
 {
-    if ([NSRunningApplication runningApplicationWithProcessIdentifier:self.processIdentifier.intValue] == nil) {
-        [self cleanupWithSuccess:YES completion:timer.userInfo];
+    if (object == self.runningApplication && [keyPath isEqualToString:NSStringFromSelector(@selector(isTerminated))]) {
+        if (self.runningApplication.isTerminated) {
+            [self.runningApplication removeObserver:self forKeyPath:keyPath];
+            [self cleanupWithSuccess:YES completion:self.completionBlock];
+            self.completionBlock = nil;
+        }
     }
 }
 

@@ -73,26 +73,17 @@ int main(int __unused argc, const char __unused *argv[])
             return EXIT_SUCCESS;
         }
         
-        NSApplication *application = [NSApplication sharedApplication];
-        
-        NSNumber *activeProcessIdentifier = nil;
-        for (NSRunningApplication *runningApplication in [[NSWorkspace sharedWorkspace] runningApplications]) {
-            if ([runningApplication.bundleURL.path isEqual:hostBundlePath]) {
-                activeProcessIdentifier = @(runningApplication.processIdentifier);
-                break;
-            }
-        }
-        
         AppInstaller *appInstaller =
         [[AppInstaller alloc]
          initWithHostPath:hostBundlePath
          relaunchPath:relaunchPath
-         hostProcessIdentifier:activeProcessIdentifier
          updateFolderPath:updateDirectoryPath
          downloadPath:downloadPath
          dsaSignature:dsaSignature];
         
         AppDelegate *delegate = [[AppDelegate alloc] initWithAppInstaller:appInstaller];
+        
+        NSApplication *application = [NSApplication sharedApplication];
         [application setDelegate:delegate];
         [application run];
     }

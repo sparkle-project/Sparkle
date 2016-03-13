@@ -81,7 +81,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
  * shouldRelaunch - indicates if the new installed app should re-launched
  * shouldShowUI - indicates if we should show the status window when installing the update
  */
-- (instancetype)initWithHostPath:(NSString *)hostPath relaunchPath:(NSString *)relaunchPath hostProcessIdentifier:(NSNumber *)hostProcessIdentifier updateFolderPath:(NSString *)updateFolderPath downloadPath:(NSString *)downloadPath dsaSignature:(NSString *)dsaSignature
+- (instancetype)initWithHostPath:(NSString *)hostPath relaunchPath:(NSString *)relaunchPath updateFolderPath:(NSString *)updateFolderPath downloadPath:(NSString *)downloadPath dsaSignature:(NSString *)dsaSignature
 {
     if (!(self = [super init])) {
         return nil;
@@ -91,7 +91,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     self.host = [[SUHost alloc] initWithBundle:bundle];
     
     self.relaunchPath = relaunchPath;
-    self.terminationListener = [[TerminationListener alloc] initWithProcessIdentifier:hostProcessIdentifier];
+    self.terminationListener = [[TerminationListener alloc] initWithBundle:bundle];
     self.updateFolderPath = updateFolderPath;
     self.downloadPath = downloadPath;
     self.dsaSignature = dsaSignature;
