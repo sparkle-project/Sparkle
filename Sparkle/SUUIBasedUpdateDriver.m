@@ -160,7 +160,6 @@
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch
 {
-    //[self.updater.userDriver showInstallingUpdate];
     [super installWithToolAndRelaunch:relaunch];
 }
 

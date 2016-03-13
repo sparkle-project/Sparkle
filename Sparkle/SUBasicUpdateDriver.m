@@ -578,15 +578,6 @@
             return;
         }
     }
-
-    if ([self.updaterDelegate respondsToSelector:@selector(updater:willInstallUpdate:)]) {
-        [self.updaterDelegate updater:self.updater willInstallUpdate:self.updateItem];
-    }
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-    if ([self.updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)]) {
-        [self.updaterDelegate updaterWillRelaunchApplication:self.updater];
-    }
     
     uint8_t response[2] = {(uint8_t)relaunch, (uint8_t)showUI};
     NSData *responseData = [NSData dataWithBytes:response length:sizeof(response)];
@@ -606,6 +597,15 @@
 // Note: this is overridden by the automatic update driver to do nothing
 - (void)terminateApp
 {
+    if ([self.updaterDelegate respondsToSelector:@selector(updater:willInstallUpdate:)]) {
+        [self.updaterDelegate updater:self.updater willInstallUpdate:self.updateItem];
+    }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
+    if ([self.updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)]) {
+        [self.updaterDelegate updaterWillRelaunchApplication:self.updater];
+    }
+    
     [self.userDriver terminateApplication];
 }
 

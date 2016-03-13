@@ -32,19 +32,13 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 @interface SUAutomaticUpdateDriver ()
 
-@property (assign) BOOL postponingInstallation;
-@property (assign) BOOL showErrors;
-@property (assign) BOOL willUpdateOnTermination;
 @property (strong) NSTimer *showUpdateAlertTimer;
 
 @end
 
 @implementation SUAutomaticUpdateDriver
 
-@synthesize postponingInstallation;
-@synthesize showErrors;
-@synthesize willUpdateOnTermination;
-@synthesize showUpdateAlertTimer;
+@synthesize showUpdateAlertTimer = _showUpdateAlertTimer;
 
 - (void)showUpdateAlert
 {
@@ -57,50 +51,30 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     }];
 }
 
-- (void)installUpdateWithTerminationStatus:(NSNumber *)terminationStatus
+- (void)automaticUpdateAlertFinishedWithChoice:(SUUpdateAlertChoice)choice
 {
-    switch ((SUApplicationTerminationStatus)(terminationStatus.unsignedIntegerValue)) {
-        case SUApplicationStoppedObservingTermination:
-            if (self.willUpdateOnTermination) {
-                [self abortUpdate];
-            }
+    switch (choice)
+    {
+        case SUInstallUpdateChoice:
+            [self installWithToolAndRelaunch:YES displayingUserInterface:YES];
             break;
-        case SUApplicationWillTerminate:
-            if (self.willUpdateOnTermination) {
-                [self installWithToolAndRelaunch:NO];
-                
-                // We could finish successfully or abort the update due to an error, so make sure we tell the user driver
-                // to terminate in both cases since they are waiting on us to signal termination
-                [self.userDriver terminateApplication];
-            }
+            
+        case SUInstallLaterChoice:
+            [self installWithToolAndRelaunch:NO displayingUserInterface:NO];
+            // We're already waiting on quit, just indicate that we're idle.
+            self.interruptible = YES;
+            break;
+            
+        case SUSkipThisVersionChoice:
+#warning this option should not exist
+            [self.host setObject:[self.updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+            [self abortUpdate];
             break;
     }
 }
 
-// Overridden to do nothing: see -installUpdateWithTerminationStatus: as to why
-- (void)terminateApp { }
-
 - (void)installerIsReadyForRelaunch
 {
-    [self.userDriver registerApplicationTermination:^(SUApplicationTerminationStatus terminationStatus) {
-        // We use -performSelectorOnMainThread:withObject:waitUntilDone: rather than GCD because if we are on the main thread already,
-        // we don't want to run the operation asynchronously. It's also possible we aren't on the main thread (say due to IPC through a XPC service).
-        // Anyway, if we're on the main thread in a single process without the app delegate delaying termination,
-        // we could be terminating *really soon* - so we want to install the update quickly
-        [self performSelectorOnMainThread:@selector(installUpdateWithTerminationStatus:) withObject:@(terminationStatus) waitUntilDone:YES];
-    }];
-    
-    // At first, it may seem like we should register for system power off ourselves rather than the user driver
-    // This is a bad idea for a couple reasons. One is it may require linkage to AppKit, or some complex IOKit code
-    // Another is that we would be making the assumption that the user driver is on the same system as the updater,
-    // which is something we would be better off not assuming!
-    [self.userDriver registerSystemPowerOff:^(SUSystemPowerOffStatus systemPowerOffStatus) {
-        // See above for why we use -performSelectorOnMainThread:withObject:waitUntilDone:
-        [self performSelectorOnMainThread:@selector(systemWillPowerOff:) withObject:@(systemPowerOffStatus) waitUntilDone:YES];
-    }];
-
-    self.willUpdateOnTermination = YES;
-
     if ([self.updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)])
     {
         BOOL relaunch = YES;
@@ -113,7 +87,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
         [self.updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationInvocation:invocation];
     }
-
+    
     // If this is marked as a critical update, we'll prompt the user to install it right away.
     if ([self.updateItem isCriticalUpdate])
     {
@@ -122,107 +96,23 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     else
     {
         self.showUpdateAlertTimer = [NSTimer scheduledTimerWithTimeInterval:SUAutomaticUpdatePromptImpatienceTimer target:self selector:@selector(showUpdateAlert) userInfo:nil repeats:NO];
-
+        
         // At this point the driver is idle, allow it to be interrupted for user-initiated update checks.
         self.interruptible = YES;
     }
 }
 
-- (void)stopUpdatingOnTermination
+- (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
 {
-    if (self.willUpdateOnTermination)
-    {
-        self.willUpdateOnTermination = NO;
-        
-        [self.userDriver unregisterApplicationTermination];
-        [self.userDriver unregisterSystemPowerOff];
-        
-        if ([self.updaterDelegate respondsToSelector:@selector(updater:didCancelInstallUpdateOnQuit:)])
-            [self.updaterDelegate updater:self.updater didCancelInstallUpdateOnQuit:self.updateItem];
-    }
-}
-
-- (void)invalidateShowUpdateAlertTimer
-{
-    [self.showUpdateAlertTimer invalidate];
-    self.showUpdateAlertTimer = nil;
-}
-
-- (void)dealloc
-{
-    [self stopUpdatingOnTermination];
-    [self invalidateShowUpdateAlertTimer];
+    [super installWithToolAndRelaunch:relaunch displayingUserInterface:showUI];
 }
 
 - (void)abortUpdate
 {
-    [self stopUpdatingOnTermination];
-    [self invalidateShowUpdateAlertTimer];
+    [self.showUpdateAlertTimer invalidate];
+    self.showUpdateAlertTimer = nil;
     
     [super abortUpdate];
-}
-
-- (void)automaticUpdateAlertFinishedWithChoice:(SUUpdateAlertChoice)choice
-{
-	switch (choice)
-	{
-        case SUInstallUpdateChoice:
-            [self stopUpdatingOnTermination];
-            [self installWithToolAndRelaunch:YES];
-            break;
-
-        case SUInstallLaterChoice:
-            self.postponingInstallation = YES;
-            // We're already waiting on quit, just indicate that we're idle.
-            self.interruptible = YES;
-            break;
-
-        case SUSkipThisVersionChoice:
-            [self.host setObject:[self.updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
-            [self abortUpdate];
-            break;
-    }
-}
-
-
-- (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
-{
-    if (relaunch) {
-        [self stopUpdatingOnTermination];
-    }
-
-    self.showErrors = YES;
-    [super installWithToolAndRelaunch:relaunch displayingUserInterface:showUI];
-}
-
-- (void)systemWillPowerOff:(NSNumber *)systemPowerOffStatus
-{
-    if (self.willUpdateOnTermination) {
-        switch ((SUSystemPowerOffStatus)(systemPowerOffStatus.unsignedIntegerValue)) {
-            case SUStoppedObservingSystemPowerOff:
-                [self abortUpdate];
-                break;
-            case SUSystemWillPowerOff:
-                [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUSystemPowerOffError userInfo:@{
-                    NSLocalizedDescriptionKey: SULocalizedString(@"The update will not be installed because the user requested for the system to power off", nil) }]];
-                break;
-        }
-    }
-}
-
-- (void)abortUpdateWithError:(NSError *)error
-{
-    if (self.showErrors) {
-        [super abortUpdateWithError:error];
-    } else {
-        // Call delegate separately here because otherwise it won't know we stopped.
-        // Normally this gets called by the superclass
-        if ([self.updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
-            [self.updaterDelegate updater:self.updater didAbortWithError:error];
-        }
-
-        [self abortUpdate];
-    }
 }
 
 @end

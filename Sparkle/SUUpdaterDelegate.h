@@ -241,7 +241,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  \param updater The SUUpdater instance.
  \param item The appcast item corresponding to the update that was proposed to be installed.
  */
-- (void)updater:(SUUpdater *)updater didCancelInstallUpdateOnQuit:(SUAppcastItem *)item;
+- (void)updater:(SUUpdater *)updater didCancelInstallUpdateOnQuit:(SUAppcastItem *)item __deprecated;
 
 /*!
  Called after an update is aborted due to an error.
