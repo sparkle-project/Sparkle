@@ -246,31 +246,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showInstallingUpdate;
 
 /*!
- * Register for application termination
- *
- * This is necessary for Sparkle's automatic updates. An implementor should listen for when an application terminates and reply back when it is happening.
- * An implementor may also want to decide if they want to delay the application's termination until -terminateApplication is invoked, which will be
- * necessary if the updater and user driver are in separate processes.
- *
- * @param applicationTerminationHandler A reply of SUApplicationWillTerminate should be used when the application is about to terminate. A reply of
- * SUApplicationStoppedObservingTermination can be used to cancel observing application termination. Note this would have the side effect of cancelling
- * the automatic update if it's in progress.
- *
- * This can be called from any thread
- */
-- (void)registerApplicationTermination:(void (^)(SUApplicationTerminationStatus))applicationTerminationHandler;
-
-/*!
- * Unregister for application termination
- *
- * Unregister for application termination that was set up in -registerApplicationTermination:
- * This is an appropriate time to reply with SUApplicationStoppedObservingTermination if not having done so already
- *
- * This can be called from any thread
- */
-- (void)unregisterApplicationTermination;
-
-/*!
  * Terminate the application
  *
  * Sparkle is signaling that it wants the application to be terminated immediately.
@@ -279,29 +254,6 @@ NS_ASSUME_NONNULL_BEGIN
  * This can be called from any thread
  */
 - (void)terminateApplication;
-
-/*!
- * Register for system power off
- *
- * This is necessary for Sparkle's automatic updates. An implementor should listen for when the system may shut off and reply back when it is happening.
- *
- * @param systemPowerOffHandler A reply of SUSystemWillPowerOff should be used when the system is about to power off. This has the side effect of Sparkle
- * aborting any updates it has automatically downloaded already. A reply of SUStoppedObservingSystemPowerOff can be used to cancel observing power off.
- * Note this has the same side effect of cancelling an in-progress update, except a different error is propagated.
- *
- * This can be called from any thread
- */
-- (void)registerSystemPowerOff:(void (^)(SUSystemPowerOffStatus))systemPowerOffHandler;
-
-/*!
- * Unregister for system power off
- *
- * Unregister for system power off that was set up in -registerSystemPowerOff:
- * This is an appropriate time to reply with SUStoppedObservingSystemPowerOff if not having done so already
- *
- * This can be called from any thread
- */
-- (void)unregisterSystemPowerOff;
 
 /*!
  * Dismiss the current update installation

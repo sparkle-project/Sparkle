@@ -213,11 +213,6 @@ static NSString * const UPDATED_VERSION = @"2.0";
     }];
 }
 
-- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)__unused sender
-{
-    return (self.remoteUpdateSettingsWindowController == nil ? NSTerminateNow : [self.remoteUpdateSettingsWindowController sendTerminationSignal]);
-}
-
 - (void)applicationWillTerminate:(NSNotification * __unused)notification
 {
     [self.webServer close];

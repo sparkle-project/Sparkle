@@ -9,14 +9,12 @@
 #import "SUPopUpTitlebarUserDriver.h"
 #import "SUStandardUserDriverDelegate.h"
 #import "SUUserDriverCoreComponent.h"
-#import "SUUserDriverUIComponent.h"
 #import "SUInstallUpdateViewController.h"
 
 @interface SUPopUpTitlebarUserDriver()
 
 @property (nonatomic, readonly) NSWindow *window;
 @property (nonatomic, readonly) SUUserDriverCoreComponent *coreComponent;
-@property (nonatomic, readonly) SUUserDriverUIComponent *uiComponent;
 @property (nonatomic) NSTitlebarAccessoryViewController *accessoryViewController;
 @property (nonatomic) BOOL addedAccessory;
 @property (nonatomic) NSButton *updateButton;
@@ -31,7 +29,6 @@
 @synthesize delegate = _delegate;
 @synthesize window = _window;
 @synthesize coreComponent = _coreComponent;
-@synthesize uiComponent = _uiComponent;
 @synthesize accessoryViewController = _accessoryViewController;
 @synthesize addedAccessory = _addedAccessory;
 @synthesize updateButton = _updateButton;
@@ -46,7 +43,6 @@
         _window = window;
         _delegate = delegate;
         _coreComponent = [[SUUserDriverCoreComponent alloc] initWithDelegate:delegate];
-        _uiComponent = [[SUUserDriverUIComponent alloc] initWithDelegate:delegate];
     }
     return self;
 }
@@ -313,51 +309,14 @@
     });
 }
 
-#pragma mark Application Death
-
-- (void)registerApplicationTermination:(void (^)(SUApplicationTerminationStatus))applicationTerminationHandler
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.uiComponent registerApplicationTermination:applicationTerminationHandler];
-    });
-}
-
-- (void)unregisterApplicationTermination
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.uiComponent unregisterApplicationTermination];
-    });
-}
-
-- (NSApplicationTerminateReply)sendApplicationTerminationSignal
-{
-    return [self.uiComponent sendApplicationTerminationSignal];
-}
+#pragma mark Aborting Everything
 
 - (void)terminateApplication
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.uiComponent terminateApplication];
+        [[NSApplication sharedApplication] terminate:nil];
     });
 }
-
-#pragma mark System Death
-
-- (void)registerSystemPowerOff:(void (^)(SUSystemPowerOffStatus))systemPowerOffHandler
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.uiComponent registerSystemPowerOff:systemPowerOffHandler];
-    });
-}
-
-- (void)unregisterSystemPowerOff
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.uiComponent unregisterSystemPowerOff];
-    });
-}
-
-#pragma mark Aborting Everything
 
 - (void)_dismissUpdateInstallation
 {
@@ -365,7 +324,6 @@
     // because we are already on the main queue (and I've been bitten in the past by this before)
     
     [self.coreComponent dismissUpdateInstallation];
-    [self.uiComponent dismissUpdateInstallation];
     
     [self removeUpdateButton];
 }
@@ -380,7 +338,6 @@
 - (void)invalidate
 {
     [self.coreComponent invalidate];
-    [self.uiComponent invalidate];
     
     [self _dismissUpdateInstallation];
 }

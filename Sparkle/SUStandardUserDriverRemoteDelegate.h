@@ -42,15 +42,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)initiateUpdateCheck;
 
-/*!
- Asks whether or not the delegate is responsible for letting the user driver know when the application is about to terminate
- 
- This is necessary to implement when automatic updates are possible and when the updater and user driver live in separate processes.
- 
- See -[SUStandardUserDriver sendApplicationTerminationSignal] for more details on how to follow up
- */
-- (BOOL)responsibleForSignalingApplicationTermination;
-
 @end
 
 NS_ASSUME_NONNULL_END

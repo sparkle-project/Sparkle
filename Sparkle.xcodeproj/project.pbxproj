@@ -170,8 +170,6 @@
 		725F97781C8A65AC00265BE4 /* SUAdHocCodeSigning.m in Sources */ = {isa = PBXBuildFile; fileRef = 725F97751C8A62F500265BE4 /* SUAdHocCodeSigning.m */; };
 		725F977B1C8A896F00265BE4 /* SUUserDriverCoreComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 725F97791C8A896F00265BE4 /* SUUserDriverCoreComponent.h */; };
 		725F977C1C8A896F00265BE4 /* SUUserDriverCoreComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 725F977A1C8A896F00265BE4 /* SUUserDriverCoreComponent.m */; };
-		725F977F1C8A93D700265BE4 /* SUUserDriverUIComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 725F977D1C8A93D700265BE4 /* SUUserDriverUIComponent.h */; };
-		725F97801C8A93D700265BE4 /* SUUserDriverUIComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 725F977E1C8A93D700265BE4 /* SUUserDriverUIComponent.m */; };
 		725F97841C8AA90000265BE4 /* SUPopUpTitlebarUserDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 725F97831C8AA90000265BE4 /* SUPopUpTitlebarUserDriver.m */; };
 		725F97A51C8B304D00265BE4 /* SUInstallUpdateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 725F97A31C8B304D00265BE4 /* SUInstallUpdateViewController.m */; };
 		725F97A61C8B304D00265BE4 /* SUInstallUpdateViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 725F97A41C8B304D00265BE4 /* SUInstallUpdateViewController.xib */; };
@@ -691,8 +689,6 @@
 		725F97751C8A62F500265BE4 /* SUAdHocCodeSigning.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUAdHocCodeSigning.m; sourceTree = "<group>"; };
 		725F97791C8A896F00265BE4 /* SUUserDriverCoreComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUserDriverCoreComponent.h; sourceTree = "<group>"; };
 		725F977A1C8A896F00265BE4 /* SUUserDriverCoreComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUserDriverCoreComponent.m; sourceTree = "<group>"; };
-		725F977D1C8A93D700265BE4 /* SUUserDriverUIComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUserDriverUIComponent.h; sourceTree = "<group>"; };
-		725F977E1C8A93D700265BE4 /* SUUserDriverUIComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUserDriverUIComponent.m; sourceTree = "<group>"; };
 		725F97821C8AA90000265BE4 /* SUPopUpTitlebarUserDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUPopUpTitlebarUserDriver.h; sourceTree = "<group>"; };
 		725F97831C8AA90000265BE4 /* SUPopUpTitlebarUserDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUPopUpTitlebarUserDriver.m; sourceTree = "<group>"; };
 		725F97A21C8B304D00265BE4 /* SUInstallUpdateViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUInstallUpdateViewController.h; sourceTree = "<group>"; };
@@ -1254,8 +1250,6 @@
 				725F97A71C8B42D700265BE4 /* SUStandardUserDriverProtocol.h */,
 				725CB9581C7121830064365A /* SUStandardUserDriver.h */,
 				725CB9591C7121830064365A /* SUStandardUserDriver.m */,
-				725F977D1C8A93D700265BE4 /* SUUserDriverUIComponent.h */,
-				725F977E1C8A93D700265BE4 /* SUUserDriverUIComponent.m */,
 			);
 			name = "User Driver";
 			sourceTree = "<group>";
@@ -1393,7 +1387,6 @@
 				610134730DD250470049ACDF /* SUUpdateDriver.h in Headers */,
 				612DCBAF0D488BC60015DBEA /* SUUpdatePermissionPrompt.h in Headers */,
 				61B5F8ED09C4CE3C00B25A18 /* SUUpdater.h in Headers */,
-				725F977F1C8A93D700265BE4 /* SUUserDriverUIComponent.h in Headers */,
 				61A354550DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.h in Headers */,
 				61A2259E0D1C495D00430CCD /* SUVersionComparisonProtocol.h in Headers */,
 				3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */,
@@ -1954,7 +1947,6 @@
 				61EF67560E25B58D00F754E0 /* SUHost.m in Sources */,
 				55C14F07136EF6DB00649790 /* SULog.m in Sources */,
 				726F2CE61BC9C33D001971A4 /* SUOperatingSystem.m in Sources */,
-				725F97801C8A93D700265BE4 /* SUUserDriverUIComponent.m in Sources */,
 				6101347C0DD2541A0049ACDF /* SUProbingUpdateDriver.m in Sources */,
 				61B93C0A0DD112FF00DCD2F8 /* SUScheduledUpdateDriver.m in Sources */,
 				61A225A50D1C4AC000430CCD /* SUStandardVersionComparator.m in Sources */,

@@ -26,16 +26,6 @@ typedef NS_ENUM(NSUInteger, SUDownloadUpdateStatus) {
     SUDownloadUpdateCancelled
 };
 
-typedef NS_ENUM(NSUInteger, SUApplicationTerminationStatus) {
-    SUApplicationWillTerminate,
-    SUApplicationStoppedObservingTermination
-};
-
-typedef NS_ENUM(NSUInteger, SUSystemPowerOffStatus) {
-    SUSystemWillPowerOff,
-    SUStoppedObservingSystemPowerOff
-};
-
 typedef NS_ENUM(NSUInteger, SUInstallUpdateStatus) {
     SUInstallAndRelaunchUpdateNow,
     SUDismissUpdateInstallation

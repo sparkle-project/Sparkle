@@ -47,33 +47,6 @@
 @property (nonatomic, readonly) BOOL idlesOnUpdateChecks;
 
 /*!
- Send a signal to the user driver that the user application should terminate.
- 
- This should only be invoked if the user driver's delegate says it's responsible for signaling application termination,
- and this should only be called from NSApplicationDelegate's applicationShouldTerminate: method.
- 
- This is particularly useful when the user driver and updater live in separate processes, and the updater
- wants to install an automatic update on termination. If the updater is in a separate process, that means
- we may have to defer application termination a bit until the updater is ready to launch its auto updater.
- 
- @return The NSApplication termination reply. Use this as a return value to NSApplicationDelegate's applicationShouldTerminate:
- */
-- (NSApplicationTerminateReply)sendApplicationTerminationSignal;
-
-/*!
- Terminate the current application after sending a termination signal
- 
- This should only be invoked by the user driver's delegate if the -sendApplicationTerminationSignal message has been sent prior.
- For this user driver's delegate, invoking this is appropriate when the application's termination has been delayed, and the connection
- to the updater has been invalidated or interrupted -- in which case the updater can no longer tell the user driver when to finish terminating.
- 
- This implementation will be dispatched on the main queue.
- 
- Note this is also a part of the SUUserDriver protocol that this class implements
- */
-- (void)terminateApplication;
-
-/*!
  Invalidate the current update installation
  
  This stops all behavior for the current update installation. It avoids making any calls or replies to Sparkle's updater.

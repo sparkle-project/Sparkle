@@ -13,8 +13,4 @@
 
 @interface SURemoteUpdateSettingsWindowController : NSWindowController <SUStandardUserDriverDelegate>
 
-// If you invoke this, it's assumed you used its return value and returned from
-// NSApplicationDelegate's -applicationShouldTerminate:
-- (NSApplicationTerminateReply)sendTerminationSignal;
-
 @end

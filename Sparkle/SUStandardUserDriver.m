@@ -8,7 +8,6 @@
 
 #import "SUStandardUserDriver.h"
 #import "SUUserDriverCoreComponent.h"
-#import "SUUserDriverUIComponent.h"
 #import "SUStandardUserDriverDelegate.h"
 #import "SUStandardUserDriverUIDelegate.h"
 #import "SUAppcastItem.h"
@@ -26,7 +25,6 @@
 @property (nonatomic, readonly) SUHost *host;
 
 @property (nonatomic, readonly) SUUserDriverCoreComponent *coreComponent;
-@property (nonatomic, readonly) SUUserDriverUIComponent *uiComponent;
 
 @property (nonatomic) SUStatusController *checkingController;
 @property (nonatomic) NSWindowController *activeUpdateAlert;
@@ -38,7 +36,6 @@
 
 @synthesize host = _host;
 @synthesize coreComponent = _coreComponent;
-@synthesize uiComponent = _uiComponent;
 @synthesize delegate = _delegate;
 @synthesize checkingController = _checkingController;
 @synthesize activeUpdateAlert = _activeUpdateAlert;
@@ -53,7 +50,6 @@
         _host = [[SUHost alloc] initWithBundle:hostBundle];
         _delegate = delegate;
         _coreComponent = [[SUUserDriverCoreComponent alloc] initWithDelegate:delegate];
-        _uiComponent = [[SUUserDriverUIComponent alloc] initWithDelegate:delegate];
     }
     return self;
 }
@@ -367,51 +363,14 @@
     });
 }
 
-#pragma mark Application Death
-
-- (void)registerApplicationTermination:(void (^)(SUApplicationTerminationStatus))applicationTerminationHandler
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.uiComponent registerApplicationTermination:applicationTerminationHandler];
-    });
-}
-
-- (void)unregisterApplicationTermination
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.uiComponent unregisterApplicationTermination];
-    });
-}
-
-- (NSApplicationTerminateReply)sendApplicationTerminationSignal
-{
-    return [self.uiComponent sendApplicationTerminationSignal];
-}
+#pragma mark Aborting Everything
 
 - (void)terminateApplication
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.uiComponent terminateApplication];
+        [[NSApplication sharedApplication] terminate:nil];
     });
 }
-
-#pragma mark System Death
-
-- (void)registerSystemPowerOff:(void (^)(SUSystemPowerOffStatus))systemPowerOffHandler
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.uiComponent registerSystemPowerOff:systemPowerOffHandler];
-    });
-}
-
-- (void)unregisterSystemPowerOff
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.uiComponent unregisterSystemPowerOff];
-    });
-}
-
-#pragma mark Aborting Everything
 
 - (void)_dismissUpdateInstallation
 {
@@ -419,7 +378,6 @@
     // because we are already on the main queue (and I've been bitten in the past by this before)
     
     [self.coreComponent dismissUpdateInstallation];
-    [self.uiComponent dismissUpdateInstallation];
     
     [self closeCheckingWindow];
     
@@ -445,7 +403,6 @@
 {
     // Make sure any remote handlers will not be invoked
     [self.coreComponent invalidate];
-    [self.uiComponent invalidate];
     
     // Dismiss the installation normally
     [self _dismissUpdateInstallation];

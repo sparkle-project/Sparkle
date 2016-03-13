@@ -54,16 +54,6 @@
 
 - (void)showInstallingUpdate {}
 
-- (void)registerApplicationTermination:(void (^)(SUApplicationTerminationStatus))__unused applicationTerminationHandler {}
-
-- (void)unregisterApplicationTermination {}
-
-- (void)terminateApplication {}
-
-- (void)registerSystemPowerOff:(void (^)(SUSystemPowerOffStatus))__unused systemPowerOffHandler {}
-
-- (void)unregisterSystemPowerOff {}
-
 - (void)dismissUpdateInstallation {}
 
 @end
