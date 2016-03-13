@@ -318,6 +318,9 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         NSError *firstStageError = nil;
         if (![installer performFirstStage:&firstStageError]) {
             SULog(@"Error: Failed to start installer with error: %@", firstStageError);
+            [self.installer cleanup];
+            self.installer = nil;
+            
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self cleanupAndExitWithStatus:EXIT_FAILURE];
             });
@@ -357,6 +360,9 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     NSError *secondStageError = nil;
     if (![self.installer performSecondStageAllowingUI:self.shouldShowUI error:&secondStageError]) {
         SULog(@"Error: Failed to resume installer on stage 2 with error: %@", secondStageError);
+        [self.installer cleanup];
+        self.installer = nil;
+        
         dispatch_async(dispatch_get_main_queue(), ^{
             [self cleanupAndExitWithStatus:EXIT_FAILURE];
         });
@@ -390,7 +396,12 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         
         if (!success) {
             SULog(@"Timed out waiting for target to terminate. Target path is %@", self.host.bundlePath);
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            [self.installer cleanup];
+            self.installer = nil;
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            });
             return;
         }
         
@@ -400,7 +411,12 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
             NSError *thirdStageError = nil;
             if (![self.installer performThirdStage:&thirdStageError]) {
                 SULog(@"Failed to finalize installation with error: %@", thirdStageError);
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                [self.installer cleanup];
+                self.installer = nil;
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                });
                 return;
             }
             

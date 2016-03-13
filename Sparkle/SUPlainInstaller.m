@@ -265,15 +265,23 @@
     NSURL *tempOldDirectoryURL = self.tempOldDirectoryURL;
     NSURL *tempNewDirectoryURL = self.tempNewDirectoryURL;
     
-    // Cleanup: move the old app to the trash
-    NSError *trashError = nil;
-    if (![fileManager moveItemAtURLToTrash:oldTempURL error:&trashError]) {
-        SULog(@"Failed to move %@ to trash with error %@", oldTempURL, trashError);
+    // Note: I'm intentionally not checking if an item at the file URLs exist since these methods already do that for us
+    
+    if (oldTempURL != nil) {
+        // Cleanup: move the old app to the trash
+        NSError *trashError = nil;
+        if (![fileManager moveItemAtURLToTrash:oldTempURL error:&trashError]) {
+            SULog(@"Failed to move %@ to trash with error %@", oldTempURL, trashError);
+        }
     }
     
-    [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
+    if (tempOldDirectoryURL != nil) {
+        [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
+    }
     
-    [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
+    if (tempNewDirectoryURL != nil) {
+        [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
+    }
 }
 
 @end
