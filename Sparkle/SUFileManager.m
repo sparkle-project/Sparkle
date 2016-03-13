@@ -156,7 +156,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     }
 
     if (isDirectory != NULL) {
-        *isDirectory = [attributes[NSFileType] isEqualToString:NSFileTypeDirectory];
+        *isDirectory = [[attributes objectForKey:NSFileType] isEqualToString:NSFileTypeDirectory];
     }
 
     return YES;
@@ -272,7 +272,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     // root-level symbolic link.
     NSString *rootURLPath = rootURL.path;
     NSDictionary *rootAttributes = [_fileManager attributesOfItemAtPath:rootURLPath error:nil];
-    NSString *rootType = rootAttributes[NSFileType];
+    NSString *rootType = [rootAttributes objectForKey:NSFileType]; // 10.7 can't subscript this
 
     if ([rootType isEqualToString:NSFileTypeDirectory]) {
         // The NSDirectoryEnumerator will avoid recursing into any contained
@@ -600,7 +600,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         return NO;
     }
 
-    NSNumber *ownerID = matchFileAttributes[NSFileOwnerAccountID];
+    NSNumber *ownerID = [matchFileAttributes objectForKey:NSFileOwnerAccountID];
     if (ownerID == nil) {
         // shouldn't be possible to error here, but just in case
         if (error != NULL) {
@@ -609,7 +609,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         return NO;
     }
 
-    NSNumber *groupID = matchFileAttributes[NSFileGroupOwnerAccountID];
+    NSNumber *groupID = [matchFileAttributes objectForKey:NSFileGroupOwnerAccountID];
     if (groupID == nil) {
         // shouldn't be possible to error here, but just in case
         if (error != NULL) {
@@ -618,8 +618,8 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         return NO;
     }
 
-    NSNumber *targetOwnerID = targetFileAttributes[NSFileOwnerAccountID];
-    NSNumber *targetGroupID = targetFileAttributes[NSFileGroupOwnerAccountID];
+    NSNumber *targetOwnerID = [targetFileAttributes objectForKey:NSFileOwnerAccountID];
+    NSNumber *targetGroupID = [targetFileAttributes objectForKey:NSFileGroupOwnerAccountID];
 
     if ((targetOwnerID != nil && [ownerID isEqualToNumber:targetOwnerID]) && (targetGroupID != nil && [groupID isEqualToNumber:targetGroupID])) {
         // Assume they're the same even if we don't check every file recursively
