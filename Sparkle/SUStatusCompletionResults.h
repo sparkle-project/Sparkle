@@ -38,7 +38,7 @@ typedef NS_ENUM(NSUInteger, SUSystemPowerOffStatus) {
 
 typedef NS_ENUM(NSUInteger, SUInstallUpdateStatus) {
     SUInstallAndRelaunchUpdateNow,
-    SUCancelUpdateInstallation
+    SUDismissUpdateInstallation
 };
 
 typedef NS_ENUM(NSInteger, SUUpdateAlertChoice) {

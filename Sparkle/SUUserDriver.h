@@ -229,7 +229,8 @@ NS_ASSUME_NONNULL_BEGIN
  * Let the user know that the update is ready and ask them whether they want to install or not
  *
  * @param installUpdateHandler A reply of SUInstallAndRelaunchUpdateNow installs the update immediately.
- * A reply of SUCancelUpdateInstallation cancels the update installation.
+ * A reply of SUDismissUpdateInstallation dismisses the update installation. Note the update may still be installed after
+ * the application terminates, however there is not a strong guarantee that this will happen.
  *
  * This can be called from any thread
  */

@@ -147,7 +147,7 @@
     [self.userDriver showExtractionFinishedAndReadyToInstallAndRelaunch:^(SUInstallUpdateStatus installUpdateStatus) {
         dispatch_async(dispatch_get_main_queue(), ^{
             switch (installUpdateStatus) {
-                case SUCancelUpdateInstallation:
+                case SUDismissUpdateInstallation:
                     [self abortUpdate];
                     break;
                 case SUInstallAndRelaunchUpdateNow:

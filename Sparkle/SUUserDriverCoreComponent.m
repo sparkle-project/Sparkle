@@ -137,10 +137,10 @@
     }
 }
 
-- (void)cancelInstallAndRestart
+- (void)dismissInstallAndRestart
 {
     if (self.installUpdateHandler != nil) {
-        self.installUpdateHandler(SUCancelUpdateInstallation);
+        self.installUpdateHandler(SUDismissUpdateInstallation);
         self.installUpdateHandler = nil;
     }
 }
@@ -217,7 +217,7 @@
     [self acceptAcknowledgement];
     [self cancelUpdateCheckStatus];
     [self cancelDownloadStatus];
-    [self cancelInstallAndRestart];
+    [self dismissInstallAndRestart];
     [self invalidateUpdateCheckTimer];
 }
 
