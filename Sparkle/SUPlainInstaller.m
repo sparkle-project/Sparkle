@@ -49,6 +49,18 @@
 @synthesize oldURL = _oldURL;
 @synthesize oldTempURL = _oldTempURL;
 
+- (instancetype)initWithHost:(SUHost *)host applicationPath:(NSString *)applicationPath installationPath:(NSString *)installationPath versionComparator:(id <SUVersionComparison>)comparator
+{
+    self = [super init];
+    if (self != nil) {
+        _host = host;
+        _applicationPath = [applicationPath copy];
+        _installationPath = [installationPath copy];
+        _comparator = comparator;
+    }
+    return self;
+}
+
 // Returns the bundle version from the specified host that is appropriate to use as a filename, or nil if we're unable to retrieve one
 - (NSString *)bundleVersionAppropriateForFilenameFromHost:(SUHost *)host
 {
@@ -114,13 +126,6 @@
         return NO;
     }
     
-    if (![fileManager changeOwnerAndGroupOfItemAtRootURL:newTempURL toMatchURL:oldURL error:error]) {
-        // But this is big enough of a deal to fail
-        SULog(@"Failed to change owner and group of new app at %@ to match old app at %@", newTempURL.path, oldURL.path);
-        [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
-        return NO;
-    }
-    
     // To carry over when we resume the installation
     self.fileManager = fileManager;
     self.oldURL = oldURL;
@@ -130,16 +135,40 @@
     return YES;
 }
 
-- (BOOL)resumeInstallationToURL:(NSURL *)installationURL withHost:(SUHost *)host error:(NSError * __autoreleasing *)error
+- (BOOL)resumeInstallationAllowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
+{
+    if (!allowsUI) {
+        self.fileManager = [SUFileManager fileManagerAllowingAuthorization:NO];
+    }
+    
+    SUFileManager *fileManager = self.fileManager;
+    NSURL *newTempURL = self.installationNewTempURL;
+    NSURL *tempNewDirectoryURL = self.tempNewDirectoryURL;
+    NSURL *oldURL = self.oldURL;
+    
+    // This is the first operation that has a high chance or prompting for auth. if the user needs to auth. at all
+    if (![fileManager changeOwnerAndGroupOfItemAtRootURL:newTempURL toMatchURL:oldURL error:error]) {
+        // But this is big enough of a deal to fail
+        SULog(@"Failed to change owner and group of new app at %@ to match old app at %@", newTempURL.path, oldURL.path);
+        [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
+        return NO;
+    }
+    
+    return YES;
+}
+
+- (BOOL)finishInstallationToURL:(NSURL *)installationURL withHost:(SUHost *)host error:(NSError * __autoreleasing *)error
 {
     SUFileManager *fileManager = self.fileManager;
     NSURL *newTempURL = self.installationNewTempURL;
     NSURL *tempNewDirectoryURL = self.tempNewDirectoryURL;
     NSURL *oldURL = self.oldURL;
     
-    if (![fileManager updateModificationAndAccessTimeOfItemAtURL:newTempURL error:error]) {
+    NSError *touchError = nil;
+    if (![fileManager updateModificationAndAccessTimeOfItemAtURL:newTempURL error:&touchError]) {
         // Not a fatal error, but a pretty unfortunate one
         SULog(@"Failed to update modification and access time of new app at %@", newTempURL.path);
+        SULog(@"Error: %@", touchError);
     }
     
     // Decide on a destination name we should use for the older app when we move it around the file system
@@ -196,19 +225,7 @@
     return YES;
 }
 
-- (instancetype)initWithHost:(SUHost *)host sourcePath:(NSString *)sourcePath installationPath:(NSString *)installationPath versionComparator:(id <SUVersionComparison>)comparator
-{
-    self = [super init];
-    if (self != nil) {
-        _host = host;
-        _applicationPath = [sourcePath copy];
-        _installationPath = [installationPath copy];
-        _comparator = comparator;
-    }
-    return self;
-}
-
-- (BOOL)startInstallation:(NSError * __autoreleasing *)error
+- (BOOL)performFirstStage:(NSError * __autoreleasing *)error
 {
     BOOL allowDowngrades = SPARKLE_AUTOMATED_DOWNGRADES;
     
@@ -231,9 +248,14 @@
     return [self startInstallationToURL:[NSURL fileURLWithPath:self.installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:self.applicationPath] withHost:self.host error:error];
 }
 
-- (BOOL)resumeInstallation:(NSError * __autoreleasing *)error
+- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError *__autoreleasing *)error
 {
-    return [self resumeInstallationToURL:[NSURL fileURLWithPath:self.installationPath] withHost:self.host error:error];
+    return [self resumeInstallationAllowingUI:allowsUI error:error];
+}
+
+- (BOOL)performThirdStage:(NSError * __autoreleasing *)error
+{
+    return [self finishInstallationToURL:[NSURL fileURLWithPath:self.installationPath] withHost:self.host error:error];
 }
 
 - (void)cleanup

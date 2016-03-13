@@ -7,8 +7,6 @@
 //
 
 #import "SUPackageInstaller.h"
-#import "SUVersionComparisonProtocol.h"
-#import "SUHost.h"
 #import "SUConstants.h"
 #import "SUErrors.h"
 #import "SULog.h"
@@ -25,42 +23,46 @@
 
 @implementation SUPackageInstaller
 
+static NSString *SUOpenUtilityPath = @"/usr/bin/open";
+
 @synthesize packagePath = _packagePath;
 
-- (instancetype)initWithHost:(SUHost *)__unused host sourcePath:(NSString *)sourcePath installationPath:(NSString *)__unused installationPath versionComparator:(id <SUVersionComparison>)__unused comparator
+- (instancetype)initWithPackagePath:(NSString *)packagePath
 {
     self = [super init];
     if (self != nil) {
-        _packagePath = [sourcePath copy];
+        _packagePath = [packagePath copy];
     }
     return self;
 }
 
-- (BOOL)startInstallation:(NSError * __autoreleasing *)__unused error
+- (BOOL)performFirstStage:(NSError * __autoreleasing *)error
 {
+    if (![[NSFileManager defaultManager] fileExistsAtPath:SUOpenUtilityPath]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingInstallerToolError userInfo:@{ NSLocalizedDescriptionKey: @"Couldn't find Apple's installer tool!" }];
+        }
+        return NO;
+    }
     return YES;
 }
 
-- (BOOL)resumeInstallation:(NSError * __autoreleasing *)error
+- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
+{
+    return allowsUI;
+}
+
+- (BOOL)performThirdStage:(NSError * __autoreleasing *)error
 {
     // Run installer using the "open" command to ensure it is launched in front of current application.
     // -W = wait until the app has quit.
     // -n = Open another instance if already open.
     // -b = app bundle identifier
-    NSString *command = @"/usr/bin/open";
     NSArray *args = @[@"-W", @"-n", @"-b", @"com.apple.installer", self.packagePath];
-    
-    if (![[NSFileManager defaultManager] fileExistsAtPath:command]) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingInstallerToolError userInfo:@{ NSLocalizedDescriptionKey: @"Couldn't find Apple's installer tool!" }];
-        }
-        
-        return NO;
-    }
     
     // Known bug: if the installation fails or is canceled, Sparkle goes ahead and restarts, thinking everything is fine.
     @try {
-        NSTask *installer = [NSTask launchedTaskWithLaunchPath:command arguments:args];
+        NSTask *installer = [NSTask launchedTaskWithLaunchPath:SUOpenUtilityPath arguments:args];
         [installer waitUntilExit];
     }
     @catch (NSException *exception) {

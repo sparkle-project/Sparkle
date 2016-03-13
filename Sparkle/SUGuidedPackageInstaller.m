@@ -11,8 +11,6 @@
 #import "SUParameterAssert.h"
 #import "SUGuidedPackageInstaller.h"
 #import "SUErrors.h"
-#import "SUVersionComparisonProtocol.h"
-#import "SUHost.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -108,21 +106,27 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 @synthesize packagePath = _packagePath;
 
-- (instancetype)initWithHost:(SUHost *)__unused host sourcePath:(NSString *)sourcePath installationPath:(NSString *)__unused installationPath versionComparator:(id <SUVersionComparison>)__unused comparator
+- (instancetype)initWithPackagePath:(NSString *)packagePath
 {
     self = [super init];
     if (self != nil) {
-        _packagePath = [sourcePath copy];
+        _packagePath = [packagePath copy];
     }
     return self;
 }
 
-- (BOOL)startInstallation:(NSError * __autoreleasing *)__unused error
+- (BOOL)performFirstStage:(NSError * __autoreleasing *)__unused error
 {
     return YES;
 }
 
-- (BOOL)resumeInstallation:(NSError * __autoreleasing *)error
+- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError *__autoreleasing *)error
+{
+#warning should prompt for auth. here
+    return allowsUI;
+}
+
+- (BOOL)performThirdStage:(NSError * __autoreleasing *)error
 {
     // Preflight
     NSString* installerPath = @"/usr/sbin/installer"; // Mac OS X 10.2+ command line installer tool

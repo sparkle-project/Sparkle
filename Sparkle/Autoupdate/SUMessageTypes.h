@@ -15,14 +15,14 @@ typedef NS_ENUM(int32_t, SUInstallerMessageType)
     SUExtractedArchiveWithProgress = 1,
     SUArchiveExtractionFailed = 2,
     SUValidationStarted = 3,
-    SUValidationFinished = 4,
-    SUInstallationStartedPreparation = 5,
-    SUInstallationFinishedPreparation = 6
+    SUInstallationStartedStage1 = 5,
+    SUInstallationFinishedStage1 = 6,
+    SUInstallationFinishedStage2 = 7
 };
 
 typedef NS_ENUM(int32_t, SUUpdaterMessageType)
 {
-    SUResumeInstallationOnTermination = 1
+    SUResumeInstallationToStage2 = 1
 };
 
 NSString *SUUpdateDriverServiceNameForHost(SUHost *host);

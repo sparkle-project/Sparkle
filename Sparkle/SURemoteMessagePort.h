@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithServiceName:(NSString *)serviceName invalidationCallback:(void (^)(void))invalidationCallback;
 
-- (BOOL)sendMessageWithIdentifier:(int32_t)identifier data:(NSData *)data;
+- (void)sendMessageWithIdentifier:(int32_t)identifier data:(NSData *)data completion:(void (^)(BOOL success))completionHandler;
 
 - (void)invalidate;
 

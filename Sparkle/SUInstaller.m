@@ -113,9 +113,9 @@
 {
     BOOL isPackage = NO;
     BOOL isGuided = NO;
-    NSString *newAppDownloadPath = [self installSourcePathInUpdateFolder:updateDirectory forHost:host isPackage:&isPackage isGuided:&isGuided];
+    NSString *newDownloadPath = [self installSourcePathInUpdateFolder:updateDirectory forHost:host isPackage:&isPackage isGuided:&isGuided];
     
-    if (newAppDownloadPath == nil) {
+    if (newDownloadPath == nil) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: @"Couldn't find an appropriate update in the downloaded package." }];
         }
@@ -124,14 +124,13 @@
     
     id <SUInstaller> installer = nil;
     if (isPackage && isGuided) {
-        installer = [SUGuidedPackageInstaller alloc];
+        installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath];
     } else if (isPackage) {
-        installer = [SUPackageInstaller alloc];
+        installer = [[SUPackageInstaller alloc] initWithPackagePath:newDownloadPath];
     } else {
-        installer = [SUPlainInstaller alloc];
+        installer = [[SUPlainInstaller alloc] initWithHost:host applicationPath:newDownloadPath installationPath:host.installationPath versionComparator:comparator];
     }
-    
-    return [installer initWithHost:host sourcePath:newAppDownloadPath installationPath:host.installationPath versionComparator:comparator];
+    return installer;
 }
 
 + (void)mdimportInstallationPath:(NSString *)installationPath

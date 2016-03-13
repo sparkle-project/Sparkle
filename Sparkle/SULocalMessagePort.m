@@ -13,6 +13,7 @@
 @property (nonatomic) CFMessagePortRef messagePort;
 @property (nonatomic, copy) void (^messageCallback)(int32_t, NSData *);
 @property (nonatomic, copy) void (^invalidationCallback)(void);
+@property (nonatomic, readonly) dispatch_queue_t messageQueue;
 
 @end
 
@@ -21,6 +22,7 @@
 @synthesize messagePort = _messagePort;
 @synthesize messageCallback = _messageCallback;
 @synthesize invalidationCallback = _invalidationCallback;
+@synthesize messageQueue = _messageQueue;
 
 - (nullable instancetype)initWithServiceName:(NSString *)serviceName messageCallback:(void (^)(int32_t identifier, NSData *data))messageCallback invalidationCallback:(void (^)(void))invalidationCallback
 {
@@ -38,7 +40,9 @@
         _messageCallback = [messageCallback copy];
         _invalidationCallback = [invalidationCallback copy];
         
-        CFMessagePortSetDispatchQueue(messagePort, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
+        _messageQueue = dispatch_queue_create("org.sparkle-project.sparkle-local-port", DISPATCH_QUEUE_SERIAL);
+        
+        CFMessagePortSetDispatchQueue(messagePort, _messageQueue);
         CFMessagePortSetInvalidationCallBack(messagePort, messageInvalidationCallback);
     }
     return self;
@@ -46,17 +50,12 @@
 
 - (void)invalidate
 {
-    @synchronized(self) {
+    dispatch_async(self.messageQueue, ^{
         if (self.invalidationCallback != nil) {
             self.invalidationCallback = nil;
             CFMessagePortInvalidate(self.messagePort);
         }
-    }
-}
-
-- (void)dealloc
-{
-    [self invalidate];
+    });
 }
 
 // Called on non-main thread
@@ -78,7 +77,7 @@ static void messageInvalidationCallback(CFMessagePortRef messagePort, void *info
 {
     SULocalMessagePort *self = (__bridge SULocalMessagePort *)info;
     
-    @synchronized(self) {
+    dispatch_async(self.messageQueue, ^{
         // note that messageCallback is deallocated on same queue that we're receiving messages from, which is good
         self.messageCallback = nil;
         
@@ -88,10 +87,10 @@ static void messageInvalidationCallback(CFMessagePortRef messagePort, void *info
         }
         
         self.messagePort = NULL;
-    }
-    
-    CFRelease(messagePort);
-    CFRelease((__bridge CFTypeRef)(self));
+        
+        CFRelease(messagePort);
+        CFRelease((__bridge CFTypeRef)(self));
+    });
 }
 
 @end

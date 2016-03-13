@@ -240,11 +240,12 @@
     NSString *downloadFileName = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
 
 
-    self.tempDir = [self.host.appCachePath stringByAppendingPathComponent:downloadFileName];
+    NSString *cachePath = [self.host appCachePath];
+    self.tempDir = [cachePath stringByAppendingPathComponent:downloadFileName];
     int cnt = 1;
 	while ([[NSFileManager defaultManager] fileExistsAtPath:self.tempDir] && cnt <= 999)
 	{
-        self.tempDir = [self.host.appCachePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, cnt++]];
+        self.tempDir = [cachePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, cnt++]];
     }
 
     // Create the temporary directory if necessary.
@@ -316,7 +317,7 @@
             double progress = *(const double *)data.bytes;
             [self unarchiverExtractedProgress:progress];
         }
-    } else if (identifier == SUInstallationStartedPreparation) {
+    } else if (identifier == SUInstallationStartedStage1) {
         [self installerDidStart];
     } else if (identifier == SUArchiveExtractionFailed) {
         if ([self.updateItem isDeltaUpdate]) {
@@ -325,24 +326,30 @@
         }
         
         [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) }]];
-    } else if (identifier == SUInstallationFinishedPreparation) {
+    } else if (identifier == SUInstallationFinishedStage1) {
         self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForHost(self.host) invalidationCallback:^{
             dispatch_async(dispatch_get_main_queue(), ^{
 #warning put in a custom error for connection closed
                 if (self.remotePort != nil) {
-                    SULog(@"Aborting remote port");
                     [self abortUpdate];
                 }
             });
         }];
         
         if (self.remotePort == nil) {
-            SULog(@"Remote port creation failed?!");
 #warning put in a custom error
             [self abortUpdate];
         } else {
             [self installerIsReadyForRelaunch];
         }
+    } else if (identifier == SUInstallationFinishedStage2) {
+        [self.remotePort invalidate];
+        self.remotePort = nil;
+        
+        [self.localPort invalidate];
+        self.localPort = nil;
+        
+        [self terminateApp];
     }
 }
 
@@ -372,6 +379,9 @@
         NSError *error = nil;
         if (![self launchAutoUpdate:&error]) {
             [self abortUpdateWithError:error];
+        } else {
+            // Autoupdate takes ownership of cleaning up our temporary download directory now
+            self.tempDir = nil;
         }
     }
 }
@@ -555,23 +565,23 @@
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-    if ([self.updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)])
+    if ([self.updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)]) {
         [self.updaterDelegate updaterWillRelaunchApplication:self.updater];
-    
-    uint8_t response[3] = {1, (uint8_t)relaunch, (uint8_t)showUI};
-    NSData *responseData = [NSData dataWithBytes:&response length:sizeof(response)];
-    if (![self.remotePort sendMessageWithIdentifier:SUResumeInstallationOnTermination data:responseData]) {
-#warning put in a custom error
-        [self abortUpdate];
-    } else {
-        [self.localPort invalidate];
-        self.localPort = nil;
-        
-        [self.remotePort invalidate];
-        self.remotePort = nil;
-        
-        [self terminateApp];
     }
+    
+    uint8_t response[2] = {(uint8_t)relaunch, (uint8_t)showUI};
+    NSData *responseData = [NSData dataWithBytes:response length:sizeof(response)];
+    
+    [self.remotePort sendMessageWithIdentifier:SUResumeInstallationToStage2 data:responseData completion:^(BOOL success) {
+        if (!success) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+#warning put in a custom error
+                [self abortUpdate];
+            });
+        } else {
+            // We'll terminate later when the installer tells us stage 2 is done
+        }
+    }];
 }
 
 // Note: this is overridden by the automatic update driver to do nothing
@@ -611,10 +621,6 @@
     }
     
     if (self.remotePort != nil) {
-        uint8_t exitCode = 0;
-        NSData *exitData = [NSData dataWithBytes:&exitCode length:sizeof(exitCode)];
-        [self.remotePort sendMessageWithIdentifier:1 data:exitData];
-        
         [self.remotePort invalidate];
         self.remotePort = nil;
     }

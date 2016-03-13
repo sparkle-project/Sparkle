@@ -13,6 +13,7 @@
 
 @property (nonatomic) CFMessagePortRef messagePort;
 @property (nonatomic, copy) void (^invalidationCallback)(void);
+@property (nonatomic, readonly) dispatch_queue_t messageQueue;
 
 @end
 
@@ -22,6 +23,7 @@ static const char *SURemoteMessagePortSelfKey = "su_messagePort";
 
 @synthesize messagePort = _messagePort;
 @synthesize invalidationCallback = _invalidationCallback;
+@synthesize messageQueue = _messageQueue;
 
 - (nullable instancetype)initWithServiceName:(NSString *)serviceName invalidationCallback:(void (^)(void))invalidationCallback
 {
@@ -32,8 +34,11 @@ static const char *SURemoteMessagePortSelfKey = "su_messagePort";
             return nil;
         }
         
+        _messageQueue = dispatch_queue_create("org.sparkle-project.remote-message-port", DISPATCH_QUEUE_SERIAL);
         _messagePort = messagePort;
         _invalidationCallback = [invalidationCallback copy];
+        
+        CFRetain((__bridge CFTypeRef)(self));
         
         // We have to set an associated object here because we can't pass an info context to remote message ports when setting up an invalidation handler
         objc_setAssociatedObject((__bridge id)messagePort, SURemoteMessagePortSelfKey, self, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -44,32 +49,27 @@ static const char *SURemoteMessagePortSelfKey = "su_messagePort";
     return self;
 }
 
-- (BOOL)sendMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
+- (void)sendMessageWithIdentifier:(int32_t)identifier data:(NSData *)data completion:(void (^)(BOOL success))completionHandler
 {
-    @synchronized(self) {
+    dispatch_async(self.messageQueue, ^{
         SInt32 status = 0;
         if (self.messagePort != NULL) {
             status = CFMessagePortSendRequest(self.messagePort, identifier, (CFDataRef)data, 0.1, 0.0, NULL, NULL);
         } else {
             status = kCFMessagePortIsInvalid;
         }
-        return (status == kCFMessagePortSuccess);
-    }
+        completionHandler(status == kCFMessagePortSuccess);
+    });
 }
 
 - (void)invalidate
 {
-    @synchronized(self) {
+    dispatch_async(self.messageQueue, ^{
         if (self.invalidationCallback != nil) {
             self.invalidationCallback = nil;
             CFMessagePortInvalidate(self.messagePort);
         }
-    }
-}
-
-- (void)dealloc
-{
-    [self invalidate];
+    });
 }
 
 // For safetly, let's not assume what thread this may be called on
@@ -77,17 +77,19 @@ static void messageInvalidationCallback(CFMessagePortRef messagePort, void * __u
 {
     SURemoteMessagePort *self = objc_getAssociatedObject((__bridge id)(messagePort), SURemoteMessagePortSelfKey);
     
-    @synchronized(self) {
+    dispatch_async(self.messageQueue, ^{
         if (self.invalidationCallback != nil) {
             self.invalidationCallback();
             self.invalidationCallback = nil;
         }
         
         self.messagePort = NULL;
-    }
-    
-    objc_setAssociatedObject((__bridge id)(messagePort), SURemoteMessagePortSelfKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    CFRelease(messagePort);
+        
+        objc_setAssociatedObject((__bridge id)(messagePort), SURemoteMessagePortSelfKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        CFRelease(messagePort);
+        
+        CFRelease((__bridge CFTypeRef)(self));
+    });
 }
 
 @end

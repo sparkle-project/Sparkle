@@ -8,16 +8,13 @@
 
 #import <Foundation/Foundation.h>
 
-@protocol SUVersionComparison;
-@class SUHost;
-
 @protocol SUInstaller <NSObject>
 
-- (instancetype)initWithHost:(SUHost *)host sourcePath:(NSString *)sourcePath installationPath:(NSString *)installationPath versionComparator:(id <SUVersionComparison>)comparator;
+- (BOOL)performFirstStage:(NSError **)error;
 
-- (BOOL)startInstallation:(NSError **)error;
+- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError **)error;
 
-- (BOOL)resumeInstallation:(NSError **)error;
+- (BOOL)performThirdStage:(NSError **)error;
 
 - (void)cleanup;
 

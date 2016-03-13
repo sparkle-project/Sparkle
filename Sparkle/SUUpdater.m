@@ -20,6 +20,8 @@
 #import "SUCodeSigningVerifier.h"
 #import "SUSystemProfiler.h"
 #include <SystemConfiguration/SystemConfiguration.h>
+#import "SURemoteMessagePort.h"
+#import "SUMessageTypes.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -576,7 +578,23 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
 
 - (BOOL)updateInProgress
 {
-    return self.driver && ([self.driver finished] == NO);
+    if (self.driver != nil) {
+        return YES;
+    }
+    
+    if (self.driver != nil && !self.driver.finished) {
+        return YES;
+    }
+    
+    SURemoteMessagePort *remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForHost(self.host) invalidationCallback:^{}];
+    BOOL installerAlive = (remotePort != nil);
+    [remotePort invalidate];
+    
+    if (installerAlive) {
+        return YES;
+    }
+    
+    return NO;
 }
 
 - (NSBundle *)hostBundle { return [self.host bundle]; }
