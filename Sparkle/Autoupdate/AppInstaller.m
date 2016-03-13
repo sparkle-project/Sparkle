@@ -47,6 +47,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 @property (nonatomic) BOOL willCompleteInstallation;
 
 @property (nonatomic) dispatch_queue_t installerQueue;
+@property (nonatomic) BOOL performedStage1Installation;
 @property (nonatomic) BOOL performedStage2Installation;
 @property (nonatomic) BOOL handledResumeInstallationToStage2;
 
@@ -69,6 +70,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 @synthesize installer = _installer;
 @synthesize willCompleteInstallation = _willCompleteInstallation;
 @synthesize installerQueue = _installerQueue;
+@synthesize performedStage1Installation = _performedStage1Installation;
 @synthesize performedStage2Installation = _performedStage2Installation;
 @synthesize handledResumeInstallationToStage2 = _handledResumeInstallationToStage2;
 
@@ -336,6 +338,10 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
                 }
             }];
             
+            self.performedStage1Installation = YES;
+            
+            // Stage 2 can still be run before we finish installation
+            // if the updater requests for it before the app is terminated
             [self finishInstallationAfterHostTermination];
         });
     });
@@ -343,7 +349,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 
 - (void)performStage2InstallationIfNeeded
 {
-    if (self.performedStage2Installation) {
+    if (!self.performedStage1Installation || self.performedStage2Installation) {
         return;
     }
     

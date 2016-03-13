@@ -42,6 +42,8 @@
 @property (nonatomic) SULocalMessagePort *localPort;
 @property (nonatomic) SURemoteMessagePort *remotePort;
 
+@property (nonatomic) SUInstallerMessageType currentStage;
+
 @end
 
 @implementation SUBasicUpdateDriver
@@ -57,6 +59,7 @@
 
 @synthesize localPort = _localPort;
 @synthesize remotePort = _remotePort;
+@synthesize currentStage = _currentStage;
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL
 {
@@ -312,20 +315,33 @@
 
 - (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
 {
+    if (!SUInstallerMessageTypeIsLegal(self.currentStage, identifier)) {
+        SULog(@"Error: received out of order message with current stage: %d, requested stage: %d", self.currentStage, identifier);
+        return;
+    }
+    
     if (identifier == SUExtractedArchiveWithProgress) {
         if (data.length == sizeof(double)) {
             double progress = *(const double *)data.bytes;
             [self unarchiverExtractedProgress:progress];
+            self.currentStage = identifier;
         }
-    } else if (identifier == SUInstallationStartedStage1) {
-        [self installerDidStart];
     } else if (identifier == SUArchiveExtractionFailed) {
         if ([self.updateItem isDeltaUpdate]) {
             [self failedToApplyDeltaUpdate];
             return;
         }
         
+        // Don't have to store current stage because we're going to abort
+        
         [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) }]];
+        
+    } else if (identifier == SUValidationStarted) {
+        self.currentStage = identifier;
+    } else if (identifier == SUInstallationStartedStage1) {
+        self.currentStage = identifier;
+        [self installerDidStart];
+        
     } else if (identifier == SUInstallationFinishedStage1) {
         self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForHost(self.host) invalidationCallback:^{
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -340,9 +356,12 @@
 #warning put in a custom error
             [self abortUpdate];
         } else {
+            self.currentStage = identifier;
             [self installerIsReadyForRelaunch];
         }
     } else if (identifier == SUInstallationFinishedStage2) {
+        // Don't have to store current stage because we're severing our connection to the installer
+        
         [self.remotePort invalidate];
         self.remotePort = nil;
         
@@ -541,12 +560,13 @@
 {
     assert(self.updateItem);
 
+#warning should we try to really tell the installer to abort? If so, I need to handle this
     if (![self mayUpdateAndRestart])
     {
         [self abortUpdate];
         return;
     }
-
+    
     // Give the host app an opportunity to postpone the install and relaunch.
     if (!self.postponedOnce && [self.updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
     {
