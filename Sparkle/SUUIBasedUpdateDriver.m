@@ -7,10 +7,9 @@
 //
 
 #import "SUUIBasedUpdateDriver.h"
-
-#import "SUUpdater_Private.h"
+#import "SUUpdaterDelegate.h"
+#import "SUUserDriver.h"
 #import "SUHost.h"
-#import "SUOperatingSystem.h"
 #import "SUConstants.h"
 #import "SUAppcastItem.h"
 
@@ -20,18 +19,26 @@
 
 @implementation SUUIBasedUpdateDriver
 
-- (instancetype)initWithUpdater:(SUUpdater *)anUpdater host:(SUHost *)aHost
+- (instancetype)initWithUpdater:(id)anUpdater updaterDelegate:(id<SUUpdaterDelegate>)updaterDelegate userDriver:(id<SUUserDriver>)userDriver host:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle
 {
-    if ((self = [super initWithUpdater:anUpdater host:aHost])) {
+    if ((self = [super initWithUpdater:anUpdater updaterDelegate:updaterDelegate userDriver:userDriver host:host sparkleBundle:sparkleBundle])) {
         self.automaticallyInstallUpdates = NO;
     }
     return self;
 }
 
+// This indicates if automatic updates are allowed even if they may not be turned on at the moment
+- (BOOL)allowsAutomaticUpdates
+{
+    // Make sure the host allows automatic updates and
+    // make sure we can automatically update in the background without bugging the user (e.g, with a administrator password prompt)
+    return (self.host.allowsAutomaticUpdates && [[NSFileManager defaultManager] isWritableFileAtPath:self.host.bundlePath]);
+}
+
 - (void)didFindValidUpdate
 {
-    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
-        [[self.updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
+    if ([self.updaterDelegate respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
+        [self.updaterDelegate updater:self.updater didFindValidUpdate:self.updateItem];
     }
 
     if (self.automaticallyInstallUpdates) {
@@ -39,7 +46,7 @@
         return;
     }
     
-    [self.updater.userDriver showUpdateFoundWithAppcastItem:self.updateItem allowsAutomaticUpdates:self.updater.allowsAutomaticUpdates reply:^(SUUpdateAlertChoice choice) {
+    [self.userDriver showUpdateFoundWithAppcastItem:self.updateItem allowsAutomaticUpdates:[self allowsAutomaticUpdates] reply:^(SUUpdateAlertChoice choice) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self updateAlertFinishedWithChoice:choice];
         });
@@ -48,13 +55,13 @@
 
 - (void)didNotFindUpdate
 {
-    if ([[self.updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
-        [[self.updater delegate] updaterDidNotFindUpdate:self.updater];
+    if ([self.updaterDelegate respondsToSelector:@selector(updaterDidNotFindUpdate:)])
+        [self.updaterDelegate updaterDidNotFindUpdate:self.updater];
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
     if (!self.automaticallyInstallUpdates) {
         [self showNotice:^{
-            [self.updater.userDriver showUpdateNotFoundWithAcknowledgement:^{
+            [self.userDriver showUpdateNotFoundWithAcknowledgement:^{
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [self abortUpdate];
                 });
@@ -69,15 +76,15 @@
     switch (choice) {
         case SUInstallUpdateChoice:
         {
-            [self.updater.userDriver showDownloadInitiatedWithCompletion:^(SUDownloadUpdateStatus downloadCompletionStatus) {
+            [self.userDriver showDownloadInitiatedWithCompletion:^(SUDownloadUpdateStatus downloadCompletionStatus) {
                 switch (downloadCompletionStatus) {
                     case SUDownloadUpdateDone:
                         break;
                     case SUDownloadUpdateCancelled:
                         dispatch_async(dispatch_get_main_queue(), ^{
                             if (self.download != nil) {
-                                if ([[self.updater delegate] respondsToSelector:@selector(userDidCancelDownload:)]) {
-                                    [[self.updater delegate] userDidCancelDownload:self.updater];
+                                if ([self.updaterDelegate respondsToSelector:@selector(userDidCancelDownload:)]) {
+                                    [self.updaterDelegate userDidCancelDownload:self.updater];
                                 }
                                 
                                 [self abortUpdate];
@@ -104,30 +111,30 @@
 
 - (void)download:(NSURLDownload *)__unused download didReceiveResponse:(NSURLResponse *)response
 {
-    [self.updater.userDriver showDownloadDidReceiveResponse:response];
+    [self.userDriver showDownloadDidReceiveResponse:response];
 }
 
 - (void)download:(NSURLDownload *)__unused download didReceiveDataOfLength:(NSUInteger)length
 {
-    [self.updater.userDriver showDownloadDidReceiveDataOfLength:length];
+    [self.userDriver showDownloadDidReceiveDataOfLength:length];
 }
 
 - (void)extractUpdate
 {
     // Now we have to extract the downloaded archive.
-    [self.updater.userDriver showDownloadFinishedAndStartedExtractingUpdate];
+    [self.userDriver showDownloadFinishedAndStartedExtractingUpdate];
     
     [super extractUpdate];
 }
 
 - (void)unarchiverExtractedProgress:(double)progress
 {
-    [self.updater.userDriver showExtractionReceivedProgress:progress];
+    [self.userDriver showExtractionReceivedProgress:progress];
 }
 
 - (void)installerDidStart
 {
-    [self.updater.userDriver showInstallingUpdate];
+    [self.userDriver showInstallingUpdate];
 }
 
 - (void)installerIsReadyForRelaunch
@@ -137,7 +144,7 @@
         return;
     }
     
-    [self.updater.userDriver showExtractionFinishedAndReadyToInstallAndRelaunch:^(SUInstallUpdateStatus installUpdateStatus) {
+    [self.userDriver showExtractionFinishedAndReadyToInstallAndRelaunch:^(SUInstallUpdateStatus installUpdateStatus) {
         dispatch_async(dispatch_get_main_queue(), ^{
             switch (installUpdateStatus) {
                 case SUCancelUpdateInstallation:
@@ -164,7 +171,7 @@
     // tabs open), the status window still stays on the screen and obscures
     // other windows; with this fix, it doesn't
 
-    [self.updater.userDriver dismissUpdateInstallation];
+    [self.userDriver dismissUpdateInstallation];
 
     [super terminateApp];
 }
@@ -172,7 +179,7 @@
 - (void)abortUpdateWithError:(NSError *)error
 {
     [self showNotice:^{
-        [self.updater.userDriver showUpdaterError:error acknowledgement:^{
+        [self.userDriver showUpdaterError:error acknowledgement:^{
             dispatch_async(dispatch_get_main_queue(), ^{
                 [super abortUpdateWithError:error];
             });
@@ -185,14 +192,14 @@
 {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    if ([[self.updater delegate] respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
-        [[self.updater delegate] updaterWillShowModalAlert:self.updater];
+    if ([self.updaterDelegate respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
+        [self.updaterDelegate updaterWillShowModalAlert:self.updater];
     }
     
     noticeHandler();
     
-    if ([[self.updater delegate] respondsToSelector:@selector(updaterDidShowModalAlert:)]) {
-        [[self.updater delegate] updaterDidShowModalAlert:self.updater];
+    if ([self.updaterDelegate respondsToSelector:@selector(updaterDidShowModalAlert:)]) {
+        [self.updaterDelegate updaterDidShowModalAlert:self.updater];
     }
 #pragma clang diagnostic pop
 }

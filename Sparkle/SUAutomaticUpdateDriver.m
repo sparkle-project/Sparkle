@@ -8,12 +8,14 @@
 
 #import "SUAutomaticUpdateDriver.h"
 #import "SULocalizations.h"
-#import "SUUpdater.h"
+#import "SUUpdaterDelegate.h"
 #import "SUHost.h"
 #import "SUConstants.h"
 #import "SUErrors.h"
 #import "SUAppcastItem.h"
 #import "SULog.h"
+#import "SUStatusCompletionResults.h"
+#import "SUUserDriver.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -48,7 +50,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 {
     self.interruptible = NO;
     
-    [self.updater.userDriver showAutomaticUpdateFoundWithAppcastItem:self.updateItem reply:^(SUUpdateAlertChoice choice) {
+    [self.userDriver showAutomaticUpdateFoundWithAppcastItem:self.updateItem reply:^(SUUpdateAlertChoice choice) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self automaticUpdateAlertFinishedWithChoice:choice];
         });
@@ -69,7 +71,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
                 
                 // We could finish successfully or abort the update due to an error, so make sure we tell the user driver
                 // to terminate in both cases since they are waiting on us to signal termination
-                [self.updater.userDriver terminateApplication];
+                [self.userDriver terminateApplication];
             }
             break;
     }
@@ -80,7 +82,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)installerIsReadyForRelaunch
 {
-    [self.updater.userDriver registerApplicationTermination:^(SUApplicationTerminationStatus terminationStatus) {
+    [self.userDriver registerApplicationTermination:^(SUApplicationTerminationStatus terminationStatus) {
         // We use -performSelectorOnMainThread:withObject:waitUntilDone: rather than GCD because if we are on the main thread already,
         // we don't want to run the operation asynchronously. It's also possible we aren't on the main thread (say due to IPC through a XPC service).
         // Anyway, if we're on the main thread in a single process without the app delegate delaying termination,
@@ -92,15 +94,14 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     // This is a bad idea for a couple reasons. One is it may require linkage to AppKit, or some complex IOKit code
     // Another is that we would be making the assumption that the user driver is on the same system as the updater,
     // which is something we would be better off not assuming!
-    [self.updater.userDriver registerSystemPowerOff:^(SUSystemPowerOffStatus systemPowerOffStatus) {
+    [self.userDriver registerSystemPowerOff:^(SUSystemPowerOffStatus systemPowerOffStatus) {
         // See above for why we use -performSelectorOnMainThread:withObject:waitUntilDone:
         [self performSelectorOnMainThread:@selector(systemWillPowerOff:) withObject:@(systemPowerOffStatus) waitUntilDone:YES];
     }];
 
     self.willUpdateOnTermination = YES;
 
-    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
-    if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)])
+    if ([self.updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)])
     {
         BOOL relaunch = YES;
         BOOL showUI = NO;
@@ -110,7 +111,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         [invocation setArgument:&showUI atIndex:3];
         [invocation setTarget:self];
 
-        [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationInvocation:invocation];
+        [self.updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationInvocation:invocation];
     }
 
     // If this is marked as a critical update, we'll prompt the user to install it right away.
@@ -133,12 +134,11 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     {
         self.willUpdateOnTermination = NO;
         
-        [self.updater.userDriver unregisterApplicationTermination];
-        [self.updater.userDriver unregisterSystemPowerOff];
-
-        id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
-        if ([updaterDelegate respondsToSelector:@selector(updater:didCancelInstallUpdateOnQuit:)])
-            [updaterDelegate updater:self.updater didCancelInstallUpdateOnQuit:self.updateItem];
+        [self.userDriver unregisterApplicationTermination];
+        [self.userDriver unregisterSystemPowerOff];
+        
+        if ([self.updaterDelegate respondsToSelector:@selector(updater:didCancelInstallUpdateOnQuit:)])
+            [self.updaterDelegate updater:self.updater didCancelInstallUpdateOnQuit:self.updateItem];
     }
 }
 
@@ -217,9 +217,8 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     } else {
         // Call delegate separately here because otherwise it won't know we stopped.
         // Normally this gets called by the superclass
-        id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
-        if ([updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
-            [updaterDelegate updater:self.updater didAbortWithError:error];
+        if ([self.updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
+            [self.updaterDelegate updater:self.updater didAbortWithError:error];
         }
 
         [self abortUpdate];

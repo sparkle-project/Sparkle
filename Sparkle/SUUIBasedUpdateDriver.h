@@ -16,7 +16,7 @@
 
 @interface SUUIBasedUpdateDriver : SUBasicUpdateDriver
 
-- (instancetype)initWithUpdater:(SUUpdater *)updater host:(SUHost *)host;
+- (instancetype)initWithUpdater:(id)updater updaterDelegate:(id<SUUpdaterDelegate>)updaterDelegate userDriver:(id<SUUserDriver>)userDriver host:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle;
 
 @end
 

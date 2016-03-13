@@ -7,10 +7,7 @@
 //
 
 #import "SUScheduledUpdateDriver.h"
-#import "SUUpdater.h"
-
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
+#import "SUUpdaterDelegate.h"
 #import "SUVersionComparisonProtocol.h"
 
 #ifdef _APPKITDEFINES_H
@@ -35,10 +32,8 @@
 
 - (void)didNotFindUpdate
 {
-    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
-
-    if ([updaterDelegate respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
-        [updaterDelegate updaterDidNotFindUpdate:self.updater];
+    if ([self.updaterDelegate respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
+        [self.updaterDelegate updaterDidNotFindUpdate:self.updater];
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
@@ -52,9 +47,8 @@
     } else {
         // Call delegate separately here because otherwise it won't know we stopped.
         // Normally this gets called by the superclass
-        id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
-        if ([updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
-            [updaterDelegate updater:self.updater didAbortWithError:error];
+        if ([self.updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
+            [self.updaterDelegate updater:self.updater didAbortWithError:error];
         }
 
         [self abortUpdate];

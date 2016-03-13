@@ -9,6 +9,7 @@
 #import "SUUpdateDriver.h"
 #import "SUHost.h"
 #import "SULog.h"
+#import "SUUserDriver.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -18,7 +19,7 @@ NSString *const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
 @interface SUUpdateDriver ()
 
-@property (weak) SUUpdater *updater;
+@property (weak) id updater;
 @property (copy) NSURL *appcastURL;
 @property (getter=isInterruptible) BOOL interruptible;
 
@@ -27,17 +28,27 @@ NSString *const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 @implementation SUUpdateDriver
 
 @synthesize updater;
+@synthesize userDriver = _userDriver;
+@synthesize updaterDelegate = _updaterDelegate;
+@synthesize sparkleBundle = _sparkleBundle;
 @synthesize host;
 @synthesize interruptible;
 @synthesize finished;
 @synthesize appcastURL;
 @synthesize automaticallyInstallUpdates;
 
-- (instancetype)initWithUpdater:(SUUpdater *)anUpdater host:(SUHost *)aHost
+// Note the updater type is intentionally left as 'id' instead of SUUpdater*
+// We don't want to include a depedency to SUUpdater. The only reason we pass an updater is to pass it in
+// when calling methods on its delegate. This is an unfortunate legacy design decision (i.e, these methods should have
+// never taken an updater instance to begin with)
+- (instancetype)initWithUpdater:(id)anUpdater updaterDelegate:(id<SUUpdaterDelegate>)updaterDelegate userDriver:(id<SUUserDriver>)userDriver host:(SUHost *)aHost sparkleBundle:(NSBundle *)sparkleBundle
 {
     if ((self = [super init])) {
         self.updater = anUpdater;
         self.host = aHost;
+        _userDriver = userDriver;
+        _updaterDelegate = updaterDelegate;
+        _sparkleBundle = sparkleBundle;
     }
     return self;
 }

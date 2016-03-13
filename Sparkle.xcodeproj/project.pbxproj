@@ -107,7 +107,6 @@
 		61299B3609CB04E000B7442F /* Sparkle.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299B3509CB04E000B7442F /* Sparkle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		612DCBAF0D488BC60015DBEA /* SUUpdatePermissionPrompt.h in Headers */ = {isa = PBXBuildFile; fileRef = 612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */; settings = {ATTRIBUTES = (); }; };
 		612DCBB00D488BC60015DBEA /* SUUpdatePermissionPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */; };
-		6158A1C5137904B300487EC1 /* SUUpdater_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6158A1C4137904B300487EC1 /* SUUpdater_Private.h */; };
 		615AE3D00D64DC40001CA7BD /* SUModelTranslation.plist in Resources */ = {isa = PBXBuildFile; fileRef = 615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */; };
 		618FA5010DAE88B40026945C /* SUInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 618FA4FF0DAE88B40026945C /* SUInstaller.h */; settings = {ATTRIBUTES = (); }; };
 		618FA5050DAE8AB80026945C /* SUPlainInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 618FA5030DAE8AB80026945C /* SUPlainInstaller.h */; settings = {ATTRIBUTES = (); }; };
@@ -228,6 +227,7 @@
 		72A6F9851C94C3FE005F404C /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E20FD68CC7005AE3F6 /* SUBinaryDeltaCommon.m */; };
 		72A6F9861C94C49C005F404C /* SUPipedUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 6129C0B90E0B79810062CE76 /* SUPipedUnarchiver.m */; };
 		72A6F9871C94C4AE005F404C /* SUDiskImageUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 6102FE490E07803800F85D09 /* SUDiskImageUnarchiver.m */; };
+		72A6F98A1C94E2D6005F404C /* SUUpdaterDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 72A6F9891C94E2D6005F404C /* SUUpdaterDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72AC6B261B9AAC8800F62325 /* SparkleTestCodeSignApp.tar.gz in Resources */ = {isa = PBXBuildFile; fileRef = 72AC6B251B9AAC8800F62325 /* SparkleTestCodeSignApp.tar.gz */; };
 		72AC6B281B9AAD6700F62325 /* SparkleTestCodeSignApp.tar in Resources */ = {isa = PBXBuildFile; fileRef = 72AC6B271B9AAD6700F62325 /* SparkleTestCodeSignApp.tar */; };
 		72AC6B2A1B9AAF3A00F62325 /* SparkleTestCodeSignApp.tar.bz2 in Resources */ = {isa = PBXBuildFile; fileRef = 72AC6B291B9AAF3A00F62325 /* SparkleTestCodeSignApp.tar.bz2 */; };
@@ -610,7 +610,6 @@
 		6158A1BE1378F8BB00487EC1 /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = tr.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
 		6158A1BF1378F8BB00487EC1 /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = tr.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
 		6158A1C01378F8BB00487EC1 /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = tr.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
-		6158A1C4137904B300487EC1 /* SUUpdater_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdater_Private.h; sourceTree = "<group>"; };
 		615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = SUModelTranslation.plist; sourceTree = "<group>"; };
 		6186554310D7484E00B1E074 /* pt_PT */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = pt_PT; path = pt_PT.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		618915730E35937600B5E981 /* sv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Sparkle.strings; sourceTree = "<group>"; };
@@ -742,6 +741,7 @@
 		72A450521C69A68900D67EEA /* SUUpdatePermissionPromptResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdatePermissionPromptResult.m; sourceTree = "<group>"; };
 		72A4A23F1BB6567D00E7820D /* SUFileManagerTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUFileManagerTest.swift; sourceTree = "<group>"; };
 		72A6F97D1C94A5C2005F404C /* SUInstallerProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUInstallerProtocol.h; path = Autoupdate/SUInstallerProtocol.h; sourceTree = "<group>"; };
+		72A6F9891C94E2D6005F404C /* SUUpdaterDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdaterDelegate.h; sourceTree = "<group>"; };
 		72AC6B251B9AAC8800F62325 /* SparkleTestCodeSignApp.tar.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = SparkleTestCodeSignApp.tar.gz; sourceTree = "<group>"; };
 		72AC6B271B9AAD6700F62325 /* SparkleTestCodeSignApp.tar */ = {isa = PBXFileReference; lastKnownFileType = archive.tar; path = SparkleTestCodeSignApp.tar; sourceTree = "<group>"; };
 		72AC6B291B9AAF3A00F62325 /* SparkleTestCodeSignApp.tar.bz2 */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSignApp.tar.bz2; sourceTree = "<group>"; };
@@ -1238,7 +1238,7 @@
 				61CFB2C20E38496B007A1735 /* Drivers */,
 				61B5F8E309C4CE3C00B25A18 /* SUUpdater.h */,
 				61B5F8E409C4CE3C00B25A18 /* SUUpdater.m */,
-				6158A1C4137904B300487EC1 /* SUUpdater_Private.h */,
+				72A6F9891C94E2D6005F404C /* SUUpdaterDelegate.h */,
 			);
 			name = "Update Control";
 			sourceTree = "<group>";
@@ -1340,6 +1340,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72A6F98A1C94E2D6005F404C /* SUUpdaterDelegate.h in Headers */,
 				726E4A371C89116000C57C6A /* SUStandardUserDriverDelegate.h in Headers */,
 				726E4A0E1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h in Headers */,
 				725F97A81C8B42D700265BE4 /* SUStandardUserDriverProtocol.h in Headers */,
@@ -1393,7 +1394,6 @@
 				612DCBAF0D488BC60015DBEA /* SUUpdatePermissionPrompt.h in Headers */,
 				61B5F8ED09C4CE3C00B25A18 /* SUUpdater.h in Headers */,
 				725F977F1C8A93D700265BE4 /* SUUserDriverUIComponent.h in Headers */,
-				6158A1C5137904B300487EC1 /* SUUpdater_Private.h in Headers */,
 				61A354550DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.h in Headers */,
 				61A2259E0D1C495D00430CCD /* SUVersionComparisonProtocol.h in Headers */,
 				3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */,

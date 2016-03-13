@@ -7,16 +7,14 @@
 //
 
 #import "SUBasicUpdateDriver.h"
-
-#import <Foundation/Foundation.h>
-
+#import "SUUpdaterDelegate.h"
+#import "SUUserDriver.h"
 #import "SUHost.h"
 #import "SUOperatingSystem.h"
 #import "SUStandardVersionComparator.h"
 #import "SUConstants.h"
 #import "SULog.h"
 #import "SUBinaryDeltaCommon.h"
-#import "SUUpdater_Private.h"
 #import "SUFileManager.h"
 #import "SUErrors.h"
 #import "SULocalizations.h"
@@ -24,6 +22,7 @@
 #import "SULocalMessagePort.h"
 #import "SURemoteMessagePort.h"
 #import "SUMessageTypes.h"
+#import "SUAppcast.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -86,8 +85,8 @@
     id<SUVersionComparison> comparator = nil;
 
     // Give the delegate a chance to provide a custom version comparator
-    if ([[self.updater delegate] respondsToSelector:@selector(versionComparatorForUpdater:)]) {
-        comparator = [[self.updater delegate] versionComparatorForUpdater:self.updater];
+    if ([self.updaterDelegate respondsToSelector:@selector(versionComparatorForUpdater:)]) {
+        comparator = [self.updaterDelegate versionComparatorForUpdater:self.updater];
     }
 
     // If we don't get a comparator from the delegate, use the default comparator
@@ -157,8 +156,8 @@
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac
 {
-    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
-        [[self.updater delegate] updater:self.updater didFinishLoadingAppcast:ac];
+    if ([self.updaterDelegate respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
+        [self.updaterDelegate updater:self.updater didFinishLoadingAppcast:ac];
     }
 
     NSDictionary *userInfo = (ac != nil) ? @{ SUUpdaterAppcastNotificationKey: ac } : nil;
@@ -167,11 +166,11 @@
     SUAppcastItem *item = nil;
 
     // Now we have to find the best valid update in the appcast.
-    if ([[self.updater delegate] respondsToSelector:@selector(bestValidUpdateInAppcast:forUpdater:)]) // Does the delegate want to handle it?
+    if ([self.updaterDelegate respondsToSelector:@selector(bestValidUpdateInAppcast:forUpdater:)]) // Does the delegate want to handle it?
     {
-        item = [[self.updater delegate] bestValidUpdateInAppcast:ac forUpdater:self.updater];
+        item = [self.updaterDelegate bestValidUpdateInAppcast:ac forUpdater:self.updater];
         if ([item isDeltaUpdate]) {
-            self.nonDeltaUpdateItem = [[self.updater delegate] bestValidUpdateInAppcast:[ac copyWithoutDeltaUpdates] forUpdater:self.updater];
+            self.nonDeltaUpdateItem = [self.updaterDelegate bestValidUpdateInAppcast:[ac copyWithoutDeltaUpdates] forUpdater:self.updater];
         }
 	}
 	else // If not, we'll take care of it ourselves.
@@ -199,8 +198,8 @@
 {
     assert(self.updateItem);
 
-    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
-        [[self.updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
+    if ([self.updaterDelegate respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
+        [self.updaterDelegate updater:self.updater didFindValidUpdate:self.updateItem];
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
@@ -211,8 +210,8 @@
 
 - (void)didNotFindUpdate
 {
-    if ([[self.updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
-        [[self.updater delegate] updaterDidNotFindUpdate:self.updater];
+    if ([self.updaterDelegate respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
+        [self.updaterDelegate updaterDidNotFindUpdate:self.updater];
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
@@ -228,8 +227,8 @@
 {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self.updateItem fileURL]];
     [request setValue:[self.updater userAgentString] forHTTPHeaderField:@"User-Agent"];
-    if ([[self.updater delegate] respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
-        [[self.updater delegate] updater:self.updater
+    if ([self.updaterDelegate respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
+        [self.updaterDelegate updater:self.updater
                       willDownloadUpdate:self.updateItem
                              withRequest:request];
     }
@@ -280,8 +279,8 @@
         failingUrl = [self.updateItem fileURL];
     }
 
-    if ([[self.updater delegate] respondsToSelector:@selector(updater:failedToDownloadUpdate:error:)]) {
-        [[self.updater delegate] updater:self.updater
+    if ([self.updaterDelegate respondsToSelector:@selector(updater:failedToDownloadUpdate:error:)]) {
+        [self.updaterDelegate updater:self.updater
                   failedToDownloadUpdate:self.updateItem
                                    error:error];
     }
@@ -419,7 +418,7 @@
 
 - (BOOL)launchAutoUpdate:(NSError * __autoreleasing *)outError
 {
-    NSBundle *sparkleBundle = self.updater.sparkleBundle;
+    NSBundle *sparkleBundle = self.sparkleBundle;
     
     NSString *relaunchPath = nil;
     
@@ -475,9 +474,8 @@
     }
     
     NSString *pathToRelaunch = [self.host bundlePath];
-    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
-    if ([updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
-        pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:self.updater];
+    if ([self.updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
+        pathToRelaunch = [self.updaterDelegate pathToRelaunchForUpdater:self.updater];
     }
     
     NSString *dsaSignature = self.updateItem.DSASignature == nil ? @"" : self.updateItem.DSASignature;
@@ -524,38 +522,41 @@
     return YES;
 }
 
+- (BOOL)mayUpdateAndRestart
+{
+    return (!self.updaterDelegate || ![self.updaterDelegate respondsToSelector:@selector(updaterShouldRelaunchApplication:)] || [self.updaterDelegate updaterShouldRelaunchApplication:self.updater]);
+}
+
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
 {
     assert(self.updateItem);
 
-    if (![self.updater mayUpdateAndRestart])
+    if (![self mayUpdateAndRestart])
     {
         [self abortUpdate];
         return;
     }
 
     // Give the host app an opportunity to postpone the install and relaunch.
-    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
-    
-    if (!self.postponedOnce && [updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
+    if (!self.postponedOnce && [self.updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
     {
         NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installWithToolAndRelaunch:)]];
         [invocation setSelector:@selector(installWithToolAndRelaunch:)];
         [invocation setArgument:&relaunch atIndex:2];
         [invocation setTarget:self];
         self.postponedOnce = YES;
-        if ([updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:self.updateItem untilInvoking:invocation]) {
+        if ([self.updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:self.updateItem untilInvoking:invocation]) {
             return;
         }
     }
 
-    if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdate:)]) {
-        [updaterDelegate updater:self.updater willInstallUpdate:self.updateItem];
+    if ([self.updaterDelegate respondsToSelector:@selector(updater:willInstallUpdate:)]) {
+        [self.updaterDelegate updater:self.updater willInstallUpdate:self.updateItem];
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-    if ([updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)])
-        [updaterDelegate updaterWillRelaunchApplication:self.updater];
+    if ([self.updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)])
+        [self.updaterDelegate updaterWillRelaunchApplication:self.updater];
     
     uint8_t response[3] = {1, (uint8_t)relaunch, (uint8_t)showUI};
     NSData *responseData = [NSData dataWithBytes:&response length:sizeof(response)];
@@ -576,7 +577,7 @@
 // Note: this is overridden by the automatic update driver to do nothing
 - (void)terminateApp
 {
-    [self.updater.userDriver terminateApplication];
+    [self.userDriver terminateApplication];
 }
 
 - (void)cleanUpDownload
@@ -618,7 +619,7 @@
         self.remotePort = nil;
     }
     
-    [self.updater.userDriver dismissUpdateInstallation];
+    [self.userDriver dismissUpdateInstallation];
     
     [self cleanUpDownload];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -638,9 +639,8 @@
     }
 
     // Notify host app that update has aborted
-    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
-    if ([updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
-        [updaterDelegate updater:self.updater didAbortWithError:error];
+    if ([self.updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
+        [self.updaterDelegate updater:self.updater didAbortWithError:error];
     }
 
     [self abortUpdate];

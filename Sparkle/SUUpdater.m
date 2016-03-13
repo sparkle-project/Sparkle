@@ -7,7 +7,7 @@
 //
 
 #import "SUUpdater.h"
-
+#import "SUUpdaterDelegate.h"
 #import "SUHost.h"
 #import "SUUpdatePermissionPromptResult.h"
 
@@ -304,8 +304,15 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
     // Background update checks should only happen if we have a network connection.
     //	Wouldn't want to annoy users on dial-up by establishing a connection every
     //	hour or so:
-    SUUpdateDriver *theUpdateDriver = [[([self automaticallyDownloadsUpdates] ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class])alloc] initWithUpdater:self host:self.host];
-
+    
+    SUUpdateDriver *theUpdateDriver =
+    [([self automaticallyDownloadsUpdates] ? [SUAutomaticUpdateDriver alloc] : [SUScheduledUpdateDriver alloc])
+     initWithUpdater:self
+     updaterDelegate:self.delegate
+     userDriver:self.userDriver
+     host:self.host
+     sparkleBundle:self.sparkleBundle];
+    
     // We don't want the rechability check to act on the driver if the updater is going near death
     __weak SUUpdater *updater = self;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -313,24 +320,19 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
     });
 }
 
-
-- (BOOL)mayUpdateAndRestart
-{
-    return (!self.delegate || ![self.delegate respondsToSelector:@selector(updaterShouldRelaunchApplication:)] || [self.delegate updaterShouldRelaunchApplication:self]);
-}
-
 - (void)checkForUpdates
 {
     if (self.driver && [self.driver isInterruptible]) {
         [self.driver abortUpdate];
     }
-
-    [self checkForUpdatesWithDriver:[[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self host:self.host]];
+    
+    SUUserInitiatedUpdateDriver *theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self updaterDelegate:self.delegate userDriver:self.userDriver host:self.host sparkleBundle:self.sparkleBundle];
+    [self checkForUpdatesWithDriver:theUpdateDriver];
 }
 
 - (void)checkForUpdateInformation
 {
-    [self checkForUpdatesWithDriver:[[SUProbingUpdateDriver alloc] initWithUpdater:self host:self.host]];
+    [self checkForUpdatesWithDriver:[[SUProbingUpdateDriver alloc] initWithUpdater:self updaterDelegate:self.delegate userDriver:self.userDriver host:self.host sparkleBundle:self.sparkleBundle]];
 }
 
 - (void)installUpdatesIfAvailable
@@ -339,7 +341,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
         [self.driver abortUpdate];
     }
 
-    SUUserInitiatedUpdateDriver *theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self host:self.host];
+    SUUserInitiatedUpdateDriver *theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self updaterDelegate:self.delegate userDriver:self.userDriver host:self.host sparkleBundle:self.sparkleBundle];
     theUpdateDriver.automaticallyInstallUpdates = YES;
     [self checkForUpdatesWithDriver:theUpdateDriver];
 }
@@ -436,13 +438,6 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
 
     // Otherwise, automatically downloading updates is allowed. Does the user want it?
     return [self.host boolForUserDefaultsKey:SUAutomaticallyUpdateKey];
-}
-
-- (BOOL)allowsAutomaticUpdates
-{
-    // Make sure the host allows automatic updates and
-    // make sure we can automatically update in the background without bugging the user (e.g, with a administrator password prompt)
-    return (self.host.allowsAutomaticUpdates && [[NSFileManager defaultManager] isWritableFileAtPath:self.host.bundlePath]);
 }
 
 - (void)setFeedURL:(NSURL *)feedURL

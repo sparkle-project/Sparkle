@@ -13,13 +13,18 @@
 
 extern NSString *const SUUpdateDriverFinishedNotification;
 
+@protocol SUUpdaterDelegate, SUUserDriver;
 @class SUHost, SUUpdater;
+
 @interface SUUpdateDriver : NSObject <NSURLDownloadDelegate>
 
-@property (readonly, weak) SUUpdater *updater;
+@property (readonly, weak) id updater;
 @property (strong) SUHost *host;
+@property (nonatomic, readonly, weak) id<SUUpdaterDelegate> updaterDelegate;
+@property (nonatomic, readonly) id<SUUserDriver> userDriver;
+@property (nonatomic, readonly) NSBundle *sparkleBundle;
 
-- (instancetype)initWithUpdater:(SUUpdater *)updater host:(SUHost *)host;
+- (instancetype)initWithUpdater:(id)updater updaterDelegate:(id<SUUpdaterDelegate>)updaterDelegate userDriver:(id<SUUserDriver>)userDriver host:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle;
 - (void)checkForUpdatesAtURL:(NSURL *)URL;
 - (void)abortUpdate;
 

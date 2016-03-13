@@ -7,8 +7,8 @@
 //
 
 #import "SUUserInitiatedUpdateDriver.h"
-#import "SUUpdater.h"
 #import "SUHost.h"
+#import "SUUserDriver.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -26,7 +26,7 @@
 
 - (void)dismissCheckingForUpdates
 {
-    [self.updater.userDriver dismissUserInitiatedUpdateCheck];
+    [self.userDriver dismissUserInitiatedUpdateCheck];
 }
 
 - (void)cancelCheckForUpdates:(id)__unused sender
@@ -39,7 +39,7 @@
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL
 {
-    [self.updater.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SUUserInitiatedCheckStatus completionStatus) {
+    [self.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SUUserInitiatedCheckStatus completionStatus) {
         switch (completionStatus) {
             case SUUserInitiatedCheckDone:
                 break;
