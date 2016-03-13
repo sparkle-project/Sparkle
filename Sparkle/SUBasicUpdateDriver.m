@@ -612,7 +612,6 @@
 
 - (void)cleanUpDownload
 {
-#warning review if download cleanup should really be done here
     if (self.tempDir != nil) // tempDir contains downloadPath, so we implicitly delete both here.
     {
         BOOL success = NO;
