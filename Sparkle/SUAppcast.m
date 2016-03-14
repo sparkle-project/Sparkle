@@ -115,8 +115,10 @@
 
 -(NSString *)sparkleNamespacedNameOfNode:(NSXMLNode *)node {
     // XML namespace prefix is semantically meaningless, so compare namespace URI
+    // NS URI isn't used to fetch anything, and must match exactly, so we look for http:// not https://
     if ([[node URI] isEqualToString:@"http://www.andymatuschak.org/xml-namespaces/sparkle"]) {
-        NSString *localName = [node localName]; assert(localName);
+        NSString *localName = [node localName];
+        assert(localName);
         return [@"sparkle:" stringByAppendingString:localName];
     } else {
         return [node name]; // Backwards compatibility
