@@ -79,7 +79,7 @@
     NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
     NSString *cachePath = nil;
     if ([cachePaths count]) {
-        cachePath = cachePaths[0];
+        cachePath = [cachePaths objectAtIndex:0];
     }
     if (!cachePath) {
         SULog(@"Failed to find user's cache directory! Using system default");

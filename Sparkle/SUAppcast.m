@@ -178,13 +178,12 @@
                 dict[name] = encDict;
 			}
             else if ([name isEqualToString:SURSSElementPubDate]) {
-                // pubDate is expected to be an NSDate by SUAppcastItem, but the RSS class was returning an NSString
-                NSString *string = node.stringValue;
-                if (string) {
-                    NSDate *date = [NSDate dateWithNaturalLanguageString:string];
-                    if (date) {
-                        dict[name] = date;
-                    }
+                // We don't want to parse and create a NSDate instance -
+                // that's a risk we can avoid. We don't use the date anywhere other
+                // than it being accessible from SUAppcastItem
+                NSString *dateString = node.stringValue;
+                if (dateString) {
+                    dict[name] = dateString;
                 }
 			}
 			else if ([name isEqualToString:SUAppcastElementDeltas]) {
@@ -230,11 +229,8 @@
             return nil;
         }
     }
-
-    if ([appcastItems count]) {
-        NSSortDescriptor *sort = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO];
-        [appcastItems sortUsingDescriptors:@[sort]];
-    }
+    
+    self.items = appcastItems;
 
     return appcastItems;
 }
@@ -262,9 +258,9 @@
         NSUnderlyingErrorKey: error,
     }];
 
-    NSURL *failingUrl = error.userInfo[NSURLErrorFailingURLErrorKey];
+    NSURL *failingUrl = [error.userInfo objectForKey:NSURLErrorFailingURLErrorKey];
     if (failingUrl) {
-        userInfo[NSURLErrorFailingURLErrorKey] = failingUrl;
+        [userInfo setObject:failingUrl forKey:NSURLErrorFailingURLErrorKey];
     }
 
     self.completionBlock([NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastError userInfo:userInfo]);
