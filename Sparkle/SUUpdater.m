@@ -340,7 +340,9 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 
 - (void)checkForUpdatesWithDriver:(id <SUUpdateDriver> )d
 {
-	if ([self updateInProgress]) { return; }
+    if ([self updateInProgress]) {
+        return;
+    }
     
     [self.userDriver invalidateUpdateCheckTimer];
 
@@ -353,10 +355,9 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
     }
 
     self.driver = d;
-
+    
     // If we're not given a driver at all, just schedule the next update check and bail.
-    if (!self.driver)
-    {
+    if (!self.driver) {
         [self scheduleNextUpdateCheck];
         return;
     }
@@ -562,7 +563,9 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
     
     // Stop checking for updates
     [self cancelNextUpdateCycle];
-    [self.userDriver invalidateUpdateCheckTimer];
+    
+    // Don't tell the user driver to invalidate the update check timer
+    // It could always create a new updater instance once the scheduled time occurs
     
     // Abort any on-going updates
     // A driver could be retained by another object (eg: a timer),

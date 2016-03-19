@@ -218,7 +218,9 @@
     [self cancelUpdateCheckStatus];
     [self cancelDownloadStatus];
     [self dismissInstallAndRestart];
-    [self invalidateUpdateCheckTimer];
+    
+    // We don't invalidate the update check timer here because that's not really a part of the installation
+    // and we might want to keep it still alive
 }
 
 - (void)invalidate
@@ -229,6 +231,8 @@
     self.downloadStatusCompletion = nil;
     self.installUpdateHandler = nil;
     self.updateCheckStatusCompletion = nil;
+    
+    [self invalidateUpdateCheckTimer];
     
     // Dismiss the installation normally
     [self dismissUpdateInstallation];
