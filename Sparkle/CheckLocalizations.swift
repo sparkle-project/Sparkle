@@ -3,7 +3,7 @@
 import Foundation
 
 func die(msg: String) {
-    println("ERROR: \(msg)")
+    print("ERROR: \(msg)")
     exit(1)
 }
 
@@ -28,8 +28,8 @@ if enStringsDict == nil {
 }
 let enStringsDictKeys = enStringsDict!.allKeys
 
-let dirPath = sparkleRoot! + "/Sparkle"
-let dirContents = NSFileManager.defaultManager().contentsOfDirectoryAtPath(dirPath, error: nil) as! [String]
+let dirPath = NSString(string: sparkleRoot! + "/Sparkle")
+let dirContents = try! NSFileManager.defaultManager().contentsOfDirectoryAtPath(dirPath as String)
 let css =
     "body { font-family: sans-serif; font-size: 10pt; }" +
     "h1 { font-size: 12pt; }" +
@@ -51,14 +51,14 @@ head.addChild(NSXMLElement(name: "style", stringValue: css))
 
 let locale = NSLocale.currentLocale()
 for dirEntry in dirContents {
-    if dirEntry.pathExtension != "lproj" || dirEntry == "en.lproj" {
+    if NSString(string: dirEntry).pathExtension != "lproj" || dirEntry == "en.lproj" {
         continue
     }
 
-    let lang = locale.displayNameForKey(NSLocaleLanguageCode, value: dirEntry.stringByDeletingPathExtension)
+    let lang = locale.displayNameForKey(NSLocaleLanguageCode, value: NSString(string: dirEntry).stringByDeletingPathExtension)
     body.addChild(NSXMLElement(name: "h1", stringValue: "\(dirEntry) (\(lang!))"))
 
-    let stringsPath = dirPath.stringByAppendingPathComponent(dirEntry).stringByAppendingPathComponent("Sparkle.strings")
+    let stringsPath = NSString(string: dirPath.stringByAppendingPathComponent(dirEntry)).stringByAppendingPathComponent("Sparkle.strings")
     let stringsDict = NSDictionary(contentsOfFile: stringsPath)
     if stringsDict == nil {
         die("Invalid strings file \(dirEntry)")
@@ -90,12 +90,12 @@ for dirEntry in dirContents {
     let sorter = { (s1: String, s2: String) -> Bool in
         return s1 < s2
     }
-    missing.sort(sorter)
-    unlocalized.sort(sorter)
-    unused.sort(sorter)
+    missing.sortInPlace(sorter)
+    unlocalized.sortInPlace(sorter)
+    unused.sortInPlace(sorter)
 
     let addRow = { (prefix: String, cssClass: String, key: String) -> Void in
-        body.addChild(NSXMLElement(name: "span", attributes: ["class": cssClass], stringValue: " ".join([prefix, key]) + "\n"))
+        body.addChild(NSXMLElement(name: "span", attributes: ["class": cssClass], stringValue: [prefix, key].joinWithSeparator(" ") + "\n"))
     }
 
     for key in missing {
