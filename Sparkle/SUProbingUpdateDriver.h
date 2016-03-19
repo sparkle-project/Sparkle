@@ -2,18 +2,22 @@
 //  SUProbingUpdateDriver.h
 //  Sparkle
 //
-//  Created by Andy Matuschak on 5/7/08.
-//  Copyright 2008 Andy Matuschak. All rights reserved.
+//  Created by Mayur Pawashe on 3/18/16.
+//  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#ifndef SUPROBINGUPDATEDRIVER_H
-#define SUPROBINGUPDATEDRIVER_H
-
 #import <Foundation/Foundation.h>
-#import "SUBasicUpdateDriver.h"
+#import "SUUpdateDriver.h"
 
-// This replaces the old SUStatusChecker.
-@interface SUProbingUpdateDriver : SUBasicUpdateDriver
+NS_ASSUME_NONNULL_BEGIN
+
+@class SUHost;
+@protocol SUUpdaterDelegate;
+
+@interface SUProbingUpdateDriver : NSObject <SUUpdateDriver>
+
+- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate;
+
 @end
 
-#endif
+NS_ASSUME_NONNULL_END

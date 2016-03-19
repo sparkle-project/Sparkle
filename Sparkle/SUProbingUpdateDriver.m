@@ -2,38 +2,56 @@
 //  SUProbingUpdateDriver.m
 //  Sparkle
 //
-//  Created by Andy Matuschak on 5/7/08.
-//  Copyright 2008 Andy Matuschak. All rights reserved.
+//  Created by Mayur Pawashe on 3/18/16.
+//  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
 #import "SUProbingUpdateDriver.h"
-#import "SUUpdaterDelegate.h"
+#import "SUBasicUpdateDriver.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
 #endif
 
+@interface SUProbingUpdateDriver () <SUBasicUpdateDriverDelegate>
+
+@property (nonatomic, readonly) SUBasicUpdateDriver *basicDriver;
+
+@end
+
 @implementation SUProbingUpdateDriver
 
-// Stop as soon as we have an answer! Since the superclass implementations are not called, we are responsible for notifying the delegate.
+@synthesize basicDriver = _basicDriver;
 
-- (void)didFindValidUpdate
+- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(id <SUUpdaterDelegate>)updaterDelegate
 {
-    if ([self.updaterDelegate respondsToSelector:@selector(updater:didFindValidUpdate:)])
-        [self.updaterDelegate updater:self.updater didFindValidUpdate:self.updateItem];
-    NSDictionary *userInfo = (self.updateItem != nil) ? @{ SUUpdaterAppcastItemNotificationKey: self.updateItem } : nil;
-    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification object:self.updater userInfo:userInfo];
+    self = [super init];
+    if (self != nil) {
+        _basicDriver = [[SUBasicUpdateDriver alloc] initWithHost:host updater:updater updaterDelegate:updaterDelegate delegate:self];
+    }
+    return self;
+}
+
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(void (^)(void))completionBlock
+{
+    [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:NO completion:completionBlock];
+}
+
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)__unused appcastItem
+{
+    // Stop as soon as we have an answer
     [self abortUpdate];
 }
 
-- (void)didNotFindUpdate
+- (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)__unused error
 {
-    if ([self.updaterDelegate respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
-        [self.updaterDelegate updaterDidNotFindUpdate:self.updater];
-    }
-    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
-
+    // Silently fail; the user doesn't need to know about the error
     [self abortUpdate];
+}
+
+- (void)abortUpdate
+{
+    [self.basicDriver abortUpdateWithError:nil];
 }
 
 @end

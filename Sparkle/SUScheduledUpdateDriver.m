@@ -2,57 +2,63 @@
 //  SUScheduledUpdateDriver.m
 //  Sparkle
 //
-//  Created by Andy Matuschak on 5/6/08.
-//  Copyright 2008 Andy Matuschak. All rights reserved.
+//  Created by Mayur Pawashe on 3/15/16.
+//  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
 #import "SUScheduledUpdateDriver.h"
+#import "SUHost.h"
+#import "SUErrors.h"
 #import "SUUpdaterDelegate.h"
-#import "SUVersionComparisonProtocol.h"
+#import "SUUserDriver.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-@interface SUScheduledUpdateDriver ()
+@interface SUScheduledUpdateDriver() <SUUIBasedUpdateDriverDelegate>
 
-@property (assign) BOOL showErrors;
+@property (nonatomic, readonly) SUUIBasedUpdateDriver *uiDriver;
 
 @end
 
 @implementation SUScheduledUpdateDriver
 
-@synthesize showErrors;
+@synthesize uiDriver = _uiDriver;
 
-- (void)didFindValidUpdate
+- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate
 {
-    self.showErrors = YES; // We only start showing errors after we present the UI for the first time.
-    [super didFindValidUpdate];
+    self = [super init];
+    if (self != nil) {
+        _uiDriver = [[SUUIBasedUpdateDriver alloc] initWithHost:host sparkleBundle:sparkleBundle updater:updater userDriver:userDriver updaterDelegate:updaterDelegate delegate:self];
+    }
+    return self;
 }
 
-- (void)didNotFindUpdate
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(void (^)(void))completionBlock
 {
-    if ([self.updaterDelegate respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
-        [self.updaterDelegate updaterDidNotFindUpdate:self.updater];
-    }
-    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
-
-    [self abortUpdate]; // Don't tell the user that no update was found; this was a scheduled update.
+    [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:NO completion:completionBlock];
 }
 
-- (void)abortUpdateWithError:(NSError *)error
+- (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)__unused error
 {
-    if (self.showErrors) {
-        [super abortUpdateWithError:error];
-    } else {
-        // Call delegate separately here because otherwise it won't know we stopped.
-        // Normally this gets called by the superclass
-        if ([self.updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
-            [self.updaterDelegate updater:self.updater didAbortWithError:error];
-        }
+    // Don't tell the user that no update was found or some appcast fetch error occurred for scheduled update checks
+    [self abortUpdateWithError:nil];
+}
 
-        [self abortUpdate];
-    }
+- (void)uiDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error
+{
+    [self abortUpdateWithError:error];
+}
+
+- (void)abortUpdate
+{
+    [self abortUpdateWithError:nil];
+}
+
+- (void)abortUpdateWithError:(nullable NSError *)error
+{
+    [self.uiDriver abortUpdateWithError:error];
 }
 
 @end

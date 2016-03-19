@@ -2,18 +2,22 @@
 //  SUUserInitiatedUpdateDriver.h
 //  Sparkle
 //
-//  Created by Andy Matuschak on 5/30/08.
-//  Copyright 2008 Andy Matuschak. All rights reserved.
+//  Created by Mayur Pawashe on 3/18/16.
+//  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#ifndef SUUSERINITIATEDUPDATEDRIVER_H
-#define SUUSERINITIATEDUPDATEDRIVER_H
-
 #import <Foundation/Foundation.h>
-#import "SUUIBasedUpdateDriver.h"
+#import "SUUpdateDriver.h"
 
-@interface SUUserInitiatedUpdateDriver : SUUIBasedUpdateDriver
+NS_ASSUME_NONNULL_BEGIN
+
+@class SUHost;
+@protocol SUUpdaterDelegate, SUUserDriver;
+
+@interface SUUserInitiatedUpdateDriver : NSObject <SUUpdateDriver>
+
+- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate;
 
 @end
 
-#endif
+NS_ASSUME_NONNULL_END

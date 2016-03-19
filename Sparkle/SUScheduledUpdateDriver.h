@@ -2,18 +2,23 @@
 //  SUScheduledUpdateDriver.h
 //  Sparkle
 //
-//  Created by Andy Matuschak on 5/6/08.
-//  Copyright 2008 Andy Matuschak. All rights reserved.
+//  Created by Mayur Pawashe on 3/15/16.
+//  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#ifndef SUSCHEDULEDUPDATEDRIVER_H
-#define SUSCHEDULEDUPDATEDRIVER_H
-
 #import <Foundation/Foundation.h>
+#import "SUUpdateDriver.h"
 #import "SUUIBasedUpdateDriver.h"
 
-@interface SUScheduledUpdateDriver : SUUIBasedUpdateDriver
+NS_ASSUME_NONNULL_BEGIN
+
+@class SUHost;
+@protocol SUUserDriver, SUUpdaterDelegate;
+
+@interface SUScheduledUpdateDriver : NSObject <SUUpdateDriver>
+
+- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate;
 
 @end
 
-#endif
+NS_ASSUME_NONNULL_END

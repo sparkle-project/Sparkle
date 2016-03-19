@@ -2,22 +2,38 @@
 //  SUUIBasedUpdateDriver.h
 //  Sparkle
 //
-//  Created by Andy Matuschak on 5/5/08.
-//  Copyright 2008 Andy Matuschak. All rights reserved.
+//  Created by Mayur Pawashe on 3/18/16.
+//  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#ifndef SUUIBASEDUPDATEDRIVER_H
-#define SUUIBASEDUPDATEDRIVER_H
-
 #import <Foundation/Foundation.h>
-#import "SUBasicUpdateDriver.h"
 
-@class SUStatusController;
+NS_ASSUME_NONNULL_BEGIN
 
-@interface SUUIBasedUpdateDriver : SUBasicUpdateDriver
+@protocol SUUIBasedUpdateDriverDelegate <NSObject>
 
-- (instancetype)initWithUpdater:(id)updater updaterDelegate:(id<SUUpdaterDelegate>)updaterDelegate userDriver:(id<SUUserDriver>)userDriver host:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle;
+- (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
+- (void)uiDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
+
+@optional
+
+- (void)basicDriverDidFinishLoadingAppcast;
 
 @end
 
-#endif
+@class SUHost;
+@protocol SUUserDriver, SUUpdaterDelegate;
+
+@interface SUUIBasedUpdateDriver : NSObject
+
+- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate delegate:(id<SUUIBasedUpdateDriverDelegate>)delegate;
+
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(void (^)(void))completionBlock;
+
+@property (nonatomic, readonly) id<SUUserDriver> userDriver;
+
+- (void)abortUpdateWithError:(nullable NSError *)error;
+
+@end
+
+NS_ASSUME_NONNULL_END

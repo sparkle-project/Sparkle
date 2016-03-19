@@ -10,16 +10,16 @@
 #import "SUUpdaterDelegate.h"
 #import "SUHost.h"
 #import "SUUpdatePermissionPromptResult.h"
-
-#import "SUAutomaticUpdateDriver.h"
-#import "SUProbingUpdateDriver.h"
-#import "SUUserInitiatedUpdateDriver.h"
-#import "SUScheduledUpdateDriver.h"
+#import "SUUpdateDriver.h"
 #import "SUConstants.h"
 #import "SULog.h"
 #import "SUCodeSigningVerifier.h"
 #import "SUSystemProfiler.h"
 #include <SystemConfiguration/SystemConfiguration.h>
+#import "SUScheduledUpdateDriver.h"
+#import "SUProbingUpdateDriver.h"
+#import "SUUserInitiatedUpdateDriver.h"
+#import "SUAutomaticUpdateDriver.h"
 #import "SURemoteMessagePort.h"
 #import "SUMessageTypes.h"
 
@@ -39,7 +39,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (strong) NSBundle *sparkleBundle;
 @property (readonly, copy) NSURL *parameterizedFeedURL;
 
-@property (strong) SUUpdateDriver *driver;
+@property (strong) id <SUUpdateDriver> driver;
 @property (strong) SUHost *host;
 
 @end
@@ -72,8 +72,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         _userDriver = userDriver;
         
         delegate = theDelegate;
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateDriverDidFinish:) name:SUUpdateDriverFinishedNotification object:nil];
         
         // This runs the permission prompt if needed, but never before the app has finished launching because the runloop may not have ran before that
         // We will also take precaussions if a developer instantiates an updater themselves where the application may not be completely finished launching yet
@@ -179,17 +177,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     [self resetUpdateCycle];
 }
 
-- (void)updateDriverDidFinish:(NSNotification *)note
-{
-	if ([note object] == self.driver && [self.driver finished])
-	{
-        self.driver = nil;
-        [self.userDriver showUpdateInProgress:NO];
-        [self updateLastUpdateCheckDate];
-        [self scheduleNextUpdateCheck];
-    }
-}
-
 - (NSDate *)lastUpdateCheckDate
 {
     return [self.host objectForUserDefaultsKey:SULastCheckTimeKey];
@@ -197,9 +184,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)updateLastUpdateCheckDate
 {
-    [self willChangeValueForKey:@"lastUpdateCheckDate"];
+    [self willChangeValueForKey:NSStringFromSelector(@selector(lastUpdateCheckDate))];
     [self.host setObject:[NSDate date] forUserDefaultsKey:SULastCheckTimeKey];
-    [self didChangeValueForKey:@"lastUpdateCheckDate"];
+    [self didChangeValueForKey:NSStringFromSelector(@selector(lastUpdateCheckDate))];
 }
 
 - (void)scheduleNextUpdateCheck
@@ -243,7 +230,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 // RUNS ON ITS OWN THREAD
 // updater should be passed as a weak reference
-static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SUUpdateDriver *inDriver)
+static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id <SUUpdateDriver> inDriver)
 {
     @try {
         // This method *must* be called on its own thread. SCNetworkReachabilityCheckByName
@@ -307,48 +294,51 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
     //	Wouldn't want to annoy users on dial-up by establishing a connection every
     //	hour or so:
     
-    SUUpdateDriver *theUpdateDriver =
-    [([self automaticallyDownloadsUpdates] ? [SUAutomaticUpdateDriver alloc] : [SUScheduledUpdateDriver alloc])
-     initWithUpdater:self
-     updaterDelegate:self.delegate
-     userDriver:self.userDriver
-     host:self.host
-     sparkleBundle:self.sparkleBundle];
+    id <SUUpdateDriver> updateDriver;
+    if ([self automaticallyDownloadsUpdates]) {
+        updateDriver =
+        [[SUAutomaticUpdateDriver alloc]
+         initWithHost:self.host
+         sparkleBundle:self.sparkleBundle
+         updater:self
+         updaterDelegate:self.delegate];
+    } else {
+        updateDriver =
+        [[SUScheduledUpdateDriver alloc]
+         initWithHost:self.host
+         sparkleBundle:self.sparkleBundle
+         updater:self
+         userDriver:self.userDriver
+         updaterDelegate:self.delegate];
+    }
     
-    // We don't want the rechability check to act on the driver if the updater is going near death
+    // We don't want the reachability check to act on the driver if the updater is going near death
     __weak SUUpdater *updater = self;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        SUCheckForUpdatesInBgReachabilityCheck(updater, theUpdateDriver);
+        SUCheckForUpdatesInBgReachabilityCheck(updater, updateDriver);
     });
 }
 
 - (void)checkForUpdates
 {
-    if (self.driver && [self.driver isInterruptible]) {
+    if (self.driver != nil) {
         [self.driver abortUpdate];
     }
     
-    SUUserInitiatedUpdateDriver *theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self updaterDelegate:self.delegate userDriver:self.userDriver host:self.host sparkleBundle:self.sparkleBundle];
+//    if (self.driver && [self.driver isInterruptible]) {
+//        [self.driver abortUpdate];
+//    }
+    
+    id <SUUpdateDriver> theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithHost:self.host sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
     [self checkForUpdatesWithDriver:theUpdateDriver];
 }
 
 - (void)checkForUpdateInformation
 {
-    [self checkForUpdatesWithDriver:[[SUProbingUpdateDriver alloc] initWithUpdater:self updaterDelegate:self.delegate userDriver:self.userDriver host:self.host sparkleBundle:self.sparkleBundle]];
+    [self checkForUpdatesWithDriver:[[SUProbingUpdateDriver alloc] initWithHost:self.host updater:self updaterDelegate:self.delegate]];
 }
 
-- (void)installUpdatesIfAvailable
-{
-    if (self.driver && [self.driver isInterruptible]) {
-        [self.driver abortUpdate];
-    }
-
-    SUUserInitiatedUpdateDriver *theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self updaterDelegate:self.delegate userDriver:self.userDriver host:self.host sparkleBundle:self.sparkleBundle];
-    theUpdateDriver.automaticallyInstallUpdates = YES;
-    [self checkForUpdatesWithDriver:theUpdateDriver];
-}
-
-- (void)checkForUpdatesWithDriver:(SUUpdateDriver *)d
+- (void)checkForUpdatesWithDriver:(id <SUUpdateDriver> )d
 {
 	if ([self updateInProgress]) { return; }
     
@@ -376,10 +366,17 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
     [self checkIfConfiguredProperly];
 
     NSURL *theFeedURL = [self parameterizedFeedURL];
-    if (theFeedURL) // Use a NIL URL to cancel quietly.
-        [self.driver checkForUpdatesAtURL:theFeedURL];
-    else
+    // Use a NIL URL to cancel quietly.
+    if (theFeedURL) {
+        [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders] completion:^{
+            self.driver = nil;
+            [self.userDriver showUpdateInProgress:NO];
+            [self updateLastUpdateCheckDate];
+            [self scheduleNextUpdateCheck];
+        }];
+    } else {
         [self.driver abortUpdate];
+    }
 }
 
 - (void)cancelNextUpdateCycle
@@ -570,19 +567,13 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, SU
     // Abort any on-going updates
     // A driver could be retained by another object (eg: a timer),
     // so not aborting could mean it stays alive longer than we'd want
-    if ([self updateInProgress]) {
-        [self.driver abortUpdate];
-        self.driver = nil;
-    }
+    [self.driver abortUpdate];
+    self.driver = nil;
 }
 
 - (BOOL)updateInProgress
 {
     if (self.driver != nil) {
-        return YES;
-    }
-    
-    if (self.driver != nil && !self.driver.finished) {
         return YES;
     }
     

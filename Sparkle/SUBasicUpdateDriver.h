@@ -1,55 +1,45 @@
 //
 //  SUBasicUpdateDriver.h
-//  Sparkle,
+//  Sparkle
 //
-//  Created by Andy Matuschak on 4/23/08.
-//  Copyright 2008 Andy Matuschak. All rights reserved.
+//  Created by Mayur Pawashe on 3/18/16.
+//  Copyright © 2016 Sparkle Project. All rights reserved.
 //
-
-#ifndef SUBASICUPDATEDRIVER_H
-#define SUBASICUPDATEDRIVER_H
 
 #import <Foundation/Foundation.h>
-#import "SUUpdateDriver.h"
 
-@class SUAppcast, SUAppcastItem, SUHost;
-@interface SUBasicUpdateDriver : SUUpdateDriver <NSURLDownloadDelegate>
+NS_ASSUME_NONNULL_BEGIN
 
-@property (strong, readonly) SUAppcastItem *updateItem;
-@property (strong, readonly) NSURLDownload *download;
-@property (copy, readonly) NSString *downloadPath;
+@class SUHost, SUAppcastItem;
+@protocol SUUpdaterDelegate;
 
-- (void)checkForUpdatesAtURL:(NSURL *)URL;
+@protocol SUBasicUpdateDriverDelegate <NSObject>
 
-- (BOOL)isItemNewer:(SUAppcastItem *)ui;
-+ (BOOL)hostSupportsItem:(SUAppcastItem *)ui;
-- (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui;
-- (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui;
-- (void)appcastDidFinishLoading:(SUAppcast *)ac;
-- (void)didFindValidUpdate;
-- (void)didNotFindUpdate;
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)appcastItem;
 
-- (void)downloadUpdate;
-- (void)download:(NSURLDownload *)d decideDestinationWithSuggestedFilename:(NSString *)name;
-- (void)downloadDidFinish:(NSURLDownload *)d;
-- (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error;
+- (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
 
-- (void)extractUpdate;
-- (void)unarchiverExtractedProgress:(double)progress;
-- (void)failedToApplyDeltaUpdate;
+@optional
 
-- (void)installerDidStart;
-- (void)installerIsReadyForRelaunch;
-
-- (void)installWithToolAndRelaunch:(BOOL)relaunch;
-- (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI;
-
-- (void)cleanUpDownload;
-
-- (void)abortUpdate;
-- (void)abortUpdateWithError:(NSError *)error;
-- (void)terminateApp;
+- (void)basicDriverDidFinishLoadingAppcast;
 
 @end
 
-#endif
+@interface SUBasicUpdateDriver : NSObject
+
+- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate delegate:(id <SUBasicUpdateDriverDelegate>)delegate;
+
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(void (^)(void))completionBlock;
+
+@property (nonatomic, readonly) SUHost *host;
+@property (nonatomic, readonly) id updater; // if we didn't have legacy support, I'd remove this..
+@property (nullable, nonatomic, readonly) id <SUUpdaterDelegate>updaterDelegate;
+
+@property (nonatomic, readonly) NSString *userAgent;
+@property (nullable, nonatomic, readonly) SUAppcastItem *nonDeltaUpdateItem;
+
+- (void)abortUpdateWithError:(nullable NSError *)error;
+
+@end
+
+NS_ASSUME_NONNULL_END

@@ -10,7 +10,7 @@
 #import "SUExport.h"
 
 @protocol SUVersionComparison;
-@class SUUpdater, SUAppcastItem;
+@class SUUpdater, SUAppcast, SUAppcastItem;
 
 // -----------------------------------------------------------------------------
 // SUUpdater Notifications for events that might be interesting to more than just the delegate

@@ -2,117 +2,74 @@
 //  SUAutomaticUpdateDriver.m
 //  Sparkle
 //
-//  Created by Andy Matuschak on 5/6/08.
-//  Copyright 2008 Andy Matuschak. All rights reserved.
+//  Created by Mayur Pawashe on 3/18/16.
+//  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
 #import "SUAutomaticUpdateDriver.h"
-#import "SULocalizations.h"
-#import "SUUpdaterDelegate.h"
+#import "SUUpdateDriver.h"
 #import "SUHost.h"
-#import "SUConstants.h"
-#import "SUErrors.h"
-#import "SUAppcastItem.h"
-#import "SULog.h"
-#import "SUStatusCompletionResults.h"
-#import "SUUserDriver.h"
+#import "SUUpdaterDelegate.h"
+#import "SUCoreBasedUpdateDriver.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-// If the user hasn't quit in a week, ask them if they want to relaunch to get the latest bits. It doesn't matter that this measure of "one day" is imprecise.
-static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 24 * 7;
+@interface SUAutomaticUpdateDriver () <SUCoreBasedUpdateDriverDelegate>
 
-@interface SUUpdateDriver ()
-
-@property (getter=isInterruptible) BOOL interruptible;
-
-@end
-
-@interface SUAutomaticUpdateDriver ()
-
-@property (strong) NSTimer *showUpdateAlertTimer;
+@property (nonatomic, readonly) SUCoreBasedUpdateDriver *coreDriver;
 
 @end
 
 @implementation SUAutomaticUpdateDriver
 
-@synthesize showUpdateAlertTimer = _showUpdateAlertTimer;
+@synthesize coreDriver = _coreDriver;
 
-- (void)showUpdateAlert
+- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate
 {
-    self.interruptible = NO;
-    
-    [self.userDriver showAutomaticUpdateFoundWithAppcastItem:self.updateItem reply:^(SUUpdateAlertChoice choice) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self automaticUpdateAlertFinishedWithChoice:choice];
-        });
-    }];
+    self = [super init];
+    if (self != nil) {
+        _coreDriver = [[SUCoreBasedUpdateDriver alloc] initWithHost:host sparkleBundle:sparkleBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
+    }
+    return self;
 }
 
-- (void)automaticUpdateAlertFinishedWithChoice:(SUUpdateAlertChoice)choice
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(void (^)(void))completionBlock
 {
-    switch (choice)
-    {
-        case SUInstallUpdateChoice:
-            [self installWithToolAndRelaunch:YES displayingUserInterface:YES];
-            break;
-            
-        case SUInstallLaterChoice:
-            [self installWithToolAndRelaunch:NO displayingUserInterface:NO];
-            // We're already waiting on quit, just indicate that we're idle.
-            self.interruptible = YES;
-            break;
-            
-        case SUSkipThisVersionChoice:
-#warning this option should not exist
-            [self.host setObject:[self.updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
-            [self abortUpdate];
-            break;
-    }
+    [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:NO completion:completionBlock];
 }
 
-- (void)installerIsReadyForRelaunch
+- (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
 {
-    if ([self.updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)])
-    {
-        BOOL relaunch = YES;
-        BOOL showUI = NO;
-        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installWithToolAndRelaunch:displayingUserInterface:)]];
-        [invocation setSelector:@selector(installWithToolAndRelaunch:displayingUserInterface:)];
-        [invocation setArgument:&relaunch atIndex:2];
-        [invocation setArgument:&showUI atIndex:3];
-        [invocation setTarget:self];
-
-        [self.updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationInvocation:invocation];
-    }
-    
-    // If this is marked as a critical update, we'll prompt the user to install it right away.
-    if ([self.updateItem isCriticalUpdate])
-    {
-        [self showUpdateAlert];
-    }
-    else
-    {
-        self.showUpdateAlertTimer = [NSTimer scheduledTimerWithTimeInterval:SUAutomaticUpdatePromptImpatienceTimer target:self selector:@selector(showUpdateAlert) userInfo:nil repeats:NO];
-        
-        // At this point the driver is idle, allow it to be interrupted for user-initiated update checks.
-        self.interruptible = YES;
-    }
+    [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
 }
 
-- (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
+- (void)installerDidFinishRelaunchPreparation
 {
-    [super installWithToolAndRelaunch:relaunch displayingUserInterface:showUI];
+    // We are done and can safely abort now
+    // The installer tool will keep the installation alive
+    [self abortUpdate];
+}
+
+- (void)basicDriverIsRequestingAbortUpdateWithError:(NSError *)error
+{
+    [self abortUpdateWithError:error];
+}
+
+- (void)coreDriverIsRequestingAbortUpdateWithError:(NSError *)error
+{
+    [self abortUpdateWithError:error];
 }
 
 - (void)abortUpdate
 {
-    [self.showUpdateAlertTimer invalidate];
-    self.showUpdateAlertTimer = nil;
-    
-    [super abortUpdate];
+    [self abortUpdateWithError:nil];
+}
+
+- (void)abortUpdateWithError:(NSError *)error
+{
+    [self.coreDriver abortUpdateWithError:error];
 }
 
 @end

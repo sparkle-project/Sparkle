@@ -2,85 +2,83 @@
 //  SUUserInitiatedUpdateDriver.m
 //  Sparkle
 //
-//  Created by Andy Matuschak on 5/30/08.
-//  Copyright 2008 Andy Matuschak. All rights reserved.
+//  Created by Mayur Pawashe on 3/18/16.
+//  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
 #import "SUUserInitiatedUpdateDriver.h"
-#import "SUHost.h"
+#import "SUUIBasedUpdateDriver.h"
 #import "SUUserDriver.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-@interface SUUserInitiatedUpdateDriver ()
+@interface SUUserInitiatedUpdateDriver () <SUUIBasedUpdateDriverDelegate>
 
-@property (assign, getter=isCanceled) BOOL canceled;
+@property (nonatomic, readonly) SUUIBasedUpdateDriver *uiDriver;
+@property (nonatomic) BOOL canceledCheckForUpdates;
 
 @end
 
 @implementation SUUserInitiatedUpdateDriver
 
-@synthesize canceled;
+@synthesize uiDriver = _uiDriver;
+@synthesize canceledCheckForUpdates = _canceledCheckForUpdates;
 
-- (void)dismissCheckingForUpdates
+- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate
 {
-    [self.userDriver dismissUserInitiatedUpdateCheck];
-}
-
-- (void)cancelCheckForUpdates:(id)__unused sender
-{
-    if (!self.canceled) {
-        [self dismissCheckingForUpdates];
-        self.canceled = YES;
+    self = [super init];
+    if (self != nil) {
+        _uiDriver = [[SUUIBasedUpdateDriver alloc] initWithHost:host sparkleBundle:sparkleBundle updater:updater userDriver:userDriver updaterDelegate:updaterDelegate delegate:self];
     }
+    return self;
 }
 
-- (void)checkForUpdatesAtURL:(NSURL *)URL
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(void (^)(void))completionBlock
 {
-    [self.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SUUserInitiatedCheckStatus completionStatus) {
+    [self.uiDriver.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SUUserInitiatedCheckStatus completionStatus) {
         switch (completionStatus) {
             case SUUserInitiatedCheckDone:
                 break;
             case SUUserInitiatedCheckCancelled:
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [self cancelCheckForUpdates:nil];
+                    self.canceledCheckForUpdates = YES;
+                    [self.uiDriver.userDriver dismissUserInitiatedUpdateCheck];
                 });
                 break;
         }
     }];
     
-    [super checkForUpdatesAtURL:URL];
+    [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:YES completion:completionBlock];
 }
 
-- (void)appcastDidFinishLoading:(SUAppcast *)ac
+- (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error
 {
-	if (self.isCanceled)
-	{
+    [self abortUpdateWithError:error];
+}
+
+- (void)uiDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error
+{
+    [self abortUpdateWithError:error];
+}
+
+- (void)basicDriverDidFinishLoadingAppcast
+{
+    if (self.canceledCheckForUpdates) {
         [self abortUpdate];
-        return;
     }
-    [self dismissCheckingForUpdates];
-    [super appcastDidFinishLoading:ac];
-}
-
-- (void)abortUpdateWithError:(NSError *)error
-{
-    [self dismissCheckingForUpdates];
-    [super abortUpdateWithError:error];
 }
 
 - (void)abortUpdate
 {
-    [self dismissCheckingForUpdates];
-    [super abortUpdate];
+    [self abortUpdateWithError:nil];
 }
 
-- (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
+- (void)abortUpdateWithError:(nullable NSError *)error
 {
-    // We don't check to see if this update's been skipped, because the user explicitly *asked* if he had the latest version.
-    return [[self class] hostSupportsItem:ui] && [self isItemNewer:ui];
+    [self.uiDriver.userDriver dismissUserInitiatedUpdateCheck];
+    [self.uiDriver abortUpdateWithError:error];
 }
 
 @end

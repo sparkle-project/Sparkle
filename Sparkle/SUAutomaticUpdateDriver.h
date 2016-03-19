@@ -2,18 +2,22 @@
 //  SUAutomaticUpdateDriver.h
 //  Sparkle
 //
-//  Created by Andy Matuschak on 5/6/08.
-//  Copyright 2008 Andy Matuschak. All rights reserved.
+//  Created by Mayur Pawashe on 3/18/16.
+//  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#ifndef SUAUTOMATICUPDATEDRIVER_H
-#define SUAUTOMATICUPDATEDRIVER_H
-
 #import <Foundation/Foundation.h>
-#import "SUBasicUpdateDriver.h"
+#import "SUUpdateDriver.h"
 
-@interface SUAutomaticUpdateDriver : SUBasicUpdateDriver
+NS_ASSUME_NONNULL_BEGIN
+
+@class SUHost;
+@protocol SUUpdaterDelegate;
+
+@interface SUAutomaticUpdateDriver : NSObject <SUUpdateDriver>
+
+- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate;
 
 @end
 
-#endif
+NS_ASSUME_NONNULL_END

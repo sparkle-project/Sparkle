@@ -93,16 +93,6 @@ SU_EXPORT @interface SUUpdater : NSObject
 - (void)checkForUpdatesInBackground;
 
 /*!
-    Checks for updates and, if available, immediately downloads and installs them.
-    A progress dialog is shown but the user will never be prompted to read the
-    release notes.
-    
-    You may want to respond to the userDidCancelDownload delegate method in case
-    the user clicks the "Cancel" button while the update is downloading.
- */
-- (void)installUpdatesIfAvailable;
-
-/*!
     Returns the date of last update check.
 
     \returns \c nil if no check has been performed.
