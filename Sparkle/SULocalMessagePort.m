@@ -61,36 +61,42 @@
 // Called on non-main thread
 static CFDataRef messagePortCallback(CFMessagePortRef __unused messagePort, SInt32 messageID, CFDataRef dataRef, void *info)
 {
-    SULocalMessagePort *self = (__bridge SULocalMessagePort *)info;
-    NSData *data = (__bridge NSData *)dataRef;
-    
-    if (self.messageCallback != nil) {
-        self.messageCallback(messageID, data);
+    @autoreleasepool {
+        SULocalMessagePort *self = (__bridge SULocalMessagePort *)info;
+        // Create a copy that we can safely pass it asynchronously
+        // Warning: Do not use a convenience -[NSData copy] or an equivalent call. This crashes, and ASAN will let you know it crashes
+        // Most likely because the bytes are set to be freed internally, and not deep copied or something
+        NSData *data = [NSData dataWithBytes:CFDataGetBytePtr(dataRef) length:(NSUInteger)CFDataGetLength(dataRef)];
+        
+        if (self.messageCallback != nil) {
+            self.messageCallback(messageID, data);
+        }
+        
+        return NULL;
     }
-    
-    // Don't have any use case where I need a reply, for now
-    return NULL;
 }
 
 // Called on non-main thread
 static void messageInvalidationCallback(CFMessagePortRef messagePort, void *info)
 {
-    SULocalMessagePort *self = (__bridge SULocalMessagePort *)info;
-    
-    dispatch_async(self.messageQueue, ^{
-        // note that messageCallback is deallocated on same queue that we're receiving messages from, which is good
-        self.messageCallback = nil;
+    @autoreleasepool {
+        SULocalMessagePort *self = (__bridge SULocalMessagePort *)info;
         
-        if (self.invalidationCallback != nil) {
-            self.invalidationCallback();
-            self.invalidationCallback = nil;
-        }
-        
-        self.messagePort = NULL;
-        
-        CFRelease(messagePort);
-        CFRelease((__bridge CFTypeRef)(self));
-    });
+        dispatch_async(self.messageQueue, ^{
+            // note that messageCallback is deallocated on same queue that we're receiving messages from, which is good
+            self.messageCallback = nil;
+            
+            if (self.invalidationCallback != nil) {
+                self.invalidationCallback();
+                self.invalidationCallback = nil;
+            }
+            
+            self.messagePort = NULL;
+            
+            CFRelease(messagePort);
+            CFRelease((__bridge CFTypeRef)(self));
+        });
+    }
 }
 
 @end

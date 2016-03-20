@@ -54,7 +54,8 @@ static const char *SURemoteMessagePortSelfKey = "su_messagePort";
     dispatch_async(self.messageQueue, ^{
         SInt32 status = 0;
         if (self.messagePort != NULL) {
-            status = CFMessagePortSendRequest(self.messagePort, identifier, (CFDataRef)data, 0.1, 0.0, NULL, NULL);
+            CFDataRef dataRef = (__bridge CFDataRef)(data);
+            status = CFMessagePortSendRequest(self.messagePort, identifier, dataRef, 0.2, 0.0, NULL, NULL);
         } else {
             status = kCFMessagePortIsInvalid;
         }
@@ -75,21 +76,23 @@ static const char *SURemoteMessagePortSelfKey = "su_messagePort";
 // For safetly, let's not assume what thread this may be called on
 static void messageInvalidationCallback(CFMessagePortRef messagePort, void * __unused info)
 {
-    SURemoteMessagePort *self = objc_getAssociatedObject((__bridge id)(messagePort), SURemoteMessagePortSelfKey);
-    
-    dispatch_async(self.messageQueue, ^{
-        if (self.invalidationCallback != nil) {
-            self.invalidationCallback();
-            self.invalidationCallback = nil;
-        }
+    @autoreleasepool {
+        SURemoteMessagePort *self = objc_getAssociatedObject((__bridge id)(messagePort), SURemoteMessagePortSelfKey);
         
-        self.messagePort = NULL;
-        
-        objc_setAssociatedObject((__bridge id)(messagePort), SURemoteMessagePortSelfKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        CFRelease(messagePort);
-        
-        CFRelease((__bridge CFTypeRef)(self));
-    });
+        dispatch_async(self.messageQueue, ^{
+            if (self.invalidationCallback != nil) {
+                self.invalidationCallback();
+                self.invalidationCallback = nil;
+            }
+            
+            self.messagePort = NULL;
+            
+            objc_setAssociatedObject((__bridge id)(messagePort), SURemoteMessagePortSelfKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            CFRelease(messagePort);
+            
+            CFRelease((__bridge CFTypeRef)(self));
+        });
+    }
 }
 
 @end
