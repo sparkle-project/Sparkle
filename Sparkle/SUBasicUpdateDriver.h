@@ -32,8 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(void (^)(void))completionBlock;
 
 @property (nonatomic, readonly) SUHost *host;
-@property (nonatomic, readonly) id updater; // if we didn't have legacy support, I'd remove this..
-@property (nullable, nonatomic, readonly) id <SUUpdaterDelegate>updaterDelegate;
+@property (nonatomic, readonly, weak) id updater; // if we didn't have legacy support, I'd remove this..
+@property (nullable, nonatomic, readonly, weak) id <SUUpdaterDelegate>updaterDelegate;
 
 @property (nonatomic, readonly) NSString *userAgent;
 @property (nullable, nonatomic, readonly) SUAppcastItem *nonDeltaUpdateItem;
