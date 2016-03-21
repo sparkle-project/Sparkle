@@ -45,6 +45,4 @@ NSString *SUUpdateDriverServiceNameForHost(SUHost *host);
 
 NSString *SUAutoUpdateServiceNameForHost(SUHost *host);
 
-NSString *SUInstallStatusServiceNameForHost(SUHost *host, int32_t tag);
-
 NS_ASSUME_NONNULL_END

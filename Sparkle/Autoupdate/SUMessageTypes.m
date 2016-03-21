@@ -47,8 +47,3 @@ NSString *SUAutoUpdateServiceNameForHost(SUHost *host)
 {
     return [NSString stringWithFormat:@"%@-sparkle-installer", host.bundle.bundleIdentifier];
 }
-
-NSString *SUInstallStatusServiceNameForHost(SUHost *host, int32_t tag)
-{
-    return [NSString stringWithFormat:@"%@-%d-sparkle-install-status", host.bundle.bundleIdentifier, tag];
-}
