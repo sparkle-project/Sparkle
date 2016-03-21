@@ -11,6 +11,8 @@
 #import "SUHost.h"
 #import "SUUpdaterDelegate.h"
 #import "SUCoreBasedUpdateDriver.h"
+#import "SULog.h"
+#import "SUAppcastItem.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -19,12 +21,14 @@
 @interface SUAutomaticUpdateDriver () <SUCoreBasedUpdateDriverDelegate>
 
 @property (nonatomic, readonly) SUCoreBasedUpdateDriver *coreDriver;
+@property (nonatomic) BOOL foundCriticalUpdate;
 
 @end
 
 @implementation SUAutomaticUpdateDriver
 
 @synthesize coreDriver = _coreDriver;
+@synthesize foundCriticalUpdate = _foundCriticalUpdate;
 
 - (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate
 {
@@ -35,13 +39,22 @@
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(void (^)(void))completionBlock
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(SUUpdateDriverCompletion)completionBlock
 {
     [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:NO completion:completionBlock];
 }
 
+- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
+{
+    // Nothing really to do here.. this shouldn't be called.
+    SULog(@"Error: resumeUpdateWithCompletion: called on SUAutomaticUpdateDriver");
+    assert(false);
+}
+
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
 {
+    self.foundCriticalUpdate = [updateItem isCriticalUpdate];
+    
     [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
 }
 
@@ -50,6 +63,11 @@
     // We are done and can safely abort now
     // The installer tool will keep the installation alive
     [self abortUpdate];
+}
+
+- (BOOL)basicDriverShouldSignalShowingUpdateImmediately
+{
+    return self.foundCriticalUpdate;
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(NSError *)error

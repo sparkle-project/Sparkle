@@ -160,14 +160,14 @@
 
 #pragma mark Update Found
 
-- (void)showUpdateWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply
+- (void)showUpdateWithAppcastItem:(SUAppcastItem *)appcastItem alreadyDownloaded:(BOOL)alreadyDownloaded reply:(void (^)(SUUpdateAlertChoice))reply
 {
     NSPopover *popover = [[NSPopover alloc] init];
     popover.behavior = NSPopoverBehaviorTransient;
     
     [self addUpdateButtonWithTitle:@"Update Available" action:^(NSButton *button) {
         if (popover.contentViewController == nil) {
-            popover.contentViewController = [[SUInstallUpdateViewController alloc] initWithAppcastItem:appcastItem reply:^(SUUpdateAlertChoice choice) {
+            popover.contentViewController = [[SUInstallUpdateViewController alloc] initWithAppcastItem:appcastItem alreadyDownloaded:alreadyDownloaded reply:^(SUUpdateAlertChoice choice) {
                 reply(choice);
                 
                 [popover close];
@@ -179,17 +179,10 @@
     }];
 }
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)__unused allowsAutomaticUpdates reply:(void (^)(SUUpdateAlertChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)__unused allowsAutomaticUpdates alreadyDownloaded:(BOOL)alreadyDownloaded reply:(void (^)(SUUpdateAlertChoice))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self showUpdateWithAppcastItem:appcastItem reply:reply];
-    });
-}
-
-- (void)showAutomaticUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self showUpdateWithAppcastItem:appcastItem reply:reply];
+        [self showUpdateWithAppcastItem:appcastItem alreadyDownloaded:alreadyDownloaded reply:reply];
     });
 }
 

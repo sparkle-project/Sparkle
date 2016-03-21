@@ -21,6 +21,11 @@
 const NSTimeInterval SUMinimumUpdateCheckInterval = DEBUG ? 60 : (60 * 60);
 const NSTimeInterval SUDefaultUpdateCheckInterval = DEBUG ? 60 : (60 * 60 * 24);
 
+// If the update has already been automatically downloaded, we normally don't want to bug the user about the update
+// However if the user has gone a very long time without quitting an application, we will bug them
+// This is the time interval for a "week"; it doesn't matter that this measure is imprecise.
+const NSTimeInterval SUImpatientUpdateCheckInterval = DEBUG ? (60 * 2) : (60 * 60 * 24 * 7);
+
 NSString *const SUBundleIdentifier = @SPARKLE_BUNDLE_IDENTIFIER;
 
 NSString *const SUTechnicalErrorInformationKey = @"SUTechnicalErrorInformation";

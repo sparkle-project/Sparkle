@@ -49,18 +49,35 @@ static const char *SURemoteMessagePortSelfKey = "su_messagePort";
     return self;
 }
 
-- (void)sendMessageWithIdentifier:(int32_t)identifier data:(NSData *)data completion:(void (^)(BOOL success))completionHandler
+- (void)sendMessageWithIdentifier:(int32_t)identifier data:(NSData *)data expectingReply:(BOOL)expectingReply completion:(void (^)(BOOL success, NSData * _Nullable replyData))completionHandler
 {
     dispatch_async(self.messageQueue, ^{
         SInt32 status = 0;
+        NSData *replyData = nil;
         if (self.messagePort != NULL) {
             CFDataRef dataRef = (__bridge CFDataRef)(data);
-            status = CFMessagePortSendRequest(self.messagePort, identifier, dataRef, 0.2, 0.0, NULL, NULL);
+            CFDataRef dataReceived = NULL;
+            status = CFMessagePortSendRequest(self.messagePort, identifier, dataRef, 0.2, 2.0, expectingReply ? kCFRunLoopDefaultMode : NULL, expectingReply ? &dataReceived : NULL);
+            if (expectingReply && status == kCFMessagePortSuccess) {
+                replyData = (NSData *)CFBridgingRelease(dataReceived);
+            }
         } else {
             status = kCFMessagePortIsInvalid;
         }
-        completionHandler(status == kCFMessagePortSuccess);
+        completionHandler(status == kCFMessagePortSuccess, replyData);
     });
+}
+
+- (void)sendMessageWithIdentifier:(int32_t)identifier data:(NSData *)data reply:(void (^)(BOOL success, NSData * _Nullable replyData))replyHandler
+{
+    [self sendMessageWithIdentifier:identifier data:data expectingReply:YES completion:replyHandler];
+}
+
+- (void)sendMessageWithIdentifier:(int32_t)identifier data:(NSData *)data completion:(void (^)(BOOL success))completionHandler
+{
+    [self sendMessageWithIdentifier:identifier data:data expectingReply:NO completion:^(BOOL success, NSData * _Nullable __unused replyData) {
+        completionHandler(success);
+    }];
 }
 
 - (void)invalidate

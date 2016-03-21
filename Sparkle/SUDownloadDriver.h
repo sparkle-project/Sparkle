@@ -26,7 +26,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)downloadUpdate;
 
-@property (nonatomic, readonly) SUAppcastItem *updateItem;
 @property (nonatomic, readonly) NSMutableURLRequest *request;
 @property (nullable, nonatomic, readonly, copy) NSString *temporaryDirectory;
 @property (nullable, nonatomic, readonly, copy) NSString *downloadPath;

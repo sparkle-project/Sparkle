@@ -20,7 +20,7 @@
 
 @property (nonatomic, weak, readonly) id <SUVersionDisplay> versionDisplayer;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host versionDisplayer:(id <SUVersionDisplay>)versionDisplayer allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates completionBlock:(void(^)(SUUpdateAlertChoice))c;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates alreadyDownloaded:(BOOL)alreadyDownloaded completionBlock:(void (^)(SUUpdateAlertChoice))block;
 
 - (IBAction)installUpdate:sender;
 - (IBAction)skipThisVersion:sender;

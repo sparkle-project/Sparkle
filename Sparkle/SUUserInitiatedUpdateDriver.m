@@ -17,6 +17,7 @@
 @interface SUUserInitiatedUpdateDriver () <SUUIBasedUpdateDriverDelegate>
 
 @property (nonatomic, readonly) SUUIBasedUpdateDriver *uiDriver;
+@property (nonatomic, readonly) id<SUUserDriver> userDriver;
 @property (nonatomic) BOOL canceledCheckForUpdates;
 
 @end
@@ -24,6 +25,7 @@
 @implementation SUUserInitiatedUpdateDriver
 
 @synthesize uiDriver = _uiDriver;
+@synthesize userDriver = _userDriver;
 @synthesize canceledCheckForUpdates = _canceledCheckForUpdates;
 
 - (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate
@@ -31,26 +33,37 @@
     self = [super init];
     if (self != nil) {
         _uiDriver = [[SUUIBasedUpdateDriver alloc] initWithHost:host sparkleBundle:sparkleBundle updater:updater userDriver:userDriver updaterDelegate:updaterDelegate delegate:self];
+        _userDriver = userDriver;
     }
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(void (^)(void))completionBlock
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(SUUpdateDriverCompletion)completionBlock
 {
-    [self.uiDriver.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SUUserInitiatedCheckStatus completionStatus) {
+    [self showUserInitiatedProgress];
+    [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:YES completion:completionBlock];
+}
+
+- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
+{
+    [self showUserInitiatedProgress];
+    [self.uiDriver resumeUpdateWithCompletion:completionBlock];
+}
+
+- (void)showUserInitiatedProgress
+{
+    [self.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SUUserInitiatedCheckStatus completionStatus) {
         switch (completionStatus) {
             case SUUserInitiatedCheckDone:
                 break;
             case SUUserInitiatedCheckCancelled:
                 dispatch_async(dispatch_get_main_queue(), ^{
                     self.canceledCheckForUpdates = YES;
-                    [self.uiDriver.userDriver dismissUserInitiatedUpdateCheck];
+                    [self.userDriver dismissUserInitiatedUpdateCheck];
                 });
                 break;
         }
     }];
-    
-    [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:YES completion:completionBlock];
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error
@@ -77,7 +90,7 @@
 
 - (void)abortUpdateWithError:(nullable NSError *)error
 {
-    [self.uiDriver.userDriver dismissUserInitiatedUpdateCheck];
+    [self.userDriver dismissUserInitiatedUpdateCheck];
     [self.uiDriver abortUpdateWithError:error];
 }
 

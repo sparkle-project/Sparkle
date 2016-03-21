@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "SUStatusCompletionResults.h"
+#import "SUUpdateDriver.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -23,6 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)coreDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
+
+- (BOOL)basicDriverShouldSignalShowingUpdateImmediately;
 
 @optional
 
@@ -42,7 +45,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate delegate:(id<SUCoreBasedUpdateDriverDelegate>)delegate;
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(void (^)(void))completionBlock;
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(SUUpdateDriverCompletion)completionBlock;
+
+- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock;
 
 - (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem;
 

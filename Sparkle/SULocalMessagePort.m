@@ -11,7 +11,7 @@
 @interface SULocalMessagePort ()
 
 @property (nonatomic) CFMessagePortRef messagePort;
-@property (nonatomic, copy) void (^messageCallback)(int32_t, NSData *);
+@property (nonatomic, copy) NSData *(^messageCallback)(int32_t, NSData *);
 @property (nonatomic, copy) void (^invalidationCallback)(void);
 @property (nonatomic, readonly) dispatch_queue_t messageQueue;
 
@@ -24,7 +24,7 @@
 @synthesize invalidationCallback = _invalidationCallback;
 @synthesize messageQueue = _messageQueue;
 
-- (nullable instancetype)initWithServiceName:(NSString *)serviceName messageCallback:(void (^)(int32_t identifier, NSData *data))messageCallback invalidationCallback:(void (^)(void))invalidationCallback
+- (nullable instancetype)initWithServiceName:(NSString *)serviceName messageCallback:(NSData *(^)(int32_t identifier, NSData *data))messageCallback invalidationCallback:(void (^)(void))invalidationCallback
 {
     self = [super init];
     if (self != nil) {
@@ -68,11 +68,12 @@ static CFDataRef messagePortCallback(CFMessagePortRef __unused messagePort, SInt
         // Most likely because the bytes are set to be freed internally, and not deep copied or something
         NSData *data = [NSData dataWithBytes:CFDataGetBytePtr(dataRef) length:(NSUInteger)CFDataGetLength(dataRef)];
         
+        NSData *replyData = nil;
         if (self.messageCallback != nil) {
-            self.messageCallback(messageID, data);
+            replyData = self.messageCallback(messageID, data);
         }
         
-        return NULL;
+        return (CFDataRef)CFBridgingRetain(replyData);
     }
 }
 

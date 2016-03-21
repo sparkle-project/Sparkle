@@ -41,6 +41,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 @property (nonatomic, copy) NSString *relaunchPath;
 @property (nonatomic, assign) BOOL shouldRelaunch;
 @property (nonatomic, assign) BOOL shouldShowUI;
+@property (nonatomic) NSData *updateItemData;
 
 @property (nonatomic, assign) BOOL isTerminating;
 @property (nonatomic) id<SUInstaller> installer;
@@ -66,6 +67,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 @synthesize relaunchPath = _relaunchPath;
 @synthesize shouldRelaunch = _shouldRelaunch;
 @synthesize shouldShowUI = _shouldShowUI;
+@synthesize updateItemData = _updateItemData;
 @synthesize isTerminating = _isTerminating;
 @synthesize installer = _installer;
 @synthesize willCompleteInstallation = _willCompleteInstallation;
@@ -101,10 +103,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     self.localPort =
     [[SULocalMessagePort alloc]
      initWithServiceName:SUAutoUpdateServiceNameForHost(self.host)
-     messageCallback:^(int32_t identifier, NSData * _Nonnull data) {
-         dispatch_async(dispatch_get_main_queue(), ^{
-             [self handleMessageWithIdentifier:identifier data:data];
-         });
+     messageCallback:^NSData *(int32_t identifier, NSData * _Nonnull data) {
+         return [self handleMessageWithIdentifier:identifier data:data];
      }
      invalidationCallback:^{
          dispatch_async(dispatch_get_main_queue(), ^{
@@ -117,23 +117,31 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     if (self.localPort == nil) {
         SULog(@"Failed creating local message port from installer");
         [self cleanupAndExitWithStatus:EXIT_FAILURE];
-    } else {
-        self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUUpdateDriverServiceNameForHost(self.host) invalidationCallback:^{
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (self.remotePort != nil && !self.willCompleteInstallation) {
-                    SULog(@"Invalidation on remote port being called");
-                    [self cleanupAndExitWithStatus:EXIT_FAILURE];
-                }
-            });
-        }];
-        
-        if (self.remotePort == nil) {
-            SULog(@"Failed creating remote message port from installer");
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
-        }
+    }
+    
+    if (![self resetRemotePort]) {
+        SULog(@"Failed creating remote message port from installer");
+        [self cleanupAndExitWithStatus:EXIT_FAILURE];
     }
     
     return self;
+}
+
+- (BOOL)resetRemotePort
+{
+    [self.remotePort invalidate];
+    self.remotePort = nil;
+    
+    self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUUpdateDriverServiceNameForHost(self.host) invalidationCallback:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (self.remotePort != nil && !self.willCompleteInstallation) {
+                SULog(@"Invalidation on remote port being called, and installation is not close enough to completion!");
+                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            }
+        });
+    }];
+    
+    return (self.remotePort != nil);
 }
 
 /**
@@ -278,25 +286,41 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     }
 }
 
-- (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
+- (NSData *)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
 {
-    if (self.handledResumeInstallationToStage2) {
-        return;
-    }
+    NSData *replyData = nil;
     
-    if (identifier == SUResumeInstallationToStage2 && data.length == sizeof(uint8_t) * 2) {
+    if (identifier == SUSentUpdateAppcastItemData) {
+        self.updateItemData = data;
+    } else if (identifier == SUReceiveUpdateAppcastItemData) {
+        replyData = self.updateItemData;
+    } else if (identifier == SUResumeInstallationToStage2 && data.length == sizeof(uint8_t) * 2) {
         uint8_t relaunch = *((const uint8_t *)data.bytes);
         uint8_t showsUI = *((const uint8_t *)data.bytes + 1);
         
-        // By default, if we never get a response from the updater to resume to installation 2,
-        // (meaning not getting to this code right here), we do not relaunch or prompt the user for any sort of UI
-        self.shouldRelaunch = (BOOL)relaunch;
-        self.shouldShowUI = (BOOL)showsUI;
-        
-        [self resumeInstallation];
-        
-        self.handledResumeInstallationToStage2 = YES;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            // Only allow handling showing UI once since only stage 2 needs it
+            if (!self.handledResumeInstallationToStage2) {
+                self.shouldShowUI = (BOOL)showsUI;
+            }
+            // Allow handling if we should relaunch at any time, however
+            self.shouldRelaunch = (BOOL)relaunch;
+            
+#warning todo: handle this message even if we aren't ready for stage 2 yet.
+            // We should try re-creating the remote port, in case the client has
+            // restarted since and wants a reply back when we say it's OK to terminate the app
+            if (![self resetRemotePort]) {
+                SULog(@"Installer failed to set up remote port to updater before resuming installation");
+            }
+            
+            // Resume the installation if we aren't done with stage 2 yet, and remind the client we are prepared to relaunch
+            [self resumeInstallation];
+            
+            self.handledResumeInstallationToStage2 = YES;
+        });
     }
+    
+    return replyData;
 }
 
 - (void)startInstallation
@@ -349,6 +373,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 
 - (void)performStage2InstallationIfNeeded
 {
+#warning this test should be async?
     if (!self.performedStage1Installation || self.performedStage2Installation) {
         return;
     }
@@ -372,12 +397,12 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         dispatch_async(dispatch_get_main_queue(), ^{
             [self cleanupAndExitWithStatus:EXIT_FAILURE];
         });
-        return;
+    } else {
+        self.performedStage2Installation = YES;
     }
-    
-    self.performedStage2Installation = YES;
 }
 
+// Can be called multiple times without harm
 - (void)resumeInstallation
 {
     dispatch_async(self.installerQueue, ^{

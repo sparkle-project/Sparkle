@@ -25,6 +25,8 @@
 @property (nonatomic, weak, readonly) id updater;
 @property (weak, nonatomic, readonly) id<SUUpdaterDelegate> updaterDelegate;
 @property (nonatomic, weak, readonly) id<SUUIBasedUpdateDriverDelegate> delegate;
+@property (nonatomic, readonly) id<SUUserDriver> userDriver;
+@property (nonatomic) BOOL resumingUpdate;
 
 @end
 
@@ -36,6 +38,7 @@
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize userDriver = _userDriver;
 @synthesize delegate = _delegate;
+@synthesize resumingUpdate = _resumingUpdate;
 
 - (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate delegate:(id<SUUIBasedUpdateDriverDelegate>)delegate
 {
@@ -52,9 +55,15 @@
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(void (^)(void))completionBlock
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(SUUpdateDriverCompletion)completionBlock
 {
     [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:includesSkippedUpdates completion:completionBlock];
+}
+
+- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
+{
+    self.resumingUpdate = YES;
+    [self.coreDriver resumeUpdateWithCompletion:completionBlock];
 }
 
 - (void)basicDriverDidFinishLoadingAppcast
@@ -66,12 +75,9 @@
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
 {
-    [self.userDriver showUpdateFoundWithAppcastItem:updateItem allowsAutomaticUpdates:[self allowsAutomaticUpdates] reply:^(SUUpdateAlertChoice choice) {
+    [self.userDriver showUpdateFoundWithAppcastItem:updateItem allowsAutomaticUpdates:[self allowsAutomaticUpdates] alreadyDownloaded:self.resumingUpdate reply:^(SUUpdateAlertChoice choice) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self updateAlertFinishedForUpdateItem:updateItem withChoice:choice];
-            if (choice == SUDownloadUpdateDone) {
-                [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
-            }
         });
     }];
 }
@@ -89,25 +95,31 @@
     switch (choice) {
         case SUInstallUpdateChoice:
         {
-            [self.userDriver showDownloadInitiatedWithCompletion:^(SUDownloadUpdateStatus downloadCompletionStatus) {
-                switch (downloadCompletionStatus) {
-                    case SUDownloadUpdateDone:
-                        break;
-                    case SUDownloadUpdateCancelled:
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            if ([self.updaterDelegate respondsToSelector:@selector(userDidCancelDownload:)]) {
-                                [self.updaterDelegate userDidCancelDownload:self.updater];
-                            }
-                            
-                            [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
-                        });
-                        break;
-                }
-            }];
+            if (!self.resumingUpdate) {
+                [self.userDriver showDownloadInitiatedWithCompletion:^(SUDownloadUpdateStatus downloadCompletionStatus) {
+                    switch (downloadCompletionStatus) {
+                        case SUDownloadUpdateDone:
+                            break;
+                        case SUDownloadUpdateCancelled:
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                if ([self.updaterDelegate respondsToSelector:@selector(userDidCancelDownload:)]) {
+                                    [self.updaterDelegate userDidCancelDownload:self.updater];
+                                }
+                                
+                                [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
+                            });
+                            break;
+                    }
+                }];
+                [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
+            } else {
+                [self.coreDriver finishInstallationWithResponse:SUInstallAndRelaunchUpdateNow];
+            }
             break;
         }
             
         case SUSkipThisVersionChoice:
+            assert(!self.resumingUpdate);
             [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
             [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
             break;
@@ -151,6 +163,11 @@
     [self.userDriver dismissUpdateInstallation];
     
     [self.userDriver terminateApplication];
+}
+
+- (BOOL)basicDriverShouldSignalShowingUpdateImmediately
+{
+    return NO;
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error

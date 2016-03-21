@@ -35,6 +35,7 @@
 @property (strong) SUAppcastItem *updateItem;
 @property (strong) SUHost *host;
 @property (nonatomic) BOOL allowsAutomaticUpdates;
+@property (nonatomic) BOOL alreadyDownloaded;
 @property (strong) void(^completionBlock)(SUUpdateAlertChoice);
 
 @property (strong) NSProgressIndicator *releaseNotesSpinner;
@@ -58,6 +59,7 @@
 @synthesize updateItem;
 @synthesize host;
 @synthesize allowsAutomaticUpdates = _allowsAutomaticUpdates;
+@synthesize alreadyDownloaded = _alreadyDownloaded;
 
 @synthesize releaseNotesSpinner;
 @synthesize webViewFinishedLoading;
@@ -70,7 +72,7 @@
 @synthesize skipButton;
 @synthesize laterButton;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates completionBlock:(void (^)(SUUpdateAlertChoice))block
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates alreadyDownloaded:(BOOL)alreadyDownloaded completionBlock:(void (^)(SUUpdateAlertChoice))block
 {
     self = [super initWithWindowNibName:@"SUUpdateAlert"];
 	if (self)
@@ -80,6 +82,7 @@
         updateItem = item;
         versionDisplayer = aVersionDisplayer;
         _allowsAutomaticUpdates = allowsAutomaticUpdates;
+        _alreadyDownloaded = alreadyDownloaded;
         [self setShouldCascadeWindows:NO];
 
         // Alex: This dummy line makes sure that the binary is linked against WebKit.
@@ -208,6 +211,19 @@
         
         [self.automaticallyInstallUpdatesButton removeFromSuperview];
     }
+    
+    if (self.alreadyDownloaded) {
+        // Should we hide the button or disable the button if the update has already been downloaded?
+        // Personally I think it looks better when the button is visible on the window...
+        // Anyway an already downloaded update can't be skipped
+        self.skipButton.enabled = NO;
+        
+        // We're going to be relaunching pretty instantaneously
+        self.installButton.title = SULocalizedString(@"Install & Relaunch", nil);
+        
+        // We should be explicit that the update will be installed on quit
+        self.laterButton.title = SULocalizedString(@"Install on Quit", nil);
+    }
 
     [self.window center];
 }
@@ -225,7 +241,14 @@
 
 - (NSString *)titleText
 {
-    return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is available!", nil), [self.host name]];
+    if ([self.updateItem isCriticalUpdate])
+    {
+        return [NSString stringWithFormat:SULocalizedString(@"An important update to %@ is ready to install", nil), [self.host name]];
+    }
+    else
+    {
+        return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is ready to install!", nil), [self.host name]];
+    }
 }
 
 - (NSString *)descriptionText
@@ -240,13 +263,23 @@
         [self.versionDisplayer formatVersion:&updateItemVersion andVersion:&hostVersion];
     }
 
-    // We display a slightly different summary depending on if it's an "info-only" item or not
+    // We display a different summary depending on if it's an "info-only" item, or a "critical update" item, or if we've already downloaded the update and just need to relaunch
     NSString *finalString = nil;
 
     if (self.updateItem.isInformationOnlyUpdate) {
         finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?", @"Description text for SUUpdateAlert when the update informational with no download."), self.host.name, updateItemVersion, hostVersion];
+    } else if ([self.updateItem isCriticalUpdate]) {
+        if (!self.alreadyDownloaded) {
+            finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. This is an important update; would you like to download it now?", @"Description text for SUUpdateAlert when the critical update is downloadable."), self.host.name, updateItemVersion, hostVersion];
+        } else {
+            finalString = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?", @"Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install."), self.host.name, updateItemVersion];
+        }
     } else {
-        finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", @"Description text for SUUpdateAlert when the update is downloadable."), self.host.name, updateItemVersion, hostVersion];
+        if (!self.alreadyDownloaded) {
+            finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", @"Description text for SUUpdateAlert when the update is downloadable."), self.host.name, updateItemVersion, hostVersion];
+        } else {
+            finalString = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?", @"Description text for SUUpdateAlert when the update has already been downloaded and ready to install."), self.host.name, updateItemVersion];
+        }
     }
     return finalString;
 }

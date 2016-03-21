@@ -19,6 +19,7 @@
 
 @interface SUDownloadDriver () <NSURLDownloadDelegate>
 
+@property (nonatomic, readonly) SUAppcastItem *updateItem;
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic) NSURLDownload *download;
 @property (nonatomic, copy) NSString *temporaryDirectory;

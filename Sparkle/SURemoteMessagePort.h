@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)sendMessageWithIdentifier:(int32_t)identifier data:(NSData *)data completion:(void (^)(BOOL success))completionHandler;
 
+- (void)sendMessageWithIdentifier:(int32_t)identifier data:(NSData *)data reply:(void (^)(BOOL success, NSData * _Nullable replyData))replyHandler;
+
 - (void)invalidate;
 
 @end

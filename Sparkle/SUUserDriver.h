@@ -120,30 +120,21 @@ NS_ASSUME_NONNULL_BEGIN
  * @param allowsAutomaticUpdates Indicates whether the user is allowed to use automatic updates.
  * A user interface may use this to give the user an option to enable automatic updates.
  *
- * @param reply A reply of SUInstallUpdateChoice installs the new update immediately. A reply of
- * SUInstallLaterChoice reminds the user later of the update, which can act as a "do nothing and abort" option.
- * Lastly, SUSkipThisVersionChoice skips this particular version and won't bother the user again
- * (unless they initiate an update check themselves).
+ * @param alreadyDownloaded Indicates whether the update has already been downloaded
+ *
+ * @param reply
+ * A reply of SUInstallUpdateChoice installs the new update immediately.
+ *
+ * A reply of SUInstallLaterChoice reminds the user later of the update, which can act as a "do nothing" option.
+ * If the update has already been downloaded (if alreadyDownloaded) is YES, then this will just delay the installation until the app terminates.
+ *
+ * A reply of SUSkipThisVersionChoice skips this particular version and won't bother the user again,
+ * unless they initiate an update check themselves. This reply must not be used if the update has already been downloaded
+ * (if alreadyDownloaded is YES) because the installer will try to install the update no matter what.
  *
  * This can be called from any thread
  */
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates reply:(void (^)(SUUpdateAlertChoice))reply;
-
-/*!
- * Show the user a new update that was already automatically downloaded is available
- *
- * Let the user know a new update is found and ask them what they want to do.
- *
- * @param appcastItem The Appcast Item containing information that reflects the new update
- *
- * @param reply A reply of SUInstallUpdateChoice installs the new update immediately. A reply of
- * SUInstallLaterChoice will attempt to install the update when the application terminates; this can act as a
- * "do nothing" option. Lastly, SUSkipThisVersionChoice skips this particular version and won't bother the user again
- * (unless they initiate an update check themselves).
- *
- * This can be called from any thread
- */
-- (void)showAutomaticUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply;
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates alreadyDownloaded:(BOOL)alreadyDownloaded reply:(void (^)(SUUpdateAlertChoice))reply;
 
 /*!
  * Show the user a new update was not found

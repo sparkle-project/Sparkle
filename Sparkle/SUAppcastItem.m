@@ -56,7 +56,6 @@
     self = [super init];
     
     if (self != nil) {
-        //self.date = [decoder decodeObjectOfClass:[NSDate class] forKey:@"date"];
         self.deltaUpdates = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSArray class], [NSDictionary class], [NSString class]]] forKey:@"deltaUpdates"];
         self.displayVersionString = [decoder decodeObjectOfClass:[NSString class] forKey:@"displayVersionString"];
         self.DSASignature = [decoder decodeObjectOfClass:[NSString class] forKey:@"DSASignature"];
@@ -76,10 +75,6 @@
 
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
-//    if (self.date != nil) {
-//        [encoder encodeObject:self.date forKey:@"date"];
-//    }
-    
     if (self.deltaUpdates != nil) {
         [encoder encodeObject:self.deltaUpdates forKey:@"deltaUpdates"];
     }

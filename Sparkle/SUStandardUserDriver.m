@@ -16,7 +16,6 @@
 #import "SUUpdatePermissionPrompt.h"
 #import "SUStatusController.h"
 #import "SUUpdateAlert.h"
-#import "SUAutomaticUpdateAlert.h"
 #import "SULocalizations.h"
 #import "SUApplicationInfo.h"
 
@@ -27,7 +26,7 @@
 @property (nonatomic, readonly) SUUserDriverCoreComponent *coreComponent;
 
 @property (nonatomic) SUStatusController *checkingController;
-@property (nonatomic) NSWindowController *activeUpdateAlert;
+@property (nonatomic) SUUpdateAlert *activeUpdateAlert;
 @property (nonatomic) SUStatusController *statusController;
 
 @end
@@ -141,7 +140,7 @@
 
 #pragma mark Update Found
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates reply:(void (^)(SUUpdateAlertChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates alreadyDownloaded:(BOOL)alreadyDownloaded reply:(void (^)(SUUpdateAlertChoice))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         id <SUVersionDisplay> versionDisplayer = nil;
@@ -150,20 +149,7 @@
         }
         
         __weak SUStandardUserDriver *weakSelf = self;
-        self.activeUpdateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host versionDisplayer:versionDisplayer allowsAutomaticUpdates:allowsAutomaticUpdates completionBlock:^(SUUpdateAlertChoice choice) {
-            reply(choice);
-            weakSelf.activeUpdateAlert = nil;
-        }];
-        
-        [self setUpFocusForActiveUpdateAlert];
-    });
-}
-
-- (void)showAutomaticUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        __weak SUStandardUserDriver *weakSelf = self;
-        self.activeUpdateAlert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host completionBlock:^(SUUpdateAlertChoice choice) {
+        self.activeUpdateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host versionDisplayer:versionDisplayer allowsAutomaticUpdates:allowsAutomaticUpdates alreadyDownloaded:alreadyDownloaded completionBlock:^(SUUpdateAlertChoice choice) {
             reply(choice);
             weakSelf.activeUpdateAlert = nil;
         }];

@@ -69,17 +69,20 @@
     return self;
 }
 
-- (BOOL)launchInstallTool:(NSError * __autoreleasing *)error
+- (BOOL)setUpLocalPort:(NSError * __autoreleasing *)error
 {
-    BOOL success = YES;
+    if (self.localPort != nil) {
+        return YES;
+    }
     
     self.localPort =
     [[SULocalMessagePort alloc]
      initWithServiceName:SUUpdateDriverServiceNameForHost(self.host)
-     messageCallback:^(int32_t identifier, NSData * _Nonnull data) {
+     messageCallback:^NSData *(int32_t identifier, NSData * _Nonnull data) {
          dispatch_async(dispatch_get_main_queue(), ^{
              [self handleMessageWithIdentifier:identifier data:data];
          });
+         return nil;
      }
      invalidationCallback:^{
          dispatch_async(dispatch_get_main_queue(), ^{
@@ -111,17 +114,68 @@
                         }
              ];
         }
-        success = NO;
-    } else {
-        NSError *launchError = nil;
-        if (![self launchAutoUpdate:&launchError]) {
-            if (error != NULL) {
-                *error = launchError;
-            }
-            success = NO;
-        }
+        return NO;
     }
-    return success;
+    return YES;
+}
+
+- (BOOL)setUpRemotePort:(NSError * __autoreleasing *)error
+{
+    if (self.remotePort != nil) {
+        return YES;
+    }
+    
+    self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForHost(self.host) invalidationCallback:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (self.remotePort != nil) {
+                NSError *remoteError =
+                [NSError
+                 errorWithDomain:SUSparkleErrorDomain
+                 code:SUInstallationError
+                 userInfo:@{
+                            NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
+                            NSLocalizedFailureReasonErrorKey:@"The remote port connection was invalidated from the updater"
+                            }
+                 ];
+                [self.delegate installerIsRequestingAbortInstallWithError:remoteError];
+            }
+        });
+    }];
+    
+    if (self.remotePort == nil) {
+        NSError *remoteError =
+        [NSError
+         errorWithDomain:SUSparkleErrorDomain
+         code:SUInstallationError
+         userInfo:@{
+                    NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
+                    NSLocalizedFailureReasonErrorKey:@"The remote port connection failed being created"
+                    }
+         ];
+        
+        if (error != NULL) {
+            *error = remoteError;
+        }
+        
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)launchInstallTool:(NSError * __autoreleasing *)error
+{
+    if (![self setUpLocalPort:error]) {
+        return NO;
+    }
+    
+    NSError *launchError = nil;
+    if (![self launchAutoUpdate:&launchError]) {
+        if (error != NULL) {
+            *error = launchError;
+        }
+        return NO;
+    }
+    return YES;
 }
 
 // This can be called multiple times (eg: if a delta update fails, this may be called again with a regular update item)
@@ -168,36 +222,30 @@
         [self.delegate installerDidStartInstalling];
         
     } else if (identifier == SUInstallationFinishedStage1) {
-        self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForHost(self.host) invalidationCallback:^{
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (self.remotePort != nil) {
-                    NSError *remoteError =
-                    [NSError
-                     errorWithDomain:SUSparkleErrorDomain
-                     code:SUInstallationError
-                     userInfo:@{
-                                NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
-                                NSLocalizedFailureReasonErrorKey:@"The remote port connection was invalidated from the updater"
-                                }
-                     ];
-                    [self.delegate installerIsRequestingAbortInstallWithError:remoteError];
-                }
-            });
-        }];
-        
-        if (self.remotePort == nil) {
-            NSError *remoteError =
-            [NSError
-             errorWithDomain:SUSparkleErrorDomain
-             code:SUInstallationError
-             userInfo:@{
-                        NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
-                        NSLocalizedFailureReasonErrorKey:@"The remote port connection failed being created"
-                        }
-             ];
+        NSError *remoteError = nil;
+        if (![self setUpRemotePort:&remoteError]) {
             [self.delegate installerIsRequestingAbortInstallWithError:remoteError];
         } else {
             self.currentStage = identifier;
+            
+            // Let the installer keep a copy of the appcast item data
+            // We may want to ask for it later (note the updater can relaunch without the app necessarily having relaunched)
+            NSMutableData *updateItemData = [NSMutableData data];
+            NSKeyedArchiver *keyedArchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:updateItemData];
+            keyedArchiver.requiresSecureCoding = YES;
+            [keyedArchiver encodeObject:self.updateItem forKey:SUAppcastItemArchiveKey];
+            [keyedArchiver finishEncoding];
+            
+            if (updateItemData != nil) {
+                [self.remotePort sendMessageWithIdentifier:SUSentUpdateAppcastItemData data:updateItemData completion:^(BOOL success) {
+                    if (!success) {
+                        SULog(@"Error: Failed to send update appcast item to installer");
+                    }
+                }];
+            } else {
+                SULog(@"Error: Archived data to send for appcast item is nil");
+            }
+            
             [self.delegate installerDidFinishRelaunchPreparation];
         }
     } else if (identifier == SUInstallationFinishedStage2) {
@@ -363,12 +411,12 @@
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
 {
-    assert(self.updateItem);
+#warning this assertion no longer holds trues due to resumability - matters for commented invocation code below
+    //assert(self.updateItem);
     
     if (![self mayUpdateAndRestart])
     {
-#warning we may have to propogate this... or return a boolean
-        [self abortInstall];
+        [self.delegate installerIsRequestingAbortInstallWithError:nil];
         return;
     }
     
@@ -384,6 +432,23 @@
         //            return;
         //        }
     }
+    
+    // Set up local and remote ports to the installer if they are not set up already
+    
+    NSError *localPortError = nil;
+    if (![self setUpLocalPort:&localPortError]) {
+        [self.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while starting the local port for the installer. Please try again later.", nil) }]];
+        return;
+    }
+    
+    NSError *remotePortError = nil;
+    if (![self setUpRemotePort:&remotePortError]) {
+        [self.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while starting the remote port for the installer. Please try again later.", nil) }]];
+        return;
+    }
+    
+    // For resumability, we'll assume we are far enough for the installation to continue
+    self.currentStage = SUInstallationFinishedStage1;
     
     uint8_t response[2] = {(uint8_t)relaunch, (uint8_t)showUI};
     NSData *responseData = [NSData dataWithBytes:response length:sizeof(response)];
@@ -402,9 +467,8 @@
                  ];
                 [self.delegate installerIsRequestingAbortInstallWithError:remoteError];
             });
-        } else {
-            // We'll terminate later when the installer tells us stage 2 is done
         }
+        // otherwise we'll terminate later when the installer tells us stage 2 is done
     }];
 }
 

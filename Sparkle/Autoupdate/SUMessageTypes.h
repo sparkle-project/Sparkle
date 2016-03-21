@@ -8,7 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class SUHost;
+
+extern NSString *SUAppcastItemArchiveKey;
 
 // Order matters; higher stages have higher values.
 typedef NS_ENUM(int32_t, SUInstallerMessageType)
@@ -22,10 +26,17 @@ typedef NS_ENUM(int32_t, SUInstallerMessageType)
     SUInstallationFinishedStage2 = 6
 };
 
-// Order matters; higher stages have higher values
 typedef NS_ENUM(int32_t, SUUpdaterMessageType)
 {
-    SUResumeInstallationToStage2 = 1
+    SUSentUpdateAppcastItemData = 0,
+    SUReceiveUpdateAppcastItemData = 1,
+    SUResumeInstallationToStage2 = 2
+};
+
+typedef NS_ENUM(int32_t, SUInstallStatusMessageType)
+{
+    SUAppcastItemData = 0,
+    SUWaitingOnUpdateData = 1
 };
 
 BOOL SUInstallerMessageTypeIsLegal(SUInstallerMessageType oldMessageType, SUInstallerMessageType newMessageType);
@@ -33,3 +44,7 @@ BOOL SUInstallerMessageTypeIsLegal(SUInstallerMessageType oldMessageType, SUInst
 NSString *SUUpdateDriverServiceNameForHost(SUHost *host);
 
 NSString *SUAutoUpdateServiceNameForHost(SUHost *host);
+
+NSString *SUInstallStatusServiceNameForHost(SUHost *host, int32_t tag);
+
+NS_ASSUME_NONNULL_END

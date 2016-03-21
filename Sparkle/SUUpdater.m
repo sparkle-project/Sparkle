@@ -20,8 +20,8 @@
 #import "SUProbingUpdateDriver.h"
 #import "SUUserInitiatedUpdateDriver.h"
 #import "SUAutomaticUpdateDriver.h"
-#import "SURemoteMessagePort.h"
-#import "SUMessageTypes.h"
+#import "SUProbeInstallStatus.h"
+#import "SUAppcastItem.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -156,9 +156,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             }
         }
         
+        __weak SUUpdater *weakSelf = self;
         [self.userDriver requestUpdatePermissionWithSystemProfile:profileInfo reply:^(SUUpdatePermissionPromptResult *result) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self updatePermissionPromptFinishedWithResult:result];
+                [weakSelf updatePermissionPromptFinishedWithResult:result];
             });
         }];
         
@@ -191,6 +192,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)scheduleNextUpdateCheck
 {
+    [self scheduleNextUpdateCheckFiringImmediately:NO];
+}
+
+- (void)scheduleNextUpdateCheckFiringImmediately:(BOOL)firingImmediately
+{
     [self.userDriver invalidateUpdateCheckTimer];
     
     if (![self automaticallyChecksForUpdates]) {
@@ -199,38 +205,44 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     } else {
         [self.userDriver idleOnUpdateChecks:NO];
     }
-
-    // How long has it been since last we checked for an update?
-    NSDate *lastCheckDate = [self lastUpdateCheckDate];
-	if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
-    NSTimeInterval intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
-
-    // Now we want to figure out how long until we check again.
-    NSTimeInterval updateCheckInterval = [self updateCheckInterval];
-    if (updateCheckInterval < SUMinimumUpdateCheckInterval)
-        updateCheckInterval = SUMinimumUpdateCheckInterval;
-    if (intervalSinceCheck < updateCheckInterval) {
-        NSTimeInterval delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
-        [self.userDriver startUpdateCheckTimerWithNextTimeInterval:delayUntilCheck reply:^(SUUpdateCheckTimerStatus checkTimerStatus) {
-            switch (checkTimerStatus) {
-                case SUCheckForUpdateWillOccurLater:
-                    break;
-                case SUCheckForUpdateNow:
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self checkForUpdatesInBackground];
-                    });
-                    break;
+    
+    if (firingImmediately) {
+        [self checkForUpdatesInBackground];
+    } else {
+        [self retrieveNextUpdateCheckInterval:^(NSTimeInterval updateCheckInterval) {
+            // How long has it been since last we checked for an update?
+            NSDate *lastCheckDate = [self lastUpdateCheckDate];
+            if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
+            NSTimeInterval intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
+            
+            // Now we want to figure out how long until we check again.
+            if (updateCheckInterval < SUMinimumUpdateCheckInterval)
+                updateCheckInterval = SUMinimumUpdateCheckInterval;
+            if (intervalSinceCheck < updateCheckInterval) {
+                NSTimeInterval delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
+                __weak SUUpdater *weakSelf = self; // we don't want this to keep the updater alive
+                [self.userDriver startUpdateCheckTimerWithNextTimeInterval:delayUntilCheck reply:^(SUUpdateCheckTimerStatus checkTimerStatus) {
+                    switch (checkTimerStatus) {
+                        case SUCheckForUpdateWillOccurLater:
+                            break;
+                        case SUCheckForUpdateNow:
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                [weakSelf checkForUpdatesInBackground];
+                            });
+                            break;
+                    }
+                }];
+            } else {
+                // We're overdue! Run one now.
+                [self checkForUpdatesInBackground];
             }
         }];
-    } else {
-        // We're overdue! Run one now.
-        [self checkForUpdatesInBackground];
     }
 }
 
 // RUNS ON ITS OWN THREAD
 // updater should be passed as a weak reference
-static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id <SUUpdateDriver> inDriver)
+static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id <SUUpdateDriver> inDriver, NSURL *feedURL)
 {
     @try {
         // This method *must* be called on its own thread. SCNetworkReachabilityCheckByName
@@ -244,18 +256,8 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
             BOOL isNetworkReachable = YES;
             
             // Don't perform automatic checks on unconnected laptops or dial-up connections that aren't online:
-            NSMutableDictionary *theDict = [NSMutableDictionary dictionary];
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                // Get feed URL on main thread, it's not safe to call elsewhere.
-                theDict[@"feedURL"] = [updater feedURL];;
-            });
             
-            // Did the updater get deallocated already?
-            if (theDict.count == 0 || updater == nil) {
-                return;
-            }
-            
-            const char *hostname = [[(NSURL *)theDict[@"feedURL"] host] cStringUsingEncoding:NSUTF8StringEncoding];
+            const char *hostname = [[feedURL host] cStringUsingEncoding:NSUTF8StringEncoding];
             SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(NULL, hostname);
             Boolean reachabilityResult = NO;
             // If the feed's using a file:// URL, we won't be able to use reachability.
@@ -295,7 +297,8 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
     //	hour or so:
     
     id <SUUpdateDriver> updateDriver;
-    if ([self automaticallyDownloadsUpdates]) {
+    BOOL inProgress = [SUProbeInstallStatus probeInstallerInProgressForHost:self.host];
+    if ([self automaticallyDownloadsUpdates] && !inProgress) {
         updateDriver =
         [[SUAutomaticUpdateDriver alloc]
          initWithHost:self.host
@@ -314,20 +317,19 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
     
     // We don't want the reachability check to act on the driver if the updater is going near death
     __weak SUUpdater *updater = self;
+    NSURL *feedURL = [updater feedURL];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        SUCheckForUpdatesInBgReachabilityCheck(updater, updateDriver);
+        SUCheckForUpdatesInBgReachabilityCheck(updater, updateDriver, feedURL);
     });
 }
 
 - (void)checkForUpdates
 {
+#warning not sure if this is the right thing to do
     if (self.driver != nil) {
-        [self.driver abortUpdate];
+        //[self.driver abortUpdate];
+        return;
     }
-    
-//    if (self.driver && [self.driver isInterruptible]) {
-//        [self.driver abortUpdate];
-//    }
     
     id <SUUpdateDriver> theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithHost:self.host sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
     [self checkForUpdatesWithDriver:theUpdateDriver];
@@ -340,7 +342,11 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 
 - (void)checkForUpdatesWithDriver:(id <SUUpdateDriver> )d
 {
-    if ([self updateInProgress]) {
+//    if ([self updateInProgress]) {
+//        return;
+//    }
+    
+    if (self.driver != nil) {
         return;
     }
     
@@ -369,12 +375,22 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
     NSURL *theFeedURL = [self parameterizedFeedURL];
     // Use a NIL URL to cancel quietly.
     if (theFeedURL) {
-        [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders] completion:^{
-            self.driver = nil;
-            [self.userDriver showUpdateInProgress:NO];
-            [self updateLastUpdateCheckDate];
-            [self scheduleNextUpdateCheck];
-        }];
+        __weak SUUpdater *weakSelf = self;
+        SUUpdateDriverCompletion completionBlock = ^(BOOL shouldShowUpdateImmediately) {
+            SUUpdater *strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                strongSelf.driver = nil;
+                [strongSelf.userDriver showUpdateInProgress:NO];
+                [strongSelf updateLastUpdateCheckDate];
+                [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately];
+            }
+        };
+        
+        if (![SUProbeInstallStatus probeInstallerInProgressForHost:self.host]) {
+            [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders] completion:completionBlock];
+        } else {
+            [self.driver resumeUpdateWithCompletion:completionBlock];
+        }
     } else {
         [self.driver abortUpdate];
     }
@@ -556,12 +572,32 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
         return SUDefaultUpdateCheckInterval;
 }
 
+// This may not return the same update check interval as the developer has configured
+// Notably it may differ when we have an update that has been already downloaded and needs to resume,
+// as well as if that update is marked critical or not
+- (void)retrieveNextUpdateCheckInterval:(void (^)(NSTimeInterval))completionHandler
+{
+    [SUProbeInstallStatus probeInstallerUpdateItemForHost:self.host completion:^(SUAppcastItem * _Nullable updateItem) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSTimeInterval regularCheckInterval = [self updateCheckInterval];
+            if (updateItem == nil) {
+                // Proceed as normal if there's no resumable updates
+                completionHandler(regularCheckInterval);
+            } else {
+                if ([updateItem isCriticalUpdate]) {
+                    completionHandler(MIN(regularCheckInterval, SUImpatientUpdateCheckInterval));
+                } else {
+                    completionHandler(MAX(regularCheckInterval, SUImpatientUpdateCheckInterval));
+                }
+            }
+        });
+    }];
+}
+
 - (void)dealloc
 {
-    // Remove updater did finish notification
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
     // Stop checking for updates
+#warning useless right now because the cycles retain self meaning dealloc won't be hit unless it's been cancelled/finished
     [self cancelNextUpdateCycle];
     
     // Don't tell the user driver to invalidate the update check timer
@@ -576,19 +612,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 
 - (BOOL)updateInProgress
 {
-    if (self.driver != nil) {
-        return YES;
-    }
-    
-    SURemoteMessagePort *remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForHost(self.host) invalidationCallback:^{}];
-    BOOL installerAlive = (remotePort != nil);
-    [remotePort invalidate];
-    
-    if (installerAlive) {
-        return YES;
-    }
-    
-    return NO;
+    return (self.driver != nil || [SUProbeInstallStatus probeInstallerInProgressForHost:self.host]);
 }
 
 - (NSBundle *)hostBundle { return [self.host bundle]; }

@@ -9,6 +9,8 @@
 #import "SUMessageTypes.h"
 #import "SUHost.h"
 
+NSString *SUAppcastItemArchiveKey = @"SUAppcastItemArchive";
+
 BOOL SUInstallerMessageTypeIsLegal(SUInstallerMessageType oldMessageType, SUInstallerMessageType newMessageType)
 {
     BOOL legal;
@@ -44,4 +46,9 @@ NSString *SUUpdateDriverServiceNameForHost(SUHost *host)
 NSString *SUAutoUpdateServiceNameForHost(SUHost *host)
 {
     return [NSString stringWithFormat:@"%@-sparkle-installer", host.bundle.bundleIdentifier];
+}
+
+NSString *SUInstallStatusServiceNameForHost(SUHost *host, int32_t tag)
+{
+    return [NSString stringWithFormat:@"%@-%d-sparkle-install-status", host.bundle.bundleIdentifier, tag];
 }

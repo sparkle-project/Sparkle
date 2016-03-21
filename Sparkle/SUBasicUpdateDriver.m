@@ -13,12 +13,18 @@
 #import "SULog.h"
 #import "SULocalizations.h"
 #import "SUHost.h"
+#import "SUAppcastItem.h"
+#import "SUProbeInstallStatus.h"
 
 @interface SUBasicUpdateDriver () <SUAppcastDriverDelegate>
 
 @property (nonatomic, weak, readonly) id<SUBasicUpdateDriverDelegate> delegate;
 @property (nonatomic, readonly) SUAppcastDriver *appcastDriver;
-@property (nonatomic, copy) void (^completionBlock)(void);
+@property (nonatomic, copy) SUUpdateDriverCompletion completionBlock;
+
+@property (nonatomic, readonly) SUHost *host;
+@property (nonatomic, readonly, weak) id updater; // if we didn't have legacy support, I'd remove this..
+@property (nullable, nonatomic, readonly, weak) id <SUUpdaterDelegate>updaterDelegate;
 
 @end
 
@@ -45,7 +51,7 @@
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(void (^)(void))completionBlock
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(SUUpdateDriverCompletion)completionBlock
 {
     self.completionBlock = completionBlock;
     
@@ -57,9 +63,23 @@
     }
 }
 
-- (NSString *)userAgent
+- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
 {
-    return self.appcastDriver.userAgent;
+    self.completionBlock = completionBlock;
+    
+    [SUProbeInstallStatus probeInstallerUpdateItemForHost:self.host completion:^(SUAppcastItem * _Nullable updateItem) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (updateItem == nil) {
+                [self.delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUResumeAppcastError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"Failed to resume installing update.", nil) }]];
+            } else {
+                // Kind of lying, but triggering the notification so drivers can know when to stop showing initial fetching progress
+                [self notifyFinishLoadingAppcast];
+                
+                SUAppcastItem *nonNullUpdateItem = updateItem;
+                [self didFindValidUpdateWithAppcastItem:nonNullUpdateItem];
+            }
+        });
+    }];
 }
 
 - (SUAppcastItem *)nonDeltaUpdateItem
@@ -72,15 +92,20 @@
     [self.delegate basicDriverIsRequestingAbortUpdateWithError:error];
 }
 
+- (void)notifyFinishLoadingAppcast
+{
+    if ([self.delegate respondsToSelector:@selector(basicDriverDidFinishLoadingAppcast)]) {
+        [self.delegate basicDriverDidFinishLoadingAppcast];
+    }
+}
+
 - (void)didFinishLoadingAppcast:(SUAppcast *)appcast
 {
     if ([self.updaterDelegate respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
         [self.updaterDelegate updater:self.updater didFinishLoadingAppcast:appcast];
     }
     
-    if ([self.delegate respondsToSelector:@selector(basicDriverDidFinishLoadingAppcast)]) {
-        [self.delegate basicDriverDidFinishLoadingAppcast];
-    }
+    [self notifyFinishLoadingAppcast];
 }
 
 - (void)didFindValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem
@@ -133,7 +158,7 @@
     }
     
     if (self.completionBlock != nil) {
-        self.completionBlock();
+        self.completionBlock([self.delegate basicDriverShouldSignalShowingUpdateImmediately]);
         self.completionBlock = nil;
     }
 }

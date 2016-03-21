@@ -13,6 +13,6 @@
 
 @interface SUInstallUpdateViewController : NSViewController
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem alreadyDownloaded:(BOOL)alreadyDownloaded reply:(void (^)(SUUpdateAlertChoice))reply;
 
 @end

@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SUUpdateDriver.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -28,9 +29,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate delegate:(id<SUUIBasedUpdateDriverDelegate>)delegate;
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(void (^)(void))completionBlock;
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(SUUpdateDriverCompletion)completionBlock;
 
-@property (nonatomic, readonly) id<SUUserDriver> userDriver;
+- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock;
 
 - (void)abortUpdateWithError:(nullable NSError *)error;
 

@@ -23,6 +23,7 @@ typedef NS_ENUM(OSStatus, SUError) {
     SUNoUpdateError = 1001,
     SUAppcastError = 1002,
     SURunningFromDiskImageError = 1003,
+    SUResumeAppcastError = 1004,
 
     // Download phase errors.
     SUTemporaryDirectoryError = 2000,
@@ -39,10 +40,7 @@ typedef NS_ENUM(OSStatus, SUError) {
     SUMissingInstallerToolError = 4003,
     SURelaunchError = 4004,
     SUInstallationError = 4005,
-    SUDowngradeError = 4006,
-    
-    // System phase errors
-    SUSystemPowerOffError = 5000
+    SUDowngradeError = 4006
 };
 
 #endif

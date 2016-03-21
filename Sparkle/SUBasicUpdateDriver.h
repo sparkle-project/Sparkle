@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SUUpdateDriver.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -19,6 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
 
+- (BOOL)basicDriverShouldSignalShowingUpdateImmediately;
+
 @optional
 
 - (void)basicDriverDidFinishLoadingAppcast;
@@ -29,13 +32,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate delegate:(id <SUBasicUpdateDriverDelegate>)delegate;
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(void (^)(void))completionBlock;
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(SUUpdateDriverCompletion)completionBlock;
 
-@property (nonatomic, readonly) SUHost *host;
-@property (nonatomic, readonly, weak) id updater; // if we didn't have legacy support, I'd remove this..
-@property (nullable, nonatomic, readonly, weak) id <SUUpdaterDelegate>updaterDelegate;
+- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock;
 
-@property (nonatomic, readonly) NSString *userAgent;
 @property (nullable, nonatomic, readonly) SUAppcastItem *nonDeltaUpdateItem;
 
 - (void)abortUpdateWithError:(nullable NSError *)error;

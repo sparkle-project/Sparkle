@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SULocalMessagePort : NSObject
 
 // Note: messageCallback may not be called on the main thread
-- (nullable instancetype)initWithServiceName:(NSString *)serviceName messageCallback:(void (^)(int32_t identifier, NSData *data))messageCallback invalidationCallback:(void (^)(void))invalidationCallback;
+- (nullable instancetype)initWithServiceName:(NSString *)serviceName messageCallback:(NSData *(^)(int32_t identifier, NSData *data))messageCallback invalidationCallback:(void (^)(void))invalidationCallback;
 
 - (void)invalidate;
 

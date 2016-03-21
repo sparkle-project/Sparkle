@@ -32,9 +32,7 @@
 
 - (void)dismissUserInitiatedUpdateCheck {}
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem allowsAutomaticUpdates:(BOOL)__unused allowsAutomaticUpdates reply:(void (^)(SUUpdateAlertChoice))__unused reply {}
-
-- (void)showAutomaticUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem reply:(void (^)(SUUpdateAlertChoice))__unused reply {}
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem allowsAutomaticUpdates:(BOOL)__unused allowsAutomaticUpdates alreadyDownloaded:(BOOL)alreadyDownloaded reply:(void (^)(SUUpdateAlertChoice))__unused reply {}
 
 - (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))__unused acknowledgement {}
 

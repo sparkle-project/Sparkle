@@ -35,9 +35,14 @@
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(void (^)(void))completionBlock
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(SUUpdateDriverCompletion)completionBlock
 {
     [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:NO completion:completionBlock];
+}
+
+- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
+{
+    [self.uiDriver resumeUpdateWithCompletion:completionBlock];
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)__unused error

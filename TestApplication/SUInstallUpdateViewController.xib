@@ -7,6 +7,7 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUInstallUpdateViewController">
             <connections>
+                <outlet property="skipUpdatesButton" destination="GnO-99-FrA" id="3lg-83-oGn"/>
                 <outlet property="textView" destination="hvq-rZ-gUG" id="U5Y-SK-7E5"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
             </connections>

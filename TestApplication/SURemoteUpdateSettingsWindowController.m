@@ -42,6 +42,12 @@
     return self;
 }
 
+- (void)dealloc
+{
+    [self.connection invalidate];
+    self.connection = nil;
+}
+
 - (NSString *)windowNibName
 {
     return NSStringFromClass([self class]);
@@ -53,8 +59,8 @@
     
     self.connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUUserDriver)];
     
-    self.userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:self.window delegate:self];
-    //self.userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:[NSBundle mainBundle] delegate:self];
+    //self.userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:self.window delegate:self];
+    self.userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:[NSBundle mainBundle] delegate:self];
     
     self.connection.exportedObject = self.userDriver;
     
@@ -119,17 +125,20 @@
     // Retrieving the settings really takes a while, perhaps a smarter app may also store defaults locally and sync them
     [self.connection.remoteObjectProxy retrieveUpdateSettings:^(BOOL automaticallyCheckForUpdates, BOOL automaticallyDownloadUpdates, BOOL sendSystemProfile, NSTimeInterval updateCheckInterval) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            // Load the window before referencing our outlets
-            [self window];
-            
-            self.automaticallyChecksForUpdatesButton.state = automaticallyCheckForUpdates ? NSOnState : NSOffState;
-            self.automaticallyDownloadUpdatesButton.state = automaticallyDownloadUpdates ? NSOnState : NSOffState;
-            self.sendsSystemProfileButton.state = sendSystemProfile ? NSOnState : NSOffState;
-            self.updateCheckIntervalTextField.doubleValue = updateCheckInterval;
-            
-            // Ready to show our window
-            if (!self.window.isVisible) {
-                [self showWindow:nil];
+            SURemoteUpdateSettingsWindowController *strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                // Load the window before referencing our outlets
+                [strongSelf window];
+                
+                strongSelf.automaticallyChecksForUpdatesButton.state = automaticallyCheckForUpdates ? NSOnState : NSOffState;
+                strongSelf.automaticallyDownloadUpdatesButton.state = automaticallyDownloadUpdates ? NSOnState : NSOffState;
+                strongSelf.sendsSystemProfileButton.state = sendSystemProfile ? NSOnState : NSOffState;
+                strongSelf.updateCheckIntervalTextField.doubleValue = updateCheckInterval;
+                
+                // Ready to show our window
+                if (!strongSelf.window.isVisible) {
+                    [strongSelf showWindow:nil];
+                }
             }
         });
     }];

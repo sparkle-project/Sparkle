@@ -32,9 +32,19 @@
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(void (^)(void))completionBlock
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(SUUpdateDriverCompletion)completionBlock
 {
     [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:NO completion:completionBlock];
+}
+
+- (BOOL)basicDriverShouldSignalShowingUpdateImmediately
+{
+    return NO;
+}
+
+- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
+{
+    [self.basicDriver resumeUpdateWithCompletion:completionBlock];
 }
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)__unused appcastItem

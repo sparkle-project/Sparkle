@@ -28,7 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)loadAppcastFromURL:(NSURL *)appcastURL userAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates;
 
-@property (nonatomic, readonly, copy) NSString *userAgent;
 @property (nullable, nonatomic, readonly) SUAppcastItem *nonDeltaUpdateItem;
 
 @end
