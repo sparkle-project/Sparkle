@@ -252,9 +252,9 @@
         NSUnderlyingErrorKey: error,
     }];
 
-    NSURL *failingUrl = error.userInfo[NSURLErrorFailingURLErrorKey];
+    NSURL *failingUrl = [error.userInfo objectForKey:NSURLErrorFailingURLErrorKey];
     if (failingUrl) {
-        userInfo[NSURLErrorFailingURLErrorKey] = failingUrl;
+        [userInfo setObject:failingUrl forKey:NSURLErrorFailingURLErrorKey];
     }
 
     self.completionBlock([NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastError userInfo:userInfo]);

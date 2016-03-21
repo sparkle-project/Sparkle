@@ -85,6 +85,7 @@ int main(int __unused argc, const char __unused *argv[])
         
         NSApplication *application = [NSApplication sharedApplication];
         [application setDelegate:delegate];
+        
         [application run];
     }
 
