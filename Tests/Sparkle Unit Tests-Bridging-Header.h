@@ -8,7 +8,7 @@
 #import "SUFileManager.h"
 #import "SUAppcast.h"
 #import "SUAppcastItem.h"
-#import "SUBasicUpdateDriver.h"
+#import "SUAppcastDriver.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SUStandardVersionComparator.h"
 
@@ -26,7 +26,7 @@ static const char *SUAppleQuarantineIdentifier = "com.apple.quarantine";
 
 @end
 
-@interface SUBasicUpdateDriver (Private)
+@interface SUAppcastDriver (Private)
 
 + (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator;
 
