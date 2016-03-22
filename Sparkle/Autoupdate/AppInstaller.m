@@ -50,7 +50,6 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 @property (nonatomic) dispatch_queue_t installerQueue;
 @property (nonatomic) BOOL performedStage1Installation;
 @property (nonatomic) BOOL performedStage2Installation;
-@property (nonatomic) BOOL handledResumeInstallationToStage2;
 
 @end
 
@@ -74,7 +73,6 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 @synthesize installerQueue = _installerQueue;
 @synthesize performedStage1Installation = _performedStage1Installation;
 @synthesize performedStage2Installation = _performedStage2Installation;
-@synthesize handledResumeInstallationToStage2 = _handledResumeInstallationToStage2;
 
 /*
  * hostPath - path to host (original) application
@@ -299,11 +297,10 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         uint8_t showsUI = *((const uint8_t *)data.bytes + 1);
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            // Only allow handling showing UI once since only stage 2 needs it
-            if (!self.handledResumeInstallationToStage2) {
-                self.shouldShowUI = (BOOL)showsUI;
-            }
-            // Allow handling if we should relaunch at any time, however
+            // Only applicable to stage 2
+            self.shouldShowUI = (BOOL)showsUI;
+            
+            // Allow handling if we should relaunch at any time
             self.shouldRelaunch = (BOOL)relaunch;
             
 #warning todo: handle this message even if we aren't ready for stage 2 yet.
@@ -315,8 +312,6 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
             
             // Resume the installation if we aren't done with stage 2 yet, and remind the client we are prepared to relaunch
             [self resumeInstallation];
-            
-            self.handledResumeInstallationToStage2 = YES;
         });
     }
     
