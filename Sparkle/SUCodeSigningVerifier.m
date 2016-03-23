@@ -141,11 +141,11 @@ static id valueOrNSNull(id value) {
         NSDictionary *signingDict = CFBridgingRelease(signingInfo);
         NSMutableDictionary *relevantInfo = [NSMutableDictionary dictionary];
         for (NSString *key in @[@"format", @"identifier", @"requirements", @"teamid", @"signing-time"]) {
-            relevantInfo[key] = valueOrNSNull(signingDict[key]);
+            [relevantInfo setObject:valueOrNSNull([signingDict objectForKey:key]) forKey:key];
         }
-        NSDictionary *infoPlist = signingDict[@"info-plist"];
-        relevantInfo[@"version"] = valueOrNSNull(infoPlist[@"CFBundleShortVersionString"]);
-        relevantInfo[@"build"] = valueOrNSNull(infoPlist[(__bridge NSString *)kCFBundleVersionKey]);
+        NSDictionary *infoPlist = [signingDict objectForKey:@"info-plist"];
+        [relevantInfo setObject:valueOrNSNull([infoPlist objectForKey:@"CFBundleShortVersionString"]) forKey:@"version"];
+        [relevantInfo setObject:valueOrNSNull([infoPlist objectForKey:(__bridge NSString *)kCFBundleVersionKey]) forKey:@"build"];
         SULog(@"%@: %@", label, relevantInfo);
     }
 }

@@ -903,7 +903,10 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
 
     if (canUseNewTrashAPI) {
         NSError *trashError = nil;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
         success = [_fileManager trashItemAtURL:tempItemURL resultingItemURL:NULL error:&trashError];
+#pragma clang diagnostic pop
         if (!success && error != NULL) {
             *error = trashError;
         }
