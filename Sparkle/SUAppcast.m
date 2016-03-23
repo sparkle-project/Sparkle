@@ -32,7 +32,7 @@
         }
         NSString *attributeStringValue = [attribute stringValue];
         if (attributeStringValue != nil) {
-            [dictionary setObject:attrName forKey:attributeStringValue];
+            [dictionary setObject:attributeStringValue forKey:attrName];
         }
     }
     return dictionary;
