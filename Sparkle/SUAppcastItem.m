@@ -182,7 +182,7 @@
 
                 NSMutableDictionary *fakeAppCastDict = [dict mutableCopy];
                 [fakeAppCastDict removeObjectForKey:SUAppcastElementDeltas];
-                [fakeAppCastDict setObject:SURSSElementEnclosure forKey:deltaDictionary];
+                [fakeAppCastDict setObject:deltaDictionary forKey:SURSSElementEnclosure];
                 SUAppcastItem *deltaItem = [[SUAppcastItem alloc] initWithDictionary:fakeAppCastDict];
 
                 [deltas setObject:deltaItem forKey:deltaFrom];
