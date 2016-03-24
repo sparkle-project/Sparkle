@@ -77,8 +77,10 @@ static NSString * const UPDATED_VERSION = @"2.0";
     assert(bundleURL != nil);
     
     // Copy main bundle into server directory
-    NSString *lastBundleURLComponent = bundleURL.lastPathComponent;
-    NSURL *destinationBundleURL = [serverDirectoryURL URLByAppendingPathComponent:lastBundleURLComponent];
+    NSString *bundleURLLastComponent = bundleURL.lastPathComponent;
+    assert(bundleURLLastComponent != nil);
+    
+    NSURL *destinationBundleURL = [serverDirectoryURL URLByAppendingPathComponent:bundleURLLastComponent];
     NSError *copyBundleError = nil;
     if (![fileManager copyItemAtURL:bundleURL toURL:destinationBundleURL error:&copyBundleError]) {
         NSLog(@"Failed to copy main bundle into server directory with error %@", copyBundleError);
@@ -92,8 +94,8 @@ static NSString * const UPDATED_VERSION = @"2.0";
     assert(infoFileExists);
     
     NSMutableDictionary *infoDictionary = [[NSMutableDictionary alloc] initWithContentsOfURL:infoURL];
-    infoDictionary[(__bridge NSString *)kCFBundleVersionKey] = UPDATED_VERSION;
-    infoDictionary[@"CFBundleShortVersionString"] = UPDATED_VERSION;
+    [infoDictionary setObject:UPDATED_VERSION forKey:(__bridge NSString *)kCFBundleVersionKey];
+    [infoDictionary setObject:UPDATED_VERSION forKey:@"CFBundleShortVersionString"];
     
     BOOL wroteInfoFile = [infoDictionary writeToURL:infoURL atomically:NO];
     assert(wroteInfoFile);

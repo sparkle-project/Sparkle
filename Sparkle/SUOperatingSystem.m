@@ -38,7 +38,11 @@
         return version;
     }
 #endif
+    
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
     return [[NSProcessInfo processInfo] operatingSystemVersion];
+#pragma clang diagnostic pop
 }
 
 + (BOOL)isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion)version
