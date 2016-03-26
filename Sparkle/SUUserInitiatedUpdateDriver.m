@@ -80,6 +80,8 @@
 {
     if (self.canceledCheckForUpdates) {
         [self abortUpdate];
+    } else {
+        [self.userDriver dismissUserInitiatedUpdateCheck];
     }
 }
 
