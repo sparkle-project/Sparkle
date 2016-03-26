@@ -10,9 +10,11 @@
 #define SUBINARYDELTAUNARCHIVER_H
 
 #import <Foundation/Foundation.h>
-#import "SUUnarchiver.h"
+#import "SUUnarchiverProtocol.h"
 
-@interface SUBinaryDeltaUnarchiver : SUUnarchiver
+@interface SUBinaryDeltaUnarchiver : NSObject <SUUnarchiver>
+
+- (instancetype)initWithArchivePath:(NSString *)archivePath updateHostBundlePath:(NSString *)updateHostBundlePath delegate:(id <SUUnarchiverDelegate>)delegate;
 
 @end
 

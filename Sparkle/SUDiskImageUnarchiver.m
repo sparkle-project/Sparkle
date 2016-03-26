@@ -7,31 +7,45 @@
 //
 
 #import "SUDiskImageUnarchiver.h"
-#import "SUUnarchiver_Private.h"
 #import "SULog.h"
-#include <CoreServices/CoreServices.h>
+//#include <CoreServices/CoreServices.h>
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
 #endif
 
+@interface SUDiskImageUnarchiver ()
+
+@property (nonatomic, copy, readonly) NSString *archivePath;
+@property (nullable, nonatomic, copy, readonly) NSString *decryptionPassword;
+@property (nonatomic, weak, readonly) id <SUUnarchiverDelegate> delegate;
+
+@end
+
 @implementation SUDiskImageUnarchiver
+
+@synthesize archivePath = _archivePath;
+@synthesize decryptionPassword = _decryptionPassword;
+@synthesize delegate = _delegate;
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
     return [[path pathExtension] isEqualToString:@"dmg"];
 }
 
-// Called on a non-main thread.
-- (void)extractDMG
+- (instancetype)initWithArchivePath:(NSString *)archivePath decryptionPassword:(nullable NSString *)decryptionPassword delegate:(nullable id <SUUnarchiverDelegate>)delegate
 {
-	@autoreleasepool {
-        [self extractDMGWithPassword:nil];
+    self = [super init];
+    if (self != nil) {
+        _archivePath = [archivePath copy];
+        _decryptionPassword = [decryptionPassword copy];
+        _delegate = delegate;
     }
+    return self;
 }
 
 // Called on a non-main thread.
-- (void)extractDMGWithPassword:(NSString *)__unused password
+- (void)extractDMG
 {
 	@autoreleasepool {
         BOOL mountedSuccessfully = NO;
@@ -48,10 +62,10 @@
         // No, we cannot have them in the dispatch_async calls, as the goto "jump enters
         // lifetime of block which strongly captures a variable"
         dispatch_block_t delegateFailure = ^{
-            [self notifyDelegateOfFailure];
+            [self.delegate unarchiverDidFail];
         };
         dispatch_block_t delegateSuccess = ^{
-            [self notifyDelegateOfSuccess];
+            [self.delegate unarchiverDidFinish];
         };
 		do
 		{
@@ -171,28 +185,10 @@
 - (void)start
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		[self extractDMG];
+        [self extractDMG];
     });
 }
 
-+ (void)load
-{
-    [self registerImplementation:self];
-}
-
-- (BOOL)isEncrypted:(NSData *)resultData
-{
-    BOOL result = NO;
-	if(resultData)
-	{
-        NSString *data = [[NSString alloc] initWithData:resultData encoding:NSUTF8StringEncoding];
-
-        if ((data != nil) && !NSEqualRanges([data rangeOfString:@"passphrase-count"], NSMakeRange(NSNotFound, 0)))
-		{
-            result = YES;
-        }
-    }
-    return result;
-}
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], self.archivePath]; }
 
 @end

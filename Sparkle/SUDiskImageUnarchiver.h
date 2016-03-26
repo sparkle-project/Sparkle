@@ -10,10 +10,16 @@
 #define SUDISKIMAGEUNARCHIVER_H
 
 #import <Foundation/Foundation.h>
-#import "SUUnarchiver.h"
+#import "SUUnarchiverProtocol.h"
 
-@interface SUDiskImageUnarchiver : SUUnarchiver
+NS_ASSUME_NONNULL_BEGIN
+
+@interface SUDiskImageUnarchiver : NSObject <SUUnarchiver>
+
+- (instancetype)initWithArchivePath:(NSString *)archivePath decryptionPassword:(nullable NSString *)decryptionPassword delegate:(nullable id <SUUnarchiverDelegate>)delegate;
 
 @end
+
+NS_ASSUME_NONNULL_END
 
 #endif

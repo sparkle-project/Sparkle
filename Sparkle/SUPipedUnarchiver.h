@@ -10,10 +10,16 @@
 #define SUPIPEDUNARCHIVER_H
 
 #import <Foundation/Foundation.h>
-#import "SUUnarchiver.h"
+#import "SUUnarchiverProtocol.h"
 
-@interface SUPipedUnarchiver : SUUnarchiver
+NS_ASSUME_NONNULL_BEGIN
+
+@interface SUPipedUnarchiver : NSObject <SUUnarchiver>
+
+- (instancetype)initWithArchivePath:(NSString *)archivePath delegate:(nullable id <SUUnarchiverDelegate>)delegate;
 
 @end
+
+NS_ASSUME_NONNULL_END
 
 #endif

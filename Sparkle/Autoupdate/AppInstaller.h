@@ -7,7 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "SUUnarchiver.h"
+#import "SUUnarchiverProtocol.h"
 
 @interface AppInstaller : NSObject <SUUnarchiverDelegate>
 

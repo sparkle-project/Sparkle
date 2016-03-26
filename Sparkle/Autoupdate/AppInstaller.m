@@ -21,6 +21,7 @@
 #import "SUMessageTypes.h"
 #import "SUSecureCoding.h"
 #import "SUInstallationInputData.h"
+#import "SUUnarchiver.h"
 
 /*!
  * Terminate the application after a delay from launching the new update to avoid OS activation issues
@@ -232,18 +233,16 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 - (void)extractAndInstallUpdate
 {
 #warning passing nothing for password atm
-    SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:self.installationData.downloadPath updatingHostBundlePath:self.host.bundlePath withPassword:nil];
-    
+    id <SUUnarchiver> unarchiver = [SUUnarchiver unarchiverForPath:self.installationData.downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:nil delegate:self];
     if (!unarchiver) {
         SULog(@"Error: No valid unarchiver for %@!", self.installationData.downloadPath);
-        [self unarchiverDidFail:nil];
+        [self unarchiverDidFail];
     } else {
-        unarchiver.delegate = self;
         [unarchiver start];
     }
 }
 
-- (void)unarchiver:(SUUnarchiver *)__unused unarchiver extractedProgress:(double)progress
+- (void)unarchiverExtractedProgress:(double)progress
 {
     NSData *data = [NSData dataWithBytes:&progress length:sizeof(progress)];
     [self.remotePort sendMessageWithIdentifier:SUExtractedArchiveWithProgress data:data completion:^(BOOL success) {
@@ -253,7 +252,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     }];
 }
 
-- (void)unarchiverDidFail:(SUUnarchiver *)__unused unarchiver
+- (void)unarchiverDidFail
 {
     // Client could try update again with different inputs
     // Eg: one common case is if a delta update fails, client may want to fall back to regular update
@@ -266,7 +265,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     }];
 }
 
-- (void)unarchiverDidFinish:(SUUnarchiver *)__unused unarchiver
+- (void)unarchiverDidFinish
 {
     [self.remotePort sendMessageWithIdentifier:SUValidationStarted data:[NSData data] completion:^(BOOL success) {
         if (!success) {

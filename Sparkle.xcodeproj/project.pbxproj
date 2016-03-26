@@ -82,7 +82,6 @@
 		5D1AF59A0FD767E50065DB48 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5990FD767E50065DB48 /* libz.dylib */; };
 		6102FE460E077FCE00F85D09 /* SUPipedUnarchiver.h in Headers */ = {isa = PBXBuildFile; fileRef = 6102FE440E077FCE00F85D09 /* SUPipedUnarchiver.h */; settings = {ATTRIBUTES = (); }; };
 		6102FE4A0E07803800F85D09 /* SUDiskImageUnarchiver.h in Headers */ = {isa = PBXBuildFile; fileRef = 6102FE480E07803800F85D09 /* SUDiskImageUnarchiver.h */; settings = {ATTRIBUTES = (); }; };
-		6102FE5B0E08C7EC00F85D09 /* SUUnarchiver_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6102FE590E08C7EC00F85D09 /* SUUnarchiver_Private.h */; settings = {ATTRIBUTES = (); }; };
 		61299A2F09CA2DAB00B7442F /* SUDSAVerifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A2D09CA2DAB00B7442F /* SUDSAVerifier.h */; settings = {ATTRIBUTES = (); }; };
 		61299A5C09CA6D4500B7442F /* SUConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A5B09CA6D4500B7442F /* SUConstants.h */; settings = {ATTRIBUTES = (); }; };
 		61299A6009CA6EB100B7442F /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
@@ -554,7 +553,6 @@
 		6102FE440E077FCE00F85D09 /* SUPipedUnarchiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUPipedUnarchiver.h; sourceTree = "<group>"; };
 		6102FE480E07803800F85D09 /* SUDiskImageUnarchiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUDiskImageUnarchiver.h; sourceTree = "<group>"; };
 		6102FE490E07803800F85D09 /* SUDiskImageUnarchiver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUDiskImageUnarchiver.m; sourceTree = "<group>"; };
-		6102FE590E08C7EC00F85D09 /* SUUnarchiver_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUnarchiver_Private.h; sourceTree = "<group>"; };
 		611142E810FB1BE5009810AA /* bspatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bspatch.h; sourceTree = "<group>"; };
 		61131A050F846CE600E97AF6 /* da */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61131A090F846D0A00E97AF6 /* zh_CN */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = zh_CN; path = zh_CN.lproj/Sparkle.strings; sourceTree = "<group>"; };
@@ -674,6 +672,7 @@
 		726E075F1CA4E9A5001A286B /* SUInstallationInputData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUInstallationInputData.m; sourceTree = "<group>"; };
 		726E07681CA616A4001A286B /* libxar.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxar.tbd; path = usr/lib/libxar.tbd; sourceTree = SDKROOT; };
 		726E076A1CA616B3001A286B /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = usr/lib/libbz2.tbd; sourceTree = SDKROOT; };
+		726E076C1CA64B9C001A286B /* SUUnarchiverProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUnarchiverProtocol.h; sourceTree = "<group>"; };
 		726E4A0D1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStandardUserDriverUIDelegate.h; sourceTree = "<group>"; };
 		726E4A0F1C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStandardUserDriverRemoteDelegate.h; sourceTree = "<group>"; };
 		726E4A111C86C44A00C57C6A /* Sparkle-Test-App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Sparkle-Test-App.entitlements"; sourceTree = "<group>"; };
@@ -1046,9 +1045,9 @@
 				6102FE490E07803800F85D09 /* SUDiskImageUnarchiver.m */,
 				6102FE440E077FCE00F85D09 /* SUPipedUnarchiver.h */,
 				6129C0B90E0B79810062CE76 /* SUPipedUnarchiver.m */,
+				726E076C1CA64B9C001A286B /* SUUnarchiverProtocol.h */,
 				61299A8B09CA790200B7442F /* SUUnarchiver.h */,
 				61299A8C09CA790200B7442F /* SUUnarchiver.m */,
-				6102FE590E08C7EC00F85D09 /* SUUnarchiver_Private.h */,
 			);
 			name = Unarchiving;
 			path = ..;
@@ -1400,7 +1399,6 @@
 				7229E1BD1C98EFF200CB50D0 /* SUDownloadDriver.h in Headers */,
 				61299A8D09CA790200B7442F /* SUUnarchiver.h in Headers */,
 				72B767CE1C9B924900A07552 /* SUInstallerDriver.h in Headers */,
-				6102FE5B0E08C7EC00F85D09 /* SUUnarchiver_Private.h in Headers */,
 				61B5FCDF09C52A9F00B25A18 /* SUUpdateAlert.h in Headers */,
 				612DCBAF0D488BC60015DBEA /* SUUpdatePermissionPrompt.h in Headers */,
 				61B5F8ED09C4CE3C00B25A18 /* SUUpdater.h in Headers */,
