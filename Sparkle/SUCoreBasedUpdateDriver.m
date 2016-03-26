@@ -192,6 +192,9 @@
 {
     SUAppcastItem *nonDeltaUpdateItem = self.basicDriver.nonDeltaUpdateItem;
     assert(nonDeltaUpdateItem != nil);
+    
+    self.updateItem = nonDeltaUpdateItem;
+    
     [self downloadUpdateFromAppcastItem:nonDeltaUpdateItem];
 }
 

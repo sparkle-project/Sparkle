@@ -12,19 +12,26 @@
 #import "SUHost.h"
 #import "SUMessageTypes.h"
 #import "SUAppcastItem.h"
+#import "SUSecureCoding.h"
 
 @implementation SUProbeInstallStatus
 
 + (BOOL)probeInstallerInProgressForHost:(SUHost *)host
 {
-    SURemoteMessagePort *remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForHost(host) invalidationCallback:^{}];
+    NSString *hostBundleIdentifier = host.bundle.bundleIdentifier;
+    assert(hostBundleIdentifier != nil);
+    
+    SURemoteMessagePort *remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier) invalidationCallback:^{}];
     [remotePort invalidate];
     return (remotePort != nil);
 }
 
 + (void)probeInstallerUpdateItemForHost:(SUHost *)host completion:(void (^)(SUAppcastItem  * _Nullable))completionHandler
 {
-    SURemoteMessagePort *remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForHost(host) invalidationCallback:^{}];
+    NSString *hostBundleIdentifier = host.bundle.bundleIdentifier;
+    assert(hostBundleIdentifier != nil);
+    
+    SURemoteMessagePort *remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier) invalidationCallback:^{}];
     if (remotePort == nil) {
         completionHandler(nil);
         return;
@@ -35,12 +42,7 @@
             completionHandler(nil);
         } else {
             NSData *nonNullReplyData = replyData;
-            
-            // This boilerplate is the only way I've found to decode a class securely
-            NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:nonNullReplyData];
-            unarchiver.requiresSecureCoding = YES;
-            SUAppcastItem *updateItem = [unarchiver decodeObjectOfClass:[SUAppcastItem class] forKey:SUAppcastItemArchiveKey];
-            [unarchiver finishDecoding];
+            SUAppcastItem  * _Nullable updateItem = SUUnarchiveRootObjectSecurely(nonNullReplyData, [SUAppcastItem class]);
             
             if (updateItem != nil) {
                 completionHandler(updateItem);

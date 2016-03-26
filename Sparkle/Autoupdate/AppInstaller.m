@@ -19,6 +19,8 @@
 #import "SURemoteMessagePort.h"
 #import "SULocalMessagePort.h"
 #import "SUMessageTypes.h"
+#import "SUSecureCoding.h"
+#import "SUInstallationInputData.h"
 
 /*!
  * Terminate the application after a delay from launching the new update to avoid OS activation issues
@@ -32,18 +34,15 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 @property (nonatomic, strong) TerminationListener *terminationListener;
 @property (nonatomic, strong) SUStatusController *statusController;
 
+@property (nonatomic, readonly, copy) NSString *hostBundleIdentifier;
 @property (nonatomic) SUHost *host;
 @property (nonatomic) SULocalMessagePort *localPort;
 @property (nonatomic) SURemoteMessagePort *remotePort;
-@property (nonatomic, copy) NSString *updateFolderPath;
-@property (nonatomic, copy) NSString *downloadPath;
-@property (nonatomic, copy) NSString *dsaSignature;
-@property (nonatomic, copy) NSString *relaunchPath;
+@property (nonatomic) SUInstallationInputData *installationData;
 @property (nonatomic, assign) BOOL shouldRelaunch;
 @property (nonatomic, assign) BOOL shouldShowUI;
 @property (nonatomic) NSData *updateItemData;
 
-@property (nonatomic, assign) BOOL isTerminating;
 @property (nonatomic) id<SUInstaller> installer;
 @property (nonatomic) BOOL willCompleteInstallation;
 
@@ -55,19 +54,16 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 
 @implementation AppInstaller
 
+@synthesize hostBundleIdentifier = _hostBundleIdentifier;
 @synthesize terminationListener = _terminationListener;
 @synthesize statusController = _statusController;
 @synthesize localPort = _localPort;
 @synthesize remotePort = _remotePort;
 @synthesize host = _host;
-@synthesize updateFolderPath = _updateFolderPath;
-@synthesize downloadPath = _downloadPath;
-@synthesize dsaSignature = _dsaSignature;
-@synthesize relaunchPath = _relaunchPath;
+@synthesize installationData = _installationData;
 @synthesize shouldRelaunch = _shouldRelaunch;
 @synthesize shouldShowUI = _shouldShowUI;
 @synthesize updateItemData = _updateItemData;
-@synthesize isTerminating = _isTerminating;
 @synthesize installer = _installer;
 @synthesize willCompleteInstallation = _willCompleteInstallation;
 @synthesize installerQueue = _installerQueue;
@@ -83,24 +79,18 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
  * shouldRelaunch - indicates if the new installed app should re-launched
  * shouldShowUI - indicates if we should show the status window when installing the update
  */
-- (instancetype)initWithHostPath:(NSString *)hostPath relaunchPath:(NSString *)relaunchPath updateFolderPath:(NSString *)updateFolderPath downloadPath:(NSString *)downloadPath dsaSignature:(NSString *)dsaSignature
+
+- (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier
 {
     if (!(self = [super init])) {
         return nil;
     }
     
-    NSBundle *bundle = [NSBundle bundleWithPath:hostPath];
-    self.host = [[SUHost alloc] initWithBundle:bundle];
-    
-    self.relaunchPath = relaunchPath;
-    self.terminationListener = [[TerminationListener alloc] initWithBundle:bundle];
-    self.updateFolderPath = updateFolderPath;
-    self.downloadPath = downloadPath;
-    self.dsaSignature = dsaSignature;
+    _hostBundleIdentifier = [hostBundleIdentifier copy];
     
     self.localPort =
     [[SULocalMessagePort alloc]
-     initWithServiceName:SUAutoUpdateServiceNameForHost(self.host)
+     initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)
      messageCallback:^NSData *(int32_t identifier, NSData * _Nonnull data) {
          return [self handleMessageWithIdentifier:identifier data:data];
      }
@@ -117,7 +107,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         [self cleanupAndExitWithStatus:EXIT_FAILURE];
     }
     
-    if (![self resetRemotePort]) {
+    if (![self startRemotePort]) {
         SULog(@"Failed creating remote message port from installer");
         [self cleanupAndExitWithStatus:EXIT_FAILURE];
     }
@@ -125,20 +115,20 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     return self;
 }
 
-- (BOOL)resetRemotePort
+- (BOOL)startRemotePort
 {
-    [self.remotePort invalidate];
-    self.remotePort = nil;
-    
-    self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUUpdateDriverServiceNameForHost(self.host) invalidationCallback:^{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (self.remotePort != nil && !self.willCompleteInstallation) {
-                SULog(@"Invalidation on remote port being called, and installation is not close enough to completion!");
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
-            }
-        });
-    }];
-    
+    if (self.remotePort == nil) {
+        self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUUpdateDriverServiceNameForBundleIdentifier(self.hostBundleIdentifier) invalidationCallback:^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (self.remotePort != nil && !self.willCompleteInstallation) {
+                    SULog(@"Invalidation on remote port being called, and installation is not close enough to completion!");
+                    [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                }
+                self.remotePort = nil;
+            });
+        }];
+    }
+
     return (self.remotePort != nil);
 }
 
@@ -227,13 +217,25 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     return YES;
 }
 
+- (void)start
+{
+    [self.remotePort sendMessageWithIdentifier:SURequestInstallationParameters data:[NSData data] completion:^(BOOL success) {
+        if (!success) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                SULog(@"Error: Failed to send request for installation parameters");
+                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            });
+        }
+    }];
+}
+
 - (void)extractAndInstallUpdate
 {
 #warning passing nothing for password atm
-    SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:self.host.bundlePath withPassword:nil];
+    SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:self.installationData.downloadPath updatingHostBundlePath:self.host.bundlePath withPassword:nil];
     
     if (!unarchiver) {
-        SULog(@"Error: No valid unarchiver for %@!", self.downloadPath);
+        SULog(@"Error: No valid unarchiver for %@!", self.installationData.downloadPath);
         [self unarchiverDidFail:nil];
     } else {
         unarchiver.delegate = self;
@@ -253,6 +255,10 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 
 - (void)unarchiverDidFail:(SUUnarchiver *)__unused unarchiver
 {
+    // Client could try update again with different inputs
+    // Eg: one common case is if a delta update fails, client may want to fall back to regular update
+    self.installationData = nil;
+    
     [self.remotePort sendMessageWithIdentifier:SUArchiveExtractionFailed data:[NSData data] completion:^(BOOL success) {
         if (!success) {
             SULog(@"Error sending extraction failed");
@@ -268,7 +274,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         }
     }];
     
-    BOOL validationSuccess = [self validateUpdateForHost:self.host downloadedToPath:self.downloadPath extractedToPath:self.updateFolderPath DSASignature:self.dsaSignature];
+    BOOL validationSuccess = [self validateUpdateForHost:self.host downloadedToPath:self.installationData.downloadPath extractedToPath:self.installationData.updateDirectoryPath DSASignature:self.installationData.dsaSignature];
     
     if (!validationSuccess) {
         SULog(@"Error: update validation was a failure");
@@ -288,7 +294,32 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 {
     NSData *replyData = nil;
     
-    if (identifier == SUSentUpdateAppcastItemData) {
+    if (identifier == SUInstallationData && self.installationData == nil) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            SUInstallationInputData * _Nullable installationData = SUUnarchiveRootObjectSecurely(data, [SUInstallationInputData class]);
+            if (installationData == nil) {
+                SULog(@"Error: Failed to unarchive input installation data");
+                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            } else {
+                SUInstallationInputData *nonNullInstallationData = installationData;
+                NSBundle *hostBundle = [NSBundle bundleWithPath:nonNullInstallationData.hostBundlePath];
+                SUHost *host = [[SUHost alloc] initWithBundle:hostBundle];
+                
+                NSString *bundleIdentifier = hostBundle.bundleIdentifier;
+                if (bundleIdentifier == nil || ![bundleIdentifier isEqualToString:self.hostBundleIdentifier]) {
+                    SULog(@"Error: Failed to match host bundle identifiers %@ and %@", self.hostBundleIdentifier, bundleIdentifier);
+                    [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                } else {
+                    self.host = host;
+                    self.installationData = installationData;
+                    
+                    self.terminationListener = [[TerminationListener alloc] initWithBundle:hostBundle];
+                    
+                    [self extractAndInstallUpdate];
+                }
+            }
+        });
+    } else if (identifier == SUSentUpdateAppcastItemData) {
         self.updateItemData = data;
     } else if (identifier == SUReceiveUpdateAppcastItemData) {
         replyData = self.updateItemData;
@@ -304,9 +335,9 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
             self.shouldRelaunch = (BOOL)relaunch;
             
 #warning todo: handle this message even if we aren't ready for stage 2 yet.
-            // We should try re-creating the remote port, in case the client has
+            // We should try re-creating the remote port if necessary, in case the client has
             // restarted since and wants a reply back when we say it's OK to terminate the app
-            if (![self resetRemotePort]) {
+            if (![self startRemotePort]) {
                 SULog(@"Installer failed to set up remote port to updater before resuming installation");
             }
             
@@ -326,7 +357,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     
     dispatch_async(self.installerQueue, ^{
         NSError *installerError = nil;
-        id <SUInstaller> installer = [SUInstaller installerForHost:self.host updateDirectory:self.updateFolderPath versionComparator:[SUStandardVersionComparator defaultComparator] error:&installerError];
+        id <SUInstaller> installer = [SUInstaller installerForHost:self.host updateDirectory:self.installationData.updateDirectoryPath versionComparator:[SUStandardVersionComparator defaultComparator] error:&installerError];
         
         if (installer == nil) {
             SULog(@"Error: Failed to create installer instance with error: %@", installerError);
@@ -453,10 +484,10 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
                     NSString *pathToRelaunch = nil;
                     // If the installation path differs from the host path, we give higher precedence for it than
                     // if the desired relaunch path differs from the host path
-                    if (![installationPath.pathComponents isEqualToArray:self.host.bundlePath.pathComponents] || [self.relaunchPath.pathComponents isEqualToArray:self.host.bundlePath.pathComponents]) {
+                    if (![installationPath.pathComponents isEqualToArray:self.host.bundlePath.pathComponents] || [self.installationData.relaunchPath.pathComponents isEqualToArray:self.host.bundlePath.pathComponents]) {
                         pathToRelaunch = installationPath;
                     } else {
-                        pathToRelaunch = self.relaunchPath;
+                        pathToRelaunch = self.installationData.relaunchPath;
                     }
                     
                     [self relaunchAtPath:pathToRelaunch];
@@ -487,7 +518,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     self.remotePort = nil;
     
     NSError *theError = nil;
-    if (![[NSFileManager defaultManager] removeItemAtPath:self.updateFolderPath error:&theError]) {
+    if (![[NSFileManager defaultManager] removeItemAtPath:self.installationData.updateDirectoryPath error:&theError]) {
         SULog(@"Couldn't remove update folder: %@.", theError);
     }
     

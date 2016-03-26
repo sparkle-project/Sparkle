@@ -18,19 +18,21 @@ extern NSString *SUAppcastItemArchiveKey;
 typedef NS_ENUM(int32_t, SUInstallerMessageType)
 {
     SUInstallerNotStarted = 0,
-    SUExtractedArchiveWithProgress = 1,
-    SUArchiveExtractionFailed = 2,
-    SUValidationStarted = 3,
-    SUInstallationStartedStage1 = 4,
-    SUInstallationFinishedStage1 = 5,
-    SUInstallationFinishedStage2 = 6
+    SURequestInstallationParameters = 1,
+    SUExtractedArchiveWithProgress = 2,
+    SUArchiveExtractionFailed = 3,
+    SUValidationStarted = 4,
+    SUInstallationStartedStage1 = 5,
+    SUInstallationFinishedStage1 = 6,
+    SUInstallationFinishedStage2 = 7
 };
 
 typedef NS_ENUM(int32_t, SUUpdaterMessageType)
 {
-    SUSentUpdateAppcastItemData = 0,
-    SUReceiveUpdateAppcastItemData = 1,
-    SUResumeInstallationToStage2 = 2
+    SUInstallationData = 0,
+    SUSentUpdateAppcastItemData = 1,
+    SUReceiveUpdateAppcastItemData = 2,
+    SUResumeInstallationToStage2 = 3
 };
 
 typedef NS_ENUM(int32_t, SUInstallStatusMessageType)
@@ -41,8 +43,8 @@ typedef NS_ENUM(int32_t, SUInstallStatusMessageType)
 
 BOOL SUInstallerMessageTypeIsLegal(SUInstallerMessageType oldMessageType, SUInstallerMessageType newMessageType);
 
-NSString *SUUpdateDriverServiceNameForHost(SUHost *host);
+NSString *SUUpdateDriverServiceNameForBundleIdentifier(NSString *bundleIdentifier);
 
-NSString *SUAutoUpdateServiceNameForHost(SUHost *host);
+NSString *SUAutoUpdateServiceNameForBundleIdentifier(NSString *bundleIdentifier);
 
 NS_ASSUME_NONNULL_END

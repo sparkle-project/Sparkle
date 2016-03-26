@@ -18,12 +18,15 @@ BOOL SUInstallerMessageTypeIsLegal(SUInstallerMessageType oldMessageType, SUInst
         case SUInstallerNotStarted:
             legal = (oldMessageType == SUInstallerNotStarted);
             break;
+        case SURequestInstallationParameters:
+            legal = (oldMessageType == SUInstallerNotStarted);
+            break;
         case SUExtractedArchiveWithProgress:
         case SUArchiveExtractionFailed:
-            legal = (oldMessageType == SUInstallerNotStarted || oldMessageType == SUExtractedArchiveWithProgress);
+            legal = (oldMessageType == SURequestInstallationParameters || oldMessageType == SUExtractedArchiveWithProgress);
             break;
         case SUValidationStarted:
-            legal = (oldMessageType == SUInstallerNotStarted || oldMessageType == SUExtractedArchiveWithProgress);
+            legal = (oldMessageType == SURequestInstallationParameters || oldMessageType == SUExtractedArchiveWithProgress);
             break;
         case SUInstallationStartedStage1:
             legal = (oldMessageType == SUValidationStarted);
@@ -38,12 +41,12 @@ BOOL SUInstallerMessageTypeIsLegal(SUInstallerMessageType oldMessageType, SUInst
     return legal;
 }
 
-NSString *SUUpdateDriverServiceNameForHost(SUHost *host)
+NSString *SUUpdateDriverServiceNameForBundleIdentifier(NSString *bundleIdentifier)
 {
-    return [NSString stringWithFormat:@"%@-sparkle-updater", host.bundle.bundleIdentifier];
+    return [NSString stringWithFormat:@"%@-sparkle-updater", bundleIdentifier];
 }
 
-NSString *SUAutoUpdateServiceNameForHost(SUHost *host)
+NSString *SUAutoUpdateServiceNameForBundleIdentifier(NSString *bundleIdentifier)
 {
-    return [NSString stringWithFormat:@"%@-sparkle-installer", host.bundle.bundleIdentifier];
+    return [NSString stringWithFormat:@"%@-sparkle-installer", bundleIdentifier];
 }

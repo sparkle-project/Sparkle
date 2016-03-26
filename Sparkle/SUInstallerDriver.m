@@ -18,6 +18,8 @@
 #import "SUErrors.h"
 #import "SUHost.h"
 #import "SUFileManager.h"
+#import "SUSecureCoding.h"
+#import "SUInstallationInputData.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -75,9 +77,12 @@
         return YES;
     }
     
+    NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
+    assert(hostBundleIdentifier != nil);
+    
     self.localPort =
     [[SULocalMessagePort alloc]
-     initWithServiceName:SUUpdateDriverServiceNameForHost(self.host)
+     initWithServiceName:SUUpdateDriverServiceNameForBundleIdentifier(hostBundleIdentifier)
      messageCallback:^NSData *(int32_t identifier, NSData * _Nonnull data) {
          dispatch_async(dispatch_get_main_queue(), ^{
              [self handleMessageWithIdentifier:identifier data:data];
@@ -125,7 +130,10 @@
         return YES;
     }
     
-    self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForHost(self.host) invalidationCallback:^{
+    NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
+    assert(hostBundleIdentifier != nil);
+    
+    self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier) invalidationCallback:^{
         dispatch_async(dispatch_get_main_queue(), ^{
             if (self.remotePort != nil) {
                 NSError *remoteError =
@@ -189,9 +197,41 @@
     
     if (self.localPort == nil) {
         return [self launchInstallTool:error];
+    } else {
+        // The Install tool is already alive; just send out installation input data again
+        [self sendInstallationData];
     }
     
     return YES;
+}
+
+- (void)sendInstallationData
+{
+    NSString *pathToRelaunch = [self.host bundlePath];
+    if ([self.updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
+        pathToRelaunch = [self.updaterDelegate pathToRelaunchForUpdater:self.updater];
+    }
+    
+    NSString *dsaSignature = (self.updateItem.DSASignature == nil) ? @"" : self.updateItem.DSASignature;
+    
+    SUInstallationInputData *installationData = [[SUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadPath:self.downloadPath dsaSignature:dsaSignature];
+    
+    NSData *archivedData = SUArchiveRootObjectSecurely(installationData);
+    
+    NSError *remoteError = nil;
+    if (![self setUpRemotePort:&remoteError]) {
+        [self.delegate installerIsRequestingAbortInstallWithError:remoteError];
+    } else {
+        [self.remotePort sendMessageWithIdentifier:SUInstallationData data:archivedData completion:^(BOOL success) {
+            if (!success) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while starting the installer parameters. Please try again later.", nil) }]];
+                });
+            }
+        }];
+        
+        self.currentStage = SURequestInstallationParameters;
+    }
 }
 
 - (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
@@ -201,7 +241,9 @@
         return;
     }
     
-    if (identifier == SUExtractedArchiveWithProgress) {
+    if (identifier == SURequestInstallationParameters) {
+        [self sendInstallationData];
+    } else if (identifier == SUExtractedArchiveWithProgress) {
         if (data.length == sizeof(double)) {
             double progress = *(const double *)data.bytes;
             [self.delegate installerDidExtractUpdateWithProgress:progress];
@@ -222,32 +264,23 @@
         [self.delegate installerDidStartInstalling];
         
     } else if (identifier == SUInstallationFinishedStage1) {
-        NSError *remoteError = nil;
-        if (![self setUpRemotePort:&remoteError]) {
-            [self.delegate installerIsRequestingAbortInstallWithError:remoteError];
+        self.currentStage = identifier;
+        
+        // Let the installer keep a copy of the appcast item data
+        // We may want to ask for it later (note the updater can relaunch without the app necessarily having relaunched)
+        NSData *updateItemData = SUArchiveRootObjectSecurely(self.updateItem);
+        
+        if (updateItemData != nil) {
+            [self.remotePort sendMessageWithIdentifier:SUSentUpdateAppcastItemData data:updateItemData completion:^(BOOL success) {
+                if (!success) {
+                    SULog(@"Error: Failed to send update appcast item to installer");
+                }
+            }];
         } else {
-            self.currentStage = identifier;
-            
-            // Let the installer keep a copy of the appcast item data
-            // We may want to ask for it later (note the updater can relaunch without the app necessarily having relaunched)
-            NSMutableData *updateItemData = [NSMutableData data];
-            NSKeyedArchiver *keyedArchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:updateItemData];
-            keyedArchiver.requiresSecureCoding = YES;
-            [keyedArchiver encodeObject:self.updateItem forKey:SUAppcastItemArchiveKey];
-            [keyedArchiver finishEncoding];
-            
-            if (updateItemData != nil) {
-                [self.remotePort sendMessageWithIdentifier:SUSentUpdateAppcastItemData data:updateItemData completion:^(BOOL success) {
-                    if (!success) {
-                        SULog(@"Error: Failed to send update appcast item to installer");
-                    }
-                }];
-            } else {
-                SULog(@"Error: Archived data to send for appcast item is nil");
-            }
-            
-            [self.delegate installerDidFinishRelaunchPreparation];
+            SULog(@"Error: Archived data to send for appcast item is nil");
         }
+        
+        [self.delegate installerDidFinishRelaunchPreparation];
     } else if (identifier == SUInstallationFinishedStage2) {
         // Don't have to store current stage because we're severing our connection to the installer
         
@@ -351,20 +384,13 @@
         return NO;
     }
     
-    NSString *pathToRelaunch = [self.host bundlePath];
-    if ([self.updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
-        pathToRelaunch = [self.updaterDelegate pathToRelaunchForUpdater:self.updater];
+    NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
+    if (hostBundleIdentifier == nil) {
+        if (outError != NULL) {
+            *outError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while finding the application's bundle identifier. Please try again later.", nil) }];
+        }
+        return NO;
     }
-    
-    NSString *dsaSignature = (self.updateItem.DSASignature == nil) ? @"" : self.updateItem.DSASignature;
-    
-    NSArray *launchArguments = @[
-                                 pathToRelaunch,
-                                 self.host.bundlePath,
-                                 self.temporaryDirectory,
-                                 self.downloadPath,
-                                 dsaSignature,
-                                 @"1"]; // last one signifies the relaunch tool should exit & reply back to us immediately
     
     // Make sure the launched task finishes & replies back.
     // If it succeeds, it will have launched a second instance of the tool through LaunchServices
@@ -373,7 +399,7 @@
     int terminationStatus = 0;
     BOOL taskDidLaunch = NO;
     @try {
-        NSTask *launchedTask = [NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:launchArguments];
+        NSTask *launchedTask = [NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:@[hostBundleIdentifier, @"1"]];
         [launchedTask waitUntilExit];
         taskDidLaunch = YES;
         terminationStatus = launchedTask.terminationStatus;

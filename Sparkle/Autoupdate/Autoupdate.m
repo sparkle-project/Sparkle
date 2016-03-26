@@ -23,7 +23,7 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification __unused *)notification
 {
-    [self.appInstaller extractAndInstallUpdate];
+    [self.appInstaller start];
 }
 
 @end
@@ -33,16 +33,11 @@ int main(int __unused argc, const char __unused *argv[])
     @autoreleasepool
     {
         NSArray *args = [[NSProcessInfo processInfo] arguments];
-        if (args.count != 7) {
+        if (args.count != 3) {
             return EXIT_FAILURE;
         }
         
-        NSString *relaunchPath = args[1];
-        NSString *hostBundlePath = args[2];
-        NSString *updateDirectoryPath = args[3];
-        NSString *downloadPath = args[4];
-        NSString *dsaSignature = args[5];
-        BOOL shouldRelaunchTool = [args[6] boolValue];
+        BOOL shouldRelaunchTool = [args[2] boolValue];
         
         if (shouldRelaunchTool) {
             NSURL *mainBundleURL = [[NSBundle mainBundle] bundleURL];
@@ -73,13 +68,9 @@ int main(int __unused argc, const char __unused *argv[])
             return EXIT_SUCCESS;
         }
         
-        AppInstaller *appInstaller =
-        [[AppInstaller alloc]
-         initWithHostPath:hostBundlePath
-         relaunchPath:relaunchPath
-         updateFolderPath:updateDirectoryPath
-         downloadPath:downloadPath
-         dsaSignature:dsaSignature];
+        NSString *hostBundleIdentifier = args[1];
+        
+        AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostBundleIdentifier:hostBundleIdentifier];
         
         AppDelegate *delegate = [[AppDelegate alloc] initWithAppInstaller:appInstaller];
         
