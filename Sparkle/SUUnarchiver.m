@@ -18,7 +18,7 @@
 
 @implementation SUUnarchiver
 
-+ (nullable id <SUUnarchiver>)unarchiverForPath:(NSString *)path updatingHostBundlePath:(NSString *)hostPath decryptionPassword:(nullable NSString *)decryptionPassword delegate:(nullable id <SUUnarchiverDelegate>)delegate
++ (nullable id <SUUnarchiver>)unarchiverForPath:(NSString *)path updatingHostBundlePath:(nullable NSString *)hostPath decryptionPassword:(nullable NSString *)decryptionPassword delegate:(nullable id <SUUnarchiverDelegate>)delegate
 {
     if ([SUPipedUnarchiver canUnarchivePath:path]) {
         return [[SUPipedUnarchiver alloc] initWithArchivePath:path delegate:delegate];
@@ -27,7 +27,9 @@
         return [[SUDiskImageUnarchiver alloc] initWithArchivePath:path decryptionPassword:decryptionPassword delegate:delegate];
         
     } else if ([SUBinaryDeltaUnarchiver canUnarchivePath:path]) {
-        return [[SUBinaryDeltaUnarchiver alloc] initWithArchivePath:path updateHostBundlePath:hostPath delegate:delegate];
+        assert(hostPath != nil);
+        NSString *nonNullHostPath = hostPath;
+        return [[SUBinaryDeltaUnarchiver alloc] initWithArchivePath:path updateHostBundlePath:nonNullHostPath delegate:delegate];
         
     }
     return nil;

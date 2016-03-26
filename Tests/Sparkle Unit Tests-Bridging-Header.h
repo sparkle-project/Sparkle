@@ -3,6 +3,7 @@
 //
 
 #import "SUUnarchiver.h"
+#import "SUUnarchiverProtocol.h"
 #import "SUPipedUnarchiver.h"
 #import "SUBinaryDeltaCommon.h"
 #import "SUFileManager.h"

@@ -164,6 +164,7 @@
 		726E07671CA61648001A286B /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E20FD68CC7005AE3F6 /* SUBinaryDeltaCommon.m */; };
 		726E07691CA616A4001A286B /* libxar.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E07681CA616A4001A286B /* libxar.tbd */; };
 		726E076B1CA616B3001A286B /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E076A1CA616B3001A286B /* libbz2.tbd */; };
+		726E076D1CA66180001A286B /* SUBinaryDeltaUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E9380FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m */; };
 		726E4A0E1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E4A0D1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		726E4A101C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E4A0F1C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		726E4A1B1C86C88F00C57C6A /* TestAppHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E4A1A1C86C88F00C57C6A /* TestAppHelper.m */; };
@@ -1880,6 +1881,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				726E076D1CA66180001A286B /* SUBinaryDeltaUnarchiver.m in Sources */,
 				72A6F9871C94C4AE005F404C /* SUDiskImageUnarchiver.m in Sources */,
 				72A6F9861C94C49C005F404C /* SUPipedUnarchiver.m in Sources */,
 				72A6F9841C94C3FE005F404C /* SUBinaryDeltaApply.m in Sources */,

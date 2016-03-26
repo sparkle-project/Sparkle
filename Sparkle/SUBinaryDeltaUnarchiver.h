@@ -12,10 +12,14 @@
 #import <Foundation/Foundation.h>
 #import "SUUnarchiverProtocol.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface SUBinaryDeltaUnarchiver : NSObject <SUUnarchiver>
 
-- (instancetype)initWithArchivePath:(NSString *)archivePath updateHostBundlePath:(NSString *)updateHostBundlePath delegate:(id <SUUnarchiverDelegate>)delegate;
+- (instancetype)initWithArchivePath:(NSString *)archivePath updateHostBundlePath:(NSString *)updateHostBundlePath delegate:(nullable id <SUUnarchiverDelegate>)delegate;
 
 @end
+
+NS_ASSUME_NONNULL_END
 
 #endif
