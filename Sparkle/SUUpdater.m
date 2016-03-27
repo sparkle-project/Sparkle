@@ -420,9 +420,8 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
     if (automaticallyCheckForUpdates && (NSInteger)[self updateCheckInterval] == 0) {
         [self setUpdateCheckInterval:SUDefaultUpdateCheckInterval];
     }
-    [self cancelNextUpdateCycle];
     // Provide a small delay in case multiple preferences are being updated simultaneously.
-    [self performSelector:@selector(resetUpdateCycle) withObject:nil afterDelay:1];
+    [self resetUpdateCycleAfterShortDelay];
 }
 
 - (BOOL)automaticallyChecksForUpdates
@@ -550,10 +549,8 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
     if ((NSInteger)updateCheckInterval == 0) { // For compatibility with 1.1's settings.
         [self setAutomaticallyChecksForUpdates:NO];
     }
-    [self cancelNextUpdateCycle];
-
     // Provide a small delay in case multiple preferences are being updated simultaneously.
-    [self performSelector:@selector(resetUpdateCycle) withObject:nil afterDelay:1];
+    [self resetUpdateCycleAfterShortDelay];
 }
 
 - (NSTimeInterval)updateCheckInterval

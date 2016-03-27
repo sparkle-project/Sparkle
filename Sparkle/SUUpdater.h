@@ -120,16 +120,6 @@ SU_EXPORT @interface SUUpdater : NSObject
 - (void)resetUpdateCycle;
 
 /*!
- Resets the update cycle after a short delay
- 
- This may be appropriate for when a user changes preferences for time interval and automatic checks,
- but have not made their mind yet and decide to toggle the preferences back immediately.
- 
- See -resetUpdateCycle for more details
- */
-- (void)resetUpdateCycleAfterShortDelay;
-
-/*!
  Returns if an update is in progress or not
  
  This may be used for menu item validation to see if the user can check for updates.
