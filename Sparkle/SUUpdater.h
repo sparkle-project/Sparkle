@@ -11,7 +11,6 @@
 
 #import <Foundation/Foundation.h>
 #import "SUExport.h"
-#import "SUVersionComparisonProtocol.h"
 #import "SUUserDriver.h"
 
 @class SUAppcastItem, SUAppcast;
