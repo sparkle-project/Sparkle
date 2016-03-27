@@ -123,10 +123,11 @@ NS_ASSUME_NONNULL_BEGIN
  * @param alreadyDownloaded Indicates whether the update has already been downloaded
  *
  * @param reply
- * A reply of SUInstallUpdateChoice installs the new update immediately.
+ * A reply of SUInstallUpdateChoice installs the new update. If the update has already been downloaded (if alreadyDownloaded is YES)
+ * then this may re-launch the application instantly (after a potential authorization prompt). Otherwise the new update will need to be downloaded & extracted first.
  *
  * A reply of SUInstallLaterChoice reminds the user later of the update, which can act as a "do nothing" option.
- * If the update has already been downloaded (if alreadyDownloaded) is YES, then this will just delay the installation until the app terminates.
+ * If the update has already been downloaded (if alreadyDownloaded is YES), then this will just delay the installation until the app terminates.
  *
  * A reply of SUSkipThisVersionChoice skips this particular version and won't bother the user again,
  * unless they initiate an update check themselves. This reply must not be used if the update has already been downloaded
@@ -252,8 +253,8 @@ NS_ASSUME_NONNULL_BEGIN
  * Stop and tear down everything. Reply to all outstanding reply/completion blocks.
  * Dismiss all update windows, alerts, progress, etc from the user.
  * Unregister for application termination and system power off if not done so already.
- * Invalidate the update next check if it's running.
  * Basically, stop everything that could have been started. Sparkle may invoke this when aborting or finishing an update.
+ * Do not, however, invaldate the next update check timer.
  *
  * This can be called from any thread, and could be called multiple times in succession.
  */
