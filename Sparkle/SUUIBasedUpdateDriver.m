@@ -22,6 +22,7 @@
 
 @property (nonatomic, readonly) SUCoreBasedUpdateDriver *coreDriver;
 @property (nonatomic, readonly) SUHost *host;
+@property (nonatomic, readonly) BOOL allowsAutomaticUpdates;
 @property (nonatomic, weak, readonly) id updater;
 @property (weak, nonatomic, readonly) id<SUUpdaterDelegate> updaterDelegate;
 @property (nonatomic, weak, readonly) id<SUUIBasedUpdateDriverDelegate> delegate;
@@ -34,13 +35,14 @@
 
 @synthesize coreDriver = _coreDriver;
 @synthesize host = _host;
+@synthesize allowsAutomaticUpdates = _allowsAutomaticUpdates;
 @synthesize updater = _updater;
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize userDriver = _userDriver;
 @synthesize delegate = _delegate;
 @synthesize resumingUpdate = _resumingUpdate;
 
-- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate delegate:(id<SUUIBasedUpdateDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate delegate:(id<SUUIBasedUpdateDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -49,6 +51,7 @@
         _updater = updater;
         _updaterDelegate = updaterDelegate;
         _host = host;
+        _allowsAutomaticUpdates = allowsAutomaticUpdates;
         
         _coreDriver = [[SUCoreBasedUpdateDriver alloc] initWithHost:host sparkleBundle:sparkleBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
     }
@@ -75,18 +78,11 @@
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
 {
-    [self.userDriver showUpdateFoundWithAppcastItem:updateItem allowsAutomaticUpdates:[self allowsAutomaticUpdates] alreadyDownloaded:self.resumingUpdate reply:^(SUUpdateAlertChoice choice) {
+    [self.userDriver showUpdateFoundWithAppcastItem:updateItem allowsAutomaticUpdates:self.allowsAutomaticUpdates alreadyDownloaded:self.resumingUpdate reply:^(SUUpdateAlertChoice choice) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self updateAlertFinishedForUpdateItem:updateItem withChoice:choice];
         });
     }];
-}
-
-- (BOOL)allowsAutomaticUpdates
-{
-    // Make sure the host allows automatic updates and
-    // make sure we can automatically update in the background without bugging the user (e.g, with a administrator password prompt)
-    return (self.host.allowsAutomaticUpdates && [[NSFileManager defaultManager] isWritableFileAtPath:self.host.bundlePath]);
 }
 
 - (void)updateAlertFinishedForUpdateItem:(SUAppcastItem *)updateItem withChoice:(SUUpdateAlertChoice)choice

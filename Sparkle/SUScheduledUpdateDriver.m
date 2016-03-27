@@ -26,11 +26,11 @@
 
 @synthesize uiDriver = _uiDriver;
 
-- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate
+- (instancetype)initWithHost:(SUHost *)host allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate
 {
     self = [super init];
     if (self != nil) {
-        _uiDriver = [[SUUIBasedUpdateDriver alloc] initWithHost:host sparkleBundle:sparkleBundle updater:updater userDriver:userDriver updaterDelegate:updaterDelegate delegate:self];
+        _uiDriver = [[SUUIBasedUpdateDriver alloc] initWithHost:host allowsAutomaticUpdates:allowsAutomaticUpdates sparkleBundle:sparkleBundle updater:updater userDriver:userDriver updaterDelegate:updaterDelegate delegate:self];
     }
     return self;
 }

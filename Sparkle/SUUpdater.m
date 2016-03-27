@@ -296,8 +296,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
     //	hour or so:
     
     id <SUUpdateDriver> updateDriver;
-    BOOL inProgress = [SUProbeInstallStatus probeInstallerInProgressForHost:self.host];
-    if ([self automaticallyDownloadsUpdates] && !inProgress) {
+    if ([self automaticallyDownloadsUpdates] && [self allowsAutomaticUpdates] && ![SUProbeInstallStatus probeInstallerInProgressForHost:self.host]) {
         updateDriver =
         [[SUAutomaticUpdateDriver alloc]
          initWithHost:self.host
@@ -308,6 +307,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
         updateDriver =
         [[SUScheduledUpdateDriver alloc]
          initWithHost:self.host
+         allowsAutomaticUpdates:[self allowsAutomaticUpdates]
          sparkleBundle:self.sparkleBundle
          updater:self
          userDriver:self.userDriver
@@ -330,7 +330,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
         return;
     }
     
-    id <SUUpdateDriver> theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithHost:self.host sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
+    id <SUUpdateDriver> theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithHost:self.host allowsAutomaticUpdates:[self allowsAutomaticUpdates] sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
     [self checkForUpdatesWithDriver:theUpdateDriver];
 }
 
@@ -441,18 +441,13 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 
 - (BOOL)automaticallyDownloadsUpdates
 {
-    // If the host doesn't allow automatic updates, don't ever let them happen
-    if (!self.host.allowsAutomaticUpdates) {
-        return NO;
-    }
-    
-    // Can we automatically update in the background without bugging the user (e.g, with a administrator password prompt)?
-    if (![[NSFileManager defaultManager] isWritableFileAtPath:self.host.bundlePath]) {
-        return NO;
-    }
-
-    // Otherwise, automatically downloading updates is allowed. Does the user want it?
     return [self.host boolForUserDefaultsKey:SUAutomaticallyUpdateKey];
+}
+
+- (BOOL)allowsAutomaticUpdates
+{
+    NSNumber *developerAllowsAutomaticUpdates = [self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
+    return (developerAllowsAutomaticUpdates == nil || developerAllowsAutomaticUpdates.boolValue) && [[NSFileManager defaultManager] isWritableFileAtPath:self.host.bundlePath];
 }
 
 - (void)setFeedURL:(NSURL *)feedURL

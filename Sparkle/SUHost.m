@@ -67,14 +67,6 @@
     return [self.bundle bundlePath];
 }
 
-// We can't determine whether or not the updater has sufficient privilleges to install automatic updates without interrupting the user
-// To find that out, ask the SUUpdater which has responsibility for that
-- (BOOL)allowsAutomaticUpdates
-{
-    NSNumber *developerAllowsAutomaticUpdates = [self objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
-    return (developerAllowsAutomaticUpdates == nil || developerAllowsAutomaticUpdates.boolValue);
-}
-
 - (NSString *)installationPath
 {
     if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
