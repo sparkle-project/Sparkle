@@ -399,7 +399,10 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 - (void)resetUpdateCycle
 {
     [self cancelNextUpdateCycle];
-    [self scheduleNextUpdateCheck];
+    
+    if (self.driver == nil) {
+        [self scheduleNextUpdateCheck];
+    }
 }
 
 - (void)resetUpdateCycleAfterShortDelay
