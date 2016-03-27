@@ -34,22 +34,11 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 - (instancetype)initWithUpdater:(SUUpdater *)updater userDriver:(id<SUUserDriver, SUStandardUserDriver>)userDriver
 {
-    self = [self init]; // note: call our own init here rather than super's
+    self = [super init];
     if (self != nil) {
         self.updater = updater;
         self.userDriver = userDriver;
         self.initializedUpdater = YES;
-    }
-    return self;
-}
-
-// Invoked from being instantiated in a nib
-- (instancetype)init
-{
-    self = [super init];
-    if (self != nil) {
-        // Register as an observer here to match unregistering in -dealloc
-        [self registerAsObserver];
     }
     return self;
 }
@@ -69,11 +58,6 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     }
 }
 
-- (void)dealloc
-{
-    [self unregisterAsObserver];
-}
-
 - (IBAction)checkForUpdates:(id)__unused sender
 {
     [self.updater checkForUpdates];
@@ -85,32 +69,6 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         return !self.userDriver.updateInProgress;
     }
     return YES;
-}
-
-- (void)registerAsObserver
-{
-    [[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:[@"values." stringByAppendingString:SUScheduledCheckIntervalKey] options:(NSKeyValueObservingOptions)0 context:(__bridge void *)(SUUpdaterDefaultsObservationContext)];
-    
-    [[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:[@"values." stringByAppendingString:SUEnableAutomaticChecksKey] options:(NSKeyValueObservingOptions)0 context:(__bridge void *)(SUUpdaterDefaultsObservationContext)];
-}
-
-- (void)unregisterAsObserver
-{
-    [[NSUserDefaultsController sharedUserDefaultsController] removeObserver:self forKeyPath:[@"values." stringByAppendingString:SUScheduledCheckIntervalKey]];
-    [[NSUserDefaultsController sharedUserDefaultsController] removeObserver:self forKeyPath:[@"values." stringByAppendingString:SUEnableAutomaticChecksKey]];
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-    if (context == (__bridge void *)(SUUpdaterDefaultsObservationContext)) {
-        // Allow a small delay, because perhaps the user or developer wants to change both preferences. This allows the developer to interpret a zero check interval as a sign to disable automatic checking.
-        // Or we may get this from the developer and from our own KVO observation, this will effectively coalesce them.
-        [self.updater resetUpdateCycleAfterShortDelay];
-    } else {
-        if ([super respondsToSelector:@selector(observeValueForKeyPath:ofObject:change:context:)]) {
-            [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-        }
-    }
 }
 
 @end
