@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SUDownloadDriver : NSObject
 
-- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host userAgent:(NSString *)userAgent delegate:(id<SUDownloadDriverDelegate>)delegate;
+- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host cachePath:(NSString *)cachePath userAgent:(NSString *)userAgent delegate:(id<SUDownloadDriverDelegate>)delegate;
 
 - (void)downloadUpdate;
 

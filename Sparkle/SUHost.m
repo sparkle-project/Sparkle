@@ -20,7 +20,8 @@
 
 // This class should also be process independent
 // For example, it should not have code that tests writabilty to somewhere on disk,
-// as that may depend on the privileges of the process owner
+// as that may depend on the privileges of the process owner. Or code that depends on
+// if the process is sandboxed or not; eg: finding user caches directory
 
 @interface SUHost ()
 
@@ -72,28 +73,6 @@
 {
     NSNumber *developerAllowsAutomaticUpdates = [self objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
     return (developerAllowsAutomaticUpdates == nil || developerAllowsAutomaticUpdates.boolValue);
-}
-
-- (NSString *)appCachePath
-{
-    NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    NSString *cachePath = nil;
-    if ([cachePaths count]) {
-        cachePath = [cachePaths objectAtIndex:0];
-    }
-    if (!cachePath) {
-        SULog(@"Failed to find user's cache directory! Using system default");
-        cachePath = NSTemporaryDirectory();
-    }
-
-    NSString *name = [self.bundle bundleIdentifier];
-    if (!name) {
-        name = [self name];
-    }
-
-    cachePath = [cachePath stringByAppendingPathComponent:name];
-    cachePath = [cachePath stringByAppendingPathComponent:@"Sparkle"];
-    return cachePath;
 }
 
 - (NSString *)installationPath

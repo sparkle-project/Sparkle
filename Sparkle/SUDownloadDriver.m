@@ -21,6 +21,7 @@
 
 @property (nonatomic, readonly) SUAppcastItem *updateItem;
 @property (nonatomic, readonly) SUHost *host;
+@property (nonatomic, readonly, copy) NSString *cachePath;
 @property (nonatomic) NSURLDownload *download;
 @property (nonatomic, copy) NSString *temporaryDirectory;
 @property (nonatomic, copy) NSString *downloadPath;
@@ -33,17 +34,19 @@
 @synthesize updateItem = _updateItem;
 @synthesize request = _request;
 @synthesize host = _host;
+@synthesize cachePath = _cachePath;
 @synthesize download = _download;
 @synthesize temporaryDirectory = _temporaryDirectory;
 @synthesize downloadPath = _downloadPath;
 @synthesize delegate = _delegate;
 
-- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host userAgent:(NSString *)userAgent delegate:(id<SUDownloadDriverDelegate>)delegate
+- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host cachePath:(NSString *)cachePath userAgent:(NSString *)userAgent delegate:(id<SUDownloadDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
         _updateItem = updateItem;
         _host = host;
+        _cachePath = [cachePath copy];
         _delegate = delegate;
         
         _request = [NSMutableURLRequest requestWithURL:updateItem.fileURL];
@@ -94,7 +97,7 @@
 {
     NSString *downloadFileName = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
     
-    NSString *cachePath = [self.host appCachePath];
+    NSString *cachePath = self.cachePath;
     NSString *tempDir = [cachePath stringByAppendingPathComponent:downloadFileName];
     int count = 1;
     while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && count <= 999)

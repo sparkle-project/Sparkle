@@ -28,6 +28,7 @@
 @interface SUInstallerDriver ()
 
 @property (nonatomic, readonly) SUHost *host;
+@property (nonatomic, readonly, copy) NSString *cachePath;
 @property (nonatomic, readonly) NSBundle *sparkleBundle;
 @property (nonatomic, weak, readonly) id<SUInstallerDriverDelegate> delegate;
 @property (nonatomic) SUInstallerMessageType currentStage;
@@ -46,6 +47,7 @@
 @implementation SUInstallerDriver
 
 @synthesize host = _host;
+@synthesize cachePath = _cachePath;
 @synthesize sparkleBundle = _sparkleBundle;
 @synthesize delegate = _delegate;
 @synthesize currentStage = _currentStage;
@@ -58,11 +60,12 @@
 @synthesize downloadPath = _downloadPath;
 @synthesize temporaryDirectory = _temporaryDirectory;
 
-- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(id<SUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SUInstallerDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host cachePath:(NSString *)cachePath sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(id<SUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SUInstallerDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
         _host = host;
+        _cachePath = [cachePath copy];
         _sparkleBundle = sparkleBundle;
         _updater = updater;
         _updaterDelegate = updaterDelegate;
@@ -330,7 +333,7 @@
     NSString *const relaunchToolName = @"" SPARKLE_RELAUNCH_TOOL_NAME;
     NSString *const relaunchPathToCopy = [sparkleBundle pathForResource:relaunchToolName ofType:@"app"];
     if (relaunchPathToCopy != nil) {
-        NSString *targetPath = [self.host.appCachePath stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
+        NSString *targetPath = [self.cachePath stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
         
         SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:NO];
         NSError *error = nil;
