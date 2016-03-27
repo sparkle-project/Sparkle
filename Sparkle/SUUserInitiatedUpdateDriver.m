@@ -18,6 +18,7 @@
 
 @property (nonatomic, readonly) SUUIBasedUpdateDriver *uiDriver;
 @property (nonatomic, readonly) id<SUUserDriver> userDriver;
+@property (nonatomic) BOOL showingUserInitiatedProgress;
 @property (nonatomic) BOOL canceledCheckForUpdates;
 
 @end
@@ -26,6 +27,7 @@
 
 @synthesize uiDriver = _uiDriver;
 @synthesize userDriver = _userDriver;
+@synthesize showingUserInitiatedProgress = _showingUserInitiatedProgress;
 @synthesize canceledCheckForUpdates = _canceledCheckForUpdates;
 
 - (instancetype)initWithHost:(SUHost *)host allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate
@@ -40,18 +42,8 @@
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(SUUpdateDriverCompletion)completionBlock
 {
-    [self showUserInitiatedProgress];
-    [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:YES completion:completionBlock];
-}
-
-- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
-{
-    [self showUserInitiatedProgress];
-    [self.uiDriver resumeUpdateWithCompletion:completionBlock];
-}
-
-- (void)showUserInitiatedProgress
-{
+    self.showingUserInitiatedProgress = YES;
+    
     [self.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SUUserInitiatedCheckStatus completionStatus) {
         switch (completionStatus) {
             case SUUserInitiatedCheckDone:
@@ -64,6 +56,13 @@
                 break;
         }
     }];
+    
+    [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:YES completion:completionBlock];
+}
+
+- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
+{
+    [self.uiDriver resumeUpdateWithCompletion:completionBlock];
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error
@@ -80,7 +79,8 @@
 {
     if (self.canceledCheckForUpdates) {
         [self abortUpdate];
-    } else {
+    } else if (self.showingUserInitiatedProgress) {
+        self.showingUserInitiatedProgress = NO;
         [self.userDriver dismissUserInitiatedUpdateCheck];
     }
 }
@@ -92,7 +92,9 @@
 
 - (void)abortUpdateWithError:(nullable NSError *)error
 {
-    [self.userDriver dismissUserInitiatedUpdateCheck];
+    if (self.showingUserInitiatedProgress) {
+        [self.userDriver dismissUserInitiatedUpdateCheck];
+    }
     [self.uiDriver abortUpdateWithError:error];
 }
 
