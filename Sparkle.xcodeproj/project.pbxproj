@@ -165,6 +165,8 @@
 		726E07691CA616A4001A286B /* libxar.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E07681CA616A4001A286B /* libxar.tbd */; };
 		726E076B1CA616B3001A286B /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E076A1CA616B3001A286B /* libbz2.tbd */; };
 		726E076D1CA66180001A286B /* SUBinaryDeltaUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E9380FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m */; };
+		726E078D1CA891E9001A286B /* SUUpdaterSettings.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E078B1CA891E9001A286B /* SUUpdaterSettings.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		726E078E1CA891E9001A286B /* SUUpdaterSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E078C1CA891E9001A286B /* SUUpdaterSettings.m */; };
 		726E4A0E1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E4A0D1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		726E4A101C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E4A0F1C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		726E4A1B1C86C88F00C57C6A /* TestAppHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E4A1A1C86C88F00C57C6A /* TestAppHelper.m */; };
@@ -674,6 +676,8 @@
 		726E07681CA616A4001A286B /* libxar.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxar.tbd; path = usr/lib/libxar.tbd; sourceTree = SDKROOT; };
 		726E076A1CA616B3001A286B /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = usr/lib/libbz2.tbd; sourceTree = SDKROOT; };
 		726E076C1CA64B9C001A286B /* SUUnarchiverProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUnarchiverProtocol.h; sourceTree = "<group>"; };
+		726E078B1CA891E9001A286B /* SUUpdaterSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdaterSettings.h; sourceTree = "<group>"; };
+		726E078C1CA891E9001A286B /* SUUpdaterSettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterSettings.m; sourceTree = "<group>"; };
 		726E4A0D1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStandardUserDriverUIDelegate.h; sourceTree = "<group>"; };
 		726E4A0F1C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStandardUserDriverRemoteDelegate.h; sourceTree = "<group>"; };
 		726E4A111C86C44A00C57C6A /* Sparkle-Test-App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Sparkle-Test-App.entitlements"; sourceTree = "<group>"; };
@@ -1224,6 +1228,8 @@
 				61CFB2C20E38496B007A1735 /* Drivers */,
 				61B5F8E309C4CE3C00B25A18 /* SUUpdater.h */,
 				61B5F8E409C4CE3C00B25A18 /* SUUpdater.m */,
+				726E078B1CA891E9001A286B /* SUUpdaterSettings.h */,
+				726E078C1CA891E9001A286B /* SUUpdaterSettings.m */,
 				72A6F9891C94E2D6005F404C /* SUUpdaterDelegate.h */,
 			);
 			name = "Update Control";
@@ -1346,6 +1352,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				726E078D1CA891E9001A286B /* SUUpdaterSettings.h in Headers */,
 				72A6F98A1C94E2D6005F404C /* SUUpdaterDelegate.h in Headers */,
 				726E4A371C89116000C57C6A /* SUStandardUserDriverDelegate.h in Headers */,
 				726E4A0E1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h in Headers */,
@@ -1951,6 +1958,7 @@
 				7297463C1C8FF6AE00FC134E /* SUCodeSigningVerifier.m in Sources */,
 				72B767E71C9CFD7200A07552 /* SUAutomaticUpdateDriver.m in Sources */,
 				61B5FBB709C4FAFF00B25A18 /* SUAppcast.m in Sources */,
+				726E078E1CA891E9001A286B /* SUUpdaterSettings.m in Sources */,
 				7229E1BE1C98EFF200CB50D0 /* SUDownloadDriver.m in Sources */,
 				61B5FC6F09C51F4900B25A18 /* SUAppcastItem.m in Sources */,
 				72B767D71C9C8B5C00A07552 /* SUBasicUpdateDriver.m in Sources */,

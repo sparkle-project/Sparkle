@@ -17,6 +17,7 @@
 #import "SUStandardVersionComparator.h"
 #import "SUUpdaterDelegate.h"
 #import "SUUpdater.h"
+#import "SUUpdaterSettings.h"
 #import "SUStandardUpdaterController.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SUVersionDisplayProtocol.h"

@@ -22,8 +22,6 @@
 // Check for updates, only bringing a prompt when an update is available and not skipped
 - (void)checkForUpdates;
 
-- (void)retrieveUpdateSettings:(void (^)(BOOL automaticallyCheckForUpdates, BOOL automaticallyDownloadUpdates, BOOL sendSystemProfile, NSTimeInterval updateCheckInterval))reply;
-
 - (void)setAutomaticallyChecksForUpdates:(BOOL)automaticallyChecksForUpdates;
 - (void)setAutomaticallyDownloadsUpdates:(BOOL)automaticallyDownloadsUpdates;
 - (void)setSendsSystemProfile:(BOOL)sendsSystemProfile;

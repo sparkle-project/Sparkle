@@ -15,8 +15,7 @@
 
 @interface SUTestApplicationDelegate ()
 
-@property (nonatomic) SUUpdateSettingsWindowController *updateSettingsWindowController;
-@property (nonatomic) SURemoteUpdateSettingsWindowController *remoteUpdateSettingsWindowController;
+@property (nonatomic) NSWindowController *updateSettingsWindowController;
 @property (nonatomic) SUTestWebServer *webServer;
 
 @end
@@ -24,7 +23,6 @@
 @implementation SUTestApplicationDelegate
 
 @synthesize updateSettingsWindowController = _updateSettingsWindowController;
-@synthesize remoteUpdateSettingsWindowController = _remoteUpdateSettingsWindowController;
 @synthesize webServer = _webServer;
 
 static NSString * const UPDATED_VERSION = @"2.0";
@@ -205,12 +203,10 @@ static NSString * const UPDATED_VERSION = @"2.0";
             self.webServer = webServer;
             
             // Show the Settings window
-            
-            // SURemoteUpdateSettingsWindowController will show its window by itself
-            self.remoteUpdateSettingsWindowController = [[SURemoteUpdateSettingsWindowController alloc] init];
-            
+            self.updateSettingsWindowController = [[SURemoteUpdateSettingsWindowController alloc] init];
             //self.updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] init];
-            //[self.updateSettingsWindowController showWindow:nil];
+            
+            [self.updateSettingsWindowController showWindow:nil];
         });
     }];
 }

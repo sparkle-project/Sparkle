@@ -53,6 +53,24 @@
     return NSStringFromClass([self class]);
 }
 
+- (void)reloadSettings
+{
+    SUUpdaterSettings *settings = [[SUUpdaterSettings alloc] initWithHostBundle:[NSBundle mainBundle]];
+    
+    // Make sure window is loaded
+    [self window];
+    
+    self.automaticallyChecksForUpdatesButton.state = settings.automaticallyChecksForUpdates ? NSOnState : NSOffState;
+    self.automaticallyDownloadUpdatesButton.state = settings.automaticallyDownloadsUpdates ? NSOnState : NSOffState;
+    self.sendsSystemProfileButton.state = settings.sendsSystemProfile ? NSOnState : NSOffState;
+    self.updateCheckIntervalTextField.doubleValue = settings.updateCheckInterval;
+}
+
+- (void)windowDidLoad
+{
+    [self reloadSettings];
+}
+
 - (void)setUpConnection
 {
     self.connection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.TestAppHelper"];
@@ -113,6 +131,7 @@
                     NSLog(@"Rebooting connection..");
                     if (weakSelf != nil && weakSelf.connection == nil) {
                         [weakSelf setUpConnection];
+                        [weakSelf reloadSettings];
                     }
                 });
             });
@@ -121,27 +140,6 @@
     
     [self.connection resume];
     [self.connection.remoteObjectProxy startSparkle];
-    
-    // Retrieving the settings really takes a while, perhaps a smarter app may also store defaults locally and sync them
-    [self.connection.remoteObjectProxy retrieveUpdateSettings:^(BOOL automaticallyCheckForUpdates, BOOL automaticallyDownloadUpdates, BOOL sendSystemProfile, NSTimeInterval updateCheckInterval) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            SURemoteUpdateSettingsWindowController *strongSelf = weakSelf;
-            if (strongSelf != nil) {
-                // Load the window before referencing our outlets
-                [strongSelf window];
-                
-                strongSelf.automaticallyChecksForUpdatesButton.state = automaticallyCheckForUpdates ? NSOnState : NSOffState;
-                strongSelf.automaticallyDownloadUpdatesButton.state = automaticallyDownloadUpdates ? NSOnState : NSOffState;
-                strongSelf.sendsSystemProfileButton.state = sendSystemProfile ? NSOnState : NSOffState;
-                strongSelf.updateCheckIntervalTextField.doubleValue = updateCheckInterval;
-                
-                // Ready to show our window
-                if (!strongSelf.window.isVisible) {
-                    [strongSelf showWindow:nil];
-                }
-            }
-        });
-    }];
 }
 
 #pragma mark UI Actions

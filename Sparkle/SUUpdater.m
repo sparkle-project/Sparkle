@@ -8,6 +8,7 @@
 
 #import "SUUpdater.h"
 #import "SUUpdaterDelegate.h"
+#import "SUUpdaterSettings.h"
 #import "SUHost.h"
 #import "SUUpdatePermissionPromptResult.h"
 #import "SUUpdateDriver.h"
@@ -41,6 +42,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 @property (strong) id <SUUpdateDriver> driver;
 @property (strong) SUHost *host;
+@property (nonatomic, readonly) SUUpdaterSettings *updaterSettings;
 
 @end
 
@@ -52,6 +54,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize httpHeaders;
 @synthesize driver;
 @synthesize host;
+@synthesize updaterSettings = _updaterSettings;
 @synthesize sparkleBundle;
 
 - (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)theDelegate
@@ -67,6 +70,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
         
         host = [[SUHost alloc] initWithBundle:bundle];
+        
+        _updaterSettings = [[SUUpdaterSettings alloc] initWithHostBundle:bundle];
         
         _userDriver = userDriver;
         
@@ -425,11 +430,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 
 - (BOOL)automaticallyChecksForUpdates
 {
-    // Don't automatically update when the check interval is 0, to be compatible with 1.1 settings.
-    if ((NSInteger)[self updateCheckInterval] == 0) {
-        return NO;
-    }
-    return [self.host boolForKey:SUEnableAutomaticChecksKey];
+    return [self.updaterSettings automaticallyChecksForUpdates];
 }
 
 - (void)setAutomaticallyDownloadsUpdates:(BOOL)automaticallyUpdates
@@ -439,7 +440,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 
 - (BOOL)automaticallyDownloadsUpdates
 {
-    return [self.host boolForUserDefaultsKey:SUAutomaticallyUpdateKey];
+    return [self.updaterSettings automaticallyDownloadsUpdates];
 }
 
 - (BOOL)allowsAutomaticUpdates
@@ -494,7 +495,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 
 - (BOOL)sendsSystemProfile
 {
-    return [self.host boolForKey:SUSendProfileInfoKey];
+    return [self.updaterSettings sendsSystemProfile];
 }
 
 - (NSURL *)parameterizedFeedURL
@@ -554,12 +555,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 
 - (NSTimeInterval)updateCheckInterval
 {
-    // Find the stored check interval. User defaults override Info.plist.
-    NSNumber *intervalValue = [self.host objectForKey:SUScheduledCheckIntervalKey];
-    if (intervalValue)
-        return [intervalValue doubleValue];
-    else
-        return SUDefaultUpdateCheckInterval;
+    return [self.updaterSettings updateCheckInterval];
 }
 
 // This may not return the same update check interval as the developer has configured

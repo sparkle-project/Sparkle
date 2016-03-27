@@ -69,14 +69,6 @@
     });
 }
 
-- (void)retrieveUpdateSettings:(void (^)(BOOL automaticallyCheckForUpdates, BOOL automaticallyDownloadUpdates, BOOL sendSystemProfile, NSTimeInterval updateCheckInterval))reply
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self startSparkleIfNeeded];
-        reply(self.updater.automaticallyChecksForUpdates, self.updater.automaticallyDownloadsUpdates, self.updater.sendsSystemProfile, self.updater.updateCheckInterval);
-    });
-}
-
 - (void)setAutomaticallyChecksForUpdates:(BOOL)automaticallyChecksForUpdates
 {
     dispatch_async(dispatch_get_main_queue(), ^{

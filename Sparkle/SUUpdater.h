@@ -50,9 +50,9 @@ SU_EXPORT @interface SUUpdater : NSObject
 @property (readonly, strong) NSBundle *hostBundle;
 @property (strong, readonly) NSBundle *sparkleBundle;
 
-@property BOOL automaticallyChecksForUpdates;
+@property (nonatomic) BOOL automaticallyChecksForUpdates;
 
-@property NSTimeInterval updateCheckInterval;
+@property (nonatomic) NSTimeInterval updateCheckInterval;
 
 /*!
  * The URL of the appcast used to download update information.
@@ -65,11 +65,11 @@ SU_EXPORT @interface SUUpdater : NSObject
 
 @property (copy) NSDictionary *httpHeaders;
 
-@property BOOL sendsSystemProfile;
+@property (nonatomic) BOOL sendsSystemProfile;
 
 @property (nonatomic, readonly) BOOL allowsAutomaticUpdates;
 
-@property BOOL automaticallyDownloadsUpdates;
+@property (nonatomic) BOOL automaticallyDownloadsUpdates;
 
 /*!
     Checks for updates, and displays progress while doing so
