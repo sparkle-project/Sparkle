@@ -82,7 +82,6 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self startSparkleIfNeeded];
         self.updater.automaticallyChecksForUpdates = automaticallyChecksForUpdates;
-        [self.updater resetUpdateCycleAfterShortDelay];
     });
 }
 
@@ -107,7 +106,6 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self startSparkleIfNeeded];
         self.updater.updateCheckInterval = updateCheckInterval;
-        [self.updater resetUpdateCycleAfterShortDelay];
     });
 }
 
