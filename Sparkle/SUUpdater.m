@@ -53,7 +53,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize driver;
 @synthesize host;
 @synthesize sparkleBundle;
-@synthesize decryptionPassword;
 
 - (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)theDelegate
 {

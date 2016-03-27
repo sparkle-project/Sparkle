@@ -13,6 +13,7 @@ static NSString *SUHostBundlePathKey = @"SUHostBundlePath";
 static NSString *SUUpdateDirectoryPathKey = @"SUUpdateDirectoryPath";
 static NSString *SUDownloadPathKey = @"SUDownloadPath";
 static NSString *SUDSASignatureKey = @"SUDSASignature";
+static NSString *SUDecryptionPasswordKey = @"SUDecryptionPassword";
 
 @implementation SUInstallationInputData
 
@@ -21,8 +22,9 @@ static NSString *SUDSASignatureKey = @"SUDSASignature";
 @synthesize updateDirectoryPath = _updateDirectoryPath;
 @synthesize downloadPath = _downloadPath;
 @synthesize dsaSignature = _dsaSignature;
+@synthesize decryptionPassword = _decryptionPassword;
 
-- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadPath:(NSString *)downloadPath dsaSignature:(NSString *)dsaSignature
+- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadPath:(NSString *)downloadPath dsaSignature:(NSString *)dsaSignature decryptionPassword:(nullable NSString *)decryptionPassword
 {
     self = [super init];
     if (self != nil) {
@@ -31,6 +33,7 @@ static NSString *SUDSASignatureKey = @"SUDSASignature";
         _updateDirectoryPath = [updateDirectoryPath copy];
         _downloadPath = [downloadPath copy];
         _dsaSignature = [dsaSignature copy];
+        _decryptionPassword = [decryptionPassword copy];
     }
     return self;
 }
@@ -62,7 +65,9 @@ static NSString *SUDSASignatureKey = @"SUDSASignature";
         return nil;
     }
     
-    return [self initWithRelaunchPath:relaunchPath hostBundlePath:hostBundlePath updateDirectoryPath:updateDirectoryPath downloadPath:downloadPath dsaSignature:dsaSignature];
+    NSString *decryptionPassword = [decoder decodeObjectOfClass:[NSString class] forKey:SUDecryptionPasswordKey];
+    
+    return [self initWithRelaunchPath:relaunchPath hostBundlePath:hostBundlePath updateDirectoryPath:updateDirectoryPath downloadPath:downloadPath dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder
@@ -72,6 +77,9 @@ static NSString *SUDSASignatureKey = @"SUDSASignature";
     [coder encodeObject:self.updateDirectoryPath forKey:SUUpdateDirectoryPathKey];
     [coder encodeObject:self.downloadPath forKey:SUDownloadPathKey];
     [coder encodeObject:self.dsaSignature forKey:SUDSASignatureKey];
+    if (self.decryptionPassword != nil) {
+        [coder encodeObject:self.decryptionPassword forKey:SUDecryptionPasswordKey];
+    }
 }
 
 + (BOOL)supportsSecureCoding

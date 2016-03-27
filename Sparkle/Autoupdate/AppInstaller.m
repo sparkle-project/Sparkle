@@ -232,8 +232,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 
 - (void)extractAndInstallUpdate
 {
-#warning passing nothing for password atm
-    id <SUUnarchiver> unarchiver = [SUUnarchiver unarchiverForPath:self.installationData.downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:nil delegate:self];
+    id <SUUnarchiver> unarchiver = [SUUnarchiver unarchiverForPath:self.installationData.downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.installationData.decryptionPassword delegate:self];
     if (!unarchiver) {
         SULog(@"Error: No valid unarchiver for %@!", self.installationData.downloadPath);
         [self unarchiverDidFail];

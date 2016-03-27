@@ -217,7 +217,12 @@
     
     NSString *dsaSignature = (self.updateItem.DSASignature == nil) ? @"" : self.updateItem.DSASignature;
     
-    SUInstallationInputData *installationData = [[SUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadPath:self.downloadPath dsaSignature:dsaSignature];
+    NSString *decryptionPassword = nil;
+    if ([self.updaterDelegate respondsToSelector:@selector(decryptionPasswordForUpdater:)]) {
+        decryptionPassword = [self.updaterDelegate decryptionPasswordForUpdater:self.updater];
+    }
+    
+    SUInstallationInputData *installationData = [[SUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadPath:self.downloadPath dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
     
     NSData *archivedData = SUArchiveRootObjectSecurely(installationData);
     

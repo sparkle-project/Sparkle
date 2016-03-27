@@ -207,6 +207,15 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (NSString *)pathToRelaunchForUpdater:(SUUpdater *)updater;
 
 /*!
+ Returns the decryption password (if any) which is used to extract the update archive DMG.
+ 
+ Return nil if no password should be used.
+ 
+ \param updater The SUUpdater instance.
+ */
+- (NSString *)decryptionPasswordForUpdater:(SUUpdater *)updater;
+
+/*!
  Called before an updater shows a modal alert window,
  to give the host the opportunity to hide attached windows that may get in the way.
  
