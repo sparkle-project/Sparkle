@@ -341,10 +341,6 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 
 - (void)checkForUpdatesWithDriver:(id <SUUpdateDriver> )d
 {
-//    if ([self updateInProgress]) {
-//        return;
-//    }
-    
     if (self.driver != nil) {
         return;
     }
@@ -599,11 +595,6 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
     // so not aborting could mean it stays alive longer than we'd want
     [self.driver abortUpdate];
     self.driver = nil;
-}
-
-- (BOOL)updateInProgress
-{
-    return (self.driver != nil || [SUProbeInstallStatus probeInstallerInProgressForHost:self.host]);
 }
 
 - (NSBundle *)hostBundle { return [self.host bundle]; }

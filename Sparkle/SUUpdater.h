@@ -119,13 +119,6 @@ SU_EXPORT @interface SUUpdater : NSObject
  */
 - (void)resetUpdateCycle;
 
-/*!
- Returns if an update is in progress or not
- 
- This may be used for menu item validation to see if the user can check for updates.
- */
-@property (readonly) BOOL updateInProgress;
-
 @end
 
 #endif
