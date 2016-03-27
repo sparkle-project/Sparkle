@@ -69,8 +69,8 @@
 - (BOOL)isDelegateResponsibleForUpdateChecking
 {
     BOOL result = NO;
-    if ([self.delegate respondsToSelector:@selector(responsibleForInitiatingUpdateCheck)]) {
-        result = [self.delegate responsibleForInitiatingUpdateCheck];
+    if ([self.delegate respondsToSelector:@selector(userDriverRequestsResponsibilityForInitiatingUpdateCheck)]) {
+        result = [self.delegate userDriverRequestsResponsibilityForInitiatingUpdateCheck];
     }
     return result;
 }
@@ -83,10 +83,10 @@
 - (void)checkForUpdates:(NSTimer *)__unused timer
 {
     if ([self isDelegateResponsibleForUpdateChecking]) {
-        if ([self.delegate respondsToSelector:@selector(initiateUpdateCheck)]) {
-            [self.delegate initiateUpdateCheck];
+        if ([self.delegate respondsToSelector:@selector(userDriverRequestsInitatingUpdateCheck)]) {
+            [self.delegate userDriverRequestsInitatingUpdateCheck];
         } else {
-            NSLog(@"Error: Delegate %@ for user driver %@ must implement initiateUpdateCheck because it returned YES from responsibleForInitiatingUpdateCheck", self.delegate, self);
+            NSLog(@"Error: Delegate %@ for user driver %@ must implement userDriverRequestsInitatingUpdateCheck because it returned YES from userDriverRequestsResponsibilityForInitiatingUpdateCheck", self.delegate, self);
         }
     } else {
         if (self.checkForUpdatesReply != nil) {

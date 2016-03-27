@@ -144,8 +144,8 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         id <SUVersionDisplay> versionDisplayer = nil;
-        if ([self.delegate respondsToSelector:@selector(versionDisplayer)]) {
-            versionDisplayer = [self.delegate versionDisplayer];
+        if ([self.delegate respondsToSelector:@selector(userDriverRequestsVersionDisplayer)]) {
+            versionDisplayer = [self.delegate userDriverRequestsVersionDisplayer];
         }
         
         __weak SUStandardUserDriver *weakSelf = self;

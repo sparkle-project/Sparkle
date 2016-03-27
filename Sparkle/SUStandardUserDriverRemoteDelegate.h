@@ -26,21 +26,21 @@ NS_ASSUME_NONNULL_BEGIN
  having a delegate implement this can be more efficient for the system and therefore is encouraged.
  
  @return Returns if the delegate is responsible for initiating update checks. If the delegate returns YES,
- then the delegate must also implement -initiateUpdateCheck which is when the delegate should
+ then the delegate must also implement -userDriverRequestsInitatingUpdateCheck which is when the delegate should
  initiate update checks.
  */
-- (BOOL)responsibleForInitiatingUpdateCheck;
+- (BOOL)userDriverRequestsResponsibilityForInitiatingUpdateCheck;
 
 /*!
  Called when user driver tells the delegate to initiate an update check
  
- This is called if the delegate returned YES from -responsibleForInitiatingUpdateCheck
+ This is called if the delegate returned YES from -userDriverRequestsResponsibilityForInitiatingUpdateCheck
  
  The delegate will have to find a pathway to tell the SUUpdater instance to check for updates, that
- does not go through the user driver. See -responsibleForInitiatingUpdateCheck as to why
+ does not go through the user driver. See -userDriverRequestsResponsibilityForInitiatingUpdateCheck as to why
  a delegate may want to implement this.
  */
-- (void)initiateUpdateCheck;
+- (void)userDriverRequestsInitatingUpdateCheck;
 
 @end
 

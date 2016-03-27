@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
  If you don't implement this method or return \c nil,
  the standard version formatter will be used.
  */
-- (_Nullable id <SUVersionDisplay>)versionDisplayer;
+- (_Nullable id <SUVersionDisplay>)userDriverRequestsVersionDisplayer;
 
 @end
 

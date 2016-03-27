@@ -189,12 +189,12 @@
 
 #pragma mark Update Checks
 
-- (BOOL)responsibleForInitiatingUpdateCheck
+- (BOOL)userDriverRequestsResponsibilityForInitiatingUpdateCheck
 {
     return YES;
 }
 
-- (void)initiateUpdateCheck
+- (void)userDriverRequestsInitatingUpdateCheck
 {
     [self.connection.remoteObjectProxy checkForUpdates];
 }
