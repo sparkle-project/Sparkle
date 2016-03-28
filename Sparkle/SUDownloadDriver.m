@@ -126,6 +126,16 @@
     self.temporaryDirectory = tempDir;
 }
 
+- (void)download:(NSURLDownload *)__unused download didReceiveResponse:(NSURLResponse *)response
+{
+    [self.delegate downloadDriverDidReceiveResponse:response];
+}
+
+- (void)download:(NSURLDownload *)__unused download didReceiveDataOfLength:(NSUInteger)length
+{
+    [self.delegate downloadDriverDidReceiveDataOfLength:length];
+}
+
 - (void)downloadDidFinish:(NSURLDownload *)__unused d
 {
     assert(self.updateItem);

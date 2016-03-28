@@ -127,6 +127,16 @@
     }
 }
 
+- (void)downloadDriverDidReceiveResponse:(NSURLResponse *)response
+{
+    [self.userDriver showDownloadDidReceiveResponse:response];
+}
+
+- (void)downloadDriverDidReceiveDataOfLength:(NSUInteger)length
+{
+    [self.userDriver showDownloadDidReceiveDataOfLength:length];
+}
+
 - (void)coreDriverDidFinishDownloadingUpdate
 {
     [self.userDriver showDownloadFinishedAndStartedExtractingUpdate];

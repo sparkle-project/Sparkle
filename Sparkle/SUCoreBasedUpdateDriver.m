@@ -126,6 +126,20 @@
     [self.downloadDriver downloadUpdate];
 }
 
+- (void)downloadDriverDidReceiveResponse:(NSURLResponse *)response
+{
+    if ([self.delegate respondsToSelector:@selector(downloadDriverDidReceiveResponse:)]) {
+        [self.delegate downloadDriverDidReceiveResponse:response];
+    }
+}
+
+- (void)downloadDriverDidReceiveDataOfLength:(NSUInteger)length
+{
+    if ([self.delegate respondsToSelector:@selector(downloadDriverDidReceiveDataOfLength:)]) {
+        [self.delegate downloadDriverDidReceiveDataOfLength:length];
+    }
+}
+
 - (void)downloadDriverDidDownloadUpdate
 {
     // Now we have to extract the downloaded archive.
