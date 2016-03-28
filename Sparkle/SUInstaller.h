@@ -16,9 +16,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SUInstaller : NSObject
 
-+ (nullable id<SUInstaller>)installerForHost:(SUHost *)host installationPath:(NSString *)installationPath updateDirectory:(NSString *)updateDirectory versionComparator:(id <SUVersionComparison>)comparator error:(NSError **)error;
++ (nullable id<SUInstaller>)installerForHost:(SUHost *)host updateDirectory:(NSString *)updateDirectory versionComparator:(id <SUVersionComparison>)comparator error:(NSError **)error;
 
 + (NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr isGuided:(nullable BOOL *)isGuidedPtr;
+
++ (NSString *)installationPathForHost:(SUHost *)host;
 
 + (void)mdimportInstallationPath:(NSString *)installationPath;
 

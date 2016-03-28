@@ -109,7 +109,7 @@
     return newAppDownloadPath;
 }
 
-+ (nullable id<SUInstaller>)installerForHost:(SUHost *)host installationPath:(NSString *)installationPath updateDirectory:(NSString *)updateDirectory versionComparator:(id <SUVersionComparison>)comparator error:(NSError * __autoreleasing *)error
++ (nullable id<SUInstaller>)installerForHost:(SUHost *)host updateDirectory:(NSString *)updateDirectory versionComparator:(id <SUVersionComparison>)comparator error:(NSError * __autoreleasing *)error
 {
     BOOL isPackage = NO;
     BOOL isGuided = NO;
@@ -128,9 +128,25 @@
     } else if (isPackage) {
         installer = [[SUPackageInstaller alloc] initWithPackagePath:newDownloadPath];
     } else {
-        installer = [[SUPlainInstaller alloc] initWithHost:host applicationPath:newDownloadPath installationPath:installationPath versionComparator:comparator];
+        installer = [[SUPlainInstaller alloc] initWithHost:host applicationPath:newDownloadPath installationPath:[[self class] installationPathForHost:host] versionComparator:comparator];
     }
     return installer;
+}
+
++ (NSString *)installationPathForHost:(SUHost *)host
+{
+    NSBundle *bundle = host.bundle;
+    assert(bundle != nil);
+    
+    if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
+        // We'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
+        NSString *normalizedAppPath = [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[bundle bundlePath] pathExtension]]];
+        
+        if (![[NSFileManager defaultManager] fileExistsAtPath:normalizedAppPath]) {
+            return normalizedAppPath;
+        }
+    }
+    return [bundle bundlePath];
 }
 
 + (void)mdimportInstallationPath:(NSString *)installationPath

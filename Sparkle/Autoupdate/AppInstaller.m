@@ -355,7 +355,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     
     dispatch_async(self.installerQueue, ^{
         NSError *installerError = nil;
-        id <SUInstaller> installer = [SUInstaller installerForHost:self.host installationPath:[self installationPath] updateDirectory:self.installationData.updateDirectoryPath versionComparator:[SUStandardVersionComparator defaultComparator] error:&installerError];
+        id <SUInstaller> installer = [SUInstaller installerForHost:self.host updateDirectory:self.installationData.updateDirectoryPath versionComparator:[SUStandardVersionComparator defaultComparator] error:&installerError];
         
         if (installer == nil) {
             SULog(@"Error: Failed to create installer instance with error: %@", installerError);
@@ -395,22 +395,6 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     });
 }
 
-- (NSString *)installationPath
-{
-    NSBundle *bundle = self.host.bundle;
-    assert(bundle != nil);
-    
-    if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
-        // We'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
-        NSString *normalizedAppPath = [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[bundle bundlePath] pathExtension]]];
-        
-        if (![[NSFileManager defaultManager] fileExistsAtPath:normalizedAppPath]) {
-            return normalizedAppPath;
-        }
-    }
-    return [bundle bundlePath];
-}
-
 - (void)performStage2InstallationIfNeeded
 {
 #warning this test should be async?
@@ -422,7 +406,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         // Predict if an admin prompt is needed
         // If it is, we should activate our app so that the auth prompt will be active
         // (Note it's more efficient/simpler to predict rather than trying, seeing if we fail, notifying, and re-trying)
-        NSString *installationPath = [self installationPath];
+        NSString *installationPath = [SUInstaller installationPathForHost:self.host];
         if (![[NSFileManager defaultManager] isWritableFileAtPath:installationPath]) {
             [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
         }
@@ -492,7 +476,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
             }
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSString *installationPath = [self installationPath];
+                NSString *installationPath = [SUInstaller installationPathForHost:self.host];
                 
                 if (self.shouldRelaunch) {
                     NSString *pathToRelaunch = nil;

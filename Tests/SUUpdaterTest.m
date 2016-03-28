@@ -10,6 +10,7 @@
 #import "SUConstants.h"
 #import "SUUpdater.h"
 #import "SUStandardUserDriver.h"
+#import "SUUpdaterDelegate.h"
 
 // This user driver does nothing
 @interface SUUselessUserDriver : NSObject <SUUserDriver>
@@ -32,7 +33,7 @@
 
 - (void)dismissUserInitiatedUpdateCheck {}
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem allowsAutomaticUpdates:(BOOL)__unused allowsAutomaticUpdates alreadyDownloaded:(BOOL)alreadyDownloaded reply:(void (^)(SUUpdateAlertChoice))__unused reply {}
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem allowsAutomaticUpdates:(BOOL)__unused allowsAutomaticUpdates alreadyDownloaded:(BOOL)__unused alreadyDownloaded reply:(void (^)(SUUpdateAlertChoice))__unused reply {}
 
 - (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))__unused acknowledgement {}
 
@@ -53,6 +54,8 @@
 - (void)showInstallingUpdate {}
 
 - (void)dismissUpdateInstallation {}
+
+- (void)terminateApplication {}
 
 @end
 
