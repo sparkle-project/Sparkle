@@ -13,6 +13,7 @@
 #import "SUConstants.h"
 #import "SUUpdaterDelegate.h"
 #import "SUAppcastItem.h"
+#import "SUErrors.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -186,11 +187,20 @@
     
     if (error != nil) {
         NSError *nonNullError = error;
-        [self.userDriver showUpdaterError:nonNullError acknowledgement:^{
-            dispatch_async(dispatch_get_main_queue(), ^{
-                abortUpdate();
-            });
-        }];
+        
+        if (error.code == SUNoUpdateError) {
+            [self.userDriver showUpdateNotFoundWithAcknowledgement:^{
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    abortUpdate();
+                });
+            }];
+        } else {
+            [self.userDriver showUpdaterError:nonNullError acknowledgement:^{
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    abortUpdate();
+                });
+            }];
+        }
     } else {
         abortUpdate();
     }
