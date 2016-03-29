@@ -113,6 +113,9 @@
  */
 - (BOOL)updateModificationAndAccessTimeOfItemAtURL:(NSURL *)targetURL error:(NSError **)error;
 
+// TODO: document me. Note this does *not* attempt authorization
+- (BOOL)updateModificationAndAccessTimeOfItemsRecursivelyAtURL:(NSURL *)targetURL error:(NSError * __autoreleasing *)error;
+
 /**
  * Releases Apple's quarantine extended attribute from the item at the specified root URL
  * @param rootURL A URL pointing to the item to release from Apple's quarantine. This will be applied recursively if the item is a directory. The item at this URL must exist.

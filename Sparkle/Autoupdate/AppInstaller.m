@@ -30,10 +30,19 @@
  */
 static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 
+/*!
+ * Our periodic update time interval used after we finished the first stage of installation.
+ * We use this to prevent the system from cleaning up files in temporary directories that we still need
+ * The system does this check daily (every 24 hours) but takes out files older than 3 days by default
+ * We should go by a significantly smaller interval to allow some leeway; "around" 3 hours seems fine
+ */
+static const NSTimeInterval SUPeriodicUpdateTimeInterval = 60 * 60 * 3;
+
 @interface AppInstaller ()
 
 @property (nonatomic, strong) TerminationListener *terminationListener;
 @property (nonatomic, strong) SUStatusController *statusController;
+@property (nonatomic) NSTimer *periodicUpdateTimer;
 
 @property (nonatomic, readonly, copy) NSString *hostBundleIdentifier;
 @property (nonatomic) SUHost *host;
@@ -50,6 +59,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 @property (nonatomic) dispatch_queue_t installerQueue;
 @property (nonatomic) BOOL performedStage1Installation;
 @property (nonatomic) BOOL performedStage2Installation;
+@property (nonatomic) BOOL performedStage3Installation;
 
 @end
 
@@ -58,6 +68,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 @synthesize hostBundleIdentifier = _hostBundleIdentifier;
 @synthesize terminationListener = _terminationListener;
 @synthesize statusController = _statusController;
+@synthesize periodicUpdateTimer = _periodicUpdateTimer;
 @synthesize localPort = _localPort;
 @synthesize remotePort = _remotePort;
 @synthesize host = _host;
@@ -70,6 +81,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 @synthesize installerQueue = _installerQueue;
 @synthesize performedStage1Installation = _performedStage1Installation;
 @synthesize performedStage2Installation = _performedStage2Installation;
+@synthesize performedStage3Installation = _performedStage3Installation;
 
 /*
  * hostPath - path to host (original) application
@@ -388,10 +400,31 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
             
             self.performedStage1Installation = YES;
             
+            if ([self.installer respondsToSelector:@selector(performPeriodicUpdate:)]) {
+                self.periodicUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:SUPeriodicUpdateTimeInterval target:self selector:@selector(performPeriodicUpdate:) userInfo:nil repeats:YES];
+            }
+            
             // Stage 2 can still be run before we finish installation
             // if the updater requests for it before the app is terminated
             [self finishInstallationAfterHostTermination];
         });
+    });
+}
+
+- (void)performPeriodicUpdate:(NSTimer *)__unused timer
+{
+    dispatch_async(self.installerQueue, ^{
+        if (!self.performedStage3Installation) {
+            NSError *updateError = nil;
+            if (![self.installer performPeriodicUpdate:&updateError]) {
+                SULog(@"Failed to perform periodic update on installer with error: %@", updateError);
+                [self.installer cleanup];
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                });
+            }
+        }
     });
 }
 
@@ -475,7 +508,12 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
                 return;
             }
             
+            self.performedStage3Installation = YES;
+            
             dispatch_async(dispatch_get_main_queue(), ^{
+                [self.periodicUpdateTimer invalidate];
+                self.periodicUpdateTimer = nil;
+                
                 NSString *installationPath = [SUInstaller installationPathForHost:self.host];
                 
                 if (self.shouldRelaunch) {

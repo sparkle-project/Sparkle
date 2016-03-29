@@ -90,6 +90,14 @@
     
     SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:YES];
     
+    // Update the access and mod time of our entire application before moving it into a temporary directory
+    // The system periodically cleans up files by looking at the mod & access times, so we have to make sure they're up to date
+    // (they could be potentially be preserved when archiving an application...)
+    if (![fileManager updateModificationAndAccessTimeOfItemsRecursivelyAtURL:newURL error:error]) {
+        SULog(@"Failed to recursively update new application's modification time before moving into temporary directory");
+        return NO;
+    }
+    
     // Create a temporary directory for our new app that resides on our destination's volume
     NSURL *tempNewDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:[installationURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingString:@" (Incomplete Update)"] appropriateForDirectoryURL:installationURL.URLByDeletingLastPathComponent error:error];
     if (tempNewDirectoryURL == nil) {
@@ -106,10 +114,7 @@
         return NO;
     }
     
-    // Release our new app from quarantine, fix its owner and group IDs, and update its modification time while it's at our temporary destination
-    // We must leave moving the app to its destination as the final step in installing it, so that
-    // it's not possible our new app can be left in an incomplete state at the final destination
-    
+    // Release our new app from quarantine
     NSError *quarantineError = nil;
     if (![fileManager releaseItemFromQuarantineAtRootURL:newTempURL error:&quarantineError]) {
         // Not big enough of a deal to fail the entire installation
@@ -135,6 +140,29 @@
     return YES;
 }
 
+// Prevent the system from removing files from our temporarily installed update by "touching" the update periodically
+- (BOOL)performPeriodicUpdate:(NSError * __autoreleasing *)error
+{
+    SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:NO];
+    NSURL *newURL = self.installationNewTempURL;
+    assert(newURL != nil);
+    
+    if (![fileManager updateModificationAndAccessTimeOfItemsRecursivelyAtURL:newURL error:error]) {
+        SULog(@"Failed to recursively update new application's modification time in temporary directory");
+        return NO;
+    }
+    
+    NSURL *temporaryDirectoryURL = self.tempNewDirectoryURL;
+    assert(temporaryDirectoryURL != nil);
+    
+    if (![fileManager updateModificationAndAccessTimeOfItemAtURL:temporaryDirectoryURL error:error]) {
+        SULog(@"Failed to update modification time of new application's temporary directory");
+        return NO;
+    }
+    
+    return YES;
+}
+
 - (BOOL)resumeInstallationAllowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
 {
     if (!allowsUI) {
@@ -147,6 +175,8 @@
     NSURL *oldURL = self.oldURL;
     
     // This is the first operation that has a high chance or prompting for auth. if the user needs to auth. at all
+    // We must leave moving the app to its destination as the final step in installing it, so that
+    // it's not possible our new app can be left in an incomplete state at the final destination
     if (![fileManager changeOwnerAndGroupOfItemAtRootURL:newTempURL toMatchURL:oldURL error:error]) {
         // But this is big enough of a deal to fail
         SULog(@"Failed to change owner and group of new app at %@ to match old app at %@", newTempURL.path, oldURL.path);

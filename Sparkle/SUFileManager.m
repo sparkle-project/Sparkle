@@ -677,6 +677,69 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     return success;
 }
 
+- (BOOL)_updateItemAtURL:(NSURL *)targetURL withModificationAndAccessTime:(struct timeval)timeValue error:(NSError * __autoreleasing *)error
+{
+    char path[PATH_MAX] = {0};
+    if (![targetURL.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"File to update modification & access time (%@) cannot be represented as a valid file name.", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    const struct timeval timeInputs[] = {timeValue, timeValue};
+    if (utimes(path, timeInputs) != 0) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to update modification & access time for %@", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    return YES;
+}
+
+- (BOOL)updateModificationAndAccessTimeOfItemsRecursivelyAtURL:(NSURL *)targetURL error:(NSError * __autoreleasing *)error
+{
+    if (![self _itemExistsAtURL:targetURL]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to update modification & access time recursively because %@ does not exist.", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    // We want to update all files with the same exact time
+    struct timeval currentTime = {0, 0};
+    if (gettimeofday(&currentTime, NULL) != 0) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to update modification & access time recursively because gettimeofday failed."] }];
+        }
+        return NO;
+    }
+    
+    // Only recurse if it's actually a directory.  Don't recurse into a
+    // root-level symbolic link.
+    NSString *rootURLPath = targetURL.path;
+    NSDictionary *rootAttributes = [_fileManager attributesOfItemAtPath:rootURLPath error:nil];
+    NSString *rootType = [rootAttributes objectForKey:NSFileType];
+    
+    if (![self _updateItemAtURL:targetURL withModificationAndAccessTime:currentTime error:error]) {
+        return NO;
+    }
+    
+    if ([rootType isEqualToString:NSFileTypeDirectory]) {
+        // The NSDirectoryEnumerator will avoid recursing into any contained
+        // symbolic links, so no further type checks are needed.
+        NSDirectoryEnumerator *directoryEnumerator = [_fileManager enumeratorAtURL:targetURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
+        
+        for (NSURL *file in directoryEnumerator) {
+            if (![self _updateItemAtURL:file withModificationAndAccessTime:currentTime error:error]) {
+                return NO;
+            }
+        }
+    }
+    return YES;
+}
+
 // /usr/bin/touch can be used to update an application, as described in:
 // https://developer.apple.com/library/mac/documentation/Carbon/Conceptual/LaunchServicesConcepts/LSCConcepts/LSCConcepts.html
 // The document says LSRegisterURL() can be used as well but this hasn't worked out well for me in practice
