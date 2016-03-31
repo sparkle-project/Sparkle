@@ -131,49 +131,6 @@
         return NO;
     }
     
-    // To carry over when we resume the installation
-    self.fileManager = fileManager;
-    self.oldURL = oldURL;
-    self.installationNewTempURL = newTempURL;
-    self.tempNewDirectoryURL = tempNewDirectoryURL;
-    
-    return YES;
-}
-
-// Prevent the system from removing files from our temporarily installed update by "touching" the update periodically
-- (BOOL)performPeriodicUpdate:(NSError * __autoreleasing *)error
-{
-    SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:NO];
-    NSURL *newURL = self.installationNewTempURL;
-    assert(newURL != nil);
-    
-    if (![fileManager updateModificationAndAccessTimeOfItemsRecursivelyAtURL:newURL error:error]) {
-        SULog(@"Failed to recursively update new application's modification time in temporary directory");
-        return NO;
-    }
-    
-    NSURL *temporaryDirectoryURL = self.tempNewDirectoryURL;
-    assert(temporaryDirectoryURL != nil);
-    
-    if (![fileManager updateModificationAndAccessTimeOfItemAtURL:temporaryDirectoryURL error:error]) {
-        SULog(@"Failed to update modification time of new application's temporary directory");
-        return NO;
-    }
-    
-    return YES;
-}
-
-- (BOOL)resumeInstallationAllowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
-{
-    if (!allowsUI) {
-        self.fileManager = [SUFileManager fileManagerAllowingAuthorization:NO];
-    }
-    
-    SUFileManager *fileManager = self.fileManager;
-    NSURL *newTempURL = self.installationNewTempURL;
-    NSURL *tempNewDirectoryURL = self.tempNewDirectoryURL;
-    NSURL *oldURL = self.oldURL;
-    
     // This is the first operation that has a high chance or prompting for auth. if the user needs to auth. at all
     // We must leave moving the app to its destination as the final step in installing it, so that
     // it's not possible our new app can be left in an incomplete state at the final destination
@@ -183,16 +140,6 @@
         [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
         return NO;
     }
-    
-    return YES;
-}
-
-- (BOOL)finishInstallationToURL:(NSURL *)installationURL withHost:(SUHost *)host error:(NSError * __autoreleasing *)error
-{
-    SUFileManager *fileManager = self.fileManager;
-    NSURL *newTempURL = self.installationNewTempURL;
-    NSURL *tempNewDirectoryURL = self.tempNewDirectoryURL;
-    NSURL *oldURL = self.oldURL;
     
     NSError *touchError = nil;
     if (![fileManager updateModificationAndAccessTimeOfItemAtURL:newTempURL error:&touchError]) {
@@ -248,6 +195,12 @@
         return NO;
     }
     
+    // To carry over when we resume the installation
+    self.fileManager = fileManager;
+    self.oldURL = oldURL;
+    self.installationNewTempURL = newTempURL;
+    self.tempNewDirectoryURL = tempNewDirectoryURL;
+    
     // To carry over when we clean up the installation
     self.tempOldDirectoryURL = tempOldDirectoryURL;
     self.oldTempURL = oldTempURL;
@@ -275,17 +228,17 @@
         }
     }
     
-    return [self startInstallationToURL:[NSURL fileURLWithPath:self.installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:self.applicationPath] withHost:self.host error:error];
+    return YES;
 }
 
 - (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError *__autoreleasing *)error
 {
-    return [self resumeInstallationAllowingUI:allowsUI error:error];
+    return YES;
 }
 
 - (BOOL)performThirdStage:(NSError * __autoreleasing *)error
 {
-    return [self finishInstallationToURL:[NSURL fileURLWithPath:self.installationPath] withHost:self.host error:error];
+    return [self startInstallationToURL:[NSURL fileURLWithPath:self.installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:self.applicationPath] withHost:self.host error:error];
 }
 
 - (void)cleanup
@@ -303,14 +256,20 @@
         if (![fileManager moveItemAtURLToTrash:oldTempURL error:&trashError]) {
             SULog(@"Failed to move %@ to trash with error %@", oldTempURL, trashError);
         }
+        
+        self.oldTempURL = nil;
     }
     
     if (tempOldDirectoryURL != nil) {
         [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
+        
+        self.tempOldDirectoryURL = nil;
     }
     
     if (tempNewDirectoryURL != nil) {
         [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
+        
+        self.tempNewDirectoryURL = nil;
     }
 }
 

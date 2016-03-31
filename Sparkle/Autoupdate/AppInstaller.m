@@ -400,31 +400,10 @@ static const NSTimeInterval SUPeriodicUpdateTimeInterval = 60 * 60 * 3;
             
             self.performedStage1Installation = YES;
             
-            if ([self.installer respondsToSelector:@selector(performPeriodicUpdate:)]) {
-                self.periodicUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:SUPeriodicUpdateTimeInterval target:self selector:@selector(performPeriodicUpdate:) userInfo:nil repeats:YES];
-            }
-            
             // Stage 2 can still be run before we finish installation
             // if the updater requests for it before the app is terminated
             [self finishInstallationAfterHostTermination];
         });
-    });
-}
-
-- (void)performPeriodicUpdate:(NSTimer *)__unused timer
-{
-    dispatch_async(self.installerQueue, ^{
-        if (!self.performedStage3Installation) {
-            NSError *updateError = nil;
-            if (![self.installer performPeriodicUpdate:&updateError]) {
-                SULog(@"Failed to perform periodic update on installer with error: %@", updateError);
-                [self.installer cleanup];
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self cleanupAndExitWithStatus:EXIT_FAILURE];
-                });
-            }
-        }
     });
 }
 

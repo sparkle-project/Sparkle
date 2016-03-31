@@ -31,13 +31,4 @@
 // Should be able to be called from non-main thread
 - (void)cleanup;
 
-@optional
-
-// A handler for performing a periodic update
-// This can only be invoked  after stage 1 and before stage 3.
-// Aditionally it should only be invoked if the install takes a very long time between stages 1 and 3.
-// The type of work that can be performed here could be cleanup prevention, or whatever else
-// Should be able to be called from non-main thread
-- (BOOL)performPeriodicUpdate:(NSError **)error;
-
 @end
