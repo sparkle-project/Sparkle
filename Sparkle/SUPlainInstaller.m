@@ -127,7 +127,7 @@
         return NO;
     }
     
-    // This is the first operation that has a high chance or prompting for auth. if the user needs to auth. at all
+    // Note: this is the first operation that has a high chance or prompting for auth. if the user needs to auth. at all
     // We must leave moving the app to its destination as the final step in installing it, so that
     // it's not possible our new app can be left in an incomplete state at the final destination
     if (![fileManager changeOwnerAndGroupOfItemAtRootURL:newTempURL toMatchURL:oldURL error:error]) {
@@ -192,7 +192,7 @@
     }
     
     // To carry over when we clean up the installation
-    self.fileManager = fileManager;
+    self.fileManager = [fileManager fileManagerByPreservingAuthorizationRights];
     self.tempNewDirectoryURL = tempNewDirectoryURL;
     self.tempOldDirectoryURL = tempOldDirectoryURL;
     self.oldTempURL = oldTempURL;
