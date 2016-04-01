@@ -7,7 +7,6 @@
 //
 
 #import "AppInstaller.h"
-#import "SUStatusController.h"
 #import "TerminationListener.h"
 #import "SUInstaller.h"
 #import "SULog.h"
@@ -33,7 +32,6 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 @interface AppInstaller ()
 
 @property (nonatomic, strong) TerminationListener *terminationListener;
-@property (nonatomic, strong) SUStatusController *statusController;
 
 @property (nonatomic, readonly, copy) NSString *hostBundleIdentifier;
 @property (nonatomic) SUHost *host;
@@ -58,7 +56,6 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 
 @synthesize hostBundleIdentifier = _hostBundleIdentifier;
 @synthesize terminationListener = _terminationListener;
-@synthesize statusController = _statusController;
 @synthesize localPort = _localPort;
 @synthesize remotePort = _remotePort;
 @synthesize host = _host;
