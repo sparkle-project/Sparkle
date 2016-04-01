@@ -77,7 +77,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  This action checks updates by invoking -[SUUpdater checkForUpdates]
  */
-- (IBAction)checkForUpdates:(_Nullable id)sender;
+- (IBAction)checkForUpdates:(id)sender;
 
 /*!
  Validates if the menu item for checkForUpdates: can be invoked or not
