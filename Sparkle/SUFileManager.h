@@ -26,6 +26,15 @@
 + (instancetype)fileManagerAllowingAuthorization:(BOOL)allowsAuthorization;
 
 /**
+ * Returns a file manager that allows or disallows authorizing for file operations based on the current file manager
+ * @return A file manager instance that can perform authorized operations if the current file manager has already performed them.
+ *  If the current file manager instance hasn't yet performed authorized operations, then neither can the instance returned by this method
+ *
+ * This may return a newly created file manager or re-use the existing file manager depending on the current authorization rights.
+ */
+- (instancetype)fileManagerByPreservingAuthorizationRights;
+
+/**
  * Creates a temporary directory on the same volume as a provided URL
  * @param preferredName A name that may be used when creating the temporary directory. Note that in the uncommon case this name is used, the temporary directory will be created inside the directory pointed by appropriateURL
  * @param appropriateURL A URL to a directory that resides on the volume that the temporary directory will be created on. In the uncommon case, the temporary directory may be created inside this directory.
