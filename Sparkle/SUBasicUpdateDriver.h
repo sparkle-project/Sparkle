@@ -18,17 +18,22 @@
 @interface SUBasicUpdateDriver : SUUpdateDriver <NSURLDownloadDelegate, SUUnarchiverDelegate>
 
 @property (strong, readonly) SUAppcastItem *updateItem;
+@property (strong, readonly) SUAppcastItem *updateItemRequiringNewerOS;
 @property (strong, readonly) NSURLDownload *download;
 @property (copy, readonly) NSString *downloadPath;
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui;
++ (BOOL)hostSatisfiesMinimumSystemVersionForItem:(SUAppcastItem *)ui;
++ (BOOL)hostSatisfiesMaximumSystemVersionForItem:(SUAppcastItem *)ui;
 + (BOOL)hostSupportsItem:(SUAppcastItem *)ui;
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui;
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui;
+- (BOOL)itemContainsApplicableUpdateRequiringNewerOS:(SUAppcastItem *)ui;
 - (void)appcastDidFinishLoading:(SUAppcast *)ac;
 - (void)didFindValidUpdate;
+- (void)didFindUpdateRequiringNewerOS;
 - (void)didNotFindUpdate;
 
 - (void)downloadUpdate;

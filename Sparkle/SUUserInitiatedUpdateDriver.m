@@ -84,4 +84,10 @@
     return [[self class] hostSupportsItem:ui] && [self isItemNewer:ui];
 }
 
+- (BOOL)itemContainsApplicableUpdateRequiringNewerOS:(SUAppcastItem *)ui
+{
+    // We don't check to see if this update's been skipped, because the user explicitly *asked* if he had the latest version.
+    return ![[self class] hostSatisfiesMinimumSystemVersionForItem:ui] && [self isItemNewer:ui];
+}
+
 @end

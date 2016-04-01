@@ -24,6 +24,7 @@
 @interface SUBasicUpdateDriver ()
 
 @property (strong) SUAppcastItem *updateItem;
+@property (strong) SUAppcastItem *updateItemRequiringNewerOS;
 @property (strong) NSURLDownload *download;
 @property (copy) NSString *downloadPath;
 
@@ -36,6 +37,7 @@
 @implementation SUBasicUpdateDriver
 
 @synthesize updateItem;
+@synthesize updateItemRequiringNewerOS;
 @synthesize download;
 @synthesize downloadPath;
 
@@ -103,23 +105,37 @@
     return item;
 }
 
-+ (BOOL)hostSupportsItem:(SUAppcastItem *)ui
++ (BOOL)hostSatisfiesMinimumSystemVersionForItem:(SUAppcastItem *)ui
 {
-	if (([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) &&
-        ([ui maximumSystemVersion] == nil || [[ui maximumSystemVersion] isEqualToString:@""])) { return YES; }
+	if ([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) { return YES; }
 
     BOOL minimumVersionOK = TRUE;
-    BOOL maximumVersionOK = TRUE;
 
-    // Check minimum and maximum System Version
+    // Check minimum System Version
     if ([ui minimumSystemVersion] != nil && ![[ui minimumSystemVersion] isEqualToString:@""]) {
         minimumVersionOK = [[SUStandardVersionComparator defaultComparator] compareVersion:[ui minimumSystemVersion] toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedDescending;
     }
+
+    return minimumVersionOK;
+}
+
++ (BOOL)hostSatisfiesMaximumSystemVersionForItem:(SUAppcastItem *)ui
+{
+    if ([ui maximumSystemVersion] == nil || [[ui maximumSystemVersion] isEqualToString:@""]) { return YES; }
+    
+    BOOL maximumVersionOK = TRUE;
+    
+    // Check maximum System Version
     if ([ui maximumSystemVersion] != nil && ![[ui maximumSystemVersion] isEqualToString:@""]) {
         maximumVersionOK = [[SUStandardVersionComparator defaultComparator] compareVersion:[ui maximumSystemVersion] toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedAscending;
     }
+    
+    return maximumVersionOK;
+}
 
-    return minimumVersionOK && maximumVersionOK;
++ (BOOL)hostSupportsItem:(SUAppcastItem *)ui
+{
+    return [self hostSatisfiesMinimumSystemVersionForItem:ui] && [self hostSatisfiesMaximumSystemVersionForItem:ui];
 }
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui
@@ -131,12 +147,24 @@
 {
     NSString *skippedVersion = [self.host objectForUserDefaultsKey:SUSkippedVersionKey];
 	if (skippedVersion == nil) { return NO; }
-    return [[self versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
+    return  [[self versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
+}
+
+- (BOOL)itemContainsVersionSkippedBecauseMinimumOSWasTooLow:(SUAppcastItem *)ui
+{
+    NSString *skippedVersion = [self.host objectForUserDefaultsKey:SUSkippedVersionBecauseMinimumOSWasTooLowKey];
+    if (skippedVersion == nil) { return NO; }
+    return  [[self versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
 }
 
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
 {
     return ui && [[self class] hostSupportsItem:ui] && [self isItemNewer:ui] && ![self itemContainsSkippedVersion:ui];
+}
+
+- (BOOL)itemContainsApplicableUpdateRequiringNewerOS:(SUAppcastItem *)ui
+{
+    return ![[self class] hostSatisfiesMinimumSystemVersionForItem:ui] && [self isItemNewer:ui] && ![self itemContainsVersionSkippedBecauseMinimumOSWasTooLow:ui];
 }
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac
@@ -149,6 +177,7 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:self.updater userInfo:userInfo];
 
     SUAppcastItem *item = nil;
+    SUAppcastItem *itemRequiringNewOS = nil;
 
     // Now we have to find the best valid update in the appcast.
     if ([[self.updater delegate] respondsToSelector:@selector(bestValidUpdateInAppcast:forUpdater:)]) // Does the delegate want to handle it?
@@ -160,6 +189,29 @@
 	}
 	else // If not, we'll take care of it ourselves.
     {
+/////<<<<<<< HEAD
+//        id<SUVersionComparison> comparator = [self versionComparator];
+//        // find the best supported update, and the best update that requires a newer OS
+//        for (SUAppcastItem *candidate in ac.items) {
+//            if ([self hostSupportsItem:candidate]) {
+//                if (!item || [comparator compareVersion:item.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
+//                    item = candidate;
+//                }
+//            }
+//            else if (![self hostSatisfiesMinimumSystemVersionForItem:candidate]) {
+//                if (!itemRequiringNewOS || [comparator compareVersion:itemRequiringNewOS.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
+//                    itemRequiringNewOS = candidate;
+//                }
+//            }
+//        }
+//        
+//        if (item) {
+//            SUAppcastItem *deltaUpdateItem = [item deltaUpdates][[self.host version]];
+//            if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem]) {
+//                self.nonDeltaUpdateItem = item;
+//                item = deltaUpdateItem;
+//            }
+//=======
         // Find the best supported update
         SUAppcastItem *deltaUpdateItem = nil;
         item = [[self class] bestItemFromAppcastItems:ac.items getDeltaItem:&deltaUpdateItem withHostVersion:self.host.version comparator:[self versionComparator]];
@@ -167,12 +219,16 @@
         if (item && deltaUpdateItem) {
             self.nonDeltaUpdateItem = item;
             item = deltaUpdateItem;
+//>>>>>>> upstream/master
         }
     }
 
     if ([self itemContainsValidUpdate:item]) {
         self.updateItem = item;
         [self didFindValidUpdate];
+    } else if (self.updater.shouldAlertForUpdatesRequiringNewerOS && itemRequiringNewOS && [self itemContainsApplicableUpdateRequiringNewerOS:itemRequiringNewOS]) {
+        self.updateItemRequiringNewerOS = itemRequiringNewOS;
+        [self didFindUpdateRequiringNewerOS];
     } else {
         self.updateItem = nil;
         [self didNotFindUpdate];
@@ -191,6 +247,23 @@
                                                         object:self.updater
                                                       userInfo:@{ SUUpdaterAppcastItemNotificationKey: self.updateItem }];
     [self downloadUpdate];
+}
+
+- (void)didFindUpdateRequiringNewerOS
+{
+    assert(self.updateItemRequiringNewerOS);
+    
+    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFindUpdateRequiringNewerOS:)]) {
+        [[self.updater delegate] updater:self.updater didFindUpdateRequiringNewerOS:self.updateItemRequiringNewerOS];
+    }
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindUpdateRequiringNewerOSNotification object:self.updater];
+
+    [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain
+                                                   code:SUUpdateRequiresNewerOSError
+                                               userInfo:@{
+                                                          NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"An update for %@ is available, but it requires a newer operating system.", "'Error' message when the user checks for updates, but the only available updates require a newer OS. (not necessarily shown in UI)"), self.host.name]
+                                                          }]];
 }
 
 - (void)didNotFindUpdate

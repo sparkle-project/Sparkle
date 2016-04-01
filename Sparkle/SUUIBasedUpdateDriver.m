@@ -86,6 +86,28 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
+- (void)didFindUpdateRequiringNewerOS
+{
+    assert(self.updateItemRequiringNewerOS);
+    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFindUpdateRequiringNewerOS:)]) {
+        [[self.updater delegate] updater:self.updater didFindUpdateRequiringNewerOS:self.updateItemRequiringNewerOS];
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindUpdateRequiringNewerOSNotification object:self.updater];
+
+    if (self.updater.shouldAlertForUpdatesRequiringNewerOS) {
+        [self.host setObject:[self.updateItemRequiringNewerOS versionString] forUserDefaultsKey:SUSkippedVersionBecauseMinimumOSWasTooLowKey];
+
+        NSString *requiredOSVersion = self.updateItemRequiringNewerOS.minimumSystemVersion;
+        NSString * currentOSVersion = [[NSProcessInfo processInfo] operatingSystemVersionString];
+        NSAlert *alert = [[NSAlert alloc] init];
+        alert.messageText = SULocalizedString(@"Update available!", "Status message shown when the user checks for updates and one is available, but the user needs to update their operating system to be eligible.");
+        alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available, but it requires OS X %@--you are running %@.\nPlease update your Mac and check for updates again.", nil), [self.host name], [self.host displayVersion], requiredOSVersion, currentOSVersion];
+        [alert addButtonWithTitle:SULocalizedString(@"OK", nil)];
+        [self showAlert:alert];
+        [self abortUpdate];
+    }
+}
+
 - (void)didNotFindUpdate
 {
     if ([[self.updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])

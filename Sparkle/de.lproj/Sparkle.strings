@@ -43,6 +43,11 @@
 
 "Checking for updates..." = "Suche nach Aktualisierungen …";
 
+/* Status message shown when the user checks for updates and one is available, but the user needs to update their operating system to be eligible. */
+"Update available!" = "Aktualisierung verfügbar!";
+
+"%@ %@ is now available, but it requires OS X %@--you are running %@.\nPlease update your Mac and check for updates again." = "%1$@ %2$@ ist verfügbar, setzt jedoch OS X %3$@ voraus (Sie verwenden %4$@).\nBitte aktualisieren Sie ihren Mac und suchen Sie erneut nach updates.";
+
 /* Take care not to overflow the status window. */
 "Downloading update..." = "Aktualisierung wird heruntergeladen …";
 

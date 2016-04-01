@@ -37,6 +37,8 @@ SU_EXPORT @interface SUUpdater : NSObject
 
 @property BOOL automaticallyChecksForUpdates;
 
+@property BOOL shouldAlertForUpdatesRequiringNewerOS;
+
 @property NSTimeInterval updateCheckInterval;
 
 /*!
@@ -126,6 +128,7 @@ SU_EXPORT @interface SUUpdater : NSObject
 // -----------------------------------------------------------------------------
 SU_EXPORT extern NSString *const SUUpdaterDidFinishLoadingAppCastNotification;
 SU_EXPORT extern NSString *const SUUpdaterDidFindValidUpdateNotification;
+SU_EXPORT extern NSString *const SUUpdaterDidFindUpdateRequiringNewerOSNotification;
 SU_EXPORT extern NSString *const SUUpdaterDidNotFindUpdateNotification;
 SU_EXPORT extern NSString *const SUUpdaterWillRestartNotification;
 #define SUUpdaterWillRelaunchApplicationNotification SUUpdaterWillRestartNotification;
@@ -214,6 +217,16 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
     \param item The appcast item corresponding to the update that is proposed to be installed.
  */
 - (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)item;
+
+/*!
+    Called when an update is found by the update driver, but that update requires a newer OS version.
+    This method will not be called if shouldAlertForUpdatesRequiringNewerOS is NO (default).
+    In that case, -updaterDidNotFindUpdate: will get called instead, replicating the behavior of older Sparkle versions.
+ 
+ \param updater The SUUpdater instance.
+ \param item The appcast item corresponding to the update that has been found.
+ */
+- (void)updater:(SUUpdater *)updater didFindUpdateRequiringNewerOS:(SUAppcastItem *)item;
 
 /*!
     Called when a valid update is not found.
