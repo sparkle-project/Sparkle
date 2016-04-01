@@ -28,10 +28,8 @@
 
 // Properties that carry over from starting installation to resuming to cleaning up
 @property (nonatomic) SUFileManager *fileManager;
-@property (nonatomic) NSURL *installationNewTempURL; // I would name this newTempURL, but compiler warning complains at prefixing with 'new'
 @property (nonatomic) NSURL *tempOldDirectoryURL;
 @property (nonatomic) NSURL *tempNewDirectoryURL;
-@property (nonatomic) NSURL *oldURL;
 @property (nonatomic) NSURL *oldTempURL;
 
 @end
@@ -43,10 +41,8 @@
 @synthesize applicationPath = _applicationPath;
 @synthesize installationPath = _installationPath;
 @synthesize fileManager = _fileManager;
-@synthesize installationNewTempURL = _installationNewTempURL;
 @synthesize tempOldDirectoryURL = _tempOldDirectoryURL;
 @synthesize tempNewDirectoryURL = _tempNewDirectoryURL;
-@synthesize oldURL = _oldURL;
 @synthesize oldTempURL = _oldTempURL;
 
 - (instancetype)initWithHost:(SUHost *)host applicationPath:(NSString *)applicationPath installationPath:(NSString *)installationPath versionComparator:(id <SUVersionComparison>)comparator
@@ -88,7 +84,7 @@
         return NO;
     }
     
-    SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:YES];
+    SUFileManager *fileManager = self.fileManager;
     
     // Update the access and mod time of our entire application before moving it into a temporary directory
     // The system periodically cleans up files by looking at the mod & access times, so we have to make sure they're up to date
@@ -195,13 +191,9 @@
         return NO;
     }
     
-    // To carry over when we resume the installation
-    self.fileManager = fileManager;
-    self.oldURL = oldURL;
-    self.installationNewTempURL = newTempURL;
-    self.tempNewDirectoryURL = tempNewDirectoryURL;
-    
     // To carry over when we clean up the installation
+    self.fileManager = fileManager;
+    self.tempNewDirectoryURL = tempNewDirectoryURL;
     self.tempOldDirectoryURL = tempOldDirectoryURL;
     self.oldTempURL = oldTempURL;
     
@@ -231,13 +223,17 @@
     return YES;
 }
 
-- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError *__autoreleasing *)error
+- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError *__autoreleasing *)__unused error
 {
+    self.fileManager = [SUFileManager fileManagerAllowingAuthorization:allowsUI];
+    
     return YES;
 }
 
 - (BOOL)performThirdStage:(NSError * __autoreleasing *)error
 {
+    // Note: we must do most installation work in the third stage due to relying on our application sitting in temporary directories.
+    // It must not be possible for our update to sit in temporary directories for a very long time.
     return [self startInstallationToURL:[NSURL fileURLWithPath:self.installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:self.applicationPath] withHost:self.host error:error];
 }
 
