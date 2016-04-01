@@ -388,7 +388,7 @@
     }
     
     NSXPCConnection *launcherConnection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.InstallerLauncher"];
-    launcherConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(InstallerLauncherProtocol)];
+    launcherConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerLauncherProtocol)];
     [launcherConnection resume];
     
     [launcherConnection.remoteObjectProxy launchInstallerAtPath:relaunchToolPath withArguments:@[hostBundleIdentifier] completion:^(BOOL success) {

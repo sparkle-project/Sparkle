@@ -23,6 +23,7 @@
 #import "SUAutomaticUpdateDriver.h"
 #import "SUProbeInstallStatus.h"
 #import "SUAppcastItem.h"
+#import "SUUpdaterPermission.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -43,6 +44,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (strong) id <SUUpdateDriver> driver;
 @property (strong) SUHost *host;
 @property (nonatomic, readonly) SUUpdaterSettings *updaterSettings;
+@property (nonatomic, readonly) SUUpdaterPermission *updaterPermission;
 
 @end
 
@@ -55,6 +57,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize driver;
 @synthesize host;
 @synthesize updaterSettings = _updaterSettings;
+@synthesize updaterPermission = _updaterPermission;
 @synthesize sparkleBundle;
 
 - (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)theDelegate
@@ -72,6 +75,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         host = [[SUHost alloc] initWithBundle:bundle];
         
         _updaterSettings = [[SUUpdaterSettings alloc] initWithHostBundle:bundle];
+        _updaterPermission = [[SUUpdaterPermission alloc] init];
         
         _userDriver = userDriver;
         
@@ -300,31 +304,33 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
     //	Wouldn't want to annoy users on dial-up by establishing a connection every
     //	hour or so:
     
-    id <SUUpdateDriver> updateDriver;
-    if ([self automaticallyDownloadsUpdates] && [self allowsAutomaticUpdates] && ![SUProbeInstallStatus probeInstallerInProgressForHost:self.host]) {
-        updateDriver =
-        [[SUAutomaticUpdateDriver alloc]
-         initWithHost:self.host
-         sparkleBundle:self.sparkleBundle
-         updater:self
-         updaterDelegate:self.delegate];
-    } else {
-        updateDriver =
-        [[SUScheduledUpdateDriver alloc]
-         initWithHost:self.host
-         allowsAutomaticUpdates:[self allowsAutomaticUpdates]
-         sparkleBundle:self.sparkleBundle
-         updater:self
-         userDriver:self.userDriver
-         updaterDelegate:self.delegate];
-    }
-    
-    // We don't want the reachability check to act on the driver if the updater is going near death
-    __weak SUUpdater *updater = self;
-    NSURL *feedURL = [updater feedURL];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        SUCheckForUpdatesInBgReachabilityCheck(updater, updateDriver, feedURL);
-    });
+    [self allowsAutomaticUpdatesWithCompletion:^(BOOL allowsAutomaticUpdates) {
+        id <SUUpdateDriver> updateDriver;
+        if ([self automaticallyDownloadsUpdates] && allowsAutomaticUpdates && ![SUProbeInstallStatus probeInstallerInProgressForHost:self.host]) {
+            updateDriver =
+            [[SUAutomaticUpdateDriver alloc]
+             initWithHost:self.host
+             sparkleBundle:self.sparkleBundle
+             updater:self
+             updaterDelegate:self.delegate];
+        } else {
+            updateDriver =
+            [[SUScheduledUpdateDriver alloc]
+             initWithHost:self.host
+             allowsAutomaticUpdates:allowsAutomaticUpdates
+             sparkleBundle:self.sparkleBundle
+             updater:self
+             userDriver:self.userDriver
+             updaterDelegate:self.delegate];
+        }
+        
+        // We don't want the reachability check to act on the driver if the updater is going near death
+        __weak SUUpdater *updater = self;
+        NSURL *feedURL = [updater feedURL];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            SUCheckForUpdatesInBgReachabilityCheck(updater, updateDriver, feedURL);
+        });
+    }];
 }
 
 - (void)checkForUpdates
@@ -335,8 +341,10 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
         return;
     }
     
-    id <SUUpdateDriver> theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithHost:self.host allowsAutomaticUpdates:[self allowsAutomaticUpdates] sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
-    [self checkForUpdatesWithDriver:theUpdateDriver];
+    [self allowsAutomaticUpdatesWithCompletion:^(BOOL allowsAutomaticUpdates) {
+        id <SUUpdateDriver> theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithHost:self.host allowsAutomaticUpdates:allowsAutomaticUpdates sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
+        [self checkForUpdatesWithDriver:theUpdateDriver];
+    }];
 }
 
 - (void)checkForUpdateInformation
@@ -443,10 +451,16 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
     return [self.updaterSettings automaticallyDownloadsUpdates];
 }
 
-- (BOOL)allowsAutomaticUpdates
+- (void)allowsAutomaticUpdatesWithCompletion:(void (^)(BOOL))completionHandler
 {
     NSNumber *developerAllowsAutomaticUpdates = [self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
-    return (developerAllowsAutomaticUpdates == nil || developerAllowsAutomaticUpdates.boolValue) && [[NSFileManager defaultManager] isWritableFileAtPath:self.host.bundlePath];
+    if (developerAllowsAutomaticUpdates != nil && !developerAllowsAutomaticUpdates.boolValue) {
+        completionHandler(NO);
+    } else {
+        [self.updaterPermission testUpdateWritabilityAtPath:self.host.bundlePath completion:^(BOOL isWritable) {
+            completionHandler(isWritable);
+        }];
+    }
 }
 
 - (void)setFeedURL:(NSURL *)feedURL

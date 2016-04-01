@@ -11,5 +11,5 @@
 
 // Non-sandboxed XPC service used for launching our installer
 // This is necessary for sandboxed applications
-@interface SUInstallerLauncher : NSObject <InstallerLauncherProtocol>
+@interface SUInstallerLauncher : NSObject <SUInstallerLauncherProtocol>
 @end

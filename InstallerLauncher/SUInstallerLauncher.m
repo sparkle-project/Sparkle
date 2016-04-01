@@ -35,4 +35,9 @@
     });
 }
 
+- (void)testWritabilityAtPath:(NSString *)path completion:(void (^)(BOOL isWritable))completionHandler
+{
+    completionHandler([[NSFileManager defaultManager] isWritableFileAtPath:path]);
+}
+
 @end

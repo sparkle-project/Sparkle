@@ -174,6 +174,8 @@
 		726E07BF1CAF0C6C001A286B /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
 		726E07C01CAF15B7001A286B /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
 		726E07C21CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */; };
+		726E07E91CAF30C0001A286B /* SUUpdaterPermission.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E07E71CAF30C0001A286B /* SUUpdaterPermission.h */; };
+		726E07EA1CAF30C0001A286B /* SUUpdaterPermission.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E07E81CAF30C0001A286B /* SUUpdaterPermission.m */; };
 		726E4A0E1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E4A0D1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		726E4A101C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E4A0F1C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		726E4A1B1C86C88F00C57C6A /* TestAppHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E4A1A1C86C88F00C57C6A /* TestAppHelper.m */; };
@@ -710,6 +712,8 @@
 		726E07B31CAF08D6001A286B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		726E07B51CAF08D6001A286B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigInstallerLauncher.xcconfig; sourceTree = "<group>"; };
+		726E07E71CAF30C0001A286B /* SUUpdaterPermission.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdaterPermission.h; sourceTree = "<group>"; };
+		726E07E81CAF30C0001A286B /* SUUpdaterPermission.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterPermission.m; sourceTree = "<group>"; };
 		726E4A0D1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStandardUserDriverUIDelegate.h; sourceTree = "<group>"; };
 		726E4A0F1C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStandardUserDriverRemoteDelegate.h; sourceTree = "<group>"; };
 		726E4A111C86C44A00C57C6A /* Sparkle-Test-App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Sparkle-Test-App.entitlements"; sourceTree = "<group>"; };
@@ -1269,6 +1273,8 @@
 				61CFB2C20E38496B007A1735 /* Drivers */,
 				61B5F8E309C4CE3C00B25A18 /* SUUpdater.h */,
 				61B5F8E409C4CE3C00B25A18 /* SUUpdater.m */,
+				726E07E71CAF30C0001A286B /* SUUpdaterPermission.h */,
+				726E07E81CAF30C0001A286B /* SUUpdaterPermission.m */,
 				726E078B1CA891E9001A286B /* SUUpdaterSettings.h */,
 				726E078C1CA891E9001A286B /* SUUpdaterSettings.m */,
 				72A6F9891C94E2D6005F404C /* SUUpdaterDelegate.h */,
@@ -1440,6 +1446,7 @@
 				726E07601CA4E9A5001A286B /* SUInstallationInputData.h in Headers */,
 				725602D51C83551C00DAA70E /* SUApplicationInfo.h in Headers */,
 				767B61AC1972D488004E0C3C /* SUGuidedPackageInstaller.h in Headers */,
+				726E07E91CAF30C0001A286B /* SUUpdaterPermission.h in Headers */,
 				618FA5010DAE88B40026945C /* SUInstaller.h in Headers */,
 				55C14F06136EF6DB00649790 /* SULog.h in Headers */,
 				726F2CE51BC9C33D001971A4 /* SUOperatingSystem.h in Headers */,
@@ -2070,6 +2077,7 @@
 				729746411C9119F300FC134E /* SULocalMessagePort.m in Sources */,
 				726E07611CA4E9A5001A286B /* SUInstallationInputData.m in Sources */,
 				7275F9C21B5F1F2900B1D19E /* SUFileManager.m in Sources */,
+				726E07EA1CAF30C0001A286B /* SUUpdaterPermission.m in Sources */,
 				725CB95B1C7121830064365A /* SUStandardUserDriver.m in Sources */,
 				61EF67560E25B58D00F754E0 /* SUHost.m in Sources */,
 				55C14F07136EF6DB00649790 /* SULog.m in Sources */,

@@ -67,8 +67,6 @@ SU_EXPORT @interface SUUpdater : NSObject
 
 @property (nonatomic) BOOL sendsSystemProfile;
 
-@property (nonatomic, readonly) BOOL allowsAutomaticUpdates;
-
 @property (nonatomic) BOOL automaticallyDownloadsUpdates;
 
 /*!
