@@ -30,19 +30,10 @@
  */
 static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 
-/*!
- * Our periodic update time interval used after we finished the first stage of installation.
- * We use this to prevent the system from cleaning up files in temporary directories that we still need
- * The system does this check daily (every 24 hours) but takes out files older than 3 days by default
- * We should go by a significantly smaller interval to allow some leeway; "around" 3 hours seems fine
- */
-static const NSTimeInterval SUPeriodicUpdateTimeInterval = 60 * 60 * 3;
-
 @interface AppInstaller ()
 
 @property (nonatomic, strong) TerminationListener *terminationListener;
 @property (nonatomic, strong) SUStatusController *statusController;
-@property (nonatomic) NSTimer *periodicUpdateTimer;
 
 @property (nonatomic, readonly, copy) NSString *hostBundleIdentifier;
 @property (nonatomic) SUHost *host;
@@ -68,7 +59,6 @@ static const NSTimeInterval SUPeriodicUpdateTimeInterval = 60 * 60 * 3;
 @synthesize hostBundleIdentifier = _hostBundleIdentifier;
 @synthesize terminationListener = _terminationListener;
 @synthesize statusController = _statusController;
-@synthesize periodicUpdateTimer = _periodicUpdateTimer;
 @synthesize localPort = _localPort;
 @synthesize remotePort = _remotePort;
 @synthesize host = _host;
@@ -490,9 +480,6 @@ static const NSTimeInterval SUPeriodicUpdateTimeInterval = 60 * 60 * 3;
             self.performedStage3Installation = YES;
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.periodicUpdateTimer invalidate];
-                self.periodicUpdateTimer = nil;
-                
                 NSString *installationPath = [SUInstaller installationPathForHost:self.host];
                 
                 if (self.shouldRelaunch) {
