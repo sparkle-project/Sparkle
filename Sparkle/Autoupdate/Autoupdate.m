@@ -33,39 +33,8 @@ int main(int __unused argc, const char __unused *argv[])
     @autoreleasepool
     {
         NSArray *args = [[NSProcessInfo processInfo] arguments];
-        if (args.count != 3) {
+        if (args.count != 2) {
             return EXIT_FAILURE;
-        }
-        
-        BOOL shouldRelaunchTool = [args[2] boolValue];
-        
-        if (shouldRelaunchTool) {
-            NSURL *mainBundleURL = [[NSBundle mainBundle] bundleURL];
-            
-            if (mainBundleURL == nil) {
-                SULog(@"Error: No bundle path located found for main bundle!");
-                return EXIT_FAILURE;
-            }
-            
-            NSMutableArray *launchArguments = [args mutableCopy];
-            [launchArguments removeObjectAtIndex:0]; // argv[0] is not important
-            launchArguments[launchArguments.count - 1] = @"0"; // we don't want to relaunch the tool this time
-            
-            // We want to launch our tool through LaunchServices, not through a NSTask instance
-            // This has a few advantages: one being that we don't inherit the privileges of the parent owner.
-            // Another is if we try to spawn a task, it may be prematurely terminated if the parent is like a XPC service,
-            // which is what the shouldRelaunchTool flag exists to prevent. Thus, a caller may specify to relaunch the tool again and
-            // wait until we exit. When we exit the first time, the caller will be notified, and we can launch a second instance through LS.
-            // The caller may not have AppKit available which is why it may not launch through LS itself.
-            NSError *launchError = nil;
-            NSRunningApplication *newRunningApplication = [[NSWorkspace sharedWorkspace] launchApplicationAtURL:mainBundleURL options:(NSWorkspaceLaunchOptions)(NSWorkspaceLaunchDefault | NSWorkspaceLaunchNewInstance) configuration:@{NSWorkspaceLaunchConfigurationArguments : [launchArguments copy]} error:&launchError];
-            
-            if (newRunningApplication == nil) {
-                SULog(@"Failed to create second instance of tool with error: %@", launchError);
-                return EXIT_FAILURE;
-            }
-            
-            return EXIT_SUCCESS;
         }
         
         NSString *hostBundleIdentifier = args[1];

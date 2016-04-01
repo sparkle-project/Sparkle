@@ -203,8 +203,8 @@ static NSString * const UPDATED_VERSION = @"2.0";
             self.webServer = webServer;
             
             // Show the Settings window
-            self.updateSettingsWindowController = [[SURemoteUpdateSettingsWindowController alloc] init];
-            //self.updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] init];
+            //self.updateSettingsWindowController = [[SURemoteUpdateSettingsWindowController alloc] init];
+            self.updateSettingsWindowController = [[SUUpdateSettingsWindowController alloc] init];
             
             [self.updateSettingsWindowController showWindow:nil];
         });

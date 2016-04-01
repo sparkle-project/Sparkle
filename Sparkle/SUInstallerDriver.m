@@ -20,6 +20,7 @@
 #import "SUFileManager.h"
 #import "SUSecureCoding.h"
 #import "SUInstallationInputData.h"
+#import "SUInstallerLauncherProtocol.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -173,24 +174,18 @@
     return YES;
 }
 
-- (BOOL)launchInstallTool:(NSError * __autoreleasing *)error
+- (void)launchInstallToolWithCompletion:(void (^)(NSError  * _Nullable ))completionHandler
 {
-    if (![self setUpLocalPort:error]) {
-        return NO;
+    NSError *localPortError = nil;
+    if (![self setUpLocalPort:&localPortError]) {
+        completionHandler(localPortError);
     }
     
-    NSError *launchError = nil;
-    if (![self launchAutoUpdate:&launchError]) {
-        if (error != NULL) {
-            *error = launchError;
-        }
-        return NO;
-    }
-    return YES;
+    [self launchAutoUpdateWithCompletion:completionHandler];
 }
 
 // This can be called multiple times (eg: if a delta update fails, this may be called again with a regular update item)
-- (BOOL)extractDownloadPath:(NSString *)downloadPath withUpdateItem:(SUAppcastItem *)updateItem temporaryDirectory:(NSString *)temporaryDirectory error:(NSError * __autoreleasing *)error
+- (void)extractDownloadPath:(NSString *)downloadPath withUpdateItem:(SUAppcastItem *)updateItem temporaryDirectory:(NSString *)temporaryDirectory completion:(void (^)(NSError * _Nullable))completionHandler
 {
     self.updateItem = updateItem;
     self.temporaryDirectory = temporaryDirectory;
@@ -199,13 +194,12 @@
     self.currentStage = SUInstallerNotStarted;
     
     if (self.localPort == nil) {
-        return [self launchInstallTool:error];
+        [self launchInstallToolWithCompletion:completionHandler];
     } else {
         // The Install tool is already alive; just send out installation input data again
         [self sendInstallationData];
+        completionHandler(nil);
     }
-    
-    return YES;
 }
 
 - (void)sendInstallationData
@@ -327,7 +321,7 @@
     return YES;
 }
 
-- (BOOL)launchAutoUpdate:(NSError * __autoreleasing *)outError
+- (void)launchAutoUpdateWithCompletion:(void (^)(NSError *_Nullable))completionHandler
 {
     NSBundle *sparkleBundle = self.sparkleBundle;
     
@@ -349,93 +343,68 @@
         // We only need to run our copy of the app by spawning a task
         // Since we are copying the app to a directory that is write-accessible, we don't need to muck with owner/group IDs
         if ([self preparePathForRelaunchTool:targetPath error:&error] && [fileManager copyItemAtURL:relaunchURLToCopy toURL:targetURL error:&error]) {
-            // Releasing quarantine is definitely important (didn't used to be) now that we launch AutoUpdate via LaunchServices
-            // Perhaps even if this fails, we should continue on in the hopes maybe this isn't a fatal error though
-            NSError *quarantineError = nil;
-            if (![fileManager releaseItemFromQuarantineAtRootURL:targetURL error:&quarantineError]) {
-                SULog(@"Failed to release quarantine on %@ with error %@", targetPath, quarantineError);
-            }
             relaunchPath = targetPath;
         } else {
-            if (outError != NULL) {
-                *outError =
-                [NSError
-                 errorWithDomain:SUSparkleErrorDomain
-                 code:SURelaunchError
-                 userInfo:@{
-                            NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil),
-                            NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", relaunchPathToCopy, targetPath, (error ? [error localizedDescription] : @"")]
-                            }
-                 ];
-            }
+            NSError *prepareError =
+            [NSError
+             errorWithDomain:SUSparkleErrorDomain
+             code:SURelaunchError
+             userInfo:@{
+                        NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil),
+                        NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", relaunchPathToCopy, targetPath, (error ? [error localizedDescription] : @"")]
+                        }
+             ];
             
-            return NO;
+            completionHandler(prepareError);
+            return;
         }
     }
     
     NSString *relaunchToolPath = [[NSBundle bundleWithPath:relaunchPath] executablePath];
     if (!relaunchToolPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath]) {
         // Note that we explicitly use the host app's name here, since updating plugin for Mail relaunches Mail, not just the plugin.
-        if (outError != NULL) {
-            *outError =
-            [NSError
-             errorWithDomain:SUSparkleErrorDomain
-             code:SURelaunchError
-             userInfo:@{
-                        NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [self.host name]],
-                        NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@)", relaunchPath]
-                        }
-             ];
-        }
+        NSError *error =
+        [NSError
+         errorWithDomain:SUSparkleErrorDomain
+         code:SURelaunchError
+         userInfo:@{
+                    NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [self.host name]],
+                    NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@)", relaunchPath]
+                    }
+         ];
         
         // We intentionally don't abandon the update here so that the host won't initiate another.
-        return NO;
+        completionHandler(error);
+        return;
     }
     
     NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
     if (hostBundleIdentifier == nil) {
-        if (outError != NULL) {
-            *outError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while finding the application's bundle identifier. Please try again later.", nil) }];
-        }
-        return NO;
-    }
-    
-    // Make sure the launched task finishes & replies back.
-    // If it succeeds, it will have launched a second instance of the tool through LaunchServices
-    // This is necessary if we are a XPC process, because otherwise we risk exiting prematurely
-    // Further, we don't launch through LS here because we don't want to reference AppKit here
-    int terminationStatus = 0;
-    BOOL taskDidLaunch = NO;
-    @try {
-        NSTask *launchedTask = [NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:@[hostBundleIdentifier, @"1"]];
-        [launchedTask waitUntilExit];
-        taskDidLaunch = YES;
-        terminationStatus = launchedTask.terminationStatus;
-    } @catch (NSException *exception) {
-        SULog(@"Raised exception when launching update tool: %@", exception);
-    }
-    
-    if (!taskDidLaunch || terminationStatus != 0) {
-        if (taskDidLaunch) {
-            SULog(@"Update tool failed with exit code: %d", terminationStatus);
-        }
+        NSError *error =
+        [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while finding the application's bundle identifier. Please try again later.", nil) }];
         
-        if (outError != NULL) {
-            *outError =
-            [NSError
-             errorWithDomain:SUSparkleErrorDomain
-             code:SURelaunchError
-             userInfo:@{
-                        NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while launching the updater. Please try again later.", nil),
-                        NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't launch relauncher at %@", relaunchToolPath]
-                        }
-             ];
-        }
-        
-        return NO;
+        completionHandler(error);
+        return;
     }
     
-    return YES;
+    NSXPCConnection *launcherConnection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.InstallerLauncher"];
+    launcherConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(InstallerLauncherProtocol)];
+    [launcherConnection resume];
+    
+    [launcherConnection.remoteObjectProxy launchInstallerAtPath:relaunchToolPath withArguments:@[hostBundleIdentifier] completion:^(BOOL success) {
+        [launcherConnection invalidate];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!success) {
+                NSError *error =
+                [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while launching the installer. Please try again later.", nil) }];
+                
+                completionHandler(error);
+            } else {
+                completionHandler(nil);
+            }
+        });
+    }];
 }
 
 - (BOOL)mayUpdateAndRestart

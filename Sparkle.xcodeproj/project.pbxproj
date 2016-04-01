@@ -167,6 +167,13 @@
 		726E076D1CA66180001A286B /* SUBinaryDeltaUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E9380FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m */; };
 		726E078D1CA891E9001A286B /* SUUpdaterSettings.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E078B1CA891E9001A286B /* SUUpdaterSettings.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		726E078E1CA891E9001A286B /* SUUpdaterSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E078C1CA891E9001A286B /* SUUpdaterSettings.m */; };
+		726E07B21CAF08D6001A286B /* SUInstallerLauncher.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E07B11CAF08D6001A286B /* SUInstallerLauncher.m */; };
+		726E07B41CAF08D6001A286B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E07B31CAF08D6001A286B /* main.m */; };
+		726E07B81CAF08D6001A286B /* InstallerLauncher.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 726E07AD1CAF08D6001A286B /* InstallerLauncher.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		726E07BE1CAF0C5C001A286B /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
+		726E07BF1CAF0C6C001A286B /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
+		726E07C01CAF15B7001A286B /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
+		726E07C21CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */; };
 		726E4A0E1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E4A0D1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		726E4A101C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E4A0F1C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		726E4A1B1C86C88F00C57C6A /* TestAppHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E4A1A1C86C88F00C57C6A /* TestAppHelper.m */; };
@@ -354,6 +361,13 @@
 			remoteGlobalIDString = 61B5F90109C4CEE200B25A18;
 			remoteInfo = "Sparkle Test App";
 		};
+		726E07B61CAF08D6001A286B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 726E07AC1CAF08D6001A286B;
+			remoteInfo = InstallerLauncher;
+		};
 		726E4A1F1C86C88F00C57C6A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -394,6 +408,17 @@
 				142E0E0019A6954400E4312B /* Sparkle.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		726E07BD1CAF08D6001A286B /* Embed XPC Services */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
+			dstSubfolderSpec = 16;
+			files = (
+				726E07B81CAF08D6001A286B /* InstallerLauncher.xpc in Embed XPC Services */,
+			);
+			name = "Embed XPC Services";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		726E4A261C86C88F00C57C6A /* Embed XPC Services */ = {
@@ -678,6 +703,13 @@
 		726E076C1CA64B9C001A286B /* SUUnarchiverProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUnarchiverProtocol.h; sourceTree = "<group>"; };
 		726E078B1CA891E9001A286B /* SUUpdaterSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdaterSettings.h; sourceTree = "<group>"; };
 		726E078C1CA891E9001A286B /* SUUpdaterSettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterSettings.m; sourceTree = "<group>"; };
+		726E07AD1CAF08D6001A286B /* InstallerLauncher.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = InstallerLauncher.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+		726E07AF1CAF08D6001A286B /* SUInstallerLauncherProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUInstallerLauncherProtocol.h; sourceTree = "<group>"; };
+		726E07B01CAF08D6001A286B /* SUInstallerLauncher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUInstallerLauncher.h; sourceTree = "<group>"; };
+		726E07B11CAF08D6001A286B /* SUInstallerLauncher.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SUInstallerLauncher.m; sourceTree = "<group>"; };
+		726E07B31CAF08D6001A286B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		726E07B51CAF08D6001A286B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigInstallerLauncher.xcconfig; sourceTree = "<group>"; };
 		726E4A0D1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStandardUserDriverUIDelegate.h; sourceTree = "<group>"; };
 		726E4A0F1C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStandardUserDriverRemoteDelegate.h; sourceTree = "<group>"; };
 		726E4A111C86C44A00C57C6A /* Sparkle-Test-App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Sparkle-Test-App.entitlements"; sourceTree = "<group>"; };
@@ -833,6 +865,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		726E07AA1CAF08D6001A286B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		726E4A131C86C88F00C57C6A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -866,6 +905,7 @@
 				8DC2EF5B0486A6940098B216 /* Sparkle.framework */,
 				726B2B5D1C645FC900388755 /* UI Tests.xctest */,
 				726E4A161C86C88F00C57C6A /* TestAppHelper.xpc */,
+				726E07AD1CAF08D6001A286B /* InstallerLauncher.xpc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -984,6 +1024,7 @@
 				089C1665FE841158C02AAC07 /* Framework Resources */,
 				61B5F8F309C4CE5900B25A18 /* Other Sources */,
 				61F83F6E0DBFE07A006FDD30 /* Update Control */,
+				726E07AE1CAF08D6001A286B /* InstallerLauncher */,
 				61299B3A09CB056100B7442F /* User Interface */,
 			);
 			path = Sparkle;
@@ -1263,6 +1304,19 @@
 			path = "UI Tests";
 			sourceTree = "<group>";
 		};
+		726E07AE1CAF08D6001A286B /* InstallerLauncher */ = {
+			isa = PBXGroup;
+			children = (
+				726E07AF1CAF08D6001A286B /* SUInstallerLauncherProtocol.h */,
+				726E07B01CAF08D6001A286B /* SUInstallerLauncher.h */,
+				726E07B11CAF08D6001A286B /* SUInstallerLauncher.m */,
+				726E07B31CAF08D6001A286B /* main.m */,
+				726E07B51CAF08D6001A286B /* Info.plist */,
+			);
+			name = InstallerLauncher;
+			path = ../InstallerLauncher;
+			sourceTree = "<group>";
+		};
 		726E4A171C86C88F00C57C6A /* TestAppHelper */ = {
 			isa = PBXGroup;
 			children = (
@@ -1338,6 +1392,7 @@
 				729F10FE1C65A9B500DFCCC5 /* ConfigUITestCoverage.xcconfig */,
 				729F10FF1C65A9B500DFCCC5 /* ConfigUITestDebug.xcconfig */,
 				729F11001C65A9B500DFCCC5 /* ConfigUITestRelease.xcconfig */,
+				726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */,
 				14732BC91960F70A00593899 /* make-release-package.sh */,
 				14652F7919A93E5F00959E44 /* set-git-version-info.sh */,
 				146EC84E19A68CF8004A50C5 /* Sparkle.podspec */,
@@ -1546,6 +1601,23 @@
 			productReference = 726B2B5D1C645FC900388755 /* UI Tests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		726E07AC1CAF08D6001A286B /* InstallerLauncher */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 726E07B91CAF08D6001A286B /* Build configuration list for PBXNativeTarget "InstallerLauncher" */;
+			buildPhases = (
+				726E07A91CAF08D6001A286B /* Sources */,
+				726E07AA1CAF08D6001A286B /* Frameworks */,
+				726E07AB1CAF08D6001A286B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = InstallerLauncher;
+			productName = InstallerLauncher;
+			productReference = 726E07AD1CAF08D6001A286B /* InstallerLauncher.xpc */;
+			productType = "com.apple.product-type.xpc-service";
+		};
 		726E4A151C86C88F00C57C6A /* TestAppHelper */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 726E4A221C86C88F00C57C6A /* Build configuration list for PBXNativeTarget "TestAppHelper" */;
@@ -1575,11 +1647,13 @@
 				6131B1910DDCDE32005215F0 /* Run Script: Set Git Version Info */,
 				6195D4B40E40505A00D41A50 /* Run Script: Link fr_CA to fr */,
 				61E31A85103299750051D188 /* Run Script: Link pt to pt_BR */,
+				726E07BD1CAF08D6001A286B /* Embed XPC Services */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				55C14F97136F044100649790 /* PBXTargetDependency */,
+				726E07B71CAF08D6001A286B /* PBXTargetDependency */,
 			);
 			name = Sparkle;
 			productInstallPath = "$(HOME)/Library/Frameworks";
@@ -1611,6 +1685,9 @@
 					726B2B5C1C645FC900388755 = {
 						CreatedOnToolsVersion = 7.2.1;
 						TestTargetID = 61B5F90109C4CEE200B25A18;
+					};
+					726E07AC1CAF08D6001A286B = {
+						CreatedOnToolsVersion = 7.3;
 					};
 					726E4A151C86C88F00C57C6A = {
 						CreatedOnToolsVersion = 7.2.1;
@@ -1680,6 +1757,7 @@
 			projectRoot = "";
 			targets = (
 				8DC2EF4F0486A6940098B216 /* Sparkle */,
+				726E07AC1CAF08D6001A286B /* InstallerLauncher */,
 				61B5F90109C4CEE200B25A18 /* Sparkle Test App */,
 				726E4A151C86C88F00C57C6A /* TestAppHelper */,
 				612279D80DB5470200AB99EA /* Sparkle Unit Tests */,
@@ -1744,6 +1822,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		726E07AB1CAF08D6001A286B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		726E4A141C86C88F00C57C6A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1759,6 +1844,7 @@
 				615AE3D00D64DC40001CA7BD /* SUModelTranslation.plist in Resources */,
 				55C14BEF136EF21700649790 /* SUStatus.xib in Resources */,
 				55C14C04136EF26100649790 /* SUUpdateAlert.xib in Resources */,
+				726E07C21CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig in Resources */,
 				55C14C19136EF2C700649790 /* SUUpdatePermissionPrompt.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1940,6 +2026,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		726E07A91CAF08D6001A286B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				726E07C01CAF15B7001A286B /* SULog.m in Sources */,
+				726E07BF1CAF0C6C001A286B /* SUConstants.m in Sources */,
+				726E07BE1CAF0C5C001A286B /* SUFileManager.m in Sources */,
+				726E07B41CAF08D6001A286B /* main.m in Sources */,
+				726E07B21CAF08D6001A286B /* SUInstallerLauncher.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		726E4A121C86C88F00C57C6A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2065,6 +2163,11 @@
 			isa = PBXTargetDependency;
 			target = 61B5F90109C4CEE200B25A18 /* Sparkle Test App */;
 			targetProxy = 726B2B621C645FC900388755 /* PBXContainerItemProxy */;
+		};
+		726E07B71CAF08D6001A286B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 726E07AC1CAF08D6001A286B /* InstallerLauncher */;
+			targetProxy = 726E07B61CAF08D6001A286B /* PBXContainerItemProxy */;
 		};
 		726E4A201C86C88F00C57C6A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2279,6 +2382,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 			};
 			name = Coverage;
 		};
@@ -2332,6 +2436,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 			};
 			name = Debug;
 		};
@@ -2339,6 +2444,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 			};
 			name = Release;
 		};
@@ -2438,6 +2544,30 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+			};
+			name = Release;
+		};
+		726E07BA1CAF08D6001A286B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = InstallerLauncher/Info.plist;
+			};
+			name = Debug;
+		};
+		726E07BB1CAF08D6001A286B /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = InstallerLauncher/Info.plist;
+			};
+			name = Coverage;
+		};
+		726E07BC1CAF08D6001A286B /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = InstallerLauncher/Info.plist;
 			};
 			name = Release;
 		};
@@ -2564,6 +2694,15 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		726E07B91CAF08D6001A286B /* Build configuration list for PBXNativeTarget "InstallerLauncher" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				726E07BA1CAF08D6001A286B /* Debug */,
+				726E07BB1CAF08D6001A286B /* Coverage */,
+				726E07BC1CAF08D6001A286B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		726E4A221C86C88F00C57C6A /* Build configuration list for PBXNativeTarget "TestAppHelper" */ = {
 			isa = XCConfigurationList;

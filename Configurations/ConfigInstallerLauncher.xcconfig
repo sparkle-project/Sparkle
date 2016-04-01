@@ -1,0 +1,6 @@
+// Installer Launcher only
+
+INFOPLIST_FILE = InstallerLauncher/Info.plist
+WRAPPER_EXTENSION = xpc
+PRODUCT_BUNDLE_IDENTIFIER = org.sparkle-project.InstallerLauncher
+CODE_SIGN_IDENTITY = -
