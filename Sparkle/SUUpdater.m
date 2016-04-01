@@ -69,7 +69,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 + (SUUpdater *)updaterForBundle:(NSBundle *)bundle
 {
     if (bundle == nil) bundle = [NSBundle mainBundle];
-    id updater = sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]];
+    id updater = [sharedUpdaters objectForKey:[NSValue valueWithNonretainedObject:bundle]];
     if (updater == nil) {
         updater = [[[self class] alloc] initForBundle:bundle];
     }
@@ -94,7 +94,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         [self registerAsObserver];
     }
 
-    id updater = sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]];
+    id updater = [sharedUpdaters objectForKey:[NSValue valueWithNonretainedObject:bundle]];
     if (updater)
 	{
         self = updater;
@@ -104,7 +104,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         if (sharedUpdaters == nil) {
             sharedUpdaters = [[NSMutableDictionary alloc] init];
         }
-        sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]] = self;
+        [sharedUpdaters setObject:self forKey:[NSValue valueWithNonretainedObject:bundle]];
         host = [[SUHost alloc] initWithBundle:bundle];
 
         // This runs the permission prompt if needed, but never before the app has finished launching because the runloop won't run before that
@@ -252,7 +252,10 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 - (void)putFeedURLIntoDictionary:(NSMutableDictionary *)theDict // You release this.
 {
-    theDict[@"feedURL"] = [self feedURL];
+    NSURL *feedURL = [self feedURL];
+    if (feedURL != nil) {
+        [theDict setObject:feedURL forKey:@"feedURL"];
+    }
 }
 
 - (void)checkForUpdatesInBgReachabilityCheckWithDriver:(SUUpdateDriver *)inDriver /* RUNS ON ITS OWN THREAD */
@@ -274,7 +277,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 				[self putFeedURLIntoDictionary:theDict];	// Get feed URL on main thread, it's not safe to call elsewhere.
             });
 
-            const char *hostname = [[(NSURL *)theDict[@"feedURL"] host] cStringUsingEncoding:NSUTF8StringEncoding];
+            const char *hostname = [[(NSURL *)[theDict objectForKey:@"feedURL"] host] cStringUsingEncoding:NSUTF8StringEncoding];
             SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(NULL, hostname);
             Boolean reachabilityResult = NO;
             // If the feed's using a file:// URL, we won't be able to use reachability.
@@ -548,7 +551,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     // Build up the parameterized URL.
     NSMutableArray *parameterStrings = [NSMutableArray array];
     for (NSDictionary *currentProfileInfo in parameters) {
-        [parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", [[currentProfileInfo[@"key"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], [[currentProfileInfo[@"value"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+        [parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", [[[currentProfileInfo objectForKey:@"key"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], [[[currentProfileInfo objectForKey:@"value"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
     }
 
     NSString *separatorCharacter = @"?";

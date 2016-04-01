@@ -84,12 +84,28 @@
     return comparator;
 }
 
-- (BOOL)isItemNewer:(SUAppcastItem *)ui
++ (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator
 {
-    return [[self versionComparator] compareVersion:[self.host version] toVersion:[ui versionString]] == NSOrderedAscending;
+    SUAppcastItem *item = nil;
+    for(SUAppcastItem *candidate in appcastItems) {
+        if ([[self class] hostSupportsItem:candidate]) {
+            if (!item || [comparator compareVersion:item.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
+                item = candidate;
+            }
+        }
+    }
+    
+    if (item && deltaItem) {
+        SUAppcastItem *deltaUpdateItem = [[item deltaUpdates] objectForKey:hostVersion];
+        if (deltaUpdateItem && [[self class] hostSupportsItem:deltaUpdateItem]) {
+            *deltaItem = deltaUpdateItem;
+        }
+    }
+    
+    return item;
 }
 
-- (BOOL)hostSatisfiesMinimumSystemVersionForItem:(SUAppcastItem *)ui
++ (BOOL)hostSatisfiesMinimumSystemVersionForItem:(SUAppcastItem *)ui
 {
 	if ([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) { return YES; }
 
@@ -103,7 +119,7 @@
     return minimumVersionOK;
 }
 
-- (BOOL)hostSatisfiesMaximumSystemVersionForItem:(SUAppcastItem *)ui
++ (BOOL)hostSatisfiesMaximumSystemVersionForItem:(SUAppcastItem *)ui
 {
     if ([ui maximumSystemVersion] == nil || [[ui maximumSystemVersion] isEqualToString:@""]) { return YES; }
     
@@ -117,9 +133,14 @@
     return maximumVersionOK;
 }
 
-- (BOOL)hostSupportsItem:(SUAppcastItem *)ui
++ (BOOL)hostSupportsItem:(SUAppcastItem *)ui
 {
     return [self hostSatisfiesMinimumSystemVersionForItem:ui] && [self hostSatisfiesMaximumSystemVersionForItem:ui];
+}
+
+- (BOOL)isItemNewer:(SUAppcastItem *)ui
+{
+    return [[self versionComparator] compareVersion:[self.host version] toVersion:[ui versionString]] == NSOrderedAscending;
 }
 
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui
@@ -138,12 +159,12 @@
 
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
 {
-    return ui && [self hostSupportsItem:ui] && [self isItemNewer:ui] && ![self itemContainsSkippedVersion:ui];
+    return ui && [[self class] hostSupportsItem:ui] && [self isItemNewer:ui] && ![self itemContainsSkippedVersion:ui];
 }
 
 - (BOOL)itemContainsApplicableUpdateRequiringNewerOS:(SUAppcastItem *)ui
 {
-    return ![self hostSatisfiesMinimumSystemVersionForItem:ui] && [self isItemNewer:ui] && ![self itemContainsVersionSkippedBecauseMinimumOSWasTooLow:ui];
+    return ![[self class] hostSatisfiesMinimumSystemVersionForItem:ui] && [self isItemNewer:ui] && ![self itemContainsVersionSkippedBecauseMinimumOSWasTooLow:ui];
 }
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac
@@ -168,27 +189,37 @@
 	}
 	else // If not, we'll take care of it ourselves.
     {
-        id<SUVersionComparison> comparator = [self versionComparator];
-        // find the best supported update, and the best update that requires a newer OS
-        for (SUAppcastItem *candidate in ac.items) {
-            if ([self hostSupportsItem:candidate]) {
-                if (!item || [comparator compareVersion:item.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
-                    item = candidate;
-                }
-            }
-            else if (![self hostSatisfiesMinimumSystemVersionForItem:candidate]) {
-                if (!itemRequiringNewOS || [comparator compareVersion:itemRequiringNewOS.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
-                    itemRequiringNewOS = candidate;
-                }
-            }
-        }
+/////<<<<<<< HEAD
+//        id<SUVersionComparison> comparator = [self versionComparator];
+//        // find the best supported update, and the best update that requires a newer OS
+//        for (SUAppcastItem *candidate in ac.items) {
+//            if ([self hostSupportsItem:candidate]) {
+//                if (!item || [comparator compareVersion:item.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
+//                    item = candidate;
+//                }
+//            }
+//            else if (![self hostSatisfiesMinimumSystemVersionForItem:candidate]) {
+//                if (!itemRequiringNewOS || [comparator compareVersion:itemRequiringNewOS.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
+//                    itemRequiringNewOS = candidate;
+//                }
+//            }
+//        }
+//        
+//        if (item) {
+//            SUAppcastItem *deltaUpdateItem = [item deltaUpdates][[self.host version]];
+//            if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem]) {
+//                self.nonDeltaUpdateItem = item;
+//                item = deltaUpdateItem;
+//            }
+//=======
+        // Find the best supported update
+        SUAppcastItem *deltaUpdateItem = nil;
+        item = [[self class] bestItemFromAppcastItems:ac.items getDeltaItem:&deltaUpdateItem withHostVersion:self.host.version comparator:[self versionComparator]];
         
-        if (item) {
-            SUAppcastItem *deltaUpdateItem = [item deltaUpdates][[self.host version]];
-            if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem]) {
-                self.nonDeltaUpdateItem = item;
-                item = deltaUpdateItem;
-            }
+        if (item && deltaUpdateItem) {
+            self.nonDeltaUpdateItem = item;
+            item = deltaUpdateItem;
+//>>>>>>> upstream/master
         }
     }
 
@@ -377,7 +408,7 @@
 
 - (void)download:(NSURLDownload *)__unused download didFailWithError:(NSError *)error
 {
-    NSURL *failingUrl = error.userInfo[NSURLErrorFailingURLErrorKey];
+    NSURL *failingUrl = [error.userInfo objectForKey:NSURLErrorFailingURLErrorKey];
     if (!failingUrl) {
         failingUrl = [self.updateItem fileURL];
     }
@@ -393,7 +424,7 @@
         NSUnderlyingErrorKey: error,
     }];
     if (failingUrl) {
-        userInfo[NSURLErrorFailingURLErrorKey] = failingUrl;
+        [userInfo setObject:failingUrl forKey:NSURLErrorFailingURLErrorKey];
     }
 
     [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo]];
@@ -623,8 +654,8 @@
         NSError *errorToDisplay = error;
         int finiteRecursion=5;
         do {
-            SULog(@"Error: %@ %@ (URL %@)", errorToDisplay.localizedDescription, errorToDisplay.localizedFailureReason, errorToDisplay.userInfo[NSURLErrorFailingURLErrorKey]);
-            errorToDisplay = errorToDisplay.userInfo[NSUnderlyingErrorKey];
+            SULog(@"Error: %@ %@ (URL %@)", errorToDisplay.localizedDescription, errorToDisplay.localizedFailureReason, [errorToDisplay.userInfo objectForKey:NSURLErrorFailingURLErrorKey]);
+            errorToDisplay = [errorToDisplay.userInfo objectForKey:NSUnderlyingErrorKey];
         } while(--finiteRecursion && errorToDisplay);
     }
     if (self.download) {

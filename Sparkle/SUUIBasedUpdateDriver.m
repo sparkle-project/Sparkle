@@ -186,8 +186,11 @@
                 SULocalizedString(@"GB", @"the unit for gigabytes")];
     }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
     return [NSByteCountFormatter stringFromByteCount:value
                                           countStyle:NSByteCountFormatterCountStyleFile];
+#pragma clang diagnostic pop
 }
 
 - (void)download:(NSURLDownload *)__unused download didReceiveDataOfLength:(NSUInteger)length

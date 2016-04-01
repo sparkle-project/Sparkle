@@ -30,7 +30,10 @@
         if (!attrName) {
             continue;
         }
-        dictionary[attrName] = [attribute stringValue];
+        NSString *attributeStringValue = [attribute stringValue];
+        if (attributeStringValue != nil) {
+            [dictionary setObject:attributeStringValue forKey:attrName];
+        }
     }
     return dictionary;
 }
@@ -107,7 +110,7 @@
             dictionaryWithObject: SULocalizedString(@"An error occurred while parsing the update feed.", nil)
                           forKey: NSLocalizedDescriptionKey];
         if (error) {
-            userInfo[NSUnderlyingErrorKey] = error;
+            [userInfo setObject:error forKey:NSUnderlyingErrorKey];
         }
         [self reportError:[NSError errorWithDomain:SUSparkleErrorDomain
                                               code:SUAppcastParseError
@@ -149,10 +152,10 @@
             while (nil != node) {
                 NSString *name = [node name];
                 if (name) {
-                    NSMutableArray *nodes = nodesDict[name];
+                    NSMutableArray *nodes = [nodesDict objectForKey:name];
                     if (nodes == nil) {
                         nodes = [NSMutableArray array];
-                        nodesDict[name] = nodes;
+                        [nodesDict setObject:nodes forKey:name];
                     }
                     [nodes addObject:node];
                 }
@@ -161,20 +164,19 @@
         }
 
         for (NSString *name in nodesDict) {
-            node = [self bestNodeInNodes:nodesDict[name]];
+            node = [self bestNodeInNodes:[nodesDict objectForKey:name]];
             if ([name isEqualToString:SURSSElementEnclosure]) {
                 // enclosure is flattened as a separate dictionary for some reason
                 NSDictionary *encDict = [(NSXMLElement *)node attributesAsDictionary];
-                dict[name] = encDict;
+                [dict setObject:encDict forKey:name];
 			}
             else if ([name isEqualToString:SURSSElementPubDate]) {
-                // pubDate is expected to be an NSDate by SUAppcastItem, but the RSS class was returning an NSString
-                NSString *string = node.stringValue;
-                if (string) {
-                    NSDate *date = [NSDate dateWithNaturalLanguageString:string];
-                    if (date) {
-                        dict[name] = date;
-                    }
+                // We don't want to parse and create a NSDate instance -
+                // that's a risk we can avoid. We don't use the date anywhere other
+                // than it being accessible from SUAppcastItem
+                NSString *dateString = node.stringValue;
+                if (dateString) {
+                    [dict setObject:dateString forKey:name];
                 }
 			}
 			else if ([name isEqualToString:SUAppcastElementDeltas]) {
@@ -185,7 +187,7 @@
                         [deltas addObject:[(NSXMLElement *)child attributesAsDictionary]];
                     }
                 }
-                dict[name] = deltas;
+                [dict setObject:deltas forKey:name];
 			}
             else if ([name isEqualToString:SUAppcastElementTags]) {
                 NSMutableArray *tags = [NSMutableArray array];
@@ -196,13 +198,13 @@
                         [tags addObject:childName];
                     }
                 }
-                dict[name] = tags;
+                [dict setObject:tags forKey:name];
             }
 			else if (name != nil) {
                 // add all other values as strings
                 NSString *theValue = [[node stringValue] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
                 if (theValue != nil) {
-                    dict[name] = theValue;
+                    [dict setObject:theValue forKey:name];
                 }
             }
         }
@@ -220,11 +222,8 @@
             return nil;
         }
     }
-
-    if ([appcastItems count]) {
-        NSSortDescriptor *sort = [[NSSortDescriptor alloc] initWithKey:@"date" ascending:NO];
-        [appcastItems sortUsingDescriptors:@[sort]];
-    }
+    
+    self.items = appcastItems;
 
     return appcastItems;
 }
@@ -252,9 +251,9 @@
         NSUnderlyingErrorKey: error,
     }];
 
-    NSURL *failingUrl = error.userInfo[NSURLErrorFailingURLErrorKey];
+    NSURL *failingUrl = [error.userInfo objectForKey:NSURLErrorFailingURLErrorKey];
     if (failingUrl) {
-        userInfo[NSURLErrorFailingURLErrorKey] = failingUrl;
+        [userInfo setObject:failingUrl forKey:NSURLErrorFailingURLErrorKey];
     }
 
     self.completionBlock([NSError errorWithDomain:SUSparkleErrorDomain code:SUAppcastError userInfo:userInfo]);
@@ -265,7 +264,7 @@
 {
     // We use this method to pick out the localized version of a node when one's available.
     if ([nodes count] == 1)
-        return nodes[0];
+        return [nodes objectAtIndex:0];
     else if ([nodes count] == 0)
         return nil;
 
@@ -276,12 +275,12 @@
         lang = [[node attributeForName:@"xml:lang"] stringValue];
         [languages addObject:(lang ? lang : @"")];
     }
-    lang = [NSBundle preferredLocalizationsFromArray:languages][0];
+    lang = [[NSBundle preferredLocalizationsFromArray:languages] objectAtIndex:0];
     i = [languages indexOfObject:([languages containsObject:lang] ? lang : @"")];
     if (i == NSNotFound) {
         i = 0;
     }
-    return nodes[i];
+    return [nodes objectAtIndex:i];
 }
 
 - (SUAppcast *)copyWithoutDeltaUpdates {

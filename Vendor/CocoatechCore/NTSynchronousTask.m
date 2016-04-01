@@ -27,7 +27,7 @@
 
 - (void)taskOutputAvailable:(NSNotification*)note
 {
-	self.output = [note userInfo][NSFileHandleNotificationDataItem];
+	self.output = [[note userInfo] objectForKey:NSFileHandleNotificationDataItem];
 
 	self.done = YES;
 }
