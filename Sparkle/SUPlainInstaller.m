@@ -223,11 +223,13 @@
     return YES;
 }
 
-- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError *__autoreleasing *)__unused error
+- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError *__autoreleasing *)error
 {
     self.fileManager = [SUFileManager fileManagerAllowingAuthorization:allowsUI];
     
-    return YES;
+    // Temporary hack for bringing authorization prompt right away if we need it
+    // Ideally, bringing up the authorization prompt may be done before extraction occurs
+    return [self.fileManager updateModificationAndAccessTimeOfItemAtURL:self.host.bundle.bundleURL error:error];
 }
 
 - (BOOL)performThirdStage:(NSError * __autoreleasing *)error
