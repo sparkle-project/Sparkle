@@ -192,7 +192,7 @@
     }
     
     // To carry over when we clean up the installation
-    self.fileManager = [fileManager fileManagerByPreservingAuthorizationRights];
+    self.fileManager = fileManager;
     self.tempNewDirectoryURL = tempNewDirectoryURL;
     self.tempOldDirectoryURL = tempOldDirectoryURL;
     self.oldTempURL = oldTempURL;
@@ -241,7 +241,7 @@
 
 - (void)cleanup
 {
-    SUFileManager *fileManager = self.fileManager;
+    SUFileManager *fileManager = [self.fileManager fileManagerByPreservingAuthorizationRights];;
     NSURL *oldTempURL = self.oldTempURL;
     NSURL *tempOldDirectoryURL = self.tempOldDirectoryURL;
     NSURL *tempNewDirectoryURL = self.tempNewDirectoryURL;
