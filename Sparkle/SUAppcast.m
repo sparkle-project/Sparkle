@@ -78,12 +78,42 @@
 
     NSXPCConnection *connection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.AppcastDownloader"];
     connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUAppcastDownloaderProtocol)];
+    
+    __block BOOL retrievedDownloadResult = NO;
+    
+    __weak NSXPCConnection *weakConnection = connection;
+    connection.interruptionHandler = ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!retrievedDownloadResult) {
+                [weakConnection invalidate];
+            }
+        });
+    };
+    
+    connection.invalidationHandler = ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!retrievedDownloadResult) {
+                SULog(@"Appcast Downloader connection was invalidated");
+                
+                NSDictionary *userInfo = [NSDictionary
+                                                 dictionaryWithObject: SULocalizedString(@"An error occurred while downloading the update feed.", nil)
+                                                 forKey: NSLocalizedDescriptionKey];
+                
+                [self reportError:[NSError errorWithDomain:SUSparkleErrorDomain
+                                                      code:SUDownloadError
+                                                  userInfo:userInfo]];
+            }
+        });
+    };
+    
     [connection resume];
     
     [connection.remoteObjectProxy startDownloadWithRequest:request completion:^(NSData * _Nullable appcastData, NSError * _Nullable error) {
         [connection invalidate];
         
         dispatch_async(dispatch_get_main_queue(), ^{
+            retrievedDownloadResult = YES;
+            
             if (appcastData == nil) {
                 [self reportError:error];
             } else {
