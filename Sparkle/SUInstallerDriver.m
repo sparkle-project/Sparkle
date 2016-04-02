@@ -391,10 +391,33 @@
     launcherConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerLauncherProtocol)];
     [launcherConnection resume];
     
-    [launcherConnection.remoteObjectProxy launchInstallerAtPath:relaunchToolPath withArguments:@[hostBundleIdentifier] completion:^(BOOL success) {
-        [launcherConnection invalidate];
-        
+    __block BOOL retrievedLaunchStatus = NO;
+    
+    __weak NSXPCConnection *weakConnection = launcherConnection;
+    launcherConnection.interruptionHandler = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
+            if (!retrievedLaunchStatus) {
+                [weakConnection invalidate];
+            }
+        });
+    };
+    
+    launcherConnection.invalidationHandler = ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!retrievedLaunchStatus) {
+                NSError *error =
+                [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while connecting to the installer. Please try again later.", nil) }];
+                
+                completionHandler(error);
+            }
+        });
+    };
+    
+    [launcherConnection.remoteObjectProxy launchInstallerAtPath:relaunchToolPath withArguments:@[hostBundleIdentifier] completion:^(BOOL success) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            retrievedLaunchStatus = YES;
+            [launcherConnection invalidate];
+            
             if (!success) {
                 NSError *error =
                 [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while launching the installer. Please try again later.", nil) }];

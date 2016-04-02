@@ -109,10 +109,9 @@
     [connection resume];
     
     [connection.remoteObjectProxy startDownloadWithRequest:request completion:^(NSData * _Nullable appcastData, NSError * _Nullable error) {
-        [connection invalidate];
-        
         dispatch_async(dispatch_get_main_queue(), ^{
             retrievedDownloadResult = YES;
+            [connection invalidate];
             
             if (appcastData == nil) {
                 [self reportError:error];

@@ -80,7 +80,8 @@
     
     self.connection.invalidationHandler = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (!retrievedDownloadResult) {
+            SUDownloadDriver *strongSelf = weakSelf;
+            if (!retrievedDownloadResult && strongSelf != nil) {
                 SULog(@"Connection to update downloader was invalidated");
                 
                 NSDictionary *userInfo =
@@ -90,7 +91,7 @@
                 
                 NSError *downloadError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo];
                 
-                [weakSelf.delegate downloadDriverDidFailToDownloadUpdateWithError:downloadError];
+                [strongSelf.delegate downloadDriverDidFailToDownloadUpdateWithError:downloadError];
             }
         });
     };
@@ -99,6 +100,10 @@
     [self.connection.remoteObjectProxy startDownloadWithRequest:self.request bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename completion:^(BOOL success, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             retrievedDownloadResult = YES;
+            SUDownloadDriver *strongSelf = weakSelf;
+            if (strongSelf == nil) {
+                return;
+            }
             
             if (!success) {
                 NSURL *failingUrl = error.userInfo[NSURLErrorFailingURLErrorKey];
@@ -115,16 +120,9 @@
                 }
                 
                 NSError *downloadError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo];
-                [self.delegate downloadDriverDidFailToDownloadUpdateWithError:downloadError];
+                [strongSelf.delegate downloadDriverDidFailToDownloadUpdateWithError:downloadError];
             } else {
-                // If this fails, then we must have already cleaned up / cancelled
-                SUDownloadDriver *strongSelf = weakSelf;
-                if (strongSelf.connection != nil) {
-                    [strongSelf.connection invalidate];
-                    strongSelf.connection = nil;
-                    
-                    [strongSelf.delegate downloadDriverDidDownloadUpdate];
-                }
+                [strongSelf.delegate downloadDriverDidDownloadUpdate];
             }
         });
     }];
