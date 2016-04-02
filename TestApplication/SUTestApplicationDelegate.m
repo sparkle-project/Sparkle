@@ -41,7 +41,14 @@ static NSString * const UPDATED_VERSION = @"2.0";
         [[NSApplication sharedApplication] terminate:nil];
     }
     
+    // Apple's file manager may not work well over the network (on OS X 10.11.4 as of writing this), but at the same time
+    // I don't want to have to export SUFileManager in release mode. The test app is primarily
+    // aimed to be used in debug mode, so I think this is a good compromise
+#ifdef DEBUG
     SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:NO];
+#else
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+#endif
     
     // Locate user's cache directory
     NSError *cacheError = nil;
@@ -168,7 +175,9 @@ static NSString * const UPDATED_VERSION = @"2.0";
             // Copy our appcast over to the server directory
             NSURL *appcastDestinationURL = [[serverDirectoryURL URLByAppendingPathComponent:appcastName] URLByAppendingPathExtension:appcastExtension];
             NSError *copyAppcastError = nil;
-            if (![fileManager copyItemAtURL:[mainBundle URLForResource:appcastName withExtension:appcastExtension] toURL:appcastDestinationURL error:&copyAppcastError]) {
+            NSURL *appcastURL = [mainBundle URLForResource:appcastName withExtension:appcastExtension];
+            assert(appcastURL != nil);
+            if (![fileManager copyItemAtURL:appcastURL toURL:appcastDestinationURL error:&copyAppcastError]) {
                 NSLog(@"Failed to copy appcast into cache directory with error %@", copyAppcastError);
                 assert(NO);
             }
