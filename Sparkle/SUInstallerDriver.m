@@ -360,7 +360,7 @@
         }
     }
     
-    NSString *relaunchToolPath = [[NSBundle bundleWithPath:relaunchPath] executablePath];
+    NSString *relaunchToolPath = [[NSBundle bundleWithPath:relaunchPath] bundlePath];
     if (!relaunchToolPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath]) {
         // Note that we explicitly use the host app's name here, since updating plugin for Mail relaunches Mail, not just the plugin.
         NSError *error =

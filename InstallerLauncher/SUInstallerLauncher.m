@@ -9,6 +9,7 @@
 #import "SUInstallerLauncher.h"
 #import "SUFileManager.h"
 #import "SULog.h"
+#import <AppKit/AppKit.h>
 
 @implementation SUInstallerLauncher
 
@@ -23,15 +24,14 @@
             SULog(@"Failed to release quarantine on installer at %@ with error %@", installerPath, quarantineError);
         }
         
-        BOOL taskDidLaunch = NO;
-        @try {
-            [NSTask launchedTaskWithLaunchPath:installerPath arguments:arguments];
-            taskDidLaunch = YES;
-        } @catch (NSException *exception) {
-            SULog(@"Raised exception when launching update tool: %@", exception);
+        NSError *launchError = nil;
+        NSRunningApplication *runningApplication = [[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:installerPath] options:NSWorkspaceLaunchDefault configuration:@{NSWorkspaceLaunchConfigurationArguments : arguments} error:&launchError];
+        
+        if (runningApplication != nil) {
+            SULog(@"Failed to launch AutoUpdate app with error: %@", launchError);
         }
         
-        completionHandler(taskDidLaunch);
+        completionHandler(runningApplication != nil);
     });
 }
 
