@@ -8,10 +8,11 @@
 
 #import <Foundation/Foundation.h>
 #import "SUStatusCompletionResults.h"
+#import "SUExport.h"
 
 @protocol SUStandardUserDriverDelegate;
 
-@interface SUUserDriverCoreComponent : NSObject
+SU_EXPORT @interface SUUserDriverCoreComponent : NSObject
 
 - (instancetype)initWithDelegate:(id<SUStandardUserDriverDelegate>)delegate;
 

@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SUExport.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -16,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
  It retrieves the settings by first looking into the host's user defaults.
  If the setting is not found in there, then the host's Info.plist file is looked at.
  */
-@interface SUUpdaterSettings : NSObject
+SU_EXPORT @interface SUUpdaterSettings : NSObject
 
 - (instancetype)initWithHostBundle:(NSBundle *)hostBundle;
 

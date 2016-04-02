@@ -7,13 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SUExport.h"
 
 typedef NS_ENUM(NSInteger, SUCheckUpdatesChoice) {
     SUAutomaticallyCheck,
     SUDoNotAutomaticallyCheck
 };
 
-@interface SUUpdatePermissionPromptResult : NSObject<NSSecureCoding>
+SU_EXPORT @interface SUUpdatePermissionPromptResult : NSObject<NSSecureCoding>
 
 + (instancetype)updatePermissionPromptResultWithChoice:(SUCheckUpdatesChoice)choice shouldSendProfile:(BOOL)shouldSendProfile;
 

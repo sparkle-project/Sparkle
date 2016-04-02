@@ -9,6 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import "SUUserDriver.h"
 #import "SUStandardUserDriverProtocol.h"
+#import "SUExport.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -17,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  Sparkle's standard built-in user driver for updater interactions
  */
-@interface SUStandardUserDriver : NSObject <SUUserDriver, SUStandardUserDriver>
+SU_EXPORT @interface SUStandardUserDriver : NSObject <SUUserDriver, SUStandardUserDriver>
 
 /*!
  Initializes a Sparkle's standard user driver for user update interactions

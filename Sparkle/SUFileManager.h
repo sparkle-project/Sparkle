@@ -7,13 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SUExport.h"
 
 /**
  * A class used for performing file operations that may also perform authentication if allowed and if permission is denied when trying to
  * perform them normally as the running user. All operations on this class may be used on thread other than the main thread.
  * This class provides basic file operations and stays away from including much application-level logic.
  */
-@interface SUFileManager : NSObject
+SU_EXPORT @interface SUFileManager : NSObject
 
 /**
  * Creates a file manager that allows or disallows authorizing for file operations
