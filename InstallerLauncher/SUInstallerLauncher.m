@@ -27,7 +27,7 @@
         NSError *launchError = nil;
         NSRunningApplication *runningApplication = [[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:installerPath] options:(NSWorkspaceLaunchOptions)(NSWorkspaceLaunchDefault | NSWorkspaceLaunchNewInstance) configuration:@{NSWorkspaceLaunchConfigurationArguments : arguments} error:&launchError];
         
-        if (runningApplication != nil) {
+        if (runningApplication == nil) {
             SULog(@"Failed to launch AutoUpdate app with error: %@", launchError);
         }
         
