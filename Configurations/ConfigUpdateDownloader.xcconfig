@@ -1,0 +1,7 @@
+// UpdateDownloader only
+
+INFOPLIST_FILE = UpdateDownloader/Info.plist
+WRAPPER_EXTENSION = xpc
+PRODUCT_BUNDLE_IDENTIFIER = org.sparkle-project.UpdateDownloader
+CODE_SIGN_ENTITLEMENTS = UpdateDownloader/UpdateDownloader.entitlements
+CODE_SIGN_IDENTITY = -

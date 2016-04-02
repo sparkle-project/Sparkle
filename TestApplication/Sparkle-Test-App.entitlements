@@ -4,16 +4,12 @@
 <dict>
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
-	<!-- server exception is only needed because the test app launches a web server instance -->
 	<key>com.apple.security.network.server</key>
-	<true/>
-	<key>com.apple.security.network.client</key>
 	<true/>
 	<key>com.apple.security.temporary-exception.mach-lookup.global-name</key>
 	<array>
 		<string>org.sparkle-project.SparkleTestApp-sparkle-installer</string>
 	</array>
-	<!-- shared preference exception may only needed when the main app and Sparkle are in separate processes  -->
 	<key>com.apple.security.temporary-exception.shared-preference.read-write</key>
 	<array>
 		<string>org.sparkle-project.SparkleTestApp</string>

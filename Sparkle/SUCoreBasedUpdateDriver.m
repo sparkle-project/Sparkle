@@ -115,7 +115,7 @@
 
 - (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem
 {
-    self.downloadDriver = [[SUDownloadDriver alloc] initWithUpdateItem:updateItem host:self.host cachePath:[[self class] sparkleCachePathForHost:self.host] userAgent:self.userAgent delegate:self];
+    self.downloadDriver = [[SUDownloadDriver alloc] initWithUpdateItem:updateItem host:self.host userAgent:self.userAgent delegate:self];
     
     if ([self.updaterDelegate respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
         [self.updaterDelegate updater:self.updater

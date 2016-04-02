@@ -173,9 +173,12 @@
 		726E07BE1CAF0C5C001A286B /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
 		726E07BF1CAF0C6C001A286B /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
 		726E07C01CAF15B7001A286B /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
-		726E07C21CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */; };
 		726E07E91CAF30C0001A286B /* SUUpdaterPermission.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E07E71CAF30C0001A286B /* SUUpdaterPermission.h */; };
 		726E07EA1CAF30C0001A286B /* SUUpdaterPermission.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E07E81CAF30C0001A286B /* SUUpdaterPermission.m */; };
+		726E07F41CAF37BD001A286B /* SUUpdateDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E07F31CAF37BD001A286B /* SUUpdateDownloader.m */; };
+		726E07F61CAF37BD001A286B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E07F51CAF37BD001A286B /* main.m */; };
+		726E07FA1CAF37BD001A286B /* UpdateDownloader.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 726E07EF1CAF37BD001A286B /* UpdateDownloader.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		726E08011CAF3F70001A286B /* SUDownloaderDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E08001CAF3F70001A286B /* SUDownloaderDelegate.h */; };
 		726E4A0E1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E4A0D1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		726E4A101C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E4A0F1C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		726E4A1B1C86C88F00C57C6A /* TestAppHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E4A1A1C86C88F00C57C6A /* TestAppHelper.m */; };
@@ -198,6 +201,10 @@
 		7275F9C31B5F1F2900B1D19E /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
 		728337A61C9E6FF40085AA99 /* SUProbeInstallStatus.h in Headers */ = {isa = PBXBuildFile; fileRef = 728337A41C9E6FF40085AA99 /* SUProbeInstallStatus.h */; };
 		728337A71C9E6FF40085AA99 /* SUProbeInstallStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 728337A51C9E6FF40085AA99 /* SUProbeInstallStatus.m */; };
+		728638ED1CAF50CE00783084 /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
+		728638F81CAF5A5F00783084 /* SUAppcastDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 728638F71CAF5A5F00783084 /* SUAppcastDownloader.m */; };
+		728638FA1CAF5A5F00783084 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 728638F91CAF5A5F00783084 /* main.m */; };
+		728638FE1CAF5A5F00783084 /* AppcastDownloader.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 728638F31CAF5A5F00783084 /* AppcastDownloader.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		729746201C8E8D9A00FC134E /* TerminationListener.m in Sources */ = {isa = PBXBuildFile; fileRef = 7297461F1C8E8D9A00FC134E /* TerminationListener.m */; };
 		729746231C8E8F1100FC134E /* AppInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 729746221C8E8F1100FC134E /* AppInstaller.m */; };
 		729746371C8FC04600FC134E /* SUUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A8C09CA790200B7442F /* SUUnarchiver.m */; };
@@ -370,12 +377,26 @@
 			remoteGlobalIDString = 726E07AC1CAF08D6001A286B;
 			remoteInfo = InstallerLauncher;
 		};
+		726E07F81CAF37BD001A286B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 726E07EE1CAF37BD001A286B;
+			remoteInfo = UpdateDownloader;
+		};
 		726E4A1F1C86C88F00C57C6A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 726E4A151C86C88F00C57C6A;
 			remoteInfo = TestAppHelper;
+		};
+		728638FC1CAF5A5F00783084 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 728638F21CAF5A5F00783084;
+			remoteInfo = AppcastDownloader;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -419,6 +440,8 @@
 			dstSubfolderSpec = 16;
 			files = (
 				726E07B81CAF08D6001A286B /* InstallerLauncher.xpc in Embed XPC Services */,
+				726E07FA1CAF37BD001A286B /* UpdateDownloader.xpc in Embed XPC Services */,
+				728638FE1CAF5A5F00783084 /* AppcastDownloader.xpc in Embed XPC Services */,
 			);
 			name = "Embed XPC Services";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -714,6 +737,14 @@
 		726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigInstallerLauncher.xcconfig; sourceTree = "<group>"; };
 		726E07E71CAF30C0001A286B /* SUUpdaterPermission.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdaterPermission.h; sourceTree = "<group>"; };
 		726E07E81CAF30C0001A286B /* SUUpdaterPermission.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterPermission.m; sourceTree = "<group>"; };
+		726E07EF1CAF37BD001A286B /* UpdateDownloader.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = UpdateDownloader.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+		726E07F11CAF37BD001A286B /* SUUpdateDownloaderProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUUpdateDownloaderProtocol.h; sourceTree = "<group>"; };
+		726E07F21CAF37BD001A286B /* SUUpdateDownloader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUUpdateDownloader.h; sourceTree = "<group>"; };
+		726E07F31CAF37BD001A286B /* SUUpdateDownloader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SUUpdateDownloader.m; sourceTree = "<group>"; };
+		726E07F51CAF37BD001A286B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		726E07F71CAF37BD001A286B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		726E07FF1CAF3801001A286B /* UpdateDownloader.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = UpdateDownloader.entitlements; sourceTree = "<group>"; };
+		726E08001CAF3F70001A286B /* SUDownloaderDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUDownloaderDelegate.h; path = ../Sparkle/SUDownloaderDelegate.h; sourceTree = "<group>"; };
 		726E4A0D1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStandardUserDriverUIDelegate.h; sourceTree = "<group>"; };
 		726E4A0F1C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStandardUserDriverRemoteDelegate.h; sourceTree = "<group>"; };
 		726E4A111C86C44A00C57C6A /* Sparkle-Test-App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Sparkle-Test-App.entitlements"; sourceTree = "<group>"; };
@@ -736,6 +767,15 @@
 		7275F9C01B5F1F2900B1D19E /* SUFileManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUFileManager.m; sourceTree = "<group>"; };
 		728337A41C9E6FF40085AA99 /* SUProbeInstallStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUProbeInstallStatus.h; sourceTree = "<group>"; };
 		728337A51C9E6FF40085AA99 /* SUProbeInstallStatus.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUProbeInstallStatus.m; sourceTree = "<group>"; };
+		728638EE1CAF589C00783084 /* ConfigUpdateDownloader.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUpdateDownloader.xcconfig; sourceTree = "<group>"; };
+		728638F31CAF5A5F00783084 /* AppcastDownloader.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = AppcastDownloader.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+		728638F51CAF5A5F00783084 /* SUAppcastDownloaderProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUAppcastDownloaderProtocol.h; sourceTree = "<group>"; };
+		728638F61CAF5A5F00783084 /* SUAppcastDownloader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUAppcastDownloader.h; sourceTree = "<group>"; };
+		728638F71CAF5A5F00783084 /* SUAppcastDownloader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SUAppcastDownloader.m; sourceTree = "<group>"; };
+		728638F91CAF5A5F00783084 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		728638FB1CAF5A5F00783084 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		728639031CAF5B3B00783084 /* AppcastDownloader.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = AppcastDownloader.entitlements; sourceTree = "<group>"; };
+		728639041CAF614000783084 /* ConfigAppcastDownloader.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigAppcastDownloader.xcconfig; sourceTree = "<group>"; };
 		7297461E1C8E8D9A00FC134E /* TerminationListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TerminationListener.h; sourceTree = "<group>"; };
 		7297461F1C8E8D9A00FC134E /* TerminationListener.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TerminationListener.m; sourceTree = "<group>"; };
 		729746211C8E8F1100FC134E /* AppInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppInstaller.h; sourceTree = "<group>"; };
@@ -876,11 +916,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		726E07EC1CAF37BD001A286B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		726E4A131C86C88F00C57C6A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				726E4A301C87DC1700C57C6A /* Sparkle.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		728638F01CAF5A5F00783084 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -910,6 +964,8 @@
 				726B2B5D1C645FC900388755 /* UI Tests.xctest */,
 				726E4A161C86C88F00C57C6A /* TestAppHelper.xpc */,
 				726E07AD1CAF08D6001A286B /* InstallerLauncher.xpc */,
+				726E07EF1CAF37BD001A286B /* UpdateDownloader.xpc */,
+				728638F31CAF5A5F00783084 /* AppcastDownloader.xpc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1029,6 +1085,7 @@
 				61B5F8F309C4CE5900B25A18 /* Other Sources */,
 				61F83F6E0DBFE07A006FDD30 /* Update Control */,
 				726E07AE1CAF08D6001A286B /* InstallerLauncher */,
+				726E07F01CAF37BD001A286B /* UpdateDownloader */,
 				61299B3A09CB056100B7442F /* User Interface */,
 			);
 			path = Sparkle;
@@ -1125,6 +1182,7 @@
 		61299B3909CB055000B7442F /* Appcast Support */ = {
 			isa = PBXGroup;
 			children = (
+				728638F41CAF5A5F00783084 /* AppcastDownloader */,
 				61B5FB9409C4F04600B25A18 /* SUAppcast.h */,
 				61B5FB9509C4F04600B25A18 /* SUAppcast.m */,
 				61B5FC5309C5182000B25A18 /* SUAppcastItem.h */,
@@ -1323,6 +1381,21 @@
 			path = ../InstallerLauncher;
 			sourceTree = "<group>";
 		};
+		726E07F01CAF37BD001A286B /* UpdateDownloader */ = {
+			isa = PBXGroup;
+			children = (
+				726E07F11CAF37BD001A286B /* SUUpdateDownloaderProtocol.h */,
+				726E08001CAF3F70001A286B /* SUDownloaderDelegate.h */,
+				726E07F21CAF37BD001A286B /* SUUpdateDownloader.h */,
+				726E07F31CAF37BD001A286B /* SUUpdateDownloader.m */,
+				726E07F51CAF37BD001A286B /* main.m */,
+				726E07F71CAF37BD001A286B /* Info.plist */,
+				726E07FF1CAF3801001A286B /* UpdateDownloader.entitlements */,
+			);
+			name = UpdateDownloader;
+			path = ../UpdateDownloader;
+			sourceTree = "<group>";
+		};
 		726E4A171C86C88F00C57C6A /* TestAppHelper */ = {
 			isa = PBXGroup;
 			children = (
@@ -1334,6 +1407,20 @@
 			);
 			name = TestAppHelper;
 			path = ../TestAppHelper;
+			sourceTree = "<group>";
+		};
+		728638F41CAF5A5F00783084 /* AppcastDownloader */ = {
+			isa = PBXGroup;
+			children = (
+				728638F51CAF5A5F00783084 /* SUAppcastDownloaderProtocol.h */,
+				728638F61CAF5A5F00783084 /* SUAppcastDownloader.h */,
+				728638F71CAF5A5F00783084 /* SUAppcastDownloader.m */,
+				728638F91CAF5A5F00783084 /* main.m */,
+				728638FB1CAF5A5F00783084 /* Info.plist */,
+				728639031CAF5B3B00783084 /* AppcastDownloader.entitlements */,
+			);
+			name = AppcastDownloader;
+			path = ../AppcastDownloader;
 			sourceTree = "<group>";
 		};
 		729746481C91483B00FC134E /* IPC */ = {
@@ -1399,6 +1486,8 @@
 				729F10FF1C65A9B500DFCCC5 /* ConfigUITestDebug.xcconfig */,
 				729F11001C65A9B500DFCCC5 /* ConfigUITestRelease.xcconfig */,
 				726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */,
+				728638EE1CAF589C00783084 /* ConfigUpdateDownloader.xcconfig */,
+				728639041CAF614000783084 /* ConfigAppcastDownloader.xcconfig */,
 				14732BC91960F70A00593899 /* make-release-package.sh */,
 				14652F7919A93E5F00959E44 /* set-git-version-info.sh */,
 				146EC84E19A68CF8004A50C5 /* Sparkle.podspec */,
@@ -1433,6 +1522,7 @@
 				72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */,
 				61B5FC0D09C4FC8200B25A18 /* SUAppcast.h in Headers */,
 				7246E0A31C83B685003B4E75 /* SUStandardUpdaterController.h in Headers */,
+				726E08011CAF3F70001A286B /* SUDownloaderDelegate.h in Headers */,
 				61B5FC7009C51F4A00B25A18 /* SUAppcastItem.h in Headers */,
 				72B767D61C9C8B5C00A07552 /* SUBasicUpdateDriver.h in Headers */,
 				61EF67590E25C5B400F754E0 /* SUHost.h in Headers */,
@@ -1625,6 +1715,24 @@
 			productReference = 726E07AD1CAF08D6001A286B /* InstallerLauncher.xpc */;
 			productType = "com.apple.product-type.xpc-service";
 		};
+		726E07EE1CAF37BD001A286B /* UpdateDownloader */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 726E07FB1CAF37BD001A286B /* Build configuration list for PBXNativeTarget "UpdateDownloader" */;
+			buildPhases = (
+				726E07EB1CAF37BD001A286B /* Sources */,
+				726E07EC1CAF37BD001A286B /* Frameworks */,
+				726E07ED1CAF37BD001A286B /* Resources */,
+				728639061CAF651300783084 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = UpdateDownloader;
+			productName = UpdateDownloader;
+			productReference = 726E07EF1CAF37BD001A286B /* UpdateDownloader.xpc */;
+			productType = "com.apple.product-type.xpc-service";
+		};
 		726E4A151C86C88F00C57C6A /* TestAppHelper */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 726E4A221C86C88F00C57C6A /* Build configuration list for PBXNativeTarget "TestAppHelper" */;
@@ -1640,6 +1748,24 @@
 			name = TestAppHelper;
 			productName = TestAppHelper;
 			productReference = 726E4A161C86C88F00C57C6A /* TestAppHelper.xpc */;
+			productType = "com.apple.product-type.xpc-service";
+		};
+		728638F21CAF5A5F00783084 /* AppcastDownloader */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 728638FF1CAF5A5F00783084 /* Build configuration list for PBXNativeTarget "AppcastDownloader" */;
+			buildPhases = (
+				728638EF1CAF5A5F00783084 /* Sources */,
+				728638F01CAF5A5F00783084 /* Frameworks */,
+				728638F11CAF5A5F00783084 /* Resources */,
+				728639051CAF64EF00783084 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AppcastDownloader;
+			productName = AppcastDownloader;
+			productReference = 728638F31CAF5A5F00783084 /* AppcastDownloader.xpc */;
 			productType = "com.apple.product-type.xpc-service";
 		};
 		8DC2EF4F0486A6940098B216 /* Sparkle */ = {
@@ -1661,6 +1787,8 @@
 			dependencies = (
 				55C14F97136F044100649790 /* PBXTargetDependency */,
 				726E07B71CAF08D6001A286B /* PBXTargetDependency */,
+				726E07F91CAF37BD001A286B /* PBXTargetDependency */,
+				728638FD1CAF5A5F00783084 /* PBXTargetDependency */,
 			);
 			name = Sparkle;
 			productInstallPath = "$(HOME)/Library/Frameworks";
@@ -1696,11 +1824,27 @@
 					726E07AC1CAF08D6001A286B = {
 						CreatedOnToolsVersion = 7.3;
 					};
+					726E07EE1CAF37BD001A286B = {
+						CreatedOnToolsVersion = 7.3;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 1;
+							};
+						};
+					};
 					726E4A151C86C88F00C57C6A = {
 						CreatedOnToolsVersion = 7.2.1;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
 								enabled = 0;
+							};
+						};
+					};
+					728638F21CAF5A5F00783084 = {
+						CreatedOnToolsVersion = 7.3;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 1;
 							};
 						};
 					};
@@ -1765,6 +1909,8 @@
 			targets = (
 				8DC2EF4F0486A6940098B216 /* Sparkle */,
 				726E07AC1CAF08D6001A286B /* InstallerLauncher */,
+				726E07EE1CAF37BD001A286B /* UpdateDownloader */,
+				728638F21CAF5A5F00783084 /* AppcastDownloader */,
 				61B5F90109C4CEE200B25A18 /* Sparkle Test App */,
 				726E4A151C86C88F00C57C6A /* TestAppHelper */,
 				612279D80DB5470200AB99EA /* Sparkle Unit Tests */,
@@ -1836,7 +1982,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		726E07ED1CAF37BD001A286B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		726E4A141C86C88F00C57C6A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		728638F11CAF5A5F00783084 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1851,7 +2011,6 @@
 				615AE3D00D64DC40001CA7BD /* SUModelTranslation.plist in Resources */,
 				55C14BEF136EF21700649790 /* SUStatus.xib in Resources */,
 				55C14C04136EF26100649790 /* SUUpdateAlert.xib in Resources */,
-				726E07C21CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig in Resources */,
 				55C14C19136EF2C700649790 /* SUUpdatePermissionPrompt.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1922,6 +2081,32 @@
 			shellPath = "/usr/bin/env sh";
 			shellScript = "ln -sfh \"pt_BR.lproj\" \"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/pt.lproj\"";
 			showEnvVarsInLog = 0;
+		};
+		728639051CAF64EF00783084 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# http://stackoverflow.com/questions/32390228/is-it-possible-to-disable-ats-in-ios-9-just-for-debug-environment\n#Disables ATS in debug builds.\nINFOPLIST=\"${TARGET_BUILD_DIR}\"/\"${INFOPLIST_PATH}\"\ncase \"${CONFIGURATION}\" in\n\"Release\"|\"Adhoc\")\n/usr/libexec/PlistBuddy -c \"Set :NSAppTransportSecurity:NSAllowsArbitraryLoads NO\" \"${INFOPLIST}\"\n;;\n\"Debug\")\n/usr/libexec/PlistBuddy -c \"Set :NSAppTransportSecurity:NSAllowsArbitraryLoads YES\" \"${INFOPLIST}\"\n;;\nesac";
+		};
+		728639061CAF651300783084 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# http://stackoverflow.com/questions/32390228/is-it-possible-to-disable-ats-in-ios-9-just-for-debug-environment\n#Disables ATS in debug builds.\nINFOPLIST=\"${TARGET_BUILD_DIR}\"/\"${INFOPLIST_PATH}\"\ncase \"${CONFIGURATION}\" in\n\"Release\"|\"Adhoc\")\n/usr/libexec/PlistBuddy -c \"Set :NSAppTransportSecurity:NSAllowsArbitraryLoads NO\" \"${INFOPLIST}\"\n;;\n\"Debug\")\n/usr/libexec/PlistBuddy -c \"Set :NSAppTransportSecurity:NSAllowsArbitraryLoads YES\" \"${INFOPLIST}\"\n;;\nesac";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2045,6 +2230,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		726E07EB1CAF37BD001A286B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				728638ED1CAF50CE00783084 /* SUConstants.m in Sources */,
+				726E07F61CAF37BD001A286B /* main.m in Sources */,
+				726E07F41CAF37BD001A286B /* SUUpdateDownloader.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		726E4A121C86C88F00C57C6A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2052,6 +2247,15 @@
 				725F97781C8A65AC00265BE4 /* SUAdHocCodeSigning.m in Sources */,
 				726E4A1D1C86C88F00C57C6A /* main.m in Sources */,
 				726E4A1B1C86C88F00C57C6A /* TestAppHelper.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		728638EF1CAF5A5F00783084 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				728638FA1CAF5A5F00783084 /* main.m in Sources */,
+				728638F81CAF5A5F00783084 /* SUAppcastDownloader.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2177,10 +2381,20 @@
 			target = 726E07AC1CAF08D6001A286B /* InstallerLauncher */;
 			targetProxy = 726E07B61CAF08D6001A286B /* PBXContainerItemProxy */;
 		};
+		726E07F91CAF37BD001A286B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 726E07EE1CAF37BD001A286B /* UpdateDownloader */;
+			targetProxy = 726E07F81CAF37BD001A286B /* PBXContainerItemProxy */;
+		};
 		726E4A201C86C88F00C57C6A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 726E4A151C86C88F00C57C6A /* TestAppHelper */;
 			targetProxy = 726E4A1F1C86C88F00C57C6A /* PBXContainerItemProxy */;
+		};
+		728638FD1CAF5A5F00783084 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 728638F21CAF5A5F00783084 /* AppcastDownloader */;
+			targetProxy = 728638FC1CAF5A5F00783084 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2579,6 +2793,30 @@
 			};
 			name = Release;
 		};
+		726E07FC1CAF37BD001A286B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 728638EE1CAF589C00783084 /* ConfigUpdateDownloader.xcconfig */;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+			};
+			name = Debug;
+		};
+		726E07FD1CAF37BD001A286B /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 728638EE1CAF589C00783084 /* ConfigUpdateDownloader.xcconfig */;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+			};
+			name = Coverage;
+		};
+		726E07FE1CAF37BD001A286B /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 728638EE1CAF589C00783084 /* ConfigUpdateDownloader.xcconfig */;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+			};
+			name = Release;
+		};
 		726E4A231C86C88F00C57C6A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 726E4A271C86CAB500C57C6A /* ConfigTestAppDebugHelper.xcconfig */;
@@ -2596,6 +2834,27 @@
 		726E4A251C86C88F00C57C6A /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 726E4A291C86CAB500C57C6A /* ConfigTestAppReleaseHelper.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		728639001CAF5A5F00783084 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 728639041CAF614000783084 /* ConfigAppcastDownloader.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		728639011CAF5A5F00783084 /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 728639041CAF614000783084 /* ConfigAppcastDownloader.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		728639021CAF5A5F00783084 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 728639041CAF614000783084 /* ConfigAppcastDownloader.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
@@ -2711,6 +2970,17 @@
 				726E07BC1CAF08D6001A286B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		726E07FB1CAF37BD001A286B /* Build configuration list for PBXNativeTarget "UpdateDownloader" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				726E07FC1CAF37BD001A286B /* Debug */,
+				726E07FD1CAF37BD001A286B /* Coverage */,
+				726E07FE1CAF37BD001A286B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		726E4A221C86C88F00C57C6A /* Build configuration list for PBXNativeTarget "TestAppHelper" */ = {
 			isa = XCConfigurationList;
@@ -2721,6 +2991,15 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		728638FF1CAF5A5F00783084 /* Build configuration list for PBXNativeTarget "AppcastDownloader" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				728639001CAF5A5F00783084 /* Debug */,
+				728639011CAF5A5F00783084 /* Coverage */,
+				728639021CAF5A5F00783084 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

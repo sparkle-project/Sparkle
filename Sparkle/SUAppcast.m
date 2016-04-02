@@ -14,6 +14,7 @@
 #import "SULog.h"
 #import "SUErrors.h"
 #import "SULocalizations.h"
+#import "SUAppcastDownloaderProtocol.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -45,8 +46,6 @@
 
 @interface SUAppcast () <NSURLDownloadDelegate>
 @property (strong) void (^completionBlock)(NSError *);
-@property (copy) NSString *downloadFilename;
-@property (strong) NSURLDownload *download;
 @property (copy) NSArray *items;
 - (void)reportError:(NSError *)error;
 - (NSXMLNode *)bestNodeInNodes:(NSArray *)nodes;
@@ -54,11 +53,9 @@
 
 @implementation SUAppcast
 
-@synthesize downloadFilename;
 @synthesize completionBlock;
 @synthesize userAgentString;
 @synthesize httpHeaders;
-@synthesize download;
 @synthesize items;
 
 - (void)fetchAppcastFromURL:(NSURL *)url completionBlock:(void (^)(NSError *))block
@@ -79,60 +76,43 @@
 
     [request setValue:@"application/rss+xml,*/*;q=0.1" forHTTPHeaderField:@"Accept"];
 
-    self.download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
+    NSXPCConnection *connection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.AppcastDownloader"];
+    connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUAppcastDownloaderProtocol)];
+    [connection resume];
+    
+    [connection.remoteObjectProxy startDownloadWithRequest:request completion:^(NSData * _Nullable appcastData, NSError * _Nullable error) {
+        [connection invalidate];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (appcastData == nil) {
+                [self reportError:error];
+            } else {
+                NSError *parseError = nil;
+                NSArray *appcastItems = [self parseAppcastItemsFromXMLData:appcastData error:&parseError];
+                
+                if (appcastItems != nil) {
+                    self.items = appcastItems;
+                    self.completionBlock(nil);
+                    self.completionBlock = nil;
+                } else {
+                    NSMutableDictionary *userInfo = [NSMutableDictionary
+                                                     dictionaryWithObject: SULocalizedString(@"An error occurred while parsing the update feed.", nil)
+                                                     forKey: NSLocalizedDescriptionKey];
+                    if (parseError != nil) {
+                        [userInfo setObject:parseError forKey:NSUnderlyingErrorKey];
+                    }
+                    [self reportError:[NSError errorWithDomain:SUSparkleErrorDomain
+                                                          code:SUAppcastParseError
+                                                      userInfo:userInfo]];
+                }
+            }
+        });
+    }];
 }
 
-- (void)download:(NSURLDownload *)__unused aDownload decideDestinationWithSuggestedFilename:(NSString *)filename
-{
-    NSString *destinationFilename = NSTemporaryDirectory();
-	if (destinationFilename)
-	{
-        destinationFilename = [destinationFilename stringByAppendingPathComponent:filename];
-        [self.download setDestination:destinationFilename allowOverwrite:NO];
-    }
-}
-
-- (void)download:(NSURLDownload *)__unused aDownload didCreateDestination:(NSString *)path
-{
-    self.downloadFilename = path;
-}
-
-- (void)downloadDidFinish:(NSURLDownload *)__unused aDownload
-{
-    NSError *error = nil;
-    NSArray *appcastItems = [self parseAppcastItemsFromXMLFile:[NSURL fileURLWithPath:self.downloadFilename] error:&error];
-
-    [[NSFileManager defaultManager] removeItemAtPath:self.downloadFilename error:nil];
-    self.downloadFilename = nil;
-
-    if (appcastItems) {
-        self.items = appcastItems;
-        self.completionBlock(nil);
-        self.completionBlock = nil;
-    } else {
-        NSMutableDictionary *userInfo = [NSMutableDictionary
-            dictionaryWithObject: SULocalizedString(@"An error occurred while parsing the update feed.", nil)
-                          forKey: NSLocalizedDescriptionKey];
-        if (error) {
-            [userInfo setObject:error forKey:NSUnderlyingErrorKey];
-        }
-        [self reportError:[NSError errorWithDomain:SUSparkleErrorDomain
-                                              code:SUAppcastParseError
-                                          userInfo:userInfo]];
-    }
-}
-
--(NSArray *)parseAppcastItemsFromXMLFile:(NSURL *)appcastFile error:(NSError *__autoreleasing*)errorp {
-    if (errorp) {
-        *errorp = nil;
-    }
-
-    if (!appcastFile) {
-        return nil;
-    }
-
+-(NSArray *)parseAppcastItemsFromXMLData:(NSData *)appcastData error:(NSError *__autoreleasing*)errorp {
     NSUInteger options = NSXMLNodeLoadExternalEntitiesNever; // Prevent inclusion from file://
-    NSXMLDocument *document = [[NSXMLDocument alloc] initWithContentsOfURL:appcastFile options:options error:errorp];
+    NSXMLDocument *document = [[NSXMLDocument alloc] initWithData:appcastData options:options error:errorp];
 	if (nil == document) {
         return nil;
     }
@@ -230,21 +210,6 @@
     self.items = appcastItems;
 
     return appcastItems;
-}
-
-- (void)download:(NSURLDownload *)__unused aDownload didFailWithError:(NSError *)error
-{
-    if (self.downloadFilename) {
-        [[NSFileManager defaultManager] removeItemAtPath:self.downloadFilename error:nil];
-    }
-    self.downloadFilename = nil;
-
-    [self reportError:error];
-}
-
-- (NSURLRequest *)download:(NSURLDownload *)__unused aDownload willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)__unused redirectResponse
-{
-    return request;
 }
 
 - (void)reportError:(NSError *)error
