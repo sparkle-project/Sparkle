@@ -85,7 +85,7 @@
 		61299A2F09CA2DAB00B7442F /* SUDSAVerifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A2D09CA2DAB00B7442F /* SUDSAVerifier.h */; settings = {ATTRIBUTES = (); }; };
 		61299A5C09CA6D4500B7442F /* SUConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A5B09CA6D4500B7442F /* SUConstants.h */; settings = {ATTRIBUTES = (); }; };
 		61299A6009CA6EB100B7442F /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
-		61299A8D09CA790200B7442F /* SUUnarchiver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A8B09CA790200B7442F /* SUUnarchiver.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		61299A8D09CA790200B7442F /* SUUnarchiver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A8B09CA790200B7442F /* SUUnarchiver.h */; };
 		61299B3609CB04E000B7442F /* Sparkle.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299B3509CB04E000B7442F /* Sparkle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		612DCBAF0D488BC60015DBEA /* SUUpdatePermissionPrompt.h in Headers */ = {isa = PBXBuildFile; fileRef = 612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */; settings = {ATTRIBUTES = (); }; };
 		612DCBB00D488BC60015DBEA /* SUUpdatePermissionPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */; };
@@ -1523,6 +1523,7 @@
 				61B5FC0D09C4FC8200B25A18 /* SUAppcast.h in Headers */,
 				7246E0A31C83B685003B4E75 /* SUStandardUpdaterController.h in Headers */,
 				726E08011CAF3F70001A286B /* SUDownloaderDelegate.h in Headers */,
+				61299A8D09CA790200B7442F /* SUUnarchiver.h in Headers */,
 				61B5FC7009C51F4A00B25A18 /* SUAppcastItem.h in Headers */,
 				72B767D61C9C8B5C00A07552 /* SUBasicUpdateDriver.h in Headers */,
 				61EF67590E25C5B400F754E0 /* SUHost.h in Headers */,
@@ -1557,7 +1558,6 @@
 				61A2279C0D1CEE7600430CCD /* SUSystemProfiler.h in Headers */,
 				72B767D21C9C7B9300A07552 /* SUProbingUpdateDriver.h in Headers */,
 				7229E1BD1C98EFF200CB50D0 /* SUDownloadDriver.h in Headers */,
-				61299A8D09CA790200B7442F /* SUUnarchiver.h in Headers */,
 				72B767CE1C9B924900A07552 /* SUInstallerDriver.h in Headers */,
 				61B5FCDF09C52A9F00B25A18 /* SUUpdateAlert.h in Headers */,
 				612DCBAF0D488BC60015DBEA /* SUUpdatePermissionPrompt.h in Headers */,
