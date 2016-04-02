@@ -16,6 +16,7 @@
 @property (nonatomic) NSURLDownload *download;
 @property (nonatomic, copy) NSString *bundleIdentifier;
 @property (nonatomic, copy) NSString *desiredFilename;
+@property (nonatomic, copy) void (^completionBlock)(BOOL, NSError * _Nullable);
 
 @end
 
@@ -25,6 +26,7 @@
 @synthesize download = _download;
 @synthesize bundleIdentifier = _bundleIdentifier;
 @synthesize desiredFilename = _desiredFilename;
+@synthesize completionBlock = _completionBlock;
 
 - (instancetype)initWithDelegate:(id <SUDownloaderDelegate>)delegate
 {
@@ -41,12 +43,13 @@
     self.download = nil;
 }
 
-- (void)startDownloadWithRequest:(NSURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename
+- (void)startDownloadWithRequest:(NSURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename completion:(void (^)(BOOL success, NSError * _Nullable error))completionBlock
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         self.download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
         self.desiredFilename = desiredFilename;
         self.bundleIdentifier = bundleIdentifier;
+        self.completionBlock = completionBlock;
         
         // Remove our old caches path so we don't start accumulating files in there
         NSString *cachePath = [[self class] sparkleCachePathForBundleIdentifier:self.bundleIdentifier];
@@ -110,12 +113,14 @@
 
 - (void)downloadDidFinish:(NSURLDownload *)__unused d
 {
-    [self.delegate downloaderDidFinish];
+    self.completionBlock(YES, nil);
+    self.completionBlock = nil;
 }
 
 - (void)download:(NSURLDownload *)__unused download didFailWithError:(NSError *)error
 {
-    [self.delegate downloaderDidFailWithError:error];
+    self.completionBlock(NO, error);
+    self.completionBlock = nil;
 }
 
 - (BOOL)download:(NSURLDownload *)__unused download shouldDecodeSourceDataOfMIMEType:(NSString *)encodingType

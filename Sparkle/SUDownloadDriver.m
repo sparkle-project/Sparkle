@@ -13,6 +13,7 @@
 #import "SUFileManager.h"
 #import "SULocalizations.h"
 #import "SUHost.h"
+#import "SULog.h"
 #import "SUErrors.h"
 
 #ifdef _APPKITDEFINES_H
@@ -66,17 +67,72 @@
     NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(bundleIdentifier != nil);
     
-    [self.connection.remoteObjectProxy startDownloadWithRequest:self.request bundleIdentifier:bundleIdentifier desiredFilename:[NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]]];
+    __weak SUDownloadDriver *weakSelf = self;
+    __block BOOL retrievedDownloadResult = NO;
+    
+    self.connection.interruptionHandler = ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!retrievedDownloadResult) {
+                [weakSelf.connection invalidate];
+            }
+        });
+    };
+    
+    self.connection.invalidationHandler = ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!retrievedDownloadResult) {
+                SULog(@"Connection to update downloader was invalidated");
+                
+                NSDictionary *userInfo =
+                @{
+                  NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while downloading the update. Please try again later.", nil),
+                  };
+                
+                NSError *downloadError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo];
+                
+                [weakSelf.delegate downloadDriverDidFailToDownloadUpdateWithError:downloadError];
+            }
+        });
+    };
+    
+    NSString *desiredFilename = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
+    [self.connection.remoteObjectProxy startDownloadWithRequest:self.request bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename completion:^(BOOL success, NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            retrievedDownloadResult = YES;
+            
+            if (!success) {
+                NSURL *failingUrl = error.userInfo[NSURLErrorFailingURLErrorKey];
+                if (!failingUrl) {
+                    failingUrl = [self.updateItem fileURL];
+                }
+                
+                NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{
+                                                                                                NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while downloading the update. Please try again later.", nil),
+                                                                                                NSUnderlyingErrorKey: error,
+                                                                                                }];
+                if (failingUrl) {
+                    userInfo[NSURLErrorFailingURLErrorKey] = failingUrl;
+                }
+                
+                NSError *downloadError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo];
+                [self.delegate downloadDriverDidFailToDownloadUpdateWithError:downloadError];
+            } else {
+                // If this fails, then we must have already cleaned up / cancelled
+                SUDownloadDriver *strongSelf = weakSelf;
+                if (strongSelf.connection != nil) {
+                    [strongSelf.connection invalidate];
+                    strongSelf.connection = nil;
+                    
+                    [strongSelf.delegate downloadDriverDidDownloadUpdate];
+                }
+            }
+        });
+    }];
 }
 
 - (void)dealloc
 {
     [self cleanup];
-}
-
-- (void)cancelTrashCleanup
-{
-    self.temporaryDirectory = nil;
 }
 
 - (void)cleanup
@@ -115,40 +171,6 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.delegate downloadDriverDidReceiveDataOfLength:length];
-    });
-}
-
-- (void)downloaderDidFinish
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        // If this fails, then we must have already cleaned up / cancelled
-        if (self.connection != nil) {
-            [self.connection invalidate];
-            self.connection = nil;
-            
-            [self.delegate downloadDriverDidDownloadUpdate];
-        }
-    });
-}
-
-- (void)downloaderDidFailWithError:(NSError *)error
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSURL *failingUrl = error.userInfo[NSURLErrorFailingURLErrorKey];
-        if (!failingUrl) {
-            failingUrl = [self.updateItem fileURL];
-        }
-        
-        NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{
-                                                                                        NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while downloading the update. Please try again later.", nil),
-                                                                                        NSUnderlyingErrorKey: error,
-                                                                                        }];
-        if (failingUrl) {
-            userInfo[NSURLErrorFailingURLErrorKey] = failingUrl;
-        }
-        
-        NSError *downloadError = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo];
-        [self.delegate downloadDriverDidFailToDownloadUpdateWithError:downloadError];
     });
 }
 

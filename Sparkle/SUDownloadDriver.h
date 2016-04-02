@@ -35,7 +35,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, readonly, copy) NSString *downloadPath;
 
 - (void)cleanup;
-- (void)cancelTrashCleanup;
 
 @end
 

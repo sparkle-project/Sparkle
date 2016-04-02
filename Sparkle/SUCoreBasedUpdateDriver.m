@@ -156,8 +156,6 @@
     [self.installerDriver extractDownloadPath:downloadPath withUpdateItem:self.updateItem temporaryDirectory:temporaryDirectory completion:^(NSError * _Nullable error) {
         if (error != nil) {
             [self.delegate coreDriverIsRequestingAbortUpdateWithError:error];
-        } else {
-            [self.downloadDriver cancelTrashCleanup];
         }
     }];
 }

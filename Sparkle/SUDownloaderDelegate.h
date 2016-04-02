@@ -20,10 +20,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)downloaderDidReceiveDataOfLength:(NSUInteger)length;
 
-- (void)downloaderDidFinish;
-
-- (void)downloaderDidFailWithError:(NSError *)error;
-
 @end
 
 NS_ASSUME_NONNULL_END
