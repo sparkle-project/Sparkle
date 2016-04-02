@@ -35,6 +35,6 @@ static const char *SUAppleQuarantineIdentifier = "com.apple.quarantine";
 
 
 @interface SUAppcast (Private)
-- (NSArray *)parseAppcastItemsFromXMLFile:(NSURL *)appcastFile error:(NSError *__autoreleasing*)errorp;
+- (NSArray *)parseAppcastItemsFromXMLData:(NSData *)appcastData error:(NSError *__autoreleasing*)errorp;
 @end
 

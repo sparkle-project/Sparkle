@@ -14,11 +14,10 @@ class SUAppcastTest: XCTestCase {
     func testExample() {
         let appcast = SUAppcast();
         let testFile = NSBundle(forClass: SUAppcastTest.self).pathForResource("testappcast", ofType: "xml")!;
-        let testFileUrl = NSURL(fileURLWithPath: testFile);
-        XCTAssertNotNil(testFileUrl);
+        let testData = NSData(contentsOfFile: testFile)!
         
         do {
-            let items = try appcast.parseAppcastItemsFromXMLFile(testFileUrl) as! [SUAppcastItem];
+            let items = try appcast.parseAppcastItemsFromXMLData(testData) as! [SUAppcastItem];
             
             XCTAssertEqual(4, items.count);
             
