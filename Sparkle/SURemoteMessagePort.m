@@ -7,10 +7,12 @@
 //
 
 #import "SURemoteMessagePort.h"
-#import <objc/runtime.h>
 
-// The global message queue where we perform message port operations
-// We want this to be global across live remote ports, otherwise I fear for out-of-order invalidation events and the such
+// Because remote message ports returned to us upon creation can be re-used, we maintain a global table so that
+// each instance we create can have its own invalidation block. We really invalidate a port for a service name if
+// the number of ports for that service reach 0. If we don't maintain a table, we could run into trouble.
+// For instance, invalidating one remote message port could invalidate another.
+static NSMutableDictionary<NSString *, NSMutableArray<SURemoteMessagePort *> *> *gMessagePortsTable;
 static dispatch_queue_t gMessageQueue;
 
 @interface SURemoteMessagePort ()
@@ -22,8 +24,6 @@ static dispatch_queue_t gMessageQueue;
 @end
 
 @implementation SURemoteMessagePort
-
-static const char *SURemoteMessagePortSelfKey = "su_messagePort";
 
 @synthesize serviceName = _serviceName;
 @synthesize messagePort = _messagePort;
@@ -37,6 +37,7 @@ static const char *SURemoteMessagePortSelfKey = "su_messagePort";
         
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
+            gMessagePortsTable = [[NSMutableDictionary alloc] init];
             gMessageQueue = dispatch_queue_create("org.sparkle-project.remote-message-port", DISPATCH_QUEUE_SERIAL);
         });
     }
@@ -46,22 +47,31 @@ static const char *SURemoteMessagePortSelfKey = "su_messagePort";
 - (void)connectWithLookupCompletion:(void (^)(BOOL))lookupCompletionHandler invalidationHandler:(void (^)(void))invalidationHandler
 {
     dispatch_async(gMessageQueue, ^{
-        CFMessagePortRef messagePort = CFMessagePortCreateRemote(kCFAllocatorDefault, (CFStringRef)self.serviceName);
-        if (messagePort == NULL) {
-            lookupCompletionHandler(NO);
-        } else {
-            self.messagePort = messagePort;
+        NSMutableArray<SURemoteMessagePort *> *existingMessagePorts = [gMessagePortsTable objectForKey:self.serviceName];
+        if (existingMessagePorts != nil && existingMessagePorts.count > 0) {
+            self.messagePort = existingMessagePorts[0].messagePort;
             self.invalidationHandler = [invalidationHandler copy];
             
-            CFRetain((__bridge CFTypeRef)(self));
-            
-            // We have to set an associated object here because we can't pass an info context to remote message ports when setting up an invalidation handler
-            objc_setAssociatedObject((__bridge id)messagePort, SURemoteMessagePortSelfKey, self, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            
-            // Note: do not add messagePort to dispatch queue or run loop: it will complain that one shouldn't be added for remote ports
-            CFMessagePortSetInvalidationCallBack(messagePort, messageInvalidationCallback);
+            [existingMessagePorts addObject:self];
             
             lookupCompletionHandler(YES);
+        } else {
+            CFMessagePortRef messagePort = CFMessagePortCreateRemote(kCFAllocatorDefault, (CFStringRef)self.serviceName);
+            if (messagePort == NULL) {
+                lookupCompletionHandler(NO);
+            } else {
+                self.messagePort = messagePort;
+                self.invalidationHandler = [invalidationHandler copy];
+                
+                NSMutableArray<SURemoteMessagePort *> *newMessagePorts = [[NSMutableArray alloc] init];
+                [newMessagePorts addObject:self];
+                [gMessagePortsTable setObject:newMessagePorts forKey:self.serviceName];
+                
+                // Note: do not add messagePort to dispatch queue or run loop: it will complain that one shouldn't be added for remote ports
+                CFMessagePortSetInvalidationCallBack(messagePort, messageInvalidationCallback);
+                
+                lookupCompletionHandler(YES);
+            }
         }
     });
 }
@@ -100,31 +110,43 @@ static const char *SURemoteMessagePortSelfKey = "su_messagePort";
 - (void)invalidate
 {
     dispatch_async(gMessageQueue, ^{
-        if (self.invalidationHandler != nil) {
-            self.invalidationHandler = nil;
-            CFMessagePortInvalidate(self.messagePort);
+        self.invalidationHandler = nil;
+        
+        if (self.messagePort != NULL) {
+            NSMutableArray<SURemoteMessagePort *> *messagePorts = [gMessagePortsTable objectForKey:self.serviceName];
+            [messagePorts removeObject:self];
+            
+            if (messagePorts.count == 0) {
+                [gMessagePortsTable removeObjectForKey:self.serviceName];
+                
+                // Removing our callback is a better decision than waiting for it to be called at an unpredictable time later
+                CFMessagePortSetInvalidationCallBack(self.messagePort, NULL);
+                CFMessagePortInvalidate(self.messagePort);
+                CFRelease(self.messagePort);
+                self.messagePort = NULL;
+            }
         }
     });
 }
 
-// For safetly, let's not assume what thread this may be called on
 static void messageInvalidationCallback(CFMessagePortRef messagePort, void * __unused info)
 {
     @autoreleasepool {
-        SURemoteMessagePort *self = objc_getAssociatedObject((__bridge id)(messagePort), SURemoteMessagePortSelfKey);
+        NSString *serviceName = [(const NSString *)CFMessagePortGetName(messagePort) copy];
         
         dispatch_async(gMessageQueue, ^{
-            if (self.invalidationHandler != nil) {
-                self.invalidationHandler();
-                self.invalidationHandler = nil;
+            if (serviceName != nil) {
+                for (SURemoteMessagePort *remoteMessagePort in [gMessagePortsTable objectForKey:serviceName]) {
+                    if (remoteMessagePort.invalidationHandler != nil) {
+                        remoteMessagePort.invalidationHandler();
+                        remoteMessagePort.invalidationHandler = nil;
+                    }
+                    remoteMessagePort.messagePort = NULL;
+                }
+                [gMessagePortsTable removeObjectForKey:serviceName];
             }
             
-            self.messagePort = NULL;
-            
-            objc_setAssociatedObject((__bridge id)(messagePort), SURemoteMessagePortSelfKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             CFRelease(messagePort);
-            
-            CFRelease((__bridge CFTypeRef)(self));
         });
     }
 }

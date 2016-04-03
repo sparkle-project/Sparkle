@@ -38,40 +38,29 @@
     
     SURemoteMessagePort *remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)];
     
-    __block BOOL handledCompletion = NO;
-    
     [remotePort connectWithLookupCompletion:^(BOOL lookupSuccess) {
         if (!lookupSuccess) {
-            if (!handledCompletion) {
-                completionHandler(nil);
-                handledCompletion = YES;
-            }
+            completionHandler(nil);
         } else {
             [remotePort sendMessageWithIdentifier:SUReceiveUpdateAppcastItemData data:[NSData data] reply:^(BOOL success, NSData * _Nullable replyData) {
                 [remotePort invalidate];
                 
-                if (!handledCompletion) {
-                    if (!success || replyData == nil) {
-                        completionHandler(nil);
+                if (!success || replyData == nil) {
+                    completionHandler(nil);
+                } else {
+                    NSData *nonNullReplyData = replyData;
+                    SUAppcastItem  * _Nullable updateItem = SUUnarchiveRootObjectSecurely(nonNullReplyData, [SUAppcastItem class]);
+                    
+                    if (updateItem != nil) {
+                        completionHandler(updateItem);
                     } else {
-                        NSData *nonNullReplyData = replyData;
-                        SUAppcastItem  * _Nullable updateItem = SUUnarchiveRootObjectSecurely(nonNullReplyData, [SUAppcastItem class]);
-                        
-                        if (updateItem != nil) {
-                            completionHandler(updateItem);
-                        } else {
-                            completionHandler(nil);
-                        }
+                        completionHandler(nil);
                     }
                 }
-                handledCompletion = YES;
             }];
         }
     } invalidationHandler:^{
-        if (!handledCompletion) {
-            completionHandler(nil);
-            handledCompletion = YES;
-        }
+        completionHandler(nil);
     }];
 }
 
