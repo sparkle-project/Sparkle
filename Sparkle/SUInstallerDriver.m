@@ -128,16 +128,23 @@
     return YES;
 }
 
-- (BOOL)setUpRemotePort:(NSError * __autoreleasing *)error
+- (void)setUpRemotePortWithCompletion:(void (^)(BOOL))completionHandler
 {
     if (self.remotePort != nil) {
-        return YES;
+        completionHandler(YES);
+        return;
     }
     
     NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier) invalidationCallback:^{
+    self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)];
+    
+    [self.remotePort connectWithLookupCompletion:^(BOOL lookupSuccess) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(lookupSuccess);
+        });
+    } invalidationHandler:^{
         dispatch_async(dispatch_get_main_queue(), ^{
             if (self.remotePort != nil) {
                 NSError *remoteError =
@@ -153,25 +160,6 @@
             }
         });
     }];
-    
-    if (self.remotePort == nil) {
-        NSError *remoteError =
-        [NSError
-         errorWithDomain:SUSparkleErrorDomain
-         code:SUInstallationError
-         userInfo:@{
-                    NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
-                    NSLocalizedFailureReasonErrorKey:@"The remote port connection failed being created"
-                    }
-         ];
-        
-        if (error != NULL) {
-            *error = remoteError;
-        }
-        
-        return NO;
-    }
-    return YES;
 }
 
 - (void)launchInstallToolWithCompletion:(void (^)(NSError  * _Nullable ))completionHandler
@@ -220,20 +208,37 @@
     
     NSData *archivedData = SUArchiveRootObjectSecurely(installationData);
     
-    NSError *remoteError = nil;
-    if (![self setUpRemotePort:&remoteError]) {
-        [self.delegate installerIsRequestingAbortInstallWithError:remoteError];
-    } else {
-        [self.remotePort sendMessageWithIdentifier:SUInstallationData data:archivedData completion:^(BOOL success) {
-            if (!success) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while starting the installer parameters. Please try again later.", nil) }]];
-                });
-            }
-        }];
+    __weak SUInstallerDriver *weakSelf = self;
+    [self setUpRemotePortWithCompletion:^(BOOL setupSuccess) {
+        SUInstallerDriver *strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
         
-        self.currentStage = SURequestInstallationParameters;
-    }
+        if (!setupSuccess) {
+            NSError *remoteError =
+            [NSError
+             errorWithDomain:SUSparkleErrorDomain
+             code:SUInstallationError
+             userInfo:@{
+                        NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
+                        NSLocalizedFailureReasonErrorKey:@"The remote port connection failed being created"
+                        }
+             ];
+            
+            [strongSelf.delegate installerIsRequestingAbortInstallWithError:remoteError];
+        } else {
+            [strongSelf.remotePort sendMessageWithIdentifier:SUInstallationData data:archivedData completion:^(BOOL success) {
+                if (!success) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [weakSelf.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while starting the installer parameters. Please try again later.", nil) }]];
+                    });
+                }
+            }];
+            
+            strongSelf.currentStage = SURequestInstallationParameters;
+        }
+    }];
 }
 
 - (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
@@ -467,34 +472,40 @@
         return;
     }
     
-    NSError *remotePortError = nil;
-    if (![self setUpRemotePort:&remotePortError]) {
-        [self.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while starting the remote port for the installer. Please try again later.", nil) }]];
-        return;
-    }
-    
-    // For resumability, we'll assume we are far enough for the installation to continue
-    self.currentStage = SUInstallationFinishedStage1;
-    
-    uint8_t response[2] = {(uint8_t)relaunch, (uint8_t)showUI};
-    NSData *responseData = [NSData dataWithBytes:response length:sizeof(response)];
-    
-    [self.remotePort sendMessageWithIdentifier:SUResumeInstallationToStage2 data:responseData completion:^(BOOL success) {
-        if (!success) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                NSError *remoteError =
-                [NSError
-                 errorWithDomain:SUSparkleErrorDomain
-                 code:SUInstallationError
-                 userInfo:@{
-                            NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
-                            NSLocalizedFailureReasonErrorKey:@"The remote port connection failed to send resume install message"
-                            }
-                 ];
-                [self.delegate installerIsRequestingAbortInstallWithError:remoteError];
-            });
+    __weak SUInstallerDriver *weakSelf = self;
+    [self setUpRemotePortWithCompletion:^(BOOL setupSuccess) {
+        SUInstallerDriver *strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
         }
-        // otherwise we'll terminate later when the installer tells us stage 2 is done
+        
+        if (!setupSuccess) {
+            [strongSelf.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while starting the remote port for the installer. Please try again later.", nil) }]];
+        } else {
+            // For resumability, we'll assume we are far enough for the installation to continue
+            strongSelf.currentStage = SUInstallationFinishedStage1;
+            
+            uint8_t response[2] = {(uint8_t)relaunch, (uint8_t)showUI};
+            NSData *responseData = [NSData dataWithBytes:response length:sizeof(response)];
+            
+            [strongSelf.remotePort sendMessageWithIdentifier:SUResumeInstallationToStage2 data:responseData completion:^(BOOL success) {
+                if (!success) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        NSError *remoteError =
+                        [NSError
+                         errorWithDomain:SUSparkleErrorDomain
+                         code:SUInstallationError
+                         userInfo:@{
+                                    NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
+                                    NSLocalizedFailureReasonErrorKey:@"The remote port connection failed to send resume install message"
+                                    }
+                         ];
+                        [weakSelf.delegate installerIsRequestingAbortInstallWithError:remoteError];
+                    });
+                }
+                // otherwise we'll terminate later when the installer tells us stage 2 is done
+            }];
+        }
     }];
 }
 

@@ -9,11 +9,15 @@
 #import "SURemoteMessagePort.h"
 #import <objc/runtime.h>
 
+// The global message queue where we perform message port operations
+// We want this to be global across live remote ports, otherwise I fear for out-of-order invalidation events and the such
+static dispatch_queue_t gMessageQueue;
+
 @interface SURemoteMessagePort ()
 
+@property (nonatomic, copy) NSString *serviceName;
 @property (nonatomic) CFMessagePortRef messagePort;
-@property (nonatomic, copy) void (^invalidationCallback)(void);
-@property (nonatomic, readonly) dispatch_queue_t messageQueue;
+@property (nonatomic, copy) void (^invalidationHandler)(void);
 
 @end
 
@@ -21,37 +25,50 @@
 
 static const char *SURemoteMessagePortSelfKey = "su_messagePort";
 
+@synthesize serviceName = _serviceName;
 @synthesize messagePort = _messagePort;
-@synthesize invalidationCallback = _invalidationCallback;
-@synthesize messageQueue = _messageQueue;
+@synthesize invalidationHandler = _invalidationHandler;
 
-- (nullable instancetype)initWithServiceName:(NSString *)serviceName invalidationCallback:(void (^)(void))invalidationCallback
+- (instancetype)initWithServiceName:(NSString *)serviceName
 {
     self = [super init];
     if (self != nil) {
-        CFMessagePortRef messagePort = CFMessagePortCreateRemote(kCFAllocatorDefault, (CFStringRef)serviceName);
-        if (messagePort == NULL) {
-            return nil;
-        }
+        _serviceName = [serviceName copy];
         
-        _messageQueue = dispatch_queue_create("org.sparkle-project.remote-message-port", DISPATCH_QUEUE_SERIAL);
-        _messagePort = messagePort;
-        _invalidationCallback = [invalidationCallback copy];
-        
-        CFRetain((__bridge CFTypeRef)(self));
-        
-        // We have to set an associated object here because we can't pass an info context to remote message ports when setting up an invalidation handler
-        objc_setAssociatedObject((__bridge id)messagePort, SURemoteMessagePortSelfKey, self, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        
-        // Note: do not add messagePort to dispatch queue or run loop: it will complain that one shouldn't be added for remote ports
-        CFMessagePortSetInvalidationCallBack(messagePort, messageInvalidationCallback);
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            gMessageQueue = dispatch_queue_create("org.sparkle-project.remote-message-port", DISPATCH_QUEUE_SERIAL);
+        });
     }
     return self;
 }
 
+- (void)connectWithLookupCompletion:(void (^)(BOOL))lookupCompletionHandler invalidationHandler:(void (^)(void))invalidationHandler
+{
+    dispatch_async(gMessageQueue, ^{
+        CFMessagePortRef messagePort = CFMessagePortCreateRemote(kCFAllocatorDefault, (CFStringRef)self.serviceName);
+        if (messagePort == NULL) {
+            lookupCompletionHandler(NO);
+        } else {
+            self.messagePort = messagePort;
+            self.invalidationHandler = [invalidationHandler copy];
+            
+            CFRetain((__bridge CFTypeRef)(self));
+            
+            // We have to set an associated object here because we can't pass an info context to remote message ports when setting up an invalidation handler
+            objc_setAssociatedObject((__bridge id)messagePort, SURemoteMessagePortSelfKey, self, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            
+            // Note: do not add messagePort to dispatch queue or run loop: it will complain that one shouldn't be added for remote ports
+            CFMessagePortSetInvalidationCallBack(messagePort, messageInvalidationCallback);
+            
+            lookupCompletionHandler(YES);
+        }
+    });
+}
+
 - (void)sendMessageWithIdentifier:(int32_t)identifier data:(NSData *)data expectingReply:(BOOL)expectingReply completion:(void (^)(BOOL success, NSData * _Nullable replyData))completionHandler
 {
-    dispatch_async(self.messageQueue, ^{
+    dispatch_async(gMessageQueue, ^{
         SInt32 status = 0;
         NSData *replyData = nil;
         if (self.messagePort != NULL) {
@@ -82,9 +99,9 @@ static const char *SURemoteMessagePortSelfKey = "su_messagePort";
 
 - (void)invalidate
 {
-    dispatch_async(self.messageQueue, ^{
-        if (self.invalidationCallback != nil) {
-            self.invalidationCallback = nil;
+    dispatch_async(gMessageQueue, ^{
+        if (self.invalidationHandler != nil) {
+            self.invalidationHandler = nil;
             CFMessagePortInvalidate(self.messagePort);
         }
     });
@@ -96,10 +113,10 @@ static void messageInvalidationCallback(CFMessagePortRef messagePort, void * __u
     @autoreleasepool {
         SURemoteMessagePort *self = objc_getAssociatedObject((__bridge id)(messagePort), SURemoteMessagePortSelfKey);
         
-        dispatch_async(self.messageQueue, ^{
-            if (self.invalidationCallback != nil) {
-                self.invalidationCallback();
-                self.invalidationCallback = nil;
+        dispatch_async(gMessageQueue, ^{
+            if (self.invalidationHandler != nil) {
+                self.invalidationHandler();
+                self.invalidationHandler = nil;
             }
             
             self.messagePort = NULL;

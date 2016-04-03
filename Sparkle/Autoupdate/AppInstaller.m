@@ -107,29 +107,42 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         [self cleanupAndExitWithStatus:EXIT_FAILURE];
     }
     
-    if (![self startRemotePort]) {
-        SULog(@"Failed creating remote message port from installer");
-        [self cleanupAndExitWithStatus:EXIT_FAILURE];
-    }
+    [self startRemotePortWithCompletion:^(BOOL success) {
+        if (!success) {
+            SULog(@"Failed creating remote message port from installer");
+            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+        }
+    }];
     
     return self;
 }
 
-- (BOOL)startRemotePort
+- (void)startRemotePortWithCompletion:(void (^)(BOOL))completionHandler
 {
-    if (self.remotePort == nil) {
-        self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUUpdateDriverServiceNameForBundleIdentifier(self.hostBundleIdentifier) invalidationCallback:^{
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (self.remotePort != nil && !self.willCompleteInstallation) {
-                    SULog(@"Invalidation on remote port being called, and installation is not close enough to completion!");
-                    [self cleanupAndExitWithStatus:EXIT_FAILURE];
-                }
-                self.remotePort = nil;
-            });
-        }];
+    if (self.remotePort != nil) {
+        completionHandler(YES);
+        return;
     }
-
-    return (self.remotePort != nil);
+    
+    self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUUpdateDriverServiceNameForBundleIdentifier(self.hostBundleIdentifier)];
+    
+    __weak AppInstaller *weakSelf = self;
+    [self.remotePort connectWithLookupCompletion:^(BOOL success) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(success);
+        });
+    } invalidationHandler:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            AppInstaller *strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                if (strongSelf.remotePort != nil && !strongSelf.willCompleteInstallation) {
+                    SULog(@"Invalidation on remote port being called, and installation is not close enough to completion!");
+                    [strongSelf cleanupAndExitWithStatus:EXIT_FAILURE];
+                }
+                strongSelf.remotePort = nil;
+            }
+        });
+    }];
 }
 
 /**
@@ -334,12 +347,14 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 #warning todo: handle this message even if we aren't ready for stage 2 yet.
             // We should try re-creating the remote port if necessary, in case the client has
             // restarted since and wants a reply back when we say it's OK to terminate the app
-            if (![self startRemotePort]) {
-                SULog(@"Installer failed to set up remote port to updater before resuming installation");
-            }
-            
-            // Resume the installation if we aren't done with stage 2 yet, and remind the client we are prepared to relaunch
-            [self resumeInstallation];
+            [self startRemotePortWithCompletion:^(BOOL success) {
+                if (!success) {
+                    SULog(@"Installer failed to set up remote port to updater before resuming installation");
+                }
+                
+                // Resume the installation if we aren't done with stage 2 yet, and remind the client we are prepared to relaunch
+                [self resumeInstallation];
+            }];
         });
     }
     

@@ -308,32 +308,47 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
     //	Wouldn't want to annoy users on dial-up by establishing a connection every
     //	hour or so:
     
+    // We don't want the reachability check to act on the driver if the updater is going near death
+    __weak SUUpdater *weakSelf = self;
+    
     [self allowsAutomaticUpdatesWithCompletion:^(BOOL allowsAutomaticUpdates) {
-        id <SUUpdateDriver> updateDriver;
-        if ([self automaticallyDownloadsUpdates] && allowsAutomaticUpdates && ![SUProbeInstallStatus probeInstallerInProgressForHost:self.host]) {
-            updateDriver =
-            [[SUAutomaticUpdateDriver alloc]
-             initWithHost:self.host
-             sparkleBundle:self.sparkleBundle
-             updater:self
-             updaterDelegate:self.delegate];
-        } else {
-            updateDriver =
-            [[SUScheduledUpdateDriver alloc]
-             initWithHost:self.host
-             allowsAutomaticUpdates:allowsAutomaticUpdates
-             sparkleBundle:self.sparkleBundle
-             updater:self
-             userDriver:self.userDriver
-             updaterDelegate:self.delegate];
+        SUHost *theHost = weakSelf.host;
+        if (theHost == nil) {
+            return;
         }
         
-        // We don't want the reachability check to act on the driver if the updater is going near death
-        __weak SUUpdater *updater = self;
-        NSURL *feedURL = [updater feedURL];
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            SUCheckForUpdatesInBgReachabilityCheck(updater, updateDriver, feedURL);
-        });
+        [SUProbeInstallStatus probeInstallerInProgressForHost:theHost completion:^(BOOL installerIsRunning) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                SUUpdater *strongSelf = weakSelf;
+                if (strongSelf == nil) {
+                    return;
+                }
+                
+                id <SUUpdateDriver> updateDriver;
+                if (!installerIsRunning && [strongSelf automaticallyDownloadsUpdates] && allowsAutomaticUpdates) {
+                    updateDriver =
+                    [[SUAutomaticUpdateDriver alloc]
+                     initWithHost:theHost
+                     sparkleBundle:strongSelf.sparkleBundle
+                     updater:strongSelf
+                     updaterDelegate:strongSelf.delegate];
+                } else {
+                    updateDriver =
+                    [[SUScheduledUpdateDriver alloc]
+                     initWithHost:theHost
+                     allowsAutomaticUpdates:allowsAutomaticUpdates
+                     sparkleBundle:strongSelf.sparkleBundle
+                     updater:strongSelf
+                     userDriver:strongSelf.userDriver
+                     updaterDelegate:strongSelf.delegate];
+                }
+                
+                NSURL *feedURL = [strongSelf feedURL];
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                    SUCheckForUpdatesInBgReachabilityCheck(weakSelf, updateDriver, feedURL);
+                });
+            });
+        }];
     }];
 }
 
@@ -398,11 +413,16 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
             }
         };
         
-        if (![SUProbeInstallStatus probeInstallerInProgressForHost:self.host]) {
-            [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders] completion:completionBlock];
-        } else {
-            [self.driver resumeUpdateWithCompletion:completionBlock];
-        }
+        [SUProbeInstallStatus probeInstallerInProgressForHost:self.host completion:^(BOOL success) {
+            SUUpdater *strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                if (!success) {
+                    [strongSelf.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[strongSelf userAgentString] httpHeaders:[strongSelf httpHeaders] completion:completionBlock];
+                } else {
+                    [strongSelf.driver resumeUpdateWithCompletion:completionBlock];
+                }
+            }
+        }];
     } else {
         [self.driver abortUpdate];
     }

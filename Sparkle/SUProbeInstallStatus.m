@@ -16,14 +16,19 @@
 
 @implementation SUProbeInstallStatus
 
-+ (BOOL)probeInstallerInProgressForHost:(SUHost *)host
++ (void)probeInstallerInProgressForHost:(SUHost *)host completion:(void (^)(BOOL))completionHandler
 {
     NSString *hostBundleIdentifier = host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    SURemoteMessagePort *remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier) invalidationCallback:^{}];
-    [remotePort invalidate];
-    return (remotePort != nil);
+    SURemoteMessagePort *remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)];
+    
+    [remotePort connectWithLookupCompletion:^(BOOL success) {
+        if (success) {
+            [remotePort invalidate];
+        }
+        completionHandler(success);
+    } invalidationHandler:^{}];
 }
 
 + (void)probeInstallerUpdateItemForHost:(SUHost *)host completion:(void (^)(SUAppcastItem  * _Nullable))completionHandler
@@ -31,26 +36,42 @@
     NSString *hostBundleIdentifier = host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    SURemoteMessagePort *remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier) invalidationCallback:^{}];
-    if (remotePort == nil) {
-        completionHandler(nil);
-        return;
-    }
+    SURemoteMessagePort *remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)];
     
-    [remotePort sendMessageWithIdentifier:SUReceiveUpdateAppcastItemData data:[NSData data] reply:^(BOOL success, NSData * _Nullable replyData) {
-        if (!success || replyData == nil) {
-            completionHandler(nil);
-        } else {
-            NSData *nonNullReplyData = replyData;
-            SUAppcastItem  * _Nullable updateItem = SUUnarchiveRootObjectSecurely(nonNullReplyData, [SUAppcastItem class]);
-            
-            if (updateItem != nil) {
-                completionHandler(updateItem);
-            } else {
+    __block BOOL handledCompletion = NO;
+    
+    [remotePort connectWithLookupCompletion:^(BOOL lookupSuccess) {
+        if (!lookupSuccess) {
+            if (!handledCompletion) {
                 completionHandler(nil);
+                handledCompletion = YES;
             }
+        } else {
+            [remotePort sendMessageWithIdentifier:SUReceiveUpdateAppcastItemData data:[NSData data] reply:^(BOOL success, NSData * _Nullable replyData) {
+                [remotePort invalidate];
+                
+                if (!handledCompletion) {
+                    if (!success || replyData == nil) {
+                        completionHandler(nil);
+                    } else {
+                        NSData *nonNullReplyData = replyData;
+                        SUAppcastItem  * _Nullable updateItem = SUUnarchiveRootObjectSecurely(nonNullReplyData, [SUAppcastItem class]);
+                        
+                        if (updateItem != nil) {
+                            completionHandler(updateItem);
+                        } else {
+                            completionHandler(nil);
+                        }
+                    }
+                }
+                handledCompletion = YES;
+            }];
         }
-        [remotePort invalidate];
+    } invalidationHandler:^{
+        if (!handledCompletion) {
+            completionHandler(nil);
+            handledCompletion = YES;
+        }
     }];
 }
 
