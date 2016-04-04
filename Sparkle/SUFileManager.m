@@ -88,10 +88,16 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     return self;
 }
 
-
 + (instancetype)fileManagerAllowingAuthorization:(BOOL)allowsAuthorization
 {
     return [[self alloc] initAllowingAuthorization:allowsAuthorization];
+}
+
+- (instancetype)fileManagerByPreservingAuthorizationRights
+{
+    // Check if we don't allow authorization, or that we haven't needed to authorize yet, to create or re-use a
+    // file manager instance with these restrictions
+    return (_allowsAuthorization && _auth != NULL) ? self : [SUFileManager fileManagerAllowingAuthorization:NO];
 }
 
 // Acquires an authorization reference which is intended to be used for future authorized file operations
