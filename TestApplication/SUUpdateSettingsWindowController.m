@@ -26,7 +26,13 @@
 
 - (IBAction)checkForUpdates:(id __unused)sender
 {
-    [self.updaterController checkForUpdates:nil];
+    [self.updaterController checkForUpdates:self];
+}
+
+// This would not be necessary if the updater controller was instantiated in the main menu nib
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+    return [self.updaterController validateMenuItem:menuItem];
 }
 
 @end
