@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SUUpdaterPermission : NSObject
 
 // Must be called from main queue
-- (void)testUpdateWritabilityAtPath:(NSString *)path completion:(void (^)(BOOL))completionHandler;
++ (void)testUpdateWritabilityAtPath:(NSString *)path completion:(void (^)(BOOL))completionHandler;
 
 @end
 

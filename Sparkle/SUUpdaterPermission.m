@@ -9,38 +9,21 @@
 #import "SUUpdaterPermission.h"
 #import "SUInstallerLauncherProtocol.h"
 
-@interface SUUpdaterPermission ()
-
-@property (nonatomic) BOOL allowsPermission;
-@property (nonatomic) BOOL checkedPermission;
-
-@end
-
 @implementation SUUpdaterPermission
 
-@synthesize allowsPermission = _allowsPermission;
-@synthesize checkedPermission = _checkedPermission;
-
-- (void)testUpdateWritabilityAtPath:(NSString *)path completion:(void (^)(BOOL))completionHandler
++ (void)testUpdateWritabilityAtPath:(NSString *)path completion:(void (^)(BOOL))completionHandler
 {
-    if (!self.checkedPermission) {
-        NSXPCConnection *launcherConnection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.InstallerLauncher"];
-        launcherConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerLauncherProtocol)];
-        [launcherConnection resume];
+    NSXPCConnection *launcherConnection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.InstallerLauncher"];
+    launcherConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerLauncherProtocol)];
+    [launcherConnection resume];
+    
+    [launcherConnection.remoteObjectProxy testWritabilityAtPath:path completion:^(BOOL isWritable) {
+        [launcherConnection invalidate];
         
-        __weak SUUpdaterPermission *weakSelf = self;
-        [launcherConnection.remoteObjectProxy testWritabilityAtPath:path completion:^(BOOL isWritable) {
-            [launcherConnection invalidate];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                weakSelf.checkedPermission = YES;
-                weakSelf.allowsPermission = isWritable;
-                completionHandler(isWritable);
-            });
-        }];
-    } else {
-        completionHandler(self.allowsPermission);
-    }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(isWritable);
+        });
+    }];
 }
 
 @end

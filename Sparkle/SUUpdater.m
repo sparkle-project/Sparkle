@@ -44,7 +44,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (strong) id <SUUpdateDriver> driver;
 @property (strong) SUHost *host;
 @property (nonatomic, readonly) SUUpdaterSettings *updaterSettings;
-@property (nonatomic, readonly) SUUpdaterPermission *updaterPermission;
+@property (nonatomic, readonly) BOOL hasWriteAccessToHostPath;
 
 @end
 
@@ -57,7 +57,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize driver;
 @synthesize host;
 @synthesize updaterSettings = _updaterSettings;
-@synthesize updaterPermission = _updaterPermission;
+@synthesize hasWriteAccessToHostPath = _hasWriteAccessToHostPath;
 @synthesize sparkleBundle;
 
 - (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)theDelegate
@@ -75,19 +75,26 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         host = [[SUHost alloc] initWithBundle:bundle];
         
         _updaterSettings = [[SUUpdaterSettings alloc] initWithHostBundle:bundle];
-        _updaterPermission = [[SUUpdaterPermission alloc] init];
         
         _userDriver = userDriver;
         
         delegate = theDelegate;
         
-        // This runs the permission prompt if needed, but never before the app has finished launching because the runloop may not have ran before that
-        // We will also take precaussions if a developer instantiates an updater themselves where the application may not be completely finished launching yet
-        [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:1];
-        
+        __weak SUUpdater *weakSelf = self;
+        [SUUpdaterPermission testUpdateWritabilityAtPath:host.bundlePath completion:^(BOOL isWritable) {
+            SUUpdater *strongSelf = weakSelf;
+            if (strongSelf == nil) {
+                return;
+            }
+            
+            strongSelf->_hasWriteAccessToHostPath = isWritable;
+            // This runs the permission prompt if needed, but never before the app has finished launching because the runloop may not have ran before that
+            // We will also take precaussions if a developer instantiates an updater themselves where the application may not be completely finished launching yet
+            [strongSelf performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:1];
 #ifdef DEBUG
-        SULog(@"WARNING: This is running a Debug build of Sparkle; don't use this in production!");
+            SULog(@"WARNING: This is running a Debug build of Sparkle; don't use this in production!");
 #endif
+        }];
     }
     
     return self;
@@ -311,44 +318,42 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
     // We don't want the reachability check to act on the driver if the updater is going near death
     __weak SUUpdater *weakSelf = self;
     
-    [self allowsAutomaticUpdatesWithCompletion:^(BOOL allowsAutomaticUpdates) {
-        SUHost *theHost = weakSelf.host;
-        if (theHost == nil) {
-            return;
-        }
-        
-        [SUProbeInstallStatus probeInstallerInProgressForHost:theHost completion:^(BOOL installerIsRunning) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                SUUpdater *strongSelf = weakSelf;
-                if (strongSelf == nil) {
-                    return;
-                }
-                
-                id <SUUpdateDriver> updateDriver;
-                if (!installerIsRunning && [strongSelf automaticallyDownloadsUpdates] && allowsAutomaticUpdates) {
-                    updateDriver =
-                    [[SUAutomaticUpdateDriver alloc]
-                     initWithHost:theHost
-                     sparkleBundle:strongSelf.sparkleBundle
-                     updater:strongSelf
-                     updaterDelegate:strongSelf.delegate];
-                } else {
-                    updateDriver =
-                    [[SUScheduledUpdateDriver alloc]
-                     initWithHost:theHost
-                     allowsAutomaticUpdates:allowsAutomaticUpdates
-                     sparkleBundle:strongSelf.sparkleBundle
-                     updater:strongSelf
-                     userDriver:strongSelf.userDriver
-                     updaterDelegate:strongSelf.delegate];
-                }
-                
-                NSURL *feedURL = [strongSelf feedURL];
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                    SUCheckForUpdatesInBgReachabilityCheck(weakSelf, updateDriver, feedURL);
-                });
+    SUHost *theHost = weakSelf.host;
+    if (theHost == nil) {
+        return;
+    }
+    
+    [SUProbeInstallStatus probeInstallerInProgressForHost:theHost completion:^(BOOL installerIsRunning) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            SUUpdater *strongSelf = weakSelf;
+            if (strongSelf == nil) {
+                return;
+            }
+            
+            id <SUUpdateDriver> updateDriver;
+            if (!installerIsRunning && [strongSelf automaticallyDownloadsUpdates] && [strongSelf allowsAutomaticUpdates]) {
+                updateDriver =
+                [[SUAutomaticUpdateDriver alloc]
+                 initWithHost:theHost
+                 sparkleBundle:strongSelf.sparkleBundle
+                 updater:strongSelf
+                 updaterDelegate:strongSelf.delegate];
+            } else {
+                updateDriver =
+                [[SUScheduledUpdateDriver alloc]
+                 initWithHost:theHost
+                 allowsAutomaticUpdates:[strongSelf allowsAutomaticUpdates]
+                 sparkleBundle:strongSelf.sparkleBundle
+                 updater:strongSelf
+                 userDriver:strongSelf.userDriver
+                 updaterDelegate:strongSelf.delegate];
+            }
+            
+            NSURL *feedURL = [strongSelf feedURL];
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                SUCheckForUpdatesInBgReachabilityCheck(weakSelf, updateDriver, feedURL);
             });
-        }];
+        });
     }];
 }
 
@@ -360,10 +365,9 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
         return;
     }
     
-    [self allowsAutomaticUpdatesWithCompletion:^(BOOL allowsAutomaticUpdates) {
-        id <SUUpdateDriver> theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithHost:self.host allowsAutomaticUpdates:allowsAutomaticUpdates sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
-        [self checkForUpdatesWithDriver:theUpdateDriver];
-    }];
+    id <SUUpdateDriver> theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithHost:self.host allowsAutomaticUpdates:[self allowsAutomaticUpdates] sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
+    
+    [self checkForUpdatesWithDriver:theUpdateDriver];
 }
 
 - (void)checkForUpdateInformation
@@ -477,16 +481,10 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
     return [self.updaterSettings automaticallyDownloadsUpdates];
 }
 
-- (void)allowsAutomaticUpdatesWithCompletion:(void (^)(BOOL))completionHandler
+- (BOOL)allowsAutomaticUpdates
 {
     NSNumber *developerAllowsAutomaticUpdates = [self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
-    if (developerAllowsAutomaticUpdates != nil && !developerAllowsAutomaticUpdates.boolValue) {
-        completionHandler(NO);
-    } else {
-        [self.updaterPermission testUpdateWritabilityAtPath:self.host.bundlePath completion:^(BOOL isWritable) {
-            completionHandler(isWritable);
-        }];
-    }
+    return self.hasWriteAccessToHostPath && (developerAllowsAutomaticUpdates == nil || developerAllowsAutomaticUpdates.boolValue);
 }
 
 - (void)setFeedURL:(NSURL *)feedURL
