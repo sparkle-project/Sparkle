@@ -84,6 +84,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         // This runs the permission prompt if needed, but never before the app has finished launching because the runloop may not have ran before that
         // We will also take precaussions if a developer instantiates an updater themselves where the application may not be completely finished launching yet
         [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:1];
+        
+#ifdef DEBUG
+        SULog(@"WARNING: This is running a Debug build of Sparkle; don't use this in production!");
+#endif
     }
     
     return self;
@@ -125,10 +129,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     if (!isMainBundle && !servingOverHttps) {
         SULog(@"WARNING: Serving updates over HTTP may be blocked in OS X 10.11. Please change the feed URL (%@) to use HTTPS. For more information:\nhttp://sparkle-project.org/documentation/app-transport-security/", feedURL);
     }
-#endif
-    
-#ifdef DEBUG
-    SULog(@"WARNING: This is running a Debug build of Sparkle; don't use this in production!");
 #endif
 }
 
