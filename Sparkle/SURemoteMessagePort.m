@@ -19,7 +19,7 @@ static dispatch_queue_t gMessageQueue;
 
 @property (nonatomic, copy) NSString *serviceName;
 @property (nonatomic) CFMessagePortRef messagePort;
-@property (nonatomic, copy) void (^invalidationHandler)(void);
+@property (nonatomic, copy) void (^invalidationCallback)(void);
 
 @end
 
@@ -27,14 +27,12 @@ static dispatch_queue_t gMessageQueue;
 
 @synthesize serviceName = _serviceName;
 @synthesize messagePort = _messagePort;
-@synthesize invalidationHandler = _invalidationHandler;
+@synthesize invalidationCallback = _invalidationCallback;
 
-- (instancetype)initWithServiceName:(NSString *)serviceName
+- (instancetype)init
 {
     self = [super init];
     if (self != nil) {
-        _serviceName = [serviceName copy];
-        
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
             gMessagePortsTable = [[NSMutableDictionary alloc] init];
@@ -44,13 +42,21 @@ static dispatch_queue_t gMessageQueue;
     return self;
 }
 
-- (void)connectWithLookupCompletion:(void (^)(BOOL))lookupCompletionHandler invalidationHandler:(void (^)(void))invalidationHandler
+- (instancetype)initWithServiceName:(NSString *)serviceName
+{
+    self = [self init];
+    if (self != nil) {
+        _serviceName = [serviceName copy];
+    }
+    return self;
+}
+
+- (void)connectWithLookupCompletion:(void (^)(BOOL))lookupCompletionHandler
 {
     dispatch_async(gMessageQueue, ^{
         NSMutableArray<SURemoteMessagePort *> *existingMessagePorts = [gMessagePortsTable objectForKey:self.serviceName];
         if (existingMessagePorts != nil && existingMessagePorts.count > 0) {
             self.messagePort = existingMessagePorts[0].messagePort;
-            self.invalidationHandler = [invalidationHandler copy];
             
             [existingMessagePorts addObject:self];
             
@@ -61,17 +67,25 @@ static dispatch_queue_t gMessageQueue;
                 lookupCompletionHandler(NO);
             } else {
                 self.messagePort = messagePort;
-                self.invalidationHandler = [invalidationHandler copy];
                 
                 NSMutableArray<SURemoteMessagePort *> *newMessagePorts = [[NSMutableArray alloc] init];
                 [newMessagePorts addObject:self];
                 [gMessagePortsTable setObject:newMessagePorts forKey:self.serviceName];
                 
-                // Note: do not add messagePort to dispatch queue or run loop: it will complain that one shouldn't be added for remote ports
-                CFMessagePortSetInvalidationCallBack(messagePort, messageInvalidationCallback);
-                
                 lookupCompletionHandler(YES);
             }
+        }
+    });
+}
+
+- (void)setInvalidationHandler:(void (^)(void))invalidationHandler
+{
+    dispatch_async(gMessageQueue, ^{
+        if (self.messagePort != NULL) {
+            self.invalidationCallback = [invalidationHandler copy];
+            
+            // Note: do not add messagePort to dispatch queue or run loop: it will complain that one shouldn't be added for remote ports
+            CFMessagePortSetInvalidationCallBack(self.messagePort, messageInvalidationCallback);
         }
     });
 }
@@ -110,7 +124,7 @@ static dispatch_queue_t gMessageQueue;
 - (void)invalidate
 {
     dispatch_async(gMessageQueue, ^{
-        self.invalidationHandler = nil;
+        self.invalidationCallback = nil;
         
         if (self.messagePort != NULL) {
             NSMutableArray<SURemoteMessagePort *> *messagePorts = [gMessagePortsTable objectForKey:self.serviceName];
@@ -137,9 +151,9 @@ static void messageInvalidationCallback(CFMessagePortRef messagePort, void * __u
         dispatch_async(gMessageQueue, ^{
             if (serviceName != nil) {
                 for (SURemoteMessagePort *remoteMessagePort in [gMessagePortsTable objectForKey:serviceName]) {
-                    if (remoteMessagePort.invalidationHandler != nil) {
-                        remoteMessagePort.invalidationHandler();
-                        remoteMessagePort.invalidationHandler = nil;
+                    if (remoteMessagePort.invalidationCallback != nil) {
+                        remoteMessagePort.invalidationCallback();
+                        remoteMessagePort.invalidationCallback = nil;
                     }
                     remoteMessagePort.messagePort = NULL;
                 }

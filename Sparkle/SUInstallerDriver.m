@@ -10,7 +10,8 @@
 #import "SULog.h"
 #import "SUMessageTypes.h"
 #import "SULocalMessagePort.h"
-#import "SURemoteMessagePort.h"
+#import "SUXPCRemoteMessagePort.h"
+#import "SURemoteMessagePortProtocol.h"
 #import "SUUpdaterDelegate.h"
 #import "SUAppcastItem.h"
 #import "SULog.h"
@@ -34,7 +35,7 @@
 @property (nonatomic, weak, readonly) id<SUInstallerDriverDelegate> delegate;
 @property (nonatomic) SUInstallerMessageType currentStage;
 @property (nonatomic) SULocalMessagePort *localPort;
-@property (nonatomic) SURemoteMessagePort *remotePort;
+@property (nonatomic) id <SURemoteMessagePort> remotePort;
 @property (nonatomic) BOOL postponedOnce;
 @property (nonatomic, weak, readonly) id updater;
 @property (nonatomic, weak, readonly) id<SUUpdaterDelegate> updaterDelegate;
@@ -138,25 +139,32 @@
     NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)];
+    self.remotePort = [[SUXPCRemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)];
+    
+    __weak SUInstallerDriver *weakSelf = self;
     
     [self.remotePort connectWithLookupCompletion:^(BOOL lookupSuccess) {
         dispatch_async(dispatch_get_main_queue(), ^{
             completionHandler(lookupSuccess);
-        });
-    } invalidationHandler:^{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (self.remotePort != nil) {
-                NSError *remoteError =
-                [NSError
-                 errorWithDomain:SUSparkleErrorDomain
-                 code:SUInstallationError
-                 userInfo:@{
-                            NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
-                            NSLocalizedFailureReasonErrorKey:@"The remote port connection was invalidated from the updater"
-                            }
-                 ];
-                [self.delegate installerIsRequestingAbortInstallWithError:remoteError];
+            
+            if (lookupSuccess) {
+                [weakSelf.remotePort setInvalidationHandler:^{
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        SUInstallerDriver *strongSelf = weakSelf;
+                        if (strongSelf.remotePort != nil) {
+                            NSError *remoteError =
+                            [NSError
+                             errorWithDomain:SUSparkleErrorDomain
+                             code:SUInstallationError
+                             userInfo:@{
+                                        NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
+                                        NSLocalizedFailureReasonErrorKey:@"The remote port connection was invalidated from the updater"
+                                        }
+                             ];
+                            [strongSelf.delegate installerIsRequestingAbortInstallWithError:remoteError];
+                        }
+                    });
+                }];
             }
         });
     }];

@@ -1,0 +1,6 @@
+// RemoteMessagePort only
+
+INFOPLIST_FILE = RemoteMessagePort/Info.plist
+WRAPPER_EXTENSION = xpc
+PRODUCT_BUNDLE_IDENTIFIER = org.sparkle-project.RemoteMessagePort
+CODE_SIGN_IDENTITY = -

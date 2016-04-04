@@ -130,16 +130,20 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     [self.remotePort connectWithLookupCompletion:^(BOOL success) {
         dispatch_async(dispatch_get_main_queue(), ^{
             completionHandler(success);
-        });
-    } invalidationHandler:^{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            AppInstaller *strongSelf = weakSelf;
-            if (strongSelf != nil) {
-                if (strongSelf.remotePort != nil && !strongSelf.willCompleteInstallation) {
-                    SULog(@"Invalidation on remote port being called, and installation is not close enough to completion!");
-                    [strongSelf cleanupAndExitWithStatus:EXIT_FAILURE];
-                }
-                strongSelf.remotePort = nil;
+            
+            if (success) {
+                [weakSelf.remotePort setInvalidationHandler:^{
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        AppInstaller *strongSelf = weakSelf;
+                        if (strongSelf != nil) {
+                            if (strongSelf.remotePort != nil && !strongSelf.willCompleteInstallation) {
+                                SULog(@"Invalidation on remote port being called, and installation is not close enough to completion!");
+                                [strongSelf cleanupAndExitWithStatus:EXIT_FAILURE];
+                            }
+                            strongSelf.remotePort = nil;
+                        }
+                    });
+                }];
             }
         });
     }];

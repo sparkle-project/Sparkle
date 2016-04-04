@@ -257,6 +257,12 @@
 		72B767E61C9CFD7200A07552 /* SUAutomaticUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 72B767E41C9CFD7200A07552 /* SUAutomaticUpdateDriver.h */; };
 		72B767E71C9CFD7200A07552 /* SUAutomaticUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B767E51C9CFD7200A07552 /* SUAutomaticUpdateDriver.m */; };
 		72D4DAA11AD7632900B211E2 /* SUBinaryDeltaCreate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7268AC621AD634C200C3E0C1 /* SUBinaryDeltaCreate.m */; };
+		72E41A391CB209CA003D47E0 /* SURemoteMessagePortProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 72E41A381CB209CA003D47E0 /* SURemoteMessagePortProtocol.h */; };
+		72E41A451CB20BA7003D47E0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E41A441CB20BA7003D47E0 /* main.m */; };
+		72E41A491CB20BA7003D47E0 /* RemoteMessagePort.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 72E41A3E1CB20BA7003D47E0 /* RemoteMessagePort.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		72E41A501CB210AE003D47E0 /* SURemoteMessagePort.m in Sources */ = {isa = PBXBuildFile; fileRef = 729746441C91212400FC134E /* SURemoteMessagePort.m */; };
+		72E41A531CB21125003D47E0 /* SUXPCRemoteMessagePort.h in Headers */ = {isa = PBXBuildFile; fileRef = 72E41A511CB21125003D47E0 /* SUXPCRemoteMessagePort.h */; };
+		72E41A541CB21125003D47E0 /* SUXPCRemoteMessagePort.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E41A521CB21125003D47E0 /* SUXPCRemoteMessagePort.m */; };
 		72E45CF31B640CDD005C701A /* SUTestApplicationDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E45CF21B640CDD005C701A /* SUTestApplicationDelegate.m */; };
 		72E45CF71B640DAE005C701A /* SUUpdateSettingsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E45CF51B640DAE005C701A /* SUUpdateSettingsWindowController.m */; };
 		72E45CF81B640DAE005C701A /* SUUpdateSettingsWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */; };
@@ -398,6 +404,13 @@
 			remoteGlobalIDString = 728638F21CAF5A5F00783084;
 			remoteInfo = AppcastDownloader;
 		};
+		72E41A471CB20BA7003D47E0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 72E41A3D1CB20BA7003D47E0;
+			remoteInfo = RemoteMessagePort;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -439,6 +452,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
 			dstSubfolderSpec = 16;
 			files = (
+				72E41A491CB20BA7003D47E0 /* RemoteMessagePort.xpc in Embed XPC Services */,
 				726E07B81CAF08D6001A286B /* InstallerLauncher.xpc in Embed XPC Services */,
 				726E07FA1CAF37BD001A286B /* UpdateDownloader.xpc in Embed XPC Services */,
 				728638FE1CAF5A5F00783084 /* AppcastDownloader.xpc in Embed XPC Services */,
@@ -817,6 +831,13 @@
 		72B767E11C9CE90A00A07552 /* SUCoreBasedUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUCoreBasedUpdateDriver.m; sourceTree = "<group>"; };
 		72B767E41C9CFD7200A07552 /* SUAutomaticUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUAutomaticUpdateDriver.h; sourceTree = "<group>"; };
 		72B767E51C9CFD7200A07552 /* SUAutomaticUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUAutomaticUpdateDriver.m; sourceTree = "<group>"; };
+		72E41A381CB209CA003D47E0 /* SURemoteMessagePortProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SURemoteMessagePortProtocol.h; path = Sparkle/SURemoteMessagePortProtocol.h; sourceTree = SOURCE_ROOT; };
+		72E41A3E1CB20BA7003D47E0 /* RemoteMessagePort.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = RemoteMessagePort.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+		72E41A441CB20BA7003D47E0 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		72E41A461CB20BA7003D47E0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		72E41A511CB21125003D47E0 /* SUXPCRemoteMessagePort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUXPCRemoteMessagePort.h; path = Sparkle/SUXPCRemoteMessagePort.h; sourceTree = SOURCE_ROOT; };
+		72E41A521CB21125003D47E0 /* SUXPCRemoteMessagePort.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUXPCRemoteMessagePort.m; path = Sparkle/SUXPCRemoteMessagePort.m; sourceTree = SOURCE_ROOT; };
+		72E41A551CB22F44003D47E0 /* ConfigRemoteMessagePort.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigRemoteMessagePort.xcconfig; sourceTree = "<group>"; };
 		72E45CF11B640CDD005C701A /* SUTestApplicationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUTestApplicationDelegate.h; sourceTree = "<group>"; };
 		72E45CF21B640CDD005C701A /* SUTestApplicationDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUTestApplicationDelegate.m; sourceTree = "<group>"; };
 		72E45CF41B640DAE005C701A /* SUUpdateSettingsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdateSettingsWindowController.h; sourceTree = "<group>"; };
@@ -938,6 +959,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		72E41A3B1CB20BA7003D47E0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DC2EF560486A6940098B216 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -966,6 +994,7 @@
 				726E07AD1CAF08D6001A286B /* InstallerLauncher.xpc */,
 				726E07EF1CAF37BD001A286B /* UpdateDownloader.xpc */,
 				728638F31CAF5A5F00783084 /* AppcastDownloader.xpc */,
+				72E41A3E1CB20BA7003D47E0 /* RemoteMessagePort.xpc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1081,6 +1110,7 @@
 			children = (
 				61299B3909CB055000B7442F /* Appcast Support */,
 				55C14BD5136EEFD000649790 /* Autoupdate */,
+				729746481C91483B00FC134E /* IPC */,
 				089C1665FE841158C02AAC07 /* Framework Resources */,
 				61B5F8F309C4CE5900B25A18 /* Other Sources */,
 				61F83F6E0DBFE07A006FDD30 /* Update Control */,
@@ -1123,7 +1153,6 @@
 				7297461F1C8E8D9A00FC134E /* TerminationListener.m */,
 				726E075E1CA4E9A5001A286B /* SUInstallationInputData.h */,
 				726E075F1CA4E9A5001A286B /* SUInstallationInputData.m */,
-				729746481C91483B00FC134E /* IPC */,
 			);
 			path = Autoupdate;
 			sourceTree = "<group>";
@@ -1426,16 +1455,21 @@
 		729746481C91483B00FC134E /* IPC */ = {
 			isa = PBXGroup;
 			children = (
+				72E41A3F1CB20BA7003D47E0 /* RemoteMessagePort */,
 				7297463E1C9119F300FC134E /* SULocalMessagePort.h */,
 				7297463F1C9119F300FC134E /* SULocalMessagePort.m */,
+				72E41A381CB209CA003D47E0 /* SURemoteMessagePortProtocol.h */,
 				729746431C91212400FC134E /* SURemoteMessagePort.h */,
 				729746441C91212400FC134E /* SURemoteMessagePort.m */,
+				72E41A511CB21125003D47E0 /* SUXPCRemoteMessagePort.h */,
+				72E41A521CB21125003D47E0 /* SUXPCRemoteMessagePort.m */,
 				729746551C936D5E00FC134E /* SUMessageTypes.h */,
 				729746561C936D5E00FC134E /* SUMessageTypes.m */,
 				726E075A1CA3A6D6001A286B /* SUSecureCoding.h */,
 				726E075B1CA3A6D6001A286B /* SUSecureCoding.m */,
 			);
 			name = IPC;
+			path = Autoupdate;
 			sourceTree = "<group>";
 		};
 		72B767E81C9D114F00A07552 /* Update Drivers */ = {
@@ -1452,6 +1486,16 @@
 				72B767E51C9CFD7200A07552 /* SUAutomaticUpdateDriver.m */,
 			);
 			name = "Update Drivers";
+			sourceTree = "<group>";
+		};
+		72E41A3F1CB20BA7003D47E0 /* RemoteMessagePort */ = {
+			isa = PBXGroup;
+			children = (
+				72E41A441CB20BA7003D47E0 /* main.m */,
+				72E41A461CB20BA7003D47E0 /* Info.plist */,
+			);
+			name = RemoteMessagePort;
+			path = ../../RemoteMessagePort;
 			sourceTree = "<group>";
 		};
 		FA1941C40D94A6EA00DD942E /* Configurations */ = {
@@ -1488,6 +1532,7 @@
 				726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */,
 				728638EE1CAF589C00783084 /* ConfigUpdateDownloader.xcconfig */,
 				728639041CAF614000783084 /* ConfigAppcastDownloader.xcconfig */,
+				72E41A551CB22F44003D47E0 /* ConfigRemoteMessagePort.xcconfig */,
 				14732BC91960F70A00593899 /* make-release-package.sh */,
 				14652F7919A93E5F00959E44 /* set-git-version-info.sh */,
 				146EC84E19A68CF8004A50C5 /* Sparkle.podspec */,
@@ -1540,6 +1585,7 @@
 				726E07E91CAF30C0001A286B /* SUUpdaterPermission.h in Headers */,
 				618FA5010DAE88B40026945C /* SUInstaller.h in Headers */,
 				55C14F06136EF6DB00649790 /* SULog.h in Headers */,
+				72E41A531CB21125003D47E0 /* SUXPCRemoteMessagePort.h in Headers */,
 				726F2CE51BC9C33D001971A4 /* SUOperatingSystem.h in Headers */,
 				72B767E61C9CFD7200A07552 /* SUAutomaticUpdateDriver.h in Headers */,
 				618FA5220DAE8E8A0026945C /* SUPackageInstaller.h in Headers */,
@@ -1551,6 +1597,7 @@
 				72B767E21C9CE90A00A07552 /* SUCoreBasedUpdateDriver.h in Headers */,
 				61A225A40D1C4AC000430CCD /* SUStandardVersionComparator.h in Headers */,
 				7229E1B91C97CC4D00CB50D0 /* SUScheduledUpdateDriver.h in Headers */,
+				72E41A391CB209CA003D47E0 /* SURemoteMessagePortProtocol.h in Headers */,
 				725F977B1C8A896F00265BE4 /* SUUserDriverCoreComponent.h in Headers */,
 				729746451C91212400FC134E /* SURemoteMessagePort.h in Headers */,
 				6196CFF909C72148000DC222 /* SUStatusController.h in Headers */,
@@ -1768,6 +1815,23 @@
 			productReference = 728638F31CAF5A5F00783084 /* AppcastDownloader.xpc */;
 			productType = "com.apple.product-type.xpc-service";
 		};
+		72E41A3D1CB20BA7003D47E0 /* RemoteMessagePort */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 72E41A4A1CB20BA7003D47E0 /* Build configuration list for PBXNativeTarget "RemoteMessagePort" */;
+			buildPhases = (
+				72E41A3A1CB20BA7003D47E0 /* Sources */,
+				72E41A3B1CB20BA7003D47E0 /* Frameworks */,
+				72E41A3C1CB20BA7003D47E0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RemoteMessagePort;
+			productName = RemoteMessagePort;
+			productReference = 72E41A3E1CB20BA7003D47E0 /* RemoteMessagePort.xpc */;
+			productType = "com.apple.product-type.xpc-service";
+		};
 		8DC2EF4F0486A6940098B216 /* Sparkle */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1DEB91AD08733DA50010E9CD /* Build configuration list for PBXNativeTarget "Sparkle" */;
@@ -1789,6 +1853,7 @@
 				726E07B71CAF08D6001A286B /* PBXTargetDependency */,
 				726E07F91CAF37BD001A286B /* PBXTargetDependency */,
 				728638FD1CAF5A5F00783084 /* PBXTargetDependency */,
+				72E41A481CB20BA7003D47E0 /* PBXTargetDependency */,
 			);
 			name = Sparkle;
 			productInstallPath = "$(HOME)/Library/Frameworks";
@@ -1847,6 +1912,9 @@
 								enabled = 1;
 							};
 						};
+					};
+					72E41A3D1CB20BA7003D47E0 = {
+						CreatedOnToolsVersion = 7.3;
 					};
 				};
 			};
@@ -1911,6 +1979,7 @@
 				726E07AC1CAF08D6001A286B /* InstallerLauncher */,
 				726E07EE1CAF37BD001A286B /* UpdateDownloader */,
 				728638F21CAF5A5F00783084 /* AppcastDownloader */,
+				72E41A3D1CB20BA7003D47E0 /* RemoteMessagePort */,
 				61B5F90109C4CEE200B25A18 /* Sparkle Test App */,
 				726E4A151C86C88F00C57C6A /* TestAppHelper */,
 				612279D80DB5470200AB99EA /* Sparkle Unit Tests */,
@@ -1997,6 +2066,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		728638F11CAF5A5F00783084 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72E41A3C1CB20BA7003D47E0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -2259,6 +2335,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		72E41A3A1CB20BA7003D47E0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72E41A501CB210AE003D47E0 /* SURemoteMessagePort.m in Sources */,
+				72E41A451CB20BA7003D47E0 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DC2EF540486A6940098B216 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2281,6 +2366,7 @@
 				729746411C9119F300FC134E /* SULocalMessagePort.m in Sources */,
 				726E07611CA4E9A5001A286B /* SUInstallationInputData.m in Sources */,
 				7275F9C21B5F1F2900B1D19E /* SUFileManager.m in Sources */,
+				72E41A541CB21125003D47E0 /* SUXPCRemoteMessagePort.m in Sources */,
 				726E07EA1CAF30C0001A286B /* SUUpdaterPermission.m in Sources */,
 				725CB95B1C7121830064365A /* SUStandardUserDriver.m in Sources */,
 				61EF67560E25B58D00F754E0 /* SUHost.m in Sources */,
@@ -2395,6 +2481,11 @@
 			isa = PBXTargetDependency;
 			target = 728638F21CAF5A5F00783084 /* AppcastDownloader */;
 			targetProxy = 728638FC1CAF5A5F00783084 /* PBXContainerItemProxy */;
+		};
+		72E41A481CB20BA7003D47E0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 72E41A3D1CB20BA7003D47E0 /* RemoteMessagePort */;
+			targetProxy = 72E41A471CB20BA7003D47E0 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2859,6 +2950,27 @@
 			};
 			name = Release;
 		};
+		72E41A4B1CB20BA7003D47E0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 72E41A551CB22F44003D47E0 /* ConfigRemoteMessagePort.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		72E41A4C1CB20BA7003D47E0 /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 72E41A551CB22F44003D47E0 /* ConfigRemoteMessagePort.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		72E41A4D1CB20BA7003D47E0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 72E41A551CB22F44003D47E0 /* ConfigRemoteMessagePort.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2998,6 +3110,16 @@
 				728639001CAF5A5F00783084 /* Debug */,
 				728639011CAF5A5F00783084 /* Coverage */,
 				728639021CAF5A5F00783084 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		72E41A4A1CB20BA7003D47E0 /* Build configuration list for PBXNativeTarget "RemoteMessagePort" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				72E41A4B1CB20BA7003D47E0 /* Debug */,
+				72E41A4C1CB20BA7003D47E0 /* Coverage */,
+				72E41A4D1CB20BA7003D47E0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 		};

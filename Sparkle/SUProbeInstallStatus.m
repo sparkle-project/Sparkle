@@ -8,7 +8,8 @@
 
 #import "SUProbeInstallStatus.h"
 #import "SULocalMessagePort.h"
-#import "SURemoteMessagePort.h"
+#import "SUXPCRemoteMessagePort.h"
+#import "SURemoteMessagePortProtocol.h"
 #import "SUHost.h"
 #import "SUMessageTypes.h"
 #import "SUAppcastItem.h"
@@ -21,14 +22,14 @@
     NSString *hostBundleIdentifier = host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    SURemoteMessagePort *remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)];
+    id <SURemoteMessagePort> remotePort = [[SUXPCRemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)];
     
     [remotePort connectWithLookupCompletion:^(BOOL success) {
         if (success) {
             [remotePort invalidate];
         }
         completionHandler(success);
-    } invalidationHandler:^{}];
+    }];
 }
 
 + (void)probeInstallerUpdateItemForHost:(SUHost *)host completion:(void (^)(SUAppcastItem  * _Nullable))completionHandler
@@ -36,7 +37,7 @@
     NSString *hostBundleIdentifier = host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    SURemoteMessagePort *remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)];
+    id <SURemoteMessagePort> remotePort = [[SUXPCRemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)];
     
     [remotePort connectWithLookupCompletion:^(BOOL lookupSuccess) {
         if (!lookupSuccess) {
@@ -59,8 +60,6 @@
                 }
             }];
         }
-    } invalidationHandler:^{
-        completionHandler(nil);
     }];
 }
 
