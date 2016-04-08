@@ -6,9 +6,6 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
-#import "SUVersionComparisonProtocol.h"
 #import "SUStatusController.h"
 #import "SUHost.h"
 #import "SUApplicationInfo.h"
