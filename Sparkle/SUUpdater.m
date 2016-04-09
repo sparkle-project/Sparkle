@@ -416,10 +416,10 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
             }
         };
         
+        [self.userDriver showCanCheckForUpdates:NO];
         [SUProbeInstallStatus probeInstallerInProgressForHost:self.host completion:^(BOOL success) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 SUUpdater *strongSelf = weakSelf;
-                [strongSelf.userDriver showCanCheckForUpdates:NO];
                 if (strongSelf != nil) {
                     if (!success) {
                         [strongSelf.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[strongSelf userAgentString] httpHeaders:[strongSelf httpHeaders] completion:completionBlock];
