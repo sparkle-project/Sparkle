@@ -82,7 +82,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  Validates if the menu item for checkForUpdates: can be invoked or not
  
- This validates the menu item by checking -[SUStandardUserDriver updateInProgress]
+ This validates the menu item by checking -[SUStandardUserDriver canCheckForUpdates]
  */
 - (BOOL)validateMenuItem:(NSMenuItem *)item;
 
