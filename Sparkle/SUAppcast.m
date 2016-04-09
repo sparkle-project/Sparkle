@@ -9,7 +9,6 @@
 #import "SUAppcast.h"
 #import "SUAppcastItem.h"
 #import "SUVersionComparisonProtocol.h"
-#import "SUAppcast.h"
 #import "SUConstants.h"
 #import "SULog.h"
 #import "SUErrors.h"
