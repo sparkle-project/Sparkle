@@ -318,7 +318,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     if (identifier == SUInstallationData && self.installationData == nil) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            SUInstallationInputData * _Nullable installationData = SUUnarchiveRootObjectSecurely(data, [SUInstallationInputData class]);
+            SUInstallationInputData *installationData = (SUInstallationInputData *)SUUnarchiveRootObjectSecurely(data, [SUInstallationInputData class]);
             if (installationData == nil) {
                 SULog(@"Error: Failed to unarchive input installation data");
                 [self cleanupAndExitWithStatus:EXIT_FAILURE];

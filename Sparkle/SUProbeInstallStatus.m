@@ -50,7 +50,7 @@
                     completionHandler(nil);
                 } else {
                     NSData *nonNullReplyData = replyData;
-                    SUAppcastItem  * _Nullable updateItem = SUUnarchiveRootObjectSecurely(nonNullReplyData, [SUAppcastItem class]);
+                    SUAppcastItem  *updateItem = (SUAppcastItem *)SUUnarchiveRootObjectSecurely(nonNullReplyData, [SUAppcastItem class]);
                     
                     if (updateItem != nil) {
                         completionHandler(updateItem);
