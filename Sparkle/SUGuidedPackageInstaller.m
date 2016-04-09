@@ -169,6 +169,11 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     return validInstallation;
 }
 
+- (BOOL)displaysUserProgress
+{
+    return NO;
+}
+
 - (void)cleanup
 {
 }

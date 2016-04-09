@@ -239,6 +239,11 @@
     return [self startInstallationToURL:[NSURL fileURLWithPath:self.installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:self.applicationPath] withHost:self.host error:error];
 }
 
+- (BOOL)displaysUserProgress
+{
+    return NO;
+}
+
 - (void)cleanup
 {
     SUFileManager *fileManager = [self.fileManager fileManagerByPreservingAuthorizationRights];;

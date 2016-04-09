@@ -491,7 +491,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         __block BOOL shouldLaunchInstallerProgress = YES;
         
         NSString *progressToolPath = self.installationData.progressToolPath;
-        if (progressToolPath != nil && self.shouldShowUI) {
+        if (progressToolPath != nil && self.shouldShowUI && ![self.installer displaysUserProgress]) {
             NSURL *progressToolURL = [NSURL fileURLWithPath:progressToolPath];
             if (progressToolURL != nil) {
                 NSError *quarantineError = nil;

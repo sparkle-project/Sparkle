@@ -72,6 +72,11 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
     return YES;
 }
 
+- (BOOL)displaysUserProgress
+{
+    return YES;
+}
+
 - (void)cleanup
 {
 }

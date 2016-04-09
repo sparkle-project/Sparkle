@@ -26,6 +26,9 @@
 // Should be able to be called from non-main thread
 - (BOOL)performThirdStage:(NSError **)error;
 
+// Indicates whether or not this installer will show the user visible installation progress
+- (BOOL)displaysUserProgress;
+
 // Cleans up work done from any of the previous stages. This should be invoked after stage 3 succeeds,
 // or after any one of the stages fails.
 // Should be able to be called from non-main thread
