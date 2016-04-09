@@ -153,7 +153,7 @@
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
     if (menuItem.action == @selector(checkForUpdates:)) {
-        return (self.userDriver != nil && !self.userDriver.updateInProgress);
+        return (self.userDriver != nil && self.userDriver.canCheckForUpdates);
     } else if (menuItem.action == @selector(invalidateConnection:)) {
         return (self.connection != nil);
     }

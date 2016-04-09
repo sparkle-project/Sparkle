@@ -66,7 +66,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (BOOL)validateMenuItem:(NSMenuItem *)item
 {
     if ([item action] == @selector(checkForUpdates:)) {
-        return !self.userDriver.updateInProgress;
+        return self.userDriver.canCheckForUpdates;
     }
     return YES;
 }

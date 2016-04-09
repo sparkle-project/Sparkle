@@ -228,6 +228,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     if (firingImmediately) {
         [self checkForUpdatesInBackground];
     } else {
+        [self.userDriver showCanCheckForUpdates:YES];
+        
         [self retrieveNextUpdateCheckInterval:^(NSTimeInterval updateCheckInterval) {
             // How long has it been since last we checked for an update?
             NSDate *lastCheckDate = [self lastUpdateCheckDate];
@@ -398,8 +400,6 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
         [self scheduleNextUpdateCheck];
         return;
     }
-    
-    [self.userDriver showUpdateInProgress:YES];
 
     [self checkIfConfiguredProperly];
 
@@ -411,7 +411,6 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
             SUUpdater *strongSelf = weakSelf;
             if (strongSelf != nil) {
                 strongSelf.driver = nil;
-                [strongSelf.userDriver showUpdateInProgress:NO];
                 [strongSelf updateLastUpdateCheckDate];
                 [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately];
             }
@@ -420,6 +419,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
         [SUProbeInstallStatus probeInstallerInProgressForHost:self.host completion:^(BOOL success) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 SUUpdater *strongSelf = weakSelf;
+                [strongSelf.userDriver showCanCheckForUpdates:NO];
                 if (strongSelf != nil) {
                     if (!success) {
                         [strongSelf.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[strongSelf userAgentString] httpHeaders:[strongSelf httpHeaders] completion:completionBlock];

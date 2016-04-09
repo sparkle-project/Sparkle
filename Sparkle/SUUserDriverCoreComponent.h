@@ -22,9 +22,9 @@ SU_EXPORT @interface SUUserDriverCoreComponent : NSObject
 
 @property (nonatomic, readonly) BOOL idlesOnUpdateChecks;
 
-- (void)showUpdateInProgress:(BOOL)isUpdateInProgress;
+- (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates;
 
-@property (nonatomic, readonly, getter=isUpdateInProgress) BOOL updateInProgress;
+@property (nonatomic, readonly) BOOL canCheckForUpdates;
 
 @property (nonatomic, readonly) BOOL willInitiateNextUpdateCheck;
 

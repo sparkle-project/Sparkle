@@ -17,7 +17,7 @@
 @interface SUUserDriverCoreComponent ()
 
 @property (nonatomic) BOOL idlesOnUpdateChecks;
-@property (nonatomic) BOOL updateInProgress;
+@property (nonatomic) BOOL canCheckForUpdates;
 
 @property (nonatomic) NSTimer *checkUpdateTimer;
 @property (nonatomic, copy) void (^checkForUpdatesReply)(SUUpdateCheckTimerStatus);
@@ -33,7 +33,7 @@
 
 @synthesize delegate = _delegate;
 @synthesize idlesOnUpdateChecks = _idlesOnUpdateChecks;
-@synthesize updateInProgress = _updateInProgress;
+@synthesize canCheckForUpdates = _canCheckForUpdates;
 @synthesize checkUpdateTimer = _checkUpdateTimer;
 @synthesize checkForUpdatesReply = _checkForUpdatesReply;
 @synthesize installUpdateHandler = _installUpdateHandler;
@@ -59,9 +59,9 @@
     self.idlesOnUpdateChecks = shouldIdleOnUpdateChecks;
 }
 
-- (void)showUpdateInProgress:(BOOL)isUpdateInProgress
+- (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates
 {
-    self.updateInProgress = isUpdateInProgress;
+    self.canCheckForUpdates = canCheckForUpdates;
 }
 
 #pragma mark Check Updates Timer
@@ -212,8 +212,6 @@
 {
     // Note: self.idlesOnUpdateChecks is intentionally not touched in case this instance is re-used
     
-    self.updateInProgress = NO;
-    
     [self acceptAcknowledgement];
     [self cancelUpdateCheckStatus];
     [self cancelDownloadStatus];
@@ -236,6 +234,8 @@
     
     // Dismiss the installation normally
     [self dismissUpdateInstallation];
+    
+    self.canCheckForUpdates = YES;
 }
 
 @end

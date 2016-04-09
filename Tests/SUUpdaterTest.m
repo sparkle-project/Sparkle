@@ -19,7 +19,7 @@
 
 @implementation SUUselessUserDriver
 
-- (void)showUpdateInProgress:(BOOL)__unused isUpdateInProgress {}
+- (void)showCanCheckForUpdates:(BOOL)__unused canCheckForUpdates {}
 
 - (void)idleOnUpdateChecks:(BOOL)__unused shouldIdleOnUpdateChecks {}
 

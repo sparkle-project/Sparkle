@@ -67,16 +67,16 @@
     return self.coreComponent.idlesOnUpdateChecks;
 }
 
-- (void)showUpdateInProgress:(BOOL)isUpdateInProgress
+- (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.coreComponent showUpdateInProgress:isUpdateInProgress];
+        [self.coreComponent showCanCheckForUpdates:canCheckForUpdates];
     });
 }
 
-- (BOOL)isUpdateInProgress
+- (BOOL)canCheckForUpdates
 {
-    return self.coreComponent.updateInProgress;
+    return self.coreComponent.canCheckForUpdates;
 }
 
 #pragma mark Check Updates Timer

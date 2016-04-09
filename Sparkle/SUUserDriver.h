@@ -32,14 +32,14 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol SUUserDriver <NSObject>
 
 /*!
- * Show that an update is or is not in progress.
+ * Show that an update can be checked by the user or not
  *
- * A client may choose to update the interface letting the user know the updater is or is not busy.
+ * A client may choose to update the interface letting the user know if they can check for updates.
  * For example, this can be used for menu item validation on the "Check for Updates" action.
  *
  * This can be called from any thread.
  */
-- (void)showUpdateInProgress:(BOOL)isUpdateInProgress;
+- (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates;
 
 /*!
  * Idle on timed updater checks.

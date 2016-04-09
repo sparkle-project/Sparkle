@@ -27,7 +27,7 @@
  
  A typical application may rely on this property for its check for updates menu item validation
  */
-@property (nonatomic, readonly, getter=isUpdateInProgress) BOOL updateInProgress;
+@property (nonatomic, readonly) BOOL canCheckForUpdates;
 
 /*!
  Indicates whether or not a currently pending update check will be initiated in the future
