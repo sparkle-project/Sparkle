@@ -15,13 +15,9 @@
 
 @implementation SUStandardVersionComparator
 
-+ (SUStandardVersionComparator *)defaultComparator
++ (SUStandardVersionComparator *)standardVersionComparator
 {
-    static SUStandardVersionComparator *defaultComparator = nil;
-    if (defaultComparator == nil) {
-        defaultComparator = [[SUStandardVersionComparator alloc] init];
-    }
-    return defaultComparator;
+    return [[SUStandardVersionComparator alloc] init];
 }
 
 typedef NS_ENUM(NSInteger, SUCharacterType) {

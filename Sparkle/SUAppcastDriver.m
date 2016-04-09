@@ -135,12 +135,14 @@
     BOOL minimumVersionOK = TRUE;
     BOOL maximumVersionOK = TRUE;
     
+    id<SUVersionComparison> versionComparator = [SUStandardVersionComparator standardVersionComparator];
+    
     // Check minimum and maximum System Version
     if ([ui minimumSystemVersion] != nil && ![[ui minimumSystemVersion] isEqualToString:@""]) {
-        minimumVersionOK = [[SUStandardVersionComparator defaultComparator] compareVersion:[ui minimumSystemVersion] toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedDescending;
+        minimumVersionOK = [versionComparator compareVersion:[ui minimumSystemVersion] toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedDescending;
     }
     if ([ui maximumSystemVersion] != nil && ![[ui maximumSystemVersion] isEqualToString:@""]) {
-        maximumVersionOK = [[SUStandardVersionComparator defaultComparator] compareVersion:[ui maximumSystemVersion] toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedAscending;
+        maximumVersionOK = [versionComparator compareVersion:[ui maximumSystemVersion] toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedAscending;
     }
     
     return minimumVersionOK && maximumVersionOK;
@@ -157,7 +159,7 @@
     
     // If we don't get a comparator from the delegate, use the default comparator
     if (!comparator) {
-        comparator = [SUStandardVersionComparator defaultComparator];
+        comparator = [SUStandardVersionComparator standardVersionComparator];
     }
     
     return comparator;
