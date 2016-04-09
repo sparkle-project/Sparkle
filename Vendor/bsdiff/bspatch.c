@@ -46,7 +46,7 @@ typedef struct
 {
 	stream_t (*open)(FILE*);
 	void (*close)(stream_t);
-	int (*read)(stream_t, void*, int);
+	off_t (*read)(stream_t, void*, off_t);
 } io_funcs_t;
 
 static stream_t BSDIFF40_open(FILE *f)
@@ -64,10 +64,10 @@ static void BSDIFF40_close(stream_t s)
 	BZ2_bzReadClose(&bzerr, (BZFILE*)s);
 }
 
-static int BSDIFF40_read(stream_t s, void *buf, int len)
+static off_t BSDIFF40_read(stream_t s, void *buf, off_t len)
 {
 	int bzerr, lenread;
-	lenread = BZ2_bzRead(&bzerr, (BZFILE*)s, buf, len);
+	lenread = BZ2_bzRead(&bzerr, (BZFILE*)s, buf, (int)len);
 	if (bzerr != BZ_OK && bzerr != BZ_STREAM_END)
 		errx(1, "Corrupt patch\n");
 	return lenread;
@@ -85,13 +85,13 @@ static stream_t BSDIFN40_open(FILE *f)
 	return f;
 }
 
-static void BSDIFN40_close(stream_t s)
+static void BSDIFN40_close(stream_t __unused s)
 {
 }
 
-static int BSDIFN40_read(stream_t s, void *buf, int len)
+static off_t BSDIFN40_read(stream_t s, void *buf, off_t len)
 {
-	return fread(buf, 1, len, (FILE*)s);
+	return (off_t)fread(buf, 1, (size_t)len, (FILE*)s);
 }
 
 static io_funcs_t BSDIFN40_funcs = {
@@ -204,11 +204,11 @@ int bspatch(int argc,const char * const argv[])
 
 	if(((fd=open(argv[1],O_RDONLY,0))<0) ||
 		((oldsize=lseek(fd,0,SEEK_END))==-1) ||
-		((old=malloc(oldsize+1))==NULL) ||
+		((old=malloc((size_t)oldsize+1))==NULL) ||
 		(lseek(fd,0,SEEK_SET)!=0) ||
-		(read(fd,old,oldsize)!=oldsize) ||
+		(read(fd,old,(size_t)oldsize)!=oldsize) ||
 		(close(fd)==-1)) err(1,"%s",argv[1]);
-	if((new=malloc(newsize+1))==NULL) err(1,NULL);
+	if((new=malloc((size_t)newsize+1))==NULL) err(1,NULL);
 
 	oldpos=0;newpos=0;
 	while(newpos<newsize) {
@@ -261,7 +261,7 @@ int bspatch(int argc,const char * const argv[])
 
 	/* Write the new file */
 	if(((fd=open(argv[2],O_CREAT|O_TRUNC|O_WRONLY,0666))<0) ||
-		(write(fd,new,newsize)!=newsize) || (close(fd)==-1))
+		(write(fd,new,(size_t)newsize)!=newsize) || (close(fd)==-1))
 		err(1,"%s",argv[2]);
 
 	free(new);
