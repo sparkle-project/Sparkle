@@ -93,21 +93,6 @@
         case SUInstallUpdateChoice:
         {
             if (!self.resumingUpdate) {
-                [self.userDriver showDownloadInitiatedWithCompletion:^(SUDownloadUpdateStatus downloadCompletionStatus) {
-                    switch (downloadCompletionStatus) {
-                        case SUDownloadUpdateDone:
-                            break;
-                        case SUDownloadUpdateCancelled:
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                if ([self.updaterDelegate respondsToSelector:@selector(userDidCancelDownload:)]) {
-                                    [self.updaterDelegate userDidCancelDownload:self.updater];
-                                }
-                                
-                                [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
-                            });
-                            break;
-                    }
-                }];
                 [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
             } else {
                 [self.coreDriver finishInstallationWithResponse:SUInstallAndRelaunchUpdateNow];
@@ -125,6 +110,25 @@
             [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
             break;
     }
+}
+
+- (void)downloadDriverWillBeginDownload
+{
+    [self.userDriver showDownloadInitiatedWithCompletion:^(SUDownloadUpdateStatus downloadCompletionStatus) {
+        switch (downloadCompletionStatus) {
+            case SUDownloadUpdateDone:
+                break;
+            case SUDownloadUpdateCancelled:
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if ([self.updaterDelegate respondsToSelector:@selector(userDidCancelDownload:)]) {
+                        [self.updaterDelegate userDidCancelDownload:self.updater];
+                    }
+                    
+                    [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
+                });
+                break;
+        }
+    }];
 }
 
 - (void)downloadDriverDidReceiveResponse:(NSURLResponse *)response

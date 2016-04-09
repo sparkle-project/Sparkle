@@ -96,6 +96,8 @@
         });
     };
     
+    [self.delegate downloadDriverWillBeginDownload];
+    
     NSString *desiredFilename = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
     [self.connection.remoteObjectProxy startDownloadWithRequest:self.request bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename completion:^(BOOL success, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{

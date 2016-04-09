@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SUDownloadDriverDelegate <NSObject>
 
+- (void)downloadDriverWillBeginDownload;
+
 - (void)downloadDriverDidReceiveResponse:(NSURLResponse *)response;
 
 - (void)downloadDriverDidReceiveDataOfLength:(NSUInteger)length;

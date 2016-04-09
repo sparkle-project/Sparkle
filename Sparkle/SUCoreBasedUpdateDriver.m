@@ -126,6 +126,13 @@
     [self.downloadDriver downloadUpdate];
 }
 
+- (void)downloadDriverWillBeginDownload
+{
+    if ([self.delegate respondsToSelector:@selector(downloadDriverWillBeginDownload)]) {
+        [self.delegate downloadDriverWillBeginDownload];
+    }
+}
+
 - (void)downloadDriverDidReceiveResponse:(NSURLResponse *)response
 {
     if ([self.delegate respondsToSelector:@selector(downloadDriverDidReceiveResponse:)]) {
