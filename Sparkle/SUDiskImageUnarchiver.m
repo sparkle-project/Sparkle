@@ -8,7 +8,6 @@
 
 #import "SUDiskImageUnarchiver.h"
 #import "SULog.h"
-//#include <CoreServices/CoreServices.h>
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -54,7 +53,6 @@
 
         // get a unique mount point path
         NSString *mountPoint = nil;
-        FSRef tmpRef;
         NSFileManager *manager;
         NSError *error;
         NSArray *contents;
@@ -82,7 +80,8 @@
                 CFRelease(uuid);
             }
 		}
-		while (noErr == FSPathMakeRefWithOptions((const UInt8 *)[mountPoint fileSystemRepresentation], kFSPathMakeRefDoNotFollowLeafSymlink, &tmpRef, NULL));
+        // Note: this check does not follow symbolic links, which is what we want
+		while ([[NSURL fileURLWithPath:mountPoint] checkResourceIsReachableAndReturnError:NULL]);
 
         NSData *promptData = nil;
         promptData = [NSData dataWithBytes:"yes\n" length:4];
