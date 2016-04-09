@@ -227,9 +227,12 @@
 {
     self.fileManager = [SUFileManager fileManagerAllowingAuthorization:allowsUI];
     
-    // Temporary hack for bringing authorization prompt right away if we need it
-    // Ideally, bringing up the authorization prompt may be done before extraction occurs
-    return [self.fileManager updateModificationAndAccessTimeOfItemAtURL:self.host.bundle.bundleURL error:error];
+    // Bring up authorization prompt right away if we need it
+#warning is this test good enough or should we check parent directory too?
+    if (![[NSFileManager defaultManager] isWritableFileAtPath:self.host.bundle.bundlePath]) {
+        return [self.fileManager grantAuthorizationPrivilegesWithError:error];
+    }
+    return YES;
 }
 
 - (BOOL)performThirdStage:(NSError * __autoreleasing *)error

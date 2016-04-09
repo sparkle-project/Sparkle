@@ -138,6 +138,23 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     }
 }
 
+- (BOOL)authorizeAndExecuteWithPrivilegesAtPath:(const char *)executablePath arguments:(char *const *)arguments
+{
+    if (![self _acquireAuthorizationWithError:NULL]) {
+        return NO;
+    }
+    return AuthorizationExecuteWithPrivilegesAndWait(_auth, executablePath, kAuthorizationFlagDefaults, arguments);
+}
+
+- (BOOL)grantAuthorizationPrivilegesWithError:(NSError * __autoreleasing *)error
+{
+    BOOL success = [self authorizeAndExecuteWithPrivilegesAtPath:"/usr/bin/true" arguments:(char *[]){NULL}];
+    if (!success && error != NULL) {
+        *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: @"Failed granting authorization." }];
+    }
+    return success;
+}
+
 // -[NSFileManager attributesOfItemAtPath:error:] won't follow symbolic links
 
 - (BOOL)_itemExistsAtURL:(NSURL *)fileURL

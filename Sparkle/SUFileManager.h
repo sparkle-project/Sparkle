@@ -35,6 +35,10 @@
  */
 - (instancetype)fileManagerByPreservingAuthorizationRights;
 
+- (BOOL)authorizeAndExecuteWithPrivilegesAtPath:(const char *)executablePath arguments:(char *const *)arguments;
+
+- (BOOL)grantAuthorizationPrivilegesWithError:(NSError **)error;
+
 /**
  * Creates a temporary directory on the same volume as a provided URL
  * @param preferredName A name that may be used when creating the temporary directory. Note that in the uncommon case this name is used, the temporary directory will be created inside the directory pointed by appropriateURL
