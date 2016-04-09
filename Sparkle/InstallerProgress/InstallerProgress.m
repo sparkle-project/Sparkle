@@ -97,11 +97,16 @@ int main(int __unused argc, const char __unused *argv[])
     @autoreleasepool
     {
         NSArray *args = [[NSProcessInfo processInfo] arguments];
-        if (args.count != 2) {
+        if (args.count < 2) {
             return EXIT_FAILURE;
         }
         
         NSString *hostBundlePath = args[1];
+        
+        NSImage *applicationIcon = nil;
+        if (args.count > 2) {
+            applicationIcon = [[NSImage alloc] initWithContentsOfFile:args[2]];
+        }
         
         NSBundle *bundle = [NSBundle bundleWithPath:hostBundlePath];
         if (bundle == nil) {
@@ -113,6 +118,11 @@ int main(int __unused argc, const char __unused *argv[])
         InstallerProgress *delegate = [[InstallerProgress alloc] initWithHost:host];
         
         NSApplication *application = [NSApplication sharedApplication];
+        
+        if (applicationIcon != nil) {
+            application.applicationIconImage = applicationIcon;
+        }
+        
         [application setDelegate:delegate];
         
         [application run];

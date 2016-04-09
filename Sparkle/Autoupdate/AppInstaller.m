@@ -502,7 +502,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUDisplayProgressTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     if (shouldLaunchInstallerProgress) {
                         NSError *launchError = nil;
-                        NSArray *arguments = @[self.host.bundlePath];
+                        
+                        NSString *iconPath = [[NSBundle mainBundle] pathForImageResource:@""SPARKLE_ICON_NAME];
+                        if (iconPath == nil) {
+                            SULog(@"Error: Path for relauncher icon was not found");
+                        }
+                        
+                        NSArray *arguments = (iconPath == nil) ? @[self.host.bundlePath] : @[self.host.bundlePath, iconPath];
                         NSRunningApplication *runningApplication = [[NSWorkspace sharedWorkspace] launchApplicationAtURL:progressToolURL options:(NSWorkspaceLaunchOptions)(NSWorkspaceLaunchDefault | NSWorkspaceLaunchNewInstance) configuration:@{NSWorkspaceLaunchConfigurationArguments : arguments} error:&launchError];
                         
                         if (runningApplication == nil) {
