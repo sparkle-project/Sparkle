@@ -110,7 +110,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 // To prevent trying to stick an SUUpdater in a nib or initializing it in an incorrect way
 - (instancetype)init
 {
-    [NSException raise:@"SUUpdaterInitNotImplemented" format:@"-[SUUpdater init] is not implemented. If you want to drop an updater into a nib, see SUUpdaterController"];
+    [NSException raise:@"SUUpdaterInitNotImplemented" format:@"-[SUUpdater init] is not implemented. If you want to drop an updater into a nib, see SUStandardUpdaterController"];
     return nil;
 }
 

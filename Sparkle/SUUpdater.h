@@ -34,7 +34,7 @@ SU_EXPORT @interface SUUpdater : NSObject
  * Hence you shouldn't create multiple live instances that target the same bundle.
  * However, this also means that updater instances can be deallocated, and that they will be torn down properly
  *
- * Related: See SUUpdaterController which wraps a SUUpdater instance and is suitable for instantiating in nib files
+ * Related: See SUStandardUpdaterController which wraps a SUUpdater instance and is suitable for instantiating in nib files
  *
  * @param hostBundle The bundle that should be targetted for updating. This must not be nil.
  * @param userDriver The user driver that Sparkle uses for user update interaction
