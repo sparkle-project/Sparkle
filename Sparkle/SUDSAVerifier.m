@@ -42,7 +42,12 @@
     }
 
     NSString *strippedSignature = [encodedSignature stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-    NSData *signature = [[NSData alloc] initWithBase64Encoding:strippedSignature];
+    NSData *signature =
+#if __MAC_OS_X_VERSION_MIN_REQUIRED < __MAC_10_9
+    [[NSData alloc] initWithBase64Encoding:strippedSignature];
+#else
+    [[NSData alloc] initWithBase64EncodedString:strippedSignature options:NSDataBase64DecodingIgnoreUnknownCharacters];
+#endif
     return [verifier verifyFileAtPath:path signature:signature];
 }
 
