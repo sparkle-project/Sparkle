@@ -21,6 +21,7 @@
 #import "SUSecureCoding.h"
 #import "SUInstallationInputData.h"
 #import "SUUnarchiver.h"
+#import "SUFileManager.h"
 
 /*!
  * Terminate the application after a delay from launching the new update to avoid OS activation issues
@@ -28,6 +29,13 @@
  * but should be low enough so that the user doesn't ponder why the updater hasn't finished terminating yet
  */
 static const NSTimeInterval SUTerminationTimeDelay = 0.5;
+
+/*!
+ * Show display progress UI after a delay from starting the final part of the installation.
+ * This should be long enough so that we don't show progress for very fast installations, but
+ * short enough so that we don't leave the user wondering why nothing is happening.
+ */
+static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 @interface AppInstaller ()
 
@@ -478,12 +486,42 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
             return;
         }
         
+        // Launch our installer progress UI tool if only after a certain amount of time passes
+        __block NSRunningApplication *installerProgressRunningApplication = nil;
+        __block BOOL shouldLaunchInstallerProgress = YES;
+        
+        NSString *progressToolPath = self.installationData.progressToolPath;
+        if (progressToolPath != nil && self.shouldShowUI) {
+            NSURL *progressToolURL = [NSURL fileURLWithPath:progressToolPath];
+            if (progressToolURL != nil) {
+                NSError *quarantineError = nil;
+                if (![[SUFileManager fileManagerAllowingAuthorization:NO] releaseItemFromQuarantineAtRootURL:progressToolURL error:&quarantineError]) {
+                    SULog(@"Error: Failed releasing quarantine from installer progress tool: %@", quarantineError);
+                }
+                
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUDisplayProgressTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    if (shouldLaunchInstallerProgress) {
+                        NSError *launchError = nil;
+                        NSArray *arguments = @[self.host.bundlePath];
+                        NSRunningApplication *runningApplication = [[NSWorkspace sharedWorkspace] launchApplicationAtURL:progressToolURL options:(NSWorkspaceLaunchOptions)(NSWorkspaceLaunchDefault | NSWorkspaceLaunchNewInstance) configuration:@{NSWorkspaceLaunchConfigurationArguments : arguments} error:&launchError];
+                        
+                        if (runningApplication == nil) {
+                            SULog(@"Failed to launch installer progress tool with error: %@", launchError);
+                        } else {
+                            installerProgressRunningApplication = runningApplication;
+                        }
+                    }
+                });
+            }
+        }
+        
         dispatch_async(self.installerQueue, ^{
             [self performStage2InstallationIfNeeded];
             
             NSError *thirdStageError = nil;
             if (![self.installer performThirdStage:&thirdStageError]) {
                 SULog(@"Failed to finalize installation with error: %@", thirdStageError);
+                
                 [self.installer cleanup];
                 self.installer = nil;
                 
@@ -496,6 +534,10 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
             self.performedStage3Installation = YES;
             
             dispatch_async(dispatch_get_main_queue(), ^{
+                // Make sure to terminate our displayed progress before we move onto cleanup
+                [installerProgressRunningApplication terminate];
+                shouldLaunchInstallerProgress = NO;
+                
                 NSString *installationPath = [SUInstaller installationPathForHost:self.host];
                 
                 if (self.shouldRelaunch) {

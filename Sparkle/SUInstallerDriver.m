@@ -212,7 +212,13 @@
         decryptionPassword = [self.updaterDelegate decryptionPasswordForUpdater:self.updater];
     }
     
-    SUInstallationInputData *installationData = [[SUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadPath:self.downloadPath dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
+    NSError *progressToolError = nil;
+    NSString *progressToolPath = [self copyApplicationResourceToCacheDirectory:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME error:&progressToolError];
+    if (progressToolPath == nil) {
+        SULog(@"Error: Failed to copy or find installer progress tool: %@", progressToolError);
+    }
+    
+    SUInstallationInputData *installationData = [[SUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch progressToolPath:progressToolPath hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadPath:self.downloadPath dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
     
     NSData *archivedData = SUArchiveRootObjectSecurely(installationData);
     
@@ -311,7 +317,7 @@
 
 // Creates intermediate directories up until targetPath if they don't already exist,
 // and removes the directory at targetPath if one already exists there
-- (BOOL)preparePathForRelaunchTool:(NSString *)targetPath error:(NSError * __autoreleasing *)error
+- (BOOL)preparePath:(NSString *)targetPath error:(NSError * __autoreleasing *)error
 {
     NSFileManager *fileManager = [[NSFileManager alloc] init];
     if ([fileManager fileExistsAtPath:targetPath]) {
@@ -334,60 +340,66 @@
     return YES;
 }
 
-- (void)launchAutoUpdateWithCompletion:(void (^)(NSError *_Nullable))completionHandler
+- (NSString *)copyApplicationResourceToCacheDirectory:(NSString *)resource error:(NSError * __autoreleasing *)error
 {
-    NSBundle *sparkleBundle = self.sparkleBundle;
-    
-    NSString *relaunchPath = nil;
-    
-    // Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
-    // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
-    NSString *const relaunchToolName = @"" SPARKLE_RELAUNCH_TOOL_NAME;
-    NSString *const relaunchPathToCopy = [sparkleBundle pathForResource:relaunchToolName ofType:@"app"];
-    if (relaunchPathToCopy != nil) {
-        NSString *targetPath = [self.cachePath stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
-        
-        SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:NO];
-        NSError *error = nil;
-        
-        NSURL *relaunchURLToCopy = [NSURL fileURLWithPath:relaunchPathToCopy];
-        NSURL *targetURL = [NSURL fileURLWithPath:targetPath];
-        
-        // We only need to run our copy of the app by spawning a task
-        // Since we are copying the app to a directory that is write-accessible, we don't need to muck with owner/group IDs
-        if ([self preparePathForRelaunchTool:targetPath error:&error] && [fileManager copyItemAtURL:relaunchURLToCopy toURL:targetURL error:&error]) {
-            relaunchPath = targetPath;
-        } else {
-            NSError *prepareError =
+    // Copy the resource into the caches directory so we can get to it after the new version's installed.
+    // Only the paranoid survive: if there's already a stray copy of resource there, we would have problems.
+    NSString *cachePath = nil;
+    NSString *const pathToCopy = [self.sparkleBundle pathForResource:resource ofType:@"app"];
+    if (pathToCopy == nil) {
+        if (error != NULL) {
+            *error =
             [NSError
              errorWithDomain:SUSparkleErrorDomain
              code:SURelaunchError
              userInfo:@{
-                        NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil),
-                        NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", relaunchPathToCopy, targetPath, (error ? [error localizedDescription] : @"")]
+                        NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [self.host name]],
+                        NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@)", pathToCopy]
                         }
              ];
-            
-            completionHandler(prepareError);
-            return;
+        }
+    } else {
+        NSString *targetPath = [self.cachePath stringByAppendingPathComponent:[pathToCopy lastPathComponent]];
+        
+        SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:NO];
+        
+        NSURL *urlToCopy = [NSURL fileURLWithPath:pathToCopy];
+        NSURL *targetURL = [NSURL fileURLWithPath:targetPath];
+        
+        NSError *prepareOrCopyError = nil;
+        
+        // We only need to run our copy of the app by spawning a task
+        // Since we are copying the app to a directory that is write-accessible, we don't need to muck with owner/group IDs
+        if ([self preparePath:targetPath error:&prepareOrCopyError] && [fileManager copyItemAtURL:urlToCopy toURL:targetURL error:&prepareOrCopyError]) {
+            cachePath = targetPath;
+        } else {
+            if (error != NULL) {
+                *error =
+                [NSError
+                 errorWithDomain:SUSparkleErrorDomain
+                 code:SURelaunchError
+                 userInfo:@{
+                            NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil),
+                            NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", pathToCopy, targetPath, (prepareOrCopyError ? [prepareOrCopyError localizedDescription] : @"")]
+                            }
+                 ];
+            }
         }
     }
     
-    NSString *relaunchToolPath = [[NSBundle bundleWithPath:relaunchPath] bundlePath];
-    if (!relaunchToolPath || ![[NSFileManager defaultManager] fileExistsAtPath:relaunchPath]) {
-        // Note that we explicitly use the host app's name here, since updating plugin for Mail relaunches Mail, not just the plugin.
-        NSError *error =
-        [NSError
-         errorWithDomain:SUSparkleErrorDomain
-         code:SURelaunchError
-         userInfo:@{
-                    NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [self.host name]],
-                    NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@)", relaunchPath]
-                    }
-         ];
-        
-        // We intentionally don't abandon the update here so that the host won't initiate another.
-        completionHandler(error);
+    return cachePath;
+}
+
+- (void)launchAutoUpdateWithCompletion:(void (^)(NSError *_Nullable))completionHandler
+{
+    NSBundle *sparkleBundle = self.sparkleBundle;
+    
+    // Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
+    // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
+    NSError *relaunchError = nil;
+    NSString *relaunchToolPath = [self copyApplicationResourceToCacheDirectory:@""SPARKLE_RELAUNCH_TOOL_NAME error:&relaunchError];
+    if (relaunchToolPath == nil) {
+        completionHandler(relaunchError);
         return;
     }
     
