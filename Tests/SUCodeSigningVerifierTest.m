@@ -147,7 +147,7 @@
 
 - (void)testUnsignedApp
 {
-    XCTAssertFalse([SUCodeSigningVerifier applicationAtPathIsCodeSigned:self.notSignedAppPath], @"App not expected to be code signed");
+    XCTAssertFalse([SUCodeSigningVerifier bundleAtPathIsCodeSigned:self.notSignedAppPath], @"App not expected to be code signed");
 
     NSError *error = nil;
     XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtPath:self.notSignedAppPath error:&error], @"signature should not be valid as it's not code signed");
@@ -156,7 +156,7 @@
 
 - (void)testValidSignedApp
 {
-    XCTAssertTrue([SUCodeSigningVerifier applicationAtPathIsCodeSigned:self.validSignedAppPath], @"App expected to be code signed");
+    XCTAssertTrue([SUCodeSigningVerifier bundleAtPathIsCodeSigned:self.validSignedAppPath], @"App expected to be code signed");
 
     NSError *error = nil;
     XCTAssertTrue([SUCodeSigningVerifier codeSignatureIsValidAtPath:self.validSignedAppPath error:&error], @"signature should be valid");
@@ -166,7 +166,7 @@
 - (void)testValidSignedCalculatorApp
 {
     NSString *appPath = @"/Applications/Calculator.app";
-    XCTAssertTrue([SUCodeSigningVerifier applicationAtPathIsCodeSigned:appPath], @"App expected to be code signed");
+    XCTAssertTrue([SUCodeSigningVerifier bundleAtPathIsCodeSigned:appPath], @"App expected to be code signed");
 
     NSError *error = nil;
     XCTAssertTrue([SUCodeSigningVerifier codeSignatureIsValidAtPath:appPath error:&error], @"signature should be valid");
@@ -175,7 +175,7 @@
 
 - (void)testInvalidSignedApp
 {
-    XCTAssertTrue([SUCodeSigningVerifier applicationAtPathIsCodeSigned:self.invalidSignedAppPath], @"App expected to be code signed, but signature is invalid");
+    XCTAssertTrue([SUCodeSigningVerifier bundleAtPathIsCodeSigned:self.invalidSignedAppPath], @"App expected to be code signed, but signature is invalid");
 
     NSError *error = nil;
     XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtPath:self.invalidSignedAppPath error:&error], @"signature should not be valid");
