@@ -267,6 +267,8 @@
 		72D9547C1CBA1FFF006F28BD /* SUInstallationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D9547A1CBA1FFE006F28BD /* SUInstallationInfo.m */; };
 		72D9547D1CBA1FFF006F28BD /* SUInstallationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D9547A1CBA1FFE006F28BD /* SUInstallationInfo.m */; };
 		72D9547E1CBA221E006F28BD /* SUAppcastItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5FC5409C5182000B25A18 /* SUAppcastItem.m */; };
+		72D954811CBACC35006F28BD /* InstallerProgressAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D954801CBACC35006F28BD /* InstallerProgressAppController.m */; };
+		72D954831CBAD34F006F28BD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D954821CBAD34F006F28BD /* main.m */; };
 		72E41A391CB209CA003D47E0 /* SURemoteMessagePortProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 72E41A381CB209CA003D47E0 /* SURemoteMessagePortProtocol.h */; };
 		72E41A451CB20BA7003D47E0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E41A441CB20BA7003D47E0 /* main.m */; };
 		72E41A491CB20BA7003D47E0 /* RemoteMessagePort.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 72E41A3E1CB20BA7003D47E0 /* RemoteMessagePort.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -279,7 +281,7 @@
 		72E45CFC1B641961005C701A /* sparkletestcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CFB1B641961005C701A /* sparkletestcast.xml */; };
 		72E45CFE1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CFD1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem */; };
 		72E45DDD1B65C3BD005C701A /* sign_update in Resources */ = {isa = PBXBuildFile; fileRef = 72E45DDC1B65C3BD005C701A /* sign_update */; };
-		72EB87EA1CB8798800C37F42 /* InstallerProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EB87E91CB8798800C37F42 /* InstallerProgress.m */; };
+		72EB87EA1CB8798800C37F42 /* ShowInstallerProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */; };
 		72EB87EB1CB8859100C37F42 /* Updater.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 721C24451CB753E6005440CB /* Updater.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		72EB87EC1CB8887E00C37F42 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
 		767B61AC1972D488004E0C3C /* SUGuidedPackageInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 767B61AA1972D488004E0C3C /* SUGuidedPackageInstaller.h */; };
@@ -848,6 +850,11 @@
 		72B767E51C9CFD7200A07552 /* SUAutomaticUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUAutomaticUpdateDriver.m; sourceTree = "<group>"; };
 		72D954791CBA1FFE006F28BD /* SUInstallationInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUInstallationInfo.h; sourceTree = "<group>"; };
 		72D9547A1CBA1FFE006F28BD /* SUInstallationInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUInstallationInfo.m; sourceTree = "<group>"; };
+		72D9547F1CBACC35006F28BD /* InstallerProgressAppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InstallerProgressAppController.h; path = Sparkle/InstallerProgress/InstallerProgressAppController.h; sourceTree = SOURCE_ROOT; };
+		72D954801CBACC35006F28BD /* InstallerProgressAppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InstallerProgressAppController.m; path = Sparkle/InstallerProgress/InstallerProgressAppController.m; sourceTree = SOURCE_ROOT; };
+		72D954821CBAD34F006F28BD /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Sparkle/InstallerProgress/main.m; sourceTree = SOURCE_ROOT; };
+		72D954841CBAD418006F28BD /* ShowInstallerProgress.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ShowInstallerProgress.h; path = Sparkle/InstallerProgress/ShowInstallerProgress.h; sourceTree = SOURCE_ROOT; };
+		72D954851CBAD4AE006F28BD /* InstallerProgressAppControllerDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = InstallerProgressAppControllerDelegate.h; path = Sparkle/InstallerProgress/InstallerProgressAppControllerDelegate.h; sourceTree = SOURCE_ROOT; };
 		72E41A381CB209CA003D47E0 /* SURemoteMessagePortProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SURemoteMessagePortProtocol.h; path = Sparkle/SURemoteMessagePortProtocol.h; sourceTree = SOURCE_ROOT; };
 		72E41A3E1CB20BA7003D47E0 /* RemoteMessagePort.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = RemoteMessagePort.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
 		72E41A441CB20BA7003D47E0 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -863,7 +870,7 @@
 		72E45CFB1B641961005C701A /* sparkletestcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = sparkletestcast.xml; sourceTree = "<group>"; };
 		72E45CFD1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test_app_only_dsa_priv_dont_ever_do_this_for_real.pem; sourceTree = "<group>"; };
 		72E45DDC1B65C3BD005C701A /* sign_update */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = sign_update; path = bin/sign_update; sourceTree = SOURCE_ROOT; };
-		72EB87E91CB8798800C37F42 /* InstallerProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InstallerProgress.m; path = Sparkle/InstallerProgress/InstallerProgress.m; sourceTree = SOURCE_ROOT; };
+		72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ShowInstallerProgress.m; path = Sparkle/InstallerProgress/ShowInstallerProgress.m; sourceTree = SOURCE_ROOT; };
 		767B61AA1972D488004E0C3C /* SUGuidedPackageInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUGuidedPackageInstaller.h; sourceTree = "<group>"; };
 		767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUGuidedPackageInstaller.m; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Sparkle-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Sparkle-Info.plist"; sourceTree = "<group>"; };
@@ -1398,7 +1405,12 @@
 		721C24461CB753E6005440CB /* Installer Progress */ = {
 			isa = PBXGroup;
 			children = (
-				72EB87E91CB8798800C37F42 /* InstallerProgress.m */,
+				72D954851CBAD4AE006F28BD /* InstallerProgressAppControllerDelegate.h */,
+				72D9547F1CBACC35006F28BD /* InstallerProgressAppController.h */,
+				72D954801CBACC35006F28BD /* InstallerProgressAppController.m */,
+				72D954841CBAD418006F28BD /* ShowInstallerProgress.h */,
+				72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */,
+				72D954821CBAD34F006F28BD /* main.m */,
 				721C24581CB7567D005440CB /* InstallerProgress-Info.plist */,
 			);
 			name = "Installer Progress";
@@ -2361,8 +2373,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72D954831CBAD34F006F28BD /* main.m in Sources */,
 				721C24621CB75C68005440CB /* SULog.m in Sources */,
-				72EB87EA1CB8798800C37F42 /* InstallerProgress.m in Sources */,
+				72D954811CBACC35006F28BD /* InstallerProgressAppController.m in Sources */,
+				72EB87EA1CB8798800C37F42 /* ShowInstallerProgress.m in Sources */,
 				721C24611CB75C5D005440CB /* SUHost.m in Sources */,
 				721C245F1CB75A6B005440CB /* SUMessageTypes.m in Sources */,
 				721C245E1CB757DE005440CB /* SUConstants.m in Sources */,
