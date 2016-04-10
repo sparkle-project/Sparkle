@@ -10,15 +10,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SUHost, SUAppcastItem;
+@class SUHost, SUInstallationInfo;
 
 @interface SUProbeInstallStatus : NSObject
 
 + (void)probeInstallerInProgressForHost:(SUHost *)host completion:(void (^)(BOOL))completionHandler;
 
 // completionHandler may not be sent on main queue
-// additionally, it may be possible that the installer is in progress but we get a nil appcast item back
-+ (void)probeInstallerUpdateItemForHost:(SUHost *)host completion:(void (^)(SUAppcastItem  * _Nullable))completionHandler;
+// additionally, it may be possible that the installer is in progress but we get a nil installation info back
++ (void)probeInstallerUpdateItemForHost:(SUHost *)host completion:(void (^)(SUInstallationInfo  * _Nullable))completionHandler;
 
 @end
 

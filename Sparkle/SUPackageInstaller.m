@@ -77,6 +77,11 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
     return YES;
 }
 
+- (BOOL)canInstallSilently
+{
+    return NO;
+}
+
 - (void)cleanup
 {
 }

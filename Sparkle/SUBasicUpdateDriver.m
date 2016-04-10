@@ -15,6 +15,7 @@
 #import "SUHost.h"
 #import "SUAppcastItem.h"
 #import "SUProbeInstallStatus.h"
+#import "SUInstallationInfo.h"
 
 @interface SUBasicUpdateDriver () <SUAppcastDriverDelegate>
 
@@ -67,8 +68,9 @@
 {
     self.completionBlock = completionBlock;
     
-    [SUProbeInstallStatus probeInstallerUpdateItemForHost:self.host completion:^(SUAppcastItem * _Nullable updateItem) {
+    [SUProbeInstallStatus probeInstallerUpdateItemForHost:self.host completion:^(SUInstallationInfo * _Nullable installationInfo) {
         dispatch_async(dispatch_get_main_queue(), ^{
+            SUAppcastItem *updateItem = installationInfo.appcastItem;
             if (updateItem == nil) {
                 [self.delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUResumeAppcastError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"Failed to resume installing update.", nil) }]];
             } else {

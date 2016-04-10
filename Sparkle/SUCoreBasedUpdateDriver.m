@@ -192,9 +192,9 @@
     }
 }
 
-- (void)installerDidFinishRelaunchPreparation
+- (void)installerDidFinishPreparationAndCanInstallSilently:(BOOL)canInstallSilently
 {
-    [self.delegate installerDidFinishRelaunchPreparation];
+    [self.delegate installerDidFinishPreparationAndCanInstallSilently:canInstallSilently];
 }
 
 - (void)finishInstallationWithResponse:(SUInstallUpdateStatus)installUpdateStatus

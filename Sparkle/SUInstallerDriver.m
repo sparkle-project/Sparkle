@@ -301,7 +301,12 @@
             SULog(@"Error: Archived data to send for appcast item is nil");
         }
         
-        [self.delegate installerDidFinishRelaunchPreparation];
+        BOOL canInstallSilently = NO;
+        if (data.length == sizeof(uint8_t)) {
+            canInstallSilently = (BOOL)*(const uint8_t *)data.bytes;
+        }
+        
+        [self.delegate installerDidFinishPreparationAndCanInstallSilently:canInstallSilently];
     } else if (identifier == SUInstallationFinishedStage2) {
         // Don't have to store current stage because we're severing our connection to the installer
         

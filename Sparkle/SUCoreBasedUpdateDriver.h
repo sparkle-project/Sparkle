@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem;
 
-- (void)installerDidFinishRelaunchPreparation;
+- (void)installerDidFinishPreparationAndCanInstallSilently:(BOOL)canInstallSilently;
 
 - (void)coreDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
 

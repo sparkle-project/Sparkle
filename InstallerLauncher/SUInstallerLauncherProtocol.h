@@ -11,7 +11,5 @@
 @protocol SUInstallerLauncherProtocol
 
 - (void)launchInstallerAtPath:(NSString *)installerPath withArguments:(NSArray *)arguments completion:(void (^)(BOOL success))completionHandler;
-
-- (void)testWritabilityAtPath:(NSString *)path completion:(void (^)(BOOL isWritable))completionHandler;
     
 @end

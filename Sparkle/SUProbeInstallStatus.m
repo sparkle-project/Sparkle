@@ -12,7 +12,7 @@
 #import "SURemoteMessagePortProtocol.h"
 #import "SUHost.h"
 #import "SUMessageTypes.h"
-#import "SUAppcastItem.h"
+#import "SUInstallationInfo.h"
 #import "SUSecureCoding.h"
 
 @implementation SUProbeInstallStatus
@@ -32,7 +32,7 @@
     }];
 }
 
-+ (void)probeInstallerUpdateItemForHost:(SUHost *)host completion:(void (^)(SUAppcastItem  * _Nullable))completionHandler
++ (void)probeInstallerUpdateItemForHost:(SUHost *)host completion:(void (^)(SUInstallationInfo  * _Nullable))completionHandler
 {
     NSString *hostBundleIdentifier = host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
@@ -50,10 +50,10 @@
                     completionHandler(nil);
                 } else {
                     NSData *nonNullReplyData = replyData;
-                    SUAppcastItem  *updateItem = (SUAppcastItem *)SUUnarchiveRootObjectSecurely(nonNullReplyData, [SUAppcastItem class]);
+                    SUInstallationInfo *installationInfo = (SUInstallationInfo *)SUUnarchiveRootObjectSecurely(nonNullReplyData, [SUInstallationInfo class]);
                     
-                    if (updateItem != nil) {
-                        completionHandler(updateItem);
+                    if (installationInfo != nil) {
+                        completionHandler(installationInfo);
                     } else {
                         completionHandler(nil);
                     }

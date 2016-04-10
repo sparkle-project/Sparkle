@@ -22,6 +22,8 @@
 #import "SUInstallationInputData.h"
 #import "SUUnarchiver.h"
 #import "SUFileManager.h"
+#import "SUInstallationInfo.h"
+#import "SUAppcastItem.h"
 
 /*!
  * Terminate the application after a delay from launching the new update to avoid OS activation issues
@@ -48,7 +50,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @property (nonatomic) SUInstallationInputData *installationData;
 @property (nonatomic, assign) BOOL shouldRelaunch;
 @property (nonatomic, assign) BOOL shouldShowUI;
-@property (nonatomic) NSData *updateItemData;
+@property (nonatomic) NSData *installationInfoData;
 
 @property (nonatomic) id<SUInstaller> installer;
 @property (nonatomic) BOOL willCompleteInstallation;
@@ -70,7 +72,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize installationData = _installationData;
 @synthesize shouldRelaunch = _shouldRelaunch;
 @synthesize shouldShowUI = _shouldShowUI;
-@synthesize updateItemData = _updateItemData;
+@synthesize installationInfoData = _installationInfoData;
 @synthesize installer = _installer;
 @synthesize willCompleteInstallation = _willCompleteInstallation;
 @synthesize installerQueue = _installerQueue;
@@ -342,9 +344,16 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             }
         });
     } else if (identifier == SUSentUpdateAppcastItemData) {
-        self.updateItemData = data;
+        if (self.installationInfoData == nil) {
+            SUAppcastItem *updateItem = (SUAppcastItem *)SUUnarchiveRootObjectSecurely(data, [SUAppcastItem class]);
+            if (updateItem != nil) {
+                SUInstallationInfo *installationInfo = [[SUInstallationInfo alloc] initWithAppcastItem:updateItem canSilentlyInstall:[self.installer canInstallSilently]];
+                
+                self.installationInfoData = SUArchiveRootObjectSecurely(installationInfo);
+            }
+        }
     } else if (identifier == SUReceiveUpdateAppcastItemData) {
-        replyData = self.updateItemData;
+        replyData = self.installationInfoData;
     } else if (identifier == SUResumeInstallationToStage2 && data.length == sizeof(uint8_t) * 2) {
         uint8_t relaunch = *((const uint8_t *)data.bytes);
         uint8_t showsUI = *((const uint8_t *)data.bytes + 1);
@@ -403,10 +412,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             return;
         }
         
+        uint8_t canPerformSilentInstall = (uint8_t)[installer canInstallSilently];
+        
         dispatch_async(dispatch_get_main_queue(), ^{
             self.installer = installer;
             
-            [self.remotePort sendMessageWithIdentifier:SUInstallationFinishedStage1 data:[NSData data] completion:^(BOOL success) {
+            NSData *silentData = [NSData dataWithBytes:&canPerformSilentInstall length:sizeof(canPerformSilentInstall)];
+            [self.remotePort sendMessageWithIdentifier:SUInstallationFinishedStage1 data:silentData completion:^(BOOL success) {
                 if (!success) {
                     SULog(@"Error sending stage 1 finish");
                 }

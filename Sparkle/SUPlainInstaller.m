@@ -228,8 +228,7 @@
     self.fileManager = [SUFileManager fileManagerAllowingAuthorization:allowsUI];
     
     // Bring up authorization prompt right away if we need it
-#warning is this test good enough or should we check parent directory too?
-    if (![[NSFileManager defaultManager] isWritableFileAtPath:self.host.bundle.bundlePath]) {
+    if (![self canInstallSilently]) {
         return [self.fileManager grantAuthorizationPrivilegesWithError:error];
     }
     return YES;
@@ -245,6 +244,12 @@
 - (BOOL)displaysUserProgress
 {
     return NO;
+}
+
+- (BOOL)canInstallSilently
+{
+#warning is this test good enough or should we check parent directory too?
+    return [[NSFileManager defaultManager] isWritableFileAtPath:self.host.bundle.bundlePath];
 }
 
 - (void)cleanup

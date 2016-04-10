@@ -23,7 +23,7 @@
 #import "SUAutomaticUpdateDriver.h"
 #import "SUProbeInstallStatus.h"
 #import "SUAppcastItem.h"
-#import "SUUpdaterPermission.h"
+#import "SUInstallationInfo.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -44,7 +44,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (strong) id <SUUpdateDriver> driver;
 @property (strong) SUHost *host;
 @property (nonatomic, readonly) SUUpdaterSettings *updaterSettings;
-@property (nonatomic, readonly) BOOL hasWriteAccessToHostPath;
 
 @end
 
@@ -57,7 +56,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize driver;
 @synthesize host;
 @synthesize updaterSettings = _updaterSettings;
-@synthesize hasWriteAccessToHostPath = _hasWriteAccessToHostPath;
 @synthesize sparkleBundle;
 
 - (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)theDelegate
@@ -80,21 +78,12 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         
         delegate = theDelegate;
         
-        __weak SUUpdater *weakSelf = self;
-        [SUUpdaterPermission testUpdateWritabilityAtPath:host.bundlePath completion:^(BOOL isWritable) {
-            SUUpdater *strongSelf = weakSelf;
-            if (strongSelf == nil) {
-                return;
-            }
-            
-            strongSelf->_hasWriteAccessToHostPath = isWritable;
-            // This runs the permission prompt if needed, but never before the app has finished launching because the runloop may not have ran before that
-            // We will also take precaussions if a developer instantiates an updater themselves where the application may not be completely finished launching yet
-            [strongSelf performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:1];
+        // This runs the permission prompt if needed, but never before the app has finished launching because the runloop may not have ran before that
+        // We will also take precaussions if a developer instantiates an updater themselves where the application may not be completely finished launching yet
+        [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:1];
 #ifdef DEBUG
-            SULog(@"WARNING: This is running a Debug build of Sparkle; don't use this in production!");
+        SULog(@"WARNING: This is running a Debug build of Sparkle; don't use this in production!");
 #endif
-        }];
     }
     
     return self;
@@ -494,7 +483,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 - (BOOL)allowsAutomaticUpdates
 {
     NSNumber *developerAllowsAutomaticUpdates = [self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
-    return self.hasWriteAccessToHostPath && (developerAllowsAutomaticUpdates == nil || developerAllowsAutomaticUpdates.boolValue);
+    return (developerAllowsAutomaticUpdates == nil || developerAllowsAutomaticUpdates.boolValue);
 }
 
 - (void)setFeedURL:(NSURL *)feedURL
@@ -611,14 +600,14 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 // as well as if that update is marked critical or not
 - (void)retrieveNextUpdateCheckInterval:(void (^)(NSTimeInterval))completionHandler
 {
-    [SUProbeInstallStatus probeInstallerUpdateItemForHost:self.host completion:^(SUAppcastItem * _Nullable updateItem) {
+    [SUProbeInstallStatus probeInstallerUpdateItemForHost:self.host completion:^(SUInstallationInfo * _Nullable installationInfo) {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSTimeInterval regularCheckInterval = [self updateCheckInterval];
-            if (updateItem == nil) {
+            if (installationInfo == nil) {
                 // Proceed as normal if there's no resumable updates
                 completionHandler(regularCheckInterval);
             } else {
-                if ([updateItem isCriticalUpdate]) {
+                if (!installationInfo.canSilentlyInstall || [installationInfo.appcastItem isCriticalUpdate]) {
                     completionHandler(MIN(regularCheckInterval, SUImpatientUpdateCheckInterval));
                 } else {
                     completionHandler(MAX(regularCheckInterval, SUImpatientUpdateCheckInterval));

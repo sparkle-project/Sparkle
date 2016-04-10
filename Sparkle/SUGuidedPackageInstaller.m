@@ -91,6 +91,11 @@
     return NO;
 }
 
+- (BOOL)canInstallSilently
+{
+    return NO; // because of authorization
+}
+
 - (void)cleanup
 {
 }

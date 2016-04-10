@@ -156,7 +156,7 @@
     [self.userDriver showExtractionReceivedProgress:progress];
 }
 
-- (void)installerDidFinishRelaunchPreparation
+- (void)installerDidFinishPreparationAndCanInstallSilently:(BOOL)__unused canInstallSilently
 {
     [self.userDriver showExtractionFinishedAndReadyToInstallAndRelaunch:^(SUInstallUpdateStatus installUpdateStatus) {
         dispatch_async(dispatch_get_main_queue(), ^{
