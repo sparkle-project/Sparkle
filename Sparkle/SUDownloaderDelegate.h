@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SUDownloaderDelegate <NSObject>
 
-- (void)downloaderDidSetDestination:(NSString *)destinationPath temporaryDirectory:(NSString *)temporaryDirectory;
+- (void)downloaderDidSetDestinationName:(NSString *)destinationName temporaryDirectory:(NSString *)temporaryDirectory;
 
 - (void)downloaderDidFailToCreateTemporaryDirectoryWithError:(NSError *)error;
 

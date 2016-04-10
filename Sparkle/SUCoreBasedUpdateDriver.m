@@ -154,13 +154,13 @@
         [self.delegate coreDriverDidFinishDownloadingUpdate];
     }
     
-    NSString *downloadPath = self.downloadDriver.downloadPath;
-    assert(downloadPath != nil);
+    NSString *downloadName = self.downloadDriver.downloadName;
+    assert(downloadName != nil);
     
     NSString *temporaryDirectory = self.downloadDriver.temporaryDirectory;
     assert(temporaryDirectory != nil);
     
-    [self.installerDriver extractDownloadPath:downloadPath withUpdateItem:self.updateItem temporaryDirectory:temporaryDirectory completion:^(NSError * _Nullable error) {
+    [self.installerDriver extractDownloadName:downloadName withUpdateItem:self.updateItem temporaryDirectory:temporaryDirectory completion:^(NSError * _Nullable error) {
         if (error != nil) {
             [self.delegate coreDriverIsRequestingAbortUpdateWithError:error];
         }

@@ -94,10 +94,9 @@
         
         [self.delegate downloaderDidFailToCreateTemporaryDirectoryWithError:error];
     } else {
-        NSString *downloadPath = [tempDir stringByAppendingPathComponent:name];
-        [self.download setDestination:downloadPath allowOverwrite:YES];
+        [self.download setDestination:[tempDir stringByAppendingPathComponent:name] allowOverwrite:YES];
         
-        [self.delegate downloaderDidSetDestination:downloadPath temporaryDirectory:tempDir];
+        [self.delegate downloaderDidSetDestinationName:name temporaryDirectory:tempDir];
     }
 }
 

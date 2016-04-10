@@ -258,9 +258,10 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (void)extractAndInstallUpdate
 {
-    id <SUUnarchiver> unarchiver = [SUUnarchiver unarchiverForPath:self.installationData.downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.installationData.decryptionPassword delegate:self];
+    NSString *downloadPath = [self.installationData.updateDirectoryPath stringByAppendingPathComponent:self.installationData.downloadName];
+    id <SUUnarchiver> unarchiver = [SUUnarchiver unarchiverForPath:downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.installationData.decryptionPassword delegate:self];
     if (!unarchiver) {
-        SULog(@"Error: No valid unarchiver for %@!", self.installationData.downloadPath);
+        SULog(@"Error: No valid unarchiver for %@!", downloadPath);
         [self unarchiverDidFail];
     } else {
         [unarchiver start];
@@ -298,7 +299,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         }
     }];
     
-    BOOL validationSuccess = [self validateUpdateForHost:self.host downloadedToPath:self.installationData.downloadPath extractedToPath:self.installationData.updateDirectoryPath DSASignature:self.installationData.dsaSignature];
+    NSString *downloadPath = [self.installationData.updateDirectoryPath stringByAppendingPathComponent:self.installationData.downloadName];
+    BOOL validationSuccess = [self validateUpdateForHost:self.host downloadedToPath:downloadPath extractedToPath:self.installationData.updateDirectoryPath DSASignature:self.installationData.dsaSignature];
     
     if (!validationSuccess) {
         SULog(@"Error: update validation was a failure");

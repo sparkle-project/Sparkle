@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSMutableURLRequest *request;
 @property (nullable, nonatomic, readonly, copy) NSString *temporaryDirectory;
-@property (nullable, nonatomic, readonly, copy) NSString *downloadPath;
+@property (nullable, nonatomic, readonly, copy) NSString *downloadName;
 
 - (void)cleanup;
 

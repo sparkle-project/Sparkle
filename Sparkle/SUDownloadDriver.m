@@ -26,7 +26,7 @@
 @property (nonatomic, readonly) SUAppcastItem *updateItem;
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, copy) NSString *temporaryDirectory;
-@property (nonatomic, copy) NSString *downloadPath;
+@property (nonatomic, copy) NSString *downloadName;
 @property (nonatomic, weak) id<SUDownloadDriverDelegate> delegate;
 
 @end
@@ -38,7 +38,7 @@
 @synthesize request = _request;
 @synthesize host = _host;
 @synthesize temporaryDirectory = _temporaryDirectory;
-@synthesize downloadPath = _downloadPath;
+@synthesize downloadName = _downloadName;
 @synthesize delegate = _delegate;
 
 - (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host userAgent:(NSString *)userAgent delegate:(id<SUDownloadDriverDelegate>)delegate
@@ -141,13 +141,13 @@
         [self.connection invalidate];
         self.connection = nil;
     }
-    self.downloadPath = nil;
+    self.downloadName = nil;
 }
 
-- (void)downloaderDidSetDestination:(NSString *)destinationPath temporaryDirectory:(NSString *)temporaryDirectory
+- (void)downloaderDidSetDestinationName:(NSString *)destinationName temporaryDirectory:(NSString *)temporaryDirectory
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.downloadPath = destinationPath;
+        self.downloadName = destinationName;
         self.temporaryDirectory = temporaryDirectory;
     });
 }

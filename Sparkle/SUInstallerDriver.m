@@ -41,7 +41,7 @@
 @property (nonatomic, weak, readonly) id<SUUpdaterDelegate> updaterDelegate;
 
 @property (nonatomic) SUAppcastItem *updateItem;
-@property (nonatomic, copy) NSString *downloadPath;
+@property (nonatomic, copy) NSString *downloadName;
 @property (nonatomic, copy) NSString *temporaryDirectory;
 
 @end
@@ -59,7 +59,7 @@
 @synthesize updater = _updater;
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize updateItem = _updateItem;
-@synthesize downloadPath = _downloadPath;
+@synthesize downloadName = _downloadName;
 @synthesize temporaryDirectory = _temporaryDirectory;
 
 - (instancetype)initWithHost:(SUHost *)host cachePath:(NSString *)cachePath sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(id<SUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SUInstallerDriverDelegate>)delegate
@@ -181,11 +181,11 @@
 }
 
 // This can be called multiple times (eg: if a delta update fails, this may be called again with a regular update item)
-- (void)extractDownloadPath:(NSString *)downloadPath withUpdateItem:(SUAppcastItem *)updateItem temporaryDirectory:(NSString *)temporaryDirectory completion:(void (^)(NSError * _Nullable))completionHandler
+- (void)extractDownloadName:(NSString *)downloadName withUpdateItem:(SUAppcastItem *)updateItem temporaryDirectory:(NSString *)temporaryDirectory completion:(void (^)(NSError * _Nullable))completionHandler
 {
     self.updateItem = updateItem;
     self.temporaryDirectory = temporaryDirectory;
-    self.downloadPath = downloadPath;
+    self.downloadName = downloadName;
     
     self.currentStage = SUInstallerNotStarted;
     
@@ -218,7 +218,7 @@
         SULog(@"Error: Failed to copy or find installer progress tool: %@", progressToolError);
     }
     
-    SUInstallationInputData *installationData = [[SUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch progressToolPath:progressToolPath hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadPath:self.downloadPath dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
+    SUInstallationInputData *installationData = [[SUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch progressToolPath:progressToolPath hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadName:self.downloadName dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
     
     NSData *archivedData = SUArchiveRootObjectSecurely(installationData);
     
