@@ -269,6 +269,7 @@
 		72D9547E1CBA221E006F28BD /* SUAppcastItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5FC5409C5182000B25A18 /* SUAppcastItem.m */; };
 		72D954811CBACC35006F28BD /* InstallerProgressAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D954801CBACC35006F28BD /* InstallerProgressAppController.m */; };
 		72D954831CBAD34F006F28BD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D954821CBAD34F006F28BD /* main.m */; };
+		72D954861CBB179D006F28BD /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DF4F196247F900203BB0 /* Images.xcassets */; };
 		72E41A391CB209CA003D47E0 /* SURemoteMessagePortProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 72E41A381CB209CA003D47E0 /* SURemoteMessagePortProtocol.h */; };
 		72E41A451CB20BA7003D47E0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E41A441CB20BA7003D47E0 /* main.m */; };
 		72E41A491CB20BA7003D47E0 /* RemoteMessagePort.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 72E41A3E1CB20BA7003D47E0 /* RemoteMessagePort.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -2114,6 +2115,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72D954861CBB179D006F28BD /* Images.xcassets in Resources */,
 				72EB87EC1CB8887E00C37F42 /* SUStatus.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -39,17 +39,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 {
     self = [super init];
     if (self != nil) {
-        if (arguments.count < 2) {
+        if (arguments.count != 2) {
             exit(EXIT_FAILURE);
-        }
-        
-        NSImage *applicationIcon = nil;
-        if (arguments.count > 2) {
-            applicationIcon = [[NSImage alloc] initWithContentsOfFile:arguments[2]];
-        }
-        
-        if (applicationIcon != nil) {
-            application.applicationIconImage = applicationIcon;
         }
         
         NSString *hostBundlePath = arguments[1];

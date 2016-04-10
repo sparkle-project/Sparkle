@@ -12,11 +12,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SUInstallationInputData : NSObject <NSSecureCoding>
 
-- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath progressToolPath:(nullable NSString *)progressToolPath progressToolIconPath:(NSString *)progressToolIconPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadName:(NSString *)downloadName dsaSignature:(NSString *)dsaSignature decryptionPassword:(nullable NSString *)decryptionPassword;
+- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath progressToolPath:(nullable NSString *)progressToolPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadName:(NSString *)downloadName dsaSignature:(NSString *)dsaSignature decryptionPassword:(nullable NSString *)decryptionPassword;
 
 @property (nonatomic, copy, readonly) NSString *relaunchPath;
 @property (nonatomic, copy, readonly, nullable) NSString *progressToolPath;
-@property (nonatomic, copy, readonly, nullable) NSString *progressToolIconPath;
 @property (nonatomic, copy, readonly) NSString *hostBundlePath;
 @property (nonatomic, copy, readonly) NSString *updateDirectoryPath;
 @property (nonatomic, copy, readonly) NSString *downloadName;

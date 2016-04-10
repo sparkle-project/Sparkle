@@ -213,9 +213,8 @@
     }
     
     NSString *localProgressToolPath = nil;
-    NSString *applicationIconPath = nil;
-    if ([self.updaterDelegate respondsToSelector:@selector(pathToInstallerProgressAppForUpdater:getApplicationIconPath:)]) {
-        localProgressToolPath = [self.updaterDelegate pathToInstallerProgressAppForUpdater:self.updater getApplicationIconPath:&applicationIconPath];
+    if ([self.updaterDelegate respondsToSelector:@selector(pathToInstallerProgressAppForUpdater:)]) {
+        localProgressToolPath = [self.updaterDelegate pathToInstallerProgressAppForUpdater:self.updater];
     }
     
     if (localProgressToolPath == nil) {
@@ -231,15 +230,7 @@
         SULog(@"Error: Failed to copy or find installer progress tool: %@", progressToolError);
     }
     
-    if (applicationIconPath != nil) {
-        NSError *applicationIconCopyError = nil;
-        applicationIconPath = [self copyPathToCacheDirectory:applicationIconPath error:&applicationIconCopyError];
-        if (applicationIconPath == nil) {
-            SULog(@"Error: Failed to copy custom application icon: %@", applicationIconCopyError);
-        }
-    }
-    
-    SUInstallationInputData *installationData = [[SUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch progressToolPath:progressToolPath progressToolIconPath:applicationIconPath hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadName:self.downloadName dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
+    SUInstallationInputData *installationData = [[SUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch progressToolPath:progressToolPath hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadName:self.downloadName dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
     
     NSData *archivedData = SUArchiveRootObjectSecurely(installationData);
     
