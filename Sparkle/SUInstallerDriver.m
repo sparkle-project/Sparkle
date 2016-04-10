@@ -212,13 +212,34 @@
         decryptionPassword = [self.updaterDelegate decryptionPasswordForUpdater:self.updater];
     }
     
+    NSString *localProgressToolPath = nil;
+    NSString *applicationIconPath = nil;
+    if ([self.updaterDelegate respondsToSelector:@selector(pathToInstallerProgressAppForUpdater:getApplicationIconPath:)]) {
+        localProgressToolPath = [self.updaterDelegate pathToInstallerProgressAppForUpdater:self.updater getApplicationIconPath:&applicationIconPath];
+    }
+    
+    if (localProgressToolPath == nil) {
+        localProgressToolPath = [self.sparkleBundle pathForResource:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME ofType:@"app"];
+        if (localProgressToolPath == nil) {
+            SULog(@"Error: Failed to find installer progress tool: %@", localProgressToolPath);
+        }
+    }
+    
     NSError *progressToolError = nil;
-    NSString *progressToolPath = [self copyApplicationResourceToCacheDirectory:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME error:&progressToolError];
+    NSString *progressToolPath = [self copyPathToCacheDirectory:localProgressToolPath error:&progressToolError];
     if (progressToolPath == nil) {
         SULog(@"Error: Failed to copy or find installer progress tool: %@", progressToolError);
     }
     
-    SUInstallationInputData *installationData = [[SUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch progressToolPath:progressToolPath hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadName:self.downloadName dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
+    if (applicationIconPath != nil) {
+        NSError *applicationIconCopyError = nil;
+        applicationIconPath = [self copyPathToCacheDirectory:applicationIconPath error:&applicationIconCopyError];
+        if (applicationIconPath == nil) {
+            SULog(@"Error: Failed to copy custom application icon: %@", applicationIconCopyError);
+        }
+    }
+    
+    SUInstallationInputData *installationData = [[SUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch progressToolPath:progressToolPath progressToolIconPath:applicationIconPath hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadName:self.downloadName dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
     
     NSData *archivedData = SUArchiveRootObjectSecurely(installationData);
     
@@ -345,12 +366,11 @@
     return YES;
 }
 
-- (NSString *)copyApplicationResourceToCacheDirectory:(NSString *)resource error:(NSError * __autoreleasing *)error
+- (NSString *)copyPathToCacheDirectory:(NSString *)pathToCopy error:(NSError * __autoreleasing *)error
 {
     // Copy the resource into the caches directory so we can get to it after the new version's installed.
     // Only the paranoid survive: if there's already a stray copy of resource there, we would have problems.
     NSString *cachePath = nil;
-    NSString *const pathToCopy = [self.sparkleBundle pathForResource:resource ofType:@"app"];
     if (pathToCopy == nil) {
         if (error != NULL) {
             *error =
@@ -400,7 +420,7 @@
     // Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
     // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
     NSError *relaunchError = nil;
-    NSString *relaunchToolPath = [self copyApplicationResourceToCacheDirectory:@""SPARKLE_RELAUNCH_TOOL_NAME error:&relaunchError];
+    NSString *relaunchToolPath = [self copyPathToCacheDirectory:[self.sparkleBundle pathForResource:@""SPARKLE_RELAUNCH_TOOL_NAME ofType:@"app"] error:&relaunchError];
     if (relaunchToolPath == nil) {
         completionHandler(relaunchError);
         return;

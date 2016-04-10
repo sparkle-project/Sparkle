@@ -207,6 +207,21 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (NSString *)pathToRelaunchForUpdater:(SUUpdater *)updater;
 
 /*!
+ Returns the path which is used to launch the installer progress app.
+ 
+ Return nil if a custom path should not be used. The default is the path Sparkle's own installer progress app.
+ 
+ Note that if the application is sandboxed, the paths returned from this method must be accessible within the application's sandbox.
+ Lastly, the installer progress app is only used if the installation takes a "long" period of time. This is more likely to occur with installations
+ that happen eg: over the network or USB drive, or if the app is really big and scattered in size. For most use cases, this tool may not be launched.
+ 
+ \param updater The SUUpdater instance.
+ \param applicationIconPath An optional path to the application icon that the installer progress app should use.
+  Output nil if no custom icon should be used; the default is Sparkle's autoupdater icon.
+ */
+- (NSString *)pathToInstallerProgressAppForUpdater:(SUUpdater *)updater getApplicationIconPath:(NSString * __autoreleasing *)applicationIconPath;
+
+/*!
  Returns the decryption password (if any) which is used to extract the update archive DMG.
  
  Return nil if no password should be used.
