@@ -40,20 +40,20 @@ class SUAppcastTest: XCTestCase {
             
             // Test best appcast item & a delta update item
             var deltaItem: SUAppcastItem? = nil
-            let bestAppcastItem = SUAppcastDriver.bestItemFromAppcastItems(items, getDeltaItem: &deltaItem, withHostVersion: "1.0", comparator: SUStandardVersionComparator.defaultComparator())
+            let bestAppcastItem = SUAppcastDriver.bestItemFromAppcastItems(items, getDeltaItem: &deltaItem, withHostVersion: "1.0", comparator: SUStandardVersionComparator())
 
             XCTAssertEqual(bestAppcastItem, items[1])
             XCTAssertEqual(deltaItem!.fileURL.lastPathComponent, "3.0_from_1.0.patch")
             
             // Test latest delta update item available
             var latestDeltaItem: SUAppcastItem? = nil
-            SUAppcastDriver.bestItemFromAppcastItems(items, getDeltaItem: &latestDeltaItem, withHostVersion: "2.0", comparator: SUStandardVersionComparator.defaultComparator())
+            SUAppcastDriver.bestItemFromAppcastItems(items, getDeltaItem: &latestDeltaItem, withHostVersion: "2.0", comparator: SUStandardVersionComparator())
             
             XCTAssertEqual(latestDeltaItem!.fileURL.lastPathComponent, "3.0_from_2.0.patch")
             
             // Test a delta item that does not exist
             var nonexistantDeltaItem: SUAppcastItem? = nil
-            SUAppcastDriver.bestItemFromAppcastItems(items, getDeltaItem: &nonexistantDeltaItem, withHostVersion: "2.1", comparator: SUStandardVersionComparator.defaultComparator())
+            SUAppcastDriver.bestItemFromAppcastItems(items, getDeltaItem: &nonexistantDeltaItem, withHostVersion: "2.1", comparator: SUStandardVersionComparator())
             
             XCTAssertNil(nonexistantDeltaItem)
         } catch let err as NSError {
