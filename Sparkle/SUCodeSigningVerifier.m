@@ -17,7 +17,7 @@
 
 @implementation SUCodeSigningVerifier
 
-+ (BOOL)codeSignatureAtPath:(NSString *)oldApplicationPath matchesSignatureAtPath:(NSString *)newApplicationPath error:(NSError *__autoreleasing *)error
++ (BOOL)codeSignatureAtPath:(NSString *)oldBundlePath matchesSignatureAtPath:(NSString *)newBundlePath error:(NSError *__autoreleasing *)error
 {
     OSStatus result;
     SecRequirementRef requirement = NULL;
@@ -30,7 +30,7 @@
         *error = nil;
     }
     
-    oldBundle = [NSBundle bundleWithPath:oldApplicationPath];
+    oldBundle = [NSBundle bundleWithPath:oldBundlePath];
     if (!oldBundle) {
         SULog(@"Failed to load NSBundle for original");
         result = -1;
@@ -48,7 +48,7 @@
         goto finally;
     }
     
-    newBundle = [NSBundle bundleWithPath:newApplicationPath];
+    newBundle = [NSBundle bundleWithPath:newBundlePath];
     if (!newBundle) {
         SULog(@"Failed to load NSBundle for update");
         result = -1;
@@ -94,7 +94,7 @@ finally:
     return (result == noErr);
 }
 
-+ (BOOL)codeSignatureIsValidAtPath:(NSString *)applicationPath error:(NSError *__autoreleasing *)error
++ (BOOL)codeSignatureIsValidAtPath:(NSString *)bundlePath error:(NSError *__autoreleasing *)error
 {
     OSStatus result;
     SecStaticCodeRef staticCode = NULL;
@@ -104,7 +104,7 @@ finally:
         *error = nil;
     }
 
-    newBundle = [NSBundle bundleWithPath:applicationPath];
+    newBundle = [NSBundle bundleWithPath:bundlePath];
     if (!newBundle) {
         SULog(@"Failed to load NSBundle");
         result = -1;
@@ -129,7 +129,7 @@ finally:
 
     if (result != noErr) {
         if (result == errSecCSUnsigned) {
-            SULog(@"Error: The app is not signed using Apple Code Signing. %@", applicationPath);
+            SULog(@"Error: The app is not signed using Apple Code Signing. %@", bundlePath);
         }
         if (result == errSecCSReqFailed) {
             [self logSigningInfoForCode:staticCode label:@"new info"];
@@ -161,13 +161,13 @@ static id valueOrNSNull(id value) {
     }
 }
 
-+ (BOOL)applicationAtPathIsCodeSigned:(NSString *)applicationPath
++ (BOOL)bundleAtPathIsCodeSigned:(NSString *)bundlePath
 {
     OSStatus result;
     SecStaticCodeRef staticCode = NULL;
     NSBundle *newBundle;
 
-    newBundle = [NSBundle bundleWithPath:applicationPath];
+    newBundle = [NSBundle bundleWithPath:bundlePath];
     if (!newBundle) {
         SULog(@"Failed to load NSBundle");
     	return NO;

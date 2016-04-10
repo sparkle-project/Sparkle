@@ -215,7 +215,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         }
     }
     
-    BOOL updateIsCodeSigned = [SUCodeSigningVerifier applicationAtPathIsCodeSigned:installSourcePath];
+    BOOL updateIsCodeSigned = [SUCodeSigningVerifier bundleAtPathIsCodeSigned:installSourcePath];
     
     if (dsaKeysMatch) {
         NSError *error = nil;
@@ -225,7 +225,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         }
     } else {
         NSString *hostBundlePath = host.bundlePath;
-        BOOL hostIsCodeSigned = [SUCodeSigningVerifier applicationAtPathIsCodeSigned:hostBundlePath];
+        BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtPathIsCodeSigned:hostBundlePath];
         
         NSString *dsaStatus = newPublicDSAKey ? @"has a new DSA key that doesn't match the previous one" : (publicDSAKey ? @"removes the DSA key" : @"isn't signed with a DSA key");
         if (!hostIsCodeSigned || !updateIsCodeSigned) {
