@@ -93,7 +93,12 @@
 
 - (BOOL)canInstallSilently
 {
-    return NO; // because of authorization
+    return ![self mayNeedToRequestAuthorization];
+}
+
+- (BOOL)mayNeedToRequestAuthorization
+{
+    return YES;
 }
 
 - (void)cleanup

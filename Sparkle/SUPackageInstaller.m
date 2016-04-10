@@ -82,6 +82,11 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
     return NO;
 }
 
+- (BOOL)mayNeedToRequestAuthorization
+{
+    return NO;
+}
+
 - (void)cleanup
 {
 }

@@ -440,14 +440,9 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         return;
     }
     
-    if (self.shouldShowUI) {
-        // Predict if an admin prompt is needed
-        // If it is, we should activate our app so that the auth prompt will be active
-        // (Note it's more efficient/simpler to predict rather than trying, seeing if we fail, notifying, and re-trying)
-        NSString *installationPath = [SUInstaller installationPathForHost:self.host];
-        if (![[NSFileManager defaultManager] isWritableFileAtPath:installationPath]) {
-            [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
-        }
+    if (self.shouldShowUI && [self.installer mayNeedToRequestAuthorization]) {
+        // We should activate our app so that the auth prompt will be active
+        [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
     }
     
     NSError *secondStageError = nil;

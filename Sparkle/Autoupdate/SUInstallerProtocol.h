@@ -36,6 +36,10 @@
 // Should be thread safe
 - (BOOL)canInstallSilently;
 
+// Indicates whether or not this installer may need authorization when performing the second stage of the installation
+// Should be thread safe
+- (BOOL)mayNeedToRequestAuthorization;
+
 // Cleans up work done from any of the previous stages. This should be invoked after stage 3 succeeds,
 // or after any one of the stages fails.
 // Should be able to be called from non-main thread

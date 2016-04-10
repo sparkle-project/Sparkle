@@ -248,8 +248,16 @@
 
 - (BOOL)canInstallSilently
 {
-#warning is this test good enough or should we check parent directory too?
-    return [[NSFileManager defaultManager] isWritableFileAtPath:self.host.bundle.bundlePath];
+    return ![self mayNeedToRequestAuthorization];
+}
+
+- (BOOL)mayNeedToRequestAuthorization
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *bundlePath = self.host.bundle.bundlePath;
+    // It's very well possible to have the bundle be writable but not be able to write into the parent directory
+    // And if the bundle isn't writable, but we can write into the parent directory, we will still need to authorize to replace it
+    return ![fileManager isWritableFileAtPath:bundlePath] || ![fileManager isWritableFileAtPath:[bundlePath stringByDeletingLastPathComponent]];
 }
 
 - (void)cleanup
