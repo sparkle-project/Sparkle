@@ -27,6 +27,7 @@ typedef NS_ENUM(NSUInteger, SUDownloadUpdateStatus) {
 };
 
 typedef NS_ENUM(NSUInteger, SUInstallUpdateStatus) {
+    SUInstallUpdateNow,
     SUInstallAndRelaunchUpdateNow,
     SUDismissUpdateInstallation
 };

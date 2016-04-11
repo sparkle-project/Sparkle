@@ -176,7 +176,7 @@
 
 - (void)installAndRestart:(id)__unused sender
 {
-    [self.coreComponent installAndRestart];
+    [self.coreComponent installAndShouldRestart:YES];
 }
 
 #pragma mark Check for Updates

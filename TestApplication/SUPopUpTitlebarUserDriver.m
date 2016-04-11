@@ -193,8 +193,9 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent registerInstallUpdateHandler:installUpdateHandler];
         
+        __weak SUPopUpTitlebarUserDriver *weakSelf = self;
         [self addUpdateButtonWithTitle:@"Install & Relaunch" action:^(NSButton *__unused button) {
-            installUpdateHandler(SUInstallAndRelaunchUpdateNow);
+            [weakSelf.coreComponent installAndShouldRestart:YES];
         }];
     });
 }

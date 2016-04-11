@@ -1,0 +1,6 @@
+// sparkle command line tool only
+
+INFOPLIST_FILE = sparkle-cli/Info.plist
+PRODUCT_BUNDLE_IDENTIFIER = org.sparkle-project.sparkle-cli
+PRODUCT_NAME = sparkle
+LD_RUNPATH_SEARCH_PATHS = @executable_path/../Frameworks/

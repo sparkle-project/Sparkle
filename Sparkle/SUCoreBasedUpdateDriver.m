@@ -203,6 +203,9 @@
         case SUDismissUpdateInstallation:
             [self.delegate coreDriverIsRequestingAbortUpdateWithError:nil];
             break;
+        case SUInstallUpdateNow:
+            [self.installerDriver installWithToolAndRelaunch:NO displayingUserInterface:YES];
+            break;
         case SUInstallAndRelaunchUpdateNow:
             [self.installerDriver installWithToolAndRelaunch:YES displayingUserInterface:YES];
             break;

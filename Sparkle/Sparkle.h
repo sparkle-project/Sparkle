@@ -28,5 +28,6 @@
 #import "SUStandardUserDriverDelegate.h"
 #import "SUStandardUserDriverUIDelegate.h"
 #import "SUStandardUserDriverRemoteDelegate.h"
+#import "SUUserDriverCoreComponent.h"
 
 #endif

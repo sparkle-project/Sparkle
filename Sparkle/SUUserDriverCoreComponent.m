@@ -129,10 +129,10 @@
     self.installUpdateHandler = installUpdateHandler;
 }
 
-- (void)installAndRestart
+- (void)installAndShouldRestart:(BOOL)shouldRestart
 {
     if (self.installUpdateHandler != nil) {
-        self.installUpdateHandler(SUInstallAndRelaunchUpdateNow);
+        self.installUpdateHandler(shouldRestart ? SUInstallAndRelaunchUpdateNow : SUInstallUpdateNow);
         self.installUpdateHandler = nil;
     }
 }

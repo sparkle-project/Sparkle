@@ -167,13 +167,13 @@
 
 - (void)coreDriverIsRequestingAppTermination
 {
+    [self.userDriver terminateApplication];
+    
     // if a user chooses to NOT relaunch the app (as is the case with WebKit
     // when it asks you if you are sure you want to close the app with multiple
     // tabs open), the status window still stays on the screen and obscures
     // other windows; with this fix, it doesn't
     [self.userDriver dismissUpdateInstallation];
-    
-    [self.userDriver terminateApplication];
 }
 
 - (BOOL)basicDriverShouldSignalShowingUpdateImmediately
