@@ -369,13 +369,6 @@
 			remoteGlobalIDString = 55C14BB6136EEF1500649790;
 			remoteInfo = Autoupdate;
 		};
-		5D06E8D50FD68C86005AE3F6 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
-			remoteInfo = Sparkle;
-		};
 		61B5F91B09C4CF7200B25A18 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -1795,7 +1788,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				5D06E8D60FD68C86005AE3F6 /* PBXTargetDependency */,
 			);
 			name = BinaryDelta;
 			productName = BinaryDelta;
@@ -2646,11 +2638,6 @@
 			isa = PBXTargetDependency;
 			target = 55C14BB6136EEF1500649790 /* Autoupdate */;
 			targetProxy = 55C14F96136F044100649790 /* PBXContainerItemProxy */;
-		};
-		5D06E8D60FD68C86005AE3F6 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8DC2EF4F0486A6940098B216 /* Sparkle */;
-			targetProxy = 5D06E8D50FD68C86005AE3F6 /* PBXContainerItemProxy */;
 		};
 		61B5F91C09C4CF7200B25A18 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
