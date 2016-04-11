@@ -425,6 +425,13 @@
 			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = Sparkle;
 		};
+		72D954B91CBB6E27006F28BD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 721C24441CB753E6005440CB;
+			remoteInfo = "Installer Progress";
+		};
 		72E41A471CB20BA7003D47E0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -1992,6 +1999,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				72D954BA1CBB6E27006F28BD /* PBXTargetDependency */,
 				55C14F97136F044100649790 /* PBXTargetDependency */,
 				726E07B71CAF08D6001A286B /* PBXTargetDependency */,
 				726E07F91CAF37BD001A286B /* PBXTargetDependency */,
@@ -2678,6 +2686,11 @@
 			isa = PBXTargetDependency;
 			target = 8DC2EF4F0486A6940098B216 /* Sparkle */;
 			targetProxy = 72D954B11CBB42D0006F28BD /* PBXContainerItemProxy */;
+		};
+		72D954BA1CBB6E27006F28BD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 721C24441CB753E6005440CB /* Installer Progress */;
+			targetProxy = 72D954B91CBB6E27006F28BD /* PBXContainerItemProxy */;
 		};
 		72E41A481CB20BA7003D47E0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
