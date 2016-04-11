@@ -56,7 +56,7 @@
     self = [super init];
     
     if (self != nil) {
-        self.deltaUpdates = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSArray class], [NSDictionary class], [NSString class]]] forKey:@"deltaUpdates"];
+        self.deltaUpdates = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [SUAppcastItem class]]] forKey:@"deltaUpdates"];
         self.displayVersionString = [decoder decodeObjectOfClass:[NSString class] forKey:@"displayVersionString"];
         self.DSASignature = [decoder decodeObjectOfClass:[NSString class] forKey:@"DSASignature"];
         self.fileURL = [decoder decodeObjectOfClass:[NSURL class] forKey:@"fileURL"];
