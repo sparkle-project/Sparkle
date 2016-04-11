@@ -63,10 +63,11 @@
     });
 }
 
-- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply
+- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))__unused reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        reply([SUUpdatePermissionPromptResult updatePermissionPromptResultWithChoice:SUDoNotAutomaticallyCheck shouldSendProfile:NO]);
+        printf("Asked about making update permission decision.. Aborting because I do not want to make this decision.");
+        exit(EXIT_FAILURE);
     });
 }
 
