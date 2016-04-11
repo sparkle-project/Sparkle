@@ -723,7 +723,21 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     }
     
     const struct timeval timeInputs[] = {timeValue, timeValue};
-    if (utimes(path, timeInputs) != 0) {
+    
+    int fileDescriptor = open(path, O_RDONLY | O_SYMLINK);
+    if (fileDescriptor == -1) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open file descriptor to %@", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    // Using futimes() because utimes() follows symbolic links
+    BOOL updatedTime = (futimes(fileDescriptor, timeInputs) == 0);
+    
+    close(fileDescriptor);
+    
+    if (!updatedTime) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to update modification & access time for %@", targetURL.path.lastPathComponent] }];
         }
