@@ -86,10 +86,11 @@
     
     SUFileManager *fileManager = self.fileManager;
     
-    // Update the access and mod time of our entire application before moving it into a temporary directory
+    // Update the access time of our entire application before moving it into a temporary directory
     // The system periodically cleans up files by looking at the mod & access times, so we have to make sure they're up to date
-    // (they could be potentially be preserved when archiving an application...)
-    if (![fileManager updateModificationAndAccessTimeOfItemsRecursivelyAtURL:newURL error:error]) {
+    // They could be potentially be preserved when archiving an application, but also an update could just be sitting on the system for a long time
+    // before being installed
+    if (![fileManager updateAccessTimeOfItemsRecursivelyAtURL:newURL error:error]) {
         SULog(@"Failed to recursively update new application's modification time before moving into temporary directory");
         return NO;
     }

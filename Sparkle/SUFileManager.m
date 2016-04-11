@@ -13,6 +13,7 @@
 #include <sys/xattr.h>
 #include <sys/errno.h>
 #include <sys/time.h>
+#include <sys/stat.h>
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -712,7 +713,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     return success;
 }
 
-- (BOOL)_updateItemAtURL:(NSURL *)targetURL withModificationAndAccessTime:(struct timeval)timeValue error:(NSError * __autoreleasing *)error
+- (BOOL)_updateItemAtURL:(NSURL *)targetURL withAccessTime:(struct timeval)accessTime error:(NSError * __autoreleasing *)error
 {
     char path[PATH_MAX] = {0};
     if (![targetURL.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
@@ -722,8 +723,6 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         return NO;
     }
     
-    const struct timeval timeInputs[] = {timeValue, timeValue};
-    
     int fileDescriptor = open(path, O_RDONLY | O_SYMLINK);
     if (fileDescriptor == -1) {
         if (error != NULL) {
@@ -731,6 +730,21 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
+    
+    struct stat statInfo;
+    if (fstat(fileDescriptor, &statInfo) != 0) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to stat file descriptor to %@", targetURL.path.lastPathComponent] }];
+        }
+        close(fileDescriptor);
+        return NO;
+    }
+    
+    // Preserve the modification time
+    struct timeval modTime;
+    TIMESPEC_TO_TIMEVAL(&modTime, &statInfo.st_mtimespec);
+    
+    const struct timeval timeInputs[] = {accessTime, modTime};
     
     // Using futimes() because utimes() follows symbolic links
     BOOL updatedTime = (futimes(fileDescriptor, timeInputs) == 0);
@@ -747,7 +761,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     return YES;
 }
 
-- (BOOL)updateModificationAndAccessTimeOfItemsRecursivelyAtURL:(NSURL *)targetURL error:(NSError * __autoreleasing *)error
+- (BOOL)updateAccessTimeOfItemsRecursivelyAtURL:(NSURL *)targetURL error:(NSError * __autoreleasing *)error
 {
     if (![self _itemExistsAtURL:targetURL]) {
         if (error != NULL) {
@@ -771,7 +785,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     NSDictionary *rootAttributes = [_fileManager attributesOfItemAtPath:rootURLPath error:nil];
     NSString *rootType = [rootAttributes objectForKey:NSFileType];
     
-    if (![self _updateItemAtURL:targetURL withModificationAndAccessTime:currentTime error:error]) {
+    if (![self _updateItemAtURL:targetURL withAccessTime:currentTime error:error]) {
         return NO;
     }
     
@@ -781,7 +795,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         NSDirectoryEnumerator *directoryEnumerator = [_fileManager enumeratorAtURL:targetURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
         
         for (NSURL *file in directoryEnumerator) {
-            if (![self _updateItemAtURL:file withModificationAndAccessTime:currentTime error:error]) {
+            if (![self _updateItemAtURL:file withAccessTime:currentTime error:error]) {
                 return NO;
             }
         }
