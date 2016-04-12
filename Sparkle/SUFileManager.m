@@ -548,7 +548,19 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         return NO;
     }
 
-    if (chown(path, ownerID.unsignedIntValue, groupID.unsignedIntValue) != 0) {
+    int fileDescriptor = open(path, O_RDONLY | O_SYMLINK);
+    if (fileDescriptor == -1) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open file descriptor to %@", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    // We use fchown instead of chown because the latter can follow symbolic links
+    BOOL success = fchown(fileDescriptor, ownerID.unsignedIntValue, groupID.unsignedIntValue) == 0;
+    close(fileDescriptor);
+    
+    if (!success) {
         if (errno == EPERM) {
             if (needsAuth != NULL) {
                 *needsAuth = YES;
@@ -701,7 +713,20 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         return NO;
     }
 
-    if (utimes(path, NULL) == 0) {
+    int fileDescriptor = open(path, O_RDONLY | O_SYMLINK);
+    if (fileDescriptor == -1) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open file descriptor to %@", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    // Using futimes() because utimes() follows symbolic links
+    BOOL updatedTime = (futimes(fileDescriptor, NULL) == 0);
+    
+    close(fileDescriptor);
+    
+    if (updatedTime) {
         return YES;
     }
 
@@ -716,7 +741,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         return NO;
     }
 
-    BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, "/usr/bin/touch", kAuthorizationFlagDefaults, (char *[]){ "--", path, NULL });
+    BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, "/usr/bin/touch", kAuthorizationFlagDefaults, (char *[]){ "-h", "--", path, NULL });
     if (!success && error != NULL) {
         NSString *errorMessage = [NSString stringWithFormat:@"Failed to update modification & access time on %@ with authentication.", targetURL.path.lastPathComponent];
         *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
