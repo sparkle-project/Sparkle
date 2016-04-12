@@ -375,8 +375,12 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                     SULog(@"Installer failed to set up remote port to updater before resuming installation");
                 }
                 
-                // Resume the installation if we aren't done with stage 2 yet, and remind the client we are prepared to relaunch
-                [self resumeInstallation];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (self.performedStage1Installation) {
+                        // Resume the installation if we aren't done with stage 2 yet, and remind the client we are prepared to relaunch
+                        [self resumeInstallation];
+                    }
+                });
             }];
         });
     }
@@ -437,8 +441,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (void)performStage2InstallationIfNeeded
 {
-#warning this test should be async?
-    if (!self.performedStage1Installation || self.performedStage2Installation) {
+    if (self.performedStage2Installation) {
         return;
     }
     
