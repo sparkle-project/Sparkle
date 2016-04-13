@@ -38,25 +38,24 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 @interface SUUpdater ()
 
-@property (strong) NSBundle *sparkleBundle;
 @property (readonly, copy) NSURL *parameterizedFeedURL;
 
-@property (strong) id <SUUpdateDriver> driver;
-@property (strong) SUHost *host;
+@property (nonatomic) id <SUUpdateDriver> driver;
+@property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly) SUUpdaterSettings *updaterSettings;
 
 @end
 
 @implementation SUUpdater
 
-@synthesize delegate;
+@synthesize delegate = _delegate;
 @synthesize userDriver = _userDriver;
 @synthesize userAgentString = customUserAgentString;
 @synthesize httpHeaders;
 @synthesize driver;
-@synthesize host;
+@synthesize host = _host;
 @synthesize updaterSettings = _updaterSettings;
-@synthesize sparkleBundle;
+@synthesize sparkleBundle = _sparkleBundle;
 
 - (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)theDelegate
 {
@@ -64,19 +63,19 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     if (self != nil) {
         // Use explicit class to use the correct bundle even when subclassed
-        self.sparkleBundle = [NSBundle bundleForClass:[SUUpdater class]];
-        if (!self.sparkleBundle) {
+        _sparkleBundle = [NSBundle bundleForClass:[SUUpdater class]];
+        if (!_sparkleBundle) {
             SULog(@"Error: SUUpdater can't find Sparkle.framework it belongs to");
             return nil;
         }
         
-        host = [[SUHost alloc] initWithBundle:bundle];
+        _host = [[SUHost alloc] initWithBundle:bundle];
         
         _updaterSettings = [[SUUpdaterSettings alloc] initWithHostBundle:bundle];
         
         _userDriver = userDriver;
         
-        delegate = theDelegate;
+        _delegate = theDelegate;
         
         // This runs the permission prompt if needed, but never before the app has finished launching because the runloop may not have ran before that
         // We will also take precaussions if a developer instantiates an updater themselves where the application may not be completely finished launching yet
