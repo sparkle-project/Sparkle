@@ -1011,7 +1011,6 @@
 				726F2CE31BC9C33D001971A4 /* SUOperatingSystem.h */,
 				726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */,
 			);
-			includeInIndex = 1;
 			name = "Other Sources";
 			sourceTree = "<group>";
 		};
