@@ -158,7 +158,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         return NO;
     } else if (isAppBundle && !(hasPublicDSAKey || hostIsCodeSigned)) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: @"For security reasons, you need to code sign your application or sign your updates with a DSA key. See Sparkle's documentation for more information." }];
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: @"For security reasons, you need to code sign your application and/or sign your updates with a DSA key. See Sparkle's documentation for more information." }];
         }
         return NO;
     } else if (isAppBundle && !hasPublicDSAKey && !servingOverHttps) {
