@@ -897,6 +897,7 @@
 		72E45CFD1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test_app_only_dsa_priv_dont_ever_do_this_for_real.pem; sourceTree = "<group>"; };
 		72E45DDC1B65C3BD005C701A /* sign_update */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = sign_update; path = bin/sign_update; sourceTree = SOURCE_ROOT; };
 		72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ShowInstallerProgress.m; path = Sparkle/InstallerProgress/ShowInstallerProgress.m; sourceTree = SOURCE_ROOT; };
+		72F94EB01CC2A865002DEE68 /* ConfigCommonReleaseHTTP.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigCommonReleaseHTTP.xcconfig; sourceTree = "<group>"; };
 		767B61AA1972D488004E0C3C /* SUGuidedPackageInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUGuidedPackageInstaller.h; sourceTree = "<group>"; };
 		767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUGuidedPackageInstaller.m; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Sparkle-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Sparkle-Info.plist"; sourceTree = "<group>"; };
@@ -1607,6 +1608,7 @@
 				149B78631B7D3A0C00D7D62C /* ConfigCommonCoverage.xcconfig */,
 				FA1941CF0D94A70100DD942E /* ConfigCommonDebug.xcconfig */,
 				FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */,
+				72F94EB01CC2A865002DEE68 /* ConfigCommonReleaseHTTP.xcconfig */,
 				FA1941D10D94A70100DD942E /* ConfigFramework.xcconfig */,
 				FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */,
 				FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */,
@@ -2319,7 +2321,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# http://stackoverflow.com/questions/32390228/is-it-possible-to-disable-ats-in-ios-9-just-for-debug-environment\n#Disables ATS in debug builds.\nINFOPLIST=\"${TARGET_BUILD_DIR}\"/\"${INFOPLIST_PATH}\"\ncase \"${CONFIGURATION}\" in\n\"Release\"|\"Adhoc\")\n/usr/libexec/PlistBuddy -c \"Set :NSAppTransportSecurity:NSAllowsArbitraryLoads NO\" \"${INFOPLIST}\"\n;;\n\"Debug\")\n/usr/libexec/PlistBuddy -c \"Set :NSAppTransportSecurity:NSAllowsArbitraryLoads YES\" \"${INFOPLIST}\"\n;;\nesac";
+			shellScript = "# http://stackoverflow.com/questions/32390228/is-it-possible-to-disable-ats-in-ios-9-just-for-debug-environment\n\nINFOPLIST=\"${TARGET_BUILD_DIR}\"/\"${INFOPLIST_PATH}\"\ncase \"${SPARKLE_ALLOW_ARBITRARY_HTTP_LOADS}\" in\n\"YES\"|\"1\")\n/usr/libexec/PlistBuddy -c \"Set :NSAppTransportSecurity:NSAllowsArbitraryLoads YES\" \"${INFOPLIST}\"\n;;\n\"NO\"|\"0\")\n/usr/libexec/PlistBuddy -c \"Set :NSAppTransportSecurity:NSAllowsArbitraryLoads NO\" \"${INFOPLIST}\"\n;;\nesac";
 		};
 		728639061CAF651300783084 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2332,7 +2334,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# http://stackoverflow.com/questions/32390228/is-it-possible-to-disable-ats-in-ios-9-just-for-debug-environment\n#Disables ATS in debug builds.\nINFOPLIST=\"${TARGET_BUILD_DIR}\"/\"${INFOPLIST_PATH}\"\ncase \"${CONFIGURATION}\" in\n\"Release\"|\"Adhoc\")\n/usr/libexec/PlistBuddy -c \"Set :NSAppTransportSecurity:NSAllowsArbitraryLoads NO\" \"${INFOPLIST}\"\n;;\n\"Debug\")\n/usr/libexec/PlistBuddy -c \"Set :NSAppTransportSecurity:NSAllowsArbitraryLoads YES\" \"${INFOPLIST}\"\n;;\nesac";
+			shellScript = "# http://stackoverflow.com/questions/32390228/is-it-possible-to-disable-ats-in-ios-9-just-for-debug-environment\n\nINFOPLIST=\"${TARGET_BUILD_DIR}\"/\"${INFOPLIST_PATH}\"\ncase \"${SPARKLE_ALLOW_ARBITRARY_HTTP_LOADS}\" in\n\"YES\"|\"1\")\n/usr/libexec/PlistBuddy -c \"Set :NSAppTransportSecurity:NSAllowsArbitraryLoads YES\" \"${INFOPLIST}\"\n;;\n\"NO\"|\"0\")\n/usr/libexec/PlistBuddy -c \"Set :NSAppTransportSecurity:NSAllowsArbitraryLoads NO\" \"${INFOPLIST}\"\n;;\nesac";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -3200,6 +3202,128 @@
 			};
 			name = Release;
 		};
+		72F94E9F1CC2A23A002DEE68 /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 72F94EB01CC2A865002DEE68 /* ConfigCommonReleaseHTTP.xcconfig */;
+			buildSettings = {
+			};
+			name = "Release-HTTP";
+		};
+		72F94EA01CC2A23A002DEE68 /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA1941D10D94A70100DD942E /* ConfigFramework.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+			};
+			name = "Release-HTTP";
+		};
+		72F94EA11CC2A23A002DEE68 /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = InstallerLauncher/Info.plist;
+			};
+			name = "Release-HTTP";
+		};
+		72F94EA21CC2A23A002DEE68 /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 728638EE1CAF589C00783084 /* ConfigUpdateDownloader.xcconfig */;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+			};
+			name = "Release-HTTP";
+		};
+		72F94EA31CC2A23A002DEE68 /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 728639041CAF614000783084 /* ConfigAppcastDownloader.xcconfig */;
+			buildSettings = {
+			};
+			name = "Release-HTTP";
+		};
+		72F94EA41CC2A23A002DEE68 /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 72E41A551CB22F44003D47E0 /* ConfigRemoteMessagePort.xcconfig */;
+			buildSettings = {
+			};
+			name = "Release-HTTP";
+		};
+		72F94EA51CC2A23A002DEE68 /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA1941CD0D94A70100DD942E /* ConfigTestApp.xcconfig */;
+			buildSettings = {
+			};
+			name = "Release-HTTP";
+		};
+		72F94EA61CC2A23A002DEE68 /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 726E4A281C86CAB500C57C6A /* ConfigTestAppHelper.xcconfig */;
+			buildSettings = {
+			};
+			name = "Release-HTTP";
+		};
+		72F94EA71CC2A23A002DEE68 /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3AAF3B1050B273004B3130 /* ConfigUnitTest.xcconfig */;
+			buildSettings = {
+			};
+			name = "Release-HTTP";
+		};
+		72F94EA81CC2A23A002DEE68 /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5D06E8F10FD68D21005AE3F6 /* ConfigBinaryDelta.xcconfig */;
+			buildSettings = {
+			};
+			name = "Release-HTTP";
+		};
+		72F94EA91CC2A23A002DEE68 /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 72D954B01CBB41E2006F28BD /* ConfigSparkleTool.xcconfig */;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+			};
+			name = "Release-HTTP";
+		};
+		72F94EAA1CC2A23A002DEE68 /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */;
+			buildSettings = {
+			};
+			name = "Release-HTTP";
+		};
+		72F94EAB1CC2A23A002DEE68 /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 721C24571CB754E8005440CB /* ConfigInstallerProgress.xcconfig */;
+			buildSettings = {
+			};
+			name = "Release-HTTP";
+		};
+		72F94EAC1CC2A23A002DEE68 /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = "Release-HTTP";
+		};
+		72F94EAD1CC2A23A002DEE68 /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = "Release-HTTP";
+		};
+		72F94EAE1CC2A23A002DEE68 /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = "Release-HTTP";
+		};
+		72F94EAF1CC2A23A002DEE68 /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 729F10FD1C65A9B500DFCCC5 /* ConfigUITest.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+			};
+			name = "Release-HTTP";
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -3209,6 +3333,7 @@
 				1420DF4B1962329200203BB0 /* Debug */,
 				149B78611B7D398100D7D62C /* Coverage */,
 				1420DF4C1962329200203BB0 /* Release */,
+				72F94EAD1CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3219,6 +3344,7 @@
 				14732BC71960F69300593899 /* Debug */,
 				149B78601B7D398100D7D62C /* Coverage */,
 				14732BC81960F69300593899 /* Release */,
+				72F94EAC1CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3229,6 +3355,7 @@
 				14950061195FB89500BC5B5B /* Debug */,
 				149B78621B7D398100D7D62C /* Coverage */,
 				14950062195FB89500BC5B5B /* Release */,
+				72F94EAE1CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3239,6 +3366,7 @@
 				1DEB91AE08733DA50010E9CD /* Debug */,
 				149B785B1B7D398100D7D62C /* Coverage */,
 				1DEB91AF08733DA50010E9CD /* Release */,
+				72F94EA01CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3249,6 +3377,7 @@
 				1DEB91B208733DA50010E9CD /* Debug */,
 				149B785A1B7D398100D7D62C /* Coverage */,
 				1DEB91B308733DA50010E9CD /* Release */,
+				72F94E9F1CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3259,6 +3388,7 @@
 				55C14BBB136EEF1500649790 /* Debug */,
 				149B785F1B7D398100D7D62C /* Coverage */,
 				55C14BBC136EEF1500649790 /* Release */,
+				72F94EAA1CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3269,6 +3399,7 @@
 				5D06E8D20FD68C7D005AE3F6 /* Debug */,
 				149B785E1B7D398100D7D62C /* Coverage */,
 				5D06E8D30FD68C7D005AE3F6 /* Release */,
+				72F94EA81CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3279,6 +3410,7 @@
 				612279DB0DB5470300AB99EA /* Debug */,
 				149B785D1B7D398100D7D62C /* Coverage */,
 				612279DC0DB5470300AB99EA /* Release */,
+				72F94EA71CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3289,6 +3421,7 @@
 				61B5F90609C4CEE300B25A18 /* Debug */,
 				149B785C1B7D398100D7D62C /* Coverage */,
 				61B5F90709C4CEE300B25A18 /* Release */,
+				72F94EA51CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3299,6 +3432,7 @@
 				721C24531CB753E7005440CB /* Debug */,
 				721C24541CB753E7005440CB /* Coverage */,
 				721C24551CB753E7005440CB /* Release */,
+				72F94EAB1CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3309,6 +3443,7 @@
 				726B2B641C645FC900388755 /* Debug */,
 				726B2B651C645FC900388755 /* Coverage */,
 				726B2B661C645FC900388755 /* Release */,
+				72F94EAF1CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3319,6 +3454,7 @@
 				726E07BA1CAF08D6001A286B /* Debug */,
 				726E07BB1CAF08D6001A286B /* Coverage */,
 				726E07BC1CAF08D6001A286B /* Release */,
+				72F94EA11CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3329,6 +3465,7 @@
 				726E07FC1CAF37BD001A286B /* Debug */,
 				726E07FD1CAF37BD001A286B /* Coverage */,
 				726E07FE1CAF37BD001A286B /* Release */,
+				72F94EA21CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3339,6 +3476,7 @@
 				726E4A231C86C88F00C57C6A /* Debug */,
 				726E4A241C86C88F00C57C6A /* Coverage */,
 				726E4A251C86C88F00C57C6A /* Release */,
+				72F94EA61CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3349,6 +3487,7 @@
 				728639001CAF5A5F00783084 /* Debug */,
 				728639011CAF5A5F00783084 /* Coverage */,
 				728639021CAF5A5F00783084 /* Release */,
+				72F94EA31CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3359,6 +3498,7 @@
 				72D954AC1CBB415C006F28BD /* Debug */,
 				72D954AD1CBB415C006F28BD /* Coverage */,
 				72D954AE1CBB415C006F28BD /* Release */,
+				72F94EA91CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3369,6 +3509,7 @@
 				72E41A4B1CB20BA7003D47E0 /* Debug */,
 				72E41A4C1CB20BA7003D47E0 /* Coverage */,
 				72E41A4D1CB20BA7003D47E0 /* Release */,
+				72F94EA41CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
