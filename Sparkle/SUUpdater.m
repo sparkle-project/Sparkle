@@ -62,6 +62,15 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize startedUpdater = _startedUpdater;
 @synthesize preStartedScheduledUpdateBlock = _preStartedScheduledUpdateBlock;
 
+#ifdef DEBUG
++ (void)load
+{
+    // We're using NSLog instead of SULog here because we don't want to start Sparkle's logger here,
+    // nor want to write this message to disk
+    NSLog(@"WARNING: This is running a Debug build of Sparkle; don't use this in production!");
+}
+#endif
+
 - (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)theDelegate
 {
     self = [super init];
@@ -77,10 +86,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         _userDriver = userDriver;
         
         _delegate = theDelegate;
-        
-#ifdef DEBUG
-        SULog(@"WARNING: This is running a Debug build of Sparkle; don't use this in production!");
-#endif
     }
     
     return self;
