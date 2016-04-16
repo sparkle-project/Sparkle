@@ -25,7 +25,7 @@
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
-		<true/>
+		<false/>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2016 Sparkle Project. All rights reserved.</string>
