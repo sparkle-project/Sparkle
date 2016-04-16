@@ -147,24 +147,14 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
     
     BOOL hasPublicDSAKey = [self.host publicDSAKey] != nil;
-    BOOL isAppBundle = [self.hostBundle.bundlePath.pathExtension.lowercaseString isEqualToString:@"app"];
-    BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtPathIsCodeSigned:self.host.bundle.bundlePath];
-    
-    BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
-    if (!isAppBundle && !hasPublicDSAKey) {
+    if (!hasPublicDSAKey) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: @"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information." }];
         }
         return NO;
-    } else if (isAppBundle && !(hasPublicDSAKey || hostIsCodeSigned)) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: @"For security reasons, you need to code sign your application and/or sign your updates with a DSA key. See Sparkle's documentation for more information." }];
-        }
-        return NO;
-    } else if (isAppBundle && !hasPublicDSAKey && !servingOverHttps) {
-        SULog(@"WARNING: Serving updates over HTTP without signing them with a DSA key is deprecated and may not be possible in a future release. Please serve your updates over https, or sign them with a DSA key, or do both. See Sparkle's documentation for more information.");
     }
     
+    BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
     BOOL allowsArbitraryHTTPLoads = SPARKLE_ALLOW_ARBITRARY_HTTP_LOADS;
     if (!allowsArbitraryHTTPLoads && !servingOverHttps) {
         if (error != NULL) {

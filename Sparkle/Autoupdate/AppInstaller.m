@@ -160,13 +160,11 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 }
 
 /**
- * If the update is a package, then it must be signed using DSA. No other verification is done.
+ * If the update is a package, then the download must be signed using DSA. No other verification is done.
  *
- * If the update is a bundle, then it must meet any one of:
- *
- *  * old and new DSA public keys are the same and valid (it allows change of Code Signing identity), or
- *
- *  * old and new Code Signing identity are the same and valid
+ * If the update is a bundle, then the download must also be signed using DSA.
+ * However, a change of DSA public keys is allowed if the Apple Code Signing identities match and are valid.
+ * Likewise, a change of Apple Code Signing identities is allowed if the DSA public keys match and the update is valid.
  *
  */
 #warning - This might be better part of SUInstaller protocol since validation between app & packages differ
@@ -205,14 +203,17 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     SUHost *newHost = [[SUHost alloc] initWithBundle:newBundle];
     NSString *newPublicDSAKey = newHost.publicDSAKey;
     
-    BOOL dsaKeysMatch = (publicDSAKey == nil || newPublicDSAKey == nil) ? NO : [publicDSAKey isEqualToString:newPublicDSAKey];
+    if (newPublicDSAKey == nil) {
+        SULog(@"No public DSA key is found in the update. For security reasons, the update will be rejected.");
+        return NO;
+    }
     
-    if (newPublicDSAKey != nil) {
-        if (![SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:newPublicDSAKey]) {
-            SULog(@"DSA signature validation failed. The update has a public DSA key and is signed with a DSA key, but the %@ doesn't match the signature. The update will be rejected.",
-                  dsaKeysMatch ? @"public key" : @"new public key shipped with the update");
-            return NO;
-        }
+    BOOL dsaKeysMatch = (publicDSAKey == nil) ? NO : [publicDSAKey isEqualToString:newPublicDSAKey];
+    
+    if (![SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:newPublicDSAKey]) {
+        SULog(@"DSA signature validation failed. The update has a public DSA key and is signed with a DSA key, but the %@ doesn't match the signature. The update will be rejected.",
+              dsaKeysMatch ? @"public key" : @"new public key shipped with the update");
+        return NO;
     }
     
     BOOL updateIsCodeSigned = [SUCodeSigningVerifier bundleAtPathIsCodeSigned:installSourcePath];
