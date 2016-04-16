@@ -649,8 +649,6 @@
 		5D06E8E20FD68CC7005AE3F6 /* SUBinaryDeltaCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBinaryDeltaCommon.m; sourceTree = "<group>"; };
 		5D06E8E30FD68CC7005AE3F6 /* SUBinaryDeltaTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBinaryDeltaTool.m; sourceTree = "<group>"; usesTabs = 0; };
 		5D06E8F10FD68D21005AE3F6 /* ConfigBinaryDelta.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigBinaryDelta.xcconfig; sourceTree = "<group>"; };
-		5D06E8F20FD68D21005AE3F6 /* ConfigBinaryDeltaDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigBinaryDeltaDebug.xcconfig; sourceTree = "<group>"; };
-		5D06E8F30FD68D21005AE3F6 /* ConfigBinaryDeltaRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigBinaryDeltaRelease.xcconfig; sourceTree = "<group>"; };
 		5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbz2.dylib; path = usr/lib/libbz2.dylib; sourceTree = SDKROOT; };
 		5D06E9370FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBinaryDeltaUnarchiver.h; sourceTree = "<group>"; };
 		5D06E9380FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBinaryDeltaUnarchiver.m; sourceTree = "<group>"; };
@@ -809,9 +807,7 @@
 		726E4A1A1C86C88F00C57C6A /* TestAppHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestAppHelper.m; sourceTree = "<group>"; };
 		726E4A1C1C86C88F00C57C6A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		726E4A1E1C86C88F00C57C6A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		726E4A271C86CAB500C57C6A /* ConfigTestAppDebugHelper.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigTestAppDebugHelper.xcconfig; sourceTree = "<group>"; };
 		726E4A281C86CAB500C57C6A /* ConfigTestAppHelper.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigTestAppHelper.xcconfig; sourceTree = "<group>"; };
-		726E4A291C86CAB500C57C6A /* ConfigTestAppReleaseHelper.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigTestAppReleaseHelper.xcconfig; sourceTree = "<group>"; };
 		726E4A311C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SURemoteUpdateSettingsWindowController.h; sourceTree = "<group>"; };
 		726E4A321C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SURemoteUpdateSettingsWindowController.m; sourceTree = "<group>"; };
 		726E4A331C87E0C700C57C6A /* SURemoteUpdateSettingsWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SURemoteUpdateSettingsWindowController.xib; sourceTree = "<group>"; };
@@ -843,8 +839,6 @@
 		729746561C936D5E00FC134E /* SUMessageTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUMessageTypes.m; sourceTree = "<group>"; };
 		729F10FD1C65A9B500DFCCC5 /* ConfigUITest.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITest.xcconfig; sourceTree = "<group>"; };
 		729F10FE1C65A9B500DFCCC5 /* ConfigUITestCoverage.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestCoverage.xcconfig; sourceTree = "<group>"; };
-		729F10FF1C65A9B500DFCCC5 /* ConfigUITestDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestDebug.xcconfig; sourceTree = "<group>"; };
-		729F11001C65A9B500DFCCC5 /* ConfigUITestRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestRelease.xcconfig; sourceTree = "<group>"; };
 		72A450511C69A68900D67EEA /* SUUpdatePermissionPromptResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdatePermissionPromptResult.h; sourceTree = "<group>"; };
 		72A450521C69A68900D67EEA /* SUUpdatePermissionPromptResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdatePermissionPromptResult.m; sourceTree = "<group>"; };
 		72A4A23F1BB6567D00E7820D /* SUFileManagerTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUFileManagerTest.swift; sourceTree = "<group>"; };
@@ -913,19 +907,12 @@
 		F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUCodeSigningVerifierTest.m; sourceTree = "<group>"; };
 		F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = SparkleTestCodeSignApp.zip; sourceTree = "<group>"; };
 		FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkDebug.xcconfig; sourceTree = "<group>"; };
-		FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigTestAppDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigCommonRelease.xcconfig; sourceTree = "<group>"; };
 		FA1941CD0D94A70100DD942E /* ConfigTestApp.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigTestApp.xcconfig; sourceTree = "<group>"; };
 		FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigRelaunch.xcconfig; sourceTree = "<group>"; };
 		FA1941CF0D94A70100DD942E /* ConfigCommonDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigCommonDebug.xcconfig; sourceTree = "<group>"; };
 		FA1941D00D94A70100DD942E /* ConfigCommon.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigCommon.xcconfig; sourceTree = "<group>"; };
 		FA1941D10D94A70100DD942E /* ConfigFramework.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFramework.xcconfig; sourceTree = "<group>"; };
-		FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigTestAppRelease.xcconfig; sourceTree = "<group>"; };
-		FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigRelaunchDebug.xcconfig; sourceTree = "<group>"; };
-		FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigRelaunchRelease.xcconfig; sourceTree = "<group>"; };
-		FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkRelease.xcconfig; sourceTree = "<group>"; };
-		FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigUnitTestRelease.xcconfig; sourceTree = "<group>"; };
-		FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigUnitTestDebug.xcconfig; sourceTree = "<group>"; };
 		FA3AAF3B1050B273004B3130 /* ConfigUnitTest.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigUnitTest.xcconfig; sourceTree = "<group>"; };
 		FE5536F517A2C6A7007CB333 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		FE5536F617A2C6AB007CB333 /* sk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sk; path = sk.lproj/Sparkle.strings; sourceTree = "<group>"; };
@@ -1616,33 +1603,20 @@
 			children = (
 				14732BB1195FF6B700593899 /* .clang-format */,
 				5D06E8F10FD68D21005AE3F6 /* ConfigBinaryDelta.xcconfig */,
-				5D06E8F20FD68D21005AE3F6 /* ConfigBinaryDeltaDebug.xcconfig */,
-				5D06E8F30FD68D21005AE3F6 /* ConfigBinaryDeltaRelease.xcconfig */,
 				FA1941D00D94A70100DD942E /* ConfigCommon.xcconfig */,
 				149B78631B7D3A0C00D7D62C /* ConfigCommonCoverage.xcconfig */,
 				FA1941CF0D94A70100DD942E /* ConfigCommonDebug.xcconfig */,
 				FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */,
 				FA1941D10D94A70100DD942E /* ConfigFramework.xcconfig */,
 				FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */,
-				FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */,
 				FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */,
-				FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */,
-				FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */,
 				721C24571CB754E8005440CB /* ConfigInstallerProgress.xcconfig */,
 				FA1941CD0D94A70100DD942E /* ConfigTestApp.xcconfig */,
-				FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */,
-				FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */,
 				726E4A281C86CAB500C57C6A /* ConfigTestAppHelper.xcconfig */,
-				726E4A271C86CAB500C57C6A /* ConfigTestAppDebugHelper.xcconfig */,
-				726E4A291C86CAB500C57C6A /* ConfigTestAppReleaseHelper.xcconfig */,
 				FA3AAF3B1050B273004B3130 /* ConfigUnitTest.xcconfig */,
 				149B78641B7D3A4800D7D62C /* ConfigUnitTestCoverage.xcconfig */,
-				FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */,
-				FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */,
 				729F10FD1C65A9B500DFCCC5 /* ConfigUITest.xcconfig */,
 				729F10FE1C65A9B500DFCCC5 /* ConfigUITestCoverage.xcconfig */,
-				729F10FF1C65A9B500DFCCC5 /* ConfigUITestDebug.xcconfig */,
-				729F11001C65A9B500DFCCC5 /* ConfigUITestRelease.xcconfig */,
 				726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */,
 				728638EE1CAF589C00783084 /* ConfigUpdateDownloader.xcconfig */,
 				728639041CAF614000783084 /* ConfigAppcastDownloader.xcconfig */,
@@ -2911,7 +2885,7 @@
 		};
 		149B785C1B7D398100D7D62C /* Coverage */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */;
+			baseConfigurationReference = FA1941CD0D94A70100DD942E /* ConfigTestApp.xcconfig */;
 			buildSettings = {
 			};
 			name = Coverage;
@@ -2925,14 +2899,14 @@
 		};
 		149B785E1B7D398100D7D62C /* Coverage */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5D06E8F20FD68D21005AE3F6 /* ConfigBinaryDeltaDebug.xcconfig */;
+			baseConfigurationReference = 5D06E8F10FD68D21005AE3F6 /* ConfigBinaryDelta.xcconfig */;
 			buildSettings = {
 			};
 			name = Coverage;
 		};
 		149B785F1B7D398100D7D62C /* Coverage */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
+			baseConfigurationReference = FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */;
 			buildSettings = {
 			};
 			name = Coverage;
@@ -2965,7 +2939,7 @@
 		};
 		1DEB91AF08733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
+			baseConfigurationReference = FA1941D10D94A70100DD942E /* ConfigFramework.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 			};
@@ -2987,56 +2961,56 @@
 		};
 		55C14BBB136EEF1500649790 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
+			baseConfigurationReference = FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
 		};
 		55C14BBC136EEF1500649790 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
+			baseConfigurationReference = FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
 		};
 		5D06E8D20FD68C7D005AE3F6 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5D06E8F20FD68D21005AE3F6 /* ConfigBinaryDeltaDebug.xcconfig */;
+			baseConfigurationReference = 5D06E8F10FD68D21005AE3F6 /* ConfigBinaryDelta.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
 		};
 		5D06E8D30FD68C7D005AE3F6 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5D06E8F30FD68D21005AE3F6 /* ConfigBinaryDeltaRelease.xcconfig */;
+			baseConfigurationReference = 5D06E8F10FD68D21005AE3F6 /* ConfigBinaryDelta.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
 		};
 		612279DB0DB5470300AB99EA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */;
+			baseConfigurationReference = FA3AAF3B1050B273004B3130 /* ConfigUnitTest.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
 		};
 		612279DC0DB5470300AB99EA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */;
+			baseConfigurationReference = FA3AAF3B1050B273004B3130 /* ConfigUnitTest.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
 		};
 		61B5F90609C4CEE300B25A18 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */;
+			baseConfigurationReference = FA1941CD0D94A70100DD942E /* ConfigTestApp.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
 		};
 		61B5F90709C4CEE300B25A18 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941D20D94A70100DD942E /* ConfigTestAppRelease.xcconfig */;
+			baseConfigurationReference = FA1941CD0D94A70100DD942E /* ConfigTestApp.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
@@ -3064,7 +3038,7 @@
 		};
 		726B2B641C645FC900388755 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 729F10FF1C65A9B500DFCCC5 /* ConfigUITestDebug.xcconfig */;
+			baseConfigurationReference = 729F10FD1C65A9B500DFCCC5 /* ConfigUITest.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
@@ -3084,7 +3058,7 @@
 		};
 		726B2B661C645FC900388755 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 729F11001C65A9B500DFCCC5 /* ConfigUITestRelease.xcconfig */;
+			baseConfigurationReference = 729F10FD1C65A9B500DFCCC5 /* ConfigUITest.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
@@ -3141,21 +3115,21 @@
 		};
 		726E4A231C86C88F00C57C6A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 726E4A271C86CAB500C57C6A /* ConfigTestAppDebugHelper.xcconfig */;
+			baseConfigurationReference = 726E4A281C86CAB500C57C6A /* ConfigTestAppHelper.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
 		};
 		726E4A241C86C88F00C57C6A /* Coverage */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 726E4A271C86CAB500C57C6A /* ConfigTestAppDebugHelper.xcconfig */;
+			baseConfigurationReference = 726E4A281C86CAB500C57C6A /* ConfigTestAppHelper.xcconfig */;
 			buildSettings = {
 			};
 			name = Coverage;
 		};
 		726E4A251C86C88F00C57C6A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 726E4A291C86CAB500C57C6A /* ConfigTestAppReleaseHelper.xcconfig */;
+			baseConfigurationReference = 726E4A281C86CAB500C57C6A /* ConfigTestAppHelper.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
@@ -3387,6 +3361,7 @@
 				72D954AE1CBB415C006F28BD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		72E41A4A1CB20BA7003D47E0 /* Build configuration list for PBXNativeTarget "RemoteMessagePort" */ = {
 			isa = XCConfigurationList;
