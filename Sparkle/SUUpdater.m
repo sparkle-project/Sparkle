@@ -159,20 +159,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     } else if (isAppBundle && !hasPublicDSAKey && !servingOverHttps) {
         SULog(@"WARNING: Serving updates over HTTP without signing them with a DSA key is deprecated and may not be possible in a future release. Please serve your updates over https, or sign them with a DSA key, or do both. See Sparkle's documentation for more information.");
     }
-    
-#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101100
-    BOOL isMainBundle = [[NSBundle mainBundle] isEqual:[self hostBundle]];
-    BOOL atsExceptionsExist = nil != [self.host objectForInfoDictionaryKey:@"NSAppTransportSecurity"];
-    if (isMainBundle && !servingOverHttps && !atsExceptionsExist) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsecureFeedURLError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"You must change the feed URL (%@) to use HTTPS or disable App Transport Security.\n\nFor more information:\nhttp://sparkle-project.org/documentation/app-transport-security/", [feedURL absoluteString]] }];
-        }
-        return NO;
-    }
-    if (!isMainBundle && !servingOverHttps) {
-        SULog(@"WARNING: Serving updates over HTTP may be blocked in OS X 10.11. Please change the feed URL (%@) to use HTTPS. For more information:\nhttp://sparkle-project.org/documentation/app-transport-security/", feedURL);
-    }
-#endif
     return YES;
 }
 
