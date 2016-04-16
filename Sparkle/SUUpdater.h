@@ -28,7 +28,7 @@ SU_EXPORT @interface SUUpdater : NSObject
 /*!
  * Initializes a new SUUpdater instance
  *
- * Update checks will start a short delay after initialization. This is to prevent the updater starting work before an application may have finished launching.
+ * This does not start the updater. To start it, see -[SUUpdater startUpdater:]
  *
  * Note that this is a normal initializer and doesn't implement the singleton pattern (i.e, instances aren't cached, so no surprises)
  * Hence you shouldn't create multiple live instances that target the same bundle.
@@ -43,6 +43,19 @@ SU_EXPORT @interface SUUpdater : NSObject
  * This must be called on the main thread.
  */
 - (instancetype)initWithHostBundle:(NSBundle *)hostBundle userDriver:(id <SUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)delegate;
+
+/*!
+ * Starts the updater.
+ *
+ * This method checks if Sparkle is configured properly. A valid feed URL should be set before this method is invoked.
+ * Other properties of this SUUpdater instance can be set before this method is invoked as well, such as automatic update checks.
+ * If the configuration is valid, this method may bring up a permission prompt (if needed) for checking if the user wants automatic update checking.
+ * This method then starts the regular update cycle if automatic update checks are enabled.
+ *
+ * @param error The error that is populated if this method fails. Pass NULL if not interested in the error information.
+ * @return YES if the updater started otherwise NO with a populated error
+ */
+- (BOOL)startUpdater:(NSError * __autoreleasing *)error;
 
 @property (weak, readonly) id<SUUpdaterDelegate> delegate;
 @property (nonatomic, readonly) id<SUUserDriver> userDriver;

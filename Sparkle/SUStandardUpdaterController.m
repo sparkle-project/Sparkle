@@ -32,17 +32,6 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 @synthesize userDriverDelegate = _userDriverDelegate;
 @synthesize initializedUpdater = _initializedUpdater;
 
-- (instancetype)initWithUpdater:(SUUpdater *)updater userDriver:(id<SUUserDriver, SUStandardUserDriver>)userDriver
-{
-    self = [super init];
-    if (self != nil) {
-        self.updater = updater;
-        self.userDriver = userDriver;
-        self.initializedUpdater = YES;
-    }
-    return self;
-}
-
 - (void)awakeFromNib
 {
     // awakeFromNib might be called more than once; guard against that
@@ -55,6 +44,21 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         id <SUUserDriver, SUStandardUserDriver> userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:self.userDriverDelegate];
         self.updater = [[SUUpdater alloc] initWithHostBundle:hostBundle userDriver:userDriver delegate:self.updaterDelegate];
         self.userDriver = userDriver;
+        
+        // In the case this is being called right as an application is being launched,
+        // the application may not have finished launching - we shouldn't do anything before the main runloop is started
+        // Note we can't say, register for an application did finish launching notification
+        // because we can't assume when our framework or this class will be loaded/instantiated before that
+        [self performSelector:@selector(startUpdater) withObject:nil afterDelay:0];
+    }
+}
+
+- (void)startUpdater
+{
+    NSError *updaterError = nil;
+    if (![self.updater startUpdater:&updaterError]) {
+        SULog(@"Fatal updater error (%ld): %@", updaterError.code, updaterError.localizedDescription);
+        abort();
     }
 }
 

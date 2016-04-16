@@ -60,26 +60,28 @@
 @end
 
 @interface SUUpdaterTest : XCTestCase <SUUpdaterDelegate>
-@property (strong) NSOperationQueue *queue;
 @property (strong) SUUpdater *updater;
 @end
 
 @implementation SUUpdaterTest
 
-@synthesize queue;
 @synthesize updater;
 
 - (void)setUp
 {
     [super setUp];
-    self.queue = [[NSOperationQueue alloc] init];
     self.updater = [[SUUpdater alloc] initWithHostBundle:[NSBundle bundleForClass:[self class]] userDriver:[[SUUselessUserDriver alloc] init] delegate:self];
+    
+    NSError *error = nil;
+    if (![self.updater startUpdater:&error]) {
+        NSLog(@"Updater error: %@", error);
+        abort();
+    }
 }
 
 - (void)tearDown
 {
     self.updater = nil;
-    self.queue = nil;
     [super tearDown];
 }
 
@@ -91,35 +93,11 @@
 - (void)testFeedURL
 {
     [self.updater feedURL]; // this WON'T throw
-
-    [self.queue addOperationWithBlock:^{
-        XCTAssertTrue(![NSThread isMainThread]);
-        @try {
-            [self.updater feedURL];
-            XCTFail(@"feedURL did not throw an exception when called on a secondary thread");
-        }
-        @catch (NSException *exception) {
-            NSLog(@"%@", exception);
-        }
-    }];
-    [self.queue waitUntilAllOperationsAreFinished];
 }
 
 - (void)testSetTestFeedURL
 {
     [self.updater setFeedURL:[NSURL URLWithString:@""]]; // this WON'T throw
-
-    [self.queue addOperationWithBlock:^{
-        XCTAssertTrue(![NSThread isMainThread]);
-        @try {
-            [self.updater setFeedURL:[NSURL URLWithString:@""]];
-            XCTFail(@"setFeedURL: did not throw an exception when called on a secondary thread");
-        }
-        @catch (NSException *exception) {
-            NSLog(@"%@", exception);
-        }
-    }];
-    [self.queue waitUntilAllOperationsAreFinished];
 }
 
 @end

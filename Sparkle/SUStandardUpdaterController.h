@@ -33,13 +33,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SUStandardUpdaterController : NSObject
 
 /*!
- Initializes a new updater controller instance using a provided updater and user driver.
- 
- Typically this class is instantiated in a nib, thus this method is not usually used.
- */
-- (instancetype)initWithUpdater:(SUUpdater *)updater userDriver:(id<SUUserDriver, SUStandardUserDriver>)userDriver;
-
-/*!
  Interface builder outlet for the updater's delegate.
  
  This property should only be set using Interface Builder by creating a connection using the outlet
@@ -56,14 +49,16 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  Accessible property for the updater. Some properties on the updater can be binded via KVO
  
- This is nil before being awoken from a nib
+ This is nil before being loaded from the nib.
+ You may access this property after your application has finished launching, or after your window controller has finished loading.
  */
 @property (nonatomic, readonly, nullable) SUUpdater *updater;
 
 /*!
  Accessible property for the updater's user driver.
  
- This is nil before being awoken from a nib
+ This is nil before being loaded from the nib.
+ You may access this property after your application has finished launching, or after your window controller has finished loading.
  */
 @property (nonatomic, readonly, nullable) id <SUStandardUserDriver> userDriver;
 

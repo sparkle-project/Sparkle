@@ -84,11 +84,29 @@
     return [[[NSFileManager defaultManager] displayNameAtPath:[self.bundle bundlePath]] stringByDeletingPathExtension];
 }
 
-- (NSString *__nonnull)version
+- (BOOL)validVersion
+{
+    return ([self _version] != nil);
+}
+
+- (BOOL)isValidVersion:(NSString *)version
+{
+    return (version != nil && version.length != 0);
+}
+
+- (NSString *)_version
 {
     NSString *version = [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
-    if (!version || [version isEqualToString:@""])
-        [NSException raise:@"SUNoVersionException" format:@"This host (%@) has no %@! This attribute is required.", [self bundlePath], (__bridge NSString *)kCFBundleVersionKey];
+    return ([self isValidVersion:version] ? version : nil);
+}
+
+- (NSString *__nonnull)version
+{
+    NSString *version = [self _version];
+    if (version == nil) {
+        SULog(@"This host (%@) has no %@! This attribute is required.", [self bundlePath], (__bridge NSString *)kCFBundleVersionKey);
+        abort();
+    }
     return version;
 }
 

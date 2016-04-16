@@ -18,6 +18,15 @@
 SU_EXPORT extern NSString *const SUSparkleErrorDomain;
 
 typedef NS_ENUM(OSStatus, SUError) {
+    // Configuration phase errors
+    SUNoPublicDSAFoundError = 0001,
+    SUInsufficientSigningError = 0002,
+    SUInsecureFeedURLError = 0003,
+    SUInvalidFeedURLError = 0004,
+    SUInvalidUpdaterError = 0005,
+    SUInvalidHostBundleIdentifierError = 0006,
+    SUInvalidHostVersionError = 0007,
+    
     // Appcast phase errors.
     SUAppcastParseError = 1000,
     SUNoUpdateError = 1001,

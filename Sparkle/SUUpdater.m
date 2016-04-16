@@ -24,6 +24,7 @@
 #import "SUProbeInstallStatus.h"
 #import "SUAppcastItem.h"
 #import "SUInstallationInfo.h"
+#import "SUErrors.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -43,6 +44,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (nonatomic) id <SUUpdateDriver> driver;
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly) SUUpdaterSettings *updaterSettings;
+@property (nonatomic) BOOL startedUpdater;
+@property (nonatomic, copy) void (^preStartedScheduledUpdateBlock)(void);
 
 @end
 
@@ -56,6 +59,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize host = _host;
 @synthesize updaterSettings = _updaterSettings;
 @synthesize sparkleBundle = _sparkleBundle;
+@synthesize startedUpdater = _startedUpdater;
+@synthesize preStartedScheduledUpdateBlock = _preStartedScheduledUpdateBlock;
 
 - (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)theDelegate
 {
@@ -64,10 +69,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     if (self != nil) {
         // Use explicit class to use the correct bundle even when subclassed
         _sparkleBundle = [NSBundle bundleForClass:[SUUpdater class]];
-        if (!_sparkleBundle) {
-            SULog(@"Error: SUUpdater can't find Sparkle.framework it belongs to");
-            return nil;
-        }
         
         _host = [[SUHost alloc] initWithBundle:bundle];
         
@@ -77,9 +78,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         
         _delegate = theDelegate;
         
-        // This runs the permission prompt if needed, but never before the app has finished launching because the runloop may not have ran before that
-        // We will also take precaussions if a developer instantiates an updater themselves where the application may not be completely finished launching yet
-        [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:1];
 #ifdef DEBUG
         SULog(@"WARNING: This is running a Debug build of Sparkle; don't use this in production!");
 #endif
@@ -91,40 +89,90 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 // To prevent subclasses from doing something bad based on older Sparkle code
 - (instancetype)initForBundle:(NSBundle *)__unused bundle
 {
-    [NSException raise:@"SUUpdaterInitForBundleNotImplemented" format:@"-[SUUpdater initForBundle:] is not implemented anymore."];
+    SULog(@"-[SUUpdater initForBundle:] is not implemented anymore.");
+    abort();
     return nil;
 }
 
 // To prevent trying to stick an SUUpdater in a nib or initializing it in an incorrect way
 - (instancetype)init
 {
-    [NSException raise:@"SUUpdaterInitNotImplemented" format:@"-[SUUpdater init] is not implemented. If you want to drop an updater into a nib, see SUStandardUpdaterController"];
+    SULog(@"-[SUUpdater init] is not implemented. If you want to drop an updater into a nib, see SUStandardUpdaterController.");
+    abort();
     return nil;
 }
 
--(void)checkIfConfiguredProperly {
+- (BOOL)startUpdater:(NSError * __autoreleasing *)error
+{
+    if (![self checkIfConfiguredProperly:error]) {
+        return NO;
+    }
+    
+    self.startedUpdater = YES;
+    [self startUpdateCycle];
+    return YES;
+}
+
+- (BOOL)checkIfConfiguredProperly:(NSError * __autoreleasing *)error
+{
+    if (self.sparkleBundle == nil) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: @"SUUpdater can't find Sparkle.framework it belongs to." }];
+        }
+        return NO;
+    }
+    
+    NSURL *feedURL = nil;
+    if (![self retrieveFeedURL:&feedURL error:error]) {
+        return NO;
+    }
+    
+    if ([[self hostBundle] bundleIdentifier] == nil) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidHostBundleIdentifierError userInfo:@{ NSLocalizedDescriptionKey: @"Sparkle cannot target a bundle that does not have a valid bundle identifier." }];
+        }
+        return NO;
+    }
+    
+    if (!self.host.validVersion) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidHostVersionError userInfo:@{ NSLocalizedDescriptionKey: @"Sparkle cannot target a bundle that does not have a valid version." }];
+        }
+        return NO;
+    }
+    
     BOOL hasPublicDSAKey = [self.host publicDSAKey] != nil;
     BOOL isMainBundle = [self.host.bundle isEqualTo:[NSBundle mainBundle]];
     BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtPathIsCodeSigned:self.host.bundle.bundlePath];
-    NSURL *feedURL = [self feedURL];
+    
     BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
     if (!isMainBundle && !hasPublicDSAKey) {
-        [NSException raise:@"SUNoPublicDSAFound" format:@"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information."];
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: @"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information." }];
+        }
+        return NO;
     } else if (isMainBundle && !(hasPublicDSAKey || hostIsCodeSigned)) {
-        [NSException raise:@"SUInsufficientSigning" format:@"For security reasons, you need to code sign your application or sign your updates with a DSA key. See Sparkle's documentation for more information."];
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsufficientSigningError userInfo:@{ NSLocalizedDescriptionKey: @"For security reasons, you need to code sign your application or sign your updates with a DSA key. See Sparkle's documentation for more information." }];
+        }
+        return NO;
     } else if (isMainBundle && !hasPublicDSAKey && !servingOverHttps) {
         SULog(@"WARNING: Serving updates over HTTP without signing them with a DSA key is deprecated and may not be possible in a future release. Please serve your updates over https, or sign them with a DSA key, or do both. See Sparkle's documentation for more information.");
     }
-
+    
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101100
     BOOL atsExceptionsExist = nil != [self.host objectForInfoDictionaryKey:@"NSAppTransportSecurity"];
     if (isMainBundle && !servingOverHttps && !atsExceptionsExist) {
-        [NSException raise:@"SUInsecureFeedURL" format:@"You must change the feed URL (%@) to use HTTPS or disable App Transport Security.\n\nFor more information:\nhttp://sparkle-project.org/documentation/app-transport-security/", [feedURL absoluteString]];
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsecureFeedURLError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"You must change the feed URL (%@) to use HTTPS or disable App Transport Security.\n\nFor more information:\nhttp://sparkle-project.org/documentation/app-transport-security/", [feedURL absoluteString]] }];
+        }
+        return NO;
     }
     if (!isMainBundle && !servingOverHttps) {
         SULog(@"WARNING: Serving updates over HTTP may be blocked in OS X 10.11. Please change the feed URL (%@) to use HTTPS. For more information:\nhttp://sparkle-project.org/documentation/app-transport-security/", feedURL);
     }
 #endif
+    return YES;
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
@@ -166,14 +214,30 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         __weak SUUpdater *weakSelf = self;
         [self.userDriver requestUpdatePermissionWithSystemProfile:profileInfo reply:^(SUUpdatePermissionPromptResult *result) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [weakSelf updatePermissionPromptFinishedWithResult:result];
+                SUUpdater *strongSelf = weakSelf;
+                if (strongSelf != nil) {
+                    [strongSelf updatePermissionPromptFinishedWithResult:result];
+                    
+                    if (strongSelf.preStartedScheduledUpdateBlock != nil) {
+                        strongSelf.preStartedScheduledUpdateBlock();
+                        strongSelf.preStartedScheduledUpdateBlock = nil;
+                    } else {
+                        // Schedule checks, but make sure we ignore the delayed call from KVO
+                        [strongSelf resetUpdateCycle];
+                    }
+                }
             });
         }];
         
         // We start the update checks and register as observer for changes after the prompt finishes
     } else {
-        // We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
-        [self scheduleNextUpdateCheck];
+        if (self.preStartedScheduledUpdateBlock != nil) {
+            self.preStartedScheduledUpdateBlock();
+            self.preStartedScheduledUpdateBlock = nil;
+        } else {
+            // We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
+            [self scheduleNextUpdateCheck];
+        }
     }
 }
 
@@ -181,8 +245,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 {
     [self.host setBool:result.shouldSendProfile forUserDefaultsKey:SUSendProfileInfoKey];
     [self setAutomaticallyChecksForUpdates:(result.choice == SUAutomaticallyCheck)];
-    // Schedule checks, but make sure we ignore the delayed call from KVO
-    [self resetUpdateCycle];
 }
 
 - (NSDate *)lastUpdateCheckDate
@@ -301,6 +363,14 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 
 - (void)checkForUpdatesInBackground
 {
+    if (!self.startedUpdater) {
+        __weak SUUpdater *weakSelf = self;
+        self.preStartedScheduledUpdateBlock = ^{
+            [weakSelf checkForUpdatesInBackground];
+        };
+        return;
+    }
+    
     // Background update checks should only happen if we have a network connection.
     //	Wouldn't want to annoy users on dial-up by establishing a connection every
     //	hour or so:
@@ -349,6 +419,14 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 
 - (void)checkForUpdates
 {
+    __weak SUUpdater *weakSelf = self;
+    if (!self.startedUpdater) {
+        self.preStartedScheduledUpdateBlock = ^{
+            [weakSelf checkForUpdates];
+        };
+        return;
+    }
+    
 #warning not sure if this is the right thing to do
     if (self.driver != nil) {
         //[self.driver abortUpdate];
@@ -357,7 +435,6 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
     
     id <SUUpdateDriver> theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithHost:self.host allowsAutomaticUpdates:[self allowsAutomaticUpdates] sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
     
-    __weak SUUpdater *weakSelf = self;
     [SUProbeInstallStatus probeInstallerInProgressForHost:self.host completion:^(BOOL installerInProgress) {
         dispatch_async(dispatch_get_main_queue(), ^{
             SUUpdater *strongSelf = weakSelf;
@@ -371,6 +448,13 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 - (void)checkForUpdateInformation
 {
     __weak SUUpdater *weakSelf = self;
+    if (!self.startedUpdater) {
+        self.preStartedScheduledUpdateBlock = ^{
+            [weakSelf checkForUpdateInformation];
+        };
+        return;
+    }
+    
     [SUProbeInstallStatus probeInstallerInProgressForHost:self.host completion:^(BOOL installerInProgress) {
         dispatch_async(dispatch_get_main_queue(), ^{
             SUUpdater *strongSelf = weakSelf;
@@ -405,7 +489,12 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
         return;
     }
 
-    [self checkIfConfiguredProperly];
+    // Because an application can change the configuration (eg: the feed url) at any point, we should always check if it's valid
+    NSError *configurationError = nil;
+    if (![self checkIfConfiguredProperly:&configurationError]) {
+        SULog(@"Fatal configuration error (%ld): %@", (long)configurationError.code, configurationError.localizedDescription);
+        abort();
+    }
 
     NSURL *theFeedURL = [self parameterizedFeedURL];
     // Use a NIL URL to cancel quietly.
@@ -439,6 +528,10 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 
 - (void)resetUpdateCycle
 {
+    if (!self.startedUpdater) {
+        return; // not even ready yet
+    }
+    
     [self cancelNextUpdateCycle];
     
     if (self.driver == nil) {
@@ -487,29 +580,54 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 
 - (void)setFeedURL:(NSURL *)feedURL
 {
-    if (![NSThread isMainThread])
-        [NSException raise:@"SUThreadException" format:@"This method must be called on the main thread"];
+    if (![NSThread isMainThread]) {
+        SULog(@"This method must be called on the main thread");
+        abort();
+    }
 
     [self.host setObject:[feedURL absoluteString] forUserDefaultsKey:SUFeedURLKey];
 }
 
-- (NSURL *)feedURL
+- (BOOL)retrieveFeedURL:(NSURL * __autoreleasing *)feedURL error:(NSError * __autoreleasing *)error
 {
-    if (![NSThread isMainThread])
-        [NSException raise:@"SUThreadException" format:@"This method must be called on the main thread"];
-
+    if (![NSThread isMainThread]) {
+        SULog(@"This method must be called on the main thread");
+        abort();
+    }
+    
     // A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
     NSString *appcastString = [self.host objectForKey:SUFeedURLKey];
     if ([self.delegate respondsToSelector:@selector(feedURLStringForUpdater:)])
         appcastString = [self.delegate feedURLStringForUpdater:self];
-    if (!appcastString) // Can't find an appcast string!
-        [NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the %@ key in either the Info.plist or the user defaults!", SUFeedURLKey];
+    
+    if (!appcastString) { // Can't find an appcast string!
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidFeedURLError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"You must specify the URL of the appcast as the %@ key in either the Info.plist or the user defaults!", SUFeedURLKey] }];
+        }
+        return NO;
+    }
+    
     NSCharacterSet *quoteSet = [NSCharacterSet characterSetWithCharactersInString:@"\"\'"]; // Some feed publishers add quotes; strip 'em.
     NSString *castUrlStr = [appcastString stringByTrimmingCharactersInSet:quoteSet];
-    if (!castUrlStr || [castUrlStr length] == 0)
-        return nil;
-    else
-        return [NSURL URLWithString:castUrlStr];
+    if (feedURL != NULL) {
+        if (!castUrlStr || [castUrlStr length] == 0) {
+            *feedURL =  nil;
+        } else {
+            *feedURL = [NSURL URLWithString:castUrlStr];
+        }
+    }
+    return YES;
+}
+
+- (NSURL *)feedURL
+{
+    NSURL *feedURL = nil;
+    NSError *feedError = nil;
+    if (![self retrieveFeedURL:&feedURL error:&feedError]) {
+        SULog(@"Fatal Error (%ld): %@", feedError.code, feedError.localizedDescription);
+        abort();
+    }
+    return feedURL;
 }
 
 - (NSString *)userAgentString

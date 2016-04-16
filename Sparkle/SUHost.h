@@ -15,6 +15,7 @@
 @property (readonly, copy) NSString *bundlePath;
 @property (readonly, copy) NSString *name;
 @property (readonly, copy) NSString *version;
+@property (readonly, nonatomic) BOOL validVersion;
 @property (readonly, copy) NSString *displayVersion;
 @property (getter=isRunningOnReadOnlyVolume, readonly) BOOL runningOnReadOnlyVolume;
 @property (readonly, copy) NSString *publicDSAKey;

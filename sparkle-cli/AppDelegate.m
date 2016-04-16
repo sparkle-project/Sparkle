@@ -12,14 +12,12 @@
 
 @interface AppDelegate ()
 
-@property (nonatomic, readonly) NSBundle *bundle;
-@property (nonatomic) SUUpdater *updater;
+@property (nonatomic, readonly) SUUpdater *updater;
 
 @end
 
 @implementation AppDelegate
 
-@synthesize bundle = _bundle;
 @synthesize updater = _updater;
 
 - (instancetype)initWithBundlePath:(const char *)bundlePath
@@ -36,15 +34,20 @@
             return nil;
         }
         
-        _bundle = bundle;
+        id <SUUserDriver> userDriver = [[SUCommandLineUserDriver alloc] initWithBundle:bundle];
+        _updater = [[SUUpdater alloc] initWithHostBundle:bundle userDriver:userDriver delegate:nil];
     }
     return self;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)__unused aNotification
 {
-    id <SUUserDriver> userDriver = [[SUCommandLineUserDriver alloc] initWithBundle:self.bundle];
-    self.updater = [[SUUpdater alloc] initWithHostBundle:self.bundle userDriver:userDriver delegate:nil];
+    NSError *updaterError = nil;
+    if (![self.updater startUpdater:&updaterError]) {
+        printf("Error: Failed to initialize updater with error (%ld): %s\n", updaterError.code, updaterError.localizedDescription.UTF8String);
+        exit(EXIT_FAILURE);
+    }
+    
     [self.updater checkForUpdates];
 }
 
