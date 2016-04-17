@@ -2,5 +2,5 @@
 
 INFOPLIST_FILE = AppcastDownloader/Info.plist
 WRAPPER_EXTENSION = xpc
-PRODUCT_BUNDLE_IDENTIFIER = org.sparkle-project.AppcastDownloader
-CODE_SIGN_ENTITLEMENTS = AppcastDownloader/AppcastDownloader.entitlements
+PRODUCT_BUNDLE_IDENTIFIER = ${APPCAST_DOWNLOADER_BUNDLE_ID}
+CODE_SIGN_ENTITLEMENTS = AppcastDownloader/SparkleAppcastDownloader.entitlements

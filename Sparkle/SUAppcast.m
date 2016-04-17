@@ -75,7 +75,7 @@
 
     [request setValue:@"application/rss+xml,*/*;q=0.1" forHTTPHeaderField:@"Accept"];
 
-    NSXPCConnection *connection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.AppcastDownloader"];
+    NSXPCConnection *connection = [[NSXPCConnection alloc] initWithServiceName:@APPCAST_DOWNLOADER_BUNDLE_ID];
     connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUAppcastDownloaderProtocol)];
     
     __block BOOL retrievedDownloadResult = NO;

@@ -52,7 +52,7 @@
         _request = [NSMutableURLRequest requestWithURL:updateItem.fileURL];
         [_request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
         
-        _connection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.UpdateDownloader"];
+        _connection = [[NSXPCConnection alloc] initWithServiceName:@UPDATE_DOWNLOADER_BUNDLE_ID];
         _connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUUpdateDownloaderProtocol)];
         _connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUDownloaderDelegate)];
         _connection.exportedObject = self;

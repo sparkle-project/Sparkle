@@ -426,7 +426,7 @@
         return;
     }
     
-    NSXPCConnection *launcherConnection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.InstallerLauncher"];
+    NSXPCConnection *launcherConnection = [[NSXPCConnection alloc] initWithServiceName:@INSTALLER_LAUNCHER_PRODUCT_ID];
     launcherConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerLauncherProtocol)];
     [launcherConnection resume];
     
