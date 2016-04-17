@@ -1,0 +1,4 @@
+// Test Application Debug
+#include "ConfigTestApp.xcconfig"
+
+CODE_SIGN_IDENTITY = -
