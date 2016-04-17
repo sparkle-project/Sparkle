@@ -43,6 +43,12 @@
         
         NSBundle *hostBundle = [NSBundle bundleWithURL:appURL];
         self.updater = [[SUUpdater alloc] initWithHostBundle:hostBundle userDriver:self.userDriver delegate:nil];
+        
+        NSError *updaterError = nil;
+        if (![self.updater startUpdater:&updaterError]) {
+            NSLog(@"Encountered error while starting updater in Test App Helper: %@", updaterError);
+            abort();
+        }
     }
 }
 
