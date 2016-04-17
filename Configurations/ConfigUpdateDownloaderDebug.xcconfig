@@ -1,0 +1,4 @@
+// UpdateDownloader Debug
+#include "ConfigUpdateDownloader.xcconfig"
+
+CODE_SIGN_IDENTITY = -

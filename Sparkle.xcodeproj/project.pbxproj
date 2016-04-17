@@ -899,6 +899,10 @@
 		72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ShowInstallerProgress.m; path = Sparkle/InstallerProgress/ShowInstallerProgress.m; sourceTree = SOURCE_ROOT; };
 		72F94EB01CC2A865002DEE68 /* ConfigCommonReleaseHTTP.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigCommonReleaseHTTP.xcconfig; sourceTree = "<group>"; };
 		72F94ED31CC33F1E002DEE68 /* set-ats-exceptions.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "set-ats-exceptions.sh"; sourceTree = "<group>"; };
+		72F94ED51CC3441A002DEE68 /* ConfigInstallerLauncherDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigInstallerLauncherDebug.xcconfig; sourceTree = "<group>"; };
+		72F94ED61CC344A7002DEE68 /* ConfigUpdateDownloaderDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUpdateDownloaderDebug.xcconfig; sourceTree = "<group>"; };
+		72F94ED71CC344E4002DEE68 /* ConfigAppcastDownloaderDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigAppcastDownloaderDebug.xcconfig; sourceTree = "<group>"; };
+		72F94ED81CC34529002DEE68 /* ConfigRemoteMessagePortDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigRemoteMessagePortDebug.xcconfig; sourceTree = "<group>"; };
 		767B61AA1972D488004E0C3C /* SUGuidedPackageInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUGuidedPackageInstaller.h; sourceTree = "<group>"; };
 		767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUGuidedPackageInstaller.m; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Sparkle-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Sparkle-Info.plist"; sourceTree = "<group>"; };
@@ -1621,9 +1625,13 @@
 				729F10FD1C65A9B500DFCCC5 /* ConfigUITest.xcconfig */,
 				729F10FE1C65A9B500DFCCC5 /* ConfigUITestCoverage.xcconfig */,
 				726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */,
+				72F94ED51CC3441A002DEE68 /* ConfigInstallerLauncherDebug.xcconfig */,
 				728638EE1CAF589C00783084 /* ConfigUpdateDownloader.xcconfig */,
+				72F94ED61CC344A7002DEE68 /* ConfigUpdateDownloaderDebug.xcconfig */,
 				728639041CAF614000783084 /* ConfigAppcastDownloader.xcconfig */,
+				72F94ED71CC344E4002DEE68 /* ConfigAppcastDownloaderDebug.xcconfig */,
 				72E41A551CB22F44003D47E0 /* ConfigRemoteMessagePort.xcconfig */,
+				72F94ED81CC34529002DEE68 /* ConfigRemoteMessagePortDebug.xcconfig */,
 				72D954B01CBB41E2006F28BD /* ConfigSparkleTool.xcconfig */,
 				14732BC91960F70A00593899 /* make-release-package.sh */,
 				14652F7919A93E5F00959E44 /* set-git-version-info.sh */,
@@ -3068,7 +3076,7 @@
 		};
 		726E07BA1CAF08D6001A286B /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */;
+			baseConfigurationReference = 72F94ED51CC3441A002DEE68 /* ConfigInstallerLauncherDebug.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = InstallerLauncher/Info.plist;
 			};
@@ -3076,7 +3084,7 @@
 		};
 		726E07BB1CAF08D6001A286B /* Coverage */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */;
+			baseConfigurationReference = 72F94ED51CC3441A002DEE68 /* ConfigInstallerLauncherDebug.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = InstallerLauncher/Info.plist;
 			};
@@ -3092,7 +3100,7 @@
 		};
 		726E07FC1CAF37BD001A286B /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 728638EE1CAF589C00783084 /* ConfigUpdateDownloader.xcconfig */;
+			baseConfigurationReference = 72F94ED61CC344A7002DEE68 /* ConfigUpdateDownloaderDebug.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 			};
@@ -3100,7 +3108,7 @@
 		};
 		726E07FD1CAF37BD001A286B /* Coverage */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 728638EE1CAF589C00783084 /* ConfigUpdateDownloader.xcconfig */;
+			baseConfigurationReference = 72F94ED61CC344A7002DEE68 /* ConfigUpdateDownloaderDebug.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 			};
@@ -3137,14 +3145,14 @@
 		};
 		728639001CAF5A5F00783084 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 728639041CAF614000783084 /* ConfigAppcastDownloader.xcconfig */;
+			baseConfigurationReference = 72F94ED71CC344E4002DEE68 /* ConfigAppcastDownloaderDebug.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
 		};
 		728639011CAF5A5F00783084 /* Coverage */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 728639041CAF614000783084 /* ConfigAppcastDownloader.xcconfig */;
+			baseConfigurationReference = 72F94ED71CC344E4002DEE68 /* ConfigAppcastDownloaderDebug.xcconfig */;
 			buildSettings = {
 			};
 			name = Coverage;
@@ -3182,14 +3190,14 @@
 		};
 		72E41A4B1CB20BA7003D47E0 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 72E41A551CB22F44003D47E0 /* ConfigRemoteMessagePort.xcconfig */;
+			baseConfigurationReference = 72F94ED81CC34529002DEE68 /* ConfigRemoteMessagePortDebug.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
 		};
 		72E41A4C1CB20BA7003D47E0 /* Coverage */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 72E41A551CB22F44003D47E0 /* ConfigRemoteMessagePort.xcconfig */;
+			baseConfigurationReference = 72F94ED81CC34529002DEE68 /* ConfigRemoteMessagePortDebug.xcconfig */;
 			buildSettings = {
 			};
 			name = Coverage;

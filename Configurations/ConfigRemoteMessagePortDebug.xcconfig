@@ -1,0 +1,5 @@
+// RemoteMessagePort Debug
+
+#include "ConfigRemoteMessagePort.xcconfig"
+
+CODE_SIGN_IDENTITY = -
