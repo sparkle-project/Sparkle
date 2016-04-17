@@ -2881,7 +2881,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
 			};
 			name = Coverage;
 		};
@@ -2935,7 +2934,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
 			};
 			name = Debug;
 		};
@@ -2943,7 +2941,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D10D94A70100DD942E /* ConfigFramework.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
 			};
 			name = Release;
 		};
@@ -3213,7 +3210,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D10D94A70100DD942E /* ConfigFramework.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "-";
 			};
 			name = "Release-HTTP";
 		};
