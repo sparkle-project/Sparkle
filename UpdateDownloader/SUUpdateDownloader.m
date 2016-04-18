@@ -39,8 +39,7 @@
 
 - (void)dealloc
 {
-    [self.download cancel];
-    self.download = nil;
+    [self cleanup];
 }
 
 - (void)startDownloadWithRequest:(NSURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename completion:(void (^)(BOOL success, NSError * _Nullable error))completionBlock
@@ -56,6 +55,21 @@
         if ([[NSFileManager defaultManager] fileExistsAtPath:cachePath]) {
             [[NSFileManager defaultManager] removeItemAtPath:cachePath error:NULL];
         }
+    });
+}
+
+- (void)cleanup
+{
+    [self.download cancel];
+    self.download = nil;
+    self.delegate = nil;
+}
+
+- (void)cleanupWithCompletion:(void (^)(void))completionBlock
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self cleanup];
+        completionBlock();
     });
 }
 
@@ -112,12 +126,14 @@
 
 - (void)downloadDidFinish:(NSURLDownload *)__unused d
 {
+    self.download = nil;
     self.completionBlock(YES, nil);
     self.completionBlock = nil;
 }
 
 - (void)download:(NSURLDownload *)__unused download didFailWithError:(NSError *)error
 {
+    self.download = nil;
     self.completionBlock(NO, error);
     self.completionBlock = nil;
 }

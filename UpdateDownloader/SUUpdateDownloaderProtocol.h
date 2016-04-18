@@ -14,7 +14,9 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol SUUpdateDownloaderProtocol
 
 - (void)startDownloadWithRequest:(NSURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename completion:(void (^)(BOOL success, NSError * _Nullable error))completionBlock;
-    
+
+- (void)cleanupWithCompletion:(void (^)(void))completionBlock;
+
 @end
 
 NS_ASSUME_NONNULL_END

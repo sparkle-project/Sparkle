@@ -8,7 +8,9 @@
 
 #import "SUProbeInstallStatus.h"
 #import "SULocalMessagePort.h"
+#import "SURemoteMessagePort.h"
 #import "SUXPCRemoteMessagePort.h"
+#import "SUXPCServiceInfo.h"
 #import "SURemoteMessagePortProtocol.h"
 #import "SUHost.h"
 #import "SUMessageTypes.h"
@@ -22,7 +24,13 @@
     NSString *hostBundleIdentifier = host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    id <SURemoteMessagePort> remotePort = [[SUXPCRemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)];
+    id <SURemoteMessagePort> remotePort = nil;
+    NSString *serviceName = SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier);
+    if (!SUXPCServiceExists(@REMOTE_MESSAGE_PORT_PRODUCT_NAME)) {
+        remotePort = [[SURemoteMessagePort alloc] initWithServiceName:serviceName];
+    } else {
+        remotePort = [[SUXPCRemoteMessagePort alloc] initWithServiceName:serviceName];
+    }
     
     [remotePort connectWithLookupCompletion:^(BOOL success) {
         if (success) {
@@ -37,7 +45,13 @@
     NSString *hostBundleIdentifier = host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    id <SURemoteMessagePort> remotePort = [[SUXPCRemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)];
+    id <SURemoteMessagePort> remotePort = nil;
+    NSString *serviceName = SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier);
+    if (!SUXPCServiceExists(@REMOTE_MESSAGE_PORT_PRODUCT_NAME)) {
+        remotePort = [[SURemoteMessagePort alloc] initWithServiceName:serviceName];
+    } else {
+        remotePort = [[SUXPCRemoteMessagePort alloc] initWithServiceName:serviceName];
+    }
     
     [remotePort connectWithLookupCompletion:^(BOOL lookupSuccess) {
         if (!lookupSuccess) {

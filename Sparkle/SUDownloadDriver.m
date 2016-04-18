@@ -8,7 +8,8 @@
 
 #import "SUDownloadDriver.h"
 #import "SUDownloaderDelegate.h"
-#import "SUUpdateDownloaderProtocol.h"
+#import "SUUpdateDownloader.h"
+#import "SUXPCServiceInfo.h"
 #import "SUAppcastItem.h"
 #import "SUFileManager.h"
 #import "SULocalizations.h"
@@ -22,6 +23,7 @@
 
 @interface SUDownloadDriver () <SUDownloaderDelegate>
 
+@property (nonatomic) id<SUUpdateDownloaderProtocol> downloader;
 @property (nonatomic) NSXPCConnection *connection;
 @property (nonatomic, readonly) SUAppcastItem *updateItem;
 @property (nonatomic, readonly) SUHost *host;
@@ -33,6 +35,7 @@
 
 @implementation SUDownloadDriver
 
+@synthesize downloader = _downloader;
 @synthesize connection = _connection;
 @synthesize updateItem = _updateItem;
 @synthesize request = _request;
@@ -52,10 +55,16 @@
         _request = [NSMutableURLRequest requestWithURL:updateItem.fileURL];
         [_request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
         
-        _connection = [[NSXPCConnection alloc] initWithServiceName:@UPDATE_DOWNLOADER_BUNDLE_ID];
-        _connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUUpdateDownloaderProtocol)];
-        _connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUDownloaderDelegate)];
-        _connection.exportedObject = self;
+        if (!SUXPCServiceExists(@UPDATE_DOWNLOADER_PRODUCT_NAME)) {
+            _downloader = [[SUUpdateDownloader alloc] initWithDelegate:self];
+        } else {
+            _connection = [[NSXPCConnection alloc] initWithServiceName:@UPDATE_DOWNLOADER_BUNDLE_ID];
+            _connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUUpdateDownloaderProtocol)];
+            _connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUDownloaderDelegate)];
+            _connection.exportedObject = self;
+            
+            _downloader = _connection.remoteObjectProxy;
+        }
     }
     return self;
 }
@@ -99,7 +108,7 @@
     [self.delegate downloadDriverWillBeginDownload];
     
     NSString *desiredFilename = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
-    [self.connection.remoteObjectProxy startDownloadWithRequest:self.request bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename completion:^(BOOL success, NSError * _Nullable error) {
+    [self.downloader startDownloadWithRequest:self.request bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename completion:^(BOOL success, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             retrievedDownloadResult = YES;
             SUDownloadDriver *strongSelf = weakSelf;
@@ -126,6 +135,8 @@
             } else {
                 [strongSelf.delegate downloadDriverDidDownloadUpdate];
             }
+            
+            [strongSelf cleanup];
         });
     }];
 }
@@ -137,11 +148,18 @@
 
 - (void)cleanup
 {
-    if (self.connection != nil) {
-        [self.connection invalidate];
-        self.connection = nil;
-    }
-    self.downloadName = nil;
+    // It's very crucial to wait until they are done with completion before invalidating our XPC connection (if there is one)
+    // Otherwise we can run into some unfortunate crashes
+    [self.downloader cleanupWithCompletion:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (self.connection != nil) {
+                [self.connection invalidate];
+                self.connection = nil;
+            }
+            self.downloadName = nil;
+            self.downloader = nil;
+        });
+    }];
 }
 
 - (void)downloaderDidSetDestinationName:(NSString *)destinationName temporaryDirectory:(NSString *)temporaryDirectory

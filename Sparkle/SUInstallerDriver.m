@@ -10,7 +10,9 @@
 #import "SULog.h"
 #import "SUMessageTypes.h"
 #import "SULocalMessagePort.h"
+#import "SURemoteMessagePort.h"
 #import "SUXPCRemoteMessagePort.h"
+#import "SUXPCServiceInfo.h"
 #import "SURemoteMessagePortProtocol.h"
 #import "SUUpdaterDelegate.h"
 #import "SUAppcastItem.h"
@@ -21,7 +23,8 @@
 #import "SUFileManager.h"
 #import "SUSecureCoding.h"
 #import "SUInstallationInputData.h"
-#import "SUInstallerLauncherProtocol.h"
+#import "SUInstallerLauncher.h"
+#import "SUXPCServiceInfo.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -139,7 +142,12 @@
     NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    self.remotePort = [[SUXPCRemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)];
+    NSString *serviceName = SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier);
+    if (!SUXPCServiceExists(@REMOTE_MESSAGE_PORT_PRODUCT_NAME)) {
+        self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:serviceName];
+    } else {
+        self.remotePort = [[SUXPCRemoteMessagePort alloc] initWithServiceName:serviceName];
+    }
     
     __weak SUInstallerDriver *weakSelf = self;
     
@@ -426,33 +434,41 @@
         return;
     }
     
-    NSXPCConnection *launcherConnection = [[NSXPCConnection alloc] initWithServiceName:@INSTALLER_LAUNCHER_PRODUCT_ID];
-    launcherConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerLauncherProtocol)];
-    [launcherConnection resume];
-    
+    id<SUInstallerLauncherProtocol> installerLauncher = nil;
     __block BOOL retrievedLaunchStatus = NO;
+    NSXPCConnection *launcherConnection = nil;
     
-    __weak NSXPCConnection *weakConnection = launcherConnection;
-    launcherConnection.interruptionHandler = ^{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (!retrievedLaunchStatus) {
-                [weakConnection invalidate];
-            }
-        });
-    };
+    if (!SUXPCServiceExists(@INSTALLER_LAUNCHER_PRODUCT_NAME)) {
+        installerLauncher = [[SUInstallerLauncher alloc] init];
+    } else {
+        launcherConnection = [[NSXPCConnection alloc] initWithServiceName:@INSTALLER_LAUNCHER_BUNDLE_ID];
+        launcherConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerLauncherProtocol)];
+        [launcherConnection resume];
+        
+        __weak NSXPCConnection *weakConnection = launcherConnection;
+        launcherConnection.interruptionHandler = ^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (!retrievedLaunchStatus) {
+                    [weakConnection invalidate];
+                }
+            });
+        };
+        
+        launcherConnection.invalidationHandler = ^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (!retrievedLaunchStatus) {
+                    NSError *error =
+                    [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while connecting to the installer. Please try again later.", nil) }];
+                    
+                    completionHandler(error);
+                }
+            });
+        };
+        
+        installerLauncher = launcherConnection.remoteObjectProxy;
+    }
     
-    launcherConnection.invalidationHandler = ^{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (!retrievedLaunchStatus) {
-                NSError *error =
-                [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while connecting to the installer. Please try again later.", nil) }];
-                
-                completionHandler(error);
-            }
-        });
-    };
-    
-    [launcherConnection.remoteObjectProxy launchInstallerAtPath:relaunchToolPath withArguments:@[hostBundleIdentifier] completion:^(BOOL success) {
+    [installerLauncher launchInstallerAtPath:relaunchToolPath withArguments:@[hostBundleIdentifier] completion:^(BOOL success) {
         dispatch_async(dispatch_get_main_queue(), ^{
             retrievedLaunchStatus = YES;
             [launcherConnection invalidate];

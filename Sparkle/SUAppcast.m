@@ -13,7 +13,8 @@
 #import "SULog.h"
 #import "SUErrors.h"
 #import "SULocalizations.h"
-#import "SUAppcastDownloaderProtocol.h"
+#import "SUAppcastDownloader.h"
+#import "SUXPCServiceInfo.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -75,39 +76,47 @@
 
     [request setValue:@"application/rss+xml,*/*;q=0.1" forHTTPHeaderField:@"Accept"];
 
-    NSXPCConnection *connection = [[NSXPCConnection alloc] initWithServiceName:@APPCAST_DOWNLOADER_BUNDLE_ID];
-    connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUAppcastDownloaderProtocol)];
-    
+    id<SUAppcastDownloaderProtocol> appcastDownloader = nil;
+    NSXPCConnection *connection = nil;
     __block BOOL retrievedDownloadResult = NO;
     
-    __weak NSXPCConnection *weakConnection = connection;
-    connection.interruptionHandler = ^{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (!retrievedDownloadResult) {
-                [weakConnection invalidate];
-            }
-        });
-    };
+    if (!SUXPCServiceExists(@APPCAST_DOWNLOADER_PRODUCT_NAME)) {
+        appcastDownloader = [[SUAppcastDownloader alloc] init];
+    } else {
+        connection = [[NSXPCConnection alloc] initWithServiceName:@APPCAST_DOWNLOADER_BUNDLE_ID];
+        connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUAppcastDownloaderProtocol)];
+        
+        __weak NSXPCConnection *weakConnection = connection;
+        connection.interruptionHandler = ^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (!retrievedDownloadResult) {
+                    [weakConnection invalidate];
+                }
+            });
+        };
+        
+        connection.invalidationHandler = ^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (!retrievedDownloadResult) {
+                    SULog(@"Appcast Downloader connection was invalidated");
+                    
+                    NSDictionary *userInfo = [NSDictionary
+                                              dictionaryWithObject: SULocalizedString(@"An error occurred while downloading the update feed.", nil)
+                                              forKey: NSLocalizedDescriptionKey];
+                    
+                    [self reportError:[NSError errorWithDomain:SUSparkleErrorDomain
+                                                          code:SUDownloadError
+                                                      userInfo:userInfo]];
+                }
+            });
+        };
+        
+        [connection resume];
+        
+        appcastDownloader = connection.remoteObjectProxy;
+    }
     
-    connection.invalidationHandler = ^{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (!retrievedDownloadResult) {
-                SULog(@"Appcast Downloader connection was invalidated");
-                
-                NSDictionary *userInfo = [NSDictionary
-                                                 dictionaryWithObject: SULocalizedString(@"An error occurred while downloading the update feed.", nil)
-                                                 forKey: NSLocalizedDescriptionKey];
-                
-                [self reportError:[NSError errorWithDomain:SUSparkleErrorDomain
-                                                      code:SUDownloadError
-                                                  userInfo:userInfo]];
-            }
-        });
-    };
-    
-    [connection resume];
-    
-    [connection.remoteObjectProxy startDownloadWithRequest:request completion:^(NSData * _Nullable appcastData, NSError * _Nullable error) {
+    [appcastDownloader startDownloadWithRequest:request completion:^(NSData * _Nullable appcastData, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             retrievedDownloadResult = YES;
             [connection invalidate];
