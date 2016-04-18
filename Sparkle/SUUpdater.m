@@ -25,6 +25,7 @@
 #import "SUAppcastItem.h"
 #import "SUInstallationInfo.h"
 #import "SUErrors.h"
+#import "SUXPCServiceInfo.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -118,6 +119,27 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     return YES;
 }
 
+- (BOOL)checkATSIssueForBundleURL:(NSURL *)bundleURL getBundleExists:(BOOL *)bundleExists
+{
+    if (bundleURL == nil) {
+        if (bundleExists != NULL) {
+            *bundleExists = NO;
+        }
+        return NO;
+    }
+    
+    NSBundle *bundle = [NSBundle bundleWithURL:bundleURL];
+    if (bundleExists != NULL) {
+        *bundleExists = (bundle != nil);
+    }
+    
+    if (bundle == nil) {
+        return NO;
+    }
+    
+    return ([bundle objectForInfoDictionaryKey:@"NSAppTransportSecurity"] == nil);
+}
+
 - (BOOL)checkIfConfiguredProperly:(NSError * __autoreleasing *)error
 {
     if (self.sparkleBundle == nil) {
@@ -155,12 +177,35 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
     
     BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
-    BOOL allowsArbitraryHTTPLoads = SPARKLE_ALLOW_ARBITRARY_HTTP_LOADS;
-    if (!allowsArbitraryHTTPLoads && !servingOverHttps) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsecureFeedURLError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"You must change the feed URL (%@) to use HTTPS or use a build of Sparkle with App Transport Security disabled.\n\nFor more information:\nhttps://sparkle-project.org/documentation/app-transport-security/", [feedURL absoluteString]] }];
+    if (!servingOverHttps) {
+        BOOL foundXPCAppcastDownloaderService = NO;
+        BOOL foundATSAppcastIssue = [self checkATSIssueForBundleURL:SUXPCServiceURL(@APPCAST_DOWNLOADER_PRODUCT_NAME) getBundleExists:&foundXPCAppcastDownloaderService];
+        
+        BOOL foundXPCUpdateDownloaderService = NO;
+        BOOL foundATSUpdateIssue = NO;
+        if (!foundATSAppcastIssue) {
+            foundATSUpdateIssue = [self checkATSIssueForBundleURL:SUXPCServiceURL(@UPDATE_DOWNLOADER_PRODUCT_NAME) getBundleExists:&foundXPCUpdateDownloaderService];
         }
-        return NO;
+        
+        NSBundle *mainBundle = [NSBundle mainBundle];
+        BOOL foundATSMainBundleIssue = NO;
+        if (!foundATSAppcastIssue && !foundATSUpdateIssue && (!foundXPCAppcastDownloaderService || !foundXPCUpdateDownloaderService)) {
+            BOOL foundATSIssue = ([mainBundle objectForInfoDictionaryKey:@"NSAppTransportSecurity"] == nil);
+            BOOL updatingMainBundle = [self.host.bundle isEqualTo:mainBundle];
+            
+            if (updatingMainBundle) {
+                // The only way we'll know for sure if there is an issue is if the main bundle is the same as the one we're updating
+                // We don't want to generate false positives..
+                foundATSMainBundleIssue = foundATSIssue;
+            }
+        }
+        
+        if (foundATSAppcastIssue || foundATSUpdateIssue || foundATSMainBundleIssue) {
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsecureFeedURLError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"You must change the feed URL (%@) to use HTTPS or use a build of Sparkle with App Transport Security disabled.\n\nFor more information:\nhttps://sparkle-project.org/documentation/app-transport-security/", [feedURL absoluteString]] }];
+            }
+            return NO;
+        }
     }
     
     return YES;

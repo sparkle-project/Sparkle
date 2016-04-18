@@ -12,4 +12,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 BOOL SUXPCServiceExists(NSString *bundleName);
 
+NSURL * _Nullable SUXPCServiceURL(NSString *bundleName);
+
 NS_ASSUME_NONNULL_END

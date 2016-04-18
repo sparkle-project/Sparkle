@@ -10,14 +10,19 @@
 
 BOOL SUXPCServiceExists(NSString *bundleName)
 {
+    NSURL *xpcBundleURL = SUXPCServiceURL(bundleName);
+    return (xpcBundleURL != nil && [xpcBundleURL checkResourceIsReachableAndReturnError:NULL]);
+}
+
+NSURL * _Nullable SUXPCServiceURL(NSString *bundleName)
+{
     NSBundle *mainBundle = [NSBundle mainBundle];
     NSURL *executableURL = mainBundle.executableURL;
     if (executableURL == nil) {
-        return NO;
+        return nil;
     }
     
     NSURL *xpcBundleURL = [[[executableURL.URLByDeletingLastPathComponent.URLByDeletingLastPathComponent URLByAppendingPathComponent:@"XPCServices"] URLByAppendingPathComponent:bundleName] URLByAppendingPathExtension:@"xpc"];
     
-    BOOL serviceExists = [xpcBundleURL checkResourceIsReachableAndReturnError:NULL];
-    return serviceExists;
+    return xpcBundleURL;
 }
