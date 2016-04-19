@@ -54,7 +54,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     assert(bundleIdentifier != nil);
     
     // Create a directory that'll be used for our web server listing
-    NSURL *serverDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
+    NSURL *serverDirectoryURL = [[cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier] URLByAppendingPathComponent:@"ServerData"];
     if ([serverDirectoryURL checkResourceIsReachableAndReturnError:nil]) {
         NSError *removeServerDirectoryError = nil;
         
