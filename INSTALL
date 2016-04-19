@@ -1,0 +1,28 @@
+== Building ==
+
+If release products have not already been built, they can be built by:
+
+> make release
+
+Or build the "Distribution" scheme from within the Xcode project.
+
+Debug builds of Sparkle can also be built from Xcode. Note that debug builds change Sparkle's default behavior to ease development. Never use a debug build of Sparkle for distribution.
+
+== Installing ==
+
+To install Sparkle, you can copy Sparkle.framework into your project as you would any other framework. Make sure you have a build phase to copy the framework into your application's Frameworks directory.
+
+Sparkle has a few components that can optionally be handed off to XPC services. If you sandbox your application, you will need to use all or some of these.
+
+If you code sign your application, these XPC services will also need to be signed by you with the attached entitlements. Included is a script to automate this.
+
+Here is an example of invoking the script with my Developer ID:
+> ./bin/codesign_xpc_services "Developer ID Application" XPCServices/
+
+After signing the services, copy them into your project and set up a build phase to embed the XPC Services into your application.
+
+Then test if your application works :).
+
+== Known Issues ==
+
+https://github.com/zorgiepoo/sparkle-ui-xpc-issues/issues
