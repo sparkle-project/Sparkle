@@ -132,7 +132,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         [self showAlertText:@"Insecure update error!"
                  informativeText:@"For security reasons, you need to code sign your application or sign your updates with a DSA key. See Sparkle's documentation for more information."];
     } else if (isMainBundle && !hasPublicDSAKey && !servingOverHttps) {
-        SULog(@"WARNING: Serving updates over HTTP without signing them with a DSA key is deprecated and may not be possible in a future release. Please serve your updates over https, or sign them with a DSA key, or do both. See Sparkle's documentation for more information.");
+        [self showAlertText:@"Insecure update error!"
+            informativeText:@"For security reasons, you need to serve your updates over https and/or sign your updates with a DSA key. See Sparkle's documentation for more information."];
     }
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101100
