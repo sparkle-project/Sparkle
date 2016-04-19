@@ -77,28 +77,6 @@
     return [[NSFileManager defaultManager] isWritableFileAtPath:bundlePath.stringByDeletingLastPathComponent] && [[NSFileManager defaultManager] isWritableFileAtPath:bundlePath];
 }
 
-- (NSString *)appCachePath
-{
-    NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    NSString *cachePath = nil;
-    if ([cachePaths count]) {
-        cachePath = [cachePaths objectAtIndex:0];
-    }
-    if (!cachePath) {
-        SULog(@"Failed to find user's cache directory! Using system default");
-        cachePath = NSTemporaryDirectory();
-    }
-
-    NSString *name = [self.bundle bundleIdentifier];
-    if (!name) {
-        name = [self name];
-    }
-
-    cachePath = [cachePath stringByAppendingPathComponent:name];
-    cachePath = [cachePath stringByAppendingPathComponent:@"Sparkle"];
-    return cachePath;
-}
-
 - (NSString *)installationPath
 {
     if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
