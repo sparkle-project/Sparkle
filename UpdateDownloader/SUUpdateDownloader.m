@@ -45,16 +45,16 @@
 - (void)startDownloadWithRequest:(NSURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename completion:(void (^)(BOOL success, NSError * _Nullable error))completionBlock
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        // Remove our old caches path so we don't start accumulating files in there
+        NSString *cachePath = [[self class] sparkleCachePathForBundleIdentifier:bundleIdentifier];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:cachePath]) {
+            [[NSFileManager defaultManager] removeItemAtPath:cachePath error:NULL];
+        }
+        
         self.download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
         self.desiredFilename = desiredFilename;
         self.bundleIdentifier = bundleIdentifier;
         self.completionBlock = completionBlock;
-        
-        // Remove our old caches path so we don't start accumulating files in there
-        NSString *cachePath = [[self class] sparkleCachePathForBundleIdentifier:self.bundleIdentifier];
-        if ([[NSFileManager defaultManager] fileExistsAtPath:cachePath]) {
-            [[NSFileManager defaultManager] removeItemAtPath:cachePath error:NULL];
-        }
     });
 }
 
@@ -80,7 +80,7 @@
     NSURL *cacheURL = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:NULL];
     
     assert(cacheURL != nil);
-    return [[[cacheURL URLByAppendingPathComponent:bundleIdentifier] URLByAppendingPathComponent:@"Sparkle"] path];
+    return [[[cacheURL URLByAppendingPathComponent:bundleIdentifier] URLByAppendingPathComponent:@SPARKLE_BUNDLE_IDENTIFIER] path];
 }
 
 - (void)download:(NSURLDownload *)__unused d decideDestinationWithSuggestedFilename:(NSString *)name

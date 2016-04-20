@@ -68,13 +68,8 @@
     [super tearDown];
     
     if (self.notSignedAppPath) {
-        [[NSFileManager defaultManager] removeItemAtPath:self.notSignedAppPath error:nil];
-    }
-    if (self.validSignedAppPath) {
-        [[NSFileManager defaultManager] removeItemAtPath:self.validSignedAppPath error:nil];
-    }
-    if (self.invalidSignedAppPath) {
-        [[NSFileManager defaultManager] removeItemAtPath:self.invalidSignedAppPath error:nil];
+        NSString *tempDir = [self.notSignedAppPath stringByDeletingLastPathComponent];
+        [[NSFileManager defaultManager] removeItemAtPath:tempDir error:nil];
     }
 }
 
