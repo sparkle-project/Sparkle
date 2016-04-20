@@ -23,6 +23,10 @@ After signing the services, copy them into your project and set up a build phase
 
 Then test if your application works :).
 
+== System Requirements ==
+
+This version of Sparkle only supports running on OS X 10.8 and later
+
 == Known Issues ==
 
 https://github.com/zorgiepoo/sparkle-ui-xpc-issues/issues
