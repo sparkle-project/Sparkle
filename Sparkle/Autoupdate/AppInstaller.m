@@ -552,6 +552,12 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 [installerProgressRunningApplication terminate];
                 shouldLaunchInstallerProgress = NO;
                 
+                // Invalidate the local port before re-launching the updated app
+                // If we don't do this, the updated app could think the installation can be resumable,
+                // if it checks for updates immediately on launch
+                [self.localPort invalidate];
+                self.localPort = nil;
+                
                 NSString *installationPath = [SUInstaller installationPathForHost:self.host];
                 
                 if (self.shouldRelaunch) {
