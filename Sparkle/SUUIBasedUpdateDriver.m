@@ -11,6 +11,7 @@
 #import "SUUpdateAlert.h"
 #import "SUUpdater_Private.h"
 #import "SUHost.h"
+#import "SUOperatingSystem.h"
 #import "SUStatusController.h"
 #import "SUConstants.h"
 
@@ -96,7 +97,7 @@
         alert.messageText = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
         alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
         [alert addButtonWithTitle:SULocalizedString(@"OK", nil)];
-        [self showModalAlert:alert];
+        [self showAlert:alert];
         [self abortUpdate];
     }
 }
@@ -143,7 +144,7 @@
 
 - (NSString *)localizedStringFromByteCount:(long long)value
 {
-    if (![SUHost isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 8, 0}]) {
+    if (![SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 8, 0}]) {
         if (value < 1000) {
             return [NSString stringWithFormat:@"%.0lf %@", value / 1.0,
                     SULocalizedString(@"B", @"the unit for bytes")];
@@ -163,8 +164,11 @@
                 SULocalizedString(@"GB", @"the unit for gigabytes")];
     }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
     return [NSByteCountFormatter stringFromByteCount:value
                                           countStyle:NSByteCountFormatterCountStyleFile];
+#pragma clang diagnostic pop
 }
 
 - (void)download:(NSURLDownload *)__unused download didReceiveDataOfLength:(NSUInteger)length
@@ -252,7 +256,7 @@
     alert.messageText = SULocalizedString(@"Update Error!", nil);
     alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
     [alert addButtonWithTitle:SULocalizedString(@"Cancel Update", nil)];
-    [self showModalAlert:alert];
+    [self showAlert:alert];
     [super abortUpdateWithError:error];
 }
 
@@ -266,7 +270,7 @@
     [super abortUpdate];
 }
 
-- (void)showModalAlert:(NSAlert *)alert
+- (void)showAlert:(NSAlert *)alert
 {
     if ([[self.updater delegate] respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
         [[self.updater delegate] updaterWillShowModalAlert:self.updater];

@@ -40,9 +40,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (void)updateDriverDidFinish:(NSNotification *)note;
 @property (readonly, copy) NSURL *parameterizedFeedURL;
 
-- (void)notifyWillShowModalAlert;
-- (void)notifyDidShowModalAlert;
-
 @property (strong) SUUpdateDriver *driver;
 @property (strong) SUHost *host;
 
@@ -57,6 +54,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize driver;
 @synthesize host;
 @synthesize sparkleBundle;
+@synthesize decryptionPassword;
 
 static NSMutableDictionary *sharedUpdaters = nil;
 static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
@@ -70,7 +68,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 + (SUUpdater *)updaterForBundle:(NSBundle *)bundle
 {
     if (bundle == nil) bundle = [NSBundle mainBundle];
-    id updater = sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]];
+    id updater = [sharedUpdaters objectForKey:[NSValue valueWithNonretainedObject:bundle]];
     if (updater == nil) {
         updater = [[[self class] alloc] initForBundle:bundle];
     }
@@ -95,7 +93,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         [self registerAsObserver];
     }
 
-    id updater = sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]];
+    id updater = [sharedUpdaters objectForKey:[NSValue valueWithNonretainedObject:bundle]];
     if (updater)
 	{
         self = updater;
@@ -105,36 +103,49 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         if (sharedUpdaters == nil) {
             sharedUpdaters = [[NSMutableDictionary alloc] init];
         }
-        sharedUpdaters[[NSValue valueWithNonretainedObject:bundle]] = self;
+        [sharedUpdaters setObject:self forKey:[NSValue valueWithNonretainedObject:bundle]];
         host = [[SUHost alloc] initWithBundle:bundle];
-
-        // Saving-the-developer-from-a-stupid-mistake-check:
-        BOOL hasPublicDSAKey = [host publicDSAKey] != nil;
-        BOOL isMainBundle = [bundle isEqualTo:[NSBundle mainBundle]];
-        BOOL hostIsCodeSigned = [SUCodeSigningVerifier hostApplicationIsCodeSigned];
-        BOOL servingOverHttps = [[[[self feedURL] scheme] lowercaseString] isEqualToString:@"https"];
-        if (!isMainBundle && !hasPublicDSAKey) {
-            [self notifyWillShowModalAlert];
-            NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = @"Insecure update error!";
-            alert.informativeText = @"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information.";
-            [alert runModal];
-            [self notifyDidShowModalAlert];
-        } else if (isMainBundle && !(hasPublicDSAKey || hostIsCodeSigned)) {
-            [self notifyWillShowModalAlert];
-            NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = @"Insecure update error!";
-            alert.informativeText = @"For security reasons, you need to code sign your application or sign your updates with a DSA key. See Sparkle's documentation for more information.";
-            [alert runModal];
-            [self notifyDidShowModalAlert];
-        } else if (isMainBundle && !hasPublicDSAKey && !servingOverHttps) {
-            SULog(@"WARNING: Serving updates over http without signing them with a DSA key is deprecated and may not be possible in a future release. Please serve your updates over https, or sign them with a DSA key, or do both. See Sparkle's documentation for more information.");
-        }
 
         // This runs the permission prompt if needed, but never before the app has finished launching because the runloop won't run before that
         [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:0];
     }
     return self;
+}
+
+-(void)showAlertText:(NSString *)text informativeText:(NSString *)informativeText {
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.messageText = text;
+    alert.informativeText = informativeText;
+    [self.driver showAlert:alert];
+}
+
+-(void)checkIfConfiguredProperly {
+    BOOL hasPublicDSAKey = [self.host publicDSAKey] != nil;
+    BOOL isMainBundle = [self.host.bundle isEqualTo:[NSBundle mainBundle]];
+    BOOL hostIsCodeSigned = [SUCodeSigningVerifier hostApplicationIsCodeSigned];
+    NSURL *feedURL = [self feedURL];
+    BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
+    if (!isMainBundle && !hasPublicDSAKey) {
+        [self showAlertText:@"Insecure update error!"
+                 informativeText:@"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information."];
+    } else if (isMainBundle && !(hasPublicDSAKey || hostIsCodeSigned)) {
+        [self showAlertText:@"Insecure update error!"
+                 informativeText:@"For security reasons, you need to code sign your application or sign your updates with a DSA key. See Sparkle's documentation for more information."];
+    } else if (isMainBundle && !hasPublicDSAKey && !servingOverHttps) {
+        [self showAlertText:@"Insecure update error!"
+            informativeText:@"For security reasons, you need to serve your updates over https and/or sign your updates with a DSA key. See Sparkle's documentation for more information."];
+    }
+
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101100
+    BOOL atsExceptionsExist = nil != [self.host objectForInfoDictionaryKey:@"NSAppTransportSecurity"];
+    if (isMainBundle && !servingOverHttps && !atsExceptionsExist) {
+        [self showAlertText:@"Insecure feed URL is blocked in OS X 10.11"
+                 informativeText:[NSString stringWithFormat:@"You must change the feed URL (%@) to use HTTPS or disable App Transport Security.\n\nFor more information:\nhttp://sparkle-project.org/documentation/app-transport-security/", [feedURL absoluteString]]];
+    }
+    if (!isMainBundle && !servingOverHttps) {
+        SULog(@"WARNING: Serving updates over HTTP may be blocked in OS X 10.11. Please change the feed URL (%@) to use HTTPS. For more information:\nhttp://sparkle-project.org/documentation/app-transport-security/", feedURL);
+    }
+#endif
 }
 
 
@@ -145,21 +156,6 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self.host bundlePath], [self.host installationPath]]; }
-
-
-- (void)notifyWillShowModalAlert
-{
-    if ([self.delegate respondsToSelector:@selector(updaterWillShowModalAlert:)])
-        [self.delegate updaterWillShowModalAlert:self];
-}
-
-
-- (void)notifyDidShowModalAlert
-{
-    if ([self.delegate respondsToSelector:@selector(updaterDidShowModalAlert:)])
-        [self.delegate updaterDidShowModalAlert:self];
-}
-
 
 - (void)startUpdateCycle
 {
@@ -211,6 +207,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 	if ([note object] == self.driver && [self.driver finished])
 	{
         self.driver = nil;
+        [self updateLastUpdateCheckDate];
         [self scheduleNextUpdateCheck];
     }
 }
@@ -218,6 +215,13 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (NSDate *)lastUpdateCheckDate
 {
     return [self.host objectForUserDefaultsKey:SULastCheckTimeKey];
+}
+
+- (void)updateLastUpdateCheckDate
+{
+    [self willChangeValueForKey:@"lastUpdateCheckDate"];
+    [self.host setObject:[NSDate date] forUserDefaultsKey:SULastCheckTimeKey];
+    [self didChangeValueForKey:@"lastUpdateCheckDate"];
 }
 
 - (void)scheduleNextUpdateCheck
@@ -248,7 +252,10 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 - (void)putFeedURLIntoDictionary:(NSMutableDictionary *)theDict // You release this.
 {
-    theDict[@"feedURL"] = [self feedURL];
+    NSURL *feedURL = [self feedURL];
+    if (feedURL != nil) {
+        [theDict setObject:feedURL forKey:@"feedURL"];
+    }
 }
 
 - (void)checkForUpdatesInBgReachabilityCheckWithDriver:(SUUpdateDriver *)inDriver /* RUNS ON ITS OWN THREAD */
@@ -270,7 +277,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 				[self putFeedURLIntoDictionary:theDict];	// Get feed URL on main thread, it's not safe to call elsewhere.
             });
 
-            const char *hostname = [[(NSURL *)theDict[@"feedURL"] host] cStringUsingEncoding:NSUTF8StringEncoding];
+            const char *hostname = [[(NSURL *)[theDict objectForKey:@"feedURL"] host] cStringUsingEncoding:NSUTF8StringEncoding];
             SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(NULL, hostname);
             Boolean reachabilityResult = NO;
             // If the feed's using a file:// URL, we won't be able to use reachability.
@@ -350,9 +357,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 	if ([self updateInProgress]) { return; }
 	if (self.checkTimer) { [self.checkTimer invalidate]; self.checkTimer = nil; }		// Timer is non-repeating, may have invalidated itself, so we had to retain it.
 
-    [self willChangeValueForKey:@"lastUpdateCheckDate"];
-    [self.host setObject:[NSDate date] forUserDefaultsKey:SULastCheckTimeKey];
-    [self didChangeValueForKey:@"lastUpdateCheckDate"];
+    [self updateLastUpdateCheckDate];
 
     if( [self.delegate respondsToSelector: @selector(updaterMayCheckForUpdates:)] && ![self.delegate updaterMayCheckForUpdates: self] )
 	{
@@ -368,6 +373,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         [self scheduleNextUpdateCheck];
         return;
     }
+
+    [self checkIfConfiguredProperly];
 
     NSURL *theFeedURL = [self parameterizedFeedURL];
     if (theFeedURL) // Use a NIL URL to cancel quietly.
@@ -534,7 +541,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     // Build up the parameterized URL.
     NSMutableArray *parameterStrings = [NSMutableArray array];
     for (NSDictionary *currentProfileInfo in parameters) {
-        [parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", [[currentProfileInfo[@"key"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], [[currentProfileInfo[@"value"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+        [parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", [[[currentProfileInfo objectForKey:@"key"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], [[[currentProfileInfo objectForKey:@"value"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
     }
 
     NSString *separatorCharacter = @"?";

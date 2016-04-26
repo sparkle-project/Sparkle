@@ -8,6 +8,7 @@
 
 #import "SUTestApplicationDelegate.h"
 #import "SUUpdateSettingsWindowController.h"
+#import "SUFileManager.h"
 #import "SUTestWebServer.h"
 
 @interface SUTestApplicationDelegate ()
@@ -38,11 +39,11 @@ static NSString * const UPDATED_VERSION = @"2.0";
         [[NSApplication sharedApplication] terminate:nil];
     }
     
-    NSFileManager *fileManager = [NSFileManager defaultManager];
+    SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:NO];
     
     // Locate user's cache directory
     NSError *cacheError = nil;
-    NSURL *cacheDirectoryURL = [fileManager URLForDirectory:NSCachesDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:&cacheError];
+    NSURL *cacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:&cacheError];
     
     if (cacheDirectoryURL == nil) {
         NSLog(@"Failed to locate cache directory with error: %@", cacheError);
@@ -53,7 +54,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     assert(bundleIdentifier != nil);
     
     // Create a directory that'll be used for our web server listing
-    NSURL *serverDirectoryURL = [cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier];
+    NSURL *serverDirectoryURL = [[cacheDirectoryURL URLByAppendingPathComponent:bundleIdentifier] URLByAppendingPathComponent:@"ServerData"];
     if ([serverDirectoryURL checkResourceIsReachableAndReturnError:nil]) {
         NSError *removeServerDirectoryError = nil;
         
@@ -63,7 +64,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     }
     
     NSError *createDirectoryError = nil;
-    if (![fileManager createDirectoryAtURL:serverDirectoryURL withIntermediateDirectories:YES attributes:nil error:&createDirectoryError]) {
+    if (![[NSFileManager defaultManager] createDirectoryAtURL:serverDirectoryURL withIntermediateDirectories:YES attributes:nil error:&createDirectoryError]) {
         NSLog(@"Failed creating directory at %@ with error %@", serverDirectoryURL.path, createDirectoryError);
         assert(NO);
     }
@@ -72,7 +73,10 @@ static NSString * const UPDATED_VERSION = @"2.0";
     assert(bundleURL != nil);
     
     // Copy main bundle into server directory
-    NSURL *destinationBundleURL = [serverDirectoryURL URLByAppendingPathComponent:bundleURL.lastPathComponent];
+    NSString *bundleURLLastComponent = bundleURL.lastPathComponent;
+    assert(bundleURLLastComponent != nil);
+    
+    NSURL *destinationBundleURL = [serverDirectoryURL URLByAppendingPathComponent:bundleURLLastComponent];
     NSError *copyBundleError = nil;
     if (![fileManager copyItemAtURL:bundleURL toURL:destinationBundleURL error:&copyBundleError]) {
         NSLog(@"Failed to copy main bundle into server directory with error %@", copyBundleError);
@@ -86,8 +90,8 @@ static NSString * const UPDATED_VERSION = @"2.0";
     assert(infoFileExists);
     
     NSMutableDictionary *infoDictionary = [[NSMutableDictionary alloc] initWithContentsOfURL:infoURL];
-    infoDictionary[(__bridge NSString *)kCFBundleVersionKey] = UPDATED_VERSION;
-    infoDictionary[@"CFBundleShortVersionString"] = UPDATED_VERSION;
+    [infoDictionary setObject:UPDATED_VERSION forKey:(__bridge NSString *)kCFBundleVersionKey];
+    [infoDictionary setObject:UPDATED_VERSION forKey:@"CFBundleShortVersionString"];
     
     BOOL wroteInfoFile = [infoDictionary writeToURL:infoURL atomically:NO];
     assert(wroteInfoFile);
@@ -138,7 +142,9 @@ static NSString * const UPDATED_VERSION = @"2.0";
     
     // Obtain the file attributes to get the file size of our update later
     NSError *fileAttributesError = nil;
-    NSDictionary *archiveFileAttributes = [fileManager attributesOfItemAtPath:archiveURL.path error:&fileAttributesError];
+    NSString *archivePath = archiveURL.path;
+    assert(archivePath != nil);
+    NSDictionary *archiveFileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:archivePath error:&fileAttributesError];
     if (archiveFileAttributes == nil) {
         NSLog(@"Failed to retrieve file attributes from archive with error %@", fileAttributesError);
         assert(NO);

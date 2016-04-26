@@ -1,20 +1,52 @@
+# 1.14.0 (Mar 11, 2016)
 
-# 1.12.0
+* Disable javascript by default and make it opt-in (Zorg)
+* URL-encoding of appcast URLs is preserved (Kornel Lesiński)
+* Delegate is asked for fallback updates if delta update fails (Kornel Lesiński)
+* Fixed crash on 10.7 - subscript operator not available (kleuter)
+* Fixed check of feed URL before delegate had a chance to set it (Kornel Lesiński)
+* Re-added support for password-protected dmg images (Andrew K. Boyd)
+* Added warning about ATS blocking (Kornel Lesiński)
+* Translation fixes for pt-BR. (vitu)
+* Add some Japanese lozalized strings (1024jp)
+* Made test app available in all languages #695 (LIU Dongyuan / 柳东原)
+* Czech localizations update (Frantisek Erben)
+* Removed a test resource from the framework bundle (Karl Moskowski)
+* Test if the updated app is the frontmost one (Zorg)
+* UI Tests for the Test Application (Zorg)
 
-* Rewrote file operations for updating an app (Zorg)
+# 1.13.1 (Jan 31, 2016)
+
+Important security fixes:
+
+* Prevent inclusion of local files via file:// XML entities
+* Disable redirects to non-HTTP URLs in release notes webview
+
+# 1.13.0 (Dec 18, 2015)
+
+* Changed framework's bundle ID from `org.andymatuschak.Sparkle` to `org.sparkle-project.Sparkle`.
+
+# 1.12.0 (Dec 13, 2015)
+
+* Rewritten file operations for updating an app (Zorg)
   - Ensuring atomic move operations, robust error handling.
   - Faster.
   - Using modern APIs where possible (no FSPathMakeRef, FSGetCatalogInfo, FSFindFolder, etc.)
   - Strong documentation, easier to read code.
-* Deprecated serving over http without DSA (Zorg)
-* Disallowed automatic updates when user can't write to the bundle (Zorg)
+* Automatic updates won't be installed if the system is about to shut off (Zorg)
+* Deprecated serving over HTTP without DSA (Zorg)
+  - Note that Apple has deprecated insecure HTTP in OS X 10.11
 * Improved Autoupdate application (Zorg)
     * Do all the installation work after the runloop is set up
     * TerminationListener only does termination listening now
     * Handle cases where host path is not installation path and host path is not desired executable path
+    * Don't show Autoupdate dock icon if we shouldn't show UI
+    * Update modification & access time for new update
+* Added installUpdatesIfAvailable (Ian Langworth)
 * Removed extensions from shell scripts (Jake Petroules)
 * Rewritten test app so it works again, and from a local web server (Zorg)
-* Set LD_RUNPATH_SEARCH_PATHS in Podspec. (Jake Petroules)
+* Replaced use of Python with built-in web server (Kevin Wojniak)
+* Set LD_RUNPATH_SEARCH_PATHS in Podspec (Jake Petroules)
 * Don't install automatic updates if the system might shut off (Zorg)
 * Don't show Autoupdate dock icon if we shouldn't show UI (Zorg)
 * Updated layout constraints when removing release notes (Zorg)
@@ -25,6 +57,7 @@
 * Updated Mac models list until July 2015 (Gabriel Ulici)
 * Updated Polish translation (Kornel Lesiński)
 * Updated Xcode project languages for which we have translations (Jake Petroules)
+* Updated XIB files (Kornel Lesiński)
 * Use NSByteCountFormatter if available (Jake Petroules)
 * Declared protocols on SUUpdateAlert for the 10.11 SDK (Daniel Jalkut)
 * Silenced warning about casting away const-ness and -Wassign-enum (Daniel Jalkut)
@@ -32,8 +65,16 @@
 * Check for empty strings (as well as nil) in SUHost's -name method (Karl Moskowski)
 * Don't follow symlinks for checking file existence (Zorg)
 * Unit tests in Swift (Zorg, Jake Petroules)
+* Fixed framework imports (Felix Schulze)
+* Fixed issues with copying files from different mounted drives (Zorg)
+* Disallowed automatic updates when user can't write to the bundle (Zorg)
+* Set the task working directories instead of changing the process working directory (Kevin Wojniak)
 
-# 1.11.0
+# 1.11.1 (Nov 9, 2015)
+
+* Don't install automatic updates when system is about to shut down
+
+# 1.11.0 (Aug 24, 2015)
 
 * Big improvements to code signing and DSA verification
    - Sparkle now checks not only whether an update is correctly signed, but also whether the updated version will be able to verify future updates. Updates now must either use DSA keys correctly, or not try to use them at all. Same goes for Apple Code Signing.
@@ -51,7 +92,7 @@
 * Added logging of appcast/download URL on error (Kornel Lesiński)
 * More robust reading of Autoupdate.app path from Sparkle bundle
 
-# 1.10.0
+# 1.10.0 (Apr 26, 2015)
 
 * Massive improvements to the BinaryDelta tool (Zorg)
   - Ability to track file permissions (Zorg)
@@ -67,7 +108,7 @@
 * Stdout used for non error outputs (JDuquennoy)
 * French locale update (Kent Sutherland)
 
-# 1.9.0
+# 1.9.0 (Jan 26, 2015)
 
 * Added SUUpdater delegate method for failures. (Benjamin Gordon)
 * Make the error definitions public (C.W. Betts)
@@ -77,7 +118,7 @@
 * Use Library/Caches rather than app support directory (Kornel Lesiński)
 * Check for a modal window being onscreen before trying to put up the Sparkle prompt (Alf Watt)
 * Fixed crashes on 10.7 (Chris Campbell, Ger Teunis)
-* Fixed Sparkle tags parsing (Tamás Lustyik)
+* Fixed Sparkle tags parsing (Tamás Lustyik)
 * SULog code cleanups (Kevin Wojniak)
 * Make sure CFBundleVersion is a semantic version number. (Jake Petroules)
 * Replace typedef enums with typedef NS_ENUM to make Swift happier (C.W. Betts)
@@ -90,7 +131,7 @@
 * Turkish localization fixes (Emir)
 * Proofing of Ukrainian localization (Vera Tkachenko)
 
-# 1.8.0
+# 1.8.0 (Jul 26, 2014)
 
 * New SUDSAVerifier based on up-to-date OS X APIs (Zachary Waldowski)
 * Detailed error log for failed signature checks (Kornel Lesiński)
@@ -101,7 +142,7 @@
 * Updated Japanese localization (1024jp)
 * Added Greek localization
 
-# 1.7.1
+# 1.7.1 (Jul 2, 2014)
 
 * Removed option to install unverified updates (Kornel Lesiński)
 * Added detailed log when code signing verification fails (Sam Deane)

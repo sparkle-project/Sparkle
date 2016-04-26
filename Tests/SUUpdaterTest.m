@@ -24,7 +24,7 @@
 {
     [super setUp];
     self.queue = [[NSOperationQueue alloc] init];
-    self.updater = [[SUUpdater alloc] init];
+    self.updater = [[SUUpdater alloc] initForBundle:[NSBundle bundleForClass:[self class]]];
     self.updater.delegate = self;
 }
 
@@ -37,7 +37,7 @@
 
 - (NSString *)feedURLStringForUpdater:(SUUpdater *) __unused updater
 {
-    return @"";
+    return @"https://test.example.com";
 }
 
 - (void)testFeedURL

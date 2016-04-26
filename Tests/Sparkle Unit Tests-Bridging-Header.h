@@ -6,6 +6,11 @@
 #import "SUPipedUnarchiver.h"
 #import "SUBinaryDeltaCommon.h"
 #import "SUFileManager.h"
+#import "SUAppcast.h"
+#import "SUAppcastItem.h"
+#import "SUBasicUpdateDriver.h"
+#import "SUVersionComparisonProtocol.h"
+#import "SUStandardVersionComparator.h"
 
 // Duplicated to avoid exporting a private symbol from SUFileManager
 static const char *SUAppleQuarantineIdentifier = "com.apple.quarantine";
@@ -20,3 +25,15 @@ static const char *SUAppleQuarantineIdentifier = "com.apple.quarantine";
 - (BOOL)_makeDirectoryAtURL:(NSURL *)url error:(NSError * __autoreleasing *)error;
 
 @end
+
+@interface SUBasicUpdateDriver (Private)
+
++ (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator;
+
+@end
+
+
+@interface SUAppcast (Private)
+- (NSArray *)parseAppcastItemsFromXMLFile:(NSURL *)appcastFile error:(NSError *__autoreleasing*)errorp;
+@end
+

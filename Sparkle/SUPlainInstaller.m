@@ -42,7 +42,7 @@
         return NO;
     }
     
-    SUFileManager *fileManager = [[SUFileManager alloc] init];
+    SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:YES];
     
     // Create a temporary directory for our new app that resides on our destination's volume
     NSURL *tempNewDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:[installationURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingString:@" (Incomplete Update)"] appropriateForDirectoryURL:installationURL.URLByDeletingLastPathComponent error:error];
@@ -139,15 +139,18 @@
         return NO;
     }
     
+    // From here on out, we don't really need to bring up authorization if we haven't done so prior
+    SUFileManager *constrainedFileManager = [fileManager fileManagerByPreservingAuthorizationRights];
+    
     // Cleanup: move the old app to the trash
     NSError *trashError = nil;
-    if (![fileManager moveItemAtURLToTrash:oldTempURL error:&trashError]) {
+    if (![constrainedFileManager moveItemAtURLToTrash:oldTempURL error:&trashError]) {
         SULog(@"Failed to move %@ to trash with error %@", oldTempURL, trashError);
     }
     
-    [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
+    [constrainedFileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
     
-    [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
+    [constrainedFileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
     
     return YES;
 }
