@@ -42,13 +42,14 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)__unused aNotification
 {
+    // Kick off a scheduled update check once we start the updater later
+    [self.updater checkForUpdates];
+    
     NSError *updaterError = nil;
     if (![self.updater startUpdater:&updaterError]) {
         printf("Error: Failed to initialize updater with error (%ld): %s\n", updaterError.code, updaterError.localizedDescription.UTF8String);
         exit(EXIT_FAILURE);
     }
-    
-    [self.updater checkForUpdates];
 }
 
 @end

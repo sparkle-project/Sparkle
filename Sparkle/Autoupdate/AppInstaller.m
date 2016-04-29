@@ -59,6 +59,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @property (nonatomic) BOOL performedStage1Installation;
 @property (nonatomic) BOOL performedStage2Installation;
 @property (nonatomic) BOOL performedStage3Installation;
+@property (nonatomic) BOOL waitingForStage2Feedback;
 
 @end
 
@@ -79,6 +80,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize performedStage1Installation = _performedStage1Installation;
 @synthesize performedStage2Installation = _performedStage2Installation;
 @synthesize performedStage3Installation = _performedStage3Installation;
+@synthesize waitingForStage2Feedback = _waitingForStage2Feedback;
 
 /*
  * hostPath - path to host (original) application
@@ -379,7 +381,9 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (self.performedStage1Installation) {
                         // Resume the installation if we aren't done with stage 2 yet, and remind the client we are prepared to relaunch
-                        [self resumeInstallation];
+                        dispatch_async(self.installerQueue, ^{
+                            [self performStage2InstallationIfNeeded];
+                        });
                     }
                 });
             }];
@@ -424,18 +428,32 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         dispatch_async(dispatch_get_main_queue(), ^{
             self.installer = installer;
             
-            NSData *silentData = [NSData dataWithBytes:&canPerformSilentInstall length:sizeof(canPerformSilentInstall)];
-            [self.remotePort sendMessageWithIdentifier:SUInstallationFinishedStage1 data:silentData completion:^(BOOL success) {
+            uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
+            
+            uint8_t sendInformation[] = {canPerformSilentInstall, targetTerminated};
+            
+            NSData *sendData = [NSData dataWithBytes:sendInformation length:sizeof(sendInformation)];
+            
+            self.waitingForStage2Feedback = (canPerformSilentInstall == 0);
+            
+            [self.remotePort sendMessageWithIdentifier:SUInstallationFinishedStage1 data:sendData completion:^(BOOL success) {
                 if (!success) {
                     SULog(@"Error sending stage 1 finish");
+                    
+                    if (self.waitingForStage2Feedback) {
+                        SULog(@"Exiting because sending Stage 1 Installation Failed and we need to wait for continuation response");
+                        [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                    }
                 }
             }];
             
             self.performedStage1Installation = YES;
             
-            // Stage 2 can still be run before we finish installation
-            // if the updater requests for it before the app is terminated
-            [self finishInstallationAfterHostTermination];
+            if (!self.waitingForStage2Feedback) {
+                // Stage 2 can still be run before we finish installation
+                // if the updater requests for it before the app is terminated
+                [self finishInstallationAfterHostTermination];
+            }
         });
     });
 }
@@ -447,6 +465,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     }
     
     if (self.shouldShowUI && [self.installer mayNeedToRequestAuthorization]) {
+#warning should probably do this on main thread
         // We should activate our app so that the auth prompt will be active
         [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
     }
@@ -462,43 +481,29 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         });
     } else {
         self.performedStage2Installation = YES;
-    }
-}
-
-// Can be called multiple times without harm
-- (void)resumeInstallation
-{
-    dispatch_async(self.installerQueue, ^{
-        [self performStage2InstallationIfNeeded];
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.remotePort sendMessageWithIdentifier:SUInstallationFinishedStage2 data:[NSData data] completion:^(BOOL success) {
+            uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
+            
+            NSData *sendData = [NSData dataWithBytes:&targetTerminated length:sizeof(targetTerminated)];
+            [self.remotePort sendMessageWithIdentifier:SUInstallationFinishedStage2 data:sendData completion:^(BOOL success) {
                 if (!success) {
                     SULog(@"Error sending stage 2 finish");
                 }
             }];
             
-            // Stage 3 will perform when the target terminates
+            if (self.waitingForStage2Feedback) {
+                self.waitingForStage2Feedback = NO;
+                
+                [self finishInstallationAfterHostTermination];
+            } // otherwise stage 3 will perform when the target terminates
         });
-    });
+    }
 }
 
 - (void)finishInstallationAfterHostTermination
 {
-    [self.terminationListener startListeningWithCompletion:^(BOOL success) {
-        self.terminationListener = nil;
-        
-        if (!success) {
-            SULog(@"Timed out waiting for target to terminate. Target path is %@", self.host.bundlePath);
-            [self.installer cleanup];
-            self.installer = nil;
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
-            });
-            return;
-        }
-        
+    [self.terminationListener startListeningWithCompletion:^{
         // Launch our installer progress UI tool if only after a certain amount of time passes
         __block NSRunningApplication *installerProgressRunningApplication = nil;
         __block BOOL shouldLaunchInstallerProgress = YES;
@@ -513,7 +518,9 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 }
                 
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUDisplayProgressTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    if (shouldLaunchInstallerProgress) {
+                    // Make sure we're still eligible for showing the installer progress
+                    // Also if the updater process is still alive, showing the progress should not be our duty
+                    if (shouldLaunchInstallerProgress && self.remotePort == nil) {
                         NSError *launchError = nil;
                         
                         NSArray *arguments = @[self.host.bundlePath];
@@ -551,6 +558,12 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 // Make sure to terminate our displayed progress before we move onto cleanup
                 [installerProgressRunningApplication terminate];
                 shouldLaunchInstallerProgress = NO;
+                
+                [self.remotePort sendMessageWithIdentifier:SUInstallationFinishedStage3 data:[NSData data] completion:^(BOOL success) {
+                    if (!success) {
+                        SULog(@"Error sending stage 3 finish");
+                    }
+                }];
                 
                 // Invalidate the local port before re-launching the updated app
                 // If we don't do this, the updated app could think the installation can be resumable,

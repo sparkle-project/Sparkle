@@ -222,6 +222,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     if ([self.host objectForUserDefaultsKey:SUEnableAutomaticChecksKey]) {
         shouldPrompt = NO;
     }
+    // If the developer wants to check for updates, we shouldn't bug the user about a prompt yet
+    else if (self.preStartedScheduledUpdateBlock != nil) {
+        shouldPrompt = NO;
+    }
     // Does the delegate want to take care of the logic for when we should ask permission to update?
     else if ([self.delegate respondsToSelector:@selector(updaterShouldPromptForPermissionToCheckForUpdates:)]) {
         shouldPrompt = [self.delegate updaterShouldPromptForPermissionToCheckForUpdates:self];
@@ -253,14 +257,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 SUUpdater *strongSelf = weakSelf;
                 if (strongSelf != nil) {
                     [strongSelf updatePermissionPromptFinishedWithResult:result];
-                    
-                    if (strongSelf.preStartedScheduledUpdateBlock != nil) {
-                        strongSelf.preStartedScheduledUpdateBlock();
-                        strongSelf.preStartedScheduledUpdateBlock = nil;
-                    } else {
-                        // Schedule checks, but make sure we ignore the delayed call from KVO
-                        [strongSelf resetUpdateCycle];
-                    }
+                    // Schedule checks, but make sure we ignore the delayed call from KVO
+                    [strongSelf resetUpdateCycle];
                 }
             });
         }];

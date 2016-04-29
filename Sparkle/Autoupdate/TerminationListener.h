@@ -14,7 +14,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithBundle:(NSBundle *)bundle;
 
-- (void)startListeningWithCompletion:(void (^)(BOOL))completionBlock;
+@property (nonatomic, readonly) BOOL terminated;
+
+- (void)startListeningWithCompletion:(void (^)(void))completionBlock;
 
 @end
 

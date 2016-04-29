@@ -188,7 +188,7 @@
 
 #pragma mark Install & Relaunch Update
 
-- (void)showExtractionFinishedAndReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))installUpdateHandler
+- (void)showReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))installUpdateHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent registerInstallUpdateHandler:installUpdateHandler];
@@ -303,11 +303,21 @@
     });
 }
 
+- (void)showUpdateInstallationDidFinish
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self addUpdateButtonWithTitle:@"Installation Finished!"];
+    });
+}
+
 #pragma mark Aborting Everything
 
 - (void)terminateApplication
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        // In case our termination request fails or is delayed
+        [self removeUpdateButton];
+        
         [[NSApplication sharedApplication] terminate:nil];
     });
 }

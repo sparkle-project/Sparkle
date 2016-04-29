@@ -66,7 +66,7 @@
 - (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))__unused reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        printf("Asked about making update permission decision.. Aborting because I do not want to make this decision.");
+        printf("Asked about making update permission decision.. Aborting because I do not want to make this decision.\n");
         exit(EXIT_FAILURE);
     });
 }
@@ -154,7 +154,7 @@
     });
 }
 
-- (void)showExtractionFinishedAndReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))installUpdateHandler
+- (void)showReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))installUpdateHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent registerInstallUpdateHandler:installUpdateHandler];
@@ -166,6 +166,13 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         printf("Installing Update...\n");
+    });
+}
+
+- (void)showUpdateInstallationDidFinish
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        printf("Installation Finished...\n");
     });
 }
 

@@ -193,9 +193,9 @@
     }
 }
 
-- (void)installerDidFinishPreparationAndCanInstallSilently:(BOOL)canInstallSilently
+- (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently
 {
-    [self.delegate installerDidFinishPreparationAndCanInstallSilently:canInstallSilently];
+    [self.delegate installerDidFinishPreparationAndWillInstallImmediately:willInstallImmediately silently:willInstallSilently];
 }
 
 - (void)finishInstallationWithResponse:(SUInstallUpdateStatus)installUpdateStatus
@@ -213,20 +213,31 @@
     }
 }
 
-- (void)installerIsRequestingAppTermination
+- (void)installerWillFinishInstallation
 {
     if ([self.updaterDelegate respondsToSelector:@selector(updater:willInstallUpdate:)]) {
         [self.updaterDelegate updater:self.updater willInstallUpdate:self.updateItem];
     }
     
+#warning should only notify if we are really about to restart the target...
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
     if ([self.updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)]) {
         [self.updaterDelegate updaterWillRelaunchApplication:self.updater];
     }
-    
+}
+
+- (void)installerDidFinishInstallation
+{
+    if ([self.delegate respondsToSelector:@selector(installerDidFinishInstallation)]) {
+        [self.delegate installerDidFinishInstallation];
+    }
+}
+
+- (void)installerIsRequestingAppTermination
+{
     // If they don't respond or do anything, we'll just install after the user terminates the app anyway
-    if ([self.delegate respondsToSelector:@selector(coreDriverIsRequestingAppTermination)]) {
-        [self.delegate coreDriverIsRequestingAppTermination];
+    if ([self.delegate respondsToSelector:@selector(installerIsRequestingAppTermination)]) {
+        [self.delegate installerIsRequestingAppTermination];
     }
 }
 

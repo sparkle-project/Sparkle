@@ -37,6 +37,9 @@ BOOL SUInstallerMessageTypeIsLegal(SUInstallerMessageType oldMessageType, SUInst
         case SUInstallationFinishedStage2:
             legal = (oldMessageType == SUInstallationFinishedStage1);
             break;
+        case SUInstallationFinishedStage3:
+            legal = (oldMessageType == SUInstallationFinishedStage2);
+            break;
     }
     return legal;
 }

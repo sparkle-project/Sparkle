@@ -22,7 +22,7 @@
 
 @property (nonatomic, readonly) SUCoreBasedUpdateDriver *coreDriver;
 @property (nonatomic) BOOL foundCriticalUpdate;
-@property (nonatomic) BOOL canInstallSilently;
+@property (nonatomic) BOOL willInstallSilently;
 
 @end
 
@@ -30,7 +30,7 @@
 
 @synthesize coreDriver = _coreDriver;
 @synthesize foundCriticalUpdate = _foundCriticalUpdate;
-@synthesize canInstallSilently = _canInstallSilently;
+@synthesize willInstallSilently = _willInstallSilently;
 
 - (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate
 {
@@ -60,18 +60,20 @@
     [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
 }
 
-- (void)installerDidFinishPreparationAndCanInstallSilently:(BOOL)canInstallSilently
+- (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently
 {
-    self.canInstallSilently = canInstallSilently;
+    self.willInstallSilently = willInstallSilently;
     
-    // We are done and can safely abort now
-    // The installer tool will keep the installation alive
-    [self abortUpdate];
+    if (!willInstallImmediately) {
+        // We are done and can safely abort now
+        // The installer tool will keep the installation alive
+        [self abortUpdate];
+    }
 }
 
 - (BOOL)basicDriverShouldSignalShowingUpdateImmediately
 {
-    return (!self.canInstallSilently || self.foundCriticalUpdate);
+    return (!self.willInstallSilently || self.foundCriticalUpdate);
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(NSError *)error

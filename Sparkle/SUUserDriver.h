@@ -216,9 +216,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showExtractionReceivedProgress:(double)progress;
 
 /*!
- * Show the user that the update finished extracting and is ready to install
+ * Show the user that the update is ready to install
  *
- * Let the user know that the update is ready and ask them whether they want to install or not
+ * Let the user know that the update is ready and ask them whether they want to install or not.
+ * Note if the target application is already terminated and an update can be performed silently, this method may not be invoked.
  *
  * @param installUpdateHandler A reply of SUInstallAndRelaunchUpdateNow installs the update immediately.
  * A reply of SUDismissUpdateInstallation dismisses the update installation. Note the update may still be installed after
@@ -226,7 +227,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * This can be called from any thread
  */
-- (void)showExtractionFinishedAndReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))installUpdateHandler;
+- (void)showReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))installUpdateHandler;
 
 /*!
  * Show the user that the update is installing
@@ -240,12 +241,24 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  * Terminate the application
  *
- * Sparkle is signaling that it wants the application to be terminated immediately.
- * If an implementor has already delayed application termination, now would be the appropriate time to stop.
+ * Sparkle is signaling that it wants the application to request for application termination.
+ * Care should be taken if the request for application termination fails or is delayed.
+ * Eg: may want to hide installation status windows in case termination doesn't happen right away
  *
  * This can be called from any thread
  */
 - (void)terminateApplication;
+
+/*!
+ * Show the user that the update installation finished
+ *
+ * Let the user know that the update finished installing.
+ * This will only be invoked if the updater process is still alive, which is typically not the case if
+ * the updater's lifetime is tied to the application it is updating.
+ *
+ * This can be called from any thread
+ */
+- (void)showUpdateInstallationDidFinish;
 
 /*!
  * Dismiss the current update installation

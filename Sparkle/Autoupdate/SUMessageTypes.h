@@ -24,7 +24,8 @@ typedef NS_ENUM(int32_t, SUInstallerMessageType)
     SUValidationStarted = 4,
     SUInstallationStartedStage1 = 5,
     SUInstallationFinishedStage1 = 6,
-    SUInstallationFinishedStage2 = 7
+    SUInstallationFinishedStage2 = 7,
+    SUInstallationFinishedStage3 = 8
 };
 
 typedef NS_ENUM(int32_t, SUUpdaterMessageType)

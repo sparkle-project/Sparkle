@@ -37,6 +37,7 @@
 @property (nonatomic, readonly) NSBundle *sparkleBundle;
 @property (nonatomic, weak, readonly) id<SUInstallerDriverDelegate> delegate;
 @property (nonatomic) SUInstallerMessageType currentStage;
+@property (nonatomic) BOOL startedInstalling;
 @property (nonatomic) SULocalMessagePort *localPort;
 @property (nonatomic) id <SURemoteMessagePort> remotePort;
 @property (nonatomic) BOOL postponedOnce;
@@ -56,6 +57,7 @@
 @synthesize sparkleBundle = _sparkleBundle;
 @synthesize delegate = _delegate;
 @synthesize currentStage = _currentStage;
+@synthesize startedInstalling = _startedInstalling;
 @synthesize localPort = _localPort;
 @synthesize remotePort = _remotePort;
 @synthesize postponedOnce = _postponedOnce;
@@ -303,6 +305,7 @@
     } else if (identifier == SUInstallationStartedStage1) {
         self.currentStage = identifier;
         [self.delegate installerDidStartInstalling];
+        self.startedInstalling = YES;
         
     } else if (identifier == SUInstallationFinishedStage1) {
         self.currentStage = identifier;
@@ -322,21 +325,45 @@
         }
         
         BOOL canInstallSilently = NO;
-        if (data.length == sizeof(uint8_t)) {
+        if (data.length >= sizeof(uint8_t)) {
             canInstallSilently = (BOOL)*(const uint8_t *)data.bytes;
         }
         
-        [self.delegate installerDidFinishPreparationAndCanInstallSilently:canInstallSilently];
+        BOOL hasTargetTerminated = NO;
+        if (data.length >= sizeof(uint8_t) * 2) {
+            hasTargetTerminated = (BOOL)*((const uint8_t *)data.bytes + 1);
+        }
+        
+        [self.delegate installerDidFinishPreparationAndWillInstallImmediately:(hasTargetTerminated && canInstallSilently) silently:canInstallSilently];
     } else if (identifier == SUInstallationFinishedStage2) {
-        // Don't have to store current stage because we're severing our connection to the installer
+        self.currentStage = identifier;
+        if (!self.startedInstalling) {
+            // It's possible we can start from resuming to stage 2 rather than doing stage 1 again, so we should notify to start installing if we haven't done so already
+            self.startedInstalling = YES;
+            [self.delegate installerDidStartInstalling];
+        }
+        
+        BOOL hasTargetTerminated = NO;
+        if (data.length >= sizeof(uint8_t)) {
+            hasTargetTerminated = (BOOL)*(const uint8_t *)data.bytes;
+        }
         
         [self.remotePort invalidate];
         self.remotePort = nil;
         
+        [self.delegate installerWillFinishInstallation];
+        
+        if (!hasTargetTerminated) {
+            [self.delegate installerIsRequestingAppTermination];
+        }
+    } else if (identifier == SUInstallationFinishedStage3) {
+        self.currentStage = identifier;
+        
         [self.localPort invalidate];
         self.localPort = nil;
         
-        [self.delegate installerIsRequestingAppTermination];
+        [self.delegate installerDidFinishInstallation];
+        [self.delegate installerIsRequestingAbortInstallWithError:nil];
     }
 }
 

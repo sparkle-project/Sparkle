@@ -17,8 +17,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)installerDidStartInstalling;
 - (void)installerDidExtractUpdateWithProgress:(double)progress;
-- (void)installerDidFinishPreparationAndCanInstallSilently:(BOOL)canInstallSilently;
+- (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently;
 - (void)installerIsRequestingAppTermination;
+- (void)installerWillFinishInstallation;
+- (void)installerDidFinishInstallation;
 
 - (void)installerIsRequestingAbortInstallWithError:(nullable NSError *)error;
 - (void)installerDidFailToApplyDeltaUpdate;

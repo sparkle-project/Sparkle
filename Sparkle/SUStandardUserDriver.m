@@ -160,7 +160,7 @@
 
 #pragma mark Install & Relaunch Update
 
-- (void)showExtractionFinishedAndReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))installUpdateHandler
+- (void)showReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))installUpdateHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.statusController beginActionWithTitle:SULocalizedString(@"Ready to Install", nil) maxProgressValue:1.0 statusText:nil];
@@ -349,11 +349,23 @@
     });
 }
 
+- (void)showUpdateInstallationDidFinish
+{
+    //...
+}
+
 #pragma mark Aborting Everything
 
 - (void)terminateApplication
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        // if a user chooses to NOT relaunch the app (as is the case with WebKit
+        // when it asks you if you are sure you want to close the app with multiple
+        // tabs open), the status window still stays on the screen and obscures
+        // other windows; with this fix, it doesn't
+        [self.statusController close];
+        self.statusController = nil;
+        
         [[NSApplication sharedApplication] terminate:nil];
     });
 }

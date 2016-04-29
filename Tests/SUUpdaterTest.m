@@ -49,9 +49,11 @@
 
 - (void)showExtractionReceivedProgress:(double)__unused progress {}
 
-- (void)showExtractionFinishedAndReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))__unused installUpdateHandler {}
+- (void)showReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))__unused installUpdateHandler {}
 
 - (void)showInstallingUpdate {}
+
+- (void)showUpdateInstallationDidFinish {}
 
 - (void)dismissUpdateInstallation {}
 
