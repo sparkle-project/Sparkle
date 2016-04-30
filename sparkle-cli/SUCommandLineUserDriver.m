@@ -201,14 +201,17 @@
 
 - (NSRunningApplication *)targetRunningApplication
 {
-    NSArray<NSRunningApplication *> *runningApplications = [[NSWorkspace sharedWorkspace] runningApplications];
-    // Make sure we *don't* use NSURLs for equality comparison; turns out to not work that great
-    NSString *bundlePath = self.bundle.bundleURL.path;
-    if (bundlePath != nil) {
-        for (NSRunningApplication *runningApplication in runningApplications) {
-            NSString *candidatePath = runningApplication.bundleURL.path;
-            if (candidatePath != nil && [bundlePath isEqualToString:candidatePath]) {
-                return runningApplication;
+    NSString *bundleIdentifier = self.bundle.bundleIdentifier;
+    if (bundleIdentifier != nil) {
+        NSArray<NSRunningApplication *> *runningApplications = [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleIdentifier];
+        // Make sure we *don't* use NSURLs for equality comparison; turns out to not work that great
+        NSString *bundlePath = self.bundle.bundleURL.path;
+        if (bundlePath != nil) {
+            for (NSRunningApplication *runningApplication in runningApplications) {
+                NSString *candidatePath = runningApplication.bundleURL.path;
+                if (candidatePath != nil && [bundlePath isEqualToString:candidatePath]) {
+                    return runningApplication;
+                }
             }
         }
     }
