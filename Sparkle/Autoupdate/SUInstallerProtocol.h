@@ -16,10 +16,11 @@
 - (BOOL)performFirstStage:(NSError **)error;
 
 // Stage 2 is where any further installation work can be done prior to the user application being terminated
+// The allowsAuthorization flag indicates whether this and the 3rd stage can request authorization if the updater has insufficient privileges to install
 // The allowsUI flag indicates whether this and the 3rd stage can show UI or not, possibly affecting whether or not this stage succeeds.
 // Eg: This may be appropriate for first showing an authorization prompt before the user application is terminated (if the operation succeeds)
 // Should be able to be called from non-main thread
-- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError **)error;
+- (BOOL)performSecondStageAllowingAuthorization:(BOOL)allowsAuthorization allowingUI:(BOOL)allowsUI error:(NSError **)error;
 
 // Stage 3 occurs after the user application has has been terminated. This is where the final installation work can be done.
 // After this stage is done, the user application will be relaunched.

@@ -334,7 +334,7 @@
             hasTargetTerminated = (BOOL)*((const uint8_t *)data.bytes + 1);
         }
         
-        [self.delegate installerDidFinishPreparationAndWillInstallImmediately:(hasTargetTerminated && canInstallSilently) silently:canInstallSilently];
+        [self.delegate installerDidFinishPreparationAndWillInstallImmediately:hasTargetTerminated silently:canInstallSilently];
     } else if (identifier == SUInstallationFinishedStage2) {
         self.currentStage = identifier;
         if (!self.startedInstalling) {
@@ -495,7 +495,12 @@
         installerLauncher = launcherConnection.remoteObjectProxy;
     }
     
-    [installerLauncher launchInstallerAtPath:relaunchToolPath withArguments:@[hostBundleIdentifier] completion:^(BOOL success) {
+    BOOL shouldInheritPrivileges = NO;
+    if ([self.updaterDelegate respondsToSelector:@selector(updaterShouldInheritInstallPrivileges:)]) {
+        shouldInheritPrivileges = [self.updaterDelegate updaterShouldInheritInstallPrivileges:self.updater];
+    }
+    
+    [installerLauncher launchInstallerAtPath:relaunchToolPath withHostBundleIdentifier:hostBundleIdentifier inheritingPrivileges:shouldInheritPrivileges completion:^(BOOL success) {
         dispatch_async(dispatch_get_main_queue(), ^{
             retrievedLaunchStatus = YES;
             [launcherConnection invalidate];

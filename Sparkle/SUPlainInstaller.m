@@ -224,15 +224,17 @@
     return YES;
 }
 
-- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError *__autoreleasing *)error
+- (BOOL)performSecondStageAllowingAuthorization:(BOOL)allowsAuthorization allowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
 {
-    self.fileManager = [SUFileManager fileManagerAllowingAuthorization:allowsUI];
+    self.fileManager = [SUFileManager fileManagerAllowingAuthorization:allowsAuthorization && allowsUI];
     
     // Bring up authorization prompt right away if we need it
-    if (![self canInstallSilently]) {
+    BOOL canInstallSilently = [self canInstallSilently];
+    if (allowsAuthorization && !canInstallSilently) {
         return [self.fileManager grantAuthorizationPrivilegesWithError:error];
+    } else {
+        return canInstallSilently;
     }
-    return YES;
 }
 
 - (BOOL)performThirdStage:(NSError * __autoreleasing *)error
@@ -272,8 +274,10 @@
     
     if (oldTempURL != nil) {
         // Cleanup: move the old app to the trash
+        // If we are the root user it's very possible that there is no trash directory to move the file into
+        // In that case, don't log out an error. Removing tempOldDirectoryURL later will remove the app
         NSError *trashError = nil;
-        if (![fileManager moveItemAtURLToTrash:oldTempURL error:&trashError]) {
+        if (![fileManager moveItemAtURLToTrash:oldTempURL error:&trashError] && trashError.code != NSFileNoSuchFileError) {
             SULog(@"Failed to move %@ to trash with error %@", oldTempURL, trashError);
         }
         

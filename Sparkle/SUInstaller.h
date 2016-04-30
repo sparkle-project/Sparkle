@@ -22,8 +22,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)installationPathForHost:(SUHost *)host;
 
-+ (void)mdimportInstallationPath:(NSString *)installationPath;
-
 @end
 
 NS_ASSUME_NONNULL_END

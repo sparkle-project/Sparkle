@@ -44,6 +44,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @property (nonatomic, strong) TerminationListener *terminationListener;
 
 @property (nonatomic, readonly, copy) NSString *hostBundleIdentifier;
+@property (nonatomic, readonly) BOOL inheritsPrivileges;
 @property (nonatomic) SUHost *host;
 @property (nonatomic) SULocalMessagePort *localPort;
 @property (nonatomic) SURemoteMessagePort *remotePort;
@@ -59,13 +60,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @property (nonatomic) BOOL performedStage1Installation;
 @property (nonatomic) BOOL performedStage2Installation;
 @property (nonatomic) BOOL performedStage3Installation;
-@property (nonatomic) BOOL waitingForStage2Feedback;
 
 @end
 
 @implementation AppInstaller
 
 @synthesize hostBundleIdentifier = _hostBundleIdentifier;
+@synthesize inheritsPrivileges = _inheritsPrivileges;
 @synthesize terminationListener = _terminationListener;
 @synthesize localPort = _localPort;
 @synthesize remotePort = _remotePort;
@@ -80,7 +81,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize performedStage1Installation = _performedStage1Installation;
 @synthesize performedStage2Installation = _performedStage2Installation;
 @synthesize performedStage3Installation = _performedStage3Installation;
-@synthesize waitingForStage2Feedback = _waitingForStage2Feedback;
 
 /*
  * hostPath - path to host (original) application
@@ -92,13 +92,15 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
  * shouldShowUI - indicates if we should show the status window when installing the update
  */
 
-- (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier
+- (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier inheritsPrivileges:(BOOL)inheritsPrivileges
 {
     if (!(self = [super init])) {
         return nil;
     }
     
     _hostBundleIdentifier = [hostBundleIdentifier copy];
+    
+    _inheritsPrivileges = inheritsPrivileges;
     
     self.localPort =
     [[SULocalMessagePort alloc]
@@ -434,26 +436,18 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             
             NSData *sendData = [NSData dataWithBytes:sendInformation length:sizeof(sendInformation)];
             
-            self.waitingForStage2Feedback = (canPerformSilentInstall == 0);
-            
             [self.remotePort sendMessageWithIdentifier:SUInstallationFinishedStage1 data:sendData completion:^(BOOL success) {
                 if (!success) {
                     SULog(@"Error sending stage 1 finish");
-                    
-                    if (self.waitingForStage2Feedback) {
-                        SULog(@"Exiting because sending Stage 1 Installation Failed and we need to wait for continuation response");
-                        [self cleanupAndExitWithStatus:EXIT_FAILURE];
-                    }
+                    [self cleanupAndExitWithStatus:EXIT_FAILURE];
                 }
             }];
             
             self.performedStage1Installation = YES;
             
-            if (!self.waitingForStage2Feedback) {
-                // Stage 2 can still be run before we finish installation
-                // if the updater requests for it before the app is terminated
-                [self finishInstallationAfterHostTermination];
-            }
+            // Stage 2 can still be run before we finish installation
+            // if the updater requests for it before the app is terminated
+            [self finishInstallationAfterHostTermination];
         });
     });
 }
@@ -464,14 +458,15 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         return;
     }
     
-    if (self.shouldShowUI && [self.installer mayNeedToRequestAuthorization]) {
-#warning should probably do this on main thread
-        // We should activate our app so that the auth prompt will be active
-        [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+    if (self.shouldShowUI && !self.inheritsPrivileges && [self.installer mayNeedToRequestAuthorization]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            // We should activate our app so that the auth prompt will be active
+            [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+        });
     }
     
     NSError *secondStageError = nil;
-    if (![self.installer performSecondStageAllowingUI:self.shouldShowUI error:&secondStageError]) {
+    if (![self.installer performSecondStageAllowingAuthorization:!self.inheritsPrivileges allowingUI:self.shouldShowUI error:&secondStageError]) {
         SULog(@"Error: Failed to resume installer on stage 2 with error: %@", secondStageError);
         [self.installer cleanup];
         self.installer = nil;
@@ -491,12 +486,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                     SULog(@"Error sending stage 2 finish");
                 }
             }];
-            
-            if (self.waitingForStage2Feedback) {
-                self.waitingForStage2Feedback = NO;
-                
-                [self finishInstallationAfterHostTermination];
-            } // otherwise stage 3 will perform when the target terminates
         });
     }
 }
@@ -588,8 +577,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 
                 dispatch_async(self.installerQueue, ^{
                     [self.installer cleanup];
-                    
-                    [SUInstaller mdimportInstallationPath:installationPath];
                     
                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUTerminationTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                         [self cleanupAndExitWithStatus:EXIT_SUCCESS];

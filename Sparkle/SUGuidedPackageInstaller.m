@@ -43,7 +43,7 @@
     return YES;
 }
 
-- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError *__autoreleasing *)error
+- (BOOL)performSecondStageAllowingAuthorization:(BOOL)allowsAuthorization allowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
 {
     if (!allowsUI) {
         if (error != NULL) {
@@ -52,7 +52,8 @@
         return NO;
     }
     
-    self.fileManager = [SUFileManager fileManagerAllowingAuthorization:YES];
+    // If we're root, we can allow using the authorization APIs
+    self.fileManager = [SUFileManager fileManagerAllowingAuthorization:(allowsAuthorization || (geteuid() == 0))];
     
     return [self.fileManager grantAuthorizationPrivilegesWithError:error];
 }

@@ -32,14 +32,15 @@ int main(int __unused argc, const char __unused *argv[])
 {
     @autoreleasepool
     {
-        NSArray *args = [[NSProcessInfo processInfo] arguments];
-        if (args.count != 2) {
+        NSArray<NSString *> *args = [[NSProcessInfo processInfo] arguments];
+        if (args.count != 3) {
             return EXIT_FAILURE;
         }
         
         NSString *hostBundleIdentifier = args[1];
+        BOOL inheritsPrivileges = args[2].boolValue;
         
-        AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostBundleIdentifier:hostBundleIdentifier];
+        AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostBundleIdentifier:hostBundleIdentifier inheritsPrivileges:inheritsPrivileges];
         
         AppDelegate *delegate = [[AppDelegate alloc] initWithAppInstaller:appInstaller];
         

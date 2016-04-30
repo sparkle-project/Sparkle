@@ -149,24 +149,4 @@
     return [bundle bundlePath];
 }
 
-+ (void)mdimportInstallationPath:(NSString *)installationPath
-{
-    // *** GETS CALLED ON NON-MAIN THREAD!
-
-    SULog(@"mdimporting");
-
-    NSTask *mdimport = [[NSTask alloc] init];
-    [mdimport setLaunchPath:@"/usr/bin/mdimport"];
-    [mdimport setArguments:@[installationPath]];
-    @try {
-        [mdimport launch];
-        [mdimport waitUntilExit];
-    }
-    @catch (NSException *launchException)
-    {
-        // No big deal.
-        SULog(@"Error: %@", [launchException description]);
-    }
-}
-
 @end

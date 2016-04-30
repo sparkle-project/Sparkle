@@ -10,7 +10,7 @@
 #import <Sparkle/Sparkle.h>
 #import "SUCommandLineUserDriver.h"
 
-@interface AppDelegate ()
+@interface AppDelegate () <SUUpdaterDelegate>
 
 @property (nonatomic, readonly) SUUpdater *updater;
 
@@ -35,9 +35,14 @@
         }
         
         id <SUUserDriver> userDriver = [[SUCommandLineUserDriver alloc] initWithBundle:bundle];
-        _updater = [[SUUpdater alloc] initWithHostBundle:bundle userDriver:userDriver delegate:nil];
+        _updater = [[SUUpdater alloc] initWithHostBundle:bundle userDriver:userDriver delegate:self];
     }
     return self;
+}
+
+- (BOOL)updaterShouldInheritInstallPrivileges:(SUUpdater *)__unused updater
+{
+    return YES;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)__unused aNotification

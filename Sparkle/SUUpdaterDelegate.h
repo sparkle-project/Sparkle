@@ -220,6 +220,21 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (NSString *)pathToInstallerProgressAppForUpdater:(SUUpdater *)updater;
 
 /*!
+ Returns whether or not the updater should inherit its parent's privileges during installation
+ 
+ Use this to override the default behavior which is to not inherit privileges.
+ 
+ If privileges are inherited, then no authorization prompt will show up, and
+ the installation will succeed only if the process has sufficient privileges.
+ 
+ On the other hand, if privileges are not inherited (the default), the installer may
+ request an authorization prompt to obtain additional privileges.
+ 
+ \param updater The SUUpdater instance.
+ */
+- (BOOL)updaterShouldInheritInstallPrivileges:(SUUpdater *)updater;
+
+/*!
  Returns the decryption password (if any) which is used to extract the update archive DMG.
  
  Return nil if no password should be used.
