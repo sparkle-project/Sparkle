@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9532" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9532"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUUpdateSettingsWindowController">
@@ -17,15 +17,15 @@
         <window title="Options" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="Sg3-gX-Lin" userLabel="Options Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES"/>
-            <rect key="contentRect" x="543" y="572" width="314" height="173"/>
+            <rect key="contentRect" x="543" y="572" width="314" height="149"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1366" height="745"/>
             <value key="minSize" type="size" width="213" height="107"/>
             <view key="contentView" id="0o9-QI-P26">
-                <rect key="frame" x="0.0" y="0.0" width="314" height="173"/>
+                <rect key="frame" x="0.0" y="0.0" width="314" height="149"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ztb-OP-JVc">
-                        <rect key="frame" x="22" y="112" width="225" height="18"/>
+                        <rect key="frame" x="22" y="88" width="225" height="18"/>
                         <buttonCell key="cell" type="check" title="Automatically check for updates" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="tLK-9z-r4H">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
@@ -35,7 +35,7 @@
                         </connections>
                     </button>
                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="z6k-h3-dCv">
-                        <rect key="frame" x="22" y="92" width="228" height="18"/>
+                        <rect key="frame" x="22" y="68" width="228" height="18"/>
                         <buttonCell key="cell" type="check" title="Automatically download updates" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="lEd-7a-Fwr">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
@@ -45,7 +45,7 @@
                         </connections>
                     </button>
                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wFV-vU-Dle">
-                        <rect key="frame" x="22" y="72" width="224" height="18"/>
+                        <rect key="frame" x="22" y="48" width="224" height="18"/>
                         <buttonCell key="cell" type="check" title="Send system profile information" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="vXw-Wi-ZkC">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
@@ -54,18 +54,8 @@
                             <binding destination="Krg-xk-XXS" name="value" keyPath="updater.sendsSystemProfile" id="oTa-ha-dC7"/>
                         </connections>
                     </button>
-                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jiL-tX-5JU">
-                        <rect key="frame" x="22" y="52" width="152" height="18"/>
-                        <buttonCell key="cell" type="check" title="Has launched before" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="kue-hk-IkK">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <binding destination="ppb-Rb-fc7" name="value" keyPath="values.SUHasLaunchedBefore" id="h9K-fn-8r6"/>
-                        </connections>
-                    </button>
                     <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mU2-vs-cVn">
-                        <rect key="frame" x="21" y="136" width="106" height="17"/>
+                        <rect key="frame" x="21" y="112" width="106" height="17"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Debug options:" id="GIS-sb-n98">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -73,7 +63,7 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7Is-To-hSg">
-                        <rect key="frame" x="18" y="20" width="157" height="17"/>
+                        <rect key="frame" x="18" y="22" width="157" height="17"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Check for updates every" id="ObK-Ox-eAR">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -81,7 +71,7 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XCP-rZ-MyN">
-                        <rect key="frame" x="241" y="20" width="63" height="17"/>
+                        <rect key="frame" x="241" y="22" width="63" height="17"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="seconds" id="Cng-TF-emj">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -89,7 +79,7 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ajc-nf-0sD">
-                        <rect key="frame" x="180" y="18" width="56" height="22"/>
+                        <rect key="frame" x="180" y="20" width="56" height="22"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="gV9-qi-vv1">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -101,7 +91,7 @@
                     </textField>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="233" y="324.5"/>
+            <point key="canvasLocation" x="233" y="312.5"/>
         </window>
         <customObject id="Krg-xk-XXS" userLabel="Updater Controller" customClass="SUStandardUpdaterController"/>
     </objects>
