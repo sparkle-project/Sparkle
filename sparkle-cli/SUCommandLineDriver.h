@@ -1,5 +1,5 @@
 //
-//  AppDelegate.h
+//  SUCommandLineDriver.h
 //  sparkle-cli
 //
 //  Created by Mayur Pawashe on 4/10/16.
@@ -10,9 +10,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface AppDelegate : NSObject <NSApplicationDelegate>
+@interface SUCommandLineDriver : NSObject
 
 - (instancetype)initWithUpdateBundlePath:(const char *)updateBundlePath relaunchBundlePath:(const char *)relaunchBundlePath;
+
+- (void)run;
 
 @end
 

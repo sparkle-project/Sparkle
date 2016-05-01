@@ -267,7 +267,7 @@
 		72D954811CBACC35006F28BD /* InstallerProgressAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D954801CBACC35006F28BD /* InstallerProgressAppController.m */; };
 		72D954831CBAD34F006F28BD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D954821CBAD34F006F28BD /* main.m */; };
 		72D954861CBB179D006F28BD /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DF4F196247F900203BB0 /* Images.xcassets */; };
-		72D954A21CBB415C006F28BD /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D954A11CBB415C006F28BD /* AppDelegate.m */; };
+		72D954A21CBB415C006F28BD /* SUCommandLineDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D954A11CBB415C006F28BD /* SUCommandLineDriver.m */; };
 		72D954A51CBB415C006F28BD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D954A41CBB415C006F28BD /* main.m */; };
 		72D954B31CBB42DA006F28BD /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; };
 		72D954B51CBB447A006F28BD /* Sparkle.framework in Copy Sparkle */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -897,8 +897,8 @@
 		72D954841CBAD418006F28BD /* ShowInstallerProgress.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ShowInstallerProgress.h; path = Sparkle/InstallerProgress/ShowInstallerProgress.h; sourceTree = SOURCE_ROOT; };
 		72D954851CBAD4AE006F28BD /* InstallerProgressAppControllerDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = InstallerProgressAppControllerDelegate.h; path = Sparkle/InstallerProgress/InstallerProgressAppControllerDelegate.h; sourceTree = SOURCE_ROOT; };
 		72D9549E1CBB415B006F28BD /* sparkle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = sparkle.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		72D954A01CBB415C006F28BD /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		72D954A11CBB415C006F28BD /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		72D954A01CBB415C006F28BD /* SUCommandLineDriver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUCommandLineDriver.h; sourceTree = "<group>"; };
+		72D954A11CBB415C006F28BD /* SUCommandLineDriver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SUCommandLineDriver.m; sourceTree = "<group>"; };
 		72D954A41CBB415C006F28BD /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		72D954AB1CBB415C006F28BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		72D954B01CBB41E2006F28BD /* ConfigSparkleTool.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigSparkleTool.xcconfig; sourceTree = "<group>"; };
@@ -1600,8 +1600,8 @@
 		72D9549F1CBB415C006F28BD /* sparkle-cli */ = {
 			isa = PBXGroup;
 			children = (
-				72D954A01CBB415C006F28BD /* AppDelegate.h */,
-				72D954A11CBB415C006F28BD /* AppDelegate.m */,
+				72D954A01CBB415C006F28BD /* SUCommandLineDriver.h */,
+				72D954A11CBB415C006F28BD /* SUCommandLineDriver.m */,
 				72D954B61CBB467F006F28BD /* SUCommandLineUserDriver.h */,
 				72D954B71CBB467F006F28BD /* SUCommandLineUserDriver.m */,
 				72D954AB1CBB415C006F28BD /* Info.plist */,
@@ -2564,7 +2564,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				72D954A51CBB415C006F28BD /* main.m in Sources */,
-				72D954A21CBB415C006F28BD /* AppDelegate.m in Sources */,
+				72D954A21CBB415C006F28BD /* SUCommandLineDriver.m in Sources */,
 				72D954B81CBB467F006F28BD /* SUCommandLineUserDriver.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

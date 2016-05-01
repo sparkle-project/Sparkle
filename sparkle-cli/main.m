@@ -6,8 +6,8 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
-#import "AppDelegate.h"
+#import <Foundation/Foundation.h>
+#import "SUCommandLineDriver.h"
 
 int main(int argc, const char *argv[])
 {
@@ -18,16 +18,14 @@ int main(int argc, const char *argv[])
             return EXIT_FAILURE;
         }
         
-        AppDelegate *delegate = [[AppDelegate alloc] initWithUpdateBundlePath:argv[1] relaunchBundlePath:argv[2]];
-        if (delegate == nil) {
+        SUCommandLineDriver *driver = [[SUCommandLineDriver alloc] initWithUpdateBundlePath:argv[1] relaunchBundlePath:argv[2]];
+        if (driver == nil) {
             printf("Error: Failed to initialize sparkle. Is the bundle you specified valid?\n");
             return EXIT_FAILURE;
         }
         
-        NSApplication *application = [NSApplication sharedApplication];
-        [application setDelegate:delegate];
-        
-        [application run];
+        [driver run];
+        [[NSRunLoop currentRunLoop] run];
     }
     
     return EXIT_SUCCESS;

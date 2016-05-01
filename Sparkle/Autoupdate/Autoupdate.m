@@ -1,32 +1,5 @@
-#import <Cocoa/Cocoa.h>
-#import "SULog.h"
+#import <Foundation/Foundation.h>
 #import "AppInstaller.h"
-
-@interface AppDelegate : NSObject <NSApplicationDelegate>
-
-@property (nonatomic, readonly) AppInstaller *appInstaller;
-
-@end
-
-@implementation AppDelegate
-
-@synthesize appInstaller = _appInstaller;
-
-- (instancetype)initWithAppInstaller:(AppInstaller *)appInstaller
-{
-    self = [super init];
-    if (self != nil) {
-        _appInstaller = appInstaller;
-    }
-    return self;
-}
-
-- (void)applicationDidFinishLaunching:(NSNotification __unused *)notification
-{
-    [self.appInstaller start];
-}
-
-@end
 
 int main(int __unused argc, const char __unused *argv[])
 {
@@ -41,13 +14,8 @@ int main(int __unused argc, const char __unused *argv[])
         BOOL inheritsPrivileges = args[2].boolValue;
         
         AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostBundleIdentifier:hostBundleIdentifier inheritsPrivileges:inheritsPrivileges];
-        
-        AppDelegate *delegate = [[AppDelegate alloc] initWithAppInstaller:appInstaller];
-        
-        NSApplication *application = [NSApplication sharedApplication];
-        [application setDelegate:delegate];
-        
-        [application run];
+        [appInstaller start];
+        [[NSRunLoop currentRunLoop] run];
     }
 
     return EXIT_SUCCESS;

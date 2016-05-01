@@ -1,23 +1,23 @@
 //
-//  AppDelegate.m
+//  SUCommandLineDriver.m
 //  sparkle-cli
 //
 //  Created by Mayur Pawashe on 4/10/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "AppDelegate.h"
+#import "SUCommandLineDriver.h"
 #import <Sparkle/Sparkle.h>
 #import "SUCommandLineUserDriver.h"
 
-@interface AppDelegate () <SUUpdaterDelegate>
+@interface SUCommandLineDriver () <SUUpdaterDelegate>
 
 @property (nonatomic, readonly) SUUpdater *updater;
 @property (nonatomic, readonly) NSString *relaunchBundlePath;
 
 @end
 
-@implementation AppDelegate
+@implementation SUCommandLineDriver
 
 @synthesize updater = _updater;
 @synthesize relaunchBundlePath = _relaunchBundlePath;
@@ -64,7 +64,7 @@
     return self.relaunchBundlePath;
 }
 
-- (void)applicationDidFinishLaunching:(NSNotification *)__unused aNotification
+- (void)run
 {
     // Kick off a scheduled update check once we start the updater later
     [self.updater checkForUpdates];
