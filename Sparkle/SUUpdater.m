@@ -216,7 +216,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (void)startUpdateCycle
 {
     BOOL shouldPrompt = NO;
-    BOOL hasLaunchedBefore = [self.host boolForUserDefaultsKey:SUHasLaunchedBeforeKey];
+    NSNumber *timeIntervalAtFirstLaunch = [self.host objectForUserDefaultsKey:SUTimeIntervalAtFirstLaunchKey];
+    NSDate *currentDate = [NSDate date];
 
     // If the user has been asked about automatic checks, don't bother prompting
     if ([self.host objectForUserDefaultsKey:SUEnableAutomaticChecksKey]) {
@@ -230,15 +231,26 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     else if ([self.delegate respondsToSelector:@selector(updaterShouldPromptForPermissionToCheckForUpdates:)]) {
         shouldPrompt = [self.delegate updaterShouldPromptForPermissionToCheckForUpdates:self];
     }
-    // Has he been asked already? And don't ask if the host has a default value set in its Info.plist.
+    // Has the user been asked already? And don't ask if the host has a default value set in its Info.plist.
     else if ([self.host objectForKey:SUEnableAutomaticChecksKey] == nil) {
-        // Now, we don't want to ask the user for permission to do a weird thing on the first launch.
-        // We wait until the second launch, unless explicitly overridden via SUPromptUserOnFirstLaunchKey.
-        shouldPrompt = [self.host objectForKey:SUPromptUserOnFirstLaunchKey] || hasLaunchedBefore;
+        // Now, we don't want to ask the user for permission to do a weird thing right when they install the app
+        // We wait until another launch after a few hours have passed, unless explicitly overridden via SUPromptUserOnFirstLaunchKey.
+        
+        if ([self.host objectForKey:SUPromptUserOnFirstLaunchKey] != nil) {
+            shouldPrompt = YES;
+        } else if (timeIntervalAtFirstLaunch != nil) {
+            NSDate *firstLaunchDate = [NSDate dateWithTimeIntervalSinceReferenceDate:timeIntervalAtFirstLaunch.doubleValue];
+            NSTimeInterval intervalSinceFirstLaunch = [currentDate timeIntervalSinceDate:firstLaunchDate];
+            // We want to prompt if more than (or equal to) 'SUDefaultUpdatePermissionPromptInterval' seconds have passed since the first launch
+            // If the first launch time is after (or equal to) our current date, then something may have gone wrong in the system - prompt to be on the safe side
+            if (intervalSinceFirstLaunch >= SUDefaultUpdatePermissionPromptInterval || intervalSinceFirstLaunch <= 0) {
+                shouldPrompt = YES;
+            }
+        }
     }
     
-    if (!hasLaunchedBefore) {
-        [self.host setBool:YES forUserDefaultsKey:SUHasLaunchedBeforeKey];
+    if (timeIntervalAtFirstLaunch == nil) {
+        [self.host setObject:@([currentDate timeIntervalSinceReferenceDate]) forUserDefaultsKey:SUTimeIntervalAtFirstLaunchKey];
     }
 
     if (shouldPrompt) {
