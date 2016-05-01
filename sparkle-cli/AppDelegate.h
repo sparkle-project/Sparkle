@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
-- (nullable instancetype)initWithBundlePath:(const char *)bundlePath;
+- (instancetype)initWithUpdateBundlePath:(const char *)updateBundlePath relaunchBundlePath:(const char *)relaunchBundlePath;
 
 @end
 

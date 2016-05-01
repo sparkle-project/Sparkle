@@ -11,7 +11,7 @@
 
 @interface SUCommandLineUserDriver ()
 
-@property (nonatomic, readonly) NSBundle *bundle;
+@property (nonatomic, readonly) NSBundle *relaunchBundle;
 @property (nonatomic, readonly) SUUserDriverCoreComponent *coreComponent;
 @property (nonatomic) NSUInteger bytesDownloaded;
 @property (nonatomic) NSUInteger bytesToDownload;
@@ -20,16 +20,16 @@
 
 @implementation SUCommandLineUserDriver
 
-@synthesize bundle = _bundle;
+@synthesize relaunchBundle = _relaunchBundle;
 @synthesize coreComponent = _coreComponent;
 @synthesize bytesDownloaded = _bytesDownloaded;
 @synthesize bytesToDownload = _bytesToDownload;
 
-- (instancetype)initWithBundle:(NSBundle *)bundle
+- (instancetype)initWithRelaunchBundle:(NSBundle *)relaunchBundle
 {
     self = [super init];
     if (self != nil) {
-        _bundle = bundle;
+        _relaunchBundle = relaunchBundle;
         _coreComponent = [[SUUserDriverCoreComponent alloc] initWithDelegate:nil];
     }
     return self;
@@ -201,11 +201,11 @@
 
 - (NSRunningApplication *)targetRunningApplication
 {
-    NSString *bundleIdentifier = self.bundle.bundleIdentifier;
+    NSString *bundleIdentifier = self.relaunchBundle.bundleIdentifier;
     if (bundleIdentifier != nil) {
         NSArray<NSRunningApplication *> *runningApplications = [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleIdentifier];
         // Make sure we *don't* use NSURLs for equality comparison; turns out to not work that great
-        NSString *bundlePath = self.bundle.bundleURL.path;
+        NSString *bundlePath = self.relaunchBundle.bundleURL.path;
         if (bundlePath != nil) {
             for (NSRunningApplication *runningApplication in runningApplications) {
                 NSString *candidatePath = runningApplication.bundleURL.path;

@@ -13,29 +13,43 @@
 @interface AppDelegate () <SUUpdaterDelegate>
 
 @property (nonatomic, readonly) SUUpdater *updater;
+@property (nonatomic, readonly) NSString *relaunchBundlePath;
 
 @end
 
 @implementation AppDelegate
 
 @synthesize updater = _updater;
+@synthesize relaunchBundlePath = _relaunchBundlePath;
 
-- (instancetype)initWithBundlePath:(const char *)bundlePath
+- (instancetype)initWithUpdateBundlePath:(const char *)updateBundlePathString relaunchBundlePath:(const char *)relaunchBundlePathString
 {
     self = [super init];
     if (self != nil) {
-        NSString *bundlePathString = [[NSString alloc] initWithUTF8String:bundlePath];
-        if (bundlePathString == nil) {
+        NSString *updateBundlePath = [[NSString alloc] initWithUTF8String:updateBundlePathString];
+        if (updateBundlePath == nil) {
             return nil;
         }
         
-        NSBundle *bundle = [NSBundle bundleWithPath:bundlePathString];
-        if (bundle == nil) {
+        NSString *relaunchBundlePath = [[NSString alloc] initWithUTF8String:relaunchBundlePathString];
+        if (relaunchBundlePath == nil) {
             return nil;
         }
         
-        id <SUUserDriver> userDriver = [[SUCommandLineUserDriver alloc] initWithBundle:bundle];
-        _updater = [[SUUpdater alloc] initWithHostBundle:bundle userDriver:userDriver delegate:self];
+        NSBundle *updateBundle = [NSBundle bundleWithPath:updateBundlePath];
+        if (updateBundle == nil) {
+            return nil;
+        }
+        
+        NSBundle *relaunchBundle = [NSBundle bundleWithPath:relaunchBundlePath];
+        if (relaunchBundle == nil) {
+            return nil;
+        }
+        
+        _relaunchBundlePath = relaunchBundlePath;
+        
+        id <SUUserDriver> userDriver = [[SUCommandLineUserDriver alloc] initWithRelaunchBundle:relaunchBundle];
+        _updater = [[SUUpdater alloc] initWithHostBundle:updateBundle userDriver:userDriver delegate:self];
     }
     return self;
 }
@@ -43,6 +57,11 @@
 - (BOOL)updaterShouldInheritInstallPrivileges:(SUUpdater *)__unused updater
 {
     return YES;
+}
+
+- (NSString *)pathToRelaunchForUpdater:(SUUpdater *)__unused updater
+{
+    return self.relaunchBundlePath;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)__unused aNotification

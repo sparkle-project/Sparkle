@@ -341,12 +341,21 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                     SULog(@"Error: Failed to match host bundle identifiers %@ and %@", self.hostBundleIdentifier, bundleIdentifier);
                     [self cleanupAndExitWithStatus:EXIT_FAILURE];
                 } else {
-                    self.host = host;
-                    self.installationData = installationData;
-                    
-                    self.terminationListener = [[TerminationListener alloc] initWithBundle:hostBundle];
-                    
-                    [self extractAndInstallUpdate];
+                    NSBundle *relaunchBundle = [NSBundle bundleWithPath:nonNullInstallationData.relaunchPath];
+                    if (relaunchBundle == nil) {
+                        SULog(@"Error: Failed to locate relaunch bundle path %@", nonNullInstallationData.relaunchPath);
+                        [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                    } else {
+                        self.host = host;
+                        self.installationData = installationData;
+                        
+                        // We use the relaunch path for the bundle to listen for termination instead of the host path
+                        // For a plug-in this makes a big difference; we want to wait until the app hosting the plug-in terminates
+                        // Otherwise for an app, the relaunch path and host path should be identical
+                        self.terminationListener = [[TerminationListener alloc] initWithBundle:relaunchBundle];
+                        
+                        [self extractAndInstallUpdate];
+                    }
                 }
             }
         });
