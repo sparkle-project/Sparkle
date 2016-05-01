@@ -314,11 +314,13 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 {
     [self.userDriver invalidateUpdateCheckTimer];
     
-    if (![self automaticallyChecksForUpdates]) {
-        [self.userDriver idleOnUpdateChecks:YES];
+    BOOL automaticallyCheckForUpdates = [self automaticallyChecksForUpdates];
+    
+    [self.userDriver showCanCheckForUpdates:!automaticallyCheckForUpdates];
+    [self.userDriver idleOnUpdateChecks:!automaticallyCheckForUpdates];
+    
+    if (!automaticallyCheckForUpdates) {
         return;
-    } else {
-        [self.userDriver idleOnUpdateChecks:NO];
     }
     
     if (firingImmediately) {
