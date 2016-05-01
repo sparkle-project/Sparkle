@@ -148,10 +148,13 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)item;
 
 /*!
+ \deprecated Use -updater:shouldPostponeRelaunchForUpdate:untilInvokingBlock: instead
  Returns whether the relaunch should be delayed in order to perform other tasks.
  
  This is not called if the user didn't relaunch on the previous update,
  in that case it will immediately restart.
+ 
+ This may also not be called if the application is not going to relaunch after it terminates.
  
  \param updater The SUUpdater instance.
  \param item The appcast item corresponding to the update that is proposed to be installed.
@@ -159,7 +162,23 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  
  \return \c YES to delay the relaunch until \p invocation is invoked.
  */
-- (BOOL)updater:(SUUpdater *)updater shouldPostponeRelaunchForUpdate:(SUAppcastItem *)item untilInvoking:(NSInvocation *)invocation;
+- (BOOL)updater:(SUUpdater *)updater shouldPostponeRelaunchForUpdate:(SUAppcastItem *)item untilInvoking:(NSInvocation *)invocation __deprecated;
+
+/*!
+ Returns whether the relaunch should be delayed in order to perform other tasks.
+ 
+ This is not called if the user didn't relaunch on the previous update,
+ in that case it will immediately restart.
+ 
+ This may also not be called if the application is not going to relaunch after it terminates.
+ 
+ \param updater The SUUpdater instance.
+ \param item The appcast item corresponding to the update that is proposed to be installed.
+ \param installHandler The install handler that must be completed before continuing with the relaunch.
+ 
+ \return \c YES to delay the relaunch until \p installHandler is invoked.
+ */
+- (BOOL)updater:(SUUpdater *)updater shouldPostponeRelaunchForUpdate:(SUAppcastItem *)item untilInvokingBlock:(void (^)(void))installHandler;
 
 /*!
  Returns whether the application should be relaunched at all.

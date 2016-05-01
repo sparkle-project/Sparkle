@@ -529,6 +529,12 @@
     return (!self.updaterDelegate || ![self.updaterDelegate respondsToSelector:@selector(updaterShouldRelaunchApplication:)] || [self.updaterDelegate updaterShouldRelaunchApplication:self.updater]);
 }
 
+// Only implemented due to backwards compability reasons; see -installWithToolAndRelaunch:displayingUserInterface: below
+- (void)installWithToolAndRelaunch:(BOOL)relaunch
+{
+    [self installWithToolAndRelaunch:relaunch displayingUserInterface:relaunch];
+}
+
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
 {
     assert(self.updateItem);
@@ -540,16 +546,29 @@
     }
     
     // Give the host app an opportunity to postpone the install and relaunch.
-    if (!self.postponedOnce && [self.updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
+    if (!self.postponedOnce)
     {
-        //        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installWithToolAndRelaunch:)]];
-        //        [invocation setSelector:@selector(installWithToolAndRelaunch:)];
-        //        [invocation setArgument:&relaunch atIndex:2];
-        //        [invocation setTarget:self];
-        //        self.postponedOnce = YES;
-        //        if ([self.updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:self.updateItem untilInvoking:invocation]) {
-        //            return;
-        //        }
+        if ([self.updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvokingBlock:)]) {
+            self.postponedOnce = YES;
+            __weak SUInstallerDriver *weakSelf = self;
+            if ([self.updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:self.updateItem untilInvokingBlock:^{
+                [weakSelf installWithToolAndRelaunch:relaunch displayingUserInterface:showUI];
+            }]) {
+                return;
+            }
+        } else if ([self.updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)]) {
+            NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installWithToolAndRelaunch:)]];
+            [invocation setSelector:@selector(installWithToolAndRelaunch:)];
+            [invocation setArgument:&relaunch atIndex:2];
+            [invocation setTarget:self];
+            self.postponedOnce = YES;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+            if ([self.updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:self.updateItem untilInvoking:invocation]) {
+#pragma clang diagnostic pop
+                return;
+            }
+        }
     }
     
     // Set up local and remote ports to the installer if they are not set up already
