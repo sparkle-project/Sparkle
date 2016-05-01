@@ -32,7 +32,7 @@ SU_EXPORT @interface SUUserDriverCoreComponent : NSObject
 - (void)invalidateUpdateCheckTimer;
 
 - (void)registerInstallUpdateHandler:(void (^)(SUInstallUpdateStatus))installUpdateHandler;
-- (void)installAndShouldRestart:(BOOL)shouldRestart;
+- (void)installUpdateWithChoice:(SUInstallUpdateStatus)choice;
 
 - (void)registerUpdateCheckStatusHandler:(void (^)(SUUserInitiatedCheckStatus))updateCheckStatusCompletion;
 - (void)cancelUpdateCheckStatus;

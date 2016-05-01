@@ -176,7 +176,7 @@
 
 - (void)installAndRestart:(id)__unused sender
 {
-    [self.coreComponent installAndShouldRestart:YES];
+    [self.coreComponent installUpdateWithChoice:SUInstallAndRelaunchUpdateNow];
 }
 
 #pragma mark Check for Updates

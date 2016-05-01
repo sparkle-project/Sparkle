@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SUCommandLineUserDriver : NSObject <SUUserDriver>
 
-- (instancetype)initWithRelaunchBundle:(NSBundle *)relaunchBundle;
+- (instancetype)initWithApplicationBundle:(NSBundle *)applicationBundle deferInstallation:(BOOL)deferInstallation;
 
 @end
 

@@ -11,7 +11,8 @@
 
 @interface SUCommandLineUserDriver ()
 
-@property (nonatomic, readonly) NSBundle *relaunchBundle;
+@property (nonatomic, readonly) NSBundle *applicationBundle;
+@property (nonatomic, readonly) BOOL deferInstallation;
 @property (nonatomic, readonly) SUUserDriverCoreComponent *coreComponent;
 @property (nonatomic) NSUInteger bytesDownloaded;
 @property (nonatomic) NSUInteger bytesToDownload;
@@ -20,16 +21,18 @@
 
 @implementation SUCommandLineUserDriver
 
-@synthesize relaunchBundle = _relaunchBundle;
+@synthesize applicationBundle = _applicationBundle;
+@synthesize deferInstallation = _deferInstallation;
 @synthesize coreComponent = _coreComponent;
 @synthesize bytesDownloaded = _bytesDownloaded;
 @synthesize bytesToDownload = _bytesToDownload;
 
-- (instancetype)initWithRelaunchBundle:(NSBundle *)relaunchBundle
+- (instancetype)initWithApplicationBundle:(NSBundle *)applicationBundle deferInstallation:(BOOL)deferInstallation
 {
     self = [super init];
     if (self != nil) {
-        _relaunchBundle = relaunchBundle;
+        _applicationBundle = applicationBundle;
+        _deferInstallation = deferInstallation;
         _coreComponent = [[SUUserDriverCoreComponent alloc] initWithDelegate:nil];
     }
     return self;
@@ -158,7 +161,15 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent registerInstallUpdateHandler:installUpdateHandler];
-        [self.coreComponent installAndShouldRestart:[self targetRunningApplication] != nil];
+        
+        if (self.deferInstallation) {
+            printf("Deferring Installation.\n");
+            [self.coreComponent installUpdateWithChoice:SUDismissUpdateInstallation];
+        } else if ([self targetRunningApplication] != nil) {
+            [self.coreComponent installUpdateWithChoice:SUInstallAndRelaunchUpdateNow];
+        } else {
+            [self.coreComponent installUpdateWithChoice:SUInstallUpdateNow];
+        }
     });
 }
 
@@ -201,11 +212,11 @@
 
 - (NSRunningApplication *)targetRunningApplication
 {
-    NSString *bundleIdentifier = self.relaunchBundle.bundleIdentifier;
+    NSString *bundleIdentifier = self.applicationBundle.bundleIdentifier;
     if (bundleIdentifier != nil) {
         NSArray<NSRunningApplication *> *runningApplications = [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleIdentifier];
         // Make sure we *don't* use NSURLs for equality comparison; turns out to not work that great
-        NSString *bundlePath = self.relaunchBundle.bundleURL.path;
+        NSString *bundlePath = self.applicationBundle.bundleURL.path;
         if (bundlePath != nil) {
             for (NSRunningApplication *runningApplication in runningApplications) {
                 NSString *candidatePath = runningApplication.bundleURL.path;

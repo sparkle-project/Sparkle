@@ -195,7 +195,7 @@
         
         __weak SUPopUpTitlebarUserDriver *weakSelf = self;
         [self addUpdateButtonWithTitle:@"Install & Relaunch" action:^(NSButton *__unused button) {
-            [weakSelf.coreComponent installAndShouldRestart:YES];
+            [weakSelf.coreComponent installUpdateWithChoice:SUInstallAndRelaunchUpdateNow];
         }];
     });
 }

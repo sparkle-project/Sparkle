@@ -8,19 +8,72 @@
 
 #import <Foundation/Foundation.h>
 #import "SUCommandLineDriver.h"
+#include <getopt.h>
 
-int main(int argc, const char *argv[])
+#define APPLICATION_FLAG "application"
+#define DEFER_FLAG "defer"
+
+static void printUsage(char **argv)
+{
+    fprintf(stderr, "Usage: %s <update-bundle-path> [--%s <path-to-application>] [--%s]\n", argv[0], APPLICATION_FLAG, DEFER_FLAG);
+}
+
+int main(int argc, char **argv)
 {
     @autoreleasepool
     {
-        if (argc != 3) {
-            printf("Usage: %s <update-bundle-path> <relaunch-app-path>\n", argv[0]);
+        struct option longOptions[] = {
+            {APPLICATION_FLAG, required_argument, NULL, 0},
+            {DEFER_FLAG, no_argument, NULL, 0},
+            {0, 0, 0, 0}
+        };
+        
+        NSString *applicationPath = nil;
+        BOOL deferInstall = NO;
+        
+        while (YES) {
+            int optionIndex = 0;
+            int choice = getopt_long(argc, argv, "", longOptions, &optionIndex);
+            if (choice == -1) {
+                break;
+            }
+            switch (choice) {
+                case 0:
+                    if (strcmp(APPLICATION_FLAG, longOptions[optionIndex].name) == 0) {
+                        assert(optarg != NULL);
+                        
+                        applicationPath = [[NSString alloc] initWithUTF8String:optarg];
+                        if (applicationPath == nil) {
+                            printUsage(argv);
+                            return EXIT_FAILURE;
+                        }
+                    } else if (strcmp(DEFER_FLAG, longOptions[optionIndex].name) == 0) {
+                        deferInstall = YES;
+                    }
+                case ':':
+                    break;
+                case '?':
+                    printUsage(argv);
+                    return EXIT_FAILURE;
+                default:
+                    abort();
+            }
+        }
+        
+        if (optind >= argc) {
+            printUsage(argv);
             return EXIT_FAILURE;
         }
         
-        SUCommandLineDriver *driver = [[SUCommandLineDriver alloc] initWithUpdateBundlePath:argv[1] relaunchBundlePath:argv[2]];
+        NSString *updatePath = [[NSString alloc] initWithUTF8String:argv[optind]];
+        if (updatePath == nil) {
+            printUsage(argv);
+            return EXIT_FAILURE;
+        }
+        
+        SUCommandLineDriver *driver = [[SUCommandLineDriver alloc] initWithUpdateBundlePath:updatePath applicationBundlePath:applicationPath deferInstallation:deferInstall];
         if (driver == nil) {
-            printf("Error: Failed to initialize sparkle. Is the bundle you specified valid?\n");
+            printUsage(argv);
             return EXIT_FAILURE;
         }
         

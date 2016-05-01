@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SUCommandLineDriver : NSObject
 
-- (instancetype)initWithUpdateBundlePath:(const char *)updateBundlePath relaunchBundlePath:(const char *)relaunchBundlePath;
+- (nullable instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath deferInstallation:(BOOL)deferInstallation;
 
 - (void)run;
 

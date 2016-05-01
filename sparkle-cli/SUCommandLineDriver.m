@@ -13,42 +13,37 @@
 @interface SUCommandLineDriver () <SUUpdaterDelegate>
 
 @property (nonatomic, readonly) SUUpdater *updater;
-@property (nonatomic, readonly) NSString *relaunchBundlePath;
+@property (nonatomic, readonly) NSString *applicationBundlePath;
 
 @end
 
 @implementation SUCommandLineDriver
 
 @synthesize updater = _updater;
-@synthesize relaunchBundlePath = _relaunchBundlePath;
+@synthesize applicationBundlePath = _applicationBundlePath;
 
-- (instancetype)initWithUpdateBundlePath:(const char *)updateBundlePathString relaunchBundlePath:(const char *)relaunchBundlePathString
+- (instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath deferInstallation:(BOOL)deferInstallation
 {
     self = [super init];
     if (self != nil) {
-        NSString *updateBundlePath = [[NSString alloc] initWithUTF8String:updateBundlePathString];
-        if (updateBundlePath == nil) {
-            return nil;
-        }
-        
-        NSString *relaunchBundlePath = [[NSString alloc] initWithUTF8String:relaunchBundlePathString];
-        if (relaunchBundlePath == nil) {
-            return nil;
-        }
-        
         NSBundle *updateBundle = [NSBundle bundleWithPath:updateBundlePath];
         if (updateBundle == nil) {
             return nil;
         }
         
-        NSBundle *relaunchBundle = [NSBundle bundleWithPath:relaunchBundlePath];
-        if (relaunchBundle == nil) {
-            return nil;
+        NSBundle *applicationBundle = nil;
+        if (applicationBundlePath == nil) {
+            applicationBundle = updateBundle;
+        } else {
+            applicationBundle = [NSBundle bundleWithPath:(NSString * _Nonnull)applicationBundlePath];
+            if (applicationBundle == nil) {
+                return nil;
+            }
         }
         
-        _relaunchBundlePath = relaunchBundlePath;
+        _applicationBundlePath = applicationBundle.bundlePath;
         
-        id <SUUserDriver> userDriver = [[SUCommandLineUserDriver alloc] initWithRelaunchBundle:relaunchBundle];
+        id <SUUserDriver> userDriver = [[SUCommandLineUserDriver alloc] initWithApplicationBundle:applicationBundle deferInstallation:deferInstallation];
         _updater = [[SUUpdater alloc] initWithHostBundle:updateBundle userDriver:userDriver delegate:self];
     }
     return self;
@@ -61,7 +56,7 @@
 
 - (NSString *)pathToRelaunchForUpdater:(SUUpdater *)__unused updater
 {
-    return self.relaunchBundlePath;
+    return self.applicationBundlePath;
 }
 
 - (void)run
