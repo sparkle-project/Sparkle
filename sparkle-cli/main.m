@@ -83,6 +83,7 @@ int main(int argc, char **argv)
         
         SUCommandLineDriver *driver = [[SUCommandLineDriver alloc] initWithUpdateBundlePath:updatePath applicationBundlePath:applicationPath deferInstallation:deferInstall verbose:verbose];
         if (driver == nil) {
+            fprintf(stderr, "Error: Failed to initialize updater. Are the bundle paths provided valid?\n");
             printUsage(argv);
             return EXIT_FAILURE;
         }
