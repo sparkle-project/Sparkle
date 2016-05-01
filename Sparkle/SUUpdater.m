@@ -10,7 +10,7 @@
 #import "SUUpdaterDelegate.h"
 #import "SUUpdaterSettings.h"
 #import "SUHost.h"
-#import "SUUpdatePermissionPromptResult.h"
+#import "SUUpdatePermission.h"
 #import "SUUpdateDriver.h"
 #import "SUConstants.h"
 #import "SULog.h"
@@ -252,7 +252,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
         
         __weak SUUpdater *weakSelf = self;
-        [self.userDriver requestUpdatePermissionWithSystemProfile:profileInfo reply:^(SUUpdatePermissionPromptResult *result) {
+        [self.userDriver requestUpdatePermissionWithSystemProfile:profileInfo reply:^(SUUpdatePermission *result) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 SUUpdater *strongSelf = weakSelf;
                 if (strongSelf != nil) {
@@ -275,9 +275,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
 }
 
-- (void)updatePermissionPromptFinishedWithResult:(SUUpdatePermissionPromptResult *)result
+- (void)updatePermissionPromptFinishedWithResult:(SUUpdatePermission *)result
 {
-    [self.host setBool:result.shouldSendProfile forUserDefaultsKey:SUSendProfileInfoKey];
+    [self.host setBool:result.sendProfile forUserDefaultsKey:SUSendProfileInfoKey];
     [self setAutomaticallyChecksForUpdates:(result.choice == SUAutomaticallyCheck)];
 }
 

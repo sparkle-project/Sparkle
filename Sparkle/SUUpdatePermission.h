@@ -1,5 +1,5 @@
 //
-//  SUUpdatePermissionPromptResult.h
+//  SUUpdatePermission.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 2/8/16.
@@ -14,11 +14,11 @@ typedef NS_ENUM(NSInteger, SUCheckUpdatesChoice) {
     SUDoNotAutomaticallyCheck
 };
 
-SU_EXPORT @interface SUUpdatePermissionPromptResult : NSObject<NSSecureCoding>
+SU_EXPORT @interface SUUpdatePermission : NSObject<NSSecureCoding>
 
-+ (instancetype)updatePermissionPromptResultWithChoice:(SUCheckUpdatesChoice)choice shouldSendProfile:(BOOL)shouldSendProfile;
++ (instancetype)updatePermissionWithChoice:(SUCheckUpdatesChoice)choice sendProfile:(BOOL)sendProfile;
 
 @property (nonatomic, readonly) SUCheckUpdatesChoice choice;
-@property (nonatomic, readonly) BOOL shouldSendProfile;
+@property (nonatomic, readonly) BOOL sendProfile;
 
 @end

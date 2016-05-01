@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SUUpdatePermissionPromptResult, SUAppcastItem;
+@class SUUpdatePermission, SUAppcastItem;
 
 /*!
  The API in Sparkle for controlling the user interaction.
@@ -85,7 +85,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * This can be called from any thread
  */
-- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply;
+- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermission *))reply;
 
 /*!
  * Show the user initating an update check

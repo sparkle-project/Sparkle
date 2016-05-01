@@ -102,7 +102,7 @@
 
 #pragma mark Update Permission
 
-- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply
+- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)systemProfile reply:(void (^)(SUUpdatePermission *))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         // This shows a modal alert dialog which unlike other alerts cannot be closed until the user makes a decision

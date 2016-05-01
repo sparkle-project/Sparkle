@@ -150,11 +150,11 @@
 
 #pragma mark Update Permission
 
-- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply
+- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SUUpdatePermission *))reply
 {
     // Just make a decision..
     dispatch_async(dispatch_get_main_queue(), ^{
-        reply([SUUpdatePermissionPromptResult updatePermissionPromptResultWithChoice:SUAutomaticallyCheck shouldSendProfile:NO]);
+        reply([SUUpdatePermission updatePermissionWithChoice:SUAutomaticallyCheck sendProfile:NO]);
     });
 }
 

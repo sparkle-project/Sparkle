@@ -22,7 +22,7 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SUVersionDisplayProtocol.h"
 #import "SUErrors.h"
-#import "SUUpdatePermissionPromptResult.h"
+#import "SUUpdatePermission.h"
 #import "SUUserDriver.h"
 #import "SUStandardUserDriver.h"
 #import "SUStandardUserDriverDelegate.h"

@@ -14,7 +14,7 @@
 @interface SUCommandLineUserDriver ()
 
 @property (nonatomic, readonly) NSBundle *applicationBundle;
-@property (nonatomic, nullable, readonly) SUUpdatePermissionPromptResult *updatePermission;
+@property (nonatomic, nullable, readonly) SUUpdatePermission *updatePermission;
 @property (nonatomic, readonly) BOOL deferInstallation;
 @property (nonatomic, readonly) BOOL verbose;
 @property (nonatomic, readonly) SUUserDriverCoreComponent *coreComponent;
@@ -33,7 +33,7 @@
 @synthesize bytesDownloaded = _bytesDownloaded;
 @synthesize bytesToDownload = _bytesToDownload;
 
-- (instancetype)initWithApplicationBundle:(NSBundle *)applicationBundle updatePermission:(nullable SUUpdatePermissionPromptResult *)updatePermission deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose
+- (instancetype)initWithApplicationBundle:(NSBundle *)applicationBundle updatePermission:(nullable SUUpdatePermission *)updatePermission deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose
 {
     self = [super init];
     if (self != nil) {
@@ -86,7 +86,7 @@
     });
 }
 
-- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply
+- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SUUpdatePermission *))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.updatePermission == nil) {
@@ -95,7 +95,7 @@
             exit(EXIT_FAILURE);
         } else {
             if (self.verbose) {
-                fprintf(stderr, "Granting permission for automatic update checks with sending system profile %s...\n", self.updatePermission.shouldSendProfile ? "enabled" : "disabled");
+                fprintf(stderr, "Granting permission for automatic update checks with sending system profile %s...\n", self.updatePermission.sendProfile ? "enabled" : "disabled");
             }
             reply(self.updatePermission);
         }

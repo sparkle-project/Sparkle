@@ -22,7 +22,7 @@
 @synthesize updater = _updater;
 @synthesize applicationBundlePath = _applicationBundlePath;
 
-- (instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath updatePermission:(nullable SUUpdatePermissionPromptResult *)updatePermission deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose
+- (instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath updatePermission:(nullable SUUpdatePermission *)updatePermission deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose
 {
     self = [super init];
     if (self != nil) {

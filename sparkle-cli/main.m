@@ -92,9 +92,9 @@ int main(int argc, char **argv)
             return EXIT_FAILURE;
         }
         
-        SUUpdatePermissionPromptResult *updatePermission = nil;
+        SUUpdatePermission *updatePermission = nil;
         if (grantAutomaticChecking) {
-            updatePermission = [SUUpdatePermissionPromptResult  updatePermissionPromptResultWithChoice:SUAutomaticallyCheck shouldSendProfile:sendProfile];
+            updatePermission = [SUUpdatePermission updatePermissionWithChoice:SUAutomaticallyCheck sendProfile:sendProfile];
         }
         
         SUCommandLineDriver *driver = [[SUCommandLineDriver alloc] initWithUpdateBundlePath:updatePath applicationBundlePath:applicationPath updatePermission:updatePermission deferInstallation:deferInstall verbose:verbose];
