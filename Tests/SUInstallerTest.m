@@ -68,7 +68,7 @@
     }
     
     NSError *secondStageError = nil;
-    if (![installer performSecondStageAllowingUI:YES error:&secondStageError]) {
+    if (![installer performSecondStageAllowingAuthorization:YES allowingUI:YES error:&secondStageError]) {
         XCTFail(@"Second Stage failed with error: %@", secondStageError);
         return;
     }
