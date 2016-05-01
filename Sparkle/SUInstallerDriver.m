@@ -210,6 +210,11 @@
     }
 }
 
+- (void)resumeUpdateWithUpdateItem:(SUAppcastItem *)updateItem
+{
+    self.updateItem = updateItem;
+}
+
 - (void)sendInstallationData
 {
     NSString *pathToRelaunch = [self.host bundlePath];
@@ -526,8 +531,7 @@
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
 {
-#warning this assertion no longer holds trues due to resumability - matters for commented invocation code below
-    //assert(self.updateItem);
+    assert(self.updateItem);
     
     if (![self mayUpdateAndRestart])
     {

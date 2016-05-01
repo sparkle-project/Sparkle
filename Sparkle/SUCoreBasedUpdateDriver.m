@@ -27,6 +27,7 @@
 @property (nonatomic) SUAppcastItem *updateItem;
 
 @property (nonatomic, readonly) SUHost *host;
+@property (nonatomic) BOOL resumingUpdate;
 @property (nonatomic, readonly, weak) id updater; // if we didn't have legacy support, I'd remove this..
 @property (nullable, nonatomic, readonly, weak) id <SUUpdaterDelegate>updaterDelegate;
 @property (nonatomic) NSString *userAgent;
@@ -41,6 +42,7 @@
 @synthesize delegate = _delegate;
 @synthesize updateItem = _updateItem;
 @synthesize host = _host;
+@synthesize resumingUpdate = _resumingUpdate;
 @synthesize updater = _updater;
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize userAgent = _userAgent;
@@ -97,6 +99,7 @@
 
 - (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
 {
+    self.resumingUpdate = YES;
     [self.basicDriver resumeUpdateWithCompletion:completionBlock];
 }
 
@@ -110,6 +113,10 @@
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
 {
     self.updateItem = updateItem;
+    
+    if (self.resumingUpdate) {
+        [self.installerDriver resumeUpdateWithUpdateItem:updateItem];
+    }
     
     [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem];
 }
