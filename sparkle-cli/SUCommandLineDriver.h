@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose;
 
-- (void)run;
+- (void)runAndCheckForUpdatesNow:(BOOL)checkForUpdatesNow;
 
 @end
 

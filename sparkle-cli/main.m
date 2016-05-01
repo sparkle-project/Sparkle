@@ -13,10 +13,11 @@
 #define APPLICATION_FLAG "application"
 #define DEFER_FLAG "defer"
 #define VERBOSE_FLAG "verbose"
+#define CHECK_NOW_FLAG "checknow"
 
 static void printUsage(char **argv)
 {
-    fprintf(stderr, "Usage: %s <update-bundle-path> [--%s <path-to-application>] [--%s] [--%s]\n", argv[0], APPLICATION_FLAG, DEFER_FLAG, VERBOSE_FLAG);
+    fprintf(stderr, "Usage: %s <update-bundle-path> [--%s <path-to-application>] [--%s] [--%s] [--%s]\n", argv[0], APPLICATION_FLAG, CHECK_NOW_FLAG, DEFER_FLAG, VERBOSE_FLAG);
 }
 
 int main(int argc, char **argv)
@@ -27,12 +28,14 @@ int main(int argc, char **argv)
             {APPLICATION_FLAG, required_argument, NULL, 0},
             {DEFER_FLAG, no_argument, NULL, 0},
             {VERBOSE_FLAG, no_argument, NULL, 0},
+            {CHECK_NOW_FLAG, no_argument, NULL, 0},
             {0, 0, 0, 0}
         };
         
         NSString *applicationPath = nil;
         BOOL deferInstall = NO;
         BOOL verbose = NO;
+        BOOL checkForUpdatesNow = NO;
         
         while (YES) {
             int optionIndex = 0;
@@ -54,6 +57,8 @@ int main(int argc, char **argv)
                         deferInstall = YES;
                     } else if (strcmp(VERBOSE_FLAG, longOptions[optionIndex].name) == 0) {
                         verbose = YES;
+                    } else if (strcmp(CHECK_NOW_FLAG, longOptions[optionIndex].name) == 0) {
+                        checkForUpdatesNow = YES;
                     }
                 case ':':
                     break;
@@ -82,7 +87,7 @@ int main(int argc, char **argv)
             return EXIT_FAILURE;
         }
         
-        [driver run];
+        [driver runAndCheckForUpdatesNow:checkForUpdatesNow];
         [[NSRunLoop currentRunLoop] run];
     }
     

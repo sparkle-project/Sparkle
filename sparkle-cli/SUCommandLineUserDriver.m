@@ -9,6 +9,8 @@
 #import "SUCommandLineUserDriver.h"
 #import <AppKit/AppKit.h>
 
+#define SCHEDULED_UPDATE_TIMER_THRESHOLD 2.0 // seconds
+
 @interface SUCommandLineUserDriver ()
 
 @property (nonatomic, readonly) NSBundle *applicationBundle;
@@ -51,6 +53,11 @@
 - (void)idleOnUpdateChecks:(BOOL)shouldIdleOnUpdateChecks
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (shouldIdleOnUpdateChecks) {
+            fprintf(stderr, "Error: Automatic update checking has been disabled.\n");
+            exit(EXIT_FAILURE);
+        }
+        
         [self.coreComponent idleOnUpdateChecks:shouldIdleOnUpdateChecks];
     });
 }
@@ -58,7 +65,14 @@
 - (void)startUpdateCheckTimerWithNextTimeInterval:(NSTimeInterval)timeInterval reply:(void (^)(SUUpdateCheckTimerStatus))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.coreComponent startUpdateCheckTimerWithNextTimeInterval:timeInterval reply:reply];
+        if (timeInterval > SCHEDULED_UPDATE_TIMER_THRESHOLD) {
+            if (self.verbose) {
+                fprintf(stderr, "Too early to check for new updates. Next check is in %f seconds. Exiting.\n", timeInterval);
+            }
+            exit(EXIT_SUCCESS);
+        } else {
+            [self.coreComponent startUpdateCheckTimerWithNextTimeInterval:timeInterval reply:reply];
+        }
     });
 }
 
@@ -73,8 +87,8 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         // We really shouldn't get here. If we do, we would be in trouble. We don't want to make this decision on behalf of the user.
-        fprintf(stderr, "Asked about making update permission decision.. Aborting because this decision should not be made.\n");
-        abort();
+        fprintf(stderr, "Error: Asked about making update permission decision. Aborting because this decision should not be made.\n");
+        exit(EXIT_FAILURE);
     });
 }
 
@@ -215,7 +229,7 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.verbose) {
-            fprintf(stderr, "Exiting...\n");
+            fprintf(stderr, "Exiting.\n");
         }
         exit(EXIT_SUCCESS);
     });

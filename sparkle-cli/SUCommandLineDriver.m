@@ -59,10 +59,12 @@
     return self.applicationBundlePath;
 }
 
-- (void)run
+- (void)runAndCheckForUpdatesNow:(BOOL)checkForUpdatesNow
 {
-    // Kick off a scheduled update check once we start the updater later
-    [self.updater checkForUpdates];
+    if (checkForUpdatesNow) {
+        // When we start the updater, this scheduled check will start afterwards too
+        [self.updater checkForUpdates];
+    }
     
     NSError *updaterError = nil;
     if (![self.updater startUpdater:&updaterError]) {
