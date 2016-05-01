@@ -197,8 +197,8 @@
 - (void)abortUpdateWithError:(nullable NSError *)error
 {
     void (^abortUpdate)(void) = ^{
-        [self.coreDriver abortUpdateWithError:error];
         [self.userDriver dismissUpdateInstallation];
+        [self.coreDriver abortUpdateWithError:error];
     };
     
     if (error != nil) {
