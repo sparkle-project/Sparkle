@@ -43,6 +43,7 @@
 @property (nonatomic) BOOL postponedOnce;
 @property (nonatomic, weak, readonly) id updater;
 @property (nonatomic, weak, readonly) id<SUUpdaterDelegate> updaterDelegate;
+@property (nonatomic) BOOL willRelaunch;
 
 @property (nonatomic) SUAppcastItem *updateItem;
 @property (nonatomic, copy) NSString *downloadName;
@@ -63,6 +64,7 @@
 @synthesize postponedOnce = _postponedOnce;
 @synthesize updater = _updater;
 @synthesize updaterDelegate = _updaterDelegate;
+@synthesize willRelaunch = _willRelaunch;
 @synthesize updateItem = _updateItem;
 @synthesize downloadName = _downloadName;
 @synthesize temporaryDirectory = _temporaryDirectory;
@@ -351,7 +353,7 @@
         [self.remotePort invalidate];
         self.remotePort = nil;
         
-        [self.delegate installerWillFinishInstallation];
+        [self.delegate installerWillFinishInstallationAndRelaunch:self.willRelaunch];
         
         if (!hasTargetTerminated) {
             [self.delegate installerIsRequestingAppTermination];
@@ -566,6 +568,8 @@
         } else {
             // For resumability, we'll assume we are far enough for the installation to continue
             strongSelf.currentStage = SUInstallationFinishedStage1;
+            
+            strongSelf.willRelaunch = relaunch;
             
             uint8_t response[2] = {(uint8_t)relaunch, (uint8_t)showUI};
             NSData *responseData = [NSData dataWithBytes:response length:sizeof(response)];

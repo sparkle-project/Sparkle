@@ -213,16 +213,17 @@
     }
 }
 
-- (void)installerWillFinishInstallation
+- (void)installerWillFinishInstallationAndRelaunch:(BOOL)relaunch
 {
     if ([self.updaterDelegate respondsToSelector:@selector(updater:willInstallUpdate:)]) {
         [self.updaterDelegate updater:self.updater willInstallUpdate:self.updateItem];
     }
     
-#warning should only notify if we are really about to restart the target...
-    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
-    if ([self.updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)]) {
-        [self.updaterDelegate updaterWillRelaunchApplication:self.updater];
+    if (relaunch) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
+        if ([self.updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)]) {
+            [self.updaterDelegate updaterWillRelaunchApplication:self.updater];
+        }
     }
 }
 
