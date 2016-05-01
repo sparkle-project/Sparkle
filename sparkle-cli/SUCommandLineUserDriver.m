@@ -14,6 +14,7 @@
 @interface SUCommandLineUserDriver ()
 
 @property (nonatomic, readonly) NSBundle *applicationBundle;
+@property (nonatomic, nullable, readonly) SUUpdatePermissionPromptResult *updatePermission;
 @property (nonatomic, readonly) BOOL deferInstallation;
 @property (nonatomic, readonly) BOOL verbose;
 @property (nonatomic, readonly) SUUserDriverCoreComponent *coreComponent;
@@ -25,17 +26,19 @@
 @implementation SUCommandLineUserDriver
 
 @synthesize applicationBundle = _applicationBundle;
+@synthesize updatePermission = _updatePermission;
 @synthesize deferInstallation = _deferInstallation;
 @synthesize verbose = _verbose;
 @synthesize coreComponent = _coreComponent;
 @synthesize bytesDownloaded = _bytesDownloaded;
 @synthesize bytesToDownload = _bytesToDownload;
 
-- (instancetype)initWithApplicationBundle:(NSBundle *)applicationBundle deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose
+- (instancetype)initWithApplicationBundle:(NSBundle *)applicationBundle updatePermission:(nullable SUUpdatePermissionPromptResult *)updatePermission deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose
 {
     self = [super init];
     if (self != nil) {
         _applicationBundle = applicationBundle;
+        _updatePermission = updatePermission;
         _deferInstallation = deferInstallation;
         _verbose = verbose;
         _coreComponent = [[SUUserDriverCoreComponent alloc] initWithDelegate:nil];
@@ -83,12 +86,19 @@
     });
 }
 
-- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))__unused reply
+- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        // We really shouldn't get here. If we do, we would be in trouble. We don't want to make this decision on behalf of the user.
-        fprintf(stderr, "Error: Asked about making update permission decision. Aborting because this decision should not be made.\n");
-        exit(EXIT_FAILURE);
+        if (self.updatePermission == nil) {
+            // We don't want to make this decision on behalf of the user.
+            fprintf(stderr, "Error: Asked to grant update permission. Exiting.\n");
+            exit(EXIT_FAILURE);
+        } else {
+            if (self.verbose) {
+                fprintf(stderr, "Granting permission for automatic update checks with sending system profile %s...\n", self.updatePermission.shouldSendProfile ? "enabled" : "disabled");
+            }
+            reply(self.updatePermission);
+        }
     });
 }
 

@@ -7,17 +7,20 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <Sparkle/Sparkle.h>
 #import "SUCommandLineDriver.h"
 #include <getopt.h>
 
 #define APPLICATION_FLAG "application"
-#define DEFER_FLAG "defer"
+#define DEFER_FLAG "defer-install"
 #define VERBOSE_FLAG "verbose"
-#define CHECK_NOW_FLAG "checknow"
+#define CHECK_NOW_FLAG "check-immediately"
+#define GRANT_AUTOMATIC_CHECKING_FLAG "grant-automatic-checks"
+#define SEND_PROFILE_FLAG "send-profile"
 
 static void printUsage(char **argv)
 {
-    fprintf(stderr, "Usage: %s <update-bundle-path> [--%s <path-to-application>] [--%s] [--%s] [--%s]\n", argv[0], APPLICATION_FLAG, CHECK_NOW_FLAG, DEFER_FLAG, VERBOSE_FLAG);
+    fprintf(stderr, "Usage: %s <update-bundle-path> [--%s <path-to-application>] [--%s] [--%s] [--%s] [--%s] [--%s]\n", argv[0], APPLICATION_FLAG, CHECK_NOW_FLAG, GRANT_AUTOMATIC_CHECKING_FLAG, SEND_PROFILE_FLAG, DEFER_FLAG, VERBOSE_FLAG);
 }
 
 int main(int argc, char **argv)
@@ -29,6 +32,8 @@ int main(int argc, char **argv)
             {DEFER_FLAG, no_argument, NULL, 0},
             {VERBOSE_FLAG, no_argument, NULL, 0},
             {CHECK_NOW_FLAG, no_argument, NULL, 0},
+            {GRANT_AUTOMATIC_CHECKING_FLAG, no_argument, NULL, 0},
+            {SEND_PROFILE_FLAG, no_argument, NULL, 0},
             {0, 0, 0, 0}
         };
         
@@ -36,6 +41,8 @@ int main(int argc, char **argv)
         BOOL deferInstall = NO;
         BOOL verbose = NO;
         BOOL checkForUpdatesNow = NO;
+        BOOL grantAutomaticChecking = NO;
+        BOOL sendProfile = NO;
         
         while (YES) {
             int optionIndex = 0;
@@ -59,6 +66,10 @@ int main(int argc, char **argv)
                         verbose = YES;
                     } else if (strcmp(CHECK_NOW_FLAG, longOptions[optionIndex].name) == 0) {
                         checkForUpdatesNow = YES;
+                    } else if (strcmp(GRANT_AUTOMATIC_CHECKING_FLAG, longOptions[optionIndex].name) == 0) {
+                        grantAutomaticChecking = YES;
+                    } else if (strcmp(SEND_PROFILE_FLAG, longOptions[optionIndex].name) == 0) {
+                        sendProfile = YES;
                     }
                 case ':':
                     break;
@@ -81,7 +92,12 @@ int main(int argc, char **argv)
             return EXIT_FAILURE;
         }
         
-        SUCommandLineDriver *driver = [[SUCommandLineDriver alloc] initWithUpdateBundlePath:updatePath applicationBundlePath:applicationPath deferInstallation:deferInstall verbose:verbose];
+        SUUpdatePermissionPromptResult *updatePermission = nil;
+        if (grantAutomaticChecking) {
+            updatePermission = [SUUpdatePermissionPromptResult  updatePermissionPromptResultWithChoice:SUAutomaticallyCheck shouldSendProfile:sendProfile];
+        }
+        
+        SUCommandLineDriver *driver = [[SUCommandLineDriver alloc] initWithUpdateBundlePath:updatePath applicationBundlePath:applicationPath updatePermission:updatePermission deferInstallation:deferInstall verbose:verbose];
         if (driver == nil) {
             fprintf(stderr, "Error: Failed to initialize updater. Are the bundle paths provided valid?\n");
             printUsage(argv);
