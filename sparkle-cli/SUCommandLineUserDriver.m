@@ -54,7 +54,7 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (shouldIdleOnUpdateChecks) {
-            fprintf(stderr, "Error: Automatic update checking has been disabled.\n");
+            fprintf(stderr, "Error: Automatic update checking is disabled.\n");
             exit(EXIT_FAILURE);
         }
         
