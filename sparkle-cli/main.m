@@ -12,10 +12,11 @@
 
 #define APPLICATION_FLAG "application"
 #define DEFER_FLAG "defer"
+#define VERBOSE_FLAG "verbose"
 
 static void printUsage(char **argv)
 {
-    fprintf(stderr, "Usage: %s <update-bundle-path> [--%s <path-to-application>] [--%s]\n", argv[0], APPLICATION_FLAG, DEFER_FLAG);
+    fprintf(stderr, "Usage: %s <update-bundle-path> [--%s <path-to-application>] [--%s] [--%s]\n", argv[0], APPLICATION_FLAG, DEFER_FLAG, VERBOSE_FLAG);
 }
 
 int main(int argc, char **argv)
@@ -25,11 +26,13 @@ int main(int argc, char **argv)
         struct option longOptions[] = {
             {APPLICATION_FLAG, required_argument, NULL, 0},
             {DEFER_FLAG, no_argument, NULL, 0},
+            {VERBOSE_FLAG, no_argument, NULL, 0},
             {0, 0, 0, 0}
         };
         
         NSString *applicationPath = nil;
         BOOL deferInstall = NO;
+        BOOL verbose = NO;
         
         while (YES) {
             int optionIndex = 0;
@@ -49,6 +52,8 @@ int main(int argc, char **argv)
                         }
                     } else if (strcmp(DEFER_FLAG, longOptions[optionIndex].name) == 0) {
                         deferInstall = YES;
+                    } else if (strcmp(VERBOSE_FLAG, longOptions[optionIndex].name) == 0) {
+                        verbose = YES;
                     }
                 case ':':
                     break;
@@ -71,7 +76,7 @@ int main(int argc, char **argv)
             return EXIT_FAILURE;
         }
         
-        SUCommandLineDriver *driver = [[SUCommandLineDriver alloc] initWithUpdateBundlePath:updatePath applicationBundlePath:applicationPath deferInstallation:deferInstall];
+        SUCommandLineDriver *driver = [[SUCommandLineDriver alloc] initWithUpdateBundlePath:updatePath applicationBundlePath:applicationPath deferInstallation:deferInstall verbose:verbose];
         if (driver == nil) {
             printUsage(argv);
             return EXIT_FAILURE;

@@ -22,7 +22,7 @@
 @synthesize updater = _updater;
 @synthesize applicationBundlePath = _applicationBundlePath;
 
-- (instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath deferInstallation:(BOOL)deferInstallation
+- (instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose
 {
     self = [super init];
     if (self != nil) {
@@ -43,7 +43,7 @@
         
         _applicationBundlePath = applicationBundle.bundlePath;
         
-        id <SUUserDriver> userDriver = [[SUCommandLineUserDriver alloc] initWithApplicationBundle:applicationBundle deferInstallation:deferInstallation];
+        id <SUUserDriver> userDriver = [[SUCommandLineUserDriver alloc] initWithApplicationBundle:applicationBundle deferInstallation:deferInstallation verbose:verbose];
         _updater = [[SUUpdater alloc] initWithHostBundle:updateBundle userDriver:userDriver delegate:self];
     }
     return self;
@@ -66,7 +66,7 @@
     
     NSError *updaterError = nil;
     if (![self.updater startUpdater:&updaterError]) {
-        printf("Error: Failed to initialize updater with error (%ld): %s\n", updaterError.code, updaterError.localizedDescription.UTF8String);
+        fprintf(stderr, "Error: Failed to initialize updater with error (%ld): %s\n", updaterError.code, updaterError.localizedDescription.UTF8String);
         exit(EXIT_FAILURE);
     }
 }

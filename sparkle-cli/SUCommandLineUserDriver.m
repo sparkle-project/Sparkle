@@ -13,6 +13,7 @@
 
 @property (nonatomic, readonly) NSBundle *applicationBundle;
 @property (nonatomic, readonly) BOOL deferInstallation;
+@property (nonatomic, readonly) BOOL verbose;
 @property (nonatomic, readonly) SUUserDriverCoreComponent *coreComponent;
 @property (nonatomic) NSUInteger bytesDownloaded;
 @property (nonatomic) NSUInteger bytesToDownload;
@@ -23,16 +24,18 @@
 
 @synthesize applicationBundle = _applicationBundle;
 @synthesize deferInstallation = _deferInstallation;
+@synthesize verbose = _verbose;
 @synthesize coreComponent = _coreComponent;
 @synthesize bytesDownloaded = _bytesDownloaded;
 @synthesize bytesToDownload = _bytesToDownload;
 
-- (instancetype)initWithApplicationBundle:(NSBundle *)applicationBundle deferInstallation:(BOOL)deferInstallation
+- (instancetype)initWithApplicationBundle:(NSBundle *)applicationBundle deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose
 {
     self = [super init];
     if (self != nil) {
         _applicationBundle = applicationBundle;
         _deferInstallation = deferInstallation;
+        _verbose = verbose;
         _coreComponent = [[SUUserDriverCoreComponent alloc] initWithDelegate:nil];
     }
     return self;
@@ -69,8 +72,9 @@
 - (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SUUpdatePermissionPromptResult *))__unused reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        printf("Asked about making update permission decision.. Aborting because I do not want to make this decision.\n");
-        exit(EXIT_FAILURE);
+        // We really shouldn't get here. If we do, we would be in trouble. We don't want to make this decision on behalf of the user.
+        fprintf(stderr, "Asked about making update permission decision.. Aborting because this decision should not be made.\n");
+        abort();
     });
 }
 
@@ -78,7 +82,9 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent registerUpdateCheckStatusHandler:updateCheckStatusCompletion];
-        printf("Checking for Updates...\n");
+        if (self.verbose) {
+            fprintf(stderr, "Checking for Updates...\n");
+        }
     });
 }
 
@@ -92,7 +98,9 @@
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)__unused allowsAutomaticUpdates alreadyDownloaded:(BOOL)__unused alreadyDownloaded reply:(void (^)(SUUpdateAlertChoice))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        printf("Found new update! (%s)\n", appcastItem.displayVersionString.UTF8String);
+        if (self.verbose) {
+            fprintf(stderr, "Found new update! (%s)\n", appcastItem.displayVersionString.UTF8String);
+        }
         reply(SUInstallUpdateChoice);
     });
 }
@@ -100,7 +108,9 @@
 - (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))__unused acknowledgement
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        printf("No new update available!\n");
+        if (self.verbose) {
+            fprintf(stderr, "No new update available!\n");
+        }
         exit(EXIT_SUCCESS);
     });
 }
@@ -108,7 +118,7 @@
 - (void)showUpdaterError:(NSError *)error acknowledgement:(void (^)(void))__unused acknowledgement
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        printf("Error: Update check has failed: %s\n", error.description.UTF8String);
+        fprintf(stderr, "Error: Update check has failed: %s\n", error.description.UTF8String);
         exit(EXIT_FAILURE);
     });
 }
@@ -118,14 +128,18 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent registerDownloadStatusHandler:downloadUpdateStatusCompletion];
         
-        printf("Downloading Update...\n");
+        if (self.verbose) {
+            fprintf(stderr, "Downloading Update...\n");
+        }
     });
 }
 
 - (void)showDownloadDidReceiveResponse:(NSURLResponse *)response
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        printf("Downloading %llu bytes...\n", response.expectedContentLength);
+        if (self.verbose) {
+            fprintf(stderr, "Downloading %llu bytes...\n", response.expectedContentLength);
+        }
         self.bytesDownloaded = 0;
         self.bytesToDownload = (NSUInteger)response.expectedContentLength;
     });
@@ -135,8 +149,8 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         self.bytesDownloaded += length;
-        if (self.bytesToDownload > 0) {
-            printf("Downloaded %lu out of %lu bytes (%.0f%%)\n", (unsigned long)self.bytesDownloaded, (unsigned long)self.bytesToDownload, (self.bytesDownloaded * 100.0 / self.bytesToDownload));
+        if (self.bytesToDownload > 0 && self.verbose) {
+            fprintf(stderr, "Downloaded %lu out of %lu bytes (%.0f%%)\n", (unsigned long)self.bytesDownloaded, (unsigned long)self.bytesToDownload, (self.bytesDownloaded * 100.0 / self.bytesToDownload));
         }
     });
 }
@@ -146,14 +160,18 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent completeDownloadStatus];
         
-        printf("Extracting update...\n");
+        if (self.verbose) {
+            fprintf(stderr, "Extracting update...\n");
+        }
     });
 }
 
 - (void)showExtractionReceivedProgress:(double)progress
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        printf("Extracting Update (%.0f%%)\n", progress * 100);
+        if (self.verbose) {
+            fprintf(stderr, "Extracting Update (%.0f%%)\n", progress * 100);
+        }
     });
 }
 
@@ -163,7 +181,9 @@
         [self.coreComponent registerInstallUpdateHandler:installUpdateHandler];
         
         if (self.deferInstallation) {
-            printf("Deferring Installation.\n");
+            if (self.verbose) {
+                fprintf(stderr, "Deferring Installation.\n");
+            }
             [self.coreComponent installUpdateWithChoice:SUDismissUpdateInstallation];
         } else if ([self targetRunningApplication] != nil) {
             [self.coreComponent installUpdateWithChoice:SUInstallAndRelaunchUpdateNow];
@@ -176,21 +196,27 @@
 - (void)showInstallingUpdate
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        printf("Installing Update...\n");
+        if (self.verbose) {
+            fprintf(stderr, "Installing Update...\n");
+        }
     });
 }
 
 - (void)showUpdateInstallationDidFinish
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        printf("Installation Finished...\n");
+        if (self.verbose) {
+           fprintf(stderr, "Installation Finished.\n");
+        }
     });
 }
 
 - (void)dismissUpdateInstallation
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        printf("Exiting...\n");
+        if (self.verbose) {
+            fprintf(stderr, "Exiting...\n");
+        }
         exit(EXIT_SUCCESS);
     });
 }
@@ -202,7 +228,7 @@
         if (runningApplication != nil) {
             if (![runningApplication terminate]) {
                 if (![runningApplication forceTerminate]) {
-                    printf("Error: Failed to terminate running application. Please terminate it to update it.");
+                    fprintf(stderr, "Error: Failed to terminate running application. Please terminate it to update it.");
                     exit(EXIT_FAILURE);
                 }
             }
