@@ -152,11 +152,11 @@
                 errorToDisplay = errorToDisplay.userInfo[NSUnderlyingErrorKey];
             } while(--finiteRecursion && errorToDisplay);
         }
-    }
-    
-    // Notify host app that update has aborted
-    if ([self.updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
-        [self.updaterDelegate updater:self.updater didAbortWithError:error];
+        
+        // Notify host app that update has aborted
+        if ([self.updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
+            [self.updaterDelegate updater:self.updater didAbortWithError:error];
+        }
     }
     
     if (self.completionBlock != nil) {
