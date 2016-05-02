@@ -1604,18 +1604,10 @@
 				72D954A11CBB415C006F28BD /* SUCommandLineDriver.m */,
 				72D954B61CBB467F006F28BD /* SUCommandLineUserDriver.h */,
 				72D954B71CBB467F006F28BD /* SUCommandLineUserDriver.m */,
+				72D954A41CBB415C006F28BD /* main.m */,
 				72D954AB1CBB415C006F28BD /* Info.plist */,
-				72D954A31CBB415C006F28BD /* Supporting Files */,
 			);
 			path = "sparkle-cli";
-			sourceTree = "<group>";
-		};
-		72D954A31CBB415C006F28BD /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				72D954A41CBB415C006F28BD /* main.m */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		72E41A3F1CB20BA7003D47E0 /* RemoteMessagePort */ = {
