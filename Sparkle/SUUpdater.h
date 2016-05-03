@@ -14,6 +14,13 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SUVersionDisplayProtocol.h"
 
+typedef NS_ENUM(NSInteger, SUDUpdateAlertChoice) {
+  SUDInstallUpdateChoice,
+  SUDRemindMeLaterChoice,
+  SUDSkipThisVersionChoice,
+  SUDOpenInfoURLChoice
+};
+
 @class SUAppcastItem, SUAppcast;
 
 @protocol SUUpdaterDelegate;
@@ -146,6 +153,9 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 @protocol SUUpdaterDelegate <NSObject>
 @optional
 
+
+@property (nonatomic) BOOL suppressUI;
+
 /*!
     Returns whether to allow Sparkle to pop up.
 
@@ -214,6 +224,15 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
     \param item The appcast item corresponding to the update that is proposed to be installed.
  */
 - (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)item;
+
+/*!
+ Called when a valid update is found by the update driver and provides delegate ability to respond.
+ 
+ \param updater The SUUpdater instance.
+ \param item The appcast item corresponding to the update that is proposed to be installed.
+ \param responseBlock The block carrying the users response to update.
+ */
+- (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)item respondWithChoice:(void (^)(SUDUpdateAlertChoice))responseBlock;
 
 /*!
     Called when a valid update is not found.
