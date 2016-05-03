@@ -117,7 +117,7 @@
     switch (choice) {
         case SUInstallUpdateChoice:
         
-        if(![[self.updater delegate] suppressUI]) {
+        if(![[self.updater delegate] suppressSparkleUI]) {
           self.statusController = [[SUStatusController alloc] initWithHost:self.host];
           [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
           [self.statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];

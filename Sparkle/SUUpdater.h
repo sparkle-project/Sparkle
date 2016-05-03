@@ -154,7 +154,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 @optional
 
 
-@property (nonatomic) BOOL suppressUI;
+-(BOOL)suppressSparkleUI;
 
 /*!
     Returns whether to allow Sparkle to pop up.
