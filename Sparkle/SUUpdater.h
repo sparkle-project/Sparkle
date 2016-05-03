@@ -61,7 +61,7 @@ SU_EXPORT @interface SUUpdater : NSObject
 - (instancetype)initForBundle:(NSBundle *)bundle;
 
 
-@property (nonatomic) BOOL suppressUI;
+-(BOOL)suppressSparkleUI;
 
 /*!
  Suppress sparkle UI. This should prevent any Sparkle UI from popping up.
