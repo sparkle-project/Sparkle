@@ -18,6 +18,13 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SUVersionDisplayProtocol.h"
 
+typedef NS_ENUM(NSInteger, SUDUpdateAlertChoice) {
+  SUDInstallUpdateChoice,
+  SUDRemindMeLaterChoice,
+  SUDSkipThisVersionChoice,
+  SUDOpenInfoURLChoice
+};
+
 @class SUAppcastItem, SUAppcast;
 
 @protocol SUUpdaterDelegate;
@@ -52,6 +59,9 @@ SU_EXPORT @interface SUUpdater : NSObject
  If an updater has already been initialized for the provided bundle, that shared instance will be returned.
  */
 - (instancetype)initForBundle:(NSBundle *)bundle;
+
+
+@property (nonatomic) BOOL suppressUI;
 
 /*!
  Explicitly checks for updates and displays a progress dialog while doing so.
@@ -117,7 +127,23 @@ SU_EXPORT @interface SUUpdater : NSObject
 /*!
  Begins a "probing" check for updates which will not actually offer to
  update to that version.
+ 
+ Called when a valid update is found by the update driver and provides delegate ability to respond.
+ 
+ \param updater The SUUpdater instance.
+ \param item The appcast item corresponding to the update that is proposed to be installed.
+ \param responseBlock The block carrying the users response to update.
+ */
+- (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)item respondWithChoice:(void (^)(SUDUpdateAlertChoice))responseBlock;
 
+/*!
+    Called when a valid update is not found.
+
+    \param updater The SUUpdater instance.
+ */
+- (void)updaterDidNotFindUpdate:(SUUpdater *)updater;
+
+/*!
  However, the delegate methods
  SUUpdaterDelegate::updater:didFindValidUpdate: and
  SUUpdaterDelegate::updaterDidNotFindUpdate: will be called,
