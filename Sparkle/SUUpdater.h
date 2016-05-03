@@ -60,6 +60,9 @@ SU_EXPORT @interface SUUpdater : NSObject
  */
 - (instancetype)initForBundle:(NSBundle *)bundle;
 
+
+@property (nonatomic) BOOL suppressUI;
+
 /*!
  Suppress sparkle UI. This should prevent any Sparkle UI from popping up.
  Updates should be handled by the host.
@@ -118,6 +121,16 @@ SU_EXPORT @interface SUUpdater : NSObject
  Setting this property will persist in the host bundle's user defaults.
  */
 @property BOOL automaticallyDownloadsUpdates;
+
+/*!
+ Called when a valid update is found by the update driver and provides delegate ability to respond.
+
+ \param updater The SUUpdater instance.
+ \param item The appcast item corresponding to the update that is proposed to be installed.
+ \param responseBlock The block carrying the users response to update.
+*/
+- (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)item respondWithChoice:(void (^)(SUDUpdateAlertChoice))responseBlock;
+
 
 /*!
  A property indicating the current automatic update check interval.
