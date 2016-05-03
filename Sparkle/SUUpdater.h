@@ -61,7 +61,7 @@ SU_EXPORT @interface SUUpdater : NSObject
 - (instancetype)initForBundle:(NSBundle *)bundle;
 
 
-@property (nonatomic) BOOL suppressUI;
+-(BOOL)suppressSparkleUI;
 
 /*!
  Explicitly checks for updates and displays a progress dialog while doing so.
