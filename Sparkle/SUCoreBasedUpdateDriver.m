@@ -278,8 +278,8 @@
 - (void)abortUpdateWithError:(nullable NSError *)error
 {
     [self.installerDriver abortInstall];
-    [self.basicDriver abortUpdateWithError:error];
     [self.downloadDriver cleanup];
+    [self.basicDriver abortUpdateWithError:error];
 }
 
 @end
