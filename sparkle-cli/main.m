@@ -17,20 +17,23 @@
 #define CHECK_NOW_FLAG "check-immediately"
 #define GRANT_AUTOMATIC_CHECKING_FLAG "grant-automatic-checks"
 #define SEND_PROFILE_FLAG "send-profile"
+#define PROBE_FLAG "probe"
 
 static void printUsage(char **argv)
 {
-    fprintf(stderr, "Usage: %s bundle [--%s <app-path>] [--%s] [--%s] [--%s] [--%s] [--%s]\n", argv[0], APPLICATION_FLAG, CHECK_NOW_FLAG, GRANT_AUTOMATIC_CHECKING_FLAG, SEND_PROFILE_FLAG, DEFER_FLAG, VERBOSE_FLAG);
+    fprintf(stderr, "Usage: %s bundle [--%s <app-path>] [--%s] [--%s] [--%s] [--%s] [--%s] [--%s]\n", argv[0], APPLICATION_FLAG, CHECK_NOW_FLAG, PROBE_FLAG, GRANT_AUTOMATIC_CHECKING_FLAG, SEND_PROFILE_FLAG, DEFER_FLAG, VERBOSE_FLAG);
     fprintf(stderr, "Description:\n");
     fprintf(stderr, "  Check if any new updates for a Sparkle supported bundle need to be installed.\n\n");
     fprintf(stderr, "  If any new updates need to be installed, the user application\n  is terminated and the update is installed immediately unless --%s\n  is specified. If the application was alive, then it will be relaunched after.\n\n", DEFER_FLAG);
+    fprintf(stderr, "  To check if an update is available without installing, use --%s.\n\n", PROBE_FLAG);
     fprintf(stderr, "  if no updates are available now, or if the last update check was recently\n  (unless --%s is specified) then nothing is done.\n\n", CHECK_NOW_FLAG);
     fprintf(stderr, "  If update permission is requested and --%s is not\n  specified, then checking for updates is aborted.\n\n", GRANT_AUTOMATIC_CHECKING_FLAG);
-    fprintf(stderr, "  Unlike an application that uses Sparkle, this tool will not request for\n  higher authorization when needed. Instead, this tool is expected to run under\n  the privileges required to update the bundle. For example, if the bundle to\n  update is owned by root, you may have to run this tool as root. Another\n  example is a non-admin user attempting to update /Applications/Foo.app\n\n");
-    fprintf(stderr, "  This tool does not linger around for long, and prefers to exit immediately.\n");
+    fprintf(stderr, "  Unlike an application that uses Sparkle, this tool will not request for\n  escalated authorization. Instead, this tool is expected to run under\n  the privileges required to update the bundle. For example, if the bundle to\n  update is owned by root, you may have to run this tool as root. Another\n  example is a non-admin user attempting to update an app in /Applications\n\n");
+    fprintf(stderr, "  This tool does not linger around for long, and prefers to exit immediately.\n  If --%s is specified, this tool will exit leaving a spawned process\n  for finishing the installation.\n", DEFER_FLAG);
     fprintf(stderr, "Options:\n");
     fprintf(stderr, " --%s\n    Path to the application to watch for termination and to relaunch.\n    If not provided, this is assumed to be the same as the bundle.\n", APPLICATION_FLAG);
     fprintf(stderr, " --%s\n    Immediately checks for updates to install.\n    Without this, updates are checked only when needed on a scheduled basis.\n", CHECK_NOW_FLAG);
+    fprintf(stderr, " --%s\n    Probe for updates. Check if any updates are available but do not install.\n    An exit status of 0 is returned if a new update is available.\n", PROBE_FLAG);
     fprintf(stderr, " --%s\n    If update permission is requested, this enables automatic update checks.\n    Note that this behavior may overwrite the user's defaults for the bundle.\n    This option has no effect if --%s is passed, or if the\n    user has replied to this request already, or if the developer configured\n    to skip it.\n", GRANT_AUTOMATIC_CHECKING_FLAG, CHECK_NOW_FLAG);
     fprintf(stderr, " --%s\n    Choose to send system profile information if update permission is requested.\n    This option can only take effect if --%s is passed.\n", SEND_PROFILE_FLAG, GRANT_AUTOMATIC_CHECKING_FLAG);
     fprintf(stderr, " --%s\n    Defer installation until after the application terminates on its own. The\n    application will not be relaunched.\n", DEFER_FLAG);
@@ -48,6 +51,7 @@ int main(int argc, char **argv)
             {CHECK_NOW_FLAG, no_argument, NULL, 0},
             {GRANT_AUTOMATIC_CHECKING_FLAG, no_argument, NULL, 0},
             {SEND_PROFILE_FLAG, no_argument, NULL, 0},
+            {PROBE_FLAG, no_argument, NULL, 0},
             {0, 0, 0, 0}
         };
         
@@ -57,6 +61,7 @@ int main(int argc, char **argv)
         BOOL checkForUpdatesNow = NO;
         BOOL grantAutomaticChecking = NO;
         BOOL sendProfile = NO;
+        BOOL probeForUpdates = NO;
         
         while (YES) {
             int optionIndex = 0;
@@ -84,6 +89,8 @@ int main(int argc, char **argv)
                         grantAutomaticChecking = YES;
                     } else if (strcmp(SEND_PROFILE_FLAG, longOptions[optionIndex].name) == 0) {
                         sendProfile = YES;
+                    } else if (strcmp(PROBE_FLAG, longOptions[optionIndex].name) == 0) {
+                        probeForUpdates = YES;
                     }
                 case ':':
                     break;
@@ -118,7 +125,11 @@ int main(int argc, char **argv)
             return EXIT_FAILURE;
         }
         
-        [driver runAndCheckForUpdatesNow:checkForUpdatesNow];
+        if (probeForUpdates) {
+            [driver probeForUpdates];
+        } else {
+            [driver runAndCheckForUpdatesNow:checkForUpdatesNow];
+        }
         [[NSRunLoop currentRunLoop] run];
     }
     

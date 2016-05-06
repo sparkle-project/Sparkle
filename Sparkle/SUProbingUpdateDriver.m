@@ -53,15 +53,21 @@
     [self abortUpdate];
 }
 
-- (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)__unused error
+- (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error
 {
-    // Silently fail; the user doesn't need to know about the error
-    [self abortUpdate];
+
+    [self abortUpdateWithError:error];
+
 }
 
 - (void)abortUpdate
 {
-    [self.basicDriver abortUpdateWithError:nil];
+    [self abortUpdateWithError:nil];
+}
+
+- (void)abortUpdateWithError:(nullable NSError *)error
+{
+    [self.basicDriver abortUpdateWithError:error];
 }
 
 @end

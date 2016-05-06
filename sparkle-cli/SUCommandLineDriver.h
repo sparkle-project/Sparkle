@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)runAndCheckForUpdatesNow:(BOOL)checkForUpdatesNow;
 
+- (void)probeForUpdates;
+
 @end
 
 NS_ASSUME_NONNULL_END
