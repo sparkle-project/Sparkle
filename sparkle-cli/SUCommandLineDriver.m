@@ -60,6 +60,7 @@
     return YES;
 }
 
+// In case we find an update during probing, otherwise we leave this to the user driver
 - (void)updater:(SUUpdater *)__unused updater didFindValidUpdate:(SUAppcastItem *)__unused item
 {
     if (self.probingForUpdates) {
@@ -70,6 +71,7 @@
     }
 }
 
+// In case we fail during probing, otherwise we leave error handling to the user driver
 - (void)updaterDidNotFindUpdate:(SUUpdater *)__unused updater
 {
     if (self.probingForUpdates) {
@@ -80,6 +82,7 @@
     }
 }
 
+// In case we fail during probing, otherwise we leave error handling to the user driver
 - (void)updater:(SUUpdater *)__unused updater didAbortWithError:(NSError *)error
 {
     if (self.probingForUpdates) {
