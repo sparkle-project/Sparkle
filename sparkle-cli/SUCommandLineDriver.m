@@ -80,16 +80,6 @@
     }
 }
 
-- (void)updater:(SUUpdater *)__unused updater failedToDownloadUpdate:(SUAppcastItem *)__unused item error:(NSError *)error
-{
-    if (self.probingForUpdates) {
-        if (self.verbose) {
-            fprintf(stderr, "Failed to download update with error (%ld): %s\n", (long)error.code, error.localizedDescription.UTF8String);
-        }
-        exit(EXIT_FAILURE);
-    }
-}
-
 - (void)updater:(SUUpdater *)__unused updater didAbortWithError:(NSError *)error
 {
     if (self.probingForUpdates) {

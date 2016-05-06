@@ -142,7 +142,7 @@
 - (void)showUpdaterError:(NSError *)error acknowledgement:(void (^)(void))__unused acknowledgement
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        fprintf(stderr, "Error: Update check has failed: %s\n", error.description.UTF8String);
+        fprintf(stderr, "Error: Update has failed: %s\n", error.description.UTF8String);
         exit(EXIT_FAILURE);
     });
 }
