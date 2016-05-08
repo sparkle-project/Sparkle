@@ -14,11 +14,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)downloaderDidSetDestinationName:(NSString *)destinationName temporaryDirectory:(NSString *)temporaryDirectory;
 
-- (void)downloaderDidFailToCreateTemporaryDirectoryWithError:(NSError *)error;
-
 - (void)downloaderDidReceiveResponse:(NSURLResponse *)response;
 
 - (void)downloaderDidReceiveDataOfLength:(NSUInteger)length;
+
+- (void)downloaderDidFinishDownloading;
+
+- (void)downloaderDidFailWithError:(NSError *)error;
 
 @end
 

@@ -10,13 +10,16 @@
 #import "SUDownloaderDelegate.h"
 #import "SUErrors.h"
 
+static NSString *SUUpdateDownloadingReason = @"Downloading Update";
+
 @interface SUUpdateDownloader () <NSURLDownloadDelegate>
 
+// Delegate is intentionally strongly referenced; see header
 @property (nonatomic) id <SUDownloaderDelegate> delegate;
 @property (nonatomic) NSURLDownload *download;
 @property (nonatomic, copy) NSString *bundleIdentifier;
 @property (nonatomic, copy) NSString *desiredFilename;
-@property (nonatomic, copy) void (^completionBlock)(BOOL, NSError * _Nullable);
+@property (nonatomic) BOOL disabledAutomaticTermination;
 
 @end
 
@@ -26,7 +29,7 @@
 @synthesize download = _download;
 @synthesize bundleIdentifier = _bundleIdentifier;
 @synthesize desiredFilename = _desiredFilename;
-@synthesize completionBlock = _completionBlock;
+@synthesize disabledAutomaticTermination = _disabledAutomaticTermination;
 
 - (instancetype)initWithDelegate:(id <SUDownloaderDelegate>)delegate
 {
@@ -37,12 +40,9 @@
     return self;
 }
 
-- (void)dealloc
-{
-    [self cleanup];
-}
+// Don't implement dealloc - make the client call cleanup, which is the only way to remove the reference cycle from the delegate anyway
 
-- (void)startDownloadWithRequest:(NSURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename completion:(void (^)(BOOL success, NSError * _Nullable error))completionBlock
+- (void)startDownloadWithRequest:(NSURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         // Remove our old caches path so we don't start accumulating files in there
@@ -51,15 +51,27 @@
             [[NSFileManager defaultManager] removeItemAtPath:cachePath error:NULL];
         }
         
+        // Prevent service from automatically terminating while downloading the update asynchronously without any reply blocks
+        [[NSProcessInfo processInfo] disableAutomaticTermination:SUUpdateDownloadingReason];
+        self.disabledAutomaticTermination = YES;
+        
         self.download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
         self.desiredFilename = desiredFilename;
         self.bundleIdentifier = bundleIdentifier;
-        self.completionBlock = completionBlock;
     });
+}
+
+- (void)enableAutomaticTermination
+{
+    if (self.disabledAutomaticTermination) {
+        [[NSProcessInfo processInfo] enableAutomaticTermination:SUUpdateDownloadingReason];
+        self.disabledAutomaticTermination = NO;
+    }
 }
 
 - (void)cleanup
 {
+    [self enableAutomaticTermination];
     [self.download cancel];
     self.download = nil;
     self.delegate = nil;
@@ -106,7 +118,7 @@
         
         NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Can't make a temporary directory for the update download at %@.", tempDir] }];
         
-        [self.delegate downloaderDidFailToCreateTemporaryDirectoryWithError:error];
+        [self.delegate downloaderDidFailWithError:error];
     } else {
         [self.download setDestination:[tempDir stringByAppendingPathComponent:name] allowOverwrite:YES];
         
@@ -127,15 +139,13 @@
 - (void)downloadDidFinish:(NSURLDownload *)__unused d
 {
     self.download = nil;
-    self.completionBlock(YES, nil);
-    self.completionBlock = nil;
+    [self.delegate downloaderDidFinishDownloading];
 }
 
 - (void)download:(NSURLDownload *)__unused download didFailWithError:(NSError *)error
 {
     self.download = nil;
-    self.completionBlock(NO, error);
-    self.completionBlock = nil;
+    [self.delegate downloaderDidFailWithError:error];
 }
 
 - (BOOL)download:(NSURLDownload *)__unused download shouldDecodeSourceDataOfMIMEType:(NSString *)encodingType
