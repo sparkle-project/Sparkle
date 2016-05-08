@@ -10,7 +10,7 @@
 
 @interface SUAppcastDownloader () <NSURLDownloadDelegate>
 
-@property (nonatomic, copy) void (^completionBlock)(NSData * _Nullable appcastData, NSError * _Nullable error);
+@property (nonatomic, copy) void (^completionBlock)(NSData * _Nullable data, NSError * _Nullable error);
 @property (nonatomic) NSURLDownload *download;
 @property (nonatomic, copy) NSString *downloadFilename;
 
@@ -22,7 +22,7 @@
 @synthesize download = _download;
 @synthesize downloadFilename = _downloadFilename;
 
-- (void)startDownloadWithRequest:(NSURLRequest *)request completion:(void (^)(NSData * _Nullable appcastData, NSError * _Nullable error))completionBlock
+- (void)startDownloadWithRequest:(NSURLRequest *)request completion:(void (^)(NSData * _Nullable data, NSError * _Nullable error))completionBlock
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         self.completionBlock = completionBlock;
