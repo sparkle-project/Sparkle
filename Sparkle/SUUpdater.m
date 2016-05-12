@@ -125,25 +125,31 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     BOOL hostIsCodeSigned = [SUCodeSigningVerifier hostApplicationIsCodeSigned];
     NSURL *feedURL = [self feedURL];
     BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
-    if (!isMainBundle && !hasPublicDSAKey) {
-        [self showAlertText:@"Insecure update error!"
-                 informativeText:@"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information."];
-    } else if (isMainBundle && !(hasPublicDSAKey || hostIsCodeSigned)) {
-        [self showAlertText:@"Insecure update error!"
-                 informativeText:@"For security reasons, you need to code sign your application or sign your updates with a DSA key. See Sparkle's documentation for more information."];
-    } else if (isMainBundle && !hasPublicDSAKey && !servingOverHttps) {
-        [self showAlertText:@"Insecure update error!"
-            informativeText:@"For security reasons, you need to serve your updates over https and/or sign your updates with a DSA key. See Sparkle's documentation for more information."];
+
+    if (!hasPublicDSAKey) {
+        if (!isMainBundle) {
+            [self showAlertText:@"Insecure update error!"
+                informativeText:@"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information."];
+        } else {
+            if (!hostIsCodeSigned) {
+                [self showAlertText:@"Insecure update error!"
+                    informativeText:@"For security reasons, you need to code sign your application or sign your updates with a DSA key. See https://sparkle-project.org/documentation/ for more information."];
+            } else if (!servingOverHttps) {
+                [self showAlertText:@"Insecure update error!"
+                    informativeText:@"For security reasons, you need to serve your updates over HTTPS and/or sign your updates with a DSA key. See https://sparkle-project.org/documentation/ for more information."];
+            }
+        }
     }
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101100
-    BOOL atsExceptionsExist = nil != [self.host objectForInfoDictionaryKey:@"NSAppTransportSecurity"];
-    if (isMainBundle && !servingOverHttps && !atsExceptionsExist) {
-        [self showAlertText:@"Insecure feed URL is blocked in OS X 10.11"
-                 informativeText:[NSString stringWithFormat:@"You must change the feed URL (%@) to use HTTPS or disable App Transport Security.\n\nFor more information:\nhttp://sparkle-project.org/documentation/app-transport-security/", [feedURL absoluteString]]];
-    }
-    if (!isMainBundle && !servingOverHttps) {
-        SULog(@"WARNING: Serving updates over HTTP may be blocked in OS X 10.11. Please change the feed URL (%@) to use HTTPS. For more information:\nhttp://sparkle-project.org/documentation/app-transport-security/", feedURL);
+    if (!servingOverHttps) {
+        BOOL atsExceptionsExist = nil != [self.host objectForInfoDictionaryKey:@"NSAppTransportSecurity"];
+        if (isMainBundle && !atsExceptionsExist) {
+            [self showAlertText:@"Insecure feed URL is blocked in OS X 10.11"
+                informativeText:[NSString stringWithFormat:@"You must change the feed URL (%@) to use HTTPS or disable App Transport Security.\n\nFor more information:\nhttps://sparkle-project.org/documentation/app-transport-security/", [feedURL absoluteString]]];
+        } else if (!isMainBundle) {
+            SULog(@"WARNING: Serving updates over HTTP may be blocked in OS X 10.11. Please change the feed URL (%@) to use HTTPS. For more information:\nhttps://sparkle-project.org/documentation/app-transport-security/", feedURL);
+        }
     }
 #endif
 }
