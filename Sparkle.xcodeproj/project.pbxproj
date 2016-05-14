@@ -243,6 +243,8 @@
 		72AC6B2A1B9AAF3A00F62325 /* SparkleTestCodeSignApp.tar.bz2 in Resources */ = {isa = PBXBuildFile; fileRef = 72AC6B291B9AAF3A00F62325 /* SparkleTestCodeSignApp.tar.bz2 */; };
 		72AC6B2C1B9AB0EE00F62325 /* SparkleTestCodeSignApp.tar.xz in Resources */ = {isa = PBXBuildFile; fileRef = 72AC6B2B1B9AB0EE00F62325 /* SparkleTestCodeSignApp.tar.xz */; };
 		72AC6B2E1B9B218C00F62325 /* SparkleTestCodeSignApp.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 72AC6B2D1B9B218C00F62325 /* SparkleTestCodeSignApp.dmg */; };
+		72B09CE71CE6BCBD0052EF9E /* SUURLDownload.h in Headers */ = {isa = PBXBuildFile; fileRef = 72B09CE51CE6BCBD0052EF9E /* SUURLDownload.h */; };
+		72B09CE81CE6BCBD0052EF9E /* SUURLDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B09CE61CE6BCBD0052EF9E /* SUURLDownload.m */; };
 		72B767CA1C9B707000A07552 /* SUAppcastDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 72B767C81C9B707000A07552 /* SUAppcastDriver.h */; };
 		72B767CB1C9B707000A07552 /* SUAppcastDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B767C91C9B707000A07552 /* SUAppcastDriver.m */; };
 		72B767CE1C9B924900A07552 /* SUInstallerDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 72B767CC1C9B924900A07552 /* SUInstallerDriver.h */; };
@@ -873,6 +875,8 @@
 		72AC6B2B1B9AB0EE00F62325 /* SparkleTestCodeSignApp.tar.xz */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSignApp.tar.xz; sourceTree = "<group>"; };
 		72AC6B2D1B9B218C00F62325 /* SparkleTestCodeSignApp.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSignApp.dmg; sourceTree = "<group>"; };
 		72AFC6121B9A944200F6B565 /* Sparkle Unit Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Sparkle Unit Tests-Bridging-Header.h"; sourceTree = "<group>"; };
+		72B09CE51CE6BCBD0052EF9E /* SUURLDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUURLDownload.h; sourceTree = "<group>"; };
+		72B09CE61CE6BCBD0052EF9E /* SUURLDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUURLDownload.m; sourceTree = "<group>"; };
 		72B767C81C9B707000A07552 /* SUAppcastDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUAppcastDriver.h; sourceTree = "<group>"; };
 		72B767C91C9B707000A07552 /* SUAppcastDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUAppcastDriver.m; sourceTree = "<group>"; };
 		72B767CC1C9B924900A07552 /* SUInstallerDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUInstallerDriver.h; sourceTree = "<group>"; };
@@ -1311,6 +1315,8 @@
 				61B5FB9509C4F04600B25A18 /* SUAppcast.m */,
 				61B5FC5309C5182000B25A18 /* SUAppcastItem.h */,
 				61B5FC5409C5182000B25A18 /* SUAppcastItem.m */,
+				72B09CE51CE6BCBD0052EF9E /* SUURLDownload.h */,
+				72B09CE61CE6BCBD0052EF9E /* SUURLDownload.m */,
 				61A225A20D1C4AC000430CCD /* SUStandardVersionComparator.h */,
 				61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */,
 				61A2279A0D1CEE7600430CCD /* SUSystemProfiler.h */,
@@ -1729,6 +1735,7 @@
 				726E075C1CA3A6D6001A286B /* SUSecureCoding.h in Headers */,
 				618FA5050DAE8AB80026945C /* SUPlainInstaller.h in Headers */,
 				72B767E21C9CE90A00A07552 /* SUCoreBasedUpdateDriver.h in Headers */,
+				72B09CE71CE6BCBD0052EF9E /* SUURLDownload.h in Headers */,
 				61A225A40D1C4AC000430CCD /* SUStandardVersionComparator.h in Headers */,
 				7229E1B91C97CC4D00CB50D0 /* SUScheduledUpdateDriver.h in Headers */,
 				72E41A391CB209CA003D47E0 /* SURemoteMessagePortProtocol.h in Headers */,
@@ -2615,6 +2622,7 @@
 				726E075D1CA3A6D6001A286B /* SUSecureCoding.m in Sources */,
 				72B767DB1C9CD2E400A07552 /* SUUIBasedUpdateDriver.m in Sources */,
 				729746461C91212400FC134E /* SURemoteMessagePort.m in Sources */,
+				72B09CE81CE6BCBD0052EF9E /* SUURLDownload.m in Sources */,
 				729746581C936D5E00FC134E /* SUMessageTypes.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
