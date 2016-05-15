@@ -119,22 +119,46 @@
     });
 }
 
+- (void)displayReleaseNotes:(NSData *)releaseNotes
+{
+    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:releaseNotes documentAttributes:NULL];
+    fprintf(stderr, "Release notes:\n");
+    fprintf(stderr, "%s\n", attributedString.string.UTF8String);
+}
+
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)__unused allowsAutomaticUpdates alreadyDownloaded:(BOOL)__unused alreadyDownloaded reply:(void (^)(SUUpdateAlertChoice))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.verbose) {
             fprintf(stderr, "Found new update! (%s)\n", appcastItem.displayVersionString.UTF8String);
+            
+            if (appcastItem.itemDescription != nil) {
+                NSData *descriptionData = [appcastItem.itemDescription dataUsingEncoding:NSUTF8StringEncoding];
+                if (descriptionData != nil) {
+                    [self displayReleaseNotes:descriptionData];
+                }
+            }
         }
         reply(SUInstallUpdateChoice);
     });
 }
 
-- (void)showUpdateReleaseNotes:(NSData *)__unused releaseNotes
+- (void)showUpdateReleaseNotes:(NSData *)releaseNotes
 {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.verbose) {
+            [self displayReleaseNotes:releaseNotes];
+        }
+    });
 }
 
-- (void)showUpdateReleaseNotesFailedToDownloadWithError:(NSError *)__unused error
+- (void)showUpdateReleaseNotesFailedToDownloadWithError:(NSError *)error
 {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.verbose) {
+            fprintf(stderr, "Error: Unable to download release notes: %s\n", error.description.UTF8String);
+        }
+    });
 }
 
 - (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))__unused acknowledgement
