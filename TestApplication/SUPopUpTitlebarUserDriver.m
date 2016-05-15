@@ -188,6 +188,7 @@
 
 - (void)showUpdateReleaseNotes:(NSData *)__unused releaseNotes
 {
+    // todo: this should really be implemented
 }
 
 - (void)showUpdateReleaseNotesFailedToDownloadWithError:(NSError *)__unused error
