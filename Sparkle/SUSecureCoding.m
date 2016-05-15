@@ -10,16 +10,21 @@
 
 static NSString *SURootObjectArchiveKey = @"SURootObjectArchive";
 
-NSData *SUArchiveRootObjectSecurely(id<NSSecureCoding> rootObject)
+NSData * _Nullable SUArchiveRootObjectSecurely(id<NSSecureCoding> rootObject)
 {
     NSMutableData *data = [NSMutableData data];
     NSKeyedArchiver *keyedArchiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:data];
     keyedArchiver.requiresSecureCoding = YES;
     
-    [keyedArchiver encodeObject:rootObject forKey:SURootObjectArchiveKey];
-    [keyedArchiver finishEncoding];
-    
-    return [data copy];
+    @try {
+        [keyedArchiver encodeObject:rootObject forKey:SURootObjectArchiveKey];
+        [keyedArchiver finishEncoding];
+        return [data copy];
+    } @catch (NSException *exception) {
+        NSLog(@"Exception while securely archiving object: %@", exception);
+        [keyedArchiver finishEncoding];
+        return nil;
+    }
 }
 
 id<NSSecureCoding> _Nullable SUUnarchiveRootObjectSecurely(NSData *data, Class klass)
@@ -27,8 +32,13 @@ id<NSSecureCoding> _Nullable SUUnarchiveRootObjectSecurely(NSData *data, Class k
     NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
     unarchiver.requiresSecureCoding = YES;
     
-    id<NSSecureCoding> rootObject = [unarchiver decodeObjectOfClass:klass forKey:SURootObjectArchiveKey];
-    [unarchiver finishDecoding];
-    
-    return rootObject;
+    @try {
+        id<NSSecureCoding> rootObject = [unarchiver decodeObjectOfClass:klass forKey:SURootObjectArchiveKey];
+        [unarchiver finishDecoding];
+        return rootObject;
+    } @catch (NSException *exception) {
+        NSLog(@"Exception while securely unarchiving object: %@", exception);
+        [unarchiver finishDecoding];
+        return nil;
+    }
 }

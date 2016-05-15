@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-NSData *SUArchiveRootObjectSecurely(id<NSSecureCoding> rootObject);
+NSData * _Nullable SUArchiveRootObjectSecurely(id<NSSecureCoding> rootObject);
 
 id<NSSecureCoding> _Nullable SUUnarchiveRootObjectSecurely(NSData *data, Class klass);
 
