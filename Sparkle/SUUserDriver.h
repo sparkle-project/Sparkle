@@ -138,6 +138,32 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates alreadyDownloaded:(BOOL)alreadyDownloaded reply:(void (^)(SUUpdateAlertChoice))reply;
 
 /*!
+ * Show the user the release notes for the new update
+ *
+ * Display the release notes to the user. This will be called after showing the new update.
+ * This is only applicable if the release notes are linked from the appcast, and are not directly embedded inside of the appcast file.
+ * That is, this may be invoked if the releaseNotesURL from the appcast item is non-nil.
+ *
+ * @param releaseNotes The data for the release notes that was downloaded from the new update's appcast.
+ *
+ * This can be called from any thread
+ */
+- (void)showUpdateReleaseNotes:(NSData *)releaseNotes;
+
+/*!
+ * Show the user that the new update's release notes could not be downloaded
+ *
+ * This will be called after showing the new update.
+ * This is only applicable if the release notes are linked from the appcast, and are not directly embedded inside of the appcast file.
+ * That is, this may be invoked if the releaseNotesURL from the appcast item is non-nil.
+ *
+ * @param error The error associated with why the new update's release notes could not be downloaded.
+ *
+ * This can be called from any thread
+ */
+- (void)showUpdateReleaseNotesFailedToDownloadWithError:(NSError *)error;
+
+/*!
  * Show the user a new update was not found
  *
  * Let the user know a new update was not found after they tried initiating an update check.

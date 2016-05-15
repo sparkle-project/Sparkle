@@ -47,10 +47,14 @@
     [[self.textView enclosingScrollView] setDrawsBackground:NO];
     [self.textView setDrawsBackground:NO];
     
-    NSString *descriptionHTML = self.appcastItem.itemDescription;
-    NSData *htmlData = [descriptionHTML dataUsingEncoding:NSUTF8StringEncoding];
-    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:htmlData documentAttributes:NULL];
-    [self.textView.textStorage setAttributedString:attributedString];
+    if (self.appcastItem.releaseNotesURL == nil) {
+        NSString *descriptionHTML = self.appcastItem.itemDescription;
+        if (descriptionHTML == nil) {
+            NSData *htmlData = [descriptionHTML dataUsingEncoding:NSUTF8StringEncoding];
+            NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:htmlData documentAttributes:NULL];
+            [self.textView.textStorage setAttributedString:attributedString];
+        }
+    }
 }
 
 - (IBAction)installUpdate:(id)__unused sender

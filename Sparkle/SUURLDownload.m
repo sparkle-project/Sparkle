@@ -10,6 +10,7 @@
 #import "SUXPCServiceInfo.h"
 #import "SUAppcastDownloader.h"
 #import "SUAppcastDownloaderProtocol.h"
+#import "SUErrors.h"
 
 void SUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(NSData * _Nullable, NSError * _Nullable))
 {
@@ -35,7 +36,7 @@ void SUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(NS
         connection.invalidationHandler = ^{
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (!retrievedDownloadResult) {
-                    completionBlock(nil, nil);
+                    completionBlock(nil, [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:nil]);
                 }
             });
         };

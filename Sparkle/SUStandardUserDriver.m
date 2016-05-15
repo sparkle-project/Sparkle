@@ -116,6 +116,9 @@
 
 - (void)setUpFocusForActiveUpdateAlert
 {
+    // Make sure the window is loaded in any case
+    [self.activeUpdateAlert window];
+    
     // If the app is a menubar app or the like, we need to focus it first and alter the
     // update prompt to behave like a normal window. Otherwise if the window were hidden
     // there may be no way for the application to be activated to make it visible again.
@@ -155,6 +158,21 @@
         }];
         
         [self setUpFocusForActiveUpdateAlert];
+    });
+}
+
+- (void)showUpdateReleaseNotes:(NSData *)releaseNotes
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.activeUpdateAlert showReleaseNotes:releaseNotes];
+    });
+}
+
+- (void)showUpdateReleaseNotesFailedToDownloadWithError:(NSError *)error
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"Failed to download release notes with error: %@", error);
+        [self.activeUpdateAlert showReleaseNotesFailedToDownload];
     });
 }
 

@@ -129,6 +129,14 @@
     });
 }
 
+- (void)showUpdateReleaseNotes:(NSData *)__unused releaseNotes
+{
+}
+
+- (void)showUpdateReleaseNotesFailedToDownloadWithError:(NSError *)__unused error
+{
+}
+
 - (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))__unused acknowledgement
 {
     dispatch_async(dispatch_get_main_queue(), ^{

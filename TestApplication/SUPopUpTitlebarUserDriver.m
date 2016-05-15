@@ -186,6 +186,14 @@
     });
 }
 
+- (void)showUpdateReleaseNotes:(NSData *)__unused releaseNotes
+{
+}
+
+- (void)showUpdateReleaseNotesFailedToDownloadWithError:(NSError *)__unused error
+{
+}
+
 #pragma mark Install & Relaunch Update
 
 - (void)showReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))installUpdateHandler

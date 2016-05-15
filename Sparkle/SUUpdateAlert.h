@@ -22,6 +22,9 @@
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates alreadyDownloaded:(BOOL)alreadyDownloaded completionBlock:(void (^)(SUUpdateAlertChoice))block;
 
+- (void)showReleaseNotes:(NSData *)releaseNotes;
+- (void)showReleaseNotesFailedToDownload;
+
 - (IBAction)installUpdate:sender;
 - (IBAction)skipThisVersion:sender;
 - (IBAction)remindMeLater:sender;

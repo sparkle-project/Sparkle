@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-// From the completion block, either data or error can be nil (or both can be nil if an unknown error occured)
+// From the completion block, either data or error can be nil, but not both
 // The completion block returns on the main queue
 void SUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(NSData * _Nullable data, NSError * _Nullable error));
 

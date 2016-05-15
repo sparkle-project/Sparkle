@@ -35,6 +35,10 @@
 
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem allowsAutomaticUpdates:(BOOL)__unused allowsAutomaticUpdates alreadyDownloaded:(BOOL)__unused alreadyDownloaded reply:(void (^)(SUUpdateAlertChoice))__unused reply {}
 
+- (void)showUpdateReleaseNotes:(NSData *)__unused releaseNotes {}
+
+- (void)showUpdateReleaseNotesFailedToDownloadWithError:(NSError *)__unused error {}
+
 - (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))__unused acknowledgement {}
 
 - (void)showUpdaterError:(NSError *)__unused error acknowledgement:(void (^)(void))__unused acknowledgement {}

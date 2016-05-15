@@ -143,7 +143,7 @@
     // "-apple-system-font" is a reference to the system UI font on OS X. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
     prefs.standardFontFamily = @"-apple-system-font";
     prefs.defaultFontSize = (int)[NSFont systemFontSize];
-
+    
     // Stick a nice big spinner in the middle of the web view until the page is loaded.
     NSRect frame = [[self.releaseNotesView superview] frame];
     self.releaseNotesSpinner = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(NSMidX(frame) - 16, NSMidY(frame) - 16, 32, 32)];
@@ -151,16 +151,32 @@
     [self.releaseNotesSpinner startAnimation:self];
     self.webViewFinishedLoading = NO;
     [[self.releaseNotesView superview] addSubview:self.releaseNotesSpinner];
-
-    // If there's a release notes URL, load it; otherwise, just stick the contents of the description into the web view.
-	if ([self.updateItem releaseNotesURL])
-	{
-        [[self.releaseNotesView mainFrame] loadRequest:[NSURLRequest requestWithURL:[self.updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30]];
-	}
-	else
+    
+    // If there's no release notes URL, just stick the contents of the description into the web view
+    // Otherwise we'll wait until the client wants us to show release notes
+	if (self.updateItem.releaseNotesURL == nil)
 	{
         [[self.releaseNotesView mainFrame] loadHTMLString:[self.updateItem itemDescription] baseURL:nil];
     }
+}
+
+- (void)showReleaseNotes:(NSData *)releaseNotes
+{
+    if (!self.webViewFinishedLoading) {
+        [[self.releaseNotesView mainFrame] loadData:releaseNotes MIMEType:@"text/html" textEncodingName:@"utf-8" baseURL:nil];
+    }
+}
+
+- (void)showReleaseNotesFailedToDownload
+{
+    [self stopReleaseNotesSpinner];
+    self.webViewFinishedLoading = YES;
+}
+
+- (void)stopReleaseNotesSpinner
+{
+    [self.releaseNotesSpinner stopAnimation:self];
+    [self.releaseNotesSpinner setHidden:YES];
 }
 
 - (BOOL)showsReleaseNotes
@@ -287,8 +303,8 @@
 - (void)webView:(WebView *)sender didFinishLoadForFrame:frame
 {
     if ([frame parentFrame] == nil) {
+        [self stopReleaseNotesSpinner];
         self.webViewFinishedLoading = YES;
-        [self.releaseNotesSpinner setHidden:YES];
         [sender display]; // necessary to prevent weird scroll bar artifacting
     }
 }

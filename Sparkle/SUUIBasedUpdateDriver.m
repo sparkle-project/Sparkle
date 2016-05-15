@@ -14,6 +14,7 @@
 #import "SUUpdaterDelegate.h"
 #import "SUAppcastItem.h"
 #import "SUErrors.h"
+#import "SUURLDownload.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -84,6 +85,19 @@
             [self updateAlertFinishedForUpdateItem:updateItem withChoice:choice];
         });
     }];
+    
+    if (updateItem.releaseNotesURL != nil) {
+        NSURLRequest *request = [NSURLRequest requestWithURL:updateItem.releaseNotesURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
+        
+        id <SUUserDriver> userDriver = self.userDriver;
+        SUDownloadURLWithRequest(request, ^(NSData * _Nullable data, NSError * _Nullable error) {
+            if (data != nil) {
+                [userDriver showUpdateReleaseNotes:(NSData * _Nonnull)data];
+            } else {
+                [userDriver showUpdateReleaseNotesFailedToDownloadWithError:(NSError * _Nonnull)error];
+            }
+        });
+    }
 }
 
 - (void)updateAlertFinishedForUpdateItem:(SUAppcastItem *)updateItem withChoice:(SUUpdateAlertChoice)choice
