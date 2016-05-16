@@ -177,6 +177,10 @@
 		721CF1AA1AD7647000D9AC09 /* libxar.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5890FD7678C0065DB48 /* libxar.1.dylib */; };
 		721CF1AB1AD764EB00D9AC09 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */; };
 		7223E7631AD1AEFF008E3161 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
+		723B252D1CEAB3A600909873 /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 723B252B1CEAB3A600909873 /* bscommon.c */; };
+		723B252E1CEAB3A600909873 /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 723B252B1CEAB3A600909873 /* bscommon.c */; };
+		723B252F1CEAB3A600909873 /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 723B252B1CEAB3A600909873 /* bscommon.c */; };
+		723B25301CEAB3A600909873 /* bscommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 723B252C1CEAB3A600909873 /* bscommon.h */; };
 		7268AC631AD634C200C3E0C1 /* SUBinaryDeltaCreate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7268AC621AD634C200C3E0C1 /* SUBinaryDeltaCreate.m */; };
 		726F2CDE1BC9BE5B001971A4 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
 		726F2CE51BC9C33D001971A4 /* SUOperatingSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 726F2CE31BC9C33D001971A4 /* SUOperatingSystem.h */; };
@@ -628,6 +632,8 @@
 		7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUUnarchiverTest.swift; sourceTree = "<group>"; };
 		7223E7611AD1AEFF008E3161 /* sais.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sais.c; sourceTree = "<group>"; };
 		7223E7621AD1AEFF008E3161 /* sais.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sais.h; sourceTree = "<group>"; };
+		723B252B1CEAB3A600909873 /* bscommon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bscommon.c; sourceTree = "<group>"; };
+		723B252C1CEAB3A600909873 /* bscommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bscommon.h; sourceTree = "<group>"; };
 		7268AC621AD634C200C3E0C1 /* SUBinaryDeltaCreate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBinaryDeltaCreate.m; sourceTree = "<group>"; };
 		7268AC641AD634E400C3E0C1 /* SUBinaryDeltaCreate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBinaryDeltaCreate.h; sourceTree = "<group>"; };
 		726B2B5D1C645FC900388755 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -840,6 +846,8 @@
 		14732BB61960ECE800593899 /* bsdiff */ = {
 			isa = PBXGroup;
 			children = (
+				723B252B1CEAB3A600909873 /* bscommon.c */,
+				723B252C1CEAB3A600909873 /* bscommon.h */,
 				5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */,
 				5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */,
 				611142E810FB1BE5009810AA /* bspatch.h */,
@@ -1183,6 +1191,7 @@
 				7275F9C11B5F1F2900B1D19E /* SUFileManager.h in Headers */,
 				767B61AC1972D488004E0C3C /* SUGuidedPackageInstaller.h in Headers */,
 				61EF67590E25C5B400F754E0 /* SUHost.h in Headers */,
+				723B25301CEAB3A600909873 /* bscommon.h in Headers */,
 				618FA5010DAE88B40026945C /* SUInstaller.h in Headers */,
 				55C14F06136EF6DB00649790 /* SULog.h in Headers */,
 				726F2CE51BC9C33D001971A4 /* SUOperatingSystem.h in Headers */,
@@ -1616,6 +1625,7 @@
 				5D06E8E90FD68CDB005AE3F6 /* bsdiff.c in Sources */,
 				14652F7E19A9728A00959E44 /* bspatch.c in Sources */,
 				7223E7631AD1AEFF008E3161 /* sais.c in Sources */,
+				723B252F1CEAB3A600909873 /* bscommon.c in Sources */,
 				14652F7D19A9726700959E44 /* SUBinaryDeltaApply.m in Sources */,
 				14652F7C19A9725300959E44 /* SUBinaryDeltaCommon.m in Sources */,
 				7268AC631AD634C200C3E0C1 /* SUBinaryDeltaCreate.m in Sources */,
@@ -1635,6 +1645,7 @@
 				721CF1A91AD7644C00D9AC09 /* sais.c in Sources */,
 				5A4094481C74EA5200983BE0 /* SUAppcastTest.swift in Sources */,
 				72D4DAA11AD7632900B211E2 /* SUBinaryDeltaCreate.m in Sources */,
+				723B252E1CEAB3A600909873 /* bscommon.c in Sources */,
 				142E0E0919A83AAC00E4312B /* SUBinaryDeltaTest.m in Sources */,
 				F8761EB11ADC5068000C9034 /* SUCodeSigningVerifierTest.m in Sources */,
 				5AF9DC3C1981DBEE001EA135 /* SUDSAVerifierTest.m in Sources */,
@@ -1692,6 +1703,7 @@
 				61EF67560E25B58D00F754E0 /* SUHost.m in Sources */,
 				618FA5020DAE88B40026945C /* SUInstaller.m in Sources */,
 				55C14F07136EF6DB00649790 /* SULog.m in Sources */,
+				723B252D1CEAB3A600909873 /* bscommon.c in Sources */,
 				726F2CE61BC9C33D001971A4 /* SUOperatingSystem.m in Sources */,
 				618FA5230DAE8E8A0026945C /* SUPackageInstaller.m in Sources */,
 				61D85D6D0E10B2ED00F9B4A9 /* SUPipedUnarchiver.m in Sources */,

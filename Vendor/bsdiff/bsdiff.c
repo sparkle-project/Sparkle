@@ -38,6 +38,8 @@ __FBSDID("$FreeBSD: src/usr.bin/bsdiff/bsdiff/bsdiff.c, v 1.1 2005/08/06 01:59:0
 #include <string.h>
 #include <unistd.h>
 
+#include "bscommon.h"
+
 #define MIN(x, y) (((x)<(y)) ? (x) : (y))
 
 /* matchlen(old, oldsize, new, newsize)
@@ -113,51 +115,6 @@ static void offtout(off_t x, u_char *buf)
 
     if (x < 0)
         buf[7] |= 0x80;
-}
-
-static u_char *readfile(const char *filename, off_t *outSize)
-{
-    FILE *file = fopen(filename, "r");
-    if (file == NULL) {
-        return NULL;
-    }
-    
-    if (fseek(file, 0L, SEEK_END) != 0) {
-        fclose(file);
-        return NULL;
-    }
-    
-    off_t size = ftell(file);
-    if (size == -1) {
-        fclose(file);
-        return NULL;
-    }
-    
-    if (outSize != NULL) {
-        *outSize = size;
-    }
-    
-    /* Allocate size + 1 bytes instead of newsize bytes to ensure
-     that we never try to malloc(0) and get a NULL pointer */
-    u_char *buffer = malloc(size + 1);
-    if (buffer == NULL) {
-        fclose(file);
-        return NULL;
-    }
-    
-    if (fseek(file, 0L, SEEK_SET) != 0) {
-        fclose(file);
-        return NULL;
-    }
-    
-    if (fread(buffer, 1, size, file) < size) {
-        fclose(file);
-        return NULL;
-    }
-    
-    fclose(file);
-    
-    return buffer;
 }
 
 int bsdiff(int argc, char *argv[]); // Added by AMM: suppresses a warning about the following not having a prototype.
