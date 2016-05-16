@@ -53,10 +53,11 @@ typedef struct
 
 static stream_t BSDIFF40_open(FILE *f)
 {
-	int bzerr;
-	BZFILE *s;
-	if ((s = BZ2_bzReadOpen(&bzerr, f, 0, 0, NULL, 0)) == NULL)
-		errx(1, "BZ2_bzReadOpen, bz2err = %d", bzerr);
+	int bzerr = 0;
+	BZFILE *s = NULL;
+    if ((s = BZ2_bzReadOpen(&bzerr, f, 0, 0, NULL, 0)) == NULL) {
+		warnx("BZ2_bzReadOpen, bz2err = %d", bzerr);
+    }
 	return s;
 }
 
@@ -68,10 +69,12 @@ static void BSDIFF40_close(stream_t s)
 
 static off_t BSDIFF40_read(stream_t s, void *buf, off_t len)
 {
-	int bzerr, lenread;
+	int bzerr = 0, lenread = 0;
 	lenread = BZ2_bzRead(&bzerr, (BZFILE*)s, buf, (int)len);
-	if (bzerr != BZ_OK && bzerr != BZ_STREAM_END)
-		errx(1, "Corrupt patch\n");
+    if (bzerr != BZ_OK && bzerr != BZ_STREAM_END) {
+		warnx("Corrupt patch\n");
+        lenread = -1;
+    }
 	return lenread;
 }
 
@@ -127,23 +130,29 @@ static off_t offtin(u_char *buf)
 
 int bspatch(int argc,const char * const argv[])
 {
-	FILE * f, * cpf, * dpf, * epf;
-	stream_t cstream, dstream, estream;
-	ssize_t oldsize,newsize;
-	ssize_t bzctrllen,bzdatalen;
-	u_char header[32],buf[8];
-	u_char *old, *new;
-	off_t oldpos,newpos;
-	off_t ctrl[3];
-	off_t lenread;
-	off_t i;
-	io_funcs_t * io;
+	FILE * f = NULL, * cpf = NULL, * dpf = NULL, * epf = NULL;
+	stream_t cstream = NULL, dstream = NULL, estream = NULL;
+	ssize_t oldsize = 0,newsize = 0;
+	ssize_t bzctrllen = 0,bzdatalen = 0;
+    u_char header[32] = {0},buf[8] = {0};
+	u_char *old = NULL, *new = NULL;
+	off_t oldpos = 0,newpos = 0;
+    off_t ctrl[3] = {0};
+	off_t lenread = 0;
+	off_t i = 0;
+	io_funcs_t * io = NULL;
+    int exitstatus = -1;
 
-	if(argc!=4) errx(1,"usage: %s oldfile newfile patchfile\n",argv[0]);
+    if(argc!=4) {
+        warnx("usage: %s oldfile newfile patchfile\n",argv[0]);
+        goto cleanup;
+    }
 
 	/* Open patch file */
-	if ((f = fopen(argv[3], "r")) == NULL)
-		err(1, "fopen(%s)", argv[3]);
+    if ((f = fopen(argv[3], "r")) == NULL) {
+		warn("fopen(%s)", argv[3]);
+        goto cleanup;
+    }
 
 	/*
 	File format:
@@ -161,9 +170,12 @@ int bspatch(int argc,const char * const argv[])
 
 	/* Read header */
 	if (fread(header, 1, 32, f) < 32) {
-		if (feof(f))
-			errx(1, "Corrupt patch\n");
-		err(1, "fread(%s)", argv[3]);
+        if (feof(f)) {
+			warnx("Corrupt patch\n");
+        } else {
+            warn("fread(%s)", argv[3]);
+        }
+        goto cleanup;
 	}
 
 	/* Check for appropriate magic */
@@ -171,67 +183,108 @@ int bspatch(int argc,const char * const argv[])
 		io = &BSDIFF40_funcs;
 	else if (memcmp(header, "BSDIFN40", 8) == 0)
 		io = &BSDIFN40_funcs;
-	else
-		errx(1, "Corrupt patch\n");
+    else {
+		warnx("Corrupt patch\n");
+        goto cleanup;
+    }
 
 	/* Read lengths from header */
 	bzctrllen=offtin(header+8);
 	bzdatalen=offtin(header+16);
 	newsize=offtin(header+24);
-	if((bzctrllen<0) || (bzdatalen<0) || (newsize<0))
-		errx(1,"Corrupt patch\n");
+    if((bzctrllen<0) || (bzdatalen<0) || (newsize<0)) {
+		warnx("Corrupt patch\n");
+        goto cleanup;
+    }
 
 	/* Close patch file and re-open it via libbzip2 at the right places */
-	if (fclose(f))
-		err(1, "fclose(%s)", argv[3]);
-	if ((cpf = fopen(argv[3], "r")) == NULL)
-		err(1, "fopen(%s)", argv[3]);
-	if (fseeko(cpf, 32, SEEK_SET))
-		err(1, "fseeko(%s, %lld)", argv[3],
+    if (fclose(f)) {
+		warn("fclose(%s)", argv[3]);
+        f = NULL;
+        goto cleanup;
+    }
+    f = NULL;
+    
+    if ((cpf = fopen(argv[3], "r")) == NULL) {
+		warn("fopen(%s)", argv[3]);
+        goto cleanup;
+    }
+    if (fseeko(cpf, 32, SEEK_SET)) {
+		warn("fseeko(%s, %lld)", argv[3],
 		    (long long)32);
+        goto cleanup;
+    }
 	cstream = io->open(cpf);
-	if ((dpf = fopen(argv[3], "r")) == NULL)
-		err(1, "fopen(%s)", argv[3]);
-	if (fseeko(dpf, 32 + bzctrllen, SEEK_SET))
-		err(1, "fseeko(%s, %lld)", argv[3],
+    if (cstream == NULL) {
+        warn("cstream open");
+        goto cleanup;
+    }
+    if ((dpf = fopen(argv[3], "r")) == NULL) {
+		warn("fopen(%s)", argv[3]);
+        goto cleanup;
+    }
+    if (fseeko(dpf, 32 + bzctrllen, SEEK_SET)) {
+		warn("fseeko(%s, %lld)", argv[3],
 		    (long long)(32 + bzctrllen));
+        goto cleanup;
+    }
 	dstream = io->open(dpf);
-	if ((epf = fopen(argv[3], "r")) == NULL)
-		err(1, "fopen(%s)", argv[3]);
-	if (fseeko(epf, 32 + bzctrllen + bzdatalen, SEEK_SET))
-		err(1, "fseeko(%s, %lld)", argv[3],
+    if (dstream == NULL) {
+        warn("dstream open");
+        goto cleanup;
+    }
+    if ((epf = fopen(argv[3], "r")) == NULL) {
+		warn("fopen(%s)", argv[3]);
+        goto cleanup;
+    }
+    if (fseeko(epf, 32 + bzctrllen + bzdatalen, SEEK_SET)) {
+		warn("fseeko(%s, %lld)", argv[3],
 		    (long long)(32 + bzctrllen + bzdatalen));
+        goto cleanup;
+    }
 	estream = io->open(epf);
-
+    if (estream == NULL) {
+        warn("estream open");
+        goto cleanup;
+    }
     off_t size = 0;
     old = readfile(argv[1], &size);
     if (old == NULL) {
         warn("old file: %s", argv[1]);
-        return -1;
+        goto cleanup;
     }
     
     oldsize = size;
     
-	if((new=malloc((size_t)newsize+1))==NULL) err(1,NULL);
+    if((new=malloc((size_t)newsize+1))==NULL) {
+        warn("Failed to allocate memory for new");
+        goto cleanup;
+    }
 
 	oldpos=0;newpos=0;
 	while(newpos<newsize) {
 		/* Read control data */
 		for(i=0;i<=2;i++) {
 			lenread = io->read(cstream, buf, 8);
-			if (lenread < 8)
-				errx(1, "Corrupt patch\n");
+            if (lenread < 8) {
+				warnx("Corrupt patch\n");
+                goto cleanup;
+            }
 			ctrl[i]=offtin(buf);
 		};
 
 		/* Sanity-check */
-		if(newpos+ctrl[0]>newsize)
-			errx(1,"Corrupt patch\n");
+        if(newpos+ctrl[0]>newsize) {
+			warnx("Corrupt patch\n");
+            goto cleanup;
+        }
 
 		/* Read diff string */
 		lenread = io->read(dstream, new + newpos, ctrl[0]);
-		if (lenread < ctrl[0])
-			errx(1, "Corrupt patch\n");
+        if (lenread < 0 || lenread < ctrl[0]) {
+			warnx("Corrupt patch\n");
+            goto cleanup;
+        }
 
 		/* Add old data to diff string */
 		for(i=0;i<ctrl[0];i++)
@@ -243,13 +296,17 @@ int bspatch(int argc,const char * const argv[])
 		oldpos+=ctrl[0];
 
 		/* Sanity-check */
-		if(newpos+ctrl[1]>newsize)
-			errx(1,"Corrupt patch\n");
+        if(newpos+ctrl[1]>newsize) {
+			warnx("Corrupt patch\n");
+            goto cleanup;
+        }
 
 		/* Read extra string */
 		lenread = io->read(estream, new + newpos, ctrl[1]);
-		if (lenread < ctrl[1])
-			errx(1, "Corrupt patch\n");
+        if (lenread < 0 || lenread < ctrl[1]) {
+			warnx("Corrupt patch\n");
+            goto cleanup;
+        }
 
 		/* Adjust pointers */
 		newpos+=ctrl[1];
@@ -258,31 +315,84 @@ int bspatch(int argc,const char * const argv[])
 
 	/* Clean up the bzip2 reads */
 	io->close(cstream);
+    cstream = NULL;
 	io->close(dstream);
+    dstream = NULL;
 	io->close(estream);
-	if (fclose(cpf) || fclose(dpf) || fclose(epf))
-		err(1, "fclose(%s)", argv[3]);
+    estream = NULL;
+    
+    if (fclose(cpf) != 0) {
+        warn("fclose cpf(%s)", argv[3]);
+        cpf = NULL;
+        goto cleanup;
+    }
+    cpf = NULL;
+    
+    if (fclose(dpf) != 0) {
+        warn("fclose dpf(%s)", argv[3]);
+        dpf = NULL;
+        goto cleanup;
+    }
+    dpf = NULL;
+    
+    if (fclose(epf) != 0) {
+        warn("fclose epf(%s)", argv[3]);
+        epf = NULL;
+        goto cleanup;
+    }
+    epf = NULL;
 
 	/* Write the new file */
-    FILE *writeFile = fopen(argv[2], "w");
-    if (writeFile == NULL) {
+    f = fopen(argv[2], "w");
+    if (f == NULL) {
         warn("failed to write new file: %s", argv[2]);
-        return -1;
+        goto cleanup;
     }
     
-    if (fwrite(new, 1, (size_t)newsize, writeFile) < (size_t)newsize) {
+    if (fwrite(new, 1, (size_t)newsize, f) < (size_t)newsize) {
         warn("failed to write to new file: %s", argv[2]);
-        fclose(writeFile);
-        return -1;
+        goto cleanup;
     }
     
-    if (fclose(writeFile) != 0) {
+    if (fclose(f) != 0) {
         warn("failed to close new file: %s", argv[2]);
-        return -1;
+        f = NULL;
+        goto cleanup;
     }
-
+    f = NULL;
+    
+    exitstatus = 0;
+cleanup:
 	free(new);
 	free(old);
+    
+    if (f != NULL) {
+        fclose(f);
+    }
+    
+    if (estream != NULL) {
+        io->close(estream);
+    }
+    
+    if (epf != NULL) {
+        fclose(epf);
+    }
+    
+    if (dstream != NULL) {
+        io->close(dstream);
+    }
+    
+    if (dpf != NULL) {
+        fclose(dpf);
+    }
+    
+    if (cstream != NULL) {
+        io->close(cstream);
+    }
+    
+    if (cpf != NULL) {
+        fclose(cpf);
+    }
 
-	return 0;
+	return exitstatus;
 }
