@@ -115,11 +115,55 @@ static void offtout(off_t x, u_char *buf)
         buf[7] |= 0x80;
 }
 
+static u_char *readfile(const char *filename, off_t *outSize)
+{
+    FILE *file = fopen(filename, "r");
+    if (file == NULL) {
+        return NULL;
+    }
+    
+    if (fseek(file, 0L, SEEK_END) != 0) {
+        fclose(file);
+        return NULL;
+    }
+    
+    off_t size = ftell(file);
+    if (size == -1) {
+        fclose(file);
+        return NULL;
+    }
+    
+    if (outSize != NULL) {
+        *outSize = size;
+    }
+    
+    /* Allocate size + 1 bytes instead of newsize bytes to ensure
+     that we never try to malloc(0) and get a NULL pointer */
+    u_char *buffer = malloc(size + 1);
+    if (buffer == NULL) {
+        fclose(file);
+        return NULL;
+    }
+    
+    if (fseek(file, 0L, SEEK_SET) != 0) {
+        fclose(file);
+        return NULL;
+    }
+    
+    if (fread(buffer, 1, size, file) < size) {
+        fclose(file);
+        return NULL;
+    }
+    
+    fclose(file);
+    
+    return buffer;
+}
+
 int bsdiff(int argc, char *argv[]); // Added by AMM: suppresses a warning about the following not having a prototype.
 
 int bsdiff(int argc, char *argv[])
 {
-    int fd;
     u_char *old,*new;           /* contents of old, new files */
     off_t oldsize, newsize;     /* length of old, new files */
     off_t *I,*V;                /* arrays used for suffix sort; I is ordering */
@@ -142,15 +186,11 @@ int bsdiff(int argc, char *argv[])
     if (argc != 4)
         errx(1,"usage: %s oldfile newfile patchfile\n", argv[0]);
 
-    /* Allocate oldsize + 1 bytes instead of oldsize bytes to ensure
-        that we never try to malloc(0) and get a NULL pointer */
-    if (((fd = open(argv[1], O_RDONLY, 0)) < 0) ||
-        ((oldsize = lseek(fd, 0, SEEK_END)) == -1) ||
-        ((old = malloc(oldsize + 1)) == NULL) ||
-        (lseek(fd, 0, SEEK_SET) != 0) ||
-        (read(fd, old, oldsize) != oldsize) ||
-        (close(fd) == -1))
-        err(1,"%s", argv[1]);
+    old = readfile(argv[1], &oldsize);
+    if (old == NULL) {
+        warn("old file error: %s", argv[1]);
+        return -1;
+    }
 
     if (((I = malloc((oldsize + 1) * sizeof(off_t))) == NULL) ||
         ((V = malloc((oldsize + 1) * sizeof(off_t))) == NULL))
@@ -160,16 +200,12 @@ int bsdiff(int argc, char *argv[])
     I[0] = oldsize; sais(old, I+1, oldsize);
 
     free(V);
-
-    /* Allocate newsize + 1 bytes instead of newsize bytes to ensure
-        that we never try to malloc(0) and get a NULL pointer */
-    if (((fd = open(argv[2], O_RDONLY, 0)) < 0) ||
-        ((newsize = lseek(fd, 0, SEEK_END)) == -1) ||
-        ((new = malloc(newsize + 1)) == NULL) ||
-        (lseek(fd, 0, SEEK_SET) != 0) ||
-        (read(fd, new, newsize) != newsize) ||
-        (close(fd) == -1))
-        err(1,"%s", argv[2]);
+    
+    new = readfile(argv[2], &newsize);
+    if (new == NULL) {
+        warn("new file error: %s", argv[2]);
+        return -1;
+    }
 
     if (((db = malloc(newsize + 1)) == NULL) ||
         ((eb = malloc(newsize + 1)) == NULL))
