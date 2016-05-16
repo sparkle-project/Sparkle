@@ -42,11 +42,13 @@ u_char *readfile(const char *filename, off_t *outSize)
     
     if (fseek(file, 0L, SEEK_SET) != 0) {
         fclose(file);
+        free(buffer);
         return NULL;
     }
     
     if (fread(buffer, 1, size, file) < size) {
         fclose(file);
+        free(buffer);
         return NULL;
     }
     
