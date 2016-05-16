@@ -37,6 +37,8 @@ __FBSDID("$FreeBSD: src/usr.bin/bsdiff/bspatch/bspatch.c,v 1.1 2005/08/06 01:59:
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "bscommon.h"
+
 /* Compatibility layer for reading either the old BSDIFF40 or the new BSDIFN40
    patch formats: */
 
@@ -127,7 +129,6 @@ int bspatch(int argc,const char * const argv[])
 {
 	FILE * f, * cpf, * dpf, * epf;
 	stream_t cstream, dstream, estream;
-	int fd;
 	ssize_t oldsize,newsize;
 	ssize_t bzctrllen,bzdatalen;
 	u_char header[32],buf[8];
@@ -202,12 +203,15 @@ int bspatch(int argc,const char * const argv[])
 		    (long long)(32 + bzctrllen + bzdatalen));
 	estream = io->open(epf);
 
-	if(((fd=open(argv[1],O_RDONLY,0))<0) ||
-		((oldsize=lseek(fd,0,SEEK_END))==-1) ||
-		((old=malloc((size_t)oldsize+1))==NULL) ||
-		(lseek(fd,0,SEEK_SET)!=0) ||
-		(read(fd,old,(size_t)oldsize)!=oldsize) ||
-		(close(fd)==-1)) err(1,"%s",argv[1]);
+    off_t size = 0;
+    old = readfile(argv[1], &size);
+    if (old == NULL) {
+        warn("old file: %s", argv[1]);
+        return -1;
+    }
+    
+    oldsize = size;
+    
 	if((new=malloc((size_t)newsize+1))==NULL) err(1,NULL);
 
 	oldpos=0;newpos=0;
@@ -260,9 +264,22 @@ int bspatch(int argc,const char * const argv[])
 		err(1, "fclose(%s)", argv[3]);
 
 	/* Write the new file */
-	if(((fd=open(argv[2],O_CREAT|O_TRUNC|O_WRONLY,0666))<0) ||
-		(write(fd,new,(size_t)newsize)!=newsize) || (close(fd)==-1))
-		err(1,"%s",argv[2]);
+    FILE *writeFile = fopen(argv[2], "w");
+    if (writeFile == NULL) {
+        warn("failed to write new file: %s", argv[2]);
+        return -1;
+    }
+    
+    if (fwrite(new, 1, (size_t)newsize, writeFile) < (size_t)newsize) {
+        warn("failed to write to new file: %s", argv[2]);
+        fclose(writeFile);
+        return -1;
+    }
+    
+    if (fclose(writeFile) != 0) {
+        warn("failed to close new file: %s", argv[2]);
+        return -1;
+    }
 
 	free(new);
 	free(old);
