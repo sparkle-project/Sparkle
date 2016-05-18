@@ -48,9 +48,7 @@
 {
 	@autoreleasepool {
         BOOL mountedSuccessfully = NO;
-
-        SULog(@"Extracting %@ as a DMG", self.archivePath);
-
+        
         // get a unique mount point path
         NSString *mountPoint = nil;
         NSFileManager *manager;
@@ -157,8 +155,6 @@
             if (![manager isReadableFileAtPath:fromPath]) {
                 continue;
             }
-
-            SULog(@"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
 
 			if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
 			{

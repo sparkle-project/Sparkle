@@ -96,8 +96,6 @@
 
         NSString *destination = [self.archivePath stringByDeletingLastPathComponent];
         
-        SULog(@"Extracting using '%@' '%@' < '%@' '%@'", command, [args componentsJoinedByString:@"' '"], self.archivePath, destination);
-
         // Get the file size.
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.archivePath error:nil];
         NSUInteger expectedLength = [[attributes objectForKey:NSFileSize] unsignedIntegerValue];
