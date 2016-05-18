@@ -11,6 +11,9 @@
 
 #include <Foundation/Foundation.h>
 
+// Logging utlity function that is thread-safe
+// Please only use this for logging *error* messages
+// More types of logging functions could be added in the future...
 void SULog(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
 
 #endif
