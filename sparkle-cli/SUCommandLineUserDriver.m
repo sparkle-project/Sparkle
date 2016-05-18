@@ -156,7 +156,7 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.verbose) {
-            fprintf(stderr, "Error: Unable to download release notes: %s\n", error.description.UTF8String);
+            fprintf(stderr, "Error: Unable to download release notes: %s\n", error.localizedDescription.UTF8String);
         }
     });
 }
@@ -174,7 +174,7 @@
 - (void)showUpdaterError:(NSError *)error acknowledgement:(void (^)(void))__unused acknowledgement
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        fprintf(stderr, "Error: Update has failed: %s\n", error.description.UTF8String);
+        fprintf(stderr, "Error: Update has failed: %s\n", error.localizedDescription.UTF8String);
         exit(EXIT_FAILURE);
     });
 }
