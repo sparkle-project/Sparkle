@@ -56,7 +56,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     
     if (cacheDirectoryURL == nil) {
         NSLog(@"Failed to locate cache directory with error: %@", cacheError);
-        assert(NO);
+        abort();
     }
     
     NSString *bundleIdentifier = mainBundle.bundleIdentifier;
@@ -68,14 +68,14 @@ static NSString * const UPDATED_VERSION = @"2.0";
         NSError *removeServerDirectoryError = nil;
         
         if (![fileManager removeItemAtURL:serverDirectoryURL error:&removeServerDirectoryError]) {
-            assert(NO);
+            abort();
         }
     }
     
     NSError *createDirectoryError = nil;
     if (![[NSFileManager defaultManager] createDirectoryAtURL:serverDirectoryURL withIntermediateDirectories:YES attributes:nil error:&createDirectoryError]) {
         NSLog(@"Failed creating directory at %@ with error %@", serverDirectoryURL.path, createDirectoryError);
-        assert(NO);
+        abort();
     }
     
     NSURL *bundleURL = mainBundle.bundleURL;
@@ -89,7 +89,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     NSError *copyBundleError = nil;
     if (![fileManager copyItemAtURL:bundleURL toURL:destinationBundleURL error:&copyBundleError]) {
         NSLog(@"Failed to copy main bundle into server directory with error %@", copyBundleError);
-        assert(NO);
+        abort();
     }
     
     // Update bundle's version keys to latest version
@@ -166,7 +166,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
             NSDictionary *archiveFileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:archiveURLPath error:&fileAttributesError];
             if (archiveFileAttributes == nil) {
                 NSLog(@"Failed to retrieve file attributes from archive with error %@", fileAttributesError);
-                assert(NO);
+                abort();
             }
             
             NSString * const appcastName = @"sparkletestcast";
@@ -179,7 +179,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
             assert(appcastURL != nil);
             if (![fileManager copyItemAtURL:appcastURL toURL:appcastDestinationURL error:&copyAppcastError]) {
                 NSLog(@"Failed to copy appcast into cache directory with error %@", copyAppcastError);
-                assert(NO);
+                abort();
             }
             
             // Update the appcast with the file size and signature of the update archive
@@ -188,7 +188,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
             NSMutableString *appcastContents = [[NSMutableString alloc] initWithContentsOfURL:appcastDestinationURL encoding:NSUTF8StringEncoding error:&appcastError];
             if (appcastContents == nil) {
                 NSLog(@"Failed to load appcast contents with error %@", appcastError);
-                assert(NO);
+                abort();
             }
             
             NSUInteger numberOfLengthReplacements = [appcastContents replaceOccurrencesOfString:@"$INSERT_ARCHIVE_LENGTH" withString:[NSString stringWithFormat:@"%llu", archiveFileAttributes.fileSize] options:NSLiteralSearch range:NSMakeRange(0, appcastContents.length)];
@@ -200,14 +200,14 @@ static NSString * const UPDATED_VERSION = @"2.0";
             NSError *writeAppcastError = nil;
             if (![appcastContents writeToURL:appcastDestinationURL atomically:NO encoding:NSUTF8StringEncoding error:&writeAppcastError]) {
                 NSLog(@"Failed to write updated appcast with error %@", writeAppcastError);
-                assert(NO);
+                abort();
             }
             
             // Finally start the server
             SUTestWebServer *webServer = [[SUTestWebServer alloc] initWithPort:1337 workingDirectory:serverDirectoryPath];
             if (!webServer) {
                 NSLog(@"Failed to create the web server");
-                assert(NO);
+                abort();
             }
             self.webServer = webServer;
             

@@ -50,7 +50,7 @@
 {
     // Nothing really to do here.. this shouldn't be called.
     SULog(@"Error: resumeUpdateWithCompletion: called on SUAutomaticUpdateDriver");
-    assert(false);
+    abort();
 }
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
