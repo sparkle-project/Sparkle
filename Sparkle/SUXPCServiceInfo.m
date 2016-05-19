@@ -10,11 +10,24 @@
 
 BOOL SUXPCServiceExists(NSString *bundleName)
 {
-    NSURL *xpcBundleURL = SUXPCServiceURL(bundleName);
-    return (xpcBundleURL != nil && [xpcBundleURL checkResourceIsReachableAndReturnError:NULL]);
+    NSBundle *xpcBundle = SUXPCServiceBundle(bundleName);
+    if (xpcBundle == nil) {
+        return NO;
+    }
+    
+    NSString *version = [xpcBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
+    NSString *projectVersion = @""CURRENT_PROJECT_VERSION;
+    if (version == nil || ![version isEqualToString:projectVersion]) {
+        // Use NSLog instead of SULog here because this is a developer configuration error...
+        NSLog(@"Error: XPC Version mismatch. Framework version is %@ but XPC Service (%@) version is %@", projectVersion, xpcBundle.bundlePath, version);
+        NSLog(@"Not using XPC Service...");
+        return NO;
+    }
+    
+    return YES;
 }
 
-NSURL * _Nullable SUXPCServiceURL(NSString *bundleName)
+NSBundle * _Nullable SUXPCServiceBundle(NSString *bundleName)
 {
     NSBundle *mainBundle = [NSBundle mainBundle];
     NSURL *executableURL = mainBundle.executableURL;
@@ -24,5 +37,5 @@ NSURL * _Nullable SUXPCServiceURL(NSString *bundleName)
     
     NSURL *xpcBundleURL = [[[executableURL.URLByDeletingLastPathComponent.URLByDeletingLastPathComponent URLByAppendingPathComponent:@"XPCServices"] URLByAppendingPathComponent:bundleName] URLByAppendingPathExtension:@"xpc"];
     
-    return xpcBundleURL;
+    return [NSBundle bundleWithURL:xpcBundleURL];
 }

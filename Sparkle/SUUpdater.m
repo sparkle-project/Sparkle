@@ -119,16 +119,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     return YES;
 }
 
-- (BOOL)checkATSIssueForBundleURL:(NSURL *)bundleURL getBundleExists:(BOOL *)bundleExists
+- (BOOL)checkATSIssueForBundle:(NSBundle * _Nullable)bundle getBundleExists:(BOOL *)bundleExists
 {
-    if (bundleURL == nil) {
-        if (bundleExists != NULL) {
-            *bundleExists = NO;
-        }
-        return NO;
-    }
-    
-    NSBundle *bundle = [NSBundle bundleWithURL:bundleURL];
     if (bundleExists != NULL) {
         *bundleExists = (bundle != nil);
     }
@@ -179,12 +171,12 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
     if (!servingOverHttps) {
         BOOL foundXPCAppcastDownloaderService = NO;
-        BOOL foundATSAppcastIssue = [self checkATSIssueForBundleURL:SUXPCServiceURL(@APPCAST_DOWNLOADER_PRODUCT_NAME) getBundleExists:&foundXPCAppcastDownloaderService];
+        BOOL foundATSAppcastIssue = [self checkATSIssueForBundle:SUXPCServiceBundle(@APPCAST_DOWNLOADER_PRODUCT_NAME) getBundleExists:&foundXPCAppcastDownloaderService];
         
         BOOL foundXPCUpdateDownloaderService = NO;
         BOOL foundATSUpdateIssue = NO;
         if (!foundATSAppcastIssue) {
-            foundATSUpdateIssue = [self checkATSIssueForBundleURL:SUXPCServiceURL(@UPDATE_DOWNLOADER_PRODUCT_NAME) getBundleExists:&foundXPCUpdateDownloaderService];
+            foundATSUpdateIssue = [self checkATSIssueForBundle:SUXPCServiceBundle(@UPDATE_DOWNLOADER_PRODUCT_NAME) getBundleExists:&foundXPCUpdateDownloaderService];
         }
         
         NSBundle *mainBundle = [NSBundle mainBundle];
