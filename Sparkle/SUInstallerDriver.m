@@ -298,8 +298,9 @@
     if (identifier == SURequestInstallationParameters) {
         [self sendInstallationData];
     } else if (identifier == SUExtractedArchiveWithProgress) {
-        if (data.length == sizeof(double)) {
-            double progress = *(const double *)data.bytes;
+        if (data.length == sizeof(double) && sizeof(double) == sizeof(uint64_t)) {
+            uint64_t progressValue = CFSwapInt64LittleToHost(*(const uint64_t *)data.bytes);
+            double progress = *(double *)&progressValue;
             [self.delegate installerDidExtractUpdateWithProgress:progress];
             self.currentStage = identifier;
         }

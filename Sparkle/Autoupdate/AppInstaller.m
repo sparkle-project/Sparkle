@@ -275,12 +275,15 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (void)unarchiverExtractedProgress:(double)progress
 {
-    NSData *data = [NSData dataWithBytes:&progress length:sizeof(progress)];
-    [self.remotePort sendMessageWithIdentifier:SUExtractedArchiveWithProgress data:data completion:^(BOOL success) {
-        if (!success) {
-            SULog(@"Error sending extracted progress");
-        }
-    }];
+    if (sizeof(progress) == sizeof(uint64_t)) {
+        uint64_t progressValue = CFSwapInt64HostToLittle(*(uint64_t *)&progress);
+        NSData *data = [NSData dataWithBytes:&progressValue length:sizeof(progressValue)];
+        [self.remotePort sendMessageWithIdentifier:SUExtractedArchiveWithProgress data:data completion:^(BOOL success) {
+            if (!success) {
+                SULog(@"Error sending extracted progress");
+            }
+        }];
+    }
 }
 
 - (void)unarchiverDidFail
