@@ -10,6 +10,7 @@
 #import "SUXPCServiceInfo.h"
 #import "SUAppcastDownloader.h"
 #import "SUAppcastDownloaderProtocol.h"
+#import "SUURLRequest.h"
 #import "SUErrors.h"
 
 void SUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(NSData * _Nullable, NSError * _Nullable))
@@ -46,7 +47,7 @@ void SUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(NS
         downloader = connection.remoteObjectProxy;
     }
     
-    [downloader startDownloadWithRequest:request completion:^(NSData * _Nullable data, NSError * _Nullable error) {
+    [downloader startDownloadWithRequest:[SUURLRequest URLRequestWithRequest:request] completion:^(NSData * _Nullable data, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             retrievedDownloadResult = YES;
             [connection invalidate];

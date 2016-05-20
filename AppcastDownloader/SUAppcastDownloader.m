@@ -7,6 +7,7 @@
 //
 
 #import "SUAppcastDownloader.h"
+#import "SUURLRequest.h"
 
 @interface SUAppcastDownloader () <NSURLDownloadDelegate>
 
@@ -22,12 +23,12 @@
 @synthesize download = _download;
 @synthesize downloadFilename = _downloadFilename;
 
-- (void)startDownloadWithRequest:(NSURLRequest *)request completion:(void (^)(NSData * _Nullable data, NSError * _Nullable error))completionBlock
+- (void)startDownloadWithRequest:(SUURLRequest *)request completion:(void (^)(NSData * _Nullable data, NSError * _Nullable error))completionBlock
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         self.completionBlock = completionBlock;
         
-        self.download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
+        self.download = [[NSURLDownload alloc] initWithRequest:request.request delegate:self];
     });
 }
 

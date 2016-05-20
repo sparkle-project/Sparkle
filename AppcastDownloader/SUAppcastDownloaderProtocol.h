@@ -10,10 +10,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class SUURLRequest;
+
 // The protocol that this service will vend as its API. This header file will also need to be visible to the process hosting the service.
 @protocol SUAppcastDownloaderProtocol
 
-- (void)startDownloadWithRequest:(NSURLRequest *)request completion:(void (^)(NSData * _Nullable data, NSError * _Nullable error))completionBlock;
+- (void)startDownloadWithRequest:(SUURLRequest *)request completion:(void (^)(NSData * _Nullable data, NSError * _Nullable error))completionBlock;
 
 @end
 

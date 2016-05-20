@@ -8,6 +8,7 @@
 
 #import "SUUpdateDownloader.h"
 #import "SUDownloaderDelegate.h"
+#import "SUURLRequest.h"
 #import "SUErrors.h"
 
 static NSString *SUUpdateDownloadingReason = @"Downloading Update";
@@ -42,7 +43,7 @@ static NSString *SUUpdateDownloadingReason = @"Downloading Update";
 
 // Don't implement dealloc - make the client call cleanup, which is the only way to remove the reference cycle from the delegate anyway
 
-- (void)startDownloadWithRequest:(NSURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename
+- (void)startDownloadWithRequest:(SUURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         // Remove our old caches path so we don't start accumulating files in there
@@ -55,7 +56,7 @@ static NSString *SUUpdateDownloadingReason = @"Downloading Update";
         [[NSProcessInfo processInfo] disableAutomaticTermination:SUUpdateDownloadingReason];
         self.disabledAutomaticTermination = YES;
         
-        self.download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
+        self.download = [[NSURLDownload alloc] initWithRequest:request.request delegate:self];
         self.desiredFilename = desiredFilename;
         self.bundleIdentifier = bundleIdentifier;
     });

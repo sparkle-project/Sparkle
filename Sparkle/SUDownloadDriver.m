@@ -16,6 +16,7 @@
 #import "SUHost.h"
 #import "SULog.h"
 #import "SUErrors.h"
+#import "SUURLRequest.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -110,7 +111,7 @@
     [self.delegate downloadDriverWillBeginDownload];
     
     NSString *desiredFilename = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
-    [self.downloader startDownloadWithRequest:self.request bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];
+    [self.downloader startDownloadWithRequest:[SUURLRequest URLRequestWithRequest:self.request] bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];
 }
 
 - (void)dealloc
