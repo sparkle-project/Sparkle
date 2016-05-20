@@ -62,7 +62,7 @@
 
 - (void)invokeInvalidation
 {
-    if (self != nil && self.invalidationHandler != nil) {
+    if (self.invalidationHandler != nil) {
         self.invalidationHandler();
         self.invalidationHandler = nil;
     }
