@@ -71,6 +71,7 @@
 {
     [self cleanup];
     self.completionBlock(nil, error);
+    self.completionBlock = nil;
 }
 
 @end
