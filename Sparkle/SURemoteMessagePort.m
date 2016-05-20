@@ -15,11 +15,14 @@
 static NSMutableDictionary<NSString *, NSMutableArray<SURemoteMessagePort *> *> *gMessagePortsTable;
 static dispatch_queue_t gMessageQueue;
 
+static NSString *SURemoteServiceLookupReason = @"Remote Service Connection";
+
 @interface SURemoteMessagePort ()
 
 @property (nonatomic, copy) NSString *serviceName;
 @property (nonatomic) CFMessagePortRef messagePort;
 @property (nonatomic, copy) void (^invalidationCallback)(void);
+@property (nonatomic) BOOL disabledAutomaticTermination;
 
 @end
 
@@ -28,6 +31,7 @@ static dispatch_queue_t gMessageQueue;
 @synthesize serviceName = _serviceName;
 @synthesize messagePort = _messagePort;
 @synthesize invalidationCallback = _invalidationCallback;
+@synthesize disabledAutomaticTermination = _disabledAutomaticTermination;
 
 - (instancetype)init
 {
@@ -38,6 +42,10 @@ static dispatch_queue_t gMessageQueue;
             gMessagePortsTable = [[NSMutableDictionary alloc] init];
             gMessageQueue = dispatch_queue_create("org.sparkle-project.remote-message-port", DISPATCH_QUEUE_SERIAL);
         });
+        
+        // If we are a XPC service, protect it from being terminated until the invalidation handler is set
+        _disabledAutomaticTermination = YES;
+        [[NSProcessInfo processInfo] disableAutomaticTermination:SURemoteServiceLookupReason];
     }
     return self;
 }
@@ -49,6 +57,19 @@ static dispatch_queue_t gMessageQueue;
         _serviceName = [serviceName copy];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    [self enableAutomaticTermination];
+}
+
+- (void)enableAutomaticTermination
+{
+    if (self.disabledAutomaticTermination) {
+        [[NSProcessInfo processInfo] enableAutomaticTermination:SURemoteServiceLookupReason];
+        self.disabledAutomaticTermination = NO;
+    }
 }
 
 - (void)connectWithLookupCompletion:(void (^)(BOOL))lookupCompletionHandler
@@ -80,6 +101,9 @@ static dispatch_queue_t gMessageQueue;
 
 - (void)setInvalidationHandler:(void (^)(void))invalidationHandler
 {
+    // We can disable automatic termination now because we will be protected by the invalidationHandler (if this is a XPC service)
+    [self enableAutomaticTermination];
+    
     dispatch_async(gMessageQueue, ^{
         if (self.messagePort != NULL) {
             self.invalidationCallback = [invalidationHandler copy];
