@@ -141,10 +141,10 @@
     }
 }
 
-- (void)downloadDriverDidReceiveResponse:(NSURLResponse *)response
+- (void)downloadDriverDidReceiveExpectedContentLength:(int64_t)expectedContentLength
 {
-    if ([self.delegate respondsToSelector:@selector(downloadDriverDidReceiveResponse:)]) {
-        [self.delegate downloadDriverDidReceiveResponse:response];
+    if ([self.delegate respondsToSelector:@selector(downloadDriverDidReceiveExpectedContentLength:)]) {
+        [self.delegate downloadDriverDidReceiveExpectedContentLength:expectedContentLength];
     }
 }
 

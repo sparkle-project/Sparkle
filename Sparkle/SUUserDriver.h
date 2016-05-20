@@ -201,14 +201,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showDownloadInitiatedWithCompletion:(void (^)(SUDownloadUpdateStatus))downloadUpdateStatusCompletion;
 
 /*!
- * Show the user that downloading the new update receieved an initial response
+ * Show the user the content length of the new update that will be downloaded
  *
- * This may be an appropriate time to retrieve the expected content length of the download
- * @param response The URL response that contains expected content length of the new update being downloaded
+ * @param expectedContentLength The expected content length of the new update being downloaded.
+ * This is NSURLResponseUnknownLength if the length is unknown.
  *
  * This can be called from any thread
  */
-- (void)showDownloadDidReceiveResponse:(NSURLResponse *)response;
+- (void)showDownloadDidReceiveExpectedContentLength:(int64_t)expectedContentLength;
 
 /*!
  * Show the user that the update download received more data

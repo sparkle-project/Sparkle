@@ -146,9 +146,9 @@
     }];
 }
 
-- (void)downloadDriverDidReceiveResponse:(NSURLResponse *)response
+- (void)downloadDriverDidReceiveExpectedContentLength:(int64_t)expectedContentLength
 {
-    [self.userDriver showDownloadDidReceiveResponse:response];
+    [self.userDriver showDownloadDidReceiveExpectedContentLength:expectedContentLength];
 }
 
 - (void)downloadDriverDidReceiveDataOfLength:(NSUInteger)length

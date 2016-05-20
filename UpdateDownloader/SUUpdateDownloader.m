@@ -129,7 +129,10 @@ static NSString *SUUpdateDownloadingReason = @"Downloading Update";
 
 - (void)download:(NSURLDownload *)__unused download didReceiveResponse:(NSURLResponse *)response
 {
-    [self.delegate downloaderDidReceiveResponse:response];
+    // It might be tempting to send over the response object instead of the expected content length but this isn't a good idea
+    // For one, we are only ever concerned about the expected content length
+    // Another reason is that NSURLResponse doesn't support NSSecureCoding in older OS releases (eg: 10.8), which cause issues with XPC
+    [self.delegate downloaderDidReceiveExpectedContentLength:response.expectedContentLength];
 }
 
 - (void)download:(NSURLDownload *)__unused download didReceiveDataOfLength:(NSUInteger)length

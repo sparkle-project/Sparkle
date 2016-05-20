@@ -268,12 +268,12 @@
     });
 }
 
-- (void)showDownloadDidReceiveResponse:(NSURLResponse *)response
+- (void)showDownloadDidReceiveExpectedContentLength:(int64_t)expectedContentLength
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self addUpdateButtonWithTitle:@"Downloading…"];
         self.contentLengthDownloaded = 0;
-        self.expectedContentLength = (NSUInteger)response.expectedContentLength;
+        self.expectedContentLength = (NSUInteger)expectedContentLength;
         if (self.expectedContentLength == 0) {
             // don't divide by zero ever
             self.expectedContentLength = 1;

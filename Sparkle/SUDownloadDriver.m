@@ -178,10 +178,10 @@
     });
 }
 
-- (void)downloaderDidReceiveResponse:(NSURLResponse *)response
+- (void)downloaderDidReceiveExpectedContentLength:(int64_t)expectedContentLength
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.delegate downloadDriverDidReceiveResponse:response];
+        [self.delegate downloadDriverDidReceiveExpectedContentLength:expectedContentLength];
     });
 }
 

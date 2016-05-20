@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)downloadDriverWillBeginDownload;
 
-- (void)downloadDriverDidReceiveResponse:(NSURLResponse *)response;
+- (void)downloadDriverDidReceiveExpectedContentLength:(int64_t)expectedContentLength;
 
 - (void)downloadDriverDidReceiveDataOfLength:(NSUInteger)length;
 

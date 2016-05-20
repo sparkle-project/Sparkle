@@ -317,10 +317,10 @@
     [self.coreComponent cancelDownloadStatus];
 }
 
-- (void)showDownloadDidReceiveResponse:(NSURLResponse *)response
+- (void)showDownloadDidReceiveExpectedContentLength:(int64_t)expectedContentLength
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.statusController setMaxProgressValue:[response expectedContentLength]];
+        [self.statusController setMaxProgressValue:expectedContentLength];
     });
 }
 
