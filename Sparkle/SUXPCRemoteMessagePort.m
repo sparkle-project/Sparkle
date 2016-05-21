@@ -8,6 +8,7 @@
 
 #import "SUXPCRemoteMessagePort.h"
 #import "SURemoteMessagePort.h"
+#import "SULog.h"
 
 @interface SUXPCRemoteMessagePort ()
 
@@ -34,6 +35,7 @@
         };
         
         _connection.interruptionHandler = ^{
+            SULog(@"RemoteMessagePort service interrupted");
             [weakSelf invokeInvalidation];
             [weakSelf.connection invalidate];
         };
