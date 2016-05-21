@@ -17,7 +17,7 @@ Sparkle has a few components that can optionally be handed off to XPC services. 
 If you code sign your application, these XPC services will also need to be signed by you with the attached entitlements. Included is a script to automate this.
 
 Here is an example of invoking the script with my Developer ID:
-> ./bin/codesign_xpc_services "Developer ID Application" XPCServices/
+> ./bin/codesign_xpc "Developer ID Application" XPCServices/*.xpc
 
 After signing the services, copy them into your project and set up a build phase to embed the XPC Services into your application.
 

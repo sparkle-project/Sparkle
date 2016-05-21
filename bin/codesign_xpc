@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+
+import os, sys, subprocess
+
+def log_message(message):
+    sys.stderr.write(message + "\n")
+
+def sanitize(argument):
+    return ('"' + argument + '"' if ' ' in argument else argument)
+
+def codesign_service(identity, path, entitlements_path=None):
+    command = ["codesign", "-fs", identity, path] + ([] if entitlements_path is None else ["--entitlements", entitlements_path])
+    log_message(" ".join(map(sanitize, command)))
+
+    process = subprocess.Popen(command, stdout=subprocess.PIPE)
+    process.communicate()
+    if process.returncode != 0:
+        log_message("Error: Failed to codesign %s" % (path))
+        sys.exit(1)
+
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        log_message("Usage:\n\t%s code-signing-identity xpc-service xpc-service2 ..." % (sys.argv[0]))
+        log_message("Example:\n\t%s \"Developer ID Application\" ./XPCServices/*.xpc" % (sys.argv[0]))
+        sys.exit(1)
+
+    signing_identity = sys.argv[1]
+    xpc_services = sys.argv[2:]
+
+    for xpc_service in xpc_services:
+        parent, child = os.path.split(xpc_service)
+        service_name = os.path.splitext(child)[0]
+        entitlements_path = os.path.join(parent, service_name + ".entitlements")
+        codesign_service(signing_identity, xpc_service, None if not os.path.exists(entitlements_path) else entitlements_path)
