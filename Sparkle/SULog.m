@@ -13,6 +13,10 @@
 #error This is a "core" implementation and should NOT import AppKit
 #endif
 
+// For converting constants to string literals using the preprocessor
+#define STRINGIFY(x) #x
+#define TO_STRING(x) STRINGIFY(x)
+
 void SULog(NSString *format, ...)
 {
     static aslclient client;
@@ -50,11 +54,10 @@ void SULog(NSString *format, ...)
         }
         
         // In the future, we could possibly have different logging functions using different levels
-        if (asl_set(message, ASL_KEY_LEVEL, "3" /* ASL_LEVEL_ERR */) != 0) {
+        if (asl_set(message, ASL_KEY_LEVEL, TO_STRING(ASL_LEVEL_ERR)) != 0) {
             return;
         }
         
         asl_send(client, message);
     });
 }
-
