@@ -86,6 +86,7 @@ static NSString *SURemoteServiceLookupReason = @"Remote Service Connection";
             CFMessagePortRef messagePort = CFMessagePortCreateRemote(kCFAllocatorDefault, (CFStringRef)self.serviceName);
             if (messagePort == NULL) {
                 lookupCompletionHandler(NO);
+                [self enableAutomaticTermination];
             } else {
                 self.messagePort = messagePort;
                 
