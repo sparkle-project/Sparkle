@@ -10,6 +10,7 @@
 #import <XCTest/XCTest.h>
 #import "NTSynchronousTask.h"
 #import "SUCodeSigningVerifier.h"
+#import "SUFileManager.h"
 
 @interface SUCodeSigningVerifierTest : XCTestCase
 
@@ -32,11 +33,24 @@
     NSBundle *unitTestBundle = [NSBundle bundleForClass:[self class]];
     NSString *unitTestBundleIdentifier = unitTestBundle.bundleIdentifier;
     NSString *zippedAppPath = [unitTestBundle pathForResource:@"SparkleTestCodeSignApp" ofType:@"zip"];
-    NSString *tempDir = [NSTemporaryDirectory() stringByAppendingPathComponent:unitTestBundleIdentifier];
+    
+    SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:NO];
+    
+    NSError *tempError = nil;
+    NSURL *tempDir = [fileManager makeTemporaryDirectoryWithPreferredName:unitTestBundleIdentifier appropriateForDirectoryURL:[NSURL fileURLWithPath:zippedAppPath] error:&tempError];
+    
+    if (tempDir == nil) {
+        XCTFail(@"Failed to create temporary directory with error: %@", tempError);
+        return;
+    }
+    
+    NSString *tempDirPath = tempDir.path;
+    XCTAssertNotNil(tempDirPath);
+    
     NSError *error = nil;
-    if ([[NSFileManager defaultManager] createDirectoryAtPath:tempDir withIntermediateDirectories:YES attributes:nil error:&error]) {
-        if ([self unzip:zippedAppPath toPath:tempDir]) {
-            self.notSignedAppPath = [tempDir stringByAppendingPathComponent:@"SparkleTestCodeSignApp.app"];
+    if ([[NSFileManager defaultManager] createDirectoryAtPath:tempDirPath withIntermediateDirectories:YES attributes:nil error:&error]) {
+        if ([self unzip:zippedAppPath toPath:tempDirPath]) {
+            self.notSignedAppPath = [tempDirPath stringByAppendingPathComponent:@"SparkleTestCodeSignApp.app"];
             [self setupValidSignedApp];
             [self setupInvalidSignedApp];
         }
@@ -54,13 +68,8 @@
     [super tearDown];
     
     if (self.notSignedAppPath) {
-        [[NSFileManager defaultManager] removeItemAtPath:self.notSignedAppPath error:nil];
-    }
-    if (self.validSignedAppPath) {
-        [[NSFileManager defaultManager] removeItemAtPath:self.validSignedAppPath error:nil];
-    }
-    if (self.invalidSignedAppPath) {
-        [[NSFileManager defaultManager] removeItemAtPath:self.invalidSignedAppPath error:nil];
+        NSString *tempDir = [self.notSignedAppPath stringByDeletingLastPathComponent];
+        [[NSFileManager defaultManager] removeItemAtPath:tempDir error:nil];
     }
 }
 

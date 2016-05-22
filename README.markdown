@@ -1,8 +1,8 @@
-# Sparkle [![Build Status](https://travis-ci.org/sparkle-project/Sparkle.svg?branch=master)](https://travis-ci.org/sparkle-project/Sparkle) [![Coverage Status](https://coveralls.io/repos/sparkle-project/Sparkle/badge.svg?branch=master&service=github)](https://coveralls.io/github/sparkle-project/Sparkle?branch=master) <a href="https://www.bandwidthhog.com/?utm_source=sparkle-github&amp;utm_medium=badge&amp;utm_campaign=readme"><img src="https://img.shields.io/badge/sponsored%20by-Bandwidth%20Hog-orange.svg" alt="sponsored by: bandwidth hog"></a>
+# Sparkle [![Build Status](https://travis-ci.org/sparkle-project/Sparkle.svg?branch=master)](https://travis-ci.org/sparkle-project/Sparkle) [![Coverage Status](https://coveralls.io/repos/sparkle-project/Sparkle/badge.svg?branch=master&service=github)](https://coveralls.io/github/sparkle-project/Sparkle?branch=master) <a href="https://www.maxcdn.com/?utm_source=sparkle-github&amp;utm_medium=badge&amp;utm_campaign=readme"><img src="https://img.shields.io/badge/sponsored%20by-MaxCDN-orange.svg" alt="sponsored by: MaxCDN"></a>
 
 An easy-to-use software update framework for Cocoa developers.
 
-<img src="Resources/Screenshot.png" width="715" alt="Sparkle shows familiar update window with release notes">
+<img src="Resources/Screenshot.png" width="732" alt="Sparkle shows familiar update window with release notes">
 
 ## Changes since 1.5b
 
@@ -50,5 +50,4 @@ Alternatively, build the Distribution scheme in the Xcode UI.
 
 ## Project Sponsor
 
-[Bandwidth Hog](https://www.bandwidthhog.com/?utm_source=sparkle-github&utm_medium=link&utm_campaign=readme-footer) is a service from MaxCDN
-that allows you to push software updates to your customers for only 1¢ a gigabyte. Best part is there are no contracts, it is all Pay-as-you-Go.
+[MaxCDN](https://www.maxcdn.com/?utm_source=sparkle-github&utm_medium=link&utm_campaign=readme-footer)

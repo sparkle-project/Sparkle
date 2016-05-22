@@ -94,7 +94,7 @@
     }
     
     if (item && deltaItem) {
-        SUAppcastItem *deltaUpdateItem = [item deltaUpdates][hostVersion];
+        SUAppcastItem *deltaUpdateItem = [[item deltaUpdates] objectForKey:hostVersion];
         if (deltaUpdateItem && [[self class] hostSupportsItem:deltaUpdateItem]) {
             *deltaItem = deltaUpdateItem;
         }
@@ -208,8 +208,36 @@
                                                }]];
 }
 
+- (NSString *)appCachePath
+{
+    NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *cachePath = nil;
+    if ([cachePaths count]) {
+        cachePath = [cachePaths objectAtIndex:0];
+    }
+    if (!cachePath) {
+        SULog(@"Failed to find user's cache directory! Using system default");
+        cachePath = NSTemporaryDirectory();
+    }
+    
+    NSString *name = [self.host.bundle bundleIdentifier];
+    if (!name) {
+        name = [self.host name];
+    }
+    
+    cachePath = [cachePath stringByAppendingPathComponent:name];
+    cachePath = [cachePath stringByAppendingPathComponent:@SPARKLE_BUNDLE_IDENTIFIER];
+    return cachePath;
+}
+
 - (void)downloadUpdate
 {
+    // Clear cache directory so that downloads can't possibly accumulate inside
+    NSString *appCachePath = [self appCachePath];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:appCachePath]) {
+        [[NSFileManager defaultManager] removeItemAtPath:appCachePath error:NULL];
+    }
+    
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self.updateItem fileURL]];
     [request setValue:[self.updater userAgentString] forHTTPHeaderField:@"User-Agent"];
     if ([[self.updater delegate] respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
@@ -223,13 +251,14 @@
 - (void)download:(NSURLDownload *)__unused d decideDestinationWithSuggestedFilename:(NSString *)name
 {
     NSString *downloadFileName = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
-
-
-    self.tempDir = [self.host.appCachePath stringByAppendingPathComponent:downloadFileName];
+    
+    NSString *appCachePath = [self appCachePath];
+    
+    self.tempDir = [appCachePath stringByAppendingPathComponent:downloadFileName];
     int cnt = 1;
 	while ([[NSFileManager defaultManager] fileExistsAtPath:self.tempDir] && cnt <= 999)
 	{
-        self.tempDir = [self.host.appCachePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, cnt++]];
+        self.tempDir = [appCachePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, cnt++]];
     }
 
     // Create the temporary directory if necessary.
@@ -335,7 +364,7 @@
 
 - (void)download:(NSURLDownload *)__unused download didFailWithError:(NSError *)error
 {
-    NSURL *failingUrl = error.userInfo[NSURLErrorFailingURLErrorKey];
+    NSURL *failingUrl = [error.userInfo objectForKey:NSURLErrorFailingURLErrorKey];
     if (!failingUrl) {
         failingUrl = [self.updateItem fileURL];
     }
@@ -351,7 +380,7 @@
         NSUnderlyingErrorKey: error,
     }];
     if (failingUrl) {
-        userInfo[NSURLErrorFailingURLErrorKey] = failingUrl;
+        [userInfo setObject:failingUrl forKey:NSURLErrorFailingURLErrorKey];
     }
 
     [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo]];
@@ -480,7 +509,7 @@
     NSString *const relaunchToolName = @"" SPARKLE_RELAUNCH_TOOL_NAME;
     NSString *const relaunchPathToCopy = [sparkleBundle pathForResource:relaunchToolName ofType:@"app"];
     if (relaunchPathToCopy != nil) {
-        NSString *targetPath = [self.host.appCachePath stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
+        NSString *targetPath = [[self appCachePath] stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
         
         SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:NO];
         NSError *error = nil;
@@ -581,8 +610,8 @@
         NSError *errorToDisplay = error;
         int finiteRecursion=5;
         do {
-            SULog(@"Error: %@ %@ (URL %@)", errorToDisplay.localizedDescription, errorToDisplay.localizedFailureReason, errorToDisplay.userInfo[NSURLErrorFailingURLErrorKey]);
-            errorToDisplay = errorToDisplay.userInfo[NSUnderlyingErrorKey];
+            SULog(@"Error: %@ %@ (URL %@)", errorToDisplay.localizedDescription, errorToDisplay.localizedFailureReason, [errorToDisplay.userInfo objectForKey:NSURLErrorFailingURLErrorKey]);
+            errorToDisplay = [errorToDisplay.userInfo objectForKey:NSUnderlyingErrorKey];
         } while(--finiteRecursion && errorToDisplay);
     }
     if (self.download) {

@@ -26,7 +26,6 @@ typedef struct {
 - (instancetype)initWithBundle:(NSBundle *)aBundle;
 @property (readonly, copy) NSString *bundlePath;
 @property (readonly) BOOL allowsAutomaticUpdates;
-@property (readonly, copy) NSString *appCachePath;
 @property (readonly, copy) NSString *installationPath;
 @property (readonly, copy) NSString *name;
 @property (readonly, copy) NSString *version;

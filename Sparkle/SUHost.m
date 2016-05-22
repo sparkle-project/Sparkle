@@ -71,29 +71,10 @@
     }
     
     // Can we automatically update in the background without bugging the user (e.g, with a administrator password prompt)?
-    return [[NSFileManager defaultManager] isWritableFileAtPath:self.bundlePath];
-}
-
-- (NSString *)appCachePath
-{
-    NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    NSString *cachePath = nil;
-    if ([cachePaths count]) {
-        cachePath = [cachePaths objectAtIndex:0];
-    }
-    if (!cachePath) {
-        SULog(@"Failed to find user's cache directory! Using system default");
-        cachePath = NSTemporaryDirectory();
-    }
-
-    NSString *name = [self.bundle bundleIdentifier];
-    if (!name) {
-        name = [self name];
-    }
-
-    cachePath = [cachePath stringByAppendingPathComponent:name];
-    cachePath = [cachePath stringByAppendingPathComponent:@"Sparkle"];
-    return cachePath;
+    // Note it's very well possible to have the bundle be writable but not be able to write into the parent directory
+    // And if the bundle isn't writable, but we can write into the parent directory, we will still need to authorize to replace it
+    NSString *bundlePath = [self bundlePath];
+    return [[NSFileManager defaultManager] isWritableFileAtPath:bundlePath.stringByDeletingLastPathComponent] && [[NSFileManager defaultManager] isWritableFileAtPath:bundlePath];
 }
 
 - (NSString *)installationPath
