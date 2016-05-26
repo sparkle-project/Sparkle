@@ -1,14 +1,14 @@
 //
 //  main.m
-//  UpdateDownloader
+//  PersistentDownloader
 //
 //  Created by Mayur Pawashe on 4/1/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
-#import "SUUpdateDownloader.h"
-#import "SUDownloaderDelegate.h"
+#import "SUPersistentDownloader.h"
+#import "SUPersistentDownloaderDelegate.h"
 
 @interface ServiceDelegate : NSObject <NSXPCListenerDelegate>
 @end
@@ -20,13 +20,13 @@
     
     // Configure the connection.
     // First, set the interface that the exported object implements.
-    newConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUUpdateDownloaderProtocol)];
+    newConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUPersistentDownloaderProtocol)];
     
     // Then set remote object interface
-    newConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUDownloaderDelegate)];
+    newConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUPersistentDownloaderDelegate)];
     
     // Next, set the object that the connection exports. All messages sent on the connection to this service will be sent to the exported object to handle. The connection retains the exported object.
-    SUUpdateDownloader *exportedObject = [[SUUpdateDownloader alloc] initWithDelegate:newConnection.remoteObjectProxy];
+    SUPersistentDownloader *exportedObject = [[SUPersistentDownloader alloc] initWithDelegate:newConnection.remoteObjectProxy];
     newConnection.exportedObject = exportedObject;
     
     // Resuming the connection allows the system to deliver more incoming messages.

@@ -15,12 +15,12 @@ if [ "$ACTION" = "" ] ; then
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
 
     cp -R "$CONFIGURATION_BUILD_DIR/SparkleInstallerLauncher.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-    cp -R "$CONFIGURATION_BUILD_DIR/SparkleUpdateDownloader.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+    cp -R "$CONFIGURATION_BUILD_DIR/SparklePersistentDownloader.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
     cp -R "$CONFIGURATION_BUILD_DIR/SparkleAppcastDownloader.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
     cp -R "$CONFIGURATION_BUILD_DIR/SparkleRemoteMessagePort.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
 
     cp "$SRCROOT/AppcastDownloader/SparkleAppcastDownloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-    cp "$SRCROOT/UpdateDownloader/SparkleUpdateDownloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+    cp "$SRCROOT/PersistentDownloader/SparklePersistentDownloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
 
     # Only copy dSYMs for Release builds, but don't check for the presence of the actual files
     # because missing dSYMs in a release build SHOULD trigger a build failure
@@ -30,7 +30,7 @@ if [ "$ACTION" = "" ] ; then
         cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
 
         cp -R "$CONFIGURATION_BUILD_DIR/SparkleInstallerLauncher.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-        cp -R "$CONFIGURATION_BUILD_DIR/SparkleUpdateDownloader.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+        cp -R "$CONFIGURATION_BUILD_DIR/SparklePersistentDownloader.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
         cp -R "$CONFIGURATION_BUILD_DIR/SparkleAppcastDownloader.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
         cp -R "$CONFIGURATION_BUILD_DIR/SparkleRemoteMessagePort.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
     fi

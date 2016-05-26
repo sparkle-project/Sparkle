@@ -7,8 +7,8 @@
 //
 
 #import "SUDownloadDriver.h"
-#import "SUDownloaderDelegate.h"
-#import "SUUpdateDownloader.h"
+#import "SUPersistentDownloaderDelegate.h"
+#import "SUPersistentDownloader.h"
 #import "SUXPCServiceInfo.h"
 #import "SUAppcastItem.h"
 #import "SUFileManager.h"
@@ -22,9 +22,9 @@
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-@interface SUDownloadDriver () <SUDownloaderDelegate>
+@interface SUDownloadDriver () <SUPersistentDownloaderDelegate>
 
-@property (nonatomic) id<SUUpdateDownloaderProtocol> downloader;
+@property (nonatomic) id<SUPersistentDownloaderProtocol> downloader;
 @property (nonatomic) NSXPCConnection *connection;
 @property (nonatomic, readonly) SUAppcastItem *updateItem;
 @property (nonatomic, readonly) SUHost *host;
@@ -58,12 +58,12 @@
         _request = [NSMutableURLRequest requestWithURL:updateItem.fileURL];
         [_request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
         
-        if (!SUXPCServiceExists(@UPDATE_DOWNLOADER_PRODUCT_NAME)) {
-            _downloader = [[SUUpdateDownloader alloc] initWithDelegate:self];
+        if (!SUXPCServiceExists(@PERSISTENT_DOWNLOADER_PRODUCT_NAME)) {
+            _downloader = [[SUPersistentDownloader alloc] initWithDelegate:self];
         } else {
-            _connection = [[NSXPCConnection alloc] initWithServiceName:@UPDATE_DOWNLOADER_BUNDLE_ID];
-            _connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUUpdateDownloaderProtocol)];
-            _connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUDownloaderDelegate)];
+            _connection = [[NSXPCConnection alloc] initWithServiceName:@PERSISTENT_DOWNLOADER_BUNDLE_ID];
+            _connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUPersistentDownloaderProtocol)];
+            _connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUPersistentDownloaderDelegate)];
             _connection.exportedObject = self;
             
             _downloader = _connection.remoteObjectProxy;

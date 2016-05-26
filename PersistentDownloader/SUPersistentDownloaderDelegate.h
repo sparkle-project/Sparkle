@@ -1,5 +1,5 @@
 //
-//  SUDownloaderDelegate.h
+//  SUPersistentDownloaderDelegate.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 4/1/16.
@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol SUDownloaderDelegate <NSObject>
+@protocol SUPersistentDownloaderDelegate <NSObject>
 
 - (void)downloaderDidSetDestinationName:(NSString *)destinationName temporaryDirectory:(NSString *)temporaryDirectory;
 

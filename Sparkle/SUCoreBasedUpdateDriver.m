@@ -49,7 +49,7 @@
 
 // If we support sandboxing this component in the future, it is important to note this may return a different path
 // For this reason, this method should not be a part of SUHost because its behavior depends on what kind of process it's being invoked from
-#warning kind of duplicated code from SUUpdateDownloader ??
+#warning kind of duplicated code from SUPersistentDownloader ??
 + (NSString *)sparkleCachePathForHost:(SUHost *)host
 {
     NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);

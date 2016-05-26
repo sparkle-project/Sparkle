@@ -1,22 +1,22 @@
 //
-//  SUUpdateDownloader.m
-//  UpdateDownloader
+//  SUPersistentDownloader.m
+//  PersistentDownloader
 //
 //  Created by Mayur Pawashe on 4/1/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SUUpdateDownloader.h"
-#import "SUDownloaderDelegate.h"
+#import "SUPersistentDownloader.h"
+#import "SUPersistentDownloaderDelegate.h"
 #import "SUURLRequest.h"
 #import "SUErrors.h"
 
-static NSString *SUUpdateDownloadingReason = @"Downloading Update";
+static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
 
-@interface SUUpdateDownloader () <NSURLDownloadDelegate>
+@interface SUPersistentDownloader () <NSURLDownloadDelegate>
 
 // Delegate is intentionally strongly referenced; see header
-@property (nonatomic) id <SUDownloaderDelegate> delegate;
+@property (nonatomic) id <SUPersistentDownloaderDelegate> delegate;
 @property (nonatomic) NSURLDownload *download;
 @property (nonatomic, copy) NSString *bundleIdentifier;
 @property (nonatomic, copy) NSString *desiredFilename;
@@ -24,7 +24,7 @@ static NSString *SUUpdateDownloadingReason = @"Downloading Update";
 
 @end
 
-@implementation SUUpdateDownloader
+@implementation SUPersistentDownloader
 
 @synthesize delegate = _delegate;
 @synthesize download = _download;
@@ -32,7 +32,7 @@ static NSString *SUUpdateDownloadingReason = @"Downloading Update";
 @synthesize desiredFilename = _desiredFilename;
 @synthesize disabledAutomaticTermination = _disabledAutomaticTermination;
 
-- (instancetype)initWithDelegate:(id <SUDownloaderDelegate>)delegate
+- (instancetype)initWithDelegate:(id <SUPersistentDownloaderDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -53,7 +53,7 @@ static NSString *SUUpdateDownloadingReason = @"Downloading Update";
         }
         
         // Prevent service from automatically terminating while downloading the update asynchronously without any reply blocks
-        [[NSProcessInfo processInfo] disableAutomaticTermination:SUUpdateDownloadingReason];
+        [[NSProcessInfo processInfo] disableAutomaticTermination:SUPersistentDownloadingReason];
         self.disabledAutomaticTermination = YES;
         
         self.download = [[NSURLDownload alloc] initWithRequest:request.request delegate:self];
@@ -65,7 +65,7 @@ static NSString *SUUpdateDownloadingReason = @"Downloading Update";
 - (void)enableAutomaticTermination
 {
     if (self.disabledAutomaticTermination) {
-        [[NSProcessInfo processInfo] enableAutomaticTermination:SUUpdateDownloadingReason];
+        [[NSProcessInfo processInfo] enableAutomaticTermination:SUPersistentDownloadingReason];
         self.disabledAutomaticTermination = NO;
     }
 }

@@ -1,0 +1,7 @@
+// PersistentDownloader
+
+INFOPLIST_FILE = PersistentDownloader/Info.plist
+WRAPPER_EXTENSION = xpc
+PRODUCT_BUNDLE_IDENTIFIER = ${PERSISTENT_DOWNLOADER_BUNDLE_ID}
+PRODUCT_NAME = ${PERSISTENT_DOWNLOADER_PRODUCT_NAME}
+CODE_SIGN_ENTITLEMENTS = PersistentDownloader/SparklePersistentDownloader.entitlements

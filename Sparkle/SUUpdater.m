@@ -173,15 +173,15 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         BOOL foundXPCAppcastDownloaderService = NO;
         BOOL foundATSAppcastIssue = [self checkATSIssueForBundle:SUXPCServiceBundle(@APPCAST_DOWNLOADER_PRODUCT_NAME) getBundleExists:&foundXPCAppcastDownloaderService];
         
-        BOOL foundXPCUpdateDownloaderService = NO;
+        BOOL foundXPCPersistentDownloaderService = NO;
         BOOL foundATSUpdateIssue = NO;
         if (!foundATSAppcastIssue) {
-            foundATSUpdateIssue = [self checkATSIssueForBundle:SUXPCServiceBundle(@UPDATE_DOWNLOADER_PRODUCT_NAME) getBundleExists:&foundXPCUpdateDownloaderService];
+            foundATSUpdateIssue = [self checkATSIssueForBundle:SUXPCServiceBundle(@PERSISTENT_DOWNLOADER_PRODUCT_NAME) getBundleExists:&foundXPCPersistentDownloaderService];
         }
         
         NSBundle *mainBundle = [NSBundle mainBundle];
         BOOL foundATSMainBundleIssue = NO;
-        if (!foundATSAppcastIssue && !foundATSUpdateIssue && (!foundXPCAppcastDownloaderService || !foundXPCUpdateDownloaderService)) {
+        if (!foundATSAppcastIssue && !foundATSUpdateIssue && (!foundXPCAppcastDownloaderService || !foundXPCPersistentDownloaderService)) {
             BOOL foundATSIssue = ([mainBundle objectForInfoDictionaryKey:@"NSAppTransportSecurity"] == nil);
             BOOL updatingMainBundle = [self.host.bundle isEqualTo:mainBundle];
             
