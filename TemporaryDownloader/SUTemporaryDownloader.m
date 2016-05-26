@@ -1,15 +1,15 @@
 //
-//  SUAppcastDownloader.m
-//  AppcastDownloader
+//  SUTemporaryDownloader.m
+//  TemporaryDownloader
 //
 //  Created by Mayur Pawashe on 4/1/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SUAppcastDownloader.h"
+#import "SUTemporaryDownloader.h"
 #import "SUURLRequest.h"
 
-@interface SUAppcastDownloader () <NSURLDownloadDelegate>
+@interface SUTemporaryDownloader () <NSURLDownloadDelegate>
 
 @property (nonatomic, copy) void (^completionBlock)(NSData * _Nullable data, NSError * _Nullable error);
 @property (nonatomic) NSURLDownload *download;
@@ -17,7 +17,7 @@
 
 @end
 
-@implementation SUAppcastDownloader
+@implementation SUTemporaryDownloader
 
 @synthesize completionBlock = _completionBlock;
 @synthesize download = _download;

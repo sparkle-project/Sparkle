@@ -8,22 +8,22 @@
 
 #import "SUURLDownload.h"
 #import "SUXPCServiceInfo.h"
-#import "SUAppcastDownloader.h"
-#import "SUAppcastDownloaderProtocol.h"
+#import "SUTemporaryDownloader.h"
+#import "SUTemporaryDownloaderProtocol.h"
 #import "SUURLRequest.h"
 #import "SUErrors.h"
 
 void SUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(NSData * _Nullable, NSError * _Nullable))
 {
-    id<SUAppcastDownloaderProtocol> downloader = nil;
+    id<SUTemporaryDownloaderProtocol> downloader = nil;
     NSXPCConnection *connection = nil;
     __block BOOL retrievedDownloadResult = NO;
     
-    if (!SUXPCServiceExists(@APPCAST_DOWNLOADER_PRODUCT_NAME)) {
-        downloader = [[SUAppcastDownloader alloc] init];
+    if (!SUXPCServiceExists(@TEMPORARY_DOWNLOADER_PRODUCT_NAME)) {
+        downloader = [[SUTemporaryDownloader alloc] init];
     } else {
-        connection = [[NSXPCConnection alloc] initWithServiceName:@APPCAST_DOWNLOADER_BUNDLE_ID];
-        connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUAppcastDownloaderProtocol)];
+        connection = [[NSXPCConnection alloc] initWithServiceName:@TEMPORARY_DOWNLOADER_BUNDLE_ID];
+        connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUTemporaryDownloaderProtocol)];
         
         __weak NSXPCConnection *weakConnection = connection;
         connection.interruptionHandler = ^{

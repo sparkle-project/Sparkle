@@ -1,13 +1,13 @@
 //
 //  main.m
-//  AppcastDownloader
+//  TemporaryDownloader
 //
 //  Created by Mayur Pawashe on 4/1/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
-#import "SUAppcastDownloader.h"
+#import "SUTemporaryDownloader.h"
 
 @interface ServiceDelegate : NSObject <NSXPCListenerDelegate>
 @end
@@ -19,10 +19,10 @@
     
     // Configure the connection.
     // First, set the interface that the exported object implements.
-    newConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUAppcastDownloaderProtocol)];
+    newConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUTemporaryDownloaderProtocol)];
     
     // Next, set the object that the connection exports. All messages sent on the connection to this service will be sent to the exported object to handle. The connection retains the exported object.
-    SUAppcastDownloader *exportedObject = [SUAppcastDownloader new];
+    SUTemporaryDownloader *exportedObject = [SUTemporaryDownloader new];
     newConnection.exportedObject = exportedObject;
     
     // Resuming the connection allows the system to deliver more incoming messages.

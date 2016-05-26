@@ -13,7 +13,6 @@
 #import "SULog.h"
 #import "SUErrors.h"
 #import "SULocalizations.h"
-#import "SUAppcastDownloader.h"
 #import "SUXPCServiceInfo.h"
 #import "SUURLDownload.h"
 

@@ -1,4 +1,0 @@
-// AppcastDownloader Debug
-#include "ConfigAppcastDownloader.xcconfig"
-
-CODE_SIGN_IDENTITY = -

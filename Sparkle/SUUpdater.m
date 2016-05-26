@@ -170,18 +170,18 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
     if (!servingOverHttps) {
-        BOOL foundXPCAppcastDownloaderService = NO;
-        BOOL foundATSAppcastIssue = [self checkATSIssueForBundle:SUXPCServiceBundle(@APPCAST_DOWNLOADER_PRODUCT_NAME) getBundleExists:&foundXPCAppcastDownloaderService];
+        BOOL foundXPCTemporaryDownloaderService = NO;
+        BOOL foundATSTemporaryIssue = [self checkATSIssueForBundle:SUXPCServiceBundle(@TEMPORARY_DOWNLOADER_PRODUCT_NAME) getBundleExists:&foundXPCTemporaryDownloaderService];
         
         BOOL foundXPCPersistentDownloaderService = NO;
-        BOOL foundATSUpdateIssue = NO;
-        if (!foundATSAppcastIssue) {
-            foundATSUpdateIssue = [self checkATSIssueForBundle:SUXPCServiceBundle(@PERSISTENT_DOWNLOADER_PRODUCT_NAME) getBundleExists:&foundXPCPersistentDownloaderService];
+        BOOL foundATSPersistentIssue = NO;
+        if (!foundATSTemporaryIssue) {
+            foundATSPersistentIssue = [self checkATSIssueForBundle:SUXPCServiceBundle(@PERSISTENT_DOWNLOADER_PRODUCT_NAME) getBundleExists:&foundXPCPersistentDownloaderService];
         }
         
         NSBundle *mainBundle = [NSBundle mainBundle];
         BOOL foundATSMainBundleIssue = NO;
-        if (!foundATSAppcastIssue && !foundATSUpdateIssue && (!foundXPCAppcastDownloaderService || !foundXPCPersistentDownloaderService)) {
+        if (!foundATSTemporaryIssue && !foundATSPersistentIssue && (!foundXPCTemporaryDownloaderService || !foundXPCPersistentDownloaderService)) {
             BOOL foundATSIssue = ([mainBundle objectForInfoDictionaryKey:@"NSAppTransportSecurity"] == nil);
             BOOL updatingMainBundle = [self.host.bundle isEqualTo:mainBundle];
             
@@ -192,7 +192,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             }
         }
         
-        if (foundATSAppcastIssue || foundATSUpdateIssue || foundATSMainBundleIssue) {
+        if (foundATSTemporaryIssue || foundATSPersistentIssue || foundATSMainBundleIssue) {
             if (error != NULL) {
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsecureFeedURLError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"You must change the feed URL (%@) to use HTTPS or use a build of Sparkle with App Transport Security disabled.\n\nFor more information:\nhttps://sparkle-project.org/documentation/app-transport-security/", [feedURL absoluteString]] }];
             }

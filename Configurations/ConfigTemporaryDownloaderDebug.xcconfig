@@ -1,0 +1,4 @@
+// TemporaryDownloader Debug
+#include "ConfigTemporaryDownloader.xcconfig"
+
+CODE_SIGN_IDENTITY = -
