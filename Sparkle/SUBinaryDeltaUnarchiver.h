@@ -14,7 +14,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SUBinaryDeltaUnarchiver : NSObject <SUUnarchiver>
+@interface SUBinaryDeltaUnarchiver : NSObject <SUUnarchiverProtocol>
 
 - (instancetype)initWithArchivePath:(NSString *)archivePath updateHostBundlePath:(NSString *)updateHostBundlePath delegate:(nullable id <SUUnarchiverDelegate>)delegate;
 

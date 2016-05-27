@@ -266,7 +266,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 - (void)extractAndInstallUpdate
 {
     NSString *downloadPath = [self.installationData.updateDirectoryPath stringByAppendingPathComponent:self.installationData.downloadName];
-    id <SUUnarchiver> unarchiver = [SUUnarchiver unarchiverForPath:downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.installationData.decryptionPassword delegate:self];
+    id <SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.installationData.decryptionPassword delegate:self];
     if (!unarchiver) {
         SULog(@"Error: No valid unarchiver for %@!", downloadPath);
         [self unarchiverDidFail];

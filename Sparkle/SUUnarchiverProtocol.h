@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol SUUnarchiver <NSObject>
+@protocol SUUnarchiverProtocol <NSObject>
 
 + (BOOL)canUnarchivePath:(NSString *)path;
 

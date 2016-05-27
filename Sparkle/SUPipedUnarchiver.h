@@ -14,7 +14,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SUPipedUnarchiver : NSObject <SUUnarchiver>
+@interface SUPipedUnarchiver : NSObject <SUUnarchiverProtocol>
 
 - (instancetype)initWithArchivePath:(NSString *)archivePath delegate:(nullable id <SUUnarchiverDelegate>)delegate;
 
