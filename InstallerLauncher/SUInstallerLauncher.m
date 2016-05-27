@@ -17,7 +17,7 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSError *quarantineError = nil;
-        SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:NO];
+        SUFileManager *fileManager = [SUFileManager fileManager];
         
         if (![fileManager releaseItemFromQuarantineAtRootURL:[NSURL fileURLWithPath:installerPath] error:&quarantineError]) {
             // This may or may not be a fatal error depending on if the process is sandboxed or not

@@ -45,7 +45,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     // I don't want to have to export SUFileManager in release mode. The test app is primarily
     // aimed to be used in debug mode, so I think this is a good compromise
 #ifdef DEBUG
-    SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:NO];
+    SUFileManager *fileManager = [SUFileManager fileManager];
 #else
     NSFileManager *fileManager = [NSFileManager defaultManager];
 #endif

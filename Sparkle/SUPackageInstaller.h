@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "SUInstallerProtocol.h"
 
-@interface SUPackageInstaller : NSObject <SUInstaller>
+@interface SUPackageInstaller : NSObject <SUInstallerProtocol>
 
 - (instancetype)initWithPackagePath:(NSString *)packagePath;
 

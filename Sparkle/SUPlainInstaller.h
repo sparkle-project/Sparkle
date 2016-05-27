@@ -12,7 +12,7 @@
 @class SUHost;
 @protocol SUVersionComparison;
 
-@interface SUPlainInstaller : NSObject <SUInstaller>
+@interface SUPlainInstaller : NSObject <SUInstallerProtocol>
 
 - (instancetype)initWithHost:(SUHost *)host applicationPath:(NSString *)applicationPath installationPath:(NSString *)installationPath versionComparator:(id <SUVersionComparison>)comparator;
 

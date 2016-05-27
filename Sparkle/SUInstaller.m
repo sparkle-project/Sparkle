@@ -109,7 +109,7 @@
     return newAppDownloadPath;
 }
 
-+ (nullable id<SUInstaller>)installerForHost:(SUHost *)host updateDirectory:(NSString *)updateDirectory versionComparator:(id <SUVersionComparison>)comparator error:(NSError * __autoreleasing *)error
++ (nullable id<SUInstallerProtocol>)installerForHost:(SUHost *)host updateDirectory:(NSString *)updateDirectory versionComparator:(id <SUVersionComparison>)comparator error:(NSError * __autoreleasing *)error
 {
     BOOL isPackage = NO;
     BOOL isGuided = NO;
@@ -122,7 +122,7 @@
         return nil;
     }
     
-    id <SUInstaller> installer = nil;
+    id <SUInstallerProtocol> installer = nil;
     if (isPackage && isGuided) {
         installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath];
     } else if (isPackage) {

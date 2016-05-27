@@ -7,6 +7,7 @@
 //
 
 #import "SUFileManager.h"
+#import "SUAuthorizationEnvironment.h"
 #import <Foundation/Foundation.h>
 #import "SUErrors.h"
 
@@ -82,28 +83,35 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     AuthorizationRef _auth;
     NSFileManager *_fileManager;
     BOOL _allowsAuthorization;
+    SUAuthorizationEnvironment *_environment;
 }
 
-- (instancetype)initAllowingAuthorization:(BOOL)allowsAuthorization
+- (instancetype)initAllowingAuthorization:(BOOL)allowsAuthorization environment:(SUAuthorizationEnvironment *)environment
 {
     self = [super init];
     if (self != nil) {
         _fileManager = [[NSFileManager alloc] init];
         _allowsAuthorization = allowsAuthorization;
+        _environment = environment;
     }
     return self;
 }
 
-+ (instancetype)fileManagerAllowingAuthorization:(BOOL)allowsAuthorization
++ (instancetype)fileManager
 {
-    return [[self alloc] initAllowingAuthorization:allowsAuthorization];
+    return [[self alloc] initAllowingAuthorization:NO environment:nil];
+}
+
++ (instancetype)fileManagerAllowingAuthorizationWithEnvironment:(SUAuthorizationEnvironment *)environment
+{
+    return [[self alloc] initAllowingAuthorization:YES environment:environment];
 }
 
 - (instancetype)fileManagerByPreservingAuthorizationRights
 {
     // Check if we don't allow authorization, or that we haven't needed to authorize yet, to create or re-use a
     // file manager instance with these restrictions
-    return (_allowsAuthorization && _auth != NULL) ? self : [SUFileManager fileManagerAllowingAuthorization:NO];
+    return (_allowsAuthorization && _auth != NULL) ? self : [SUFileManager fileManager];
 }
 
 // Acquires an authorization reference which is intended to be used for future authorized file operations
@@ -120,15 +128,41 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
-
-    OSStatus status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &_auth);
-    if (status != errAuthorizationSuccess) {
+    
+    // This should almost always succeed, fail in unusual/rare cases
+    OSStatus createStatus = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &_auth);
+    if (createStatus != errAuthorizationSuccess) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed creating authorization reference with status code %d.", status] }];
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed creating authorization reference with status code %d.", createStatus] }];
         }
         _auth = NULL;
         return NO;
     }
+    
+    AuthorizationItem rightItems[] = {
+        // The right that allows us to run tools as root user
+        {.name = kAuthorizationRightExecute, .valueLength = 0, .value = NULL, .flags = 0}
+    };
+    
+    AuthorizationRights rights = {
+        .count = sizeof(rightItems) / sizeof(*rightItems),
+        .items = rightItems
+    };
+    
+    AuthorizationFlags flags =
+    (AuthorizationFlags)(kAuthorizationFlagDefaults | kAuthorizationFlagInteractionAllowed | kAuthorizationFlagExtendRights | kAuthorizationFlagPreAuthorize);
+    
+    // This will test if we can gain authorization for running utlities as root
+    OSStatus copyStatus = AuthorizationCopyRights(_auth, &rights, (_environment != nil ? _environment.environment : NULL), flags, NULL);
+    
+    if (copyStatus != errAuthorizationSuccess) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed granting authorization rights with status code %d.", copyStatus] }];
+        }
+        _auth = NULL;
+        return NO;
+    }
+    
     return YES;
 }
 
@@ -149,11 +183,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
 
 - (BOOL)grantAuthorizationPrivilegesWithError:(NSError * __autoreleasing *)error
 {
-    BOOL success = [self authorizeAndExecuteWithPrivilegesAtPath:"/usr/bin/true" arguments:(char *[]){NULL}];
-    if (!success && error != NULL) {
-        *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: @"Failed granting authorization." }];
-    }
-    return success;
+    return [self _acquireAuthorizationWithError:error];
 }
 
 // -[NSFileManager attributesOfItemAtPath:error:] won't follow symbolic links

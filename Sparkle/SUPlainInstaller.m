@@ -224,9 +224,9 @@
     return YES;
 }
 
-- (BOOL)performSecondStageAllowingAuthorization:(BOOL)allowsAuthorization allowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
+- (BOOL)performSecondStageAllowingAuthorization:(BOOL)allowsAuthorization withEnvironment:(SUAuthorizationEnvironment * _Nullable)authorizationEnvironment allowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
 {
-    self.fileManager = [SUFileManager fileManagerAllowingAuthorization:allowsAuthorization && allowsUI];
+    self.fileManager = (allowsAuthorization && allowsUI) ? [SUFileManager fileManagerAllowingAuthorizationWithEnvironment:authorizationEnvironment] : [SUFileManager fileManager];
     
     // Bring up authorization prompt right away if we need it
     BOOL canInstallSilently = [self canInstallSilently];

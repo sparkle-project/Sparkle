@@ -9,6 +9,10 @@
 #import <Foundation/Foundation.h>
 #import "SUExport.h"
 
+@class SUAuthorizationEnvironment;
+
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * A class used for performing file operations that may also perform authentication if allowed and if permission is denied when trying to
  * perform them normally as the running user. All operations on this class may be used on thread other than the main thread.
@@ -17,14 +21,20 @@
 @interface SUFileManager : NSObject
 
 /**
- * Creates a file manager that allows or disallows authorizing for file operations
- * @param allowsAuthorization Specifies whether operations invoked on this instance are allowed to acquire authorization in order
- *  to perform file operations when read or write access is denied
- * @return A new file manager instance
- * 
- * This method just creates the file manager. It doesn't acquire authorization immediately if allowsAuthorization is YES
+ * Creates a file manager that disallows authorizing for file operations
+ *
+ * @return A new file manager instance that cannot make authorization requests when read/write access is denied
  */
-+ (instancetype)fileManagerAllowingAuthorization:(BOOL)allowsAuthorization;
++ (instancetype)fileManager;
+
+/**
+ * Creates a file manager that allows authorizing for file operations when needed.
+ * Authorization may be attempted after a read or write file operation is denied access.
+ *
+ * @param environment Specifies the authorization environment used when making an authorization request. Pass nil to use a default environment.
+ * @return A new file manager instance that can make authorization requests. Creating this instance does not acquire authorization immediately.
+ */
++ (instancetype)fileManagerAllowingAuthorizationWithEnvironment:(SUAuthorizationEnvironment * _Nullable)environment;
 
 /**
  * Returns a file manager that allows or disallows authorizing for file operations based on the current file manager
@@ -35,7 +45,7 @@
  */
 - (instancetype)fileManagerByPreservingAuthorizationRights;
 
-- (BOOL)authorizeAndExecuteWithPrivilegesAtPath:(const char *)executablePath arguments:(char *const *)arguments;
+- (BOOL)authorizeAndExecuteWithPrivilegesAtPath:(const char *)executablePath arguments:(char * _Nonnull const * _Nonnull)arguments;
 
 - (BOOL)grantAuthorizationPrivilegesWithError:(NSError **)error;
 
@@ -149,3 +159,5 @@
 - (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError **)error;
 
 @end
+
+NS_ASSUME_NONNULL_END

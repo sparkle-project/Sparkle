@@ -424,7 +424,7 @@
     } else {
         NSString *targetPath = [self.cachePath stringByAppendingPathComponent:[pathToCopy lastPathComponent]];
         
-        SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:NO];
+        SUFileManager *fileManager = [SUFileManager fileManager];
         
         NSURL *urlToCopy = [NSURL fileURLWithPath:pathToCopy];
         NSURL *targetURL = [NSURL fileURLWithPath:targetPath];

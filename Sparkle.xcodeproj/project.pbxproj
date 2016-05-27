@@ -253,6 +253,10 @@
 		72B09CE81CE6BCBD0052EF9E /* SUURLDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B09CE61CE6BCBD0052EF9E /* SUURLDownload.m */; };
 		72B09CEC1CEA18900052EF9E /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 72B09CE91CEA18900052EF9E /* bscommon.c */; };
 		72B09CEE1CEA21CD0052EF9E /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 72B09CE91CEA18900052EF9E /* bscommon.c */; };
+		72B144501CF8826900B971EE /* SUAuthorizationEnvironment.h in Headers */ = {isa = PBXBuildFile; fileRef = 72B1444E1CF8826900B971EE /* SUAuthorizationEnvironment.h */; };
+		72B144511CF8826900B971EE /* SUAuthorizationEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B1444F1CF8826900B971EE /* SUAuthorizationEnvironment.m */; };
+		72B144521CF8826900B971EE /* SUAuthorizationEnvironment.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B1444F1CF8826900B971EE /* SUAuthorizationEnvironment.m */; };
+		72B144531CF8992200B971EE /* SUApplicationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 725602D41C83551C00DAA70E /* SUApplicationInfo.m */; };
 		72B767CA1C9B707000A07552 /* SUAppcastDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 72B767C81C9B707000A07552 /* SUAppcastDriver.h */; };
 		72B767CB1C9B707000A07552 /* SUAppcastDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B767C91C9B707000A07552 /* SUAppcastDriver.m */; };
 		72B767CE1C9B924900A07552 /* SUInstallerDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 72B767CC1C9B924900A07552 /* SUInstallerDriver.h */; };
@@ -887,6 +891,8 @@
 		72B09CE61CE6BCBD0052EF9E /* SUURLDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUURLDownload.m; sourceTree = "<group>"; };
 		72B09CE91CEA18900052EF9E /* bscommon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bscommon.c; sourceTree = "<group>"; };
 		72B09CEA1CEA18900052EF9E /* bscommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bscommon.h; sourceTree = "<group>"; };
+		72B1444E1CF8826900B971EE /* SUAuthorizationEnvironment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUAuthorizationEnvironment.h; sourceTree = "<group>"; };
+		72B1444F1CF8826900B971EE /* SUAuthorizationEnvironment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUAuthorizationEnvironment.m; sourceTree = "<group>"; };
 		72B767C81C9B707000A07552 /* SUAppcastDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUAppcastDriver.h; sourceTree = "<group>"; };
 		72B767C91C9B707000A07552 /* SUAppcastDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUAppcastDriver.m; sourceTree = "<group>"; };
 		72B767CC1C9B924900A07552 /* SUInstallerDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUInstallerDriver.h; sourceTree = "<group>"; };
@@ -1362,6 +1368,8 @@
 			children = (
 				7275F9BF1B5F1F2900B1D19E /* SUFileManager.h */,
 				7275F9C01B5F1F2900B1D19E /* SUFileManager.m */,
+				72B1444E1CF8826900B971EE /* SUAuthorizationEnvironment.h */,
+				72B1444F1CF8826900B971EE /* SUAuthorizationEnvironment.m */,
 				72A6F97D1C94A5C2005F404C /* SUInstallerProtocol.h */,
 				618FA4FF0DAE88B40026945C /* SUInstaller.h */,
 				618FA5000DAE88B40026945C /* SUInstaller.m */,
@@ -1701,6 +1709,7 @@
 			files = (
 				725F977B1C8A896F00265BE4 /* SUUserDriverCoreComponent.h in Headers */,
 				726E078D1CA891E9001A286B /* SUUpdaterSettings.h in Headers */,
+				72B144501CF8826900B971EE /* SUAuthorizationEnvironment.h in Headers */,
 				72A6F98A1C94E2D6005F404C /* SUUpdaterDelegate.h in Headers */,
 				726E4A371C89116000C57C6A /* SUStandardUserDriverDelegate.h in Headers */,
 				726E4A0E1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h in Headers */,
@@ -2409,8 +2418,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72B144531CF8992200B971EE /* SUApplicationInfo.m in Sources */,
 				72B09CEE1CEA21CD0052EF9E /* bscommon.c in Sources */,
 				72D9547E1CBA221E006F28BD /* SUAppcastItem.m in Sources */,
+				72B144521CF8826900B971EE /* SUAuthorizationEnvironment.m in Sources */,
 				726E07671CA61648001A286B /* SUBinaryDeltaCommon.m in Sources */,
 				726E07661CA61621001A286B /* bspatch.c in Sources */,
 				726E07651CA61603001A286B /* SUBinaryDeltaApply.m in Sources */,
@@ -2638,6 +2649,7 @@
 				61B5FCDE09C52A9F00B25A18 /* SUUpdateAlert.m in Sources */,
 				612DCBB00D488BC60015DBEA /* SUUpdatePermissionPrompt.m in Sources */,
 				61B5F8EE09C4CE3C00B25A18 /* SUUpdater.m in Sources */,
+				72B144511CF8826900B971EE /* SUAuthorizationEnvironment.m in Sources */,
 				72B767CB1C9B707000A07552 /* SUAppcastDriver.m in Sources */,
 				726E075D1CA3A6D6001A286B /* SUSecureCoding.m in Sources */,
 				72B767DB1C9CD2E400A07552 /* SUUIBasedUpdateDriver.m in Sources */,

@@ -47,7 +47,7 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
     return YES;
 }
 
-- (BOOL)performSecondStageAllowingAuthorization:(BOOL)__unused allowsAuthorization allowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
+- (BOOL)performSecondStageAllowingAuthorization:(BOOL)__unused allowsAuthorization withEnvironment:(SUAuthorizationEnvironment * _Nullable)__unused authorizationEnvironment allowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
 {
     return allowsUI;
 }

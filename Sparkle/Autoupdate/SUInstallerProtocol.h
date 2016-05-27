@@ -8,7 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
-@protocol SUInstaller <NSObject>
+@class SUAuthorizationEnvironment;
+
+NS_ASSUME_NONNULL_BEGIN
+
+@protocol SUInstallerProtocol <NSObject>
 
 // Stage 1 is where any installation work can be done prior to user application being terminated and relaunched
 // No UI should occur during this stage (i.e, do not prompt for authorization prompts, show package installer apps, etc..)
@@ -16,11 +20,12 @@
 - (BOOL)performFirstStage:(NSError **)error;
 
 // Stage 2 is where any further installation work can be done prior to the user application being terminated
-// The allowsAuthorization flag indicates whether this and the 3rd stage can request authorization if the updater has insufficient privileges to install
+// If the authorizationEnvironment flag is nil, then this and the 3rd stage cannot request authorization if the updater has insufficient privileges to install
+// Otherwise if it's non-nil, then they can request authorization and they will use the environment that's passed.
 // The allowsUI flag indicates whether this and the 3rd stage can show UI or not, possibly affecting whether or not this stage succeeds.
 // Eg: This may be appropriate for first showing an authorization prompt before the user application is terminated (if the operation succeeds)
 // Should be able to be called from non-main thread
-- (BOOL)performSecondStageAllowingAuthorization:(BOOL)allowsAuthorization allowingUI:(BOOL)allowsUI error:(NSError **)error;
+- (BOOL)performSecondStageAllowingAuthorization:(BOOL)allowsAuthorization withEnvironment:(SUAuthorizationEnvironment * _Nullable)authorizationEnvironment allowingUI:(BOOL)allowsUI error:(NSError **)error;
 
 // Stage 3 occurs after the user application has has been terminated. This is where the final installation work can be done.
 // After this stage is done, the user application will be relaunched.
@@ -47,3 +52,5 @@
 - (void)cleanup;
 
 @end
+
+NS_ASSUME_NONNULL_END

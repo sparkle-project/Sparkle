@@ -24,6 +24,8 @@
 #import "SUFileManager.h"
 #import "SUInstallationInfo.h"
 #import "SUAppcastItem.h"
+#import "SUAuthorizationEnvironment.h"
+#import "SUApplicationInfo.h"
 
 /*!
  * Terminate the application after a delay from launching the new update to avoid OS activation issues
@@ -53,7 +55,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @property (nonatomic, assign) BOOL shouldShowUI;
 @property (nonatomic) NSData *installationInfoData;
 
-@property (nonatomic) id<SUInstaller> installer;
+@property (nonatomic) id<SUInstallerProtocol> installer;
 @property (nonatomic) BOOL willCompleteInstallation;
 
 @property (nonatomic) dispatch_queue_t installerQueue;
@@ -415,7 +417,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     dispatch_async(self.installerQueue, ^{
         NSError *installerError = nil;
-        id <SUInstaller> installer = [SUInstaller installerForHost:self.host updateDirectory:self.installationData.updateDirectoryPath versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
+        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self.host updateDirectory:self.installationData.updateDirectoryPath versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
         
         if (installer == nil) {
             SULog(@"Error: Failed to create installer instance with error: %@", installerError);
@@ -470,7 +472,35 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         return;
     }
     
+    SUAuthorizationEnvironment *environment = nil;
+    NSURL *tempIconDirectoryURL = nil;
     if (self.shouldShowUI && !self.inheritsPrivileges && [self.installer mayNeedToRequestAuthorization]) {
+        NSString *prompt = [NSString stringWithFormat:NSLocalizedString(@"%1$@ wants to update.", nil), self.host.name];
+        
+        NSString *iconPath = nil;
+        
+        // Authorization API requires a 32x32 icon image and accepts png (but not icns or tiff)
+        NSImage *icon = [SUApplicationInfo bestIconForBundle:self.host.bundle];
+        [icon setSize:NSMakeSize(32, 32)];
+        
+        CGImageRef iconRef = [icon CGImageForProposedRect:NULL context:nil hints:nil];
+        NSBitmapImageRep *representation = [[NSBitmapImageRep alloc] initWithCGImage:iconRef];
+        NSData *pngData = [representation representationUsingType:NSPNGFileType properties:@{}];
+        
+        // Write the icon to a temporary directory. This icon file should be in a directory that's readable to everyone.
+        NSError *tempError = nil;
+        tempIconDirectoryURL = [[SUFileManager fileManager] makeTemporaryDirectoryWithPreferredName:@"sparkle-auth-icon" appropriateForDirectoryURL:[NSURL fileURLWithPath:NSTemporaryDirectory()] error:&tempError];
+        if (tempIconDirectoryURL == nil) {
+            SULog(@"Failed to create temporary directory for authorization icon: %@", tempError);
+        } else {
+            NSURL *iconURL = [tempIconDirectoryURL URLByAppendingPathComponent:@"icon.png"];
+            if ([pngData writeToURL:iconURL atomically:YES]) {
+                iconPath = iconURL.path;
+            }
+        }
+        
+        environment = [[SUAuthorizationEnvironment alloc] initWithPrompt:prompt iconPath:(iconPath != nil ? iconPath : @"")];
+        
         dispatch_async(dispatch_get_main_queue(), ^{
             // We should activate our app so that the auth prompt will be active
             [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
@@ -478,7 +508,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     }
     
     NSError *secondStageError = nil;
-    if (![self.installer performSecondStageAllowingAuthorization:!self.inheritsPrivileges allowingUI:self.shouldShowUI error:&secondStageError]) {
+    BOOL performedSecondStage = [self.installer performSecondStageAllowingAuthorization:!self.inheritsPrivileges withEnvironment:environment allowingUI:self.shouldShowUI error:&secondStageError];
+    
+    if (tempIconDirectoryURL != nil) {
+        [[SUFileManager fileManager] removeItemAtURL:tempIconDirectoryURL error:NULL];
+    }
+    
+    if (!performedSecondStage) {
         SULog(@"Error: Failed to resume installer on stage 2 with error: %@", secondStageError);
         [self.installer cleanup];
         self.installer = nil;
@@ -514,7 +550,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             NSURL *progressToolURL = [NSURL fileURLWithPath:progressToolPath];
             if (progressToolURL != nil) {
                 NSError *quarantineError = nil;
-                if (![[SUFileManager fileManagerAllowingAuthorization:NO] releaseItemFromQuarantineAtRootURL:progressToolURL error:&quarantineError]) {
+                if (![[SUFileManager fileManager] releaseItemFromQuarantineAtRootURL:progressToolURL error:&quarantineError]) {
                     SULog(@"Error: Failed releasing quarantine from installer progress tool: %@", quarantineError);
                 }
                 
