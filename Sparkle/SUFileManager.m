@@ -157,7 +157,11 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     
     if (copyStatus != errAuthorizationSuccess) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed granting authorization rights with status code %d.", copyStatus] }];
+            if (copyStatus == errAuthorizationCanceled) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationCancelledError userInfo:@{ NSLocalizedDescriptionKey: @"Authorization access was cancelled by the user." }];
+            } else {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed granting authorization rights with status code %d.", copyStatus] }];
+            }
         }
         _auth = NULL;
         return NO;

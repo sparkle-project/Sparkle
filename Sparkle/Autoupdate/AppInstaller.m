@@ -26,6 +26,7 @@
 #import "SUAppcastItem.h"
 #import "SUAuthorizationEnvironment.h"
 #import "SUApplicationInfo.h"
+#import "SUErrors.h"
 
 /*!
  * Terminate the application after a delay from launching the new update to avoid OS activation issues
@@ -514,7 +515,11 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         [[SUFileManager fileManager] removeItemAtURL:tempIconDirectoryURL error:NULL];
     }
     
-    if (!performedSecondStage) {
+    if (performedSecondStage) {
+        self.performedStage2Installation = YES;
+    }
+    
+    void (^cleanupAndExit)(void) = ^{
         SULog(@"Error: Failed to resume installer on stage 2 with error: %@", secondStageError);
         [self.installer cleanup];
         self.installer = nil;
@@ -522,19 +527,32 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         dispatch_async(dispatch_get_main_queue(), ^{
             [self cleanupAndExitWithStatus:EXIT_FAILURE];
         });
-    } else {
-        self.performedStage2Installation = YES;
-        
+    };
+    
+    // Let the other end know we cancelled so they can fail gracefully without disturbing the user
+    BOOL installationCancelled = (!performedSecondStage && secondStageError.code == SUInstallationCancelledError);
+    if (performedSecondStage || installationCancelled) {
         dispatch_async(dispatch_get_main_queue(), ^{
+            uint8_t cancelled = (uint8_t)installationCancelled;
             uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
             
-            NSData *sendData = [NSData dataWithBytes:&targetTerminated length:sizeof(targetTerminated)];
+            uint8_t sendInfo[] = {cancelled, targetTerminated};
+            
+            NSData *sendData = [NSData dataWithBytes:sendInfo length:sizeof(sendInfo)];
             [self.remotePort sendMessageWithIdentifier:SUInstallationFinishedStage2 data:sendData completion:^(BOOL success) {
                 if (!success) {
                     SULog(@"Error sending stage 2 finish");
                 }
+                
+                if (installationCancelled) {
+                    cleanupAndExit();
+                }
             }];
         });
+    }
+    
+    if (!performedSecondStage && !installationCancelled) {
+        cleanupAndExit();
     }
 }
 
