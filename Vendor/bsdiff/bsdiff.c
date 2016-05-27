@@ -84,7 +84,7 @@ static off_t search(off_t *I, u_char *old, off_t oldsize,
     }
 
     x = st + (en - st)/2;
-    if (memcmp(old + I[x], new, MIN(oldsize - I[x], newsize)) < 0) {
+    if (memcmp(old + I[x], new, (size_t)(MIN(oldsize - I[x], newsize))) < 0) {
         return search(I, old, oldsize, new, newsize, x, en, pos);
     } else {
         return search(I, old, oldsize, new, newsize, st, x, pos);
@@ -103,15 +103,15 @@ static void offtout(off_t x, u_char *buf)
     else
         y = x;
 
-    buf[0] = y % 256;
+    buf[0] = (u_char)(y % 256);
     y -= buf[0];
-    y = y/256; buf[1] = y%256; y -= buf[1];
-    y = y/256; buf[2] = y%256; y -= buf[2];
-    y = y/256; buf[3] = y%256; y -= buf[3];
-    y = y/256; buf[4] = y%256; y -= buf[4];
-    y = y/256; buf[5] = y%256; y -= buf[5];
-    y = y/256; buf[6] = y%256; y -= buf[6];
-    y = y/256; buf[7] = y%256;
+    y = y/256; buf[1] = (u_char)(y%256); y -= buf[1];
+    y = y/256; buf[2] = (u_char)(y%256); y -= buf[2];
+    y = y/256; buf[3] = (u_char)(y%256); y -= buf[3];
+    y = y/256; buf[4] = (u_char)(y%256); y -= buf[4];
+    y = y/256; buf[5] = (u_char)(y%256); y -= buf[5];
+    y = y/256; buf[6] = (u_char)(y%256); y -= buf[6];
+    y = y/256; buf[7] = (u_char)(y%256);
 
     if (x < 0)
         buf[7] |= 0x80;
@@ -152,14 +152,15 @@ int bsdiff(int argc, char *argv[])
         goto cleanup;
     }
 
-    if (((I = malloc((oldsize + 1) * sizeof(off_t))) == NULL) ||
-        ((V = malloc((oldsize + 1) * sizeof(off_t))) == NULL)) {
+    if (((I = malloc(((size_t)oldsize + 1) * sizeof(off_t))) == NULL) ||
+        ((V = malloc(((size_t)oldsize + 1) * sizeof(off_t))) == NULL)) {
         warn("Failed to allocate memory for I or V");
         goto cleanup;
     }
 
     /* Do a suffix sort on the old file. */
-    I[0] = oldsize; sais(old, I+1, oldsize);
+    I[0] = oldsize;
+    sais(old, I+1, (int)oldsize);
 
     free(V);
     V = NULL;
@@ -170,8 +171,8 @@ int bsdiff(int argc, char *argv[])
         goto cleanup;
     }
 
-    if (((db = malloc(newsize + 1)) == NULL) ||
-        ((eb = malloc(newsize + 1)) == NULL)) {
+    if (((db = malloc((size_t)newsize + 1)) == NULL) ||
+        ((eb = malloc((size_t)newsize + 1)) == NULL)) {
         warn("Failed to allocate memory for db or eb");
         goto cleanup;
     }
@@ -352,7 +353,7 @@ int bsdiff(int argc, char *argv[])
     offtout(len - 32, header + 8);
 
     /* Write diff data */
-    if (dblen && fwrite(db, dblen, 1, pf) != 1) {
+    if (dblen && fwrite(db, (size_t)dblen, 1, pf) != 1) {
         warn("fwrite");
         goto cleanup;
     }
@@ -365,7 +366,7 @@ int bsdiff(int argc, char *argv[])
     offtout(newsize - len, header + 16);
 
     /* Write extra data */
-    if (eblen && fwrite(eb, eblen, 1, pf) != 1) {
+    if (eblen && fwrite(eb, (size_t)eblen, 1, pf) != 1) {
         warn("fwrite");
         goto cleanup;
     }

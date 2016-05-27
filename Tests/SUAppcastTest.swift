@@ -11,7 +11,7 @@ import Sparkle;
 
 class SUAppcastTest: XCTestCase {
 
-    func testExample() {
+    func testParseAppcast() {
         let appcast = SUAppcast();
         let testFile = NSBundle(forClass: SUAppcastTest.self).pathForResource("testappcast", ofType: "xml")!;
         let testData = NSData(contentsOfFile: testFile)!
@@ -61,4 +61,26 @@ class SUAppcastTest: XCTestCase {
             XCTFail(err.localizedDescription);
         }
     }
+
+    func testNamespaces() {
+        let appcast = SUAppcast();
+        let testFile = NSBundle(forClass: SUAppcastTest.self).pathForResource("testnamespaces", ofType: "xml")!;
+        let testFileUrl = NSURL(fileURLWithPath: testFile);
+        XCTAssertNotNil(testFileUrl);
+
+        do {
+            let items = try appcast.parseAppcastItemsFromXMLFile(testFileUrl) as! [SUAppcastItem];
+
+            XCTAssertEqual(2, items.count);
+
+            XCTAssertEqual("Version 2.0", items[1].title);
+            XCTAssertEqual("desc", items[1].itemDescription);
+            XCTAssertNotNil(items[0].releaseNotesURL);
+            XCTAssertEqual("https://sparkle-project.org/#works", items[0].releaseNotesURL!.absoluteString);
+        } catch let err as NSError {
+            NSLog("%@", err);
+            XCTFail(err.localizedDescription);
+        }
+    }
+
 }

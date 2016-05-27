@@ -110,6 +110,33 @@
     });
 }
 
+- (NSDictionary *)attributesOfNode:(NSXMLElement *)node
+{
+    NSEnumerator *attributeEnum = [[node attributes] objectEnumerator];
+    NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+
+    for (NSXMLNode *attribute in attributeEnum) {
+        NSString *attrName = [self sparkleNamespacedNameOfNode:attribute];
+        if (!attrName) {
+            continue;
+        }
+        [dictionary setObject:[attribute stringValue] forKey:attrName];
+    }
+    return dictionary;
+}
+
+-(NSString *)sparkleNamespacedNameOfNode:(NSXMLNode *)node {
+    // XML namespace prefix is semantically meaningless, so compare namespace URI
+    // NS URI isn't used to fetch anything, and must match exactly, so we look for http:// not https://
+    if ([[node URI] isEqualToString:@"http://www.andymatuschak.org/xml-namespaces/sparkle"]) {
+        NSString *localName = [node localName];
+        assert(localName);
+        return [@"sparkle:" stringByAppendingString:localName];
+    } else {
+        return [node name]; // Backwards compatibility
+    }
+}
+
 -(NSArray *)parseAppcastItemsFromXMLData:(NSData *)appcastData error:(NSError *__autoreleasing*)errorp {
     NSUInteger options = NSXMLNodeLoadExternalEntitiesNever; // Prevent inclusion from file://
     NSXMLDocument *document = [[NSXMLDocument alloc] initWithData:appcastData options:options error:errorp];
@@ -134,7 +161,7 @@
         if ([[node children] count]) {
             node = [node childAtIndex:0];
             while (nil != node) {
-                NSString *name = [node name];
+                NSString *name = [self sparkleNamespacedNameOfNode:node];
                 if (name) {
                     NSMutableArray *nodes = [nodesDict objectForKey:name];
                     if (nodes == nil) {
@@ -151,7 +178,7 @@
             node = [self bestNodeInNodes:[nodesDict objectForKey:name]];
             if ([name isEqualToString:SURSSElementEnclosure]) {
                 // enclosure is flattened as a separate dictionary for some reason
-                NSDictionary *encDict = [(NSXMLElement *)node attributesAsDictionary];
+                NSDictionary *encDict = [self attributesOfNode:(NSXMLElement *)node];
                 [dict setObject:encDict forKey:name];
 			}
             else if ([name isEqualToString:SURSSElementPubDate]) {
@@ -168,7 +195,7 @@
                 NSEnumerator *childEnum = [[node children] objectEnumerator];
                 for (NSXMLNode *child in childEnum) {
                     if ([[child name] isEqualToString:SURSSElementEnclosure]) {
-                        [deltas addObject:[(NSXMLElement *)child attributesAsDictionary]];
+                        [deltas addObject:[self attributesOfNode:(NSXMLElement *)child]];
                     }
                 }
                 [dict setObject:deltas forKey:name];
