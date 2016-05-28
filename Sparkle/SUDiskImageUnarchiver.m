@@ -170,10 +170,22 @@
         dispatch_async(dispatch_get_main_queue(), delegateFailure);
 
     finally:
-        if (mountedSuccessfully)
-            [NSTask launchedTaskWithLaunchPath:@"/usr/bin/hdiutil" arguments:@[@"detach", mountPoint, @"-force"]];
-        else
+        if (mountedSuccessfully) {
+            NSTask *task = [[NSTask alloc] init];
+            task.launchPath = @"/usr/bin/hdiutil";
+            task.arguments = @[@"detach", mountPoint, @"-force"];
+            task.standardOutput = [NSPipe pipe];
+            task.standardError = [NSPipe pipe];
+            
+            @try {
+                [task launch];
+            } @catch (NSException *exception) {
+                SULog(@"Failed to unmount %@", mountPoint);
+                SULog(@"Exception: %@", exception);
+            }
+        } else {
             SULog(@"Can't mount DMG %@", self.archivePath);
+        }
     }
 }
 
