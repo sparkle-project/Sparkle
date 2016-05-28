@@ -594,6 +594,11 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         dispatch_async(self.installerQueue, ^{
             [self performStage2InstallationIfNeeded];
             
+            if (!self.performedStage2Installation) {
+                // We failed and we're going to exit shortly
+                return;
+            }
+            
             NSError *thirdStageError = nil;
             if (![self.installer performThirdStage:&thirdStageError]) {
                 SULog(@"Failed to finalize installation with error: %@", thirdStageError);
