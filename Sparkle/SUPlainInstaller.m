@@ -236,6 +236,11 @@
     if (allowsAuthorization && !canInstallSilently) {
         return [self.fileManager grantAuthorizationPrivilegesWithError:error];
     } else {
+        if (!canInstallSilently) {
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{ NSLocalizedDescriptionKey: @"Sparkle cannot install the update silently" }];
+            }
+        }
         return canInstallSilently;
     }
 }
