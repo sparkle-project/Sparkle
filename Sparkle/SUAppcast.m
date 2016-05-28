@@ -120,7 +120,10 @@
         if (!attrName) {
             continue;
         }
-        [dictionary setObject:[attribute stringValue] forKey:attrName];
+        NSString *attributeStringValue = [attribute stringValue];
+        if (attributeStringValue != nil) {
+            [dictionary setObject:attributeStringValue forKey:attrName];
+        }
     }
     return dictionary;
 }
