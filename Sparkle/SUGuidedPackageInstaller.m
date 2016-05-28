@@ -53,7 +53,7 @@
     }
     
     // If we're root, we can allow using the authorization APIs
-    self.fileManager = (allowsAuthorization || (geteuid() == 0)) ? [SUFileManager fileManagerAllowingAuthorizationWithEnvironment:authorizationEnvironment] : [SUFileManager fileManager];
+    self.fileManager = (allowsAuthorization || (geteuid() == 0)) ? [SUFileManager fileManagerAllowingAuthorizationWithEnvironment:authorizationEnvironment] : [SUFileManager defaultManager];
     
     return [self.fileManager grantAuthorizationPrivilegesWithError:error];
 }

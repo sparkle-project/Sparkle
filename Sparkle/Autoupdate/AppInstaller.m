@@ -490,7 +490,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         
         // Write the icon to a temporary directory. This icon file should be in a directory that's readable to everyone.
         NSError *tempError = nil;
-        tempIconDirectoryURL = [[SUFileManager fileManager] makeTemporaryDirectoryWithPreferredName:@"sparkle-auth-icon" appropriateForDirectoryURL:[NSURL fileURLWithPath:NSTemporaryDirectory()] error:&tempError];
+        tempIconDirectoryURL = [[SUFileManager defaultManager] makeTemporaryDirectoryWithPreferredName:@"sparkle-auth-icon" appropriateForDirectoryURL:[NSURL fileURLWithPath:NSTemporaryDirectory()] error:&tempError];
         if (tempIconDirectoryURL == nil) {
             SULog(@"Failed to create temporary directory for authorization icon: %@", tempError);
         } else {
@@ -512,7 +512,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     BOOL performedSecondStage = [self.installer performSecondStageAllowingAuthorization:!self.inheritsPrivileges withEnvironment:environment allowingUI:self.shouldShowUI error:&secondStageError];
     
     if (tempIconDirectoryURL != nil) {
-        [[SUFileManager fileManager] removeItemAtURL:tempIconDirectoryURL error:NULL];
+        [[SUFileManager defaultManager] removeItemAtURL:tempIconDirectoryURL error:NULL];
     }
     
     if (performedSecondStage) {
@@ -568,7 +568,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             NSURL *progressToolURL = [NSURL fileURLWithPath:progressToolPath];
             if (progressToolURL != nil) {
                 NSError *quarantineError = nil;
-                if (![[SUFileManager fileManager] releaseItemFromQuarantineAtRootURL:progressToolURL error:&quarantineError]) {
+                if (![[SUFileManager defaultManager] releaseItemFromQuarantineAtRootURL:progressToolURL error:&quarantineError]) {
                     SULog(@"Error: Failed releasing quarantine from installer progress tool: %@", quarantineError);
                 }
                 

@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return A new file manager instance that cannot make authorization requests when read/write access is denied
  */
-+ (instancetype)fileManager;
++ (instancetype)defaultManager;
 
 /**
  * Creates a file manager that allows authorizing for file operations when needed.
@@ -47,7 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)authorizeAndExecuteWithPrivilegesAtPath:(const char *)executablePath arguments:(char * _Nonnull const * _Nonnull)arguments;
 
-- (BOOL)grantAuthorizationPrivilegesWithError:(NSError **)error;
+- (BOOL)grantAuthorizationPrivilegesWithError:(NSError * __autoreleasing *)error;
 
 /**
  * Creates a temporary directory on the same volume as a provided URL
@@ -59,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
  * When moving an item from a source to a destination, it is desirable to create a temporary intermediate destination on the same volume as the destination to ensure
  * that the item will be moved, and not copied, from the intermediate point to the final destination. This ensures file atomicity.
  */
-- (NSURL *)makeTemporaryDirectoryWithPreferredName:(NSString *)preferredName appropriateForDirectoryURL:(NSURL *)appropriateURL error:(NSError **)error;
+- (NSURL * _Nullable)makeTemporaryDirectoryWithPreferredName:(NSString *)preferredName appropriateForDirectoryURL:(NSURL *)appropriateURL error:(NSError * __autoreleasing *)error;
 
 /**
  * Moves an item from a source to a destination

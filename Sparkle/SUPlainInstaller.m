@@ -229,7 +229,7 @@
 
 - (BOOL)performSecondStageAllowingAuthorization:(BOOL)allowsAuthorization withEnvironment:(SUAuthorizationEnvironment * _Nullable)authorizationEnvironment allowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
 {
-    self.fileManager = (allowsAuthorization && allowsUI) ? [SUFileManager fileManagerAllowingAuthorizationWithEnvironment:authorizationEnvironment] : [SUFileManager fileManager];
+    self.fileManager = (allowsAuthorization && allowsUI) ? [SUFileManager fileManagerAllowingAuthorizationWithEnvironment:authorizationEnvironment] : [SUFileManager defaultManager];
     
     // Bring up authorization prompt right away if we need it
     BOOL canInstallSilently = [self canInstallSilently];

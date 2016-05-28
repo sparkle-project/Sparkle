@@ -65,11 +65,10 @@ class SUAppcastTest: XCTestCase {
     func testNamespaces() {
         let appcast = SUAppcast();
         let testFile = NSBundle(forClass: SUAppcastTest.self).pathForResource("testnamespaces", ofType: "xml")!;
-        let testFileUrl = NSURL(fileURLWithPath: testFile);
-        XCTAssertNotNil(testFileUrl);
+        let testData = NSData(contentsOfFile: testFile)!
 
         do {
-            let items = try appcast.parseAppcastItemsFromXMLFile(testFileUrl) as! [SUAppcastItem];
+            let items = try appcast.parseAppcastItemsFromXMLData(testData) as! [SUAppcastItem];
 
             XCTAssertEqual(2, items.count);
 

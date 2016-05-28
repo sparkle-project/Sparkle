@@ -12,7 +12,7 @@ class SUFileManagerTest: XCTestCase
 {
     func makeTempFiles(testBlock: (SUFileManager, NSURL, NSURL, NSURL, NSURL, NSURL, NSURL) -> Void)
     {
-        let fileManager = SUFileManager(allowingAuthorization: false)
+        let fileManager = SUFileManager.defaultManager()
         
         let tempDirectoryURL = try! fileManager.makeTemporaryDirectoryWithPreferredName("Sparkle Unit Test Data", appropriateForDirectoryURL: NSURL(fileURLWithPath: NSHomeDirectory()))
         
@@ -308,16 +308,9 @@ class SUFileManagerTest: XCTestCase
         }
     }
     
-    // This alone shouldn't prompt a password dialog and should always succeed
-    func testAcquireAuthorization()
-    {
-        let fileManager = SUFileManager(allowingAuthorization: true)
-        try! fileManager._acquireAuthorization()
-    }
-    
     func testAcquireBadAuthorization()
     {
-        let fileManager = SUFileManager(allowingAuthorization: false)
+        let fileManager = SUFileManager.defaultManager()
         XCTAssertNil(try? fileManager._acquireAuthorization())
     }
 }

@@ -54,7 +54,7 @@
     SUHost *host = [[SUHost alloc] initWithBundle:bundle];
     
     NSError *installerError = nil;
-    id<SUInstaller> installer = [SUInstaller installerForHost:host updateDirectory:[path stringByDeletingLastPathComponent] versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
+    id<SUInstallerProtocol> installer = [SUInstaller installerForHost:host updateDirectory:[path stringByDeletingLastPathComponent] versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
     
     if (installer == nil) {
         XCTFail(@"Installer is nil with error: %@", installerError);
@@ -68,7 +68,7 @@
     }
     
     NSError *secondStageError = nil;
-    if (![installer performSecondStageAllowingAuthorization:YES allowingUI:YES error:&secondStageError]) {
+    if (![installer performSecondStageAllowingAuthorization:YES withEnvironment:nil allowingUI:YES error:&secondStageError]) {
         XCTFail(@"Second Stage failed with error: %@", secondStageError);
         return;
     }
