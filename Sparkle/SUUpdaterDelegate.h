@@ -115,6 +115,17 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (void)updaterDidNotFindUpdate:(SUUpdater *)updater;
 
 /*!
+ Returns whether the release notes (if available) should be downloaded after an update is found and shown.
+ 
+ This is specifically for the releaseNotesLink element in the appcast.
+ 
+ \param updater The SUUpdater instance.
+ 
+ \return \c YES to download and show the release notes if available
+ */
+- (BOOL)updaterShouldDownloadReleaseNotes:(SUUpdater *)updater;
+
+/*!
  Called immediately before downloading the specified update.
  
  \param updater The SUUpdater instance.

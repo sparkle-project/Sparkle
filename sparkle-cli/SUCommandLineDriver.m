@@ -98,6 +98,11 @@
     return self.applicationBundlePath;
 }
 
+- (BOOL)updaterShouldDownloadReleaseNotes:(SUUpdater *)__unused updater
+{
+    return self.verbose;
+}
+
 - (void)startUpdater
 {
     NSError *updaterError = nil;
