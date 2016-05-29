@@ -181,7 +181,20 @@
 - (void)downloaderDidReceiveExpectedContentLength:(int64_t)expectedContentLength
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.delegate downloadDriverDidReceiveExpectedContentLength:expectedContentLength];
+        BOOL validExpectedContentLength = (expectedContentLength > 0 && expectedContentLength != NSURLResponseUnknownLength);
+        NSUInteger expectedLength = (NSUInteger)expectedContentLength;
+        NSUInteger updateItemContentLength = self.updateItem.contentLength;
+        
+        NSUInteger contentLength =
+            validExpectedContentLength ?
+            updateItemContentLength :
+            expectedLength;
+        
+        if (validExpectedContentLength && updateItemContentLength != expectedLength) {
+            SULog(@"Warning: Downloader's expected content length (%lu) != Appcast item's length (%lu)", expectedLength, updateItemContentLength);
+        }
+        
+        [self.delegate downloadDriverDidReceiveExpectedContentLength:contentLength];
     });
 }
 

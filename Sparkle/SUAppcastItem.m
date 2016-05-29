@@ -24,6 +24,7 @@
 @property (copy, readwrite) NSString *minimumSystemVersion;
 @property (copy, readwrite) NSString *maximumSystemVersion;
 @property (strong, readwrite) NSURL *fileURL;
+@property (nonatomic) NSUInteger contentLength;
 @property (copy, readwrite) NSString *versionString;
 @property (copy, readwrite) NSString *displayVersionString;
 @property (copy, readwrite) NSDictionary *deltaUpdates;
@@ -37,6 +38,7 @@
 @synthesize displayVersionString;
 @synthesize DSASignature;
 @synthesize fileURL;
+@synthesize contentLength = _contentLength;
 @synthesize infoURL;
 @synthesize itemDescription;
 @synthesize maximumSystemVersion;
@@ -61,6 +63,12 @@
         self.DSASignature = [decoder decodeObjectOfClass:[NSString class] forKey:@"DSASignature"];
         self.fileURL = [decoder decodeObjectOfClass:[NSURL class] forKey:@"fileURL"];
         self.infoURL = [decoder decodeObjectOfClass:[NSURL class] forKey:@"infoURL"];
+        
+        self.contentLength = (NSUInteger)[decoder decodeIntegerForKey:@"contentLength"];
+        if (self.contentLength == 0) {
+            return nil;
+        }
+        
         self.itemDescription = [decoder decodeObjectOfClass:[NSString class] forKey:@"itemDescription"];
         self.maximumSystemVersion = [decoder decodeObjectOfClass:[NSString class] forKey:@"maximumSystemVersion"];
         self.minimumSystemVersion = [decoder decodeObjectOfClass:[NSString class] forKey:@"minimumSystemVersion"];
@@ -94,6 +102,8 @@
     if (self.infoURL != nil) {
         [encoder encodeObject:self.infoURL forKey:@"infoURL"];
     }
+    
+    [encoder encodeInteger:(NSInteger)self.contentLength forKey:@"contentLength"];
     
     if (self.itemDescription != nil) {
         [encoder encodeObject:self.itemDescription forKey:@"itemDescription"];
@@ -209,6 +219,23 @@
         if (!enclosureURLString && !theInfoURL) {
             if (error) {
                 *error = @"Feed item's enclosure lacks URL";
+            }
+            return nil;
+        }
+        
+        NSString *enclosureLengthString = [enclosure objectForKey:SURSSAttributeLength];
+        NSInteger contentLength = 0;
+        if (enclosureLengthString != nil) {
+            contentLength = [enclosureLengthString integerValue];
+        }
+        if (contentLength > 0) {
+            self.contentLength = (NSUInteger)contentLength;
+        } else {
+            // content length is important enough to require
+            // developers copying the sample appcast should be using it already,
+            // and we can get away with assuming the content length provided is valid
+            if (error != NULL) {
+                *error = @"Feed item's enclosure lacks length";
             }
             return nil;
         }

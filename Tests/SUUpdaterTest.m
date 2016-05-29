@@ -45,7 +45,7 @@
 
 - (void)showDownloadInitiatedWithCompletion:(void (^)(SUDownloadUpdateStatus))__unused downloadUpdateStatusCompletion {}
 
-- (void)showDownloadDidReceiveExpectedContentLength:(int64_t)__unused expectedContentLength {}
+- (void)showDownloadDidReceiveExpectedContentLength:(NSUInteger)__unused expectedContentLength {}
 
 - (void)showDownloadDidReceiveDataOfLength:(NSUInteger)__unused length {}
 

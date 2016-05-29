@@ -317,7 +317,7 @@
     [self.coreComponent cancelDownloadStatus];
 }
 
-- (void)showDownloadDidReceiveExpectedContentLength:(int64_t)expectedContentLength
+- (void)showDownloadDidReceiveExpectedContentLength:(NSUInteger)expectedContentLength
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.statusController setMaxProgressValue:expectedContentLength];

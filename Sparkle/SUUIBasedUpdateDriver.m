@@ -147,7 +147,7 @@
     }];
 }
 
-- (void)downloadDriverDidReceiveExpectedContentLength:(int64_t)expectedContentLength
+- (void)downloadDriverDidReceiveExpectedContentLength:(NSUInteger)expectedContentLength
 {
     [self.userDriver showDownloadDidReceiveExpectedContentLength:expectedContentLength];
 }

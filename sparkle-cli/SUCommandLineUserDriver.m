@@ -190,14 +190,14 @@
     });
 }
 
-- (void)showDownloadDidReceiveExpectedContentLength:(int64_t)expectedContentLength
+- (void)showDownloadDidReceiveExpectedContentLength:(NSUInteger)expectedContentLength
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.verbose) {
             fprintf(stderr, "Downloading %llu bytes...\n", expectedContentLength);
         }
         self.bytesDownloaded = 0;
-        self.bytesToDownload = (NSUInteger)expectedContentLength;
+        self.bytesToDownload = expectedContentLength;
     });
 }
 

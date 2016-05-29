@@ -141,7 +141,7 @@
     }
 }
 
-- (void)downloadDriverDidReceiveExpectedContentLength:(int64_t)expectedContentLength
+- (void)downloadDriverDidReceiveExpectedContentLength:(NSUInteger)expectedContentLength
 {
     if ([self.delegate respondsToSelector:@selector(downloadDriverDidReceiveExpectedContentLength:)]) {
         [self.delegate downloadDriverDidReceiveExpectedContentLength:expectedContentLength];

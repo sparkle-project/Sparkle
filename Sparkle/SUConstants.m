@@ -73,6 +73,7 @@ NSString *const SUAppcastElementReleaseNotesLink = @"sparkle:releaseNotesLink";
 NSString *const SUAppcastElementTags = @"sparkle:tags";
 
 NSString *const SURSSAttributeURL = @"url";
+NSString *const SURSSAttributeLength = @"length";
 
 NSString *const SURSSElementDescription = @"description";
 NSString *const SURSSElementEnclosure = @"enclosure";

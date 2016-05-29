@@ -203,12 +203,11 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  * Show the user the content length of the new update that will be downloaded
  *
- * @param expectedContentLength The expected content length of the new update being downloaded.
- * This is NSURLResponseUnknownLength if the length is unknown.
+ * @param expectedContentLength The expected content length of the new update being downloaded. This will be greater than 0.
  *
  * This can be called from any thread
  */
-- (void)showDownloadDidReceiveExpectedContentLength:(int64_t)expectedContentLength;
+- (void)showDownloadDidReceiveExpectedContentLength:(NSUInteger)expectedContentLength;
 
 /*!
  * Show the user that the update download received more data
