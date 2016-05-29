@@ -229,16 +229,9 @@
         decryptionPassword = [self.updaterDelegate decryptionPasswordForUpdater:self.updater];
     }
     
-    NSString *localProgressToolPath = nil;
-    if ([self.updaterDelegate respondsToSelector:@selector(pathToInstallerProgressAppForUpdater:)]) {
-        localProgressToolPath = [self.updaterDelegate pathToInstallerProgressAppForUpdater:self.updater];
-    }
-    
+    NSString *localProgressToolPath = [self.sparkleBundle pathForResource:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME ofType:@"app"];
     if (localProgressToolPath == nil) {
-        localProgressToolPath = [self.sparkleBundle pathForResource:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME ofType:@"app"];
-        if (localProgressToolPath == nil) {
-            SULog(@"Error: Failed to find installer progress tool: %@", localProgressToolPath);
-        }
+        SULog(@"Error: Failed to find installer progress tool: %@", localProgressToolPath);
     }
     
     NSError *progressToolError = nil;

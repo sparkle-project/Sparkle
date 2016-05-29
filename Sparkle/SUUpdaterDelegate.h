@@ -237,19 +237,6 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (NSString *)pathToRelaunchForUpdater:(SUUpdater *)updater;
 
 /*!
- Returns the path which is used to launch the installer progress app.
- 
- Return nil if a custom path should not be used. The default is the path Sparkle's own installer progress app.
- 
- Note that if the application is sandboxed, the path returned from this method must be accessible within the application's sandbox.
- Lastly, the installer progress app is only used if the installation takes a "long" period of time. This is more likely to occur with installations
- that happen eg: over the network or USB drive, or if the app is really big and scattered in size. For most use cases, this tool may not be launched.
- 
- \param updater The SUUpdater instance.
- */
-- (NSString *)pathToInstallerProgressAppForUpdater:(SUUpdater *)updater;
-
-/*!
  Returns whether or not the updater should inherit its parent's privileges during installation
  
  Use this to override the default behavior which is to not inherit privileges.
