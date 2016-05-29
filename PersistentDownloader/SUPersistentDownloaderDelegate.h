@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)downloaderDidSetDestinationName:(NSString *)destinationName temporaryDirectory:(NSString *)temporaryDirectory;
 
+// Under rare cases, this may be called more than once, in which case the current progress should be reset back to 0
 - (void)downloaderDidReceiveExpectedContentLength:(int64_t)expectedContentLength;
 
 - (void)downloaderDidReceiveDataOfLength:(NSUInteger)length;
