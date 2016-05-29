@@ -16,6 +16,7 @@
 @property (nonatomic, readonly) NSString *applicationBundlePath;
 @property (nonatomic, readonly) BOOL verbose;
 @property (nonatomic) BOOL probingForUpdates;
+@property (nonatomic, readonly) BOOL interactive;
 
 @end
 
@@ -25,8 +26,9 @@
 @synthesize applicationBundlePath = _applicationBundlePath;
 @synthesize verbose = _verbose;
 @synthesize probingForUpdates = _probingForUpdates;
+@synthesize interactive = _interactive;
 
-- (instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath updatePermission:(nullable SUUpdatePermission *)updatePermission deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose
+- (instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath updatePermission:(nullable SUUpdatePermission *)updatePermission deferInstallation:(BOOL)deferInstallation interactiveInstallation:(BOOL)interactiveInstallation verbose:(BOOL)verbose
 {
     self = [super init];
     if (self != nil) {
@@ -46,6 +48,7 @@
         }
         
         _verbose = verbose;
+        _interactive = interactiveInstallation;
         
         _applicationBundlePath = applicationBundle.bundlePath;
         
@@ -57,7 +60,9 @@
 
 - (BOOL)updaterShouldInheritInstallPrivileges:(SUUpdater *)__unused updater
 {
-    return YES;
+    // If the installation is interactive, we can show an authorization prompt for requesting additional privileges,
+    // otherwise we should have the installer inherit the updater's privileges.
+    return !self.interactive;
 }
 
 // In case we find an update during probing, otherwise we leave this to the user driver
