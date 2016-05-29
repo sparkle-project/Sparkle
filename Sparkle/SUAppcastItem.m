@@ -15,38 +15,21 @@
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-@interface SUAppcastItem ()
-@property (copy, readwrite) NSString *title;
-@property (copy, readwrite) NSString *dateString;
-@property (copy, readwrite) NSString *itemDescription;
-@property (strong, readwrite) NSURL *releaseNotesURL;
-@property (copy, readwrite) NSString *DSASignature;
-@property (copy, readwrite) NSString *minimumSystemVersion;
-@property (copy, readwrite) NSString *maximumSystemVersion;
-@property (strong, readwrite) NSURL *fileURL;
-@property (nonatomic) NSUInteger contentLength;
-@property (copy, readwrite) NSString *versionString;
-@property (copy, readwrite) NSString *displayVersionString;
-@property (copy, readwrite) NSDictionary *deltaUpdates;
-@property (strong, readwrite) NSURL *infoURL;
-@property (readwrite, copy) NSDictionary *propertiesDictionary;
-@end
-
 @implementation SUAppcastItem
-@synthesize dateString;
-@synthesize deltaUpdates;
-@synthesize displayVersionString;
-@synthesize DSASignature;
-@synthesize fileURL;
+@synthesize dateString = _dateString;
+@synthesize deltaUpdates = _deltaUpdates;
+@synthesize displayVersionString = _displayVersionString;
+@synthesize DSASignature = _DSASignature;
+@synthesize fileURL = _fileURL;
 @synthesize contentLength = _contentLength;
-@synthesize infoURL;
-@synthesize itemDescription;
-@synthesize maximumSystemVersion;
-@synthesize minimumSystemVersion;
-@synthesize releaseNotesURL;
-@synthesize title;
-@synthesize versionString;
-@synthesize propertiesDictionary;
+@synthesize infoURL = _infoURL;
+@synthesize itemDescription = _itemDescription;
+@synthesize maximumSystemVersion = _maximumSystemVersion;
+@synthesize minimumSystemVersion = _minimumSystemVersion;
+@synthesize releaseNotesURL = _releaseNotesURL;
+@synthesize title = _title;
+@synthesize versionString = _versionString;
+@synthesize propertiesDictionary = _propertiesDictionary;
 
 + (BOOL)supportsSecureCoding
 {
@@ -58,24 +41,24 @@
     self = [super init];
     
     if (self != nil) {
-        self.deltaUpdates = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [SUAppcastItem class]]] forKey:@"deltaUpdates"];
-        self.displayVersionString = [decoder decodeObjectOfClass:[NSString class] forKey:@"displayVersionString"];
-        self.DSASignature = [decoder decodeObjectOfClass:[NSString class] forKey:@"DSASignature"];
-        self.fileURL = [decoder decodeObjectOfClass:[NSURL class] forKey:@"fileURL"];
-        self.infoURL = [decoder decodeObjectOfClass:[NSURL class] forKey:@"infoURL"];
+        _deltaUpdates = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [SUAppcastItem class]]] forKey:@"deltaUpdates"];
+        _displayVersionString = [[decoder decodeObjectOfClass:[NSString class] forKey:@"displayVersionString"] copy];
+        _DSASignature = [[decoder decodeObjectOfClass:[NSString class] forKey:@"DSASignature"] copy];
+        _fileURL = [decoder decodeObjectOfClass:[NSURL class] forKey:@"fileURL"];
+        _infoURL = [decoder decodeObjectOfClass:[NSURL class] forKey:@"infoURL"];
         
-        self.contentLength = (NSUInteger)[decoder decodeIntegerForKey:@"contentLength"];
-        if (self.contentLength == 0) {
+        _contentLength = (NSUInteger)[decoder decodeIntegerForKey:@"contentLength"];
+        if (_contentLength == 0) {
             return nil;
         }
         
-        self.itemDescription = [decoder decodeObjectOfClass:[NSString class] forKey:@"itemDescription"];
-        self.maximumSystemVersion = [decoder decodeObjectOfClass:[NSString class] forKey:@"maximumSystemVersion"];
-        self.minimumSystemVersion = [decoder decodeObjectOfClass:[NSString class] forKey:@"minimumSystemVersion"];
-        self.releaseNotesURL = [decoder decodeObjectOfClass:[NSURL class] forKey:@"releaseNotesURL"];
-        self.title = [decoder decodeObjectOfClass:[NSString class] forKey:@"title"];
-        self.versionString = [decoder decodeObjectOfClass:[NSString class] forKey:@"versionString"];
-        self.propertiesDictionary = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [NSString class], [NSDate class], [NSArray class]]] forKey:@"propertiesDictionary"];
+        _itemDescription = [[decoder decodeObjectOfClass:[NSString class] forKey:@"itemDescription"] copy];
+        _maximumSystemVersion = [[decoder decodeObjectOfClass:[NSString class] forKey:@"maximumSystemVersion"] copy];
+        _minimumSystemVersion = [[decoder decodeObjectOfClass:[NSString class] forKey:@"minimumSystemVersion"] copy];
+        _releaseNotesURL = [decoder decodeObjectOfClass:[NSURL class] forKey:@"releaseNotesURL"];
+        _title = [[decoder decodeObjectOfClass:[NSString class] forKey:@"title"] copy];
+        _versionString = [[decoder decodeObjectOfClass:[NSString class] forKey:@"versionString"] copy];
+        _propertiesDictionary = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [NSString class], [NSDate class], [NSArray class]]] forKey:@"propertiesDictionary"];
     }
     
     return self;
@@ -192,17 +175,17 @@
             return nil;
         }
 
-        propertiesDictionary = [[NSMutableDictionary alloc] initWithDictionary:dict];
-        self.title = [dict objectForKey:SURSSElementTitle];
-        self.dateString = [dict objectForKey:SURSSElementPubDate];
-        self.itemDescription = [dict objectForKey:SURSSElementDescription];
+        _propertiesDictionary = [[NSDictionary alloc] initWithDictionary:dict];
+        _title = [[dict objectForKey:SURSSElementTitle] copy];
+        _dateString = [[dict objectForKey:SURSSElementPubDate] copy];
+        _itemDescription = [[dict objectForKey:SURSSElementDescription] copy];
 
         NSString *theInfoURL = [dict objectForKey:SURSSElementLink];
         if (theInfoURL) {
             if (![theInfoURL isKindOfClass:[NSString class]]) {
                 SULog(@"%@ -%@ Info URL is not of valid type.", NSStringFromClass([self class]), NSStringFromSelector(_cmd));
             } else {
-                self.infoURL = [NSURL URLWithString:theInfoURL];
+                _infoURL = [NSURL URLWithString:theInfoURL];
             }
         }
 
@@ -229,7 +212,7 @@
             contentLength = [enclosureLengthString integerValue];
         }
         if (contentLength > 0) {
-            self.contentLength = (NSUInteger)contentLength;
+            _contentLength = (NSUInteger)contentLength;
         } else {
             // content length is important enough to require
             // developers copying the sample appcast should be using it already,
@@ -243,15 +226,15 @@
         if (enclosureURLString) {
             // Sparkle used to always URL-encode, so for backwards compatibility spaces in URLs must be forgiven.
             NSString *fileURLString = [enclosureURLString stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
-            self.fileURL = [NSURL URLWithString:fileURLString];
+            _fileURL = [NSURL URLWithString:fileURLString];
         }
         if (enclosure) {
-            self.DSASignature = [enclosure objectForKey:SUAppcastAttributeDSASignature];
+            _DSASignature = [[enclosure objectForKey:SUAppcastAttributeDSASignature] copy];
         }
 
-        self.versionString = newVersion;
-        self.minimumSystemVersion = [dict objectForKey:SUAppcastElementMinimumSystemVersion];
-        self.maximumSystemVersion = [dict objectForKey:SUAppcastElementMaximumSystemVersion];
+        _versionString = [newVersion copy];
+        _minimumSystemVersion = [[dict objectForKey:SUAppcastElementMinimumSystemVersion] copy];
+        _maximumSystemVersion = [[dict objectForKey:SUAppcastElementMaximumSystemVersion] copy];
 
         NSString *shortVersionString = [enclosure objectForKey:SUAppcastAttributeShortVersionString];
         if (nil == shortVersionString) {
@@ -259,9 +242,9 @@
         }
 
         if (shortVersionString) {
-            self.displayVersionString = shortVersionString;
+            _displayVersionString = [shortVersionString copy];
         } else {
-            self.displayVersionString = self.versionString;
+            _displayVersionString = [_versionString copy];
         }
 
         // Find the appropriate release notes URL.
@@ -271,12 +254,12 @@
             if ([url isFileURL]) {
                 SULog(@"Release notes with file:// URLs are not supported");
             } else {
-                self.releaseNotesURL = url;
+                _releaseNotesURL = url;
             }
         } else if ([self.itemDescription hasPrefix:@"http://"] || [self.itemDescription hasPrefix:@"https://"]) { // if the description starts with http:// or https:// use that.
-            self.releaseNotesURL = [NSURL URLWithString:self.itemDescription];
+            _releaseNotesURL = [NSURL URLWithString:self.itemDescription];
         } else {
-            self.releaseNotesURL = nil;
+            _releaseNotesURL = nil;
         }
 
         NSArray *deltaDictionaries = [dict objectForKey:SUAppcastElementDeltas];
@@ -293,7 +276,7 @@
 
                 [deltas setObject:deltaItem forKey:deltaFrom];
             }
-            self.deltaUpdates = deltas;
+            _deltaUpdates = deltas;
         }
     }
     return self;
