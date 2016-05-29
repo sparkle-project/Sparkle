@@ -11,6 +11,7 @@
 #import "SURemoteMessagePort.h"
 #import "SUMessageTypes.h"
 #import "SULog.h"
+#import "SUApplicationInfo.h"
 
 /*!
  * Terminate the application after a delay from launching the new update to avoid OS activation issues
@@ -56,6 +57,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             exit(EXIT_FAILURE);
         }
         
+        application.applicationIconImage = [SUApplicationInfo bestIconForBundle:bundle];
+
         application.delegate = self;
         
         _application = application;
