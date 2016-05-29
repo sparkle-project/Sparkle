@@ -15,7 +15,22 @@
 #error This is a "core" class and should NOT import AppKit
 #endif
 
+static NSString *SUAppcastItemDeltaUpdatesKey = @"deltaUpdates";
+static NSString *SUAppcastItemDisplayVersionStringKey = @"displayVersionString";
+static NSString *SUAppcastItemDSASignatureKey = @"DSASignature";
+static NSString *SUAppcastItemFileURLKey = @"fileURL";
+static NSString *SUAppcastItemInfoURLKey = @"infoURL";
+static NSString *SUAppcastItemContentLengthKey = @"contentLength";
+static NSString *SUAppcastItemDescriptionKey = @"itemDescription";
+static NSString *SUAppcastItemMaximumSystemVersionKey = @"maximumSystemVersion";
+static NSString *SUAppcastItemMinimumSystemVersionKey = @"minimumSystemVersion";
+static NSString *SUAppcastItemReleaseNotesURLKey = @"releaseNotesURL";
+static NSString *SUAppcastItemTitleKey = @"title";
+static NSString *SUAppcastItemVersionStringKey = @"versionString";
+static NSString *SUAppcastItemPropertiesKey = @"propertiesDictionary";
+
 @implementation SUAppcastItem
+
 @synthesize dateString = _dateString;
 @synthesize deltaUpdates = _deltaUpdates;
 @synthesize displayVersionString = _displayVersionString;
@@ -41,24 +56,24 @@
     self = [super init];
     
     if (self != nil) {
-        _deltaUpdates = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [SUAppcastItem class]]] forKey:@"deltaUpdates"];
-        _displayVersionString = [[decoder decodeObjectOfClass:[NSString class] forKey:@"displayVersionString"] copy];
-        _DSASignature = [[decoder decodeObjectOfClass:[NSString class] forKey:@"DSASignature"] copy];
-        _fileURL = [decoder decodeObjectOfClass:[NSURL class] forKey:@"fileURL"];
-        _infoURL = [decoder decodeObjectOfClass:[NSURL class] forKey:@"infoURL"];
+        _deltaUpdates = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [SUAppcastItem class]]] forKey:SUAppcastItemDeltaUpdatesKey];
+        _displayVersionString = [[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemDisplayVersionStringKey] copy];
+        _DSASignature = [[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemDSASignatureKey] copy];
+        _fileURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemFileURLKey];
+        _infoURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemInfoURLKey];
         
-        _contentLength = (NSUInteger)[decoder decodeIntegerForKey:@"contentLength"];
+        _contentLength = (NSUInteger)[decoder decodeIntegerForKey:SUAppcastItemContentLengthKey];
         if (_contentLength == 0) {
             return nil;
         }
         
-        _itemDescription = [[decoder decodeObjectOfClass:[NSString class] forKey:@"itemDescription"] copy];
-        _maximumSystemVersion = [[decoder decodeObjectOfClass:[NSString class] forKey:@"maximumSystemVersion"] copy];
-        _minimumSystemVersion = [[decoder decodeObjectOfClass:[NSString class] forKey:@"minimumSystemVersion"] copy];
-        _releaseNotesURL = [decoder decodeObjectOfClass:[NSURL class] forKey:@"releaseNotesURL"];
-        _title = [[decoder decodeObjectOfClass:[NSString class] forKey:@"title"] copy];
-        _versionString = [[decoder decodeObjectOfClass:[NSString class] forKey:@"versionString"] copy];
-        _propertiesDictionary = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [NSString class], [NSDate class], [NSArray class]]] forKey:@"propertiesDictionary"];
+        _itemDescription = [[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemDescriptionKey] copy];
+        _maximumSystemVersion = [[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemMaximumSystemVersionKey] copy];
+        _minimumSystemVersion = [[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemMinimumSystemVersionKey] copy];
+        _releaseNotesURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemReleaseNotesURLKey];
+        _title = [[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemTitleKey] copy];
+        _versionString = [[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemVersionStringKey] copy];
+        _propertiesDictionary = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [NSString class], [NSDate class], [NSArray class]]] forKey:SUAppcastItemPropertiesKey];
     }
     
     return self;
@@ -67,53 +82,53 @@
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
     if (self.deltaUpdates != nil) {
-        [encoder encodeObject:self.deltaUpdates forKey:@"deltaUpdates"];
+        [encoder encodeObject:self.deltaUpdates forKey:SUAppcastItemDeltaUpdatesKey];
     }
     
     if (self.displayVersionString != nil) {
-        [encoder encodeObject:self.displayVersionString forKey:@"displayVersionString"];
+        [encoder encodeObject:self.displayVersionString forKey:SUAppcastItemDisplayVersionStringKey];
     }
     
     if (self.DSASignature != nil) {
-        [encoder encodeObject:self.DSASignature forKey:@"DSASignature"];
+        [encoder encodeObject:self.DSASignature forKey:SUAppcastItemDSASignatureKey];
     }
     
     if (self.fileURL != nil) {
-        [encoder encodeObject:self.fileURL forKey:@"fileURL"];
+        [encoder encodeObject:self.fileURL forKey:SUAppcastItemFileURLKey];
     }
     
     if (self.infoURL != nil) {
-        [encoder encodeObject:self.infoURL forKey:@"infoURL"];
+        [encoder encodeObject:self.infoURL forKey:SUAppcastItemInfoURLKey];
     }
     
-    [encoder encodeInteger:(NSInteger)self.contentLength forKey:@"contentLength"];
+    [encoder encodeInteger:(NSInteger)self.contentLength forKey:SUAppcastItemContentLengthKey];
     
     if (self.itemDescription != nil) {
-        [encoder encodeObject:self.itemDescription forKey:@"itemDescription"];
+        [encoder encodeObject:self.itemDescription forKey:SUAppcastItemDescriptionKey];
     }
     
     if (self.maximumSystemVersion != nil) {
-        [encoder encodeObject:self.maximumSystemVersion forKey:@"maximumSystemVersion"];
+        [encoder encodeObject:self.maximumSystemVersion forKey:SUAppcastItemMaximumSystemVersionKey];
     }
     
     if (self.minimumSystemVersion != nil) {
-        [encoder encodeObject:self.minimumSystemVersion forKey:@"minimumSystemVersion"];
+        [encoder encodeObject:self.minimumSystemVersion forKey:SUAppcastItemMinimumSystemVersionKey];
     }
     
     if (self.releaseNotesURL != nil) {
-        [encoder encodeObject:self.releaseNotesURL forKey:@"releaseNotesURL"];
+        [encoder encodeObject:self.releaseNotesURL forKey:SUAppcastItemReleaseNotesURLKey];
     }
     
     if (self.title != nil) {
-        [encoder encodeObject:self.title forKey:@"title"];
+        [encoder encodeObject:self.title forKey:SUAppcastItemTitleKey];
     }
     
     if (self.versionString != nil) {
-        [encoder encodeObject:self.versionString forKey:@"versionString"];
+        [encoder encodeObject:self.versionString forKey:SUAppcastItemVersionStringKey];
     }
     
     if (self.propertiesDictionary != nil) {
-        [encoder encodeObject:self.propertiesDictionary forKey:@"propertiesDictionary"];
+        [encoder encodeObject:self.propertiesDictionary forKey:SUAppcastItemPropertiesKey];
     }
 }
 
