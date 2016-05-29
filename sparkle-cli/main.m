@@ -119,6 +119,16 @@ int main(int argc, char **argv)
             return EXIT_FAILURE;
         }
         
+        if (probeForUpdates && (applicationPath != nil || deferInstall || checkForUpdatesNow || interactive)) {
+            fprintf(stderr, "Error: --%s does not work together with --%s, --%s, --%s, --%s\n", PROBE_FLAG, APPLICATION_FLAG, DEFER_FLAG, CHECK_NOW_FLAG, INTERACTIVE_FLAG);
+            return EXIT_FAILURE;
+        }
+        
+        if (interactive && deferInstall) {
+            fprintf(stderr, "Error: --%s does not work together with --%s\n", INTERACTIVE_FLAG, DEFER_FLAG);
+            return EXIT_FAILURE;
+        }
+        
         SUUpdatePermission *updatePermission = nil;
         if (grantAutomaticChecking) {
             updatePermission = [SUUpdatePermission updatePermissionWithChoice:SUAutomaticallyCheck sendProfile:sendProfile];
@@ -127,7 +137,6 @@ int main(int argc, char **argv)
         SUCommandLineDriver *driver = [[SUCommandLineDriver alloc] initWithUpdateBundlePath:updatePath applicationBundlePath:applicationPath updatePermission:updatePermission deferInstallation:deferInstall interactiveInstallation:interactive verbose:verbose];
         if (driver == nil) {
             fprintf(stderr, "Error: Failed to initialize updater. Are the bundle paths provided valid?\n");
-            printUsage(argv);
             return EXIT_FAILURE;
         }
         
