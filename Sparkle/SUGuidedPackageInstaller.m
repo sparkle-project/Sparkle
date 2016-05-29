@@ -94,7 +94,8 @@
 
 - (BOOL)canInstallSilently
 {
-    return ![self mayNeedToRequestAuthorization];
+    // Are we root?
+    return (geteuid() == 0);
 }
 
 - (BOOL)mayNeedToRequestAuthorization
