@@ -194,7 +194,7 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.verbose) {
-            fprintf(stderr, "Downloading %llu bytes...\n", expectedContentLength);
+            fprintf(stderr, "Downloading %lu bytes...\n", (unsigned long)expectedContentLength);
         }
         self.bytesDownloaded = 0;
         self.bytesToDownload = expectedContentLength;
