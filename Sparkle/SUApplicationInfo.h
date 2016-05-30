@@ -8,10 +8,14 @@
 
 #import <Cocoa/Cocoa.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface SUApplicationInfo : NSObject
 
-+ (BOOL)isBackgroundApplication:(NSApplication * __nonnull)application;
++ (BOOL)isBackgroundApplication:(NSApplication *)application;
 
-+ (NSImage *__nonnull)bestIconForBundle:(NSBundle * __nonnull)bundle;
++ (NSImage *)bestIconForBundle:(NSBundle *)bundle;
 
 @end
+
+NS_ASSUME_NONNULL_END
