@@ -32,6 +32,8 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    // So ideally we would want to replace this (and Autoupdate.app) with SMJobBless (or maybe SMJobSubmit) & launchd,
+    // but making that kind of privillege separation change is not trivial and would need to be heavily tested
     if (AuthorizationExecuteWithPrivileges(authorization, executablePath, options, arguments, NULL) == errAuthorizationSuccess) {
 #pragma clang diagnostic pop
         // Wait for every child to finish termination because we won't know which particular child is ours.
