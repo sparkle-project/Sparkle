@@ -45,7 +45,7 @@
 
 - (BOOL)performSecondStageAllowingAuthorization:(BOOL)allowsAuthorization withEnvironment:(SUAuthorizationEnvironment * _Nullable)authorizationEnvironment allowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
 {
-    if (!allowsUI) {
+    if (!allowsUI && ![self canInstallSilently]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{NSLocalizedDescriptionKey : @"Guided installer cannot continue if showing UI is not allowed"}];
         }
@@ -80,7 +80,6 @@
     };
     
     validInstallation = [self.fileManager authorizeAndExecuteWithPrivilegesAtPath:installerPath arguments:arguments];
-    
     if (!validInstallation && error != NULL) {
         *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{NSLocalizedDescriptionKey : @"Failed to authorize installer"}];
     }
