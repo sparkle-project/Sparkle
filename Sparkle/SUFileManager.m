@@ -30,34 +30,24 @@ static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authoriza
     // Do not try to save/later restore signal handler for ECHILD
     // We don't have a custom handler in our app anyway, and manipulating signals should not be our responsibility due to threading concerns
 
+    FILE *pipe = NULL;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     // So ideally we would want to replace this (and Autoupdate.app) with SMJobBless (or maybe SMJobSubmit) & launchd,
     // but making that kind of privillege separation change is not trivial and would need to be heavily tested
-    if (AuthorizationExecuteWithPrivileges(authorization, executablePath, options, arguments, NULL) == errAuthorizationSuccess) {
+    if (AuthorizationExecuteWithPrivileges(authorization, executablePath, options, arguments, &pipe) == errAuthorizationSuccess) {
 #pragma clang diagnostic pop
-        // Wait for every child to finish termination because we won't know which particular child is ours.
-        // Perhaps in the future writing a custom wrapper tool that communicates its pid in stdout may be a better route
-        // However that has the security issue of anyone being able to swap in our tool with their own
-        // Another possible idea is using sh -c and echo'ing the pid which we read from here, then executing our command,
-        // but we would have to be careful about sanitizing paths, \ escaping quotation marks, ...
-        while (true) {
-            pid_t waitPid = 0;
-            int waitStatus = 0;
-            
-            waitPid = wait(&waitStatus);
-            if (waitPid != -1 || errno == EINTR) {
-                // Continue and wait for all children to terminate
-            } else {
-                if (errno != ECHILD) {
-                    // Ran into an abnormal error
-                    returnValue = NO;
-                }
-                break;
-            }
+        pid_t childPid = fcntl(fileno(pipe), F_GETOWN, 0);
+        
+        pid_t waitPid = 0;
+        int status = 0;
+        do {
+            waitPid = waitpid(childPid, &status, 0);
+        } while (waitPid == -1 && errno == EINTR);
+        
+        if (waitPid == -1 || !WIFEXITED(status) || WEXITSTATUS(status) != 0) {
+            returnValue = NO;
         }
-        // We can't check the status from wait() here because the child whose status we check may not be the child we are responsible for
-        // So we will assume that the process terminated successfully; I know, not ideal.
     } else {
         returnValue = NO;
     }
