@@ -147,7 +147,7 @@
  * @return YES if the installer ran the package successfully, otherwise NO with a populated error object
  *
  * This method uses the system wide installer tool to run the provided package. This process does not show any UI, except for
- * an initial authorization prompt if the calling process does not have root privileges. In other words, root privileges are required to use this method.
+ * an initial authorization prompt if the calling process does not have root privileges. In other words, root privileges are required to use this method, and the file manager instance must have been created by allowing authorization.
  * An error can occur if the package is unable to be ran by the installer, or if the installer reports a non-zero exit status code.
  */
 - (BOOL)executePackageAtURL:(NSURL *)packageURL error:(NSError **)error;
