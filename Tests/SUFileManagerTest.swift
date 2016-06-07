@@ -308,13 +308,6 @@ class SUFileManagerTest: XCTestCase
         }
     }
     
-    // This alone shouldn't prompt a password dialog and should always succeed
-    func testAcquireAuthorization()
-    {
-        let fileManager = SUFileManager(allowingAuthorization: true)
-        try! fileManager._acquireAuthorization()
-    }
-    
     func testAcquireBadAuthorization()
     {
         let fileManager = SUFileManager(allowingAuthorization: false)
