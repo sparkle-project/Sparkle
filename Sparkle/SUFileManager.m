@@ -18,24 +18,30 @@ static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
 // Authorization code based on generous contribution from Allan Odgaard. Thanks, Allan!
 static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char *executablePath, AuthorizationFlags options, char *const *arguments)
 {
-    sig_t oldSigChildHandler = signal(SIGCHLD, SIG_DFL);
     BOOL returnValue = YES;
 
+    FILE *pipe = NULL;
 #pragma clang diagnostic push
     // In the future, we may have to look at SMJobBless API to avoid deprecation. See issue #558
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    if (AuthorizationExecuteWithPrivileges(authorization, executablePath, options, arguments, NULL) == errAuthorizationSuccess)
+    if (AuthorizationExecuteWithPrivileges(authorization, executablePath, options, arguments, &pipe) == errAuthorizationSuccess)
 #pragma clang diagnostic pop
     {
-        int status;
-        pid_t pid = wait(&status);
-        if (pid == -1 || !WIFEXITED(status) || WEXITSTATUS(status) != 0)
+        pid_t childPid = fcntl(fileno(pipe), F_GETOWN, 0);
+        int status = 0;
+        pid_t pid = -1;
+        do {
+            pid = waitpid(childPid, &status, 0);
+        } while (pid == -1 && errno == EINTR);
+        
+        if (pid == -1 || !WIFEXITED(status) || WEXITSTATUS(status) != 0) {
             returnValue = NO;
-    }
-    else
+        }
+        fclose(pipe);
+    } else {
         returnValue = NO;
-
-    signal(SIGCHLD, oldSigChildHandler);
+    }
+    
     return returnValue;
 }
 
