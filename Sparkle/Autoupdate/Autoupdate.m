@@ -173,6 +173,10 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
                        completionHandler:^(NSError *error) {
                            if (error) {
                                SULog(@"Installation Error: %@", error);
+                               NSError *underlyingError = [error.userInfo objectForKey:NSUnderlyingErrorKey];
+                               if (underlyingError != nil) {
+                                   SULog(@"Installation Underlying Error: %@", underlyingError);
+                               }
                                if (self.shouldShowUI) {
                                    NSAlert *alert = [[NSAlert alloc] init];
                                    alert.messageText = @"";
