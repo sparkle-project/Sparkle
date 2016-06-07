@@ -511,7 +511,7 @@
     if (relaunchPathToCopy != nil) {
         NSString *targetPath = [[self appCachePath] stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
         
-        SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:NO];
+        SUFileManager *fileManager = [SUFileManager defaultManager];
         NSError *error = nil;
         
         NSURL *relaunchURLToCopy = [NSURL fileURLWithPath:relaunchPathToCopy];
