@@ -43,7 +43,7 @@
     return YES;
 }
 
-- (BOOL)performSecondStageAllowingAuthorization:(BOOL)allowsAuthorization withEnvironment:(SUAuthorizationEnvironment * _Nullable)authorizationEnvironment allowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
+- (BOOL)performSecondStageAllowingAuthorization:(BOOL)allowsAuthorization fileOperationToolPath:(NSString *)fileOperationToolPath environment:(SUAuthorizationEnvironment * _Nullable)authorizationEnvironment allowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
 {
     if (!allowsUI && ![self canInstallSilently]) {
         if (error != NULL) {
@@ -53,37 +53,14 @@
     }
     
     // If we're root, we can allow using the authorization APIs
-    self.fileManager = (allowsAuthorization || (geteuid() == 0)) ? [SUFileManager fileManagerAllowingAuthorizationWithEnvironment:authorizationEnvironment] : [SUFileManager defaultManager];
+    self.fileManager = (allowsAuthorization || (geteuid() == 0)) ? [SUFileManager fileManagerWithAuthorizationToolPath:fileOperationToolPath environment:authorizationEnvironment] : [SUFileManager defaultManager];
     
     return [self.fileManager grantAuthorizationPrivilegesWithError:error];
 }
 
 - (BOOL)performThirdStage:(NSError * __autoreleasing *)error
 {
-    BOOL validInstallation = NO;
-    
-    char pathBuffer[PATH_MAX] = {0};
-    if (![self.packagePath getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)]) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{NSLocalizedDescriptionKey : @"Failed to get file system representation of package path"}];
-        }
-        return NO;
-    }
-    
-    const char *installerPath = "/usr/sbin/installer"; // Mac OS X 10.2+ command line installer tool
-    char * const arguments[] = {
-        "-pkg",
-        pathBuffer,
-        "-target",
-        "/",
-        NULL
-    };
-    
-    validInstallation = [self.fileManager authorizeAndExecuteWithPrivilegesAtPath:installerPath arguments:arguments];
-    if (!validInstallation && error != NULL) {
-        *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{NSLocalizedDescriptionKey : @"Failed to authorize installer"}];
-    }
-    return validInstallation;
+    return [self.fileManager executePackageAtURL:[NSURL fileURLWithPath:self.packagePath] error:error];
 }
 
 - (BOOL)displaysUserProgress

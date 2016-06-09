@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 // The allowsUI flag indicates whether this and the 3rd stage can show UI or not, possibly affecting whether or not this stage succeeds.
 // Eg: This may be appropriate for first showing an authorization prompt before the user application is terminated (if the operation succeeds)
 // Should be able to be called from non-main thread
-- (BOOL)performSecondStageAllowingAuthorization:(BOOL)allowsAuthorization withEnvironment:(SUAuthorizationEnvironment * _Nullable)authorizationEnvironment allowingUI:(BOOL)allowsUI error:(NSError **)error;
+- (BOOL)performSecondStageAllowingAuthorization:(BOOL)allowsAuthorization fileOperationToolPath:(NSString *)fileOperationToolPath environment:(SUAuthorizationEnvironment * _Nullable)authorizationEnvironment allowingUI:(BOOL)allowsUI error:(NSError **)error;
 
 // Stage 3 occurs after the user application has has been terminated. This is where the final installation work can be done.
 // After this stage is done, the user application will be relaunched.

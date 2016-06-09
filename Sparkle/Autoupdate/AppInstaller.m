@@ -508,8 +508,14 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         });
     }
     
+    NSString *fileOperationToolPath = [[[[NSBundle mainBundle] executablePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:@""SPARKLE_FILEOP_TOOL_NAME];
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:fileOperationToolPath]) {
+        SULog(@"Potential Installation Error: File operation tool path %@ is not found", fileOperationToolPath);
+    }
+    
     NSError *secondStageError = nil;
-    BOOL performedSecondStage = [self.installer performSecondStageAllowingAuthorization:!self.inheritsPrivileges withEnvironment:environment allowingUI:self.shouldShowUI error:&secondStageError];
+    BOOL performedSecondStage = [self.installer performSecondStageAllowingAuthorization:!self.inheritsPrivileges fileOperationToolPath:fileOperationToolPath environment:environment allowingUI:self.shouldShowUI error:&secondStageError];
     
     if (tempIconDirectoryURL != nil) {
         [[SUFileManager defaultManager] removeItemAtURL:tempIconDirectoryURL error:NULL];
@@ -602,6 +608,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             NSError *thirdStageError = nil;
             if (![self.installer performThirdStage:&thirdStageError]) {
                 SULog(@"Failed to finalize installation with error: %@", thirdStageError);
+                SULog(@"Underlying error: %@", [thirdStageError.userInfo objectForKey:NSUnderlyingErrorKey]);
                 
                 [self.installer cleanup];
                 self.installer = nil;

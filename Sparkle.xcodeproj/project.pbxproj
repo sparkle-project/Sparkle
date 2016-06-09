@@ -298,6 +298,15 @@
 		72E45CFC1B641961005C701A /* sparkletestcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CFB1B641961005C701A /* sparkletestcast.xml */; };
 		72E45CFE1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CFD1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem */; };
 		72E45DDD1B65C3BD005C701A /* sign_update in Resources */ = {isa = PBXBuildFile; fileRef = 72E45DDC1B65C3BD005C701A /* sign_update */; };
+		72E641A71D090F51000404CA /* fileop.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E641A41D090F51000404CA /* fileop.m */; };
+		72E641A81D090F51000404CA /* SUFileOperationConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E641A61D090F51000404CA /* SUFileOperationConstants.m */; };
+		72E641AB1D090F6E000404CA /* SUFileOperationConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E641A61D090F51000404CA /* SUFileOperationConstants.m */; };
+		72E641AC1D090F7F000404CA /* SUFileOperationConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E641A61D090F51000404CA /* SUFileOperationConstants.m */; };
+		72E641AF1D090F9E000404CA /* fileop in Resources */ = {isa = PBXBuildFile; fileRef = 72E6419B1D090F1C000404CA /* fileop */; };
+		72E641B11D091781000404CA /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
+		72E641B21D091789000404CA /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
+		72E641B31D0918E4000404CA /* SUFileOperationConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E641A61D090F51000404CA /* SUFileOperationConstants.m */; };
+		72E641B51D091A15000404CA /* fileop in Copy Executables */ = {isa = PBXBuildFile; fileRef = 72E6419B1D090F1C000404CA /* fileop */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		72EB87EA1CB8798800C37F42 /* ShowInstallerProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */; };
 		72EB87EB1CB8859100C37F42 /* Updater.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 721C24451CB753E6005440CB /* Updater.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		72EB87EC1CB8887E00C37F42 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
@@ -429,6 +438,20 @@
 			remoteGlobalIDString = 721C24441CB753E6005440CB;
 			remoteInfo = "Installer Progress";
 		};
+		72E641A91D090F63000404CA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 72E6419A1D090F1C000404CA;
+			remoteInfo = fileop;
+		};
+		72E641AD1D090F98000404CA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 72E6419A1D090F1C000404CA;
+			remoteInfo = fileop;
+		};
 		72F94F611CC48669002DEE68 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -545,6 +568,26 @@
 				72D954B51CBB447A006F28BD /* Sparkle.framework in Copy Sparkle */,
 			);
 			name = "Copy Sparkle";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		72E641991D090F1C000404CA /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		72E641B41D091A0A000404CA /* Copy Executables */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				72E641B51D091A15000404CA /* fileop in Copy Executables */,
+			);
+			name = "Copy Executables";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -941,6 +984,11 @@
 		72E45CFB1B641961005C701A /* sparkletestcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = sparkletestcast.xml; sourceTree = "<group>"; };
 		72E45CFD1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test_app_only_dsa_priv_dont_ever_do_this_for_real.pem; sourceTree = "<group>"; };
 		72E45DDC1B65C3BD005C701A /* sign_update */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = sign_update; path = bin/sign_update; sourceTree = SOURCE_ROOT; };
+		72E6419B1D090F1C000404CA /* fileop */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = fileop; sourceTree = BUILT_PRODUCTS_DIR; };
+		72E641A41D090F51000404CA /* fileop.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = fileop.m; sourceTree = "<group>"; };
+		72E641A51D090F51000404CA /* SUFileOperationConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUFileOperationConstants.h; sourceTree = "<group>"; };
+		72E641A61D090F51000404CA /* SUFileOperationConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUFileOperationConstants.m; sourceTree = "<group>"; };
+		72E641B01D09119F000404CA /* ConfigFileop.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigFileop.xcconfig; sourceTree = "<group>"; };
 		72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ShowInstallerProgress.m; path = Sparkle/InstallerProgress/ShowInstallerProgress.m; sourceTree = SOURCE_ROOT; };
 		72F94EB01CC2A865002DEE68 /* ConfigCommonReleaseHTTP.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigCommonReleaseHTTP.xcconfig; sourceTree = "<group>"; };
 		72F94ED31CC33F1E002DEE68 /* set-ats-exceptions.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "set-ats-exceptions.sh"; sourceTree = "<group>"; };
@@ -1081,6 +1129,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		72E641981D090F1C000404CA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DC2EF560486A6940098B216 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1112,6 +1167,7 @@
 				72E41A3E1CB20BA7003D47E0 /* SparkleRemoteMessagePort.xpc */,
 				721C24451CB753E6005440CB /* Updater.app */,
 				72D9549E1CBB415B006F28BD /* sparkle.app */,
+				72E6419B1D090F1C000404CA /* fileop */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1263,6 +1319,7 @@
 		55C14BD5136EEFD000649790 /* Autoupdate */ = {
 			isa = PBXGroup;
 			children = (
+				72E6419C1D090F1C000404CA /* fileop */,
 				61CFB2C10E384958007A1735 /* Verifiers */,
 				6101354A0DD25B7F0049ACDF /* Unarchiving */,
 				618FA6DB0DB485440026945C /* Installation */,
@@ -1651,6 +1708,17 @@
 			path = ../RemoteMessagePort;
 			sourceTree = "<group>";
 		};
+		72E6419C1D090F1C000404CA /* fileop */ = {
+			isa = PBXGroup;
+			children = (
+				72E641A41D090F51000404CA /* fileop.m */,
+				72E641A51D090F51000404CA /* SUFileOperationConstants.h */,
+				72E641A61D090F51000404CA /* SUFileOperationConstants.m */,
+			);
+			name = fileop;
+			path = ../../fileop;
+			sourceTree = "<group>";
+		};
 		72F94F551CC43D99002DEE68 /* XPC Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -1677,6 +1745,7 @@
 				FA1941D10D94A70100DD942E /* ConfigFramework.xcconfig */,
 				FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */,
 				FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */,
+				72E641B01D09119F000404CA /* ConfigFileop.xcconfig */,
 				721C24571CB754E8005440CB /* ConfigInstallerProgress.xcconfig */,
 				FA1941CD0D94A70100DD942E /* ConfigTestApp.xcconfig */,
 				72F94EDA1CC36C37002DEE68 /* ConfigTestAppDebug.xcconfig */,
@@ -1830,10 +1899,12 @@
 				55C14BB4136EEF1500649790 /* Sources */,
 				55C14BB5136EEF1500649790 /* Frameworks */,
 				14652F7B19A945D600959E44 /* Run Script: Set Git Version Info */,
+				72E641B41D091A0A000404CA /* Copy Executables */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				72E641AA1D090F63000404CA /* PBXTargetDependency */,
 			);
 			name = Autoupdate;
 			productName = Autoupdate;
@@ -1868,6 +1939,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				72E641AE1D090F98000404CA /* PBXTargetDependency */,
 				61FA528D0E2D9EB200EF58AD /* PBXTargetDependency */,
 			);
 			name = "Sparkle Unit Tests";
@@ -2041,6 +2113,23 @@
 			productReference = 72E41A3E1CB20BA7003D47E0 /* SparkleRemoteMessagePort.xpc */;
 			productType = "com.apple.product-type.xpc-service";
 		};
+		72E6419A1D090F1C000404CA /* fileop */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 72E6419F1D090F1C000404CA /* Build configuration list for PBXNativeTarget "fileop" */;
+			buildPhases = (
+				72E641971D090F1C000404CA /* Sources */,
+				72E641981D090F1C000404CA /* Frameworks */,
+				72E641991D090F1C000404CA /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = fileop;
+			productName = fileop;
+			productReference = 72E6419B1D090F1C000404CA /* fileop */;
+			productType = "com.apple.product-type.tool";
+		};
 		8DC2EF4F0486A6940098B216 /* Sparkle */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1DEB91AD08733DA50010E9CD /* Build configuration list for PBXNativeTarget "Sparkle" */;
@@ -2127,6 +2216,9 @@
 					72E41A3D1CB20BA7003D47E0 = {
 						CreatedOnToolsVersion = 7.3;
 					};
+					72E6419A1D090F1C000404CA = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
 				};
 			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "Sparkle" */;
@@ -2203,6 +2295,7 @@
 				1420DF491962329200203BB0 /* Documentation */,
 				1495005F195FB89400BC5B5B /* All */,
 				726B2B5C1C645FC900388755 /* UI Tests */,
+				72E6419A1D090F1C000404CA /* fileop */,
 			);
 		};
 /* End PBXProject section */
@@ -2212,6 +2305,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72E641AF1D090F9E000404CA /* fileop in Resources */,
 				14958C6E19AEBC950061B14F /* signed-test-file.txt in Resources */,
 				5F1510A21C96E591006E1629 /* testnamespaces.xml in Resources */,
 				72AC6B2E1B9B218C00F62325 /* SparkleTestCodeSignApp.dmg in Resources */,
@@ -2422,6 +2516,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72E641AB1D090F6E000404CA /* SUFileOperationConstants.m in Sources */,
 				72B144531CF8992200B971EE /* SUApplicationInfo.m in Sources */,
 				72B09CEE1CEA21CD0052EF9E /* bscommon.c in Sources */,
 				72D9547E1CBA221E006F28BD /* SUAppcastItem.m in Sources */,
@@ -2553,6 +2648,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72E641B31D0918E4000404CA /* SUFileOperationConstants.m in Sources */,
 				726E07C01CAF15B7001A286B /* SULog.m in Sources */,
 				726E07BF1CAF0C6C001A286B /* SUConstants.m in Sources */,
 				726E07BE1CAF0C5C001A286B /* SUFileManager.m in Sources */,
@@ -2611,10 +2707,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		72E641971D090F1C000404CA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72E641B21D091789000404CA /* SUConstants.m in Sources */,
+				72E641B11D091781000404CA /* SUFileManager.m in Sources */,
+				72E641A71D090F51000404CA /* fileop.m in Sources */,
+				72E641A81D090F51000404CA /* SUFileOperationConstants.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DC2EF540486A6940098B216 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72E641AC1D090F7F000404CA /* SUFileOperationConstants.m in Sources */,
 				724A0A3E1CF7AF0E00D8C3D5 /* SUTemporaryDownloader.m in Sources */,
 				723B5DAA1CF7AB6A00365F95 /* SUPersistentDownloader.m in Sources */,
 				72F94F5A1CC450DE002DEE68 /* SUInstallerLauncher.m in Sources */,
@@ -2745,6 +2853,16 @@
 			isa = PBXTargetDependency;
 			target = 721C24441CB753E6005440CB /* Installer Progress */;
 			targetProxy = 72D954B91CBB6E27006F28BD /* PBXContainerItemProxy */;
+		};
+		72E641AA1D090F63000404CA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 72E6419A1D090F1C000404CA /* fileop */;
+			targetProxy = 72E641A91D090F63000404CA /* PBXContainerItemProxy */;
+		};
+		72E641AE1D090F98000404CA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 72E6419A1D090F1C000404CA /* fileop */;
+			targetProxy = 72E641AD1D090F98000404CA /* PBXContainerItemProxy */;
 		};
 		72F94F621CC48669002DEE68 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3312,6 +3430,169 @@
 			};
 			name = Release;
 		};
+		72E641A01D090F1C000404CA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 72E641B01D09119F000404CA /* ConfigFileop.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		72E641A11D090F1C000404CA /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 72E641B01D09119F000404CA /* ConfigFileop.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Coverage;
+		};
+		72E641A21D090F1C000404CA /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 72E641B01D09119F000404CA /* ConfigFileop.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		72E641A31D090F1C000404CA /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 72E641B01D09119F000404CA /* ConfigFileop.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = "Release-HTTP";
+		};
 		72F94E9F1CC2A23A002DEE68 /* Release-HTTP */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 72F94EB01CC2A865002DEE68 /* ConfigCommonReleaseHTTP.xcconfig */;
@@ -3622,6 +3903,16 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		72E6419F1D090F1C000404CA /* Build configuration list for PBXNativeTarget "fileop" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				72E641A01D090F1C000404CA /* Debug */,
+				72E641A11D090F1C000404CA /* Coverage */,
+				72E641A21D090F1C000404CA /* Release */,
+				72E641A31D090F1C000404CA /* Release-HTTP */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

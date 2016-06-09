@@ -291,20 +291,20 @@ class SUFileManagerTest: XCTestCase
     func testMakeDirectory()
     {
         makeTempFiles() { fileManager, rootURL, ordinaryFileURL, directoryURL, fileInDirectoryURL, validSymlinkURL, invalidSymlinkURL in
-            XCTAssertNil(try? fileManager._makeDirectoryAtURL(ordinaryFileURL))
-            XCTAssertNil(try? fileManager._makeDirectoryAtURL(directoryURL))
+            XCTAssertNil(try? fileManager.makeDirectoryAtURL(ordinaryFileURL))
+            XCTAssertNil(try? fileManager.makeDirectoryAtURL(directoryURL))
             
-            XCTAssertNil(try? fileManager._makeDirectoryAtURL(rootURL.URLByAppendingPathComponent("this should").URLByAppendingPathComponent("be a failure")))
+            XCTAssertNil(try? fileManager.makeDirectoryAtURL(rootURL.URLByAppendingPathComponent("this should").URLByAppendingPathComponent("be a failure")))
             
             let newDirectoryURL = rootURL.URLByAppendingPathComponent("new test directory")
             XCTAssertFalse(fileManager._itemExistsAtURL(newDirectoryURL))
-            try! fileManager._makeDirectoryAtURL(newDirectoryURL)
+            try! fileManager.makeDirectoryAtURL(newDirectoryURL)
             
             var isDirectory: ObjCBool = false
             XCTAssertTrue(fileManager._itemExistsAtURL(newDirectoryURL, isDirectory: &isDirectory))
             
             try! fileManager.removeItemAtURL(directoryURL)
-            XCTAssertNil(try? fileManager._makeDirectoryAtURL(validSymlinkURL))
+            XCTAssertNil(try? fileManager.makeDirectoryAtURL(validSymlinkURL))
         }
     }
     

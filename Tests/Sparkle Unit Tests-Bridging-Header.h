@@ -23,8 +23,6 @@ static const char *SUAppleQuarantineIdentifier = "com.apple.quarantine";
 - (BOOL)_itemExistsAtURL:(NSURL *)fileURL;
 - (BOOL)_itemExistsAtURL:(NSURL *)fileURL isDirectory:(BOOL *)isDirectory;
 
-- (BOOL)_makeDirectoryAtURL:(NSURL *)url error:(NSError * __autoreleasing *)error;
-
 @end
 
 @interface SUAppcastDriver (Private)
