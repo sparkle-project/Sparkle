@@ -166,18 +166,28 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         [self.statusController showWindow:self];
     }
     
+    NSString *fileOperationToolPath = [[[[NSBundle mainBundle] executablePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:@""SPARKLE_FILEOP_TOOL_NAME];
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:fileOperationToolPath]) {
+        SULog(@"Potential Installation Error: File operation tool path %@ is not found", fileOperationToolPath);
+    }
+    
     [SUInstaller installFromUpdateFolder:self.updateFolderPath
                                 overHost:host
                         installationPath:installationPath
+                   fileOperationToolPath:fileOperationToolPath
                        versionComparator:[SUStandardVersionComparator defaultComparator]
                        completionHandler:^(NSError *error) {
                            if (error) {
-                               SULog(@"Installation Error: %@", error);
-                               if (self.shouldShowUI) {
-                                   NSAlert *alert = [[NSAlert alloc] init];
-                                   alert.messageText = @"";
-                                   alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
-                                   [alert runModal];
+                               NSError *underlyingError = [error.userInfo objectForKey:NSUnderlyingErrorKey];
+                               if (underlyingError == nil || underlyingError.code != SUInstallationCancelledError) {
+                                   SULog(@"Installation Error: %@", error);
+                                   if (self.shouldShowUI) {
+                                       NSAlert *alert = [[NSAlert alloc] init];
+                                       alert.messageText = @"";
+                                       alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
+                                       [alert runModal];
+                                   }
                                }
                                exit(EXIT_FAILURE);
                            } else {

@@ -39,7 +39,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
         [[NSApplication sharedApplication] terminate:nil];
     }
     
-    SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:NO];
+    SUFileManager *fileManager = [SUFileManager defaultManager];
     
     // Locate user's cache directory
     NSError *cacheError = nil;

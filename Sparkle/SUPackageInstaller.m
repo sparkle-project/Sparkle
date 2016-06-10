@@ -12,7 +12,7 @@
 
 @implementation SUPackageInstaller
 
-+ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)__unused host versionComparator:(id<SUVersionComparison>)__unused comparator completionHandler:(void (^)(NSError *))completionHandler
++ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)__unused host fileOperationToolPath:(NSString *)__unused fileOperationToolPath versionComparator:(id<SUVersionComparison>)__unused comparator completionHandler:(void (^)(NSError *))completionHandler
 {
     // Run installer using the "open" command to ensure it is launched in front of current application.
     // -W = wait until the app has quit.

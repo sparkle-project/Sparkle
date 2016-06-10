@@ -9,21 +9,27 @@
 #import <Foundation/Foundation.h>
 
 /**
- * A class used for performing file operations that may also perform authentication if allowed and if permission is denied when trying to
+ * A class used for performing file operations that may also perform authorization if allowed and if permission is denied when trying to
  * perform them normally as the running user. All operations on this class may be used on thread other than the main thread.
  * This class provides basic file operations and stays away from including much application-level logic.
  */
 @interface SUFileManager : NSObject
 
 /**
- * Creates a file manager that allows or disallows authorizing for file operations
- * @param allowsAuthorization Specifies whether operations invoked on this instance are allowed to acquire authorization in order
- *  to perform file operations when read or write access is denied
+* Creates a file manager that will not authorize for file operations
+* @return A new file manager instance
+*/
++ (instancetype)defaultManager;
+
+/**
+ * Creates a file manager that allows authorizing for file operations
+ * @param authorizationToolPath Specifies the path to the tool that can perform file operations and be run as root.
+ * This tool will be invoked when read or write access is denied when attempting ordinary file operations. See the `fileop` tool included in Sparkle.
  * @return A new file manager instance
- * 
- * This method just creates the file manager. It doesn't acquire authorization immediately if allowsAuthorization is YES
+ *
+ * This method just creates the file manager. It doesn't acquire authorization immediately or if it doesn't need to.
  */
-+ (instancetype)fileManagerAllowingAuthorization:(BOOL)allowsAuthorization;
++ (instancetype)fileManagerWithAuthorizationToolPath:(NSString *)authorizationToolPath;
 
 /**
  * Returns a file manager that allows or disallows authorizing for file operations based on the current file manager
@@ -45,6 +51,16 @@
  * that the item will be moved, and not copied, from the intermediate point to the final destination. This ensures file atomicity.
  */
 - (NSURL *)makeTemporaryDirectoryWithPreferredName:(NSString *)preferredName appropriateForDirectoryURL:(NSURL *)appropriateURL error:(NSError **)error;
+
+/**
+ * Creates a directory at the target URL
+ * @param targetURL A URL pointing to the directory to create. The item at this URL must not exist, and the parent directory of this URL must already exist.
+ * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
+ * @return YES if the item was created successfully, otherwise NO along with a populated error object
+ *
+ * This is an atomic operation.
+ */
+- (BOOL)makeDirectoryAtURL:(NSURL *)targetURL error:(NSError **)error;
 
 /**
  * Moves an item from a source to a destination
@@ -139,5 +155,17 @@
  * This is not an atomic operation.
  */
 - (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError **)error;
+
+/**
+ * Runs an installer package (pkg) in a headless mode using /usr/sbin/installer
+ * @param packageURL A URL pointing to the package to execute. The item at this URL must exist.
+ * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
+ * @return YES if the installer ran the package successfully, otherwise NO with a populated error object
+ *
+ * This method uses the system wide installer tool to run the provided package. This process does not show any UI, except for
+ * an initial authorization prompt if the calling process does not have root privileges. In other words, root privileges are required to use this method, and the file manager instance must have been created by allowing authorization.
+ * An error can occur if the package is unable to be ran by the installer, or if the installer reports a non-zero exit status code.
+ */
+- (BOOL)executePackageAtURL:(NSURL *)packageURL error:(NSError **)error;
 
 @end
