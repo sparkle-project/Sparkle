@@ -608,7 +608,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             NSError *thirdStageError = nil;
             if (![self.installer performThirdStage:&thirdStageError]) {
                 SULog(@"Failed to finalize installation with error: %@", thirdStageError);
-                SULog(@"Underlying error: %@", [thirdStageError.userInfo objectForKey:NSUnderlyingErrorKey]);
                 
                 [self.installer cleanup];
                 self.installer = nil;

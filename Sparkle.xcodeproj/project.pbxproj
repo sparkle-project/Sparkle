@@ -121,6 +121,7 @@
 		61EF67590E25C5B400F754E0 /* SUHost.h in Headers */ = {isa = PBXBuildFile; fileRef = 61EF67580E25C5B400F754E0 /* SUHost.h */; };
 		61FA52880E2D9EA400EF58AD /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		720B16451C66433D006985FB /* SUTestApplicationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720B16431C66433D006985FB /* SUTestApplicationTest.swift */; };
+		720E21781D0CED2B003A311C /* SUFileOperationConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E641A61D090F51000404CA /* SUFileOperationConstants.m */; };
 		7210C7681B9A9A1500EB90AC /* SUUnarchiverTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */; };
 		72162B061C82C8B30013C1C5 /* SUParameterAssert.h in Headers */ = {isa = PBXBuildFile; fileRef = 72162B051C82C8B30013C1C5 /* SUParameterAssert.h */; };
 		72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */ = {isa = PBXBuildFile; fileRef = 72162B071C82C9600013C1C5 /* SULocalizations.h */; };
@@ -2567,6 +2568,7 @@
 				726F2CE81BC9C48F001971A4 /* SUConstants.m in Sources */,
 				726F2CDE1BC9BE5B001971A4 /* SUFileManager.m in Sources */,
 				726F2CE91BC9C499001971A4 /* SUOperatingSystem.m in Sources */,
+				720E21781D0CED2B003A311C /* SUFileOperationConstants.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3913,6 +3915,7 @@
 				72E641A31D090F1C000404CA /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
