@@ -471,9 +471,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
         return;
     }
     
-#warning not sure if this is the right thing to do
     if (self.driver != nil) {
-        //[self.driver abortUpdate];
         return;
     }
     
