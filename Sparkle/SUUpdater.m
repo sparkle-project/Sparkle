@@ -26,6 +26,7 @@
 #import "SUInstallationInfo.h"
 #import "SUErrors.h"
 #import "SUXPCServiceInfo.h"
+#import "SUUpdaterCycle.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -38,13 +39,14 @@ NSString *const SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotific
 NSString *const SUUpdaterAppcastItemNotificationKey = @"SUUpdaterAppcastItemNotificationKey";
 NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotificationKey";
 
-@interface SUUpdater ()
+@interface SUUpdater () <SUUpdaterCycleDelegate>
 
 @property (readonly, copy) NSURL *parameterizedFeedURL;
 
 @property (nonatomic) id <SUUpdateDriver> driver;
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly) SUUpdaterSettings *updaterSettings;
+@property (nonatomic, readonly) SUUpdaterCycle *updaterCycle;
 @property (nonatomic) BOOL startedUpdater;
 @property (nonatomic, copy) void (^preStartedScheduledUpdateBlock)(void);
 
@@ -59,6 +61,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize driver;
 @synthesize host = _host;
 @synthesize updaterSettings = _updaterSettings;
+@synthesize updaterCycle = _updaterCycle;
 @synthesize sparkleBundle = _sparkleBundle;
 @synthesize startedUpdater = _startedUpdater;
 @synthesize preStartedScheduledUpdateBlock = _preStartedScheduledUpdateBlock;
@@ -83,6 +86,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         _host = [[SUHost alloc] initWithBundle:bundle];
         
         _updaterSettings = [[SUUpdaterSettings alloc] initWithHostBundle:bundle];
+        _updaterCycle = [[SUUpdaterCycle alloc] initWithDelegate:self];
         
         _userDriver = userDriver;
         
@@ -563,7 +567,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 
 - (void)cancelNextUpdateCycle
 {
-    [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetUpdateCycle) object:nil];
+    [self.updaterCycle cancelNextUpdateCycle];
 }
 
 - (void)resetUpdateCycle
@@ -582,7 +586,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 - (void)resetUpdateCycleAfterShortDelay
 {
     [self cancelNextUpdateCycle];
-    [self performSelector:@selector(resetUpdateCycle) withObject:nil afterDelay:1];
+    [self.updaterCycle resetUpdateCycleAfterDelay];
 }
 
 - (void)setAutomaticallyChecksForUpdates:(BOOL)automaticallyCheckForUpdates
@@ -777,7 +781,6 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 - (void)dealloc
 {
     // Stop checking for updates
-#warning useless right now because the cycles retain self meaning dealloc won't be hit unless it's been cancelled/finished
     [self cancelNextUpdateCycle];
     
     // Don't tell the user driver to invalidate the update check timer

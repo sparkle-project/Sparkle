@@ -122,6 +122,8 @@
 		61FA52880E2D9EA400EF58AD /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		720B16451C66433D006985FB /* SUTestApplicationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720B16431C66433D006985FB /* SUTestApplicationTest.swift */; };
 		720E21781D0CED2B003A311C /* SUFileOperationConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E641A61D090F51000404CA /* SUFileOperationConstants.m */; };
+		720E217B1D0D00BF003A311C /* SUUpdaterCycle.h in Headers */ = {isa = PBXBuildFile; fileRef = 720E21791D0D00BF003A311C /* SUUpdaterCycle.h */; };
+		720E217C1D0D00BF003A311C /* SUUpdaterCycle.m in Sources */ = {isa = PBXBuildFile; fileRef = 720E217A1D0D00BF003A311C /* SUUpdaterCycle.m */; };
 		7210C7681B9A9A1500EB90AC /* SUUnarchiverTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */; };
 		72162B061C82C8B30013C1C5 /* SUParameterAssert.h in Headers */ = {isa = PBXBuildFile; fileRef = 72162B051C82C8B30013C1C5 /* SUParameterAssert.h */; };
 		72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */ = {isa = PBXBuildFile; fileRef = 72162B071C82C9600013C1C5 /* SULocalizations.h */; };
@@ -821,6 +823,8 @@
 		61F614540E24A12D009F47E7 /* it */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		720B16421C66433D006985FB /* UITests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "UITests-Info.plist"; path = "UITests/UITests-Info.plist"; sourceTree = SOURCE_ROOT; };
 		720B16431C66433D006985FB /* SUTestApplicationTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SUTestApplicationTest.swift; path = UITests/SUTestApplicationTest.swift; sourceTree = SOURCE_ROOT; };
+		720E21791D0D00BF003A311C /* SUUpdaterCycle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdaterCycle.h; sourceTree = "<group>"; };
+		720E217A1D0D00BF003A311C /* SUUpdaterCycle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterCycle.m; sourceTree = "<group>"; };
 		7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUUnarchiverTest.swift; sourceTree = "<group>"; };
 		72162B051C82C8B30013C1C5 /* SUParameterAssert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUParameterAssert.h; sourceTree = "<group>"; };
 		72162B071C82C9600013C1C5 /* SULocalizations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULocalizations.h; sourceTree = "<group>"; };
@@ -1547,6 +1551,8 @@
 				72A6F9891C94E2D6005F404C /* SUUpdaterDelegate.h */,
 				72A450511C69A68900D67EEA /* SUUpdatePermission.h */,
 				72A450521C69A68900D67EEA /* SUUpdatePermission.m */,
+				720E21791D0D00BF003A311C /* SUUpdaterCycle.h */,
+				720E217A1D0D00BF003A311C /* SUUpdaterCycle.m */,
 			);
 			name = "Update Control";
 			sourceTree = "<group>";
@@ -1783,6 +1789,7 @@
 				725F977B1C8A896F00265BE4 /* SUUserDriverCoreComponent.h in Headers */,
 				726E078D1CA891E9001A286B /* SUUpdaterSettings.h in Headers */,
 				72B144501CF8826900B971EE /* SUAuthorizationEnvironment.h in Headers */,
+				720E217B1D0D00BF003A311C /* SUUpdaterCycle.h in Headers */,
 				72A6F98A1C94E2D6005F404C /* SUUpdaterDelegate.h in Headers */,
 				726E4A371C89116000C57C6A /* SUStandardUserDriverDelegate.h in Headers */,
 				726E4A0E1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h in Headers */,
@@ -2743,6 +2750,7 @@
 				725602D61C83551C00DAA70E /* SUApplicationInfo.m in Sources */,
 				72B767DF1C9CDB9700A07552 /* SUUserInitiatedUpdateDriver.m in Sources */,
 				72B767CF1C9B924900A07552 /* SUInstallerDriver.m in Sources */,
+				720E217C1D0D00BF003A311C /* SUUpdaterCycle.m in Sources */,
 				72A450541C69A68900D67EEA /* SUUpdatePermission.m in Sources */,
 				7229E1BA1C97CC4D00CB50D0 /* SUScheduledUpdateDriver.m in Sources */,
 				729746411C9119F300FC134E /* SULocalMessagePort.m in Sources */,
