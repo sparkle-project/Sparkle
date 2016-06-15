@@ -6,7 +6,7 @@ An easy-to-use software update framework for Cocoa developers.
 
 ## Changes since 1.5b
 
-* Up-to-date with 10.11 SDK and Xcode 7. Supports OS X 10.7+.
+* Up-to-date with 10.11 SDK and Xcode 7. Supports macOS 10.7+.
 * Cleaned up and modernized code, using ARC and Autolayout.
 * Merged bugfixes, security fixes and some features from multiple Sparkle forks.
 * Truly automatic background updates (no UI at all) when user agreed to "Automatically download and install updates in the future."
@@ -33,7 +33,7 @@ An easy-to-use software update framework for Cocoa developers.
 
 ## Requirements
 
-* Runtime: OS X 10.7 or greater
+* Runtime: macOS 10.7 or greater
 * Build: Xcode 5 and 10.8 SDK or greater
 * HTTPS server for serving updates (see [App Transport Security](http://sparkle-project.org/documentation/app-transport-security/))
 

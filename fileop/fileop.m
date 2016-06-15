@@ -124,7 +124,7 @@ int main(int argc, const char *argv[])
             }
         } else if ([command isEqualToString:@(SUFileOpInstallCommand)]) {
             // The one command that can *only* be run as the root user
-            NSString *installerPath = @"/usr/sbin/installer"; // Mac OS X 10.2+ command line installer tool
+            NSString *installerPath = @"/usr/sbin/installer";
             
             NSTask *task = [[NSTask alloc] init];
             task.launchPath = installerPath;

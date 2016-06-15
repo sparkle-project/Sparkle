@@ -128,7 +128,7 @@
     self.releaseNotesView.policyDelegate = self;
     
     // Set the default font
-    // "-apple-system-font" is a reference to the system UI font on OS X. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
+    // "-apple-system-font" is a reference to the system UI font. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
     prefs.standardFontFamily = @"-apple-system-font";
     prefs.defaultFontSize = (int)[NSFont systemFontSize];
 
