@@ -105,24 +105,23 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     _inheritsPrivileges = inheritsPrivileges;
     
-    self.localPort =
-    [[SULocalMessagePort alloc]
-     initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)
-     messageCallback:^NSData *(int32_t identifier, NSData * _Nonnull data) {
-         return [self handleMessageWithIdentifier:identifier data:data];
-     }
-     invalidationCallback:^{
-         dispatch_async(dispatch_get_main_queue(), ^{
-             if (self.localPort != nil) {
-                 [self cleanupAndExitWithStatus:EXIT_FAILURE];
-             }
-         });
-     }];
+    self.localPort = [[SULocalMessagePort alloc] init];
     
-    if (self.localPort == nil) {
-        SULog(@"Failed creating local message port from installer");
-        [self cleanupAndExitWithStatus:EXIT_FAILURE];
-    }
+    [self.localPort setServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)];
+    
+    __weak AppInstaller *weakSelf = self;
+    [self.localPort setMessageCallback:^NSData * _Nullable(int32_t identifier, NSData * _Nonnull data) {
+        return [weakSelf handleMessageWithIdentifier:identifier data:data];
+    }];
+    
+    [self.localPort setInvalidationCallback:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            AppInstaller *strongSelf = weakSelf;
+            if (strongSelf.localPort != nil) {
+                [strongSelf cleanupAndExitWithStatus:EXIT_FAILURE];
+            }
+        });
+    }];
     
     [self startRemotePortWithCompletion:^(BOOL success) {
         if (!success) {

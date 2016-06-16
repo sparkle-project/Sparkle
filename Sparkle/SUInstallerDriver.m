@@ -10,6 +10,8 @@
 #import "SULog.h"
 #import "SUMessageTypes.h"
 #import "SULocalMessagePort.h"
+#import "SUXPCLocalMessagePort.h"
+#import "SULocalMessagePortDelegate.h"
 #import "SURemoteMessagePort.h"
 #import "SUXPCRemoteMessagePort.h"
 #import "SUXPCServiceInfo.h"
@@ -30,7 +32,7 @@
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-@interface SUInstallerDriver ()
+@interface SUInstallerDriver () <SULocalMessagePortDelegate>
 
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly, copy) NSString *cachePath;
@@ -38,7 +40,7 @@
 @property (nonatomic, weak, readonly) id<SUInstallerDriverDelegate> delegate;
 @property (nonatomic) SUInstallerMessageType currentStage;
 @property (nonatomic) BOOL startedInstalling;
-@property (nonatomic) SULocalMessagePort *localPort;
+@property (nonatomic) id<SULocalMessagePortProtocol> localPort;
 @property (nonatomic) id <SURemoteMessagePort> remotePort;
 @property (nonatomic) BOOL postponedOnce;
 @property (nonatomic, weak, readonly) id updater;
@@ -83,57 +85,50 @@
     return self;
 }
 
-- (BOOL)setUpLocalPort:(NSError * __autoreleasing *)error
+- (void)localMessagePortReceivedMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self handleMessageWithIdentifier:identifier data:data];
+    });
+}
+
+- (void)setUpLocalPort
 {
     if (self.localPort != nil) {
-        return YES;
+        return;
     }
     
     NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    self.localPort =
-    [[SULocalMessagePort alloc]
-     initWithServiceName:SUUpdateDriverServiceNameForBundleIdentifier(hostBundleIdentifier)
-     messageCallback:^NSData *(int32_t identifier, NSData * _Nonnull data) {
-         dispatch_async(dispatch_get_main_queue(), ^{
-             [self handleMessageWithIdentifier:identifier data:data];
-         });
-         return nil;
-     }
-     invalidationCallback:^{
-         dispatch_async(dispatch_get_main_queue(), ^{
-             if (self.localPort != nil) {
-                 NSError *invalidationError =
-                 [NSError
-                  errorWithDomain:SUSparkleErrorDomain
-                  code:SUInstallationError
-                  userInfo:@{
-                             NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
-                             NSLocalizedFailureReasonErrorKey:@"The local port connection from the updater was invalidated"
-                             }
-                  ];
-                 
-                 [self.delegate installerIsRequestingAbortInstallWithError:invalidationError];
-             }
-         });
-     }];
+    __weak SUInstallerDriver *weakSelf = self;
     
-    if (self.localPort == nil) {
-        if (error != NULL) {
-            *error =
-            [NSError
-             errorWithDomain:SUSparkleErrorDomain
-             code:SUInstallationError
-             userInfo:@{
-                        NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
-                        NSLocalizedFailureReasonErrorKey:@"The local port connection failed being created"
-                        }
-             ];
-        }
-        return NO;
+    if (SUXPCServiceExists(@LOCAL_MESSAGE_PORT_PRODUCT_NAME)) {
+        self.localPort = [[SUXPCLocalMessagePort alloc] initWithDelegate:self];
+    } else {
+        self.localPort = [[SULocalMessagePort alloc] initWithDelegate:self];
     }
-    return YES;
+    
+    [self.localPort setServiceName:SUUpdateDriverServiceNameForBundleIdentifier(hostBundleIdentifier)];
+    
+    [self.localPort setInvalidationCallback:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            SUInstallerDriver *strongSelf = weakSelf;
+            if (strongSelf.localPort != nil) {
+                NSError *invalidationError =
+                [NSError
+                 errorWithDomain:SUSparkleErrorDomain
+                 code:SUInstallationError
+                 userInfo:@{
+                            NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while running the updater. Please try again later.", nil),
+                            NSLocalizedFailureReasonErrorKey:@"The local port connection from the updater was invalidated"
+                            }
+                 ];
+                
+                [strongSelf.delegate installerIsRequestingAbortInstallWithError:invalidationError];
+            }
+        });
+    }];
 }
 
 - (void)setUpRemotePortWithCompletion:(void (^)(BOOL))completionHandler
@@ -184,11 +179,7 @@
 
 - (void)launchInstallToolWithCompletion:(void (^)(NSError  * _Nullable ))completionHandler
 {
-    NSError *localPortError = nil;
-    if (![self setUpLocalPort:&localPortError]) {
-        completionHandler(localPortError);
-    }
-    
+    [self setUpLocalPort];
     [self launchAutoUpdateWithCompletion:completionHandler];
 }
 
@@ -580,12 +571,7 @@
     }
     
     // Set up local and remote ports to the installer if they are not set up already
-    
-    NSError *localPortError = nil;
-    if (![self setUpLocalPort:&localPortError]) {
-        [self.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while starting the local port for the installer. Please try again later.", nil) }]];
-        return;
-    }
+    [self setUpLocalPort];
     
     __weak SUInstallerDriver *weakSelf = self;
     [self setUpRemotePortWithCompletion:^(BOOL setupSuccess) {

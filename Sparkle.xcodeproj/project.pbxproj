@@ -124,6 +124,13 @@
 		720E21781D0CED2B003A311C /* SUFileOperationConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E641A61D090F51000404CA /* SUFileOperationConstants.m */; };
 		720E217B1D0D00BF003A311C /* SUUpdaterCycle.h in Headers */ = {isa = PBXBuildFile; fileRef = 720E21791D0D00BF003A311C /* SUUpdaterCycle.h */; };
 		720E217C1D0D00BF003A311C /* SUUpdaterCycle.m in Sources */ = {isa = PBXBuildFile; fileRef = 720E217A1D0D00BF003A311C /* SUUpdaterCycle.m */; };
+		720E217E1D10EB04003A311C /* SULocalMessagePortProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 720E217D1D10EB04003A311C /* SULocalMessagePortProtocol.h */; };
+		720E218A1D10EDB4003A311C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 720E21891D10EDB4003A311C /* main.m */; };
+		720E218E1D10EDB4003A311C /* SparkleLocalMessagePort.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 720E21831D10EDB4003A311C /* SparkleLocalMessagePort.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		720E21941D10EE1F003A311C /* SULocalMessagePort.m in Sources */ = {isa = PBXBuildFile; fileRef = 7297463F1C9119F300FC134E /* SULocalMessagePort.m */; };
+		720E21991D10F4FC003A311C /* SUXPCLocalMessagePort.h in Headers */ = {isa = PBXBuildFile; fileRef = 720E21971D10F4FC003A311C /* SUXPCLocalMessagePort.h */; };
+		720E219A1D10F4FC003A311C /* SUXPCLocalMessagePort.m in Sources */ = {isa = PBXBuildFile; fileRef = 720E21981D10F4FC003A311C /* SUXPCLocalMessagePort.m */; };
+		720E219C1D11ED83003A311C /* SULocalMessagePortDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 720E219B1D11ED83003A311C /* SULocalMessagePortDelegate.h */; };
 		7210C7681B9A9A1500EB90AC /* SUUnarchiverTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */; };
 		72162B061C82C8B30013C1C5 /* SUParameterAssert.h in Headers */ = {isa = PBXBuildFile; fileRef = 72162B051C82C8B30013C1C5 /* SUParameterAssert.h */; };
 		72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */ = {isa = PBXBuildFile; fileRef = 72162B071C82C9600013C1C5 /* SULocalizations.h */; };
@@ -413,6 +420,13 @@
 			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = Sparkle;
 		};
+		720E218C1D10EDB4003A311C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 720E21821D10EDB3003A311C;
+			remoteInfo = LocalMessagePort;
+		};
 		726B2B621C645FC900388755 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -557,6 +571,7 @@
 				72F94F5E1CC455B4002DEE68 /* SparklePersistentDownloader.xpc in Embed XPC Services */,
 				72F94F5F1CC455B4002DEE68 /* SparkleTemporaryDownloader.xpc in Embed XPC Services */,
 				72F94F601CC455B4002DEE68 /* SparkleRemoteMessagePort.xpc in Embed XPC Services */,
+				720E218E1D10EDB4003A311C /* SparkleLocalMessagePort.xpc in Embed XPC Services */,
 				726E4A211C86C88F00C57C6A /* TestAppHelper.xpc in Embed XPC Services */,
 			);
 			name = "Embed XPC Services";
@@ -825,6 +840,15 @@
 		720B16431C66433D006985FB /* SUTestApplicationTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SUTestApplicationTest.swift; path = UITests/SUTestApplicationTest.swift; sourceTree = SOURCE_ROOT; };
 		720E21791D0D00BF003A311C /* SUUpdaterCycle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdaterCycle.h; sourceTree = "<group>"; };
 		720E217A1D0D00BF003A311C /* SUUpdaterCycle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterCycle.m; sourceTree = "<group>"; };
+		720E217D1D10EB04003A311C /* SULocalMessagePortProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SULocalMessagePortProtocol.h; path = Sparkle/SULocalMessagePortProtocol.h; sourceTree = SOURCE_ROOT; };
+		720E21831D10EDB4003A311C /* SparkleLocalMessagePort.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = SparkleLocalMessagePort.xpc; sourceTree = BUILT_PRODUCTS_DIR; };
+		720E21891D10EDB4003A311C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		720E218B1D10EDB4003A311C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		720E21951D10F1C4003A311C /* ConfigLocalMessagePort.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigLocalMessagePort.xcconfig; sourceTree = "<group>"; };
+		720E21961D10F1C4003A311C /* ConfigLocalMessagePortDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigLocalMessagePortDebug.xcconfig; sourceTree = "<group>"; };
+		720E21971D10F4FC003A311C /* SUXPCLocalMessagePort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUXPCLocalMessagePort.h; path = Sparkle/SUXPCLocalMessagePort.h; sourceTree = SOURCE_ROOT; };
+		720E21981D10F4FC003A311C /* SUXPCLocalMessagePort.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUXPCLocalMessagePort.m; path = Sparkle/SUXPCLocalMessagePort.m; sourceTree = SOURCE_ROOT; };
+		720E219B1D11ED83003A311C /* SULocalMessagePortDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SULocalMessagePortDelegate.h; path = Sparkle/SULocalMessagePortDelegate.h; sourceTree = SOURCE_ROOT; };
 		7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUUnarchiverTest.swift; sourceTree = "<group>"; };
 		72162B051C82C8B30013C1C5 /* SUParameterAssert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUParameterAssert.h; sourceTree = "<group>"; };
 		72162B071C82C9600013C1C5 /* SULocalizations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULocalizations.h; sourceTree = "<group>"; };
@@ -1075,6 +1099,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		720E21801D10EDB3003A311C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		721C24421CB753E6005440CB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1173,6 +1204,7 @@
 				721C24451CB753E6005440CB /* Updater.app */,
 				72D9549E1CBB415B006F28BD /* sparkle.app */,
 				72E6419B1D090F1C000404CA /* fileop */,
+				720E21831D10EDB4003A311C /* SparkleLocalMessagePort.xpc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1557,6 +1589,16 @@
 			name = "Update Control";
 			sourceTree = "<group>";
 		};
+		720E21841D10EDB4003A311C /* LocalMessagePort */ = {
+			isa = PBXGroup;
+			children = (
+				720E21891D10EDB4003A311C /* main.m */,
+				720E218B1D10EDB4003A311C /* Info.plist */,
+			);
+			name = LocalMessagePort;
+			path = ../LocalMessagePort;
+			sourceTree = "<group>";
+		};
 		721C24461CB753E6005440CB /* Installer Progress */ = {
 			isa = PBXGroup;
 			children = (
@@ -1658,8 +1700,12 @@
 		729746481C91483B00FC134E /* IPC */ = {
 			isa = PBXGroup;
 			children = (
+				720E217D1D10EB04003A311C /* SULocalMessagePortProtocol.h */,
 				7297463E1C9119F300FC134E /* SULocalMessagePort.h */,
 				7297463F1C9119F300FC134E /* SULocalMessagePort.m */,
+				720E21971D10F4FC003A311C /* SUXPCLocalMessagePort.h */,
+				720E21981D10F4FC003A311C /* SUXPCLocalMessagePort.m */,
+				720E219B1D11ED83003A311C /* SULocalMessagePortDelegate.h */,
 				72E41A381CB209CA003D47E0 /* SURemoteMessagePortProtocol.h */,
 				729746431C91212400FC134E /* SURemoteMessagePort.h */,
 				729746441C91212400FC134E /* SURemoteMessagePort.m */,
@@ -1734,6 +1780,7 @@
 				728638F41CAF5A5F00783084 /* TemporaryDownloader */,
 				726E07AE1CAF08D6001A286B /* InstallerLauncher */,
 				726E07F01CAF37BD001A286B /* PersistentDownloader */,
+				720E21841D10EDB4003A311C /* LocalMessagePort */,
 				72E41A3F1CB20BA7003D47E0 /* RemoteMessagePort */,
 			);
 			name = "XPC Services";
@@ -1766,6 +1813,8 @@
 				72F94ED51CC3441A002DEE68 /* ConfigInstallerLauncherDebug.xcconfig */,
 				728638EE1CAF589C00783084 /* ConfigPersistentDownloader.xcconfig */,
 				72F94ED61CC344A7002DEE68 /* ConfigPersistentDownloaderDebug.xcconfig */,
+				720E21951D10F1C4003A311C /* ConfigLocalMessagePort.xcconfig */,
+				720E21961D10F1C4003A311C /* ConfigLocalMessagePortDebug.xcconfig */,
 				728639041CAF614000783084 /* ConfigTemporaryDownloader.xcconfig */,
 				72F94ED71CC344E4002DEE68 /* ConfigTemporaryDownloaderDebug.xcconfig */,
 				72E41A551CB22F44003D47E0 /* ConfigRemoteMessagePort.xcconfig */,
@@ -1805,6 +1854,8 @@
 				7229E1B61C97C91100CB50D0 /* SUUpdateDriver.h in Headers */,
 				729746401C9119F300FC134E /* SULocalMessagePort.h in Headers */,
 				61299B3609CB04E000B7442F /* Sparkle.h in Headers */,
+				720E219C1D11ED83003A311C /* SULocalMessagePortDelegate.h in Headers */,
+				720E217E1D10EB04003A311C /* SULocalMessagePortProtocol.h in Headers */,
 				61CFB3290E385186007A1735 /* Sparkle.pch in Headers */,
 				72F94F581CC44DE1002DEE68 /* SUXPCServiceInfo.h in Headers */,
 				72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */,
@@ -1832,6 +1883,7 @@
 				72B767E61C9CFD7200A07552 /* SUAutomaticUpdateDriver.h in Headers */,
 				618FA5220DAE8E8A0026945C /* SUPackageInstaller.h in Headers */,
 				728337A61C9E6FF40085AA99 /* SUProbeInstallStatus.h in Headers */,
+				720E21991D10F4FC003A311C /* SUXPCLocalMessagePort.h in Headers */,
 				72B767CA1C9B707000A07552 /* SUAppcastDriver.h in Headers */,
 				6102FE460E077FCE00F85D09 /* SUPipedUnarchiver.h in Headers */,
 				726E075C1CA3A6D6001A286B /* SUSecureCoding.h in Headers */,
@@ -1972,6 +2024,7 @@
 				72F94F621CC48669002DEE68 /* PBXTargetDependency */,
 				72F94F641CC48669002DEE68 /* PBXTargetDependency */,
 				72F94F661CC48669002DEE68 /* PBXTargetDependency */,
+				720E218D1D10EDB4003A311C /* PBXTargetDependency */,
 				72F94F681CC48669002DEE68 /* PBXTargetDependency */,
 				726E4A201C86C88F00C57C6A /* PBXTargetDependency */,
 			);
@@ -1979,6 +2032,23 @@
 			productName = "Test Application";
 			productReference = 61B5F90209C4CEE200B25A18 /* Sparkle Test App.app */;
 			productType = "com.apple.product-type.application";
+		};
+		720E21821D10EDB3003A311C /* SparkleLocalMessagePort */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 720E218F1D10EDB4003A311C /* Build configuration list for PBXNativeTarget "SparkleLocalMessagePort" */;
+			buildPhases = (
+				720E217F1D10EDB3003A311C /* Sources */,
+				720E21801D10EDB3003A311C /* Frameworks */,
+				720E21811D10EDB3003A311C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SparkleLocalMessagePort;
+			productName = LocalMessagePort;
+			productReference = 720E21831D10EDB4003A311C /* SparkleLocalMessagePort.xpc */;
+			productType = "com.apple.product-type.xpc-service";
 		};
 		721C24441CB753E6005440CB /* Installer Progress */ = {
 			isa = PBXNativeTarget;
@@ -2184,6 +2254,9 @@
 							};
 						};
 					};
+					720E21821D10EDB3003A311C = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
 					721C24441CB753E6005440CB = {
 						CreatedOnToolsVersion = 7.3;
 					};
@@ -2292,6 +2365,7 @@
 				726E07EE1CAF37BD001A286B /* SparklePersistentDownloader */,
 				728638F21CAF5A5F00783084 /* SparkleTemporaryDownloader */,
 				72E41A3D1CB20BA7003D47E0 /* SparkleRemoteMessagePort */,
+				720E21821D10EDB3003A311C /* SparkleLocalMessagePort */,
 				61B5F90109C4CEE200B25A18 /* Sparkle Test App */,
 				726E4A151C86C88F00C57C6A /* TestAppHelper */,
 				612279D80DB5470200AB99EA /* Sparkle Unit Tests */,
@@ -2351,6 +2425,13 @@
 				72E45CF81B640DAE005C701A /* SUUpdateSettingsWindowController.xib in Resources */,
 				72E45CFE1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem in Resources */,
 				14732BC01960F2C200593899 /* test_app_only_dsa_pub.pem in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		720E21811D10EDB3003A311C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2628,6 +2709,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		720E217F1D10EDB3003A311C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				720E21941D10EE1F003A311C /* SULocalMessagePort.m in Sources */,
+				720E218A1D10EDB4003A311C /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		721C24411CB753E6005440CB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2757,6 +2847,7 @@
 				726E07611CA4E9A5001A286B /* SUInstallationInputData.m in Sources */,
 				7275F9C21B5F1F2900B1D19E /* SUFileManager.m in Sources */,
 				72E41A541CB21125003D47E0 /* SUXPCRemoteMessagePort.m in Sources */,
+				720E219A1D10F4FC003A311C /* SUXPCLocalMessagePort.m in Sources */,
 				725CB95B1C7121830064365A /* SUStandardUserDriver.m in Sources */,
 				61EF67560E25B58D00F754E0 /* SUHost.m in Sources */,
 				55C14F07136EF6DB00649790 /* SULog.m in Sources */,
@@ -2843,6 +2934,11 @@
 			isa = PBXTargetDependency;
 			target = 8DC2EF4F0486A6940098B216 /* Sparkle */;
 			targetProxy = 61FA528C0E2D9EB200EF58AD /* PBXContainerItemProxy */;
+		};
+		720E218D1D10EDB4003A311C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 720E21821D10EDB3003A311C /* SparkleLocalMessagePort */;
+			targetProxy = 720E218C1D10EDB4003A311C /* PBXContainerItemProxy */;
 		};
 		726B2B631C645FC900388755 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3129,6 +3225,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 72F94EDA1CC36C37002DEE68 /* ConfigTestAppDebug.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 			};
 			name = Coverage;
 		};
@@ -3245,6 +3342,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 72F94EDA1CC36C37002DEE68 /* ConfigTestAppDebug.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 			};
 			name = Debug;
 		};
@@ -3252,8 +3350,37 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CD0D94A70100DD942E /* ConfigTestApp.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 			};
 			name = Release;
+		};
+		720E21901D10EDB4003A311C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 720E21961D10F1C4003A311C /* ConfigLocalMessagePortDebug.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		720E21911D10EDB4003A311C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 720E21951D10F1C4003A311C /* ConfigLocalMessagePort.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		720E21921D10EDB4003A311C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 720E21951D10F1C4003A311C /* ConfigLocalMessagePort.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		720E21931D10EDB4003A311C /* Release-HTTP */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 720E21951D10F1C4003A311C /* ConfigLocalMessagePort.xcconfig */;
+			buildSettings = {
+			};
+			name = "Release-HTTP";
 		};
 		721C24531CB753E7005440CB /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -3651,6 +3778,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CD0D94A70100DD942E /* ConfigTestApp.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
 			};
 			name = "Release-HTTP";
 		};
@@ -3825,6 +3953,16 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		720E218F1D10EDB4003A311C /* Build configuration list for PBXNativeTarget "SparkleLocalMessagePort" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				720E21901D10EDB4003A311C /* Debug */,
+				720E21911D10EDB4003A311C /* Coverage */,
+				720E21921D10EDB4003A311C /* Release */,
+				720E21931D10EDB4003A311C /* Release-HTTP */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		721C24561CB753E7005440CB /* Build configuration list for PBXNativeTarget "Installer Progress" */ = {
 			isa = XCConfigurationList;

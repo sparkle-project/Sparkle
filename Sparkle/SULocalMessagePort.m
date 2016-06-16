@@ -11,8 +11,9 @@
 @interface SULocalMessagePort ()
 
 @property (nonatomic) CFMessagePortRef messagePort;
-@property (nonatomic, copy) NSData *(^messageCallback)(int32_t, NSData *);
-@property (nonatomic, copy) void (^invalidationCallback)(void);
+@property (nonatomic, nullable) id<SULocalMessagePortDelegate> delegate;
+@property (nonatomic, copy) NSData * _Nullable(^messageHandler)(int32_t, NSData *);
+@property (nonatomic, copy) void (^invalidationBlock)(void);
 @property (nonatomic, readonly) dispatch_queue_t messageQueue;
 
 @end
@@ -20,42 +21,81 @@
 @implementation SULocalMessagePort
 
 @synthesize messagePort = _messagePort;
-@synthesize messageCallback = _messageCallback;
-@synthesize invalidationCallback = _invalidationCallback;
+@synthesize delegate = _delegate;
+@synthesize messageHandler = _messageHandler;
+@synthesize invalidationBlock = _invalidationBlock;
 @synthesize messageQueue = _messageQueue;
 
-- (nullable instancetype)initWithServiceName:(NSString *)serviceName messageCallback:(NSData *(^)(int32_t identifier, NSData *data))messageCallback invalidationCallback:(void (^)(void))invalidationCallback
+- (instancetype)init
 {
     self = [super init];
     if (self != nil) {
-        CFMessagePortContext context = {.version = 0, .info = (void *)CFBridgingRetain(self), .retain = NULL, .release = NULL, .copyDescription = NULL};
-        CFMessagePortRef messagePort = CFMessagePortCreateLocal(kCFAllocatorDefault, (CFStringRef)serviceName, messagePortCallback, &context, NULL);
-        
-        if (messagePort == NULL) {
-            CFRelease((__bridge CFTypeRef)(self));
-            return nil;
-        }
-        
-        _messagePort = messagePort;
-        _messageCallback = [messageCallback copy];
-        _invalidationCallback = [invalidationCallback copy];
-        
         _messageQueue = dispatch_queue_create("org.sparkle-project.sparkle-local-port", DISPATCH_QUEUE_SERIAL);
-        
-        CFMessagePortSetDispatchQueue(messagePort, _messageQueue);
-        CFMessagePortSetInvalidationCallBack(messagePort, messageInvalidationCallback);
     }
     return self;
+}
+
+- (instancetype)initWithDelegate:(id<SULocalMessagePortDelegate>)delegate
+{
+    self = [self init];
+    if (self != nil) {
+        _delegate = delegate;
+    }
+    return self;
+}
+
+- (void)setServiceName:(NSString *)serviceName
+{
+    assert(self.messagePort == NULL);
+    
+    CFMessagePortContext context = {.version = 0, .info = (void *)CFBridgingRetain(self), .retain = NULL, .release = NULL, .copyDescription = NULL};
+    CFMessagePortRef messagePort = CFMessagePortCreateLocal(kCFAllocatorDefault, (CFStringRef)serviceName, messagePortCallback, &context, NULL);
+    
+    if (messagePort == NULL) {
+        CFRelease((__bridge CFTypeRef)(self));
+    } else {
+        self.messagePort = messagePort;
+        CFMessagePortSetDispatchQueue(messagePort, self.messageQueue);
+    }
+}
+
+- (void)setMessageCallback:(NSData * _Nullable(^)(int32_t identifier, NSData *data))messageCallback
+{
+    self.messageHandler = messageCallback;
+}
+
+- (void)setInvalidationCallback:(void (^)(void))invalidationCallback
+{
+    if (self.messagePort == NULL) {
+        invalidationCallback();
+    } else {
+        self.invalidationBlock = [invalidationCallback copy];
+        CFMessagePortSetInvalidationCallBack(self.messagePort, messageInvalidationCallback);
+    }
 }
 
 - (void)invalidate
 {
     dispatch_async(self.messageQueue, ^{
-        if (self.invalidationCallback != nil) {
-            self.invalidationCallback = nil;
+        if (self.invalidationBlock != nil) {
+            self.invalidationBlock = nil;
             CFMessagePortInvalidate(self.messagePort);
+        } else {
+            [self removeDelegate];
         }
     });
+}
+
+- (void)removeDelegate
+{
+    // Remove our delegate right away but make sure it is released on main thread
+    __block id<SULocalMessagePortDelegate> delegate = self.delegate;
+    if (delegate != nil) {
+        self.delegate = nil;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            delegate = nil;
+        });
+    }
 }
 
 // Called on non-main thread
@@ -69,8 +109,10 @@ static CFDataRef messagePortCallback(CFMessagePortRef __unused messagePort, SInt
         NSData *data = [NSData dataWithBytes:CFDataGetBytePtr(dataRef) length:(NSUInteger)CFDataGetLength(dataRef)];
         
         NSData *replyData = nil;
-        if (self.messageCallback != nil) {
-            replyData = self.messageCallback(messageID, data);
+        if (self.delegate != nil) {
+            [self.delegate localMessagePortReceivedMessageWithIdentifier:messageID data:data];
+        } else if (self.messageHandler != nil) {
+            replyData = self.messageHandler(messageID, data);
         }
         
         return (CFDataRef)CFBridgingRetain(replyData);
@@ -84,12 +126,14 @@ static void messageInvalidationCallback(CFMessagePortRef messagePort, void *info
         SULocalMessagePort *self = (__bridge SULocalMessagePort *)info;
         
         dispatch_async(self.messageQueue, ^{
-            // note that messageCallback is deallocated on same queue that we're receiving messages from, which is good
-            self.messageCallback = nil;
+            [self removeDelegate];
             
-            if (self.invalidationCallback != nil) {
-                self.invalidationCallback();
-                self.invalidationCallback = nil;
+            // note that messageHandler is deallocated on same queue that we're receiving messages from, which is good
+            self.messageHandler = nil;
+            
+            if (self.invalidationBlock != nil) {
+                self.invalidationBlock();
+                self.invalidationBlock = nil;
             }
             
             self.messagePort = NULL;
