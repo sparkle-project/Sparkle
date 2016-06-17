@@ -128,7 +128,7 @@
         if (!attrName) {
             continue;
         }
-        [dictionary setObject:[attribute stringValue] forKey:attrName];
+        [dictionary setValue:[attribute stringValue] forKey:attrName];
     }
     return dictionary;
 }
