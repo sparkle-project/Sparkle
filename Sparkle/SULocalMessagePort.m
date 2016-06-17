@@ -8,6 +8,8 @@
 
 #import "SULocalMessagePort.h"
 
+static NSString *SULocalServiceLookupReason = @"Local Service Connection";
+
 @interface SULocalMessagePort ()
 
 @property (nonatomic) CFMessagePortRef messagePort;
@@ -15,6 +17,7 @@
 @property (nonatomic, copy) NSData * _Nullable(^messageHandler)(int32_t, NSData *);
 @property (nonatomic, copy) void (^invalidationBlock)(void);
 @property (nonatomic, readonly) dispatch_queue_t messageQueue;
+@property (nonatomic) BOOL disabledAutomaticTermination;
 
 @end
 
@@ -25,12 +28,17 @@
 @synthesize messageHandler = _messageHandler;
 @synthesize invalidationBlock = _invalidationBlock;
 @synthesize messageQueue = _messageQueue;
+@synthesize disabledAutomaticTermination = _disabledAutomaticTermination;
 
 - (instancetype)init
 {
     self = [super init];
     if (self != nil) {
         _messageQueue = dispatch_queue_create("org.sparkle-project.sparkle-local-port", DISPATCH_QUEUE_SERIAL);
+        
+        // If we are a XPC service, protect it from being terminated until the invalidation handler is set
+        _disabledAutomaticTermination = YES;
+        [[NSProcessInfo processInfo] disableAutomaticTermination:SULocalServiceLookupReason];
     }
     return self;
 }
@@ -44,6 +52,11 @@
     return self;
 }
 
+- (void)dealloc
+{
+    [self enableAutomaticTermination];
+}
+
 - (void)setServiceName:(NSString *)serviceName
 {
     assert(self.messagePort == NULL);
@@ -53,6 +66,9 @@
     
     if (messagePort == NULL) {
         CFRelease((__bridge CFTypeRef)(self));
+        self.messageHandler = nil;
+        [self removeDelegate];
+        [self enableAutomaticTermination];
     } else {
         self.messagePort = messagePort;
         CFMessagePortSetDispatchQueue(messagePort, self.messageQueue);
@@ -64,8 +80,19 @@
     self.messageHandler = messageCallback;
 }
 
+- (void)enableAutomaticTermination
+{
+    if (self.disabledAutomaticTermination) {
+        [[NSProcessInfo processInfo] enableAutomaticTermination:SULocalServiceLookupReason];
+        self.disabledAutomaticTermination = NO;
+    }
+}
+
 - (void)setInvalidationCallback:(void (^)(void))invalidationCallback
 {
+    // We can disable automatic termination now because we will be protected by the invalidationHandler (if this is a XPC service)
+    [self enableAutomaticTermination];
+    
     if (self.messagePort == NULL) {
         invalidationCallback();
     } else {
