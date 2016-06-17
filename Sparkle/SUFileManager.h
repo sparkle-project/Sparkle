@@ -157,8 +157,8 @@ NS_ASSUME_NONNULL_BEGIN
  * @return YES if all the items at the target could be released from quarantine, otherwise NO if any items couldn't along with a populated error object
  *
  * This method removes quarantine attributes from an item, ideally an application, so that when the user launches a new application themselves, they
- * don't have to witness the OS X dialog alerting them that they downloaded an application from the internet and asking if they want to continue.
- * Note that this may not exactly mimic OS X's behavior when a user opens an application for the first time (i.e, the xattr isn't deleted),
+ * don't have to witness the system dialog alerting them that they downloaded an application from the internet and asking if they want to continue.
+ * Note that this may not exactly mimic the system behavior when a user opens an application for the first time (i.e, the xattr isn't deleted),
  * but this should be sufficient enough for our purposes.
  *
  * This method may return NO even if some items do get released from quarantine if the target URL is pointing to a directory.

@@ -167,7 +167,7 @@ class SUFileManagerTest: XCTestCase
             XCTAssertEqual(0, setxattr(fileInDirectoryURL.path!, SUAppleQuarantineIdentifier, quarantineData, quarantineDataLength, 0, XATTR_CREATE))
             XCTAssertGreaterThan(getxattr(fileInDirectoryURL.path!, SUAppleQuarantineIdentifier, nil, 0, 0, XATTR_NOFOLLOW), 0)
             
-            // Extended attributes can't be set on symbolic links in OS X, currently
+            // Extended attributes can't be set on symbolic links currently
             try! fileManager.releaseItemFromQuarantineAtRootURL(validSymlinkURL)
             XCTAssertGreaterThan(getxattr(directoryURL.path!, SUAppleQuarantineIdentifier, nil, 0, 0, XATTR_NOFOLLOW), 0)
             XCTAssertEqual(-1, getxattr(validSymlinkURL.path!, SUAppleQuarantineIdentifier, nil, 0, 0, XATTR_NOFOLLOW))

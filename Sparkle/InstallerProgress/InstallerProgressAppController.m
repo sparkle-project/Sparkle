@@ -97,7 +97,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 
 // Close status window immediately, but delay termination for a little bit to better increase the chance
 // the updated application when relaunched will be the frontmost application
-// This is related to OS X activation issues when terminating a frontmost application happens right before
+// This is related to macOS activation issues when terminating a frontmost application happens right before
 // launching another app
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {

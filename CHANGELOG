@@ -56,7 +56,7 @@ Important security fixes:
   - Strong documentation, easier to read code.
 * Automatic updates won't be installed if the system is about to shut off (Zorg)
 * Deprecated serving over HTTP without DSA (Zorg)
-  - Note that Apple has deprecated insecure HTTP in OS X 10.11
+  - Note that Apple has deprecated insecure HTTP in macOS 10.11
 * Improved Autoupdate application (Zorg)
     * Do all the installation work after the runloop is set up
     * TerminationListener only does termination listening now
@@ -154,12 +154,12 @@ Important security fixes:
 
 # 1.8.0 (Jul 26, 2014)
 
-* New SUDSAVerifier based on up-to-date OS X APIs (Zachary Waldowski)
+* New SUDSAVerifier based on up-to-date macOS APIs (Zachary Waldowski)
 * Detailed error log for failed signature checks (Kornel Lesiński)
 * Converted Sparkle to ARC (C.W. Betts)
 * Converted ivars to properties. (Jake Petroules)
 * Cocoapod support (Xhacker Liu)
-* Quarantine removal on OS X 10.10 (C.W. Betts)
+* Quarantine removal on macOS 10.10 (C.W. Betts)
 * Updated Japanese localization (1024jp)
 * Added Greek localization
 
@@ -180,7 +180,7 @@ Important security fixes:
 
 # 1.7.0
 
-* Dropped support for OS X 10.6. Sparkle now supports 10.7 and newer (including 10.10 Yosemite) on 64-bit Intel Macs (the last 32-bit Mac was released in 2006).
+* Dropped support for macOS 10.6. Sparkle now supports 10.7 and newer (including 10.10 Yosemite) on 64-bit Intel Macs (the last 32-bit Mac was released in 2006).
 * Removed use of deprecated functions (Zachary Waldowski)
 * Switched to modern Obj-C runtime and new literals syntax
 * Removed pre-10.7 code. (C.W. Betts)

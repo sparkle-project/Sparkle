@@ -375,7 +375,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
 }
 
 // Removes the directory tree rooted at |root| from the file quarantine.
-// The quarantine was introduced on OS X 10.5 and is described at:
+// The quarantine was introduced on macOS 10.5 and is described at:
 //
 // http://developer.apple.com/releasenotes/Carbon/RN-LaunchServices/index.html#apple_ref/doc/uid/TP40001369-DontLinkElementID_2
 //
