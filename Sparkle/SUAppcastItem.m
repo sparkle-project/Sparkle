@@ -221,21 +221,23 @@ static NSString *SUAppcastItemPropertiesKey = @"propertiesDictionary";
             return nil;
         }
         
-        NSString *enclosureLengthString = [enclosure objectForKey:SURSSAttributeLength];
-        NSInteger contentLength = 0;
-        if (enclosureLengthString != nil) {
-            contentLength = [enclosureLengthString integerValue];
-        }
-        if (contentLength > 0) {
-            _contentLength = (NSUInteger)contentLength;
-        } else {
-            // content length is important enough to require
-            // developers copying the sample appcast should be using it already,
-            // and we can get away with assuming the content length provided is valid
-            if (error != NULL) {
-                *error = @"Feed item's enclosure lacks length";
+        if (enclosureURLString) {
+            NSString *enclosureLengthString = [enclosure objectForKey:SURSSAttributeLength];
+            NSInteger contentLength = 0;
+            if (enclosureLengthString != nil) {
+                contentLength = [enclosureLengthString integerValue];
             }
-            return nil;
+            if (contentLength > 0) {
+                _contentLength = (NSUInteger)contentLength;
+            } else {
+                // content length is important enough to require
+                // developers copying the sample appcast should be using it already,
+                // and we can get away with assuming the content length provided is valid
+                if (error != NULL) {
+                    *error = @"Feed item's enclosure lacks length";
+                }
+                return nil;
+            }
         }
 
         if (enclosureURLString) {
