@@ -20,14 +20,13 @@
     {
         NSOperatingSystemVersion version = { 0, 0, 0 };
         NSURL *coreServices = [[NSFileManager defaultManager] URLForDirectory:NSCoreServiceDirectory inDomain:NSSystemDomainMask appropriateForURL:nil create:NO error:nil];
-        NSURL *url = [coreServices URLByAppendingPathComponent:@"SystemVersion.plist"] ;
-        if (url) {
-            NSDictionary *dictionary = [NSDictionary dictionaryWithContentsOfURL:url];
-            NSArray *components = [ [dictionary objectForKey: @"ProductVersion"] componentsSeparatedByString:@"."];
-            version.majorVersion = components.count > 0 ? [ [components objectAtIndex:0] integerValue] : 0;
-            version.minorVersion = components.count > 1 ? [ [components objectAtIndex:1] integerValue] : 0;
-            version.patchVersion = components.count > 2 ? [ [components objectAtIndex:2] integerValue] : 0;
-        }
+        NSURL *url = [coreServices URLByAppendingPathComponent:@"SystemVersion.plist"];
+        assert(url != nil);
+        NSDictionary *dictionary = [NSDictionary dictionaryWithContentsOfURL:url];
+        NSArray *components = [ [dictionary objectForKey: @"ProductVersion"] componentsSeparatedByString:@"."];
+        version.majorVersion = components.count > 0 ? [ [components objectAtIndex:0] integerValue] : 0;
+        version.minorVersion = components.count > 1 ? [ [components objectAtIndex:1] integerValue] : 0;
+        version.patchVersion = components.count > 2 ? [ [components objectAtIndex:2] integerValue] : 0;
         return version;
     }
 #endif
