@@ -17,6 +17,7 @@ if [ "$ACTION" = "" ] ; then
     cp -R "$CONFIGURATION_BUILD_DIR/SparkleInstallerLauncher.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
     cp -R "$CONFIGURATION_BUILD_DIR/SparklePersistentDownloader.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
     cp -R "$CONFIGURATION_BUILD_DIR/SparkleTemporaryDownloader.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+    cp -R "$CONFIGURATION_BUILD_DIR/SparkleLocalMessagePort.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
     cp -R "$CONFIGURATION_BUILD_DIR/SparkleRemoteMessagePort.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
 
     cp "$SRCROOT/TemporaryDownloader/SparkleTemporaryDownloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
@@ -32,6 +33,7 @@ if [ "$ACTION" = "" ] ; then
         cp -R "$CONFIGURATION_BUILD_DIR/SparkleInstallerLauncher.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
         cp -R "$CONFIGURATION_BUILD_DIR/SparklePersistentDownloader.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
         cp -R "$CONFIGURATION_BUILD_DIR/SparkleTemporaryDownloader.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+        cp -R "$CONFIGURATION_BUILD_DIR/SparkleLocalMessagePort.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
         cp -R "$CONFIGURATION_BUILD_DIR/SparkleRemoteMessagePort.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
     fi
 
