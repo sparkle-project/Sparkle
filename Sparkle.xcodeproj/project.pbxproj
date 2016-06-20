@@ -134,6 +134,9 @@
 		7210C7681B9A9A1500EB90AC /* SUUnarchiverTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */; };
 		72162B061C82C8B30013C1C5 /* SUParameterAssert.h in Headers */ = {isa = PBXBuildFile; fileRef = 72162B051C82C8B30013C1C5 /* SUParameterAssert.h */; };
 		72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */ = {isa = PBXBuildFile; fileRef = 72162B071C82C9600013C1C5 /* SULocalizations.h */; };
+		721BC2031D17A4FC002BC71E /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
+		721BC2041D17A51B002BC71E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
+		721BC20B1D17A5AD002BC71E /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 721BC20A1D17A5AD002BC71E /* CoreServices.framework */; };
 		721C245A1CB75756005440CB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
 		721C245B1CB75765005440CB /* SURemoteMessagePort.m in Sources */ = {isa = PBXBuildFile; fileRef = 729746441C91212400FC134E /* SURemoteMessagePort.m */; };
 		721C245C1CB7576E005440CB /* SUStatusController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6196CFE409C71ADE000DC222 /* SUStatusController.m */; };
@@ -852,6 +855,9 @@
 		7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUUnarchiverTest.swift; sourceTree = "<group>"; };
 		72162B051C82C8B30013C1C5 /* SUParameterAssert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUParameterAssert.h; sourceTree = "<group>"; };
 		72162B071C82C9600013C1C5 /* SULocalizations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULocalizations.h; sourceTree = "<group>"; };
+		721BC2061D17A532002BC71E /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		721BC2081D17A553002BC71E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
+		721BC20A1D17A5AD002BC71E /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		721C24451CB753E6005440CB /* Updater.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Updater.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		721C24571CB754E8005440CB /* ConfigInstallerProgress.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigInstallerProgress.xcconfig; sourceTree = "<group>"; };
 		721C24581CB7567D005440CB /* InstallerProgress-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "InstallerProgress-Info.plist"; path = "Sparkle/InstallerProgress/InstallerProgress-Info.plist"; sourceTree = SOURCE_ROOT; };
@@ -1169,6 +1175,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				721BC20B1D17A5AD002BC71E /* CoreServices.framework in Frameworks */,
+				721BC2041D17A51B002BC71E /* Foundation.framework in Frameworks */,
+				721BC2031D17A4FC002BC71E /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1231,6 +1240,9 @@
 		0867D69AFE84028FC02AAC07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				721BC20A1D17A5AD002BC71E /* CoreServices.framework */,
+				721BC2081D17A553002BC71E /* Carbon.framework */,
+				721BC2061D17A532002BC71E /* CoreFoundation.framework */,
 				726E076A1CA616B3001A286B /* libbz2.tbd */,
 				726E07681CA616A4001A286B /* libxar.tbd */,
 				0867D6A5FE840307C02AAC07 /* AppKit.framework */,
