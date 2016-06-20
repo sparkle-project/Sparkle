@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol SURemoteMessagePort <NSObject>
+@protocol SURemoteMessagePortProtocol <NSObject>
 
 - (void)setServiceName:(NSString *)serviceName;
 

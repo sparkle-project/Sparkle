@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SUXPCRemoteMessagePort : NSObject <SURemoteMessagePort>
+@interface SUXPCRemoteMessagePort : NSObject <SURemoteMessagePortProtocol>
 
 - (instancetype)initWithServiceName:(NSString *)serviceName;
 

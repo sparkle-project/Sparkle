@@ -24,7 +24,7 @@
     NSString *hostBundleIdentifier = host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    id <SURemoteMessagePort> remotePort = nil;
+    id <SURemoteMessagePortProtocol> remotePort = nil;
     NSString *serviceName = SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier);
     if (!SUXPCServiceExists(@REMOTE_MESSAGE_PORT_PRODUCT_NAME)) {
         remotePort = [[SURemoteMessagePort alloc] initWithServiceName:serviceName];
@@ -45,7 +45,7 @@
     NSString *hostBundleIdentifier = host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    id <SURemoteMessagePort> remotePort = nil;
+    id <SURemoteMessagePortProtocol> remotePort = nil;
     NSString *serviceName = SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier);
     if (!SUXPCServiceExists(@REMOTE_MESSAGE_PORT_PRODUCT_NAME)) {
         remotePort = [[SURemoteMessagePort alloc] initWithServiceName:serviceName];

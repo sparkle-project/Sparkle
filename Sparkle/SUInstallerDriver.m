@@ -41,7 +41,7 @@
 @property (nonatomic) SUInstallerMessageType currentStage;
 @property (nonatomic) BOOL startedInstalling;
 @property (nonatomic) id<SULocalMessagePortProtocol> localPort;
-@property (nonatomic) id <SURemoteMessagePort> remotePort;
+@property (nonatomic) id <SURemoteMessagePortProtocol> remotePort;
 @property (nonatomic) BOOL postponedOnce;
 @property (nonatomic, weak, readonly) id updater;
 @property (nonatomic, weak, readonly) id<SUUpdaterDelegate> updaterDelegate;

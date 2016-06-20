@@ -27,7 +27,7 @@
     self = [self init];
     if (self != nil) {
         _connection = [[NSXPCConnection alloc] initWithServiceName:@REMOTE_MESSAGE_PORT_BUNDLE_ID];
-        _connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SURemoteMessagePort)];
+        _connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SURemoteMessagePortProtocol)];
         
         __weak SUXPCRemoteMessagePort *weakSelf = self;
         _connection.invalidationHandler = ^{

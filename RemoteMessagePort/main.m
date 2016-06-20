@@ -18,7 +18,7 @@
     // This method is where the NSXPCListener configures, accepts, and resumes a new incoming NSXPCConnection.
     
     // Configure the connection.
-    newConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SURemoteMessagePort)];
+    newConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SURemoteMessagePortProtocol)];
     
     newConnection.exportedObject = [[SURemoteMessagePort alloc] init];
     
