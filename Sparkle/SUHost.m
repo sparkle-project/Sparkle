@@ -86,7 +86,7 @@
 
 - (BOOL)validVersion
 {
-    return ([self _version] != nil);
+    return [self isValidVersion:[self _version]];
 }
 
 - (BOOL)isValidVersion:(NSString *)version
