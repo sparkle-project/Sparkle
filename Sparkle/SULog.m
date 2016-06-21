@@ -43,7 +43,8 @@ void SULog(NSString *format, ...)
     NSString *logMessage = [[NSString alloc] initWithFormat:format arguments:ap];
     va_end(ap);
     
-    dispatch_async(queue, ^{
+    // Make sure we do not async, because if we async, the log may not be delivered deterministically
+    dispatch_sync(queue, ^{
         aslmsg message = asl_new(ASL_TYPE_MSG);
         if (message == NULL) {
             return;
