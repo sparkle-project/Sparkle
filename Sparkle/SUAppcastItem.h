@@ -9,7 +9,11 @@
 #ifndef SUAPPCASTITEM_H
 #define SUAPPCASTITEM_H
 
+#if __has_feature(modules)
+@import Foundation;
+#else
 #import <Foundation/Foundation.h>
+#endif
 #import "SUExport.h"
 
 SU_EXPORT @interface SUAppcastItem : NSObject
