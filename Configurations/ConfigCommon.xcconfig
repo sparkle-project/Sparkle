@@ -52,7 +52,6 @@ CLANG_WARN_OBJC_EXPLICIT_OWNERSHIP_TYPE = YES
 CLANG_WARN_OBJC_IMPLICIT_ATOMIC_PROPERTIES = YES
 CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES
 CLANG_WARN_OBJC_MISSING_PROPERTY_SYNTHESIS = YES
-CLANG_WARN_OBJC_RECEIVER_WEAK = YES
 CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES
 CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES
 CLANG_WARN_UNREACHABLE_CODE = YES
@@ -88,4 +87,4 @@ CLANG_ENABLE_MODULES[sdk=macosx10.8] = NO
 WARNING_CFLAGS_EXTRA = -Wno-custom-atomic-properties -Wno-implicit-atomic-properties
 
 // Turn on all warnings, then disable a few which are almost impossible to avoid
-WARNING_CFLAGS = -Wall -Weverything -Wno-unused-macros -Wno-gnu-statement-expression -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wno-auto-import $(WARNING_CFLAGS_EXTRA)
+WARNING_CFLAGS = -Wall -Weverything -Wno-unused-macros -Wno-gnu-statement-expression -Wno-arc-repeated-use-of-weak -Wno-auto-import $(WARNING_CFLAGS_EXTRA)

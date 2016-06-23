@@ -128,7 +128,10 @@
         if (!attrName) {
             continue;
         }
-        [dictionary setObject:[attribute stringValue] forKey:attrName];
+        NSString *stringValue = [attribute stringValue];
+        if (stringValue) {
+            [dictionary setObject:stringValue forKey:attrName];
+        }
     }
     return dictionary;
 }
