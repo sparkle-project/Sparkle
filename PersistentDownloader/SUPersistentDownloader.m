@@ -8,6 +8,7 @@
 
 #import "SUPersistentDownloader.h"
 #import "SUPersistentDownloaderDelegate.h"
+#import "SULocalCacheDirectory.h"
 #import "SUURLRequest.h"
 #import "SUErrors.h"
 
@@ -47,7 +48,7 @@ static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         // Remove our old caches path so we don't start accumulating files in there
-        NSString *cachePath = [[self class] sparkleCachePathForBundleIdentifier:bundleIdentifier];
+        NSString *cachePath = [SULocalCacheDirectory cachePathForBundleIdentifier:bundleIdentifier];
         if ([[NSFileManager defaultManager] fileExistsAtPath:cachePath]) {
             [[NSFileManager defaultManager] removeItemAtPath:cachePath error:NULL];
         }
@@ -86,21 +87,11 @@ static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
     });
 }
 
-// If we support sandboxing this component in the future, it is important to note this may return a different path
-// For this reason, this method should not be a part of SUHost because its behavior depends on what kind of process it's being invoked from
-+ (NSString *)sparkleCachePathForBundleIdentifier:(NSString *)bundleIdentifier
-{
-    NSURL *cacheURL = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:NULL];
-    
-    assert(cacheURL != nil);
-    return [[[cacheURL URLByAppendingPathComponent:bundleIdentifier] URLByAppendingPathComponent:@SPARKLE_BUNDLE_IDENTIFIER] path];
-}
-
 - (void)download:(NSURLDownload *)__unused d decideDestinationWithSuggestedFilename:(NSString *)name
 {
     NSString *downloadFileName = self.desiredFilename;
     
-    NSString *cachePath = [[self class] sparkleCachePathForBundleIdentifier:self.bundleIdentifier];
+    NSString *cachePath = [SULocalCacheDirectory cachePathForBundleIdentifier:self.bundleIdentifier];
     
     NSString *tempDir = [cachePath stringByAppendingPathComponent:downloadFileName];
     int count = 1;

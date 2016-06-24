@@ -12,6 +12,7 @@
 #import "SUBasicUpdateDriver.h"
 #import "SUInstallerDriver.h"
 #import "SUDownloadDriver.h"
+#import "SULocalCacheDirectory.h"
 #import "SULog.h"
 
 #ifdef _APPKITDEFINES_H
@@ -47,38 +48,15 @@
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize userAgent = _userAgent;
 
-// If we support sandboxing this component in the future, it is important to note this may return a different path
-// For this reason, this method should not be a part of SUHost because its behavior depends on what kind of process it's being invoked from
-#warning kind of duplicated code from SUPersistentDownloader ??
-+ (NSString *)sparkleCachePathForHost:(SUHost *)host
-{
-    NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    NSString *cachePath = nil;
-    if ([cachePaths count]) {
-        cachePath = [cachePaths objectAtIndex:0];
-    }
-    if (!cachePath) {
-        SULog(@"Failed to find user's cache directory! Using system default");
-        cachePath = NSTemporaryDirectory();
-    }
-    
-    NSString *name = [host.bundle bundleIdentifier];
-    if (!name) {
-        name = [host name];
-    }
-    
-    cachePath = [cachePath stringByAppendingPathComponent:name];
-    cachePath = [cachePath stringByAppendingPathComponent:@SPARKLE_BUNDLE_IDENTIFIER];
-    return cachePath;
-}
-
 - (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate delegate:(id<SUCoreBasedUpdateDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
         _delegate = delegate;
         
-        NSString *cachePath = [[self class] sparkleCachePathForHost:host];
+        NSString *bundleIdentifier = host.bundle.bundleIdentifier;
+        assert(bundleIdentifier != nil);
+        NSString *cachePath = [SULocalCacheDirectory cachePathForBundleIdentifier:bundleIdentifier];
         
         _basicDriver = [[SUBasicUpdateDriver alloc] initWithHost:host updater:updater updaterDelegate:updaterDelegate delegate:self];
         _installerDriver = [[SUInstallerDriver alloc] initWithHost:host cachePath:cachePath sparkleBundle:sparkleBundle updater:updater updaterDelegate:updaterDelegate delegate:self];

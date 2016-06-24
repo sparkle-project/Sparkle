@@ -137,6 +137,9 @@
 		721BC2031D17A4FC002BC71E /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
 		721BC2041D17A51B002BC71E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		721BC20B1D17A5AD002BC71E /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 721BC20A1D17A5AD002BC71E /* CoreServices.framework */; };
+		721BC20E1D1CDE55002BC71E /* SULocalCacheDirectory.h in Headers */ = {isa = PBXBuildFile; fileRef = 721BC20C1D1CDE55002BC71E /* SULocalCacheDirectory.h */; };
+		721BC20F1D1CDE55002BC71E /* SULocalCacheDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 721BC20D1D1CDE55002BC71E /* SULocalCacheDirectory.m */; };
+		721BC2101D1CDE55002BC71E /* SULocalCacheDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 721BC20D1D1CDE55002BC71E /* SULocalCacheDirectory.m */; };
 		721C245A1CB75756005440CB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
 		721C245B1CB75765005440CB /* SURemoteMessagePort.m in Sources */ = {isa = PBXBuildFile; fileRef = 729746441C91212400FC134E /* SURemoteMessagePort.m */; };
 		721C245C1CB7576E005440CB /* SUStatusController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6196CFE409C71ADE000DC222 /* SUStatusController.m */; };
@@ -858,6 +861,8 @@
 		721BC2061D17A532002BC71E /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		721BC2081D17A553002BC71E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		721BC20A1D17A5AD002BC71E /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
+		721BC20C1D1CDE55002BC71E /* SULocalCacheDirectory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULocalCacheDirectory.h; sourceTree = "<group>"; };
+		721BC20D1D1CDE55002BC71E /* SULocalCacheDirectory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SULocalCacheDirectory.m; sourceTree = "<group>"; };
 		721C24451CB753E6005440CB /* Updater.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Updater.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		721C24571CB754E8005440CB /* ConfigInstallerProgress.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigInstallerProgress.xcconfig; sourceTree = "<group>"; };
 		721C24581CB7567D005440CB /* InstallerProgress-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "InstallerProgress-Info.plist"; path = "Sparkle/InstallerProgress/InstallerProgress-Info.plist"; sourceTree = SOURCE_ROOT; };
@@ -1506,6 +1511,8 @@
 				14652F8319A9759F00959E44 /* SUExport.h */,
 				61EF67580E25C5B400F754E0 /* SUHost.h */,
 				61EF67550E25B58D00F754E0 /* SUHost.m */,
+				721BC20C1D1CDE55002BC71E /* SULocalCacheDirectory.h */,
+				721BC20D1D1CDE55002BC71E /* SULocalCacheDirectory.m */,
 				55C14F04136EF6DB00649790 /* SULog.h */,
 				55C14F05136EF6DB00649790 /* SULog.m */,
 				726F2CE31BC9C33D001971A4 /* SUOperatingSystem.h */,
@@ -1856,6 +1863,7 @@
 				726E4A0E1C86881600C57C6A /* SUStandardUserDriverUIDelegate.h in Headers */,
 				725F97A81C8B42D700265BE4 /* SUStandardUserDriverProtocol.h in Headers */,
 				726E4A101C86B5A200C57C6A /* SUStandardUserDriverRemoteDelegate.h in Headers */,
+				721BC20E1D1CDE55002BC71E /* SULocalCacheDirectory.h in Headers */,
 				72B767DA1C9CD2E400A07552 /* SUUIBasedUpdateDriver.h in Headers */,
 				725CB95A1C7121830064365A /* SUStandardUserDriver.h in Headers */,
 				725CB9571C7120410064365A /* SUUserDriver.h in Headers */,
@@ -2773,6 +2781,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7293A1B11CEE9B9F00B957A7 /* SUURLRequest.m in Sources */,
+				721BC2101D1CDE55002BC71E /* SULocalCacheDirectory.m in Sources */,
 				723B5DA71CF7AB0100365F95 /* main.m in Sources */,
 				728638ED1CAF50CE00783084 /* SUConstants.m in Sources */,
 				723B5DA91CF7AB0100365F95 /* SUPersistentDownloader.m in Sources */,
@@ -2834,6 +2843,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				72E641AC1D090F7F000404CA /* SUFileOperationConstants.m in Sources */,
+				721BC20F1D1CDE55002BC71E /* SULocalCacheDirectory.m in Sources */,
 				724A0A3E1CF7AF0E00D8C3D5 /* SUTemporaryDownloader.m in Sources */,
 				723B5DAA1CF7AB6A00365F95 /* SUPersistentDownloader.m in Sources */,
 				72F94F5A1CC450DE002DEE68 /* SUInstallerLauncher.m in Sources */,
