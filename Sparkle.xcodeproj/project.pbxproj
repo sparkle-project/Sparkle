@@ -172,6 +172,7 @@
 		720B16441C66433D006985FB /* UITests-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 720B16421C66433D006985FB /* UITests-Info.plist */; };
 		720B16451C66433D006985FB /* SUTestApplicationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720B16431C66433D006985FB /* SUTestApplicationTest.swift */; };
 		7210C7681B9A9A1500EB90AC /* SUUnarchiverTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */; };
+		721BC2111D1DFF05002BC71E /* SUFileOperationConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 722954C31D04E66F00ECF9CA /* SUFileOperationConstants.m */; };
 		721CF1A71AD7643600D9AC09 /* bsdiff.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */; };
 		721CF1A81AD7644100D9AC09 /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; };
 		721CF1A91AD7644C00D9AC09 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
@@ -1766,6 +1767,7 @@
 				61B5F93009C4CFDC00B25A18 /* main.m in Sources */,
 				726F2CEB1BC9C733001971A4 /* SUConstants.m in Sources */,
 				5A6D31EE1BF53245009C5157 /* SUFileManager.m in Sources */,
+				721BC2111D1DFF05002BC71E /* SUFileOperationConstants.m in Sources */,
 				5A6D31EF1BF5325F009C5157 /* SUOperatingSystem.m in Sources */,
 				72E45CF31B640CDD005C701A /* SUTestApplicationDelegate.m in Sources */,
 				A5BF4F1D1BC7668B007A052A /* SUTestWebServer.m in Sources */,
