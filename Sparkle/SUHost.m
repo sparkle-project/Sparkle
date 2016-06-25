@@ -67,7 +67,7 @@
     return [self.bundle bundlePath];
 }
 
-- (NSString *__nonnull)name
+- (NSString * _Nonnull)name
 {
     NSString *name;
 
@@ -100,7 +100,7 @@
     return ([self isValidVersion:version] ? version : nil);
 }
 
-- (NSString *__nonnull)version
+- (NSString * _Nonnull)version
 {
     NSString *version = [self _version];
     if (version == nil) {
@@ -110,7 +110,7 @@
     return version;
 }
 
-- (NSString *__nonnull)displayVersion
+- (NSString * _Nonnull)displayVersion
 {
     NSString *shortVersionString = [self.bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     if (shortVersionString)
@@ -126,7 +126,7 @@
     return (statfs_info.f_flags & MNT_RDONLY) != 0;
 }
 
-- (NSString *__nullable)publicDSAKey
+- (NSString *_Nullable)publicDSAKey
 {
     // Maybe the key is just a string in the Info.plist.
     NSString *key = [self.bundle objectForInfoDictionaryKey:SUPublicDSAKeyKey];

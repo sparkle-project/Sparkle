@@ -10,12 +10,12 @@
 
 @implementation SUApplicationInfo
 
-+ (BOOL)isBackgroundApplication:(NSApplication * __nonnull)application
++ (BOOL)isBackgroundApplication:(NSApplication *)application
 {
     return (application.activationPolicy == NSApplicationActivationPolicyAccessory);
 }
 
-+ (NSImage *__nonnull)bestIconForBundle:(NSBundle * __nonnull)bundle
++ (NSImage *)bestIconForBundle:(NSBundle *)bundle
 {
     // Cache the application icon.
     NSString *iconPath = [bundle pathForResource:[bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType:@"icns"];
