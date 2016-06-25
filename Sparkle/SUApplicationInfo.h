@@ -7,14 +7,17 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "SUExport.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SUApplicationInfo : NSObject
+SU_EXPORT @interface SUApplicationInfo : NSObject
 
 + (BOOL)isBackgroundApplication:(NSApplication *)application;
 
 + (NSImage *)bestIconForBundle:(NSBundle *)bundle;
+
++ (NSRunningApplication * _Nullable)runningApplicationWithBundle:(NSBundle *)bundle;
 
 @end
 

@@ -40,5 +40,26 @@
     return icon;
 }
 
++ (NSRunningApplication *)runningApplicationWithBundle:(NSBundle *)bundle
+{
+    NSString *bundlePath = bundle.bundlePath;
+    NSString *bundleIdentifier = bundle.bundleIdentifier;
+    
+    if (bundleIdentifier != nil && bundlePath != nil) {
+        NSArray *runningApplications =
+        (bundleIdentifier != nil) ?
+        [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleIdentifier] :
+        [[NSWorkspace sharedWorkspace] runningApplications];
+        
+        for (NSRunningApplication *runningApplication in runningApplications) {
+            // Comparing the URLs hasn't worked well for me in practice, so I'm comparing the file paths instead
+            NSString *candidatePath = runningApplication.bundleURL.path;
+            if (candidatePath != nil && [candidatePath isEqualToString:bundlePath]) {
+                return runningApplication;
+            }
+        }
+    }
+    return nil;
+}
 
 @end

@@ -7,6 +7,7 @@
 //
 
 #import "TerminationListener.h"
+#import "SUApplicationInfo.h"
 
 @interface TerminationListener ()
 
@@ -37,21 +38,7 @@
 // If for example, the user re-launches the application and we haven't started listening yet
 - (NSRunningApplication *)runningApplication
 {
-    NSString *bundlePath = self.bundle.bundlePath;
-    NSString *bundleIdentifier = self.bundle.bundleIdentifier;
-    
-    NSArray *runningApplications =
-    (bundleIdentifier != nil) ?
-    [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleIdentifier] :
-    [[NSWorkspace sharedWorkspace] runningApplications];
-    
-    for (NSRunningApplication *runningApplication in runningApplications) {
-        // Comparing the URLs hasn't worked well for me in practice, so I'm comparing the file paths instead
-        if ([runningApplication.bundleURL.path isEqualToString:bundlePath]) {
-            return runningApplication;
-        }
-    }
-    return nil;
+    return [SUApplicationInfo runningApplicationWithBundle:self.bundle];
 }
 
 - (BOOL)terminated

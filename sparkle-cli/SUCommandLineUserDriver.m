@@ -8,6 +8,7 @@
 
 #import "SUCommandLineUserDriver.h"
 #import <AppKit/AppKit.h>
+#import "SUApplicationInfo.h"
 
 #define SCHEDULED_UPDATE_TIMER_THRESHOLD 2.0 // seconds
 
@@ -241,7 +242,7 @@
                 fprintf(stderr, "Deferring Installation.\n");
             }
             [self.coreComponent installUpdateWithChoice:SUDismissUpdateInstallation];
-        } else if ([self targetRunningApplication] != nil) {
+        } else if ([SUApplicationInfo runningApplicationWithBundle:self.applicationBundle] != nil) {
             [self.coreComponent installUpdateWithChoice:SUInstallAndRelaunchUpdateNow];
         } else {
             [self.coreComponent installUpdateWithChoice:SUInstallUpdateNow];
@@ -280,7 +281,7 @@
 - (void)terminateApplication
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSRunningApplication *runningApplication = [self targetRunningApplication];
+        NSRunningApplication *runningApplication = [SUApplicationInfo runningApplicationWithBundle:self.applicationBundle];
         if (runningApplication != nil) {
             if (self.verbose) {
                 fprintf(stderr, "Terminating application...\n");
@@ -293,25 +294,6 @@
             }
         }
     });
-}
-
-- (NSRunningApplication *)targetRunningApplication
-{
-    NSString *bundleIdentifier = self.applicationBundle.bundleIdentifier;
-    if (bundleIdentifier != nil) {
-        NSArray<NSRunningApplication *> *runningApplications = [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleIdentifier];
-        // Make sure we *don't* use NSURLs for equality comparison; turns out to not work that great
-        NSString *bundlePath = self.applicationBundle.bundleURL.path;
-        if (bundlePath != nil) {
-            for (NSRunningApplication *runningApplication in runningApplications) {
-                NSString *candidatePath = runningApplication.bundleURL.path;
-                if (candidatePath != nil && [bundlePath isEqualToString:candidatePath]) {
-                    return runningApplication;
-                }
-            }
-        }
-    }
-    return nil;
 }
 
 @end
