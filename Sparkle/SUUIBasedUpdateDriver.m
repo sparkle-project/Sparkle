@@ -80,11 +80,31 @@
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
 {
-    [self.userDriver showUpdateFoundWithAppcastItem:updateItem allowsAutomaticUpdates:self.allowsAutomaticUpdates alreadyDownloaded:self.resumingUpdate reply:^(SUUpdateAlertChoice choice) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self updateAlertFinishedForUpdateItem:updateItem withChoice:choice];
-        });
-    }];
+    if (!self.resumingUpdate) {
+        [self.userDriver showUpdateFoundWithAppcastItem:updateItem allowsAutomaticUpdates:self.allowsAutomaticUpdates reply:^(SUUpdateAlertChoice choice) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
+                switch (choice) {
+                    case SUInstallUpdateChoice:
+                        [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
+                        break;
+                    case SUSkipThisVersionChoice:
+                        [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+                        // Fall through
+                    case SUInstallLaterChoice:
+                        [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
+                        break;
+                }
+            });
+        }];
+    } else {
+        [self.userDriver showResumableUpdateFoundWithAppcastItem:updateItem allowsAutomaticUpdates:self.allowsAutomaticUpdates reply:^(SUInstallUpdateStatus choice) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
+                [self.coreDriver finishInstallationWithResponse:choice];
+            });
+        }];
+    }
     
     id <SUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
     if (updateItem.releaseNotesURL != nil && (![updaterDelegate respondsToSelector:@selector(updaterShouldDownloadReleaseNotes:)] || [updaterDelegate updaterShouldDownloadReleaseNotes:self.updater])) {
@@ -98,33 +118,6 @@
                 [userDriver showUpdateReleaseNotesFailedToDownloadWithError:(NSError * _Nonnull)error];
             }
         });
-    }
-}
-
-- (void)updateAlertFinishedForUpdateItem:(SUAppcastItem *)updateItem withChoice:(SUUpdateAlertChoice)choice
-{
-    [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
-    switch (choice) {
-        case SUInstallUpdateChoice:
-        {
-            if (!self.resumingUpdate) {
-                [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
-            } else {
-#warning why should we have to relaunch??
-                [self.coreDriver finishInstallationWithResponse:SUInstallAndRelaunchUpdateNow];
-            }
-            break;
-        }
-            
-        case SUSkipThisVersionChoice:
-            assert(!self.resumingUpdate);
-            [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
-            [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
-            break;
-            
-        case SUInstallLaterChoice:
-            [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
-            break;
     }
 }
 

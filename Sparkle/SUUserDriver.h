@@ -111,31 +111,45 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)dismissUserInitiatedUpdateCheck;
 
 /*!
- * Show the user a new update is found
+ * Show the user a new update is found and can be downloaded & installed
  *
- * Let the user know a new update is found and ask them what they want to do.
+ * Let the user know a new downloadable update is found and ask them what they want to do.
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update
  *
  * @param allowsAutomaticUpdates Indicates whether the user is allowed to use automatic updates.
  * A user interface may use this to give the user an option to enable automatic updates.
  *
- * @param alreadyDownloaded Indicates whether the update has already been downloaded
- *
  * @param reply
- * A reply of SUInstallUpdateChoice installs the new update. If the update has already been downloaded (if alreadyDownloaded is YES)
- * then this may re-launch the application instantly (after a potential authorization prompt). Otherwise the new update will need to be downloaded & extracted first.
+ * A reply of SUInstallUpdateChoice begins downloading and installing the new update.
  *
  * A reply of SUInstallLaterChoice reminds the user later of the update, which can act as a "do nothing" option.
- * If the update has already been downloaded (if alreadyDownloaded is YES), then this will just delay the installation until the app terminates.
  *
  * A reply of SUSkipThisVersionChoice skips this particular version and won't bother the user again,
- * unless they initiate an update check themselves. This reply must not be used if the update has already been downloaded
- * (if alreadyDownloaded is YES) because the installer will try to install the update no matter what.
+ * unless they initiate an update check themselves.
  *
  * This can be called from any thread
  */
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates alreadyDownloaded:(BOOL)alreadyDownloaded reply:(void (^)(SUUpdateAlertChoice))reply;
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates reply:(void (^)(SUUpdateAlertChoice))reply;
+
+/*!
+ * Show the user a downloaded update can be resumed and installed immediately
+ *
+ * Let the user know a downloaded update can be installed ask them what they want to do.
+ *
+ * @param appcastItem The Appcast Item containing information that reflects the new update
+ *
+ * @param allowsAutomaticUpdates Indicates whether the user is allowed to use automatic updates.
+ * A user interface may use this to give the user an option to enable automatic updates.
+ *
+ * @param reply A reply of SUInstallAndRelaunchUpdateNow installs the update immediately and relaunches the new update.
+ * A reply of SUInstallUpdateNow installes the update immediately but does not relaunch the new update.
+ * A reply of SUDismissUpdateInstallation dismisses the update installation. Note the update may still be installed after
+ * the application terminates, however there is not a strong guarantee that this will happen.
+ *
+ * This can be called from any thread
+ */
+- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates reply:(void (^)(SUInstallUpdateStatus))reply;
 
 /*!
  * Show the user the release notes for the new update
@@ -246,7 +260,8 @@ NS_ASSUME_NONNULL_BEGIN
  * Let the user know that the update is ready and ask them whether they want to install or not.
  * Note if the target application is already terminated and an update can be performed silently, this method may not be invoked.
  *
- * @param installUpdateHandler A reply of SUInstallAndRelaunchUpdateNow installs the update immediately.
+ * @param installUpdateHandler A reply of SUInstallAndRelaunchUpdateNow installs the update immediately and relaunches the new update.
+ * A reply of SUInstallUpdateNow installes the update immediately but does not relaunch the new update.
  * A reply of SUDismissUpdateInstallation dismisses the update installation. Note the update may still be installed after
  * the application terminates, however there is not a strong guarantee that this will happen.
  *

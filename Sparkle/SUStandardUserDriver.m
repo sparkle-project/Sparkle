@@ -143,7 +143,7 @@
 
 #pragma mark Update Found
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates alreadyDownloaded:(BOOL)alreadyDownloaded reply:(void (^)(SUUpdateAlertChoice))reply
+- (void)showUpdateFoundWithAlertHandler:(SUUpdateAlert *(^)(SUStandardUserDriver *, SUHost *, id<SUVersionDisplay>))alertHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         id <SUVersionDisplay> versionDisplayer = nil;
@@ -152,13 +152,31 @@
         }
         
         __weak SUStandardUserDriver *weakSelf = self;
-        self.activeUpdateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:self.host versionDisplayer:versionDisplayer allowsAutomaticUpdates:allowsAutomaticUpdates alreadyDownloaded:alreadyDownloaded completionBlock:^(SUUpdateAlertChoice choice) {
-            reply(choice);
-            weakSelf.activeUpdateAlert = nil;
-        }];
+        SUHost *host = self.host;
+        self.activeUpdateAlert = alertHandler(weakSelf, host, versionDisplayer);
         
         [self setUpFocusForActiveUpdateAlert];
     });
+}
+
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates reply:(void (^)(SUUpdateAlertChoice))reply
+{
+    [self showUpdateFoundWithAlertHandler:^SUUpdateAlert *(SUStandardUserDriver *weakSelf, SUHost *host, id<SUVersionDisplay> versionDisplayer) {
+        return [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:host versionDisplayer:versionDisplayer allowsAutomaticUpdates:allowsAutomaticUpdates completionBlock:^(SUUpdateAlertChoice choice) {
+            reply(choice);
+            weakSelf.activeUpdateAlert = nil;
+        }];
+    }];
+}
+
+- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates reply:(void (^)(SUInstallUpdateStatus))reply
+{
+    [self showUpdateFoundWithAlertHandler:^SUUpdateAlert *(SUStandardUserDriver *weakSelf, SUHost *host, id<SUVersionDisplay> versionDisplayer) {
+        return [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:host versionDisplayer:versionDisplayer allowsAutomaticUpdates:allowsAutomaticUpdates resumableCompletionBlock:^(SUInstallUpdateStatus choice) {
+            reply(choice);
+            weakSelf.activeUpdateAlert = nil;
+        }];
+    }];
 }
 
 - (void)showUpdateReleaseNotes:(NSData *)releaseNotes

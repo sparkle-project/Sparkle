@@ -35,8 +35,8 @@
 @property (strong) SUAppcastItem *updateItem;
 @property (strong) SUHost *host;
 @property (nonatomic) BOOL allowsAutomaticUpdates;
-@property (nonatomic) BOOL alreadyDownloaded;
-@property (strong) void(^completionBlock)(SUUpdateAlertChoice);
+@property (nonatomic, copy, nullable) void(^completionBlock)(SUUpdateAlertChoice);
+@property (nonatomic, copy, nullable) void(^resumableCompletionBlock)(SUInstallUpdateStatus);
 
 @property (strong) NSProgressIndicator *releaseNotesSpinner;
 @property (assign) BOOL webViewFinishedLoading;
@@ -53,13 +53,13 @@
 
 @implementation SUUpdateAlert
 
-@synthesize completionBlock;
+@synthesize completionBlock = _completionBlock;
+@synthesize resumableCompletionBlock = _resumableCompletionBlock;
 @synthesize versionDisplayer;
 
 @synthesize updateItem;
 @synthesize host;
 @synthesize allowsAutomaticUpdates = _allowsAutomaticUpdates;
-@synthesize alreadyDownloaded = _alreadyDownloaded;
 
 @synthesize releaseNotesSpinner;
 @synthesize webViewFinishedLoading;
@@ -72,23 +72,40 @@
 @synthesize skipButton;
 @synthesize laterButton;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates alreadyDownloaded:(BOOL)alreadyDownloaded completionBlock:(void (^)(SUUpdateAlertChoice))block
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates
 {
     self = [super initWithWindowNibName:@"SUUpdateAlert"];
-	if (self)
-	{
-        self.completionBlock = block;
+    if (self != nil) {
         host = aHost;
         updateItem = item;
         versionDisplayer = aVersionDisplayer;
         _allowsAutomaticUpdates = allowsAutomaticUpdates;
-        _alreadyDownloaded = alreadyDownloaded;
         [self setShouldCascadeWindows:NO];
-
+        
         // Alex: This dummy line makes sure that the binary is linked against WebKit.
         // The SUUpdateAlert.xib file contains a WebView and if we don't link against WebKit,
         // we will get a runtime crash when decoding the NIB. It is better to get a link error.
         [WebView MIMETypesShownAsHTML];
+    }
+    return self;
+}
+
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates completionBlock:(void (^)(SUUpdateAlertChoice))block
+{
+    self = [self initWithAppcastItem:item host:aHost versionDisplayer:aVersionDisplayer allowsAutomaticUpdates:allowsAutomaticUpdates];
+	if (self != nil)
+	{
+        _completionBlock = [block copy];
+    }
+    return self;
+}
+
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates resumableCompletionBlock:(void (^)(SUInstallUpdateStatus))block
+{
+    self = [self initWithAppcastItem:item host:aHost versionDisplayer:aVersionDisplayer allowsAutomaticUpdates:allowsAutomaticUpdates];
+    if (self != nil)
+    {
+        _resumableCompletionBlock = [block copy];
     }
     return self;
 }
@@ -103,8 +120,23 @@
     [self.releaseNotesView setPolicyDelegate:nil];
     [self.releaseNotesView removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
     [self close];
-    self.completionBlock(choice);
-    self.completionBlock = nil;
+    
+    if (self.completionBlock != nil) {
+        self.completionBlock(choice);
+        self.completionBlock = nil;
+    } else if (self.resumableCompletionBlock != nil) {
+        switch (choice) {
+            case SUInstallUpdateChoice:
+                self.resumableCompletionBlock(SUInstallAndRelaunchUpdateNow);
+                break;
+            case SUInstallLaterChoice:
+                self.resumableCompletionBlock(SUDismissUpdateInstallation);
+                break;
+            case SUSkipThisVersionChoice:
+                abort();
+        }
+        self.resumableCompletionBlock = nil;
+    }
 }
 
 - (IBAction)installUpdate:(id)__unused sender
@@ -228,7 +260,8 @@
         [self.automaticallyInstallUpdatesButton removeFromSuperview];
     }
     
-    if (self.alreadyDownloaded) {
+    BOOL alreadyDownloaded = (self.resumableCompletionBlock != nil);
+    if (alreadyDownloaded) {
         // Should we hide the button or disable the button if the update has already been downloaded?
         // Personally I think it looks better when the button is visible on the window...
         // Anyway an already downloaded update can't be skipped
@@ -278,6 +311,8 @@
     } else {
         [self.versionDisplayer formatVersion:&updateItemVersion andVersion:&hostVersion];
     }
+    
+    BOOL alreadyDownloaded = (self.resumableCompletionBlock != nil);
 
     // We display a different summary depending on if it's an "info-only" item, or a "critical update" item, or if we've already downloaded the update and just need to relaunch
     NSString *finalString = nil;
@@ -285,13 +320,13 @@
     if (self.updateItem.isInformationOnlyUpdate) {
         finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?", @"Description text for SUUpdateAlert when the update informational with no download."), self.host.name, updateItemVersion, hostVersion];
     } else if ([self.updateItem isCriticalUpdate]) {
-        if (!self.alreadyDownloaded) {
+        if (!alreadyDownloaded) {
             finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. This is an important update; would you like to download it now?", @"Description text for SUUpdateAlert when the critical update is downloadable."), self.host.name, updateItemVersion, hostVersion];
         } else {
             finalString = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?", @"Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install."), self.host.name, updateItemVersion];
         }
     } else {
-        if (!self.alreadyDownloaded) {
+        if (!alreadyDownloaded) {
             finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", @"Description text for SUUpdateAlert when the update is downloadable."), self.host.name, updateItemVersion, hostVersion];
         } else {
             finalString = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?", @"Description text for SUUpdateAlert when the update has already been downloaded and ready to install."), self.host.name, updateItemVersion];
