@@ -25,11 +25,8 @@ void SULog(NSString *format, ...)
     dispatch_once(&onceToken, ^{
         NSBundle *mainBundle = [NSBundle mainBundle];
         NSString *displayName = [[NSFileManager defaultManager] displayNameAtPath:mainBundle.bundlePath];
-#ifdef DEBUG
+#warning Can there be a better approach than always outputting to stderr?
         uint32_t options = ASL_OPT_NO_DELAY | ASL_OPT_STDERR;
-#else
-        uint32_t options = ASL_OPT_NO_DELAY;
-#endif
         client = asl_open([displayName stringByAppendingString:@" [Sparkle]"].UTF8String, mainBundle.bundleIdentifier.UTF8String, options);
         queue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
     });
