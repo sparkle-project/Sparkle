@@ -179,14 +179,14 @@
     }];
 }
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)__unused allowsAutomaticUpdates reply:(void (^)(SUUpdateAlertChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self showUpdateWithAppcastItem:appcastItem alreadyDownloaded:NO reply:reply];
     });
 }
 
-- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)__unused allowsAutomaticUpdates reply:(void (^)(SUInstallUpdateStatus))reply
+- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUInstallUpdateStatus))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self showUpdateWithAppcastItem:appcastItem alreadyDownloaded:YES reply:^(SUUpdateAlertChoice choice) {

@@ -117,9 +117,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update
  *
- * @param allowsAutomaticUpdates Indicates whether the user is allowed to use automatic updates.
- * A user interface may use this to give the user an option to enable automatic updates.
- *
  * @param reply
  * A reply of SUInstallUpdateChoice begins downloading and installing the new update.
  *
@@ -130,7 +127,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * This can be called from any thread
  */
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates reply:(void (^)(SUUpdateAlertChoice))reply;
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply;
 
 /*!
  * Show the user a downloaded update can be resumed and installed immediately
@@ -139,9 +136,6 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update
  *
- * @param allowsAutomaticUpdates Indicates whether the user is allowed to use automatic updates.
- * A user interface may use this to give the user an option to enable automatic updates.
- *
  * @param reply A reply of SUInstallAndRelaunchUpdateNow installs the update immediately and relaunches the new update.
  * A reply of SUInstallUpdateNow installes the update immediately but does not relaunch the new update.
  * A reply of SUDismissUpdateInstallation dismisses the update installation. Note the update may still be installed after
@@ -149,7 +143,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * This can be called from any thread
  */
-- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates reply:(void (^)(SUInstallUpdateStatus))reply;
+- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUInstallUpdateStatus))reply;
 
 /*!
  * Show the user the release notes for the new update

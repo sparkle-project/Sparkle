@@ -52,6 +52,13 @@
         return SUDefaultUpdateCheckInterval;
 }
 
+// For allowing automatic downloaded updates to be turned on or off
+- (BOOL)allowsAutomaticUpdates
+{
+    NSNumber *developerAllowsAutomaticUpdates = [self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
+    return (developerAllowsAutomaticUpdates == nil || developerAllowsAutomaticUpdates.boolValue);
+}
+
 - (BOOL)automaticallyDownloadsUpdates
 {
     return [self.host boolForUserDefaultsKey:SUAutomaticallyUpdateKey];

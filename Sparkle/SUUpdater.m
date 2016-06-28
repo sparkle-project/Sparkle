@@ -446,7 +446,6 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
                 updateDriver =
                 [[SUScheduledUpdateDriver alloc]
                  initWithHost:theHost
-                 allowsAutomaticUpdates:[strongSelf allowsAutomaticUpdates]
                  sparkleBundle:strongSelf.sparkleBundle
                  updater:strongSelf
                  userDriver:strongSelf.userDriver
@@ -475,7 +474,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
         return;
     }
     
-    id <SUUpdateDriver> theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithHost:self.host allowsAutomaticUpdates:[self allowsAutomaticUpdates] sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
+    id <SUUpdateDriver> theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithHost:self.host sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
     
     [SUProbeInstallStatus probeInstallerInProgressForHost:self.host completion:^(BOOL installerInProgress) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -616,8 +615,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
 
 - (BOOL)allowsAutomaticUpdates
 {
-    NSNumber *developerAllowsAutomaticUpdates = [self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
-    return (developerAllowsAutomaticUpdates == nil || developerAllowsAutomaticUpdates.boolValue);
+    return [self.updaterSettings allowsAutomaticUpdates];
 }
 
 - (void)setFeedURL:(NSURL *)feedURL

@@ -32,10 +32,15 @@ SU_EXPORT @interface SUUpdaterSettings : NSObject
 @property (readonly, nonatomic) NSTimeInterval updateCheckInterval;
 
 /*!
+ * Indicates whether or not automatically downloading updates is allowed to be turned on by the user.
+ */
+@property (readonly, nonatomic) BOOL allowsAutomaticUpdates;
+
+/*!
  * Indicates whether or not automatically downloading updates is enabled by the user or developer.
  *
  * Note this does not indicate whether or not automatic downloading of updates is allowable.
- * See SUUpdater to retrieve that information.
+ * See `-allowsAutomaticUpdates` property for that.
  */
 @property (readonly, nonatomic) BOOL automaticallyDownloadsUpdates;
 

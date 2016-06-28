@@ -20,6 +20,7 @@
 #import "SULocalizations.h"
 #import "SUAppcastItem.h"
 #import "SUApplicationInfo.h"
+#import "SUUpdaterSettings.h"
 
 // WebKit protocols are not explicitly declared until 10.11 SDK, so
 // declare dummy protocols to keep the build working on earlier SDKs.
@@ -72,14 +73,16 @@
 @synthesize skipButton;
 @synthesize laterButton;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer
 {
     self = [super initWithWindowNibName:@"SUUpdateAlert"];
     if (self != nil) {
         host = aHost;
         updateItem = item;
         versionDisplayer = aVersionDisplayer;
-        _allowsAutomaticUpdates = allowsAutomaticUpdates;
+        
+        SUUpdaterSettings *updaterSettings = [[SUUpdaterSettings alloc] initWithHostBundle:host.bundle];
+        _allowsAutomaticUpdates = updaterSettings.allowsAutomaticUpdates;
         [self setShouldCascadeWindows:NO];
         
         // Alex: This dummy line makes sure that the binary is linked against WebKit.
@@ -90,9 +93,9 @@
     return self;
 }
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates completionBlock:(void (^)(SUUpdateAlertChoice))block
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SUUpdateAlertChoice))block
 {
-    self = [self initWithAppcastItem:item host:aHost versionDisplayer:aVersionDisplayer allowsAutomaticUpdates:allowsAutomaticUpdates];
+    self = [self initWithAppcastItem:item host:aHost versionDisplayer:aVersionDisplayer];
 	if (self != nil)
 	{
         _completionBlock = [block copy];
@@ -100,9 +103,9 @@
     return self;
 }
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer allowsAutomaticUpdates:(BOOL)allowsAutomaticUpdates resumableCompletionBlock:(void (^)(SUInstallUpdateStatus))block
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer resumableCompletionBlock:(void (^)(SUInstallUpdateStatus))block
 {
-    self = [self initWithAppcastItem:item host:aHost versionDisplayer:aVersionDisplayer allowsAutomaticUpdates:allowsAutomaticUpdates];
+    self = [self initWithAppcastItem:item host:aHost versionDisplayer:aVersionDisplayer];
     if (self != nil)
     {
         _resumableCompletionBlock = [block copy];
