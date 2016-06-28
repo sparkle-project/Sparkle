@@ -8,14 +8,26 @@
 
 #include "SULog.h"
 #include <asl.h>
+#include "SUExport.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" implementation and should NOT import AppKit
 #endif
 
+void _SULogDisableStandardErrorStream(void);
+static BOOL gDisableStandardErrorStream;
+
 // For converting constants to string literals using the preprocessor
 #define STRINGIFY(x) #x
 #define TO_STRING(x) STRINGIFY(x)
+
+// Private API for disable logging to standard error stream
+// We don't want to do this normally unless eg: releasing a command line utility,
+// because it may be useful for error output to show up in an immediately visible terminal/panel
+SU_EXPORT void _SULogDisableStandardErrorStream(void)
+{
+    gDisableStandardErrorStream = YES;
+}
 
 void SULog(NSString *format, ...)
 {
@@ -25,8 +37,11 @@ void SULog(NSString *format, ...)
     dispatch_once(&onceToken, ^{
         NSBundle *mainBundle = [NSBundle mainBundle];
         NSString *displayName = [[NSFileManager defaultManager] displayNameAtPath:mainBundle.bundlePath];
-#warning Can there be a better approach than always outputting to stderr?
-        uint32_t options = ASL_OPT_NO_DELAY | ASL_OPT_STDERR;
+        
+        uint32_t options = ASL_OPT_NO_DELAY;
+        if (!gDisableStandardErrorStream) {
+            options |= ASL_OPT_STDERR;
+        }
         client = asl_open([displayName stringByAppendingString:@" [Sparkle]"].UTF8String, mainBundle.bundleIdentifier.UTF8String, options);
         queue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
     });

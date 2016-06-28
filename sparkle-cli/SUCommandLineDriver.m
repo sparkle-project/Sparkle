@@ -10,6 +10,8 @@
 #import <Sparkle/Sparkle.h>
 #import "SUCommandLineUserDriver.h"
 
+void _SULogDisableStandardErrorStream(void);
+
 @interface SUCommandLineDriver () <SUUpdaterDelegate>
 
 @property (nonatomic, readonly) SUUpdater *updater;
@@ -51,6 +53,10 @@
         _interactive = interactiveInstallation;
         
         _applicationBundlePath = applicationBundle.bundlePath;
+        
+#ifndef DEBUG
+        _SULogDisableStandardErrorStream();
+#endif
         
         id <SUUserDriver> userDriver = [[SUCommandLineUserDriver alloc] initWithApplicationBundle:applicationBundle updatePermission:updatePermission deferInstallation:deferInstallation verbose:verbose];
         _updater = [[SUUpdater alloc] initWithHostBundle:updateBundle userDriver:userDriver delegate:self];
