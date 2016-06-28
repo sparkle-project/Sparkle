@@ -49,7 +49,7 @@
     
     if (self.appcastItem.releaseNotesURL == nil) {
         NSString *descriptionHTML = self.appcastItem.itemDescription;
-        if (descriptionHTML == nil) {
+        if (descriptionHTML != nil) {
             NSData *htmlData = [descriptionHTML dataUsingEncoding:NSUTF8StringEncoding];
             NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:htmlData documentAttributes:NULL];
             [self.textView.textStorage setAttributedString:attributedString];
