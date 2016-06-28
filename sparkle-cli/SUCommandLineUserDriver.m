@@ -127,20 +127,33 @@
     fprintf(stderr, "%s\n", attributedString.string.UTF8String);
 }
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)__unused allowsAutomaticUpdates alreadyDownloaded:(BOOL)__unused alreadyDownloaded reply:(void (^)(SUUpdateAlertChoice))reply
+- (void)showUpdateWithAppcastItem:(SUAppcastItem *)appcastItem updateAdjective:(NSString *)updateAdjective
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.verbose) {
-            fprintf(stderr, "Found new update! (%s)\n", appcastItem.displayVersionString.UTF8String);
-            
-            if (appcastItem.itemDescription != nil) {
-                NSData *descriptionData = [appcastItem.itemDescription dataUsingEncoding:NSUTF8StringEncoding];
-                if (descriptionData != nil) {
-                    [self displayReleaseNotes:descriptionData];
-                }
+    if (self.verbose) {
+        fprintf(stderr, "Found %s update! (%s)\n", updateAdjective.UTF8String, appcastItem.displayVersionString.UTF8String);
+        
+        if (appcastItem.itemDescription != nil) {
+            NSData *descriptionData = [appcastItem.itemDescription dataUsingEncoding:NSUTF8StringEncoding];
+            if (descriptionData != nil) {
+                [self displayReleaseNotes:descriptionData];
             }
         }
+    }
+}
+
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)__unused allowsAutomaticUpdates reply:(void (^)(SUUpdateAlertChoice))reply
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self showUpdateWithAppcastItem:appcastItem updateAdjective:@"new"];
         reply(SUInstallUpdateChoice);
+    });
+}
+
+- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)__unused allowsAutomaticUpdates reply:(void (^)(SUInstallUpdateStatus))reply
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self showUpdateWithAppcastItem:appcastItem updateAdjective:@"resumable"];
+        reply(SUInstallAndRelaunchUpdateNow);
     });
 }
 
