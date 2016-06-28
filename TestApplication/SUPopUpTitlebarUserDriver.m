@@ -179,10 +179,28 @@
     }];
 }
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)__unused allowsAutomaticUpdates alreadyDownloaded:(BOOL)alreadyDownloaded reply:(void (^)(SUUpdateAlertChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)__unused allowsAutomaticUpdates reply:(void (^)(SUUpdateAlertChoice))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self showUpdateWithAppcastItem:appcastItem alreadyDownloaded:alreadyDownloaded reply:reply];
+        [self showUpdateWithAppcastItem:appcastItem alreadyDownloaded:NO reply:reply];
+    });
+}
+
+- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem allowsAutomaticUpdates:(BOOL)__unused allowsAutomaticUpdates reply:(void (^)(SUInstallUpdateStatus))reply
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self showUpdateWithAppcastItem:appcastItem alreadyDownloaded:YES reply:^(SUUpdateAlertChoice choice) {
+            switch (choice) {
+                case SUInstallUpdateChoice:
+                    reply(SUInstallAndRelaunchUpdateNow);
+                    break;
+                case SUInstallLaterChoice:
+                    reply(SUDismissUpdateInstallation);
+                    break;
+                case SUSkipThisVersionChoice:
+                    abort();
+            }
+        }];
     });
 }
 
