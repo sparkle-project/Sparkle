@@ -49,6 +49,11 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
 
 - (BOOL)performSecondStageAllowingAuthorization:(BOOL)__unused allowsAuthorization fileOperationToolPath:(NSString *)__unused fileOperationToolPath environment:(SUAuthorizationEnvironment * _Nullable)__unused authorizationEnvironment allowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
 {
+    if (!allowsUI) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: @"Package installer cannot continue if showing UI is not allowed." }];
+        }
+    }
     return allowsUI;
 }
 
@@ -67,6 +72,10 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
     }
     @catch (NSException *exception) {
         SULog(@"Error: Failed to launch package installer: %@", exception);
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: @"Package installer failed to launch." }];
+        }
+        return NO;
     }
     
     return YES;
