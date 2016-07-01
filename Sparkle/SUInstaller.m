@@ -112,7 +112,7 @@
     return newAppDownloadPath;
 }
 
-+ (nullable id<SUInstallerProtocol>)installerForHost:(SUHost *)host updateDirectory:(NSString *)updateDirectory versionComparator:(id <SUVersionComparison>)comparator error:(NSError * __autoreleasing *)error
++ (nullable id<SUInstallerProtocol>)installerForHost:(SUHost *)host updateDirectory:(NSString *)updateDirectory inheritsPrivileges:(BOOL)inheritsPrivileges versionComparator:(id <SUVersionComparison>)comparator error:(NSError * __autoreleasing *)error
 {
     BOOL isPackage = NO;
     BOOL isGuided = NO;
@@ -125,8 +125,10 @@
         return nil;
     }
     
+    // If the installer inherits privileges, it could be running as root
+    // If it's running as root, using a non-guided package installer does not work properly so avoid it at all costs
     id <SUInstallerProtocol> installer = nil;
-    if (isPackage && isGuided) {
+    if (isPackage && (isGuided || inheritsPrivileges)) {
         installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath];
     } else if (isPackage) {
         installer = [[SUPackageInstaller alloc] initWithPackagePath:newDownloadPath];

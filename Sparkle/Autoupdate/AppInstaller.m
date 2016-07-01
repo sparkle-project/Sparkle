@@ -417,7 +417,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     dispatch_async(self.installerQueue, ^{
         NSError *installerError = nil;
-        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self.host updateDirectory:self.installationData.updateDirectoryPath versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
+        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self.host updateDirectory:self.installationData.updateDirectoryPath inheritsPrivileges:self.inheritsPrivileges versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
         
         if (installer == nil) {
             SULog(@"Error: Failed to create installer instance with error: %@", installerError);
