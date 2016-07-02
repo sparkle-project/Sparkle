@@ -130,7 +130,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     (AuthorizationFlags)(kAuthorizationFlagDefaults | kAuthorizationFlagInteractionAllowed | kAuthorizationFlagExtendRights | kAuthorizationFlagPreAuthorize);
     
     // This will test if we can gain authorization for running utlities as root
-    OSStatus copyStatus = AuthorizationCopyRights(_auth, &rights, kAuthorizationEmptyEnvironment, flags, NULL);
+    OSStatus copyStatus = AuthorizationCopyRights(_auth, &rights, (_environment != nil ? _environment.environment : kAuthorizationEmptyEnvironment), flags, NULL);
     if (copyStatus != errAuthorizationSuccess) {
         if (error != NULL) {
             if (copyStatus == errAuthorizationCanceled) {
