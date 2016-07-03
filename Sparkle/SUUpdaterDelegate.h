@@ -213,7 +213,9 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  
  This method allows you to provide a custom version comparator.
  If you don't implement this method or return \c nil,
- the standard version comparator will be used.
+ the standard version comparator will be used. Note that the
+ standard version comparator may be used during installation for preventing
+ a downgrade, even if you provide a custom comparator here.
  
  \sa SUStandardVersionComparator
  
@@ -228,7 +230,9 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (id)versionDisplayerForUpdater:(SUUpdater *)updater __deprecated;
 
 /*!
- Returns the path which is used to relaunch the client after the update is installed.
+ Returns the path to the application which is used to relaunch after the update is installed.
+ 
+ The installer also waits for the termination of the application at this path.
  
  The default is the path of the host bundle.
  
@@ -266,7 +270,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  
  \param updater The SUUpdater instance.
  
- @deprecated See SUStandardUserUpdaterDriver delegate instead
+ @deprecated See SUStandardUserUpdaterDriver delegate instead. This method is no longer invoked.
  */
 - (void)updaterWillShowModalAlert:(SUUpdater *)updater __deprecated;
 
@@ -276,7 +280,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  
  \param updater The SUUpdater instance.
  
- @deprecated See SUStandardUserUpdaterDriver delegate instead
+ @deprecated See SUStandardUserUpdaterDriver delegate instead. This method is no longer invoked.
  */
 - (void)updaterDidShowModalAlert:(SUUpdater *)updater __deprecated;
 
@@ -294,6 +298,8 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  
  \param updater The SUUpdater instance.
  \param item The appcast item corresponding to the update that was proposed to be installed.
+ 
+  \deprecated This method is no longer invoked. The installer will try to its best ability to install the update.
  */
 - (void)updater:(SUUpdater *)updater didCancelInstallUpdateOnQuit:(SUAppcastItem *)item __deprecated;
 
