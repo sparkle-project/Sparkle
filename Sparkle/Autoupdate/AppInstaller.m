@@ -375,7 +375,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             // Allow handling if we should relaunch at any time
             self.shouldRelaunch = (BOOL)relaunch;
             
-#warning todo: handle this message even if we aren't ready for stage 2 yet.
             // We should try re-creating the remote port if necessary, in case the client has
             // restarted since and wants a reply back when we say it's OK to terminate the app
             [self startRemotePortWithCompletion:^(BOOL success) {
