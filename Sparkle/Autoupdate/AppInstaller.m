@@ -85,16 +85,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize performedStage2Installation = _performedStage2Installation;
 @synthesize performedStage3Installation = _performedStage3Installation;
 
-/*
- * hostPath - path to host (original) application
- * relaunchPath - path to what the host wants to relaunch (default is same as hostPath)
- * hostProcessIdentifier - process identifier of the host before launching us
- * updateFolderPath - path to update folder (i.e, temporary directory containing the new update archive)
- * downloadPath - path to new downloaded update archive
- * shouldRelaunch - indicates if the new installed app should re-launched
- * shouldShowUI - indicates if we should show the status window when installing the update
- */
-
 - (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier inheritsPrivileges:(BOOL)inheritsPrivileges
 {
     if (!(self = [super init])) {
