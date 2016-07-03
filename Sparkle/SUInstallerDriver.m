@@ -353,9 +353,6 @@
                 hasTargetTerminated = (BOOL)*((const uint8_t *)data.bytes + 1);
             }
             
-            [self.remotePort invalidate];
-            self.remotePort = nil;
-            
             [self.delegate installerWillFinishInstallationAndRelaunch:self.willRelaunch];
             
             if (!hasTargetTerminated) {
@@ -364,6 +361,9 @@
         }
     } else if (identifier == SUInstallationFinishedStage3) {
         self.currentStage = identifier;
+        
+        [self.remotePort invalidate];
+        self.remotePort = nil;
         
         [self.localPort invalidate];
         self.localPort = nil;
