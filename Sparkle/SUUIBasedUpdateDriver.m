@@ -98,7 +98,7 @@
         [self.userDriver showResumableUpdateFoundWithAppcastItem:updateItem reply:^(SUInstallUpdateStatus choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
-                [self.coreDriver finishInstallationWithResponse:choice];
+                [self.coreDriver finishInstallationWithResponse:choice displayingUserInterface:YES];
             });
         }];
     }
@@ -167,7 +167,7 @@
     if (!willInstallImmediately) {
         [self.userDriver showReadyToInstallAndRelaunch:^(SUInstallUpdateStatus installUpdateStatus) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.coreDriver finishInstallationWithResponse:installUpdateStatus];
+                [self.coreDriver finishInstallationWithResponse:installUpdateStatus displayingUserInterface:YES];
             });
         }];
     }

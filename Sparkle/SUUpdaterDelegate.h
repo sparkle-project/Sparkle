@@ -290,8 +290,36 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  \param updater The SUUpdater instance.
  \param item The appcast item corresponding to the update that is proposed to be installed.
  \param invocation Can be used to trigger an immediate silent install and relaunch.
+ 
+ \deprecated See -updater:willInstallUpdateOnQuit:immediateInstallationBlock: and -updaterIsRequestingQuit: instead. This method is no longer invoked.
  */
-- (void)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationInvocation:(NSInvocation *)invocation;
+- (void)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationInvocation:(NSInvocation *)invocation __deprecated;
+
+/*!
+ Called when an update is scheduled to be silently installed on quit after downloading the update automatically.
+ 
+ \param updater The SUUpdater instance.
+ \param item The appcast item corresponding to the update that is proposed to be installed.
+ \param immediateInstallHandler The install handler to immediately install the update.
+ If you plan to invoke this, you must return YES from this method and also implement -updaterIsRequestingQuit:
+ \return Return YES if the delegate will handle installing the update or NO if the updater should be given responsibility.
+ 
+ If the updater is given responsibility, it can later remind the user an update is available if they have not terminated the application for a long time.
+ Also if the updater is given responsibility and the update item is marked critical, the new update will be presented to the user immediately after.
+ Even if the immediateInstallHandler is not invoked, the installer will attempt to install the update on termination.
+ */
+- (BOOL)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationBlock:(void (^)(void))immediateInstallHandler;
+
+/*!
+ Called when the updater requests to quit the application after the delegate invoked its installation block from -updater:willInstallUpdateOnQuit:immediateInstallationBlock:
+ 
+ \param updater the SUUpdater instance.
+ 
+ The delegate should terminate the application so the installer can immediately install the update.
+ After the application is terminated, the installer will install the update and the application will be relaunched.
+ The installer will not show any UI interaction.
+ */
+- (void)updaterIsRequestingQuit:(SUUpdater *)updater;
 
 /*!
  Calls after an update that was scheduled to be silently installed on quit has been canceled.

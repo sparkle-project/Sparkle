@@ -20,22 +20,28 @@
 
 @interface SUAutomaticUpdateDriver () <SUCoreBasedUpdateDriverDelegate>
 
+@property (nonatomic, readonly, weak) id updater;
+@property (nonatomic, readonly, weak, nullable) id updaterDelegate;
 @property (nonatomic, readonly) SUCoreBasedUpdateDriver *coreDriver;
-@property (nonatomic) BOOL foundCriticalUpdate;
+@property (nonatomic) SUAppcastItem* updateItem;
 @property (nonatomic) BOOL willInstallSilently;
 
 @end
 
 @implementation SUAutomaticUpdateDriver
 
+@synthesize updater = _updater;
+@synthesize updaterDelegate = _updaterDelegate;
 @synthesize coreDriver = _coreDriver;
-@synthesize foundCriticalUpdate = _foundCriticalUpdate;
+@synthesize updateItem = _updateItem;
 @synthesize willInstallSilently = _willInstallSilently;
 
 - (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate
 {
     self = [super init];
     if (self != nil) {
+        _updater = updater;
+        _updaterDelegate = updaterDelegate;
         _coreDriver = [[SUCoreBasedUpdateDriver alloc] initWithHost:host sparkleBundle:sparkleBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
     }
     return self;
@@ -55,7 +61,7 @@
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
 {
-    self.foundCriticalUpdate = [updateItem isCriticalUpdate];
+    self.updateItem = updateItem;
     
     [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
 }
@@ -65,15 +71,37 @@
     self.willInstallSilently = willInstallSilently;
     
     if (!willInstallImmediately) {
-        // We are done and can safely abort now
-        // The installer tool will keep the installation alive
-        [self abortUpdate];
+        BOOL installationHandledByDelegate = NO;
+        id<SUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
+        if (self.willInstallSilently && [updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationBlock:)]) {
+            __weak SUAutomaticUpdateDriver *weakSelf = self;
+            installationHandledByDelegate =
+            [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationBlock:^{
+                [weakSelf.coreDriver finishInstallationWithResponse:SUInstallAndRelaunchUpdateNow displayingUserInterface:NO];
+            }];
+        }
+        
+        if (!installationHandledByDelegate) {
+            // We are done and can safely abort now
+            // The installer tool will keep the installation alive
+            [self abortUpdate];
+        }
+    }
+}
+
+// This can only be reached if the updater delegate invokes its immediate installation block above,
+// otherwise the update driver will abort the update before then
+- (void)installerIsRequestingAppTermination
+{
+    id<SUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
+    if ([updaterDelegate respondsToSelector:@selector(updaterIsRequestingQuit:)]) {
+        [updaterDelegate updaterIsRequestingQuit:self.updater];
     }
 }
 
 - (BOOL)basicDriverShouldSignalShowingUpdateImmediately
 {
-    return (!self.willInstallSilently || self.foundCriticalUpdate);
+    return (!self.willInstallSilently || self.updateItem.isCriticalUpdate);
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(NSError *)error

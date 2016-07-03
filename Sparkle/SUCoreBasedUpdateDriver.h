@@ -59,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem;
 
-- (void)finishInstallationWithResponse:(SUInstallUpdateStatus)installUpdateStatus;
+- (void)finishInstallationWithResponse:(SUInstallUpdateStatus)installUpdateStatus displayingUserInterface:(BOOL)displayingUserInterface;
 
 - (void)abortUpdateWithError:(nullable NSError *)error;
 

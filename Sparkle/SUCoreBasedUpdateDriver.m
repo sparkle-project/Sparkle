@@ -183,17 +183,17 @@
     [self.delegate installerDidFinishPreparationAndWillInstallImmediately:willInstallImmediately silently:willInstallSilently];
 }
 
-- (void)finishInstallationWithResponse:(SUInstallUpdateStatus)installUpdateStatus
+- (void)finishInstallationWithResponse:(SUInstallUpdateStatus)installUpdateStatus displayingUserInterface:(BOOL)displayingUserInterface
 {
     switch (installUpdateStatus) {
         case SUDismissUpdateInstallation:
             [self.delegate coreDriverIsRequestingAbortUpdateWithError:nil];
             break;
         case SUInstallUpdateNow:
-            [self.installerDriver installWithToolAndRelaunch:NO displayingUserInterface:YES];
+            [self.installerDriver installWithToolAndRelaunch:NO displayingUserInterface:displayingUserInterface];
             break;
         case SUInstallAndRelaunchUpdateNow:
-            [self.installerDriver installWithToolAndRelaunch:YES displayingUserInterface:YES];
+            [self.installerDriver installWithToolAndRelaunch:YES displayingUserInterface:displayingUserInterface];
             break;
     }
 }
