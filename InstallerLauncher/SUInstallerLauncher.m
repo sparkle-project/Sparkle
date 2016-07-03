@@ -29,6 +29,7 @@
         if (!inheritingPrivileges) {
             // This new process does not inherit privileges because it's being launched via LaunchServices
             // This allows the installer app to make authorization requests for example from a non-sandboxed XPC service
+            // From testing I have found this is necessary if the entirety of Sparkle's framework is inside a XPC service
             NSError *launchError = nil;
             NSRunningApplication *runningApplication = [[NSWorkspace sharedWorkspace] launchApplicationAtURL:[NSURL fileURLWithPath:installerPath] options:(NSWorkspaceLaunchOptions)(NSWorkspaceLaunchDefault | NSWorkspaceLaunchNewInstance) configuration:@{NSWorkspaceLaunchConfigurationArguments : arguments} error:&launchError];
             
