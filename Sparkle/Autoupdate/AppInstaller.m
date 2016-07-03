@@ -163,7 +163,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
  * Likewise, a change of Apple Code Signing identities is allowed if the DSA public keys match and the update is valid.
  *
  */
-#warning - This might be better part of SUInstaller protocol since validation between app & packages differ
 - (BOOL)validateUpdateForHost:(SUHost *)host downloadedToPath:(NSString *)downloadedPath extractedToPath:(NSString *)extractedPath DSASignature:(NSString *)DSASignature
 {
     BOOL isPackage = NO;
