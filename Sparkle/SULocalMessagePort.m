@@ -61,7 +61,10 @@ static NSString *SULocalServiceLookupReason = @"Local Service Connection";
 {
     assert(self.messagePort == NULL);
     
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcast-qual"
     CFMessagePortContext context = {.version = 0, .info = (void *)CFBridgingRetain(self), .retain = NULL, .release = NULL, .copyDescription = NULL};
+#pragma clang diagnostic pop
     CFMessagePortRef messagePort = CFMessagePortCreateLocal(kCFAllocatorDefault, (CFStringRef)serviceName, messagePortCallback, &context, NULL);
     
     if (messagePort == NULL) {
