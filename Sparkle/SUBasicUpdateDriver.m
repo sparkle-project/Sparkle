@@ -319,8 +319,9 @@
     
     BOOL dsaKeysMatch = (publicDSAKey == nil || newPublicDSAKey == nil) ? NO : [publicDSAKey isEqualToString:newPublicDSAKey];
     
-    // This check is not a security measure, because the new key is not trusted.
-    // The check ensures that the app author has correctly used DSA keys, so that the app will be updateable in the next version
+    // If the new DSA key differs from the old, then this check is not a security measure, because the new key is not trusted.
+    // In that case, the check ensures that the app author has correctly used DSA keys, so that the app will be updateable in the next version.
+    // However if the new and old DSA keys are the same, then this is a security measure.
     if (newPublicDSAKey != nil) {
         if (![SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:newPublicDSAKey]) {
             SULog(@"DSA signature validation failed. The update has a public DSA key and is signed with a DSA key, but the %@ doesn't match the signature. The update will be rejected.",
