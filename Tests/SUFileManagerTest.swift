@@ -260,6 +260,54 @@ class SUFileManagerTest: XCTestCase
         }
     }
     
+    func testUpdateFileAccessTime()
+    {
+        let accessTime: (NSURL -> timespec?) = { url in
+            var outputStat = stat()
+            let path = url.path!
+            let result = lstat(path, &outputStat)
+            if result != 0 {
+                return nil
+            } else {
+                return outputStat.st_atimespec
+            }
+        }
+        
+        let timespecEqual: (timespec, timespec) -> Bool = {t1, t2 in
+            (t1.tv_sec == t2.tv_sec && t1.tv_nsec == t2.tv_nsec)
+        }
+        
+        makeTempFiles() { fileManager, rootURL, ordinaryFileURL, directoryURL, fileInDirectoryURL, validSymlinkURL, invalidSymlinkURL in
+            XCTAssertNil(try? fileManager.updateAccessTimeOfItemsRecursivelyAtURL(rootURL.URLByAppendingPathComponent("does not exist")))
+            
+            let oldOrdinaryFileTime = accessTime(ordinaryFileURL)!
+            let oldDirectoryTime = accessTime(directoryURL)!
+            let oldValidSymlinkTime = accessTime(validSymlinkURL)!
+            
+            sleep(1); // wait for clock to advance
+            
+            // Make sure access time haven't changed since; lstat() shouldn't have changed the access time..
+            XCTAssertTrue(timespecEqual(oldOrdinaryFileTime, accessTime(ordinaryFileURL)!))
+            XCTAssertTrue(timespecEqual(oldDirectoryTime, accessTime(directoryURL)!))
+            XCTAssertTrue(timespecEqual(oldValidSymlinkTime, accessTime(validSymlinkURL)!))
+            
+            // Test the symlink and make sure the target directory doesn't change
+            try! fileManager.updateAccessTimeOfItemsRecursivelyAtURL(validSymlinkURL)
+            XCTAssertFalse(timespecEqual(oldValidSymlinkTime, accessTime(validSymlinkURL)!))
+            XCTAssertTrue(timespecEqual(oldDirectoryTime, accessTime(directoryURL)!))
+            
+            // Test an ordinary file
+            try! fileManager.updateAccessTimeOfItemsRecursivelyAtURL(ordinaryFileURL)
+            XCTAssertFalse(timespecEqual(oldOrdinaryFileTime, accessTime(ordinaryFileURL)!))
+            
+            // Test the directory and file inside the directory
+            try! fileManager.updateAccessTimeOfItemsRecursivelyAtURL(directoryURL)
+            let newDirectoryTime = accessTime(directoryURL)!
+            XCTAssertFalse(timespecEqual(oldDirectoryTime, newDirectoryTime))
+            XCTAssertTrue(timespecEqual(newDirectoryTime, accessTime(fileInDirectoryURL)!))
+        }
+    }
+    
     func testFileExists()
     {
         makeTempFiles() { fileManager, rootURL, ordinaryFileURL, directoryURL, fileInDirectoryURL, validSymlinkURL, invalidSymlinkURL in
