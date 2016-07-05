@@ -2,6 +2,13 @@
 set -e
 
 if [ "$ACTION" = "" ] ; then
+    # Sanity check that the Podspec version matches the Sparkle version
+    spec_version=$(printf "require 'cocoapods'\nspec = %s\nprint spec.version" "$(cat "$SRCROOT/Sparkle.podspec")" | LANG=en_US.UTF-8 ruby)
+    if [ "$spec_version" != "$CURRENT_PROJECT_VERSION" ] ; then
+        echo "podspec version '$spec_version' does not match the current project version '$CURRENT_PROJECT_VERSION'" >&2
+        exit 1
+    fi
+
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
     rm -f "Sparkle-$CURRENT_PROJECT_VERSION.tar.bz2"
 
