@@ -47,6 +47,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)fileManagerByPreservingAuthorizationRights;
 
+/**
+ * Requests and grants authorization for performing authorized operations.
+ *
+ * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL. An error code of SUInstallationCancelledError is returned if an authorization prompt occurs and the user decides to cancel the request.
+ * @return YES on success otherwise returns NO
+ *
+ * This will prompt the user for an authorization dialog if the user's permission is needed to perform authorized operations.
+ * If the process is running as root already, no authorization prompt is made.
+ */
 - (BOOL)grantAuthorizationPrivilegesWithError:(NSError * __autoreleasing *)error;
 
 /**
