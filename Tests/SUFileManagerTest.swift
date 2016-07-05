@@ -278,7 +278,7 @@ class SUFileManagerTest: XCTestCase
         }
         
         makeTempFiles() { fileManager, rootURL, ordinaryFileURL, directoryURL, fileInDirectoryURL, validSymlinkURL, invalidSymlinkURL in
-            XCTAssertNil(try? fileManager.updateAccessTimeOfItemsRecursivelyAtURL(rootURL.URLByAppendingPathComponent("does not exist")))
+            XCTAssertNil(try? fileManager.updateAccessTimeOfItemAtRootURL(rootURL.URLByAppendingPathComponent("does not exist")))
             
             let oldOrdinaryFileTime = accessTime(ordinaryFileURL)!
             let oldDirectoryTime = accessTime(directoryURL)!
@@ -292,16 +292,16 @@ class SUFileManagerTest: XCTestCase
             XCTAssertTrue(timespecEqual(oldValidSymlinkTime, accessTime(validSymlinkURL)!))
             
             // Test the symlink and make sure the target directory doesn't change
-            try! fileManager.updateAccessTimeOfItemsRecursivelyAtURL(validSymlinkURL)
+            try! fileManager.updateAccessTimeOfItemAtRootURL(validSymlinkURL)
             XCTAssertFalse(timespecEqual(oldValidSymlinkTime, accessTime(validSymlinkURL)!))
             XCTAssertTrue(timespecEqual(oldDirectoryTime, accessTime(directoryURL)!))
             
             // Test an ordinary file
-            try! fileManager.updateAccessTimeOfItemsRecursivelyAtURL(ordinaryFileURL)
+            try! fileManager.updateAccessTimeOfItemAtRootURL(ordinaryFileURL)
             XCTAssertFalse(timespecEqual(oldOrdinaryFileTime, accessTime(ordinaryFileURL)!))
             
             // Test the directory and file inside the directory
-            try! fileManager.updateAccessTimeOfItemsRecursivelyAtURL(directoryURL)
+            try! fileManager.updateAccessTimeOfItemAtRootURL(directoryURL)
             let newDirectoryTime = accessTime(directoryURL)!
             XCTAssertFalse(timespecEqual(oldDirectoryTime, newDirectoryTime))
             XCTAssertTrue(timespecEqual(newDirectoryTime, accessTime(fileInDirectoryURL)!))

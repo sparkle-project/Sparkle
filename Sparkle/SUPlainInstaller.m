@@ -90,7 +90,7 @@
     // The system periodically cleans up files by looking at the mod & access times, so we have to make sure they're up to date
     // They could be potentially be preserved when archiving an application, but also an update could just be sitting on the system for a long time
     // before being installed
-    if (![fileManager updateAccessTimeOfItemsRecursivelyAtURL:newURL error:error]) {
+    if (![fileManager updateAccessTimeOfItemAtRootURL:newURL error:error]) {
         SULog(@"Failed to recursively update new application's modification time before moving into temporary directory");
         return NO;
     }

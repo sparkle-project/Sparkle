@@ -812,7 +812,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     return YES;
 }
 
-- (BOOL)updateAccessTimeOfItemsRecursivelyAtURL:(NSURL *)targetURL error:(NSError * __autoreleasing *)error
+- (BOOL)updateAccessTimeOfItemAtRootURL:(NSURL *)targetURL error:(NSError * __autoreleasing *)error
 {
     if (![self _itemExistsAtURL:targetURL]) {
         if (error != NULL) {

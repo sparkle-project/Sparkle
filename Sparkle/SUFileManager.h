@@ -147,8 +147,19 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)updateModificationAndAccessTimeOfItemAtURL:(NSURL *)targetURL error:(NSError **)error;
 
-// TODO: document me. Note this does *not* attempt authorization
-- (BOOL)updateAccessTimeOfItemsRecursivelyAtURL:(NSURL *)targetURL error:(NSError * __autoreleasing *)error;
+/**
+ * Updates the access time of an item at a specified root URL to the current time
+ * @param targetURL A URL pointing to the target item whose access time to update to the current time.
+ * This will be applied recursively if the item is a directory. The item at this URL must exist.
+ * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
+ * @return YES if the target item's access times have been updated, otherwise NO along with a populated error object
+ *
+ * This method updates the access time of an item to the current time, ideal for letting the system know not to remove a file or directory when placing it
+ * at a temporary directory.
+ *
+ * This is not an atomic operation. No authorization is performed for this method.
+ */
+- (BOOL)updateAccessTimeOfItemAtRootURL:(NSURL *)targetURL error:(NSError * __autoreleasing *)error;
 
 /**
  * Releases Apple's quarantine extended attribute from the item at the specified root URL
