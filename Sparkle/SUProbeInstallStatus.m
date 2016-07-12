@@ -7,15 +7,18 @@
 //
 
 #import "SUProbeInstallStatus.h"
-#import "SULocalMessagePort.h"
-#import "SURemoteMessagePort.h"
-#import "SUXPCRemoteMessagePort.h"
 #import "SUXPCServiceInfo.h"
-#import "SURemoteMessagePortProtocol.h"
 #import "SUHost.h"
 #import "SUMessageTypes.h"
 #import "SUInstallationInfo.h"
 #import "SUSecureCoding.h"
+#import "SUInstallerStatus.h"
+#import "SUXPCInstallerStatus.h"
+#import "SULog.h"
+
+// This timeout is if probing the installer takes too long
+// It should be at least more than 1 second since a probe can take around that much time
+#define PROBE_TIMEOUT 7
 
 @implementation SUProbeInstallStatus
 
@@ -24,20 +27,45 @@
     NSString *hostBundleIdentifier = host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    id <SURemoteMessagePortProtocol> remotePort = nil;
-    NSString *serviceName = SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier);
-    if (!SUXPCServiceExists(@REMOTE_MESSAGE_PORT_PRODUCT_NAME)) {
-        remotePort = [[SURemoteMessagePort alloc] initWithServiceName:serviceName];
+    id<SUInstallerStatusProtocol> installerStatus = nil;
+    if (!SUXPCServiceExists(@INSTALLER_STATUS_PRODUCT_NAME)) {
+        installerStatus = [[SUInstallerStatus alloc] init];
     } else {
-        remotePort = [[SUXPCRemoteMessagePort alloc] initWithServiceName:serviceName];
+        installerStatus = [[SUXPCInstallerStatus alloc] init];
     }
     
-    [remotePort connectWithLookupCompletion:^(BOOL success) {
-        if (success) {
-            [remotePort invalidate];
-        }
-        completionHandler(success);
+    __block BOOL handledCompletion = NO;
+    
+    [installerStatus setInvalidationHandler:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!handledCompletion) {
+                completionHandler(NO);
+                handledCompletion = YES;
+            }
+        });
     }];
+    
+    NSString *serviceName = SUStatusInfoServiceNameForBundleIdentifier(hostBundleIdentifier);
+    [installerStatus setServiceName:serviceName];
+    
+    [installerStatus probeStatusConnectivityWithReply:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!handledCompletion) {
+                completionHandler(YES);
+                handledCompletion = YES;
+            }
+        });
+        [installerStatus invalidate];
+    }];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(PROBE_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (!handledCompletion) {
+            SULog(@"Timed out while probing installer progress");
+            completionHandler(NO);
+            handledCompletion = YES;
+        }
+        [installerStatus invalidate];
+    });
 }
 
 + (void)probeInstallerUpdateItemForHost:(SUHost *)host completion:(void (^)(SUInstallationInfo  * _Nullable))completionHandler
@@ -45,36 +73,51 @@
     NSString *hostBundleIdentifier = host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    id <SURemoteMessagePortProtocol> remotePort = nil;
-    NSString *serviceName = SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier);
-    if (!SUXPCServiceExists(@REMOTE_MESSAGE_PORT_PRODUCT_NAME)) {
-        remotePort = [[SURemoteMessagePort alloc] initWithServiceName:serviceName];
+    id<SUInstallerStatusProtocol> installerStatus = nil;
+    if (!SUXPCServiceExists(@INSTALLER_STATUS_PRODUCT_NAME)) {
+        installerStatus = [[SUInstallerStatus alloc] init];
     } else {
-        remotePort = [[SUXPCRemoteMessagePort alloc] initWithServiceName:serviceName];
+        installerStatus = [[SUXPCInstallerStatus alloc] init];
     }
     
-    [remotePort connectWithLookupCompletion:^(BOOL lookupSuccess) {
-        if (!lookupSuccess) {
-            completionHandler(nil);
-        } else {
-            [remotePort sendMessageWithIdentifier:SUReceiveUpdateAppcastItemData data:[NSData data] reply:^(BOOL success, NSData * _Nullable replyData) {
-                [remotePort invalidate];
-                
-                if (!success || replyData == nil) {
-                    completionHandler(nil);
-                } else {
-                    NSData *nonNullReplyData = replyData;
-                    SUInstallationInfo *installationInfo = (SUInstallationInfo *)SUUnarchiveRootObjectSecurely(nonNullReplyData, [SUInstallationInfo class]);
-                    
-                    if (installationInfo != nil) {
-                        completionHandler(installationInfo);
-                    } else {
-                        completionHandler(nil);
-                    }
-                }
-            }];
-        }
+    __block BOOL handledCompletion = NO;
+    
+    [installerStatus setInvalidationHandler:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!handledCompletion) {
+                completionHandler(nil);
+                handledCompletion = YES;
+            }
+        });
     }];
+    
+    NSString *serviceName = SUStatusInfoServiceNameForBundleIdentifier(hostBundleIdentifier);
+    [installerStatus setServiceName:serviceName];
+    
+    [installerStatus probeStatusInfoWithReply:^(NSData * _Nullable installationInfoData) {
+        SUInstallationInfo *installationInfo = nil;
+        if (installationInfoData != nil) {
+            installationInfo = (SUInstallationInfo *)SUUnarchiveRootObjectSecurely((NSData * _Nonnull)installationInfoData, [SUInstallationInfo class]);
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!handledCompletion) {
+                completionHandler(installationInfo);
+                handledCompletion = YES;
+            }
+        });
+        
+        [installerStatus invalidate];
+    }];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(PROBE_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (!handledCompletion) {
+            SULog(@"Timed out while probing installer info data");
+            completionHandler(nil);
+            handledCompletion = YES;
+        }
+        [installerStatus invalidate];
+    });
 }
 
 @end

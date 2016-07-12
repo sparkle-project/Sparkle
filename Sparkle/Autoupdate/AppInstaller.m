@@ -8,6 +8,7 @@
 
 #import "AppInstaller.h"
 #import "TerminationListener.h"
+#import "StatusInfo.h"
 #import "SUInstaller.h"
 #import "SULog.h"
 #import "SUHost.h"
@@ -15,8 +16,6 @@
 #import "SUStandardVersionComparator.h"
 #import "SUDSAVerifier.h"
 #import "SUCodeSigningVerifier.h"
-#import "SURemoteMessagePort.h"
-#import "SULocalMessagePort.h"
 #import "SUMessageTypes.h"
 #import "SUSecureCoding.h"
 #import "SUInstallationInputData.h"
@@ -27,6 +26,7 @@
 #import "SUAuthorizationEnvironment.h"
 #import "SUApplicationInfo.h"
 #import "SUErrors.h"
+#import "SUInstallerCommunicationProtocol.h"
 
 /*!
  * Terminate the application after a delay from launching the new update to avoid OS activation issues
@@ -42,19 +42,21 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
  */
 static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
-@interface AppInstaller ()
+@interface AppInstaller () <NSXPCListenerDelegate, SUInstallerCommunicationProtocol>
+
+@property (nonatomic) NSXPCListener* xpcListener;
+@property (nonatomic) NSXPCConnection *activeConnection;
+@property (nonatomic) id<SUInstallerCommunicationProtocol> communicator;
+@property (nonatomic) StatusInfo *statusInfo;
 
 @property (nonatomic, strong) TerminationListener *terminationListener;
 
 @property (nonatomic, readonly, copy) NSString *hostBundleIdentifier;
-@property (nonatomic, readonly) BOOL inheritsPrivileges;
+@property (nonatomic, readonly) BOOL allowsInteraction;
 @property (nonatomic) SUHost *host;
-@property (nonatomic) SULocalMessagePort *localPort;
-@property (nonatomic) SURemoteMessagePort *remotePort;
 @property (nonatomic) SUInstallationInputData *installationData;
 @property (nonatomic, assign) BOOL shouldRelaunch;
 @property (nonatomic, assign) BOOL shouldShowUI;
-@property (nonatomic) NSData *installationInfoData;
 
 @property (nonatomic) id<SUInstallerProtocol> installer;
 @property (nonatomic) BOOL willCompleteInstallation;
@@ -68,16 +70,17 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 @implementation AppInstaller
 
+@synthesize xpcListener = _xpcListener;
+@synthesize activeConnection = _activeConnection;
+@synthesize communicator = _communicator;
+@synthesize statusInfo = _statusInfo;
 @synthesize hostBundleIdentifier = _hostBundleIdentifier;
-@synthesize inheritsPrivileges = _inheritsPrivileges;
+@synthesize allowsInteraction = _allowsInteraction;
 @synthesize terminationListener = _terminationListener;
-@synthesize localPort = _localPort;
-@synthesize remotePort = _remotePort;
 @synthesize host = _host;
 @synthesize installationData = _installationData;
 @synthesize shouldRelaunch = _shouldRelaunch;
 @synthesize shouldShowUI = _shouldShowUI;
-@synthesize installationInfoData = _installationInfoData;
 @synthesize installer = _installer;
 @synthesize willCompleteInstallation = _willCompleteInstallation;
 @synthesize installerQueue = _installerQueue;
@@ -85,7 +88,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize performedStage2Installation = _performedStage2Installation;
 @synthesize performedStage3Installation = _performedStage3Installation;
 
-- (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier inheritsPrivileges:(BOOL)inheritsPrivileges
+- (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier allowingInteraction:(BOOL)allowsInteraction
 {
     if (!(self = [super init])) {
         return nil;
@@ -93,66 +96,63 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     _hostBundleIdentifier = [hostBundleIdentifier copy];
     
-    _inheritsPrivileges = inheritsPrivileges;
+    _allowsInteraction = allowsInteraction;
     
-    self.localPort = [[SULocalMessagePort alloc] init];
+    _xpcListener = [[NSXPCListener alloc] initWithMachServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)];
+    _xpcListener.delegate = self;
     
-    [self.localPort setServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)];
-    
-    __weak AppInstaller *weakSelf = self;
-    [self.localPort setMessageCallback:^NSData * _Nullable(int32_t identifier, NSData * _Nonnull data) {
-        return [weakSelf handleMessageWithIdentifier:identifier data:data];
-    }];
-    
-    [self.localPort setInvalidationCallback:^{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            AppInstaller *strongSelf = weakSelf;
-            if (strongSelf.localPort != nil) {
-                [strongSelf cleanupAndExitWithStatus:EXIT_FAILURE];
-            }
-        });
-    }];
-    
-    [self startRemotePortWithCompletion:^(BOOL success) {
-        if (!success) {
-            SULog(@"Failed creating remote message port from installer");
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
-        }
-    }];
+    _statusInfo = [[StatusInfo alloc] initWithHostBundleIdentifier:hostBundleIdentifier];
     
     return self;
 }
 
-- (void)startRemotePortWithCompletion:(void (^)(BOOL))completionHandler
+- (BOOL)listener:(NSXPCListener *)__unused listener shouldAcceptNewConnection:(NSXPCConnection *)newConnection
 {
-    if (self.remotePort != nil) {
-        completionHandler(YES);
-        return;
+    SULog(@"Incoming connection: %@", newConnection);
+    
+    if (self.activeConnection != nil) {
+        SULog(@"Rejecting multiple connections...");
+        [newConnection invalidate];
+        return NO;
     }
     
-    self.remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUUpdateDriverServiceNameForBundleIdentifier(self.hostBundleIdentifier)];
+    self.activeConnection = newConnection;
+    
+    newConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerCommunicationProtocol)];
+    newConnection.exportedObject = self;
+    
+    newConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerCommunicationProtocol)];
     
     __weak AppInstaller *weakSelf = self;
-    [self.remotePort connectWithLookupCompletion:^(BOOL success) {
+    newConnection.interruptionHandler = ^{
+        [weakSelf.activeConnection invalidate];
+    };
+    
+    newConnection.invalidationHandler = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            completionHandler(success);
-            
-            if (success) {
-                [weakSelf.remotePort setInvalidationHandler:^{
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        AppInstaller *strongSelf = weakSelf;
-                        if (strongSelf != nil) {
-                            if (strongSelf.remotePort != nil && !strongSelf.willCompleteInstallation) {
-                                SULog(@"Invalidation on remote port being called, and installation is not close enough to completion!");
-                                [strongSelf cleanupAndExitWithStatus:EXIT_FAILURE];
-                            }
-                            strongSelf.remotePort = nil;
-                        }
-                    });
-                }];
+            AppInstaller *strongSelf = weakSelf;
+            if (strongSelf != nil) {
+                if (strongSelf.activeConnection != nil && !strongSelf.willCompleteInstallation) {
+                    SULog(@"Invalidation on remote port being called, and installation is not close enough to completion!");
+                    [strongSelf cleanupAndExitWithStatus:EXIT_FAILURE];
+                }
+                strongSelf.communicator = nil;
+                strongSelf.activeConnection = nil;
             }
         });
-    }];
+    };
+    
+    [newConnection resume];
+    
+    self.communicator = newConnection.remoteObjectProxy;
+    
+    return YES;
+}
+
+- (void)start
+{
+    [self.xpcListener resume];
+    [self.statusInfo startListener];
 }
 
 /**
@@ -243,18 +243,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     return YES;
 }
 
-- (void)start
-{
-    [self.remotePort sendMessageWithIdentifier:SURequestInstallationParameters data:[NSData data] completion:^(BOOL success) {
-        if (!success) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                SULog(@"Error: Failed to send request for installation parameters");
-                [self cleanupAndExitWithStatus:EXIT_FAILURE];
-            });
-        }
-    }];
-}
-
 - (void)extractAndInstallUpdate
 {
     NSString *downloadPath = [self.installationData.updateDirectoryPath stringByAppendingPathComponent:self.installationData.downloadName];
@@ -272,11 +260,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     if (sizeof(progress) == sizeof(uint64_t)) {
         uint64_t progressValue = CFSwapInt64HostToLittle(*(uint64_t *)&progress);
         NSData *data = [NSData dataWithBytes:&progressValue length:sizeof(progressValue)];
-        [self.remotePort sendMessageWithIdentifier:SUExtractedArchiveWithProgress data:data completion:^(BOOL success) {
-            if (!success) {
-                SULog(@"Error sending extracted progress");
-            }
-        }];
+        
+        [self.communicator handleMessageWithIdentifier:SUExtractedArchiveWithProgress data:data];
     }
 }
 
@@ -286,20 +271,12 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     // Eg: one common case is if a delta update fails, client may want to fall back to regular update
     self.installationData = nil;
     
-    [self.remotePort sendMessageWithIdentifier:SUArchiveExtractionFailed data:[NSData data] completion:^(BOOL success) {
-        if (!success) {
-            SULog(@"Error sending extraction failed");
-        }
-    }];
+    [self.communicator handleMessageWithIdentifier:SUArchiveExtractionFailed data:[NSData data]];
 }
 
 - (void)unarchiverDidFinish
 {
-    [self.remotePort sendMessageWithIdentifier:SUValidationStarted data:[NSData data] completion:^(BOOL success) {
-        if (!success) {
-            SULog(@"Error sending validation finish");
-        }
-    }];
+    [self.communicator handleMessageWithIdentifier:SUValidationStarted data:[NSData data]];
     
     NSString *downloadPath = [self.installationData.updateDirectoryPath stringByAppendingPathComponent:self.installationData.downloadName];
     BOOL validationSuccess = [self validateUpdateForHost:self.host downloadedToPath:downloadPath extractedToPath:self.installationData.updateDirectoryPath DSASignature:self.installationData.dsaSignature];
@@ -308,20 +285,14 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         SULog(@"Error: update validation was a failure");
         [self cleanupAndExitWithStatus:EXIT_FAILURE];
     } else {
-        [self.remotePort sendMessageWithIdentifier:SUInstallationStartedStage1 data:[NSData data] completion:^(BOOL success) {
-            if (!success) {
-                SULog(@"Error sending stage 1 started");
-            }
-        }];
+        [self.communicator handleMessageWithIdentifier:SUInstallationStartedStage1 data:[NSData data]];
         
         [self startInstallation];
     }
 }
 
-- (NSData *)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
+- (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
 {
-    NSData *replyData = nil;
-    
     if (identifier == SUInstallationData && self.installationData == nil) {
         dispatch_async(dispatch_get_main_queue(), ^{
             SUInstallationInputData *installationData = (SUInstallationInputData *)SUUnarchiveRootObjectSecurely(data, [SUInstallationInputData class]);
@@ -357,16 +328,14 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             }
         });
     } else if (identifier == SUSentUpdateAppcastItemData) {
-        if (self.installationInfoData == nil) {
+        if (self.statusInfo.installationInfoData == nil) {
             SUAppcastItem *updateItem = (SUAppcastItem *)SUUnarchiveRootObjectSecurely(data, [SUAppcastItem class]);
             if (updateItem != nil) {
                 SUInstallationInfo *installationInfo = [[SUInstallationInfo alloc] initWithAppcastItem:updateItem canSilentlyInstall:[self.installer canInstallSilently]];
                 
-                self.installationInfoData = SUArchiveRootObjectSecurely(installationInfo);
+                self.statusInfo.installationInfoData = SUArchiveRootObjectSecurely(installationInfo);
             }
         }
-    } else if (identifier == SUReceiveUpdateAppcastItemData) {
-        replyData = self.installationInfoData;
     } else if (identifier == SUResumeInstallationToStage2 && data.length == sizeof(uint8_t) * 2) {
         uint8_t relaunch = *((const uint8_t *)data.bytes);
         uint8_t showsUI = *((const uint8_t *)data.bytes + 1);
@@ -378,26 +347,16 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             // Allow handling if we should relaunch at any time
             self.shouldRelaunch = (BOOL)relaunch;
             
-            // We should try re-creating the remote port if necessary, in case the client has
-            // restarted since and wants a reply back when we say it's OK to terminate the app
-            [self startRemotePortWithCompletion:^(BOOL success) {
-                if (!success) {
-                    SULog(@"Installer failed to set up remote port to updater before resuming installation");
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (self.performedStage1Installation) {
+                    // Resume the installation if we aren't done with stage 2 yet, and remind the client we are prepared to relaunch
+                    dispatch_async(self.installerQueue, ^{
+                        [self performStage2InstallationIfNeeded];
+                    });
                 }
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (self.performedStage1Installation) {
-                        // Resume the installation if we aren't done with stage 2 yet, and remind the client we are prepared to relaunch
-                        dispatch_async(self.installerQueue, ^{
-                            [self performStage2InstallationIfNeeded];
-                        });
-                    }
-                });
-            }];
+            });
         });
     }
-    
-    return replyData;
 }
 
 - (void)startInstallation
@@ -408,7 +367,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     dispatch_async(self.installerQueue, ^{
         NSError *installerError = nil;
-        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self.host updateDirectory:self.installationData.updateDirectoryPath inheritsPrivileges:self.inheritsPrivileges versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
+        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self.host updateDirectory:self.installationData.updateDirectoryPath allowingInteraction:self.allowsInteraction versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
         
         if (installer == nil) {
             SULog(@"Error: Failed to create installer instance with error: %@", installerError);
@@ -441,12 +400,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             
             NSData *sendData = [NSData dataWithBytes:sendInformation length:sizeof(sendInformation)];
             
-            [self.remotePort sendMessageWithIdentifier:SUInstallationFinishedStage1 data:sendData completion:^(BOOL success) {
-                if (!success) {
-                    SULog(@"Error sending stage 1 finish");
-                    [self cleanupAndExitWithStatus:EXIT_FAILURE];
-                }
-            }];
+            [self.communicator handleMessageWithIdentifier:SUInstallationFinishedStage1 data:sendData];
             
             self.performedStage1Installation = YES;
             
@@ -465,7 +419,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     SUAuthorizationEnvironment *environment = nil;
     NSURL *tempIconDirectoryURL = nil;
-    if (self.shouldShowUI && !self.inheritsPrivileges && [self.installer mayNeedToRequestAuthorization]) {
+    if (self.shouldShowUI && self.allowsInteraction && [self.installer mayNeedToRequestAuthorization]) {
         NSString *prompt = [NSString stringWithFormat:NSLocalizedString(@"%1$@ wants to update.", nil), self.host.name];
         
         NSString *iconPath = nil;
@@ -505,7 +459,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     }
     
     NSError *secondStageError = nil;
-    BOOL performedSecondStage = [self.installer performSecondStageAllowingAuthorization:!self.inheritsPrivileges fileOperationToolPath:fileOperationToolPath environment:environment allowingUI:self.shouldShowUI error:&secondStageError];
+    BOOL performedSecondStage = [self.installer performSecondStageAllowingAuthorization:self.allowsInteraction fileOperationToolPath:fileOperationToolPath environment:environment allowingUI:self.shouldShowUI error:&secondStageError];
     
     if (tempIconDirectoryURL != nil) {
         [[SUFileManager defaultManager] removeItemAtURL:tempIconDirectoryURL error:NULL];
@@ -535,15 +489,11 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             uint8_t sendInfo[] = {cancelled, targetTerminated};
             
             NSData *sendData = [NSData dataWithBytes:sendInfo length:sizeof(sendInfo)];
-            [self.remotePort sendMessageWithIdentifier:SUInstallationFinishedStage2 data:sendData completion:^(BOOL success) {
-                if (!success) {
-                    SULog(@"Error sending stage 2 finish");
-                }
-                
-                if (installationCancelled) {
-                    cleanupAndExit();
-                }
-            }];
+            [self.communicator handleMessageWithIdentifier:SUInstallationFinishedStage2 data:sendData];
+            
+            if (installationCancelled) {
+                cleanupAndExit();
+            }
         });
     }
     
@@ -571,7 +521,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUDisplayProgressTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     // Make sure we're still eligible for showing the installer progress
                     // Also if the updater process is still alive, showing the progress should not be our duty
-                    if (shouldLaunchInstallerProgress && self.remotePort == nil) {
+                    if (shouldLaunchInstallerProgress && self.communicator == nil) {
                         NSError *launchError = nil;
                         
                         NSArray *arguments = @[self.host.bundlePath];
@@ -615,17 +565,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 [installerProgressRunningApplication terminate];
                 shouldLaunchInstallerProgress = NO;
                 
-                [self.remotePort sendMessageWithIdentifier:SUInstallationFinishedStage3 data:[NSData data] completion:^(BOOL success) {
-                    if (!success) {
-                        SULog(@"Error sending stage 3 finish");
-                    }
-                }];
+                [self.communicator handleMessageWithIdentifier:SUInstallationFinishedStage3 data:[NSData data]];
                 
-                // Invalidate the local port before re-launching the updated app
+                // Invalidate the status info listener before re-launching the updated app
                 // If we don't do this, the updated app could think the installation can be resumable,
                 // if it checks for updates immediately on launch
-                [self.localPort invalidate];
-                self.localPort = nil;
+                [self.statusInfo invalidate];
+                self.statusInfo = nil;
                 
                 NSString *installationPath = [SUInstaller installationPathForHost:self.host];
                 
@@ -658,11 +604,14 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 {
     // It's nice to tell the other end we're invalidating
     
-    [self.localPort invalidate];
-    self.localPort = nil;
+    [self.activeConnection invalidate];
+    self.activeConnection = nil;
     
-    [self.remotePort invalidate];
-    self.remotePort = nil;
+    [self.xpcListener invalidate];
+    self.xpcListener = nil;
+    
+    [self.statusInfo invalidate];
+    self.statusInfo = nil;
     
     NSError *theError = nil;
     if (![[NSFileManager defaultManager] removeItemAtPath:self.installationData.updateDirectoryPath error:&theError]) {

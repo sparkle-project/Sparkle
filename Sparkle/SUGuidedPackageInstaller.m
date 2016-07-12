@@ -53,7 +53,7 @@
     }
     
     // If we're root, we can allow using the authorization APIs
-    self.fileManager = (allowsAuthorization || (geteuid() == 0)) ? [SUFileManager fileManagerWithAuthorizationToolPath:fileOperationToolPath environment:authorizationEnvironment] : [SUFileManager defaultManager];
+    self.fileManager = (allowsAuthorization || [self isRootUser]) ? [SUFileManager fileManagerWithAuthorizationToolPath:fileOperationToolPath environment:authorizationEnvironment] : [SUFileManager defaultManager];
     
     return [self.fileManager grantAuthorizationPrivilegesWithError:error];
 }
@@ -68,10 +68,14 @@
     return NO;
 }
 
+- (BOOL)isRootUser
+{
+    return (geteuid() == 0);
+}
+
 - (BOOL)canInstallSilently
 {
-    // Are we root?
-    return (geteuid() == 0);
+    return [self isRootUser];
 }
 
 - (BOOL)mayNeedToRequestAuthorization

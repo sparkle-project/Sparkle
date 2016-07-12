@@ -10,6 +10,6 @@
 
 @protocol SUInstallerLauncherProtocol
 
-- (void)launchInstallerAtPath:(NSString *)installerPath withHostBundleIdentifier:(NSString *)hostBundleIdentifier inheritingPrivileges:(BOOL)inheritingPrivileges completion:(void (^)(BOOL success))completionHandler;
+- (void)launchInstallerAtPath:(NSString *)installerPath withHostBundleIdentifier:(NSString *)hostBundleIdentifier allowingInteraction:(BOOL)allowingInteraction completion:(void (^)(BOOL success))completionHandler;
     
 @end

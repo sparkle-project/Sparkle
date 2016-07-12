@@ -8,7 +8,7 @@
 
 #import "InstallerProgressAppController.h"
 #import "InstallerProgressAppControllerDelegate.h"
-#import "SURemoteMessagePort.h"
+#import "SUInstallerStatus.h"
 #import "SUMessageTypes.h"
 #import "SULog.h"
 #import "SUApplicationInfo.h"
@@ -25,7 +25,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @property (nonatomic, readonly) NSApplication *application;
 @property (nonatomic, readonly) NSBundle *bundle;
 @property (nonatomic, readonly, weak) id<InstallerProgressAppControllerDelegate> delegate;
-@property (nonatomic, readonly) SURemoteMessagePort *remotePort;
+@property (nonatomic, readonly) id<SUInstallerStatusProtocol> statusInfo;
 
 @end
 
@@ -34,7 +34,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @synthesize application = _application;
 @synthesize bundle = _bundle;
 @synthesize delegate = _delegate;
-@synthesize remotePort = _remotePort;
+@synthesize statusInfo = _statusInfo;
 
 - (instancetype)initWithApplication:(NSApplication *)application arguments:(NSArray<NSString *> *)arguments delegate:(id<InstallerProgressAppControllerDelegate>)delegate
 {
@@ -64,7 +64,15 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
         _application = application;
         _delegate = delegate;
         _bundle = bundle;
-        _remotePort = [[SURemoteMessagePort alloc] initWithServiceName:SUAutoUpdateServiceNameForBundleIdentifier(bundleIdentifier)];
+        _statusInfo = [[SUInstallerStatus alloc] init];
+        
+        [_statusInfo setInvalidationHandler:^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [application terminate:nil];
+            });
+        }];
+        
+        [_statusInfo setServiceName:SUStatusInfoServiceNameForBundleIdentifier(bundleIdentifier)];
     }
     return self;
 }
@@ -76,22 +84,10 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)__unused notification
 {
-    __weak InstallerProgressAppController *weakSelf = self;
-    [self.remotePort connectWithLookupCompletion:^(BOOL success) {
-        if (!success) {
-            [NSApp terminate:nil];
-        } else {
-            [weakSelf.remotePort setInvalidationHandler:^{
-                [weakSelf.application terminate:nil];
-            }];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                InstallerProgressAppController *strongSelf = weakSelf;
-                if (strongSelf != nil) {
-                    [strongSelf.delegate applicationDidFinishLaunchingWithTargetBundle:strongSelf.bundle];
-                }
-            });
-        }
+    [self.statusInfo probeStatusConnectivityWithReply:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.delegate applicationDidFinishLaunchingWithTargetBundle:self.bundle];
+        });
     }];
 }
 

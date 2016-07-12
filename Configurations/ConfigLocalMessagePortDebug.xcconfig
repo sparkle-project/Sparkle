@@ -1,5 +1,0 @@
-// LocalMessagePort Debug
-
-#include "ConfigLocalMessagePort.xcconfig"
-
-CODE_SIGN_IDENTITY = -

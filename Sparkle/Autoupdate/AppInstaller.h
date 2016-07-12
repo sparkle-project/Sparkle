@@ -11,8 +11,10 @@
 
 @interface AppInstaller : NSObject <SUUnarchiverDelegate>
 
-- (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier inheritsPrivileges:(BOOL)inheritsPrivileges;
+- (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier allowingInteraction:(BOOL)allowsInteraction;
 
 - (void)start;
+
+- (void)cleanupAndExitWithStatus:(int)status __attribute__((noreturn));
 
 @end

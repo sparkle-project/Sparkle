@@ -1,0 +1,5 @@
+// InstallerStatus Debug
+
+#include "ConfigInstallerStatus.xcconfig"
+
+CODE_SIGN_IDENTITY = -

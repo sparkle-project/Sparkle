@@ -1,13 +1,14 @@
 //
 //  main.m
-//  RemoteMessagePort
+//  InstallerConnection
 //
-//  Created by Mayur Pawashe on 4/3/16.
+//  Created by Mayur Pawashe on 7/9/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
-#import "SURemoteMessagePort.h"
+#import "SUInstallerConnection.h"
+#import "SUInstallerCommunicationProtocol.h"
 
 @interface ServiceDelegate : NSObject <NSXPCListenerDelegate>
 @end
@@ -18,9 +19,13 @@
     // This method is where the NSXPCListener configures, accepts, and resumes a new incoming NSXPCConnection.
     
     // Configure the connection.
-    newConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SURemoteMessagePortProtocol)];
+    // First, set the interface that the exported object implements.
+    newConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerConnectionProtocol)];
+    newConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerCommunicationProtocol)];
     
-    newConnection.exportedObject = [[SURemoteMessagePort alloc] init];
+    SUInstallerConnection *exportedObject = [[SUInstallerConnection alloc] initWithDelegate:newConnection.remoteObjectProxy];
+    
+    newConnection.exportedObject = exportedObject;
     
     // Resuming the connection allows the system to deliver more incoming messages.
     [newConnection resume];

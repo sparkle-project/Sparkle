@@ -64,11 +64,11 @@ void _SULogDisableStandardErrorStream(void);
     return self;
 }
 
-- (BOOL)updaterShouldInheritInstallPrivileges:(SUUpdater *)__unused updater
+- (BOOL)updaterShouldAllowInstallerInteraction:(SUUpdater *)__unused updater
 {
     // If the installation is interactive, we can show an authorization prompt for requesting additional privileges,
     // otherwise we should have the installer inherit the updater's privileges.
-    return !self.interactive;
+    return self.interactive;
 }
 
 // In case we find an update during probing, otherwise we leave this to the user driver
