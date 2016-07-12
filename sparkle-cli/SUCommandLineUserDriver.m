@@ -152,8 +152,17 @@
 - (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUInstallUpdateStatus))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self.coreComponent registerInstallUpdateHandler:reply];
         [self showUpdateWithAppcastItem:appcastItem updateAdjective:@"resumable"];
-        reply(SUInstallAndRelaunchUpdateNow);
+        
+        if (self.deferInstallation) {
+            if (self.verbose) {
+                fprintf(stderr, "Deferring Installation.\n");
+            }
+            [self.coreComponent installUpdateWithChoice:SUDismissUpdateInstallation];
+        } else {
+            [self.coreComponent installUpdateWithChoice:SUInstallAndRelaunchUpdateNow];
+        }
     });
 }
 
