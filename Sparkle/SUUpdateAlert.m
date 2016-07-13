@@ -198,7 +198,8 @@
 - (void)showReleaseNotes:(NSData *)releaseNotes
 {
     if (!self.webViewFinishedLoading) {
-        [[self.releaseNotesView mainFrame] loadData:releaseNotes MIMEType:@"text/html" textEncodingName:@"utf-8" baseURL:nil];
+        NSURL *baseURL = self.updateItem.releaseNotesURL.URLByDeletingLastPathComponent;
+        [[self.releaseNotesView mainFrame] loadData:releaseNotes MIMEType:@"text/html" textEncodingName:@"utf-8" baseURL:baseURL];
     }
 }
 
