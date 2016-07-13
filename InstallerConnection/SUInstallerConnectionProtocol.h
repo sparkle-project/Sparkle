@@ -13,6 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SUInstallerConnectionProtocol <SUInstallerCommunicationProtocol>
 
+// This method is declared in SUInstallerCommunicationProtocol too, but the XPC decoder on macOS 10.8 doesn't know that
+- (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data;
+
 - (void)setInvalidationHandler:(void (^)(void))invalidationHandler;
 
 - (void)setServiceName:(NSString *)serviceName;
