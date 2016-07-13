@@ -162,7 +162,6 @@
 		724BB3671D30B2C5005D534A /* SUMessageTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 729746561C936D5E00FC134E /* SUMessageTypes.m */; };
 		724BB3711D31D0B7005D534A /* SUInstallerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3701D31D0B7005D534A /* SUInstallerConnection.m */; };
 		724BB3731D31D0B7005D534A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3721D31D0B7005D534A /* main.m */; };
-		724BB3771D31D0B7005D534A /* SparkleInstallerConnection.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 724BB36C1D31D0B7005D534A /* SparkleInstallerConnection.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		724BB3841D3203BA005D534A /* SparkleInstallerConnection.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 724BB36C1D31D0B7005D534A /* SparkleInstallerConnection.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		724BB3871D32A167005D534A /* SUXPCInstallerConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 724BB3851D32A167005D534A /* SUXPCInstallerConnection.h */; };
 		724BB3881D32A167005D534A /* SUXPCInstallerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3861D32A167005D534A /* SUXPCInstallerConnection.m */; };
@@ -559,17 +558,6 @@
 				142E0E0019A6954400E4312B /* Sparkle.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		724BB37D1D31D0B7005D534A /* Embed XPC Services */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "$(CONTENTS_FOLDER_PATH)/XPCServices";
-			dstSubfolderSpec = 16;
-			files = (
-				724BB3771D31D0B7005D534A /* SparkleInstallerConnection.xpc in Embed XPC Services */,
-			);
-			name = "Embed XPC Services";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		726E4A261C86C88F00C57C6A /* Embed XPC Services */ = {
@@ -2249,7 +2237,6 @@
 				6131B1910DDCDE32005215F0 /* Run Script: Set Git Version Info */,
 				6195D4B40E40505A00D41A50 /* Run Script: Link fr_CA to fr */,
 				61E31A85103299750051D188 /* Run Script: Link pt to pt_BR */,
-				724BB37D1D31D0B7005D534A /* Embed XPC Services */,
 			);
 			buildRules = (
 			);
