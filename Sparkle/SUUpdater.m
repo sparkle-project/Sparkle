@@ -355,56 +355,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
 }
 
-// RUNS ON ITS OWN THREAD
-// updater should be passed as a weak reference
-static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id <SUUpdateDriver> inDriver, NSURL *feedURL, BOOL installerIsRunning)
-{
-    @try {
-        // This method *must* be called on its own thread. SCNetworkReachabilityCheckByName
-        //	can block, and it can be waiting a long time on slow networks, and we
-        //	wouldn't want to beachball the main thread for a background operation.
-        // We could use asynchronous reachability callbacks, but those aren't
-        //	reliable enough and can 'get lost' sometimes, which we don't want.
-        
-        @autoreleasepool {
-            SCNetworkConnectionFlags flags = 0;
-            BOOL isNetworkReachable = YES;
-            
-            // Don't perform automatic checks on unconnected laptops or dial-up connections that aren't online:
-            
-            const char *hostname = [[feedURL host] cStringUsingEncoding:NSUTF8StringEncoding];
-            SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(NULL, hostname);
-            Boolean reachabilityResult = NO;
-            // If the feed's using a file:// URL, we won't be able to use reachability.
-            if (reachability != NULL) {
-                SCNetworkReachabilityGetFlags(reachability, &flags);
-                CFRelease(reachability);
-            }
-            
-            if( reachabilityResult )
-            {
-                BOOL reachable = (flags & kSCNetworkFlagsReachable) == kSCNetworkFlagsReachable;
-                BOOL automatic = (flags & kSCNetworkFlagsConnectionAutomatic) == kSCNetworkFlagsConnectionAutomatic;
-                BOOL local = (flags & kSCNetworkFlagsIsLocalAddress) == kSCNetworkFlagsIsLocalAddress;
-                
-                if (!(reachable || automatic || local))
-                    isNetworkReachable = NO;
-            }
-            
-            // If the network's not reachable, we pass a nil driver into checkForUpdatesWithDriver, which will then reschedule the next update so we try again later.
-            dispatch_async(dispatch_get_main_queue(), ^{
-                // Is the updater still alive?
-                if (updater != nil) {
-                    [updater checkForUpdatesWithDriver: isNetworkReachable ? inDriver : nil installerInProgress:installerIsRunning];
-                }
-            });
-        }
-    } @catch (NSException *localException) {
-        SULog(@"UNCAUGHT EXCEPTION IN UPDATE CHECK TIMER: %@", [localException reason]);
-        // Don't propagate the exception beyond here. In Carbon apps that would trash the stack.
-    }
-}
-
 - (void)checkForUpdatesInBackground
 {
     if (!self.startedUpdater) {
@@ -452,10 +402,7 @@ static void SUCheckForUpdatesInBgReachabilityCheck(__weak SUUpdater *updater, id
                  updaterDelegate:strongSelf.delegate];
             }
             
-            NSURL *feedURL = [strongSelf feedURL];
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                SUCheckForUpdatesInBgReachabilityCheck(weakSelf, updateDriver, feedURL, installerIsRunning);
-            });
+            [strongSelf checkForUpdatesWithDriver:updateDriver installerInProgress:installerIsRunning];
         });
     }];
 }
