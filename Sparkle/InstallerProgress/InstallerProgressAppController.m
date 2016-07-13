@@ -95,15 +95,14 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 // the updated application when relaunched will be the frontmost application
 // This is related to macOS activation issues when terminating a frontmost application happens right before
 // launching another app
-- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)__unused sender
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUTerminationTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [sender replyToApplicationShouldTerminate:YES];
+        // Exit right away, don't go through the apple event process again
+        exit(EXIT_SUCCESS);
     });
-    
-    [self.delegate applicationWillTerminateAfterDelay];
-    
-    return NSTerminateLater;
+    // Reply with a 'cancel' rather than 'later' because 'later' may make the runloop stop completely, not having the dispatch_after above invoked
+    return NSTerminateCancel;
 }
 
 @end
