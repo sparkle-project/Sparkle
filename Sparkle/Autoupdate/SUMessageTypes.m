@@ -18,12 +18,15 @@ BOOL SUInstallerMessageTypeIsLegal(SUInstallerMessageType oldMessageType, SUInst
         case SUInstallerNotStarted:
             legal = (oldMessageType == SUInstallerNotStarted);
             break;
+        case SUExtractionStarted:
+            legal = (oldMessageType == SUInstallerNotStarted);
+            break;
         case SUExtractedArchiveWithProgress:
         case SUArchiveExtractionFailed:
-            legal = (oldMessageType == SUInstallerNotStarted || oldMessageType == SUExtractedArchiveWithProgress);
+            legal = (oldMessageType == SUExtractionStarted || oldMessageType == SUExtractedArchiveWithProgress);
             break;
         case SUValidationStarted:
-            legal = (oldMessageType == SUInstallerNotStarted || oldMessageType == SUExtractedArchiveWithProgress);
+            legal = (oldMessageType == SUExtractionStarted || oldMessageType == SUExtractedArchiveWithProgress);
             break;
         case SUInstallationStartedStage1:
             legal = (oldMessageType == SUValidationStarted);

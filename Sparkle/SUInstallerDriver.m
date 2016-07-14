@@ -29,6 +29,8 @@
 #error This is a "core" class and should NOT import AppKit
 #endif
 
+#define FIRST_INSTALLER_MESSAGE_TIMEOUT 7ull
+
 @interface SUInstallerDriver () <SUInstallerCommunicationProtocol>
 
 @property (nonatomic, readonly) SUHost *host;
@@ -40,6 +42,7 @@
 
 @property (nonatomic) id<SUInstallerConnectionProtocol> installerConnection;
 
+@property (nonatomic) NSUInteger extractionAttempts;
 @property (nonatomic) BOOL postponedOnce;
 @property (nonatomic, weak, readonly) id updater;
 @property (nonatomic, weak, readonly) id<SUUpdaterDelegate> updaterDelegate;
@@ -60,6 +63,7 @@
 @synthesize currentStage = _currentStage;
 @synthesize startedInstalling = _startedInstalling;
 @synthesize installerConnection = _installerConnection;
+@synthesize extractionAttempts = _extractionAttempts;
 @synthesize postponedOnce = _postponedOnce;
 @synthesize updater = _updater;
 @synthesize updaterDelegate = _updaterDelegate;
@@ -182,6 +186,20 @@
     [self.installerConnection handleMessageWithIdentifier:SUInstallationData data:archivedData];
     
     self.currentStage = SUInstallerNotStarted;
+    
+    // If the number of extractions attempts stays the same, then we've waited too long and should abort the installation
+    // The extraction attempts is incremented when we receive an extraction should start message from the installer
+    // This also handles the case when a delta extraction fails and tries to re-try another extraction attempt later
+    // We will also want to make sure current stage is still SUInstallerNotStarted because it may not be due to resumability
+    NSUInteger currentExtractionAttempts = self.extractionAttempts;
+    __weak SUInstallerDriver *weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FIRST_INSTALLER_MESSAGE_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        SUInstallerDriver *strongSelf = weakSelf;
+        if (strongSelf != nil && strongSelf.currentStage == SUInstallerNotStarted && currentExtractionAttempts == self.extractionAttempts) {
+            SULog(@"Timeout: Installer never started archive extraction");
+            [strongSelf.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while starting the installer. Please try again later.", nil) }]];
+        }
+    });
 }
 
 - (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
@@ -198,7 +216,10 @@
         return;
     }
     
-    if (identifier == SUExtractedArchiveWithProgress) {
+    if (identifier == SUExtractionStarted) {
+        self.extractionAttempts++;
+        self.currentStage = identifier;
+    } else if (identifier == SUExtractedArchiveWithProgress) {
         if (data.length == sizeof(double) && sizeof(double) == sizeof(uint64_t)) {
             uint64_t progressValue = CFSwapInt64LittleToHost(*(const uint64_t *)data.bytes);
             double progress = *(double *)&progressValue;

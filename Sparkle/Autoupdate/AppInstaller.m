@@ -28,6 +28,8 @@
 #import "SUErrors.h"
 #import "SUInstallerCommunicationProtocol.h"
 
+#define FIRST_UPDATER_MESSAGE_TIMEOUT 7ull
+
 /*!
  * Terminate the application after a delay from launching the new update to avoid OS activation issues
  * This delay should be be high enough to increase the likelihood that our updated app will be launched up front,
@@ -60,6 +62,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 @property (nonatomic) id<SUInstallerProtocol> installer;
 @property (nonatomic) BOOL willCompleteInstallation;
+@property (nonatomic) BOOL receivedInstallationData;
 
 @property (nonatomic) dispatch_queue_t installerQueue;
 @property (nonatomic) BOOL performedStage1Installation;
@@ -83,6 +86,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize shouldShowUI = _shouldShowUI;
 @synthesize installer = _installer;
 @synthesize willCompleteInstallation = _willCompleteInstallation;
+@synthesize receivedInstallationData = _receivedInstallationData;
 @synthesize installerQueue = _installerQueue;
 @synthesize performedStage1Installation = _performedStage1Installation;
 @synthesize performedStage2Installation = _performedStage2Installation;
@@ -153,6 +157,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 {
     [self.xpcListener resume];
     [self.statusInfo startListener];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FIRST_UPDATER_MESSAGE_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (!self.receivedInstallationData) {
+            SULog(@"Timeout: installation data was never received");
+            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+        }
+    });
 }
 
 /**
@@ -245,6 +256,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (void)extractAndInstallUpdate
 {
+    [self.communicator handleMessageWithIdentifier:SUExtractionStarted data:[NSData data]];
+    
     NSString *downloadPath = [self.installationData.updateDirectoryPath stringByAppendingPathComponent:self.installationData.downloadName];
     id <SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.installationData.decryptionPassword delegate:self];
     if (!unarchiver) {
@@ -295,6 +308,10 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 {
     if (identifier == SUInstallationData && self.installationData == nil) {
         dispatch_async(dispatch_get_main_queue(), ^{
+            // Mark that we have received the installation data
+            // Do not rely on self.installationData != nil because we may set it to nil again if an early stage fails (i.e, archive extraction)
+            self.receivedInstallationData = YES;
+            
             SUInstallationInputData *installationData = (SUInstallationInputData *)SUUnarchiveRootObjectSecurely(data, [SUInstallationInputData class]);
             if (installationData == nil) {
                 SULog(@"Error: Failed to unarchive input installation data");

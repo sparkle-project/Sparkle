@@ -18,13 +18,14 @@ extern NSString *SUAppcastItemArchiveKey;
 typedef NS_ENUM(int32_t, SUInstallerMessageType)
 {
     SUInstallerNotStarted = 0,
-    SUExtractedArchiveWithProgress = 1,
-    SUArchiveExtractionFailed = 2,
-    SUValidationStarted = 3,
-    SUInstallationStartedStage1 = 4,
-    SUInstallationFinishedStage1 = 5,
-    SUInstallationFinishedStage2 = 6,
-    SUInstallationFinishedStage3 = 7
+    SUExtractionStarted = 1,
+    SUExtractedArchiveWithProgress = 2,
+    SUArchiveExtractionFailed = 3,
+    SUValidationStarted = 4,
+    SUInstallationStartedStage1 = 5,
+    SUInstallationFinishedStage1 = 6,
+    SUInstallationFinishedStage2 = 7,
+    SUInstallationFinishedStage3 = 8
 };
 
 typedef NS_ENUM(int32_t, SUUpdaterMessageType)
