@@ -45,10 +45,16 @@
             CFStringRef domain = (grantsSystemPrivilege ? kSMDomainSystemLaunchd : kSMDomainUserLaunchd);
             NSString *label = [NSString stringWithFormat:@"%@-sparkle-updater", hostBundleIdentifier];
             
+            // Try to remove the job from launchd if it is already running
+            // We could invoke SMJobCopyDictionary() first to see if the job exists, but I'd rather avoid
+            // using it because the headers indicate it may be removed one day without any replacement
             CFErrorRef removeError = NULL;
             if (!SMJobRemove(domain, (__bridge CFStringRef)(label), auth, true, &removeError)) {
                 if (removeError != NULL) {
-                    SULog(@"Remove error: %@", removeError);
+                    // It's normal for a job to not be found, so this is not an interesting error
+                    if (CFErrorGetCode(removeError) != kSMErrorJobNotFound) {
+                        SULog(@"Remove error: %@", removeError);
+                    }
                     CFRelease(removeError);
                 }
             }
