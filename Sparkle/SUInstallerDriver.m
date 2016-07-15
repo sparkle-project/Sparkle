@@ -301,6 +301,9 @@
         
         [self.delegate installerDidFinishInstallation];
         [self.delegate installerIsRequestingAbortInstallWithError:nil];
+    } else if (identifier == SUUpdaterAlivePing) {
+        // Don't update the current stage; a ping request has no effect on that.
+        [self.installerConnection handleMessageWithIdentifier:SUUpdaterAlivePong data:[NSData data]];
     }
 }
 

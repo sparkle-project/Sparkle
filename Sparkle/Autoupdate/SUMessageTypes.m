@@ -40,6 +40,11 @@ BOOL SUInstallerMessageTypeIsLegal(SUInstallerMessageType oldMessageType, SUInst
         case SUInstallationFinishedStage3:
             legal = (oldMessageType == SUInstallationFinishedStage2);
             break;
+        case SUUpdaterAlivePing:
+            // Having this state being dependent on other installation states would make the complicate our logic
+            // So just always allow this type of message
+            legal = YES;
+            break;
     }
     return legal;
 }

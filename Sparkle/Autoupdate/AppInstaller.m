@@ -50,6 +50,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @property (nonatomic) NSXPCConnection *activeConnection;
 @property (nonatomic) id<SUInstallerCommunicationProtocol> communicator;
 @property (nonatomic) StatusInfo *statusInfo;
+@property (nonatomic) BOOL receivedUpdaterPong;
 
 @property (nonatomic, strong) TerminationListener *terminationListener;
 
@@ -77,6 +78,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize activeConnection = _activeConnection;
 @synthesize communicator = _communicator;
 @synthesize statusInfo = _statusInfo;
+@synthesize receivedUpdaterPong = _receivedUpdaterPong;
 @synthesize hostBundleIdentifier = _hostBundleIdentifier;
 @synthesize allowsInteraction = _allowsInteraction;
 @synthesize terminationListener = _terminationListener;
@@ -373,6 +375,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 }
             });
         });
+    } else if (identifier == SUUpdaterAlivePong) {
+        self.receivedUpdaterPong = YES;
     }
 }
 
@@ -522,6 +526,12 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 - (void)finishInstallationAfterHostTermination
 {
     [self.terminationListener startListeningWithCompletion:^{
+        // Ask the updater if it is still alive
+        // If they are, we will receive a pong response back
+        // Reset if we received a pong just to be on the safe side
+        self.receivedUpdaterPong = NO;
+        [self.communicator handleMessageWithIdentifier:SUUpdaterAlivePing data:[NSData data]];
+        
         // Launch our installer progress UI tool if only after a certain amount of time passes
         __block NSRunningApplication *installerProgressRunningApplication = nil;
         __block BOOL shouldLaunchInstallerProgress = YES;
@@ -538,7 +548,9 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUDisplayProgressTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     // Make sure we're still eligible for showing the installer progress
                     // Also if the updater process is still alive, showing the progress should not be our duty
-                    if (shouldLaunchInstallerProgress && self.communicator == nil) {
+                    // if the communicator object is nil, the updater definitely isn't alive. However, if it is not nil,
+                    // this does not necessarily mean the updater is alive, so we should also check if we got a recent response back from the updater
+                    if (shouldLaunchInstallerProgress && (!self.receivedUpdaterPong || self.communicator == nil)) {
                         NSError *launchError = nil;
                         
                         NSArray *arguments = @[self.host.bundlePath];
