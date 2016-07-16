@@ -404,7 +404,8 @@
         [self.statusController close];
         self.statusController = nil;
         
-        [[NSApplication sharedApplication] terminate:nil];
+        NSRunningApplication *runningApplication = [SUApplicationInfo runningApplicationWithBundle:self.host.bundle];
+        [runningApplication terminate];
     });
 }
 
