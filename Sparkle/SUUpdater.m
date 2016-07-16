@@ -365,19 +365,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         return;
     }
     
-    // Background update checks should only happen if we have a network connection.
-    //	Wouldn't want to annoy users on dial-up by establishing a connection every
-    //	hour or so:
-    
-    // We don't want the reachability check to act on the driver if the updater is going near death
+    // We don't want the probe check to act on the driver if the updater is going near death
     __weak SUUpdater *weakSelf = self;
     
-    SUHost *theHost = weakSelf.host;
-    if (theHost == nil) {
-        return;
-    }
-    
-    [SUProbeInstallStatus probeInstallerInProgressForHost:theHost completion:^(BOOL installerIsRunning) {
+    [SUProbeInstallStatus probeInstallerInProgressForHost:self.host completion:^(BOOL installerIsRunning) {
         dispatch_async(dispatch_get_main_queue(), ^{
             SUUpdater *strongSelf = weakSelf;
             if (strongSelf == nil) {
@@ -388,14 +379,14 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             if (!installerIsRunning && [strongSelf automaticallyDownloadsUpdates] && [strongSelf allowsAutomaticUpdates]) {
                 updateDriver =
                 [[SUAutomaticUpdateDriver alloc]
-                 initWithHost:theHost
+                 initWithHost:strongSelf.host
                  sparkleBundle:strongSelf.sparkleBundle
                  updater:strongSelf
                  updaterDelegate:strongSelf.delegate];
             } else {
                 updateDriver =
                 [[SUScheduledUpdateDriver alloc]
-                 initWithHost:theHost
+                 initWithHost:strongSelf.host
                  sparkleBundle:strongSelf.sparkleBundle
                  updater:strongSelf
                  userDriver:strongSelf.userDriver
