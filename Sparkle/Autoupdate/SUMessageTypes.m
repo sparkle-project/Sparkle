@@ -11,6 +11,16 @@
 
 NSString *SUAppcastItemArchiveKey = @"SUAppcastItemArchive";
 
+// Tags added to the bundle identifier which is used as Mach service names
+// These should be very short because length restrictions exist on earlier versions of macOS
+#define SPARKLE_INSTALLER_TAG @"-spki"
+#define SPARKLE_STATUS_TAG @"-spks"
+
+// macOS 10.8 at least can't handle service names that are 64 characters or longer
+// This was fixed some point after 10.8, but I'm not sure if it was fixed in 10.9 or 10.10 or 10.11
+// If we knew when it was fixed, this could only be relevant to OS versions prior to that
+#define MAX_SERVICE_NAME_LENGTH 63u
+
 BOOL SUInstallerMessageTypeIsLegal(SUInstallerMessageType oldMessageType, SUInstallerMessageType newMessageType)
 {
     BOOL legal;
@@ -49,12 +59,21 @@ BOOL SUInstallerMessageTypeIsLegal(SUInstallerMessageType oldMessageType, SUInst
     return legal;
 }
 
+static NSString *SUServiceNameWithTag(NSString *tagName, NSString *bundleIdentifier)
+{
+    NSString *serviceName = [bundleIdentifier stringByAppendingString:tagName];
+    NSUInteger length = MIN(serviceName.length, MAX_SERVICE_NAME_LENGTH);
+    // If the service name is too long, cut off the beginning rather than cutting off the end
+    // This should lead to a more unique name
+    return [serviceName substringFromIndex:serviceName.length - length];
+}
+
 NSString *SUAutoUpdateServiceNameForBundleIdentifier(NSString *bundleIdentifier)
 {
-    return [NSString stringWithFormat:@"%@-spkinstll", bundleIdentifier];
+    return SUServiceNameWithTag(SPARKLE_INSTALLER_TAG, bundleIdentifier);
 }
 
 NSString *SUStatusInfoServiceNameForBundleIdentifier(NSString *bundleIdentifier)
 {
-    return [NSString stringWithFormat:@"%@-spkstat", bundleIdentifier];
+    return SUServiceNameWithTag(SPARKLE_STATUS_TAG, bundleIdentifier);
 }
