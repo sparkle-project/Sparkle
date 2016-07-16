@@ -36,14 +36,14 @@
             SULog(@"Failed to change ownership on installer executable at %@ with error %@", executablePath, ownershipError);
         }
         
-        NSArray *arguments = @[hostBundleIdentifier, @(allowingInteraction).stringValue];
+        NSArray *arguments = @[executablePath, hostBundleIdentifier, @(allowingInteraction).stringValue];
         
         // If the updater is running as the logged in user, we submit a job under the user domain
         // However if the updater is running as root (which is experimental), we submit the job under the system domain
         // We don't yet handle the updater running as the logged in user, and submitting a job under the system domain, which
         // would remove the need for using AuthorizationExecuteWithPrivileges() in the installer. That would require knowing before hand
         // if we will need to request authorization privileges, and that would prevent this code from being invoked silently/automatically.
-        // Additionally, we would want to remove AppKit references in the installer 
+        // Additionally, we would want to remove AppKit references in the installer
         BOOL grantsSystemPrivilege = NO;
         AuthorizationRef auth = SUCreateAuthorization(&grantsSystemPrivilege);
         Boolean submittedJob = false;
@@ -65,7 +65,7 @@
                 }
             }
             
-            NSDictionary *jobDictionary = @{@"Label" : label, @"ProgramArguments" : [@[executablePath] arrayByAddingObjectsFromArray:arguments], @"EnableTransactions" : @NO, @"KeepAlive" : @{@"SuccessfulExit" : @NO}, @"RunAtLoad" : @NO, @"NICE" : @0, @"LaunchOnlyOnce": @YES, @"MachServices" : @{SUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES, SUStatusInfoServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES}};
+            NSDictionary *jobDictionary = @{@"Label" : label, @"ProgramArguments" : arguments, @"EnableTransactions" : @NO, @"KeepAlive" : @{@"SuccessfulExit" : @NO}, @"RunAtLoad" : @NO, @"NICE" : @0, @"LaunchOnlyOnce": @YES, @"MachServices" : @{SUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES, SUStatusInfoServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES}};
             
             CFErrorRef submitError = NULL;
             submittedJob = SMJobSubmit(domain, (__bridge CFDictionaryRef)(jobDictionary), auth, &submitError);
