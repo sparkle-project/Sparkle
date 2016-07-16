@@ -305,9 +305,6 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         NSRunningApplication *runningApplication = [SUApplicationInfo runningApplicationWithBundle:self.applicationBundle];
         if (runningApplication != nil) {
-            if (self.verbose) {
-                fprintf(stderr, "Terminating application...\n");
-            }
             if (![runningApplication terminate]) {
                 if (![runningApplication forceTerminate]) {
                     fprintf(stderr, "Error: Failed to terminate running application. Please terminate it to update it.");
