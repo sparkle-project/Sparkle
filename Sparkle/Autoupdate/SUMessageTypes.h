@@ -39,7 +39,7 @@ typedef NS_ENUM(int32_t, SUUpdaterMessageType)
 
 BOOL SUInstallerMessageTypeIsLegal(SUInstallerMessageType oldMessageType, SUInstallerMessageType newMessageType);
 
-NSString *SUAutoUpdateServiceNameForBundleIdentifier(NSString *bundleIdentifier);
+NSString *SUInstallerServiceNameForBundleIdentifier(NSString *bundleIdentifier);
 
 NSString *SUStatusInfoServiceNameForBundleIdentifier(NSString *bundleIdentifier);
 

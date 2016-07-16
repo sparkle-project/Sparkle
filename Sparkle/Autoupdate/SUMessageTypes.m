@@ -68,7 +68,7 @@ static NSString *SUServiceNameWithTag(NSString *tagName, NSString *bundleIdentif
     return [serviceName substringFromIndex:serviceName.length - length];
 }
 
-NSString *SUAutoUpdateServiceNameForBundleIdentifier(NSString *bundleIdentifier)
+NSString *SUInstallerServiceNameForBundleIdentifier(NSString *bundleIdentifier)
 {
     return SUServiceNameWithTag(SPARKLE_INSTALLER_TAG, bundleIdentifier);
 }

@@ -104,7 +104,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     _allowsInteraction = allowsInteraction;
     
-    _xpcListener = [[NSXPCListener alloc] initWithMachServiceName:SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier)];
+    _xpcListener = [[NSXPCListener alloc] initWithMachServiceName:SUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier)];
     _xpcListener.delegate = self;
     
     _statusInfo = [[StatusInfo alloc] initWithHostBundleIdentifier:hostBundleIdentifier];

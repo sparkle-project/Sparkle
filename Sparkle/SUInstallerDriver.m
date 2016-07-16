@@ -120,7 +120,7 @@
         });
     }];
     
-    NSString *serviceName = SUAutoUpdateServiceNameForBundleIdentifier(hostBundleIdentifier);
+    NSString *serviceName = SUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier);
     
     [self.installerConnection setServiceName:serviceName];
     
