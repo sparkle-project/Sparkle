@@ -7,69 +7,114 @@
 //
 
 #import "TerminationListener.h"
-#import "SUApplicationInfo.h"
+#import "SULog.h"
+
+#include <sys/types.h>
+#include <sys/event.h>
+#include <sys/time.h>
+
+#ifdef _APPKITDEFINES_H
+#error This is class should NOT import AppKit
+#endif
 
 @interface TerminationListener ()
 
-@property (nonatomic, readonly) NSBundle *bundle;
-@property (nonatomic) NSRunningApplication *listeningApplication;
-@property (nonatomic, copy) void (^completionBlock)(void);
+@property (nonatomic, readonly, nullable) NSNumber *processIdentifier;
+@property (nonatomic) BOOL watchedTermination;
+@property (nonatomic, copy) void (^completionBlock)(BOOL);
 
 @end
 
 @implementation TerminationListener
 
-@synthesize bundle = _bundle;
-@synthesize listeningApplication = _listeningApplication;
 @synthesize completionBlock = _completionBlock;
+@synthesize processIdentifier = _processIdentifier;
+@synthesize watchedTermination = _watchedTermination;
 
-- (instancetype)initWithBundle:(NSBundle *)bundle
+- (instancetype)initWithProcessIdentifier:(NSNumber * _Nullable)processIdentifier
 {
-    if (!(self = [super init])) {
-        return nil;
+    self = [super init];
+    if (self != nil) {
+        _processIdentifier = processIdentifier;
     }
-    
-    _bundle = bundle;
     
     return self;
 }
 
-// Don't cache the running application instance because it can change later any number of times after initialization
-// If for example, the user re-launches the application and we haven't started listening yet
-- (NSRunningApplication *)runningApplication
-{
-    return [SUApplicationInfo runningApplicationWithBundle:self.bundle];
-}
-
 - (BOOL)terminated
 {
-    NSRunningApplication *runningApplication = [self runningApplication];
-    return (runningApplication == nil || runningApplication.isTerminated);
+    return (self.watchedTermination || self.processIdentifier == nil) ? YES : (kill(self.processIdentifier.intValue, 0) != 0);
 }
 
-- (void)startListeningWithCompletion:(void (^)(void))completionBlock
+- (void)invokeCompletionWithSuccess:(BOOL)success
 {
-    NSRunningApplication *runningApplication = [self runningApplication];
-    if (runningApplication == nil || runningApplication.terminated) {
-        completionBlock();
-    } else {
-        self.completionBlock = completionBlock;
-        
-        // We must strongly reference the listening application, so it doesn't deallocate while we have KVO observer to it
-        self.listeningApplication = runningApplication;
-        [self.listeningApplication addObserver:self forKeyPath:NSStringFromSelector(@selector(isTerminated)) options:NSKeyValueObservingOptionNew context:NULL];
-    }
+    self.completionBlock(success);
+    self.completionBlock = nil;
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)__unused change context:(void *)__unused context
+- (void)startListeningWithCompletion:(void (^)(BOOL))completionBlock
 {
-    if (object == self.listeningApplication && [keyPath isEqualToString:NSStringFromSelector(@selector(isTerminated))]) {
-        if (self.listeningApplication.terminated) {
-            [self.listeningApplication removeObserver:self forKeyPath:keyPath];
-            self.completionBlock();
-            self.completionBlock = nil;
-        }
+    self.completionBlock = completionBlock;
+    
+    if (self.processIdentifier == nil) {
+        [self invokeCompletionWithSuccess:YES];
+        return;
     }
+    
+    // Use kqueues to determine when the process will terminate
+    // As described in https://developer.apple.com/library/mac/technotes/tn2050/_index.html#//apple_ref/doc/uid/DTS10003081-CH1-SUBSECTION10
+    // By using kqueues, we can stay away from using AppKit in case we ever decide to abandon it
+    
+    pid_t processIdentifier = self.processIdentifier.intValue;
+    int queue = kqueue();
+    if (queue == -1) {
+        SULog(@"Failed to create kqueue() due to error %d: %@", errno, @(strerror(errno)));
+        [self invokeCompletionWithSuccess:NO];
+        return;
+    }
+    
+    struct kevent changes;
+    EV_SET(&changes, processIdentifier, EVFILT_PROC, EV_ADD | EV_RECEIPT, NOTE_EXIT, 0, NULL);
+    
+    if (kevent(queue, &changes, 1, &changes, 1, NULL) == -1) {
+        SULog(@"Failed to invoke kevent() due to error %d: %@", errno, @(strerror(errno)));
+        [self invokeCompletionWithSuccess:NO];
+        return;
+    }
+    
+    // We will assume this terminationListener will never be deallocated
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcast-qual"
+    CFFileDescriptorContext context = { 0, (void *)CFBridgingRetain(self), NULL, NULL, NULL };
+#pragma clang diagnostic pop
+    CFFileDescriptorRef noteExitKQueueRef = CFFileDescriptorCreate(NULL, queue, true, noteExitKQueueCallback, &context);
+    if (noteExitKQueueRef == NULL) {
+        SULog(@"Failed to create file descriptor via CFFileDescriptorCreate()");
+        [self invokeCompletionWithSuccess:NO];
+        return;
+    }
+    
+    CFRunLoopSourceRef runLoopSource = CFFileDescriptorCreateRunLoopSource(NULL, noteExitKQueueRef, 0);
+    if (runLoopSource == NULL) {
+        SULog(@"Failed to create runLoopSource via CFFileDescriptorCreateRunLoopSource()");
+        [self invokeCompletionWithSuccess:NO];
+        return;
+    }
+    
+    CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopDefaultMode);
+    CFRelease(runLoopSource);
+    
+    CFFileDescriptorEnableCallBacks(noteExitKQueueRef, kCFFileDescriptorReadCallBack);
+}
+
+static void noteExitKQueueCallback(CFFileDescriptorRef file, CFOptionFlags __unused callBackTypes, void *info)
+{
+    struct kevent event;
+    kevent(CFFileDescriptorGetNativeDescriptor(file), NULL, 0, &event, 1, NULL);
+    
+    TerminationListener *self = CFBridgingRelease(info);
+    self.watchedTermination = YES;
+    [self invokeCompletionWithSuccess:YES];
 }
 
 @end

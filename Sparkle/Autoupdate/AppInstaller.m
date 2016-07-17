@@ -339,7 +339,11 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                         // We use the relaunch path for the bundle to listen for termination instead of the host path
                         // For a plug-in this makes a big difference; we want to wait until the app hosting the plug-in terminates
                         // Otherwise for an app, the relaunch path and host path should be identical
-                        self.terminationListener = [[TerminationListener alloc] initWithBundle:relaunchBundle];
+                        
+                        NSRunningApplication *runningApplication = [SUApplicationInfo runningApplicationWithBundle:host.bundle];
+                        NSNumber *processIdentifier = (runningApplication == nil || runningApplication.terminated) ? nil : @(runningApplication.processIdentifier);
+                        
+                        self.terminationListener = [[TerminationListener alloc] initWithProcessIdentifier:processIdentifier];
                         
                         [self extractAndInstallUpdate];
                     }
@@ -525,7 +529,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (void)finishInstallationAfterHostTermination
 {
-    [self.terminationListener startListeningWithCompletion:^{
+    [self.terminationListener startListeningWithCompletion:^(BOOL success) {
+        if (!success) {
+            SULog(@"Failed to listen for application termination");
+            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            return;
+        }
+        
         // Ask the updater if it is still alive
         // If they are, we will receive a pong response back
         // Reset if we received a pong just to be on the safe side
