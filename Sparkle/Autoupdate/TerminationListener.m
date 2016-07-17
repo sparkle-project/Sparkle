@@ -90,6 +90,7 @@
     CFFileDescriptorRef noteExitKQueueRef = CFFileDescriptorCreate(NULL, queue, true, noteExitKQueueCallback, &context);
     if (noteExitKQueueRef == NULL) {
         SULog(@"Failed to create file descriptor via CFFileDescriptorCreate()");
+        CFRelease((__bridge CFTypeRef)(self));
         [self invokeCompletionWithSuccess:NO];
         return;
     }
@@ -97,6 +98,7 @@
     CFRunLoopSourceRef runLoopSource = CFFileDescriptorCreateRunLoopSource(NULL, noteExitKQueueRef, 0);
     if (runLoopSource == NULL) {
         SULog(@"Failed to create runLoopSource via CFFileDescriptorCreateRunLoopSource()");
+        CFRelease((__bridge CFTypeRef)(self));
         [self invokeCompletionWithSuccess:NO];
         return;
     }
