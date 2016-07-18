@@ -49,7 +49,7 @@ BOOL SUNeedsSystemAuthorizationAccess(NSString *path, BOOL guided, BOOL * _Nulla
     } else if (guided) {
         result = YES;
     } else {
-#pragma what about symbolic links?
+#warning what about symbolic links?
         NSFileManager *fileManager = [NSFileManager defaultManager];
         result = ![fileManager isWritableFileAtPath:path] || ![fileManager isWritableFileAtPath:[path stringByDeletingLastPathComponent]];
     }

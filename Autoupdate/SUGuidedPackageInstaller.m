@@ -60,6 +60,7 @@
 
 - (BOOL)performThirdStage:(NSError * __autoreleasing *)error
 {
+#warning this probably shouldn't be part of file manager anymore
     return [self.fileManager executePackageAtURL:[NSURL fileURLWithPath:self.packagePath] error:error];
 }
 

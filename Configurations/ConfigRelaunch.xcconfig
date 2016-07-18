@@ -1,6 +1,5 @@
 // Relaunch Tool only
 
-INFOPLIST_FILE = Sparkle/Autoupdate/Autoupdate-Info.plist
 PRODUCT_NAME = $(SPARKLE_RELAUNCH_TOOL_NAME)
 SKIP_INSTALL = YES
 CLANG_ENABLE_MODULES = NO

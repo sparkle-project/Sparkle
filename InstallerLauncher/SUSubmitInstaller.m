@@ -22,23 +22,14 @@
     
     NSError *quarantineError = nil;
     if (![fileManager releaseItemFromQuarantineAtRootURL:installerURL error:&quarantineError]) {
-        // This may or may not be a fatal error depending on if the process is sandboxed or not
+        // Probably not a fatal error because we are submitting the executable through launchd
         SULog(@"Failed to release quarantine on installer at %@ with error %@", installerPath, quarantineError);
-    }
-    
-    NSString *executablePath = [[NSBundle bundleWithURL:installerURL] executablePath];
-    assert(executablePath != nil);
-    
-    NSError *ownershipError = nil;
-    if (![fileManager changeOwnerAndGroupOfItemAtRootURL:[NSURL fileURLWithPath:executablePath] toMatchURL:installerURL error:&ownershipError]) {
-        // This may or may not be a fatal error
-        SULog(@"Failed to change ownership on installer executable at %@ with error %@", executablePath, ownershipError);
     }
     
     NSString *hostBundleIdentifier = hostBundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    NSArray<NSString *> *arguments = @[executablePath, hostBundleIdentifier, @(allowingInteraction).stringValue];
+    NSArray<NSString *> *arguments = @[installerPath, hostBundleIdentifier, @(allowingInteraction).stringValue];
     
     AuthorizationRef auth = NULL;
     OSStatus createStatus = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &auth);
