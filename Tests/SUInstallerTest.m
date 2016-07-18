@@ -67,11 +67,8 @@
         return;
     }
     
-    NSString *fileOperationToolPath = [bundle pathForResource:@""SPARKLE_FILEOP_TOOL_NAME ofType:@""];
-    XCTAssertNotNil(fileOperationToolPath);
-    
     NSError *secondStageError = nil;
-    if (![installer performSecondStageAllowingAuthorization:YES fileOperationToolPath:fileOperationToolPath environment:nil allowingUI:YES error:&secondStageError]) {
+    if (![installer performSecondStageAllowingUI:YES error:&secondStageError]) {
         NSLog(@"Underlying error: %@", [secondStageError.userInfo objectForKey:NSUnderlyingErrorKey]);
         XCTFail(@"Second Stage failed with error: %@", secondStageError);
         return;

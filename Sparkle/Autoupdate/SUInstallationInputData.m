@@ -8,8 +8,11 @@
 
 #import "SUInstallationInputData.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "daemon-safe" class and should NOT import AppKit
+#endif
+
 static NSString *SURelaunchPathKey = @"SURelaunchPath";
-static NSString *SUProgressToolPathKey = @"SUProgressToolPath";
 static NSString *SUHostBundlePathKey = @"SUHostBundlePath";
 static NSString *SUUpdateDirectoryPathKey = @"SUUpdateDirectoryPath";
 static NSString *SUDownloadNameKey = @"SUDownloadName";
@@ -19,19 +22,17 @@ static NSString *SUDecryptionPasswordKey = @"SUDecryptionPassword";
 @implementation SUInstallationInputData
 
 @synthesize relaunchPath = _relaunchPath;
-@synthesize progressToolPath = _progressToolPath;
 @synthesize hostBundlePath = _hostBundlePath;
 @synthesize updateDirectoryPath = _updateDirectoryPath;
 @synthesize downloadName = _downloadName;
 @synthesize dsaSignature = _dsaSignature;
 @synthesize decryptionPassword = _decryptionPassword;
 
-- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath progressToolPath:(nullable NSString *)progressToolPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadName:(NSString *)downloadName dsaSignature:(NSString *)dsaSignature decryptionPassword:(nullable NSString *)decryptionPassword
+- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadName:(NSString *)downloadName dsaSignature:(NSString *)dsaSignature decryptionPassword:(nullable NSString *)decryptionPassword
 {
     self = [super init];
     if (self != nil) {
         _relaunchPath = [relaunchPath copy];
-        _progressToolPath = [progressToolPath copy];
         _hostBundlePath = [hostBundlePath copy];
         _updateDirectoryPath = [updateDirectoryPath copy];
         _downloadName = [downloadName copy];
@@ -47,8 +48,6 @@ static NSString *SUDecryptionPasswordKey = @"SUDecryptionPassword";
     if (relaunchPath == nil) {
         return nil;
     }
-    
-    NSString *progressToolPath = [decoder decodeObjectOfClass:[NSString class] forKey:SUProgressToolPathKey];
     
     NSString *hostBundlePath = [decoder decodeObjectOfClass:[NSString class] forKey:SUHostBundlePathKey];
     if (hostBundlePath == nil) {
@@ -72,15 +71,12 @@ static NSString *SUDecryptionPasswordKey = @"SUDecryptionPassword";
     
     NSString *decryptionPassword = [decoder decodeObjectOfClass:[NSString class] forKey:SUDecryptionPasswordKey];
     
-    return [self initWithRelaunchPath:relaunchPath progressToolPath:progressToolPath hostBundlePath:hostBundlePath updateDirectoryPath:updateDirectoryPath downloadName:downloadName dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
+    return [self initWithRelaunchPath:relaunchPath hostBundlePath:hostBundlePath updateDirectoryPath:updateDirectoryPath downloadName:downloadName dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
     [coder encodeObject:self.relaunchPath forKey:SURelaunchPathKey];
-    if (self.progressToolPath != nil) {
-        [coder encodeObject:self.progressToolPath forKey:SUProgressToolPathKey];
-    }
     [coder encodeObject:self.hostBundlePath forKey:SUHostBundlePathKey];
     [coder encodeObject:self.updateDirectoryPath forKey:SUUpdateDirectoryPathKey];
     [coder encodeObject:self.downloadName forKey:SUDownloadNameKey];

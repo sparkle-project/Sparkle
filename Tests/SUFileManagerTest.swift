@@ -355,10 +355,4 @@ class SUFileManagerTest: XCTestCase
             XCTAssertNil(try? fileManager.makeDirectoryAtURL(validSymlinkURL))
         }
     }
-    
-    func testAcquireBadAuthorization()
-    {
-        let fileManager = SUFileManager.defaultManager()
-        XCTAssertNil(try? fileManager._acquireAuthorization())
-    }
 }

@@ -7,9 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SUAuthorizationReply.h"
 
 @protocol SUInstallerLauncherProtocol
 
-- (void)launchInstallerAtPath:(NSString *)installerPath withHostBundleIdentifier:(NSString *)hostBundleIdentifier allowingInteraction:(BOOL)allowingInteraction completion:(void (^)(BOOL success))completionHandler;
+- (void)launchInstallerAtPath:(NSString *)installerPath progressToolPath:(NSString *)progressToolPath withHostBundlePath:(NSString *)hostBundlePath guidedInstallation:(BOOL)guidedInstallation allowingInteraction:(BOOL)allowingInteraction completion:(void (^)(SUAuthorizationReply))completionHandler;
     
 @end

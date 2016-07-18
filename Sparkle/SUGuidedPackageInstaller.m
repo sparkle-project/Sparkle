@@ -43,7 +43,7 @@
     return YES;
 }
 
-- (BOOL)performSecondStageAllowingAuthorization:(BOOL)allowsAuthorization fileOperationToolPath:(NSString *)fileOperationToolPath environment:(SUAuthorizationEnvironment * _Nullable)authorizationEnvironment allowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
+- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
 {
     if (!allowsUI && ![self canInstallSilently]) {
         if (error != NULL) {
@@ -53,9 +53,9 @@
     }
     
     // If we're root, we can allow using the authorization APIs
-    self.fileManager = (allowsAuthorization || [self isRootUser]) ? [SUFileManager fileManagerWithAuthorizationToolPath:fileOperationToolPath environment:authorizationEnvironment] : [SUFileManager defaultManager];
+    self.fileManager = [SUFileManager defaultManager];
     
-    return [self.fileManager grantAuthorizationPrivilegesWithError:error];
+    return YES;
 }
 
 - (BOOL)performThirdStage:(NSError * __autoreleasing *)error
@@ -76,11 +76,6 @@
 - (BOOL)canInstallSilently
 {
     return [self isRootUser];
-}
-
-- (BOOL)mayNeedToRequestAuthorization
-{
-    return YES;
 }
 
 - (void)cleanup

@@ -14,6 +14,7 @@
 #import "SUDownloadDriver.h"
 #import "SULocalCacheDirectory.h"
 #import "SULog.h"
+#import "SUErrors.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -148,7 +149,7 @@
     
     [self.installerDriver extractDownloadName:downloadName withUpdateItem:self.updateItem temporaryDirectory:temporaryDirectory completion:^(NSError * _Nullable error) {
         if (error != nil) {
-            [self.delegate coreDriverIsRequestingAbortUpdateWithError:error];
+            [self.delegate coreDriverIsRequestingAbortUpdateWithError:(error.code == SUInstallationCancelledError) ? nil : error];
         }
     }];
 }

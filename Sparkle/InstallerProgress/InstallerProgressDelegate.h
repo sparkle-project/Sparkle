@@ -1,5 +1,5 @@
 //
-//  ShowInstallerProgress.h
+//  InstallerProgressDelegate.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 4/10/16.
@@ -7,11 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "InstallerProgressDelegate.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ShowInstallerProgress : NSObject <InstallerProgressDelegate>
+@protocol InstallerProgressDelegate <NSObject>
+
+- (void)installerProgressShouldDisplayWithBundle:(NSBundle *)bundle;
+- (void)installerProgressShouldStop;
 
 @end
 

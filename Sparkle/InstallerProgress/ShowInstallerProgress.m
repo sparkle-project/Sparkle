@@ -22,7 +22,7 @@
 
 @synthesize statusController = _statusController;
 
-- (void)applicationDidFinishLaunchingWithTargetBundle:(NSBundle *)bundle
+- (void)installerProgressShouldDisplayWithBundle:(NSBundle *)bundle
 {
     SUHost *host = [[SUHost alloc] initWithBundle:bundle];
     self.statusController = [[SUStatusController alloc] initWithHost:host];
@@ -32,7 +32,7 @@
     [self.statusController showWindow:self];
 }
 
-- (void)applicationWillTerminateAfterDelay
+- (void)installerProgressShouldStop
 {
     [self.statusController close];
     self.statusController = nil;

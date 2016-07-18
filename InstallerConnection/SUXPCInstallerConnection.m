@@ -59,9 +59,9 @@
     }];
 }
 
-- (void)setServiceName:(NSString *)serviceName
+- (void)setServiceName:(NSString *)serviceName hostPath:(NSString *)hostPath guided:(BOOL)guided
 {
-    [self.connection.remoteObjectProxy setServiceName:serviceName];
+    [self.connection.remoteObjectProxy setServiceName:serviceName hostPath:hostPath guided:guided];
 }
 
 - (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data

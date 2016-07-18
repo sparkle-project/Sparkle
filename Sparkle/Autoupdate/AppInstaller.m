@@ -23,12 +23,17 @@
 #import "SUFileManager.h"
 #import "SUInstallationInfo.h"
 #import "SUAppcastItem.h"
-#import "SUAuthorizationEnvironment.h"
-#import "SUApplicationInfo.h"
 #import "SUErrors.h"
 #import "SUInstallerCommunicationProtocol.h"
+#import "AgentConnection.h"
+#import "SUInstallerAgentProtocol.h"
+
+#ifdef _APPKITDEFINES_H
+#error This is a "daemon-safe" class and should NOT import AppKit
+#endif
 
 #define FIRST_UPDATER_MESSAGE_TIMEOUT 7ull
+#define RETRIEVE_PROCESS_IDENTIFIER_TIMEOUT 5ull
 
 /*!
  * Terminate the application after a delay from launching the new update to avoid OS activation issues
@@ -44,12 +49,13 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
  */
 static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
-@interface AppInstaller () <NSXPCListenerDelegate, SUInstallerCommunicationProtocol>
+@interface AppInstaller () <NSXPCListenerDelegate, SUInstallerCommunicationProtocol, AgentConnectionDelegate>
 
 @property (nonatomic) NSXPCListener* xpcListener;
 @property (nonatomic) NSXPCConnection *activeConnection;
 @property (nonatomic) id<SUInstallerCommunicationProtocol> communicator;
 @property (nonatomic) StatusInfo *statusInfo;
+@property (nonatomic) AgentConnection *agentConnection;
 @property (nonatomic) BOOL receivedUpdaterPong;
 
 @property (nonatomic, strong) TerminationListener *terminationListener;
@@ -70,6 +76,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @property (nonatomic) BOOL performedStage2Installation;
 @property (nonatomic) BOOL performedStage3Installation;
 
+@property (nonatomic) NSUInteger agentConnectionCounter;
+
 @end
 
 @implementation AppInstaller
@@ -78,6 +86,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize activeConnection = _activeConnection;
 @synthesize communicator = _communicator;
 @synthesize statusInfo = _statusInfo;
+@synthesize agentConnection = _agentConnection;
 @synthesize receivedUpdaterPong = _receivedUpdaterPong;
 @synthesize hostBundleIdentifier = _hostBundleIdentifier;
 @synthesize allowsInteraction = _allowsInteraction;
@@ -93,6 +102,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize performedStage1Installation = _performedStage1Installation;
 @synthesize performedStage2Installation = _performedStage2Installation;
 @synthesize performedStage3Installation = _performedStage3Installation;
+@synthesize agentConnectionCounter = _agentConnectionCounter;
 
 - (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier allowingInteraction:(BOOL)allowsInteraction
 {
@@ -108,6 +118,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     _xpcListener.delegate = self;
     
     _statusInfo = [[StatusInfo alloc] initWithHostBundleIdentifier:hostBundleIdentifier];
+    _agentConnection = [[AgentConnection alloc] initWithHostBundleIdentifier:hostBundleIdentifier delegate:self];
     
     return self;
 }
@@ -159,10 +170,16 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 {
     [self.xpcListener resume];
     [self.statusInfo startListener];
+    [self.agentConnection startListener];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FIRST_UPDATER_MESSAGE_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (!self.receivedInstallationData) {
             SULog(@"Timeout: installation data was never received");
+            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+        }
+        
+        if (!self.agentConnection.connected) {
+            SULog(@"Timeout: agent connection was never initiated");
             [self cleanupAndExitWithStatus:EXIT_FAILURE];
         }
     });
@@ -302,8 +319,48 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     } else {
         [self.communicator handleMessageWithIdentifier:SUInstallationStartedStage1 data:[NSData data]];
         
-        [self startInstallation];
+        self.agentConnectionCounter++;
+        if (self.agentConnectionCounter == 2) {
+            [self retrieveProcessIdentifierAndStartInstallation];
+        }
     }
+}
+
+- (void)agentConnectionDidInitiate
+{
+    self.agentConnectionCounter++;
+    if (self.agentConnectionCounter == 2) {
+        [self retrieveProcessIdentifierAndStartInstallation];
+    }
+}
+
+- (void)agentConnectionDidInvalidate
+{
+    if (self.agentConnectionCounter < 2) {
+        SULog(@"Error: Agent connection invalidated before installation began");
+        [self cleanupAndExitWithStatus:EXIT_FAILURE];
+    }
+}
+
+- (void)retrieveProcessIdentifierAndStartInstallation
+{
+    // We use the relaunch path for the bundle to listen for termination instead of the host path
+    // For a plug-in this makes a big difference; we want to wait until the app hosting the plug-in terminates
+    // Otherwise for an app, the relaunch path and host path should be identical
+    
+    [self.agentConnection.agent registerRelaunchBundlePath:self.installationData.relaunchPath reply:^(NSNumber * _Nullable processIdentifier) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.terminationListener = [[TerminationListener alloc] initWithProcessIdentifier:processIdentifier];
+            [self startInstallation];
+        });
+    }];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(RETRIEVE_PROCESS_IDENTIFIER_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (self.terminationListener == nil) {
+            SULog(@"Timeour error: failed to retreive process identifier from agent");
+            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+        }
+    });
 }
 
 - (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
@@ -328,22 +385,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                     SULog(@"Error: Failed to match host bundle identifiers %@ and %@", self.hostBundleIdentifier, bundleIdentifier);
                     [self cleanupAndExitWithStatus:EXIT_FAILURE];
                 } else {
-                    NSBundle *relaunchBundle = [NSBundle bundleWithPath:nonNullInstallationData.relaunchPath];
-                    if (relaunchBundle == nil) {
-                        SULog(@"Error: Failed to locate relaunch bundle path %@", nonNullInstallationData.relaunchPath);
+                    // This will be important later
+                    if (nonNullInstallationData.relaunchPath == nil) {
+                        SULog(@"Error: Failed to obtain relaunch path from installation data");
                         [self cleanupAndExitWithStatus:EXIT_FAILURE];
                     } else {
                         self.host = host;
                         self.installationData = installationData;
-                        
-                        // We use the relaunch path for the bundle to listen for termination instead of the host path
-                        // For a plug-in this makes a big difference; we want to wait until the app hosting the plug-in terminates
-                        // Otherwise for an app, the relaunch path and host path should be identical
-                        
-                        NSRunningApplication *runningApplication = [SUApplicationInfo runningApplicationWithBundle:host.bundle];
-                        NSNumber *processIdentifier = (runningApplication == nil || runningApplication.terminated) ? nil : @(runningApplication.processIdentifier);
-                        
-                        self.terminationListener = [[TerminationListener alloc] initWithProcessIdentifier:processIdentifier];
                         
                         [self extractAndInstallUpdate];
                     }
@@ -442,53 +490,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         return;
     }
     
-    SUAuthorizationEnvironment *environment = nil;
-    NSURL *tempIconDirectoryURL = nil;
-    if (self.shouldShowUI && self.allowsInteraction && [self.installer mayNeedToRequestAuthorization]) {
-        NSString *prompt = [NSString stringWithFormat:NSLocalizedString(@"%1$@ wants to update.", nil), self.host.name];
-        
-        NSString *iconPath = nil;
-        
-        // Authorization API requires a 32x32 icon image and accepts png (but not icns or tiff)
-        NSImage *icon = [SUApplicationInfo bestIconForBundle:self.host.bundle];
-        [icon setSize:NSMakeSize(32, 32)];
-        
-        CGImageRef iconRef = [icon CGImageForProposedRect:NULL context:nil hints:nil];
-        NSBitmapImageRep *representation = [[NSBitmapImageRep alloc] initWithCGImage:iconRef];
-        NSData *pngData = [representation representationUsingType:NSPNGFileType properties:@{}];
-        
-        // Write the icon to a temporary directory. This icon file should be in a directory that's readable to everyone.
-        NSError *tempError = nil;
-        tempIconDirectoryURL = [[SUFileManager defaultManager] makeTemporaryDirectoryWithPreferredName:@"sparkle-auth-icon" appropriateForDirectoryURL:[NSURL fileURLWithPath:NSTemporaryDirectory()] error:&tempError];
-        if (tempIconDirectoryURL == nil) {
-            SULog(@"Failed to create temporary directory for authorization icon: %@", tempError);
-        } else {
-            NSURL *iconURL = [tempIconDirectoryURL URLByAppendingPathComponent:@"icon.png"];
-            if ([pngData writeToURL:iconURL atomically:YES]) {
-                iconPath = iconURL.path;
-            }
-        }
-        
-        environment = [[SUAuthorizationEnvironment alloc] initWithPrompt:prompt iconPath:(iconPath != nil ? iconPath : @"")];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            // We should activate our app so that the auth prompt will be active
-            [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
-        });
-    }
-    
-    NSString *fileOperationToolPath = [[[[NSBundle mainBundle] executablePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:@""SPARKLE_FILEOP_TOOL_NAME];
-    
-    if (![[NSFileManager defaultManager] fileExistsAtPath:fileOperationToolPath]) {
-        SULog(@"Potential Installation Error: File operation tool path %@ is not found", fileOperationToolPath);
-    }
-    
     NSError *secondStageError = nil;
-    BOOL performedSecondStage = [self.installer performSecondStageAllowingAuthorization:self.allowsInteraction fileOperationToolPath:fileOperationToolPath environment:environment allowingUI:self.shouldShowUI error:&secondStageError];
-    
-    if (tempIconDirectoryURL != nil) {
-        [[SUFileManager defaultManager] removeItemAtURL:tempIconDirectoryURL error:NULL];
-    }
+    BOOL performedSecondStage = [self.installer performSecondStageAllowingUI:self.shouldShowUI error:&secondStageError];
     
     if (performedSecondStage) {
         self.performedStage2Installation = YES;
@@ -543,37 +546,17 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         [self.communicator handleMessageWithIdentifier:SUUpdaterAlivePing data:[NSData data]];
         
         // Launch our installer progress UI tool if only after a certain amount of time passes
-        __block NSRunningApplication *installerProgressRunningApplication = nil;
         __block BOOL shouldLaunchInstallerProgress = YES;
-        
-        NSString *progressToolPath = self.installationData.progressToolPath;
-        if (progressToolPath != nil && self.shouldShowUI && ![self.installer displaysUserProgress]) {
-            NSURL *progressToolURL = [NSURL fileURLWithPath:progressToolPath];
-            if (progressToolURL != nil) {
-                NSError *quarantineError = nil;
-                if (![[SUFileManager defaultManager] releaseItemFromQuarantineAtRootURL:progressToolURL error:&quarantineError]) {
-                    SULog(@"Error: Failed releasing quarantine from installer progress tool: %@", quarantineError);
+        if (self.shouldShowUI && ![self.installer displaysUserProgress]) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUDisplayProgressTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                // Make sure we're still eligible for showing the installer progress
+                // Also if the updater process is still alive, showing the progress should not be our duty
+                // if the communicator object is nil, the updater definitely isn't alive. However, if it is not nil,
+                // this does not necessarily mean the updater is alive, so we should also check if we got a recent response back from the updater
+                if (shouldLaunchInstallerProgress && (!self.receivedUpdaterPong || self.communicator == nil)) {
+                    [self.agentConnection.agent showProgress];
                 }
-                
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUDisplayProgressTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    // Make sure we're still eligible for showing the installer progress
-                    // Also if the updater process is still alive, showing the progress should not be our duty
-                    // if the communicator object is nil, the updater definitely isn't alive. However, if it is not nil,
-                    // this does not necessarily mean the updater is alive, so we should also check if we got a recent response back from the updater
-                    if (shouldLaunchInstallerProgress && (!self.receivedUpdaterPong || self.communicator == nil)) {
-                        NSError *launchError = nil;
-                        
-                        NSArray *arguments = @[self.host.bundlePath];
-                        NSRunningApplication *runningApplication = [[NSWorkspace sharedWorkspace] launchApplicationAtURL:progressToolURL options:(NSWorkspaceLaunchOptions)(NSWorkspaceLaunchDefault | NSWorkspaceLaunchNewInstance) configuration:@{NSWorkspaceLaunchConfigurationArguments : arguments} error:&launchError];
-                        
-                        if (runningApplication == nil) {
-                            SULog(@"Failed to launch installer progress tool with error: %@", launchError);
-                        } else {
-                            installerProgressRunningApplication = runningApplication;
-                        }
-                    }
-                });
-            }
+            });
         }
         
         dispatch_async(self.installerQueue, ^{
@@ -601,7 +584,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 // Make sure to terminate our displayed progress before we move onto cleanup
-                [installerProgressRunningApplication terminate];
+                [self.agentConnection.agent stopProgress];
                 shouldLaunchInstallerProgress = NO;
                 
                 [self.communicator handleMessageWithIdentifier:SUInstallationFinishedStage3 data:[NSData data]];
@@ -624,7 +607,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                         pathToRelaunch = self.installationData.relaunchPath;
                     }
                     
-                    [self relaunchAtPath:pathToRelaunch];
+                    [self.agentConnection.agent relaunchPath:pathToRelaunch];
                 }
                 
                 dispatch_async(self.installerQueue, ^{
@@ -652,6 +635,9 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     [self.statusInfo invalidate];
     self.statusInfo = nil;
     
+    [self.agentConnection invalidate];
+    self.agentConnection = nil;
+    
     NSError *theError = nil;
     if (![[NSFileManager defaultManager] removeItemAtPath:self.installationData.updateDirectoryPath error:&theError]) {
         SULog(@"Couldn't remove update folder: %@.", theError);
@@ -660,14 +646,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     [[NSFileManager defaultManager] removeItemAtPath:[[NSBundle mainBundle] bundlePath] error:NULL];
     
     exit(status);
-}
-
-- (void)relaunchAtPath:(NSString *)relaunchPath
-{
-    // Don't use -launchApplication: because we may not be launching an application. Eg: it could be a system prefpane
-    if (![[NSWorkspace sharedWorkspace] openFile:relaunchPath]) {
-        SULog(@"Failed to launch %@", relaunchPath);
-    }
 }
 
 @end
