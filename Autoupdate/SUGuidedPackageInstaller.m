@@ -60,8 +60,32 @@
 
 - (BOOL)performThirdStage:(NSError * __autoreleasing *)error
 {
-#warning this probably shouldn't be part of file manager anymore
-    return [self.fileManager executePackageAtURL:[NSURL fileURLWithPath:self.packagePath] error:error];
+    // This command *must* be run as root
+    NSString *installerPath = @"/usr/sbin/installer";
+    
+    NSTask *task = [[NSTask alloc] init];
+    task.launchPath = installerPath;
+    task.arguments = @[@"-pkg", self.packagePath, @"-target", @"/"];
+    task.standardError = [NSPipe pipe];
+    task.standardOutput = [NSPipe pipe];
+    
+    BOOL success = YES;
+    @try {
+        [task launch];
+        [task waitUntilExit];
+        if (task.terminationStatus != EXIT_SUCCESS) {
+            success = NO;
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Guided package installer returned non-zero exit status (%d)", task.terminationStatus] }];
+            }
+        }
+    } @catch (NSException *) {
+        success = NO;
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Guided package installer task threw an exception"] }];
+        }
+    }
+    return success;
 }
 
 - (BOOL)displaysUserProgress

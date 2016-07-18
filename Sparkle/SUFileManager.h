@@ -155,18 +155,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError **)error;
 
-/**
- * Runs an installer package (pkg) in a headless mode using /usr/sbin/installer
- * @param packageURL A URL pointing to the package to execute. The item at this URL must exist.
- * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
- * @return YES if the installer ran the package successfully, otherwise NO with a populated error object
- *
- * This method uses the system wide installer tool to run the provided package. This process does not show any UI, except for
- * an initial authorization prompt if the calling process does not have root privileges. In other words, root privileges are required to use this method, and the file manager instance must have been created by allowing authorization.
- * An error can occur if the package is unable to be ran by the installer, or if the installer reports a non-zero exit status code.
- */
-- (BOOL)executePackageAtURL:(NSURL *)packageURL error:(NSError **)error;
-
 @end
 
 NS_ASSUME_NONNULL_END

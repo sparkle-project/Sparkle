@@ -727,44 +727,6 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     return success;
 }
 
-// Unlike other methods, authorization is required to execute this method successfully
-- (BOOL)executePackageAtURL:(NSURL *)packageURL error:(NSError * __autoreleasing *)error
-{
-    if (![self _itemExistsAtURL:packageURL]) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to execute package %@ because the file does not exist.", packageURL.path.lastPathComponent] }];
-        }
-        return NO;
-    }
-    
-    // This command *must* be run as root
-    NSString *installerPath = @"/usr/sbin/installer";
-    
-    NSTask *task = [[NSTask alloc] init];
-    task.launchPath = installerPath;
-    task.arguments = @[@"-pkg", packageURL.path, @"-target", @"/"];
-    task.standardError = [NSPipe pipe];
-    task.standardOutput = [NSPipe pipe];
-    
-    BOOL success = YES;
-    @try {
-        [task launch];
-        [task waitUntilExit];
-        if (task.terminationStatus != EXIT_SUCCESS) {
-            success = NO;
-            if (error != NULL) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Guided package installer returned non-zero exit status (%d)", task.terminationStatus] }];
-            }
-        }
-    } @catch (NSException *) {
-        success = NO;
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Guided package installer task threw an exception"] }];
-        }
-    }
-    return success;
-}
-
 @end
 
 #pragma clang diagnostic pop
