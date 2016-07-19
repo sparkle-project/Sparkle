@@ -10,6 +10,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class SUAppcastItem, SUHost, SUDownloadedUpdate;
+
 @protocol SUDownloadDriverDelegate <NSObject>
 
 - (void)downloadDriverWillBeginDownload;
@@ -18,13 +20,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)downloadDriverDidReceiveDataOfLength:(NSUInteger)length;
 
-- (void)downloadDriverDidDownloadUpdate;
+- (void)downloadDriverDidDownloadUpdate:(SUDownloadedUpdate *)downloadedUpdate;
 
 - (void)downloadDriverDidFailToDownloadUpdateWithError:(NSError *)error;
 
 @end
-
-@class SUAppcastItem, SUHost;
 
 @interface SUDownloadDriver : NSObject
 
@@ -33,8 +33,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)downloadUpdate;
 
 @property (nonatomic, readonly) NSMutableURLRequest *request;
-@property (nullable, nonatomic, readonly, copy) NSString *temporaryDirectory;
-@property (nullable, nonatomic, readonly, copy) NSString *downloadName;
 
 - (void)cleanup;
 

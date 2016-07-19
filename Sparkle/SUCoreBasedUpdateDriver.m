@@ -15,6 +15,7 @@
 #import "SULocalCacheDirectory.h"
 #import "SULog.h"
 #import "SUErrors.h"
+#import "SUDownloadedUpdate.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -134,20 +135,14 @@
     }
 }
 
-- (void)downloadDriverDidDownloadUpdate
+- (void)downloadDriverDidDownloadUpdate:(SUDownloadedUpdate *)downloadedUpdate
 {
     // Now we have to extract the downloaded archive.
     if ([self.delegate respondsToSelector:@selector(coreDriverDidFinishDownloadingUpdate)]) {
         [self.delegate coreDriverDidFinishDownloadingUpdate];
     }
     
-    NSString *downloadName = self.downloadDriver.downloadName;
-    assert(downloadName != nil);
-    
-    NSString *temporaryDirectory = self.downloadDriver.temporaryDirectory;
-    assert(temporaryDirectory != nil);
-    
-    [self.installerDriver extractDownloadName:downloadName withUpdateItem:self.updateItem temporaryDirectory:temporaryDirectory completion:^(NSError * _Nullable error) {
+    [self.installerDriver extractDownloadedUpdate:downloadedUpdate completion:^(NSError * _Nullable error) {
         if (error != nil) {
             [self.delegate coreDriverIsRequestingAbortUpdateWithError:(error.code == SUInstallationCancelledError) ? nil : error];
         }

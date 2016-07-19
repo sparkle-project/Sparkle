@@ -17,6 +17,7 @@
 #import "SULog.h"
 #import "SUErrors.h"
 #import "SUURLRequest.h"
+#import "SUDownloadedUpdate.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -148,7 +149,9 @@
             SULog(@"Warning: Downloader's expected content length (%lu) != Appcast item's length (%lu)", self.expectedContentLength, self.updateItem.contentLength);
         }
         
-        [self.delegate downloadDriverDidDownloadUpdate];
+        SUDownloadedUpdate *downloadedUpdate = [[SUDownloadedUpdate alloc] initWithAppcastItem:self.updateItem downloadName:self.downloadName temporaryDirectory:self.temporaryDirectory];
+        
+        [self.delegate downloadDriverDidDownloadUpdate:downloadedUpdate];
         [self cleanup];
     });
 }

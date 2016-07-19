@@ -11,7 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol SUUpdaterDelegate;
-@class SUHost, SUAppcastItem;
+@class SUHost, SUAppcastItem, SUDownloadedUpdate;
 
 @protocol SUInstallerDriverDelegate <NSObject>
 
@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)resumeUpdateWithUpdateItem:(SUAppcastItem *)updateItem;
 
-- (void)extractDownloadName:(NSString *)downloadName withUpdateItem:(SUAppcastItem *)updateItem temporaryDirectory:(NSString *)temporaryDirectory completion:(void (^)(NSError * _Nullable))completionHandler;
+- (void)extractDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(void (^)(NSError * _Nullable))completionHandler;
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI;
 

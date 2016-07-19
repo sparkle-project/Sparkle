@@ -24,6 +24,7 @@
 #import "SUInstallerConnection.h"
 #import "SUInstallerConnectionProtocol.h"
 #import "SUXPCInstallerConnection.h"
+#import "SUDownloadedUpdate.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -129,11 +130,11 @@
 }
 
 // This can be called multiple times (eg: if a delta update fails, this may be called again with a regular update item)
-- (void)extractDownloadName:(NSString *)downloadName withUpdateItem:(SUAppcastItem *)updateItem temporaryDirectory:(NSString *)temporaryDirectory completion:(void (^)(NSError * _Nullable))completionHandler
+- (void)extractDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(void (^)(NSError * _Nullable))completionHandler
 {
-    self.updateItem = updateItem;
-    self.temporaryDirectory = temporaryDirectory;
-    self.downloadName = downloadName;
+    self.updateItem = downloadedUpdate.updateItem;
+    self.temporaryDirectory = downloadedUpdate.temporaryDirectory;
+    self.downloadName = downloadedUpdate.downloadName;
     
     self.currentStage = SUInstallerNotStarted;
     
