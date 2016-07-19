@@ -510,34 +510,43 @@
     // Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
     // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
     NSString *const relaunchToolName = @"" SPARKLE_RELAUNCH_TOOL_NAME;
-    NSString *const relaunchPathToCopy = [sparkleBundle pathForResource:relaunchToolName ofType:@"app"];
-    if (relaunchPathToCopy != nil) {
-        NSString *targetPath = [[self appCachePath] stringByAppendingPathComponent:[relaunchPathToCopy lastPathComponent]];
-        
+    NSString *const relaunchToolSourcePath = [sparkleBundle pathForResource:relaunchToolName ofType:@"app"];
+    NSString *relaunchCopyTargetPath = nil;
+    NSError *error = nil;
+    BOOL copiedRelaunchPath = NO;
+
+    if (relaunchToolSourcePath) {
+        relaunchCopyTargetPath = [[self appCachePath] stringByAppendingPathComponent:[relaunchToolSourcePath lastPathComponent]];
+
         SUFileManager *fileManager = [SUFileManager defaultManager];
-        NSError *error = nil;
-        
-        NSURL *relaunchURLToCopy = [NSURL fileURLWithPath:relaunchPathToCopy];
-        NSURL *targetURL = [NSURL fileURLWithPath:targetPath];
-        
+
+        NSURL *relaunchToolSourceURL = [NSURL fileURLWithPath:relaunchToolSourcePath];
+        NSURL *relaunchCopyTargetURL = [NSURL fileURLWithPath:relaunchCopyTargetPath];
+
         // We only need to run our copy of the app by spawning a task
         // Since we are copying the app to a directory that is write-accessible, we don't need to muck with owner/group IDs
-        if ([self preparePathForRelaunchTool:targetPath error:&error] && [fileManager copyItemAtURL:relaunchURLToCopy toURL:targetURL error:&error]) {
+        if ([self preparePathForRelaunchTool:relaunchCopyTargetPath error:&error] && [fileManager copyItemAtURL:relaunchToolSourceURL toURL:relaunchCopyTargetURL error:&error]) {
+            copiedRelaunchPath = YES;
+
             // We probably don't need to release the quarantine, but we'll do it just in case it's necessary.
             // Perhaps in a sandboxed environment this matters more. Note that this may not be a fatal error.
             NSError *quarantineError = nil;
-            if (![fileManager releaseItemFromQuarantineAtRootURL:targetURL error:&quarantineError]) {
-                SULog(@"Failed to release quarantine on %@ with error %@", targetPath, quarantineError);
+            if (![fileManager releaseItemFromQuarantineAtRootURL:relaunchCopyTargetURL error:&quarantineError]) {
+                SULog(@"Failed to release quarantine on %@ with error %@", relaunchCopyTargetPath, quarantineError);
             }
-            self.relaunchPath = targetPath;
-        } else {
-            [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{
-                NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil),
-                NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", relaunchPathToCopy, targetPath, (error ? [error localizedDescription] : @"")]
-            }]];
         }
     }
 
+    if (!copiedRelaunchPath) {
+        [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{
+            NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [self.host name]],
+            NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@",
+                                                                         relaunchToolSourcePath, relaunchCopyTargetPath, (error ? [error localizedDescription] : @"")],
+        }]];
+        return;
+    }
+
+    self.relaunchPath = relaunchCopyTargetPath; // Set for backwards compatibility, in case any delegates modify it
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
     if ([updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)])
         [updaterDelegate updaterWillRelaunchApplication:self.updater];
@@ -547,9 +556,8 @@
         // Note that we explicitly use the host app's name here, since updating plugin for Mail relaunches Mail, not just the plugin.
         [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURelaunchError userInfo:@{
             NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [self.host name]],
-            NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@)", self.relaunchPath]
+            NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@ and %@)", relaunchToolSourcePath, self.relaunchPath],
         }]];
-        // We intentionally don't abandon the update here so that the host won't initiate another.
         return;
     }
 
