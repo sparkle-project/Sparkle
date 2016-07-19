@@ -14,6 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)registerRelaunchBundlePath:(NSString *)relaunchBundlePath reply:(void (^)(NSNumber * _Nullable processIdentifier))reply;
 
+- (void)registerInstallationInfoData:(NSData *)installationInfoData;
+
 - (void)showProgress;
 
 - (void)stopProgress;

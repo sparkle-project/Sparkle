@@ -80,9 +80,13 @@
         jobDictionary[@"NICE"] = @0;
         jobDictionary[@"LaunchOnlyOnce"] = @YES;
         
+        NSMutableDictionary *machServicesDictionary = [[NSMutableDictionary alloc] init];
+        machServicesDictionary[SUStatusInfoServiceNameForBundleIdentifier(hostBundleIdentifier)] = @YES;
         if (shouldSubmitInstaller) {
-            jobDictionary[@"MachServices"] = @{SUProgressAgentLauncherServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES};
+            machServicesDictionary[SUProgressAgentLauncherServiceNameForBundleIdentifier(hostBundleIdentifier)] = @YES;
         }
+        
+        jobDictionary[@"MachServices"] = [machServicesDictionary copy];
         
         CFErrorRef submitError = NULL;
         submittedJob = SMJobSubmit(domain, (__bridge CFDictionaryRef)(jobDictionary), auth, &submitError);

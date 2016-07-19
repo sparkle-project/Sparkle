@@ -14,6 +14,7 @@
 #import "SUInstallerAgentProtocol.h"
 #import "SUInstallerAgentInitiationProtocol.h"
 #import "InstallerProgressLauncher.h"
+#import "StatusInfo.h"
 #import <ServiceManagement/ServiceManagement.h>
 
 /*!
@@ -32,6 +33,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @property (nonatomic) BOOL repliedToRegistration;
 @property (nonatomic, readonly) NSBundle *hostBundle;
 @property (nonatomic, readonly, nullable) InstallerProgressLauncher *progressLauncher;
+@property (nonatomic) StatusInfo *statusInfo;
 @property (nonatomic) BOOL submittedLauncherJob;
 
 @end
@@ -47,6 +49,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @synthesize repliedToRegistration = _repliedToRegistration;
 @synthesize hostBundle = _hostBundle;
 @synthesize progressLauncher = _progressLauncher;
+@synthesize statusInfo = _statusInfo;
 @synthesize submittedLauncherJob = _submittedLauncherJob;
 
 - (instancetype)initWithApplication:(NSApplication *)application arguments:(NSArray<NSString *> *)arguments delegate:(id<InstallerProgressDelegate>)delegate
@@ -89,6 +92,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             _progressLauncher = [[InstallerProgressLauncher alloc] initWithHostBundle:_hostBundle installerPath:installerPath allowingInteraction:allowingInteraction delegate:self];
         }
         
+        _statusInfo = [[StatusInfo alloc] initWithHostBundleIdentifier:hostBundleIdentifier];
+        
         application.delegate = self;
         
         _application = application;
@@ -130,6 +135,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 
 - (void)startConnection
 {
+    [self.statusInfo startListener];
+    
     [self.connection resume];
     [self.connection.remoteObjectProxy connectionDidInitiateWithReply:^{
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -156,6 +163,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 
 - (void)cleanupAndExitWithStatus:(int)status __attribute__((noreturn))
 {
+    [self.statusInfo invalidate];
     [self.connection invalidate];
     [self.progressLauncher invalidate];
     
@@ -194,6 +202,15 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     });
 }
 
+- (void)registerInstallationInfoData:(NSData *)installationInfoData
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.statusInfo.installationInfoData == nil) {
+            self.statusInfo.installationInfoData = installationInfoData;
+        }
+    });
+}
+
 - (void)relaunchPath:(NSString *)pathToRelaunch
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -229,6 +246,9 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 
 - (void)_stopProgress
 {
+    [self.statusInfo invalidate];
+    self.statusInfo = nil;
+    
     [self.delegate installerProgressShouldStop];
     self.delegate = nil;
 }

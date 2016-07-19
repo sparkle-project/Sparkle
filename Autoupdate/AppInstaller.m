@@ -8,7 +8,6 @@
 
 #import "AppInstaller.h"
 #import "TerminationListener.h"
-#import "StatusInfo.h"
 #import "SUInstaller.h"
 #import "SULog.h"
 #import "SUHost.h"
@@ -54,7 +53,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @property (nonatomic) NSXPCListener* xpcListener;
 @property (nonatomic) NSXPCConnection *activeConnection;
 @property (nonatomic) id<SUInstallerCommunicationProtocol> communicator;
-@property (nonatomic) StatusInfo *statusInfo;
 @property (nonatomic) AgentConnection *agentConnection;
 @property (nonatomic) BOOL receivedUpdaterPong;
 
@@ -85,7 +83,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize xpcListener = _xpcListener;
 @synthesize activeConnection = _activeConnection;
 @synthesize communicator = _communicator;
-@synthesize statusInfo = _statusInfo;
 @synthesize agentConnection = _agentConnection;
 @synthesize receivedUpdaterPong = _receivedUpdaterPong;
 @synthesize hostBundleIdentifier = _hostBundleIdentifier;
@@ -117,7 +114,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     _xpcListener = [[NSXPCListener alloc] initWithMachServiceName:SUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier)];
     _xpcListener.delegate = self;
     
-    _statusInfo = [[StatusInfo alloc] initWithHostBundleIdentifier:hostBundleIdentifier];
     _agentConnection = [[AgentConnection alloc] initWithHostBundleIdentifier:hostBundleIdentifier delegate:self];
     
     return self;
@@ -169,7 +165,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 - (void)start
 {
     [self.xpcListener resume];
-    [self.statusInfo startListener];
     [self.agentConnection startListener];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FIRST_UPDATER_MESSAGE_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -399,12 +394,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             }
         });
     } else if (identifier == SUSentUpdateAppcastItemData) {
-        if (self.statusInfo.installationInfoData == nil) {
-            SUAppcastItem *updateItem = (SUAppcastItem *)SUUnarchiveRootObjectSecurely(data, [SUAppcastItem class]);
-            if (updateItem != nil) {
-                SUInstallationInfo *installationInfo = [[SUInstallationInfo alloc] initWithAppcastItem:updateItem canSilentlyInstall:[self.installer canInstallSilently]];
-                
-                self.statusInfo.installationInfoData = SUArchiveRootObjectSecurely(installationInfo);
+        SUAppcastItem *updateItem = (SUAppcastItem *)SUUnarchiveRootObjectSecurely(data, [SUAppcastItem class]);
+        if (updateItem != nil) {
+            SUInstallationInfo *installationInfo = [[SUInstallationInfo alloc] initWithAppcastItem:updateItem canSilentlyInstall:[self.installer canInstallSilently]];
+            
+            NSData *archivedData = SUArchiveRootObjectSecurely(installationInfo);
+            if (archivedData != nil) {
+                [self.agentConnection.agent registerInstallationInfoData:archivedData];
             }
         }
     } else if (identifier == SUResumeInstallationToStage2 && data.length == sizeof(uint8_t) * 2) {
@@ -583,17 +579,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             self.performedStage3Installation = YES;
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                // Make sure to terminate our displayed progress before we move onto cleanup
+                // Make sure to terminate our displayed progress before we move onto cleanup & relaunch
+                // This will also stop the agent from broadcasting the status info service, which we want to do before
+                // we relaunch the app because the relaunched app could check the service upon launch..
                 [self.agentConnection.agent stopProgress];
                 shouldLaunchInstallerProgress = NO;
                 
                 [self.communicator handleMessageWithIdentifier:SUInstallationFinishedStage3 data:[NSData data]];
-                
-                // Invalidate the status info listener before re-launching the updated app
-                // If we don't do this, the updated app could think the installation can be resumable,
-                // if it checks for updates immediately on launch
-                [self.statusInfo invalidate];
-                self.statusInfo = nil;
                 
                 NSString *installationPath = [SUInstaller installationPathForHost:self.host];
                 
@@ -631,9 +623,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     [self.xpcListener invalidate];
     self.xpcListener = nil;
-    
-    [self.statusInfo invalidate];
-    self.statusInfo = nil;
     
     [self.agentConnection invalidate];
     self.agentConnection = nil;

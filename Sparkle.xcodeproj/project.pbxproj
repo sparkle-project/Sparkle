@@ -180,7 +180,6 @@
 		7267E59D1D3D8A5A00D1BF90 /* SUDSAVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E59B1D3D8A5A00D1BF90 /* SUDSAVerifier.m */; };
 		7267E59F1D3D8A6F00D1BF90 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E59E1D3D8A6F00D1BF90 /* main.m */; };
 		7267E5A21D3D8A7E00D1BF90 /* AppInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5A11D3D8A7E00D1BF90 /* AppInstaller.m */; };
-		7267E5A51D3D8A8A00D1BF90 /* StatusInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5A41D3D8A8A00D1BF90 /* StatusInfo.m */; };
 		7267E5A81D3D8A9900D1BF90 /* AgentConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5A71D3D8A9900D1BF90 /* AgentConnection.m */; };
 		7267E5AB1D3D8AA800D1BF90 /* TerminationListener.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5AA1D3D8AA800D1BF90 /* TerminationListener.m */; };
 		7267E5AE1D3D8AB700D1BF90 /* SUInstallationInputData.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5AD1D3D8AB700D1BF90 /* SUInstallationInputData.m */; };
@@ -233,6 +232,7 @@
 		7267E5F71D3D919600D1BF90 /* SUPlainInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5C11D3D8B2700D1BF90 /* SUPlainInstaller.m */; };
 		7267E5F81D3D91A800D1BF90 /* SUPipedUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5831D3D89B300D1BF90 /* SUPipedUnarchiver.m */; };
 		7267E5F91D3D92DA00D1BF90 /* Autoupdate in CopyFiles */ = {isa = PBXBuildFile; fileRef = 72B398D21D3D879300EE297F /* Autoupdate */; };
+		7267E5FA1D3DAC3600D1BF90 /* StatusInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5A41D3D8A8A00D1BF90 /* StatusInfo.m */; };
 		726DF88E1C84277600188804 /* SUStatusCompletionResults.h in Headers */ = {isa = PBXBuildFile; fileRef = 726DF88D1C84277500188804 /* SUStatusCompletionResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		726E075C1CA3A6D6001A286B /* SUSecureCoding.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E075A1CA3A6D6001A286B /* SUSecureCoding.h */; };
 		726E075D1CA3A6D6001A286B /* SUSecureCoding.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E075B1CA3A6D6001A286B /* SUSecureCoding.m */; };
@@ -1315,8 +1315,6 @@
 				7267E59E1D3D8A6F00D1BF90 /* main.m */,
 				7267E5A01D3D8A7E00D1BF90 /* AppInstaller.h */,
 				7267E5A11D3D8A7E00D1BF90 /* AppInstaller.m */,
-				7267E5A31D3D8A8A00D1BF90 /* StatusInfo.h */,
-				7267E5A41D3D8A8A00D1BF90 /* StatusInfo.m */,
 				7267E5A61D3D8A9900D1BF90 /* AgentConnection.h */,
 				7267E5A71D3D8A9900D1BF90 /* AgentConnection.m */,
 				7267E5A91D3D8AA800D1BF90 /* TerminationListener.h */,
@@ -1557,6 +1555,8 @@
 				721652641D3C744700FD13D8 /* InstallerProgressLauncher.m */,
 				72D954841CBAD418006F28BD /* ShowInstallerProgress.h */,
 				72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */,
+				7267E5A31D3D8A8A00D1BF90 /* StatusInfo.h */,
+				7267E5A41D3D8A8A00D1BF90 /* StatusInfo.m */,
 				72D954821CBAD34F006F28BD /* main.m */,
 				721C24581CB7567D005440CB /* InstallerProgress-Info.plist */,
 			);
@@ -2570,6 +2570,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7267E5FA1D3DAC3600D1BF90 /* StatusInfo.m in Sources */,
 				7267E5EB1D3D90C200D1BF90 /* SUFileManager.m in Sources */,
 				7267E5DC1D3D8F1E00D1BF90 /* SUMessageTypes.m in Sources */,
 				721652621D3C44A100FD13D8 /* SUSystemAuthorization.m in Sources */,
@@ -2687,7 +2688,6 @@
 				7267E5C41D3D8B2700D1BF90 /* SUPackageInstaller.m in Sources */,
 				7267E5771D3D895B00D1BF90 /* SUBinaryDeltaCommon.m in Sources */,
 				7267E5871D3D89B300D1BF90 /* SUPipedUnarchiver.m in Sources */,
-				7267E5A51D3D8A8A00D1BF90 /* StatusInfo.m in Sources */,
 				7267E5751D3D895B00D1BF90 /* SUBinaryDeltaApply.m in Sources */,
 				7267E59D1D3D8A5A00D1BF90 /* SUDSAVerifier.m in Sources */,
 				7267E5791D3D895B00D1BF90 /* SUBinaryDeltaCreate.m in Sources */,
