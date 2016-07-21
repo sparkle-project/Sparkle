@@ -87,7 +87,7 @@ SU_EXPORT @interface SUUpdater : NSObject
     Checks for updates and, if available, immediately downloads and installs them.
     A progress dialog is shown but the user will never be prompted to read the
     release notes.
-    
+
     You may want to respond to the userDidCancelDownload delegate method in case
     the user clicks the "Cancel" button while the update is downloading.
  */
@@ -267,7 +267,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 
     \param updater The SUUpdater instance.
     \param item The appcast item corresponding to the update that is proposed to be installed.
-    \param invocation The invocation that must be completed before continuing with the relaunch.
+    \param invocation The invocation that must be completed with `[invocation invoke]` before continuing with the relaunch.
 
     \return \c YES to delay the relaunch until \p invocation is invoked.
  */
