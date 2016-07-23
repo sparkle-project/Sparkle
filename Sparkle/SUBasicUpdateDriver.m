@@ -153,10 +153,10 @@
     [self.delegate basicDriverIsRequestingAbortUpdateWithError:notFoundError];
 }
 
-- (void)abortUpdateAndSignalShowingNextUpdateImmediately:(BOOL)shouldSignalShowingUpdate downloadedUpdate:(SUDownloadedUpdate * _Nullable)downloadedUpdate error:(nullable NSError *)error
+- (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately downloadedUpdate:(SUDownloadedUpdate * _Nullable)downloadedUpdate error:(nullable NSError *)error
 {
     if (error != nil) {
-        if ([error code] != SUNoUpdateError) { // Let's not bother logging this.
+        if (error.code != SUNoUpdateError && error.code != SUInstallationCancelledError && error.code != SUInstallationTryAgainLaterError) { // Let's not bother logging this.
             NSError *errorToDisplay = error;
             int finiteRecursion=5;
             do {
@@ -172,7 +172,7 @@
     }
     
     if (self.completionBlock != nil) {
-        self.completionBlock(shouldSignalShowingUpdate, downloadedUpdate);
+        self.completionBlock(shouldShowUpdateImmediately, downloadedUpdate);
         self.completionBlock = nil;
     }
 }

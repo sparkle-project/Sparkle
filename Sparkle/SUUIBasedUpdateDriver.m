@@ -211,7 +211,7 @@
 {
     void (^abortUpdate)(void) = ^{
         [self.userDriver dismissUpdateInstallation];
-        [self.coreDriver abortUpdateAndSignalShowingNextUpdateImmediately:NO error:error];
+        [self.coreDriver abortUpdateAndShowNextUpdateImmediately:NO error:error];
     };
     
     if (error != nil) {
@@ -223,6 +223,8 @@
                     abortUpdate();
                 });
             }];
+        } else if (error.code == SUInstallationCancelledError || error.code == SUInstallationTryAgainLaterError) {
+            abortUpdate();
         } else {
             [self.userDriver showUpdaterError:nonNullError acknowledgement:^{
                 dispatch_async(dispatch_get_main_queue(), ^{

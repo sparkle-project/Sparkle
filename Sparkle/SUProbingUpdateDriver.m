@@ -69,7 +69,7 @@
 
 - (void)abortUpdateWithError:(nullable NSError *)error
 {
-    [self.basicDriver abortUpdateAndSignalShowingNextUpdateImmediately:NO downloadedUpdate:self.downloadedUpdate error:error];
+    [self.basicDriver abortUpdateAndShowNextUpdateImmediately:NO downloadedUpdate:self.downloadedUpdate error:error];
 }
 
 @end

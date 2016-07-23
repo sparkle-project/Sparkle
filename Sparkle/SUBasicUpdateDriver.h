@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nullable, nonatomic, readonly) SUAppcastItem *nonDeltaUpdateItem;
 
-- (void)abortUpdateAndSignalShowingNextUpdateImmediately:(BOOL)shouldSignalShowingUpdate downloadedUpdate:(SUDownloadedUpdate * _Nullable)downloadedUpdate error:(nullable NSError *)error;
+- (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldSignalShowingUpdate downloadedUpdate:(SUDownloadedUpdate * _Nullable)downloadedUpdate error:(nullable NSError *)error;
 
 @end
 

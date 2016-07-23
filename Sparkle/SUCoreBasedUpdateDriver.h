@@ -65,7 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)finishInstallationWithResponse:(SUInstallUpdateStatus)installUpdateStatus displayingUserInterface:(BOOL)displayingUserInterface;
 
-- (void)abortUpdateAndSignalShowingNextUpdateImmediately:(BOOL)shouldSignalShowingUpdate error:(nullable NSError *)error;
+- (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately error:(nullable NSError *)error;
 
 @end
 

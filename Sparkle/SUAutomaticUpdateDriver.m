@@ -13,6 +13,7 @@
 #import "SUCoreBasedUpdateDriver.h"
 #import "SULog.h"
 #import "SUAppcastItem.h"
+#import "SUErrors.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -123,8 +124,8 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    BOOL startNextUpdateImmediately = (error == nil) && (!self.willInstallSilently || self.updateItem.isCriticalUpdate);
-    [self.coreDriver abortUpdateAndSignalShowingNextUpdateImmediately:startNextUpdateImmediately error:error];
+    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationTryAgainLaterError) && (!self.willInstallSilently || self.updateItem.isCriticalUpdate);
+    [self.coreDriver abortUpdateAndShowNextUpdateImmediately:showNextUpdateImmediately error:error];
 }
 
 @end

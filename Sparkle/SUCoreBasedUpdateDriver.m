@@ -176,8 +176,11 @@
     
     [self.installerDriver extractDownloadedUpdate:downloadedUpdate silently:self.silentInstall completion:^(NSError * _Nullable error) {
         if (error != nil) {
-            BOOL silentError = (error.code == SUInstallationCancelledError || error.code == SUInstallationTryAgainLaterError);
-            [self.delegate coreDriverIsRequestingAbortUpdateWithError:silentError ? nil : error];
+            [self.delegate coreDriverIsRequestingAbortUpdateWithError:error];
+        } else {
+            // If the installer started properly, we can't use the downloaded update archive anymore
+            // Especially if the installer fails later and we try resuming the update with a missing archive file
+            [self clearDownloadedUpdate];
         }
     }];
 }
@@ -277,13 +280,13 @@
     [self downloadUpdateFromAppcastItem:nonDeltaUpdateItem];
 }
 
-- (void)abortUpdateAndSignalShowingNextUpdateImmediately:(BOOL)shouldSignalShowingUpdate error:(nullable NSError *)error
+- (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately error:(nullable NSError *)error
 {
     [self.installerDriver abortInstall];
     [self.downloadDriver cleanup];
     
-    SUDownloadedUpdate *downloadedUpdate = (error == nil) ? self.downloadedUpdate : nil;
-    [self.basicDriver abortUpdateAndSignalShowingNextUpdateImmediately:shouldSignalShowingUpdate downloadedUpdate:downloadedUpdate error:error];
+    SUDownloadedUpdate *downloadedUpdate = (error == nil || error.code == SUInstallationTryAgainLaterError) ? self.downloadedUpdate : nil;
+    [self.basicDriver abortUpdateAndShowNextUpdateImmediately:shouldShowUpdateImmediately downloadedUpdate:downloadedUpdate error:error];
 }
 
 @end
