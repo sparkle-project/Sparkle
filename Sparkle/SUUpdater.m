@@ -27,6 +27,7 @@
 #import "SUErrors.h"
 #import "SUXPCServiceInfo.h"
 #import "SUUpdaterCycle.h"
+#import "SUDownloadedUpdate.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -49,6 +50,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (nonatomic, readonly) SUUpdaterCycle *updaterCycle;
 @property (nonatomic) BOOL startedUpdater;
 @property (nonatomic, copy) void (^preStartedScheduledUpdateBlock)(void);
+@property (nonatomic, nullable) SUDownloadedUpdate *resumableUpdate;
 
 @end
 
@@ -65,6 +67,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize sparkleBundle = _sparkleBundle;
 @synthesize startedUpdater = _startedUpdater;
 @synthesize preStartedScheduledUpdateBlock = _preStartedScheduledUpdateBlock;
+@synthesize resumableUpdate = _resumableUpdate;
 
 #ifdef DEBUG
 + (void)load
@@ -376,7 +379,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             }
             
             id <SUUpdateDriver> updateDriver;
-            if (!installerIsRunning && [strongSelf automaticallyDownloadsUpdates] && [strongSelf allowsAutomaticUpdates]) {
+            if (!installerIsRunning && [strongSelf automaticallyDownloadsUpdates] && [strongSelf allowsAutomaticUpdates] && strongSelf.resumableUpdate == nil) {
                 updateDriver =
                 [[SUAutomaticUpdateDriver alloc]
                  initWithHost:strongSelf.host
@@ -479,9 +482,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     // Use a NIL URL to cancel quietly.
     if (theFeedURL) {
         __weak SUUpdater *weakSelf = self;
-        SUUpdateDriverCompletion completionBlock = ^(BOOL shouldShowUpdateImmediately) {
+        SUUpdateDriverCompletion completionBlock = ^(BOOL shouldShowUpdateImmediately, SUDownloadedUpdate * _Nullable resumableUpdate) {
             SUUpdater *strongSelf = weakSelf;
             if (strongSelf != nil) {
+                strongSelf.resumableUpdate = resumableUpdate;
                 strongSelf.driver = nil;
                 [strongSelf updateLastUpdateCheckDate];
                 [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately];
@@ -490,10 +494,12 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         
         [self.userDriver showCanCheckForUpdates:NO];
         
-        if (!installerInProgress) {
-            [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders] completion:completionBlock];
-        } else {
+        if (installerInProgress) {
             [self.driver resumeUpdateWithCompletion:completionBlock];
+        } else if (self.resumableUpdate != nil) {
+            [self.driver resumeDownloadedUpdate:(SUDownloadedUpdate * _Nonnull)self.resumableUpdate completion:completionBlock];
+        } else {
+            [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders] completion:completionBlock];
         }
     } else {
         [self.driver abortUpdate];

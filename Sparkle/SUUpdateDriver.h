@@ -8,13 +8,17 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^SUUpdateDriverCompletion)(BOOL shouldShowUpdateImmediately);
+@class SUDownloadedUpdate;
+
+typedef void (^SUUpdateDriverCompletion)(BOOL shouldShowUpdateImmediately, SUDownloadedUpdate * _Nullable resumableUpdate);
 
 @protocol SUUpdateDriver <NSObject>
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(SUUpdateDriverCompletion)completionBlock;
 
 - (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock;
+
+- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock;
 
 - (void)abortUpdate;
 

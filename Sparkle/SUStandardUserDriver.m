@@ -318,15 +318,22 @@
 
 #pragma mark Download & Install Updates
 
+- (void)showStatusController
+{
+    if (self.statusController == nil) {
+        self.statusController = [[SUStatusController alloc] initWithHost:self.host];
+        [self.statusController showWindow:self];
+    }
+}
+
 - (void)showDownloadInitiatedWithCompletion:(void (^)(SUDownloadUpdateStatus))downloadUpdateStatusCompletion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent registerDownloadStatusHandler:downloadUpdateStatusCompletion];
         
-        self.statusController = [[SUStatusController alloc] initWithHost:self.host];
+        [self showStatusController];
         [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
         [self.statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
-        [self.statusController showWindow:self];
     });
 }
 
@@ -364,7 +371,9 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent completeDownloadStatus];
         
+        [self showStatusController];
         [self.statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
+        [self.statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:nil action:nil isDefault:NO];
         [self.statusController setButtonEnabled:NO];
     });
 }

@@ -16,6 +16,7 @@
 #import "SUAppcastItem.h"
 #import "SUProbeInstallStatus.h"
 #import "SUInstallationInfo.h"
+#import "SUDownloadedUpdate.h"
 
 @interface SUBasicUpdateDriver () <SUAppcastDriverDelegate>
 
@@ -64,24 +65,35 @@
     }
 }
 
+- (void)notifyResumableUpdateItem:(SUAppcastItem *)updateItem
+{
+    if (updateItem == nil) {
+        [self.delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUResumeAppcastError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"Failed to resume installing update.", nil) }]];
+    } else {
+        // Kind of lying, but triggering the notification so drivers can know when to stop showing initial fetching progress
+        [self notifyFinishLoadingAppcast];
+        
+        SUAppcastItem *nonNullUpdateItem = updateItem;
+        [self didFindValidUpdateWithAppcastItem:nonNullUpdateItem];
+    }
+}
+
 - (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
 {
     self.completionBlock = completionBlock;
     
     [SUProbeInstallStatus probeInstallerUpdateItemForHost:self.host completion:^(SUInstallationInfo * _Nullable installationInfo) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            SUAppcastItem *updateItem = installationInfo.appcastItem;
-            if (updateItem == nil) {
-                [self.delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUResumeAppcastError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"Failed to resume installing update.", nil) }]];
-            } else {
-                // Kind of lying, but triggering the notification so drivers can know when to stop showing initial fetching progress
-                [self notifyFinishLoadingAppcast];
-                
-                SUAppcastItem *nonNullUpdateItem = updateItem;
-                [self didFindValidUpdateWithAppcastItem:nonNullUpdateItem];
-            }
+            [self notifyResumableUpdateItem:installationInfo.appcastItem];
         });
     }];
+}
+
+- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock
+{
+    self.completionBlock = completionBlock;
+    
+    [self notifyResumableUpdateItem:downloadedUpdate.updateItem];
 }
 
 - (SUAppcastItem *)nonDeltaUpdateItem
@@ -141,7 +153,7 @@
     [self.delegate basicDriverIsRequestingAbortUpdateWithError:notFoundError];
 }
 
-- (void)abortUpdateWithError:(nullable NSError *)error
+- (void)abortUpdateAndSignalShowingNextUpdateImmediately:(BOOL)shouldSignalShowingUpdate downloadedUpdate:(SUDownloadedUpdate * _Nullable)downloadedUpdate error:(nullable NSError *)error
 {
     if (error != nil) {
         if ([error code] != SUNoUpdateError) { // Let's not bother logging this.
@@ -160,7 +172,7 @@
     }
     
     if (self.completionBlock != nil) {
-        self.completionBlock([self.delegate basicDriverShouldSignalShowingUpdateImmediately]);
+        self.completionBlock(shouldSignalShowingUpdate, downloadedUpdate);
         self.completionBlock = nil;
     }
 }

@@ -45,6 +45,11 @@
     [self.uiDriver resumeUpdateWithCompletion:completionBlock];
 }
 
+- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock
+{
+    [self.uiDriver resumeDownloadedUpdate:downloadedUpdate completion:completionBlock];
+}
+
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)__unused error
 {
     // Don't tell the user that no update was found or some appcast fetch error occurred for scheduled update checks

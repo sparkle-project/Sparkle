@@ -130,7 +130,7 @@
 }
 
 // This can be called multiple times (eg: if a delta update fails, this may be called again with a regular update item)
-- (void)extractDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(void (^)(NSError * _Nullable))completionHandler
+- (void)extractDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate silently:(BOOL)silently completion:(void (^)(NSError * _Nullable))completionHandler
 {
     self.updateItem = downloadedUpdate.updateItem;
     self.temporaryDirectory = downloadedUpdate.temporaryDirectory;
@@ -139,7 +139,7 @@
     self.currentStage = SUInstallerNotStarted;
     
     if (self.installerConnection == nil) {
-        [self launchAutoUpdateWithCompletion:completionHandler];
+        [self launchAutoUpdateSilently:silently completion:completionHandler];
     } else {
         // The Install tool is already alive; just send out installation input data again
         [self sendInstallationData];
@@ -372,7 +372,7 @@
     return cachePath;
 }
 
-- (void)launchAutoUpdateWithCompletion:(void (^)(NSError *_Nullable))completionHandler
+- (void)launchAutoUpdateSilently:(BOOL)silently completion:(void (^)(NSError *_Nullable))completionHandler
 {
     // Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
     // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
@@ -426,7 +426,8 @@
         installerLauncher = launcherConnection.remoteObjectProxy;
     }
     
-    BOOL shouldAllowInstallerInteraction = NO;
+#warning review this...
+    BOOL shouldAllowInstallerInteraction = !silently;
     if ([self.updaterDelegate respondsToSelector:@selector(updaterShouldAllowInstallerInteraction:)]) {
         shouldAllowInstallerInteraction = [self.updaterDelegate updaterShouldAllowInstallerInteraction:self.updater];
     }
@@ -440,18 +441,20 @@
             retrievedLaunchStatus = YES;
             [launcherConnection invalidate];
             
-            if (result == SUAuthorizationReplyFailure) {
-                NSError *error =
-                [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while launching the installer. Please try again later.", nil) }];
-                
-                completionHandler(error);
-            } else if (result == SUAuthorizationReplyCancelled) {
-                NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationCancelledError userInfo:nil];
-                completionHandler(error);
-            } else {
-                [self setUpConnection];
-                
-                completionHandler(nil);
+            switch (result) {
+                case SUAuthorizationReplyFailure:
+                    completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while launching the installer. Please try again later.", nil) }]);
+                    break;
+                case SUAuthorizationReplyCancelled:
+                    completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationCancelledError userInfo:nil]);
+                    break;
+                case SUAuthorizationReplyTryAgainLater:
+                    completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationTryAgainLaterError userInfo:nil]);
+                    break;
+                case SUAuthorizationReplySuccess:
+                    [self setUpConnection];
+                    completionHandler(nil);
+                    break;
             }
         });
     }];

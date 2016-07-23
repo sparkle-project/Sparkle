@@ -175,14 +175,18 @@
             submittedInstaller = ([SUSubmitInstaller submitInstallerAtPath:installerPath withHostBundle:hostBundle allowingInteraction:allowingInteraction inSystemDomain:needsSystemAuthorization] == SUAuthorizationReplySuccess);
         }
         
-        BOOL submittedProgressTool = [self submitProgressToolAtPath:progressToolPath withHostBundle:hostBundle allowingInteraction:allowingInteraction  installerPath:installerPath shouldSubmitInstaller:!shouldSubmitInstallerImmediately];
-        
-        if (!submittedProgressTool) {
-            completionHandler(SUAuthorizationReplyFailure);
-        } else if (shouldSubmitInstallerImmediately) {
-            completionHandler(submittedInstaller ? SUAuthorizationReplySuccess : SUAuthorizationReplyFailure);
+        if (needsSystemAuthorization && !preflighted && !allowingInteraction) {
+            completionHandler(SUAuthorizationReplyTryAgainLater);
         } else {
-            [self waitForProgressAgentWithHostBundle:hostBundle completion:completionHandler];
+            BOOL submittedProgressTool = [self submitProgressToolAtPath:progressToolPath withHostBundle:hostBundle allowingInteraction:allowingInteraction  installerPath:installerPath shouldSubmitInstaller:!shouldSubmitInstallerImmediately];
+            
+            if (!submittedProgressTool) {
+                completionHandler(SUAuthorizationReplyFailure);
+            } else if (shouldSubmitInstallerImmediately) {
+                completionHandler(submittedInstaller ? SUAuthorizationReplySuccess : SUAuthorizationReplyFailure);
+            } else {
+                [self waitForProgressAgentWithHostBundle:hostBundle completion:completionHandler];
+            }
         }
     });
 }

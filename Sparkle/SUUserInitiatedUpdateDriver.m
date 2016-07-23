@@ -65,6 +65,11 @@
     [self.uiDriver resumeUpdateWithCompletion:completionBlock];
 }
 
+- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock
+{
+    [self.uiDriver resumeDownloadedUpdate:downloadedUpdate completion:completionBlock];
+}
+
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error
 {
     [self abortUpdateWithError:error];

@@ -49,13 +49,20 @@
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(SUUpdateDriverCompletion)completionBlock
 {
-    [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:NO completion:completionBlock];
+    [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:NO requiresSilentInstall:YES completion:completionBlock];
 }
 
 - (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
 {
     // Nothing really to do here.. this shouldn't be called.
     SULog(@"Error: resumeUpdateWithCompletion: called on SUAutomaticUpdateDriver");
+    abort();
+}
+
+- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)__unused downloadedUpdate completion:(SUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
+{
+    // Nothing really to do here.. this shouldn't be called.
+    SULog(@"Error: resumeDownloadedUpdate:completion: called on SUAutomaticUpdateDriver");
     abort();
 }
 
@@ -99,11 +106,6 @@
     }
 }
 
-- (BOOL)basicDriverShouldSignalShowingUpdateImmediately
-{
-    return (!self.willInstallSilently || self.updateItem.isCriticalUpdate);
-}
-
 - (void)basicDriverIsRequestingAbortUpdateWithError:(NSError *)error
 {
     [self abortUpdateWithError:error];
@@ -121,7 +123,8 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    [self.coreDriver abortUpdateWithError:error];
+    BOOL startNextUpdateImmediately = (error == nil) && (!self.willInstallSilently || self.updateItem.isCriticalUpdate);
+    [self.coreDriver abortUpdateAndSignalShowingNextUpdateImmediately:startNextUpdateImmediately error:error];
 }
 
 @end
