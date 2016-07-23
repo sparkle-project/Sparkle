@@ -35,7 +35,7 @@
     OSStatus createStatus = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &auth);
     if (createStatus != errAuthorizationSuccess) {
         auth = NULL;
-        SULog(@"Failed to create authorization reference");
+        SULog(@"Failed to create authorization reference: %d", createStatus);
     }
     
     BOOL canceledAuthorization = NO;
@@ -55,7 +55,7 @@
         
         OSStatus copyStatus = AuthorizationCopyRights(auth, &rights, kAuthorizationEmptyEnvironment, flags, NULL);
         if (copyStatus != errAuthorizationSuccess) {
-            SULog(@"Failed copying system domain rights with kSMRightModifySystemDaemons");
+            SULog(@"Failed copying system domain rights with kSMRightModifySystemDaemons: %d", copyStatus);
             failedToUseSystemDomain = YES;
             
             if (copyStatus == errAuthorizationCanceled) {
