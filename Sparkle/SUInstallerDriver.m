@@ -448,8 +448,8 @@
                 case SUAuthorizationReplyCancelled:
                     completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationCancelledError userInfo:nil]);
                     break;
-                case SUAuthorizationReplyTryAgainLater:
-                    completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationTryAgainLaterError userInfo:nil]);
+                case SUAuthorizationReplyAuthorizeLater:
+                    completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationAuthorizeLaterError userInfo:nil]);
                     break;
                 case SUAuthorizationReplySuccess:
                     [self setUpConnection];

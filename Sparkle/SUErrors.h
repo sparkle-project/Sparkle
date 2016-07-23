@@ -55,7 +55,7 @@ typedef NS_ENUM(OSStatus, SUError) {
     SUInstallationError = 4005,
     SUDowngradeError = 4006,
     SUInstallationCancelledError = 4007,
-    SUInstallationTryAgainLaterError = 4008
+    SUInstallationAuthorizeLaterError = 4008
 };
 
 #endif

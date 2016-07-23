@@ -176,7 +176,7 @@
         }
         
         if (needsSystemAuthorization && !preflighted && !allowingInteraction) {
-            completionHandler(SUAuthorizationReplyTryAgainLater);
+            completionHandler(SUAuthorizationReplyAuthorizeLater);
         } else {
             BOOL submittedProgressTool = [self submitProgressToolAtPath:progressToolPath withHostBundle:hostBundle allowingInteraction:allowingInteraction  installerPath:installerPath shouldSubmitInstaller:!shouldSubmitInstallerImmediately];
             

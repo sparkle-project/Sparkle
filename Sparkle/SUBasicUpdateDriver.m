@@ -156,7 +156,7 @@
 - (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately downloadedUpdate:(SUDownloadedUpdate * _Nullable)downloadedUpdate error:(nullable NSError *)error
 {
     if (error != nil) {
-        if (error.code != SUNoUpdateError && error.code != SUInstallationCancelledError && error.code != SUInstallationTryAgainLaterError) { // Let's not bother logging this.
+        if (error.code != SUNoUpdateError && error.code != SUInstallationCancelledError && error.code != SUInstallationAuthorizeLaterError) { // Let's not bother logging this.
             NSError *errorToDisplay = error;
             int finiteRecursion=5;
             do {

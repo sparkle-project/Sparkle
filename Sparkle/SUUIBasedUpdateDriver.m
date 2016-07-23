@@ -223,7 +223,7 @@
                     abortUpdate();
                 });
             }];
-        } else if (error.code == SUInstallationCancelledError || error.code == SUInstallationTryAgainLaterError) {
+        } else if (error.code == SUInstallationCancelledError || error.code == SUInstallationAuthorizeLaterError) {
             abortUpdate();
         } else {
             [self.userDriver showUpdaterError:nonNullError acknowledgement:^{

@@ -13,5 +13,5 @@ typedef NS_ENUM(NSUInteger, SUAuthorizationReply)
     SUAuthorizationReplySuccess = 0,
     SUAuthorizationReplyCancelled = 1,
     SUAuthorizationReplyFailure = 2,
-    SUAuthorizationReplyTryAgainLater = 3
+    SUAuthorizationReplyAuthorizeLater = 3
 };

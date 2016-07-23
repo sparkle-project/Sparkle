@@ -285,7 +285,7 @@
     [self.installerDriver abortInstall];
     [self.downloadDriver cleanup];
     
-    SUDownloadedUpdate *downloadedUpdate = (error == nil || error.code == SUInstallationTryAgainLaterError) ? self.downloadedUpdate : nil;
+    SUDownloadedUpdate *downloadedUpdate = (error == nil || error.code == SUInstallationAuthorizeLaterError) ? self.downloadedUpdate : nil;
     [self.basicDriver abortUpdateAndShowNextUpdateImmediately:shouldShowUpdateImmediately downloadedUpdate:downloadedUpdate error:error];
 }
 
