@@ -436,7 +436,9 @@
     assert(hostBundlePath != nil);
     
 #warning pass actual guided flag eventually
-    [installerLauncher launchInstallerAtPath:relaunchToolPath progressToolPath:progressToolPath withHostBundlePath:hostBundlePath guidedInstallation:NO allowingInteraction:shouldAllowInstallerInteraction completion:^(SUAuthorizationReply result) {
+    // The installer launcher could be in a XPC service, so we don't want to do localization in there
+    NSString *authorizationPrompt = [NSString stringWithFormat:SULocalizedString(@"%1$@ wants to update.", nil), self.host.name];
+    [installerLauncher launchInstallerAtPath:relaunchToolPath progressToolPath:progressToolPath withHostBundlePath:hostBundlePath authorizationPrompt:authorizationPrompt guidedInstallation:NO allowingInteraction:shouldAllowInstallerInteraction completion:^(SUAuthorizationReply result) {
         dispatch_async(dispatch_get_main_queue(), ^{
             retrievedLaunchStatus = YES;
             [launcherConnection invalidate];

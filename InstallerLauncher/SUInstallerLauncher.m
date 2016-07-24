@@ -84,7 +84,7 @@
     return (submittedJob == true);
 }
 
-- (SUAuthorizationReply)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle allowingInteraction:(BOOL)allowingInteraction inSystemDomain:(BOOL)systemDomain
+- (SUAuthorizationReply)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle authorizationPrompt:(NSString *)authorizationPrompt allowingInteraction:(BOOL)allowingInteraction inSystemDomain:(BOOL)systemDomain
 {
     SUFileManager *fileManager = [SUFileManager defaultManager];
     
@@ -111,31 +111,40 @@
     BOOL canceledAuthorization = NO;
     BOOL failedToUseSystemDomain = NO;
     if (auth != NULL && systemDomain) {
-        AuthorizationItem rightItems[] = {
-            { .name = kSMRightModifySystemDaemons, .valueLength = 0, .value = NULL, .flags = 0}
-        };
+        // See Apple's 'EvenBetterAuthorizationSample' sample code and
+        // https://developer.apple.com/library/mac/technotes/tn2095/_index.html#//apple_ref/doc/uid/DTS10003110-CH1-SECTION7
+        // We can set a custom right name for authenticating as an administrator
+        // Using this right rather than using something like kSMRightModifySystemDaemons allows us to present a better worded prompt
         
-        AuthorizationRights rights = {
-            .count = sizeof(rightItems) / sizeof(*rightItems),
-            .items = rightItems,
-        };
+        const char *rightName = [[NSString stringWithFormat:@"%@.sparkle-auth", hostBundleIdentifier] UTF8String];
+        assert(rightName != NULL);
         
-        AuthorizationFlags flags =
-        (AuthorizationFlags)(kAuthorizationFlagDefaults | kAuthorizationFlagExtendRights | kAuthorizationFlagPreAuthorize | kAuthorizationFlagInteractionAllowed);
+        OSStatus getRightResult = AuthorizationRightGet(rightName, NULL);
+        if (getRightResult == errAuthorizationDenied) {
+            if (AuthorizationRightSet(auth, rightName, (__bridge CFTypeRef _Nonnull)(@(kAuthorizationRuleAuthenticateAsAdmin)), (__bridge CFStringRef _Nullable)(authorizationPrompt), NULL, NULL) != errAuthorizationSuccess) {
+                SULog(@"Failed to make auth right set");
+            }
+        }
+        
+        AuthorizationItem right = { .name = rightName, .valueLength = 0, .value = NULL, .flags = 0 };
+        AuthorizationRights rights = { .count = 1, .items = &right };
+        
+        AuthorizationFlags flags = (AuthorizationFlags)(kAuthorizationFlagExtendRights | kAuthorizationFlagInteractionAllowed);
         
         OSStatus copyStatus = AuthorizationCopyRights(auth, &rights, kAuthorizationEmptyEnvironment, flags, NULL);
         if (copyStatus != errAuthorizationSuccess) {
-            SULog(@"Failed copying system domain rights with kSMRightModifySystemDaemons: %d", copyStatus);
             failedToUseSystemDomain = YES;
             
             if (copyStatus == errAuthorizationCanceled) {
                 canceledAuthorization = YES;
+            } else {
+                SULog(@"Failed copying system domain rights: %d", copyStatus);
             }
         }
     }
     
     Boolean submittedJob = false;
-    if (!failedToUseSystemDomain && auth != NULL) {
+    if (!canceledAuthorization && !failedToUseSystemDomain && auth != NULL) {
         CFStringRef domain = (systemDomain ? kSMDomainSystemLaunchd : kSMDomainUserLaunchd);
         NSString *label = [NSString stringWithFormat:@"%@-sparkle-updater", hostBundleIdentifier];
         
@@ -147,7 +156,7 @@
             if (removeError != NULL) {
                 // It's normal for a job to not be found, so this is not an interesting error
                 if (CFErrorGetCode(removeError) != kSMErrorJobNotFound) {
-                    SULog(@"Remove error: %@", removeError);
+                    SULog(@"Remove job error: %@", removeError);
                 }
                 CFRelease(removeError);
             }
@@ -163,7 +172,9 @@
                 CFRelease(submitError);
             }
         }
-        
+    }
+    
+    if (auth != NULL) {
         AuthorizationFree(auth, kAuthorizationFlagDefaults);
     }
     
@@ -178,7 +189,7 @@
     return reply;
 }
 
-- (void)launchInstallerAtPath:(NSString *)installerPath progressToolPath:(NSString *)progressToolPath withHostBundlePath:(NSString *)hostBundlePath guidedInstallation:(BOOL)guidedInstallation allowingInteraction:(BOOL)allowingInteraction completion:(void (^)(SUAuthorizationReply))completionHandler
+- (void)launchInstallerAtPath:(NSString *)installerPath progressToolPath:(NSString *)progressToolPath withHostBundlePath:(NSString *)hostBundlePath authorizationPrompt:(NSString *)authorizationPrompt guidedInstallation:(BOOL)guidedInstallation allowingInteraction:(BOOL)allowingInteraction completion:(void (^)(SUAuthorizationReply))completionHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
@@ -190,14 +201,14 @@
         if (needsSystemAuthorization && !preflighted && !allowingInteraction) {
             completionHandler(SUAuthorizationReplyAuthorizeLater);
         } else {
-            BOOL submittedInstaller = ([self submitInstallerAtPath:installerPath withHostBundle:hostBundle allowingInteraction:allowingInteraction inSystemDomain:needsSystemAuthorization] == SUAuthorizationReplySuccess);
+            SUAuthorizationReply installerReply = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle authorizationPrompt:authorizationPrompt allowingInteraction:allowingInteraction inSystemDomain:needsSystemAuthorization];
             
-            if (!submittedInstaller) {
+            if (installerReply == SUAuthorizationReplyFailure) {
                 SULog(@"Failed to submit installer job");
             }
             
             BOOL submittedProgressTool = NO;
-            if (submittedInstaller) {
+            if (installerReply == SUAuthorizationReplySuccess) {
                 submittedProgressTool = [self submitProgressToolAtPath:progressToolPath withHostBundle:hostBundle inSystemDomainForInstaller:needsSystemAuthorization];
                 
                 if (!submittedProgressTool) {
@@ -205,7 +216,11 @@
                 }
             }
             
-            completionHandler(submittedProgressTool ? SUAuthorizationReplySuccess : SUAuthorizationReplyFailure);
+            if (installerReply == SUAuthorizationReplyCancelled) {
+                completionHandler(installerReply);
+            } else {
+                completionHandler(submittedProgressTool ? SUAuthorizationReplySuccess : SUAuthorizationReplyFailure);
+            }
         }
     });
 }
