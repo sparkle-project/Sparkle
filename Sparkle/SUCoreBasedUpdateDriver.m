@@ -275,6 +275,8 @@
     SUAppcastItem *nonDeltaUpdateItem = self.basicDriver.nonDeltaUpdateItem;
     assert(nonDeltaUpdateItem != nil);
     
+    [self clearDownloadedUpdate];
+    
     // Fall back to the non-delta update. Note that we don't want to trigger another update was found event.
     self.updateItem = nonDeltaUpdateItem;
     [self downloadUpdateFromAppcastItem:nonDeltaUpdateItem];
