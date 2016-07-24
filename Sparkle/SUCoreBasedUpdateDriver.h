@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)downloadDriverDidReceiveDataOfLength:(NSUInteger)length;
 
-- (void)coreDriverDidFinishDownloadingUpdate;
+- (void)coreDriverDidStartExtractingUpdate;
 
 - (void)installerDidStartInstalling;
 

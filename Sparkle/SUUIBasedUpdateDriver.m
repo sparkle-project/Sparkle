@@ -160,9 +160,9 @@
     [self.userDriver showDownloadDidReceiveDataOfLength:length];
 }
 
-- (void)coreDriverDidFinishDownloadingUpdate
+- (void)coreDriverDidStartExtractingUpdate
 {
-    [self.userDriver showDownloadFinishedAndStartedExtractingUpdate];
+    [self.userDriver showDownloadDidStartExtractingUpdate];
 }
 
 - (void)installerDidStartInstalling

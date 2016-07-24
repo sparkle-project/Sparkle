@@ -200,9 +200,9 @@ NS_ASSUME_NONNULL_BEGIN
  * Let the user know that downloading the new update started.
  *
  * @param downloadUpdateStatusCompletion A reply of SUDownloadUpdateCancelled can be used to cancel
- * the download at any point before -showDownloadFinishedAndStartedExtractingUpdate is invoked.
+ * the download at any point before -showDownloadDidStartExtractingUpdate is invoked.
  * A reply of SUDownloadUpdateDone signifies that the download is done, which should not be invoked until
- * -showDownloadFinishedAndStartedExtractingUpdate
+ * -showDownloadDidStartExtractingUpdate
  *
  * This can be called from any thread
  */
@@ -235,7 +235,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * This can be called from any thread
  */
-- (void)showDownloadFinishedAndStartedExtractingUpdate;
+- (void)showDownloadDidStartExtractingUpdate;
 
 /*!
  * Show the user that the update is extracting with progress

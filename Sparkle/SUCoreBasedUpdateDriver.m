@@ -170,8 +170,8 @@
 - (void)extractUpdate:(SUDownloadedUpdate *)downloadedUpdate
 {
     // Now we have to extract the downloaded archive.
-    if ([self.delegate respondsToSelector:@selector(coreDriverDidFinishDownloadingUpdate)]) {
-        [self.delegate coreDriverDidFinishDownloadingUpdate];
+    if ([self.delegate respondsToSelector:@selector(coreDriverDidStartExtractingUpdate)]) {
+        [self.delegate coreDriverDidStartExtractingUpdate];
     }
     
     [self.installerDriver extractDownloadedUpdate:downloadedUpdate silently:self.silentInstall completion:^(NSError * _Nullable error) {

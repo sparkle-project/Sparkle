@@ -51,7 +51,7 @@
 
 - (void)showDownloadDidReceiveDataOfLength:(NSUInteger)__unused length {}
 
-- (void)showDownloadFinishedAndStartedExtractingUpdate {}
+- (void)showDownloadDidStartExtractingUpdate {}
 
 - (void)showExtractionReceivedProgress:(double)__unused progress {}
 

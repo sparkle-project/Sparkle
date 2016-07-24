@@ -366,7 +366,7 @@
     });
 }
 
-- (void)showDownloadFinishedAndStartedExtractingUpdate
+- (void)showDownloadDidStartExtractingUpdate
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent completeDownloadStatus];
