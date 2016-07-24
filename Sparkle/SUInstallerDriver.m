@@ -53,6 +53,8 @@
 @property (nonatomic, copy) NSString *downloadName;
 @property (nonatomic, copy) NSString *temporaryDirectory;
 
+@property (nonatomic) BOOL aborted;
+
 @end
 
 @implementation SUInstallerDriver
@@ -72,6 +74,7 @@
 @synthesize updateItem = _updateItem;
 @synthesize downloadName = _downloadName;
 @synthesize temporaryDirectory = _temporaryDirectory;
+@synthesize aborted = _aborted;
 
 - (instancetype)initWithHost:(SUHost *)host cachePath:(NSString *)cachePath sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(id<SUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SUInstallerDriverDelegate>)delegate
 {
@@ -106,7 +109,7 @@
     [self.installerConnection setInvalidationHandler:^{
         dispatch_async(dispatch_get_main_queue(), ^{
             SUInstallerDriver *strongSelf = weakSelf;
-            if (strongSelf.installerConnection != nil) {
+            if (strongSelf.installerConnection != nil && !strongSelf.aborted) {
                 NSError *remoteError =
                 [NSError
                  errorWithDomain:SUSparkleErrorDomain
@@ -527,6 +530,7 @@
 
 - (void)abortInstall
 {
+    self.aborted = YES;
     if (self.installerConnection != nil) {
         [self.installerConnection invalidate];
         self.installerConnection = nil;
