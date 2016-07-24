@@ -28,7 +28,7 @@
 @property (weak, nonatomic, readonly) id<SUUpdaterDelegate> updaterDelegate;
 @property (nonatomic, weak, readonly) id<SUUIBasedUpdateDriverDelegate> delegate;
 @property (nonatomic, readonly) id<SUUserDriver> userDriver;
-@property (nonatomic) BOOL resumingUpdate;
+@property (nonatomic) BOOL resumingInstallingUpdate;
 @property (nonatomic) BOOL resumingDownloadedUpdate;
 
 @end
@@ -41,7 +41,7 @@
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize userDriver = _userDriver;
 @synthesize delegate = _delegate;
-@synthesize resumingUpdate = _resumingUpdate;
+@synthesize resumingInstallingUpdate = _resumingInstallingUpdate;
 @synthesize resumingDownloadedUpdate = _resumingDownloadedUpdate;
 
 - (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate delegate:(id<SUUIBasedUpdateDriverDelegate>)delegate
@@ -64,10 +64,10 @@
     [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:includesSkippedUpdates requiresSilentInstall:NO completion:completionBlock];
 }
 
-- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
+- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
 {
-    self.resumingUpdate = YES;
-    [self.coreDriver resumeUpdateWithCompletion:completionBlock];
+    self.resumingInstallingUpdate = YES;
+    [self.coreDriver resumeInstallingUpdateWithCompletion:completionBlock];
 }
 
 - (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock
@@ -103,7 +103,7 @@
                 }
             });
         }];
-    } else if (!self.resumingUpdate) {
+    } else if (!self.resumingInstallingUpdate) {
         [self.userDriver showUpdateFoundWithAppcastItem:updateItem reply:^(SUUpdateAlertChoice choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];

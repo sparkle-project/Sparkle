@@ -147,7 +147,7 @@
     }
 }
 
-- (void)resumeUpdateWithUpdateItem:(SUAppcastItem *)updateItem
+- (void)resumeInstallingUpdateWithUpdateItem:(SUAppcastItem *)updateItem
 {
     self.updateItem = updateItem;
 }

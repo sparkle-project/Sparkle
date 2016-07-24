@@ -495,7 +495,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         [self.userDriver showCanCheckForUpdates:NO];
         
         if (installerInProgress) {
-            [self.driver resumeUpdateWithCompletion:completionBlock];
+            [self.driver resumeInstallingUpdateWithCompletion:completionBlock];
         } else if (self.resumableUpdate != nil) {
             [self.driver resumeDownloadedUpdate:(SUDownloadedUpdate * _Nonnull)self.resumableUpdate completion:completionBlock];
         } else {

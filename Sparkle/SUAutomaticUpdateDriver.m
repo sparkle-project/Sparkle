@@ -53,10 +53,10 @@
     [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:NO requiresSilentInstall:YES completion:completionBlock];
 }
 
-- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
+- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
 {
     // Nothing really to do here.. this shouldn't be called.
-    SULog(@"Error: resumeUpdateWithCompletion: called on SUAutomaticUpdateDriver");
+    SULog(@"Error: resumeInstallingUpdateWithCompletion: called on SUAutomaticUpdateDriver");
     abort();
 }
 

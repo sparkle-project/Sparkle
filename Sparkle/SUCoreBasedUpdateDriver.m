@@ -31,7 +31,7 @@
 @property (nonatomic) SUDownloadedUpdate *downloadedUpdate;
 
 @property (nonatomic, readonly) SUHost *host;
-@property (nonatomic) BOOL resumingUpdate;
+@property (nonatomic) BOOL resumingInstallingUpdate;
 @property (nonatomic) BOOL silentInstall;
 @property (nonatomic, readonly, weak) id updater; // if we didn't have legacy support, I'd remove this..
 @property (nullable, nonatomic, readonly, weak) id <SUUpdaterDelegate>updaterDelegate;
@@ -47,7 +47,7 @@
 @synthesize delegate = _delegate;
 @synthesize updateItem = _updateItem;
 @synthesize host = _host;
-@synthesize resumingUpdate = _resumingUpdate;
+@synthesize resumingInstallingUpdate = _resumingInstallingUpdate;
 @synthesize silentInstall = _silentInstall;
 @synthesize updater = _updater;
 @synthesize updaterDelegate = _updaterDelegate;
@@ -82,12 +82,12 @@
     [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:includesSkippedUpdates completion:completionBlock];
 }
 
-- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
+- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
 {
-    self.resumingUpdate = YES;
+    self.resumingInstallingUpdate = YES;
     self.silentInstall = NO;
     
-    [self.basicDriver resumeUpdateWithCompletion:completionBlock];
+    [self.basicDriver resumeInstallingUpdateWithCompletion:completionBlock];
 }
 
 - (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock
@@ -109,8 +109,8 @@
 {
     self.updateItem = updateItem;
     
-    if (self.resumingUpdate) {
-        [self.installerDriver resumeUpdateWithUpdateItem:updateItem];
+    if (self.resumingInstallingUpdate) {
+        [self.installerDriver resumeInstallingUpdateWithUpdateItem:updateItem];
     }
     
     [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem];
