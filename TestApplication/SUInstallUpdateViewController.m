@@ -15,7 +15,7 @@
 @property (nonatomic) IBOutlet NSTextView *textView;
 @property (nonatomic, readonly) SUAppcastItem *appcastItem;
 @property (nonatomic, copy) void (^reply)(SUUpdateAlertChoice);
-@property (nonatomic, readonly) BOOL alreadyDownloaded;
+@property (nonatomic, readonly) BOOL skippable;
 
 @end
 
@@ -25,14 +25,14 @@
 @synthesize textView = _textView;
 @synthesize appcastItem = _appcastItem;
 @synthesize reply = _reply;
-@synthesize alreadyDownloaded = _alreadyDownloaded;
+@synthesize skippable = _skippable;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem alreadyDownloaded:(BOOL)alreadyDownloaded reply:(void (^)(SUUpdateAlertChoice))reply
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem skippable:(BOOL)skippable reply:(void (^)(SUUpdateAlertChoice))reply
 {
     self = [super initWithNibName:@"SUInstallUpdateViewController" bundle:nil];
     if (self != nil) {
         _appcastItem = appcastItem;
-        _alreadyDownloaded = alreadyDownloaded;
+        _skippable = skippable;
         self.reply = reply;
     }
     return self;
@@ -42,7 +42,7 @@
 {
     [super viewDidLoad];
     
-    self.skipUpdatesButton.enabled = !self.alreadyDownloaded;
+    self.skipUpdatesButton.enabled = self.skippable;
     
     [[self.textView enclosingScrollView] setDrawsBackground:NO];
     [self.textView setDrawsBackground:NO];

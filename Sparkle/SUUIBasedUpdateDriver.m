@@ -85,20 +85,33 @@
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
 {
-    if (!self.resumingUpdate || self.resumingDownloadedUpdate) {
+    if (self.resumingDownloadedUpdate) {
+        [self.userDriver showDownloadedUpdateFoundWithAppcastItem:updateItem reply:^(SUUpdateAlertChoice choice) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
+                switch (choice) {
+                    case SUInstallUpdateChoice:
+                        [self.coreDriver extractDownloadedUpdate];
+                        break;
+                    case SUSkipThisVersionChoice:
+                        [self.coreDriver clearDownloadedUpdate];
+                        [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+                        // Fall through
+                    case SUInstallLaterChoice:
+                        [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
+                        break;
+                }
+            });
+        }];
+    } else if (!self.resumingUpdate) {
         [self.userDriver showUpdateFoundWithAppcastItem:updateItem reply:^(SUUpdateAlertChoice choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
                 switch (choice) {
                     case SUInstallUpdateChoice:
-                        if (!self.resumingDownloadedUpdate) {
-                            [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
-                        } else {
-                            [self.coreDriver extractDownloadedUpdate];
-                        }
+                        [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
                         break;
                     case SUSkipThisVersionChoice:
-                        [self.coreDriver clearDownloadedUpdate];
                         [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
                         // Fall through
                     case SUInstallLaterChoice:

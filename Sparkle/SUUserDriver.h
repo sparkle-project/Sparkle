@@ -130,16 +130,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply;
 
 /*!
- * Show the user a downloaded update can be resumed and installed immediately
+ * Show the user a new update has been downloaded and can be installed
  *
- * Let the user know a downloaded update can be installed ask them what they want to do.
+ * This method behaves just like -showUpdateFoundWithAppcastItem:reply: except the update has already been downloaded.
+ */
+- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply;
+
+/*!
+ * Show the user an update that has started installing can be resumed and installed immediately
+ *
+ * Let the user know an update that has already been downloaded and started installing can be resumed.
+ * Note at this point the update cannot be cancelled.
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update
  *
  * @param reply A reply of SUInstallAndRelaunchUpdateNow installs the update immediately and relaunches the new update.
- * A reply of SUInstallUpdateNow installes the update immediately but does not relaunch the new update.
- * A reply of SUDismissUpdateInstallation dismisses the update installation. Note the update may still be installed after
- * the application terminates, however there is not a strong guarantee that this will happen.
+ * A reply of SUInstallUpdateNow installs the update immediately but does not relaunch the new update.
+ * A reply of SUDismissUpdateInstallation dismisses the update installation. Note the update will attempt to finish installation
+ * after the application terminates.
  *
  * This can be called from any thread
  */

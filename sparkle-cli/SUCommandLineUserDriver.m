@@ -149,6 +149,14 @@
     });
 }
 
+- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self showUpdateWithAppcastItem:appcastItem updateAdjective:@"downloaded"];
+        reply(SUInstallUpdateChoice);
+    });
+}
+
 - (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUInstallUpdateStatus))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{

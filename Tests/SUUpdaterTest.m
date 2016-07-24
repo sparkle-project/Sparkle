@@ -35,6 +35,8 @@
 
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem reply:(void (^)(SUUpdateAlertChoice))__unused reply {}
 
+- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem reply:(void (^)(SUUpdateAlertChoice))__unused reply {}
+
 - (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem reply:(void (^)(SUInstallUpdateStatus))__unused reply {}
 
 - (void)showUpdateReleaseNotes:(NSData *)__unused releaseNotes {}

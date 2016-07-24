@@ -34,6 +34,7 @@
 @interface SUUpdateAlert () <WebFrameLoadDelegate, WebPolicyDelegate>
 
 @property (strong) SUAppcastItem *updateItem;
+@property (nonatomic) BOOL alreadyDownloaded;
 @property (strong) SUHost *host;
 @property (nonatomic) BOOL allowsAutomaticUpdates;
 @property (nonatomic, copy, nullable) void(^completionBlock)(SUUpdateAlertChoice);
@@ -55,6 +56,7 @@
 @implementation SUUpdateAlert
 
 @synthesize completionBlock = _completionBlock;
+@synthesize alreadyDownloaded = _alreadyDownloaded;
 @synthesize resumableCompletionBlock = _resumableCompletionBlock;
 @synthesize versionDisplayer;
 
@@ -93,12 +95,13 @@
     return self;
 }
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SUUpdateAlertChoice))block
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item alreadyDownloaded:(BOOL)alreadyDownloaded host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SUUpdateAlertChoice))block
 {
     self = [self initWithAppcastItem:item host:aHost versionDisplayer:aVersionDisplayer];
 	if (self != nil)
 	{
         _completionBlock = [block copy];
+        _alreadyDownloaded = alreadyDownloaded;
     }
     return self;
 }
@@ -109,6 +112,7 @@
     if (self != nil)
     {
         _resumableCompletionBlock = [block copy];
+        _alreadyDownloaded = YES;
     }
     return self;
 }
@@ -264,9 +268,9 @@
         [self.automaticallyInstallUpdatesButton removeFromSuperview];
     }
     
-    BOOL alreadyDownloaded = (self.resumableCompletionBlock != nil);
-    if (alreadyDownloaded) {
-        // Should we hide the button or disable the button if the update has already been downloaded?
+    BOOL startedInstalling = (self.resumableCompletionBlock != nil);
+    if (startedInstalling) {
+        // Should we hide the button or disable the button if the update has already started installing?
         // Personally I think it looks better when the button is visible on the window...
         // Anyway an already downloaded update can't be skipped
         self.skipButton.enabled = NO;
@@ -315,8 +319,6 @@
     } else {
         [self.versionDisplayer formatVersion:&updateItemVersion andVersion:&hostVersion];
     }
-    
-    BOOL alreadyDownloaded = (self.resumableCompletionBlock != nil);
 
     // We display a different summary depending on if it's an "info-only" item, or a "critical update" item, or if we've already downloaded the update and just need to relaunch
     NSString *finalString = nil;
@@ -324,13 +326,13 @@
     if (self.updateItem.isInformationOnlyUpdate) {
         finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?", @"Description text for SUUpdateAlert when the update informational with no download."), self.host.name, updateItemVersion, hostVersion];
     } else if ([self.updateItem isCriticalUpdate]) {
-        if (!alreadyDownloaded) {
+        if (!self.alreadyDownloaded) {
             finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. This is an important update; would you like to download it now?", @"Description text for SUUpdateAlert when the critical update is downloadable."), self.host.name, updateItemVersion, hostVersion];
         } else {
             finalString = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?", @"Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install."), self.host.name, updateItemVersion];
         }
     } else {
-        if (!alreadyDownloaded) {
+        if (!self.alreadyDownloaded) {
             finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", @"Description text for SUUpdateAlert when the update is downloadable."), self.host.name, updateItemVersion, hostVersion];
         } else {
             finalString = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?", @"Description text for SUUpdateAlert when the update has already been downloaded and ready to install."), self.host.name, updateItemVersion];
