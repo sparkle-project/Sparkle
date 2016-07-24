@@ -102,7 +102,6 @@
 		72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */ = {isa = PBXBuildFile; fileRef = 72162B071C82C9600013C1C5 /* SULocalizations.h */; };
 		721652611D3C437E00FD13D8 /* SUSubmitInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 722194771D3C4251004C34FF /* SUSubmitInstaller.m */; };
 		721652621D3C44A100FD13D8 /* SUSystemAuthorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3AC1D347EDE005D534A /* SUSystemAuthorization.m */; };
-		721652651D3C744700FD13D8 /* InstallerProgressLauncher.m in Sources */ = {isa = PBXBuildFile; fileRef = 721652641D3C744700FD13D8 /* InstallerProgressLauncher.m */; };
 		721BC20E1D1CDE55002BC71E /* SULocalCacheDirectory.h in Headers */ = {isa = PBXBuildFile; fileRef = 721BC20C1D1CDE55002BC71E /* SULocalCacheDirectory.h */; };
 		721BC20F1D1CDE55002BC71E /* SULocalCacheDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 721BC20D1D1CDE55002BC71E /* SULocalCacheDirectory.m */; };
 		721BC2101D1CDE55002BC71E /* SULocalCacheDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 721BC20D1D1CDE55002BC71E /* SULocalCacheDirectory.m */; };
@@ -760,9 +759,6 @@
 		7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUUnarchiverTest.swift; sourceTree = "<group>"; };
 		72162B051C82C8B30013C1C5 /* SUParameterAssert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUParameterAssert.h; sourceTree = "<group>"; };
 		72162B071C82C9600013C1C5 /* SULocalizations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULocalizations.h; sourceTree = "<group>"; };
-		721652631D3C744700FD13D8 /* InstallerProgressLauncher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InstallerProgressLauncher.h; path = InstallerLauncher/InstallerProgressLauncher.h; sourceTree = SOURCE_ROOT; };
-		721652641D3C744700FD13D8 /* InstallerProgressLauncher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = InstallerProgressLauncher.m; path = InstallerLauncher/InstallerProgressLauncher.m; sourceTree = SOURCE_ROOT; };
-		721652661D3C76E500FD13D8 /* SUInstallerProgressLauncherProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUInstallerProgressLauncherProtocol.h; path = InstallerLauncher/SUInstallerProgressLauncherProtocol.h; sourceTree = SOURCE_ROOT; };
 		721652671D3C8FED00FD13D8 /* SUAuthorizationReply.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SUAuthorizationReply.h; path = InstallerLauncher/SUAuthorizationReply.h; sourceTree = SOURCE_ROOT; };
 		721BC2061D17A532002BC71E /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		721BC2081D17A553002BC71E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
@@ -1557,10 +1553,6 @@
 				722194521D3BFEB7004C34FF /* SUInstallerAgentInitiationProtocol.h */,
 				72D9547F1CBACC35006F28BD /* InstallerProgressAppController.h */,
 				72D954801CBACC35006F28BD /* InstallerProgressAppController.m */,
-				721652671D3C8FED00FD13D8 /* SUAuthorizationReply.h */,
-				721652661D3C76E500FD13D8 /* SUInstallerProgressLauncherProtocol.h */,
-				721652631D3C744700FD13D8 /* InstallerProgressLauncher.h */,
-				721652641D3C744700FD13D8 /* InstallerProgressLauncher.m */,
 				72D954841CBAD418006F28BD /* ShowInstallerProgress.h */,
 				72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */,
 				7267E5A31D3D8A8A00D1BF90 /* StatusInfo.h */,
@@ -1635,6 +1627,7 @@
 		726E07AE1CAF08D6001A286B /* InstallerLauncher */ = {
 			isa = PBXGroup;
 			children = (
+				721652671D3C8FED00FD13D8 /* SUAuthorizationReply.h */,
 				726E07AF1CAF08D6001A286B /* SUInstallerLauncherProtocol.h */,
 				726E07B01CAF08D6001A286B /* SUInstallerLauncher.h */,
 				726E07B11CAF08D6001A286B /* SUInstallerLauncher.m */,
@@ -2590,7 +2583,6 @@
 				72D954811CBACC35006F28BD /* InstallerProgressAppController.m in Sources */,
 				72EB87EA1CB8798800C37F42 /* ShowInstallerProgress.m in Sources */,
 				721C24611CB75C5D005440CB /* SUHost.m in Sources */,
-				721652651D3C744700FD13D8 /* InstallerProgressLauncher.m in Sources */,
 				722194791D3C4251004C34FF /* SUSubmitInstaller.m in Sources */,
 				721C245E1CB757DE005440CB /* SUConstants.m in Sources */,
 				721C245D1CB757C4005440CB /* SUApplicationInfo.m in Sources */,

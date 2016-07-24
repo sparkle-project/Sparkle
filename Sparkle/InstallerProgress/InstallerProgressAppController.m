@@ -13,7 +13,6 @@
 #import "SUApplicationInfo.h"
 #import "SUInstallerAgentProtocol.h"
 #import "SUInstallerAgentInitiationProtocol.h"
-#import "InstallerProgressLauncher.h"
 #import "StatusInfo.h"
 #import <ServiceManagement/ServiceManagement.h>
 
@@ -24,7 +23,7 @@
  */
 static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 
-@interface InstallerProgressAppController () <NSApplicationDelegate, SUInstallerAgentProtocol, InstallerProgressLauncherDelegate>
+@interface InstallerProgressAppController () <NSApplicationDelegate, SUInstallerAgentProtocol>
 
 @property (nonatomic, readonly) NSApplication *application;
 @property (nonatomic, weak) id<InstallerProgressDelegate> delegate;
@@ -32,7 +31,6 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @property (nonatomic) BOOL connected;
 @property (nonatomic) BOOL repliedToRegistration;
 @property (nonatomic, readonly) NSBundle *hostBundle;
-@property (nonatomic, readonly, nullable) InstallerProgressLauncher *progressLauncher;
 @property (nonatomic) StatusInfo *statusInfo;
 @property (nonatomic) BOOL submittedLauncherJob;
 
@@ -48,7 +46,6 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @synthesize connected = _connected;
 @synthesize repliedToRegistration = _repliedToRegistration;
 @synthesize hostBundle = _hostBundle;
-@synthesize progressLauncher = _progressLauncher;
 @synthesize statusInfo = _statusInfo;
 @synthesize submittedLauncherJob = _submittedLauncherJob;
 
@@ -56,8 +53,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 {
     self = [super init];
     if (self != nil) {
-        if (arguments.count != 5) {
-            SULog(@"Error: Invalid arguments");
+        if (arguments.count != 3) {
+            SULog(@"Error: Invalid number of arguments supplied: %@", arguments);
             [self cleanupAndExitWithStatus:EXIT_FAILURE];
         }
         
@@ -79,18 +76,9 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             [self cleanupAndExitWithStatus:EXIT_FAILURE];
         }
         
-        BOOL allowingInteraction = arguments[2].boolValue;
-        
-        NSString *installerPath = arguments[3];
-        if (installerPath.length == 0) {
-            SULog(@"Error: Installer path length is 0");
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
-        }
-        
-        BOOL shouldSubmitInstaller = arguments[4].boolValue;
-        if (shouldSubmitInstaller) {
-            _progressLauncher = [[InstallerProgressLauncher alloc] initWithHostBundle:_hostBundle installerPath:installerPath allowingInteraction:allowingInteraction delegate:self];
-        }
+        BOOL systemDomain = arguments[2].boolValue;
+        NSXPCConnectionOptions connectionOptions = systemDomain ? NSXPCConnectionPrivileged : 0;
+        _connection = [[NSXPCConnection alloc] initWithMachServiceName:SUProgressAgentServiceNameForBundleIdentifier(hostBundleIdentifier) options:connectionOptions];
         
         _statusInfo = [[StatusInfo alloc] initWithHostBundleIdentifier:hostBundleIdentifier];
         
@@ -98,9 +86,6 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
         
         _application = application;
         _delegate = delegate;
-        
-        NSXPCConnectionOptions connectionOptions = shouldSubmitInstaller ? NSXPCConnectionPrivileged : 0;
-        _connection = [[NSXPCConnection alloc] initWithMachServiceName:SUProgressAgentServiceNameForBundleIdentifier(hostBundleIdentifier) options:connectionOptions];
         
         _connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerAgentProtocol)];
         _connection.exportedObject = self;
@@ -154,34 +139,15 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)__unused notification
 {
-    if (self.progressLauncher == nil) {
-        [self startConnection];
-    } else {
-        [self.progressLauncher startListener];
-    }
+    [self startConnection];
 }
 
 - (void)cleanupAndExitWithStatus:(int)status __attribute__((noreturn))
 {
     [self.statusInfo invalidate];
     [self.connection invalidate];
-    [self.progressLauncher invalidate];
     
     exit(status);
-}
-
-- (void)installerProgressLauncherDidSubmitJob
-{
-    self.submittedLauncherJob = YES;
-    [self startConnection];
-}
-
-- (void)installerProgressLauncherDidInvalidate
-{
-    if (!self.submittedLauncherJob) {
-        SULog(@"Installer progress launcher invalidated");
-        [self cleanupAndExitWithStatus:EXIT_FAILURE];
-    }
 }
 
 - (void)registerRelaunchBundlePath:(NSString *)relaunchBundlePath reply:(void (^)(NSNumber *))reply
