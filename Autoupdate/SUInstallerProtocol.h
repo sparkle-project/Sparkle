@@ -8,8 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-@class SUAuthorizationEnvironment;
-
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol SUInstallerProtocol <NSObject>
