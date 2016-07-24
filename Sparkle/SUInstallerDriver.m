@@ -435,7 +435,7 @@
         installerLauncher = launcherConnection.remoteObjectProxy;
     }
     
-    BOOL shouldAllowInstallerInteraction = NO;
+    BOOL shouldAllowInstallerInteraction = YES;
     if ([self.updaterDelegate respondsToSelector:@selector(updaterShouldAllowInstallerInteraction:)]) {
         shouldAllowInstallerInteraction = [self.updaterDelegate updaterShouldAllowInstallerInteraction:self.updater];
     }
