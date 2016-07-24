@@ -26,6 +26,8 @@
 	<dict>
 		<key>ServiceType</key>
 		<string>Application</string>
+		<key>JoinExistingSession</key>
+		<true/>
 	</dict>
 </dict>
 </plist>
