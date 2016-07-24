@@ -11,6 +11,11 @@
 #import "SULog.h"
 #import "SUMessageTypes.h"
 #import "SUSystemAuthorization.h"
+#import "SUBundleIcon.h"
+
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
 
 @implementation SUInstallerLauncher
 
@@ -131,7 +136,73 @@
         
         AuthorizationFlags flags = (AuthorizationFlags)(kAuthorizationFlagExtendRights | kAuthorizationFlagInteractionAllowed);
         
-        OSStatus copyStatus = AuthorizationCopyRights(auth, &rights, kAuthorizationEmptyEnvironment, flags, NULL);
+        AuthorizationItem iconAuthorizationItem = {.name = kAuthorizationEnvironmentIcon, .valueLength = 0, .value = NULL, .flags = 0};
+        AuthorizationEnvironment authorizationEnvironment = {.count = 0, .items = NULL};
+        
+        // Find a 32x32 image representation of the icon, and write out a PNG version of it to a temporary location
+        // Then use the icon (if one is available) for the authorization prompt
+        // NSImage is not used because it relies on AppKit
+        NSURL *tempIconDestinationURL = nil;
+        NSURL *iconURL = [SUBundleIcon iconURLForBundle:hostBundle];
+        if (iconURL != nil) {
+            CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)iconURL, (CFDictionaryRef)@{});
+            if (imageSource != NULL) {
+                size_t imageCount = CGImageSourceGetCount(imageSource);
+                for (size_t imageIndex = 0; imageIndex < imageCount; imageIndex++) {
+                    CFDictionaryRef cfProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, imageIndex, (CFDictionaryRef)@{});
+                    NSDictionary *properties = (__bridge NSDictionary *)(cfProperties);
+                    
+                    NSNumber *pixelWidth = properties[(const NSString *)kCGImagePropertyPixelWidth];
+                    NSNumber *pixelHeight = properties[(const NSString *)kCGImagePropertyPixelHeight];
+                    
+                    // If we don't find a 32x32 image representation, then we don't provide an icon
+                    // Don't try to make up with it by eg: converting an image representation to this size
+                    // The app developer should be providing the icon representation.
+                    // The authorization API may not take other size dimensions.
+                    NSNumber *targetDimension = @32;
+                    if ([pixelWidth isKindOfClass:[NSNumber class]] && [pixelHeight isKindOfClass:[NSNumber class]]  && [pixelWidth isEqualToNumber:targetDimension] && [pixelHeight isEqualToNumber:targetDimension]) {
+                        
+                        // Use /tmp rather than NSTemporaryDirectory() or SUFileManager's temp directory function because we want:
+                        // a) no spaces in the path (SU/NSFileManager fails here)
+                        // b) short file path that does not exceed a small threshold (NSTemporaryDirectory() fails here)
+                        // These limitations only apply to older systems (eg: macOS 10.8)
+                        // The file also needs to be placed in a system readable place such as /tmp
+                        // See https://github.com/sparkle-project/Sparkle/issues/347#issuecomment-149523848 for more info
+                        char pathBuffer[] = "/tmp/XXXXXX.png";
+                        int tempIconFile = mkstemps(pathBuffer, strlen(".png"));
+                        if (tempIconFile == -1) {
+                            SULog(@"Failed to open temp icon from path buffer with error: %d", errno);
+                        } else {
+                            close(tempIconFile);
+                            
+                            NSString *path = [[NSString alloc] initWithUTF8String:pathBuffer];
+                            tempIconDestinationURL = [NSURL fileURLWithPath:path];
+                            
+                            CGImageDestinationRef imageDestination = CGImageDestinationCreateWithURL((CFURLRef)tempIconDestinationURL, kUTTypePNG, 1, NULL);
+                            if (imageDestination != NULL) {
+                                CGImageDestinationAddImageFromSource(imageDestination, imageSource, imageIndex, (CFDictionaryRef)@{});
+                                if (CGImageDestinationFinalize(imageDestination)) {
+                                    iconAuthorizationItem.valueLength = strlen(pathBuffer);
+                                    iconAuthorizationItem.value = pathBuffer;
+                                    
+                                    authorizationEnvironment.count = 1;
+                                    authorizationEnvironment.items = &iconAuthorizationItem;
+                                }
+                                
+                                CFRelease(imageDestination);
+                            }
+                        }
+                        
+                        break;
+                    }
+                }
+                
+                CFRelease(imageSource);
+            }
+        }
+        
+        // This should prompt up the authorization dialog if necessary
+        OSStatus copyStatus = AuthorizationCopyRights(auth, &rights, &authorizationEnvironment, flags, NULL);
         if (copyStatus != errAuthorizationSuccess) {
             failedToUseSystemDomain = YES;
             
@@ -140,6 +211,10 @@
             } else {
                 SULog(@"Failed copying system domain rights: %d", copyStatus);
             }
+        }
+        
+        if (tempIconDestinationURL != nil) {
+            [fileManager removeItemAtURL:tempIconDestinationURL error:NULL];
         }
     }
     

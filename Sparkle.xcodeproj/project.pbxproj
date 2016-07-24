@@ -98,6 +98,10 @@
 		720E217B1D0D00BF003A311C /* SUUpdaterCycle.h in Headers */ = {isa = PBXBuildFile; fileRef = 720E21791D0D00BF003A311C /* SUUpdaterCycle.h */; };
 		720E217C1D0D00BF003A311C /* SUUpdaterCycle.m in Sources */ = {isa = PBXBuildFile; fileRef = 720E217A1D0D00BF003A311C /* SUUpdaterCycle.m */; };
 		7210C7681B9A9A1500EB90AC /* SUUnarchiverTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */; };
+		7214B8811D456A8500CB5CED /* SUBundleIcon.h in Headers */ = {isa = PBXBuildFile; fileRef = 7214B87F1D456A8500CB5CED /* SUBundleIcon.h */; };
+		7214B8821D456A8500CB5CED /* SUBundleIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7214B8801D456A8500CB5CED /* SUBundleIcon.m */; };
+		7214B8831D456C2400CB5CED /* SUBundleIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7214B8801D456A8500CB5CED /* SUBundleIcon.m */; };
+		7214B8841D456C9500CB5CED /* SUBundleIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7214B8801D456A8500CB5CED /* SUBundleIcon.m */; };
 		72162B061C82C8B30013C1C5 /* SUParameterAssert.h in Headers */ = {isa = PBXBuildFile; fileRef = 72162B051C82C8B30013C1C5 /* SUParameterAssert.h */; };
 		72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */ = {isa = PBXBuildFile; fileRef = 72162B071C82C9600013C1C5 /* SULocalizations.h */; };
 		721652621D3C44A100FD13D8 /* SUSystemAuthorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3AC1D347EDE005D534A /* SUSystemAuthorization.m */; };
@@ -754,6 +758,8 @@
 		720E21791D0D00BF003A311C /* SUUpdaterCycle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdaterCycle.h; sourceTree = "<group>"; };
 		720E217A1D0D00BF003A311C /* SUUpdaterCycle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdaterCycle.m; sourceTree = "<group>"; };
 		7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUUnarchiverTest.swift; sourceTree = "<group>"; };
+		7214B87F1D456A8500CB5CED /* SUBundleIcon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBundleIcon.h; sourceTree = "<group>"; };
+		7214B8801D456A8500CB5CED /* SUBundleIcon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBundleIcon.m; sourceTree = "<group>"; };
 		72162B051C82C8B30013C1C5 /* SUParameterAssert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUParameterAssert.h; sourceTree = "<group>"; };
 		72162B071C82C9600013C1C5 /* SULocalizations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULocalizations.h; sourceTree = "<group>"; };
 		721652671D3C8FED00FD13D8 /* SUAuthorizationReply.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SUAuthorizationReply.h; path = InstallerLauncher/SUAuthorizationReply.h; sourceTree = SOURCE_ROOT; };
@@ -1443,6 +1449,8 @@
 				7267E5E41D3D90AA00D1BF90 /* SUFileManager.m */,
 				721BC20C1D1CDE55002BC71E /* SULocalCacheDirectory.h */,
 				721BC20D1D1CDE55002BC71E /* SULocalCacheDirectory.m */,
+				7214B87F1D456A8500CB5CED /* SUBundleIcon.h */,
+				7214B8801D456A8500CB5CED /* SUBundleIcon.m */,
 				55C14F04136EF6DB00649790 /* SULog.h */,
 				55C14F05136EF6DB00649790 /* SULog.m */,
 				726F2CE31BC9C33D001971A4 /* SUOperatingSystem.h */,
@@ -1831,6 +1839,7 @@
 				72B09CE71CE6BCBD0052EF9E /* SUURLDownload.h in Headers */,
 				61A225A40D1C4AC000430CCD /* SUStandardVersionComparator.h in Headers */,
 				7229E1B91C97CC4D00CB50D0 /* SUScheduledUpdateDriver.h in Headers */,
+				7214B8811D456A8500CB5CED /* SUBundleIcon.h in Headers */,
 				7293A1AE1CEE933800B957A7 /* SUURLRequest.h in Headers */,
 				6196CFF909C72148000DC222 /* SUStatusController.h in Headers */,
 				72B767DE1C9CDB9700A07552 /* SUUserInitiatedUpdateDriver.h in Headers */,
@@ -2567,6 +2576,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7214B8831D456C2400CB5CED /* SUBundleIcon.m in Sources */,
 				7267E5FA1D3DAC3600D1BF90 /* StatusInfo.m in Sources */,
 				7267E5EB1D3D90C200D1BF90 /* SUFileManager.m in Sources */,
 				7267E5DC1D3D8F1E00D1BF90 /* SUMessageTypes.m in Sources */,
@@ -2614,6 +2624,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7214B8841D456C9500CB5CED /* SUBundleIcon.m in Sources */,
 				7267E5E11D3D901600D1BF90 /* SUMessageTypes.m in Sources */,
 				724BB3AF1D34828A005D534A /* SUSystemAuthorization.m in Sources */,
 				726E07C01CAF15B7001A286B /* SULog.m in Sources */,
@@ -2735,6 +2746,7 @@
 				720E217C1D0D00BF003A311C /* SUUpdaterCycle.m in Sources */,
 				72A450541C69A68900D67EEA /* SUUpdatePermission.m in Sources */,
 				724BB3881D32A167005D534A /* SUXPCInstallerConnection.m in Sources */,
+				7214B8821D456A8500CB5CED /* SUBundleIcon.m in Sources */,
 				7229E1BA1C97CC4D00CB50D0 /* SUScheduledUpdateDriver.m in Sources */,
 				725CB95B1C7121830064365A /* SUStandardUserDriver.m in Sources */,
 				61EF67560E25B58D00F754E0 /* SUHost.m in Sources */,
