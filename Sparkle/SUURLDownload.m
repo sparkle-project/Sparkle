@@ -25,6 +25,7 @@ void SUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(NS
         connection = [[NSXPCConnection alloc] initWithServiceName:@TEMPORARY_DOWNLOADER_BUNDLE_ID];
         connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUTemporaryDownloaderProtocol)];
         
+#warning revisit connection weak reference
         __weak NSXPCConnection *weakConnection = connection;
         connection.interruptionHandler = ^{
             dispatch_async(dispatch_get_main_queue(), ^{

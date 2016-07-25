@@ -28,7 +28,8 @@
 @property (weak, nonatomic, readonly) id<SUUpdaterDelegate> updaterDelegate;
 @property (nonatomic, weak, readonly) id<SUUIBasedUpdateDriverDelegate> delegate;
 @property (nonatomic, readonly) id<SUUserDriver> userDriver;
-@property (nonatomic) BOOL resumingUpdate;
+@property (nonatomic) BOOL resumingInstallingUpdate;
+@property (nonatomic) BOOL resumingDownloadedUpdate;
 
 @end
 
@@ -40,7 +41,8 @@
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize userDriver = _userDriver;
 @synthesize delegate = _delegate;
-@synthesize resumingUpdate = _resumingUpdate;
+@synthesize resumingInstallingUpdate = _resumingInstallingUpdate;
+@synthesize resumingDownloadedUpdate = _resumingDownloadedUpdate;
 
 - (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate delegate:(id<SUUIBasedUpdateDriverDelegate>)delegate
 {
@@ -59,13 +61,19 @@
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(SUUpdateDriverCompletion)completionBlock
 {
-    [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:includesSkippedUpdates completion:completionBlock];
+    [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:includesSkippedUpdates requiresSilentInstall:NO completion:completionBlock];
 }
 
-- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
+- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
 {
-    self.resumingUpdate = YES;
-    [self.coreDriver resumeUpdateWithCompletion:completionBlock];
+    self.resumingInstallingUpdate = YES;
+    [self.coreDriver resumeInstallingUpdateWithCompletion:completionBlock];
+}
+
+- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock
+{
+    self.resumingDownloadedUpdate = YES;
+    [self.coreDriver resumeDownloadedUpdate:downloadedUpdate completion:completionBlock];
 }
 
 - (void)basicDriverDidFinishLoadingAppcast
@@ -77,7 +85,25 @@
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
 {
-    if (!self.resumingUpdate) {
+    if (self.resumingDownloadedUpdate) {
+        [self.userDriver showDownloadedUpdateFoundWithAppcastItem:updateItem reply:^(SUUpdateAlertChoice choice) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
+                switch (choice) {
+                    case SUInstallUpdateChoice:
+                        [self.coreDriver extractDownloadedUpdate];
+                        break;
+                    case SUSkipThisVersionChoice:
+                        [self.coreDriver clearDownloadedUpdate];
+                        [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+                        // Fall through
+                    case SUInstallLaterChoice:
+                        [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
+                        break;
+                }
+            });
+        }];
+    } else if (!self.resumingInstallingUpdate) {
         [self.userDriver showUpdateFoundWithAppcastItem:updateItem reply:^(SUUpdateAlertChoice choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
@@ -124,7 +150,7 @@
         switch (downloadCompletionStatus) {
             case SUDownloadUpdateDone:
                 break;
-            case SUDownloadUpdateCancelled:
+            case SUDownloadUpdateCanceled:
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if ([self.updaterDelegate respondsToSelector:@selector(userDidCancelDownload:)]) {
                         [self.updaterDelegate userDidCancelDownload:self.updater];
@@ -147,9 +173,9 @@
     [self.userDriver showDownloadDidReceiveDataOfLength:length];
 }
 
-- (void)coreDriverDidFinishDownloadingUpdate
+- (void)coreDriverDidStartExtractingUpdate
 {
-    [self.userDriver showDownloadFinishedAndStartedExtractingUpdate];
+    [self.userDriver showDownloadDidStartExtractingUpdate];
 }
 
 - (void)installerDidStartInstalling
@@ -183,11 +209,6 @@
     [self.userDriver showUpdateInstallationDidFinish];
 }
 
-- (BOOL)basicDriverShouldSignalShowingUpdateImmediately
-{
-    return NO;
-}
-
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error
 {
     // A delegate may want to handle this type of error specially
@@ -203,7 +224,7 @@
 {
     void (^abortUpdate)(void) = ^{
         [self.userDriver dismissUpdateInstallation];
-        [self.coreDriver abortUpdateWithError:error];
+        [self.coreDriver abortUpdateAndShowNextUpdateImmediately:NO error:error];
     };
     
     if (error != nil) {
@@ -215,6 +236,8 @@
                     abortUpdate();
                 });
             }];
+        } else if (error.code == SUInstallationCanceledError || error.code == SUInstallationAuthorizeLaterError) {
+            abortUpdate();
         } else {
             [self.userDriver showUpdaterError:nonNullError acknowledgement:^{
                 dispatch_async(dispatch_get_main_queue(), ^{

@@ -160,14 +160,14 @@
 
 #pragma mark Update Found
 
-- (void)showUpdateWithAppcastItem:(SUAppcastItem *)appcastItem alreadyDownloaded:(BOOL)alreadyDownloaded reply:(void (^)(SUUpdateAlertChoice))reply
+- (void)showUpdateWithAppcastItem:(SUAppcastItem *)appcastItem skippable:(BOOL)skippable reply:(void (^)(SUUpdateAlertChoice))reply
 {
     NSPopover *popover = [[NSPopover alloc] init];
     popover.behavior = NSPopoverBehaviorTransient;
     
     [self addUpdateButtonWithTitle:@"Update Available" action:^(NSButton *button) {
         if (popover.contentViewController == nil) {
-            popover.contentViewController = [[SUInstallUpdateViewController alloc] initWithAppcastItem:appcastItem alreadyDownloaded:alreadyDownloaded reply:^(SUUpdateAlertChoice choice) {
+            popover.contentViewController = [[SUInstallUpdateViewController alloc] initWithAppcastItem:appcastItem skippable:skippable reply:^(SUUpdateAlertChoice choice) {
                 reply(choice);
                 
                 [popover close];
@@ -182,14 +182,21 @@
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self showUpdateWithAppcastItem:appcastItem alreadyDownloaded:NO reply:reply];
+        [self showUpdateWithAppcastItem:appcastItem skippable:YES reply:reply];
+    });
+}
+
+- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self showUpdateWithAppcastItem:appcastItem skippable:YES reply:reply];
     });
 }
 
 - (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUInstallUpdateStatus))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self showUpdateWithAppcastItem:appcastItem alreadyDownloaded:YES reply:^(SUUpdateAlertChoice choice) {
+        [self showUpdateWithAppcastItem:appcastItem skippable:NO reply:^(SUUpdateAlertChoice choice) {
             switch (choice) {
                 case SUInstallUpdateChoice:
                     reply(SUInstallAndRelaunchUpdateNow);
@@ -304,7 +311,7 @@
     });
 }
 
-- (void)showDownloadFinishedAndStartedExtractingUpdate
+- (void)showDownloadDidStartExtractingUpdate
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent completeDownloadStatus];

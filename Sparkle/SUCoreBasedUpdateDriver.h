@@ -25,8 +25,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
 
-- (BOOL)basicDriverShouldSignalShowingUpdateImmediately;
-
 @optional
 
 - (void)basicDriverDidFinishLoadingAppcast;
@@ -37,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)downloadDriverDidReceiveDataOfLength:(NSUInteger)length;
 
-- (void)coreDriverDidFinishDownloadingUpdate;
+- (void)coreDriverDidStartExtractingUpdate;
 
 - (void)installerDidStartInstalling;
 
@@ -53,15 +51,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate delegate:(id<SUCoreBasedUpdateDriverDelegate>)delegate;
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(SUUpdateDriverCompletion)completionBlock;
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates requiresSilentInstall:(BOOL)silentInstall completion:(SUUpdateDriverCompletion)completionBlock;
 
-- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock;
+- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock;
+
+- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock;
 
 - (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem;
 
+- (void)extractDownloadedUpdate;
+
+- (void)clearDownloadedUpdate;
+
 - (void)finishInstallationWithResponse:(SUInstallUpdateStatus)installUpdateStatus displayingUserInterface:(BOOL)displayingUserInterface;
 
-- (void)abortUpdateWithError:(nullable NSError *)error;
+- (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately error:(nullable NSError *)error;
 
 @end
 

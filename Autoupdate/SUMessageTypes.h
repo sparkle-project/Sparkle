@@ -43,4 +43,8 @@ NSString *SUInstallerServiceNameForBundleIdentifier(NSString *bundleIdentifier);
 
 NSString *SUStatusInfoServiceNameForBundleIdentifier(NSString *bundleIdentifier);
 
+NSString *SUProgressAgentServiceNameForBundleIdentifier(NSString *bundleIdentifier);
+
+NSString *SUProgressAgentLauncherServiceNameForBundleIdentifier(NSString *bundleIdentifier);
+
 NS_ASSUME_NONNULL_END

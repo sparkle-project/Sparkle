@@ -16,12 +16,14 @@
 @interface SUProbingUpdateDriver () <SUBasicUpdateDriverDelegate>
 
 @property (nonatomic, readonly) SUBasicUpdateDriver *basicDriver;
+@property (nonatomic) SUDownloadedUpdate *downloadedUpdate;
 
 @end
 
 @implementation SUProbingUpdateDriver
 
 @synthesize basicDriver = _basicDriver;
+@synthesize downloadedUpdate = _downloadedUpdate;
 
 - (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(id <SUUpdaterDelegate>)updaterDelegate
 {
@@ -37,14 +39,16 @@
     [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:NO completion:completionBlock];
 }
 
-- (BOOL)basicDriverShouldSignalShowingUpdateImmediately
+- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
 {
-    return NO;
+    [self.basicDriver resumeInstallingUpdateWithCompletion:completionBlock];
 }
 
-- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
+- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock
 {
-    [self.basicDriver resumeUpdateWithCompletion:completionBlock];
+    self.downloadedUpdate = downloadedUpdate;
+    
+    [self.basicDriver resumeDownloadedUpdate:downloadedUpdate completion:completionBlock];
 }
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)__unused appcastItem
@@ -55,9 +59,7 @@
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error
 {
-
     [self abortUpdateWithError:error];
-
 }
 
 - (void)abortUpdate
@@ -67,7 +69,7 @@
 
 - (void)abortUpdateWithError:(nullable NSError *)error
 {
-    [self.basicDriver abortUpdateWithError:error];
+    [self.basicDriver abortUpdateAndShowNextUpdateImmediately:NO downloadedUpdate:self.downloadedUpdate error:error];
 }
 
 @end

@@ -9,8 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "SUExport.h"
 
-@class SUAuthorizationEnvironment;
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -26,37 +24,6 @@ NS_ASSUME_NONNULL_BEGIN
  * @return A new file manager instance that cannot make authorization requests when read/write access is denied
  */
 + (instancetype)defaultManager;
-
-/**
- * Creates a file manager that allows authorizing for file operations
- * @param authorizationToolPath Specifies the path to the tool that can perform file operations and be run as root.
- * This tool will be invoked when read or write access is denied when attempting ordinary file operations. See the `fileop` tool included in Sparkle.
- * @param environment Specifies the authorization environment used when making an authorization request. Pass nil to use a default environment.
- * @return A new file manager instance
- *
- * This method just creates the file manager. It doesn't acquire authorization immediately or if it doesn't need to.
- */
-+ (instancetype)fileManagerWithAuthorizationToolPath:(NSString *)authorizationToolPath environment:(SUAuthorizationEnvironment * _Nullable)environment;
-
-/**
- * Returns a file manager that allows or disallows authorizing for file operations based on the current file manager
- * @return A file manager instance that can perform authorized operations if the current file manager has already performed them.
- *  If the current file manager instance hasn't yet performed authorized operations, then neither can the instance returned by this method
- *
- * This may return a newly created file manager or re-use the existing file manager depending on the current authorization rights.
- */
-- (instancetype)fileManagerByPreservingAuthorizationRights;
-
-/**
- * Requests and grants authorization for performing authorized operations.
- *
- * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL. An error code of SUInstallationCancelledError is returned if an authorization prompt occurs and the user decides to cancel the request.
- * @return YES on success otherwise returns NO
- *
- * This will prompt the user for an authorization dialog if the user's permission is needed to perform authorized operations.
- * If the process is running as root already, no authorization prompt is made.
- */
-- (BOOL)grantAuthorizationPrivilegesWithError:(NSError * __autoreleasing *)error;
 
 /**
  * Creates a temporary directory on the same volume as a provided URL
@@ -187,18 +154,6 @@ NS_ASSUME_NONNULL_BEGIN
  * This is not an atomic operation.
  */
 - (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError **)error;
-
-/**
- * Runs an installer package (pkg) in a headless mode using /usr/sbin/installer
- * @param packageURL A URL pointing to the package to execute. The item at this URL must exist.
- * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
- * @return YES if the installer ran the package successfully, otherwise NO with a populated error object
- *
- * This method uses the system wide installer tool to run the provided package. This process does not show any UI, except for
- * an initial authorization prompt if the calling process does not have root privileges. In other words, root privileges are required to use this method, and the file manager instance must have been created by allowing authorization.
- * An error can occur if the package is unable to be ran by the installer, or if the installer reports a non-zero exit status code.
- */
-- (BOOL)executePackageAtURL:(NSURL *)packageURL error:(NSError **)error;
 
 @end
 

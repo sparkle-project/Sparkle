@@ -92,7 +92,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Respond to the user initiating an update check. Sparkle uses this to show the user a window with an indeterminate progress bar.
  *
- * @param updateCheckStatusCompletion A reply indicating whether the initiated update check is done or cancelled.
+ * @param updateCheckStatusCompletion A reply indicating whether the initiated update check is done or canceled.
  * Attempts to canceling can be made before -dismissUserInitiatedUpdateCheck is invoked. Replying with SUUserInitiatedCheckDone
  * on the other hand should not be done until -dismissUserInitiatedUpdateCheck is invoked.
  *
@@ -130,16 +130,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply;
 
 /*!
- * Show the user a downloaded update can be resumed and installed immediately
+ * Show the user a new update has been downloaded and can be installed
  *
- * Let the user know a downloaded update can be installed ask them what they want to do.
+ * This method behaves just like -showUpdateFoundWithAppcastItem:reply: except the update has already been downloaded.
+ */
+- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply;
+
+/*!
+ * Show the user an update that has started installing can be resumed and installed immediately
+ *
+ * Let the user know an update that has already been downloaded and started installing can be resumed.
+ * Note at this point the update cannot be canceled.
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update
  *
  * @param reply A reply of SUInstallAndRelaunchUpdateNow installs the update immediately and relaunches the new update.
- * A reply of SUInstallUpdateNow installes the update immediately but does not relaunch the new update.
- * A reply of SUDismissUpdateInstallation dismisses the update installation. Note the update may still be installed after
- * the application terminates, however there is not a strong guarantee that this will happen.
+ * A reply of SUInstallUpdateNow installs the update immediately but does not relaunch the new update.
+ * A reply of SUDismissUpdateInstallation dismisses the update installation. Note the update will attempt to finish installation
+ * after the application terminates.
  *
  * This can be called from any thread
  */
@@ -199,10 +207,10 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Let the user know that downloading the new update started.
  *
- * @param downloadUpdateStatusCompletion A reply of SUDownloadUpdateCancelled can be used to cancel
- * the download at any point before -showDownloadFinishedAndStartedExtractingUpdate is invoked.
+ * @param downloadUpdateStatusCompletion A reply of SUDownloadUpdateCanceled can be used to cancel
+ * the download at any point before -showDownloadDidStartExtractingUpdate is invoked.
  * A reply of SUDownloadUpdateDone signifies that the download is done, which should not be invoked until
- * -showDownloadFinishedAndStartedExtractingUpdate
+ * -showDownloadDidStartExtractingUpdate
  *
  * This can be called from any thread
  */
@@ -233,9 +241,12 @@ NS_ASSUME_NONNULL_BEGIN
  * This is an appropriate time to reply with SUDownloadUpdateDone if not done so already
  * Sparkle uses this to show an indeterminate progress bar.
  *
+ * Note that an update can resume at this point after having been downloaded before,
+ * so this may be called without any of the download callbacks being invoked prior.
+ *
  * This can be called from any thread
  */
-- (void)showDownloadFinishedAndStartedExtractingUpdate;
+- (void)showDownloadDidStartExtractingUpdate;
 
 /*!
  * Show the user that the update is extracting with progress

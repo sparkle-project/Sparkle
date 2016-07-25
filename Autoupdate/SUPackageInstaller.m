@@ -47,7 +47,7 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
     return YES;
 }
 
-- (BOOL)performSecondStageAllowingAuthorization:(BOOL)__unused allowsAuthorization fileOperationToolPath:(NSString *)__unused fileOperationToolPath environment:(SUAuthorizationEnvironment * _Nullable)__unused authorizationEnvironment allowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
+- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
 {
     if (!allowsUI) {
         if (error != NULL) {
@@ -87,11 +87,6 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
 }
 
 - (BOOL)canInstallSilently
-{
-    return NO;
-}
-
-- (BOOL)mayNeedToRequestAuthorization
 {
     return NO;
 }

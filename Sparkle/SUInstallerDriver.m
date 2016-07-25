@@ -24,6 +24,7 @@
 #import "SUInstallerConnection.h"
 #import "SUInstallerConnectionProtocol.h"
 #import "SUXPCInstallerConnection.h"
+#import "SUDownloadedUpdate.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -52,6 +53,8 @@
 @property (nonatomic, copy) NSString *downloadName;
 @property (nonatomic, copy) NSString *temporaryDirectory;
 
+@property (nonatomic) BOOL aborted;
+
 @end
 
 @implementation SUInstallerDriver
@@ -71,6 +74,7 @@
 @synthesize updateItem = _updateItem;
 @synthesize downloadName = _downloadName;
 @synthesize temporaryDirectory = _temporaryDirectory;
+@synthesize aborted = _aborted;
 
 - (instancetype)initWithHost:(SUHost *)host cachePath:(NSString *)cachePath sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(id<SUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SUInstallerDriverDelegate>)delegate
 {
@@ -105,7 +109,7 @@
     [self.installerConnection setInvalidationHandler:^{
         dispatch_async(dispatch_get_main_queue(), ^{
             SUInstallerDriver *strongSelf = weakSelf;
-            if (strongSelf.installerConnection != nil) {
+            if (strongSelf.installerConnection != nil && !strongSelf.aborted) {
                 NSError *remoteError =
                 [NSError
                  errorWithDomain:SUSparkleErrorDomain
@@ -121,23 +125,25 @@
     }];
     
     NSString *serviceName = SUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier);
+    NSString *installationType = self.updateItem.installationType;
+    assert(installationType != nil);
     
-    [self.installerConnection setServiceName:serviceName];
+    [self.installerConnection setServiceName:serviceName hostPath:self.host.bundlePath installationType:installationType];
     
     [self sendInstallationData];
 }
 
 // This can be called multiple times (eg: if a delta update fails, this may be called again with a regular update item)
-- (void)extractDownloadName:(NSString *)downloadName withUpdateItem:(SUAppcastItem *)updateItem temporaryDirectory:(NSString *)temporaryDirectory completion:(void (^)(NSError * _Nullable))completionHandler
+- (void)extractDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate silently:(BOOL)silently completion:(void (^)(NSError * _Nullable))completionHandler
 {
-    self.updateItem = updateItem;
-    self.temporaryDirectory = temporaryDirectory;
-    self.downloadName = downloadName;
+    self.updateItem = downloadedUpdate.updateItem;
+    self.temporaryDirectory = downloadedUpdate.temporaryDirectory;
+    self.downloadName = downloadedUpdate.downloadName;
     
     self.currentStage = SUInstallerNotStarted;
     
     if (self.installerConnection == nil) {
-        [self launchAutoUpdateWithCompletion:completionHandler];
+        [self launchAutoUpdateSilently:silently completion:completionHandler];
     } else {
         // The Install tool is already alive; just send out installation input data again
         [self sendInstallationData];
@@ -145,7 +151,7 @@
     }
 }
 
-- (void)resumeUpdateWithUpdateItem:(SUAppcastItem *)updateItem
+- (void)resumeInstallingUpdateWithUpdateItem:(SUAppcastItem *)updateItem
 {
     self.updateItem = updateItem;
 }
@@ -164,18 +170,7 @@
         decryptionPassword = [self.updaterDelegate decryptionPasswordForUpdater:self.updater];
     }
     
-    NSString *localProgressToolPath = [self.sparkleBundle pathForResource:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME ofType:@"app"];
-    if (localProgressToolPath == nil) {
-        SULog(@"Error: Failed to find installer progress tool: %@", localProgressToolPath);
-    }
-    
-    NSError *progressToolError = nil;
-    NSString *progressToolPath = [self copyPathToCacheDirectory:localProgressToolPath error:&progressToolError];
-    if (progressToolPath == nil) {
-        SULog(@"Error: Failed to copy or find installer progress tool: %@", progressToolError);
-    }
-    
-    SUInstallationInputData *installationData = [[SUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch progressToolPath:progressToolPath hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadName:self.downloadName dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
+    SUInstallationInputData *installationData = [[SUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadName:self.downloadName installationType:self.updateItem.installationType dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
     
     NSData *archivedData = SUArchiveRootObjectSecurely(installationData);
     if (archivedData == nil) {
@@ -268,12 +263,12 @@
     } else if (identifier == SUInstallationFinishedStage2) {
         self.currentStage = identifier;
         
-        BOOL cancelledInstallation = NO;
+        BOOL canceledInstallation = NO;
         if (data.length >= sizeof(uint8_t)) {
-            cancelledInstallation = (*(const uint8_t *)data.bytes == 0x1);
+            canceledInstallation = (*(const uint8_t *)data.bytes == 0x1);
         }
         
-        if (cancelledInstallation) {
+        if (canceledInstallation) {
             [self.delegate installerIsRequestingAbortInstallWithError:nil];
         } else {
             if (!self.startedInstalling) {
@@ -381,23 +376,22 @@
     return cachePath;
 }
 
-- (void)launchAutoUpdateWithCompletion:(void (^)(NSError *_Nullable))completionHandler
+- (void)launchAutoUpdateSilently:(BOOL)silently completion:(void (^)(NSError *_Nullable))completionHandler
 {
     // Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
     // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
     NSError *relaunchError = nil;
-    NSString *relaunchToolPath = [self copyPathToCacheDirectory:[self.sparkleBundle pathForResource:@""SPARKLE_RELAUNCH_TOOL_NAME ofType:@"app"] error:&relaunchError];
+    NSString *relaunchToolPath = [self copyPathToCacheDirectory:[self.sparkleBundle pathForResource:@""SPARKLE_RELAUNCH_TOOL_NAME ofType:@""] error:&relaunchError];
     if (relaunchToolPath == nil) {
         completionHandler(relaunchError);
         return;
     }
     
-    NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
-    if (hostBundleIdentifier == nil) {
-        NSError *error =
-        [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while finding the application's bundle identifier. Please try again later.", nil) }];
-        
-        completionHandler(error);
+    // Copy the progress tool as well
+    NSError *progressToolError = nil;
+    NSString *progressToolPath = [self copyPathToCacheDirectory:[self.sparkleBundle pathForResource:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME ofType:@"app"] error:&progressToolError];
+    if (progressToolPath == nil) {
+        completionHandler(progressToolError);
         return;
     }
     
@@ -412,6 +406,7 @@
         launcherConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerLauncherProtocol)];
         [launcherConnection resume];
         
+#warning revisit weak connection
         __weak NSXPCConnection *weakConnection = launcherConnection;
         launcherConnection.interruptionHandler = ^{
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -435,25 +430,39 @@
         installerLauncher = launcherConnection.remoteObjectProxy;
     }
     
-    BOOL shouldAllowInstallerInteraction = YES;
+#warning review this...
+    BOOL shouldAllowInstallerInteraction = !silently;
     if ([self.updaterDelegate respondsToSelector:@selector(updaterShouldAllowInstallerInteraction:)]) {
         shouldAllowInstallerInteraction = [self.updaterDelegate updaterShouldAllowInstallerInteraction:self.updater];
     }
     
-    [installerLauncher launchInstallerAtPath:relaunchToolPath withHostBundleIdentifier:hostBundleIdentifier allowingInteraction:shouldAllowInstallerInteraction completion:^(BOOL success) {
+    NSString *hostBundlePath = self.host.bundle.bundlePath;
+    assert(hostBundlePath != nil);
+    
+    NSString *installationType = self.updateItem.installationType;
+    assert(installationType != nil);
+    
+    // The installer launcher could be in a XPC service, so we don't want to do localization in there
+    NSString *authorizationPrompt = [NSString stringWithFormat:SULocalizedString(@"%1$@ wants to update.", nil), self.host.name];
+    [installerLauncher launchInstallerAtPath:relaunchToolPath progressToolPath:progressToolPath withHostBundlePath:hostBundlePath authorizationPrompt:authorizationPrompt installationType:installationType allowingInteraction:shouldAllowInstallerInteraction completion:^(SUAuthorizationReply result) {
         dispatch_async(dispatch_get_main_queue(), ^{
             retrievedLaunchStatus = YES;
             [launcherConnection invalidate];
             
-            if (!success) {
-                NSError *error =
-                [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while launching the installer. Please try again later.", nil) }];
-                
-                completionHandler(error);
-            } else {
-                [self setUpConnection];
-                
-                completionHandler(nil);
+            switch (result) {
+                case SUAuthorizationReplyFailure:
+                    completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while launching the installer. Please try again later.", nil) }]);
+                    break;
+                case SUAuthorizationReplyCanceled:
+                    completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationCanceledError userInfo:nil]);
+                    break;
+                case SUAuthorizationReplyAuthorizeLater:
+                    completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationAuthorizeLaterError userInfo:nil]);
+                    break;
+                case SUAuthorizationReplySuccess:
+                    [self setUpConnection];
+                    completionHandler(nil);
+                    break;
             }
         });
     }];
@@ -524,6 +533,7 @@
 
 - (void)abortInstall
 {
+    self.aborted = YES;
     if (self.installerConnection != nil) {
         [self.installerConnection invalidate];
         self.installerConnection = nil;

@@ -227,22 +227,11 @@
     return YES;
 }
 
-- (BOOL)performSecondStageAllowingAuthorization:(BOOL)allowsAuthorization fileOperationToolPath:(NSString *)fileOperationToolPath environment:(SUAuthorizationEnvironment * _Nullable)authorizationEnvironment allowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
+- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
 {
-    self.fileManager = (allowsAuthorization && allowsUI) ? [SUFileManager fileManagerWithAuthorizationToolPath:fileOperationToolPath environment:authorizationEnvironment] : [SUFileManager defaultManager];
+    self.fileManager = [SUFileManager defaultManager];
     
-    // Bring up authorization prompt right away if we need it
-    BOOL canInstallSilently = [self canInstallSilently];
-    if (allowsAuthorization && !canInstallSilently) {
-        return [self.fileManager grantAuthorizationPrivilegesWithError:error];
-    } else {
-        if (!canInstallSilently) {
-            if (error != NULL) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{ NSLocalizedDescriptionKey: @"Sparkle cannot install the update silently" }];
-            }
-        }
-        return canInstallSilently;
-    }
+    return YES;
 }
 
 - (BOOL)performThirdStage:(NSError * __autoreleasing *)error
@@ -259,21 +248,12 @@
 
 - (BOOL)canInstallSilently
 {
-    return ![self mayNeedToRequestAuthorization];
-}
-
-- (BOOL)mayNeedToRequestAuthorization
-{
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSString *bundlePath = self.host.bundle.bundlePath;
-    // It's very well possible to have the bundle be writable but not be able to write into the parent directory
-    // And if the bundle isn't writable, but we can write into the parent directory, we will still need to authorize to replace it
-    return ![fileManager isWritableFileAtPath:bundlePath] || ![fileManager isWritableFileAtPath:[bundlePath stringByDeletingLastPathComponent]];
+    return YES;
 }
 
 - (void)cleanup
 {
-    SUFileManager *fileManager = [self.fileManager fileManagerByPreservingAuthorizationRights];;
+    SUFileManager *fileManager = self.fileManager;
     NSURL *oldTempURL = self.oldTempURL;
     NSURL *tempOldDirectoryURL = self.tempOldDirectoryURL;
     NSURL *tempNewDirectoryURL = self.tempNewDirectoryURL;

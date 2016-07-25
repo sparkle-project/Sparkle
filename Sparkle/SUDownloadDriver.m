@@ -17,6 +17,7 @@
 #import "SULog.h"
 #import "SUErrors.h"
 #import "SUURLRequest.h"
+#import "SUDownloadedUpdate.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -34,6 +35,7 @@
 @property (nonatomic) BOOL retrievedDownloadResult;
 @property (nonatomic) BOOL retrievedDownloadResponse;
 @property (nonatomic) NSUInteger expectedContentLength;
+@property (nonatomic) BOOL cleaningUp;
 
 @end
 
@@ -50,6 +52,7 @@
 @synthesize retrievedDownloadResult = _retrievedDownloadResult;
 @synthesize retrievedDownloadResponse = _retrievedDownloadResponse;
 @synthesize expectedContentLength = _expectedContentLength;
+@synthesize cleaningUp = _cleaningUp;
 
 - (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host userAgent:(NSString *)userAgent delegate:(id<SUDownloadDriverDelegate>)delegate
 {
@@ -97,7 +100,7 @@
     self.connection.invalidationHandler = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
             SUDownloadDriver *strongSelf = weakSelf;
-            if (strongSelf != nil && !strongSelf.retrievedDownloadResult) {
+            if (strongSelf != nil && !strongSelf.retrievedDownloadResult && !strongSelf.cleaningUp) {
                 SULog(@"Connection to update downloader was invalidated");
                 
                 NSDictionary *userInfo =
@@ -118,15 +121,14 @@
     [self.downloader startDownloadWithRequest:[SUURLRequest URLRequestWithRequest:self.request] bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];
 }
 
-- (void)dealloc
-{
-    [self cleanup];
-}
-
 - (void)cleanup
 {
     // It's very crucial to wait until they are done with completion before invalidating our XPC connection (if there is one)
     // Otherwise we can run into some unfortunate crashes
+    // Edit: I think this was an issue because -dealloc was implemented to invoke this method. I have since removed -dealloc
+    // Will have to test around with this later
+    self.cleaningUp = YES;
+    
     [self.downloader cleanupWithCompletion:^{
         dispatch_async(dispatch_get_main_queue(), ^{
             if (self.connection != nil) {
@@ -148,7 +150,9 @@
             SULog(@"Warning: Downloader's expected content length (%lu) != Appcast item's length (%lu)", self.expectedContentLength, self.updateItem.contentLength);
         }
         
-        [self.delegate downloadDriverDidDownloadUpdate];
+        SUDownloadedUpdate *downloadedUpdate = [[SUDownloadedUpdate alloc] initWithAppcastItem:self.updateItem downloadName:self.downloadName temporaryDirectory:self.temporaryDirectory];
+        
+        [self.delegate downloadDriverDidDownloadUpdate:downloadedUpdate];
         [self cleanup];
     });
 }

@@ -14,20 +14,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 /*
  * relaunchPath - path to application bundle to relaunch and listen for termination
- * progressToolPath - path to optional GUI tool that shows update progress if installation is not quick
  * hostBundlePath - path to host bundle to update & replace
  * updateDirectoryPath - path to update directory (i.e, temporary directory containing the new update archive)
  * downloadName - name of update archive in update directory
  * dsaSignature - DSA signature for the update that came from the appcast item
  * decryptionPassword - optional decryption password for dmg archives
  */
-- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath progressToolPath:(nullable NSString *)progressToolPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadName:(NSString *)downloadName dsaSignature:(NSString *)dsaSignature decryptionPassword:(nullable NSString *)decryptionPassword;
+- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadName:(NSString *)downloadName installationType:(NSString *)installationType dsaSignature:(NSString *)dsaSignature decryptionPassword:(nullable NSString *)decryptionPassword;
 
 @property (nonatomic, copy, readonly) NSString *relaunchPath;
-@property (nonatomic, copy, readonly, nullable) NSString *progressToolPath;
 @property (nonatomic, copy, readonly) NSString *hostBundlePath;
 @property (nonatomic, copy, readonly) NSString *updateDirectoryPath;
 @property (nonatomic, copy, readonly) NSString *downloadName;
+@property (nonatomic, copy, readonly) NSString *installationType;
 @property (nonatomic, copy, readonly) NSString *dsaSignature;
 @property (nonatomic, copy, readonly, nullable) NSString *decryptionPassword;
 

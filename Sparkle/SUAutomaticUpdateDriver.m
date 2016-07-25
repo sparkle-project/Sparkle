@@ -13,6 +13,7 @@
 #import "SUCoreBasedUpdateDriver.h"
 #import "SULog.h"
 #import "SUAppcastItem.h"
+#import "SUErrors.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -49,13 +50,20 @@
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(SUUpdateDriverCompletion)completionBlock
 {
-    [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:NO completion:completionBlock];
+    [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:NO requiresSilentInstall:YES completion:completionBlock];
 }
 
-- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
+- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
 {
     // Nothing really to do here.. this shouldn't be called.
-    SULog(@"Error: resumeUpdateWithCompletion: called on SUAutomaticUpdateDriver");
+    SULog(@"Error: resumeInstallingUpdateWithCompletion: called on SUAutomaticUpdateDriver");
+    abort();
+}
+
+- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)__unused downloadedUpdate completion:(SUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
+{
+    // Nothing really to do here.. this shouldn't be called.
+    SULog(@"Error: resumeDownloadedUpdate:completion: called on SUAutomaticUpdateDriver");
     abort();
 }
 
@@ -99,11 +107,6 @@
     }
 }
 
-- (BOOL)basicDriverShouldSignalShowingUpdateImmediately
-{
-    return (!self.willInstallSilently || self.updateItem.isCriticalUpdate);
-}
-
 - (void)basicDriverIsRequestingAbortUpdateWithError:(NSError *)error
 {
     [self abortUpdateWithError:error];
@@ -121,7 +124,8 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    [self.coreDriver abortUpdateWithError:error];
+    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (!self.willInstallSilently || self.updateItem.isCriticalUpdate);
+    [self.coreDriver abortUpdateAndShowNextUpdateImmediately:showNextUpdateImmediately error:error];
 }
 
 @end

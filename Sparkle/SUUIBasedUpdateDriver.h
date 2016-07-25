@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@class SUHost;
+@class SUHost, SUDownloadedUpdate;
 @protocol SUUserDriver, SUUpdaterDelegate;
 
 @interface SUUIBasedUpdateDriver : NSObject
@@ -31,7 +31,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(SUUpdateDriverCompletion)completionBlock;
 
-- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock;
+- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock;
+
+- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock;
 
 - (void)abortUpdateWithError:(nullable NSError *)error;
 

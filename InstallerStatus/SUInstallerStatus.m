@@ -28,8 +28,7 @@
 
 - (void)setServiceName:(NSString *)serviceName
 {
-    NSXPCConnectionOptions options = SUGrantsSystemAuthorizationAccess() ? NSXPCConnectionPrivileged : 0;
-    NSXPCConnection *connection = [[NSXPCConnection alloc] initWithMachServiceName:serviceName options:options];
+    NSXPCConnection *connection = [[NSXPCConnection alloc] initWithMachServiceName:serviceName options:(NSXPCConnectionOptions)0];
     
     connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUStatusInfoProtocol)];
     
@@ -37,7 +36,7 @@
     
     __weak SUInstallerStatus *weakSelf = self;
     self.connection.interruptionHandler = ^{
-        [weakSelf invalidate];
+        [weakSelf.connection invalidate];
     };
     
     self.connection.invalidationHandler = ^{

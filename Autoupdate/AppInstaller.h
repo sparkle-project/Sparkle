@@ -6,7 +6,7 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "SUUnarchiverProtocol.h"
 
 @interface AppInstaller : NSObject <SUUnarchiverDelegate>

@@ -8,8 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-@class SUAuthorizationEnvironment;
-
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol SUInstallerProtocol <NSObject>
@@ -25,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 // The allowsUI flag indicates whether this and the 3rd stage can show UI or not, possibly affecting whether or not this stage succeeds.
 // Eg: This may be appropriate for first showing an authorization prompt before the user application is terminated (if the operation succeeds)
 // Should be able to be called from non-main thread
-- (BOOL)performSecondStageAllowingAuthorization:(BOOL)allowsAuthorization fileOperationToolPath:(NSString *)fileOperationToolPath environment:(SUAuthorizationEnvironment * _Nullable)authorizationEnvironment allowingUI:(BOOL)allowsUI error:(NSError **)error;
+- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError **)error;
 
 // Stage 3 occurs after the user application has has been terminated. This is where the final installation work can be done.
 // After this stage is done, the user application will be relaunched.
@@ -41,10 +39,6 @@ NS_ASSUME_NONNULL_BEGIN
 // If this returns NO, then the second stage of the installation should fail if it is not allowed to show UI.
 // Should be thread safe
 - (BOOL)canInstallSilently;
-
-// Indicates whether or not this installer may need authorization when performing the second stage of the installation
-// Should be thread safe
-- (BOOL)mayNeedToRequestAuthorization;
 
 // Cleans up work done from any of the previous stages. This should be invoked after stage 3 succeeds,
 // or after any one of the stages fails.

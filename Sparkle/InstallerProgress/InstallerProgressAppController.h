@@ -10,13 +10,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol InstallerProgressAppControllerDelegate;
+@protocol InstallerProgressDelegate;
 
 @interface InstallerProgressAppController : NSObject <NSApplicationDelegate>
 
-- (instancetype)initWithApplication:(NSApplication *)application arguments:(NSArray<NSString *> *)arguments delegate:(id<InstallerProgressAppControllerDelegate>)delegate;
+- (instancetype)initWithApplication:(NSApplication *)application arguments:(NSArray<NSString *> *)arguments delegate:(id<InstallerProgressDelegate>)delegate;
 
 - (void)run;
+
+- (void)cleanupAndExitWithStatus:(int)status __attribute__((noreturn));
 
 @end
 

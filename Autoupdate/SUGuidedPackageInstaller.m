@@ -43,7 +43,7 @@
     return YES;
 }
 
-- (BOOL)performSecondStageAllowingAuthorization:(BOOL)allowsAuthorization fileOperationToolPath:(NSString *)fileOperationToolPath environment:(SUAuthorizationEnvironment * _Nullable)authorizationEnvironment allowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
+- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
 {
     if (!allowsUI && ![self canInstallSilently]) {
         if (error != NULL) {
@@ -53,14 +53,39 @@
     }
     
     // If we're root, we can allow using the authorization APIs
-    self.fileManager = (allowsAuthorization || [self isRootUser]) ? [SUFileManager fileManagerWithAuthorizationToolPath:fileOperationToolPath environment:authorizationEnvironment] : [SUFileManager defaultManager];
+    self.fileManager = [SUFileManager defaultManager];
     
-    return [self.fileManager grantAuthorizationPrivilegesWithError:error];
+    return YES;
 }
 
 - (BOOL)performThirdStage:(NSError * __autoreleasing *)error
 {
-    return [self.fileManager executePackageAtURL:[NSURL fileURLWithPath:self.packagePath] error:error];
+    // This command *must* be run as root
+    NSString *installerPath = @"/usr/sbin/installer";
+    
+    NSTask *task = [[NSTask alloc] init];
+    task.launchPath = installerPath;
+    task.arguments = @[@"-pkg", self.packagePath, @"-target", @"/"];
+    task.standardError = [NSPipe pipe];
+    task.standardOutput = [NSPipe pipe];
+    
+    BOOL success = YES;
+    @try {
+        [task launch];
+        [task waitUntilExit];
+        if (task.terminationStatus != EXIT_SUCCESS) {
+            success = NO;
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Guided package installer returned non-zero exit status (%d)", task.terminationStatus] }];
+            }
+        }
+    } @catch (NSException *) {
+        success = NO;
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Guided package installer task threw an exception"] }];
+        }
+    }
+    return success;
 }
 
 - (BOOL)displaysUserProgress
@@ -76,11 +101,6 @@
 - (BOOL)canInstallSilently
 {
     return [self isRootUser];
-}
-
-- (BOOL)mayNeedToRequestAuthorization
-{
-    return YES;
 }
 
 - (void)cleanup

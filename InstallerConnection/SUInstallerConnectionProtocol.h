@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setInvalidationHandler:(void (^)(void))invalidationHandler;
 
-- (void)setServiceName:(NSString *)serviceName;
+- (void)setServiceName:(NSString *)serviceName hostPath:(NSString *)hostPath installationType:(NSString *)installationType;
 
 - (void)invalidate;
     

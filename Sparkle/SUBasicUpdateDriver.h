@@ -20,8 +20,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
 
-- (BOOL)basicDriverShouldSignalShowingUpdateImmediately;
-
 @optional
 
 - (void)basicDriverDidFinishLoadingAppcast;
@@ -34,11 +32,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(SUUpdateDriverCompletion)completionBlock;
 
-- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock;
+- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock;
+
+- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock;
 
 @property (nullable, nonatomic, readonly) SUAppcastItem *nonDeltaUpdateItem;
 
-- (void)abortUpdateWithError:(nullable NSError *)error;
+- (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldSignalShowingUpdate downloadedUpdate:(SUDownloadedUpdate * _Nullable)downloadedUpdate error:(nullable NSError *)error;
 
 @end
 

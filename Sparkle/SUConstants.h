@@ -66,6 +66,7 @@ extern NSString *const SUAppcastAttributeDeltaFrom;
 extern NSString *const SUAppcastAttributeDSASignature;
 extern NSString *const SUAppcastAttributeShortVersionString;
 extern NSString *const SUAppcastAttributeVersion;
+extern NSString *const SUAppcastAttributeInstallationType;
 
 extern NSString *const SUAppcastElementCriticalUpdate;
 extern NSString *const SUAppcastElementDeltas;

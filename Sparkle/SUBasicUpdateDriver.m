@@ -16,6 +16,7 @@
 #import "SUAppcastItem.h"
 #import "SUProbeInstallStatus.h"
 #import "SUInstallationInfo.h"
+#import "SUDownloadedUpdate.h"
 
 @interface SUBasicUpdateDriver () <SUAppcastDriverDelegate>
 
@@ -27,6 +28,8 @@
 @property (nonatomic, readonly, weak) id updater; // if we didn't have legacy support, I'd remove this..
 @property (nullable, nonatomic, readonly, weak) id <SUUpdaterDelegate>updaterDelegate;
 
+@property (nonatomic) BOOL aborted;
+
 @end
 
 @implementation SUBasicUpdateDriver
@@ -37,6 +40,7 @@
 @synthesize delegate = _delegate;
 @synthesize appcastDriver = _appcastDriver;
 @synthesize completionBlock = _completionBlock;
+@synthesize aborted = _aborted;
 
 - (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(id <SUUpdaterDelegate>)updaterDelegate delegate:(id <SUBasicUpdateDriverDelegate>)delegate
 {
@@ -64,24 +68,35 @@
     }
 }
 
-- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
+- (void)notifyResumableUpdateItem:(SUAppcastItem *)updateItem
+{
+    if (updateItem == nil) {
+        [self.delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUResumeAppcastError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"Failed to resume installing update.", nil) }]];
+    } else {
+        // Kind of lying, but triggering the notification so drivers can know when to stop showing initial fetching progress
+        [self notifyFinishLoadingAppcast];
+        
+        SUAppcastItem *nonNullUpdateItem = updateItem;
+        [self didFindValidUpdateWithAppcastItem:nonNullUpdateItem];
+    }
+}
+
+- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
 {
     self.completionBlock = completionBlock;
     
     [SUProbeInstallStatus probeInstallerUpdateItemForHost:self.host completion:^(SUInstallationInfo * _Nullable installationInfo) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            SUAppcastItem *updateItem = installationInfo.appcastItem;
-            if (updateItem == nil) {
-                [self.delegate basicDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUResumeAppcastError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"Failed to resume installing update.", nil) }]];
-            } else {
-                // Kind of lying, but triggering the notification so drivers can know when to stop showing initial fetching progress
-                [self notifyFinishLoadingAppcast];
-                
-                SUAppcastItem *nonNullUpdateItem = updateItem;
-                [self didFindValidUpdateWithAppcastItem:nonNullUpdateItem];
-            }
+            [self notifyResumableUpdateItem:installationInfo.appcastItem];
         });
     }];
+}
+
+- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock
+{
+    self.completionBlock = completionBlock;
+    
+    [self notifyResumableUpdateItem:downloadedUpdate.updateItem];
 }
 
 - (SUAppcastItem *)nonDeltaUpdateItem
@@ -91,7 +106,9 @@
 
 - (void)didFailToFetchAppcastWithError:(NSError *)error
 {
-    [self.delegate basicDriverIsRequestingAbortUpdateWithError:error];
+    if (!self.aborted) {
+        [self.delegate basicDriverIsRequestingAbortUpdateWithError:error];
+    }
 }
 
 - (void)notifyFinishLoadingAppcast
@@ -103,48 +120,56 @@
 
 - (void)didFinishLoadingAppcast:(SUAppcast *)appcast
 {
-    if ([self.updaterDelegate respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
-        [self.updaterDelegate updater:self.updater didFinishLoadingAppcast:appcast];
+    if (!self.aborted) {
+        if ([self.updaterDelegate respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
+            [self.updaterDelegate updater:self.updater didFinishLoadingAppcast:appcast];
+        }
+        
+        [self notifyFinishLoadingAppcast];
     }
-    
-    [self notifyFinishLoadingAppcast];
 }
 
 - (void)didFindValidUpdateWithAppcastItem:(SUAppcastItem *)updateItem
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
-                                                        object:self.updater
-                                                      userInfo:@{ SUUpdaterAppcastItemNotificationKey: updateItem }];
-    
-    if ([self.updaterDelegate respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
-        [self.updaterDelegate updater:self.updater didFindValidUpdate:updateItem];
+    if (!self.aborted) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
+                                                            object:self.updater
+                                                          userInfo:@{ SUUpdaterAppcastItemNotificationKey: updateItem }];
+        
+        if ([self.updaterDelegate respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
+            [self.updaterDelegate updater:self.updater didFindValidUpdate:updateItem];
+        }
+        
+        [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem];
     }
-    
-    [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem];
 }
 
 - (void)didNotFindUpdate
 {
-    if ([self.updaterDelegate respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
-        [self.updaterDelegate updaterDidNotFindUpdate:self.updater];
+    if (!self.aborted) {
+        if ([self.updaterDelegate respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
+            [self.updaterDelegate updaterDidNotFindUpdate:self.updater];
+        }
+        [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
+        
+        NSError *notFoundError =
+        [NSError
+         errorWithDomain:SUSparkleErrorDomain
+         code:SUNoUpdateError
+         userInfo:@{
+                    NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"You already have the newest version of %@.", "'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI)"), self.host.name]
+                    }
+         ];
+        [self.delegate basicDriverIsRequestingAbortUpdateWithError:notFoundError];
     }
-    [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
-    
-    NSError *notFoundError =
-    [NSError
-     errorWithDomain:SUSparkleErrorDomain
-     code:SUNoUpdateError
-     userInfo:@{
-                NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"You already have the newest version of %@.", "'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI)"), self.host.name]
-                }
-     ];
-    [self.delegate basicDriverIsRequestingAbortUpdateWithError:notFoundError];
 }
 
-- (void)abortUpdateWithError:(nullable NSError *)error
+- (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately downloadedUpdate:(SUDownloadedUpdate * _Nullable)downloadedUpdate error:(nullable NSError *)error
 {
+    self.aborted = YES;
+    
     if (error != nil) {
-        if ([error code] != SUNoUpdateError) { // Let's not bother logging this.
+        if (error.code != SUNoUpdateError && error.code != SUInstallationCanceledError && error.code != SUInstallationAuthorizeLaterError) { // Let's not bother logging this.
             NSError *errorToDisplay = error;
             int finiteRecursion=5;
             do {
@@ -160,7 +185,7 @@
     }
     
     if (self.completionBlock != nil) {
-        self.completionBlock([self.delegate basicDriverShouldSignalShowingUpdateImmediately]);
+        self.completionBlock(shouldShowUpdateImmediately, downloadedUpdate);
         self.completionBlock = nil;
     }
 }

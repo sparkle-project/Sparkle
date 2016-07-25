@@ -14,6 +14,8 @@
 #import "SUDownloadDriver.h"
 #import "SULocalCacheDirectory.h"
 #import "SULog.h"
+#import "SUErrors.h"
+#import "SUDownloadedUpdate.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -26,9 +28,11 @@
 @property (nonatomic, readonly) SUInstallerDriver *installerDriver;
 @property (nonatomic, weak, readonly) id<SUCoreBasedUpdateDriverDelegate> delegate;
 @property (nonatomic) SUAppcastItem *updateItem;
+@property (nonatomic) SUDownloadedUpdate *downloadedUpdate;
 
 @property (nonatomic, readonly) SUHost *host;
-@property (nonatomic) BOOL resumingUpdate;
+@property (nonatomic) BOOL resumingInstallingUpdate;
+@property (nonatomic) BOOL silentInstall;
 @property (nonatomic, readonly, weak) id updater; // if we didn't have legacy support, I'd remove this..
 @property (nullable, nonatomic, readonly, weak) id <SUUpdaterDelegate>updaterDelegate;
 @property (nonatomic) NSString *userAgent;
@@ -43,10 +47,12 @@
 @synthesize delegate = _delegate;
 @synthesize updateItem = _updateItem;
 @synthesize host = _host;
-@synthesize resumingUpdate = _resumingUpdate;
+@synthesize resumingInstallingUpdate = _resumingInstallingUpdate;
+@synthesize silentInstall = _silentInstall;
 @synthesize updater = _updater;
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize userAgent = _userAgent;
+@synthesize downloadedUpdate = _downloadedUpdate;
 
 - (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate delegate:(id<SUCoreBasedUpdateDriverDelegate>)delegate
 {
@@ -68,17 +74,28 @@
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(SUUpdateDriverCompletion)completionBlock
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates requiresSilentInstall:(BOOL)silentInstall completion:(SUUpdateDriverCompletion)completionBlock
 {
     self.userAgent = userAgent;
+    self.silentInstall = silentInstall;
     
     [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:includesSkippedUpdates completion:completionBlock];
 }
 
-- (void)resumeUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
+- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
 {
-    self.resumingUpdate = YES;
-    [self.basicDriver resumeUpdateWithCompletion:completionBlock];
+    self.resumingInstallingUpdate = YES;
+    self.silentInstall = NO;
+    
+    [self.basicDriver resumeInstallingUpdateWithCompletion:completionBlock];
+}
+
+- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock
+{
+    self.downloadedUpdate = downloadedUpdate;
+    self.silentInstall = NO;
+    
+    [self.basicDriver resumeDownloadedUpdate:downloadedUpdate completion:completionBlock];
 }
 
 - (void)basicDriverDidFinishLoadingAppcast
@@ -92,8 +109,8 @@
 {
     self.updateItem = updateItem;
     
-    if (self.resumingUpdate) {
-        [self.installerDriver resumeUpdateWithUpdateItem:updateItem];
+    if (self.resumingInstallingUpdate) {
+        [self.installerDriver resumeInstallingUpdateWithUpdateItem:updateItem];
     }
     
     [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem];
@@ -133,22 +150,37 @@
     }
 }
 
-- (void)downloadDriverDidDownloadUpdate
+- (void)downloadDriverDidDownloadUpdate:(SUDownloadedUpdate *)downloadedUpdate
+{
+    self.downloadedUpdate = downloadedUpdate;
+    [self extractUpdate:downloadedUpdate];
+}
+
+- (void)extractDownloadedUpdate
+{
+    assert(self.downloadedUpdate != nil);
+    [self extractUpdate:self.downloadedUpdate];
+}
+
+- (void)clearDownloadedUpdate
+{
+    self.downloadedUpdate = nil;
+}
+
+- (void)extractUpdate:(SUDownloadedUpdate *)downloadedUpdate
 {
     // Now we have to extract the downloaded archive.
-    if ([self.delegate respondsToSelector:@selector(coreDriverDidFinishDownloadingUpdate)]) {
-        [self.delegate coreDriverDidFinishDownloadingUpdate];
+    if ([self.delegate respondsToSelector:@selector(coreDriverDidStartExtractingUpdate)]) {
+        [self.delegate coreDriverDidStartExtractingUpdate];
     }
     
-    NSString *downloadName = self.downloadDriver.downloadName;
-    assert(downloadName != nil);
-    
-    NSString *temporaryDirectory = self.downloadDriver.temporaryDirectory;
-    assert(temporaryDirectory != nil);
-    
-    [self.installerDriver extractDownloadName:downloadName withUpdateItem:self.updateItem temporaryDirectory:temporaryDirectory completion:^(NSError * _Nullable error) {
+    [self.installerDriver extractDownloadedUpdate:downloadedUpdate silently:self.silentInstall completion:^(NSError * _Nullable error) {
         if (error != nil) {
             [self.delegate coreDriverIsRequestingAbortUpdateWithError:error];
+        } else {
+            // If the installer started properly, we can't use the downloaded update archive anymore
+            // Especially if the installer fails later and we try resuming the update with a missing archive file
+            [self clearDownloadedUpdate];
         }
     }];
 }
@@ -243,21 +275,20 @@
     SUAppcastItem *nonDeltaUpdateItem = self.basicDriver.nonDeltaUpdateItem;
     assert(nonDeltaUpdateItem != nil);
     
+    [self clearDownloadedUpdate];
+    
     // Fall back to the non-delta update. Note that we don't want to trigger another update was found event.
     self.updateItem = nonDeltaUpdateItem;
     [self downloadUpdateFromAppcastItem:nonDeltaUpdateItem];
 }
 
-- (BOOL)basicDriverShouldSignalShowingUpdateImmediately
-{
-    return [self.delegate basicDriverShouldSignalShowingUpdateImmediately];
-}
-
-- (void)abortUpdateWithError:(nullable NSError *)error
+- (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately error:(nullable NSError *)error
 {
     [self.installerDriver abortInstall];
     [self.downloadDriver cleanup];
-    [self.basicDriver abortUpdateWithError:error];
+    
+    SUDownloadedUpdate *downloadedUpdate = (error == nil || error.code == SUInstallationAuthorizeLaterError) ? self.downloadedUpdate : nil;
+    [self.basicDriver abortUpdateAndShowNextUpdateImmediately:shouldShowUpdateImmediately downloadedUpdate:downloadedUpdate error:error];
 }
 
 @end

@@ -7,6 +7,7 @@
 //
 
 #import "SUApplicationInfo.h"
+#import "SUBundleIcon.h"
 
 @implementation SUApplicationInfo
 
@@ -17,17 +18,9 @@
 
 + (NSImage *)bestIconForBundle:(NSBundle *)bundle
 {
-    // Cache the application icon.
-    NSString *iconPath = [bundle pathForResource:[bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType:@"icns"];
-    // According to the macOS docs, "CFBundleIconFile - This key identifies the file containing
-    // the icon for the bundle. The filename you specify does not need to include the .icns
-    // extension, although it may."
-    //
-    // However, if it *does* include the '.icns' the above method fails (tested on macOS 10.3.9) so we'll also try:
-    if (!iconPath) {
-        iconPath = [bundle pathForResource:[bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType:nil];
-    }
-    NSImage *icon = [[NSImage alloc] initWithContentsOfFile:iconPath];
+    NSURL *iconURL = [SUBundleIcon iconURLForBundle:bundle];
+    
+    NSImage *icon = (iconURL == nil) ? nil : [[NSImage alloc] initWithContentsOfURL:iconURL];
     // Use a default icon if none is defined.
     if (!icon) {
         // this asumption may not be correct (eg. even though we're not the main bundle, it could be still be a regular app)

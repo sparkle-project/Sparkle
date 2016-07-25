@@ -18,12 +18,12 @@ typedef NS_ENUM(NSUInteger, SUUpdateCheckTimerStatus) {
 
 typedef NS_ENUM(NSUInteger, SUUserInitiatedCheckStatus) {
     SUUserInitiatedCheckDone,
-    SUUserInitiatedCheckCancelled
+    SUUserInitiatedCheckCanceled
 };
 
 typedef NS_ENUM(NSUInteger, SUDownloadUpdateStatus) {
     SUDownloadUpdateDone,
-    SUDownloadUpdateCancelled
+    SUDownloadUpdateCanceled
 };
 
 typedef NS_ENUM(NSUInteger, SUInstallUpdateStatus) {

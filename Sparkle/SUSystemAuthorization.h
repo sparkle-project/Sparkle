@@ -11,9 +11,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-// Must free authorization ref later
-AuthorizationRef SUCreateAuthorization(BOOL * _Nullable grantedSystemPrivilege);
-
-BOOL SUGrantsSystemAuthorizationAccess(void);
+BOOL SUNeedsSystemAuthorizationAccess(NSString *path, NSString *installationType, BOOL * _Nullable preflighted);
 
 NS_ASSUME_NONNULL_END

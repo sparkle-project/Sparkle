@@ -15,6 +15,8 @@ NSString *SUAppcastItemArchiveKey = @"SUAppcastItemArchive";
 // These should be very short because length restrictions exist on earlier versions of macOS
 #define SPARKLE_INSTALLER_TAG @"-spki"
 #define SPARKLE_STATUS_TAG @"-spks"
+#define SPARKLE_PROGRESS_TAG @"-spkp"
+#define SPARKLE_PROGRESS_LAUNCH_INSTALLER_TAG @"-spkl"
 
 // macOS 10.8 at least can't handle service names that are 64 characters or longer
 // This was fixed some point after 10.8, but I'm not sure if it was fixed in 10.9 or 10.10 or 10.11
@@ -76,4 +78,14 @@ NSString *SUInstallerServiceNameForBundleIdentifier(NSString *bundleIdentifier)
 NSString *SUStatusInfoServiceNameForBundleIdentifier(NSString *bundleIdentifier)
 {
     return SUServiceNameWithTag(SPARKLE_STATUS_TAG, bundleIdentifier);
+}
+
+NSString *SUProgressAgentServiceNameForBundleIdentifier(NSString *bundleIdentifier)
+{
+    return SUServiceNameWithTag(SPARKLE_PROGRESS_TAG, bundleIdentifier);
+}
+
+NSString *SUProgressAgentLauncherServiceNameForBundleIdentifier(NSString *bundleIdentifier)
+{
+    return SUServiceNameWithTag(SPARKLE_PROGRESS_LAUNCH_INSTALLER_TAG, bundleIdentifier);
 }
