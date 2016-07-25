@@ -12,6 +12,7 @@
 #import "SUInstaller.h"
 #import "SUInstallerProtocol.h"
 #import "SUStandardVersionComparator.h"
+#import "SUInstallationType.h"
 #import <unistd.h>
 
 @interface SUInstallerTest : XCTestCase
@@ -39,7 +40,7 @@
 
     if (uid) {
         NSLog(@"Test must be run as root: sudo xctest -XCTest SUInstallerTest 'Sparkle Unit Tests.xctest'");
-        return; // or just comment this line out and enter password when the auth. prompt comes up
+        return;
     }
 
     NSString *expectedDestination = @"/tmp/sparklepkgtest.app";
@@ -54,7 +55,7 @@
     SUHost *host = [[SUHost alloc] initWithBundle:bundle];
     
     NSError *installerError = nil;
-    id<SUInstallerProtocol> installer = [SUInstaller installerForHost:host updateDirectory:[path stringByDeletingLastPathComponent] allowingInteraction:NO versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
+    id<SUInstallerProtocol> installer = [SUInstaller installerForHost:host expectedInstallationType:SUInstallationTypeGuidedPackage updateDirectory:[path stringByDeletingLastPathComponent] allowingInteraction:NO versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
     
     if (installer == nil) {
         XCTFail(@"Installer is nil with error: %@", installerError);
