@@ -241,6 +241,9 @@ NS_ASSUME_NONNULL_BEGIN
  * This is an appropriate time to reply with SUDownloadUpdateDone if not done so already
  * Sparkle uses this to show an indeterminate progress bar.
  *
+ * Note that an update can resume at this point after having been downloaded before,
+ * so this may be called without any of the download callbacks being invoked prior.
+ *
  * This can be called from any thread
  */
 - (void)showDownloadDidStartExtractingUpdate;
