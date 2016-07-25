@@ -49,7 +49,6 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
 
 @implementation SUFileManager
 {
-    AuthorizationRef _auth;
     NSFileManager *_fileManager;
 }
 
