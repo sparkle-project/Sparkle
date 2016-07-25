@@ -92,7 +92,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Respond to the user initiating an update check. Sparkle uses this to show the user a window with an indeterminate progress bar.
  *
- * @param updateCheckStatusCompletion A reply indicating whether the initiated update check is done or cancelled.
+ * @param updateCheckStatusCompletion A reply indicating whether the initiated update check is done or canceled.
  * Attempts to canceling can be made before -dismissUserInitiatedUpdateCheck is invoked. Replying with SUUserInitiatedCheckDone
  * on the other hand should not be done until -dismissUserInitiatedUpdateCheck is invoked.
  *
@@ -140,7 +140,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Show the user an update that has started installing can be resumed and installed immediately
  *
  * Let the user know an update that has already been downloaded and started installing can be resumed.
- * Note at this point the update cannot be cancelled.
+ * Note at this point the update cannot be canceled.
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update
  *
@@ -207,7 +207,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Let the user know that downloading the new update started.
  *
- * @param downloadUpdateStatusCompletion A reply of SUDownloadUpdateCancelled can be used to cancel
+ * @param downloadUpdateStatusCompletion A reply of SUDownloadUpdateCanceled can be used to cancel
  * the download at any point before -showDownloadDidStartExtractingUpdate is invoked.
  * A reply of SUDownloadUpdateDone signifies that the download is done, which should not be invoked until
  * -showDownloadDidStartExtractingUpdate

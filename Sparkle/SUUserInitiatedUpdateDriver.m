@@ -46,7 +46,7 @@
         switch (completionStatus) {
             case SUUserInitiatedCheckDone:
                 break;
-            case SUUserInitiatedCheckCancelled:
+            case SUUserInitiatedCheckCanceled:
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (self.showingUserInitiatedProgress) {
                         [self abortUpdate];

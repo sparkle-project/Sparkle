@@ -503,25 +503,25 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         });
     };
     
-    // Let the other end know we cancelled so they can fail gracefully without disturbing the user
-    BOOL installationCancelled = (!performedSecondStage && secondStageError.code == SUInstallationCancelledError);
-    if (performedSecondStage || installationCancelled) {
+    // Let the other end know we canceled so they can fail gracefully without disturbing the user
+    BOOL installationCanceled = (!performedSecondStage && secondStageError.code == SUInstallationCanceledError);
+    if (performedSecondStage || installationCanceled) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            uint8_t cancelled = (uint8_t)installationCancelled;
+            uint8_t canceled = (uint8_t)installationCanceled;
             uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
             
-            uint8_t sendInfo[] = {cancelled, targetTerminated};
+            uint8_t sendInfo[] = {canceled, targetTerminated};
             
             NSData *sendData = [NSData dataWithBytes:sendInfo length:sizeof(sendInfo)];
             [self.communicator handleMessageWithIdentifier:SUInstallationFinishedStage2 data:sendData];
             
-            if (installationCancelled) {
+            if (installationCanceled) {
                 cleanupAndExit();
             }
         });
     }
     
-    if (!performedSecondStage && !installationCancelled) {
+    if (!performedSecondStage && !installationCanceled) {
         cleanupAndExit();
     }
 }

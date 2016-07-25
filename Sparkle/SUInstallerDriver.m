@@ -262,12 +262,12 @@
     } else if (identifier == SUInstallationFinishedStage2) {
         self.currentStage = identifier;
         
-        BOOL cancelledInstallation = NO;
+        BOOL canceledInstallation = NO;
         if (data.length >= sizeof(uint8_t)) {
-            cancelledInstallation = (*(const uint8_t *)data.bytes == 0x1);
+            canceledInstallation = (*(const uint8_t *)data.bytes == 0x1);
         }
         
-        if (cancelledInstallation) {
+        if (canceledInstallation) {
             [self.delegate installerIsRequestingAbortInstallWithError:nil];
         } else {
             if (!self.startedInstalling) {
@@ -450,8 +450,8 @@
                 case SUAuthorizationReplyFailure:
                     completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while launching the installer. Please try again later.", nil) }]);
                     break;
-                case SUAuthorizationReplyCancelled:
-                    completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationCancelledError userInfo:nil]);
+                case SUAuthorizationReplyCanceled:
+                    completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationCanceledError userInfo:nil]);
                     break;
                 case SUAuthorizationReplyAuthorizeLater:
                     completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationAuthorizeLaterError userInfo:nil]);

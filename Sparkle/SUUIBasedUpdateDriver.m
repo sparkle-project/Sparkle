@@ -150,7 +150,7 @@
         switch (downloadCompletionStatus) {
             case SUDownloadUpdateDone:
                 break;
-            case SUDownloadUpdateCancelled:
+            case SUDownloadUpdateCanceled:
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if ([self.updaterDelegate respondsToSelector:@selector(userDidCancelDownload:)]) {
                         [self.updaterDelegate userDidCancelDownload:self.updater];
@@ -236,7 +236,7 @@
                     abortUpdate();
                 });
             }];
-        } else if (error.code == SUInstallationCancelledError || error.code == SUInstallationAuthorizeLaterError) {
+        } else if (error.code == SUInstallationCanceledError || error.code == SUInstallationAuthorizeLaterError) {
             abortUpdate();
         } else {
             [self.userDriver showUpdaterError:nonNullError acknowledgement:^{

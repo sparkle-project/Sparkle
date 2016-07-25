@@ -155,7 +155,7 @@
 - (void)cancelUpdateCheckStatus
 {
     if (self.updateCheckStatusCompletion != nil) {
-        self.updateCheckStatusCompletion(SUUserInitiatedCheckCancelled);
+        self.updateCheckStatusCompletion(SUUserInitiatedCheckCanceled);
         self.updateCheckStatusCompletion = nil;
     }
 }
@@ -178,7 +178,7 @@
 - (void)cancelDownloadStatus
 {
     if (self.downloadStatusCompletion != nil) {
-        self.downloadStatusCompletion(SUDownloadUpdateCancelled);
+        self.downloadStatusCompletion(SUDownloadUpdateCanceled);
         self.downloadStatusCompletion = nil;
     }
 }

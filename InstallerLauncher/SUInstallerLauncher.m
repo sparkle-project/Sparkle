@@ -257,7 +257,7 @@
     if (submittedJob == true) {
         reply = SUAuthorizationReplySuccess;
     } else if (canceledAuthorization) {
-        reply = SUAuthorizationReplyCancelled;
+        reply = SUAuthorizationReplyCanceled;
     } else {
         reply = SUAuthorizationReplyFailure;
     }
@@ -291,7 +291,7 @@
                 }
             }
             
-            if (installerReply == SUAuthorizationReplyCancelled) {
+            if (installerReply == SUAuthorizationReplyCanceled) {
                 completionHandler(installerReply);
             } else {
                 completionHandler(submittedProgressTool ? SUAuthorizationReplySuccess : SUAuthorizationReplyFailure);
