@@ -84,8 +84,3 @@ NSString *SUProgressAgentServiceNameForBundleIdentifier(NSString *bundleIdentifi
 {
     return SUServiceNameWithTag(SPARKLE_PROGRESS_TAG, bundleIdentifier);
 }
-
-NSString *SUProgressAgentLauncherServiceNameForBundleIdentifier(NSString *bundleIdentifier)
-{
-    return SUServiceNameWithTag(SPARKLE_PROGRESS_LAUNCH_INSTALLER_TAG, bundleIdentifier);
-}
