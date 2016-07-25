@@ -125,9 +125,10 @@
     }];
     
     NSString *serviceName = SUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier);
+    NSString *installationType = self.updateItem.installationType;
+    assert(installationType != nil);
     
-#warning use self.updateItem later for passing guided option
-    [self.installerConnection setServiceName:serviceName hostPath:self.host.bundlePath guided:NO];
+    [self.installerConnection setServiceName:serviceName hostPath:self.host.bundlePath installationType:installationType];
     
     [self sendInstallationData];
 }
@@ -169,7 +170,7 @@
         decryptionPassword = [self.updaterDelegate decryptionPasswordForUpdater:self.updater];
     }
     
-    SUInstallationInputData *installationData = [[SUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadName:self.downloadName dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
+    SUInstallationInputData *installationData = [[SUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadName:self.downloadName installationType:self.updateItem.installationType dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
     
     NSData *archivedData = SUArchiveRootObjectSecurely(installationData);
     if (archivedData == nil) {
@@ -438,10 +439,12 @@
     NSString *hostBundlePath = self.host.bundle.bundlePath;
     assert(hostBundlePath != nil);
     
-#warning pass actual guided flag eventually
+    NSString *installationType = self.updateItem.installationType;
+    assert(installationType != nil);
+    
     // The installer launcher could be in a XPC service, so we don't want to do localization in there
     NSString *authorizationPrompt = [NSString stringWithFormat:SULocalizedString(@"%1$@ wants to update.", nil), self.host.name];
-    [installerLauncher launchInstallerAtPath:relaunchToolPath progressToolPath:progressToolPath withHostBundlePath:hostBundlePath authorizationPrompt:authorizationPrompt guidedInstallation:NO allowingInteraction:shouldAllowInstallerInteraction completion:^(SUAuthorizationReply result) {
+    [installerLauncher launchInstallerAtPath:relaunchToolPath progressToolPath:progressToolPath withHostBundlePath:hostBundlePath authorizationPrompt:authorizationPrompt installationType:installationType allowingInteraction:shouldAllowInstallerInteraction completion:^(SUAuthorizationReply result) {
         dispatch_async(dispatch_get_main_queue(), ^{
             retrievedLaunchStatus = YES;
             [launcherConnection invalidate];

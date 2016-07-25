@@ -10,6 +10,7 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SULog.h"
 #import "SUConstants.h"
+#import "SUInstallationType.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -28,6 +29,7 @@ static NSString *SUAppcastItemReleaseNotesURLKey = @"releaseNotesURL";
 static NSString *SUAppcastItemTitleKey = @"title";
 static NSString *SUAppcastItemVersionStringKey = @"versionString";
 static NSString *SUAppcastItemPropertiesKey = @"propertiesDictionary";
+static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationType";
 
 @implementation SUAppcastItem
 
@@ -45,6 +47,7 @@ static NSString *SUAppcastItemPropertiesKey = @"propertiesDictionary";
 @synthesize title = _title;
 @synthesize versionString = _versionString;
 @synthesize propertiesDictionary = _propertiesDictionary;
+@synthesize installationType = _installationType;
 
 + (BOOL)supportsSecureCoding
 {
@@ -64,6 +67,11 @@ static NSString *SUAppcastItemPropertiesKey = @"propertiesDictionary";
         
         _contentLength = (NSUInteger)[decoder decodeIntegerForKey:SUAppcastItemContentLengthKey];
         if (_contentLength == 0) {
+            return nil;
+        }
+        
+        _installationType = [decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemInstallationTypeKey];
+        if (!SUValidInstallationType(_installationType)) {
             return nil;
         }
         
@@ -129,6 +137,10 @@ static NSString *SUAppcastItemPropertiesKey = @"propertiesDictionary";
     
     if (self.propertiesDictionary != nil) {
         [encoder encodeObject:self.propertiesDictionary forKey:SUAppcastItemPropertiesKey];
+    }
+    
+    if (self.installationType != nil) {
+        [encoder encodeObject:self.installationType forKey:SUAppcastItemInstallationTypeKey];
     }
 }
 
@@ -262,6 +274,18 @@ static NSString *SUAppcastItemPropertiesKey = @"propertiesDictionary";
             _displayVersionString = [shortVersionString copy];
         } else {
             _displayVersionString = [_versionString copy];
+        }
+        
+        _installationType = [enclosure objectForKey:SUAppcastAttributeInstallationType];
+        if (_installationType == nil) {
+            _installationType = SUInstallationTypeDefault;
+        } else if (!SUValidInstallationType(_installationType)) {
+            if (error != NULL) {
+                *error = [NSString stringWithFormat:@"Feed item's enclosure lacks valid %@ (found %@)", SUAppcastAttributeInstallationType, _installationType];
+            }
+            return nil;
+        } else if ([_installationType isEqualToString:SUInstallationTypePackage]) {
+            SULog(@"warning: '%@' for %@ is deprecated. Use '%@' instead.", SUInstallationTypePackage, SUAppcastAttributeInstallationType, SUInstallationTypeGuidedPackage);
         }
 
         // Find the appropriate release notes URL.

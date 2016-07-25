@@ -8,6 +8,7 @@
 
 #import "SUSystemAuthorization.h"
 #import <ServiceManagement/ServiceManagement.h>
+#import "SUInstallationType.h"
 
 static BOOL SUPreflightSystemAuthorization(void)
 {
@@ -38,7 +39,7 @@ static BOOL SUPreflightSystemAuthorization(void)
     return (copyStatus == errAuthorizationSuccess);
 }
 
-BOOL SUNeedsSystemAuthorizationAccess(NSString *path, BOOL guided, BOOL * _Nullable preflighted)
+BOOL SUNeedsSystemAuthorizationAccess(NSString *path, NSString *installationType, BOOL * _Nullable preflighted)
 {
     BOOL result;
     if (SUPreflightSystemAuthorization()) {
@@ -46,8 +47,10 @@ BOOL SUNeedsSystemAuthorizationAccess(NSString *path, BOOL guided, BOOL * _Nulla
             *preflighted = YES;
         }
         result = YES;
-    } else if (guided) {
+    } else if ([installationType isEqualToString:SUInstallationTypeGuidedPackage]) {
         result = YES;
+    } else if ([installationType isEqualToString:SUInstallationTypePackage]) {
+        result = NO;
     } else {
 #warning what about symbolic links?
         NSFileManager *fileManager = [NSFileManager defaultManager];

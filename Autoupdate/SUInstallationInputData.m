@@ -7,6 +7,7 @@
 //
 
 #import "SUInstallationInputData.h"
+#import "SUInstallationType.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "daemon-safe" class and should NOT import AppKit
@@ -18,6 +19,7 @@ static NSString *SUUpdateDirectoryPathKey = @"SUUpdateDirectoryPath";
 static NSString *SUDownloadNameKey = @"SUDownloadName";
 static NSString *SUDSASignatureKey = @"SUDSASignature";
 static NSString *SUDecryptionPasswordKey = @"SUDecryptionPassword";
+static NSString *SUInstallationTypeKey = @"SUInstallationType";
 
 @implementation SUInstallationInputData
 
@@ -27,8 +29,9 @@ static NSString *SUDecryptionPasswordKey = @"SUDecryptionPassword";
 @synthesize downloadName = _downloadName;
 @synthesize dsaSignature = _dsaSignature;
 @synthesize decryptionPassword = _decryptionPassword;
+@synthesize installationType = _installationType;
 
-- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadName:(NSString *)downloadName dsaSignature:(NSString *)dsaSignature decryptionPassword:(nullable NSString *)decryptionPassword
+- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadName:(NSString *)downloadName installationType:(NSString *)installationType dsaSignature:(NSString *)dsaSignature decryptionPassword:(nullable NSString *)decryptionPassword
 {
     self = [super init];
     if (self != nil) {
@@ -36,6 +39,10 @@ static NSString *SUDecryptionPasswordKey = @"SUDecryptionPassword";
         _hostBundlePath = [hostBundlePath copy];
         _updateDirectoryPath = [updateDirectoryPath copy];
         _downloadName = [downloadName copy];
+        
+        _installationType = [installationType copy];
+        assert(SUValidInstallationType(_installationType));
+        
         _dsaSignature = [dsaSignature copy];
         _decryptionPassword = [decryptionPassword copy];
     }
@@ -64,6 +71,11 @@ static NSString *SUDecryptionPasswordKey = @"SUDecryptionPassword";
         return nil;
     }
     
+    NSString *installationType = [decoder decodeObjectOfClass:[NSString class] forKey:SUInstallationTypeKey];
+    if (!SUValidInstallationType(installationType)) {
+        return nil;
+    }
+    
     NSString *dsaSignature = [decoder decodeObjectOfClass:[NSString class] forKey:SUDSASignatureKey];
     if (dsaSignature == nil) {
         return nil;
@@ -71,7 +83,7 @@ static NSString *SUDecryptionPasswordKey = @"SUDecryptionPassword";
     
     NSString *decryptionPassword = [decoder decodeObjectOfClass:[NSString class] forKey:SUDecryptionPasswordKey];
     
-    return [self initWithRelaunchPath:relaunchPath hostBundlePath:hostBundlePath updateDirectoryPath:updateDirectoryPath downloadName:downloadName dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
+    return [self initWithRelaunchPath:relaunchPath hostBundlePath:hostBundlePath updateDirectoryPath:updateDirectoryPath downloadName:downloadName installationType:installationType dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder
@@ -79,6 +91,7 @@ static NSString *SUDecryptionPasswordKey = @"SUDecryptionPassword";
     [coder encodeObject:self.relaunchPath forKey:SURelaunchPathKey];
     [coder encodeObject:self.hostBundlePath forKey:SUHostBundlePathKey];
     [coder encodeObject:self.updateDirectoryPath forKey:SUUpdateDirectoryPathKey];
+    [coder encodeObject:self.installationType forKey:SUInstallationTypeKey];
     [coder encodeObject:self.downloadName forKey:SUDownloadNameKey];
     [coder encodeObject:self.dsaSignature forKey:SUDSASignatureKey];
     if (self.decryptionPassword != nil) {

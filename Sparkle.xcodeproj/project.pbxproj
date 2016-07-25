@@ -760,6 +760,7 @@
 		7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUUnarchiverTest.swift; sourceTree = "<group>"; };
 		7214B87F1D456A8500CB5CED /* SUBundleIcon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBundleIcon.h; sourceTree = "<group>"; };
 		7214B8801D456A8500CB5CED /* SUBundleIcon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBundleIcon.m; sourceTree = "<group>"; };
+		7214B8851D45AD9A00CB5CED /* SUInstallationType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUInstallationType.h; sourceTree = "<group>"; };
 		72162B051C82C8B30013C1C5 /* SUParameterAssert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUParameterAssert.h; sourceTree = "<group>"; };
 		72162B071C82C9600013C1C5 /* SULocalizations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULocalizations.h; sourceTree = "<group>"; };
 		721652671D3C8FED00FD13D8 /* SUAuthorizationReply.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SUAuthorizationReply.h; path = InstallerLauncher/SUAuthorizationReply.h; sourceTree = SOURCE_ROOT; };
@@ -1385,6 +1386,7 @@
 				61B5FB9509C4F04600B25A18 /* SUAppcast.m */,
 				61B5FC5309C5182000B25A18 /* SUAppcastItem.h */,
 				61B5FC5409C5182000B25A18 /* SUAppcastItem.m */,
+				7214B8851D45AD9A00CB5CED /* SUInstallationType.h */,
 				72B09CE51CE6BCBD0052EF9E /* SUURLDownload.h */,
 				72B09CE61CE6BCBD0052EF9E /* SUURLDownload.m */,
 				7293A1AC1CEE933800B957A7 /* SUURLRequest.h */,

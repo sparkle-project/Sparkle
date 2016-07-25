@@ -26,6 +26,7 @@
 #import "SUInstallerCommunicationProtocol.h"
 #import "AgentConnection.h"
 #import "SUInstallerAgentProtocol.h"
+#import "SUInstallationType.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "daemon-safe" class and should NOT import AppKit
@@ -375,20 +376,26 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 NSBundle *hostBundle = [NSBundle bundleWithPath:nonNullInstallationData.hostBundlePath];
                 SUHost *host = [[SUHost alloc] initWithBundle:hostBundle];
                 
-                NSString *bundleIdentifier = hostBundle.bundleIdentifier;
-                if (bundleIdentifier == nil || ![bundleIdentifier isEqualToString:self.hostBundleIdentifier]) {
-                    SULog(@"Error: Failed to match host bundle identifiers %@ and %@", self.hostBundleIdentifier, bundleIdentifier);
+                NSString *installationType = nonNullInstallationData.installationType;
+                if (!SUValidInstallationType(installationType)) {
+                    SULog(@"Error: Received invalid installation type: %@", installationType);
                     [self cleanupAndExitWithStatus:EXIT_FAILURE];
                 } else {
-                    // This will be important later
-                    if (nonNullInstallationData.relaunchPath == nil) {
-                        SULog(@"Error: Failed to obtain relaunch path from installation data");
+                    NSString *bundleIdentifier = hostBundle.bundleIdentifier;
+                    if (bundleIdentifier == nil || ![bundleIdentifier isEqualToString:self.hostBundleIdentifier]) {
+                        SULog(@"Error: Failed to match host bundle identifiers %@ and %@", self.hostBundleIdentifier, bundleIdentifier);
                         [self cleanupAndExitWithStatus:EXIT_FAILURE];
                     } else {
-                        self.host = host;
-                        self.installationData = installationData;
-                        
-                        [self extractAndInstallUpdate];
+                        // This will be important later
+                        if (nonNullInstallationData.relaunchPath == nil) {
+                            SULog(@"Error: Failed to obtain relaunch path from installation data");
+                            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                        } else {
+                            self.host = host;
+                            self.installationData = installationData;
+                            
+                            [self extractAndInstallUpdate];
+                        }
                     }
                 }
             }
@@ -436,7 +443,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     dispatch_async(self.installerQueue, ^{
         NSError *installerError = nil;
-        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self.host updateDirectory:self.installationData.updateDirectoryPath allowingInteraction:self.allowsInteraction versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
+        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self.host expectedInstallationType:self.installationData.installationType updateDirectory:self.installationData.updateDirectoryPath allowingInteraction:self.allowsInteraction versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
         
         if (installer == nil) {
             SULog(@"Error: Failed to create installer instance with error: %@", installerError);

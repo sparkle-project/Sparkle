@@ -20,12 +20,13 @@ NS_ASSUME_NONNULL_BEGIN
  * dsaSignature - DSA signature for the update that came from the appcast item
  * decryptionPassword - optional decryption password for dmg archives
  */
-- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadName:(NSString *)downloadName dsaSignature:(NSString *)dsaSignature decryptionPassword:(nullable NSString *)decryptionPassword;
+- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadName:(NSString *)downloadName installationType:(NSString *)installationType dsaSignature:(NSString *)dsaSignature decryptionPassword:(nullable NSString *)decryptionPassword;
 
 @property (nonatomic, copy, readonly) NSString *relaunchPath;
 @property (nonatomic, copy, readonly) NSString *hostBundlePath;
 @property (nonatomic, copy, readonly) NSString *updateDirectoryPath;
 @property (nonatomic, copy, readonly) NSString *downloadName;
+@property (nonatomic, copy, readonly) NSString *installationType;
 @property (nonatomic, copy, readonly) NSString *dsaSignature;
 @property (nonatomic, copy, readonly, nullable) NSString *decryptionPassword;
 

@@ -58,9 +58,9 @@ static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection K
     [self enableAutomaticTermination];
 }
 
-- (void)setServiceName:(NSString *)serviceName hostPath:(NSString *)hostPath guided:(BOOL)guided
+- (void)setServiceName:(NSString *)serviceName hostPath:(NSString *)hostPath installationType:(NSString *)installationType
 {
-    NSXPCConnectionOptions options = SUNeedsSystemAuthorizationAccess(hostPath, guided, NULL) ? NSXPCConnectionPrivileged : 0;
+    NSXPCConnectionOptions options = SUNeedsSystemAuthorizationAccess(hostPath, installationType, NULL) ? NSXPCConnectionPrivileged : 0;
     NSXPCConnection *connection = [[NSXPCConnection alloc] initWithMachServiceName:serviceName options:options];
     
     connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerCommunicationProtocol)];

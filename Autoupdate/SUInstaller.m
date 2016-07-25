@@ -15,6 +15,7 @@
 #import "SULog.h"
 #import "SUParameterAssert.h"
 #import "SUErrors.h"
+#import "SUInstallationType.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -112,7 +113,7 @@
     return newAppDownloadPath;
 }
 
-+ (nullable id<SUInstallerProtocol>)installerForHost:(SUHost *)host updateDirectory:(NSString *)updateDirectory allowingInteraction:(BOOL)allowsInteraction versionComparator:(id <SUVersionComparison>)comparator error:(NSError * __autoreleasing *)error
++ (nullable id<SUInstallerProtocol>)installerForHost:(SUHost *)host expectedInstallationType:(NSString *)expectedInstallationType updateDirectory:(NSString *)updateDirectory allowingInteraction:(BOOL)allowsInteraction versionComparator:(id <SUVersionComparison>)comparator error:(NSError * __autoreleasing *)error
 {
     BOOL isPackage = NO;
     BOOL isGuided = NO;
@@ -125,16 +126,43 @@
         return nil;
     }
     
-    // If the installer does not allow interaction, we could be running as root
-    // If we are running as root, using a non-guided package installer does not work properly so avoid it at all costs
+    // Make sure we find the type of installer that we were expecting to find
+    // We shouldn't implicitly trust the installation type fed into here from the appcast because the installation type helps us determine
+    // ahead of time whether or not this installer tool should be ran as root or not
     id <SUInstallerProtocol> installer = nil;
-    if (isPackage && (isGuided || !allowsInteraction)) {
-        installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath];
+    if (isPackage && isGuided) {
+        if (![expectedInstallationType isEqualToString:SUInstallationTypeGuidedPackage]) {
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found guided package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SUInstallationTypeGuidedPackage] }];
+            }
+        } else {
+            installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath];
+        }
     } else if (isPackage) {
-        installer = [[SUPackageInstaller alloc] initWithPackagePath:newDownloadPath];
+        if (![expectedInstallationType isEqualToString:SUInstallationTypePackage]) {
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SUInstallationTypePackage] }];
+            }
+        } else {
+#warning review this
+            // Even if we expect an ordinary package, if we don't allow interaction (eg: because we're already running root) -
+            // we should try a guided installation instead - because an ordinary package installation may not work well
+            if (allowsInteraction) {
+                installer = [[SUPackageInstaller alloc] initWithPackagePath:newDownloadPath];
+            } else {
+                installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath];
+            }
+        }
     } else {
-        installer = [[SUPlainInstaller alloc] initWithHost:host applicationPath:newDownloadPath installationPath:[[self class] installationPathForHost:host] versionComparator:comparator];
+        if (![expectedInstallationType isEqualToString:SUInstallationTypeApplication]) {
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found regular application update but expected '%@=%@' from the appcast item enclosure instead", SUAppcastAttributeInstallationType, expectedInstallationType] }];
+            }
+        } else {
+            installer = [[SUPlainInstaller alloc] initWithHost:host applicationPath:newDownloadPath installationPath:[[self class] installationPathForHost:host] versionComparator:comparator];
+        }
     }
+    
     return installer;
 }
 

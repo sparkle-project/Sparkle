@@ -11,6 +11,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-BOOL SUNeedsSystemAuthorizationAccess(NSString *path, BOOL guided, BOOL * _Nullable preflighted);
+BOOL SUNeedsSystemAuthorizationAccess(NSString *path, NSString *installationType, BOOL * _Nullable preflighted);
 
 NS_ASSUME_NONNULL_END
