@@ -672,60 +672,6 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     return YES;
 }
 
-- (BOOL)moveItemAtURLToTrash:(NSURL *)url error:(NSError *__autoreleasing *)error
-{
-    if (![self _itemExistsAtURL:url]) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move %@ to the trash because the file does not exist.", url.path.lastPathComponent] }];
-        }
-        return NO;
-    }
-
-    NSURL *trashURL = [_fileManager URLForDirectory:NSTrashDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:nil];
-
-    if (trashURL == nil) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to locate the user's trash folder." }];
-        }
-        return NO;
-    }
-
-    // In the rare worst case scenario, our temporary directory will be labeled incomplete and be in the user's trash directory,
-    // indicating that whatever inside of there is not yet completely moved.
-    // Regardless, we want the item to be in our Volume before we try moving it to the trash
-    NSString *preferredName = [url.lastPathComponent.stringByDeletingPathExtension stringByAppendingString:@" (Incomplete Files)"];
-    NSURL *tempDirectory = [self makeTemporaryDirectoryWithPreferredName:preferredName appropriateForDirectoryURL:trashURL error:error];
-    if (tempDirectory == nil) {
-        return NO;
-    }
-
-    NSString *urlLastPathComponent = url.lastPathComponent;
-    NSURL *tempItemURL = [tempDirectory URLByAppendingPathComponent:urlLastPathComponent];
-    if (![self moveItemAtURL:url toURL:tempItemURL error:error]) {
-        // If we can't move the item at url, just remove it completely; chances are it's not going to be missed
-        [self removeItemAtURL:url error:NULL];
-        [self removeItemAtURL:tempDirectory error:NULL];
-        return NO;
-    }
-
-    if (![self changeOwnerAndGroupOfItemAtRootURL:tempItemURL toMatchURL:trashURL error:error]) {
-        // Removing the item inside of the temp directory is better than trying to move the item to the trash with incorrect ownership
-        [self removeItemAtURL:tempDirectory error:NULL];
-        return NO;
-    }
-
-    // If we get here, we should be able to trash the item normally without authentication
-    NSError *trashError = nil;
-    BOOL success = [_fileManager trashItemAtURL:tempItemURL resultingItemURL:NULL error:&trashError];
-    if (!success && error != NULL) {
-        *error = trashError;
-    }
-
-    [self removeItemAtURL:tempDirectory error:NULL];
-
-    return success;
-}
-
 @end
 
 #pragma clang diagnostic pop

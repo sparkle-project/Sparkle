@@ -30,7 +30,6 @@
 @property (nonatomic) SUFileManager *fileManager;
 @property (nonatomic) NSURL *tempOldDirectoryURL;
 @property (nonatomic) NSURL *tempNewDirectoryURL;
-@property (nonatomic) NSURL *oldTempURL;
 
 @end
 
@@ -43,7 +42,6 @@
 @synthesize fileManager = _fileManager;
 @synthesize tempOldDirectoryURL = _tempOldDirectoryURL;
 @synthesize tempNewDirectoryURL = _tempNewDirectoryURL;
-@synthesize oldTempURL = _oldTempURL;
 
 - (instancetype)initWithHost:(SUHost *)host applicationPath:(NSString *)applicationPath installationPath:(NSString *)installationPath versionComparator:(id <SUVersionComparison>)comparator
 {
@@ -148,17 +146,8 @@
     }
     
     // Decide on a destination name we should use for the older app when we move it around the file system
-    NSString *oldDestinationName = nil;
-    if (SPARKLE_APPEND_VERSION_NUMBER) {
-        NSString *oldBundleVersion = [self bundleVersionAppropriateForFilenameFromHost:host];
-        
-        oldDestinationName = [oldURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingFormat:@" (%@)", oldBundleVersion != nil ? oldBundleVersion : @"old"];
-    } else {
-        oldDestinationName = oldURL.lastPathComponent.stringByDeletingPathExtension;
-    }
-    
-    NSString *oldURLExtension = oldURL.pathExtension;
-    NSString *oldDestinationNameWithPathExtension = [oldDestinationName stringByAppendingPathExtension:oldURLExtension];
+    NSString *oldDestinationName = oldURL.lastPathComponent.stringByDeletingPathExtension;
+    NSString *oldDestinationNameWithPathExtension = oldURL.lastPathComponent;
     
     // Create a temporary directory for our old app that resides on its volume
     NSURL *oldDirectoryURL = oldURL.URLByDeletingLastPathComponent;
@@ -199,7 +188,6 @@
     self.fileManager = fileManager;
     self.tempNewDirectoryURL = tempNewDirectoryURL;
     self.tempOldDirectoryURL = tempOldDirectoryURL;
-    self.oldTempURL = oldTempURL;
     
     return YES;
 }
@@ -254,25 +242,13 @@
 - (void)cleanup
 {
     SUFileManager *fileManager = self.fileManager;
-    NSURL *oldTempURL = self.oldTempURL;
     NSURL *tempOldDirectoryURL = self.tempOldDirectoryURL;
     NSURL *tempNewDirectoryURL = self.tempNewDirectoryURL;
     
     // Note: I'm intentionally not checking if an item at the file URLs exist since these methods already do that for us
     
-    if (oldTempURL != nil) {
-        // Cleanup: move the old app to the trash
-        // If we are the root user it's very possible that there is no trash directory to move the file into
-        // In that case, don't log out an error. Removing tempOldDirectoryURL later will remove the app
-        NSError *trashError = nil;
-        if (![fileManager moveItemAtURLToTrash:oldTempURL error:&trashError] && trashError.code != NSFileNoSuchFileError) {
-            SULog(@"Failed to move %@ to trash with error %@", oldTempURL, trashError);
-        }
-        
-        self.oldTempURL = nil;
-    }
-    
     if (tempOldDirectoryURL != nil) {
+        // This will remove the old app contained inside the directory as well
         [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
         
         self.tempOldDirectoryURL = nil;

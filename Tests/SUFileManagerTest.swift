@@ -70,38 +70,6 @@ class SUFileManagerTest: XCTestCase
         }
     }
     
-    func testMoveFilesToTrash()
-    {
-        makeTempFiles() { fileManager, rootURL, ordinaryFileURL, directoryURL, fileInDirectoryURL, validSymlinkURL, invalidSymlinkURL in
-            XCTAssertNil(try? fileManager.moveItemAtURLToTrash(rootURL.URLByAppendingPathComponent("does not exist")))
-            
-            let trashURL = try! NSFileManager.defaultManager().URLForDirectory(.TrashDirectory, inDomain: .UserDomainMask, appropriateForURL: nil, create: false)
-            
-            try! fileManager.moveItemAtURLToTrash(ordinaryFileURL)
-            XCTAssertFalse(fileManager._itemExistsAtURL(ordinaryFileURL))
-            
-            let ordinaryFileTrashURL = trashURL.URLByAppendingPathComponent(ordinaryFileURL.lastPathComponent!)
-            XCTAssertTrue(fileManager._itemExistsAtURL(ordinaryFileTrashURL))
-            try! fileManager.removeItemAtURL(ordinaryFileTrashURL)
-            
-            let validSymlinkTrashURL = trashURL.URLByAppendingPathComponent(validSymlinkURL.lastPathComponent!)
-            try! fileManager.moveItemAtURLToTrash(validSymlinkURL)
-            XCTAssertTrue(fileManager._itemExistsAtURL(validSymlinkTrashURL))
-            XCTAssertTrue(fileManager._itemExistsAtURL(directoryURL))
-            try! fileManager.removeItemAtURL(validSymlinkTrashURL)
-            
-            try! fileManager.moveItemAtURLToTrash(directoryURL)
-            XCTAssertFalse(fileManager._itemExistsAtURL(directoryURL))
-            XCTAssertFalse(fileManager._itemExistsAtURL(fileInDirectoryURL))
-            
-            let directoryTrashURL = trashURL.URLByAppendingPathComponent(directoryURL.lastPathComponent!)
-            XCTAssertTrue(fileManager._itemExistsAtURL(directoryTrashURL))
-            XCTAssertTrue(fileManager._itemExistsAtURL(directoryTrashURL.URLByAppendingPathComponent(fileInDirectoryURL.lastPathComponent!)))
-            
-            try! fileManager.removeItemAtURL(directoryTrashURL)
-        }
-    }
-    
     func testCopyFiles()
     {
         makeTempFiles() { fileManager, rootURL, ordinaryFileURL, directoryURL, fileInDirectoryURL, validSymlinkURL, invalidSymlinkURL in
