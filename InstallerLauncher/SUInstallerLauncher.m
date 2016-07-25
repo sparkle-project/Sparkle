@@ -93,13 +93,8 @@
 {
     SUFileManager *fileManager = [SUFileManager defaultManager];
     
-    NSURL *installerURL = [NSURL fileURLWithPath:installerPath];
-    
-    NSError *quarantineError = nil;
-    if (![fileManager releaseItemFromQuarantineAtRootURL:installerURL error:&quarantineError]) {
-        // Probably not a fatal error because we are submitting the executable through launchd
-        SULog(@"Failed to release quarantine on installer at %@ with error %@", installerPath, quarantineError);
-    }
+    // No need to release the quarantine for this utility
+    // In fact, we shouldn't because the tool may be located at a path we should not be writing too.
     
     NSString *hostBundleIdentifier = hostBundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);

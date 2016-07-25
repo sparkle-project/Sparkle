@@ -378,22 +378,17 @@
 
 - (void)launchAutoUpdateSilently:(BOOL)silently completion:(void (^)(NSError *_Nullable))completionHandler
 {
-    // Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
-    // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
-    NSError *relaunchError = nil;
-    NSString *relaunchToolPath = [self copyPathToCacheDirectory:[self.sparkleBundle pathForResource:@""SPARKLE_RELAUNCH_TOOL_NAME ofType:@""] error:&relaunchError];
-    if (relaunchToolPath == nil) {
-        completionHandler(relaunchError);
-        return;
-    }
-    
-    // Copy the progress tool as well
+    // Copy the progress tool into a temporary directory so we can get to it as the new version is being installed.
     NSError *progressToolError = nil;
     NSString *progressToolPath = [self copyPathToCacheDirectory:[self.sparkleBundle pathForResource:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME ofType:@"app"] error:&progressToolError];
     if (progressToolPath == nil) {
         completionHandler(progressToolError);
         return;
     }
+    
+    // Grab the installer path. Note we do not have to copy this tool out of where it may be located right now since it's a utility with no dependencies.
+    // Furthermore, we can keep the tool at a place that may not necessarily be writable.
+    NSString *relaunchToolPath = [self.sparkleBundle pathForResource:@""SPARKLE_RELAUNCH_TOOL_NAME ofType:@""];
     
     id<SUInstallerLauncherProtocol> installerLauncher = nil;
     __block BOOL retrievedLaunchStatus = NO;
