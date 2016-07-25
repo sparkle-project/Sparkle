@@ -1171,7 +1171,6 @@
 				FA1941C40D94A6EA00DD942E /* Configurations */,
 				726B2B5E1C645FC900388755 /* UI Tests */,
 				72D9549F1CBB415C006F28BD /* sparkle-cli */,
-				72B398D31D3D879400EE297F /* Autoupdate */,
 				0867D69AFE84028FC02AAC07 /* Frameworks */,
 				034768DFFF38A50411DB9C8B /* Products */,
 			);
@@ -1696,13 +1695,6 @@
 				724BB3AC1D347EDE005D534A /* SUSystemAuthorization.m */,
 			);
 			name = IPC;
-			path = Autoupdate;
-			sourceTree = "<group>";
-		};
-		72B398D31D3D879400EE297F /* Autoupdate */ = {
-			isa = PBXGroup;
-			children = (
-			);
 			path = Autoupdate;
 			sourceTree = "<group>";
 		};
