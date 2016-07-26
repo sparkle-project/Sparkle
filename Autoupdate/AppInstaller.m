@@ -498,9 +498,14 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     if (performedSecondStage) {
         self.performedStage2Installation = YES;
-    }
-    
-    void (^cleanupAndExit)(void) = ^{
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
+            
+            NSData *sendData = [NSData dataWithBytes:&targetTerminated length:sizeof(targetTerminated)];
+            [self.communicator handleMessageWithIdentifier:SUInstallationFinishedStage2 data:sendData];
+        });
+    } else {
         SULog(@"Error: Failed to resume installer on stage 2 with error: %@", secondStageError);
         [self.installer cleanup];
         self.installer = nil;
@@ -508,28 +513,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         dispatch_async(dispatch_get_main_queue(), ^{
             [self cleanupAndExitWithStatus:EXIT_FAILURE];
         });
-    };
-    
-    // Let the other end know we canceled so they can fail gracefully without disturbing the user
-    BOOL installationCanceled = (!performedSecondStage && secondStageError.code == SUInstallationCanceledError);
-    if (performedSecondStage || installationCanceled) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            uint8_t canceled = (uint8_t)installationCanceled;
-            uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
-            
-            uint8_t sendInfo[] = {canceled, targetTerminated};
-            
-            NSData *sendData = [NSData dataWithBytes:sendInfo length:sizeof(sendInfo)];
-            [self.communicator handleMessageWithIdentifier:SUInstallationFinishedStage2 data:sendData];
-            
-            if (installationCanceled) {
-                cleanupAndExit();
-            }
-        });
-    }
-    
-    if (!performedSecondStage && !installationCanceled) {
-        cleanupAndExit();
     }
 }
 

@@ -263,30 +263,21 @@
     } else if (identifier == SUInstallationFinishedStage2) {
         self.currentStage = identifier;
         
-        BOOL canceledInstallation = NO;
-        if (data.length >= sizeof(uint8_t)) {
-            canceledInstallation = (*(const uint8_t *)data.bytes == 0x1);
+        if (!self.startedInstalling) {
+            // It's possible we can start from resuming to stage 2 rather than doing stage 1 again, so we should notify to start installing if we haven't done so already
+            self.startedInstalling = YES;
+            [self.delegate installerDidStartInstalling];
         }
         
-        if (canceledInstallation) {
-            [self.delegate installerIsRequestingAbortInstallWithError:nil];
-        } else {
-            if (!self.startedInstalling) {
-                // It's possible we can start from resuming to stage 2 rather than doing stage 1 again, so we should notify to start installing if we haven't done so already
-                self.startedInstalling = YES;
-                [self.delegate installerDidStartInstalling];
-            }
-            
-            BOOL hasTargetTerminated = NO;
-            if (data.length >= sizeof(uint8_t) * 2) {
-                hasTargetTerminated = (BOOL)*((const uint8_t *)data.bytes + 1);
-            }
-            
-            [self.delegate installerWillFinishInstallationAndRelaunch:self.willRelaunch];
-            
-            if (!hasTargetTerminated) {
-                [self.delegate installerIsRequestingAppTermination];
-            }
+        BOOL hasTargetTerminated = NO;
+        if (data.length >= sizeof(uint8_t)) {
+            hasTargetTerminated = (BOOL)*((const uint8_t *)data.bytes);
+        }
+        
+        [self.delegate installerWillFinishInstallationAndRelaunch:self.willRelaunch];
+        
+        if (!hasTargetTerminated) {
+            [self.delegate installerIsRequestingAppTermination];
         }
     } else if (identifier == SUInstallationFinishedStage3) {
         self.currentStage = identifier;
