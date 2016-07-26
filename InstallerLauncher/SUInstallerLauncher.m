@@ -12,6 +12,7 @@
 #import "SUMessageTypes.h"
 #import "SUSystemAuthorization.h"
 #import "SUBundleIcon.h"
+#import <ServiceManagement/ServiceManagement.h>
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -42,7 +43,7 @@
     
     NSArray<NSString *> *arguments = @[executablePath, hostBundlePath, @(inSystemDomainForInstaller).stringValue];
     
-#warning support running under system domain if updater is running as root - this means we would have to try running job under a different user
+    // The progress tool can only be ran as the logged in user, not as root
     CFStringRef domain = kSMDomainUserLaunchd;
     NSString *label = [NSString stringWithFormat:@"%@-sparkle-progress", hostBundleIdentifier];
     
@@ -264,11 +265,10 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
         
-        BOOL preflighted = NO;
-        BOOL needsSystemAuthorization = SUNeedsSystemAuthorizationAccess(hostBundlePath, installationType, &preflighted);
+        BOOL needsSystemAuthorization = SUNeedsSystemAuthorizationAccess(hostBundlePath, installationType);
         
-        // if we need to use the system domain and we aren't already root and we aren't allowed interaction, then try sometime later when interaction is allowed
-        if (needsSystemAuthorization && !preflighted && !allowingInteraction) {
+        // if we need to use the system domain and we aren't allowed interaction, then try sometime later when interaction is allowed
+        if (needsSystemAuthorization && !allowingInteraction) {
             completionHandler(SUAuthorizationReplyAuthorizeLater);
         } else {
             SUAuthorizationReply installerReply = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle authorizationPrompt:authorizationPrompt allowingInteraction:allowingInteraction inSystemDomain:needsSystemAuthorization];

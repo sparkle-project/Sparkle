@@ -7,10 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <ServiceManagement/SMLoginItem.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-BOOL SUNeedsSystemAuthorizationAccess(NSString *path, NSString *installationType, BOOL * _Nullable preflighted);
+BOOL SUNeedsSystemAuthorizationAccess(NSString *path, NSString *installationType);
 
 NS_ASSUME_NONNULL_END

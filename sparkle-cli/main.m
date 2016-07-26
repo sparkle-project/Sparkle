@@ -46,6 +46,11 @@ int main(int argc, char **argv)
 {
     @autoreleasepool
     {
+        if (geteuid() == 0) {
+            fprintf(stderr, "Error: Running as root is not supported\n");
+            return EXIT_FAILURE;
+        }
+        
         struct option longOptions[] = {
             {APPLICATION_FLAG, required_argument, NULL, 0},
             {DEFER_FLAG, no_argument, NULL, 0},
