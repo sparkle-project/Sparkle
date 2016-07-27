@@ -25,12 +25,14 @@ void SUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(NS
         connection = [[NSXPCConnection alloc] initWithServiceName:@TEMPORARY_DOWNLOADER_BUNDLE_ID];
         connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUTemporaryDownloaderProtocol)];
         
-#warning revisit connection weak reference
-        __weak NSXPCConnection *weakConnection = connection;
         connection.interruptionHandler = ^{
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (!retrievedDownloadResult) {
-                    [weakConnection invalidate];
+                    // We'll break the retain cycle in the invalidation handler
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-retain-cycles"
+                    [connection invalidate];
+#pragma clang diagnostic pop
                 }
             });
         };
@@ -40,6 +42,13 @@ void SUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(NS
                 if (!retrievedDownloadResult) {
                     completionBlock(nil, [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:nil]);
                 }
+                
+                // Break the retain cycle
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-retain-cycles"
+                connection.interruptionHandler = nil;
+                connection.invalidationHandler = nil;
+#pragma clang diagnostic pop
             });
         };
         

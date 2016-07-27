@@ -392,12 +392,14 @@
         launcherConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerLauncherProtocol)];
         [launcherConnection resume];
         
-#warning revisit weak connection
-        __weak NSXPCConnection *weakConnection = launcherConnection;
         launcherConnection.interruptionHandler = ^{
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (!retrievedLaunchStatus) {
-                    [weakConnection invalidate];
+                    // We'll break the retain cycle in the invalidation handler
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-retain-cycles"
+                    [launcherConnection invalidate];
+#pragma clang diagnostic pop
                 }
             });
         };
@@ -409,6 +411,13 @@
                     [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while connecting to the installer. Please try again later.", nil) }];
                     
                     completionHandler(error);
+                    
+                    // Break the retain cycle
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-retain-cycles"
+                    launcherConnection.interruptionHandler = nil;
+                    launcherConnection.invalidationHandler = nil;
+#pragma clang diagnostic pop
                 }
             });
         };
