@@ -99,7 +99,7 @@
     NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    if (!SUXPCServiceExists(@INSTALLER_CONNECTION_PRODUCT_NAME)) {
+    if (!SUXPCServiceExists(@INSTALLER_CONNECTION_BUNDLE_ID)) {
         self.installerConnection = [[SUInstallerConnection alloc] initWithDelegate:self];
     } else {
         self.installerConnection = [[SUXPCInstallerConnection alloc] initWithDelegate:self];
@@ -385,7 +385,7 @@
     __block BOOL retrievedLaunchStatus = NO;
     NSXPCConnection *launcherConnection = nil;
     
-    if (!SUXPCServiceExists(@INSTALLER_LAUNCHER_PRODUCT_NAME)) {
+    if (!SUXPCServiceExists(@INSTALLER_LAUNCHER_BUNDLE_ID)) {
         installerLauncher = [[SUInstallerLauncher alloc] init];
     } else {
         launcherConnection = [[NSXPCConnection alloc] initWithServiceName:@INSTALLER_LAUNCHER_BUNDLE_ID];

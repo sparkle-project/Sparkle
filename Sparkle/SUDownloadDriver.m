@@ -65,7 +65,7 @@
         _request = [NSMutableURLRequest requestWithURL:updateItem.fileURL];
         [_request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
         
-        if (!SUXPCServiceExists(@PERSISTENT_DOWNLOADER_PRODUCT_NAME)) {
+        if (!SUXPCServiceExists(@PERSISTENT_DOWNLOADER_BUNDLE_ID)) {
             _downloader = [[SUPersistentDownloader alloc] initWithDelegate:self];
         } else {
             _connection = [[NSXPCConnection alloc] initWithServiceName:@PERSISTENT_DOWNLOADER_BUNDLE_ID];

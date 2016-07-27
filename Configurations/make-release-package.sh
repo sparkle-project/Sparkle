@@ -21,14 +21,14 @@ if [ "$ACTION" = "" ] ; then
 
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
 
-    cp -R "$CONFIGURATION_BUILD_DIR/SparkleInstallerLauncher.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-    cp -R "$CONFIGURATION_BUILD_DIR/SparklePersistentDownloader.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-    cp -R "$CONFIGURATION_BUILD_DIR/SparkleTemporaryDownloader.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-    cp -R "$CONFIGURATION_BUILD_DIR/SparkleInstallerConnection.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-    cp -R "$CONFIGURATION_BUILD_DIR/SparkleInstallerStatus.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+    cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_LAUNCHER_BUNDLE_ID.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+    cp -R "$CONFIGURATION_BUILD_DIR/$PERSISTENT_DOWNLOADER_BUNDLE_ID.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+    cp -R "$CONFIGURATION_BUILD_DIR/$TEMPORARY_DOWNLOADER_BUNDLE_ID.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+    cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_CONNECTION_BUNDLE_ID.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+    cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_STATUS_BUNDLE_ID.xpc" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
 
-    cp "$SRCROOT/TemporaryDownloader/SparkleTemporaryDownloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-    cp "$SRCROOT/PersistentDownloader/SparklePersistentDownloader.entitlements" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+    cp "$SRCROOT/TemporaryDownloader/$TEMPORARY_DOWNLOADER_BUNDLE_ID.entitlements" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+    cp "$SRCROOT/PersistentDownloader/$PERSISTENT_DOWNLOADER_BUNDLE_ID.entitlements" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
 
     # Only copy dSYMs for Release builds, but don't check for the presence of the actual files
     # because missing dSYMs in a release build SHOULD trigger a build failure
@@ -37,11 +37,11 @@ if [ "$ACTION" = "" ] ; then
         cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
         cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
 
-        cp -R "$CONFIGURATION_BUILD_DIR/SparkleInstallerLauncher.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-        cp -R "$CONFIGURATION_BUILD_DIR/SparklePersistentDownloader.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-        cp -R "$CONFIGURATION_BUILD_DIR/SparkleTemporaryDownloader.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-        cp -R "$CONFIGURATION_BUILD_DIR/SparkleInstallerConnection.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
-        cp -R "$CONFIGURATION_BUILD_DIR/SparkleInstallerStatus.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+        cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_LAUNCHER_BUNDLE_ID.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+        cp -R "$CONFIGURATION_BUILD_DIR/$PERSISTENT_DOWNLOADER_BUNDLE_ID.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+        cp -R "$CONFIGURATION_BUILD_DIR/$TEMPORARY_DOWNLOADER_BUNDLE_ID.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+        cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_CONNECTION_BUNDLE_ID.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
+        cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_STATUS_BUNDLE_ID.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
     fi
 
     cd "$CONFIGURATION_BUILD_DIR/staging"

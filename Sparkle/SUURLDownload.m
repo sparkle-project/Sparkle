@@ -19,7 +19,7 @@ void SUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(NS
     NSXPCConnection *connection = nil;
     __block BOOL retrievedDownloadResult = NO;
     
-    if (!SUXPCServiceExists(@TEMPORARY_DOWNLOADER_PRODUCT_NAME)) {
+    if (!SUXPCServiceExists(@TEMPORARY_DOWNLOADER_BUNDLE_ID)) {
         downloader = [[SUTemporaryDownloader alloc] init];
     } else {
         connection = [[NSXPCConnection alloc] initWithServiceName:@TEMPORARY_DOWNLOADER_BUNDLE_ID];

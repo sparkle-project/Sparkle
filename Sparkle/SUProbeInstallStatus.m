@@ -28,7 +28,7 @@
     assert(hostBundleIdentifier != nil);
     
     id<SUInstallerStatusProtocol> installerStatus = nil;
-    if (!SUXPCServiceExists(@INSTALLER_STATUS_PRODUCT_NAME)) {
+    if (!SUXPCServiceExists(@INSTALLER_STATUS_BUNDLE_ID)) {
         installerStatus = [[SUInstallerStatus alloc] init];
     } else {
         installerStatus = [[SUXPCInstallerStatus alloc] init];
@@ -74,7 +74,7 @@
     assert(hostBundleIdentifier != nil);
     
     id<SUInstallerStatusProtocol> installerStatus = nil;
-    if (!SUXPCServiceExists(@INSTALLER_STATUS_PRODUCT_NAME)) {
+    if (!SUXPCServiceExists(@INSTALLER_STATUS_BUNDLE_ID)) {
         installerStatus = [[SUInstallerStatus alloc] init];
     } else {
         installerStatus = [[SUXPCInstallerStatus alloc] init];

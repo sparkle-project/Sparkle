@@ -177,12 +177,12 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
     if (!servingOverHttps) {
         BOOL foundXPCTemporaryDownloaderService = NO;
-        BOOL foundATSTemporaryIssue = [self checkATSIssueForBundle:SUXPCServiceBundle(@TEMPORARY_DOWNLOADER_PRODUCT_NAME) getBundleExists:&foundXPCTemporaryDownloaderService];
+        BOOL foundATSTemporaryIssue = [self checkATSIssueForBundle:SUXPCServiceBundle(@TEMPORARY_DOWNLOADER_BUNDLE_ID) getBundleExists:&foundXPCTemporaryDownloaderService];
         
         BOOL foundXPCPersistentDownloaderService = NO;
         BOOL foundATSPersistentIssue = NO;
         if (!foundATSTemporaryIssue) {
-            foundATSPersistentIssue = [self checkATSIssueForBundle:SUXPCServiceBundle(@PERSISTENT_DOWNLOADER_PRODUCT_NAME) getBundleExists:&foundXPCPersistentDownloaderService];
+            foundATSPersistentIssue = [self checkATSIssueForBundle:SUXPCServiceBundle(@PERSISTENT_DOWNLOADER_BUNDLE_ID) getBundleExists:&foundXPCPersistentDownloaderService];
         }
         
         NSBundle *mainBundle = [NSBundle mainBundle];
