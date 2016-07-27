@@ -90,7 +90,7 @@
     return (submittedJob == true);
 }
 
-- (SUAuthorizationReply)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle authorizationPrompt:(NSString *)authorizationPrompt allowingInteraction:(BOOL)allowingInteraction inSystemDomain:(BOOL)systemDomain
+- (SUAuthorizationReply)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain
 {
     SUFileManager *fileManager = [SUFileManager defaultManager];
     
@@ -100,7 +100,7 @@
     NSString *hostBundleIdentifier = hostBundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    NSArray<NSString *> *arguments = @[installerPath, hostBundleIdentifier, @(allowingInteraction).stringValue];
+    NSArray<NSString *> *arguments = @[installerPath, hostBundleIdentifier];
     
     AuthorizationRef auth = NULL;
     OSStatus createStatus = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &auth);
@@ -260,7 +260,7 @@
     return reply;
 }
 
-- (void)launchInstallerAtPath:(NSString *)installerPath progressToolPath:(NSString *)progressToolPath withHostBundlePath:(NSString *)hostBundlePath authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingInteraction:(BOOL)allowingInteraction completion:(void (^)(SUAuthorizationReply))completionHandler
+- (void)launchInstallerAtPath:(NSString *)installerPath progressToolPath:(NSString *)progressToolPath withHostBundlePath:(NSString *)hostBundlePath authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction allowingUpdaterInteraction:(BOOL)allowingUpdaterInteraction completion:(void (^)(SUAuthorizationReply))completionHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
@@ -268,14 +268,12 @@
         BOOL needsSystemAuthorization = SUNeedsSystemAuthorizationAccess(hostBundlePath, installationType);
         
         // if we need to use the system domain and we aren't allowed interaction, then try sometime later when interaction is allowed
-        if (needsSystemAuthorization && !allowingInteraction) {
+        if (needsSystemAuthorization && !allowingUpdaterInteraction) {
+            completionHandler(SUAuthorizationReplyFailure);
+        } else if (needsSystemAuthorization && !allowingDriverInteraction) {
             completionHandler(SUAuthorizationReplyAuthorizeLater);
         } else {
-            SUAuthorizationReply installerReply = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle authorizationPrompt:authorizationPrompt allowingInteraction:allowingInteraction inSystemDomain:needsSystemAuthorization];
-            
-            if (installerReply == SUAuthorizationReplyFailure) {
-                SULog(@"Failed to submit installer job");
-            }
+            SUAuthorizationReply installerReply = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle authorizationPrompt:authorizationPrompt inSystemDomain:needsSystemAuthorization];
             
             BOOL submittedProgressTool = NO;
             if (installerReply == SUAuthorizationReplySuccess) {
@@ -284,6 +282,8 @@
                 if (!submittedProgressTool) {
                     SULog(@"Failed to submit progress tool job");
                 }
+            } else if (installerReply == SUAuthorizationReplyFailure) {
+                SULog(@"Failed to submit installer job");
             }
             
             if (installerReply == SUAuthorizationReplyCanceled) {

@@ -416,11 +416,16 @@
         installerLauncher = launcherConnection.remoteObjectProxy;
     }
     
-#warning review this...
-    BOOL shouldAllowInstallerInteraction = !silently;
+    // This determines if our updater delegate allows interaction
+    // If the delegate disallows interaction, then the update cannot be continued
+    BOOL updaterAllowsInteraction = YES;
     if ([self.updaterDelegate respondsToSelector:@selector(updaterShouldAllowInstallerInteraction:)]) {
-        shouldAllowInstallerInteraction = [self.updaterDelegate updaterShouldAllowInstallerInteraction:self.updater];
+        updaterAllowsInteraction = [self.updaterDelegate updaterShouldAllowInstallerInteraction:self.updater];
     }
+    
+    // Our driver (automatic or UI based) has a say if interaction is allowed as well
+    // An automatic driver may disallow interaction but the updater could try again later a UI based driver that does allow interaction
+    BOOL driverAllowsInteraction = !silently;
     
     NSString *hostBundlePath = self.host.bundle.bundlePath;
     assert(hostBundlePath != nil);
@@ -430,13 +435,14 @@
     
     // The installer launcher could be in a XPC service, so we don't want to do localization in there
     NSString *authorizationPrompt = [NSString stringWithFormat:SULocalizedString(@"%1$@ wants to update.", nil), self.host.name];
-    [installerLauncher launchInstallerAtPath:relaunchToolPath progressToolPath:progressToolPath withHostBundlePath:hostBundlePath authorizationPrompt:authorizationPrompt installationType:installationType allowingInteraction:shouldAllowInstallerInteraction completion:^(SUAuthorizationReply result) {
+    [installerLauncher launchInstallerAtPath:relaunchToolPath progressToolPath:progressToolPath withHostBundlePath:hostBundlePath authorizationPrompt:authorizationPrompt installationType:installationType allowingDriverInteraction:driverAllowsInteraction allowingUpdaterInteraction:updaterAllowsInteraction completion:^(SUAuthorizationReply result) {
         dispatch_async(dispatch_get_main_queue(), ^{
             retrievedLaunchStatus = YES;
             [launcherConnection invalidate];
             
             switch (result) {
                 case SUAuthorizationReplyFailure:
+                    SULog(@"Error: Failed to gain authorization required to update target");
                     completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while launching the installer. Please try again later.", nil) }]);
                     break;
                 case SUAuthorizationReplyCanceled:

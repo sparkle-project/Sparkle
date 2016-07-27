@@ -60,7 +60,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @property (nonatomic, strong) TerminationListener *terminationListener;
 
 @property (nonatomic, readonly, copy) NSString *hostBundleIdentifier;
-@property (nonatomic, readonly) BOOL allowsInteraction;
 @property (nonatomic) SUHost *host;
 @property (nonatomic) SUInstallationInputData *installationData;
 @property (nonatomic, assign) BOOL shouldRelaunch;
@@ -87,7 +86,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize agentConnection = _agentConnection;
 @synthesize receivedUpdaterPong = _receivedUpdaterPong;
 @synthesize hostBundleIdentifier = _hostBundleIdentifier;
-@synthesize allowsInteraction = _allowsInteraction;
 @synthesize terminationListener = _terminationListener;
 @synthesize host = _host;
 @synthesize installationData = _installationData;
@@ -102,15 +100,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize performedStage3Installation = _performedStage3Installation;
 @synthesize agentConnectionCounter = _agentConnectionCounter;
 
-- (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier allowingInteraction:(BOOL)allowsInteraction
+- (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier
 {
     if (!(self = [super init])) {
         return nil;
     }
     
     _hostBundleIdentifier = [hostBundleIdentifier copy];
-    
-    _allowsInteraction = allowsInteraction;
     
     _xpcListener = [[NSXPCListener alloc] initWithMachServiceName:SUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier)];
     _xpcListener.delegate = self;
@@ -443,7 +439,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     dispatch_async(self.installerQueue, ^{
         NSError *installerError = nil;
-        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self.host expectedInstallationType:self.installationData.installationType updateDirectory:self.installationData.updateDirectoryPath allowingInteraction:self.allowsInteraction versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
+        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self.host expectedInstallationType:self.installationData.installationType updateDirectory:self.installationData.updateDirectoryPath versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
         
         if (installer == nil) {
             SULog(@"Error: Failed to create installer instance with error: %@", installerError);

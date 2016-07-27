@@ -6,14 +6,13 @@ int main(int __unused argc, const char __unused *argv[])
     @autoreleasepool
     {
         NSArray<NSString *> *args = [[NSProcessInfo processInfo] arguments];
-        if (args.count != 3) {
+        if (args.count != 2) {
             return EXIT_FAILURE;
         }
         
         NSString *hostBundleIdentifier = args[1];
-        BOOL allowsInteraction = args[2].boolValue;
         
-        AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostBundleIdentifier:hostBundleIdentifier allowingInteraction:allowsInteraction];
+        AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostBundleIdentifier:hostBundleIdentifier];
         [appInstaller start];
         
         // Ignore SIGTERM because we are going to catch it ourselves

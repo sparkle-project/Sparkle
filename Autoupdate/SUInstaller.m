@@ -113,7 +113,7 @@
     return newAppDownloadPath;
 }
 
-+ (nullable id<SUInstallerProtocol>)installerForHost:(SUHost *)host expectedInstallationType:(NSString *)expectedInstallationType updateDirectory:(NSString *)updateDirectory allowingInteraction:(BOOL)allowsInteraction versionComparator:(id <SUVersionComparison>)comparator error:(NSError * __autoreleasing *)error
++ (nullable id<SUInstallerProtocol>)installerForHost:(SUHost *)host expectedInstallationType:(NSString *)expectedInstallationType updateDirectory:(NSString *)updateDirectory versionComparator:(id <SUVersionComparison>)comparator error:(NSError * __autoreleasing *)error
 {
     BOOL isPackage = NO;
     BOOL isGuided = NO;
@@ -144,14 +144,7 @@
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SUInstallationTypePackage] }];
             }
         } else {
-#warning review this
-            // Even if we expect an ordinary package, if we don't allow interaction (eg: because we're already running root) -
-            // we should try a guided installation instead - because an ordinary package installation may not work well
-            if (allowsInteraction) {
-                installer = [[SUPackageInstaller alloc] initWithPackagePath:newDownloadPath];
-            } else {
-                installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath];
-            }
+            installer = [[SUPackageInstaller alloc] initWithPackagePath:newDownloadPath];
         }
     } else {
         if (![expectedInstallationType isEqualToString:SUInstallationTypeApplication]) {
