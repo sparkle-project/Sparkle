@@ -55,7 +55,7 @@
     SUHost *host = [[SUHost alloc] initWithBundle:bundle];
     
     NSError *installerError = nil;
-    id<SUInstallerProtocol> installer = [SUInstaller installerForHost:host expectedInstallationType:SUInstallationTypeGuidedPackage updateDirectory:[path stringByDeletingLastPathComponent] allowingInteraction:NO versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
+    id<SUInstallerProtocol> installer = [SUInstaller installerForHost:host expectedInstallationType:SUInstallationTypeGuidedPackage updateDirectory:[path stringByDeletingLastPathComponent] versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
     
     if (installer == nil) {
         XCTFail(@"Installer is nil with error: %@", installerError);
