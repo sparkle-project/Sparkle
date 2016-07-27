@@ -118,6 +118,9 @@
 		721CF1AA1AD7647000D9AC09 /* libxar.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5890FD7678C0065DB48 /* libxar.1.dylib */; };
 		721CF1AB1AD764EB00D9AC09 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */; };
 		721D8A611D48413B0032E472 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
+		721D8A721D4950B80032E472 /* Autoupdate in Copy Tools */ = {isa = PBXBuildFile; fileRef = 72B398D21D3D879300EE297F /* Autoupdate */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		721D8A761D4952430032E472 /* Updater.app in Resources */ = {isa = PBXBuildFile; fileRef = 721C24451CB753E6005440CB /* Updater.app */; };
+		721D8A7B1D4963190032E472 /* SULocalCacheDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 721BC20D1D1CDE55002BC71E /* SULocalCacheDirectory.m */; };
 		7223E7631AD1AEFF008E3161 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
 		7229E1B61C97C91100CB50D0 /* SUUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 7229E1B51C97C91100CB50D0 /* SUUpdateDriver.h */; };
 		7229E1B91C97CC4D00CB50D0 /* SUScheduledUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 7229E1B71C97CC4D00CB50D0 /* SUScheduledUpdateDriver.h */; };
@@ -393,6 +396,20 @@
 			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = Sparkle;
 		};
+		721D8A771D4952B60032E472 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 72B398D11D3D879300EE297F;
+			remoteInfo = Autoupdate;
+		};
+		721D8A791D4952B60032E472 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 721C24441CB753E6005440CB;
+			remoteInfo = "Installer Progress";
+		};
 		724BB3821D3203A9005D534A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -511,6 +528,17 @@
 				142E0E0019A6954400E4312B /* Sparkle.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		721D8A711D4950910032E472 /* Copy Tools */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				721D8A721D4950B80032E472 /* Autoupdate in Copy Tools */,
+			);
+			name = "Copy Tools";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		726E4A261C86C88F00C57C6A /* Embed XPC Services */ = {
@@ -760,7 +788,7 @@
 		7214B8851D45AD9A00CB5CED /* SUInstallationType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUInstallationType.h; sourceTree = "<group>"; };
 		72162B051C82C8B30013C1C5 /* SUParameterAssert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUParameterAssert.h; sourceTree = "<group>"; };
 		72162B071C82C9600013C1C5 /* SULocalizations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULocalizations.h; sourceTree = "<group>"; };
-		721652671D3C8FED00FD13D8 /* SUAuthorizationReply.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SUAuthorizationReply.h; path = InstallerLauncher/SUAuthorizationReply.h; sourceTree = SOURCE_ROOT; };
+		721652671D3C8FED00FD13D8 /* SUInstallerLauncherStatus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SUInstallerLauncherStatus.h; path = InstallerLauncher/SUInstallerLauncherStatus.h; sourceTree = SOURCE_ROOT; };
 		721BC2061D17A532002BC71E /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		721BC2081D17A553002BC71E /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		721BC20A1D17A5AD002BC71E /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
@@ -1625,7 +1653,7 @@
 		726E07AE1CAF08D6001A286B /* InstallerLauncher */ = {
 			isa = PBXGroup;
 			children = (
-				721652671D3C8FED00FD13D8 /* SUAuthorizationReply.h */,
+				721652671D3C8FED00FD13D8 /* SUInstallerLauncherStatus.h */,
 				726E07AF1CAF08D6001A286B /* SUInstallerLauncherProtocol.h */,
 				726E07B01CAF08D6001A286B /* SUInstallerLauncher.h */,
 				726E07B11CAF08D6001A286B /* SUInstallerLauncher.m */,
@@ -2023,10 +2051,13 @@
 				726E07A91CAF08D6001A286B /* Sources */,
 				726E07AA1CAF08D6001A286B /* Frameworks */,
 				726E07AB1CAF08D6001A286B /* Resources */,
+				721D8A711D4950910032E472 /* Copy Tools */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				721D8A781D4952B60032E472 /* PBXTargetDependency */,
+				721D8A7A1D4952B60032E472 /* PBXTargetDependency */,
 			);
 			name = SparkleInstallerLauncher;
 			productName = InstallerLauncher;
@@ -2365,6 +2396,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				721D8A761D4952430032E472 /* Updater.app in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2612,6 +2644,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				721D8A7B1D4963190032E472 /* SULocalCacheDirectory.m in Sources */,
 				7214B8841D456C9500CB5CED /* SUBundleIcon.m in Sources */,
 				7267E5E11D3D901600D1BF90 /* SUMessageTypes.m in Sources */,
 				724BB3AF1D34828A005D534A /* SUSystemAuthorization.m in Sources */,
@@ -2811,6 +2844,16 @@
 			isa = PBXTargetDependency;
 			target = 8DC2EF4F0486A6940098B216 /* Sparkle */;
 			targetProxy = 61FA528C0E2D9EB200EF58AD /* PBXContainerItemProxy */;
+		};
+		721D8A781D4952B60032E472 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 72B398D11D3D879300EE297F /* Autoupdate */;
+			targetProxy = 721D8A771D4952B60032E472 /* PBXContainerItemProxy */;
+		};
+		721D8A7A1D4952B60032E472 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 721C24441CB753E6005440CB /* Installer Progress */;
+			targetProxy = 721D8A791D4952B60032E472 /* PBXContainerItemProxy */;
 		};
 		724BB3831D3203A9005D534A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

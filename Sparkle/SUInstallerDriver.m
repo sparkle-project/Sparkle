@@ -369,18 +369,6 @@
 
 - (void)launchAutoUpdateSilently:(BOOL)silently completion:(void (^)(NSError *_Nullable))completionHandler
 {
-    // Copy the progress tool into a temporary directory so we can get to it as the new version is being installed.
-    NSError *progressToolError = nil;
-    NSString *progressToolPath = [self copyPathToCacheDirectory:[self.sparkleBundle pathForResource:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME ofType:@"app"] error:&progressToolError];
-    if (progressToolPath == nil) {
-        completionHandler(progressToolError);
-        return;
-    }
-    
-    // Grab the installer path. Note we do not have to copy this tool out of where it may be located right now since it's a utility with no dependencies.
-    // Furthermore, we can keep the tool at a place that may not necessarily be writable.
-    NSString *relaunchToolPath = [self.sparkleBundle pathForResource:@""SPARKLE_RELAUNCH_TOOL_NAME ofType:@""];
-    
     id<SUInstallerLauncherProtocol> installerLauncher = nil;
     __block BOOL retrievedLaunchStatus = NO;
     NSXPCConnection *launcherConnection = nil;
@@ -444,23 +432,23 @@
     
     // The installer launcher could be in a XPC service, so we don't want to do localization in there
     NSString *authorizationPrompt = [NSString stringWithFormat:SULocalizedString(@"%1$@ wants to update.", nil), self.host.name];
-    [installerLauncher launchInstallerAtPath:relaunchToolPath progressToolPath:progressToolPath withHostBundlePath:hostBundlePath authorizationPrompt:authorizationPrompt installationType:installationType allowingDriverInteraction:driverAllowsInteraction allowingUpdaterInteraction:updaterAllowsInteraction completion:^(SUAuthorizationReply result) {
+    [installerLauncher launchInstallerWithHostBundlePath:hostBundlePath authorizationPrompt:authorizationPrompt installationType:installationType allowingDriverInteraction:driverAllowsInteraction allowingUpdaterInteraction:updaterAllowsInteraction completion:^(SUInstallerLauncherStatus result) {
         dispatch_async(dispatch_get_main_queue(), ^{
             retrievedLaunchStatus = YES;
             [launcherConnection invalidate];
             
             switch (result) {
-                case SUAuthorizationReplyFailure:
+                case SUInstallerLauncherFailure:
                     SULog(@"Error: Failed to gain authorization required to update target");
                     completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while launching the installer. Please try again later.", nil) }]);
                     break;
-                case SUAuthorizationReplyCanceled:
+                case SUInstallerLauncherCanceled:
                     completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationCanceledError userInfo:nil]);
                     break;
-                case SUAuthorizationReplyAuthorizeLater:
+                case SUInstallerLauncherAuthorizeLater:
                     completionHandler([NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationAuthorizeLaterError userInfo:nil]);
                     break;
-                case SUAuthorizationReplySuccess:
+                case SUInstallerLauncherSuccess:
                     [self setUpConnection];
                     completionHandler(nil);
                     break;

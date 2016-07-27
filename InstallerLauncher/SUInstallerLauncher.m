@@ -12,6 +12,7 @@
 #import "SUMessageTypes.h"
 #import "SUSystemAuthorization.h"
 #import "SUBundleIcon.h"
+#import "SULocalCacheDirectory.h"
 #import <ServiceManagement/ServiceManagement.h>
 
 #ifdef _APPKITDEFINES_H
@@ -90,7 +91,7 @@
     return (submittedJob == true);
 }
 
-- (SUAuthorizationReply)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain
+- (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain
 {
     SUFileManager *fileManager = [SUFileManager defaultManager];
     
@@ -249,48 +250,117 @@
         AuthorizationFree(auth, kAuthorizationFlagDefaults);
     }
     
-    SUAuthorizationReply reply;
+    SUInstallerLauncherStatus status;
     if (submittedJob == true) {
-        reply = SUAuthorizationReplySuccess;
+        status = SUInstallerLauncherSuccess;
     } else if (canceledAuthorization) {
-        reply = SUAuthorizationReplyCanceled;
+        status = SUInstallerLauncherCanceled;
     } else {
-        reply = SUAuthorizationReplyFailure;
+        status = SUInstallerLauncherFailure;
     }
-    return reply;
+    return status;
 }
 
-- (void)launchInstallerAtPath:(NSString *)installerPath progressToolPath:(NSString *)progressToolPath withHostBundlePath:(NSString *)hostBundlePath authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction allowingUpdaterInteraction:(BOOL)allowingUpdaterInteraction completion:(void (^)(SUAuthorizationReply))completionHandler
+// First we check if the tool is in an auxiliary directory. If that fails, we then check if it is in a resources directory
+- (NSString *)pathForBundledTool:(NSString *)toolName extension:(NSString *)extension inBundle:(NSBundle *)bundle
+{
+    NSString *resultPath = nil;
+    // If the path extension is empty, we don't want to add a "." at the end
+    NSString *pathWithExtension = (extension.length > 0) ? [toolName stringByAppendingPathExtension:extension] : toolName;
+    assert(pathWithExtension != nil);
+    NSString *auxiliaryPath = [bundle pathForAuxiliaryExecutable:pathWithExtension];
+    if (auxiliaryPath == nil || ![[NSFileManager defaultManager] fileExistsAtPath:auxiliaryPath]) {
+        resultPath = [bundle pathForResource:toolName ofType:extension];
+    } else {
+        resultPath = auxiliaryPath;
+    }
+    return resultPath;
+}
+
+- (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction allowingUpdaterInteraction:(BOOL)allowingUpdaterInteraction completion:(void (^)(SUInstallerLauncherStatus))completionHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
-        
         BOOL needsSystemAuthorization = SUNeedsSystemAuthorizationAccess(hostBundlePath, installationType);
         
-        // if we need to use the system domain and we aren't allowed interaction, then try sometime later when interaction is allowed
         if (needsSystemAuthorization && !allowingUpdaterInteraction) {
-            completionHandler(SUAuthorizationReplyFailure);
-        } else if (needsSystemAuthorization && !allowingDriverInteraction) {
-            completionHandler(SUAuthorizationReplyAuthorizeLater);
+            SULog(@"Updater is not allowing interaction with the launcer.");
+            completionHandler(SUInstallerLauncherFailure);
+            return;
+        }
+        
+        // if we need to use the system domain and we aren't allowed interaction, then try sometime later when interaction is allowed
+        if (needsSystemAuthorization && !allowingDriverInteraction) {
+            completionHandler(SUInstallerLauncherAuthorizeLater);
+            return;
+        }
+        
+        NSString *hostBundleIdentifier = hostBundle.bundleIdentifier;
+        assert(hostBundleIdentifier != nil);
+        
+        // We could be inside the InstallerLauncher XPC bundle or in the Sparkle.framework bundle if no XPC service is used
+        NSBundle *ourBundle = [NSBundle bundleForClass:[self class]];
+        
+        // Note we do not have to copy this tool out of the bundle it's in because it's a utility with no dependencies.
+        // Furthermore, we can keep the tool at a place that may not necessarily be writable.
+        NSString *installerPath = [self pathForBundledTool:@""SPARKLE_RELAUNCH_TOOL_NAME extension:@"" inBundle:ourBundle];
+        if (installerPath == nil) {
+            SULog(@"Error: Cannot submit installer because the installer could not be located");
+            completionHandler(SUInstallerLauncherFailure);
+            return;
+        }
+        
+        // We do however have to copy the progress tool app somewhere safe due to its external depedencies
+        NSString *progressToolResourcePath = [self pathForBundledTool:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME extension:@"app" inBundle:ourBundle];
+        
+        if (progressToolResourcePath == nil) {
+            SULog(@"Error: Cannot submit progress tool because the progress tool could not be located");
+            completionHandler(SUInstallerLauncherFailure);
+            return;
+        }
+        
+        NSString *cachePath = [SULocalCacheDirectory cachePathForBundleIdentifier:hostBundleIdentifier];
+        
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        NSError *createCacheError = nil;
+        // Do not remove the cache directory if it already exists since it may be containing downloaded files
+        if (![fileManager createDirectoryAtPath:cachePath withIntermediateDirectories:YES attributes:nil error:&createCacheError]) {
+            SULog(@"Failed to create cache directory for progress tool: %@", createCacheError);
+            completionHandler(SUInstallerLauncherFailure);
+            return;
+        }
+        
+        NSString *progressToolPath = [cachePath stringByAppendingPathComponent:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME@".app"];
+        
+        if ([fileManager fileExistsAtPath:progressToolPath]) {
+            [fileManager removeItemAtPath:progressToolPath error:NULL];
+        }
+        
+        NSError *copyError = nil;
+        // SUFileManager is more reliable for copying files around
+        if (![[SUFileManager defaultManager] copyItemAtURL:[NSURL fileURLWithPath:progressToolResourcePath] toURL:[NSURL fileURLWithPath:progressToolPath] error:&copyError]) {
+            SULog(@"Failed to copy progress tool to cache: %@", copyError);
+            completionHandler(SUInstallerLauncherFailure);
+            return;
+        }
+        
+        SUInstallerLauncherStatus installerStatus = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle authorizationPrompt:authorizationPrompt inSystemDomain:needsSystemAuthorization];
+        
+        BOOL submittedProgressTool = NO;
+        if (installerStatus == SUInstallerLauncherSuccess) {
+            submittedProgressTool = [self submitProgressToolAtPath:progressToolPath withHostBundle:hostBundle inSystemDomainForInstaller:needsSystemAuthorization];
+            
+            if (!submittedProgressTool) {
+                SULog(@"Failed to submit progress tool job");
+            }
+        } else if (installerStatus == SUInstallerLauncherFailure) {
+            SULog(@"Failed to submit installer job");
+        }
+        
+        if (installerStatus == SUInstallerLauncherCanceled) {
+            completionHandler(installerStatus);
         } else {
-            SUAuthorizationReply installerReply = [self submitInstallerAtPath:installerPath withHostBundle:hostBundle authorizationPrompt:authorizationPrompt inSystemDomain:needsSystemAuthorization];
-            
-            BOOL submittedProgressTool = NO;
-            if (installerReply == SUAuthorizationReplySuccess) {
-                submittedProgressTool = [self submitProgressToolAtPath:progressToolPath withHostBundle:hostBundle inSystemDomainForInstaller:needsSystemAuthorization];
-                
-                if (!submittedProgressTool) {
-                    SULog(@"Failed to submit progress tool job");
-                }
-            } else if (installerReply == SUAuthorizationReplyFailure) {
-                SULog(@"Failed to submit installer job");
-            }
-            
-            if (installerReply == SUAuthorizationReplyCanceled) {
-                completionHandler(installerReply);
-            } else {
-                completionHandler(submittedProgressTool ? SUAuthorizationReplySuccess : SUAuthorizationReplyFailure);
-            }
+            completionHandler(submittedProgressTool ? SUInstallerLauncherSuccess : SUInstallerLauncherFailure);
         }
     });
 }
