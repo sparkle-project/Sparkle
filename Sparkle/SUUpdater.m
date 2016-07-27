@@ -16,7 +16,6 @@
 #import "SULog.h"
 #import "SUCodeSigningVerifier.h"
 #import "SUSystemProfiler.h"
-#include <SystemConfiguration/SystemConfiguration.h>
 #import "SUScheduledUpdateDriver.h"
 #import "SUProbingUpdateDriver.h"
 #import "SUUserInitiatedUpdateDriver.h"
