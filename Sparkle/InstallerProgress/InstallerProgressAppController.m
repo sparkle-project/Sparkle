@@ -14,7 +14,6 @@
 #import "SUInstallerAgentProtocol.h"
 #import "SUInstallerAgentInitiationProtocol.h"
 #import "StatusInfo.h"
-#import <ServiceManagement/ServiceManagement.h>
 
 /*!
  * Terminate the application after a delay from launching the new update to avoid OS activation issues
