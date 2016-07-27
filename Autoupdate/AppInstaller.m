@@ -36,13 +36,6 @@
 #define RETRIEVE_PROCESS_IDENTIFIER_TIMEOUT 5ull
 
 /*!
- * Terminate the application after a delay from launching the new update to avoid OS activation issues
- * This delay should be be high enough to increase the likelihood that our updated app will be launched up front,
- * but should be low enough so that the user doesn't ponder why the updater hasn't finished terminating yet
- */
-static const NSTimeInterval SUTerminationTimeDelay = 0.5;
-
-/*!
  * Show display progress UI after a delay from starting the final part of the installation.
  * This should be long enough so that we don't show progress for very fast installations, but
  * short enough so that we don't leave the user wondering why nothing is happening.
@@ -591,7 +584,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 dispatch_async(self.installerQueue, ^{
                     [self.installer cleanup];
                     
-                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUTerminationTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    dispatch_async(dispatch_get_main_queue(), ^{
                         [self cleanupAndExitWithStatus:EXIT_SUCCESS];
                     });
                 });

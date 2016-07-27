@@ -32,6 +32,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @property (nonatomic, readonly) NSBundle *hostBundle;
 @property (nonatomic) StatusInfo *statusInfo;
 @property (nonatomic) BOOL submittedLauncherJob;
+@property (nonatomic) BOOL willTerminate;
 
 @end
 
@@ -47,6 +48,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @synthesize hostBundle = _hostBundle;
 @synthesize statusInfo = _statusInfo;
 @synthesize submittedLauncherJob = _submittedLauncherJob;
+@synthesize willTerminate = _willTerminate;
 
 - (instancetype)initWithApplication:(NSApplication *)application arguments:(NSArray<NSString *> *)arguments delegate:(id<InstallerProgressDelegate>)delegate
 {
@@ -104,7 +106,9 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
                     if (!strongSelf.repliedToRegistration) {
                         SULog(@"Error: Agent Invalidating without having the chance to reply to installer");
                     }
-                    [strongSelf cleanupAndExitWithStatus:exitStatus];
+                    if (!strongSelf.willTerminate) {
+                        [strongSelf cleanupAndExitWithStatus:exitStatus];
+                    }
                 }
             });
         };
@@ -145,6 +149,12 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 {
     [self.statusInfo invalidate];
     [self.connection invalidate];
+    
+    // Remove the agent bundle; it is assumed this bundle is in a temporary/cache/support directory
+    NSError *theError = nil;
+    if (![[NSFileManager defaultManager] removeItemAtPath:[[NSBundle mainBundle] bundlePath] error:&theError]) {
+        SULog(@"Couldn't remove agent bundle: %@.", theError);
+    }
     
     exit(status);
 }
@@ -214,25 +224,19 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     [self.statusInfo invalidate];
     self.statusInfo = nil;
     
+    // Dismiss any UI immediately, but delay termination for a little bit to better increase the chance
+    // the updated application when relaunched will be the frontmost application
+    // This is related to macOS activation issues when terminating a frontmost application happens right before
+    // launching another app
+    
     [self.delegate installerProgressShouldStop];
     self.delegate = nil;
-}
-
-// Dismiss any UI immediately, but delay termination for a little bit to better increase the chance
-// the updated application when relaunched will be the frontmost application
-// This is related to macOS activation issues when terminating a frontmost application happens right before
-// launching another app
-- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)__unused sender
-{
+    
+    self.willTerminate = YES;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUTerminationTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         // Exit right away, don't go through the apple event process again
         [self cleanupAndExitWithStatus:EXIT_SUCCESS];
     });
-    
-    [self _stopProgress];
-    
-    // Reply with a 'cancel' rather than 'later' because 'later' may make the runloop stop completely, not having the dispatch_after above invoked
-    return NSTerminateCancel;
 }
 
 @end
