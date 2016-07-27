@@ -111,8 +111,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (BOOL)listener:(NSXPCListener *)__unused listener shouldAcceptNewConnection:(NSXPCConnection *)newConnection
 {
-    SULog(@"Incoming connection: %@", newConnection);
-    
     if (self.activeConnection != nil) {
         SULog(@"Rejecting multiple connections...");
         [newConnection invalidate];
