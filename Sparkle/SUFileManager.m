@@ -120,71 +120,6 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     return removexattr(path, attr, options);
 }
 
-- (BOOL)_releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL withQuarantineRetrieval:(BOOL (^)(NSURL *))quarantineRetrieval quarantineRemoval:(BOOL (^)(NSURL *, NSError * __autoreleasing *))quarantineRemoval error:(NSError * __autoreleasing *)error
-{
-    if (![self _itemExistsAtURL:rootURL]) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove quarantine because %@ does not exist.", rootURL.path.lastPathComponent] }];
-        }
-        return NO;
-    }
-
-    BOOL (^releasingQuarantineRequiredAuthentication)(NSURL *, BOOL *, BOOL *) = ^(NSURL *fileURL, BOOL *didReleaseQuarantine, BOOL *success) {
-        BOOL removedQuarantine = NO;
-        BOOL attemptedAuthentication = NO;
-
-        if (quarantineRetrieval(fileURL)) {
-            NSError *removalError = nil;
-            if (quarantineRemoval(fileURL, &removalError)) {
-                removedQuarantine = YES;
-            } else {
-                if (success != NULL) {
-                    // Make sure we haven't already run into an error
-                    if (*success && error != NULL) {
-                        *error = removalError;
-                    }
-                    // Fail, but still try to release other items from quarantine
-                    *success = NO;
-                }
-            }
-        }
-
-        if (didReleaseQuarantine != NULL) {
-            *didReleaseQuarantine = removedQuarantine;
-        }
-
-        return attemptedAuthentication;
-    };
-
-    BOOL success = YES;
-
-    BOOL releasedRootQuarantine = NO;
-    if (releasingQuarantineRequiredAuthentication(rootURL, &releasedRootQuarantine, &success)) {
-        return releasedRootQuarantine;
-    }
-
-    // Only recurse if it's actually a directory.  Don't recurse into a
-    // root-level symbolic link.
-    NSString *rootURLPath = rootURL.path;
-    NSDictionary *rootAttributes = [_fileManager attributesOfItemAtPath:rootURLPath error:nil];
-    NSString *rootType = [rootAttributes objectForKey:NSFileType]; // 10.7 can't subscript this
-
-    if ([rootType isEqualToString:NSFileTypeDirectory]) {
-        // The NSDirectoryEnumerator will avoid recursing into any contained
-        // symbolic links, so no further type checks are needed.
-        NSDirectoryEnumerator *directoryEnumerator = [_fileManager enumeratorAtURL:rootURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
-
-        for (NSURL *file in directoryEnumerator) {
-            BOOL releasedQuarantine = NO;
-            if (releasingQuarantineRequiredAuthentication(file, &releasedQuarantine, &success)) {
-                return releasedQuarantine;
-            }
-        }
-    }
-
-    return success;
-}
-
 // Removes the directory tree rooted at |root| from the file quarantine.
 // The quarantine was introduced on macOS 10.5 and is described at:
 //
@@ -210,22 +145,47 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
 - (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError *__autoreleasing *)error
 {
     static const int removeXAttrOptions = XATTR_NOFOLLOW;
-
-#warning this code is over complicated now, needs to be rewritten
-    return
-    [self
-     _releaseItemFromQuarantineAtRootURL:rootURL
-     withQuarantineRetrieval:^BOOL(NSURL *fileURL) {
-         return ([self _getXAttr:SUAppleQuarantineIdentifier fromFile:fileURL.path options:removeXAttrOptions] >= 0);
-     }
-     quarantineRemoval:^BOOL(NSURL *fileURL, NSError * __autoreleasing *removalError) {
-         BOOL removedQuarantine = ([self _removeXAttr:SUAppleQuarantineIdentifier fromFile:fileURL.path options:removeXAttrOptions] == 0);
-         if (!removedQuarantine && removalError != NULL) {
-             *removalError = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove file quarantine on %@.", fileURL.lastPathComponent] }];
-         }
-         return removedQuarantine;
-     }
-     error:error];
+    BOOL success = YES;
+    
+    // First remove quarantine on the root item
+    NSString *rootURLPath = rootURL.path;
+    if ([self _getXAttr:SUAppleQuarantineIdentifier fromFile:rootURLPath options:removeXAttrOptions] >= 0) {
+        BOOL removedRootQuarantine = ([self _removeXAttr:SUAppleQuarantineIdentifier fromFile:rootURLPath options:removeXAttrOptions] == 0);
+        if (!removedRootQuarantine) {
+            success = NO;
+            
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove file quarantine on %@.", rootURL.lastPathComponent] }];
+            }
+        }
+    }
+    
+    // Only recurse if it's actually a directory.  Don't recurse into a root-level symbolic link.
+    // Even if we fail removing the quarantine from the root item or any single item in the directory, we will continue trying to remove the quarantine.
+    // This is because often it may not be a fatal error from the caller to not remove the quarantine of an item
+    NSDictionary *rootAttributes = [_fileManager attributesOfItemAtPath:rootURLPath error:nil];
+    NSString *rootType = [rootAttributes objectForKey:NSFileType]; // 10.7 can't subscript this
+    
+    if ([rootType isEqualToString:NSFileTypeDirectory]) {
+        // The NSDirectoryEnumerator will avoid recursing into any contained
+        // symbolic links, so no further type checks are needed.
+        NSDirectoryEnumerator *directoryEnumerator = [_fileManager enumeratorAtURL:rootURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
+        
+        for (NSURL *fileURL in directoryEnumerator) {
+            if ([self _getXAttr:SUAppleQuarantineIdentifier fromFile:fileURL.path options:removeXAttrOptions] >= 0) {
+                BOOL removedQuarantine = ([self _removeXAttr:SUAppleQuarantineIdentifier fromFile:fileURL.path options:removeXAttrOptions] == 0);
+                
+                if (!removedQuarantine && success) {
+                    success = NO;
+                    
+                    if (error != NULL) {
+                        *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove file quarantine on %@.", fileURL.lastPathComponent] }];
+                    }
+                }
+            }
+        }
+    }
+    return success;
 }
 
 /*
