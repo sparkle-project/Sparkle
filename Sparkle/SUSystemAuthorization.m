@@ -17,7 +17,6 @@ BOOL SUNeedsSystemAuthorizationAccess(NSString *path, NSString *installationType
     } else if ([installationType isEqualToString:SUInstallationTypePackage]) {
         result = NO;
     } else {
-#warning what about symbolic links?
         NSFileManager *fileManager = [NSFileManager defaultManager];
         result = ![fileManager isWritableFileAtPath:path] || ![fileManager isWritableFileAtPath:[path stringByDeletingLastPathComponent]];
     }
