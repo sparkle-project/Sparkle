@@ -27,7 +27,6 @@
 @property (nonatomic, copy, readonly) NSString *installationPath;
 
 // Properties that carry over from starting installation to resuming to cleaning up
-@property (nonatomic) SUFileManager *fileManager;
 @property (nonatomic) NSURL *tempOldDirectoryURL;
 @property (nonatomic) NSURL *tempNewDirectoryURL;
 
@@ -39,7 +38,6 @@
 @synthesize comparator = _comparator;
 @synthesize applicationPath = _applicationPath;
 @synthesize installationPath = _installationPath;
-@synthesize fileManager = _fileManager;
 @synthesize tempOldDirectoryURL = _tempOldDirectoryURL;
 @synthesize tempNewDirectoryURL = _tempNewDirectoryURL;
 
@@ -82,7 +80,7 @@
         return NO;
     }
     
-    SUFileManager *fileManager = self.fileManager;
+    SUFileManager *fileManager = [SUFileManager defaultManager];
     
     // Update the access time of our entire application before moving it into a temporary directory
     // The system periodically cleans up files by looking at the mod & access times, so we have to make sure they're up to date
@@ -185,14 +183,13 @@
     }
     
     // To carry over when we clean up the installation
-    self.fileManager = fileManager;
     self.tempNewDirectoryURL = tempNewDirectoryURL;
     self.tempOldDirectoryURL = tempOldDirectoryURL;
     
     return YES;
 }
 
-- (BOOL)performFirstStage:(NSError * __autoreleasing *)error
+- (BOOL)performInitialInstallation:(NSError * __autoreleasing *)error
 {
     BOOL allowDowngrades = SPARKLE_AUTOMATED_DOWNGRADES;
     
@@ -215,23 +212,11 @@
     return YES;
 }
 
-- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
-{
-    self.fileManager = [SUFileManager defaultManager];
-    
-    return YES;
-}
-
-- (BOOL)performThirdStage:(NSError * __autoreleasing *)error
+- (BOOL)performFinalInstallation:(NSError * __autoreleasing *)error
 {
     // Note: we must do most installation work in the third stage due to relying on our application sitting in temporary directories.
     // It must not be possible for our update to sit in temporary directories for a very long time.
     return [self startInstallationToURL:[NSURL fileURLWithPath:self.installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:self.applicationPath] withHost:self.host error:error];
-}
-
-- (BOOL)displaysUserProgress
-{
-    return NO;
 }
 
 - (BOOL)canInstallSilently
@@ -241,7 +226,7 @@
 
 - (void)cleanup
 {
-    SUFileManager *fileManager = self.fileManager;
+    SUFileManager *fileManager = [SUFileManager defaultManager];
     NSURL *tempOldDirectoryURL = self.tempOldDirectoryURL;
     NSURL *tempNewDirectoryURL = self.tempNewDirectoryURL;
     

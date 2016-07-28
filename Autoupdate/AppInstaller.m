@@ -441,7 +441,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         }
         
         NSError *firstStageError = nil;
-        if (![installer performFirstStage:&firstStageError]) {
+        if (![installer performInitialInstallation:&firstStageError]) {
             SULog(@"Error: Failed to start installer with error: %@", firstStageError);
             [self.installer cleanup];
             self.installer = nil;
@@ -480,9 +480,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         return;
     }
     
-    NSError *secondStageError = nil;
-    BOOL performedSecondStage = [self.installer performSecondStageAllowingUI:self.shouldShowUI error:&secondStageError];
-    
+    BOOL performedSecondStage = self.shouldShowUI || [self.installer canInstallSilently];
     if (performedSecondStage) {
         self.performedStage2Installation = YES;
         
@@ -493,7 +491,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             [self.communicator handleMessageWithIdentifier:SUInstallationFinishedStage2 data:sendData];
         });
     } else {
-        SULog(@"Error: Failed to resume installer on stage 2 with error: %@", secondStageError);
+        SULog(@"Error: Failed to resume installer on stage 2 because installation cannot be installed silently");
         [self.installer cleanup];
         self.installer = nil;
         
@@ -518,9 +516,10 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         self.receivedUpdaterPong = NO;
         [self.communicator handleMessageWithIdentifier:SUUpdaterAlivePing data:[NSData data]];
         
-        // Launch our installer progress UI tool if only after a certain amount of time passes
+        // Launch our installer progress UI tool if only after a certain amount of time passes,
+        // and if our installer is silent (i.e, doesn't show progress on its own)
         __block BOOL shouldLaunchInstallerProgress = YES;
-        if (self.shouldShowUI && ![self.installer displaysUserProgress]) {
+        if (self.shouldShowUI && [self.installer canInstallSilently]) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUDisplayProgressTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 // Make sure we're still eligible for showing the installer progress
                 // Also if the updater process is still alive, showing the progress should not be our duty
@@ -541,7 +540,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             }
             
             NSError *thirdStageError = nil;
-            if (![self.installer performThirdStage:&thirdStageError]) {
+            if (![self.installer performFinalInstallation:&thirdStageError]) {
                 SULog(@"Failed to finalize installation with error: %@", thirdStageError);
                 
                 [self.installer cleanup];

@@ -7,10 +7,7 @@
 //
 
 #import <sys/stat.h>
-#import <Security/Security.h>
-#import "SUParameterAssert.h"
 #import "SUGuidedPackageInstaller.h"
-#import "SUFileManager.h"
 #import "SUErrors.h"
 
 #ifdef _APPKITDEFINES_H
@@ -20,14 +17,12 @@
 @interface SUGuidedPackageInstaller ()
 
 @property (nonatomic, readonly, copy) NSString *packagePath;
-@property (nonatomic) SUFileManager *fileManager;
 
 @end
 
 @implementation SUGuidedPackageInstaller
 
 @synthesize packagePath = _packagePath;
-@synthesize fileManager = _fileManager;
 
 - (instancetype)initWithPackagePath:(NSString *)packagePath
 {
@@ -38,27 +33,12 @@
     return self;
 }
 
-- (BOOL)performFirstStage:(NSError * __autoreleasing *)__unused error
+- (BOOL)performInitialInstallation:(NSError * __autoreleasing *)__unused error
 {
     return YES;
 }
 
-- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
-{
-    if (!allowsUI && ![self canInstallSilently]) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{NSLocalizedDescriptionKey : @"Guided installer cannot continue if showing UI is not allowed"}];
-        }
-        return NO;
-    }
-    
-    // If we're root, we can allow using the authorization APIs
-    self.fileManager = [SUFileManager defaultManager];
-    
-    return YES;
-}
-
-- (BOOL)performThirdStage:(NSError * __autoreleasing *)error
+- (BOOL)performFinalInstallation:(NSError * __autoreleasing *)error
 {
     // This command *must* be run as root
     NSString *installerPath = @"/usr/sbin/installer";
@@ -88,19 +68,9 @@
     return success;
 }
 
-- (BOOL)displaysUserProgress
-{
-    return NO;
-}
-
-- (BOOL)isRootUser
-{
-    return (geteuid() == 0);
-}
-
 - (BOOL)canInstallSilently
 {
-    return [self isRootUser];
+    return YES;
 }
 
 - (void)cleanup

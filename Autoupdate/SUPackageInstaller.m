@@ -36,7 +36,7 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
     return self;
 }
 
-- (BOOL)performFirstStage:(NSError * __autoreleasing *)error
+- (BOOL)performInitialInstallation:(NSError * __autoreleasing *)error
 {
     if (![[NSFileManager defaultManager] fileExistsAtPath:SUOpenUtilityPath]) {
         if (error != NULL) {
@@ -47,17 +47,7 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
     return YES;
 }
 
-- (BOOL)performSecondStageAllowingUI:(BOOL)allowsUI error:(NSError * __autoreleasing *)error
-{
-    if (!allowsUI) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: @"Package installer cannot continue if showing UI is not allowed." }];
-        }
-    }
-    return allowsUI;
-}
-
-- (BOOL)performThirdStage:(NSError * __autoreleasing *)error
+- (BOOL)performFinalInstallation:(NSError * __autoreleasing *)error
 {
     // Run installer using the "open" command to ensure it is launched in front of current application.
     // -W = wait until the app has quit.
@@ -78,11 +68,6 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
         return NO;
     }
     
-    return YES;
-}
-
-- (BOOL)displaysUserProgress
-{
     return YES;
 }
 
