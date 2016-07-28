@@ -119,8 +119,8 @@
 		721CF1AB1AD764EB00D9AC09 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */; };
 		721D8A611D48413B0032E472 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
 		721D8A721D4950B80032E472 /* Autoupdate in Copy Tools */ = {isa = PBXBuildFile; fileRef = 72B398D21D3D879300EE297F /* Autoupdate */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		721D8A761D4952430032E472 /* Updater.app in Resources */ = {isa = PBXBuildFile; fileRef = 721C24451CB753E6005440CB /* Updater.app */; };
 		721D8A7B1D4963190032E472 /* SULocalCacheDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 721BC20D1D1CDE55002BC71E /* SULocalCacheDirectory.m */; };
+		721D8A811D498B9B0032E472 /* Updater.app in Copy Tools */ = {isa = PBXBuildFile; fileRef = 721C24451CB753E6005440CB /* Updater.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7223E7631AD1AEFF008E3161 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
 		7229E1B61C97C91100CB50D0 /* SUUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 7229E1B51C97C91100CB50D0 /* SUUpdateDriver.h */; };
 		7229E1B91C97CC4D00CB50D0 /* SUScheduledUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 7229E1B71C97CC4D00CB50D0 /* SUScheduledUpdateDriver.h */; };
@@ -536,6 +536,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
+				721D8A811D498B9B0032E472 /* Updater.app in Copy Tools */,
 				721D8A721D4950B80032E472 /* Autoupdate in Copy Tools */,
 			);
 			name = "Copy Tools";
@@ -797,6 +798,7 @@
 		721C24451CB753E6005440CB /* Updater.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Updater.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		721C24571CB754E8005440CB /* ConfigInstallerProgress.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigInstallerProgress.xcconfig; sourceTree = "<group>"; };
 		721C24581CB7567D005440CB /* InstallerProgress-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "InstallerProgress-Info.plist"; path = "Sparkle/InstallerProgress/InstallerProgress-Info.plist"; sourceTree = SOURCE_ROOT; };
+		721D8A831D498F1D0032E472 /* set-agent-signing.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "set-agent-signing.sh"; sourceTree = "<group>"; };
 		722194511D3BF987004C34FF /* SUInstallerAgentProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SUInstallerAgentProtocol.h; path = Sparkle/InstallerProgress/SUInstallerAgentProtocol.h; sourceTree = SOURCE_ROOT; };
 		722194521D3BFEB7004C34FF /* SUInstallerAgentInitiationProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SUInstallerAgentInitiationProtocol.h; path = Sparkle/InstallerProgress/SUInstallerAgentInitiationProtocol.h; sourceTree = SOURCE_ROOT; };
 		7223E7611AD1AEFF008E3161 /* sais.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sais.c; sourceTree = "<group>"; };
@@ -1801,6 +1803,7 @@
 				14732BC91960F70A00593899 /* make-release-package.sh */,
 				14652F7919A93E5F00959E44 /* set-git-version-info.sh */,
 				72F94ED31CC33F1E002DEE68 /* set-ats-exceptions.sh */,
+				721D8A831D498F1D0032E472 /* set-agent-signing.sh */,
 				146EC84E19A68CF8004A50C5 /* Sparkle.podspec */,
 			);
 			path = Configurations;
@@ -2050,8 +2053,8 @@
 			buildPhases = (
 				726E07A91CAF08D6001A286B /* Sources */,
 				726E07AA1CAF08D6001A286B /* Frameworks */,
-				726E07AB1CAF08D6001A286B /* Resources */,
 				721D8A711D4950910032E472 /* Copy Tools */,
+				721D8A841D498F7A0032E472 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -2392,14 +2395,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		726E07AB1CAF08D6001A286B /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				721D8A761D4952430032E472 /* Updater.app in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		726E07ED1CAF37BD001A286B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2491,6 +2486,19 @@
 			shellPath = "/usr/bin/env sh";
 			shellScript = "ln -sfh \"pt_BR.lproj\" \"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/pt.lproj\"";
 			showEnvVarsInLog = 0;
+		};
+		721D8A841D498F7A0032E472 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/Configurations/set-agent-signing.sh\"";
 		};
 		728639061CAF651300783084 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
