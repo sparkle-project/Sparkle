@@ -62,22 +62,15 @@
         return;
     }
     
-    NSError *firstStageError = nil;
-    if (![installer performFirstStage:&firstStageError]) {
-        XCTFail(@"First Stage failed with error: %@", firstStageError);
+    NSError *initialInstallError = nil;
+    if (![installer performInitialInstallation:&initialInstallError]) {
+        XCTFail(@"Initial Installation failed with error: %@", initialInstallError);
         return;
     }
     
-    NSError *secondStageError = nil;
-    if (![installer performSecondStageAllowingUI:YES error:&secondStageError]) {
-        NSLog(@"Underlying error: %@", [secondStageError.userInfo objectForKey:NSUnderlyingErrorKey]);
-        XCTFail(@"Second Stage failed with error: %@", secondStageError);
-        return;
-    }
-    
-    NSError *thirdStageError = nil;
-    if (![installer performThirdStage:&thirdStageError]) {
-        XCTFail(@"Third Stage failed with error: %@", thirdStageError);
+    NSError *finalInstallError = nil;
+    if (![installer performFinalInstallation:&finalInstallError]) {
+        XCTFail(@"Final installation failed with error: %@", finalInstallError);
         return;
     }
     
