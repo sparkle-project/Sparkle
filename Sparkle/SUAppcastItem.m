@@ -284,8 +284,8 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
                 *error = [NSString stringWithFormat:@"Feed item's enclosure lacks valid %@ (found %@)", SUAppcastAttributeInstallationType, _installationType];
             }
             return nil;
-        } else if ([_installationType isEqualToString:SUInstallationTypePackage]) {
-            SULog(@"warning: '%@' for %@ is deprecated. Use '%@' instead.", SUInstallationTypePackage, SUAppcastAttributeInstallationType, SUInstallationTypeGuidedPackage);
+        } else if ([_installationType isEqualToString:SUInstallationTypeInteractivePackage]) {
+            SULog(@"warning: '%@' for %@ is deprecated. Use '%@' instead.", SUInstallationTypeInteractivePackage, SUAppcastAttributeInstallationType, SUInstallationTypeGuidedPackage);
         }
 
         // Find the appropriate release notes URL.

@@ -93,11 +93,11 @@
     }
 
     if (isPackage) {
-        // Guided installs used to be opt-in (i.e, Sparkle would detect foo.sparkle_guided.pkg or foo.sparkle_guided.mpkg),
-        // but to get an unguided install, the developer now must opt-out of guided installations.
+        // Guided (or now "normal") installs used to be opt-in (i.e, Sparkle would detect foo.sparkle_guided.pkg or foo.sparkle_guided.mpkg),
+        // but to get an interactive (or "unguided") install, the developer now must opt-out of guided installations.
         
-        // foo.app -> foo.sparkle_unguided.pkg or foo.sparkle_unguided.mpkg
-        if ([[[newAppDownloadPath stringByDeletingPathExtension] pathExtension] isEqualToString:@"sparkle_unguided"]) {
+        // foo.app -> foo.sparkle_interactive.pkg or foo.sparkle_interactive.mpkg
+        if ([[[newAppDownloadPath stringByDeletingPathExtension] pathExtension] isEqualToString:@"sparkle_interactive"]) {
             isGuided = NO;
         }
     }
@@ -139,9 +139,9 @@
             installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath];
         }
     } else if (isPackage) {
-        if (![expectedInstallationType isEqualToString:SUInstallationTypePackage]) {
+        if (![expectedInstallationType isEqualToString:SUInstallationTypeInteractivePackage]) {
             if (error != NULL) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SUInstallationTypePackage] }];
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SUInstallationTypeInteractivePackage] }];
             }
         } else {
             installer = [[SUPackageInstaller alloc] initWithPackagePath:newDownloadPath];

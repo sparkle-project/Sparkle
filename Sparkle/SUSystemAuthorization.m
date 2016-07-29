@@ -14,7 +14,7 @@ BOOL SUNeedsSystemAuthorizationAccess(NSString *path, NSString *installationType
     BOOL result;
     if ([installationType isEqualToString:SUInstallationTypeGuidedPackage]) {
         result = YES;
-    } else if ([installationType isEqualToString:SUInstallationTypePackage]) {
+    } else if ([installationType isEqualToString:SUInstallationTypeInteractivePackage]) {
         result = NO;
     } else {
         NSFileManager *fileManager = [NSFileManager defaultManager];

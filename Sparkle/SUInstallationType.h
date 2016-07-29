@@ -10,11 +10,11 @@
 #define SUInstallationType_h
 
 #define SUInstallationTypeApplication @"application" // the default installation type for ordinary application updates
-#define SUInstallationTypeGuidedPackage @"guided-package" // the preferred installation type for package installations
-#define SUInstallationTypePackage @"package" // the deprecated installation type; use guided package instead
+#define SUInstallationTypeGuidedPackage @"package" // the preferred installation type for package installations
+#define SUInstallationTypeInteractivePackage @"interactive-package" // the deprecated installation type; use guided package instead
 
 #define SUInstallationTypeDefault SUInstallationTypeApplication
-#define SUInstallationTypesArray (@[SUInstallationTypeApplication, SUInstallationTypeGuidedPackage, SUInstallationTypePackage])
+#define SUInstallationTypesArray (@[SUInstallationTypeApplication, SUInstallationTypeGuidedPackage, SUInstallationTypeInteractivePackage])
 #define SUValidInstallationType(x) ((x != nil) && [SUInstallationTypesArray containsObject:x])
 
 #endif /* SUInstallationType_h */
