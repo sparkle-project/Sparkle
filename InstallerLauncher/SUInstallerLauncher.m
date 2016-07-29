@@ -101,6 +101,10 @@
     NSString *hostBundleIdentifier = hostBundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
+    // The first argument has to be the path to the program, and the second is a host identifier so that the installer knows what mach services to host
+    // We intentionally do not pass any more arguments. Anything else should be done via IPC.
+    // This is compatible to SMJobBless() which does not allow arguments
+    // Even though we aren't using that function for now, it'd be wise to not decrease compatibility to it
     NSArray<NSString *> *arguments = @[installerPath, hostBundleIdentifier];
     
     AuthorizationRef auth = NULL;
@@ -234,7 +238,7 @@
             }
         }
         
-        NSDictionary *jobDictionary = @{@"Label" : label, @"ProgramArguments" : arguments, @"EnableTransactions" : @NO, @"KeepAlive" : @{@"SuccessfulExit" : @NO}, @"RunAtLoad" : @NO, @"NICE" : @0, @"LaunchOnlyOnce": @YES, @"MachServices" : @{SUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES, SUProgressAgentServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES}};
+        NSDictionary *jobDictionary = @{@"Label" : label, @"ProgramArguments" : arguments, @"EnableTransactions" : @NO, @"KeepAlive" : @{@"SuccessfulExit" : @NO}, @"RunAtLoad" : @NO, @"Nice" : @0, @"LaunchOnlyOnce": @YES, @"MachServices" : @{SUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES, SUProgressAgentServiceNameForBundleIdentifier(hostBundleIdentifier) : @YES}};
         
         CFErrorRef submitError = NULL;
         submittedJob = SMJobSubmit(domain, (__bridge CFDictionaryRef)(jobDictionary), auth, &submitError);
@@ -277,6 +281,7 @@
     return resultPath;
 }
 
+// Note: do not pass untrusted information such as paths to the installer and progress agent tools, when we can find them ourselves here
 - (void)launchInstallerWithHostBundlePath:(NSString *)hostBundlePath authorizationPrompt:(NSString *)authorizationPrompt installationType:(NSString *)installationType allowingDriverInteraction:(BOOL)allowingDriverInteraction allowingUpdaterInteraction:(BOOL)allowingUpdaterInteraction completion:(void (^)(SUInstallerLauncherStatus))completionHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -318,6 +323,11 @@
             completionHandler(SUInstallerLauncherFailure);
             return;
         }
+        
+        // It may be tempting here to validate/match the signature of the installer and progress tool, however this is not very reliable
+        // We can't compare the signature of this framework/XPC service (depending how it's run) to the host bundle because
+        // they could be different (eg: take a look at sparkle-cli). We also can't easily tell if the signature of the service/framework is the same as the bundle it's inside.
+        // The service/framework also need not even be signed in the first place. We'll just assume for now the original bundle hasn't been tampered with
         
         NSString *cachePath = [SULocalCacheDirectory cachePathForBundleIdentifier:hostBundleIdentifier];
         

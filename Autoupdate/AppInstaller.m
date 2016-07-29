@@ -398,6 +398,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             }
         }
     } else if (identifier == SUResumeInstallationToStage2 && data.length == sizeof(uint8_t) * 2) {
+        // Because anyone can ask us to resume the installation, it may be wise to think about backwards compatibility here if IPC changes
         uint8_t relaunch = *((const uint8_t *)data.bytes);
         uint8_t showsUI = *((const uint8_t *)data.bytes + 1);
         
