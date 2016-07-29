@@ -256,7 +256,20 @@
             hasTargetTerminated = (BOOL)*((const uint8_t *)data.bytes + 1);
         }
         
-        [self.delegate installerDidFinishPreparationAndWillInstallImmediately:hasTargetTerminated silently:canInstallSilently];
+        // Are we allowed to perform updates that may require interaction?
+        BOOL updaterAllowsInteraction = YES;
+        if ([self.updaterDelegate respondsToSelector:@selector(updaterShouldAllowInstallerInteraction:)]) {
+            updaterAllowsInteraction = [self.updaterDelegate updaterShouldAllowInstallerInteraction:self.updater];
+        }
+        
+        // Note only non-guided package updates cannot be performed silently (which is one reason why they're deprecated)
+        // A consequence of this is it may not be possible for the installer to install the update (via a non-guided package)
+        // if the application to relaunch has already been terminated because the installer won't wait for us to decide to show UI in that case
+        if (!canInstallSilently && !updaterAllowsInteraction) {
+            [self.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An interactive installation could not be performed because the updater disallowed it.", nil) }]];
+        } else {
+            [self.delegate installerDidFinishPreparationAndWillInstallImmediately:hasTargetTerminated silently:canInstallSilently];
+        }
     } else if (identifier == SUInstallationFinishedStage2) {
         self.currentStage = identifier;
         
