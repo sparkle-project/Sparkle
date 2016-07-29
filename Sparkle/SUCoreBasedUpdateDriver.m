@@ -12,7 +12,6 @@
 #import "SUBasicUpdateDriver.h"
 #import "SUInstallerDriver.h"
 #import "SUDownloadDriver.h"
-#import "SULocalCacheDirectory.h"
 #import "SULog.h"
 #import "SUErrors.h"
 #import "SUDownloadedUpdate.h"
@@ -62,10 +61,9 @@
         
         NSString *bundleIdentifier = host.bundle.bundleIdentifier;
         assert(bundleIdentifier != nil);
-        NSString *cachePath = [SULocalCacheDirectory cachePathForBundleIdentifier:bundleIdentifier];
         
         _basicDriver = [[SUBasicUpdateDriver alloc] initWithHost:host updater:updater updaterDelegate:updaterDelegate delegate:self];
-        _installerDriver = [[SUInstallerDriver alloc] initWithHost:host cachePath:cachePath sparkleBundle:sparkleBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
+        _installerDriver = [[SUInstallerDriver alloc] initWithHost:host sparkleBundle:sparkleBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
         
         _host = host;
         _updater = updater;

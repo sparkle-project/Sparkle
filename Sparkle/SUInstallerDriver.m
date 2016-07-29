@@ -35,7 +35,6 @@
 @interface SUInstallerDriver () <SUInstallerCommunicationProtocol>
 
 @property (nonatomic, readonly) SUHost *host;
-@property (nonatomic, readonly, copy) NSString *cachePath;
 @property (nonatomic, readonly) NSBundle *sparkleBundle;
 @property (nonatomic, weak, readonly) id<SUInstallerDriverDelegate> delegate;
 @property (nonatomic) SUInstallerMessageType currentStage;
@@ -60,7 +59,6 @@
 @implementation SUInstallerDriver
 
 @synthesize host = _host;
-@synthesize cachePath = _cachePath;
 @synthesize sparkleBundle = _sparkleBundle;
 @synthesize delegate = _delegate;
 @synthesize currentStage = _currentStage;
@@ -76,12 +74,11 @@
 @synthesize temporaryDirectory = _temporaryDirectory;
 @synthesize aborted = _aborted;
 
-- (instancetype)initWithHost:(SUHost *)host cachePath:(NSString *)cachePath sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(id<SUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SUInstallerDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(id<SUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SUInstallerDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
         _host = host;
-        _cachePath = [cachePath copy];
         _sparkleBundle = sparkleBundle;
         _updater = updater;
         _updaterDelegate = updaterDelegate;
@@ -291,80 +288,6 @@
         // Don't update the current stage; a ping request has no effect on that.
         [self.installerConnection handleMessageWithIdentifier:SUUpdaterAlivePong data:[NSData data]];
     }
-}
-
-// Creates intermediate directories up until targetPath if they don't already exist,
-// and removes the directory at targetPath if one already exists there
-- (BOOL)preparePath:(NSString *)targetPath error:(NSError * __autoreleasing *)error
-{
-    NSFileManager *fileManager = [[NSFileManager alloc] init];
-    if ([fileManager fileExistsAtPath:targetPath]) {
-        NSError *removeError = nil;
-        if (![fileManager removeItemAtPath:targetPath error:&removeError]) {
-            if (error != NULL) {
-                *error = removeError;
-            }
-            return NO;
-        }
-    } else {
-        NSError *createDirectoryError = nil;
-        if (![fileManager createDirectoryAtPath:[targetPath stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:@{} error:&createDirectoryError]) {
-            if (error != NULL) {
-                *error = createDirectoryError;
-            }
-            return NO;
-        }
-    }
-    return YES;
-}
-
-- (NSString *)copyPathToCacheDirectory:(NSString *)pathToCopy error:(NSError * __autoreleasing *)error
-{
-    // Copy the resource into the caches directory so we can get to it after the new version's installed.
-    // Only the paranoid survive: if there's already a stray copy of resource there, we would have problems.
-    NSString *cachePath = nil;
-    if (pathToCopy == nil) {
-        if (error != NULL) {
-            *error =
-            [NSError
-             errorWithDomain:SUSparkleErrorDomain
-             code:SURelaunchError
-             userInfo:@{
-                        NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@.", nil), [self.host name]],
-                        NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't find the relauncher (expected to find it at %@)", pathToCopy]
-                        }
-             ];
-        }
-    } else {
-        NSString *targetPath = [self.cachePath stringByAppendingPathComponent:[pathToCopy lastPathComponent]];
-        
-        SUFileManager *fileManager = [SUFileManager defaultManager];
-        
-        NSURL *urlToCopy = [NSURL fileURLWithPath:pathToCopy];
-        NSURL *targetURL = [NSURL fileURLWithPath:targetPath];
-        
-        NSError *prepareOrCopyError = nil;
-        
-        // We only need to run our copy of the app by spawning a task
-        // Since we are copying the app to a directory that is write-accessible, we don't need to muck with owner/group IDs
-        if ([self preparePath:targetPath error:&prepareOrCopyError] && [fileManager copyItemAtURL:urlToCopy toURL:targetURL error:&prepareOrCopyError]) {
-            cachePath = targetPath;
-        } else {
-            if (error != NULL) {
-                *error =
-                [NSError
-                 errorWithDomain:SUSparkleErrorDomain
-                 code:SURelaunchError
-                 userInfo:@{
-                            NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil),
-                            NSLocalizedFailureReasonErrorKey: [NSString stringWithFormat:@"Couldn't copy relauncher (%@) to temporary path (%@)! %@", pathToCopy, targetPath, (prepareOrCopyError ? [prepareOrCopyError localizedDescription] : @"")]
-                            }
-                 ];
-            }
-        }
-    }
-    
-    return cachePath;
 }
 
 - (void)launchAutoUpdateSilently:(BOOL)silently completion:(void (^)(NSError *_Nullable))completionHandler

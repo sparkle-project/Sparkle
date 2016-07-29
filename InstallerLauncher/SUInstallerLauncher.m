@@ -329,22 +329,19 @@
         // they could be different (eg: take a look at sparkle-cli). We also can't easily tell if the signature of the service/framework is the same as the bundle it's inside.
         // The service/framework also need not even be signed in the first place. We'll just assume for now the original bundle hasn't been tampered with
         
-        NSString *cachePath = [SULocalCacheDirectory cachePathForBundleIdentifier:hostBundleIdentifier];
+        NSString *launcherCachePath = [[SULocalCacheDirectory cachePathForBundleIdentifier:hostBundleIdentifier] stringByAppendingPathComponent:@"Launcher"];
         
         NSFileManager *fileManager = [NSFileManager defaultManager];
+        [fileManager removeItemAtPath:launcherCachePath error:NULL];
+        
         NSError *createCacheError = nil;
-        // Do not remove the cache directory if it already exists since it may be containing downloaded files
-        if (![fileManager createDirectoryAtPath:cachePath withIntermediateDirectories:YES attributes:nil error:&createCacheError]) {
+        if (![fileManager createDirectoryAtPath:launcherCachePath withIntermediateDirectories:YES attributes:nil error:&createCacheError]) {
             SULog(@"Failed to create cache directory for progress tool: %@", createCacheError);
             completionHandler(SUInstallerLauncherFailure);
             return;
         }
         
-        NSString *progressToolPath = [cachePath stringByAppendingPathComponent:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME@".app"];
-        
-        if ([fileManager fileExistsAtPath:progressToolPath]) {
-            [fileManager removeItemAtPath:progressToolPath error:NULL];
-        }
+        NSString *progressToolPath = [launcherCachePath stringByAppendingPathComponent:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME@".app"];
         
         NSError *copyError = nil;
         // SUFileManager is more reliable for copying files around

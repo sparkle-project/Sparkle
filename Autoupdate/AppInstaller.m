@@ -27,6 +27,7 @@
 #import "AgentConnection.h"
 #import "SUInstallerAgentProtocol.h"
 #import "SUInstallationType.h"
+#import "SULocalCacheDirectory.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "daemon-safe" class and should NOT import AppKit
@@ -54,7 +55,12 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 @property (nonatomic, readonly, copy) NSString *hostBundleIdentifier;
 @property (nonatomic) SUHost *host;
-@property (nonatomic) SUInstallationInputData *installationData;
+@property (nonatomic, copy) NSString *updateDirectoryPath;
+@property (nonatomic, copy) NSString *downloadName;
+@property (nonatomic, copy) NSString *decryptionPassword;
+@property (nonatomic, copy) NSString *dsaSignature;
+@property (nonatomic, copy) NSString *relaunchPath;
+@property (nonatomic, copy) NSString *installationType;
 @property (nonatomic, assign) BOOL shouldRelaunch;
 @property (nonatomic, assign) BOOL shouldShowUI;
 
@@ -81,7 +87,12 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize hostBundleIdentifier = _hostBundleIdentifier;
 @synthesize terminationListener = _terminationListener;
 @synthesize host = _host;
-@synthesize installationData = _installationData;
+@synthesize updateDirectoryPath = _updateDirectoryPath;
+@synthesize downloadName = _downloadName;
+@synthesize decryptionPassword = _decryptionPassword;
+@synthesize dsaSignature = _dsaSignature;
+@synthesize relaunchPath = _relaunchPath;
+@synthesize installationType = _installationType;
 @synthesize shouldRelaunch = _shouldRelaunch;
 @synthesize shouldShowUI = _shouldShowUI;
 @synthesize installer = _installer;
@@ -260,8 +271,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 {
     [self.communicator handleMessageWithIdentifier:SUExtractionStarted data:[NSData data]];
     
-    NSString *downloadPath = [self.installationData.updateDirectoryPath stringByAppendingPathComponent:self.installationData.downloadName];
-    id <SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.installationData.decryptionPassword delegate:self];
+    NSString *downloadPath = [self.updateDirectoryPath stringByAppendingPathComponent:self.downloadName];
+    id <SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.decryptionPassword delegate:self];
     if (!unarchiver) {
         SULog(@"Error: No valid unarchiver for %@!", downloadPath);
         [self unarchiverDidFail];
@@ -284,7 +295,14 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 {
     // Client could try update again with different inputs
     // Eg: one common case is if a delta update fails, client may want to fall back to regular update
-    self.installationData = nil;
+    // We really only need to set updateDirectoryPath to nil since that's the field we check if we've received installation data,
+    // but may as well set other fields to nil too
+    self.updateDirectoryPath = nil;
+    self.downloadName = nil;
+    self.decryptionPassword = nil;
+    self.dsaSignature = nil;
+    self.relaunchPath = nil;
+    self.host = nil;
     
     [self.communicator handleMessageWithIdentifier:SUArchiveExtractionFailed data:[NSData data]];
 }
@@ -293,8 +311,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 {
     [self.communicator handleMessageWithIdentifier:SUValidationStarted data:[NSData data]];
     
-    NSString *downloadPath = [self.installationData.updateDirectoryPath stringByAppendingPathComponent:self.installationData.downloadName];
-    BOOL validationSuccess = [self validateUpdateForHost:self.host downloadedToPath:downloadPath extractedToPath:self.installationData.updateDirectoryPath DSASignature:self.installationData.dsaSignature];
+    NSString *downloadPath = [self.updateDirectoryPath stringByAppendingPathComponent:self.downloadName];
+    BOOL validationSuccess = [self validateUpdateForHost:self.host downloadedToPath:downloadPath extractedToPath:self.updateDirectoryPath DSASignature:self.dsaSignature];
     
     if (!validationSuccess) {
         SULog(@"Error: update validation was a failure");
@@ -331,7 +349,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     // For a plug-in this makes a big difference; we want to wait until the app hosting the plug-in terminates
     // Otherwise for an app, the relaunch path and host path should be identical
     
-    [self.agentConnection.agent registerRelaunchBundlePath:self.installationData.relaunchPath reply:^(NSNumber * _Nullable processIdentifier) {
+    [self.agentConnection.agent registerRelaunchBundlePath:self.relaunchPath reply:^(NSNumber * _Nullable processIdentifier) {
         dispatch_async(dispatch_get_main_queue(), ^{
             self.terminationListener = [[TerminationListener alloc] initWithProcessIdentifier:processIdentifier];
             [self startInstallation];
@@ -348,44 +366,79 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
 {
-    if (identifier == SUInstallationData && self.installationData == nil) {
+    if (identifier == SUInstallationData && self.updateDirectoryPath == nil) {
         dispatch_async(dispatch_get_main_queue(), ^{
             // Mark that we have received the installation data
-            // Do not rely on self.installationData != nil because we may set it to nil again if an early stage fails (i.e, archive extraction)
+            // Do not rely on eg: self.ipdateDirectoryPath != nil because we may set it to nil again if an early stage fails (i.e, archive extraction)
             self.receivedInstallationData = YES;
             
             SUInstallationInputData *installationData = (SUInstallationInputData *)SUUnarchiveRootObjectSecurely(data, [SUInstallationInputData class]);
             if (installationData == nil) {
                 SULog(@"Error: Failed to unarchive input installation data");
                 [self cleanupAndExitWithStatus:EXIT_FAILURE];
-            } else {
-                SUInstallationInputData *nonNullInstallationData = installationData;
-                NSBundle *hostBundle = [NSBundle bundleWithPath:nonNullInstallationData.hostBundlePath];
-                SUHost *host = [[SUHost alloc] initWithBundle:hostBundle];
-                
-                NSString *installationType = nonNullInstallationData.installationType;
-                if (!SUValidInstallationType(installationType)) {
-                    SULog(@"Error: Received invalid installation type: %@", installationType);
-                    [self cleanupAndExitWithStatus:EXIT_FAILURE];
-                } else {
-                    NSString *bundleIdentifier = hostBundle.bundleIdentifier;
-                    if (bundleIdentifier == nil || ![bundleIdentifier isEqualToString:self.hostBundleIdentifier]) {
-                        SULog(@"Error: Failed to match host bundle identifiers %@ and %@", self.hostBundleIdentifier, bundleIdentifier);
-                        [self cleanupAndExitWithStatus:EXIT_FAILURE];
-                    } else {
-                        // This will be important later
-                        if (nonNullInstallationData.relaunchPath == nil) {
-                            SULog(@"Error: Failed to obtain relaunch path from installation data");
-                            [self cleanupAndExitWithStatus:EXIT_FAILURE];
-                        } else {
-                            self.host = host;
-                            self.installationData = installationData;
-                            
-                            [self extractAndInstallUpdate];
-                        }
-                    }
-                }
+                return;
             }
+            
+            NSString *installationType = installationData.installationType;
+            if (!SUValidInstallationType(installationType)) {
+                SULog(@"Error: Received invalid installation type: %@", installationType);
+                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                return;
+            }
+            
+            NSBundle *hostBundle = [NSBundle bundleWithPath:installationData.hostBundlePath];
+            
+            NSString *bundleIdentifier = hostBundle.bundleIdentifier;
+            if (bundleIdentifier == nil || ![bundleIdentifier isEqualToString:self.hostBundleIdentifier]) {
+                SULog(@"Error: Failed to match host bundle identifiers %@ and %@", self.hostBundleIdentifier, bundleIdentifier);
+                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                return;
+            }
+            
+            // This will be important later
+            if (installationData.relaunchPath == nil) {
+                SULog(@"Error: Failed to obtain relaunch path from installation data");
+                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                return;
+            }
+            
+            // This installation path is specific to sparkle and the bundle identifier
+            NSString *cacheInstallationPath = [[SULocalCacheDirectory cachePathForBundleIdentifier:bundleIdentifier] stringByAppendingPathComponent:@"Installation"];
+            
+            SUFileManager *fileManager = [SUFileManager defaultManager];
+            [fileManager removeItemAtURL:[NSURL fileURLWithPath:cacheInstallationPath] error:NULL];
+            
+            NSError *createError = nil;
+            if (![[NSFileManager defaultManager] createDirectoryAtPath:cacheInstallationPath withIntermediateDirectories:YES attributes:nil error:&createError]) {
+                SULog(@"Error: Failed to create installation cache directory");
+                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                return;
+            }
+            
+            // Move the download archive to somewhere where probably only we will be touching it
+            // This prevents eg: if a bug exists in the updater that removes files we are trying to install
+            // When this tool is ran as root, we are moving it into a directory that only root will have access to
+            NSURL *downloadURL = [[NSURL fileURLWithPath:installationData.updateDirectoryPath] URLByAppendingPathComponent:installationData.downloadName];
+            
+            NSURL *downloadDestinationURL = [[NSURL fileURLWithPath:cacheInstallationPath] URLByAppendingPathComponent:installationData.downloadName];
+            
+            NSError *moveError = nil;
+            if (![fileManager moveItemAtURL:downloadURL toURL:downloadDestinationURL error:&moveError]) {
+                SULog(@"Error: Failed to move download archive to new location: %@", moveError);
+                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                return;
+            }
+            
+            // Carry these properities separately rather than using the SUInstallationInputData object
+            // Some of our properties may slightly differ than our input and we don't want to make the mistake of using one of those
+            self.installationType = installationType;
+            self.relaunchPath = installationData.relaunchPath;
+            self.downloadName = installationData.downloadName;
+            self.dsaSignature = installationData.dsaSignature;
+            self.updateDirectoryPath = cacheInstallationPath;
+            self.host = [[SUHost alloc] initWithBundle:hostBundle];
+            
+            [self extractAndInstallUpdate];
         });
     } else if (identifier == SUSentUpdateAppcastItemData) {
         SUAppcastItem *updateItem = (SUAppcastItem *)SUUnarchiveRootObjectSecurely(data, [SUAppcastItem class]);
@@ -431,7 +484,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     dispatch_async(self.installerQueue, ^{
         NSError *installerError = nil;
-        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self.host expectedInstallationType:self.installationData.installationType updateDirectory:self.installationData.updateDirectoryPath versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
+        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self.host expectedInstallationType:self.installationType updateDirectory:self.updateDirectoryPath versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
         
         if (installer == nil) {
             SULog(@"Error: Failed to create installer instance with error: %@", installerError);
@@ -570,10 +623,10 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                     NSString *pathToRelaunch = nil;
                     // If the installation path differs from the host path, we give higher precedence for it than
                     // if the desired relaunch path differs from the host path
-                    if (![installationPath.pathComponents isEqualToArray:self.host.bundlePath.pathComponents] || [self.installationData.relaunchPath.pathComponents isEqualToArray:self.host.bundlePath.pathComponents]) {
+                    if (![installationPath.pathComponents isEqualToArray:self.host.bundlePath.pathComponents] || [self.relaunchPath.pathComponents isEqualToArray:self.host.bundlePath.pathComponents]) {
                         pathToRelaunch = installationPath;
                     } else {
-                        pathToRelaunch = self.installationData.relaunchPath;
+                        pathToRelaunch = self.relaunchPath;
                     }
                     
                     [self.agentConnection.agent relaunchPath:pathToRelaunch];
@@ -605,7 +658,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     self.agentConnection = nil;
     
     NSError *theError = nil;
-    if (![[NSFileManager defaultManager] removeItemAtPath:self.installationData.updateDirectoryPath error:&theError]) {
+    if (![[NSFileManager defaultManager] removeItemAtPath:self.updateDirectoryPath error:&theError]) {
         SULog(@"Couldn't remove update folder: %@.", theError);
     }
     

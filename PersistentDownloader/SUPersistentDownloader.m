@@ -47,12 +47,6 @@ static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
 - (void)startDownloadWithRequest:(SUURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        // Remove our old caches path so we don't start accumulating files in there
-        NSString *cachePath = [SULocalCacheDirectory cachePathForBundleIdentifier:bundleIdentifier];
-        if ([[NSFileManager defaultManager] fileExistsAtPath:cachePath]) {
-            [[NSFileManager defaultManager] removeItemAtPath:cachePath error:NULL];
-        }
-        
         // Prevent service from automatically terminating while downloading the update asynchronously without any reply blocks
         [[NSProcessInfo processInfo] disableAutomaticTermination:SUPersistentDownloadingReason];
         self.disabledAutomaticTermination = YES;
@@ -91,13 +85,15 @@ static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
 {
     NSString *downloadFileName = self.desiredFilename;
     
-    NSString *cachePath = [SULocalCacheDirectory cachePathForBundleIdentifier:self.bundleIdentifier];
+    // Remove our old caches path so we don't start accumulating files in there
+    NSString *persistentDownloadCachePath = [[SULocalCacheDirectory cachePathForBundleIdentifier:self.bundleIdentifier] stringByAppendingPathComponent:@"PersistentDownloads"];
+    [[NSFileManager defaultManager] removeItemAtPath:persistentDownloadCachePath error:NULL];
     
-    NSString *tempDir = [cachePath stringByAppendingPathComponent:downloadFileName];
+    NSString *tempDir = [persistentDownloadCachePath stringByAppendingPathComponent:downloadFileName];
     int count = 1;
     while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && count <= 999)
     {
-        tempDir = [cachePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, count++]];
+        tempDir = [persistentDownloadCachePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, count++]];
     }
     
     // Create the temporary directory if necessary.

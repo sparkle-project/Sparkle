@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 // Intermediate directories to this path may not exist yet
 // This path may depend on the type of running process,
 // such that sandboxed vs non-sandboxed processes could yield different paths
+// The caller should create a subdirectory from the path that is returned here so they don't have files that
+// conflict with other callers
 + (NSString *)cachePathForBundleIdentifier:(NSString *)bundleIdentifier;
 
 @end
