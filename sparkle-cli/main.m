@@ -29,16 +29,16 @@ static void printUsage(char **argv)
     fprintf(stderr, "  To check if an update is available without installing, use --%s.\n\n", PROBE_FLAG);
     fprintf(stderr, "  if no updates are available now, or if the last update check was recently\n  (unless --%s is specified) then nothing is done.\n\n", CHECK_NOW_FLAG);
     fprintf(stderr, "  If update permission is requested and --%s is not\n  specified, then checking for updates is aborted.\n\n", GRANT_AUTOMATIC_CHECKING_FLAG);
-    fprintf(stderr, "  Unless --%s is specified, this tool will not request for escalated\n  authorization. The default behavior assumes this tool will for example be ran\n  as root to update an application owned by root.\n\n", INTERACTIVE_FLAG);
+    fprintf(stderr, "  Unless --%s is specified, this tool will not request for escalated\n  authorization. Running as root is not supported.\n\n", INTERACTIVE_FLAG);
     fprintf(stderr, "  If --%s is specified, this tool will exit leaving a spawned process\n  for finishing the installation after the target application terminates.\n", DEFER_FLAG);
     fprintf(stderr, "Options:\n");
     fprintf(stderr, " --%s\n    Path to the application to watch for termination and to relaunch.\n    If not provided, this is assumed to be the same as the bundle.\n", APPLICATION_FLAG);
     fprintf(stderr, " --%s\n    Immediately checks for updates to install.\n    Without this, updates are checked only when needed on a scheduled basis.\n", CHECK_NOW_FLAG);
     fprintf(stderr, " --%s\n    Probe for updates. Check if any updates are available but do not install.\n    An exit status of 0 is returned if a new update is available.\n", PROBE_FLAG);
-    fprintf(stderr, " --%s\n    Allows prompting the user for an authorization dialog prompt if the\n    installer needs elevated privileges. Without this flag, the tool would have\n    to run under the sufficient install privileges. Note this flag may not\n    function if the target application is terminated before installation begins.\n", INTERACTIVE_FLAG);
+    fprintf(stderr, " --%s\n    Allows prompting the user for an authorization dialog prompt if the\n    installer needs elevated privileges, or allows performing an interactive\n    installer package.\n", INTERACTIVE_FLAG);
     fprintf(stderr, " --%s\n    If update permission is requested, this enables automatic update checks.\n    Note that this behavior may overwrite the user's defaults for the bundle.\n    This option has no effect if --%s is passed, or if the\n    user has replied to this request already, or if the developer configured\n    to skip it.\n", GRANT_AUTOMATIC_CHECKING_FLAG, CHECK_NOW_FLAG);
     fprintf(stderr, " --%s\n    Choose to send system profile information if update permission is requested.\n    This option can only take effect if --%s is passed.\n", SEND_PROFILE_FLAG, GRANT_AUTOMATIC_CHECKING_FLAG);
-    fprintf(stderr, " --%s\n    Defer installation until after the application terminates on its own. The\n    application will not be relaunched. This option does not work together with\n    --%s.\n", DEFER_FLAG, INTERACTIVE_FLAG);
+    fprintf(stderr, " --%s\n    Defer installation until after the application terminates on its own. The\n    application will not be relaunched unless the installation is resumed later.\n", DEFER_FLAG);
     fprintf(stderr, " --%s\n    Enable verbose logging.\n", VERBOSE_FLAG);
 }
 
@@ -126,11 +126,6 @@ int main(int argc, char **argv)
         
         if (probeForUpdates && (applicationPath != nil || deferInstall || checkForUpdatesNow || interactive)) {
             fprintf(stderr, "Error: --%s does not work together with --%s, --%s, --%s, --%s\n", PROBE_FLAG, APPLICATION_FLAG, DEFER_FLAG, CHECK_NOW_FLAG, INTERACTIVE_FLAG);
-            return EXIT_FAILURE;
-        }
-        
-        if (interactive && deferInstall) {
-            fprintf(stderr, "Error: --%s does not work together with --%s\n", INTERACTIVE_FLAG, DEFER_FLAG);
             return EXIT_FAILURE;
         }
         
