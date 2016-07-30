@@ -162,18 +162,19 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 - (void)registerRelaunchBundlePath:(NSString *)relaunchBundlePath reply:(void (^)(NSNumber *))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        assert(relaunchBundlePath != nil);
-        NSBundle *relaunchBundle = [NSBundle bundleWithPath:relaunchBundlePath];
-        if (relaunchBundle == nil) {
-            [self cleanupAndExitWithStatus:EXIT_FAILURE];
+        if (relaunchBundlePath != nil && !self.willTerminate) {
+            NSBundle *relaunchBundle = [NSBundle bundleWithPath:relaunchBundlePath];
+            if (relaunchBundle == nil) {
+                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            }
+            
+            NSRunningApplication *runningApplication = [SUApplicationInfo runningApplicationWithBundle:relaunchBundle];
+            NSNumber *processIdentifier = (runningApplication == nil || runningApplication.terminated) ? nil : @(runningApplication.processIdentifier);
+            
+            reply(processIdentifier);
+            
+            self.repliedToRegistration = YES;
         }
-        
-        NSRunningApplication *runningApplication = [SUApplicationInfo runningApplicationWithBundle:relaunchBundle];
-        NSNumber *processIdentifier = (runningApplication == nil || runningApplication.terminated) ? nil : @(runningApplication.processIdentifier);
-        
-        reply(processIdentifier);
-        
-        self.repliedToRegistration = YES;
     });
 }
 
@@ -189,8 +190,18 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 - (void)relaunchPath:(NSString *)pathToRelaunch
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (![[NSWorkspace sharedWorkspace] openFile:pathToRelaunch]) {
-            SULog(@"Error: Failed to relaunch bundle at %@", pathToRelaunch);
+        if (!self.willTerminate) {
+            if (![[NSWorkspace sharedWorkspace] openFile:pathToRelaunch]) {
+                SULog(@"Error: Failed to relaunch bundle at %@", pathToRelaunch);
+            }
+            
+            // Delay termination for a little bit to better increase the chance the updated application when relaunched will be the frontmost application
+            // This is related to macOS activation issues when terminating a frontmost application happens right before launching another app
+            
+            self.willTerminate = YES;
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUTerminationTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [self cleanupAndExitWithStatus:EXIT_SUCCESS];
+            });
         }
     });
 }
@@ -198,44 +209,33 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 - (void)showProgress
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        // Show app icon in the dock
-        ProcessSerialNumber psn = { 0, kCurrentProcess };
-        TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-        
-        // Note: the application icon needs to be set after showing the icon in the dock
-        self.application.applicationIconImage = [SUApplicationInfo bestIconForBundle:self.hostBundle];
-        
-        // Activate ourselves otherwise we will probably be in the background
-        [self.application activateIgnoringOtherApps:YES];
-        
-        [self.delegate installerProgressShouldDisplayWithBundle:self.hostBundle];
+        if (!self.willTerminate) {
+            // Show app icon in the dock
+            ProcessSerialNumber psn = { 0, kCurrentProcess };
+            TransformProcessType(&psn, kProcessTransformToForegroundApplication);
+            
+            // Note: the application icon needs to be set after showing the icon in the dock
+            self.application.applicationIconImage = [SUApplicationInfo bestIconForBundle:self.hostBundle];
+            
+            // Activate ourselves otherwise we will probably be in the background
+            [self.application activateIgnoringOtherApps:YES];
+            
+            [self.delegate installerProgressShouldDisplayWithBundle:self.hostBundle];
+        }
     });
 }
 
 - (void)stopProgress
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self _stopProgress];
-    });
-}
-
-- (void)_stopProgress
-{
-    [self.statusInfo invalidate];
-    self.statusInfo = nil;
-    
-    // Dismiss any UI immediately, but delay termination for a little bit to better increase the chance
-    // the updated application when relaunched will be the frontmost application
-    // This is related to macOS activation issues when terminating a frontmost application happens right before
-    // launching another app
-    
-    [self.delegate installerProgressShouldStop];
-    self.delegate = nil;
-    
-    self.willTerminate = YES;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUTerminationTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        // Exit right away, don't go through the apple event process again
-        [self cleanupAndExitWithStatus:EXIT_SUCCESS];
+        // Dismiss any UI immediately
+        [self.delegate installerProgressShouldStop];
+        self.delegate = nil;
+        
+        // No need to broadcast status service anymore
+        // In fact we shouldn't when we decide to relaunch the update
+        [self.statusInfo invalidate];
+        self.statusInfo = nil;
     });
 }
 

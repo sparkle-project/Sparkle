@@ -563,22 +563,22 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             return;
         }
         
-        // Ask the updater if it is still alive
-        // If they are, we will receive a pong response back
-        // Reset if we received a pong just to be on the safe side
-        self.receivedUpdaterPong = NO;
-        [self.communicator handleMessageWithIdentifier:SUUpdaterAlivePing data:[NSData data]];
-        
-        // Launch our installer progress UI tool if only after a certain amount of time passes,
+        // Show our installer progress UI tool if only after a certain amount of time passes,
         // and if our installer is silent (i.e, doesn't show progress on its own)
-        __block BOOL shouldLaunchInstallerProgress = YES;
+        __block BOOL shouldShowUIProgress = YES;
         if (self.shouldShowUI && [self.installer canInstallSilently]) {
+            // Ask the updater if it is still alive
+            // If they are, we will receive a pong response back
+            // Reset if we received a pong just to be on the safe side
+            self.receivedUpdaterPong = NO;
+            [self.communicator handleMessageWithIdentifier:SUUpdaterAlivePing data:[NSData data]];
+            
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUDisplayProgressTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 // Make sure we're still eligible for showing the installer progress
                 // Also if the updater process is still alive, showing the progress should not be our duty
                 // if the communicator object is nil, the updater definitely isn't alive. However, if it is not nil,
                 // this does not necessarily mean the updater is alive, so we should also check if we got a recent response back from the updater
-                if (shouldLaunchInstallerProgress && (!self.receivedUpdaterPong || self.communicator == nil)) {
+                if (shouldShowUIProgress && (!self.receivedUpdaterPong || self.communicator == nil)) {
                     [self.agentConnection.agent showProgress];
                 }
             });
@@ -608,11 +608,11 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             self.performedStage3Installation = YES;
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                // Make sure to terminate our displayed progress before we move onto cleanup & relaunch
+                // Make sure to stop our displayed progress before we move onto cleanup & relaunch
                 // This will also stop the agent from broadcasting the status info service, which we want to do before
                 // we relaunch the app because the relaunched app could check the service upon launch..
                 [self.agentConnection.agent stopProgress];
-                shouldLaunchInstallerProgress = NO;
+                shouldShowUIProgress = NO;
                 
                 [self.communicator handleMessageWithIdentifier:SUInstallationFinishedStage3 data:[NSData data]];
                 
@@ -628,6 +628,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                         pathToRelaunch = self.relaunchPath;
                     }
                     
+                    // This will also signal to the agent that it will terminate soon
                     [self.agentConnection.agent relaunchPath:pathToRelaunch];
                 }
                 
