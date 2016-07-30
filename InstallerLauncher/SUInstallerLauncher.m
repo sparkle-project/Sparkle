@@ -336,14 +336,13 @@
         // they could be different (eg: take a look at sparkle-cli). We also can't easily tell if the signature of the service/framework is the same as the bundle it's inside.
         // The service/framework also need not even be signed in the first place. We'll just assume for now the original bundle hasn't been tampered with
         
-        NSString *launcherCachePath = [[SULocalCacheDirectory cachePathForBundleIdentifier:hostBundleIdentifier] stringByAppendingPathComponent:@"Launcher"];
+        NSString *rootLauncherCachePath = [[SULocalCacheDirectory cachePathForBundleIdentifier:hostBundleIdentifier] stringByAppendingPathComponent:@"Launcher"];
         
-        NSFileManager *fileManager = [NSFileManager defaultManager];
-        [fileManager removeItemAtPath:launcherCachePath error:NULL];
+        [SULocalCacheDirectory removeOldItemsInDirectory:rootLauncherCachePath];
         
-        NSError *createCacheError = nil;
-        if (![fileManager createDirectoryAtPath:launcherCachePath withIntermediateDirectories:YES attributes:nil error:&createCacheError]) {
-            SULog(@"Failed to create cache directory for progress tool: %@", createCacheError);
+        NSString *launcherCachePath = [SULocalCacheDirectory createUniqueDirectoryInDirectory:rootLauncherCachePath];
+        if (launcherCachePath == nil) {
+            SULog(@"Failed to create cache directory for progress tool in %@", rootLauncherCachePath);
             completionHandler(SUInstallerLauncherFailure);
             return;
         }

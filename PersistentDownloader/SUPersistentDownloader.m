@@ -83,22 +83,13 @@ static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
 
 - (void)download:(NSURLDownload *)__unused d decideDestinationWithSuggestedFilename:(NSString *)name
 {
-    NSString *downloadFileName = self.desiredFilename;
-    
     // Remove our old caches path so we don't start accumulating files in there
-    NSString *persistentDownloadCachePath = [[SULocalCacheDirectory cachePathForBundleIdentifier:self.bundleIdentifier] stringByAppendingPathComponent:@"PersistentDownloads"];
-    [[NSFileManager defaultManager] removeItemAtPath:persistentDownloadCachePath error:NULL];
+    NSString *rootPersistentDownloadCachePath = [[SULocalCacheDirectory cachePathForBundleIdentifier:self.bundleIdentifier] stringByAppendingPathComponent:@"PersistentDownloads"];
     
-    NSString *tempDir = [persistentDownloadCachePath stringByAppendingPathComponent:downloadFileName];
-    int count = 1;
-    while ([[NSFileManager defaultManager] fileExistsAtPath:tempDir] && count <= 999)
-    {
-        tempDir = [persistentDownloadCachePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, count++]];
-    }
+    [SULocalCacheDirectory removeOldItemsInDirectory:rootPersistentDownloadCachePath];
     
-    // Create the temporary directory if necessary.
-    BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:tempDir withIntermediateDirectories:YES attributes:nil error:NULL];
-    if (!success)
+    NSString *tempDir = [SULocalCacheDirectory createUniqueDirectoryInDirectory:rootPersistentDownloadCachePath];
+    if (tempDir == nil)
     {
         // Okay, something's really broken with this user's file structure.
         [self.download cancel];
@@ -108,9 +99,19 @@ static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
         
         [self.delegate downloaderDidFailWithError:error];
     } else {
-        [self.download setDestination:[tempDir stringByAppendingPathComponent:name] allowOverwrite:YES];
+        NSString *downloadFileName = self.desiredFilename;
+        NSString *downloadFileNameDirectory = [tempDir stringByAppendingPathComponent:downloadFileName];
         
-        [self.delegate downloaderDidSetDestinationName:name temporaryDirectory:tempDir];
+        NSError *createError = nil;
+        if (![[NSFileManager defaultManager] createDirectoryAtPath:downloadFileNameDirectory withIntermediateDirectories:NO attributes:nil error:&createError]) {
+            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Can't make a download file name %@ directory inside temporary directory for the update download at %@.", downloadFileName, downloadFileNameDirectory] }];
+            
+            [self.delegate downloaderDidFailWithError:error];
+        } else {
+            [self.download setDestination:[downloadFileNameDirectory stringByAppendingPathComponent:name] allowOverwrite:YES];
+            
+            [self.delegate downloaderDidSetDestinationName:name temporaryDirectory:downloadFileNameDirectory];
+        }
     }
 }
 

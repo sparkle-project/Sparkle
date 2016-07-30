@@ -122,6 +122,7 @@
 		721D8A7B1D4963190032E472 /* SULocalCacheDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 721BC20D1D1CDE55002BC71E /* SULocalCacheDirectory.m */; };
 		721D8A811D498B9B0032E472 /* Updater.app in Copy Tools */ = {isa = PBXBuildFile; fileRef = 721C24451CB753E6005440CB /* Updater.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		721D8A861D4ADFEB0032E472 /* SULocalCacheDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 721BC20D1D1CDE55002BC71E /* SULocalCacheDirectory.m */; };
+		721D8A871D4C5BF10032E472 /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
 		7223E7631AD1AEFF008E3161 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
 		7229E1B61C97C91100CB50D0 /* SUUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 7229E1B51C97C91100CB50D0 /* SUUpdateDriver.h */; };
 		7229E1B91C97CC4D00CB50D0 /* SUScheduledUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 7229E1B71C97CC4D00CB50D0 /* SUScheduledUpdateDriver.h */; };
@@ -2669,6 +2670,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				721D8A871D4C5BF10032E472 /* SULog.m in Sources */,
 				7293A1B11CEE9B9F00B957A7 /* SUURLRequest.m in Sources */,
 				721BC2101D1CDE55002BC71E /* SULocalCacheDirectory.m in Sources */,
 				723B5DA71CF7AB0100365F95 /* main.m in Sources */,

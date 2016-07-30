@@ -403,14 +403,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             }
             
             // This installation path is specific to sparkle and the bundle identifier
-            NSString *cacheInstallationPath = [[SULocalCacheDirectory cachePathForBundleIdentifier:bundleIdentifier] stringByAppendingPathComponent:@"Installation"];
+            NSString *rootCacheInstallationPath = [[SULocalCacheDirectory cachePathForBundleIdentifier:bundleIdentifier] stringByAppendingPathComponent:@"Installation"];
             
-            SUFileManager *fileManager = [SUFileManager defaultManager];
-            [fileManager removeItemAtURL:[NSURL fileURLWithPath:cacheInstallationPath] error:NULL];
+            [SULocalCacheDirectory removeOldItemsInDirectory:rootCacheInstallationPath];
             
-            NSError *createError = nil;
-            if (![[NSFileManager defaultManager] createDirectoryAtPath:cacheInstallationPath withIntermediateDirectories:YES attributes:nil error:&createError]) {
-                SULog(@"Error: Failed to create installation cache directory");
+            NSString *cacheInstallationPath = [SULocalCacheDirectory createUniqueDirectoryInDirectory:rootCacheInstallationPath];
+            if (cacheInstallationPath == nil) {
+                SULog(@"Error: Failed to create installation cache directory in %@", rootCacheInstallationPath);
                 [self cleanupAndExitWithStatus:EXIT_FAILURE];
                 return;
             }
@@ -423,7 +422,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             NSURL *downloadDestinationURL = [[NSURL fileURLWithPath:cacheInstallationPath] URLByAppendingPathComponent:installationData.downloadName];
             
             NSError *moveError = nil;
-            if (![fileManager moveItemAtURL:downloadURL toURL:downloadDestinationURL error:&moveError]) {
+            if (![[SUFileManager defaultManager] moveItemAtURL:downloadURL toURL:downloadDestinationURL error:&moveError]) {
                 SULog(@"Error: Failed to move download archive to new location: %@", moveError);
                 [self cleanupAndExitWithStatus:EXIT_FAILURE];
                 return;
