@@ -801,6 +801,7 @@
 		721C24571CB754E8005440CB /* ConfigInstallerProgress.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigInstallerProgress.xcconfig; sourceTree = "<group>"; };
 		721C24581CB7567D005440CB /* InstallerProgress-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "InstallerProgress-Info.plist"; path = "Sparkle/InstallerProgress/InstallerProgress-Info.plist"; sourceTree = SOURCE_ROOT; };
 		721D8A831D498F1D0032E472 /* set-agent-signing.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "set-agent-signing.sh"; sourceTree = "<group>"; };
+		721D8A881D4D272E0032E472 /* Installation.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Installation.md; sourceTree = "<group>"; };
 		722194511D3BF987004C34FF /* SUInstallerAgentProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SUInstallerAgentProtocol.h; path = Sparkle/InstallerProgress/SUInstallerAgentProtocol.h; sourceTree = SOURCE_ROOT; };
 		722194521D3BFEB7004C34FF /* SUInstallerAgentInitiationProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SUInstallerAgentInitiationProtocol.h; path = Sparkle/InstallerProgress/SUInstallerAgentInitiationProtocol.h; sourceTree = SOURCE_ROOT; };
 		7223E7611AD1AEFF008E3161 /* sais.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sais.c; sourceTree = "<group>"; };
@@ -1246,6 +1247,7 @@
 		1420DE391962322200203BB0 /* Documentation */ = {
 			isa = PBXGroup;
 			children = (
+				721D8A891D4D273E0032E472 /* Internal */,
 				1420DF4E196247B500203BB0 /* Doxyfile */,
 				1420DF4D196247B500203BB0 /* build-docs.sh */,
 			);
@@ -1592,6 +1594,14 @@
 			);
 			name = "Installer Progress";
 			path = "../Installer Progress";
+			sourceTree = "<group>";
+		};
+		721D8A891D4D273E0032E472 /* Internal */ = {
+			isa = PBXGroup;
+			children = (
+				721D8A881D4D272E0032E472 /* Installation.md */,
+			);
+			name = Internal;
 			sourceTree = "<group>";
 		};
 		724BB36D1D31D0B7005D534A /* InstallerConnection */ = {
