@@ -67,13 +67,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @property (nonatomic) id<SUInstallerProtocol> installer;
 @property (nonatomic) BOOL willCompleteInstallation;
 @property (nonatomic) BOOL receivedInstallationData;
+@property (nonatomic) BOOL finishedValidation;
+@property (nonatomic) BOOL agentInitiatedConnection;
 
 @property (nonatomic) dispatch_queue_t installerQueue;
 @property (nonatomic) BOOL performedStage1Installation;
 @property (nonatomic) BOOL performedStage2Installation;
 @property (nonatomic) BOOL performedStage3Installation;
-
-@property (nonatomic) NSUInteger agentConnectionCounter;
 
 @end
 
@@ -102,7 +102,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize performedStage1Installation = _performedStage1Installation;
 @synthesize performedStage2Installation = _performedStage2Installation;
 @synthesize performedStage3Installation = _performedStage3Installation;
-@synthesize agentConnectionCounter = _agentConnectionCounter;
+@synthesize finishedValidation = _finishedValidation;
+@synthesize agentInitiatedConnection = _agentInitiatedConnection;
 
 - (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier
 {
@@ -320,8 +321,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     } else {
         [self.communicator handleMessageWithIdentifier:SUInstallationStartedStage1 data:[NSData data]];
         
-        self.agentConnectionCounter++;
-        if (self.agentConnectionCounter == 2) {
+        self.finishedValidation = YES;
+        if (self.agentInitiatedConnection) {
             [self retrieveProcessIdentifierAndStartInstallation];
         }
     }
@@ -329,15 +330,15 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (void)agentConnectionDidInitiate
 {
-    self.agentConnectionCounter++;
-    if (self.agentConnectionCounter == 2) {
+    self.agentInitiatedConnection = YES;
+    if (self.finishedValidation) {
         [self retrieveProcessIdentifierAndStartInstallation];
     }
 }
 
 - (void)agentConnectionDidInvalidate
 {
-    if (self.agentConnectionCounter < 2) {
+    if (!self.finishedValidation || !self.agentInitiatedConnection) {
         SULog(@"Error: Agent connection invalidated before installation began");
         [self cleanupAndExitWithStatus:EXIT_FAILURE];
     }
