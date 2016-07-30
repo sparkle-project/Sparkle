@@ -12,18 +12,18 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * A class used for performing file operations that may also perform authorization if allowed and if permission is denied when trying to
- * perform them normally as the running user. All operations on this class may be used on thread other than the main thread.
- * This class provides basic file operations and stays away from including much application-level logic.
+ * A class used for performing file operations more suitable than NSFileManager for performing installation work.
+ * All operations on this class may be used on thread other than the main thread.
+ * This class provides just basic file operations and stays away from including much application-level logic.
  */
 @interface SUFileManager : NSObject
 
 /**
- * Creates a file manager that disallows authorizing for file operations
+ * Initializes a new file manager
  *
- * @return A new file manager instance that cannot make authorization requests when read/write access is denied
+ * @return A new file manager instance
  */
-+ (instancetype)defaultManager;
+- (instancetype)init;
 
 /**
  * Creates a temporary directory on the same volume as a provided URL
@@ -118,7 +118,7 @@ NS_ASSUME_NONNULL_BEGIN
  * This method updates the access time of an item to the current time, ideal for letting the system know not to remove a file or directory when placing it
  * at a temporary directory.
  *
- * This is not an atomic operation. No authorization is performed for this method.
+ * This is not an atomic operation.
  */
 - (BOOL)updateAccessTimeOfItemAtRootURL:(NSURL *)targetURL error:(NSError * __autoreleasing *)error;
 

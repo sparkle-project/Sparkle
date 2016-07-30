@@ -34,7 +34,7 @@
     NSString *unitTestBundleIdentifier = unitTestBundle.bundleIdentifier;
     NSString *zippedAppPath = [unitTestBundle pathForResource:@"SparkleTestCodeSignApp" ofType:@"zip"];
     
-    SUFileManager *fileManager = [SUFileManager defaultManager];
+    SUFileManager *fileManager = [[SUFileManager alloc] init];
     
     NSError *tempError = nil;
     NSURL *tempDir = [fileManager makeTemporaryDirectoryWithPreferredName:unitTestBundleIdentifier appropriateForDirectoryURL:[NSURL fileURLWithPath:zippedAppPath] error:&tempError];

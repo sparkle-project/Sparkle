@@ -61,11 +61,6 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     return self;
 }
 
-+ (instancetype)defaultManager
-{
-    return [[self alloc] init];
-}
-
 // -[NSFileManager attributesOfItemAtPath:error:] won't follow symbolic links
 
 - (BOOL)_itemExistsAtURL:(NSURL *)fileURL

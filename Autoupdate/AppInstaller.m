@@ -422,7 +422,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             NSURL *downloadDestinationURL = [[NSURL fileURLWithPath:cacheInstallationPath] URLByAppendingPathComponent:installationData.downloadName];
             
             NSError *moveError = nil;
-            if (![[SUFileManager defaultManager] moveItemAtURL:downloadURL toURL:downloadDestinationURL error:&moveError]) {
+            if (![[[SUFileManager alloc] init] moveItemAtURL:downloadURL toURL:downloadDestinationURL error:&moveError]) {
                 SULog(@"Error: Failed to move download archive to new location: %@", moveError);
                 [self cleanupAndExitWithStatus:EXIT_FAILURE];
                 return;
@@ -657,7 +657,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     self.agentConnection = nil;
     
     NSError *theError = nil;
-    if (![[NSFileManager defaultManager] removeItemAtPath:self.updateDirectoryPath error:&theError]) {
+    if (![[[SUFileManager alloc] init] removeItemAtURL:[NSURL fileURLWithPath:self.updateDirectoryPath] error:&theError]) {
         SULog(@"Couldn't remove update folder: %@.", theError);
     }
     

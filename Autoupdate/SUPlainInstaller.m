@@ -80,7 +80,7 @@
         return NO;
     }
     
-    SUFileManager *fileManager = [SUFileManager defaultManager];
+    SUFileManager *fileManager = [[SUFileManager alloc] init];
     
     // Update the access time of our entire application before moving it into a temporary directory
     // The system periodically cleans up files by looking at the mod & access times, so we have to make sure they're up to date
@@ -226,7 +226,7 @@
 
 - (void)cleanup
 {
-    SUFileManager *fileManager = [SUFileManager defaultManager];
+    SUFileManager *fileManager = [[SUFileManager alloc] init];
     NSURL *tempOldDirectoryURL = self.tempOldDirectoryURL;
     NSURL *tempNewDirectoryURL = self.tempNewDirectoryURL;
     

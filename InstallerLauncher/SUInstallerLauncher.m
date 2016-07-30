@@ -24,7 +24,7 @@
 
 - (BOOL)submitProgressToolAtPath:(NSString *)progressToolPath withHostBundle:(NSBundle *)hostBundle inSystemDomainForInstaller:(BOOL)inSystemDomainForInstaller
 {
-    SUFileManager *fileManager = [SUFileManager defaultManager];
+    SUFileManager *fileManager = [[SUFileManager alloc] init];
     
     NSURL *progressToolURL = [NSURL fileURLWithPath:progressToolPath];
     
@@ -94,7 +94,7 @@
 
 - (SUInstallerLauncherStatus)submitInstallerAtPath:(NSString *)installerPath withHostBundle:(NSBundle *)hostBundle authorizationPrompt:(NSString *)authorizationPrompt inSystemDomain:(BOOL)systemDomain
 {
-    SUFileManager *fileManager = [SUFileManager defaultManager];
+    SUFileManager *fileManager = [[SUFileManager alloc] init];
     
     // No need to release the quarantine for this utility
     // In fact, we shouldn't because the tool may be located at a path we should not be writing too.
@@ -351,7 +351,7 @@
         
         NSError *copyError = nil;
         // SUFileManager is more reliable for copying files around
-        if (![[SUFileManager defaultManager] copyItemAtURL:[NSURL fileURLWithPath:progressToolResourcePath] toURL:[NSURL fileURLWithPath:progressToolPath] error:&copyError]) {
+        if (![[[SUFileManager alloc] init] copyItemAtURL:[NSURL fileURLWithPath:progressToolResourcePath] toURL:[NSURL fileURLWithPath:progressToolPath] error:&copyError]) {
             SULog(@"Failed to copy progress tool to cache: %@", copyError);
             completionHandler(SUInstallerLauncherFailure);
             return;

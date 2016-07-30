@@ -82,7 +82,7 @@
                         }
                     }
                     
-                    SUFileManager *fileManager = [SUFileManager defaultManager];
+                    SUFileManager *fileManager = [[SUFileManager alloc] init];
                     for (NSURL *file in filesToUpdate) {
                         NSError *error = nil;
                         if (![fileManager updateModificationAndAccessTimeOfItemAtURL:file error:&error]) {

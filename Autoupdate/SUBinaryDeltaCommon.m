@@ -225,7 +225,8 @@ BOOL removeTree(NSString *path)
 
 BOOL copyTree(NSString *source, NSString *dest)
 {
-    return [[SUFileManager defaultManager] copyItemAtURL:[NSURL fileURLWithPath:source] toURL:[NSURL fileURLWithPath:dest] error:NULL];
+    // SUFileManager will be more reliable for copying items especially across network mounts
+    return [[[SUFileManager alloc] init] copyItemAtURL:[NSURL fileURLWithPath:source] toURL:[NSURL fileURLWithPath:dest] error:NULL];
 }
 
 BOOL modifyPermissions(NSString *path, mode_t desiredPermissions)
