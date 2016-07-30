@@ -607,9 +607,11 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     [self.agentConnection invalidate];
     self.agentConnection = nil;
     
-    NSError *theError = nil;
-    if (![[[SUFileManager alloc] init] removeItemAtURL:[NSURL fileURLWithPath:self.updateDirectoryPath] error:&theError]) {
-        SULog(@"Couldn't remove update folder: %@.", theError);
+    if (self.updateDirectoryPath != nil) {
+        NSError *theError = nil;
+        if (![[[SUFileManager alloc] init] removeItemAtURL:[NSURL fileURLWithPath:self.updateDirectoryPath] error:&theError]) {
+            SULog(@"Couldn't remove update folder: %@.", theError);
+        }
     }
     
     exit(status);
