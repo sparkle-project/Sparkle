@@ -123,6 +123,7 @@
 		721D8A811D498B9B0032E472 /* Updater.app in Copy Tools */ = {isa = PBXBuildFile; fileRef = 721C24451CB753E6005440CB /* Updater.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		721D8A861D4ADFEB0032E472 /* SULocalCacheDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 721BC20D1D1CDE55002BC71E /* SULocalCacheDirectory.m */; };
 		721D8A871D4C5BF10032E472 /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
+		721D8A8C1D4D3A6F0032E472 /* SUInstallerValidation.m in Sources */ = {isa = PBXBuildFile; fileRef = 721D8A8B1D4D3A6F0032E472 /* SUInstallerValidation.m */; };
 		7223E7631AD1AEFF008E3161 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
 		7229E1B61C97C91100CB50D0 /* SUUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 7229E1B51C97C91100CB50D0 /* SUUpdateDriver.h */; };
 		7229E1B91C97CC4D00CB50D0 /* SUScheduledUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 7229E1B71C97CC4D00CB50D0 /* SUScheduledUpdateDriver.h */; };
@@ -802,6 +803,8 @@
 		721C24581CB7567D005440CB /* InstallerProgress-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "InstallerProgress-Info.plist"; path = "Sparkle/InstallerProgress/InstallerProgress-Info.plist"; sourceTree = SOURCE_ROOT; };
 		721D8A831D498F1D0032E472 /* set-agent-signing.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "set-agent-signing.sh"; sourceTree = "<group>"; };
 		721D8A881D4D272E0032E472 /* Installation.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Installation.md; sourceTree = "<group>"; };
+		721D8A8A1D4D3A6F0032E472 /* SUInstallerValidation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUInstallerValidation.h; path = Autoupdate/SUInstallerValidation.h; sourceTree = SOURCE_ROOT; };
+		721D8A8B1D4D3A6F0032E472 /* SUInstallerValidation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUInstallerValidation.m; path = Autoupdate/SUInstallerValidation.m; sourceTree = SOURCE_ROOT; };
 		722194511D3BF987004C34FF /* SUInstallerAgentProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SUInstallerAgentProtocol.h; path = Sparkle/InstallerProgress/SUInstallerAgentProtocol.h; sourceTree = SOURCE_ROOT; };
 		722194521D3BFEB7004C34FF /* SUInstallerAgentInitiationProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SUInstallerAgentInitiationProtocol.h; path = Sparkle/InstallerProgress/SUInstallerAgentInitiationProtocol.h; sourceTree = SOURCE_ROOT; };
 		7223E7611AD1AEFF008E3161 /* sais.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sais.c; sourceTree = "<group>"; };
@@ -1346,6 +1349,8 @@
 				7267E59E1D3D8A6F00D1BF90 /* main.m */,
 				7267E5A01D3D8A7E00D1BF90 /* AppInstaller.h */,
 				7267E5A11D3D8A7E00D1BF90 /* AppInstaller.m */,
+				721D8A8A1D4D3A6F0032E472 /* SUInstallerValidation.h */,
+				721D8A8B1D4D3A6F0032E472 /* SUInstallerValidation.m */,
 				7267E5A61D3D8A9900D1BF90 /* AgentConnection.h */,
 				7267E5A71D3D8A9900D1BF90 /* AgentConnection.m */,
 				7267E5A91D3D8AA800D1BF90 /* TerminationListener.h */,
@@ -2737,6 +2742,7 @@
 				7267E5771D3D895B00D1BF90 /* SUBinaryDeltaCommon.m in Sources */,
 				7267E5871D3D89B300D1BF90 /* SUPipedUnarchiver.m in Sources */,
 				7267E5751D3D895B00D1BF90 /* SUBinaryDeltaApply.m in Sources */,
+				721D8A8C1D4D3A6F0032E472 /* SUInstallerValidation.m in Sources */,
 				7267E59D1D3D8A5A00D1BF90 /* SUDSAVerifier.m in Sources */,
 				7267E5791D3D895B00D1BF90 /* SUBinaryDeltaCreate.m in Sources */,
 				7267E5C21D3D8B2700D1BF90 /* SUGuidedPackageInstaller.m in Sources */,
