@@ -48,10 +48,18 @@ The installer takes note of all this information, but it moves the downloaded it
 2. The updater, or another updater running, or someone else probably won't accidently remove the downloaded item if the installer decides to 'own' it.
 
 ### Update Extraction
-After the installer receives the input installation data, it starts extracting the update. The installer first sends a `SUExtractionStarted` message. Then it may send several `SUExtractedArchiveWithProgress` messages indicating the unarchival progress back to the updater. On failure, the installer will send `SUArchiveExtractionFailed`. In the updater, if the update is a delta update and extraction fails, then the full archive is downloaded and we go back to the "Sending Installation Data" section to re-send the data and begin extraction again. If the update is not a delta update and extraction fails on the other hand, then the updater aborts causing the installer to abort as well.
+After the installer receives the input installation data, it starts extracting the update. The installer first sends a `SUExtractionStarted` message.
 
-### Validation
-If the unarchiving succeeds, a `SUValidationStarted` message is sent back to the updater, and the installer begins validating the update. If validation fails, the installer aborts, causing the updater to abort the update as well. Otherwise, the installer sends a message `SUInstallationStartedStage1` to the updater and begins the installation.
+If the unarchiver requires DSA validation before extraction (binary delta archives do) or if the expected installation type is a package type, then before starting the unarchiver, validation is checked to make sure the signature for the archive is valid. If the signature is not valid, then a `SUArchiveExtractionFailed` message is sent to the updater (see below on what happens after that). We can't require validation before extracting for normal application updates because they allow changes to DSA keys. Delta updates are fine however because if those fail, then a full update can be tried.
+
+After extraction starts, one or more `SUExtractedArchiveWithProgress` messages indicating the unarchival progress are sent back to the updater. On failure, the installer will send `SUArchiveExtractionFailed`. In the updater, if the update is a delta update and extraction fails, then the full archive is downloaded and we go back to the "Sending Installation Data" section to re-send the data and begin extraction again. If the update is not a delta update and extraction fails on the other hand, then the updater aborts causing the installer to abort as well.
+
+### Post Validation
+If the unarchiving succeeds, a `SUValidationStarted` message is sent back to the updater, and the installer begins post validating the update.
+
+If validation was already done before extraction, just the code signature is checked on the extracted bundle to make sure it's valid (if there's a code signature on the bundle). This is just a consistency check to make sure the developer didn't make a careless erorr.
+
+If validation fails, the installer aborts, causing the updater to abort the update as well. Otherwise, the installer sends a message `SUInstallationStartedStage1` to the updater and begins the installation.
 
 ### Retrieving Process Identifier
 
