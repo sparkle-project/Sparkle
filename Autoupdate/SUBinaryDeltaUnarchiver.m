@@ -35,6 +35,11 @@
     return [[path pathExtension] isEqualToString:@"delta"];
 }
 
++ (BOOL)requiresValidationBeforeUnarchiving
+{
+    return YES;
+}
+
 - (instancetype)initWithArchivePath:(NSString *)archivePath updateHostBundlePath:(NSString *)updateHostBundlePath delegate:(id <SUUnarchiverDelegate>)delegate
 {
     self = [super init];

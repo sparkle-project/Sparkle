@@ -63,6 +63,11 @@
     return ([self commandAndArgumentsConformingToTypeOfPath:path] != nil);
 }
 
++ (BOOL)requiresValidationBeforeUnarchiving
+{
+    return NO;
+}
+
 - (instancetype)initWithArchivePath:(NSString *)archivePath delegate:(nullable id <SUUnarchiverDelegate>)delegate
 {
     self = [super init];

@@ -32,6 +32,11 @@
     return [[path pathExtension] isEqualToString:@"dmg"];
 }
 
++ (BOOL)requiresValidationBeforeUnarchiving
+{
+    return NO;
+}
+
 - (instancetype)initWithArchivePath:(NSString *)archivePath decryptionPassword:(nullable NSString *)decryptionPassword delegate:(nullable id <SUUnarchiverDelegate>)delegate
 {
     self = [super init];

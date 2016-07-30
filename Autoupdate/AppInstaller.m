@@ -68,6 +68,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @property (nonatomic) BOOL receivedInstallationData;
 @property (nonatomic) BOOL finishedValidation;
 @property (nonatomic) BOOL agentInitiatedConnection;
+@property (nonatomic) BOOL validatedArchiveBeforeExtraction;
 
 @property (nonatomic) dispatch_queue_t installerQueue;
 @property (nonatomic) BOOL performedStage1Installation;
@@ -95,6 +96,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize shouldRelaunch = _shouldRelaunch;
 @synthesize shouldShowUI = _shouldShowUI;
 @synthesize installer = _installer;
+@synthesize validatedArchiveBeforeExtraction = _validatedArchiveBeforeExtraction;
 @synthesize willCompleteInstallation = _willCompleteInstallation;
 @synthesize receivedInstallationData = _receivedInstallationData;
 @synthesize installerQueue = _installerQueue;
@@ -183,13 +185,25 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 {
     [self.communicator handleMessageWithIdentifier:SUExtractionStarted data:[NSData data]];
     
-    NSString *downloadPath = [self.updateDirectoryPath stringByAppendingPathComponent:self.downloadName];
-    id <SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.decryptionPassword delegate:self];
+    NSString *archivePath = [self.updateDirectoryPath stringByAppendingPathComponent:self.downloadName];
+    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:archivePath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.decryptionPassword delegate:self];
     if (!unarchiver) {
-        SULog(@"Error: No valid unarchiver for %@!", downloadPath);
+        SULog(@"Error: No valid unarchiver for %@", archivePath);
         [self unarchiverDidFail];
     } else {
-        [unarchiver start];
+        // Delta & package updates will require validation before extraction
+        // Normal application updates are a bit more lenient allowing developers to change one of apple dev ID or DSA keys
+        if ([[unarchiver class] requiresValidationBeforeUnarchiving] || ![self.installationType isEqualToString:SUInstallationTypeApplication]) {
+            if ([SUInstallerValidation validateUpdateForHost:self.host archivePath:archivePath DSASignature:self.dsaSignature]) {
+                self.validatedArchiveBeforeExtraction = YES;
+                [unarchiver start];
+            } else {
+                SULog(@"Error: Archive could not be validated for %@", archivePath);
+                [self unarchiverDidFail];
+            }
+        } else {
+            [unarchiver start];
+        }
     }
 }
 
@@ -205,6 +219,9 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (void)unarchiverDidFail
 {
+    // Clear this in case we try another extraction attempt (eg: if it failed once from a delta update)
+    self.validatedArchiveBeforeExtraction = NO;
+    
     // Client could try update again with different inputs
     // Eg: one common case is if a delta update fails, client may want to fall back to regular update
     // We really only need to set updateDirectoryPath to nil since that's the field we check if we've received installation data,
@@ -223,8 +240,29 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 {
     [self.communicator handleMessageWithIdentifier:SUValidationStarted data:[NSData data]];
     
-    NSString *downloadPath = [self.updateDirectoryPath stringByAppendingPathComponent:self.downloadName];
-    BOOL validationSuccess = [SUInstallerValidation validateUpdateForHost:self.host downloadedToPath:downloadPath extractedToPath:self.updateDirectoryPath DSASignature:self.dsaSignature];
+    NSString *archivePath = [self.updateDirectoryPath stringByAppendingPathComponent:self.downloadName];
+    
+    BOOL isPackage = NO;
+    // The path to the new bundle or package
+    NSString *installSourcePath = [SUInstaller installSourcePathInUpdateFolder:self.updateDirectoryPath forHost:self.host isPackage:&isPackage isGuided:NULL];
+    if (installSourcePath == nil) {
+        SULog(@"No suitable install is found in the update. The update will be rejected.");
+        [self cleanupAndExitWithStatus:EXIT_FAILURE];
+    }
+    
+    BOOL validationSuccess = YES;
+    if (!self.validatedArchiveBeforeExtraction) {
+        if (isPackage) {
+            // If we get here, then the appcast installation type was lying to us.. This error will be caught later when starting the installer.
+            validationSuccess = [SUInstallerValidation validateUpdateForHost:self.host archivePath:archivePath DSASignature:self.dsaSignature];
+        } else {
+            // Validate the bundle code signatures and DSA signatures of archive together
+            validationSuccess = [SUInstallerValidation validateBundleUpdateForHost:self.host newBundlePath:installSourcePath archivePath:archivePath DSASignature:self.dsaSignature];
+        }
+    } else if (!isPackage) {
+        // Just make sure the bundle is valid to check that the developer didn't make a careless mistake
+        validationSuccess = [SUInstallerValidation validateCodeSignatureIfAvailableForBundlePath:installSourcePath];
+    }
     
     if (!validationSuccess) {
         SULog(@"Error: update validation was a failure");
