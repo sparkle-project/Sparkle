@@ -13,6 +13,7 @@
 #import "SUSystemAuthorization.h"
 #import "SUBundleIcon.h"
 #import "SULocalCacheDirectory.h"
+#import "SUInstallationType.h"
 #import <ServiceManagement/ServiceManagement.h>
 
 #ifdef _APPKITDEFINES_H
@@ -289,7 +290,13 @@
         BOOL needsSystemAuthorization = SUNeedsSystemAuthorizationAccess(hostBundlePath, installationType);
         
         if (needsSystemAuthorization && !allowingUpdaterInteraction) {
-            SULog(@"Updater is not allowing interaction with the launcer.");
+            SULog(@"Updater is not allowing interaction to the launcher.");
+            completionHandler(SUInstallerLauncherFailure);
+            return;
+        }
+        
+        if (!allowingUpdaterInteraction && [installationType isEqualToString:SUInstallationTypeInteractivePackage]) {
+            SULog(@"Updater is not allowing interaction to the launcher for performing an interactive type package installation.");
             completionHandler(SUInstallerLauncherFailure);
             return;
         }

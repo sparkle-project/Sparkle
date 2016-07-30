@@ -83,6 +83,16 @@
     }
 }
 
+- (BOOL)canDisplayInstallerUserInterface
+{
+    // Are we allowed to perform updates that may require interaction?
+    BOOL updaterAllowsInteraction = YES;
+    if ([self.updaterDelegate respondsToSelector:@selector(updaterShouldAllowInstallerInteraction:)]) {
+        updaterAllowsInteraction = [self.updaterDelegate updaterShouldAllowInstallerInteraction:self.updater];
+    }
+    return updaterAllowsInteraction;
+}
+
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
 {
     if (self.resumingDownloadedUpdate) {
@@ -124,7 +134,7 @@
         [self.userDriver showResumableUpdateFoundWithAppcastItem:updateItem reply:^(SUInstallUpdateStatus choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
-                [self.coreDriver finishInstallationWithResponse:choice displayingUserInterface:YES];
+                [self.coreDriver finishInstallationWithResponse:choice displayingUserInterface:[self canDisplayInstallerUserInterface]];
             });
         }];
     }
@@ -193,7 +203,7 @@
     if (!willInstallImmediately) {
         [self.userDriver showReadyToInstallAndRelaunch:^(SUInstallUpdateStatus installUpdateStatus) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.coreDriver finishInstallationWithResponse:installUpdateStatus displayingUserInterface:YES];
+                [self.coreDriver finishInstallationWithResponse:installUpdateStatus displayingUserInterface:[self canDisplayInstallerUserInterface]];
             });
         }];
     }
