@@ -146,7 +146,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         self.retrievedDownloadResult = YES;
         
-        if (self.expectedContentLength > 0 && self.expectedContentLength != self.updateItem.contentLength) {
+        if (self.expectedContentLength > 0 && self.updateItem.contentLength > 0 && self.expectedContentLength != self.updateItem.contentLength) {
             SULog(@"Warning: Downloader's expected content length (%lu) != Appcast item's length (%lu)", self.expectedContentLength, self.updateItem.contentLength);
         }
         
@@ -193,10 +193,10 @@
 - (void)downloaderDidReceiveExpectedContentLength:(int64_t)expectedContentLength
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        // We only notify the expected content length once and we use the content length from the appcast instead of from the downloader,
-        // so that we an expected length for the entire download rather than a single piece of block
+        // We only notify the expected content length once and we try to use the content length from the appcast instead of from the downloader,
+        // so that we have an expected length for the entire download rather than a single piece of block
         if (!self.retrievedDownloadResponse) {
-            [self.delegate downloadDriverDidReceiveExpectedContentLength:self.updateItem.contentLength];
+            [self.delegate downloadDriverDidReceiveExpectedContentLength:(self.updateItem.contentLength > 0 ? self.updateItem.contentLength : (NSUInteger)expectedContentLength)];
             self.retrievedDownloadResponse = YES;
         }
         

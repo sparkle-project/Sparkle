@@ -66,9 +66,6 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         _infoURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemInfoURLKey];
         
         _contentLength = (NSUInteger)[decoder decodeIntegerForKey:SUAppcastItemContentLengthKey];
-        if (_contentLength == 0) {
-            return nil;
-        }
         
         _installationType = [decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemInstallationTypeKey];
         if (!SUValidInstallationType(_installationType)) {
@@ -238,18 +235,10 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
             NSInteger contentLength = 0;
             if (enclosureLengthString != nil) {
                 contentLength = [enclosureLengthString integerValue];
-            }
-            if (contentLength > 0) {
-                _contentLength = (NSUInteger)contentLength;
             } else {
-                // content length is important enough to require
-                // developers copying the sample appcast should be using it already,
-                // and we can get away with assuming the content length provided is valid
-                if (error != NULL) {
-                    *error = @"Feed item's enclosure lacks length";
-                }
-                return nil;
+                SULog(@"warning: <%@> for URL '%@' is missing %@ attribute. Downloading progress may be unreliable. Please always specify %@", SURSSElementEnclosure, [enclosure objectForKey:SURSSAttributeURL], SURSSAttributeLength, SURSSAttributeLength);
             }
+            _contentLength = (contentLength > 0) ? (NSUInteger)contentLength : 0;
         }
 
         if (enclosureURLString) {
