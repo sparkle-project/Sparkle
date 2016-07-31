@@ -65,7 +65,7 @@ If validation fails, the installer aborts, causing the updater to abort the upda
 
 If the installer hasn't made a connection to the agent yet within the time threshold, the installer waits until a connection is made. Otherwise, the installer asks the agent for the process identifier of the application bundle that it wants to wait for termination. If the installer doesn't get a response within a certain threshold, the installer aborts.
 
-When the installer gets the process identifier, it begins the installation.
+When the installer gets the process identifier, it begins the installation. At this point on, the installer will try to perform the installation even if the connection to the updater or the connection to the agent invalidates.
 
 ### Starting the Installation
 
