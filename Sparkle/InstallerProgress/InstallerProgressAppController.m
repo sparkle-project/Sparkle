@@ -77,6 +77,9 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             [self cleanupAndExitWithStatus:EXIT_FAILURE];
         }
         
+        // Note that we are connecting to the installer rather than the installer connecting to us
+        // This difference is significant. We shouldn't have a model where the 'server' tries to connect to a 'client',
+        // nor have a model where a process that runs at the highest level (the installer can run as root) tries to connect to a user level agent or process
         BOOL systemDomain = arguments[2].boolValue;
         NSXPCConnectionOptions connectionOptions = systemDomain ? NSXPCConnectionPrivileged : 0;
         _connection = [[NSXPCConnection alloc] initWithMachServiceName:SUProgressAgentServiceNameForBundleIdentifier(hostBundleIdentifier) options:connectionOptions];
