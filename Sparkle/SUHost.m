@@ -28,6 +28,7 @@
 @property (strong, readwrite) NSBundle *bundle;
 @property (copy) NSString *defaultsDomain;
 @property (assign) BOOL usesStandardUserDefaults;
+@property (nonatomic) NSDictionary *infoDictionary;
 
 @end
 
@@ -36,6 +37,7 @@
 @synthesize bundle;
 @synthesize defaultsDomain;
 @synthesize usesStandardUserDefaults;
+@synthesize infoDictionary = _infoDictionary;
 
 - (instancetype)initWithBundle:(NSBundle *)aBundle
 {
@@ -46,8 +48,10 @@
         if (![self.bundle bundleIdentifier]) {
             SULog(@"Error: the bundle being updated at %@ has no %@! This will cause preference read/write to not work properly.", self.bundle, kCFBundleIdentifierKey);
         }
+        
+        _infoDictionary = aBundle.infoDictionary;
 
-        self.defaultsDomain = [self.bundle objectForInfoDictionaryKey:SUDefaultsDomainKey];
+        self.defaultsDomain = [self objectForInfoDictionaryKey:SUDefaultsDomainKey];
         if (!self.defaultsDomain) {
             self.defaultsDomain = [self.bundle bundleIdentifier];
         }
@@ -59,6 +63,13 @@
     return self;
 }
 
+// NSBundles always cache the info dictionary, even if you create a new NSBundle instance, but we sometimes want to reload it
+// in case the bundle changes or is updated
+- (void)reloadInfoDictionary
+{
+    CFDictionaryRef infoDictionary = CFBundleCopyInfoDictionaryInDirectory((CFURLRef)self.bundle.bundleURL);
+    self.infoDictionary = CFBridgingRelease(infoDictionary);
+}
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self bundlePath]]; }
 
@@ -75,7 +86,7 @@
     name = [self objectForInfoDictionaryKey:@"SUBundleName"];
     if (name && name.length > 0) return name;
 
-    name = [self.bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+    name = [self objectForInfoDictionaryKey:@"CFBundleDisplayName"];
 	if (name && name.length > 0) return name;
 
     name = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey];
@@ -96,7 +107,7 @@
 
 - (NSString *)_version
 {
-    NSString *version = [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
+    NSString *version = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     return ([self isValidVersion:version] ? version : nil);
 }
 
@@ -112,7 +123,7 @@
 
 - (NSString * _Nonnull)displayVersion
 {
-    NSString *shortVersionString = [self.bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    NSString *shortVersionString = [self objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     if (shortVersionString)
         return shortVersionString;
     else
@@ -129,7 +140,7 @@
 - (NSString *_Nullable)publicDSAKey
 {
     // Maybe the key is just a string in the Info.plist.
-    NSString *key = [self.bundle objectForInfoDictionaryKey:SUPublicDSAKeyKey];
+    NSString *key = [self objectForInfoDictionaryKey:SUPublicDSAKeyKey];
 	if (key) {
         return key;
     }
@@ -149,7 +160,7 @@
 
 - (id)objectForInfoDictionaryKey:(NSString *)key
 {
-    return [self.bundle objectForInfoDictionaryKey:key];
+    return [self.infoDictionary objectForKey:key];
 }
 
 - (BOOL)boolForInfoDictionaryKey:(NSString *)key
