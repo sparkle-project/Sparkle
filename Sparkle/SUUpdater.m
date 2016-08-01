@@ -370,7 +370,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     // We don't want the probe check to act on the driver if the updater is going near death
     __weak SUUpdater *weakSelf = self;
     
-    [SUProbeInstallStatus probeInstallerInProgressForHost:self.host completion:^(BOOL installerIsRunning) {
+    NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
+    assert(hostBundleIdentifier != nil);
+    [SUProbeInstallStatus probeInstallerInProgressForHostBundleIdentifier:hostBundleIdentifier completion:^(BOOL installerIsRunning) {
         dispatch_async(dispatch_get_main_queue(), ^{
             SUUpdater *strongSelf = weakSelf;
             if (strongSelf == nil) {
@@ -416,7 +418,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     id <SUUpdateDriver> theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithHost:self.host sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
     
-    [SUProbeInstallStatus probeInstallerInProgressForHost:self.host completion:^(BOOL installerInProgress) {
+    NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
+    assert(bundleIdentifier != nil);
+    [SUProbeInstallStatus probeInstallerInProgressForHostBundleIdentifier:bundleIdentifier completion:^(BOOL installerInProgress) {
         dispatch_async(dispatch_get_main_queue(), ^{
             SUUpdater *strongSelf = weakSelf;
             if (strongSelf != nil) {
@@ -436,7 +440,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         return;
     }
     
-    [SUProbeInstallStatus probeInstallerInProgressForHost:self.host completion:^(BOOL installerInProgress) {
+    NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
+    assert(bundleIdentifier != nil);
+    [SUProbeInstallStatus probeInstallerInProgressForHostBundleIdentifier:bundleIdentifier completion:^(BOOL installerInProgress) {
         dispatch_async(dispatch_get_main_queue(), ^{
             SUUpdater *strongSelf = weakSelf;
             if (strongSelf != nil) {
@@ -700,7 +706,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 // as well as if that update is marked critical or not
 - (void)retrieveNextUpdateCheckInterval:(void (^)(NSTimeInterval))completionHandler
 {
-    [SUProbeInstallStatus probeInstallerUpdateItemForHost:self.host completion:^(SUInstallationInfo * _Nullable installationInfo) {
+    NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
+    assert(hostBundleIdentifier != nil);
+    [SUProbeInstallStatus probeInstallerUpdateItemForHostBundleIdentifier:hostBundleIdentifier completion:^(SUInstallationInfo * _Nullable installationInfo) {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSTimeInterval regularCheckInterval = [self updateCheckInterval];
             if (installationInfo == nil) {

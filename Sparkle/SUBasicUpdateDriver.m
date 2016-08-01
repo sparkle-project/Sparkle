@@ -85,7 +85,9 @@
 {
     self.completionBlock = completionBlock;
     
-    [SUProbeInstallStatus probeInstallerUpdateItemForHost:self.host completion:^(SUInstallationInfo * _Nullable installationInfo) {
+    NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
+    assert(hostBundleIdentifier != nil);
+    [SUProbeInstallStatus probeInstallerUpdateItemForHostBundleIdentifier:hostBundleIdentifier completion:^(SUInstallationInfo * _Nullable installationInfo) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self notifyResumableUpdateItem:installationInfo.appcastItem];
         });

@@ -8,7 +8,6 @@
 
 #import "SUProbeInstallStatus.h"
 #import "SUXPCServiceInfo.h"
-#import "SUHost.h"
 #import "SUMessageTypes.h"
 #import "SUInstallationInfo.h"
 #import "SUSecureCoding.h"
@@ -22,11 +21,8 @@
 
 @implementation SUProbeInstallStatus
 
-+ (void)probeInstallerInProgressForHost:(SUHost *)host completion:(void (^)(BOOL))completionHandler
++ (void)probeInstallerInProgressForHostBundleIdentifier:(NSString *)hostBundleIdentifier completion:(void (^)(BOOL))completionHandler
 {
-    NSString *hostBundleIdentifier = host.bundle.bundleIdentifier;
-    assert(hostBundleIdentifier != nil);
-    
     id<SUInstallerStatusProtocol> installerStatus = nil;
     if (!SUXPCServiceExists(@INSTALLER_STATUS_BUNDLE_ID)) {
         installerStatus = [[SUInstallerStatus alloc] init];
@@ -68,11 +64,8 @@
     });
 }
 
-+ (void)probeInstallerUpdateItemForHost:(SUHost *)host completion:(void (^)(SUInstallationInfo  * _Nullable))completionHandler
++ (void)probeInstallerUpdateItemForHostBundleIdentifier:(NSString *)hostBundleIdentifier completion:(void (^)(SUInstallationInfo  * _Nullable))completionHandler
 {
-    NSString *hostBundleIdentifier = host.bundle.bundleIdentifier;
-    assert(hostBundleIdentifier != nil);
-    
     id<SUInstallerStatusProtocol> installerStatus = nil;
     if (!SUXPCServiceExists(@INSTALLER_STATUS_BUNDLE_ID)) {
         installerStatus = [[SUInstallerStatus alloc] init];
