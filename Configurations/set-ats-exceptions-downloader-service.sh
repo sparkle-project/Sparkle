@@ -7,6 +7,6 @@ case "${SPARKLE_ALLOW_ARBITRARY_HTTP_LOADS}" in
 /usr/libexec/PlistBuddy -c "Set :NSAppTransportSecurity:NSAllowsArbitraryLoads YES" "${INFOPLIST}"
 ;;
 "NO"|"0")
-/usr/libexec/PlistBuddy -c "Delete :NSAppTransportSecurity" "${INFOPLIST}"
+/usr/libexec/PlistBuddy -c "Set :NSAppTransportSecurity:NSAllowsArbitraryLoads NO" "${INFOPLIST}"
 ;;
 esac
