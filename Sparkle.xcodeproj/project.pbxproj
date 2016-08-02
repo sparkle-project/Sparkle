@@ -816,7 +816,6 @@
 		7229E1BC1C98EFF200CB50D0 /* SUDownloadDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUDownloadDriver.m; sourceTree = "<group>"; };
 		723B5D9F1CF7AB0100365F95 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = PersistentDownloader/Info.plist; sourceTree = SOURCE_ROOT; };
 		723B5DA01CF7AB0100365F95 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = PersistentDownloader/main.m; sourceTree = SOURCE_ROOT; };
-		723B5DA11CF7AB0100365F95 /* SparklePersistentDownloader.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = SparklePersistentDownloader.entitlements; path = PersistentDownloader/SparklePersistentDownloader.entitlements; sourceTree = SOURCE_ROOT; };
 		723B5DA21CF7AB0100365F95 /* SUPersistentDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUPersistentDownloader.h; path = PersistentDownloader/SUPersistentDownloader.h; sourceTree = SOURCE_ROOT; };
 		723B5DA31CF7AB0100365F95 /* SUPersistentDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUPersistentDownloader.m; path = PersistentDownloader/SUPersistentDownloader.m; sourceTree = SOURCE_ROOT; };
 		723B5DA41CF7AB0100365F95 /* SUPersistentDownloaderDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUPersistentDownloaderDelegate.h; path = PersistentDownloader/SUPersistentDownloaderDelegate.h; sourceTree = SOURCE_ROOT; };
@@ -825,7 +824,6 @@
 		7246E0A21C83B685003B4E75 /* SUStandardUpdaterController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUStandardUpdaterController.m; sourceTree = "<group>"; };
 		724A0A341CF7AEEA00D8C3D5 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = TemporaryDownloader/Info.plist; sourceTree = SOURCE_ROOT; };
 		724A0A351CF7AEEA00D8C3D5 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = TemporaryDownloader/main.m; sourceTree = SOURCE_ROOT; };
-		724A0A361CF7AEEA00D8C3D5 /* SparkleTemporaryDownloader.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = SparkleTemporaryDownloader.entitlements; path = TemporaryDownloader/SparkleTemporaryDownloader.entitlements; sourceTree = SOURCE_ROOT; };
 		724A0A371CF7AEEA00D8C3D5 /* SUTemporaryDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUTemporaryDownloader.h; path = TemporaryDownloader/SUTemporaryDownloader.h; sourceTree = SOURCE_ROOT; };
 		724A0A381CF7AEEA00D8C3D5 /* SUTemporaryDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUTemporaryDownloader.m; path = TemporaryDownloader/SUTemporaryDownloader.m; sourceTree = SOURCE_ROOT; };
 		724A0A391CF7AEEA00D8C3D5 /* SUTemporaryDownloaderProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUTemporaryDownloaderProtocol.h; path = TemporaryDownloader/SUTemporaryDownloaderProtocol.h; sourceTree = SOURCE_ROOT; };
@@ -959,6 +957,8 @@
 		7293A1AD1CEE933800B957A7 /* SUURLRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUURLRequest.m; sourceTree = "<group>"; };
 		729BB3CD1D503253007C4276 /* set-ats-exceptions-test-app.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "set-ats-exceptions-test-app.sh"; sourceTree = "<group>"; };
 		729BB3CE1D50344A007C4276 /* set-ats-exceptions-downloader-service.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "set-ats-exceptions-downloader-service.sh"; sourceTree = "<group>"; };
+		729BB3D11D503826007C4276 /* org.sparkle-project.PersistentDownloader.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "org.sparkle-project.PersistentDownloader.entitlements"; path = "PersistentDownloader/org.sparkle-project.PersistentDownloader.entitlements"; sourceTree = SOURCE_ROOT; };
+		729BB3D21D503834007C4276 /* org.sparkle-project.TemporaryDownloader.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "org.sparkle-project.TemporaryDownloader.entitlements"; path = "TemporaryDownloader/org.sparkle-project.TemporaryDownloader.entitlements"; sourceTree = SOURCE_ROOT; };
 		729F10FD1C65A9B500DFCCC5 /* ConfigUITest.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITest.xcconfig; sourceTree = "<group>"; };
 		729F10FE1C65A9B500DFCCC5 /* ConfigUITestCoverage.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestCoverage.xcconfig; sourceTree = "<group>"; };
 		72A450511C69A68900D67EEA /* SUUpdatePermission.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdatePermission.h; sourceTree = "<group>"; };
@@ -1014,7 +1014,6 @@
 		72E45CFD1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test_app_only_dsa_priv_dont_ever_do_this_for_real.pem; sourceTree = "<group>"; };
 		72E45DDC1B65C3BD005C701A /* sign_update */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = sign_update; path = bin/sign_update; sourceTree = SOURCE_ROOT; };
 		72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ShowInstallerProgress.m; path = Sparkle/InstallerProgress/ShowInstallerProgress.m; sourceTree = SOURCE_ROOT; };
-		72F94EB01CC2A865002DEE68 /* ConfigCommonReleaseHTTP.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigCommonReleaseHTTP.xcconfig; sourceTree = "<group>"; };
 		72F94ED51CC3441A002DEE68 /* ConfigInstallerLauncherDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigInstallerLauncherDebug.xcconfig; sourceTree = "<group>"; };
 		72F94ED61CC344A7002DEE68 /* ConfigPersistentDownloaderDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigPersistentDownloaderDebug.xcconfig; sourceTree = "<group>"; };
 		72F94ED71CC344E4002DEE68 /* ConfigTemporaryDownloaderDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigTemporaryDownloaderDebug.xcconfig; sourceTree = "<group>"; };
@@ -1688,8 +1687,8 @@
 			isa = PBXGroup;
 			children = (
 				723B5D9F1CF7AB0100365F95 /* Info.plist */,
+				729BB3D11D503826007C4276 /* org.sparkle-project.PersistentDownloader.entitlements */,
 				723B5DA01CF7AB0100365F95 /* main.m */,
-				723B5DA11CF7AB0100365F95 /* SparklePersistentDownloader.entitlements */,
 				723B5DA21CF7AB0100365F95 /* SUPersistentDownloader.h */,
 				723B5DA31CF7AB0100365F95 /* SUPersistentDownloader.m */,
 				723B5DA41CF7AB0100365F95 /* SUPersistentDownloaderDelegate.h */,
@@ -1716,8 +1715,8 @@
 			isa = PBXGroup;
 			children = (
 				724A0A341CF7AEEA00D8C3D5 /* Info.plist */,
+				729BB3D21D503834007C4276 /* org.sparkle-project.TemporaryDownloader.entitlements */,
 				724A0A351CF7AEEA00D8C3D5 /* main.m */,
-				724A0A361CF7AEEA00D8C3D5 /* SparkleTemporaryDownloader.entitlements */,
 				724A0A371CF7AEEA00D8C3D5 /* SUTemporaryDownloader.h */,
 				724A0A381CF7AEEA00D8C3D5 /* SUTemporaryDownloader.m */,
 				724A0A391CF7AEEA00D8C3D5 /* SUTemporaryDownloaderProtocol.h */,
@@ -1794,7 +1793,6 @@
 				149B78631B7D3A0C00D7D62C /* ConfigCommonCoverage.xcconfig */,
 				FA1941CF0D94A70100DD942E /* ConfigCommonDebug.xcconfig */,
 				FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */,
-				72F94EB01CC2A865002DEE68 /* ConfigCommonReleaseHTTP.xcconfig */,
 				FA1941D10D94A70100DD942E /* ConfigFramework.xcconfig */,
 				FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */,
 				FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */,
@@ -3322,13 +3320,6 @@
 			};
 			name = Release;
 		};
-		724BB37C1D31D0B7005D534A /* Release-HTTP */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 724BB37E1D31D1EA005D534A /* ConfigInstallerConnection.xcconfig */;
-			buildSettings = {
-			};
-			name = "Release-HTTP";
-		};
 		724BB3A01D333832005D534A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 724BB3A51D3338C8005D534A /* ConfigInstallerStatusDebug.xcconfig */;
@@ -3349,13 +3340,6 @@
 			buildSettings = {
 			};
 			name = Release;
-		};
-		724BB3A31D333832005D534A /* Release-HTTP */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 724BB3A41D3338C8005D534A /* ConfigInstallerStatus.xcconfig */;
-			buildSettings = {
-			};
-			name = "Release-HTTP";
 		};
 		726B2B641C645FC900388755 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -3494,13 +3478,6 @@
 			};
 			name = Release;
 		};
-		72B398DA1D3D879400EE297F /* Release-HTTP */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */;
-			buildSettings = {
-			};
-			name = "Release-HTTP";
-		};
 		72D954AC1CBB415C006F28BD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 72D954B01CBB41E2006F28BD /* ConfigSparkleTool.xcconfig */;
@@ -3525,112 +3502,6 @@
 			};
 			name = Release;
 		};
-		72F94E9F1CC2A23A002DEE68 /* Release-HTTP */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 72F94EB01CC2A865002DEE68 /* ConfigCommonReleaseHTTP.xcconfig */;
-			buildSettings = {
-			};
-			name = "Release-HTTP";
-		};
-		72F94EA01CC2A23A002DEE68 /* Release-HTTP */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941D10D94A70100DD942E /* ConfigFramework.xcconfig */;
-			buildSettings = {
-			};
-			name = "Release-HTTP";
-		};
-		72F94EA11CC2A23A002DEE68 /* Release-HTTP */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */;
-			buildSettings = {
-				INFOPLIST_FILE = InstallerLauncher/Info.plist;
-			};
-			name = "Release-HTTP";
-		};
-		72F94EA21CC2A23A002DEE68 /* Release-HTTP */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 728638EE1CAF589C00783084 /* ConfigPersistentDownloader.xcconfig */;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-			};
-			name = "Release-HTTP";
-		};
-		72F94EA31CC2A23A002DEE68 /* Release-HTTP */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 728639041CAF614000783084 /* ConfigTemporaryDownloader.xcconfig */;
-			buildSettings = {
-			};
-			name = "Release-HTTP";
-		};
-		72F94EA51CC2A23A002DEE68 /* Release-HTTP */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA1941CD0D94A70100DD942E /* ConfigTestApp.xcconfig */;
-			buildSettings = {
-			};
-			name = "Release-HTTP";
-		};
-		72F94EA61CC2A23A002DEE68 /* Release-HTTP */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 726E4A281C86CAB500C57C6A /* ConfigTestAppHelper.xcconfig */;
-			buildSettings = {
-			};
-			name = "Release-HTTP";
-		};
-		72F94EA71CC2A23A002DEE68 /* Release-HTTP */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA3AAF3B1050B273004B3130 /* ConfigUnitTest.xcconfig */;
-			buildSettings = {
-			};
-			name = "Release-HTTP";
-		};
-		72F94EA81CC2A23A002DEE68 /* Release-HTTP */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5D06E8F10FD68D21005AE3F6 /* ConfigBinaryDelta.xcconfig */;
-			buildSettings = {
-			};
-			name = "Release-HTTP";
-		};
-		72F94EA91CC2A23A002DEE68 /* Release-HTTP */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 72D954B01CBB41E2006F28BD /* ConfigSparkleTool.xcconfig */;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-			};
-			name = "Release-HTTP";
-		};
-		72F94EAB1CC2A23A002DEE68 /* Release-HTTP */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 721C24571CB754E8005440CB /* ConfigInstallerProgress.xcconfig */;
-			buildSettings = {
-			};
-			name = "Release-HTTP";
-		};
-		72F94EAC1CC2A23A002DEE68 /* Release-HTTP */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-			};
-			name = "Release-HTTP";
-		};
-		72F94EAD1CC2A23A002DEE68 /* Release-HTTP */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-			};
-			name = "Release-HTTP";
-		};
-		72F94EAE1CC2A23A002DEE68 /* Release-HTTP */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-			};
-			name = "Release-HTTP";
-		};
-		72F94EAF1CC2A23A002DEE68 /* Release-HTTP */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 729F10FD1C65A9B500DFCCC5 /* ConfigUITest.xcconfig */;
-			buildSettings = {
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-			};
-			name = "Release-HTTP";
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -3640,7 +3511,6 @@
 				1420DF4B1962329200203BB0 /* Debug */,
 				149B78611B7D398100D7D62C /* Coverage */,
 				1420DF4C1962329200203BB0 /* Release */,
-				72F94EAD1CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3651,7 +3521,6 @@
 				14732BC71960F69300593899 /* Debug */,
 				149B78601B7D398100D7D62C /* Coverage */,
 				14732BC81960F69300593899 /* Release */,
-				72F94EAC1CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3662,7 +3531,6 @@
 				14950061195FB89500BC5B5B /* Debug */,
 				149B78621B7D398100D7D62C /* Coverage */,
 				14950062195FB89500BC5B5B /* Release */,
-				72F94EAE1CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3673,7 +3541,6 @@
 				1DEB91AE08733DA50010E9CD /* Debug */,
 				149B785B1B7D398100D7D62C /* Coverage */,
 				1DEB91AF08733DA50010E9CD /* Release */,
-				72F94EA01CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3684,7 +3551,6 @@
 				1DEB91B208733DA50010E9CD /* Debug */,
 				149B785A1B7D398100D7D62C /* Coverage */,
 				1DEB91B308733DA50010E9CD /* Release */,
-				72F94E9F1CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3695,7 +3561,6 @@
 				5D06E8D20FD68C7D005AE3F6 /* Debug */,
 				149B785E1B7D398100D7D62C /* Coverage */,
 				5D06E8D30FD68C7D005AE3F6 /* Release */,
-				72F94EA81CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3706,7 +3571,6 @@
 				612279DB0DB5470300AB99EA /* Debug */,
 				149B785D1B7D398100D7D62C /* Coverage */,
 				612279DC0DB5470300AB99EA /* Release */,
-				72F94EA71CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3717,7 +3581,6 @@
 				61B5F90609C4CEE300B25A18 /* Debug */,
 				149B785C1B7D398100D7D62C /* Coverage */,
 				61B5F90709C4CEE300B25A18 /* Release */,
-				72F94EA51CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3728,7 +3591,6 @@
 				721C24531CB753E7005440CB /* Debug */,
 				721C24541CB753E7005440CB /* Coverage */,
 				721C24551CB753E7005440CB /* Release */,
-				72F94EAB1CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3739,7 +3601,6 @@
 				724BB3791D31D0B7005D534A /* Debug */,
 				724BB37A1D31D0B7005D534A /* Coverage */,
 				724BB37B1D31D0B7005D534A /* Release */,
-				724BB37C1D31D0B7005D534A /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3750,7 +3611,6 @@
 				724BB3A01D333832005D534A /* Debug */,
 				724BB3A11D333832005D534A /* Coverage */,
 				724BB3A21D333832005D534A /* Release */,
-				724BB3A31D333832005D534A /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3761,7 +3621,6 @@
 				726B2B641C645FC900388755 /* Debug */,
 				726B2B651C645FC900388755 /* Coverage */,
 				726B2B661C645FC900388755 /* Release */,
-				72F94EAF1CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3772,7 +3631,6 @@
 				726E07BA1CAF08D6001A286B /* Debug */,
 				726E07BB1CAF08D6001A286B /* Coverage */,
 				726E07BC1CAF08D6001A286B /* Release */,
-				72F94EA11CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3783,7 +3641,6 @@
 				726E07FC1CAF37BD001A286B /* Debug */,
 				726E07FD1CAF37BD001A286B /* Coverage */,
 				726E07FE1CAF37BD001A286B /* Release */,
-				72F94EA21CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3794,7 +3651,6 @@
 				726E4A231C86C88F00C57C6A /* Debug */,
 				726E4A241C86C88F00C57C6A /* Coverage */,
 				726E4A251C86C88F00C57C6A /* Release */,
-				72F94EA61CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3805,7 +3661,6 @@
 				728639001CAF5A5F00783084 /* Debug */,
 				728639011CAF5A5F00783084 /* Coverage */,
 				728639021CAF5A5F00783084 /* Release */,
-				72F94EA31CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3816,7 +3671,6 @@
 				72B398D71D3D879400EE297F /* Debug */,
 				72B398D81D3D879400EE297F /* Coverage */,
 				72B398D91D3D879400EE297F /* Release */,
-				72B398DA1D3D879400EE297F /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3827,7 +3681,6 @@
 				72D954AC1CBB415C006F28BD /* Debug */,
 				72D954AD1CBB415C006F28BD /* Coverage */,
 				72D954AE1CBB415C006F28BD /* Release */,
-				72F94EA91CC2A23A002DEE68 /* Release-HTTP */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
