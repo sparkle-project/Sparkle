@@ -105,15 +105,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     BOOL wroteInfoFile = [infoDictionary writeToURL:infoURL atomically:NO];
     assert(wroteInfoFile);
     
-    // This is unfortunately necessary for testing sandboxing
-    NSXPCConnection *codeSignConnection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.TestAppHelper"];
-    codeSignConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(TestAppHelperProtocol)];
-    [codeSignConnection resume];
-    
-    [codeSignConnection.remoteObjectProxy codeSignApplicationAtPath:destinationBundleURL.path reply:^(BOOL success) {
-        assert(success);
-        [codeSignConnection invalidate];
-        
+    [self signApplicationIfRequiredAtPath:destinationBundleURL.path completion:^{
         dispatch_async(dispatch_get_main_queue(), ^{
             // Change current working directory so web server knows where to list files
             NSString *serverDirectoryPath = serverDirectoryURL.path;
@@ -218,6 +210,26 @@ static NSString * const UPDATED_VERSION = @"2.0";
             [self.updateSettingsWindowController showWindow:nil];
         });
     }];
+}
+
+- (void)signApplicationIfRequiredAtPath:(NSString *)applicationPath completion:(void (^)(void))completionBlock
+{
+#ifdef DEBUG
+    // This is unfortunately necessary for testing sandboxing
+    NSXPCConnection *codeSignConnection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.TestAppHelper"];
+    codeSignConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(TestAppHelperProtocol)];
+    [codeSignConnection resume];
+    
+    [codeSignConnection.remoteObjectProxy codeSignApplicationAtPath:applicationPath reply:^(BOOL success) {
+        assert(success);
+        [codeSignConnection invalidate];
+        
+        completionBlock();
+    }];
+#else
+    (void)(applicationPath); // ignore unused warning
+    completionBlock();
+#endif
 }
 
 - (void)applicationWillTerminate:(NSNotification * __unused)notification
