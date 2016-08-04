@@ -20,6 +20,16 @@
     return [[SUStandardVersionComparator alloc] init];
 }
 
++ (SUStandardVersionComparator *)defaultComparator
+{
+    static SUStandardVersionComparator *defaultComparator = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        defaultComparator = [[SUStandardVersionComparator alloc] init];
+    });
+    return defaultComparator;
+}
+
 typedef NS_ENUM(NSInteger, SUCharacterType) {
     kNumberType,
     kStringType,
