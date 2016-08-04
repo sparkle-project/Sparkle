@@ -7,7 +7,7 @@
 //
 
 #import "SUStandardUpdaterController.h"
-#import "SUUpdater.h"
+#import "SPUUpdater.h"
 #import "SUHost.h"
 #import "SUStandardUserDriver.h"
 #import "SUConstants.h"
@@ -18,7 +18,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 @interface SUStandardUpdaterController ()
 
-@property (nonatomic) SUUpdater *updater;
+@property (nonatomic) SPUUpdater *updater;
 @property (nonatomic) id <SUStandardUserDriver> userDriver;
 @property (nonatomic) BOOL initializedUpdater;
 
@@ -42,7 +42,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         
         NSBundle *hostBundle = [NSBundle mainBundle];
         id <SUUserDriver, SUStandardUserDriver> userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:self.userDriverDelegate];
-        self.updater = [[SUUpdater alloc] initWithHostBundle:hostBundle userDriver:userDriver delegate:self.updaterDelegate];
+        self.updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle userDriver:userDriver delegate:self.updaterDelegate];
         self.userDriver = userDriver;
         
         // In the case this is being called right as an application is being launched,

@@ -7,743 +7,244 @@
 //
 
 #import "SUUpdater.h"
-#import "SUUpdaterDelegate.h"
-#import "SUUpdaterSettings.h"
-#import "SUHost.h"
-#import "SUUpdatePermission.h"
-#import "SUUpdateDriver.h"
-#import "SUConstants.h"
+#import "SPUUpdater.h"
+#import "SUStandardUserDriver.h"
+#import "SUStandardUserDriverDelegate.h"
 #import "SULog.h"
-#import "SUCodeSigningVerifier.h"
-#import "SUSystemProfiler.h"
-#import "SUScheduledUpdateDriver.h"
-#import "SUProbingUpdateDriver.h"
-#import "SUUserInitiatedUpdateDriver.h"
-#import "SUAutomaticUpdateDriver.h"
-#import "SUProbeInstallStatus.h"
-#import "SUAppcastItem.h"
-#import "SUInstallationInfo.h"
-#import "SUErrors.h"
-#import "SUXPCServiceInfo.h"
-#import "SUUpdaterCycle.h"
-#import "SUDownloadedUpdate.h"
 
-#ifdef _APPKITDEFINES_H
-#error This is a "core" class and should NOT import AppKit
-#endif
+@interface SUUpdater () <SUStandardUserDriverDelegate>
 
-NSString *const SUUpdaterDidFinishLoadingAppCastNotification = @"SUUpdaterDidFinishLoadingAppCastNotification";
-NSString *const SUUpdaterDidFindValidUpdateNotification = @"SUUpdaterDidFindValidUpdateNotification";
-NSString *const SUUpdaterDidNotFindUpdateNotification = @"SUUpdaterDidNotFindUpdateNotification";
-NSString *const SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotificationName";
-NSString *const SUUpdaterAppcastItemNotificationKey = @"SUUpdaterAppcastItemNotificationKey";
-NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotificationKey";
-
-@interface SUUpdater () <SUUpdaterCycleDelegate>
-
-@property (readonly, copy) NSURL *parameterizedFeedURL;
-
-@property (nonatomic) id <SUUpdateDriver> driver;
-@property (nonatomic, readonly) SUHost *host;
-@property (nonatomic, readonly) SUUpdaterSettings *updaterSettings;
-@property (nonatomic, readonly) SUUpdaterCycle *updaterCycle;
-@property (nonatomic) BOOL startedUpdater;
-@property (nonatomic, copy) void (^preStartedScheduledUpdateBlock)(void);
-@property (nonatomic, nullable) SUDownloadedUpdate *resumableUpdate;
+@property (nonatomic, readonly) SPUUpdater *updater;
+@property (nonatomic, readonly) SUStandardUserDriver *userDriver;
 
 @end
 
+@interface SPUUpdater (Private)
+
+- (void)setDelegate:(id<SUUpdaterDelegate>)delegate;
+- (void)setUpdaterDelegator:(id)delegator;
+
+@end
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
 @implementation SUUpdater
+#pragma clang diagnostic pop
 
-@synthesize delegate = _delegate;
+@synthesize updater = _updater;
 @synthesize userDriver = _userDriver;
-@synthesize userAgentString = customUserAgentString;
-@synthesize httpHeaders;
-@synthesize driver;
-@synthesize host = _host;
-@synthesize updaterSettings = _updaterSettings;
-@synthesize updaterCycle = _updaterCycle;
-@synthesize sparkleBundle = _sparkleBundle;
-@synthesize startedUpdater = _startedUpdater;
-@synthesize preStartedScheduledUpdateBlock = _preStartedScheduledUpdateBlock;
-@synthesize resumableUpdate = _resumableUpdate;
+@synthesize decryptionPassword = _decryptionPassword;
 
-#ifdef DEBUG
-+ (void)load
+static NSMutableDictionary *sharedUpdaters = nil;
+
++ (SUUpdater *)sharedUpdater
 {
-    // We're using NSLog instead of SULog here because we don't want to start Sparkle's logger here,
-    // and because this is not really an error, just a warning notice
-    NSLog(@"WARNING: This is running a Debug build of Sparkle; don't use this in production!");
+    return [self updaterForBundle:[NSBundle mainBundle]];
 }
-#endif
 
-- (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)theDelegate
+// SUUpdater has a singleton for each bundle. We use the fact that NSBundle instances are also singletons, so we can use them as keys. If you don't trust that you can also use the identifier as key
++ (SUUpdater *)updaterForBundle:(NSBundle *)bundle
+{
+    if (bundle == nil) bundle = [NSBundle mainBundle];
+    id updater = [sharedUpdaters objectForKey:[NSValue valueWithNonretainedObject:bundle]];
+    if (updater == nil) {
+        updater = [[[self class] alloc] initForBundle:bundle];
+    }
+    return updater;
+}
+
+// This is the designated initializer for SUUpdater, important for subclasses
+- (instancetype)initForBundle:(NSBundle *)bundle
 {
     self = [super init];
+    if (bundle == nil) bundle = [NSBundle mainBundle];
     
-    if (self != nil) {
-        // Use explicit class to use the correct bundle even when subclassed
-        _sparkleBundle = [NSBundle bundleForClass:[SUUpdater class]];
-        
-        _host = [[SUHost alloc] initWithBundle:bundle];
-        
-        _updaterSettings = [[SUUpdaterSettings alloc] initWithHostBundle:bundle];
-        _updaterCycle = [[SUUpdaterCycle alloc] initWithDelegate:self];
-        
-        _userDriver = userDriver;
-        
-        _delegate = theDelegate;
+    id updater = [sharedUpdaters objectForKey:[NSValue valueWithNonretainedObject:bundle]];
+    if (updater)
+    {
+        self = updater;
     }
-    
+    else if (self)
+    {
+        if (sharedUpdaters == nil) {
+            sharedUpdaters = [[NSMutableDictionary alloc] init];
+        }
+        [sharedUpdaters setObject:self forKey:[NSValue valueWithNonretainedObject:bundle]];
+        
+        _userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:bundle delegate:self];
+        _updater = [[SPUUpdater alloc] initWithHostBundle:bundle userDriver:_userDriver delegate:nil];
+        [_updater setUpdaterDelegator:self];
+        
+        NSError *updaterError = nil;
+        if (![_updater startUpdater:&updaterError]) {
+            SULog(@"Error: Falied to start updater with error: %@", updaterError);
+            abort();
+        }
+    }
     return self;
 }
 
-// To prevent subclasses from doing something bad based on older Sparkle code
-- (instancetype)initForBundle:(NSBundle *)__unused bundle
-{
-    SULog(@"-[SUUpdater initForBundle:] is not implemented anymore.");
-    abort();
-    return nil;
-}
-
-// To prevent trying to stick an SUUpdater in a nib or initializing it in an incorrect way
+// This will be used when the updater is instantiated in a nib such as MainMenu
 - (instancetype)init
 {
-    SULog(@"-[SUUpdater init] is not implemented. If you want to drop an updater into a nib, see SUStandardUpdaterController.");
-    abort();
-    return nil;
-}
-
-- (BOOL)startUpdater:(NSError * __autoreleasing *)error
-{
-    if (![self checkIfConfiguredProperly:error]) {
-        return NO;
-    }
-    
-    self.startedUpdater = YES;
-    [self startUpdateCycle];
-    return YES;
-}
-
-- (BOOL)checkATSIssueForBundle:(NSBundle * _Nullable)bundle getBundleExists:(BOOL *)bundleExists
-{
-    if (bundleExists != NULL) {
-        *bundleExists = (bundle != nil);
-    }
-    
-    if (bundle == nil) {
-        return NO;
-    }
-    
-    return ([bundle objectForInfoDictionaryKey:@"NSAppTransportSecurity"] == nil);
-}
-
-- (BOOL)checkIfConfiguredProperly:(NSError * __autoreleasing *)error
-{
-    if (self.sparkleBundle == nil) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: @"SUUpdater can't find Sparkle.framework it belongs to." }];
-        }
-        return NO;
-    }
-    
-    NSURL *feedURL = nil;
-    if (![self retrieveFeedURL:&feedURL error:error]) {
-        return NO;
-    }
-    
-    if ([[self hostBundle] bundleIdentifier] == nil) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidHostBundleIdentifierError userInfo:@{ NSLocalizedDescriptionKey: @"Sparkle cannot target a bundle that does not have a valid bundle identifier." }];
-        }
-        return NO;
-    }
-    
-    if (!self.host.validVersion) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidHostVersionError userInfo:@{ NSLocalizedDescriptionKey: @"Sparkle cannot target a bundle that does not have a valid version." }];
-        }
-        return NO;
-    }
-    
-    BOOL hasPublicDSAKey = [self.host publicDSAKey] != nil;
-    if (!hasPublicDSAKey) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: @"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information." }];
-        }
-        return NO;
-    }
-    
-    BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
-    if (!servingOverHttps) {
-        BOOL foundXPCTemporaryDownloaderService = NO;
-        BOOL foundATSTemporaryIssue = [self checkATSIssueForBundle:SUXPCServiceBundle(@TEMPORARY_DOWNLOADER_BUNDLE_ID) getBundleExists:&foundXPCTemporaryDownloaderService];
-        
-        BOOL foundXPCPersistentDownloaderService = NO;
-        BOOL foundATSPersistentIssue = NO;
-        if (!foundATSTemporaryIssue) {
-            foundATSPersistentIssue = [self checkATSIssueForBundle:SUXPCServiceBundle(@PERSISTENT_DOWNLOADER_BUNDLE_ID) getBundleExists:&foundXPCPersistentDownloaderService];
-        }
-        
-        NSBundle *mainBundle = [NSBundle mainBundle];
-        BOOL foundATSMainBundleIssue = NO;
-        if (!foundATSTemporaryIssue && !foundATSPersistentIssue && (!foundXPCTemporaryDownloaderService || !foundXPCPersistentDownloaderService)) {
-            BOOL foundATSIssue = ([mainBundle objectForInfoDictionaryKey:@"NSAppTransportSecurity"] == nil);
-            BOOL updatingMainBundle = [self.host.bundle isEqualTo:mainBundle];
-            
-            if (updatingMainBundle) {
-                // The only way we'll know for sure if there is an issue is if the main bundle is the same as the one we're updating
-                // We don't want to generate false positives..
-                foundATSMainBundleIssue = foundATSIssue;
-            }
-        }
-        
-        if (foundATSTemporaryIssue || foundATSPersistentIssue || foundATSMainBundleIssue) {
-            if (error != NULL) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInsecureFeedURLError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"You must change the feed URL (%@) to use HTTPS or use a build of Sparkle with App Transport Security disabled.\n\nFor more information:\nhttps://sparkle-project.org/documentation/app-transport-security/", [feedURL absoluteString]] }];
-            }
-            return NO;
-        }
-    }
-    
-    return YES;
-}
-
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
-
-- (void)startUpdateCycle
-{
-    BOOL shouldPrompt = NO;
-    NSNumber *timeIntervalAtFirstLaunch = [self.host objectForUserDefaultsKey:SUTimeIntervalAtFirstLaunchKey];
-    NSDate *currentDate = [NSDate date];
-
-    // If the user has been asked about automatic checks, don't bother prompting
-    if ([self.host objectForUserDefaultsKey:SUEnableAutomaticChecksKey]) {
-        shouldPrompt = NO;
-    }
-    // If the developer wants to check for updates, we shouldn't bug the user about a prompt yet
-    else if (self.preStartedScheduledUpdateBlock != nil) {
-        shouldPrompt = NO;
-    }
-    // Does the delegate want to take care of the logic for when we should ask permission to update?
-    else if ([self.delegate respondsToSelector:@selector(updaterShouldPromptForPermissionToCheckForUpdates:)]) {
-        shouldPrompt = [self.delegate updaterShouldPromptForPermissionToCheckForUpdates:self];
-    }
-    // Has the user been asked already? And don't ask if the host has a default value set in its Info.plist.
-    else if ([self.host objectForKey:SUEnableAutomaticChecksKey] == nil) {
-        // Now, we don't want to ask the user for permission to do a weird thing right when they install the app
-        // We wait until another launch after a few hours have passed, unless explicitly overridden via SUPromptUserOnFirstLaunchKey.
-        
-        if ([self.host objectForKey:SUPromptUserOnFirstLaunchKey] != nil) {
-            shouldPrompt = YES;
-        } else if (timeIntervalAtFirstLaunch != nil) {
-            NSDate *firstLaunchDate = [NSDate dateWithTimeIntervalSinceReferenceDate:timeIntervalAtFirstLaunch.doubleValue];
-            NSTimeInterval intervalSinceFirstLaunch = [currentDate timeIntervalSinceDate:firstLaunchDate];
-            // We want to prompt if more than (or equal to) 'SUDefaultUpdatePermissionPromptInterval' seconds have passed since the first launch
-            // If the first launch time is after (or equal to) our current date, then something may have gone wrong in the system - prompt to be on the safe side
-            if (intervalSinceFirstLaunch >= SUDefaultUpdatePermissionPromptInterval || intervalSinceFirstLaunch <= 0) {
-                shouldPrompt = YES;
-            }
-        }
-    }
-    
-    if (timeIntervalAtFirstLaunch == nil) {
-        [self.host setObject:@([currentDate timeIntervalSinceReferenceDate]) forUserDefaultsKey:SUTimeIntervalAtFirstLaunchKey];
-    }
-
-    if (shouldPrompt) {
-        NSArray *profileInfo = [SUSystemProfiler systemProfileArrayForHost:self.host];
-        // Always say we're sending the system profile here so that the delegate displays the parameters it would send.
-        if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
-            NSArray *feedParameters = [self.delegate feedParametersForUpdater:self sendingSystemProfile:YES];
-            if (feedParameters != nil) {
-                profileInfo = [profileInfo arrayByAddingObjectsFromArray:feedParameters];
-            }
-        }
-        
-        __weak SUUpdater *weakSelf = self;
-        [self.userDriver requestUpdatePermissionWithSystemProfile:profileInfo reply:^(SUUpdatePermission *result) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                SUUpdater *strongSelf = weakSelf;
-                if (strongSelf != nil) {
-                    [strongSelf updatePermissionPromptFinishedWithResult:result];
-                    // Schedule checks, but make sure we ignore the delayed call from KVO
-                    [strongSelf resetUpdateCycle];
-                }
-            });
-        }];
-        
-        // We start the update checks and register as observer for changes after the prompt finishes
-    } else {
-        if (self.preStartedScheduledUpdateBlock != nil) {
-            self.preStartedScheduledUpdateBlock();
-            self.preStartedScheduledUpdateBlock = nil;
-        } else {
-            // We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
-            [self scheduleNextUpdateCheck];
-        }
-    }
-}
-
-- (void)updatePermissionPromptFinishedWithResult:(SUUpdatePermission *)result
-{
-    [self.host setBool:result.sendProfile forUserDefaultsKey:SUSendProfileInfoKey];
-    [self setAutomaticallyChecksForUpdates:(result.choice == SUAutomaticallyCheck)];
-}
-
-- (NSDate *)lastUpdateCheckDate
-{
-    return [self.host objectForUserDefaultsKey:SULastCheckTimeKey];
-}
-
-- (void)updateLastUpdateCheckDate
-{
-    [self willChangeValueForKey:NSStringFromSelector(@selector(lastUpdateCheckDate))];
-    [self.host setObject:[NSDate date] forUserDefaultsKey:SULastCheckTimeKey];
-    [self didChangeValueForKey:NSStringFromSelector(@selector(lastUpdateCheckDate))];
-}
-
-- (void)scheduleNextUpdateCheck
-{
-    [self scheduleNextUpdateCheckFiringImmediately:NO];
-}
-
-- (void)scheduleNextUpdateCheckFiringImmediately:(BOOL)firingImmediately
-{
-    [self.userDriver invalidateUpdateCheckTimer];
-    
-    BOOL automaticallyCheckForUpdates = [self automaticallyChecksForUpdates];
-    
-    [self.userDriver showCanCheckForUpdates:!automaticallyCheckForUpdates];
-    [self.userDriver idleOnUpdateChecks:!automaticallyCheckForUpdates];
-    
-    if (!automaticallyCheckForUpdates) {
-        return;
-    }
-    
-    if (firingImmediately) {
-        [self checkForUpdatesInBackground];
-    } else {
-        [self.userDriver showCanCheckForUpdates:YES];
-        
-        [self retrieveNextUpdateCheckInterval:^(NSTimeInterval updateCheckInterval) {
-            // How long has it been since last we checked for an update?
-            NSDate *lastCheckDate = [self lastUpdateCheckDate];
-            if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
-            NSTimeInterval intervalSinceCheck = [[NSDate date] timeIntervalSinceDate:lastCheckDate];
-            
-            // Now we want to figure out how long until we check again.
-            if (updateCheckInterval < SUMinimumUpdateCheckInterval)
-                updateCheckInterval = SUMinimumUpdateCheckInterval;
-            if (intervalSinceCheck < updateCheckInterval) {
-                NSTimeInterval delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
-                __weak SUUpdater *weakSelf = self; // we don't want this to keep the updater alive
-                [self.userDriver startUpdateCheckTimerWithNextTimeInterval:delayUntilCheck reply:^(SUUpdateCheckTimerStatus checkTimerStatus) {
-                    switch (checkTimerStatus) {
-                        case SUCheckForUpdateWillOccurLater:
-                            break;
-                        case SUCheckForUpdateNow:
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                [weakSelf checkForUpdatesInBackground];
-                            });
-                            break;
-                    }
-                }];
-            } else {
-                // We're overdue! Run one now.
-                [self checkForUpdatesInBackground];
-            }
-        }];
-    }
-}
-
-- (void)checkForUpdatesInBackground
-{
-    if (!self.startedUpdater) {
-        __weak SUUpdater *weakSelf = self;
-        self.preStartedScheduledUpdateBlock = ^{
-            [weakSelf checkForUpdatesInBackground];
-        };
-        return;
-    }
-    
-    // We don't want the probe check to act on the driver if the updater is going near death
-    __weak SUUpdater *weakSelf = self;
-    
-    NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
-    assert(hostBundleIdentifier != nil);
-    [SUProbeInstallStatus probeInstallerInProgressForHostBundleIdentifier:hostBundleIdentifier completion:^(BOOL installerIsRunning) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            SUUpdater *strongSelf = weakSelf;
-            if (strongSelf == nil) {
-                return;
-            }
-            
-            id <SUUpdateDriver> updateDriver;
-            if (!installerIsRunning && [strongSelf automaticallyDownloadsUpdates] && [strongSelf allowsAutomaticUpdates] && strongSelf.resumableUpdate == nil) {
-                updateDriver =
-                [[SUAutomaticUpdateDriver alloc]
-                 initWithHost:strongSelf.host
-                 sparkleBundle:strongSelf.sparkleBundle
-                 updater:strongSelf
-                 updaterDelegate:strongSelf.delegate];
-            } else {
-                updateDriver =
-                [[SUScheduledUpdateDriver alloc]
-                 initWithHost:strongSelf.host
-                 sparkleBundle:strongSelf.sparkleBundle
-                 updater:strongSelf
-                 userDriver:strongSelf.userDriver
-                 updaterDelegate:strongSelf.delegate];
-            }
-            
-            [strongSelf checkForUpdatesWithDriver:updateDriver installerInProgress:installerIsRunning];
-        });
-    }];
-}
-
-- (void)checkForUpdates
-{
-    __weak SUUpdater *weakSelf = self;
-    if (!self.startedUpdater) {
-        self.preStartedScheduledUpdateBlock = ^{
-            [weakSelf checkForUpdates];
-        };
-        return;
-    }
-    
-    if (self.driver != nil) {
-        return;
-    }
-    
-    id <SUUpdateDriver> theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithHost:self.host sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
-    
-    NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
-    assert(bundleIdentifier != nil);
-    [SUProbeInstallStatus probeInstallerInProgressForHostBundleIdentifier:bundleIdentifier completion:^(BOOL installerInProgress) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            SUUpdater *strongSelf = weakSelf;
-            if (strongSelf != nil) {
-                [strongSelf checkForUpdatesWithDriver:theUpdateDriver installerInProgress:installerInProgress];
-            }
-        });
-    }];
-}
-
-- (void)checkForUpdateInformation
-{
-    __weak SUUpdater *weakSelf = self;
-    if (!self.startedUpdater) {
-        self.preStartedScheduledUpdateBlock = ^{
-            [weakSelf checkForUpdateInformation];
-        };
-        return;
-    }
-    
-    NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
-    assert(bundleIdentifier != nil);
-    [SUProbeInstallStatus probeInstallerInProgressForHostBundleIdentifier:bundleIdentifier completion:^(BOOL installerInProgress) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            SUUpdater *strongSelf = weakSelf;
-            if (strongSelf != nil) {
-                [strongSelf checkForUpdatesWithDriver:[[SUProbingUpdateDriver alloc] initWithHost:strongSelf.host updater:strongSelf updaterDelegate:strongSelf.delegate] installerInProgress:installerInProgress];
-            }
-        });
-    }];
-}
-
-- (void)checkForUpdatesWithDriver:(id <SUUpdateDriver> )d installerInProgress:(BOOL)installerInProgress
-{
-    if (self.driver != nil) {
-        return;
-    }
-    
-    [self.userDriver invalidateUpdateCheckTimer];
-
-    [self updateLastUpdateCheckDate];
-
-    if( [self.delegate respondsToSelector: @selector(updaterMayCheckForUpdates:)] && ![self.delegate updaterMayCheckForUpdates: self] )
-	{
-        [self scheduleNextUpdateCheck];
-        return;
-    }
-
-    self.driver = d;
-    
-    // If we're not given a driver at all, just schedule the next update check and bail.
-    if (!self.driver) {
-        [self scheduleNextUpdateCheck];
-        return;
-    }
-    
-    // Reload our host bundle information in case its current cache is out of date
-    // We could have updated the bundle before for example without terminating this updater process
-    [self.host reloadInfoDictionary];
-
-    // Because an application can change the configuration (eg: the feed url) at any point, we should always check if it's valid
-    NSError *configurationError = nil;
-    if (![self checkIfConfiguredProperly:&configurationError]) {
-        SULog(@"Fatal configuration error (%ld): %@", (long)configurationError.code, configurationError.localizedDescription);
-        abort();
-    }
-
-    NSURL *theFeedURL = [self parameterizedFeedURL];
-    // Use a NIL URL to cancel quietly.
-    if (theFeedURL) {
-        __weak SUUpdater *weakSelf = self;
-        SUUpdateDriverCompletion completionBlock = ^(BOOL shouldShowUpdateImmediately, SUDownloadedUpdate * _Nullable resumableUpdate) {
-            SUUpdater *strongSelf = weakSelf;
-            if (strongSelf != nil) {
-                strongSelf.resumableUpdate = resumableUpdate;
-                strongSelf.driver = nil;
-                [strongSelf updateLastUpdateCheckDate];
-                [strongSelf scheduleNextUpdateCheckFiringImmediately:shouldShowUpdateImmediately];
-            }
-        };
-        
-        [self.userDriver showCanCheckForUpdates:NO];
-        
-        if (installerInProgress) {
-            [self.driver resumeInstallingUpdateWithCompletion:completionBlock];
-        } else if (self.resumableUpdate != nil) {
-            [self.driver resumeDownloadedUpdate:(SUDownloadedUpdate * _Nonnull)self.resumableUpdate completion:completionBlock];
-        } else {
-            [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders] completion:completionBlock];
-        }
-    } else {
-        [self.driver abortUpdate];
-    }
-}
-
-- (void)cancelNextUpdateCycle
-{
-    [self.updaterCycle cancelNextUpdateCycle];
+    return [self initForBundle:[NSBundle mainBundle]];
 }
 
 - (void)resetUpdateCycle
 {
-    if (!self.startedUpdater) {
-        return; // not even ready yet
-    }
-    
-    [self cancelNextUpdateCycle];
-    
-    if (self.driver == nil) {
-        [self scheduleNextUpdateCheck];
-    }
+    [self.updater resetUpdateCycle];
 }
 
-- (void)resetUpdateCycleAfterShortDelay
+- (id<SUUpdaterDelegate>)delegate
 {
-    [self cancelNextUpdateCycle];
-    [self.updaterCycle resetUpdateCycleAfterDelay];
+    return self.updater.delegate;
 }
 
-- (void)setAutomaticallyChecksForUpdates:(BOOL)automaticallyCheckForUpdates
+- (void)setDelegate:(id<SUUpdaterDelegate>)delegate
 {
-    [self.host setBool:automaticallyCheckForUpdates forUserDefaultsKey:SUEnableAutomaticChecksKey];
-    // Hack to support backwards compatibility with older Sparkle versions, which supported
-    // disabling updates by setting the check interval to 0.
-    if (automaticallyCheckForUpdates && (NSInteger)[self updateCheckInterval] == 0) {
-        [self setUpdateCheckInterval:SUDefaultUpdateCheckInterval];
-    }
-    // Provide a small delay in case multiple preferences are being updated simultaneously.
-    [self resetUpdateCycleAfterShortDelay];
+    // Note: This invokes a private API
+    [self.updater setDelegate:delegate];
+}
+
+- (NSBundle *)hostBundle
+{
+    return self.updater.hostBundle;
+}
+
+- (NSBundle *)sparkleBundle
+{
+    return self.updater.sparkleBundle;
 }
 
 - (BOOL)automaticallyChecksForUpdates
 {
-    return [self.updaterSettings automaticallyChecksForUpdates];
+    return self.updater.automaticallyChecksForUpdates;
 }
 
-- (void)setAutomaticallyDownloadsUpdates:(BOOL)automaticallyUpdates
+- (void)setAutomaticallyChecksForUpdates:(BOOL)automaticallyChecksForUpdates
 {
-    [self.host setBool:automaticallyUpdates forUserDefaultsKey:SUAutomaticallyUpdateKey];
-}
-
-- (BOOL)automaticallyDownloadsUpdates
-{
-    return [self.updaterSettings automaticallyDownloadsUpdates];
-}
-
-- (BOOL)allowsAutomaticUpdates
-{
-    return [self.updaterSettings allowsAutomaticUpdates];
-}
-
-- (void)setFeedURL:(NSURL *)feedURL
-{
-    if (![NSThread isMainThread]) {
-        SULog(@"This method must be called on the main thread");
-        abort();
-    }
-
-    [self.host setObject:[feedURL absoluteString] forUserDefaultsKey:SUFeedURLKey];
-}
-
-- (BOOL)retrieveFeedURL:(NSURL * __autoreleasing *)feedURL error:(NSError * __autoreleasing *)error
-{
-    if (![NSThread isMainThread]) {
-        SULog(@"This method must be called on the main thread");
-        abort();
-    }
-    
-    // A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
-    NSString *appcastString = [self.host objectForKey:SUFeedURLKey];
-    if ([self.delegate respondsToSelector:@selector(feedURLStringForUpdater:)])
-        appcastString = [self.delegate feedURLStringForUpdater:self];
-    
-    if (!appcastString) { // Can't find an appcast string!
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidFeedURLError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"You must specify the URL of the appcast as the %@ key in either the Info.plist or the user defaults!", SUFeedURLKey] }];
-        }
-        return NO;
-    }
-    
-    NSCharacterSet *quoteSet = [NSCharacterSet characterSetWithCharactersInString:@"\"\'"]; // Some feed publishers add quotes; strip 'em.
-    NSString *castUrlStr = [appcastString stringByTrimmingCharactersInSet:quoteSet];
-    if (feedURL != NULL) {
-        if (!castUrlStr || [castUrlStr length] == 0) {
-            *feedURL =  nil;
-        } else {
-            *feedURL = [NSURL URLWithString:castUrlStr];
-        }
-    }
-    return YES;
-}
-
-- (NSURL *)feedURL
-{
-    NSURL *feedURL = nil;
-    NSError *feedError = nil;
-    if (![self retrieveFeedURL:&feedURL error:&feedError]) {
-        SULog(@"Fatal Error (%ld): %@", feedError.code, feedError.localizedDescription);
-        abort();
-    }
-    return feedURL;
-}
-
-- (NSString *)userAgentString
-{
-    if (customUserAgentString) {
-        return customUserAgentString;
-    }
-
-    NSString *version = [self.sparkleBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
-    NSString *userAgent = [NSString stringWithFormat:@"%@/%@ Sparkle/%@", [self.host name], [self.host displayVersion], version ? version : @"?"];
-    NSData *cleanedAgent = [userAgent dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-    return [[NSString alloc] initWithData:cleanedAgent encoding:NSASCIIStringEncoding];
-}
-
-- (void)setSendsSystemProfile:(BOOL)sendsSystemProfile
-{
-    [self.host setBool:sendsSystemProfile forUserDefaultsKey:SUSendProfileInfoKey];
-}
-
-- (BOOL)sendsSystemProfile
-{
-    return [self.updaterSettings sendsSystemProfile];
-}
-
-- (NSURL *)parameterizedFeedURL
-{
-    NSURL *baseFeedURL = [self feedURL];
-
-    // Determine all the parameters we're attaching to the base feed URL.
-    BOOL sendingSystemProfile = [self sendsSystemProfile];
-
-    // Let's only send the system profiling information once per week at most, so we normalize daily-checkers vs. biweekly-checkers and the such.
-    NSDate *lastSubmitDate = [self.host objectForUserDefaultsKey:SULastProfileSubmitDateKey];
-    if (!lastSubmitDate) {
-        lastSubmitDate = [NSDate distantPast];
-    }
-    const NSTimeInterval oneWeek = 60 * 60 * 24 * 7;
-    sendingSystemProfile &= (-[lastSubmitDate timeIntervalSinceNow] >= oneWeek);
-
-    NSArray *parameters = @[];
-    if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
-        NSArray *feedParameters = [self.delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile];
-        if (feedParameters != nil) {
-            parameters = [parameters arrayByAddingObjectsFromArray:feedParameters];
-        }
-    }
-	if (sendingSystemProfile)
-	{
-        parameters = [parameters arrayByAddingObjectsFromArray:[SUSystemProfiler systemProfileArrayForHost:self.host]];
-        [self.host setObject:[NSDate date] forUserDefaultsKey:SULastProfileSubmitDateKey];
-    }
-	if ([parameters count] == 0) { return baseFeedURL; }
-
-    // Build up the parameterized URL.
-    NSMutableArray *parameterStrings = [NSMutableArray array];
-    for (NSDictionary *currentProfileInfo in parameters) {
-        [parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", [[[currentProfileInfo objectForKey:@"key"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], [[[currentProfileInfo objectForKey:@"value"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
-    }
-
-    NSString *separatorCharacter = @"?";
-    if ([baseFeedURL query]) {
-        separatorCharacter = @"&"; // In case the URL is already http://foo.org/baz.xml?bat=4
-    }
-    NSString *appcastStringWithProfile = [NSString stringWithFormat:@"%@%@%@", [baseFeedURL absoluteString], separatorCharacter, [parameterStrings componentsJoinedByString:@"&"]];
-
-    // Clean it up so it's a valid URL
-    return [NSURL URLWithString:appcastStringWithProfile];
-}
-
-- (void)setUpdateCheckInterval:(NSTimeInterval)updateCheckInterval
-{
-    [self.host setObject:@(updateCheckInterval) forUserDefaultsKey:SUScheduledCheckIntervalKey];
-    if ((NSInteger)updateCheckInterval == 0) { // For compatibility with 1.1's settings.
-        [self setAutomaticallyChecksForUpdates:NO];
-    }
-    // Provide a small delay in case multiple preferences are being updated simultaneously.
-    [self resetUpdateCycleAfterShortDelay];
+    [self.updater setAutomaticallyChecksForUpdates:automaticallyChecksForUpdates];
 }
 
 - (NSTimeInterval)updateCheckInterval
 {
-    return [self.updaterSettings updateCheckInterval];
+    return self.updater.updateCheckInterval;
 }
 
-// This may not return the same update check interval as the developer has configured
-// Notably it may differ when we have an update that has been already downloaded and needs to resume,
-// as well as if that update is marked critical or not
-- (void)retrieveNextUpdateCheckInterval:(void (^)(NSTimeInterval))completionHandler
+- (void)setUpdateCheckInterval:(NSTimeInterval)updateCheckInterval
 {
-    NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
-    assert(hostBundleIdentifier != nil);
-    [SUProbeInstallStatus probeInstallerUpdateItemForHostBundleIdentifier:hostBundleIdentifier completion:^(SUInstallationInfo * _Nullable installationInfo) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSTimeInterval regularCheckInterval = [self updateCheckInterval];
-            if (installationInfo == nil) {
-                // Proceed as normal if there's no resumable updates
-                completionHandler(regularCheckInterval);
-            } else {
-                if (!installationInfo.canSilentlyInstall || [installationInfo.appcastItem isCriticalUpdate]) {
-                    completionHandler(MIN(regularCheckInterval, SUImpatientUpdateCheckInterval));
-                } else {
-                    completionHandler(MAX(regularCheckInterval, SUImpatientUpdateCheckInterval));
-                }
-            }
-        });
-    }];
+    [self.updater setUpdateCheckInterval:updateCheckInterval];
 }
 
-- (void)dealloc
+- (NSURL *)feedURL
 {
-    // Stop checking for updates
-    [self cancelNextUpdateCycle];
-    
-    // Don't tell the user driver to invalidate the update check timer
-    // It could always create a new updater instance once the scheduled time occurs
-    
-    // Abort any on-going updates
-    // A driver could be retained by another object (eg: a timer),
-    // so not aborting could mean it stays alive longer than we'd want
-    [self.driver abortUpdate];
-    self.driver = nil;
+    return self.updater.feedURL;
 }
 
-- (NSBundle *)hostBundle { return [self.host bundle]; }
+- (void)setFeedURL:(NSURL *)feedURL
+{
+    [self.updater setFeedURL:feedURL];
+}
+
+- (NSString *)userAgentString
+{
+    return self.updater.userAgentString;
+}
+
+- (void)setUserAgentString:(NSString *)userAgentString
+{
+    [self.updater setUserAgentString:userAgentString];
+}
+
+- (NSDictionary *)httpHeaders
+{
+    return self.updater.httpHeaders;
+}
+
+- (void)setHttpHeaders:(NSDictionary *)httpHeaders
+{
+    [self.updater setHttpHeaders:httpHeaders];
+}
+
+- (BOOL)sendsSystemProfile
+{
+    return self.updater.sendsSystemProfile;
+}
+
+- (void)setSendsSystemProfile:(BOOL)sendsSystemProfile
+{
+    [self.updater setSendsSystemProfile:sendsSystemProfile];
+}
+
+- (BOOL)automaticallyDownloadsUpdates
+{
+    return self.updater.automaticallyDownloadsUpdates;
+}
+
+- (void)setAutomaticallyDownloadsUpdates:(BOOL)automaticallyDownloadsUpdates
+{
+    [self.updater setAutomaticallyDownloadsUpdates:automaticallyDownloadsUpdates];
+}
+
+- (IBAction)checkForUpdates:(id)__unused sender
+{
+    [self.updater checkForUpdates];
+}
+
+- (BOOL)validateMenuItem:(NSMenuItem *)item
+{
+    if ([item action] == @selector(checkForUpdates:)) {
+        return self.userDriver.canCheckForUpdates;
+    }
+    return YES;
+}
+
+- (void)checkForUpdatesInBackground
+{
+    [self.updater checkForUpdatesInBackground];
+}
+
+- (NSDate *)lastUpdateCheckDate
+{
+    return self.updater.lastUpdateCheckDate;
+}
+
+- (void)checkForUpdateInformation
+{
+    [self.updater checkForUpdateInformation];
+}
+
+- (BOOL)updateInProgress
+{
+    return !self.userDriver.canCheckForUpdates;
+}
+
+- (void)userDriverWillShowModalAlert
+{
+    if ([self.updater.delegate respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
+        [self.updater.delegate updaterWillShowModalAlert:self];
+    }
+}
+
+- (void)userDriverDidShowModalAlert
+{
+    if ([self.updater.delegate respondsToSelector:@selector(updaterDidShowModalAlert:)]) {
+        [self.updater.delegate updaterDidShowModalAlert:self];
+    }
+}
+
+- (_Nullable id <SUVersionDisplay>)userDriverRequestsVersionDisplayer
+{
+    if ([self.updater.delegate respondsToSelector:@selector(versionDisplayerForUpdater:)]) {
+        return [self.updater.delegate versionDisplayerForUpdater:self];
+    }
+    return nil;
+}
+
+// Private API that is used by SUInstallerDriver
+- (NSString *)_decryptionPasswordForSparkleUpdater
+{
+    return self.decryptionPassword;
+}
 
 @end

@@ -12,7 +12,7 @@
 
 @interface TestAppHelper ()
 
-@property (nonatomic) SUUpdater *updater;
+@property (nonatomic) SPUUpdater *updater;
 @property (nonatomic) id <SUUserDriver> userDriver;
 
 @end
@@ -42,7 +42,7 @@
         NSURL *appURL = [[[[[NSBundle mainBundle] bundleURL] URLByDeletingLastPathComponent] URLByDeletingLastPathComponent] URLByDeletingLastPathComponent];
         
         NSBundle *hostBundle = [NSBundle bundleWithURL:appURL];
-        self.updater = [[SUUpdater alloc] initWithHostBundle:hostBundle userDriver:self.userDriver delegate:nil];
+        self.updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle userDriver:self.userDriver delegate:nil];
         
         NSError *updaterError = nil;
         if (![self.updater startUpdater:&updaterError]) {

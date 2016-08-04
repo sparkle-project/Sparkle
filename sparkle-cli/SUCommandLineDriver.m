@@ -14,7 +14,7 @@ void _SULogDisableStandardErrorStream(void);
 
 @interface SUCommandLineDriver () <SUUpdaterDelegate>
 
-@property (nonatomic, readonly) SUUpdater *updater;
+@property (nonatomic, readonly) SPUUpdater *updater;
 @property (nonatomic, readonly) NSString *applicationBundlePath;
 @property (nonatomic, readonly) BOOL verbose;
 @property (nonatomic) BOOL probingForUpdates;
@@ -64,7 +64,7 @@ void _SULogDisableStandardErrorStream(void);
     return self;
 }
 
-- (BOOL)updaterShouldAllowInstallerInteraction:(SUUpdater *)__unused updater
+- (BOOL)updaterShouldAllowInstallerInteraction:(id)__unused updater
 {
     // If the installation is interactive, we can show an authorization prompt for requesting additional privileges,
     // otherwise we should have the installer inherit the updater's privileges.
@@ -83,7 +83,7 @@ void _SULogDisableStandardErrorStream(void);
 }
 
 // In case we fail during probing, otherwise we leave error handling to the user driver
-- (void)updaterDidNotFindUpdate:(SUUpdater *)__unused updater
+- (void)updaterDidNotFindUpdate:(id)__unused updater
 {
     if (self.probingForUpdates) {
         if (self.verbose) {
@@ -94,7 +94,7 @@ void _SULogDisableStandardErrorStream(void);
 }
 
 // In case we fail during probing, otherwise we leave error handling to the user driver
-- (void)updater:(SUUpdater *)__unused updater didAbortWithError:(NSError *)error
+- (void)updater:(id)__unused updater didAbortWithError:(NSError *)error
 {
     if (self.probingForUpdates) {
         if (self.verbose) {
@@ -104,12 +104,12 @@ void _SULogDisableStandardErrorStream(void);
     }
 }
 
-- (NSString *)pathToRelaunchForUpdater:(SUUpdater *)__unused updater
+- (NSString *)pathToRelaunchForUpdater:(id)__unused updater
 {
     return self.applicationBundlePath;
 }
 
-- (BOOL)updaterShouldDownloadReleaseNotes:(SUUpdater *)__unused updater
+- (BOOL)updaterShouldDownloadReleaseNotes:(id)__unused updater
 {
     return self.verbose;
 }

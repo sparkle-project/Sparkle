@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SUUpdater;
+@class SPUUpdater;
 @protocol SUUserDriver, SUStandardUserDriver, SUUpdaterDelegate, SUStandardUserDriverDelegate;
 
 /*!
@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
  This is nil before being loaded from the nib.
  You may access this property after your application has finished launching, or after your window controller has finished loading.
  */
-@property (nonatomic, readonly, nullable) SUUpdater *updater;
+@property (nonatomic, readonly, nullable) SPUUpdater *updater;
 
 /*!
  Accessible property for the updater's user driver.

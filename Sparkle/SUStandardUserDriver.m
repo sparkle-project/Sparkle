@@ -9,7 +9,6 @@
 #import "SUStandardUserDriver.h"
 #import "SUUserDriverCoreComponent.h"
 #import "SUStandardUserDriverDelegate.h"
-#import "SUStandardUserDriverUIDelegate.h"
 #import "SUAppcastItem.h"
 #import "SUVersionDisplayProtocol.h"
 #import "SUHost.h"

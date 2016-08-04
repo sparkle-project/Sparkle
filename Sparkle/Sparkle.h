@@ -16,7 +16,7 @@
 #import "SUAppcastItem.h"
 #import "SUStandardVersionComparator.h"
 #import "SUUpdaterDelegate.h"
-#import "SUUpdater.h"
+#import "SPUUpdater.h"
 #import "SUUpdaterSettings.h"
 #import "SUStandardUpdaterController.h"
 #import "SUVersionComparisonProtocol.h"

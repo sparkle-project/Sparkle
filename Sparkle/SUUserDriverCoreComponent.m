@@ -8,7 +8,6 @@
 
 #import "SUUserDriverCoreComponent.h"
 #import "SUStandardUserDriverDelegate.h"
-#import "SUStandardUserDriverRemoteDelegate.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit

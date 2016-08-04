@@ -32,6 +32,12 @@
 
 #define FIRST_INSTALLER_MESSAGE_TIMEOUT 7ull
 
+@interface NSObject (SparkleUpdaterDeprecated)
+
+- (NSString *)_decryptionPasswordForSparkleUpdater;
+
+@end
+
 @interface SUInstallerDriver () <SUInstallerCommunicationProtocol>
 
 @property (nonatomic, readonly) SUHost *host;
@@ -165,6 +171,10 @@
     NSString *decryptionPassword = nil;
     if ([self.updaterDelegate respondsToSelector:@selector(decryptionPasswordForUpdater:)]) {
         decryptionPassword = [self.updaterDelegate decryptionPasswordForUpdater:self.updater];
+    } else if ([self.updater respondsToSelector:@selector(_decryptionPasswordForSparkleUpdater)]) {
+        // The old updater (SUUpdater) has a decryptionPassword property
+        // Let's ask it if it has a decryption password available
+        decryptionPassword = [self.updater _decryptionPasswordForSparkleUpdater];
     }
     
     SUInstallationInputData *installationData = [[SUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadName:self.downloadName installationType:self.updateItem.installationType dsaSignature:dsaSignature decryptionPassword:decryptionPassword];

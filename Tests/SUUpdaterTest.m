@@ -8,7 +8,7 @@
 
 #import <XCTest/XCTest.h>
 #import "SUConstants.h"
-#import "SUUpdater.h"
+#import "SPUUpdater.h"
 #import "SUStandardUserDriver.h"
 #import "SUUpdaterDelegate.h"
 
@@ -70,7 +70,7 @@
 @end
 
 @interface SUUpdaterTest : XCTestCase <SUUpdaterDelegate>
-@property (strong) SUUpdater *updater;
+@property (strong) SPUUpdater *updater;
 @end
 
 @implementation SUUpdaterTest
@@ -95,7 +95,7 @@
     [super tearDown];
 }
 
-- (NSString *)feedURLStringForUpdater:(SUUpdater *) __unused updater
+- (NSString *)feedURLStringForUpdater:(id)__unused updater
 {
     return @"https://test.example.com";
 }
