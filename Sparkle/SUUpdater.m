@@ -8,14 +8,14 @@
 
 #import "SUUpdater.h"
 #import "SPUUpdater.h"
-#import "SUStandardUserDriver.h"
-#import "SUStandardUserDriverDelegate.h"
+#import "SPUStandardUserDriver.h"
+#import "SPUStandardUserDriverDelegate.h"
 #import "SULog.h"
 
-@interface SUUpdater () <SUStandardUserDriverDelegate>
+@interface SUUpdater () <SPUStandardUserDriverDelegate>
 
 @property (nonatomic, readonly) SPUUpdater *updater;
-@property (nonatomic, readonly) SUStandardUserDriver *userDriver;
+@property (nonatomic, readonly) SPUStandardUserDriver *userDriver;
 
 @end
 
@@ -71,7 +71,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
         }
         [sharedUpdaters setObject:self forKey:[NSValue valueWithNonretainedObject:bundle]];
         
-        _userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:bundle delegate:self];
+        _userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:bundle delegate:self];
         _updater = [[SPUUpdater alloc] initWithHostBundle:bundle userDriver:_userDriver delegate:nil];
         [_updater setUpdaterDelegator:self];
         

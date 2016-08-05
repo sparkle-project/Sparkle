@@ -15,7 +15,7 @@
 #import "SULog.h"
 #import "SUParameterAssert.h"
 #import "SUErrors.h"
-#import "SUInstallationType.h"
+#import "SPUInstallationType.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -113,7 +113,7 @@
     return newAppDownloadPath;
 }
 
-+ (nullable id<SUInstallerProtocol>)installerForHost:(SUHost *)host expectedInstallationType:(NSString *)expectedInstallationType updateDirectory:(NSString *)updateDirectory versionComparator:(id <SUVersionComparison>)comparator error:(NSError * __autoreleasing *)error
++ (nullable id<SPUInstallerProtocol>)installerForHost:(SUHost *)host expectedInstallationType:(NSString *)expectedInstallationType updateDirectory:(NSString *)updateDirectory versionComparator:(id <SUVersionComparison>)comparator error:(NSError * __autoreleasing *)error
 {
     BOOL isPackage = NO;
     BOOL isGuided = NO;
@@ -129,25 +129,25 @@
     // Make sure we find the type of installer that we were expecting to find
     // We shouldn't implicitly trust the installation type fed into here from the appcast because the installation type helps us determine
     // ahead of time whether or not this installer tool should be ran as root or not
-    id <SUInstallerProtocol> installer = nil;
+    id <SPUInstallerProtocol> installer = nil;
     if (isPackage && isGuided) {
-        if (![expectedInstallationType isEqualToString:SUInstallationTypeGuidedPackage]) {
+        if (![expectedInstallationType isEqualToString:SPUInstallationTypeGuidedPackage]) {
             if (error != NULL) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found guided package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SUInstallationTypeGuidedPackage] }];
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found guided package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SPUInstallationTypeGuidedPackage] }];
             }
         } else {
             installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath];
         }
     } else if (isPackage) {
-        if (![expectedInstallationType isEqualToString:SUInstallationTypeInteractivePackage]) {
+        if (![expectedInstallationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
             if (error != NULL) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SUInstallationTypeInteractivePackage] }];
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SPUInstallationTypeInteractivePackage] }];
             }
         } else {
             installer = [[SUPackageInstaller alloc] initWithPackagePath:newDownloadPath];
         }
     } else {
-        if (![expectedInstallationType isEqualToString:SUInstallationTypeApplication]) {
+        if (![expectedInstallationType isEqualToString:SPUInstallationTypeApplication]) {
             if (error != NULL) {
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found regular application update but expected '%@=%@' from the appcast item enclosure instead", SUAppcastAttributeInstallationType, expectedInstallationType] }];
             }

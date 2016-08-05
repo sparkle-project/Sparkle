@@ -9,7 +9,7 @@
 #import "SUInstallerDriver.h"
 #import "SULog.h"
 #import "SUMessageTypes.h"
-#import "SUXPCServiceInfo.h"
+#import "SPUXPCServiceInfo.h"
 #import "SUUpdaterDelegate.h"
 #import "SUAppcastItem.h"
 #import "SULog.h"
@@ -17,10 +17,9 @@
 #import "SUErrors.h"
 #import "SUHost.h"
 #import "SUFileManager.h"
-#import "SUSecureCoding.h"
-#import "SUInstallationInputData.h"
+#import "SPUSecureCoding.h"
+#import "SPUInstallationInputData.h"
 #import "SUInstallerLauncher.h"
-#import "SUXPCServiceInfo.h"
 #import "SUInstallerConnection.h"
 #import "SUInstallerConnectionProtocol.h"
 #import "SUXPCInstallerConnection.h"
@@ -102,7 +101,7 @@
     NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
     
-    if (!SUXPCServiceExists(@INSTALLER_CONNECTION_BUNDLE_ID)) {
+    if (!SPUXPCServiceExists(@INSTALLER_CONNECTION_BUNDLE_ID)) {
         self.installerConnection = [[SUInstallerConnection alloc] initWithDelegate:self];
     } else {
         self.installerConnection = [[SUXPCInstallerConnection alloc] initWithDelegate:self];
@@ -177,9 +176,9 @@
         decryptionPassword = [self.updater _decryptionPasswordForSparkleUpdater];
     }
     
-    SUInstallationInputData *installationData = [[SUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadName:self.downloadName installationType:self.updateItem.installationType dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
+    SPUInstallationInputData *installationData = [[SPUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadName:self.downloadName installationType:self.updateItem.installationType dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
     
-    NSData *archivedData = SUArchiveRootObjectSecurely(installationData);
+    NSData *archivedData = SPUArchiveRootObjectSecurely(installationData);
     if (archivedData == nil) {
         [self.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while encoding the installer parameters. Please try again later.", nil) }]];
         return;
@@ -248,7 +247,7 @@
         
         // Let the installer keep a copy of the appcast item data
         // We may want to ask for it later (note the updater can relaunch without the app necessarily having relaunched)
-        NSData *updateItemData = SUArchiveRootObjectSecurely(self.updateItem);
+        NSData *updateItemData = SPUArchiveRootObjectSecurely(self.updateItem);
         
         if (updateItemData != nil) {
             [self.installerConnection handleMessageWithIdentifier:SUSentUpdateAppcastItemData data:updateItemData];
@@ -306,7 +305,7 @@
     __block BOOL retrievedLaunchStatus = NO;
     NSXPCConnection *launcherConnection = nil;
     
-    if (!SUXPCServiceExists(@INSTALLER_LAUNCHER_BUNDLE_ID)) {
+    if (!SPUXPCServiceExists(@INSTALLER_LAUNCHER_BUNDLE_ID)) {
         installerLauncher = [[SUInstallerLauncher alloc] init];
     } else {
         launcherConnection = [[NSXPCConnection alloc] initWithServiceName:@INSTALLER_LAUNCHER_BUNDLE_ID];

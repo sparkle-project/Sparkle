@@ -8,7 +8,7 @@
 
 #import "SUUserInitiatedUpdateDriver.h"
 #import "SUUIBasedUpdateDriver.h"
-#import "SUUserDriver.h"
+#import "SPUUserDriver.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -17,7 +17,7 @@
 @interface SUUserInitiatedUpdateDriver () <SUUIBasedUpdateDriverDelegate>
 
 @property (nonatomic, readonly) SUUIBasedUpdateDriver *uiDriver;
-@property (nonatomic, readonly) id<SUUserDriver> userDriver;
+@property (nonatomic, readonly) id<SPUUserDriver> userDriver;
 @property (nonatomic) BOOL showingUserInitiatedProgress;
 
 @end
@@ -28,7 +28,7 @@
 @synthesize userDriver = _userDriver;
 @synthesize showingUserInitiatedProgress = _showingUserInitiatedProgress;
 
-- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate
+- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate
 {
     self = [super init];
     if (self != nil) {

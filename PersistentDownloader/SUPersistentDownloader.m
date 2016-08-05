@@ -8,8 +8,8 @@
 
 #import "SUPersistentDownloader.h"
 #import "SUPersistentDownloaderDelegate.h"
-#import "SULocalCacheDirectory.h"
-#import "SUURLRequest.h"
+#import "SPULocalCacheDirectory.h"
+#import "SPUURLRequest.h"
 #import "SUErrors.h"
 
 static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
@@ -44,7 +44,7 @@ static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
 
 // Don't implement dealloc - make the client call cleanup, which is the only way to remove the reference cycle from the delegate anyway
 
-- (void)startDownloadWithRequest:(SUURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename
+- (void)startDownloadWithRequest:(SPUURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         // Prevent service from automatically terminating while downloading the update asynchronously without any reply blocks
@@ -84,11 +84,11 @@ static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
 - (void)download:(NSURLDownload *)__unused d decideDestinationWithSuggestedFilename:(NSString *)name
 {
     // Remove our old caches path so we don't start accumulating files in there
-    NSString *rootPersistentDownloadCachePath = [[SULocalCacheDirectory cachePathForBundleIdentifier:self.bundleIdentifier] stringByAppendingPathComponent:@"PersistentDownloads"];
+    NSString *rootPersistentDownloadCachePath = [[SPULocalCacheDirectory cachePathForBundleIdentifier:self.bundleIdentifier] stringByAppendingPathComponent:@"PersistentDownloads"];
     
-    [SULocalCacheDirectory removeOldItemsInDirectory:rootPersistentDownloadCachePath];
+    [SPULocalCacheDirectory removeOldItemsInDirectory:rootPersistentDownloadCachePath];
     
-    NSString *tempDir = [SULocalCacheDirectory createUniqueDirectoryInDirectory:rootPersistentDownloadCachePath];
+    NSString *tempDir = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:rootPersistentDownloadCachePath];
     if (tempDir == nil)
     {
         // Okay, something's really broken with this user's file structure.

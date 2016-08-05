@@ -7,7 +7,7 @@
 //
 
 #import "SUInstallerStatus.h"
-#import "SUSystemAuthorization.h"
+#import "SPUSystemAuthorization.h"
 
 @interface SUInstallerStatus ()
 

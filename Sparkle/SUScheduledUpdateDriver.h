@@ -13,11 +13,11 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class SUHost;
-@protocol SUUserDriver, SUUpdaterDelegate;
+@protocol SPUUserDriver, SUUpdaterDelegate;
 
 @interface SUScheduledUpdateDriver : NSObject <SUUpdateDriver>
 
-- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate;
+- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate;
 
 @end
 

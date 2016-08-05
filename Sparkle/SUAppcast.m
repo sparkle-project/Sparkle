@@ -13,8 +13,8 @@
 #import "SULog.h"
 #import "SUErrors.h"
 #import "SULocalizations.h"
-#import "SUXPCServiceInfo.h"
-#import "SUURLDownload.h"
+#import "SPUXPCServiceInfo.h"
+#import "SPUURLDownload.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -76,7 +76,7 @@
 
     [request setValue:@"application/rss+xml,*/*;q=0.1" forHTTPHeaderField:@"Accept"];
     
-    SUDownloadURLWithRequest(request, ^(NSData * _Nullable data, NSError * _Nullable error) {
+    SPUDownloadURLWithRequest(request, ^(NSData * _Nullable data, NSError * _Nullable error) {
         if (data != nil) {
             NSError *parseError = nil;
             NSArray *appcastItems = [self parseAppcastItemsFromXMLData:data error:&parseError];

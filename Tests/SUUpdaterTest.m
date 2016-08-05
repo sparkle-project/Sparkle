@@ -9,11 +9,11 @@
 #import <XCTest/XCTest.h>
 #import "SUConstants.h"
 #import "SPUUpdater.h"
-#import "SUStandardUserDriver.h"
+#import "SPUStandardUserDriver.h"
 #import "SUUpdaterDelegate.h"
 
 // This user driver does nothing
-@interface SUUselessUserDriver : NSObject <SUUserDriver>
+@interface SUUselessUserDriver : NSObject <SPUUserDriver>
 
 @end
 
@@ -27,7 +27,7 @@
 
 - (void)invalidateUpdateCheckTimer {}
 
-- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SUUpdatePermission *))__unused reply {}
+- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SPUUpdatePermission *))__unused reply {}
 
 - (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SUUserInitiatedCheckStatus))__unused updateCheckStatusCompletion {}
 
@@ -80,7 +80,7 @@
 - (void)setUp
 {
     [super setUp];
-    self.updater = [[SUUpdater alloc] initWithHostBundle:[NSBundle bundleForClass:[self class]] userDriver:[[SUUselessUserDriver alloc] init] delegate:self];
+    self.updater = [[SPUUpdater alloc] initWithHostBundle:[NSBundle bundleForClass:[self class]] userDriver:[[SUUselessUserDriver alloc] init] delegate:self];
     
     NSError *error = nil;
     if (![self.updater startUpdater:&error]) {

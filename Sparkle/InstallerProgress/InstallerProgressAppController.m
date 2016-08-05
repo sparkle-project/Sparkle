@@ -10,8 +10,8 @@
 #import "InstallerProgressDelegate.h"
 #import "SUMessageTypes.h"
 #import "SULog.h"
-#import "SUApplicationInfo.h"
-#import "SUInstallerAgentProtocol.h"
+#import "SPUApplicationInfo.h"
+#import "SPUInstallerAgentProtocol.h"
 #import "SUInstallerAgentInitiationProtocol.h"
 #import "StatusInfo.h"
 
@@ -22,7 +22,7 @@
  */
 static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 
-@interface InstallerProgressAppController () <NSApplicationDelegate, SUInstallerAgentProtocol>
+@interface InstallerProgressAppController () <NSApplicationDelegate, SPUInstallerAgentProtocol>
 
 @property (nonatomic, readonly) NSApplication *application;
 @property (nonatomic, weak) id<InstallerProgressDelegate> delegate;
@@ -91,7 +91,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
         _application = application;
         _delegate = delegate;
         
-        _connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerAgentProtocol)];
+        _connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SPUInstallerAgentProtocol)];
         _connection.exportedObject = self;
         
         _connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerAgentInitiationProtocol)];
@@ -171,7 +171,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
                 [self cleanupAndExitWithStatus:EXIT_FAILURE];
             }
             
-            NSRunningApplication *runningApplication = [SUApplicationInfo runningApplicationWithBundle:relaunchBundle];
+            NSRunningApplication *runningApplication = [SPUApplicationInfo runningApplicationWithBundle:relaunchBundle];
             NSNumber *processIdentifier = (runningApplication == nil || runningApplication.terminated) ? nil : @(runningApplication.processIdentifier);
             
             reply(processIdentifier);
@@ -218,7 +218,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             TransformProcessType(&psn, kProcessTransformToForegroundApplication);
             
             // Note: the application icon needs to be set after showing the icon in the dock
-            self.application.applicationIconImage = [SUApplicationInfo bestIconForBundle:self.hostBundle];
+            self.application.applicationIconImage = [SPUApplicationInfo bestIconForBundle:self.hostBundle];
             
             // Activate ourselves otherwise we will probably be in the background
             [self.application activateIgnoringOtherApps:YES];

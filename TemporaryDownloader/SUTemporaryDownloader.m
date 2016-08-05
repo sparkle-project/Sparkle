@@ -7,7 +7,7 @@
 //
 
 #import "SUTemporaryDownloader.h"
-#import "SUURLRequest.h"
+#import "SPUURLRequest.h"
 
 @interface SUTemporaryDownloader () <NSURLDownloadDelegate>
 
@@ -23,7 +23,7 @@
 @synthesize download = _download;
 @synthesize downloadFilename = _downloadFilename;
 
-- (void)startDownloadWithRequest:(SUURLRequest *)request completion:(void (^)(NSData * _Nullable data, NSError * _Nullable error))completionBlock
+- (void)startDownloadWithRequest:(SPUURLRequest *)request completion:(void (^)(NSData * _Nullable data, NSError * _Nullable error))completionBlock
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         self.completionBlock = completionBlock;

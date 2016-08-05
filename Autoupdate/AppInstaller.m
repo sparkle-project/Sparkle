@@ -9,24 +9,24 @@
 #import "AppInstaller.h"
 #import "TerminationListener.h"
 #import "SUInstaller.h"
-#import "SUInstallerValidation.h"
+#import "SPUInstallerValidation.h"
 #import "SULog.h"
 #import "SUHost.h"
 #import "SULocalizations.h"
 #import "SUStandardVersionComparator.h"
 #import "SUMessageTypes.h"
-#import "SUSecureCoding.h"
-#import "SUInstallationInputData.h"
+#import "SPUSecureCoding.h"
+#import "SPUInstallationInputData.h"
 #import "SUUnarchiver.h"
 #import "SUFileManager.h"
-#import "SUInstallationInfo.h"
+#import "SPUInstallationInfo.h"
 #import "SUAppcastItem.h"
 #import "SUErrors.h"
 #import "SUInstallerCommunicationProtocol.h"
 #import "AgentConnection.h"
-#import "SUInstallerAgentProtocol.h"
-#import "SUInstallationType.h"
-#import "SULocalCacheDirectory.h"
+#import "SPUInstallerAgentProtocol.h"
+#import "SPUInstallationType.h"
+#import "SPULocalCacheDirectory.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "daemon-safe" class and should NOT import AppKit
@@ -63,7 +63,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @property (nonatomic, assign) BOOL shouldRelaunch;
 @property (nonatomic, assign) BOOL shouldShowUI;
 
-@property (nonatomic) id<SUInstallerProtocol> installer;
+@property (nonatomic) id<SPUInstallerProtocol> installer;
 @property (nonatomic) BOOL willCompleteInstallation;
 @property (nonatomic) BOOL receivedInstallationData;
 @property (nonatomic) BOOL finishedValidation;
@@ -193,8 +193,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     } else {
         // Delta & package updates will require validation before extraction
         // Normal application updates are a bit more lenient allowing developers to change one of apple dev ID or DSA keys
-        if ([[unarchiver class] requiresValidationBeforeUnarchiving] || ![self.installationType isEqualToString:SUInstallationTypeApplication]) {
-            if ([SUInstallerValidation validateUpdateForHost:self.host archivePath:archivePath DSASignature:self.dsaSignature]) {
+        if ([[unarchiver class] requiresValidationBeforeUnarchiving] || ![self.installationType isEqualToString:SPUInstallationTypeApplication]) {
+            if ([SPUInstallerValidation validateUpdateForHost:self.host archivePath:archivePath DSASignature:self.dsaSignature]) {
                 self.validatedArchiveBeforeExtraction = YES;
                 [unarchiver start];
             } else {
@@ -254,14 +254,14 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     if (!self.validatedArchiveBeforeExtraction) {
         if (isPackage) {
             // If we get here, then the appcast installation type was lying to us.. This error will be caught later when starting the installer.
-            validationSuccess = [SUInstallerValidation validateUpdateForHost:self.host archivePath:archivePath DSASignature:self.dsaSignature];
+            validationSuccess = [SPUInstallerValidation validateUpdateForHost:self.host archivePath:archivePath DSASignature:self.dsaSignature];
         } else {
             // Validate the bundle code signatures and DSA signatures of archive together
-            validationSuccess = [SUInstallerValidation validateBundleUpdateForHost:self.host newBundlePath:installSourcePath archivePath:archivePath DSASignature:self.dsaSignature];
+            validationSuccess = [SPUInstallerValidation validateBundleUpdateForHost:self.host newBundlePath:installSourcePath archivePath:archivePath DSASignature:self.dsaSignature];
         }
     } else if (!isPackage) {
         // Just make sure the bundle is valid to check that the developer didn't make a careless mistake
-        validationSuccess = [SUInstallerValidation validateCodeSignatureIfAvailableForBundlePath:installSourcePath];
+        validationSuccess = [SPUInstallerValidation validateCodeSignatureIfAvailableForBundlePath:installSourcePath];
     }
     
     if (!validationSuccess) {
@@ -322,7 +322,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             // Do not rely on eg: self.ipdateDirectoryPath != nil because we may set it to nil again if an early stage fails (i.e, archive extraction)
             self.receivedInstallationData = YES;
             
-            SUInstallationInputData *installationData = (SUInstallationInputData *)SUUnarchiveRootObjectSecurely(data, [SUInstallationInputData class]);
+            SPUInstallationInputData *installationData = (SPUInstallationInputData *)SPUUnarchiveRootObjectSecurely(data, [SPUInstallationInputData class]);
             if (installationData == nil) {
                 SULog(@"Error: Failed to unarchive input installation data");
                 [self cleanupAndExitWithStatus:EXIT_FAILURE];
@@ -330,7 +330,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             }
             
             NSString *installationType = installationData.installationType;
-            if (!SUValidInstallationType(installationType)) {
+            if (!SPUValidInstallationType(installationType)) {
                 SULog(@"Error: Received invalid installation type: %@", installationType);
                 [self cleanupAndExitWithStatus:EXIT_FAILURE];
                 return;
@@ -353,11 +353,11 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             }
             
             // This installation path is specific to sparkle and the bundle identifier
-            NSString *rootCacheInstallationPath = [[SULocalCacheDirectory cachePathForBundleIdentifier:bundleIdentifier] stringByAppendingPathComponent:@"Installation"];
+            NSString *rootCacheInstallationPath = [[SPULocalCacheDirectory cachePathForBundleIdentifier:bundleIdentifier] stringByAppendingPathComponent:@"Installation"];
             
-            [SULocalCacheDirectory removeOldItemsInDirectory:rootCacheInstallationPath];
+            [SPULocalCacheDirectory removeOldItemsInDirectory:rootCacheInstallationPath];
             
-            NSString *cacheInstallationPath = [SULocalCacheDirectory createUniqueDirectoryInDirectory:rootCacheInstallationPath];
+            NSString *cacheInstallationPath = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:rootCacheInstallationPath];
             if (cacheInstallationPath == nil) {
                 SULog(@"Error: Failed to create installation cache directory in %@", rootCacheInstallationPath);
                 [self cleanupAndExitWithStatus:EXIT_FAILURE];
@@ -390,11 +390,11 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             [self extractAndInstallUpdate];
         });
     } else if (identifier == SUSentUpdateAppcastItemData) {
-        SUAppcastItem *updateItem = (SUAppcastItem *)SUUnarchiveRootObjectSecurely(data, [SUAppcastItem class]);
+        SUAppcastItem *updateItem = (SUAppcastItem *)SPUUnarchiveRootObjectSecurely(data, [SUAppcastItem class]);
         if (updateItem != nil) {
-            SUInstallationInfo *installationInfo = [[SUInstallationInfo alloc] initWithAppcastItem:updateItem canSilentlyInstall:[self.installer canInstallSilently]];
+            SPUInstallationInfo *installationInfo = [[SPUInstallationInfo alloc] initWithAppcastItem:updateItem canSilentlyInstall:[self.installer canInstallSilently]];
             
-            NSData *archivedData = SUArchiveRootObjectSecurely(installationInfo);
+            NSData *archivedData = SPUArchiveRootObjectSecurely(installationInfo);
             if (archivedData != nil) {
                 [self.agentConnection.agent registerInstallationInfoData:archivedData];
             }
@@ -433,7 +433,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     dispatch_async(self.installerQueue, ^{
         NSError *installerError = nil;
-        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self.host expectedInstallationType:self.installationType updateDirectory:self.updateDirectoryPath versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
+        id <SPUInstallerProtocol> installer = [SUInstaller installerForHost:self.host expectedInstallationType:self.installationType updateDirectory:self.updateDirectoryPath versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
         
         if (installer == nil) {
             SULog(@"Error: Failed to create installer instance with error: %@", installerError);

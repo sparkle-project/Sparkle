@@ -7,7 +7,7 @@
 //
 
 #import "SUInstallerConnection.h"
-#import "SUSystemAuthorization.h"
+#import "SPUSystemAuthorization.h"
 
 static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection Keep Alive";
 
@@ -60,7 +60,7 @@ static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection K
 
 - (void)setServiceName:(NSString *)serviceName hostPath:(NSString *)hostPath installationType:(NSString *)installationType
 {
-    NSXPCConnectionOptions options = SUNeedsSystemAuthorizationAccess(hostPath, installationType) ? NSXPCConnectionPrivileged : 0;
+    NSXPCConnectionOptions options = SPUNeedsSystemAuthorizationAccess(hostPath, installationType) ? NSXPCConnectionPrivileged : 0;
     NSXPCConnection *connection = [[NSXPCConnection alloc] initWithMachServiceName:serviceName options:options];
     
     connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerCommunicationProtocol)];

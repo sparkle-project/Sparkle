@@ -10,7 +10,7 @@
 #import "SUHost.h"
 #import "SUErrors.h"
 #import "SUUpdaterDelegate.h"
-#import "SUUserDriver.h"
+#import "SPUUserDriver.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -26,7 +26,7 @@
 
 @synthesize uiDriver = _uiDriver;
 
-- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate
+- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate
 {
     self = [super init];
     if (self != nil) {

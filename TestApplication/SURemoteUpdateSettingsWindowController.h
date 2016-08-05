@@ -9,8 +9,8 @@
 #import <Cocoa/Cocoa.h>
 #import <Sparkle/Sparkle.h>
 
-@protocol SUStandardUserDriverDelegate;
+@protocol SPUStandardUserDriverDelegate;
 
-@interface SURemoteUpdateSettingsWindowController : NSWindowController <SUStandardUserDriverDelegate>
+@interface SURemoteUpdateSettingsWindowController : NSWindowController <SPUStandardUserDriverDelegate>
 
 @end

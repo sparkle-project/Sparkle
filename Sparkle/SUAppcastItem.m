@@ -10,7 +10,7 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SULog.h"
 #import "SUConstants.h"
-#import "SUInstallationType.h"
+#import "SPUInstallationType.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -68,7 +68,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         _contentLength = (NSUInteger)[decoder decodeIntegerForKey:SUAppcastItemContentLengthKey];
         
         _installationType = [decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemInstallationTypeKey];
-        if (!SUValidInstallationType(_installationType)) {
+        if (!SPUValidInstallationType(_installationType)) {
             return nil;
         }
         
@@ -267,14 +267,14 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         
         _installationType = [enclosure objectForKey:SUAppcastAttributeInstallationType];
         if (_installationType == nil) {
-            _installationType = SUInstallationTypeDefault;
-        } else if (!SUValidInstallationType(_installationType)) {
+            _installationType = SPUInstallationTypeDefault;
+        } else if (!SPUValidInstallationType(_installationType)) {
             if (error != NULL) {
                 *error = [NSString stringWithFormat:@"Feed item's enclosure lacks valid %@ (found %@)", SUAppcastAttributeInstallationType, _installationType];
             }
             return nil;
-        } else if ([_installationType isEqualToString:SUInstallationTypeInteractivePackage]) {
-            SULog(@"warning: '%@' for %@ is deprecated. Use '%@' instead.", SUInstallationTypeInteractivePackage, SUAppcastAttributeInstallationType, SUInstallationTypeGuidedPackage);
+        } else if ([_installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
+            SULog(@"warning: '%@' for %@ is deprecated. Use '%@' instead.", SPUInstallationTypeInteractivePackage, SUAppcastAttributeInstallationType, SPUInstallationTypeGuidedPackage);
         }
 
         // Find the appropriate release notes URL.

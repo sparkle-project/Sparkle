@@ -7,9 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SUInstallerProtocol.h"
+#import "SPUInstallerProtocol.h"
 
-@interface SUPackageInstaller : NSObject <SUInstallerProtocol>
+@interface SUPackageInstaller : NSObject <SPUInstallerProtocol>
 
 - (instancetype)initWithPackagePath:(NSString *)packagePath;
 

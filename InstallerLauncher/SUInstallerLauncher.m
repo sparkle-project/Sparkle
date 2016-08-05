@@ -10,10 +10,10 @@
 #import "SUFileManager.h"
 #import "SULog.h"
 #import "SUMessageTypes.h"
-#import "SUSystemAuthorization.h"
-#import "SUBundleIcon.h"
-#import "SULocalCacheDirectory.h"
-#import "SUInstallationType.h"
+#import "SPUSystemAuthorization.h"
+#import "SPUBundleIcon.h"
+#import "SPULocalCacheDirectory.h"
+#import "SPUInstallationType.h"
 #import <ServiceManagement/ServiceManagement.h>
 
 #ifdef _APPKITDEFINES_H
@@ -145,7 +145,7 @@
         // Then use the icon (if one is available) for the authorization prompt
         // NSImage is not used because it relies on AppKit
         NSURL *tempIconDestinationURL = nil;
-        NSURL *iconURL = [SUBundleIcon iconURLForBundle:hostBundle];
+        NSURL *iconURL = [SPUBundleIcon iconURLForBundle:hostBundle];
         if (iconURL != nil) {
             CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)iconURL, (CFDictionaryRef)@{});
             if (imageSource != NULL) {
@@ -287,7 +287,7 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSBundle *hostBundle = [NSBundle bundleWithPath:hostBundlePath];
-        BOOL needsSystemAuthorization = SUNeedsSystemAuthorizationAccess(hostBundlePath, installationType);
+        BOOL needsSystemAuthorization = SPUNeedsSystemAuthorizationAccess(hostBundlePath, installationType);
         
         if (needsSystemAuthorization && !allowingUpdaterInteraction) {
             SULog(@"Updater is not allowing interaction to the launcher.");
@@ -295,7 +295,7 @@
             return;
         }
         
-        if (!allowingUpdaterInteraction && [installationType isEqualToString:SUInstallationTypeInteractivePackage]) {
+        if (!allowingUpdaterInteraction && [installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
             SULog(@"Updater is not allowing interaction to the launcher for performing an interactive type package installation.");
             completionHandler(SUInstallerLauncherFailure);
             return;
@@ -336,11 +336,11 @@
         // they could be different (eg: take a look at sparkle-cli). We also can't easily tell if the signature of the service/framework is the same as the bundle it's inside.
         // The service/framework also need not even be signed in the first place. We'll just assume for now the original bundle hasn't been tampered with
         
-        NSString *rootLauncherCachePath = [[SULocalCacheDirectory cachePathForBundleIdentifier:hostBundleIdentifier] stringByAppendingPathComponent:@"Launcher"];
+        NSString *rootLauncherCachePath = [[SPULocalCacheDirectory cachePathForBundleIdentifier:hostBundleIdentifier] stringByAppendingPathComponent:@"Launcher"];
         
-        [SULocalCacheDirectory removeOldItemsInDirectory:rootLauncherCachePath];
+        [SPULocalCacheDirectory removeOldItemsInDirectory:rootLauncherCachePath];
         
-        NSString *launcherCachePath = [SULocalCacheDirectory createUniqueDirectoryInDirectory:rootLauncherCachePath];
+        NSString *launcherCachePath = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:rootLauncherCachePath];
         if (launcherCachePath == nil) {
             SULog(@"Failed to create cache directory for progress tool in %@", rootLauncherCachePath);
             completionHandler(SUInstallerLauncherFailure);

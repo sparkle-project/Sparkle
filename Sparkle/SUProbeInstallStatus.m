@@ -7,10 +7,10 @@
 //
 
 #import "SUProbeInstallStatus.h"
-#import "SUXPCServiceInfo.h"
+#import "SPUXPCServiceInfo.h"
 #import "SUMessageTypes.h"
-#import "SUInstallationInfo.h"
-#import "SUSecureCoding.h"
+#import "SPUInstallationInfo.h"
+#import "SPUSecureCoding.h"
 #import "SUInstallerStatus.h"
 #import "SUXPCInstallerStatus.h"
 #import "SULog.h"
@@ -24,7 +24,7 @@
 + (void)probeInstallerInProgressForHostBundleIdentifier:(NSString *)hostBundleIdentifier completion:(void (^)(BOOL))completionHandler
 {
     id<SUInstallerStatusProtocol> installerStatus = nil;
-    if (!SUXPCServiceExists(@INSTALLER_STATUS_BUNDLE_ID)) {
+    if (!SPUXPCServiceExists(@INSTALLER_STATUS_BUNDLE_ID)) {
         installerStatus = [[SUInstallerStatus alloc] init];
     } else {
         installerStatus = [[SUXPCInstallerStatus alloc] init];
@@ -64,10 +64,10 @@
     });
 }
 
-+ (void)probeInstallerUpdateItemForHostBundleIdentifier:(NSString *)hostBundleIdentifier completion:(void (^)(SUInstallationInfo  * _Nullable))completionHandler
++ (void)probeInstallerUpdateItemForHostBundleIdentifier:(NSString *)hostBundleIdentifier completion:(void (^)(SPUInstallationInfo  * _Nullable))completionHandler
 {
     id<SUInstallerStatusProtocol> installerStatus = nil;
-    if (!SUXPCServiceExists(@INSTALLER_STATUS_BUNDLE_ID)) {
+    if (!SPUXPCServiceExists(@INSTALLER_STATUS_BUNDLE_ID)) {
         installerStatus = [[SUInstallerStatus alloc] init];
     } else {
         installerStatus = [[SUXPCInstallerStatus alloc] init];
@@ -88,9 +88,9 @@
     [installerStatus setServiceName:serviceName];
     
     [installerStatus probeStatusInfoWithReply:^(NSData * _Nullable installationInfoData) {
-        SUInstallationInfo *installationInfo = nil;
+        SPUInstallationInfo *installationInfo = nil;
         if (installationInfoData != nil) {
-            installationInfo = (SUInstallationInfo *)SUUnarchiveRootObjectSecurely((NSData * _Nonnull)installationInfoData, [SUInstallationInfo class]);
+            installationInfo = (SPUInstallationInfo *)SPUUnarchiveRootObjectSecurely((NSData * _Nonnull)installationInfoData, [SPUInstallationInfo class]);
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{

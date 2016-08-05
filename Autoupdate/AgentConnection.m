@@ -8,7 +8,7 @@
 
 #import "AgentConnection.h"
 #import "SUMessageTypes.h"
-#import "SUInstallerAgentProtocol.h"
+#import "SPUInstallerAgentProtocol.h"
 #import "SUInstallerAgentInitiationProtocol.h"
 
 #ifdef _APPKITDEFINES_H
@@ -19,7 +19,7 @@
 
 @property (nonatomic) NSXPCListener *xpcListener;
 @property (nonatomic, nullable) NSXPCConnection *activeConnection;
-@property (nonatomic, nullable) id<SUInstallerAgentProtocol> agent;
+@property (nonatomic, nullable) id<SPUInstallerAgentProtocol> agent;
 @property (nonatomic, weak) id<AgentConnectionDelegate> delegate;
 @property (nonatomic) BOOL connected;
 
@@ -72,7 +72,7 @@
     newConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerAgentInitiationProtocol)];
     newConnection.exportedObject = self;
     
-    newConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerAgentProtocol)];
+    newConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SPUInstallerAgentProtocol)];
     
     self.activeConnection = newConnection;
     

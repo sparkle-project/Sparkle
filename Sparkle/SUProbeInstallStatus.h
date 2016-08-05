@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SUInstallationInfo;
+@class SPUInstallationInfo;
 
 @interface SUProbeInstallStatus : NSObject
 
@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // completionHandler may not be sent on main queue
 // additionally, it may be possible that the installer is in progress but we get a nil installation info back
-+ (void)probeInstallerUpdateItemForHostBundleIdentifier:(NSString *)hostBundleIdentifier completion:(void (^)(SUInstallationInfo  * _Nullable))completionHandler;
++ (void)probeInstallerUpdateItemForHostBundleIdentifier:(NSString *)hostBundleIdentifier completion:(void (^)(SPUInstallationInfo  * _Nullable))completionHandler;
 
 @end
 

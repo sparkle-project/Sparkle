@@ -8,9 +8,9 @@
 
 #import "SPUUpdater.h"
 #import "SUUpdaterDelegate.h"
-#import "SUUpdaterSettings.h"
+#import "SPUUpdaterSettings.h"
 #import "SUHost.h"
-#import "SUUpdatePermission.h"
+#import "SPUUpdatePermission.h"
 #import "SUUpdateDriver.h"
 #import "SUConstants.h"
 #import "SULog.h"
@@ -22,10 +22,10 @@
 #import "SUAutomaticUpdateDriver.h"
 #import "SUProbeInstallStatus.h"
 #import "SUAppcastItem.h"
-#import "SUInstallationInfo.h"
+#import "SPUInstallationInfo.h"
 #import "SUErrors.h"
-#import "SUXPCServiceInfo.h"
-#import "SUUpdaterCycle.h"
+#import "SPUXPCServiceInfo.h"
+#import "SPUUpdaterCycle.h"
 #import "SUDownloadedUpdate.h"
 
 #ifdef _APPKITDEFINES_H
@@ -39,15 +39,15 @@ NSString *const SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotific
 NSString *const SUUpdaterAppcastItemNotificationKey = @"SUUpdaterAppcastItemNotificationKey";
 NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotificationKey";
 
-@interface SPUUpdater () <SUUpdaterCycleDelegate>
+@interface SPUUpdater () <SPUUpdaterCycleDelegate>
 
 @property (readonly, copy) NSURL *parameterizedFeedURL;
 
 @property (nonatomic) id <SUUpdateDriver> driver;
 @property (nonatomic, weak) id delegator;
 @property (nonatomic, readonly) SUHost *host;
-@property (nonatomic, readonly) SUUpdaterSettings *updaterSettings;
-@property (nonatomic, readonly) SUUpdaterCycle *updaterCycle;
+@property (nonatomic, readonly) SPUUpdaterSettings *updaterSettings;
+@property (nonatomic, readonly) SPUUpdaterCycle *updaterCycle;
 @property (nonatomic) BOOL startedUpdater;
 @property (nonatomic, copy) void (^preStartedScheduledUpdateBlock)(void);
 @property (nonatomic, nullable) SUDownloadedUpdate *resumableUpdate;
@@ -79,7 +79,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 }
 #endif
 
-- (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)theDelegate
+- (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SPUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)theDelegate
 {
     self = [super init];
     
@@ -89,8 +89,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         
         _host = [[SUHost alloc] initWithBundle:bundle];
         
-        _updaterSettings = [[SUUpdaterSettings alloc] initWithHostBundle:bundle];
-        _updaterCycle = [[SUUpdaterCycle alloc] initWithDelegate:self];
+        _updaterSettings = [[SPUUpdaterSettings alloc] initWithHostBundle:bundle];
+        _updaterCycle = [[SPUUpdaterCycle alloc] initWithDelegate:self];
         
         _userDriver = userDriver;
         
@@ -180,12 +180,12 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
     if (!servingOverHttps) {
         BOOL foundXPCTemporaryDownloaderService = NO;
-        BOOL foundATSTemporaryIssue = [self checkATSIssueForBundle:SUXPCServiceBundle(@TEMPORARY_DOWNLOADER_BUNDLE_ID) getBundleExists:&foundXPCTemporaryDownloaderService];
+        BOOL foundATSTemporaryIssue = [self checkATSIssueForBundle:SPUXPCServiceBundle(@TEMPORARY_DOWNLOADER_BUNDLE_ID) getBundleExists:&foundXPCTemporaryDownloaderService];
         
         BOOL foundXPCPersistentDownloaderService = NO;
         BOOL foundATSPersistentIssue = NO;
         if (!foundATSTemporaryIssue) {
-            foundATSPersistentIssue = [self checkATSIssueForBundle:SUXPCServiceBundle(@PERSISTENT_DOWNLOADER_BUNDLE_ID) getBundleExists:&foundXPCPersistentDownloaderService];
+            foundATSPersistentIssue = [self checkATSIssueForBundle:SPUXPCServiceBundle(@PERSISTENT_DOWNLOADER_BUNDLE_ID) getBundleExists:&foundXPCPersistentDownloaderService];
         }
         
         NSBundle *mainBundle = [NSBundle mainBundle];
@@ -263,7 +263,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
         
         __weak SPUUpdater *weakSelf = self;
-        [self.userDriver requestUpdatePermissionWithSystemProfile:profileInfo reply:^(SUUpdatePermission *result) {
+        [self.userDriver requestUpdatePermissionWithSystemProfile:profileInfo reply:^(SPUUpdatePermission *result) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 SPUUpdater *strongSelf = weakSelf;
                 if (strongSelf != nil) {
@@ -286,7 +286,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
 }
 
-- (void)updatePermissionPromptFinishedWithResult:(SUUpdatePermission *)result
+- (void)updatePermissionPromptFinishedWithResult:(SPUUpdatePermission *)result
 {
     [self.host setBool:result.sendProfile forUserDefaultsKey:SUSendProfileInfoKey];
     [self setAutomaticallyChecksForUpdates:(result.choice == SUAutomaticallyCheck)];
@@ -713,7 +713,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 {
     NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
-    [SUProbeInstallStatus probeInstallerUpdateItemForHostBundleIdentifier:hostBundleIdentifier completion:^(SUInstallationInfo * _Nullable installationInfo) {
+    [SUProbeInstallStatus probeInstallerUpdateItemForHostBundleIdentifier:hostBundleIdentifier completion:^(SPUInstallationInfo * _Nullable installationInfo) {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSTimeInterval regularCheckInterval = [self updateCheckInterval];
             if (installationInfo == nil) {

@@ -9,14 +9,14 @@
 #import "SUDownloadDriver.h"
 #import "SUPersistentDownloaderDelegate.h"
 #import "SUPersistentDownloader.h"
-#import "SUXPCServiceInfo.h"
+#import "SPUXPCServiceInfo.h"
 #import "SUAppcastItem.h"
 #import "SUFileManager.h"
 #import "SULocalizations.h"
 #import "SUHost.h"
 #import "SULog.h"
 #import "SUErrors.h"
-#import "SUURLRequest.h"
+#import "SPUURLRequest.h"
 #import "SUDownloadedUpdate.h"
 
 #ifdef _APPKITDEFINES_H
@@ -65,7 +65,7 @@
         _request = [NSMutableURLRequest requestWithURL:updateItem.fileURL];
         [_request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
         
-        if (!SUXPCServiceExists(@PERSISTENT_DOWNLOADER_BUNDLE_ID)) {
+        if (!SPUXPCServiceExists(@PERSISTENT_DOWNLOADER_BUNDLE_ID)) {
             _downloader = [[SUPersistentDownloader alloc] initWithDelegate:self];
         } else {
             _connection = [[NSXPCConnection alloc] initWithServiceName:@PERSISTENT_DOWNLOADER_BUNDLE_ID];
@@ -118,7 +118,7 @@
     [self.delegate downloadDriverWillBeginDownload];
     
     NSString *desiredFilename = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
-    [self.downloader startDownloadWithRequest:[SUURLRequest URLRequestWithRequest:self.request] bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];
+    [self.downloader startDownloadWithRequest:[SPUURLRequest URLRequestWithRequest:self.request] bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];
 }
 
 - (void)cleanup

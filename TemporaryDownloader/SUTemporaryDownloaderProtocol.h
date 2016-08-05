@@ -10,12 +10,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SUURLRequest;
+@class SPUURLRequest;
 
 // The protocol that this service will vend as its API. This header file will also need to be visible to the process hosting the service.
 @protocol SUTemporaryDownloaderProtocol
 
-- (void)startDownloadWithRequest:(SUURLRequest *)request completion:(void (^)(NSData * _Nullable data, NSError * _Nullable error))completionBlock;
+- (void)startDownloadWithRequest:(SPUURLRequest *)request completion:(void (^)(NSData * _Nullable data, NSError * _Nullable error))completionBlock;
 
 @end
 

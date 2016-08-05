@@ -7,12 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SUInstallerProtocol.h"
+#import "SPUInstallerProtocol.h"
 
 @class SUHost;
 @protocol SUVersionComparison;
 
-@interface SUPlainInstaller : NSObject <SUInstallerProtocol>
+@interface SUPlainInstaller : NSObject <SPUInstallerProtocol>
 
 - (instancetype)initWithHost:(SUHost *)host applicationPath:(NSString *)applicationPath installationPath:(NSString *)installationPath versionComparator:(id <SUVersionComparison>)comparator;
 

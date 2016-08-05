@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Sparkle/Sparkle.h>
-#import "SUCommandLineDriver.h"
+#import "SPUCommandLineDriver.h"
 #include <getopt.h>
 
 #define APPLICATION_FLAG "application"
@@ -129,12 +129,12 @@ int main(int argc, char **argv)
             return EXIT_FAILURE;
         }
         
-        SUUpdatePermission *updatePermission = nil;
+        SPUUpdatePermission *updatePermission = nil;
         if (grantAutomaticChecking) {
-            updatePermission = [SUUpdatePermission updatePermissionWithChoice:SUAutomaticallyCheck sendProfile:sendProfile];
+            updatePermission = [SPUUpdatePermission updatePermissionWithChoice:SUAutomaticallyCheck sendProfile:sendProfile];
         }
         
-        SUCommandLineDriver *driver = [[SUCommandLineDriver alloc] initWithUpdateBundlePath:updatePath applicationBundlePath:applicationPath updatePermission:updatePermission deferInstallation:deferInstall interactiveInstallation:interactive verbose:verbose];
+        SPUCommandLineDriver *driver = [[SPUCommandLineDriver alloc] initWithUpdateBundlePath:updatePath applicationBundlePath:applicationPath updatePermission:updatePermission deferInstallation:deferInstall interactiveInstallation:interactive verbose:verbose];
         if (driver == nil) {
             fprintf(stderr, "Error: Failed to initialize updater. Are the bundle paths provided valid?\n");
             return EXIT_FAILURE;

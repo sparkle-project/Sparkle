@@ -7,14 +7,14 @@
 //
 
 #import "SUPopUpTitlebarUserDriver.h"
-#import "SUStandardUserDriverDelegate.h"
-#import "SUUserDriverCoreComponent.h"
+#import "SPUStandardUserDriverDelegate.h"
+#import "SPUUserDriverCoreComponent.h"
 #import "SUInstallUpdateViewController.h"
 
 @interface SUPopUpTitlebarUserDriver()
 
 @property (nonatomic, readonly) NSWindow *window;
-@property (nonatomic, readonly) SUUserDriverCoreComponent *coreComponent;
+@property (nonatomic, readonly) SPUUserDriverCoreComponent *coreComponent;
 @property (nonatomic) NSTitlebarAccessoryViewController *accessoryViewController;
 @property (nonatomic) BOOL addedAccessory;
 @property (nonatomic) NSButton *updateButton;
@@ -36,13 +36,13 @@
 @synthesize expectedContentLength = _expectedContentLength;
 @synthesize contentLengthDownloaded = _contentLengthDownloaded;
 
-- (instancetype)initWithWindow:(NSWindow *)window delegate:(id<SUStandardUserDriverDelegate>)delegate
+- (instancetype)initWithWindow:(NSWindow *)window delegate:(id<SPUStandardUserDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
         _window = window;
         _delegate = delegate;
-        _coreComponent = [[SUUserDriverCoreComponent alloc] initWithDelegate:delegate];
+        _coreComponent = [[SPUUserDriverCoreComponent alloc] initWithDelegate:delegate];
     }
     return self;
 }
@@ -150,11 +150,11 @@
 
 #pragma mark Update Permission
 
-- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SUUpdatePermission *))reply
+- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SPUUpdatePermission *))reply
 {
     // Just make a decision..
     dispatch_async(dispatch_get_main_queue(), ^{
-        reply([SUUpdatePermission updatePermissionWithChoice:SUAutomaticallyCheck sendProfile:NO]);
+        reply([SPUUpdatePermission updatePermissionWithChoice:SUAutomaticallyCheck sendProfile:NO]);
     });
 }
 

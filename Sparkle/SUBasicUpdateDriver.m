@@ -15,7 +15,7 @@
 #import "SUHost.h"
 #import "SUAppcastItem.h"
 #import "SUProbeInstallStatus.h"
-#import "SUInstallationInfo.h"
+#import "SPUInstallationInfo.h"
 #import "SUDownloadedUpdate.h"
 
 @interface SUBasicUpdateDriver () <SUAppcastDriverDelegate>
@@ -87,7 +87,7 @@
     
     NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
-    [SUProbeInstallStatus probeInstallerUpdateItemForHostBundleIdentifier:hostBundleIdentifier completion:^(SUInstallationInfo * _Nullable installationInfo) {
+    [SUProbeInstallStatus probeInstallerUpdateItemForHostBundleIdentifier:hostBundleIdentifier completion:^(SPUInstallationInfo * _Nullable installationInfo) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self notifyResumableUpdateItem:installationInfo.appcastItem];
         });

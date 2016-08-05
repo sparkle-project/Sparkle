@@ -8,7 +8,7 @@
 
 #import "SUStatusController.h"
 #import "SUHost.h"
-#import "SUApplicationInfo.h"
+#import "SPUApplicationInfo.h"
 #import "SULocalizations.h"
 
 @interface SUStatusController ()
@@ -41,7 +41,7 @@
 
 - (void)windowDidLoad
 {
-    if ([SUApplicationInfo isBackgroundApplication:NSApp]) {
+    if ([SPUApplicationInfo isBackgroundApplication:NSApp]) {
         [[self window] setLevel:NSFloatingWindowLevel];
     }
 
@@ -57,7 +57,7 @@
 
 - (NSImage *)applicationIcon
 {
-    return [SUApplicationInfo bestIconForBundle:self.host.bundle];
+    return [SPUApplicationInfo bestIconForBundle:self.host.bundle];
 }
 
 - (void)beginActionWithTitle:(NSString *)aTitle maxProgressValue:(double)aMaxProgressValue statusText:(NSString *)aStatusText

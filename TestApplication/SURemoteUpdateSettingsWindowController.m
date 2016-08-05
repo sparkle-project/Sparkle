@@ -13,7 +13,7 @@
 @interface SURemoteUpdateSettingsWindowController ()
 
 @property (nonatomic) NSXPCConnection *connection;
-@property (nonatomic) id<SUStandardUserDriver> userDriver;
+@property (nonatomic) id<SPUStandardUserDriverProtocol> userDriver;
 
 @property (nonatomic) IBOutlet NSButton *automaticallyChecksForUpdatesButton;
 @property (nonatomic) IBOutlet NSButton *automaticallyDownloadUpdatesButton;
@@ -55,7 +55,7 @@
 
 - (void)reloadSettings
 {
-    SUUpdaterSettings *settings = [[SUUpdaterSettings alloc] initWithHostBundle:[NSBundle mainBundle]];
+    SPUUpdaterSettings *settings = [[SPUUpdaterSettings alloc] initWithHostBundle:[NSBundle mainBundle]];
     
     // Make sure window is loaded
     [self window];
@@ -75,10 +75,10 @@
 {
     self.connection = [[NSXPCConnection alloc] initWithServiceName:@"org.sparkle-project.TestAppHelper"];
     
-    self.connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUUserDriver)];
+    self.connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SPUUserDriver)];
     
     //self.userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:self.window delegate:self];
-    self.userDriver = [[SUStandardUserDriver alloc] initWithHostBundle:[NSBundle mainBundle] delegate:self];
+    self.userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:[NSBundle mainBundle] delegate:self];
     
     self.connection.exportedObject = self.userDriver;
     

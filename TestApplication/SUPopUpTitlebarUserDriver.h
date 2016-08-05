@@ -9,10 +9,10 @@
 #import <Foundation/Foundation.h>
 #import <Sparkle/Sparkle.h>
 
-@protocol SUStandardUserDriver;
+@protocol SPUStandardUserDriverProtocol;
 
-@interface SUPopUpTitlebarUserDriver : NSObject <SUUserDriver, SUStandardUserDriver>
+@interface SUPopUpTitlebarUserDriver : NSObject <SPUUserDriver, SPUStandardUserDriverProtocol>
 
-- (instancetype)initWithWindow:(NSWindow *)window delegate:(id<SUStandardUserDriverDelegate>)delegate;
+- (instancetype)initWithWindow:(NSWindow *)window delegate:(id<SPUStandardUserDriverDelegate>)delegate;
 
 @end

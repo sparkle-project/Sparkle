@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@protocol SUInstallerAgentProtocol;
+@protocol SPUInstallerAgentProtocol;
 
 @interface AgentConnection : NSObject
 
@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)startListener;
 - (void)invalidate;
 
-@property (nonatomic, readonly, nullable) id<SUInstallerAgentProtocol> agent;
+@property (nonatomic, readonly, nullable) id<SPUInstallerAgentProtocol> agent;
 @property (nonatomic, readonly) BOOL connected;
 
 @end

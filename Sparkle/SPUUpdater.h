@@ -12,7 +12,7 @@
 #import <Foundation/Foundation.h>
 #endif
 #import "SUExport.h"
-#import "SUUserDriver.h"
+#import "SPUUserDriver.h"
 
 @class SUAppcastItem, SUAppcast;
 
@@ -43,7 +43,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  *
  * This must be called on the main thread.
  */
-- (instancetype)initWithHostBundle:(NSBundle *)hostBundle userDriver:(id <SUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)delegate;
+- (instancetype)initWithHostBundle:(NSBundle *)hostBundle userDriver:(id <SPUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)delegate;
 
 /*!
  * Starts the updater.
@@ -59,7 +59,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
 - (BOOL)startUpdater:(NSError * __autoreleasing *)error;
 
 @property (weak, readonly) id<SUUpdaterDelegate> delegate;
-@property (nonatomic, readonly) id<SUUserDriver> userDriver;
+@property (nonatomic, readonly) id<SPUUserDriver> userDriver;
 
 @property (readonly, strong) NSBundle *hostBundle;
 @property (strong, readonly) NSBundle *sparkleBundle;

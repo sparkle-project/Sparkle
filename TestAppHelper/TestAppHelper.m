@@ -13,7 +13,7 @@
 @interface TestAppHelper ()
 
 @property (nonatomic) SPUUpdater *updater;
-@property (nonatomic) id <SUUserDriver> userDriver;
+@property (nonatomic) id <SPUUserDriver> userDriver;
 
 @end
 
@@ -22,7 +22,7 @@
 @synthesize updater = _updater;
 @synthesize userDriver = _userDriver;
 
-- (instancetype)initWithUserDriver:(id <SUUserDriver>)userDriver
+- (instancetype)initWithUserDriver:(id <SPUUserDriver>)userDriver
 {
     self = [super init];
     if (self != nil) {

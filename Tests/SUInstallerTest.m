@@ -10,9 +10,9 @@
 #import <XCTest/XCTest.h>
 #import "SUHost.h"
 #import "SUInstaller.h"
-#import "SUInstallerProtocol.h"
+#import "SPUInstallerProtocol.h"
 #import "SUStandardVersionComparator.h"
-#import "SUInstallationType.h"
+#import "SPUInstallationType.h"
 #import <unistd.h>
 
 @interface SUInstallerTest : XCTestCase
@@ -55,7 +55,7 @@
     SUHost *host = [[SUHost alloc] initWithBundle:bundle];
     
     NSError *installerError = nil;
-    id<SUInstallerProtocol> installer = [SUInstaller installerForHost:host expectedInstallationType:SUInstallationTypeGuidedPackage updateDirectory:[path stringByDeletingLastPathComponent] versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
+    id<SPUInstallerProtocol> installer = [SUInstaller installerForHost:host expectedInstallationType:SPUInstallationTypeGuidedPackage updateDirectory:[path stringByDeletingLastPathComponent] versionComparator:[SUStandardVersionComparator standardVersionComparator] error:&installerError];
     
     if (installer == nil) {
         XCTFail(@"Installer is nil with error: %@", installerError);
