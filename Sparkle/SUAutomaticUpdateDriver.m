@@ -13,6 +13,7 @@
 #import "SUCoreBasedUpdateDriver.h"
 #import "SULog.h"
 #import "SUAppcastItem.h"
+#import "SPUUserDriver.h"
 #import "SUErrors.h"
 
 #ifdef _APPKITDEFINES_H
@@ -22,6 +23,7 @@
 @interface SUAutomaticUpdateDriver () <SUCoreBasedUpdateDriverDelegate>
 
 @property (nonatomic, readonly, weak) id updater;
+@property (nonatomic, readonly, weak) id<SPUUserDriver> userDriver;
 @property (nonatomic, readonly, weak, nullable) id updaterDelegate;
 @property (nonatomic, readonly) SUCoreBasedUpdateDriver *coreDriver;
 @property (nonatomic) SUAppcastItem* updateItem;
@@ -32,16 +34,19 @@
 @implementation SUAutomaticUpdateDriver
 
 @synthesize updater = _updater;
+@synthesize userDriver = _userDriver;
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize coreDriver = _coreDriver;
 @synthesize updateItem = _updateItem;
 @synthesize willInstallSilently = _willInstallSilently;
 
-- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate
+- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate
 {
     self = [super init];
     if (self != nil) {
         _updater = updater;
+        // The user driver is only used for a termination callback
+        _userDriver = userDriver;
         _updaterDelegate = updaterDelegate;
         _coreDriver = [[SUCoreBasedUpdateDriver alloc] initWithHost:host sparkleBundle:sparkleBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
     }
@@ -83,8 +88,7 @@
         id<SUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
         if (self.willInstallSilently && [updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationBlock:)]) {
             __weak SUAutomaticUpdateDriver *weakSelf = self;
-            installationHandledByDelegate =
-            [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationBlock:^{
+            installationHandledByDelegate = [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationBlock:^{
                 [weakSelf.coreDriver finishInstallationWithResponse:SUInstallAndRelaunchUpdateNow displayingUserInterface:NO];
             }];
         }
@@ -101,10 +105,7 @@
 // otherwise the update driver will abort the update before then
 - (void)installerIsRequestingAppTermination
 {
-    id<SUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
-    if ([updaterDelegate respondsToSelector:@selector(updaterIsRequestingQuit:)]) {
-        [updaterDelegate updaterIsRequestingQuit:self.updater];
-    }
+    [self.userDriver terminateApplication];
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(NSError *)error

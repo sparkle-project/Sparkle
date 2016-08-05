@@ -387,6 +387,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                  initWithHost:strongSelf.host
                  sparkleBundle:strongSelf.sparkleBundle
                  updater:strongSelf.delegator
+                 userDriver:strongSelf.userDriver
                  updaterDelegate:strongSelf.delegate];
             } else {
                 updateDriver =
