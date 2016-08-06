@@ -90,6 +90,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
 // This will be used when the updater is instantiated in a nib such as MainMenu
 - (instancetype)init
 {
+    SULog(@"DEPRECATION: SUUpdater is now deprecated. Please use SPUStandardUpdaterController as a nib instantiated replacement, or SPUUpdater.");
     return [self initForBundle:[NSBundle mainBundle]];
 }
 
