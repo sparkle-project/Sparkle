@@ -241,6 +241,13 @@ static NSMutableDictionary *sharedUpdaters = nil;
     return nil;
 }
 
+// Not implemented properly at the moment - haven't decided if it should be
+// Just invoke the regular update process if this is invoked
+- (void)installUpdatesIfAvailable
+{
+    [self checkForUpdates:nil];
+}
+
 // Private API that is used by SUInstallerDriver
 - (NSString *)_decryptionPasswordForSparkleUpdater
 {
