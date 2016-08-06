@@ -100,6 +100,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         _userDriver = userDriver;
         
         _delegate = theDelegate;
+        
+        // This property can be changed by an SUUpdater instance using us to setting our delegator to itself
+        // This is why the updater types in the SUUpdaterDelegate are 'id' - because they can be SPUUpdater or SUUpdater
+        // This is not a really a big deal because using the sender type is normally bad practice, and us passing it was a regretful decision in the first place.
         _delegator = self;
     }
     
