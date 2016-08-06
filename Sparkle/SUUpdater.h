@@ -28,6 +28,8 @@
  
  This class is used to configure the update paramters as well as manually
  and automatically schedule and control checks for updates.
+ 
+ Note: This class is now deprecated and acts as a thin wrapper around SPUUpdater and SPUStandardUserDriver
  */
 __deprecated_msg("Use SUStandardUpdaterController or SPUUpdater instead")
 SU_EXPORT @interface SUUpdater : NSObject
