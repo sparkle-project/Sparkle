@@ -321,7 +321,7 @@
 		72F94F5D1CC455B4002DEE68 /* org.sparkle-project.InstallerLauncher.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 726E07AD1CAF08D6001A286B /* org.sparkle-project.InstallerLauncher.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		72F94F5E1CC455B4002DEE68 /* org.sparkle-project.PersistentDownloader.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 726E07EF1CAF37BD001A286B /* org.sparkle-project.PersistentDownloader.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		72F94F5F1CC455B4002DEE68 /* org.sparkle-project.TemporaryDownloader.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 728638F31CAF5A5F00783084 /* org.sparkle-project.TemporaryDownloader.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		72F9EBE21D517E2F004AC8B6 /* SUUpdater.h in Headers */ = {isa = PBXBuildFile; fileRef = 72F9EBE01D517E2F004AC8B6 /* SUUpdater.h */; };
+		72F9EBE21D517E2F004AC8B6 /* SUUpdater.h in Headers */ = {isa = PBXBuildFile; fileRef = 72F9EBE01D517E2F004AC8B6 /* SUUpdater.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72F9EBE31D517E2F004AC8B6 /* SUUpdater.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F9EBE11D517E2F004AC8B6 /* SUUpdater.m */; };
 		C23E885B1BE7B24F0050BB73 /* SparkleTestCodeSignApp.enc.dmg in Resources */ = {isa = PBXBuildFile; fileRef = C23E88591BE7AF890050BB73 /* SparkleTestCodeSignApp.enc.dmg */; };
 		F8761EB11ADC5068000C9034 /* SUCodeSigningVerifierTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */; };
@@ -1842,6 +1842,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				725F977B1C8A896F00265BE4 /* SPUUserDriverCoreComponent.h in Headers */,
+				72F9EBE21D517E2F004AC8B6 /* SUUpdater.h in Headers */,
 				726E078D1CA891E9001A286B /* SPUUpdaterSettings.h in Headers */,
 				720E217B1D0D00BF003A311C /* SPUUpdaterCycle.h in Headers */,
 				72A6F98A1C94E2D6005F404C /* SUUpdaterDelegate.h in Headers */,
@@ -1879,7 +1880,6 @@
 				726E075C1CA3A6D6001A286B /* SPUSecureCoding.h in Headers */,
 				72B767E21C9CE90A00A07552 /* SUCoreBasedUpdateDriver.h in Headers */,
 				72B09CE71CE6BCBD0052EF9E /* SPUURLDownload.h in Headers */,
-				72F9EBE21D517E2F004AC8B6 /* SUUpdater.h in Headers */,
 				61A225A40D1C4AC000430CCD /* SUStandardVersionComparator.h in Headers */,
 				7229E1B91C97CC4D00CB50D0 /* SUScheduledUpdateDriver.h in Headers */,
 				7214B8811D456A8500CB5CED /* SPUBundleIcon.h in Headers */,
