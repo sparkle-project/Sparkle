@@ -79,6 +79,12 @@
     [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
 }
 
+// Method used for backwards compatibility for the updater delegate
+- (void)finishInstallationAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showingUI
+{
+    [self.coreDriver finishInstallationWithResponse:(relaunch ? SUInstallAndRelaunchUpdateNow : SUInstallUpdateNow) displayingUserInterface:showingUI];
+}
+
 - (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently
 {
     self.willInstallSilently = willInstallSilently;
@@ -86,11 +92,33 @@
     if (!willInstallImmediately) {
         BOOL installationHandledByDelegate = NO;
         id<SUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
-        if (self.willInstallSilently && [updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationBlock:)]) {
-            __weak SUAutomaticUpdateDriver *weakSelf = self;
-            installationHandledByDelegate = [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationBlock:^{
-                [weakSelf.coreDriver finishInstallationWithResponse:SUInstallAndRelaunchUpdateNow displayingUserInterface:NO];
-            }];
+        if (self.willInstallSilently) {
+            if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationBlock:)]) {
+                __weak SUAutomaticUpdateDriver *weakSelf = self;
+                installationHandledByDelegate = [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationBlock:^{
+                    [weakSelf.coreDriver finishInstallationWithResponse:SUInstallAndRelaunchUpdateNow displayingUserInterface:NO];
+                }];
+            } else if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)]) {
+                // Just for backwards compatibility
+                
+                BOOL relaunch = YES;
+                BOOL showUI = NO;
+                
+                NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(finishInstallationAndRelaunch:displayingUserInterface:)]];
+                [invocation setSelector:@selector(finishInstallationAndRelaunch:displayingUserInterface:)];
+                [invocation setArgument:&relaunch atIndex:2];
+                [invocation setArgument:&showUI atIndex:3];
+                [invocation setTarget:self];
+                
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationInvocation:invocation];
+#pragma clang diagnostic pop
+                
+                // We have to assume they will handle the installation since they implement this method
+                // Not ideal, but this is why this delegate callback is deprecated
+                installationHandledByDelegate = YES;
+            }
         }
         
         if (!installationHandledByDelegate) {

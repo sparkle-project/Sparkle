@@ -291,7 +291,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  \param item The appcast item corresponding to the update that is proposed to be installed.
  \param invocation Can be used to trigger an immediate silent install and relaunch.
  
- \deprecated See -updater:willInstallUpdateOnQuit:immediateInstallationBlock: instead. This method is no longer invoked.
+ \deprecated See -updater:willInstallUpdateOnQuit:immediateInstallationBlock: instead. If this method is implemented, Sparkle will assume the delegate is given responsibility to handling the update without a choice. For this reason, please don't implement this method.
  */
 - (void)updater:(id)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationInvocation:(NSInvocation *)invocation __deprecated;
 
