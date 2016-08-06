@@ -17,6 +17,8 @@
 @property (nonatomic, readonly) SPUUpdater *updater;
 @property (nonatomic, readonly) SPUStandardUserDriver *userDriver;
 
+@property (nonatomic) BOOL loggedInstallUpdatesIfAvailableWarning;
+
 @end
 
 @interface SPUUpdater (Private)
@@ -34,6 +36,7 @@
 @synthesize updater = _updater;
 @synthesize userDriver = _userDriver;
 @synthesize decryptionPassword = _decryptionPassword;
+@synthesize loggedInstallUpdatesIfAvailableWarning = _loggedInstallUpdatesIfAvailableWarning;
 
 static NSMutableDictionary *sharedUpdaters = nil;
 
@@ -250,10 +253,18 @@ static NSMutableDictionary *sharedUpdaters = nil;
     return nil;
 }
 
-// Not implemented properly at the moment - haven't decided if it should be
-// Just invoke the regular update process if this is invoked
+// Not implemented properly at the moment - leaning towards it not be in the future
+// because it may be hard to implement properly (without passing a boolean flag everywhere), or
+// it would require us to maintain support for an additional class used by a very few people thus far
+// For now, just invoke the regular update process if this is invoked. Could change our minds on this later.
 - (void)installUpdatesIfAvailable
 {
+    if (!self.loggedInstallUpdatesIfAvailableWarning) {
+        SULog(@"-[%@ installUpdatesIfAvailable] does not function anymore.. Instead a user-initiated update check will be done instead.", NSStringFromClass([self class]));
+        
+        self.loggedInstallUpdatesIfAvailableWarning = YES;
+    }
+    
     [self checkForUpdates:nil];
 }
 
