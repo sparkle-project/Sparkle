@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "SUStatusCompletionResults.h"
+#import "SUExport.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -29,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
  An implementor of this protocol should act defensively. For example, it may be possible for an action that says to
  invalidate or dismiss something to be called multiple times in succession, and the implementor may choose to ignore further requests.
  */
-@protocol SPUUserDriver <NSObject>
+SU_EXPORT @protocol SPUUserDriver <NSObject>
 
 /*!
  * Show that an update can be checked by the user or not

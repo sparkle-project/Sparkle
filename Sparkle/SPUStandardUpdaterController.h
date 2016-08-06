@@ -7,6 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "SUExport.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -30,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
  * You don't want to use a convenience class that provides very little glue ;)
  
   */
-@interface SPUStandardUpdaterController : NSObject
+SU_EXPORT @interface SPUStandardUpdaterController : NSObject
 
 /*!
  Interface builder outlet for the updater's delegate.

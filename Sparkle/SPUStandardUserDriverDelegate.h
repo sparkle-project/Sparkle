@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SUExport.h"
 
 @protocol SUVersionDisplay;
 
@@ -15,7 +16,7 @@
  
  This includes methods related to UI interactions and XPC/remote process communication.
  */
-@protocol SPUStandardUserDriverDelegate <NSObject>
+SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
 
 @optional
 
