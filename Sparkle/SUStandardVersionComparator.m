@@ -15,9 +15,9 @@
 
 @implementation SUStandardVersionComparator
 
-+ (SUStandardVersionComparator *)standardVersionComparator
+- (instancetype)init
 {
-    return [[SUStandardVersionComparator alloc] init];
+    return [super init];
 }
 
 + (SUStandardVersionComparator *)defaultComparator

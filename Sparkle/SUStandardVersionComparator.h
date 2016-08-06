@@ -27,14 +27,16 @@
 SU_EXPORT @interface SUStandardVersionComparator : NSObject <SUVersionComparison>
 
 /*!
-    Creates a new instance of the standard version comparator.
+    Initializes a new instance of the standard version comparator.
 */
-+ (SUStandardVersionComparator *)standardVersionComparator;
+- (instancetype)init;
 
 /*!
     Returns a singleton instance of the comparator.
+
+    It is usually preferred to alloc/init new a comparator instead.
  */
-+ (SUStandardVersionComparator *)defaultComparator __deprecated;
++ (SUStandardVersionComparator *)defaultComparator;
 
 /*!
     Compares version strings through textual analysis.
