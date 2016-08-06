@@ -224,10 +224,15 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (id<SUVersionComparison>)versionComparatorForUpdater:(id)updater;
 
 /*!
- @deprecated This method is no longer used. See SUStandardUserUpdaterDriver delegate instead.
+ \deprecated See SUStandardUserUpdaterDriver delegate instead.
+ 
+ Returns an object that formats version numbers for display to the user.
+ If you don't implement this method or return \c nil, the standard version formatter will be used.
+ 
+ \sa SUUpdateAlert
+ \param updater The updater instance.
  */
-// Don't specify SUVersionDisplay in the return type, otherwise we'd have to forward declare a protocol that isn't used here anymore
-- (id)versionDisplayerForUpdater:(id)updater __deprecated;
+- (id)versionDisplayerForUpdater:(id)updater __deprecated; // Don't specify SUVersionDisplay in the return type, otherwise we'd have to forward declare a protocol that isn't used here anymore
 
 /*!
  Returns the path to the application which is used to relaunch after the update is installed.
@@ -270,7 +275,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  
  \param updater The updater instance.
  
- @deprecated See SUStandardUserUpdaterDriver delegate instead. This method is no longer invoked.
+ @deprecated See SUStandardUserUpdaterDriver delegate instead.
  */
 - (void)updaterWillShowModalAlert:(id)updater __deprecated;
 
@@ -280,7 +285,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  
  \param updater The updater instance.
  
- @deprecated See SUStandardUserUpdaterDriver delegate instead. This method is no longer invoked.
+ @deprecated See SUStandardUserUpdaterDriver delegate instead.
  */
 - (void)updaterDidShowModalAlert:(id)updater __deprecated;
 
