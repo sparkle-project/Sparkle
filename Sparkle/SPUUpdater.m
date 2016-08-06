@@ -109,7 +109,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 // To prevent subclasses from doing something bad based on older Sparkle code
 - (instancetype)initForBundle:(NSBundle *)__unused bundle
 {
-    SULog(@"-[SUUpdater initForBundle:] is not implemented anymore.");
+    SULog(@"-[%@ initForBundle:] is not implemented anymore.", NSStringFromClass([self class]));
     abort();
     return nil;
 }
@@ -117,7 +117,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 // To prevent trying to stick an SUUpdater in a nib or initializing it in an incorrect way
 - (instancetype)init
 {
-    SULog(@"-[SUUpdater init] is not implemented. If you want to drop an updater into a nib, see SUStandardUpdaterController.");
+    SULog(@"-[%@ init] is not implemented. If you want to drop an updater into a nib, see SUStandardUpdaterController.", NSStringFromClass([self class]));
     abort();
     return nil;
 }
@@ -150,7 +150,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 {
     if (self.sparkleBundle == nil) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: @"SPUUpdater can't find Sparkle.framework it belongs to." }];
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidUpdaterError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"%@ can't find Sparkle.framework it belongs to.", NSStringFromClass([self class])] }];
         }
         return NO;
     }
