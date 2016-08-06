@@ -222,21 +222,30 @@ static NSMutableDictionary *sharedUpdaters = nil;
 - (void)userDriverWillShowModalAlert
 {
     if ([self.updater.delegate respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         [self.updater.delegate updaterWillShowModalAlert:self];
+#pragma clang diagnostic pop
     }
 }
 
 - (void)userDriverDidShowModalAlert
 {
     if ([self.updater.delegate respondsToSelector:@selector(updaterDidShowModalAlert:)]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         [self.updater.delegate updaterDidShowModalAlert:self];
+#pragma clang diagnostic pop
     }
 }
 
 - (_Nullable id <SUVersionDisplay>)userDriverRequestsVersionDisplayer
 {
     if ([self.updater.delegate respondsToSelector:@selector(versionDisplayerForUpdater:)]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         return [self.updater.delegate versionDisplayerForUpdater:self];
+#pragma clang diagnostic pop
     }
     return nil;
 }
