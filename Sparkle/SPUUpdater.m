@@ -52,6 +52,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (nonatomic, copy) void (^preStartedScheduledUpdateBlock)(void);
 @property (nonatomic, nullable) SUDownloadedUpdate *resumableUpdate;
 
+@property (nonatomic) BOOL loggedATSWarning;
+@property (nonatomic) BOOL loggedDSAWarning;
+
 @end
 
 @implementation SPUUpdater
@@ -69,6 +72,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize startedUpdater = _startedUpdater;
 @synthesize preStartedScheduledUpdateBlock = _preStartedScheduledUpdateBlock;
 @synthesize resumableUpdate = _resumableUpdate;
+@synthesize loggedATSWarning = _loggedATSWarning;
+@synthesize loggedDSAWarning = _loggedDSAWarning;
 
 #ifdef DEBUG
 + (void)load
@@ -169,14 +174,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         return NO;
     }
     
-    BOOL hasPublicDSAKey = [self.host publicDSAKey] != nil;
-    if (!hasPublicDSAKey) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: @"For security reasons, updates need to be signed with a DSA key. See Sparkle's documentation for more information." }];
-        }
-        return NO;
-    }
-    
     BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
     if (!servingOverHttps) {
         BOOL foundXPCTemporaryDownloaderService = NO;
@@ -202,8 +199,31 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
         
         if (foundATSTemporaryIssue || foundATSPersistentIssue || foundATSMainBundleIssue) {
-            // Just log a warning. Don't outright fail in case we are wrong (eg: app is linked on an old SDK where ATS doesn't take effect)
-            SULog(@"The feed URL (%@) may need to change to use HTTPS.\nFor more information: https://sparkle-project.org/documentation/app-transport-security", [feedURL absoluteString]);
+            if (!self.loggedATSWarning) {
+                // Just log a warning. Don't outright fail in case we are wrong (eg: app is linked on an old SDK where ATS doesn't take effect)
+                SULog(@"The feed URL (%@) may need to change to use HTTPS.\nFor more information: https://sparkle-project.org/documentation/app-transport-security", [feedURL absoluteString]);
+                
+                self.loggedATSWarning = YES;
+            }
+        }
+    }
+    
+    BOOL hasPublicDSAKey = [self.host publicDSAKey] != nil;
+    if (!hasPublicDSAKey) {
+        if (!servingOverHttps) {
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: @"For security reasons, updates need to be signed with a DSA key. See Sparkle's documentation for more information." }];
+            }
+            return NO;
+        } else {
+            if (!self.loggedDSAWarning) {
+                // Deprecated because we pass the downloaded archive to the installer and the installer has no way of knowing where the download came from.
+                // Even if it did, the server and the download on it could still be compromised. But if a DSA signature was used, the private key should
+                // not be stored on the server serving the update
+                SULog(@"DEPRECATION: Serving updates without a DSA key is now deprecated and may be removed from a future release. See Sparkle's documentation for more information.");
+                
+                self.loggedDSAWarning = YES;
+            }
         }
     }
     

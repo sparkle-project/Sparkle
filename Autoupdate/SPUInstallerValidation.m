@@ -25,22 +25,25 @@
     SUHost *newHost = [[SUHost alloc] initWithBundle:newBundle];
     NSString *newPublicDSAKey = newHost.publicDSAKey;
     
-    if (newPublicDSAKey == nil) {
-        SULog(@"No public DSA key is found in the update. For security reasons, the update will be rejected.");
+    NSString *publicDSAKey = host.publicDSAKey;
+    
+    // Downgrade in DSA security should not be possible
+    if (publicDSAKey != nil && newPublicDSAKey == nil) {
+        SULog(@"A public DSA key is found in the old bundle but no public DSA key is found in the new update. For security reasons, the update will be rejected.");
         return NO;
     }
     
-    NSString *publicDSAKey = host.publicDSAKey;
-    
-    BOOL dsaKeysMatch = (publicDSAKey == nil) ? NO : [publicDSAKey isEqualToString:newPublicDSAKey];
+    BOOL dsaKeysMatch = (publicDSAKey == nil || newPublicDSAKey == nil) ? NO : [publicDSAKey isEqualToString:newPublicDSAKey];
     
     // If the new DSA key differs from the old, then this check is not a security measure, because the new key is not trusted.
     // In that case, the check ensures that the app author has correctly used DSA keys, so that the app will be updateable in the next version.
     // However if the new and old DSA keys are the same, then this is a security measure.
-    if (![SUDSAVerifier validatePath:archivePath withEncodedDSASignature:DSASignature withPublicDSAKey:newPublicDSAKey]) {
-        SULog(@"DSA signature validation failed. The update has a public DSA key and is signed with a DSA key, but the %@ doesn't match the signature. The update will be rejected.",
-              dsaKeysMatch ? @"public key" : @"new public key shipped with the update");
-        return NO;
+    if (newPublicDSAKey != nil) {
+        if (![SUDSAVerifier validatePath:archivePath withEncodedDSASignature:DSASignature withPublicDSAKey:newPublicDSAKey]) {
+            SULog(@"DSA signature validation failed. The update has a public DSA key and is signed with a DSA key, but the %@ doesn't match the signature. The update will be rejected.",
+                  dsaKeysMatch ? @"public key" : @"new public key shipped with the update");
+            return NO;
+        }
     }
     
     BOOL updateIsCodeSigned = [SUCodeSigningVerifier bundleAtPathIsCodeSigned:newBundlePath];
