@@ -107,7 +107,9 @@
 
 - (void)testSetTestFeedURL
 {
-    [self.updater setFeedURL:[NSURL URLWithString:@""]]; // this WON'T throw
+    NSURL *emptyURL = [NSURL URLWithString:@""];
+    XCTAssertNotNil(emptyURL);
+    [self.updater setFeedURL:emptyURL]; // this WON'T throw
 }
 
 @end
