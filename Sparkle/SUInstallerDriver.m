@@ -8,7 +8,7 @@
 
 #import "SUInstallerDriver.h"
 #import "SULog.h"
-#import "SUMessageTypes.h"
+#import "SPUMessageTypes.h"
 #import "SPUXPCServiceInfo.h"
 #import "SUUpdaterDelegate.h"
 #import "SUAppcastItem.h"
@@ -42,7 +42,7 @@
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly) NSBundle *sparkleBundle;
 @property (nonatomic, weak, readonly) id<SUInstallerDriverDelegate> delegate;
-@property (nonatomic) SUInstallerMessageType currentStage;
+@property (nonatomic) SPUInstallerMessageType currentStage;
 @property (nonatomic) BOOL startedInstalling;
 
 @property (nonatomic) id<SUInstallerConnectionProtocol> installerConnection;
@@ -126,7 +126,7 @@
         });
     }];
     
-    NSString *serviceName = SUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier);
+    NSString *serviceName = SPUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier);
     NSString *installationType = self.updateItem.installationType;
     assert(installationType != nil);
     
@@ -142,7 +142,7 @@
     self.temporaryDirectory = downloadedUpdate.temporaryDirectory;
     self.downloadName = downloadedUpdate.downloadName;
     
-    self.currentStage = SUInstallerNotStarted;
+    self.currentStage = SPUInstallerNotStarted;
     
     if (self.installerConnection == nil) {
         [self launchAutoUpdateSilently:silently completion:completionHandler];
@@ -184,9 +184,9 @@
         return;
     }
     
-    [self.installerConnection handleMessageWithIdentifier:SUInstallationData data:archivedData];
+    [self.installerConnection handleMessageWithIdentifier:SPUInstallationData data:archivedData];
     
-    self.currentStage = SUInstallerNotStarted;
+    self.currentStage = SPUInstallerNotStarted;
     
     // If the number of extractions attempts stays the same, then we've waited too long and should abort the installation
     // The extraction attempts is incremented when we receive an extraction should start message from the installer
@@ -196,7 +196,7 @@
     __weak SUInstallerDriver *weakSelf = self;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FIRST_INSTALLER_MESSAGE_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         SUInstallerDriver *strongSelf = weakSelf;
-        if (strongSelf != nil && strongSelf.currentStage == SUInstallerNotStarted && currentExtractionAttempts == self.extractionAttempts) {
+        if (strongSelf != nil && strongSelf.currentStage == SPUInstallerNotStarted && currentExtractionAttempts == self.extractionAttempts) {
             SULog(@"Timeout: Installer never started archive extraction");
             [strongSelf.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while starting the installer. Please try again later.", nil) }]];
         }
@@ -212,22 +212,22 @@
 
 - (void)_handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
 {
-    if (!SUInstallerMessageTypeIsLegal(self.currentStage, identifier)) {
+    if (!SPUInstallerMessageTypeIsLegal(self.currentStage, identifier)) {
         SULog(@"Error: received out of order message with current stage: %d, requested stage: %d", self.currentStage, identifier);
         return;
     }
     
-    if (identifier == SUExtractionStarted) {
+    if (identifier == SPUExtractionStarted) {
         self.extractionAttempts++;
         self.currentStage = identifier;
-    } else if (identifier == SUExtractedArchiveWithProgress) {
+    } else if (identifier == SPUExtractedArchiveWithProgress) {
         if (data.length == sizeof(double) && sizeof(double) == sizeof(uint64_t)) {
             uint64_t progressValue = CFSwapInt64LittleToHost(*(const uint64_t *)data.bytes);
             double progress = *(double *)&progressValue;
             [self.delegate installerDidExtractUpdateWithProgress:progress];
             self.currentStage = identifier;
         }
-    } else if (identifier == SUArchiveExtractionFailed) {
+    } else if (identifier == SPUArchiveExtractionFailed) {
         // If this is a delta update, there must be a regular update we can fall back to
         if ([self.updateItem isDeltaUpdate]) {
             [self.delegate installerDidFailToApplyDeltaUpdate];
@@ -235,14 +235,14 @@
             // Don't have to store current stage because we're going to abort
             [self.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) }]];
         }
-    } else if (identifier == SUValidationStarted) {
+    } else if (identifier == SPUValidationStarted) {
         self.currentStage = identifier;
-    } else if (identifier == SUInstallationStartedStage1) {
+    } else if (identifier == SPUInstallationStartedStage1) {
         self.currentStage = identifier;
         [self.delegate installerDidStartInstalling];
         self.startedInstalling = YES;
         
-    } else if (identifier == SUInstallationFinishedStage1) {
+    } else if (identifier == SPUInstallationFinishedStage1) {
         self.currentStage = identifier;
         
         // Let the installer keep a copy of the appcast item data
@@ -250,7 +250,7 @@
         NSData *updateItemData = SPUArchiveRootObjectSecurely(self.updateItem);
         
         if (updateItemData != nil) {
-            [self.installerConnection handleMessageWithIdentifier:SUSentUpdateAppcastItemData data:updateItemData];
+            [self.installerConnection handleMessageWithIdentifier:SPUSentUpdateAppcastItemData data:updateItemData];
         } else {
             SULog(@"Error: Archived data to send for appcast item is nil");
         }
@@ -266,7 +266,7 @@
         }
         
         [self.delegate installerDidFinishPreparationAndWillInstallImmediately:hasTargetTerminated silently:canInstallSilently];
-    } else if (identifier == SUInstallationFinishedStage2) {
+    } else if (identifier == SPUInstallationFinishedStage2) {
         self.currentStage = identifier;
         
         if (!self.startedInstalling) {
@@ -285,7 +285,7 @@
         if (!hasTargetTerminated) {
             [self.delegate installerIsRequestingAppTermination];
         }
-    } else if (identifier == SUInstallationFinishedStage3) {
+    } else if (identifier == SPUInstallationFinishedStage3) {
         self.currentStage = identifier;
         
         [self.installerConnection invalidate];
@@ -293,9 +293,9 @@
         
         [self.delegate installerDidFinishInstallation];
         [self.delegate installerIsRequestingAbortInstallWithError:nil];
-    } else if (identifier == SUUpdaterAlivePing) {
+    } else if (identifier == SPUUpdaterAlivePing) {
         // Don't update the current stage; a ping request has no effect on that.
-        [self.installerConnection handleMessageWithIdentifier:SUUpdaterAlivePong data:[NSData data]];
+        [self.installerConnection handleMessageWithIdentifier:SPUUpdaterAlivePong data:[NSData data]];
     }
 }
 
@@ -441,14 +441,14 @@
     [self setUpConnection];
     
     // For resumability, we'll assume we are far enough for the installation to continue
-    self.currentStage = SUInstallationFinishedStage1;
+    self.currentStage = SPUInstallationFinishedStage1;
     
     self.willRelaunch = relaunch;
     
     uint8_t response[2] = {(uint8_t)relaunch, (uint8_t)showUI};
     NSData *responseData = [NSData dataWithBytes:response length:sizeof(response)];
     
-    [self.installerConnection handleMessageWithIdentifier:SUResumeInstallationToStage2 data:responseData];
+    [self.installerConnection handleMessageWithIdentifier:SPUResumeInstallationToStage2 data:responseData];
     
     // we'll terminate later when the installer tells us stage 2 is done
 }

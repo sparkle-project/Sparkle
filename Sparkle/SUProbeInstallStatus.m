@@ -8,7 +8,7 @@
 
 #import "SUProbeInstallStatus.h"
 #import "SPUXPCServiceInfo.h"
-#import "SUMessageTypes.h"
+#import "SPUMessageTypes.h"
 #import "SPUInstallationInfo.h"
 #import "SPUSecureCoding.h"
 #import "SUInstallerStatus.h"
@@ -41,7 +41,7 @@
         });
     }];
     
-    NSString *serviceName = SUStatusInfoServiceNameForBundleIdentifier(hostBundleIdentifier);
+    NSString *serviceName = SPUStatusInfoServiceNameForBundleIdentifier(hostBundleIdentifier);
     [installerStatus setServiceName:serviceName];
     
     [installerStatus probeStatusConnectivityWithReply:^{
@@ -84,7 +84,7 @@
         });
     }];
     
-    NSString *serviceName = SUStatusInfoServiceNameForBundleIdentifier(hostBundleIdentifier);
+    NSString *serviceName = SPUStatusInfoServiceNameForBundleIdentifier(hostBundleIdentifier);
     [installerStatus setServiceName:serviceName];
     
     [installerStatus probeStatusInfoWithReply:^(NSData * _Nullable installationInfoData) {

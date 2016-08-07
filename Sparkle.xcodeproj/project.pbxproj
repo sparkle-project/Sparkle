@@ -187,9 +187,9 @@
 		7267E5A81D3D8A9900D1BF90 /* AgentConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5A71D3D8A9900D1BF90 /* AgentConnection.m */; };
 		7267E5AB1D3D8AA800D1BF90 /* TerminationListener.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5AA1D3D8AA800D1BF90 /* TerminationListener.m */; };
 		7267E5AE1D3D8AB700D1BF90 /* SPUInstallationInputData.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5AD1D3D8AB700D1BF90 /* SPUInstallationInputData.m */; };
-		7267E5B11D3D8AD500D1BF90 /* SUMessageTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 7267E5AF1D3D8AD500D1BF90 /* SUMessageTypes.h */; };
-		7267E5B21D3D8AD500D1BF90 /* SUMessageTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B01D3D8AD500D1BF90 /* SUMessageTypes.m */; };
-		7267E5B31D3D8AD500D1BF90 /* SUMessageTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B01D3D8AD500D1BF90 /* SUMessageTypes.m */; };
+		7267E5B11D3D8AD500D1BF90 /* SPUMessageTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 7267E5AF1D3D8AD500D1BF90 /* SPUMessageTypes.h */; };
+		7267E5B21D3D8AD500D1BF90 /* SPUMessageTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B01D3D8AD500D1BF90 /* SPUMessageTypes.m */; };
+		7267E5B31D3D8AD500D1BF90 /* SPUMessageTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B01D3D8AD500D1BF90 /* SPUMessageTypes.m */; };
 		7267E5B61D3D8AEE00D1BF90 /* SPUInstallationInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 7267E5B41D3D8AEE00D1BF90 /* SPUInstallationInfo.h */; };
 		7267E5B71D3D8AEE00D1BF90 /* SPUInstallationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B51D3D8AEE00D1BF90 /* SPUInstallationInfo.m */; };
 		7267E5B81D3D8AEE00D1BF90 /* SPUInstallationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B51D3D8AEE00D1BF90 /* SPUInstallationInfo.m */; };
@@ -211,9 +211,9 @@
 		7267E5D71D3D8D3F00D1BF90 /* SUHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 61EF67550E25B58D00F754E0 /* SUHost.m */; };
 		7267E5D81D3D8D4400D1BF90 /* SUStandardVersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */; };
 		7267E5D91D3D8D4B00D1BF90 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
-		7267E5DC1D3D8F1E00D1BF90 /* SUMessageTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B01D3D8AD500D1BF90 /* SUMessageTypes.m */; };
+		7267E5DC1D3D8F1E00D1BF90 /* SPUMessageTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B01D3D8AD500D1BF90 /* SPUMessageTypes.m */; };
 		7267E5DF1D3D8FFA00D1BF90 /* SPUInstallationInputData.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5AD1D3D8AB700D1BF90 /* SPUInstallationInputData.m */; };
-		7267E5E11D3D901600D1BF90 /* SUMessageTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B01D3D8AD500D1BF90 /* SUMessageTypes.m */; };
+		7267E5E11D3D901600D1BF90 /* SPUMessageTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B01D3D8AD500D1BF90 /* SPUMessageTypes.m */; };
 		7267E5E51D3D90AA00D1BF90 /* SUFileManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 7267E5E31D3D90AA00D1BF90 /* SUFileManager.h */; };
 		7267E5E61D3D90AA00D1BF90 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5E41D3D90AA00D1BF90 /* SUFileManager.m */; };
 		7267E5E71D3D90AA00D1BF90 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5E41D3D90AA00D1BF90 /* SUFileManager.m */; };
@@ -897,8 +897,8 @@
 		7267E5AA1D3D8AA800D1BF90 /* TerminationListener.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TerminationListener.m; path = Autoupdate/TerminationListener.m; sourceTree = SOURCE_ROOT; };
 		7267E5AC1D3D8AB700D1BF90 /* SPUInstallationInputData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SPUInstallationInputData.h; path = Autoupdate/SPUInstallationInputData.h; sourceTree = SOURCE_ROOT; };
 		7267E5AD1D3D8AB700D1BF90 /* SPUInstallationInputData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SPUInstallationInputData.m; path = Autoupdate/SPUInstallationInputData.m; sourceTree = SOURCE_ROOT; };
-		7267E5AF1D3D8AD500D1BF90 /* SUMessageTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUMessageTypes.h; path = Autoupdate/SUMessageTypes.h; sourceTree = SOURCE_ROOT; };
-		7267E5B01D3D8AD500D1BF90 /* SUMessageTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUMessageTypes.m; path = Autoupdate/SUMessageTypes.m; sourceTree = SOURCE_ROOT; };
+		7267E5AF1D3D8AD500D1BF90 /* SPUMessageTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SPUMessageTypes.h; path = Autoupdate/SPUMessageTypes.h; sourceTree = SOURCE_ROOT; };
+		7267E5B01D3D8AD500D1BF90 /* SPUMessageTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SPUMessageTypes.m; path = Autoupdate/SPUMessageTypes.m; sourceTree = SOURCE_ROOT; };
 		7267E5B41D3D8AEE00D1BF90 /* SPUInstallationInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SPUInstallationInfo.h; path = Autoupdate/SPUInstallationInfo.h; sourceTree = SOURCE_ROOT; };
 		7267E5B51D3D8AEE00D1BF90 /* SPUInstallationInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SPUInstallationInfo.m; path = Autoupdate/SPUInstallationInfo.m; sourceTree = SOURCE_ROOT; };
 		7267E5B91D3D8B0B00D1BF90 /* SPUInstallerProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPUInstallerProtocol.h; path = Autoupdate/SPUInstallerProtocol.h; sourceTree = SOURCE_ROOT; };
@@ -1727,8 +1727,8 @@
 		729746481C91483B00FC134E /* IPC */ = {
 			isa = PBXGroup;
 			children = (
-				7267E5AF1D3D8AD500D1BF90 /* SUMessageTypes.h */,
-				7267E5B01D3D8AD500D1BF90 /* SUMessageTypes.m */,
+				7267E5AF1D3D8AD500D1BF90 /* SPUMessageTypes.h */,
+				7267E5B01D3D8AD500D1BF90 /* SPUMessageTypes.m */,
 				726E075A1CA3A6D6001A286B /* SPUSecureCoding.h */,
 				726E075B1CA3A6D6001A286B /* SPUSecureCoding.m */,
 				7267E5B41D3D8AEE00D1BF90 /* SPUInstallationInfo.h */,
@@ -1892,7 +1892,7 @@
 				72B767CE1C9B924900A07552 /* SUInstallerDriver.h in Headers */,
 				724BB3871D32A167005D534A /* SUXPCInstallerConnection.h in Headers */,
 				61B5FCDF09C52A9F00B25A18 /* SUUpdateAlert.h in Headers */,
-				7267E5B11D3D8AD500D1BF90 /* SUMessageTypes.h in Headers */,
+				7267E5B11D3D8AD500D1BF90 /* SPUMessageTypes.h in Headers */,
 				61B5F8ED09C4CE3C00B25A18 /* SPUUpdater.h in Headers */,
 				61A2259E0D1C495D00430CCD /* SUVersionComparisonProtocol.h in Headers */,
 				3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */,
@@ -2646,7 +2646,7 @@
 				7214B8831D456C2400CB5CED /* SPUBundleIcon.m in Sources */,
 				7267E5FA1D3DAC3600D1BF90 /* StatusInfo.m in Sources */,
 				7267E5EB1D3D90C200D1BF90 /* SUFileManager.m in Sources */,
-				7267E5DC1D3D8F1E00D1BF90 /* SUMessageTypes.m in Sources */,
+				7267E5DC1D3D8F1E00D1BF90 /* SPUMessageTypes.m in Sources */,
 				721652621D3C44A100FD13D8 /* SPUSystemAuthorization.m in Sources */,
 				72D954831CBAD34F006F28BD /* main.m in Sources */,
 				721C24621CB75C68005440CB /* SULog.m in Sources */,
@@ -2693,7 +2693,7 @@
 			files = (
 				721D8A7B1D4963190032E472 /* SPULocalCacheDirectory.m in Sources */,
 				7214B8841D456C9500CB5CED /* SPUBundleIcon.m in Sources */,
-				7267E5E11D3D901600D1BF90 /* SUMessageTypes.m in Sources */,
+				7267E5E11D3D901600D1BF90 /* SPUMessageTypes.m in Sources */,
 				724BB3AF1D34828A005D534A /* SPUSystemAuthorization.m in Sources */,
 				726E07C01CAF15B7001A286B /* SULog.m in Sources */,
 				726E07BF1CAF0C6C001A286B /* SUConstants.m in Sources */,
@@ -2757,7 +2757,7 @@
 				7267E5E71D3D90AA00D1BF90 /* SUFileManager.m in Sources */,
 				7267E59C1D3D8A5A00D1BF90 /* SUCodeSigningVerifier.m in Sources */,
 				7267E5C51D3D8B2700D1BF90 /* SUPlainInstaller.m in Sources */,
-				7267E5B31D3D8AD500D1BF90 /* SUMessageTypes.m in Sources */,
+				7267E5B31D3D8AD500D1BF90 /* SPUMessageTypes.m in Sources */,
 				7267E5881D3D89B300D1BF90 /* SUUnarchiver.m in Sources */,
 				7267E5AE1D3D8AB700D1BF90 /* SPUInstallationInputData.m in Sources */,
 				7267E5C41D3D8B2700D1BF90 /* SUPackageInstaller.m in Sources */,
@@ -2837,7 +2837,7 @@
 				61B5F8EE09C4CE3C00B25A18 /* SPUUpdater.m in Sources */,
 				72B767CB1C9B707000A07552 /* SUAppcastDriver.m in Sources */,
 				726E075D1CA3A6D6001A286B /* SPUSecureCoding.m in Sources */,
-				7267E5B21D3D8AD500D1BF90 /* SUMessageTypes.m in Sources */,
+				7267E5B21D3D8AD500D1BF90 /* SPUMessageTypes.m in Sources */,
 				72B767DB1C9CD2E400A07552 /* SUUIBasedUpdateDriver.m in Sources */,
 				72B09CE81CE6BCBD0052EF9E /* SPUURLDownload.m in Sources */,
 			);

@@ -7,7 +7,7 @@
 //
 
 #import "StatusInfo.h"
-#import "SUMessageTypes.h"
+#import "SPUMessageTypes.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "daemon-safe" class and should NOT import AppKit
@@ -28,7 +28,7 @@
 {
     self = [super init];
     if (self != nil) {
-        _xpcListener = [[NSXPCListener alloc] initWithMachServiceName:SUStatusInfoServiceNameForBundleIdentifier(bundleIdentifier)];
+        _xpcListener = [[NSXPCListener alloc] initWithMachServiceName:SPUStatusInfoServiceNameForBundleIdentifier(bundleIdentifier)];
         _xpcListener.delegate = self;
     }
     return self;

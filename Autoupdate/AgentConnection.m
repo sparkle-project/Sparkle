@@ -7,7 +7,7 @@
 //
 
 #import "AgentConnection.h"
-#import "SUMessageTypes.h"
+#import "SPUMessageTypes.h"
 #import "SPUInstallerAgentProtocol.h"
 #import "SUInstallerAgentInitiationProtocol.h"
 
@@ -39,7 +39,7 @@
     if (self != nil) {
         // Agents should always be the one that connect to daemons due to how mach bootstraps work
         // For this reason, we are the ones that are creating a listener, not the agent
-        _xpcListener = [[NSXPCListener alloc] initWithMachServiceName:SUProgressAgentServiceNameForBundleIdentifier(bundleIdentifier)];
+        _xpcListener = [[NSXPCListener alloc] initWithMachServiceName:SPUProgressAgentServiceNameForBundleIdentifier(bundleIdentifier)];
         _xpcListener.delegate = self;
         _delegate = delegate;
     }

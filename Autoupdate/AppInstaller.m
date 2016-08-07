@@ -14,7 +14,7 @@
 #import "SUHost.h"
 #import "SULocalizations.h"
 #import "SUStandardVersionComparator.h"
-#import "SUMessageTypes.h"
+#import "SPUMessageTypes.h"
 #import "SPUSecureCoding.h"
 #import "SPUInstallationInputData.h"
 #import "SUUnarchiver.h"
@@ -114,7 +114,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     _hostBundleIdentifier = [hostBundleIdentifier copy];
     
-    _xpcListener = [[NSXPCListener alloc] initWithMachServiceName:SUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier)];
+    _xpcListener = [[NSXPCListener alloc] initWithMachServiceName:SPUInstallerServiceNameForBundleIdentifier(hostBundleIdentifier)];
     _xpcListener.delegate = self;
     
     _agentConnection = [[AgentConnection alloc] initWithHostBundleIdentifier:hostBundleIdentifier delegate:self];
@@ -183,7 +183,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (void)extractAndInstallUpdate
 {
-    [self.communicator handleMessageWithIdentifier:SUExtractionStarted data:[NSData data]];
+    [self.communicator handleMessageWithIdentifier:SPUExtractionStarted data:[NSData data]];
     
     NSString *archivePath = [self.updateDirectoryPath stringByAppendingPathComponent:self.downloadName];
     id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:archivePath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.decryptionPassword delegate:self];
@@ -213,7 +213,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         uint64_t progressValue = CFSwapInt64HostToLittle(*(uint64_t *)&progress);
         NSData *data = [NSData dataWithBytes:&progressValue length:sizeof(progressValue)];
         
-        [self.communicator handleMessageWithIdentifier:SUExtractedArchiveWithProgress data:data];
+        [self.communicator handleMessageWithIdentifier:SPUExtractedArchiveWithProgress data:data];
     }
 }
 
@@ -233,12 +233,12 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     self.relaunchPath = nil;
     self.host = nil;
     
-    [self.communicator handleMessageWithIdentifier:SUArchiveExtractionFailed data:[NSData data]];
+    [self.communicator handleMessageWithIdentifier:SPUArchiveExtractionFailed data:[NSData data]];
 }
 
 - (void)unarchiverDidFinish
 {
-    [self.communicator handleMessageWithIdentifier:SUValidationStarted data:[NSData data]];
+    [self.communicator handleMessageWithIdentifier:SPUValidationStarted data:[NSData data]];
     
     NSString *archivePath = [self.updateDirectoryPath stringByAppendingPathComponent:self.downloadName];
     
@@ -268,7 +268,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         SULog(@"Error: update validation was a failure");
         [self cleanupAndExitWithStatus:EXIT_FAILURE];
     } else {
-        [self.communicator handleMessageWithIdentifier:SUInstallationStartedStage1 data:[NSData data]];
+        [self.communicator handleMessageWithIdentifier:SPUInstallationStartedStage1 data:[NSData data]];
         
         self.finishedValidation = YES;
         if (self.agentInitiatedConnection) {
@@ -316,7 +316,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 
 - (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
 {
-    if (identifier == SUInstallationData && self.updateDirectoryPath == nil) {
+    if (identifier == SPUInstallationData && self.updateDirectoryPath == nil) {
         dispatch_async(dispatch_get_main_queue(), ^{
             // Mark that we have received the installation data
             // Do not rely on eg: self.ipdateDirectoryPath != nil because we may set it to nil again if an early stage fails (i.e, archive extraction)
@@ -389,7 +389,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             
             [self extractAndInstallUpdate];
         });
-    } else if (identifier == SUSentUpdateAppcastItemData) {
+    } else if (identifier == SPUSentUpdateAppcastItemData) {
         SUAppcastItem *updateItem = (SUAppcastItem *)SPUUnarchiveRootObjectSecurely(data, [SUAppcastItem class]);
         if (updateItem != nil) {
             SPUInstallationInfo *installationInfo = [[SPUInstallationInfo alloc] initWithAppcastItem:updateItem canSilentlyInstall:[self.installer canInstallSilently]];
@@ -399,7 +399,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 [self.agentConnection.agent registerInstallationInfoData:archivedData];
             }
         }
-    } else if (identifier == SUResumeInstallationToStage2 && data.length == sizeof(uint8_t) * 2) {
+    } else if (identifier == SPUResumeInstallationToStage2 && data.length == sizeof(uint8_t) * 2) {
         // Because anyone can ask us to resume the installation, it may be wise to think about backwards compatibility here if IPC changes
         uint8_t relaunch = *((const uint8_t *)data.bytes);
         uint8_t showsUI = *((const uint8_t *)data.bytes + 1);
@@ -420,7 +420,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 }
             });
         });
-    } else if (identifier == SUUpdaterAlivePong) {
+    } else if (identifier == SPUUpdaterAlivePong) {
         self.receivedUpdaterPong = YES;
     }
 }
@@ -466,7 +466,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             
             NSData *sendData = [NSData dataWithBytes:sendInformation length:sizeof(sendInformation)];
             
-            [self.communicator handleMessageWithIdentifier:SUInstallationFinishedStage1 data:sendData];
+            [self.communicator handleMessageWithIdentifier:SPUInstallationFinishedStage1 data:sendData];
             
             self.performedStage1Installation = YES;
             
@@ -491,7 +491,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             uint8_t targetTerminated = (uint8_t)self.terminationListener.terminated;
             
             NSData *sendData = [NSData dataWithBytes:&targetTerminated length:sizeof(targetTerminated)];
-            [self.communicator handleMessageWithIdentifier:SUInstallationFinishedStage2 data:sendData];
+            [self.communicator handleMessageWithIdentifier:SPUInstallationFinishedStage2 data:sendData];
         });
     } else {
         SULog(@"Error: Failed to resume installer on stage 2 because installation cannot be installed silently");
@@ -521,7 +521,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             // If they are, we will receive a pong response back
             // Reset if we received a pong just to be on the safe side
             self.receivedUpdaterPong = NO;
-            [self.communicator handleMessageWithIdentifier:SUUpdaterAlivePing data:[NSData data]];
+            [self.communicator handleMessageWithIdentifier:SPUUpdaterAlivePing data:[NSData data]];
             
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUDisplayProgressTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 // Make sure we're still eligible for showing the installer progress
@@ -564,7 +564,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 [self.agentConnection.agent stopProgress];
                 shouldShowUIProgress = NO;
                 
-                [self.communicator handleMessageWithIdentifier:SUInstallationFinishedStage3 data:[NSData data]];
+                [self.communicator handleMessageWithIdentifier:SPUInstallationFinishedStage3 data:[NSData data]];
                 
                 NSString *installationPath = [SUInstaller installationPathForHost:self.host];
                 

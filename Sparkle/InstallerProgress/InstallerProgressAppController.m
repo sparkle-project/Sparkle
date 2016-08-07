@@ -8,7 +8,7 @@
 
 #import "InstallerProgressAppController.h"
 #import "InstallerProgressDelegate.h"
-#import "SUMessageTypes.h"
+#import "SPUMessageTypes.h"
 #import "SULog.h"
 #import "SPUApplicationInfo.h"
 #import "SPUInstallerAgentProtocol.h"
@@ -82,7 +82,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
         // nor have a model where a process that runs at the highest level (the installer can run as root) tries to connect to a user level agent or process
         BOOL systemDomain = arguments[2].boolValue;
         NSXPCConnectionOptions connectionOptions = systemDomain ? NSXPCConnectionPrivileged : 0;
-        _connection = [[NSXPCConnection alloc] initWithMachServiceName:SUProgressAgentServiceNameForBundleIdentifier(hostBundleIdentifier) options:connectionOptions];
+        _connection = [[NSXPCConnection alloc] initWithMachServiceName:SPUProgressAgentServiceNameForBundleIdentifier(hostBundleIdentifier) options:connectionOptions];
         
         _statusInfo = [[StatusInfo alloc] initWithHostBundleIdentifier:hostBundleIdentifier];
         
