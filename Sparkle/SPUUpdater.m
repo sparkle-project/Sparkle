@@ -658,7 +658,16 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     NSString *version = [self.sparkleBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     NSString *userAgent = [NSString stringWithFormat:@"%@/%@ Sparkle/%@", [self.host name], [self.host displayVersion], version ? version : @"?"];
     NSData *cleanedAgent = [userAgent dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-    return [[NSString alloc] initWithData:cleanedAgent encoding:NSASCIIStringEncoding];
+    
+    NSString *result = @"";
+    if (cleanedAgent != nil) {
+        NSString *cleanedAgentString = [[NSString alloc] initWithData:(NSData * _Nonnull)cleanedAgent encoding:NSASCIIStringEncoding];
+        if (cleanedAgentString != nil) {
+            result = cleanedAgentString;
+        }
+    }
+    
+    return result;
 }
 
 - (void)setSendsSystemProfile:(BOOL)sendsSystemProfile

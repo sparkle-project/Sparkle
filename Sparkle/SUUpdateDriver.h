@@ -14,7 +14,7 @@ typedef void (^SUUpdateDriverCompletion)(BOOL shouldShowUpdateImmediately, SUDow
 
 @protocol SUUpdateDriver <NSObject>
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(SUUpdateDriverCompletion)completionBlock;
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders completion:(SUUpdateDriverCompletion)completionBlock;
 
 - (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock;
 

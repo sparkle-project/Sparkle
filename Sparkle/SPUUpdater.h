@@ -14,6 +14,8 @@
 #import "SUExport.h"
 #import "SPUUserDriver.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class SUAppcastItem, SUAppcast;
 
 @protocol SUUpdaterDelegate;
@@ -43,7 +45,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  *
  * This must be called on the main thread.
  */
-- (instancetype)initWithHostBundle:(NSBundle *)hostBundle userDriver:(id <SPUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)delegate;
+- (instancetype)initWithHostBundle:(NSBundle *)hostBundle userDriver:(id <SPUUserDriver>)userDriver delegate:(id<SUUpdaterDelegate> _Nullable)delegate;
 
 /*!
  * Starts the updater.
@@ -58,7 +60,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  */
 - (BOOL)startUpdater:(NSError * __autoreleasing *)error;
 
-@property (weak, readonly) id<SUUpdaterDelegate> delegate;
+@property (weak, readonly, nullable) id<SUUpdaterDelegate> delegate;
 @property (nonatomic, readonly) id<SPUUserDriver> userDriver;
 
 @property (readonly, strong) NSBundle *hostBundle;
@@ -77,7 +79,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
 
 @property (nonatomic, copy) NSString *userAgentString;
 
-@property (copy) NSDictionary *httpHeaders;
+@property (copy, nullable) NSDictionary *httpHeaders;
 
 @property (nonatomic) BOOL sendsSystemProfile;
 
@@ -108,7 +110,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
 
     \returns \c nil if no check has been performed.
  */
-@property (readonly, copy) NSDate *lastUpdateCheckDate;
+@property (readonly, copy, nullable) NSDate *lastUpdateCheckDate;
 
 /*!
     Begins a "probing" check for updates which will not actually offer to
@@ -131,3 +133,5 @@ SU_EXPORT @interface SPUUpdater : NSObject
 - (void)resetUpdateCycle;
 
 @end
+
+NS_ASSUME_NONNULL_END
