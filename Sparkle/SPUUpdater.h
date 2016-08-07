@@ -27,19 +27,19 @@
 SU_EXPORT @interface SPUUpdater : NSObject
 
 /*!
- * Initializes a new SUUpdater instance
+ * Initializes a new SPUUpdater instance
  *
- * This does not start the updater. To start it, see -[SUUpdater startUpdater:]
+ * This does not start the updater. To start it, see -[SPUUpdater startUpdater:]
  *
  * Note that this is a normal initializer and doesn't implement the singleton pattern (i.e, instances aren't cached, so no surprises)
  * Hence you shouldn't create multiple live instances that target the same bundle.
  * However, this also means that updater instances can be deallocated, and that they will be torn down properly
  *
- * Related: See SUStandardUpdaterController which wraps a SUUpdater instance and is suitable for instantiating in nib files
+ * Related: See SPUStandardUpdaterController which wraps a SPUUpdater instance and is suitable for instantiating in nib files
  *
  * @param hostBundle The bundle that should be targetted for updating. This must not be nil.
  * @param userDriver The user driver that Sparkle uses for user update interaction
- * @param delegate The delegate for SUUpdater. This may be nil.
+ * @param delegate The delegate for SPUUpdater. This may be nil.
  *
  * This must be called on the main thread.
  */
@@ -49,7 +49,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  * Starts the updater.
  *
  * This method checks if Sparkle is configured properly. A valid feed URL should be set before this method is invoked.
- * Other properties of this SUUpdater instance can be set before this method is invoked as well, such as automatic update checks.
+ * Other properties of this SPUUpdater instance can be set before this method is invoked as well, such as automatic update checks.
  * If the configuration is valid, this method may bring up a permission prompt (if needed) for checking if the user wants automatic update checking.
  * This method then starts the regular update cycle if automatic update checks are enabled.
  *
