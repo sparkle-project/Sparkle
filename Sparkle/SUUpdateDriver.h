@@ -21,6 +21,7 @@ typedef void (^SUUpdateDriverCompletion)(BOOL shouldShowUpdateImmediately, SUDow
 - (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock;
 
 - (void)abortUpdate;
+- (void)abortUpdateWithError:(NSError * _Nullable)error;
 
 @end
 

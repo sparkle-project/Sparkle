@@ -520,12 +520,18 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     // Because an application can change the configuration (eg: the feed url) at any point, we should always check if it's valid
     NSError *configurationError = nil;
     if (![self checkIfConfiguredProperly:&configurationError]) {
-        SULog(@"Fatal configuration error (%ld): %@", (long)configurationError.code, configurationError.localizedDescription);
-        abort();
+        // Don't think we should schedule a next update check if the bundle has been misconfigured once,
+        // which would mean something is really off
+        SULog(@"Sparkle configuration error (%ld): %@", (long)configurationError.code, configurationError.localizedDescription);
+        SULog(@"Disabling scheduled updates..");
+        
+        [self.driver abortUpdateWithError:configurationError];
+        self.driver = nil;
+        
+        return;
     }
 
     NSURL *theFeedURL = [self parameterizedFeedURL];
-    // Use a NIL URL to cancel quietly.
     if (theFeedURL) {
         __weak SPUUpdater *weakSelf = self;
         SUUpdateDriverCompletion completionBlock = ^(BOOL shouldShowUpdateImmediately, SUDownloadedUpdate * _Nullable resumableUpdate) {
@@ -548,7 +554,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders] completion:completionBlock];
         }
     } else {
-        [self.driver abortUpdate];
+        // I think this is really unlikely to occur but better be safe
+        [self.driver abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInvalidFeedURLError userInfo:@{ NSLocalizedDescriptionKey: @"Sparkle cannot form a valid feed URL." }]];
+        self.driver = nil;
     }
 }
 
@@ -649,12 +657,13 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     return YES;
 }
 
+// A client may call this method but do not invoke this method ourselves because its unsafe
 - (NSURL *)feedURL
 {
     NSURL *feedURL = nil;
     NSError *feedError = nil;
     if (![self retrieveFeedURL:&feedURL error:&feedError]) {
-        SULog(@"Fatal Error (%ld): %@", feedError.code, feedError.localizedDescription);
+        SULog(@"Fatal Feed Error (%ld): %@", feedError.code, feedError.localizedDescription);
         abort();
     }
     return feedURL;
@@ -691,10 +700,15 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     return [self.updaterSettings sendsSystemProfile];
 }
 
-- (NSURL *)parameterizedFeedURL
+// Precondition: The feed URL should be valid
+- (NSURL * _Nullable)parameterizedFeedURL
 {
-    NSURL *baseFeedURL = [self feedURL];
-
+    NSURL *baseFeedURL = nil;
+    if (![self retrieveFeedURL:&baseFeedURL error:NULL]) {
+        SULog(@"Unexpected error: base feed URL is invalid during -parameterizedFeedURL");
+        return nil;
+    }
+    
     // Determine all the parameters we're attaching to the base feed URL.
     BOOL sendingSystemProfile = [self sendsSystemProfile];
 
@@ -733,7 +747,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     NSString *appcastStringWithProfile = [NSString stringWithFormat:@"%@%@%@", [baseFeedURL absoluteString], separatorCharacter, [parameterStrings componentsJoinedByString:@"&"]];
 
     // Clean it up so it's a valid URL
-    return [NSURL URLWithString:appcastStringWithProfile];
+    NSURL *parameterizedFeedURL = [NSURL URLWithString:appcastStringWithProfile];
+    if (parameterizedFeedURL == nil) {
+        SULog(@"Unexpected error: parameterized feed URL formed from %@ is invalid", appcastStringWithProfile);
+    }
+    return parameterizedFeedURL;
 }
 
 - (void)setUpdateCheckInterval:(NSTimeInterval)updateCheckInterval
