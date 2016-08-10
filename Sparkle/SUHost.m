@@ -146,7 +146,7 @@
     }
 
     // More likely, we've got a reference to a Resources file by filename:
-    NSString *keyFilename = [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];
+    NSString *keyFilename = [self publicDSAKeyFileKey];
 	if (!keyFilename) {
         return nil;
     }
@@ -156,6 +156,11 @@
         return nil;
     }
     return [NSString stringWithContentsOfFile:keyPath encoding:NSASCIIStringEncoding error:nil];
+}
+
+- (NSString * _Nullable)publicDSAKeyFileKey
+{
+    return [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];;
 }
 
 - (id)objectForInfoDictionaryKey:(NSString *)key
