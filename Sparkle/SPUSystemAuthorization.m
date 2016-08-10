@@ -8,17 +8,45 @@
 
 #import "SPUSystemAuthorization.h"
 #import "SPUInstallationType.h"
+#import "SUFileManager.h"
 
 BOOL SPUNeedsSystemAuthorizationAccess(NSString *path, NSString *installationType)
 {
-    BOOL result;
+    BOOL needsAuthorization;
     if ([installationType isEqualToString:SPUInstallationTypeGuidedPackage]) {
-        result = YES;
+        needsAuthorization = YES;
     } else if ([installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
-        result = NO;
+        needsAuthorization = NO;
     } else {
         NSFileManager *fileManager = [NSFileManager defaultManager];
-        result = ![fileManager isWritableFileAtPath:path] || ![fileManager isWritableFileAtPath:[path stringByDeletingLastPathComponent]];
+        BOOL hasWritability = [fileManager isWritableFileAtPath:path] && [fileManager isWritableFileAtPath:[path stringByDeletingLastPathComponent]];
+        if (!hasWritability) {
+            needsAuthorization = YES;
+        } else {
+            // Just because we have writability access does not mean we can set the correct owner/group
+            // Test if we can set the owner/group on a temporarily created file
+            // If we can, then we can probably perform an update without authorization
+            
+            NSString *tempFilename = @"permission_test" ;
+            
+            SUFileManager *suFileManager = [[SUFileManager alloc] init];
+            NSURL *tempDirectoryURL = [suFileManager makeTemporaryDirectoryWithPreferredName:tempFilename appropriateForDirectoryURL:[NSURL fileURLWithPath:NSTemporaryDirectory()] error:NULL];
+            
+            if (tempDirectoryURL == nil) {
+                // I don't imagine this ever happening but in case it does, requesting authorization may be the better option
+                needsAuthorization = YES;
+            } else {
+                NSURL *tempFileURL = [tempDirectoryURL URLByAppendingPathComponent:tempFilename];
+                if (![[NSData data] writeToURL:tempFileURL atomically:NO]) {
+                    // Obvious indicator we may need authorization
+                    needsAuthorization = YES;
+                } else {
+                    needsAuthorization = ![suFileManager changeOwnerAndGroupOfItemAtRootURL:tempFileURL toMatchURL:[NSURL fileURLWithPath:path] error:NULL];
+                }
+                
+                [suFileManager removeItemAtURL:tempDirectoryURL error:NULL];
+            }
+        }
     }
-    return result;
+    return needsAuthorization;
 }

@@ -323,6 +323,8 @@
 		72F94F5F1CC455B4002DEE68 /* org.sparkle-project.TemporaryDownloader.xpc in Embed XPC Services */ = {isa = PBXBuildFile; fileRef = 728638F31CAF5A5F00783084 /* org.sparkle-project.TemporaryDownloader.xpc */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		72F9EBE21D517E2F004AC8B6 /* SUUpdater.h in Headers */ = {isa = PBXBuildFile; fileRef = 72F9EBE01D517E2F004AC8B6 /* SUUpdater.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72F9EBE31D517E2F004AC8B6 /* SUUpdater.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F9EBE11D517E2F004AC8B6 /* SUUpdater.m */; };
+		72F9EC341D5BF542004AC8B6 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5E41D3D90AA00D1BF90 /* SUFileManager.m */; };
+		72F9EC351D5BF54E004AC8B6 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5E41D3D90AA00D1BF90 /* SUFileManager.m */; };
 		C23E885B1BE7B24F0050BB73 /* SparkleTestCodeSignApp.enc.dmg in Resources */ = {isa = PBXBuildFile; fileRef = C23E88591BE7AF890050BB73 /* SparkleTestCodeSignApp.enc.dmg */; };
 		F8761EB11ADC5068000C9034 /* SUCodeSigningVerifierTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */; };
 		F8761EB31ADC50EB000C9034 /* SparkleTestCodeSignApp.zip in Resources */ = {isa = PBXBuildFile; fileRef = F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */; };
@@ -2663,6 +2665,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72F9EC341D5BF542004AC8B6 /* SUFileManager.m in Sources */,
 				724BB3B11D3484B2005D534A /* SPUSystemAuthorization.m in Sources */,
 				724BB3731D31D0B7005D534A /* main.m in Sources */,
 				724BB3711D31D0B7005D534A /* SUInstallerConnection.m in Sources */,
@@ -2673,6 +2676,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72F9EC351D5BF54E004AC8B6 /* SUFileManager.m in Sources */,
 				724BB3B21D34862A005D534A /* SPUSystemAuthorization.m in Sources */,
 				724BB39A1D333832005D534A /* main.m in Sources */,
 				724BB3981D333832005D534A /* SUInstallerStatus.m in Sources */,
