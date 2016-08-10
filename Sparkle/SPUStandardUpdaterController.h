@@ -1,5 +1,5 @@
 //
-//  SUStandardUpdaterController.h
+//  SPUStandardUpdaterController.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 2/28/16.

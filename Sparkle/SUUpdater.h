@@ -31,7 +31,7 @@
  
  Note: This class is now deprecated and acts as a thin wrapper around SPUUpdater and SPUStandardUserDriver
  */
-__deprecated_msg("Use SUStandardUpdaterController or SPUUpdater instead")
+__deprecated_msg("Use SPUStandardUpdaterController or SPUUpdater instead")
 SU_EXPORT @interface SUUpdater : NSObject
 
 @property (unsafe_unretained, nonatomic) IBOutlet id<SUUpdaterDelegate> delegate;
