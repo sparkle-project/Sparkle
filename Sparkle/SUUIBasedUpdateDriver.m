@@ -15,6 +15,7 @@
 #import "SUAppcastItem.h"
 #import "SUErrors.h"
 #import "SPUURLDownload.h"
+#import "SPUTemporaryDownload.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -144,9 +145,10 @@
         NSURLRequest *request = [NSURLRequest requestWithURL:updateItem.releaseNotesURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
         
         id <SPUUserDriver> userDriver = self.userDriver;
-        SPUDownloadURLWithRequest(request, ^(NSData * _Nullable data, NSError * _Nullable error) {
-            if (data != nil) {
-                [userDriver showUpdateReleaseNotes:(NSData * _Nonnull)data];
+        SPUDownloadURLWithRequest(request, ^(SPUTemporaryDownload * _Nullable download, NSError * _Nullable error) {
+            if (download != nil) {
+                SPUTemporaryDownload *nonnullDownload = download;
+                [userDriver showUpdateReleaseNotesWithData:nonnullDownload.data textEncodingName:nonnullDownload.textEncoding MIMEType:nonnullDownload.MIMEType];
             } else {
                 [userDriver showUpdateReleaseNotesFailedToDownloadWithError:(NSError * _Nonnull)error];
             }

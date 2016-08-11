@@ -15,6 +15,7 @@
 #import "SULocalizations.h"
 #import "SPUXPCServiceInfo.h"
 #import "SPUURLDownload.h"
+#import "SPUTemporaryDownload.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -76,10 +77,10 @@
 
     [request setValue:@"application/rss+xml,*/*;q=0.1" forHTTPHeaderField:@"Accept"];
     
-    SPUDownloadURLWithRequest(request, ^(NSData * _Nullable data, NSError * _Nullable error) {
-        if (data != nil) {
+    SPUDownloadURLWithRequest(request, ^(SPUTemporaryDownload * _Nullable download, NSError * _Nullable error) {
+        if (download != nil) {
             NSError *parseError = nil;
-            NSArray *appcastItems = [self parseAppcastItemsFromXMLData:data error:&parseError];
+            NSArray *appcastItems = [self parseAppcastItemsFromXMLData:download.data error:&parseError];
             
             if (appcastItems != nil) {
                 self.items = appcastItems;

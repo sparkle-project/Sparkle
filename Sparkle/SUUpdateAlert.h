@@ -24,7 +24,7 @@
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer resumableCompletionBlock:(void (^)(SUInstallUpdateStatus))block;
 
-- (void)showReleaseNotes:(NSData *)releaseNotes;
+- (void)showUpdateReleaseNotesWithData:(NSData *)releaseNotesData textEncodingName:(NSString *)textEncodingName MIMEType:(NSString *)MIMEType;
 - (void)showReleaseNotesFailedToDownload;
 
 - (IBAction)installUpdate:sender;

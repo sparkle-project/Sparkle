@@ -10,8 +10,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class SPUTemporaryDownload;
+
 // From the completion block, either data or error can be nil, but not both
 // The completion block returns on the main queue
-void SPUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(NSData * _Nullable data, NSError * _Nullable error));
+void SPUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(SPUTemporaryDownload * _Nullable download, NSError * _Nullable error));
 
 NS_ASSUME_NONNULL_END

@@ -211,7 +211,7 @@
     });
 }
 
-- (void)showUpdateReleaseNotes:(NSData *)__unused releaseNotes
+- (void)showUpdateReleaseNotesWithData:(NSData *)__unused releaseNotesData textEncodingName:(NSString * _Nullable)__unused textEncodingName MIMEType:(NSString * _Nullable)__unused MIMEType
 {
     // todo: this should really be implemented
 }

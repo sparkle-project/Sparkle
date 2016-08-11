@@ -325,6 +325,10 @@
 		72F9EBE31D517E2F004AC8B6 /* SUUpdater.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F9EBE11D517E2F004AC8B6 /* SUUpdater.m */; };
 		72F9EC341D5BF542004AC8B6 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5E41D3D90AA00D1BF90 /* SUFileManager.m */; };
 		72F9EC351D5BF54E004AC8B6 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5E41D3D90AA00D1BF90 /* SUFileManager.m */; };
+		72F9EC381D5C04A9004AC8B6 /* SPUTemporaryDownload.h in Headers */ = {isa = PBXBuildFile; fileRef = 72F9EC361D5C04A9004AC8B6 /* SPUTemporaryDownload.h */; };
+		72F9EC3A1D5C04A9004AC8B6 /* SPUTemporaryDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F9EC371D5C04A9004AC8B6 /* SPUTemporaryDownload.m */; };
+		72F9EC3B1D5C15D0004AC8B6 /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
+		72F9EC3C1D5C15EF004AC8B6 /* SPUTemporaryDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F9EC371D5C04A9004AC8B6 /* SPUTemporaryDownload.m */; };
 		C23E885B1BE7B24F0050BB73 /* SparkleTestCodeSignApp.enc.dmg in Resources */ = {isa = PBXBuildFile; fileRef = C23E88591BE7AF890050BB73 /* SparkleTestCodeSignApp.enc.dmg */; };
 		F8761EB11ADC5068000C9034 /* SUCodeSigningVerifierTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */; };
 		F8761EB31ADC50EB000C9034 /* SparkleTestCodeSignApp.zip in Resources */ = {isa = PBXBuildFile; fileRef = F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */; };
@@ -1023,6 +1027,8 @@
 		72F94F571CC44DE1002DEE68 /* SPUXPCServiceInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUXPCServiceInfo.m; sourceTree = "<group>"; };
 		72F9EBE01D517E2F004AC8B6 /* SUUpdater.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdater.h; sourceTree = "<group>"; };
 		72F9EBE11D517E2F004AC8B6 /* SUUpdater.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdater.m; sourceTree = "<group>"; };
+		72F9EC361D5C04A9004AC8B6 /* SPUTemporaryDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SPUTemporaryDownload.h; path = TemporaryDownloader/SPUTemporaryDownload.h; sourceTree = SOURCE_ROOT; };
+		72F9EC371D5C04A9004AC8B6 /* SPUTemporaryDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SPUTemporaryDownload.m; path = TemporaryDownloader/SPUTemporaryDownload.m; sourceTree = SOURCE_ROOT; };
 		8DC2EF5A0486A6940098B216 /* Sparkle-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Sparkle-Info.plist"; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* Sparkle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Sparkle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A5BF4F1B1BC7668B007A052A /* SUTestWebServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUTestWebServer.h; sourceTree = "<group>"; };
@@ -1720,6 +1726,8 @@
 				724A0A351CF7AEEA00D8C3D5 /* main.m */,
 				724A0A371CF7AEEA00D8C3D5 /* SUTemporaryDownloader.h */,
 				724A0A381CF7AEEA00D8C3D5 /* SUTemporaryDownloader.m */,
+				72F9EC361D5C04A9004AC8B6 /* SPUTemporaryDownload.h */,
+				72F9EC371D5C04A9004AC8B6 /* SPUTemporaryDownload.m */,
 				724A0A391CF7AEEA00D8C3D5 /* SUTemporaryDownloaderProtocol.h */,
 			);
 			name = TemporaryDownloader;
@@ -1898,6 +1906,7 @@
 				61B5F8ED09C4CE3C00B25A18 /* SPUUpdater.h in Headers */,
 				61A2259E0D1C495D00430CCD /* SUVersionComparisonProtocol.h in Headers */,
 				3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */,
+				72F9EC381D5C04A9004AC8B6 /* SPUTemporaryDownload.h in Headers */,
 				7267E5E51D3D90AA00D1BF90 /* SUFileManager.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2734,6 +2743,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72F9EC3B1D5C15D0004AC8B6 /* SUConstants.m in Sources */,
+				72F9EC3A1D5C04A9004AC8B6 /* SPUTemporaryDownload.m in Sources */,
 				724A0A3B1CF7AEEA00D8C3D5 /* main.m in Sources */,
 				7293A1B01CEE9B9800B957A7 /* SPUURLRequest.m in Sources */,
 				724A0A3D1CF7AEEA00D8C3D5 /* SUTemporaryDownloader.m in Sources */,
@@ -2794,6 +2805,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72F9EC3C1D5C15EF004AC8B6 /* SPUTemporaryDownload.m in Sources */,
 				7267E5DF1D3D8FFA00D1BF90 /* SPUInstallationInputData.m in Sources */,
 				724BB3B01D3482BA005D534A /* SPUSystemAuthorization.m in Sources */,
 				724BB3AA1D3347C2005D534A /* SUInstallerStatus.m in Sources */,

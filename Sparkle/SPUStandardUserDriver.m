@@ -188,10 +188,10 @@
     }];
 }
 
-- (void)showUpdateReleaseNotes:(NSData *)releaseNotes
+- (void)showUpdateReleaseNotesWithData:(NSData *)releaseNotesData textEncodingName:(NSString * _Nullable)textEncodingName MIMEType:(NSString * _Nullable)MIMEType
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.activeUpdateAlert showReleaseNotes:releaseNotes];
+        [self.activeUpdateAlert showUpdateReleaseNotesWithData:releaseNotesData textEncodingName:textEncodingName MIMEType:MIMEType];
     });
 }
 

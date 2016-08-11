@@ -120,11 +120,18 @@
     });
 }
 
-- (void)displayReleaseNotes:(NSData *)releaseNotes
+- (void)displayHTMLReleaseNotes:(NSData *)releaseNotes
 {
     NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:releaseNotes documentAttributes:NULL];
     fprintf(stderr, "Release notes:\n");
     fprintf(stderr, "%s\n", attributedString.string.UTF8String);
+}
+
+- (void)displayPlainTextReleaseNotes:(NSData *)releaseNotes encoding:(NSStringEncoding)encoding
+{
+    NSString *string = [[NSString alloc] initWithData:releaseNotes encoding:encoding];
+    fprintf(stderr, "Release notes:\n");
+    fprintf(stderr, "%s\n", string.UTF8String);
 }
 
 - (void)showUpdateWithAppcastItem:(SUAppcastItem *)appcastItem updateAdjective:(NSString *)updateAdjective
@@ -135,7 +142,7 @@
         if (appcastItem.itemDescription != nil) {
             NSData *descriptionData = [appcastItem.itemDescription dataUsingEncoding:NSUTF8StringEncoding];
             if (descriptionData != nil) {
-                [self displayReleaseNotes:descriptionData];
+                [self displayHTMLReleaseNotes:descriptionData];
             }
         }
     }
@@ -174,11 +181,21 @@
     });
 }
 
-- (void)showUpdateReleaseNotes:(NSData *)releaseNotes
+- (void)showUpdateReleaseNotesWithData:(NSData *)releaseNotesData textEncodingName:(NSString * _Nullable)textEncodingName MIMEType:(NSString * _Nullable)MIMEType
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.verbose) {
-            [self displayReleaseNotes:releaseNotes];
+            if ([MIMEType isEqualToString:@"text/plain"]) {
+                NSStringEncoding encoding;
+                if (textEncodingName == nil) {
+                    encoding = NSUTF8StringEncoding;
+                } else {
+                    encoding = CFStringConvertEncodingToNSStringEncoding(CFStringConvertIANACharSetNameToEncoding((CFStringRef)textEncodingName));
+                }
+                [self displayPlainTextReleaseNotes:releaseNotesData encoding:encoding];
+            } else {
+                [self displayHTMLReleaseNotes:releaseNotesData];
+            }
         }
     });
 }
