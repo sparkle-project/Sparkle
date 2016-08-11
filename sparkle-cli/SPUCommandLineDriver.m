@@ -72,7 +72,7 @@ void _SULogDisableStandardErrorStream(void);
 }
 
 // In case we find an update during probing, otherwise we leave this to the user driver
-- (void)updater:(SPUUpdater *)__unused updater didFindValidUpdate:(SUAppcastItem *)__unused item
+- (void)updater:(id)__unused updater didFindValidUpdate:(SUAppcastItem *)__unused item
 {
     if (self.probingForUpdates) {
         if (self.verbose) {
