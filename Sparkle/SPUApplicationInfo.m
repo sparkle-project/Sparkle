@@ -35,10 +35,11 @@
 
 + (NSRunningApplication *)runningApplicationWithBundle:(NSBundle *)bundle
 {
-    NSString *bundlePath = bundle.bundlePath;
+    // Resolve symlinks otherwise when we compare file paths, we may not realize two paths that are represented differently are the same
+    NSArray<NSString *> *bundlePathComponents = bundle.bundlePath.stringByResolvingSymlinksInPath.pathComponents;
     NSString *bundleIdentifier = bundle.bundleIdentifier;
     
-    if (bundleIdentifier != nil && bundlePath != nil) {
+    if (bundleIdentifier != nil && bundlePathComponents != nil) {
         NSArray *runningApplications =
         (bundleIdentifier != nil) ?
         [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleIdentifier] :
@@ -46,8 +47,8 @@
         
         for (NSRunningApplication *runningApplication in runningApplications) {
             // Comparing the URLs hasn't worked well for me in practice, so I'm comparing the file paths instead
-            NSString *candidatePath = runningApplication.bundleURL.path;
-            if (candidatePath != nil && [candidatePath isEqualToString:bundlePath]) {
+            NSString *candidatePath = runningApplication.bundleURL.URLByResolvingSymlinksInPath.path;
+            if (candidatePath != nil && [candidatePath.pathComponents isEqualToArray:bundlePathComponents]) {
                 return runningApplication;
             }
         }
