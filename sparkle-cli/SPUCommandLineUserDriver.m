@@ -190,7 +190,12 @@
                 if (textEncodingName == nil) {
                     encoding = NSUTF8StringEncoding;
                 } else {
-                    encoding = CFStringConvertEncodingToNSStringEncoding(CFStringConvertIANACharSetNameToEncoding((CFStringRef)textEncodingName));
+                    CFStringEncoding cfEncoding = CFStringConvertIANACharSetNameToEncoding((CFStringRef)textEncodingName);
+                    if (cfEncoding != kCFStringEncodingInvalidId) {
+                        encoding = CFStringConvertEncodingToNSStringEncoding(cfEncoding);
+                    } else {
+                        encoding = NSUTF8StringEncoding;
+                    }
                 }
                 [self displayPlainTextReleaseNotes:releaseNotesData encoding:encoding];
             } else {
