@@ -18,18 +18,9 @@ SU_EXPORT @interface SPUUserDriverCoreComponent : NSObject
 
 @property (nonatomic, readonly, weak) id<SPUStandardUserDriverDelegate> delegate;
 
-- (void)idleOnUpdateChecks:(BOOL)shouldIdleOnUpdateChecks;
-
-@property (nonatomic, readonly) BOOL idlesOnUpdateChecks;
-
 - (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates;
 
 @property (nonatomic, readonly) BOOL canCheckForUpdates;
-
-@property (nonatomic, readonly) BOOL willInitiateNextUpdateCheck;
-
-- (void)startUpdateCheckTimerWithNextTimeInterval:(NSTimeInterval)timeInterval reply:(void (^)(SUUpdateCheckTimerStatus))reply;
-- (void)invalidateUpdateCheckTimer;
 
 - (void)registerInstallUpdateHandler:(void (^)(SUInstallUpdateStatus))installUpdateHandler;
 - (void)installUpdateWithChoice:(SUInstallUpdateStatus)choice;
@@ -46,7 +37,5 @@ SU_EXPORT @interface SPUUserDriverCoreComponent : NSObject
 - (void)acceptAcknowledgement;
 
 - (void)dismissUpdateInstallation;
-
-- (void)invalidate;
 
 @end

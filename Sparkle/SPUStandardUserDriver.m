@@ -54,18 +54,6 @@
 
 #pragma mark Is Update Busy?
 
-- (void)idleOnUpdateChecks:(BOOL)shouldIdleOnUpdateChecks
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.coreComponent idleOnUpdateChecks:shouldIdleOnUpdateChecks];
-    });
-}
-
-- (BOOL)idlesOnUpdateChecks
-{
-    return self.coreComponent.idlesOnUpdateChecks;
-}
-
 - (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -76,27 +64,6 @@
 - (BOOL)canCheckForUpdates
 {
     return self.coreComponent.canCheckForUpdates;
-}
-
-#pragma mark Check Updates Timer
-
-- (BOOL)willInitiateNextUpdateCheck
-{
-    return [self.coreComponent willInitiateNextUpdateCheck];
-}
-
-- (void)startUpdateCheckTimerWithNextTimeInterval:(NSTimeInterval)timeInterval reply:(void (^)(SUUpdateCheckTimerStatus))reply
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.coreComponent startUpdateCheckTimerWithNextTimeInterval:timeInterval reply:reply];
-    });
-}
-
-- (void)invalidateUpdateCheckTimer
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.coreComponent invalidateUpdateCheckTimer];
-    });
 }
 
 #pragma mark Update Permission
@@ -452,15 +419,6 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         [self _dismissUpdateInstallation];
     });
-}
-
-- (void)invalidate
-{
-    // Make sure any remote handlers will not be invoked
-    [self.coreComponent invalidate];
-    
-    // Dismiss the installation normally
-    [self _dismissUpdateInstallation];
 }
 
 @end

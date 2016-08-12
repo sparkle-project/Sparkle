@@ -43,40 +43,6 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 - (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates;
 
 /*!
- * Idle on timed updater checks.
- *
- * If the user driver should idle on update checks, then it shouldn't have to schedule any update checks.
- * If we can idle on update checks, this means the updater just determined that automatic update checks were disabled
- *
- * @param shouldIdleOnUpdateChecks Indicates if the user driver should idle on updater checks
- *
- * This can be called from any thread.
- */
-- (void)idleOnUpdateChecks:(BOOL)shouldIdleOnUpdateChecks;
-
-/*!
- * Start the next scheduled update check timer.
- *
- * @param timeInterval The time interval or delay since now that should be used to initiate the next update check.
- * @param reply A reply of SUCheckForUpdateNow will tell Sparkle to start its update check immediately. This should not be called sooner
- * than the timeInterval delay. A reply of SUCheckForUpdateWillOccurLater can be used immediately however, allowing Sparkle to idle.
- * If a SUCheckForUpdateWillOccurLater reply is used, then someone after the delay must be delegated to telling the updater to check for the next update.
- *
- * This can be called from any thread.
- */
-- (void)startUpdateCheckTimerWithNextTimeInterval:(NSTimeInterval)timeInterval reply:(void (^)(SUUpdateCheckTimerStatus))reply;
-
-/*!
- * Invalidate the update check timer.
- *
- * Stop the update check initated from -startUpdateCheckTimerWithNextTimeInterval:reply:
- * Only if a response hasn't been sent yet, then send a SUCheckForUpdateWillOccurLater reply
- *
- * This can be called from any thread, and could be called multiple times in succession.
- */
-- (void)invalidateUpdateCheckTimer;
-
-/*!
  * Request updater permission from the user
  *
  * Ask the user if they want automatic update checks to be on or off, and if they want to send an anonymous system profile

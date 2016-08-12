@@ -11,11 +11,6 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NS_ENUM(NSUInteger, SUUpdateCheckTimerStatus) {
-    SUCheckForUpdateNow,
-    SUCheckForUpdateWillOccurLater
-};
-
 typedef NS_ENUM(NSUInteger, SUUserInitiatedCheckStatus) {
     SUUserInitiatedCheckDone,
     SUUserInitiatedCheckCanceled

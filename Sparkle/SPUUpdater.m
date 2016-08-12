@@ -26,6 +26,7 @@
 #import "SUErrors.h"
 #import "SPUXPCServiceInfo.h"
 #import "SPUUpdaterCycle.h"
+#import "SPUUpdaterTimer.h"
 #import "SUDownloadedUpdate.h"
 
 #ifdef _APPKITDEFINES_H
@@ -39,7 +40,7 @@ NSString *const SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotific
 NSString *const SUUpdaterAppcastItemNotificationKey = @"SUUpdaterAppcastItemNotificationKey";
 NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotificationKey";
 
-@interface SPUUpdater () <SPUUpdaterCycleDelegate>
+@interface SPUUpdater () <SPUUpdaterCycleDelegate, SPUUpdaterTimerDelegate>
 
 @property (readonly, copy) NSURL *parameterizedFeedURL;
 
@@ -48,6 +49,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly) SPUUpdaterSettings *updaterSettings;
 @property (nonatomic, readonly) SPUUpdaterCycle *updaterCycle;
+@property (nonatomic, readonly) SPUUpdaterTimer *updaterTimer;
 @property (nonatomic) BOOL startedUpdater;
 @property (nonatomic, copy) void (^preStartedScheduledUpdateBlock)(void);
 @property (nonatomic, nullable) SUDownloadedUpdate *resumableUpdate;
@@ -68,6 +70,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize host = _host;
 @synthesize updaterSettings = _updaterSettings;
 @synthesize updaterCycle = _updaterCycle;
+@synthesize updaterTimer = _updaterTimer;
 @synthesize sparkleBundle = _sparkleBundle;
 @synthesize startedUpdater = _startedUpdater;
 @synthesize preStartedScheduledUpdateBlock = _preStartedScheduledUpdateBlock;
@@ -96,6 +99,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         
         _updaterSettings = [[SPUUpdaterSettings alloc] initWithHostBundle:bundle];
         _updaterCycle = [[SPUUpdaterCycle alloc] initWithDelegate:self];
+        _updaterTimer = [[SPUUpdaterTimer alloc] initWithDelegate:self];
         
         _userDriver = userDriver;
         
@@ -346,12 +350,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)scheduleNextUpdateCheckFiringImmediately:(BOOL)firingImmediately
 {
-    [self.userDriver invalidateUpdateCheckTimer];
+    [self.updaterTimer invalidate];
     
     BOOL automaticallyCheckForUpdates = [self automaticallyChecksForUpdates];
     
     [self.userDriver showCanCheckForUpdates:!automaticallyCheckForUpdates];
-    [self.userDriver idleOnUpdateChecks:!automaticallyCheckForUpdates];
     
     if (!automaticallyCheckForUpdates) {
         return;
@@ -373,24 +376,18 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 updateCheckInterval = SUMinimumUpdateCheckInterval;
             if (intervalSinceCheck < updateCheckInterval) {
                 NSTimeInterval delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
-                __weak SPUUpdater *weakSelf = self; // we don't want this to keep the updater alive
-                [self.userDriver startUpdateCheckTimerWithNextTimeInterval:delayUntilCheck reply:^(SUUpdateCheckTimerStatus checkTimerStatus) {
-                    switch (checkTimerStatus) {
-                        case SUCheckForUpdateWillOccurLater:
-                            break;
-                        case SUCheckForUpdateNow:
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                [weakSelf checkForUpdatesInBackground];
-                            });
-                            break;
-                    }
-                }];
+                [self.updaterTimer startAndFireAfterDelay:delayUntilCheck];
             } else {
                 // We're overdue! Run one now.
                 [self checkForUpdatesInBackground];
             }
         }];
     }
+}
+
+- (void)updaterTimerDidFire
+{
+    [self checkForUpdatesInBackground];
 }
 
 - (void)checkForUpdatesInBackground
@@ -495,7 +492,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         return;
     }
     
-    [self.userDriver invalidateUpdateCheckTimer];
+    [self.updaterTimer invalidate];
 
     [self updateLastUpdateCheckDate];
 
@@ -797,9 +794,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 {
     // Stop checking for updates
     [self cancelNextUpdateCycle];
-    
-    // Don't tell the user driver to invalidate the update check timer
-    // It could always create a new updater instance once the scheduled time occurs
+    [self.updaterTimer invalidate];
     
     // Abort any on-going updates
     // A driver could be retained by another object (eg: a timer),

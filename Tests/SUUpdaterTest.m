@@ -21,12 +21,6 @@
 
 - (void)showCanCheckForUpdates:(BOOL)__unused canCheckForUpdates {}
 
-- (void)idleOnUpdateChecks:(BOOL)__unused shouldIdleOnUpdateChecks {}
-
-- (void)startUpdateCheckTimerWithNextTimeInterval:(NSTimeInterval)__unused timeInterval reply:(void (^)(SUUpdateCheckTimerStatus))__unused reply {}
-
-- (void)invalidateUpdateCheckTimer {}
-
 - (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SPUUpdatePermission *))__unused reply {}
 
 - (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SUUserInitiatedCheckStatus))__unused updateCheckStatusCompletion {}

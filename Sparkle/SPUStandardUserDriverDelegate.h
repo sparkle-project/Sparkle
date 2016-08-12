@@ -14,7 +14,7 @@
 /*!
  A protocol for Sparkle's standard user driver's delegate
  
- This includes methods related to UI interactions and XPC/remote process communication.
+ This includes methods related to UI interactions
  */
 SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
 
@@ -38,30 +38,5 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  the standard version formatter will be used.
  */
 - (_Nullable id <SUVersionDisplay>)userDriverRequestsVersionDisplayer;
-
-/*!
- Asks whether or not the delegate is responsible for initiating updater checks.
- 
- The user driver uses this to decide whether or not it should be the one initiating update checks.
- If the delegate wants to initiate update checks, then the user driver lets the updater know it shouldn't
- wait for a response from the user driver. When the user driver and updater live in separate processes,
- having a delegate implement this can be more efficient for the system and therefore is encouraged.
- 
- @return Returns if the delegate is responsible for initiating update checks. If the delegate returns YES,
- then the delegate must also implement -userDriverRequestsInitatingUpdateCheck which is when the delegate should
- initiate update checks.
- */
-- (BOOL)userDriverRequestsResponsibilityForInitiatingUpdateCheck;
-
-/*!
- Called when user driver tells the delegate to initiate an update check
- 
- This is called if the delegate returned YES from -userDriverRequestsResponsibilityForInitiatingUpdateCheck
- 
- The delegate will have to find a pathway to tell the SUUpdater instance to check for updates, that
- does not go through the user driver. See -userDriverRequestsResponsibilityForInitiatingUpdateCheck as to why
- a delegate may want to implement this.
- */
-- (void)userDriverRequestsInitatingUpdateCheck;
 
 @end

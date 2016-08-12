@@ -29,34 +29,4 @@
  */
 @property (nonatomic, readonly) BOOL canCheckForUpdates;
 
-/*!
- Indicates whether or not a currently pending update check will be initiated in the future
- 
- This may be useful for deciding if the user driver should be invalidated, when the connection to the updater
- has been interrupted.
- */
-@property (nonatomic, readonly) BOOL willInitiateNextUpdateCheck;
-
-/*!
- Indicates whether or not Sparkle's updater has been idling on update checks; i.e, if automatic update checks
- had been disabled the last time the updater checked.
- 
- This may be useful for deciding if a connection needs to be immediately resumed or re-created if it has been interrupted.
- See also -willInitiateNextUpdateCheck
- */
-@property (nonatomic, readonly) BOOL idlesOnUpdateChecks;
-
-/*!
- Invalidate the current update installation
- 
- This stops all behavior for the current update installation. It avoids making any calls or replies to Sparkle's updater.
- Note this does not change the idle state of update checks (i.e, -idlesOnUpdateChecks), but it will invalidate any pending update checks.
- One may want to check if there is a pending update check (i.e, -willInitiateNextUpdateCheck) before making this call to decide if the
- user driver should be invalidated or not
- 
- This is appropriate to call when the connection to the updater has been interrupted or invalidated. Note this class is still re-usable
- in the case that the connection should be later resumed.
- */
-- (void)invalidate;
-
 @end
