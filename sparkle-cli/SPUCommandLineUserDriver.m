@@ -120,18 +120,24 @@
     });
 }
 
+- (void)displayReleaseNotes:(const char * _Nullable)releaseNotes
+{
+    if (releaseNotes != NULL) {
+        fprintf(stderr, "Release notes:\n");
+        fprintf(stderr, "%s\n", releaseNotes);
+    }
+}
+
 - (void)displayHTMLReleaseNotes:(NSData *)releaseNotes
 {
     NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:releaseNotes documentAttributes:NULL];
-    fprintf(stderr, "Release notes:\n");
-    fprintf(stderr, "%s\n", attributedString.string.UTF8String);
+    [self displayReleaseNotes:attributedString.string.UTF8String];
 }
 
 - (void)displayPlainTextReleaseNotes:(NSData *)releaseNotes encoding:(NSStringEncoding)encoding
 {
     NSString *string = [[NSString alloc] initWithData:releaseNotes encoding:encoding];
-    fprintf(stderr, "Release notes:\n");
-    fprintf(stderr, "%s\n", string.UTF8String);
+    [self displayReleaseNotes:string.UTF8String];
 }
 
 - (void)showUpdateWithAppcastItem:(SUAppcastItem *)appcastItem updateAdjective:(NSString *)updateAdjective
