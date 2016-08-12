@@ -11,9 +11,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol SUInstallerConnectionProtocol <SUInstallerCommunicationProtocol>
+@protocol SUInstallerConnectionProtocol
 
-// This method is declared in SUInstallerCommunicationProtocol too, but the XPC decoder on macOS 10.8 doesn't know that
+// This method is declared in SUInstallerCommunicationProtocol too
+// the XPC decoder on macOS 10.8 doesn't follow protocols that adopt other protocols, which is why this protocol doesn't adopt SUInstallerCommunicationProtocol
 - (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data;
 
 - (void)setInvalidationHandler:(void (^)(void))invalidationHandler;
