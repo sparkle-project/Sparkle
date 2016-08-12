@@ -60,7 +60,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * @param timeInterval The time interval or delay since now that should be used to initiate the next update check.
  * @param reply A reply of SUCheckForUpdateNow will tell Sparkle to start its update check immediately. This should not be called sooner
  * than the timeInterval delay. A reply of SUCheckForUpdateWillOccurLater can be used immediately however, allowing Sparkle to idle.
- * If a SUCheckForUpdateWillOccurLater reply is used, then someone after the delay must be delegated to telling the SUUpdater to check for the next update.
+ * If a SUCheckForUpdateWillOccurLater reply is used, then someone after the delay must be delegated to telling the updater to check for the next update.
  *
  * This can be called from any thread.
  */
