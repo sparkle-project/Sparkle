@@ -26,8 +26,6 @@
 	<string>Copyright © 2016 Sparkle Project. All rights reserved.</string>
 	<key>XPCService</key>
 	<dict>
-		<key>RunLoopType</key>
-		<string>NSRunLoop</string>
 		<key>ServiceType</key>
 		<string>Application</string>
 		<key>JoinExistingSession</key>
