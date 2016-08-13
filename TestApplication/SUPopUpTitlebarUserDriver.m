@@ -276,7 +276,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         self.contentLengthDownloaded += length;
         double progress = (double)self.contentLengthDownloaded / self.expectedContentLength;
-        [self addUpdateButtonWithTitle:[NSString stringWithFormat:@"Downloading (%d%%)", (int)progress] action:nil];
+        [self addUpdateButtonWithTitle:[NSString stringWithFormat:@"Downloading (%0.0f%%)", progress * 100] action:nil];
     });
 }
 
