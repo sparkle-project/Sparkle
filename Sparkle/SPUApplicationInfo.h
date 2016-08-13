@@ -7,10 +7,11 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "SUExport.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SPUApplicationInfo : NSObject
+SU_EXPORT @interface SPUApplicationInfo : NSObject
 
 + (BOOL)isBackgroundApplication:(NSApplication *)application;
 

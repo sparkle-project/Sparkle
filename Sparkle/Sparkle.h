@@ -26,6 +26,7 @@
 #import "SPUUserDriver.h"
 #import "SPUStandardUserDriver.h"
 #import "SPUStandardUserDriverDelegate.h"
+#import "SPUApplicationInfo.h"
 #import "SPUUserDriverCoreComponent.h"
 #import "SPUDownloadData.h"
 

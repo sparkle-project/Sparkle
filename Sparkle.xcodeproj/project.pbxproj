@@ -156,7 +156,7 @@
 		724BB3B11D3484B2005D534A /* SPUSystemAuthorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3AC1D347EDE005D534A /* SPUSystemAuthorization.m */; };
 		724BB3B21D34862A005D534A /* SPUSystemAuthorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3AC1D347EDE005D534A /* SPUSystemAuthorization.m */; };
 		724BB3B71D35ABA8005D534A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
-		725602D51C83551C00DAA70E /* SPUApplicationInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 725602D31C83551C00DAA70E /* SPUApplicationInfo.h */; };
+		725602D51C83551C00DAA70E /* SPUApplicationInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 725602D31C83551C00DAA70E /* SPUApplicationInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		725602D61C83551C00DAA70E /* SPUApplicationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 725602D41C83551C00DAA70E /* SPUApplicationInfo.m */; };
 		725CB9571C7120410064365A /* SPUUserDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 725CB9561C7120410064365A /* SPUUserDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		725CB95A1C7121830064365A /* SPUStandardUserDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 725CB9581C7121830064365A /* SPUStandardUserDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1853,6 +1853,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				725602D51C83551C00DAA70E /* SPUApplicationInfo.h in Headers */,
 				72F9EC441D5E9ED8004AC8B6 /* SPUDownloadData.h in Headers */,
 				725F977B1C8A896F00265BE4 /* SPUUserDriverCoreComponent.h in Headers */,
 				72F9EC481D5EA904004AC8B6 /* SPUUpdaterDelegate.h in Headers */,
@@ -1885,7 +1886,6 @@
 				55E6F33319EC9F6C00005E76 /* SUErrors.h in Headers */,
 				14652F8419A978C200959E44 /* SUExport.h in Headers */,
 				7267E5FD1D3DD1B700D1BF90 /* SUDownloadedUpdate.h in Headers */,
-				725602D51C83551C00DAA70E /* SPUApplicationInfo.h in Headers */,
 				55C14F06136EF6DB00649790 /* SULog.h in Headers */,
 				726F2CE51BC9C33D001971A4 /* SUOperatingSystem.h in Headers */,
 				72B767E61C9CFD7200A07552 /* SUAutomaticUpdateDriver.h in Headers */,

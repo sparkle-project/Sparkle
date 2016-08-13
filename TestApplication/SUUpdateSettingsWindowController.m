@@ -29,18 +29,18 @@
 
 - (void)windowDidLoad
 {
-    NSBundle *mainBundle = [NSBundle mainBundle];
+    NSBundle *hostBundle = [NSBundle mainBundle];
     
     // If the user is holding down command, we use the popup title user driver instead
     id<SPUUserDriver, SPUStandardUserDriverProtocol> userDriver;
     if (([NSEvent modifierFlags] & NSCommandKeyMask) != 0) {
-        userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:self.window delegate:nil];
+        userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithHostBundle:hostBundle window:self.window delegate:nil];
     } else {
-        userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:mainBundle delegate:nil];
+        userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
     }
     
     self.userDriver = userDriver;
-    self.updater = [[SPUUpdater alloc] initWithHostBundle:mainBundle userDriver:userDriver delegate:nil];
+    self.updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle userDriver:userDriver delegate:nil];
     
     NSError *updaterError = nil;
     if (![self.updater startUpdater:&updaterError]) {

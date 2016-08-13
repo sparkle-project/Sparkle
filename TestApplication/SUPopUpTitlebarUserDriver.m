@@ -14,6 +14,7 @@
 
 @interface SUPopUpTitlebarUserDriver()
 
+@property (nonatomic, readonly) NSBundle *hostBundle;
 @property (nonatomic, readonly) NSWindow *window;
 @property (nonatomic, readonly) SPUUserDriverCoreComponent *coreComponent;
 @property (nonatomic) NSTitlebarAccessoryViewController *accessoryViewController;
@@ -28,6 +29,7 @@
 @implementation SUPopUpTitlebarUserDriver
 
 @synthesize delegate = _delegate;
+@synthesize hostBundle = _hostBundle;
 @synthesize window = _window;
 @synthesize coreComponent = _coreComponent;
 @synthesize accessoryViewController = _accessoryViewController;
@@ -37,10 +39,11 @@
 @synthesize expectedContentLength = _expectedContentLength;
 @synthesize contentLengthDownloaded = _contentLengthDownloaded;
 
-- (instancetype)initWithWindow:(NSWindow *)window delegate:(id<SPUStandardUserDriverDelegate>)delegate
+- (instancetype)initWithHostBundle:(NSBundle *)hostBundle window:(NSWindow *)window delegate:(id<SPUStandardUserDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
+        _hostBundle = hostBundle;
         _window = window;
         _delegate = delegate;
         _coreComponent = [[SPUUserDriverCoreComponent alloc] initWithDelegate:delegate];
@@ -316,7 +319,8 @@
         // In case our termination request fails or is delayed
         [self removeUpdateButton];
         
-        [[NSApplication sharedApplication] terminate:nil];
+        NSRunningApplication *runningApplication = [SPUApplicationInfo runningApplicationWithBundle:self.hostBundle];
+        [runningApplication terminate];
     });
 }
 
