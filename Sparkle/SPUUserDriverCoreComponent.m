@@ -7,7 +7,6 @@
 //
 
 #import "SPUUserDriverCoreComponent.h"
-#import "SPUStandardUserDriverDelegate.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -26,23 +25,11 @@
 
 @implementation SPUUserDriverCoreComponent
 
-@synthesize delegate = _delegate;
 @synthesize canCheckForUpdates = _canCheckForUpdates;
 @synthesize installUpdateHandler = _installUpdateHandler;
 @synthesize updateCheckStatusCompletion = _updateCheckStatusCompletion;
 @synthesize downloadStatusCompletion = _downloadStatusCompletion;
 @synthesize acknowledgement = _acknowledgement;
-
-#pragma mark Birth
-
-- (instancetype)initWithDelegate:(id<SPUStandardUserDriverDelegate>)delegate
-{
-    self = [super init];
-    if (self != nil) {
-        _delegate = delegate;
-    }
-    return self;
-}
 
 #pragma mark Is Update Busy?
 

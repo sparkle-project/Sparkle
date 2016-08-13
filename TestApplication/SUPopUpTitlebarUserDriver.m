@@ -28,7 +28,6 @@
 
 @implementation SUPopUpTitlebarUserDriver
 
-@synthesize delegate = _delegate;
 @synthesize hostBundle = _hostBundle;
 @synthesize window = _window;
 @synthesize coreComponent = _coreComponent;
@@ -39,14 +38,13 @@
 @synthesize expectedContentLength = _expectedContentLength;
 @synthesize contentLengthDownloaded = _contentLengthDownloaded;
 
-- (instancetype)initWithHostBundle:(NSBundle *)hostBundle window:(NSWindow *)window delegate:(id<SPUStandardUserDriverDelegate>)delegate
+- (instancetype)initWithHostBundle:(NSBundle *)hostBundle window:(NSWindow *)window
 {
     self = [super init];
     if (self != nil) {
         _hostBundle = hostBundle;
         _window = window;
-        _delegate = delegate;
-        _coreComponent = [[SPUUserDriverCoreComponent alloc] initWithDelegate:delegate];
+        _coreComponent = [[SPUUserDriverCoreComponent alloc] init];
     }
     return self;
 }

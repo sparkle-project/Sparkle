@@ -24,6 +24,7 @@
 @property (nonatomic, readonly) SUHost *host;
 
 @property (nonatomic, readonly) SPUUserDriverCoreComponent *coreComponent;
+@property (nonatomic, weak, nullable, readonly) id <SPUStandardUserDriverDelegate> delegate;
 
 @property (nonatomic) SUStatusController *checkingController;
 @property (nonatomic) SUUpdateAlert *activeUpdateAlert;
@@ -48,7 +49,7 @@
     if (self != nil) {
         _host = [[SUHost alloc] initWithBundle:hostBundle];
         _delegate = delegate;
-        _coreComponent = [[SPUUserDriverCoreComponent alloc] initWithDelegate:delegate];
+        _coreComponent = [[SPUUserDriverCoreComponent alloc] init];
     }
     return self;
 }

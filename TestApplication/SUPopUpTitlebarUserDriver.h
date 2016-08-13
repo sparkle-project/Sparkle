@@ -13,6 +13,6 @@
 
 @interface SUPopUpTitlebarUserDriver : NSObject <SPUUserDriver, SPUStandardUserDriverProtocol>
 
-- (instancetype)initWithHostBundle:(NSBundle *)hostBundle window:(NSWindow *)window delegate:(id<SPUStandardUserDriverDelegate>)delegate;
+- (instancetype)initWithHostBundle:(NSBundle *)hostBundle window:(NSWindow *)window;
 
 @end

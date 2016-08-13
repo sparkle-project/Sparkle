@@ -14,10 +14,6 @@
 
 SU_EXPORT @interface SPUUserDriverCoreComponent : NSObject
 
-- (instancetype)initWithDelegate:(id<SPUStandardUserDriverDelegate>)delegate;
-
-@property (nonatomic, readonly, weak) id<SPUStandardUserDriverDelegate> delegate;
-
 - (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates;
 
 @property (nonatomic, readonly) BOOL canCheckForUpdates;
