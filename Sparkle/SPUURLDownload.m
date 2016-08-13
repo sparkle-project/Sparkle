@@ -11,10 +11,10 @@
 #import "SUTemporaryDownloader.h"
 #import "SUTemporaryDownloaderProtocol.h"
 #import "SPUURLRequest.h"
-#import "SPUTemporaryDownload.h"
+#import "SPUDownloadData.h"
 #import "SUErrors.h"
 
-void SPUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(SPUTemporaryDownload * _Nullable, NSError * _Nullable))
+void SPUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(SPUDownloadData * _Nullable, NSError * _Nullable))
 {
     id<SUTemporaryDownloaderProtocol> downloader = nil;
     NSXPCConnection *connection = nil;
@@ -58,15 +58,15 @@ void SPUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(S
         downloader = connection.remoteObjectProxy;
     }
     
-    [downloader startDownloadWithRequest:[SPUURLRequest URLRequestWithRequest:request] completion:^(SPUTemporaryDownload * _Nullable download, NSError * _Nullable error) {
+    [downloader startDownloadWithRequest:[SPUURLRequest URLRequestWithRequest:request] completion:^(SPUDownloadData * _Nullable downloadData, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             retrievedDownloadResult = YES;
             [connection invalidate];
             
-            if (download == nil || download.data == nil) {
+            if (downloadData == nil || downloadData.data == nil) {
                 completionBlock(nil, error);
             } else {
-                completionBlock(download, nil);
+                completionBlock(downloadData, nil);
             }
         });
     }];

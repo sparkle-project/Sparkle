@@ -15,7 +15,7 @@
 
 @protocol SUUpdateAlertDelegate;
 
-@class SUAppcastItem, SUHost;
+@class SUAppcastItem, SPUDownloadData, SUHost;
 @interface SUUpdateAlert : NSWindowController
 
 @property (nonatomic, weak, readonly) id <SUVersionDisplay> versionDisplayer;
@@ -24,7 +24,7 @@
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer resumableCompletionBlock:(void (^)(SUInstallUpdateStatus))block;
 
-- (void)showUpdateReleaseNotesWithData:(NSData *)releaseNotesData textEncodingName:(NSString *)textEncodingName MIMEType:(NSString *)MIMEType;
+- (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData;
 - (void)showReleaseNotesFailedToDownload;
 
 - (IBAction)installUpdate:sender;

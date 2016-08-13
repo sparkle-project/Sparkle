@@ -9,6 +9,7 @@
 #import "SPUCommandLineUserDriver.h"
 #import <AppKit/AppKit.h>
 #import "SPUApplicationInfo.h"
+#import "SPUDownloadData.h"
 
 #define SCHEDULED_UPDATE_TIMER_THRESHOLD 2.0 // seconds
 
@@ -51,39 +52,6 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent showCanCheckForUpdates:canCheckForUpdates];
-    });
-}
-
-- (void)idleOnUpdateChecks:(BOOL)shouldIdleOnUpdateChecks
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (shouldIdleOnUpdateChecks) {
-            fprintf(stderr, "Error: Automatic update checking is disabled.\n");
-            exit(EXIT_FAILURE);
-        }
-        
-        [self.coreComponent idleOnUpdateChecks:shouldIdleOnUpdateChecks];
-    });
-}
-
-- (void)startUpdateCheckTimerWithNextTimeInterval:(NSTimeInterval)timeInterval reply:(void (^)(SUUpdateCheckTimerStatus))reply
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (timeInterval > SCHEDULED_UPDATE_TIMER_THRESHOLD) {
-            if (self.verbose) {
-                fprintf(stderr, "Too early to check for new updates. Next check is in %f seconds. Exiting.\n", timeInterval);
-            }
-            exit(EXIT_SUCCESS);
-        } else {
-            [self.coreComponent startUpdateCheckTimerWithNextTimeInterval:timeInterval reply:reply];
-        }
-    });
-}
-
-- (void)invalidateUpdateCheckTimer
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.coreComponent invalidateUpdateCheckTimer];
     });
 }
 
@@ -187,25 +155,25 @@
     });
 }
 
-- (void)showUpdateReleaseNotesWithData:(NSData *)releaseNotesData textEncodingName:(NSString * _Nullable)textEncodingName MIMEType:(NSString * _Nullable)MIMEType
+- (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.verbose) {
-            if ([MIMEType isEqualToString:@"text/plain"]) {
+            if (downloadData.MIMEType != nil && [downloadData.MIMEType isEqualToString:@"text/plain"]) {
                 NSStringEncoding encoding;
-                if (textEncodingName == nil) {
+                if (downloadData.textEncodingName == nil) {
                     encoding = NSUTF8StringEncoding;
                 } else {
-                    CFStringEncoding cfEncoding = CFStringConvertIANACharSetNameToEncoding((CFStringRef)textEncodingName);
+                    CFStringEncoding cfEncoding = CFStringConvertIANACharSetNameToEncoding((CFStringRef)downloadData.textEncodingName);
                     if (cfEncoding != kCFStringEncodingInvalidId) {
                         encoding = CFStringConvertEncodingToNSStringEncoding(cfEncoding);
                     } else {
                         encoding = NSUTF8StringEncoding;
                     }
                 }
-                [self displayPlainTextReleaseNotes:releaseNotesData encoding:encoding];
+                [self displayPlainTextReleaseNotes:downloadData.data encoding:encoding];
             } else {
-                [self displayHTMLReleaseNotes:releaseNotesData];
+                [self displayHTMLReleaseNotes:downloadData.data];
             }
         }
     });

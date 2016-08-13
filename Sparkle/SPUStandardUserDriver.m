@@ -17,6 +17,7 @@
 #import "SUUpdateAlert.h"
 #import "SULocalizations.h"
 #import "SPUApplicationInfo.h"
+#import "SPUDownloadData.h"
 
 @interface SPUStandardUserDriver ()
 
@@ -155,10 +156,10 @@
     }];
 }
 
-- (void)showUpdateReleaseNotesWithData:(NSData *)releaseNotesData textEncodingName:(NSString * _Nullable)textEncodingName MIMEType:(NSString * _Nullable)MIMEType
+- (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.activeUpdateAlert showUpdateReleaseNotesWithData:releaseNotesData textEncodingName:textEncodingName MIMEType:MIMEType];
+        [self.activeUpdateAlert showUpdateReleaseNotesWithDownloadData:downloadData];
     });
 }
 

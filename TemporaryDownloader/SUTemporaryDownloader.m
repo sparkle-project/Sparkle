@@ -7,14 +7,14 @@
 //
 
 #import "SUTemporaryDownloader.h"
-#import "SPUTemporaryDownload.h"
+#import "SPUDownloadData.h"
 #import "SPUURLRequest.h"
 #import "SUErrors.h"
 #import "SUConstants.h"
 
 @interface SUTemporaryDownloader () <NSURLDownloadDelegate>
 
-@property (nonatomic, copy) void (^completionBlock)(SPUTemporaryDownload * _Nullable download, NSError * _Nullable error);
+@property (nonatomic, copy) void (^completionBlock)(SPUDownloadData * _Nullable downloadData, NSError * _Nullable error);
 @property (nonatomic) NSURLDownload *download;
 @property (nonatomic, copy) NSString *downloadFilename;
 @property (nonatomic) NSURLResponse *response;
@@ -28,7 +28,7 @@
 @synthesize downloadFilename = _downloadFilename;
 @synthesize response = _response;
 
-- (void)startDownloadWithRequest:(SPUURLRequest *)request completion:(void (^)(SPUTemporaryDownload * _Nullable download, NSError * _Nullable error))completionBlock
+- (void)startDownloadWithRequest:(SPUURLRequest *)request completion:(void (^)(SPUDownloadData * _Nullable downloadData, NSError * _Nullable error))completionBlock
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         self.completionBlock = completionBlock;
@@ -78,8 +78,8 @@
     NSData *data = [NSData dataWithContentsOfFile:self.downloadFilename];
     if (data != nil) {
         // See SUPersistentDownloader as to why sending the NSURLResponse object over is not a good idea
-        SPUTemporaryDownload *download = [[SPUTemporaryDownload alloc] initWithData:data textEncoding:self.response.textEncodingName MIMEType:self.response.MIMEType];
-        self.completionBlock(download, nil);
+        SPUDownloadData *downloadData = [[SPUDownloadData alloc] initWithData:data textEncodingName:self.response.textEncodingName MIMEType:self.response.MIMEType];
+        self.completionBlock(downloadData, nil);
     } else {
         self.completionBlock(nil, [NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read temporary downloaded data from %@", self.downloadFilename] }]);
     }

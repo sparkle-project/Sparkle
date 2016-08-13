@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SPUUpdatePermission, SUAppcastItem;
+@class SPUUpdatePermission, SUAppcastItem, SPUDownloadData;
 
 /*!
  The API in Sparkle for controlling the user interaction.
@@ -127,13 +127,11 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * This is only applicable if the release notes are linked from the appcast, and are not directly embedded inside of the appcast file.
  * That is, this may be invoked if the releaseNotesURL from the appcast item is non-nil.
  *
- * @param releaseNotesData The data for the release notes that was downloaded from the new update's appcast.
- * @param textEncodingName The text encoding name (eg: "utf-8"). This may be nil if one wasn't retrieved.
- * @param MIMEType The MIME type that was retrieved from the download. This may be nil if one wasn't retrieved.
+ * @param downloadData The data for the release notes that was downloaded from the new update's appcast.
  *
  * This can be called from any thread
  */
-- (void)showUpdateReleaseNotesWithData:(NSData *)releaseNotesData textEncodingName:(NSString * _Nullable)textEncodingName MIMEType:(NSString * _Nullable)MIMEType;
+- (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData;
 
 /*!
  * Show the user that the new update's release notes could not be downloaded

@@ -19,6 +19,7 @@
 #import "SULog.h"
 #import "SULocalizations.h"
 #import "SUAppcastItem.h"
+#import "SPUDownloadData.h"
 #import "SPUApplicationInfo.h"
 #import "SPUUpdaterSettings.h"
 
@@ -199,16 +200,16 @@
     }
 }
 
-- (void)showUpdateReleaseNotesWithData:(NSData *)releaseNotesData textEncodingName:(NSString * _Nullable)textEncodingName MIMEType:(NSString * _Nullable)MIMEType
+- (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
 {
     if (!self.webViewFinishedLoading) {
         NSURL *baseURL = self.updateItem.releaseNotesURL.URLByDeletingLastPathComponent;
         // If a MIME type isn't provided, we will pick html as the default, as opposed to plain text. Questionable decision..
-        NSString *chosenMIMEType = (MIMEType != nil) ? MIMEType : @"text/html";
+        NSString *chosenMIMEType = (downloadData.MIMEType != nil) ? downloadData.MIMEType : @"text/html";
         // We'll pick utf-8 as the default text encoding name if one isn't provided which I think is reasonable
-        NSString *chosenTextEncodingName = (textEncodingName != nil) ? textEncodingName : @"utf-8";
+        NSString *chosenTextEncodingName = (downloadData.textEncodingName != nil) ? downloadData.textEncodingName : @"utf-8";
         
-        [[self.releaseNotesView mainFrame] loadData:releaseNotesData MIMEType:chosenMIMEType textEncodingName:chosenTextEncodingName baseURL:baseURL];
+        [[self.releaseNotesView mainFrame] loadData:downloadData.data MIMEType:chosenMIMEType textEncodingName:chosenTextEncodingName baseURL:baseURL];
     }
 }
 

@@ -10,6 +10,7 @@
 #import "SPUStandardUserDriverDelegate.h"
 #import "SPUUserDriverCoreComponent.h"
 #import "SUInstallUpdateViewController.h"
+#import "SPUDownloadData.h"
 
 @interface SUPopUpTitlebarUserDriver()
 
@@ -178,7 +179,7 @@
     });
 }
 
-- (void)showUpdateReleaseNotesWithData:(NSData *)__unused releaseNotesData textEncodingName:(NSString * _Nullable)__unused textEncodingName MIMEType:(NSString * _Nullable)__unused MIMEType
+- (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)__unused downloadData
 {
     // todo: this should really be implemented
 }

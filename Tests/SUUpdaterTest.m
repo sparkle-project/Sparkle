@@ -33,7 +33,7 @@
 
 - (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem reply:(void (^)(SUInstallUpdateStatus))__unused reply {}
 
-- (void)showUpdateReleaseNotesWithData:(NSData *)__unused releaseNotesData textEncodingName:(NSString * _Nullable)__unused textEncodingName MIMEType:(NSString * _Nullable)__unused MIMEType {}
+- (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)__unused downloadData {}
 
 - (void)showUpdateReleaseNotesFailedToDownloadWithError:(NSError *)__unused error {}
 
