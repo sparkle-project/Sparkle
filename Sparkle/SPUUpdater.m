@@ -250,11 +250,12 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (void)startUpdateCycle
 {
     BOOL shouldPrompt = NO;
-    NSNumber *timeIntervalAtFirstLaunch = [self.host objectForUserDefaultsKey:SUTimeIntervalAtFirstLaunchKey];
+    NSDate *firstLaunchDate = [self.host objectForUserDefaultsKey:SUTimeIntervalAtFirstLaunchKey];
     NSDate *currentDate = [NSDate date];
 
     // If the user has been asked about automatic checks, don't bother prompting
-    if ([self.host objectForUserDefaultsKey:SUEnableAutomaticChecksKey]) {
+    // When the user answers to the permission prompt, this will be set to either @YES or @NO instead of nil
+    if ([self.host objectForUserDefaultsKey:SUEnableAutomaticChecksKey] != nil) {
         shouldPrompt = NO;
     }
     // If the developer wants to check for updates, we shouldn't bug the user about a prompt yet
@@ -272,8 +273,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         
         if ([self.host objectForKey:SUPromptUserOnFirstLaunchKey] != nil) {
             shouldPrompt = YES;
-        } else if (timeIntervalAtFirstLaunch != nil) {
-            NSDate *firstLaunchDate = [NSDate dateWithTimeIntervalSinceReferenceDate:timeIntervalAtFirstLaunch.doubleValue];
+        } else if (firstLaunchDate != nil) {
             NSTimeInterval intervalSinceFirstLaunch = [currentDate timeIntervalSinceDate:firstLaunchDate];
             // We want to prompt if more than (or equal to) 'SUDefaultUpdatePermissionPromptInterval' seconds have passed since the first launch
             // If the first launch time is after (or equal to) our current date, then something may have gone wrong in the system - prompt to be on the safe side
@@ -283,8 +283,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
     }
     
-    if (timeIntervalAtFirstLaunch == nil) {
-        [self.host setObject:@([currentDate timeIntervalSinceReferenceDate]) forUserDefaultsKey:SUTimeIntervalAtFirstLaunchKey];
+    if (firstLaunchDate == nil) {
+        [self.host setObject:currentDate forUserDefaultsKey:SUTimeIntervalAtFirstLaunchKey];
     }
 
     if (shouldPrompt) {
