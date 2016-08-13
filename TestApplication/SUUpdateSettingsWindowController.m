@@ -8,31 +8,58 @@
 
 #import "SUUpdateSettingsWindowController.h"
 #import <Sparkle/Sparkle.h>
+#import "SUPopUpTitlebarUserDriver.h"
 
 @interface SUUpdateSettingsWindowController ()
 
-@property (nonatomic) IBOutlet SPUStandardUpdaterController *updaterController;
+@property (nonatomic) SPUUpdater *updater;
+@property (nonatomic) id<SPUStandardUserDriverProtocol> userDriver;
 
 @end
 
 @implementation SUUpdateSettingsWindowController
 
-@synthesize updaterController = _updaterController;
+@synthesize updater = _updater;
+@synthesize userDriver = _userDriver;
 
 - (NSString *)windowNibName
 {
     return NSStringFromClass([self class]);
 }
 
-- (IBAction)checkForUpdates:(id __unused)sender
+- (void)windowDidLoad
 {
-    [self.updaterController checkForUpdates:self];
+    NSBundle *mainBundle = [NSBundle mainBundle];
+    
+    // If the user is holding down command, we use the popup title user driver instead
+    id<SPUUserDriver, SPUStandardUserDriverProtocol> userDriver;
+    if (([NSEvent modifierFlags] & NSCommandKeyMask) != 0) {
+        userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:self.window delegate:nil];
+    } else {
+        userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:mainBundle delegate:nil];
+    }
+    
+    self.userDriver = userDriver;
+    self.updater = [[SPUUpdater alloc] initWithHostBundle:mainBundle userDriver:userDriver delegate:nil];
+    
+    NSError *updaterError = nil;
+    if (![self.updater startUpdater:&updaterError]) {
+        NSLog(@"Failed to start updater with error: %@", updaterError);
+        abort();
+    }
 }
 
-// This would not be necessary if the updater controller was instantiated in the main menu nib
+- (IBAction)checkForUpdates:(id __unused)sender
+{
+    [self.updater checkForUpdates];
+}
+
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
-    return [self.updaterController validateMenuItem:menuItem];
+    if (menuItem.action == @selector(checkForUpdates:)) {
+        return self.userDriver.canCheckForUpdates;
+    }
+    return YES;
 }
 
 @end

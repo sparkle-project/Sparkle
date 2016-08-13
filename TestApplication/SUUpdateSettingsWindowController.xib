@@ -7,14 +7,13 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUUpdateSettingsWindowController">
             <connections>
-                <outlet property="updaterController" destination="Krg-xk-XXS" id="6b6-LB-0qA"/>
                 <outlet property="window" destination="Sg3-gX-Lin" id="wMT-bp-cDf"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <userDefaultsController representsSharedInstance="YES" id="ppb-Rb-fc7" userLabel="Shared User Defaults Controller"/>
-        <window title="Options" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="Sg3-gX-Lin" userLabel="Options Window">
+        <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="Sg3-gX-Lin" userLabel="Options Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES"/>
             <rect key="contentRect" x="543" y="572" width="314" height="149"/>
@@ -31,7 +30,7 @@
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                         <connections>
-                            <binding destination="Krg-xk-XXS" name="value" keyPath="updater.automaticallyChecksForUpdates" id="tr7-kI-Ucb"/>
+                            <binding destination="-2" name="value" keyPath="self.updater.automaticallyChecksForUpdates" id="23i-l2-Iol"/>
                         </connections>
                     </button>
                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="z6k-h3-dCv">
@@ -41,7 +40,7 @@
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                         <connections>
-                            <binding destination="Krg-xk-XXS" name="value" keyPath="updater.automaticallyDownloadsUpdates" id="BHg-1e-ggS"/>
+                            <binding destination="-2" name="value" keyPath="self.updater.automaticallyDownloadsUpdates" id="JjR-6W-VVm"/>
                         </connections>
                     </button>
                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wFV-vU-Dle">
@@ -51,7 +50,7 @@
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                         <connections>
-                            <binding destination="Krg-xk-XXS" name="value" keyPath="updater.sendsSystemProfile" id="oTa-ha-dC7"/>
+                            <binding destination="-2" name="value" keyPath="self.updater.sendsSystemProfile" id="neZ-PW-Ps7"/>
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mU2-vs-cVn">
@@ -86,13 +85,12 @@
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                         <connections>
-                            <binding destination="Krg-xk-XXS" name="value" keyPath="updater.updateCheckInterval" id="XFG-PN-mB8"/>
+                            <binding destination="-2" name="value" keyPath="self.updater.updateCheckInterval" id="U5m-Up-VEZ"/>
                         </connections>
                     </textField>
                 </subviews>
             </view>
             <point key="canvasLocation" x="233" y="312.5"/>
         </window>
-        <customObject id="Krg-xk-XXS" userLabel="Updater Controller" customClass="SPUStandardUpdaterController"/>
     </objects>
 </document>
