@@ -43,7 +43,7 @@
         _updatePermission = updatePermission;
         _deferInstallation = deferInstallation;
         _verbose = verbose;
-        _coreComponent = [[SPUUserDriverCoreComponent alloc] initWithDelegate:nil];
+        _coreComponent = [[SPUUserDriverCoreComponent alloc] init];
     }
     return self;
 }
