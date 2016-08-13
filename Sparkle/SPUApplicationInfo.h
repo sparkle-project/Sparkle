@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSImage *)bestIconForBundle:(NSBundle *)bundle;
 
++ (NSArray<NSRunningApplication *> *)runningApplicationsWithBundle:(NSBundle *)bundle;
+
 + (NSRunningApplication * _Nullable)runningApplicationWithBundle:(NSBundle *)bundle;
 
 @end

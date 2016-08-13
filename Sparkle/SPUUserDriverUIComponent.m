@@ -21,8 +21,8 @@
 
 - (void)terminateApplicationForBundle:(NSBundle *)bundle
 {
-    NSRunningApplication *runningApplication = [SPUApplicationInfo runningApplicationWithBundle:bundle];
-    if (runningApplication != nil) {
+    NSArray<NSRunningApplication *> *runningApplications = [SPUApplicationInfo runningApplicationsWithBundle:bundle];
+    for (NSRunningApplication *runningApplication in runningApplications) {
         [runningApplication terminate];
     }
 }
