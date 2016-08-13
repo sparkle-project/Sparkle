@@ -247,10 +247,12 @@
     }
 }
 
-- (void)installerDidFinishInstallation
+- (void)installerDidFinishInstallationWithAcknowledgement:(void(^)(void))acknowledgement
 {
-    if ([self.delegate respondsToSelector:@selector(installerDidFinishInstallation)]) {
-        [self.delegate installerDidFinishInstallation];
+    if ([self.delegate respondsToSelector:@selector(installerDidFinishInstallationWithAcknowledgement:)]) {
+        [self.delegate installerDidFinishInstallationWithAcknowledgement:acknowledgement];
+    } else {
+        acknowledgement();
     }
 }
 

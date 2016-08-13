@@ -268,9 +268,11 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * This will only be invoked if the updater process is still alive, which is typically not the case if
  * the updater's lifetime is tied to the application it is updating.
  *
+ * @param acknowledgement Acknowledge to the updater that the installation finish was shown.
+ *
  * This can be called from any thread
  */
-- (void)showUpdateInstallationDidFinish;
+- (void)showUpdateInstallationDidFinishWithAcknowledgement:(void (^)(void))acknowledgement;
 
 /*!
  * Dismiss the current update installation

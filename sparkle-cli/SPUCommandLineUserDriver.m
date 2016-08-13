@@ -285,12 +285,16 @@
     });
 }
 
-- (void)showUpdateInstallationDidFinish
+- (void)showUpdateInstallationDidFinishWithAcknowledgement:(void (^)(void))acknowledgement
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self.coreComponent registerAcknowledgement:acknowledgement];
+        
         if (self.verbose) {
            fprintf(stderr, "Installation Finished.\n");
         }
+        
+        [self.coreComponent acceptAcknowledgement];
     });
 }
 

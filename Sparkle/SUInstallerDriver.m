@@ -284,8 +284,11 @@
         [self.installerConnection invalidate];
         self.installerConnection = nil;
         
-        [self.delegate installerDidFinishInstallation];
-        [self.delegate installerIsRequestingAbortInstallWithError:nil];
+        [self.delegate installerDidFinishInstallationWithAcknowledgement:^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.delegate installerIsRequestingAbortInstallWithError:nil];
+            });
+        }];
     } else if (identifier == SPUUpdaterAlivePing) {
         // Don't update the current stage; a ping request has no effect on that.
         [self.installerConnection handleMessageWithIdentifier:SPUUpdaterAlivePong data:[NSData data]];

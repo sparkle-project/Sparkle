@@ -215,9 +215,9 @@
     [self.userDriver terminateApplication];
 }
 
-- (void)installerDidFinishInstallation
+- (void)installerDidFinishInstallationWithAcknowledgement:(void(^)(void))acknowledgement
 {
-    [self.userDriver showUpdateInstallationDidFinish];
+    [self.userDriver showUpdateInstallationDidFinishWithAcknowledgement:acknowledgement];
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error

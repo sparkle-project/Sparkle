@@ -378,9 +378,11 @@
     });
 }
 
-- (void)showUpdateInstallationDidFinish
+- (void)showUpdateInstallationDidFinishWithAcknowledgement:(void (^)(void))acknowledgement
 {
-    //...
+    // Deciding not to show anything here
+    [self.coreComponent registerAcknowledgement:acknowledgement];
+    [self.coreComponent acceptAcknowledgement];
 }
 
 #pragma mark Aborting Everything

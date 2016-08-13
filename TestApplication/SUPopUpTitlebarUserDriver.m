@@ -224,6 +224,14 @@
 
 #pragma mark Update Errors
 
+- (void)acceptAcknowledgementAfterDelay
+{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        // Installation will be dismissed shortly after this
+        [self.coreComponent acceptAcknowledgement];
+    });
+}
+
 - (void)showUpdaterError:(NSError *)error acknowledgement:(void (^)(void))acknowledgement
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -232,10 +240,7 @@
         NSLog(@"Error: %@", error);
         [self addUpdateButtonWithTitle:@"Update Errored!" action:nil];
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            // Installation will be dismissed shortly after this
-            [self.coreComponent acceptAcknowledgement];
-        });
+        [self acceptAcknowledgementAfterDelay];
     });
 }
 
@@ -246,10 +251,7 @@
         
         [self addUpdateButtonWithTitle:@"No Update Available" action:nil];
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            // Installation will be dismissed shortly after this
-            [self.coreComponent acceptAcknowledgement];
-        });
+        [self acceptAcknowledgementAfterDelay];
     });
 }
 
@@ -302,10 +304,14 @@
     });
 }
 
-- (void)showUpdateInstallationDidFinish
+- (void)showUpdateInstallationDidFinishWithAcknowledgement:(void (^)(void))acknowledgement
 {
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self.coreComponent registerAcknowledgement:acknowledgement];
+        
         [self addUpdateButtonWithTitle:@"Installation Finished!"];
+        
+        [self acceptAcknowledgementAfterDelay];
     });
 }
 
