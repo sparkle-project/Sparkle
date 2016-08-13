@@ -52,8 +52,13 @@ SU_EXPORT @interface SPUUpdater : NSObject
  *
  * This method checks if Sparkle is configured properly. A valid feed URL should be set before this method is invoked.
  * Other properties of this SPUUpdater instance can be set before this method is invoked as well, such as automatic update checks.
+ *
  * If the configuration is valid, this method may bring up a permission prompt (if needed) for checking if the user wants automatic update checking.
  * This method then starts the regular update cycle if automatic update checks are enabled.
+ *
+ * One of -checkForUpdates, -checkForUpdatesInBackground, or -checkForUpdateInformation can be invoked before starting the updater.
+ * This preschedules an update action before starting the updater. When the updater is started, the prescheduled action is immediately invoked.
+ * This may be useful for example if you want to check for updates right away without a permission prompt potentially showing.
  *
  * @param error The error that is populated if this method fails. Pass NULL if not interested in the error information.
  * @return YES if the updater started otherwise NO with a populated error
