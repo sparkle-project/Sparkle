@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SPUUserDriver.h"
 
 @protocol SPUStandardUserDriverDelegate;
 
@@ -14,6 +15,7 @@
  Protocol for Sparkle's standard built-in user driver for updater interactions.
  
  Other user drivers may wish to implement this protocol.
+ Note that this protocol does not adopt SUUserDriver because one may want to *only* export properties from this protocol.
  */
 @protocol SPUStandardUserDriverProtocol <NSObject>
 
