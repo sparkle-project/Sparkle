@@ -8,6 +8,7 @@
 
 #import "SPUStandardUserDriver.h"
 #import "SPUUserDriverCoreComponent.h"
+#import "SPUUserDriverUIComponent.h"
 #import "SPUStandardUserDriverDelegate.h"
 #import "SUAppcastItem.h"
 #import "SUVersionDisplayProtocol.h"
@@ -24,6 +25,7 @@
 @property (nonatomic, readonly) SUHost *host;
 
 @property (nonatomic, readonly) SPUUserDriverCoreComponent *coreComponent;
+@property (nonatomic, readonly) SPUUserDriverUIComponent *uiComponent;
 @property (nonatomic, weak, nullable, readonly) id <SPUStandardUserDriverDelegate> delegate;
 
 @property (nonatomic) SUStatusController *checkingController;
@@ -36,6 +38,7 @@
 
 @synthesize host = _host;
 @synthesize coreComponent = _coreComponent;
+@synthesize uiComponent = _uiComponent;
 @synthesize delegate = _delegate;
 @synthesize checkingController = _checkingController;
 @synthesize activeUpdateAlert = _activeUpdateAlert;
@@ -50,6 +53,7 @@
         _host = [[SUHost alloc] initWithBundle:hostBundle];
         _delegate = delegate;
         _coreComponent = [[SPUUserDriverCoreComponent alloc] init];
+        _uiComponent = [[SPUUserDriverUIComponent alloc] init];
     }
     return self;
 }
@@ -391,8 +395,7 @@
         [self.statusController close];
         self.statusController = nil;
         
-        NSRunningApplication *runningApplication = [SPUApplicationInfo runningApplicationWithBundle:self.host.bundle];
-        [runningApplication terminate];
+        [self.uiComponent terminateApplicationForBundle:self.host.bundle];
     });
 }
 

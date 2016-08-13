@@ -7,16 +7,14 @@
 //
 
 #import "SUPopUpTitlebarUserDriver.h"
-#import "SPUStandardUserDriverDelegate.h"
-#import "SPUUserDriverCoreComponent.h"
 #import "SUInstallUpdateViewController.h"
-#import "SPUDownloadData.h"
 
 @interface SUPopUpTitlebarUserDriver()
 
 @property (nonatomic, readonly) NSBundle *hostBundle;
 @property (nonatomic, readonly) NSWindow *window;
 @property (nonatomic, readonly) SPUUserDriverCoreComponent *coreComponent;
+@property (nonatomic, readonly) SPUUserDriverUIComponent *uiComponent;
 @property (nonatomic) NSTitlebarAccessoryViewController *accessoryViewController;
 @property (nonatomic) BOOL addedAccessory;
 @property (nonatomic) NSButton *updateButton;
@@ -31,6 +29,7 @@
 @synthesize hostBundle = _hostBundle;
 @synthesize window = _window;
 @synthesize coreComponent = _coreComponent;
+@synthesize uiComponent = _uiComponent;
 @synthesize accessoryViewController = _accessoryViewController;
 @synthesize addedAccessory = _addedAccessory;
 @synthesize updateButton = _updateButton;
@@ -45,6 +44,7 @@
         _hostBundle = hostBundle;
         _window = window;
         _coreComponent = [[SPUUserDriverCoreComponent alloc] init];
+        _uiComponent = [[SPUUserDriverUIComponent alloc] init];
     }
     return self;
 }
@@ -317,8 +317,7 @@
         // In case our termination request fails or is delayed
         [self removeUpdateButton];
         
-        NSRunningApplication *runningApplication = [SPUApplicationInfo runningApplicationWithBundle:self.hostBundle];
-        [runningApplication terminate];
+        [self.uiComponent terminateApplicationForBundle:self.hostBundle];
     });
 }
 

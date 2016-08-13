@@ -156,7 +156,7 @@
 		724BB3B11D3484B2005D534A /* SPUSystemAuthorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3AC1D347EDE005D534A /* SPUSystemAuthorization.m */; };
 		724BB3B21D34862A005D534A /* SPUSystemAuthorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3AC1D347EDE005D534A /* SPUSystemAuthorization.m */; };
 		724BB3B71D35ABA8005D534A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
-		725602D51C83551C00DAA70E /* SPUApplicationInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 725602D31C83551C00DAA70E /* SPUApplicationInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		725602D51C83551C00DAA70E /* SPUApplicationInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 725602D31C83551C00DAA70E /* SPUApplicationInfo.h */; };
 		725602D61C83551C00DAA70E /* SPUApplicationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 725602D41C83551C00DAA70E /* SPUApplicationInfo.m */; };
 		725CB9571C7120410064365A /* SPUUserDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 725CB9561C7120410064365A /* SPUUserDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		725CB95A1C7121830064365A /* SPUStandardUserDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 725CB9581C7121830064365A /* SPUStandardUserDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -331,6 +331,8 @@
 		72F9EC451D5E9ED8004AC8B6 /* SPUDownloadData.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F9EC431D5E9ED8004AC8B6 /* SPUDownloadData.m */; };
 		72F9EC461D5E9ED8004AC8B6 /* SPUDownloadData.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F9EC431D5E9ED8004AC8B6 /* SPUDownloadData.m */; };
 		72F9EC481D5EA904004AC8B6 /* SPUUpdaterDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 72F9EC471D5EA7D3004AC8B6 /* SPUUpdaterDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		72F9EC4B1D5F53A7004AC8B6 /* SPUUserDriverUIComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 72F9EC491D5F53A7004AC8B6 /* SPUUserDriverUIComponent.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		72F9EC4C1D5F53A7004AC8B6 /* SPUUserDriverUIComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F9EC4A1D5F53A7004AC8B6 /* SPUUserDriverUIComponent.m */; };
 		C23E885B1BE7B24F0050BB73 /* SparkleTestCodeSignApp.enc.dmg in Resources */ = {isa = PBXBuildFile; fileRef = C23E88591BE7AF890050BB73 /* SparkleTestCodeSignApp.enc.dmg */; };
 		F8761EB11ADC5068000C9034 /* SUCodeSigningVerifierTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */; };
 		F8761EB31ADC50EB000C9034 /* SparkleTestCodeSignApp.zip in Resources */ = {isa = PBXBuildFile; fileRef = F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */; };
@@ -1031,6 +1033,8 @@
 		72F9EC421D5E9ED8004AC8B6 /* SPUDownloadData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUDownloadData.h; sourceTree = "<group>"; };
 		72F9EC431D5E9ED8004AC8B6 /* SPUDownloadData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUDownloadData.m; sourceTree = "<group>"; };
 		72F9EC471D5EA7D3004AC8B6 /* SPUUpdaterDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUUpdaterDelegate.h; sourceTree = "<group>"; };
+		72F9EC491D5F53A7004AC8B6 /* SPUUserDriverUIComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUUserDriverUIComponent.h; sourceTree = "<group>"; };
+		72F9EC4A1D5F53A7004AC8B6 /* SPUUserDriverUIComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUUserDriverUIComponent.m; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Sparkle-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Sparkle-Info.plist"; sourceTree = "<group>"; };
 		8DC2EF5B0486A6940098B216 /* Sparkle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Sparkle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A5BF4F1B1BC7668B007A052A /* SUTestWebServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUTestWebServer.h; sourceTree = "<group>"; };
@@ -1659,6 +1663,8 @@
 				725CB9561C7120410064365A /* SPUUserDriver.h */,
 				725F97791C8A896F00265BE4 /* SPUUserDriverCoreComponent.h */,
 				725F977A1C8A896F00265BE4 /* SPUUserDriverCoreComponent.m */,
+				72F9EC491D5F53A7004AC8B6 /* SPUUserDriverUIComponent.h */,
+				72F9EC4A1D5F53A7004AC8B6 /* SPUUserDriverUIComponent.m */,
 				726DF88D1C84277500188804 /* SPUStatusCompletionResults.h */,
 				7246E0A11C83B685003B4E75 /* SPUStandardUpdaterController.h */,
 				7246E0A21C83B685003B4E75 /* SPUStandardUpdaterController.m */,
@@ -1853,7 +1859,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				725602D51C83551C00DAA70E /* SPUApplicationInfo.h in Headers */,
+				72F9EC4B1D5F53A7004AC8B6 /* SPUUserDriverUIComponent.h in Headers */,
 				72F9EC441D5E9ED8004AC8B6 /* SPUDownloadData.h in Headers */,
 				725F977B1C8A896F00265BE4 /* SPUUserDriverCoreComponent.h in Headers */,
 				72F9EC481D5EA904004AC8B6 /* SPUUpdaterDelegate.h in Headers */,
@@ -1876,6 +1882,7 @@
 				72F94F581CC44DE1002DEE68 /* SPUXPCServiceInfo.h in Headers */,
 				72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */,
 				61B5FC0D09C4FC8200B25A18 /* SUAppcast.h in Headers */,
+				725602D51C83551C00DAA70E /* SPUApplicationInfo.h in Headers */,
 				72A1C2631CD6849C004CD282 /* SPUUpdatePermissionPrompt.h in Headers */,
 				724BB3A81D33461B005D534A /* SUXPCInstallerStatus.h in Headers */,
 				7246E0A31C83B685003B4E75 /* SPUStandardUpdaterController.h in Headers */,
@@ -2816,6 +2823,7 @@
 				7267E5B71D3D8AEE00D1BF90 /* SPUInstallationInfo.m in Sources */,
 				724A0A3E1CF7AF0E00D8C3D5 /* SUTemporaryDownloader.m in Sources */,
 				723B5DAA1CF7AB6A00365F95 /* SUPersistentDownloader.m in Sources */,
+				72F9EC4C1D5F53A7004AC8B6 /* SPUUserDriverUIComponent.m in Sources */,
 				72F94F5A1CC450DE002DEE68 /* SUInstallerLauncher.m in Sources */,
 				724BB3A91D33461B005D534A /* SUXPCInstallerStatus.m in Sources */,
 				72F9EC451D5E9ED8004AC8B6 /* SPUDownloadData.m in Sources */,
