@@ -214,16 +214,16 @@ static NSMutableDictionary *sharedUpdaters = nil;
 // Not implemented properly at the moment - leaning towards it not be in the future
 // because it may be hard to implement properly (without passing a boolean flag everywhere), or
 // it would require us to maintain support for an additional class used by a very few people thus far
-// For now, just invoke the regular update process if this is invoked. Could change our minds on this later.
+// For now, just invoke the regular background update process if this is invoked. Could change our minds on this later.
 - (void)installUpdatesIfAvailable
 {
     if (!self.loggedInstallUpdatesIfAvailableWarning) {
-        SULog(@"-[%@ installUpdatesIfAvailable] does not function anymore.. Instead a user-initiated update check will be done instead.", NSStringFromClass([self class]));
+        SULog(@"-[%@ installUpdatesIfAvailable] does not function anymore.. Instead a background scheduled update check will be done.", NSStringFromClass([self class]));
         
         self.loggedInstallUpdatesIfAvailableWarning = YES;
     }
     
-    [self checkForUpdates:nil];
+    [self checkForUpdatesInBackground];
 }
 
 - (void)userDriverWillShowModalAlert
