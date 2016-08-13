@@ -39,7 +39,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  * Related: See SPUStandardUpdaterController which wraps a SPUUpdater instance and is suitable for instantiating in nib files
  *
  * @param hostBundle The bundle that should be targetted for updating. This must not be nil.
- * @param applicationBundle The application bundle that should be relaunched and waited for termination. Usually this can be the same as hostBundle.
+ * @param applicationBundle The application bundle that should be relaunched and waited for termination. Usually this can be the same as hostBundle. This may differ when updating a plug-in or other non-application bundle.
  * @param userDriver The user driver that Sparkle uses for user update interaction
  * @param delegate The delegate for SPUUpdater. This may be nil.
  *
