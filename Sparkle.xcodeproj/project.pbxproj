@@ -1583,7 +1583,6 @@
 				61B5F8E409C4CE3C00B25A18 /* SPUUpdater.m */,
 				726E078B1CA891E9001A286B /* SPUUpdaterSettings.h */,
 				726E078C1CA891E9001A286B /* SPUUpdaterSettings.m */,
-				72A6F9891C94E2D6005F404C /* SUUpdaterDelegate.h */,
 				72F9EC471D5EA7D3004AC8B6 /* SPUUpdaterDelegate.h */,
 				72A450511C69A68900D67EEA /* SPUUpdatePermission.h */,
 				72A450521C69A68900D67EEA /* SPUUpdatePermission.m */,
@@ -1798,6 +1797,7 @@
 		72F9EBE41D519425004AC8B6 /* Deprecated */ = {
 			isa = PBXGroup;
 			children = (
+				72A6F9891C94E2D6005F404C /* SUUpdaterDelegate.h */,
 				72F9EBE01D517E2F004AC8B6 /* SUUpdater.h */,
 				72F9EBE11D517E2F004AC8B6 /* SUUpdater.m */,
 			);
