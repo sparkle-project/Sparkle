@@ -13,6 +13,7 @@
 
 @property (nonatomic, readonly) NSBundle *hostBundle;
 @property (nonatomic, readonly) NSWindow *window;
+@property (nonatomic, nullable) SUInstallUpdateViewController *installUpdateViewController;
 @property (nonatomic, readonly) SPUUserDriverCoreComponent *coreComponent;
 @property (nonatomic, readonly) SPUUserDriverUIComponent *uiComponent;
 @property (nonatomic) NSTitlebarAccessoryViewController *accessoryViewController;
@@ -28,6 +29,7 @@
 
 @synthesize hostBundle = _hostBundle;
 @synthesize window = _window;
+@synthesize installUpdateViewController = _installUpdateViewController;
 @synthesize coreComponent = _coreComponent;
 @synthesize uiComponent = _uiComponent;
 @synthesize accessoryViewController = _accessoryViewController;
@@ -134,16 +136,23 @@
     NSPopover *popover = [[NSPopover alloc] init];
     popover.behavior = NSPopoverBehaviorTransient;
     
-    [self addUpdateButtonWithTitle:@"Update Available" action:^(NSButton *button) {
-        if (popover.contentViewController == nil) {
-            popover.contentViewController = [[SUInstallUpdateViewController alloc] initWithAppcastItem:appcastItem skippable:skippable reply:^(SPUUpdateAlertChoice choice) {
-                reply(choice);
-                
-                [popover close];
-                button.enabled = NO;
-            }];
-        }
+    __weak SUPopUpTitlebarUserDriver *weakSelf = self;
+    __block NSButton *actionButton = nil;
+    
+    SUInstallUpdateViewController *viewController = [[SUInstallUpdateViewController alloc] initWithAppcastItem:appcastItem skippable:skippable reply:^(SPUUpdateAlertChoice choice) {
+        reply(choice);
         
+        [popover close];
+        actionButton.enabled = NO;
+        
+        weakSelf.installUpdateViewController = nil;
+    }];
+    
+    self.installUpdateViewController = viewController;
+    
+    [self addUpdateButtonWithTitle:@"Update Available" action:^(NSButton *button) {
+        actionButton = button;
+        popover.contentViewController = viewController;
         [popover showRelativeToRect:button.bounds ofView:button preferredEdge:NSMaxYEdge];
     }];
 }
@@ -180,9 +189,9 @@
     });
 }
 
-- (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)__unused downloadData
+- (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
 {
-    // todo: this should really be implemented
+    [self.installUpdateViewController showReleaseNotesWithDownloadData:downloadData];
 }
 
 - (void)showUpdateReleaseNotesFailedToDownloadWithError:(NSError *)__unused error

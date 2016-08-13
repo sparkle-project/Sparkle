@@ -7,12 +7,12 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "SPUStatusCompletionResults.h"
-
-@class SUAppcastItem;
+#import <Sparkle/Sparkle.h>
 
 @interface SUInstallUpdateViewController : NSViewController
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)appcastItem skippable:(BOOL)skippable reply:(void (^)(SPUUpdateAlertChoice))reply;
+
+- (void)showReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData;
 
 @end
