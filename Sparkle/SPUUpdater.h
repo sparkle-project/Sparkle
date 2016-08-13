@@ -117,8 +117,8 @@ SU_EXPORT @interface SPUUpdater : NSObject
     update to that version.
 
     However, the delegate methods
-    SUUpdaterDelegate::updater:didFindValidUpdate: and
-    SUUpdaterDelegate::updaterDidNotFindUpdate: will be called,
+    SPUUpdaterDelegate::updater:didFindValidUpdate: and
+    SPUUpdaterDelegate::updaterDidNotFindUpdate: will be called,
     so you can use that information in your UI.
  */
 - (void)checkForUpdateInformation;

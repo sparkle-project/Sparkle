@@ -9,7 +9,7 @@
 #import "SUScheduledUpdateDriver.h"
 #import "SUHost.h"
 #import "SUErrors.h"
-#import "SUUpdaterDelegate.h"
+#import "SPUUpdaterDelegate.h"
 #import "SPUUserDriver.h"
 
 #ifdef _APPKITDEFINES_H

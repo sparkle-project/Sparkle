@@ -10,14 +10,14 @@
 #import "SUConstants.h"
 #import "SPUUpdater.h"
 #import "SPUStandardUserDriver.h"
-#import "SUUpdaterDelegate.h"
+#import "SPUUpdaterDelegate.h"
 
 // This user driver does nothing
-@interface SUUselessUserDriver : NSObject <SPUUserDriver>
+@interface SPUUselessUserDriver : NSObject <SPUUserDriver>
 
 @end
 
-@implementation SUUselessUserDriver
+@implementation SPUUselessUserDriver
 
 - (void)showCanCheckForUpdates:(BOOL)__unused canCheckForUpdates {}
 
@@ -63,7 +63,7 @@
 
 @end
 
-@interface SUUpdaterTest : XCTestCase <SUUpdaterDelegate>
+@interface SUUpdaterTest : XCTestCase <SPUUpdaterDelegate>
 @property (strong) SPUUpdater *updater;
 @end
 
@@ -74,7 +74,7 @@
 - (void)setUp
 {
     [super setUp];
-    self.updater = [[SPUUpdater alloc] initWithHostBundle:[NSBundle bundleForClass:[self class]] userDriver:[[SUUselessUserDriver alloc] init] delegate:self];
+    self.updater = [[SPUUpdater alloc] initWithHostBundle:[NSBundle bundleForClass:[self class]] userDriver:[[SPUUselessUserDriver alloc] init] delegate:self];
     
     NSError *error = nil;
     if (![self.updater startUpdater:&error]) {

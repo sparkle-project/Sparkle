@@ -15,16 +15,16 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol SPUUserDriver, SPUStandardUserDriverProtocol, SPUUpdaterDelegate, SPUStandardUserDriverDelegate;
 
 /*!
- A controller class that instantiates a SUUpdater and allows binding UI to it.
+ A controller class that instantiates a SPUUpdater and allows binding UI to it.
  
  This class is meant to be instantiated in a nib. When doing so, the controller's updater target's the application's main bundle,
  and uses Sparkle's standard user interface. Typically, this class is used by sticking it as a custom NSObject subclass in an Interface Builder nib (probably in MainMenu).
  
- The controller creates an SUUpdater instance and allows hooking up the check for updates action and menu item validation. It also allows hooking
+ The controller creates an SPUUpdater instance and allows hooking up the check for updates action and menu item validation. It also allows hooking
  up the updater's and user driver's delegates.
  
  This controller class may not be valuable to you if:
- * You want to control or defer the instantiation of an SUUpdater, or don't want to be tied into a nib's instantiation, or don't want to use a nib
+ * You want to control or defer the instantiation of an SPUUpdater, or don't want to be tied into a nib's instantiation, or don't want to use a nib
  * You want to target a bundle that's not the main bundle
  * You want to separate Sparkle's updater and user interface into separate processes
  * You want to provide a custom user interface, or perhaps one that provides little-to-none
@@ -71,7 +71,7 @@ SU_EXPORT @interface SPUStandardUpdaterController : NSObject
  and Sparkle will check for updates and report back its findings verbosely
  when it is invoked.
  
- This action checks updates by invoking -[SUUpdater checkForUpdates]
+ This action checks updates by invoking -[SPUUpdater checkForUpdates]
  */
 - (IBAction)checkForUpdates:(id)sender;
 
