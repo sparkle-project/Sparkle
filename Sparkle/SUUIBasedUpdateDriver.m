@@ -97,42 +97,42 @@
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
 {
     if (self.resumingDownloadedUpdate) {
-        [self.userDriver showDownloadedUpdateFoundWithAppcastItem:updateItem reply:^(SUUpdateAlertChoice choice) {
+        [self.userDriver showDownloadedUpdateFoundWithAppcastItem:updateItem reply:^(SPUUpdateAlertChoice choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
                 switch (choice) {
-                    case SUInstallUpdateChoice:
+                    case SPUInstallUpdateChoice:
                         [self.coreDriver extractDownloadedUpdate];
                         break;
-                    case SUSkipThisVersionChoice:
+                    case SPUSkipThisVersionChoice:
                         [self.coreDriver clearDownloadedUpdate];
                         [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
                         // Fall through
-                    case SUInstallLaterChoice:
+                    case SPUInstallLaterChoice:
                         [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
                         break;
                 }
             });
         }];
     } else if (!self.resumingInstallingUpdate) {
-        [self.userDriver showUpdateFoundWithAppcastItem:updateItem reply:^(SUUpdateAlertChoice choice) {
+        [self.userDriver showUpdateFoundWithAppcastItem:updateItem reply:^(SPUUpdateAlertChoice choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
                 switch (choice) {
-                    case SUInstallUpdateChoice:
+                    case SPUInstallUpdateChoice:
                         [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
                         break;
-                    case SUSkipThisVersionChoice:
+                    case SPUSkipThisVersionChoice:
                         [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
                         // Fall through
-                    case SUInstallLaterChoice:
+                    case SPUInstallLaterChoice:
                         [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
                         break;
                 }
             });
         }];
     } else {
-        [self.userDriver showResumableUpdateFoundWithAppcastItem:updateItem reply:^(SUInstallUpdateStatus choice) {
+        [self.userDriver showResumableUpdateFoundWithAppcastItem:updateItem reply:^(SPUInstallUpdateStatus choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
                 [self.coreDriver finishInstallationWithResponse:choice displayingUserInterface:[self canDisplayInstallerUserInterface]];
@@ -157,11 +157,11 @@
 
 - (void)downloadDriverWillBeginDownload
 {
-    [self.userDriver showDownloadInitiatedWithCompletion:^(SUDownloadUpdateStatus downloadCompletionStatus) {
+    [self.userDriver showDownloadInitiatedWithCompletion:^(SPUDownloadUpdateStatus downloadCompletionStatus) {
         switch (downloadCompletionStatus) {
-            case SUDownloadUpdateDone:
+            case SPUDownloadUpdateDone:
                 break;
-            case SUDownloadUpdateCanceled:
+            case SPUDownloadUpdateCanceled:
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if ([self.updaterDelegate respondsToSelector:@selector(userDidCancelDownload:)]) {
                         [self.updaterDelegate userDidCancelDownload:self.updater];
@@ -202,7 +202,7 @@
 - (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)__unused willInstallSilently
 {
     if (!willInstallImmediately) {
-        [self.userDriver showReadyToInstallAndRelaunch:^(SUInstallUpdateStatus installUpdateStatus) {
+        [self.userDriver showReadyToInstallAndRelaunch:^(SPUInstallUpdateStatus installUpdateStatus) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.coreDriver finishInstallationWithResponse:installUpdateStatus displayingUserInterface:[self canDisplayInstallerUserInterface]];
             });

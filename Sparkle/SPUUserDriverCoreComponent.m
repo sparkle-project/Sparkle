@@ -17,9 +17,9 @@
 
 @property (nonatomic) BOOL canCheckForUpdates;
 
-@property (nonatomic, copy) void (^installUpdateHandler)(SUInstallUpdateStatus);
-@property (nonatomic, copy) void (^updateCheckStatusCompletion)(SUUserInitiatedCheckStatus);
-@property (nonatomic, copy) void (^downloadStatusCompletion)(SUDownloadUpdateStatus);
+@property (nonatomic, copy) void (^installUpdateHandler)(SPUInstallUpdateStatus);
+@property (nonatomic, copy) void (^updateCheckStatusCompletion)(SPUUserInitiatedCheckStatus);
+@property (nonatomic, copy) void (^downloadStatusCompletion)(SPUDownloadUpdateStatus);
 @property (nonatomic, copy) void (^acknowledgement)(void);
 
 @end
@@ -53,12 +53,12 @@
 
 #pragma mark Install Updates
 
-- (void)registerInstallUpdateHandler:(void (^)(SUInstallUpdateStatus))installUpdateHandler
+- (void)registerInstallUpdateHandler:(void (^)(SPUInstallUpdateStatus))installUpdateHandler
 {
     self.installUpdateHandler = installUpdateHandler;
 }
 
-- (void)installUpdateWithChoice:(SUInstallUpdateStatus)choice
+- (void)installUpdateWithChoice:(SPUInstallUpdateStatus)choice
 {
     if (self.installUpdateHandler != nil) {
         self.installUpdateHandler(choice);
@@ -69,14 +69,14 @@
 - (void)dismissInstallAndRestart
 {
     if (self.installUpdateHandler != nil) {
-        self.installUpdateHandler(SUDismissUpdateInstallation);
+        self.installUpdateHandler(SPUDismissUpdateInstallation);
         self.installUpdateHandler = nil;
     }
 }
 
 #pragma mark Update Check Status
 
-- (void)registerUpdateCheckStatusHandler:(void (^)(SUUserInitiatedCheckStatus))updateCheckStatusCompletion
+- (void)registerUpdateCheckStatusHandler:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion
 {
     self.updateCheckStatusCompletion = updateCheckStatusCompletion;
 }
@@ -84,7 +84,7 @@
 - (void)cancelUpdateCheckStatus
 {
     if (self.updateCheckStatusCompletion != nil) {
-        self.updateCheckStatusCompletion(SUUserInitiatedCheckCanceled);
+        self.updateCheckStatusCompletion(SPUUserInitiatedCheckCanceled);
         self.updateCheckStatusCompletion = nil;
     }
 }
@@ -92,14 +92,14 @@
 - (void)completeUpdateCheckStatus
 {
     if (self.updateCheckStatusCompletion != nil) {
-        self.updateCheckStatusCompletion(SUUserInitiatedCheckDone);
+        self.updateCheckStatusCompletion(SPUUserInitiatedCheckDone);
         self.updateCheckStatusCompletion = nil;
     }
 }
 
 #pragma mark Download Status
 
-- (void)registerDownloadStatusHandler:(void (^)(SUDownloadUpdateStatus))downloadUpdateStatusCompletion
+- (void)registerDownloadStatusHandler:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion
 {
     self.downloadStatusCompletion = downloadUpdateStatusCompletion;
 }
@@ -107,7 +107,7 @@
 - (void)cancelDownloadStatus
 {
     if (self.downloadStatusCompletion != nil) {
-        self.downloadStatusCompletion(SUDownloadUpdateCanceled);
+        self.downloadStatusCompletion(SPUDownloadUpdateCanceled);
         self.downloadStatusCompletion = nil;
     }
 }
@@ -115,7 +115,7 @@
 - (void)completeDownloadStatus
 {
     if (self.downloadStatusCompletion != nil) {
-        self.downloadStatusCompletion(SUDownloadUpdateDone);
+        self.downloadStatusCompletion(SPUDownloadUpdateDone);
         self.downloadStatusCompletion = nil;
     }
 }

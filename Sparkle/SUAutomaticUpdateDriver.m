@@ -82,7 +82,7 @@
 // Method used for backwards compatibility for the updater delegate
 - (void)finishInstallationAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showingUI
 {
-    [self.coreDriver finishInstallationWithResponse:(relaunch ? SUInstallAndRelaunchUpdateNow : SUInstallUpdateNow) displayingUserInterface:showingUI];
+    [self.coreDriver finishInstallationWithResponse:(relaunch ? SPUInstallAndRelaunchUpdateNow : SPUInstallUpdateNow) displayingUserInterface:showingUI];
 }
 
 - (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently
@@ -96,7 +96,7 @@
             if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationBlock:)]) {
                 __weak SUAutomaticUpdateDriver *weakSelf = self;
                 installationHandledByDelegate = [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationBlock:^{
-                    [weakSelf.coreDriver finishInstallationWithResponse:SUInstallAndRelaunchUpdateNow displayingUserInterface:NO];
+                    [weakSelf.coreDriver finishInstallationWithResponse:SPUInstallAndRelaunchUpdateNow displayingUserInterface:NO];
                 }];
             } else if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)]) {
                 // Just for backwards compatibility

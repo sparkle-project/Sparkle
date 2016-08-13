@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SUStatusCompletionResults.h"
+#import "SPUStatusCompletionResults.h"
 #import "SUExport.h"
 
 @protocol SPUStandardUserDriverDelegate;
@@ -22,14 +22,14 @@ SU_EXPORT @interface SPUUserDriverCoreComponent : NSObject
 
 @property (nonatomic, readonly) BOOL canCheckForUpdates;
 
-- (void)registerInstallUpdateHandler:(void (^)(SUInstallUpdateStatus))installUpdateHandler;
-- (void)installUpdateWithChoice:(SUInstallUpdateStatus)choice;
+- (void)registerInstallUpdateHandler:(void (^)(SPUInstallUpdateStatus))installUpdateHandler;
+- (void)installUpdateWithChoice:(SPUInstallUpdateStatus)choice;
 
-- (void)registerUpdateCheckStatusHandler:(void (^)(SUUserInitiatedCheckStatus))updateCheckStatusCompletion;
+- (void)registerUpdateCheckStatusHandler:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion;
 - (void)cancelUpdateCheckStatus;
 - (void)completeUpdateCheckStatus;
 
-- (void)registerDownloadStatusHandler:(void (^)(SUDownloadUpdateStatus))downloadUpdateStatusCompletion;
+- (void)registerDownloadStatusHandler:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion;
 - (void)cancelDownloadStatus;
 - (void)completeDownloadStatus;
 

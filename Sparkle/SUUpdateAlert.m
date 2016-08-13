@@ -38,8 +38,8 @@
 @property (nonatomic) BOOL alreadyDownloaded;
 @property (strong) SUHost *host;
 @property (nonatomic) BOOL allowsAutomaticUpdates;
-@property (nonatomic, copy, nullable) void(^completionBlock)(SUUpdateAlertChoice);
-@property (nonatomic, copy, nullable) void(^resumableCompletionBlock)(SUInstallUpdateStatus);
+@property (nonatomic, copy, nullable) void(^completionBlock)(SPUUpdateAlertChoice);
+@property (nonatomic, copy, nullable) void(^resumableCompletionBlock)(SPUInstallUpdateStatus);
 
 @property (strong) NSProgressIndicator *releaseNotesSpinner;
 @property (assign) BOOL webViewFinishedLoading;
@@ -96,7 +96,7 @@
     return self;
 }
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item alreadyDownloaded:(BOOL)alreadyDownloaded host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SUUpdateAlertChoice))block
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item alreadyDownloaded:(BOOL)alreadyDownloaded host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUpdateAlertChoice))block
 {
     self = [self initWithAppcastItem:item host:aHost versionDisplayer:aVersionDisplayer];
 	if (self != nil)
@@ -107,7 +107,7 @@
     return self;
 }
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer resumableCompletionBlock:(void (^)(SUInstallUpdateStatus))block
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer resumableCompletionBlock:(void (^)(SPUInstallUpdateStatus))block
 {
     self = [self initWithAppcastItem:item host:aHost versionDisplayer:aVersionDisplayer];
     if (self != nil)
@@ -121,7 +121,7 @@
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
 
 
-- (void)endWithSelection:(SUUpdateAlertChoice)choice
+- (void)endWithSelection:(SPUUpdateAlertChoice)choice
 {
     [self.releaseNotesView stopLoading:self];
     [self.releaseNotesView setFrameLoadDelegate:nil];
@@ -134,13 +134,13 @@
         self.completionBlock = nil;
     } else if (self.resumableCompletionBlock != nil) {
         switch (choice) {
-            case SUInstallUpdateChoice:
-                self.resumableCompletionBlock(SUInstallAndRelaunchUpdateNow);
+            case SPUInstallUpdateChoice:
+                self.resumableCompletionBlock(SPUInstallAndRelaunchUpdateNow);
                 break;
-            case SUInstallLaterChoice:
-                self.resumableCompletionBlock(SUDismissUpdateInstallation);
+            case SPUInstallLaterChoice:
+                self.resumableCompletionBlock(SPUDismissUpdateInstallation);
                 break;
-            case SUSkipThisVersionChoice:
+            case SPUSkipThisVersionChoice:
                 abort();
         }
         self.resumableCompletionBlock = nil;
@@ -149,24 +149,24 @@
 
 - (IBAction)installUpdate:(id)__unused sender
 {
-    [self endWithSelection:SUInstallUpdateChoice];
+    [self endWithSelection:SPUInstallUpdateChoice];
 }
 
 - (IBAction)openInfoURL:(id)__unused sender
 {
     [[NSWorkspace sharedWorkspace] openURL:self.updateItem.infoURL];
     
-    [self endWithSelection:SUInstallLaterChoice];
+    [self endWithSelection:SPUInstallLaterChoice];
 }
 
 - (IBAction)skipThisVersion:(id)__unused sender
 {
-    [self endWithSelection:SUSkipThisVersionChoice];
+    [self endWithSelection:SPUSkipThisVersionChoice];
 }
 
 - (IBAction)remindMeLater:(id)__unused sender
 {
-    [self endWithSelection:SUInstallLaterChoice];
+    [self endWithSelection:SPUInstallLaterChoice];
 }
 
 - (void)displayReleaseNotes
@@ -293,7 +293,7 @@
 
 - (BOOL)windowShouldClose:(NSNotification *) __unused note
 {
-	[self endWithSelection:SUInstallLaterChoice];
+	[self endWithSelection:SPUInstallLaterChoice];
 	return YES;
 }
 

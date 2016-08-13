@@ -42,11 +42,11 @@
 {
     self.showingUserInitiatedProgress = YES;
     
-    [self.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SUUserInitiatedCheckStatus completionStatus) {
+    [self.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SPUUserInitiatedCheckStatus completionStatus) {
         switch (completionStatus) {
-            case SUUserInitiatedCheckDone:
+            case SPUUserInitiatedCheckDone:
                 break;
-            case SUUserInitiatedCheckCanceled:
+            case SPUUserInitiatedCheckCanceled:
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (self.showingUserInitiatedProgress) {
                         [self abortUpdate];

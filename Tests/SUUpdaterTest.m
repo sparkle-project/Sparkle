@@ -23,15 +23,15 @@
 
 - (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SPUUpdatePermission *))__unused reply {}
 
-- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SUUserInitiatedCheckStatus))__unused updateCheckStatusCompletion {}
+- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))__unused updateCheckStatusCompletion {}
 
 - (void)dismissUserInitiatedUpdateCheck {}
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem reply:(void (^)(SUUpdateAlertChoice))__unused reply {}
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem reply:(void (^)(SPUUpdateAlertChoice))__unused reply {}
 
-- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem reply:(void (^)(SUUpdateAlertChoice))__unused reply {}
+- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem reply:(void (^)(SPUUpdateAlertChoice))__unused reply {}
 
-- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem reply:(void (^)(SUInstallUpdateStatus))__unused reply {}
+- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem reply:(void (^)(SPUInstallUpdateStatus))__unused reply {}
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)__unused downloadData {}
 
@@ -41,7 +41,7 @@
 
 - (void)showUpdaterError:(NSError *)__unused error acknowledgement:(void (^)(void))__unused acknowledgement {}
 
-- (void)showDownloadInitiatedWithCompletion:(void (^)(SUDownloadUpdateStatus))__unused downloadUpdateStatusCompletion {}
+- (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))__unused downloadUpdateStatusCompletion {}
 
 - (void)showDownloadDidReceiveExpectedContentLength:(NSUInteger)__unused expectedContentLength {}
 
@@ -51,7 +51,7 @@
 
 - (void)showExtractionReceivedProgress:(double)__unused progress {}
 
-- (void)showReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))__unused installUpdateHandler {}
+- (void)showReadyToInstallAndRelaunch:(void (^)(SPUInstallUpdateStatus))__unused installUpdateHandler {}
 
 - (void)showInstallingUpdate {}
 

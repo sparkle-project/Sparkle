@@ -240,7 +240,7 @@
 		7267E5FE1D3DD1B700D1BF90 /* SUDownloadedUpdate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5FC1D3DD1B700D1BF90 /* SUDownloadedUpdate.m */; };
 		7267E5FF1D3DD1B700D1BF90 /* SUDownloadedUpdate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5FC1D3DD1B700D1BF90 /* SUDownloadedUpdate.m */; };
 		7267E6001D3DD1B700D1BF90 /* SUDownloadedUpdate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5FC1D3DD1B700D1BF90 /* SUDownloadedUpdate.m */; };
-		726DF88E1C84277600188804 /* SUStatusCompletionResults.h in Headers */ = {isa = PBXBuildFile; fileRef = 726DF88D1C84277500188804 /* SUStatusCompletionResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		726DF88E1C84277600188804 /* SPUStatusCompletionResults.h in Headers */ = {isa = PBXBuildFile; fileRef = 726DF88D1C84277500188804 /* SPUStatusCompletionResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		726E075C1CA3A6D6001A286B /* SPUSecureCoding.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E075A1CA3A6D6001A286B /* SPUSecureCoding.h */; };
 		726E075D1CA3A6D6001A286B /* SPUSecureCoding.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E075B1CA3A6D6001A286B /* SPUSecureCoding.m */; };
 		726E078D1CA891E9001A286B /* SPUUpdaterSettings.h in Headers */ = {isa = PBXBuildFile; fileRef = 726E078B1CA891E9001A286B /* SPUUpdaterSettings.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -924,7 +924,7 @@
 		7267E5FB1D3DD1B700D1BF90 /* SUDownloadedUpdate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUDownloadedUpdate.h; sourceTree = "<group>"; };
 		7267E5FC1D3DD1B700D1BF90 /* SUDownloadedUpdate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUDownloadedUpdate.m; sourceTree = "<group>"; };
 		726B2B5D1C645FC900388755 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		726DF88D1C84277500188804 /* SUStatusCompletionResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUStatusCompletionResults.h; sourceTree = "<group>"; };
+		726DF88D1C84277500188804 /* SPUStatusCompletionResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUStatusCompletionResults.h; sourceTree = "<group>"; };
 		726E075A1CA3A6D6001A286B /* SPUSecureCoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SPUSecureCoding.h; path = Sparkle/SPUSecureCoding.h; sourceTree = SOURCE_ROOT; };
 		726E075B1CA3A6D6001A286B /* SPUSecureCoding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SPUSecureCoding.m; path = Sparkle/SPUSecureCoding.m; sourceTree = SOURCE_ROOT; };
 		726E07681CA616A4001A286B /* libxar.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxar.tbd; path = usr/lib/libxar.tbd; sourceTree = SDKROOT; };
@@ -1657,7 +1657,7 @@
 				725CB9561C7120410064365A /* SPUUserDriver.h */,
 				725F97791C8A896F00265BE4 /* SPUUserDriverCoreComponent.h */,
 				725F977A1C8A896F00265BE4 /* SPUUserDriverCoreComponent.m */,
-				726DF88D1C84277500188804 /* SUStatusCompletionResults.h */,
+				726DF88D1C84277500188804 /* SPUStatusCompletionResults.h */,
 				7246E0A11C83B685003B4E75 /* SPUStandardUpdaterController.h */,
 				7246E0A21C83B685003B4E75 /* SPUStandardUpdaterController.m */,
 				726E4A361C89116000C57C6A /* SPUStandardUserDriverDelegate.h */,
@@ -1863,7 +1863,7 @@
 				725CB95A1C7121830064365A /* SPUStandardUserDriver.h in Headers */,
 				725CB9571C7120410064365A /* SPUUserDriver.h in Headers */,
 				72162B061C82C8B30013C1C5 /* SUParameterAssert.h in Headers */,
-				726DF88E1C84277600188804 /* SUStatusCompletionResults.h in Headers */,
+				726DF88E1C84277600188804 /* SPUStatusCompletionResults.h in Headers */,
 				72A450531C69A68900D67EEA /* SPUUpdatePermission.h in Headers */,
 				7267E5B61D3D8AEE00D1BF90 /* SPUInstallationInfo.h in Headers */,
 				7229E1B61C97C91100CB50D0 /* SUUpdateDriver.h in Headers */,

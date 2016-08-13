@@ -128,14 +128,14 @@
 
 #pragma mark Update Found
 
-- (void)showUpdateWithAppcastItem:(SUAppcastItem *)appcastItem skippable:(BOOL)skippable reply:(void (^)(SUUpdateAlertChoice))reply
+- (void)showUpdateWithAppcastItem:(SUAppcastItem *)appcastItem skippable:(BOOL)skippable reply:(void (^)(SPUUpdateAlertChoice))reply
 {
     NSPopover *popover = [[NSPopover alloc] init];
     popover.behavior = NSPopoverBehaviorTransient;
     
     [self addUpdateButtonWithTitle:@"Update Available" action:^(NSButton *button) {
         if (popover.contentViewController == nil) {
-            popover.contentViewController = [[SUInstallUpdateViewController alloc] initWithAppcastItem:appcastItem skippable:skippable reply:^(SUUpdateAlertChoice choice) {
+            popover.contentViewController = [[SUInstallUpdateViewController alloc] initWithAppcastItem:appcastItem skippable:skippable reply:^(SPUUpdateAlertChoice choice) {
                 reply(choice);
                 
                 [popover close];
@@ -147,32 +147,32 @@
     }];
 }
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUpdateAlertChoice))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self showUpdateWithAppcastItem:appcastItem skippable:YES reply:reply];
     });
 }
 
-- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply
+- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUpdateAlertChoice))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self showUpdateWithAppcastItem:appcastItem skippable:YES reply:reply];
     });
 }
 
-- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUInstallUpdateStatus))reply
+- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUInstallUpdateStatus))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self showUpdateWithAppcastItem:appcastItem skippable:NO reply:^(SUUpdateAlertChoice choice) {
+        [self showUpdateWithAppcastItem:appcastItem skippable:NO reply:^(SPUUpdateAlertChoice choice) {
             switch (choice) {
-                case SUInstallUpdateChoice:
-                    reply(SUInstallAndRelaunchUpdateNow);
+                case SPUInstallUpdateChoice:
+                    reply(SPUInstallAndRelaunchUpdateNow);
                     break;
-                case SUInstallLaterChoice:
-                    reply(SUDismissUpdateInstallation);
+                case SPUInstallLaterChoice:
+                    reply(SPUDismissUpdateInstallation);
                     break;
-                case SUSkipThisVersionChoice:
+                case SPUSkipThisVersionChoice:
                     abort();
             }
         }];
@@ -190,21 +190,21 @@
 
 #pragma mark Install & Relaunch Update
 
-- (void)showReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))installUpdateHandler
+- (void)showReadyToInstallAndRelaunch:(void (^)(SPUInstallUpdateStatus))installUpdateHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent registerInstallUpdateHandler:installUpdateHandler];
         
         __weak SUPopUpTitlebarUserDriver *weakSelf = self;
         [self addUpdateButtonWithTitle:@"Install & Relaunch" action:^(NSButton *__unused button) {
-            [weakSelf.coreComponent installUpdateWithChoice:SUInstallAndRelaunchUpdateNow];
+            [weakSelf.coreComponent installUpdateWithChoice:SPUInstallAndRelaunchUpdateNow];
         }];
     });
 }
 
 #pragma mark Check for Updates
 
-- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SUUserInitiatedCheckStatus))updateCheckStatusCompletion
+- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent registerUpdateCheckStatusHandler:updateCheckStatusCompletion];
@@ -254,7 +254,7 @@
 
 #pragma mark Download & Install Updates
 
-- (void)showDownloadInitiatedWithCompletion:(void (^)(SUDownloadUpdateStatus))downloadUpdateStatusCompletion
+- (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent registerDownloadStatusHandler:downloadUpdateStatusCompletion];

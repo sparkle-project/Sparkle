@@ -11,7 +11,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "SUVersionDisplayProtocol.h"
-#import "SUStatusCompletionResults.h"
+#import "SPUStatusCompletionResults.h"
 
 @protocol SUUpdateAlertDelegate;
 
@@ -20,9 +20,9 @@
 
 @property (nonatomic, weak, readonly) id <SUVersionDisplay> versionDisplayer;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item alreadyDownloaded:(BOOL)alreadyDownloaded host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SUUpdateAlertChoice))block;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item alreadyDownloaded:(BOOL)alreadyDownloaded host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUpdateAlertChoice))block;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer resumableCompletionBlock:(void (^)(SUInstallUpdateStatus))block;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer resumableCompletionBlock:(void (^)(SPUInstallUpdateStatus))block;
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData;
 - (void)showReleaseNotesFailedToDownload;

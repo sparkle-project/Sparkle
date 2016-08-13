@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SUStatusCompletionResults.h"
+#import "SPUStatusCompletionResults.h"
 #import "SUUpdateDriver.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -63,7 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)clearDownloadedUpdate;
 
-- (void)finishInstallationWithResponse:(SUInstallUpdateStatus)installUpdateStatus displayingUserInterface:(BOOL)displayingUserInterface;
+- (void)finishInstallationWithResponse:(SPUInstallUpdateStatus)installUpdateStatus displayingUserInterface:(BOOL)displayingUserInterface;
 
 - (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately error:(nullable NSError *)error;
 

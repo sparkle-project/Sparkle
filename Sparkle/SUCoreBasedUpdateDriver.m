@@ -213,16 +213,16 @@
     [self.delegate installerDidFinishPreparationAndWillInstallImmediately:willInstallImmediately silently:willInstallSilently];
 }
 
-- (void)finishInstallationWithResponse:(SUInstallUpdateStatus)installUpdateStatus displayingUserInterface:(BOOL)displayingUserInterface
+- (void)finishInstallationWithResponse:(SPUInstallUpdateStatus)installUpdateStatus displayingUserInterface:(BOOL)displayingUserInterface
 {
     switch (installUpdateStatus) {
-        case SUDismissUpdateInstallation:
+        case SPUDismissUpdateInstallation:
             [self.delegate coreDriverIsRequestingAbortUpdateWithError:nil];
             break;
-        case SUInstallUpdateNow:
+        case SPUInstallUpdateNow:
             [self.installerDriver installWithToolAndRelaunch:NO displayingUserInterface:displayingUserInterface];
             break;
-        case SUInstallAndRelaunchUpdateNow:
+        case SPUInstallAndRelaunchUpdateNow:
             [self.installerDriver installWithToolAndRelaunch:YES displayingUserInterface:displayingUserInterface];
             break;
     }

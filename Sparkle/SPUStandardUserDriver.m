@@ -126,30 +126,30 @@
     });
 }
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUpdateAlertChoice))reply
 {
     [self showUpdateFoundWithAlertHandler:^SUUpdateAlert *(SPUStandardUserDriver *weakSelf, SUHost *host, id<SUVersionDisplay> versionDisplayer) {
-        return [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem alreadyDownloaded:NO host:host versionDisplayer:versionDisplayer completionBlock:^(SUUpdateAlertChoice choice) {
+        return [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem alreadyDownloaded:NO host:host versionDisplayer:versionDisplayer completionBlock:^(SPUUpdateAlertChoice choice) {
             reply(choice);
             weakSelf.activeUpdateAlert = nil;
         }];
     }];
 }
 
-- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply
+- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUpdateAlertChoice))reply
 {
     [self showUpdateFoundWithAlertHandler:^SUUpdateAlert *(SPUStandardUserDriver *weakSelf, SUHost *host, id<SUVersionDisplay> versionDisplayer) {
-        return [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem alreadyDownloaded:YES host:host versionDisplayer:versionDisplayer completionBlock:^(SUUpdateAlertChoice choice) {
+        return [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem alreadyDownloaded:YES host:host versionDisplayer:versionDisplayer completionBlock:^(SPUUpdateAlertChoice choice) {
             reply(choice);
             weakSelf.activeUpdateAlert = nil;
         }];
     }];
 }
 
-- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUInstallUpdateStatus))reply
+- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUInstallUpdateStatus))reply
 {
     [self showUpdateFoundWithAlertHandler:^SUUpdateAlert *(SPUStandardUserDriver *weakSelf, SUHost *host, id<SUVersionDisplay> versionDisplayer) {
-        return [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:host versionDisplayer:versionDisplayer resumableCompletionBlock:^(SUInstallUpdateStatus choice) {
+        return [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:host versionDisplayer:versionDisplayer resumableCompletionBlock:^(SPUInstallUpdateStatus choice) {
             reply(choice);
             weakSelf.activeUpdateAlert = nil;
         }];
@@ -175,7 +175,7 @@
 
 #pragma mark Install & Relaunch Update
 
-- (void)showReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))installUpdateHandler
+- (void)showReadyToInstallAndRelaunch:(void (^)(SPUInstallUpdateStatus))installUpdateHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.statusController beginActionWithTitle:SULocalizedString(@"Ready to Install", nil) maxProgressValue:1.0 statusText:nil];
@@ -191,12 +191,12 @@
 
 - (void)installAndRestart:(id)__unused sender
 {
-    [self.coreComponent installUpdateWithChoice:SUInstallAndRelaunchUpdateNow];
+    [self.coreComponent installUpdateWithChoice:SPUInstallAndRelaunchUpdateNow];
 }
 
 #pragma mark Check for Updates
 
-- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SUUserInitiatedCheckStatus))updateCheckStatusCompletion
+- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent registerUpdateCheckStatusHandler:updateCheckStatusCompletion];
@@ -303,7 +303,7 @@
     }
 }
 
-- (void)showDownloadInitiatedWithCompletion:(void (^)(SUDownloadUpdateStatus))downloadUpdateStatusCompletion
+- (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent registerDownloadStatusHandler:downloadUpdateStatusCompletion];

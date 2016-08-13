@@ -71,7 +71,7 @@
     });
 }
 
-- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SUUserInitiatedCheckStatus))updateCheckStatusCompletion
+- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent registerUpdateCheckStatusHandler:updateCheckStatusCompletion];
@@ -122,23 +122,23 @@
     }
 }
 
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUpdateAlertChoice))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self showUpdateWithAppcastItem:appcastItem updateAdjective:@"new"];
-        reply(SUInstallUpdateChoice);
+        reply(SPUInstallUpdateChoice);
     });
 }
 
-- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply
+- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUpdateAlertChoice))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self showUpdateWithAppcastItem:appcastItem updateAdjective:@"downloaded"];
-        reply(SUInstallUpdateChoice);
+        reply(SPUInstallUpdateChoice);
     });
 }
 
-- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUInstallUpdateStatus))reply
+- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUInstallUpdateStatus))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent registerInstallUpdateHandler:reply];
@@ -148,9 +148,9 @@
             if (self.verbose) {
                 fprintf(stderr, "Deferring Installation.\n");
             }
-            [self.coreComponent installUpdateWithChoice:SUDismissUpdateInstallation];
+            [self.coreComponent installUpdateWithChoice:SPUDismissUpdateInstallation];
         } else {
-            [self.coreComponent installUpdateWithChoice:SUInstallAndRelaunchUpdateNow];
+            [self.coreComponent installUpdateWithChoice:SPUInstallAndRelaunchUpdateNow];
         }
     });
 }
@@ -206,7 +206,7 @@
     });
 }
 
-- (void)showDownloadInitiatedWithCompletion:(void (^)(SUDownloadUpdateStatus))downloadUpdateStatusCompletion
+- (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent registerDownloadStatusHandler:downloadUpdateStatusCompletion];
@@ -258,7 +258,7 @@
     });
 }
 
-- (void)showReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))installUpdateHandler
+- (void)showReadyToInstallAndRelaunch:(void (^)(SPUInstallUpdateStatus))installUpdateHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.coreComponent registerInstallUpdateHandler:installUpdateHandler];
@@ -267,11 +267,11 @@
             if (self.verbose) {
                 fprintf(stderr, "Deferring Installation.\n");
             }
-            [self.coreComponent installUpdateWithChoice:SUDismissUpdateInstallation];
+            [self.coreComponent installUpdateWithChoice:SPUDismissUpdateInstallation];
         } else if ([SPUApplicationInfo runningApplicationWithBundle:self.applicationBundle] != nil) {
-            [self.coreComponent installUpdateWithChoice:SUInstallAndRelaunchUpdateNow];
+            [self.coreComponent installUpdateWithChoice:SPUInstallAndRelaunchUpdateNow];
         } else {
-            [self.coreComponent installUpdateWithChoice:SUInstallUpdateNow];
+            [self.coreComponent installUpdateWithChoice:SPUInstallUpdateNow];
         }
     });
 }

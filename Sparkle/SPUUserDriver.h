@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SUStatusCompletionResults.h"
+#import "SPUStatusCompletionResults.h"
 #import "SUExport.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -65,7 +65,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * This can be called from any thread
  */
-- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SUUserInitiatedCheckStatus))updateCheckStatusCompletion;
+- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))updateCheckStatusCompletion;
 
 /*!
  * Dismiss the user initiated update check from the user
@@ -94,14 +94,14 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * This can be called from any thread
  */
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply;
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUpdateAlertChoice))reply;
 
 /*!
  * Show the user a new update has been downloaded and can be installed
  *
  * This method behaves just like -showUpdateFoundWithAppcastItem:reply: except the update has already been downloaded.
  */
-- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUUpdateAlertChoice))reply;
+- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUpdateAlertChoice))reply;
 
 /*!
  * Show the user an update that has started installing can be resumed and installed immediately
@@ -118,7 +118,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * This can be called from any thread
  */
-- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SUInstallUpdateStatus))reply;
+- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUInstallUpdateStatus))reply;
 
 /*!
  * Show the user the release notes for the new update
@@ -181,7 +181,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * This can be called from any thread
  */
-- (void)showDownloadInitiatedWithCompletion:(void (^)(SUDownloadUpdateStatus))downloadUpdateStatusCompletion;
+- (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))downloadUpdateStatusCompletion;
 
 /*!
  * Show the user the content length of the new update that will be downloaded
@@ -239,7 +239,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * This can be called from any thread
  */
-- (void)showReadyToInstallAndRelaunch:(void (^)(SUInstallUpdateStatus))installUpdateHandler;
+- (void)showReadyToInstallAndRelaunch:(void (^)(SPUInstallUpdateStatus))installUpdateHandler;
 
 /*!
  * Show the user that the update is installing
