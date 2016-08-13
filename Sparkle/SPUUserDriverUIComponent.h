@@ -17,6 +17,8 @@ SU_EXPORT @interface SPUUserDriverUIComponent : NSObject
 
 - (void)terminateApplicationForBundle:(NSBundle *)bundle;
 
+- (BOOL)applicationIsAliveForBundle:(NSBundle *)bundle;
+
 @end
 
 NS_ASSUME_NONNULL_END

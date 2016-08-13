@@ -27,4 +27,9 @@
     }
 }
 
+- (BOOL)applicationIsAliveForBundle:(NSBundle *)bundle
+{
+    return ([SPUApplicationInfo runningApplicationWithBundle:bundle] != nil);
+}
+
 @end
