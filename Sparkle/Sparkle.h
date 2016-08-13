@@ -15,8 +15,8 @@
 #import "SUAppcast.h"
 #import "SUAppcastItem.h"
 #import "SUStandardVersionComparator.h"
-#import "SUUpdaterDelegate.h"
 #import "SPUUpdater.h"
+#import "SPUUpdaterDelegate.h"
 #import "SPUUpdaterSettings.h"
 #import "SPUStandardUpdaterController.h"
 #import "SUVersionComparisonProtocol.h"
@@ -30,5 +30,6 @@
 #import "SPUDownloadData.h"
 
 #import "SUUpdater.h" // deprecated
+#import "SUUpdaterDelegate.h" // deprecated
 
 #endif

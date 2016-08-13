@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SUAppcastItem, SUAppcast;
 
-@protocol SUUpdaterDelegate;
+@protocol SPUUpdaterDelegate;
 
 /*!
     The main API in Sparkle for controlling the update mechanism.
@@ -45,7 +45,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  *
  * This must be called on the main thread.
  */
-- (instancetype)initWithHostBundle:(NSBundle *)hostBundle userDriver:(id <SPUUserDriver>)userDriver delegate:(id<SUUpdaterDelegate> _Nullable)delegate;
+- (instancetype)initWithHostBundle:(NSBundle *)hostBundle userDriver:(id <SPUUserDriver>)userDriver delegate:(id<SPUUpdaterDelegate> _Nullable)delegate;
 
 /*!
  * Starts the updater.
@@ -60,7 +60,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  */
 - (BOOL)startUpdater:(NSError * __autoreleasing *)error;
 
-@property (weak, readonly, nullable) id<SUUpdaterDelegate> delegate;
+@property (weak, readonly, nullable) id<SPUUpdaterDelegate> delegate;
 @property (nonatomic, readonly) id<SPUUserDriver> userDriver;
 
 @property (readonly, strong) NSBundle *hostBundle;

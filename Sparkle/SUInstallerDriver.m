@@ -10,7 +10,7 @@
 #import "SULog.h"
 #import "SPUMessageTypes.h"
 #import "SPUXPCServiceInfo.h"
-#import "SUUpdaterDelegate.h"
+#import "SPUUpdaterDelegate.h"
 #import "SUAppcastItem.h"
 #import "SULog.h"
 #import "SULocalizations.h"
@@ -31,12 +31,6 @@
 
 #define FIRST_INSTALLER_MESSAGE_TIMEOUT 7ull
 
-@interface NSObject (SparkleUpdaterDeprecated)
-
-- (NSString *)_decryptionPasswordForSparkleUpdater;
-
-@end
-
 @interface SUInstallerDriver () <SUInstallerCommunicationProtocol>
 
 @property (nonatomic, readonly) SUHost *host;
@@ -50,7 +44,7 @@
 @property (nonatomic) NSUInteger extractionAttempts;
 @property (nonatomic) BOOL postponedOnce;
 @property (nonatomic, weak, readonly) id updater;
-@property (nonatomic, weak, readonly) id<SUUpdaterDelegate> updaterDelegate;
+@property (nonatomic, weak, readonly) id<SPUUpdaterDelegate> updaterDelegate;
 @property (nonatomic) BOOL willRelaunch;
 
 @property (nonatomic) SUAppcastItem *updateItem;
@@ -79,7 +73,7 @@
 @synthesize temporaryDirectory = _temporaryDirectory;
 @synthesize aborted = _aborted;
 
-- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(id<SUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SUInstallerDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(id<SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SUInstallerDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -162,7 +156,10 @@
 {
     NSString *pathToRelaunch = [self.host bundlePath];
     if ([self.updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
-        pathToRelaunch = [self.updaterDelegate pathToRelaunchForUpdater:self.updater];
+        NSString *relaunchPath = [self.updaterDelegate pathToRelaunchForUpdater:self.updater];
+        if (relaunchPath != nil) {
+            pathToRelaunch = relaunchPath;
+        }
     }
     
     NSString *dsaSignature = (self.updateItem.DSASignature == nil) ? @"" : self.updateItem.DSASignature;
@@ -170,10 +167,6 @@
     NSString *decryptionPassword = nil;
     if ([self.updaterDelegate respondsToSelector:@selector(decryptionPasswordForUpdater:)]) {
         decryptionPassword = [self.updaterDelegate decryptionPasswordForUpdater:self.updater];
-    } else if ([self.updater respondsToSelector:@selector(_decryptionPasswordForSparkleUpdater)]) {
-        // The old updater (SUUpdater) has a decryptionPassword property
-        // Let's ask it if it has a decryption password available
-        decryptionPassword = [self.updater _decryptionPasswordForSparkleUpdater];
     }
     
     SPUInstallationInputData *installationData = [[SPUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadName:self.downloadName installationType:self.updateItem.installationType dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
@@ -419,19 +412,6 @@
             if ([self.updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:self.updateItem untilInvokingBlock:^{
                 [weakSelf installWithToolAndRelaunch:relaunch displayingUserInterface:showUI];
             }]) {
-                return;
-            }
-        } else if ([self.updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)]) {
-            // This isn't technically correct anymore (hence why it's deprecated) because it assumes relaunch == displayingUserInterface
-            NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installWithToolAndRelaunch:)]];
-            [invocation setSelector:@selector(installWithToolAndRelaunch:)];
-            [invocation setArgument:&relaunch atIndex:2];
-            [invocation setTarget:self];
-            self.postponedOnce = YES;
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            if ([self.updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:self.updateItem untilInvoking:invocation]) {
-#pragma clang diagnostic pop
                 return;
             }
         }

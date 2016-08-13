@@ -11,7 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class SUAppcastItem, SUHost, SUAppcast;
-@protocol SUUpdaterDelegate;
+@protocol SPUUpdaterDelegate;
 
 @protocol SUAppcastDriverDelegate <NSObject>
 
@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SUAppcastDriver : NSObject
 
-- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate delegate:(nullable id <SUAppcastDriverDelegate>)delegate;
+- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id <SUAppcastDriverDelegate>)delegate;
 
 - (void)loadAppcastFromURL:(NSURL *)appcastURL userAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates;
 

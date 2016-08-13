@@ -12,7 +12,7 @@
 
 void _SULogDisableStandardErrorStream(void);
 
-@interface SPUCommandLineDriver () <SUUpdaterDelegate>
+@interface SPUCommandLineDriver () <SPUUpdaterDelegate>
 
 @property (nonatomic, readonly) SPUUpdater *updater;
 @property (nonatomic, readonly) NSString *applicationBundlePath;
@@ -64,7 +64,7 @@ void _SULogDisableStandardErrorStream(void);
     return self;
 }
 
-- (BOOL)updaterShouldAllowInstallerInteraction:(id)__unused updater
+- (BOOL)updaterShouldAllowInstallerInteraction:(SPUUpdater *)__unused updater
 {
     // If the installation is interactive, we can show an authorization prompt for requesting additional privileges,
     // otherwise we should have the installer inherit the updater's privileges.
@@ -72,7 +72,7 @@ void _SULogDisableStandardErrorStream(void);
 }
 
 // In case we find an update during probing, otherwise we leave this to the user driver
-- (void)updater:(id)__unused updater didFindValidUpdate:(SUAppcastItem *)__unused item
+- (void)updater:(SPUUpdater *)__unused updater didFindValidUpdate:(SUAppcastItem *)__unused item
 {
     if (self.probingForUpdates) {
         if (self.verbose) {
@@ -83,7 +83,7 @@ void _SULogDisableStandardErrorStream(void);
 }
 
 // In case we fail during probing, otherwise we leave error handling to the user driver
-- (void)updaterDidNotFindUpdate:(id)__unused updater
+- (void)updaterDidNotFindUpdate:(SPUUpdater *)__unused updater
 {
     if (self.probingForUpdates) {
         if (self.verbose) {
@@ -94,7 +94,7 @@ void _SULogDisableStandardErrorStream(void);
 }
 
 // In case we fail during probing, otherwise we leave error handling to the user driver
-- (void)updater:(id)__unused updater didAbortWithError:(NSError *)error
+- (void)updater:(SPUUpdater *)__unused updater didAbortWithError:(NSError *)error
 {
     if (self.probingForUpdates) {
         if (self.verbose) {
@@ -104,12 +104,12 @@ void _SULogDisableStandardErrorStream(void);
     }
 }
 
-- (NSString *)pathToRelaunchForUpdater:(id)__unused updater
+- (NSString *)pathToRelaunchForUpdater:(SPUUpdater *)__unused updater
 {
     return self.applicationBundlePath;
 }
 
-- (BOOL)updaterShouldDownloadReleaseNotes:(id)__unused updater
+- (BOOL)updaterShouldDownloadReleaseNotes:(SPUUpdater *)__unused updater
 {
     return self.verbose;
 }

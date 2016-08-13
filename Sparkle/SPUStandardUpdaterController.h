@@ -12,7 +12,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class SPUUpdater;
-@protocol SPUUserDriver, SPUStandardUserDriverProtocol, SUUpdaterDelegate, SPUStandardUserDriverDelegate;
+@protocol SPUUserDriver, SPUStandardUserDriverProtocol, SPUUpdaterDelegate, SPUStandardUserDriverDelegate;
 
 /*!
  A controller class that instantiates a SUUpdater and allows binding UI to it.
@@ -38,7 +38,7 @@ SU_EXPORT @interface SPUStandardUpdaterController : NSObject
  
  This property should only be set using Interface Builder by creating a connection using the outlet
  */
-@property (nonatomic, weak, nullable) IBOutlet id<SUUpdaterDelegate> updaterDelegate;
+@property (nonatomic, weak, nullable) IBOutlet id<SPUUpdaterDelegate> updaterDelegate;
 
 /*!
  Interface builder outlet for the user driver's delegate.

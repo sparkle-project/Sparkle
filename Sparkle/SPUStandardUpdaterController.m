@@ -12,7 +12,6 @@
 #import "SPUStandardUserDriver.h"
 #import "SUConstants.h"
 #import "SULog.h"
-#import "SPUStandardUserDriver.h"
 
 static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
 

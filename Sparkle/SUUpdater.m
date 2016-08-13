@@ -10,21 +10,18 @@
 #import "SPUUpdater.h"
 #import "SPUStandardUserDriver.h"
 #import "SPUStandardUserDriverDelegate.h"
+#import "SPUUpdaterDelegate.h"
 #import "SULog.h"
 
-@interface SUUpdater () <SPUStandardUserDriverDelegate>
+@interface SUUpdater () <SPUUpdaterDelegate, SPUStandardUserDriverDelegate>
 
 @property (nonatomic, readonly) SPUUpdater *updater;
 @property (nonatomic, readonly) SPUStandardUserDriver *userDriver;
 
+@property (nonatomic, copy) void(^postponedInstallHandler)(void);
+@property (nonatomic, copy) void(^silentInstallHandler)(void);
+
 @property (nonatomic) BOOL loggedInstallUpdatesIfAvailableWarning;
-
-@end
-
-@interface SPUUpdater (Private)
-
-- (void)setDelegate:(id<SUUpdaterDelegate>)delegate;
-- (void)setUpdaterDelegator:(id)delegator;
 
 @end
 
@@ -34,7 +31,10 @@
 #pragma clang diagnostic pop
 
 @synthesize updater = _updater;
+@synthesize delegate = _delegate;
 @synthesize userDriver = _userDriver;
+@synthesize postponedInstallHandler = _postponedInstallHandler;
+@synthesize silentInstallHandler = _silentInstallHandler;
 @synthesize decryptionPassword = _decryptionPassword;
 @synthesize loggedInstallUpdatesIfAvailableWarning = _loggedInstallUpdatesIfAvailableWarning;
 
@@ -75,8 +75,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
         [sharedUpdaters setObject:self forKey:[NSValue valueWithNonretainedObject:bundle]];
         
         _userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:bundle delegate:self];
-        _updater = [[SPUUpdater alloc] initWithHostBundle:bundle userDriver:_userDriver delegate:nil];
-        [_updater setUpdaterDelegator:self];
+        _updater = [[SPUUpdater alloc] initWithHostBundle:bundle userDriver:_userDriver delegate:self];
         
         NSError *updaterError = nil;
         if (![_updater startUpdater:&updaterError]) {
@@ -97,17 +96,6 @@ static NSMutableDictionary *sharedUpdaters = nil;
 - (void)resetUpdateCycle
 {
     [self.updater resetUpdateCycle];
-}
-
-- (id<SUUpdaterDelegate>)delegate
-{
-    return self.updater.delegate;
-}
-
-- (void)setDelegate:(id<SUUpdaterDelegate>)delegate
-{
-    // Note: This invokes a private API
-    [self.updater setDelegate:delegate];
 }
 
 - (NSBundle *)hostBundle
@@ -223,37 +211,6 @@ static NSMutableDictionary *sharedUpdaters = nil;
     return !self.userDriver.canCheckForUpdates;
 }
 
-- (void)userDriverWillShowModalAlert
-{
-    if ([self.updater.delegate respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        [self.updater.delegate updaterWillShowModalAlert:self];
-#pragma clang diagnostic pop
-    }
-}
-
-- (void)userDriverDidShowModalAlert
-{
-    if ([self.updater.delegate respondsToSelector:@selector(updaterDidShowModalAlert:)]) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        [self.updater.delegate updaterDidShowModalAlert:self];
-#pragma clang diagnostic pop
-    }
-}
-
-- (_Nullable id <SUVersionDisplay>)userDriverRequestsVersionDisplayer
-{
-    if ([self.updater.delegate respondsToSelector:@selector(versionDisplayerForUpdater:)]) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-        return [self.updater.delegate versionDisplayerForUpdater:self];
-#pragma clang diagnostic pop
-    }
-    return nil;
-}
-
 // Not implemented properly at the moment - leaning towards it not be in the future
 // because it may be hard to implement properly (without passing a boolean flag everywhere), or
 // it would require us to maintain support for an additional class used by a very few people thus far
@@ -269,10 +226,227 @@ static NSMutableDictionary *sharedUpdaters = nil;
     [self checkForUpdates:nil];
 }
 
-// Private API that is used by SUInstallerDriver
-- (NSString *)_decryptionPasswordForSparkleUpdater
+- (void)userDriverWillShowModalAlert
+{
+    if ([self.updater.delegate respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
+        [self.delegate updaterWillShowModalAlert:self];
+    }
+}
+
+- (void)userDriverDidShowModalAlert
+{
+    if ([self.updater.delegate respondsToSelector:@selector(updaterDidShowModalAlert:)]) {
+        [self.delegate updaterDidShowModalAlert:self];
+    }
+}
+
+- (_Nullable id <SUVersionDisplay>)userDriverRequestsVersionDisplayer
+{
+    id <SUVersionDisplay> versionDisplayer = nil;
+    if ([self.updater.delegate respondsToSelector:@selector(versionDisplayerForUpdater:)]) {
+        versionDisplayer = [self.delegate versionDisplayerForUpdater:self];
+    }
+    return versionDisplayer;
+}
+
+- (BOOL)updaterMayCheckForUpdates:(SPUUpdater *)__unused updater
+{
+    BOOL updaterMayCheck = YES;
+    if ([self.delegate respondsToSelector:@selector(updaterMayCheckForUpdates:)]) {
+        updaterMayCheck = [self.delegate updaterMayCheckForUpdates:self];
+    }
+    return updaterMayCheck;
+}
+
+- (NSArray *)feedParametersForUpdater:(SPUUpdater *)__unused updater sendingSystemProfile:(BOOL)sendingProfile
+{
+    NSArray *feedParameters;
+    if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
+        feedParameters = [self.delegate feedParametersForUpdater:self sendingSystemProfile:sendingProfile];
+    } else {
+        feedParameters = [NSArray array];
+    }
+    return feedParameters;
+}
+
+- (NSString *)feedURLStringForUpdater:(SPUUpdater *)__unused updater
+{
+    NSString *feedURL = nil;
+    if ([self.delegate respondsToSelector:@selector(feedURLStringForUpdater:)]) {
+        feedURL = [self.delegate feedURLStringForUpdater:self];
+    }
+    return feedURL;
+}
+
+- (BOOL)updaterShouldPromptForPermissionToCheckForUpdates:(SPUUpdater *)__unused updater
+{
+    BOOL shouldPrompt = YES;
+    if ([self.delegate respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
+        shouldPrompt = [self.delegate updaterShouldPromptForPermissionToCheckForUpdates:self];
+    }
+    return shouldPrompt;
+}
+
+- (void)updater:(SPUUpdater *)__unused updater didFinishLoadingAppcast:(SUAppcast *)appcast
+{
+    if ([self.delegate respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
+        [self.delegate updater:self didFinishLoadingAppcast:appcast];
+    }
+}
+
+- (SUAppcastItem *)bestValidUpdateInAppcast:(SUAppcast *)appcast forUpdater:(SPUUpdater *)__unused updater
+{
+    SUAppcastItem *bestValidUpdate = nil;
+    if ([self.delegate respondsToSelector:@selector(bestValidUpdateInAppcast:forUpdater:)]) {
+        bestValidUpdate = [self.delegate bestValidUpdateInAppcast:appcast forUpdater:self];
+    }
+    return bestValidUpdate;
+}
+
+- (void)updater:(SPUUpdater *)__unused updater didFindValidUpdate:(SUAppcastItem *)item
+{
+    if ([self.delegate respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
+        [self.delegate updater:self didFindValidUpdate:item];
+    }
+}
+
+- (void)updaterDidNotFindUpdate:(SPUUpdater *)__unused updater
+{
+    if ([self.delegate respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
+        [self.delegate updaterDidNotFindUpdate:self];
+    }
+}
+
+- (void)updater:(SPUUpdater *)__unused updater willDownloadUpdate:(SUAppcastItem *)item withRequest:(NSMutableURLRequest *)request
+{
+    if ([self.delegate respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
+        [self.delegate updater:self willDownloadUpdate:item withRequest:request];
+    }
+}
+
+- (void)updater:(SPUUpdater *)__unused updater failedToDownloadUpdate:(SUAppcastItem *)item error:(NSError *)error
+{
+    if ([self.delegate respondsToSelector:@selector(updater:failedToDownloadUpdate:error:)]) {
+        [self.delegate updater:self failedToDownloadUpdate:item error:error];
+    }
+}
+
+- (void)userDidCancelDownload:(SPUUpdater *)__unused updater
+{
+    if ([self.delegate respondsToSelector:@selector(userDidCancelDownload:)]) {
+        [self.delegate userDidCancelDownload:self];
+    }
+}
+
+- (void)updater:(SPUUpdater *)__unused updater willInstallUpdate:(SUAppcastItem *)item
+{
+    if ([self.delegate respondsToSelector:@selector(updater:willInstallUpdate:)]) {
+        [self.delegate updater:self willInstallUpdate:item];
+    }
+}
+
+- (void)installPostponedUpdate
+{
+    if (self.postponedInstallHandler != nil) {
+        self.postponedInstallHandler();
+        self.postponedInstallHandler = nil;
+    }
+}
+
+- (BOOL)updater:(SPUUpdater *)__unused updater shouldPostponeRelaunchForUpdate:(SUAppcastItem *)item untilInvokingBlock:(void (^)(void))installHandler
+{
+    BOOL shouldPostponeRelaunch = NO;
+    
+    if ([self.delegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)]) {
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installPostponedUpdate)]];
+        
+        [invocation setSelector:@selector(installPostponedUpdate)];
+        
+        // This invocation will retain self, but this instance is kept alive forever by our singleton pattern anyway
+        [invocation setTarget:self];
+        
+        self.postponedInstallHandler = installHandler;
+        
+        shouldPostponeRelaunch = [self.delegate updater:self shouldPostponeRelaunchForUpdate:item untilInvoking:invocation];
+    }
+    
+    return shouldPostponeRelaunch;
+}
+
+- (BOOL)updaterShouldRelaunchApplication:(SPUUpdater *)__unused updater
+{
+    BOOL shouldRestart = YES;
+    if ([self.delegate respondsToSelector:@selector(updaterShouldRelaunchApplication:)]) {
+        shouldRestart = [self.delegate updaterShouldRelaunchApplication:self];
+    }
+    return shouldRestart;
+}
+
+- (void)updaterWillRelaunchApplication:(SPUUpdater *)__unused updater
+{
+    if ([self.delegate respondsToSelector:@selector(updaterWillRelaunchApplication:)]) {
+        [self.delegate updaterWillRelaunchApplication:self];
+    }
+}
+
+- (id<SUVersionComparison>)versionComparatorForUpdater:(SPUUpdater *)__unused updater
+{
+    id<SUVersionComparison> versionComparator;
+    if ([self.delegate respondsToSelector:@selector(versionComparatorForUpdater:)]) {
+        versionComparator = [self.delegate versionComparatorForUpdater:self];
+    }
+    return versionComparator;
+}
+
+- (NSString *)pathToRelaunchForUpdater:(SPUUpdater *)__unused updater
+{
+    NSString *relaunchPath = nil;
+    if ([self.delegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
+        relaunchPath = [self.delegate pathToRelaunchForUpdater:self];
+    }
+    return relaunchPath;
+}
+
+- (NSString *)decryptionPasswordForUpdater:(SPUUpdater *)__unused updater
 {
     return self.decryptionPassword;
+}
+
+- (void)finishSilentInstallation
+{
+    if (self.silentInstallHandler != nil) {
+        self.silentInstallHandler();
+        self.silentInstallHandler = nil;
+    }
+}
+
+- (BOOL)updater:(SPUUpdater *)__unused updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationBlock:(void (^)(void))immediateInstallHandler
+{
+    BOOL installationHandledByDelegate = NO;
+    
+    if ([self.delegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)]) {
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(finishSilentInstallation)]];
+        
+        // This invocation will retain self, but this instance is kept alive forever by our singleton pattern anyway
+        [invocation setTarget:self];
+        
+        self.silentInstallHandler = immediateInstallHandler;
+        
+        [self.delegate updater:self willInstallUpdateOnQuit:item immediateInstallationInvocation:invocation];
+        
+        // We have to assume they will handle the installation since they implement this method
+        // Not ideal, but this is why this delegate callback is deprecated
+        installationHandledByDelegate = YES;
+    }
+    
+    return installationHandledByDelegate;
+}
+
+- (void)updater:(SPUUpdater *)__unused updater didAbortWithError:(NSError *)error
+{
+    if ([self.delegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
+        [self.delegate updater:self didAbortWithError:error];
+    }
 }
 
 @end

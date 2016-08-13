@@ -25,7 +25,7 @@
 @synthesize basicDriver = _basicDriver;
 @synthesize downloadedUpdate = _downloadedUpdate;
 
-- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(id <SUUpdaterDelegate>)updaterDelegate
+- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(id <SPUUpdaterDelegate>)updaterDelegate
 {
     self = [super init];
     if (self != nil) {

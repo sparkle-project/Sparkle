@@ -8,7 +8,7 @@
 
 #import "SUCoreBasedUpdateDriver.h"
 #import "SUHost.h"
-#import "SUUpdaterDelegate.h"
+#import "SPUUpdaterDelegate.h"
 #import "SUBasicUpdateDriver.h"
 #import "SUInstallerDriver.h"
 #import "SUDownloadDriver.h"
@@ -33,7 +33,7 @@
 @property (nonatomic) BOOL resumingInstallingUpdate;
 @property (nonatomic) BOOL silentInstall;
 @property (nonatomic, readonly, weak) id updater; // if we didn't have legacy support, I'd remove this..
-@property (nullable, nonatomic, readonly, weak) id <SUUpdaterDelegate>updaterDelegate;
+@property (nullable, nonatomic, readonly, weak) id <SPUUpdaterDelegate>updaterDelegate;
 @property (nonatomic) NSString *userAgent;
 
 @end
@@ -53,7 +53,7 @@
 @synthesize userAgent = _userAgent;
 @synthesize downloadedUpdate = _downloadedUpdate;
 
-- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate delegate:(id<SUCoreBasedUpdateDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SUCoreBasedUpdateDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -186,9 +186,14 @@
 - (void)downloadDriverDidFailToDownloadUpdateWithError:(NSError *)error
 {
     if ([self.updaterDelegate respondsToSelector:@selector(updater:failedToDownloadUpdate:error:)]) {
+        NSError *errorToReport = [error.userInfo objectForKey:NSUnderlyingErrorKey];
+        if (errorToReport == nil) {
+            errorToReport = error;
+        }
+        
         [self.updaterDelegate updater:self.updater
                            failedToDownloadUpdate:self.updateItem
-                                            error:error.userInfo[NSUnderlyingErrorKey]];
+                                            error:errorToReport];
     }
     
     [self.delegate coreDriverIsRequestingAbortUpdateWithError:error];

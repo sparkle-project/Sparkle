@@ -11,7 +11,7 @@
 #import "SPUUserDriver.h"
 #import "SUHost.h"
 #import "SUConstants.h"
-#import "SUUpdaterDelegate.h"
+#import "SPUUpdaterDelegate.h"
 #import "SUAppcastItem.h"
 #import "SUErrors.h"
 #import "SPUURLDownload.h"
@@ -26,7 +26,7 @@
 @property (nonatomic, readonly) SUCoreBasedUpdateDriver *coreDriver;
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, weak, readonly) id updater;
-@property (weak, nonatomic, readonly) id<SUUpdaterDelegate> updaterDelegate;
+@property (weak, nonatomic, readonly) id<SPUUpdaterDelegate> updaterDelegate;
 @property (nonatomic, weak, readonly) id<SUUIBasedUpdateDriverDelegate> delegate;
 @property (nonatomic, readonly) id<SPUUserDriver> userDriver;
 @property (nonatomic) BOOL resumingInstallingUpdate;
@@ -45,7 +45,7 @@
 @synthesize resumingInstallingUpdate = _resumingInstallingUpdate;
 @synthesize resumingDownloadedUpdate = _resumingDownloadedUpdate;
 
-- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate delegate:(id<SUUIBasedUpdateDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SUUIBasedUpdateDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -140,7 +140,7 @@
         }];
     }
     
-    id <SUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
+    id <SPUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
     if (updateItem.releaseNotesURL != nil && (![updaterDelegate respondsToSelector:@selector(updaterShouldDownloadReleaseNotes:)] || [updaterDelegate updaterShouldDownloadReleaseNotes:self.updater])) {
         NSURLRequest *request = [NSURLRequest requestWithURL:updateItem.releaseNotesURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
         

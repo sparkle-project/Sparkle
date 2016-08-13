@@ -13,7 +13,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class SUHost, SUAppcastItem;
-@protocol SUUpdaterDelegate;
+@protocol SPUUpdaterDelegate;
 
 @protocol SUCoreBasedUpdateDriverDelegate <NSObject>
 
@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SUCoreBasedUpdateDriver : NSObject
 
-- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate delegate:(id<SUCoreBasedUpdateDriverDelegate>)delegate;
+- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SUCoreBasedUpdateDriverDelegate>)delegate;
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates requiresSilentInstall:(BOOL)silentInstall completion:(SUUpdateDriverCompletion)completionBlock;
 

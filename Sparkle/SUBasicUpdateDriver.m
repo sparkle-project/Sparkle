@@ -8,7 +8,7 @@
 
 #import "SUBasicUpdateDriver.h"
 #import "SUAppcastDriver.h"
-#import "SUUpdaterDelegate.h"
+#import "SPUUpdaterDelegate.h"
 #import "SUErrors.h"
 #import "SULog.h"
 #import "SULocalizations.h"
@@ -26,7 +26,7 @@
 
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly, weak) id updater; // if we didn't have legacy support, I'd remove this..
-@property (nullable, nonatomic, readonly, weak) id <SUUpdaterDelegate>updaterDelegate;
+@property (nullable, nonatomic, readonly, weak) id <SPUUpdaterDelegate>updaterDelegate;
 
 @property (nonatomic) BOOL aborted;
 
@@ -42,7 +42,7 @@
 @synthesize completionBlock = _completionBlock;
 @synthesize aborted = _aborted;
 
-- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(id <SUUpdaterDelegate>)updaterDelegate delegate:(id <SUBasicUpdateDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(id <SPUUpdaterDelegate>)updaterDelegate delegate:(id <SUBasicUpdateDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -182,7 +182,7 @@
         
         // Notify host app that update has aborted
         if ([self.updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
-            [self.updaterDelegate updater:self.updater didAbortWithError:error];
+            [self.updaterDelegate updater:self.updater didAbortWithError:(NSError * _Nonnull)error];
         }
     }
     

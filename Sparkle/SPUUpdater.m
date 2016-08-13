@@ -7,7 +7,7 @@
 //
 
 #import "SPUUpdater.h"
-#import "SUUpdaterDelegate.h"
+#import "SPUUpdaterDelegate.h"
 #import "SPUUpdaterSettings.h"
 #import "SUHost.h"
 #import "SPUUpdatePermission.h"
@@ -45,7 +45,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (readonly, copy) NSURL *parameterizedFeedURL;
 
 @property (nonatomic) id <SUUpdateDriver> driver;
-@property (nonatomic, weak) id delegator;
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly) SPUUpdaterSettings *updaterSettings;
 @property (nonatomic, readonly) SPUUpdaterCycle *updaterCycle;
@@ -62,7 +61,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @implementation SPUUpdater
 
 @synthesize delegate = _delegate;
-@synthesize delegator = _delegator;
 @synthesize userDriver = _userDriver;
 @synthesize userAgentString = customUserAgentString;
 @synthesize httpHeaders;
@@ -87,7 +85,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 }
 #endif
 
-- (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SPUUserDriver>)userDriver delegate:(id <SUUpdaterDelegate>)theDelegate
+- (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SPUUserDriver>)userDriver delegate:(id <SPUUpdaterDelegate>)theDelegate
 {
     self = [super init];
     
@@ -104,11 +102,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         _userDriver = userDriver;
         
         _delegate = theDelegate;
-        
-        // This property can be changed by an SUUpdater instance using us to setting our delegator to itself
-        // This is why the updater types in the SUUpdaterDelegate are 'id' - because they can be SPUUpdater or SUUpdater
-        // This is not a really a big deal because using the sender type is normally bad practice, and us passing it was a regretful decision in the first place.
-        _delegator = self;
     }
     
     return self;
@@ -267,7 +260,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
     // Does the delegate want to take care of the logic for when we should ask permission to update?
     else if ([self.delegate respondsToSelector:@selector(updaterShouldPromptForPermissionToCheckForUpdates:)]) {
-        shouldPrompt = [self.delegate updaterShouldPromptForPermissionToCheckForUpdates:self.delegator];
+        shouldPrompt = [self.delegate updaterShouldPromptForPermissionToCheckForUpdates:self];
     }
     // Has the user been asked already? And don't ask if the host has a default value set in its Info.plist.
     else if ([self.host objectForKey:SUEnableAutomaticChecksKey] == nil) {
@@ -295,7 +288,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         NSArray *profileInfo = [SUSystemProfiler systemProfileArrayForHost:self.host];
         // Always say we're sending the system profile here so that the delegate displays the parameters it would send.
         if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
-            NSArray *feedParameters = [self.delegate feedParametersForUpdater:self.delegator sendingSystemProfile:YES];
+            NSArray *feedParameters = [self.delegate feedParametersForUpdater:self sendingSystemProfile:YES];
             if (feedParameters != nil) {
                 profileInfo = [profileInfo arrayByAddingObjectsFromArray:feedParameters];
             }
@@ -418,7 +411,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 [[SUAutomaticUpdateDriver alloc]
                  initWithHost:strongSelf.host
                  sparkleBundle:strongSelf.sparkleBundle
-                 updater:strongSelf.delegator
+                 updater:strongSelf
                  userDriver:strongSelf.userDriver
                  updaterDelegate:strongSelf.delegate];
             } else {
@@ -426,7 +419,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 [[SUScheduledUpdateDriver alloc]
                  initWithHost:strongSelf.host
                  sparkleBundle:strongSelf.sparkleBundle
-                 updater:strongSelf.delegator
+                 updater:strongSelf
                  userDriver:strongSelf.userDriver
                  updaterDelegate:strongSelf.delegate];
             }
@@ -450,7 +443,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         return;
     }
     
-    id <SUUpdateDriver> theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithHost:self.host sparkleBundle:self.sparkleBundle updater:self.delegator userDriver:self.userDriver updaterDelegate:self.delegate];
+    id <SUUpdateDriver> theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithHost:self.host sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
     
     NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(bundleIdentifier != nil);
@@ -480,7 +473,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         dispatch_async(dispatch_get_main_queue(), ^{
             SPUUpdater *strongSelf = weakSelf;
             if (strongSelf != nil) {
-                [strongSelf checkForUpdatesWithDriver:[[SUProbingUpdateDriver alloc] initWithHost:strongSelf.host updater:strongSelf.delegator updaterDelegate:strongSelf.delegate] installerInProgress:installerInProgress];
+                [strongSelf checkForUpdatesWithDriver:[[SUProbingUpdateDriver alloc] initWithHost:strongSelf.host updater:strongSelf updaterDelegate:strongSelf.delegate] installerInProgress:installerInProgress];
             }
         });
     }];
@@ -496,7 +489,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
     [self updateLastUpdateCheckDate];
 
-    if( [self.delegate respondsToSelector: @selector(updaterMayCheckForUpdates:)] && ![self.delegate updaterMayCheckForUpdates:self.delegator] )
+    if( [self.delegate respondsToSelector: @selector(updaterMayCheckForUpdates:)] && ![self.delegate updaterMayCheckForUpdates:self] )
 	{
         [self scheduleNextUpdateCheck];
         return;
@@ -632,8 +625,12 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     // A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
     NSString *appcastString = [self.host objectForKey:SUFeedURLKey];
-    if ([self.delegate respondsToSelector:@selector(feedURLStringForUpdater:)])
-        appcastString = [self.delegate feedURLStringForUpdater:self.delegator];
+    if ([self.delegate respondsToSelector:@selector(feedURLStringForUpdater:)]) {
+        NSString *delegateAppcastString = [self.delegate feedURLStringForUpdater:self];
+        if (delegateAppcastString != nil) {
+            appcastString = delegateAppcastString;
+        }
+    }
     
     if (!appcastString) { // Can't find an appcast string!
         if (error != NULL) {
@@ -719,7 +716,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
     NSArray *parameters = @[];
     if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
-        NSArray *feedParameters = [self.delegate feedParametersForUpdater:self.delegator sendingSystemProfile:sendingSystemProfile];
+        NSArray *feedParameters = [self.delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile];
         if (feedParameters != nil) {
             parameters = [parameters arrayByAddingObjectsFromArray:feedParameters];
         }
@@ -804,25 +801,5 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 }
 
 - (NSBundle *)hostBundle { return [self.host bundle]; }
-
-// Private API for backwards compatibility, used by SUUpdater
-- (void)setDelegate:(id<SUUpdaterDelegate>)delegate
-{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdirect-ivar-access"
-    // Don't want to declare a property for a private API
-    _delegate = delegate;
-#pragma clang diagnostic pop
-}
-
-// Private API for backwards compatibility, used by SUUpdater
-- (void)setUpdaterDelegator:(id)delegator
-{
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdirect-ivar-access"
-    // Don't want to declare a property for a private API
-    _delegator = delegator;
-#pragma clang diagnostic pop
-}
 
 @end

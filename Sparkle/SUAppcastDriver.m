@@ -12,7 +12,7 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SUStandardVersionComparator.h"
 #import "SUOperatingSystem.h"
-#import "SUUpdaterDelegate.h"
+#import "SPUUpdaterDelegate.h"
 #import "SUHost.h"
 #import "SUConstants.h"
 
@@ -25,7 +25,7 @@
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, copy) NSString *userAgent;
 @property (nullable, nonatomic, readonly, weak) id updater;
-@property (nullable, nonatomic, readonly, weak) id <SUUpdaterDelegate> updaterDelegate;
+@property (nullable, nonatomic, readonly, weak) id <SPUUpdaterDelegate> updaterDelegate;
 @property (nullable, nonatomic) SUAppcastItem *nonDeltaUpdateItem;
 @property (nullable, nonatomic, readonly) id <SUAppcastDriverDelegate> delegate;
 
@@ -40,7 +40,7 @@
 @synthesize nonDeltaUpdateItem = _nonDeltaUpdateItem;
 @synthesize delegate = _delegate;
 
-- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(id <SUUpdaterDelegate>)updaterDelegate delegate:(id <SUAppcastDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(id <SPUUpdaterDelegate>)updaterDelegate delegate:(id <SUAppcastDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -79,11 +79,16 @@
     SUAppcastItem *nonDeltaUpdateItem = nil;
     
     // Now we have to find the best valid update in the appcast.
-    if ([self.updaterDelegate respondsToSelector:@selector(bestValidUpdateInAppcast:forUpdater:)]) // Does the delegate want to handle it?
+    if ([self.updaterDelegate respondsToSelector:@selector(bestValidUpdateInAppcast:forUpdater:)])
     {
-        item = [self.updaterDelegate bestValidUpdateInAppcast:ac forUpdater:self.updater];
+        item = [self.updaterDelegate bestValidUpdateInAppcast:ac forUpdater:(id _Nonnull)self.updater];
+    }
+    
+    if (item != nil)
+    {
+        // Does the delegate want to handle it?
         if ([item isDeltaUpdate]) {
-            nonDeltaUpdateItem = [self.updaterDelegate bestValidUpdateInAppcast:[ac copyWithoutDeltaUpdates] forUpdater:self.updater];
+            nonDeltaUpdateItem = [self.updaterDelegate bestValidUpdateInAppcast:[ac copyWithoutDeltaUpdates] forUpdater:(id _Nonnull)self.updater];
         }
     }
     else // If not, we'll take care of it ourselves.
@@ -154,7 +159,7 @@
     
     // Give the delegate a chance to provide a custom version comparator
     if ([self.updaterDelegate respondsToSelector:@selector(versionComparatorForUpdater:)]) {
-        comparator = [self.updaterDelegate versionComparatorForUpdater:self.updater];
+        comparator = [self.updaterDelegate versionComparatorForUpdater:(id _Nonnull)self.updater];
     }
     
     // If we don't get a comparator from the delegate, use the default comparator

@@ -9,7 +9,7 @@
 #import "SUAutomaticUpdateDriver.h"
 #import "SUUpdateDriver.h"
 #import "SUHost.h"
-#import "SUUpdaterDelegate.h"
+#import "SPUUpdaterDelegate.h"
 #import "SUCoreBasedUpdateDriver.h"
 #import "SULog.h"
 #import "SUAppcastItem.h"
@@ -40,7 +40,7 @@
 @synthesize updateItem = _updateItem;
 @synthesize willInstallSilently = _willInstallSilently;
 
-- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SUUpdaterDelegate>)updaterDelegate
+- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate
 {
     self = [super init];
     if (self != nil) {
@@ -79,46 +79,18 @@
     [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
 }
 
-// Method used for backwards compatibility for the updater delegate
-- (void)finishInstallationAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showingUI
-{
-    [self.coreDriver finishInstallationWithResponse:(relaunch ? SPUInstallAndRelaunchUpdateNow : SPUInstallUpdateNow) displayingUserInterface:showingUI];
-}
-
 - (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently
 {
     self.willInstallSilently = willInstallSilently;
     
     if (!willInstallImmediately) {
         BOOL installationHandledByDelegate = NO;
-        id<SUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
-        if (self.willInstallSilently) {
-            if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationBlock:)]) {
-                __weak SUAutomaticUpdateDriver *weakSelf = self;
-                installationHandledByDelegate = [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationBlock:^{
-                    [weakSelf.coreDriver finishInstallationWithResponse:SPUInstallAndRelaunchUpdateNow displayingUserInterface:NO];
-                }];
-            } else if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)]) {
-                // Just for backwards compatibility
-                
-                BOOL relaunch = YES;
-                BOOL showUI = NO;
-                
-                NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(finishInstallationAndRelaunch:displayingUserInterface:)]];
-                [invocation setSelector:@selector(finishInstallationAndRelaunch:displayingUserInterface:)];
-                [invocation setArgument:&relaunch atIndex:2];
-                [invocation setArgument:&showUI atIndex:3];
-                [invocation setTarget:self];
-                
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-                [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationInvocation:invocation];
-#pragma clang diagnostic pop
-                
-                // We have to assume they will handle the installation since they implement this method
-                // Not ideal, but this is why this delegate callback is deprecated
-                installationHandledByDelegate = YES;
-            }
+        id<SPUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
+        if (self.willInstallSilently && [updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationBlock:)]) {
+            __weak SUAutomaticUpdateDriver *weakSelf = self;
+            installationHandledByDelegate = [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationBlock:^{
+                [weakSelf.coreDriver finishInstallationWithResponse:SPUInstallAndRelaunchUpdateNow displayingUserInterface:NO];
+            }];
         }
         
         if (!installationHandledByDelegate) {
