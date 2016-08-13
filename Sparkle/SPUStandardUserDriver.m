@@ -35,6 +35,12 @@
 
 @end
 
+@interface NSObject (Private)
+
+- (NSString * _Nullable)_pathToTerminateForStandardUserDriver;
+
+@end
+
 @implementation SPUStandardUserDriver
 
 @synthesize host = _host;
@@ -400,7 +406,22 @@
         [self.statusController close];
         self.statusController = nil;
         
-        [self.uiComponent terminateApplicationForBundle:self.applicationBundle];
+        // Give the delegate a deferred chance for providing an application path
+        // This is a private API and used by SUUpdater
+        NSString *applicationPath = nil;
+        if ([self.delegate respondsToSelector:@selector(_pathToTerminateForStandardUserDriver)]) {
+            applicationPath = [(NSObject *)self.delegate _pathToTerminateForStandardUserDriver];
+        }
+        
+        NSBundle *applicationBundle;
+        if (applicationPath != nil) {
+            applicationBundle = [NSBundle bundleWithPath:applicationPath];
+            assert(applicationBundle != nil);
+        } else {
+            applicationBundle = self.applicationBundle;
+        }
+        
+        [self.uiComponent terminateApplicationForBundle:applicationBundle];
     });
 }
 
