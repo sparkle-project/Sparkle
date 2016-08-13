@@ -271,6 +271,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
 
 - (NSString *)feedURLStringForUpdater:(SPUUpdater *)__unused updater
 {
+    // Be really careful not to call [self feedURL] here. That might lead us into infinite recursion.
     NSString *feedURL = nil;
     if ([self.delegate respondsToSelector:@selector(feedURLStringForUpdater:)]) {
         feedURL = [self.delegate feedURLStringForUpdater:self];
