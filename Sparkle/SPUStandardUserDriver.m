@@ -1,5 +1,5 @@
 //
-//  SUStandardUserDriver.m
+//  SPUStandardUserDriver.m
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 2/14/16.

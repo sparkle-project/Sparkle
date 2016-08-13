@@ -78,7 +78,7 @@ SU_EXPORT @interface SPUStandardUpdaterController : NSObject
 /*!
  Validates if the menu item for checkForUpdates: can be invoked or not
  
- This validates the menu item by checking -[SUStandardUserDriver canCheckForUpdates]
+ This validates the menu item by checking -[SPUStandardUserDriver canCheckForUpdates]
  */
 - (BOOL)validateMenuItem:(NSMenuItem *)item;
 
