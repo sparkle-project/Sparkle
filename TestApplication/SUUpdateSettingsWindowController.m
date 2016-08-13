@@ -34,7 +34,7 @@
     
     // If the user is holding down command, we use the popup title user driver instead
     id<SPUUserDriver, SPUStandardUserDriverProtocol> userDriver;
-    if (([NSEvent modifierFlags] & NSCommandKeyMask) != 0) {
+    if (([NSEvent modifierFlags] & NSShiftKeyMask) != 0) {
         userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithApplicationBundle:applicationBundle window:self.window];
     } else {
         userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle applicationBundle:applicationBundle delegate:nil];
