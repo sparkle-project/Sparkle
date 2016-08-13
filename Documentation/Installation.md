@@ -21,7 +21,7 @@ The installer is first submitted. If it requires root privileges, it will ask fo
 
 * If the installation type from the appcast is an interactive package based installer, then no root privileges are necessary because the package installer will ask for them. Note this type of installation is deprecated however.
 * If the installation type from the appcast is a guided or regular package based installer, then root privileges are necessary because the system installer utility has to run as root.
-* Otherwise the installation type is a normal application update, and root privileges are only needed if write permission is currently insufficient to installation location.
+* Otherwise the installation type is a normal application update, and root privileges are only needed if write permission or changing the owner/group is currently insufficient.
 
 The installer makes sure, after extraction, that the expected installation type from the appcast matches the type of installation found within the archive. So this hint from the appcast is not just trusted implicitly.
 
