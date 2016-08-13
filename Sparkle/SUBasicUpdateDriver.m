@@ -18,6 +18,10 @@
 #import "SPUInstallationInfo.h"
 #import "SUDownloadedUpdate.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 @interface SUBasicUpdateDriver () <SUAppcastDriverDelegate>
 
 @property (nonatomic, weak, readonly) id<SUBasicUpdateDriverDelegate> delegate;

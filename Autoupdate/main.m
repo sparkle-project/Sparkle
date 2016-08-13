@@ -1,6 +1,10 @@
 #import <Foundation/Foundation.h>
 #import "AppInstaller.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 int main(int __unused argc, const char __unused *argv[])
 {
     @autoreleasepool

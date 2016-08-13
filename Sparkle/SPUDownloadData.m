@@ -8,6 +8,10 @@
 
 #import "SPUDownloadData.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 static NSString *SPUDownloadDataKey = @"SPUDownloadData";
 static NSString *SPUDownloadTextEncodingKey = @"SPUDownloadTextEncoding";
 static NSString *SPUDownloadMIMETypeKey = @"SPUDownloadMIMEType";

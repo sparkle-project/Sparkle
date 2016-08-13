@@ -9,6 +9,10 @@
 #import "SUInstallerConnection.h"
 #import "SPUSystemAuthorization.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection Keep Alive";
 
 @interface SUInstallerConnection () <SUInstallerCommunicationProtocol>

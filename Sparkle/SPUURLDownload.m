@@ -14,6 +14,10 @@
 #import "SPUDownloadData.h"
 #import "SUErrors.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 void SPUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(SPUDownloadData * _Nullable, NSError * _Nullable))
 {
     id<SUTemporaryDownloaderProtocol> downloader = nil;

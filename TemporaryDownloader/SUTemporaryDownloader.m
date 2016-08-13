@@ -12,6 +12,10 @@
 #import "SUErrors.h"
 #import "SUConstants.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 @interface SUTemporaryDownloader () <NSURLDownloadDelegate>
 
 @property (nonatomic, copy) void (^completionBlock)(SPUDownloadData * _Nullable downloadData, NSError * _Nullable error);
