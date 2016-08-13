@@ -34,8 +34,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  * This does not start the updater. To start it, see -[SPUUpdater startUpdater:]
  *
  * Note that this is a normal initializer and doesn't implement the singleton pattern (i.e, instances aren't cached, so no surprises)
- * Hence you shouldn't create multiple live instances that target the same bundle.
- * However, this also means that updater instances can be deallocated, and that they will be torn down properly
+ * This also means that updater instances can be deallocated, and that they will be torn down properly.
  *
  * Related: See SPUStandardUpdaterController which wraps a SPUUpdater instance and is suitable for instantiating in nib files
  *
