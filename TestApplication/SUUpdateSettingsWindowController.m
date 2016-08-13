@@ -41,7 +41,7 @@
     }
     
     self.userDriver = userDriver;
-    self.updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle userDriver:userDriver delegate:nil];
+    self.updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:applicationBundle userDriver:userDriver delegate:nil];
     
     NSError *updaterError = nil;
     if (![self.updater startUpdater:&updaterError]) {

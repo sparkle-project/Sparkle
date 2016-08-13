@@ -31,9 +31,16 @@
 
 #define FIRST_INSTALLER_MESSAGE_TIMEOUT 7ull
 
+@interface NSObject (PrivateDelegateMethods)
+
+- (nullable NSString *)_pathToRelaunchForUpdater:(SPUUpdater *)updater;
+
+@end
+
 @interface SUInstallerDriver () <SUInstallerCommunicationProtocol>
 
 @property (nonatomic, readonly) SUHost *host;
+@property (nonatomic, readonly) NSBundle *applicationBundle;
 @property (nonatomic, readonly) NSBundle *sparkleBundle;
 @property (nonatomic, weak, readonly) id<SUInstallerDriverDelegate> delegate;
 @property (nonatomic) SPUInstallerMessageType currentStage;
@@ -58,6 +65,7 @@
 @implementation SUInstallerDriver
 
 @synthesize host = _host;
+@synthesize applicationBundle = _applicationBundle;
 @synthesize sparkleBundle = _sparkleBundle;
 @synthesize delegate = _delegate;
 @synthesize currentStage = _currentStage;
@@ -73,11 +81,12 @@
 @synthesize temporaryDirectory = _temporaryDirectory;
 @synthesize aborted = _aborted;
 
-- (instancetype)initWithHost:(SUHost *)host sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(id<SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SUInstallerDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(id<SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SUInstallerDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
         _host = host;
+        _applicationBundle = applicationBundle;
         _sparkleBundle = sparkleBundle;
         _updater = updater;
         _updaterDelegate = updaterDelegate;
@@ -154,9 +163,10 @@
 
 - (void)sendInstallationData
 {
-    NSString *pathToRelaunch = [self.host bundlePath];
-    if ([self.updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
-        NSString *relaunchPath = [self.updaterDelegate pathToRelaunchForUpdater:self.updater];
+    NSString *pathToRelaunch = self.applicationBundle.bundlePath;
+    // Give the delegate one more chance for determining the path to relaunch via a private API used by SUUpdater
+    if ([self.updaterDelegate respondsToSelector:@selector(_pathToRelaunchForUpdater:)]) {
+        NSString *relaunchPath = [(NSObject *)self.updaterDelegate _pathToRelaunchForUpdater:self.updater];
         if (relaunchPath != nil) {
             pathToRelaunch = relaunchPath;
         }

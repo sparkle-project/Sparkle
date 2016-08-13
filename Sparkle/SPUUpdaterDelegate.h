@@ -212,18 +212,6 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (nullable id<SUVersionComparison>)versionComparatorForUpdater:(SPUUpdater *)updater;
 
 /*!
- Returns the path to the application which is used to relaunch after the update is installed.
- 
- The installer also waits for the termination of the application at this path.
- 
- The default is the path of the host bundle.
- 
- \param updater The updater instance.
- \return The path to the application bundle to relaunch and wait for termination, or nil if you don't want to be delegated this task.
- */
-- (nullable NSString *)pathToRelaunchForUpdater:(SPUUpdater *)updater;
-
-/*!
  Returns whether or not the updater should allow interaction with its installer
  
  Use this to override the default behavior which is to allow interaction with the installer.

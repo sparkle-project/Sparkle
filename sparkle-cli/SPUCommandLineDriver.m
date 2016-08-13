@@ -15,7 +15,6 @@ void _SULogDisableStandardErrorStream(void);
 @interface SPUCommandLineDriver () <SPUUpdaterDelegate>
 
 @property (nonatomic, readonly) SPUUpdater *updater;
-@property (nonatomic, readonly) NSString *applicationBundlePath;
 @property (nonatomic, readonly) BOOL verbose;
 @property (nonatomic) BOOL probingForUpdates;
 @property (nonatomic, readonly) BOOL interactive;
@@ -25,7 +24,6 @@ void _SULogDisableStandardErrorStream(void);
 @implementation SPUCommandLineDriver
 
 @synthesize updater = _updater;
-@synthesize applicationBundlePath = _applicationBundlePath;
 @synthesize verbose = _verbose;
 @synthesize probingForUpdates = _probingForUpdates;
 @synthesize interactive = _interactive;
@@ -52,14 +50,12 @@ void _SULogDisableStandardErrorStream(void);
         _verbose = verbose;
         _interactive = interactiveInstallation;
         
-        _applicationBundlePath = applicationBundle.bundlePath;
-        
 #ifndef DEBUG
         _SULogDisableStandardErrorStream();
 #endif
         
         id <SPUUserDriver> userDriver = [[SPUCommandLineUserDriver alloc] initWithApplicationBundle:applicationBundle updatePermission:updatePermission deferInstallation:deferInstallation verbose:verbose];
-        _updater = [[SPUUpdater alloc] initWithHostBundle:updateBundle userDriver:userDriver delegate:self];
+        _updater = [[SPUUpdater alloc] initWithHostBundle:updateBundle applicationBundle:applicationBundle userDriver:userDriver delegate:self];
     }
     return self;
 }
@@ -102,11 +98,6 @@ void _SULogDisableStandardErrorStream(void);
         }
         exit(EXIT_FAILURE);
     }
-}
-
-- (NSString *)pathToRelaunchForUpdater:(SPUUpdater *)__unused updater
-{
-    return self.applicationBundlePath;
 }
 
 - (BOOL)updaterShouldDownloadReleaseNotes:(SPUUpdater *)__unused updater

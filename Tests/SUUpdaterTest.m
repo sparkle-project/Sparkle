@@ -24,11 +24,12 @@
 {
     [super setUp];
     
-    // We really want a useless / not really functional user driver so we will pass nil here
-    // For real world applications we should pass a valid user driver which is why this is not a nullable parameter
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnonnull"
-    self.updater = [[SPUUpdater alloc] initWithHostBundle:[NSBundle bundleForClass:[self class]] userDriver:nil delegate:self];
+    // We really want a useless / not really functional user driver so we will pass nil here
+    // For real world applications we should pass a valid user driver which is why this is not a nullable parameter
+    self.updater = [[SPUUpdater alloc] initWithHostBundle:bundle applicationBundle:bundle userDriver:nil delegate:self];
 #pragma clang diagnostic pop
     
     NSError *error = nil;

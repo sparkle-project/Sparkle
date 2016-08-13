@@ -41,7 +41,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         
         NSBundle *hostBundle = [NSBundle mainBundle];
         id <SPUUserDriver, SPUStandardUserDriverProtocol> userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle delegate:self.userDriverDelegate];
-        self.updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle userDriver:userDriver delegate:self.updaterDelegate];
+        self.updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle userDriver:userDriver delegate:self.updaterDelegate];
         self.userDriver = userDriver;
         
         // In the case this is being called right as an application is being launched,

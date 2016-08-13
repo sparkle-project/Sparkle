@@ -46,6 +46,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 @property (nonatomic) id <SUUpdateDriver> driver;
 @property (nonatomic, readonly) SUHost *host;
+@property (nonatomic, readonly) NSBundle *applicationBundle;
 @property (nonatomic, readonly) SPUUpdaterSettings *updaterSettings;
 @property (nonatomic, readonly) SPUUpdaterCycle *updaterCycle;
 @property (nonatomic, readonly) SPUUpdaterTimer *updaterTimer;
@@ -66,6 +67,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize httpHeaders;
 @synthesize driver;
 @synthesize host = _host;
+@synthesize applicationBundle = _applicationBundle;
 @synthesize updaterSettings = _updaterSettings;
 @synthesize updaterCycle = _updaterCycle;
 @synthesize updaterTimer = _updaterTimer;
@@ -85,7 +87,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 }
 #endif
 
-- (instancetype)initWithHostBundle:(NSBundle *)bundle userDriver:(id <SPUUserDriver>)userDriver delegate:(id <SPUUpdaterDelegate>)theDelegate
+- (instancetype)initWithHostBundle:(NSBundle *)hostBundle applicationBundle:(NSBundle *)applicationBundle userDriver:(id <SPUUserDriver>)userDriver delegate:(id<SPUUpdaterDelegate> _Nullable)delegate
 {
     self = [super init];
     
@@ -93,15 +95,16 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         // Use explicit class to use the correct bundle even when subclassed
         _sparkleBundle = [NSBundle bundleForClass:[SPUUpdater class]];
         
-        _host = [[SUHost alloc] initWithBundle:bundle];
+        _host = [[SUHost alloc] initWithBundle:hostBundle];
+        _applicationBundle = applicationBundle;
         
-        _updaterSettings = [[SPUUpdaterSettings alloc] initWithHostBundle:bundle];
+        _updaterSettings = [[SPUUpdaterSettings alloc] initWithHostBundle:hostBundle];
         _updaterCycle = [[SPUUpdaterCycle alloc] initWithDelegate:self];
         _updaterTimer = [[SPUUpdaterTimer alloc] initWithDelegate:self];
         
         _userDriver = userDriver;
         
-        _delegate = theDelegate;
+        _delegate = delegate;
     }
     
     return self;
@@ -410,6 +413,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 updateDriver =
                 [[SUAutomaticUpdateDriver alloc]
                  initWithHost:strongSelf.host
+                 applicationBundle:strongSelf.applicationBundle
                  sparkleBundle:strongSelf.sparkleBundle
                  updater:strongSelf
                  userDriver:strongSelf.userDriver
@@ -418,6 +422,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 updateDriver =
                 [[SUScheduledUpdateDriver alloc]
                  initWithHost:strongSelf.host
+                 applicationBundle:strongSelf.applicationBundle
                  sparkleBundle:strongSelf.sparkleBundle
                  updater:strongSelf
                  userDriver:strongSelf.userDriver
@@ -443,7 +448,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         return;
     }
     
-    id <SUUpdateDriver> theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithHost:self.host sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
+    id <SUUpdateDriver> theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithHost:self.host applicationBundle:self.applicationBundle sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
     
     NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(bundleIdentifier != nil);

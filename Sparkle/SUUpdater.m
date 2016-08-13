@@ -76,9 +76,9 @@ static NSMutableDictionary *sharedUpdaters = nil;
         
         // This bundle may not necessarily be the correct application bundle
         // Unfortunately we won't know the correct application bundle until after the delegate is set
-        // See -[SUUpdater _standardUserDriverRequestsPathToRelaunch] below which resolves this
+        // See -[SUUpdater _standardUserDriverRequestsPathToRelaunch] and -[SUUpdater _pathToRelaunchForUpdater:] implemented below which resolves this
         _userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:bundle applicationBundle:bundle delegate:self];
-        _updater = [[SPUUpdater alloc] initWithHostBundle:bundle userDriver:_userDriver delegate:self];
+        _updater = [[SPUUpdater alloc] initWithHostBundle:bundle applicationBundle:bundle userDriver:_userDriver delegate:self];
         
         NSError *updaterError = nil;
         if (![_updater startUpdater:&updaterError]) {
@@ -402,7 +402,8 @@ static NSMutableDictionary *sharedUpdaters = nil;
     return versionComparator;
 }
 
-- (NSString *)pathToRelaunchForUpdater:(SPUUpdater *)__unused updater
+// Private SPUUpdater API that allows us to defer providing an application path to relaunch
+- (NSString * _Nullable)_pathToRelaunchForUpdater:(SPUUpdater *)__unused updater
 {
     NSString *relaunchPath = nil;
     if ([self.delegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
@@ -414,7 +415,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
 // Private SPUStandardUserDriver API that allows us to defer providing an application path to terminate
 - (NSString * _Nullable)_pathToTerminateForStandardUserDriver
 {
-    return [self pathToRelaunchForUpdater:self.updater];
+    return [self _pathToRelaunchForUpdater:self.updater];
 }
 
 - (NSString *)decryptionPasswordForUpdater:(SPUUpdater *)__unused updater
