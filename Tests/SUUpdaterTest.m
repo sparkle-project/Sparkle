@@ -12,57 +12,6 @@
 #import "SPUStandardUserDriver.h"
 #import "SPUUpdaterDelegate.h"
 
-// This user driver does nothing
-@interface SPUUselessUserDriver : NSObject <SPUUserDriver>
-
-@end
-
-@implementation SPUUselessUserDriver
-
-- (void)showCanCheckForUpdates:(BOOL)__unused canCheckForUpdates {}
-
-- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SPUUpdatePermission *))__unused reply {}
-
-- (void)showUserInitiatedUpdateCheckWithCompletion:(void (^)(SPUUserInitiatedCheckStatus))__unused updateCheckStatusCompletion {}
-
-- (void)dismissUserInitiatedUpdateCheck {}
-
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem reply:(void (^)(SPUUpdateAlertChoice))__unused reply {}
-
-- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem reply:(void (^)(SPUUpdateAlertChoice))__unused reply {}
-
-- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)__unused appcastItem reply:(void (^)(SPUInstallUpdateStatus))__unused reply {}
-
-- (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)__unused downloadData {}
-
-- (void)showUpdateReleaseNotesFailedToDownloadWithError:(NSError *)__unused error {}
-
-- (void)showUpdateNotFoundWithAcknowledgement:(void (^)(void))__unused acknowledgement {}
-
-- (void)showUpdaterError:(NSError *)__unused error acknowledgement:(void (^)(void))__unused acknowledgement {}
-
-- (void)showDownloadInitiatedWithCompletion:(void (^)(SPUDownloadUpdateStatus))__unused downloadUpdateStatusCompletion {}
-
-- (void)showDownloadDidReceiveExpectedContentLength:(NSUInteger)__unused expectedContentLength {}
-
-- (void)showDownloadDidReceiveDataOfLength:(NSUInteger)__unused length {}
-
-- (void)showDownloadDidStartExtractingUpdate {}
-
-- (void)showExtractionReceivedProgress:(double)__unused progress {}
-
-- (void)showReadyToInstallAndRelaunch:(void (^)(SPUInstallUpdateStatus))__unused installUpdateHandler {}
-
-- (void)showInstallingUpdate {}
-
-- (void)showUpdateInstallationDidFinish {}
-
-- (void)dismissUpdateInstallation {}
-
-- (void)terminateApplication {}
-
-@end
-
 @interface SUUpdaterTest : XCTestCase <SPUUpdaterDelegate>
 @property (strong) SPUUpdater *updater;
 @end
@@ -74,7 +23,13 @@
 - (void)setUp
 {
     [super setUp];
-    self.updater = [[SPUUpdater alloc] initWithHostBundle:[NSBundle bundleForClass:[self class]] userDriver:[[SPUUselessUserDriver alloc] init] delegate:self];
+    
+    // We really want a useless / not really functional user driver so we will pass nil here
+    // For real world applications we should pass a valid user driver which is why this is not a nullable parameter
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
+    self.updater = [[SPUUpdater alloc] initWithHostBundle:[NSBundle bundleForClass:[self class]] userDriver:nil delegate:self];
+#pragma clang diagnostic pop
     
     NSError *error = nil;
     if (![self.updater startUpdater:&error]) {
