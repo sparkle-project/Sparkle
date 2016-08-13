@@ -24,19 +24,19 @@ SU_EXPORT @protocol SPUStandardUserDriverDelegate <NSObject>
  Called before showing a modal alert window,
  to give the opportunity to hide attached windows that may get in the way.
  */
-- (void)userDriverWillShowModalAlert;
+- (void)standardUserDriverWillShowModalAlert;
 
 /*!
  Called after showing a modal alert window,
  to give the opportunity to hide attached windows that may get in the way.
  */
-- (void)userDriverDidShowModalAlert;
+- (void)standardUserDriverDidShowModalAlert;
 
 /*!
  Returns an object that formats version numbers for display to the user.
  If you don't implement this method or return \c nil,
  the standard version formatter will be used.
  */
-- (_Nullable id <SUVersionDisplay>)userDriverRequestsVersionDisplayer;
+- (_Nullable id <SUVersionDisplay>)standardUserDriverRequestsVersionDisplayer;
 
 @end

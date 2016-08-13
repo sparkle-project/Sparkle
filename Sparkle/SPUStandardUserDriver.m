@@ -115,8 +115,8 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         id <SUVersionDisplay> versionDisplayer = nil;
-        if ([self.delegate respondsToSelector:@selector(userDriverRequestsVersionDisplayer)]) {
-            versionDisplayer = [self.delegate userDriverRequestsVersionDisplayer];
+        if ([self.delegate respondsToSelector:@selector(standardUserDriverRequestsVersionDisplayer)]) {
+            versionDisplayer = [self.delegate standardUserDriverRequestsVersionDisplayer];
         }
         
         __weak SPUStandardUserDriver *weakSelf = self;
@@ -277,8 +277,8 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         id <SPUStandardUserDriverDelegate> delegate = self.delegate;
         
-        if ([delegate respondsToSelector:@selector(userDriverWillShowModalAlert)]) {
-            [delegate userDriverWillShowModalAlert];
+        if ([delegate respondsToSelector:@selector(standardUserDriverWillShowModalAlert)]) {
+            [delegate standardUserDriverWillShowModalAlert];
         }
         
         // When showing a modal alert we need to ensure that background applications
@@ -288,8 +288,8 @@
         [alert setIcon:[SPUApplicationInfo bestIconForBundle:self.host.bundle]];
         [alert runModal];
         
-        if ([delegate respondsToSelector:@selector(userDriverDidShowModalAlert)]) {
-            [delegate userDriverDidShowModalAlert];
+        if ([delegate respondsToSelector:@selector(standardUserDriverDidShowModalAlert)]) {
+            [delegate standardUserDriverDidShowModalAlert];
         }
     });
 }

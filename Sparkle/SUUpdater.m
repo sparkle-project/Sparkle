@@ -226,21 +226,21 @@ static NSMutableDictionary *sharedUpdaters = nil;
     [self checkForUpdatesInBackground];
 }
 
-- (void)userDriverWillShowModalAlert
+- (void)standardUserDriverWillShowModalAlert
 {
     if ([self.updater.delegate respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
         [self.delegate updaterWillShowModalAlert:self];
     }
 }
 
-- (void)userDriverDidShowModalAlert
+- (void)standardUserDriverDidShowModalAlert
 {
     if ([self.updater.delegate respondsToSelector:@selector(updaterDidShowModalAlert:)]) {
         [self.delegate updaterDidShowModalAlert:self];
     }
 }
 
-- (_Nullable id <SUVersionDisplay>)userDriverRequestsVersionDisplayer
+- (_Nullable id <SUVersionDisplay>)standardUserDriverRequestsVersionDisplayer
 {
     id <SUVersionDisplay> versionDisplayer = nil;
     if ([self.updater.delegate respondsToSelector:@selector(versionDisplayerForUpdater:)]) {
