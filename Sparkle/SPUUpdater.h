@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
     The main API in Sparkle for controlling the update mechanism.
 
-    This class is used to configure the update paramters as well as manually
+    This class is used to configure the update parameters as well as manually
     and automatically schedule and control checks for updates.
  */
 SU_EXPORT @interface SPUUpdater : NSObject
