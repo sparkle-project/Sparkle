@@ -74,7 +74,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
         }
         [sharedUpdaters setObject:self forKey:[NSValue valueWithNonretainedObject:bundle]];
         
-        _userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:bundle delegate:self];
+        _userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:bundle applicationBundle:bundle delegate:self];
         _updater = [[SPUUpdater alloc] initWithHostBundle:bundle userDriver:_userDriver delegate:self];
         
         NSError *updaterError = nil;

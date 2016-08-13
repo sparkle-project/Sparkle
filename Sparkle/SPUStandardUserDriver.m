@@ -23,6 +23,7 @@
 @interface SPUStandardUserDriver ()
 
 @property (nonatomic, readonly) SUHost *host;
+@property (nonatomic, readonly) NSBundle *applicationBundle;
 
 @property (nonatomic, readonly) SPUUserDriverCoreComponent *coreComponent;
 @property (nonatomic, readonly) SPUUserDriverUIComponent *uiComponent;
@@ -37,6 +38,7 @@
 @implementation SPUStandardUserDriver
 
 @synthesize host = _host;
+@synthesize applicationBundle = _applicationBundle;
 @synthesize coreComponent = _coreComponent;
 @synthesize uiComponent = _uiComponent;
 @synthesize delegate = _delegate;
@@ -46,11 +48,12 @@
 
 #pragma mark Birth
 
-- (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(id<SPUStandardUserDriverDelegate>)delegate
+- (instancetype)initWithHostBundle:(NSBundle *)hostBundle applicationBundle:(NSBundle *)applicationBundle delegate:(nullable id<SPUStandardUserDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
         _host = [[SUHost alloc] initWithBundle:hostBundle];
+        _applicationBundle = applicationBundle;
         _delegate = delegate;
         _coreComponent = [[SPUUserDriverCoreComponent alloc] init];
         _uiComponent = [[SPUUserDriverUIComponent alloc] init];
@@ -397,7 +400,7 @@
         [self.statusController close];
         self.statusController = nil;
         
-        [self.uiComponent terminateApplicationForBundle:self.host.bundle];
+        [self.uiComponent terminateApplicationForBundle:self.applicationBundle];
     });
 }
 

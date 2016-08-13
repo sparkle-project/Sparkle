@@ -24,9 +24,10 @@ SU_EXPORT @interface SPUStandardUserDriver : NSObject <SPUUserDriver, SPUStandar
  Initializes a Sparkle's standard user driver for user update interactions
  
  @param hostBundle The target bundle of the host that is being updated
+ @param applicationBundle The application bundle designated for relaunching
  @param delegate The delegate to this user driver. Pass nil if you don't want to provide one.
  */
-- (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(_Nullable id <SPUStandardUserDriverDelegate>)delegate;
+- (instancetype)initWithHostBundle:(NSBundle *)hostBundle applicationBundle:(NSBundle *)applicationBundle delegate:(nullable id<SPUStandardUserDriverDelegate>)delegate;
 
 @end
 
