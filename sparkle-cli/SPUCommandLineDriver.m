@@ -60,6 +60,22 @@ void _SULogDisableStandardErrorStream(void);
     return self;
 }
 
+- (void)updater:(SPUUpdater *)__unused updater willScheduleUpdateCheckAfterDelay:(NSTimeInterval)delay __attribute__((noreturn))
+{
+    if (self.verbose) {
+        fprintf(stderr, "Last update check occurred too soon. Try again after %0.0f second(s).", delay);
+    }
+    exit(EXIT_SUCCESS);
+}
+
+- (void)updaterWillIdleSchedulingUpdates:(SPUUpdater *)__unused updater __attribute__((noreturn))
+{
+    if (self.verbose) {
+        fprintf(stderr, "Automatic update checks are disabled. Exiting.\n");
+    }
+    exit(EXIT_SUCCESS);
+}
+
 - (BOOL)updaterShouldAllowInstallerInteraction:(SPUUpdater *)__unused updater
 {
     // If the installation is interactive, we can show an authorization prompt for requesting additional privileges,
@@ -79,25 +95,21 @@ void _SULogDisableStandardErrorStream(void);
 }
 
 // In case we fail during probing, otherwise we leave error handling to the user driver
-- (void)updaterDidNotFindUpdate:(SPUUpdater *)__unused updater
+- (void)updaterDidNotFindUpdate:(SPUUpdater *)__unused updater __attribute__((noreturn))
 {
-    if (self.probingForUpdates) {
-        if (self.verbose) {
-            fprintf(stderr, "No update available!\n");
-        }
-        exit(EXIT_FAILURE);
+    if (self.verbose) {
+        fprintf(stderr, "No update available!\n");
     }
+    exit(EXIT_FAILURE);
 }
 
 // In case we fail during probing, otherwise we leave error handling to the user driver
-- (void)updater:(SPUUpdater *)__unused updater didAbortWithError:(NSError *)error
+- (void)updater:(SPUUpdater *)__unused updater didAbortWithError:(NSError *)error __attribute__((noreturn))
 {
-    if (self.probingForUpdates) {
-        if (self.verbose) {
-            fprintf(stderr, "Aborted update with error (%ld): %s\n", (long)error.code, error.localizedDescription.UTF8String);
-        }
-        exit(EXIT_FAILURE);
+    if (self.verbose) {
+        fprintf(stderr, "Aborted update with error (%ld): %s\n", (long)error.code, error.localizedDescription.UTF8String);
     }
+    exit(EXIT_FAILURE);
 }
 
 - (BOOL)updaterShouldDownloadReleaseNotes:(SPUUpdater *)__unused updater

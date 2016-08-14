@@ -41,6 +41,26 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 @optional
 
 /*!
+ Called when a background update will be scheduled after a delay.
+ 
+ Automatic update checks need to be enabled for this to trigger.
+ 
+ \param delay The delay until the next scheduled update will occur.
+ 
+ \param updater The updater instance.
+ */
+- (void)updater:(SPUUpdater *)updater willScheduleUpdateCheckAfterDelay:(NSTimeInterval)delay;
+
+/*!
+ Called when no updates will be scheduled in the future.
+ 
+ This may later change if automatic update checks become enabled.
+ 
+ \param updater The updater instance.
+ */
+- (void)updaterWillIdleSchedulingUpdates:(SPUUpdater *)updater;
+
+/*!
  Returns whether to allow Sparkle to pop up.
  
  For example, this may be used to prevent Sparkle from interrupting a setup assistant.

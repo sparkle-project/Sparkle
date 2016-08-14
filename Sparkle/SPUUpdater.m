@@ -353,6 +353,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     [self.userDriver showCanCheckForUpdates:!automaticallyCheckForUpdates];
     
     if (!automaticallyCheckForUpdates) {
+        if ([self.delegate respondsToSelector:@selector(updaterWillIdleSchedulingUpdates:)]) {
+            [self.delegate updaterWillIdleSchedulingUpdates:self];
+        }
         return;
     }
     
@@ -372,6 +375,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 updateCheckInterval = SUMinimumUpdateCheckInterval;
             if (intervalSinceCheck < updateCheckInterval) {
                 NSTimeInterval delayUntilCheck = (updateCheckInterval - intervalSinceCheck); // It hasn't been long enough.
+                if ([self.delegate respondsToSelector:@selector(updater:willScheduleUpdateCheckAfterDelay:)]) {
+                    [self.delegate updater:self willScheduleUpdateCheckAfterDelay:delayUntilCheck];
+                }
                 [self.updaterTimer startAndFireAfterDelay:delayUntilCheck];
             } else {
                 // We're overdue! Run one now.
