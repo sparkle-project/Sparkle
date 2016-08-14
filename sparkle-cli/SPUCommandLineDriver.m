@@ -18,6 +18,7 @@ void _SULogDisableStandardErrorStream(void);
 @property (nonatomic, readonly) BOOL verbose;
 @property (nonatomic) BOOL probingForUpdates;
 @property (nonatomic, readonly) BOOL interactive;
+@property (nonatomic, copy, readonly, nullable) NSString *customFeedURL;
 
 @end
 
@@ -27,8 +28,9 @@ void _SULogDisableStandardErrorStream(void);
 @synthesize verbose = _verbose;
 @synthesize probingForUpdates = _probingForUpdates;
 @synthesize interactive = _interactive;
+@synthesize customFeedURL = _customFeedURL;
 
-- (instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath updatePermission:(nullable SPUUpdatePermission *)updatePermission deferInstallation:(BOOL)deferInstallation interactiveInstallation:(BOOL)interactiveInstallation verbose:(BOOL)verbose
+- (instancetype)initWithUpdateBundlePath:(NSString *)updateBundlePath applicationBundlePath:(nullable NSString *)applicationBundlePath customFeedURL:(nullable NSString *)customFeedURL updatePermission:(nullable SPUUpdatePermission *)updatePermission deferInstallation:(BOOL)deferInstallation interactiveInstallation:(BOOL)interactiveInstallation verbose:(BOOL)verbose
 {
     self = [super init];
     if (self != nil) {
@@ -49,6 +51,7 @@ void _SULogDisableStandardErrorStream(void);
         
         _verbose = verbose;
         _interactive = interactiveInstallation;
+        _customFeedURL = [customFeedURL copy];
         
 #ifndef DEBUG
         _SULogDisableStandardErrorStream();
@@ -83,6 +86,11 @@ void _SULogDisableStandardErrorStream(void);
     return self.interactive;
 }
 
+- (nullable NSString *)feedURLStringForUpdater:(SPUUpdater *)__unused updater
+{
+    return self.customFeedURL;
+}
+
 // In case we find an update during probing, otherwise we leave this to the user driver
 - (void)updater:(SPUUpdater *)__unused updater didFindValidUpdate:(SUAppcastItem *)__unused item
 {
@@ -94,7 +102,6 @@ void _SULogDisableStandardErrorStream(void);
     }
 }
 
-// In case we fail during probing, otherwise we leave error handling to the user driver
 - (void)updaterDidNotFindUpdate:(SPUUpdater *)__unused updater __attribute__((noreturn))
 {
     if (self.verbose) {
@@ -103,7 +110,6 @@ void _SULogDisableStandardErrorStream(void);
     exit(EXIT_FAILURE);
 }
 
-// In case we fail during probing, otherwise we leave error handling to the user driver
 - (void)updater:(SPUUpdater *)__unused updater didAbortWithError:(NSError *)error __attribute__((noreturn))
 {
     if (self.verbose) {

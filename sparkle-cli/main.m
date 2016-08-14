@@ -19,6 +19,7 @@
 #define SEND_PROFILE_FLAG "send-profile"
 #define PROBE_FLAG "probe"
 #define INTERACTIVE_FLAG "interactive"
+#define FEED_URL_FLAG "feed-url"
 
 static void printUsage(char **argv)
 {
@@ -35,6 +36,7 @@ static void printUsage(char **argv)
     fprintf(stderr, " --%s\n    Path to the application to watch for termination and to relaunch.\n    If not provided, this is assumed to be the same as the bundle.\n", APPLICATION_FLAG);
     fprintf(stderr, " --%s\n    Immediately checks for updates to install.\n    Without this, updates are checked only when needed on a scheduled basis.\n", CHECK_NOW_FLAG);
     fprintf(stderr, " --%s\n    Probe for updates. Check if any updates are available but do not install.\n    An exit status of 0 is returned if a new update is available.\n", PROBE_FLAG);
+    fprintf(stderr, " --%s\n    URL for appcast feed. This URL will be used for the feed instead of the one\n    in the bundle's Info.plist or in the bundle's user defaults.\n", FEED_URL_FLAG);
     fprintf(stderr, " --%s\n    Allows prompting the user for an authorization dialog prompt if the\n    installer needs elevated privileges, or allows performing an interactive\n    installer package.\n", INTERACTIVE_FLAG);
     fprintf(stderr, " --%s\n    If update permission is requested, this enables automatic update checks.\n    Note that this behavior may overwrite the user's defaults for the bundle.\n    This option has no effect if --%s is passed, or if the\n    user has replied to this request already, or if the developer configured\n    to skip it.\n", GRANT_AUTOMATIC_CHECKING_FLAG, CHECK_NOW_FLAG);
     fprintf(stderr, " --%s\n    Choose to send system profile information if update permission is requested.\n    This option can only take effect if --%s is passed.\n", SEND_PROFILE_FLAG, GRANT_AUTOMATIC_CHECKING_FLAG);
@@ -53,6 +55,7 @@ int main(int argc, char **argv)
         
         struct option longOptions[] = {
             {APPLICATION_FLAG, required_argument, NULL, 0},
+            {FEED_URL_FLAG, required_argument, NULL, 0},
             {DEFER_FLAG, no_argument, NULL, 0},
             {VERBOSE_FLAG, no_argument, NULL, 0},
             {CHECK_NOW_FLAG, no_argument, NULL, 0},
@@ -64,6 +67,7 @@ int main(int argc, char **argv)
         };
         
         NSString *applicationPath = nil;
+        NSString *feedURL = nil;
         BOOL deferInstall = NO;
         BOOL verbose = NO;
         BOOL checkForUpdatesNow = NO;
@@ -85,6 +89,14 @@ int main(int argc, char **argv)
                         
                         applicationPath = [[NSString alloc] initWithUTF8String:optarg];
                         if (applicationPath == nil) {
+                            printUsage(argv);
+                            return EXIT_FAILURE;
+                        }
+                    } else if (strcmp(FEED_URL_FLAG, longOptions[optionIndex].name) == 0) {
+                        assert(optarg != NULL);
+                        
+                        feedURL = [[NSString alloc] initWithUTF8String:optarg];
+                        if (feedURL == nil) {
                             printUsage(argv);
                             return EXIT_FAILURE;
                         }
@@ -134,7 +146,7 @@ int main(int argc, char **argv)
             updatePermission = [SPUUpdatePermission updatePermissionWithChoice:SUAutomaticallyCheck sendProfile:sendProfile];
         }
         
-        SPUCommandLineDriver *driver = [[SPUCommandLineDriver alloc] initWithUpdateBundlePath:updatePath applicationBundlePath:applicationPath updatePermission:updatePermission deferInstallation:deferInstall interactiveInstallation:interactive verbose:verbose];
+        SPUCommandLineDriver *driver = [[SPUCommandLineDriver alloc] initWithUpdateBundlePath:updatePath applicationBundlePath:applicationPath customFeedURL:feedURL updatePermission:updatePermission deferInstallation:deferInstall interactiveInstallation:interactive verbose:verbose];
         if (driver == nil) {
             fprintf(stderr, "Error: Failed to initialize updater. Are the bundle paths provided valid?\n");
             return EXIT_FAILURE;

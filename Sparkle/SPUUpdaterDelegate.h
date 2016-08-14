@@ -88,7 +88,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  
  \param updater The updater instance.
  */
-- (NSString *)feedURLStringForUpdater:(SPUUpdater *)updater;
+- (nullable NSString *)feedURLStringForUpdater:(SPUUpdater *)updater;
 
 /*!
  Returns whether Sparkle should prompt the user about automatic update checks.
