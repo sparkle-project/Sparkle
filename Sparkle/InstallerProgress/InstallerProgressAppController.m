@@ -194,6 +194,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (!self.willTerminate) {
+            // We only launch applications, but I'm not sure how reliable -launchApplicationAtURL:options:config: is so we're not using it
+            // Eg: http://www.openradar.me/10952677
             if (![[NSWorkspace sharedWorkspace] openFile:pathToRelaunch]) {
                 SULog(@"Error: Failed to relaunch bundle at %@", pathToRelaunch);
             }
