@@ -330,10 +330,12 @@
 - (void)terminateApplication
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        // In case our termination request fails or is delayed
-        [self removeUpdateButton];
-        
-        [self.uiComponent terminateApplicationForBundle:self.applicationBundle];
+        if ([self.uiComponent terminateApplicationForBundleAndWillTerminateCurrentApplication:self.applicationBundle]) {
+            // In case our termination request fails or is delayed
+            [self removeUpdateButton];
+        } else {
+            [self addUpdateButtonWithTitle:@"Installing…"];
+        }
     });
 }
 

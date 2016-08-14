@@ -15,6 +15,8 @@ SU_EXPORT @interface SPUUserDriverUIComponent : NSObject
 
 - (instancetype)init;
 
+- (BOOL)terminateApplicationForBundleAndWillTerminateCurrentApplication:(NSBundle *)bundle;
+
 - (void)terminateApplicationForBundle:(NSBundle *)bundle;
 
 - (BOOL)applicationIsAliveForBundle:(NSBundle *)bundle;

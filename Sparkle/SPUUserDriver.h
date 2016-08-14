@@ -252,11 +252,12 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 - (void)showInstallingUpdate;
 
 /*!
- * Terminate the application
+ * Terminate the application and show or dismiss installer progress.
  *
- * Sparkle is signaling that it wants the application to request for application termination.
- * Care should be taken if the request for application termination fails or is delayed.
- * Eg: may want to hide installation status windows in case termination doesn't happen right away
+ * Sparkle is asking us to send a request to terminate the application.
+ *
+ * If this will terminate the current application, one may decide to dismiss progress UI in case the termination request is delayed or canceled.
+ * Or if this will terminate a remote application, one may decide to show the user that the update is currently installing.
  *
  * This can be called from any thread
  */

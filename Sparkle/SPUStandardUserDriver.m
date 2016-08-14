@@ -379,19 +379,26 @@
     });
 }
 
+- (void)_showInstallingUpdate
+{
+    [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
+    [self.statusController setButtonEnabled:NO];
+}
+
 - (void)showInstallingUpdate
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
-        [self.statusController setButtonEnabled:NO];
+        [self _showInstallingUpdate];
     });
 }
 
 - (void)showUpdateInstallationDidFinishWithAcknowledgement:(void (^)(void))acknowledgement
 {
-    // Deciding not to show anything here
-    [self.coreComponent registerAcknowledgement:acknowledgement];
-    [self.coreComponent acceptAcknowledgement];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // Deciding not to show anything here
+        [self.coreComponent registerAcknowledgement:acknowledgement];
+        [self.coreComponent acceptAcknowledgement];
+    });
 }
 
 #pragma mark Aborting Everything
@@ -399,13 +406,6 @@
 - (void)terminateApplication
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        // if a user chooses to NOT relaunch the app (as is the case with WebKit
-        // when it asks you if you are sure you want to close the app with multiple
-        // tabs open), the status window still stays on the screen and obscures
-        // other windows; with this fix, it doesn't
-        [self.statusController close];
-        self.statusController = nil;
-        
         // Give the delegate a deferred chance for providing an application path
         // This is a private API and used by SUUpdater
         NSString *applicationPath = nil;
@@ -421,7 +421,16 @@
             applicationBundle = self.applicationBundle;
         }
         
-        [self.uiComponent terminateApplicationForBundle:applicationBundle];
+        if ([self.uiComponent terminateApplicationForBundleAndWillTerminateCurrentApplication:applicationBundle]) {
+            // if a user chooses to NOT relaunch the app (as is the case with WebKit
+            // when it asks you if you are sure you want to close the app with multiple
+            // tabs open), the status window still stays on the screen and obscures
+            // other windows; with this fix, it doesn't
+            [self.statusController close];
+            self.statusController = nil;
+        } else {
+            [self _showInstallingUpdate];
+        }
     });
 }
 

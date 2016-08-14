@@ -21,10 +21,23 @@
 
 - (void)terminateApplicationForBundle:(NSBundle *)bundle
 {
+    [self terminateApplicationForBundleAndWillTerminateCurrentApplication:bundle];
+}
+
+- (BOOL)terminateApplicationForBundleAndWillTerminateCurrentApplication:(NSBundle *)bundle
+{
+    NSRunningApplication *currentRunningApplication = [NSRunningApplication currentApplication];
+    BOOL willTerminateSelf = NO;
+    
     NSArray<NSRunningApplication *> *runningApplications = [SPUApplicationInfo runningApplicationsWithBundle:bundle];
     for (NSRunningApplication *runningApplication in runningApplications) {
+        if (!willTerminateSelf && [currentRunningApplication isEqual:runningApplication]) {
+            willTerminateSelf = YES;
+        }
         [runningApplication terminate];
     }
+    
+    return willTerminateSelf;
 }
 
 - (BOOL)applicationIsAliveForBundle:(NSBundle *)bundle
