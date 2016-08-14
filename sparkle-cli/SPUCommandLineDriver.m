@@ -63,20 +63,27 @@ void _SULogDisableStandardErrorStream(void);
     return self;
 }
 
-- (void)updater:(SPUUpdater *)__unused updater willScheduleUpdateCheckAfterDelay:(NSTimeInterval)delay __attribute__((noreturn))
+// Because the user driver dispatches to the main queue asynchronously, we should do so here too
+// to preserve the order of handled events
+
+- (void)updater:(SPUUpdater *)__unused updater willScheduleUpdateCheckAfterDelay:(NSTimeInterval)delay
 {
-    if (self.verbose) {
-        fprintf(stderr, "Last update check occurred too soon. Try again after %0.0f second(s).", delay);
-    }
-    exit(EXIT_SUCCESS);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.verbose) {
+            fprintf(stderr, "Last update check occurred too soon. Try again after %0.0f second(s).", delay);
+        }
+        exit(EXIT_SUCCESS);
+    });
 }
 
-- (void)updaterWillIdleSchedulingUpdates:(SPUUpdater *)__unused updater __attribute__((noreturn))
+- (void)updaterWillIdleSchedulingUpdates:(SPUUpdater *)__unused updater
 {
-    if (self.verbose) {
-        fprintf(stderr, "Automatic update checks are disabled. Exiting.\n");
-    }
-    exit(EXIT_SUCCESS);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.verbose) {
+            fprintf(stderr, "Automatic update checks are disabled. Exiting.\n");
+        }
+        exit(EXIT_SUCCESS);
+    });
 }
 
 - (BOOL)updaterShouldAllowInstallerInteraction:(SPUUpdater *)__unused updater
@@ -94,28 +101,34 @@ void _SULogDisableStandardErrorStream(void);
 // In case we find an update during probing, otherwise we leave this to the user driver
 - (void)updater:(SPUUpdater *)__unused updater didFindValidUpdate:(SUAppcastItem *)__unused item
 {
-    if (self.probingForUpdates) {
-        if (self.verbose) {
-            fprintf(stderr, "Update available!\n");
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.probingForUpdates) {
+            if (self.verbose) {
+                fprintf(stderr, "Update available!\n");
+            }
+            exit(EXIT_SUCCESS);
         }
-        exit(EXIT_SUCCESS);
-    }
+    });
 }
 
-- (void)updaterDidNotFindUpdate:(SPUUpdater *)__unused updater __attribute__((noreturn))
+- (void)updaterDidNotFindUpdate:(SPUUpdater *)__unused updater
 {
-    if (self.verbose) {
-        fprintf(stderr, "No update available!\n");
-    }
-    exit(EXIT_FAILURE);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.verbose) {
+            fprintf(stderr, "No update available!\n");
+        }
+        exit(EXIT_FAILURE);
+    });
 }
 
-- (void)updater:(SPUUpdater *)__unused updater didAbortWithError:(NSError *)error __attribute__((noreturn))
+- (void)updater:(SPUUpdater *)__unused updater didAbortWithError:(NSError *)error
 {
-    if (self.verbose) {
-        fprintf(stderr, "Aborted update with error (%ld): %s\n", (long)error.code, error.localizedDescription.UTF8String);
-    }
-    exit(EXIT_FAILURE);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.verbose) {
+            fprintf(stderr, "Aborted update with error (%ld): %s\n", (long)error.code, error.localizedDescription.UTF8String);
+        }
+        exit(EXIT_FAILURE);
+    });
 }
 
 - (BOOL)updaterShouldDownloadReleaseNotes:(SPUUpdater *)__unused updater
