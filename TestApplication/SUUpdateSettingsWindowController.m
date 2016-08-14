@@ -13,6 +13,7 @@
 @interface SUUpdateSettingsWindowController ()
 
 @property (nonatomic) SPUUpdater *updater;
+@property (nonatomic, readonly) BOOL customUserDriver;
 @property (nonatomic) id<SPUStandardUserDriverProtocol> userDriver;
 
 @end
@@ -20,7 +21,17 @@
 @implementation SUUpdateSettingsWindowController
 
 @synthesize updater = _updater;
+@synthesize customUserDriver = _customUserDriver;
 @synthesize userDriver = _userDriver;
+
+- (instancetype)initWithCustomUserDriver:(BOOL)customUserDriver
+{
+    self = [super init];
+    if (self != nil) {
+        _customUserDriver = customUserDriver;
+    }
+    return self;
+}
 
 - (NSString *)windowNibName
 {
@@ -34,7 +45,7 @@
     
     // If the user is holding down command, we use the popup title user driver instead
     id<SPUUserDriver, SPUStandardUserDriverProtocol> userDriver;
-    if (([NSEvent modifierFlags] & NSShiftKeyMask) != 0) {
+    if (self.customUserDriver) {
         userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithApplicationBundle:applicationBundle window:self.window];
     } else {
         userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle applicationBundle:applicationBundle delegate:nil];
