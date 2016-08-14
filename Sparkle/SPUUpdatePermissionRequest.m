@@ -8,6 +8,10 @@
 
 #import "SPUUpdatePermissionRequest.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 static NSString *SPUUpdatePermissionRequestSystemProfileKey = @"SPUUpdatePermissionRequestSystemProfile";
 
 @implementation SPUUpdatePermissionRequest
