@@ -44,6 +44,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 @property (readonly, copy) NSURL *parameterizedFeedURL;
 
+@property (nonatomic, readonly) id<SPUUserDriver> userDriver;
+@property (weak, readonly, nullable) id<SPUUpdaterDelegate> delegate;
 @property (nonatomic) id <SUUpdateDriver> driver;
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly) NSBundle *applicationBundle;

@@ -65,9 +65,6 @@ SU_EXPORT @interface SPUUpdater : NSObject
  */
 - (BOOL)startUpdater:(NSError * __autoreleasing *)error;
 
-@property (weak, readonly, nullable) id<SPUUpdaterDelegate> delegate;
-@property (nonatomic, readonly) id<SPUUserDriver> userDriver;
-
 @property (readonly, strong) NSBundle *hostBundle;
 @property (strong, readonly) NSBundle *sparkleBundle;
 
@@ -91,7 +88,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
 @property (nonatomic) BOOL automaticallyDownloadsUpdates;
 
 /*!
-    Checks for updates, and displays progress while doing so
+    Checks for updates, and displays progress while doing so.
  
     This is meant for users initiating an update check
  */

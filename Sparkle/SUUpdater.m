@@ -231,14 +231,14 @@ static NSMutableDictionary *sharedUpdaters = nil;
 
 - (void)standardUserDriverWillShowModalAlert
 {
-    if ([self.updater.delegate respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
+    if ([self.delegate respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
         [self.delegate updaterWillShowModalAlert:self];
     }
 }
 
 - (void)standardUserDriverDidShowModalAlert
 {
-    if ([self.updater.delegate respondsToSelector:@selector(updaterDidShowModalAlert:)]) {
+    if ([self.delegate respondsToSelector:@selector(updaterDidShowModalAlert:)]) {
         [self.delegate updaterDidShowModalAlert:self];
     }
 }
@@ -246,7 +246,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
 - (_Nullable id <SUVersionDisplay>)standardUserDriverRequestsVersionDisplayer
 {
     id <SUVersionDisplay> versionDisplayer = nil;
-    if ([self.updater.delegate respondsToSelector:@selector(versionDisplayerForUpdater:)]) {
+    if ([self.delegate respondsToSelector:@selector(versionDisplayerForUpdater:)]) {
         versionDisplayer = [self.delegate versionDisplayerForUpdater:self];
     }
     return versionDisplayer;
