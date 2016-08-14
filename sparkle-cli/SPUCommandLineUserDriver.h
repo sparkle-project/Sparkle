@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SPUCommandLineUserDriver : NSObject <SPUUserDriver>
 
-- (instancetype)initWithApplicationBundle:(NSBundle *)applicationBundle updatePermission:(nullable SPUUpdatePermission *)updatePermission deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose;
+- (instancetype)initWithApplicationBundle:(NSBundle *)applicationBundle updatePermissionResponse:(nullable SPUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose;
 
 @end
 

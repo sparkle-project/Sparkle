@@ -31,19 +31,19 @@ static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
 
 @implementation SUSystemProfiler
 
-+ (NSDictionary *)modelTranslationTable
++ (NSDictionary<NSString *, NSString *> *)modelTranslationTable
 {
     // Use explicit class to use the correct bundle even when subclassed
     NSString *path = [[NSBundle bundleForClass:[SUSystemProfiler class]] pathForResource:@"SUModelTranslation" ofType:@"plist"];
     return [[NSDictionary alloc] initWithContentsOfFile:path];
 }
 
-+ (NSMutableArray *)systemProfileArrayForHost:(SUHost *)host
++ (NSArray<NSDictionary<NSString *, NSString *> *> *)systemProfileArrayForHost:(SUHost *)host
 {
-    NSDictionary *modelTranslation = [self modelTranslationTable];
+    NSDictionary<NSString *, NSString *> *modelTranslation = [self modelTranslationTable];
 
     // Gather profile information and append it to the URL.
-    NSMutableArray *profileArray = [NSMutableArray array];
+    NSMutableArray<NSDictionary<NSString *, NSString *> *> *profileArray = [NSMutableArray array];
     NSArray *profileDictKeys = @[@"key", @"displayKey", @"value", @"displayValue"];
     int error = 0;
     int value = 0;
@@ -161,7 +161,7 @@ static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
         [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerMemoryKey, @"Memory (MB)", @(megabytes), @(megabytes)] forKeys:profileDictKeys]];
     }
 
-    return profileArray;
+    return [profileArray copy];
 }
 
 @end

@@ -121,11 +121,12 @@
 
 #pragma mark Update Permission
 
-- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SPUUpdatePermission *))reply
+- (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)__unused request reply:(void (^)(SPUUpdatePermissionResponse *))reply
 {
     // Just make a decision..
     dispatch_async(dispatch_get_main_queue(), ^{
-        reply([SPUUpdatePermission updatePermissionWithChoice:SUAutomaticallyCheck sendProfile:NO]);
+        SPUUpdatePermissionResponse *response = [[SPUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:YES sendSystemProfile:NO];
+        reply(response);
     });
 }
 

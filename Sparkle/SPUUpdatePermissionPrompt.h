@@ -11,11 +11,11 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class SUHost, SPUUpdatePermission;
+@class SUHost, SPUUpdatePermissionRequest, SPUUpdatePermissionResponse;
 
 @interface SPUUpdatePermissionPrompt : NSWindowController
 
-+ (void)promptWithHost:(SUHost *)host systemProfile:(NSArray *)systemProfile reply:(void (^)(SPUUpdatePermission *))reply;
++ (void)promptWithHost:(SUHost *)host request:(SPUUpdatePermissionRequest *)request reply:(void (^)(SPUUpdatePermissionResponse *))reply;
 
 - (IBAction)toggleMoreInfo:(id)sender;
 - (IBAction)finishPrompt:(id)sender;

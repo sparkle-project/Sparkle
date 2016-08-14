@@ -141,12 +141,12 @@ int main(int argc, char **argv)
             return EXIT_FAILURE;
         }
         
-        SPUUpdatePermission *updatePermission = nil;
+        SPUUpdatePermissionResponse *updatePermissionResponse = nil;
         if (grantAutomaticChecking) {
-            updatePermission = [SPUUpdatePermission updatePermissionWithChoice:SUAutomaticallyCheck sendProfile:sendProfile];
+            updatePermissionResponse = [[SPUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:YES sendSystemProfile:sendProfile];
         }
         
-        SPUCommandLineDriver *driver = [[SPUCommandLineDriver alloc] initWithUpdateBundlePath:updatePath applicationBundlePath:applicationPath customFeedURL:feedURL updatePermission:updatePermission deferInstallation:deferInstall interactiveInstallation:interactive verbose:verbose];
+        SPUCommandLineDriver *driver = [[SPUCommandLineDriver alloc] initWithUpdateBundlePath:updatePath applicationBundlePath:applicationPath customFeedURL:feedURL updatePermissionResponse:updatePermissionResponse deferInstallation:deferInstall interactiveInstallation:interactive verbose:verbose];
         if (driver == nil) {
             fprintf(stderr, "Error: Failed to initialize updater. Are the bundle paths provided valid?\n");
             return EXIT_FAILURE;

@@ -10,7 +10,8 @@
 #import "SPUUpdaterDelegate.h"
 #import "SPUUpdaterSettings.h"
 #import "SUHost.h"
-#import "SPUUpdatePermission.h"
+#import "SPUUpdatePermissionRequest.h"
+#import "SPUUpdatePermissionResponse.h"
 #import "SUUpdateDriver.h"
 #import "SUConstants.h"
 #import "SULog.h"
@@ -290,7 +291,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
 
     if (shouldPrompt) {
-        NSArray *profileInfo = [SUSystemProfiler systemProfileArrayForHost:self.host];
+        NSArray<NSDictionary<NSString *, NSString *> *> *profileInfo = [SUSystemProfiler systemProfileArrayForHost:self.host];
         // Always say we're sending the system profile here so that the delegate displays the parameters it would send.
         if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
             NSArray *feedParameters = [self.delegate feedParametersForUpdater:self sendingSystemProfile:YES];
@@ -299,12 +300,14 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             }
         }
         
+        SPUUpdatePermissionRequest *updatePermissionRequest = [[SPUUpdatePermissionRequest alloc] initWithSystemProfile:profileInfo];
+        
         __weak SPUUpdater *weakSelf = self;
-        [self.userDriver requestUpdatePermissionWithSystemProfile:profileInfo reply:^(SPUUpdatePermission *result) {
+        [self.userDriver showUpdatePermissionRequest:updatePermissionRequest reply:^(SPUUpdatePermissionResponse *response) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 SPUUpdater *strongSelf = weakSelf;
                 if (strongSelf != nil) {
-                    [strongSelf updatePermissionPromptFinishedWithResult:result];
+                    [strongSelf updatePermissionRequestFinishedWithResponse:response];
                     // Schedule checks, but make sure we ignore the delayed call from KVO
                     [strongSelf resetUpdateCycle];
                 }
@@ -323,10 +326,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
 }
 
-- (void)updatePermissionPromptFinishedWithResult:(SPUUpdatePermission *)result
+- (void)updatePermissionRequestFinishedWithResponse:(SPUUpdatePermissionResponse *)response
 {
-    [self.host setBool:result.sendProfile forUserDefaultsKey:SUSendProfileInfoKey];
-    [self setAutomaticallyChecksForUpdates:(result.choice == SUAutomaticallyCheck)];
+    [self.host setBool:response.sendSystemProfile forUserDefaultsKey:SUSendProfileInfoKey];
+    [self setAutomaticallyChecksForUpdates:response.automaticUpdateChecks];
 }
 
 - (NSDate *)lastUpdateCheckDate

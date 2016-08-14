@@ -14,7 +14,7 @@
 @interface SPUCommandLineUserDriver ()
 
 @property (nonatomic, readonly) NSBundle *applicationBundle;
-@property (nonatomic, nullable, readonly) SPUUpdatePermission *updatePermission;
+@property (nonatomic, nullable, readonly) SPUUpdatePermissionResponse *updatePermissionResponse;
 @property (nonatomic, readonly) BOOL deferInstallation;
 @property (nonatomic, readonly) BOOL verbose;
 @property (nonatomic, readonly) SPUUserDriverCoreComponent *coreComponent;
@@ -27,7 +27,7 @@
 @implementation SPUCommandLineUserDriver
 
 @synthesize applicationBundle = _applicationBundle;
-@synthesize updatePermission = _updatePermission;
+@synthesize updatePermissionResponse = _updatePermissionResponse;
 @synthesize deferInstallation = _deferInstallation;
 @synthesize verbose = _verbose;
 @synthesize coreComponent = _coreComponent;
@@ -35,12 +35,12 @@
 @synthesize bytesDownloaded = _bytesDownloaded;
 @synthesize bytesToDownload = _bytesToDownload;
 
-- (instancetype)initWithApplicationBundle:(NSBundle *)applicationBundle updatePermission:(nullable SPUUpdatePermission *)updatePermission deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose
+- (instancetype)initWithApplicationBundle:(NSBundle *)applicationBundle updatePermissionResponse:(nullable SPUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose
 {
     self = [super init];
     if (self != nil) {
         _applicationBundle = applicationBundle;
-        _updatePermission = updatePermission;
+        _updatePermissionResponse = updatePermissionResponse;
         _deferInstallation = deferInstallation;
         _verbose = verbose;
         _coreComponent = [[SPUUserDriverCoreComponent alloc] init];
@@ -56,18 +56,18 @@
     });
 }
 
-- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)__unused systemProfile reply:(void (^)(SPUUpdatePermission *))reply
+- (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)__unused request reply:(void (^)(SPUUpdatePermissionResponse *))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.updatePermission == nil) {
+        if (self.updatePermissionResponse == nil) {
             // We don't want to make this decision on behalf of the user.
             fprintf(stderr, "Error: Asked to grant update permission. Exiting.\n");
             exit(EXIT_FAILURE);
         } else {
             if (self.verbose) {
-                fprintf(stderr, "Granting permission for automatic update checks with sending system profile %s...\n", self.updatePermission.sendProfile ? "enabled" : "disabled");
+                fprintf(stderr, "Granting permission for automatic update checks with sending system profile %s...\n", self.updatePermissionResponse.sendSystemProfile ? "enabled" : "disabled");
             }
-            reply(self.updatePermission);
+            reply(self.updatePermissionResponse);
         }
     });
 }

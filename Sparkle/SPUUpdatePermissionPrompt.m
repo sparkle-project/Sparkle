@@ -7,7 +7,8 @@
 //
 
 #import "SPUUpdatePermissionPrompt.h"
-#import "SPUUpdatePermission.h"
+#import "SPUUpdatePermissionRequest.h"
+#import "SPUUpdatePermissionResponse.h"
 #import "SULocalizations.h"
 
 #import "SUHost.h"
@@ -26,7 +27,7 @@
 @property (weak) IBOutlet NSButton *moreInfoButton;
 @property (weak) IBOutlet NSTableView *profileTableView;
 
-@property (nonatomic, readonly) void (^reply)(SPUUpdatePermission *);
+@property (nonatomic, readonly) void (^reply)(SPUUpdatePermissionResponse *);
 
 @end
 
@@ -42,7 +43,7 @@
 @synthesize moreInfoButton;
 @synthesize profileTableView;
 
-- (instancetype)initPromptWithHost:(SUHost *)theHost systemProfile:(NSArray *)systemProfile reply:(void (^)(SPUUpdatePermission *))reply
+- (instancetype)initPromptWithHost:(SUHost *)theHost request:(SPUUpdatePermissionRequest *)request reply:(void (^)(SPUUpdatePermissionResponse *))reply
 {
     self = [super initWithWindowNibName:@"SPUUpdatePermissionPrompt"];
     if (self)
@@ -51,13 +52,13 @@
         self.host = theHost;
         self.isShowingMoreInfo = NO;
         self.shouldSendProfile = [self shouldAskAboutProfile];
-        self.systemProfileInformationArray = systemProfile;
+        self.systemProfileInformationArray = request.systemProfile;
         [self setShouldCascadeWindows:NO];
     }
     return self;
 }
 
-+ (void)promptWithHost:(SUHost *)host systemProfile:(NSArray *)systemProfile reply:(void (^)(SPUUpdatePermission *))reply
++ (void)promptWithHost:(SUHost *)host request:(SPUUpdatePermissionRequest *)request reply:(void (^)(SPUUpdatePermissionResponse *))reply
 {
     // If this is a background application we need to focus it in order to bring the prompt
     // to the user's attention. Otherwise the prompt would be hidden behind other applications and
@@ -67,7 +68,7 @@
     }
     
     if (![NSApp modalWindow]) { // do not prompt if there is is another modal window on screen
-        SPUUpdatePermissionPrompt *prompt = [[[self class] alloc] initPromptWithHost:host systemProfile:systemProfile reply:reply];
+        SPUUpdatePermissionPrompt *prompt = [[[self class] alloc] initPromptWithHost:host request:request reply:reply];
         NSWindow *window = [prompt window];
         if (window) {
             [NSApp runModalForWindow:window];
@@ -153,7 +154,8 @@
 
 - (IBAction)finishPrompt:(id)sender
 {
-    self.reply([SPUUpdatePermission updatePermissionWithChoice:([sender tag] == 1 ? SUAutomaticallyCheck : SUDoNotAutomaticallyCheck) sendProfile:self.shouldSendProfile]);
+    SPUUpdatePermissionResponse *response = [[SPUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:([sender tag] == 1) sendSystemProfile:self.shouldSendProfile];
+    self.reply(response);
     
     [[self window] close];
     [NSApp stopModal];

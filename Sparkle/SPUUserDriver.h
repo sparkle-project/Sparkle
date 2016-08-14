@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SPUUpdatePermission, SUAppcastItem, SPUDownloadData;
+@class SPUUpdatePermissionRequest, SPUUpdatePermissionResponse, SUAppcastItem, SPUDownloadData;
 
 /*!
  The API in Sparkle for controlling the user interaction.
@@ -43,16 +43,17 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 - (void)showCanCheckForUpdates:(BOOL)canCheckForUpdates;
 
 /*!
- * Request updater permission from the user
+ * Show an updater permission request to the user
  *
- * Ask the user if they want automatic update checks to be on or off, and if they want to send an anonymous system profile
+ * Ask the user for their permission regarding update checks.
  * This is typically only called once per app installation.
  *
- * @param reply A reply supplying whether the user wants automatic update checks off or on, and whether they want to send their system profile
+ * @param request The update permission request.
+ * @param reply A reply with a update permission response.
  *
  * This can be called from any thread
  */
-- (void)requestUpdatePermissionWithSystemProfile:(NSArray *)systemProfile reply:(void (^)(SPUUpdatePermission *))reply;
+- (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)request reply:(void (^)(SPUUpdatePermissionResponse *))reply;
 
 /*!
  * Show the user initating an update check
