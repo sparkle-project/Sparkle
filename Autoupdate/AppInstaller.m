@@ -378,6 +378,29 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 return;
             }
             
+            // Make sure the downloaded archive we moved over is a regular file and not a symbolic link placed by an attacker
+            NSError *attributesError = nil;
+            NSString *downloadDestinationPath = downloadDestinationURL.path;
+            if (downloadDestinationPath == nil) {
+                SULog(@"Error: Failed to retrieve download archive path from %@", downloadDestinationURL);
+                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                return;
+            }
+            
+            NSDictionary<NSString *, id> *archiveAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:downloadDestinationPath error:&attributesError];
+            
+            if (archiveAttributes == nil) {
+                SULog(@"Error: Failed to retrieve download archive attributes from %@", downloadDestinationPath);
+                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                return;
+            }
+            
+            if (![archiveAttributes[NSFileType] isEqualToString:NSFileTypeRegular]) {
+                SULog(@"Error: Received bad archive file type: %@", archiveAttributes[NSFileType]);
+                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                return;
+            }
+            
             // Carry these properities separately rather than using the SUInstallationInputData object
             // Some of our properties may slightly differ than our input and we don't want to make the mistake of using one of those
             self.installationType = installationType;
