@@ -44,8 +44,10 @@ After the installer launches, the updater creates a connection to the installer 
 
 The installer takes note of all this information, but it moves the downloaded item into a update directory it chooses for itself. This is for two reasons:
 
-1. If the installer is running as root, it makes sense to work in a directory owned by root.
+1. If the installer is running at a higher level than the process that submitted it (eg: sandboxed -> user, or user -> root), it make sense from a security perspective to move the file into its own support directory. This could prevent an attacker from manipulating the download while the installer is using it.
 2. The updater, or another updater running, or someone else probably won't accidently remove the downloaded item if the installer decides to 'own' it.
+
+After the installer moves the downloaded item, it makes sure the item is not a symbolic link. If it is a non-regular file, the installer aborts, causing the updater to abort as well. Note this check is done after the move rather than before due to potential race conditions an attacker could create.
 
 ### Update Extraction
 After the installer receives the input installation data, it starts extracting the update. The installer first sends a `SUExtractionStarted` message.
