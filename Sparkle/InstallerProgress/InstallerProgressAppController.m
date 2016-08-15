@@ -190,6 +190,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     });
 }
 
+// The pathToRelaunch passed to here is not necessarily the same as the one passed in -registerRelaunchBundlePath:reply: if the developer uses SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME
 - (void)relaunchPath:(NSString *)pathToRelaunch
 {
     dispatch_async(dispatch_get_main_queue(), ^{
