@@ -6,5 +6,9 @@
 	<true/>
 	<key>com.apple.security.network.server</key>
 	<true/>
+	<key>com.apple.security.temporary-exception.shared-preference.read-write</key>
+	<array>
+		<string>org.sparkle-project.SparkleTestApp</string>
+	</array>
 </dict>
 </plist>
