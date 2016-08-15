@@ -168,6 +168,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
         if (relaunchBundlePath != nil && !self.willTerminate) {
             NSBundle *relaunchBundle = [NSBundle bundleWithPath:relaunchBundlePath];
             if (relaunchBundle == nil) {
+                SULog(@"Error: Encountered invalid path for waiting termination: %@", relaunchBundlePath);
                 [self cleanupAndExitWithStatus:EXIT_FAILURE];
             }
             
@@ -191,12 +192,21 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 }
 
 // The pathToRelaunch passed to here is not necessarily the same as the one passed in -registerRelaunchBundlePath:reply: if the developer uses SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME
+// Note the installer won't tell us to launch an application unless it was already running before
 - (void)relaunchPath:(NSString *)pathToRelaunch
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (!self.willTerminate) {
             // We only launch applications, but I'm not sure how reliable -launchApplicationAtURL:options:config: is so we're not using it
             // Eg: http://www.openradar.me/10952677
+            
+            // We should at least make sure we're opening a bundle however
+            NSBundle *relaunchBundle = [NSBundle bundleWithPath:pathToRelaunch];
+            if (relaunchBundle == nil) {
+                SULog(@"Error: Encountered invalid path to relaunch: %@", pathToRelaunch);
+                [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            }
+            
             if (![[NSWorkspace sharedWorkspace] openFile:pathToRelaunch]) {
                 SULog(@"Error: Failed to relaunch bundle at %@", pathToRelaunch);
             }
