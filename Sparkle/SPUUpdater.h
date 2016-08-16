@@ -80,8 +80,8 @@ SU_EXPORT @interface SPUUpdater : NSObject
  * proceeds as usual.
  *
  * If the fully automated updating is turned on, however, this will invoke that
- * behavior, and if an update is found, it will be downloaded and prepped for
- * installation.
+ * behavior, and if an update is found, it will be downloaded. If possible, it will be prepped for installation without disrupting the user.
+ * Otherwise, the user may be alerted of the update that was just downloaded and be able to resume the installation.
  */
 - (void)checkForUpdatesInBackground;
 
