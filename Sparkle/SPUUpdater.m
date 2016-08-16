@@ -420,7 +420,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             }
             
             id <SUUpdateDriver> updateDriver;
-            if (!installerIsRunning && [strongSelf automaticallyDownloadsUpdates] && [strongSelf allowsAutomaticUpdates] && strongSelf.resumableUpdate == nil) {
+            if (!installerIsRunning && [strongSelf automaticallyDownloadsUpdates] && strongSelf.resumableUpdate == nil) {
                 updateDriver =
                 [[SUAutomaticUpdateDriver alloc]
                  initWithHost:strongSelf.host
@@ -614,12 +614,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (BOOL)automaticallyDownloadsUpdates
 {
-    return [self.updaterSettings automaticallyDownloadsUpdates];
-}
-
-- (BOOL)allowsAutomaticUpdates
-{
-    return [self.updaterSettings allowsAutomaticUpdates];
+    return [self.updaterSettings allowsAutomaticUpdates] && [self.updaterSettings automaticallyDownloadsUpdates];
 }
 
 - (void)setFeedURL:(NSURL *)feedURL

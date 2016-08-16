@@ -88,7 +88,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
 /*!
  * A property indicating whether or not updates can be automatically downloaded in the background.
  *
- * Note that the developer can disallow automatic downloading of updates.
+ * Note that the developer can disallow automatic downloading of updates from being enabled.
  */
 @property (nonatomic) BOOL automaticallyDownloadsUpdates;
 
