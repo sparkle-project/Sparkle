@@ -65,12 +65,32 @@ SU_EXPORT @interface SPUUpdater : NSObject
  */
 - (BOOL)startUpdater:(NSError * __autoreleasing *)error;
 
+/*!
+ * The host bundle that is being updated.
+ */
 @property (readonly, strong) NSBundle *hostBundle;
+
+/*!
+ * The bundle this class (SPUUpdater) is loaded into
+ */
 @property (strong, readonly) NSBundle *sparkleBundle;
 
+/*!
+ * A property indicating whether or not to check for updates automatically.
+ */
 @property (nonatomic) BOOL automaticallyChecksForUpdates;
 
+/*!
+ * A property indicating the current automatic update check interval.
+ */
 @property (nonatomic) NSTimeInterval updateCheckInterval;
+
+/*!
+ * A property indicating whether or not updates can be automatically downloaded in the background.
+ *
+ * Note that the developer can disallow automatic downloading of updates.
+ */
+@property (nonatomic) BOOL automaticallyDownloadsUpdates;
 
 /*!
  * The URL of the appcast used to download update information.
@@ -79,13 +99,22 @@ SU_EXPORT @interface SPUUpdater : NSObject
  */
 @property (copy) NSURL *feedURL;
 
+/*!
+ * The user agent used when checking for updates.
+ *
+ * The default implementation can be overrided.
+ */
 @property (nonatomic, copy) NSString *userAgentString;
 
+/*!
+ * The HTTP headers used when checking for updates.
+ */
 @property (copy, nullable) NSDictionary *httpHeaders;
 
+/*!
+ * A property indicating whether or not the user's system profile information is sent when checking for updates.
+ */
 @property (nonatomic) BOOL sendsSystemProfile;
-
-@property (nonatomic) BOOL automaticallyDownloadsUpdates;
 
 /*!
     Checks for updates, and displays progress while doing so.
