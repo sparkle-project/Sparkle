@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
  This protocol is used for implementing a user interface for the Sparkle updater. Sparkle's internal drivers tell
  an object that implements this protocol what actions to take and show to the user.
  
- Every method in this protocol has a void return type and can optionally take a single parameter block, which waits for
+ Every method in this protocol is required (i.e, not optional) and has a void return type and can optionally take a single parameter block, which waits for
  a response back from the user driver. Note that every parameter block, or reply, *must* be responded to eventually -
  that is, none can be ignored. Furthermore, they can only be replied to *once* - a reply or completion block should be considered
  invalidated after it's once used. The faster a reply can be made, the more Sparkle may be able to idle, and so the better.
