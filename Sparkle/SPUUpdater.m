@@ -228,7 +228,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
     
     if (!hasPublicDSAKey) {
-        if (!servingOverHttps) {
+        if (!servingOverHttps || ![SUCodeSigningVerifier bundleAtPathIsCodeSigned:[[self hostBundle] bundlePath]]) {
             if (error != NULL) {
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: @"For security reasons, updates need to be signed with a DSA key. See Sparkle's documentation for more information." }];
             }
