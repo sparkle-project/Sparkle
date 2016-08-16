@@ -403,25 +403,30 @@
 
 #pragma mark Aborting Everything
 
+- (BOOL)_terminateApplicationAndWillTerminateCurrentApplication
+{
+    // Give the delegate a deferred chance for providing an application path
+    // This is a private API and used by SUUpdater
+    NSString *applicationPath = nil;
+    if ([self.delegate respondsToSelector:@selector(_pathToTerminateForStandardUserDriver)]) {
+        applicationPath = [(NSObject *)self.delegate _pathToTerminateForStandardUserDriver];
+    }
+    
+    NSBundle *applicationBundle;
+    if (applicationPath != nil) {
+        applicationBundle = [NSBundle bundleWithPath:applicationPath];
+        assert(applicationBundle != nil);
+    } else {
+        applicationBundle = self.applicationBundle;
+    }
+    
+    return [self.uiComponent terminateApplicationForBundleAndWillTerminateCurrentApplication:applicationBundle];
+}
+
 - (void)terminateApplication
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        // Give the delegate a deferred chance for providing an application path
-        // This is a private API and used by SUUpdater
-        NSString *applicationPath = nil;
-        if ([self.delegate respondsToSelector:@selector(_pathToTerminateForStandardUserDriver)]) {
-            applicationPath = [(NSObject *)self.delegate _pathToTerminateForStandardUserDriver];
-        }
-        
-        NSBundle *applicationBundle;
-        if (applicationPath != nil) {
-            applicationBundle = [NSBundle bundleWithPath:applicationPath];
-            assert(applicationBundle != nil);
-        } else {
-            applicationBundle = self.applicationBundle;
-        }
-        
-        if ([self.uiComponent terminateApplicationForBundleAndWillTerminateCurrentApplication:applicationBundle]) {
+        if ([self _terminateApplicationAndWillTerminateCurrentApplication]) {
             // if a user chooses to NOT relaunch the app (as is the case with WebKit
             // when it asks you if you are sure you want to close the app with multiple
             // tabs open), the status window still stays on the screen and obscures
@@ -431,6 +436,13 @@
         } else {
             [self _showInstallingUpdate];
         }
+    });
+}
+
+- (void)terminateApplicationSilently
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self _terminateApplicationAndWillTerminateCurrentApplication];
     });
 }
 

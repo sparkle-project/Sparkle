@@ -105,7 +105,7 @@
 // otherwise the update driver will abort the update before then
 - (void)installerIsRequestingAppTermination
 {
-    [self.userDriver terminateApplication];
+    [self.userDriver terminateApplicationSilently];
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(NSError *)error

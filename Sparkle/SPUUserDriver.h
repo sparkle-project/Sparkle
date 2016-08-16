@@ -256,12 +256,25 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * Sparkle is asking us to send a request to terminate the application.
  *
- * If this will terminate the current application, one may decide to dismiss progress UI in case the termination request is delayed or canceled.
- * Or if this will terminate a remote application, one may decide to show the user that the update is currently installing.
+ * If this will terminate the current application, an implementor may decide to dismiss progress UI in case the termination request is delayed or canceled.
+ * Or if this will terminate a remote application, an implementor may decide to show the user that the update is currently installing.
  *
  * This can be called from any thread
  */
 - (void)terminateApplication;
+
+/*!
+ * Terminate the application silently.
+ *
+ * Sparkle is asking us to send a request to terminate the application without showing any UI interaction.
+ * This may be invoked after Sparkle has downloaded an update in the background automatically,
+ * and the updater's delegate has decided to install & relaunch the application without disrupting the user (think of a backgrounded application).
+ *
+ * After the application is terminated, the update will be installed and the application will be relaunched.
+ *
+ * This can be called from any thread
+ */
+- (void)terminateApplicationSilently;
 
 /*!
  * Show the user that the update installation finished

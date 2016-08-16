@@ -316,4 +316,9 @@
     });
 }
 
+- (void)terminateApplicationSilently
+{
+    [self terminateApplication];
+}
+
 @end

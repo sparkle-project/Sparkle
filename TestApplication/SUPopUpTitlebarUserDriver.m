@@ -339,6 +339,13 @@
     });
 }
 
+- (void)terminateApplicationSilently
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.uiComponent terminateApplicationForBundle:self.applicationBundle];
+    });
+}
+
 - (void)_dismissUpdateInstallation
 {
     // Make sure everything we call here does not dispatch async to main queue
