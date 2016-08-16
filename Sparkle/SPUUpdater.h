@@ -66,14 +66,35 @@ SU_EXPORT @interface SPUUpdater : NSObject
 - (BOOL)startUpdater:(NSError * __autoreleasing *)error;
 
 /*!
- * The host bundle that is being updated.
+ * Checks for updates, and displays progress while doing so.
+ *
+ * This is meant for users initiating an update check
  */
-@property (readonly, strong) NSBundle *hostBundle;
+- (void)checkForUpdates;
 
 /*!
- * The bundle this class (SPUUpdater) is loaded into
+ * Checks for updates, but does not display any UI unless an update is found.
+ *
+ * This is meant for programmatically initating a check for updates. That is,
+ * it will display no UI unless it actually finds an update, in which case it
+ * proceeds as usual.
+ *
+ * If the fully automated updating is turned on, however, this will invoke that
+ * behavior, and if an update is found, it will be downloaded and prepped for
+ * installation.
  */
-@property (strong, readonly) NSBundle *sparkleBundle;
+- (void)checkForUpdatesInBackground;
+
+/*!
+ * Begins a "probing" check for updates which will not actually offer to
+ * update to that version.
+ *
+ * However, the delegate methods
+ * SPUUpdaterDelegate::updater:didFindValidUpdate: and
+ * SPUUpdaterDelegate::updaterDidNotFindUpdate: will be called,
+ * so you can use that information in your UI.
+ */
+- (void)checkForUpdateInformation;
 
 /*!
  * A property indicating whether or not to check for updates automatically.
@@ -100,6 +121,16 @@ SU_EXPORT @interface SPUUpdater : NSObject
 @property (copy) NSURL *feedURL;
 
 /*!
+ * The host bundle that is being updated.
+ */
+@property (readonly, strong) NSBundle *hostBundle;
+
+/*!
+ * The bundle this class (SPUUpdater) is loaded into
+ */
+@property (strong, readonly) NSBundle *sparkleBundle;
+
+/*!
  * The user agent used when checking for updates.
  *
  * The default implementation can be overrided.
@@ -117,42 +148,11 @@ SU_EXPORT @interface SPUUpdater : NSObject
 @property (nonatomic) BOOL sendsSystemProfile;
 
 /*!
-    Checks for updates, and displays progress while doing so.
- 
-    This is meant for users initiating an update check
- */
-- (void)checkForUpdates;
-
-/*!
-    Checks for updates, but does not display any UI unless an update is found.
-
-    This is meant for programmatically initating a check for updates. That is,
-    it will display no UI unless it actually finds an update, in which case it
-    proceeds as usual.
-
-    If the fully automated updating is turned on, however, this will invoke that
-    behavior, and if an update is found, it will be downloaded and prepped for
-    installation.
- */
-- (void)checkForUpdatesInBackground;
-
-/*!
     Returns the date of last update check.
 
     \returns \c nil if no check has been performed.
  */
 @property (readonly, copy, nullable) NSDate *lastUpdateCheckDate;
-
-/*!
-    Begins a "probing" check for updates which will not actually offer to
-    update to that version.
-
-    However, the delegate methods
-    SPUUpdaterDelegate::updater:didFindValidUpdate: and
-    SPUUpdaterDelegate::updaterDidNotFindUpdate: will be called,
-    so you can use that information in your UI.
- */
-- (void)checkForUpdateInformation;
 
 /*!
     Appropriately schedules or cancels the update checking timer according to
