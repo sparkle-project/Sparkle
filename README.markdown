@@ -40,7 +40,7 @@ Extraction, validation, and installation of the update are all handled by the in
 
 Usage of AppKit has been minimized greatly. No linkage of it is found in the installer daemon. All code core to Sparkle's functionality prevents it from being imported. Only user driver classes and a progress agent may use AppKit for showing UI.
 
-## API Compatability
+## API Compatibility
 
 Despite decoupling update scheduling, UI, installation, and minimizing AppKit usage, a great deal of effort was made to maintain compatibility with older versions of Sparkle. A deprecated `SUUpdater` shim exists for maintaining runtime compatibility. Please check out `SPUStandardUpdaterController` and `SPUUpdater` instead for modern replacements.
 
