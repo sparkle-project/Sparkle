@@ -1,5 +1,11 @@
 # Design Practices
 
+## XPC Services
+
+XPC services in Sparkle are all optional, so the code involved in the services needs to be usable directly from the framework as well. For this to work well, if the class used in the XPC service takes a delegate, it must not be weakly referenced, so the retain cycle will have to be broken explicitly (via an explicit added invalidate method). dealloc also must not be implemented (do cleanup in custom invalidate method). As one may tell, a couple of the services are simply proxies (InstallerConnection, InstallerStatus), and I wish that didn't have to be the case -- it would be a burden to require a developer to set up a temporary exception with a specific bundle ID, and unsure how long that approach would work for in the future.
+
+The protocols used in XPC services must also not adopt other protocols (i.e, one protocol inheriting from another protocol). This is because the XPC protocol decoder on older supported systems doesn't properly handle this case, and won't be able to find that methods exist on a class.
+
 ## Singletons
 
 Singletons and other global mutable variables have been either removed entirely or completely avoided with an exception to backwards compatibility. They have no place in a well architectured framework.
