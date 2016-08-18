@@ -41,11 +41,6 @@
     });
 }
 
-- (void)dealloc
-{
-    [self cleanup];
-}
-
 - (void)cleanup
 {
     if (self.downloadFilename != nil) {
