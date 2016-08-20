@@ -1,4 +1,0 @@
-// PersistentDownloader Debug
-#include "ConfigPersistentDownloader.xcconfig"
-
-CODE_SIGN_IDENTITY = -

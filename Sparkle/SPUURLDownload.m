@@ -10,16 +10,16 @@
 #import "SPUXPCServiceInfo.h"
 #import "SPUURLRequest.h"
 #import "SPUDownloadData.h"
-#import "SUPersistentDownloaderProtocol.h"
-#import "SUPersistentDownloaderDelegate.h"
-#import "SUPersistentDownloader.h"
+#import "SPUDownloaderProtocol.h"
+#import "SPUDownloaderDelegate.h"
+#import "SPUDownloader.h"
 #import "SUErrors.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-@interface SPUTemporaryDownloaderDelegate : NSObject <SUPersistentDownloaderDelegate>
+@interface SPUTemporaryDownloaderDelegate : NSObject <SPUDownloaderDelegate>
 
 @property (nonatomic, copy) void (^completionBlock)(SPUDownloadData * _Nullable, NSError * _Nullable);
 
@@ -66,7 +66,7 @@
 
 void SPUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(SPUDownloadData * _Nullable, NSError * _Nullable))
 {
-    id<SUPersistentDownloaderProtocol> downloader = nil;
+    id<SPUDownloaderProtocol> downloader = nil;
     NSXPCConnection *connection = nil;
     __block BOOL retrievedDownloadResult = NO;
     
@@ -85,12 +85,12 @@ void SPUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(S
         });
     }];
     
-    if (!SPUXPCServiceExists(@PERSISTENT_DOWNLOADER_BUNDLE_ID)) {
-        downloader = [[SUPersistentDownloader alloc] initWithDelegate:temporaryDownloaderDelegate];
+    if (!SPUXPCServiceExists(@DOWNLOADER_BUNDLE_ID)) {
+        downloader = [[SPUDownloader alloc] initWithDelegate:temporaryDownloaderDelegate];
     } else {
-        connection = [[NSXPCConnection alloc] initWithServiceName:@PERSISTENT_DOWNLOADER_BUNDLE_ID];
-        connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUPersistentDownloaderProtocol)];
-        connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUPersistentDownloaderDelegate)];
+        connection = [[NSXPCConnection alloc] initWithServiceName:@DOWNLOADER_BUNDLE_ID];
+        connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SPUDownloaderProtocol)];
+        connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SPUDownloaderDelegate)];
         connection.exportedObject = temporaryDownloaderDelegate;
         
         connection.interruptionHandler = ^{

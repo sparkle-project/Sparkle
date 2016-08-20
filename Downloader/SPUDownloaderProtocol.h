@@ -1,5 +1,5 @@
 //
-//  SUPersistentDownloaderProtocol.h
+//  SPUDownloaderProtocol.h
 //  PersistentDownloader
 //
 //  Created by Mayur Pawashe on 4/1/16.
@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class SPUURLRequest;
 
 // The protocol that this service will vend as its API. This header file will also need to be visible to the process hosting the service.
-@protocol SUPersistentDownloaderProtocol
+@protocol SPUDownloaderProtocol
 
 - (void)startPersistentDownloadWithRequest:(SPUURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename;
 

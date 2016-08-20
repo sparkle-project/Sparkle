@@ -1,13 +1,13 @@
 //
-//  SUPersistentDownloader.m
-//  PersistentDownloader
+//  SPUDownloader.m
+//  Downloader
 //
 //  Created by Mayur Pawashe on 4/1/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SUPersistentDownloader.h"
-#import "SUPersistentDownloaderDelegate.h"
+#import "SPUDownloader.h"
+#import "SPUDownloaderDelegate.h"
 #import "SPULocalCacheDirectory.h"
 #import "SPUURLRequest.h"
 #import "SPUDownloadData.h"
@@ -23,12 +23,12 @@ typedef NS_ENUM(NSUInteger, SPUDownloadMode)
     SPUDownloadModeTemporary
 };
 
-static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
+static NSString *SUDownloadingReason = @"Downloading update related file";
 
-@interface SUPersistentDownloader () <NSURLDownloadDelegate>
+@interface SPUDownloader () <NSURLDownloadDelegate>
 
 // Delegate is intentionally strongly referenced; see header
-@property (nonatomic) id <SUPersistentDownloaderDelegate> delegate;
+@property (nonatomic) id <SPUDownloaderDelegate> delegate;
 @property (nonatomic) NSURLDownload *download;
 @property (nonatomic, copy) NSString *bundleIdentifier;
 @property (nonatomic, copy) NSString *desiredFilename;
@@ -39,7 +39,7 @@ static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
 
 @end
 
-@implementation SUPersistentDownloader
+@implementation SPUDownloader
 
 @synthesize delegate = _delegate;
 @synthesize download = _download;
@@ -50,7 +50,7 @@ static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
 @synthesize mode = _mode;
 @synthesize response = _response;
 
-- (instancetype)initWithDelegate:(id <SUPersistentDownloaderDelegate>)delegate
+- (instancetype)initWithDelegate:(id <SPUDownloaderDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -66,7 +66,7 @@ static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.download == nil && self.delegate != nil) {
             // Prevent service from automatically terminating while downloading the update asynchronously without any reply blocks
-            [[NSProcessInfo processInfo] disableAutomaticTermination:SUPersistentDownloadingReason];
+            [[NSProcessInfo processInfo] disableAutomaticTermination:SUDownloadingReason];
             self.disabledAutomaticTermination = YES;
             
             self.mode = SPUDownloadModePersistent;
@@ -83,7 +83,7 @@ static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.download == nil && self.delegate != nil) {
             // Prevent service from automatically terminating while downloading the update asynchronously without any reply blocks
-            [[NSProcessInfo processInfo] disableAutomaticTermination:SUPersistentDownloadingReason];
+            [[NSProcessInfo processInfo] disableAutomaticTermination:SUDownloadingReason];
             self.disabledAutomaticTermination = YES;
             
             self.mode = SPUDownloadModeTemporary;
@@ -95,7 +95,7 @@ static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
 - (void)enableAutomaticTermination
 {
     if (self.disabledAutomaticTermination) {
-        [[NSProcessInfo processInfo] enableAutomaticTermination:SUPersistentDownloadingReason];
+        [[NSProcessInfo processInfo] enableAutomaticTermination:SUDownloadingReason];
         self.disabledAutomaticTermination = NO;
     }
 }

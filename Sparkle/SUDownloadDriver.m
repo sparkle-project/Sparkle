@@ -7,8 +7,8 @@
 //
 
 #import "SUDownloadDriver.h"
-#import "SUPersistentDownloaderDelegate.h"
-#import "SUPersistentDownloader.h"
+#import "SPUDownloaderDelegate.h"
+#import "SPUDownloader.h"
 #import "SPUXPCServiceInfo.h"
 #import "SUAppcastItem.h"
 #import "SUFileManager.h"
@@ -24,9 +24,9 @@
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-@interface SUDownloadDriver () <SUPersistentDownloaderDelegate>
+@interface SUDownloadDriver () <SPUDownloaderDelegate>
 
-@property (nonatomic) id<SUPersistentDownloaderProtocol> downloader;
+@property (nonatomic) id<SPUDownloaderProtocol> downloader;
 @property (nonatomic) NSXPCConnection *connection;
 @property (nonatomic, readonly) SUAppcastItem *updateItem;
 @property (nonatomic, readonly) SUHost *host;
@@ -66,12 +66,12 @@
         _request = [NSMutableURLRequest requestWithURL:updateItem.fileURL];
         [_request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
         
-        if (!SPUXPCServiceExists(@PERSISTENT_DOWNLOADER_BUNDLE_ID)) {
-            _downloader = [[SUPersistentDownloader alloc] initWithDelegate:self];
+        if (!SPUXPCServiceExists(@DOWNLOADER_BUNDLE_ID)) {
+            _downloader = [[SPUDownloader alloc] initWithDelegate:self];
         } else {
-            _connection = [[NSXPCConnection alloc] initWithServiceName:@PERSISTENT_DOWNLOADER_BUNDLE_ID];
-            _connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUPersistentDownloaderProtocol)];
-            _connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUPersistentDownloaderDelegate)];
+            _connection = [[NSXPCConnection alloc] initWithServiceName:@DOWNLOADER_BUNDLE_ID];
+            _connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SPUDownloaderProtocol)];
+            _connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SPUDownloaderDelegate)];
             _connection.exportedObject = self;
             
             _downloader = _connection.remoteObjectProxy;

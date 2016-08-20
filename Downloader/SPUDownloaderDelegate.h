@@ -1,5 +1,5 @@
 //
-//  SUPersistentDownloaderDelegate.h
+//  SPUDownloaderDelegate.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 4/1/16.
@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SPUDownloadData;
 
-@protocol SUPersistentDownloaderDelegate <NSObject>
+@protocol SPUDownloaderDelegate <NSObject>
 
 // This is only invoked for persistent downloads
 - (void)downloaderDidSetDestinationName:(NSString *)destinationName temporaryDirectory:(NSString *)temporaryDirectory;

@@ -7,8 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SUPersistentDownloader.h"
-#import "SUPersistentDownloaderDelegate.h"
+#import "SPUDownloader.h"
+#import "SPUDownloaderDelegate.h"
 
 @interface ServiceDelegate : NSObject <NSXPCListenerDelegate>
 @end
@@ -20,13 +20,13 @@
     
     // Configure the connection.
     // First, set the interface that the exported object implements.
-    newConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUPersistentDownloaderProtocol)];
+    newConnection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SPUDownloaderProtocol)];
     
     // Then set remote object interface
-    newConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUPersistentDownloaderDelegate)];
+    newConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SPUDownloaderDelegate)];
     
     // Next, set the object that the connection exports. All messages sent on the connection to this service will be sent to the exported object to handle. The connection retains the exported object.
-    SUPersistentDownloader *exportedObject = [[SUPersistentDownloader alloc] initWithDelegate:newConnection.remoteObjectProxy];
+    SPUDownloader *exportedObject = [[SPUDownloader alloc] initWithDelegate:newConnection.remoteObjectProxy];
     newConnection.exportedObject = exportedObject;
     
     // Resuming the connection allows the system to deliver more incoming messages.

@@ -184,7 +184,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
     if (!servingOverHttps) {
         BOOL foundXPCPersistentDownloaderService = NO;
-        BOOL foundATSPersistentIssue = [self checkATSIssueForBundle:SPUXPCServiceBundle(@PERSISTENT_DOWNLOADER_BUNDLE_ID) getBundleExists:&foundXPCPersistentDownloaderService];
+        BOOL foundATSPersistentIssue = [self checkATSIssueForBundle:SPUXPCServiceBundle(@DOWNLOADER_BUNDLE_ID) getBundleExists:&foundXPCPersistentDownloaderService];
         
         NSBundle *mainBundle = [NSBundle mainBundle];
         BOOL foundATSMainBundleIssue = NO;
