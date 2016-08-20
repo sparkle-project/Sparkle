@@ -14,7 +14,7 @@ To install Sparkle, you can copy Sparkle.framework into your project as you woul
 
 Sparkle has a few components that can optionally be handed off to XPC services. If you sandbox your application, you will need to use these.
 
-If you have a sandboxed application and it has a "com.apple.security.network.client" entitlement to allow for outgoing HTTP connections, then the "Downloader" services are not necessary to include. If you do decide to include the services and your application does not pass Apple's App Transport Security requirements, then you may have to add exceptions inside the downloader service bundles themselves.
+If you have a sandboxed application and it has a "com.apple.security.network.client" entitlement to allow for outgoing HTTP connections, then the Downloader service is not necessary to include. If you do decide to include the Downloader service and your application does not pass Apple's App Transport Security requirements, then you may have to add exceptions inside the downloader service's Info.plist.
 
 If you have a sandboxed application that does not have the entitlement mentioned above for allowing outgoing HTTP connections, then linked release notes cannot contain external references (eg: images or external style sheets).
 
