@@ -310,6 +310,7 @@
 		72E45CFC1B641961005C701A /* sparkletestcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CFB1B641961005C701A /* sparkletestcast.xml */; };
 		72E45CFE1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CFD1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem */; };
 		72E45DDD1B65C3BD005C701A /* sign_update in Resources */ = {isa = PBXBuildFile; fileRef = 72E45DDC1B65C3BD005C701A /* sign_update */; };
+		72E539121D68C3FA0092CE5E /* SPUDownloadData.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F9EC431D5E9ED8004AC8B6 /* SPUDownloadData.m */; };
 		72EB87EA1CB8798800C37F42 /* ShowInstallerProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */; };
 		72EB87EB1CB8859100C37F42 /* Updater.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 721C24451CB753E6005440CB /* Updater.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		72EB87EC1CB8887E00C37F42 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
@@ -2641,6 +2642,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72E539121D68C3FA0092CE5E /* SPUDownloadData.m in Sources */,
 				721D8A871D4C5BF10032E472 /* SULog.m in Sources */,
 				7293A1B11CEE9B9F00B957A7 /* SPUURLRequest.m in Sources */,
 				721BC2101D1CDE55002BC71E /* SPULocalCacheDirectory.m in Sources */,
