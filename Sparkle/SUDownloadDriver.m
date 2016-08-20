@@ -18,6 +18,7 @@
 #import "SUErrors.h"
 #import "SPUURLRequest.h"
 #import "SUDownloadedUpdate.h"
+#import "SPUDownloadData.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -118,14 +119,12 @@
     [self.delegate downloadDriverWillBeginDownload];
     
     NSString *desiredFilename = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
-    [self.downloader startDownloadWithRequest:[SPUURLRequest URLRequestWithRequest:self.request] bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];
+    [self.downloader startDownloadWithRequest:[SPUURLRequest URLRequestWithRequest:self.request] mode:SPUDownloadModePersistent bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];
 }
 
 - (void)cleanup
 {
     self.cleaningUp = YES;
-    
-    [self.downloader cleanup];
     
     if (self.connection != nil) {
         [self.connection invalidate];
@@ -135,7 +134,7 @@
     self.downloader = nil;
 }
 
-- (void)downloaderDidFinishDownloading
+- (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData * _Nullable)__unused downloadData
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         self.retrievedDownloadResult = YES;

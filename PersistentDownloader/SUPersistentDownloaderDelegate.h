@@ -10,8 +10,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class SPUDownloadData;
+
 @protocol SUPersistentDownloaderDelegate <NSObject>
 
+// This is only invoked for persistent downloads
 - (void)downloaderDidSetDestinationName:(NSString *)destinationName temporaryDirectory:(NSString *)temporaryDirectory;
 
 // Under rare cases, this may be called more than once, in which case the current progress should be reset back to 0
@@ -19,7 +22,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)downloaderDidReceiveDataOfLength:(NSUInteger)length;
 
-- (void)downloaderDidFinishDownloading;
+// downloadData is nil if this is a persisent download
+- (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData * _Nullable)downloadData;
 
 - (void)downloaderDidFailWithError:(NSError *)error;
 
