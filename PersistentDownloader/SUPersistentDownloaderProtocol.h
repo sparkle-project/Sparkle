@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)startDownloadWithRequest:(SPUURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename;
 
-- (void)cleanupWithCompletion:(void (^)(void))completionBlock;
+- (void)cleanup;
 
 @end
 

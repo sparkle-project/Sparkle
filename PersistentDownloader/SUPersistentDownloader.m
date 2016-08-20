@@ -77,14 +77,6 @@ static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
     self.delegate = nil;
 }
 
-- (void)cleanupWithCompletion:(void (^)(void))completionBlock
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self cleanup];
-        completionBlock();
-    });
-}
-
 - (void)download:(NSURLDownload *)__unused d decideDestinationWithSuggestedFilename:(NSString *)name
 {
     // Remove our old caches path so we don't start accumulating files in there

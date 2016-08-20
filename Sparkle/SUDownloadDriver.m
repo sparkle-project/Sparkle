@@ -123,22 +123,16 @@
 
 - (void)cleanup
 {
-    // It's very crucial to wait until they are done with completion before invalidating our XPC connection (if there is one)
-    // Otherwise we can run into some unfortunate crashes
-    // Edit: I think this was an issue because -dealloc was implemented to invoke this method. I have since removed -dealloc
-    // Will have to test around with this later
     self.cleaningUp = YES;
     
-    [self.downloader cleanupWithCompletion:^{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (self.connection != nil) {
-                [self.connection invalidate];
-                self.connection = nil;
-            }
-            self.downloadName = nil;
-            self.downloader = nil;
-        });
-    }];
+    [self.downloader cleanup];
+    
+    if (self.connection != nil) {
+        [self.connection invalidate];
+        self.connection = nil;
+    }
+    self.downloadName = nil;
+    self.downloader = nil;
 }
 
 - (void)downloaderDidFinishDownloading
