@@ -12,16 +12,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SPUURLRequest;
 
-typedef NS_ENUM(NSUInteger, SPUDownloadMode)
-{
-    SPUDownloadModePersistent,
-    SPUDownloadModeTemporary
-};
-
 // The protocol that this service will vend as its API. This header file will also need to be visible to the process hosting the service.
 @protocol SUPersistentDownloaderProtocol
 
-- (void)startDownloadWithRequest:(SPUURLRequest *)request mode:(SPUDownloadMode)mode bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename;
+- (void)startPersistentDownloadWithRequest:(SPUURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename;
+
+- (void)startTemporaryDownloadWithRequest:(SPUURLRequest *)request;
 
 @end
 

@@ -17,6 +17,12 @@
 #error This is a "core" class and should NOT import AppKit
 #endif
 
+typedef NS_ENUM(NSUInteger, SPUDownloadMode)
+{
+    SPUDownloadModePersistent,
+    SPUDownloadModeTemporary
+};
+
 static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
 
 @interface SUPersistentDownloader () <NSURLDownloadDelegate>
@@ -55,18 +61,34 @@ static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
 
 // Don't implement dealloc - make the client call cleanup, which is the only way to remove the reference cycle from the delegate anyway
 
-- (void)startDownloadWithRequest:(SPUURLRequest *)request mode:(SPUDownloadMode)mode bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename
+- (void)startPersistentDownloadWithRequest:(SPUURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        // Prevent service from automatically terminating while downloading the update asynchronously without any reply blocks
-        [[NSProcessInfo processInfo] disableAutomaticTermination:SUPersistentDownloadingReason];
-        self.disabledAutomaticTermination = YES;
-        
-        self.mode = mode;
-        self.desiredFilename = desiredFilename;
-        self.bundleIdentifier = bundleIdentifier;
-        
-        self.download = [[NSURLDownload alloc] initWithRequest:request.request delegate:self];
+        if (self.download == nil && self.delegate != nil) {
+            // Prevent service from automatically terminating while downloading the update asynchronously without any reply blocks
+            [[NSProcessInfo processInfo] disableAutomaticTermination:SUPersistentDownloadingReason];
+            self.disabledAutomaticTermination = YES;
+            
+            self.mode = SPUDownloadModePersistent;
+            self.desiredFilename = desiredFilename;
+            self.bundleIdentifier = bundleIdentifier;
+            
+            self.download = [[NSURLDownload alloc] initWithRequest:request.request delegate:self];
+        }
+    });
+}
+
+- (void)startTemporaryDownloadWithRequest:(SPUURLRequest *)request
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.download == nil && self.delegate != nil) {
+            // Prevent service from automatically terminating while downloading the update asynchronously without any reply blocks
+            [[NSProcessInfo processInfo] disableAutomaticTermination:SUPersistentDownloadingReason];
+            self.disabledAutomaticTermination = YES;
+            
+            self.mode = SPUDownloadModeTemporary;
+            self.download = [[NSURLDownload alloc] initWithRequest:request.request delegate:self];
+        }
     });
 }
 
@@ -150,15 +172,19 @@ static NSString *SUPersistentDownloadingReason = @"Downloading persistent file";
 {
     self.response = response;
     
-    // It might be tempting to send over the response object instead of the expected content length but this isn't a good idea
-    // For one, we are only ever concerned about the expected content length
-    // Another reason is that NSURLResponse doesn't support NSSecureCoding in older OS releases (eg: 10.8), which cause issues with XPC
-    [self.delegate downloaderDidReceiveExpectedContentLength:response.expectedContentLength];
+    if (self.mode == SPUDownloadModePersistent) {
+        // It might be tempting to send over the response object instead of the expected content length but this isn't a good idea
+        // For one, we are only ever concerned about the expected content length
+        // Another reason is that NSURLResponse doesn't support NSSecureCoding in older OS releases (eg: 10.8), which cause issues with XPC
+        [self.delegate downloaderDidReceiveExpectedContentLength:response.expectedContentLength];
+    }
 }
 
 - (void)download:(NSURLDownload *)__unused download didReceiveDataOfLength:(NSUInteger)length
 {
-    [self.delegate downloaderDidReceiveDataOfLength:length];
+    if (self.mode == SPUDownloadModePersistent) {
+        [self.delegate downloaderDidReceiveDataOfLength:length];
+    }
 }
 
 - (void)downloadDidFinish:(NSURLDownload *)__unused d

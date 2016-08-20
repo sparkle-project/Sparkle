@@ -119,7 +119,7 @@
     [self.delegate downloadDriverWillBeginDownload];
     
     NSString *desiredFilename = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
-    [self.downloader startDownloadWithRequest:[SPUURLRequest URLRequestWithRequest:self.request] mode:SPUDownloadModePersistent bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];
+    [self.downloader startPersistentDownloadWithRequest:[SPUURLRequest URLRequestWithRequest:self.request] bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];
 }
 
 - (void)cleanup

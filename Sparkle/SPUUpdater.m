@@ -183,18 +183,12 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
     if (!servingOverHttps) {
-        BOOL foundXPCTemporaryDownloaderService = NO;
-        BOOL foundATSTemporaryIssue = [self checkATSIssueForBundle:SPUXPCServiceBundle(@TEMPORARY_DOWNLOADER_BUNDLE_ID) getBundleExists:&foundXPCTemporaryDownloaderService];
-        
         BOOL foundXPCPersistentDownloaderService = NO;
-        BOOL foundATSPersistentIssue = NO;
-        if (!foundATSTemporaryIssue) {
-            foundATSPersistentIssue = [self checkATSIssueForBundle:SPUXPCServiceBundle(@PERSISTENT_DOWNLOADER_BUNDLE_ID) getBundleExists:&foundXPCPersistentDownloaderService];
-        }
+        BOOL foundATSPersistentIssue = [self checkATSIssueForBundle:SPUXPCServiceBundle(@PERSISTENT_DOWNLOADER_BUNDLE_ID) getBundleExists:&foundXPCPersistentDownloaderService];
         
         NSBundle *mainBundle = [NSBundle mainBundle];
         BOOL foundATSMainBundleIssue = NO;
-        if (!foundATSTemporaryIssue && !foundATSPersistentIssue && (!foundXPCTemporaryDownloaderService || !foundXPCPersistentDownloaderService)) {
+        if (!foundATSPersistentIssue && !foundXPCPersistentDownloaderService) {
             BOOL foundATSIssue = ([mainBundle objectForInfoDictionaryKey:@"NSAppTransportSecurity"] == nil);
             BOOL updatingMainBundle = [self.host.bundle isEqualTo:mainBundle];
             
@@ -205,7 +199,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             }
         }
         
-        if (foundATSTemporaryIssue || foundATSPersistentIssue || foundATSMainBundleIssue) {
+        if (foundATSPersistentIssue || foundATSMainBundleIssue) {
             if (!self.loggedATSWarning) {
                 // Just log a warning. Don't outright fail in case we are wrong (eg: app is linked on an old SDK where ATS doesn't take effect)
                 SULog(@"The feed URL (%@) may need to change to use HTTPS.\nFor more information: https://sparkle-project.org/documentation/app-transport-security", [feedURL absoluteString]);

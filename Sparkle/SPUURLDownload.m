@@ -8,27 +8,90 @@
 
 #import "SPUURLDownload.h"
 #import "SPUXPCServiceInfo.h"
-#import "SUTemporaryDownloader.h"
-#import "SUTemporaryDownloaderProtocol.h"
 #import "SPUURLRequest.h"
 #import "SPUDownloadData.h"
+#import "SUPersistentDownloaderProtocol.h"
+#import "SUPersistentDownloaderDelegate.h"
+#import "SUPersistentDownloader.h"
 #import "SUErrors.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
 #endif
 
+@interface SPUTemporaryDownloaderDelegate : NSObject <SUPersistentDownloaderDelegate>
+
+@property (nonatomic, copy) void (^completionBlock)(SPUDownloadData * _Nullable, NSError * _Nullable);
+
+@end
+
+@implementation SPUTemporaryDownloaderDelegate
+
+@synthesize completionBlock = _completionBlock;
+
+- (instancetype)initWithCompletion:(void (^)(SPUDownloadData * _Nullable, NSError * _Nullable))completionBlock
+{
+    self = [super init];
+    if (self != nil) {
+        _completionBlock = [completionBlock copy];
+    }
+    return self;
+}
+
+- (void)downloaderDidSetDestinationName:(NSString *)__unused destinationName temporaryDirectory:(NSString *)__unused temporaryDirectory
+{
+}
+
+- (void)downloaderDidReceiveExpectedContentLength:(int64_t)__unused expectedContentLength
+{
+}
+
+- (void)downloaderDidReceiveDataOfLength:(NSUInteger)__unused length
+{
+}
+
+- (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData * _Nullable)downloadData
+{
+    self.completionBlock(downloadData, nil);
+    self.completionBlock = nil;
+}
+
+- (void)downloaderDidFailWithError:(NSError *)error
+{
+    self.completionBlock(nil, error);
+    self.completionBlock = nil;
+}
+
+@end
+
 void SPUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(SPUDownloadData * _Nullable, NSError * _Nullable))
 {
-    id<SUTemporaryDownloaderProtocol> downloader = nil;
+    id<SUPersistentDownloaderProtocol> downloader = nil;
     NSXPCConnection *connection = nil;
     __block BOOL retrievedDownloadResult = NO;
     
-    if (!SPUXPCServiceExists(@TEMPORARY_DOWNLOADER_BUNDLE_ID)) {
-        downloader = [[SUTemporaryDownloader alloc] init];
+    SPUTemporaryDownloaderDelegate *temporaryDownloaderDelegate = [[SPUTemporaryDownloaderDelegate alloc] initWithCompletion:^(SPUDownloadData * _Nullable downloadData, NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!retrievedDownloadResult) {
+                retrievedDownloadResult = YES;
+                [connection invalidate];
+                
+                if (downloadData == nil || downloadData.data == nil) {
+                    completionBlock(nil, error);
+                } else {
+                    completionBlock(downloadData, nil);
+                }
+            }
+        });
+    }];
+    
+    if (!SPUXPCServiceExists(@PERSISTENT_DOWNLOADER_BUNDLE_ID)) {
+        downloader = [[SUPersistentDownloader alloc] initWithDelegate:temporaryDownloaderDelegate];
     } else {
-        connection = [[NSXPCConnection alloc] initWithServiceName:@TEMPORARY_DOWNLOADER_BUNDLE_ID];
-        connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUTemporaryDownloaderProtocol)];
+        connection = [[NSXPCConnection alloc] initWithServiceName:@PERSISTENT_DOWNLOADER_BUNDLE_ID];
+        connection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUPersistentDownloaderProtocol)];
+        connection.exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUPersistentDownloaderDelegate)];
+        connection.exportedObject = temporaryDownloaderDelegate;
         
         connection.interruptionHandler = ^{
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -62,16 +125,5 @@ void SPUDownloadURLWithRequest(NSURLRequest * request, void (^completionBlock)(S
         downloader = connection.remoteObjectProxy;
     }
     
-    [downloader startDownloadWithRequest:[SPUURLRequest URLRequestWithRequest:request] completion:^(SPUDownloadData * _Nullable downloadData, NSError * _Nullable error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            retrievedDownloadResult = YES;
-            [connection invalidate];
-            
-            if (downloadData == nil || downloadData.data == nil) {
-                completionBlock(nil, error);
-            } else {
-                completionBlock(downloadData, nil);
-            }
-        });
-    }];
+    [downloader startTemporaryDownloadWithRequest:[SPUURLRequest URLRequestWithRequest:request]];
 }
