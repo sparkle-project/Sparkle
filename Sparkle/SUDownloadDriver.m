@@ -82,8 +82,6 @@
 
 - (void)downloadUpdate
 {
-    [self.connection resume];
-    
     NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(bundleIdentifier != nil);
     
@@ -115,6 +113,8 @@
             }
         });
     };
+    
+    [self.connection resume];
     
     [self.delegate downloadDriverWillBeginDownload];
     

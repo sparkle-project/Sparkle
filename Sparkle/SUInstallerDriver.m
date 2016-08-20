@@ -317,7 +317,6 @@
     } else {
         launcherConnection = [[NSXPCConnection alloc] initWithServiceName:@INSTALLER_LAUNCHER_BUNDLE_ID];
         launcherConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerLauncherProtocol)];
-        [launcherConnection resume];
         
         launcherConnection.interruptionHandler = ^{
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -347,6 +346,8 @@
             });
         };
         
+        [launcherConnection resume];
+        
         installerLauncher = launcherConnection.remoteObjectProxy;
     }
     
@@ -373,7 +374,6 @@
     } else {
         launcherConnection = [[NSXPCConnection alloc] initWithServiceName:@INSTALLER_LAUNCHER_BUNDLE_ID];
         launcherConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerLauncherProtocol)];
-        [launcherConnection resume];
         
         launcherConnection.interruptionHandler = ^{
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -404,6 +404,8 @@
                 }
             });
         };
+        
+        [launcherConnection resume];
         
         installerLauncher = launcherConnection.remoteObjectProxy;
     }
