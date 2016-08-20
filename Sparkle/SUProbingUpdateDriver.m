@@ -36,7 +36,11 @@
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders completion:(SUUpdateDriverCompletion)completionBlock
 {
-    [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:NO completion:completionBlock];
+    // We don't preflight for update permission in this driver because we are just interested if an update is available
+    
+    [self.basicDriver prepareCheckForUpdatesWithCompletion:completionBlock];
+    
+    [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:NO];
 }
 
 - (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock

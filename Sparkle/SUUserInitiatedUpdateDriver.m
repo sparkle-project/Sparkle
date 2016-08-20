@@ -19,6 +19,7 @@
 @property (nonatomic, readonly) SUUIBasedUpdateDriver *uiDriver;
 @property (nonatomic, readonly) id<SPUUserDriver> userDriver;
 @property (nonatomic) BOOL showingUserInitiatedProgress;
+@property (nonatomic) BOOL aborted;
 
 @end
 
@@ -27,6 +28,7 @@
 @synthesize uiDriver = _uiDriver;
 @synthesize userDriver = _userDriver;
 @synthesize showingUserInitiatedProgress = _showingUserInitiatedProgress;
+@synthesize aborted = _aborted;
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate
 {
@@ -40,23 +42,33 @@
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(SUUpdateDriverCompletion)completionBlock
 {
-    self.showingUserInitiatedProgress = YES;
+    [self.uiDriver prepareCheckForUpdatesWithCompletion:completionBlock];
     
-    [self.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SPUUserInitiatedCheckStatus completionStatus) {
-        switch (completionStatus) {
-            case SPUUserInitiatedCheckDone:
-                break;
-            case SPUUserInitiatedCheckCanceled:
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (self.showingUserInitiatedProgress) {
-                        [self abortUpdate];
+    [self.uiDriver preflightForUpdatePermissionWithReply:^(NSError * _Nullable error) {
+        if (!self.aborted) {
+            if (error != nil) {
+                [self abortUpdateWithError:error];
+            } else {
+                self.showingUserInitiatedProgress = YES;
+                
+                [self.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SPUUserInitiatedCheckStatus completionStatus) {
+                    switch (completionStatus) {
+                        case SPUUserInitiatedCheckDone:
+                            break;
+                        case SPUUserInitiatedCheckCanceled:
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                if (self.showingUserInitiatedProgress) {
+                                    [self abortUpdate];
+                                }
+                            });
+                            break;
                     }
-                });
-                break;
+                }];
+                
+                [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:YES];
+            }
         }
     }];
-    
-    [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:YES completion:completionBlock];
 }
 
 - (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
@@ -70,6 +82,11 @@
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error
+{
+    [self abortUpdateWithError:error];
+}
+
+- (void)coreDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error
 {
     [self abortUpdateWithError:error];
 }
@@ -98,6 +115,7 @@
         [self.userDriver dismissUserInitiatedUpdateCheck];
         self.showingUserInitiatedProgress = NO;
     }
+    self.aborted = YES;
     [self.uiDriver abortUpdateWithError:error];
 }
 

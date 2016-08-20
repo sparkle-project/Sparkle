@@ -55,7 +55,15 @@
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(SUUpdateDriverCompletion)completionBlock
 {
-    [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:NO requiresSilentInstall:YES completion:completionBlock];
+    [self.coreDriver prepareCheckForUpdatesWithCompletion:completionBlock];
+    
+    [self.coreDriver preflightForUpdatePermissionWithReply:^(NSError * _Nullable error) {
+        if (error != nil) {
+            [self abortUpdateWithError:error];
+        } else {
+            [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:NO requiresSilentInstall:YES];
+        }
+    }];
 }
 
 - (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))

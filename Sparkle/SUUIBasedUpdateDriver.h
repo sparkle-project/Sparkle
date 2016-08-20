@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol SUUIBasedUpdateDriverDelegate <NSObject>
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
+- (void)coreDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
 - (void)uiDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
 
 @optional
@@ -29,7 +30,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SUUIBasedUpdateDriverDelegate>)delegate;
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(SUUpdateDriverCompletion)completionBlock;
+- (void)prepareCheckForUpdatesWithCompletion:(SUUpdateDriverCompletion)completionBlock;
+
+- (void)preflightForUpdatePermissionWithReply:(void (^)(NSError * _Nullable))reply;
+
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates;
 
 - (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock;
 

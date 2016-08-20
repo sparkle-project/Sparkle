@@ -60,9 +60,19 @@
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(SUUpdateDriverCompletion)completionBlock
+- (void)prepareCheckForUpdatesWithCompletion:(SUUpdateDriverCompletion)completionBlock
 {
-    [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:includesSkippedUpdates requiresSilentInstall:NO completion:completionBlock];
+    [self.coreDriver prepareCheckForUpdatesWithCompletion:completionBlock];
+}
+
+- (void)preflightForUpdatePermissionWithReply:(void (^)(NSError * _Nullable))reply
+{
+    [self.coreDriver preflightForUpdatePermissionWithReply:reply];
+}
+
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates
+{
+    [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:includesSkippedUpdates requiresSilentInstall:NO];
 }
 
 - (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
@@ -228,7 +238,8 @@
 
 - (void)coreDriverIsRequestingAbortUpdateWithError:(NSError *)error
 {
-    [self.delegate uiDriverIsRequestingAbortUpdateWithError:error];
+    // A delegate may want to handle this type of error specially
+    [self.delegate coreDriverIsRequestingAbortUpdateWithError:error];
 }
 
 - (void)abortUpdateWithError:(nullable NSError *)error

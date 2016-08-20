@@ -378,4 +378,10 @@
     });
 }
 
+- (void)checkIfApplicationInstallationRequiresAuthorizationWithHostBundlePath:(NSString *)hostBundlePath reply:(void(^)(BOOL))reply
+{
+    // No need to execute on main queue
+    reply(SPUNeedsSystemAuthorizationAccess(hostBundlePath, SPUInstallationTypeApplication));
+}
+
 @end

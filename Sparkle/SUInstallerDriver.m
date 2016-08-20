@@ -24,6 +24,7 @@
 #import "SUInstallerConnectionProtocol.h"
 #import "SUXPCInstallerConnection.h"
 #import "SUDownloadedUpdate.h"
+#import "SPUInstallationType.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -303,6 +304,62 @@
         // Don't update the current stage; a ping request has no effect on that.
         [self.installerConnection handleMessageWithIdentifier:SPUUpdaterAlivePong data:[NSData data]];
     }
+}
+
+- (void)checkIfApplicationInstallationRequiresAuthorizationWithReply:(void (^)(BOOL requiresAuthorization))reply
+{
+    id<SUInstallerLauncherProtocol> installerLauncher = nil;
+    __block BOOL madeReply = NO;
+    NSXPCConnection *launcherConnection = nil;
+    
+    if (!SPUXPCServiceExists(@INSTALLER_LAUNCHER_BUNDLE_ID)) {
+        installerLauncher = [[SUInstallerLauncher alloc] init];
+    } else {
+        launcherConnection = [[NSXPCConnection alloc] initWithServiceName:@INSTALLER_LAUNCHER_BUNDLE_ID];
+        launcherConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(SUInstallerLauncherProtocol)];
+        [launcherConnection resume];
+        
+        launcherConnection.interruptionHandler = ^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (!madeReply) {
+                    // We'll break the retain cycle in the invalidation handler
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-retain-cycles"
+                    [launcherConnection invalidate];
+#pragma clang diagnostic pop
+                }
+            });
+        };
+        
+        launcherConnection.invalidationHandler = ^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (!madeReply) {
+                    // If something went horribly wrong, just guess that we won't require authorization
+                    reply(NO);
+                    
+                    // Break the retain cycle
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-retain-cycles"
+                    launcherConnection.interruptionHandler = nil;
+                    launcherConnection.invalidationHandler = nil;
+#pragma clang diagnostic pop
+                }
+            });
+        };
+        
+        installerLauncher = launcherConnection.remoteObjectProxy;
+    }
+    
+    [installerLauncher checkIfApplicationInstallationRequiresAuthorizationWithHostBundlePath:self.host.bundlePath reply:^(BOOL requiresAuthorization) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!madeReply) {
+                madeReply = YES;
+                [launcherConnection invalidate];
+                
+                reply(requiresAuthorization);
+            }
+        });
+    }];
 }
 
 - (void)launchAutoUpdateSilently:(BOOL)silently completion:(void (^)(NSError *_Nullable))completionHandler

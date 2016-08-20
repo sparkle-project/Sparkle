@@ -30,7 +30,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id <SUBasicUpdateDriverDelegate>)delegate;
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates completion:(SUUpdateDriverCompletion)completionBlock;
+- (void)prepareCheckForUpdatesWithCompletion:(SUUpdateDriverCompletion)completionBlock;
+
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates;
 
 - (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock;
 

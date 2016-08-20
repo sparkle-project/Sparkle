@@ -37,7 +37,16 @@
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(SUUpdateDriverCompletion)completionBlock
 {
-    [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:NO completion:completionBlock];
+    [self.uiDriver prepareCheckForUpdatesWithCompletion:completionBlock];
+    
+    [self.uiDriver preflightForUpdatePermissionWithReply:^(NSError * _Nullable error) {
+        if (error != nil) {
+            // Don't tell the user about the permission error for scheduled update checks
+            [self abortUpdateWithError:nil];
+        } else {
+            [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:YES];
+        }
+    }];
 }
 
 - (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
@@ -53,6 +62,12 @@
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)__unused error
 {
     // Don't tell the user that no update was found or some appcast fetch error occurred for scheduled update checks
+    [self abortUpdateWithError:nil];
+}
+
+- (void)coreDriverIsRequestingAbortUpdateWithError:(nullable NSError *)__unused error
+{
+    // Don't tell the user that a non-UI update error occurred for scheduled update checks
     [self abortUpdateWithError:nil];
 }
 

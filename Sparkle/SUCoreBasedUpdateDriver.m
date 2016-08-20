@@ -15,6 +15,9 @@
 #import "SULog.h"
 #import "SUErrors.h"
 #import "SUDownloadedUpdate.h"
+#import "SUAppcastItem.h"
+#import "SULocalizations.h"
+#import "SPUInstallationType.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -72,12 +75,38 @@
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates requiresSilentInstall:(BOOL)silentInstall completion:(SUUpdateDriverCompletion)completionBlock
+- (void)prepareCheckForUpdatesWithCompletion:(SUUpdateDriverCompletion)completionBlock
+{
+    [self.basicDriver prepareCheckForUpdatesWithCompletion:completionBlock];
+}
+
+- (void)preflightForUpdatePermissionWithReply:(void (^)(NSError * _Nullable))reply
+{
+    // If we don't allow interaction, make sure we have sufficient privileges to update
+    // If we don't, then we should abort early before trying to check for updates
+    // Note if we don't have permission to update an application update without interaction,
+    // then we won't have permission for package type of updates either (converse is not true)
+    if (![self.updaterDelegate respondsToSelector:@selector(updaterShouldAllowInstallerInteraction:)] || [self.updaterDelegate updaterShouldAllowInstallerInteraction:self.updater]) {
+        // Simple case where installer interaction is allowed
+        reply(nil);
+    } else {
+        // Otherwise check if we have sufficient privileges to update without interaction
+        [self.installerDriver checkIfApplicationInstallationRequiresAuthorizationWithReply:^(BOOL requiresAuthorization) {
+            if (requiresAuthorization) {
+                reply([NSError errorWithDomain:SUSparkleErrorDomain code:SUNotAllowedInteractionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"No new update has been checked because the installation will require interaction, which has been prevented.", nil)] }]);
+            } else {
+                reply(nil);
+            }
+        }];
+    }
+}
+
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates requiresSilentInstall:(BOOL)silentInstall
 {
     self.userAgent = userAgent;
     self.silentInstall = silentInstall;
     
-    [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:includesSkippedUpdates completion:completionBlock];
+    [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:includesSkippedUpdates];
 }
 
 - (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
@@ -92,6 +121,9 @@
 {
     self.downloadedUpdate = downloadedUpdate;
     self.silentInstall = NO;
+    
+    // Note if installer interaction isn't allowed, we shouldn't have downloaded the update, and shouldn't be able to get here
+    // So no need to do a test if we can perform an update without authorization
     
     [self.basicDriver resumeDownloadedUpdate:downloadedUpdate completion:completionBlock];
 }
@@ -109,9 +141,21 @@
     
     if (self.resumingInstallingUpdate) {
         [self.installerDriver resumeInstallingUpdateWithUpdateItem:updateItem];
+        [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem];
+    } else {
+        if (![self.updaterDelegate respondsToSelector:@selector(updaterShouldAllowInstallerInteraction:)] || [self.updaterDelegate updaterShouldAllowInstallerInteraction:self.updater]) {
+            // Simple case - delegate allows interaction, so we should continue along
+            [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem];
+        } else {
+            // Package type installations will always require installer interaction as long as we don't support running as root
+            // If it's not a package type installation, we should be okay since we did an auth check before checking for updates above
+            if (![updateItem.installationType isEqualToString:SPUInstallationTypeApplication]) {
+                [self.delegate coreDriverIsRequestingAbortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUNotAllowedInteractionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"A new update is available but cannot be installed because interaction has been prevented.", nil)] }]];
+            } else {
+                [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem];
+            }
+        }
     }
-    
-    [self.delegate basicDriverDidFindUpdateWithAppcastItem:updateItem];
 }
 
 - (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem
