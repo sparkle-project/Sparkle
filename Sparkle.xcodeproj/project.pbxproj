@@ -332,7 +332,6 @@
 		72A5D5F01D692C4B0009E5AC /* Updater.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 721C24451CB753E6005440CB /* Updater.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		72A5D5F41D692CF50009E5AC /* SparkleCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72A5D59C1D6927730009E5AC /* SparkleCore.framework */; };
 		72A5D5F51D692CFE0009E5AC /* SparkleCore.framework in Copy Sparkle */ = {isa = PBXBuildFile; fileRef = 72A5D59C1D6927730009E5AC /* SparkleCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		72A5D5F61D692D850009E5AC /* SPUUserDriverUIComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F9EC4A1D5F53A7004AC8B6 /* SPUUserDriverUIComponent.m */; };
 		72A5D5F71D692D900009E5AC /* SPUApplicationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 725602D41C83551C00DAA70E /* SPUApplicationInfo.m */; };
 		72A5D5F81D692F2B0009E5AC /* SUExport.h in Headers */ = {isa = PBXBuildFile; fileRef = 14652F8319A9759F00959E44 /* SUExport.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72A5D5F91D692F4C0009E5AC /* SPUStatusCompletionResults.h in Headers */ = {isa = PBXBuildFile; fileRef = 726DF88D1C84277500188804 /* SPUStatusCompletionResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -2943,11 +2942,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				72A5D5F71D692D900009E5AC /* SPUApplicationInfo.m in Sources */,
-				72A5D5F61D692D850009E5AC /* SPUUserDriverUIComponent.m in Sources */,
 				72D954A51CBB415C006F28BD /* main.m in Sources */,
 				72D954A21CBB415C006F28BD /* SPUCommandLineDriver.m in Sources */,
 				72D954B81CBB467F006F28BD /* SPUCommandLineUserDriver.m in Sources */,
+				72A5D5F71D692D900009E5AC /* SPUApplicationInfo.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3851,6 +3849,7 @@
 				72A5D5A31D6927730009E5AC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		72B398D61D3D879400EE297F /* Build configuration list for PBXNativeTarget "Autoupdate" */ = {
 			isa = XCConfigurationList;
