@@ -35,11 +35,11 @@
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(SUUpdateDriverCompletion)completionBlock
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders preventingInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(SUUpdateDriverCompletion)completionBlock
 {
     [self.uiDriver prepareCheckForUpdatesWithCompletion:completionBlock];
     
-    [self.uiDriver preflightForUpdatePermissionWithReply:^(NSError * _Nullable error) {
+    [self.uiDriver preflightForUpdatePermissionPreventingInstallerInteraction:preventsInstallerInteraction reply:^(NSError * _Nullable error) {
         if (error != nil) {
             // Don't tell the user about the permission error for scheduled update checks
             [self abortUpdateWithError:nil];

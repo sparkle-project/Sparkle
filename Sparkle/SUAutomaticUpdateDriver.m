@@ -53,11 +53,11 @@
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders completion:(SUUpdateDriverCompletion)completionBlock
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders preventingInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(SUUpdateDriverCompletion)completionBlock
 {
     [self.coreDriver prepareCheckForUpdatesWithCompletion:completionBlock];
     
-    [self.coreDriver preflightForUpdatePermissionWithReply:^(NSError * _Nullable error) {
+    [self.coreDriver preflightForUpdatePermissionPreventingInstallerInteraction:preventsInstallerInteraction reply:^(NSError * _Nullable error) {
         if (error != nil) {
             [self abortUpdateWithError:error];
         } else {

@@ -140,7 +140,7 @@
 }
 
 // This can be called multiple times (eg: if a delta update fails, this may be called again with a regular update item)
-- (void)extractDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate silently:(BOOL)silently completion:(void (^)(NSError * _Nullable))completionHandler
+- (void)extractDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate silently:(BOOL)silently preventsInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(void (^)(NSError * _Nullable))completionHandler
 {
     self.updateItem = downloadedUpdate.updateItem;
     self.temporaryDirectory = downloadedUpdate.temporaryDirectory;
@@ -149,7 +149,7 @@
     self.currentStage = SPUInstallerNotStarted;
     
     if (self.installerConnection == nil) {
-        [self launchAutoUpdateSilently:silently completion:completionHandler];
+        [self launchAutoUpdateSilently:silently preventsInstallerInteraction:preventsInstallerInteraction completion:completionHandler];
     } else {
         // The Install tool is already alive; just send out installation input data again
         [self sendInstallationData];
@@ -363,7 +363,7 @@
     }];
 }
 
-- (void)launchAutoUpdateSilently:(BOOL)silently completion:(void (^)(NSError *_Nullable))completionHandler
+- (void)launchAutoUpdateSilently:(BOOL)silently preventsInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(void (^)(NSError *_Nullable))completionHandler
 {
     id<SUInstallerLauncherProtocol> installerLauncher = nil;
     __block BOOL retrievedLaunchStatus = NO;
@@ -410,13 +410,6 @@
         installerLauncher = launcherConnection.remoteObjectProxy;
     }
     
-    // This determines if our updater delegate allows interaction
-    // If the delegate disallows interaction, then the update cannot be continued
-    BOOL updaterAllowsInteraction = YES;
-    if ([self.updaterDelegate respondsToSelector:@selector(updaterShouldAllowInstallerInteraction:)]) {
-        updaterAllowsInteraction = [self.updaterDelegate updaterShouldAllowInstallerInteraction:self.updater];
-    }
-    
     // Our driver (automatic or UI based) has a say if interaction is allowed as well
     // An automatic driver may disallow interaction but the updater could try again later a UI based driver that does allow interaction
     BOOL driverAllowsInteraction = !silently;
@@ -429,7 +422,7 @@
     
     // The installer launcher could be in a XPC service, so we don't want to do localization in there
     NSString *authorizationPrompt = [NSString stringWithFormat:SULocalizedString(@"%1$@ wants to update.", nil), self.host.name];
-    [installerLauncher launchInstallerWithHostBundlePath:hostBundlePath authorizationPrompt:authorizationPrompt installationType:installationType allowingDriverInteraction:driverAllowsInteraction allowingUpdaterInteraction:updaterAllowsInteraction completion:^(SUInstallerLauncherStatus result) {
+    [installerLauncher launchInstallerWithHostBundlePath:hostBundlePath authorizationPrompt:authorizationPrompt installationType:installationType allowingDriverInteraction:driverAllowsInteraction allowingUpdaterInteraction:!preventsInstallerInteraction completion:^(SUInstallerLauncherStatus result) {
         dispatch_async(dispatch_get_main_queue(), ^{
             retrievedLaunchStatus = YES;
             [launcherConnection invalidate];

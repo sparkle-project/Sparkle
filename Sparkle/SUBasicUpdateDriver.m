@@ -187,7 +187,7 @@
             } while(--finiteRecursion && errorToDisplay);
         }
         
-        // Notify host app that update has aborted
+        // Notify host app that updater has aborted
         if ([self.updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
             [self.updaterDelegate updater:self.updater didAbortWithError:(NSError * _Nonnull)error];
         }

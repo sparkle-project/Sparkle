@@ -31,6 +31,7 @@
 @property (nonatomic, readonly) id<SPUUserDriver> userDriver;
 @property (nonatomic) BOOL resumingInstallingUpdate;
 @property (nonatomic) BOOL resumingDownloadedUpdate;
+@property (nonatomic) BOOL preventsInstallerInteraction;
 
 @end
 
@@ -44,6 +45,7 @@
 @synthesize delegate = _delegate;
 @synthesize resumingInstallingUpdate = _resumingInstallingUpdate;
 @synthesize resumingDownloadedUpdate = _resumingDownloadedUpdate;
+@synthesize preventsInstallerInteraction = _preventsInstallerInteraction;
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SUUIBasedUpdateDriverDelegate>)delegate
 {
@@ -65,12 +67,14 @@
     [self.coreDriver prepareCheckForUpdatesWithCompletion:completionBlock];
 }
 
-- (void)preflightForUpdatePermissionWithReply:(void (^)(NSError * _Nullable))reply
+- (void)preflightForUpdatePermissionPreventingInstallerInteraction:(BOOL)preventsInstallerInteraction reply:(void (^)(NSError * _Nullable))reply
 {
-    [self.coreDriver preflightForUpdatePermissionWithReply:reply];
+    self.preventsInstallerInteraction = preventsInstallerInteraction;
+    
+    [self.coreDriver preflightForUpdatePermissionPreventingInstallerInteraction:preventsInstallerInteraction reply:reply];
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary *)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates
 {
     [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:includesSkippedUpdates requiresSilentInstall:NO];
 }
@@ -92,16 +96,6 @@
     if ([self.delegate respondsToSelector:@selector(basicDriverDidFinishLoadingAppcast)]) {
         [self.delegate basicDriverDidFinishLoadingAppcast];
     }
-}
-
-- (BOOL)canDisplayInstallerUserInterface
-{
-    // Are we allowed to perform updates that may require interaction?
-    BOOL updaterAllowsInteraction = YES;
-    if ([self.updaterDelegate respondsToSelector:@selector(updaterShouldAllowInstallerInteraction:)]) {
-        updaterAllowsInteraction = [self.updaterDelegate updaterShouldAllowInstallerInteraction:self.updater];
-    }
-    return updaterAllowsInteraction;
 }
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
@@ -145,7 +139,7 @@
         [self.userDriver showResumableUpdateFoundWithAppcastItem:updateItem reply:^(SPUInstallUpdateStatus choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
-                [self.coreDriver finishInstallationWithResponse:choice displayingUserInterface:[self canDisplayInstallerUserInterface]];
+                [self.coreDriver finishInstallationWithResponse:choice displayingUserInterface:!self.preventsInstallerInteraction];
             });
         }];
     }
@@ -214,7 +208,7 @@
     if (!willInstallImmediately) {
         [self.userDriver showReadyToInstallAndRelaunch:^(SPUInstallUpdateStatus installUpdateStatus) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.coreDriver finishInstallationWithResponse:installUpdateStatus displayingUserInterface:[self canDisplayInstallerUserInterface]];
+                [self.coreDriver finishInstallationWithResponse:installUpdateStatus displayingUserInterface:!self.preventsInstallerInteraction];
             });
         }];
     }

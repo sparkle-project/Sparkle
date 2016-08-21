@@ -551,7 +551,10 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         } else if (self.resumableUpdate != nil) {
             [self.driver resumeDownloadedUpdate:(SUDownloadedUpdate * _Nonnull)self.resumableUpdate completion:completionBlock];
         } else {
-            [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders] completion:completionBlock];
+            BOOL allowsInstallerInteraction =
+            (![self.delegate respondsToSelector:@selector(updaterShouldAllowInstallerInteraction:)] || [self.delegate updaterShouldAllowInstallerInteraction:self]);
+            
+            [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders] preventingInstallerInteraction:!allowsInstallerInteraction completion:completionBlock];
         }
     } else {
         // I think this is really unlikely to occur but better be safe
