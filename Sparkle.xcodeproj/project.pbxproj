@@ -348,6 +348,7 @@
 		72B09CE71CE6BCBD0052EF9E /* SPUURLDownload.h in Headers */ = {isa = PBXBuildFile; fileRef = 72B09CE51CE6BCBD0052EF9E /* SPUURLDownload.h */; };
 		72B09CE81CE6BCBD0052EF9E /* SPUURLDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B09CE61CE6BCBD0052EF9E /* SPUURLDownload.m */; };
 		72B09CEC1CEA18900052EF9E /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 72B09CE91CEA18900052EF9E /* bscommon.c */; };
+		72B4BF091D69805900F5B92D /* Sparkle.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8220A321A7F00D8810D /* Sparkle.strings */; };
 		72B767CA1C9B707000A07552 /* SUAppcastDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 72B767C81C9B707000A07552 /* SUAppcastDriver.h */; };
 		72B767CB1C9B707000A07552 /* SUAppcastDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B767C91C9B707000A07552 /* SUAppcastDriver.m */; };
 		72B767CE1C9B924900A07552 /* SUInstallerDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 72B767CC1C9B924900A07552 /* SUInstallerDriver.h */; };
@@ -2261,6 +2262,9 @@
 				72A5D5981D6927730009E5AC /* Frameworks */,
 				72A5D5EE1D692C360009E5AC /* CopyFiles */,
 				72A5D5F11D692C860009E5AC /* Run Script: Set Git Version Info */,
+				72B4BF081D69805100F5B92D /* Resources */,
+				72B4BF0B1D69811100F5B92D /* Run Script: Link fr_CA to fr */,
+				72B4BF0C1D69814200F5B92D /* Run Script: Link pt to pt_BR */,
 			);
 			buildRules = (
 			);
@@ -2557,6 +2561,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		72B4BF081D69805100F5B92D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72B4BF091D69805900F5B92D /* Sparkle.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		72D9549C1CBB415B006F28BD /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2701,6 +2713,40 @@
 			showEnvVarsInLog = 0;
 		};
 		72B4BF061D697E7300F5B92D /* Run Script: Link pt to pt_BR */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/pt_BR.lproj",
+			);
+			name = "Run Script: Link pt to pt_BR";
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/pt.lproj",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "ln -sfh \"pt_BR.lproj\" \"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/pt.lproj\"";
+			showEnvVarsInLog = 0;
+		};
+		72B4BF0B1D69811100F5B92D /* Run Script: Link fr_CA to fr */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/fr.lproj",
+			);
+			name = "Run Script: Link fr_CA to fr";
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/fr_CA.lproj",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "ln -sfh \"fr.lproj\" \"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/fr_CA.lproj\"";
+			showEnvVarsInLog = 0;
+		};
+		72B4BF0C1D69814200F5B92D /* Run Script: Link pt to pt_BR */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
