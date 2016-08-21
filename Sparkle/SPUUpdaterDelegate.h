@@ -240,6 +240,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  
  If interaction is allowed, then an authorization prompt may show up to the user if they do
  not curently have sufficient privileges to perform the installation of the new update.
+ The installer may also show UI and progress when interaction is allowed.
  
  On the other hand, if interaction is not allowed, then an installation may fail if the user does not
  have sufficient privileges to perform the installation. In this case, the feed and update may not even be downloaded.
@@ -259,6 +260,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  
  If interaction is allowed, then an authorization prompt may show up to the user if they do
  not curently have sufficient privileges to perform the installation of the new update.
+ The installer may also show UI and progress when interaction is allowed.
  
  On the other hand, if interaction is not allowed, then an installation may fail if the user does not
  have sufficient privileges to perform the installation. In this case, the feed and update may not even be downloaded.
