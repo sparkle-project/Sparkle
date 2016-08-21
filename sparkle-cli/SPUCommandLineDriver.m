@@ -86,10 +86,16 @@ void _SULogDisableStandardErrorStream(void);
     });
 }
 
-- (BOOL)updaterShouldAllowInstallerInteraction:(SPUUpdater *)__unused updater
+// If the installation is interactive, we can show an authorization prompt for requesting additional privileges,
+// along with allowing the installer to show UI when installing
+
+- (BOOL)updaterShouldAllowInstallerInteractionForInitiatedChecks:(SPUUpdater *)__unused updater
 {
-    // If the installation is interactive, we can show an authorization prompt for requesting additional privileges,
-    // otherwise we should have the installer inherit the updater's privileges.
+    return self.interactive;
+}
+
+- (BOOL)updaterShouldAllowInstallerInteractionForScheduledChecks:(SPUUpdater *)__unused updater
+{
     return self.interactive;
 }
 
