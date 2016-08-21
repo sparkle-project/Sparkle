@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <Sparkle/Sparkle.h>
+#import <SparkleCore/SparkleCore.h>
 #import "SPUCommandLineDriver.h"
 #include <getopt.h>
 

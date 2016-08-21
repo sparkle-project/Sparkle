@@ -21,6 +21,7 @@
 #import "SUAppcastItem.h"
 #import "SPUDownloadData.h"
 #import "SPUApplicationInfo.h"
+#import "SPUApplicationIcon.h"
 #import "SPUUpdaterSettings.h"
 
 // WebKit protocols are not explicitly declared until 10.11 SDK, so
@@ -299,7 +300,7 @@
 
 - (NSImage *)applicationIcon
 {
-    return [SPUApplicationInfo bestIconForBundle:self.host.bundle];
+    return [SPUApplicationIcon bestIconForBundle:self.host.bundle];
 }
 
 - (NSString *)titleText

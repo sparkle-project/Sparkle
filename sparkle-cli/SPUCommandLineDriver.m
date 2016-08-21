@@ -7,7 +7,7 @@
 //
 
 #import "SPUCommandLineDriver.h"
-#import <Sparkle/Sparkle.h>
+#import <SparkleCore/SparkleCore.h>
 #import "SPUCommandLineUserDriver.h"
 
 void _SULogDisableStandardErrorStream(void);

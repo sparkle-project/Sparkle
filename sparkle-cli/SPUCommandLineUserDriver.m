@@ -8,6 +8,12 @@
 
 #import "SPUCommandLineUserDriver.h"
 #import <AppKit/AppKit.h>
+#import <SparkleCore/SparkleCore.h>
+#import "SPUUserDriverCoreComponent.h"
+
+// Going to borrow this private class from Sparkle
+// Note to compile properly, this class must not be exported (which is why we aren't importing SPUUserDriverUIComponent)
+#import "SPUApplicationInfo.h"
 
 #define SCHEDULED_UPDATE_TIMER_THRESHOLD 2.0 // seconds
 
@@ -18,7 +24,6 @@
 @property (nonatomic, readonly) BOOL deferInstallation;
 @property (nonatomic, readonly) BOOL verbose;
 @property (nonatomic, readonly) SPUUserDriverCoreComponent *coreComponent;
-@property (nonatomic, readonly) SPUUserDriverUIComponent *uiComponent;
 @property (nonatomic) NSUInteger bytesDownloaded;
 @property (nonatomic) NSUInteger bytesToDownload;
 
@@ -31,7 +36,6 @@
 @synthesize deferInstallation = _deferInstallation;
 @synthesize verbose = _verbose;
 @synthesize coreComponent = _coreComponent;
-@synthesize uiComponent = _uiComponent;
 @synthesize bytesDownloaded = _bytesDownloaded;
 @synthesize bytesToDownload = _bytesToDownload;
 
@@ -44,7 +48,6 @@
         _deferInstallation = deferInstallation;
         _verbose = verbose;
         _coreComponent = [[SPUUserDriverCoreComponent alloc] init];
-        _uiComponent = [[SPUUserDriverUIComponent alloc] init];
     }
     return self;
 }
@@ -269,7 +272,7 @@
                 fprintf(stderr, "Deferring Installation.\n");
             }
             [self.coreComponent installUpdateWithChoice:SPUDismissUpdateInstallation];
-        } else if ([self.uiComponent applicationIsAliveForBundle:self.applicationBundle]) {
+        } else if ([SPUApplicationInfo runningApplicationWithBundle:self.applicationBundle] != nil) {
             [self.coreComponent installUpdateWithChoice:SPUInstallAndRelaunchUpdateNow];
         } else {
             [self.coreComponent installUpdateWithChoice:SPUInstallUpdateNow];
@@ -312,7 +315,9 @@
 - (void)terminateApplication
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.uiComponent terminateApplicationForBundle:self.applicationBundle];
+        for (NSRunningApplication *application in [SPUApplicationInfo runningApplicationsWithBundle:self.applicationBundle]) {
+            [application terminate];
+        }
     });
 }
 

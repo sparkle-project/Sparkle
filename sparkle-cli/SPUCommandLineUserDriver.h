@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <Sparkle/Sparkle.h>
+#import <SparkleCore/SparkleCore.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
