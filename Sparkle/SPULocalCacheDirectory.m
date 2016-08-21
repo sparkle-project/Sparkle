@@ -17,7 +17,7 @@ static NSTimeInterval OLD_ITEM_DELETION_INTERVAL = 86400 * 10; // 10 days
 
 @implementation SPULocalCacheDirectory
 
-// If we support sandboxing this component in the future, it is important to note this may return a different path
+// It is important to note this may return a different path whether invoked from a sanboxed vs non-sandboxed process, or from a different user
 // For this reason, this method should not be a part of SUHost because its behavior depends on what kind of process it's being invoked from
 + (NSString *)cachePathForBundleIdentifier:(NSString *)bundleIdentifier
 {
