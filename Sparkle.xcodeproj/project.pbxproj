@@ -1991,6 +1991,8 @@
 				721C24411CB753E6005440CB /* Sources */,
 				721C24421CB753E6005440CB /* Frameworks */,
 				721C24431CB753E6005440CB /* Resources */,
+				72B4BF011D693F7300F5B92D /* Run Script: Link fr_CA to fr */,
+				72B4BF021D693FBD00F5B92D /* Run Script: Link pt to pt_BR */,
 			);
 			buildRules = (
 			);
@@ -2498,6 +2500,40 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "${SRCROOT}/Configurations/set-ats-exceptions-downloader-service.sh";
+		};
+		72B4BF011D693F7300F5B92D /* Run Script: Link fr_CA to fr */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/fr.lproj",
+			);
+			name = "Run Script: Link fr_CA to fr";
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/fr_CA.lproj",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "ln -sfh \"fr.lproj\" \"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/fr_CA.lproj\"";
+			showEnvVarsInLog = 0;
+		};
+		72B4BF021D693FBD00F5B92D /* Run Script: Link pt to pt_BR */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/pt_BR.lproj",
+			);
+			name = "Run Script: Link pt to pt_BR";
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/pt.lproj",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "ln -sfh \"pt_BR.lproj\" \"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/pt.lproj\"";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
