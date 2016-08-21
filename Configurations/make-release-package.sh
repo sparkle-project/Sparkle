@@ -19,6 +19,7 @@ if [ "$ACTION" = "" ] ; then
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app" "$CONFIGURATION_BUILD_DIR/staging"
     cp -R "$CONFIGURATION_BUILD_DIR/sparkle.app" "$CONFIGURATION_BUILD_DIR/staging"
     cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework" "$CONFIGURATION_BUILD_DIR/staging"
+    cp -R "$CONFIGURATION_BUILD_DIR/SparkleCore.framework" "$CONFIGURATION_BUILD_DIR/staging"
 
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
 
@@ -36,6 +37,7 @@ if [ "$ACTION" = "" ] ; then
         cp -R "$CONFIGURATION_BUILD_DIR/Sparkle Test App.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
         cp -R "$CONFIGURATION_BUILD_DIR/sparkle.app.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
         cp -R "$CONFIGURATION_BUILD_DIR/Sparkle.framework.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
+        cp -R "$CONFIGURATION_BUILD_DIR/SparkleCore.framework.dSYM" "$CONFIGURATION_BUILD_DIR/staging"
 
         cp -R "$CONFIGURATION_BUILD_DIR/$INSTALLER_LAUNCHER_BUNDLE_ID.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
         cp -R "$CONFIGURATION_BUILD_DIR/$DOWNLOADER_BUNDLE_ID.xpc.dSYM" "$CONFIGURATION_BUILD_DIR/staging/XPCServices"
