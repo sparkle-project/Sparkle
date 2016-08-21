@@ -232,19 +232,42 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (nullable id<SUVersionComparison>)versionComparatorForUpdater:(SPUUpdater *)updater;
 
 /*!
- Returns whether or not the updater should allow interaction with its installer
+ Returns whether or not the updater should allow interaction from the installer for scheduled checks
  
  Use this to override the default behavior which is to allow interaction with the installer.
+ 
+ This method applies to updates started in the background
  
  If interaction is allowed, then an authorization prompt may show up to the user if they do
  not curently have sufficient privileges to perform the installation of the new update.
  
  On the other hand, if interaction is not allowed, then an installation may fail if the user does not
- have sufficient privileges to perform the installation.
+ have sufficient privileges to perform the installation. In this case, the feed and update may not even be downloaded.
+ 
+ Note this has no effect if the update has already been downloaded in the background silently and ready to be resumed.
  
  \param updater The updater instance.
  */
-- (BOOL)updaterShouldAllowInstallerInteraction:(SPUUpdater *)updater;
+- (BOOL)updaterShouldAllowInstallerInteractionForScheduledChecks:(SPUUpdater *)updater;
+
+/*!
+ Returns whether or not the updater should allow interaction from the installer for user initiated checks
+ 
+ Use this to override the default behavior which is to allow interaction with the installer.
+ 
+ This method applies to updates started from -[SPUUpdater checkForUpdates]
+ 
+ If interaction is allowed, then an authorization prompt may show up to the user if they do
+ not curently have sufficient privileges to perform the installation of the new update.
+ 
+ On the other hand, if interaction is not allowed, then an installation may fail if the user does not
+ have sufficient privileges to perform the installation. In this case, the feed and update may not even be downloaded.
+ 
+ Note this has no effect if the update has already been downloaded in the background silently and ready to be resumed.
+ 
+ \param updater The updater instance.
+ */
+- (BOOL)updaterShouldAllowInstallerInteractionForInitiatedChecks:(SPUUpdater *)updater;
 
 /*!
  Returns the decryption password (if any) which is used to extract the update archive DMG.

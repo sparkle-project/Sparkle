@@ -434,7 +434,14 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                  updaterDelegate:strongSelf.delegate];
             }
             
-            [strongSelf checkForUpdatesWithDriver:updateDriver installerInProgress:installerIsRunning];
+            BOOL preventsInstallerInteraction;
+            if ([strongSelf.delegate respondsToSelector:@selector(updaterShouldAllowInstallerInteractionForScheduledChecks:)]) {
+                preventsInstallerInteraction = ![strongSelf.delegate updaterShouldAllowInstallerInteractionForScheduledChecks:strongSelf];
+            } else {
+                preventsInstallerInteraction = NO;
+            }
+            
+            [strongSelf checkForUpdatesWithDriver:updateDriver installerInProgress:installerIsRunning preventsInstallerInteraction:preventsInstallerInteraction];
         });
     }];
 }
@@ -461,7 +468,14 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         dispatch_async(dispatch_get_main_queue(), ^{
             SPUUpdater *strongSelf = weakSelf;
             if (strongSelf != nil) {
-                [strongSelf checkForUpdatesWithDriver:theUpdateDriver installerInProgress:installerInProgress];
+                BOOL preventsInstallerInteraction;
+                if ([strongSelf.delegate respondsToSelector:@selector(updaterShouldAllowInstallerInteractionForInitiatedChecks:)]) {
+                    preventsInstallerInteraction = ![strongSelf.delegate updaterShouldAllowInstallerInteractionForInitiatedChecks:strongSelf];
+                } else {
+                    preventsInstallerInteraction = NO;
+                }
+                
+                [strongSelf checkForUpdatesWithDriver:theUpdateDriver installerInProgress:installerInProgress preventsInstallerInteraction:preventsInstallerInteraction];
             }
         });
     }];
@@ -483,13 +497,13 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         dispatch_async(dispatch_get_main_queue(), ^{
             SPUUpdater *strongSelf = weakSelf;
             if (strongSelf != nil) {
-                [strongSelf checkForUpdatesWithDriver:[[SUProbingUpdateDriver alloc] initWithHost:strongSelf.host updater:strongSelf updaterDelegate:strongSelf.delegate] installerInProgress:installerInProgress];
+                [strongSelf checkForUpdatesWithDriver:[[SUProbingUpdateDriver alloc] initWithHost:strongSelf.host updater:strongSelf updaterDelegate:strongSelf.delegate] installerInProgress:installerInProgress preventsInstallerInteraction:NO];
             }
         });
     }];
 }
 
-- (void)checkForUpdatesWithDriver:(id <SUUpdateDriver> )d installerInProgress:(BOOL)installerInProgress
+- (void)checkForUpdatesWithDriver:(id <SUUpdateDriver> )d installerInProgress:(BOOL)installerInProgress preventsInstallerInteraction:(BOOL)preventsInstallerInteraction
 {
     if (self.driver != nil) {
         return;
@@ -551,10 +565,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         } else if (self.resumableUpdate != nil) {
             [self.driver resumeDownloadedUpdate:(SUDownloadedUpdate * _Nonnull)self.resumableUpdate completion:completionBlock];
         } else {
-            BOOL allowsInstallerInteraction =
-            (![self.delegate respondsToSelector:@selector(updaterShouldAllowInstallerInteraction:)] || [self.delegate updaterShouldAllowInstallerInteraction:self]);
-            
-            [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders] preventingInstallerInteraction:!allowsInstallerInteraction completion:completionBlock];
+            [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders] preventingInstallerInteraction:preventsInstallerInteraction completion:completionBlock];
         }
     } else {
         // I think this is really unlikely to occur but better be safe
