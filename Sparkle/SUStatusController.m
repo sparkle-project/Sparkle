@@ -9,6 +9,7 @@
 #import "SUStatusController.h"
 #import "SUHost.h"
 #import "SPUApplicationInfo.h"
+#import "SPUApplicationIcon.h"
 #import "SULocalizations.h"
 
 @interface SUStatusController ()
@@ -57,7 +58,7 @@
 
 - (NSImage *)applicationIcon
 {
-    return [SPUApplicationInfo bestIconForBundle:self.host.bundle];
+    return [SPUApplicationIcon bestIconForBundle:self.host.bundle];
 }
 
 - (void)beginActionWithTitle:(NSString *)aTitle maxProgressValue:(double)aMaxProgressValue statusText:(NSString *)aStatusText

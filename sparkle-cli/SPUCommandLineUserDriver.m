@@ -8,6 +8,9 @@
 
 #import "SPUCommandLineUserDriver.h"
 #import <AppKit/AppKit.h>
+#import <SparkleCore/SparkleCore.h>
+#import "SPUUserDriverCoreComponent.h"
+#import "SPUUserDriverUIComponent.h" // going to borrow this one class from Sparkle
 
 #define SCHEDULED_UPDATE_TIMER_THRESHOLD 2.0 // seconds
 
