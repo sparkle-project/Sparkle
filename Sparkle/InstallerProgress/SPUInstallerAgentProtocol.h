@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)registerInstallationInfoData:(NSData *)installationInfoData;
 
+- (void)sendTerminationSignal;
+
 - (void)showProgress;
 
 - (void)stopProgress;

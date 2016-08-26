@@ -112,7 +112,9 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update
  *
- * @param reply A reply of SPUInstallAndRelaunchUpdateNow installs the update immediately and relaunches the new update.
+ * @param reply
+ * A reply of SPUInstallAndRelaunchUpdateNow installs the update immediately and relaunches the new update.
+ * Note: the application is not relaunched if it was not running before installing the update.
  * A reply of SPUInstallUpdateNow installs the update immediately but does not relaunch the new update.
  * A reply of SPUDismissUpdateInstallation dismisses the update installation. Note the update will attempt to finish installation
  * after the application terminates.
@@ -233,7 +235,9 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * Let the user know that the update is ready and ask them whether they want to install or not.
  * Note if the target application is already terminated and an update can be performed silently, this method may not be invoked.
  *
- * @param installUpdateHandler A reply of SPUInstallAndRelaunchUpdateNow installs the update immediately and relaunches the new update.
+ * @param installUpdateHandler
+ * A reply of SPUInstallAndRelaunchUpdateNow installs the update immediately and relaunches the new update.
+ * Note: the application is not relaunched if it was not running before installing the update.
  * A reply of SPUInstallUpdateNow installes the update immediately but does not relaunch the new update.
  * A reply of SPUDismissUpdateInstallation dismisses the update installation. Note the update may still be installed after
  * the application terminates, however there is not a strong guarantee that this will happen.
@@ -252,29 +256,17 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 - (void)showInstallingUpdate;
 
 /*!
- * Terminate the application and show or dismiss installer progress.
+ * Show or dismiss progress while a termination signal is being sent to the application
  *
- * Sparkle is asking us to send a request to terminate the application.
+ * Terminating and relaunching the application (if requested to be relaunched) may happen quickly,
+ * or it may take some time to perform the final installation, or the termination signal can be canceled or delayed by the application or user.
  *
- * If this will terminate the current application, an implementor may decide to dismiss progress UI in case the termination request is delayed or canceled.
- * Or if this will terminate a remote application, an implementor may decide to show the user that the update is currently installing.
- *
- * This can be called from any thread
- */
-- (void)terminateApplication;
-
-/*!
- * Terminate the application silently.
- *
- * Sparkle is asking us to send a request to terminate the application without showing any UI interaction.
- * This may be invoked after Sparkle has downloaded an update in the background automatically,
- * and the updater's delegate has decided to install & relaunch the application without disrupting the user (think of a backgrounded application).
- *
- * After the application is terminated, the update will be installed and the application will be relaunched.
+ * It is up to the implementor whether or not to decide to continue showing installation progress
+ * or dismissing UI that won't remain obscuring other parts of the user interface.
  *
  * This can be called from any thread
  */
-- (void)terminateApplicationSilently;
+- (void)showSendingTerminationSignal;
 
 /*!
  * Show the user that the update installation finished

@@ -9,10 +9,8 @@
 #import <Foundation/Foundation.h>
 #import <Sparkle/Sparkle.h>
 
-@protocol SPUStandardUserDriverProtocol;
-
 @interface SUPopUpTitlebarUserDriver : NSObject <SPUUserDriver, SPUStandardUserDriverProtocol>
 
-- (instancetype)initWithApplicationBundle:(NSBundle *)applicationBundle window:(NSWindow *)window;
+- (instancetype)initWithWindow:(NSWindow *)window;
 
 @end

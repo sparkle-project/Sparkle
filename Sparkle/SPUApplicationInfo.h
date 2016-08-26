@@ -14,10 +14,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)isBackgroundApplication:(NSApplication *)application;
 
-+ (NSArray<NSRunningApplication *> *)runningApplicationsWithBundle:(NSBundle *)bundle;
-
-+ (NSRunningApplication * _Nullable)runningApplicationWithBundle:(NSBundle *)bundle;
-
 @end
 
 NS_ASSUME_NONNULL_END

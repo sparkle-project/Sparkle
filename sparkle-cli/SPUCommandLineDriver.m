@@ -57,7 +57,7 @@ void _SULogDisableStandardErrorStream(void);
         _SULogDisableStandardErrorStream();
 #endif
         
-        id <SPUUserDriver> userDriver = [[SPUCommandLineUserDriver alloc] initWithApplicationBundle:applicationBundle updatePermissionResponse:updatePermissionResponse deferInstallation:deferInstallation verbose:verbose];
+        id <SPUUserDriver> userDriver = [[SPUCommandLineUserDriver alloc] initWithUpdatePermissionResponse:updatePermissionResponse deferInstallation:deferInstallation verbose:verbose];
         _updater = [[SPUUpdater alloc] initWithHostBundle:updateBundle applicationBundle:applicationBundle userDriver:userDriver delegate:self];
     }
     return self;

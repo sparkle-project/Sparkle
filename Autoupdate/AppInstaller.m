@@ -428,20 +428,17 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         uint8_t showsUI = *((const uint8_t *)data.bytes + 1);
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            // Only applicable to stage 2
+            // This flag has an impact on interactive type installations and showing UI progress during non-interactive installations
             self.shouldShowUI = (BOOL)showsUI;
+            // We only allow relaunching if the application has been alive
+            self.shouldRelaunch = (BOOL)relaunch && !self.terminationListener.terminated;
             
-            // Allow handling if we should relaunch at any time
-            self.shouldRelaunch = (BOOL)relaunch;
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (self.performedStage1Installation) {
-                    // Resume the installation if we aren't done with stage 2 yet, and remind the client we are prepared to relaunch
-                    dispatch_async(self.installerQueue, ^{
-                        [self performStage2InstallationIfNeeded];
-                    });
-                }
-            });
+            if (self.performedStage1Installation) {
+                // Resume the installation if we aren't done with stage 2 yet, and remind the client we are prepared to relaunch
+                dispatch_async(self.installerQueue, ^{
+                    [self performStage2InstallationIfNeeded];
+                });
+            }
         });
     } else if (identifier == SPUUpdaterAlivePong) {
         self.receivedUpdaterPong = YES;
@@ -515,6 +512,10 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             
             NSData *sendData = [NSData dataWithBytes:&targetTerminated length:sizeof(targetTerminated)];
             [self.communicator handleMessageWithIdentifier:SPUInstallationFinishedStage2 data:sendData];
+            
+            if (!self.terminationListener.terminated) {
+                [self.agentConnection.agent sendTerminationSignal];
+            }
         });
     } else {
         SULog(@"Error: Failed to resume installer on stage 2 because installation cannot be installed silently");

@@ -10,7 +10,6 @@
 #import "InstallerProgressDelegate.h"
 #import "SPUMessageTypes.h"
 #import "SULog.h"
-#import "SPUApplicationInfo.h"
 #import "SPUApplicationIcon.h"
 #import "SPUInstallerAgentProtocol.h"
 #import "SUInstallerAgentInitiationProtocol.h"
@@ -34,6 +33,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @property (nonatomic) StatusInfo *statusInfo;
 @property (nonatomic) BOOL submittedLauncherJob;
 @property (nonatomic) BOOL willTerminate;
+@property (nonatomic) BOOL applicationInitiallyAlive;
+@property (nonatomic) NSBundle *applicationBundle;
 
 @end
 
@@ -50,6 +51,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 @synthesize statusInfo = _statusInfo;
 @synthesize submittedLauncherJob = _submittedLauncherJob;
 @synthesize willTerminate = _willTerminate;
+@synthesize applicationInitiallyAlive = _applicationInitiallyAlive;
+@synthesize applicationBundle = _applicationBundle;
 
 - (instancetype)initWithApplication:(NSApplication *)application arguments:(NSArray<NSString *> *)arguments delegate:(id<InstallerProgressDelegate>)delegate
 {
@@ -163,6 +166,32 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     exit(status);
 }
 
+- (NSArray<NSRunningApplication *> *)runningApplicationsWithBundle:(NSBundle *)bundle
+{
+    // Resolve symlinks otherwise when we compare file paths, we may not realize two paths that are represented differently are the same
+    NSArray<NSString *> *bundlePathComponents = bundle.bundlePath.stringByResolvingSymlinksInPath.pathComponents;
+    NSString *bundleIdentifier = bundle.bundleIdentifier;
+    
+    NSMutableArray<NSRunningApplication *> *matchedRunningApplications = [[NSMutableArray alloc] init];
+    
+    if (bundleIdentifier != nil && bundlePathComponents != nil) {
+        NSArray *runningApplications =
+        (bundleIdentifier != nil) ?
+        [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleIdentifier] :
+        [[NSWorkspace sharedWorkspace] runningApplications];
+        
+        for (NSRunningApplication *runningApplication in runningApplications) {
+            // Comparing the URLs hasn't worked well for me in practice, so I'm comparing the file paths instead
+            NSString *candidatePath = runningApplication.bundleURL.URLByResolvingSymlinksInPath.path;
+            if (candidatePath != nil && [candidatePath.pathComponents isEqualToArray:bundlePathComponents]) {
+                [matchedRunningApplications addObject:runningApplication];
+            }
+        }
+    }
+    
+    return [matchedRunningApplications copy];
+}
+
 - (void)registerRelaunchBundlePath:(NSString *)relaunchBundlePath reply:(void (^)(NSNumber *))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -173,12 +202,21 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
                 [self cleanupAndExitWithStatus:EXIT_FAILURE];
             }
             
-            NSRunningApplication *runningApplication = [SPUApplicationInfo runningApplicationWithBundle:relaunchBundle];
-            NSNumber *processIdentifier = (runningApplication == nil || runningApplication.terminated) ? nil : @(runningApplication.processIdentifier);
+            NSArray<NSRunningApplication *> *runningApplications = [self runningApplicationsWithBundle:relaunchBundle];
+            
+            // We're just picking the first running application to send..
+            // Ideally we'd send them all and have the installer monitor all of them but I don't want to deal with that complexity at the moment
+            // Although that would still have the issue if another instance of the application launched during that duration
+            // At the same time we don't want the installer to be over-reliant on us (the agent tool) in a way that could leave the installer as a zombie by accident
+            // Lastly we don't handle monitoring or terminating processes from logged in user's
+            NSRunningApplication *firstRunningApplication = runningApplications.firstObject;
+            NSNumber *processIdentifier = (firstRunningApplication == nil || firstRunningApplication.terminated) ? nil : @(firstRunningApplication.processIdentifier);
             
             reply(processIdentifier);
             
             self.repliedToRegistration = YES;
+            self.applicationBundle = relaunchBundle;
+            self.applicationInitiallyAlive = (processIdentifier != nil);
         }
     });
 }
@@ -192,12 +230,24 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     });
 }
 
+- (void)sendTerminationSignal
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (!self.willTerminate && self.applicationBundle != nil && self.applicationInitiallyAlive) {
+            // Note we are sending an Apple quit event, which gives the application or user a chance to delay or cancel the request, which is what we desire
+            for (NSRunningApplication *runningApplication in [self runningApplicationsWithBundle:self.applicationBundle]) {
+                [runningApplication terminate];
+            }
+        }
+    });
+}
+
 // The pathToRelaunch passed to here is not necessarily the same as the one passed in -registerRelaunchBundlePath:reply: if the developer uses SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME
 // Note the installer won't tell us to launch an application unless it was already running before
 - (void)relaunchPath:(NSString *)pathToRelaunch
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (!self.willTerminate) {
+        if (!self.willTerminate && self.applicationInitiallyAlive) {
             // We only launch applications, but I'm not sure how reliable -launchApplicationAtURL:options:config: is so we're not using it
             // Eg: http://www.openradar.me/10952677
             

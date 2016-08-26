@@ -11,11 +11,9 @@
 
 @interface SUPopUpTitlebarUserDriver()
 
-@property (nonatomic, readonly) NSBundle *applicationBundle;
 @property (nonatomic, readonly) NSWindow *window;
 @property (nonatomic, nullable) SUInstallUpdateViewController *installUpdateViewController;
 @property (nonatomic, readonly) SPUUserDriverCoreComponent *coreComponent;
-@property (nonatomic, readonly) SPUUserDriverUIComponent *uiComponent;
 @property (nonatomic) NSTitlebarAccessoryViewController *accessoryViewController;
 @property (nonatomic) BOOL addedAccessory;
 @property (nonatomic) NSButton *updateButton;
@@ -27,11 +25,9 @@
 
 @implementation SUPopUpTitlebarUserDriver
 
-@synthesize applicationBundle = _applicationBundle;
 @synthesize window = _window;
 @synthesize installUpdateViewController = _installUpdateViewController;
 @synthesize coreComponent = _coreComponent;
-@synthesize uiComponent = _uiComponent;
 @synthesize accessoryViewController = _accessoryViewController;
 @synthesize addedAccessory = _addedAccessory;
 @synthesize updateButton = _updateButton;
@@ -39,14 +35,12 @@
 @synthesize expectedContentLength = _expectedContentLength;
 @synthesize contentLengthDownloaded = _contentLengthDownloaded;
 
-- (instancetype)initWithApplicationBundle:(NSBundle *)applicationBundle window:(NSWindow *)window
+- (instancetype)initWithWindow:(NSWindow *)window
 {
     self = [super init];
     if (self != nil) {
-        _applicationBundle = applicationBundle;
         _window = window;
         _coreComponent = [[SPUUserDriverCoreComponent alloc] init];
-        _uiComponent = [[SPUUserDriverUIComponent alloc] init];
     }
     return self;
 }
@@ -314,6 +308,14 @@
     });
 }
 
+- (void)showSendingTerminationSignal
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // In case our termination request fails or is delayed
+        [self removeUpdateButton];
+    });
+}
+
 - (void)showUpdateInstallationDidFinishWithAcknowledgement:(void (^)(void))acknowledgement
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -326,25 +328,6 @@
 }
 
 #pragma mark Aborting Everything
-
-- (void)terminateApplication
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.uiComponent terminateApplicationForBundleAndWillTerminateCurrentApplication:self.applicationBundle]) {
-            // In case our termination request fails or is delayed
-            [self removeUpdateButton];
-        } else {
-            [self addUpdateButtonWithTitle:@"Installing…"];
-        }
-    });
-}
-
-- (void)terminateApplicationSilently
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.uiComponent terminateApplicationForBundle:self.applicationBundle];
-    });
-}
 
 - (void)_dismissUpdateInstallation
 {

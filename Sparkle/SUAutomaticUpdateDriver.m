@@ -109,13 +109,6 @@
     }
 }
 
-// This can only be reached if the updater delegate invokes its immediate installation block above,
-// otherwise the update driver will abort the update before then
-- (void)installerIsRequestingAppTermination
-{
-    [self.userDriver terminateApplicationSilently];
-}
-
 - (void)basicDriverIsRequestingAbortUpdateWithError:(NSError *)error
 {
     [self abortUpdateWithError:error];

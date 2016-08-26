@@ -214,9 +214,9 @@
     }
 }
 
-- (void)installerIsRequestingAppTermination
+- (void)installerIsSendingAppTerminationSignal
 {
-    [self.userDriver terminateApplication];
+    [self.userDriver showSendingTerminationSignal];
 }
 
 - (void)installerDidFinishInstallationWithAcknowledgement:(void(^)(void))acknowledgement

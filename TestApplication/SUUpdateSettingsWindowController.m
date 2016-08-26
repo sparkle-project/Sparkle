@@ -46,9 +46,9 @@
     // If the user is holding down command, we use the popup title user driver instead
     id<SPUUserDriver, SPUStandardUserDriverProtocol> userDriver;
     if (self.customUserDriver) {
-        userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithApplicationBundle:applicationBundle window:self.window];
+        userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:self.window];
     } else {
-        userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle applicationBundle:applicationBundle delegate:nil];
+        userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:nil];
     }
     
     self.userDriver = userDriver;

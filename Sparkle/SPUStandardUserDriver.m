@@ -8,7 +8,6 @@
 
 #import "SPUStandardUserDriver.h"
 #import "SPUUserDriverCoreComponent.h"
-#import "SPUUserDriverUIComponent.h"
 #import "SPUStandardUserDriverDelegate.h"
 #import "SUAppcastItem.h"
 #import "SUVersionDisplayProtocol.h"
@@ -23,10 +22,8 @@
 @interface SPUStandardUserDriver ()
 
 @property (nonatomic, readonly) SUHost *host;
-@property (nonatomic, readonly) NSBundle *applicationBundle;
 
 @property (nonatomic, readonly) SPUUserDriverCoreComponent *coreComponent;
-@property (nonatomic, readonly) SPUUserDriverUIComponent *uiComponent;
 @property (nonatomic, weak, nullable, readonly) id <SPUStandardUserDriverDelegate> delegate;
 
 @property (nonatomic) SUStatusController *checkingController;
@@ -35,18 +32,10 @@
 
 @end
 
-@interface NSObject (Private)
-
-- (NSString * _Nullable)_pathToTerminateForStandardUserDriver;
-
-@end
-
 @implementation SPUStandardUserDriver
 
 @synthesize host = _host;
-@synthesize applicationBundle = _applicationBundle;
 @synthesize coreComponent = _coreComponent;
-@synthesize uiComponent = _uiComponent;
 @synthesize delegate = _delegate;
 @synthesize checkingController = _checkingController;
 @synthesize activeUpdateAlert = _activeUpdateAlert;
@@ -54,15 +43,13 @@
 
 #pragma mark Birth
 
-- (instancetype)initWithHostBundle:(NSBundle *)hostBundle applicationBundle:(NSBundle *)applicationBundle delegate:(nullable id<SPUStandardUserDriverDelegate>)delegate
+- (instancetype)initWithHostBundle:(NSBundle *)hostBundle delegate:(nullable id<SPUStandardUserDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
         _host = [[SUHost alloc] initWithBundle:hostBundle];
-        _applicationBundle = applicationBundle;
         _delegate = delegate;
         _coreComponent = [[SPUUserDriverCoreComponent alloc] init];
-        _uiComponent = [[SPUUserDriverUIComponent alloc] init];
     }
     return self;
 }
@@ -404,46 +391,14 @@
 
 #pragma mark Aborting Everything
 
-- (BOOL)_terminateApplicationAndWillTerminateCurrentApplication
-{
-    // Give the delegate a deferred chance for providing an application path
-    // This is a private API and used by SUUpdater
-    NSString *applicationPath = nil;
-    if ([self.delegate respondsToSelector:@selector(_pathToTerminateForStandardUserDriver)]) {
-        applicationPath = [(NSObject *)self.delegate _pathToTerminateForStandardUserDriver];
-    }
-    
-    NSBundle *applicationBundle;
-    if (applicationPath != nil) {
-        applicationBundle = [NSBundle bundleWithPath:applicationPath];
-        assert(applicationBundle != nil);
-    } else {
-        applicationBundle = self.applicationBundle;
-    }
-    
-    return [self.uiComponent terminateApplicationForBundleAndWillTerminateCurrentApplication:applicationBundle];
-}
-
-- (void)terminateApplication
+- (void)showSendingTerminationSignal
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self _terminateApplicationAndWillTerminateCurrentApplication]) {
-            // if a user chooses to NOT relaunch the app (as is the case with WebKit
-            // when it asks you if you are sure you want to close the app with multiple
-            // tabs open), the status window still stays on the screen and obscures
-            // other windows; with this fix, it doesn't
-            [self.statusController close];
-            self.statusController = nil;
-        } else {
-            [self _showInstallingUpdate];
-        }
-    });
-}
-
-- (void)terminateApplicationSilently
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self _terminateApplicationAndWillTerminateCurrentApplication];
+        // The "quit" event can always be canceled or delayed by the application we're updating
+        // So we can't easily predict how long the installation will take or if it won't happen right away
+        // We close our status window because we don't want it persisting for too long and have it obscure other windows
+        [self.statusController close];
+        self.statusController = nil;
     });
 }
 

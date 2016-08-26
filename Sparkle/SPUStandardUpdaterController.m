@@ -40,7 +40,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         self.initializedUpdater = YES;
         
         NSBundle *hostBundle = [NSBundle mainBundle];
-        id <SPUUserDriver, SPUStandardUserDriverProtocol> userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle delegate:self.userDriverDelegate];
+        id <SPUUserDriver, SPUStandardUserDriverProtocol> userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:hostBundle delegate:self.userDriverDelegate];
         self.updater = [[SPUUpdater alloc] initWithHostBundle:hostBundle applicationBundle:hostBundle userDriver:userDriver delegate:self.updaterDelegate];
         self.userDriver = userDriver;
         

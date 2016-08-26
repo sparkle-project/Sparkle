@@ -11,15 +11,10 @@
 #import <SparkleCore/SparkleCore.h>
 #import "SPUUserDriverCoreComponent.h"
 
-// Going to borrow this private class from Sparkle
-// Note to compile properly, this class must not be exported (which is why we aren't importing SPUUserDriverUIComponent)
-#import "SPUApplicationInfo.h"
-
 #define SCHEDULED_UPDATE_TIMER_THRESHOLD 2.0 // seconds
 
 @interface SPUCommandLineUserDriver ()
 
-@property (nonatomic, readonly) NSBundle *applicationBundle;
 @property (nonatomic, nullable, readonly) SPUUpdatePermissionResponse *updatePermissionResponse;
 @property (nonatomic, readonly) BOOL deferInstallation;
 @property (nonatomic, readonly) BOOL verbose;
@@ -31,7 +26,6 @@
 
 @implementation SPUCommandLineUserDriver
 
-@synthesize applicationBundle = _applicationBundle;
 @synthesize updatePermissionResponse = _updatePermissionResponse;
 @synthesize deferInstallation = _deferInstallation;
 @synthesize verbose = _verbose;
@@ -39,11 +33,10 @@
 @synthesize bytesDownloaded = _bytesDownloaded;
 @synthesize bytesToDownload = _bytesToDownload;
 
-- (instancetype)initWithApplicationBundle:(NSBundle *)applicationBundle updatePermissionResponse:(nullable SPUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose
+- (instancetype)initWithUpdatePermissionResponse:(nullable SPUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose
 {
     self = [super init];
     if (self != nil) {
-        _applicationBundle = applicationBundle;
         _updatePermissionResponse = updatePermissionResponse;
         _deferInstallation = deferInstallation;
         _verbose = verbose;
@@ -102,7 +95,8 @@
 
 - (void)displayHTMLReleaseNotes:(NSData *)releaseNotes
 {
-    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:releaseNotes documentAttributes:NULL];
+    // Note: this is the only API we rely on here that references AppKit
+    NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:releaseNotes documentAttributes:nil];
     [self displayReleaseNotes:attributedString.string.UTF8String];
 }
 
@@ -272,10 +266,8 @@
                 fprintf(stderr, "Deferring Installation.\n");
             }
             [self.coreComponent installUpdateWithChoice:SPUDismissUpdateInstallation];
-        } else if ([SPUApplicationInfo runningApplicationWithBundle:self.applicationBundle] != nil) {
-            [self.coreComponent installUpdateWithChoice:SPUInstallAndRelaunchUpdateNow];
         } else {
-            [self.coreComponent installUpdateWithChoice:SPUInstallUpdateNow];
+            [self.coreComponent installUpdateWithChoice:SPUInstallAndRelaunchUpdateNow];
         }
     });
 }
@@ -312,18 +304,9 @@
     });
 }
 
-- (void)terminateApplication
+- (void)showSendingTerminationSignal
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        for (NSRunningApplication *application in [SPUApplicationInfo runningApplicationsWithBundle:self.applicationBundle]) {
-            [application terminate];
-        }
-    });
-}
-
-- (void)terminateApplicationSilently
-{
-    [self terminateApplication];
+    // We are already showing that the update is installing, so there is no need to do anything here
 }
 
 @end

@@ -28,7 +28,6 @@
 #import "SPUStandardUserDriver.h"
 #import "SPUStandardUserDriverDelegate.h"
 #import "SPUUserDriverCoreComponent.h"
-#import "SPUUserDriverUIComponent.h"
 #import "SPUDownloadData.h"
 
 #import "SUUpdater.h" // deprecated

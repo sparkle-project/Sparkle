@@ -287,7 +287,7 @@
         [self.delegate installerWillFinishInstallationAndRelaunch:self.willRelaunch];
         
         if (!hasTargetTerminated) {
-            [self.delegate installerIsRequestingAppTermination];
+            [self.delegate installerIsSendingAppTerminationSignal];
         }
     } else if (identifier == SPUInstallationFinishedStage3) {
         self.currentStage = identifier;

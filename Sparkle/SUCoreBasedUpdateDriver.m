@@ -305,11 +305,11 @@
     }
 }
 
-- (void)installerIsRequestingAppTermination
+- (void)installerIsSendingAppTerminationSignal
 {
     // If they don't respond or do anything, we'll just install after the user terminates the app anyway
-    if ([self.delegate respondsToSelector:@selector(installerIsRequestingAppTermination)]) {
-        [self.delegate installerIsRequestingAppTermination];
+    if ([self.delegate respondsToSelector:@selector(installerIsSendingAppTerminationSignal)]) {
+        [self.delegate installerIsSendingAppTerminationSignal];
     }
 }
 
