@@ -286,11 +286,9 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * Stop and tear down everything. Reply to all outstanding reply/completion blocks.
  * Dismiss all update windows, alerts, progress, etc from the user.
- * Unregister for application termination and system power off if not done so already.
  * Basically, stop everything that could have been started. Sparkle may invoke this when aborting or finishing an update.
- * Do not, however, invaldate the next update check timer.
  *
- * This can be called from any thread, and could be called multiple times in succession.
+ * This can be called from any thread
  */
 - (void)dismissUpdateInstallation;
 
