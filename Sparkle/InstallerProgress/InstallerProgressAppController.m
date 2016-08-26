@@ -208,7 +208,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             // Ideally we'd send them all and have the installer monitor all of them but I don't want to deal with that complexity at the moment
             // Although that would still have the issue if another instance of the application launched during that duration
             // At the same time we don't want the installer to be over-reliant on us (the agent tool) in a way that could leave the installer as a zombie by accident
-            // Lastly we don't handle monitoring or terminating processes from logged in user's
+            // In other words, the installer should be monitoring for dead processes, not us
+            // Lastly we don't handle monitoring or terminating processes from logged in users
             NSRunningApplication *firstRunningApplication = runningApplications.firstObject;
             NSNumber *processIdentifier = (firstRunningApplication == nil || firstRunningApplication.terminated) ? nil : @(firstRunningApplication.processIdentifier);
             
