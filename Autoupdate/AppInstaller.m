@@ -430,8 +430,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         dispatch_async(dispatch_get_main_queue(), ^{
             // This flag has an impact on interactive type installations and showing UI progress during non-interactive installations
             self.shouldShowUI = (BOOL)showsUI;
-            // We only allow relaunching if the application has been alive
-            self.shouldRelaunch = (BOOL)relaunch && !self.terminationListener.terminated;
+            // Don't test if the application was alive initially, leave that to the progress agent if we decide to relaunch
+            self.shouldRelaunch = (BOOL)relaunch;
             
             if (self.performedStage1Installation) {
                 // Resume the installation if we aren't done with stage 2 yet, and remind the client we are prepared to relaunch
@@ -513,9 +513,9 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             NSData *sendData = [NSData dataWithBytes:&targetTerminated length:sizeof(targetTerminated)];
             [self.communicator handleMessageWithIdentifier:SPUInstallationFinishedStage2 data:sendData];
             
-            if (!self.terminationListener.terminated) {
-                [self.agentConnection.agent sendTerminationSignal];
-            }
+            // Don't check if the target is already terminated, leave that to the progress agent
+            // We could be slightly off if there were multiple instances running
+            [self.agentConnection.agent sendTerminationSignal];
         });
     } else {
         SULog(@"Error: Failed to resume installer on stage 2 because installation cannot be installed silently");

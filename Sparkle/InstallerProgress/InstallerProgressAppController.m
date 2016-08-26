@@ -234,7 +234,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
 - (void)sendTerminationSignal
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (!self.willTerminate && self.applicationBundle != nil && self.applicationInitiallyAlive) {
+        if (!self.willTerminate && self.applicationBundle != nil) {
             // Note we are sending an Apple quit event, which gives the application or user a chance to delay or cancel the request, which is what we desire
             for (NSRunningApplication *runningApplication in [self runningApplicationsWithBundle:self.applicationBundle]) {
                 [runningApplication terminate];
