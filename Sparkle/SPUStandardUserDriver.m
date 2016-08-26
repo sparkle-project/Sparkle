@@ -17,7 +17,6 @@
 #import "SUUpdateAlert.h"
 #import "SULocalizations.h"
 #import "SPUApplicationInfo.h"
-#import "SPUApplicationIcon.h"
 
 @interface SPUStandardUserDriver ()
 
@@ -286,7 +285,7 @@
         // are focused to inform the user since there is no dock icon to notify them.
         if ([SPUApplicationInfo isBackgroundApplication:NSApp]) { [NSApp activateIgnoringOtherApps:YES]; }
         
-        [alert setIcon:[SPUApplicationIcon bestIconForBundle:self.host.bundle]];
+        [alert setIcon:[SPUApplicationInfo bestIconForBundle:self.host.bundle]];
         [alert runModal];
         
         if ([delegate respondsToSelector:@selector(standardUserDriverDidShowModalAlert)]) {

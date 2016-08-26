@@ -14,6 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)isBackgroundApplication:(NSApplication *)application;
 
++ (NSImage *)bestIconForBundle:(NSBundle *)bundle;
+
 @end
 
 NS_ASSUME_NONNULL_END

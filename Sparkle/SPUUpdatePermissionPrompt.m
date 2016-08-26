@@ -14,7 +14,6 @@
 #import "SUHost.h"
 #import "SUConstants.h"
 #import "SPUApplicationInfo.h"
-#import "SPUApplicationIcon.h"
 
 @interface SPUUpdatePermissionPrompt ()
 
@@ -102,7 +101,7 @@
 
 - (NSImage *)icon
 {
-    return [SPUApplicationIcon bestIconForBundle:self.host.bundle];
+    return [SPUApplicationInfo bestIconForBundle:self.host.bundle];
 }
 
 - (NSString *)promptDescription
