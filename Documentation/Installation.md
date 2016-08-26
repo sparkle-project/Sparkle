@@ -40,7 +40,7 @@ When the updater attempts to set up a connection to the installer, after a certa
 Note, we don't have a "version tag" for the installer or agent because they are either bundled inside the framework or in the XPC service, and the XPC service already has a version check of its own.
 
 ### Installation Data
-After the installer launches, the updater creates a connection to the installer and sends installation data to the installer using the `SUInstallationData` message. This data includes the bundle application path to relaunch, the path to the bundle to update and replace, DSA signature from the appcast item, decryption password for dmg if available, the path to the downloaded directory and name of the downloaded item, and the type of expected installation.
+After the installer launches, the updater creates a connection to the installer and sends installation data to the installer using the `SPUInstallationData` message. This data includes the bundle application path to relaunch, the path to the bundle to update and replace, DSA signature from the appcast item, decryption password for dmg if available, the path to the downloaded directory and name of the downloaded item, and the type of expected installation.
 
 The installer takes note of all this information, but it moves the downloaded item into a update directory it chooses for itself. This is for two reasons:
 
@@ -50,18 +50,18 @@ The installer takes note of all this information, but it moves the downloaded it
 After the installer moves the downloaded item, it makes sure the item is not a symbolic link. If it is a non-regular file, the installer aborts, causing the updater to abort as well. Note this check is done after the move rather than before due to potential race conditions an attacker could create.
 
 ### Update Extraction
-After the installer receives the input installation data, it starts extracting the update. The installer first sends a `SUExtractionStarted` message.
+After the installer receives the input installation data, it starts extracting the update. The installer first sends a `SPUExtractionStarted` message.
 
-If the unarchiver requires DSA validation before extraction (binary delta archives do) or if the expected installation type is a package type, then before starting the unarchiver, validation is checked to make sure the signature for the archive is valid. If the signature is not valid, then a `SUArchiveExtractionFailed` message is sent to the updater (see below on what happens after that). We can't require validation before extracting for normal application updates because they allow changes to DSA keys. Delta updates are fine however because if those fail, then a full update can be tried.
+If the unarchiver requires DSA validation before extraction (binary delta archives do) or if the expected installation type is a package type, then before starting the unarchiver, validation is checked to make sure the signature for the archive is valid. If the signature is not valid, then a `SPUArchiveExtractionFailed` message is sent to the updater (see below on what happens after that). We can't require validation before extracting for normal application updates because they allow changes to DSA keys. Delta updates are fine however because if those fail, then a full update can be tried.
 
-After extraction starts, one or more `SUExtractedArchiveWithProgress` messages indicating the unarchival progress are sent back to the updater. On failure, the installer will send `SUArchiveExtractionFailed`. In the updater, if the update is a delta update and extraction fails, then the full archive is downloaded and we go back to the "Sending Installation Data" section to re-send the data and begin extraction again. If the update is not a delta update and extraction fails on the other hand, then the updater aborts causing the installer to abort as well.
+After extraction starts, one or more `SPUExtractedArchiveWithProgress` messages indicating the unarchival progress are sent back to the updater. On failure, the installer will send `SPUArchiveExtractionFailed`. In the updater, if the update is a delta update and extraction fails, then the full archive is downloaded and we go back to the "Sending Installation Data" section to re-send the data and begin extraction again. If the update is not a delta update and extraction fails on the other hand, then the updater aborts causing the installer to abort as well.
 
 ### Post Validation
-If the unarchiving succeeds, a `SUValidationStarted` message is sent back to the updater, and the installer begins post validating the update.
+If the unarchiving succeeds, a `SPUValidationStarted` message is sent back to the updater, and the installer begins post validating the update.
 
 If validation was already done before extraction, just the code signature is checked on the extracted bundle to make sure it's valid (if there's a code signature on the bundle). This is just a consistency check to make sure the developer didn't make a careless erorr.
 
-If validation fails, the installer aborts, causing the updater to abort the update as well. Otherwise, the installer sends a message `SUInstallationStartedStage1` to the updater and begins the installation.
+If validation fails, the installer aborts, causing the updater to abort the update as well. Otherwise, the installer sends a message `SPUInstallationStartedStage1` to the updater and begins the installation.
 
 ### Retrieving Process Identifier
 
@@ -81,12 +81,12 @@ Once the type of installer is found, the first stage of installation is performe
 
 If the first stage fails, the installer aborts causing the updater to abort the update.
 
-Otherwise a `SUInstallationFinishedStage1` message is sent back to the updater along with some data. This data includes whether the application bundle to relaunch is currently terminated, and whether the installation at later stages can be performed silently (that is, with no user interaction allowed). If we reach here, only the interactive package installer can't be performed silently.
+Otherwise a `SPUInstallationFinishedStage1` message is sent back to the updater along with some data. This data includes whether the application bundle to relaunch is currently terminated, and whether the installation at later stages can be performed silently (that is, with no user interaction allowed). If we reach here, only the interactive package installer can't be performed silently.
 
 The installer then listens and waits for the target application to relaunch terminates. If it is already terminated, then it resumes to stage 2 and 3 of the installation immediately on the assumption that the installer does not have permission to show UI interaction to the user. Thus if the installer has to show user interaction here and hasn't received an OK from the updater (it won't if the target application is already terminated), the install will fail. If the target is already terminated, the installer will also assume that the target should not be relaunched after installation.
 
 ### Installation Waiting Period
-The updater receives `SUInstallationFinishedStage1` message. The updater sends a message `SUSentUpdateAppcastItemData` with the appcast data in case the updater may request for it later (due to installer resumability, discussed later). It also reads if the target has already been terminated (implying that the installer will continue installing the update immediately), and if the installation will be done silently.
+The updater receives `SPUInstallationFinishedStage1` message. The updater sends a message `SPUSentUpdateAppcastItemData` with the appcast data in case the updater may request for it later (due to installer resumability, discussed later). It also reads if the target has already been terminated (implying that the installer will continue installing the update immediately), and if the installation will be done silently.
 
 For UI based update drivers, the updater tells the user driver to show that the application is ready to be relaunched - the user can continue to install & relaunch the app. The user driver is only alerted however if the installation isn't happening immediately (that is, if the target application to relaunch is still alive). The user driver can decide whether to a) install b) install & relaunch or c) delay installation. If installation is delayed, it can be resumed later, or if the target application terminates, the installer will try to continue installation if it is capable to without user interaction.
 
@@ -99,17 +99,17 @@ If an update driver is resumed (which cannot happen if the target applicaton is 
 Afterwards the resumed update driver then allows the user driver to decide whether to a) install the update now, b) install & relaunch the update, or to c) delay the update installation and abort the update driver. Note we are now back to the same options discussed earlier.
 
 ### Continue to Installation
-If the user driver decides to install the update, it sends a `SUResumeInstallationToStage2` message to the installer and supplies whether the update should be relaunched, and whether user interface can be displayed. The user driver specifies that the user interface can be displayed as long as the updater delegate allows interaction. If the updater's delegate handles immediate installation in the automatic based update driver, UI cannot be displayed there too.
+If the user driver decides to install the update, it sends a `SPUResumeInstallationToStage2` message to the installer and supplies whether the update should be relaunched, and whether user interface can be displayed. The user driver specifies that the user interface can be displayed as long as the updater delegate allows interaction. If the updater's delegate handles immediate installation in the automatic based update driver, UI cannot be displayed there too.
 
-The installer receives `SUResumeInstallationToStage2` and reads whether it should relaunch the target application and whether it can show UI (thus be allowed to show user interaction). The installer then resumes to stage 2 of the installation if it has not been performed already (that is if the target app already terminated). Note if the installer doesn't receive this message before the target application terminates, then the installer will not relaunch or show UI and resume stage 2 & 3 by itself. Again not displaying UI is only an issue for interactive based package installers which are deprecated.
+The installer receives `SPUResumeInstallationToStage2` and reads whether it should relaunch the target application and whether it can show UI (thus be allowed to show user interaction). The installer then resumes to stage 2 of the installation if it has not been performed already (that is if the target app already terminated). Note if the installer doesn't receive this message before the target application terminates, then the installer will not relaunch or show UI and resume stage 2 & 3 by itself. Again not displaying UI is only an issue for interactive based package installers which are deprecated.
 
-If the 2nd stage succeeds, the installer sends a `SUInstallationFinishedStage2` message back to the updater, including if the target application has already terminated at this time.
+If the 2nd stage succeeds, the installer sends a `SPUInstallationFinishedStage2` message back to the updater, including if the target application has already terminated at this time. If the target application has not already been terminated, the installer sends a request to the progress agent to *terminate* the application. By *terminate*, we mean sending an Apple quit event, allowing the application or user to possibly cancel or delay termination.
 
-The updater receives a `SUInstallationFinishedStage2` message, and reads if the target application had already been terminated. If the target application has not already terminated, the updater requests the user driver to terminate the application.
+The updater receives a `SPUInstallationFinishedStage2` message, and reads if the target application had already been terminated. If the target application has not already terminated, the updater tells the user driver to show that the application is being sent a termination request.
 
 ### Showing Progress
 
-When the target application is terminated, if the updater allowed the installer to show UI progress and the installation type doesn't show progress on its own (only interactive package installer shows progress on its own), then the installer sends a `SUUpdaterAlivePing` message to the updater. If the updater is still alive by now and receives the message, the updater will then send back a `SUUpdaterAlivePong` message. This lets the installer know that the updater is still active after the target application is terminated, and whether the installer should later be responsible for displaying updater progress or not if a short time passes by, and the installation is still not finished. If the updater is still not alive, then the installer should be responsible for showing progress if otherwise allowed.
+When the target application is terminated, if the updater allowed the installer to show UI progress and the installation type doesn't show progress on its own (only interactive package installer shows progress on its own), then the installer sends a `SPUUpdaterAlivePing` message to the updater. If the updater is still alive by now and receives the message, the updater will then send back a `SPUUpdaterAlivePong` message. This lets the installer know that the updater is still active after the target application is terminated, and whether the installer should later be responsible for displaying updater progress or not if a short time passes by, and the installation is still not finished. If the updater is still not alive, then the installer should be responsible for showing progress if otherwise allowed.
 
 If the installer decides to show progress, it sends a message to the progress agent to show progress UI. Under most circumstances, the installation will finish faster than this point is reached however (exceptions may be potentially large updates with many scattered files, guided package installers, and updates over a remote network mount). If the connection to the updater is still connected after this short time passes (eg: like with sparkle-cli), then it's the updater's job to show progress instead.
 
@@ -118,7 +118,7 @@ The installer starts stage 3 of the installation after the target application is
 
 If the third stage fails, then the installer aborts, causing the updater driver to abort if it's still running. The target application is not ever relaunched on failure.
 
-Otherwise if the third stage succeeds, the installer sends a message to the agent to stop showing progress. The agent uses this hint to acknowledge that it should stop broadcasting the status info service for the updater. If the connection to the updater is still alive, a `SUInstallationFinishedStage3` message is sent back to the updater and the updater driver silently aborts the update.
+Otherwise if the third stage succeeds, the installer sends a message to the agent to stop showing progress. The agent uses this hint to acknowledge that it should stop broadcasting the status info service for the updater. If the connection to the updater is still alive, a `SPUInstallationFinishedStage3` message is sent back to the updater and the updater driver silently aborts the update.
 
 The installer then sends a message to the agent to relaunch the new application if the installer was requested to relaunch it. This also signals to the agent that it will terminate shortly. If the installer decides not to relaunch the update, the agent will terminate when its connection to the installer invalidates. The installer lastly does cleanup work by removing its update directory it was using and exits.
 
@@ -126,8 +126,10 @@ When the progress agent exits, it cleans up by removing itself from disk. The in
 
 ## Notes:
 
-* Performing an update as the root user is not currently supported. The command line driver and the agent application link to AppKit, and running the agent as a different user (i.e, dropping from root -> logged in user) is not particularly the most elegant idea.
+* Performing an update as the root user is not currently supported. The command line driver (minorly) and the agent application link to AppKit, and running the agent as a different user (i.e, dropping from root -> logged in user) is not particularly the most elegant idea.
 
 * We use IPC in such a way that the installer process does not trust the updater process, which is why the installer does extraction, validation, and installation -- all in a single process. The launcher portion of code (which could be running as a XPC service) also does not trust the updater for determining the paths to the installer and agent tool. This portion of code does not check the code signing signature of the installer or agent though for reasons explained in the code.
+
+* When we terminate the application before doing final installation work, we send an Apple quit event to all running application instances we find under the agent's GUI login session. This does not include running instances from other logged in sessions -- that may require authenticating all the time, so trade off is not worthwhile. Also currently the installer only handles a single process identifier to watch for until termination, and certainly doesn't handle the case if more instances are launched afterwards. Note all of this only applies to instances being launched from the same bundle path, and the consequence may rarely be updating a bundle when a running instance is still left alive.
 
 * SMJobBless() would be interesting to explore and perhaps more suitable for sparkle-cli than ordinary application updaters because using this API is less approriate for one-off installations. There may be some issues to take account of though (eg: http://www.openradar.me/20446733). Furthermore, the installer would have to change to persist rather than be a one-time install, and may have to handle mutliple connections for installing multiple bundles simutaneously.
