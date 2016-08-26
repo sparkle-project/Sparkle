@@ -495,7 +495,7 @@
     
     [self.installerConnection handleMessageWithIdentifier:SPUResumeInstallationToStage2 data:responseData];
     
-    // we'll terminate later when the installer tells us stage 2 is done
+    // the installer will send us SPUInstallationFinishedStage2 when stage 2 is done
 }
 
 - (void)abortInstall
