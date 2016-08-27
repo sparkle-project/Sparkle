@@ -71,6 +71,11 @@ SU_EXPORT @interface SUUpdater : NSObject
 - (IBAction)checkForUpdates:(id)sender;
 
 /*!
+   The menu item validation used for the -checkForUpdates: action
+ */
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem;
+
+/*!
     Checks for updates, but does not display any UI unless an update is found.
 
     This is meant for programmatically initating a check for updates. That is,
