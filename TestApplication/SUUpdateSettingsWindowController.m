@@ -43,7 +43,6 @@
     NSBundle *hostBundle = [NSBundle mainBundle];
     NSBundle *applicationBundle = hostBundle;
     
-    // If the user is holding down command, we use the popup title user driver instead
     id<SPUUserDriver, SPUStandardUserDriverProtocol> userDriver;
     if (self.customUserDriver) {
         userDriver = [[SUPopUpTitlebarUserDriver alloc] initWithWindow:self.window];
