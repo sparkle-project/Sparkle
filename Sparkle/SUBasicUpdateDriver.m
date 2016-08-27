@@ -317,6 +317,12 @@
     SUHost *newHost = [[SUHost alloc] initWithBundle:newBundle];
     NSString *newPublicDSAKey = newHost.publicDSAKey;
     
+    // Downgrade in DSA security should not be possible
+    if (publicDSAKey != nil && newPublicDSAKey == nil) {
+        SULog(@"A public DSA key is found in the old bundle but no public DSA key is found in the new update. For security reasons, the update will be rejected.");
+        return NO;
+    }
+    
     BOOL dsaKeysMatch = (publicDSAKey == nil || newPublicDSAKey == nil) ? NO : [publicDSAKey isEqualToString:newPublicDSAKey];
     
     // If the new DSA key differs from the old, then this check is not a security measure, because the new key is not trusted.

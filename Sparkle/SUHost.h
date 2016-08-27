@@ -34,6 +34,7 @@ typedef struct {
 @property (getter=isRunningOnReadOnlyVolume, readonly) BOOL runningOnReadOnlyVolume;
 @property (getter=isBackgroundApplication, readonly) BOOL backgroundApplication;
 @property (readonly, copy) NSString *publicDSAKey;
+@property (readonly, nonatomic, copy) NSString *publicDSAKeyFileKey;
 @property (readonly, copy) NSArray *systemProfile;
 
 - (id)objectForInfoDictionaryKey:(NSString *)key;
