@@ -12,7 +12,6 @@
 #import "SUUnarchiver_Private.h"
 #import "SUHost.h"
 #import "SULog.h"
-#import "NTSynchronousTask.h"
 
 @implementation SUBinaryDeltaUnarchiver
 
