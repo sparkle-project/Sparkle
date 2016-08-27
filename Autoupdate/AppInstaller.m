@@ -299,7 +299,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     // For a plug-in this makes a big difference; we want to wait until the app hosting the plug-in terminates
     // Otherwise for an app, the relaunch path and host path should be identical
     
-    [self.agentConnection.agent registerRelaunchBundlePath:self.relaunchPath reply:^(NSNumber * _Nullable processIdentifier) {
+    [self.agentConnection.agent registerApplicationBundlePath:self.relaunchPath reply:^(NSNumber * _Nullable processIdentifier) {
         dispatch_async(dispatch_get_main_queue(), ^{
             self.terminationListener = [[TerminationListener alloc] initWithProcessIdentifier:processIdentifier];
             [self startInstallation];

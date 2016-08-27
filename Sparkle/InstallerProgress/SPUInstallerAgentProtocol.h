@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol SPUInstallerAgentProtocol
 
-- (void)registerRelaunchBundlePath:(NSString *)relaunchBundlePath reply:(void (^)(NSNumber * _Nullable processIdentifier))reply;
+- (void)registerApplicationBundlePath:(NSString *)applicationBundlePath reply:(void (^)(NSNumber * _Nullable processIdentifier))reply;
 
 - (void)registerInstallationInfoData:(NSData *)installationInfoData;
 

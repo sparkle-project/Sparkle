@@ -192,17 +192,17 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     return [matchedRunningApplications copy];
 }
 
-- (void)registerRelaunchBundlePath:(NSString *)relaunchBundlePath reply:(void (^)(NSNumber *))reply
+- (void)registerApplicationBundlePath:(NSString *)applicationBundlePath reply:(void (^)(NSNumber *))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (relaunchBundlePath != nil && !self.willTerminate) {
-            NSBundle *relaunchBundle = [NSBundle bundleWithPath:relaunchBundlePath];
-            if (relaunchBundle == nil) {
-                SULog(@"Error: Encountered invalid path for waiting termination: %@", relaunchBundlePath);
+        if (applicationBundlePath != nil && !self.willTerminate) {
+            NSBundle *applicationBundle = [NSBundle bundleWithPath:applicationBundlePath];
+            if (applicationBundle == nil) {
+                SULog(@"Error: Encountered invalid path for waiting termination: %@", applicationBundlePath);
                 [self cleanupAndExitWithStatus:EXIT_FAILURE];
             }
             
-            NSArray<NSRunningApplication *> *runningApplications = [self runningApplicationsWithBundle:relaunchBundle];
+            NSArray<NSRunningApplication *> *runningApplications = [self runningApplicationsWithBundle:applicationBundle];
             
             // We're just picking the first running application to send..
             // Ideally we'd send them all and have the installer monitor all of them but I don't want to deal with that complexity at the moment
@@ -216,7 +216,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             reply(processIdentifier);
             
             self.repliedToRegistration = YES;
-            self.applicationBundle = relaunchBundle;
+            self.applicationBundle = applicationBundle;
             self.applicationInitiallyAlive = (processIdentifier != nil);
         }
     });
@@ -243,7 +243,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     });
 }
 
-// The pathToRelaunch passed to here is not necessarily the same as the one passed in -registerRelaunchBundlePath:reply: if the developer uses SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME
+// The pathToRelaunch passed to here is not necessarily the same as the one passed in -registerApplicationBundlePath:reply: if the developer uses SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME
 // Note the installer won't tell us to launch an application unless it was already running before
 - (void)relaunchPath:(NSString *)pathToRelaunch
 {
