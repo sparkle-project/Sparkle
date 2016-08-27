@@ -526,7 +526,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (BOOL)validateMenuItem:(NSMenuItem *)item
 {
     if ([item action] == @selector(checkForUpdates:)) {
-        return ![self updateInProgress];
+        return ![self updateInProgress] || [self.driver isInterruptible];
     }
     return YES;
 }
