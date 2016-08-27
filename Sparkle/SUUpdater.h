@@ -19,7 +19,7 @@
 #import "SUVersionDisplayProtocol.h"
 #import "SUUpdaterDelegate.h"
 
-@class SUAppcastItem, SUAppcast;
+@class SUAppcastItem, SUAppcast, NSMenuItem;
 
 @protocol SUUpdaterDelegate;
 
@@ -73,6 +73,11 @@ SU_EXPORT @interface SUUpdater : NSObject
  when it is invoked.
  */
 - (IBAction)checkForUpdates:(id)sender;
+
+/*!
+   The menu item validation used for the -checkForUpdates: action
+ */
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem;
 
 /*!
  Checks for updates, but does not display any UI unless an update is found.
