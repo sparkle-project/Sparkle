@@ -104,9 +104,10 @@
             [inputPipe.fileHandleForWriting writeData:promptData];
             [inputPipe.fileHandleForWriting closeFile];
             
-            [task waitUntilExit];
-            
+            // Read data to end *before* waiting until the task ends so we don't deadlock if the stdout buffer becomes full if we haven't consumed from it
             output = [outputPipe.fileHandleForReading readDataToEndOfFile];
+            
+            [task waitUntilExit];
             taskResult = task.terminationStatus;
         }
         @catch (NSException *)
