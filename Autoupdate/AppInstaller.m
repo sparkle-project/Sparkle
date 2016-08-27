@@ -566,6 +566,10 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 return;
             }
             
+            // Used later for relaunching
+            // Compute this now before we set this installer property to nil
+            NSString *installationPath = [self.installer installationPath];
+            
             NSError *thirdStageError = nil;
             if (![self.installer performFinalInstallation:&thirdStageError]) {
                 SULog(@"Failed to finalize installation with error: %@", thirdStageError);
@@ -590,13 +594,11 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                 
                 [self.communicator handleMessageWithIdentifier:SPUInstallationFinishedStage3 data:[NSData data]];
                 
-                NSString *installationPath = [SUInstaller installationPathForHost:self.host];
-                
                 if (self.shouldRelaunch) {
                     NSString *pathToRelaunch = nil;
-                    // If the installation path differs from the host path, we give higher precedence for it than
-                    // if the desired relaunch path differs from the host path
-                    if (![installationPath.pathComponents isEqualToArray:self.host.bundlePath.pathComponents] || [self.relaunchPath.pathComponents isEqualToArray:self.host.bundlePath.pathComponents]) {
+                    // If the relaunch path is the same as the host bundle path, use the installation path from the installer which may be normalized
+                    // Otherwise use the requested relaunch path in all other cases
+                    if ([self.relaunchPath.pathComponents isEqualToArray:self.host.bundlePath.pathComponents]) {
                         pathToRelaunch = installationPath;
                     } else {
                         pathToRelaunch = self.relaunchPath;

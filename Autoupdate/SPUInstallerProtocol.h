@@ -31,6 +31,9 @@ NS_ASSUME_NONNULL_BEGIN
 // Should be able to be called from non-main thread
 - (void)cleanup;
 
+// The destination and installation path of the bundle being updated
+- (NSString *)installationPath;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -136,7 +136,7 @@
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found guided package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SPUInstallationTypeGuidedPackage] }];
             }
         } else {
-            installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath];
+            installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath installationPath:host.bundlePath];
         }
     } else if (isPackage) {
         if (![expectedInstallationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
@@ -144,7 +144,7 @@
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SPUInstallationTypeInteractivePackage] }];
             }
         } else {
-            installer = [[SUPackageInstaller alloc] initWithPackagePath:newDownloadPath];
+            installer = [[SUPackageInstaller alloc] initWithPackagePath:newDownloadPath installationPath:host.bundlePath];
         }
     } else {
         if (![expectedInstallationType isEqualToString:SPUInstallationTypeApplication]) {
@@ -152,27 +152,35 @@
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found regular application update but expected '%@=%@' from the appcast item enclosure instead", SUAppcastAttributeInstallationType, expectedInstallationType] }];
             }
         } else {
-            installer = [[SUPlainInstaller alloc] initWithHost:host applicationPath:newDownloadPath installationPath:[[self class] installationPathForHost:host] versionComparator:comparator];
+            NSString *normalizedInstallationPath = nil;
+            if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
+                normalizedInstallationPath = [[self class] normalizedInstallationPathForHost:host];
+            }
+            
+            // If we have a normalized path, we'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
+            // Otherwise if there's no normalized path (the more likely case), we'll just use the host bundle's path
+            NSString *installationPath;
+            if (normalizedInstallationPath != nil && ![[NSFileManager defaultManager] fileExistsAtPath:normalizedInstallationPath]) {
+                installationPath = normalizedInstallationPath;
+            } else {
+                installationPath = host.bundlePath;
+            }
+            
+            installer = [[SUPlainInstaller alloc] initWithHost:host applicationPath:newDownloadPath installationPath:installationPath versionComparator:comparator];
         }
     }
     
     return installer;
 }
 
-+ (NSString *)installationPathForHost:(SUHost *)host
++ (NSString *)normalizedInstallationPathForHost:(SUHost *)host
 {
     NSBundle *bundle = host.bundle;
     assert(bundle != nil);
     
-    if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
-        // We'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
-        NSString *normalizedAppPath = [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[bundle bundlePath] pathExtension]]];
-        
-        if (![[NSFileManager defaultManager] fileExistsAtPath:normalizedAppPath]) {
-            return normalizedAppPath;
-        }
-    }
-    return [bundle bundlePath];
+    NSString *normalizedAppPath = [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[bundle bundlePath] pathExtension]]];
+    
+    return normalizedAppPath;
 }
 
 @end

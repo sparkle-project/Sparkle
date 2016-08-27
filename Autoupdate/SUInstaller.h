@@ -20,8 +20,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr isGuided:(nullable BOOL *)isGuidedPtr;
 
-+ (NSString *)installationPathForHost:(SUHost *)host;
-
 @end
 
 NS_ASSUME_NONNULL_END

@@ -243,14 +243,18 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     });
 }
 
-// The pathToRelaunch passed to here is not necessarily the same as the one passed in -registerApplicationBundlePath:reply: if the developer uses SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME
-// Note the installer won't tell us to launch an application unless it was already running before
-- (void)relaunchPath:(NSString *)pathToRelaunch
+- (void)relaunchPath:(NSString *)requestedPathToRelaunch
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (!self.willTerminate && self.applicationInitiallyAlive) {
-            // We only launch applications, but I'm not sure how reliable -launchApplicationAtURL:options:config: is so we're not using it
-            // Eg: http://www.openradar.me/10952677
+        if (!self.willTerminate && self.applicationBundle != nil && self.applicationInitiallyAlive) {
+            // If the normalized setting is not enabled, we shouldn't trust the relaunch path input that is being passed to us
+            // because we already have the application path to relaunch, and we verified that it was running before
+            NSString *pathToRelaunch;
+            if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
+                pathToRelaunch = requestedPathToRelaunch;
+            } else {
+                pathToRelaunch = self.applicationBundle.bundlePath;
+            }
             
             // We should at least make sure we're opening a bundle however
             NSBundle *relaunchBundle = [NSBundle bundleWithPath:pathToRelaunch];
@@ -259,6 +263,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
                 [self cleanupAndExitWithStatus:EXIT_FAILURE];
             }
             
+            // We only launch applications, but I'm not sure how reliable -launchApplicationAtURL:options:config: is so we're not using it
+            // Eg: http://www.openradar.me/10952677
             if (![[NSWorkspace sharedWorkspace] openFile:pathToRelaunch]) {
                 SULog(@"Error: Failed to relaunch bundle at %@", pathToRelaunch);
             }

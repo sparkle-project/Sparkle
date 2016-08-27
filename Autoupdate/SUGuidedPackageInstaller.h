@@ -21,6 +21,6 @@ A guided installation can be started by applications other than the application 
 
 @interface SUGuidedPackageInstaller : NSObject <SPUInstallerProtocol>
 
-- (instancetype)initWithPackagePath:(NSString *)packagePath;
+- (instancetype)initWithPackagePath:(NSString *)packagePath installationPath:(NSString *)installationPath;
 
 @end
