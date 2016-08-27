@@ -29,4 +29,12 @@
     [self.updater checkForUpdates:nil];
 }
 
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+    if (menuItem.action == @selector(checkForUpdates:)) {
+        return [self.updater validateMenuItem:menuItem];
+    }
+    return YES;
+}
+
 @end
