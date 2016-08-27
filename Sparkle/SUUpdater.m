@@ -131,7 +131,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         NSString *publicDSAKeyFileKey = [self.host publicDSAKeyFileKey];
         if (publicDSAKeyFileKey != nil) {
             [self showAlertText:SULocalizedString(@"Insecure update error!", nil)
-                informativeText:[NSString stringWithFormat:SULocalizedString(@"For security reasons, the file indicated by the '%@' key needs to exist in the bundle's Resources.", nil), SUPublicDSAKeyFileKey]];
+                informativeText:[NSString stringWithFormat:SULocalizedString(@"For security reasons, the file (%@) indicated by the '%@' key needs to exist in the bundle's Resources.", nil), publicDSAKeyFileKey, SUPublicDSAKeyFileKey]];
         } else {
             if (!isMainBundle) {
                 [self showAlertText:SULocalizedString(@"Insecure update error!", nil)
