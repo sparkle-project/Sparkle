@@ -98,8 +98,9 @@
         alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
         [alert addButtonWithTitle:SULocalizedString(@"OK", nil)];
         [self showAlert:alert];
-        [self abortUpdate];
     }
+    
+    [self abortUpdate];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)__unused aNotification
