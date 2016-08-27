@@ -152,7 +152,7 @@
                 size_t imageCount = CGImageSourceGetCount(imageSource);
                 for (size_t imageIndex = 0; imageIndex < imageCount; imageIndex++) {
                     CFDictionaryRef cfProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, imageIndex, (CFDictionaryRef)@{});
-                    NSDictionary *properties = (__bridge NSDictionary *)(cfProperties);
+                    NSDictionary *properties = CFBridgingRelease(cfProperties);
                     
                     NSNumber *pixelWidth = properties[(const NSString *)kCGImagePropertyPixelWidth];
                     NSNumber *pixelHeight = properties[(const NSString *)kCGImagePropertyPixelHeight];
