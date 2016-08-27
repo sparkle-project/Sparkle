@@ -140,7 +140,7 @@
         // Now that we've mounted it, we need to copy out its contents.
         manager = [[NSFileManager alloc] init];
         contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
-		if (error)
+		if (contents == nil)
 		{
             SULog(@"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
             goto reportError;
