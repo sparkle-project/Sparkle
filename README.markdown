@@ -63,7 +63,6 @@ New Sparkle classes are now prefixed with `SPU` rather than `SU`. Older classes 
 * Sparkle's icon in the official branch is no longer used for installation. Instead, the icon of the bundle to update is used. A 32x32 image representation of the icon is needed for the authorization dialog.
 * Sparkle doesn't log to a special file in ~/Library/ anymore due to multiple processes. Just the standard ASL API is used now.
 * The `length` attribute in the appcast enclosure item for the update should now exist and be valid.
-* Invocation of `mdimport` has been removed. The modification date of the `mdimporter` bundles are now updated after delta extractions.
 * Delegation methods may have been removed or added to the newer updater API. Please review `SPUUpdaterDelegate` if using `SPUUpdater`.
 
 ## Requirements
