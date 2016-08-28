@@ -3,6 +3,7 @@
 //
 
 #import "SUUnarchiver.h"
+#import "SUBinaryDeltaUnarchiver.h"
 #import "SUPipedUnarchiver.h"
 #import "SUBinaryDeltaCommon.h"
 #import "SUFileManager.h"
@@ -35,3 +36,8 @@ static const char *SUAppleQuarantineIdentifier = "com.apple.quarantine";
 - (NSArray *)parseAppcastItemsFromXMLFile:(NSURL *)appcastFile error:(NSError *__autoreleasing*)errorp;
 @end
 
+@interface SUBinaryDeltaUnarchiver (Private)
+
++ (void)updateSpotlightImportersAtBundlePath:(NSString *)targetPath;
+
+@end

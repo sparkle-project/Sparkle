@@ -122,30 +122,9 @@
     }
 }
 
-+ (void)mdimportInstallationPath:(NSString *)installationPath
-{
-    // *** GETS CALLED ON NON-MAIN THREAD!
-
-    SULog(@"mdimporting");
-
-    NSTask *mdimport = [[NSTask alloc] init];
-    [mdimport setLaunchPath:@"/usr/bin/mdimport"];
-    [mdimport setArguments:@[installationPath]];
-    @try {
-        [mdimport launch];
-        [mdimport waitUntilExit];
-    }
-    @catch (NSException *launchException)
-    {
-        // No big deal.
-        SULog(@"Error: %@", [launchException description]);
-    }
-}
-
-+ (void)finishInstallationToPath:(NSString *)installationPath withResult:(BOOL)result error:(NSError *)error completionHandler:(void (^)(NSError *))completionHandler
++ (void)finishInstallationToPath:(NSString *)__unused installationPath withResult:(BOOL)result error:(NSError *)error completionHandler:(void (^)(NSError *))completionHandler
 {
     if (result) {
-        [self mdimportInstallationPath:installationPath];
         dispatch_async(dispatch_get_main_queue(), ^{
             completionHandler(nil);
         });
