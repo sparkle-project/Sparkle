@@ -236,7 +236,10 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
             if (enclosureLengthString != nil) {
                 contentLength = [enclosureLengthString integerValue];
             } else {
-                SULog(@"warning: <%@> for URL '%@' is missing %@ attribute. Downloading progress may be unreliable. Please always specify %@", SURSSElementEnclosure, [enclosure objectForKey:SURSSAttributeURL], SURSSAttributeLength, SURSSAttributeLength);
+                static dispatch_once_t onceToken;
+                dispatch_once(&onceToken, ^{
+                    SULog(@"warning: <%@> for URL '%@' is missing %@ attribute. Downloading progress may be unreliable. Please always specify %@", SURSSElementEnclosure, [enclosure objectForKey:SURSSAttributeURL], SURSSAttributeLength, SURSSAttributeLength);
+                });
             }
             _contentLength = (contentLength > 0) ? (NSUInteger)contentLength : 0;
         }
