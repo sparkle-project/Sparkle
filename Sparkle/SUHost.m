@@ -11,6 +11,7 @@
 #import "SUSystemProfiler.h"
 #include <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
 #import "SULog.h"
+#import "SUFileManager.h"
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED < 101000
 @interface NSProcessInfo ()
@@ -74,7 +75,34 @@
     // Note it's very well possible to have the bundle be writable but not be able to write into the parent directory
     // And if the bundle isn't writable, but we can write into the parent directory, we will still need to authorize to replace it
     NSString *bundlePath = [self bundlePath];
-    return [[NSFileManager defaultManager] isWritableFileAtPath:bundlePath.stringByDeletingLastPathComponent] && [[NSFileManager defaultManager] isWritableFileAtPath:bundlePath];
+    if (![[NSFileManager defaultManager] isWritableFileAtPath:bundlePath.stringByDeletingLastPathComponent] || ![[NSFileManager defaultManager] isWritableFileAtPath:bundlePath]) {
+        return NO;
+    }
+    
+    // Just because we have writability access does not mean we can set the correct owner/group silently
+    // Test if we can set the owner/group on a temporarily created file
+    // If we can, then we can probably perform an update without authorization
+    // One place where this matters is if you copy and run an app from /tmp/
+    
+    NSString *tempFilename = @"permission_test" ;
+    
+    SUFileManager *suFileManager = [SUFileManager defaultManager];
+    NSURL *tempDirectoryURL = [suFileManager makeTemporaryDirectoryWithPreferredName:tempFilename appropriateForDirectoryURL:[NSURL fileURLWithPath:NSTemporaryDirectory()] error:NULL];
+    
+    if (tempDirectoryURL == nil) {
+        // I don't imagine this ever happening but in case it does, requesting authorization may be the better option
+        return NO;
+    }
+    
+    NSURL *tempFileURL = [tempDirectoryURL URLByAppendingPathComponent:tempFilename];
+    
+    BOOL changeOwnerAndGroupSuccess =
+    [[NSData data] writeToURL:tempFileURL atomically:NO] &&
+    [suFileManager changeOwnerAndGroupOfItemAtRootURL:tempFileURL toMatchURL:self.bundle.bundleURL error:NULL];
+    
+    [suFileManager removeItemAtURL:tempDirectoryURL error:NULL];
+    
+    return changeOwnerAndGroupSuccess;
 }
 
 - (NSString *)installationPath
