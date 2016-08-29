@@ -73,11 +73,19 @@
 
 - (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
 {
+    // Just let the user driver know that this was a user initiated check
+    [self.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SPUUserInitiatedCheckStatus __unused completionStatus) {}];
+    [self.userDriver dismissUserInitiatedUpdateCheck];
+    
     [self.uiDriver resumeInstallingUpdateWithCompletion:completionBlock];
 }
 
 - (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock
 {
+    // Just let the user driver know that this was a user initiated check
+    [self.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SPUUserInitiatedCheckStatus __unused completionStatus) {}];
+    [self.userDriver dismissUserInitiatedUpdateCheck];
+    
     [self.uiDriver resumeDownloadedUpdate:downloadedUpdate completion:completionBlock];
 }
 
