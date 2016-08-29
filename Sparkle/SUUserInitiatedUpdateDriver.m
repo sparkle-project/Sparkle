@@ -34,7 +34,7 @@
 {
     self = [super init];
     if (self != nil) {
-        _uiDriver = [[SUUIBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle sparkleBundle:sparkleBundle updater:updater userDriver:userDriver updaterDelegate:updaterDelegate delegate:self];
+        _uiDriver = [[SUUIBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle sparkleBundle:sparkleBundle updater:updater userDriver:userDriver userInitiated:YES updaterDelegate:updaterDelegate delegate:self];
         _userDriver = userDriver;
     }
     return self;
@@ -73,19 +73,11 @@
 
 - (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
 {
-    // Just let the user driver know that this was a user initiated check
-    [self.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SPUUserInitiatedCheckStatus __unused completionStatus) {}];
-    [self.userDriver dismissUserInitiatedUpdateCheck];
-    
     [self.uiDriver resumeInstallingUpdateWithCompletion:completionBlock];
 }
 
 - (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock
 {
-    // Just let the user driver know that this was a user initiated check
-    [self.userDriver showUserInitiatedUpdateCheckWithCompletion:^(SPUUserInitiatedCheckStatus __unused completionStatus) {}];
-    [self.userDriver dismissUserInitiatedUpdateCheck];
-    
     [self.uiDriver resumeDownloadedUpdate:downloadedUpdate completion:completionBlock];
 }
 

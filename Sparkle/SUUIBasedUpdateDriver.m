@@ -26,6 +26,7 @@
 @property (nonatomic, readonly) SUCoreBasedUpdateDriver *coreDriver;
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, weak, readonly) id updater;
+@property (nonatomic, readonly) BOOL userInitiated;
 @property (weak, nonatomic, readonly) id<SPUUpdaterDelegate> updaterDelegate;
 @property (nonatomic, weak, readonly) id<SUUIBasedUpdateDriverDelegate> delegate;
 @property (nonatomic, readonly) id<SPUUserDriver> userDriver;
@@ -40,6 +41,7 @@
 @synthesize coreDriver = _coreDriver;
 @synthesize host = _host;
 @synthesize updater = _updater;
+@synthesize userInitiated = _userInitiated;
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize userDriver = _userDriver;
 @synthesize delegate = _delegate;
@@ -47,13 +49,14 @@
 @synthesize resumingDownloadedUpdate = _resumingDownloadedUpdate;
 @synthesize preventsInstallerInteraction = _preventsInstallerInteraction;
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SUUIBasedUpdateDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver userInitiated:(BOOL)userInitiated updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SUUIBasedUpdateDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
         _userDriver = userDriver;
         _delegate = delegate;
         _updater = updater;
+        _userInitiated = userInitiated;
         _updaterDelegate = updaterDelegate;
         _host = host;
         
@@ -101,7 +104,7 @@
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
 {
     if (self.resumingDownloadedUpdate) {
-        [self.userDriver showDownloadedUpdateFoundWithAppcastItem:updateItem reply:^(SPUUpdateAlertChoice choice) {
+        [self.userDriver showDownloadedUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated reply:^(SPUUpdateAlertChoice choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
                 switch (choice) {
@@ -119,7 +122,7 @@
             });
         }];
     } else if (!self.resumingInstallingUpdate) {
-        [self.userDriver showUpdateFoundWithAppcastItem:updateItem reply:^(SPUUpdateAlertChoice choice) {
+        [self.userDriver showUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated reply:^(SPUUpdateAlertChoice choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
                 switch (choice) {
@@ -136,7 +139,7 @@
             });
         }];
     } else {
-        [self.userDriver showResumableUpdateFoundWithAppcastItem:updateItem reply:^(SPUInstallUpdateStatus choice) {
+        [self.userDriver showResumableUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated reply:^(SPUInstallUpdateStatus choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
                 [self.coreDriver finishInstallationWithResponse:choice displayingUserInterface:!self.preventsInstallerInteraction];

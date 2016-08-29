@@ -85,6 +85,8 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update
  *
+ * @param userInitiated A flag indicating whether or not a user initiated this update check
+ *
  * @param reply
  * A reply of SPUInstallUpdateChoice begins downloading and installing the new update.
  *
@@ -95,14 +97,14 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * This can be called from any thread
  */
-- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUpdateAlertChoice))reply;
+- (void)showUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply;
 
 /*!
  * Show the user a new update has been downloaded and can be installed
  *
  * This method behaves just like -showUpdateFoundWithAppcastItem:reply: except the update has already been downloaded.
  */
-- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUUpdateAlertChoice))reply;
+- (void)showDownloadedUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUUpdateAlertChoice))reply;
 
 /*!
  * Show the user an update that has started installing can be resumed and installed immediately
@@ -111,6 +113,8 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * Note at this point the update cannot be canceled.
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update
+ *
+ * @param userInitiated A flag indicating whether or not a user initiated this update check
  *
  * @param reply
  * A reply of SPUInstallAndRelaunchUpdateNow installs the update immediately and relaunches the new update.
@@ -121,7 +125,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * This can be called from any thread
  */
-- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem reply:(void (^)(SPUInstallUpdateStatus))reply;
+- (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUInstallUpdateStatus))reply;
 
 /*!
  * Show the user the release notes for the new update
