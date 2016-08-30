@@ -69,6 +69,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  Returns whether to allow Sparkle to pop up.
  
  For example, this may be used to prevent Sparkle from interrupting a setup assistant.
+ Alternatively, you may want to consider starting the updater after eg: the setup assistant finishes
  
  \param updater The updater instance.
  */
@@ -84,12 +85,14 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  
  \return An array of dictionaries with keys: "key", "value", "displayKey", "displayValue", the latter two being specifically for display to the user.
  */
-- (NSArray *)feedParametersForUpdater:(SPUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
+- (NSArray<NSDictionary<NSString *, NSString *> *> *)feedParametersForUpdater:(SPUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
 
 /*!
  Returns a custom appcast URL.
  
  Override this to dynamically specify the entire URL.
+ Alternatively you may want to consider adding a feed parameter using -feedParametersForUpdater:sendingSystemProfile:
+ and having the server which appcast to serve.
  
  \param updater The updater instance.
  */
