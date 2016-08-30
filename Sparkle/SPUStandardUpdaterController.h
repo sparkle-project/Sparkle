@@ -6,7 +6,12 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
+#if __has_feature(modules)
+@import Cocoa;
+#else
 #import <Cocoa/Cocoa.h>
+#endif
+
 #import "SUExport.h"
 
 NS_ASSUME_NONNULL_BEGIN
