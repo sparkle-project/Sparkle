@@ -16,6 +16,7 @@
 @interface SUCodeSigningVerifierTest : XCTestCase
 
 @property (copy) NSString *notSignedAppPath;
+@property (copy) NSString *notSignedAppURL;
 @property (copy) NSString *validSignedAppPath;
 @property (copy) NSString *invalidSignedAppPath;
 @property (copy) NSString *calculatorCopyPath;
@@ -25,6 +26,7 @@
 @implementation SUCodeSigningVerifierTest
 
 @synthesize notSignedAppPath = _notSignedAppPath;
+@synthesize notSignedAppURL = _notSignedAppURL;
 @synthesize validSignedAppPath = _validSignedAppPath;
 @synthesize invalidSignedAppPath = _invalidSignedAppPath;
 @synthesize calculatorCopyPath = _calculatorCopyPath;
@@ -54,6 +56,7 @@
     if ([[NSFileManager defaultManager] createDirectoryAtPath:tempDirPath withIntermediateDirectories:YES attributes:nil error:&error]) {
         if ([self unzip:zippedAppPath toPath:tempDirPath]) {
             self.notSignedAppPath = [tempDirPath stringByAppendingPathComponent:@"SparkleTestCodeSignApp.app"];
+            self.notSignedAppURL = [NSURL fileURLWithPath:self.notSignedAppPath];
             [self setupValidSignedApp];
             [self setupCalculatorCopy];
             [self setupInvalidSignedApp];
@@ -195,58 +198,58 @@
 
 - (void)testUnsignedApp
 {
-    XCTAssertFalse([SUCodeSigningVerifier bundleAtPathIsCodeSigned:self.notSignedAppPath], @"App not expected to be code signed");
+    XCTAssertFalse([SUCodeSigningVerifier bundleAtURLIsCodeSigned:self.notSignedAppURL], @"App not expected to be code signed");
 
     NSError *error = nil;
-    XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtPath:self.notSignedAppPath error:&error], @"signature should not be valid as it's not code signed");
+    XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:self.notSignedAppURL error:&error], @"signature should not be valid as it's not code signed");
     XCTAssertNotNil(error, @"error should not be nil");
 }
 
 - (void)testValidSignedApp
 {
-    XCTAssertTrue([SUCodeSigningVerifier bundleAtPathIsCodeSigned:self.validSignedAppPath], @"App expected to be code signed");
+    XCTAssertTrue([SUCodeSigningVerifier bundleAtURLIsCodeSigned:self.validSignedAppPath], @"App expected to be code signed");
 
     NSError *error = nil;
-    XCTAssertTrue([SUCodeSigningVerifier codeSignatureIsValidAtPath:self.validSignedAppPath error:&error], @"signature should be valid");
+    XCTAssertTrue([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:self.validSignedAppPath error:&error], @"signature should be valid");
     XCTAssertNil(error, @"error should be nil");
 }
 
 - (void)testValidSignedCalculatorApp
 {
     NSString *appPath = CALCULATOR_PATH;
-    XCTAssertTrue([SUCodeSigningVerifier bundleAtPathIsCodeSigned:appPath], @"App expected to be code signed");
+    XCTAssertTrue([SUCodeSigningVerifier bundleAtURLIsCodeSigned:appPath], @"App expected to be code signed");
 
     NSError *error = nil;
-    XCTAssertTrue([SUCodeSigningVerifier codeSignatureIsValidAtPath:appPath error:&error], @"signature should be valid");
+    XCTAssertTrue([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:appPath error:&error], @"signature should be valid");
     XCTAssertNil(error, @"error should be nil");
 }
 
 - (void)testValidMatchingSelf
 {
     NSError *error = nil;
-    XCTAssertTrue([SUCodeSigningVerifier codeSignatureAtPath:CALCULATOR_PATH matchesSignatureAtPath:CALCULATOR_PATH error:&error], @"Our valid signed app expected to having matching signature to itself");
+    XCTAssertTrue([SUCodeSigningVerifier codeSignatureAtBundleURL:CALCULATOR_PATH matchesSignatureAtBundleURL:CALCULATOR_PATH error:&error], @"Our valid signed app expected to having matching signature to itself");
 }
 
 - (void)testValidMatching
 {
     // We can't test our own app because matching with ad-hoc signed apps understandably does not succeed
     NSError *error = nil;
-    XCTAssertTrue([SUCodeSigningVerifier codeSignatureAtPath:CALCULATOR_PATH matchesSignatureAtPath:self.calculatorCopyPath error:&error], @"The calculator app is expected to have matching identity signature to its altered copy");
+    XCTAssertTrue([SUCodeSigningVerifier codeSignatureAtBundleURL:CALCULATOR_PATH matchesSignatureAtBundleURL:self.calculatorCopyPath error:&error], @"The calculator app is expected to have matching identity signature to its altered copy");
 }
 
 - (void)testInvalidMatching
 {
     NSString *appPath = CALCULATOR_PATH;
     NSError *error = nil;
-    XCTAssertFalse([SUCodeSigningVerifier codeSignatureAtPath:appPath matchesSignatureAtPath:self.validSignedAppPath error:&error], @"Calculator app bundle expected to have different signature than our valid signed app");
+    XCTAssertFalse([SUCodeSigningVerifier codeSignatureAtBundleURL:appPath matchesSignatureAtBundleURL:self.validSignedAppPath error:&error], @"Calculator app bundle expected to have different signature than our valid signed app");
 }
 
 - (void)testInvalidSignedApp
 {
-    XCTAssertTrue([SUCodeSigningVerifier bundleAtPathIsCodeSigned:self.invalidSignedAppPath], @"App expected to be code signed, but signature is invalid");
+    XCTAssertTrue([SUCodeSigningVerifier bundleAtURLIsCodeSigned:self.invalidSignedAppPath], @"App expected to be code signed, but signature is invalid");
 
     NSError *error = nil;
-    XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtPath:self.invalidSignedAppPath error:&error], @"signature should not be valid");
+    XCTAssertFalse([SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:self.invalidSignedAppPath error:&error], @"signature should not be valid");
     XCTAssertNotNil(error, @"error should not be nil");
 }
 
