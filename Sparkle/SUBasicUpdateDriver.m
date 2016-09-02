@@ -31,6 +31,8 @@
 @property (copy) NSString *tempDir;
 @property (copy) NSString *relaunchPath;
 
+@property (nonatomic) BOOL validatedDsaSignatureBeforeUnarchiving;
+
 @end
 
 @implementation SUBasicUpdateDriver
@@ -42,6 +44,8 @@
 @synthesize nonDeltaUpdateItem;
 @synthesize tempDir;
 @synthesize relaunchPath;
+
+@synthesize validatedDsaSignatureBeforeUnarchiving = _validatedDsaSignatureBeforeUnarchiving;
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
 {
@@ -275,8 +279,6 @@
 }
 
 /**
- * If the update is a package, then it must be signed using DSA. No other verification is done.
- *
  * If the update is a bundle, then it must meet any one of:
  *
  *  * old and new DSA public keys are the same and valid (it allows change of Code Signing identity), or
@@ -284,31 +286,9 @@
  *  * old and new Code Signing identity are the same and valid
  *
  */
-- (BOOL)validateUpdateDownloadedToPath:(NSString *)downloadedPath extractedToPath:(NSString *)extractedPath DSASignature:(NSString *)DSASignature publicDSAKey:(NSString *)publicDSAKey
+- (BOOL)validateUpdateDownloadedToPath:(NSString *)downloadedPath newBundlePath:(NSString *)newBundlePath DSASignature:(NSString *)DSASignature publicDSAKey:(NSString *)publicDSAKey
 {
-    BOOL isPackage = NO;
-    NSString *installSourcePath = [SUInstaller installSourcePathInUpdateFolder:extractedPath forHost:self.host isPackage:&isPackage isGuided:NULL];
-    if (installSourcePath == nil) {
-        SULog(@"No suitable install is found in the update. The update will be rejected.");
-        return NO;
-    }
-    
-    // Modern packages are not distributed as bundles and are code signed differently than regular applications
-    if (isPackage) {
-        if (nil == publicDSAKey) {
-            SULog(@"The existing app bundle does not have a DSA key, so it can't verify installer packages.");
-        }
-
-        BOOL packageValidated = [SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey];
-
-        if (!packageValidated) {
-            SULog(@"DSA signature validation of the package failed. The update contains an installer package, and valid DSA signatures are mandatory for all installer packages. The update will be rejected. Sign the installer with a valid DSA key or use an .app bundle update instead.");
-        }
-        
-        return packageValidated;
-    }
-    
-    NSBundle *newBundle = [NSBundle bundleWithPath:installSourcePath];
+    NSBundle *newBundle = [NSBundle bundleWithPath:newBundlePath];
     if (newBundle == nil) {
         SULog(@"No suitable bundle is found in the update. The update will be rejected.");
         return NO;
@@ -336,11 +316,11 @@
         }
     }
     
-    BOOL updateIsCodeSigned = [SUCodeSigningVerifier applicationAtPathIsCodeSigned:installSourcePath];
+    BOOL updateIsCodeSigned = [SUCodeSigningVerifier applicationAtPathIsCodeSigned:newBundlePath];
 
     if (dsaKeysMatch) {
         NSError *error = nil;
-        if (updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtPath:installSourcePath error:&error]) {
+        if (updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtPath:newBundlePath error:&error]) {
             SULog(@"The update archive has a valid DSA signature, but the app is also signed with Code Signing, which is corrupted: %@. The update will be rejected.", error);
             return NO;
         }
@@ -355,7 +335,7 @@
         }
 
         NSError *error = nil;
-        if (![SUCodeSigningVerifier codeSignatureMatchesHostAndIsValidAtPath:installSourcePath error:&error]) {
+        if (![SUCodeSigningVerifier codeSignatureMatchesHostAndIsValidAtPath:newBundlePath error:&error]) {
             SULog(@"The update archive %@, and the app is signed with a new Code Signing identity that doesn't match code signing of the original app: %@. At least one method of signature verification must be valid. The update will be rejected.", dsaStatus, error);
             return NO;
         }
@@ -405,17 +385,48 @@
 - (void)extractUpdate
 {
     SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:[[self.host bundle] bundlePath] withPassword:self.updater.decryptionPassword];
+    
+    BOOL success;
     if (!unarchiver) {
         SULog(@"Error: No valid unarchiver for %@!", self.downloadPath);
+        success = NO;
+    } else if ([[unarchiver class] requiresValidationBeforeUnarchiving]) {
+        // Currently just binary delta updates require validation before unarchiving
+        
+        NSString *publicDSAKey = self.host.publicDSAKey;
+        NSString *dsaSignature = self.updateItem.DSASignature;
+        
+        if (publicDSAKey == nil) {
+            SULog(@"Failed to validate update before unarchiving because no DSA key was found");
+            success = NO;
+        } else if (dsaSignature == nil) {
+            SULog(@"Failed to validate update before unarchiving because no DSA signature was found");
+            success = NO;
+        } else if (![SUDSAVerifier validatePath:self.downloadPath withEncodedDSASignature:dsaSignature withPublicDSAKey:publicDSAKey]) {
+            SULog(@"DSA signature validation before unarchiving failed for update %@", self.downloadPath);
+            success = NO;
+        } else {
+            success = YES;
+            self.validatedDsaSignatureBeforeUnarchiving = YES;
+        }
+    } else {
+        success = YES;
+    }
+    
+    if (!success) {
         [self unarchiverDidFail:nil];
         return;
+    } else {
+        unarchiver.delegate = self;
+        [unarchiver start];
     }
-    unarchiver.delegate = self;
-    [unarchiver start];
 }
 
 - (void)failedToApplyDeltaUpdate
 {
+    // Clear this flag if we decide to do another full extraction
+    self.validatedDsaSignatureBeforeUnarchiving = NO;
+    
     // When a delta update fails to apply we fall back on updating via a full install.
     self.updateItem = self.nonDeltaUpdateItem;
     self.nonDeltaUpdateItem = nil;
@@ -474,13 +485,54 @@
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
 {
     assert(self.updateItem);
-
-    if (![self validateUpdateDownloadedToPath:self.downloadPath extractedToPath:self.tempDir DSASignature:self.updateItem.DSASignature publicDSAKey:self.host.publicDSAKey])
-    {
+    
+    NSString *DSASignature = self.updateItem.DSASignature;
+    NSString *publicDSAKey = self.host.publicDSAKey;
+    
+    BOOL validationCheckSuccess;
+    BOOL isPackage = NO;
+    
+    // install source could point to a new bundle or a package
+    NSString *installSource = [SUInstaller installSourcePathInUpdateFolder:self.tempDir forHost:self.host isPackage:&isPackage isGuided:NULL];
+    if (installSource == nil) {
+        SULog(@"No suitable install is found in the update. The update will be rejected.");
+        validationCheckSuccess = NO;
+    } else {
+        if (!self.validatedDsaSignatureBeforeUnarchiving) {
+            // Check to see if we have a package or bundle to validate
+            if (isPackage) {
+                // For package type updates, all we do is check if the DSA signature is valid
+                validationCheckSuccess = [SUDSAVerifier validatePath:self.downloadPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey];
+                if (!validationCheckSuccess) {
+                    SULog(@"DSA signature validation of the package failed. The update contains an installer package, and valid DSA signatures are mandatory for all installer packages. The update will be rejected. Sign the installer with a valid DSA key or use an .app bundle update instead.");
+                }
+            } else {
+                // For application bundle updates, we check both the DSA and Apple code signing signatures
+                validationCheckSuccess = [self validateUpdateDownloadedToPath:self.downloadPath newBundlePath:installSource DSASignature:DSASignature publicDSAKey:publicDSAKey];
+            }
+        } else if (isPackage) {
+            // We shouldn't get here because we don't validate packages before extracting them currently
+            SULog(@"Error: not expecting to find package after being required to validate update before extraction");
+            validationCheckSuccess = NO;
+        } else {
+            // Because we already validated the DSA signature, this is just a consistency check to see
+            // if the developer signed their application properly with their Apple ID
+            // Currently, this case only gets hit for binary delta updates
+            NSError *error = nil;
+            if ([SUCodeSigningVerifier applicationAtPathIsCodeSigned:installSource] && ![SUCodeSigningVerifier codeSignatureIsValidAtPath:installSource error:&error]) {
+                SULog(@"Failed to validate apple code sign signature on bundle after archive validation with error: %@", error);
+                validationCheckSuccess = NO;
+            } else {
+                validationCheckSuccess = YES;
+            }
+        }
+    }
+    
+    if (!validationCheckSuccess) {
         NSDictionary *userInfo = @{
-            NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil),
-            NSLocalizedFailureReasonErrorKey: SULocalizedString(@"The update is improperly signed.", nil),
-        };
+                                   NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil),
+                                   NSLocalizedFailureReasonErrorKey: SULocalizedString(@"The update is improperly signed.", nil),
+                                   };
         [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUSignatureError userInfo:userInfo]];
         return;
     }

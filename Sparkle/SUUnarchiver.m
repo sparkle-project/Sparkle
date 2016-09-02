@@ -55,6 +55,11 @@
     return NO;
 }
 
++ (BOOL)requiresValidationBeforeUnarchiving
+{
+    return NO;
+}
+
 - (void)notifyDelegateOfProgress:(double)progress
 {
     if ([self.delegate respondsToSelector:@selector(unarchiver:extractedProgress:)]) {
