@@ -48,6 +48,10 @@ If you are adding a symbol to the public API you must decorate the declaration w
 
 Alternatively, build the Distribution scheme in the Xcode UI.
 
+## Code of Conduct
+
+We pledge to have an open and welcoming environment. See our [Code of Conduct](CODE_OF_CONDUCT.md).
+
 ## Project Sponsor
 
 [MaxCDN](https://www.maxcdn.com/?utm_source=sparkle-github&utm_medium=link&utm_campaign=readme-footer)
