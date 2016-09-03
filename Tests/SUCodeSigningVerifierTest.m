@@ -77,20 +77,19 @@
 - (void)setupValidSignedApp
 {
     NSError *error = nil;
-    NSString *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
-    NSString *signedAndValid = [tempDir URLByAppendingPathComponent:@"valid-signed.app"];
+    NSURL *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
+    NSURL *signedAndValid = [tempDir URLByAppendingPathComponent:@"valid-signed.app"];
 
-    if ([[NSFileManager defaultManager] fileExistsAtURL:signedAndValid]) {
+    if ([[NSFileManager defaultManager] fileExistsAtPath:signedAndValid.path]) {
         [[NSFileManager defaultManager] removeItemAtURL:signedAndValid error:NULL];
     }
 
-    if (![[NSFileManager defaultManager] copyItemAtURL:self.notSignedAppURL toPath:signedAndValid error:&error]) {
+    if (![[NSFileManager defaultManager] copyItemAtURL:self.notSignedAppURL toURL:signedAndValid error:&error]) {
         XCTFail("Failed to copy %@ to %@ with error: %@", self.notSignedAppURL, signedAndValid, error);
     }
 
     self.validSignedAppURL = signedAndValid;
-    self.validSignedAppURL = [NSURL fileURLWithPath:signedAndValid];
-
+    
     if (![self codesignAppURL:self.validSignedAppURL]) {
         XCTFail(@"Failed to codesign %@", self.validSignedAppURL);
     }
@@ -98,10 +97,10 @@
 
 - (void)setupCalculatorCopy
 {
-    NSString *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
-    NSString *calculatorCopy = [tempDir URLByAppendingPathComponent:@"calc.app"];
+    NSURL *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
+    NSURL *calculatorCopy = [tempDir URLByAppendingPathComponent:@"calc.app"];
 
-    if ([[NSFileManager defaultManager] fileExistsAtURL:calculatorCopy]) {
+    if ([[NSFileManager defaultManager] fileExistsAtPath:calculatorCopy.path]) {
         [[NSFileManager defaultManager] removeItemAtURL:calculatorCopy error:NULL];
     }
 
@@ -110,9 +109,9 @@
     NSError *copyError = nil;
     // Don't check the return value of this operation - seems like on 10.11 the API can say it fails even though the operation really succeeds,
     // which sounds like some kind of (SIP / attribute?) bug
-    [[NSFileManager defaultManager] copyItemAtURL:CALCULATOR_PATH toPath:calculatorCopy error:&copyError];
+    [[NSFileManager defaultManager] copyItemAtURL:[NSURL fileURLWithPath:CALCULATOR_PATH] toURL:calculatorCopy error:&copyError];
 
-    if (![[NSFileManager defaultManager] fileExistsAtURL:calculatorCopy]) {
+    if (![[NSFileManager defaultManager] fileExistsAtPath:calculatorCopy.path]) {
         XCTFail(@"Copied calculator application does not exist");
     }
 
@@ -129,16 +128,16 @@
 - (void)setupInvalidSignedApp
 {
     NSError *error = nil;
-    NSString *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
-    NSString *signedAndInvalid = [tempDir URLByAppendingPathComponent:@"invalid-signed.app"];
+    NSURL *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
+    NSURL *signedAndInvalid = [tempDir URLByAppendingPathComponent:@"invalid-signed.app"];
 
-    if ([[NSFileManager defaultManager] fileExistsAtURL:signedAndInvalid]) {
+    if ([[NSFileManager defaultManager] fileExistsAtPath:signedAndInvalid.path]) {
         [[NSFileManager defaultManager] removeItemAtURL:signedAndInvalid error:NULL];
     }
-    if ([[NSFileManager defaultManager] copyItemAtURL:self.notSignedAppURL toPath:signedAndInvalid error:&error]) {
+    if ([[NSFileManager defaultManager] copyItemAtURL:self.notSignedAppURL toURL:signedAndInvalid error:&error]) {
         self.invalidSignedAppURL = signedAndInvalid;
         if ([self codesignAppURL:self.invalidSignedAppURL]) {
-            NSString *fileInAppBundleToRemove = [self.invalidSignedAppURL URLByAppendingPathComponent:@"Contents/Resources/test_app_only_dsa_pub.pem"];
+            NSURL *fileInAppBundleToRemove = [self.invalidSignedAppURL URLByAppendingPathComponent:@"Contents/Resources/test_app_only_dsa_pub.pem"];
             if (![[NSFileManager defaultManager] removeItemAtURL:fileInAppBundleToRemove error:&error]) {
                 NSLog(@"Failed to remove %@ with error %@", fileInAppBundleToRemove, error);
             }
@@ -173,7 +172,7 @@
     return success;
 }
 
-- (BOOL)codesignAppURL:(NSString *)appPath
+- (BOOL)codesignAppURL:(NSURL *)appPath
 {
     BOOL success = NO;
     @try
