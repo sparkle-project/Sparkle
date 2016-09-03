@@ -337,18 +337,17 @@
             return NO;
         }
     }
-    
-    BOOL updateIsCodeSigned = [SUCodeSigningVerifier bundleAtPathIsCodeSigned:installSourcePath];
+
+    BOOL updateIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:newHost.bundle.bundleURL];
 
     if (dsaKeysMatch) {
         NSError *error = nil;
-        if (updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtPath:installSourcePath error:&error]) {
+        if (updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:newHost.bundle.bundleURL error:&error]) {
             SULog(@"The update archive has a valid DSA signature, but the app is also signed with Code Signing, which is corrupted: %@. The update will be rejected.", error);
             return NO;
         }
     } else {
-        NSString *hostBundlePath = host.bundlePath;
-        BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtPathIsCodeSigned:hostBundlePath];
+        BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:host.bundle.bundleURL];
 
         NSString *dsaStatus = newPublicDSAKey ? @"has a new DSA key that doesn't match the previous one" : (publicDSAKey ? @"removes the DSA key" : @"isn't signed with a DSA key");
         if (!hostIsCodeSigned || !updateIsCodeSigned) {
@@ -358,7 +357,7 @@
         }
 
         NSError *error = nil;
-        if (![SUCodeSigningVerifier codeSignatureAtPath:hostBundlePath matchesSignatureAtPath:installSourcePath error:&error]) {
+        if (![SUCodeSigningVerifier codeSignatureAtBundleURL:host.bundle.bundleURL matchesSignatureAtBundleURL:newHost.bundle.bundleURL error:&error]) {
             SULog(@"The update archive %@, and the app is signed with a new Code Signing identity that doesn't match code signing of the original app: %@. At least one method of signature verification must be valid. The update will be rejected.", dsaStatus, error);
             return NO;
         }
@@ -407,7 +406,7 @@
 
 - (void)extractUpdate
 {
-    SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:[[self.host bundle] bundlePath] withPassword:self.updater.decryptionPassword];
+    SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:self.host.bundlePath withPassword:self.updater.decryptionPassword];
     if (!unarchiver) {
         SULog(@"Error: No valid unarchiver for %@!", self.downloadPath);
         [self unarchiverDidFail:nil];

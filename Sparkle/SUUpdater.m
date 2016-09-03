@@ -122,7 +122,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 -(void)checkIfConfiguredProperly {
     BOOL hasPublicDSAKey = [self.host publicDSAKey] != nil;
     BOOL isMainBundle = [self.host.bundle isEqualTo:[NSBundle mainBundle]];
-    BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtPathIsCodeSigned:self.host.bundlePath];
+    BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:self.host.bundle.bundleURL];
     NSURL *feedURL = [self feedURL];
     BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
 
