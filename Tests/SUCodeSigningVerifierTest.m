@@ -81,16 +81,12 @@
     NSURL *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
     NSURL *signedAndValid = [tempDir URLByAppendingPathComponent:@"valid-signed.app"];
 
-    if ([signedAndValid checkResourceIsReachableAndReturnError:NULL]) {
-        [[NSFileManager defaultManager] removeItemAtURL:signedAndValid error:NULL];
-    }
-
+    [[NSFileManager defaultManager] removeItemAtURL:signedAndValid error:NULL];
     if (![[NSFileManager defaultManager] copyItemAtURL:self.notSignedAppURL toURL:signedAndValid error:&error]) {
         XCTFail("Failed to copy %@ to %@ with error: %@", self.notSignedAppURL, signedAndValid, error);
     }
 
     self.validSignedAppURL = signedAndValid;
-    
     if (![SUAdHocCodeSigning codeSignApplicationAtPath:self.validSignedAppURL.path]) {
         NSLog(@"Failed to codesign %@", self.validSignedAppURL);
     }
@@ -101,9 +97,7 @@
     NSURL *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
     NSURL *calculatorCopy = [tempDir URLByAppendingPathComponent:@"calc.app"];
 
-    if ([calculatorCopy checkResourceIsReachableAndReturnError:NULL]) {
-        [[NSFileManager defaultManager] removeItemAtURL:calculatorCopy error:NULL];
-    }
+    [[NSFileManager defaultManager] removeItemAtURL:calculatorCopy error:NULL];
 
     // Make a copy of the signed calculator app so we can match signatures later
     // Matching signatures on ad-hoc signed apps does *not* work
@@ -119,7 +113,9 @@
     // Alter the signed copy slightly, this won't invalidate signature matching (although it will invalidate the integrity part of the signature)
     // Which is what we want. If a user alters an app bundle, we should still be able to update as long as its identity is still valid
     NSError *removeError = nil;
-    if (![[NSFileManager defaultManager] removeItemAtURL:[[calculatorCopy URLByAppendingPathComponent:@"Contents"] URLByAppendingPathComponent:@"PkgInfo"] error:&removeError]) {
+    NSURL *calculatorPkgInfo = [[calculatorCopy URLByAppendingPathComponent:@"Contents"] URLByAppendingPathComponent:@"PkgInfo"];
+    XCTAssertNotNil(calculatorPkgInfo);
+    if (![[NSFileManager defaultManager] removeItemAtURL:calculatorPkgInfo error:&removeError]) {
         XCTFail(@"Failed to remove file in calculator copy with error: %@", removeError);
     }
 
@@ -132,9 +128,7 @@
     NSURL *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
     NSURL *signedAndInvalid = [tempDir URLByAppendingPathComponent:@"invalid-signed.app"];
 
-    if ([signedAndInvalid checkResourceIsReachableAndReturnError:NULL]) {
-        [[NSFileManager defaultManager] removeItemAtURL:signedAndInvalid error:NULL];
-    }
+    [[NSFileManager defaultManager] removeItemAtURL:signedAndInvalid error:NULL];
     if ([[NSFileManager defaultManager] copyItemAtURL:self.notSignedAppURL toURL:signedAndInvalid error:&error]) {
         self.invalidSignedAppURL = signedAndInvalid;
         if ([SUAdHocCodeSigning codeSignApplicationAtPath:self.invalidSignedAppURL.path]) {

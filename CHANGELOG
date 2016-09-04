@@ -23,6 +23,8 @@
 * Removed SUEnableAutomaticChecksKeyOld and SUCheckAtStartup constants (Eitot)
 * Updated Sparkle framework headers to use modules if modules are available (B. Kevin Hardman)
 * Fixed warnings, fixed uses of SULocalizedString (Jerry Krinock)
+* Improved signing verifier to take any host and s/application/bundle/ (Zorg)
+* Improved Spotlight updates after delta extraction (Zorg)
 
 # 1.14.0 (Mar 11, 2016)
 
