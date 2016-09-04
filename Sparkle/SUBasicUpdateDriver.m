@@ -286,13 +286,15 @@
  *  * old and new Code Signing identity are the same and valid
  *
  */
-- (BOOL)validateUpdateDownloadedToPath:(NSString *)downloadedPath newBundlePath:(NSString *)newBundlePath DSASignature:(NSString *)DSASignature publicDSAKey:(NSString *)publicDSAKey
+- (BOOL)validateUpdateForHost:(SUHost *)host downloadedToPath:(NSString *)downloadedPath newBundleURL:(NSURL *)newBundleURL DSASignature:(NSString *)DSASignature
 {
-    NSBundle *newBundle = [NSBundle bundleWithPath:newBundlePath];
+    NSBundle *newBundle = [NSBundle bundleWithURL:newBundleURL];
     if (newBundle == nil) {
         SULog(@"No suitable bundle is found in the update. The update will be rejected.");
         return NO;
     }
+    
+    NSString *publicDSAKey = host.publicDSAKey;
     
     SUHost *newHost = [[SUHost alloc] initWithBundle:newBundle];
     NSString *newPublicDSAKey = newHost.publicDSAKey;
@@ -315,17 +317,16 @@
             return NO;
         }
     }
-    
-    BOOL updateIsCodeSigned = [SUCodeSigningVerifier applicationAtPathIsCodeSigned:newBundlePath];
+    BOOL updateIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:newHost.bundle.bundleURL];
 
     if (dsaKeysMatch) {
         NSError *error = nil;
-        if (updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtPath:newBundlePath error:&error]) {
+        if (updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:newHost.bundle.bundleURL error:&error]) {
             SULog(@"The update archive has a valid DSA signature, but the app is also signed with Code Signing, which is corrupted: %@. The update will be rejected.", error);
             return NO;
         }
     } else {
-        BOOL hostIsCodeSigned = [SUCodeSigningVerifier hostApplicationIsCodeSigned];
+        BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:host.bundle.bundleURL];
 
         NSString *dsaStatus = newPublicDSAKey ? @"has a new DSA key that doesn't match the previous one" : (publicDSAKey ? @"removes the DSA key" : @"isn't signed with a DSA key");
         if (!hostIsCodeSigned || !updateIsCodeSigned) {
@@ -335,7 +336,7 @@
         }
 
         NSError *error = nil;
-        if (![SUCodeSigningVerifier codeSignatureMatchesHostAndIsValidAtPath:newBundlePath error:&error]) {
+        if (![SUCodeSigningVerifier codeSignatureAtBundleURL:host.bundle.bundleURL matchesSignatureAtBundleURL:newHost.bundle.bundleURL error:&error]) {
             SULog(@"The update archive %@, and the app is signed with a new Code Signing identity that doesn't match code signing of the original app: %@. At least one method of signature verification must be valid. The update will be rejected.", dsaStatus, error);
             return NO;
         }
@@ -384,7 +385,7 @@
 
 - (void)extractUpdate
 {
-    SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:[[self.host bundle] bundlePath] withPassword:self.updater.decryptionPassword];
+    SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:self.host.bundlePath withPassword:self.updater.decryptionPassword];
     
     BOOL success;
     if (!unarchiver) {
@@ -498,6 +499,8 @@
         SULog(@"No suitable install is found in the update. The update will be rejected.");
         validationCheckSuccess = NO;
     } else {
+        NSURL *installSourceURL = [NSURL fileURLWithPath:installSource];
+        
         if (!self.validatedDsaSignatureBeforeUnarchiving) {
             // Check to see if we have a package or bundle to validate
             if (isPackage) {
@@ -508,7 +511,7 @@
                 }
             } else {
                 // For application bundle updates, we check both the DSA and Apple code signing signatures
-                validationCheckSuccess = [self validateUpdateDownloadedToPath:self.downloadPath newBundlePath:installSource DSASignature:DSASignature publicDSAKey:publicDSAKey];
+                validationCheckSuccess = [self validateUpdateForHost:self.host downloadedToPath:self.downloadPath newBundleURL:installSourceURL DSASignature:DSASignature];
             }
         } else if (isPackage) {
             // We shouldn't get here because we don't validate packages before extracting them currently
@@ -519,7 +522,7 @@
             // if the developer signed their application properly with their Apple ID
             // Currently, this case only gets hit for binary delta updates
             NSError *error = nil;
-            if ([SUCodeSigningVerifier applicationAtPathIsCodeSigned:installSource] && ![SUCodeSigningVerifier codeSignatureIsValidAtPath:installSource error:&error]) {
+            if ([SUCodeSigningVerifier bundleAtURLIsCodeSigned:installSourceURL] && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:installSourceURL error:&error]) {
                 SULog(@"Failed to validate apple code sign signature on bundle after archive validation with error: %@", error);
                 validationCheckSuccess = NO;
             } else {
