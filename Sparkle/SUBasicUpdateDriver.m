@@ -416,7 +416,6 @@
     
     if (!success) {
         [self unarchiverDidFail:nil];
-        return;
     } else {
         unarchiver.delegate = self;
         [unarchiver start];
