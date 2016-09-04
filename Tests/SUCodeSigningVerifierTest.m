@@ -80,16 +80,13 @@
     NSURL *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
     NSURL *signedAndValid = [tempDir URLByAppendingPathComponent:@"valid-signed.app"];
 
-    if ([[NSFileManager defaultManager] fileExistsAtPath:signedAndValid.path]) {
-        [[NSFileManager defaultManager] removeItemAtURL:signedAndValid error:NULL];
-    }
-
+    [[NSFileManager defaultManager] removeItemAtURL:signedAndValid error:NULL];
     if (![[NSFileManager defaultManager] copyItemAtURL:self.notSignedAppURL toURL:signedAndValid error:&error]) {
         XCTFail("Failed to copy %@ to %@ with error: %@", self.notSignedAppURL, signedAndValid, error);
     }
 
     self.validSignedAppURL = signedAndValid;
-    
+
     if (![self codesignAppURL:self.validSignedAppURL]) {
         XCTFail(@"Failed to codesign %@", self.validSignedAppURL);
     }
@@ -100,9 +97,7 @@
     NSURL *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
     NSURL *calculatorCopy = [tempDir URLByAppendingPathComponent:@"calc.app"];
 
-    if ([[NSFileManager defaultManager] fileExistsAtPath:calculatorCopy.path]) {
-        [[NSFileManager defaultManager] removeItemAtURL:calculatorCopy error:NULL];
-    }
+    [[NSFileManager defaultManager] removeItemAtURL:calculatorCopy error:NULL];
 
     // Make a copy of the signed calculator app so we can match signatures later
     // Matching signatures on ad-hoc signed apps does *not* work
@@ -111,14 +106,16 @@
     // which sounds like some kind of (SIP / attribute?) bug
     [[NSFileManager defaultManager] copyItemAtURL:[NSURL fileURLWithPath:CALCULATOR_PATH] toURL:calculatorCopy error:&copyError];
 
-    if (![[NSFileManager defaultManager] fileExistsAtPath:calculatorCopy.path]) {
+    if (![calculatorCopy checkResourceIsReachableAndReturnError:nil]) {
         XCTFail(@"Copied calculator application does not exist");
     }
 
     // Alter the signed copy slightly, this won't invalidate signature matching (although it will invalidate the integrity part of the signature)
     // Which is what we want. If a user alters an app bundle, we should still be able to update as long as its identity is still valid
     NSError *removeError = nil;
-    if (![[NSFileManager defaultManager] removeItemAtURL:[[calculatorCopy URLByAppendingPathComponent:@"Contents"] URLByAppendingPathComponent:@"PkgInfo"] error:&removeError]) {
+    NSURL *calculatorPkgInfo = [[calculatorCopy URLByAppendingPathComponent:@"Contents"] URLByAppendingPathComponent:@"PkgInfo"];
+    XCTAssertNotNil(calculatorPkgInfo);
+    if (![[NSFileManager defaultManager] removeItemAtURL:calculatorPkgInfo error:&removeError]) {
         XCTFail(@"Failed to remove file in calculator copy with error: %@", removeError);
     }
 
@@ -131,9 +128,7 @@
     NSURL *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
     NSURL *signedAndInvalid = [tempDir URLByAppendingPathComponent:@"invalid-signed.app"];
 
-    if ([[NSFileManager defaultManager] fileExistsAtPath:signedAndInvalid.path]) {
-        [[NSFileManager defaultManager] removeItemAtURL:signedAndInvalid error:NULL];
-    }
+    [[NSFileManager defaultManager] removeItemAtURL:signedAndInvalid error:NULL];
     if ([[NSFileManager defaultManager] copyItemAtURL:self.notSignedAppURL toURL:signedAndInvalid error:&error]) {
         self.invalidSignedAppURL = signedAndInvalid;
         if ([self codesignAppURL:self.invalidSignedAppURL]) {
