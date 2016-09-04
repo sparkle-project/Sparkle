@@ -1,5 +1,5 @@
 //
-//  SUInstallerDriver.h
+//  SPUInstallerDriver.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/17/16.
@@ -11,9 +11,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol SPUUpdaterDelegate;
-@class SUHost, SUAppcastItem, SUDownloadedUpdate;
+@class SUHost, SUAppcastItem, SPUDownloadedUpdate;
 
-@protocol SUInstallerDriverDelegate <NSObject>
+@protocol SPUInstallerDriverDelegate <NSObject>
 
 - (void)installerDidStartInstalling;
 - (void)installerDidExtractUpdateWithProgress:(double)progress;
@@ -27,15 +27,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface SUInstallerDriver : NSObject
+@interface SPUInstallerDriver : NSObject
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SUInstallerDriverDelegate>)delegate;
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SPUInstallerDriverDelegate>)delegate;
 
 - (void)resumeInstallingUpdateWithUpdateItem:(SUAppcastItem *)updateItem;
 
 - (void)checkIfApplicationInstallationRequiresAuthorizationWithReply:(void (^)(BOOL requiresAuthorization))reply;
 
-- (void)extractDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate silently:(BOOL)silently preventsInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(void (^)(NSError * _Nullable))completionHandler;
+- (void)extractDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate silently:(BOOL)silently preventsInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(void (^)(NSError * _Nullable))completionHandler;
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI;
 

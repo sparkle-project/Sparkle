@@ -1,12 +1,12 @@
 //
-//  SUScheduledUpdateDriver.m
+//  SPUScheduledUpdateDriver.m
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/15/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SUScheduledUpdateDriver.h"
+#import "SPUScheduledUpdateDriver.h"
 #import "SUHost.h"
 #import "SUErrors.h"
 #import "SPUUpdaterDelegate.h"
@@ -16,13 +16,13 @@
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-@interface SUScheduledUpdateDriver() <SUUIBasedUpdateDriverDelegate>
+@interface SPUScheduledUpdateDriver() <SPUUIBasedUpdateDriverDelegate>
 
-@property (nonatomic, readonly) SUUIBasedUpdateDriver *uiDriver;
+@property (nonatomic, readonly) SPUUIBasedUpdateDriver *uiDriver;
 
 @end
 
-@implementation SUScheduledUpdateDriver
+@implementation SPUScheduledUpdateDriver
 
 @synthesize uiDriver = _uiDriver;
 
@@ -30,12 +30,12 @@
 {
     self = [super init];
     if (self != nil) {
-        _uiDriver = [[SUUIBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle sparkleBundle:sparkleBundle updater:updater userDriver:userDriver userInitiated:NO updaterDelegate:updaterDelegate delegate:self];
+        _uiDriver = [[SPUUIBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle sparkleBundle:sparkleBundle updater:updater userDriver:userDriver userInitiated:NO updaterDelegate:updaterDelegate delegate:self];
     }
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders preventingInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(SUUpdateDriverCompletion)completionBlock
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders preventingInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(SPUUpdateDriverCompletion)completionBlock
 {
     [self.uiDriver prepareCheckForUpdatesWithCompletion:completionBlock];
     
@@ -49,12 +49,12 @@
     }];
 }
 
-- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
+- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock
 {
     [self.uiDriver resumeInstallingUpdateWithCompletion:completionBlock];
 }
 
-- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock
+- (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
     [self.uiDriver resumeDownloadedUpdate:downloadedUpdate completion:completionBlock];
 }

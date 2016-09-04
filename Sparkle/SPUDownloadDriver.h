@@ -1,5 +1,5 @@
 //
-//  SUDownloadDriver.h
+//  SPUDownloadDriver.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/15/16.
@@ -10,9 +10,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SUAppcastItem, SUHost, SUDownloadedUpdate;
+@class SUAppcastItem, SUHost, SPUDownloadedUpdate;
 
-@protocol SUDownloadDriverDelegate <NSObject>
+@protocol SPUDownloadDriverDelegate <NSObject>
 
 - (void)downloadDriverWillBeginDownload;
 
@@ -20,15 +20,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)downloadDriverDidReceiveDataOfLength:(NSUInteger)length;
 
-- (void)downloadDriverDidDownloadUpdate:(SUDownloadedUpdate *)downloadedUpdate;
+- (void)downloadDriverDidDownloadUpdate:(SPUDownloadedUpdate *)downloadedUpdate;
 
 - (void)downloadDriverDidFailToDownloadUpdateWithError:(NSError *)error;
 
 @end
 
-@interface SUDownloadDriver : NSObject
+@interface SPUDownloadDriver : NSObject
 
-- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host userAgent:(NSString *)userAgent delegate:(id<SUDownloadDriverDelegate>)delegate;
+- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host userAgent:(NSString *)userAgent delegate:(id<SPUDownloadDriverDelegate>)delegate;
 
 - (void)downloadUpdate;
 

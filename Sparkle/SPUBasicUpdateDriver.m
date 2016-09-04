@@ -1,12 +1,12 @@
 //
-//  SUBasicUpdateDriver.m
+//  SPUBasicUpdateDriver.m
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/18/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SUBasicUpdateDriver.h"
+#import "SPUBasicUpdateDriver.h"
 #import "SUAppcastDriver.h"
 #import "SPUUpdaterDelegate.h"
 #import "SUErrors.h"
@@ -14,19 +14,19 @@
 #import "SULocalizations.h"
 #import "SUHost.h"
 #import "SUAppcastItem.h"
-#import "SUProbeInstallStatus.h"
+#import "SPUProbeInstallStatus.h"
 #import "SPUInstallationInfo.h"
-#import "SUDownloadedUpdate.h"
+#import "SPUDownloadedUpdate.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-@interface SUBasicUpdateDriver () <SUAppcastDriverDelegate>
+@interface SPUBasicUpdateDriver () <SUAppcastDriverDelegate>
 
-@property (nonatomic, weak, readonly) id<SUBasicUpdateDriverDelegate> delegate;
+@property (nonatomic, weak, readonly) id<SPUBasicUpdateDriverDelegate> delegate;
 @property (nonatomic, readonly) SUAppcastDriver *appcastDriver;
-@property (nonatomic, copy) SUUpdateDriverCompletion completionBlock;
+@property (nonatomic, copy) SPUUpdateDriverCompletion completionBlock;
 
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly, weak) id updater; // if we didn't have legacy support, I'd remove this..
@@ -36,7 +36,7 @@
 
 @end
 
-@implementation SUBasicUpdateDriver
+@implementation SPUBasicUpdateDriver
 
 @synthesize host = _host;
 @synthesize updater = _updater;
@@ -46,7 +46,7 @@
 @synthesize completionBlock = _completionBlock;
 @synthesize aborted = _aborted;
 
-- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(id <SPUUpdaterDelegate>)updaterDelegate delegate:(id <SUBasicUpdateDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(id <SPUUpdaterDelegate>)updaterDelegate delegate:(id <SPUBasicUpdateDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -60,7 +60,7 @@
     return self;
 }
 
-- (void)prepareCheckForUpdatesWithCompletion:(SUUpdateDriverCompletion)completionBlock
+- (void)prepareCheckForUpdatesWithCompletion:(SPUUpdateDriverCompletion)completionBlock
 {
     self.completionBlock = completionBlock;
 }
@@ -88,20 +88,20 @@
     }
 }
 
-- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
+- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock
 {
     self.completionBlock = completionBlock;
     
     NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
-    [SUProbeInstallStatus probeInstallerUpdateItemForHostBundleIdentifier:hostBundleIdentifier completion:^(SPUInstallationInfo * _Nullable installationInfo) {
+    [SPUProbeInstallStatus probeInstallerUpdateItemForHostBundleIdentifier:hostBundleIdentifier completion:^(SPUInstallationInfo * _Nullable installationInfo) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self notifyResumableUpdateItem:installationInfo.appcastItem];
         });
     }];
 }
 
-- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock
+- (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
     self.completionBlock = completionBlock;
     
@@ -173,7 +173,7 @@
     }
 }
 
-- (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately downloadedUpdate:(SUDownloadedUpdate * _Nullable)downloadedUpdate error:(nullable NSError *)error
+- (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately downloadedUpdate:(SPUDownloadedUpdate * _Nullable)downloadedUpdate error:(nullable NSError *)error
 {
     self.aborted = YES;
     

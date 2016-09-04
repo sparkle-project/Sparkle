@@ -1,29 +1,29 @@
 //
-//  SUUserInitiatedUpdateDriver.m
+//  SPUUserInitiatedUpdateDriver.m
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/18/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SUUserInitiatedUpdateDriver.h"
-#import "SUUIBasedUpdateDriver.h"
+#import "SPUUserInitiatedUpdateDriver.h"
+#import "SPUUIBasedUpdateDriver.h"
 #import "SPUUserDriver.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-@interface SUUserInitiatedUpdateDriver () <SUUIBasedUpdateDriverDelegate>
+@interface SPUUserInitiatedUpdateDriver () <SPUUIBasedUpdateDriverDelegate>
 
-@property (nonatomic, readonly) SUUIBasedUpdateDriver *uiDriver;
+@property (nonatomic, readonly) SPUUIBasedUpdateDriver *uiDriver;
 @property (nonatomic, readonly) id<SPUUserDriver> userDriver;
 @property (nonatomic) BOOL showingUserInitiatedProgress;
 @property (nonatomic) BOOL aborted;
 
 @end
 
-@implementation SUUserInitiatedUpdateDriver
+@implementation SPUUserInitiatedUpdateDriver
 
 @synthesize uiDriver = _uiDriver;
 @synthesize userDriver = _userDriver;
@@ -34,13 +34,13 @@
 {
     self = [super init];
     if (self != nil) {
-        _uiDriver = [[SUUIBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle sparkleBundle:sparkleBundle updater:updater userDriver:userDriver userInitiated:YES updaterDelegate:updaterDelegate delegate:self];
+        _uiDriver = [[SPUUIBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle sparkleBundle:sparkleBundle updater:updater userDriver:userDriver userInitiated:YES updaterDelegate:updaterDelegate delegate:self];
         _userDriver = userDriver;
     }
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders preventingInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(SUUpdateDriverCompletion)completionBlock
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders preventingInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(SPUUpdateDriverCompletion)completionBlock
 {
     [self.uiDriver prepareCheckForUpdatesWithCompletion:completionBlock];
     
@@ -71,12 +71,12 @@
     }];
 }
 
-- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
+- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock
 {
     [self.uiDriver resumeInstallingUpdateWithCompletion:completionBlock];
 }
 
-- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock
+- (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
     [self.uiDriver resumeDownloadedUpdate:downloadedUpdate completion:completionBlock];
 }

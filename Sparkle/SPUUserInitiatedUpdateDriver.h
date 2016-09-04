@@ -1,5 +1,5 @@
 //
-//  SUAutomaticUpdateDriver.h
+//  SPUUserInitiatedUpdateDriver.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/18/16.
@@ -7,14 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SUUpdateDriver.h"
+#import "SPUUpdateDriver.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class SUHost;
 @protocol SPUUpdaterDelegate, SPUUserDriver;
 
-@interface SUAutomaticUpdateDriver : NSObject <SUUpdateDriver>
+@interface SPUUserInitiatedUpdateDriver : NSObject <SPUUpdateDriver>
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate;
 

@@ -1,13 +1,13 @@
 //
-//  SUUIBasedUpdateDriver.m
+//  SPUUIBasedUpdateDriver.m
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/18/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SUUIBasedUpdateDriver.h"
-#import "SUCoreBasedUpdateDriver.h"
+#import "SPUUIBasedUpdateDriver.h"
+#import "SPUCoreBasedUpdateDriver.h"
 #import "SPUUserDriver.h"
 #import "SUHost.h"
 #import "SUConstants.h"
@@ -21,14 +21,14 @@
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-@interface SUUIBasedUpdateDriver() <SUCoreBasedUpdateDriverDelegate>
+@interface SPUUIBasedUpdateDriver() <SPUCoreBasedUpdateDriverDelegate>
 
-@property (nonatomic, readonly) SUCoreBasedUpdateDriver *coreDriver;
+@property (nonatomic, readonly) SPUCoreBasedUpdateDriver *coreDriver;
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, weak, readonly) id updater;
 @property (nonatomic, readonly) BOOL userInitiated;
 @property (weak, nonatomic, readonly) id<SPUUpdaterDelegate> updaterDelegate;
-@property (nonatomic, weak, readonly) id<SUUIBasedUpdateDriverDelegate> delegate;
+@property (nonatomic, weak, readonly) id<SPUUIBasedUpdateDriverDelegate> delegate;
 @property (nonatomic, readonly) id<SPUUserDriver> userDriver;
 @property (nonatomic) BOOL resumingInstallingUpdate;
 @property (nonatomic) BOOL resumingDownloadedUpdate;
@@ -36,7 +36,7 @@
 
 @end
 
-@implementation SUUIBasedUpdateDriver
+@implementation SPUUIBasedUpdateDriver
 
 @synthesize coreDriver = _coreDriver;
 @synthesize host = _host;
@@ -49,7 +49,7 @@
 @synthesize resumingDownloadedUpdate = _resumingDownloadedUpdate;
 @synthesize preventsInstallerInteraction = _preventsInstallerInteraction;
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver userInitiated:(BOOL)userInitiated updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SUUIBasedUpdateDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver userInitiated:(BOOL)userInitiated updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUUIBasedUpdateDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -60,12 +60,12 @@
         _updaterDelegate = updaterDelegate;
         _host = host;
         
-        _coreDriver = [[SUCoreBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle sparkleBundle:sparkleBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
+        _coreDriver = [[SPUCoreBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle sparkleBundle:sparkleBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
     }
     return self;
 }
 
-- (void)prepareCheckForUpdatesWithCompletion:(SUUpdateDriverCompletion)completionBlock
+- (void)prepareCheckForUpdatesWithCompletion:(SPUUpdateDriverCompletion)completionBlock
 {
     [self.coreDriver prepareCheckForUpdatesWithCompletion:completionBlock];
 }
@@ -82,13 +82,13 @@
     [self.coreDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:includesSkippedUpdates requiresSilentInstall:NO];
 }
 
-- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
+- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock
 {
     self.resumingInstallingUpdate = YES;
     [self.coreDriver resumeInstallingUpdateWithCompletion:completionBlock];
 }
 
-- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock
+- (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
     self.resumingDownloadedUpdate = YES;
     [self.coreDriver resumeDownloadedUpdate:downloadedUpdate completion:completionBlock];

@@ -1,12 +1,12 @@
 //
-//  SUProbeInstallStatus.m
+//  SPUProbeInstallStatus.m
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/20/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SUProbeInstallStatus.h"
+#import "SPUProbeInstallStatus.h"
 #import "SPUXPCServiceInfo.h"
 #import "SPUMessageTypes.h"
 #import "SPUInstallationInfo.h"
@@ -23,7 +23,7 @@
 // It should be at least more than 1 second since a probe can take around that much time
 #define PROBE_TIMEOUT 7
 
-@implementation SUProbeInstallStatus
+@implementation SPUProbeInstallStatus
 
 + (void)probeInstallerInProgressForHostBundleIdentifier:(NSString *)hostBundleIdentifier completion:(void (^)(BOOL))completionHandler
 {

@@ -12,23 +12,23 @@
 #import "SUHost.h"
 #import "SPUUpdatePermissionRequest.h"
 #import "SPUUpdatePermissionResponse.h"
-#import "SUUpdateDriver.h"
+#import "SPUUpdateDriver.h"
 #import "SUConstants.h"
 #import "SULog.h"
 #import "SUCodeSigningVerifier.h"
 #import "SUSystemProfiler.h"
-#import "SUScheduledUpdateDriver.h"
-#import "SUProbingUpdateDriver.h"
-#import "SUUserInitiatedUpdateDriver.h"
-#import "SUAutomaticUpdateDriver.h"
-#import "SUProbeInstallStatus.h"
+#import "SPUScheduledUpdateDriver.h"
+#import "SPUProbingUpdateDriver.h"
+#import "SPUUserInitiatedUpdateDriver.h"
+#import "SPUAutomaticUpdateDriver.h"
+#import "SPUProbeInstallStatus.h"
 #import "SUAppcastItem.h"
 #import "SPUInstallationInfo.h"
 #import "SUErrors.h"
 #import "SPUXPCServiceInfo.h"
 #import "SPUUpdaterCycle.h"
 #import "SPUUpdaterTimer.h"
-#import "SUDownloadedUpdate.h"
+#import "SPUDownloadedUpdate.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -47,7 +47,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 @property (nonatomic, readonly) id<SPUUserDriver> userDriver;
 @property (weak, readonly, nullable) id<SPUUpdaterDelegate> delegate;
-@property (nonatomic) id <SUUpdateDriver> driver;
+@property (nonatomic) id <SPUUpdateDriver> driver;
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly) NSBundle *applicationBundle;
 @property (nonatomic, readonly) SPUUpdaterSettings *updaterSettings;
@@ -55,7 +55,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (nonatomic, readonly) SPUUpdaterTimer *updaterTimer;
 @property (nonatomic) BOOL startedUpdater;
 @property (nonatomic, copy) void (^preStartedScheduledUpdateBlock)(void);
-@property (nonatomic, nullable) SUDownloadedUpdate *resumableUpdate;
+@property (nonatomic, nullable) SPUDownloadedUpdate *resumableUpdate;
 
 @property (nonatomic) BOOL loggedATSWarning;
 @property (nonatomic) BOOL loggedDSAWarning;
@@ -406,17 +406,17 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
-    [SUProbeInstallStatus probeInstallerInProgressForHostBundleIdentifier:hostBundleIdentifier completion:^(BOOL installerIsRunning) {
+    [SPUProbeInstallStatus probeInstallerInProgressForHostBundleIdentifier:hostBundleIdentifier completion:^(BOOL installerIsRunning) {
         dispatch_async(dispatch_get_main_queue(), ^{
             SPUUpdater *strongSelf = weakSelf;
             if (strongSelf == nil) {
                 return;
             }
             
-            id <SUUpdateDriver> updateDriver;
+            id <SPUUpdateDriver> updateDriver;
             if (!installerIsRunning && [strongSelf automaticallyDownloadsUpdates] && strongSelf.resumableUpdate == nil) {
                 updateDriver =
-                [[SUAutomaticUpdateDriver alloc]
+                [[SPUAutomaticUpdateDriver alloc]
                  initWithHost:strongSelf.host
                  applicationBundle:strongSelf.applicationBundle
                  sparkleBundle:strongSelf.sparkleBundle
@@ -425,7 +425,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                  updaterDelegate:strongSelf.delegate];
             } else {
                 updateDriver =
-                [[SUScheduledUpdateDriver alloc]
+                [[SPUScheduledUpdateDriver alloc]
                  initWithHost:strongSelf.host
                  applicationBundle:strongSelf.applicationBundle
                  sparkleBundle:strongSelf.sparkleBundle
@@ -460,11 +460,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         return;
     }
     
-    id <SUUpdateDriver> theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithHost:self.host applicationBundle:self.applicationBundle sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
+    id <SPUUpdateDriver> theUpdateDriver = [[SPUUserInitiatedUpdateDriver alloc] initWithHost:self.host applicationBundle:self.applicationBundle sparkleBundle:self.sparkleBundle updater:self userDriver:self.userDriver updaterDelegate:self.delegate];
     
     NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(bundleIdentifier != nil);
-    [SUProbeInstallStatus probeInstallerInProgressForHostBundleIdentifier:bundleIdentifier completion:^(BOOL installerInProgress) {
+    [SPUProbeInstallStatus probeInstallerInProgressForHostBundleIdentifier:bundleIdentifier completion:^(BOOL installerInProgress) {
         dispatch_async(dispatch_get_main_queue(), ^{
             SPUUpdater *strongSelf = weakSelf;
             if (strongSelf != nil) {
@@ -493,17 +493,17 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     
     NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(bundleIdentifier != nil);
-    [SUProbeInstallStatus probeInstallerInProgressForHostBundleIdentifier:bundleIdentifier completion:^(BOOL installerInProgress) {
+    [SPUProbeInstallStatus probeInstallerInProgressForHostBundleIdentifier:bundleIdentifier completion:^(BOOL installerInProgress) {
         dispatch_async(dispatch_get_main_queue(), ^{
             SPUUpdater *strongSelf = weakSelf;
             if (strongSelf != nil) {
-                [strongSelf checkForUpdatesWithDriver:[[SUProbingUpdateDriver alloc] initWithHost:strongSelf.host updater:strongSelf updaterDelegate:strongSelf.delegate] installerInProgress:installerInProgress preventsInstallerInteraction:NO];
+                [strongSelf checkForUpdatesWithDriver:[[SPUProbingUpdateDriver alloc] initWithHost:strongSelf.host updater:strongSelf updaterDelegate:strongSelf.delegate] installerInProgress:installerInProgress preventsInstallerInteraction:NO];
             }
         });
     }];
 }
 
-- (void)checkForUpdatesWithDriver:(id <SUUpdateDriver> )d installerInProgress:(BOOL)installerInProgress preventsInstallerInteraction:(BOOL)preventsInstallerInteraction
+- (void)checkForUpdatesWithDriver:(id <SPUUpdateDriver> )d installerInProgress:(BOOL)installerInProgress preventsInstallerInteraction:(BOOL)preventsInstallerInteraction
 {
     if (self.driver != nil) {
         return;
@@ -548,7 +548,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     NSURL *theFeedURL = [self parameterizedFeedURL];
     if (theFeedURL) {
         __weak SPUUpdater *weakSelf = self;
-        SUUpdateDriverCompletion completionBlock = ^(BOOL shouldShowUpdateImmediately, SUDownloadedUpdate * _Nullable resumableUpdate) {
+        SPUUpdateDriverCompletion completionBlock = ^(BOOL shouldShowUpdateImmediately, SPUDownloadedUpdate * _Nullable resumableUpdate) {
             SPUUpdater *strongSelf = weakSelf;
             if (strongSelf != nil) {
                 strongSelf.resumableUpdate = resumableUpdate;
@@ -563,7 +563,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         if (installerInProgress) {
             [self.driver resumeInstallingUpdateWithCompletion:completionBlock];
         } else if (self.resumableUpdate != nil) {
-            [self.driver resumeDownloadedUpdate:(SUDownloadedUpdate * _Nonnull)self.resumableUpdate completion:completionBlock];
+            [self.driver resumeDownloadedUpdate:(SPUDownloadedUpdate * _Nonnull)self.resumableUpdate completion:completionBlock];
         } else {
             [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders] preventingInstallerInteraction:preventsInstallerInteraction completion:completionBlock];
         }
@@ -789,7 +789,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 {
     NSString *hostBundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(hostBundleIdentifier != nil);
-    [SUProbeInstallStatus probeInstallerUpdateItemForHostBundleIdentifier:hostBundleIdentifier completion:^(SPUInstallationInfo * _Nullable installationInfo) {
+    [SPUProbeInstallStatus probeInstallerUpdateItemForHostBundleIdentifier:hostBundleIdentifier completion:^(SPUInstallationInfo * _Nullable installationInfo) {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSTimeInterval regularCheckInterval = [self updateCheckInterval];
             if (installationInfo == nil) {

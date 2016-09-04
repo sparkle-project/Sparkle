@@ -1,26 +1,26 @@
 //
-//  SUProbingUpdateDriver.m
+//  SPUProbingUpdateDriver.m
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/18/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SUProbingUpdateDriver.h"
-#import "SUBasicUpdateDriver.h"
+#import "SPUProbingUpdateDriver.h"
+#import "SPUBasicUpdateDriver.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-@interface SUProbingUpdateDriver () <SUBasicUpdateDriverDelegate>
+@interface SPUProbingUpdateDriver () <SPUBasicUpdateDriverDelegate>
 
-@property (nonatomic, readonly) SUBasicUpdateDriver *basicDriver;
-@property (nonatomic) SUDownloadedUpdate *downloadedUpdate;
+@property (nonatomic, readonly) SPUBasicUpdateDriver *basicDriver;
+@property (nonatomic) SPUDownloadedUpdate *downloadedUpdate;
 
 @end
 
-@implementation SUProbingUpdateDriver
+@implementation SPUProbingUpdateDriver
 
 @synthesize basicDriver = _basicDriver;
 @synthesize downloadedUpdate = _downloadedUpdate;
@@ -29,12 +29,12 @@
 {
     self = [super init];
     if (self != nil) {
-        _basicDriver = [[SUBasicUpdateDriver alloc] initWithHost:host updater:updater updaterDelegate:updaterDelegate delegate:self];
+        _basicDriver = [[SPUBasicUpdateDriver alloc] initWithHost:host updater:updater updaterDelegate:updaterDelegate delegate:self];
     }
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders preventingInstallerInteraction:(BOOL)__unused preventsInstallerInteraction completion:(SUUpdateDriverCompletion)completionBlock
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders preventingInstallerInteraction:(BOOL)__unused preventsInstallerInteraction completion:(SPUUpdateDriverCompletion)completionBlock
 {
     // We don't preflight for update permission in this driver because we are just interested if an update is available
     
@@ -43,12 +43,12 @@
     [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:NO];
 }
 
-- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
+- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock
 {
     [self.basicDriver resumeInstallingUpdateWithCompletion:completionBlock];
 }
 
-- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock
+- (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
     self.downloadedUpdate = downloadedUpdate;
     

@@ -1,20 +1,20 @@
 //
-//  SUCoreBasedUpdateDriver.m
+//  SPUCoreBasedUpdateDriver.m
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/18/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SUCoreBasedUpdateDriver.h"
+#import "SPUCoreBasedUpdateDriver.h"
 #import "SUHost.h"
 #import "SPUUpdaterDelegate.h"
-#import "SUBasicUpdateDriver.h"
-#import "SUInstallerDriver.h"
-#import "SUDownloadDriver.h"
+#import "SPUBasicUpdateDriver.h"
+#import "SPUInstallerDriver.h"
+#import "SPUDownloadDriver.h"
 #import "SULog.h"
 #import "SUErrors.h"
-#import "SUDownloadedUpdate.h"
+#import "SPUDownloadedUpdate.h"
 #import "SUAppcastItem.h"
 #import "SULocalizations.h"
 #import "SPUInstallationType.h"
@@ -23,14 +23,14 @@
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-@interface SUCoreBasedUpdateDriver () <SUBasicUpdateDriverDelegate, SUDownloadDriverDelegate, SUInstallerDriverDelegate>
+@interface SPUCoreBasedUpdateDriver () <SPUBasicUpdateDriverDelegate, SPUDownloadDriverDelegate, SPUInstallerDriverDelegate>
 
-@property (nonatomic, readonly) SUBasicUpdateDriver *basicDriver;
-@property (nonatomic) SUDownloadDriver *downloadDriver;
-@property (nonatomic, readonly) SUInstallerDriver *installerDriver;
-@property (nonatomic, weak, readonly) id<SUCoreBasedUpdateDriverDelegate> delegate;
+@property (nonatomic, readonly) SPUBasicUpdateDriver *basicDriver;
+@property (nonatomic) SPUDownloadDriver *downloadDriver;
+@property (nonatomic, readonly) SPUInstallerDriver *installerDriver;
+@property (nonatomic, weak, readonly) id<SPUCoreBasedUpdateDriverDelegate> delegate;
 @property (nonatomic) SUAppcastItem *updateItem;
-@property (nonatomic) SUDownloadedUpdate *downloadedUpdate;
+@property (nonatomic) SPUDownloadedUpdate *downloadedUpdate;
 
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic) BOOL resumingInstallingUpdate;
@@ -42,7 +42,7 @@
 
 @end
 
-@implementation SUCoreBasedUpdateDriver
+@implementation SPUCoreBasedUpdateDriver
 
 @synthesize basicDriver = _basicDriver;
 @synthesize downloadDriver = _downloadDriver;
@@ -58,7 +58,7 @@
 @synthesize userAgent = _userAgent;
 @synthesize downloadedUpdate = _downloadedUpdate;
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SUCoreBasedUpdateDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUCoreBasedUpdateDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -67,8 +67,8 @@
         NSString *bundleIdentifier = host.bundle.bundleIdentifier;
         assert(bundleIdentifier != nil);
         
-        _basicDriver = [[SUBasicUpdateDriver alloc] initWithHost:host updater:updater updaterDelegate:updaterDelegate delegate:self];
-        _installerDriver = [[SUInstallerDriver alloc] initWithHost:host applicationBundle:applicationBundle sparkleBundle:sparkleBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
+        _basicDriver = [[SPUBasicUpdateDriver alloc] initWithHost:host updater:updater updaterDelegate:updaterDelegate delegate:self];
+        _installerDriver = [[SPUInstallerDriver alloc] initWithHost:host applicationBundle:applicationBundle sparkleBundle:sparkleBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
         
         _host = host;
         _updater = updater;
@@ -77,7 +77,7 @@
     return self;
 }
 
-- (void)prepareCheckForUpdatesWithCompletion:(SUUpdateDriverCompletion)completionBlock
+- (void)prepareCheckForUpdatesWithCompletion:(SPUUpdateDriverCompletion)completionBlock
 {
     [self.basicDriver prepareCheckForUpdatesWithCompletion:completionBlock];
 }
@@ -114,7 +114,7 @@
     [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:includesSkippedUpdates];
 }
 
-- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock
+- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock
 {
     self.resumingInstallingUpdate = YES;
     self.silentInstall = NO;
@@ -122,7 +122,7 @@
     [self.basicDriver resumeInstallingUpdateWithCompletion:completionBlock];
 }
 
-- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock
+- (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
     self.downloadedUpdate = downloadedUpdate;
     self.silentInstall = NO;
@@ -165,7 +165,7 @@
 
 - (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem
 {
-    self.downloadDriver = [[SUDownloadDriver alloc] initWithUpdateItem:updateItem host:self.host userAgent:self.userAgent delegate:self];
+    self.downloadDriver = [[SPUDownloadDriver alloc] initWithUpdateItem:updateItem host:self.host userAgent:self.userAgent delegate:self];
     
     if ([self.updaterDelegate respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
         [self.updaterDelegate updater:self.updater
@@ -197,7 +197,7 @@
     }
 }
 
-- (void)downloadDriverDidDownloadUpdate:(SUDownloadedUpdate *)downloadedUpdate
+- (void)downloadDriverDidDownloadUpdate:(SPUDownloadedUpdate *)downloadedUpdate
 {
     self.downloadedUpdate = downloadedUpdate;
     [self extractUpdate:downloadedUpdate];
@@ -214,7 +214,7 @@
     self.downloadedUpdate = nil;
 }
 
-- (void)extractUpdate:(SUDownloadedUpdate *)downloadedUpdate
+- (void)extractUpdate:(SPUDownloadedUpdate *)downloadedUpdate
 {
     // Now we have to extract the downloaded archive.
     if ([self.delegate respondsToSelector:@selector(coreDriverDidStartExtractingUpdate)]) {
@@ -341,7 +341,7 @@
     [self.installerDriver abortInstall];
     [self.downloadDriver cleanup];
     
-    SUDownloadedUpdate *downloadedUpdate = (error == nil || error.code == SUInstallationAuthorizeLaterError) ? self.downloadedUpdate : nil;
+    SPUDownloadedUpdate *downloadedUpdate = (error == nil || error.code == SUInstallationAuthorizeLaterError) ? self.downloadedUpdate : nil;
     [self.basicDriver abortUpdateAndShowNextUpdateImmediately:shouldShowUpdateImmediately downloadedUpdate:downloadedUpdate error:error];
 }
 

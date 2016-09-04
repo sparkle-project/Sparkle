@@ -1,16 +1,16 @@
 //
-//  SUAutomaticUpdateDriver.m
+//  SPUAutomaticUpdateDriver.m
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/18/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SUAutomaticUpdateDriver.h"
-#import "SUUpdateDriver.h"
+#import "SPUAutomaticUpdateDriver.h"
+#import "SPUUpdateDriver.h"
 #import "SUHost.h"
 #import "SPUUpdaterDelegate.h"
-#import "SUCoreBasedUpdateDriver.h"
+#import "SPUCoreBasedUpdateDriver.h"
 #import "SULog.h"
 #import "SUAppcastItem.h"
 #import "SPUUserDriver.h"
@@ -20,18 +20,18 @@
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-@interface SUAutomaticUpdateDriver () <SUCoreBasedUpdateDriverDelegate>
+@interface SPUAutomaticUpdateDriver () <SPUCoreBasedUpdateDriverDelegate>
 
 @property (nonatomic, readonly, weak) id updater;
 @property (nonatomic, readonly, weak) id<SPUUserDriver> userDriver;
 @property (nonatomic, readonly, weak, nullable) id updaterDelegate;
-@property (nonatomic, readonly) SUCoreBasedUpdateDriver *coreDriver;
+@property (nonatomic, readonly) SPUCoreBasedUpdateDriver *coreDriver;
 @property (nonatomic) SUAppcastItem* updateItem;
 @property (nonatomic) BOOL willInstallSilently;
 
 @end
 
-@implementation SUAutomaticUpdateDriver
+@implementation SPUAutomaticUpdateDriver
 
 @synthesize updater = _updater;
 @synthesize userDriver = _userDriver;
@@ -48,12 +48,12 @@
         // The user driver is only used for a termination callback
         _userDriver = userDriver;
         _updaterDelegate = updaterDelegate;
-        _coreDriver = [[SUCoreBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle sparkleBundle:sparkleBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
+        _coreDriver = [[SPUCoreBasedUpdateDriver alloc] initWithHost:host applicationBundle:applicationBundle sparkleBundle:sparkleBundle updater:updater updaterDelegate:updaterDelegate delegate:self];
     }
     return self;
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders preventingInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(SUUpdateDriverCompletion)completionBlock
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders preventingInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(SPUUpdateDriverCompletion)completionBlock
 {
     [self.coreDriver prepareCheckForUpdatesWithCompletion:completionBlock];
     
@@ -66,17 +66,17 @@
     }];
 }
 
-- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
+- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
 {
     // Nothing really to do here.. this shouldn't be called.
-    SULog(@"Error: resumeInstallingUpdateWithCompletion: called on SUAutomaticUpdateDriver");
+    SULog(@"Error: resumeInstallingUpdateWithCompletion: called on SPUAutomaticUpdateDriver");
     abort();
 }
 
-- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)__unused downloadedUpdate completion:(SUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
+- (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)__unused downloadedUpdate completion:(SPUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
 {
     // Nothing really to do here.. this shouldn't be called.
-    SULog(@"Error: resumeDownloadedUpdate:completion: called on SUAutomaticUpdateDriver");
+    SULog(@"Error: resumeDownloadedUpdate:completion: called on SPUAutomaticUpdateDriver");
     abort();
 }
 
@@ -95,7 +95,7 @@
         BOOL installationHandledByDelegate = NO;
         id<SPUUpdaterDelegate> updaterDelegate = self.updaterDelegate;
         if (self.willInstallSilently && [updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationBlock:)]) {
-            __weak SUAutomaticUpdateDriver *weakSelf = self;
+            __weak SPUAutomaticUpdateDriver *weakSelf = self;
             installationHandledByDelegate = [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationBlock:^{
                 [weakSelf.coreDriver finishInstallationWithResponse:SPUInstallAndRelaunchUpdateNow displayingUserInterface:NO];
             }];

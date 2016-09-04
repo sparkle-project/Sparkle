@@ -1,12 +1,12 @@
 //
-//  SUDownloadDriver.m
+//  SPUDownloadDriver.m
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/15/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SUDownloadDriver.h"
+#import "SPUDownloadDriver.h"
 #import "SPUDownloaderDelegate.h"
 #import "SPUDownloader.h"
 #import "SPUXPCServiceInfo.h"
@@ -17,14 +17,14 @@
 #import "SULog.h"
 #import "SUErrors.h"
 #import "SPUURLRequest.h"
-#import "SUDownloadedUpdate.h"
+#import "SPUDownloadedUpdate.h"
 #import "SPUDownloadData.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-@interface SUDownloadDriver () <SPUDownloaderDelegate>
+@interface SPUDownloadDriver () <SPUDownloaderDelegate>
 
 @property (nonatomic) id<SPUDownloaderProtocol> downloader;
 @property (nonatomic) NSXPCConnection *connection;
@@ -32,7 +32,7 @@
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, copy) NSString *temporaryDirectory;
 @property (nonatomic, copy) NSString *downloadName;
-@property (nonatomic, weak) id<SUDownloadDriverDelegate> delegate;
+@property (nonatomic, weak) id<SPUDownloadDriverDelegate> delegate;
 @property (nonatomic) BOOL retrievedDownloadResult;
 @property (nonatomic) BOOL retrievedDownloadResponse;
 @property (nonatomic) NSUInteger expectedContentLength;
@@ -40,7 +40,7 @@
 
 @end
 
-@implementation SUDownloadDriver
+@implementation SPUDownloadDriver
 
 @synthesize downloader = _downloader;
 @synthesize connection = _connection;
@@ -55,7 +55,7 @@
 @synthesize expectedContentLength = _expectedContentLength;
 @synthesize cleaningUp = _cleaningUp;
 
-- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host userAgent:(NSString *)userAgent delegate:(id<SUDownloadDriverDelegate>)delegate
+- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host userAgent:(NSString *)userAgent delegate:(id<SPUDownloadDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -85,11 +85,11 @@
     NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(bundleIdentifier != nil);
     
-    __weak SUDownloadDriver *weakSelf = self;
+    __weak SPUDownloadDriver *weakSelf = self;
     
     self.connection.interruptionHandler = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            SUDownloadDriver *strongSelf = weakSelf;
+            SPUDownloadDriver *strongSelf = weakSelf;
             if (strongSelf != nil && !strongSelf.retrievedDownloadResult) {
                 [strongSelf.connection invalidate];
             }
@@ -98,7 +98,7 @@
     
     self.connection.invalidationHandler = ^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            SUDownloadDriver *strongSelf = weakSelf;
+            SPUDownloadDriver *strongSelf = weakSelf;
             if (strongSelf != nil && !strongSelf.retrievedDownloadResult && !strongSelf.cleaningUp) {
                 SULog(@"Connection to update downloader was invalidated");
                 
@@ -143,7 +143,7 @@
             SULog(@"Warning: Downloader's expected content length (%lu) != Appcast item's length (%lu)", self.expectedContentLength, self.updateItem.contentLength);
         }
         
-        SUDownloadedUpdate *downloadedUpdate = [[SUDownloadedUpdate alloc] initWithAppcastItem:self.updateItem downloadName:self.downloadName temporaryDirectory:self.temporaryDirectory];
+        SPUDownloadedUpdate *downloadedUpdate = [[SPUDownloadedUpdate alloc] initWithAppcastItem:self.updateItem downloadName:self.downloadName temporaryDirectory:self.temporaryDirectory];
         
         [self.delegate downloadDriverDidDownloadUpdate:downloadedUpdate];
         [self cleanup];

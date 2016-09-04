@@ -1,5 +1,5 @@
 //
-//  SUCoreBasedUpdateDriver.h
+//  SPUCoreBasedUpdateDriver.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/18/16.
@@ -8,14 +8,14 @@
 
 #import <Foundation/Foundation.h>
 #import "SPUStatusCompletionResults.h"
-#import "SUUpdateDriver.h"
+#import "SPUUpdateDriver.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class SUHost, SUAppcastItem;
 @protocol SPUUpdaterDelegate;
 
-@protocol SUCoreBasedUpdateDriverDelegate <NSObject>
+@protocol SPUCoreBasedUpdateDriverDelegate <NSObject>
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem;
 
@@ -47,19 +47,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface SUCoreBasedUpdateDriver : NSObject
+@interface SPUCoreBasedUpdateDriver : NSObject
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SUCoreBasedUpdateDriverDelegate>)delegate;
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUCoreBasedUpdateDriverDelegate>)delegate;
 
-- (void)prepareCheckForUpdatesWithCompletion:(SUUpdateDriverCompletion)completionBlock;
+- (void)prepareCheckForUpdatesWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
 
 - (void)preflightForUpdatePermissionPreventingInstallerInteraction:(BOOL)preventsInstallerInteraction reply:(void (^)(NSError * _Nullable))reply;
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates requiresSilentInstall:(BOOL)silentInstall;
 
-- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock;
+- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
 
-- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock;
+- (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
 
 - (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem;
 

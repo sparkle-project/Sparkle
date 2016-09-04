@@ -1,5 +1,5 @@
 //
-//  SUProbingUpdateDriver.h
+//  SPUProbingUpdateDriver.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/18/16.
@@ -7,14 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SUUpdateDriver.h"
+#import "SPUUpdateDriver.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class SUHost;
 @protocol SPUUpdaterDelegate;
 
-@interface SUProbingUpdateDriver : NSObject <SUUpdateDriver>
+@interface SPUProbingUpdateDriver : NSObject <SPUUpdateDriver>
 
 - (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate;
 

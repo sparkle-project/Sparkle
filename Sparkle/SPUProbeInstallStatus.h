@@ -1,5 +1,5 @@
 //
-//  SUProbeInstallStatus.h
+//  SPUProbeInstallStatus.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/20/16.
@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SPUInstallationInfo;
 
-@interface SUProbeInstallStatus : NSObject
+@interface SPUProbeInstallStatus : NSObject
 
 + (void)probeInstallerInProgressForHostBundleIdentifier:(NSString *)hostBundleIdentifier completion:(void (^)(BOOL))completionHandler;
 

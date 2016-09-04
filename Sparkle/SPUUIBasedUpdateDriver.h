@@ -1,5 +1,5 @@
 //
-//  SUUIBasedUpdateDriver.h
+//  SPUUIBasedUpdateDriver.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/18/16.
@@ -7,11 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SUUpdateDriver.h"
+#import "SPUUpdateDriver.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol SUUIBasedUpdateDriverDelegate <NSObject>
+@protocol SPUUIBasedUpdateDriverDelegate <NSObject>
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
 - (void)coreDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error;
@@ -23,22 +23,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@class SUHost, SUDownloadedUpdate;
+@class SUHost, SPUDownloadedUpdate;
 @protocol SPUUserDriver, SPUUpdaterDelegate;
 
-@interface SUUIBasedUpdateDriver : NSObject
+@interface SPUUIBasedUpdateDriver : NSObject
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver userInitiated:(BOOL)userInitiated updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SUUIBasedUpdateDriverDelegate>)delegate;
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater userDriver:(id <SPUUserDriver>)userDriver userInitiated:(BOOL)userInitiated updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUUIBasedUpdateDriverDelegate>)delegate;
 
-- (void)prepareCheckForUpdatesWithCompletion:(SUUpdateDriverCompletion)completionBlock;
+- (void)prepareCheckForUpdatesWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
 
 - (void)preflightForUpdatePermissionPreventingInstallerInteraction:(BOOL)preventsInstallerInteraction reply:(void (^)(NSError * _Nullable))reply;
 
 - (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates;
 
-- (void)resumeInstallingUpdateWithCompletion:(SUUpdateDriverCompletion)completionBlock;
+- (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
 
-- (void)resumeDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate completion:(SUUpdateDriverCompletion)completionBlock;
+- (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
 
 - (void)abortUpdateWithError:(nullable NSError *)error;
 

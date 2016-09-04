@@ -1,12 +1,12 @@
 //
-//  SUInstallerDriver.m
+//  SPUInstallerDriver.m
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/17/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SUInstallerDriver.h"
+#import "SPUInstallerDriver.h"
 #import "SULog.h"
 #import "SPUMessageTypes.h"
 #import "SPUXPCServiceInfo.h"
@@ -23,7 +23,7 @@
 #import "SUInstallerConnection.h"
 #import "SUInstallerConnectionProtocol.h"
 #import "SUXPCInstallerConnection.h"
-#import "SUDownloadedUpdate.h"
+#import "SPUDownloadedUpdate.h"
 #import "SPUInstallationType.h"
 
 #ifdef _APPKITDEFINES_H
@@ -38,12 +38,12 @@
 
 @end
 
-@interface SUInstallerDriver () <SUInstallerCommunicationProtocol>
+@interface SPUInstallerDriver () <SUInstallerCommunicationProtocol>
 
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly) NSBundle *applicationBundle;
 @property (nonatomic, readonly) NSBundle *sparkleBundle;
-@property (nonatomic, weak, readonly) id<SUInstallerDriverDelegate> delegate;
+@property (nonatomic, weak, readonly) id<SPUInstallerDriverDelegate> delegate;
 @property (nonatomic) SPUInstallerMessageType currentStage;
 @property (nonatomic) BOOL startedInstalling;
 
@@ -63,7 +63,7 @@
 
 @end
 
-@implementation SUInstallerDriver
+@implementation SPUInstallerDriver
 
 @synthesize host = _host;
 @synthesize applicationBundle = _applicationBundle;
@@ -82,7 +82,7 @@
 @synthesize temporaryDirectory = _temporaryDirectory;
 @synthesize aborted = _aborted;
 
-- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(id<SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SUInstallerDriverDelegate>)delegate
+- (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(id<SPUUpdaterDelegate>)updaterDelegate delegate:(nullable id<SPUInstallerDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -111,10 +111,10 @@
         self.installerConnection = [[SUXPCInstallerConnection alloc] initWithDelegate:self];
     }
     
-    __weak SUInstallerDriver *weakSelf = self;
+    __weak SPUInstallerDriver *weakSelf = self;
     [self.installerConnection setInvalidationHandler:^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            SUInstallerDriver *strongSelf = weakSelf;
+            SPUInstallerDriver *strongSelf = weakSelf;
             if (strongSelf.installerConnection != nil && !strongSelf.aborted) {
                 NSError *remoteError =
                 [NSError
@@ -140,7 +140,7 @@
 }
 
 // This can be called multiple times (eg: if a delta update fails, this may be called again with a regular update item)
-- (void)extractDownloadedUpdate:(SUDownloadedUpdate *)downloadedUpdate silently:(BOOL)silently preventsInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(void (^)(NSError * _Nullable))completionHandler
+- (void)extractDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate silently:(BOOL)silently preventsInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(void (^)(NSError * _Nullable))completionHandler
 {
     self.updateItem = downloadedUpdate.updateItem;
     self.temporaryDirectory = downloadedUpdate.temporaryDirectory;
@@ -197,9 +197,9 @@
     // This also handles the case when a delta extraction fails and tries to re-try another extraction attempt later
     // We will also want to make sure current stage is still SUInstallerNotStarted because it may not be due to resumability
     NSUInteger currentExtractionAttempts = self.extractionAttempts;
-    __weak SUInstallerDriver *weakSelf = self;
+    __weak SPUInstallerDriver *weakSelf = self;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(FIRST_INSTALLER_MESSAGE_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        SUInstallerDriver *strongSelf = weakSelf;
+        SPUInstallerDriver *strongSelf = weakSelf;
         if (strongSelf != nil && strongSelf.currentStage == SPUInstallerNotStarted && currentExtractionAttempts == self.extractionAttempts) {
             SULog(@"Timeout: Installer never started archive extraction");
             [strongSelf.delegate installerIsRequestingAbortInstallWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey:SULocalizedString(@"An error occurred while starting the installer. Please try again later.", nil) }]];
@@ -473,7 +473,7 @@
     {
         if ([self.updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvokingBlock:)]) {
             self.postponedOnce = YES;
-            __weak SUInstallerDriver *weakSelf = self;
+            __weak SPUInstallerDriver *weakSelf = self;
             if ([self.updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:self.updateItem untilInvokingBlock:^{
                 [weakSelf installWithToolAndRelaunch:relaunch displayingUserInterface:showUI];
             }]) {
