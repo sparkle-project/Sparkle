@@ -245,7 +245,8 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     BOOL isPackage = NO;
     // The path to the new bundle or package
     NSString *installSourcePath = [SUInstaller installSourcePathInUpdateFolder:self.updateDirectoryPath forHost:self.host isPackage:&isPackage isGuided:NULL];
-    if (installSourcePath == nil) {
+    NSURL *installSourceURL = [NSURL fileURLWithPath:installSourcePath];
+    if (installSourceURL == nil) {
         SULog(@"No suitable install is found in the update. The update will be rejected.");
         [self cleanupAndExitWithStatus:EXIT_FAILURE];
     }
@@ -257,11 +258,11 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             validationSuccess = [SPUInstallerValidation validateUpdateForHost:self.host archivePath:archivePath DSASignature:self.dsaSignature];
         } else {
             // Validate the bundle code signatures and DSA signatures of archive together
-            validationSuccess = [SPUInstallerValidation validateBundleUpdateForHost:self.host newBundlePath:installSourcePath archivePath:archivePath DSASignature:self.dsaSignature];
+            validationSuccess = [SPUInstallerValidation validateBundleUpdateForHost:self.host newBundleURL:installSourceURL archivePath:archivePath DSASignature:self.dsaSignature];
         }
     } else if (!isPackage) {
         // Just make sure the bundle is valid to check that the developer didn't make a careless mistake
-        validationSuccess = [SPUInstallerValidation validateCodeSignatureIfAvailableForBundlePath:installSourcePath];
+        validationSuccess = [SPUInstallerValidation validateCodeSignatureIfAvailableForBundleURL:installSourceURL];
     }
     
     if (!validationSuccess) {

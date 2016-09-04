@@ -18,9 +18,9 @@
 
 @implementation SPUInstallerValidation
 
-+ (BOOL)validateBundleUpdateForHost:(SUHost *)host newBundlePath:(NSString *)newBundlePath archivePath:(NSString *)archivePath DSASignature:(NSString *)DSASignature
++ (BOOL)validateBundleUpdateForHost:(SUHost *)host newBundleURL:(NSURL *)newBundleURL archivePath:(NSString *)archivePath DSASignature:(NSString *)DSASignature
 {
-    NSBundle *newBundle = [NSBundle bundleWithPath:newBundlePath];
+    NSBundle *newBundle = [NSBundle bundleWithURL:newBundleURL];
     if (newBundle == nil) {
         SULog(@"No suitable bundle is found in the update. The update will be rejected.");
         return NO;
@@ -50,17 +50,17 @@
         }
     }
     
-    BOOL updateIsCodeSigned = [SUCodeSigningVerifier bundleAtPathIsCodeSigned:newBundlePath];
+    BOOL updateIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:newBundleURL];
     
     if (dsaKeysMatch) {
         NSError *error = nil;
-        if (updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtPath:newBundlePath error:&error]) {
+        if (updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:newBundleURL error:&error]) {
             SULog(@"The update archive has a valid DSA signature, but the app is also signed with Code Signing, which is corrupted: %@. The update will be rejected.", error);
             return NO;
         }
     } else {
-        NSString *hostBundlePath = host.bundlePath;
-        BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtPathIsCodeSigned:hostBundlePath];
+        NSURL *hostBundleURL = host.bundle.bundleURL;
+        BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:hostBundleURL];
         
         NSString *dsaStatus = newPublicDSAKey ? @"has a new DSA key that doesn't match the previous one" : (publicDSAKey ? @"removes the DSA key" : @"isn't signed with a DSA key");
         if (!hostIsCodeSigned || !updateIsCodeSigned) {
@@ -70,7 +70,7 @@
         }
         
         NSError *error = nil;
-        if (![SUCodeSigningVerifier codeSignatureAtPath:hostBundlePath matchesSignatureAtPath:newBundlePath error:&error]) {
+        if (![SUCodeSigningVerifier codeSignatureAtBundleURL:hostBundleURL matchesSignatureAtBundleURL:newBundleURL error:&error]) {
             SULog(@"The update archive %@, and the app is signed with a new Code Signing identity that doesn't match code signing of the original app: %@. At least one method of signature verification must be valid. The update will be rejected.", dsaStatus, error);
             return NO;
         }
@@ -100,13 +100,13 @@
     return YES;
 }
 
-+ (BOOL)validateCodeSignatureIfAvailableForBundlePath:(NSString *)bundlePath
++ (BOOL)validateCodeSignatureIfAvailableForBundleURL:(NSURL *)bundleURL
 {
-    BOOL updateIsCodeSigned = [SUCodeSigningVerifier bundleAtPathIsCodeSigned:bundlePath];
+    BOOL updateIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:bundleURL];
     
     NSError *error = nil;
-    if (updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtPath:bundlePath error:&error]) {
-        SULog(@"Failed to validate code sign signature on bundle at %@", bundlePath);
+    if (updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:bundleURL error:&error]) {
+        SULog(@"Failed to validate code sign signature on bundle at %@", bundleURL);
         return NO;
     }
     return YES;
