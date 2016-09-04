@@ -81,7 +81,7 @@
     NSURL *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
     NSURL *signedAndValid = [tempDir URLByAppendingPathComponent:@"valid-signed.app"];
 
-    if ([[NSFileManager defaultManager] fileExistsAtPath:signedAndValid.path]) {
+    if ([signedAndValid checkResourceIsReachableAndReturnError:NULL]) {
         [[NSFileManager defaultManager] removeItemAtURL:signedAndValid error:NULL];
     }
 
@@ -101,7 +101,7 @@
     NSURL *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
     NSURL *calculatorCopy = [tempDir URLByAppendingPathComponent:@"calc.app"];
 
-    if ([[NSFileManager defaultManager] fileExistsAtPath:calculatorCopy.path]) {
+    if ([calculatorCopy checkResourceIsReachableAndReturnError:NULL]) {
         [[NSFileManager defaultManager] removeItemAtURL:calculatorCopy error:NULL];
     }
 
@@ -112,7 +112,7 @@
     // which sounds like some kind of (SIP / attribute?) bug
     [[NSFileManager defaultManager] copyItemAtURL:[NSURL fileURLWithPath:CALCULATOR_PATH] toURL:calculatorCopy error:&copyError];
 
-    if (![[NSFileManager defaultManager] fileExistsAtPath:calculatorCopy.path]) {
+    if (![calculatorCopy checkResourceIsReachableAndReturnError:NULL]) {
         XCTFail(@"Copied calculator application does not exist");
     }
 
@@ -132,7 +132,7 @@
     NSURL *tempDir = [self.notSignedAppURL URLByDeletingLastPathComponent];
     NSURL *signedAndInvalid = [tempDir URLByAppendingPathComponent:@"invalid-signed.app"];
 
-    if ([[NSFileManager defaultManager] fileExistsAtPath:signedAndInvalid.path]) {
+    if ([signedAndInvalid checkResourceIsReachableAndReturnError:NULL]) {
         [[NSFileManager defaultManager] removeItemAtURL:signedAndInvalid error:NULL];
     }
     if ([[NSFileManager defaultManager] copyItemAtURL:self.notSignedAppURL toURL:signedAndInvalid error:&error]) {
