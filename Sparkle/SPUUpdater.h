@@ -71,6 +71,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  * This is meant for users initiating an update check.
  * This may find a resumable update that has already been downloaded or has begun installing, or
  * this may find a new update that can start to be downloaded if the user requests it.
+ * This will find updates that the user has opted into skipping.
  */
 - (void)checkForUpdates;
 
@@ -79,6 +80,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  *
  * This is meant for programmatically initating a check for updates.
  * That is, it will display no UI unless it finds an update, in which case it proceeds as usual.
+ * This will not find updates that the user has opted into skipping.
  *
  * Note if there is no resumable update found, and automated updating is turned on,
  * the update will be downloaded in the background without disrupting the user.
@@ -93,6 +95,8 @@ SU_EXPORT @interface SPUUpdater : NSObject
  * SPUUpdaterDelegate::updater:didFindValidUpdate: and
  * SPUUpdaterDelegate::updaterDidNotFindUpdate: will be called,
  * so you can use that information in your UI.
+ *
+ * Updates that have been skipped by the user will not be found.
  */
 - (void)checkForUpdateInformation;
 
@@ -154,6 +158,8 @@ SU_EXPORT @interface SPUUpdater : NSObject
 
 /*!
  * The HTTP headers used when checking for updates.
+ *
+ * The keys of this dictionary are HTTP header fields (NSString) and values are corresponding values (NSString)
  */
 @property (copy, nullable) NSDictionary<NSString *, NSString *> *httpHeaders;
 

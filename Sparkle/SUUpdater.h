@@ -36,33 +36,25 @@ SU_EXPORT @interface SUUpdater : NSObject
 
 @property (unsafe_unretained, nonatomic) IBOutlet id<SUUpdaterDelegate> delegate;
 
+/*!
+ The shared updater for the main bundle.
+ 
+ This is equivalent to passing [NSBundle mainBundle] to SUUpdater::updaterForBundle:
+ */
 + (SUUpdater *)sharedUpdater;
-+ (SUUpdater *)updaterForBundle:(NSBundle *)bundle;
-- (instancetype)initForBundle:(NSBundle *)bundle;
-
-@property (readonly, nonatomic) NSBundle *hostBundle;
-@property (strong, readonly) NSBundle *sparkleBundle;
-
-@property (nonatomic) BOOL automaticallyChecksForUpdates;
-
-@property (nonatomic) NSTimeInterval updateCheckInterval;
 
 /*!
- * The URL of the appcast used to download update information.
- *
- * This property must be called on the main thread.
+ The shared updater for a specified bundle.
+ If an updater has already been initialized for the provided bundle, that shared instance will be returned.
  */
-@property (nonatomic, copy) NSURL *feedURL;
++ (SUUpdater *)updaterForBundle:(NSBundle *)bundle;
 
-@property (nonatomic, copy) NSString *userAgentString;
-
-@property (nonatomic, copy) NSDictionary *httpHeaders;
-
-@property (nonatomic) BOOL sendsSystemProfile;
-
-@property (nonatomic) BOOL automaticallyDownloadsUpdates;
-
-@property (nonatomic, copy) NSString *decryptionPassword;
+/*!
+ Designated initializer for SUUpdater.
+ 
+ If an updater has already been initialized for the provided bundle, that shared instance will be returned.
+ */
+- (instancetype)initForBundle:(NSBundle *)bundle;
 
 /*!
  Explicitly checks for updates and displays a progress dialog while doing so.
@@ -71,11 +63,13 @@ SU_EXPORT @interface SUUpdater : NSObject
  Connect any menu item to this action in Interface Builder,
  and Sparkle will check for updates and report back its findings verbosely
  when it is invoked.
+ 
+ This will find updates that the user has opted into skipping.
  */
 - (IBAction)checkForUpdates:(id)sender;
 
 /*!
-   The menu item validation used for the -checkForUpdates: action
+ The menu item validation used for the -checkForUpdates: action
  */
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem;
 
@@ -86,18 +80,41 @@ SU_EXPORT @interface SUUpdater : NSObject
  it will display no UI unless it actually finds an update, in which case it
  proceeds as usual.
  
- If the fully automated updating is turned on, however, this will invoke that
- behavior, and if an update is found, it will be downloaded and prepped for
- installation.
+ If automatic downloading of updates it turned on and allowed, however,
+ this will invoke that behavior, and if an update is found, it will be downloaded
+ in the background silently and will be prepped for installation.
+ 
+ This will not find updates that the user has opted into skipping.
  */
 - (void)checkForUpdatesInBackground;
 
 /*!
- Returns the date of last update check.
+ A property indicating whether or not to check for updates automatically.
  
- \returns \c nil if no check has been performed.
+ Setting this property will persist in the host bundle's user defaults.
+ The update schedule cycle will be reset in a short delay after the property's new value is set.
+ This is to allow reverting this property without kicking off a schedule change immediately
  */
-@property (nonatomic, readonly, copy) NSDate *lastUpdateCheckDate;
+@property (nonatomic) BOOL automaticallyChecksForUpdates;
+
+/*!
+ A property indicating whether or not updates can be automatically downloaded in the background.
+ 
+ Note that automatic downloading of updates can be disallowed by the developer.
+ In this case, -automaticallyDownloadsUpdates will return NO regardless of how this property is set.
+ 
+ Setting this property will persist in the host bundle's user defaults.
+ */
+@property (nonatomic) BOOL automaticallyDownloadsUpdates;
+
+/*!
+ A property indicating the current automatic update check interval.
+ 
+ Setting this property will persist in the host bundle's user defaults.
+ The update schedule cycle will be reset in a short delay after the property's new value is set.
+ This is to allow reverting this property without kicking off a schedule change immediately
+ */
+@property (nonatomic) NSTimeInterval updateCheckInterval;
 
 /*!
  Begins a "probing" check for updates which will not actually offer to
@@ -107,8 +124,64 @@ SU_EXPORT @interface SUUpdater : NSObject
  SUUpdaterDelegate::updater:didFindValidUpdate: and
  SUUpdaterDelegate::updaterDidNotFindUpdate: will be called,
  so you can use that information in your UI.
+ 
+ Updates that have been skipped by the user will not be found.
  */
 - (void)checkForUpdateInformation;
+
+/*!
+ The URL of the appcast used to download update information.
+ 
+ Setting this property will persist in the host bundle's user defaults.
+ If you don't want persistence, you may want to consider instead implementing
+ SUUpdaterDelegate::feedURLStringForUpdater: or SUUpdaterDelegate::feedParametersForUpdater:sendingSystemProfile:
+ 
+ This property must be called on the main thread.
+ */
+@property (nonatomic, copy) NSURL *feedURL;
+
+/*!
+ The host bundle that is being updated.
+ */
+@property (readonly, nonatomic) NSBundle *hostBundle;
+
+/*!
+ The bundle this class (SUUpdater) is loaded into.
+ */
+@property (strong, readonly) NSBundle *sparkleBundle;
+
+/*!
+ The user agent used when checking for updates.
+ 
+ The default implementation can be overrided.
+ */
+@property (nonatomic, copy) NSString *userAgentString;
+
+/*!
+ The HTTP headers used when checking for updates.
+ 
+ The keys of this dictionary are HTTP header fields (NSString) and values are corresponding values (NSString)
+ */
+@property (nonatomic, copy) NSDictionary *httpHeaders;
+
+/*!
+ A property indicating whether or not the user's system profile information is sent when checking for updates.
+ 
+ Setting this property will persist in the host bundle's user defaults.
+ */
+@property (nonatomic) BOOL sendsSystemProfile;
+
+/*!
+ A property indicating the decryption password used for extracting updates shipped as Apple Disk Images (dmg)
+ */
+@property (nonatomic, copy) NSString *decryptionPassword;
+
+/*!
+ Returns the date of last update check.
+ 
+ \returns \c nil if no check has been performed.
+ */
+@property (nonatomic, readonly, copy) NSDate *lastUpdateCheckDate;
 
 /*!
  Appropriately schedules or cancels the update checking timer according to
@@ -119,6 +192,12 @@ SU_EXPORT @interface SUUpdater : NSObject
  */
 - (void)resetUpdateCycle;
 
+/*!
+ A property indicating whether or not an update is in progress.
+ 
+ Note this property is not indicative of whether or not user initiated updates can be performed.
+ Use SUUpdater::validateMenuItem: for that instead.
+ */
 @property (nonatomic, readonly) BOOL updateInProgress;
 
 @end
