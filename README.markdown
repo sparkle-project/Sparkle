@@ -6,7 +6,7 @@ A major fork to the popular Sparkle update framework that supports sandboxing, c
 
 This fork's current status is beta. I am no longer looking into adding or rewriting major functionality, and would like to finalize and have it be battle tested.
 
-New issues that are found should be [reported here](https://github.com/zorgiepoo/sparkle-ui-xpc-issues/issues), and internal design documents can be found in `Documentation`.
+New issues that are found should be [reported here](https://github.com/zorgiepoo/sparkle-ui-xpc-issues/issues), and internal design documents can be found in `Documentation`. Discussion of this fork can be found on the [official branch](https://github.com/sparkle-project/Sparkle/issues/363).
 
 # Features
 
@@ -38,13 +38,13 @@ Not only is sandboxing supported, but launchd is now used for submitting the ins
 
 Extraction, validation, and installation of the update are all handled by the installer. The XPC services and the installer job don't implicitly trust the other end of the connection. Signing downloads with a DSA signature is now encouraged more aggressively.
 
-Usage of AppKit has been minimized greatly. No linkage of it is found in the installer daemon. All code core to Sparkle's functionality prevents it from being imported. Only user driver classes and a progress agent may use AppKit for showing UI.
+Usage of AppKit has been minimized greatly. No linkage of it is found in the installer daemon. All code core to Sparkle's functionality prevents it from being imported. Only user driver classes and a progress agent may use AppKit for showing UI. A `SparkleCore.framework` target has been created that just uses the core.
 
 ## API Compatibility
 
 Despite decoupling update scheduling, UI, installation, and minimizing AppKit usage, a great deal of effort was made to maintain compatibility with older versions of Sparkle. A deprecated `SUUpdater` shim exists for maintaining runtime compatibility. Please check out `SPUStandardUpdaterController` and `SPUUpdater` instead for modern replacements.
 
-Interactive package based installations have been deprecated in favor for guided package installations. As a consequence, interactive installations now have to be opted into (eg: `foo.sparkle_interactive.pkg`). A `sparkle:installationType=package` or `sparkle:installationType=interactive-package` tag is now required in the appcast enclosure item for package based installs.
+Interactive package based installations have been deprecated in favor for guided package installations. As a consequence, interactive installations now have to be opted into (eg: `foo.sparkle_interactive.pkg`). A `sparkle:installationType=package` or `sparkle:installationType=interactive-package` tag is also now required in the appcast enclosure item for package based installs.
 
 No attempt is made to preserve compatibility with regards to subclassing Sparkle's internal classes. Doing this is not supported or maintainable anymore. Much of this desire will go away with the extensibility provided by the user driver API.
 
@@ -53,7 +53,7 @@ New Sparkle classes are now prefixed with `SPU` rather than `SU`. Older classes 
 ## Misc. Changes
 
 * Unless overridden, Sparkle now waits 3 hours before prompting the user for updater permission, rather than waiting for a 2nd launch.
-* Updates are more instant to install once extracted. The "installing update" dialog seldomly shows up after the old application has quit.
+* Updates are more instant to install once extracted. The "installing update" dialog seldomly shows up after the old application quits.
 * The installer will attempt installing the update after extraction is finished, even if the user quits the process and doesn't relaunch the application explicitly.
 * Updates can be downloaded in the background automatically (if enabled) and be resumed by the user later, even if the user has insufficent permission to install them initially.
 * Authentication now occurs before launching the installer and before terminating the application, which can be canceled by the user cleanly.
