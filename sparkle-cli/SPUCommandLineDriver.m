@@ -88,15 +88,13 @@ void _SULogDisableStandardErrorStream(void);
 
 // If the installation is interactive, we can show an authorization prompt for requesting additional privileges,
 // along with allowing the installer to show UI when installing
-
-- (BOOL)updaterShouldAllowInstallerInteractionForInitiatedChecks:(SPUUpdater *)__unused updater
+- (BOOL)updater:(SPUUpdater *)__unused updater shouldAllowInstallerInteractionForScheduledChecks:(SPUUpdateCheck)updateCheck
 {
-    return self.interactive;
-}
-
-- (BOOL)updaterShouldAllowInstallerInteractionForScheduledChecks:(SPUUpdater *)__unused updater
-{
-    return self.interactive;
+    switch (updateCheck) {
+        case SPUUpdateCheckUserInitiated:
+        case SPUUpdateCheckBackgroundScheduled:
+            return self.interactive;
+    }
 }
 
 - (nullable NSString *)feedURLStringForUpdater:(SPUUpdater *)__unused updater
