@@ -12,49 +12,49 @@ class SUSpotlightImporterTest: XCTestCase
 {
     func testUpdatingSpotlightBundles()
     {
-        let fileManager = SUFileManager.defaultManager()
-        let tempDirectoryURL = try! fileManager.makeTemporaryDirectoryWithPreferredName("Sparkle Unit Test Data", appropriateForDirectoryURL: NSURL(fileURLWithPath: NSHomeDirectory()))
+        let fileManager = SUFileManager.default()
+        let tempDirectoryURL = try! fileManager?.makeTemporaryDirectory(withPreferredName: "Sparkle Unit Test Data", appropriateForDirectoryURL: URL(fileURLWithPath: NSHomeDirectory()))
         
-        let bundleDirectory = tempDirectoryURL.URLByAppendingPathComponent("bundle.app")
-        try! fileManager.makeDirectoryAtURL(bundleDirectory)
+        let bundleDirectory = tempDirectoryURL?.appendingPathComponent("bundle.app")
+        try! fileManager?.makeDirectory(at: bundleDirectory)
         
-        let innerDirectory = bundleDirectory.URLByAppendingPathComponent("foo")
-        try! fileManager.makeDirectoryAtURL(innerDirectory)
-        try! NSData().writeToURL(bundleDirectory.URLByAppendingPathComponent("bar"), options: .AtomicWrite)
+        let innerDirectory = bundleDirectory?.appendingPathComponent("foo")
+        try! fileManager?.makeDirectory(at: innerDirectory)
+        try! Data().write(to: (bundleDirectory?.appendingPathComponent("bar"))!, options: .atomicWrite)
         
-        let importerDirectory = innerDirectory.URLByAppendingPathComponent("baz.mdimporter")
+        let importerDirectory = innerDirectory?.appendingPathComponent("baz.mdimporter")
         
-        try! fileManager.makeDirectoryAtURL(importerDirectory)
-        try! fileManager.makeDirectoryAtURL(innerDirectory.URLByAppendingPathComponent("flag"))
+        try! fileManager?.makeDirectory(at: importerDirectory)
+        try! fileManager?.makeDirectory(at: innerDirectory?.appendingPathComponent("flag"))
         
-        try! NSData().writeToURL(importerDirectory.URLByAppendingPathComponent("file"), options: .AtomicWrite)
+        try! Data().write(to: (importerDirectory?.appendingPathComponent("file"))!, options: .atomicWrite)
         
-        let oldFooDirectoryAttributes = try! NSFileManager.defaultManager().attributesOfItemAtPath(innerDirectory.path!)
-        let oldBarFileAttributes = try! NSFileManager.defaultManager().attributesOfItemAtPath(bundleDirectory.URLByAppendingPathComponent("bar").path!)
-        let oldImporterAttributes = try! NSFileManager.defaultManager().attributesOfItemAtPath(importerDirectory.path!)
-        let oldFlagAttributes = try! NSFileManager.defaultManager().attributesOfItemAtPath(innerDirectory.URLByAppendingPathComponent("flag").path!)
-        let oldFileInImporterAttributes = try! NSFileManager.defaultManager().attributesOfItemAtPath(importerDirectory.URLByAppendingPathComponent("file").path!)
+        let oldFooDirectoryAttributes = try! FileManager.default.attributesOfItem(atPath: innerDirectory!.path)
+        let oldBarFileAttributes = try! FileManager.default.attributesOfItem(atPath: bundleDirectory!.appendingPathComponent("bar").path)
+        let oldImporterAttributes = try! FileManager.default.attributesOfItem(atPath: importerDirectory!.path)
+        let oldFlagAttributes = try! FileManager.default.attributesOfItem(atPath: innerDirectory!.appendingPathComponent("flag").path)
+        let oldFileInImporterAttributes = try! FileManager.default.attributesOfItem(atPath: importerDirectory!.appendingPathComponent("file").path)
         
         sleep(1) // wait for clock to advance
         
         // Update spotlight bundles
-        SUBinaryDeltaUnarchiver.updateSpotlightImportersAtBundlePath(bundleDirectory.path!)
+        SUBinaryDeltaUnarchiver.updateSpotlightImporters(atBundlePath: bundleDirectory!.path)
         
-        let newFooDirectoryAttributes = try! NSFileManager.defaultManager().attributesOfItemAtPath(innerDirectory.path!)
-        XCTAssertEqual((newFooDirectoryAttributes[NSFileModificationDate] as! NSDate).timeIntervalSinceDate(oldFooDirectoryAttributes[NSFileModificationDate] as! NSDate), 0)
+        let newFooDirectoryAttributes = try! FileManager.default.attributesOfItem(atPath: innerDirectory!.path)
+        XCTAssertEqual((newFooDirectoryAttributes[FileAttributeKey.modificationDate] as! Date).timeIntervalSince(oldFooDirectoryAttributes[FileAttributeKey.modificationDate] as! Date), 0)
         
-        let newBarFileAttributes = try! NSFileManager.defaultManager().attributesOfItemAtPath(bundleDirectory.URLByAppendingPathComponent("bar").path!)
-        XCTAssertEqual((newBarFileAttributes[NSFileModificationDate] as! NSDate).timeIntervalSinceDate(oldBarFileAttributes[NSFileModificationDate] as! NSDate), 0)
+        let newBarFileAttributes = try! FileManager.default.attributesOfItem(atPath: bundleDirectory!.appendingPathComponent("bar").path)
+        XCTAssertEqual((newBarFileAttributes[FileAttributeKey.modificationDate] as! Date).timeIntervalSince(oldBarFileAttributes[FileAttributeKey.modificationDate] as! Date), 0)
         
-        let newImporterAttributes = try! NSFileManager.defaultManager().attributesOfItemAtPath(importerDirectory.path!)
-        XCTAssertGreaterThan((newImporterAttributes[NSFileModificationDate] as! NSDate).timeIntervalSinceDate(oldImporterAttributes[NSFileModificationDate] as! NSDate), 0)
+        let newImporterAttributes = try! FileManager.default.attributesOfItem(atPath: importerDirectory!.path)
+        XCTAssertGreaterThan((newImporterAttributes[FileAttributeKey.modificationDate] as! Date).timeIntervalSince(oldImporterAttributes[FileAttributeKey.modificationDate] as! Date), 0)
         
-        let newFlagAttributes = try! NSFileManager.defaultManager().attributesOfItemAtPath(innerDirectory.URLByAppendingPathComponent("flag").path!)
-        XCTAssertEqual((newFlagAttributes[NSFileModificationDate] as! NSDate).timeIntervalSinceDate(oldFlagAttributes[NSFileModificationDate] as! NSDate), 0)
+        let newFlagAttributes = try! FileManager.default.attributesOfItem(atPath: innerDirectory!.appendingPathComponent("flag").path)
+        XCTAssertEqual((newFlagAttributes[FileAttributeKey.modificationDate] as! Date).timeIntervalSince(oldFlagAttributes[FileAttributeKey.modificationDate] as! Date), 0)
         
-        let newFileInImporterAttributes = try! NSFileManager.defaultManager().attributesOfItemAtPath(importerDirectory.URLByAppendingPathComponent("file").path!)
-        XCTAssertEqual((newFileInImporterAttributes[NSFileModificationDate] as! NSDate).timeIntervalSinceDate(oldFileInImporterAttributes[NSFileModificationDate] as! NSDate), 0)
+        let newFileInImporterAttributes = try! FileManager.default.attributesOfItem(atPath: importerDirectory!.appendingPathComponent("file").path)
+        XCTAssertEqual((newFileInImporterAttributes[FileAttributeKey.modificationDate] as! Date).timeIntervalSince(oldFileInImporterAttributes[FileAttributeKey.modificationDate] as! Date), 0)
         
-        try! fileManager.removeItemAtURL(tempDirectoryURL)
+        try! fileManager?.removeItem(at: tempDirectoryURL)
     }
 }
