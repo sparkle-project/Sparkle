@@ -26,34 +26,34 @@ class SUUnarchiverTest: XCTestCase, SUUnarchiverDelegate
         self.unarchivedExpectation!.fulfill()
     }
     
-    func unarchiveTestAppWithExtension(archiveExtension: String)
+    func unarchiveTestAppWithExtension(_ archiveExtension: String)
     {
         let appName = "SparkleTestCodeSignApp"
-        let archiveResourceURL = NSBundle(forClass: self.dynamicType).URLForResource(appName, withExtension: archiveExtension)!
+        let archiveResourceURL = Bundle(for: type(of: self)).url(forResource: appName, withExtension: archiveExtension)!
         
-        let fileManager = NSFileManager.defaultManager()
+        let fileManager = FileManager.default
         
-        let tempDirectoryURL = try! fileManager.URLForDirectory(.ItemReplacementDirectory, inDomain: .UserDomainMask, appropriateForURL: NSURL(fileURLWithPath: NSHomeDirectory()), create: true)
+        let tempDirectoryURL = try! fileManager.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: URL(fileURLWithPath: NSHomeDirectory()), create: true)
         defer {
-            try! fileManager.removeItemAtURL(tempDirectoryURL)
+            try! fileManager.removeItem(at: tempDirectoryURL)
         }
         
-        let tempArchiveURL = tempDirectoryURL.URLByAppendingPathComponent(archiveResourceURL.lastPathComponent!)
-        let extractedAppURL = tempDirectoryURL.URLByAppendingPathComponent(appName).URLByAppendingPathExtension("app")
+        let tempArchiveURL = tempDirectoryURL.appendingPathComponent(archiveResourceURL.lastPathComponent)
+        let extractedAppURL = tempDirectoryURL.appendingPathComponent(appName).appendingPathExtension("app")
         
-        try! fileManager.copyItemAtURL(archiveResourceURL, toURL: tempArchiveURL)
+        try! fileManager.copyItem(at: archiveResourceURL, to: tempArchiveURL)
         
-        self.unarchivedExpectation = super.expectationWithDescription("Unarchived Application (format: \(archiveExtension))")
+        self.unarchivedExpectation = super.expectation(description: "Unarchived Application (format: \(archiveExtension))")
         
-        let unarchiver = SUUnarchiver.unarchiverForPath(tempArchiveURL.path!, updatingHostBundlePath: nil, decryptionPassword: self.password, delegate: self)
+        let unarchiver = SUUnarchiver.unarchiver(forPath: tempArchiveURL.path, updatingHostBundlePath: nil, decryptionPassword: self.password, delegate: self)
         unarchiver!.start()
         
-        super.waitForExpectationsWithTimeout(7.0, handler: nil)
+        super.waitForExpectations(timeout: 7.0, handler: nil)
         
         XCTAssertTrue(self.unarchivedResult)
-        XCTAssertTrue(fileManager.fileExistsAtPath(extractedAppURL.path!))
+        XCTAssertTrue(fileManager.fileExists(atPath: extractedAppURL.path))
         
-        XCTAssertEqual("6a60ab31430cfca8fb499a884f4a29f73e59b472", hashOfTree(extractedAppURL.path!))
+        XCTAssertEqual("6a60ab31430cfca8fb499a884f4a29f73e59b472", hashOfTree(extractedAppURL.path))
     }
 
     func testUnarchivingZip()

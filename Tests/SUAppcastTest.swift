@@ -13,11 +13,11 @@ class SUAppcastTest: XCTestCase {
 
     func testParseAppcast() {
         let appcast = SUAppcast();
-        let testFile = NSBundle(forClass: SUAppcastTest.self).pathForResource("testappcast", ofType: "xml")!;
+        let testFile = Bundle(for: SUAppcastTest.self).path(forResource: "testappcast", ofType: "xml")!;
         let testData = NSData(contentsOfFile: testFile)!
         
         do {
-            let items = try appcast.parseAppcastItemsFromXMLData(testData) as! [SUAppcastItem];
+            let items = try appcast.parseAppcastItems(fromXMLData: testData as Data!) as! [SUAppcastItem];
             
             XCTAssertEqual(4, items.count);
             
@@ -40,20 +40,20 @@ class SUAppcastTest: XCTestCase {
             
             // Test best appcast item & a delta update item
             var deltaItem: SUAppcastItem? = nil
-            let bestAppcastItem = SUAppcastDriver.bestItemFromAppcastItems(items, getDeltaItem: &deltaItem, withHostVersion: "1.0", comparator: SUStandardVersionComparator())
+            let bestAppcastItem = SUAppcastDriver.bestItem(fromAppcastItems: items, getDeltaItem: &deltaItem, withHostVersion: "1.0", comparator: SUStandardVersionComparator())
 
             XCTAssertEqual(bestAppcastItem, items[1])
             XCTAssertEqual(deltaItem!.fileURL.lastPathComponent, "3.0_from_1.0.patch")
             
             // Test latest delta update item available
             var latestDeltaItem: SUAppcastItem? = nil
-            SUAppcastDriver.bestItemFromAppcastItems(items, getDeltaItem: &latestDeltaItem, withHostVersion: "2.0", comparator: SUStandardVersionComparator())
+            SUAppcastDriver.bestItem(fromAppcastItems: items, getDeltaItem: &latestDeltaItem, withHostVersion: "2.0", comparator: SUStandardVersionComparator())
             
             XCTAssertEqual(latestDeltaItem!.fileURL.lastPathComponent, "3.0_from_2.0.patch")
             
             // Test a delta item that does not exist
             var nonexistantDeltaItem: SUAppcastItem? = nil
-            SUAppcastDriver.bestItemFromAppcastItems(items, getDeltaItem: &nonexistantDeltaItem, withHostVersion: "2.1", comparator: SUStandardVersionComparator())
+            SUAppcastDriver.bestItem(fromAppcastItems: items, getDeltaItem: &nonexistantDeltaItem, withHostVersion: "2.1", comparator: SUStandardVersionComparator())
             
             XCTAssertNil(nonexistantDeltaItem)
         } catch let err as NSError {
@@ -64,11 +64,11 @@ class SUAppcastTest: XCTestCase {
 
     func testNamespaces() {
         let appcast = SUAppcast();
-        let testFile = NSBundle(forClass: SUAppcastTest.self).pathForResource("testnamespaces", ofType: "xml")!;
+        let testFile = Bundle(for: SUAppcastTest.self).path(forResource: "testnamespaces", ofType: "xml")!;
         let testData = NSData(contentsOfFile: testFile)!
 
         do {
-            let items = try appcast.parseAppcastItemsFromXMLData(testData) as! [SUAppcastItem];
+            let items = try appcast.parseAppcastItems(fromXMLData: testData as Data!) as! [SUAppcastItem];
 
             XCTAssertEqual(2, items.count);
 
