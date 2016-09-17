@@ -40,15 +40,6 @@
 
 static NSMutableDictionary *sharedUpdaters = nil;
 
-#ifdef DEBUG
-+ (void)load
-{
-    // Debug builds have different configurations for update check intervals
-    // We're using NSLog instead of SULog here because we don't want to start Sparkle's logger here
-    NSLog(@"WARNING: This is running a Debug build of Sparkle; don't use this in production!");
-}
-#endif
-
 + (SUUpdater *)sharedUpdater
 {
     return [self updaterForBundle:[NSBundle mainBundle]];
