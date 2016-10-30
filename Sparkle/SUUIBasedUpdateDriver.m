@@ -167,8 +167,9 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
-    return [NSByteCountFormatter stringFromByteCount:value
-                                          countStyle:NSByteCountFormatterCountStyleFile];
+    NSByteCountFormatter *formatter = [[NSByteCountFormatter alloc] init];
+    [formatter setZeroPadsFractionDigits:YES];
+    return [formatter stringFromByteCount:value];
 #pragma clang diagnostic pop
 }
 
