@@ -10,6 +10,7 @@
             <connections>
                 <outlet property="actionButton" destination="12" id="34"/>
                 <outlet property="progressBar" destination="11" id="49"/>
+                <outlet property="statusTextField" destination="16" id="MiZ-Tn-yVg"/>
                 <outlet property="window" destination="5" id="25"/>
             </connections>
         </customObject>
