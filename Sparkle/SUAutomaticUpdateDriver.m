@@ -48,13 +48,13 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)showUpdateAlert
 {
-  
   id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
   if ([updaterDelegate suppressSparkleUI])
   {
     [self automaticUpdateAlertFinishedWithChoice:SUInstallLaterChoice];
     return;
   }
+//    NSLog(@"[Sparkle showUpdateAlert]");
   
     self.interruptible = NO;
     [self invalidateShowUpdateAlertTimer];
@@ -110,6 +110,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     // If this is marked as a critical update, we'll prompt the user to install it right away.
     if ([self.updateItem isCriticalUpdate])
     {
+//        NSLog(@"[Sparkle update deemed critical]");
         [self showUpdateAlert];
     }
     else

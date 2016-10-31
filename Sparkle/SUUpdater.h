@@ -60,8 +60,12 @@ SU_EXPORT @interface SUUpdater : NSObject
  */
 - (instancetype)initForBundle:(NSBundle *)bundle;
 
-
+/*!
+ Suppress sparkle UI. This should prevent any Sparkle UI from popping up.
+ Updates should be handled by the host.
+ */
 -(BOOL)suppressSparkleUI;
+
 
 /*!
  Explicitly checks for updates and displays a progress dialog while doing so.
