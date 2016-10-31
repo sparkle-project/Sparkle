@@ -283,7 +283,29 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (void)checkForUpdatesInBackground
 {
     // Do not use reachability for a preflight check. This can be deceptive and a bad idea. Apple does not recommend doing it.
-    SUUpdateDriver *theUpdateDriver = [[([self automaticallyDownloadsUpdates] ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class])alloc] initWithUpdater:self];
+    BOOL canAutomaticallyDownloadUpdates = [self automaticallyDownloadsUpdates];
+    if (!canAutomaticallyDownloadUpdates)
+    {
+        // TB: App is in a non writable directory
+        if ([self.delegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
+            NSError *error =
+            [NSError errorWithDomain:SUSparkleErrorDomain code:SUHostDirectoryNotWritable
+                            userInfo:@{NSLocalizedDescriptionKey: SULocalizedString(@"Host directory is not writable", nil)}];
+            [self.delegate updater:nil didAbortWithError:error];
+        }
+        return;
+    }
+    
+    SUUpdateDriver *theUpdateDriver;
+    
+    if (canAutomaticallyDownloadUpdates || [self.delegate suppressSparkleUI])
+    {
+        theUpdateDriver = [[SUAutomaticUpdateDriver alloc] initWithUpdater:self];
+    }
+    else {
+        theUpdateDriver = [[SUScheduledUpdateDriver alloc] initWithUpdater:self];
+    }
+
     
     [self checkForUpdatesWithDriver:theUpdateDriver];
 }
@@ -307,6 +329,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 - (void)installUpdatesIfAvailable
 {
+//    NSLog(@"[Sparkle installUpdatesIfAvailable]");
+    
     if (self.driver && [self.driver isInterruptible]) {
         if ([self.driver resumeUpdateInteractively]) {
             return;
@@ -425,9 +449,12 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     if (![SUSystemUpdateInfo systemAllowsAutomaticUpdatesForHost:self.host]) {
         return NO;
     }
-
     // Otherwise, automatically downloading updates is allowed. Does the user want it?
-    return [self.host boolForUserDefaultsKey:SUAutomaticallyUpdateKey];
+    
+    BOOL automatic = [self.host boolForUserDefaultsKey:SUAutomaticallyUpdateKey];
+//    NSLog(@"Automatic updates %@", automatic ? @"enabled" : @"disabled");
+    
+    return automatic;
 }
 
 - (void)setFeedURL:(NSURL *)feedURL
