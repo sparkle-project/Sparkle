@@ -153,8 +153,12 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 @protocol SUUpdaterDelegate <NSObject>
 @optional
 
-
+/*!
+ Suppress sparkle UI. This should prevent any Sparkle UI from popping up.
+ Updates should be handled by the host.
+ */
 -(BOOL)suppressSparkleUI;
+
 
 /*!
     Returns whether to allow Sparkle to pop up.

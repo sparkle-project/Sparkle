@@ -314,8 +314,30 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     // Background update checks should only happen if we have a network connection.
     //	Wouldn't want to annoy users on dial-up by establishing a connection every
     //	hour or so:
-    SUUpdateDriver *theUpdateDriver = [[([self automaticallyDownloadsUpdates] ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class])alloc] initWithUpdater:self];
+    BOOL canAutomaticallyDownloadUpdates = [self automaticallyDownloadsUpdates];
+    if (!canAutomaticallyDownloadUpdates)
+    {
+        // TB: App is in a non writable directory
+        if ([self.delegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
+            NSError *error =
+            [NSError errorWithDomain:SUSparkleErrorDomain code:SUHostDirectoryNotWritable
+                            userInfo:@{NSLocalizedDescriptionKey: SULocalizedString(@"Host directory is not writable", nil)}];
+            [self.delegate updater:nil didAbortWithError:error];
+        }
+        return;
+    }
+    
+    SUUpdateDriver *theUpdateDriver;
+    
+    if (canAutomaticallyDownloadUpdates || [self.delegate suppressSparkleUI])
+    {
+        theUpdateDriver = [[SUAutomaticUpdateDriver alloc] initWithUpdater:self];
+    }
+    else {
+        theUpdateDriver = [[SUScheduledUpdateDriver alloc] initWithUpdater:self];
+    }
 
+//    NSLog(@"[Sparkle driver class: %@]", [theUpdateDriver class]);
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		[self checkForUpdatesInBgReachabilityCheckWithDriver:theUpdateDriver];
     });
@@ -343,6 +365,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 - (void)installUpdatesIfAvailable
 {
+//    NSLog(@"[Sparkle installUpdatesIfAvailable]");
+    
     if (self.driver && [self.driver isInterruptible]) {
         [self.driver abortUpdate];
     }
@@ -456,11 +480,15 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 {
     // If the host doesn't allow automatic updates, don't ever let them happen
     if (!self.host.allowsAutomaticUpdates) {
+//        NSLog(@"Host denied automatic updates");
         return NO;
     }
-
     // Otherwise, automatically downloading updates is allowed. Does the user want it?
-    return [self.host boolForUserDefaultsKey:SUAutomaticallyUpdateKey];
+    
+    BOOL automatic = [self.host boolForUserDefaultsKey:SUAutomaticallyUpdateKey];
+//    NSLog(@"Automatic updates %@", automatic ? @"enabled" : @"disabled");
+    
+    return automatic;
 }
 
 - (void)setFeedURL:(NSURL *)feedURL
