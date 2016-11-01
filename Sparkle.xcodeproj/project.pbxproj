@@ -26,7 +26,6 @@
 
 /* Begin PBXBuildFile section */
 		1420DF50196247F900203BB0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DF4F196247F900203BB0 /* Images.xcassets */; };
-		1420DF51196247F900203BB0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DF4F196247F900203BB0 /* Images.xcassets */; };
 		142E0E0019A6954400E4312B /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		142E0E0219A6A14700E4312B /* Sparkle.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		142E0E0419A6A26F00E4312B /* Autoupdate.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 55C14BB7136EEF1500649790 /* Autoupdate.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -78,6 +77,7 @@
 		5AD0FA7F1C73F2E2004BCEFF /* testappcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5AD0FA7E1C73F2E2004BCEFF /* testappcast.xml */; };
 		5AE459001C34118500E3BB47 /* SUUpdaterTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 14950074195FDF5900BC5B5B /* SUUpdaterTest.m */; };
 		5AE459021C34118500E3BB47 /* SUVersionComparisonTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 61227A150DB548B800AB99EA /* SUVersionComparisonTest.m */; };
+		5AE7E1111DC81AD3009C2C12 /* Sparkle.icns in Resources */ = {isa = PBXBuildFile; fileRef = 5AE7E10E1DC81ACA009C2C12 /* Sparkle.icns */; };
 		5AF6C74F1AEA46D10014A3AB /* test.sparkle_guided.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 5AF6C74E1AEA46D10014A3AB /* test.sparkle_guided.pkg */; };
 		5AF6C7541AEA49840014A3AB /* SUInstallerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF6C74C1AEA40760014A3AB /* SUInstallerTest.m */; };
 		5AF9DC3C1981DBEE001EA135 /* SUDSAVerifierTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF9DC3B1981DBEE001EA135 /* SUDSAVerifierTest.m */; };
@@ -537,6 +537,7 @@
 		55E6F33219EC9F6C00005E76 /* SUErrors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUErrors.h; sourceTree = "<group>"; };
 		5AA4DCD01C73E5510078F128 /* SUAppcastTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUAppcastTest.swift; sourceTree = "<group>"; };
 		5AD0FA7E1C73F2E2004BCEFF /* testappcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = testappcast.xml; sourceTree = "<group>"; };
+		5AE7E10E1DC81ACA009C2C12 /* Sparkle.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Sparkle.icns; sourceTree = "<group>"; };
 		5AEF45D9189D1CC90030D7DC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		5AF6C74C1AEA40760014A3AB /* SUInstallerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUInstallerTest.m; sourceTree = "<group>"; };
 		5AF6C74E1AEA46D10014A3AB /* test.sparkle_guided.pkg */ = {isa = PBXFileReference; lastKnownFileType = file; path = test.sparkle_guided.pkg; sourceTree = "<group>"; };
@@ -924,6 +925,7 @@
 				1420DF4F196247F900203BB0 /* Images.xcassets */,
 				14732BBC1960EFB500593899 /* README.markdown */,
 				14732BB91960EEEE00593899 /* SampleAppcast.xml */,
+				5AE7E10E1DC81ACA009C2C12 /* Sparkle.icns */,
 				615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */,
 			);
 			path = Resources;
@@ -1573,7 +1575,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1420DF51196247F900203BB0 /* Images.xcassets in Resources */,
+				5AE7E1111DC81AD3009C2C12 /* Sparkle.icns in Resources */,
 				55C14FC7136F05E100649790 /* Sparkle.strings in Resources */,
 				55C14BD9136EF00C00649790 /* SUStatus.xib in Resources */,
 			);
