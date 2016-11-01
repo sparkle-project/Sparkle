@@ -1,4 +1,6 @@
 # To update the icon run make -f Makefile-icon
+# Requires:
+# autoconf, automake, libtool, pkg-config, pngquant
 
 ICONDIR=./Resources/Images.xcassets/AppIcon.appiconset
 OPTIMIZEDICONS=$(ICONDIR)/optimized_16x16.png $(ICONDIR)/optimized_32x32.png $(ICONDIR)/optimized_128x128.png $(ICONDIR)/optimized_512x512.png
