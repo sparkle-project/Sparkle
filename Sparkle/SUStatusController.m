@@ -10,6 +10,7 @@
 #import "SUHost.h"
 #import "SPUApplicationInfo.h"
 #import "SULocalizations.h"
+#import "SUOperatingSystem.h"
 
 @interface SUStatusController ()
 @property (copy) NSString *title, *buttonTitle;
@@ -25,6 +26,7 @@
 @synthesize host;
 @synthesize actionButton;
 @synthesize progressBar;
+@synthesize statusTextField;
 
 - (instancetype)initWithHost:(SUHost *)aHost
 {
@@ -48,6 +50,13 @@
     [[self window] center];
     [[self window] setFrameAutosaveName:@"SUStatusFrame"];
     [self.progressBar setUsesThreadedAnimation:YES];
+
+    if ([SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 11, 0}]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+        [self.statusTextField setFont:[NSFont monospacedDigitSystemFontOfSize:0 weight:NSFontWeightRegular]];
+#pragma clang diagnostic pop
+    }
 }
 
 - (NSString *)windowTitle
