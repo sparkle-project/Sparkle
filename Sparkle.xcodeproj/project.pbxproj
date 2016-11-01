@@ -366,7 +366,6 @@
 		72BEBFEF1D7287570019146B /* SUSpotlightImporterTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72BEBFEE1D7287560019146B /* SUSpotlightImporterTest.swift */; };
 		72D954811CBACC35006F28BD /* InstallerProgressAppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D954801CBACC35006F28BD /* InstallerProgressAppController.m */; };
 		72D954831CBAD34F006F28BD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D954821CBAD34F006F28BD /* main.m */; };
-		72D954861CBB179D006F28BD /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DF4F196247F900203BB0 /* Images.xcassets */; };
 		72D954A21CBB415C006F28BD /* SPUCommandLineDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D954A11CBB415C006F28BD /* SPUCommandLineDriver.m */; };
 		72D954A51CBB415C006F28BD /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D954A41CBB415C006F28BD /* main.m */; };
 		72D954B81CBB467F006F28BD /* SPUCommandLineUserDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D954B71CBB467F006F28BD /* SPUCommandLineUserDriver.m */; };
@@ -801,6 +800,7 @@
 		55E6F33219EC9F6C00005E76 /* SUErrors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUErrors.h; sourceTree = "<group>"; };
 		5AA4DCD01C73E5510078F128 /* SUAppcastTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUAppcastTest.swift; sourceTree = "<group>"; };
 		5AD0FA7E1C73F2E2004BCEFF /* testappcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = testappcast.xml; sourceTree = "<group>"; };
+		5AE7E10E1DC81ACA009C2C12 /* Sparkle.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Sparkle.icns; sourceTree = "<group>"; };
 		5AEF45D9189D1CC90030D7DC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		5AF6C74C1AEA40760014A3AB /* SUInstallerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUInstallerTest.m; sourceTree = "<group>"; };
 		5AF6C74E1AEA46D10014A3AB /* test.sparkle_guided.pkg */ = {isa = PBXFileReference; lastKnownFileType = file; path = test.sparkle_guided.pkg; sourceTree = "<group>"; };
@@ -1389,6 +1389,7 @@
 				1420DF4F196247F900203BB0 /* Images.xcassets */,
 				14732BBC1960EFB500593899 /* README.markdown */,
 				14732BB91960EEEE00593899 /* SampleAppcast.xml */,
+				5AE7E10E1DC81ACA009C2C12 /* Sparkle.icns */,
 				615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */,
 			);
 			path = Resources;
@@ -2513,7 +2514,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				725264A91D5FBD9100CD6400 /* Sparkle.strings in Resources */,
-				72D954861CBB179D006F28BD /* Images.xcassets in Resources */,
 				72EB87EC1CB8887E00C37F42 /* SUStatus.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
