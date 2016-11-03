@@ -43,7 +43,6 @@ SU_EXPORT @interface SPUUpdater : NSObject
  * @param userDriver The user driver that Sparkle uses for user update interaction
  * @param delegate The delegate for SPUUpdater. This may be nil.
  *
- * This must be called on the main thread.
  */
 - (instancetype)initWithHostBundle:(NSBundle *)hostBundle applicationBundle:(NSBundle *)applicationBundle userDriver:(id <SPUUserDriver>)userDriver delegate:(id<SPUUpdaterDelegate> _Nullable)delegate;
 
@@ -59,6 +58,8 @@ SU_EXPORT @interface SPUUpdater : NSObject
  * One of -checkForUpdates, -checkForUpdatesInBackground, or -checkForUpdateInformation can be invoked before starting the updater.
  * This preschedules an update action before starting the updater. When the updater is started, the prescheduled action is immediately invoked.
  * This may be useful for example if you want to check for updates right away without a permission prompt potentially showing.
+ *
+ * This must be called on the main thread.
  *
  * @param error The error that is populated if this method fails. Pass NULL if not interested in the error information.
  * @return YES if the updater started otherwise NO with a populated error
