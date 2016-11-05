@@ -4,7 +4,11 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ היא הגרסה האחונה הזמינה.";
 
-"%@ %@ is now available (you have %@). Would you like to download it now?" = "%1$@ %2$@ זמין כעת (לך יש %3$@). ברצונך להוריד כעת?";
+/* Description text for SUUpdateAlert when the update is downloadable. */
+"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ זמין כעת (לך יש %3$@). ברצונך להוריד כעת?";
+
+/* Description text for SUUpdateAlert when the update informational with no download. */
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
 
 "%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help." = "ל %@ אין הרשאה לכתוב לתקיית התוכניות! האם אתה פועל מ- disc image? אם לא, בקש עזרה ממנהל הרשת.";
 
@@ -48,5 +52,5 @@
 
 "Yes" = "כן";
 
-"You're up to date!" = "התכנה עדכנית!";
+"You're up-to-date!" = "התכנה עדכנית!";
 

@@ -11,7 +11,7 @@
 
 A guided installation allows Sparkle to download and install a package (pkg) or multi-package (mpkg) without user interaction.
 
-The installer package is installed using Mac OS X's built-in command line installer, `/usr/sbin/installer`. No installation interface is shown to the user.
+The installer package is installed using macOS's built-in command line installer, `/usr/sbin/installer`. No installation interface is shown to the user.
 
 A guided installation can be started by applications other than the application being replaced. This is particularly useful where helper applications or agents are used.
 
@@ -29,7 +29,7 @@ A guided installation can be started by applications other than the application 
 @interface SUGuidedPackageInstaller : SUInstaller
 
 /*! Perform the guided installation */
-+ (void)performInstallationToPath:(NSString *)path fromPath:(NSString *)installerGuide host:(SUHost *)host versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler;
++ (void)performInstallationToPath:(NSString *)path fromPath:(NSString *)installerGuide host:(SUHost *)host fileOperationToolPath:(NSString *)fileOperationToolPath versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler;
 @end
 
 #endif

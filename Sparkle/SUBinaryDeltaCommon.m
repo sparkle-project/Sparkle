@@ -7,6 +7,7 @@
 //
 
 #include "SUBinaryDeltaCommon.h"
+#import "SUFileManager.h"
 #include <CommonCrypto/CommonDigest.h>
 #include <Foundation/Foundation.h>
 #include <fcntl.h>
@@ -145,7 +146,9 @@ NSData *hashOfFileContents(FTSENT *ent)
 NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
 {
     char pathBuffer[PATH_MAX] = {0};
-    [path getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)];
+    if (![path getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)]) {
+        return nil;
+    }
 
     char * const sourcePaths[] = {pathBuffer, 0};
     FTS *fts = fts_open(sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
@@ -218,7 +221,7 @@ BOOL removeTree(NSString *path)
 
 BOOL copyTree(NSString *source, NSString *dest)
 {
-    return [[NSFileManager defaultManager] copyItemAtPath:source toPath:dest error:nil];
+    return [[SUFileManager defaultManager] copyItemAtURL:[NSURL fileURLWithPath:source] toURL:[NSURL fileURLWithPath:dest] error:NULL];
 }
 
 BOOL modifyPermissions(NSString *path, mode_t desiredPermissions)
@@ -228,12 +231,12 @@ BOOL modifyPermissions(NSString *path, mode_t desiredPermissions)
     if (!attributes) {
         return NO;
     }
-    NSNumber *permissions = attributes[NSFilePosixPermissions];
+    NSNumber *permissions = [attributes objectForKey:NSFilePosixPermissions];
     if (!permissions) {
         return NO;
     }
     mode_t newMode = ([permissions unsignedShortValue] & ~PERMISSION_FLAGS) | desiredPermissions;
-    int (*changeModeFunc)(const char *, mode_t) = [attributes[NSFileType] isEqualToString:NSFileTypeSymbolicLink] ? lchmod : chmod;
+    int (*changeModeFunc)(const char *, mode_t) = [[attributes objectForKey:NSFileType] isEqualToString:NSFileTypeSymbolicLink] ? lchmod : chmod;
     if (changeModeFunc([path fileSystemRepresentation], newMode) != 0) {
         return NO;
     }

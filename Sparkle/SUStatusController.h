@@ -15,6 +15,7 @@
 @interface SUStatusController : SUWindowController
 @property (weak) IBOutlet NSButton *actionButton;
 @property (weak) IBOutlet NSProgressIndicator *progressBar;
+@property (weak) IBOutlet NSTextField *statusTextField;
 
 @property (copy) NSString *statusText;
 @property double progressValue;

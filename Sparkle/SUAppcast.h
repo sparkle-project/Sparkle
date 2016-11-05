@@ -9,7 +9,11 @@
 #ifndef SUAPPCAST_H
 #define SUAPPCAST_H
 
+#if __has_feature(modules)
+@import Foundation;
+#else
 #import <Foundation/Foundation.h>
+#endif
 #import "SUExport.h"
 
 @class SUAppcastItem;
@@ -19,6 +23,7 @@ SU_EXPORT @interface SUAppcast : NSObject<NSURLDownloadDelegate>
 @property (copy) NSDictionary *httpHeaders;
 
 - (void)fetchAppcastFromURL:(NSURL *)url completionBlock:(void (^)(NSError *))err;
+- (SUAppcast *)copyWithoutDeltaUpdates;
 
 @property (readonly, copy) NSArray *items;
 @end

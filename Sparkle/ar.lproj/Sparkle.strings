@@ -4,7 +4,11 @@
 
 "%@ %@ is currently the newest version available." = "الإصدار %2$@ هو أحدث إصدار متوفر حاليًا لتطبيق %1$@";
 
+/* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "لديك الإصدار %3$@ من تطبيق %1$@، هل ترغب بتزيل الإصدار %2$@ الآن";
+
+/* Description text for SUUpdateAlert when the update informational with no download. */
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
 
 "%@ downloaded" =  "تم تنزيل %@";
 

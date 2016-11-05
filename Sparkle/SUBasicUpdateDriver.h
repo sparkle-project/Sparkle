@@ -24,7 +24,7 @@
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui;
-- (BOOL)hostSupportsItem:(SUAppcastItem *)ui;
++ (BOOL)hostSupportsItem:(SUAppcastItem *)ui;
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui;
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui;
 - (void)appcastDidFinishLoading:(SUAppcast *)ac;

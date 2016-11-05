@@ -67,7 +67,7 @@
 {
     SUDSAVerifier *v = [[SUDSAVerifier alloc] initWithPublicKeyData:pubKey];
 
-    NSData *sig = [[NSData alloc] initWithBase64Encoding:sigString];
+    NSData *sig = [[NSData alloc] initWithBase64EncodedString:sigString options:(NSDataBase64DecodingOptions)0];
 
     return [v verifyFileAtPath:aFile signature:sig];
 }

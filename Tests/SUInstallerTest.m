@@ -53,7 +53,13 @@
 
     SUHost *host = [[SUHost alloc] initWithBundle:bundle];
 
-    [SUInstaller installFromUpdateFolder:[path stringByDeletingLastPathComponent] overHost:host installationPath:@"/tmp" versionComparator:nil completionHandler:^(NSError *error) {
+    NSString *fileOperationToolPath = [bundle pathForResource:@""SPARKLE_FILEOP_TOOL_NAME ofType:@""];
+    XCTAssertNotNil(fileOperationToolPath);
+    
+    [SUInstaller installFromUpdateFolder:[path stringByDeletingLastPathComponent] overHost:host installationPath:@"/tmp" fileOperationToolPath:fileOperationToolPath versionComparator:nil completionHandler:^(NSError *error) {
+        if (error != nil) {
+            NSLog(@"Underlying error: %@", [error.userInfo objectForKey:NSUnderlyingErrorKey]);
+        }
         XCTAssertNil(error);
         XCTAssertTrue([fm fileExistsAtPath:expectedDestination isDirectory:nil]);
         [done fulfill];

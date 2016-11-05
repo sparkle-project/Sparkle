@@ -4,7 +4,11 @@
 
 "%@ %@ is currently the newest version available." = "%@ %@ er nýjasta útgáfan sem er fáanleg þessa stundina.";
 
+/* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "Útgafa %2$@ af %1$@ er nú fáanlegt en þú ert með %3$@. Viltu sækja hana núna?";
+
+/* Description text for SUUpdateAlert when the update informational with no download. */
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
 
 "%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help." = "%@ hefur ekki heimild til að skrifa í möppu forritsins! Ertu að keyra forritið af diskmynd? Ef ekki skaltu ráðfæra þig við kerfisstjórann.";
 
@@ -40,13 +44,13 @@
 
 "OK" = "Í lagi";
 
+"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Viltu að forritið %1$@ athugi með uppfærslur þegar það er ræst? Ef ekki getur þú athugað handvirkt af %1$@-valblaðinu.";
+
 "Update Error!" = "Villa við uppfærslu!";
 
 "Updating %@" = "Uppfæri %@";
 
-"Would you like %@ to check for updates on startup? If not, you can initiate the check manually from the %@ menu." = "Viltu að forritið %@ athugi með uppfærslur þegar það er ræst? Ef ekki getur þú athugað handvirkt af %@-valblaðinu.";
-
 "Yes" = "Já";
 
-"You're up to date!" = "Það er allt uppfært hjá þér!";
+"You're up-to-date!" = "Það er allt uppfært hjá þér!";
 

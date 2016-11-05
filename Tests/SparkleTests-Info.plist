@@ -16,5 +16,11 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUEnableSystemProfiling</key>
+	<false/>
+	<key>SUPublicDSAKeyFile</key>
+	<string>test-pubkey.pem</string>
 </dict>
 </plist>

@@ -16,30 +16,13 @@
 
 @implementation SUInstaller
 
-static NSString *sUpdateFolder = nil;
-
-+ (NSString *)updateFolder
-{
-    return sUpdateFolder;
-}
-
 + (BOOL)isAliasFolderAtPath:(NSString *)path
 {
-    FSRef fileRef;
-    OSStatus err = noErr;
-    Boolean aliasFileFlag = false, folderFlag = false;
-    NSURL *fileURL = [NSURL fileURLWithPath:path];
-
-    if (FALSE == CFURLGetFSRef((CFURLRef)fileURL, &fileRef))
-        err = coreFoundationUnknownErr;
-
-    if (noErr == err)
-        err = FSIsAliasFile(&fileRef, &aliasFileFlag, &folderFlag);
-
-    if (noErr == err)
-        return !!(aliasFileFlag && folderFlag);
-    else
-        return NO;
+    NSNumber *aliasFlag = nil;
+    [[NSURL fileURLWithPath:path] getResourceValue:&aliasFlag forKey:NSURLIsAliasFileKey error:nil];
+    NSNumber *directoryFlag = nil;
+    [[NSURL fileURLWithPath:path] getResourceValue:&directoryFlag forKey:NSURLIsDirectoryKey error:nil];
+    return aliasFlag.boolValue && directoryFlag.boolValue;
 }
 
 + (NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr isGuided:(BOOL *)isGuidedPtr
@@ -57,8 +40,6 @@ static NSString *sUpdateFolder = nil;
     NSString *fallbackPackagePath = nil;
     NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:inUpdateFolder];
     NSString *bundleFileNameNoExtension = [bundleFileName stringByDeletingPathExtension];
-
-    sUpdateFolder = inUpdateFolder;
 
     while ((currentFile = [dirEnum nextObject])) {
         NSString *currentPath = [inUpdateFolder stringByAppendingPathComponent:currentFile];
@@ -122,7 +103,7 @@ static NSString *sUpdateFolder = nil;
     return newAppDownloadPath;
 }
 
-+ (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler
++ (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath fileOperationToolPath:(NSString *)fileOperationToolPath versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler
 {
     BOOL isPackage = NO;
     BOOL isGuided = NO;
@@ -132,39 +113,18 @@ static NSString *sUpdateFolder = nil;
         [self finishInstallationToPath:installationPath withResult:NO error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: @"Couldn't find an appropriate update in the downloaded package." }] completionHandler:completionHandler];
     } else {
         if (isPackage && isGuided) {
-            [SUGuidedPackageInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host versionComparator:comparator completionHandler:completionHandler];
+            [SUGuidedPackageInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host fileOperationToolPath:fileOperationToolPath versionComparator:comparator completionHandler:completionHandler];
         } else if (isPackage) {
-            [SUPackageInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host versionComparator:comparator completionHandler:completionHandler];
+            [SUPackageInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host fileOperationToolPath:fileOperationToolPath versionComparator:comparator completionHandler:completionHandler];
         } else {
-            [SUPlainInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host versionComparator:comparator completionHandler:completionHandler];
+            [SUPlainInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host fileOperationToolPath:fileOperationToolPath versionComparator:comparator completionHandler:completionHandler];
         }
     }
 }
 
-+ (void)mdimportInstallationPath:(NSString *)installationPath
-{
-    // *** GETS CALLED ON NON-MAIN THREAD!
-
-    SULog(@"mdimporting");
-
-    NSTask *mdimport = [[NSTask alloc] init];
-    [mdimport setLaunchPath:@"/usr/bin/mdimport"];
-    [mdimport setArguments:@[installationPath]];
-    @try {
-        [mdimport launch];
-        [mdimport waitUntilExit];
-    }
-    @catch (NSException *launchException)
-    {
-        // No big deal.
-        SULog(@"Error: %@", [launchException description]);
-    }
-}
-
-+ (void)finishInstallationToPath:(NSString *)installationPath withResult:(BOOL)result error:(NSError *)error completionHandler:(void (^)(NSError *))completionHandler
++ (void)finishInstallationToPath:(NSString *)__unused installationPath withResult:(BOOL)result error:(NSError *)error completionHandler:(void (^)(NSError *))completionHandler
 {
     if (result) {
-        [self mdimportInstallationPath:installationPath];
         dispatch_async(dispatch_get_main_queue(), ^{
             completionHandler(nil);
         });
