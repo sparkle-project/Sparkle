@@ -29,6 +29,6 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>CFBundleIconFile</key>
-	<string>Sparkle.icns</string>
+	<string>${ASSETCATALOG_COMPILER_APPICON_NAME}.icns</string>
 </dict>
 </plist>
