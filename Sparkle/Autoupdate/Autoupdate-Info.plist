@@ -24,11 +24,9 @@
 	<string>${MACOSX_DEPLOYMENT_TARGET}</string>
 	<key>LSUIElement</key>
 	<string>1</string>
-	<key>NSMainNibFile</key>
-	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>CFBundleIconFile</key>
-	<string>${ASSETCATALOG_COMPILER_APPICON_NAME}.icns</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>sparkle-project.org</string>
 </dict>
 </plist>

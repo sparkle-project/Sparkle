@@ -14,15 +14,19 @@ if [ -z "$SRCROOT" ] || \
 fi
 
 # Get the current Git master hash
-version=$(cd "$SRCROOT" ; git show-ref --abbrev heads/master | awk '{print $1}')
-if [ -z "$version" ] ; then
+gitversion=$(cd "$SRCROOT" ; git show-ref --abbrev heads/master | awk '{print $1}')
+if [ -z "$gitversion" ] ; then
 	echo "$0: Can't find a Git hash!" 1>&2
     exit 0
 fi
 
-version="$CURRENT_PROJECT_VERSION git-$version"
+gitversion="Sparkle $CURRENT_PROJECT_VERSION git-$gitversion"
 
-# and use it to set the CFBundleShortVersionString value
+# and use it to set the NSHumanReadableCopyright value
 export PATH="$PATH:/usr/libexec"
-PlistBuddy -c "Set :CFBundleShortVersionString '$version'" \
+PlistBuddy -c "Set :NSHumanReadableCopyright '$gitversion'" \
+    "$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH"
+
+# CFBundleShortVersionString requires simpler version format
+PlistBuddy -c "Set :CFBundleShortVersionString '$CURRENT_PROJECT_VERSION'" \
     "$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH"

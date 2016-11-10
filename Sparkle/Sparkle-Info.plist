@@ -24,5 +24,7 @@
 	<string>${CURRENT_PROJECT_VERSION}</string>
 	<key>NSPrincipalClass</key>
 	<string></string>
+	<key>NSHumanReadableCopyright</key>
+	<string>sparkle-project.org</string>
 </dict>
 </plist>
