@@ -678,6 +678,9 @@
 		722954C21D04E66F00ECF9CA /* SUFileOperationConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUFileOperationConstants.h; sourceTree = "<group>"; };
 		722954C31D04E66F00ECF9CA /* SUFileOperationConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUFileOperationConstants.m; sourceTree = "<group>"; };
 		722954C81D04E89500ECF9CA /* ConfigFileop.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigFileop.xcconfig; sourceTree = "<group>"; };
+		722FB7471DD51331001D40CE /* ConfigSwift.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigSwift.xcconfig; sourceTree = "<group>"; };
+		722FB7481DD51350001D40CE /* ConfigSwiftDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigSwiftDebug.xcconfig; sourceTree = "<group>"; };
+		722FB7491DD51350001D40CE /* ConfigSwiftRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigSwiftRelease.xcconfig; sourceTree = "<group>"; };
 		723A920D1D722438004A9DED /* SUSpotlightImporterTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUSpotlightImporterTest.swift; sourceTree = "<group>"; };
 		723B252B1CEAB3A600909873 /* bscommon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bscommon.c; sourceTree = "<group>"; };
 		723B252C1CEAB3A600909873 /* bscommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bscommon.h; sourceTree = "<group>"; };
@@ -1222,6 +1225,9 @@
 				729F10FE1C65A9B500DFCCC5 /* ConfigUITestCoverage.xcconfig */,
 				729F10FF1C65A9B500DFCCC5 /* ConfigUITestDebug.xcconfig */,
 				729F11001C65A9B500DFCCC5 /* ConfigUITestRelease.xcconfig */,
+				722FB7471DD51331001D40CE /* ConfigSwift.xcconfig */,
+				722FB7481DD51350001D40CE /* ConfigSwiftDebug.xcconfig */,
+				722FB7491DD51350001D40CE /* ConfigSwiftRelease.xcconfig */,
 				14732BC91960F70A00593899 /* make-release-package.sh */,
 				14652F7919A93E5F00959E44 /* set-git-version-info.sh */,
 				146EC84E19A68CF8004A50C5 /* Sparkle.podspec */,
@@ -2164,7 +2170,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 149B78641B7D3A4800D7D62C /* ConfigUnitTestCoverage.xcconfig */;
 			buildSettings = {
-				SWIFT_VERSION = 3.0;
 			};
 			name = Coverage;
 		};
@@ -2260,7 +2265,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3AAF3A1050B273004B3130 /* ConfigUnitTestDebug.xcconfig */;
 			buildSettings = {
-				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -2268,7 +2272,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3AAF391050B273004B3130 /* ConfigUnitTestRelease.xcconfig */;
 			buildSettings = {
-				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -2317,10 +2320,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 729F10FF1C65A9B500DFCCC5 /* ConfigUITestDebug.xcconfig */;
 			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -2328,10 +2327,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 729F10FE1C65A9B500DFCCC5 /* ConfigUITestCoverage.xcconfig */;
 			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
 			};
 			name = Coverage;
 		};
@@ -2339,9 +2334,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 729F11001C65A9B500DFCCC5 /* ConfigUITestRelease.xcconfig */;
 			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
