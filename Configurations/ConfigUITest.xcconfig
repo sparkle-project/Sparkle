@@ -1,5 +1,7 @@
 // UI Test only
 
+#include "ConfigSwift.xcconfig"
+
 INFOPLIST_FILE = UITests/UITests-Info.plist
 WRAPPER_EXTENSION = xctest
 MACOSX_DEPLOYMENT_TARGET = 10.11
@@ -10,5 +12,4 @@ LD_RUNPATH_SEARCH_PATHS = @loader_path/../Frameworks
 TEST_TARGET_NAME = Sparkle Test App
 USES_XCTRUNNER = YES
 
-SWIFT_VERSION = 3.0
 SWIFT_OPTIMIZATION_LEVEL = -Onone
