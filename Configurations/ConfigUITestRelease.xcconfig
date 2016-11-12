@@ -1,1 +1,2 @@
 #include "ConfigUITest.xcconfig"
+#include "ConfigSwiftRelease.xcconfig"
