@@ -16,7 +16,7 @@ fi
 version="$CURRENT_PROJECT_VERSION"
 
 # Get version in format 1.x.x-commits-hash
-gitversion=$(cd "$SRCROOT" ; git describe --tags --match '[12].*')
+gitversion=$( cd "$SRCROOT"; git describe --tags --match '[12].*' || true )
 if [ -z "$gitversion" ] ; then
     echo "$0: Can't find a Git hash!" 1>&2
     exit 0
