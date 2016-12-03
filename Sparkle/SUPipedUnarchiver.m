@@ -41,7 +41,7 @@
     return NULL;
 }
 
-+ (BOOL)requiresValidationBeforeUnarchiving
++ (BOOL)unsafeIfArchiveIsNotValidated
 {
     return NO;
 }

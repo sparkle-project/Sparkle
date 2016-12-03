@@ -21,7 +21,7 @@
     return [[path pathExtension] isEqualToString:@"delta"];
 }
 
-+ (BOOL)requiresValidationBeforeUnarchiving
++ (BOOL)unsafeIfArchiveIsNotValidated
 {
     return YES;
 }

@@ -23,7 +23,7 @@
 
 + (SUUnarchiver *)unarchiverForPath:(NSString *)path updatingHostBundlePath:(NSString *)host withPassword:(NSString *)decryptionPassword;
 
-+ (BOOL)requiresValidationBeforeUnarchiving;
++ (BOOL)unsafeIfArchiveIsNotValidated;
 
 - (void)start;
 

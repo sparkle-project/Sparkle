@@ -391,7 +391,7 @@
     if (!unarchiver) {
         SULog(@"Error: No valid unarchiver for %@!", self.downloadPath);
         success = NO;
-    } else if ([[unarchiver class] requiresValidationBeforeUnarchiving]) {
+    } else if ([[unarchiver class] unsafeIfArchiveIsNotValidated]) {
         // Currently just binary delta updates require validation before unarchiving
         
         NSString *publicDSAKey = self.host.publicDSAKey;

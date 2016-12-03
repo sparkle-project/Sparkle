@@ -18,7 +18,7 @@
     return [[path pathExtension] isEqualToString:@"dmg"];
 }
 
-+ (BOOL)requiresValidationBeforeUnarchiving
++ (BOOL)unsafeIfArchiveIsNotValidated
 {
     return NO;
 }

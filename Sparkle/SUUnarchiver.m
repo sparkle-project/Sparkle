@@ -55,7 +55,7 @@
     return NO;
 }
 
-+ (BOOL)requiresValidationBeforeUnarchiving
++ (BOOL)unsafeIfArchiveIsNotValidated
 {
     return NO;
 }
