@@ -138,17 +138,17 @@ SU_EXPORT @interface SPUUpdater : NSObject
  *
  * This property must be called on the main thread.
  */
-@property (copy) NSURL *feedURL;
+@property (nonatomic, copy) NSURL *feedURL;
 
 /*!
  * The host bundle that is being updated.
  */
-@property (readonly, strong) NSBundle *hostBundle;
+@property (nonatomic, readonly) NSBundle *hostBundle;
 
 /*!
  * The bundle this class (SPUUpdater) is loaded into
  */
-@property (strong, readonly) NSBundle *sparkleBundle;
+@property (nonatomic, readonly) NSBundle *sparkleBundle;
 
 /*!
  * The user agent used when checking for updates.
@@ -162,7 +162,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
  *
  * The keys of this dictionary are HTTP header fields (NSString) and values are corresponding values (NSString)
  */
-@property (copy, nullable) NSDictionary<NSString *, NSString *> *httpHeaders;
+@property (nonatomic, copy, nullable) NSDictionary<NSString *, NSString *> *httpHeaders;
 
 /*!
  * A property indicating whether or not the user's system profile information is sent when checking for updates.
@@ -176,7 +176,7 @@ SU_EXPORT @interface SPUUpdater : NSObject
 
     \returns \c nil if no check has been performed.
  */
-@property (readonly, copy, nullable) NSDate *lastUpdateCheckDate;
+@property (nonatomic, readonly, copy, nullable) NSDate *lastUpdateCheckDate;
 
 /*!
     Appropriately schedules or cancels the update checking timer according to

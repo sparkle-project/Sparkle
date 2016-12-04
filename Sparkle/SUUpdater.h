@@ -148,7 +148,7 @@ SU_EXPORT @interface SUUpdater : NSObject
 /*!
  The bundle this class (SUUpdater) is loaded into.
  */
-@property (strong, readonly) NSBundle *sparkleBundle;
+@property (nonatomic, readonly) NSBundle *sparkleBundle;
 
 /*!
  The user agent used when checking for updates.
