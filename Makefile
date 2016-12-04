@@ -14,7 +14,7 @@ release:
 	xcodebuild -scheme Distribution -configuration Release -derivedDataPath "$(BUILDDIR)" build
 	open -R "$(BUILDDIR)/Build/Products/Release/Sparkle-"*.tar.bz2
 	cat Sparkle.podspec
-	@echo "Don't forget to update CocoaPods!"
+	@echo "Don't forget to update CocoaPods! pod trunk push"
 
 build:
 	xcodebuild clean build

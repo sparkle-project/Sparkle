@@ -63,7 +63,7 @@
     return ([self commandAndArgumentsConformingToTypeOfPath:path] != nil);
 }
 
-+ (BOOL)requiresValidationBeforeUnarchiving
++ (BOOL)unsafeIfArchiveIsNotValidated
 {
     return NO;
 }

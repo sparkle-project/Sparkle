@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name        = "Sparkle"
-  s.version     = "1.15.0"
+  s.version     = "1.15.1"
   s.summary     = "A software update framework for macOS"
   s.description = "Sparkle is an easy-to-use software update framework for Cocoa developers."
   s.homepage    = "http://sparkle-project.org"
@@ -11,15 +11,16 @@ Pod::Spec.new do |s|
     :file => 'LICENSE'
   }
   s.authors     = {
-    'Andy Matuschak' => 'andy@andymatuschak.org',
-    'Kornel Lesiński' => 'pornel@pornel.net',
-    'C.W. Betts' => 'computers57@hotmail.com',
-    'Jake Petroules' => 'jake.petroules@petroules.com',
     'Mayur Pawashe' => 'zorgiepoo@gmail.com',
+    'Kornel Lesiński' => 'pornel@pornel.net',
+    'Jake Petroules' => 'jake.petroules@petroules.com',
+    'C.W. Betts' => 'computers57@hotmail.com',
+    'Andy Matuschak' => 'andy@andymatuschak.org',
   }
 
   s.platform = :osx, '10.7'
   s.source   = { :http => "https://github.com/sparkle-project/Sparkle/releases/download/#{s.version}/Sparkle-#{s.version}.tar.bz2" }
+  s.source_files = 'Sparkle.framework/Versions/A/Headers/*.h'
 
   s.public_header_files = 'Sparkle.framework/Versions/A/Headers/*.h'
   s.vendored_frameworks  = 'Sparkle.framework'

@@ -106,7 +106,7 @@
     
     NSError *error = nil;
     if (updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:bundleURL error:&error]) {
-        SULog(@"Failed to validate code sign signature on bundle at %@", bundleURL);
+        SULog(@"Failed to validate code sign signature on bundle at %@ with error: %@", bundleURL, error);
         return NO;
     }
     return YES;

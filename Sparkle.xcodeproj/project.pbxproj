@@ -266,6 +266,7 @@
 		7293A1AE1CEE933800B957A7 /* SPUURLRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 7293A1AC1CEE933800B957A7 /* SPUURLRequest.h */; };
 		7293A1AF1CEE933800B957A7 /* SPUURLRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7293A1AD1CEE933800B957A7 /* SPUURLRequest.m */; };
 		7293A1B11CEE9B9F00B957A7 /* SPUURLRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7293A1AD1CEE933800B957A7 /* SPUURLRequest.m */; };
+		729924941DF4A45000DBCDF5 /* SUUpdateValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = 729924931DF4A45000DBCDF5 /* SUUpdateValidator.m */; };
 		72A1C2631CD6849C004CD282 /* SPUUpdatePermissionPrompt.h in Headers */ = {isa = PBXBuildFile; fileRef = 612DCBAD0D488BC60015DBEA /* SPUUpdatePermissionPrompt.h */; };
 		72A450531C69A68900D67EEA /* SPUUpdatePermissionResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 72A450511C69A68900D67EEA /* SPUUpdatePermissionResponse.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72A450541C69A68900D67EEA /* SPUUpdatePermissionResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 72A450521C69A68900D67EEA /* SPUUpdatePermissionResponse.m */; };
@@ -1041,6 +1042,8 @@
 		728638EE1CAF589C00783084 /* ConfigDownloader.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigDownloader.xcconfig; sourceTree = "<group>"; };
 		7293A1AC1CEE933800B957A7 /* SPUURLRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUURLRequest.h; sourceTree = "<group>"; };
 		7293A1AD1CEE933800B957A7 /* SPUURLRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUURLRequest.m; sourceTree = "<group>"; };
+		729924921DF4A45000DBCDF5 /* SUUpdateValidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUUpdateValidator.h; path = Sparkle/SUUpdateValidator.h; sourceTree = SOURCE_ROOT; };
+		729924931DF4A45000DBCDF5 /* SUUpdateValidator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUUpdateValidator.m; path = Sparkle/SUUpdateValidator.m; sourceTree = SOURCE_ROOT; };
 		729BB3CD1D503253007C4276 /* set-ats-exceptions-test-app.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "set-ats-exceptions-test-app.sh"; sourceTree = "<group>"; };
 		729BB3CE1D50344A007C4276 /* set-ats-exceptions-downloader-service.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "set-ats-exceptions-downloader-service.sh"; sourceTree = "<group>"; };
 		729BB3D11D503826007C4276 /* org.sparkle-project.Downloader.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "org.sparkle-project.Downloader.entitlements"; path = "Downloader/org.sparkle-project.Downloader.entitlements"; sourceTree = SOURCE_ROOT; };
@@ -1448,6 +1451,8 @@
 				7267E59E1D3D8A6F00D1BF90 /* main.m */,
 				7267E5A01D3D8A7E00D1BF90 /* AppInstaller.h */,
 				7267E5A11D3D8A7E00D1BF90 /* AppInstaller.m */,
+				729924921DF4A45000DBCDF5 /* SUUpdateValidator.h */,
+				729924931DF4A45000DBCDF5 /* SUUpdateValidator.m */,
 				721D8A8A1D4D3A6F0032E472 /* SPUInstallerValidation.h */,
 				721D8A8B1D4D3A6F0032E472 /* SPUInstallerValidation.m */,
 				7267E5A61D3D8A9900D1BF90 /* AgentConnection.h */,
@@ -2984,6 +2989,7 @@
 				7267E5D31D3D8CF200D1BF90 /* bscommon.c in Sources */,
 				7267E5D41D3D8CF200D1BF90 /* bspatch.c in Sources */,
 				7267E5D21D3D8CE800D1BF90 /* bsdiff.c in Sources */,
+				729924941DF4A45000DBCDF5 /* SUUpdateValidator.m in Sources */,
 				7267E5CE1D3D8C7500D1BF90 /* SULog.m in Sources */,
 				7267E5CD1D3D8C7200D1BF90 /* SPUSecureCoding.m in Sources */,
 				7267E5CC1D3D8C6B00D1BF90 /* SUConstants.m in Sources */,

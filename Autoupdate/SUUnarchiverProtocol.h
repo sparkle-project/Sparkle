@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)canUnarchivePath:(NSString *)path;
 
-+ (BOOL)requiresValidationBeforeUnarchiving;
++ (BOOL)unsafeIfArchiveIsNotValidated;
 
 - (void)start;
 
