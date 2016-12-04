@@ -130,15 +130,29 @@ SU_EXPORT @interface SPUUpdater : NSObject
 @property (nonatomic) BOOL automaticallyDownloadsUpdates;
 
 /*!
- * The URL of the appcast used to download update information.
- *
- * Setting this property will persist in the host bundle's user defaults.
- * To avoid this, you may want to consider instead implementing
- * -[SPUUpdaterDelegate feedURLStringForUpdater:] or -[SPUUpdaterDelegate feedParametersForUpdater:sendingSystemProfile:]
- *
- * This property must be called on the main thread.
+ The URL of the appcast used to download update information.
+ 
+ If the updater's delegate implements -[SPUUpdaterDelegate feedURLStringForUpdater:], this will return that feed URL.
+ Otherwise if the feed URL has been set before, the feed URL returned will be retrieved from the host bundle's user defaults.
+ Otherwise the feed URL in the host bundle's Info.plist will be returned.
+ If no feed URL can be retrieved, this will raise an exception.
+ 
+ This property must be called on the main thread.
  */
-@property (nonatomic, copy) NSURL *feedURL;
+@property (nonatomic, readonly) NSURL *feedURL;
+
+/*!
+ Set the URL of the appcast used to download update information. Using this method is discouraged.
+ 
+ Setting this property will persist in the host bundle's user defaults.
+ To avoid this, you should consider implementing
+ -[SPUUpdaterDelegate feedURLStringForUpdater:] or -[SPUUpdaterDelegate feedParametersForUpdater:sendingSystemProfile:]
+ 
+ Passing nil will remove any feed URL that has been set in the host bundle's user defaults.
+ 
+ This property must be called on the main thread.
+ */
+- (void)setFeedURL:(NSURL * _Nullable)feedURL;
 
 /*!
  * The host bundle that is being updated.

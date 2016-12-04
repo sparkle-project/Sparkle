@@ -625,13 +625,14 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     return [self.updaterSettings allowsAutomaticUpdates] && [self.updaterSettings automaticallyDownloadsUpdates];
 }
 
-- (void)setFeedURL:(NSURL *)feedURL
+- (void)setFeedURL:(NSURL * _Nullable)feedURL
 {
     if (![NSThread isMainThread]) {
         SULog(@"This method must be called on the main thread");
         abort();
     }
 
+    // When feedURL is nil, -absoluteString will return nil and will remove the user default key
     [self.host setObject:[feedURL absoluteString] forUserDefaultsKey:SUFeedURLKey];
 }
 

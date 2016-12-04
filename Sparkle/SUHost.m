@@ -190,6 +190,7 @@
     return CFBridgingRelease(obj);
 }
 
+// Note this handles nil being passed for defaultName, in which case the user default will be removed
 - (void)setObject:(id)value forUserDefaultsKey:(NSString *)defaultName
 {
 	if (self.usesStandardUserDefaults)
