@@ -78,14 +78,13 @@
     
     BOOL prevalidatedDsaSignature = self.prevalidatedDsaSignature;
     
-    BOOL validationCheckSuccess;
     BOOL isPackage = NO;
     
     // install source could point to a new bundle or a package
     NSString *installSource = [SUInstaller installSourcePathInUpdateFolder:updateDirectory forHost:host isPackage:&isPackage isGuided:NULL];
     if (installSource == nil) {
         SULog(@"No suitable install is found in the update. The update will be rejected.");
-        validationCheckSuccess = NO;
+        return NO;
     } else {
         NSURL *installSourceURL = [NSURL fileURLWithPath:installSource];
         
@@ -93,18 +92,19 @@
             // Check to see if we have a package or bundle to validate
             if (isPackage) {
                 // For package type updates, all we do is check if the DSA signature is valid
-                validationCheckSuccess = [SUDSAVerifier validatePath:downloadPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey];
+                BOOL validationCheckSuccess = [SUDSAVerifier validatePath:downloadPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey];
                 if (!validationCheckSuccess) {
                     SULog(@"DSA signature validation of the package failed. The update contains an installer package, and valid DSA signatures are mandatory for all installer packages. The update will be rejected. Sign the installer with a valid DSA key or use an .app bundle update instead.");
                 }
+                return validationCheckSuccess;
             } else {
                 // For application bundle updates, we check both the DSA and Apple code signing signatures
-                validationCheckSuccess = [self validateUpdateForHost:host downloadedToPath:downloadPath newBundleURL:installSourceURL DSASignature:DSASignature];
+                return [self validateUpdateForHost:host downloadedToPath:downloadPath newBundleURL:installSourceURL DSASignature:DSASignature];
             }
         } else if (isPackage) {
             // We shouldn't get here because we don't validate packages before extracting them currently
             SULog(@"Error: not expecting to find package after being required to validate update before extraction");
-            validationCheckSuccess = NO;
+            return NO;
         } else {
             // Because we already validated the DSA signature, this is just a consistency check to see
             // if the developer signed their application properly with their Apple ID
@@ -112,14 +112,12 @@
             NSError *error = nil;
             if ([SUCodeSigningVerifier bundleAtURLIsCodeSigned:installSourceURL] && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:installSourceURL error:&error]) {
                 SULog(@"Failed to validate apple code sign signature on bundle after archive validation with error: %@", error);
-                validationCheckSuccess = NO;
+                return NO;
             } else {
-                validationCheckSuccess = YES;
+                return YES;
             }
         }
     }
-    
-    return validationCheckSuccess;
 }
 
 /**
