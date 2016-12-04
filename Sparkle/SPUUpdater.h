@@ -29,103 +29,102 @@ NS_ASSUME_NONNULL_BEGIN
 SU_EXPORT @interface SPUUpdater : NSObject
 
 /*!
- * Initializes a new SPUUpdater instance
- *
- * This does not start the updater. To start it, see -[SPUUpdater startUpdater:]
- *
- * Note that this is a normal initializer and doesn't implement the singleton pattern (i.e, instances aren't cached, so no surprises)
- * This also means that updater instances can be deallocated, and that they will be torn down properly.
- *
- * Related: See SPUStandardUpdaterController which wraps a SPUUpdater instance and is suitable for instantiating in nib files
- *
- * @param hostBundle The bundle that should be targetted for updating. This must not be nil.
- * @param applicationBundle The application bundle that should be relaunched and waited for termination. Usually this can be the same as hostBundle. This may differ when updating a plug-in or other non-application bundle.
- * @param userDriver The user driver that Sparkle uses for user update interaction
- * @param delegate The delegate for SPUUpdater. This may be nil.
- *
+ Initializes a new SPUUpdater instance
+ 
+ This does not start the updater. To start it, see -[SPUUpdater startUpdater:]
+ 
+ Note that this is a normal initializer and doesn't implement the singleton pattern (i.e, instances aren't cached, so no surprises)
+ This also means that updater instances can be deallocated, and that they will be torn down properly.
+ 
+ Related: See SPUStandardUpdaterController which wraps a SPUUpdater instance and is suitable for instantiating in nib files
+ 
+ @param hostBundle The bundle that should be targetted for updating. This must not be nil.
+ @param applicationBundle The application bundle that should be relaunched and waited for termination. Usually this can be the same as hostBundle. This may differ when updating a plug-in or other non-application bundle.
+ @param userDriver The user driver that Sparkle uses for user update interaction
+ @param delegate The delegate for SPUUpdater. This may be nil.
  */
 - (instancetype)initWithHostBundle:(NSBundle *)hostBundle applicationBundle:(NSBundle *)applicationBundle userDriver:(id <SPUUserDriver>)userDriver delegate:(id<SPUUpdaterDelegate> _Nullable)delegate;
 
 /*!
- * Starts the updater.
- *
- * This method checks if Sparkle is configured properly. A valid feed URL should be set before this method is invoked.
- * Other properties of this SPUUpdater instance can be set before this method is invoked as well, such as automatic update checks.
- *
- * If the configuration is valid, this method may bring up a permission prompt (if needed) for checking if the user wants automatic update checking.
- * This method then starts the regular update cycle if automatic update checks are enabled.
- *
- * One of -checkForUpdates, -checkForUpdatesInBackground, or -checkForUpdateInformation can be invoked before starting the updater.
- * This preschedules an update action before starting the updater. When the updater is started, the prescheduled action is immediately invoked.
- * This may be useful for example if you want to check for updates right away without a permission prompt potentially showing.
- *
- * This must be called on the main thread.
- *
- * @param error The error that is populated if this method fails. Pass NULL if not interested in the error information.
- * @return YES if the updater started otherwise NO with a populated error
+ Starts the updater.
+
+ This method checks if Sparkle is configured properly. A valid feed URL should be set before this method is invoked.
+ Other properties of this SPUUpdater instance can be set before this method is invoked as well, such as automatic update checks.
+
+ If the configuration is valid, this method may bring up a permission prompt (if needed) for checking if the user wants automatic update checking.
+ This method then starts the regular update cycle if automatic update checks are enabled.
+
+ One of -checkForUpdates, -checkForUpdatesInBackground, or -checkForUpdateInformation can be invoked before starting the updater.
+ This preschedules an update action before starting the updater. When the updater is started, the prescheduled action is immediately invoked.
+ This may be useful for example if you want to check for updates right away without a permission prompt potentially showing.
+
+ This must be called on the main thread.
+
+ @param error The error that is populated if this method fails. Pass NULL if not interested in the error information.
+ @return YES if the updater started otherwise NO with a populated error
  */
 - (BOOL)startUpdater:(NSError * __autoreleasing *)error;
 
 /*!
- * Checks for updates, and displays progress while doing so.
- *
- * This is meant for users initiating an update check.
- * This may find a resumable update that has already been downloaded or has begun installing, or
- * this may find a new update that can start to be downloaded if the user requests it.
- * This will find updates that the user has opted into skipping.
+ Checks for updates, and displays progress while doing so.
+ 
+ This is meant for users initiating an update check.
+ This may find a resumable update that has already been downloaded or has begun installing, or
+ this may find a new update that can start to be downloaded if the user requests it.
+ This will find updates that the user has opted into skipping.
  */
 - (void)checkForUpdates;
 
 /*!
- * Checks for updates, but does not display any UI unless an update is found.
- *
- * This is meant for programmatically initating a check for updates.
- * That is, it will display no UI unless it finds an update, in which case it proceeds as usual.
- * This will not find updates that the user has opted into skipping.
- *
- * Note if there is no resumable update found, and automated updating is turned on,
- * the update will be downloaded in the background without disrupting the user.
+ Checks for updates, but does not display any UI unless an update is found.
+ 
+ This is meant for programmatically initating a check for updates.
+ That is, it will display no UI unless it finds an update, in which case it proceeds as usual.
+ This will not find updates that the user has opted into skipping.
+ 
+ Note if there is no resumable update found, and automated updating is turned on,
+ the update will be downloaded in the background without disrupting the user.
  */
 - (void)checkForUpdatesInBackground;
 
 /*!
- * Begins a "probing" check for updates which will not actually offer to
- * update to that version.
- *
- * However, the delegate methods
- * SPUUpdaterDelegate::updater:didFindValidUpdate: and
- * SPUUpdaterDelegate::updaterDidNotFindUpdate: will be called,
- * so you can use that information in your UI.
- *
- * Updates that have been skipped by the user will not be found.
+ Begins a "probing" check for updates which will not actually offer to
+ update to that version.
+ 
+ However, the delegate methods
+ SPUUpdaterDelegate::updater:didFindValidUpdate: and
+ SPUUpdaterDelegate::updaterDidNotFindUpdate: will be called,
+ so you can use that information in your UI.
+ 
+ Updates that have been skipped by the user will not be found.
  */
 - (void)checkForUpdateInformation;
 
 /*!
- * A property indicating whether or not to check for updates automatically.
- *
- * Setting this property will persist in the host bundle's user defaults.
- * The update schedule cycle will be reset in a short delay after the property's new value is set.
- * This is to allow reverting this property without kicking off a schedule change immediately
+ A property indicating whether or not to check for updates automatically.
+ 
+ Setting this property will persist in the host bundle's user defaults.
+ The update schedule cycle will be reset in a short delay after the property's new value is set.
+ This is to allow reverting this property without kicking off a schedule change immediately
  */
 @property (nonatomic) BOOL automaticallyChecksForUpdates;
 
 /*!
- * A property indicating the current automatic update check interval.
- *
- * Setting this property will persist in the host bundle's user defaults.
- * The update schedule cycle will be reset in a short delay after the property's new value is set.
- * This is to allow reverting this property without kicking off a schedule change immediately
+ A property indicating the current automatic update check interval.
+ 
+ Setting this property will persist in the host bundle's user defaults.
+ The update schedule cycle will be reset in a short delay after the property's new value is set.
+ This is to allow reverting this property without kicking off a schedule change immediately
  */
 @property (nonatomic) NSTimeInterval updateCheckInterval;
 
 /*!
- * A property indicating whether or not updates can be automatically downloaded in the background.
- *
- * Note that the developer can disallow automatic downloading of updates from being enabled.
- * In this case, -automaticallyDownloadsUpdates will return NO regardless of how this property is set.
- *
- * Setting this property will persist in the host bundle's user defaults.
+ A property indicating whether or not updates can be automatically downloaded in the background.
+ 
+ Note that the developer can disallow automatic downloading of updates from being enabled.
+ In this case, -automaticallyDownloadsUpdates will return NO regardless of how this property is set.
+ 
+ Setting this property will persist in the host bundle's user defaults.
  */
 @property (nonatomic) BOOL automaticallyDownloadsUpdates;
 
@@ -155,12 +154,12 @@ SU_EXPORT @interface SPUUpdater : NSObject
 - (void)setFeedURL:(NSURL * _Nullable)feedURL;
 
 /*!
- * The host bundle that is being updated.
+ The host bundle that is being updated.
  */
 @property (nonatomic, readonly) NSBundle *hostBundle;
 
 /*!
- * The bundle this class (SPUUpdater) is loaded into
+ The bundle this class (SPUUpdater) is loaded into
  */
 @property (nonatomic, readonly) NSBundle *sparkleBundle;
 
@@ -172,16 +171,16 @@ SU_EXPORT @interface SPUUpdater : NSObject
 @property (nonatomic, copy) NSString *userAgentString;
 
 /*!
- * The HTTP headers used when checking for updates.
- *
- * The keys of this dictionary are HTTP header fields (NSString) and values are corresponding values (NSString)
+ The HTTP headers used when checking for updates.
+ 
+ The keys of this dictionary are HTTP header fields (NSString) and values are corresponding values (NSString)
  */
 @property (nonatomic, copy, nullable) NSDictionary<NSString *, NSString *> *httpHeaders;
 
 /*!
- * A property indicating whether or not the user's system profile information is sent when checking for updates.
- *
- * Setting this property will persist in the host bundle's user defaults.
+ A property indicating whether or not the user's system profile information is sent when checking for updates.
+
+ Setting this property will persist in the host bundle's user defaults.
  */
 @property (nonatomic) BOOL sendsSystemProfile;
 
