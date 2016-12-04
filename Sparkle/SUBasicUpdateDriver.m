@@ -43,14 +43,20 @@
 @synthesize tempDir;
 @synthesize relaunchPath;
 
+- (BOOL)verifyHostVolumeWritable
+{
+    if ([self.host isRunningOnReadOnlyVolume])
+    {
+        [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again.", nil), [self.host name]] }]];
+        return NO;
+    }
+    
+    return YES;
+}
+
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)aHost
 {
     [super checkForUpdatesAtURL:URL host:aHost];
-	if ([aHost isRunningOnReadOnlyVolume])
-	{
-        [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again.", nil), [aHost name]] }]];
-        return;
-    }
 
     SUAppcast *appcast = [[SUAppcast alloc] init];
 
@@ -190,6 +196,11 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
                                                         object:self.updater
                                                       userInfo:@{ SUUpdaterAppcastItemNotificationKey: self.updateItem }];
+    
+    if (![self verifyHostVolumeWritable]) {
+        return;
+    }
+    
     [self downloadUpdate];
 }
 

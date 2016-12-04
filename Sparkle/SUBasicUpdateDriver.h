@@ -21,6 +21,7 @@
 @property (strong, readonly) NSURLDownload *download;
 @property (copy, readonly) NSString *downloadPath;
 
+- (BOOL)verifyHostVolumeWritable;
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui;
