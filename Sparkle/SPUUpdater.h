@@ -144,12 +144,12 @@ SU_EXPORT @interface SPUUpdater : NSObject
  Set the URL of the appcast used to download update information. Using this method is discouraged.
  
  Setting this property will persist in the host bundle's user defaults.
- To avoid this, you should consider implementing
+ To avoid this, you should consider instead implementing
  -[SPUUpdaterDelegate feedURLStringForUpdater:] or -[SPUUpdaterDelegate feedParametersForUpdater:sendingSystemProfile:]
  
  Passing nil will remove any feed URL that has been set in the host bundle's user defaults.
  
- This property must be called on the main thread.
+ This method must be called on the main thread.
  */
 - (void)setFeedURL:(NSURL * _Nullable)feedURL;
 
