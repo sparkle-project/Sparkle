@@ -18,6 +18,11 @@
     return [[path pathExtension] isEqualToString:@"dmg"];
 }
 
++ (BOOL)unsafeIfArchiveIsNotValidated
+{
+    return NO;
+}
+
 // Called on a non-main thread.
 - (void)extractDMG
 {

@@ -41,6 +41,11 @@
     return NULL;
 }
 
++ (BOOL)unsafeIfArchiveIsNotValidated
+{
+    return NO;
+}
+
 - (void)start
 {
     [NSThread detachNewThreadSelector:[[self class] selectorConformingToTypeOfPath:self.archivePath] toTarget:self withObject:nil];
