@@ -42,7 +42,7 @@ Usage of AppKit has been minimized greatly. No linkage of it is found in the ins
 
 ## API Compatibility
 
-Despite decoupling update scheduling, UI, installation, and minimizing AppKit usage, a great deal of effort was made to maintain compatibility with older versions of Sparkle. A deprecated `SUUpdater` shim exists for maintaining runtime compatibility. Please check out `SPUStandardUpdaterController` and `SPUUpdater` instead for modern replacements.
+Despite decoupling update scheduling, UI, installation, and minimizing AppKit usage, a great deal of effort was made to maintain ABI compatibility with older versions of Sparkle. A deprecated `SUUpdater` shim exists for maintaining runtime compatibility. Please check out `SPUStandardUpdaterController` and `SPUUpdater` instead for modern replacements.
 
 Interactive package based installations have been deprecated in favor for guided package installations. As a consequence, interactive installations now have to be opted into (eg: `foo.sparkle_interactive.pkg`). A `sparkle:installationType=package` or `sparkle:installationType=interactive-package` tag is also now required in the appcast enclosure item for package based installs.
 
