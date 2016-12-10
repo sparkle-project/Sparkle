@@ -7,7 +7,7 @@ An easy-to-use software update framework for Cocoa developers.
 ## Changes since 1.5b
 
 * Compatibilty with macOS Sierra.
-* Up-to-date with 10.11 SDK and Xcode 7 (supports macOS 10.7+).
+* Up-to-date with 10.12 SDK and Xcode 8 (supports macOS 10.7+).
 * Important security fixes.
 * Cleaned up and modernized code, using ARC and Autolayout.
 * Truly automatic background updates (no UI at all) when user agreed to "Automatically download and install updates in the future."
