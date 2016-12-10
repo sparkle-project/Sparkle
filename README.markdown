@@ -6,14 +6,15 @@ An easy-to-use software update framework for Cocoa developers.
 
 ## Changes since 1.5b
 
-* Up-to-date with 10.11 SDK and Xcode 7. Supports macOS 10.7+.
+* Compatibilty with macOS Sierra.
+* Up-to-date with 10.11 SDK and Xcode 7 (supports macOS 10.7+).
 * Important security fixes.
 * Cleaned up and modernized code, using ARC and Autolayout.
 * Truly automatic background updates (no UI at all) when user agreed to "Automatically download and install updates in the future."
+* Upgraded and more reliable binary delta and code signing verification.
 * Ability to mark updates as critical.
 * Progress and status notifications for the host app.
 * Name of finish_installation.app can be configured to match your app's name.
-* Upgraded and more reliable binary delta and code signing verification.
 
 ## Features
 
