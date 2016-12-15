@@ -27,7 +27,7 @@
 @property (nullable, nonatomic, readonly, weak) id updater;
 @property (nullable, nonatomic, readonly, weak) id <SPUUpdaterDelegate> updaterDelegate;
 @property (nullable, nonatomic) SUAppcastItem *nonDeltaUpdateItem;
-@property (nullable, nonatomic, readonly) id <SUAppcastDriverDelegate> delegate;
+@property (nullable, nonatomic, readonly, weak) id <SUAppcastDriverDelegate> delegate;
 
 @end
 
