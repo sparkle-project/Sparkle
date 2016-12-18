@@ -352,6 +352,41 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)item;
 
 /*!
+ Called after the update has been downloaded, but before relaunching and moving it to its final destination.
+ 
+ Delegates can use this call to perform post-processing on the downloaded content.  For example:
+ \code
+    -   (void)updater:(SUUpdater *)updater
+    didDownloadUpdate:(SUAppcastItem *)item
+             tempPath:(NSString *)path
+    {
+        // locate a script called "postupdate.sh" in the downloaded version's resources folder
+        NSBundle *bundle = [NSBundle bundleWithPath:path];
+        NSString *scriptPath = [bundle pathForResource:@"postupdate" ofType:@"sh"];
+        if (scriptPath)
+        {
+            // execute the script
+            scriptPath = [NSString stringWithFormat:@"\"%@\"", scriptPath];
+            int exitCode = system([scriptPath cStringUsingEncoding:NSUTF8StringEncoding]);
+            if (exitCode)
+            {
+                // script failed
+            }
+        }
+        else
+        {
+            // the script was not in the downloaded version
+        }
+    }
+ \endcode
+ 
+ \param updater The SUUpdater instance.
+ \param item The appcast item corresponding to the update that is proposed to be installed.
+ \param path The temporary location the product was downloaded into.
+ */
+- (void)updater:(SUUpdater *)updater didDownloadUpdate:(SUAppcastItem *)item tempPath:(NSString *)path;
+
+/*!
     Returns whether the relaunch should be delayed in order to perform other tasks.
 
     This is not called if the user didn't relaunch on the previous update,
