@@ -93,12 +93,12 @@
         if (numBytes > 0) {
             NSString *request = [[NSString alloc] initWithBytes:buffer length:(NSUInteger)numBytes encoding:NSUTF8StringEncoding];
             NSArray *lines = [request componentsSeparatedByString:@"\r\n"];
-            NSString *requestLine = lines.count >= 3 ? lines[0] : nil;
+            NSString *requestLine = lines.count >= 3 ? [lines objectAtIndex:0] : nil;
             NSArray *parts = requestLine ? [requestLine componentsSeparatedByString:@" "] : nil;
             // Only process GET requests for existing files
-            if ([parts[0] isEqualToString:@"GET"]) {
+            if ([[parts objectAtIndex:0] isEqualToString:@"GET"]) {
                 // Use NSURL to strip out query parameters
-                NSString *path = [NSURL URLWithString:parts[1] relativeToURL:nil].path;
+                NSString *path = [NSURL URLWithString:[parts objectAtIndex:1] relativeToURL:nil].path;
                 NSString *filePath = [self.workingDirectory stringByAppendingString:path];
                 BOOL isDir = NO;
                 if (![[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:&isDir] || isDir) {

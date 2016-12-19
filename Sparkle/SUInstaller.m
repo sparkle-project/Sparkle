@@ -103,7 +103,7 @@
     return newAppDownloadPath;
 }
 
-+ (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler
++ (void)installFromUpdateFolder:(NSString *)inUpdateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath fileOperationToolPath:(NSString *)fileOperationToolPath versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler
 {
     BOOL isPackage = NO;
     BOOL isGuided = NO;
@@ -113,39 +113,18 @@
         [self finishInstallationToPath:installationPath withResult:NO error:[NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: @"Couldn't find an appropriate update in the downloaded package." }] completionHandler:completionHandler];
     } else {
         if (isPackage && isGuided) {
-            [SUGuidedPackageInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host versionComparator:comparator completionHandler:completionHandler];
+            [SUGuidedPackageInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host fileOperationToolPath:fileOperationToolPath versionComparator:comparator completionHandler:completionHandler];
         } else if (isPackage) {
-            [SUPackageInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host versionComparator:comparator completionHandler:completionHandler];
+            [SUPackageInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host fileOperationToolPath:fileOperationToolPath versionComparator:comparator completionHandler:completionHandler];
         } else {
-            [SUPlainInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host versionComparator:comparator completionHandler:completionHandler];
+            [SUPlainInstaller performInstallationToPath:installationPath fromPath:newAppDownloadPath host:host fileOperationToolPath:fileOperationToolPath versionComparator:comparator completionHandler:completionHandler];
         }
     }
 }
 
-+ (void)mdimportInstallationPath:(NSString *)installationPath
-{
-    // *** GETS CALLED ON NON-MAIN THREAD!
-
-    SULog(@"mdimporting");
-
-    NSTask *mdimport = [[NSTask alloc] init];
-    [mdimport setLaunchPath:@"/usr/bin/mdimport"];
-    [mdimport setArguments:@[installationPath]];
-    @try {
-        [mdimport launch];
-        [mdimport waitUntilExit];
-    }
-    @catch (NSException *launchException)
-    {
-        // No big deal.
-        SULog(@"Error: %@", [launchException description]);
-    }
-}
-
-+ (void)finishInstallationToPath:(NSString *)installationPath withResult:(BOOL)result error:(NSError *)error completionHandler:(void (^)(NSError *))completionHandler
++ (void)finishInstallationToPath:(NSString *)__unused installationPath withResult:(BOOL)result error:(NSError *)error completionHandler:(void (^)(NSError *))completionHandler
 {
     if (result) {
-        [self mdimportInstallationPath:installationPath];
         dispatch_async(dispatch_get_main_queue(), ^{
             completionHandler(nil);
         });

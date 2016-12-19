@@ -166,18 +166,28 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         [self.statusController showWindow:self];
     }
     
+    NSString *fileOperationToolPath = [[[[NSBundle mainBundle] executablePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:@""SPARKLE_FILEOP_TOOL_NAME];
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:fileOperationToolPath]) {
+        SULog(@"Potential Installation Error: File operation tool path %@ is not found", fileOperationToolPath);
+    }
+    
     [SUInstaller installFromUpdateFolder:self.updateFolderPath
                                 overHost:host
                         installationPath:installationPath
+                   fileOperationToolPath:fileOperationToolPath
                        versionComparator:[SUStandardVersionComparator defaultComparator]
                        completionHandler:^(NSError *error) {
                            if (error) {
-                               SULog(@"Installation Error: %@", error);
-                               if (self.shouldShowUI) {
-                                   NSAlert *alert = [[NSAlert alloc] init];
-                                   alert.messageText = @"";
-                                   alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
-                                   [alert runModal];
+                               NSError *underlyingError = [error.userInfo objectForKey:NSUnderlyingErrorKey];
+                               if (underlyingError == nil || underlyingError.code != SUInstallationCancelledError) {
+                                   SULog(@"Installation Error: %@", error);
+                                   if (self.shouldShowUI) {
+                                       NSAlert *alert = [[NSAlert alloc] init];
+                                       alert.messageText = @"";
+                                       alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
+                                       [alert runModal];
+                                   }
                                }
                                exit(EXIT_FAILURE);
                            } else {
@@ -247,16 +257,16 @@ int main(int __unused argc, const char __unused *argv[])
         
         NSApplication *application = [NSApplication sharedApplication];
 
-        BOOL shouldShowUI = (args.count > 6) ? [args[6] boolValue] : YES;
+        BOOL shouldShowUI = (args.count > 6) ? [[args objectAtIndex:6] boolValue] : YES;
         if (shouldShowUI) {
             [application activateIgnoringOtherApps:YES];
         }
         
-        AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostPath:args[1]
-                                                               relaunchPath:args[2]
-                                                            parentProcessId:[args[3] intValue]
-                                                           updateFolderPath:args[4]
-                                                             shouldRelaunch:(args.count > 5) ? [args[5] boolValue] : YES
+        AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostPath:[args objectAtIndex:1]
+                                                               relaunchPath:[args objectAtIndex:2]
+                                                            parentProcessId:[[args objectAtIndex:3] intValue]
+                                                           updateFolderPath:[args objectAtIndex:4]
+                                                             shouldRelaunch:(args.count > 5) ? [[args objectAtIndex:5] boolValue] : YES
                                                                shouldShowUI:shouldShowUI];
         [application setDelegate:appInstaller];
         [application run];

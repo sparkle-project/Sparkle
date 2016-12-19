@@ -31,7 +31,7 @@
     return trimmedVersion.length > 0 ? trimmedVersion : nil;
 }
 
-+ (BOOL)performInstallationToURL:(NSURL *)installationURL fromUpdateAtURL:(NSURL *)newURL withHost:(SUHost *)host error:(NSError * __autoreleasing *)error
++ (BOOL)performInstallationToURL:(NSURL *)installationURL fromUpdateAtURL:(NSURL *)newURL withHost:(SUHost *)host fileOperationToolPath:(NSString *)fileOperationToolPath error:(NSError * __autoreleasing *)error
 {
     if (installationURL == nil || newURL == nil) {
         // this really shouldn't happen but just in case
@@ -42,7 +42,7 @@
         return NO;
     }
     
-    SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:YES];
+    SUFileManager *fileManager = [SUFileManager fileManagerWithAuthorizationToolPath:fileOperationToolPath];
     
     // Create a temporary directory for our new app that resides on our destination's volume
     NSURL *tempNewDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:[installationURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingString:@" (Incomplete Update)"] appropriateForDirectoryURL:installationURL.URLByDeletingLastPathComponent error:error];
@@ -139,20 +139,23 @@
         return NO;
     }
     
+    // From here on out, we don't really need to bring up authorization if we haven't done so prior
+    SUFileManager *constrainedFileManager = [fileManager fileManagerByPreservingAuthorizationRights];
+    
     // Cleanup: move the old app to the trash
     NSError *trashError = nil;
-    if (![fileManager moveItemAtURLToTrash:oldTempURL error:&trashError]) {
+    if (![constrainedFileManager moveItemAtURLToTrash:oldTempURL error:&trashError]) {
         SULog(@"Failed to move %@ to trash with error %@", oldTempURL, trashError);
     }
     
-    [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
+    [constrainedFileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
     
-    [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
+    [constrainedFileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
     
     return YES;
 }
 
-+ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler
++ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host fileOperationToolPath:(NSString *)fileOperationToolPath versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler
 {
     SUParameterAssert(host);
 
@@ -161,7 +164,7 @@
     // Prevent malicious downgrades
     if (!allowDowngrades) {
         if ([comparator compareVersion:[host version] toVersion:[[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]] == NSOrderedDescending) {
-            NSString *errorMessage = [NSString stringWithFormat:@"Sparkle Updater: Possible attack in progress! Attempting to \"upgrade\" from %@ to %@. Aborting update.", [host version], [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
+            NSString *errorMessage = [NSString stringWithFormat:@"For security reasons, updates that downgrade version of the application are not allowed. Refusing to downgrade app from version %@ to %@. Aborting update.", [host version], [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
             NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
             [self finishInstallationToPath:installationPath withResult:NO error:error completionHandler:completionHandler];
             return;
@@ -170,7 +173,7 @@
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSError *error = nil;
-        BOOL result = [self performInstallationToURL:[NSURL fileURLWithPath:installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:path] withHost:host error:&error];
+        BOOL result = [self performInstallationToURL:[NSURL fileURLWithPath:installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:path] withHost:host fileOperationToolPath:fileOperationToolPath error:&error];
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [self finishInstallationToPath:installationPath withResult:result error:error completionHandler:completionHandler];

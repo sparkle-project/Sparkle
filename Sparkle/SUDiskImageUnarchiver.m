@@ -8,7 +8,6 @@
 
 #import "SUDiskImageUnarchiver.h"
 #import "SUUnarchiver_Private.h"
-#import "NTSynchronousTask.h"
 #import "SULog.h"
 #include <CoreServices/CoreServices.h>
 
@@ -17,6 +16,11 @@
 + (BOOL)canUnarchivePath:(NSString *)path
 {
     return [[path pathExtension] isEqualToString:@"dmg"];
+}
+
++ (BOOL)unsafeIfArchiveIsNotValidated
+{
+    return NO;
 }
 
 // Called on a non-main thread.
@@ -92,12 +96,27 @@
         NSInteger taskResult = -1;
 		@try
 		{
-            NTSynchronousTask *task = [[NTSynchronousTask alloc] init];
-
-            [task run:@"/usr/bin/hdiutil" directory:@"/" withArgs:arguments input:promptData];
-
-            taskResult = [task result];
-            output = [[task output] copy];
+            NSTask *task = [[NSTask alloc] init];
+            task.launchPath = @"/usr/bin/hdiutil";
+            task.currentDirectoryPath = @"/";
+            task.arguments = arguments;
+            
+            NSPipe *inputPipe = [NSPipe pipe];
+            NSPipe *outputPipe = [NSPipe pipe];
+            
+            task.standardInput = inputPipe;
+            task.standardOutput = outputPipe;
+            
+            [task launch];
+            
+            [inputPipe.fileHandleForWriting writeData:promptData];
+            [inputPipe.fileHandleForWriting closeFile];
+            
+            // Read data to end *before* waiting until the task ends so we don't deadlock if the stdout buffer becomes full if we haven't consumed from it
+            output = [outputPipe.fileHandleForReading readDataToEndOfFile];
+            
+            [task waitUntilExit];
+            taskResult = task.terminationStatus;
         }
         @catch (NSException *)
         {
@@ -147,10 +166,16 @@
         dispatch_async(dispatch_get_main_queue(), delegateFailure);
 
     finally:
-        if (mountedSuccessfully)
-            [NSTask launchedTaskWithLaunchPath:@"/usr/bin/hdiutil" arguments:@[@"detach", mountPoint, @"-force"]];
-        else
+        if (mountedSuccessfully) {
+            @try {
+                [NSTask launchedTaskWithLaunchPath:@"/usr/bin/hdiutil" arguments:@[@"detach", mountPoint, @"-force"]];
+            } @catch (NSException *exception) {
+                SULog(@"Failed to unmount %@", mountPoint);
+                SULog(@"Exception: %@", exception);
+            }
+        } else {
             SULog(@"Can't mount DMG %@", self.archivePath);
+        }
     }
 }
 

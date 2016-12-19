@@ -26,7 +26,6 @@ typedef struct {
 - (instancetype)initWithBundle:(NSBundle *)aBundle;
 @property (readonly, copy) NSString *bundlePath;
 @property (readonly) BOOL allowsAutomaticUpdates;
-@property (readonly, copy) NSString *appCachePath;
 @property (readonly, copy) NSString *installationPath;
 @property (readonly, copy) NSString *name;
 @property (readonly, copy) NSString *version;
@@ -35,6 +34,7 @@ typedef struct {
 @property (getter=isRunningOnReadOnlyVolume, readonly) BOOL runningOnReadOnlyVolume;
 @property (getter=isBackgroundApplication, readonly) BOOL backgroundApplication;
 @property (readonly, copy) NSString *publicDSAKey;
+@property (readonly, nonatomic, copy) NSString *publicDSAKeyFileKey;
 @property (readonly, copy) NSArray *systemProfile;
 
 - (id)objectForInfoDictionaryKey:(NSString *)key;

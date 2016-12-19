@@ -98,8 +98,9 @@
         alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
         [alert addButtonWithTitle:SULocalizedString(@"OK", nil)];
         [self showAlert:alert];
-        [self abortUpdate];
     }
+    
+    [self abortUpdate];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)__unused aNotification
@@ -114,10 +115,6 @@
     [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
     switch (choice) {
         case SUInstallUpdateChoice:
-            self.statusController = [[SUStatusController alloc] initWithHost:self.host];
-            [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
-            [self.statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
-            [self.statusController showWindow:self];
             [self downloadUpdate];
             break;
 
@@ -135,6 +132,25 @@
             [self abortUpdate];
             break;
     }
+}
+
+- (void)downloadUpdate
+{
+    BOOL createdStatusController = NO;
+    if (self.statusController == nil) {
+        self.statusController = [[SUStatusController alloc] initWithHost:self.host];
+        createdStatusController = YES;
+    }
+    
+    [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
+    [self.statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
+    [self.statusController setButtonEnabled:YES];
+    
+    if (createdStatusController) {
+        [self.statusController showWindow:self];
+    }
+    
+    [super downloadUpdate];
 }
 
 - (void)download:(NSURLDownload *)__unused download didReceiveResponse:(NSURLResponse *)response
@@ -164,8 +180,12 @@
                 SULocalizedString(@"GB", @"the unit for gigabytes")];
     }
 
-    return [NSByteCountFormatter stringFromByteCount:value
-                                          countStyle:NSByteCountFormatterCountStyleFile];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+    NSByteCountFormatter *formatter = [[NSByteCountFormatter alloc] init];
+    [formatter setZeroPadsFractionDigits:YES];
+    return [formatter stringFromByteCount:value];
+#pragma clang diagnostic pop
 }
 
 - (void)download:(NSURLDownload *)__unused download didReceiveDataOfLength:(NSUInteger)length

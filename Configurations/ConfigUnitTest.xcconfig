@@ -1,5 +1,7 @@
 // Unit Test only
 
+#include "ConfigSwift.xcconfig"
+
 INFOPLIST_FILE = Tests/SparkleTests-Info.plist
 WRAPPER_EXTENSION = xctest
 OTHER_CFLAGS = $(inherited) -iframework"$(DEVELOPER_FRAMEWORKS_DIR)" -iframework"$(PLATFORM_DIR)/Developer/Library/Frameworks"

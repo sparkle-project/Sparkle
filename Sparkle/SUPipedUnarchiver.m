@@ -30,7 +30,7 @@
     NSString *lastPathComponent = [path lastPathComponent];
 	for (NSString *currentType in typeSelectorDictionary)
 	{
-        NSString *value = typeSelectorDictionary[currentType];
+        NSString *value = [typeSelectorDictionary objectForKey:currentType];
         assert(value);
 
 		if ([currentType length] > [lastPathComponent length]) continue;
@@ -39,6 +39,11 @@
         }
     }
     return NULL;
+}
+
++ (BOOL)unsafeIfArchiveIsNotValidated
+{
+    return NO;
 }
 
 - (void)start
@@ -62,7 +67,8 @@
         SULog(@"Extracting using '%@' '%@' < '%@' '%@'", command, [args componentsJoinedByString:@"' '"], self.archivePath, destination);
 
         // Get the file size.
-        NSUInteger expectedLength = [[[NSFileManager defaultManager] attributesOfItemAtPath:self.archivePath error:nil][NSFileSize] unsignedIntegerValue];
+        NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.archivePath error:nil];
+        NSUInteger expectedLength = [[attributes objectForKey:NSFileSize] unsignedIntegerValue];
         if (expectedLength > 0) {
             NSFileHandle *archiveInput = [NSFileHandle fileHandleForReadingAtPath:self.archivePath];
 

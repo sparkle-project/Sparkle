@@ -87,7 +87,7 @@ static NSDictionary *infoForFile(FTSENT *ent)
 
 static bool aclExists(const FTSENT *ent)
 {
-    // OS X does not currently support ACLs for symlinks
+    // macOS does not currently support ACLs for symlinks
     if (ent->fts_info == FTS_SL) {
         return NO;
     }
