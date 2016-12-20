@@ -45,7 +45,8 @@
     SUFileManager *fileManager = [SUFileManager fileManagerWithAuthorizationToolPath:fileOperationToolPath];
     
     // Create a temporary directory for our new app that resides on our destination's volume
-    NSURL *tempNewDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:[installationURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingString:@" (Incomplete Update)"] appropriateForDirectoryURL:installationURL.URLByDeletingLastPathComponent error:error];
+    NSString *preferredName = [installationURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingString:@" (Incomplete Update)"];
+    NSURL *tempNewDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:preferredName appropriateForDirectoryURL:installationURL.URLByDeletingLastPathComponent error:error];
     if (tempNewDirectoryURL == nil) {
         SULog(@"Failed to make new temp directory");
         return NO;
@@ -163,7 +164,10 @@
 
     // Prevent malicious downgrades
     if (!allowDowngrades) {
-        if ([comparator compareVersion:[host version] toVersion:[[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]] == NSOrderedDescending) {
+        NSString *hostVersion = [host version];
+        NSBundle *bundle = [NSBundle bundleWithPath:path];
+        NSString *updateVersion = [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
+        if (!updateVersion || [comparator compareVersion:hostVersion toVersion:updateVersion] == NSOrderedDescending) {
             NSString *errorMessage = [NSString stringWithFormat:@"For security reasons, updates that downgrade version of the application are not allowed. Refusing to downgrade app from version %@ to %@. Aborting update.", [host version], [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
             NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
             [self finishInstallationToPath:installationPath withResult:NO error:error completionHandler:completionHandler];
