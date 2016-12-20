@@ -335,7 +335,6 @@
     if (!success) {
         [self unarchiverDidFail:nil];
     } else {
-        unarchiver.delegate = self;
         [unarchiver unarchiveWithCompletionBlock:^(NSError *err){
             if (err) {
                 [self unarchiverDidFail:err];
@@ -344,6 +343,8 @@
 
             assert(self.updateItem);
             [self installWithToolAndRelaunch:YES];
+        } progressBlock:^(__unused double progress){
+
         }];
     }
 }

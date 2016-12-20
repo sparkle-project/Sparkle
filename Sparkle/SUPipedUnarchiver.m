@@ -46,9 +46,9 @@
     return NO;
 }
 
-- (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))block
+- (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))block progressBlock:(void (^ _Nullable)(double progress))progress
 {
-    [super unarchiveWithCompletionBlock:block];
+    [super unarchiveWithCompletionBlock:block progressBlock:progress];
     [NSThread detachNewThreadSelector:[[self class] selectorConformingToTypeOfPath:self.archivePath] toTarget:self withObject:nil];
 }
 
@@ -94,7 +94,7 @@
                 bytesRead += len;
                 [archiveOutput writeData:data];
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [self notifyDelegateOfProgress:(double)bytesRead / (double)expectedLength];
+                    [self notifyProgress:(double)bytesRead / (double)expectedLength];
                 });
             }
             while(bytesRead < expectedLength);

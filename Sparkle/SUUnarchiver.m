@@ -17,15 +17,16 @@
 
 @interface SUUnarchiver ()
 @property (strong) void (^completionBlock)(NSError * _Nullable);
+@property (strong) void (^progressBlock)(double progress);
+
 @end
 
 @implementation SUUnarchiver
 
 @synthesize archivePath;
 @synthesize updateHostBundlePath;
-@synthesize delegate;
 @synthesize decryptionPassword;
-@synthesize completionBlock;
+@synthesize completionBlock, progressBlock;
 
 + (SUUnarchiver *)unarchiverForPath:(NSString *)path updatingHostBundlePath:(NSString *)hostPath withPassword:(NSString *)decryptionPassword
 {
@@ -39,8 +40,9 @@
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], self.archivePath]; }
 
-- (void)unarchiveWithCompletionBlock:(void (^_Nonnull)(NSError * _Nullable))block {
+- (void)unarchiveWithCompletionBlock:(void (^_Nonnull)(NSError * _Nullable))block progressBlock:(void (^_Nullable)(double progress))progress {
     self.completionBlock = block;
+    self.progressBlock = progress;
 }
 
 - (instancetype)initWithPath:(NSString *)path hostBundlePath:(NSString *)hostPath password:(NSString *)password
@@ -64,10 +66,10 @@
     return NO;
 }
 
-- (void)notifyDelegateOfProgress:(double)progress
+- (void)notifyProgress:(double)progress
 {
-    if ([self.delegate respondsToSelector:@selector(unarchiver:extractedProgress:)]) {
-        [self.delegate unarchiver:self extractedProgress:progress];
+    if (self.progressBlock) {
+        self.progressBlock(progress);
     }
 }
 

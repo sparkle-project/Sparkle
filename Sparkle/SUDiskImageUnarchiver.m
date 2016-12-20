@@ -159,9 +159,9 @@
     }
 }
 
-- (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))block
+- (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))block progressBlock:(void (^ _Nullable)(double progress))progress
 {
-    [super unarchiveWithCompletionBlock:block];
+    [super unarchiveWithCompletionBlock:block progressBlock:progress];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		[self extractDMG];
     });

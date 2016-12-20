@@ -14,26 +14,19 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class SUHost;
-@protocol SUUnarchiverDelegate;
 
 @interface SUUnarchiver : NSObject
 
 @property (copy, readonly) NSString *archivePath;
 @property (copy, readonly) NSString *_Nullable updateHostBundlePath;
 @property (copy, readonly) NSString *_Nullable decryptionPassword;
-@property (weak) _Nullable id<SUUnarchiverDelegate> delegate;
 
 + (nullable SUUnarchiver *)unarchiverForPath:(NSString *)path updatingHostBundlePath:(nullable NSString *)host withPassword:(nullable NSString *)decryptionPassword;
 
 + (BOOL)unsafeIfArchiveIsNotValidated;
 
-- (void)unarchiveWithCompletionBlock:(void (^_Nonnull)(NSError *_Nullable))block;
+- (void)unarchiveWithCompletionBlock:(void (^)(NSError *_Nullable))completion progressBlock:(void (^_Nullable)(double progress))progress;
 
-@end
-
-@protocol SUUnarchiverDelegate <NSObject>
-@optional
-- (void)unarchiver:(SUUnarchiver *)unarchiver extractedProgress:(double)progress;
 @end
 
 NS_ASSUME_NONNULL_END
