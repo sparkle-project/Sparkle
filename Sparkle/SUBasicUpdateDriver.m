@@ -356,7 +356,7 @@
     [self installWithToolAndRelaunch:YES];
 }
 
-- (void)unarchiverDidFail:(SUUnarchiver *)__unused ua
+- (void)unarchiverDidFail:(NSError *)err
 {
     // No longer needed
     self.updateValidator = nil;
@@ -366,7 +366,7 @@
         return;
     }
 
-    [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) }]];
+    [self abortUpdateWithError:err];
 }
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch

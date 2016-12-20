@@ -67,7 +67,7 @@
     }
 }
 
-- (void)notifyDelegateOfSuccess
+- (void)unarchiverDidFinish
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(unarchiverDidFinish:)]) {
@@ -76,7 +76,7 @@
     });
 }
 
-- (void)unarchiverDidFailWithError:(NSError *)error
+- (void)unarchiverDidFail:(NSError *)reason
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([self.delegate respondsToSelector:@selector(unarchiverDidFail:)]) {

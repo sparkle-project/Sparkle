@@ -71,7 +71,7 @@
         BOOL success = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO, &applyDiffError);
         if (success) {
             [[self class] updateSpotlightImportersAtBundlePath:targetPath];
-            [self notifyDelegateOfSuccess];
+            [self unarchiverDidFinish];
         }
         else {
             [self unarchiverDidFailWithError:applyDiffError];

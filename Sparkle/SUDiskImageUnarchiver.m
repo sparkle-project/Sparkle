@@ -139,7 +139,7 @@
             }
         }
 
-        [self notifyDelegateOfSuccess];
+        [self unarchiverDidFinish];
         goto finally;
 
     reportError:

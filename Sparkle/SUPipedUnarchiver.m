@@ -104,7 +104,7 @@
             
             if ([task terminationStatus] == 0) {
                 if (bytesRead == expectedLength) {
-                    [self notifyDelegateOfSuccess];
+                    [self unarchiverDidFinish];
                     return;
                 } else {
                     error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, command '%@' got only %ld of %ld bytes", command, (long)bytesRead, (long)expectedLength]}];

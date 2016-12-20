@@ -19,8 +19,8 @@
 - (instancetype)initWithPath:(NSString *)archive hostBundlePath:(NSString *)host;
 
 - (void)notifyDelegateOfProgress:(double)progress;
-- (void)notifyDelegateOfSuccess;
-- (void)unarchiverDidFailWithError:(NSError *)error;
+- (void)unarchiverDidFinish;
+- (void)unarchiverDidFailWithError:(NSError *)err;
 @end
 
 #endif
