@@ -74,8 +74,7 @@
             [self notifyDelegateOfSuccess];
         }
         else {
-            SULog(@"Applying delta patch failed with error: %@", applyDiffError);
-            [self notifyDelegateOfFailure];
+            [self unarchiverDidFailWithError:applyDiffError];
         }
     }
 }

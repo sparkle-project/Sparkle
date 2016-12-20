@@ -61,7 +61,7 @@
 {
     // *** GETS CALLED ON NON-MAIN THREAD!!!
 	@autoreleasepool {
-
+        NSError *error = nil;
         NSString *destination = [self.archivePath stringByDeletingLastPathComponent];
         
         SULog(@"Extracting using '%@' '%@' < '%@' '%@'", command, [args componentsJoinedByString:@"' '"], self.archivePath, destination);
@@ -107,16 +107,17 @@
                     [self notifyDelegateOfSuccess];
                     return;
                 } else {
-                    SULog(@"Extraction failed, command '%@' got only %ld of %ld bytes", command, (long)bytesRead, (long)expectedLength);
+                    error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, command '%@' got only %ld of %ld bytes", command, (long)bytesRead, (long)expectedLength]}];
+
                 }
             } else {
-                SULog(@"Extraction failed, command '%@' returned %d", command, [task terminationStatus]);
+                error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, command '%@' returned %d", command, [task terminationStatus]]}];
             }
         } else {
-            SULog(@"Extraction failed, archive '%@' is empty", self.archivePath);
+            error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, archive '%@' is empty", self.archivePath]}];
         }
 
-        [self notifyDelegateOfFailure];
+        [self unarchiverDidFailWithError:error];
     }
 }
 

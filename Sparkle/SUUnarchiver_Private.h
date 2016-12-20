@@ -20,7 +20,7 @@
 
 - (void)notifyDelegateOfProgress:(double)progress;
 - (void)notifyDelegateOfSuccess;
-- (void)notifyDelegateOfFailure;
+- (void)unarchiverDidFailWithError:(NSError *)error;
 @end
 
 #endif

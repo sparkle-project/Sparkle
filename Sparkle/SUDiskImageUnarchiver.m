@@ -135,7 +135,6 @@
 
 			if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
 			{
-                SULog(@"Couldn't copy item: %@ : %@", error, error.userInfo ? error.userInfo : @"");
                 goto reportError;
             }
         }
@@ -144,7 +143,7 @@
         goto finally;
 
     reportError:
-        [self notifyDelegateOfFailure];
+        [self unarchiverDidFailWithError:error];
 
     finally:
         if (mountedSuccessfully) {
