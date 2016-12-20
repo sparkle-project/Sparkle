@@ -25,7 +25,7 @@ static BOOL applyBinaryDeltaToFile(xar_t x, xar_file_t file, NSString *sourceFil
     return success;
 }
 
-BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, BOOL verbose, NSError * __autoreleasing *error)
+BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, BOOL verbose, void (^progressCallback)(double progress), NSError * __autoreleasing *error)
 {
     xar_t x = xar_open([patchFile fileSystemRepresentation], READ);
     if (!x) {
@@ -44,6 +44,8 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     NSString *expectedNewBeforeHash = nil;
     NSString *expectedNewAfterHash = nil;
     
+    progressCallback(0/6.0);
+
     xar_subdoc_t subdoc;
     for (subdoc = xar_subdoc_first(x); subdoc; subdoc = xar_subdoc_next(subdoc)) {
         if (!strcmp(xar_subdoc_name(subdoc), BINARY_DELTA_ATTRIBUTES_KEY)) {
@@ -112,6 +114,8 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         fprintf(stderr, "Verifying source...");
     }
     
+    progressCallback(1/6.0);
+
     NSString *beforeHash = hashOfTreeWithVersion(source, majorDiffVersion);
     if (!beforeHash) {
         if (verbose) {
@@ -137,6 +141,8 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         fprintf(stderr, "\nCopying files...");
     }
     
+    progressCallback(2/6.0);
+
     if (!removeTree(destination)) {
         if (verbose) {
             fprintf(stderr, "\n");
@@ -146,6 +152,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         }
         return NO;
     }
+
+    progressCallback(3/6.0);
+
     if (!copyTree(source, destination)) {
         if (verbose) {
             fprintf(stderr, "\n");
@@ -156,6 +165,8 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         return NO;
     }
     
+    progressCallback(4/6.0);
+
     BOOL hasExtractKeyAvailable = MAJOR_VERSION_IS_AT_LEAST(majorDiffVersion, SUBeigeMajorVersion);
 
     if (verbose) {
@@ -252,6 +263,8 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     }
     xar_close(x);
 
+    progressCallback(5/6.0);
+
     if (verbose) {
         fprintf(stderr, "\nVerifying destination...");
     }
@@ -276,6 +289,8 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         removeTree(destination);
         return NO;
     }
+
+    progressCallback(6/6.0);
 
     if (verbose) {
         fprintf(stderr, "\nDone!\n");

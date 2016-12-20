@@ -68,7 +68,9 @@
         NSString *targetPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
 
         NSError *applyDiffError = nil;
-        BOOL success = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO, &applyDiffError);
+        BOOL success = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO, ^(double progress){
+            [self notifyProgress:progress];
+        }, &applyDiffError);
         if (success) {
             [[self class] updateSpotlightImportersAtBundlePath:targetPath];
             [self unarchiverDidFinish];
