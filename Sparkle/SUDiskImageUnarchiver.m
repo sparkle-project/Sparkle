@@ -27,14 +27,6 @@
 - (void)extractDMG
 {
 	@autoreleasepool {
-        [self extractDMGWithPassword:nil];
-    }
-}
-
-// Called on a non-main thread.
-- (void)extractDMGWithPassword:(NSString *)__unused password
-{
-	@autoreleasepool {
         BOOL mountedSuccessfully = NO;
 
         SULog(@"Extracting %@ as a DMG", self.archivePath);
