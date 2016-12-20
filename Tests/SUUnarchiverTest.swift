@@ -18,18 +18,6 @@ class SUUnarchiverTest: XCTestCase, SUUnarchiverDelegate
     {
     }
     
-    func unarchiverDidFail(_ unarchiver: SUUnarchiver)
-    {
-        self.unarchivedResult = false
-        self.unarchivedExpectation!.fulfill()
-    }
-    
-    func unarchiverDidFinish(_ unarchiver: SUUnarchiver)
-    {
-        self.unarchivedResult = true
-        self.unarchivedExpectation!.fulfill()
-    }
-    
     func unarchiveTestAppWithExtension(_ archiveExtension: String)
     {
         let appName = "SparkleTestCodeSignApp"
@@ -49,10 +37,13 @@ class SUUnarchiverTest: XCTestCase, SUUnarchiverDelegate
         
         self.unarchivedExpectation = super.expectation(description: "Unarchived Application (format: \(archiveExtension))")
         
-        let unarchiver = SUUnarchiver(forPath: tempArchiveURL.path, updatingHostBundlePath: nil, withPassword: self.password)
+        let unarchiver = SUUnarchiver(forPath: tempArchiveURL.path, updatingHostBundlePath: nil, withPassword: self.password)!
 
-        unarchiver?.delegate = self
-        unarchiver?.start()
+        unarchiver.delegate = self
+        unarchiver.unarchive {(error: Error?) -> Void in
+            self.unarchivedResult = nil == error;
+            self.unarchivedExpectation!.fulfill()
+        }
         
         super.waitForExpectations(timeout: 7.0, handler: nil)
         

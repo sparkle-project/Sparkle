@@ -27,13 +27,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)unsafeIfArchiveIsNotValidated;
 
-- (void)start;
+- (void)unarchiveWithCompletionBlock:(void (^_Nonnull)(NSError *_Nullable))block;
 
 @end
 
 @protocol SUUnarchiverDelegate <NSObject>
-- (void)unarchiverDidFinish:(SUUnarchiver *)unarchiver;
-- (void)unarchiverDidFail:(SUUnarchiver *)unarchiver;
 @optional
 - (void)unarchiver:(SUUnarchiver *)unarchiver extractedProgress:(double)progress;
 @end

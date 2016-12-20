@@ -15,12 +15,17 @@
 #import "SUUnarchiver.h"
 #import "SUUnarchiver_Private.h"
 
+@interface SUUnarchiver ()
+@property (strong) void (^completionBlock)(NSError * _Nullable);
+@end
+
 @implementation SUUnarchiver
 
 @synthesize archivePath;
 @synthesize updateHostBundlePath;
 @synthesize delegate;
 @synthesize decryptionPassword;
+@synthesize completionBlock;
 
 + (SUUnarchiver *)unarchiverForPath:(NSString *)path updatingHostBundlePath:(NSString *)hostPath withPassword:(NSString *)decryptionPassword
 {
@@ -34,9 +39,8 @@
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], self.archivePath]; }
 
-- (void)start
-{
-    // No-op
+- (void)unarchiveWithCompletionBlock:(void (^_Nonnull)(NSError * _Nullable))block {
+    self.completionBlock = block;
 }
 
 - (instancetype)initWithPath:(NSString *)path hostBundlePath:(NSString *)hostPath password:(NSString *)password
@@ -70,18 +74,21 @@
 - (void)unarchiverDidFinish
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(unarchiverDidFinish:)]) {
-            [self.delegate unarchiverDidFinish:self];
-        }
+        self.completionBlock(nil);
     });
 }
 
 - (void)unarchiverDidFail:(NSError *)reason
 {
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObject:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) forKey:NSLocalizedDescriptionKey];
+    if (reason) {
+        [userInfo setObject:reason forKey:NSUnderlyingErrorKey];
+    }
+
+    NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:userInfo];
+
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([self.delegate respondsToSelector:@selector(unarchiverDidFail:)]) {
-            [self.delegate unarchiverDidFail:self];
-        }
+        self.completionBlock(error);
     });
 }
 

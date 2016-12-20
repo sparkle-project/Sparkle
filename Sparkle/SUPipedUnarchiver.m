@@ -46,8 +46,9 @@
     return NO;
 }
 
-- (void)start
+- (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))block
 {
+    [super unarchiveWithCompletionBlock:block];
     [NSThread detachNewThreadSelector:[[self class] selectorConformingToTypeOfPath:self.archivePath] toTarget:self withObject:nil];
 }
 

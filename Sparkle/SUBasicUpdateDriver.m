@@ -336,7 +336,15 @@
         [self unarchiverDidFail:nil];
     } else {
         unarchiver.delegate = self;
-        [unarchiver start];
+        [unarchiver unarchiveWithCompletionBlock:^(NSError *err){
+            if (err) {
+                [self unarchiverDidFail:err];
+                return;
+            }
+
+            assert(self.updateItem);
+            [self installWithToolAndRelaunch:YES];
+        }];
     }
 }
 
@@ -347,13 +355,6 @@
     self.nonDeltaUpdateItem = nil;
 
     [self downloadUpdate];
-}
-
-- (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
-{
-    assert(self.updateItem);
-
-    [self installWithToolAndRelaunch:YES];
 }
 
 - (void)unarchiverDidFail:(NSError *)err
