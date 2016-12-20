@@ -14,17 +14,17 @@ class SUUnarchiverTest: XCTestCase, SUUnarchiverDelegate
     var unarchivedExpectation: XCTestExpectation? = nil
     var unarchivedResult: Bool = false
     
-    func unarchiver(_ unarchiver: SUUnarchiver!, extractedProgress progress: Double)
+    func unarchiver(_ unarchiver: SUUnarchiver, extractedProgress progress: Double)
     {
     }
     
-    func unarchiverDidFail(_ unarchiver: SUUnarchiver!)
+    func unarchiverDidFail(_ unarchiver: SUUnarchiver)
     {
         self.unarchivedResult = false
         self.unarchivedExpectation!.fulfill()
     }
     
-    func unarchiverDidFinish(_ unarchiver: SUUnarchiver!)
+    func unarchiverDidFinish(_ unarchiver: SUUnarchiver)
     {
         self.unarchivedResult = true
         self.unarchivedExpectation!.fulfill()

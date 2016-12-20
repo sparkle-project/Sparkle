@@ -11,17 +11,19 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class SUHost;
 @protocol SUUnarchiverDelegate;
 
 @interface SUUnarchiver : NSObject
 
 @property (copy, readonly) NSString *archivePath;
-@property (copy, readonly) NSString *updateHostBundlePath;
-@property (copy, readonly) NSString *decryptionPassword;
-@property (weak) id<SUUnarchiverDelegate> delegate;
+@property (copy, readonly) NSString *_Nullable updateHostBundlePath;
+@property (copy, readonly) NSString *_Nullable decryptionPassword;
+@property (weak) _Nullable id<SUUnarchiverDelegate> delegate;
 
-+ (SUUnarchiver *)unarchiverForPath:(NSString *)path updatingHostBundlePath:(NSString *)host withPassword:(NSString *)decryptionPassword;
++ (nullable SUUnarchiver *)unarchiverForPath:(NSString *)path updatingHostBundlePath:(nullable NSString *)host withPassword:(nullable NSString *)decryptionPassword;
 
 + (BOOL)unsafeIfArchiveIsNotValidated;
 
@@ -36,4 +38,5 @@
 - (void)unarchiver:(SUUnarchiver *)unarchiver extractedProgress:(double)progress;
 @end
 
+NS_ASSUME_NONNULL_END
 #endif
