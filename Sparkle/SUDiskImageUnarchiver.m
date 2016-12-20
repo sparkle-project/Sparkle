@@ -90,6 +90,8 @@
             
             [task launch];
             
+            [self notifyProgress:0.125];
+
             [inputPipe.fileHandleForWriting writeData:promptData];
             [inputPipe.fileHandleForWriting closeFile];
             
@@ -103,6 +105,8 @@
         {
             goto reportError;
         }
+
+        [self notifyProgress:0.5];
 
 		if (taskResult != 0)
 		{
@@ -121,6 +125,9 @@
             goto reportError;
         }
 
+        double itemsCopied = 0;
+        double totalItems = [contents count];
+
 		for (NSString *item in contents)
 		{
             NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
@@ -131,6 +138,8 @@
                 continue;
             }
 
+            itemsCopied += 1.0;
+            [self notifyProgress:0.5 + itemsCopied/(totalItems*2.0)];
             SULog(@"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
 
 			if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
