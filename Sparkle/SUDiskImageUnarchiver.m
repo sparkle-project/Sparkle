@@ -45,16 +45,8 @@
         NSFileManager *manager;
         NSError *error;
         NSArray *contents;
-        // We have to declare these before a goto to prevent an error under ARC.
-        // No, we cannot have them in the dispatch_async calls, as the goto "jump enters
-        // lifetime of block which strongly captures a variable"
-        dispatch_block_t delegateFailure = ^{
-            [self notifyDelegateOfFailure];
-        };
-        dispatch_block_t delegateSuccess = ^{
-            [self notifyDelegateOfSuccess];
-        };
-		do
+
+        do
 		{
             // Using NSUUID would make creating UUIDs be done in Cocoa,
             // and thus managed under ARC. Sadly, the class is in 10.8 and later.
@@ -156,11 +148,11 @@
             }
         }
 
-        dispatch_async(dispatch_get_main_queue(), delegateSuccess);
+        [self notifyDelegateOfSuccess];
         goto finally;
 
     reportError:
-        dispatch_async(dispatch_get_main_queue(), delegateFailure);
+        [self notifyDelegateOfFailure];
 
     finally:
         if (mountedSuccessfully) {

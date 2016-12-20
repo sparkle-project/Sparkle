@@ -104,9 +104,7 @@
             
             if ([task terminationStatus] == 0) {
                 if (bytesRead == expectedLength) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self notifyDelegateOfSuccess];
-                    });
+                    [self notifyDelegateOfSuccess];
                     return;
                 } else {
                     SULog(@"Extraction failed, command '%@' got only %ld of %ld bytes", command, (long)bytesRead, (long)expectedLength);
@@ -118,9 +116,7 @@
             SULog(@"Extraction failed, archive '%@' is empty", self.archivePath);
         }
 
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self notifyDelegateOfFailure];
-        });
+        [self notifyDelegateOfFailure];
     }
 }
 

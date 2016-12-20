@@ -71,16 +71,11 @@
         BOOL success = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO, &applyDiffError);
         if (success) {
             [[self class] updateSpotlightImportersAtBundlePath:targetPath];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self notifyDelegateOfSuccess];
-            });
+            [self notifyDelegateOfSuccess];
         }
         else {
             SULog(@"Applying delta patch failed with error: %@", applyDiffError);
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self notifyDelegateOfFailure];
-            });
+            [self notifyDelegateOfFailure];
         }
     }
 }

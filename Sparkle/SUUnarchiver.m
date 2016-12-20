@@ -69,16 +69,20 @@
 
 - (void)notifyDelegateOfSuccess
 {
-    if ([self.delegate respondsToSelector:@selector(unarchiverDidFinish:)]) {
-        [self.delegate unarchiverDidFinish:self];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([self.delegate respondsToSelector:@selector(unarchiverDidFinish:)]) {
+            [self.delegate unarchiverDidFinish:self];
+        }
+    });
 }
 
 - (void)notifyDelegateOfFailure
 {
-    if ([self.delegate respondsToSelector:@selector(unarchiverDidFail:)]) {
-        [self.delegate unarchiverDidFail:self];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([self.delegate respondsToSelector:@selector(unarchiverDidFail:)]) {
+            [self.delegate unarchiverDidFail:self];
+        }
+    });
 }
 
 static NSMutableArray *gUnarchiverImplementations;
