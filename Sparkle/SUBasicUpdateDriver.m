@@ -342,8 +342,8 @@
                 return;
             }
 
-            assert(self.updateItem);
-            [self installWithToolAndRelaunch:YES];
+            // This will call any of the subclass' implementation of -unarchiverDidFinish first
+            [self unarchiverDidFinish];
         } progressBlock:nil];
     }
 }
