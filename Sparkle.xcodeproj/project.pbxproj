@@ -907,6 +907,8 @@
 		722194521D3BFEB7004C34FF /* SUInstallerAgentInitiationProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SUInstallerAgentInitiationProtocol.h; path = Sparkle/InstallerProgress/SUInstallerAgentInitiationProtocol.h; sourceTree = SOURCE_ROOT; };
 		7223E7611AD1AEFF008E3161 /* sais.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sais.c; sourceTree = "<group>"; };
 		7223E7621AD1AEFF008E3161 /* sais.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sais.h; sourceTree = "<group>"; };
+		722589B51E0A24B9005EA0B9 /* Security.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Security.md; sourceTree = "<group>"; };
+		722589B61E0A24C6005EA0B9 /* Design Practices.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "Design Practices.md"; sourceTree = "<group>"; };
 		7229E1B51C97C91100CB50D0 /* SPUUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUUpdateDriver.h; sourceTree = "<group>"; };
 		7229E1B71C97CC4D00CB50D0 /* SPUScheduledUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUScheduledUpdateDriver.h; sourceTree = "<group>"; };
 		7229E1B81C97CC4D00CB50D0 /* SPUScheduledUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUScheduledUpdateDriver.m; sourceTree = "<group>"; };
@@ -1714,6 +1716,8 @@
 			isa = PBXGroup;
 			children = (
 				721D8A881D4D272E0032E472 /* Installation.md */,
+				722589B51E0A24B9005EA0B9 /* Security.md */,
+				722589B61E0A24C6005EA0B9 /* Design Practices.md */,
 			);
 			name = Internal;
 			sourceTree = "<group>";
