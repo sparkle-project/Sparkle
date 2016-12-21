@@ -11,11 +11,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol SUUnarchiverProtocol;
-@protocol SUUnarchiverDelegate;
 
 @interface SUUnarchiver : NSObject
 
-+ (nullable id <SUUnarchiverProtocol>)unarchiverForPath:(NSString *)path updatingHostBundlePath:(nullable NSString *)hostPath decryptionPassword:(nullable NSString *)decryptionPassword delegate:(nullable id <SUUnarchiverDelegate>)delegate;
++ (nullable id <SUUnarchiverProtocol>)unarchiverForPath:(NSString *)path updatingHostBundlePath:(nullable NSString *)hostPath decryptionPassword:(nullable NSString *)decryptionPassword;
 
 @end
 

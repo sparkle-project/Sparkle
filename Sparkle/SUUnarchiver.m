@@ -14,19 +14,18 @@
 
 @implementation SUUnarchiver
 
-+ (nullable id <SUUnarchiverProtocol>)unarchiverForPath:(NSString *)path updatingHostBundlePath:(nullable NSString *)hostPath decryptionPassword:(nullable NSString *)decryptionPassword delegate:(nullable id <SUUnarchiverDelegate>)delegate
++ (nullable id <SUUnarchiverProtocol>)unarchiverForPath:(NSString *)path updatingHostBundlePath:(nullable NSString *)hostPath decryptionPassword:(nullable NSString *)decryptionPassword
 {
     if ([SUPipedUnarchiver canUnarchivePath:path]) {
-        return [[SUPipedUnarchiver alloc] initWithArchivePath:path delegate:delegate];
+        return [[SUPipedUnarchiver alloc] initWithArchivePath:path];
         
     } else if ([SUDiskImageUnarchiver canUnarchivePath:path]) {
-        return [[SUDiskImageUnarchiver alloc] initWithArchivePath:path decryptionPassword:decryptionPassword delegate:delegate];
+        return [[SUDiskImageUnarchiver alloc] initWithArchivePath:path decryptionPassword:decryptionPassword];
         
     } else if ([SUBinaryDeltaUnarchiver canUnarchivePath:path]) {
         assert(hostPath != nil);
         NSString *nonNullHostPath = hostPath;
-        return [[SUBinaryDeltaUnarchiver alloc] initWithArchivePath:path updateHostBundlePath:nonNullHostPath delegate:delegate];
-        
+        return [[SUBinaryDeltaUnarchiver alloc] initWithArchivePath:path updateHostBundlePath:nonNullHostPath];
     }
     return nil;
 }

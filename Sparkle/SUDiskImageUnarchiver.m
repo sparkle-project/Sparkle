@@ -7,13 +7,13 @@
 //
 
 #import "SUDiskImageUnarchiver.h"
+#import "SUUnarchiverNotifier.h"
 #import "SULog.h"
 
 @interface SUDiskImageUnarchiver ()
 
 @property (nonatomic, copy, readonly) NSString *archivePath;
 @property (nullable, nonatomic, copy, readonly) NSString *decryptionPassword;
-@property (nonatomic, weak, readonly) id <SUUnarchiverDelegate> delegate;
 
 @end
 
@@ -21,7 +21,6 @@
 
 @synthesize archivePath = _archivePath;
 @synthesize decryptionPassword = _decryptionPassword;
-@synthesize delegate = _delegate;
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
@@ -33,21 +32,28 @@
     return NO;
 }
 
-- (instancetype)initWithArchivePath:(NSString *)archivePath decryptionPassword:(nullable NSString *)decryptionPassword delegate:(nullable id <SUUnarchiverDelegate>)delegate
+- (instancetype)initWithArchivePath:(NSString *)archivePath decryptionPassword:(nullable NSString *)decryptionPassword
 {
     self = [super init];
     if (self != nil) {
         _archivePath = [archivePath copy];
         _decryptionPassword = [decryptionPassword copy];
-        _delegate = delegate;
     }
     return self;
 }
 
-// Called on a non-main thread.
-- (void)extractDMG
+- (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock
 {
-    @autoreleasepool {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        SUUnarchiverNotifier *notifier = [[SUUnarchiverNotifier alloc] initWithCompletionBlock:completionBlock progressBlock:progressBlock];
+        [self extractDMGWithNotifier:notifier];
+    });
+}
+
+// Called on a non-main thread.
+- (void)extractDMGWithNotifier:(SUUnarchiverNotifier *)notifier
+{
+	@autoreleasepool {
         BOOL mountedSuccessfully = NO;
         
         // get a unique mount point path
@@ -55,17 +61,8 @@
         NSFileManager *manager;
         NSError *error;
         NSArray *contents;
-        // We have to declare these before a goto to prevent an error under ARC.
-        // No, we cannot have them in the dispatch_async calls, as the goto "jump enters
-        // lifetime of block which strongly captures a variable"
-        dispatch_block_t delegateFailure = ^{
-            [self.delegate unarchiverDidFail];
-        };
-        dispatch_block_t delegateSuccess = ^{
-            [self.delegate unarchiverDidFinish];
-        };
         do
-        {
+		{
             // Using NSUUID would make creating UUIDs be done in Cocoa,
             // and thus managed under ARC. Sadly, the class is in 10.8 and later.
             CFUUIDRef uuid = CFUUIDCreate(NULL);
@@ -117,6 +114,8 @@
             
             [task launch];
             
+            [notifier notifyProgress:0.125];
+
             [inputPipe.fileHandleForWriting writeData:promptData];
             [inputPipe.fileHandleForWriting closeFile];
             
@@ -131,8 +130,10 @@
             goto reportError;
         }
         
-        if (taskResult != 0)
-        {
+        [notifier notifyProgress:0.5];
+
+		if (taskResult != 0)
+		{
             NSString *resultStr = output ? [[NSString alloc] initWithData:output encoding:NSUTF8StringEncoding] : nil;
             SULog(@"hdiutil failed with code: %ld data: <<%@>>", (long)taskResult, resultStr);
             goto reportError;
@@ -147,9 +148,12 @@
             SULog(@"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
             goto reportError;
         }
-        
-        for (NSString *item in contents)
-        {
+
+        double itemsCopied = 0;
+        double totalItems = [contents count];
+
+		for (NSString *item in contents)
+		{
             NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
             NSString *toPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:item];
             
@@ -158,21 +162,22 @@
                 continue;
             }
             
+            itemsCopied += 1.0;
+            [notifier notifyProgress:0.5 + itemsCopied/(totalItems*2.0)];
             SULog(@"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
-            
-            if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
-            {
-                SULog(@"Couldn't copy item: %@ : %@", error, error.userInfo ? error.userInfo : @"");
+
+			if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
+			{
                 goto reportError;
             }
         }
         
-        dispatch_async(dispatch_get_main_queue(), delegateSuccess);
+        [notifier notifySuccess];
         goto finally;
         
     reportError:
-        dispatch_async(dispatch_get_main_queue(), delegateFailure);
-        
+        [notifier notifyFailureWithError:error];
+
     finally:
         if (mountedSuccessfully) {
             NSTask *task = [[NSTask alloc] init];
@@ -191,13 +196,6 @@
             SULog(@"Can't mount DMG %@", self.archivePath);
         }
     }
-}
-
-- (void)start
-{
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self extractDMG];
-    });
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], self.archivePath]; }

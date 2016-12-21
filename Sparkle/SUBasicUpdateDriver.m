@@ -316,7 +316,7 @@
 
 - (void)extractUpdate
 {
-    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.updater.decryptionPassword delegate:self];
+    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.updater.decryptionPassword];
     
     BOOL success;
     if (!unarchiver) {
@@ -333,9 +333,18 @@
     }
     
     if (!success) {
-        [self unarchiverDidFail];
+#warning this is bad
+        [self unarchiverDidFail:nil];
     } else {
-        [unarchiver start];
+        [unarchiver unarchiveWithCompletionBlock:^(NSError *err){
+            if (err) {
+                [self unarchiverDidFail:err];
+                return;
+            }
+
+            assert(self.updateItem);
+            [self installWithToolAndRelaunch:YES];
+        } progressBlock:nil];
     }
 }
 
@@ -355,7 +364,7 @@
     [self installWithToolAndRelaunch:YES];
 }
 
-- (void)unarchiverDidFail
+- (void)unarchiverDidFail:(NSError *)err
 {
     // No longer needed
     self.updateValidator = nil;
@@ -365,7 +374,7 @@
         return;
     }
 
-    [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) }]];
+    [self abortUpdateWithError:err];
 }
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch
