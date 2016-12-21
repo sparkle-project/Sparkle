@@ -21,6 +21,11 @@
     return [[path pathExtension] isEqualToString:@"delta"];
 }
 
++ (BOOL)unsafeIfArchiveIsNotValidated
+{
+    return YES;
+}
+
 // According to https://developer.apple.com/library/mac/documentation/Carbon/Conceptual/MDImporters/Concepts/Troubleshooting.html
 // We should make sure mdimporter bundles have an up to date time in the event they were delta updated.
 // We used to invoke mdimport on the bundle but this is not a very good approach.

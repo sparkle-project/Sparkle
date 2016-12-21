@@ -55,6 +55,11 @@
     return NO;
 }
 
++ (BOOL)unsafeIfArchiveIsNotValidated
+{
+    return NO;
+}
+
 - (void)notifyDelegateOfProgress:(double)progress
 {
     if ([self.delegate respondsToSelector:@selector(unarchiver:extractedProgress:)]) {
