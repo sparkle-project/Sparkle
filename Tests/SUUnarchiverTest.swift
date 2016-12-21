@@ -13,8 +13,7 @@ class SUUnarchiverTest: XCTestCase
     var password: String? = nil
     var unarchivedSuccessExpectation: XCTestExpectation? = nil
     
-    func unarchiveTestAppWithExtension(_ archiveExtension: String)
-    {
+    func unarchiveTestAppWithExtension(_ archiveExtension: String) {
         let appName = "SparkleTestCodeSignApp"
         let archiveResourceURL = Bundle(for: type(of: self)).url(forResource: appName, withExtension: archiveExtension)!
         
@@ -29,21 +28,28 @@ class SUUnarchiverTest: XCTestCase
 
         let tempArchiveURL = tempDirectoryURL.appendingPathComponent(archiveResourceURL.lastPathComponent)
         let extractedAppURL = tempDirectoryURL.appendingPathComponent(appName).appendingPathExtension("app")
+
+        self.unarchiveTestSuccessAppWithExtension(archiveExtension, appName: appName, tempDirectoryURL: tempDirectoryURL, tempArchiveURL: tempArchiveURL, archiveResourceURL: archiveResourceURL);
+        
+        super.waitForExpectations(timeout: 7.0, handler: nil)
+
+        XCTAssertTrue(fileManager.fileExists(atPath: extractedAppURL.path))
+        
+        XCTAssertEqual("6a60ab31430cfca8fb499a884f4a29f73e59b472", hashOfTree(extractedAppURL.path))
+    }
+        
+    func unarchiveTestSuccessAppWithExtension(_ archiveExtension: String, appName: String, tempDirectoryURL: URL, tempArchiveURL: URL, archiveResourceURL: URL) {
+        
+        let fileManager = FileManager.default
         
         try! fileManager.copyItem(at: archiveResourceURL, to: tempArchiveURL)
-        
+
         let unarchiver = SUUnarchiver(forPath: tempArchiveURL.path, updatingHostBundlePath: nil, withPassword: self.password)!
 
         unarchiver.unarchive(completionBlock: {(error: Error?) -> Void in
             XCTAssertNil(error);
             self.unarchivedSuccessExpectation!.fulfill()
         }, progressBlock:{(progress: Double) -> Void in });
-        
-        super.waitForExpectations(timeout: 7.0, handler: nil)
-        
-        XCTAssertTrue(fileManager.fileExists(atPath: extractedAppURL.path))
-        
-        XCTAssertEqual("6a60ab31430cfca8fb499a884f4a29f73e59b472", hashOfTree(extractedAppURL.path))
     }
 
     func testUnarchivingZip()
