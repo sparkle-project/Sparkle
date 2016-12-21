@@ -80,7 +80,7 @@
     });
 }
 
-- (void)unarchiverDidFail:(NSError *)reason
+- (void)unarchiverDidFailWithError:(NSError *)reason
 {
     NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithObject:SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) forKey:NSLocalizedDescriptionKey];
     if (reason) {
