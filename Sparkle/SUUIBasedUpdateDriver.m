@@ -225,7 +225,7 @@
     [self.statusController setProgressValue:progress];
 }
 
-- (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
+- (void)unarchiverDidFinish
 {
     if (self.automaticallyInstallUpdates) {
         [self installWithToolAndRelaunch:YES];

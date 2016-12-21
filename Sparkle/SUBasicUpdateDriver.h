@@ -13,6 +13,7 @@
 #import "SUUpdateDriver.h"
 #import "SUUnarchiver.h"
 #import "SUAppcast.h"
+#import "SUUnarchiverProtocol.h"
 
 @class SUAppcastItem, SUHost;
 @interface SUBasicUpdateDriver : SUUpdateDriver <NSURLDownloadDelegate, SUUnarchiverDelegate>
@@ -37,8 +38,8 @@
 - (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error;
 
 - (void)extractUpdate;
-- (void)unarchiverDidFinish:(SUUnarchiver *)ua;
-- (void)unarchiverDidFail:(SUUnarchiver *)ua;
+- (void)unarchiverDidFinish;
+- (void)unarchiverDidFail;
 - (void)failedToApplyDeltaUpdate;
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch;

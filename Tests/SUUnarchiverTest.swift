@@ -18,13 +18,13 @@ class SUUnarchiverTest: XCTestCase, SUUnarchiverDelegate
     {
     }
     
-    func unarchiverDidFail(_ unarchiver: SUUnarchiver!)
+    func unarchiverDidFail()
     {
         self.unarchivedResult = false
         self.unarchivedExpectation!.fulfill()
     }
     
-    func unarchiverDidFinish(_ unarchiver: SUUnarchiver!)
+    func unarchiverDidFinish()
     {
         self.unarchivedResult = true
         self.unarchivedExpectation!.fulfill()
@@ -49,10 +49,8 @@ class SUUnarchiverTest: XCTestCase, SUUnarchiverDelegate
         
         self.unarchivedExpectation = super.expectation(description: "Unarchived Application (format: \(archiveExtension))")
         
-        let unarchiver = SUUnarchiver(forPath: tempArchiveURL.path, updatingHostBundlePath: nil, withPassword: self.password)
-
-        unarchiver?.delegate = self
-        unarchiver?.start()
+        let unarchiver = SUUnarchiver.unarchiver(forPath: tempArchiveURL.path, updatingHostBundlePath: nil, decryptionPassword: self.password, delegate: self)
+        unarchiver!.start()
         
         super.waitForExpectations(timeout: 7.0, handler: nil)
         

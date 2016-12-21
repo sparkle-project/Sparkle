@@ -6,15 +6,25 @@
 //  Copyright 2009 Mark Rowe. All rights reserved.
 //
 
-#import "SUBinaryDeltaCommon.h"
 #import "SUBinaryDeltaUnarchiver.h"
+#import "SUBinaryDeltaCommon.h"
 #import "SUBinaryDeltaApply.h"
-#import "SUUnarchiver_Private.h"
-#import "SUFileManager.h"
-#import "SUHost.h"
 #import "SULog.h"
+#import "SUFileManager.h"
+
+@interface SUBinaryDeltaUnarchiver ()
+
+@property (nonatomic, copy, readonly) NSString *archivePath;
+@property (nonatomic, copy, readonly) NSString *updateHostBundlePath;
+@property (nonatomic, weak, readonly) id <SUUnarchiverDelegate> delegate;
+
+@end
 
 @implementation SUBinaryDeltaUnarchiver
+
+@synthesize archivePath = _archivePath;
+@synthesize updateHostBundlePath = _updateHostBundlePath;
+@synthesize delegate = _delegate;
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
@@ -61,40 +71,44 @@
     }
 }
 
-- (void)applyBinaryDelta
+- (instancetype)initWithArchivePath:(NSString *)archivePath updateHostBundlePath:(NSString *)updateHostBundlePath delegate:(id <SUUnarchiverDelegate>)delegate
 {
-    @autoreleasepool {
-        NSString *sourcePath = self.updateHostBundlePath;
-        NSString *targetPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
-
-        NSError *applyDiffError = nil;
-        BOOL success = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO, &applyDiffError);
-        if (success) {
-            [[self class] updateSpotlightImportersAtBundlePath:targetPath];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self notifyDelegateOfSuccess];
-            });
-        }
-        else {
-            SULog(@"Applying delta patch failed with error: %@", applyDiffError);
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self notifyDelegateOfFailure];
-            });
-        }
+    self = [super init];
+    if (self != nil) {
+        _archivePath = [archivePath copy];
+        _updateHostBundlePath = [updateHostBundlePath copy];
+        _delegate = delegate;
     }
+    return self;
 }
 
 - (void)start
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self applyBinaryDelta];
+        @autoreleasepool {
+            NSString *sourcePath = self.updateHostBundlePath;
+            NSString *targetPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
+            
+            NSError *applyDiffError = nil;
+            BOOL success = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO, &applyDiffError);
+            
+            if (success) {
+                [[self class] updateSpotlightImportersAtBundlePath:targetPath];
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self.delegate unarchiverDidFinish];
+                });
+            }
+            else {
+                SULog(@"Applying delta patch failed with error: %@", applyDiffError);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self.delegate unarchiverDidFail];
+                });
+            }
+        }
     });
 }
 
-+ (void)load
-{
-    [self registerImplementation:self];
-}
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], self.archivePath]; }
 
 @end

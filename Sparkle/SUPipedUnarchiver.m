@@ -7,38 +7,56 @@
 //
 
 #import "SUPipedUnarchiver.h"
-#import "SUUnarchiver_Private.h"
 #import "SULog.h"
 
+@interface SUPipedUnarchiver ()
+
+@property (nonatomic, copy, readonly) NSString *archivePath;
+@property (nonatomic, weak, readonly) id <SUUnarchiverDelegate> delegate;
+
+@end
 
 @implementation SUPipedUnarchiver
 
-+ (SEL)selectorConformingToTypeOfPath:(NSString *)path
+@synthesize archivePath = _archivePath;
+@synthesize delegate = _delegate;
+
++ (nullable NSArray <NSString *> *)commandAndArgumentsConformingToTypeOfPath:(NSString *)path
 {
-    static NSDictionary *typeSelectorDictionary;
-    if (!typeSelectorDictionary)
-        typeSelectorDictionary = @{ @".zip": @"extractZIP",
-                                    @".tar": @"extractTAR",
-                                    @".tar.gz": @"extractTGZ",
-                                    @".tgz": @"extractTGZ",
-                                    @".tar.bz2": @"extractTBZ",
-                                    @".tbz": @"extractTBZ",
-                                    @".tar.xz": @"extractTXZ",
-                                    @".txz": @"extractTXZ",
-                                    @".tar.lzma": @"extractTXZ"};
-
+    NSArray <NSString *> *extractTGZ = @[@"/usr/bin/tar", @"-zxC"];
+    NSArray <NSString *> *extractTBZ = @[@"/usr/bin/tar", @"-jxC"];
+    NSArray <NSString *> *extractTXZ = extractTGZ;
+    
+    NSDictionary <NSString *, NSArray<NSString *> *> *extractCommandDictionary =
+    @{
+      @".zip" : @[@"/usr/bin/ditto", @"-x",@"-k",@"-"],
+      @".tar" : @[@"/usr/bin/tar", @"-xC"],
+      @".tar.gz" : extractTGZ,
+      @".tgz" : extractTGZ,
+      @".tar.bz2" : extractTBZ,
+      @".tbz" : extractTBZ,
+      @".tar.xz" : extractTXZ,
+      @".txz" : extractTXZ,
+      @".tar.lzma" : extractTXZ
+      };
+    
     NSString *lastPathComponent = [path lastPathComponent];
-	for (NSString *currentType in typeSelectorDictionary)
-	{
-        NSString *value = [typeSelectorDictionary objectForKey:currentType];
-        assert(value);
-
-		if ([currentType length] > [lastPathComponent length]) continue;
+    for (NSString *currentType in extractCommandDictionary)
+    {
+        NSArray<NSString *> *value = [extractCommandDictionary objectForKey:currentType];
+        assert(value != nil);
+        
+        if ([currentType length] > [lastPathComponent length]) continue;
         if ([[lastPathComponent substringFromIndex:[lastPathComponent length] - [currentType length]] isEqualToString:currentType]) {
-            return NSSelectorFromString(value);
+            return value;
         }
     }
-    return NULL;
+    return nil;
+}
+
++ (BOOL)canUnarchivePath:(NSString *)path
+{
+    return ([self commandAndArgumentsConformingToTypeOfPath:path] != nil);
 }
 
 + (BOOL)unsafeIfArchiveIsNotValidated
@@ -46,35 +64,50 @@
     return NO;
 }
 
-- (void)start
+- (instancetype)initWithArchivePath:(NSString *)archivePath delegate:(nullable id <SUUnarchiverDelegate>)delegate
 {
-    [NSThread detachNewThreadSelector:[[self class] selectorConformingToTypeOfPath:self.archivePath] toTarget:self withObject:nil];
+    self = [super init];
+    if (self != nil) {
+        _archivePath = [archivePath copy];
+        _delegate = delegate;
+    }
+    return self;
 }
 
-+ (BOOL)canUnarchivePath:(NSString *)path
+- (void)start
 {
-    return ([self selectorConformingToTypeOfPath:path] != nil);
+    NSArray <NSString *> *commandAndArguments = [[self class] commandAndArgumentsConformingToTypeOfPath:self.archivePath];
+    assert(commandAndArguments != nil);
+    
+    NSString *command = commandAndArguments.firstObject;
+    assert(command != nil);
+    
+    NSArray <NSString *> *arguments = [commandAndArguments subarrayWithRange:NSMakeRange(1, commandAndArguments.count - 1)];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [self extractArchivePipingDataToCommand:command arguments:arguments];
+    });
 }
 
 // This method abstracts the types that use a command line tool piping data from stdin.
-- (void)extractArchivePipingDataToCommand:(NSString *)command args:(NSArray*)args
+- (void)extractArchivePipingDataToCommand:(NSString *)command arguments:(NSArray*)args
 {
     // *** GETS CALLED ON NON-MAIN THREAD!!!
-	@autoreleasepool {
-
+    @autoreleasepool {
+        
         NSString *destination = [self.archivePath stringByDeletingLastPathComponent];
         
         SULog(@"Extracting using '%@' '%@' < '%@' '%@'", command, [args componentsJoinedByString:@"' '"], self.archivePath, destination);
-
+        
         // Get the file size.
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.archivePath error:nil];
         NSUInteger expectedLength = [[attributes objectForKey:NSFileSize] unsignedIntegerValue];
         if (expectedLength > 0) {
             NSFileHandle *archiveInput = [NSFileHandle fileHandleForReadingAtPath:self.archivePath];
-
+            
             NSPipe *pipe = [NSPipe pipe];
             NSFileHandle *archiveOutput = [pipe fileHandleForWriting];
-
+            
             NSTask *task = [[NSTask alloc] init];
             [task setStandardInput:[pipe fileHandleForReading]];
             [task setStandardError:[NSFileHandle fileHandleWithStandardError]];
@@ -82,7 +115,7 @@
             [task setLaunchPath:command];
             [task setArguments:[args arrayByAddingObject:destination]];
             [task launch];
-
+            
             NSUInteger bytesRead = 0;
             do {
                 NSData *data = [archiveInput readDataOfLength:256*1024];
@@ -93,19 +126,21 @@
                 bytesRead += len;
                 [archiveOutput writeData:data];
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [self notifyDelegateOfProgress:(double)bytesRead / (double)expectedLength];
+                    if ([self.delegate respondsToSelector:@selector(unarchiverExtractedProgress:)]) {
+                        [self.delegate unarchiverExtractedProgress:(double)bytesRead / (double)expectedLength];
+                    }
                 });
             }
             while(bytesRead < expectedLength);
             
             [archiveOutput closeFile];
-
+            
             [task waitUntilExit];
             
             if ([task terminationStatus] == 0) {
                 if (bytesRead == expectedLength) {
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        [self notifyDelegateOfSuccess];
+                        [self.delegate unarchiverDidFinish];
                     });
                     return;
                 } else {
@@ -117,51 +152,13 @@
         } else {
             SULog(@"Extraction failed, archive '%@' is empty", self.archivePath);
         }
-
+        
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self notifyDelegateOfFailure];
+            [self.delegate unarchiverDidFail];
         });
     }
 }
 
-- (void)extractTAR
-{
-    // *** GETS CALLED ON NON-MAIN THREAD!!!
-
-    [self extractArchivePipingDataToCommand:@"/usr/bin/tar" args:@[@"-xC"]];
-}
-
-- (void)extractTGZ
-{
-    // *** GETS CALLED ON NON-MAIN THREAD!!!
-
-    [self extractArchivePipingDataToCommand:@"/usr/bin/tar" args:@[@"-zxC"]];
-}
-
-- (void)extractTBZ
-{
-    // *** GETS CALLED ON NON-MAIN THREAD!!!
-
-    [self extractArchivePipingDataToCommand:@"/usr/bin/tar" args:@[@"-jxC"]];
-}
-
-- (void)extractZIP
-{
-    // *** GETS CALLED ON NON-MAIN THREAD!!!
-
-    [self extractArchivePipingDataToCommand:@"/usr/bin/ditto" args:@[@"-x",@"-k",@"-"]];
-}
-
-- (void)extractTXZ
-{
-    // *** GETS CALLED ON NON-MAIN THREAD!!!
-
-    [self extractArchivePipingDataToCommand:@"/usr/bin/tar" args:@[@"-zxC"]];
-}
-
-+ (void)load
-{
-    [self registerImplementation:self];
-}
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], self.archivePath]; }
 
 @end

@@ -316,7 +316,7 @@
 
 - (void)extractUpdate
 {
-    SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:self.host.bundlePath withPassword:self.updater.decryptionPassword];
+    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.updater.decryptionPassword delegate:self];
     
     BOOL success;
     if (!unarchiver) {
@@ -333,9 +333,8 @@
     }
     
     if (!success) {
-        [self unarchiverDidFail:nil];
+        [self unarchiverDidFail];
     } else {
-        unarchiver.delegate = self;
         [unarchiver start];
     }
 }
@@ -349,14 +348,14 @@
     [self downloadUpdate];
 }
 
-- (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
+- (void)unarchiverDidFinish
 {
     assert(self.updateItem);
 
     [self installWithToolAndRelaunch:YES];
 }
 
-- (void)unarchiverDidFail:(SUUnarchiver *)__unused ua
+- (void)unarchiverDidFail
 {
     // No longer needed
     self.updateValidator = nil;

@@ -12,6 +12,7 @@
 #import <Cocoa/Cocoa.h>
 #import "SUBasicUpdateDriver.h"
 #import "SUAutomaticUpdateAlert.h"
+#import "SUUnarchiverProtocol.h"
 
 @interface SUAutomaticUpdateDriver : SUBasicUpdateDriver <SUUnarchiverDelegate>
 
