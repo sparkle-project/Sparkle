@@ -200,7 +200,7 @@
         
         if ([self.comparator compareVersion:self.host.version toVersion:[bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]] == NSOrderedDescending) {
             if (error != NULL) {
-                NSString *errorMessage = [NSString stringWithFormat:@"Sparkle Updater: Possible attack in progress! Attempting to \"upgrade\" from %@ to %@. Aborting update.", self.host.version, [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
+                NSString *errorMessage = [NSString stringWithFormat:@"For security reasons, updates that downgrade version of the application are not allowed. Refusing to downgrade app from version %@ to %@. Aborting update.", [self.host version], [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
                 
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
             }
