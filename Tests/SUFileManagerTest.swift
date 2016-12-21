@@ -12,30 +12,30 @@ class SUFileManagerTest: XCTestCase
 {
     func makeTempFiles(_ testBlock: (SUFileManager, URL, URL, URL, URL, URL, URL) -> Void)
     {
-        let fileManager = SUFileManager.default()
+        let fileManager = SUFileManager.default()!
         
-        let tempDirectoryURL = try! fileManager?.makeTemporaryDirectory(withPreferredName: "Sparkle Unit Test Data", appropriateForDirectoryURL: URL(fileURLWithPath: NSHomeDirectory()))
+        let tempDirectoryURL = (try! fileManager.makeTemporaryDirectory(withPreferredName: "Sparkle Unit Test Data", appropriateForDirectoryURL: URL(fileURLWithPath: NSHomeDirectory())))
         
         defer {
-            try! fileManager?.removeItem(at: tempDirectoryURL)
+            try! fileManager.removeItem(at: tempDirectoryURL)
         }
         
-        let ordinaryFileURL = tempDirectoryURL?.appendingPathComponent("a file written by sparkles unit tests")
-        try! "foo".data(using: String.Encoding.utf8)!.write(to: ordinaryFileURL!, options: .atomic)
+        let ordinaryFileURL = tempDirectoryURL.appendingPathComponent("a file written by sparkles unit tests")
+        try! "foo".data(using: String.Encoding.utf8)!.write(to: ordinaryFileURL, options: .atomic)
         
-        let directoryURL = tempDirectoryURL?.appendingPathComponent("a directory written by sparkles unit tests")
-        try! FileManager.default.createDirectory(at: directoryURL!, withIntermediateDirectories: false, attributes: nil)
+        let directoryURL = tempDirectoryURL.appendingPathComponent("a directory written by sparkles unit tests")
+        try! FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: false, attributes: nil)
         
-        let fileInDirectoryURL = directoryURL?.appendingPathComponent("a file inside a directory written by sparkles unit tests")
-        try! "bar baz".data(using: String.Encoding.utf8)!.write(to: fileInDirectoryURL!, options: .atomic)
+        let fileInDirectoryURL = directoryURL.appendingPathComponent("a file inside a directory written by sparkles unit tests")
+        try! "bar baz".data(using: String.Encoding.utf8)!.write(to: fileInDirectoryURL, options: .atomic)
         
-        let validSymlinkURL = tempDirectoryURL?.appendingPathComponent("symlink test")
-        try! FileManager.default.createSymbolicLink(at: validSymlinkURL!, withDestinationURL: directoryURL!)
+        let validSymlinkURL = tempDirectoryURL.appendingPathComponent("symlink test")
+        try! FileManager.default.createSymbolicLink(at: validSymlinkURL, withDestinationURL: directoryURL)
         
-        let invalidSymlinkURL = tempDirectoryURL?.appendingPathComponent("symlink test 2")
-        try! FileManager.default.createSymbolicLink(at: invalidSymlinkURL!, withDestinationURL: (tempDirectoryURL?.appendingPathComponent("does not exist"))!)
+        let invalidSymlinkURL = tempDirectoryURL.appendingPathComponent("symlink test 2")
+        try! FileManager.default.createSymbolicLink(at: invalidSymlinkURL, withDestinationURL: (tempDirectoryURL.appendingPathComponent("does not exist")))
         
-        testBlock(fileManager!, tempDirectoryURL!, ordinaryFileURL!, directoryURL!, fileInDirectoryURL!, validSymlinkURL!, invalidSymlinkURL!)
+        testBlock(fileManager, tempDirectoryURL, ordinaryFileURL, directoryURL, fileInDirectoryURL, validSymlinkURL, invalidSymlinkURL)
     }
     
     func testMoveFiles()
