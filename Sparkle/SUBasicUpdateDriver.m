@@ -333,8 +333,8 @@
     }
     
     if (!success) {
-#warning this is bad
-        [self unarchiverDidFail:nil];
+        NSError *reason = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{NSLocalizedDescriptionKey: @"Failed to extract update."}];
+        [self unarchiverDidFail:reason];
     } else {
         [unarchiver unarchiveWithCompletionBlock:^(NSError *err){
             if (err) {
