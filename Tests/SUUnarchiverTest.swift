@@ -12,6 +12,7 @@ class SUUnarchiverTest: XCTestCase
 {
     var password: String? = nil
     var unarchivedSuccessExpectation: XCTestExpectation? = nil
+    var unarchivedFailureExpectation: XCTestExpectation? = nil
     
     func unarchiveTestAppWithExtension(_ archiveExtension: String) {
         let appName = "SparkleTestCodeSignApp"
@@ -25,17 +26,29 @@ class SUUnarchiverTest: XCTestCase
         }
         
         self.unarchivedSuccessExpectation = super.expectation(description: "Unarchived Success (format: \(archiveExtension))")
+        self.unarchivedFailureExpectation = super.expectation(description: "Unarchived Failure (format: \(archiveExtension))")
 
         let tempArchiveURL = tempDirectoryURL.appendingPathComponent(archiveResourceURL.lastPathComponent)
         let extractedAppURL = tempDirectoryURL.appendingPathComponent(appName).appendingPathExtension("app")
 
         self.unarchiveTestSuccessAppWithExtension(archiveExtension, appName: appName, tempDirectoryURL: tempDirectoryURL, tempArchiveURL: tempArchiveURL, archiveResourceURL: archiveResourceURL);
+        self.unarchiveTestFailureAppWithExtension(archiveExtension, tempDirectoryURL: tempDirectoryURL);
         
         super.waitForExpectations(timeout: 7.0, handler: nil)
 
         XCTAssertTrue(fileManager.fileExists(atPath: extractedAppURL.path))
         
         XCTAssertEqual("6a60ab31430cfca8fb499a884f4a29f73e59b472", hashOfTree(extractedAppURL.path))
+    }
+
+    func unarchiveTestFailureAppWithExtension(_ archiveExtension: String, tempDirectoryURL: URL) {
+        let tempArchiveURL = tempDirectoryURL.appendingPathComponent("error-invalid").appendingPathExtension(archiveExtension);
+        let unarchiver = SUUnarchiver(forPath: tempArchiveURL.path, updatingHostBundlePath: nil, withPassword: self.password)!
+
+        unarchiver.unarchive(completionBlock: {(error: Error?) -> Void in
+            XCTAssertNotNil(error);
+            self.unarchivedFailureExpectation!.fulfill()
+        }, progressBlock:{(progress: Double) -> Void in });
     }
         
     func unarchiveTestSuccessAppWithExtension(_ archiveExtension: String, appName: String, tempDirectoryURL: URL, tempArchiveURL: URL, archiveResourceURL: URL) {
