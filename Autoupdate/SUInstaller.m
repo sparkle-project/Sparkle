@@ -32,7 +32,7 @@
     return aliasFlag.boolValue && directoryFlag.boolValue;
 }
 
-+ (NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr isGuided:(BOOL *)isGuidedPtr
++ (nullable NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr isGuided:(BOOL *)isGuidedPtr
 {
     SUParameterAssert(inUpdateFolder);
     SUParameterAssert(host);
