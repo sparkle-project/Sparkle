@@ -8,27 +8,11 @@
 
 import XCTest
 
-class SUUnarchiverTest: XCTestCase, SUUnarchiverDelegate
+class SUUnarchiverTest: XCTestCase
 {
     var password: String? = nil
     var unarchivedExpectation: XCTestExpectation? = nil
     var unarchivedResult: Bool = false
-    
-    func unarchiver(_ unarchiver: SUUnarchiver!, extractedProgress progress: Double)
-    {
-    }
-    
-    func unarchiverDidFail(_ unarchiver: SUUnarchiver!)
-    {
-        self.unarchivedResult = false
-        self.unarchivedExpectation!.fulfill()
-    }
-    
-    func unarchiverDidFinish(_ unarchiver: SUUnarchiver!)
-    {
-        self.unarchivedResult = true
-        self.unarchivedExpectation!.fulfill()
-    }
     
     func unarchiveTestAppWithExtension(_ archiveExtension: String)
     {
@@ -49,10 +33,12 @@ class SUUnarchiverTest: XCTestCase, SUUnarchiverDelegate
         
         self.unarchivedExpectation = super.expectation(description: "Unarchived Application (format: \(archiveExtension))")
         
-        let unarchiver = SUUnarchiver(forPath: tempArchiveURL.path, updatingHostBundlePath: nil, withPassword: self.password)
+        let unarchiver = SUUnarchiver(forPath: tempArchiveURL.path, updatingHostBundlePath: nil, withPassword: self.password)!
 
-        unarchiver?.delegate = self
-        unarchiver?.start()
+        unarchiver.unarchive(completionBlock: {(error: Error?) -> Void in
+            self.unarchivedResult = nil == error;
+            self.unarchivedExpectation!.fulfill()
+        }, progressBlock:{(progress: Double) -> Void in });
         
         super.waitForExpectations(timeout: 7.0, handler: nil)
         

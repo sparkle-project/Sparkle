@@ -13,7 +13,7 @@
 #import "SUBasicUpdateDriver.h"
 #import "SUAutomaticUpdateAlert.h"
 
-@interface SUAutomaticUpdateDriver : SUBasicUpdateDriver <SUUnarchiverDelegate>
+@interface SUAutomaticUpdateDriver : SUBasicUpdateDriver
 
 @end
 

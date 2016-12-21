@@ -18,9 +18,9 @@
 + (BOOL)canUnarchivePath:(NSString *)path;
 - (instancetype)initWithPath:(NSString *)archive hostBundlePath:(NSString *)host;
 
-- (void)notifyDelegateOfProgress:(double)progress;
-- (void)notifyDelegateOfSuccess;
-- (void)notifyDelegateOfFailure;
+- (void)notifyProgress:(double)progress;
+- (void)unarchiverDidFinish;
+- (void)unarchiverDidFailWithError:(NSError *)err;
 @end
 
 #endif
