@@ -216,7 +216,7 @@
     [super extractUpdate];
 }
 
-- (void)unarchiver:(SUUnarchiver *)__unused ua extractedProgress:(double)progress
+- (void)unarchiver:(id)__unused ua extractedProgress:(double)progress
 {
     // We do this here instead of in extractUpdate so that we only have a determinate progress bar for archives with progress.
 	if ([self.statusController maxProgressValue] == 0.0) {
@@ -225,7 +225,7 @@
     [self.statusController setProgressValue:progress];
 }
 
-- (void)unarchiverDidFinish
+- (void)unarchiverDidFinish:(id)__unused ua
 {
     if (self.automaticallyInstallUpdates) {
         [self installWithToolAndRelaunch:YES];

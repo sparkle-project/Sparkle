@@ -334,17 +334,18 @@
     
     if (!success) {
         NSError *reason = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{NSLocalizedDescriptionKey: @"Failed to extract update."}];
-        [self unarchiverDidFail:reason];
+        [self unarchiverDidFailWithError:reason];
     } else {
         [unarchiver unarchiveWithCompletionBlock:^(NSError *err){
             if (err) {
-                [self unarchiverDidFail:err];
+                [self unarchiverDidFailWithError:err];
                 return;
             }
-
-            // This will call any of the subclass' implementation of -unarchiverDidFinish first
-            [self unarchiverDidFinish];
-        } progressBlock:nil];
+            
+            [self unarchiverDidFinish:nil];
+        } progressBlock:^(double progress) {
+            [self unarchiver:nil extractedProgress:progress];
+        }];
     }
 }
 
@@ -357,14 +358,20 @@
     [self downloadUpdate];
 }
 
-- (void)unarchiverDidFinish
+// By default does nothing, can be overridden
+- (void)unarchiver:(id)__unused ua extractedProgress:(double)__unused progress
+{
+}
+
+// Note this method can be overridden (and is)
+- (void)unarchiverDidFinish:(id)__unused ua
 {
     assert(self.updateItem);
-
+    
     [self installWithToolAndRelaunch:YES];
 }
 
-- (void)unarchiverDidFail:(NSError *)err
+- (void)unarchiverDidFailWithError:(NSError *)err
 {
     // No longer needed
     self.updateValidator = nil;
@@ -373,7 +380,7 @@
         [self failedToApplyDeltaUpdate];
         return;
     }
-
+    
     [self abortUpdateWithError:err];
 }
 

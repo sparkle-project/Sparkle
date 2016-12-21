@@ -40,6 +40,10 @@
 - (void)extractUpdate;
 - (void)failedToApplyDeltaUpdate;
 
+// Needed to preserve compatibility to subclasses, even though our unarchiver code uses blocks now
+- (void)unarchiver:(id)ua extractedProgress:(double)progress;
+- (void)unarchiverDidFinish:(id)ua;
+
 - (void)installWithToolAndRelaunch:(BOOL)relaunch;
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI;
 - (void)installerForHost:(SUHost *)host failedWithError:(NSError *)error;
