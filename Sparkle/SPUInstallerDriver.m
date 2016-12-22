@@ -411,7 +411,7 @@
     }
     
     // Our driver (automatic or UI based) has a say if interaction is allowed as well
-    // An automatic driver may disallow interaction but the updater could try again later a UI based driver that does allow interaction
+    // An automatic driver may disallow interaction but the updater could try again later for a UI based driver that does allow interaction
     BOOL driverAllowsInteraction = !silently;
     
     NSString *hostBundlePath = self.host.bundle.bundlePath;
