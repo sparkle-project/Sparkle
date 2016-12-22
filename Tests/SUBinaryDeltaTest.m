@@ -69,7 +69,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     NSError *applyDiffError = nil;
     BOOL appliedDiff = NO;
     if (createdDiff) {
-        if (applyBinaryDelta(sourceDirectory, patchDirectory, diffFile, NO, &applyDiffError)) {
+        if (applyBinaryDelta(sourceDirectory, patchDirectory, diffFile, NO, ^(__unused double progress){}, &applyDiffError)) {
             appliedDiff = YES;
         } else {
             NSLog(@"Applying binary diff failed with error: %@", applyDiffError);

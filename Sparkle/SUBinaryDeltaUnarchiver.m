@@ -68,25 +68,22 @@
         NSString *targetPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
 
         NSError *applyDiffError = nil;
-        BOOL success = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO, &applyDiffError);
+        BOOL success = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO, ^(double progress){
+            [self notifyProgress:progress];
+        }, &applyDiffError);
         if (success) {
             [[self class] updateSpotlightImportersAtBundlePath:targetPath];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self notifyDelegateOfSuccess];
-            });
+            [self unarchiverDidFinish];
         }
         else {
-            SULog(@"Applying delta patch failed with error: %@", applyDiffError);
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self notifyDelegateOfFailure];
-            });
+            [self unarchiverDidFailWithError:applyDiffError];
         }
     }
 }
 
-- (void)start
+- (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))block progressBlock:(void (^ _Nullable)(double progress))progress
 {
+    [super unarchiveWithCompletionBlock:block progressBlock:progress];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         [self applyBinaryDelta];
     });

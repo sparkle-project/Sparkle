@@ -335,8 +335,17 @@
     if (!success) {
         [self unarchiverDidFail:nil];
     } else {
-        unarchiver.delegate = self;
-        [unarchiver start];
+        [unarchiver unarchiveWithCompletionBlock:^(NSError *err){
+            if (err) {
+                [self unarchiverDidFail:err];
+                return;
+            }
+
+            assert(self.updateItem);
+            [self installWithToolAndRelaunch:YES];
+        } progressBlock:^(__unused double progress){
+
+        }];
     }
 }
 
@@ -349,14 +358,7 @@
     [self downloadUpdate];
 }
 
-- (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
-{
-    assert(self.updateItem);
-
-    [self installWithToolAndRelaunch:YES];
-}
-
-- (void)unarchiverDidFail:(SUUnarchiver *)__unused ua
+- (void)unarchiverDidFail:(NSError *)err
 {
     // No longer needed
     self.updateValidator = nil;
@@ -366,7 +368,7 @@
         return;
     }
 
-    [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while extracting the archive. Please try again later.", nil) }]];
+    [self abortUpdateWithError:err];
 }
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch

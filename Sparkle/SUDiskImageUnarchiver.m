@@ -27,14 +27,6 @@
 - (void)extractDMG
 {
 	@autoreleasepool {
-        [self extractDMGWithPassword:nil];
-    }
-}
-
-// Called on a non-main thread.
-- (void)extractDMGWithPassword:(NSString *)__unused password
-{
-	@autoreleasepool {
         BOOL mountedSuccessfully = NO;
 
         SULog(@"Extracting %@ as a DMG", self.archivePath);
@@ -45,16 +37,8 @@
         NSFileManager *manager;
         NSError *error;
         NSArray *contents;
-        // We have to declare these before a goto to prevent an error under ARC.
-        // No, we cannot have them in the dispatch_async calls, as the goto "jump enters
-        // lifetime of block which strongly captures a variable"
-        dispatch_block_t delegateFailure = ^{
-            [self notifyDelegateOfFailure];
-        };
-        dispatch_block_t delegateSuccess = ^{
-            [self notifyDelegateOfSuccess];
-        };
-		do
+
+        do
 		{
             // Using NSUUID would make creating UUIDs be done in Cocoa,
             // and thus managed under ARC. Sadly, the class is in 10.8 and later.
@@ -106,6 +90,8 @@
             
             [task launch];
             
+            [self notifyProgress:0.125];
+
             [inputPipe.fileHandleForWriting writeData:promptData];
             [inputPipe.fileHandleForWriting closeFile];
             
@@ -119,6 +105,8 @@
         {
             goto reportError;
         }
+
+        [self notifyProgress:0.5];
 
 		if (taskResult != 0)
 		{
@@ -137,6 +125,9 @@
             goto reportError;
         }
 
+        double itemsCopied = 0;
+        double totalItems = [contents count];
+
 		for (NSString *item in contents)
 		{
             NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
@@ -147,20 +138,21 @@
                 continue;
             }
 
+            itemsCopied += 1.0;
+            [self notifyProgress:0.5 + itemsCopied/(totalItems*2.0)];
             SULog(@"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
 
 			if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
 			{
-                SULog(@"Couldn't copy item: %@ : %@", error, error.userInfo ? error.userInfo : @"");
                 goto reportError;
             }
         }
 
-        dispatch_async(dispatch_get_main_queue(), delegateSuccess);
+        [self unarchiverDidFinish];
         goto finally;
 
     reportError:
-        dispatch_async(dispatch_get_main_queue(), delegateFailure);
+        [self unarchiverDidFailWithError:error];
 
     finally:
         if (mountedSuccessfully) {
@@ -176,8 +168,9 @@
     }
 }
 
-- (void)start
+- (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))block progressBlock:(void (^ _Nullable)(double progress))progress
 {
+    [super unarchiveWithCompletionBlock:block progressBlock:progress];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		[self extractDMG];
     });
