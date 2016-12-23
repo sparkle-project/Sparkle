@@ -106,9 +106,8 @@
             return [SPUInstallerValidation validateBundleUpdateForHost:host newBundleURL:installSourceURL archivePath:downloadPath DSASignature:DSASignature];
         }
     } else if (isPackage) {
-        // We shouldn't get here because we don't validate packages before extracting them currently
-        SULog(@"Error: not expecting to find package after being required to validate update before extraction");
-        return NO;
+        // We already prevalidated the package and nothing else needs to be done
+        return YES;
     } else {
         // Because we already validated the DSA signature, this is just a consistency check to see
         // if the developer signed their application properly with their Apple ID
