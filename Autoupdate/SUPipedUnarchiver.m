@@ -42,17 +42,13 @@
       @".tar.xz" : extractTXZ,
       @".txz" : extractTXZ,
       @".tar.lzma" : extractTXZ
-      };
+    };
     
     NSString *lastPathComponent = [path lastPathComponent];
     for (NSString *currentType in extractCommandDictionary)
     {
-        NSArray<NSString *> *value = [extractCommandDictionary objectForKey:currentType];
-        assert(value != nil);
-        
-        if ([currentType length] > [lastPathComponent length]) continue;
-        if ([[lastPathComponent substringFromIndex:[lastPathComponent length] - [currentType length]] isEqualToString:currentType]) {
-            return value;
+        if ([lastPathComponent hasSuffix:currentType]) {
+            return [extractCommandDictionary objectForKey:currentType];
         }
     }
     return nil;
