@@ -158,7 +158,7 @@ static BOOL runApplyCommand(NSString *programName, NSArray *args)
     }
     
     NSError *applyDiffError = nil;
-    if (!applyBinaryDelta(fileArgs[0], fileArgs[1], fileArgs[2], verbose, &applyDiffError)) {
+    if (!applyBinaryDelta(fileArgs[0], fileArgs[1], fileArgs[2], verbose, ^(__unused double x){}, &applyDiffError)) {
         fprintf(stderr, "%s\n", [applyDiffError.localizedDescription UTF8String]);
         return NO;
     }
