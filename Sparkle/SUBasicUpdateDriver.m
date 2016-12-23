@@ -316,7 +316,7 @@
 
 - (void)extractUpdate
 {
-    SUUnarchiver *unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:self.host.bundlePath withPassword:self.updater.decryptionPassword];
+    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.updater.decryptionPassword];
     
     BOOL success;
     if (!unarchiver) {
@@ -333,18 +333,18 @@
     }
     
     if (!success) {
-        [self unarchiverDidFail:nil];
+        NSError *reason = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{NSLocalizedDescriptionKey: @"Failed to extract update."}];
+        [self unarchiverDidFailWithError:reason];
     } else {
         [unarchiver unarchiveWithCompletionBlock:^(NSError *err){
             if (err) {
-                [self unarchiverDidFail:err];
+                [self unarchiverDidFailWithError:err];
                 return;
             }
-
-            assert(self.updateItem);
-            [self installWithToolAndRelaunch:YES];
-        } progressBlock:^(__unused double progress){
-
+            
+            [self unarchiverDidFinish:nil];
+        } progressBlock:^(double progress) {
+            [self unarchiver:nil extractedProgress:progress];
         }];
     }
 }
@@ -358,7 +358,20 @@
     [self downloadUpdate];
 }
 
-- (void)unarchiverDidFail:(NSError *)err
+// By default does nothing, can be overridden
+- (void)unarchiver:(id)__unused ua extractedProgress:(double)__unused progress
+{
+}
+
+// Note this method can be overridden (and is)
+- (void)unarchiverDidFinish:(id)__unused ua
+{
+    assert(self.updateItem);
+    
+    [self installWithToolAndRelaunch:YES];
+}
+
+- (void)unarchiverDidFailWithError:(NSError *)err
 {
     // No longer needed
     self.updateValidator = nil;
@@ -367,7 +380,7 @@
         [self failedToApplyDeltaUpdate];
         return;
     }
-
+    
     [self abortUpdateWithError:err];
 }
 

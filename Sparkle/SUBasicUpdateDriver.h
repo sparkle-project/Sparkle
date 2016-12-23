@@ -13,6 +13,7 @@
 #import "SUUpdateDriver.h"
 #import "SUUnarchiver.h"
 #import "SUAppcast.h"
+#import "SUUnarchiverProtocol.h"
 
 @class SUAppcastItem, SUHost;
 @interface SUBasicUpdateDriver : SUUpdateDriver <NSURLDownloadDelegate>
@@ -38,6 +39,10 @@
 
 - (void)extractUpdate;
 - (void)failedToApplyDeltaUpdate;
+
+// Needed to preserve compatibility to subclasses, even though our unarchiver code uses blocks now
+- (void)unarchiver:(id)ua extractedProgress:(double)progress;
+- (void)unarchiverDidFinish:(id)ua;
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch;
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI;
