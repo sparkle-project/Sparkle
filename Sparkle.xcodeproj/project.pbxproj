@@ -97,6 +97,10 @@
 		5AE13FB61E0D9F39000D2C2C /* SUPipedUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 6129C0B90E0B79810062CE76 /* SUPipedUnarchiver.m */; };
 		5AE13FB71E0D9F42000D2C2C /* SUUnarchiverNotifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 722589D91E0B19F4005EA0B9 /* SUUnarchiverNotifier.m */; };
 		5AE13FB81E0D9F8E000D2C2C /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
+		5AE13FB91E0DA384000D2C2C /* SUBinaryDeltaUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E9380FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m */; };
+		5AE13FBA1E0DA389000D2C2C /* SUBinaryDeltaApply.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E00FD68CC7005AE3F6 /* SUBinaryDeltaApply.m */; };
+		5AE13FBB1E0DA391000D2C2C /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; };
+		5AE13FBD1E0DA39B000D2C2C /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AE13FBC1E0DA39B000D2C2C /* libbz2.tbd */; };
 		5AE459001C34118500E3BB47 /* SUUpdaterTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 14950074195FDF5900BC5B5B /* SUUpdaterTest.m */; };
 		5AE459021C34118500E3BB47 /* SUVersionComparisonTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 61227A150DB548B800AB99EA /* SUVersionComparisonTest.m */; };
 		5AE7E1111DC81AD3009C2C12 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 5AE7E10E1DC81ACA009C2C12 /* AppIcon.icns */; };
@@ -586,6 +590,7 @@
 		5AE13F771E0C9B12000D2C2C /* DSASignature.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DSASignature.swift; sourceTree = "<group>"; };
 		5AE13F9F1E0D4F65000D2C2C /* Appcast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Appcast.swift; sourceTree = "<group>"; };
 		5AE13FB31E0D9E07000D2C2C /* generate_appcast */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = generate_appcast; sourceTree = BUILT_PRODUCTS_DIR; };
+		5AE13FBC1E0DA39B000D2C2C /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = usr/lib/libbz2.tbd; sourceTree = SDKROOT; };
 		5AE7E10E1DC81ACA009C2C12 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		5AEF45D9189D1CC90030D7DC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		5AF6C74C1AEA40760014A3AB /* SUInstallerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUInstallerTest.m; sourceTree = "<group>"; };
@@ -806,6 +811,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AE13FBD1E0DA39B000D2C2C /* libbz2.tbd in Frameworks */,
 				5AAD006C1E0C2DBF00AF411E /* libxar.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -924,6 +930,7 @@
 				0867D69BFE84028FC02AAC07 /* Foundation.framework */,
 				6117796E0D1112E000749C97 /* IOKit.framework */,
 				5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */,
+				5AE13FBC1E0DA39B000D2C2C /* libbz2.tbd */,
 				5D1AF5890FD7678C0065DB48 /* libxar.1.dylib */,
 				5AAD006B1E0C2DBF00AF411E /* libxar.tbd */,
 				5D1AF58F0FD767AD0065DB48 /* libxml2.dylib */,
@@ -1830,12 +1837,15 @@
 				5AAD00521E0BE6BE00AF411E /* ArchiveItem.swift in Sources */,
 				5AAD00681E0C2DAB00AF411E /* bscommon.c in Sources */,
 				5AAD00691E0C2DAB00AF411E /* bsdiff.c in Sources */,
+				5AE13FBB1E0DA391000D2C2C /* bspatch.c in Sources */,
 				5AE13F781E0C9B12000D2C2C /* DSASignature.swift in Sources */,
 				5A5AC5381E0C6D3000998119 /* FeedXML.swift in Sources */,
 				5AA96C581E0AE0DB00CA4346 /* main.swift in Sources */,
 				5AAD006A1E0C2DB500AF411E /* sais.c in Sources */,
+				5AE13FBA1E0DA389000D2C2C /* SUBinaryDeltaApply.m in Sources */,
 				5AAD00661E0C2D9B00AF411E /* SUBinaryDeltaCommon.m in Sources */,
 				5AAD00671E0C2D9B00AF411E /* SUBinaryDeltaCreate.m in Sources */,
+				5AE13FB91E0DA384000D2C2C /* SUBinaryDeltaUnarchiver.m in Sources */,
 				5AE13FA51E0D71F5000D2C2C /* SUConstants.m in Sources */,
 				5AE13FB51E0D9F32000D2C2C /* SUDiskImageUnarchiver.m in Sources */,
 				5AE13FA21E0D716F000D2C2C /* SUFileManager.m in Sources */,
