@@ -10,6 +10,7 @@
 #import "SUUnarchiver_Private.h"
 #import "SULog.h"
 #include <CoreServices/CoreServices.h>
+#import "SUFileManager.h"
 
 @implementation SUDiskImageUnarchiver
 
@@ -73,7 +74,20 @@
             [arguments addObject:@"-stdinpass"];
         }
 
-        NSData *output = nil;
+        // We want to redirect hdiutil output to a temp file
+        // Note the file is not *critically* important because it's just used when hdiutil fails on error
+        
+        NSURL *tempDirectoryURL = [[SUFileManager defaultManager] makeTemporaryDirectoryWithPreferredName:@"dmg-temp-output" appropriateForDirectoryURL:[NSURL fileURLWithPath:NSTemporaryDirectory()] error:NULL];
+        
+        NSURL *outputFileURL = nil;
+        if (tempDirectoryURL != nil) {
+            NSURL *tempFileURL = [tempDirectoryURL URLByAppendingPathComponent:@"dmg-output.txt"];
+            // Create an empty file to ensure a file exists when we create a file handle for it later
+            if ([[NSData data] writeToURL:tempFileURL atomically:NO]) {
+                outputFileURL = tempFileURL;
+            }
+        }
+        
         NSInteger taskResult = -1;
 		@try
 		{
@@ -83,10 +97,11 @@
             task.arguments = arguments;
             
             NSPipe *inputPipe = [NSPipe pipe];
-            NSPipe *outputPipe = [NSPipe pipe];
+            // See https://github.com/sparkle-project/Sparkle/pull/874#issuecomment-242924887 for why we don't create a pipe
+            NSFileHandle *outputFileHandle = (outputFileURL != nil) ? [NSFileHandle fileHandleForWritingToURL:outputFileURL error:NULL] : nil;
             
             task.standardInput = inputPipe;
-            task.standardOutput = outputPipe;
+            task.standardOutput = outputFileHandle;
             
             [task launch];
             
@@ -95,10 +110,9 @@
             [inputPipe.fileHandleForWriting writeData:promptData];
             [inputPipe.fileHandleForWriting closeFile];
             
-            // Read data to end *before* waiting until the task ends so we don't deadlock if the stdout buffer becomes full if we haven't consumed from it
-            output = [outputPipe.fileHandleForReading readDataToEndOfFile];
-            
             [task waitUntilExit];
+            [outputFileHandle closeFile];
+            
             taskResult = task.terminationStatus;
         }
         @catch (NSException *)
@@ -110,7 +124,7 @@
 
 		if (taskResult != 0)
 		{
-            NSString *resultStr = output ? [[NSString alloc] initWithData:output encoding:NSUTF8StringEncoding] : nil;
+            NSString *resultStr = (outputFileURL != nil) ? [[NSString alloc] initWithContentsOfURL:outputFileURL encoding:NSUTF8StringEncoding error:NULL] : nil;
             SULog(@"hdiutil failed with code: %ld data: <<%@>>", (long)taskResult, resultStr);
             goto reportError;
         }
@@ -119,7 +133,7 @@
         // Now that we've mounted it, we need to copy out its contents.
         manager = [[NSFileManager alloc] init];
         contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
-		if (error)
+		if (contents == nil)
 		{
             SULog(@"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
             goto reportError;
@@ -164,6 +178,10 @@
             }
         } else {
             SULog(@"Can't mount DMG %@", self.archivePath);
+        }
+        
+        if (tempDirectoryURL != nil) {
+            [[NSFileManager defaultManager] removeItemAtURL:tempDirectoryURL error:NULL];
         }
     }
 }
