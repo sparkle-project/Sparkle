@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 * Creates a file manager that will not authorize for file operations
 * @return A new file manager instance
 */
-+ (nullable instancetype)defaultManager;
++ (instancetype)defaultManager;
 
 /**
  * Creates a file manager that allows authorizing for file operations
@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * This method just creates the file manager. It doesn't acquire authorization immediately or if it doesn't need to.
  */
-+ (nullable instancetype)fileManagerWithAuthorizationToolPath:(NSString *)authorizationToolPath;
++ (instancetype)fileManagerWithAuthorizationToolPath:(NSString *)authorizationToolPath;
 
 /**
  * Returns a file manager that allows or disallows authorizing for file operations based on the current file manager
@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * This may return a newly created file manager or re-use the existing file manager depending on the current authorization rights.
  */
-- (nullable instancetype)fileManagerByPreservingAuthorizationRights;
+- (instancetype)fileManagerByPreservingAuthorizationRights;
 
 /**
  * Creates a temporary directory on the same volume as a provided URL
@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
  * When moving an item from a source to a destination, it is desirable to create a temporary intermediate destination on the same volume as the destination to ensure
  * that the item will be moved, and not copied, from the intermediate point to the final destination. This ensures file atomicity.
  */
-- (nullable NSURL *)makeTemporaryDirectoryWithPreferredName:(NSString *)preferredName appropriateForDirectoryURL:(nullable NSURL *)appropriateURL error:(NSError *_Nullable*_Nullable)error;
+- (nullable NSURL *)makeTemporaryDirectoryWithPreferredName:(NSString *)preferredName appropriateForDirectoryURL:(NSURL *)appropriateURL error:(NSError *_Nullable*_Nullable)error;
 
 /**
  * Creates a directory at the target URL

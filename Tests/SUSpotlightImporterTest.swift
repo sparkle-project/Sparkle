@@ -12,7 +12,7 @@ class SUSpotlightImporterTest: XCTestCase
 {
     func testUpdatingSpotlightBundles()
     {
-        let fileManager = SUFileManager.default()!
+        let fileManager = SUFileManager.default()
         let tempDirectoryURL = try! fileManager.makeTemporaryDirectory(withPreferredName: "Sparkle Unit Test Data", appropriateForDirectoryURL: URL(fileURLWithPath: NSHomeDirectory()))
         
         let bundleDirectory = tempDirectoryURL.appendingPathComponent("bundle.app")

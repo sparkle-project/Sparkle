@@ -311,6 +311,6 @@ class SUFileManagerTest: XCTestCase
     func testAcquireBadAuthorization()
     {
         let fileManager = SUFileManager.default()
-        XCTAssertNil(try? fileManager?._acquireAuthorization())
+        XCTAssertNil(try? fileManager._acquireAuthorization())
     }
 }

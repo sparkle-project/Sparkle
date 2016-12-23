@@ -21,13 +21,13 @@ NS_ASSUME_NONNULL_BEGIN
 @class SUAppcastItem;
 SU_EXPORT @interface SUAppcast : NSObject<NSURLDownloadDelegate>
 
-@property (copy) NSString *_Nullable userAgentString;
-@property (copy) NSDictionary *_Nullable httpHeaders;
+@property (copy, nullable) NSString *userAgentString;
+@property (copy, nullable) NSDictionary *httpHeaders;
 
 - (void)fetchAppcastFromURL:(NSURL *)url completionBlock:(void (^)(NSError *_Nullable))err;
 - (SUAppcast *)copyWithoutDeltaUpdates;
 
-@property (readonly, copy) NSArray *_Nullable items;
+@property (readonly, copy, nullable) NSArray *items;
 @end
 
 NS_ASSUME_NONNULL_END

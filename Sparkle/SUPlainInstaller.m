@@ -46,7 +46,8 @@
     
     // Create a temporary directory for our new app that resides on our destination's volume
     NSString *preferredName = [installationURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingString:@" (Incomplete Update)"];
-    NSURL *tempNewDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:preferredName appropriateForDirectoryURL:installationURL.URLByDeletingLastPathComponent error:error];
+    NSURL *installationDirectory = installationURL.URLByDeletingLastPathComponent;
+    NSURL *tempNewDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:preferredName appropriateForDirectoryURL:installationDirectory error:error];
     if (tempNewDirectoryURL == nil) {
         SULog(@"Failed to make new temp directory");
         return NO;
@@ -105,9 +106,10 @@
     
     NSString *oldURLExtension = oldURL.pathExtension;
     NSString *oldDestinationNameWithPathExtension = [oldDestinationName stringByAppendingPathExtension:oldURLExtension];
+    NSURL *oldURLDirectory = oldURL.URLByDeletingLastPathComponent;
     
     // Create a temporary directory for our old app that resides on its volume
-    NSURL *tempOldDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:oldDestinationName appropriateForDirectoryURL:oldURL.URLByDeletingLastPathComponent error:error];
+    NSURL *tempOldDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:oldDestinationName appropriateForDirectoryURL:oldURLDirectory error:error];
     if (tempOldDirectoryURL == nil) {
         SULog(@"Failed to create temporary directory for old app at %@", oldURL.path);
         [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
