@@ -92,9 +92,10 @@
     }
     
     // Create a temporary directory for our new app that resides on our destination's volume
-    NSString *installationDirectoryName = installationURL.lastPathComponent;
-    NSURL *installationDirectoryURL = installationURL.URLByDeletingLastPathComponent;
-    NSURL *tempNewDirectoryURL = (installationDirectoryName != nil && installationDirectoryURL != nil) ? [fileManager makeTemporaryDirectoryWithPreferredName:[installationDirectoryName.stringByDeletingPathExtension stringByAppendingString:@" (Incomplete Update)"] appropriateForDirectoryURL:installationDirectoryURL error:error] : nil;
+    NSString *preferredName = [installationURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingString:@" (Incomplete Update)"];
+    NSURL *installationDirectory = installationURL.URLByDeletingLastPathComponent;
+    NSURL *tempNewDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:preferredName appropriateForDirectoryURL:installationDirectory error:error];
+    
     if (tempNewDirectoryURL == nil) {
         SULog(@"Failed to make new temp directory");
         return NO;
@@ -195,14 +196,13 @@
     // Prevent malicious downgrades
     // Note that we may not be able to do this for package installations, hence this code being done here
     if (!allowDowngrades) {
+        NSString *hostVersion = [self.host version];
         NSBundle *bundle = [NSBundle bundleWithPath:self.applicationPath];
-        
-        if ([self.comparator compareVersion:self.host.version toVersion:[bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]] == NSOrderedDescending) {
-            if (error != NULL) {
-                NSString *errorMessage = [NSString stringWithFormat:@"For security reasons, updates that downgrade version of the application are not allowed. Refusing to downgrade app from version %@ to %@. Aborting update.", [self.host version], [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
-                
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
-            }
+        NSString *updateVersion = [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
+        if (!updateVersion || [self.comparator compareVersion:hostVersion toVersion:updateVersion] == NSOrderedDescending) {
+            NSString *errorMessage = [NSString stringWithFormat:@"For security reasons, updates that downgrade version of the application are not allowed. Refusing to downgrade app from version %@ to %@. Aborting update.", hostVersion, [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
+            
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
             
             return NO;
         }

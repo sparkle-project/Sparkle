@@ -7,7 +7,9 @@
 //
 
 #import "SUPipedUnarchiver.h"
+#import "SUUnarchiverNotifier.h"
 #import "SULog.h"
+#import "SUErrors.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -16,14 +18,12 @@
 @interface SUPipedUnarchiver ()
 
 @property (nonatomic, copy, readonly) NSString *archivePath;
-@property (nonatomic, weak, readonly) id <SUUnarchiverDelegate> delegate;
 
 @end
 
 @implementation SUPipedUnarchiver
 
 @synthesize archivePath = _archivePath;
-@synthesize delegate = _delegate;
 
 + (nullable NSArray <NSString *> *)commandAndArgumentsConformingToTypeOfPath:(NSString *)path
 {
@@ -68,17 +68,16 @@
     return NO;
 }
 
-- (instancetype)initWithArchivePath:(NSString *)archivePath delegate:(nullable id <SUUnarchiverDelegate>)delegate
+- (instancetype)initWithArchivePath:(NSString *)archivePath
 {
     self = [super init];
     if (self != nil) {
         _archivePath = [archivePath copy];
-        _delegate = delegate;
     }
     return self;
 }
 
-- (void)start
+- (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock
 {
     NSArray <NSString *> *commandAndArguments = [[self class] commandAndArgumentsConformingToTypeOfPath:self.archivePath];
     assert(commandAndArguments != nil);
@@ -89,16 +88,17 @@
     NSArray <NSString *> *arguments = [commandAndArguments subarrayWithRange:NSMakeRange(1, commandAndArguments.count - 1)];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self extractArchivePipingDataToCommand:command arguments:arguments];
+        SUUnarchiverNotifier *notifier = [[SUUnarchiverNotifier alloc] initWithCompletionBlock:completionBlock progressBlock:progressBlock];
+        [self extractArchivePipingDataToCommand:command arguments:arguments notifier:notifier];
     });
 }
 
 // This method abstracts the types that use a command line tool piping data from stdin.
-- (void)extractArchivePipingDataToCommand:(NSString *)command arguments:(NSArray*)args
+- (void)extractArchivePipingDataToCommand:(NSString *)command arguments:(NSArray*)args notifier:(SUUnarchiverNotifier *)notifier
 {
     // *** GETS CALLED ON NON-MAIN THREAD!!!
 	@autoreleasepool {
-
+        NSError *error = nil;
         NSString *destination = [self.archivePath stringByDeletingLastPathComponent];
         
         // Get the file size.
@@ -106,10 +106,10 @@
         NSUInteger expectedLength = [[attributes objectForKey:NSFileSize] unsignedIntegerValue];
         if (expectedLength > 0) {
             NSFileHandle *archiveInput = [NSFileHandle fileHandleForReadingAtPath:self.archivePath];
-
+            
             NSPipe *pipe = [NSPipe pipe];
             NSFileHandle *archiveOutput = [pipe fileHandleForWriting];
-
+            
             NSTask *task = [[NSTask alloc] init];
             [task setStandardInput:[pipe fileHandleForReading]];
             [task setStandardError:[NSFileHandle fileHandleWithStandardError]];
@@ -117,7 +117,7 @@
             [task setLaunchPath:command];
             [task setArguments:[args arrayByAddingObject:destination]];
             [task launch];
-
+            
             NSUInteger bytesRead = 0;
             do {
                 NSData *data = [archiveInput readDataOfLength:256*1024];
@@ -127,37 +127,29 @@
                 }
                 bytesRead += len;
                 [archiveOutput writeData:data];
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if ([self.delegate respondsToSelector:@selector(unarchiverExtractedProgress:)]) {
-                        [self.delegate unarchiverExtractedProgress:(double)bytesRead / (double)expectedLength];
-                    }
-                });
+                [notifier notifyProgress:(double)bytesRead / (double)expectedLength];
             }
             while(bytesRead < expectedLength);
             
             [archiveOutput closeFile];
-
+            
             [task waitUntilExit];
             
             if ([task terminationStatus] == 0) {
                 if (bytesRead == expectedLength) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self.delegate unarchiverDidFinish];
-                    });
+                    [notifier notifySuccess];
                     return;
                 } else {
-                    SULog(@"Extraction failed, command '%@' got only %ld of %ld bytes", command, (long)bytesRead, (long)expectedLength);
+                    error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, command '%@' got only %ld of %ld bytes", command, (long)bytesRead, (long)expectedLength]}];
+
                 }
             } else {
-                SULog(@"Extraction failed, command '%@' returned %d", command, [task terminationStatus]);
+                error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, command '%@' returned %d", command, [task terminationStatus]]}];
             }
         } else {
-            SULog(@"Extraction failed, archive '%@' is empty", self.archivePath);
+            error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, archive '%@' is empty", self.archivePath]}];
         }
-
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.delegate unarchiverDidFail];
-        });
+        [notifier notifyFailureWithError:error];
     }
 }
 

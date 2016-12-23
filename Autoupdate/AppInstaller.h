@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "SUUnarchiverProtocol.h"
 
-@interface AppInstaller : NSObject <SUUnarchiverDelegate>
+@interface AppInstaller : NSObject
 
 - (instancetype)initWithHostBundleIdentifier:(NSString *)hostBundleIdentifier;
 

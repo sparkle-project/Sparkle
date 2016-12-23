@@ -187,7 +187,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     [self.communicator handleMessageWithIdentifier:SPUExtractionStarted data:[NSData data]];
     
     NSString *archivePath = [self.updateDirectoryPath stringByAppendingPathComponent:self.downloadName];
-    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:archivePath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.decryptionPassword delegate:self];
+    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:archivePath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.decryptionPassword];
     
     BOOL success;
     if (!unarchiver) {
@@ -207,17 +207,36 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     if (!success) {
         [self unarchiverDidFail];
     } else {
-        [unarchiver start];
-    }
-}
-
-- (void)unarchiverExtractedProgress:(double)progress
-{
-    if (sizeof(progress) == sizeof(uint64_t)) {
-        uint64_t progressValue = CFSwapInt64HostToLittle(*(uint64_t *)&progress);
-        NSData *data = [NSData dataWithBytes:&progressValue length:sizeof(progressValue)];
-        
-        [self.communicator handleMessageWithIdentifier:SPUExtractedArchiveWithProgress data:data];
+        [unarchiver
+         unarchiveWithCompletionBlock:^(NSError * _Nullable error) {
+             if (error != nil) {
+                 [self unarchiverDidFail];
+             } else {
+                 [self.communicator handleMessageWithIdentifier:SPUValidationStarted data:[NSData data]];
+                 
+                 BOOL validationSuccess = [self.updateValidator validateWithUpdateDirectory:self.updateDirectoryPath];
+                 
+                 if (!validationSuccess) {
+                     SULog(@"Error: update validation was a failure");
+                     [self cleanupAndExitWithStatus:EXIT_FAILURE];
+                 } else {
+                     [self.communicator handleMessageWithIdentifier:SPUInstallationStartedStage1 data:[NSData data]];
+                     
+                     self.finishedValidation = YES;
+                     if (self.agentInitiatedConnection) {
+                         [self retrieveProcessIdentifierAndStartInstallation];
+                     }
+                 }
+             }
+         }
+         progressBlock:^(double progress) {
+             if (sizeof(progress) == sizeof(uint64_t)) {
+                 uint64_t progressValue = CFSwapInt64HostToLittle(*(uint64_t *)&progress);
+                 NSData *data = [NSData dataWithBytes:&progressValue length:sizeof(progressValue)];
+                 
+                 [self.communicator handleMessageWithIdentifier:SPUExtractedArchiveWithProgress data:data];
+             }
+         }];
     }
 }
 
@@ -238,25 +257,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     self.host = nil;
     
     [self.communicator handleMessageWithIdentifier:SPUArchiveExtractionFailed data:[NSData data]];
-}
-
-- (void)unarchiverDidFinish
-{
-    [self.communicator handleMessageWithIdentifier:SPUValidationStarted data:[NSData data]];
-    
-    BOOL validationSuccess = [self.updateValidator validateWithUpdateDirectory:self.updateDirectoryPath];
-    
-    if (!validationSuccess) {
-        SULog(@"Error: update validation was a failure");
-        [self cleanupAndExitWithStatus:EXIT_FAILURE];
-    } else {
-        [self.communicator handleMessageWithIdentifier:SPUInstallationStartedStage1 data:[NSData data]];
-        
-        self.finishedValidation = YES;
-        if (self.agentInitiatedConnection) {
-            [self retrieveProcessIdentifierAndStartInstallation];
-        }
-    }
 }
 
 - (void)agentConnectionDidInitiate
