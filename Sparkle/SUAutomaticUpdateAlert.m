@@ -7,6 +7,8 @@
 //
 
 #import "SUAutomaticUpdateAlert.h"
+#import "SULocalizations.h"
+#import "SUAppcastItem.h"
 
 #import "SUHost.h"
 

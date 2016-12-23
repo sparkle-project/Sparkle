@@ -6,10 +6,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SUUpdater.h"
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
-#import "SUVersionComparisonProtocol.h"
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED < 101000
 typedef struct {

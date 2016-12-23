@@ -6,13 +6,9 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "SUUpdater.h"
-
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
-#import "SUVersionComparisonProtocol.h"
 #import "SUAppcastItem.h"
 #import "SULog.h"
+#import "SUConstants.h"
 
 @interface SUAppcastItem ()
 @property (copy, readwrite) NSString *title;

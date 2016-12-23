@@ -8,6 +8,7 @@
 
 #import "SUBasicUpdateDriver.h"
 
+#import "SUUnarchiverProtocol.h"
 #import "SUHost.h"
 #import "SUOperatingSystem.h"
 #import "SUStandardVersionComparator.h"
@@ -18,6 +19,10 @@
 #import "SUUpdater_Private.h"
 #import "SUFileManager.h"
 #import "SUUpdateValidator.h"
+#import "SULocalizations.h"
+#import "SUErrors.h"
+#import "SUAppcast.h"
+#import "SUAppcastItem.h"
 
 @interface SUBasicUpdateDriver ()
 

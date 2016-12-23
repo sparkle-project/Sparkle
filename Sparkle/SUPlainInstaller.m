@@ -8,10 +8,9 @@
 
 #import "SUPlainInstaller.h"
 #import "SUFileManager.h"
-#import "SUCodeSigningVerifier.h"
-#import "SUConstants.h"
 #import "SUHost.h"
 #import "SULog.h"
+#import "SUErrors.h"
 
 @implementation SUPlainInstaller
 
@@ -160,7 +159,7 @@
 
 + (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host fileOperationToolPath:(NSString *)fileOperationToolPath versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler
 {
-    SUParameterAssert(host);
+    NSParameterAssert(host);
 
     BOOL allowDowngrades = SPARKLE_AUTOMATED_DOWNGRADES;
 

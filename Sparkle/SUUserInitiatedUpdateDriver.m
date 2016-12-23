@@ -10,6 +10,7 @@
 
 #import "SUStatusController.h"
 #import "SUHost.h"
+#import "SULocalizations.h"
 
 @interface SUUserInitiatedUpdateDriver ()
 

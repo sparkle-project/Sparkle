@@ -11,8 +11,6 @@
 
 #import <Cocoa/Cocoa.h>
 #import "SUBasicUpdateDriver.h"
-#import "SUUpdateAlert.h"
-#import "SUUnarchiverProtocol.h"
 
 @class SUStatusController;
 

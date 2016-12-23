@@ -9,10 +9,6 @@
 #import "SUScheduledUpdateDriver.h"
 #import "SUUpdater.h"
 
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
-#import "SUVersionComparisonProtocol.h"
-
 @interface SUScheduledUpdateDriver ()
 
 @property (assign) BOOL showErrors;
