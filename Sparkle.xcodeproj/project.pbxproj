@@ -159,7 +159,6 @@
 		61B93B280DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B93B260DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.m */; };
 		61B93C090DD112FF00DCD2F8 /* SUScheduledUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B93C070DD112FF00DCD2F8 /* SUScheduledUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
 		61B93C0A0DD112FF00DCD2F8 /* SUScheduledUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B93C080DD112FF00DCD2F8 /* SUScheduledUpdateDriver.m */; };
-		61CFB3290E385186007A1735 /* Sparkle.pch in Headers */ = {isa = PBXBuildFile; fileRef = 61CFB3280E385186007A1735 /* Sparkle.pch */; };
 		61D85D6D0E10B2ED00F9B4A9 /* SUPipedUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 6129C0B90E0B79810062CE76 /* SUPipedUnarchiver.m */; };
 		61EF67560E25B58D00F754E0 /* SUHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 61EF67550E25B58D00F754E0 /* SUHost.m */; };
 		61EF67590E25C5B400F754E0 /* SUHost.h in Headers */ = {isa = PBXBuildFile; fileRef = 61EF67580E25C5B400F754E0 /* SUHost.h */; };
@@ -190,6 +189,7 @@
 		722954CA1D04EA6000ECF9CA /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
 		722954CB1D04EA6900ECF9CA /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
 		722954CC1D04EA7000ECF9CA /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
+		72316BD61E0DBF730039EFD9 /* SULocalizations.h in Headers */ = {isa = PBXBuildFile; fileRef = 72316BD51E0DBF730039EFD9 /* SULocalizations.h */; };
 		723A920E1D722438004A9DED /* SUSpotlightImporterTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 723A920D1D722438004A9DED /* SUSpotlightImporterTest.swift */; };
 		723B252D1CEAB3A600909873 /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 723B252B1CEAB3A600909873 /* bscommon.c */; };
 		723B252E1CEAB3A600909873 /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 723B252B1CEAB3A600909873 /* bscommon.c */; };
@@ -660,7 +660,6 @@
 		61BA66DB14BDFC5500D02D86 /* sl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = sl; path = sl.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
 		61BA66DC14BDFC5500D02D86 /* sl */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = sl; path = sl.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
 		61C268090E2DB5D000175E6C /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = SOURCE_ROOT; };
-		61CFB3280E385186007A1735 /* Sparkle.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sparkle.pch; sourceTree = "<group>"; };
 		61E31A80103299500051D188 /* pt_BR */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = pt_BR; path = pt_BR.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61EF67550E25B58D00F754E0 /* SUHost.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUHost.m; sourceTree = "<group>"; };
 		61EF67580E25C5B400F754E0 /* SUHost.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUHost.h; sourceTree = "<group>"; };
@@ -687,6 +686,7 @@
 		722FB7471DD51331001D40CE /* ConfigSwift.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigSwift.xcconfig; sourceTree = "<group>"; };
 		722FB7481DD51350001D40CE /* ConfigSwiftDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigSwiftDebug.xcconfig; sourceTree = "<group>"; };
 		722FB7491DD51350001D40CE /* ConfigSwiftRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigSwiftRelease.xcconfig; sourceTree = "<group>"; };
+		72316BD51E0DBF730039EFD9 /* SULocalizations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULocalizations.h; sourceTree = "<group>"; };
 		723A920D1D722438004A9DED /* SUSpotlightImporterTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUSpotlightImporterTest.swift; sourceTree = "<group>"; };
 		723B252B1CEAB3A600909873 /* bscommon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bscommon.c; sourceTree = "<group>"; };
 		723B252C1CEAB3A600909873 /* bscommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bscommon.h; sourceTree = "<group>"; };
@@ -1103,7 +1103,7 @@
 			isa = PBXGroup;
 			children = (
 				61299B3509CB04E000B7442F /* Sparkle.h */,
-				61CFB3280E385186007A1735 /* Sparkle.pch */,
+				72316BD51E0DBF730039EFD9 /* SULocalizations.h */,
 				61299A5B09CA6D4500B7442F /* SUConstants.h */,
 				61299A5F09CA6EB100B7442F /* SUConstants.m */,
 				55E6F33219EC9F6C00005E76 /* SUErrors.h */,
@@ -1256,7 +1256,6 @@
 			files = (
 				611142E910FB1BE5009810AA /* bspatch.h in Headers */,
 				61299B3609CB04E000B7442F /* Sparkle.h in Headers */,
-				61CFB3290E385186007A1735 /* Sparkle.pch in Headers */,
 				722589DA1E0B19F4005EA0B9 /* SUUnarchiverNotifier.h in Headers */,
 				61B5FC0D09C4FC8200B25A18 /* SUAppcast.h in Headers */,
 				61B5FC7009C51F4A00B25A18 /* SUAppcastItem.h in Headers */,
@@ -1285,6 +1284,7 @@
 				6101347B0DD2541A0049ACDF /* SUProbingUpdateDriver.h in Headers */,
 				61B93C090DD112FF00DCD2F8 /* SUScheduledUpdateDriver.h in Headers */,
 				61A225A40D1C4AC000430CCD /* SUStandardVersionComparator.h in Headers */,
+				72316BD61E0DBF730039EFD9 /* SULocalizations.h in Headers */,
 				6196CFF909C72148000DC222 /* SUStatusController.h in Headers */,
 				61A2279C0D1CEE7600430CCD /* SUSystemProfiler.h in Headers */,
 				61B93A3C0DD02D7000DCD2F8 /* SUUIBasedUpdateDriver.h in Headers */,

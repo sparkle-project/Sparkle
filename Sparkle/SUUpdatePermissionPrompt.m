@@ -10,6 +10,7 @@
 
 #import "SUHost.h"
 #import "SUConstants.h"
+#import "SULocalizations.h"
 
 @interface SUUpdatePermissionPrompt ()
 

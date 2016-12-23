@@ -1,4 +1,6 @@
-#import <AppKit/AppKit.h>
+#import <Cocoa/Cocoa.h>
+#import "SULocalizations.h"
+#import "SUErrors.h"
 #import "SUInstaller.h"
 #import "SUHost.h"
 #import "SUStandardVersionComparator.h"

@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Sparkle Project. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import <XCTest/XCTest.h>
 #import "SUDSAVerifier.h"
 

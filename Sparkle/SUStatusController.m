@@ -6,14 +6,10 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "SUUpdater.h"
-
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
-#import "SUVersionComparisonProtocol.h"
 #import "SUOperatingSystem.h"
 #import "SUStatusController.h"
 #import "SUHost.h"
+#import "SULocalizations.h"
 
 @interface SUStatusController ()
 @property (copy) NSString *title, *buttonTitle;

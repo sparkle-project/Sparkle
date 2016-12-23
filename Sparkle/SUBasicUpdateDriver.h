@@ -9,13 +9,9 @@
 #ifndef SUBASICUPDATEDRIVER_H
 #define SUBASICUPDATEDRIVER_H
 
-#import <Cocoa/Cocoa.h>
 #import "SUUpdateDriver.h"
-#import "SUUnarchiver.h"
-#import "SUAppcast.h"
-#import "SUUnarchiverProtocol.h"
 
-@class SUAppcastItem, SUHost;
+@class SUAppcast, SUAppcastItem, SUHost;
 @interface SUBasicUpdateDriver : SUUpdateDriver <NSURLDownloadDelegate>
 
 @property (strong, readonly) SUAppcastItem *updateItem;

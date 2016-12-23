@@ -7,7 +7,7 @@
 //  Adapted from Sparkle+, by Tom Harrington.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "SUSystemProfiler.h"
 
 #import "SUHost.h"

@@ -23,7 +23,6 @@ A guided installation can be started by applications other than the application 
 #define SUGUIDEDPACKAGEINSTALLER_H
 
 #import <Foundation/Foundation.h>
-#import "Sparkle.h"
 #import "SUInstaller.h"
 
 @interface SUGuidedPackageInstaller : SUInstaller

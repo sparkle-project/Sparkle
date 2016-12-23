@@ -10,9 +10,9 @@
 #define SUVERSIONCOMPARISONPROTOCOL_H
 
 #if __has_feature(modules)
-@import Cocoa;
+@import Foundation;
 #else
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #endif
 #import "SUExport.h"
 

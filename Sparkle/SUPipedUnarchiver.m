@@ -9,6 +9,7 @@
 #import "SUPipedUnarchiver.h"
 #import "SUUnarchiverNotifier.h"
 #import "SULog.h"
+#import "SUErrors.h"
 
 @interface SUPipedUnarchiver ()
 

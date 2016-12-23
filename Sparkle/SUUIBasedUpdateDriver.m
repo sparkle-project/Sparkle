@@ -14,6 +14,8 @@
 #import "SUOperatingSystem.h"
 #import "SUStatusController.h"
 #import "SUConstants.h"
+#import "SULocalizations.h"
+#import "SUAppcastItem.h"
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED < 1080
 @interface NSByteCountFormatter : NSFormatter {

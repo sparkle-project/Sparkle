@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Sparkle Project. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import <XCTest/XCTest.h>
 #import "SUCodeSigningVerifier.h"
 #import "SUFileManager.h"

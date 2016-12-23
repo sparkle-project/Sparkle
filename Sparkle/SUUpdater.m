@@ -18,6 +18,7 @@
 #import "SUConstants.h"
 #import "SULog.h"
 #import "SUCodeSigningVerifier.h"
+#import "SULocalizations.h"
 #include <SystemConfiguration/SystemConfiguration.h>
 
 NSString *const SUUpdaterDidFinishLoadingAppCastNotification = @"SUUpdaterDidFinishLoadingAppCastNotification";

@@ -6,14 +6,11 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "SUUpdater.h"
-
 #import "SUAppcast.h"
 #import "SUAppcastItem.h"
-#import "SUVersionComparisonProtocol.h"
-#import "SUAppcast.h"
-#import "SUConstants.h"
 #import "SULog.h"
+#import "SULocalizations.h"
+#import "SUErrors.h"
 
 @interface NSXMLElement (SUAppcastExtensions)
 @property (readonly, copy) NSDictionary *attributesAsDictionary;

@@ -7,6 +7,8 @@
 //
 
 #import "SUUnarchiverNotifier.h"
+#import "SULocalizations.h"
+#import "SUErrors.h"
 
 @interface SUUnarchiverNotifier ()
 
