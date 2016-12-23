@@ -10,34 +10,20 @@
 #import "SUUnarchiver_Private.h"
 #import "SULog.h"
 
-
 @implementation SUPipedUnarchiver
 
 + (SEL)selectorConformingToTypeOfPath:(NSString *)path
 {
-    static NSDictionary *typeSelectorDictionary;
-    if (!typeSelectorDictionary)
-        typeSelectorDictionary = @{ @".zip": @"extractZIP",
-                                    @".tar": @"extractTAR",
-                                    @".tar.gz": @"extractTGZ",
-                                    @".tgz": @"extractTGZ",
-                                    @".tar.bz2": @"extractTBZ",
-                                    @".tbz": @"extractTBZ",
-                                    @".tar.xz": @"extractTXZ",
-                                    @".txz": @"extractTXZ",
-                                    @".tar.lzma": @"extractTXZ"};
-
     NSString *lastPathComponent = [path lastPathComponent];
-	for (NSString *currentType in typeSelectorDictionary)
-	{
-        NSString *value = [typeSelectorDictionary objectForKey:currentType];
-        assert(value);
-
-		if ([currentType length] > [lastPathComponent length]) continue;
-        if ([[lastPathComponent substringFromIndex:[lastPathComponent length] - [currentType length]] isEqualToString:currentType]) {
-            return NSSelectorFromString(value);
-        }
-    }
+    if ([lastPathComponent hasSuffix:@".zip"]) return @selector(extractZIP);
+    if ([lastPathComponent hasSuffix:@".tar"]) return @selector(extractTAR);
+    if ([lastPathComponent hasSuffix:@".tar.gz"]) return @selector(extractTGZ);
+    if ([lastPathComponent hasSuffix:@".tgz"]) return @selector(extractTGZ);
+    if ([lastPathComponent hasSuffix:@".tar.bz2"]) return @selector(extractTBZ);
+    if ([lastPathComponent hasSuffix:@".tbz"]) return @selector(extractTBZ);
+    if ([lastPathComponent hasSuffix:@".tar.xz"]) return @selector(extractTXZ);
+    if ([lastPathComponent hasSuffix:@".txz"]) return @selector(extractTXZ);
+    if ([lastPathComponent hasSuffix:@".tar.lzma"]) return @selector(extractTXZ);
     return NULL;
 }
 
