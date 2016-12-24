@@ -7,8 +7,6 @@
 
 #import "SUHost.h"
 
-// This is a "core" class and thus should NOT import Cocoa/AppKit
-
 #import "SUConstants.h"
 #include <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
 #import "SULog.h"
@@ -43,7 +41,7 @@
 {
 	if ((self = [super init]))
 	{
-        SUParameterAssert(aBundle);
+        NSParameterAssert(aBundle);
         self.bundle = aBundle;
         if (![self.bundle bundleIdentifier]) {
             SULog(@"Error: the bundle being updated at %@ has no %@! This will cause preference read/write to not work properly.", self.bundle, kCFBundleIdentifierKey);

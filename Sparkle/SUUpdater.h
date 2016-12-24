@@ -10,9 +10,9 @@
 #define SUUPDATER_H
 
 #if __has_feature(modules)
-@import Foundation;
+@import Cocoa;
 #else
-#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 #endif
 #import "SUExport.h"
 #import "SUVersionComparisonProtocol.h"
