@@ -12,7 +12,6 @@
 #import "SUHost.h"
 #import "SULog.h"
 #import "SUErrors.h"
-#import "SUParameterAssert.h"
 #import "SUVersionComparisonProtocol.h"
 
 #ifdef _APPKITDEFINES_H

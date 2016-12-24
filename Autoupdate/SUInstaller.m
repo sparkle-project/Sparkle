@@ -13,7 +13,6 @@
 #import "SUHost.h"
 #import "SUConstants.h"
 #import "SULog.h"
-#import "SUParameterAssert.h"
 #import "SUErrors.h"
 #import "SPUInstallationType.h"
 
@@ -34,8 +33,8 @@
 
 + (nullable NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr isGuided:(BOOL *)isGuidedPtr
 {
-    SUParameterAssert(inUpdateFolder);
-    SUParameterAssert(host);
+    NSParameterAssert(inUpdateFolder);
+    NSParameterAssert(host);
 
     // Search subdirectories for the application
     NSString *currentFile,

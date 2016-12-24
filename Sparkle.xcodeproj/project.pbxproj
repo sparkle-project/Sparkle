@@ -101,7 +101,6 @@
 		7214B8821D456A8500CB5CED /* SPUBundleIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7214B8801D456A8500CB5CED /* SPUBundleIcon.m */; };
 		7214B8831D456C2400CB5CED /* SPUBundleIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7214B8801D456A8500CB5CED /* SPUBundleIcon.m */; };
 		7214B8841D456C9500CB5CED /* SPUBundleIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7214B8801D456A8500CB5CED /* SPUBundleIcon.m */; };
-		72162B061C82C8B30013C1C5 /* SUParameterAssert.h in Headers */ = {isa = PBXBuildFile; fileRef = 72162B051C82C8B30013C1C5 /* SUParameterAssert.h */; };
 		72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */ = {isa = PBXBuildFile; fileRef = 72162B071C82C9600013C1C5 /* SULocalizations.h */; };
 		721652621D3C44A100FD13D8 /* SPUSystemAuthorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3AC1D347EDE005D534A /* SPUSystemAuthorization.m */; };
 		721BC20E1D1CDE55002BC71E /* SPULocalCacheDirectory.h in Headers */ = {isa = PBXBuildFile; fileRef = 721BC20C1D1CDE55002BC71E /* SPULocalCacheDirectory.h */; };
@@ -890,7 +889,6 @@
 		7214B87F1D456A8500CB5CED /* SPUBundleIcon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUBundleIcon.h; sourceTree = "<group>"; };
 		7214B8801D456A8500CB5CED /* SPUBundleIcon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUBundleIcon.m; sourceTree = "<group>"; };
 		7214B8851D45AD9A00CB5CED /* SPUInstallationType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUInstallationType.h; sourceTree = "<group>"; };
-		72162B051C82C8B30013C1C5 /* SUParameterAssert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUParameterAssert.h; sourceTree = "<group>"; };
 		72162B071C82C9600013C1C5 /* SULocalizations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULocalizations.h; sourceTree = "<group>"; };
 		721652671D3C8FED00FD13D8 /* SUInstallerLauncherStatus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SUInstallerLauncherStatus.h; path = InstallerLauncher/SUInstallerLauncherStatus.h; sourceTree = SOURCE_ROOT; };
 		721BC2061D17A532002BC71E /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
@@ -1588,7 +1586,6 @@
 				61299B3509CB04E000B7442F /* Sparkle.h */,
 				72A5D5DD1D692ACC0009E5AC /* SparkleCore.h */,
 				72162B071C82C9600013C1C5 /* SULocalizations.h */,
-				72162B051C82C8B30013C1C5 /* SUParameterAssert.h */,
 				61299A5B09CA6D4500B7442F /* SUConstants.h */,
 				61299A5F09CA6EB100B7442F /* SUConstants.m */,
 				55E6F33219EC9F6C00005E76 /* SUErrors.h */,
@@ -1981,7 +1978,6 @@
 				72B767DA1C9CD2E400A07552 /* SPUUIBasedUpdateDriver.h in Headers */,
 				725CB95A1C7121830064365A /* SPUStandardUserDriver.h in Headers */,
 				725CB9571C7120410064365A /* SPUUserDriver.h in Headers */,
-				72162B061C82C8B30013C1C5 /* SUParameterAssert.h in Headers */,
 				726DF88E1C84277600188804 /* SPUStatusCompletionResults.h in Headers */,
 				72A450531C69A68900D67EEA /* SPUUpdatePermissionResponse.h in Headers */,
 				7267E5B61D3D8AEE00D1BF90 /* SPUInstallationInfo.h in Headers */,
