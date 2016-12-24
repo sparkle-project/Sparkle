@@ -31,9 +31,14 @@ ci:
 			( rm -rf build && xcodebuild -sdk "macosx10.$$i" -scheme Distribution -configuration Coverage -derivedDataPath build ) || exit 1 ; \
 		fi ; \
 	done
-	for i in {10..11} ; do \
+	for i in {10..12} ; do \
 		if xcrun --sdk "macosx10.$$i" --show-sdk-path 2> /dev/null ; then \
 			( rm -rf build && xcodebuild -sdk "macosx10.$$i" -scheme Distribution -configuration Coverage -derivedDataPath build test ) || exit 1 ; \
+		fi ; \
+	done
+	for i in {11..12} ; do \
+		if xcrun --sdk "macosx10.$$i" --show-sdk-path 2> /dev/null ; then \
+			( rm -rf build && xcodebuild -sdk "macosx10.$$i" -scheme UITests -configuration Debug -derivedDataPath build test ) || exit 1 ; \
 		fi ; \
 	done
 
