@@ -37,7 +37,7 @@ NSString *const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
     return self;
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self.host bundlePath], [self.host installationPath]]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)h
 {

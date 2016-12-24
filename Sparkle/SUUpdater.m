@@ -20,6 +20,8 @@
 #import "SUCodeSigningVerifier.h"
 #import "SULocalizations.h"
 #include <SystemConfiguration/SystemConfiguration.h>
+#import "SUSystemProfiler.h"
+#import "SUSystemUpdateInfo.h"
 
 NSString *const SUUpdaterDidFinishLoadingAppCastNotification = @"SUUpdaterDidFinishLoadingAppCastNotification";
 NSString *const SUUpdaterDidFindValidUpdateNotification = @"SUUpdaterDidFindValidUpdateNotification";
@@ -178,7 +180,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     return [self initForBundle:[NSBundle mainBundle]];
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self.host bundlePath], [self.host installationPath]]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
 
 - (void)startUpdateCycle
 {
@@ -205,7 +207,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     }
 
     if (shouldPrompt) {
-        NSArray *profileInfo = [self.host systemProfile];
+        NSArray *profileInfo = [SUSystemProfiler systemProfileArrayForHost:self.host];
         // Always say we're sending the system profile here so that the delegate displays the parameters it would send.
         if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
             profileInfo = [profileInfo arrayByAddingObjectsFromArray:[self.delegate feedParametersForUpdater:self sendingSystemProfile:YES]];
@@ -412,8 +414,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 - (BOOL)automaticallyDownloadsUpdates
 {
-    // If the host doesn't allow automatic updates, don't ever let them happen
-    if (!self.host.allowsAutomaticUpdates) {
+    // If we aren't allowed automatic updates, don't ever let them happen
+    if (![SUSystemUpdateInfo systemAllowsAutomaticUpdatesForHost:self.host]) {
         return NO;
     }
 
@@ -491,7 +493,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     }
 	if (sendingSystemProfile)
 	{
-        parameters = [parameters arrayByAddingObjectsFromArray:[self.host systemProfile]];
+        parameters = [parameters arrayByAddingObjectsFromArray:[SUSystemProfiler systemProfileArrayForHost:self.host]];
         [self.host setObject:[NSDate date] forUserDefaultsKey:SULastProfileSubmitDateKey];
     }
 	if ([parameters count] == 0) { return baseFeedURL; }
