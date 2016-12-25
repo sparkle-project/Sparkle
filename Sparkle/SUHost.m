@@ -15,10 +15,11 @@
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-// This class should also be process independent
+// This class should not rely on AppKit and should also be process independent
 // For example, it should not have code that tests writabilty to somewhere on disk,
 // as that may depend on the privileges of the process owner. Or code that depends on
-// if the process is sandboxed or not; eg: finding user caches directory
+// if the process is sandboxed or not; eg: finding the user's caches directory. Or code that depends
+// on compilation flags and if other files exist relative to the host bundle.
 
 @interface SUHost ()
 
