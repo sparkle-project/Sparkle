@@ -435,8 +435,12 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
     // A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
     NSString *appcastString = [self.host objectForKey:SUFeedURLKey];
-    if ([self.delegate respondsToSelector:@selector(feedURLStringForUpdater:)])
-        appcastString = [self.delegate feedURLStringForUpdater:self];
+    if ([self.delegate respondsToSelector:@selector(feedURLStringForUpdater:)]) {
+        NSString *delegateAppcastString = [self.delegate feedURLStringForUpdater:self];
+        if (delegateAppcastString != nil) {
+            appcastString = delegateAppcastString;
+        }
+    }
     if (!appcastString) // Can't find an appcast string!
         [NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the %@ key in either the Info.plist or the user defaults!", SUFeedURLKey];
     NSCharacterSet *quoteSet = [NSCharacterSet characterSetWithCharactersInString:@"\"\'"]; // Some feed publishers add quotes; strip 'em.

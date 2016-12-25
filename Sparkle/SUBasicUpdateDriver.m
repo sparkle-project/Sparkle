@@ -162,11 +162,15 @@
     if ([[self.updater delegate] respondsToSelector:@selector(bestValidUpdateInAppcast:forUpdater:)]) // Does the delegate want to handle it?
     {
         item = [[self.updater delegate] bestValidUpdateInAppcast:ac forUpdater:(id)self.updater];
+    }
+    
+    if (item != nil) // Does the delegate want to handle it?
+    {
         if ([item isDeltaUpdate]) {
             self.nonDeltaUpdateItem = [[self.updater delegate] bestValidUpdateInAppcast:[ac copyWithoutDeltaUpdates] forUpdater:(id)self.updater];
         }
-	}
-	else // If not, we'll take care of it ourselves.
+    }
+    else // If not, we'll take care of it ourselves.
     {
         // Find the best supported update
         SUAppcastItem *deltaUpdateItem = nil;
@@ -525,7 +529,10 @@
 
     NSString *pathToRelaunch = [self.host bundlePath];
     if ([updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
-        pathToRelaunch = [updaterDelegate pathToRelaunchForUpdater:(id)self.updater];
+        NSString *delegateRelaunchPath = [updaterDelegate pathToRelaunchForUpdater:(id)self.updater];
+        if (delegateRelaunchPath != nil) {
+            pathToRelaunch = delegateRelaunchPath;
+        }
     }
     
     [NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:@[[self.host bundlePath],
