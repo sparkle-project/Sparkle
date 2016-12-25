@@ -10,7 +10,7 @@
 #import "InstallerProgressDelegate.h"
 #import "SPUMessageTypes.h"
 #import "SULog.h"
-#import "SPUApplicationInfo.h"
+#import "SUApplicationInfo.h"
 #import "SPUInstallerAgentProtocol.h"
 #import "SUInstallerAgentInitiationProtocol.h"
 #import "StatusInfo.h"
@@ -289,7 +289,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             TransformProcessType(&psn, kProcessTransformToForegroundApplication);
             
             // Note: the application icon needs to be set after showing the icon in the dock
-            self.application.applicationIconImage = [SPUApplicationInfo bestIconForBundle:self.hostBundle];
+            self.application.applicationIconImage = [SUApplicationInfo bestIconForBundle:self.hostBundle];
             
             // Activate ourselves otherwise we will probably be in the background
             [self.application activateIgnoringOtherApps:YES];

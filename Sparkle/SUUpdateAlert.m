@@ -20,7 +20,7 @@
 #import "SULocalizations.h"
 #import "SUAppcastItem.h"
 #import "SPUDownloadData.h"
-#import "SPUApplicationInfo.h"
+#import "SUApplicationInfo.h"
 #import "SPUUpdaterSettings.h"
 
 // WebKit protocols are not explicitly declared until 10.11 SDK, so
@@ -245,7 +245,7 @@
 
     [self.window setFrameAutosaveName: showReleaseNotes ? @"SUUpdateAlert" : @"SUUpdateAlertSmall" ];
 
-    if ([SPUApplicationInfo isBackgroundApplication:NSApp]) {
+    if ([SUApplicationInfo isBackgroundApplication:NSApp]) {
         [self.window setLevel:NSFloatingWindowLevel]; // This means the window will float over all other apps, if our app is switched out ?!
     }
 
@@ -299,7 +299,7 @@
 
 - (NSImage *)applicationIcon
 {
-    return [SPUApplicationInfo bestIconForBundle:self.host.bundle];
+    return [SUApplicationInfo bestIconForBundle:self.host.bundle];
 }
 
 - (NSString *)titleText

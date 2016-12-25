@@ -6,10 +6,10 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SPUApplicationInfo.h"
-#import "SPUBundleIcon.h"
+#import "SUApplicationInfo.h"
+#import "SUBundleIcon.h"
 
-@implementation SPUApplicationInfo
+@implementation SUApplicationInfo
 
 + (BOOL)isBackgroundApplication:(NSApplication *)application
 {
@@ -18,7 +18,7 @@
 
 + (NSImage *)bestIconForBundle:(NSBundle *)bundle
 {
-    NSURL *iconURL = [SPUBundleIcon iconURLForBundle:bundle];
+    NSURL *iconURL = [SUBundleIcon iconURLForBundle:bundle];
     
     NSImage *icon = (iconURL == nil) ? nil : [[NSImage alloc] initWithContentsOfURL:iconURL];
     // Use a default icon if none is defined.

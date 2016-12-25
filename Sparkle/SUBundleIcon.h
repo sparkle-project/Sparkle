@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SPUBundleIcon : NSObject
+@interface SUBundleIcon : NSObject
 
 + (NSURL * _Nullable)iconURLForBundle:(NSBundle *)bundle;
 

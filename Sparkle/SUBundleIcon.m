@@ -6,13 +6,13 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SPUBundleIcon.h"
+#import "SUBundleIcon.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-@implementation SPUBundleIcon
+@implementation SUBundleIcon
 
 + (NSURL *)iconURLForBundle:(NSBundle *)bundle
 {

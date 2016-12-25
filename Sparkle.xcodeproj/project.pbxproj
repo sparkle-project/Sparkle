@@ -92,15 +92,15 @@
 		61EF67560E25B58D00F754E0 /* SUHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 61EF67550E25B58D00F754E0 /* SUHost.m */; };
 		61EF67590E25C5B400F754E0 /* SUHost.h in Headers */ = {isa = PBXBuildFile; fileRef = 61EF67580E25C5B400F754E0 /* SUHost.h */; };
 		61FA52880E2D9EA400EF58AD /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (Required, ); }; };
-		720595EF1D700568000572E8 /* SPUApplicationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 725602D41C83551C00DAA70E /* SPUApplicationInfo.m */; };
+		720595EF1D700568000572E8 /* SUApplicationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 725602D41C83551C00DAA70E /* SUApplicationInfo.m */; };
 		720B16451C66433D006985FB /* SUTestApplicationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720B16431C66433D006985FB /* SUTestApplicationTest.swift */; };
 		720E217B1D0D00BF003A311C /* SPUUpdaterCycle.h in Headers */ = {isa = PBXBuildFile; fileRef = 720E21791D0D00BF003A311C /* SPUUpdaterCycle.h */; };
 		720E217C1D0D00BF003A311C /* SPUUpdaterCycle.m in Sources */ = {isa = PBXBuildFile; fileRef = 720E217A1D0D00BF003A311C /* SPUUpdaterCycle.m */; };
 		7210C7681B9A9A1500EB90AC /* SUUnarchiverTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */; };
-		7214B8811D456A8500CB5CED /* SPUBundleIcon.h in Headers */ = {isa = PBXBuildFile; fileRef = 7214B87F1D456A8500CB5CED /* SPUBundleIcon.h */; };
-		7214B8821D456A8500CB5CED /* SPUBundleIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7214B8801D456A8500CB5CED /* SPUBundleIcon.m */; };
-		7214B8831D456C2400CB5CED /* SPUBundleIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7214B8801D456A8500CB5CED /* SPUBundleIcon.m */; };
-		7214B8841D456C9500CB5CED /* SPUBundleIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7214B8801D456A8500CB5CED /* SPUBundleIcon.m */; };
+		7214B8811D456A8500CB5CED /* SUBundleIcon.h in Headers */ = {isa = PBXBuildFile; fileRef = 7214B87F1D456A8500CB5CED /* SUBundleIcon.h */; };
+		7214B8821D456A8500CB5CED /* SUBundleIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7214B8801D456A8500CB5CED /* SUBundleIcon.m */; };
+		7214B8831D456C2400CB5CED /* SUBundleIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7214B8801D456A8500CB5CED /* SUBundleIcon.m */; };
+		7214B8841D456C9500CB5CED /* SUBundleIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7214B8801D456A8500CB5CED /* SUBundleIcon.m */; };
 		72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */ = {isa = PBXBuildFile; fileRef = 72162B071C82C9600013C1C5 /* SULocalizations.h */; };
 		721652621D3C44A100FD13D8 /* SPUSystemAuthorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3AC1D347EDE005D534A /* SPUSystemAuthorization.m */; };
 		721BC20E1D1CDE55002BC71E /* SPULocalCacheDirectory.h in Headers */ = {isa = PBXBuildFile; fileRef = 721BC20C1D1CDE55002BC71E /* SPULocalCacheDirectory.h */; };
@@ -156,8 +156,8 @@
 		724BB3B71D35ABA8005D534A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
 		724F76F91D6EAD0D00ECD062 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 525A278F133D6AE900FD8D70 /* Cocoa.framework */; };
 		725264A91D5FBD9100CD6400 /* Sparkle.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8220A321A7F00D8810D /* Sparkle.strings */; };
-		725602D51C83551C00DAA70E /* SPUApplicationInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 725602D31C83551C00DAA70E /* SPUApplicationInfo.h */; };
-		725602D61C83551C00DAA70E /* SPUApplicationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 725602D41C83551C00DAA70E /* SPUApplicationInfo.m */; };
+		725602D51C83551C00DAA70E /* SUApplicationInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 725602D31C83551C00DAA70E /* SUApplicationInfo.h */; };
+		725602D61C83551C00DAA70E /* SUApplicationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 725602D41C83551C00DAA70E /* SUApplicationInfo.m */; };
 		725CB9571C7120410064365A /* SPUUserDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 725CB9561C7120410064365A /* SPUUserDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		725CB95A1C7121830064365A /* SPUStandardUserDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 725CB9581C7121830064365A /* SPUStandardUserDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		725CB95B1C7121830064365A /* SPUStandardUserDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 725CB9591C7121830064365A /* SPUStandardUserDriver.m */; };
@@ -334,11 +334,11 @@
 		72A5D5EB1D692BD40009E5AC /* SPUDownloadData.h in Headers */ = {isa = PBXBuildFile; fileRef = 72F9EC421D5E9ED8004AC8B6 /* SPUDownloadData.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72A5D5EF1D692C440009E5AC /* Autoupdate in CopyFiles */ = {isa = PBXBuildFile; fileRef = 72B398D21D3D879300EE297F /* Autoupdate */; };
 		72A5D5F01D692C4B0009E5AC /* Updater.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 721C24451CB753E6005440CB /* Updater.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		72A5D5F41D692CF50009E5AC /* .framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72A5D59C1D6927730009E5AC /* .framework */; };
-		72A5D5F51D692CFE0009E5AC /* .framework in Copy Sparkle */ = {isa = PBXBuildFile; fileRef = 72A5D59C1D6927730009E5AC /* .framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		72A5D5F41D692CF50009E5AC /* SparkleCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72A5D59C1D6927730009E5AC /* SparkleCore.framework */; };
+		72A5D5F51D692CFE0009E5AC /* SparkleCore.framework in Copy Sparkle */ = {isa = PBXBuildFile; fileRef = 72A5D59C1D6927730009E5AC /* SparkleCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		72A5D5F81D692F2B0009E5AC /* SUExport.h in Headers */ = {isa = PBXBuildFile; fileRef = 14652F8319A9759F00959E44 /* SUExport.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72A5D5F91D692F4C0009E5AC /* SPUStatusCompletionResults.h in Headers */ = {isa = PBXBuildFile; fileRef = 726DF88D1C84277500188804 /* SPUStatusCompletionResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		72A5D5FB1D69312F0009E5AC /* SPUBundleIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7214B8801D456A8500CB5CED /* SPUBundleIcon.m */; };
+		72A5D5FB1D69312F0009E5AC /* SUBundleIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7214B8801D456A8500CB5CED /* SUBundleIcon.m */; };
 		72A6F98A1C94E2D6005F404C /* SUUpdaterDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 72A6F9891C94E2D6005F404C /* SUUpdaterDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		72AC6B261B9AAC8800F62325 /* SparkleTestCodeSignApp.tar.gz in Resources */ = {isa = PBXBuildFile; fileRef = 72AC6B251B9AAC8800F62325 /* SparkleTestCodeSignApp.tar.gz */; };
 		72AC6B281B9AAD6700F62325 /* SparkleTestCodeSignApp.tar in Resources */ = {isa = PBXBuildFile; fileRef = 72AC6B271B9AAD6700F62325 /* SparkleTestCodeSignApp.tar */; };
@@ -675,7 +675,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				72A5D5F51D692CFE0009E5AC /* .framework in Copy Sparkle */,
+				72A5D5F51D692CFE0009E5AC /* SparkleCore.framework in Copy Sparkle */,
 			);
 			name = "Copy Sparkle";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -886,8 +886,8 @@
 		720E21791D0D00BF003A311C /* SPUUpdaterCycle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUUpdaterCycle.h; sourceTree = "<group>"; };
 		720E217A1D0D00BF003A311C /* SPUUpdaterCycle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUUpdaterCycle.m; sourceTree = "<group>"; };
 		7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUUnarchiverTest.swift; sourceTree = "<group>"; };
-		7214B87F1D456A8500CB5CED /* SPUBundleIcon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUBundleIcon.h; sourceTree = "<group>"; };
-		7214B8801D456A8500CB5CED /* SPUBundleIcon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUBundleIcon.m; sourceTree = "<group>"; };
+		7214B87F1D456A8500CB5CED /* SUBundleIcon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBundleIcon.h; sourceTree = "<group>"; };
+		7214B8801D456A8500CB5CED /* SUBundleIcon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBundleIcon.m; sourceTree = "<group>"; };
 		7214B8851D45AD9A00CB5CED /* SPUInstallationType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUInstallationType.h; sourceTree = "<group>"; };
 		72162B071C82C9600013C1C5 /* SULocalizations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SULocalizations.h; sourceTree = "<group>"; };
 		721652671D3C8FED00FD13D8 /* SUInstallerLauncherStatus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SUInstallerLauncherStatus.h; path = InstallerLauncher/SUInstallerLauncherStatus.h; sourceTree = SOURCE_ROOT; };
@@ -949,8 +949,8 @@
 		724BB3AB1D347EDE005D534A /* SPUSystemAuthorization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SPUSystemAuthorization.h; path = Sparkle/SPUSystemAuthorization.h; sourceTree = SOURCE_ROOT; };
 		724BB3AC1D347EDE005D534A /* SPUSystemAuthorization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SPUSystemAuthorization.m; path = Sparkle/SPUSystemAuthorization.m; sourceTree = SOURCE_ROOT; };
 		724BB3B51D35AAC3005D534A /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
-		725602D31C83551C00DAA70E /* SPUApplicationInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUApplicationInfo.h; sourceTree = "<group>"; };
-		725602D41C83551C00DAA70E /* SPUApplicationInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUApplicationInfo.m; sourceTree = "<group>"; };
+		725602D31C83551C00DAA70E /* SUApplicationInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUApplicationInfo.h; sourceTree = "<group>"; };
+		725602D41C83551C00DAA70E /* SUApplicationInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUApplicationInfo.m; sourceTree = "<group>"; };
 		725CB9561C7120410064365A /* SPUUserDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUUserDriver.h; sourceTree = "<group>"; };
 		725CB9581C7121830064365A /* SPUStandardUserDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUStandardUserDriver.h; sourceTree = "<group>"; };
 		725CB9591C7121830064365A /* SPUStandardUserDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUStandardUserDriver.m; sourceTree = "<group>"; };
@@ -1056,7 +1056,7 @@
 		72A450511C69A68900D67EEA /* SPUUpdatePermissionResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUUpdatePermissionResponse.h; sourceTree = "<group>"; };
 		72A450521C69A68900D67EEA /* SPUUpdatePermissionResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUUpdatePermissionResponse.m; sourceTree = "<group>"; };
 		72A4A23F1BB6567D00E7820D /* SUFileManagerTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUFileManagerTest.swift; sourceTree = "<group>"; };
-		72A5D59C1D6927730009E5AC /* .framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = .framework; path = SparkleCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		72A5D59C1D6927730009E5AC /* SparkleCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SparkleCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		72A5D5DD1D692ACC0009E5AC /* SparkleCore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SparkleCore.h; sourceTree = "<group>"; };
 		72A6F9891C94E2D6005F404C /* SUUpdaterDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdaterDelegate.h; sourceTree = "<group>"; };
 		72AC6B251B9AAC8800F62325 /* SparkleTestCodeSignApp.tar.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = SparkleTestCodeSignApp.tar.gz; sourceTree = "<group>"; };
@@ -1257,7 +1257,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				724F76F91D6EAD0D00ECD062 /* Cocoa.framework in Frameworks */,
-				72A5D5F41D692CF50009E5AC /* .framework in Frameworks */,
+				72A5D5F41D692CF50009E5AC /* SparkleCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1290,7 +1290,7 @@
 				724BB36C1D31D0B7005D534A /* org.sparkle-project.InstallerConnection.xpc */,
 				724BB3931D333832005D534A /* org.sparkle-project.InstallerStatus.xpc */,
 				72B398D21D3D879300EE297F /* Autoupdate */,
-				72A5D59C1D6927730009E5AC /* .framework */,
+				72A5D59C1D6927730009E5AC /* SparkleCore.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1557,8 +1557,8 @@
 				612DCBAD0D488BC60015DBEA /* SPUUpdatePermissionPrompt.h */,
 				612DCBAE0D488BC60015DBEA /* SPUUpdatePermissionPrompt.m */,
 				3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */,
-				725602D31C83551C00DAA70E /* SPUApplicationInfo.h */,
-				725602D41C83551C00DAA70E /* SPUApplicationInfo.m */,
+				725602D31C83551C00DAA70E /* SUApplicationInfo.h */,
+				725602D41C83551C00DAA70E /* SUApplicationInfo.m */,
 			);
 			name = "User Interface";
 			sourceTree = "<group>";
@@ -1596,8 +1596,8 @@
 				7267E5E41D3D90AA00D1BF90 /* SUFileManager.m */,
 				721BC20C1D1CDE55002BC71E /* SPULocalCacheDirectory.h */,
 				721BC20D1D1CDE55002BC71E /* SPULocalCacheDirectory.m */,
-				7214B87F1D456A8500CB5CED /* SPUBundleIcon.h */,
-				7214B8801D456A8500CB5CED /* SPUBundleIcon.m */,
+				7214B87F1D456A8500CB5CED /* SUBundleIcon.h */,
+				7214B8801D456A8500CB5CED /* SUBundleIcon.m */,
 				55C14F04136EF6DB00649790 /* SULog.h */,
 				55C14F05136EF6DB00649790 /* SULog.m */,
 				726F2CE31BC9C33D001971A4 /* SUOperatingSystem.h */,
@@ -1986,7 +1986,7 @@
 				72F94F581CC44DE1002DEE68 /* SPUXPCServiceInfo.h in Headers */,
 				72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */,
 				61B5FC0D09C4FC8200B25A18 /* SUAppcast.h in Headers */,
-				725602D51C83551C00DAA70E /* SPUApplicationInfo.h in Headers */,
+				725602D51C83551C00DAA70E /* SUApplicationInfo.h in Headers */,
 				72A1C2631CD6849C004CD282 /* SPUUpdatePermissionPrompt.h in Headers */,
 				724BB3A81D33461B005D534A /* SUXPCInstallerStatus.h in Headers */,
 				7246E0A31C83B685003B4E75 /* SPUStandardUpdaterController.h in Headers */,
@@ -2008,7 +2008,7 @@
 				72B09CE71CE6BCBD0052EF9E /* SPUURLDownload.h in Headers */,
 				61A225A40D1C4AC000430CCD /* SUStandardVersionComparator.h in Headers */,
 				7229E1B91C97CC4D00CB50D0 /* SPUScheduledUpdateDriver.h in Headers */,
-				7214B8811D456A8500CB5CED /* SPUBundleIcon.h in Headers */,
+				7214B8811D456A8500CB5CED /* SUBundleIcon.h in Headers */,
 				7293A1AE1CEE933800B957A7 /* SPUURLRequest.h in Headers */,
 				6196CFF909C72148000DC222 /* SUStatusController.h in Headers */,
 				72B767DE1C9CDB9700A07552 /* SPUUserInitiatedUpdateDriver.h in Headers */,
@@ -2276,7 +2276,7 @@
 			);
 			name = SparkleCore;
 			productName = SparkleCore;
-			productReference = 72A5D59C1D6927730009E5AC /* .framework */;
+			productReference = 72A5D59C1D6927730009E5AC /* SparkleCore.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		72B398D11D3D879300EE297F /* Autoupdate */ = {
@@ -2846,8 +2846,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				729051E41DC82AC0003DEA7F /* SUOperatingSystem.m in Sources */,
-				720595EF1D700568000572E8 /* SPUApplicationInfo.m in Sources */,
-				7214B8831D456C2400CB5CED /* SPUBundleIcon.m in Sources */,
+				720595EF1D700568000572E8 /* SUApplicationInfo.m in Sources */,
+				7214B8831D456C2400CB5CED /* SUBundleIcon.m in Sources */,
 				7267E5FA1D3DAC3600D1BF90 /* StatusInfo.m in Sources */,
 				7267E5EB1D3D90C200D1BF90 /* SUFileManager.m in Sources */,
 				7267E5DC1D3D8F1E00D1BF90 /* SPUMessageTypes.m in Sources */,
@@ -2897,7 +2897,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				721D8A7B1D4963190032E472 /* SPULocalCacheDirectory.m in Sources */,
-				7214B8841D456C9500CB5CED /* SPUBundleIcon.m in Sources */,
+				7214B8841D456C9500CB5CED /* SUBundleIcon.m in Sources */,
 				7267E5E11D3D901600D1BF90 /* SPUMessageTypes.m in Sources */,
 				724BB3AF1D34828A005D534A /* SPUSystemAuthorization.m in Sources */,
 				726E07C01CAF15B7001A286B /* SULog.m in Sources */,
@@ -2936,7 +2936,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				72A5D5FB1D69312F0009E5AC /* SPUBundleIcon.m in Sources */,
+				72A5D5FB1D69312F0009E5AC /* SUBundleIcon.m in Sources */,
 				72A5D5DC1D692A4E0009E5AC /* SUCodeSigningVerifier.m in Sources */,
 				72A5D5AD1D6929F80009E5AC /* SPUXPCServiceInfo.m in Sources */,
 				72A5D5AE1D6929F80009E5AC /* SUInstallerLauncher.m in Sources */,
@@ -3063,7 +3063,7 @@
 				72B767D71C9C8B5C00A07552 /* SPUBasicUpdateDriver.m in Sources */,
 				61299A6009CA6EB100B7442F /* SUConstants.m in Sources */,
 				728337A71C9E6FF40085AA99 /* SPUProbeInstallStatus.m in Sources */,
-				725602D61C83551C00DAA70E /* SPUApplicationInfo.m in Sources */,
+				725602D61C83551C00DAA70E /* SUApplicationInfo.m in Sources */,
 				72B767DF1C9CDB9700A07552 /* SPUUserInitiatedUpdateDriver.m in Sources */,
 				72F9EBE31D517E2F004AC8B6 /* SUUpdater.m in Sources */,
 				72B767CF1C9B924900A07552 /* SPUInstallerDriver.m in Sources */,
@@ -3071,7 +3071,7 @@
 				72A450541C69A68900D67EEA /* SPUUpdatePermissionResponse.m in Sources */,
 				724BB3881D32A167005D534A /* SUXPCInstallerConnection.m in Sources */,
 				72DBA37E1D60CC34002594A8 /* SPUUpdatePermissionRequest.m in Sources */,
-				7214B8821D456A8500CB5CED /* SPUBundleIcon.m in Sources */,
+				7214B8821D456A8500CB5CED /* SUBundleIcon.m in Sources */,
 				72F9EC401D5E823F004AC8B6 /* SPUUpdaterTimer.m in Sources */,
 				7229E1BA1C97CC4D00CB50D0 /* SPUScheduledUpdateDriver.m in Sources */,
 				725CB95B1C7121830064365A /* SPUStandardUserDriver.m in Sources */,

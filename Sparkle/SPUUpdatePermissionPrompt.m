@@ -13,7 +13,7 @@
 
 #import "SUHost.h"
 #import "SUConstants.h"
-#import "SPUApplicationInfo.h"
+#import "SUApplicationInfo.h"
 
 @interface SPUUpdatePermissionPrompt ()
 
@@ -63,7 +63,7 @@
     // If this is a background application we need to focus it in order to bring the prompt
     // to the user's attention. Otherwise the prompt would be hidden behind other applications and
     // the user would not know why the application was paused.
-    if ([SPUApplicationInfo isBackgroundApplication:NSApp]) {
+    if ([SUApplicationInfo isBackgroundApplication:NSApp]) {
         [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
     }
     
@@ -101,7 +101,7 @@
 
 - (NSImage *)icon
 {
-    return [SPUApplicationInfo bestIconForBundle:self.host.bundle];
+    return [SUApplicationInfo bestIconForBundle:self.host.bundle];
 }
 
 - (NSString *)promptDescription

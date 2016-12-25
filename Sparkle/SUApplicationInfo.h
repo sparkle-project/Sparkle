@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SPUApplicationInfo : NSObject
+@interface SUApplicationInfo : NSObject
 
 + (BOOL)isBackgroundApplication:(NSApplication *)application;
 
