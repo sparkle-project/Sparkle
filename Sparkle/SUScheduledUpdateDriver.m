@@ -7,7 +7,8 @@
 //
 
 #import "SUScheduledUpdateDriver.h"
-#import "SUUpdater.h"
+#import "SUUpdaterPrivate.h"
+#import "SUUpdaterDelegate.h"
 
 @interface SUScheduledUpdateDriver ()
 
@@ -30,7 +31,7 @@
     id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
 
     if ([updaterDelegate respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
-        [updaterDelegate updaterDidNotFindUpdate:self.updater];
+        [updaterDelegate updaterDidNotFindUpdate:(id)self.updater];
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
@@ -46,7 +47,7 @@
         // Normally this gets called by the superclass
         id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
         if ([updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
-            [updaterDelegate updater:self.updater didAbortWithError:error];
+            [updaterDelegate updater:(id)self.updater didAbortWithError:error];
         }
 
         [self abortUpdate];

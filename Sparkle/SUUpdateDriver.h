@@ -13,13 +13,14 @@
 
 extern NSString *const SUUpdateDriverFinishedNotification;
 
-@class SUHost, SUUpdater;
+@class SUHost;
+@protocol SUUpdaterPrivate;
 @interface SUUpdateDriver : NSObject <NSURLDownloadDelegate>
 
-@property (readonly, weak) SUUpdater *updater;
+@property (readonly, weak) id<SUUpdaterPrivate> updater;
 @property (strong) SUHost *host;
 
-- (instancetype)initWithUpdater:(SUUpdater *)updater;
+- (instancetype)initWithUpdater:(id<SUUpdaterPrivate>)updater;
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
 - (void)abortUpdate;
 

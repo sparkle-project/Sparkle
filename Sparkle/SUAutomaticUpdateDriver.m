@@ -7,7 +7,8 @@
 //
 
 #import "SUAutomaticUpdateDriver.h"
-#import "SUUpdater.h"
+#import "SUUpdaterPrivate.h"
+#import "SUUpdaterDelegate.h"
 #import "SULocalizations.h"
 #import "SUErrors.h"
 #import "SUAutomaticUpdateAlert.h"
@@ -88,7 +89,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         [invocation setArgument:&showUI atIndex:3];
         [invocation setTarget:self];
 
-        [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationInvocation:invocation];
+        [updaterDelegate updater:(id)self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationInvocation:invocation];
     }
 
     // If this is marked as a critical update, we'll prompt the user to install it right away.
@@ -119,7 +120,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
         id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
         if ([updaterDelegate respondsToSelector:@selector(updater:didCancelInstallUpdateOnQuit:)])
-            [updaterDelegate updater:self.updater didCancelInstallUpdateOnQuit:self.updateItem];
+            [updaterDelegate updater:(id)self.updater didCancelInstallUpdateOnQuit:self.updateItem];
     }
 }
 
@@ -216,7 +217,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         // Normally this gets called by the superclass
         id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
         if ([updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
-            [updaterDelegate updater:self.updater didAbortWithError:error];
+            [updaterDelegate updater:(id)self.updater didAbortWithError:error];
         }
 
         [self abortUpdate];

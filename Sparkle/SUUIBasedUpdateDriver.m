@@ -9,7 +9,8 @@
 #import "SUUIBasedUpdateDriver.h"
 
 #import "SUUpdateAlert.h"
-#import "SUUpdater_Private.h"
+#import "SUUpdaterPrivate.h"
+#import "SUUpdaterDelegate.h"
 #import "SUHost.h"
 #import "SUOperatingSystem.h"
 #import "SUStatusController.h"
@@ -45,7 +46,7 @@
 @synthesize statusController;
 @synthesize updateAlert;
 
-- (instancetype)initWithUpdater:(SUUpdater *)anUpdater
+- (instancetype)initWithUpdater:(id<SUUpdaterPrivate>)anUpdater
 {
     if ((self = [super initWithUpdater:anUpdater])) {
         self.automaticallyInstallUpdates = NO;
@@ -56,7 +57,7 @@
 - (void)didFindValidUpdate
 {
     if ([[self.updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
-        [[self.updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
+        [[self.updater delegate] updater:(id)self.updater didFindValidUpdate:self.updateItem];
     }
 
     if (self.automaticallyInstallUpdates) {
@@ -70,7 +71,7 @@
 
     id<SUVersionDisplay> versDisp = nil;
     if ([[self.updater delegate] respondsToSelector:@selector(versionDisplayerForUpdater:)]) {
-        versDisp = [[self.updater delegate] versionDisplayerForUpdater:self.updater];
+        versDisp = [[self.updater delegate] versionDisplayerForUpdater:(id)self.updater];
     }
     [self.updateAlert setVersionDisplayer:versDisp];
 
@@ -92,7 +93,7 @@
 - (void)didNotFindUpdate
 {
     if ([[self.updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
-        [[self.updater delegate] updaterDidNotFindUpdate:self.updater];
+        [[self.updater delegate] updaterDidNotFindUpdate:(id)self.updater];
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
     if (!self.automaticallyInstallUpdates) {
@@ -205,7 +206,7 @@
     if (self.download) {
         [self.download cancel];
         if ([[self.updater delegate] respondsToSelector:@selector(userDidCancelDownload:)]) {
-            [[self.updater delegate] userDidCancelDownload:self.updater];
+            [[self.updater delegate] userDidCancelDownload:(id)self.updater];
         }
     }
     [self abortUpdate];
@@ -293,7 +294,7 @@
 - (void)showAlert:(NSAlert *)alert
 {
     if ([[self.updater delegate] respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
-        [[self.updater delegate] updaterWillShowModalAlert:self.updater];
+        [[self.updater delegate] updaterWillShowModalAlert:(id)self.updater];
     }
 
     // When showing a modal alert we need to ensure that background applications
@@ -304,7 +305,7 @@
     [alert runModal];
 
     if ([[self.updater delegate] respondsToSelector:@selector(updaterDidShowModalAlert:)])
-        [[self.updater delegate] updaterDidShowModalAlert:self.updater];
+        [[self.updater delegate] updaterDidShowModalAlert:(id)self.updater];
 }
 
 @end

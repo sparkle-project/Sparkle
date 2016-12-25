@@ -7,6 +7,8 @@
 //
 
 #import "SUUpdater.h"
+#import "SUUpdaterDelegate.h"
+#import "SUUpdaterPrivate.h"
 
 #import "SUHost.h"
 #import "SUUpdatePermissionPrompt.h"
@@ -30,7 +32,7 @@ NSString *const SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotific
 NSString *const SUUpdaterAppcastItemNotificationKey = @"SUUpdaterAppcastItemNotificationKey";
 NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotificationKey";
 
-@interface SUUpdater () <SUUpdatePermissionPromptDelegate>
+@interface SUUpdater () <SUUpdaterPrivate, SUUpdatePermissionPromptDelegate>
 @property (strong) NSTimer *checkTimer;
 @property (strong) NSBundle *sparkleBundle;
 
@@ -280,11 +282,6 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     SUUpdateDriver *theUpdateDriver = [[([self automaticallyDownloadsUpdates] ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class])alloc] initWithUpdater:self];
     
     [self checkForUpdatesWithDriver:theUpdateDriver];
-}
-
-- (BOOL)mayUpdateAndRestart
-{
-    return (!self.delegate || ![self.delegate respondsToSelector:@selector(updaterShouldRelaunchApplication:)] || [self.delegate updaterShouldRelaunchApplication:self]);
 }
 
 - (IBAction)checkForUpdates:(id)__unused sender
