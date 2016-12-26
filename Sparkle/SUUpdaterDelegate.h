@@ -17,6 +17,8 @@
 @protocol SUVersionComparison;
 @class SUUpdater, SUAppcast, SUAppcastItem;
 
+NS_ASSUME_NONNULL_BEGIN
+
 // -----------------------------------------------------------------------------
 // SUUpdater Notifications for events that might be interesting to more than just the delegate
 // The updater will be the notification object
@@ -72,7 +74,7 @@ __deprecated_msg("See SPUUpdaterDelegate instead")
  
  \param updater The updater instance.
  */
-- (NSString *)feedURLStringForUpdater:(SUUpdater *)updater;
+- (nullable NSString *)feedURLStringForUpdater:(SUUpdater *)updater;
 
 /*!
  Returns whether Sparkle should prompt the user about automatic update checks.
@@ -103,7 +105,7 @@ __deprecated_msg("See SPUUpdaterDelegate instead")
  \param appcast The appcast that was downloaded from the remote server.
  \param updater The updater instance.
  */
-- (SUAppcastItem *)bestValidUpdateInAppcast:(SUAppcast *)appcast forUpdater:(SUUpdater *)updater;
+- (nullable SUAppcastItem *)bestValidUpdateInAppcast:(SUAppcast *)appcast forUpdater:(SUUpdater *)updater;
 
 /*!
  Called when a valid update is found by the update driver.
@@ -200,7 +202,7 @@ __deprecated_msg("See SPUUpdaterDelegate instead")
  
  \param updater The updater instance.
  */
-- (id<SUVersionComparison>)versionComparatorForUpdater:(SUUpdater *)updater;
+- (nullable id<SUVersionComparison>)versionComparatorForUpdater:(SUUpdater *)updater;
 
 /*!
  \deprecated See SUStandardUserUpdaterDriver delegate instead.
@@ -211,7 +213,7 @@ __deprecated_msg("See SPUUpdaterDelegate instead")
  \sa SUUpdateAlert
  \param updater The updater instance.
  */
-- (id)versionDisplayerForUpdater:(SUUpdater *)updater __deprecated; // Don't specify SUVersionDisplay in the return type, otherwise we'd have to forward declare a protocol that isn't used here anymore
+- (nullable id)versionDisplayerForUpdater:(SUUpdater *)updater __deprecated; // Don't specify SUVersionDisplay in the return type, otherwise we'd have to forward declare a protocol that isn't used here anymore
 
 /*!
  Returns the path to the application which is used to relaunch after the update is installed.
@@ -222,7 +224,7 @@ __deprecated_msg("See SPUUpdaterDelegate instead")
  
  \param updater The updater instance.
  */
-- (NSString *)pathToRelaunchForUpdater:(SUUpdater *)updater;
+- (nullable NSString *)pathToRelaunchForUpdater:(SUUpdater *)updater;
 
 /*!
  Called before an updater shows a modal alert window,
@@ -274,3 +276,5 @@ __deprecated_msg("See SPUUpdaterDelegate instead")
 - (void)updater:(SUUpdater *)updater didAbortWithError:(NSError *)error;
 
 @end
+
+NS_ASSUME_NONNULL_END
