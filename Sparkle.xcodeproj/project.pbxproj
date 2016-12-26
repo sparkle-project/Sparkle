@@ -119,7 +119,7 @@
 		61299B3609CB04E000B7442F /* Sparkle.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299B3509CB04E000B7442F /* Sparkle.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		612DCBAF0D488BC60015DBEA /* SUUpdatePermissionPrompt.h in Headers */ = {isa = PBXBuildFile; fileRef = 612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */; settings = {ATTRIBUTES = (); }; };
 		612DCBB00D488BC60015DBEA /* SUUpdatePermissionPrompt.m in Sources */ = {isa = PBXBuildFile; fileRef = 612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */; };
-		6158A1C5137904B300487EC1 /* SUUpdater_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6158A1C4137904B300487EC1 /* SUUpdater_Private.h */; };
+		6158A1C5137904B300487EC1 /* SUUpdaterPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 6158A1C4137904B300487EC1 /* SUUpdaterPrivate.h */; };
 		615AE3D00D64DC40001CA7BD /* SUModelTranslation.plist in Resources */ = {isa = PBXBuildFile; fileRef = 615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */; };
 		618FA5010DAE88B40026945C /* SUInstaller.h in Headers */ = {isa = PBXBuildFile; fileRef = 618FA4FF0DAE88B40026945C /* SUInstaller.h */; settings = {ATTRIBUTES = (); }; };
 		618FA5020DAE88B40026945C /* SUInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 618FA5000DAE88B40026945C /* SUInstaller.m */; };
@@ -198,6 +198,7 @@
 		72316BE01E0E17910039EFD9 /* SUApplicationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 72316BDD1E0E17910039EFD9 /* SUApplicationInfo.m */; };
 		72316BE31E0E1C7F0039EFD9 /* SUSystemUpdateInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 72316BE11E0E1C7F0039EFD9 /* SUSystemUpdateInfo.h */; };
 		72316BE41E0E1C7F0039EFD9 /* SUSystemUpdateInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 72316BE21E0E1C7F0039EFD9 /* SUSystemUpdateInfo.m */; };
+		72316BE61E1087060039EFD9 /* SUUpdaterDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 72316BE51E1087060039EFD9 /* SUUpdaterDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		723A920E1D722438004A9DED /* SUSpotlightImporterTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 723A920D1D722438004A9DED /* SUSpotlightImporterTest.swift */; };
 		723B252D1CEAB3A600909873 /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 723B252B1CEAB3A600909873 /* bscommon.c */; };
 		723B252E1CEAB3A600909873 /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 723B252B1CEAB3A600909873 /* bscommon.c */; };
@@ -615,7 +616,7 @@
 		6158A1BE1378F8BB00487EC1 /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = tr.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
 		6158A1BF1378F8BB00487EC1 /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = tr.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
 		6158A1C01378F8BB00487EC1 /* tr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = tr; path = tr.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
-		6158A1C4137904B300487EC1 /* SUUpdater_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdater_Private.h; sourceTree = "<group>"; };
+		6158A1C4137904B300487EC1 /* SUUpdaterPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdaterPrivate.h; sourceTree = "<group>"; };
 		615AE3CF0D64DC40001CA7BD /* SUModelTranslation.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = SUModelTranslation.plist; sourceTree = "<group>"; };
 		6186554310D7484E00B1E074 /* pt_PT */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = pt_PT; path = pt_PT.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		618915730E35937600B5E981 /* sv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Sparkle.strings; sourceTree = "<group>"; };
@@ -701,6 +702,7 @@
 		72316BDD1E0E17910039EFD9 /* SUApplicationInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUApplicationInfo.m; sourceTree = "<group>"; };
 		72316BE11E0E1C7F0039EFD9 /* SUSystemUpdateInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUSystemUpdateInfo.h; sourceTree = "<group>"; };
 		72316BE21E0E1C7F0039EFD9 /* SUSystemUpdateInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUSystemUpdateInfo.m; sourceTree = "<group>"; };
+		72316BE51E1087060039EFD9 /* SUUpdaterDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdaterDelegate.h; sourceTree = "<group>"; };
 		723A920D1D722438004A9DED /* SUSpotlightImporterTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUSpotlightImporterTest.swift; sourceTree = "<group>"; };
 		723B252B1CEAB3A600909873 /* bscommon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bscommon.c; sourceTree = "<group>"; };
 		723B252C1CEAB3A600909873 /* bscommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bscommon.h; sourceTree = "<group>"; };
@@ -1203,7 +1205,8 @@
 				61CFB2C10E384958007A1735 /* Support */,
 				61B5F8E309C4CE3C00B25A18 /* SUUpdater.h */,
 				61B5F8E409C4CE3C00B25A18 /* SUUpdater.m */,
-				6158A1C4137904B300487EC1 /* SUUpdater_Private.h */,
+				72316BE51E1087060039EFD9 /* SUUpdaterDelegate.h */,
+				6158A1C4137904B300487EC1 /* SUUpdaterPrivate.h */,
 			);
 			name = "Update Control";
 			sourceTree = "<group>";
@@ -1281,6 +1284,7 @@
 				61B5FC7009C51F4A00B25A18 /* SUAppcastItem.h in Headers */,
 				6120721209CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.h in Headers */,
 				61B93B270DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.h in Headers */,
+				72316BE61E1087060039EFD9 /* SUUpdaterDelegate.h in Headers */,
 				61F83F740DBFE141006FDD30 /* SUBasicUpdateDriver.h in Headers */,
 				5D06E9390FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.h in Headers */,
 				61B078CE15A5FB6100600039 /* SUCodeSigningVerifier.h in Headers */,
@@ -1315,7 +1319,7 @@
 				72316BD91E0E17180039EFD9 /* SUBundleIcon.h in Headers */,
 				612DCBAF0D488BC60015DBEA /* SUUpdatePermissionPrompt.h in Headers */,
 				61B5F8ED09C4CE3C00B25A18 /* SUUpdater.h in Headers */,
-				6158A1C5137904B300487EC1 /* SUUpdater_Private.h in Headers */,
+				6158A1C5137904B300487EC1 /* SUUpdaterPrivate.h in Headers */,
 				72316BDE1E0E17910039EFD9 /* SUApplicationInfo.h in Headers */,
 				61A354550DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.h in Headers */,
 				61A2259E0D1C495D00430CCD /* SUVersionComparisonProtocol.h in Headers */,

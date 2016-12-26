@@ -7,6 +7,8 @@
 //
 
 #import "SUUpdater.h"
+#import "SUUpdaterDelegate.h"
+#import "SUUpdaterPrivate.h"
 
 #import "SUHost.h"
 #import "SUUpdatePermissionPrompt.h"
@@ -30,7 +32,7 @@ NSString *const SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotific
 NSString *const SUUpdaterAppcastItemNotificationKey = @"SUUpdaterAppcastItemNotificationKey";
 NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotificationKey";
 
-@interface SUUpdater () <SUUpdatePermissionPromptDelegate>
+@interface SUUpdater () <SUUpdaterPrivate, SUUpdatePermissionPromptDelegate>
 @property (strong) NSTimer *checkTimer;
 @property (strong) NSBundle *sparkleBundle;
 
@@ -282,11 +284,6 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     [self checkForUpdatesWithDriver:theUpdateDriver];
 }
 
-- (BOOL)mayUpdateAndRestart
-{
-    return (!self.delegate || ![self.delegate respondsToSelector:@selector(updaterShouldRelaunchApplication:)] || [self.delegate updaterShouldRelaunchApplication:self]);
-}
-
 - (IBAction)checkForUpdates:(id)__unused sender
 {
     if (self.driver && [self.driver isInterruptible]) {
@@ -438,8 +435,12 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
     // A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
     NSString *appcastString = [self.host objectForKey:SUFeedURLKey];
-    if ([self.delegate respondsToSelector:@selector(feedURLStringForUpdater:)])
-        appcastString = [self.delegate feedURLStringForUpdater:self];
+    if ([self.delegate respondsToSelector:@selector(feedURLStringForUpdater:)]) {
+        NSString *delegateAppcastString = [self.delegate feedURLStringForUpdater:self];
+        if (delegateAppcastString != nil) {
+            appcastString = delegateAppcastString;
+        }
+    }
     if (!appcastString) // Can't find an appcast string!
         [NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the %@ key in either the Info.plist or the user defaults!", SUFeedURLKey];
     NSCharacterSet *quoteSet = [NSCharacterSet characterSetWithCharactersInString:@"\"\'"]; // Some feed publishers add quotes; strip 'em.
