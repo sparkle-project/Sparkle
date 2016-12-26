@@ -165,7 +165,7 @@
                 installationPath = host.bundlePath;
             }
             
-            installer = [[SUPlainInstaller alloc] initWithHost:host applicationPath:newDownloadPath installationPath:installationPath versionComparator:comparator];
+            installer = [[SUPlainInstaller alloc] initWithHost:host bundlePath:newDownloadPath installationPath:installationPath versionComparator:comparator];
         }
     }
     

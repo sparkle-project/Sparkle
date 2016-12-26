@@ -14,6 +14,12 @@
 
 @interface SUPlainInstaller : NSObject <SPUInstallerProtocol>
 
-- (instancetype)initWithHost:(SUHost *)host applicationPath:(NSString *)applicationPath installationPath:(NSString *)installationPath versionComparator:(id <SUVersionComparison>)comparator;
+/*!
+ @param host The current (old) bundle host
+ @param bundlePath The path to the new bundle that will be installed.
+ @param installationPath The path the new bundlePath will be installed to.
+ @param comparator The version comparator to use to prevent a downgrade from occurring.
+ */
+- (instancetype)initWithHost:(SUHost *)host bundlePath:(NSString *)bundlePath installationPath:(NSString *)installationPath versionComparator:(id <SUVersionComparison>)comparator;
 
 @end

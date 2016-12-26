@@ -22,7 +22,7 @@
 
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly) id <SUVersionComparison> comparator;
-@property (nonatomic, copy, readonly) NSString *applicationPath;
+@property (nonatomic, copy, readonly) NSString *bundlePath;
 @property (nonatomic, copy, readonly) NSString *installationPath;
 
 // Properties that carry over from starting installation to resuming to cleaning up
@@ -35,17 +35,17 @@
 
 @synthesize host = _host;
 @synthesize comparator = _comparator;
-@synthesize applicationPath = _applicationPath;
+@synthesize bundlePath = _bundlePath;
 @synthesize installationPath = _installationPath;
 @synthesize tempOldDirectoryURL = _tempOldDirectoryURL;
 @synthesize tempNewDirectoryURL = _tempNewDirectoryURL;
 
-- (instancetype)initWithHost:(SUHost *)host applicationPath:(NSString *)applicationPath installationPath:(NSString *)installationPath versionComparator:(id <SUVersionComparison>)comparator
+- (instancetype)initWithHost:(SUHost *)host bundlePath:(NSString *)bundlePath installationPath:(NSString *)installationPath versionComparator:(id <SUVersionComparison>)comparator
 {
     self = [super init];
     if (self != nil) {
         _host = host;
-        _applicationPath = [applicationPath copy];
+        _bundlePath = [bundlePath copy];
         _installationPath = [installationPath copy];
         _comparator = comparator;
     }
@@ -196,7 +196,7 @@
     // Note that we may not be able to do this for package installations, hence this code being done here
     if (!allowDowngrades) {
         NSString *hostVersion = [self.host version];
-        NSBundle *bundle = [NSBundle bundleWithPath:self.applicationPath];
+        NSBundle *bundle = [NSBundle bundleWithPath:self.bundlePath];
         NSString *updateVersion = [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
         if (!updateVersion || [self.comparator compareVersion:hostVersion toVersion:updateVersion] == NSOrderedDescending) {
             NSString *errorMessage = [NSString stringWithFormat:@"For security reasons, updates that downgrade version of the application are not allowed. Refusing to downgrade app from version %@ to %@. Aborting update.", hostVersion, [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
@@ -214,7 +214,7 @@
 {
     // Note: we must do most installation work in the third stage due to relying on our application sitting in temporary directories.
     // It must not be possible for our update to sit in temporary directories for a very long time.
-    return [self startInstallationToURL:[NSURL fileURLWithPath:self.installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:self.applicationPath] withHost:self.host error:error];
+    return [self startInstallationToURL:[NSURL fileURLWithPath:self.installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:self.bundlePath] withHost:self.host error:error];
 }
 
 - (BOOL)canInstallSilently
