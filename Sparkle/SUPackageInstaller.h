@@ -6,13 +6,15 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
-#ifndef SUPACKAGEINSTALLER_H
-#define SUPACKAGEINSTALLER_H
-
 #import <Foundation/Foundation.h>
-#import "SUPlainInstaller.h"
+#import "SUInstallerProtocol.h"
 
-@interface SUPackageInstaller : SUPlainInstaller
+NS_ASSUME_NONNULL_BEGIN
+
+@interface SUPackageInstaller : NSObject <SUInstallerProtocol>
+
+- (instancetype)initWithPackagePath:(NSString *)packagePath installationPath:(NSString *)installationPath;
+
 @end
 
-#endif
+NS_ASSUME_NONNULL_END

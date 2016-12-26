@@ -6,6 +6,7 @@
 #import "SUStandardVersionComparator.h"
 #import "SUStatusController.h"
 #import "SULog.h"
+#import "SUInstallerProtocol.h"
 
 #include <unistd.h>
 
@@ -154,32 +155,20 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     }];
 }
 
-- (NSString *)installationPathForBundle:(NSBundle *)bundle
+- (void)showError:(NSError *)error
 {
-    if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
-        // We'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
-        NSString *normalizedAppPath = [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[bundle bundlePath] pathExtension]]];
-        
-        if (![[NSFileManager defaultManager] fileExistsAtPath:normalizedAppPath]) {
-            return normalizedAppPath;
-        }
+    if (self.shouldShowUI) {
+        NSAlert *alert = [[NSAlert alloc] init];
+        alert.messageText = @"";
+        alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
+        [alert runModal];
     }
-    return [bundle bundlePath];
 }
 
 - (void)install
 {
     NSBundle *theBundle = [NSBundle bundleWithPath:self.hostPath];
     SUHost *host = [[SUHost alloc] initWithBundle:theBundle];
-    NSString *installationPath = [self installationPathForBundle:theBundle];
-    
-    if (self.shouldShowUI) {
-        self.statusController = [[SUStatusController alloc] initWithHost:host];
-        [self.statusController setButtonTitle:SULocalizedString(@"Cancel Update", @"") target:nil action:Nil isDefault:NO];
-        [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"")
-                                   maxProgressValue: 0 statusText: @""];
-        [self.statusController showWindow:self];
-    }
     
     NSString *fileOperationToolPath = [[[[NSBundle mainBundle] executablePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:@""SPARKLE_FILEOP_TOOL_NAME];
     
@@ -187,36 +176,59 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         SULog(@"Potential Installation Error: File operation tool path %@ is not found", fileOperationToolPath);
     }
     
-    [SUInstaller installFromUpdateFolder:self.updateFolderPath
-                                overHost:host
-                        installationPath:installationPath
-                   fileOperationToolPath:fileOperationToolPath
-                       versionComparator:[SUStandardVersionComparator defaultComparator]
-                       completionHandler:^(NSError *error) {
-                           if (error) {
-                               NSError *underlyingError = [error.userInfo objectForKey:NSUnderlyingErrorKey];
-                               if (underlyingError == nil || underlyingError.code != SUInstallationCancelledError) {
-                                   SULog(@"Installation Error: %@", error);
-                                   if (self.shouldShowUI) {
-                                       NSAlert *alert = [[NSAlert alloc] init];
-                                       alert.messageText = @"";
-                                       alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
-                                       [alert runModal];
-                                   }
-                               }
-                               exit(EXIT_FAILURE);
-                           } else {
-                               NSString *pathToRelaunch = nil;
-                               // If the installation path differs from the host path, we give higher precedence for it than
-                               // if the desired relaunch path differs from the host path
-                               if (![installationPath.pathComponents isEqualToArray:self.hostPath.pathComponents] || [self.relaunchPath.pathComponents isEqualToArray:self.hostPath.pathComponents]) {
-                                   pathToRelaunch = installationPath;
-                               } else {
-                                   pathToRelaunch = self.relaunchPath;
-                               }
-                               [self cleanupAndTerminateWithPathToRelaunch:pathToRelaunch];
-                           }
-                       }];
+    NSError *retrieveInstallerError = nil;
+    id<SUInstallerProtocol> installer = [SUInstaller installerForHost:host fileOperationToolPath:fileOperationToolPath updateDirectory:self.updateFolderPath error:&retrieveInstallerError];
+    if (installer == nil) {
+        SULog(@"Retrieved Installer Error: %@", retrieveInstallerError);
+        exit(EXIT_FAILURE);
+    }
+    
+    if (self.shouldShowUI && [installer canInstallSilently]) {
+        self.statusController = [[SUStatusController alloc] initWithHost:host];
+        [self.statusController setButtonTitle:SULocalizedString(@"Cancel Update", @"") target:nil action:Nil isDefault:NO];
+        [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"")
+                                   maxProgressValue: 0 statusText: @""];
+        [self.statusController showWindow:self];
+    }
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSError *initialInstallationError = nil;
+        if (![installer performInitialInstallation:&initialInstallationError]) {
+            SULog(@"Failed to perform initial installation with error: %@", initialInstallationError);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self showError:initialInstallationError];
+                exit(EXIT_FAILURE);
+            });
+            return;
+        }
+        
+        NSError *finalInstallationError = nil;
+        if (![installer performFinalInstallation:&finalInstallationError]) {
+            NSError *underlyingError = [finalInstallationError.userInfo objectForKey:NSUnderlyingErrorKey];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (underlyingError == nil || underlyingError.code != SUInstallationCancelledError) {
+                    SULog(@"Failed to perform final installation Error: %@", finalInstallationError);
+                    [self showError:finalInstallationError];
+                }
+                exit(EXIT_FAILURE);
+            });
+            return;
+        }
+        
+        NSString *installationPath = [installer installationPath];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSString *pathToRelaunch = nil;
+            // If the relaunch path is the same as the host bundle path, use the installation path from the installer which may be normalized
+            // Otherwise use the requested relaunch path in all other cases
+            if ([self.relaunchPath.pathComponents isEqualToArray:host.bundlePath.pathComponents]) {
+                pathToRelaunch = installationPath;
+            } else {
+                pathToRelaunch = self.relaunchPath;
+            }
+            [self cleanupAndTerminateWithPathToRelaunch:pathToRelaunch];
+        });
+    });
 }
 
 - (void)cleanupAndTerminateWithPathToRelaunch:(NSString *)relaunchPath
