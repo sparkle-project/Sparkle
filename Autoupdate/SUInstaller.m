@@ -153,7 +153,7 @@
         } else {
             NSString *normalizedInstallationPath = nil;
             if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
-                normalizedInstallationPath = [[self class] normalizedInstallationPathForHost:host];
+                normalizedInstallationPath = [self normalizedInstallationPathForHost:host];
             }
             
             // If we have a normalized path, we'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
