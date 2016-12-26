@@ -14,7 +14,7 @@
 
 #import "SUExport.h"
 
-@protocol SUVersionComparison;
+@protocol SUVersionComparison, SUVersionDisplay;
 @class SUUpdater, SUAppcast, SUAppcastItem;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -156,7 +156,6 @@ __deprecated_msg("See SPUUpdaterDelegate instead")
 - (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)item;
 
 /*!
- \deprecated Use -updater:shouldPostponeRelaunchForUpdate:untilInvokingBlock: instead
  Returns whether the relaunch should be delayed in order to perform other tasks.
  
  This is not called if the user didn't relaunch on the previous update,
@@ -170,7 +169,7 @@ __deprecated_msg("See SPUUpdaterDelegate instead")
  
  \return \c YES to delay the relaunch until \p invocation is invoked.
  */
-- (BOOL)updater:(SUUpdater *)updater shouldPostponeRelaunchForUpdate:(SUAppcastItem *)item untilInvoking:(NSInvocation *)invocation __deprecated;
+- (BOOL)updater:(SUUpdater *)updater shouldPostponeRelaunchForUpdate:(SUAppcastItem *)item untilInvoking:(NSInvocation *)invocation;
 
 /*!
  Returns whether the application should be relaunched at all.
@@ -205,15 +204,13 @@ __deprecated_msg("See SPUUpdaterDelegate instead")
 - (nullable id<SUVersionComparison>)versionComparatorForUpdater:(SUUpdater *)updater;
 
 /*!
- \deprecated See SUStandardUserUpdaterDriver delegate instead.
- 
  Returns an object that formats version numbers for display to the user.
  If you don't implement this method or return \c nil, the standard version formatter will be used.
  
  \sa SUUpdateAlert
  \param updater The updater instance.
  */
-- (nullable id)versionDisplayerForUpdater:(SUUpdater *)updater __deprecated; // Don't specify SUVersionDisplay in the return type, otherwise we'd have to forward declare a protocol that isn't used here anymore
+- (nullable id <SUVersionDisplay>)versionDisplayerForUpdater:(SUUpdater *)updater;
 
 /*!
  Returns the path to the application which is used to relaunch after the update is installed.
@@ -231,20 +228,16 @@ __deprecated_msg("See SPUUpdaterDelegate instead")
  to give the host the opportunity to hide attached windows that may get in the way.
  
  \param updater The updater instance.
- 
- @deprecated See SUStandardUserUpdaterDriver delegate instead.
  */
-- (void)updaterWillShowModalAlert:(SUUpdater *)updater __deprecated;
+- (void)updaterWillShowModalAlert:(SUUpdater *)updater;
 
 /*!
  Called after an updater shows a modal alert window,
  to give the host the opportunity to hide attached windows that may get in the way.
  
  \param updater The updater instance.
- 
- @deprecated See SUStandardUserUpdaterDriver delegate instead.
  */
-- (void)updaterDidShowModalAlert:(SUUpdater *)updater __deprecated;
+- (void)updaterDidShowModalAlert:(SUUpdater *)updater;
 
 /*!
  Called when an update is scheduled to be silently installed on quit.
@@ -252,10 +245,8 @@ __deprecated_msg("See SPUUpdaterDelegate instead")
  \param updater The updater instance.
  \param item The appcast item corresponding to the update that is proposed to be installed.
  \param invocation Can be used to trigger an immediate silent install and relaunch.
- 
- \deprecated See -[SPUpdaterDelegate updater:willInstallUpdateOnQuit:immediateInstallationBlock:] instead. If this method is implemented, Sparkle will assume the delegate is given responsibility to handling the update without a choice. For this reason, please don't implement this method.
  */
-- (void)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationInvocation:(NSInvocation *)invocation __deprecated;
+- (void)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationInvocation:(NSInvocation *)invocation;
 
 /*!
  Calls after an update that was scheduled to be silently installed on quit has been canceled.
