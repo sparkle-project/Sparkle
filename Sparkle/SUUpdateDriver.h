@@ -13,11 +13,14 @@
 
 extern NSString *const SUUpdateDriverFinishedNotification;
 
-@class SUHost;
+@class SUHost, SUUpdater;
 @protocol SUUpdaterPrivate;
 @interface SUUpdateDriver : NSObject <NSURLDownloadDelegate>
 
-@property (readonly, weak) id<SUUpdaterPrivate> updater;
+// We only have SUUpdater* forward declared intentionally (i.e, not #import'ing SUUpdater.h in the update drivers)
+// This is so we can minimize what we can access using SUUpdaterPrivate
+@property (readonly, weak) SUUpdater<SUUpdaterPrivate> *updater;
+
 @property (strong) SUHost *host;
 
 - (instancetype)initWithUpdater:(id<SUUpdaterPrivate>)updater;

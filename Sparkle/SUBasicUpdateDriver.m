@@ -62,8 +62,9 @@
 
     SUAppcast *appcast = [[SUAppcast alloc] init];
 
-    [appcast setUserAgentString:[self.updater userAgentString]];
-    [appcast setHttpHeaders:[self.updater httpHeaders]];
+    id<SUUpdaterPrivate> updater = self.updater;
+    [appcast setUserAgentString:[updater userAgentString]];
+    [appcast setHttpHeaders:[updater httpHeaders]];
     [appcast fetchAppcastFromURL:URL completionBlock:^(NSError *error) {
         if (error) {
             [self abortUpdateWithError:error];
@@ -76,10 +77,11 @@
 - (id<SUVersionComparison>)versionComparator
 {
     id<SUVersionComparison> comparator = nil;
-
+    id<SUUpdaterPrivate> updater = self.updater;
+    
     // Give the delegate a chance to provide a custom version comparator
-    if ([[self.updater delegate] respondsToSelector:@selector(versionComparatorForUpdater:)]) {
-        comparator = [[self.updater delegate] versionComparatorForUpdater:(id)self.updater];
+    if ([[updater delegate] respondsToSelector:@selector(versionComparatorForUpdater:)]) {
+        comparator = [[updater delegate] versionComparatorForUpdater:self.updater];
     }
 
     // If we don't get a comparator from the delegate, use the default comparator
@@ -149,8 +151,9 @@
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac
 {
-    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
-        [[self.updater delegate] updater:(id)self.updater didFinishLoadingAppcast:ac];
+    id<SUUpdaterPrivate> updater = self.updater;
+    if ([[updater delegate] respondsToSelector:@selector(updater:didFinishLoadingAppcast:)]) {
+        [[updater delegate] updater:self.updater didFinishLoadingAppcast:ac];
     }
 
     NSDictionary *userInfo = (ac != nil) ? @{ SUUpdaterAppcastNotificationKey: ac } : nil;
@@ -159,15 +162,15 @@
     SUAppcastItem *item = nil;
 
     // Now we have to find the best valid update in the appcast.
-    if ([[self.updater delegate] respondsToSelector:@selector(bestValidUpdateInAppcast:forUpdater:)]) // Does the delegate want to handle it?
+    if ([[updater delegate] respondsToSelector:@selector(bestValidUpdateInAppcast:forUpdater:)]) // Does the delegate want to handle it?
     {
-        item = [[self.updater delegate] bestValidUpdateInAppcast:ac forUpdater:(id)self.updater];
+        item = [[updater delegate] bestValidUpdateInAppcast:ac forUpdater:self.updater];
     }
     
     if (item != nil) // Does the delegate want to handle it?
     {
         if ([item isDeltaUpdate]) {
-            self.nonDeltaUpdateItem = [[self.updater delegate] bestValidUpdateInAppcast:[ac copyWithoutDeltaUpdates] forUpdater:(id)self.updater];
+            self.nonDeltaUpdateItem = [[updater delegate] bestValidUpdateInAppcast:[ac copyWithoutDeltaUpdates] forUpdater:self.updater];
         }
     }
     else // If not, we'll take care of it ourselves.
@@ -194,9 +197,11 @@
 - (void)didFindValidUpdate
 {
     assert(self.updateItem);
+    
+    id<SUUpdaterPrivate> updater = self.updater;
 
-    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
-        [[self.updater delegate] updater:(id)self.updater didFindValidUpdate:self.updateItem];
+    if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
+        [[updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFindValidUpdateNotification
@@ -207,8 +212,10 @@
 
 - (void)didNotFindUpdate
 {
-    if ([[self.updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
-        [[self.updater delegate] updaterDidNotFindUpdate:(id)self.updater];
+    id<SUUpdaterPrivate> updater = self.updater;
+    
+    if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
+        [[updater delegate] updaterDidNotFindUpdate:self.updater];
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
@@ -250,10 +257,12 @@
         [[NSFileManager defaultManager] removeItemAtPath:appCachePath error:NULL];
     }
     
+    id<SUUpdaterPrivate> updater = self.updater;
+    
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self.updateItem fileURL]];
-    [request setValue:[self.updater userAgentString] forHTTPHeaderField:@"User-Agent"];
-    if ([[self.updater delegate] respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
-        [[self.updater delegate] updater:(id)self.updater
+    [request setValue:[updater userAgentString] forHTTPHeaderField:@"User-Agent"];
+    if ([[updater delegate] respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
+        [[updater delegate] updater:self.updater
                       willDownloadUpdate:self.updateItem
                              withRequest:request];
     }
@@ -299,9 +308,11 @@
     if (!failingUrl) {
         failingUrl = [self.updateItem fileURL];
     }
+    
+    id<SUUpdaterPrivate> updater = self.updater;
 
-    if ([[self.updater delegate] respondsToSelector:@selector(updater:failedToDownloadUpdate:error:)]) {
-        [[self.updater delegate] updater:(id)self.updater
+    if ([[updater delegate] respondsToSelector:@selector(updater:failedToDownloadUpdate:error:)]) {
+        [[updater delegate] updater:self.updater
                   failedToDownloadUpdate:self.updateItem
                                    error:error];
     }
@@ -326,7 +337,8 @@
 
 - (void)extractUpdate
 {
-    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.updater.decryptionPassword];
+    id<SUUpdaterPrivate> updater = self.updater;
+    id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:updater.decryptionPassword];
     
     BOOL success;
     if (!unarchiver) {
@@ -427,7 +439,8 @@
 
 - (BOOL)mayUpdateAndRestart
 {
-    return (!self.updater.delegate || ![self.updater.delegate respondsToSelector:@selector(updaterShouldRelaunchApplication:)] || [self.updater.delegate updaterShouldRelaunchApplication:(id)self.updater]);
+    id<SUUpdaterPrivate> updater = self.updater;
+    return (!updater.delegate || ![updater.delegate respondsToSelector:@selector(updaterShouldRelaunchApplication:)] || [updater.delegate updaterShouldRelaunchApplication:self.updater]);
 }
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI
@@ -452,8 +465,9 @@
     }
 
     // Give the host app an opportunity to postpone the install and relaunch.
+    id<SUUpdaterPrivate> updater = self.updater;
     static BOOL postponedOnce = NO;
-    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
     if (!postponedOnce && [updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
     {
         NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installWithToolAndRelaunch:)]];
@@ -461,17 +475,17 @@
         [invocation setArgument:&relaunch atIndex:2];
         [invocation setTarget:self];
         postponedOnce = YES;
-        if ([updaterDelegate updater:(id)self.updater shouldPostponeRelaunchForUpdate:self.updateItem untilInvoking:invocation]) {
+        if ([updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:self.updateItem untilInvoking:invocation]) {
             return;
         }
     }
 
 
     if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdate:)]) {
-        [updaterDelegate updater:(id)self.updater willInstallUpdate:self.updateItem];
+        [updaterDelegate updater:self.updater willInstallUpdate:self.updateItem];
     }
 
-    NSBundle *sparkleBundle = self.updater.sparkleBundle;
+    NSBundle *sparkleBundle = updater.sparkleBundle;
 
     // Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
     // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
@@ -515,7 +529,7 @@
     self.relaunchPath = relaunchCopyTargetPath; // Set for backwards compatibility, in case any delegates modify it
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterWillRestartNotification object:self];
     if ([updaterDelegate respondsToSelector:@selector(updaterWillRelaunchApplication:)])
-        [updaterDelegate updaterWillRelaunchApplication:(id)self.updater];
+        [updaterDelegate updaterWillRelaunchApplication:self.updater];
 
     NSString *relaunchToolPath = [[NSBundle bundleWithPath:self.relaunchPath] executablePath];
     if (!relaunchToolPath || ![[NSFileManager defaultManager] fileExistsAtPath:self.relaunchPath]) {
@@ -529,7 +543,7 @@
 
     NSString *pathToRelaunch = [self.host bundlePath];
     if ([updaterDelegate respondsToSelector:@selector(pathToRelaunchForUpdater:)]) {
-        NSString *delegateRelaunchPath = [updaterDelegate pathToRelaunchForUpdater:(id)self.updater];
+        NSString *delegateRelaunchPath = [updaterDelegate pathToRelaunchForUpdater:self.updater];
         if (delegateRelaunchPath != nil) {
             pathToRelaunch = delegateRelaunchPath;
         }
@@ -599,9 +613,10 @@
     }
 
     // Notify host app that update has aborted
-    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+    id<SUUpdaterPrivate> updater = self.updater;
+    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
     if ([updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
-        [updaterDelegate updater:(id)self.updater didAbortWithError:error];
+        [updaterDelegate updater:self.updater didAbortWithError:error];
     }
 
     [self abortUpdate];

@@ -78,7 +78,8 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
     self.willUpdateOnTermination = YES;
 
-    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+    id<SUUpdaterPrivate> updater = self.updater;
+    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
     if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)])
     {
         BOOL relaunch = YES;
@@ -88,8 +89,8 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         [invocation setArgument:&relaunch atIndex:2];
         [invocation setArgument:&showUI atIndex:3];
         [invocation setTarget:self];
-
-        [updaterDelegate updater:(id)self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationInvocation:invocation];
+        
+        [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationInvocation:invocation];
     }
 
     // If this is marked as a critical update, we'll prompt the user to install it right away.
@@ -118,9 +119,10 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
         self.willUpdateOnTermination = NO;
 
-        id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+        id<SUUpdaterPrivate> updater = self.updater;
+        id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
         if ([updaterDelegate respondsToSelector:@selector(updater:didCancelInstallUpdateOnQuit:)])
-            [updaterDelegate updater:(id)self.updater didCancelInstallUpdateOnQuit:self.updateItem];
+            [updaterDelegate updater:self.updater didCancelInstallUpdateOnQuit:self.updateItem];
     }
 }
 
@@ -215,9 +217,10 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     } else {
         // Call delegate separately here because otherwise it won't know we stopped.
         // Normally this gets called by the superclass
-        id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+        id<SUUpdaterPrivate> updater = self.updater;
+        id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
         if ([updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
-            [updaterDelegate updater:(id)self.updater didAbortWithError:error];
+            [updaterDelegate updater:self.updater didAbortWithError:error];
         }
 
         [self abortUpdate];

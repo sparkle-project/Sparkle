@@ -28,10 +28,11 @@
 
 - (void)didNotFindUpdate
 {
-    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+    id<SUUpdaterPrivate> updater = self.updater;
+    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
 
     if ([updaterDelegate respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
-        [updaterDelegate updaterDidNotFindUpdate:(id)self.updater];
+        [updaterDelegate updaterDidNotFindUpdate:self.updater];
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
@@ -45,9 +46,10 @@
     } else {
         // Call delegate separately here because otherwise it won't know we stopped.
         // Normally this gets called by the superclass
-        id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+        id<SUUpdaterPrivate> updater = self.updater;
+        id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
         if ([updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
-            [updaterDelegate updater:(id)self.updater didAbortWithError:error];
+            [updaterDelegate updater:self.updater didAbortWithError:error];
         }
 
         [self abortUpdate];
