@@ -21,7 +21,7 @@ func main() {
     }
 
     let privateKeyPath = URL(fileURLWithPath: args[1]);
-    let archivesSourceDir = URL(fileURLWithPath: "/Users/porneL/ImageOptim/imageoptim/archive", isDirectory:true);
+    let archivesSourceDir = URL(fileURLWithPath: args[2], isDirectory:true);
 
     do {
         let privateKey = try loadPrivateKey(privateKeyPath: privateKeyPath);
