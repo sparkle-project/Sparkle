@@ -11,7 +11,6 @@
 #import "SUHost.h"
 #import "SUInstaller.h"
 #import "SPUInstallerProtocol.h"
-#import "SUStandardVersionComparator.h"
 #import "SPUInstallationType.h"
 #import <unistd.h>
 
@@ -55,7 +54,7 @@
     SUHost *host = [[SUHost alloc] initWithBundle:bundle];
     
     NSError *installerError = nil;
-    id<SPUInstallerProtocol> installer = [SUInstaller installerForHost:host expectedInstallationType:SPUInstallationTypeGuidedPackage updateDirectory:[path stringByDeletingLastPathComponent] versionComparator:[[SUStandardVersionComparator alloc] init] error:&installerError];
+    id<SPUInstallerProtocol> installer = [SUInstaller installerForHost:host expectedInstallationType:SPUInstallationTypeGuidedPackage updateDirectory:[path stringByDeletingLastPathComponent] error:&installerError];
     
     if (installer == nil) {
         XCTFail(@"Installer is nil with error: %@", installerError);

@@ -13,6 +13,7 @@
 #import "SULog.h"
 #import "SUErrors.h"
 #import "SUVersionComparisonProtocol.h"
+#import "SUStandardVersionComparator.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -21,7 +22,6 @@
 @interface SUPlainInstaller ()
 
 @property (nonatomic, readonly) SUHost *host;
-@property (nonatomic, readonly) id <SUVersionComparison> comparator;
 @property (nonatomic, copy, readonly) NSString *bundlePath;
 @property (nonatomic, copy, readonly) NSString *installationPath;
 
@@ -34,20 +34,18 @@
 @implementation SUPlainInstaller
 
 @synthesize host = _host;
-@synthesize comparator = _comparator;
 @synthesize bundlePath = _bundlePath;
 @synthesize installationPath = _installationPath;
 @synthesize tempOldDirectoryURL = _tempOldDirectoryURL;
 @synthesize tempNewDirectoryURL = _tempNewDirectoryURL;
 
-- (instancetype)initWithHost:(SUHost *)host bundlePath:(NSString *)bundlePath installationPath:(NSString *)installationPath versionComparator:(id <SUVersionComparison>)comparator
+- (instancetype)initWithHost:(SUHost *)host bundlePath:(NSString *)bundlePath installationPath:(NSString *)installationPath
 {
     self = [super init];
     if (self != nil) {
         _host = host;
         _bundlePath = [bundlePath copy];
         _installationPath = [installationPath copy];
-        _comparator = comparator;
     }
     return self;
 }
@@ -198,7 +196,8 @@
         NSString *hostVersion = [self.host version];
         NSBundle *bundle = [NSBundle bundleWithPath:self.bundlePath];
         NSString *updateVersion = [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
-        if (!updateVersion || [self.comparator compareVersion:hostVersion toVersion:updateVersion] == NSOrderedDescending) {
+        id<SUVersionComparison> comparator = [[SUStandardVersionComparator alloc] init];
+        if (!updateVersion || [comparator compareVersion:hostVersion toVersion:updateVersion] == NSOrderedDescending) {
             NSString *errorMessage = [NSString stringWithFormat:@"For security reasons, updates that downgrade version of the application are not allowed. Refusing to downgrade app from version %@ to %@. Aborting update.", hostVersion, [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
             
             *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
