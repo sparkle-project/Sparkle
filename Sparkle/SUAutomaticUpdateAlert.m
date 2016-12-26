@@ -7,7 +7,9 @@
 //
 
 #import "SUAutomaticUpdateAlert.h"
-
+#import "SULocalizations.h"
+#import "SUAppcastItem.h"
+#import "SUApplicationInfo.h"
 #import "SUHost.h"
 
 @interface SUAutomaticUpdateAlert ()
@@ -34,7 +36,7 @@
     return self;
 }
 
-- (NSString *__nonnull)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self.host bundlePath], [self.host installationPath]]; }
+- (NSString *__nonnull)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
 
 - (IBAction)installNow:(id)__unused sender
 {
@@ -59,7 +61,7 @@
 
 - (NSImage *__nonnull)applicationIcon
 {
-    return [self.host icon];
+    return [SUApplicationInfo bestIconForBundle:self.host.bundle];
 }
 
 - (NSString *__nonnull)titleText

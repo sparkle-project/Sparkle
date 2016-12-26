@@ -9,7 +9,6 @@
 #ifndef SUPROBINGUPDATEDRIVER_H
 #define SUPROBINGUPDATEDRIVER_H
 
-#import <Cocoa/Cocoa.h>
 #import "SUBasicUpdateDriver.h"
 
 // This replaces the old SUStatusChecker.

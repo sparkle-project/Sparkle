@@ -11,7 +11,6 @@
 
 #import <Cocoa/Cocoa.h>
 #import "SUBasicUpdateDriver.h"
-#import "SUUpdateAlert.h"
 
 @class SUStatusController;
 

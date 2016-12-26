@@ -6,15 +6,24 @@
 //  Copyright 2009 Mark Rowe. All rights reserved.
 //
 
-#import "SUBinaryDeltaCommon.h"
 #import "SUBinaryDeltaUnarchiver.h"
+#import "SUUnarchiverNotifier.h"
+#import "SUBinaryDeltaCommon.h"
 #import "SUBinaryDeltaApply.h"
-#import "SUUnarchiver_Private.h"
-#import "SUFileManager.h"
-#import "SUHost.h"
 #import "SULog.h"
+#import "SUFileManager.h"
+
+@interface SUBinaryDeltaUnarchiver ()
+
+@property (nonatomic, copy, readonly) NSString *archivePath;
+@property (nonatomic, copy, readonly) NSString *updateHostBundlePath;
+
+@end
 
 @implementation SUBinaryDeltaUnarchiver
+
+@synthesize archivePath = _archivePath;
+@synthesize updateHostBundlePath = _updateHostBundlePath;
 
 + (BOOL)canUnarchivePath:(NSString *)path
 {
@@ -61,37 +70,46 @@
     }
 }
 
-- (void)applyBinaryDelta
+- (instancetype)initWithArchivePath:(NSString *)archivePath updateHostBundlePath:(NSString *)updateHostBundlePath
 {
-    @autoreleasepool {
-        NSString *sourcePath = self.updateHostBundlePath;
-        NSString *targetPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
-
-        NSError *applyDiffError = nil;
-        BOOL success = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO, ^(double progress){
-            [self notifyProgress:progress];
-        }, &applyDiffError);
-        if (success) {
-            [[self class] updateSpotlightImportersAtBundlePath:targetPath];
-            [self unarchiverDidFinish];
-        }
-        else {
-            [self unarchiverDidFailWithError:applyDiffError];
-        }
+    self = [super init];
+    if (self != nil) {
+        _archivePath = [archivePath copy];
+        _updateHostBundlePath = [updateHostBundlePath copy];
     }
+    return self;
 }
 
-- (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))block progressBlock:(void (^ _Nullable)(double progress))progress
+- (void)unarchiveWithCompletionBlock:(void (^)(NSError * _Nullable))completionBlock progressBlock:(void (^ _Nullable)(double))progressBlock
 {
-    [super unarchiveWithCompletionBlock:block progressBlock:progress];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self applyBinaryDelta];
+        @autoreleasepool {
+            SUUnarchiverNotifier *notifier = [[SUUnarchiverNotifier alloc] initWithCompletionBlock:completionBlock progressBlock:progressBlock];
+            [self extractDeltaWithNotifier:notifier];
+        }
     });
 }
 
-+ (void)load
+- (void)extractDeltaWithNotifier:(SUUnarchiverNotifier *)notifier
 {
-    [self registerImplementation:self];
+    NSString *sourcePath = self.updateHostBundlePath;
+    NSString *targetPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
+    
+    NSError *applyDiffError = nil;
+    BOOL success = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO, ^(double progress){
+        [notifier notifyProgress:progress];
+
+    }, &applyDiffError);
+    
+    if (success) {
+        [[self class] updateSpotlightImportersAtBundlePath:targetPath];
+        [notifier notifySuccess];
+    }
+    else {
+        [notifier notifyFailureWithError:applyDiffError];
+    }
 }
+
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], self.archivePath]; }
 
 @end

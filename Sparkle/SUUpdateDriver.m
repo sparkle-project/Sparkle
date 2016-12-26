@@ -7,6 +7,7 @@
 //
 
 #import "SUUpdateDriver.h"
+#import "SUUpdaterPrivate.h"
 #import "SUHost.h"
 #import "SULog.h"
 
@@ -14,7 +15,7 @@ NSString *const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
 @interface SUUpdateDriver ()
 
-@property (weak) SUUpdater *updater;
+@property (weak) id<SUUpdaterPrivate> updater;
 @property (copy) NSURL *appcastURL;
 @property (getter=isInterruptible) BOOL interruptible;
 
@@ -29,7 +30,7 @@ NSString *const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 @synthesize appcastURL;
 @synthesize automaticallyInstallUpdates;
 
-- (instancetype)initWithUpdater:(SUUpdater *)anUpdater
+- (instancetype)initWithUpdater:(id<SUUpdaterPrivate>)anUpdater
 {
     if ((self = [super init])) {
         self.updater = anUpdater;
@@ -37,7 +38,7 @@ NSString *const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
     return self;
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self.host bundlePath], [self.host installationPath]]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)h
 {

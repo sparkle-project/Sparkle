@@ -10,6 +10,8 @@
 
 #import "SUHost.h"
 #import "SUConstants.h"
+#import "SULocalizations.h"
+#import "SUApplicationInfo.h"
 
 @interface SUUpdatePermissionPrompt ()
 
@@ -63,7 +65,7 @@
     // If this is a background application we need to focus it in order to bring the prompt
     // to the user's attention. Otherwise the prompt would be hidden behind other applications and
     // the user would not know why the application was paused.
-	if ([aHost isBackgroundApplication]) {
+	if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
         [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
     }
 
@@ -96,7 +98,7 @@
 
 - (NSImage *)icon
 {
-    return [self.host icon];
+    return [SUApplicationInfo bestIconForBundle:self.host.bundle];
 }
 
 - (NSString *)promptDescription

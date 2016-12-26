@@ -7,8 +7,8 @@
 //
 
 #import "SUPackageInstaller.h"
-#import <Cocoa/Cocoa.h>
 #import "SUConstants.h"
+#import "SUErrors.h"
 
 @implementation SUPackageInstaller
 

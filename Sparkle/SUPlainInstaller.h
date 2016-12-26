@@ -10,14 +10,8 @@
 #define SUPLAININSTALLER_H
 
 #import <Foundation/Foundation.h>
-
-#import "SUUpdater.h"
-
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SUInstaller.h"
-#import "SUVersionComparisonProtocol.h"
 
 @class SUHost;
 

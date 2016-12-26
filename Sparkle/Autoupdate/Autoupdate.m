@@ -1,4 +1,6 @@
-#import <AppKit/AppKit.h>
+#import <Cocoa/Cocoa.h>
+#import "SULocalizations.h"
+#import "SUErrors.h"
 #import "SUInstaller.h"
 #import "SUHost.h"
 #import "SUStandardVersionComparator.h"
@@ -152,11 +154,24 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     }];
 }
 
+- (NSString *)installationPathForBundle:(NSBundle *)bundle
+{
+    if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
+        // We'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
+        NSString *normalizedAppPath = [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[bundle bundlePath] pathExtension]]];
+        
+        if (![[NSFileManager defaultManager] fileExistsAtPath:normalizedAppPath]) {
+            return normalizedAppPath;
+        }
+    }
+    return [bundle bundlePath];
+}
+
 - (void)install
 {
     NSBundle *theBundle = [NSBundle bundleWithPath:self.hostPath];
     SUHost *host = [[SUHost alloc] initWithBundle:theBundle];
-    NSString *installationPath = [[host installationPath] copy];
+    NSString *installationPath = [self installationPathForBundle:theBundle];
     
     if (self.shouldShowUI) {
         self.statusController = [[SUStatusController alloc] initWithHost:host];

@@ -9,11 +9,15 @@
 #import "SUUIBasedUpdateDriver.h"
 
 #import "SUUpdateAlert.h"
-#import "SUUpdater_Private.h"
+#import "SUUpdaterPrivate.h"
+#import "SUUpdaterDelegate.h"
 #import "SUHost.h"
 #import "SUOperatingSystem.h"
 #import "SUStatusController.h"
 #import "SUConstants.h"
+#import "SULocalizations.h"
+#import "SUAppcastItem.h"
+#import "SUApplicationInfo.h"
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED < 1080
 @interface NSByteCountFormatter : NSFormatter {
@@ -42,7 +46,7 @@
 @synthesize statusController;
 @synthesize updateAlert;
 
-- (instancetype)initWithUpdater:(SUUpdater *)anUpdater
+- (instancetype)initWithUpdater:(id<SUUpdaterPrivate>)anUpdater
 {
     if ((self = [super initWithUpdater:anUpdater])) {
         self.automaticallyInstallUpdates = NO;
@@ -52,8 +56,9 @@
 
 - (void)didFindValidUpdate
 {
-    if ([[self.updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
-        [[self.updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
+    id<SUUpdaterPrivate> updater = self.updater;
+    if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
+        [[updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
     }
 
     if (self.automaticallyInstallUpdates) {
@@ -66,15 +71,15 @@
     }];
 
     id<SUVersionDisplay> versDisp = nil;
-    if ([[self.updater delegate] respondsToSelector:@selector(versionDisplayerForUpdater:)]) {
-        versDisp = [[self.updater delegate] versionDisplayerForUpdater:self.updater];
+    if ([[updater delegate] respondsToSelector:@selector(versionDisplayerForUpdater:)]) {
+        versDisp = [[updater delegate] versionDisplayerForUpdater:self.updater];
     }
     [self.updateAlert setVersionDisplayer:versDisp];
 
     // If the app is a menubar app or the like, we need to focus it first and alter the
     // update prompt to behave like a normal window. Otherwise if the window were hidden
     // there may be no way for the application to be activated to make it visible again.
-    if ([self.host isBackgroundApplication]) {
+    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
         [[self.updateAlert window] setHidesOnDeactivate:NO];
         [NSApp activateIgnoringOtherApps:YES];
     }
@@ -88,8 +93,9 @@
 
 - (void)didNotFindUpdate
 {
-    if ([[self.updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
-        [[self.updater delegate] updaterDidNotFindUpdate:self.updater];
+    id<SUUpdaterPrivate> updater = self.updater;
+    if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
+        [[updater delegate] updaterDidNotFindUpdate:self.updater];
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
     if (!self.automaticallyInstallUpdates) {
@@ -201,8 +207,10 @@
 {
     if (self.download) {
         [self.download cancel];
-        if ([[self.updater delegate] respondsToSelector:@selector(userDidCancelDownload:)]) {
-            [[self.updater delegate] userDidCancelDownload:self.updater];
+        
+        id<SUUpdaterPrivate> updater = self.updater;
+        if ([[updater delegate] respondsToSelector:@selector(userDidCancelDownload:)]) {
+            [[updater delegate] userDidCancelDownload:self.updater];
         }
     }
     [self abortUpdate];
@@ -216,7 +224,7 @@
     [super extractUpdate];
 }
 
-- (void)unarchiver:(SUUnarchiver *)__unused ua extractedProgress:(double)progress
+- (void)unarchiver:(id)__unused ua extractedProgress:(double)progress
 {
     // We do this here instead of in extractUpdate so that we only have a determinate progress bar for archives with progress.
 	if ([self.statusController maxProgressValue] == 0.0) {
@@ -225,7 +233,7 @@
     [self.statusController setProgressValue:progress];
 }
 
-- (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
+- (void)unarchiverDidFinish:(id)__unused ua
 {
     if (self.automaticallyInstallUpdates) {
         [self installWithToolAndRelaunch:YES];
@@ -289,19 +297,20 @@
 
 - (void)showAlert:(NSAlert *)alert
 {
-    if ([[self.updater delegate] respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
-        [[self.updater delegate] updaterWillShowModalAlert:self.updater];
+    id<SUUpdaterPrivate> updater = self.updater;
+    if ([[updater delegate] respondsToSelector:@selector(updaterWillShowModalAlert:)]) {
+        [[updater delegate] updaterWillShowModalAlert:self.updater];
     }
 
     // When showing a modal alert we need to ensure that background applications
     // are focused to inform the user since there is no dock icon to notify them.
-    if ([self.host isBackgroundApplication]) { [NSApp activateIgnoringOtherApps:YES]; }
+    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) { [NSApp activateIgnoringOtherApps:YES]; }
 
-    [alert setIcon:[self.host icon]];
+    [alert setIcon:[SUApplicationInfo bestIconForBundle:self.host.bundle]];
     [alert runModal];
 
-    if ([[self.updater delegate] respondsToSelector:@selector(updaterDidShowModalAlert:)])
-        [[self.updater delegate] updaterDidShowModalAlert:self.updater];
+    if ([[updater delegate] respondsToSelector:@selector(updaterDidShowModalAlert:)])
+        [[updater delegate] updaterDidShowModalAlert:self.updater];
 }
 
 @end
