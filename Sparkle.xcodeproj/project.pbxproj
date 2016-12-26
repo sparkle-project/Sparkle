@@ -679,6 +679,7 @@
 		61F614540E24A12D009F47E7 /* it */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		61F83F6F0DBFE137006FDD30 /* SUBasicUpdateDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUBasicUpdateDriver.h; sourceTree = "<group>"; };
 		61F83F700DBFE137006FDD30 /* SUBasicUpdateDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUBasicUpdateDriver.m; sourceTree = "<group>"; };
+		7205C42E1E11A6DA00E370AE /* SUInstallerProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUInstallerProtocol.h; sourceTree = "<group>"; };
 		720B16421C66433D006985FB /* UITests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "UITests-Info.plist"; path = "UITests/UITests-Info.plist"; sourceTree = SOURCE_ROOT; };
 		720B16431C66433D006985FB /* SUTestApplicationTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SUTestApplicationTest.swift; path = UITests/SUTestApplicationTest.swift; sourceTree = SOURCE_ROOT; };
 		7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUUnarchiverTest.swift; sourceTree = "<group>"; };
@@ -1105,6 +1106,7 @@
 				7275F9C01B5F1F2900B1D19E /* SUFileManager.m */,
 				767B61AA1972D488004E0C3C /* SUGuidedPackageInstaller.h */,
 				767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */,
+				7205C42E1E11A6DA00E370AE /* SUInstallerProtocol.h */,
 				618FA4FF0DAE88B40026945C /* SUInstaller.h */,
 				618FA5000DAE88B40026945C /* SUInstaller.m */,
 				618FA5200DAE8E8A0026945C /* SUPackageInstaller.h */,

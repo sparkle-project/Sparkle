@@ -7,15 +7,43 @@
 //
 
 #import "SUPlainInstaller.h"
+#import "SUVersionComparisonProtocol.h"
+#import "SUStandardVersionComparator.h"
 #import "SUFileManager.h"
 #import "SUHost.h"
 #import "SULog.h"
 #import "SUErrors.h"
 
+@interface SUPlainInstaller ()
+
+@property (nonatomic, readonly) SUHost *host;
+@property (nonatomic, copy, readonly) NSString *bundlePath;
+@property (nonatomic, copy, readonly) NSString *installationPath;
+@property (nonatomic, copy, readonly) NSString *fileOperationToolPath;
+
+@end
+
 @implementation SUPlainInstaller
 
+@synthesize host = _host;
+@synthesize bundlePath = _bundlePath;
+@synthesize installationPath = _installationPath;
+@synthesize fileOperationToolPath = _fileOperationToolPath;
+
+- (instancetype)initWithHost:(SUHost *)host bundlePath:(NSString *)bundlePath installationPath:(NSString *)installationPath fileOperationToolPath:(NSString *)fileOperationToolPath
+{
+    self = [super init];
+    if (self != nil) {
+        _host = host;
+        _bundlePath = [bundlePath copy];
+        _installationPath = [installationPath copy];
+        _fileOperationToolPath = [fileOperationToolPath copy];
+    }
+    return self;
+}
+
 // Returns the bundle version from the specified host that is appropriate to use as a filename, or nil if we're unable to retrieve one
-+ (NSString *)bundleVersionAppropriateForFilenameFromHost:(SUHost *)host
+- (NSString *)bundleVersionAppropriateForFilenameFromHost:(SUHost *)host
 {
     NSString *bundleVersion = [host objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     NSString *trimmedVersion = @"";
@@ -30,7 +58,7 @@
     return trimmedVersion.length > 0 ? trimmedVersion : nil;
 }
 
-+ (BOOL)performInstallationToURL:(NSURL *)installationURL fromUpdateAtURL:(NSURL *)newURL withHost:(SUHost *)host fileOperationToolPath:(NSString *)fileOperationToolPath error:(NSError * __autoreleasing *)error
+- (BOOL)performInstallationToURL:(NSURL *)installationURL fromUpdateAtURL:(NSURL *)newURL withHost:(SUHost *)host fileOperationToolPath:(NSString *)fileOperationToolPath error:(NSError * __autoreleasing *)error
 {
     if (installationURL == nil || newURL == nil) {
         // this really shouldn't happen but just in case
@@ -157,33 +185,36 @@
     return YES;
 }
 
-+ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host fileOperationToolPath:(NSString *)fileOperationToolPath versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler
+- (BOOL)performInitialInstallation:(NSError * __autoreleasing *)error
 {
-    NSParameterAssert(host);
-
     BOOL allowDowngrades = SPARKLE_AUTOMATED_DOWNGRADES;
-
+    
     // Prevent malicious downgrades
     if (!allowDowngrades) {
-        NSString *hostVersion = [host version];
-        NSBundle *bundle = [NSBundle bundleWithPath:path];
+        NSString *hostVersion = [self.host version];
+        NSBundle *bundle = [NSBundle bundleWithPath:self.bundlePath];
         NSString *updateVersion = [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
+        id<SUVersionComparison> comparator = [SUStandardVersionComparator defaultComparator];
         if (!updateVersion || [comparator compareVersion:hostVersion toVersion:updateVersion] == NSOrderedDescending) {
-            NSString *errorMessage = [NSString stringWithFormat:@"For security reasons, updates that downgrade version of the application are not allowed. Refusing to downgrade app from version %@ to %@. Aborting update.", [host version], [[NSBundle bundleWithPath:path] objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
-            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
-            [self finishInstallationToPath:installationPath withResult:NO error:error completionHandler:completionHandler];
-            return;
+            if (error != NULL) {
+                NSString *errorMessage = [NSString stringWithFormat:@"For security reasons, updates that downgrade version of the application are not allowed. Refusing to downgrade app from version %@ to %@. Aborting update.", hostVersion, [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
+                
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
+            }
+            return NO;
         }
     }
+    return YES;
+}
 
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSError *error = nil;
-        BOOL result = [self performInstallationToURL:[NSURL fileURLWithPath:installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:path] withHost:host fileOperationToolPath:fileOperationToolPath error:&error];
+- (BOOL)performFinalInstallation:(NSError * __autoreleasing *)error
+{
+    return [self performInstallationToURL:[NSURL fileURLWithPath:self.installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:self.bundlePath] withHost:self.host fileOperationToolPath:self.fileOperationToolPath error:error];
+}
 
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self finishInstallationToPath:installationPath withResult:result error:error completionHandler:completionHandler];
-        });
-    });
+- (BOOL)canInstallSilently
+{
+    return YES;
 }
 
 @end
