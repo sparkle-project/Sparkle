@@ -17,6 +17,7 @@
 				14950066195FB8A600BC5B5B /* PBXTargetDependency */,
 				14950068195FB8A600BC5B5B /* PBXTargetDependency */,
 				1495006A195FB8A600BC5B5B /* PBXTargetDependency */,
+				7205C4691E1306FB00E370AE /* PBXTargetDependency */,
 			);
 			name = All;
 			productName = All;
@@ -93,6 +94,30 @@
 		61EF67590E25C5B400F754E0 /* SUHost.h in Headers */ = {isa = PBXBuildFile; fileRef = 61EF67580E25C5B400F754E0 /* SUHost.h */; };
 		61FA52880E2D9EA400EF58AD /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		720595EF1D700568000572E8 /* SUApplicationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 725602D41C83551C00DAA70E /* SUApplicationInfo.m */; };
+		7205C4411E13049400E370AE /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7205C4401E13049400E370AE /* main.swift */; };
+		7205C44C1E1304CE00E370AE /* Appcast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7205C4471E1304CE00E370AE /* Appcast.swift */; };
+		7205C44D1E1304CE00E370AE /* ArchiveItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7205C4481E1304CE00E370AE /* ArchiveItem.swift */; };
+		7205C44E1E1304CE00E370AE /* DSASignature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7205C4491E1304CE00E370AE /* DSASignature.swift */; };
+		7205C44F1E1304CE00E370AE /* FeedXML.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7205C44A1E1304CE00E370AE /* FeedXML.swift */; };
+		7205C4501E1304CE00E370AE /* Unarchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7205C44B1E1304CE00E370AE /* Unarchive.swift */; };
+		7205C4561E13060D00E370AE /* SUStandardVersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */; };
+		7205C4571E13061F00E370AE /* SUUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5851D3D89B300D1BF90 /* SUUnarchiver.m */; };
+		7205C4581E13061F00E370AE /* SUUnarchiverNotifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 72316BD21E0DA8430039EFD9 /* SUUnarchiverNotifier.m */; };
+		7205C4591E13062500E370AE /* SUPipedUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5831D3D89B300D1BF90 /* SUPipedUnarchiver.m */; };
+		7205C45A1E13063E00E370AE /* SUDiskImageUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5811D3D89B300D1BF90 /* SUDiskImageUnarchiver.m */; };
+		7205C45B1E13064C00E370AE /* SUBinaryDeltaUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E57E1D3D896700D1BF90 /* SUBinaryDeltaUnarchiver.m */; };
+		7205C45C1E13065800E370AE /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
+		7205C45D1E13065F00E370AE /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
+		7205C45E1E13066800E370AE /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5E41D3D90AA00D1BF90 /* SUFileManager.m */; };
+		7205C45F1E13066F00E370AE /* SUBinaryDeltaApply.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E56F1D3D895B00D1BF90 /* SUBinaryDeltaApply.m */; };
+		7205C4601E13067E00E370AE /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; };
+		7205C4611E13069000E370AE /* SUBinaryDeltaCreate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5731D3D895B00D1BF90 /* SUBinaryDeltaCreate.m */; };
+		7205C4621E1306A600E370AE /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5711D3D895B00D1BF90 /* SUBinaryDeltaCommon.m */; };
+		7205C4631E1306B500E370AE /* libxar.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E07681CA616A4001A286B /* libxar.tbd */; };
+		7205C4641E1306BE00E370AE /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E076A1CA616B3001A286B /* libbz2.tbd */; };
+		7205C4651E1306C400E370AE /* bsdiff.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */; };
+		7205C4661E1306CC00E370AE /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
+		7205C4671E1306E100E370AE /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 72B09CE91CEA18900052EF9E /* bscommon.c */; };
 		720B16451C66433D006985FB /* SUTestApplicationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720B16431C66433D006985FB /* SUTestApplicationTest.swift */; };
 		720E217B1D0D00BF003A311C /* SPUUpdaterCycle.h in Headers */ = {isa = PBXBuildFile; fileRef = 720E21791D0D00BF003A311C /* SPUUpdaterCycle.h */; };
 		720E217C1D0D00BF003A311C /* SPUUpdaterCycle.m in Sources */ = {isa = PBXBuildFile; fileRef = 720E217A1D0D00BF003A311C /* SPUUpdaterCycle.m */; };
@@ -473,6 +498,20 @@
 			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = Sparkle;
 		};
+		7205C4681E1306FB00E370AE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7205C43D1E13049400E370AE;
+			remoteInfo = generate_appcast;
+		};
+		7205C46A1E13070300E370AE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7205C43D1E13049400E370AE;
+			remoteInfo = generate_appcast;
+		};
 		721D8A771D4952B60032E472 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -620,6 +659,15 @@
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7205C43C1E13049400E370AE /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 		721D8A711D4950910032E472 /* Copy Tools */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -880,6 +928,19 @@
 		61F3AC1615C22D5900260CA2 /* th */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = th; path = th.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
 		61F3AC1715C22D5900260CA2 /* th */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = th; path = th.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
 		61F614540E24A12D009F47E7 /* it */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		7205C43E1E13049400E370AE /* generate_appcast */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = generate_appcast; sourceTree = BUILT_PRODUCTS_DIR; };
+		7205C4401E13049400E370AE /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		7205C4461E1304C300E370AE /* Appcast-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Appcast-Bridging-Header.h"; sourceTree = "<group>"; };
+		7205C4471E1304CE00E370AE /* Appcast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Appcast.swift; sourceTree = "<group>"; };
+		7205C4481E1304CE00E370AE /* ArchiveItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArchiveItem.swift; sourceTree = "<group>"; };
+		7205C4491E1304CE00E370AE /* DSASignature.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DSASignature.swift; sourceTree = "<group>"; };
+		7205C44A1E1304CE00E370AE /* FeedXML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedXML.swift; sourceTree = "<group>"; };
+		7205C44B1E1304CE00E370AE /* Unarchive.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Unarchive.swift; sourceTree = "<group>"; };
+		7205C4511E13053500E370AE /* ConfigSwiftDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigSwiftDebug.xcconfig; sourceTree = "<group>"; };
+		7205C4521E13053500E370AE /* ConfigSwiftRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigSwiftRelease.xcconfig; sourceTree = "<group>"; };
+		7205C4531E13054900E370AE /* ConfigGenerateAppcast.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigGenerateAppcast.xcconfig; sourceTree = "<group>"; };
+		7205C4541E13054900E370AE /* ConfigGenerateAppcastDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigGenerateAppcastDebug.xcconfig; sourceTree = "<group>"; };
+		7205C4551E13054900E370AE /* ConfigGenerateAppcastRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigGenerateAppcastRelease.xcconfig; sourceTree = "<group>"; };
 		720B16421C66433D006985FB /* UITests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "UITests-Info.plist"; path = "UITests/UITests-Info.plist"; sourceTree = SOURCE_ROOT; };
 		720B16431C66433D006985FB /* SUTestApplicationTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SUTestApplicationTest.swift; path = UITests/SUTestApplicationTest.swift; sourceTree = SOURCE_ROOT; };
 		720E21791D0D00BF003A311C /* SPUUpdaterCycle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUUpdaterCycle.h; sourceTree = "<group>"; };
@@ -1177,6 +1238,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7205C43B1E13049400E370AE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7205C4641E1306BE00E370AE /* libbz2.tbd in Frameworks */,
+				7205C4631E1306B500E370AE /* libxar.tbd in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		721C24421CB753E6005440CB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1288,6 +1358,7 @@
 				724BB3931D333832005D534A /* org.sparkle-project.InstallerStatus.xpc */,
 				72B398D21D3D879300EE297F /* Autoupdate */,
 				72A5D59C1D6927730009E5AC /* SparkleCore.framework */,
+				7205C43E1E13049400E370AE /* generate_appcast */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1295,6 +1366,7 @@
 		0867D691FE84028FC02AAC07 /* Sparkle */ = {
 			isa = PBXGroup;
 			children = (
+				7205C43F1E13049400E370AE /* generate_appcast */,
 				1495006D195FBBBD00BC5B5B /* Sparkle */,
 				14732BB81960EEB600593899 /* Resources */,
 				61227A100DB5484000AB99EA /* Tests */,
@@ -1691,6 +1763,20 @@
 			name = "Update Control";
 			sourceTree = "<group>";
 		};
+		7205C43F1E13049400E370AE /* generate_appcast */ = {
+			isa = PBXGroup;
+			children = (
+				7205C4461E1304C300E370AE /* Appcast-Bridging-Header.h */,
+				7205C4401E13049400E370AE /* main.swift */,
+				7205C4471E1304CE00E370AE /* Appcast.swift */,
+				7205C4481E1304CE00E370AE /* ArchiveItem.swift */,
+				7205C4491E1304CE00E370AE /* DSASignature.swift */,
+				7205C44A1E1304CE00E370AE /* FeedXML.swift */,
+				7205C44B1E1304CE00E370AE /* Unarchive.swift */,
+			);
+			path = generate_appcast;
+			sourceTree = "<group>";
+		};
 		721C24461CB753E6005440CB /* Installer Progress */ = {
 			isa = PBXGroup;
 			children = (
@@ -1899,6 +1985,9 @@
 				FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */,
 				FA1941D10D94A70100DD942E /* ConfigFramework.xcconfig */,
 				FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */,
+				7205C4531E13054900E370AE /* ConfigGenerateAppcast.xcconfig */,
+				7205C4541E13054900E370AE /* ConfigGenerateAppcastDebug.xcconfig */,
+				7205C4551E13054900E370AE /* ConfigGenerateAppcastRelease.xcconfig */,
 				FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */,
 				721C24571CB754E8005440CB /* ConfigInstallerProgress.xcconfig */,
 				FA1941CD0D94A70100DD942E /* ConfigTestApp.xcconfig */,
@@ -1919,6 +2008,8 @@
 				72F94ED61CC344A7002DEE68 /* ConfigDownloaderDebug.xcconfig */,
 				72D954B01CBB41E2006F28BD /* ConfigSparkleTool.xcconfig */,
 				722FB7CA1DD69897001D40CE /* ConfigSwift.xcconfig */,
+				7205C4511E13053500E370AE /* ConfigSwiftDebug.xcconfig */,
+				7205C4521E13053500E370AE /* ConfigSwiftRelease.xcconfig */,
 				14732BC91960F70A00593899 /* make-release-package.sh */,
 				14652F7919A93E5F00959E44 /* set-git-version-info.sh */,
 				729BB3CE1D50344A007C4276 /* set-ats-exceptions-downloader-service.sh */,
@@ -2054,6 +2145,7 @@
 				72F94F6D1CC4A0C8002DEE68 /* PBXTargetDependency */,
 				1454BA1619637EDB00344E57 /* PBXTargetDependency */,
 				14732BCF1960F73500593899 /* PBXTargetDependency */,
+				7205C46B1E13070300E370AE /* PBXTargetDependency */,
 				1454BA1819637EE900344E57 /* PBXTargetDependency */,
 			);
 			name = Distribution;
@@ -2123,6 +2215,23 @@
 			productName = "Test Application";
 			productReference = 61B5F90209C4CEE200B25A18 /* .app */;
 			productType = "com.apple.product-type.application";
+		};
+		7205C43D1E13049400E370AE /* generate_appcast */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7205C4451E13049400E370AE /* Build configuration list for PBXNativeTarget "generate_appcast" */;
+			buildPhases = (
+				7205C43A1E13049400E370AE /* Sources */,
+				7205C43B1E13049400E370AE /* Frameworks */,
+				7205C43C1E13049400E370AE /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = generate_appcast;
+			productName = generate_appcast;
+			productReference = 7205C43E1E13049400E370AE /* generate_appcast */;
+			productType = "com.apple.product-type.tool";
 		};
 		721C24441CB753E6005440CB /* Installer Progress */ = {
 			isa = PBXNativeTarget;
@@ -2341,7 +2450,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = SU;
-				LastSwiftUpdateCheck = 0720;
+				LastSwiftUpdateCheck = 0820;
 				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Sparkle Project";
 				TargetAttributes = {
@@ -2355,6 +2464,10 @@
 								enabled = 1;
 							};
 						};
+					};
+					7205C43D1E13049400E370AE = {
+						CreatedOnToolsVersion = 8.2.1;
+						ProvisioningStyle = Automatic;
 					};
 					721C24441CB753E6005440CB = {
 						CreatedOnToolsVersion = 7.3;
@@ -2475,6 +2588,7 @@
 				1420DF491962329200203BB0 /* Documentation */,
 				1495005F195FB89400BC5B5B /* All */,
 				726B2B5C1C645FC900388755 /* UI Tests */,
+				7205C43D1E13049400E370AE /* generate_appcast */,
 			);
 		};
 /* End PBXProject section */
@@ -2836,6 +2950,35 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7205C43A1E13049400E370AE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7205C4671E1306E100E370AE /* bscommon.c in Sources */,
+				7205C4661E1306CC00E370AE /* sais.c in Sources */,
+				7205C4651E1306C400E370AE /* bsdiff.c in Sources */,
+				7205C4621E1306A600E370AE /* SUBinaryDeltaCommon.m in Sources */,
+				7205C4611E13069000E370AE /* SUBinaryDeltaCreate.m in Sources */,
+				7205C4601E13067E00E370AE /* bspatch.c in Sources */,
+				7205C45F1E13066F00E370AE /* SUBinaryDeltaApply.m in Sources */,
+				7205C45E1E13066800E370AE /* SUFileManager.m in Sources */,
+				7205C45D1E13065F00E370AE /* SUConstants.m in Sources */,
+				7205C45C1E13065800E370AE /* SULog.m in Sources */,
+				7205C45B1E13064C00E370AE /* SUBinaryDeltaUnarchiver.m in Sources */,
+				7205C45A1E13063E00E370AE /* SUDiskImageUnarchiver.m in Sources */,
+				7205C4591E13062500E370AE /* SUPipedUnarchiver.m in Sources */,
+				7205C4571E13061F00E370AE /* SUUnarchiver.m in Sources */,
+				7205C4581E13061F00E370AE /* SUUnarchiverNotifier.m in Sources */,
+				7205C4561E13060D00E370AE /* SUStandardVersionComparator.m in Sources */,
+				7205C44C1E1304CE00E370AE /* Appcast.swift in Sources */,
+				7205C4501E1304CE00E370AE /* Unarchive.swift in Sources */,
+				7205C4411E13049400E370AE /* main.swift in Sources */,
+				7205C44F1E1304CE00E370AE /* FeedXML.swift in Sources */,
+				7205C44D1E1304CE00E370AE /* ArchiveItem.swift in Sources */,
+				7205C44E1E1304CE00E370AE /* DSASignature.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		721C24411CB753E6005440CB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3143,6 +3286,16 @@
 			isa = PBXTargetDependency;
 			target = 8DC2EF4F0486A6940098B216 /* Sparkle */;
 			targetProxy = 61FA528C0E2D9EB200EF58AD /* PBXContainerItemProxy */;
+		};
+		7205C4691E1306FB00E370AE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7205C43D1E13049400E370AE /* generate_appcast */;
+			targetProxy = 7205C4681E1306FB00E370AE /* PBXContainerItemProxy */;
+		};
+		7205C46B1E13070300E370AE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7205C43D1E13049400E370AE /* generate_appcast */;
+			targetProxy = 7205C46A1E13070300E370AE /* PBXContainerItemProxy */;
 		};
 		721D8A781D4952B60032E472 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3544,6 +3697,33 @@
 			};
 			name = Release;
 		};
+		7205C4421E13049400E370AE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7205C4541E13054900E370AE /* ConfigGenerateAppcastDebug.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "-";
+			};
+			name = Debug;
+		};
+		7205C4431E13049400E370AE /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7205C4541E13054900E370AE /* ConfigGenerateAppcastDebug.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "-";
+			};
+			name = Coverage;
+		};
+		7205C4441E13049400E370AE /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7205C4551E13054900E370AE /* ConfigGenerateAppcastRelease.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "-";
+			};
+			name = Release;
+		};
 		721C24531CB753E7005440CB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 721C24571CB754E8005440CB /* ConfigInstallerProgress.xcconfig */;
@@ -3845,6 +4025,15 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		7205C4451E13049400E370AE /* Build configuration list for PBXNativeTarget "generate_appcast" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7205C4421E13049400E370AE /* Debug */,
+				7205C4431E13049400E370AE /* Coverage */,
+				7205C4441E13049400E370AE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		721C24561CB753E7005440CB /* Build configuration list for PBXNativeTarget "Installer Progress" */ = {
 			isa = XCConfigurationList;
