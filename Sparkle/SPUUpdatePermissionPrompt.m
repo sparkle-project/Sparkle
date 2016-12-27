@@ -63,7 +63,7 @@
     // If this is a background application we need to focus it in order to bring the prompt
     // to the user's attention. Otherwise the prompt would be hidden behind other applications and
     // the user would not know why the application was paused.
-    if ([SUApplicationInfo isBackgroundApplication:NSApp]) {
+    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
         [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
     }
     

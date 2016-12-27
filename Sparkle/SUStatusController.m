@@ -43,7 +43,7 @@
 
 - (void)windowDidLoad
 {
-    if ([SUApplicationInfo isBackgroundApplication:NSApp]) {
+    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
         [[self window] setLevel:NSFloatingWindowLevel];
     }
 

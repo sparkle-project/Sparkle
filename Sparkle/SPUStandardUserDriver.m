@@ -90,7 +90,7 @@
     // If the app is a menubar app or the like, we need to focus it first and alter the
     // update prompt to behave like a normal window. Otherwise if the window were hidden
     // there may be no way for the application to be activated to make it visible again.
-    if ([SUApplicationInfo isBackgroundApplication:NSApp]) {
+    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
         [self.activeUpdateAlert.window setHidesOnDeactivate:NO];
         
         [NSApp activateIgnoringOtherApps:YES];
@@ -210,7 +210,7 @@
         
         // For background applications, obtain focus.
         // Useful if the update check is requested from another app like System Preferences.
-        if ([SUApplicationInfo isBackgroundApplication:NSApp])
+        if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]])
         {
             [NSApp activateIgnoringOtherApps:YES];
         }
@@ -283,7 +283,7 @@
         
         // When showing a modal alert we need to ensure that background applications
         // are focused to inform the user since there is no dock icon to notify them.
-        if ([SUApplicationInfo isBackgroundApplication:NSApp]) { [NSApp activateIgnoringOtherApps:YES]; }
+        if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) { [[NSApplication sharedApplication] activateIgnoringOtherApps:YES]; }
         
         [alert setIcon:[SUApplicationInfo bestIconForBundle:self.host.bundle]];
         [alert runModal];

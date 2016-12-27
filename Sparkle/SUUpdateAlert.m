@@ -245,7 +245,7 @@
 
     [self.window setFrameAutosaveName: showReleaseNotes ? @"SUUpdateAlert" : @"SUUpdateAlertSmall" ];
 
-    if ([SUApplicationInfo isBackgroundApplication:NSApp]) {
+    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
         [self.window setLevel:NSFloatingWindowLevel]; // This means the window will float over all other apps, if our app is switched out ?!
     }
 
