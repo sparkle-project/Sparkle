@@ -729,6 +729,8 @@
 		7205C42E1E11A6DA00E370AE /* SUInstallerProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUInstallerProtocol.h; sourceTree = "<group>"; };
 		7205C42F1E1215AD00E370AE /* SUUpdatePermissionResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUpdatePermissionResponse.h; sourceTree = "<group>"; };
 		7205C4301E1215AD00E370AE /* SUUpdatePermissionResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdatePermissionResponse.m; sourceTree = "<group>"; };
+		7205C4331E12C23C00E370AE /* ConfigGenerateAppcast.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigGenerateAppcast.xcconfig; sourceTree = "<group>"; };
+		7205C4341E12C66D00E370AE /* ConfigGenerateAppcastRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigGenerateAppcastRelease.xcconfig; sourceTree = "<group>"; };
 		720B16421C66433D006985FB /* UITests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "UITests-Info.plist"; path = "UITests/UITests-Info.plist"; sourceTree = SOURCE_ROOT; };
 		720B16431C66433D006985FB /* SUTestApplicationTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SUTestApplicationTest.swift; path = UITests/SUTestApplicationTest.swift; sourceTree = SOURCE_ROOT; };
 		7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUUnarchiverTest.swift; sourceTree = "<group>"; };
@@ -1323,6 +1325,8 @@
 				FA1941D10D94A70100DD942E /* ConfigFramework.xcconfig */,
 				FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */,
 				FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */,
+				7205C4331E12C23C00E370AE /* ConfigGenerateAppcast.xcconfig */,
+				7205C4341E12C66D00E370AE /* ConfigGenerateAppcastRelease.xcconfig */,
 				FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */,
 				FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */,
 				FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */,
@@ -2437,32 +2441,22 @@
 		};
 		5AA96C591E0AE0DC00CA4346 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7205C4331E12C23C00E370AE /* ConfigGenerateAppcast.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "generate_appcast/Appcast-Bridging-Header.h";
-				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
 		5AA96C5A1E0AE0DC00CA4346 /* Coverage */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7205C4331E12C23C00E370AE /* ConfigGenerateAppcast.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "generate_appcast/Appcast-Bridging-Header.h";
-				SWIFT_VERSION = 3.0;
 			};
 			name = Coverage;
 		};
 		5AA96C5B1E0AE0DC00CA4346 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7205C4341E12C66D00E370AE /* ConfigGenerateAppcastRelease.xcconfig */;
 			buildSettings = {
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "generate_appcast/Appcast-Bridging-Header.h";
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
