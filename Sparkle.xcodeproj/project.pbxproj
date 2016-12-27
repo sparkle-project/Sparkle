@@ -999,7 +999,7 @@
 		7267E5B01D3D8AD500D1BF90 /* SPUMessageTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SPUMessageTypes.m; path = Autoupdate/SPUMessageTypes.m; sourceTree = SOURCE_ROOT; };
 		7267E5B41D3D8AEE00D1BF90 /* SPUInstallationInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SPUInstallationInfo.h; path = Autoupdate/SPUInstallationInfo.h; sourceTree = SOURCE_ROOT; };
 		7267E5B51D3D8AEE00D1BF90 /* SPUInstallationInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SPUInstallationInfo.m; path = Autoupdate/SPUInstallationInfo.m; sourceTree = SOURCE_ROOT; };
-		7267E5B91D3D8B0B00D1BF90 /* SPUInstallerProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SPUInstallerProtocol.h; path = Autoupdate/SPUInstallerProtocol.h; sourceTree = SOURCE_ROOT; };
+		7267E5B91D3D8B0B00D1BF90 /* SUInstallerProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SUInstallerProtocol.h; path = Autoupdate/SUInstallerProtocol.h; sourceTree = SOURCE_ROOT; };
 		7267E5BA1D3D8B2700D1BF90 /* SUGuidedPackageInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUGuidedPackageInstaller.h; path = Autoupdate/SUGuidedPackageInstaller.h; sourceTree = SOURCE_ROOT; };
 		7267E5BB1D3D8B2700D1BF90 /* SUGuidedPackageInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUGuidedPackageInstaller.m; path = Autoupdate/SUGuidedPackageInstaller.m; sourceTree = SOURCE_ROOT; };
 		7267E5BC1D3D8B2700D1BF90 /* SUInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUInstaller.h; path = Autoupdate/SUInstaller.h; sourceTree = SOURCE_ROOT; };
@@ -1566,7 +1566,7 @@
 		618FA6DB0DB485440026945C /* Installation */ = {
 			isa = PBXGroup;
 			children = (
-				7267E5B91D3D8B0B00D1BF90 /* SPUInstallerProtocol.h */,
+				7267E5B91D3D8B0B00D1BF90 /* SUInstallerProtocol.h */,
 				7267E5BC1D3D8B2700D1BF90 /* SUInstaller.h */,
 				7267E5BD1D3D8B2700D1BF90 /* SUInstaller.m */,
 				7267E5C01D3D8B2700D1BF90 /* SUPlainInstaller.h */,

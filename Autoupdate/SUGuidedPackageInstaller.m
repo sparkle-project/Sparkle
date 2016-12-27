@@ -76,8 +76,4 @@
     return YES;
 }
 
-- (void)cleanup
-{
-}
-
 @end

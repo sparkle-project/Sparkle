@@ -65,7 +65,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @property (nonatomic, assign) BOOL shouldRelaunch;
 @property (nonatomic, assign) BOOL shouldShowUI;
 
-@property (nonatomic) id<SPUInstallerProtocol> installer;
+@property (nonatomic) id<SUInstallerProtocol> installer;
 @property (nonatomic) BOOL willCompleteInstallation;
 @property (nonatomic) BOOL receivedInstallationData;
 @property (nonatomic) BOOL finishedValidation;
@@ -435,7 +435,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     
     dispatch_async(self.installerQueue, ^{
         NSError *installerError = nil;
-        id <SPUInstallerProtocol> installer = [SUInstaller installerForHost:self.host expectedInstallationType:self.installationType updateDirectory:self.updateDirectoryPath error:&installerError];
+        id <SUInstallerProtocol> installer = [SUInstaller installerForHost:self.host expectedInstallationType:self.installationType updateDirectory:self.updateDirectoryPath error:&installerError];
         
         if (installer == nil) {
             SULog(@"Error: Failed to create installer instance with error: %@", installerError);
@@ -448,7 +448,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         NSError *firstStageError = nil;
         if (![installer performInitialInstallation:&firstStageError]) {
             SULog(@"Error: Failed to start installer with error: %@", firstStageError);
-            [self.installer cleanup];
             self.installer = nil;
             
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -501,7 +500,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         });
     } else {
         SULog(@"Error: Failed to resume installer on stage 2 because installation cannot be installed silently");
-        [self.installer cleanup];
         self.installer = nil;
         
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -556,7 +554,6 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             if (![self.installer performFinalInstallation:&thirdStageError]) {
                 SULog(@"Failed to finalize installation with error: %@", thirdStageError);
                 
-                [self.installer cleanup];
                 self.installer = nil;
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
@@ -590,13 +587,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
                     [self.agentConnection.agent relaunchPath:pathToRelaunch];
                 }
                 
-                dispatch_async(self.installerQueue, ^{
-                    [self.installer cleanup];
-                    
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self cleanupAndExitWithStatus:EXIT_SUCCESS];
-                    });
-                });
+                [self cleanupAndExitWithStatus:EXIT_SUCCESS];
             });
         });
     }];

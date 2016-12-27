@@ -7,12 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SPUInstallerProtocol.h"
+#import "SUInstallerProtocol.h"
 
 // This is the deprecated package installation type, aka the "interactive" package installer
 // For a more supported package installation, see SUGuidedPackageInstaller
 
-@interface SUPackageInstaller : NSObject <SPUInstallerProtocol>
+@interface SUPackageInstaller : NSObject <SUInstallerProtocol>
 
 - (instancetype)initWithPackagePath:(NSString *)packagePath installationPath:(NSString *)installationPath;
 

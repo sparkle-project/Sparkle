@@ -112,7 +112,7 @@
     return newAppDownloadPath;
 }
 
-+ (nullable id<SPUInstallerProtocol>)installerForHost:(SUHost *)host expectedInstallationType:(NSString *)expectedInstallationType updateDirectory:(NSString *)updateDirectory error:(NSError * __autoreleasing *)error
++ (nullable id<SUInstallerProtocol>)installerForHost:(SUHost *)host expectedInstallationType:(NSString *)expectedInstallationType updateDirectory:(NSString *)updateDirectory error:(NSError * __autoreleasing *)error
 {
     BOOL isPackage = NO;
     BOOL isGuided = NO;
@@ -128,7 +128,7 @@
     // Make sure we find the type of installer that we were expecting to find
     // We shouldn't implicitly trust the installation type fed into here from the appcast because the installation type helps us determine
     // ahead of time whether or not this installer tool should be ran as root or not
-    id <SPUInstallerProtocol> installer = nil;
+    id <SUInstallerProtocol> installer = nil;
     if (isPackage && isGuided) {
         if (![expectedInstallationType isEqualToString:SPUInstallationTypeGuidedPackage]) {
             if (error != NULL) {

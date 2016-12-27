@@ -25,10 +25,6 @@
 @property (nonatomic, copy, readonly) NSString *bundlePath;
 @property (nonatomic, copy, readonly) NSString *installationPath;
 
-// Properties that carry over from starting installation to resuming to cleaning up
-@property (nonatomic) NSURL *tempOldDirectoryURL;
-@property (nonatomic) NSURL *tempNewDirectoryURL;
-
 @end
 
 @implementation SUPlainInstaller
@@ -36,8 +32,6 @@
 @synthesize host = _host;
 @synthesize bundlePath = _bundlePath;
 @synthesize installationPath = _installationPath;
-@synthesize tempOldDirectoryURL = _tempOldDirectoryURL;
-@synthesize tempNewDirectoryURL = _tempNewDirectoryURL;
 
 - (instancetype)initWithHost:(SUHost *)host bundlePath:(NSString *)bundlePath installationPath:(NSString *)installationPath
 {
@@ -179,9 +173,9 @@
         return NO;
     }
     
-    // To carry over when we clean up the installation
-    self.tempNewDirectoryURL = tempNewDirectoryURL;
-    self.tempOldDirectoryURL = tempOldDirectoryURL;
+    // Cleanup
+    [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
+    [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
     
     return YES;
 }
@@ -219,28 +213,6 @@
 - (BOOL)canInstallSilently
 {
     return YES;
-}
-
-- (void)cleanup
-{
-    SUFileManager *fileManager = [[SUFileManager alloc] init];
-    NSURL *tempOldDirectoryURL = self.tempOldDirectoryURL;
-    NSURL *tempNewDirectoryURL = self.tempNewDirectoryURL;
-    
-    // Note: I'm intentionally not checking if an item at the file URLs exist since these methods already do that for us
-    
-    if (tempOldDirectoryURL != nil) {
-        // This will remove the old app contained inside the directory as well
-        [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
-        
-        self.tempOldDirectoryURL = nil;
-    }
-    
-    if (tempNewDirectoryURL != nil) {
-        [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
-        
-        self.tempNewDirectoryURL = nil;
-    }
 }
 
 @end

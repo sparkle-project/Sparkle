@@ -1,5 +1,5 @@
 //
-//  SPUInstallerProtocol.h
+//  SUInstallerProtocol.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 3/12/16.
@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol SPUInstallerProtocol <NSObject>
+@protocol SUInstallerProtocol <NSObject>
 
 // Any installation work can be done prior to user application being terminated and relaunched
 // No UI should occur during this stage (i.e, do not show package installer apps, etc..)
@@ -26,10 +26,6 @@ NS_ASSUME_NONNULL_BEGIN
 // If this returns NO, then the installation can fail if the user did not directly request for the install to occur.
 // Should be thread safe
 - (BOOL)canInstallSilently;
-
-// Cleans up work done from the initial or final installation (depending on how far installation gets)
-// Should be able to be called from non-main thread
-- (void)cleanup;
 
 // The destination and installation path of the bundle being updated
 - (NSString *)installationPath;

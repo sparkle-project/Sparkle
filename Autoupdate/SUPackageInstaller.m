@@ -79,8 +79,4 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
     return NO;
 }
 
-- (void)cleanup
-{
-}
-
 @end

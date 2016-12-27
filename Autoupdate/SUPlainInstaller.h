@@ -7,12 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SPUInstallerProtocol.h"
+#import "SUInstallerProtocol.h"
 
 @class SUHost;
 @protocol SUVersionComparison;
 
-@interface SUPlainInstaller : NSObject <SPUInstallerProtocol>
+@interface SUPlainInstaller : NSObject <SUInstallerProtocol>
 
 /*!
  @param host The current (old) bundle host

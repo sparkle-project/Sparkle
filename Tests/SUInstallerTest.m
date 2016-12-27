@@ -10,7 +10,7 @@
 #import <XCTest/XCTest.h>
 #import "SUHost.h"
 #import "SUInstaller.h"
-#import "SPUInstallerProtocol.h"
+#import "SUInstallerProtocol.h"
 #import "SPUInstallationType.h"
 #import <unistd.h>
 
@@ -54,7 +54,7 @@
     SUHost *host = [[SUHost alloc] initWithBundle:bundle];
     
     NSError *installerError = nil;
-    id<SPUInstallerProtocol> installer = [SUInstaller installerForHost:host expectedInstallationType:SPUInstallationTypeGuidedPackage updateDirectory:[path stringByDeletingLastPathComponent] error:&installerError];
+    id<SUInstallerProtocol> installer = [SUInstaller installerForHost:host expectedInstallationType:SPUInstallationTypeGuidedPackage updateDirectory:[path stringByDeletingLastPathComponent] error:&installerError];
     
     if (installer == nil) {
         XCTFail(@"Installer is nil with error: %@", installerError);
@@ -72,8 +72,6 @@
         XCTFail(@"Final installation failed with error: %@", finalInstallError);
         return;
     }
-    
-    [installer cleanup];
     
     XCTAssertTrue([fm fileExistsAtPath:expectedDestination isDirectory:nil]);
     
