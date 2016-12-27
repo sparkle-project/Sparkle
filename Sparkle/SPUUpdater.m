@@ -322,7 +322,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 
 - (void)updatePermissionRequestFinishedWithResponse:(SUUpdatePermissionResponse *)response
 {
-    [self.host setBool:response.sendSystemProfile forUserDefaultsKey:SUSendProfileInfoKey];
+    [self setSendsSystemProfile:response.sendSystemProfile];
     [self setAutomaticallyChecksForUpdates:response.automaticUpdateChecks];
 }
 

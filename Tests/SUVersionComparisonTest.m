@@ -63,19 +63,19 @@
     SUAssertAscending(comparator, @"1.0.1b5 (1234)", @"1.0.1b6 (1234)");
     SUAssertAscending(comparator, @"2.0.0.2429", @"2.0.0.2430");
     SUAssertAscending(comparator, @"1.1.1.1818", @"2.0.0.2430");
-
+    
     SUAssertAscending(comparator, @"3.3 (5847)", @"3.3.1b1 (5902)");
 }
 
 - (void)testWordsWithSpaceInFront
 {
-// SUStandardVersionComparator *comparator = [[SUStandardVersionComparator alloc] init];
+    // SUStandardVersionComparator *comparator = [[SUStandardVersionComparator alloc] init];
     
-//	SUAssertAscending(comparator, @"1.0 beta", @"1.0");
-//	SUAssertAscending(comparator, @"1.0  - beta", @"1.0");
-//	SUAssertAscending(comparator, @"1.0 alpha", @"1.0 beta");
-//	SUAssertEqual(comparator, @"1.0  - beta", @"1.0beta");
-//	SUAssertEqual(comparator, @"1.0  - beta", @"1.0 beta");
+    //	SUAssertAscending(comparator, @"1.0 beta", @"1.0");
+    //	SUAssertAscending(comparator, @"1.0  - beta", @"1.0");
+    //	SUAssertAscending(comparator, @"1.0 alpha", @"1.0 beta");
+    //	SUAssertEqual(comparator, @"1.0  - beta", @"1.0beta");
+    //	SUAssertEqual(comparator, @"1.0  - beta", @"1.0 beta");
 }
 
 - (void)testVersionsWithReverseDateBasedNumbers
