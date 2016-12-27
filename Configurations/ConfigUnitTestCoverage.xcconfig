@@ -1,4 +1,5 @@
 #include "ConfigUnitTest.xcconfig"
+#include "ConfigSwiftDebug.xcconfig"
 
 GCC_GENERATE_TEST_COVERAGE_FILES = NO
 GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = NO

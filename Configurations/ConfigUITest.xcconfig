@@ -11,5 +11,3 @@ LD_RUNPATH_SEARCH_PATHS = @loader_path/../Frameworks
 
 TEST_TARGET_NAME = Sparkle Test App
 USES_XCTRUNNER = YES
-
-SWIFT_OPTIMIZATION_LEVEL = -Onone

@@ -941,6 +941,10 @@
 		7205C4531E13054900E370AE /* ConfigGenerateAppcast.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigGenerateAppcast.xcconfig; sourceTree = "<group>"; };
 		7205C4541E13054900E370AE /* ConfigGenerateAppcastDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigGenerateAppcastDebug.xcconfig; sourceTree = "<group>"; };
 		7205C4551E13054900E370AE /* ConfigGenerateAppcastRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigGenerateAppcastRelease.xcconfig; sourceTree = "<group>"; };
+		7205C46C1E13244800E370AE /* ConfigUnitTestDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUnitTestDebug.xcconfig; sourceTree = "<group>"; };
+		7205C46D1E13245600E370AE /* ConfigUnitTestRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUnitTestRelease.xcconfig; sourceTree = "<group>"; };
+		7205C46E1E13254500E370AE /* ConfigUITestDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestDebug.xcconfig; sourceTree = "<group>"; };
+		7205C46F1E13255900E370AE /* ConfigUITestRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestRelease.xcconfig; sourceTree = "<group>"; };
 		720B16421C66433D006985FB /* UITests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "UITests-Info.plist"; path = "UITests/UITests-Info.plist"; sourceTree = SOURCE_ROOT; };
 		720B16431C66433D006985FB /* SUTestApplicationTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SUTestApplicationTest.swift; path = UITests/SUTestApplicationTest.swift; sourceTree = SOURCE_ROOT; };
 		720E21791D0D00BF003A311C /* SPUUpdaterCycle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUUpdaterCycle.h; sourceTree = "<group>"; };
@@ -1996,8 +2000,12 @@
 				72F94EDB1CC36C6F002DEE68 /* ConfigTestAppHelperDebug.xcconfig */,
 				FA3AAF3B1050B273004B3130 /* ConfigUnitTest.xcconfig */,
 				149B78641B7D3A4800D7D62C /* ConfigUnitTestCoverage.xcconfig */,
+				7205C46C1E13244800E370AE /* ConfigUnitTestDebug.xcconfig */,
+				7205C46D1E13245600E370AE /* ConfigUnitTestRelease.xcconfig */,
 				729F10FD1C65A9B500DFCCC5 /* ConfigUITest.xcconfig */,
 				729F10FE1C65A9B500DFCCC5 /* ConfigUITestCoverage.xcconfig */,
+				7205C46E1E13254500E370AE /* ConfigUITestDebug.xcconfig */,
+				7205C46F1E13255900E370AE /* ConfigUITestRelease.xcconfig */,
 				724BB37E1D31D1EA005D534A /* ConfigInstallerConnection.xcconfig */,
 				724BB37F1D31D1EA005D534A /* ConfigInstallerConnectionDebug.xcconfig */,
 				726E07C11CAF1E79001A286B /* ConfigInstallerLauncher.xcconfig */,
@@ -3671,14 +3679,14 @@
 		};
 		612279DB0DB5470300AB99EA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA3AAF3B1050B273004B3130 /* ConfigUnitTest.xcconfig */;
+			baseConfigurationReference = 7205C46C1E13244800E370AE /* ConfigUnitTestDebug.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
 		};
 		612279DC0DB5470300AB99EA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA3AAF3B1050B273004B3130 /* ConfigUnitTest.xcconfig */;
+			baseConfigurationReference = 7205C46D1E13245600E370AE /* ConfigUnitTestRelease.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
@@ -3789,7 +3797,7 @@
 		};
 		726B2B641C645FC900388755 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 729F10FD1C65A9B500DFCCC5 /* ConfigUITest.xcconfig */;
+			baseConfigurationReference = 7205C46E1E13254500E370AE /* ConfigUITestDebug.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
@@ -3803,7 +3811,7 @@
 		};
 		726B2B661C645FC900388755 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 729F10FD1C65A9B500DFCCC5 /* ConfigUITest.xcconfig */;
+			baseConfigurationReference = 7205C46F1E13255900E370AE /* ConfigUITestRelease.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
