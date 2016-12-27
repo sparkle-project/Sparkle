@@ -18,16 +18,13 @@ typedef NS_ENUM(NSInteger, SUPermissionPromptResult) {
 
 @protocol SUUpdatePermissionPromptDelegate;
 
-@class SUHost;
+@class SUHost, SUUpdatePermissionResponse;
 @interface SUUpdatePermissionPrompt : SUWindowController
 
-+ (void)promptWithHost:(SUHost *)aHost systemProfile:(NSArray *)profile delegate:(id<SUUpdatePermissionPromptDelegate>)d;
++ (void)promptWithHost:(SUHost *)host systemProfile:(NSArray *)profile reply:(void (^)(SUUpdatePermissionResponse *))reply;
+
 - (IBAction)toggleMoreInfo:(id)sender;
 - (IBAction)finishPrompt:(id)sender;
-@end
-
-@protocol SUUpdatePermissionPromptDelegate <NSObject>
-- (void)updatePermissionPromptFinishedWithResult:(SUPermissionPromptResult)result;
 @end
 
 #endif
