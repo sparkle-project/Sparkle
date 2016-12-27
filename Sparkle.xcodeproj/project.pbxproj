@@ -869,7 +869,7 @@
 		6117796E0D1112E000749C97 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		611A904210240DD300CC659E /* pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		611A904610240DF700CC659E /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Sparkle.strings; sourceTree = "<group>"; };
-		612279D90DB5470200AB99EA /* .xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = .xctest; path = "Sparkle Unit Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		612279D90DB5470200AB99EA /* Sparkle Unit Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Sparkle Unit Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		612279DA0DB5470200AB99EA /* SparkleTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SparkleTests-Info.plist"; sourceTree = "<group>"; };
 		61227A150DB548B800AB99EA /* SUVersionComparisonTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUVersionComparisonTest.m; sourceTree = "<group>"; };
 		61299A5B09CA6D4500B7442F /* SUConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUConstants.h; sourceTree = "<group>"; };
@@ -905,7 +905,7 @@
 		61B5F8E309C4CE3C00B25A18 /* SPUUpdater.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SPUUpdater.h; sourceTree = "<group>"; };
 		61B5F8E409C4CE3C00B25A18 /* SPUUpdater.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = SPUUpdater.m; sourceTree = "<group>"; };
 		61B5F8F609C4CEB300B25A18 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
-		61B5F90209C4CEE200B25A18 /* .app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = .app; path = "Sparkle Test App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		61B5F90209C4CEE200B25A18 /* Sparkle Test App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Sparkle Test App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		61B5F90409C4CEE200B25A18 /* TestApplication-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TestApplication-Info.plist"; sourceTree = "<group>"; };
 		61B5F92409C4CFC900B25A18 /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		61B5F92B09C4CFD800B25A18 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -1072,7 +1072,7 @@
 		7267E5E41D3D90AA00D1BF90 /* SUFileManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUFileManager.m; sourceTree = "<group>"; };
 		7267E5FB1D3DD1B700D1BF90 /* SPUDownloadedUpdate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUDownloadedUpdate.h; sourceTree = "<group>"; };
 		7267E5FC1D3DD1B700D1BF90 /* SPUDownloadedUpdate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUDownloadedUpdate.m; sourceTree = "<group>"; };
-		726B2B5D1C645FC900388755 /* .xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = .xctest; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		726B2B5D1C645FC900388755 /* UI Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "UI Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		726DF88D1C84277500188804 /* SPUStatusCompletionResults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUStatusCompletionResults.h; sourceTree = "<group>"; };
 		726E075A1CA3A6D6001A286B /* SPUSecureCoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SPUSecureCoding.h; path = Sparkle/SPUSecureCoding.h; sourceTree = SOURCE_ROOT; };
 		726E075B1CA3A6D6001A286B /* SPUSecureCoding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SPUSecureCoding.m; path = Sparkle/SPUSecureCoding.m; sourceTree = SOURCE_ROOT; };
@@ -1345,10 +1345,10 @@
 			isa = PBXGroup;
 			children = (
 				5D06E8D00FD68C7C005AE3F6 /* BinaryDelta */,
-				61B5F90209C4CEE200B25A18 /* .app */,
-				612279D90DB5470200AB99EA /* .xctest */,
+				61B5F90209C4CEE200B25A18 /* Sparkle Test App.app */,
+				612279D90DB5470200AB99EA /* Sparkle Unit Tests.xctest */,
 				8DC2EF5B0486A6940098B216 /* Sparkle.framework */,
-				726B2B5D1C645FC900388755 /* .xctest */,
+				726B2B5D1C645FC900388755 /* UI Tests.xctest */,
 				726E4A161C86C88F00C57C6A /* TestAppHelper.xpc */,
 				726E07AD1CAF08D6001A286B /* org.sparkle-project.InstallerLauncher.xpc */,
 				726E07EF1CAF37BD001A286B /* org.sparkle-project.Downloader.xpc */,
@@ -2187,7 +2187,7 @@
 			);
 			name = "Sparkle Unit Tests";
 			productName = "Sparkle Unit Tests";
-			productReference = 612279D90DB5470200AB99EA /* .xctest */;
+			productReference = 612279D90DB5470200AB99EA /* Sparkle Unit Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		61B5F90109C4CEE200B25A18 /* Sparkle Test App */ = {
@@ -2213,7 +2213,7 @@
 			);
 			name = "Sparkle Test App";
 			productName = "Test Application";
-			productReference = 61B5F90209C4CEE200B25A18 /* .app */;
+			productReference = 61B5F90209C4CEE200B25A18 /* Sparkle Test App.app */;
 			productType = "com.apple.product-type.application";
 		};
 		7205C43D1E13049400E370AE /* generate_appcast */ = {
@@ -2301,7 +2301,7 @@
 			);
 			name = "UI Tests";
 			productName = "UI Tests";
-			productReference = 726B2B5D1C645FC900388755 /* .xctest */;
+			productReference = 726B2B5D1C645FC900388755 /* UI Tests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 		726E07AC1CAF08D6001A286B /* SparkleInstallerLauncher */ = {
@@ -4034,6 +4034,7 @@
 				7205C4441E13049400E370AE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		721C24561CB753E7005440CB /* Build configuration list for PBXNativeTarget "Installer Progress" */ = {
 			isa = XCConfigurationList;
