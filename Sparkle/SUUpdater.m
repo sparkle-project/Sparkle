@@ -11,6 +11,7 @@
 #import "SUUpdaterPrivate.h"
 
 #import "SUHost.h"
+#import "SUUpdatePermissionResponse.h"
 #import "SUUpdatePermissionPrompt.h"
 
 #import "SUAutomaticUpdateDriver.h"
@@ -32,7 +33,7 @@ NSString *const SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotific
 NSString *const SUUpdaterAppcastItemNotificationKey = @"SUUpdaterAppcastItemNotificationKey";
 NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotificationKey";
 
-@interface SUUpdater () <SUUpdaterPrivate, SUUpdatePermissionPromptDelegate>
+@interface SUUpdater () <SUUpdaterPrivate>
 @property (strong) NSTimer *checkTimer;
 @property (strong) NSBundle *sparkleBundle;
 
@@ -214,7 +215,11 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
             profileInfo = [profileInfo arrayByAddingObjectsFromArray:[self.delegate feedParametersForUpdater:self sendingSystemProfile:YES]];
         }
-        [SUUpdatePermissionPrompt promptWithHost:self.host systemProfile:profileInfo delegate:self];
+        [SUUpdatePermissionPrompt promptWithHost:self.host systemProfile:profileInfo reply:^(SUUpdatePermissionResponse *response) {
+            [self updatePermissionRequestFinishedWithResponse:response];
+            // Schedule checks, but make sure we ignore the delayed call from KVO
+            [self resetUpdateCycle];
+        }];
         // We start the update checks and register as observer for changes after the prompt finishes
     } else {
         // We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
@@ -222,11 +227,10 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     }
 }
 
-- (void)updatePermissionPromptFinishedWithResult:(SUPermissionPromptResult)result
+- (void)updatePermissionRequestFinishedWithResponse:(SUUpdatePermissionResponse *)response
 {
-    [self setAutomaticallyChecksForUpdates:(result == SUAutomaticallyCheck)];
-    // Schedule checks, but make sure we ignore the delayed call from KVO
-    [self resetUpdateCycle];
+    [self setAutomaticallyChecksForUpdates:response.automaticUpdateChecks];
+    [self setSendsSystemProfile:response.sendSystemProfile];
 }
 
 - (void)updateDriverDidFinish:(NSNotification *)note

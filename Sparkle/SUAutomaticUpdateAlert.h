@@ -9,7 +9,7 @@
 #ifndef SUAUTOMATICUPDATEALERT_H
 #define SUAUTOMATICUPDATEALERT_H
 
-#import "SUWindowController.h"
+#import <Cocoa/Cocoa.h>
 
 typedef NS_ENUM(NSInteger, SUAutomaticInstallationChoice) {
     SUInstallNowChoice,
@@ -18,7 +18,7 @@ typedef NS_ENUM(NSInteger, SUAutomaticInstallationChoice) {
 };
 
 @class SUAppcastItem, SUHost;
-@interface SUAutomaticUpdateAlert : SUWindowController
+@interface SUAutomaticUpdateAlert : NSWindowController
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)hostBundle completionBlock:(void (^)(SUAutomaticInstallationChoice))c;
 - (IBAction)installNow:sender;

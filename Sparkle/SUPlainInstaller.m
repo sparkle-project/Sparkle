@@ -194,7 +194,7 @@
         NSString *hostVersion = [self.host version];
         NSBundle *bundle = [NSBundle bundleWithPath:self.bundlePath];
         NSString *updateVersion = [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
-        id<SUVersionComparison> comparator = [SUStandardVersionComparator defaultComparator];
+        id<SUVersionComparison> comparator = [[SUStandardVersionComparator alloc] init];
         if (!updateVersion || [comparator compareVersion:hostVersion toVersion:updateVersion] == NSOrderedDescending) {
             if (error != NULL) {
                 NSString *errorMessage = [NSString stringWithFormat:@"For security reasons, updates that downgrade version of the application are not allowed. Refusing to downgrade app from version %@ to %@. Aborting update.", hostVersion, [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey]];
