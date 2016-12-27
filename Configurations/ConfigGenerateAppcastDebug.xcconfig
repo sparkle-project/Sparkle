@@ -1,0 +1,4 @@
+// Generate Appcast Debug
+
+#include "ConfigGenerateAppcast.xcconfig"
+#include "ConfigSwiftDebug.xcconfig"
