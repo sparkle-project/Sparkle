@@ -1,5 +1,5 @@
 //
-//  SPUUpdatePermissionResponse.h
+//  SUUpdatePermissionResponse.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 2/8/16.
@@ -17,7 +17,7 @@
 /*!
  This class represents a response for permission to check updates.
 */
-SU_EXPORT @interface SPUUpdatePermissionResponse : NSObject<NSSecureCoding>
+SU_EXPORT @interface SUUpdatePermissionResponse : NSObject<NSSecureCoding>
 
 /*!
  Initializes a new update permission response instance.

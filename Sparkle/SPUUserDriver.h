@@ -17,7 +17,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SPUUpdatePermissionRequest, SPUUpdatePermissionResponse, SUAppcastItem, SPUDownloadData;
+@class SPUUpdatePermissionRequest, SUUpdatePermissionResponse, SUAppcastItem, SPUDownloadData;
 
 /*!
  The API in Sparkle for controlling the user interaction.
@@ -58,7 +58,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * This can be called from any thread
  */
-- (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)request reply:(void (^)(SPUUpdatePermissionResponse *))reply;
+- (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply;
 
 /*!
  * Show the user initating an update check

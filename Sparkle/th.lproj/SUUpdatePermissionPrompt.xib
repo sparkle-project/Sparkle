@@ -1,10 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16C67" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="SPUUpdatePermissionPrompt">
+        <customObject id="-2" userLabel="File's Owner" customClass="SUUpdatePermissionPrompt">
             <connections>
                 <outlet property="descriptionTextField" destination="33" id="133"/>
                 <outlet property="moreInfoButton" destination="71" id="132"/>
@@ -26,9 +28,9 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" tag="1" id="13">
-                        <rect key="frame" x="287" y="12" width="137" height="32"/>
+                        <rect key="frame" x="262" y="12" width="162" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
-                        <buttonCell key="cell" type="push" title="Kanna sjálfkrafa" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" tag="1" inset="2" id="176">
+                        <buttonCell key="cell" type="push" title="ตรวจสอบโดยอัตโนมัติ" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" tag="1" inset="2" id="176">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
@@ -40,9 +42,9 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="14">
-                        <rect key="frame" x="182" y="12" width="105" height="32"/>
+                        <rect key="frame" x="134" y="12" width="128" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
-                        <buttonCell key="cell" type="push" title="Ekki kanna" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="177">
+                        <buttonCell key="cell" type="push" title="ไม่ต้องตรวจสอบ" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="177">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
@@ -56,7 +58,7 @@ Gw
                     <textField verticalHuggingPriority="750" id="32">
                         <rect key="frame" x="104" y="114" width="289" height="34"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Athuga sjálfkrafa með uppfærslur?" id="178">
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="ตรวจสอบอัพเดทอัตโนมัติ?" id="178">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -77,7 +79,7 @@ Gw
                     <button focusRingType="none" id="34">
                         <rect key="frame" x="104" y="53" width="278" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="check" title="Innifela nafnlausa kerfisskýrslu" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" focusRingType="none" inset="2" id="180">
+                        <buttonCell key="cell" type="check" title="ส่งข้อมูลระบบแบบนิรนาม" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" focusRingType="none" inset="2" id="180">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                         </buttonCell>
@@ -142,9 +144,9 @@ Gw
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="183">
                         <font key="font" metaFont="smallSystem"/>
-                        <string key="title">Upplýsingar úr nafnlausum kerfisskýrslum eru notaðar til að hjálpa okkur við framtíðarþróun hugbúnaðarins. Ekki hika við að hafa samband ef spurningar vakna um þetta.
+                        <string key="title">ข้อมูลระบบแบบนิรนามช่วยในการวางแผนพัฒนาแอปพลิเคชันของเราในอนาคต กรุณาติดต่อเราถ้าคุณมีข้อสงสัยในเรื่องนี้
 
-Þetta eru upplýsingarnar sem yrðu sendar:</string>
+นี่คือข้อมูลที่จะถูกส่งไป:</string>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -157,7 +159,7 @@ Gw
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="14" id="41">
-                                <rect key="frame" x="0.0" y="0.0" width="353" height="16"/>
+                                <rect key="frame" x="0.0" y="0.0" width="353" height="113"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -198,7 +200,6 @@ Gw
                                 </tableColumns>
                             </tableView>
                         </subviews>
-                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </clipView>
                     <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" controlSize="small" horizontal="YES" id="185">
                         <rect key="frame" x="-100" y="-100" width="345" height="11"/>

@@ -1,21 +1,21 @@
 //
-//  SPUUpdatePermissionResponse.m
+//  SUUpdatePermissionResponse.m
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 2/8/16.
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SPUUpdatePermissionResponse.h"
+#import "SUUpdatePermissionResponse.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
 #endif
 
-static NSString *SPUUpdatePermissionAutomaticUpdateChecksKey = @"SPUUpdatePermissionAutomaticUpdateChecks";
-static NSString *SPUUpdatePermissionSendSystemProfileKey = @"SPUUpdatePermissionSendSystemProfile";
+static NSString *SUUpdatePermissionAutomaticUpdateChecksKey = @"SUUpdatePermissionAutomaticUpdateChecks";
+static NSString *SUUpdatePermissionSendSystemProfileKey = @"SUUpdatePermissionSendSystemProfile";
 
-@implementation SPUUpdatePermissionResponse
+@implementation SUUpdatePermissionResponse
 
 @synthesize automaticUpdateChecks = _automaticUpdateChecks;
 @synthesize sendSystemProfile = _sendSystemProfile;
@@ -27,15 +27,15 @@ static NSString *SPUUpdatePermissionSendSystemProfileKey = @"SPUUpdatePermission
 
 - (instancetype)initWithCoder:(NSCoder *)decoder
 {
-    BOOL automaticUpdateChecks = [decoder decodeBoolForKey:SPUUpdatePermissionAutomaticUpdateChecksKey];
-    BOOL sendSystemProfile = [decoder decodeBoolForKey:SPUUpdatePermissionSendSystemProfileKey];
+    BOOL automaticUpdateChecks = [decoder decodeBoolForKey:SUUpdatePermissionAutomaticUpdateChecksKey];
+    BOOL sendSystemProfile = [decoder decodeBoolForKey:SUUpdatePermissionSendSystemProfileKey];
     return [self initWithAutomaticUpdateChecks:automaticUpdateChecks sendSystemProfile:sendSystemProfile];
 }
 
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
-    [encoder encodeBool:self.automaticUpdateChecks forKey:SPUUpdatePermissionAutomaticUpdateChecksKey];
-    [encoder encodeBool:self.sendSystemProfile forKey:SPUUpdatePermissionSendSystemProfileKey];
+    [encoder encodeBool:self.automaticUpdateChecks forKey:SUUpdatePermissionAutomaticUpdateChecksKey];
+    [encoder encodeBool:self.sendSystemProfile forKey:SUUpdatePermissionSendSystemProfileKey];
 }
 
 - (instancetype)initWithAutomaticUpdateChecks:(BOOL)automaticUpdateChecks sendSystemProfile:(BOOL)sendSystemProfile

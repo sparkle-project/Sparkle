@@ -15,7 +15,7 @@
 
 @interface SPUCommandLineUserDriver ()
 
-@property (nonatomic, nullable, readonly) SPUUpdatePermissionResponse *updatePermissionResponse;
+@property (nonatomic, nullable, readonly) SUUpdatePermissionResponse *updatePermissionResponse;
 @property (nonatomic, readonly) BOOL deferInstallation;
 @property (nonatomic, readonly) BOOL verbose;
 @property (nonatomic, readonly) SPUUserDriverCoreComponent *coreComponent;
@@ -33,7 +33,7 @@
 @synthesize bytesDownloaded = _bytesDownloaded;
 @synthesize bytesToDownload = _bytesToDownload;
 
-- (instancetype)initWithUpdatePermissionResponse:(nullable SPUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose
+- (instancetype)initWithUpdatePermissionResponse:(nullable SUUpdatePermissionResponse *)updatePermissionResponse deferInstallation:(BOOL)deferInstallation verbose:(BOOL)verbose
 {
     self = [super init];
     if (self != nil) {
@@ -52,7 +52,7 @@
     });
 }
 
-- (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)__unused request reply:(void (^)(SPUUpdatePermissionResponse *))reply
+- (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)__unused request reply:(void (^)(SUUpdatePermissionResponse *))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.updatePermissionResponse == nil) {

@@ -11,7 +11,7 @@
 #import "SPUUpdaterSettings.h"
 #import "SUHost.h"
 #import "SPUUpdatePermissionRequest.h"
-#import "SPUUpdatePermissionResponse.h"
+#import "SUUpdatePermissionResponse.h"
 #import "SPUUpdateDriver.h"
 #import "SUConstants.h"
 #import "SULog.h"
@@ -297,7 +297,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         SPUUpdatePermissionRequest *updatePermissionRequest = [[SPUUpdatePermissionRequest alloc] initWithSystemProfile:profileInfo];
         
         __weak SPUUpdater *weakSelf = self;
-        [self.userDriver showUpdatePermissionRequest:updatePermissionRequest reply:^(SPUUpdatePermissionResponse *response) {
+        [self.userDriver showUpdatePermissionRequest:updatePermissionRequest reply:^(SUUpdatePermissionResponse *response) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 SPUUpdater *strongSelf = weakSelf;
                 if (strongSelf != nil) {
@@ -320,7 +320,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     }
 }
 
-- (void)updatePermissionRequestFinishedWithResponse:(SPUUpdatePermissionResponse *)response
+- (void)updatePermissionRequestFinishedWithResponse:(SUUpdatePermissionResponse *)response
 {
     [self.host setBool:response.sendSystemProfile forUserDefaultsKey:SUSendProfileInfoKey];
     [self setAutomaticallyChecksForUpdates:response.automaticUpdateChecks];

@@ -6,16 +6,16 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
-#import "SPUUpdatePermissionPrompt.h"
+#import "SUUpdatePermissionPrompt.h"
 #import "SPUUpdatePermissionRequest.h"
-#import "SPUUpdatePermissionResponse.h"
+#import "SUUpdatePermissionResponse.h"
 #import "SULocalizations.h"
 
 #import "SUHost.h"
 #import "SUConstants.h"
 #import "SUApplicationInfo.h"
 
-@interface SPUUpdatePermissionPrompt ()
+@interface SUUpdatePermissionPrompt ()
 
 @property (assign) BOOL isShowingMoreInfo;
 @property (assign) BOOL shouldSendProfile;
@@ -27,11 +27,11 @@
 @property (weak) IBOutlet NSButton *moreInfoButton;
 @property (weak) IBOutlet NSTableView *profileTableView;
 
-@property (nonatomic, readonly) void (^reply)(SPUUpdatePermissionResponse *);
+@property (nonatomic, readonly) void (^reply)(SUUpdatePermissionResponse *);
 
 @end
 
-@implementation SPUUpdatePermissionPrompt
+@implementation SUUpdatePermissionPrompt
 
 @synthesize reply = _reply;
 @synthesize isShowingMoreInfo = _isShowingMoreInfo;
@@ -43,9 +43,9 @@
 @synthesize moreInfoButton;
 @synthesize profileTableView;
 
-- (instancetype)initPromptWithHost:(SUHost *)theHost request:(SPUUpdatePermissionRequest *)request reply:(void (^)(SPUUpdatePermissionResponse *))reply
+- (instancetype)initPromptWithHost:(SUHost *)theHost request:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply
 {
-    self = [super initWithWindowNibName:@"SPUUpdatePermissionPrompt"];
+    self = [super initWithWindowNibName:@"SUUpdatePermissionPrompt"];
     if (self)
     {
         _reply = reply;
@@ -58,7 +58,7 @@
     return self;
 }
 
-+ (void)promptWithHost:(SUHost *)host request:(SPUUpdatePermissionRequest *)request reply:(void (^)(SPUUpdatePermissionResponse *))reply
++ (void)promptWithHost:(SUHost *)host request:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply
 {
     // If this is a background application we need to focus it in order to bring the prompt
     // to the user's attention. Otherwise the prompt would be hidden behind other applications and
@@ -68,7 +68,7 @@
     }
     
     if (![NSApp modalWindow]) { // do not prompt if there is is another modal window on screen
-        SPUUpdatePermissionPrompt *prompt = [[[self class] alloc] initPromptWithHost:host request:request reply:reply];
+        SUUpdatePermissionPrompt *prompt = [[[self class] alloc] initPromptWithHost:host request:request reply:reply];
         NSWindow *window = [prompt window];
         if (window) {
             [NSApp runModalForWindow:window];
@@ -154,7 +154,7 @@
 
 - (IBAction)finishPrompt:(id)sender
 {
-    SPUUpdatePermissionResponse *response = [[SPUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:([sender tag] == 1) sendSystemProfile:self.shouldSendProfile];
+    SUUpdatePermissionResponse *response = [[SUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:([sender tag] == 1) sendSystemProfile:self.shouldSendProfile];
     self.reply(response);
     
     [[self window] close];

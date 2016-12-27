@@ -115,11 +115,11 @@
 
 #pragma mark Update Permission
 
-- (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)__unused request reply:(void (^)(SPUUpdatePermissionResponse *))reply
+- (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)__unused request reply:(void (^)(SUUpdatePermissionResponse *))reply
 {
     // Just make a decision..
     dispatch_async(dispatch_get_main_queue(), ^{
-        SPUUpdatePermissionResponse *response = [[SPUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:YES sendSystemProfile:NO];
+        SUUpdatePermissionResponse *response = [[SUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:YES sendSystemProfile:NO];
         reply(response);
     });
 }

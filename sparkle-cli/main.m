@@ -141,9 +141,9 @@ int main(int argc, char **argv)
             return EXIT_FAILURE;
         }
         
-        SPUUpdatePermissionResponse *updatePermissionResponse = nil;
+        SUUpdatePermissionResponse *updatePermissionResponse = nil;
         if (grantAutomaticChecking) {
-            updatePermissionResponse = [[SPUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:YES sendSystemProfile:sendProfile];
+            updatePermissionResponse = [[SUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:YES sendSystemProfile:sendProfile];
         }
         
         SPUCommandLineDriver *driver = [[SPUCommandLineDriver alloc] initWithUpdateBundlePath:updatePath applicationBundlePath:applicationPath customFeedURL:feedURL updatePermissionResponse:updatePermissionResponse deferInstallation:deferInstall interactiveInstallation:interactive verbose:verbose];

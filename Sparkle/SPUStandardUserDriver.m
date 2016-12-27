@@ -12,7 +12,7 @@
 #import "SUAppcastItem.h"
 #import "SUVersionDisplayProtocol.h"
 #import "SUHost.h"
-#import "SPUUpdatePermissionPrompt.h"
+#import "SUUpdatePermissionPrompt.h"
 #import "SUStatusController.h"
 #import "SUUpdateAlert.h"
 #import "SULocalizations.h"
@@ -69,14 +69,14 @@
 
 #pragma mark Update Permission
 
-- (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)request reply:(void (^)(SPUUpdatePermissionResponse *))reply
+- (void)showUpdatePermissionRequest:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         // This shows a modal alert dialog which unlike other alerts cannot be closed until the user makes a decision
         // This means that we can never programatically close the dialog if something goes horribly wrong
         // But this dialog should only show up once in the application's lifetime so this may be an OK decision
         
-        [SPUUpdatePermissionPrompt promptWithHost:self.host request:request reply:reply];
+        [SUUpdatePermissionPrompt promptWithHost:self.host request:request reply:reply];
     });
 }
 

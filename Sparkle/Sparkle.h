@@ -23,7 +23,7 @@
 #import "SUVersionDisplayProtocol.h"
 #import "SUErrors.h"
 #import "SPUUpdatePermissionRequest.h"
-#import "SPUUpdatePermissionResponse.h"
+#import "SUUpdatePermissionResponse.h"
 #import "SPUUserDriver.h"
 #import "SPUStandardUserDriver.h"
 #import "SPUStandardUserDriverDelegate.h"
