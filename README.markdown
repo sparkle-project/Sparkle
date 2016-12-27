@@ -35,7 +35,7 @@ An easy-to-use software update framework for Cocoa developers.
 ## Requirements
 
 * Runtime: macOS 10.7 or greater
-* Build: Xcode 5 and 10.8 SDK or greater
+* Build: Xcode 7 and 10.8 SDK or greater
 * HTTPS server for serving updates (see [App Transport Security](http://sparkle-project.org/documentation/app-transport-security/))
 
 ## API
