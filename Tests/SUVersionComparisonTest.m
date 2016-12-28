@@ -16,63 +16,73 @@
 
 @implementation SUVersionComparisonTestCase
 
-#define SUAssertOrder(a, b, c) XCTAssertTrue([[SUStandardVersionComparator defaultComparator] compareVersion:a toVersion:b] == c, @"b should be newer than a!")
-#define SUAssertAscending(a, b) SUAssertOrder(a, b, NSOrderedAscending)
-#define SUAssertDescending(a, b) SUAssertOrder(a, b, NSOrderedDescending)
-#define SUAssertEqual(a, b) SUAssertOrder(a, b, NSOrderedSame)
+#define SUAssertOrder(comparator, a, b, c) XCTAssertTrue([comparator compareVersion:a toVersion:b] == c, @"b should be newer than a!")
+#define SUAssertAscending(comparator, a, b) SUAssertOrder(comparator, a, b, NSOrderedAscending)
+#define SUAssertDescending(comparator, a, b) SUAssertOrder(comparator, a, b, NSOrderedDescending)
+#define SUAssertEqual(comparator, a, b) SUAssertOrder(comparator, a, b, NSOrderedSame)
 
 - (void)testNumbers
 {
-    SUAssertAscending(@"1.0", @"1.1");
-    SUAssertEqual(@"1.0", @"1.0");
-    SUAssertDescending(@"2.0", @"1.1");
-    SUAssertDescending(@"0.1", @"0.0.1");
-    //SUAssertDescending(@".1", @"0.0.1"); Known bug, but I'm not sure I care.
-    SUAssertAscending(@"0.1", @"0.1.2");
+    SUStandardVersionComparator *comparator = [[SUStandardVersionComparator alloc] init];
+    
+    SUAssertAscending(comparator, @"1.0", @"1.1");
+    SUAssertEqual(comparator, @"1.0", @"1.0");
+    SUAssertDescending(comparator, @"2.0", @"1.1");
+    SUAssertDescending(comparator, @"0.1", @"0.0.1");
+    //SUAssertDescending(comparator, @".1", @"0.0.1"); Known bug, but I'm not sure I care.
+    SUAssertAscending(comparator, @"0.1", @"0.1.2");
 }
 
 - (void)testPrereleases
 {
-    SUAssertAscending(@"1.5.5", @"1.5.6a1");
-    SUAssertAscending(@"1.1.0b1", @"1.1.0b2");
-    SUAssertAscending(@"1.1.1b2", @"1.1.2b1");
-    SUAssertAscending(@"1.1.1b2", @"1.1.2a1");
-    SUAssertAscending(@"1.0a1", @"1.0b1");
-    SUAssertAscending(@"1.0b1", @"1.0");
-    SUAssertAscending(@"0.9", @"1.0a1");
-    SUAssertAscending(@"1.0b", @"1.0b2");
-    SUAssertAscending(@"1.0b10", @"1.0b11");
-    SUAssertAscending(@"1.0b9", @"1.0b10");
-    SUAssertAscending(@"1.0rc", @"1.0");
-    SUAssertAscending(@"1.0b", @"1.0");
-    SUAssertAscending(@"1.0pre1", @"1.0");
+    SUStandardVersionComparator *comparator = [[SUStandardVersionComparator alloc] init];
+    
+    SUAssertAscending(comparator, @"1.5.5", @"1.5.6a1");
+    SUAssertAscending(comparator, @"1.1.0b1", @"1.1.0b2");
+    SUAssertAscending(comparator, @"1.1.1b2", @"1.1.2b1");
+    SUAssertAscending(comparator, @"1.1.1b2", @"1.1.2a1");
+    SUAssertAscending(comparator, @"1.0a1", @"1.0b1");
+    SUAssertAscending(comparator, @"1.0b1", @"1.0");
+    SUAssertAscending(comparator, @"0.9", @"1.0a1");
+    SUAssertAscending(comparator, @"1.0b", @"1.0b2");
+    SUAssertAscending(comparator, @"1.0b10", @"1.0b11");
+    SUAssertAscending(comparator, @"1.0b9", @"1.0b10");
+    SUAssertAscending(comparator, @"1.0rc", @"1.0");
+    SUAssertAscending(comparator, @"1.0b", @"1.0");
+    SUAssertAscending(comparator, @"1.0pre1", @"1.0");
 }
 
 - (void)testVersionsWithBuildNumbers
 {
-    SUAssertAscending(@"1.0 (1234)", @"1.0 (1235)");
-    SUAssertAscending(@"1.0b1 (1234)", @"1.0 (1234)");
-    SUAssertAscending(@"1.0b5 (1234)", @"1.0b5 (1235)");
-    SUAssertAscending(@"1.0b5 (1234)", @"1.0.1b5 (1234)");
-    SUAssertAscending(@"1.0.1b5 (1234)", @"1.0.1b6 (1234)");
-    SUAssertAscending(@"2.0.0.2429", @"2.0.0.2430");
-    SUAssertAscending(@"1.1.1.1818", @"2.0.0.2430");
-
-    SUAssertAscending(@"3.3 (5847)", @"3.3.1b1 (5902)");
+    SUStandardVersionComparator *comparator = [[SUStandardVersionComparator alloc] init];
+    
+    SUAssertAscending(comparator, @"1.0 (1234)", @"1.0 (1235)");
+    SUAssertAscending(comparator, @"1.0b1 (1234)", @"1.0 (1234)");
+    SUAssertAscending(comparator, @"1.0b5 (1234)", @"1.0b5 (1235)");
+    SUAssertAscending(comparator, @"1.0b5 (1234)", @"1.0.1b5 (1234)");
+    SUAssertAscending(comparator, @"1.0.1b5 (1234)", @"1.0.1b6 (1234)");
+    SUAssertAscending(comparator, @"2.0.0.2429", @"2.0.0.2430");
+    SUAssertAscending(comparator, @"1.1.1.1818", @"2.0.0.2430");
+    
+    SUAssertAscending(comparator, @"3.3 (5847)", @"3.3.1b1 (5902)");
 }
 
 - (void)testWordsWithSpaceInFront
 {
-//	SUAssertAscending(@"1.0 beta", @"1.0");
-//	SUAssertAscending(@"1.0  - beta", @"1.0");
-//	SUAssertAscending(@"1.0 alpha", @"1.0 beta");
-//	SUAssertEqual(@"1.0  - beta", @"1.0beta");
-//	SUAssertEqual(@"1.0  - beta", @"1.0 beta");
+    // SUStandardVersionComparator *comparator = [[SUStandardVersionComparator alloc] init];
+    
+    //	SUAssertAscending(comparator, @"1.0 beta", @"1.0");
+    //	SUAssertAscending(comparator, @"1.0  - beta", @"1.0");
+    //	SUAssertAscending(comparator, @"1.0 alpha", @"1.0 beta");
+    //	SUAssertEqual(comparator, @"1.0  - beta", @"1.0beta");
+    //	SUAssertEqual(comparator, @"1.0  - beta", @"1.0 beta");
 }
 
 - (void)testVersionsWithReverseDateBasedNumbers
 {
-    SUAssertAscending(@"201210251627", @"201211051041");
+    SUStandardVersionComparator *comparator = [[SUStandardVersionComparator alloc] init];
+    
+    SUAssertAscending(comparator, @"201210251627", @"201211051041");
 }
 
 @end

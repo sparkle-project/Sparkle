@@ -1,3 +1,16 @@
+# 1.16.0
+
+ * generate_appcast helper tool (Kornel Lesiński)
+ * Fixed UI update scheduler not prompting for install & relaunch (Zorg)
+ * Progressbar for DMG and binary delta extraction (Kornel Lesiński)
+ * Re-show download status if we attempt a 2nd download (Zorg)
+ * Refactorings to sync with upcoming 2.0
+    * Decoupled and simplified installation code using protocols (Zorg)
+    * Added nullability annotations (Zorg)
+    * Allowed delegate methods that return an object to return nil (Zorg)
+    * Decreased responsibility of SUHost and moved code into other components (Zorg)
+    * Removed Sparkle.pch and many file #includes (Zorg)
+
 # 1.15.0
 
 * A new icon! Thanks to 1024jp

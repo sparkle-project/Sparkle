@@ -11,12 +11,18 @@
 
 @implementation SUStandardVersionComparator
 
+- (instancetype)init
+{
+    return [super init];
+}
+
 + (SUStandardVersionComparator *)defaultComparator
 {
     static SUStandardVersionComparator *defaultComparator = nil;
-    if (defaultComparator == nil) {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
         defaultComparator = [[SUStandardVersionComparator alloc] init];
-    }
+    });
     return defaultComparator;
 }
 
