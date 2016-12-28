@@ -65,7 +65,7 @@ func makeAppcast(archivesSourceDir: URL, privateKey: SecKey) throws -> [String:[
                     continue;
                 }
 
-                let deltaBaseName = appBaseName + item.version + "-" + latestItem.version;
+                let deltaBaseName = appBaseName + latestItem.version + "-" + item.version;
                 let deltaPath = archivesSourceDir.appendingPathComponent(deltaBaseName).appendingPathExtension("delta");
 
                 var delta:DeltaUpdate;
