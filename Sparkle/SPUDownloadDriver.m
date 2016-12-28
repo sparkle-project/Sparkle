@@ -193,9 +193,10 @@
             self.retrievedDownloadResponse = YES;
         }
         
-        // Accumulate expected content length from downloader so we can later verify if the total length matches with the content length from the appcast
+        // Reset expected content length from downloader
+        // Later we verify if the total length matches with the content length from the appcast
         if (expectedContentLength > 0 && expectedContentLength != NSURLResponseUnknownLength) {
-            self.expectedContentLength += (NSUInteger)expectedContentLength;
+            self.expectedContentLength = (NSUInteger)expectedContentLength;
         }
     });
 }
