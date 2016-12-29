@@ -198,7 +198,9 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 /*!
  * Show the user the content length of the new update that will be downloaded
  *
- * @param expectedContentLength The expected content length of the new update being downloaded. This will be greater than 0.
+ * @param expectedContentLength The expected content length of the new update being downloaded.
+ * An implementor should be able to handle if this value is invalid (more or less than actual content length downloaded).
+ * Additionally, this method may be called more than once for the same download in rare scenarios.
  *
  * This can be called from any thread
  */

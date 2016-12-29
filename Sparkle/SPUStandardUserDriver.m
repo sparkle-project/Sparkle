@@ -336,7 +336,14 @@
 - (void)showDownloadDidReceiveDataOfLength:(uint64_t)length
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.statusController setProgressValue:[self.statusController progressValue] + (double)length];
+        double newProgressValue = [self.statusController progressValue] + (double)length;
+        
+        // In case our expected content length was incorrect
+        if (newProgressValue > [self.statusController maxProgressValue]) {
+            [self.statusController setMaxProgressValue:newProgressValue];
+        }
+        
+        [self.statusController setProgressValue:newProgressValue];
         if ([self.statusController maxProgressValue] > 0.0)
             [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [self localizedStringFromByteCount:(long long)self.statusController.progressValue], [self localizedStringFromByteCount:(long long)self.statusController.maxProgressValue]]];
         else

@@ -281,8 +281,16 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         self.contentLengthDownloaded += length;
-        double progress = (double)self.contentLengthDownloaded / self.expectedContentLength;
-        [self addUpdateButtonWithTitle:[NSString stringWithFormat:@"Downloading (%0.0f%%)", progress * 100] action:nil];
+        
+        // In case our expected content length was incorrect
+        if (self.contentLengthDownloaded > self.expectedContentLength) {
+            self.expectedContentLength = self.contentLengthDownloaded;
+        }
+        
+        if (self.expectedContentLength > 0) {
+            double progress = (double)self.contentLengthDownloaded / self.expectedContentLength;
+            [self addUpdateButtonWithTitle:[NSString stringWithFormat:@"Downloading (%0.0f%%)", progress * 100] action:nil];
+        }
     });
 }
 

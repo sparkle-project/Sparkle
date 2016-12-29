@@ -230,6 +230,12 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         self.bytesDownloaded += length;
+        
+        // In case our expected content length was incorrect
+        if (self.bytesDownloaded > self.bytesToDownload) {
+            self.bytesToDownload = self.bytesDownloaded;
+        }
+        
         if (self.bytesToDownload > 0 && self.verbose) {
             fprintf(stderr, "Downloaded %llu out of %llu bytes (%.0f%%)\n", self.bytesDownloaded, self.bytesToDownload, (self.bytesDownloaded * 100.0 / self.bytesToDownload));
         }
