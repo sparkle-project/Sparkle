@@ -320,7 +320,7 @@
     [self.coreComponent cancelDownloadStatus];
 }
 
-- (void)showDownloadDidReceiveExpectedContentLength:(NSUInteger)expectedContentLength
+- (void)showDownloadDidReceiveExpectedContentLength:(uint64_t)expectedContentLength
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.statusController setMaxProgressValue:expectedContentLength];
@@ -333,7 +333,7 @@
                                           countStyle:NSByteCountFormatterCountStyleFile];
 }
 
-- (void)showDownloadDidReceiveDataOfLength:(NSUInteger)length
+- (void)showDownloadDidReceiveDataOfLength:(uint64_t)length
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.statusController setProgressValue:[self.statusController progressValue] + (double)length];

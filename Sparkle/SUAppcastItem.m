@@ -65,7 +65,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         _fileURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemFileURLKey];
         _infoURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemInfoURLKey];
         
-        _contentLength = (NSUInteger)[decoder decodeIntegerForKey:SUAppcastItemContentLengthKey];
+        _contentLength = (uint64_t)[decoder decodeInt64ForKey:SUAppcastItemContentLengthKey];
         
         _installationType = [decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemInstallationTypeKey];
         if (!SPUValidInstallationType(_installationType)) {
@@ -106,7 +106,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         [encoder encodeObject:self.infoURL forKey:SUAppcastItemInfoURLKey];
     }
     
-    [encoder encodeInteger:(NSInteger)self.contentLength forKey:SUAppcastItemContentLengthKey];
+    [encoder encodeInt64:(int64_t)self.contentLength forKey:SUAppcastItemContentLengthKey];
     
     if (self.itemDescription != nil) {
         [encoder encodeObject:self.itemDescription forKey:SUAppcastItemDescriptionKey];
@@ -232,16 +232,11 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         
         if (enclosureURLString) {
             NSString *enclosureLengthString = [enclosure objectForKey:SURSSAttributeLength];
-            NSInteger contentLength = 0;
+            long long contentLength = 0;
             if (enclosureLengthString != nil) {
-                contentLength = [enclosureLengthString integerValue];
-            } else {
-                static dispatch_once_t onceToken;
-                dispatch_once(&onceToken, ^{
-                    SULog(@"warning: <%@> for URL '%@' is missing %@ attribute. Downloading progress may be unreliable. Please always specify %@", SURSSElementEnclosure, [enclosure objectForKey:SURSSAttributeURL], SURSSAttributeLength, SURSSAttributeLength);
-                });
+                contentLength = [enclosureLengthString longLongValue];
             }
-            _contentLength = (contentLength > 0) ? (NSUInteger)contentLength : 0;
+            _contentLength = (contentLength > 0) ? (uint64_t)contentLength : 0;
         }
 
         if (enclosureURLString) {

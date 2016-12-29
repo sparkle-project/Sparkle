@@ -202,7 +202,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * This can be called from any thread
  */
-- (void)showDownloadDidReceiveExpectedContentLength:(NSUInteger)expectedContentLength;
+- (void)showDownloadDidReceiveExpectedContentLength:(uint64_t)expectedContentLength;
 
 /*!
  * Show the user that the update download received more data
@@ -212,7 +212,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * This can be called from any thread
  */
-- (void)showDownloadDidReceiveDataOfLength:(NSUInteger)length;
+- (void)showDownloadDidReceiveDataOfLength:(uint64_t)length;
 
 /*!
  * Show the user that the update finished downloading and started extracting

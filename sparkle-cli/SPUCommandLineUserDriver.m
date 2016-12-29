@@ -19,8 +19,8 @@
 @property (nonatomic, readonly) BOOL deferInstallation;
 @property (nonatomic, readonly) BOOL verbose;
 @property (nonatomic, readonly) SPUUserDriverCoreComponent *coreComponent;
-@property (nonatomic) NSUInteger bytesDownloaded;
-@property (nonatomic) NSUInteger bytesToDownload;
+@property (nonatomic) uint64_t bytesDownloaded;
+@property (nonatomic) uint64_t bytesToDownload;
 
 @end
 
@@ -215,23 +215,23 @@
     });
 }
 
-- (void)showDownloadDidReceiveExpectedContentLength:(NSUInteger)expectedContentLength
+- (void)showDownloadDidReceiveExpectedContentLength:(uint64_t)expectedContentLength
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.verbose) {
-            fprintf(stderr, "Downloading %lu bytes...\n", (unsigned long)expectedContentLength);
+            fprintf(stderr, "Downloading %llu bytes...\n", expectedContentLength);
         }
         self.bytesDownloaded = 0;
         self.bytesToDownload = expectedContentLength;
     });
 }
 
-- (void)showDownloadDidReceiveDataOfLength:(NSUInteger)length
+- (void)showDownloadDidReceiveDataOfLength:(uint64_t)length
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         self.bytesDownloaded += length;
         if (self.bytesToDownload > 0 && self.verbose) {
-            fprintf(stderr, "Downloaded %lu out of %lu bytes (%.0f%%)\n", (unsigned long)self.bytesDownloaded, (unsigned long)self.bytesToDownload, (self.bytesDownloaded * 100.0 / self.bytesToDownload));
+            fprintf(stderr, "Downloaded %llu out of %llu bytes (%.0f%%)\n", self.bytesDownloaded, self.bytesToDownload, (self.bytesDownloaded * 100.0 / self.bytesToDownload));
         }
     });
 }

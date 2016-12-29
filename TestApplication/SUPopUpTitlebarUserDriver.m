@@ -18,8 +18,8 @@
 @property (nonatomic) BOOL addedAccessory;
 @property (nonatomic) NSButton *updateButton;
 @property (nonatomic, copy) void (^updateButtonAction)(NSButton *);
-@property (nonatomic) NSUInteger expectedContentLength;
-@property (nonatomic) NSUInteger contentLengthDownloaded;
+@property (nonatomic) uint64_t expectedContentLength;
+@property (nonatomic) uint64_t contentLengthDownloaded;
 
 @end
 
@@ -268,7 +268,7 @@
     });
 }
 
-- (void)showDownloadDidReceiveExpectedContentLength:(NSUInteger)expectedContentLength
+- (void)showDownloadDidReceiveExpectedContentLength:(uint64_t)expectedContentLength
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self addUpdateButtonWithTitle:@"Downloading…"];
@@ -277,7 +277,7 @@
     });
 }
 
-- (void)showDownloadDidReceiveDataOfLength:(NSUInteger)length
+- (void)showDownloadDidReceiveDataOfLength:(uint64_t)length
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         self.contentLengthDownloaded += length;

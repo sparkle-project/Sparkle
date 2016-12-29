@@ -46,7 +46,7 @@
 {
 }
 
-- (void)downloaderDidReceiveDataOfLength:(NSUInteger)__unused length
+- (void)downloaderDidReceiveDataOfLength:(uint64_t)__unused length
 {
 }
 

@@ -181,12 +181,12 @@
     }];
 }
 
-- (void)downloadDriverDidReceiveExpectedContentLength:(NSUInteger)expectedContentLength
+- (void)downloadDriverDidReceiveExpectedContentLength:(uint64_t)expectedContentLength
 {
     [self.userDriver showDownloadDidReceiveExpectedContentLength:expectedContentLength];
 }
 
-- (void)downloadDriverDidReceiveDataOfLength:(NSUInteger)length
+- (void)downloadDriverDidReceiveDataOfLength:(uint64_t)length
 {
     [self.userDriver showDownloadDidReceiveDataOfLength:length];
 }

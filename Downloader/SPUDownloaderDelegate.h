@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)downloaderDidReceiveExpectedContentLength:(int64_t)expectedContentLength;
 
 // This is only invoked for persistent downloads
-- (void)downloaderDidReceiveDataOfLength:(NSUInteger)length;
+- (void)downloaderDidReceiveDataOfLength:(uint64_t)length;
 
 // downloadData is nil if this is a persisent download, otherwise it's non-nil if it's a temporary download
 - (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData * _Nullable)downloadData;

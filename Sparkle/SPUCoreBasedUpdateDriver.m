@@ -183,14 +183,14 @@
     }
 }
 
-- (void)downloadDriverDidReceiveExpectedContentLength:(NSUInteger)expectedContentLength
+- (void)downloadDriverDidReceiveExpectedContentLength:(uint64_t)expectedContentLength
 {
     if ([self.delegate respondsToSelector:@selector(downloadDriverDidReceiveExpectedContentLength:)]) {
         [self.delegate downloadDriverDidReceiveExpectedContentLength:expectedContentLength];
     }
 }
 
-- (void)downloadDriverDidReceiveDataOfLength:(NSUInteger)length
+- (void)downloadDriverDidReceiveDataOfLength:(uint64_t)length
 {
     if ([self.delegate respondsToSelector:@selector(downloadDriverDidReceiveDataOfLength:)]) {
         [self.delegate downloadDriverDidReceiveDataOfLength:length];
