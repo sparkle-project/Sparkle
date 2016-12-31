@@ -171,7 +171,8 @@
 
 - (BOOL)allowsAutomaticUpdates
 {
-    return [SUSystemUpdateInfo systemAllowsAutomaticUpdatesForHost:self.host];
+    return [SUSystemUpdateInfo systemAllowsAutomaticUpdatesForHost:self.host]
+            && !self.updateItem.isInformationOnlyUpdate;
 }
 
 - (void)windowDidLoad
