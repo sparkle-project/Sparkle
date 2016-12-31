@@ -88,21 +88,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)copyItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError *_Nullable*_Nullable)error;
 
 /**
- * Moves an item at a specified URL to the running user's trash directory
- * @param url A URL pointing to the item to move to the trash. The item at this URL must exist.
- * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
- * @return YES if the item was moved to the trash successfully, otherwise NO along with a populated error object
- *
- *
- * This method has to locate the trash directory and uses an intermediate temporary directory before trashing the item.
- * A copy may have to be done if the url is not on the same volume as the running user's trash directory.
- * If a failure occurs in the middle of this operation, the item to remove may be lost forever or stuck in a temporary location.
- *
- * This is not an atomic operation, nor intended to be a recoverable operation if the worst comes to worst.
- */
-- (BOOL)moveItemAtURLToTrash:(NSURL *)url error:(NSError *_Nullable*_Nullable)error;
-
-/**
  * Removes an item at a URL
  * @param url A URL pointing to the item to remove. The item at this URL must exist.
  * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
