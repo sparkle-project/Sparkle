@@ -32,6 +32,7 @@
 @synthesize displayVersionString;
 @synthesize DSASignature;
 @synthesize fileURL;
+@synthesize contentLength = _contentLength;
 @synthesize infoURL;
 @synthesize itemDescription;
 @synthesize maximumSystemVersion;
@@ -128,6 +129,15 @@
                 *error = @"Feed item's enclosure lacks URL";
             }
             return nil;
+        }
+        
+        if (enclosureURLString) {
+            NSString *enclosureLengthString = [enclosure objectForKey:SURSSAttributeLength];
+            long long contentLength = 0;
+            if (enclosureLengthString != nil) {
+                contentLength = [enclosureLengthString longLongValue];
+            }
+            _contentLength = (contentLength > 0) ? (uint64_t)contentLength : 0;
         }
 
         if (enclosureURLString) {

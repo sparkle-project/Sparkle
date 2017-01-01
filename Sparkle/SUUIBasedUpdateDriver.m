@@ -161,7 +161,8 @@
 
 - (void)download:(NSURLDownload *)__unused download didReceiveResponse:(NSURLResponse *)response
 {
-    [self.statusController setMaxProgressValue:[response expectedContentLength]];
+    long long expectedContentLength = [response expectedContentLength];
+    [self.statusController setMaxProgressValue:expectedContentLength > 0 ? expectedContentLength : self.updateItem.contentLength];
 }
 
 - (NSString *)localizedStringFromByteCount:(long long)value
@@ -196,7 +197,14 @@
 
 - (void)download:(NSURLDownload *)__unused download didReceiveDataOfLength:(NSUInteger)length
 {
-    [self.statusController setProgressValue:[self.statusController progressValue] + (double)length];
+    double newProgressValue = [self.statusController progressValue] + (double)length;
+    
+    // In case our expected content length was incorrect
+    if (newProgressValue > [self.statusController maxProgressValue]) {
+        [self.statusController setMaxProgressValue:newProgressValue];
+    }
+    
+    [self.statusController setProgressValue:newProgressValue];
     if ([self.statusController maxProgressValue] > 0.0)
         [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [self localizedStringFromByteCount:(long long)self.statusController.progressValue], [self localizedStringFromByteCount:(long long)self.statusController.maxProgressValue]]];
     else
