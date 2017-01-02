@@ -85,7 +85,7 @@
         versionDisplayer = aVersionDisplayer;
         
         SPUUpdaterSettings *updaterSettings = [[SPUUpdaterSettings alloc] initWithHostBundle:host.bundle];
-        _allowsAutomaticUpdates = updaterSettings.allowsAutomaticUpdates;
+        _allowsAutomaticUpdates = updaterSettings.allowsAutomaticUpdates && !item.isInformationOnlyUpdate;
         [self setShouldCascadeWindows:NO];
         
         // Alex: This dummy line makes sure that the binary is linked against WebKit.

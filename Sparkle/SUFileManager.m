@@ -9,10 +9,6 @@
 #import "SUFileManager.h"
 #import "SUErrors.h"
 
-#if __MAC_OS_X_VERSION_MIN_REQUIRED < 1080
-#import <AppKit/AppKit.h> // for NSWorkspace
-#endif
-
 #include <sys/xattr.h>
 #include <sys/errno.h>
 #include <sys/time.h>
