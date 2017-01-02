@@ -16,9 +16,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)updateItem downloadName:(NSString *)downloadName temporaryDirectory:(NSString *)temporaryDirectory;
 
+// For information only updates
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)updateItem;
+
 @property (nonatomic, readonly) SUAppcastItem *updateItem;
-@property (nonatomic, copy, readonly) NSString *downloadName;
-@property (nonatomic, copy, readonly) NSString *temporaryDirectory;
+
+// These are nil when the update item is just informational and no download is linked
+@property (nonatomic, copy, nullable, readonly) NSString *downloadName;
+@property (nonatomic, copy, nullable, readonly) NSString *temporaryDirectory;
 
 @end
 

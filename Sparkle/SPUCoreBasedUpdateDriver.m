@@ -203,6 +203,11 @@
     [self extractUpdate:downloadedUpdate];
 }
 
+- (void)deferInformationalUpdate:(SUAppcastItem *)updateItem
+{
+    self.downloadedUpdate = [[SPUDownloadedUpdate alloc] initWithAppcastItem:updateItem];
+}
+
 - (void)extractDownloadedUpdate
 {
     assert(self.downloadedUpdate != nil);
@@ -342,6 +347,7 @@
     [self.downloadDriver cleanup];
     
     SPUDownloadedUpdate *downloadedUpdate = (error == nil || error.code == SUInstallationAuthorizeLaterError) ? self.downloadedUpdate : nil;
+    
     [self.basicDriver abortUpdateAndShowNextUpdateImmediately:shouldShowUpdateImmediately downloadedUpdate:downloadedUpdate error:error];
 }
 

@@ -29,4 +29,13 @@
     return self;
 }
 
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)updateItem
+{
+    self = [super init];
+    if (self != nil) {
+        _updateItem = updateItem;
+    }
+    return self;
+}
+
 @end

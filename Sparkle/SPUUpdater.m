@@ -797,7 +797,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 // Proceed as normal if there's no resumable updates
                 completionHandler(regularCheckInterval);
             } else {
-                if (!installationInfo.canSilentlyInstall || [installationInfo.appcastItem isCriticalUpdate]) {
+                if (!installationInfo.canSilentlyInstall || [installationInfo.appcastItem isCriticalUpdate] || [installationInfo.appcastItem isInformationOnlyUpdate]) {
                     completionHandler(MIN(regularCheckInterval, SUImpatientUpdateCheckInterval));
                 } else {
                     completionHandler(MAX(regularCheckInterval, SUImpatientUpdateCheckInterval));

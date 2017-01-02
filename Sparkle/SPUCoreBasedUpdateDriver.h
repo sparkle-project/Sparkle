@@ -63,6 +63,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem;
 
+- (void)deferInformationalUpdate:(SUAppcastItem *)updateItem;
+
 - (void)extractDownloadedUpdate;
 
 - (void)clearDownloadedUpdate;

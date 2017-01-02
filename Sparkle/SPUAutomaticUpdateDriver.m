@@ -84,7 +84,12 @@
 {
     self.updateItem = updateItem;
     
-    [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
+    if (updateItem.isInformationOnlyUpdate) {
+        [self.coreDriver deferInformationalUpdate:updateItem];
+        [self abortUpdate];
+    } else {
+        [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
+    }
 }
 
 - (void)installerDidFinishPreparationAndWillInstallImmediately:(BOOL)willInstallImmediately silently:(BOOL)willInstallSilently
@@ -126,7 +131,7 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (!self.willInstallSilently || self.updateItem.isCriticalUpdate);
+    BOOL showNextUpdateImmediately = (error == nil || error.code == SUInstallationAuthorizeLaterError) && (!self.willInstallSilently || self.updateItem.isCriticalUpdate || self.updateItem.isInformationOnlyUpdate);
     [self.coreDriver abortUpdateAndShowNextUpdateImmediately:showNextUpdateImmediately error:error];
 }
 
