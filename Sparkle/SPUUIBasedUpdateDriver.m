@@ -16,6 +16,7 @@
 #import "SUErrors.h"
 #import "SPUURLDownload.h"
 #import "SPUDownloadData.h"
+#import "SPUDownloadedUpdate.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -90,7 +91,10 @@
 
 - (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
-    self.resumingDownloadedUpdate = YES;
+    // Informational downloads shouldn't be presented as updates to be downloaded
+    if (!downloadedUpdate.updateItem.isInformationOnlyUpdate) {
+        self.resumingDownloadedUpdate = YES;
+    }
     [self.coreDriver resumeDownloadedUpdate:downloadedUpdate completion:completionBlock];
 }
 
