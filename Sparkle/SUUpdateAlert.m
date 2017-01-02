@@ -308,9 +308,13 @@
     {
         return [NSString stringWithFormat:SULocalizedString(@"An important update to %@ is ready to install", nil), [self.host name]];
     }
-    else
+    else if (self.alreadyDownloaded)
     {
         return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is ready to install!", nil), [self.host name]];
+    }
+    else
+    {
+        return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is available!", nil), [self.host name]];
     }
 }
 
