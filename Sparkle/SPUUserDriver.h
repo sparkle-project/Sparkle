@@ -84,9 +84,9 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 - (void)dismissUserInitiatedUpdateCheck;
 
 /*!
- * Show the user a new update is found and can be downloaded & installed
+ * Show the user a new update is found
  *
- * Let the user know a new downloadable update is found and ask them what they want to do.
+ * Let the user know a new update is found and ask them what they want to do.
  *
  * @param appcastItem The Appcast Item containing information that reflects the new update
  *
@@ -94,6 +94,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * @param reply
  * A reply of SPUInstallUpdateChoice begins downloading and installing the new update.
+ * Note if the update is only informational (appcastItem.isInformationOnlyUpdate), this response shouldn't be made.
  *
  * A reply of SPUInstallLaterChoice reminds the user later of the update, which can act as a "do nothing" option.
  *

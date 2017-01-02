@@ -131,7 +131,11 @@
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
                 switch (choice) {
                     case SPUInstallUpdateChoice:
-                        [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
+                        if (!updateItem.isInformationOnlyUpdate) {
+                            [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
+                        } else {
+                            [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
+                        }
                         break;
                     case SPUSkipThisVersionChoice:
                         [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
