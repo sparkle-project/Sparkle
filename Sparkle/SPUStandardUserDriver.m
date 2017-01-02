@@ -157,6 +157,16 @@
     }];
 }
 
+- (void)showInformationalUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUInformationalUpdateAlertChoice))reply
+{
+    [self showUpdateFoundWithAlertHandler:^SUUpdateAlert *(SPUStandardUserDriver *weakSelf, SUHost *host, id<SUVersionDisplay> versionDisplayer) {
+        return [[SUUpdateAlert alloc] initWithAppcastItem:appcastItem host:host versionDisplayer:versionDisplayer informationalCompletionBlock:^(SPUInformationalUpdateAlertChoice choice) {
+            reply(choice);
+            weakSelf.activeUpdateAlert = nil;
+        }];
+    }];
+}
+
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
 {
     dispatch_async(dispatch_get_main_queue(), ^{

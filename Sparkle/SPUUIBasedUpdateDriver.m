@@ -107,7 +107,23 @@
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
 {
-    if (self.resumingDownloadedUpdate) {
+    if (updateItem.isInformationOnlyUpdate) {
+        assert(!self.resumingDownloadedUpdate);
+        assert(!self.resumingInstallingUpdate);
+        
+        [self.userDriver showInformationalUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated reply:^(SPUInformationalUpdateAlertChoice choice) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                switch (choice) {
+                    case SPUSkipThisInformationalVersionChoice:
+                        [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
+                        // Fall through
+                    case SPUDismissInformationalNoticeChoice:
+                        [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
+                        break;
+                }
+            });
+        }];
+    } else if (self.resumingDownloadedUpdate) {
         [self.userDriver showDownloadedUpdateFoundWithAppcastItem:updateItem userInitiated:self.userInitiated reply:^(SPUUpdateAlertChoice choice) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
@@ -131,11 +147,7 @@
                 [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
                 switch (choice) {
                     case SPUInstallUpdateChoice:
-                        if (!updateItem.isInformationOnlyUpdate) {
-                            [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
-                        } else {
-                            [self.delegate uiDriverIsRequestingAbortUpdateWithError:nil];
-                        }
+                        [self.coreDriver downloadUpdateFromAppcastItem:updateItem];
                         break;
                     case SPUSkipThisVersionChoice:
                         [self.host setObject:[updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];

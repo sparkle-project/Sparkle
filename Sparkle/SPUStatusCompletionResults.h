@@ -37,4 +37,9 @@ typedef NS_ENUM(NSInteger, SPUUpdateAlertChoice) {
     SPUSkipThisVersionChoice
 };
 
+typedef NS_ENUM(NSInteger, SPUInformationalUpdateAlertChoice) {
+    SPUDismissInformationalNoticeChoice,
+    SPUSkipThisInformationalVersionChoice
+};
+
 #endif /* SPUStatusCompletionResults_h */

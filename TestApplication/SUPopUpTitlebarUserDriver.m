@@ -184,6 +184,16 @@
     });
 }
 
+- (void)showInformationalUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUInformationalUpdateAlertChoice))reply
+{
+    // Todo: show user interface for this
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"Found info URL: %@", appcastItem.infoURL);
+        
+        reply(SPUDismissInformationalNoticeChoice);
+    });
+}
+
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
 {
     [self.installUpdateViewController showReleaseNotesWithDownloadData:downloadData];

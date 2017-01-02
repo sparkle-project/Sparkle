@@ -40,6 +40,7 @@
 @property (nonatomic) BOOL allowsAutomaticUpdates;
 @property (nonatomic, copy, nullable) void(^completionBlock)(SPUUpdateAlertChoice);
 @property (nonatomic, copy, nullable) void(^resumableCompletionBlock)(SPUInstallUpdateStatus);
+@property (nonatomic, copy, nullable) void(^informationalCompletionBlock)(SPUInformationalUpdateAlertChoice);
 
 @property (strong) NSProgressIndicator *releaseNotesSpinner;
 @property (assign) BOOL webViewFinishedLoading;
@@ -59,6 +60,7 @@
 @synthesize completionBlock = _completionBlock;
 @synthesize alreadyDownloaded = _alreadyDownloaded;
 @synthesize resumableCompletionBlock = _resumableCompletionBlock;
+@synthesize informationalCompletionBlock = _informationalCompletionBlock;
 @synthesize versionDisplayer;
 
 @synthesize updateItem;
@@ -118,6 +120,16 @@
     return self;
 }
 
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer informationalCompletionBlock:(void (^)(SPUInformationalUpdateAlertChoice))block
+{
+    self = [self initWithAppcastItem:item host:aHost versionDisplayer:aVersionDisplayer];
+    if (self != nil)
+    {
+        _informationalCompletionBlock = [block copy];
+    }
+    return self;
+}
+
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
 
 
@@ -144,6 +156,17 @@
                 abort();
         }
         self.resumableCompletionBlock = nil;
+    } else if (self.informationalCompletionBlock != nil) {
+        switch (choice) {
+            case SPUInstallLaterChoice:
+                self.informationalCompletionBlock(SPUDismissInformationalNoticeChoice);
+                break;
+            case SPUSkipThisVersionChoice:
+                self.informationalCompletionBlock(SPUSkipThisInformationalVersionChoice);
+                break;
+            case SPUInstallUpdateChoice:
+                abort();
+        }
     }
 }
 

@@ -84,7 +84,7 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
 - (void)dismissUserInitiatedUpdateCheck;
 
 /*!
- * Show the user a new update is found
+ * Show the user a new update is found and can be downloaded and installed
  *
  * Let the user know a new update is found and ask them what they want to do.
  *
@@ -94,7 +94,6 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  *
  * @param reply
  * A reply of SPUInstallUpdateChoice begins downloading and installing the new update.
- * Note if the update is only informational (appcastItem.isInformationOnlyUpdate), this response shouldn't be made.
  *
  * A reply of SPUInstallLaterChoice reminds the user later of the update, which can act as a "do nothing" option.
  *
@@ -132,6 +131,27 @@ SU_EXPORT @protocol SPUUserDriver <NSObject>
  * This can be called from any thread
  */
 - (void)showResumableUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUInstallUpdateStatus))reply;
+
+/*!
+ * Show the user a new informational only update has been found
+ *
+ * Let the user know a new informational update is found and ask them what they want to do.
+ *
+ * @param appcastItem The Appcast Item containing information that reflects the new update.
+ * The infoURL property for the appcastItem may be of interest.
+ *
+ * @param userInitiated A flag indicating whether or not a user initiated this update check
+ *
+ * @param reply
+ * A reply of SPUDismissInformationalNoticeChoice dismisses this notice.
+ * An implementor may decide to invoke another action before dismissing the notice.
+ *
+ * A reply of SPUSkipThisInformationalVersionChoice skips this particular version and won't bother the user again,
+ * unless they initiate an update check themselves.
+ *
+ * This can be called from any thread
+ */
+- (void)showInformationalUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)userInitiated reply:(void (^)(SPUInformationalUpdateAlertChoice))reply;
 
 /*!
  * Show the user the release notes for the new update

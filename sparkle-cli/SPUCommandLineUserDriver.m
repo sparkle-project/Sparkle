@@ -153,6 +153,15 @@
     });
 }
 
+- (void)showInformationalUpdateFoundWithAppcastItem:(SUAppcastItem *)appcastItem userInitiated:(BOOL)__unused userInitiated reply:(void (^)(SPUInformationalUpdateAlertChoice))reply
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        fprintf(stderr, "Found information for new update: %s\n", appcastItem.infoURL.absoluteString.UTF8String);
+        
+        reply(SPUDismissInformationalNoticeChoice);
+    });
+}
+
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
 {
     dispatch_async(dispatch_get_main_queue(), ^{
