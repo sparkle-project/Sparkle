@@ -48,7 +48,7 @@
     XCTAssertFalse([fm fileExistsAtPath:expectedDestination isDirectory:nil]);
 
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-    NSString *path = [bundle pathForResource:@"test.sparkle_guided" ofType:@"pkg"];
+    NSString *path = [bundle pathForResource:@"test" ofType:@"pkg"];
     XCTAssertNotNil(path);
 
     SUHost *host = [[SUHost alloc] initWithBundle:bundle];
