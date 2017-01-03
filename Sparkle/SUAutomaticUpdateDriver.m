@@ -50,6 +50,11 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 {
     self.interruptible = NO;
     [self invalidateShowUpdateAlertTimer];
+
+    if (self.alert) {
+        [self.alert close];
+    }
+
     self.alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host completionBlock:^(SUAutomaticInstallationChoice choice) {
         [self automaticUpdateAlertFinishedWithChoice:choice];
     }];
