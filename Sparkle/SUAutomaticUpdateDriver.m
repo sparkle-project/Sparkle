@@ -113,6 +113,14 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     }
 }
 
+-(BOOL)resumeUpdateInteractively {
+    if ([self isInterruptible]) {
+        [self showUpdateAlert];
+        return YES;
+    }
+    return NO;
+}
+
 - (void)stopUpdatingOnTermination
 {
     if (self.willUpdateOnTermination)
