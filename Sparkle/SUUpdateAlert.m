@@ -210,6 +210,10 @@
         [self.automaticallyInstallUpdatesButton removeFromSuperview];
     }
 
+    if ([self.updateItem isCriticalUpdate]) {
+        self.skipButton.enabled = NO;
+    }
+
     [self.window center];
 }
 
