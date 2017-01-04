@@ -49,6 +49,12 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 - (void)showUpdateAlert
 {
     self.interruptible = NO;
+    [self invalidateShowUpdateAlertTimer];
+
+    if (self.alert) {
+        [self.alert close];
+    }
+
     self.alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host completionBlock:^(SUAutomaticInstallationChoice choice) {
         [self automaticUpdateAlertFinishedWithChoice:choice];
     }];
@@ -107,6 +113,14 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     }
 }
 
+-(BOOL)resumeUpdateInteractively {
+    if ([self isInterruptible]) {
+        [self showUpdateAlert];
+        return YES;
+    }
+    return NO;
+}
+
 - (void)stopUpdatingOnTermination
 {
     if (self.willUpdateOnTermination)
@@ -140,6 +154,8 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)abortUpdate
 {
+    [self.alert close];
+
     self.isTerminating = NO;
     [self stopUpdatingOnTermination];
     [self invalidateShowUpdateAlertTimer];
@@ -154,6 +170,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)automaticUpdateAlertFinishedWithChoice:(SUAutomaticInstallationChoice)choice
 {
+    self.alert = nil;
 	switch (choice)
 	{
         case SUInstallNowChoice:
