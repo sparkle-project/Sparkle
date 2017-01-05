@@ -9,7 +9,7 @@ Secure and reliable software update framework for Cocoa developers.
 * Seamless. There's no mention of Sparkle; your icons and app name are used.
 * Secure. Updates are verified using DSA signatures and Apple Code Signing.
 * Fast. Supports delta updates which only patch files that have changed.
-* Easy to install. Sparkle requires no code in your app, so it's easy to upgrade or remove the framework.
+* Easy to install. Sparkle requires no code in your app, and only needs static files on a web server.
 * Supports bundles, preference panes, plugins, and other non-.app software. Can install .pkg files for more complicated products.
 * Handles permissions, quarantine and automatically asks for authentication if needed.
 * Uses RSS-based appcasts for release information. Appcasts are a de-facto standard supported by 3rd party update-tracking programs and websites.
