@@ -40,6 +40,7 @@ void SULog(SULogLevel level, NSString *format, ...)
             const char *subsystem = [[bundleIdentifier stringByAppendingString:@".Sparkle"] UTF8String];
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
+            // This creates a thread-safe object
             logger = os_log_create(subsystem, "Sparkle");
 #pragma clang diagnostic pop
         } else {
