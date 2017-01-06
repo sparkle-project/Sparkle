@@ -12,8 +12,11 @@
 #include <Foundation/Foundation.h>
 
 typedef NS_ENUM(uint8_t, SULogLevel) {
-    SULogLevelDefault = 0,
-    SULogLevelError = 1
+    // This level is for information that *might* result a failure
+    // For now until other levels are added, this may serve as a level for other information as well
+    SULogLevelDefault,
+    // This level is for errors that occurred
+    SULogLevelError
 };
 
 // Logging utlity function that is thread-safe
