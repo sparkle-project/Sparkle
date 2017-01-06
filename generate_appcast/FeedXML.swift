@@ -47,7 +47,6 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
             XMLNode.Options.nodeLoadExternalEntitiesNever,
             XMLNode.Options.nodePreserveCDATA,
             XMLNode.Options.nodePreserveWhitespace,
-            XMLNode.Options.nodePreservePrefixes,
         ];
         doc = try XMLDocument(contentsOf: appcastDestPath, options: Int(options.rawValue));
     } catch {
