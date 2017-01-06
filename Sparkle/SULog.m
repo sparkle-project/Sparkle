@@ -8,9 +8,8 @@
 
 #include "SULog.h"
 #include <asl.h>
-#include "SUExport.h"
+#include <os/log.h>
 #import "SUOperatingSystem.h"
-#import <os/log.h>
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" implementation and should NOT import AppKit
