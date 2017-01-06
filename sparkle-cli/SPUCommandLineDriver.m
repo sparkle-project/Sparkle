@@ -10,8 +10,6 @@
 #import <SparkleCore/SparkleCore.h>
 #import "SPUCommandLineUserDriver.h"
 
-void _SULogDisableStandardErrorStream(void);
-
 @interface SPUCommandLineDriver () <SPUUpdaterDelegate>
 
 @property (nonatomic, readonly) SPUUpdater *updater;
@@ -52,10 +50,6 @@ void _SULogDisableStandardErrorStream(void);
         _verbose = verbose;
         _interactive = interactiveInstallation;
         _customFeedURL = [customFeedURL copy];
-        
-#ifndef DEBUG
-        _SULogDisableStandardErrorStream();
-#endif
         
         id <SPUUserDriver> userDriver = [[SPUCommandLineUserDriver alloc] initWithUpdatePermissionResponse:updatePermissionResponse deferInstallation:deferInstallation verbose:verbose];
         _updater = [[SPUUpdater alloc] initWithHostBundle:updateBundle applicationBundle:applicationBundle userDriver:userDriver delegate:self];

@@ -16,21 +16,9 @@
 #error This is a "core" implementation and should NOT import AppKit
 #endif
 
-void _SULogDisableStandardErrorStream(void);
-static BOOL gDisableStandardErrorStream;
-
 // For converting constants to string literals using the preprocessor
 #define STRINGIFY(x) #x
 #define TO_STRING(x) STRINGIFY(x)
-
-// Private API for disable logging to standard error stream
-// We don't want to do this normally unless eg: releasing a command line utility,
-// because it may be useful for error output to show up in an immediately visible terminal/panel
-// Note this is only necessary for the older ASL API. This is effectively a no-op when os_log is available (10.12+)
-SU_EXPORT void _SULogDisableStandardErrorStream(void)
-{
-    gDisableStandardErrorStream = YES;
-}
 
 void SULog(SULogLevel level, NSString *format, ...)
 {
@@ -57,7 +45,8 @@ void SULog(SULogLevel level, NSString *format, ...)
 #pragma clang diagnostic pop
         } else {
             uint32_t options = ASL_OPT_NO_DELAY;
-            if (!gDisableStandardErrorStream) {
+            // Act the same way os_log() does; don't log to stderr if a terminal device is attached
+            if (!isatty(STDERR_FILENO)) {
                 options |= ASL_OPT_STDERR;
             }
             
