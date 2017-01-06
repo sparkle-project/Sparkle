@@ -68,7 +68,7 @@
         for (NSURL *file in filesToUpdate) {
             NSError *error = nil;
             if (![fileManager updateModificationAndAccessTimeOfItemAtURL:file error:&error]) {
-                SULog(@"Error: During delta unarchiving, failed to touch %@", error);
+                SULog(SULogLevelError, @"Error: During delta unarchiving, failed to touch %@", error);
             }
         }
     }

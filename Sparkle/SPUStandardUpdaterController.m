@@ -56,7 +56,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 {
     NSError *updaterError = nil;
     if (![self.updater startUpdater:&updaterError]) {
-        SULog(@"Fatal updater error (%ld): %@", updaterError.code, updaterError.localizedDescription);
+        SULog(SULogLevelError, @"Fatal updater error (%ld): %@", updaterError.code, updaterError.localizedDescription);
         abort();
     }
 }

@@ -31,7 +31,7 @@
     NSError *quarantineError = nil;
     if (![fileManager releaseItemFromQuarantineAtRootURL:progressToolURL error:&quarantineError]) {
         // This may or may not be a fatal error depending on if the process is sandboxed or not
-        SULog(@"Failed to release quarantine on installer at %@ with error %@", progressToolPath, quarantineError);
+        SULog(SULogLevelError, @"Failed to release quarantine on installer at %@ with error %@", progressToolPath, quarantineError);
     }
     
     NSString *executablePath = [[NSBundle bundleWithURL:progressToolURL] executablePath];
@@ -61,7 +61,7 @@
             if (removeError != NULL) {
                 // It's normal for a job to not be found, so this is not an interesting error
                 if (CFErrorGetCode(removeError) != kSMErrorJobNotFound) {
-                    SULog(@"Remove error: %@", removeError);
+                    SULog(SULogLevelError, @"Remove error: %@", removeError);
                 }
                 CFRelease(removeError);
             }
@@ -81,7 +81,7 @@
         submittedJob = SMJobSubmit(domain, (__bridge CFDictionaryRef)(jobDictionary), auth, &submitError);
         if (!submittedJob) {
             if (submitError != NULL) {
-                SULog(@"Submit progress error: %@", submitError);
+                SULog(SULogLevelError, @"Submit progress error: %@", submitError);
                 CFRelease(submitError);
             }
         }
@@ -112,7 +112,7 @@
     OSStatus createStatus = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &auth);
     if (createStatus != errAuthorizationSuccess) {
         auth = NULL;
-        SULog(@"Failed to create authorization reference: %d", createStatus);
+        SULog(SULogLevelError, @"Failed to create authorization reference: %d", createStatus);
     }
     
     BOOL canceledAuthorization = NO;
@@ -129,7 +129,7 @@
         OSStatus getRightResult = AuthorizationRightGet(rightName, NULL);
         if (getRightResult == errAuthorizationDenied) {
             if (AuthorizationRightSet(auth, rightName, (__bridge CFTypeRef _Nonnull)(@(kAuthorizationRuleAuthenticateAsAdmin)), (__bridge CFStringRef _Nullable)(authorizationPrompt), NULL, NULL) != errAuthorizationSuccess) {
-                SULog(@"Failed to make auth right set");
+                SULog(SULogLevelError, @"Failed to make auth right set");
             }
         }
         
@@ -173,7 +173,7 @@
                         char pathBuffer[] = "/tmp/XXXXXX.png";
                         int tempIconFile = mkstemps(pathBuffer, strlen(".png"));
                         if (tempIconFile == -1) {
-                            SULog(@"Failed to open temp icon from path buffer with error: %d", errno);
+                            SULog(SULogLevelError, @"Failed to open temp icon from path buffer with error: %d", errno);
                         } else {
                             close(tempIconFile);
                             
@@ -211,7 +211,7 @@
             if (copyStatus == errAuthorizationCanceled) {
                 canceledAuthorization = YES;
             } else {
-                SULog(@"Failed copying system domain rights: %d", copyStatus);
+                SULog(SULogLevelError, @"Failed copying system domain rights: %d", copyStatus);
             }
         }
         
@@ -233,7 +233,7 @@
             if (removeError != NULL) {
                 // It's normal for a job to not be found, so this is not an interesting error
                 if (CFErrorGetCode(removeError) != kSMErrorJobNotFound) {
-                    SULog(@"Remove job error: %@", removeError);
+                    SULog(SULogLevelError, @"Remove job error: %@", removeError);
                 }
                 CFRelease(removeError);
             }
@@ -245,7 +245,7 @@
         submittedJob = SMJobSubmit(domain, (__bridge CFDictionaryRef)(jobDictionary), auth, &submitError);
         if (!submittedJob) {
             if (submitError != NULL) {
-                SULog(@"Submit error: %@", submitError);
+                SULog(SULogLevelError, @"Submit error: %@", submitError);
                 CFRelease(submitError);
             }
         }
@@ -290,13 +290,13 @@
         BOOL needsSystemAuthorization = SPUNeedsSystemAuthorizationAccess(hostBundlePath, installationType);
         
         if (needsSystemAuthorization && !allowingUpdaterInteraction) {
-            SULog(@"Updater is not allowing interaction to the launcher.");
+            SULog(SULogLevelError, @"Updater is not allowing interaction to the launcher.");
             completionHandler(SUInstallerLauncherFailure);
             return;
         }
         
         if (!allowingUpdaterInteraction && [installationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
-            SULog(@"Updater is not allowing interaction to the launcher for performing an interactive type package installation.");
+            SULog(SULogLevelError, @"Updater is not allowing interaction to the launcher for performing an interactive type package installation.");
             completionHandler(SUInstallerLauncherFailure);
             return;
         }
@@ -317,7 +317,7 @@
         // Furthermore, we can keep the tool at a place that may not necessarily be writable.
         NSString *installerPath = [self pathForBundledTool:@""SPARKLE_RELAUNCH_TOOL_NAME extension:@"" inBundle:ourBundle];
         if (installerPath == nil) {
-            SULog(@"Error: Cannot submit installer because the installer could not be located");
+            SULog(SULogLevelError, @"Error: Cannot submit installer because the installer could not be located");
             completionHandler(SUInstallerLauncherFailure);
             return;
         }
@@ -326,7 +326,7 @@
         NSString *progressToolResourcePath = [self pathForBundledTool:@""SPARKLE_INSTALLER_PROGRESS_TOOL_NAME extension:@"app" inBundle:ourBundle];
         
         if (progressToolResourcePath == nil) {
-            SULog(@"Error: Cannot submit progress tool because the progress tool could not be located");
+            SULog(SULogLevelError, @"Error: Cannot submit progress tool because the progress tool could not be located");
             completionHandler(SUInstallerLauncherFailure);
             return;
         }
@@ -342,7 +342,7 @@
         
         NSString *launcherCachePath = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:rootLauncherCachePath];
         if (launcherCachePath == nil) {
-            SULog(@"Failed to create cache directory for progress tool in %@", rootLauncherCachePath);
+            SULog(SULogLevelError, @"Failed to create cache directory for progress tool in %@", rootLauncherCachePath);
             completionHandler(SUInstallerLauncherFailure);
             return;
         }
@@ -352,7 +352,7 @@
         NSError *copyError = nil;
         // SUFileManager is more reliable for copying files around
         if (![[[SUFileManager alloc] init] copyItemAtURL:[NSURL fileURLWithPath:progressToolResourcePath] toURL:[NSURL fileURLWithPath:progressToolPath] error:&copyError]) {
-            SULog(@"Failed to copy progress tool to cache: %@", copyError);
+            SULog(SULogLevelError, @"Failed to copy progress tool to cache: %@", copyError);
             completionHandler(SUInstallerLauncherFailure);
             return;
         }
@@ -364,10 +364,10 @@
             submittedProgressTool = [self submitProgressToolAtPath:progressToolPath withHostBundle:hostBundle inSystemDomainForInstaller:needsSystemAuthorization];
             
             if (!submittedProgressTool) {
-                SULog(@"Failed to submit progress tool job");
+                SULog(SULogLevelError, @"Failed to submit progress tool job");
             }
         } else if (installerStatus == SUInstallerLauncherFailure) {
-            SULog(@"Failed to submit installer job");
+            SULog(SULogLevelError, @"Failed to submit installer job");
         }
         
         if (installerStatus == SUInstallerLauncherCanceled) {

@@ -64,7 +64,7 @@ static NSTimeInterval OLD_ITEM_DELETION_INTERVAL = 86400 * 10; // 10 days
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSError *createError = nil;
     if (![fileManager createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:nil error:&createError]) {
-        SULog(@"Failed to create directory with intermediate components at %@ with error %@", directory, createError);
+        SULog(SULogLevelError, @"Failed to create directory with intermediate components at %@ with error %@", directory, createError);
         return nil;
     }
     

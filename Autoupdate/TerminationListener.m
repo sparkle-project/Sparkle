@@ -68,7 +68,7 @@
     pid_t processIdentifier = self.processIdentifier.intValue;
     int queue = kqueue();
     if (queue == -1) {
-        SULog(@"Failed to create kqueue() due to error %d: %@", errno, @(strerror(errno)));
+        SULog(SULogLevelError, @"Failed to create kqueue() due to error %d: %@", errno, @(strerror(errno)));
         [self invokeCompletionWithSuccess:NO];
         return;
     }
@@ -77,7 +77,7 @@
     EV_SET(&changes, processIdentifier, EVFILT_PROC, EV_ADD | EV_RECEIPT, NOTE_EXIT, 0, NULL);
     
     if (kevent(queue, &changes, 1, &changes, 1, NULL) == -1) {
-        SULog(@"Failed to invoke kevent() due to error %d: %@", errno, @(strerror(errno)));
+        SULog(SULogLevelError, @"Failed to invoke kevent() due to error %d: %@", errno, @(strerror(errno)));
         [self invokeCompletionWithSuccess:NO];
         return;
     }
@@ -89,7 +89,7 @@
 #pragma clang diagnostic pop
     CFFileDescriptorRef noteExitKQueueRef = CFFileDescriptorCreate(NULL, queue, true, noteExitKQueueCallback, &context);
     if (noteExitKQueueRef == NULL) {
-        SULog(@"Failed to create file descriptor via CFFileDescriptorCreate()");
+        SULog(SULogLevelError, @"Failed to create file descriptor via CFFileDescriptorCreate()");
         CFRelease((__bridge CFTypeRef)(self));
         [self invokeCompletionWithSuccess:NO];
         return;
@@ -97,7 +97,7 @@
     
     CFRunLoopSourceRef runLoopSource = CFFileDescriptorCreateRunLoopSource(NULL, noteExitKQueueRef, 0);
     if (runLoopSource == NULL) {
-        SULog(@"Failed to create runLoopSource via CFFileDescriptorCreateRunLoopSource()");
+        SULog(SULogLevelError, @"Failed to create runLoopSource via CFFileDescriptorCreateRunLoopSource()");
         CFRelease((__bridge CFTypeRef)(self));
         [self invokeCompletionWithSuccess:NO];
         return;

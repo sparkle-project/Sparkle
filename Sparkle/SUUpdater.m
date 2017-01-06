@@ -82,7 +82,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
         
         NSError *updaterError = nil;
         if (![_updater startUpdater:&updaterError]) {
-            SULog(@"Error: Falied to start updater with error: %@", updaterError);
+            SULog(SULogLevelError, @"Error: Failed to start updater with error: %@", updaterError);
             abort();
         }
     }
@@ -92,7 +92,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
 // This will be used when the updater is instantiated in a nib such as MainMenu
 - (instancetype)init
 {
-    SULog(@"DEPRECATION: SUUpdater is now deprecated. Please use SPUStandardUpdaterController as a nib instantiated replacement, or SPUUpdater.");
+    SULog(SULogLevelDefault, @"DEPRECATION: SUUpdater is now deprecated. Please use SPUStandardUpdaterController as a nib instantiated replacement, or SPUUpdater.");
     return [self initForBundle:[NSBundle mainBundle]];
 }
 
@@ -221,7 +221,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
 - (void)installUpdatesIfAvailable
 {
     if (!self.loggedInstallUpdatesIfAvailableWarning) {
-        SULog(@"-[%@ installUpdatesIfAvailable] does not function anymore.. Instead a background scheduled update check will be done.", NSStringFromClass([self class]));
+        SULog(SULogLevelError, @"-[%@ installUpdatesIfAvailable] does not function anymore.. Instead a background scheduled update check will be done.", NSStringFromClass([self class]));
         
         self.loggedInstallUpdatesIfAvailableWarning = YES;
     }

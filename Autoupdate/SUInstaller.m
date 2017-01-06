@@ -107,7 +107,7 @@
         *isGuidedPtr = isGuided;
 
     if (!newAppDownloadPath) {
-        SULog(@"Searched %@ for %@.(app|pkg)", inUpdateFolder, bundleFileNameNoExtension);
+        SULog(SULogLevelError, @"Searched %@ for %@.(app|pkg)", inUpdateFolder, bundleFileNameNoExtension);
     }
     return newAppDownloadPath;
 }

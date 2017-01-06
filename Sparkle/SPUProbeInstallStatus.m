@@ -60,7 +60,7 @@
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(PROBE_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (!handledCompletion) {
-            SULog(@"Timed out while probing installer progress");
+            SULog(SULogLevelError, @"Timed out while probing installer progress");
             completionHandler(NO);
             handledCompletion = YES;
         }
@@ -109,7 +109,7 @@
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(PROBE_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (!handledCompletion) {
-            SULog(@"Timed out while probing installer info data");
+            SULog(SULogLevelDefault, @"Timed out while probing installer info data");
             completionHandler(nil);
             handledCompletion = YES;
         }

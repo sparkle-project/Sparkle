@@ -391,7 +391,7 @@
 
     // Do not allow redirects to dangerous protocols such as file://
     if (!whitelistedSafe) {
-        SULog(@"Blocked display of %@ URL which may be dangerous", scheme);
+        SULog(SULogLevelDefault, @"Blocked display of %@ URL which may be dangerous", scheme);
         [listener ignore];
         return;
     }

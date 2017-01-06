@@ -32,8 +32,7 @@ SU_EXPORT void _SULogDisableStandardErrorStream(void)
     gDisableStandardErrorStream = YES;
 }
 
-// In the future, we could possibly support different logging levels
-void SULog(NSString *format, ...)
+void SULog(SULogLevel level, NSString *format, ...)
 {
     static aslclient client;
     static dispatch_queue_t queue;
@@ -84,7 +83,17 @@ void SULog(NSString *format, ...)
         // And we don't really leverage of os_log's deferred formatting processing because we format the string before passing it in
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
-        os_log_error(logger, "%{public}@", logMessage);
+        switch (level) {
+            case SULogLevelDefault:
+                // See docs for OS_LOG_TYPE_DEFAULT
+                // By default, OS_LOG_TYPE_DEFAULT seems to be more noticable than OS_LOG_TYPE_INFO
+                os_log(logger, "%{public}@", logMessage);
+                break;
+            case SULogLevelError:
+                // See docs for OS_LOG_TYPE_ERROR
+                os_log_error(logger, "%{public}@", logMessage);
+                break;
+        }
 #pragma clang diagnostic pop
         return;
     }
@@ -101,7 +110,17 @@ void SULog(NSString *format, ...)
             return;
         }
         
-        if (asl_set(message, ASL_KEY_LEVEL, TO_STRING(ASL_LEVEL_ERR)) != 0) {
+        int levelSetResult;
+        switch (level) {
+            case SULogLevelDefault:
+                // Just use one level below the error level
+                levelSetResult = asl_set(message, ASL_KEY_LEVEL, TO_STRING(ASL_LEVEL_WARNING));
+                break;
+            case SULogLevelError:
+                levelSetResult = asl_set(message, ASL_KEY_LEVEL, TO_STRING(ASL_LEVEL_ERR));
+                break;
+        }
+        if (levelSetResult != 0) {
             return;
         }
         

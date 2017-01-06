@@ -98,7 +98,7 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             SPUDownloadDriver *strongSelf = weakSelf;
             if (strongSelf != nil && !strongSelf.retrievedDownloadResult && !strongSelf.cleaningUp) {
-                SULog(@"Connection to update downloader was invalidated");
+                SULog(SULogLevelError, @"Connection to update downloader was invalidated");
                 
                 NSDictionary *userInfo =
                 @{
@@ -138,7 +138,7 @@
         self.retrievedDownloadResult = YES;
         
         if (self.expectedContentLength > 0 && self.updateItem.contentLength > 0 && self.expectedContentLength != self.updateItem.contentLength) {
-            SULog(@"Warning: Downloader's expected content length (%llu) != Appcast item's length (%llu)", self.expectedContentLength, self.updateItem.contentLength);
+            SULog(SULogLevelError, @"Warning: Downloader's expected content length (%llu) != Appcast item's length (%llu)", self.expectedContentLength, self.updateItem.contentLength);
         }
         
         SPUDownloadedUpdate *downloadedUpdate = [[SPUDownloadedUpdate alloc] initWithAppcastItem:self.updateItem downloadName:self.downloadName temporaryDirectory:self.temporaryDirectory];

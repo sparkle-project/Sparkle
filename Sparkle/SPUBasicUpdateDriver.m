@@ -182,7 +182,7 @@
             NSError *errorToDisplay = error;
             int finiteRecursion=5;
             do {
-                SULog(@"Error: %@ %@ (URL %@)", errorToDisplay.localizedDescription, errorToDisplay.localizedFailureReason, errorToDisplay.userInfo[NSURLErrorFailingURLErrorKey]);
+                SULog(SULogLevelError, @"Error: %@ %@ (URL %@)", errorToDisplay.localizedDescription, errorToDisplay.localizedFailureReason, errorToDisplay.userInfo[NSURLErrorFailingURLErrorKey]);
                 errorToDisplay = errorToDisplay.userInfo[NSUnderlyingErrorKey];
             } while(--finiteRecursion && errorToDisplay);
         }

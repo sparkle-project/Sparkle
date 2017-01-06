@@ -116,7 +116,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 // To prevent subclasses from doing something bad based on older Sparkle code
 - (instancetype)initForBundle:(NSBundle *)__unused bundle
 {
-    SULog(@"-[%@ initForBundle:] is not implemented anymore.", NSStringFromClass([self class]));
+    SULog(SULogLevelError, @"-[%@ initForBundle:] is not implemented anymore.", NSStringFromClass([self class]));
     abort();
     return nil;
 }
@@ -124,7 +124,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 // To prevent trying to stick an SUUpdater in a nib or initializing it in an incorrect way
 - (instancetype)init
 {
-    SULog(@"-[%@ init] is not implemented. If you want to drop an updater into a nib, see SPUStandardUpdaterController.", NSStringFromClass([self class]));
+    SULog(SULogLevelError, @"-[%@ init] is not implemented. If you want to drop an updater into a nib, see SPUStandardUpdaterController.", NSStringFromClass([self class]));
     abort();
     return nil;
 }
@@ -202,7 +202,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         if (foundATSPersistentIssue || foundATSMainBundleIssue) {
             if (!self.loggedATSWarning) {
                 // Just log a warning. Don't outright fail in case we are wrong (eg: app is linked on an old SDK where ATS doesn't take effect)
-                SULog(@"The feed URL (%@) may need to change to use HTTPS.\nFor more information: https://sparkle-project.org/documentation/app-transport-security", [feedURL absoluteString]);
+                SULog(SULogLevelDefault, @"The feed URL (%@) may need to change to use HTTPS.\nFor more information: https://sparkle-project.org/documentation/app-transport-security", [feedURL absoluteString]);
                 
                 self.loggedATSWarning = YES;
             }
@@ -232,7 +232,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 // Deprecated because we pass the downloaded archive to the installer and the installer has no way of knowing where the download came from.
                 // Even if it did, the server and the download on it could still be compromised. But if a DSA signature was used, the private key should
                 // not be stored on the server serving the update
-                SULog(@"DEPRECATION: Serving updates without a DSA key is now deprecated and may be removed from a future release. See Sparkle's documentation for more information.");
+                SULog(SULogLevelDefault, @"DEPRECATION: Serving updates without a DSA key is now deprecated and may be removed from a future release. See Sparkle's documentation for more information.");
                 
                 self.loggedDSAWarning = YES;
             }
@@ -536,8 +536,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     if (![self checkIfConfiguredProperly:&configurationError]) {
         // Don't think we should schedule a next update check if the bundle has been misconfigured once,
         // which would mean something is really off
-        SULog(@"Sparkle configuration error (%ld): %@", (long)configurationError.code, configurationError.localizedDescription);
-        SULog(@"Disabling scheduled updates..");
+        SULog(SULogLevelError, @"Sparkle configuration error (%ld): %@", (long)configurationError.code, configurationError.localizedDescription);
+        SULog(SULogLevelDefault, @"Disabling scheduled updates..");
         
         [self.driver abortUpdateWithError:configurationError];
         self.driver = nil;
@@ -628,7 +628,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (void)setFeedURL:(NSURL * _Nullable)feedURL
 {
     if (![NSThread isMainThread]) {
-        SULog(@"This method must be called on the main thread");
+        SULog(SULogLevelError, @"This method must be called on the main thread");
         abort();
     }
 
@@ -639,7 +639,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (BOOL)retrieveFeedURL:(NSURL * __autoreleasing *)feedURL error:(NSError * __autoreleasing *)error
 {
     if (![NSThread isMainThread]) {
-        SULog(@"This method must be called on the main thread");
+        SULog(SULogLevelError, @"This method must be called on the main thread");
         abort();
     }
     
@@ -677,7 +677,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     NSURL *feedURL = nil;
     NSError *feedError = nil;
     if (![self retrieveFeedURL:&feedURL error:&feedError]) {
-        SULog(@"Fatal Feed Error (%ld): %@", feedError.code, feedError.localizedDescription);
+        SULog(SULogLevelError, @"Fatal Feed Error (%ld): %@", feedError.code, feedError.localizedDescription);
         abort();
     }
     return feedURL;
@@ -719,7 +719,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 {
     NSURL *baseFeedURL = nil;
     if (![self retrieveFeedURL:&baseFeedURL error:NULL]) {
-        SULog(@"Unexpected error: base feed URL is invalid during -parameterizedFeedURL");
+        SULog(SULogLevelError, @"Unexpected error: base feed URL is invalid during -parameterizedFeedURL");
         return nil;
     }
     
@@ -763,7 +763,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     // Clean it up so it's a valid URL
     NSURL *parameterizedFeedURL = [NSURL URLWithString:appcastStringWithProfile];
     if (parameterizedFeedURL == nil) {
-        SULog(@"Unexpected error: parameterized feed URL formed from %@ is invalid", appcastStringWithProfile);
+        SULog(SULogLevelError, @"Unexpected error: parameterized feed URL formed from %@ is invalid", appcastStringWithProfile);
     }
     return parameterizedFeedURL;
 }

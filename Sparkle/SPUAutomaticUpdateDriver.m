@@ -69,14 +69,14 @@
 - (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
 {
     // Nothing really to do here.. this shouldn't be called.
-    SULog(@"Error: resumeInstallingUpdateWithCompletion: called on SPUAutomaticUpdateDriver");
+    SULog(SULogLevelError, @"Error: resumeInstallingUpdateWithCompletion: called on SPUAutomaticUpdateDriver");
     abort();
 }
 
 - (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)__unused downloadedUpdate completion:(SPUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
 {
     // Nothing really to do here.. this shouldn't be called.
-    SULog(@"Error: resumeDownloadedUpdate:completion: called on SPUAutomaticUpdateDriver");
+    SULog(SULogLevelError, @"Error: resumeDownloadedUpdate:completion: called on SPUAutomaticUpdateDriver");
     abort();
 }
 

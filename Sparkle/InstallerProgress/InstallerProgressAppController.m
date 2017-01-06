@@ -59,25 +59,25 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     self = [super init];
     if (self != nil) {
         if (arguments.count != 3) {
-            SULog(@"Error: Invalid number of arguments supplied: %@", arguments);
+            SULog(SULogLevelError, @"Error: Invalid number of arguments supplied: %@", arguments);
             [self cleanupAndExitWithStatus:EXIT_FAILURE];
         }
         
         NSString *hostBundlePath = arguments[1];
         if (hostBundlePath.length == 0) {
-            SULog(@"Error: Host bundle path length is 0");
+            SULog(SULogLevelError, @"Error: Host bundle path length is 0");
             [self cleanupAndExitWithStatus:EXIT_FAILURE];
         }
         
         _hostBundle = [NSBundle bundleWithPath:hostBundlePath];
         if (_hostBundle == nil) {
-            SULog(@"Error: Host bundle for target is nil");
+            SULog(SULogLevelError, @"Error: Host bundle for target is nil");
             [self cleanupAndExitWithStatus:EXIT_FAILURE];
         }
         
         NSString *hostBundleIdentifier = _hostBundle.bundleIdentifier;
         if (hostBundleIdentifier == nil) {
-            SULog(@"Error: Host bundle identifier for target is nil");
+            SULog(SULogLevelError, @"Error: Host bundle identifier for target is nil");
             [self cleanupAndExitWithStatus:EXIT_FAILURE];
         }
         
@@ -111,7 +111,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
                 if (strongSelf != nil) {
                     int exitStatus = (strongSelf.repliedToRegistration ? EXIT_SUCCESS : EXIT_FAILURE);
                     if (!strongSelf.repliedToRegistration) {
-                        SULog(@"Error: Agent Invalidating without having the chance to reply to installer");
+                        SULog(SULogLevelError, @"Error: Agent Invalidating without having the chance to reply to installer");
                     }
                     if (!strongSelf.willTerminate) {
                         [strongSelf cleanupAndExitWithStatus:exitStatus];
@@ -141,7 +141,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(CONNECTION_ACKNOWLEDGEMENT_TIMEOUT * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (!self.connected) {
-            SULog(@"Timeout error: failed to receive acknowledgement from installer");
+            SULog(SULogLevelError, @"Timeout error: failed to receive acknowledgement from installer");
             [self cleanupAndExitWithStatus:EXIT_FAILURE];
         }
     });
@@ -160,7 +160,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     // Remove the agent bundle; it is assumed this bundle is in a temporary/cache/support directory
     NSError *theError = nil;
     if (![[NSFileManager defaultManager] removeItemAtPath:[[NSBundle mainBundle] bundlePath] error:&theError]) {
-        SULog(@"Couldn't remove agent bundle: %@.", theError);
+        SULog(SULogLevelError, @"Couldn't remove agent bundle: %@.", theError);
     }
     
     exit(status);
@@ -198,7 +198,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
         if (applicationBundlePath != nil && !self.willTerminate) {
             NSBundle *applicationBundle = [NSBundle bundleWithPath:applicationBundlePath];
             if (applicationBundle == nil) {
-                SULog(@"Error: Encountered invalid path for waiting termination: %@", applicationBundlePath);
+                SULog(SULogLevelError, @"Error: Encountered invalid path for waiting termination: %@", applicationBundlePath);
                 [self cleanupAndExitWithStatus:EXIT_FAILURE];
             }
             
@@ -259,14 +259,14 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             // We should at least make sure we're opening a bundle however
             NSBundle *relaunchBundle = [NSBundle bundleWithPath:pathToRelaunch];
             if (relaunchBundle == nil) {
-                SULog(@"Error: Encountered invalid path to relaunch: %@", pathToRelaunch);
+                SULog(SULogLevelError, @"Error: Encountered invalid path to relaunch: %@", pathToRelaunch);
                 [self cleanupAndExitWithStatus:EXIT_FAILURE];
             }
             
             // We only launch applications, but I'm not sure how reliable -launchApplicationAtURL:options:config: is so we're not using it
             // Eg: http://www.openradar.me/10952677
             if (![[NSWorkspace sharedWorkspace] openFile:pathToRelaunch]) {
-                SULog(@"Error: Failed to relaunch bundle at %@", pathToRelaunch);
+                SULog(SULogLevelError, @"Error: Failed to relaunch bundle at %@", pathToRelaunch);
             }
             
             // Delay termination for a little bit to better increase the chance the updated application when relaunched will be the frontmost application
