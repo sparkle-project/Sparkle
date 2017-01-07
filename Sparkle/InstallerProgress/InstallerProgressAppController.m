@@ -79,6 +79,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
         if (hostBundleIdentifier == nil) {
             SULog(SULogLevelError, @"Error: Host bundle identifier for target is nil");
             [self cleanupAndExitWithStatus:EXIT_FAILURE];
+            return nil; // just to silence analyzer warnings later about hostBundleIdentifier being nil
         }
         
         // Note that we are connecting to the installer rather than the installer connecting to us
