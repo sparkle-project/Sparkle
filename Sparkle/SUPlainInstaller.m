@@ -172,14 +172,8 @@
     // From here on out, we don't really need to bring up authorization if we haven't done so prior
     SUFileManager *constrainedFileManager = [fileManager fileManagerByPreservingAuthorizationRights];
     
-    // Cleanup: move the old app to the trash
-    NSError *trashError = nil;
-    if (![constrainedFileManager moveItemAtURLToTrash:oldTempURL error:&trashError]) {
-        SULog(@"Failed to move %@ to trash with error %@", oldTempURL, trashError);
-    }
-    
+    // Cleanup
     [constrainedFileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
-    
     [constrainedFileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
     
     return YES;

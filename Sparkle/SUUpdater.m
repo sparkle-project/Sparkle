@@ -291,6 +291,9 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (IBAction)checkForUpdates:(id)__unused sender
 {
     if (self.driver && [self.driver isInterruptible]) {
+        if ([self.driver resumeUpdateInteractively]) {
+            return;
+        }
         [self.driver abortUpdate];
     }
 
@@ -305,6 +308,9 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (void)installUpdatesIfAvailable
 {
     if (self.driver && [self.driver isInterruptible]) {
+        if ([self.driver resumeUpdateInteractively]) {
+            return;
+        }
         [self.driver abortUpdate];
     }
 

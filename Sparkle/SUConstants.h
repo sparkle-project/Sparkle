@@ -73,6 +73,7 @@ extern NSString *const SUAppcastElementReleaseNotesLink;
 extern NSString *const SUAppcastElementTags;
 
 extern NSString *const SURSSAttributeURL;
+extern NSString *const SURSSAttributeLength;
 
 extern NSString *const SURSSElementDescription;
 extern NSString *const SURSSElementEnclosure;

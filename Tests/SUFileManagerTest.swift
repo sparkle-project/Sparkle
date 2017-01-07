@@ -70,38 +70,6 @@ class SUFileManagerTest: XCTestCase
         }
     }
     
-    func testMoveFilesToTrash()
-    {
-        makeTempFiles() { fileManager, rootURL, ordinaryFileURL, directoryURL, fileInDirectoryURL, validSymlinkURL, invalidSymlinkURL in
-            XCTAssertNil(try? fileManager.moveItemAtURL(toTrash: rootURL.appendingPathComponent("does not exist")))
-            
-            let trashURL = try! FileManager.default.url(for: .trashDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-            
-            try! fileManager.moveItemAtURL(toTrash: ordinaryFileURL)
-            XCTAssertFalse(fileManager._itemExists(at: ordinaryFileURL))
-            
-            let ordinaryFileTrashURL = trashURL.appendingPathComponent(ordinaryFileURL.lastPathComponent)
-            XCTAssertTrue(fileManager._itemExists(at: ordinaryFileTrashURL))
-            try! fileManager.removeItem(at: ordinaryFileTrashURL)
-            
-            let validSymlinkTrashURL = trashURL.appendingPathComponent(validSymlinkURL.lastPathComponent)
-            try! fileManager.moveItemAtURL(toTrash: validSymlinkURL)
-            XCTAssertTrue(fileManager._itemExists(at: validSymlinkTrashURL))
-            XCTAssertTrue(fileManager._itemExists(at: directoryURL))
-            try! fileManager.removeItem(at: validSymlinkTrashURL)
-            
-            try! fileManager.moveItemAtURL(toTrash: directoryURL)
-            XCTAssertFalse(fileManager._itemExists(at: directoryURL))
-            XCTAssertFalse(fileManager._itemExists(at: fileInDirectoryURL))
-            
-            let directoryTrashURL = trashURL.appendingPathComponent(directoryURL.lastPathComponent)
-            XCTAssertTrue(fileManager._itemExists(at: directoryTrashURL))
-            XCTAssertTrue(fileManager._itemExists(at: directoryTrashURL.appendingPathComponent(fileInDirectoryURL.lastPathComponent)))
-            
-            try! fileManager.removeItem(at: directoryTrashURL)
-        }
-    }
-    
     func testCopyFiles()
     {
         makeTempFiles() { fileManager, rootURL, ordinaryFileURL, directoryURL, fileInDirectoryURL, validSymlinkURL, invalidSymlinkURL in

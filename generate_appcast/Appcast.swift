@@ -5,6 +5,9 @@
 
 import Foundation
 
+// Maximum number of delta updates (per OS).
+let maxDeltas = 5;
+
 func makeError(code: SUError, _ description: String) -> NSError {
     return NSError(domain: SUSparkleErrorDomain, code: Int(OSStatus(code.rawValue)), userInfo: [
         NSLocalizedDescriptionKey: description,
@@ -65,7 +68,7 @@ func makeAppcast(archivesSourceDir: URL, privateKey: SecKey) throws -> [String:[
                     continue;
                 }
 
-                let deltaBaseName = appBaseName + item.version + "-" + latestItem.version;
+                let deltaBaseName = appBaseName + latestItem.version + "-" + item.version;
                 let deltaPath = archivesSourceDir.appendingPathComponent(deltaBaseName).appendingPathExtension("delta");
 
                 var delta:DeltaUpdate;
@@ -84,7 +87,7 @@ func makeAppcast(archivesSourceDir: URL, privateKey: SecKey) throws -> [String:[
                 if delta.fileSize / 7 < latestItem.fileSize / 8 {
                     // Max 3 deltas per version (arbitrary limit to reduce amount of work)
                     numDeltas += 1;
-                    if numDeltas > 3 {
+                    if numDeltas > maxDeltas {
                         break;
                     }
 

@@ -37,7 +37,7 @@
         *bundleFileName = [[host bundlePath] lastPathComponent],
         *alternateBundleFileName = [[host name] stringByAppendingPathExtension:[[host bundlePath] pathExtension]];
     BOOL isPackage = NO;
-    BOOL isGuided = NO;
+    BOOL isGuided = YES;
     NSString *fallbackPackagePath = nil;
     NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:inUpdateFolder];
     NSString *bundleFileNameNoExtension = [bundleFileName stringByDeletingPathExtension];
@@ -87,9 +87,12 @@
     }
 
     if (isPackage) {
-        // foo.app -> foo.sparkle_guided.pkg or foo.sparkle_guided.mpkg
-        if ([[[newAppDownloadPath stringByDeletingPathExtension] pathExtension] isEqualToString:@"sparkle_guided"]) {
-            isGuided = YES;
+        // Guided (or now "normal") installs used to be opt-in (i.e, Sparkle would detect foo.sparkle_guided.pkg or foo.sparkle_guided.mpkg),
+        // but to get an interactive (or "unguided") install, the developer now must opt-out of guided installations.
+        
+        // foo.app -> foo.sparkle_interactive.pkg or foo.sparkle_interactive.mpkg
+        if ([[[newAppDownloadPath stringByDeletingPathExtension] pathExtension] isEqualToString:@"sparkle_interactive"]) {
+            isGuided = NO;
         }
     }
 

@@ -52,6 +52,9 @@ NSString *const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdateDriverFinishedNotification object:self];
 }
 
+-(BOOL)resumeUpdateInteractively {
+    return NO;
+}
 
 - (void)showAlert:(NSAlert *)alert {
     // Only UI-based subclass shows the actual alert

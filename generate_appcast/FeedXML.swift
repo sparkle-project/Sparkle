@@ -5,6 +5,8 @@
 
 import Foundation
 
+let maxVersionsInFeed = 5;
+
 func findElement(name: String, parent: XMLElement) -> XMLElement? {
     if let found = try? parent.nodes(forXPath: name) {
         if found.count > 0 {
@@ -79,7 +81,7 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
         let createNewItem = existingItems.count == 0;
 
         // Update all old items, but aim for less than 5 in new feeds
-        if createNewItem && numItems >= 5 {
+        if createNewItem && numItems >= maxVersionsInFeed {
             continue;
         }
         numItems += 1;
