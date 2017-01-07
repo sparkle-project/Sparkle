@@ -158,7 +158,7 @@
         [[updater delegate] updater:self.updater didFinishLoadingAppcast:ac];
     }
 
-    NSDictionary *userInfo = (ac != nil) ? @{ SUUpdaterAppcastNotificationKey: ac } : nil;
+    NSDictionary *userInfo = @{ SUUpdaterAppcastNotificationKey: ac };
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidFinishLoadingAppCastNotification object:self.updater userInfo:userInfo];
 
     SUAppcastItem *item = nil;
