@@ -23,7 +23,7 @@ class DeltaUpdate {
     class func create(from: ArchiveItem, to: ArchiveItem, archivePath: URL) throws -> DeltaUpdate {
         var applyDiffError: NSError? = nil;
 
-        if (!createBinaryDelta(from.appPath.path, to.appPath.path, archivePath.path, .beigeMajorVersion, true, &applyDiffError)) {
+        if (!createBinaryDelta(from.appPath.path, to.appPath.path, archivePath.path, .beigeMajorVersion, false, &applyDiffError)) {
             throw applyDiffError!;
         }
 

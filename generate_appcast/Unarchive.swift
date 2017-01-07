@@ -31,7 +31,7 @@ func unarchive(itemPath:URL, archiveDestDir: URL, callback: @escaping (Error?) -
             }, progressBlock: nil)
         } else {
             _ = try? fileManager.removeItem(at: itemCopy);
-            callback(makeError(code: .unarchivingError, "Can't create a hardlink to \(itemCopy)"));
+            callback(makeError(code: .unarchivingError, "Not a supported archive format: \(itemCopy)"));
         }
     } catch {
         _ = try? fileManager.removeItem(at: tempDir);
