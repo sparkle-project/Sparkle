@@ -1,9 +1,15 @@
 # 1.16.0
 
- * generate_appcast helper tool (Kornel Lesiński)
+ * Guided package installs are now the default for updating packages (Zorg)
+   - `pkg` installers won't show any UI. If you require the old behavior of showing a full installer window, rename the `*.pkg` file to `*.sparkle_interactive.pkg`
+ * Previous version of the app is now deleted instead of staying in the trash (Zorg)
+ * Added `generate_appcast` helper tool (Kornel Lesiński)
+ * Made manual check resume pending automatic updates instead of starting a new update (Kornel Lesiński)
+ * Started using `length` value from RSS if HTTP doesn't give one (Zorg)
+ * Hidden automatic updates checkbox for information only updates (Bi11)
  * Fixed UI update scheduler not prompting for install & relaunch (Zorg)
- * Progressbar for DMG and binary delta extraction (Kornel Lesiński)
- * Re-show download status if we attempt a 2nd download (Zorg)
+ * Added progressbar for DMG and binary delta extraction (Kornel Lesiński)
+ * Fixed showing of download status if we attempt a 2nd download (Zorg)
  * Refactorings to sync with upcoming 2.0
     * Decoupled and simplified installation code using protocols (Zorg)
     * Added nullability annotations (Zorg)
