@@ -237,7 +237,7 @@
         cachePath = [cachePaths objectAtIndex:0];
     }
     if (!cachePath) {
-        SULog(@"Failed to find user's cache directory! Using system default");
+        SULog(SULogLevelError, @"Failed to find user's cache directory! Using system default");
         cachePath = NSTemporaryDirectory();
     }
     
@@ -344,7 +344,7 @@
     
     BOOL success;
     if (!unarchiver) {
-        SULog(@"Error: No valid unarchiver for %@!", self.downloadPath);
+        SULog(SULogLevelError, @"Error: No valid unarchiver for %@!", self.downloadPath);
         
         success = NO;
     } else {
@@ -514,7 +514,7 @@
             // Perhaps in a sandboxed environment this matters more. Note that this may not be a fatal error.
             NSError *quarantineError = nil;
             if (![fileManager releaseItemFromQuarantineAtRootURL:relaunchCopyTargetURL error:&quarantineError]) {
-                SULog(@"Failed to release quarantine on %@ with error %@", relaunchCopyTargetPath, quarantineError);
+                SULog(SULogLevelError, @"Failed to release quarantine on %@ with error %@", relaunchCopyTargetPath, quarantineError);
             }
         }
     }
@@ -606,7 +606,7 @@
         NSError *errorToDisplay = error;
         int finiteRecursion=5;
         do {
-            SULog(@"Error: %@ %@ (URL %@)", errorToDisplay.localizedDescription, errorToDisplay.localizedFailureReason, [errorToDisplay.userInfo objectForKey:NSURLErrorFailingURLErrorKey]);
+            SULog(SULogLevelError, @"Error: %@ %@ (URL %@)", errorToDisplay.localizedDescription, errorToDisplay.localizedFailureReason, [errorToDisplay.userInfo objectForKey:NSURLErrorFailingURLErrorKey]);
             errorToDisplay = [errorToDisplay.userInfo objectForKey:NSUnderlyingErrorKey];
         } while(--finiteRecursion && errorToDisplay);
     }

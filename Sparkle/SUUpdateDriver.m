@@ -58,7 +58,7 @@ NSString *const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
 - (void)showAlert:(NSAlert *)alert {
     // Only UI-based subclass shows the actual alert
-    SULog(@"ALERT: %@\n%@", alert.messageText, alert.informativeText);
+    SULog(SULogLevelDefault, @"ALERT: %@\n%@", alert.messageText, alert.informativeText);
 }
 
 @end
