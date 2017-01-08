@@ -24,18 +24,18 @@
 @interface SUHost ()
 
 @property (strong, readwrite) NSBundle *bundle;
+@property (nonatomic, readonly) BOOL isMainBundle;
 @property (copy) NSString *defaultsDomain;
 @property (assign) BOOL usesStandardUserDefaults;
-@property (nonatomic) NSDictionary *infoDictionary;
 
 @end
 
 @implementation SUHost
 
 @synthesize bundle;
+@synthesize isMainBundle = _isMainBundle;
 @synthesize defaultsDomain;
 @synthesize usesStandardUserDefaults;
-@synthesize infoDictionary = _infoDictionary;
 
 - (instancetype)initWithBundle:(NSBundle *)aBundle
 {
@@ -47,7 +47,7 @@
             SULog(SULogLevelError, @"Error: the bundle being updated at %@ has no %@! This will cause preference read/write to not work properly.", self.bundle, kCFBundleIdentifierKey);
         }
         
-        _infoDictionary = aBundle.infoDictionary;
+        _isMainBundle = [aBundle isEqualTo:[NSBundle mainBundle]];
 
         self.defaultsDomain = [self objectForInfoDictionaryKey:SUDefaultsDomainKey];
         if (!self.defaultsDomain) {
@@ -59,14 +59,6 @@
         usesStandardUserDefaults = !self.defaultsDomain || [self.defaultsDomain isEqualToString:mainBundleIdentifier];
     }
     return self;
-}
-
-// NSBundles always cache the info dictionary, even if you create a new NSBundle instance, but we sometimes want to reload it
-// in case the bundle changes or is updated
-- (void)reloadInfoDictionary
-{
-    CFDictionaryRef infoDictionary = CFBundleCopyInfoDictionaryInDirectory((CFURLRef)self.bundle.bundleURL);
-    self.infoDictionary = CFBridgingRelease(infoDictionary);
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self bundlePath]]; }
@@ -163,7 +155,21 @@
 
 - (id)objectForInfoDictionaryKey:(NSString *)key
 {
-    return [self.infoDictionary objectForKey:key];
+    if (self.isMainBundle) {
+        // Common fast path - if we're updating the main bundle, that means our updater and host bundle's lifetime is the same
+        // If the bundle happens to be updated or change, that means our updater process needs to be terminated first to do it safely
+        // Thus we can rely on the cached Info dictionary
+        return [self.bundle objectForInfoDictionaryKey:key];
+    } else {
+        // Slow path - if we're updating another bundle, we should read in the most up to date Info dictionary because
+        // the bundle can be replaced externally or even by us.
+        // This is the easiest way to read the Info dictionary values *correctly* despite some performance loss.
+        // A mutable method to reload the Info dictionary at certain points and have it cached at other points is challenging to do correctly.
+        CFDictionaryRef cfInfoDictionary = CFBundleCopyInfoDictionaryInDirectory((CFURLRef)self.bundle.bundleURL);
+        NSDictionary *infoDictionary = CFBridgingRelease(cfInfoDictionary);
+        
+        return [infoDictionary objectForKey:key];
+    }
 }
 
 - (BOOL)boolForInfoDictionaryKey:(NSString *)key

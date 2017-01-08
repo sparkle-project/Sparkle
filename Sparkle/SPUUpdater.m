@@ -526,10 +526,6 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         [self scheduleNextUpdateCheck];
         return;
     }
-    
-    // Reload our host bundle information in case its current cache is out of date
-    // We could have updated the bundle before for example without terminating this updater process
-    [self.host reloadInfoDictionary];
 
     // Because an application can change the configuration (eg: the feed url) at any point, we should always check if it's valid
     NSError *configurationError = nil;

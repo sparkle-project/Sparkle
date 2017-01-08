@@ -13,10 +13,6 @@
 
 - (instancetype)initWithBundle:(NSBundle *)aBundle;
 
-// Invalidates the info dictionary cache
-// This is not thread safe
--  (void)reloadInfoDictionary;
-
 @property (readonly, copy) NSString *bundlePath;
 @property (readonly, copy) NSString *name;
 @property (readonly, copy) NSString *version;
