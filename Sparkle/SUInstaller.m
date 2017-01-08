@@ -150,7 +150,7 @@
     NSBundle *bundle = host.bundle;
     assert(bundle != nil);
     
-    NSString *normalizedAppPath = [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[bundle bundlePath] pathExtension]]];
+    NSString *normalizedAppPath = [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [host objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[bundle bundlePath] pathExtension]]];
     
     return normalizedAppPath;
 }
