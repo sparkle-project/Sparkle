@@ -295,7 +295,7 @@
         // are focused to inform the user since there is no dock icon to notify them.
         if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) { [[NSApplication sharedApplication] activateIgnoringOtherApps:YES]; }
         
-        [alert setIcon:[SUApplicationInfo bestIconForBundle:self.host.bundle]];
+        [alert setIcon:[SUApplicationInfo bestIconForHost:self.host]];
         [alert runModal];
         
         if ([delegate respondsToSelector:@selector(standardUserDriverDidShowModalAlert)]) {

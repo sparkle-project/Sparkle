@@ -14,6 +14,7 @@
 #import "SUBundleIcon.h"
 #import "SPULocalCacheDirectory.h"
 #import "SPUInstallationType.h"
+#import "SUHost.h"
 #import <ServiceManagement/ServiceManagement.h>
 
 #ifdef _APPKITDEFINES_H
@@ -145,7 +146,7 @@
         // Then use the icon (if one is available) for the authorization prompt
         // NSImage is not used because it relies on AppKit
         NSURL *tempIconDestinationURL = nil;
-        NSURL *iconURL = [SUBundleIcon iconURLForBundle:hostBundle];
+        NSURL *iconURL = [SUBundleIcon iconURLForHost:[[SUHost alloc] initWithBundle:hostBundle]];
         if (iconURL != nil) {
             CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)iconURL, (CFDictionaryRef)@{});
             if (imageSource != NULL) {

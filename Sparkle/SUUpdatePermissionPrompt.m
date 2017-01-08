@@ -101,7 +101,7 @@
 
 - (NSImage *)icon
 {
-    return [SUApplicationInfo bestIconForBundle:self.host.bundle];
+    return [SUApplicationInfo bestIconForHost:self.host];
 }
 
 - (NSString *)promptDescription

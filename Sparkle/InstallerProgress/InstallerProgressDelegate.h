@@ -10,9 +10,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class SUHost;
+
 @protocol InstallerProgressDelegate <NSObject>
 
-- (void)installerProgressShouldDisplayWithBundle:(NSBundle *)bundle;
+- (void)installerProgressShouldDisplayWithHost:(SUHost *)host;
 - (void)installerProgressShouldStop;
 
 @end

@@ -22,9 +22,8 @@
 
 @synthesize statusController = _statusController;
 
-- (void)installerProgressShouldDisplayWithBundle:(NSBundle *)bundle
+- (void)installerProgressShouldDisplayWithHost:(SUHost *)host
 {
-    SUHost *host = [[SUHost alloc] initWithBundle:bundle];
     self.statusController = [[SUStatusController alloc] initWithHost:host];
     
     [self.statusController setButtonTitle:SULocalizedString(@"Cancel Update", @"") target:nil action:nil isDefault:NO];

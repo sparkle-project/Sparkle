@@ -14,6 +14,7 @@
 #import "SPUInstallerAgentProtocol.h"
 #import "SUInstallerAgentInitiationProtocol.h"
 #import "StatusInfo.h"
+#import "SUHost.h"
 
 /*!
  * Terminate the application after a delay from launching the new update to avoid OS activation issues
@@ -290,12 +291,13 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
             TransformProcessType(&psn, kProcessTransformToForegroundApplication);
             
             // Note: the application icon needs to be set after showing the icon in the dock
-            self.application.applicationIconImage = [SUApplicationInfo bestIconForBundle:self.hostBundle];
+            SUHost *host = [[SUHost alloc] initWithBundle:self.hostBundle];
+            self.application.applicationIconImage = [SUApplicationInfo bestIconForHost:host];
             
             // Activate ourselves otherwise we will probably be in the background
             [self.application activateIgnoringOtherApps:YES];
             
-            [self.delegate installerProgressShouldDisplayWithBundle:self.hostBundle];
+            [self.delegate installerProgressShouldDisplayWithHost:host];
         }
     });
 }

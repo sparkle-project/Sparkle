@@ -163,6 +163,7 @@
 		72464F711E1F326A00FB341C /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		72464F721E1F327C00FB341C /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		72464F7C1E2097F600FB341C /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
+		72464F7E1E21ED8C00FB341C /* SUHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 61EF67550E25B58D00F754E0 /* SUHost.m */; };
 		7246E0A31C83B685003B4E75 /* SPUStandardUpdaterController.h in Headers */ = {isa = PBXBuildFile; fileRef = 7246E0A11C83B685003B4E75 /* SPUStandardUpdaterController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7246E0A41C83B685003B4E75 /* SPUStandardUpdaterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7246E0A21C83B685003B4E75 /* SPUStandardUpdaterController.m */; };
 		724BB3711D31D0B7005D534A /* SUInstallerConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 724BB3701D31D0B7005D534A /* SUInstallerConnection.m */; };
@@ -3047,6 +3048,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72464F7E1E21ED8C00FB341C /* SUHost.m in Sources */,
 				72464F711E1F326A00FB341C /* SUOperatingSystem.m in Sources */,
 				726E07B41CAF08D6001A286B /* main.m in Sources */,
 				721D8A7B1D4963190032E472 /* SPULocalCacheDirectory.m in Sources */,
