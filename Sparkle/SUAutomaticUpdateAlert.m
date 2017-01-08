@@ -11,6 +11,7 @@
 #import "SUAppcastItem.h"
 #import "SUApplicationInfo.h"
 #import "SUHost.h"
+#import "SUTouchBar.h"
 
 @interface SUAutomaticUpdateAlert ()
 @property (strong) void(^completionBlock)(SUAutomaticInstallationChoice);
@@ -86,6 +87,32 @@
     {
         return [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?", nil), [self.host name], [self.updateItem displayVersionString]];
     }
+}
+
+- (NSTouchBar *)makeTouchBar
+{
+    NSButton *installButton, *laterButton, *cancelButton;
+    for (NSView *control in self.window.contentView.subviews) {
+        if ([control isKindOfClass:[NSButton class]]) {
+            NSButton *button = (NSButton *)control;
+            if (button.action == @selector(installNow:)) {
+                installButton = button;
+            } else if (button.action == @selector(installLater:)) {
+                laterButton = button;
+            } else if (button.action == @selector(doNotInstall:)) {
+                cancelButton = button;
+            }
+        }
+    }
+    
+    SUTouchBar *touchBar =  [[SUTouchBar alloc] initWithIdentifier:self.className];
+    [touchBar addButtonWithButton:cancelButton];
+    [touchBar addSpace];
+    [touchBar addButtonWithButton:laterButton];
+    [touchBar addButtonWithButton:installButton];
+    [touchBar addSpace];
+    [touchBar addSpace];
+    return touchBar;
 }
 
 @end

@@ -11,10 +11,12 @@
 #import "SUHost.h"
 #import "SULocalizations.h"
 #import "SUApplicationInfo.h"
+#import "SUTouchBar.h"
 
 @interface SUStatusController ()
 @property (copy) NSString *title, *buttonTitle;
 @property (strong) SUHost *host;
+@property NSButton *touchBarButton;
 @end
 
 @implementation SUStatusController
@@ -27,6 +29,7 @@
 @synthesize actionButton;
 @synthesize progressBar;
 @synthesize statusTextField;
+@synthesize touchBarButton;
 
 - (instancetype)initWithHost:(SUHost *)aHost
 {
@@ -93,6 +96,10 @@
     [self.actionButton setTarget:target];
     [self.actionButton setAction:action];
     [self.actionButton setKeyEquivalent:isDefault ? @"\r" : @""];
+    
+    self.touchBarButton.target = self.actionButton.target;
+    self.touchBarButton.action = self.actionButton.action;
+    self.touchBarButton.keyEquivalent = self.actionButton.keyEquivalent;
 
     // 06/05/2008 Alex: Avoid a crash when cancelling during the extraction
     [self setButtonEnabled:(target != nil)];
@@ -121,6 +128,15 @@
     [self.progressBar setIndeterminate:(value == 0.0)];
     [self.progressBar startAnimation:self];
     [self.progressBar setUsesThreadedAnimation:YES];
+}
+
+- (NSTouchBar *)makeTouchBar
+{
+    SUTouchBar *touchBar =  [[SUTouchBar alloc] initWithIdentifier:self.className];
+    self.touchBarButton = [touchBar addButtonWithButton:self.actionButton];
+    [self.touchBarButton bind:@"title" toObject:self.actionButton withKeyPath:@"title" options:nil];
+    [self.touchBarButton bind:@"enabled" toObject:self.actionButton withKeyPath:@"enabled" options:nil];
+    return touchBar;
 }
 
 @end

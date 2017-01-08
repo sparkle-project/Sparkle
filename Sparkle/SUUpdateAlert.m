@@ -21,6 +21,7 @@
 #import "SUAppcastItem.h"
 #import "SUApplicationInfo.h"
 #import "SUSystemUpdateInfo.h"
+#import "SUTouchBar.h"
 
 // WebKit protocols are not explicitly declared until 10.11 SDK, so
 // declare dummy protocols to keep the build working on earlier SDKs.
@@ -314,6 +315,18 @@
     }
 
     return webViewMenuItems;
+}
+
+- (NSTouchBar *)makeTouchBar
+{
+    SUTouchBar *touchBar =  [[SUTouchBar alloc] initWithIdentifier:self.className];
+    [touchBar addButtonWithButton:self.skipButton];
+    [touchBar addSpace];
+    [touchBar addButtonWithButton:self.laterButton];
+    [touchBar addButtonWithButton:self.installButton];
+    [touchBar addSpace];
+    [touchBar addSpace];
+    return touchBar;
 }
 
 @end

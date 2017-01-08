@@ -13,6 +13,7 @@
 #import "SUConstants.h"
 #import "SULocalizations.h"
 #import "SUApplicationInfo.h"
+#import "SUTouchBar.h"
 
 @interface SUUpdatePermissionPrompt ()
 
@@ -158,6 +159,27 @@
     
     [[self window] close];
     [NSApp stopModal];
+}
+
+- (NSTouchBar *)makeTouchBar
+{
+    NSButton *checkButton, *cancelButton;
+    for (NSView *control in self.window.contentView.subviews) {
+        if ([control isKindOfClass:[NSButton class]]) {
+            NSButton *button = (NSButton *)control;
+            if (button.action == @selector(finishPrompt:)) {
+                if (button.tag == 1) {
+                    checkButton = button;
+                } else if (button.tag == 0) {
+                    cancelButton = button;
+                }
+            }
+        }
+    }
+    SUTouchBar *touchBar =  [[SUTouchBar alloc] initWithIdentifier:self.className];
+    [touchBar addButtonWithButton:cancelButton];
+    [touchBar addButtonWithButton:checkButton];
+    return touchBar;
 }
 
 @end
