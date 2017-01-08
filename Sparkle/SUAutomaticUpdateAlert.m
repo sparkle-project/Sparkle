@@ -73,7 +73,7 @@
 
 - (NSImage *__nonnull)applicationIcon
 {
-    return [SUApplicationInfo bestIconForBundle:self.host.bundle];
+    return [SUApplicationInfo bestIconForHost:self.host];
 }
 
 - (NSString *__nonnull)titleText
