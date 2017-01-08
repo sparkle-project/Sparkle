@@ -173,13 +173,13 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     NSString *fileOperationToolPath = [[[[NSBundle mainBundle] executablePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:@""SPARKLE_FILEOP_TOOL_NAME];
     
     if (![[NSFileManager defaultManager] fileExistsAtPath:fileOperationToolPath]) {
-        SULog(@"Potential Installation Error: File operation tool path %@ is not found", fileOperationToolPath);
+        SULog(SULogLevelError, @"Potential Installation Error: File operation tool path %@ is not found", fileOperationToolPath);
     }
     
     NSError *retrieveInstallerError = nil;
     id<SUInstallerProtocol> installer = [SUInstaller installerForHost:host fileOperationToolPath:fileOperationToolPath updateDirectory:self.updateFolderPath error:&retrieveInstallerError];
     if (installer == nil) {
-        SULog(@"Retrieved Installer Error: %@", retrieveInstallerError);
+        SULog(SULogLevelError, @"Retrieved Installer Error: %@", retrieveInstallerError);
         exit(EXIT_FAILURE);
     }
     
@@ -194,7 +194,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSError *initialInstallationError = nil;
         if (![installer performInitialInstallation:&initialInstallationError]) {
-            SULog(@"Failed to perform initial installation with error: %@", initialInstallationError);
+            SULog(SULogLevelError, @"Failed to perform initial installation with error: %@", initialInstallationError);
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self showError:initialInstallationError];
                 exit(EXIT_FAILURE);
@@ -207,7 +207,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
             NSError *underlyingError = [finalInstallationError.userInfo objectForKey:NSUnderlyingErrorKey];
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (underlyingError == nil || underlyingError.code != SUInstallationCancelledError) {
-                    SULog(@"Failed to perform final installation Error: %@", finalInstallationError);
+                    SULog(SULogLevelError, @"Failed to perform final installation Error: %@", finalInstallationError);
                     [self showError:finalInstallationError];
                 }
                 exit(EXIT_FAILURE);
@@ -238,7 +238,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     dispatch_block_t cleanupAndExit = ^{
         NSError *theError = nil;
         if (![[NSFileManager defaultManager] removeItemAtPath:self.updateFolderPath error:&theError]) {
-            SULog(@"Couldn't remove update folder: %@.", theError);
+            SULog(SULogLevelError, @"Couldn't remove update folder: %@.", theError);
         }
         
         [[NSFileManager defaultManager] removeItemAtPath:[[NSBundle mainBundle] bundlePath] error:NULL];
@@ -254,7 +254,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         
         // Don't use -launchApplication: because we may not be launching an application. Eg: it could be a system prefpane
         if (![[NSWorkspace sharedWorkspace] openFile:relaunchPath]) {
-            SULog(@"Failed to launch %@", relaunchPath);
+            SULog(SULogLevelError, @"Failed to launch %@", relaunchPath);
         }
         
         [self.statusController close];

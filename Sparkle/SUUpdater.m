@@ -99,7 +99,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     // Use explicit class to use the correct bundle even when subclassed
     self.sparkleBundle = [NSBundle bundleForClass:[SUUpdater class]];
     if (!self.sparkleBundle) {
-        SULog(@"Error: SUUpdater can't find Sparkle.framework it belongs to");
+        SULog(SULogLevelError, @"Error: SUUpdater can't find Sparkle.framework it belongs to");
         return nil;
     }
 
@@ -170,7 +170,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
             [self showAlertText:SULocalizedString(@"Insecure feed URL is blocked in macOS 10.11", nil)
                 informativeText:[NSString stringWithFormat:SULocalizedString(@"You must change the feed URL (%@) to use HTTPS or disable App Transport Security.\n\nFor more information:\nhttps://sparkle-project.org/documentation/app-transport-security/", nil), [feedURL absoluteString]]];
         } else if (!isMainBundle) {
-            SULog(@"WARNING: Serving updates over HTTP may be blocked in macOS 10.11. Please change the feed URL (%@) to use HTTPS. For more information:\nhttps://sparkle-project.org/documentation/app-transport-security/", feedURL);
+            SULog(SULogLevelDefault, @"WARNING: Serving updates over HTTP may be blocked in macOS 10.11. Please change the feed URL (%@) to use HTTPS. For more information:\nhttps://sparkle-project.org/documentation/app-transport-security/", feedURL);
         }
     }
 #endif
@@ -367,7 +367,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     }
     @catch (NSException *)
     {
-        SULog(@"Error: [SUUpdater unregisterAsObserver] called, but the updater wasn't registered as an observer.");
+        SULog(SULogLevelError, @"Error: [SUUpdater unregisterAsObserver] called, but the updater wasn't registered as an observer.");
     }
 }
 

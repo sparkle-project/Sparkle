@@ -135,7 +135,7 @@
 		if (taskResult != 0)
 		{
             NSString *resultStr = output ? [[NSString alloc] initWithData:output encoding:NSUTF8StringEncoding] : nil;
-            SULog(@"hdiutil failed with code: %ld data: <<%@>>", (long)taskResult, resultStr);
+            SULog(SULogLevelError, @"hdiutil failed with code: %ld data: <<%@>>", (long)taskResult, resultStr);
             goto reportError;
         }
         mountedSuccessfully = YES;
@@ -145,7 +145,7 @@
         contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
         if (error)
         {
-            SULog(@"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
+            SULog(SULogLevelError, @"Couldn't enumerate contents of archive mounted at %@: %@", mountPoint, error);
             goto reportError;
         }
 
@@ -164,7 +164,7 @@
             
             itemsCopied += 1.0;
             [notifier notifyProgress:0.5 + itemsCopied/(totalItems*2.0)];
-            SULog(@"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
+            SULog(SULogLevelDefault, @"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
 
 			if (![manager copyItemAtPath:fromPath toPath:toPath error:&error])
 			{
@@ -189,11 +189,11 @@
             @try {
                 [task launch];
             } @catch (NSException *exception) {
-                SULog(@"Failed to unmount %@", mountPoint);
-                SULog(@"Exception: %@", exception);
+                SULog(SULogLevelError, @"Failed to unmount %@", mountPoint);
+                SULog(SULogLevelError, @"Exception: %@", exception);
             }
         } else {
-            SULog(@"Can't mount DMG %@", self.archivePath);
+            SULog(SULogLevelError, @"Can't mount DMG %@", self.archivePath);
         }
     }
 }

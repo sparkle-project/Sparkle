@@ -242,7 +242,7 @@
             [appcastItems addObject:anItem];
 		}
         else {
-            SULog(@"Sparkle Updater: Failed to parse appcast item: %@.\nAppcast dictionary was: %@", errString, dict);
+            SULog(SULogLevelError, @"Sparkle Updater: Failed to parse appcast item: %@.\nAppcast dictionary was: %@", errString, dict);
             if (errorp) *errorp = [NSError errorWithDomain:SUSparkleErrorDomain
                                                       code:SUAppcastParseError
                                                   userInfo:@{NSLocalizedDescriptionKey: errString}];
