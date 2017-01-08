@@ -10,9 +10,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class SUHost;
+
 @interface SUBundleIcon : NSObject
 
-+ (NSURL * _Nullable)iconURLForBundle:(NSBundle *)bundle;
++ (NSURL * _Nullable)iconURLForHost:(SUHost *)host;
 
 @end
 
