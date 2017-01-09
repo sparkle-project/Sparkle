@@ -54,6 +54,9 @@
     NSButton *buttonCopy = [NSButton buttonWithTitle:button.title target:button.target action:button.action];
     buttonCopy.keyEquivalent = button.keyEquivalent;
     buttonCopy.tag = button.tag;
+    
+    [buttonCopy bind:@"title" toObject:button withKeyPath:@"title" options:nil];
+    [buttonCopy bind:@"enabled" toObject:button withKeyPath:@"enabled" options:nil];
 
     item.view = buttonCopy;
     [self.touchBarItems addObject:item];

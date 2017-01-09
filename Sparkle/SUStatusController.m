@@ -136,8 +136,6 @@
 {
     self.touchBarProvider = [[SUTouchBarProvider alloc] initWithIdentifier:self.className];
     self.touchBarButton = [self.touchBarProvider addButtonWithButton:self.actionButton];
-    [self.touchBarButton bind:@"title" toObject:self.actionButton withKeyPath:@"title" options:nil];
-    [self.touchBarButton bind:@"enabled" toObject:self.actionButton withKeyPath:@"enabled" options:nil];
     return self.touchBarProvider.touchBar;
 }
 
