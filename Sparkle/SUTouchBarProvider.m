@@ -1,46 +1,49 @@
 //
-//  SUTouchBar.m
+//  SUTouchBarProvider.m
 //  Sparkle
 //
 //  Created by Yuxin Wang on 05/01/2017.
 //  Copyright © 2017 Sparkle Project. All rights reserved.
 //
 
-#import "SUTouchBar.h"
+#import "SUTouchBarProvider.h"
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101202
 
-@interface SUTouchBar()
+@interface SUTouchBarProvider() <NSTouchBarDelegate>
 
 @property (copy) NSString* indentifier;
 @property NSMutableArray<NSTouchBarItem*> *touchBarItems;
 
 @end
 
-@implementation SUTouchBar
+@implementation SUTouchBarProvider
 
 @synthesize indentifier;
 @synthesize touchBarItems;
+@synthesize touchBar;
 
 -(instancetype)initWithIdentifier:(NSString *)anIdentifier
 {
     if (!(self = [super init]))
         return self;
     
-    self.indentifier = [NSString stringWithFormat:@"%@.%@", [NSBundle mainBundle].bundleIdentifier, anIdentifier];
-    self.touchBarItems = [NSMutableArray arrayWithCapacity:6];
+    indentifier = [NSString stringWithFormat:@"%@.%@", [NSBundle mainBundle].bundleIdentifier, anIdentifier];
+    touchBarItems = [NSMutableArray arrayWithCapacity:6];
     
-    self.defaultItemIdentifiers = @[self.indentifier,];
-    self.principalItemIdentifier = self.indentifier;
+    touchBar = [[NSTouchBar alloc] init];
+    touchBar.defaultItemIdentifiers = @[indentifier,];
+    touchBar.principalItemIdentifier = indentifier;
+    touchBar.delegate = self;
     
     return self;
 }
 
-- (NSTouchBarItem *)itemForIdentifier:(NSTouchBarItemIdentifier)identifier
+- (NSTouchBarItem *)touchBar:(NSTouchBar * __unused)touchBar makeItemForIdentifier:(NSTouchBarItemIdentifier)identifier
 {
     if ([identifier isEqualToString:self.indentifier])
         return [NSGroupTouchBarItem groupItemWithIdentifier:self.indentifier items:self.touchBarItems];
-    return [super itemForIdentifier:identifier];
+    return nil;
 }
 
 -(NSButton *)addButtonWithButton:(NSButton *)button
@@ -59,7 +62,7 @@
 
 -(void)addSpace
 {
-    NSTouchBarItem *item = [super itemForIdentifier:NSTouchBarItemIdentifierFixedSpaceLarge];
+    NSTouchBarItem *item = [[NSTouchBarItem alloc] initWithIdentifier:NSTouchBarItemIdentifierFixedSpaceLarge];
     [self.touchBarItems addObject:item];
 }
 
@@ -67,15 +70,9 @@
 
 #else
 
-@interface NSTouchBar : NSObject
+@implementation SUTouchBarProvider
 
-@end
-
-@implementation NSTouchBar
-
-@end
-
-@implementation SUTouchBar
+@synthesize touchBar;
 
 -(instancetype)initWithIdentifier:(NSString *)identifier {
     return nil;

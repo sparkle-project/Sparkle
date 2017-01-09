@@ -11,18 +11,20 @@
 #import "SUAppcastItem.h"
 #import "SUApplicationInfo.h"
 #import "SUHost.h"
-#import "SUTouchBar.h"
+#import "SUTouchBarProvider.h"
 
 @interface SUAutomaticUpdateAlert ()
 @property (strong) void(^completionBlock)(SUAutomaticInstallationChoice);
 @property (strong) SUAppcastItem *updateItem;
 @property (strong) SUHost *host;
+@property (strong) SUTouchBarProvider *touchBarProvider;
 @end
 
 @implementation SUAutomaticUpdateAlert
 @synthesize host;
 @synthesize updateItem;
 @synthesize completionBlock;
+@synthesize touchBarProvider;
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUAutomaticInstallationChoice))block
 {
@@ -105,14 +107,14 @@
         }
     }
     
-    SUTouchBar *touchBar =  [[SUTouchBar alloc] initWithIdentifier:self.className];
-    [touchBar addButtonWithButton:cancelButton];
-    [touchBar addSpace];
-    [touchBar addButtonWithButton:laterButton];
-    [touchBar addButtonWithButton:installButton];
-    [touchBar addSpace];
-    [touchBar addSpace];
-    return touchBar;
+    self.touchBarProvider = [[SUTouchBarProvider alloc] initWithIdentifier:self.className];
+    [self.touchBarProvider addButtonWithButton:cancelButton];
+    [self.touchBarProvider addSpace];
+    [self.touchBarProvider addButtonWithButton:laterButton];
+    [self.touchBarProvider addButtonWithButton:installButton];
+    [self.touchBarProvider addSpace];
+    [self.touchBarProvider addSpace];
+    return self.touchBarProvider.touchBar;
 }
 
 @end

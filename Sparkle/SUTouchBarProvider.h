@@ -1,5 +1,5 @@
 //
-//  SUTouchBar.h
+//  SUTouchBarProvider.h
 //  Sparkle
 //
 //  Created by Yuxin Wang on 05/01/2017.
@@ -10,7 +10,9 @@
 
 @class NSTouchBar;
 
-@interface SUTouchBar : NSTouchBar
+@interface SUTouchBarProvider : NSObject
+
+@property (strong, readonly) NSTouchBar *touchBar;
 
 -(instancetype)initWithIdentifier:(NSString *)identifier;
 -(NSButton *)addButtonWithButton:(NSButton *)button;

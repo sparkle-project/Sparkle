@@ -13,7 +13,7 @@
 #import "SUConstants.h"
 #import "SULocalizations.h"
 #import "SUApplicationInfo.h"
-#import "SUTouchBar.h"
+#import "SUTouchBarProvider.h"
 
 @interface SUUpdatePermissionPrompt ()
 
@@ -26,6 +26,7 @@
 @property (weak) IBOutlet NSView *moreInfoView;
 @property (weak) IBOutlet NSButton *moreInfoButton;
 @property (weak) IBOutlet NSTableView *profileTableView;
+@property (strong) SUTouchBarProvider *touchBarProvider;
 
 @property (nonatomic, readonly) void (^reply)(SUUpdatePermissionResponse *);
 
@@ -42,6 +43,7 @@
 @synthesize moreInfoView;
 @synthesize moreInfoButton;
 @synthesize profileTableView;
+@synthesize touchBarProvider;
 
 - (BOOL)shouldAskAboutProfile
 {
@@ -176,10 +178,10 @@
             }
         }
     }
-    SUTouchBar *touchBar =  [[SUTouchBar alloc] initWithIdentifier:self.className];
-    [touchBar addButtonWithButton:cancelButton];
-    [touchBar addButtonWithButton:checkButton];
-    return touchBar;
+    self.touchBarProvider = [[SUTouchBarProvider alloc] initWithIdentifier:self.className];
+    [self.touchBarProvider addButtonWithButton:cancelButton];
+    [self.touchBarProvider addButtonWithButton:checkButton];
+    return self.touchBarProvider.touchBar;
 }
 
 @end

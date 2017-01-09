@@ -21,7 +21,7 @@
 #import "SUAppcastItem.h"
 #import "SUApplicationInfo.h"
 #import "SUSystemUpdateInfo.h"
-#import "SUTouchBar.h"
+#import "SUTouchBarProvider.h"
 
 // WebKit protocols are not explicitly declared until 10.11 SDK, so
 // declare dummy protocols to keep the build working on earlier SDKs.
@@ -48,6 +48,7 @@
 @property (weak) IBOutlet NSButton *installButton;
 @property (weak) IBOutlet NSButton *skipButton;
 @property (weak) IBOutlet NSButton *laterButton;
+@property (strong) SUTouchBarProvider *touchBarProvider;
 
 @end
 
@@ -69,6 +70,8 @@
 @synthesize installButton;
 @synthesize skipButton;
 @synthesize laterButton;
+
+@synthesize touchBarProvider;
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUUpdateAlertChoice))block
 {
@@ -319,14 +322,14 @@
 
 - (NSTouchBar *)makeTouchBar
 {
-    SUTouchBar *touchBar =  [[SUTouchBar alloc] initWithIdentifier:self.className];
-    [touchBar addButtonWithButton:self.skipButton];
-    [touchBar addSpace];
-    [touchBar addButtonWithButton:self.laterButton];
-    [touchBar addButtonWithButton:self.installButton];
-    [touchBar addSpace];
-    [touchBar addSpace];
-    return touchBar;
+    self.touchBarProvider = [[SUTouchBarProvider alloc] initWithIdentifier:self.className];
+    [self.touchBarProvider addButtonWithButton:self.skipButton];
+    [self.touchBarProvider addSpace];
+    [self.touchBarProvider addButtonWithButton:self.laterButton];
+    [self.touchBarProvider addButtonWithButton:self.installButton];
+    [self.touchBarProvider addSpace];
+    [self.touchBarProvider addSpace];
+    return self.touchBarProvider.touchBar;
 }
 
 @end
