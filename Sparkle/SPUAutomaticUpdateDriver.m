@@ -73,7 +73,7 @@
     abort();
 }
 
-- (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)__unused downloadedUpdate completion:(SPUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
+- (void)resumeUpdate:(SPUResumableUpdate *)__unused resumableUpdate completion:(SPUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
 {
     // Nothing really to do here.. this shouldn't be called.
     SULog(SULogLevelError, @"Error: resumeDownloadedUpdate:completion: called on SPUAutomaticUpdateDriver");

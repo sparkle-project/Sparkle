@@ -14,7 +14,7 @@
 #import "SPUDownloadDriver.h"
 #import "SULog.h"
 #import "SUErrors.h"
-#import "SPUDownloadedUpdate.h"
+#import "SPUResumableUpdate.h"
 #import "SUAppcastItem.h"
 #import "SULocalizations.h"
 #import "SPUInstallationType.h"
@@ -30,7 +30,7 @@
 @property (nonatomic, readonly) SPUInstallerDriver *installerDriver;
 @property (nonatomic, weak, readonly) id<SPUCoreBasedUpdateDriverDelegate> delegate;
 @property (nonatomic) SUAppcastItem *updateItem;
-@property (nonatomic) SPUDownloadedUpdate *downloadedUpdate;
+@property (nonatomic) SPUResumableUpdate *resumableUpdate;
 
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic) BOOL resumingInstallingUpdate;
@@ -56,7 +56,7 @@
 @synthesize updater = _updater;
 @synthesize updaterDelegate = _updaterDelegate;
 @synthesize userAgent = _userAgent;
-@synthesize downloadedUpdate = _downloadedUpdate;
+@synthesize resumableUpdate = _resumableUpdate;
 
 - (instancetype)initWithHost:(SUHost *)host applicationBundle:(NSBundle *)applicationBundle sparkleBundle:(NSBundle *)sparkleBundle updater:(id)updater updaterDelegate:(nullable id <SPUUpdaterDelegate>)updaterDelegate delegate:(id<SPUCoreBasedUpdateDriverDelegate>)delegate
 {
@@ -122,15 +122,15 @@
     [self.basicDriver resumeInstallingUpdateWithCompletion:completionBlock];
 }
 
-- (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeUpdate:(SPUResumableUpdate *)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
-    self.downloadedUpdate = downloadedUpdate;
+    self.resumableUpdate = resumableUpdate;
     self.silentInstall = NO;
     
     // Note if installer interaction isn't allowed, we shouldn't have downloaded the update, and shouldn't be able to get here
     // So no need to do a test if we can perform an update without authorization
     
-    [self.basicDriver resumeDownloadedUpdate:downloadedUpdate completion:completionBlock];
+    [self.basicDriver resumeUpdate:resumableUpdate completion:completionBlock];
 }
 
 - (void)basicDriverDidFinishLoadingAppcast
@@ -197,29 +197,29 @@
     }
 }
 
-- (void)downloadDriverDidDownloadUpdate:(SPUDownloadedUpdate *)downloadedUpdate
+- (void)downloadDriverDidDownloadUpdate:(SPUResumableUpdate *)downloadedUpdate
 {
-    self.downloadedUpdate = downloadedUpdate;
+    self.resumableUpdate = downloadedUpdate;
     [self extractUpdate:downloadedUpdate];
 }
 
 - (void)deferInformationalUpdate:(SUAppcastItem *)updateItem
 {
-    self.downloadedUpdate = [[SPUDownloadedUpdate alloc] initWithAppcastItem:updateItem];
+    self.resumableUpdate = [[SPUResumableUpdate alloc] initWithAppcastItem:updateItem];
 }
 
 - (void)extractDownloadedUpdate
 {
-    assert(self.downloadedUpdate != nil);
-    [self extractUpdate:self.downloadedUpdate];
+    assert(self.resumableUpdate != nil);
+    [self extractUpdate:self.resumableUpdate];
 }
 
 - (void)clearDownloadedUpdate
 {
-    self.downloadedUpdate = nil;
+    self.resumableUpdate = nil;
 }
 
-- (void)extractUpdate:(SPUDownloadedUpdate *)downloadedUpdate
+- (void)extractUpdate:(SPUResumableUpdate *)downloadedUpdate
 {
     // Now we have to extract the downloaded archive.
     if ([self.delegate respondsToSelector:@selector(coreDriverDidStartExtractingUpdate)]) {
@@ -346,9 +346,9 @@
     [self.installerDriver abortInstall];
     [self.downloadDriver cleanup];
     
-    SPUDownloadedUpdate *downloadedUpdate = (error == nil || error.code == SUInstallationAuthorizeLaterError) ? self.downloadedUpdate : nil;
+    SPUResumableUpdate *resumableUpdate = (error == nil || error.code == SUInstallationAuthorizeLaterError) ? self.resumableUpdate : nil;
     
-    [self.basicDriver abortUpdateAndShowNextUpdateImmediately:shouldShowUpdateImmediately downloadedUpdate:downloadedUpdate error:error];
+    [self.basicDriver abortUpdateAndShowNextUpdateImmediately:shouldShowUpdateImmediately resumableUpdate:resumableUpdate error:error];
 }
 
 @end

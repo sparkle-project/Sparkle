@@ -59,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
 
-- (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
+- (void)resumeUpdate:(SPUResumableUpdate *)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
 
 - (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem;
 

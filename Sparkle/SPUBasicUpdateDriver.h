@@ -36,11 +36,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
 
-- (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
+- (void)resumeUpdate:(SPUResumableUpdate *)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
 
 @property (nullable, nonatomic, readonly) SUAppcastItem *nonDeltaUpdateItem;
 
-- (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldSignalShowingUpdate downloadedUpdate:(SPUDownloadedUpdate * _Nullable)downloadedUpdate error:(nullable NSError *)error;
+- (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldSignalShowingUpdate resumableUpdate:(SPUResumableUpdate * _Nullable)resumableUpdate error:(nullable NSError *)error;
 
 @end
 

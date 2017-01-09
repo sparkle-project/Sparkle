@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SUAppcastItem, SUHost, SPUDownloadedUpdate;
+@class SUAppcastItem, SUHost, SPUResumableUpdate;
 
 @protocol SPUDownloadDriverDelegate <NSObject>
 
@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)downloadDriverDidReceiveDataOfLength:(uint64_t)length;
 
-- (void)downloadDriverDidDownloadUpdate:(SPUDownloadedUpdate *)downloadedUpdate;
+- (void)downloadDriverDidDownloadUpdate:(SPUResumableUpdate *)downloadedUpdate;
 
 - (void)downloadDriverDidFailToDownloadUpdateWithError:(NSError *)error;
 

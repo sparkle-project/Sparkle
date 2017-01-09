@@ -1,5 +1,5 @@
 //
-//  SPUDownloadedUpdate.h
+//  SPUResumableUpdate.h
 //  Sparkle
 //
 //  Created by Mayur Pawashe on 7/18/16.
@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class SUAppcastItem;
 
-@interface SPUDownloadedUpdate : NSObject
+@interface SPUResumableUpdate : NSObject
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)updateItem downloadName:(NSString *)downloadName temporaryDirectory:(NSString *)temporaryDirectory;
 

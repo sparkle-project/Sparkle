@@ -76,9 +76,9 @@
     [self.uiDriver resumeInstallingUpdateWithCompletion:completionBlock];
 }
 
-- (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeUpdate:(SPUResumableUpdate *)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
-    [self.uiDriver resumeDownloadedUpdate:downloadedUpdate completion:completionBlock];
+    [self.uiDriver resumeUpdate:resumableUpdate completion:completionBlock];
 }
 
 - (void)basicDriverIsRequestingAbortUpdateWithError:(nullable NSError *)error

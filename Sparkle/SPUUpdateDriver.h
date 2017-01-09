@@ -8,9 +8,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SPUDownloadedUpdate;
+@class SPUResumableUpdate;
 
-typedef void (^SPUUpdateDriverCompletion)(BOOL shouldShowUpdateImmediately, SPUDownloadedUpdate * _Nullable resumableUpdate);
+typedef void (^SPUUpdateDriverCompletion)(BOOL shouldShowUpdateImmediately, SPUResumableUpdate * _Nullable resumableUpdate);
 
 @protocol SPUUpdateDriver <NSObject>
 
@@ -18,7 +18,7 @@ typedef void (^SPUUpdateDriverCompletion)(BOOL shouldShowUpdateImmediately, SPUD
 
 - (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
 
-- (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
+- (void)resumeUpdate:(SPUResumableUpdate *)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
 
 - (void)abortUpdate;
 - (void)abortUpdateWithError:(NSError * _Nullable)error;

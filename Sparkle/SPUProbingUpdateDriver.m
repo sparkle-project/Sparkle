@@ -16,14 +16,14 @@
 @interface SPUProbingUpdateDriver () <SPUBasicUpdateDriverDelegate>
 
 @property (nonatomic, readonly) SPUBasicUpdateDriver *basicDriver;
-@property (nonatomic) SPUDownloadedUpdate *downloadedUpdate;
+@property (nonatomic) SPUResumableUpdate *resumableUpdate;
 
 @end
 
 @implementation SPUProbingUpdateDriver
 
 @synthesize basicDriver = _basicDriver;
-@synthesize downloadedUpdate = _downloadedUpdate;
+@synthesize resumableUpdate = _resumableUpdate;
 
 - (instancetype)initWithHost:(SUHost *)host updater:(id)updater updaterDelegate:(id <SPUUpdaterDelegate>)updaterDelegate
 {
@@ -48,11 +48,11 @@
     [self.basicDriver resumeInstallingUpdateWithCompletion:completionBlock];
 }
 
-- (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeUpdate:(SPUResumableUpdate *)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
-    self.downloadedUpdate = downloadedUpdate;
+    self.resumableUpdate = resumableUpdate;
     
-    [self.basicDriver resumeDownloadedUpdate:downloadedUpdate completion:completionBlock];
+    [self.basicDriver resumeUpdate:resumableUpdate completion:completionBlock];
 }
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)__unused appcastItem
@@ -73,7 +73,7 @@
 
 - (void)abortUpdateWithError:(nullable NSError *)error
 {
-    [self.basicDriver abortUpdateAndShowNextUpdateImmediately:NO downloadedUpdate:self.downloadedUpdate error:error];
+    [self.basicDriver abortUpdateAndShowNextUpdateImmediately:NO resumableUpdate:self.resumableUpdate error:error];
 }
 
 @end

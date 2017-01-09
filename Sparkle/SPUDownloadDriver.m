@@ -17,7 +17,7 @@
 #import "SULog.h"
 #import "SUErrors.h"
 #import "SPUURLRequest.h"
-#import "SPUDownloadedUpdate.h"
+#import "SPUResumableUpdate.h"
 #import "SPUDownloadData.h"
 
 #ifdef _APPKITDEFINES_H
@@ -141,7 +141,7 @@
             SULog(SULogLevelError, @"Warning: Downloader's expected content length (%llu) != Appcast item's length (%llu)", self.expectedContentLength, self.updateItem.contentLength);
         }
         
-        SPUDownloadedUpdate *downloadedUpdate = [[SPUDownloadedUpdate alloc] initWithAppcastItem:self.updateItem downloadName:self.downloadName temporaryDirectory:self.temporaryDirectory];
+        SPUResumableUpdate *downloadedUpdate = [[SPUResumableUpdate alloc] initWithAppcastItem:self.updateItem downloadName:self.downloadName temporaryDirectory:self.temporaryDirectory];
         
         [self.delegate downloadDriverDidDownloadUpdate:downloadedUpdate];
         [self cleanup];

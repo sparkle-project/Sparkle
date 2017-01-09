@@ -16,7 +16,7 @@
 #import "SUAppcastItem.h"
 #import "SPUProbeInstallStatus.h"
 #import "SPUInstallationInfo.h"
-#import "SPUDownloadedUpdate.h"
+#import "SPUResumableUpdate.h"
 
 #ifdef _APPKITDEFINES_H
 #error This is a "core" class and should NOT import AppKit
@@ -101,11 +101,11 @@
     }];
 }
 
-- (void)resumeDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeUpdate:(SPUResumableUpdate *)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
     self.completionBlock = completionBlock;
     
-    [self notifyResumableUpdateItem:downloadedUpdate.updateItem];
+    [self notifyResumableUpdateItem:resumableUpdate.updateItem];
 }
 
 - (SUAppcastItem *)nonDeltaUpdateItem
@@ -173,7 +173,7 @@
     }
 }
 
-- (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately downloadedUpdate:(SPUDownloadedUpdate * _Nullable)downloadedUpdate error:(nullable NSError *)error
+- (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately resumableUpdate:(SPUResumableUpdate * _Nullable)resumableUpdate error:(nullable NSError *)error
 {
     self.aborted = YES;
     
@@ -194,7 +194,7 @@
     }
     
     if (self.completionBlock != nil) {
-        self.completionBlock(shouldShowUpdateImmediately, downloadedUpdate);
+        self.completionBlock(shouldShowUpdateImmediately, resumableUpdate);
         self.completionBlock = nil;
     }
 }
