@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@class SUHost, SPUResumableUpdate;
+@class SUHost;
 @protocol SPUUserDriver, SPUUpdaterDelegate;
 
 @interface SPUUIBasedUpdateDriver : NSObject
@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock;
 
-- (void)resumeUpdate:(SPUResumableUpdate *)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock;
 
 - (void)abortUpdateWithError:(nullable NSError *)error;
 

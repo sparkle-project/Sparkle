@@ -23,7 +23,7 @@
 #import "SUInstallerConnection.h"
 #import "SUInstallerConnectionProtocol.h"
 #import "SUXPCInstallerConnection.h"
-#import "SPUResumableUpdate.h"
+#import "SPUDownloadedUpdate.h"
 #import "SPUInstallationType.h"
 
 #ifdef _APPKITDEFINES_H
@@ -140,7 +140,7 @@
 }
 
 // This can be called multiple times (eg: if a delta update fails, this may be called again with a regular update item)
-- (void)extractDownloadedUpdate:(SPUResumableUpdate *)downloadedUpdate silently:(BOOL)silently preventsInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(void (^)(NSError * _Nullable))completionHandler
+- (void)extractDownloadedUpdate:(SPUDownloadedUpdate *)downloadedUpdate silently:(BOOL)silently preventsInstallerInteraction:(BOOL)preventsInstallerInteraction completion:(void (^)(NSError * _Nullable))completionHandler
 {
     self.updateItem = downloadedUpdate.updateItem;
     self.temporaryDirectory = downloadedUpdate.temporaryDirectory;

@@ -76,7 +76,7 @@
     [self.uiDriver resumeInstallingUpdateWithCompletion:completionBlock];
 }
 
-- (void)resumeUpdate:(SPUResumableUpdate *)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
     [self.uiDriver resumeUpdate:resumableUpdate completion:completionBlock];
 }

@@ -55,7 +55,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (nonatomic, readonly) SPUUpdaterTimer *updaterTimer;
 @property (nonatomic) BOOL startedUpdater;
 @property (nonatomic, copy) void (^preStartedScheduledUpdateBlock)(void);
-@property (nonatomic, nullable) SPUResumableUpdate *resumableUpdate;
+@property (nonatomic, nullable) id<SPUResumableUpdate> resumableUpdate;
 
 @property (nonatomic) BOOL loggedATSWarning;
 @property (nonatomic) BOOL loggedDSAWarning;
@@ -544,7 +544,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     NSURL *theFeedURL = [self parameterizedFeedURL];
     if (theFeedURL) {
         __weak SPUUpdater *weakSelf = self;
-        SPUUpdateDriverCompletion completionBlock = ^(BOOL shouldShowUpdateImmediately, SPUResumableUpdate * _Nullable resumableUpdate) {
+        SPUUpdateDriverCompletion completionBlock = ^(BOOL shouldShowUpdateImmediately, id<SPUResumableUpdate> _Nullable resumableUpdate) {
             SPUUpdater *strongSelf = weakSelf;
             if (strongSelf != nil) {
                 strongSelf.resumableUpdate = resumableUpdate;
@@ -559,7 +559,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         if (installerInProgress) {
             [self.driver resumeInstallingUpdateWithCompletion:completionBlock];
         } else if (self.resumableUpdate != nil) {
-            [self.driver resumeUpdate:(SPUResumableUpdate * _Nonnull)self.resumableUpdate completion:completionBlock];
+            [self.driver resumeUpdate:(id<SPUResumableUpdate> _Nonnull)self.resumableUpdate completion:completionBlock];
         } else {
             [self.driver checkForUpdatesAtAppcastURL:theFeedURL withUserAgent:[self userAgentString] httpHeaders:[self httpHeaders] preventingInstallerInteraction:preventsInstallerInteraction completion:completionBlock];
         }

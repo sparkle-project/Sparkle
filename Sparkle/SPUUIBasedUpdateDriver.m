@@ -89,7 +89,7 @@
     [self.coreDriver resumeInstallingUpdateWithCompletion:completionBlock];
 }
 
-- (void)resumeUpdate:(SPUResumableUpdate *)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
     // Informational downloads shouldn't be presented as updates to be downloaded
     if (!resumableUpdate.updateItem.isInformationOnlyUpdate) {

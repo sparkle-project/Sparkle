@@ -15,6 +15,8 @@
 #import "SULog.h"
 #import "SUErrors.h"
 #import "SPUResumableUpdate.h"
+#import "SPUDownloadedUpdate.h"
+#import "SPUInformationalUpdate.h"
 #import "SUAppcastItem.h"
 #import "SULocalizations.h"
 #import "SPUInstallationType.h"
@@ -30,7 +32,7 @@
 @property (nonatomic, readonly) SPUInstallerDriver *installerDriver;
 @property (nonatomic, weak, readonly) id<SPUCoreBasedUpdateDriverDelegate> delegate;
 @property (nonatomic) SUAppcastItem *updateItem;
-@property (nonatomic) SPUResumableUpdate *resumableUpdate;
+@property (nonatomic) id<SPUResumableUpdate> resumableUpdate;
 
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic) BOOL resumingInstallingUpdate;
@@ -122,7 +124,7 @@
     [self.basicDriver resumeInstallingUpdateWithCompletion:completionBlock];
 }
 
-- (void)resumeUpdate:(SPUResumableUpdate *)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
     self.resumableUpdate = resumableUpdate;
     self.silentInstall = NO;
@@ -197,7 +199,7 @@
     }
 }
 
-- (void)downloadDriverDidDownloadUpdate:(SPUResumableUpdate *)downloadedUpdate
+- (void)downloadDriverDidDownloadUpdate:(SPUDownloadedUpdate *)downloadedUpdate
 {
     self.resumableUpdate = downloadedUpdate;
     [self extractUpdate:downloadedUpdate];
@@ -205,7 +207,7 @@
 
 - (void)deferInformationalUpdate:(SUAppcastItem *)updateItem
 {
-    self.resumableUpdate = [[SPUResumableUpdate alloc] initWithAppcastItem:updateItem];
+    self.resumableUpdate = [[SPUInformationalUpdate alloc] initWithAppcastItem:updateItem];
 }
 
 - (void)extractDownloadedUpdate
@@ -219,7 +221,7 @@
     self.resumableUpdate = nil;
 }
 
-- (void)extractUpdate:(SPUResumableUpdate *)downloadedUpdate
+- (void)extractUpdate:(SPUDownloadedUpdate *)downloadedUpdate
 {
     // Now we have to extract the downloaded archive.
     if ([self.delegate respondsToSelector:@selector(coreDriverDidStartExtractingUpdate)]) {
@@ -346,7 +348,7 @@
     [self.installerDriver abortInstall];
     [self.downloadDriver cleanup];
     
-    SPUResumableUpdate *resumableUpdate = (error == nil || error.code == SUInstallationAuthorizeLaterError) ? self.resumableUpdate : nil;
+    id<SPUResumableUpdate> resumableUpdate = (error == nil || error.code == SUInstallationAuthorizeLaterError) ? self.resumableUpdate : nil;
     
     [self.basicDriver abortUpdateAndShowNextUpdateImmediately:shouldShowUpdateImmediately resumableUpdate:resumableUpdate error:error];
 }

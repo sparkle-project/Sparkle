@@ -16,7 +16,7 @@
 @interface SPUProbingUpdateDriver () <SPUBasicUpdateDriverDelegate>
 
 @property (nonatomic, readonly) SPUBasicUpdateDriver *basicDriver;
-@property (nonatomic) SPUResumableUpdate *resumableUpdate;
+@property (nonatomic) id<SPUResumableUpdate> resumableUpdate;
 
 @end
 
@@ -48,7 +48,7 @@
     [self.basicDriver resumeInstallingUpdateWithCompletion:completionBlock];
 }
 
-- (void)resumeUpdate:(SPUResumableUpdate *)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
+- (void)resumeUpdate:(id<SPUResumableUpdate>)resumableUpdate completion:(SPUUpdateDriverCompletion)completionBlock
 {
     self.resumableUpdate = resumableUpdate;
     
