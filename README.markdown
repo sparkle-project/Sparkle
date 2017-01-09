@@ -59,10 +59,7 @@ New Sparkle classes are now prefixed with `SPU` rather than `SU`. Older classes 
 * Authentication now occurs before launching the installer and before terminating the application, which can be canceled by the user cleanly.
 * Sudden termination for silent updates isn't disabled because Sparkle doesn't listen for AppKit events anymore such as termination or power off (note the installer running as a separate process listens for termination).
 * Distributing updates without DSA signing the archives is now deprecated.
-* The old app is now removed rather than attempted to be moved into the trash for a more seemless and efficient experience.
 * Sparkle's icon in the official branch is no longer used for installation. Instead, the icon of the bundle to update is used. A 32x32 image representation of the icon is needed for the authorization dialog.
-* Sparkle doesn't log to a special file in ~/Library/ anymore due to multiple processes. Just the standard ASL API is used now.
-* The `length` attribute in the appcast enclosure item for the update should now exist and be valid.
 * Delegation methods may have been removed or added to the newer updater API. Please review `SPUUpdaterDelegate` if using `SPUUpdater`.
 
 ## Requirements
