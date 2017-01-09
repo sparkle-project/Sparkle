@@ -214,6 +214,10 @@
         [self.automaticallyInstallUpdatesButton removeFromSuperview];
     }
 
+    if ([self.updateItem isCriticalUpdate]) {
+        self.skipButton.enabled = NO;
+    }
+
     [self.window center];
 }
 
@@ -225,7 +229,7 @@
 
 - (NSImage *)applicationIcon
 {
-    return [SUApplicationInfo bestIconForBundle:self.host.bundle];
+    return [SUApplicationInfo bestIconForHost:self.host];
 }
 
 - (NSString *)titleText
@@ -273,7 +277,7 @@
 
     // Do not allow redirects to dangerous protocols such as file://
     if (!whitelistedSafe) {
-        SULog(@"Blocked display of %@ URL which may be dangerous", scheme);
+        SULog(SULogLevelDefault, @"Blocked display of %@ URL which may be dangerous", scheme);
         [listener ignore];
         return;
     }

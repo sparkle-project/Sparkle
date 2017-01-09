@@ -17,6 +17,8 @@
 @property (strong) void(^completionBlock)(SUAutomaticInstallationChoice);
 @property (strong) SUAppcastItem *updateItem;
 @property (strong) SUHost *host;
+
+@property (weak) IBOutlet NSButton *skipButton;
 @property (strong) SUTouchBarProvider *touchBarProvider;
 @end
 
@@ -24,6 +26,7 @@
 @synthesize host;
 @synthesize updateItem;
 @synthesize completionBlock;
+@synthesize skipButton;
 @synthesize touchBarProvider;
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUAutomaticInstallationChoice))block
@@ -34,6 +37,7 @@
         self.completionBlock = block;
         self.host = aHost;
         [self setShouldCascadeWindows:NO];
+
         [[self window] center];
     }
     return self;
@@ -62,9 +66,17 @@
     self.completionBlock = nil;
 }
 
+- (void)windowDidLoad
+{
+    if ([self.updateItem isCriticalUpdate]) {
+        self.skipButton.enabled = NO;
+    }
+}
+
+
 - (NSImage *__nonnull)applicationIcon
 {
-    return [SUApplicationInfo bestIconForBundle:self.host.bundle];
+    return [SUApplicationInfo bestIconForHost:self.host];
 }
 
 - (NSString *__nonnull)titleText
