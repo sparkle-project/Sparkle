@@ -30,7 +30,7 @@
         return self;
     
     indentifier = [NSString stringWithFormat:@"%@.%@", SUBundleIdentifier, anIdentifier];
-    touchBarItems = [NSMutableArray arrayWithCapacity:6];
+    touchBarItems = [NSMutableArray array];
     
     touchBar = [[NSTouchBar alloc] init];
     touchBar.defaultItemIdentifiers = @[indentifier,];
