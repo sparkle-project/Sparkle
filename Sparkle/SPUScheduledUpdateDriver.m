@@ -44,7 +44,7 @@
             // Don't tell the user about the permission error for scheduled update checks
             [self abortUpdateWithError:nil];
         } else {
-            [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:YES];
+            [self.uiDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:YES includesSkippedUpdates:YES];
         }
     }];
 }

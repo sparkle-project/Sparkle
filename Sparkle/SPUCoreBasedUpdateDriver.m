@@ -108,12 +108,12 @@
     }
 }
 
-- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders includesSkippedUpdates:(BOOL)includesSkippedUpdates requiresSilentInstall:(BOOL)silentInstall
+- (void)checkForUpdatesAtAppcastURL:(NSURL *)appcastURL withUserAgent:(NSString *)userAgent httpHeaders:(NSDictionary * _Nullable)httpHeaders inBackground:(BOOL)background includesSkippedUpdates:(BOOL)includesSkippedUpdates requiresSilentInstall:(BOOL)silentInstall
 {
     self.userAgent = userAgent;
     self.silentInstall = silentInstall;
     
-    [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders includesSkippedUpdates:includesSkippedUpdates];
+    [self.basicDriver checkForUpdatesAtAppcastURL:appcastURL withUserAgent:userAgent httpHeaders:httpHeaders inBackground:background includesSkippedUpdates:includesSkippedUpdates];
 }
 
 - (void)resumeInstallingUpdateWithCompletion:(SPUUpdateDriverCompletion)completionBlock
@@ -165,9 +165,9 @@
     }
 }
 
-- (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem
+- (void)downloadUpdateFromAppcastItem:(SUAppcastItem *)updateItem inBackground:(BOOL)background
 {
-    self.downloadDriver = [[SPUDownloadDriver alloc] initWithUpdateItem:updateItem host:self.host userAgent:self.userAgent delegate:self];
+    self.downloadDriver = [[SPUDownloadDriver alloc] initWithUpdateItem:updateItem host:self.host userAgent:self.userAgent inBackground:background delegate:self];
     
     if ([self.updaterDelegate respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
         [self.updaterDelegate updater:self.updater
@@ -336,11 +336,13 @@
     SUAppcastItem *nonDeltaUpdateItem = self.basicDriver.nonDeltaUpdateItem;
     assert(nonDeltaUpdateItem != nil);
     
+    BOOL backgroundDownload = self.downloadDriver.inBackground;
+    
     [self clearDownloadedUpdate];
     
     // Fall back to the non-delta update. Note that we don't want to trigger another update was found event.
     self.updateItem = nonDeltaUpdateItem;
-    [self downloadUpdateFromAppcastItem:nonDeltaUpdateItem];
+    [self downloadUpdateFromAppcastItem:nonDeltaUpdateItem inBackground:backgroundDownload];
 }
 
 - (void)abortUpdateAndShowNextUpdateImmediately:(BOOL)shouldShowUpdateImmediately error:(nullable NSError *)error

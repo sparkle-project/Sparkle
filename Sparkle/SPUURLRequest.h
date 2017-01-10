@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 // * Cache policy
 // * Timeout interval
 // * HTTP header fields
+// * networkServiceType
 + (instancetype)URLRequestWithRequest:(NSURLRequest *)request;
 
 @property (nonatomic, readonly) NSURLRequest *request;

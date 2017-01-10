@@ -45,6 +45,7 @@
 @synthesize connection = _connection;
 @synthesize updateItem = _updateItem;
 @synthesize request = _request;
+@synthesize inBackground = _inBackground;
 @synthesize host = _host;
 @synthesize temporaryDirectory = _temporaryDirectory;
 @synthesize downloadName = _downloadName;
@@ -53,7 +54,7 @@
 @synthesize expectedContentLength = _expectedContentLength;
 @synthesize cleaningUp = _cleaningUp;
 
-- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host userAgent:(NSString *)userAgent delegate:(id<SPUDownloadDriverDelegate>)delegate
+- (instancetype)initWithUpdateItem:(SUAppcastItem *)updateItem host:(SUHost *)host userAgent:(NSString *)userAgent inBackground:(BOOL)background delegate:(id<SPUDownloadDriverDelegate>)delegate
 {
     self = [super init];
     if (self != nil) {
@@ -61,8 +62,10 @@
         _host = host;
         _delegate = delegate;
         
+        _inBackground = background;
         _request = [NSMutableURLRequest requestWithURL:updateItem.fileURL];
         [_request setValue:userAgent forHTTPHeaderField:@"User-Agent"];
+        _request.networkServiceType = background ? NSURLNetworkServiceTypeBackground : NSURLNetworkServiceTypeDefault;
         
         if (!SPUXPCServiceExists(@DOWNLOADER_BUNDLE_ID)) {
             _downloader = [[SPUDownloader alloc] initWithDelegate:self];
