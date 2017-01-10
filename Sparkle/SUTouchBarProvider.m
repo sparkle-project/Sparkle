@@ -86,7 +86,6 @@
 }
 
 -(void)addSpace {
-    return nil;
 }
 
 @end
