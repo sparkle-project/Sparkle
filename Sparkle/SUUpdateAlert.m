@@ -330,7 +330,7 @@
     [self.touchBarProvider addButtonWithButton:self.skipButton];
     [self.touchBarProvider addSpace];
     [self.touchBarProvider addButtonWithButton:self.laterButton];
-    [self.touchBarProvider addButtonWithButton:self.installButton];
+    [self.touchBarProvider addButtonWithButton:self.installButton].keyEquivalent = @"\r";
     [self.touchBarProvider addSpace];
     [self.touchBarProvider addSpace];
     return self.touchBarProvider.touchBar;

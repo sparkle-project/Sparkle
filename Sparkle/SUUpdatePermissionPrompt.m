@@ -171,7 +171,7 @@
 {
     self.touchBarProvider = [[SUTouchBarProvider alloc] initWithIdentifier:self.className];
     [self.touchBarProvider addButtonWithButton:self.cancelButton];
-    [self.touchBarProvider addButtonWithButton:self.checkButton];
+    [self.touchBarProvider addButtonWithButton:self.checkButton].keyEquivalent = @"\r";
     return self.touchBarProvider.touchBar;
 }
 
