@@ -26,6 +26,8 @@
 @property (weak) IBOutlet NSView *moreInfoView;
 @property (weak) IBOutlet NSButton *moreInfoButton;
 @property (weak) IBOutlet NSTableView *profileTableView;
+@property (weak) IBOutlet NSButton *cancelButton;
+@property (weak) IBOutlet NSButton *checkButton;
 @property (strong) SUTouchBarProvider *touchBarProvider;
 
 @property (nonatomic, readonly) void (^reply)(SUUpdatePermissionResponse *);
@@ -43,6 +45,8 @@
 @synthesize moreInfoView;
 @synthesize moreInfoButton;
 @synthesize profileTableView;
+@synthesize cancelButton;
+@synthesize checkButton;
 @synthesize touchBarProvider;
 
 - (BOOL)shouldAskAboutProfile
@@ -165,22 +169,9 @@
 
 - (NSTouchBar *)makeTouchBar
 {
-    NSButton *checkButton, *cancelButton;
-    for (NSView *control in self.window.contentView.subviews) {
-        if ([control isKindOfClass:[NSButton class]]) {
-            NSButton *button = (NSButton *)control;
-            if (button.action == @selector(finishPrompt:)) {
-                if (button.tag == 1) {
-                    checkButton = button;
-                } else if (button.tag == 0) {
-                    cancelButton = button;
-                }
-            }
-        }
-    }
     self.touchBarProvider = [[SUTouchBarProvider alloc] initWithIdentifier:self.className];
-    [self.touchBarProvider addButtonWithButton:cancelButton];
-    [self.touchBarProvider addButtonWithButton:checkButton];
+    [self.touchBarProvider addButtonWithButton:self.cancelButton];
+    [self.touchBarProvider addButtonWithButton:self.checkButton];
     return self.touchBarProvider.touchBar;
 }
 

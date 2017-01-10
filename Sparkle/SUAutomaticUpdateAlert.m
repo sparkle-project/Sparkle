@@ -19,6 +19,8 @@
 @property (strong) SUHost *host;
 
 @property (weak) IBOutlet NSButton *skipButton;
+@property (weak) IBOutlet NSButton *laterButton;
+@property (weak) IBOutlet NSButton *installButton;
 @property (strong) SUTouchBarProvider *touchBarProvider;
 @end
 
@@ -27,6 +29,8 @@
 @synthesize updateItem;
 @synthesize completionBlock;
 @synthesize skipButton;
+@synthesize laterButton;
+@synthesize installButton;
 @synthesize touchBarProvider;
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUAutomaticInstallationChoice))block
@@ -105,25 +109,11 @@
 
 - (NSTouchBar *)makeTouchBar
 {
-    NSButton *installButton, *laterButton, *cancelButton;
-    for (NSView *control in self.window.contentView.subviews) {
-        if ([control isKindOfClass:[NSButton class]]) {
-            NSButton *button = (NSButton *)control;
-            if (button.action == @selector(installNow:)) {
-                installButton = button;
-            } else if (button.action == @selector(installLater:)) {
-                laterButton = button;
-            } else if (button.action == @selector(doNotInstall:)) {
-                cancelButton = button;
-            }
-        }
-    }
-    
     self.touchBarProvider = [[SUTouchBarProvider alloc] initWithIdentifier:self.className];
-    [self.touchBarProvider addButtonWithButton:cancelButton];
+    [self.touchBarProvider addButtonWithButton:self.skipButton];
     [self.touchBarProvider addSpace];
-    [self.touchBarProvider addButtonWithButton:laterButton];
-    [self.touchBarProvider addButtonWithButton:installButton];
+    [self.touchBarProvider addButtonWithButton:self.laterButton];
+    [self.touchBarProvider addButtonWithButton:self.installButton];
     [self.touchBarProvider addSpace];
     [self.touchBarProvider addSpace];
     return self.touchBarProvider.touchBar;
