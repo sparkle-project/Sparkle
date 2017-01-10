@@ -110,10 +110,10 @@
 - (NSTouchBar *)makeTouchBar
 {
     self.touchBarProvider = [[SUTouchBarProvider alloc] initWithIdentifier:self.className];
-    [self.touchBarProvider addButtonWithButton:self.skipButton];
+    [self.touchBarProvider addButtonWithButton:self.skipButton isDefault:NO];
     [self.touchBarProvider addSpace];
-    [self.touchBarProvider addButtonWithButton:self.laterButton];
-    [self.touchBarProvider addButtonWithButton:self.installButton].keyEquivalent = @"\r";
+    [self.touchBarProvider addButtonWithButton:self.laterButton isDefault:NO];
+    [self.touchBarProvider addButtonWithButton:self.installButton isDefault:YES];
     [self.touchBarProvider addSpace];
     [self.touchBarProvider addSpace];
     return self.touchBarProvider.touchBar;

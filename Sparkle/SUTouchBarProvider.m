@@ -46,14 +46,16 @@
     return nil;
 }
 
--(NSButton *)addButtonWithButton:(NSButton *)button
+-(NSButton *)addButtonWithButton:(NSButton *)button isDefault:(BOOL)isDefault
 {
     NSString *itemId = [self.indentifier stringByAppendingFormat:@".button-%lu", self.touchBarItems.count];
     NSCustomTouchBarItem *item = [[NSCustomTouchBarItem alloc] initWithIdentifier:itemId];
 
     NSButton *buttonCopy = [NSButton buttonWithTitle:button.title target:button.target action:button.action];
-    buttonCopy.keyEquivalent = button.keyEquivalent;
     buttonCopy.tag = button.tag;
+    if (isDefault) {
+        buttonCopy.keyEquivalent = @"\r";
+    }
     
     [buttonCopy bind:@"title" toObject:button withKeyPath:@"title" options:nil];
     [buttonCopy bind:@"enabled" toObject:button withKeyPath:@"enabled" options:nil];

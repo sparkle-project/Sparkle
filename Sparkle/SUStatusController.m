@@ -135,7 +135,7 @@
 - (NSTouchBar *)makeTouchBar
 {
     self.touchBarProvider = [[SUTouchBarProvider alloc] initWithIdentifier:self.className];
-    self.touchBarButton = [self.touchBarProvider addButtonWithButton:self.actionButton];
+    self.touchBarButton = [self.touchBarProvider addButtonWithButton:self.actionButton isDefault:[self.actionButton.keyEquivalent isEqualToString:@"\r"]];
     return self.touchBarProvider.touchBar;
 }
 

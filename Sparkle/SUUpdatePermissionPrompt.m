@@ -170,8 +170,8 @@
 - (NSTouchBar *)makeTouchBar
 {
     self.touchBarProvider = [[SUTouchBarProvider alloc] initWithIdentifier:self.className];
-    [self.touchBarProvider addButtonWithButton:self.cancelButton];
-    [self.touchBarProvider addButtonWithButton:self.checkButton].keyEquivalent = @"\r";
+    [self.touchBarProvider addButtonWithButton:self.cancelButton isDefault:NO];
+    [self.touchBarProvider addButtonWithButton:self.checkButton isDefault:YES];
     return self.touchBarProvider.touchBar;
 }
 

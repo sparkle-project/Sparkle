@@ -15,7 +15,7 @@
 @property (strong, readonly) NSTouchBar *touchBar;
 
 -(instancetype)initWithIdentifier:(NSString *)identifier;
--(NSButton *)addButtonWithButton:(NSButton *)button;
+-(NSButton *)addButtonWithButton:(NSButton *)button isDefault:(BOOL)isDefault;
 -(void)addSpace;
 
 @end
