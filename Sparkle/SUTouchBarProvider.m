@@ -7,6 +7,7 @@
 //
 
 #import "SUTouchBarProvider.h"
+#import "SUConstants.h"
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101202
 
@@ -28,7 +29,7 @@
     if (!(self = [super init]))
         return self;
     
-    indentifier = [NSString stringWithFormat:@"%@.%@", [NSBundle mainBundle].bundleIdentifier, anIdentifier];
+    indentifier = [NSString stringWithFormat:@"%@.%@", SUBundleIdentifier, anIdentifier];
     touchBarItems = [NSMutableArray arrayWithCapacity:6];
     
     touchBar = [[NSTouchBar alloc] init];
