@@ -21,7 +21,9 @@
 #import "SUAppcastItem.h"
 #import "SUApplicationInfo.h"
 #import "SUSystemUpdateInfo.h"
-#import "SUTouchBarBuilder.h"
+#import "SUButtonGroupTouchBarItem.h"
+
+static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUUpdateAlert";
 
 // WebKit protocols are not explicitly declared until 10.11 SDK, so
 // declare dummy protocols to keep the build working on earlier SDKs.
@@ -32,7 +34,7 @@
 @end
 #endif
 
-@interface SUUpdateAlert () <WebFrameLoadDelegate, WebPolicyDelegate>
+@interface SUUpdateAlert () <WebFrameLoadDelegate, WebPolicyDelegate, NSTouchBarDelegate>
 
 @property (strong) SUAppcastItem *updateItem;
 @property (strong) SUHost *host;
@@ -48,7 +50,6 @@
 @property (weak) IBOutlet NSButton *installButton;
 @property (weak) IBOutlet NSButton *skipButton;
 @property (weak) IBOutlet NSButton *laterButton;
-@property (strong) SUTouchBarBuilder *touchBarBuilder;
 
 @end
 
@@ -70,8 +71,6 @@
 @synthesize installButton;
 @synthesize skipButton;
 @synthesize laterButton;
-
-@synthesize touchBarBuilder;
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUUpdateAlertChoice))block
 {
@@ -326,12 +325,18 @@
 
 - (NSTouchBar *)makeTouchBar
 {
-    self.touchBarBuilder = [[SUTouchBarBuilder alloc] initWithIdentifier:self.className];
-    [self.touchBarBuilder addButtonUsingButton:self.skipButton isDefault:NO];
-    [self.touchBarBuilder addSpace];
-    [self.touchBarBuilder addButtonUsingButton:self.laterButton isDefault:NO];
-    [self.touchBarBuilder addButtonUsingButton:self.installButton isDefault:YES];
-    return self.touchBarBuilder.touchBar;
+    NSTouchBar *touchBar = [[NSTouchBar alloc] init];
+    touchBar.defaultItemIdentifiers = @[SUUpdateAlertTouchBarIndentifier,];
+    touchBar.principalItemIdentifier = SUUpdateAlertTouchBarIndentifier;
+    touchBar.delegate = self;
+    return touchBar;
+}
+
+- (NSTouchBarItem *)touchBar:(NSTouchBar * __unused)touchBar makeItemForIdentifier:(NSTouchBarItemIdentifier)identifier
+{
+    if ([identifier isEqualToString:SUUpdateAlertTouchBarIndentifier])
+        return [SUButtonGroupTouchBarItem itemWithIndentifier:SUUpdateAlertTouchBarIndentifier usingButtons:@[self.installButton, self.laterButton, self.skipButton]];
+    return nil;
 }
 
 @end

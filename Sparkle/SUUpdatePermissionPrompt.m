@@ -13,9 +13,11 @@
 #import "SUConstants.h"
 #import "SULocalizations.h"
 #import "SUApplicationInfo.h"
-#import "SUTouchBarBuilder.h"
+#import "SUButtonGroupTouchBarItem.h"
 
-@interface SUUpdatePermissionPrompt ()
+static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUUpdatePermissionPrompt";
+
+@interface SUUpdatePermissionPrompt () <NSTouchBarDelegate>
 
 @property (assign) BOOL isShowingMoreInfo;
 @property (assign) BOOL shouldSendProfile;
@@ -28,7 +30,6 @@
 @property (weak) IBOutlet NSTableView *profileTableView;
 @property (weak) IBOutlet NSButton *cancelButton;
 @property (weak) IBOutlet NSButton *checkButton;
-@property (strong) SUTouchBarBuilder *touchBarBuilder;
 
 @property (nonatomic, readonly) void (^reply)(SUUpdatePermissionResponse *);
 
@@ -47,7 +48,6 @@
 @synthesize profileTableView;
 @synthesize cancelButton;
 @synthesize checkButton;
-@synthesize touchBarBuilder;
 
 - (BOOL)shouldAskAboutProfile
 {
@@ -169,10 +169,18 @@
 
 - (NSTouchBar *)makeTouchBar
 {
-    self.touchBarBuilder = [[SUTouchBarBuilder alloc] initWithIdentifier:self.className];
-    [self.touchBarBuilder addButtonUsingButton:self.cancelButton isDefault:NO];
-    [self.touchBarBuilder addButtonUsingButton:self.checkButton isDefault:YES];
-    return self.touchBarBuilder.touchBar;
+    NSTouchBar *touchBar = [[NSTouchBar alloc] init];
+    touchBar.defaultItemIdentifiers = @[SUUpdatePermissionPromptTouchBarIndentifier,];
+    touchBar.principalItemIdentifier = SUUpdatePermissionPromptTouchBarIndentifier;
+    touchBar.delegate = self;
+    return touchBar;
+}
+
+- (NSTouchBarItem *)touchBar:(NSTouchBar * __unused)touchBar makeItemForIdentifier:(NSTouchBarItemIdentifier)identifier
+{
+    if ([identifier isEqualToString:SUUpdatePermissionPromptTouchBarIndentifier])
+        return [SUButtonGroupTouchBarItem itemWithIndentifier:SUUpdatePermissionPromptTouchBarIndentifier usingButtons:@[self.checkButton, self.cancelButton]];
+    return nil;
 }
 
 @end

@@ -11,9 +11,11 @@
 #import "SUAppcastItem.h"
 #import "SUApplicationInfo.h"
 #import "SUHost.h"
-#import "SUTouchBarBuilder.h"
+#import "SUButtonGroupTouchBarItem.h"
 
-@interface SUAutomaticUpdateAlert ()
+static NSString *const SUAutomaticUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUAutomaticUpdateAlert";
+
+@interface SUAutomaticUpdateAlert () <NSTouchBarDelegate>
 @property (strong) void(^completionBlock)(SUAutomaticInstallationChoice);
 @property (strong) SUAppcastItem *updateItem;
 @property (strong) SUHost *host;
@@ -21,7 +23,6 @@
 @property (weak) IBOutlet NSButton *skipButton;
 @property (weak) IBOutlet NSButton *laterButton;
 @property (weak) IBOutlet NSButton *installButton;
-@property (strong) SUTouchBarBuilder *touchBarBuilder;
 @end
 
 @implementation SUAutomaticUpdateAlert
@@ -31,7 +32,6 @@
 @synthesize skipButton;
 @synthesize laterButton;
 @synthesize installButton;
-@synthesize touchBarBuilder;
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUAutomaticInstallationChoice))block
 {
@@ -109,12 +109,18 @@
 
 - (NSTouchBar *)makeTouchBar
 {
-    self.touchBarBuilder = [[SUTouchBarBuilder alloc] initWithIdentifier:self.className];
-    [self.touchBarBuilder addButtonUsingButton:self.skipButton isDefault:NO];
-    [self.touchBarBuilder addSpace];
-    [self.touchBarBuilder addButtonUsingButton:self.laterButton isDefault:NO];
-    [self.touchBarBuilder addButtonUsingButton:self.installButton isDefault:YES];
-    return self.touchBarBuilder.touchBar;
+    NSTouchBar *touchBar = [[NSTouchBar alloc] init];
+    touchBar.defaultItemIdentifiers = @[SUAutomaticUpdateAlertTouchBarIndentifier,];
+    touchBar.principalItemIdentifier = SUAutomaticUpdateAlertTouchBarIndentifier;
+    touchBar.delegate = self;
+    return touchBar;
+}
+
+- (NSTouchBarItem *)touchBar:(NSTouchBar * __unused)touchBar makeItemForIdentifier:(NSTouchBarItemIdentifier)identifier
+{
+    if ([identifier isEqualToString:SUAutomaticUpdateAlertTouchBarIndentifier])
+        return [SUButtonGroupTouchBarItem itemWithIndentifier:SUAutomaticUpdateAlertTouchBarIndentifier usingButtons:@[self.installButton, self.laterButton, self.skipButton]];
+    return nil;
 }
 
 @end

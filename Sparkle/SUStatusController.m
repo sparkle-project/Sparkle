@@ -11,13 +11,14 @@
 #import "SUHost.h"
 #import "SULocalizations.h"
 #import "SUApplicationInfo.h"
-#import "SUTouchBarBuilder.h"
+#import "SUButtonGroupTouchBarItem.h"
 
-@interface SUStatusController ()
+static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUStatusController";
+
+@interface SUStatusController () <NSTouchBarDelegate>
 @property (copy) NSString *title, *buttonTitle;
 @property (strong) SUHost *host;
 @property NSButton *touchBarButton;
-@property (strong) SUTouchBarBuilder *touchBarBuilder;
 @end
 
 @implementation SUStatusController
@@ -31,7 +32,6 @@
 @synthesize progressBar;
 @synthesize statusTextField;
 @synthesize touchBarButton;
-@synthesize touchBarBuilder;
 
 - (instancetype)initWithHost:(SUHost *)aHost
 {
@@ -132,11 +132,21 @@
     [self.progressBar setUsesThreadedAnimation:YES];
 }
 
+
 - (NSTouchBar *)makeTouchBar
 {
-    self.touchBarBuilder = [[SUTouchBarBuilder alloc] initWithIdentifier:self.className];
-    self.touchBarButton = [self.touchBarBuilder addButtonUsingButton:self.actionButton isDefault:[self.actionButton.keyEquivalent isEqualToString:@"\r"]];
-    return self.touchBarBuilder.touchBar;
+    NSTouchBar *touchBar = [[NSTouchBar alloc] init];
+    touchBar.defaultItemIdentifiers = @[ SUStatusControllerTouchBarIndentifier,];
+    touchBar.principalItemIdentifier = SUStatusControllerTouchBarIndentifier;
+    touchBar.delegate = self;
+    return touchBar;
+}
+
+- (NSTouchBarItem *)touchBar:(NSTouchBar * __unused)touchBar makeItemForIdentifier:(NSTouchBarItemIdentifier)identifier
+{
+    if ([identifier isEqualToString:SUStatusControllerTouchBarIndentifier])
+        return [SUButtonGroupTouchBarItem itemWithIndentifier:SUStatusControllerTouchBarIndentifier usingButtons:@[self.actionButton,]];
+    return nil;
 }
 
 @end
