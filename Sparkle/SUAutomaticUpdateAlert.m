@@ -11,7 +11,7 @@
 #import "SUAppcastItem.h"
 #import "SUApplicationInfo.h"
 #import "SUHost.h"
-#import "SUTouchBarProvider.h"
+#import "SUTouchBarBuilder.h"
 
 @interface SUAutomaticUpdateAlert ()
 @property (strong) void(^completionBlock)(SUAutomaticInstallationChoice);
@@ -21,7 +21,7 @@
 @property (weak) IBOutlet NSButton *skipButton;
 @property (weak) IBOutlet NSButton *laterButton;
 @property (weak) IBOutlet NSButton *installButton;
-@property (strong) SUTouchBarProvider *touchBarProvider;
+@property (strong) SUTouchBarBuilder *touchBarBuilder;
 @end
 
 @implementation SUAutomaticUpdateAlert
@@ -31,7 +31,7 @@
 @synthesize skipButton;
 @synthesize laterButton;
 @synthesize installButton;
-@synthesize touchBarProvider;
+@synthesize touchBarBuilder;
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUAutomaticInstallationChoice))block
 {
@@ -109,14 +109,12 @@
 
 - (NSTouchBar *)makeTouchBar
 {
-    self.touchBarProvider = [[SUTouchBarProvider alloc] initWithIdentifier:self.className];
-    [self.touchBarProvider addButtonWithButton:self.skipButton isDefault:NO];
-    [self.touchBarProvider addSpace];
-    [self.touchBarProvider addButtonWithButton:self.laterButton isDefault:NO];
-    [self.touchBarProvider addButtonWithButton:self.installButton isDefault:YES];
-    [self.touchBarProvider addSpace];
-    [self.touchBarProvider addSpace];
-    return self.touchBarProvider.touchBar;
+    self.touchBarBuilder = [[SUTouchBarBuilder alloc] initWithIdentifier:self.className];
+    [self.touchBarBuilder addButtonUsingButton:self.skipButton isDefault:NO];
+    [self.touchBarBuilder addSpace];
+    [self.touchBarBuilder addButtonUsingButton:self.laterButton isDefault:NO];
+    [self.touchBarBuilder addButtonUsingButton:self.installButton isDefault:YES];
+    return self.touchBarBuilder.touchBar;
 }
 
 @end

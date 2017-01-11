@@ -11,13 +11,13 @@
 #import "SUHost.h"
 #import "SULocalizations.h"
 #import "SUApplicationInfo.h"
-#import "SUTouchBarProvider.h"
+#import "SUTouchBarBuilder.h"
 
 @interface SUStatusController ()
 @property (copy) NSString *title, *buttonTitle;
 @property (strong) SUHost *host;
 @property NSButton *touchBarButton;
-@property (strong) SUTouchBarProvider *touchBarProvider;
+@property (strong) SUTouchBarBuilder *touchBarBuilder;
 @end
 
 @implementation SUStatusController
@@ -31,7 +31,7 @@
 @synthesize progressBar;
 @synthesize statusTextField;
 @synthesize touchBarButton;
-@synthesize touchBarProvider;
+@synthesize touchBarBuilder;
 
 - (instancetype)initWithHost:(SUHost *)aHost
 {
@@ -134,9 +134,9 @@
 
 - (NSTouchBar *)makeTouchBar
 {
-    self.touchBarProvider = [[SUTouchBarProvider alloc] initWithIdentifier:self.className];
-    self.touchBarButton = [self.touchBarProvider addButtonWithButton:self.actionButton isDefault:[self.actionButton.keyEquivalent isEqualToString:@"\r"]];
-    return self.touchBarProvider.touchBar;
+    self.touchBarBuilder = [[SUTouchBarBuilder alloc] initWithIdentifier:self.className];
+    self.touchBarButton = [self.touchBarBuilder addButtonUsingButton:self.actionButton isDefault:[self.actionButton.keyEquivalent isEqualToString:@"\r"]];
+    return self.touchBarBuilder.touchBar;
 }
 
 @end

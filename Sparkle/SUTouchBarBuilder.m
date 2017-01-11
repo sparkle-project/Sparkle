@@ -1,41 +1,41 @@
 //
-//  SUTouchBarProvider.m
+//  SUTouchBarBuilder.m
 //  Sparkle
 //
 //  Created by Yuxin Wang on 05/01/2017.
 //  Copyright © 2017 Sparkle Project. All rights reserved.
 //
 
-#import "SUTouchBarProvider.h"
+#import "SUTouchBarBuilder.h"
 #import "SUConstants.h"
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101202
 
-@interface SUTouchBarProvider() <NSTouchBarDelegate>
+@interface SUTouchBarBuilder() <NSTouchBarDelegate>
 
-@property (copy) NSString* indentifier;
-@property NSMutableArray<NSTouchBarItem*> *touchBarItems;
+@property (nonatomic, copy) NSString* indentifier;
+@property (nonatomic) NSMutableArray<NSTouchBarItem*> *touchBarItems;
 
 @end
 
-@implementation SUTouchBarProvider
+@implementation SUTouchBarBuilder
 
-@synthesize indentifier;
-@synthesize touchBarItems;
-@synthesize touchBar;
+@synthesize indentifier = _indentifier;
+@synthesize touchBarItems = _touchBarItems;
+@synthesize touchBar = _touchBar;
 
--(instancetype)initWithIdentifier:(NSString *)anIdentifier
+- (instancetype)initWithIdentifier:(NSString *)anIdentifier
 {
     if (!(self = [super init]))
         return self;
     
-    indentifier = [NSString stringWithFormat:@"%@.%@", SUBundleIdentifier, anIdentifier];
-    touchBarItems = [NSMutableArray array];
+    _indentifier = [NSString stringWithFormat:@"%@.%@", SUBundleIdentifier, anIdentifier];
+    _touchBarItems = [NSMutableArray array];
     
-    touchBar = [[NSTouchBar alloc] init];
-    touchBar.defaultItemIdentifiers = @[indentifier,];
-    touchBar.principalItemIdentifier = indentifier;
-    touchBar.delegate = self;
+    _touchBar = [[NSTouchBar alloc] init];
+    _touchBar.defaultItemIdentifiers = @[_indentifier,];
+    _touchBar.principalItemIdentifier = _indentifier;
+    _touchBar.delegate = self;
     
     return self;
 }
@@ -47,13 +47,16 @@
     return nil;
 }
 
--(NSButton *)addButtonWithButton:(NSButton *)button isDefault:(BOOL)isDefault
+- (NSButton *)addButtonUsingButton:(NSButton *)button isDefault:(BOOL)isDefault
 {
     NSString *itemId = [self.indentifier stringByAppendingFormat:@".button-%lu", self.touchBarItems.count];
     NSCustomTouchBarItem *item = [[NSCustomTouchBarItem alloc] initWithIdentifier:itemId];
 
     NSButton *buttonCopy = [NSButton buttonWithTitle:button.title target:button.target action:button.action];
     buttonCopy.tag = button.tag;
+    
+    // A modal NSWindow may empty its default button's keyEquivalent when it shows.
+    // We have to set the default button explicitly.
     if (isDefault) {
         buttonCopy.keyEquivalent = @"\r";
     }
@@ -66,7 +69,7 @@
     return buttonCopy;
 }
 
--(void)addSpace
+- (void)addSpace
 {
     NSTouchBarItem *item = [[NSTouchBarItem alloc] initWithIdentifier:NSTouchBarItemIdentifierFixedSpaceLarge];
     [self.touchBarItems addObject:item];
@@ -76,7 +79,7 @@
 
 #else
 
-@implementation SUTouchBarProvider
+@implementation SUTouchBarBuilder
 
 @synthesize touchBar;
 
@@ -84,7 +87,7 @@
     return nil;
 }
 
--(NSButton *)addButtonWithButton:(NSButton *)button {
+-(NSButton *)addButtonUsingButton:(NSButton *)button isDefault:(BOOL)isDefault{
     return nil;
 }
 
