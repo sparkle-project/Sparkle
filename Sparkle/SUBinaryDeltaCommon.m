@@ -73,14 +73,14 @@ NSString *temporaryDirectory(NSString *base)
     NSString *template = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.XXXXXXXXXX", base]];
     NSMutableData *data = [NSMutableData data];
     [data appendBytes:template.fileSystemRepresentation length:strlen(template.fileSystemRepresentation) + 1];
-    
+
     char *buffer = data.mutableBytes;
     char *templateResult = mkdtemp(buffer);
     if (templateResult == NULL) {
         perror("mkdtemp");
         return nil;
     }
-    
+
     return stringWithFileSystemRepresentation(templateResult);
 }
 
@@ -121,7 +121,7 @@ static BOOL _hashOfFileContents(unsigned char* hash, FTSENT *ent)
                 perror("mmap");
                 return NO;
             }
-            
+
             _hashOfBuffer(hash, buffer, fileSize);
             munmap(buffer, (size_t)fileSize);
         }
@@ -164,11 +164,11 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
     while ((ent = fts_read(fts))) {
         if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D)
             continue;
-        
+
         if (ent->fts_info == FTS_D && !MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion)) {
             continue;
         }
-        
+
         NSString *relativePath = pathRelativeToDirectory(path, stringWithFileSystemRepresentation(ent->fts_path));
         if (relativePath.length == 0)
             continue;
@@ -181,12 +181,12 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
 
         const char *relativePathBytes = [relativePath fileSystemRepresentation];
         CC_SHA1_Update(&hashContext, relativePathBytes, (CC_LONG)strlen(relativePathBytes));
-        
+
         if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion)) {
             uint16_t mode = ent->fts_statp->st_mode;
             uint16_t type = ent->fts_info;
             uint16_t permissions = mode & PERMISSION_FLAGS;
-            
+
             CC_SHA1_Update(&hashContext, &type, sizeof(type));
             CC_SHA1_Update(&hashContext, &permissions, sizeof(permissions));
         }

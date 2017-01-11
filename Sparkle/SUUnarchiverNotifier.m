@@ -45,9 +45,9 @@
     if (reason) {
         [userInfo setObject:(NSError * _Nonnull)reason forKey:NSUnderlyingErrorKey];
     }
-    
+
     NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:userInfo];
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
         self.completionBlock(error);
     });

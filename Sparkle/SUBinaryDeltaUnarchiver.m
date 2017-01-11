@@ -47,19 +47,19 @@
     // root-level symbolic link.
     NSDictionary *rootAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:targetPath error:nil];
     NSString *rootType = [rootAttributes objectForKey:NSFileType];
-    
+
     if ([rootType isEqualToString:NSFileTypeDirectory]) {
         // The NSDirectoryEnumerator will avoid recursing into any contained
         // symbolic links, so no further type checks are needed.
         NSDirectoryEnumerator *directoryEnumerator = [[NSFileManager defaultManager] enumeratorAtURL:targetURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
-        
+
         NSMutableArray *filesToUpdate = [[NSMutableArray alloc] init];
         for (NSURL *file in directoryEnumerator) {
             if ([file.pathExtension isEqualToString:@"mdimporter"]) {
                 [filesToUpdate addObject:file];
             }
         }
-        
+
         SUFileManager *fileManager = [SUFileManager defaultManager];
         for (NSURL *file in filesToUpdate) {
             NSError *error = nil;
@@ -94,13 +94,13 @@
 {
     NSString *sourcePath = self.updateHostBundlePath;
     NSString *targetPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:[sourcePath lastPathComponent]];
-    
+
     NSError *applyDiffError = nil;
     BOOL success = applyBinaryDelta(sourcePath, targetPath, self.archivePath, NO, ^(double progress){
         [notifier notifyProgress:progress];
 
     }, &applyDiffError);
-    
+
     if (success) {
         [[self class] updateSpotlightImportersAtBundlePath:targetPath];
         [notifier notifySuccess];

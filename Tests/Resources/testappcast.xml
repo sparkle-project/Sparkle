@@ -19,7 +19,7 @@
             length="1235"
             type="application/octet-stream"
             sparkle:dsaSignature="..." />
-            
+
             <enclosure url="http://localhost:1337/3.0_from_1.0.patch"
             sparkle:version="3.0"
             sparkle:deltaFrom="1.0"

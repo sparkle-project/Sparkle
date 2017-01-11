@@ -125,14 +125,14 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     if (!(self = [super init])) {
         return nil;
     }
-    
+
     self.hostPath = hostPath;
     self.relaunchPath = relaunchPath;
     self.terminationListener = [[TerminationListener alloc] initWithProcessId:parentProcessId];
     self.updateFolderPath = updateFolderPath;
     self.shouldRelaunch = shouldRelaunch;
     self.shouldShowUI = shouldShowUI;
-    
+
     return self;
 }
 
@@ -140,7 +140,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 {
     [self.terminationListener startListeningWithCompletion:^{
         self.terminationListener = nil;
-		
+
         if (self.shouldShowUI) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUInstallationTimeLimit * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
 				if (!self.isTerminating) {
@@ -150,7 +150,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 				}
             });
         }
-        
+
         [self install];
     }];
 }
@@ -169,20 +169,20 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 {
     NSBundle *theBundle = [NSBundle bundleWithPath:self.hostPath];
     SUHost *host = [[SUHost alloc] initWithBundle:theBundle];
-    
+
     NSString *fileOperationToolPath = [[[[NSBundle mainBundle] executablePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:@""SPARKLE_FILEOP_TOOL_NAME];
-    
+
     if (![[NSFileManager defaultManager] fileExistsAtPath:fileOperationToolPath]) {
         SULog(@"Potential Installation Error: File operation tool path %@ is not found", fileOperationToolPath);
     }
-    
+
     NSError *retrieveInstallerError = nil;
     id<SUInstallerProtocol> installer = [SUInstaller installerForHost:host fileOperationToolPath:fileOperationToolPath updateDirectory:self.updateFolderPath error:&retrieveInstallerError];
     if (installer == nil) {
         SULog(@"Retrieved Installer Error: %@", retrieveInstallerError);
         exit(EXIT_FAILURE);
     }
-    
+
     if (self.shouldShowUI && [installer canInstallSilently]) {
         self.statusController = [[SUStatusController alloc] initWithHost:host];
         [self.statusController setButtonTitle:SULocalizedString(@"Cancel Update", @"") target:nil action:Nil isDefault:NO];
@@ -190,7 +190,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
                                    maxProgressValue: 0 statusText: @""];
         [self.statusController showWindow:self];
     }
-    
+
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSError *initialInstallationError = nil;
         if (![installer performInitialInstallation:&initialInstallationError]) {
@@ -201,7 +201,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
             });
             return;
         }
-        
+
         NSError *finalInstallationError = nil;
         if (![installer performFinalInstallation:&finalInstallationError]) {
             NSError *underlyingError = [finalInstallationError.userInfo objectForKey:NSUnderlyingErrorKey];
@@ -214,9 +214,9 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
             });
             return;
         }
-        
+
         NSString *installationPath = [installer installationPath];
-        
+
         dispatch_async(dispatch_get_main_queue(), ^{
             NSString *pathToRelaunch = nil;
             // If the relaunch path is the same as the host bundle path, use the installation path from the installer which may be normalized
@@ -234,35 +234,35 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 - (void)cleanupAndTerminateWithPathToRelaunch:(NSString *)relaunchPath
 {
     self.isTerminating = YES;
-    
+
     dispatch_block_t cleanupAndExit = ^{
         NSError *theError = nil;
         if (![[NSFileManager defaultManager] removeItemAtPath:self.updateFolderPath error:&theError]) {
             SULog(@"Couldn't remove update folder: %@.", theError);
         }
-        
+
         [[NSFileManager defaultManager] removeItemAtPath:[[NSBundle mainBundle] bundlePath] error:NULL];
-        
+
         exit(EXIT_SUCCESS);
     };
-    
+
     if (self.shouldRelaunch) {
         // The auto updater can terminate before the newly updated app is finished launching
         // If that happens, the OS may not make the updated app active and frontmost
         // (Or it does become frontmost, but the OS backgrounds it afterwards.. It's some kind of timing/activation issue that doesn't occur all the time)
         // The only remedy I've been able to find is waiting an arbitrary delay before exiting our application
-        
+
         // Don't use -launchApplication: because we may not be launching an application. Eg: it could be a system prefpane
         if (![[NSWorkspace sharedWorkspace] openFile:relaunchPath]) {
             SULog(@"Failed to launch %@", relaunchPath);
         }
-        
+
         [self.statusController close];
-        
+
         // Don't even think about hiding the app icon from the dock if we've already shown it
         // Transforming the app back to a background one has a backfiring effect, decreasing the likelihood
         // that the updated app will be brought up front
-        
+
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUTerminationTimeDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             cleanupAndExit();
         });
@@ -281,14 +281,14 @@ int main(int __unused argc, const char __unused *argv[])
         if (args.count < 5 || args.count > 7) {
             return EXIT_FAILURE;
         }
-        
+
         NSApplication *application = [NSApplication sharedApplication];
 
         BOOL shouldShowUI = (args.count > 6) ? [[args objectAtIndex:6] boolValue] : YES;
         if (shouldShowUI) {
             [application activateIgnoringOtherApps:YES];
         }
-        
+
         AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostPath:[args objectAtIndex:1]
                                                                relaunchPath:[args objectAtIndex:2]
                                                             parentProcessId:[[args objectAtIndex:3] intValue]

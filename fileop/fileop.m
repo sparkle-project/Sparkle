@@ -46,31 +46,31 @@ int main(int argc, const char *argv[])
         if (fwrite(&pid, sizeof(pid), 1, stdout) < 1) {
             exit(SUWritePIDFailure);
         }
-        
+
         if (fflush(stdout) != 0) {
             exit(SUFlushFailure);
         }
-        
+
         // At least we need the command name and file path arguments
         if (argc < 3) {
             exit(SUInsufficientNumberOfArguments);
         }
-        
+
         NSString *command = [[NSString alloc] initWithUTF8String:argv[1]];
         if (command == nil) {
             exit(SUCommandNameUTF8ParseFailure);
         }
-        
+
         NSString *filepath = [[NSString alloc] initWithUTF8String:argv[2]];
         if (filepath == nil) {
             exit(SUPathUTF8ParseFailure);
         }
-        
+
         NSURL *fileURL = [NSURL fileURLWithPath:filepath];
         if (fileURL == nil) {
             exit(SUPathUTF8ParseFailure);
         }
-        
+
         NSURL *destinationURL = nil;
         if (argc >= 4) {
             NSString *destinationPath = [[NSString alloc] initWithUTF8String:argv[3]];
@@ -78,10 +78,10 @@ int main(int argc, const char *argv[])
                 destinationURL = [NSURL fileURLWithPath:destinationPath];
             }
         }
-        
+
         // This tool should be executed as root, so we should not try to authorize
         SUFileManager *fileManager = [SUFileManager defaultManager];
-        
+
         if ([command isEqualToString:@(SUFileOpRemoveQuarantineCommand)]) {
             if (![fileManager releaseItemFromQuarantineAtRootURL:fileURL error:NULL]) {
                 exit(SUQuarantineRemovalFailure);
@@ -125,14 +125,14 @@ int main(int argc, const char *argv[])
         } else if ([command isEqualToString:@(SUFileOpInstallCommand)]) {
             // The one command that can *only* be run as the root user
             NSString *installerPath = @"/usr/sbin/installer";
-            
+
             NSTask *task = [[NSTask alloc] init];
             task.launchPath = installerPath;
             task.arguments = @[@"-pkg", filepath, @"-target", @"/"];
             // Output won't show up anyway, so we may as well ignore it
             task.standardError = [NSPipe pipe];
             task.standardOutput = [NSPipe pipe];
-            
+
             @try {
                 [task launch];
                 [task waitUntilExit];
@@ -145,7 +145,7 @@ int main(int argc, const char *argv[])
         } else {
             exit(SUInvalidCommandFailure);
         }
-        
+
         return EXIT_SUCCESS;
 	}
 }

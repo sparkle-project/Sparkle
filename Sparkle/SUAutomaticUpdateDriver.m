@@ -95,7 +95,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         [invocation setArgument:&relaunch atIndex:2];
         [invocation setArgument:&showUI atIndex:3];
         [invocation setTarget:self];
-        
+
         [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationInvocation:invocation];
     }
 
@@ -216,7 +216,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     // because we give the delegate an invocation to our install methods and
     // this code was added later :|
     self.isTerminating = YES;
-    
+
     [self installWithToolAndRelaunch:NO];
 }
 

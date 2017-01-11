@@ -3,7 +3,7 @@
  * All rights reserved
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted providing that the following conditions 
+ * modification, are permitted providing that the following conditions
  * are met:
  * 1. Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
@@ -92,7 +92,7 @@ static off_t search(off_t *I, u_char *old, off_t oldsize,
 }
 
 /* offtout(x, buf)
- * 
+ *
  * Writes the off_t 'x' portably to the array 'buf'. */
 static void offtout(off_t x, u_char *buf)
 {
@@ -164,7 +164,7 @@ int bsdiff(int argc, char *argv[])
 
     free(V);
     V = NULL;
-    
+
     new = readfile(argv[2], &newsize);
     if (new == NULL) {
         warn("new file error: %s", argv[2]);
@@ -231,7 +231,7 @@ int bsdiff(int argc, char *argv[])
             /* Choose this as our match if it contains more than eight
              * characters that would be wrong if matched with a forward
              * extension of the previous match instead. */
-            if (((len == oldscore) && (len != 0)) || 
+            if (((len == oldscore) && (len != 0)) ||
                 (len > oldscore + 8))
                 break;
 
@@ -386,14 +386,14 @@ int bsdiff(int argc, char *argv[])
         goto cleanup;
     }
     pf = NULL;
-    
+
     exitstatus = 0;
 cleanup:
 
     if (pf != NULL) {
         fclose(pf);
     }
-    
+
     /* Free the memory we used */
     free(db);
     free(eb);

@@ -3,7 +3,7 @@
  * All rights reserved
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted providing that the following conditions 
+ * modification, are permitted providing that the following conditions
  * are met:
  * 1. Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
@@ -204,7 +204,7 @@ int bspatch(int argc,const char * const argv[])
         goto cleanup;
     }
     f = NULL;
-    
+
     if ((cpf = fopen(argv[3], "r")) == NULL) {
         warn("fopen(%s)", argv[3]);
         goto cleanup;
@@ -253,9 +253,9 @@ int bspatch(int argc,const char * const argv[])
         warn("old file: %s", argv[1]);
         goto cleanup;
     }
-    
+
     oldsize = size;
-    
+
     if((new=malloc((size_t)newsize+1))==NULL) {
         warn("Failed to allocate memory for new");
         goto cleanup;
@@ -320,21 +320,21 @@ int bspatch(int argc,const char * const argv[])
     dstream = NULL;
     io->close(estream);
     estream = NULL;
-    
+
     if (fclose(cpf) != 0) {
         warn("fclose cpf(%s)", argv[3]);
         cpf = NULL;
         goto cleanup;
     }
     cpf = NULL;
-    
+
     if (fclose(dpf) != 0) {
         warn("fclose dpf(%s)", argv[3]);
         dpf = NULL;
         goto cleanup;
     }
     dpf = NULL;
-    
+
     if (fclose(epf) != 0) {
         warn("fclose epf(%s)", argv[3]);
         epf = NULL;
@@ -348,48 +348,48 @@ int bspatch(int argc,const char * const argv[])
         warn("failed to write new file: %s", argv[2]);
         goto cleanup;
     }
-    
+
     if (fwrite(new, 1, (size_t)newsize, f) < (size_t)newsize) {
         warn("failed to write to new file: %s", argv[2]);
         goto cleanup;
     }
-    
+
     if (fclose(f) != 0) {
         warn("failed to close new file: %s", argv[2]);
         f = NULL;
         goto cleanup;
     }
     f = NULL;
-    
+
     exitstatus = 0;
 cleanup:
     free(new);
     free(old);
-    
+
     if (f != NULL) {
         fclose(f);
     }
-    
+
     if (estream != NULL) {
         io->close(estream);
     }
-    
+
     if (epf != NULL) {
         fclose(epf);
     }
-    
+
     if (dstream != NULL) {
         io->close(dstream);
     }
-    
+
     if (dpf != NULL) {
         fclose(dpf);
     }
-    
+
     if (cstream != NULL) {
         io->close(cstream);
     }
-    
+
     if (cpf != NULL) {
         fclose(cpf);
     }

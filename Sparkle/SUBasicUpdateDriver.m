@@ -78,7 +78,7 @@
 {
     id<SUVersionComparison> comparator = nil;
     id<SUUpdaterPrivate> updater = self.updater;
-    
+
     // Give the delegate a chance to provide a custom version comparator
     if ([[updater delegate] respondsToSelector:@selector(versionComparatorForUpdater:)]) {
         comparator = [[updater delegate] versionComparatorForUpdater:self.updater];
@@ -102,14 +102,14 @@
             }
         }
     }
-    
+
     if (item && deltaItem) {
         SUAppcastItem *deltaUpdateItem = [[item deltaUpdates] objectForKey:hostVersion];
         if (deltaUpdateItem && [[self class] hostSupportsItem:deltaUpdateItem]) {
             *deltaItem = deltaUpdateItem;
         }
     }
-    
+
     return item;
 }
 
@@ -120,7 +120,7 @@
 
     BOOL minimumVersionOK = TRUE;
     BOOL maximumVersionOK = TRUE;
-    
+
     id<SUVersionComparison> versionComparator = [[SUStandardVersionComparator alloc] init];
 
     // Check minimum and maximum System Version
@@ -168,7 +168,7 @@
     {
         item = [[updater delegate] bestValidUpdateInAppcast:ac forUpdater:self.updater];
     }
-    
+
     if (item != nil) // Does the delegate want to handle it?
     {
         if ([item isDeltaUpdate]) {
@@ -180,7 +180,7 @@
         // Find the best supported update
         SUAppcastItem *deltaUpdateItem = nil;
         item = [[self class] bestItemFromAppcastItems:ac.items getDeltaItem:&deltaUpdateItem withHostVersion:self.host.version comparator:[self versionComparator]];
-        
+
         if (item && deltaUpdateItem) {
             self.nonDeltaUpdateItem = item;
             item = deltaUpdateItem;
@@ -199,7 +199,7 @@
 - (void)didFindValidUpdate
 {
     assert(self.updateItem);
-    
+
     id<SUUpdaterPrivate> updater = self.updater;
 
     if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
@@ -215,7 +215,7 @@
 - (void)didNotFindUpdate
 {
     id<SUUpdaterPrivate> updater = self.updater;
-    
+
     if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
         [[updater delegate] updaterDidNotFindUpdate:self.updater];
     }
@@ -240,12 +240,12 @@
         SULog(@"Failed to find user's cache directory! Using system default");
         cachePath = NSTemporaryDirectory();
     }
-    
+
     NSString *name = [self.host.bundle bundleIdentifier];
     if (!name) {
         name = [self.host name];
     }
-    
+
     cachePath = [cachePath stringByAppendingPathComponent:name];
     cachePath = [cachePath stringByAppendingPathComponent:@SPARKLE_BUNDLE_IDENTIFIER];
     return cachePath;
@@ -258,9 +258,9 @@
     if ([[NSFileManager defaultManager] fileExistsAtPath:appCachePath]) {
         [[NSFileManager defaultManager] removeItemAtPath:appCachePath error:NULL];
     }
-    
+
     id<SUUpdaterPrivate> updater = self.updater;
-    
+
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self.updateItem fileURL]];
     [request setValue:[updater userAgentString] forHTTPHeaderField:@"User-Agent"];
     if ([[updater delegate] respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
@@ -274,9 +274,9 @@
 - (void)download:(NSURLDownload *)__unused d decideDestinationWithSuggestedFilename:(NSString *)name
 {
     NSString *downloadFileName = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
-    
+
     NSString *appCachePath = [self appCachePath];
-    
+
     self.tempDir = [appCachePath stringByAppendingPathComponent:downloadFileName];
     int cnt = 1;
 	while ([[NSFileManager defaultManager] fileExistsAtPath:self.tempDir] && cnt <= 999)
@@ -310,7 +310,7 @@
     if (!failingUrl) {
         failingUrl = [self.updateItem fileURL];
     }
-    
+
     id<SUUpdaterPrivate> updater = self.updater;
 
     if ([[updater delegate] respondsToSelector:@selector(updater:failedToDownloadUpdate:error:)]) {
@@ -341,21 +341,21 @@
 {
     id<SUUpdaterPrivate> updater = self.updater;
     id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:updater.decryptionPassword];
-    
+
     BOOL success;
     if (!unarchiver) {
         SULog(@"Error: No valid unarchiver for %@!", self.downloadPath);
-        
+
         success = NO;
     } else {
         // Currently unsafe archives are the only case where we can prevalidate before extraction, but that could change in the future
         BOOL needsPrevalidation = [[unarchiver class] unsafeIfArchiveIsNotValidated];
-        
+
         self.updateValidator = [[SUUpdateValidator alloc] initWithDownloadPath:self.downloadPath dsaSignature:self.updateItem.DSASignature host:self.host performingPrevalidation:needsPrevalidation];
-        
+
         success = self.updateValidator.canValidate;
     }
-    
+
     if (!success) {
         NSError *reason = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{NSLocalizedDescriptionKey: @"Failed to extract update."}];
         [self unarchiverDidFailWithError:reason];
@@ -365,7 +365,7 @@
                 [self unarchiverDidFailWithError:err];
                 return;
             }
-            
+
             [self unarchiverDidFinish:nil];
         } progressBlock:^(double progress) {
             [self unarchiver:nil extractedProgress:progress];
@@ -391,7 +391,7 @@
 - (void)unarchiverDidFinish:(id)__unused ua
 {
     assert(self.updateItem);
-    
+
     [self installWithToolAndRelaunch:YES];
 }
 
@@ -399,12 +399,12 @@
 {
     // No longer needed
     self.updateValidator = nil;
-    
+
     if ([self.updateItem isDeltaUpdate]) {
         [self failedToApplyDeltaUpdate];
         return;
     }
-    
+
     [self abortUpdateWithError:err];
 }
 
@@ -449,7 +449,7 @@
 {
     assert(self.updateItem);
     assert(self.updateValidator);
-    
+
     BOOL validationCheckSuccess = [self.updateValidator validateWithUpdateDirectory:self.tempDir];
     if (!validationCheckSuccess) {
         NSDictionary *userInfo = @{
@@ -550,7 +550,7 @@
             pathToRelaunch = delegateRelaunchPath;
         }
     }
-    
+
     [NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:@[[self.host bundlePath],
                                                                     pathToRelaunch,
                                                                     [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]],

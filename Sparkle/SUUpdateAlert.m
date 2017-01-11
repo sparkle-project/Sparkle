@@ -130,7 +130,7 @@
     prefs.javaScriptEnabled = [self.host boolForInfoDictionaryKey:SUEnableJavaScriptKey];
     self.releaseNotesView.frameLoadDelegate = self;
     self.releaseNotesView.policyDelegate = self;
-    
+
     // Set the default font
     // "-apple-system-font" is a reference to the system UI font. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
     prefs.standardFontFamily = @"-apple-system-font";
@@ -194,19 +194,19 @@
         [self displayReleaseNotes];
     } else {
         NSLayoutConstraint *automaticallyInstallUpdatesButtonToDescriptionFieldConstraint = [NSLayoutConstraint constraintWithItem:self.automaticallyInstallUpdatesButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.descriptionField attribute:NSLayoutAttributeBottom multiplier:1.0 constant:8.0];
-        
+
         [self.window.contentView addConstraint:automaticallyInstallUpdatesButtonToDescriptionFieldConstraint];
-        
+
         [self.releaseNotesContainerView removeFromSuperview];
     }
-    
+
     // When we show release notes, it looks ugly if the install buttons are not closer to the release notes view
     // However when we don't show release notes, it looks ugly if the install buttons are too close to the description field. Shrugs.
     if (showReleaseNotes && ![self allowsAutomaticUpdates]) {
         NSLayoutConstraint *skipButtonToReleaseNotesContainerConstraint = [NSLayoutConstraint constraintWithItem:self.skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.releaseNotesContainerView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:12.0];
-        
+
         [self.window.contentView addConstraint:skipButtonToReleaseNotesContainerConstraint];
-        
+
         [self.automaticallyInstallUpdatesButton removeFromSuperview];
     }
 

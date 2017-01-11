@@ -89,7 +89,7 @@
     if (isPackage) {
         // Guided (or now "normal") installs used to be opt-in (i.e, Sparkle would detect foo.sparkle_guided.pkg or foo.sparkle_guided.mpkg),
         // but to get an interactive (or "unguided") install, the developer now must opt-out of guided installations.
-        
+
         // foo.app -> foo.sparkle_interactive.pkg or foo.sparkle_interactive.mpkg
         if ([[[newAppDownloadPath stringByDeletingPathExtension] pathExtension] isEqualToString:@"sparkle_interactive"]) {
             isGuided = NO;
@@ -112,14 +112,14 @@
     BOOL isPackage = NO;
     BOOL isGuided = NO;
     NSString *newDownloadPath = [self installSourcePathInUpdateFolder:updateDirectory forHost:host isPackage:&isPackage isGuided:&isGuided];
-    
+
     if (newDownloadPath == nil) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUMissingUpdateError userInfo:@{ NSLocalizedDescriptionKey: @"Couldn't find an appropriate update in the downloaded package." }];
         }
         return nil;
     }
-    
+
     id <SUInstallerProtocol> installer;
     if (isPackage && isGuided) {
         installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath installationPath:host.bundlePath fileOperationToolPath:fileOperationToolPath];
@@ -130,7 +130,7 @@
         if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
             normalizedInstallationPath = [self normalizedInstallationPathForHost:host];
         }
-        
+
         // If we have a normalized path, we'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
         // Otherwise if there's no normalized path (the more likely case), we'll just use the host bundle's path
         NSString *installationPath;
@@ -139,7 +139,7 @@
         } else {
             installationPath = host.bundlePath;
         }
-        
+
         installer = [[SUPlainInstaller alloc] initWithHost:host bundlePath:newDownloadPath installationPath:installationPath fileOperationToolPath:fileOperationToolPath];
     }
     return installer;
@@ -149,9 +149,9 @@
 {
     NSBundle *bundle = host.bundle;
     assert(bundle != nil);
-    
+
     NSString *normalizedAppPath = [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[bundle bundlePath] pathExtension]]];
-    
+
     return normalizedAppPath;
 }
 

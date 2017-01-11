@@ -56,25 +56,25 @@
 
     NSString *fileOperationToolPath = [bundle pathForResource:@""SPARKLE_FILEOP_TOOL_NAME ofType:@""];
     XCTAssertNotNil(fileOperationToolPath);
-    
+
     NSError *installerError = nil;
     id<SUInstallerProtocol> installer = [SUInstaller installerForHost:host fileOperationToolPath:fileOperationToolPath updateDirectory:[path stringByDeletingLastPathComponent] error:&installerError];
-    
+
     if (installer == nil) {
         XCTFail(@"Failed to retrieve installer: %@", installerError);
     }
-    
+
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSError *initialInstallationError = nil;
         if (![installer performInitialInstallation:&initialInstallationError]) {
             XCTFail(@"Failed to perform initial installation: %@", initialInstallationError);
         }
-        
+
         NSError *finalInstallationError = nil;
         if (![installer performFinalInstallation:&finalInstallationError]) {
             XCTFail(@"Failed to perform final installation with underlying error = %@ ; error = %@", [finalInstallationError.userInfo objectForKey:NSUnderlyingErrorKey], finalInstallationError);
         }
-        
+
         XCTAssertTrue([fm fileExistsAtPath:expectedDestination isDirectory:nil]);
         [done fulfill];
     });

@@ -34,7 +34,7 @@ SU_EXPORT @interface SUUpdater : NSObject
 
 /*!
  The shared updater for the main bundle.
- 
+
  This is equivalent to passing [NSBundle mainBundle] to SUUpdater::updaterForBundle:
  */
 + (SUUpdater *)sharedUpdater;
@@ -48,7 +48,7 @@ SU_EXPORT @interface SUUpdater : NSObject
 
 /*!
  Designated initializer for SUUpdater.
- 
+
  If an updater has already been initialized for the provided bundle, that shared instance will be returned.
  */
 - (instancetype)initForBundle:(NSBundle *)bundle;

@@ -24,7 +24,7 @@
 - (void)testNumbers
 {
     SUStandardVersionComparator *comparator = [[SUStandardVersionComparator alloc] init];
-    
+
     SUAssertAscending(comparator, @"1.0", @"1.1");
     SUAssertEqual(comparator, @"1.0", @"1.0");
     SUAssertDescending(comparator, @"2.0", @"1.1");
@@ -36,7 +36,7 @@
 - (void)testPrereleases
 {
     SUStandardVersionComparator *comparator = [[SUStandardVersionComparator alloc] init];
-    
+
     SUAssertAscending(comparator, @"1.5.5", @"1.5.6a1");
     SUAssertAscending(comparator, @"1.1.0b1", @"1.1.0b2");
     SUAssertAscending(comparator, @"1.1.1b2", @"1.1.2b1");
@@ -55,7 +55,7 @@
 - (void)testVersionsWithBuildNumbers
 {
     SUStandardVersionComparator *comparator = [[SUStandardVersionComparator alloc] init];
-    
+
     SUAssertAscending(comparator, @"1.0 (1234)", @"1.0 (1235)");
     SUAssertAscending(comparator, @"1.0b1 (1234)", @"1.0 (1234)");
     SUAssertAscending(comparator, @"1.0b5 (1234)", @"1.0b5 (1235)");
@@ -63,14 +63,14 @@
     SUAssertAscending(comparator, @"1.0.1b5 (1234)", @"1.0.1b6 (1234)");
     SUAssertAscending(comparator, @"2.0.0.2429", @"2.0.0.2430");
     SUAssertAscending(comparator, @"1.1.1.1818", @"2.0.0.2430");
-    
+
     SUAssertAscending(comparator, @"3.3 (5847)", @"3.3.1b1 (5902)");
 }
 
 - (void)testWordsWithSpaceInFront
 {
     // SUStandardVersionComparator *comparator = [[SUStandardVersionComparator alloc] init];
-    
+
     //	SUAssertAscending(comparator, @"1.0 beta", @"1.0");
     //	SUAssertAscending(comparator, @"1.0  - beta", @"1.0");
     //	SUAssertAscending(comparator, @"1.0 alpha", @"1.0 beta");
@@ -81,7 +81,7 @@
 - (void)testVersionsWithReverseDateBasedNumbers
 {
     SUStandardVersionComparator *comparator = [[SUStandardVersionComparator alloc] init];
-    
+
     SUAssertAscending(comparator, @"201210251627", @"201211051041");
 }
 
