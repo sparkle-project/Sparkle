@@ -65,7 +65,7 @@
     id<SUUpdaterPrivate> updater = self.updater;
     [appcast setUserAgentString:[updater userAgentString]];
     [appcast setHttpHeaders:[updater httpHeaders]];
-    [appcast fetchAppcastFromURL:URL completionBlock:^(NSError *error) {
+    [appcast fetchAppcastFromURL:URL inBackground:self.downloadsAppcastInBackground completionBlock:^(NSError *error) {
         if (error) {
             [self abortUpdateWithError:error];
         } else {
@@ -258,10 +258,14 @@
     if ([[NSFileManager defaultManager] fileExistsAtPath:appCachePath]) {
         [[NSFileManager defaultManager] removeItemAtPath:appCachePath error:NULL];
     }
-    
+
     id<SUUpdaterPrivate> updater = self.updater;
-    
+
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self.updateItem fileURL]];
+    if (self.downloadsUpdatesInBackground) {
+        request.networkServiceType = NSURLNetworkServiceTypeBackground;
+    }
+
     [request setValue:[updater userAgentString] forHTTPHeaderField:@"User-Agent"];
     if ([[updater delegate] respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
         [[updater delegate] updater:self.updater

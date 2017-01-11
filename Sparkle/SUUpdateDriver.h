@@ -32,6 +32,8 @@ extern NSString *const SUUpdateDriverFinishedNotification;
 
 @property (getter=isInterruptible, readonly) BOOL interruptible;
 @property (readonly) BOOL finished;
+@property (readonly) BOOL downloadsAppcastInBackground;
+@property (readonly) BOOL downloadsUpdatesInBackground;
 @property BOOL automaticallyInstallUpdates;
 
 @end
