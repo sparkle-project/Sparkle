@@ -19,8 +19,8 @@
 
     NSView *buttonGroup = [NSView new];
     self.view = buttonGroup;
-    NSMutableArray *constraints = [NSMutableArray array];
-    NSMutableArray *buttonCopies = [NSMutableArray arrayWithCapacity:buttons.count];
+    NSMutableArray<NSLayoutConstraint *> *constraints = [NSMutableArray array];
+    NSMutableArray<NSButton *> *buttonCopies = [NSMutableArray arrayWithCapacity:buttons.count];
     
     for (NSUInteger i = 0; i < buttons.count; i++) {
         NSButton *button = buttons[i];
@@ -43,6 +43,8 @@
             [constraints addObject:[NSLayoutConstraint constraintWithItem:buttonCopy attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:buttonGroup attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0]];
         } else {
             [constraints addObject:[NSLayoutConstraint constraintWithItem:buttonCopy attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:buttonCopies[i-1] attribute:NSLayoutAttributeLeading multiplier:1.0 constant:(i == 1) ? -8 : -32]];
+            [constraints addObject:[NSLayoutConstraint constraintWithItem:buttonCopy attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:buttonCopies[i-1] attribute:NSLayoutAttributeWidth multiplier:1.0 constant:0.0]];
+            constraints.lastObject.priority = 250;
         }
         if (i == buttons.count - 1) {
             [constraints addObject:[NSLayoutConstraint constraintWithItem:buttonCopy attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:buttonGroup attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0]];
