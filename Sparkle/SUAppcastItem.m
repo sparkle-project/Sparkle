@@ -130,7 +130,7 @@
             }
             return nil;
         }
-        
+
         if (enclosureURLString) {
             NSString *enclosureLengthString = [enclosure objectForKey:SURSSAttributeLength];
             long long contentLength = 0;

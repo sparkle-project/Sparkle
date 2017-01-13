@@ -55,7 +55,7 @@
 {
 	@autoreleasepool {
         BOOL mountedSuccessfully = NO;
-        
+
         // get a unique mount point path
         NSString *mountPoint = nil;
         NSFileManager *manager;
@@ -78,12 +78,12 @@
         }
         // Note: this check does not follow symbolic links, which is what we want
         while ([[NSURL fileURLWithPath:mountPoint] checkResourceIsReachableAndReturnError:NULL]);
-        
+
         NSData *promptData = nil;
         promptData = [NSData dataWithBytes:"yes\n" length:4];
-        
+
         NSMutableArray *arguments = [@[@"attach", self.archivePath, @"-mountpoint", mountPoint, /*@"-noverify",*/ @"-nobrowse", @"-noautoopen"] mutableCopy];
-        
+
         if (self.decryptionPassword) {
             NSMutableData *passwordData = [[self.decryptionPassword dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
             // From the hdiutil docs:
@@ -93,10 +93,10 @@
             [passwordData appendData:[NSData dataWithBytes:"\0" length:1]];
             [passwordData appendData:promptData];
             promptData = passwordData;
-            
+
             [arguments addObject:@"-stdinpass"];
         }
-        
+
         NSData *output = nil;
         NSInteger taskResult = -1;
         @try
@@ -105,23 +105,23 @@
             task.launchPath = @"/usr/bin/hdiutil";
             task.currentDirectoryPath = @"/";
             task.arguments = arguments;
-            
+
             NSPipe *inputPipe = [NSPipe pipe];
             NSPipe *outputPipe = [NSPipe pipe];
-            
+
             task.standardInput = inputPipe;
             task.standardOutput = outputPipe;
-            
+
             [task launch];
-            
+
             [notifier notifyProgress:0.125];
 
             [inputPipe.fileHandleForWriting writeData:promptData];
             [inputPipe.fileHandleForWriting closeFile];
-            
+
             // Read data to end *before* waiting until the task ends so we don't deadlock if the stdout buffer becomes full if we haven't consumed from it
             output = [outputPipe.fileHandleForReading readDataToEndOfFile];
-            
+
             [task waitUntilExit];
             taskResult = task.terminationStatus;
         }
@@ -129,7 +129,7 @@
         {
             goto reportError;
         }
-        
+
         [notifier notifyProgress:0.5];
 
 		if (taskResult != 0)
@@ -139,7 +139,7 @@
             goto reportError;
         }
         mountedSuccessfully = YES;
-        
+
         // Now that we've mounted it, we need to copy out its contents.
         manager = [[NSFileManager alloc] init];
         contents = [manager contentsOfDirectoryAtPath:mountPoint error:&error];
@@ -156,12 +156,12 @@
 		{
             NSString *fromPath = [mountPoint stringByAppendingPathComponent:item];
             NSString *toPath = [[self.archivePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:item];
-            
+
             // We skip any files in the DMG which are not readable.
             if (![manager isReadableFileAtPath:fromPath]) {
                 continue;
             }
-            
+
             itemsCopied += 1.0;
             [notifier notifyProgress:0.5 + itemsCopied/(totalItems*2.0)];
             SULog(@"copyItemAtPath:%@ toPath:%@", fromPath, toPath);
@@ -171,10 +171,10 @@
                 goto reportError;
             }
         }
-        
+
         [notifier notifySuccess];
         goto finally;
-        
+
     reportError:
         [notifier notifyFailureWithError:error];
 
@@ -185,7 +185,7 @@
             task.arguments = @[@"detach", mountPoint, @"-force"];
             task.standardOutput = [NSPipe pipe];
             task.standardError = [NSPipe pipe];
-            
+
             @try {
                 [task launch];
             } @catch (NSException *exception) {

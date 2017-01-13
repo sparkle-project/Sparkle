@@ -155,7 +155,7 @@
 {
     SUUpdatePermissionResponse *response = [[SUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:([sender tag] == 1) sendSystemProfile:self.shouldSendProfile];
     self.reply(response);
-    
+
     [[self window] close];
     [NSApp stopModal];
 }

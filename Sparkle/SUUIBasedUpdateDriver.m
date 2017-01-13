@@ -105,7 +105,7 @@
         [alert addButtonWithTitle:SULocalizedString(@"OK", nil)];
         [self showAlert:alert];
     }
-    
+
     [self abortUpdate];
 }
 
@@ -147,15 +147,15 @@
         self.statusController = [[SUStatusController alloc] initWithHost:self.host];
         createdStatusController = YES;
     }
-    
+
     [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
     [self.statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
     [self.statusController setButtonEnabled:YES];
-    
+
     if (createdStatusController) {
         [self.statusController showWindow:self];
     }
-    
+
     [super downloadUpdate];
 }
 
@@ -198,12 +198,12 @@
 - (void)download:(NSURLDownload *)__unused download didReceiveDataOfLength:(NSUInteger)length
 {
     double newProgressValue = [self.statusController progressValue] + (double)length;
-    
+
     // In case our expected content length was incorrect
     if (newProgressValue > [self.statusController maxProgressValue]) {
         [self.statusController setMaxProgressValue:newProgressValue];
     }
-    
+
     [self.statusController setProgressValue:newProgressValue];
     if ([self.statusController maxProgressValue] > 0.0)
         [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [self localizedStringFromByteCount:(long long)self.statusController.progressValue], [self localizedStringFromByteCount:(long long)self.statusController.maxProgressValue]]];
@@ -215,7 +215,7 @@
 {
     if (self.download) {
         [self.download cancel];
-        
+
         id<SUUpdaterPrivate> updater = self.updater;
         if ([[updater delegate] respondsToSelector:@selector(userDidCancelDownload:)]) {
             [[updater delegate] userDidCancelDownload:self.updater];

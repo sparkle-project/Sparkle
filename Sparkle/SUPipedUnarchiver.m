@@ -26,7 +26,7 @@
     NSArray <NSString *> *extractTGZ = @[@"/usr/bin/tar", @"-zxC"];
     NSArray <NSString *> *extractTBZ = @[@"/usr/bin/tar", @"-jxC"];
     NSArray <NSString *> *extractTXZ = extractTGZ;
-    
+
     NSDictionary <NSString *, NSArray<NSString *> *> *extractCommandDictionary =
     @{
       @".zip" : @[@"/usr/bin/ditto", @"-x",@"-k",@"-"],
@@ -39,7 +39,7 @@
       @".txz" : extractTXZ,
       @".tar.lzma" : extractTXZ
     };
-    
+
     NSString *lastPathComponent = [path lastPathComponent];
     for (NSString *currentType in extractCommandDictionary)
     {
@@ -73,12 +73,12 @@
 {
     NSArray <NSString *> *commandAndArguments = [[self class] commandAndArgumentsConformingToTypeOfPath:self.archivePath];
     assert(commandAndArguments != nil);
-    
+
     NSString *command = commandAndArguments.firstObject;
     assert(command != nil);
-    
+
     NSArray <NSString *> *arguments = [commandAndArguments subarrayWithRange:NSMakeRange(1, commandAndArguments.count - 1)];
-    
+
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         SUUnarchiverNotifier *notifier = [[SUUnarchiverNotifier alloc] initWithCompletionBlock:completionBlock progressBlock:progressBlock];
         [self extractArchivePipingDataToCommand:command arguments:arguments notifier:notifier];
@@ -92,18 +92,18 @@
 	@autoreleasepool {
         NSError *error = nil;
         NSString *destination = [self.archivePath stringByDeletingLastPathComponent];
-        
+
         SULog(@"Extracting using '%@' '%@' < '%@' '%@'", command, [args componentsJoinedByString:@"' '"], self.archivePath, destination);
-        
+
         // Get the file size.
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.archivePath error:nil];
         NSUInteger expectedLength = [[attributes objectForKey:NSFileSize] unsignedIntegerValue];
         if (expectedLength > 0) {
             NSFileHandle *archiveInput = [NSFileHandle fileHandleForReadingAtPath:self.archivePath];
-            
+
             NSPipe *pipe = [NSPipe pipe];
             NSFileHandle *archiveOutput = [pipe fileHandleForWriting];
-            
+
             NSTask *task = [[NSTask alloc] init];
             [task setStandardInput:[pipe fileHandleForReading]];
             [task setStandardError:[NSFileHandle fileHandleWithStandardError]];
@@ -111,7 +111,7 @@
             [task setLaunchPath:command];
             [task setArguments:[args arrayByAddingObject:destination]];
             [task launch];
-            
+
             NSUInteger bytesRead = 0;
             do {
                 NSData *data = [archiveInput readDataOfLength:256*1024];
@@ -124,11 +124,11 @@
                 [notifier notifyProgress:(double)bytesRead / (double)expectedLength];
             }
             while(bytesRead < expectedLength);
-            
+
             [archiveOutput closeFile];
-            
+
             [task waitUntilExit];
-            
+
             if ([task terminationStatus] == 0) {
                 if (bytesRead == expectedLength) {
                     [notifier notifySuccess];

@@ -18,10 +18,10 @@
 {
     if ([SUPipedUnarchiver canUnarchivePath:path]) {
         return [[SUPipedUnarchiver alloc] initWithArchivePath:path];
-        
+
     } else if ([SUDiskImageUnarchiver canUnarchivePath:path]) {
         return [[SUDiskImageUnarchiver alloc] initWithArchivePath:path decryptionPassword:decryptionPassword];
-        
+
     } else if ([SUBinaryDeltaUnarchiver canUnarchivePath:path]) {
         assert(hostPath != nil);
         NSString *nonNullHostPath = hostPath;

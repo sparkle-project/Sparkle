@@ -249,7 +249,7 @@
             return nil;
         }
     }
-    
+
     self.items = appcastItems;
 
     return appcastItems;

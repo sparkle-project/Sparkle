@@ -40,19 +40,19 @@
         SULog(@"Failed to get static code %d", result);
         goto finally;
     }
-    
+
     // Note that kSecCSCheckNestedCode may not work with pre-Mavericks code signing.
     // See https://github.com/sparkle-project/Sparkle/issues/376#issuecomment-48824267 and https://developer.apple.com/library/mac/technotes/tn2206
     // Aditionally, there are several reasons to stay away from deep verification and to prefer DSA signing the download archive instead.
     // See https://github.com/sparkle-project/Sparkle/pull/523#commitcomment-17549302 and https://github.com/sparkle-project/Sparkle/issues/543
     SecCSFlags flags = (SecCSFlags) (kSecCSDefaultFlags | kSecCSCheckAllArchitectures);
     result = SecStaticCodeCheckValidityWithErrors(staticCode, flags, requirement, &cfError);
-    
+
     if (cfError) {
         NSError *tmpError = CFBridgingRelease(cfError);
         if (error) *error = tmpError;
     }
-    
+
     if (result != noErr) {
         if (result == errSecCSUnsigned) {
             SULog(@"The host app is signed, but the new version of the app is not signed using Apple Code Signing. Please ensure that the new app is signed and that archiving did not corrupt the signature.");
@@ -63,12 +63,12 @@
                 SULog(@"Code signature of the new version doesn't match the old version: %@. Please ensure that old and new app is signed using exactly the same certificate.", requirementString);
                 CFRelease(requirementString);
             }
-            
+
             [self logSigningInfoForCode:oldCode label:@"old info"];
             [self logSigningInfoForCode:staticCode label:@"new info"];
         }
     }
-    
+
 finally:
     if (oldCode) CFRelease(oldCode);
     if (staticCode) CFRelease(staticCode);
@@ -94,12 +94,12 @@ finally:
     // See in -codeSignatureAtBundleURL:matchesSignatureAtBundleURL:error: for why kSecCSCheckNestedCode is not passed
     SecCSFlags flags = (SecCSFlags) (kSecCSDefaultFlags | kSecCSCheckAllArchitectures);
     result = SecStaticCodeCheckValidityWithErrors(staticCode, flags, NULL, &cfError);
-    
+
     if (cfError) {
         NSError *tmpError = CFBridgingRelease(cfError);
         if (error) *error = tmpError;
     }
-    
+
     if (result != noErr) {
         if (result == errSecCSUnsigned) {
             SULog(@"Error: The app is not signed using Apple Code Signing. %@", bundleURL);
@@ -108,7 +108,7 @@ finally:
             [self logSigningInfoForCode:staticCode label:@"new info"];
         }
     }
-    
+
 finally:
     if (staticCode) CFRelease(staticCode);
     return (result == noErr);

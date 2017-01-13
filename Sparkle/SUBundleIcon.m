@@ -16,9 +16,9 @@
     if (resource == nil || ![resource isKindOfClass:[NSString class]]) {
         return nil;
     }
-    
+
     NSURL *iconURL = [bundle URLForResource:resource withExtension:@"icns"];
-    
+
     // The resource could already be containing the path extension, so try again without the extra extension
     if (iconURL == nil) {
         iconURL = [bundle URLForResource:resource withExtension:nil];

@@ -42,7 +42,7 @@
 - (BOOL)performFinalInstallation:(NSError * __autoreleasing *)error
 {
     SUFileManager *fileManager = [SUFileManager fileManagerWithAuthorizationToolPath:self.fileOperationToolPath];
-    
+
     return [fileManager executePackageAtURL:[NSURL fileURLWithPath:self.packagePath] error:error];
 }
 

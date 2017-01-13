@@ -53,7 +53,7 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
     // -n = Open another instance if already open.
     // -b = app bundle identifier
     NSArray *args = @[@"-W", @"-n", @"-b", @"com.apple.installer", self.packagePath];
-    
+
     // Known bug: if the installation fails or is canceled, Sparkle goes ahead and restarts, thinking everything is fine.
     @try {
         NSTask *installer = [NSTask launchedTaskWithLaunchPath:SUOpenUtilityPath arguments:args];
@@ -66,7 +66,7 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
         }
         return NO;
     }
-    
+
     return YES;
 }
 

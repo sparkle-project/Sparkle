@@ -15,7 +15,7 @@
 
 /*!
  Initializes a new update permission response instance.
- 
+
  @param automaticUpdateChecks Flag for whether to allow automatic update checks.
  @param sendSystemProfile Flag for if system profile information should be sent to the server hosting the appcast.
  */
