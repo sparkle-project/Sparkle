@@ -24,7 +24,7 @@ SU_EXPORT @interface SUAppcast : NSObject<NSURLDownloadDelegate>
 @property (copy, nullable) NSString *userAgentString;
 @property (copy, nullable) NSDictionary *httpHeaders;
 
-- (void)fetchAppcastFromURL:(NSURL *)url inBackground:(BOOL)background completionBlock:(void (^)(NSError *_Nullable))err;
+- (void)fetchAppcastFromURL:(NSURL *)url inBackground:(BOOL)bg completionBlock:(void (^)(NSError *_Nullable))err;
 - (SUAppcast *)copyWithoutDeltaUpdates;
 
 @property (readonly, copy, nullable) NSArray *items;

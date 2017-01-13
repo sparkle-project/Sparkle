@@ -311,6 +311,10 @@
         self.laterButton.title = SULocalizedString(@"Install on Quit", nil);
     }
 
+    if ([self.updateItem isCriticalUpdate]) {
+        self.skipButton.enabled = NO;
+    }
+
     [self.window center];
 }
 

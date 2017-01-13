@@ -64,6 +64,10 @@
     self.completionBlock = block;
 
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
+    if (background) {
+        request.networkServiceType = NSURLNetworkServiceTypeBackground;
+    }
+
     if (self.userAgentString) {
         [request setValue:self.userAgentString forHTTPHeaderField:@"User-Agent"];
     }
