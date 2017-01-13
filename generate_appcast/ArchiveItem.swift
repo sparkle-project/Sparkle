@@ -100,7 +100,7 @@ class ArchiveItem: CustomStringConvertible {
 
     var archiveURL: URL {
         if let relative = self.feedURL {
-            return URL(string: self.archivePath.lastPathComponent, relativeTo: relative)!
+            return URL(fileURLWithPath: self.archivePath.lastPathComponent, relativeTo: relative)
         }
         return URL(string: self.archivePath.lastPathComponent)!
     }
