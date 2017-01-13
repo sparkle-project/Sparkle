@@ -117,8 +117,11 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
             item.addChild(enclosure!);
         }
 
+        guard let archiveURL = update.archiveURL?.absoluteString else {
+            throw makeError(code: .appcastError, "Bad archive name or feed URL");
+        };
         var attributes = [
-            XMLNode.attribute(withName: "url", stringValue: update.archiveURL.absoluteString) as! XMLNode,
+            XMLNode.attribute(withName: "url", stringValue: archiveURL) as! XMLNode,
             XMLNode.attribute(withName: "sparkle:version", uri: sparkleNS, stringValue: update.version) as! XMLNode,
             XMLNode.attribute(withName: "length", stringValue: String(update.fileSize)) as! XMLNode,
             XMLNode.attribute(withName: "type", stringValue: update.mimeType) as! XMLNode,
