@@ -47,7 +47,6 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
             XMLNode.Options.nodeLoadExternalEntitiesNever,
             XMLNode.Options.nodePreserveCDATA,
             XMLNode.Options.nodePreserveWhitespace,
-            XMLNode.Options.nodePreservePrefixes,
         ];
         doc = try XMLDocument(contentsOf: appcastDestPath, options: Int(options.rawValue));
     } catch {
@@ -118,8 +117,11 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
             item.addChild(enclosure!);
         }
 
+        guard let archiveURL = update.archiveURL?.absoluteString else {
+            throw makeError(code: .appcastError, "Bad archive name or feed URL");
+        };
         var attributes = [
-            XMLNode.attribute(withName: "url", stringValue: update.archiveURL.absoluteString) as! XMLNode,
+            XMLNode.attribute(withName: "url", stringValue: archiveURL) as! XMLNode,
             XMLNode.attribute(withName: "sparkle:version", uri: sparkleNS, stringValue: update.version) as! XMLNode,
             XMLNode.attribute(withName: "length", stringValue: String(update.fileSize)) as! XMLNode,
             XMLNode.attribute(withName: "type", stringValue: update.mimeType) as! XMLNode,
@@ -160,5 +162,7 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
     }
 
     let options = XMLNode.Options.nodeCompactEmptyElement;
-    try doc.xmlData(withOptions:Int(options.rawValue)).write(to: appcastDestPath);
+    let docData = doc.xmlData(withOptions:Int(options.rawValue));
+    let _ = try XMLDocument(data: docData, options:0); // Verify that it was generated correctly, which does not always happen!
+    try docData.write(to: appcastDestPath);
 }
