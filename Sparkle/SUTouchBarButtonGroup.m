@@ -17,7 +17,7 @@
     if (!(self = [super init]))
         return self;
 
-    NSView *buttonGroup = [NSView new];
+    NSView *buttonGroup = [[NSView alloc] initWithFrame:NSZeroRect];
     self.view = buttonGroup;
     NSMutableArray<NSLayoutConstraint *> *constraints = [NSMutableArray array];
     NSMutableArray<NSButton *> *buttonCopies = [NSMutableArray arrayWithCapacity:buttons.count];
