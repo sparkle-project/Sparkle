@@ -80,6 +80,10 @@
     [super abortUpdate];
 }
 
+-(BOOL)downloadsAppcastInBackground {
+    return NO;
+}
+
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
 {
     // We don't check to see if this update's been skipped, because the user explicitly *asked* if he had the latest version.

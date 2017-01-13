@@ -98,11 +98,14 @@ class ArchiveItem: CustomStringConvertible {
         return "\(self.archivePath) \(self.version)"
     }
 
-    var archiveURL: URL {
-        if let relative = self.feedURL {
-            return URL(string: self.archivePath.lastPathComponent, relativeTo: relative)!
+    var archiveURL: URL? {
+        guard let escapedFilename = self.archivePath.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
+            return nil;
         }
-        return URL(string: self.archivePath.lastPathComponent)!
+        if let relative = self.feedURL {
+            return URL(string: escapedFilename, relativeTo: relative)
+        }
+        return URL(string: escapedFilename)
     }
 
     var pubDate : String {
