@@ -19,5 +19,11 @@
         <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
         <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="2.0" length="$INSERT_ARCHIVE_LENGTH" type="application/octet-stream" sparkle:dsaSignature="$INSERT_DSA_SIGNATURE" />
       </item>
+      <item>
+        <title>This entry is just for testing the criticalUpdate tag handling</title>
+        <pubDate>Sat, 11 Nov 2011 11:11:11 +0000</pubDate>
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="1.6" length="12345" type="application/octet-stream" sparkle:dsaSignature="dummy_signature" />
+        <sparkle:tags> <sparkle:criticalUpdate /> </sparkle:tags>
+      </item>
   </channel>
 </rss>

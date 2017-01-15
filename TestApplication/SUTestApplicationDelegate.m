@@ -10,11 +10,41 @@
 #import "SUUpdateSettingsWindowController.h"
 #import "SUFileManager.h"
 #import "SUTestWebServer.h"
+#import "SUUpdater.h"
+#import "SUUpdaterDelegate.h"
+#import "SUAppcast.h"
+#import "SUAppcastItem.h"
+
+#pragma mark - Updater Delegate
+
+@interface SUTestUpdaterDelegate : NSObject  <SUUpdaterDelegate>
+@end
+
+@implementation SUTestUpdaterDelegate
+
+- (void)updater:(SUUpdater *)updater didFinishLoadingAppcast:(SUAppcast *)appcast
+{
+    #pragma unused (updater)
+
+    // Let's make sure the second item has the "critical" flag set, and the first one does not
+    SUAppcastItem *firstItem = appcast.items[0];
+    assert(!firstItem.isCriticalUpdate);
+    SUAppcastItem *secondItem = appcast.items[1];
+    assert(secondItem.isCriticalUpdate);
+
+    return;
+}
+
+@end
+
+
+#pragma mark - Application Delegate
 
 @interface SUTestApplicationDelegate ()
 
 @property (nonatomic) SUUpdateSettingsWindowController *updateSettingsWindowController;
 @property (nonatomic) SUTestWebServer *webServer;
+@property (nonatomic, strong) SUTestUpdaterDelegate *updaterDelegate;
 
 @end
 
@@ -22,11 +52,16 @@
 
 @synthesize updateSettingsWindowController = _updateSettingsWindowController;
 @synthesize webServer = _webServer;
+@synthesize updaterDelegate = _updaterDelegate;
 
 static NSString * const UPDATED_VERSION = @"2.0";
 
 - (void)applicationDidFinishLaunching:(NSNotification * __unused)notification
 {
+    // Let's set up a delegate for the updater so that we can perform some extra checks
+    self.updaterDelegate = [SUTestUpdaterDelegate new];
+    [SUUpdater sharedUpdater].delegate = self.updaterDelegate;
+
     NSBundle *mainBundle = [NSBundle mainBundle];
     
     // Check if we are already up to date
@@ -203,3 +238,4 @@ static NSString * const UPDATED_VERSION = @"2.0";
 }
 
 @end
+
