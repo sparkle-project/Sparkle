@@ -36,10 +36,12 @@ class SUAppcastTest: XCTestCase {
             XCTAssertEqual("Version 4.0", items[2].title);
             XCTAssertNil(items[2].itemDescription);
             XCTAssertEqual("Sat, 26 Jul 2014 15:20:13 +0000", items[2].dateString)
+            XCTAssertFalse(items[2].isCriticalUpdate);
             
             XCTAssertEqual("Version 5.0", items[3].title);
             XCTAssertNil(items[3].itemDescription);
             XCTAssertNil(items[3].dateString)
+            XCTAssertFalse(items[3].isCriticalUpdate);
             
             // Test best appcast item & a delta update item
             var deltaItem: SUAppcastItem? = nil
