@@ -25,11 +25,13 @@ class SUAppcastTest: XCTestCase {
             XCTAssertEqual("Version 2.0", items[0].title);
             XCTAssertEqual("desc", items[0].itemDescription);
             XCTAssertEqual("Sat, 26 Jul 2014 15:20:11 +0000", items[0].dateString)
+            XCTAssertTrue(items[0].isCriticalUpdate);
             
             // This is the best release matching our system version
             XCTAssertEqual("Version 3.0", items[1].title);
             XCTAssertNil(items[1].itemDescription);
             XCTAssertNil(items[1].dateString)
+            XCTAssertFalse(items[1].isCriticalUpdate);
             
             XCTAssertEqual("Version 4.0", items[2].title);
             XCTAssertNil(items[2].itemDescription);
