@@ -159,6 +159,9 @@
 		723B5DA71CF7AB0100365F95 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 723B5DA01CF7AB0100365F95 /* main.m */; };
 		723B5DA91CF7AB0100365F95 /* SPUDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 723B5DA31CF7AB0100365F95 /* SPUDownloader.m */; };
 		723B5DAA1CF7AB6A00365F95 /* SPUDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 723B5DA31CF7AB0100365F95 /* SPUDownloader.m */; };
+		723C8A541E2D60DB00C14942 /* SUTouchBarButtonGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 723C8A521E2D60DB00C14942 /* SUTouchBarButtonGroup.h */; };
+		723C8A551E2D60DB00C14942 /* SUTouchBarButtonGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 723C8A531E2D60DB00C14942 /* SUTouchBarButtonGroup.m */; };
+		723C8A561E2D60DB00C14942 /* SUTouchBarButtonGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 723C8A531E2D60DB00C14942 /* SUTouchBarButtonGroup.m */; };
 		72464F701E1F31E000FB341C /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		72464F711E1F326A00FB341C /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		72464F721E1F327C00FB341C /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
@@ -993,6 +996,8 @@
 		723B5DA31CF7AB0100365F95 /* SPUDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SPUDownloader.m; path = Downloader/SPUDownloader.m; sourceTree = SOURCE_ROOT; };
 		723B5DA41CF7AB0100365F95 /* SPUDownloaderDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderDelegate.h; path = Downloader/SPUDownloaderDelegate.h; sourceTree = SOURCE_ROOT; };
 		723B5DA51CF7AB0100365F95 /* SPUDownloaderProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SPUDownloaderProtocol.h; path = Downloader/SPUDownloaderProtocol.h; sourceTree = SOURCE_ROOT; };
+		723C8A521E2D60DB00C14942 /* SUTouchBarButtonGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUTouchBarButtonGroup.h; sourceTree = "<group>"; };
+		723C8A531E2D60DB00C14942 /* SUTouchBarButtonGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUTouchBarButtonGroup.m; sourceTree = "<group>"; };
 		7246E0A11C83B685003B4E75 /* SPUStandardUpdaterController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUStandardUpdaterController.h; sourceTree = "<group>"; };
 		7246E0A21C83B685003B4E75 /* SPUStandardUpdaterController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUStandardUpdaterController.m; sourceTree = "<group>"; };
 		724BB36C1D31D0B7005D534A /* org.sparkle-project.InstallerConnection.xpc */ = {isa = PBXFileReference; explicitFileType = "wrapper.xpc-service"; includeInIndex = 0; path = "org.sparkle-project.InstallerConnection.xpc"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1640,6 +1645,8 @@
 				61B5FCA109C5228F00B25A18 /* SUUpdateAlert.m */,
 				612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */,
 				612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */,
+				723C8A521E2D60DB00C14942 /* SUTouchBarButtonGroup.h */,
+				723C8A531E2D60DB00C14942 /* SUTouchBarButtonGroup.m */,
 				3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */,
 			);
 			name = "User Interface";
@@ -2085,6 +2092,7 @@
 				721BC20E1D1CDE55002BC71E /* SPULocalCacheDirectory.h in Headers */,
 				7267E5B11D3D8AD500D1BF90 /* SPUMessageTypes.h in Headers */,
 				728337A61C9E6FF40085AA99 /* SPUProbeInstallStatus.h in Headers */,
+				723C8A541E2D60DB00C14942 /* SUTouchBarButtonGroup.h in Headers */,
 				72B767D21C9C7B9300A07552 /* SPUProbingUpdateDriver.h in Headers */,
 				7229E1B91C97CC4D00CB50D0 /* SPUScheduledUpdateDriver.h in Headers */,
 				726E075C1CA3A6D6001A286B /* SPUSecureCoding.h in Headers */,
@@ -3011,6 +3019,7 @@
 				72D954831CBAD34F006F28BD /* main.m in Sources */,
 				72EB87EA1CB8798800C37F42 /* ShowInstallerProgress.m in Sources */,
 				7267E5DC1D3D8F1E00D1BF90 /* SPUMessageTypes.m in Sources */,
+				723C8A561E2D60DB00C14942 /* SUTouchBarButtonGroup.m in Sources */,
 				721652621D3C44A100FD13D8 /* SPUSystemAuthorization.m in Sources */,
 				7267E5FA1D3DAC3600D1BF90 /* StatusInfo.m in Sources */,
 				720595EF1D700568000572E8 /* SUApplicationInfo.m in Sources */,
@@ -3226,6 +3235,7 @@
 				7246E0A41C83B685003B4E75 /* SPUStandardUpdaterController.m in Sources */,
 				725CB95B1C7121830064365A /* SPUStandardUserDriver.m in Sources */,
 				724BB3B01D3482BA005D534A /* SPUSystemAuthorization.m in Sources */,
+				723C8A551E2D60DB00C14942 /* SUTouchBarButtonGroup.m in Sources */,
 				72B767DB1C9CD2E400A07552 /* SPUUIBasedUpdateDriver.m in Sources */,
 				72DBA37E1D60CC34002594A8 /* SPUUpdatePermissionRequest.m in Sources */,
 				61B5F8EE09C4CE3C00B25A18 /* SPUUpdater.m in Sources */,

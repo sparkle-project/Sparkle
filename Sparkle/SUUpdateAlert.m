@@ -22,6 +22,10 @@
 #import "SPUDownloadData.h"
 #import "SUApplicationInfo.h"
 #import "SPUUpdaterSettings.h"
+#import "SUSystemUpdateInfo.h"
+#import "SUTouchBarButtonGroup.h"
+
+static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUUpdateAlert";
 
 // WebKit protocols are not explicitly declared until 10.11 SDK, so
 // declare dummy protocols to keep the build working on earlier SDKs.
@@ -32,7 +36,7 @@
 @end
 #endif
 
-@interface SUUpdateAlert () <WebFrameLoadDelegate, WebPolicyDelegate>
+@interface SUUpdateAlert () <WebFrameLoadDelegate, WebPolicyDelegate, NSTouchBarDelegate>
 
 @property (strong) SUAppcastItem *updateItem;
 @property (nonatomic) BOOL alreadyDownloaded;
@@ -440,6 +444,25 @@
     }
 
     return webViewMenuItems;
+}
+
+- (NSTouchBar *)makeTouchBar
+{
+    NSTouchBar *touchBar = [[NSTouchBar alloc] init];
+    touchBar.defaultItemIdentifiers = @[SUUpdateAlertTouchBarIndentifier,];
+    touchBar.principalItemIdentifier = SUUpdateAlertTouchBarIndentifier;
+    touchBar.delegate = self;
+    return touchBar;
+}
+
+- (NSTouchBarItem *)touchBar:(NSTouchBar * __unused)touchBar makeItemForIdentifier:(NSTouchBarItemIdentifier)identifier
+{
+    if ([identifier isEqualToString:SUUpdateAlertTouchBarIndentifier]) {
+        NSCustomTouchBarItem* item = [[NSCustomTouchBarItem alloc] initWithIdentifier:identifier];
+        item.viewController = [[SUTouchBarButtonGroup alloc] initByReferencingButtons:@[self.installButton, self.laterButton, self.skipButton]];
+        return item;
+    }
+    return nil;
 }
 
 @end
