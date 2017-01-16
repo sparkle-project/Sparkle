@@ -21,9 +21,6 @@
 const NSTimeInterval SUMinimumUpdateCheckInterval = DEBUG ? 60 : (60 * 60);
 const NSTimeInterval SUDefaultUpdateCheckInterval = DEBUG ? 60 : (60 * 60 * 24);
 
-// Define the amount of time between Sparkle being started for the first time and before we can prompt the user for permission about checking for updates automatically
-const NSTimeInterval SUDefaultUpdatePermissionPromptInterval = DEBUG ? (60 * 3) : (60 * 60 * 3);
-
 // If the update has already been automatically downloaded, we normally don't want to bug the user about the update
 // However if the user has gone a very long time without quitting an application, we will bug them
 // This is the time interval for a "week"; it doesn't matter that this measure is imprecise.
@@ -34,6 +31,7 @@ NSString *const SUBundleIdentifier = @SPARKLE_BUNDLE_IDENTIFIER;
 NSString *const SUTechnicalErrorInformationKey = @"SUTechnicalErrorInformation";
 
 NSString *const SUFeedURLKey = @"SUFeedURL";
+NSString *const SUHasLaunchedBeforeKey = @"SUHasLaunchedBefore";
 NSString *const SUShowReleaseNotesKey = @"SUShowReleaseNotes";
 NSString *const SUSkippedVersionKey = @"SUSkippedVersion";
 NSString *const SUScheduledCheckIntervalKey = @"SUScheduledCheckInterval";
@@ -48,7 +46,6 @@ NSString *const SUEnableAutomaticChecksKey = @"SUEnableAutomaticChecks";
 NSString *const SUSendProfileInfoKey = @"SUSendProfileInfo";
 NSString *const SULastProfileSubmitDateKey = @"SULastProfileSubmissionDate";
 NSString *const SUPromptUserOnFirstLaunchKey = @"SUPromptUserOnFirstLaunch";
-NSString *const SUTimeIntervalAtFirstLaunchKey = @"SUTimeIntervalAtTheFirstLaunch";
 NSString *const SUEnableJavaScriptKey = @"SUEnableJavaScript";
 NSString *const SUFixedHTMLDisplaySizeKey = @"SUFixedHTMLDisplaySize";
 NSString *const SUKeepDownloadOnFailedInstallKey = @"SUKeepDownloadOnFailedInstall";

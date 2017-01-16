@@ -34,6 +34,7 @@ extern NSString *const SUTechnicalErrorInformationKey;
 // -----------------------------------------------------------------------------
 
 extern NSString *const SUFeedURLKey;
+extern NSString *const SUHasLaunchedBeforeKey;
 extern NSString *const SUShowReleaseNotesKey;
 extern NSString *const SUSkippedVersionKey;
 extern NSString *const SUScheduledCheckIntervalKey;
@@ -48,7 +49,6 @@ extern NSString *const SUEnableSystemProfilingKey;
 extern NSString *const SUSendProfileInfoKey;
 extern NSString *const SULastProfileSubmitDateKey;
 extern NSString *const SUPromptUserOnFirstLaunchKey;
-extern NSString *const SUTimeIntervalAtFirstLaunchKey;
 extern NSString *const SUKeepDownloadOnFailedInstallKey;
 extern NSString *const SUDefaultsDomainKey;
 extern NSString *const SUEnableJavaScriptKey;
