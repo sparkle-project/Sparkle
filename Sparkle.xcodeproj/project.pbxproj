@@ -263,6 +263,9 @@
 		767B61AE1972D488004E0C3C /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */; };
 		A5BF4F1D1BC7668B007A052A /* SUTestWebServer.m in Sources */ = {isa = PBXBuildFile; fileRef = A5BF4F1C1BC7668B007A052A /* SUTestWebServer.m */; };
 		C23E885B1BE7B24F0050BB73 /* SparkleTestCodeSignApp.enc.dmg in Resources */ = {isa = PBXBuildFile; fileRef = C23E88591BE7AF890050BB73 /* SparkleTestCodeSignApp.enc.dmg */; };
+		E1545EC51E1D7E0200FAECE8 /* SUTouchBarButtonGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = E1545EC31E1D7E0200FAECE8 /* SUTouchBarButtonGroup.h */; };
+		E1545EC61E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = E1545EC41E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m */; settings = {COMPILER_FLAGS = "-Wno-partial-availability"; }; };
+		E1EC2A301E21667000245715 /* SUTouchBarButtonGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = E1545EC41E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m */; settings = {COMPILER_FLAGS = "-Wno-partial-availability"; }; };
 		F8761EB11ADC5068000C9034 /* SUCodeSigningVerifierTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */; };
 		F8761EB31ADC50EB000C9034 /* SparkleTestCodeSignApp.zip in Resources */ = {isa = PBXBuildFile; fileRef = F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */; };
 		F8761EB61ADC5E7A000C9034 /* SUCodeSigningVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B078CD15A5FB6100600039 /* SUCodeSigningVerifier.m */; };
@@ -795,6 +798,8 @@
 		A5BF4F1B1BC7668B007A052A /* SUTestWebServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUTestWebServer.h; sourceTree = "<group>"; };
 		A5BF4F1C1BC7668B007A052A /* SUTestWebServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUTestWebServer.m; sourceTree = "<group>"; };
 		C23E88591BE7AF890050BB73 /* SparkleTestCodeSignApp.enc.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSignApp.enc.dmg; sourceTree = "<group>"; };
+		E1545EC31E1D7E0200FAECE8 /* SUTouchBarButtonGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUTouchBarButtonGroup.h; sourceTree = "<group>"; };
+		E1545EC41E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUTouchBarButtonGroup.m; sourceTree = "<group>"; };
 		F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUCodeSigningVerifierTest.m; sourceTree = "<group>"; };
 		F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = SparkleTestCodeSignApp.zip; sourceTree = "<group>"; };
 		FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkDebug.xcconfig; sourceTree = "<group>"; };
@@ -1175,6 +1180,8 @@
 				612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */,
 				7205C42F1E1215AD00E370AE /* SUUpdatePermissionResponse.h */,
 				7205C4301E1215AD00E370AE /* SUUpdatePermissionResponse.m */,
+				E1545EC31E1D7E0200FAECE8 /* SUTouchBarButtonGroup.h */,
+				E1545EC41E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m */,
 			);
 			name = "User Interface";
 			sourceTree = "<group>";
@@ -1378,6 +1385,7 @@
 				6102FE4A0E07803800F85D09 /* SUDiskImageUnarchiver.h in Headers */,
 				61299A2F09CA2DAB00B7442F /* SUDSAVerifier.h in Headers */,
 				55E6F33319EC9F6C00005E76 /* SUErrors.h in Headers */,
+				E1545EC51E1D7E0200FAECE8 /* SUTouchBarButtonGroup.h in Headers */,
 				14652F8419A978C200959E44 /* SUExport.h in Headers */,
 				7275F9C11B5F1F2900B1D19E /* SUFileManager.h in Headers */,
 				722954C41D04E66F00ECF9CA /* SUFileOperationConstants.h in Headers */,
@@ -1862,6 +1870,7 @@
 				55C14F22136EF86000649790 /* SUStandardVersionComparator.m in Sources */,
 				55C14F20136EF84300649790 /* SUStatusController.m in Sources */,
 				55C14F23136EF86700649790 /* SUSystemProfiler.m in Sources */,
+				E1EC2A301E21667000245715 /* SUTouchBarButtonGroup.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2009,6 +2018,7 @@
 				6196CFFA09C72149000DC222 /* SUStatusController.m in Sources */,
 				61A2279D0D1CEE7600430CCD /* SUSystemProfiler.m in Sources */,
 				72316BE41E0E1C7F0039EFD9 /* SUSystemUpdateInfo.m in Sources */,
+				E1545EC61E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m in Sources */,
 				61B93A3D0DD02D7000DCD2F8 /* SUUIBasedUpdateDriver.m in Sources */,
 				61299A8E09CA790200B7442F /* SUUnarchiver.m in Sources */,
 				722589DB1E0B19F4005EA0B9 /* SUUnarchiverNotifier.m in Sources */,

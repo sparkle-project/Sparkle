@@ -89,7 +89,7 @@ class SUTestApplicationTest: XCTestCase
         app.dialogs["SUUpdateAlert"].staticTexts["Software Update"].click()
         
         app.dialogs["SUUpdateAlert"].buttons["Install Update"].click()
-        app.buttons["Install and Relaunch"].click()
+        app.windows["SUStatus"].buttons["Install and Relaunch"].click()
         
         // Wait for the new updated app to finish launching so we can test if it's the frontmost app
         sleep(3)
