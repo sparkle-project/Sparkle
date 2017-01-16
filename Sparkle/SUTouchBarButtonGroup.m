@@ -28,6 +28,8 @@
         buttonCopy.tag = button.tag;
         buttonCopy.enabled = button.enabled;
         
+        // Must be set explicitly, because NSWindow clears it
+        // https://github.com/sparkle-project/Sparkle/pull/987#issuecomment-271539319
         if (i == 0) {
             buttonCopy.keyEquivalent = @"\r";
         }
@@ -37,6 +39,8 @@
         [buttonCopies addObject:buttonCopy];
         [buttonGroup addSubview:buttonCopy];
         
+        // Custom layout is used for equal width buttons, to look more keyboard-like and mimic standard alerts
+        // https://github.com/sparkle-project/Sparkle/pull/987#issuecomment-272324726
         [constraints addObject:[NSLayoutConstraint constraintWithItem:buttonCopy attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:buttonGroup attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0]];
         [constraints addObject:[NSLayoutConstraint constraintWithItem:buttonCopy attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:buttonGroup attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0.0]];
         if (i == 0) {
