@@ -52,7 +52,6 @@ New Sparkle classes are now prefixed with `SPU` rather than `SU`. Older classes 
 
 ## Misc. Changes
 
-* Unless overridden, Sparkle now waits 3 hours before prompting the user for updater permission, rather than waiting for a 2nd launch.
 * Updates are more instant to install once extracted. The "installing update" dialog seldomly shows up after the old application quits.
 * The installer will attempt installing the update after extraction is finished, even if the user quits the process and doesn't relaunch the application explicitly.
 * Updates can be downloaded in the background automatically (if enabled) and be resumed by the user later, even if the user has insufficent permission to install them initially.
