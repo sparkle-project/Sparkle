@@ -13,6 +13,7 @@
 #import "SUConstants.h"
 #import "SULocalizations.h"
 #import "SUApplicationInfo.h"
+#import "SUTouchBarForwardDeclarations.h"
 #import "SUTouchBarButtonGroup.h"
 
 static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUUpdatePermissionPrompt";
@@ -169,7 +170,7 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 
 - (NSTouchBar *)makeTouchBar
 {
-    NSTouchBar *touchBar = [[NSTouchBar alloc] init];
+    NSTouchBar *touchBar = [[NSClassFromString(@"NSTouchBar") alloc] init];
     touchBar.defaultItemIdentifiers = @[SUUpdatePermissionPromptTouchBarIndentifier,];
     touchBar.principalItemIdentifier = SUUpdatePermissionPromptTouchBarIndentifier;
     touchBar.delegate = self;
@@ -179,7 +180,7 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 - (NSTouchBarItem *)touchBar:(NSTouchBar * __unused)touchBar makeItemForIdentifier:(NSTouchBarItemIdentifier)identifier
 {
     if ([identifier isEqualToString:SUUpdatePermissionPromptTouchBarIndentifier]) {
-        NSCustomTouchBarItem* item = [[NSCustomTouchBarItem alloc] initWithIdentifier:identifier];
+        NSCustomTouchBarItem* item = [(NSCustomTouchBarItem *)[NSClassFromString(@"NSCustomTouchBarItem") alloc] initWithIdentifier:identifier];
         item.viewController = [[SUTouchBarButtonGroup alloc] initByReferencingButtons:@[self.checkButton, self.cancelButton]];
         return item;
     }
