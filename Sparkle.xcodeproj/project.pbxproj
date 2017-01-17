@@ -1175,15 +1175,15 @@
 				6120721109CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.m */,
 				6196CFE309C71ADE000DC222 /* SUStatusController.h */,
 				6196CFE409C71ADE000DC222 /* SUStatusController.m */,
+				E1545EC31E1D7E0200FAECE8 /* SUTouchBarButtonGroup.h */,
+				E1545EC41E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m */,
+				E19CA4901E2E7E4D009D4D18 /* SUTouchBarForwardDeclarations.h */,
 				61B5FCA009C5228F00B25A18 /* SUUpdateAlert.h */,
 				61B5FCA109C5228F00B25A18 /* SUUpdateAlert.m */,
 				612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */,
 				612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */,
 				7205C42F1E1215AD00E370AE /* SUUpdatePermissionResponse.h */,
 				7205C4301E1215AD00E370AE /* SUUpdatePermissionResponse.m */,
-				E1545EC31E1D7E0200FAECE8 /* SUTouchBarButtonGroup.h */,
-				E1545EC41E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m */,
-				E19CA4901E2E7E4D009D4D18 /* SUTouchBarForwardDeclarations.h */,
 			);
 			name = "User Interface";
 			sourceTree = "<group>";
@@ -1387,7 +1387,6 @@
 				6102FE4A0E07803800F85D09 /* SUDiskImageUnarchiver.h in Headers */,
 				61299A2F09CA2DAB00B7442F /* SUDSAVerifier.h in Headers */,
 				55E6F33319EC9F6C00005E76 /* SUErrors.h in Headers */,
-				E1545EC51E1D7E0200FAECE8 /* SUTouchBarButtonGroup.h in Headers */,
 				14652F8419A978C200959E44 /* SUExport.h in Headers */,
 				7275F9C11B5F1F2900B1D19E /* SUFileManager.h in Headers */,
 				722954C41D04E66F00ECF9CA /* SUFileOperationConstants.h in Headers */,
@@ -1406,6 +1405,7 @@
 				6196CFF909C72148000DC222 /* SUStatusController.h in Headers */,
 				61A2279C0D1CEE7600430CCD /* SUSystemProfiler.h in Headers */,
 				72316BE31E0E1C7F0039EFD9 /* SUSystemUpdateInfo.h in Headers */,
+				E1545EC51E1D7E0200FAECE8 /* SUTouchBarButtonGroup.h in Headers */,
 				61B93A3C0DD02D7000DCD2F8 /* SUUIBasedUpdateDriver.h in Headers */,
 				61299A8D09CA790200B7442F /* SUUnarchiver.h in Headers */,
 				722589DA1E0B19F4005EA0B9 /* SUUnarchiverNotifier.h in Headers */,
@@ -1880,7 +1880,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				72464F7D1E213ED400FB341C /* SUOperatingSystem.m in Sources */,
 				5AE13FA01E0D4F65000D2C2C /* Appcast.swift in Sources */,
 				5AAD00521E0BE6BE00AF411E /* ArchiveItem.swift in Sources */,
 				5AAD00681E0C2DAB00AF411E /* bscommon.c in Sources */,
@@ -1899,6 +1898,7 @@
 				5AE13FA21E0D716F000D2C2C /* SUFileManager.m in Sources */,
 				5AE13FA41E0D71D1000D2C2C /* SUFileOperationConstants.m in Sources */,
 				5AE13FB81E0D9F8E000D2C2C /* SULog.m in Sources */,
+				72464F7D1E213ED400FB341C /* SUOperatingSystem.m in Sources */,
 				5AE13FB61E0D9F39000D2C2C /* SUPipedUnarchiver.m in Sources */,
 				5AE13FA61E0D7275000D2C2C /* SUStandardVersionComparator.m in Sources */,
 				5AE13FA11E0D7168000D2C2C /* SUUnarchiver.m in Sources */,
