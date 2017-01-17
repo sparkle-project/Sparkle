@@ -11,6 +11,9 @@
 #import "SULog.h"
 #import "SUErrors.h"
 
+
+#include "AppKitPrevention.h"
+
 @interface SUPipedUnarchiver ()
 
 @property (nonatomic, copy, readonly) NSString *archivePath;

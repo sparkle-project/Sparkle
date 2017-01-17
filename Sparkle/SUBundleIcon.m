@@ -9,6 +9,9 @@
 #import "SUBundleIcon.h"
 #import "SUHost.h"
 
+
+#include "AppKitPrevention.h"
+
 @implementation SUBundleIcon
 
 // Note: To obtain the most current bundle icon file from the Info dictionary, this should take a SUHost, not a NSBundle

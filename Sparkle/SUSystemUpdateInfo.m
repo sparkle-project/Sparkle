@@ -11,6 +11,9 @@
 #import "SUConstants.h"
 #import "SUFileManager.h"
 
+
+#include "AppKitPrevention.h"
+
 @implementation SUSystemUpdateInfo
 
 + (BOOL)systemAllowsAutomaticUpdatesForHost:(SUHost *)host

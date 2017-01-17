@@ -14,6 +14,9 @@
 #import "SULog.h"
 #import "SUErrors.h"
 
+
+#include "AppKitPrevention.h"
+
 @interface SUPlainInstaller ()
 
 @property (nonatomic, readonly) SUHost *host;

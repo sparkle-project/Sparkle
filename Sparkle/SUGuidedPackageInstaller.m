@@ -9,6 +9,9 @@
 #import "SUGuidedPackageInstaller.h"
 #import "SUFileManager.h"
 
+
+#include "AppKitPrevention.h"
+
 @interface SUGuidedPackageInstaller ()
 
 @property (nonatomic, readonly, copy) NSString *packagePath;

@@ -15,6 +15,9 @@
 #import "SULog.h"
 #import "SUErrors.h"
 
+
+#include "AppKitPrevention.h"
+
 @implementation SUInstaller
 
 + (BOOL)isAliasFolderAtPath:(NSString *)path

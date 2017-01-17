@@ -9,6 +9,9 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SUStandardVersionComparator.h"
 
+
+#include "AppKitPrevention.h"
+
 @implementation SUStandardVersionComparator
 
 - (instancetype)init

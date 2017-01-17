@@ -13,6 +13,9 @@
 #import "SUHost.h"
 #import "SULog.h"
 
+
+#include "AppKitPrevention.h"
+
 @interface SUUpdateValidator ()
 
 @property (nonatomic, readonly) SUHost *host;

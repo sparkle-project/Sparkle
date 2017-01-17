@@ -8,6 +8,9 @@
 
 #import "SUFileOperationConstants.h"
 
+
+#include "AppKitPrevention.h"
+
 char * const SUFileOpRemoveQuarantineCommand = "xattr-d-apple-quarantine";
 char * const SUFileOpCopyCommand = "cp";
 char * const SUFileOpMoveCommand = "mv";
