@@ -7,66 +7,9 @@
 #import "SUStatusController.h"
 #import "SULog.h"
 #import "SUInstallerProtocol.h"
+#import "TerminationListener.h"
 
 #include <unistd.h>
-
-/*!
- * Time this app uses to recheck if the parent has already died.
- */
-static const NSTimeInterval SUParentQuitCheckInterval = .25;
-
-@interface TerminationListener : NSObject
-
-- (instancetype)initWithProcessId:(pid_t)pid;
-
-@end
-
-@interface TerminationListener ()
-
-@property (nonatomic, assign) pid_t processIdentifier;
-@property (nonatomic, strong) NSTimer *watchdogTimer;
-
-@end
-
-@implementation TerminationListener
-
-@synthesize processIdentifier = _processIdentifier;
-@synthesize watchdogTimer = _watchdogTimer;
-
-- (instancetype)initWithProcessId:(pid_t)pid
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    self.processIdentifier = pid;
-
-    return self;
-}
-
-- (void)cleanupWithCompletion:(void (^)(void))completionBlock
-{
-    [self.watchdogTimer invalidate];
-    completionBlock();
-}
-
-- (void)startListeningWithCompletion:(void (^)(void))completionBlock
-{
-    BOOL alreadyTerminated = (getppid() == 1); // ppid is launchd (1) => parent terminated already
-    if (alreadyTerminated)
-        [self cleanupWithCompletion:completionBlock];
-    else
-        self.watchdogTimer = [NSTimer scheduledTimerWithTimeInterval:SUParentQuitCheckInterval target:self selector:@selector(watchdog:) userInfo:completionBlock repeats:YES];
-}
-
-- (void)watchdog:(NSTimer *)timer
-{
-    if (![NSRunningApplication runningApplicationWithProcessIdentifier:self.processIdentifier]) {
-        [self cleanupWithCompletion:timer.userInfo];
-    }
-}
-
-@end
 
 /*!
  * If the Installation takes longer than this time the Application Icon is shown in the Dock so that the user has some feedback.
@@ -128,7 +71,8 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
     
     self.hostPath = hostPath;
     self.relaunchPath = relaunchPath;
-    self.terminationListener = [[TerminationListener alloc] initWithProcessId:parentProcessId];
+    SULog(SULogLevelDefault, @"PID to listen: %d", parentProcessId);
+    self.terminationListener = [[TerminationListener alloc] initWithProcessIdentifier:@(parentProcessId)];
     self.updateFolderPath = updateFolderPath;
     self.shouldRelaunch = shouldRelaunch;
     self.shouldShowUI = shouldShowUI;
@@ -138,8 +82,16 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 
 - (void)applicationDidFinishLaunching:(NSNotification __unused *)notification
 {
-    [self.terminationListener startListeningWithCompletion:^{
+    SULog(SULogLevelDefault, @"GONNA PID LISTEN");
+    [self.terminationListener startListeningWithCompletion:^(BOOL terminationSuccess) {
+        SULog(SULogLevelDefault, @"LISTENING COMPLETION RESUME");
+        
         self.terminationListener = nil;
+        
+        if (!terminationSuccess) {
+            SULog(SULogLevelError, @"Failed to listen for application termination");
+            // Continue on with the installation anyway..
+        }
 		
         if (self.shouldShowUI) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SUInstallationTimeLimit * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
