@@ -10,7 +10,7 @@
 
 #import <Foundation/Foundation.h>
 
-#if !defined(MAC_OS_X_VERSION_10_12_1)
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101201
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -78,7 +78,7 @@ NS_CLASS_AVAILABLE_MAC(10_12_2)
 
 NS_ASSUME_NONNULL_END
 
-#elif MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_12_1
+#else
 
 // When compiling against the 10.12.1 SDK or later, just provide forward
 // declarations to suppress the partial availability warnings.
@@ -88,4 +88,4 @@ NS_ASSUME_NONNULL_END
 @class NSTouchBarItem;
 @class NSCustomTouchBarItem;
 
-#endif  // MAC_OS_X_VERSION_10_12_1
+#endif
