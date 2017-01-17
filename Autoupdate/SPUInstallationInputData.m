@@ -9,9 +9,8 @@
 #import "SPUInstallationInputData.h"
 #import "SPUInstallationType.h"
 
-#ifdef _APPKITDEFINES_H
-#error This is a "daemon-safe" class and should NOT import AppKit
-#endif
+
+#include "AppKitPrevention.h"
 
 static NSString *SURelaunchPathKey = @"SURelaunchPath";
 static NSString *SUHostBundlePathKey = @"SUHostBundlePath";

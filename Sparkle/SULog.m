@@ -11,9 +11,8 @@
 #include <os/log.h>
 #import "SUOperatingSystem.h"
 
-#ifdef _APPKITDEFINES_H
-#error This is a "core" implementation and should NOT import AppKit
-#endif
+
+#include "AppKitPrevention.h"
 
 // For converting constants to string literals using the preprocessor
 #define STRINGIFY(x) #x

@@ -21,9 +21,8 @@
 #include <sys/xattr.h>
 #include <xar/xar.h>
 
-#ifdef _APPKITDEFINES_H
-#error This is a "core" class and should NOT import AppKit
-#endif
+
+#include "AppKitPrevention.h"
 
 extern int bsdiff(int argc, const char **argv);
 

@@ -11,9 +11,8 @@
 #import "SPUInstallerAgentProtocol.h"
 #import "SUInstallerAgentInitiationProtocol.h"
 
-#ifdef _APPKITDEFINES_H
-#error This is a "daemon-safe" class and should NOT import AppKit
-#endif
+
+#include "AppKitPrevention.h"
 
 @interface AgentConnection () <NSXPCListenerDelegate, SUInstallerAgentInitiationProtocol>
 

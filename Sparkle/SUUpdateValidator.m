@@ -13,9 +13,8 @@
 #import "SUHost.h"
 #import "SULog.h"
 
-#ifdef _APPKITDEFINES_H
-#error This is a "daemon-safe" class and should NOT import AppKit
-#endif
+
+#include "AppKitPrevention.h"
 
 @interface SUUpdateValidator ()
 

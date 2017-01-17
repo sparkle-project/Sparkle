@@ -7,9 +7,8 @@
 
 #import "SUOperatingSystem.h"
 
-#ifdef _APPKITDEFINES_H
-#error This is a "core" class and should NOT import AppKit
-#endif
+
+#include "AppKitPrevention.h"
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED < 101000
 @interface NSProcessInfo ()

@@ -956,6 +956,7 @@
 		7205C46D1E13245600E370AE /* ConfigUnitTestRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUnitTestRelease.xcconfig; sourceTree = "<group>"; };
 		7205C46E1E13254500E370AE /* ConfigUITestDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestDebug.xcconfig; sourceTree = "<group>"; };
 		7205C46F1E13255900E370AE /* ConfigUITestRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestRelease.xcconfig; sourceTree = "<group>"; };
+		720767D11E2EB86200F9A850 /* AppKitPrevention.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppKitPrevention.h; sourceTree = "<group>"; };
 		720B16421C66433D006985FB /* UITests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "UITests-Info.plist"; path = "UITests/UITests-Info.plist"; sourceTree = SOURCE_ROOT; };
 		720B16431C66433D006985FB /* SUTestApplicationTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SUTestApplicationTest.swift; path = UITests/SUTestApplicationTest.swift; sourceTree = SOURCE_ROOT; };
 		720E21791D0D00BF003A311C /* SPUUpdaterCycle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUUpdaterCycle.h; sourceTree = "<group>"; };
@@ -1502,6 +1503,7 @@
 		1495006D195FBBBD00BC5B5B /* Sparkle */ = {
 			isa = PBXGroup;
 			children = (
+				720767D11E2EB86200F9A850 /* AppKitPrevention.h */,
 				61299B3909CB055000B7442F /* Appcast Support */,
 				55C14BD5136EEFD000649790 /* Autoupdate */,
 				72F9EBE41D519425004AC8B6 /* Deprecated */,

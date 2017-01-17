@@ -15,9 +15,8 @@
 #import "SUXPCInstallerStatus.h"
 #import "SULog.h"
 
-#ifdef _APPKITDEFINES_H
-#error This is a "core" class and should NOT import AppKit
-#endif
+
+#include "AppKitPrevention.h"
 
 // This timeout is if probing the installer takes too long
 // It should be at least more than 1 second since a probe can take around that much time

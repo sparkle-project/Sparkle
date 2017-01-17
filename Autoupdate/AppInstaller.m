@@ -28,9 +28,8 @@
 #import "SPUInstallationType.h"
 #import "SPULocalCacheDirectory.h"
 
-#ifdef _APPKITDEFINES_H
-#error This is a "daemon-safe" class and should NOT import AppKit
-#endif
+
+#include "AppKitPrevention.h"
 
 #define FIRST_UPDATER_MESSAGE_TIMEOUT 7ull
 #define RETRIEVE_PROCESS_IDENTIFIER_TIMEOUT 5ull

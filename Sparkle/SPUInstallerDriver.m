@@ -26,9 +26,8 @@
 #import "SPUDownloadedUpdate.h"
 #import "SPUInstallationType.h"
 
-#ifdef _APPKITDEFINES_H
-#error This is a "core" class and should NOT import AppKit
-#endif
+
+#include "AppKitPrevention.h"
 
 #define FIRST_INSTALLER_MESSAGE_TIMEOUT 7ull
 

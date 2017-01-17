@@ -17,9 +17,8 @@
 #import "SPUURLDownload.h"
 #import "SPUDownloadData.h"
 
-#ifdef _APPKITDEFINES_H
-#error This is a "core" class and should NOT import AppKit
-#endif
+
+#include "AppKitPrevention.h"
 
 @interface NSXMLElement (SUAppcastExtensions)
 @property (readonly, copy) NSDictionary *attributesAsDictionary;

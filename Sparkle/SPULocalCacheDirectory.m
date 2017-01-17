@@ -9,9 +9,8 @@
 #import "SPULocalCacheDirectory.h"
 #import "SULog.h"
 
-#ifdef _APPKITDEFINES_H
-#error This is a "core" class and should NOT import AppKit
-#endif
+
+#include "AppKitPrevention.h"
 
 static NSTimeInterval OLD_ITEM_DELETION_INTERVAL = 86400 * 10; // 10 days
 
