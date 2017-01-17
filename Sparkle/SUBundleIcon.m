@@ -8,6 +8,9 @@
 
 #import "SUBundleIcon.h"
 
+
+#include "AppKitPrevention.h"
+
 @implementation SUBundleIcon
 
 + (NSURL *)iconURLForBundle:(NSBundle *)bundle

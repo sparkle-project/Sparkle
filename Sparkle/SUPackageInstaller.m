@@ -11,6 +11,9 @@
 #import "SUErrors.h"
 #import "SULog.h"
 
+
+#include "AppKitPrevention.h"
+
 @interface SUPackageInstaller ()
 
 @property (nonatomic, readonly, copy) NSString *packagePath;

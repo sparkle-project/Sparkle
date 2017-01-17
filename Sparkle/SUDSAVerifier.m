@@ -16,6 +16,9 @@
 #import "SULog.h"
 #include <CommonCrypto/CommonDigest.h>
 
+
+#include "AppKitPrevention.h"
+
 @implementation SUDSAVerifier {
     SecKeyRef _secKey;
 }

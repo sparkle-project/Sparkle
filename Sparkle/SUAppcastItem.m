@@ -10,6 +10,9 @@
 #import "SULog.h"
 #import "SUConstants.h"
 
+
+#include "AppKitPrevention.h"
+
 @interface SUAppcastItem ()
 @property (copy, readwrite) NSString *title;
 @property (copy, readwrite) NSString *dateString;

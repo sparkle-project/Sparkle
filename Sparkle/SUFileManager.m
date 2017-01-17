@@ -15,6 +15,9 @@
 #include <sys/errno.h>
 #include <sys/time.h>
 
+
+#include "AppKitPrevention.h"
+
 static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
 
 static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {

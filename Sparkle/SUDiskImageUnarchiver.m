@@ -10,6 +10,9 @@
 #import "SUUnarchiverNotifier.h"
 #import "SULog.h"
 
+
+#include "AppKitPrevention.h"
+
 @interface SUDiskImageUnarchiver ()
 
 @property (nonatomic, copy, readonly) NSString *archivePath;

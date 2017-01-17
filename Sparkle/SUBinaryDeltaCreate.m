@@ -21,6 +21,9 @@
 #include <sys/xattr.h>
 #include <xar/xar.h>
 
+
+#include "AppKitPrevention.h"
+
 extern int bsdiff(int argc, const char **argv);
 
 @interface CreateBinaryDeltaOperation : NSOperation

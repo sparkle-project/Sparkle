@@ -13,6 +13,9 @@
 #import "SULog.h"
 #import "SUFileManager.h"
 
+
+#include "AppKitPrevention.h"
+
 @interface SUBinaryDeltaUnarchiver ()
 
 @property (nonatomic, copy, readonly) NSString *archivePath;

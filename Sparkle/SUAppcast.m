@@ -12,6 +12,9 @@
 #import "SULocalizations.h"
 #import "SUErrors.h"
 
+
+#include "AppKitPrevention.h"
+
 @interface NSXMLElement (SUAppcastExtensions)
 @property (readonly, copy) NSDictionary *attributesAsDictionary;
 @end

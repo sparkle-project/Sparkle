@@ -9,10 +9,12 @@
 
 #import <Foundation/Foundation.h>
 #import "SUSystemProfiler.h"
-
 #import "SUHost.h"
 #import "SUOperatingSystem.h"
 #include <sys/sysctl.h>
+
+
+#include "AppKitPrevention.h"
 
 static NSString *const SUSystemProfilerApplicationNameKey = @"appName";
 static NSString *const SUSystemProfilerApplicationVersionKey = @"appVersion";

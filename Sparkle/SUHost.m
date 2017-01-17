@@ -11,6 +11,9 @@
 #include <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
 #import "SULog.h"
 
+
+#include "AppKitPrevention.h"
+
 // This class should not rely on AppKit and should also be process independent
 // For example, it should not have code that tests writabilty to somewhere on disk,
 // as that may depend on the privileges of the process owner. Or code that depends on

@@ -11,6 +11,9 @@
 #import "SUCodeSigningVerifier.h"
 #import "SULog.h"
 
+
+#include "AppKitPrevention.h"
+
 @implementation SUCodeSigningVerifier
 
 + (BOOL)codeSignatureAtBundleURL:(NSURL *)oldBundleURL matchesSignatureAtBundleURL:(NSURL *)newBundleURL error:(NSError *__autoreleasing *)error

@@ -10,6 +10,9 @@
 #import "SULocalizations.h"
 #import "SUErrors.h"
 
+
+#include "AppKitPrevention.h"
+
 @interface SUUnarchiverNotifier ()
 
 @property (nonatomic, readonly, copy) void (^completionBlock)(NSError * _Nullable);
