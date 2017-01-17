@@ -57,6 +57,7 @@ NS_CLASS_AVAILABLE_MAC(10_12_2)
 - (instancetype)initWithIdentifier:(NSTouchBarItemIdentifier)identifier NS_DESIGNATED_INITIALIZER;
 - (nullable instancetype)initWithCoder:(NSCoder *)coder NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
++ (instancetype)buttonWithTitle:(NSString *)title target:(nullable id)target action:(nullable SEL)action NS_AVAILABLE_MAC(10_12);
 
 @property (readonly, copy) NSTouchBarItemIdentifier identifier;
 @property NSTouchBarItemPriority visibilityPriority;
