@@ -16,6 +16,10 @@
 #import "SULog.h"
 #include <CommonCrypto/CommonDigest.h>
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 @implementation SUDSAVerifier {
     SecKeyRef _secKey;
 }

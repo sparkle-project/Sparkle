@@ -11,6 +11,10 @@
 #import "SULog.h"
 #import "SUErrors.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 @interface SUPipedUnarchiver ()
 
 @property (nonatomic, copy, readonly) NSString *archivePath;

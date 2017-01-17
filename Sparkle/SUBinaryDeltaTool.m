@@ -20,6 +20,10 @@
 #define VERSION_COMMAND @"version"
 #define VERSION_ALTERNATE_COMMAND @"--version"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 static void printUsage(NSString *programName)
 {
     fprintf(stderr, "Usage:\n");

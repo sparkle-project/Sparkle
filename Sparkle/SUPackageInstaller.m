@@ -11,6 +11,10 @@
 #import "SUErrors.h"
 #import "SULog.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 @interface SUPackageInstaller ()
 
 @property (nonatomic, readonly, copy) NSString *packagePath;

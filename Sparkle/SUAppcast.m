@@ -12,6 +12,10 @@
 #import "SULocalizations.h"
 #import "SUErrors.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 @interface NSXMLElement (SUAppcastExtensions)
 @property (readonly, copy) NSDictionary *attributesAsDictionary;
 @end

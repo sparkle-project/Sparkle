@@ -14,6 +14,10 @@
 #import "SUOperatingSystem.h"
 #include <sys/sysctl.h>
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 static NSString *const SUSystemProfilerApplicationNameKey = @"appName";
 static NSString *const SUSystemProfilerApplicationVersionKey = @"appVersion";
 static NSString *const SUSystemProfilerCPU64bitKey = @"cpu64bit";

@@ -15,6 +15,10 @@
 #include <stdlib.h>
 #include <xar/xar.h>
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 static BOOL applyBinaryDeltaToFile(xar_t x, xar_file_t file, NSString *sourceFilePath, NSString *destinationFilePath)
 {
     NSString *patchFile = temporaryFilename(@"apply-binary-delta");

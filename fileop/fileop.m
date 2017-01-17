@@ -10,6 +10,10 @@
 #import "SUFileManager.h"
 #import "SUFileOperationConstants.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 // If we fail, we exit with a unique status code
 // We don't try to NSLog because the logs can't be seen anywhere,
 // and we don't want to log to a file irresponsibly (especially as root),

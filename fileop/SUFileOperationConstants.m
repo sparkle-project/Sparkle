@@ -8,6 +8,10 @@
 
 #import "SUFileOperationConstants.h"
 
+#ifdef _APPKITDEFINES_H
+#error This is a "core" class and should NOT import AppKit
+#endif
+
 char * const SUFileOpRemoveQuarantineCommand = "xattr-d-apple-quarantine";
 char * const SUFileOpCopyCommand = "cp";
 char * const SUFileOpMoveCommand = "mv";
