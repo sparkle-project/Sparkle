@@ -13,9 +13,7 @@
 #define DEBUG 0
 #endif
 
-#ifdef _APPKITDEFINES_H
-#error This is a "core" class and should NOT import AppKit
-#endif
+#include "AppKitPrevention.h"
 
 // Define some minimum intervals to avoid DoS-like checking attacks
 const NSTimeInterval SUMinimumUpdateCheckInterval = DEBUG ? 60 : (60 * 60);

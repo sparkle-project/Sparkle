@@ -10,9 +10,8 @@
 #import "SUFileManager.h"
 #import "SUFileOperationConstants.h"
 
-#ifdef _APPKITDEFINES_H
-#error This is a "core" class and should NOT import AppKit
-#endif
+
+#include "AppKitPrevention.h"
 
 // If we fail, we exit with a unique status code
 // We don't try to NSLog because the logs can't be seen anywhere,
