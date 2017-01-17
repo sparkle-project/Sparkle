@@ -91,7 +91,11 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  
  \return An array of dictionaries with keys: "key", "value", "displayKey", "displayValue", the latter two being specifically for display to the user.
  */
+#if __has_feature(objc_generics)
 - (NSArray<NSDictionary<NSString *, NSString *> *> *)feedParametersForUpdater:(SPUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
+#else
+- (NSArray *)feedParametersForUpdater:(SPUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
+#endif
 
 /*!
  Returns a custom appcast URL.

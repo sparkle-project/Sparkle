@@ -175,7 +175,11 @@ SU_EXPORT @interface SPUUpdater : NSObject
  
  The keys of this dictionary are HTTP header fields (NSString) and values are corresponding values (NSString)
  */
+#if __has_feature(objc_generics)
 @property (nonatomic, copy, nullable) NSDictionary<NSString *, NSString *> *httpHeaders;
+#else
+@property (nonatomic, copy, nullable) NSDictionary *httpHeaders;
+#endif
 
 /*!
  A property indicating whether or not the user's system profile information is sent when checking for updates.
