@@ -8,10 +8,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class NSTouchBar;
-@class NSTouchBarItem;
-@class NSCustomTouchBarItem;
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface SUTouchBarButtonGroup : NSViewController
