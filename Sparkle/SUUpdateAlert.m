@@ -23,6 +23,7 @@
 #import "SUApplicationInfo.h"
 #import "SPUUpdaterSettings.h"
 #import "SUSystemUpdateInfo.h"
+#import "SUTouchBarForwardDeclarations.h"
 #import "SUTouchBarButtonGroup.h"
 
 static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUUpdateAlert";
@@ -448,7 +449,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (NSTouchBar *)makeTouchBar
 {
-    NSTouchBar *touchBar = [[NSTouchBar alloc] init];
+    NSTouchBar *touchBar = [[NSClassFromString(@"NSTouchBar") alloc] init];
     touchBar.defaultItemIdentifiers = @[SUUpdateAlertTouchBarIndentifier,];
     touchBar.principalItemIdentifier = SUUpdateAlertTouchBarIndentifier;
     touchBar.delegate = self;
@@ -458,7 +459,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 - (NSTouchBarItem *)touchBar:(NSTouchBar * __unused)touchBar makeItemForIdentifier:(NSTouchBarItemIdentifier)identifier
 {
     if ([identifier isEqualToString:SUUpdateAlertTouchBarIndentifier]) {
-        NSCustomTouchBarItem* item = [[NSCustomTouchBarItem alloc] initWithIdentifier:identifier];
+        NSCustomTouchBarItem* item = [(NSCustomTouchBarItem *)[NSClassFromString(@"NSCustomTouchBarItem") alloc] initWithIdentifier:identifier];
         item.viewController = [[SUTouchBarButtonGroup alloc] initByReferencingButtons:@[self.installButton, self.laterButton, self.skipButton]];
         return item;
     }

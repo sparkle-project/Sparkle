@@ -118,6 +118,7 @@
 		7205C4651E1306C400E370AE /* bsdiff.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */; };
 		7205C4661E1306CC00E370AE /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
 		7205C4671E1306E100E370AE /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 72B09CE91CEA18900052EF9E /* bscommon.c */; };
+		720767D31E2EE9C200F9A850 /* SUTouchBarForwardDeclarations.h in Headers */ = {isa = PBXBuildFile; fileRef = 720767D21E2EE9C200F9A850 /* SUTouchBarForwardDeclarations.h */; };
 		720B16451C66433D006985FB /* SUTestApplicationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720B16431C66433D006985FB /* SUTestApplicationTest.swift */; };
 		720E217B1D0D00BF003A311C /* SPUUpdaterCycle.h in Headers */ = {isa = PBXBuildFile; fileRef = 720E21791D0D00BF003A311C /* SPUUpdaterCycle.h */; };
 		720E217C1D0D00BF003A311C /* SPUUpdaterCycle.m in Sources */ = {isa = PBXBuildFile; fileRef = 720E217A1D0D00BF003A311C /* SPUUpdaterCycle.m */; };
@@ -957,6 +958,7 @@
 		7205C46E1E13254500E370AE /* ConfigUITestDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestDebug.xcconfig; sourceTree = "<group>"; };
 		7205C46F1E13255900E370AE /* ConfigUITestRelease.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigUITestRelease.xcconfig; sourceTree = "<group>"; };
 		720767D11E2EB86200F9A850 /* AppKitPrevention.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppKitPrevention.h; sourceTree = "<group>"; };
+		720767D21E2EE9C200F9A850 /* SUTouchBarForwardDeclarations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUTouchBarForwardDeclarations.h; sourceTree = "<group>"; };
 		720B16421C66433D006985FB /* UITests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "UITests-Info.plist"; path = "UITests/UITests-Info.plist"; sourceTree = SOURCE_ROOT; };
 		720B16431C66433D006985FB /* SUTestApplicationTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SUTestApplicationTest.swift; path = UITests/SUTestApplicationTest.swift; sourceTree = SOURCE_ROOT; };
 		720E21791D0D00BF003A311C /* SPUUpdaterCycle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUUpdaterCycle.h; sourceTree = "<group>"; };
@@ -1647,6 +1649,7 @@
 				61B5FCA109C5228F00B25A18 /* SUUpdateAlert.m */,
 				612DCBAD0D488BC60015DBEA /* SUUpdatePermissionPrompt.h */,
 				612DCBAE0D488BC60015DBEA /* SUUpdatePermissionPrompt.m */,
+				720767D21E2EE9C200F9A850 /* SUTouchBarForwardDeclarations.h */,
 				723C8A521E2D60DB00C14942 /* SUTouchBarButtonGroup.h */,
 				723C8A531E2D60DB00C14942 /* SUTouchBarButtonGroup.m */,
 				3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */,
@@ -2122,6 +2125,7 @@
 				61B5FC7009C51F4A00B25A18 /* SUAppcastItem.h in Headers */,
 				725602D51C83551C00DAA70E /* SUApplicationInfo.h in Headers */,
 				7214B8811D456A8500CB5CED /* SUBundleIcon.h in Headers */,
+				720767D31E2EE9C200F9A850 /* SUTouchBarForwardDeclarations.h in Headers */,
 				61299A5C09CA6D4500B7442F /* SUConstants.h in Headers */,
 				55E6F33319EC9F6C00005E76 /* SUErrors.h in Headers */,
 				14652F8419A978C200959E44 /* SUExport.h in Headers */,
