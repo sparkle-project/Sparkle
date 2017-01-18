@@ -10,6 +10,9 @@
 #import "SUFileManager.h"
 #import "SUFileOperationConstants.h"
 
+
+#include "AppKitPrevention.h"
+
 // If we fail, we exit with a unique status code
 // We don't try to NSLog because the logs can't be seen anywhere,
 // and we don't want to log to a file irresponsibly (especially as root),

@@ -15,6 +15,9 @@
 #include <stdlib.h>
 #include <xar/xar.h>
 
+
+#include "AppKitPrevention.h"
+
 static BOOL applyBinaryDeltaToFile(xar_t x, xar_file_t file, NSString *sourceFilePath, NSString *destinationFilePath)
 {
     NSString *patchFile = temporaryFilename(@"apply-binary-delta");

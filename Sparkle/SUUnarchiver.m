@@ -12,6 +12,9 @@
 #import "SUDiskImageUnarchiver.h"
 #import "SUBinaryDeltaUnarchiver.h"
 
+
+#include "AppKitPrevention.h"
+
 @implementation SUUnarchiver
 
 + (nullable id <SUUnarchiverProtocol>)unarchiverForPath:(NSString *)path updatingHostBundlePath:(nullable NSString *)hostPath decryptionPassword:(nullable NSString *)decryptionPassword

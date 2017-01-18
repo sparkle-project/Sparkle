@@ -11,6 +11,9 @@
 #import "SULog.h"
 #import "SUErrors.h"
 
+
+#include "AppKitPrevention.h"
+
 @interface SUPipedUnarchiver ()
 
 @property (nonatomic, copy, readonly) NSString *archivePath;
@@ -93,7 +96,7 @@
         NSError *error = nil;
         NSString *destination = [self.archivePath stringByDeletingLastPathComponent];
         
-        SULog(@"Extracting using '%@' '%@' < '%@' '%@'", command, [args componentsJoinedByString:@"' '"], self.archivePath, destination);
+        SULog(SULogLevelDefault, @"Extracting using '%@' '%@' < '%@' '%@'", command, [args componentsJoinedByString:@"' '"], self.archivePath, destination);
         
         // Get the file size.
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:self.archivePath error:nil];

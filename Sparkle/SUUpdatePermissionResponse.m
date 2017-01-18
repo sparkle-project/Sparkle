@@ -8,6 +8,9 @@
 
 #import "SUUpdatePermissionResponse.h"
 
+
+#include "AppKitPrevention.h"
+
 @implementation SUUpdatePermissionResponse
 
 @synthesize automaticUpdateChecks = _automaticUpdateChecks;

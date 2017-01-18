@@ -16,6 +16,9 @@
 #import "SULog.h"
 #include <CommonCrypto/CommonDigest.h>
 
+
+#include "AppKitPrevention.h"
+
 @implementation SUDSAVerifier {
     SecKeyRef _secKey;
 }
@@ -23,7 +26,7 @@
 + (BOOL)validatePath:(NSString *)path withEncodedDSASignature:(NSString *)encodedSignature withPublicDSAKey:(NSString *)pkeyString
 {
     if (!encodedSignature) {
-        SULog(@"There is no DSA signature to check");
+        SULog(SULogLevelError, @"There is no DSA signature to check");
         return NO;
     }
 
@@ -47,7 +50,7 @@
     self = [super init];
 
     if (!self || !data.length) {
-        SULog(@"Could not read public DSA key");
+        SULog(SULogLevelError, @"Could not read public DSA key");
         return nil;
     }
 
@@ -60,7 +63,7 @@
         if (items) {
             CFRelease(items);
         }
-        SULog(@"Public DSA key could not be imported: %d", status);
+        SULog(SULogLevelError, @"Public DSA key could not be imported: %d", status);
         return nil;
     }
 
@@ -118,7 +121,7 @@
 
     dataReadTransform = SecTransformCreateReadTransformWithReadStream((__bridge CFReadStreamRef)stream);
     if (!dataReadTransform) {
-        SULog(@"File containing update archive could not be read (failed to create SecTransform for input stream)");
+        SULog(SULogLevelError, @"File containing update archive could not be read (failed to create SecTransform for input stream)");
         return cleanup();
     }
 
@@ -132,30 +135,30 @@
     dataVerifyTransform = SecVerifyTransformCreate(_secKey, (__bridge CFDataRef)signature, &error);
 #pragma clang diagnostic pop
     if (!dataVerifyTransform || error) {
-        SULog(@"Could not understand format of the signature: %@; Signature data: %@", error, signature);
+        SULog(SULogLevelError, @"Could not understand format of the signature: %@; Signature data: %@", error, signature);
         return cleanup();
     }
 
     SecTransformConnectTransforms(dataReadTransform, kSecTransformOutputAttributeName, dataDigestTransform, kSecTransformInputAttributeName, group, &error);
     if (error) {
-        SULog(@"%@", error);
+        SULog(SULogLevelError, @"%@", error);
         return cleanup();
     }
 
     SecTransformConnectTransforms(dataDigestTransform, kSecTransformOutputAttributeName, dataVerifyTransform, kSecTransformInputAttributeName, group, &error);
     if (error) {
-        SULog(@"%@", error);
+        SULog(SULogLevelError, @"%@", error);
         return cleanup();
     }
 
     NSNumber *result = CFBridgingRelease(SecTransformExecute(group, &error));
     if (error) {
-        SULog(@"DSA signature verification failed: %@", error);
+        SULog(SULogLevelError, @"DSA signature verification failed: %@", error);
         return cleanup();
     }
 
     if (!result.boolValue) {
-        SULog(@"DSA signature does not match. Data of the update file being checked is different than data that has been signed, or the public key and the private key are not from the same set.");
+        SULog(SULogLevelError, @"DSA signature does not match. Data of the update file being checked is different than data that has been signed, or the public key and the private key are not from the same set.");
     }
 
     cleanup();

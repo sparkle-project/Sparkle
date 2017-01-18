@@ -65,7 +65,7 @@
     id<SUUpdaterPrivate> updater = self.updater;
     [appcast setUserAgentString:[updater userAgentString]];
     [appcast setHttpHeaders:[updater httpHeaders]];
-    [appcast fetchAppcastFromURL:URL completionBlock:^(NSError *error) {
+    [appcast fetchAppcastFromURL:URL inBackground:self.downloadsAppcastInBackground completionBlock:^(NSError *error) {
         if (error) {
             [self abortUpdateWithError:error];
         } else {
@@ -237,7 +237,7 @@
         cachePath = [cachePaths objectAtIndex:0];
     }
     if (!cachePath) {
-        SULog(@"Failed to find user's cache directory! Using system default");
+        SULog(SULogLevelError, @"Failed to find user's cache directory! Using system default");
         cachePath = NSTemporaryDirectory();
     }
     
@@ -258,10 +258,14 @@
     if ([[NSFileManager defaultManager] fileExistsAtPath:appCachePath]) {
         [[NSFileManager defaultManager] removeItemAtPath:appCachePath error:NULL];
     }
-    
+
     id<SUUpdaterPrivate> updater = self.updater;
-    
+
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self.updateItem fileURL]];
+    if (self.downloadsUpdatesInBackground) {
+        request.networkServiceType = NSURLNetworkServiceTypeBackground;
+    }
+
     [request setValue:[updater userAgentString] forHTTPHeaderField:@"User-Agent"];
     if ([[updater delegate] respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
         [[updater delegate] updater:self.updater
@@ -344,7 +348,7 @@
     
     BOOL success;
     if (!unarchiver) {
-        SULog(@"Error: No valid unarchiver for %@!", self.downloadPath);
+        SULog(SULogLevelError, @"Error: No valid unarchiver for %@!", self.downloadPath);
         
         success = NO;
     } else {
@@ -514,7 +518,7 @@
             // Perhaps in a sandboxed environment this matters more. Note that this may not be a fatal error.
             NSError *quarantineError = nil;
             if (![fileManager releaseItemFromQuarantineAtRootURL:relaunchCopyTargetURL error:&quarantineError]) {
-                SULog(@"Failed to release quarantine on %@ with error %@", relaunchCopyTargetPath, quarantineError);
+                SULog(SULogLevelError, @"Failed to release quarantine on %@ with error %@", relaunchCopyTargetPath, quarantineError);
             }
         }
     }
@@ -606,7 +610,7 @@
         NSError *errorToDisplay = error;
         int finiteRecursion=5;
         do {
-            SULog(@"Error: %@ %@ (URL %@)", errorToDisplay.localizedDescription, errorToDisplay.localizedFailureReason, [errorToDisplay.userInfo objectForKey:NSURLErrorFailingURLErrorKey]);
+            SULog(SULogLevelError, @"Error: %@ %@ (URL %@)", errorToDisplay.localizedDescription, errorToDisplay.localizedFailureReason, [errorToDisplay.userInfo objectForKey:NSURLErrorFailingURLErrorKey]);
             errorToDisplay = [errorToDisplay.userInfo objectForKey:NSUnderlyingErrorKey];
         } while(--finiteRecursion && errorToDisplay);
     }

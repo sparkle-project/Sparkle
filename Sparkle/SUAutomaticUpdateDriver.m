@@ -121,6 +121,10 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     return NO;
 }
 
+-(BOOL)downloadsUpdatesInBackground {
+    return YES;
+}
+
 - (void)stopUpdatingOnTermination
 {
     if (self.willUpdateOnTermination)

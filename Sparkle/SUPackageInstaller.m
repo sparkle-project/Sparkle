@@ -11,6 +11,9 @@
 #import "SUErrors.h"
 #import "SULog.h"
 
+
+#include "AppKitPrevention.h"
+
 @interface SUPackageInstaller ()
 
 @property (nonatomic, readonly, copy) NSString *packagePath;
@@ -60,7 +63,7 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
         [installer waitUntilExit];
     }
     @catch (NSException *exception) {
-        SULog(@"Error: Failed to launch package installer: %@", exception);
+        SULog(SULogLevelError, @"Error: Failed to launch package installer: %@", exception);
         if (error != NULL) {
             *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: @"Package installer failed to launch." }];
         }

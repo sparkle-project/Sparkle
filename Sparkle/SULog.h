@@ -1,32 +1,29 @@
-/*
- *  SULog.h
- *  EyeTV
- *
- *  Created by Uli Kusterer on 12/03/2009.
- *  Copyright 2008 Elgato Systems GmbH. All rights reserved.
- *
- */
-
-/*
-	Log output for troubleshooting Sparkle failures on end-user machines.
-	Your tech support will hug you if you tell them about this.
-*/
+//
+//  SULog.h
+//  Sparkle
+//
+//  Created by Mayur Pawashe on 5/18/16.
+//  Copyright © 2016 Sparkle Project. All rights reserved.
+//
 
 #ifndef SULOG_H
 #define SULOG_H
 
-// -----------------------------------------------------------------------------
-//	Headers:
-// -----------------------------------------------------------------------------
-
 #include <Foundation/Foundation.h>
 
+typedef NS_ENUM(uint8_t, SULogLevel) {
+    // This level is for information that *might* result a failure
+    // For now until other levels are added, this may serve as a level for other information as well
+    SULogLevelDefault,
+    // This level is for errors that occurred
+    SULogLevelError
+};
 
-// -----------------------------------------------------------------------------
-//	Prototypes:
-// -----------------------------------------------------------------------------
-
-void SUClearLog(void);
-void SULog(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
+// Logging utlity function that is thread-safe
+// On 10.12 or later this uses os_log
+// Otherwise on older systems this uses ASL
+// For debugging command line tools, you may have to use Console.app or log(1) to view log messages
+// Try to keep log messages as compact/short as possible
+void SULog(SULogLevel level, NSString *format, ...) NS_FORMAT_FUNCTION(2, 3);
 
 #endif

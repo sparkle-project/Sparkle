@@ -10,11 +10,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class SUHost;
+
 @interface SUApplicationInfo : NSObject
 
 + (BOOL)isBackgroundApplication:(NSApplication *)application;
 
-+ (NSImage *)bestIconForBundle:(NSBundle *)bundle;
++ (NSImage *)bestIconForHost:(SUHost *)host;
 
 @end
 
