@@ -31,11 +31,8 @@ void SULog(SULogLevel level, NSString *format, ...)
 
         hasOSLogging = [SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 12, 0}];
 
-        NSString *mainBundleIdentifier = mainBundle.bundleIdentifier;
-        NSString *bundleIdentifier = (mainBundleIdentifier != nil) ? mainBundleIdentifier : @""SPARKLE_BUNDLE_IDENTIFIER;
-        
         if (hasOSLogging) {
-            const char *subsystem = [[bundleIdentifier stringByAppendingString:@".Sparkle"] UTF8String];
+            const char *subsystem = SPARKLE_BUNDLE_IDENTIFIER;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
             // This creates a thread-safe object
