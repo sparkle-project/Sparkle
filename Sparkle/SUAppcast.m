@@ -48,6 +48,7 @@
 - (NSXMLNode *)bestNodeInNodes:(NSArray *)nodes;
 @end
 
+
 @implementation SUAppcast
 
 @synthesize downloadFilename;
