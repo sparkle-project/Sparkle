@@ -8,6 +8,8 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUUpdatePermissionPrompt">
             <connections>
+                <outlet property="cancelButton" destination="14" id="gmk-EB-rHf"/>
+                <outlet property="checkButton" destination="13" id="JAM-bi-JDs"/>
                 <outlet property="descriptionTextField" destination="33" id="133"/>
                 <outlet property="moreInfoButton" destination="71" id="132"/>
                 <outlet property="moreInfoView" destination="39" id="127"/>
