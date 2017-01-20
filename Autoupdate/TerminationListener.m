@@ -47,8 +47,10 @@
 
 - (void)invokeCompletionWithSuccess:(BOOL)success
 {
-    self.completionBlock(success);
-    self.completionBlock = nil;
+    if (self.completionBlock != nil) {
+        self.completionBlock(success);
+        self.completionBlock = nil;
+    }
 }
 
 - (void)startListeningWithCompletion:(void (^)(BOOL))completionBlock
@@ -106,6 +108,14 @@
     CFRelease(runLoopSource);
     
     CFFileDescriptorEnableCallBacks(noteExitKQueueRef, kCFFileDescriptorReadCallBack);
+    
+    // Make sure we didn't set the listener callback to a dead PID
+    // If we did, we could hang forever. To avoid this, we check if the process has terminated *after* we set up the callback
+    // If we tried to do this check before setting the callback, we could run into an issue where the process can terminate after our check
+    // but before setting the callback
+    if ([self terminated]) {
+        [self invokeCompletionWithSuccess:YES];
+    }
 }
 
 static void noteExitKQueueCallback(CFFileDescriptorRef file, CFOptionFlags __unused callBackTypes, void *info)
