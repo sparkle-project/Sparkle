@@ -16,7 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) BOOL terminated;
 
-- (void)startListeningWithCompletion:(void (^)(BOOL))completionBlock;
+// If the process identifier provided was nil, then the completion block will invoke immediately with a YES success
+- (void)startListeningWithCompletion:(void (^)(BOOL success))completionBlock;
 
 @end
 
