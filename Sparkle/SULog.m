@@ -15,25 +15,24 @@
 #define STRINGIFY(x) #x
 #define TO_STRING(x) STRINGIFY(x)
 
+#include "AppKitPrevention.h"
+
 void SULog(SULogLevel level, NSString *format, ...)
 {
     static aslclient client;
     static dispatch_queue_t queue;
     static dispatch_once_t onceToken;
-    
+
     static os_log_t logger;
     static BOOL hasOSLogging;
-    
+
     dispatch_once(&onceToken, ^{
         NSBundle *mainBundle = [NSBundle mainBundle];
-        
+
         hasOSLogging = [SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 12, 0}];
-        
-        NSString *mainBundleIdentifier = mainBundle.bundleIdentifier;
-        NSString *bundleIdentifier = (mainBundleIdentifier != nil) ? mainBundleIdentifier : @""SPARKLE_BUNDLE_IDENTIFIER;
-        
+
         if (hasOSLogging) {
-            const char *subsystem = [[bundleIdentifier stringByAppendingString:@".Sparkle"] UTF8String];
+            const char *subsystem = SPARKLE_BUNDLE_IDENTIFIER;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
             // This creates a thread-safe object
@@ -44,23 +43,23 @@ void SULog(SULogLevel level, NSString *format, ...)
             // Act the same way os_log() does; don't log to stderr if a terminal device is attached
             if (!isatty(STDERR_FILENO)) {
                 options |= ASL_OPT_STDERR;
-            }
+        }
             
             NSString *displayName = [[NSFileManager defaultManager] displayNameAtPath:mainBundle.bundlePath];
-            client = asl_open([displayName stringByAppendingString:@" [Sparkle]"].UTF8String, bundleIdentifier.UTF8String, options);
+            client = asl_open([displayName stringByAppendingString:@" [Sparkle]"].UTF8String, SPARKLE_BUNDLE_IDENTIFIER, options);
             queue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
         }
     });
-    
+
     if (!hasOSLogging && client == NULL) {
         return;
     }
-    
+
     va_list ap;
     va_start(ap, format);
     NSString *logMessage = [[NSString alloc] initWithFormat:format arguments:ap];
     va_end(ap);
-    
+
     // Use os_log if available (on 10.12+)
     if (hasOSLogging) {
         // We'll make all of our messages formatted as public; just don't log sensitive information.
@@ -78,11 +77,11 @@ void SULog(SULogLevel level, NSString *format, ...)
                 // See docs for OS_LOG_TYPE_ERROR
                 os_log_error(logger, "%{public}@", logMessage);
                 break;
-        }
+    }
 #pragma clang diagnostic pop
         return;
-    }
-    
+}
+
     // Otherwise use ASL
     // Make sure we do not async, because if we async, the log may not be delivered deterministically
     dispatch_sync(queue, ^{
@@ -90,7 +89,7 @@ void SULog(SULogLevel level, NSString *format, ...)
         if (message == NULL) {
             return;
         }
-        
+
         if (asl_set(message, ASL_KEY_MSG, logMessage.UTF8String) != 0) {
             return;
         }

@@ -20,6 +20,8 @@
 #define VERSION_COMMAND @"version"
 #define VERSION_ALTERNATE_COMMAND @"--version"
 
+#include "AppKitPrevention.h"
+
 static void printUsage(NSString *programName)
 {
     fprintf(stderr, "Usage:\n");

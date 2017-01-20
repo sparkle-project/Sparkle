@@ -13,6 +13,8 @@
 #define DEBUG 0
 #endif
 
+#include "AppKitPrevention.h"
+
 // Define some minimum intervals to avoid DoS-like checking attacks
 const NSTimeInterval SUMinimumUpdateCheckInterval = DEBUG ? 60 : (60 * 60);
 const NSTimeInterval SUDefaultUpdateCheckInterval = DEBUG ? 60 : (60 * 60 * 24);

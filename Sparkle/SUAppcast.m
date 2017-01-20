@@ -12,6 +12,9 @@
 #import "SULocalizations.h"
 #import "SUErrors.h"
 
+
+#include "AppKitPrevention.h"
+
 @interface NSXMLElement (SUAppcastExtensions)
 @property (readonly, copy) NSDictionary *attributesAsDictionary;
 @end
@@ -69,7 +72,7 @@
 
     if (self.httpHeaders) {
         for (NSString *key in self.httpHeaders) {
-            id value = [self.httpHeaders objectForKey:key];
+            NSString *value = [self.httpHeaders objectForKey:key];
             [request setValue:value forHTTPHeaderField:key];
         }
     }
