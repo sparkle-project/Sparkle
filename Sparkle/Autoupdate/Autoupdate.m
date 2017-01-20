@@ -82,15 +82,12 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
 
 - (void)applicationDidFinishLaunching:(NSNotification __unused *)notification
 {
-    SULog(SULogLevelDefault, @"GONNA PID LISTEN");
     [self.terminationListener startListeningWithCompletion:^(BOOL terminationSuccess) {
-        SULog(SULogLevelDefault, @"LISTENING COMPLETION RESUME");
-        
         self.terminationListener = nil;
         
         if (!terminationSuccess) {
             SULog(SULogLevelError, @"Failed to listen for application termination");
-            // Continue on with the installation anyway..
+            // Continue on with the installation anyway?
         }
 		
         if (self.shouldShowUI) {
