@@ -6,6 +6,8 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUAutomaticUpdateAlert">
             <connections>
+                <outlet property="installButton" destination="15" id="VHi-SZ-6td"/>
+                <outlet property="laterButton" destination="16" id="AZg-1M-E8w"/>
                 <outlet property="skipButton" destination="30" id="LpO-Ax-F1B"/>
                 <outlet property="window" destination="5" id="22"/>
             </connections>

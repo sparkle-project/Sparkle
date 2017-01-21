@@ -31,11 +31,8 @@ void SULog(SULogLevel level, NSString *format, ...)
 
         hasOSLogging = [SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 12, 0}];
 
-        NSString *mainBundleIdentifier = mainBundle.bundleIdentifier;
-        NSString *bundleIdentifier = (mainBundleIdentifier != nil) ? mainBundleIdentifier : @""SPARKLE_BUNDLE_IDENTIFIER;
-        
         if (hasOSLogging) {
-            const char *subsystem = [[bundleIdentifier stringByAppendingString:@".Sparkle"] UTF8String];
+            const char *subsystem = SPARKLE_BUNDLE_IDENTIFIER;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
             // This creates a thread-safe object
@@ -46,12 +43,12 @@ void SULog(SULogLevel level, NSString *format, ...)
             // Act the same way os_log() does; don't log to stderr if a terminal device is attached
             if (!isatty(STDERR_FILENO)) {
                 options |= ASL_OPT_STDERR;
-    }
+        }
             
             NSString *displayName = [[NSFileManager defaultManager] displayNameAtPath:mainBundle.bundlePath];
-            client = asl_open([displayName stringByAppendingString:@" [Sparkle]"].UTF8String, bundleIdentifier.UTF8String, options);
+            client = asl_open([displayName stringByAppendingString:@" [Sparkle]"].UTF8String, SPARKLE_BUNDLE_IDENTIFIER, options);
             queue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
-}
+        }
     });
 
     if (!hasOSLogging && client == NULL) {
