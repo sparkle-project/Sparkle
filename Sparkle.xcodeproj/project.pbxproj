@@ -1955,13 +1955,13 @@
 		72B767E81C9D114F00A07552 /* Update Drivers */ = {
 			isa = PBXGroup;
 			children = (
+				7229E1B51C97C91100CB50D0 /* SPUUpdateDriver.h */,
 				72B767E41C9CFD7200A07552 /* SPUAutomaticUpdateDriver.h */,
 				72B767E51C9CFD7200A07552 /* SPUAutomaticUpdateDriver.m */,
 				72B767D01C9C7B9300A07552 /* SPUProbingUpdateDriver.h */,
 				72B767D11C9C7B9300A07552 /* SPUProbingUpdateDriver.m */,
 				7229E1B71C97CC4D00CB50D0 /* SPUScheduledUpdateDriver.h */,
 				7229E1B81C97CC4D00CB50D0 /* SPUScheduledUpdateDriver.m */,
-				7229E1B51C97C91100CB50D0 /* SPUUpdateDriver.h */,
 				72B767DC1C9CDB9700A07552 /* SPUUserInitiatedUpdateDriver.h */,
 				72B767DD1C9CDB9700A07552 /* SPUUserInitiatedUpdateDriver.m */,
 			);
