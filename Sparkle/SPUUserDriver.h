@@ -34,6 +34,11 @@ NS_ASSUME_NONNULL_BEGIN
  
  An implementor of this protocol should act defensively. For example, it may be possible for an action that says to
  invalidate or dismiss something to be called multiple times in succession, and the implementor may choose to ignore further requests.
+ 
+ Note: Once upon a time, when first developing the user driver API, I had the user driver exist in a separate process from the rest of the framework.
+ If you're familiar with how the higher level XPC APIs work, this explains why some of the decisions above were made
+ (reply block executed on any thread, reply block replied only once, single reply block, void return types, idleness, no optional methods, ...)
+ This is somewhat of an artifact (maybe?) now, but I think most of these set of restrictions still enforces a well designed API.
  */
 SU_EXPORT @protocol SPUUserDriver <NSObject>
 
