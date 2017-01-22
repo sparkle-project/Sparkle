@@ -1,3 +1,16 @@
+# 1.17.0
+
+ * Added Touch Bar support (Bi11)
+ * Upgraded SULog to use logging APIs that Apple provides built-in (Zorg)
+ * Skip buttons are disabled if the update is marked as critical (Kornel Lesiński)
+ * Backround updates ask OS for lower-priority networking (Kornel Lesiński)
+ * Refactorings to sync with upcoming 2.0
+   * Added kqueue based termination listener (Zorg)
+   * Added AppKit prevention guards to modules that shouldn't import it (Zorg)
+   * Added Obj-C generics where applicable (Zorg)
+   * Made SUBundleIcon & SUApplicationInfo take SUHost, not NSBundle (Zorg)
+   * Improved -[SUHost objectForInfoDictionaryKey:] (Zorg)
+
 # 1.16.0
 
  * Guided package installs are now the default for updating packages (Zorg)
