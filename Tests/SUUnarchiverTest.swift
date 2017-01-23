@@ -16,10 +16,10 @@ class SUUnarchiverTest: XCTestCase
         
         let fileManager = FileManager.default
         
+        // Do not remove this temporary directory
+        // If we do want to clean up and remove it (which isn't necessary but nice), we'd have to remove it
+        // after *both* our unarchive success and failure calls below finish (they both have async completion blocks inside their implementation)
         let tempDirectoryURL = try! fileManager.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: URL(fileURLWithPath: NSHomeDirectory()), create: true)
-        defer {
-            try! fileManager.removeItem(at: tempDirectoryURL)
-        }
         
         let unarchivedSuccessExpectation = super.expectation(description: "Unarchived Success (format: \(archiveExtension))")
         let unarchivedFailureExpectation = super.expectation(description: "Unarchived Failure (format: \(archiveExtension))")
