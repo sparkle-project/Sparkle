@@ -7,7 +7,6 @@
  * Made manual check resume pending automatic updates instead of starting a new update (Kornel Lesiński)
  * Started using `length` value from RSS if HTTP doesn't give one (Zorg)
  * Hidden automatic updates checkbox for information only updates (Bi11)
- * Fixed UI update scheduler not prompting for install & relaunch (Zorg)
  * Added progressbar for DMG and binary delta extraction (Kornel Lesiński)
  * Fixed showing of download status if we attempt a 2nd download (Zorg)
  * Refactorings to sync with upcoming 2.0
