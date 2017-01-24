@@ -131,10 +131,12 @@ int main(int argc, const char *argv[])
             
             NSTask *task = [[NSTask alloc] init];
             task.launchPath = installerPath;
-            task.arguments = @[@"-pkg", filepath, @"-target", @"/"];
-            // Output won't show up anyway, so we may as well ignore it
+            task.arguments = @[@"-verboseR",
+                               @"-pkg", filepath,
+                               @"-target", @"/"];
             task.standardError = [NSPipe pipe];
-            task.standardOutput = [NSPipe pipe];
+            // Pass through verbose output from the installer, so the caller can parse it
+            task.standardOutput = [NSFileHandle fileHandleWithStandardOutput];
             
             @try {
                 [task launch];

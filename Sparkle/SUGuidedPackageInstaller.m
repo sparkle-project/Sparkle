@@ -46,7 +46,7 @@
 {
     SUFileManager *fileManager = [SUFileManager fileManagerWithAuthorizationToolPath:self.fileOperationToolPath];
     
-    return [fileManager executePackageAtURL:[NSURL fileURLWithPath:self.packagePath] error:error];
+    return [fileManager executePackageAtURL:[NSURL fileURLWithPath:self.packagePath] progressBlock:progressBlock error:error];
 }
 
 - (BOOL)canInstallSilently

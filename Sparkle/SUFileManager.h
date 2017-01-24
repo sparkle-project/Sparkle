@@ -146,6 +146,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Runs an installer package (pkg) in a headless mode using /usr/sbin/installer
  * @param packageURL A URL pointing to the package to execute. The item at this URL must exist.
+ * @param progressBlock Callback that takes double value (0..1 range) notifying how far the installation has progressed
  * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
  * @return YES if the installer ran the package successfully, otherwise NO with a populated error object
  *
@@ -153,7 +154,7 @@ NS_ASSUME_NONNULL_BEGIN
  * an initial authorization prompt if the calling process does not have root privileges. In other words, root privileges are required to use this method, and the file manager instance must have been created by allowing authorization.
  * An error can occur if the package is unable to be ran by the installer, or if the installer reports a non-zero exit status code.
  */
-- (BOOL)executePackageAtURL:(NSURL *)packageURL error:(NSError *_Nullable*_Nullable)error;
+- (BOOL)executePackageAtURL:(NSURL *)packageURL progressBlock:(nullable void(^)(double))progressBlock error:(NSError *_Nullable*_Nullable)error;
 
 NS_ASSUME_NONNULL_END
 
