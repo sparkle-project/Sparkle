@@ -3,7 +3,7 @@
  * Added Touch Bar support (Bi11)
  * Upgraded SULog to use logging APIs that Apple provides built-in (Zorg)
  * Skip buttons are disabled if the update is marked as critical (Kornel Lesiński)
- * Backround updates ask OS for lower-priority networking (Kornel Lesiński)
+ * Background updates ask OS for lower-priority networking (Kornel Lesiński)
  * Refactorings to sync with upcoming 2.0
    * Added kqueue based termination listener (Zorg)
    * Added AppKit prevention guards to modules that shouldn't import it (Zorg)
