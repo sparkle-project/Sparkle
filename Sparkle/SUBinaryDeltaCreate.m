@@ -230,9 +230,9 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     assert(destination);
     assert(patchFile);
     assert(majorVersion >= FIRST_DELTA_DIFF_MAJOR_VERSION && majorVersion <= LATEST_DELTA_DIFF_MAJOR_VERSION);
-    
-    SUBinaryDeltaMinorVersion minorVersion = latestMinorVersionForMajorVersion(majorVersion);
-    
+
+    int minorVersion = latestMinorVersionForMajorVersion(majorVersion);
+
     NSMutableDictionary *originalTreeState = [NSMutableDictionary dictionary];
 
     char pathBuffer[PATH_MAX] = {0};
