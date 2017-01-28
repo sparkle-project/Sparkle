@@ -57,16 +57,7 @@ typedef NS_ENUM(uint16_t, SUBinaryDeltaMajorVersion)
     SUBeigeMajorVersion = 2
 };
 
-// Only keep track of the latest minor version for each major version
-typedef NS_ENUM(uint16_t, SUBinaryDeltaMinorVersion)
-{
-    SUAzureMinorVersion = 1,
-    SUBeigeMinorVersion = 1,
-};
-
 #define FIRST_DELTA_DIFF_MAJOR_VERSION SUAzureMajorVersion
-#define FIRST_DELTA_DIFF_MINOR_VERSION ((SUBinaryDeltaMinorVersion)0)
-
 #define LATEST_DELTA_DIFF_MAJOR_VERSION SUBeigeMajorVersion
 
 extern int compareFiles(const FTSENT **a, const FTSENT **b);
@@ -80,5 +71,5 @@ extern NSString *pathRelativeToDirectory(NSString *directory, NSString *path);
 NSString *temporaryFilename(NSString *base);
 NSString *temporaryDirectory(NSString *base);
 NSString *stringWithFileSystemRepresentation(const char*);
-SUBinaryDeltaMinorVersion latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion);
+int latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion);
 #endif

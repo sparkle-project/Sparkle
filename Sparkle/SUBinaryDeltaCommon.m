@@ -39,15 +39,15 @@ NSString *stringWithFileSystemRepresentation(const char *input) {
     return [[NSFileManager defaultManager] stringWithFileSystemRepresentation:input length:strlen(input)];
 }
 
-SUBinaryDeltaMinorVersion latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion)
+int latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion)
 {
     switch (majorVersion) {
         case SUAzureMajorVersion:
-            return SUAzureMinorVersion;
+            return 1;
         case SUBeigeMajorVersion:
-            return SUBeigeMinorVersion;
+            return 2;
     }
-    return (SUBinaryDeltaMinorVersion)0;
+    return 0;
 }
 
 NSString *temporaryFilename(NSString *base)
