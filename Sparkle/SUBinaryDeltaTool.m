@@ -188,10 +188,10 @@ static BOOL runVersionCommand(NSString *programName, NSArray *args)
             fprintf(stderr, "Unable to open patch %s\n", [patchFile fileSystemRepresentation]);
             return NO;
         }
-        
+
         SUBinaryDeltaMajorVersion majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
-        SUBinaryDeltaMinorVersion minorDiffVersion = FIRST_DELTA_DIFF_MINOR_VERSION;
-        
+        int minorDiffVersion = 0;
+
         xar_subdoc_t subdoc;
         for (subdoc = xar_subdoc_first(x); subdoc; subdoc = xar_subdoc_next(subdoc)) {
             if (!strcmp(xar_subdoc_name(subdoc), BINARY_DELTA_ATTRIBUTES_KEY)) {
@@ -205,7 +205,7 @@ static BOOL runVersionCommand(NSString *programName, NSArray *args)
                 // available in version 2.0 or later
                 xar_subdoc_prop_get(subdoc, MINOR_DIFF_VERSION_KEY, &value);
                 if (value)
-                    minorDiffVersion = (SUBinaryDeltaMinorVersion)[@(value) intValue];
+                    minorDiffVersion = [@(value) intValue];
             }
         }
         

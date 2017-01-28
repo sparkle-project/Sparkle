@@ -39,7 +39,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     }
     
     SUBinaryDeltaMajorVersion majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
-    SUBinaryDeltaMinorVersion minorDiffVersion = FIRST_DELTA_DIFF_MINOR_VERSION;
+    int minorDiffVersion = 0;
 
     NSString *expectedBeforeHashv1 = nil;
     NSString *expectedAfterHashv1 = nil;
@@ -62,8 +62,8 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             // available in version 2.0 or later
             xar_subdoc_prop_get(subdoc, MINOR_DIFF_VERSION_KEY, &value);
             if (value)
-                minorDiffVersion = (SUBinaryDeltaMinorVersion)[@(value) intValue];
-            
+                minorDiffVersion = [@(value) intValue];
+
             // available in version 2.0 or later
             xar_subdoc_prop_get(subdoc, BEFORE_TREE_SHA1_KEY, &value);
             if (value)

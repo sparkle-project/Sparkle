@@ -39,15 +39,15 @@ NSString *stringWithFileSystemRepresentation(const char *input) {
     return [[NSFileManager defaultManager] stringWithFileSystemRepresentation:input length:strlen(input)];
 }
 
-SUBinaryDeltaMinorVersion latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion)
+int latestMinorVersionForMajorVersion(SUBinaryDeltaMajorVersion majorVersion)
 {
     switch (majorVersion) {
         case SUAzureMajorVersion:
-            return SUAzureMinorVersion;
+            return 1;
         case SUBeigeMajorVersion:
-            return SUBeigeMinorVersion;
+            return 2;
     }
-    return (SUBinaryDeltaMinorVersion)0;
+    return 0;
 }
 
 NSString *temporaryFilename(NSString *base)
@@ -163,6 +163,9 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
     CC_SHA1_CTX hashContext;
     CC_SHA1_Init(&hashContext);
 
+    // Ensure the path uses filesystem-specific Unicode normalization #1017
+    NSString *normalizedPath = stringWithFileSystemRepresentation(pathBuffer);
+
     FTSENT *ent = 0;
     while ((ent = fts_read(fts))) {
         if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D)
@@ -171,8 +174,8 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
         if (ent->fts_info == FTS_D && !MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion)) {
             continue;
         }
-        
-        NSString *relativePath = pathRelativeToDirectory(path, stringWithFileSystemRepresentation(ent->fts_path));
+
+        NSString *relativePath = pathRelativeToDirectory(normalizedPath, stringWithFileSystemRepresentation(ent->fts_path));
         if (relativePath.length == 0)
             continue;
 
