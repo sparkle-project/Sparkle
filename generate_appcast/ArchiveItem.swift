@@ -65,7 +65,7 @@ class ArchiveItem: CustomStringConvertible {
                 throw makeError(code: .unarchivingError, "Too many apps in \(unarchivedDir.path) \(apps)");
             }
 
-            let appPath = items[0];
+            let appPath = apps[0];
             guard let infoPlist = NSDictionary(contentsOf: appPath.appendingPathComponent("Contents/Info.plist")) else {
                 throw makeError(code: .unarchivingError, "No plist \(appPath.path)");
             }
