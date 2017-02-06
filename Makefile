@@ -21,6 +21,7 @@ build:
 
 test:
 	xcodebuild -scheme Distribution -configuration Debug test
+	./objc_dep/objc_dep.py -t .
 
 uitest:
 	xcodebuild -scheme UITests -configuration Debug test
