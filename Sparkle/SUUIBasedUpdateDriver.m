@@ -85,10 +85,18 @@
     }
 
     // Only show the update alert if the app is active; otherwise, we'll wait until it is.
-    if ([NSApp isActive])
-        [[self.updateAlert window] makeKeyAndOrderFront:self];
-    else
+    if ([NSApp isActive]) {
+        NSWindow *window = [self.updateAlert window];
+        if ([self shouldDisableKeyboardShortcutForInstallButton]) {
+            [self.updateAlert disableKeyboardShortcutForInstallButton];
+        }
+        [window makeKeyAndOrderFront:self];
+    } else
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
+}
+
+- (BOOL)shouldDisableKeyboardShortcutForInstallButton {
+    return NO;
 }
 
 - (void)didNotFindUpdate

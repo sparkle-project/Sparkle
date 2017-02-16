@@ -31,6 +31,7 @@ typedef NS_ENUM(NSInteger, SUUpdateAlertChoice) {
 - (IBAction)installUpdate:sender;
 - (IBAction)skipThisVersion:sender;
 - (IBAction)remindMeLater:sender;
+- (void)disableKeyboardShortcutForInstallButton;
 
 @end
 
