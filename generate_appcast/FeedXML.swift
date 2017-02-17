@@ -123,6 +123,7 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
         var attributes = [
             XMLNode.attribute(withName: "url", stringValue: archiveURL) as! XMLNode,
             XMLNode.attribute(withName: "sparkle:version", uri: sparkleNS, stringValue: update.version) as! XMLNode,
+            XMLNode.attribute(withName: "sparkle:shortVersionString", uri: sparkleNS, stringValue: update.shortVersion) as! XMLNode,
             XMLNode.attribute(withName: "length", stringValue: String(update.fileSize)) as! XMLNode,
             XMLNode.attribute(withName: "type", stringValue: update.mimeType) as! XMLNode,
         ];
@@ -142,8 +143,9 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
             }
             for delta in update.deltas {
                 var attributes = [
-                    XMLNode.attribute(withName: "url", stringValue: URL(string: delta.archivePath.lastPathComponent, relativeTo: update.archiveURL)!.absoluteString) as! XMLNode,
+                    XMLNode.attribute(withName: "url", stringValue: URL(string: delta.archivePath.lastPathComponent.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlPathAllowed)!, relativeTo: update.archiveURL)!.absoluteString) as! XMLNode,
                     XMLNode.attribute(withName: "sparkle:version", uri: sparkleNS, stringValue: update.version) as! XMLNode,
+                    XMLNode.attribute(withName: "sparkle:shortVersionString", uri: sparkleNS, stringValue: update.shortVersion) as! XMLNode,
                     XMLNode.attribute(withName: "sparkle:deltaFrom", uri: sparkleNS, stringValue: delta.fromVersion) as! XMLNode,
                     XMLNode.attribute(withName: "length", stringValue: String(delta.fileSize)) as! XMLNode,
                     XMLNode.attribute(withName: "type", stringValue: "application/octet-stream") as! XMLNode,

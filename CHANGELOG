@@ -10,6 +10,13 @@
    * Added Obj-C generics where applicable (Zorg)
    * Made SUBundleIcon & SUApplicationInfo take SUHost, not NSBundle (Zorg)
    * Improved -[SUHost objectForInfoDictionaryKey:] (Zorg)
+   * Detect and fail if any two-way dependencies exist in the project (Zorg)
+ * generate_appcast:
+   * fixed handling of multiple directories in an archive
+   * percent encode the filename used in the delta url (Brett Walker)
+ * Update Sparkle.strings (BR Lingo)
+ * Improved handling of non-ASCII names in delta archives (Kornel Lesiński)
+ * Don't touch Info.plist unless git version changes (Václav Slavík)
 
 # 1.16.0
 

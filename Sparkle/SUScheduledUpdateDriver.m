@@ -56,4 +56,8 @@
     }
 }
 
+- (BOOL)shouldDisableKeyboardShortcutForInstallButton {
+    return YES;
+}
+   
 @end
