@@ -37,13 +37,13 @@
 
 "Cancel Update" = "Cancelar Atualização";
 
-"Checking for updates..." = "Verificando atualizações…";
+"Checking for updates..." = "Buscar atualizações...";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "Transferindo atualização…";
+"Downloading update..." = "Transferindo atualização...";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "Extraindo atualização…";
+"Extracting update..." = "Extraindo atualização...";
 
 /* the unit for gigabytes */
 "GB" = "GB";
@@ -51,7 +51,7 @@
 "Install and Relaunch" = "Instalar e Recarregar";
 
 /* Take care not to overflow the status window. */
-"Installing update..." = "Instalando a atualização…";
+"Installing update..." = "Instalando a atualização...";
 
 /* the unit for kilobytes */
 "KB" = "KB";
