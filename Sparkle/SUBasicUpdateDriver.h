@@ -9,13 +9,10 @@
 #ifndef SUBASICUPDATEDRIVER_H
 #define SUBASICUPDATEDRIVER_H
 
-#import <Cocoa/Cocoa.h>
 #import "SUUpdateDriver.h"
-#import "SUUnarchiver.h"
-#import "SUAppcast.h"
 
-@class SUAppcastItem, SUHost;
-@interface SUBasicUpdateDriver : SUUpdateDriver <NSURLDownloadDelegate, SUUnarchiverDelegate>
+@class SUAppcast, SUAppcastItem, SUHost;
+@interface SUBasicUpdateDriver : SUUpdateDriver <NSURLDownloadDelegate>
 
 @property (strong, readonly) SUAppcastItem *updateItem;
 @property (strong, readonly) NSURLDownload *download;
@@ -37,9 +34,11 @@
 - (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error;
 
 - (void)extractUpdate;
-- (void)unarchiverDidFinish:(SUUnarchiver *)ua;
-- (void)unarchiverDidFail:(SUUnarchiver *)ua;
 - (void)failedToApplyDeltaUpdate;
+
+// Needed to preserve compatibility to subclasses, even though our unarchiver code uses blocks now
+- (void)unarchiver:(id)ua extractedProgress:(double)progress;
+- (void)unarchiverDidFinish:(id)ua;
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch;
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI;

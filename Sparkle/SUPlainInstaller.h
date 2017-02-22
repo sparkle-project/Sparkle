@@ -6,25 +6,23 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
-#ifndef SUPLAININSTALLER_H
-#define SUPLAININSTALLER_H
-
 #import <Foundation/Foundation.h>
+#import "SUInstallerProtocol.h"
 
-#import "SUUpdater.h"
-
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
-#import "SUVersionComparisonProtocol.h"
-#import "SUInstaller.h"
-#import "SUVersionComparisonProtocol.h"
+NS_ASSUME_NONNULL_BEGIN
 
 @class SUHost;
 
-@interface SUPlainInstaller : SUInstaller
+@interface SUPlainInstaller : NSObject <SUInstallerProtocol>
 
-+ (void)performInstallationToPath:(NSString *)installationPath fromPath:(NSString *)path host:(SUHost *)host versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler;
+/*!
+ @param host The current (old) bundle host
+ @param bundlePath The path to the new bundle that will be installed.
+ @param installationPath The path the new bundlePath will be installed to.
+ @param fileOperationToolPath The path to the file operation tool for authorized operations.
+ */
+- (instancetype)initWithHost:(SUHost *)host bundlePath:(NSString *)bundlePath installationPath:(NSString *)installationPath fileOperationToolPath:(NSString *)fileOperationToolPath;
 
 @end
 
-#endif
+NS_ASSUME_NONNULL_END

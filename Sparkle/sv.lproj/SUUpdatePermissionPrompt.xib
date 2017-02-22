@@ -7,6 +7,8 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUUpdatePermissionPrompt">
             <connections>
+                <outlet property="cancelButton" destination="14" id="gmk-EB-rHf"/>
+                <outlet property="checkButton" destination="13" id="JAM-bi-JDs"/>
                 <outlet property="descriptionTextField" destination="33" id="133"/>
                 <outlet property="moreInfoButton" destination="71" id="132"/>
                 <outlet property="moreInfoView" destination="39" id="127"/>
@@ -29,7 +31,6 @@
                     <button verticalHuggingPriority="750" tag="1" id="13">
                         <rect key="frame" x="243" y="12" width="181" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
-                        <animations/>
                         <buttonCell key="cell" type="push" title="Kontrollera automatiskt" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" tag="1" inset="2" id="176">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -44,7 +45,6 @@ DQ
                     <button verticalHuggingPriority="750" id="14">
                         <rect key="frame" x="111" y="12" width="132" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
-                        <animations/>
                         <buttonCell key="cell" type="push" title="Kontrollera inte" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="177">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -59,7 +59,6 @@ Gw
                     <textField verticalHuggingPriority="750" id="32">
                         <rect key="frame" x="104" y="114" width="289" height="34"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                        <animations/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="178">
                             <font key="font" metaFont="systemBold"/>
                             <string key="title">Leta efter uppdateringar automatiskt?
@@ -71,7 +70,6 @@ Gw
                     <textField verticalHuggingPriority="750" id="33">
                         <rect key="frame" x="104" y="81" width="315" height="42"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                        <animations/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="DO NOT LOCALIZE" id="179">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -84,7 +82,6 @@ Gw
                     <button focusRingType="none" id="34">
                         <rect key="frame" x="104" y="53" width="278" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                        <animations/>
                         <buttonCell key="cell" type="check" title="Inkludera anonym systemprofil" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" focusRingType="none" inset="2" id="180">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="smallSystem"/>
@@ -106,7 +103,6 @@ Gw
                     <imageView id="37">
                         <rect key="frame" x="23" y="84" width="64" height="64"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                        <animations/>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="axesIndependently" image="NSApplicationIcon" id="181"/>
                         <connections>
                             <binding destination="-2" name="value" keyPath="icon" id="130"/>
@@ -115,7 +111,6 @@ Gw
                     <button focusRingType="none" horizontalHuggingPriority="750" verticalHuggingPriority="750" id="71">
                         <rect key="frame" x="80" y="50" width="27" height="26"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                        <animations/>
                         <buttonCell key="cell" type="disclosureTriangle" bezelStyle="disclosure" imagePosition="overlaps" alignment="center" borderStyle="border" focusRingType="none" imageScaling="proportionallyDown" inset="2" id="182">
                             <behavior key="behavior" pushIn="YES" changeBackground="YES" changeGray="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
@@ -130,7 +125,6 @@ Gw
                         </connections>
                     </button>
                 </subviews>
-                <animations/>
             </view>
         </window>
         <arrayController editable="NO" preservesSelection="NO" selectsInsertedObjects="NO" avoidsEmptySelection="NO" id="24" userLabel="Array Controller">
@@ -151,7 +145,6 @@ Gw
                 <textField verticalHuggingPriority="750" id="46">
                     <rect key="frame" x="1" y="128" width="358" height="70"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                    <animations/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="183">
                         <font key="font" metaFont="smallSystem"/>
                         <string key="title">Anonym systemprofilinformation används för att hjälpa oss att planera framtida utvecklingsarbete. Vänligen kontakta oss ifall du har några frågot om detta.
@@ -171,7 +164,6 @@ Detta är informationen som skulle sändas:</string>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="14" id="41">
                                 <rect key="frame" x="0.0" y="0.0" width="353" height="16"/>
                                 <autoresizingMask key="autoresizingMask"/>
-                                <animations/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
@@ -211,23 +203,18 @@ Detta är informationen som skulle sändas:</string>
                                 </tableColumns>
                             </tableView>
                         </subviews>
-                        <animations/>
                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </clipView>
-                    <animations/>
                     <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" controlSize="small" horizontal="YES" id="185">
                         <rect key="frame" x="-100" y="-100" width="345" height="11"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <animations/>
                     </scroller>
                     <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" controlSize="small" horizontal="NO" id="184">
                         <rect key="frame" x="-22" y="1" width="11" height="125"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <animations/>
                     </scroller>
                 </scrollView>
             </subviews>
-            <animations/>
         </customView>
         <userDefaultsController id="49" userLabel="User Defaults Controller">
             <declaredKeys>

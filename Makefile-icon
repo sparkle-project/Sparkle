@@ -1,0 +1,24 @@
+# To update the icon run make -f Makefile-icon
+# Requires:
+# autoconf, automake, libtool, pkg-config, pngquant
+
+ICONDIR=./Resources/Images.xcassets/AppIcon.appiconset
+OPTIMIZEDICONS=$(ICONDIR)/optimized_16x16.png $(ICONDIR)/optimized_32x32.png $(ICONDIR)/optimized_128x128.png $(ICONDIR)/optimized_512x512.png
+DESTICON=Resources/AppIcon.icns
+
+all: $(DESTICON)
+
+libicns:
+	git clone https://github.com/pornel/libicns.git
+
+libicns/Makefile: libicns
+	( cd libicns && autoreconf -vif && ./configure )
+
+libicns/icnsutils/png2icns: libicns/Makefile
+	( cd libicns && make -j8 )
+
+optimized_%.png: icon_%.png
+	pngquant -s1 -f -o $@ $<
+
+$(DESTICON): libicns/icnsutils/png2icns $(OPTIMIZEDICONS)
+	./libicns/icnsutils/png2icns $@ $(OPTIMIZEDICONS)

@@ -7,12 +7,14 @@
 //  Adapted from Sparkle+, by Tom Harrington.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "SUSystemProfiler.h"
-
 #import "SUHost.h"
 #import "SUOperatingSystem.h"
 #include <sys/sysctl.h>
+
+
+#include "AppKitPrevention.h"
 
 static NSString *const SUSystemProfilerApplicationNameKey = @"appName";
 static NSString *const SUSystemProfilerApplicationVersionKey = @"appVersion";
@@ -27,28 +29,20 @@ static NSString *const SUSystemProfilerOperatingSystemVersionKey = @"osVersion";
 static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
 
 @implementation SUSystemProfiler
-+ (SUSystemProfiler *)sharedSystemProfiler
-{
-    static SUSystemProfiler *sharedSystemProfiler = nil;
-    if (!sharedSystemProfiler) {
-        sharedSystemProfiler = [[self alloc] init];
-    }
-    return sharedSystemProfiler;
-}
 
-- (NSDictionary *)modelTranslationTable
++ (NSDictionary<NSString *, NSString *> *)modelTranslationTable
 {
     // Use explicit class to use the correct bundle even when subclassed
     NSString *path = [[NSBundle bundleForClass:[SUSystemProfiler class]] pathForResource:@"SUModelTranslation" ofType:@"plist"];
     return [[NSDictionary alloc] initWithContentsOfFile:path];
 }
 
-- (NSMutableArray *)systemProfileArrayForHost:(SUHost *)host
++ (NSArray<NSDictionary<NSString *, NSString *> *> *)systemProfileArrayForHost:(SUHost *)host
 {
-    NSDictionary *modelTranslation = [self modelTranslationTable];
+    NSDictionary<NSString *, NSString *> *modelTranslation = [self modelTranslationTable];
 
     // Gather profile information and append it to the URL.
-    NSMutableArray *profileArray = [NSMutableArray array];
+    NSMutableArray<NSDictionary<NSString *, NSString *> *> *profileArray = [NSMutableArray array];
     NSArray *profileDictKeys = @[@"key", @"displayKey", @"value", @"displayValue"];
     int error = 0;
     int value = 0;
@@ -166,7 +160,7 @@ static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
         [profileArray addObject:[NSDictionary dictionaryWithObjects:@[SUSystemProfilerMemoryKey, @"Memory (MB)", @(megabytes), @(megabytes)] forKeys:profileDictKeys]];
     }
 
-    return profileArray;
+    return [profileArray copy];
 }
 
 @end

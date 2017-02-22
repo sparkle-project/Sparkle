@@ -7,6 +7,15 @@
 
 #import "SUOperatingSystem.h"
 
+
+#include "AppKitPrevention.h"
+
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101000
+@interface NSProcessInfo ()
+- (NSOperatingSystemVersion)operatingSystemVersion;
+@end
+#endif
+
 @implementation SUOperatingSystem
 
 + (NSOperatingSystemVersion)operatingSystemVersion
@@ -20,7 +29,9 @@
     {
         NSOperatingSystemVersion version = { 0, 0, 0 };
         NSURL *coreServices = [[NSFileManager defaultManager] URLForDirectory:NSCoreServiceDirectory inDomain:NSSystemDomainMask appropriateForURL:nil create:NO error:nil];
-        NSDictionary *dictionary = [NSDictionary dictionaryWithContentsOfURL:[coreServices URLByAppendingPathComponent:@"SystemVersion.plist"]];
+        NSURL *url = [coreServices URLByAppendingPathComponent:@"SystemVersion.plist"];
+        assert(url != nil);
+        NSDictionary *dictionary = [NSDictionary dictionaryWithContentsOfURL:url];
         NSArray *components = [ [dictionary objectForKey: @"ProductVersion"] componentsSeparatedByString:@"."];
         version.majorVersion = components.count > 0 ? [ [components objectAtIndex:0] integerValue] : 0;
         version.minorVersion = components.count > 1 ? [ [components objectAtIndex:1] integerValue] : 0;

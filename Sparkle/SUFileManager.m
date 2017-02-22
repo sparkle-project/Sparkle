@@ -7,37 +7,18 @@
 //
 
 #import "SUFileManager.h"
+#import "SUErrors.h"
 #import "SUOperatingSystem.h"
+#import "SUFileOperationConstants.h"
 
 #include <sys/xattr.h>
 #include <sys/errno.h>
 #include <sys/time.h>
 
+
+#include "AppKitPrevention.h"
+
 static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
-
-// Authorization code based on generous contribution from Allan Odgaard. Thanks, Allan!
-static BOOL AuthorizationExecuteWithPrivilegesAndWait(AuthorizationRef authorization, const char *executablePath, AuthorizationFlags options, char *const *arguments)
-{
-    sig_t oldSigChildHandler = signal(SIGCHLD, SIG_DFL);
-    BOOL returnValue = YES;
-
-#pragma clang diagnostic push
-    // In the future, we may have to look at SMJobBless API to avoid deprecation. See issue #558
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    if (AuthorizationExecuteWithPrivileges(authorization, executablePath, options, arguments, NULL) == errAuthorizationSuccess)
-#pragma clang diagnostic pop
-    {
-        int status;
-        pid_t pid = wait(&status);
-        if (pid == -1 || !WIFEXITED(status) || WEXITSTATUS(status) != 0)
-            returnValue = NO;
-    }
-    else
-        returnValue = NO;
-
-    signal(SIGCHLD, oldSigChildHandler);
-    return returnValue;
-}
 
 static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
 
@@ -75,32 +56,37 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
 {
     AuthorizationRef _auth;
     NSFileManager *_fileManager;
-    BOOL _allowsAuthorization;
+    NSString *_authorizationToolPath;
 }
 
-- (instancetype)initAllowingAuthorization:(BOOL)allowsAuthorization
+- (instancetype)initWithAuthorizationToolPath:(NSString *)authorizationToolPath
 {
     self = [super init];
     if (self != nil) {
         _fileManager = [[NSFileManager alloc] init];
-        _allowsAuthorization = allowsAuthorization;
+        _authorizationToolPath = [authorizationToolPath copy];
     }
     return self;
 }
 
-+ (instancetype)fileManagerAllowingAuthorization:(BOOL)allowsAuthorization
++ (instancetype)defaultManager
 {
-    return [[self alloc] initAllowingAuthorization:allowsAuthorization];
+    return [[self alloc] initWithAuthorizationToolPath:nil];
+}
+
++ (instancetype)fileManagerWithAuthorizationToolPath:(NSString *)authorizationToolPath
+{
+    return [[self alloc] initWithAuthorizationToolPath:authorizationToolPath];
 }
 
 - (instancetype)fileManagerByPreservingAuthorizationRights
 {
     // Check if we don't allow authorization, or that we haven't needed to authorize yet, to create or re-use a
     // file manager instance with these restrictions
-    return (_allowsAuthorization && _auth != NULL) ? self : [SUFileManager fileManagerAllowingAuthorization:NO];
+    return (_authorizationToolPath != nil && _auth != NULL) ? self : [SUFileManager defaultManager];
 }
 
-// Acquires an authorization reference which is intended to be used for future authorized file operations
+// Acquires an authorization reference with root privileges which is intended to be used for authorized file operations
 - (BOOL)_acquireAuthorizationWithError:(NSError *__autoreleasing *)error
 {
     // No need to continue if we already acquired an authorization reference
@@ -108,21 +94,112 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         return YES;
     }
 
-    if (!_allowsAuthorization) {
+    if (_authorizationToolPath == nil) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: @"Unable to grant authorization to perform action because it is explicitly turned off" }];
         }
         return NO;
     }
 
-    OSStatus status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &_auth);
-    if (status != errAuthorizationSuccess) {
+    OSStatus createStatus = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &_auth);
+    if (createStatus != errAuthorizationSuccess) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed creating authorization reference with status code %d.", status] }];
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed creating authorization reference with status code %d.", createStatus] }];
         }
         _auth = NULL;
         return NO;
     }
+    
+    AuthorizationItem rightItems[] = {
+        // The right that allows us to run tools as root user
+        {.name = kAuthorizationRightExecute, .valueLength = 0, .value = NULL, .flags = 0}
+    };
+    
+    AuthorizationRights rights = {
+        .count = sizeof(rightItems) / sizeof(*rightItems),
+        .items = rightItems
+    };
+    
+    AuthorizationFlags flags =
+    (AuthorizationFlags)(kAuthorizationFlagDefaults | kAuthorizationFlagInteractionAllowed | kAuthorizationFlagExtendRights | kAuthorizationFlagPreAuthorize);
+    
+    // This will test if we can gain authorization for running utlities as root
+    OSStatus copyStatus = AuthorizationCopyRights(_auth, &rights, kAuthorizationEmptyEnvironment, flags, NULL);
+    if (copyStatus != errAuthorizationSuccess) {
+        if (error != NULL) {
+            if (copyStatus == errAuthorizationCanceled) {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationCancelledError userInfo:@{ NSLocalizedDescriptionKey: @"Authorization access was cancelled by the user." }];
+            } else {
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed granting authorization rights with status code %d.", copyStatus] }];
+            }
+        }
+        
+        AuthorizationFree(_auth, kAuthorizationFlagDefaults);
+        _auth = NULL;
+        
+        return NO;
+    }
+    
+    return YES;
+}
+
+- (BOOL)_authorizeAndExecuteCommand:(char *)command sourcePath:(char *)sourcePath destinationPath:(char *)destinationPath error:(NSError * __autoreleasing *)error
+{
+    NSError *acquireError = nil;
+    if (![self _acquireAuthorizationWithError:&acquireError]) {
+        if (error != NULL) {
+            *error = acquireError;
+        }
+        return NO;
+    }
+    
+    char *arguments[] = { command, sourcePath, destinationPath, NULL };
+    
+    char toolPath[PATH_MAX] = {0};
+    if (![_authorizationToolPath getFileSystemRepresentation:toolPath maxLength:sizeof(toolPath)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Authorization tool (%@) cannot be represented as a valid file name.", _authorizationToolPath.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    FILE *pipe = NULL;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    if (AuthorizationExecuteWithPrivileges(_auth, toolPath, kAuthorizationFlagDefaults, arguments, &pipe) != errAuthorizationSuccess) {
+#pragma clang diagnostic pop
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey:@"Failed to run authorization tool." }];
+        }
+        return NO;
+    }
+    
+    uint32_t pidData = 0;
+    if (fread(&pidData, sizeof(pidData), 1, pipe) < 1) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey:@"Failed to retrieve authorized executable process identifier." }];
+        }
+        fclose(pipe);
+        return NO;
+    }
+    
+    pid_t childPid = (int32_t)CFSwapInt32LittleToHost(pidData);
+    int status = 0;
+    
+    pid_t waitResult;
+    do {
+        waitResult = waitpid(childPid, &status, 0);
+    } while (waitResult == -1 && errno == EINTR);
+    
+    fclose(pipe);
+    
+    if (waitResult == -1 || !WIFEXITED(status) || WEXITSTATUS(status) != 0) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Failed to execute authorized executable with result %d and status (%d, %d, %d).", waitResult, status, WIFEXITED(status), WEXITSTATUS(status)] }];
+        }
+        return NO;
+    }
+    
     return YES;
 }
 
@@ -189,7 +266,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
 
 #define XATTR_UTILITY_PATH "/usr/bin/xattr"
 // Recursively remove an xattr at a specified root URL with authentication
-- (BOOL)_removeXAttrWithAuthentication:(char *__nonnull)xattrName fromRootURL:(NSURL *)rootURL error:(NSError *__autoreleasing *)error
+- (BOOL)_removeQuarantineWithAuthenticationAtRootURL:(NSURL *)rootURL error:(NSError *__autoreleasing *)error
 {
     // Because this is a system utility, it's fine to follow the symbolic link if one exists
     if (![_fileManager fileExistsAtPath:@(XATTR_UTILITY_PATH)]) {
@@ -206,16 +283,11 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
-
-    if (![self _acquireAuthorizationWithError:error]) {
-        return NO;
-    }
-
-    BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, XATTR_UTILITY_PATH, kAuthorizationFlagDefaults, (char *[]){ "-s", "-r", "-d", xattrName, path, NULL });
-
+    
+    NSError *executeError = nil;
+    BOOL success = [self _authorizeAndExecuteCommand:SUFileOpRemoveQuarantineCommand sourcePath:path destinationPath:NULL error:&executeError];
     if (!success && error != NULL) {
-        NSString *errorMessage = [NSString stringWithFormat:@"Authenticated extended attribute deletion for %@ failed on %@.", [NSString stringWithUTF8String:xattrName], rootURL.path.lastPathComponent];
-        *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey:errorMessage }];
+        *error = executeError;
     }
 
     return success;
@@ -240,7 +312,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
                 removedQuarantine = YES;
             } else {
                 if (isAccessError(removalError)) {
-                    removedQuarantine = [self _removeXAttrWithAuthentication:SUAppleQuarantineIdentifier fromRootURL:rootURL error:error];
+                    removedQuarantine = [self _removeQuarantineWithAuthenticationAtRootURL:rootURL error:error];
                     attemptedAuthentication = YES;
                 } else {
                     if (success != NULL) {
@@ -292,7 +364,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
 }
 
 // Removes the directory tree rooted at |root| from the file quarantine.
-// The quarantine was introduced on OS X 10.5 and is described at:
+// The quarantine was introduced on macOS 10.5 and is described at:
 //
 // http://developer.apple.com/releasenotes/Carbon/RN-LaunchServices/index.html#apple_ref/doc/uid/TP40001369-DontLinkElementID_2
 //
@@ -394,11 +466,6 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         return NO;
     }
 
-    if (![self _acquireAuthorizationWithError:error]) {
-        return NO;
-    }
-
-
     char sourcePath[PATH_MAX] = {0};
     if (![sourceURL.path getFileSystemRepresentation:sourcePath maxLength:sizeof(sourcePath)]) {
         if (error != NULL) {
@@ -414,11 +481,11 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
-
-    if (!AuthorizationExecuteWithPrivilegesAndWait(_auth, "/bin/cp", kAuthorizationFlagDefaults, (char *[]){ "-Rf", "--", sourcePath, destinationPath, NULL })) {
+    
+    NSError *executeError = nil;
+    if (![self _authorizeAndExecuteCommand:SUFileOpCopyCommand sourcePath:sourcePath destinationPath:destinationPath error:&executeError]) {
         if (error != NULL) {
-            NSString *errorMessage = [NSString stringWithFormat:@"Failed to perform authenticated file copy for %@.", sourceURL.lastPathComponent];
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey:errorMessage }];
+            *error = executeError;
         }
         return NO;
     }
@@ -507,10 +574,6 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         return NO;
     }
 
-    if (![self _acquireAuthorizationWithError:error]) {
-        return NO;
-    }
-
     char sourcePath[PATH_MAX] = {0};
     if (![sourceURL.path getFileSystemRepresentation:sourcePath maxLength:sizeof(sourcePath)]) {
         if (error != NULL) {
@@ -526,11 +589,12 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
-
-    if (!AuthorizationExecuteWithPrivilegesAndWait(_auth, "/bin/mv", kAuthorizationFlagDefaults, (char *[]){ "-f", "--", sourcePath, destinationPath, NULL })) {
+    
+    NSError *executeError = nil;
+    if (![self _authorizeAndExecuteCommand:SUFileOpMoveCommand sourcePath:sourcePath destinationPath:destinationPath error:&executeError]) {
         if (error != NULL) {
-            NSString *errorMessage = [NSString stringWithFormat:@"Failed to perform authenticated file move for %@.", sourceURL.lastPathComponent];
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey:errorMessage }];
+            NSString *errorMessage = [NSString stringWithFormat:@"Failed to perform authorized file move for %@.", sourceURL.lastPathComponent];
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey:errorMessage, NSUnderlyingErrorKey: executeError }];
         }
         return NO;
     }
@@ -670,21 +734,20 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
-
-    char userAndGroup[100];
-    int written = snprintf(userAndGroup, sizeof(userAndGroup), "%u:%u", ownerID.unsignedIntValue, groupID.unsignedIntValue);
-    if (written < 0 || written >= 100) {
-        return NO; // No custom error, because it's too unlikely to ever happen
-    }
-
-    if (![self _acquireAuthorizationWithError:error]) {
+    
+    char matchPath[PATH_MAX] = {0};
+    if (![matchURLPath getFileSystemRepresentation:matchPath maxLength:sizeof(matchPath)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Match file (%@) cannot be represented as a valid file name.", matchURL.path.lastPathComponent] }];
+        }
         return NO;
     }
 
-    BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, "/usr/sbin/chown", kAuthorizationFlagDefaults, (char *[]){ "-R", userAndGroup, targetPath, NULL });
+    NSError *executeError = nil;
+    BOOL success = [self _authorizeAndExecuteCommand:SUFileOpChangeOwnerAndGroupCommand sourcePath:targetPath destinationPath:matchPath error:&executeError];
     if (!success && error != NULL) {
-        NSString *errorMessage = [NSString stringWithFormat:@"Failed to change owner:group %@ on %@ with authentication.", [NSString stringWithUTF8String:userAndGroup], targetURL.path.lastPathComponent];
-        *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
+        NSString *errorMessage = [NSString stringWithFormat:@"Failed to change owner & group on %@ to match %@ with authorization.", targetURL.path.lastPathComponent, matchURLPath.lastPathComponent];
+        *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: errorMessage, NSUnderlyingErrorKey: executeError }];
     }
 
     return success;
@@ -736,15 +799,12 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
-
-    if (![self _acquireAuthorizationWithError:error]) {
-        return NO;
-    }
-
-    BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, "/usr/bin/touch", kAuthorizationFlagDefaults, (char *[]){ "-h", "--", path, NULL });
+    
+    NSError *executeError = nil;
+    BOOL success = [self _authorizeAndExecuteCommand:SUFileOpUpdateModificationAndAccessTimeCommand sourcePath:path destinationPath:NULL error:&executeError];
     if (!success && error != NULL) {
-        NSString *errorMessage = [NSString stringWithFormat:@"Failed to update modification & access time on %@ with authentication.", targetURL.path.lastPathComponent];
-        *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
+        NSString *errorMessage = [NSString stringWithFormat:@"Failed to update modification & access time on %@ with authorization.", targetURL.path.lastPathComponent];
+        *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: errorMessage, NSUnderlyingErrorKey: executeError }];
     }
 
     return success;
@@ -752,7 +812,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
 
 // Creates a directory at the item pointed by url
 // An item cannot already exist at the url, but the parent must be a directory that exists
-- (BOOL)_makeDirectoryAtURL:(NSURL *)url error:(NSError * __autoreleasing *)error
+- (BOOL)makeDirectoryAtURL:(NSURL *)url error:(NSError * __autoreleasing *)error
 {
     if ([self _itemExistsAtURL:url]) {
         if (error != NULL) {
@@ -789,16 +849,16 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
-
-    if (![self _acquireAuthorizationWithError:error]) {
-        return NO;
+    
+    NSError *executeError = nil;
+    BOOL success = [self _authorizeAndExecuteCommand:SUFileOpMakeDirectoryCommand sourcePath:path destinationPath:NULL error:&executeError];
+    if (!success) {
+        if (error != NULL) {
+            NSString *errorMessage = [NSString stringWithFormat:@"Failed to make directory %@ with authorization.", url.path.lastPathComponent];
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: errorMessage, NSUnderlyingErrorKey: executeError }];
+        }
     }
-
-    BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, "/bin/mkdir", kAuthorizationFlagDefaults, (char *[]){ "--", path, NULL });
-    if (!success && error != NULL) {
-        NSString *errorMessage = [NSString stringWithFormat:@"Failed to make directory %@ with authentication.", url.path.lastPathComponent];
-        *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
-    }
+    
     return success;
 }
 
@@ -820,7 +880,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         desiredURL = [directoryURL URLByAppendingPathComponent:[preferredName stringByAppendingFormat:@" (%lu)", (unsigned long)++tagIndex]];
     }
 
-    return [self _makeDirectoryAtURL:desiredURL error:error] ? desiredURL : nil;
+    return [self makeDirectoryAtURL:desiredURL error:error] ? desiredURL : nil;
 }
 
 - (BOOL)removeItemAtURL:(NSURL *)url error:(NSError * __autoreleasing *)error
@@ -844,10 +904,6 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         return NO;
     }
 
-    if (![self _acquireAuthorizationWithError:error]) {
-        return NO;
-    }
-
     char path[PATH_MAX] = {0};
     if (![url.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
         if (error != NULL) {
@@ -855,96 +911,42 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
+    
+    NSError *executeError = nil;
+    BOOL success = [self _authorizeAndExecuteCommand:SUFileOpRemoveCommand sourcePath:path destinationPath:NULL error:&executeError];
 
-    BOOL success = AuthorizationExecuteWithPrivilegesAndWait(_auth, "/bin/rm", kAuthorizationFlagDefaults, (char *[]){ "-rf", "--", path, NULL });
     if (!success && error != NULL) {
-        *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove %@ with authentication.", url.path.lastPathComponent] }];
+        *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove %@ with authentication.", url.path.lastPathComponent], NSUnderlyingErrorKey: executeError }];
     }
+    
     return success;
 }
 
-- (BOOL)moveItemAtURLToTrash:(NSURL *)url error:(NSError *__autoreleasing *)error
+// Unlike other methods, authorization is required to execute this method successfully
+- (BOOL)executePackageAtURL:(NSURL *)packageURL error:(NSError * __autoreleasing *)error
 {
-    if (![self _itemExistsAtURL:url]) {
+    if (![self _itemExistsAtURL:packageURL]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move %@ to the trash because the file does not exist.", url.path.lastPathComponent] }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to execute package %@ because the file does not exist.", packageURL.path.lastPathComponent] }];
         }
         return NO;
     }
-
-    NSURL *trashURL = nil;
-    BOOL canUseNewTrashAPI = YES;
-#if __MAC_OS_X_VERSION_MIN_REQUIRED < 1080
-    canUseNewTrashAPI = [SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 8, 0}];
-    if (!canUseNewTrashAPI) {
-        FSRef trashRef;
-        if (FSFindFolder(kUserDomain, kTrashFolderType, kDontCreateFolder, &trashRef) == noErr) {
-            trashURL = CFBridgingRelease(CFURLCreateFromFSRef(kCFAllocatorDefault, &trashRef));
-        }
-    }
-#endif
-
-    if (canUseNewTrashAPI) {
-        trashURL = [_fileManager URLForDirectory:NSTrashDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:nil];
-    }
-
-    if (trashURL == nil) {
+    
+    char path[PATH_MAX] = {0};
+    if (![packageURL.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
         if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to locate the user's trash folder." }];
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Package to execute (%@) cannot be represented as a valid file name.", packageURL.path.lastPathComponent] }];
         }
         return NO;
     }
-
-    // In the rare worst case scenario, our temporary directory will be labeled incomplete and be in the user's trash directory,
-    // indicating that whatever inside of there is not yet completely moved.
-    // Regardless, we want the item to be in our Volume before we try moving it to the trash
-    NSString *preferredName = [url.lastPathComponent.stringByDeletingPathExtension stringByAppendingString:@" (Incomplete Files)"];
-    NSURL *tempDirectory = [self makeTemporaryDirectoryWithPreferredName:preferredName appropriateForDirectoryURL:trashURL error:error];
-    if (tempDirectory == nil) {
-        return NO;
+    
+    NSError *executeError = nil;
+    BOOL success = [self _authorizeAndExecuteCommand:SUFileOpInstallCommand sourcePath:path destinationPath:NULL error:&executeError];
+    
+    if (!success && error != NULL) {
+        NSString* errorMessage = @"Failed to execute package installer.";
+        *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{NSLocalizedDescriptionKey: errorMessage, NSUnderlyingErrorKey: executeError}];
     }
-
-    NSString *urlLastPathComponent = url.lastPathComponent;
-    NSURL *tempItemURL = [tempDirectory URLByAppendingPathComponent:urlLastPathComponent];
-    if (![self moveItemAtURL:url toURL:tempItemURL error:error]) {
-        // If we can't move the item at url, just remove it completely; chances are it's not going to be missed
-        [self removeItemAtURL:url error:NULL];
-        [self removeItemAtURL:tempDirectory error:NULL];
-        return NO;
-    }
-
-    if (![self changeOwnerAndGroupOfItemAtRootURL:tempItemURL toMatchURL:trashURL error:error]) {
-        // Removing the item inside of the temp directory is better than trying to move the item to the trash with incorrect ownership
-        [self removeItemAtURL:tempDirectory error:NULL];
-        return NO;
-    }
-
-    // If we get here, we should be able to trash the item normally without authentication
-
-    BOOL success = NO;
-#if __MAC_OS_X_VERSION_MIN_REQUIRED < 1080
-    if (!canUseNewTrashAPI) {
-        NSString *tempParentPath = tempItemURL.URLByDeletingLastPathComponent.path;
-        success = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:tempParentPath destination:@"" files:@[tempItemURL.lastPathComponent] tag:NULL];
-        if (!success && error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move file %@ into the trash.", tempItemURL.lastPathComponent] }];
-        }
-    }
-#endif
-
-    if (canUseNewTrashAPI) {
-        NSError *trashError = nil;
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-        success = [_fileManager trashItemAtURL:tempItemURL resultingItemURL:NULL error:&trashError];
-#pragma clang diagnostic pop
-        if (!success && error != NULL) {
-            *error = trashError;
-        }
-    }
-
-    [self removeItemAtURL:tempDirectory error:NULL];
-
     return success;
 }
 

@@ -39,7 +39,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
         [[NSApplication sharedApplication] terminate:nil];
     }
     
-    SUFileManager *fileManager = [SUFileManager fileManagerAllowingAuthorization:NO];
+    SUFileManager *fileManager = [SUFileManager defaultManager];
     
     // Locate user's cache directory
     NSError *cacheError = nil;
@@ -155,8 +155,10 @@ static NSString * const UPDATED_VERSION = @"2.0";
     
     // Copy our appcast over to the server directory
     NSURL *appcastDestinationURL = [[serverDirectoryURL URLByAppendingPathComponent:appcastName] URLByAppendingPathExtension:appcastExtension];
+    NSURL *appcastPath = [mainBundle URLForResource:appcastName withExtension:appcastExtension];
+    assert(appcastPath);
     NSError *copyAppcastError = nil;
-    if (![fileManager copyItemAtURL:[mainBundle URLForResource:appcastName withExtension:appcastExtension] toURL:appcastDestinationURL error:&copyAppcastError]) {
+    if (![fileManager copyItemAtURL:appcastPath toURL:appcastDestinationURL error:&copyAppcastError]) {
         NSLog(@"Failed to copy appcast into cache directory with error %@", copyAppcastError);
         assert(NO);
     }

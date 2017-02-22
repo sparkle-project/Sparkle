@@ -6,19 +6,21 @@
 //  Copyright 2008 Andy Matuschak. All rights reserved.
 //
 
-#ifndef SUINSTALLER_H
-#define SUINSTALLER_H
-
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import "SUVersionComparisonProtocol.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class SUHost;
+
+@protocol SUInstallerProtocol;
+
 @interface SUInstaller : NSObject
 
-+ (NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr isGuided:(BOOL *)isGuidedPtr;
-+ (void)installFromUpdateFolder:(NSString *)updateFolder overHost:(SUHost *)host installationPath:(NSString *)installationPath versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler;
-+ (void)finishInstallationToPath:(NSString *)installationPath withResult:(BOOL)result error:(NSError *)error completionHandler:(void (^)(NSError *))completionHandler;
++ (nullable id<SUInstallerProtocol>)installerForHost:(SUHost *)host fileOperationToolPath:(NSString *)fileOperationToolPath updateDirectory:(NSString *)updateDirectory error:(NSError **)error;
+
++ (nullable NSString *)installSourcePathInUpdateFolder:(NSString *)inUpdateFolder forHost:(SUHost *)host isPackage:(BOOL *)isPackagePtr isGuided:(nullable BOOL *)isGuidedPtr;
 
 @end
 
-#endif
+NS_ASSUME_NONNULL_END

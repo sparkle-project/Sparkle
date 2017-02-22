@@ -7,7 +7,8 @@
 //
 
 #import "SUProbingUpdateDriver.h"
-#import "SUUpdater.h"
+#import "SUUpdaterPrivate.h"
+#import "SUUpdaterDelegate.h"
 
 @implementation SUProbingUpdateDriver
 
@@ -15,7 +16,8 @@
 
 - (void)didFindValidUpdate
 {
-    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+    id<SUUpdaterPrivate> updater = self.updater;
+    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
 
     if ([updaterDelegate respondsToSelector:@selector(updater:didFindValidUpdate:)])
         [updaterDelegate updater:self.updater didFindValidUpdate:self.updateItem];
@@ -26,7 +28,8 @@
 
 - (void)didNotFindUpdate
 {
-    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+    id<SUUpdaterPrivate> updater = self.updater;
+    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
 
     if ([updaterDelegate respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
         [updaterDelegate updaterDidNotFindUpdate:self.updater];

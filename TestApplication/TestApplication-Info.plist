@@ -27,7 +27,7 @@
 	<key>SUEnableSystemProfiling</key>
 	<true/>
 	<key>SUFeedURL</key>
-	<string>http://0.0.0.0:1337/sparkletestcast.xml</string>
+	<string>http://localhost:1337/sparkletestcast.xml</string>
 	<key>SUPublicDSAKeyFile</key>
 	<string>test_app_only_dsa_pub.pem</string>
 	<key>NSAppTransportSecurity</key>

@@ -12,10 +12,9 @@
 #import <Foundation/Foundation.h>
 
 @interface SUCodeSigningVerifier : NSObject
-+ (BOOL)codeSignatureMatchesHostAndIsValidAtPath:(NSString *)applicationPath error:(NSError **)error;
-+ (BOOL)codeSignatureIsValidAtPath:(NSString *)applicationPath error:(NSError **)error;
-+ (BOOL)hostApplicationIsCodeSigned;
-+ (BOOL)applicationAtPathIsCodeSigned:(NSString *)applicationPath;
++ (BOOL)codeSignatureAtBundleURL:(NSURL *)oldBundlePath matchesSignatureAtBundleURL:(NSURL *)newBundlePath error:(NSError  **)error;
++ (BOOL)codeSignatureIsValidAtBundleURL:(NSURL *)bundlePath error:(NSError **)error;
++ (BOOL)bundleAtURLIsCodeSigned:(NSURL *)bundlePath;
 @end
 
 #endif

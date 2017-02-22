@@ -1,3 +1,69 @@
+# 1.17.0
+
+ * Added Touch Bar support (Bi11)
+ * Upgraded SULog to use logging APIs that Apple provides built-in (Zorg)
+ * Skip buttons are disabled if the update is marked as critical (Kornel Lesiński)
+ * Background updates ask OS for lower-priority networking (Kornel Lesiński)
+ * Refactorings to sync with upcoming 2.0
+   * Added kqueue based termination listener (Zorg)
+   * Added AppKit prevention guards to modules that shouldn't import it (Zorg)
+   * Added Obj-C generics where applicable (Zorg)
+   * Made SUBundleIcon & SUApplicationInfo take SUHost, not NSBundle (Zorg)
+   * Improved -[SUHost objectForInfoDictionaryKey:] (Zorg)
+   * Detect and fail if any two-way dependencies exist in the project (Zorg)
+ * generate_appcast:
+   * fixed handling of multiple directories in an archive
+   * percent encode the filename used in the delta url (Brett Walker)
+ * Update Sparkle.strings (BR Lingo)
+ * Improved handling of non-ASCII names in delta archives (Kornel Lesiński)
+ * Don't touch Info.plist unless git version changes (Václav Slavík)
+
+# 1.16.0
+
+ * Guided package installs are now the default for updating packages (Zorg)
+   - `pkg` installers won't show any UI. If you require the old behavior of showing a full installer window, rename the `*.pkg` file to `*.sparkle_interactive.pkg`
+ * Previous version of the app is now deleted instead of staying in the trash (Zorg)
+ * Added `generate_appcast` helper tool (Kornel Lesiński)
+ * Made manual check resume pending automatic updates instead of starting a new update (Kornel Lesiński)
+ * Started using `length` value from RSS if HTTP doesn't give one (Zorg)
+ * Hidden automatic updates checkbox for information only updates (Bi11)
+ * Added progressbar for DMG and binary delta extraction (Kornel Lesiński)
+ * Fixed showing of download status if we attempt a 2nd download (Zorg)
+ * Refactorings to sync with upcoming 2.0
+    * Decoupled and simplified installation code using protocols (Zorg)
+    * Added nullability annotations (Zorg)
+    * Allowed delegate methods that return an object to return nil (Zorg)
+    * Decreased responsibility of SUHost and moved code into other components (Zorg)
+    * Removed Sparkle.pch and many file #includes (Zorg)
+
+# 1.15.0
+
+* A new icon! Thanks to 1024jp
+* Show alert when an update is sent over insecure HTTP with no DSA key (Zorg)
+  - If you can't use HTTPS, you must at least sign updates with a DSA key.
+* Improved binary delta implementation (Zorg)
+* Added improved -validateMenuItem: as a method in SUUpdater.h for public use (Zorg)
+* Removed reachability preflight check (Zorg)
+* Clear update caches directory before downloading new update (Zorg)
+* Check the bundle's parent directory for writability too (Zorg)
+* Don't follow symbolic links for file operations (Zorg)
+* Don't bring up an authorized dialog during cleanup (Zorg)
+* Made Sparkle look for the highest compatible version regardless of timestamps (Zorg)
+* Fixed compatibility with 10.7
+  * Fixed crash on 10.7 - subscript operator not available (kleuter)
+  * Fixed warnings caused by -Wpartial-availability (Zorg)
+* Fixed german l10n. (Sebastian Volland)
+* Error code for download errors (Kornel Lesiński)
+* Update last update check date when the update driver finishes (Zorg)
+* Scale app icon up if needed in Software Update window (Nicholas Riley)
+* Don't register for termination notifications more than once (Zorg)
+* Don't terminate the app if we're already terminating (Zorg)
+* Removed SUEnableAutomaticChecksKeyOld and SUCheckAtStartup constants (Eitot)
+* Updated Sparkle framework headers to use modules if modules are available (B. Kevin Hardman)
+* Fixed warnings, fixed uses of SULocalizedString (Jerry Krinock)
+* Improved signing verifier to take any host and s/application/bundle/ (Zorg)
+* Improved Spotlight updates after delta extraction (Zorg)
+
 # 1.14.0 (Mar 11, 2016)
 
 * Disable javascript by default and make it opt-in (Zorg)
@@ -35,7 +101,7 @@ Important security fixes:
   - Strong documentation, easier to read code.
 * Automatic updates won't be installed if the system is about to shut off (Zorg)
 * Deprecated serving over HTTP without DSA (Zorg)
-  - Note that Apple has deprecated insecure HTTP in OS X 10.11
+  - Note that Apple has deprecated insecure HTTP in macOS 10.11
 * Improved Autoupdate application (Zorg)
     * Do all the installation work after the runloop is set up
     * TerminationListener only does termination listening now
@@ -133,12 +199,12 @@ Important security fixes:
 
 # 1.8.0 (Jul 26, 2014)
 
-* New SUDSAVerifier based on up-to-date OS X APIs (Zachary Waldowski)
+* New SUDSAVerifier based on up-to-date macOS APIs (Zachary Waldowski)
 * Detailed error log for failed signature checks (Kornel Lesiński)
 * Converted Sparkle to ARC (C.W. Betts)
 * Converted ivars to properties. (Jake Petroules)
 * Cocoapod support (Xhacker Liu)
-* Quarantine removal on OS X 10.10 (C.W. Betts)
+* Quarantine removal on macOS 10.10 (C.W. Betts)
 * Updated Japanese localization (1024jp)
 * Added Greek localization
 
@@ -159,7 +225,7 @@ Important security fixes:
 
 # 1.7.0
 
-* Dropped support for OS X 10.6. Sparkle now supports 10.7 and newer (including 10.10 Yosemite) on 64-bit Intel Macs (the last 32-bit Mac was released in 2006).
+* Dropped support for macOS 10.6. Sparkle now supports 10.7 and newer (including 10.10 Yosemite) on 64-bit Intel Macs (the last 32-bit Mac was released in 2006).
 * Removed use of deprecated functions (Zachary Waldowski)
 * Switched to modern Obj-C runtime and new literals syntax
 * Removed pre-10.7 code. (C.W. Betts)

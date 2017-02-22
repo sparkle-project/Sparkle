@@ -15,17 +15,19 @@
 #include <stdlib.h>
 #include <xar/xar.h>
 
+#include "AppKitPrevention.h"
+
 static BOOL applyBinaryDeltaToFile(xar_t x, xar_file_t file, NSString *sourceFilePath, NSString *destinationFilePath)
 {
     NSString *patchFile = temporaryFilename(@"apply-binary-delta");
     xar_extract_tofile(x, file, [patchFile fileSystemRepresentation]);
-    const char *argv[] = {"/usr/bin/bspatch", [sourceFilePath fileSystemRepresentation], [destinationFilePath fileSystemRepresentation], [patchFile fileSystemRepresentation]};
+    const char *argv[] = { "/usr/bin/bspatch", [sourceFilePath fileSystemRepresentation], [destinationFilePath fileSystemRepresentation], [patchFile fileSystemRepresentation] };
     BOOL success = (bspatch(4, argv) == 0);
     unlink([patchFile fileSystemRepresentation]);
     return success;
 }
 
-BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, BOOL verbose, NSError * __autoreleasing *error)
+BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, BOOL verbose, void (^progressCallback)(double progress), NSError *__autoreleasing *error)
 {
     xar_t x = xar_open([patchFile fileSystemRepresentation], READ);
     if (!x) {
@@ -34,69 +36,71 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         }
         return NO;
     }
-    
+
     SUBinaryDeltaMajorVersion majorDiffVersion = FIRST_DELTA_DIFF_MAJOR_VERSION;
-    SUBinaryDeltaMinorVersion minorDiffVersion = FIRST_DELTA_DIFF_MINOR_VERSION;
+    int minorDiffVersion = 0;
 
     NSString *expectedBeforeHashv1 = nil;
     NSString *expectedAfterHashv1 = nil;
-    
+
     NSString *expectedNewBeforeHash = nil;
     NSString *expectedNewAfterHash = nil;
-    
+
+    progressCallback(0/6.0);
+
     xar_subdoc_t subdoc;
     for (subdoc = xar_subdoc_first(x); subdoc; subdoc = xar_subdoc_next(subdoc)) {
         if (!strcmp(xar_subdoc_name(subdoc), BINARY_DELTA_ATTRIBUTES_KEY)) {
             const char *value = 0;
-            
+
             // available in version 2.0 or later
             xar_subdoc_prop_get(subdoc, MAJOR_DIFF_VERSION_KEY, &value);
             if (value)
                 majorDiffVersion = (SUBinaryDeltaMajorVersion)[@(value) intValue];
-            
+
             // available in version 2.0 or later
             xar_subdoc_prop_get(subdoc, MINOR_DIFF_VERSION_KEY, &value);
             if (value)
-                minorDiffVersion = (SUBinaryDeltaMinorVersion)[@(value) intValue];
-            
+                minorDiffVersion = [@(value) intValue];
+
             // available in version 2.0 or later
             xar_subdoc_prop_get(subdoc, BEFORE_TREE_SHA1_KEY, &value);
             if (value)
                 expectedNewBeforeHash = @(value);
-            
+
             // available in version 2.0 or later
             xar_subdoc_prop_get(subdoc, AFTER_TREE_SHA1_KEY, &value);
             if (value)
                 expectedNewAfterHash = @(value);
-            
+
             // only available in version 1.0
             xar_subdoc_prop_get(subdoc, BEFORE_TREE_SHA1_OLD_KEY, &value);
             if (value)
                 expectedBeforeHashv1 = @(value);
-            
+
             // only available in version 1.0
             xar_subdoc_prop_get(subdoc, AFTER_TREE_SHA1_OLD_KEY, &value);
             if (value)
                 expectedAfterHashv1 = @(value);
         }
     }
-    
+
     if (majorDiffVersion < FIRST_DELTA_DIFF_MAJOR_VERSION) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadCorruptFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Unable to identify diff-version %u in delta.  Giving up.", majorDiffVersion] }];
         }
         return NO;
     }
-    
+
     if (majorDiffVersion > LATEST_DELTA_DIFF_MAJOR_VERSION) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"A later version is needed to apply this patch (on major version %u, but patch requests version %u).", LATEST_DELTA_DIFF_MAJOR_VERSION, majorDiffVersion] }];
         }
         return NO;
     }
-    
+
     BOOL usesNewTreeHash = MAJOR_VERSION_IS_AT_LEAST(majorDiffVersion, SUBeigeMajorVersion);
-    
+
     NSString *expectedBeforeHash = usesNewTreeHash ? expectedNewBeforeHash : expectedBeforeHashv1;
     NSString *expectedAfterHash = usesNewTreeHash ? expectedNewAfterHash : expectedAfterHashv1;
 
@@ -111,7 +115,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         fprintf(stderr, "Applying version %u.%u patch...\n", majorDiffVersion, minorDiffVersion);
         fprintf(stderr, "Verifying source...");
     }
-    
+
+    progressCallback(1/6.0);
+
     NSString *beforeHash = hashOfTreeWithVersion(source, majorDiffVersion);
     if (!beforeHash) {
         if (verbose) {
@@ -136,7 +142,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     if (verbose) {
         fprintf(stderr, "\nCopying files...");
     }
-    
+
+    progressCallback(2/6.0);
+
     if (!removeTree(destination)) {
         if (verbose) {
             fprintf(stderr, "\n");
@@ -146,6 +154,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         }
         return NO;
     }
+
+    progressCallback(3/6.0);
+
     if (!copyTree(source, destination)) {
         if (verbose) {
             fprintf(stderr, "\n");
@@ -155,7 +166,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         }
         return NO;
     }
-    
+
+    progressCallback(4/6.0);
+
     BOOL hasExtractKeyAvailable = MAJOR_VERSION_IS_AT_LEAST(majorDiffVersion, SUBeigeMajorVersion);
 
     if (verbose) {
@@ -172,10 +185,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         // Don't use -[NSFileManager fileExistsAtPath:] because it will follow symbolic links
         BOOL fileExisted = verbose && [fileManager attributesOfItemAtPath:destinationFilePath error:nil];
         BOOL removedFile = NO;
-        
+
         const char *value;
-        if (!xar_prop_get(file, DELETE_KEY, &value) ||
-            (!hasExtractKeyAvailable && !xar_prop_get(file, DELETE_THEN_EXTRACT_OLD_KEY, &value))) {
+        if (!xar_prop_get(file, DELETE_KEY, &value) || (!hasExtractKeyAvailable && !xar_prop_get(file, DELETE_THEN_EXTRACT_OLD_KEY, &value))) {
             if (!removeTree(destinationFilePath)) {
                 if (verbose) {
                     fprintf(stderr, "\n");
@@ -191,7 +203,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 }
                 continue;
             }
-            
+
             removedFile = YES;
         }
 
@@ -205,13 +217,12 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 }
                 return NO;
             }
-            
+
             if (verbose) {
                 fprintf(stderr, "\n🔨  %s %s", VERBOSE_PATCHED, [path fileSystemRepresentation]);
             }
-        } else if ((hasExtractKeyAvailable && !xar_prop_get(file, EXTRACT_KEY, &value)) ||
-                   (!hasExtractKeyAvailable && xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value))) { // extract and permission modifications don't coexist
-            
+        } else if ((hasExtractKeyAvailable && !xar_prop_get(file, EXTRACT_KEY, &value)) || (!hasExtractKeyAvailable && xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value))) { // extract and permission modifications don't coexist
+
             if (xar_extract_tofile(x, file, [destinationFilePath fileSystemRepresentation]) != 0) {
                 if (verbose) {
                     fprintf(stderr, "\n");
@@ -221,7 +232,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 }
                 return NO;
             }
-            
+
             if (verbose) {
                 if (fileExisted) {
                     fprintf(stderr, "\n✏️  %s %s", VERBOSE_UPDATED, [path fileSystemRepresentation]);
@@ -232,7 +243,7 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         } else if (verbose && removedFile) {
             fprintf(stderr, "\n❌  %s %s", VERBOSE_DELETED, [path fileSystemRepresentation]);
         }
-        
+
         if (!xar_prop_get(file, MODIFY_PERMISSIONS_KEY, &value)) {
             mode_t mode = (mode_t)[[NSString stringWithUTF8String:value] intValue];
             if (!modifyPermissions(destinationFilePath, mode)) {
@@ -244,13 +255,15 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
                 }
                 return NO;
             }
-            
+
             if (verbose) {
                 fprintf(stderr, "\n👮  %s %s (0%o)", VERBOSE_MODIFIED, [path fileSystemRepresentation], mode);
             }
         }
     }
     xar_close(x);
+
+    progressCallback(5/6.0);
 
     if (verbose) {
         fprintf(stderr, "\nVerifying destination...");
@@ -276,6 +289,8 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         removeTree(destination);
         return NO;
     }
+
+    progressCallback(6/6.0);
 
     if (verbose) {
         fprintf(stderr, "\nDone!\n");

@@ -10,14 +10,14 @@ import XCTest
 
 class SUTestApplicationTest: XCTestCase
 {
-    var testApplicationURL: NSURL? = nil
-    var testApplicationBackupURL: NSURL? = nil
-    var tempDirectoryURL: NSURL? = nil
+    var testApplicationURL: URL? = nil
+    var testApplicationBackupURL: URL? = nil
+    var tempDirectoryURL: URL? = nil
     
     func runningTestApplication() -> NSRunningApplication
     {
         // TODO: don't hardcode bundle ID?
-        let runningApplications = NSRunningApplication.runningApplicationsWithBundleIdentifier("org.sparkle-project.SparkleTestApp")
+        let runningApplications = NSRunningApplication.runningApplications(withBundleIdentifier: "org.sparkle-project.SparkleTestApp")
         XCTAssertEqual(runningApplications.count, 1, "More than one or zero running instances of the Test Application are found")
         return runningApplications[0]
     }
@@ -35,11 +35,11 @@ class SUTestApplicationTest: XCTestCase
         // When a successful test is over we'll revert the update
         let testApplicationURL = self.runningTestApplication().bundleURL!
         
-        let tempDirectoryURL = try! NSFileManager.defaultManager().URLForDirectory(.ItemReplacementDirectory, inDomain: NSSearchPathDomainMask.UserDomainMask, appropriateForURL: testApplicationURL, create: true)
+        let tempDirectoryURL = try! FileManager.default.url(for: .itemReplacementDirectory, in: FileManager.SearchPathDomainMask.userDomainMask, appropriateFor: testApplicationURL, create: true)
         
-        let testApplicationBackupURL = tempDirectoryURL.URLByAppendingPathComponent(testApplicationURL.lastPathComponent!)
+        let testApplicationBackupURL = tempDirectoryURL.appendingPathComponent(testApplicationURL.lastPathComponent)
         
-        try! NSFileManager.defaultManager().copyItemAtURL(testApplicationURL, toURL: testApplicationBackupURL)
+        try! FileManager.default.copyItem(at: testApplicationURL, to: testApplicationBackupURL)
         
         self.testApplicationURL = testApplicationURL
         self.testApplicationBackupURL = testApplicationBackupURL
@@ -58,16 +58,16 @@ class SUTestApplicationTest: XCTestCase
         // Revert our update with the original test application
         
         var resultingURL: NSURL? = nil
-        try! NSFileManager.defaultManager().replaceItemAtURL(self.testApplicationURL!, withItemAtURL: self.testApplicationBackupURL!, backupItemName: nil, options: .UsingNewMetadataOnly, resultingItemURL: &resultingURL)
+        try! FileManager.default.replaceItem(at: self.testApplicationURL!, withItemAt: self.testApplicationBackupURL!, backupItemName: nil, options: .usingNewMetadataOnly, resultingItemURL: &resultingURL)
         
         do {
-            try NSFileManager.defaultManager().removeItemAtURL(self.tempDirectoryURL!)
+            try FileManager.default.removeItem(at: self.tempDirectoryURL!)
         } catch let error as NSError {
             NSLog("Failed to remove temporary directory \(self.tempDirectoryURL) with error: \(error)")
         }
         
         // The URL we get back from NSFileManager should be the same..
-        XCTAssertEqual(self.testApplicationURL, resultingURL, "Test application was replaced, but at a different location")
+        XCTAssertEqual(self.testApplicationURL, resultingURL as URL?, "Test application was replaced, but at a different location")
         
         super.tearDown()
     }
@@ -76,22 +76,27 @@ class SUTestApplicationTest: XCTestCase
     {
         let app = XCUIApplication()
         let menuBarsQuery = app.menuBars
-            
+
         menuBarsQuery.menuBarItems["Sparkle Test App"].click()
         
         // If the update window already showed up automatically, this option will be disabled.
         // Even if it's disabled, attempting to click it will do no harm and continue on
         menuBarsQuery.menuItems["Check for Updates…"].click()
         
+        // Workaround to make sure we can click the install update button later
+        // This workaround is needed if the alert prompts up automatically *before* we manually check for updates
+        // I'm not sure why this workaround works or is necessary
+        app.dialogs["SUUpdateAlert"].staticTexts["Software Update"].click()
+        
         app.dialogs["SUUpdateAlert"].buttons["Install Update"].click()
-        app.buttons["Install and Relaunch"].click()
+        app.windows["SUStatus"].buttons["Install and Relaunch"].click()
         
         // Wait for the new updated app to finish launching so we can test if it's the frontmost app
         sleep(3)
         
         // Our new updated app should be launched now. Test if it's the active app
         // We used to run into timing issues where the updated app sometimes may not show up as the frontmost one
-        XCTAssertTrue(self.runningTestApplication().active)
+        XCTAssertTrue(self.runningTestApplication().isActive)
         
         // Grab another XCUIApplication instance rather than using the old one, just in case
         let updatedApp = XCUIApplication()

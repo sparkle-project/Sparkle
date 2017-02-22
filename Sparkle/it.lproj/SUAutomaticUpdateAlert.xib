@@ -1,11 +1,14 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9046" systemVersion="15C27e" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16C68" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9046"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUAutomaticUpdateAlert">
             <connections>
+                <outlet property="installButton" destination="15" id="VHi-SZ-6td"/>
+                <outlet property="laterButton" destination="16" id="AZg-1M-E8w"/>
+                <outlet property="skipButton" destination="30" id="LpO-Ax-F1B"/>
                 <outlet property="window" destination="5" id="22"/>
             </connections>
         </customObject>
@@ -24,7 +27,6 @@
                     <imageView id="7">
                         <rect key="frame" x="23" y="73" width="64" height="64"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <animations/>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSApplicationIcon" id="38"/>
                         <connections>
                             <binding destination="-2" name="value" keyPath="applicationIcon" id="10"/>
@@ -33,7 +35,6 @@
                     <textField verticalHuggingPriority="750" id="8">
                         <rect key="frame" x="105" y="120" width="497" height="17"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <animations/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="39">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -46,7 +47,6 @@
                     <textField verticalHuggingPriority="750" id="9">
                         <rect key="frame" x="105" y="81" width="497" height="31"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <animations/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="40">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -59,7 +59,6 @@
                     <button verticalHuggingPriority="750" id="15">
                         <rect key="frame" x="435" y="12" width="167" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
-                        <animations/>
                         <buttonCell key="cell" type="push" title="Installa e Riavvia" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="41">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -74,7 +73,6 @@ DQ
                     <button verticalHuggingPriority="750" id="16">
                         <rect key="frame" x="306" y="12" width="129" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
-                        <animations/>
                         <buttonCell key="cell" type="push" title="Installa ed Esci" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="42">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -89,7 +87,6 @@ Gw
                     <button verticalHuggingPriority="750" id="30">
                         <rect key="frame" x="102" y="12" width="116" height="32"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <animations/>
                         <buttonCell key="cell" type="push" title="Non installare" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="44">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -101,7 +98,6 @@ Gw
                     <button id="17">
                         <rect key="frame" x="105" y="58" width="619" height="18"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <animations/>
                         <buttonCell key="cell" type="check" title="In futuro scarica e installa automaticamente gli aggiornamenti" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="43">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="smallSystem"/>
@@ -111,7 +107,6 @@ Gw
                         </connections>
                     </button>
                 </subviews>
-                <animations/>
             </view>
         </window>
         <userDefaultsController representsSharedInstance="YES" id="18" userLabel="Shared Defaults"/>
