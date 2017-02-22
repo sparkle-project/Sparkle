@@ -346,6 +346,15 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (void)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationInvocation:(NSInvocation *)invocation;
 
 /*!
+    Called when an update is scheduled to be silentyl installed on quit. Swift compatible.
+
+    \param updater the SUUpdater instance.
+    \param item The appcast item corresponding to the udpate that is proposed to be installed.
+    \param restartBlock Can be used to trigger an immediate silent install and relaunch.
+*/
+- (void)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationBlock:(void (^)()) restartBlock;
+
+/*!
     Calls after an update that was scheduled to be silently installed on quit has been canceled.
 
     \param updater The SUUpdater instance.
