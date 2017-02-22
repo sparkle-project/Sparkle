@@ -14,6 +14,13 @@
 
 #import "SUExport.h"
 
+typedef NS_ENUM(NSInteger, SUDUpdateAlertChoice) {
+    SUDInstallUpdateChoice,
+    SUDRemindMeLaterChoice,
+    SUDSkipThisVersionChoice,
+    SUDOpenInfoURLChoice
+};
+
 @protocol SUVersionComparison, SUVersionDisplay;
 @class SUUpdater, SUAppcast, SUAppcastItem;
 
@@ -44,6 +51,12 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  */
 @protocol SUUpdaterDelegate <NSObject>
 @optional
+
+/*!
+ Suppress sparkle UI. This should prevent any Sparkle UI from popping up.
+ Updates should be handled by the host.
+ */
+-(BOOL)suppressSparkleUI;
 
 /*!
  Returns whether to allow Sparkle to pop up.
@@ -120,6 +133,16 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  \param item The appcast item corresponding to the update that is proposed to be installed.
  */
 - (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)item;
+
+/*!
+ Called when a valid update is found by the update driver and provides delegate ability to respond.
+ 
+ \param updater The SUUpdater instance.
+ \param item The appcast item corresponding to the update that is proposed to be installed.
+ \param responseBlock The block carrying the users response to update.
+ */
+- (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)item respondWithChoice:(void (^)(SUDUpdateAlertChoice))responseBlock;
+
 
 /*!
  Called when a valid update is not found.
@@ -252,6 +275,15 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  \param invocation Can be used to trigger an immediate silent install and relaunch.
  */
 - (void)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationInvocation:(NSInvocation *)invocation;
+
+/*!
+ Called when an update is scheduled to be silently installed on quit. Swift compatible.
+ 
+ \param updater the SUUpdater instance.
+ \param item The appcast item corresponding to the udpate that is proposed to be installed.
+ \param restartBlock Can be used to trigger an immediate silent install and relaunch.
+ */
+- (void)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationBlock:(void (^)()) restartBlock;
 
 /*!
  Calls after an update that was scheduled to be silently installed on quit has been canceled.

@@ -69,30 +69,6 @@
     else if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
       [[updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
     }
-  
-//    self.updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host completionBlock:^(SUUpdateAlertChoice choice) {
-//        [self updateAlertFinishedWithChoice:choice];
-//    }];
-//
-//    id<SUVersionDisplay> versDisp = nil;
-//    if ([[updater delegate] respondsToSelector:@selector(versionDisplayerForUpdater:)]) {
-//        versDisp = [[updater delegate] versionDisplayerForUpdater:self.updater];
-//    }
-//    [self.updateAlert setVersionDisplayer:versDisp];
-//
-//    // If the app is a menubar app or the like, we need to focus it first and alter the
-//    // update prompt to behave like a normal window. Otherwise if the window were hidden
-//    // there may be no way for the application to be activated to make it visible again.
-//    if ([self.host isBackgroundApplication]) {
-//        [[self.updateAlert window] setHidesOnDeactivate:NO];
-//        [NSApp activateIgnoringOtherApps:YES];
-//    }
-  
-    // Only show the update alert if the app is active; otherwise, we'll wait until it is.
-//    if ([NSApp isActive])
-//        [[self.updateAlert window] makeKeyAndOrderFront:self];
-//    else
-//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
 - (BOOL)shouldDisableKeyboardShortcutForInstallButton {
@@ -151,7 +127,7 @@
 - (void)downloadUpdate
 {
     id<SUUpdaterPrivate> updater = self.updater;
-    if(![[updater delegate] suppressUI])
+    if(![[updater delegate] suppressSparkleUI])
     {
         BOOL createdStatusController = NO;
         if (self.statusController == nil) {
