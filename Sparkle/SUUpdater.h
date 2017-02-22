@@ -222,6 +222,18 @@ SU_EXPORT @interface SUUpdater : NSObject
  */
 @property (readonly, copy) NSDate *lastUpdateCheckDate;
 
+
+/*!
+ Called when an update is scheduled to be silently installed on quit. Swift compatible.
+
+ \param updater the SUUpdater instance.
+ \param item The appcast item corresponding to the udpate that is proposed to be installed.
+ \param restartBlock Can be used to trigger an immediate silent install and relaunch.
+*/
+- (void)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationBlock:(void (^)()) restartBlock;
+
+
+
 /*!
     Appropriately schedules or cancels the update checking timer according to
     the preferences for time interval and automatic checks.
