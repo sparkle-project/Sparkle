@@ -48,12 +48,13 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)showUpdateAlert
 {
-  id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
-  if ([updaterDelegate suppressSparkleUI])
-  {
-    [self automaticUpdateAlertFinishedWithChoice:SUInstallLaterChoice];
-    return;
-  }
+    id<SUUpdaterPrivate> updater = self.updater;
+    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
+    if ([updaterDelegate suppressSparkleUI])
+    {
+      [self automaticUpdateAlertFinishedWithChoice:SUInstallLaterChoice];
+      return;
+    }
 //    NSLog(@"[Sparkle showUpdateAlert]");
   
     self.interruptible = NO;

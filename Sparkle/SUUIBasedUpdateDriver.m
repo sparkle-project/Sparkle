@@ -81,7 +81,7 @@
     // If the app is a menubar app or the like, we need to focus it first and alter the
     // update prompt to behave like a normal window. Otherwise if the window were hidden
     // there may be no way for the application to be activated to make it visible again.
-    if ([self.host isBackgroundApplication]) {
+    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
         [[self.updateAlert window] setHidesOnDeactivate:NO];
         [NSApp activateIgnoringOtherApps:YES];
     }
@@ -149,7 +149,7 @@
 - (void)downloadUpdate
 {
     id<SUUpdaterPrivate> updater = self.updater;
-    if(![[updater delegate] suppressUI])
+    if(![[updater delegate] suppressSparkleUI])
     {
         BOOL createdStatusController = NO;
         if (self.statusController == nil) {

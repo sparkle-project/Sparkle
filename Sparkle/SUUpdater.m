@@ -10,6 +10,7 @@
 #import "SUUpdaterDelegate.h"
 #import "SUUpdaterPrivate.h"
 
+#import "SUErrors.h"
 #import "SUHost.h"
 #import "SUUpdatePermissionResponse.h"
 #import "SUUpdatePermissionPrompt.h"
@@ -291,7 +292,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
             NSError *error =
             [NSError errorWithDomain:SUSparkleErrorDomain code:SUHostDirectoryNotWritable
                             userInfo:@{NSLocalizedDescriptionKey: SULocalizedString(@"Host directory is not writable", nil)}];
-            [self.delegate updater:nil didAbortWithError:error];
+            [self.delegate updater:self didAbortWithError:error];
         }
         return;
     }

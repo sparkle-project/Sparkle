@@ -18,13 +18,6 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SUVersionDisplayProtocol.h"
 
-typedef NS_ENUM(NSInteger, SUDUpdateAlertChoice) {
-  SUDInstallUpdateChoice,
-  SUDRemindMeLaterChoice,
-  SUDSkipThisVersionChoice,
-  SUDOpenInfoURLChoice
-};
-
 @class SUAppcastItem, SUAppcast;
 
 @protocol SUUpdaterDelegate;
@@ -59,13 +52,6 @@ SU_EXPORT @interface SUUpdater : NSObject
  If an updater has already been initialized for the provided bundle, that shared instance will be returned.
  */
 - (instancetype)initForBundle:(NSBundle *)bundle;
-
-/*!
- Suppress sparkle UI. This should prevent any Sparkle UI from popping up.
- Updates should be handled by the host.
- */
--(BOOL)suppressSparkleUI;
-
 
 /*!
  Explicitly checks for updates and displays a progress dialog while doing so.
@@ -118,16 +104,6 @@ SU_EXPORT @interface SUUpdater : NSObject
  Setting this property will persist in the host bundle's user defaults.
  */
 @property BOOL automaticallyDownloadsUpdates;
-
-/*!
- Called when a valid update is found by the update driver and provides delegate ability to respond.
-
- \param updater The SUUpdater instance.
- \param item The appcast item corresponding to the update that is proposed to be installed.
- \param responseBlock The block carrying the users response to update.
-*/
-- (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)item respondWithChoice:(void (^)(SUDUpdateAlertChoice))responseBlock;
-
 
 /*!
  A property indicating the current automatic update check interval.
@@ -221,18 +197,6 @@ SU_EXPORT @interface SUUpdater : NSObject
     \returns \c nil if no check has been performed.
  */
 @property (readonly, copy) NSDate *lastUpdateCheckDate;
-
-
-/*!
- Called when an update is scheduled to be silently installed on quit. Swift compatible.
-
- \param updater the SUUpdater instance.
- \param item The appcast item corresponding to the udpate that is proposed to be installed.
- \param restartBlock Can be used to trigger an immediate silent install and relaunch.
-*/
-- (void)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationBlock:(void (^)()) restartBlock;
-
-
 
 /*!
     Appropriately schedules or cancels the update checking timer according to
