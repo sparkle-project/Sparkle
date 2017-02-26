@@ -166,10 +166,11 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     FILE *pipe = NULL;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    if (AuthorizationExecuteWithPrivileges(_auth, toolPath, kAuthorizationFlagDefaults, arguments, &pipe) != errAuthorizationSuccess) {
+    OSStatus runStatus = AuthorizationExecuteWithPrivileges(_auth, toolPath, kAuthorizationFlagDefaults, arguments, &pipe);
+    if (runStatus != errAuthorizationSuccess) {
 #pragma clang diagnostic pop
         if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey:@"Failed to run authorization tool." }];
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Failed to run authorization tool %s (%d).", toolPath, (int)runStatus] }];
         }
         return NO;
     }
