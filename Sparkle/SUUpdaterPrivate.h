@@ -20,4 +20,6 @@
 
 @property (strong, readonly) NSBundle *sparkleBundle;
 
+@property BOOL automaticallyDownloadsUpdates;
+
 @end

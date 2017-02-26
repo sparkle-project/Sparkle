@@ -284,22 +284,10 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (void)checkForUpdatesInBackground
 {
     // Do not use reachability for a preflight check. This can be deceptive and a bad idea. Apple does not recommend doing it.
-    BOOL canAutomaticallyDownloadUpdates = [self automaticallyDownloadsUpdates];
-    if (!canAutomaticallyDownloadUpdates)
-    {
-        // TB: App is in a non writable directory
-        if ([self.delegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
-            NSError *error =
-            [NSError errorWithDomain:SUSparkleErrorDomain code:SUHostDirectoryNotWritable
-                            userInfo:@{NSLocalizedDescriptionKey: SULocalizedString(@"Host directory is not writable", nil)}];
-            [self.delegate updater:self didAbortWithError:error];
-        }
-        return;
-    }
     
     SUUpdateDriver *theUpdateDriver;
     
-    if (canAutomaticallyDownloadUpdates || [self.delegate suppressSparkleUI])
+    if ([self.delegate suppressSparkleUI])
     {
         theUpdateDriver = [[SUAutomaticUpdateDriver alloc] initWithUpdater:self];
     }
