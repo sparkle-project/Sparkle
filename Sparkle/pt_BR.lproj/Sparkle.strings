@@ -37,7 +37,7 @@
 
 "Cancel Update" = "Cancelar Atualização";
 
-"Checking for updates..." = "Buscar atualizações…";
+"Checking for updates..." = "Verificando atualizações…";
 
 /* Take care not to overflow the status window. */
 "Downloading update..." = "Transferindo atualização…";
