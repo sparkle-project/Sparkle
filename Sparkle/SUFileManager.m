@@ -143,7 +143,11 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     return YES;
 }
 
-- (BOOL)_authorizeAndExecuteCommand:(char *)command sourcePath:(char *)sourcePath destinationPath:(char *)destinationPath error:(NSError * __autoreleasing *)error
+- (BOOL)_authorizeAndExecuteCommand:(char *)command sourcePath:(char *)sourcePath destinationPath:(char *)destinationPath error:(NSError * __autoreleasing *)error {
+    return [self _authorizeAndExecuteCommand:command sourcePath:sourcePath destinationPath:destinationPath lineCallback:nil error:error];
+}
+
+- (BOOL)_authorizeAndExecuteCommand:(char *)command sourcePath:(char *)sourcePath destinationPath:(char *)destinationPath lineCallback:(void(^)(NSString*))lineCallback error:(NSError * __autoreleasing *)error
 {
     NSError *acquireError = nil;
     if (![self _acquireAuthorizationWithError:&acquireError]) {
@@ -184,6 +188,11 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         return NO;
     }
     
+    if (lineCallback) {
+        NSFileHandle *pipeHandle = [[NSFileHandle alloc] initWithFileDescriptor:fileno(pipe) closeOnDealloc:NO];
+        [self parseLines:pipeHandle lineCallback:lineCallback];
+    }
+
     pid_t childPid = (int32_t)CFSwapInt32LittleToHost(pidData);
     int status = 0;
     
@@ -202,6 +211,28 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     }
     
     return YES;
+}
+
+- (void)parseLines:(NSFileHandle *)pipeHandle lineCallback:(void(^)(NSString *))lineCallback {
+    __block NSMutableData *line = [NSMutableData new];
+    pipeHandle.readabilityHandler = ^(NSFileHandle *handle){
+        NSData *data = handle.availableData;
+        NSUInteger length = data.length;
+        if (!length) {
+            return;
+        }
+        const char *bytes = data.bytes;
+        for(NSUInteger i = 0; i < length; i++) {
+            if (bytes[i] == '\n') {
+                NSData *dataToEOL = [data subdataWithRange:NSMakeRange(0, i)];
+                [line appendData:dataToEOL];
+                NSString *fullLine = [[NSString alloc] initWithData:line encoding:NSUTF8StringEncoding];
+                lineCallback(fullLine);
+                line = [[data subdataWithRange:NSMakeRange(i+1, length-i-1)] mutableCopy];
+                break;
+            }
+        }
+    };
 }
 
 - (void)dealloc
@@ -924,7 +955,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
 }
 
 // Unlike other methods, authorization is required to execute this method successfully
-- (BOOL)executePackageAtURL:(NSURL *)packageURL error:(NSError * __autoreleasing *)error
+- (BOOL)executePackageAtURL:(NSURL *)packageURL progressBlock:(void(^)(double))progressBlock error:(NSError * __autoreleasing *)error
 {
     if (![self _itemExistsAtURL:packageURL]) {
         if (error != NULL) {
@@ -942,7 +973,11 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     }
     
     NSError *executeError = nil;
-    BOOL success = [self _authorizeAndExecuteCommand:SUFileOpInstallCommand sourcePath:path destinationPath:NULL error:&executeError];
+    BOOL success = [self _authorizeAndExecuteCommand:SUFileOpInstallCommand sourcePath:path destinationPath:NULL lineCallback:^(NSString *line){
+        if ([line hasPrefix:@"installer:%"]) {
+            progressBlock([[line substringFromIndex:11] doubleValue]/100.0);
+        }
+    } error:&executeError];
     
     if (!success && error != NULL) {
         NSString* errorMessage = @"Failed to execute package installer.";
