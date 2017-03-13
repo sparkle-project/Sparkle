@@ -170,7 +170,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     if (runStatus != errAuthorizationSuccess) {
 #pragma clang diagnostic pop
         if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Failed to run authorization tool %s (%d).", toolPath, (int)runStatus] }];
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Failed to run authorization tool %@ (%d).", [NSString stringWithCString:toolPath encoding:NSUTF8StringEncoding], (int)runStatus] }];
         }
         return NO;
     }
