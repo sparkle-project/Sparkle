@@ -1,6 +1,6 @@
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ foi transferido e está pronto para uso! Deseja instalar e reiniciar o %1$@ agora?";
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ foi transferido e está pronto para uso! Deseja instalar e reabrir o %1$@ agora?";
 
-"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "%1$@ não pode ser atualizado enquanto for executado a partir de um volume somente de leitura, como uma imagem de disco ou CD/DVD. Mova o %1$@ para a pasta Aplicativos, reinicie-o e tente novamente.";
+"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "%1$@ não pode ser atualizado enquanto for executado a partir de um volume somente de leitura, como uma imagem de disco ou CD/DVD. Mova o %1$@ para a pasta Aplicativos, reabra-o e tente novamente.";
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ é a versão mais recente disponível.";
 

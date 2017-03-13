@@ -6,21 +6,26 @@
 //  Copyright 2007 Andy Matuschak. All rights reserved.
 //
 
-#import "SUUpdater.h"
-
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SUStandardVersionComparator.h"
 
+
+#include "AppKitPrevention.h"
+
 @implementation SUStandardVersionComparator
+
+- (instancetype)init
+{
+    return [super init];
+}
 
 + (SUStandardVersionComparator *)defaultComparator
 {
     static SUStandardVersionComparator *defaultComparator = nil;
-    if (defaultComparator == nil) {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
         defaultComparator = [[SUStandardVersionComparator alloc] init];
-    }
+    });
     return defaultComparator;
 }
 

@@ -6,21 +6,22 @@
         <title>Version 2.0</title>
         <description>desc</description>
         <pubDate>Sat, 26 Jul 2014 15:20:11 +0000</pubDate>
-        <enclosure url="http://0.0.0.0:1337/Sparkle_Test_App.zip" sparkle:version="2.0" />
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="2.0" />
+        <sparkle:tags> <sparkle:criticalUpdate /> </sparkle:tags> 
     </item>
     <!-- The best chosen release -->
     <item>
         <title>Version 3.0</title>
-        <enclosure url="http://0.0.0.0:1337/Sparkle_Test_App.zip" sparkle:version="3.0" />
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="3.0" />
         <sparkle:deltas>
-            <enclosure url="http://0.0.0.0:1337/3.0_from_2.0.patch"
+            <enclosure url="http://localhost:1337/3.0_from_2.0.patch"
             sparkle:version="3.0"
             sparkle:deltaFrom="2.0"
             length="1235"
             type="application/octet-stream"
             sparkle:dsaSignature="..." />
             
-            <enclosure url="http://0.0.0.0:1337/3.0_from_1.0.patch"
+            <enclosure url="http://localhost:1337/3.0_from_1.0.patch"
             sparkle:version="3.0"
             sparkle:deltaFrom="1.0"
             length="1485"
@@ -32,13 +33,13 @@
     <item>
         <title>Version 4.0</title>
         <pubDate>Sat, 26 Jul 2014 15:20:13 +0000</pubDate>
-        <enclosure url="http://0.0.0.0:1337/Sparkle_Test_App.zip" sparkle:version="4.0" />
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="4.0" />
         <sparkle:minimumSystemVersion>17.0.0</sparkle:minimumSystemVersion>
     </item>
     <!-- A joke release testing maximumSystemVersion -->
     <item>
         <title>Version 5.0</title>
-        <enclosure url="http://0.0.0.0:1337/Sparkle_Test_App.zip" sparkle:version="5.0" />
+        <enclosure url="http://localhost:1337/Sparkle_Test_App.zip" sparkle:version="5.0" />
         <sparkle:maximumSystemVersion>2.0.0</sparkle:maximumSystemVersion>
     </item>
   </channel>

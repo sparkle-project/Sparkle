@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Sparkle Project. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 
 @interface SUTestApplicationDelegate : NSObject <NSApplicationDelegate>
 

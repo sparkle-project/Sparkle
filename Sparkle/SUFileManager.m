@@ -7,12 +7,16 @@
 //
 
 #import "SUFileManager.h"
+#import "SUErrors.h"
 #import "SUOperatingSystem.h"
 #import "SUFileOperationConstants.h"
 
 #include <sys/xattr.h>
 #include <sys/errno.h>
 #include <sys/time.h>
+
+
+#include "AppKitPrevention.h"
 
 static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
 
@@ -162,10 +166,11 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     FILE *pipe = NULL;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    if (AuthorizationExecuteWithPrivileges(_auth, toolPath, kAuthorizationFlagDefaults, arguments, &pipe) != errAuthorizationSuccess) {
+    OSStatus runStatus = AuthorizationExecuteWithPrivileges(_auth, toolPath, kAuthorizationFlagDefaults, arguments, &pipe);
+    if (runStatus != errAuthorizationSuccess) {
 #pragma clang diagnostic pop
         if (error != NULL) {
-            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey:@"Failed to run authorization tool." }];
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Failed to run authorization tool %s (%d).", toolPath, (int)runStatus] }];
         }
         return NO;
     }
@@ -915,91 +920,6 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUAuthenticationFailure userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove %@ with authentication.", url.path.lastPathComponent], NSUnderlyingErrorKey: executeError }];
     }
     
-    return success;
-}
-
-- (BOOL)moveItemAtURLToTrash:(NSURL *)url error:(NSError *__autoreleasing *)error
-{
-    if (![self _itemExistsAtURL:url]) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move %@ to the trash because the file does not exist.", url.path.lastPathComponent] }];
-        }
-        return NO;
-    }
-
-    NSURL *trashURL = nil;
-    BOOL canUseNewTrashAPI = YES;
-#if __MAC_OS_X_VERSION_MIN_REQUIRED < 1080
-    canUseNewTrashAPI = [SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 8, 0}];
-    if (!canUseNewTrashAPI) {
-        FSRef trashRef;
-        if (FSFindFolder(kUserDomain, kTrashFolderType, kDontCreateFolder, &trashRef) == noErr) {
-            trashURL = CFBridgingRelease(CFURLCreateFromFSRef(kCFAllocatorDefault, &trashRef));
-        }
-    }
-#endif
-
-    if (canUseNewTrashAPI) {
-        trashURL = [_fileManager URLForDirectory:NSTrashDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:NO error:nil];
-    }
-
-    if (trashURL == nil) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: @"Failed to locate the user's trash folder." }];
-        }
-        return NO;
-    }
-
-    // In the rare worst case scenario, our temporary directory will be labeled incomplete and be in the user's trash directory,
-    // indicating that whatever inside of there is not yet completely moved.
-    // Regardless, we want the item to be in our Volume before we try moving it to the trash
-    NSString *preferredName = [url.lastPathComponent.stringByDeletingPathExtension stringByAppendingString:@" (Incomplete Files)"];
-    NSURL *tempDirectory = [self makeTemporaryDirectoryWithPreferredName:preferredName appropriateForDirectoryURL:trashURL error:error];
-    if (tempDirectory == nil) {
-        return NO;
-    }
-
-    NSString *urlLastPathComponent = url.lastPathComponent;
-    NSURL *tempItemURL = [tempDirectory URLByAppendingPathComponent:urlLastPathComponent];
-    if (![self moveItemAtURL:url toURL:tempItemURL error:error]) {
-        // If we can't move the item at url, just remove it completely; chances are it's not going to be missed
-        [self removeItemAtURL:url error:NULL];
-        [self removeItemAtURL:tempDirectory error:NULL];
-        return NO;
-    }
-
-    if (![self changeOwnerAndGroupOfItemAtRootURL:tempItemURL toMatchURL:trashURL error:error]) {
-        // Removing the item inside of the temp directory is better than trying to move the item to the trash with incorrect ownership
-        [self removeItemAtURL:tempDirectory error:NULL];
-        return NO;
-    }
-
-    // If we get here, we should be able to trash the item normally without authentication
-
-    BOOL success = NO;
-#if __MAC_OS_X_VERSION_MIN_REQUIRED < 1080
-    if (!canUseNewTrashAPI) {
-        NSString *tempParentPath = tempItemURL.URLByDeletingLastPathComponent.path;
-        success = [[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:tempParentPath destination:@"" files:@[tempItemURL.lastPathComponent] tag:NULL];
-        if (!success && error != NULL) {
-            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to move file %@ into the trash.", tempItemURL.lastPathComponent] }];
-        }
-    }
-#endif
-
-    if (canUseNewTrashAPI) {
-        NSError *trashError = nil;
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-        success = [_fileManager trashItemAtURL:tempItemURL resultingItemURL:NULL error:&trashError];
-#pragma clang diagnostic pop
-        if (!success && error != NULL) {
-            *error = trashError;
-        }
-    }
-
-    [self removeItemAtURL:tempDirectory error:NULL];
-
     return success;
 }
 

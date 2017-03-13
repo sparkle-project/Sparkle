@@ -11,6 +11,9 @@
 #import "SUCodeSigningVerifier.h"
 #import "SULog.h"
 
+
+#include "AppKitPrevention.h"
+
 @implementation SUCodeSigningVerifier
 
 + (BOOL)codeSignatureAtBundleURL:(NSURL *)oldBundleURL matchesSignatureAtBundleURL:(NSURL *)newBundleURL error:(NSError *__autoreleasing *)error
@@ -31,13 +34,13 @@
 
     result = SecCodeCopyDesignatedRequirement(oldCode, kSecCSDefaultFlags, &requirement);
     if (result != noErr) {
-        SULog(@"Failed to copy designated requirement. Code Signing OSStatus code: %d", result);
+        SULog(SULogLevelError, @"Failed to copy designated requirement. Code Signing OSStatus code: %d", result);
         goto finally;
     }
 
     result = SecStaticCodeCreateWithPath((__bridge CFURLRef)newBundleURL, kSecCSDefaultFlags, &staticCode);
     if (result != noErr) {
-        SULog(@"Failed to get static code %d", result);
+        SULog(SULogLevelError, @"Failed to get static code %d", result);
         goto finally;
     }
     
@@ -55,12 +58,12 @@
     
     if (result != noErr) {
         if (result == errSecCSUnsigned) {
-            SULog(@"The host app is signed, but the new version of the app is not signed using Apple Code Signing. Please ensure that the new app is signed and that archiving did not corrupt the signature.");
+            SULog(SULogLevelError, @"The host app is signed, but the new version of the app is not signed using Apple Code Signing. Please ensure that the new app is signed and that archiving did not corrupt the signature.");
         }
         if (result == errSecCSReqFailed) {
             CFStringRef requirementString = nil;
             if (SecRequirementCopyString(requirement, kSecCSDefaultFlags, &requirementString) == noErr) {
-                SULog(@"Code signature of the new version doesn't match the old version: %@. Please ensure that old and new app is signed using exactly the same certificate.", requirementString);
+                SULog(SULogLevelError, @"Code signature of the new version doesn't match the old version: %@. Please ensure that old and new app is signed using exactly the same certificate.", requirementString);
                 CFRelease(requirementString);
             }
             
@@ -87,7 +90,7 @@ finally:
 
     result = SecStaticCodeCreateWithPath((__bridge CFURLRef)bundleURL, kSecCSDefaultFlags, &staticCode);
     if (result != noErr) {
-        SULog(@"Failed to get static code %d", result);
+        SULog(SULogLevelError, @"Failed to get static code %d", result);
         goto finally;
     }
 
@@ -102,7 +105,7 @@ finally:
     
     if (result != noErr) {
         if (result == errSecCSUnsigned) {
-            SULog(@"Error: The app is not signed using Apple Code Signing. %@", bundleURL);
+            SULog(SULogLevelError, @"Error: The app is not signed using Apple Code Signing. %@", bundleURL);
         }
         if (result == errSecCSReqFailed) {
             [self logSigningInfoForCode:staticCode label:@"new info"];
@@ -130,7 +133,7 @@ static id valueOrNSNull(id value) {
         NSDictionary *infoPlist = [signingDict objectForKey:@"info-plist"];
         [relevantInfo setObject:valueOrNSNull([infoPlist objectForKey:@"CFBundleShortVersionString"]) forKey:@"version"];
         [relevantInfo setObject:valueOrNSNull([infoPlist objectForKey:(__bridge NSString *)kCFBundleVersionKey]) forKey:@"build"];
-        SULog(@"%@: %@", label, relevantInfo);
+        SULog(SULogLevelDefault, @"%@: %@", label, relevantInfo);
     }
 }
 

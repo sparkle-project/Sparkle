@@ -1,3 +1,41 @@
+# 1.17.0
+
+ * Added Touch Bar support (Bi11)
+ * Upgraded SULog to use logging APIs that Apple provides built-in (Zorg)
+ * Skip buttons are disabled if the update is marked as critical (Kornel Lesiński)
+ * Background updates ask OS for lower-priority networking (Kornel Lesiński)
+ * Refactorings to sync with upcoming 2.0
+   * Added kqueue based termination listener (Zorg)
+   * Added AppKit prevention guards to modules that shouldn't import it (Zorg)
+   * Added Obj-C generics where applicable (Zorg)
+   * Made SUBundleIcon & SUApplicationInfo take SUHost, not NSBundle (Zorg)
+   * Improved -[SUHost objectForInfoDictionaryKey:] (Zorg)
+   * Detect and fail if any two-way dependencies exist in the project (Zorg)
+ * generate_appcast:
+   * fixed handling of multiple directories in an archive
+   * percent encode the filename used in the delta url (Brett Walker)
+ * Update Sparkle.strings (BR Lingo)
+ * Improved handling of non-ASCII names in delta archives (Kornel Lesiński)
+ * Don't touch Info.plist unless git version changes (Václav Slavík)
+
+# 1.16.0
+
+ * Guided package installs are now the default for updating packages (Zorg)
+   - `pkg` installers won't show any UI. If you require the old behavior of showing a full installer window, rename the `*.pkg` file to `*.sparkle_interactive.pkg`
+ * Previous version of the app is now deleted instead of staying in the trash (Zorg)
+ * Added `generate_appcast` helper tool (Kornel Lesiński)
+ * Made manual check resume pending automatic updates instead of starting a new update (Kornel Lesiński)
+ * Started using `length` value from RSS if HTTP doesn't give one (Zorg)
+ * Hidden automatic updates checkbox for information only updates (Bi11)
+ * Added progressbar for DMG and binary delta extraction (Kornel Lesiński)
+ * Fixed showing of download status if we attempt a 2nd download (Zorg)
+ * Refactorings to sync with upcoming 2.0
+    * Decoupled and simplified installation code using protocols (Zorg)
+    * Added nullability annotations (Zorg)
+    * Allowed delegate methods that return an object to return nil (Zorg)
+    * Decreased responsibility of SUHost and moved code into other components (Zorg)
+    * Removed Sparkle.pch and many file #includes (Zorg)
+
 # 1.15.0
 
 * A new icon! Thanks to 1024jp

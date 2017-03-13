@@ -11,11 +11,10 @@
 
 #import <Cocoa/Cocoa.h>
 #import "SUBasicUpdateDriver.h"
-#import "SUUpdateAlert.h"
 
 @class SUStatusController;
 
-@interface SUUIBasedUpdateDriver : SUBasicUpdateDriver <SUUnarchiverDelegate>
+@interface SUUIBasedUpdateDriver : SUBasicUpdateDriver
 
 - (void)showAlert:(NSAlert *)alert;
 - (IBAction)cancelDownload:(id)sender;

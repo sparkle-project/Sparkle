@@ -9,6 +9,7 @@
 #import <XCTest/XCTest.h>
 #import "SUConstants.h"
 #import "SUUpdater.h"
+#import "SUUpdaterDelegate.h"
 
 @interface SUUpdaterTest : XCTestCase <SUUpdaterDelegate>
 @property (strong) NSOperationQueue *queue;

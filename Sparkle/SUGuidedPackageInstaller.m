@@ -9,26 +9,49 @@
 #import "SUGuidedPackageInstaller.h"
 #import "SUFileManager.h"
 
+
+#include "AppKitPrevention.h"
+
+@interface SUGuidedPackageInstaller ()
+
+@property (nonatomic, readonly, copy) NSString *packagePath;
+@property (nonatomic, readonly, copy) NSString *installationPath;
+@property (nonatomic, readonly, copy) NSString *fileOperationToolPath;
+
+@end
+
 @implementation SUGuidedPackageInstaller
 
-+ (void)performInstallationToPath:(NSString *)destinationPath fromPath:(NSString *)packagePath host:(SUHost *)__unused host fileOperationToolPath:(NSString *)fileOperationToolPath versionComparator:(id<SUVersionComparison>)__unused comparator completionHandler:(void (^)(NSError *))completionHandler
+@synthesize packagePath = _packagePath;
+@synthesize installationPath = _installationPath;
+@synthesize fileOperationToolPath = _fileOperationToolPath;
+
+- (instancetype)initWithPackagePath:(NSString *)packagePath installationPath:(NSString *)installationPath fileOperationToolPath:(NSString *)fileOperationToolPath
 {
-    SUParameterAssert(packagePath);
+    self = [super init];
+    if (self != nil) {
+        _packagePath = [packagePath copy];
+        _installationPath = [installationPath copy];
+        _fileOperationToolPath = [fileOperationToolPath copy];
+    }
+    return self;
+}
+
+- (BOOL)performInitialInstallation:(NSError * __autoreleasing *)__unused error
+{
+    return YES;
+}
+
+- (BOOL)performFinalInstallation:(NSError * __autoreleasing *)error
+{
+    SUFileManager *fileManager = [SUFileManager fileManagerWithAuthorizationToolPath:self.fileOperationToolPath];
     
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        SUFileManager *fileManager = [SUFileManager fileManagerWithAuthorizationToolPath:fileOperationToolPath];
-        
-        NSError *error = nil;
-        BOOL validInstallation = [fileManager executePackageAtURL:[NSURL fileURLWithPath:packagePath] error:&error];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self finishInstallationToPath:destinationPath
-                                withResult:validInstallation
-                                     error:error
-                         completionHandler:completionHandler];
-            
-        });
-    });
+    return [fileManager executePackageAtURL:[NSURL fileURLWithPath:self.packagePath] error:error];
+}
+
+- (BOOL)canInstallSilently
+{
+    return YES;
 }
 
 @end

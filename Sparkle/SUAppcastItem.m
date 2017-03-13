@@ -6,13 +6,12 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "SUUpdater.h"
-
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
-#import "SUVersionComparisonProtocol.h"
 #import "SUAppcastItem.h"
 #import "SULog.h"
+#import "SUConstants.h"
+
+
+#include "AppKitPrevention.h"
 
 @interface SUAppcastItem ()
 @property (copy, readwrite) NSString *title;
@@ -36,6 +35,7 @@
 @synthesize displayVersionString;
 @synthesize DSASignature;
 @synthesize fileURL;
+@synthesize contentLength = _contentLength;
 @synthesize infoURL;
 @synthesize itemDescription;
 @synthesize maximumSystemVersion;
@@ -86,7 +86,7 @@
         }
         if (newVersion == nil) // no sparkle:version attribute anywhere?
         {
-            SULog(@"warning: <%@> for URL '%@' is missing %@ attribute. Version comparison may be unreliable. Please always specify %@", SURSSElementEnclosure, [enclosure objectForKey:SURSSAttributeURL], SUAppcastAttributeVersion, SUAppcastAttributeVersion);
+            SULog(SULogLevelError, @"warning: <%@> for URL '%@' is missing %@ attribute. Version comparison may be unreliable. Please always specify %@", SURSSElementEnclosure, [enclosure objectForKey:SURSSAttributeURL], SUAppcastAttributeVersion, SUAppcastAttributeVersion);
 
             // Separate the url by underscores and take the last component, as that'll be closest to the end,
             // then we remove the extension. Hopefully, this will be the version.
@@ -111,7 +111,7 @@
         NSString *theInfoURL = [dict objectForKey:SURSSElementLink];
         if (theInfoURL) {
             if (![theInfoURL isKindOfClass:[NSString class]]) {
-                SULog(@"%@ -%@ Info URL is not of valid type.", NSStringFromClass([self class]), NSStringFromSelector(_cmd));
+                SULog(SULogLevelError, @"%@ -%@ Info URL is not of valid type.", NSStringFromClass([self class]), NSStringFromSelector(_cmd));
             } else {
                 self.infoURL = [NSURL URLWithString:theInfoURL];
             }
@@ -132,6 +132,15 @@
                 *error = @"Feed item's enclosure lacks URL";
             }
             return nil;
+        }
+        
+        if (enclosureURLString) {
+            NSString *enclosureLengthString = [enclosure objectForKey:SURSSAttributeLength];
+            long long contentLength = 0;
+            if (enclosureLengthString != nil) {
+                contentLength = [enclosureLengthString longLongValue];
+            }
+            _contentLength = (contentLength > 0) ? (uint64_t)contentLength : 0;
         }
 
         if (enclosureURLString) {
@@ -163,7 +172,7 @@
         if (releaseNotesString) {
             NSURL *url = [NSURL URLWithString:releaseNotesString];
             if ([url isFileURL]) {
-                SULog(@"Release notes with file:// URLs are not supported");
+                SULog(SULogLevelError, @"Release notes with file:// URLs are not supported");
             } else {
                 self.releaseNotesURL = url;
             }

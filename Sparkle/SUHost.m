@@ -8,20 +8,22 @@
 #import "SUHost.h"
 
 #import "SUConstants.h"
-#import "SUSystemProfiler.h"
 #include <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
 #import "SULog.h"
-#import "SUFileManager.h"
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101000
-@interface NSProcessInfo ()
-- (NSOperatingSystemVersion)operatingSystemVersion;
-@end
-#endif
+
+#include "AppKitPrevention.h"
+
+// This class should not rely on AppKit and should also be process independent
+// For example, it should not have code that tests writabilty to somewhere on disk,
+// as that may depend on the privileges of the process owner. Or code that depends on
+// if the process is sandboxed or not; eg: finding the user's caches directory. Or code that depends
+// on compilation flags and if other files exist relative to the host bundle.
 
 @interface SUHost ()
 
 @property (strong, readwrite) NSBundle *bundle;
+@property (nonatomic, readonly) BOOL isMainBundle;
 @property (copy) NSString *defaultsDomain;
 @property (assign) BOOL usesStandardUserDefaults;
 
@@ -30,6 +32,7 @@
 @implementation SUHost
 
 @synthesize bundle;
+@synthesize isMainBundle = _isMainBundle;
 @synthesize defaultsDomain;
 @synthesize usesStandardUserDefaults;
 
@@ -37,13 +40,15 @@
 {
 	if ((self = [super init]))
 	{
-        SUParameterAssert(aBundle);
+        NSParameterAssert(aBundle);
         self.bundle = aBundle;
         if (![self.bundle bundleIdentifier]) {
-            SULog(@"Error: the bundle being updated at %@ has no %@! This will cause preference read/write to not work properly.", self.bundle, kCFBundleIdentifierKey);
+            SULog(SULogLevelError, @"Error: the bundle being updated at %@ has no %@! This will cause preference read/write to not work properly.", self.bundle, kCFBundleIdentifierKey);
         }
+        
+        _isMainBundle = [aBundle isEqualTo:[NSBundle mainBundle]];
 
-        self.defaultsDomain = [self.bundle objectForInfoDictionaryKey:SUDefaultsDomainKey];
+        self.defaultsDomain = [self objectForInfoDictionaryKey:SUDefaultsDomainKey];
         if (!self.defaultsDomain) {
             self.defaultsDomain = [self.bundle bundleIdentifier];
         }
@@ -56,65 +61,10 @@
 }
 
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self bundlePath], [self installationPath]]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self bundlePath]]; }
 
 - (NSString *)bundlePath
 {
-    return [self.bundle bundlePath];
-}
-
-- (BOOL)allowsAutomaticUpdates
-{
-    // Does the developer want us to disable automatic updates?
-    NSNumber *developerAllowsAutomaticUpdates = [self objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
-    if (developerAllowsAutomaticUpdates != nil && !developerAllowsAutomaticUpdates.boolValue) {
-        return NO;
-    }
-    
-    // Can we automatically update in the background without bugging the user (e.g, with a administrator password prompt)?
-    // Note it's very well possible to have the bundle be writable but not be able to write into the parent directory
-    // And if the bundle isn't writable, but we can write into the parent directory, we will still need to authorize to replace it
-    NSString *bundlePath = [self bundlePath];
-    if (![[NSFileManager defaultManager] isWritableFileAtPath:bundlePath.stringByDeletingLastPathComponent] || ![[NSFileManager defaultManager] isWritableFileAtPath:bundlePath]) {
-        return NO;
-    }
-    
-    // Just because we have writability access does not mean we can set the correct owner/group silently
-    // Test if we can set the owner/group on a temporarily created file
-    // If we can, then we can probably perform an update without authorization
-    // One place where this matters is if you copy and run an app from /tmp/
-    
-    NSString *tempFilename = @"permission_test" ;
-    
-    SUFileManager *suFileManager = [SUFileManager defaultManager];
-    NSURL *tempDirectoryURL = [suFileManager makeTemporaryDirectoryWithPreferredName:tempFilename appropriateForDirectoryURL:[NSURL fileURLWithPath:NSTemporaryDirectory()] error:NULL];
-    
-    if (tempDirectoryURL == nil) {
-        // I don't imagine this ever happening but in case it does, requesting authorization may be the better option
-        return NO;
-    }
-    
-    NSURL *tempFileURL = [tempDirectoryURL URLByAppendingPathComponent:tempFilename];
-    
-    BOOL changeOwnerAndGroupSuccess =
-    [[NSData data] writeToURL:tempFileURL atomically:NO] &&
-    [suFileManager changeOwnerAndGroupOfItemAtRootURL:tempFileURL toMatchURL:self.bundle.bundleURL error:NULL];
-    
-    [suFileManager removeItemAtURL:tempDirectoryURL error:NULL];
-    
-    return changeOwnerAndGroupSuccess;
-}
-
-- (NSString *)installationPath
-{
-    if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
-        // We'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
-        NSString *normalizedAppPath = [[[self.bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[self.bundle bundlePath] pathExtension]]];
-
-        if (![[NSFileManager defaultManager] fileExistsAtPath:normalizedAppPath]) {
-            return normalizedAppPath;
-        }
-    }
     return [self.bundle bundlePath];
 }
 
@@ -126,7 +76,7 @@
     name = [self objectForInfoDictionaryKey:@"SUBundleName"];
     if (name && name.length > 0) return name;
 
-    name = [self.bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+    name = [self objectForInfoDictionaryKey:@"CFBundleDisplayName"];
 	if (name && name.length > 0) return name;
 
     name = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey];
@@ -137,7 +87,7 @@
 
 - (NSString *__nonnull)version
 {
-    NSString *version = [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
+    NSString *version = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     if (!version || [version isEqualToString:@""])
         [NSException raise:@"SUNoVersionException" format:@"This host (%@) has no %@! This attribute is required.", [self bundlePath], (__bridge NSString *)kCFBundleVersionKey];
     return version;
@@ -145,34 +95,11 @@
 
 - (NSString *__nonnull)displayVersion
 {
-    NSString *shortVersionString = [self.bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    NSString *shortVersionString = [self objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     if (shortVersionString)
         return shortVersionString;
     else
         return [self version]; // Fall back on the normal version string.
-}
-
-- (NSImage *__nonnull)icon
-{
-    // Cache the application icon.
-    NSString *iconPath = [self.bundle pathForResource:[self.bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType:@"icns"];
-    // According to the macOS docs, "CFBundleIconFile - This key identifies the file containing
-    // the icon for the bundle. The filename you specify does not need to include the .icns
-    // extension, although it may."
-    //
-    // However, if it *does* include the '.icns' the above method fails (tested on macOS 10.3.9) so we'll also try:
-    if (!iconPath) {
-        iconPath = [self.bundle pathForResource:[self.bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType:nil];
-    }
-    NSImage *icon = [[NSImage alloc] initWithContentsOfFile:iconPath];
-    // Use a default icon if none is defined.
-    if (!icon) {
-        BOOL isMainBundle = (self.bundle == [NSBundle mainBundle]);
-
-        NSString *fileType = isMainBundle ? (__bridge NSString *)kUTTypeApplication : (__bridge NSString *)kUTTypeBundle;
-        icon = [[NSWorkspace sharedWorkspace] iconForFileType:fileType];
-    }
-    return icon;
 }
 
 - (BOOL)isRunningOnReadOnlyVolume
@@ -182,15 +109,10 @@
     return (statfs_info.f_flags & MNT_RDONLY) != 0;
 }
 
-- (BOOL)isBackgroundApplication
-{
-    return ([[NSApplication sharedApplication] activationPolicy] == NSApplicationActivationPolicyAccessory);
-}
-
 - (NSString *__nullable)publicDSAKey
 {
     // Maybe the key is just a string in the Info.plist.
-    NSString *key = [self.bundle objectForInfoDictionaryKey:SUPublicDSAKeyKey];
+    NSString *key = [self objectForInfoDictionaryKey:SUPublicDSAKeyKey];
 	if (key) {
         return key;
     }
@@ -213,14 +135,23 @@
     return [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];
 }
 
-- (NSArray *)systemProfile
-{
-    return [[SUSystemProfiler sharedSystemProfiler] systemProfileArrayForHost:self];
-}
-
 - (id)objectForInfoDictionaryKey:(NSString *)key
 {
-    return [self.bundle objectForInfoDictionaryKey:key];
+    if (self.isMainBundle) {
+        // Common fast path - if we're updating the main bundle, that means our updater and host bundle's lifetime is the same
+        // If the bundle happens to be updated or change, that means our updater process needs to be terminated first to do it safely
+        // Thus we can rely on the cached Info dictionary
+        return [self.bundle objectForInfoDictionaryKey:key];
+    } else {
+        // Slow path - if we're updating another bundle, we should read in the most up to date Info dictionary because
+        // the bundle can be replaced externally or even by us.
+        // This is the easiest way to read the Info dictionary values *correctly* despite some performance loss.
+        // A mutable method to reload the Info dictionary at certain points and have it cached at other points is challenging to do correctly.
+        CFDictionaryRef cfInfoDictionary = CFBundleCopyInfoDictionaryInDirectory((CFURLRef)self.bundle.bundleURL);
+        NSDictionary *infoDictionary = CFBridgingRelease(cfInfoDictionary);
+        
+        return [infoDictionary objectForKey:key];
+    }
 }
 
 - (BOOL)boolForInfoDictionaryKey:(NSString *)key
@@ -245,6 +176,7 @@
     return CFBridgingRelease(obj);
 }
 
+// Note this handles nil being passed for defaultName, in which case the user default will be removed
 - (void)setObject:(id)value forUserDefaultsKey:(NSString *)defaultName
 {
 	if (self.usesStandardUserDefaults)

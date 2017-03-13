@@ -76,15 +76,20 @@ class SUTestApplicationTest: XCTestCase
     {
         let app = XCUIApplication()
         let menuBarsQuery = app.menuBars
-            
+
         menuBarsQuery.menuBarItems["Sparkle Test App"].click()
         
         // If the update window already showed up automatically, this option will be disabled.
         // Even if it's disabled, attempting to click it will do no harm and continue on
         menuBarsQuery.menuItems["Check for Updates…"].click()
         
+        // Workaround to make sure we can click the install update button later
+        // This workaround is needed if the alert prompts up automatically *before* we manually check for updates
+        // I'm not sure why this workaround works or is necessary
+        app.dialogs["SUUpdateAlert"].staticTexts["Software Update"].click()
+        
         app.dialogs["SUUpdateAlert"].buttons["Install Update"].click()
-        app.buttons["Install and Relaunch"].click()
+        app.windows["SUStatus"].buttons["Install and Relaunch"].click()
         
         // Wait for the new updated app to finish launching so we can test if it's the frontmost app
         sleep(3)

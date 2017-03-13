@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Sparkle Project. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import <XCTest/XCTest.h>
 #import "SUBinaryDeltaCommon.h"
 #import "SUBinaryDeltaCreate.h"
@@ -24,8 +24,8 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 
 - (void)testTemporaryDirectory
 {
-    NSString *tmp1 = temporaryDirectory(@"Sparkle");
-    NSString *tmp2 = temporaryDirectory(@"Sparkle");
+    NSString *tmp1 = temporaryDirectory(@"Sparklęエンジン");
+    NSString *tmp2 = temporaryDirectory(@"Sparklęエンジン");
     NSLog(@"Temporary directories: %@, %@", tmp1, tmp2);
     XCTAssertNotEqualObjects(tmp1, tmp2);
     XCTAssert(YES, @"Pass");
@@ -33,8 +33,8 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 
 - (void)testTemporaryFile
 {
-    NSString *tmp1 = temporaryFilename(@"Sparkle");
-    NSString *tmp2 = temporaryFilename(@"Sparkle");
+    NSString *tmp1 = temporaryFilename(@"Sparklęエンジン");
+    NSString *tmp2 = temporaryFilename(@"Sparklęエンジン");
     NSLog(@"Temporary files: %@, %@", tmp1, tmp2);
     XCTAssertNotEqualObjects(tmp1, tmp2);
     XCTAssert(YES, @"Pass");
@@ -42,12 +42,12 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 
 - (BOOL)createAndApplyPatchUsingVersion:(SUBinaryDeltaMajorVersion)majorVersion beforeDiffHandler:(SUDeltaHandler)beforeDiffHandler afterDiffHandler:(SUDeltaHandler)afterDiffHandler
 {
-    NSString *sourceDirectory = temporaryDirectory(@"Sparkle_temp1");
-    NSString *destinationDirectory = temporaryDirectory(@"Sparkle_temp2");
-    
-    NSString *diffFile = temporaryFilename(@"Sparkle_diff");
-    NSString *patchDirectory = temporaryDirectory(@"Sparkle_patch");
-    
+    NSString *sourceDirectory = temporaryDirectory(@"Spąrkle_temp1エンジン");
+    NSString *destinationDirectory = temporaryDirectory(@"Spąrkle_temp2エンジン");
+
+    NSString *diffFile = temporaryFilename(@"Spąrkle_diffエンジン");
+    NSString *patchDirectory = temporaryDirectory(@"Spąrkle_patchエンジン");
+
     XCTAssertNotNil(sourceDirectory);
     XCTAssertNotNil(destinationDirectory);
     XCTAssertNotNil(diffFile);
@@ -69,7 +69,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     NSError *applyDiffError = nil;
     BOOL appliedDiff = NO;
     if (createdDiff) {
-        if (applyBinaryDelta(sourceDirectory, patchDirectory, diffFile, NO, &applyDiffError)) {
+        if (applyBinaryDelta(sourceDirectory, patchDirectory, diffFile, NO, ^(__unused double progress){}, &applyDiffError)) {
             appliedDiff = YES;
         } else {
             NSLog(@"Applying binary diff failed with error: %@", applyDiffError);
@@ -120,9 +120,9 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
 {
     [self createAndApplyPatchWithHandler:^(NSFileManager *__unused fileManager, NSString *sourceDirectory, NSString *destinationDirectory) {
         NSData *emptyData = [NSData data];
-        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"A"];
-        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"A"];
-        
+        NSString *sourceFile = [sourceDirectory stringByAppendingPathComponent:@"AĄエンジン"];
+        NSString *destinationFile = [destinationDirectory stringByAppendingPathComponent:@"AĄエンジン"];
+
         XCTAssertTrue([emptyData writeToFile:sourceFile atomically:YES]);
         XCTAssertTrue([emptyData writeToFile:destinationFile atomically:YES]);
         

@@ -7,8 +7,11 @@
 //
 
 #import "SUUpdater.h"
+#import "SUUpdaterDelegate.h"
+#import "SUUpdaterPrivate.h"
 
 #import "SUHost.h"
+#import "SUUpdatePermissionResponse.h"
 #import "SUUpdatePermissionPrompt.h"
 
 #import "SUAutomaticUpdateDriver.h"
@@ -18,7 +21,10 @@
 #import "SUConstants.h"
 #import "SULog.h"
 #import "SUCodeSigningVerifier.h"
+#import "SULocalizations.h"
 #include <SystemConfiguration/SystemConfiguration.h>
+#import "SUSystemProfiler.h"
+#import "SUSystemUpdateInfo.h"
 
 NSString *const SUUpdaterDidFinishLoadingAppCastNotification = @"SUUpdaterDidFinishLoadingAppCastNotification";
 NSString *const SUUpdaterDidFindValidUpdateNotification = @"SUUpdaterDidFindValidUpdateNotification";
@@ -27,7 +33,7 @@ NSString *const SUUpdaterWillRestartNotification = @"SUUpdaterWillRestartNotific
 NSString *const SUUpdaterAppcastItemNotificationKey = @"SUUpdaterAppcastItemNotificationKey";
 NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotificationKey";
 
-@interface SUUpdater () <SUUpdatePermissionPromptDelegate>
+@interface SUUpdater () <SUUpdaterPrivate>
 @property (strong) NSTimer *checkTimer;
 @property (strong) NSBundle *sparkleBundle;
 
@@ -93,7 +99,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     // Use explicit class to use the correct bundle even when subclassed
     self.sparkleBundle = [NSBundle bundleForClass:[SUUpdater class]];
     if (!self.sparkleBundle) {
-        SULog(@"Error: SUUpdater can't find Sparkle.framework it belongs to");
+        SULog(SULogLevelError, @"Error: SUUpdater can't find Sparkle.framework it belongs to");
         return nil;
     }
 
@@ -164,7 +170,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
             [self showAlertText:SULocalizedString(@"Insecure feed URL is blocked in macOS 10.11", nil)
                 informativeText:[NSString stringWithFormat:SULocalizedString(@"You must change the feed URL (%@) to use HTTPS or disable App Transport Security.\n\nFor more information:\nhttps://sparkle-project.org/documentation/app-transport-security/", nil), [feedURL absoluteString]]];
         } else if (!isMainBundle) {
-            // SULog(@"WARNING: Serving updates over HTTP may be blocked in macOS 10.11. Please change the feed URL (%@) to use HTTPS. For more information:\nhttps://sparkle-project.org/documentation/app-transport-security/", feedURL);
+            // SULog(SULogLevelDefault, @"WARNING: Serving updates over HTTP may be blocked in macOS 10.11. Please change the feed URL (%@) to use HTTPS. For more information:\nhttps://sparkle-project.org/documentation/app-transport-security/", feedURL);
         }
     }
 #endif
@@ -177,7 +183,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     return [self initForBundle:[NSBundle mainBundle]];
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self.host bundlePath], [self.host installationPath]]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
 
 - (void)startUpdateCycle
 {
@@ -204,12 +210,16 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     }
 
     if (shouldPrompt) {
-        NSArray *profileInfo = [self.host systemProfile];
+        NSArray<NSDictionary<NSString *, NSString *> *> *profileInfo = [SUSystemProfiler systemProfileArrayForHost:self.host];
         // Always say we're sending the system profile here so that the delegate displays the parameters it would send.
         if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
             profileInfo = [profileInfo arrayByAddingObjectsFromArray:[self.delegate feedParametersForUpdater:self sendingSystemProfile:YES]];
         }
-        [SUUpdatePermissionPrompt promptWithHost:self.host systemProfile:profileInfo delegate:self];
+        [SUUpdatePermissionPrompt promptWithHost:self.host systemProfile:profileInfo reply:^(SUUpdatePermissionResponse *response) {
+            [self updatePermissionRequestFinishedWithResponse:response];
+            // Schedule checks, but make sure we ignore the delayed call from KVO
+            [self resetUpdateCycle];
+        }];
         // We start the update checks and register as observer for changes after the prompt finishes
     } else {
         // We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
@@ -217,11 +227,10 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     }
 }
 
-- (void)updatePermissionPromptFinishedWithResult:(SUPermissionPromptResult)result
+- (void)updatePermissionRequestFinishedWithResponse:(SUUpdatePermissionResponse *)response
 {
-    [self setAutomaticallyChecksForUpdates:(result == SUAutomaticallyCheck)];
-    // Schedule checks, but make sure we ignore the delayed call from KVO
-    [self resetUpdateCycle];
+    [self setAutomaticallyChecksForUpdates:response.automaticUpdateChecks];
+    [self setSendsSystemProfile:response.sendSystemProfile];
 }
 
 - (void)updateDriverDidFinish:(NSNotification *)note
@@ -279,14 +288,12 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     [self checkForUpdatesWithDriver:theUpdateDriver];
 }
 
-- (BOOL)mayUpdateAndRestart
-{
-    return (!self.delegate || ![self.delegate respondsToSelector:@selector(updaterShouldRelaunchApplication:)] || [self.delegate updaterShouldRelaunchApplication:self]);
-}
-
 - (IBAction)checkForUpdates:(id)__unused sender
 {
     if (self.driver && [self.driver isInterruptible]) {
+        if ([self.driver resumeUpdateInteractively]) {
+            return;
+        }
         [self.driver abortUpdate];
     }
 
@@ -301,6 +308,9 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (void)installUpdatesIfAvailable
 {
     if (self.driver && [self.driver isInterruptible]) {
+        if ([self.driver resumeUpdateInteractively]) {
+            return;
+        }
         [self.driver abortUpdate];
     }
 
@@ -357,7 +367,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     }
     @catch (NSException *)
     {
-        SULog(@"Error: [SUUpdater unregisterAsObserver] called, but the updater wasn't registered as an observer.");
+        SULog(SULogLevelError, @"Error: [SUUpdater unregisterAsObserver] called, but the updater wasn't registered as an observer.");
     }
 }
 
@@ -411,8 +421,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 - (BOOL)automaticallyDownloadsUpdates
 {
-    // If the host doesn't allow automatic updates, don't ever let them happen
-    if (!self.host.allowsAutomaticUpdates) {
+    // If we aren't allowed automatic updates, don't ever let them happen
+    if (![SUSystemUpdateInfo systemAllowsAutomaticUpdatesForHost:self.host]) {
         return NO;
     }
 
@@ -435,8 +445,12 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
     // A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
     NSString *appcastString = [self.host objectForKey:SUFeedURLKey];
-    if ([self.delegate respondsToSelector:@selector(feedURLStringForUpdater:)])
-        appcastString = [self.delegate feedURLStringForUpdater:self];
+    if ([self.delegate respondsToSelector:@selector(feedURLStringForUpdater:)]) {
+        NSString *delegateAppcastString = [self.delegate feedURLStringForUpdater:self];
+        if (delegateAppcastString != nil) {
+            appcastString = delegateAppcastString;
+        }
+    }
     if (!appcastString) // Can't find an appcast string!
         [NSException raise:@"SUNoFeedURL" format:@"You must specify the URL of the appcast as the %@ key in either the Info.plist or the user defaults!", SUFeedURLKey];
     NSCharacterSet *quoteSet = [NSCharacterSet characterSetWithCharactersInString:@"\"\'"]; // Some feed publishers add quotes; strip 'em.
@@ -490,7 +504,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     }
 	if (sendingSystemProfile)
 	{
-        parameters = [parameters arrayByAddingObjectsFromArray:[self.host systemProfile]];
+        parameters = [parameters arrayByAddingObjectsFromArray:[SUSystemProfiler systemProfileArrayForHost:self.host]];
         [self.host setObject:[NSDate date] forUserDefaultsKey:SULastProfileSubmitDateKey];
     }
 	if ([parameters count] == 0) { return baseFeedURL; }

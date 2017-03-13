@@ -9,11 +9,9 @@
 #ifndef SUAUTOMATICUPDATEDRIVER_H
 #define SUAUTOMATICUPDATEDRIVER_H
 
-#import <Cocoa/Cocoa.h>
 #import "SUBasicUpdateDriver.h"
-#import "SUAutomaticUpdateAlert.h"
 
-@interface SUAutomaticUpdateDriver : SUBasicUpdateDriver <SUUnarchiverDelegate>
+@interface SUAutomaticUpdateDriver : SUBasicUpdateDriver
 
 @end
 

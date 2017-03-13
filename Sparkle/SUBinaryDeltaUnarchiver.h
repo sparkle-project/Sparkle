@@ -9,11 +9,17 @@
 #ifndef SUBINARYDELTAUNARCHIVER_H
 #define SUBINARYDELTAUNARCHIVER_H
 
-#import <Cocoa/Cocoa.h>
-#import "SUUnarchiver.h"
+#import <Foundation/Foundation.h>
+#import "SUUnarchiverProtocol.h"
 
-@interface SUBinaryDeltaUnarchiver : SUUnarchiver
+NS_ASSUME_NONNULL_BEGIN
+
+@interface SUBinaryDeltaUnarchiver : NSObject <SUUnarchiverProtocol>
+
+- (instancetype)initWithArchivePath:(NSString *)archivePath updateHostBundlePath:(NSString *)updateHostBundlePath;
 
 @end
+
+NS_ASSUME_NONNULL_END
 
 #endif

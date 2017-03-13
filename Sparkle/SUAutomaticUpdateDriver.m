@@ -7,10 +7,15 @@
 //
 
 #import "SUAutomaticUpdateDriver.h"
-
+#import "SUUpdaterPrivate.h"
+#import "SUUpdaterDelegate.h"
+#import "SULocalizations.h"
+#import "SUErrors.h"
 #import "SUAutomaticUpdateAlert.h"
 #import "SUHost.h"
 #import "SUConstants.h"
+#import "SUAppcastItem.h"
+#import "SUApplicationInfo.h"
 
 // If the user hasn't quit in a week, ask them if they want to relaunch to get the latest bits. It doesn't matter that this measure of "one day" is imprecise.
 static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 24 * 7;
@@ -44,6 +49,12 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 - (void)showUpdateAlert
 {
     self.interruptible = NO;
+    [self invalidateShowUpdateAlertTimer];
+
+    if (self.alert) {
+        [self.alert close];
+    }
+
     self.alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host completionBlock:^(SUAutomaticInstallationChoice choice) {
         [self automaticUpdateAlertFinishedWithChoice:choice];
     }];
@@ -51,7 +62,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     // If the app is a menubar app or the like, we need to focus it first and alter the
     // update prompt to behave like a normal window. Otherwise if the window were hidden
     // there may be no way for the application to be activated to make it visible again.
-    if ([self.host isBackgroundApplication]) {
+    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
         [[self.alert window] setHidesOnDeactivate:NO];
         [NSApp activateIgnoringOtherApps:YES];
     }
@@ -62,7 +73,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
-- (void)unarchiverDidFinish:(SUUnarchiver *)__unused ua
+- (void)unarchiverDidFinish:(id)__unused ua
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillTerminate:) name:NSApplicationWillTerminateNotification object:nil];
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(systemWillPowerOff:) name:NSWorkspaceWillPowerOffNotification object:nil];
@@ -73,7 +84,8 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
     self.willUpdateOnTermination = YES;
 
-    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+    id<SUUpdaterPrivate> updater = self.updater;
+    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
     if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationInvocation:)])
     {
         BOOL relaunch = YES;
@@ -83,7 +95,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         [invocation setArgument:&relaunch atIndex:2];
         [invocation setArgument:&showUI atIndex:3];
         [invocation setTarget:self];
-
+        
         [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationInvocation:invocation];
     }
 
@@ -101,6 +113,18 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     }
 }
 
+-(BOOL)resumeUpdateInteractively {
+    if ([self isInterruptible]) {
+        [self showUpdateAlert];
+        return YES;
+    }
+    return NO;
+}
+
+-(BOOL)downloadsUpdatesInBackground {
+    return YES;
+}
+
 - (void)stopUpdatingOnTermination
 {
     if (self.willUpdateOnTermination)
@@ -113,7 +137,8 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
         self.willUpdateOnTermination = NO;
 
-        id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+        id<SUUpdaterPrivate> updater = self.updater;
+        id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
         if ([updaterDelegate respondsToSelector:@selector(updater:didCancelInstallUpdateOnQuit:)])
             [updaterDelegate updater:self.updater didCancelInstallUpdateOnQuit:self.updateItem];
     }
@@ -133,6 +158,8 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)abortUpdate
 {
+    [self.alert close];
+
     self.isTerminating = NO;
     [self stopUpdatingOnTermination];
     [self invalidateShowUpdateAlertTimer];
@@ -147,6 +174,7 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)automaticUpdateAlertFinishedWithChoice:(SUAutomaticInstallationChoice)choice
 {
+    self.alert = nil;
 	switch (choice)
 	{
         case SUInstallNowChoice:
@@ -210,7 +238,8 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     } else {
         // Call delegate separately here because otherwise it won't know we stopped.
         // Normally this gets called by the superclass
-        id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+        id<SUUpdaterPrivate> updater = self.updater;
+        id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
         if ([updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
             [updaterDelegate updater:self.updater didAbortWithError:error];
         }
