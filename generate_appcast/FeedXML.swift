@@ -114,16 +114,13 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
         minVer?.setChildren([text(update.minimumSystemVersion)]);
 
         let relElement = findElement(name: "sparkle:releaseNotesLink", parent: item);
-        if nil == relElement {
-            if FileManager.default.fileExists(atPath: update.releaseNotesPath.path) {
+        if let url = update.releaseNotesURL {
+            if nil == relElement {
                 linebreak(item);
-                item.addChild(XMLElement.element(withName:"sparkle:releaseNotesLink", stringValue: (update.releaseNotesURL?.absoluteString)!) as! XMLElement);
+                item.addChild(XMLElement.element(withName:"sparkle:releaseNotesLink", stringValue: url.absoluteString) as! XMLElement);
             }
-        } else {
-            if !FileManager.default.fileExists(atPath: update.releaseNotesPath.path) {
-                let childIndex = relElement?.index;
-                item.removeChild(at: childIndex!);
-            }
+        } else if let childIndex = relElement?.index {
+            item.removeChild(at: childIndex);
         }
         
         var enclosure = findElement(name: "enclosure", parent: item);

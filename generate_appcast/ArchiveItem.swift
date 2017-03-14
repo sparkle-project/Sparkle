@@ -119,13 +119,16 @@ class ArchiveItem: CustomStringConvertible {
         return (self.archiveFileAttributes[.size] as! NSNumber).int64Value;
     }
     
-    var releaseNotesPath : URL {
+    private var releaseNotesPath : URL {
         let basename = self.archivePath.deletingPathExtension();
         let releaseNotes = basename.appendingPathExtension("html");
         return releaseNotes;
     }
 
     var releaseNotesURL : URL? {
+        if !FileManager.default.fileExists(atPath: self.releaseNotesPath.path) {
+            return nil;
+        }
         guard let escapedFilename = self.releaseNotesPath.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
             return nil;
         }
