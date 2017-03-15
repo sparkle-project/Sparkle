@@ -105,6 +105,13 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
             item.addChild(XMLElement.element(withName: "pubDate", stringValue: update.pubDate) as! XMLElement);
         }
 
+        if let html = update.releaseNotesHTML {
+            let descElement = findOrCreateElement(name: "description", parent: item);
+            let cdata = XMLNode(kind:.text, options:.nodeIsCDATA);
+            cdata.stringValue = html;
+            descElement.setChildren([cdata]);
+        }
+
         var minVer = findElement(name: "sparkle:minimumSystemVersion", parent: item);
         if nil == minVer {
             minVer = XMLElement.element(withName: "sparkle:minimumSystemVersion", uri: sparkleNS) as? XMLElement;

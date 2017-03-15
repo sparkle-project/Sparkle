@@ -119,17 +119,42 @@ class ArchiveItem: CustomStringConvertible {
         return (self.archiveFileAttributes[.size] as! NSNumber).int64Value;
     }
     
-    private var releaseNotesPath : URL {
+    private var releaseNotesPath : URL? {
         let basename = self.archivePath.deletingPathExtension();
         let releaseNotes = basename.appendingPathExtension("html");
+        if !FileManager.default.fileExists(atPath: releaseNotes.path) {
+            return nil;
+        }
         return releaseNotes;
     }
 
+    private func getReleaseNotesAsHTMLFragment(_ path: URL) -> String?  {
+        if let html = try? String(contentsOf: path) {
+            if html.utf8.count < 1000 &&
+                !html.localizedCaseInsensitiveContains("<!DOCTYPE") &&
+                !html.localizedCaseInsensitiveContains("<body") {
+                return html;
+            }
+        }
+        return nil;
+    }
+
+    var releaseNotesHTML : String? {
+        if let path = self.releaseNotesPath {
+            return self.getReleaseNotesAsHTMLFragment(path);
+        }
+        return nil;
+    }
+
     var releaseNotesURL : URL? {
-        if !FileManager.default.fileExists(atPath: self.releaseNotesPath.path) {
+        guard let path = self.releaseNotesPath else {
             return nil;
         }
-        guard let escapedFilename = self.releaseNotesPath.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
+        // The file is already used as inline description
+        if self.getReleaseNotesAsHTMLFragment(path) != nil {
+            return nil;
+        }
+        guard let escapedFilename = path.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
             return nil;
         }
         if let relative = self.feedURL {
