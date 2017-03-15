@@ -23,6 +23,7 @@ func findOrCreateElement(name: String, parent: XMLElement) -> XMLElement {
         return element;
     }
     let element = XMLElement(name: name);
+    linebreak(parent);
     parent.addChild(element);
     return element;
 }
@@ -69,7 +70,9 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
         channel = channelNodes[0] as! XMLElement;
     } else {
         channel = XMLElement(name: "channel");
+        linebreak(channel);
         channel.addChild(XMLElement.element(withName: "title", stringValue: appBaseName) as! XMLElement);
+        linebreak(root);
         root.addChild(channel);
     }
 
