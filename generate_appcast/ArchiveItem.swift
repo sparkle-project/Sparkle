@@ -120,7 +120,10 @@ class ArchiveItem: CustomStringConvertible {
     }
     
     private var releaseNotesPath : URL? {
-        let basename = self.archivePath.deletingPathExtension();
+        var basename = self.archivePath.deletingPathExtension();
+        if basename.pathExtension == "tar" { // tar.gz
+            basename = basename.deletingPathExtension();
+        }
         let releaseNotes = basename.appendingPathExtension("html");
         if !FileManager.default.fileExists(atPath: releaseNotes.path) {
             return nil;
