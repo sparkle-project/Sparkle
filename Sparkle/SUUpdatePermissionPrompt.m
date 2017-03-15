@@ -72,20 +72,22 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 
 + (void)promptWithHost:(SUHost *)host systemProfile:(NSArray *)profile reply:(void (^)(SUUpdatePermissionResponse *))reply
 {
-    // If this is a background application we need to focus it in order to bring the prompt
-    // to the user's attention. Otherwise the prompt would be hidden behind other applications and
-    // the user would not know why the application was paused.
-	if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
-        [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
-    }
-
-    if (![NSApp modalWindow]) { // do not prompt if there is is another modal window on screen
-        SUUpdatePermissionPrompt *prompt = [[[self class] alloc] initWithHost:host systemProfile:profile reply:reply];
-        NSWindow *window = [prompt window];
-        if (window) {
-            [NSApp runModalForWindow:window];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // If this is a background application we need to focus it in order to bring the prompt
+        // to the user's attention. Otherwise the prompt would be hidden behind other applications and
+        // the user would not know why the application was paused.
+        if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
+            [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
         }
-    }
+
+        if (![NSApp modalWindow]) { // do not prompt if there is is another modal window on screen
+            SUUpdatePermissionPrompt *prompt = [[[self class] alloc] initWithHost:host systemProfile:profile reply:reply];
+            NSWindow *window = [prompt window];
+            if (window) {
+                [NSApp runModalForWindow:window];
+            }
+        }
+    });
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
