@@ -136,7 +136,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
         self.statusController = [[SUStatusController alloc] initWithHost:host];
         [self.statusController setButtonTitle:SULocalizedString(@"Cancel Update", @"") target:nil action:Nil isDefault:NO];
         [self.statusController beginActionWithTitle:SULocalizedString(@"Installing update...", @"")
-                                   maxProgressValue: 0 statusText: @""];
+                                   maxProgressValue:100 statusText: @""];
         [self.statusController showWindow:self];
     }
     
@@ -151,8 +151,14 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.5;
             return;
         }
         
+        void(^progressBlock)(double) = ^(double progress){
+            dispatch_async(dispatch_get_main_queue(), ^(){
+                self.statusController.progressValue = progress * 100.0;
+            });
+        };
+
         NSError *finalInstallationError = nil;
-        if (![installer performFinalInstallation:&finalInstallationError]) {
+        if (![installer performFinalInstallationProgressBlock:progressBlock error:&finalInstallationError]) {
             NSError *underlyingError = [finalInstallationError.userInfo objectForKey:NSUnderlyingErrorKey];
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (underlyingError == nil || underlyingError.code != SUInstallationCancelledError) {

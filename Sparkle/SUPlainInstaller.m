@@ -61,7 +61,7 @@
     return trimmedVersion.length > 0 ? trimmedVersion : nil;
 }
 
-- (BOOL)performInstallationToURL:(NSURL *)installationURL fromUpdateAtURL:(NSURL *)newURL withHost:(SUHost *)host fileOperationToolPath:(NSString *)fileOperationToolPath error:(NSError * __autoreleasing *)error
+- (BOOL)performInstallationToURL:(NSURL *)installationURL fromUpdateAtURL:(NSURL *)newURL withHost:(SUHost *)host fileOperationToolPath:(NSString *)fileOperationToolPath progressBlock:(nullable void(^)(double))progress error:(NSError * __autoreleasing *)error
 {
     if (installationURL == nil || newURL == nil) {
         // this really shouldn't happen but just in case
@@ -71,7 +71,9 @@
         }
         return NO;
     }
-    
+
+    progress(1/10.0);
+
     SUFileManager *fileManager = [SUFileManager fileManagerWithAuthorizationToolPath:fileOperationToolPath];
     
     // Create a temporary directory for our new app that resides on our destination's volume
@@ -82,7 +84,9 @@
         SULog(SULogLevelError, @"Failed to make new temp directory");
         return NO;
     }
-    
+
+    progress(2/10.0);
+
     // Move the new app to our temporary directory
     NSString *newURLLastPathComponent = newURL.lastPathComponent;
     NSURL *newTempURL = [tempNewDirectoryURL URLByAppendingPathComponent:newURLLastPathComponent];
@@ -91,7 +95,9 @@
         [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
         return NO;
     }
-    
+
+    progress(3/10.0);
+
     // Release our new app from quarantine, fix its owner and group IDs, and update its modification time while it's at our temporary destination
     // We must leave moving the app to its destination as the final step in installing it, so that
     // it's not possible our new app can be left in an incomplete state at the final destination
@@ -101,7 +107,9 @@
         // Not big enough of a deal to fail the entire installation
         SULog(SULogLevelError, @"Failed to release quarantine at %@ with error %@", newTempURL.path, quarantineError);
     }
-    
+
+    progress(4/10.0);
+
     NSURL *oldURL = [NSURL fileURLWithPath:host.bundlePath];
     if (oldURL == nil) {
         // this really shouldn't happen but just in case
@@ -119,11 +127,16 @@
         return NO;
     }
     
+
+    progress(5/10.0);
+
     if (![fileManager updateModificationAndAccessTimeOfItemAtURL:newTempURL error:error]) {
         // Not a fatal error, but a pretty unfortunate one
         SULog(SULogLevelError, @"Failed to update modification and access time of new app at %@", newTempURL.path);
     }
-    
+
+    progress(6/10.0);
+
     // Decide on a destination name we should use for the older app when we move it around the file system
     NSString *oldDestinationName = nil;
     if (SPARKLE_APPEND_VERSION_NUMBER) {
@@ -145,7 +158,9 @@
         [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
         return NO;
     }
-    
+
+    progress(7/10.0);
+
     // Move the old app to the temporary directory
     NSURL *oldTempURL = [tempOldDirectoryURL URLByAppendingPathComponent:oldDestinationNameWithPathExtension];
     if (![fileManager moveItemAtURL:oldURL toURL:oldTempURL error:error]) {
@@ -157,7 +172,9 @@
         
         return NO;
     }
-    
+
+    progress(8/10.0);
+
     // Move the new app to its final destination
     if (![fileManager moveItemAtURL:newTempURL toURL:installationURL error:error]) {
         SULog(SULogLevelError, @"Failed to move new app at %@ to final destination %@", newTempURL.path, installationURL.path);
@@ -171,14 +188,18 @@
         
         return NO;
     }
-    
+
+    progress(9/10.0);
+
     // From here on out, we don't really need to bring up authorization if we haven't done so prior
     SUFileManager *constrainedFileManager = [fileManager fileManagerByPreservingAuthorizationRights];
     
     // Cleanup
     [constrainedFileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
     [constrainedFileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
-    
+
+    progress(10/10.0);
+
     return YES;
 }
 
@@ -207,9 +228,9 @@
     return YES;
 }
 
-- (BOOL)performFinalInstallation:(NSError * __autoreleasing *)error
+- (BOOL)performFinalInstallationProgressBlock:(nullable void(^)(double))cb error:(NSError *__autoreleasing*)error
 {
-    return [self performInstallationToURL:[NSURL fileURLWithPath:self.installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:self.bundlePath] withHost:self.host fileOperationToolPath:self.fileOperationToolPath error:error];
+    return [self performInstallationToURL:[NSURL fileURLWithPath:self.installationPath] fromUpdateAtURL:[NSURL fileURLWithPath:self.bundlePath] withHost:self.host fileOperationToolPath:self.fileOperationToolPath progressBlock:cb error:error];
 }
 
 - (BOOL)canInstallSilently

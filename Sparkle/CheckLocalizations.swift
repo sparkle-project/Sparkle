@@ -2,21 +2,21 @@
 
 import Foundation
 
-func die(msg: String) {
+func die(_ msg: String) {
     print("ERROR: \(msg)")
     exit(1)
 }
 
-extension NSXMLElement {
+extension XMLElement {
     convenience init(name: String, attributes: [String: String], stringValue string: String? = nil) {
         self.init(name: name, stringValue: string)
-        setAttributesWithDictionary(attributes)
+        setAttributesWith(attributes)
     }
 }
 
-let ud = NSUserDefaults.standardUserDefaults()
-let sparkleRoot = ud.objectForKey("root") as? String
-let htmlPath = ud.objectForKey("htmlPath") as? String
+let ud = UserDefaults.standard
+let sparkleRoot = ud.object(forKey: "root") as? String
+let htmlPath = ud.object(forKey: "htmlPath") as? String
 if sparkleRoot == nil || htmlPath == nil {
     die("Missing arguments")
 }
@@ -29,36 +29,36 @@ if enStringsDict == nil {
 let enStringsDictKeys = enStringsDict!.allKeys
 
 let dirPath = NSString(string: sparkleRoot! + "/Sparkle")
-let dirContents = try! NSFileManager.defaultManager().contentsOfDirectoryAtPath(dirPath as String)
+let dirContents = try! FileManager.default.contentsOfDirectory(atPath: dirPath as String)
 let css =
     "body { font-family: sans-serif; font-size: 10pt; }" +
     "h1 { font-size: 12pt; }" +
     ".missing { background-color: #FFBABA; color: #D6010E; white-space: pre; }" +
     ".unused { background-color: #BDE5F8; color: #00529B; white-space: pre; }" +
     ".unlocalized { background-color: #FEEFB3; color: #9F6000; white-space: pre; }"
-var html = NSXMLDocument(rootElement: NSXMLElement(name: "html"))
-html.DTD = NSXMLDTD()
-html.DTD!.name = html.rootElement()!.name
+var html = XMLDocument(rootElement: XMLElement(name: "html"))
+html.dtd = XMLDTD()
+html.dtd!.name = html.rootElement()!.name
 html.characterEncoding = "UTF-8"
-html.documentContentKind = NSXMLDocumentContentKind.XHTMLKind
-var body = NSXMLElement(name: "body")
-var head = NSXMLElement(name: "head")
+html.documentContentKind = XMLDocument.ContentKind.xhtml
+var body = XMLElement(name: "body")
+var head = XMLElement(name: "head")
 html.rootElement()!.addChild(head)
 html.rootElement()!.addChild(body)
-head.addChild(NSXMLElement(name: "meta", attributes: ["charset": html.characterEncoding!]))
-head.addChild(NSXMLElement(name: "title", stringValue: "Sparkle Localizations Report"))
-head.addChild(NSXMLElement(name: "style", stringValue: css))
+head.addChild(XMLElement(name: "meta", attributes: ["charset": html.characterEncoding!]))
+head.addChild(XMLElement(name: "title", stringValue: "Sparkle Localizations Report"))
+head.addChild(XMLElement(name: "style", stringValue: css))
 
-let locale = NSLocale.currentLocale()
+let locale = Locale.current
 for dirEntry in dirContents {
     if NSString(string: dirEntry).pathExtension != "lproj" || dirEntry == "en.lproj" {
         continue
     }
 
-    let lang = locale.displayNameForKey(NSLocaleLanguageCode, value: NSString(string: dirEntry).stringByDeletingPathExtension)
-    body.addChild(NSXMLElement(name: "h1", stringValue: "\(dirEntry) (\(lang!))"))
+    let lang = (locale as NSLocale).displayName(forKey: NSLocale.Key.languageCode, value: NSString(string: dirEntry).deletingPathExtension)
+    body.addChild(XMLElement(name: "h1", stringValue: "\(dirEntry) (\(lang!))"))
 
-    let stringsPath = NSString(string: dirPath.stringByAppendingPathComponent(dirEntry)).stringByAppendingPathComponent("Sparkle.strings")
+    let stringsPath = NSString(string: dirPath.appendingPathComponent(dirEntry)).appendingPathComponent("Sparkle.strings")
     let stringsDict = NSDictionary(contentsOfFile: stringsPath)
     if stringsDict == nil {
         die("Invalid strings file \(dirEntry)")
@@ -70,10 +70,10 @@ for dirEntry in dirContents {
     var unused: [String] = []
 
     for key in enStringsDictKeys {
-        let str = stringsDict?.objectForKey(key) as? String
+        let str = stringsDict?.object(forKey: key) as? String
         if str == nil {
             missing.append(key as! String)
-        } else if let enStr = enStringsDict?.objectForKey(key) as? String {
+        } else if let enStr = enStringsDict?.object(forKey: key) as? String {
             if enStr == str {
                 unlocalized.append(key as! String)
             }
@@ -82,7 +82,7 @@ for dirEntry in dirContents {
 
     let stringsDictKeys = stringsDict!.allKeys
     for key in stringsDictKeys {
-        if enStringsDict?.objectForKey(key) == nil {
+        if enStringsDict?.object(forKey: key) == nil {
             unused.append(key as! String)
         }
     }
@@ -90,12 +90,12 @@ for dirEntry in dirContents {
     let sorter = { (s1: String, s2: String) -> Bool in
         return s1 < s2
     }
-    missing.sortInPlace(sorter)
-    unlocalized.sortInPlace(sorter)
-    unused.sortInPlace(sorter)
+    missing.sort(by: sorter)
+    unlocalized.sort(by: sorter)
+    unused.sort(by: sorter)
 
     let addRow = { (prefix: String, cssClass: String, key: String) -> Void in
-        body.addChild(NSXMLElement(name: "span", attributes: ["class": cssClass], stringValue: [prefix, key].joinWithSeparator(" ") + "\n"))
+        body.addChild(XMLElement(name: "span", attributes: ["class": cssClass], stringValue: [prefix, key].joined(separator: " ") + "\n"))
     }
 
     for key in missing {
@@ -110,6 +110,6 @@ for dirEntry in dirContents {
 }
 
 var err: NSError?
-if !html.XMLData.writeToFile(htmlPath!, atomically: true) {
-    die("Can't write report: \(err)")
+if !((try? html.xmlData.write(to: URL(fileURLWithPath: htmlPath!), options: [.atomic])) != nil) {
+    die("Can't write report: \(err!)")
 }

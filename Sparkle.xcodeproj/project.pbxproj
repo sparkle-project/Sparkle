@@ -1628,7 +1628,7 @@
 			attributes = {
 				CLASSPREFIX = SU;
 				LastSwiftUpdateCheck = 0800;
-				LastUpgradeCheck = 0800;
+				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = "Sparkle Project";
 				TargetAttributes = {
 					5AA96C541E0AE0DB00CA4346 = {

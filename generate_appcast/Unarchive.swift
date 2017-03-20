@@ -50,7 +50,7 @@ func unarchiveUpdates(archivesSourceDir: URL) throws -> [ArchiveItem] {
 
     let dir = try fileManager.contentsOfDirectory(atPath: archivesSourceDir.path);
     var running = 0;
-    for item in dir.filter({ !$0.hasPrefix(".") && !$0.hasSuffix(".delta") && !$0.hasSuffix(".xml") }) {
+    for item in dir.filter({ !$0.hasPrefix(".") && !$0.hasSuffix(".delta") && !$0.hasSuffix(".xml") && !$0.hasSuffix(".html") }) {
         let itemPath = archivesSourceDir.appendingPathComponent(item);
         let archiveDestDir = archivesDestDir.appendingPathComponent(itemPath.lastPathComponent);
 
