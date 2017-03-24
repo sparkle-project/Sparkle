@@ -49,7 +49,7 @@ static NSString *SUOpenUtilityPath = @"/usr/bin/open";
     return YES;
 }
 
-- (BOOL)performFinalInstallation:(NSError * __autoreleasing *)error
+- (BOOL)performFinalInstallationProgressBlock:(nullable void(^)(double))__unused cb error:(NSError *__autoreleasing*)error
 {
     // Run installer using the "open" command to ensure it is launched in front of current application.
     // -W = wait until the app has quit.

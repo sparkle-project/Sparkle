@@ -52,7 +52,7 @@
     XCTAssertNotNil(path);
 
     SUHost *host = [[SUHost alloc] initWithBundle:bundle];
-    
+
     NSError *installerError = nil;
     id<SUInstallerProtocol> installer = [SUInstaller installerForHost:host expectedInstallationType:SPUInstallationTypeGuidedPackage updateDirectory:[path stringByDeletingLastPathComponent] error:&installerError];
     
@@ -66,15 +66,15 @@
         XCTFail(@"Initial Installation failed with error: %@", initialInstallError);
         return;
     }
-    
+
     NSError *finalInstallError = nil;
-    if (![installer performFinalInstallation:&finalInstallError]) {
+    if (![installer performFinalInstallationProgressBlock:nil error:&finalInstallError]) {
         XCTFail(@"Final installation failed with error: %@", finalInstallError);
         return;
     }
-    
+
     XCTAssertTrue([fm fileExistsAtPath:expectedDestination isDirectory:nil]);
-    
+
     [fm removeItemAtPath:expectedDestination error:nil];
 }
 #endif

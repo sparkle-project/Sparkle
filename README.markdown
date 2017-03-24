@@ -67,12 +67,18 @@ New Sparkle classes are now prefixed with `SPU` rather than `SU`. Older classes 
 * Build: Not sure. I have been using Xcode 7.
 * HTTPS server for serving updates (see [App Transport Security](http://sparkle-project.org/documentation/app-transport-security/))
 
-## API Visibility
+## Usage
+
+See [getting started guide](https://sparkle-project.org/documentation/). No code is necessary, but a bit of Xcode configuration is required.
+
+## Development
+
+### API symbols
 
 Sparkle is built with `-fvisibility=hidden -fvisibility-inlines-hidden` which means no symbols are exported by default.
 If you are adding a symbol to the public API you must decorate the declaration with the `SU_EXPORT` macro (grep the source code for examples).
 
-## Building the distribution package
+### Building the distribution package
 
 `cd` to the root of the Sparkle source tree and run `make release`. Sparkle-*VERSION*.tar.bz2 will be created in a temporary directory and revealed in Finder after the build has completed.
 

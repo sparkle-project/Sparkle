@@ -65,7 +65,7 @@ class ArchiveItem: CustomStringConvertible {
                 throw makeError(code: .unarchivingError, "Too many apps in \(unarchivedDir.path) \(apps)");
             }
 
-            let appPath = items[0];
+            let appPath = apps[0];
             guard let infoPlist = NSDictionary(contentsOf: appPath.appendingPathComponent("Contents/Info.plist")) else {
                 throw makeError(code: .unarchivingError, "No plist \(appPath.path)");
             }
@@ -117,6 +117,22 @@ class ArchiveItem: CustomStringConvertible {
 
     var fileSize : Int64 {
         return (self.archiveFileAttributes[.size] as! NSNumber).int64Value;
+    }
+    
+    var releaseNotesPath : URL {
+        let basename = self.archivePath.deletingPathExtension();
+        let releaseNotes = basename.appendingPathExtension("html");
+        return releaseNotes;
+    }
+
+    var releaseNotesURL : URL? {
+        guard let escapedFilename = self.releaseNotesPath.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
+            return nil;
+        }
+        if let relative = self.feedURL {
+            return URL(string: escapedFilename, relativeTo: relative)
+        }
+        return URL(string: escapedFilename)
     }
 
     let mimeType = "application/octet-stream";

@@ -110,6 +110,19 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
         }
         minVer?.setChildren([text(update.minimumSystemVersion)]);
 
+        let relElement = findElement(name: "sparkle:releaseNotesLink", parent: item);
+        if nil == relElement {
+            if FileManager.default.fileExists(atPath: update.releaseNotesPath.path) {
+                linebreak(item);
+                item.addChild(XMLElement.element(withName:"sparkle:releaseNotesLink", stringValue: (update.releaseNotesURL?.absoluteString)!) as! XMLElement);
+            }
+        } else {
+            if !FileManager.default.fileExists(atPath: update.releaseNotesPath.path) {
+                let childIndex = relElement?.index;
+                item.removeChild(at: childIndex!);
+            }
+        }
+        
         var enclosure = findElement(name: "enclosure", parent: item);
         if nil == enclosure {
             enclosure = XMLElement.element(withName: "enclosure") as? XMLElement;
@@ -123,6 +136,7 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
         var attributes = [
             XMLNode.attribute(withName: "url", stringValue: archiveURL) as! XMLNode,
             XMLNode.attribute(withName: "sparkle:version", uri: sparkleNS, stringValue: update.version) as! XMLNode,
+            XMLNode.attribute(withName: "sparkle:shortVersionString", uri: sparkleNS, stringValue: update.shortVersion) as! XMLNode,
             XMLNode.attribute(withName: "length", stringValue: String(update.fileSize)) as! XMLNode,
             XMLNode.attribute(withName: "type", stringValue: update.mimeType) as! XMLNode,
         ];
@@ -142,8 +156,9 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
             }
             for delta in update.deltas {
                 var attributes = [
-                    XMLNode.attribute(withName: "url", stringValue: URL(string: delta.archivePath.lastPathComponent, relativeTo: update.archiveURL)!.absoluteString) as! XMLNode,
+                    XMLNode.attribute(withName: "url", stringValue: URL(string: delta.archivePath.lastPathComponent.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlPathAllowed)!, relativeTo: update.archiveURL)!.absoluteString) as! XMLNode,
                     XMLNode.attribute(withName: "sparkle:version", uri: sparkleNS, stringValue: update.version) as! XMLNode,
+                    XMLNode.attribute(withName: "sparkle:shortVersionString", uri: sparkleNS, stringValue: update.shortVersion) as! XMLNode,
                     XMLNode.attribute(withName: "sparkle:deltaFrom", uri: sparkleNS, stringValue: delta.fromVersion) as! XMLNode,
                     XMLNode.attribute(withName: "length", stringValue: String(delta.fileSize)) as! XMLNode,
                     XMLNode.attribute(withName: "type", stringValue: "application/octet-stream") as! XMLNode,

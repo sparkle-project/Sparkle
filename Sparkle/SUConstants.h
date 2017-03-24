@@ -49,7 +49,6 @@ extern NSString *const SUEnableSystemProfilingKey;
 extern NSString *const SUSendProfileInfoKey;
 extern NSString *const SULastProfileSubmitDateKey;
 extern NSString *const SUPromptUserOnFirstLaunchKey;
-extern NSString *const SUKeepDownloadOnFailedInstallKey;
 extern NSString *const SUDefaultsDomainKey;
 extern NSString *const SUEnableJavaScriptKey;
 extern NSString *const SUFixedHTMLDisplaySizeKey __attribute__((deprecated("This key is obsolete and has no effect.")));

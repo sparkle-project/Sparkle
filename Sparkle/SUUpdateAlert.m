@@ -137,6 +137,9 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
 
+- (void)disableKeyboardShortcutForInstallButton {
+    self.installButton.keyEquivalent = @"";
+}
 
 - (void)endWithSelection:(SPUUpdateAlertChoice)choice
 {

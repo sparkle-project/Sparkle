@@ -140,7 +140,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
 {
     static const int removeXAttrOptions = XATTR_NOFOLLOW;
     BOOL success = YES;
-    
+
     // First remove quarantine on the root item
     NSString *rootURLPath = rootURL.path;
     if ([self _getXAttr:SUAppleQuarantineIdentifier fromFile:rootURLPath options:removeXAttrOptions] >= 0) {
@@ -227,13 +227,13 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
     OSStatus copyResult = FSCopyObjectSync(&sourceRef, &destinationParentRef, (__bridge CFStringRef)(destinationURL.lastPathComponent), NULL, kFSFileOperationDefaultOptions);
 #pragma clang diagnostic pop
-    
+
     if (copyResult != noErr) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:copyResult userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to copy file (%@)", sourceURL.lastPathComponent] }];
         }
     }
-    
+
     return YES;
 }
 
@@ -305,7 +305,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     if (foundSourceVolume && foundDestinationVolume && sourceVolume != destinationVolume) {
         return ([self copyItemAtURL:sourceURL toURL:destinationURL error:error] && [self removeItemAtURL:sourceURL error:error]);
     }
-    
+
     return [_fileManager moveItemAtURL:sourceURL toURL:destinationURL error:error];
 }
 
@@ -429,7 +429,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
-    
+
     int fileDescriptor = open(path, O_RDONLY | O_SYMLINK);
     if (fileDescriptor == -1) {
         if (error != NULL) {
@@ -446,7 +446,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         close(fileDescriptor);
         return NO;
     }
-    
+
     // Preserve the modification time
     struct timeval modTime;
     TIMESPEC_TO_TIMEVAL(&modTime, &statInfo.st_mtimespec);
@@ -485,7 +485,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
-    
+
     // Only recurse if it's actually a directory.  Don't recurse into a
     // root-level symbolic link.
     NSString *rootURLPath = targetURL.path;
@@ -495,7 +495,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     if (![self _updateItemAtURL:targetURL withAccessTime:currentTime error:error]) {
         return NO;
     }
-    
+
     if ([rootType isEqualToString:NSFileTypeDirectory]) {
         // The NSDirectoryEnumerator will avoid recursing into any contained
         // symbolic links, so no further type checks are needed.
@@ -581,7 +581,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
-    
+
     return YES;
 }
 
@@ -622,7 +622,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
-    
+
     return YES;
 }
 

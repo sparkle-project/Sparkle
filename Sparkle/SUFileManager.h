@@ -53,7 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param destinationURL A URL pointing to the destination the item will be moved at. An item must not already exist at this URL.
  * @param error If an error occurs, upon returns contains an NSError object that describes the problem. If you are not interested in possible errors, you may pass in NULL.
  * @return YES if the item was moved successfully, otherwise NO along with a populated error object
- * 
+ *
  * If sourceURL and destinationURL reside on the same volume, this operation will be an atomic move operation.
  * Otherwise this will be equivalent to a copy & remove which will be a nonatomic operation.
  */

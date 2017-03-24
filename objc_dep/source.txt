@@ -1,0 +1,3 @@
+Source: https://github.com/nst/objc_dep/
+License: See README.md
+Commit: c73b097d8de0fbca8b9468cf25aaef398d66c68f

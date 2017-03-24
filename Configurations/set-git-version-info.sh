@@ -30,5 +30,11 @@ fi
 
 # and use it to set the CFBundleShortVersionString value
 export PATH="$PATH:/usr/libexec"
-PlistBuddy -c "Set :CFBundleShortVersionString '$version'" \
-    "$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH"
+
+if [ -f "$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH" ] ; then
+    oldversion=$(PlistBuddy -c "Print :CFBundleShortVersionString" "$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH")
+fi
+if [ "$version" != "$oldversion" ] ; then
+    PlistBuddy -c "Set :CFBundleShortVersionString '$version'" \
+        "$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH"
+fi

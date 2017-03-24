@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 // Any installation work after the user application has has been terminated. This is where the final installation work can be done.
 // After this stage is done, the user application may be relaunched.
 // Should be able to be called from non-main thread
-- (BOOL)performFinalInstallation:(NSError **)error;
+- (BOOL)performFinalInstallationProgressBlock:(nullable void(^)(double))cb error:(NSError **)error;
 
 // Indicates whether or not this installer can install the update silently in the background, without hindering the user
 // If this returns NO, then the installation can fail if the user did not directly request for the install to occur.
