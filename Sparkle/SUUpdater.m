@@ -484,9 +484,10 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 }
 
 static NSString *escapeURLComponent(NSString *str) {
-    return [[[str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
+    return [[[[str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
              stringByReplacingOccurrencesOfString:@"=" withString:@"%3d"]
-             stringByReplacingOccurrencesOfString:@"&" withString:@"%26"];
+             stringByReplacingOccurrencesOfString:@"&" withString:@"%26"]
+             stringByReplacingOccurrencesOfString:@"+" withString:@"%2b"];
 }
 
 - (NSURL *)parameterizedFeedURL
