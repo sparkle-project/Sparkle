@@ -1800,6 +1800,7 @@
 			);
 			name = "Run Script: Set Git Version Info";
 			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1815,6 +1816,7 @@
 			);
 			name = "Run Script: Set Git Version Info";
 			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
