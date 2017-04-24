@@ -697,6 +697,13 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     return [self.updaterSettings sendsSystemProfile];
 }
 
+static NSString *escapeURLComponent(NSString *str) {
+    return [[[[str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
+             stringByReplacingOccurrencesOfString:@"=" withString:@"%3d"]
+             stringByReplacingOccurrencesOfString:@"&" withString:@"%26"]
+             stringByReplacingOccurrencesOfString:@"+" withString:@"%2b"];
+}
+
 // Precondition: The feed URL should be valid
 - (NSURL * _Nullable)parameterizedFeedURL
 {
@@ -734,7 +741,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     // Build up the parameterized URL.
     NSMutableArray *parameterStrings = [NSMutableArray array];
     for (NSDictionary *currentProfileInfo in parameters) {
-        [parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", [[[currentProfileInfo objectForKey:@"key"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], [[[currentProfileInfo objectForKey:@"value"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+        [parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", escapeURLComponent([[currentProfileInfo objectForKey:@"key"] description]), escapeURLComponent([[currentProfileInfo objectForKey:@"value"] description])]];
     }
 
     NSString *separatorCharacter = @"?";

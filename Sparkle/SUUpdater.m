@@ -61,7 +61,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
 {
     self = [super init];
     if (bundle == nil) bundle = [NSBundle mainBundle];
-    
+
     id updater = [sharedUpdaters objectForKey:[NSValue valueWithNonretainedObject:bundle]];
     if (updater)
     {
@@ -79,7 +79,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
         // See -[SUUpdater _standardUserDriverRequestsPathToRelaunch] and -[SUUpdater _pathToRelaunchForUpdater:] implemented below which resolves this
         _userDriver = [[SPUStandardUserDriver alloc] initWithHostBundle:bundle delegate:self];
         _updater = [[SPUUpdater alloc] initWithHostBundle:bundle applicationBundle:bundle userDriver:_userDriver delegate:self];
-        
+
         NSError *updaterError = nil;
         if (![_updater startUpdater:&updaterError]) {
             SULog(SULogLevelError, @"Error: Failed to start updater with error: %@", updaterError);
@@ -185,7 +185,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
 {
     [self.updater checkForUpdates];
 }
-
+    
 - (BOOL)validateMenuItem:(NSMenuItem *)item
 {
     if ([item action] == @selector(checkForUpdates:)) {
@@ -225,7 +225,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
         
         self.loggedInstallUpdatesIfAvailableWarning = YES;
     }
-    
+
     [self checkForUpdatesInBackground];
 }
 
@@ -357,6 +357,13 @@ static NSMutableDictionary *sharedUpdaters = nil;
     }
 }
 
+static NSString *escapeURLComponent(NSString *str) {
+    return [[[[str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
+             stringByReplacingOccurrencesOfString:@"=" withString:@"%3d"]
+             stringByReplacingOccurrencesOfString:@"&" withString:@"%26"]
+             stringByReplacingOccurrencesOfString:@"+" withString:@"%2b"];
+}
+
 - (BOOL)updater:(SPUUpdater *)__unused updater shouldPostponeRelaunchForUpdate:(SUAppcastItem *)item untilInvokingBlock:(void (^)(void))installHandler
 {
     BOOL shouldPostponeRelaunch = NO;
@@ -368,9 +375,9 @@ static NSMutableDictionary *sharedUpdaters = nil;
         
         // This invocation will retain self, but this instance is kept alive forever by our singleton pattern anyway
         [invocation setTarget:self];
-        
+
         self.postponedInstallHandler = installHandler;
-        
+
         shouldPostponeRelaunch = [self.delegate updater:self shouldPostponeRelaunchForUpdate:item untilInvoking:invocation];
     }
     

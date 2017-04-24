@@ -144,7 +144,12 @@
     if (!keyPath) {
         return nil;
     }
-    return [NSString stringWithContentsOfFile:keyPath encoding:NSASCIIStringEncoding error:nil];
+    NSError *error = nil;
+    key = [NSString stringWithContentsOfFile:keyPath encoding:NSASCIIStringEncoding error:&error];
+    if (error) {
+        SULog(SULogLevelError, @"Error loading %@: %@", keyPath, error);
+    }
+    return key;
 }
 
 - (NSString * _Nullable)publicDSAKeyFileKey

@@ -23,6 +23,7 @@ func findOrCreateElement(name: String, parent: XMLElement) -> XMLElement {
         return element;
     }
     let element = XMLElement(name: name);
+    linebreak(parent);
     parent.addChild(element);
     return element;
 }
@@ -69,7 +70,9 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
         channel = channelNodes[0] as! XMLElement;
     } else {
         channel = XMLElement(name: "channel");
+        linebreak(channel);
         channel.addChild(XMLElement.element(withName: "title", stringValue: appBaseName) as! XMLElement);
+        linebreak(root);
         root.addChild(channel);
     }
 
@@ -102,6 +105,13 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
             item.addChild(XMLElement.element(withName: "pubDate", stringValue: update.pubDate) as! XMLElement);
         }
 
+        if let html = update.releaseNotesHTML {
+            let descElement = findOrCreateElement(name: "description", parent: item);
+            let cdata = XMLNode(kind:.text, options:.nodeIsCDATA);
+            cdata.stringValue = html;
+            descElement.setChildren([cdata]);
+        }
+
         var minVer = findElement(name: "sparkle:minimumSystemVersion", parent: item);
         if nil == minVer {
             minVer = XMLElement.element(withName: "sparkle:minimumSystemVersion", uri: sparkleNS) as? XMLElement;
@@ -111,16 +121,13 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
         minVer?.setChildren([text(update.minimumSystemVersion)]);
 
         let relElement = findElement(name: "sparkle:releaseNotesLink", parent: item);
-        if nil == relElement {
-            if FileManager.default.fileExists(atPath: update.releaseNotesPath.path) {
+        if let url = update.releaseNotesURL {
+            if nil == relElement {
                 linebreak(item);
-                item.addChild(XMLElement.element(withName:"sparkle:releaseNotesLink", stringValue: (update.releaseNotesURL?.absoluteString)!) as! XMLElement);
+                item.addChild(XMLElement.element(withName:"sparkle:releaseNotesLink", stringValue: url.absoluteString) as! XMLElement);
             }
-        } else {
-            if !FileManager.default.fileExists(atPath: update.releaseNotesPath.path) {
-                let childIndex = relElement?.index;
-                item.removeChild(at: childIndex!);
-            }
+        } else if let childIndex = relElement?.index {
+            item.removeChild(at: childIndex);
         }
         
         var enclosure = findElement(name: "enclosure", parent: item);
