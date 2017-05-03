@@ -45,11 +45,13 @@
 
 @synthesize statusController;
 @synthesize updateAlert;
+@synthesize showErrors;
 
 - (instancetype)initWithUpdater:(id<SUUpdaterPrivate>)anUpdater
 {
     if ((self = [super initWithUpdater:anUpdater])) {
         self.automaticallyInstallUpdates = NO;
+        self.showErrors = YES;
     }
     return self;
 }
@@ -293,11 +295,13 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    NSAlert *alert = [[NSAlert alloc] init];
-    alert.messageText = SULocalizedString(@"Update Error!", nil);
-    alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
-    [alert addButtonWithTitle:SULocalizedString(@"Cancel Update", nil)];
-    [self showAlert:alert];
+    if (self.showErrors) {
+        NSAlert *alert = [[NSAlert alloc] init];
+        alert.messageText = SULocalizedString(@"Update Error!", nil);
+        alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
+        [alert addButtonWithTitle:SULocalizedString(@"Cancel Update", nil)];
+        [self showAlert:alert];
+    }
     [super abortUpdateWithError:error];
 }
 
