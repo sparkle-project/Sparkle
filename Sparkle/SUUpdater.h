@@ -30,7 +30,13 @@
  */
 SU_EXPORT @interface SUUpdater : NSObject
 
+// Work-around for a OS X 10.7 bug when using a NSViewController / NSWindowController as a weak property will crash.
+// Crash report: objc[308]: cannot form weak reference to instance (0x7fc55b481cf0) of class MainWindowViewController
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= 1080
+@property (weak) IBOutlet id<SUUpdaterDelegate> delegate;
+#else
 @property (unsafe_unretained) IBOutlet id<SUUpdaterDelegate> delegate;
+#endif
 
 /*!
  The shared updater for the main bundle.
