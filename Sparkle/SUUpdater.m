@@ -221,7 +221,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
             [self resetUpdateCycle];
         }];
         // We start the update checks and register as observer for changes after the prompt finishes
-    } else {
+    } else if (hasLaunchedBefore) {
         // We check if the user's said they want updates, or they haven't said anything, and the default is set to checking.
         [self scheduleNextUpdateCheck];
     }
