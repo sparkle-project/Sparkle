@@ -492,6 +492,10 @@
     }
 
     NSBundle *sparkleBundle = updater.sparkleBundle;
+    if (!sparkleBundle) {
+        SULog(SULogLevelError, @"Sparkle bundle is gone?");
+        return;
+    }
 
     // Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
     // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
@@ -500,6 +504,14 @@
     NSString *relaunchCopyTargetPath = nil;
     NSError *error = nil;
     BOOL copiedRelaunchPath = NO;
+
+    if (!relaunchToolName) {
+        SULog(SULogLevelError, @"SPARKLE_RELAUNCH_TOOL_NAME not configued");
+    }
+
+    if (!relaunchToolSourcePath) {
+        SULog(SULogLevelError, @"Sparkle.framework is damaged. %@ is missing", relaunchToolName);
+    }
 
     if (relaunchToolSourcePath) {
         relaunchCopyTargetPath = [[self appCachePath] stringByAppendingPathComponent:[relaunchToolSourcePath lastPathComponent]];
