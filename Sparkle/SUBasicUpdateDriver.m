@@ -56,7 +56,7 @@
     [super checkForUpdatesAtURL:URL host:aHost];
 	if ([aHost isRunningOnReadOnlyVolume])
 	{
-        [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again.", nil), [aHost name]] }]];
+        [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again.", nil), [aHost name]] }]];
         return;
     }
 
