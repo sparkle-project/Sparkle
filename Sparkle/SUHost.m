@@ -82,7 +82,7 @@
     name = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey];
 	if (name && name.length > 0) return name;
 
-    return [[[NSFileManager defaultManager] displayNameAtPath:[self.bundle bundlePath]] stringByDeletingPathExtension];
+    return [[[NSFileManager defaultManager] displayNameAtPath:[self bundlePath]] stringByDeletingPathExtension];
 }
 
 - (NSString *__nonnull)version
@@ -127,7 +127,12 @@
     if (!keyPath) {
         return nil;
     }
-    return [NSString stringWithContentsOfFile:keyPath encoding:NSASCIIStringEncoding error:nil];
+    NSError *error = nil;
+    key = [NSString stringWithContentsOfFile:keyPath encoding:NSASCIIStringEncoding error:&error];
+    if (error) {
+        SULog(SULogLevelError, @"Error loading %@: %@", keyPath, error);
+    }
+    return key;
 }
 
 - (NSString * __nullable)publicDSAKeyFileKey

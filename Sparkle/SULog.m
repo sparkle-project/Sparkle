@@ -43,8 +43,8 @@ void SULog(SULogLevel level, NSString *format, ...)
             // Act the same way os_log() does; don't log to stderr if a terminal device is attached
             if (!isatty(STDERR_FILENO)) {
                 options |= ASL_OPT_STDERR;
-        }
-            
+            }
+
             NSString *displayName = [[NSFileManager defaultManager] displayNameAtPath:mainBundle.bundlePath];
             client = asl_open([displayName stringByAppendingString:@" [Sparkle]"].UTF8String, SPARKLE_BUNDLE_IDENTIFIER, options);
             queue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
@@ -77,10 +77,10 @@ void SULog(SULogLevel level, NSString *format, ...)
                 // See docs for OS_LOG_TYPE_ERROR
                 os_log_error(logger, "%{public}@", logMessage);
                 break;
-    }
+        }
 #pragma clang diagnostic pop
         return;
-}
+    }
 
     // Otherwise use ASL
     // Make sure we do not async, because if we async, the log may not be delivered deterministically

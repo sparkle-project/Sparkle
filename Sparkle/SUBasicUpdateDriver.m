@@ -56,7 +56,7 @@
     [super checkForUpdatesAtURL:URL host:aHost];
 	if ([aHost isRunningOnReadOnlyVolume])
 	{
-        [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again.", nil), [aHost name]] }]];
+        [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SURunningFromDiskImageError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again.", nil), [aHost name]] }]];
         return;
     }
 
@@ -492,6 +492,10 @@
     }
 
     NSBundle *sparkleBundle = updater.sparkleBundle;
+    if (!sparkleBundle) {
+        SULog(SULogLevelError, @"Sparkle bundle is gone?");
+        return;
+    }
 
     // Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
     // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
@@ -500,6 +504,14 @@
     NSString *relaunchCopyTargetPath = nil;
     NSError *error = nil;
     BOOL copiedRelaunchPath = NO;
+
+    if (!relaunchToolName) {
+        SULog(SULogLevelError, @"SPARKLE_RELAUNCH_TOOL_NAME not configued");
+    }
+
+    if (!relaunchToolSourcePath) {
+        SULog(SULogLevelError, @"Sparkle.framework is damaged. %@ is missing", relaunchToolName);
+    }
 
     if (relaunchToolSourcePath) {
         relaunchCopyTargetPath = [[self appCachePath] stringByAppendingPathComponent:[relaunchToolSourcePath lastPathComponent]];
