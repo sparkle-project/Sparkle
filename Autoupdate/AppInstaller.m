@@ -548,9 +548,13 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             // Used later for relaunching
             // Compute this now before we set this installer property to nil
             NSString *installationPath = [self.installer installationPath];
+
+            void(^progressBlock)(double) = ^(double progress){
+                // not exactly sure what to do
+            };
             
             NSError *thirdStageError = nil;
-            if (![self.installer performFinalInstallationProgressBlock:nil error:&thirdStageError]) {
+            if (![self.installer performFinalInstallationProgressBlock:progressBlock error:&thirdStageError]) {
                 SULog(SULogLevelError, @"Failed to finalize installation with error: %@", thirdStageError);
                 
                 self.installer = nil;
