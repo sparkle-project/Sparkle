@@ -81,7 +81,7 @@
     name = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey];
 	if (name && name.length > 0) return name;
 
-    return [[[NSFileManager defaultManager] displayNameAtPath:[self.bundle bundlePath]] stringByDeletingPathExtension];
+    return [[[NSFileManager defaultManager] displayNameAtPath:[self bundlePath]] stringByDeletingPathExtension];
 }
 
 - (BOOL)validVersion

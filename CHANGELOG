@@ -1,3 +1,13 @@
+# 1.18.0
+
+ * More detailed progress bar for package installers (Kornel Lesiński)
+ * Disabled the keyboard shortcut for the install button for scheduled updates to avoid accidental installs. (George Nachman)
+ * generate_appcast tool adds release notes if there's an .html file with the same base name as the archive (Brett Walker)
+ * Added `sparkle:shortVersionString` to the enclosure, #1032 (Brett Walker)
+ * Fixed Japanese localization (1024jp)
+ * Fixed escaping of system profile URLs
+ * Added more logging in various failure cases (Kornel Lesiński)
+
 # 1.17.0
 
  * Added Touch Bar support (Bi11)

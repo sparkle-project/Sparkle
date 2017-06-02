@@ -69,8 +69,11 @@
         }
         return NO;
     }
-    
-    progress(1/10.0);
+
+    if (progress) {
+        progress(1/10.0);
+    }
+
     SUFileManager *fileManager = [[SUFileManager alloc] init];
 
     // Update the access time of our entire application before moving it into a temporary directory
@@ -91,8 +94,10 @@
         SULog(SULogLevelError, @"Failed to make new temp directory");
         return NO;
     }
-    
-    progress(2/10.0);
+
+    if (progress) {
+        progress(2/10.0);
+    }
 
     // Move the new app to our temporary directory
     NSString *newURLLastPathComponent = newURL.lastPathComponent;
@@ -102,8 +107,10 @@
         [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
         return NO;
     }
-    
-    progress(3/10.0);
+
+    if (progress) {
+        progress(3/10.0);
+    }
 
     // Release our new app from quarantine
     NSError *quarantineError = nil;
@@ -111,8 +118,10 @@
         // Not big enough of a deal to fail the entire installation
         SULog(SULogLevelError, @"Failed to release quarantine at %@ with error %@", newTempURL.path, quarantineError);
     }
-    
-    progress(4/10.0);
+
+    if (progress) {
+        progress(4/10.0);
+    }
 
     NSURL *oldURL = [NSURL fileURLWithPath:host.bundlePath];
     if (oldURL == nil) {
@@ -133,7 +142,10 @@
         return NO;
     }
     
-    progress(5/10.0);
+
+    if (progress) {
+        progress(5/10.0);
+    }
 
     NSError *touchError = nil;
     if (![fileManager updateModificationAndAccessTimeOfItemAtURL:newTempURL error:&touchError]) {
@@ -141,13 +153,15 @@
         SULog(SULogLevelError, @"Failed to update modification and access time of new app at %@", newTempURL.path);
         SULog(SULogLevelError, @"Error: %@", touchError);
     }
-    
-    progress(6/10.0);
+
+    if (progress) {
+        progress(6/10.0);
+    }
 
     // Decide on a destination name we should use for the older app when we move it around the file system
     NSString *oldDestinationName = oldURL.lastPathComponent.stringByDeletingPathExtension;
     NSString *oldDestinationNameWithPathExtension = oldURL.lastPathComponent;
-        
+
     // Create a temporary directory for our old app that resides on its volume
     NSURL *oldDirectoryURL = oldURL.URLByDeletingLastPathComponent;
     NSURL *tempOldDirectoryURL = (oldDirectoryURL != nil) ? [fileManager makeTemporaryDirectoryWithPreferredName:oldDestinationName appropriateForDirectoryURL:oldDirectoryURL error:error] : nil;
@@ -156,8 +170,10 @@
         [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
         return NO;
     }
-    
-    progress(7/10.0);
+
+    if (progress) {
+        progress(7/10.0);
+    }
 
     // Move the old app to the temporary directory
     NSURL *oldTempURL = [tempOldDirectoryURL URLByAppendingPathComponent:oldDestinationNameWithPathExtension];
@@ -170,8 +186,10 @@
         
         return NO;
     }
-    
-    progress(8/10.0);
+
+    if (progress) {
+        progress(8/10.0);
+    }
 
     // Move the new app to its final destination
     if (![fileManager moveItemAtURL:newTempURL toURL:installationURL error:error]) {
@@ -186,14 +204,18 @@
         
         return NO;
     }
-    
-    progress(9/10.0);
+
+    if (progress) {
+        progress(9/10.0);
+    }
 
     // Cleanup
     [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
     [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
-    
-    progress(10/10.0);
+
+    if (progress) {
+        progress(10/10.0);
+    }
 
     return YES;
 }
