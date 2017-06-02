@@ -41,13 +41,13 @@
 
 "Cancel Update" = "アップデートを中止";
 
-"Checking for updates..." = "アップデートを確認しています…";
+"Checking for updates..." = "アップデートを確認しています...";
 
 /* Take care not to overflow the status window. */
-"Downloading update..." = "アップデートをダウンロードしています…";
+"Downloading update..." = "アップデートをダウンロードしています...";
 
 /* Take care not to overflow the status window. */
-"Extracting update..." = "アップデートを展開しています…";
+"Extracting update..." = "アップデートを展開しています...";
 
 /* the unit for gigabytes */
 "GB" = "GB";
@@ -55,14 +55,14 @@
 "Install and Relaunch" = "インストールして再起動";
 
 /* Take care not to overflow the status window. */
-"Installing update..." = "アップデートをインストールしています…";
+"Installing update..." = "アップデートをインストールしています...";
 
 /* the unit for kilobytes */
 "KB" = "KB";
 
 /* Alternative name for "Install" button if we have a paid update or other update
 	without a download but with a URL. */
-"Learn More..." = "詳しい情報…";
+"Learn More..." = "詳しい情報...";
 
 /* the unit for megabytes */
 "MB" = "MB";
