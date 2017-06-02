@@ -1,5 +1,6 @@
 # 1.18.0
 
+ * Name of the host app is used in authorization prompt (the `SPARKLE_RELAUNCH_TOOL_NAME` setting is now obsolete)
  * More detailed progress bar for package installers (Kornel Lesiński)
  * Disabled the keyboard shortcut for the install button for scheduled updates to avoid accidental installs. (George Nachman)
  * generate_appcast tool adds release notes if there's an .html file with the same base name as the archive (Brett Walker)
@@ -7,6 +8,7 @@
  * Fixed Japanese localization (1024jp)
  * Fixed escaping of system profile URLs
  * Added more logging in various failure cases (Kornel Lesiński)
+ * Better error message for quarantined apps that can't be updated
 
 # 1.17.0
 
