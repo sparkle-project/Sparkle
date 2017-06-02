@@ -2446,6 +2446,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */;
 			buildSettings = {
+				COPY_PHASE_STRIP = NO;
 			};
 			name = Release;
 		};
