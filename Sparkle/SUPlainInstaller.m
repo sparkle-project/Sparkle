@@ -72,7 +72,9 @@
         return NO;
     }
 
-    progress(1/10.0);
+    if (progress) {
+        progress(1/10.0);
+    }
 
     SUFileManager *fileManager = [SUFileManager fileManagerWithAuthorizationToolPath:fileOperationToolPath];
     
@@ -85,7 +87,9 @@
         return NO;
     }
 
-    progress(2/10.0);
+    if (progress) {
+        progress(2/10.0);
+    }
 
     // Move the new app to our temporary directory
     NSString *newURLLastPathComponent = newURL.lastPathComponent;
@@ -96,7 +100,9 @@
         return NO;
     }
 
-    progress(3/10.0);
+    if (progress) {
+        progress(3/10.0);
+    }
 
     // Release our new app from quarantine, fix its owner and group IDs, and update its modification time while it's at our temporary destination
     // We must leave moving the app to its destination as the final step in installing it, so that
@@ -108,7 +114,9 @@
         SULog(SULogLevelError, @"Failed to release quarantine at %@ with error %@", newTempURL.path, quarantineError);
     }
 
-    progress(4/10.0);
+    if (progress) {
+        progress(4/10.0);
+    }
 
     NSURL *oldURL = [NSURL fileURLWithPath:host.bundlePath];
     if (oldURL == nil) {
@@ -127,15 +135,18 @@
         return NO;
     }
     
-
-    progress(5/10.0);
+    if (progress) {
+        progress(5/10.0);
+    }
 
     if (![fileManager updateModificationAndAccessTimeOfItemAtURL:newTempURL error:error]) {
         // Not a fatal error, but a pretty unfortunate one
         SULog(SULogLevelError, @"Failed to update modification and access time of new app at %@", newTempURL.path);
     }
 
-    progress(6/10.0);
+    if (progress) {
+        progress(6/10.0);
+    }
 
     // Decide on a destination name we should use for the older app when we move it around the file system
     NSString *oldDestinationName = nil;
@@ -159,7 +170,9 @@
         return NO;
     }
 
-    progress(7/10.0);
+    if (progress) {
+        progress(7/10.0);
+    }
 
     // Move the old app to the temporary directory
     NSURL *oldTempURL = [tempOldDirectoryURL URLByAppendingPathComponent:oldDestinationNameWithPathExtension];
@@ -173,7 +186,9 @@
         return NO;
     }
 
-    progress(8/10.0);
+    if (progress) {
+        progress(8/10.0);
+    }
 
     // Move the new app to its final destination
     if (![fileManager moveItemAtURL:newTempURL toURL:installationURL error:error]) {
@@ -189,7 +204,9 @@
         return NO;
     }
 
-    progress(9/10.0);
+    if (progress) {
+        progress(9/10.0);
+    }
 
     // From here on out, we don't really need to bring up authorization if we haven't done so prior
     SUFileManager *constrainedFileManager = [fileManager fileManagerByPreservingAuthorizationRights];
@@ -198,7 +215,9 @@
     [constrainedFileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
     [constrainedFileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
 
-    progress(10/10.0);
+    if (progress) {
+        progress(10/10.0);
+    }
 
     return YES;
 }
