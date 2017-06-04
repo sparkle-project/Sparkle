@@ -2,7 +2,7 @@
 
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ がダウンロードされました! 今すぐ %1$@ をインストールして再起動しますか？";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ は、ディスクイメージや光学式ドライブなどの読み出し専用ボリュームから起動している場合アップデートできません。%1$@ をアプリケーションフォルダに移動し、そこから再起動したあとやり直してください。";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ は読み出し専用またはテンポラリな場所で開かれているためアップデートできません。%1$@ をアプリケーションフォルダに移動し、そこから再起動したあとやり直してください。";
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ は現在入手できる最新バージョンです。";
 
