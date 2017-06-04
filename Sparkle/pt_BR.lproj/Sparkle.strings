@@ -2,7 +2,7 @@
 
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ foi transferido e está pronto para uso! Deseja instalar e reabrir o %1$@ agora?";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ não pode ser atualizado enquanto for executado a partir de um volume somente de leitura, como uma imagem de disco ou CD/DVD. Mova o %1$@ para a pasta Aplicativos, reabra-o e tente novamente.";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ não pode ser atualizado porque foi aberto de um volume somente leitura ou local temporário. Use o Finder para copiar %1$@ para a pasta de Aplicativos, reabra-o e tente novamente.";
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ é a versão mais recente disponível.";
 
