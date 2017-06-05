@@ -59,15 +59,17 @@
 - (void)didFindValidUpdate
 {
     id<SUUpdaterPrivate> updater = self.updater;
-    if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
-        [[updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
+    if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:respondWithChoice:)]) {
+        [[updater delegate] updater:self.updater didFindValidUpdate:self.updateItem respondWithChoice:^(SUDUpdateAlertChoice choice) {
+          [self updateAlertFinishedWithChoice:(SUUpdateAlertChoice)choice];
+        }];
+      
+      return;
     }
-
-    if (self.automaticallyInstallUpdates) {
-        [self updateAlertFinishedWithChoice:SUInstallUpdateChoice];
-        return;
+    else if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
+      [[updater delegate] updater:self.updater didFindValidUpdate:self.updateItem];
     }
-
+  
     self.updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host completionBlock:^(SUUpdateAlertChoice choice) {
         [self updateAlertFinishedWithChoice:choice];
     }];
@@ -87,14 +89,10 @@
     }
 
     // Only show the update alert if the app is active; otherwise, we'll wait until it is.
-    if ([NSApp isActive]) {
-        NSWindow *window = [self.updateAlert window];
-        if ([self shouldDisableKeyboardShortcutForInstallButton]) {
-            [self.updateAlert disableKeyboardShortcutForInstallButton];
-        }
-        [window makeKeyAndOrderFront:self];
-    } else
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
+//    if ([NSApp isActive])
+//        [[self.updateAlert window] makeKeyAndOrderFront:self];
+//    else
+//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
 - (BOOL)shouldDisableKeyboardShortcutForInstallButton {
@@ -135,7 +133,7 @@
             break;
 
         case SUOpenInfoURLChoice:
-            [[NSWorkspace sharedWorkspace] openURL:[self.updateItem infoURL]];
+            [[NSWorkspace sharedWorkspace] openURL:[self.updateItem releaseNotesURL]];
             [self abortUpdate];
             break;
 
@@ -152,18 +150,22 @@
 
 - (void)downloadUpdate
 {
-    BOOL createdStatusController = NO;
-    if (self.statusController == nil) {
-        self.statusController = [[SUStatusController alloc] initWithHost:self.host];
-        createdStatusController = YES;
-    }
-    
-    [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
-    [self.statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
-    [self.statusController setButtonEnabled:YES];
-    
-    if (createdStatusController) {
-        [self.statusController showWindow:self];
+    id<SUUpdaterPrivate> updater = self.updater;
+    if(![[updater delegate] suppressSparkleUI])
+    {
+        BOOL createdStatusController = NO;
+        if (self.statusController == nil) {
+            self.statusController = [[SUStatusController alloc] initWithHost:self.host];
+            createdStatusController = YES;
+        }
+        
+        [self.statusController beginActionWithTitle:SULocalizedString(@"Downloading update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
+        [self.statusController setButtonTitle:SULocalizedString(@"Cancel", nil) target:self action:@selector(cancelDownload:) isDefault:NO];
+        [self.statusController setButtonEnabled:YES];
+        
+        if (createdStatusController) {
+            [self.statusController showWindow:self];
+        }
     }
     
     [super downloadUpdate];

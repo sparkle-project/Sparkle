@@ -31,6 +31,7 @@ typedef NS_ENUM(OSStatus, SUError) {
     // Download phase errors.
     SUTemporaryDirectoryError = 2000,
     SUDownloadError = 2001,
+    SUHostDirectoryNotWritable = 2002,
 
     // Extraction phase errors.
     SUUnarchivingError = 3000,

@@ -46,6 +46,15 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 
 - (void)showUpdateAlert
 {
+    id<SUUpdaterPrivate> updater = self.updater;
+    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
+    if ([updaterDelegate suppressSparkleUI])
+    {
+      [self automaticUpdateAlertFinishedWithChoice:SUInstallLaterChoice];
+      return;
+    }
+//    NSLog(@"[Sparkle showUpdateAlert]");
+  
     self.interruptible = NO;
     [self invalidateShowUpdateAlertTimer];
 
@@ -96,10 +105,26 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         
         [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationInvocation:invocation];
     }
+    //For Swift
+    else if ([updaterDelegate respondsToSelector:@selector(updater: willInstallUpdateOnQuit:immediateInstallationBlock:)])
+    {
+      BOOL relaunch = YES;
+      BOOL showUI = NO;
+      NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installWithToolAndRelaunch:displayingUserInterface:)]];
+      [invocation setSelector:@selector(installWithToolAndRelaunch:displayingUserInterface:)];
+      [invocation setArgument:&relaunch atIndex:2];
+      [invocation setArgument:&showUI atIndex:3];
+      [invocation setTarget:self];
+    
+      [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationBlock:^{
+         [invocation invoke];
+        }];
+      }
 
     // If this is marked as a critical update, we'll prompt the user to install it right away.
     if ([self.updateItem isCriticalUpdate])
     {
+//        NSLog(@"[Sparkle update deemed critical]");
         [self showUpdateAlert];
     }
     else
