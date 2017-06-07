@@ -115,12 +115,13 @@
 
 + (BOOL)hostSupportsItem:(SUAppcastItem *)ui
 {
+  BOOL osxSupported = [ui isOsxUpdate];
 	if (([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) &&
-        ([ui maximumSystemVersion] == nil || [[ui maximumSystemVersion] isEqualToString:@""])) { return YES; }
+        ([ui maximumSystemVersion] == nil || [[ui maximumSystemVersion] isEqualToString:@""])) { return osxSupported; }
 
     BOOL minimumVersionOK = TRUE;
     BOOL maximumVersionOK = TRUE;
-    
+  
     id<SUVersionComparison> versionComparator = [[SUStandardVersionComparator alloc] init];
 
     // Check minimum and maximum System Version
@@ -131,7 +132,7 @@
         maximumVersionOK = [versionComparator compareVersion:[ui maximumSystemVersion] toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedAscending;
     }
 
-    return minimumVersionOK && maximumVersionOK;
+    return minimumVersionOK && maximumVersionOK && osxSupported;
 }
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui
