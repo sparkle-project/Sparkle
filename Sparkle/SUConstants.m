@@ -21,7 +21,7 @@ const NSTimeInterval SUDefaultUpdateCheckInterval = DEBUG ? 60 : (60 * 60 * 24);
 
 NSString *const SUBundleIdentifier = @SPARKLE_BUNDLE_IDENTIFIER;
 
-NSString *const SUAppcastAttributeValueOsx = @"osx";
+NSString *const SUAppcastAttributeValueMacOS = @"macos";
 
 NSString *const SUTechnicalErrorInformationKey = @"SUTechnicalErrorInformation";
 

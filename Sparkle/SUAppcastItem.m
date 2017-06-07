@@ -58,11 +58,11 @@
     return [[self.propertiesDictionary objectForKey:SUAppcastElementTags] containsObject:SUAppcastElementCriticalUpdate];
 }
 
-- (BOOL)isOsxUpdate
+- (BOOL)isMacOsUpdate
 {
     BOOL result = true;
-  
-    if (self.osString != nil && [self.osString caseInsensitiveCompare:SUAppcastAttributeValueOsx] != NSOrderedSame)
+
+    if (self.osString != nil && [self.osString caseInsensitiveCompare:SUAppcastAttributeValueMacOS] != NSOrderedSame)
     {
         result = false;
     }

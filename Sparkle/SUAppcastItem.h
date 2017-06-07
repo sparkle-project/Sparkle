@@ -38,7 +38,7 @@ SU_EXPORT @interface SUAppcastItem : NSObject
 
 @property (getter=isDeltaUpdate, readonly) BOOL deltaUpdate;
 @property (getter=isCriticalUpdate, readonly) BOOL criticalUpdate;
-@property (getter=isOsxUpdate, readonly) BOOL osxUpdate;
+@property (getter=isMacOsUpdate, readonly) BOOL macOsUpdate;
 @property (getter=isInformationOnlyUpdate, readonly) BOOL informationOnlyUpdate;
 
 // Returns the dictionary provided in initWithDictionary; this might be useful later for extensions.

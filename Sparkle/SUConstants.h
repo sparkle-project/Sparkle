@@ -21,7 +21,7 @@ extern const NSTimeInterval SUDefaultUpdateCheckInterval;
 
 extern NSString *const SUBundleIdentifier;
 
-extern NSString *const SUAppcastAttributeValueOsx;
+extern NSString *const SUAppcastAttributeValueMacOS;
 
 // -----------------------------------------------------------------------------
 //	Notifications:
