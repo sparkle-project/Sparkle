@@ -60,13 +60,7 @@
 
 - (BOOL)isMacOsUpdate
 {
-    BOOL result = true;
-
-    if (self.osString != nil && [self.osString caseInsensitiveCompare:SUAppcastAttributeValueMacOS] != NSOrderedSame)
-    {
-        result = false;
-    }
-    return result;
+    return self.osString == nil || [self.osString isEqualToString:SUAppcastAttributeValueMacOS];
 }
 
 - (BOOL)isInformationOnlyUpdate
