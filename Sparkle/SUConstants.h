@@ -21,6 +21,8 @@ extern const NSTimeInterval SUDefaultUpdateCheckInterval;
 
 extern NSString *const SUBundleIdentifier;
 
+extern NSString *const SUAppcastAttributeValueOsx;
+
 // -----------------------------------------------------------------------------
 //	Notifications:
 // -----------------------------------------------------------------------------
@@ -64,6 +66,9 @@ extern NSString *const SUAppcastAttributeDeltaFrom;
 extern NSString *const SUAppcastAttributeDSASignature;
 extern NSString *const SUAppcastAttributeShortVersionString;
 extern NSString *const SUAppcastAttributeVersion;
+extern NSString *const SUAppcastAttributeOsType;
+
+
 
 extern NSString *const SUAppcastElementCriticalUpdate;
 extern NSString *const SUAppcastElementDeltas;
