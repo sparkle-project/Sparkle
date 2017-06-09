@@ -36,6 +36,22 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     // awakeFromNib might be called more than once; guard against that
     // We have to use awakeFromNib otherwise the delegate outlets may not be connected yet,
     // and we aren't a proper window or view controller, so we don't have a proper "did load" point
+    [self initializeUpdater];
+}
+
+- (instancetype)initWithUpdaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)userDriverDelegate
+{
+    if ((self = [super init])) {
+        _updaterDelegate = updaterDelegate;
+        _userDriverDelegate = userDriverDelegate;
+
+        [self initializeUpdater];
+    }
+    return self;
+}
+
+- (void)initializeUpdater
+{
     if (!self.initializedUpdater) {
         self.initializedUpdater = YES;
         
