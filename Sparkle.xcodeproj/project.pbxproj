@@ -243,7 +243,7 @@
 		7267E5D61D3D8D3500D1BF90 /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E076A1CA616B3001A286B /* libbz2.tbd */; };
 		7267E5D71D3D8D3F00D1BF90 /* SUHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 61EF67550E25B58D00F754E0 /* SUHost.m */; };
 		7267E5D81D3D8D4400D1BF90 /* SUStandardVersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */; };
-		7267E5D91D3D8D4B00D1BF90 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
+		7267E5D91D3D8D4B00D1BF90 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; settings = {COMPILER_FLAGS = "-Wno-comma"; }; };
 		7267E5DC1D3D8F1E00D1BF90 /* SPUMessageTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B01D3D8AD500D1BF90 /* SPUMessageTypes.m */; };
 		7267E5DF1D3D8FFA00D1BF90 /* SPUInstallationInputData.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5AD1D3D8AB700D1BF90 /* SPUInstallationInputData.m */; };
 		7267E5E11D3D901600D1BF90 /* SPUMessageTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B01D3D8AD500D1BF90 /* SPUMessageTypes.m */; };
