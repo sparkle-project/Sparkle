@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 /*!
  A controller class that instantiates a SPUUpdater and allows binding UI to it.
  
- This class is meant to be instantiated in a nib. When doing so, the controller's updater targets the application's main bundle,
+ This class can be instantiated in a nib or created using initWithUpdaterDelegate:userDriverDelegate:. The controller's updater targets the application's main bundle
  and uses Sparkle's standard user interface. Typically, this class is used by sticking it as a custom NSObject subclass in an Interface Builder nib (probably in MainMenu).
  
  The controller creates an SPUUpdater instance and allows hooking up the check for updates action and menu item validation. It also allows hooking
@@ -66,6 +66,16 @@ SU_EXPORT @interface SPUStandardUpdaterController : NSObject
  You may access this property after your application has finished launching, or after your window controller has finished loading.
  */
 @property (nonatomic, readonly, nullable) id <SPUStandardUserDriverProtocol> userDriver;
+
+/*!
+ Use initWithUpdaterDelegate:userDriverDelegate: instead.
+ */
+- (instancetype)init NS_UNAVAILABLE;
+
+/*!
+ Create a new SPUStandardUpdaterController programmatically.
+ */
+- (instancetype)initWithUpdaterDelegate:(nullable id<SPUUpdaterDelegate>)updaterDelegate userDriverDelegate:(nullable id<SPUStandardUserDriverDelegate>)userDriverDelegate;
 
 /*!
  Explicitly checks for updates and displays a progress dialog while doing so.
