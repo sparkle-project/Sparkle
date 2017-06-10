@@ -357,13 +357,6 @@ static NSMutableDictionary *sharedUpdaters = nil;
     }
 }
 
-static NSString *escapeURLComponent(NSString *str) {
-    return [[[[str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
-             stringByReplacingOccurrencesOfString:@"=" withString:@"%3d"]
-             stringByReplacingOccurrencesOfString:@"&" withString:@"%26"]
-             stringByReplacingOccurrencesOfString:@"+" withString:@"%2b"];
-}
-
 - (BOOL)updater:(SPUUpdater *)__unused updater shouldPostponeRelaunchForUpdate:(SUAppcastItem *)item untilInvokingBlock:(void (^)(void))installHandler
 {
     BOOL shouldPostponeRelaunch = NO;
