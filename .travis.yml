@@ -1,5 +1,0 @@
-language: objective-c
-osx_image: xcode8.2
-before_install:
-  - brew update
-script: make ci
