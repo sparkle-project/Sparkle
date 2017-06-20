@@ -115,12 +115,15 @@
 
 + (BOOL)hostSupportsItem:(SUAppcastItem *)ui
 {
+    BOOL osOK = [ui isMacOsUpdate];
 	if (([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) &&
-        ([ui maximumSystemVersion] == nil || [[ui maximumSystemVersion] isEqualToString:@""])) { return YES; }
+        ([ui maximumSystemVersion] == nil || [[ui maximumSystemVersion] isEqualToString:@""])) {
+        return osOK;
+    }
 
     BOOL minimumVersionOK = TRUE;
     BOOL maximumVersionOK = TRUE;
-    
+
     id<SUVersionComparison> versionComparator = [[SUStandardVersionComparator alloc] init];
 
     // Check minimum and maximum System Version
@@ -131,7 +134,7 @@
         maximumVersionOK = [versionComparator compareVersion:[ui maximumSystemVersion] toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedAscending;
     }
 
-    return minimumVersionOK && maximumVersionOK;
+    return minimumVersionOK && maximumVersionOK && osOK;
 }
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui
@@ -499,22 +502,29 @@
 
     // Copy the relauncher into a temporary directory so we can get to it after the new version's installed.
     // Only the paranoid survive: if there's already a stray copy of relaunch there, we would have problems.
-    NSString *const relaunchToolName = @"" SPARKLE_RELAUNCH_TOOL_NAME;
-    NSString *const relaunchToolSourcePath = [sparkleBundle pathForResource:relaunchToolName ofType:@"app"];
+    NSString *const relaunchToolSourceName = @"" SPARKLE_RELAUNCH_TOOL_NAME;
+    NSString *const relaunchToolSourcePath = [sparkleBundle pathForResource:relaunchToolSourceName ofType:@"app"];
     NSString *relaunchCopyTargetPath = nil;
     NSError *error = nil;
     BOOL copiedRelaunchPath = NO;
 
-    if (!relaunchToolName) {
+    if (!relaunchToolSourceName || ![relaunchToolSourceName length]) {
         SULog(SULogLevelError, @"SPARKLE_RELAUNCH_TOOL_NAME not configued");
     }
 
     if (!relaunchToolSourcePath) {
-        SULog(SULogLevelError, @"Sparkle.framework is damaged. %@ is missing", relaunchToolName);
+        SULog(SULogLevelError, @"Sparkle.framework is damaged. %@ is missing", relaunchToolSourceName);
     }
 
     if (relaunchToolSourcePath) {
-        relaunchCopyTargetPath = [[self appCachePath] stringByAppendingPathComponent:[relaunchToolSourcePath lastPathComponent]];
+        NSString *hostBundleBaseName = [[self.host.bundlePath lastPathComponent] stringByDeletingPathExtension];
+        if (!hostBundleBaseName) {
+            SULog(SULogLevelError, @"Unable to get bundlePath");
+            hostBundleBaseName = @"Sparkle";
+        }
+        NSString *relaunchCopyBaseName = [NSString stringWithFormat:@"%@ (Autoupdate).app", hostBundleBaseName];
+
+        relaunchCopyTargetPath = [[self appCachePath] stringByAppendingPathComponent:relaunchCopyBaseName];
 
         SUFileManager *fileManager = [SUFileManager defaultManager];
 
