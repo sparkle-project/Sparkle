@@ -213,20 +213,10 @@
                                                         object:self.updater
                                                       userInfo:@{ SUUpdaterAppcastItemNotificationKey: self.updateItem }];
     
-    
-    if (![updater automaticallyDownloadsUpdates])
-    {
-        // TB: App is in a non writable directory
-        NSError *error =
-        [NSError errorWithDomain:SUSparkleErrorDomain code:SUHostDirectoryNotWritable
-                        userInfo:@{NSLocalizedDescriptionKey: SULocalizedString(@"Host directory is not writable", nil)}];
-        
-        [self abortUpdateWithError:error];
-    }
-    else
-    {
-        [self downloadUpdate];
-    }
+  
+  // TB: Always download update.
+  // Stadard accounts will recieve an auth prompt before installation
+  [self downloadUpdate];
 }
 
 - (void)didNotFindUpdate
