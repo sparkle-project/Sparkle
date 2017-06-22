@@ -59,7 +59,7 @@ Gw
                     <textField verticalHuggingPriority="750" id="32">
                         <rect key="frame" x="104" y="131" width="316" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Automatisch nach Aktualisierungen suchen?" id="178">
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Automatisch nach Updates suchen?" id="178">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
