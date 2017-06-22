@@ -123,23 +123,7 @@ SU_EXPORT @interface SUUpdater : NSObject
 /*!
  Begins a "probing" check for updates which will not actually offer to
  update to that version.
- 
- Called when a valid update is found by the update driver and provides delegate ability to respond.
- 
- \param updater The SUUpdater instance.
- \param item The appcast item corresponding to the update that is proposed to be installed.
- \param responseBlock The block carrying the users response to update.
- */
-- (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)item respondWithChoice:(void (^)(SUDUpdateAlertChoice))responseBlock;
 
-/*!
-    Called when a valid update is not found.
-
-    \param updater The SUUpdater instance.
- */
-- (void)updaterDidNotFindUpdate:(SUUpdater *)updater;
-
-/*!
  However, the delegate methods
  SUUpdaterDelegate::updater:didFindValidUpdate: and
  SUUpdaterDelegate::updaterDidNotFindUpdate: will be called,
