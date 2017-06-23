@@ -12,7 +12,7 @@ class SUFileManagerTest: XCTestCase
 {
     func makeTempFiles(_ testBlock: (SUFileManager, URL, URL, URL, URL, URL, URL) -> Void)
     {
-        let fileManager = SUFileManager.default()
+        let fileManager = SUFileManager.default
         
         let tempDirectoryURL = (try! fileManager.makeTemporaryDirectory(withPreferredName: "Sparkle Unit Test Data", appropriateForDirectoryURL: URL(fileURLWithPath: NSHomeDirectory())))
         
@@ -278,7 +278,7 @@ class SUFileManagerTest: XCTestCase
     
     func testAcquireBadAuthorization()
     {
-        let fileManager = SUFileManager.default()
+        let fileManager = SUFileManager.default
         XCTAssertNil(try? fileManager._acquireAuthorization())
     }
 }
