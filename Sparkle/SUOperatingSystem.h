@@ -17,8 +17,18 @@ typedef struct {
 
 @interface SUOperatingSystem : NSObject
 
+#if __has_feature(objc_class_property)
+@property (class, readonly) NSOperatingSystemVersion operatingSystemVersion;
+#else
 + (NSOperatingSystemVersion)operatingSystemVersion;
+#endif
+
 + (BOOL)isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion)version;
+
+#if __has_feature(objc_class_property)
+@property (class, readonly) NSString *systemVersionString;
+#else
 + (NSString *)systemVersionString;
+#endif
 
 @end

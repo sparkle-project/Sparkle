@@ -37,7 +37,11 @@ SU_EXPORT @interface SUUpdater : NSObject
  
  This is equivalent to passing [NSBundle mainBundle] to SUUpdater::updaterForBundle:
  */
+#if __has_feature(objc_class_property)
+@property (class, readonly) SUUpdater* sharedUpdater;
+#else
 + (SUUpdater *)sharedUpdater;
+#endif
 
 /*!
  The shared updater for a specified bundle.

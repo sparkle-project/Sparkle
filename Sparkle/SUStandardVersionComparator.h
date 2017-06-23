@@ -38,7 +38,11 @@ SU_EXPORT @interface SUStandardVersionComparator : NSObject <SUVersionComparison
  
     It is usually preferred to alloc/init new a comparator instead.
 */
+#if __has_feature(objc_class_property)
+@property (class, readonly) SUStandardVersionComparator *defaultComparator;
+#else
 + (SUStandardVersionComparator *)defaultComparator;
+#endif
 
 /*!
     Compares version strings through textual analysis.

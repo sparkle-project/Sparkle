@@ -21,7 +21,11 @@ NS_ASSUME_NONNULL_BEGIN
 * Creates a file manager that will not authorize for file operations
 * @return A new file manager instance
 */
+#if __has_feature(objc_class_property)
+@property (class, readonly) SUFileManager *defaultManager;
+#else
 + (instancetype)defaultManager;
+#endif
 
 /**
  * Creates a file manager that allows authorizing for file operations
