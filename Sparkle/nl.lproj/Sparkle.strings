@@ -1,14 +1,14 @@
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ is gedownload en klaar om te installeren! Wilt u %1$@ nu installeren en herstarten?";
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ is gedownload en klaar om te installeren! Wil je %1$@ nu installeren en herstarten?";
 
 "%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ kan niet worden geüpdatet, omdat het vanuit een alleen-lezen- of tijdelijke locatie geopend is. Verplaats %1$@ naar de map ’Programma’s’, herstart vandaar en probeer opnieuw.";
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ is momenteel de nieuwste versie.";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
-"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ is nu beschikbaar – u hebt %3$@. Wilt u de update nu downloaden?";
+"%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ is nu beschikbaar – je hebt %3$@. Wil je de update nu downloaden?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is nu beschikbaar – u hebt %3$@. Wilt u een webpagina openen met meer informatie?";
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is nu beschikbaar – je hebt %3$@. Wil je een webpagina openen met meer informatie?";
 
 "%@ downloaded" = "%@ gedownload";
 
@@ -28,7 +28,7 @@
 
 "An error occurred while parsing the update feed." = "Bij het verwerken van de update-informatie deed zich een fout voor.";
 
-"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Bij het herstarten van %1$@ deed zich een fout voor. De nieuwe versie is beschikbaar wanneer u %1$@ de volgende keer opent.";
+"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Bij het herstarten van %1$@ deed zich een fout voor. De nieuwe versie is beschikbaar wanneer je %1$@ de volgende keer opent.";
 
 /* the unit for bytes */
 "B" = "B";
@@ -66,17 +66,17 @@
 "Ready to Install" = "Klaar om te installeren";
 
 /* Message that is optionally shown at startup to allow users to turn on/off update checks. */
-"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Wilt u dat %1$@ automatisch naar updates zoekt? U kunt altijd nog handmatig zoeken naar updates via het %1$@-menu.";
+"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Wil je dat %1$@ automatisch naar updates zoekt? Je kunt altijd nog handmatig zoeken naar updates via het %1$@-menu.";
 
 "Update Error!" = "Fout bij het bijwerken!";
 
 "Updating %@" = "%@ bijwerken…";
 
 /* 'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI) */
-"You already have the newest version of %@." = "U hebt al de nieuwste versie van %@.";
+"You already have the newest version of %@." = "Je hebt al de nieuwste versie van %@.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You're up-to-date!" = "U hebt de nieuwste versie!";
+"You're up-to-date!" = "Je hebt de nieuwste versie!";
 
 /* Alternative name for "Install" button if we have a paid update or other update
 	without a download but with a URL. */

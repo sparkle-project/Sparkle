@@ -145,7 +145,7 @@ Gw
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="183">
                         <font key="font" metaFont="smallSystem"/>
-                        <string key="title">Aan de hand van anonieme informatie over het systeemprofiel kunnen wij toekomstige ontwikkelingswerkzaamheden beter plannen. Neem contact met ons op als u hierover vragen hebt.
+                        <string key="title">Aan de hand van anonieme informatie over het systeemprofiel kunnen wij toekomstige ontwikkelingswerkzaamheden beter plannen. Neem contact met ons op als je hierover vragen hebt.
 
 Dit is de informatie die wordt verzonden:</string>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
