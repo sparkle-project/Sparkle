@@ -49,29 +49,26 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
     self.interruptible = NO;
     [self invalidateShowUpdateAlertTimer];
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.alert) {
-            [self.alert close];
-        }
+    if (self.alert) {
+        [self.alert close];
+    }
 
-        self.alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host completionBlock:^(SUAutomaticInstallationChoice choice) {
-            [self automaticUpdateAlertFinishedWithChoice:choice];
-        }];
+    self.alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host completionBlock:^(SUAutomaticInstallationChoice choice) {
+        [self automaticUpdateAlertFinishedWithChoice:choice];
+    }];
 
-        // If the app is a menubar app or the like, we need to focus it first and alter the
-        // update prompt to behave like a normal window. Otherwise if the window were hidden
-        // there may be no way for the application to be activated to make it visible again.
-        if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
-            [[self.alert window] setHidesOnDeactivate:NO];
-            [NSApp activateIgnoringOtherApps:YES];
-        }
+    // If the app is a menubar app or the like, we need to focus it first and alter the
+    // update prompt to behave like a normal window. Otherwise if the window were hidden
+    // there may be no way for the application to be activated to make it visible again.
+    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
+        [[self.alert window] setHidesOnDeactivate:NO];
+        [NSApp activateIgnoringOtherApps:YES];
+    }
 
-        if ([NSApp isActive]) {
-            [[self.alert window] makeKeyAndOrderFront:self];
-        } else {
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
-        }
-    });
+    if ([NSApp isActive])
+        [[self.alert window] makeKeyAndOrderFront:self];
+    else
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
 - (void)unarchiverDidFinish:(id)__unused ua
