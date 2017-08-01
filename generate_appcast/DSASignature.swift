@@ -22,7 +22,7 @@ func loadPrivateKey(privateKeyPath: URL) throws -> SecKey {
         throw makeError(code: .signatureError, "Not an OpensSSL private key \(format) \(type)");
     }
 
-    return (cfitems as! NSArray)[0] as! SecKey;
+    return (cfitems! as NSArray)[0] as! SecKey;
 }
 
 func dsaSignature(path: URL, privateKey: SecKey) throws -> String {
