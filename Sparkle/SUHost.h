@@ -19,7 +19,6 @@
 @property (getter=isRunningOnReadOnlyVolume, readonly) BOOL runningOnReadOnlyVolume;
 @property (readonly, copy) NSString *publicDSAKey;
 @property (readonly, nonatomic, copy) NSString *publicDSAKeyFileKey;
-@property (getter=isUpdaterRelaunching,readonly) BOOL updaterRelaunching;
 
 - (id)objectForInfoDictionaryKey:(NSString *)key;
 - (BOOL)boolForInfoDictionaryKey:(NSString *)key;
