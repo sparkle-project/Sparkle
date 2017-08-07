@@ -102,6 +102,11 @@
         return [self version]; // Fall back on the normal version string.
 }
 
+- (BOOL)isUpdaterRelaunching
+{
+    return [self boolForUserDefaultsKey:SUUpdateRelaunchingMarkerKey];
+}
+
 - (BOOL)isRunningOnReadOnlyVolume
 {
     struct statfs statfs_info;

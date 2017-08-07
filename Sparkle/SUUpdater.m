@@ -208,6 +208,14 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     if (!hasLaunchedBefore) {
         [self.host setBool:YES forUserDefaultsKey:SUHasLaunchedBeforeKey];
     }
+    // Relanching from app update?
+    else if ([self.host boolForUserDefaultsKey:SUUpdateRelaunchingMarkerKey]) {
+        if ([self.delegate respondsToSelector:@selector(updaterDidRelaunchApplication:)]) {
+            [self.delegate updaterDidRelaunchApplication:self];
+        }
+        //Reset flag back to NO.
+        [self.host setBool:NO forUserDefaultsKey:SUUpdateRelaunchingMarkerKey];
+    }
 
     if (shouldPrompt) {
         NSArray<NSDictionary<NSString *, NSString *> *> *profileInfo = [SUSystemProfiler systemProfileArrayForHost:self.host];
