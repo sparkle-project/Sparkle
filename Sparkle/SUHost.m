@@ -38,8 +38,8 @@
 
 - (instancetype)initWithBundle:(NSBundle *)aBundle
 {
-    if ((self = [super init]))
-    {
+	if ((self = [super init]))
+	{
         NSParameterAssert(aBundle);
         self.bundle = aBundle;
         if (![self.bundle bundleIdentifier]) {
@@ -47,12 +47,12 @@
         }
         
         _isMainBundle = [aBundle isEqualTo:[NSBundle mainBundle]];
-        
+
         self.defaultsDomain = [self objectForInfoDictionaryKey:SUDefaultsDomainKey];
         if (!self.defaultsDomain) {
             self.defaultsDomain = [self.bundle bundleIdentifier];
         }
-        
+
         // If we're using the main bundle's defaults we'll use the standard user defaults mechanism, otherwise we have to get CF-y.
         NSString *mainBundleIdentifier = NSBundle.mainBundle.bundleIdentifier;
         usesStandardUserDefaults = !self.defaultsDomain || [self.defaultsDomain isEqualToString:mainBundleIdentifier];
@@ -71,17 +71,17 @@
 - (NSString *__nonnull)name
 {
     NSString *name;
-    
+
     // Allow host bundle to provide a custom name
     name = [self objectForInfoDictionaryKey:@"SUBundleName"];
     if (name && name.length > 0) return name;
-    
+
     name = [self objectForInfoDictionaryKey:@"CFBundleDisplayName"];
-    if (name && name.length > 0) return name;
-    
+	if (name && name.length > 0) return name;
+
     name = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey];
-    if (name && name.length > 0) return name;
-    
+	if (name && name.length > 0) return name;
+
     return [[[NSFileManager defaultManager] displayNameAtPath:[self bundlePath]] stringByDeletingPathExtension];
 }
 
@@ -113,16 +113,16 @@
 {
     // Maybe the key is just a string in the Info.plist.
     NSString *key = [self objectForInfoDictionaryKey:SUPublicDSAKeyKey];
-    if (key) {
+	if (key) {
         return key;
     }
-    
+
     // More likely, we've got a reference to a Resources file by filename:
     NSString *keyFilename = [self publicDSAKeyFileKey];
-    if (!keyFilename) {
+	if (!keyFilename) {
         return nil;
     }
-    
+
     NSString *keyPath = [self.bundle pathForResource:keyFilename ofType:nil];
     if (!keyPath) {
         return nil;
@@ -169,14 +169,14 @@
     if (!defaultName || !self.defaultsDomain) {
         return nil;
     }
-    
+
     // Under Tiger, CFPreferencesCopyAppValue doesn't get values from NSRegistrationDomain, so anything
     // passed into -[NSUserDefaults registerDefaults:] is ignored.  The following line falls
     // back to using NSUserDefaults, but only if the host bundle is the main bundle.
     if (self.usesStandardUserDefaults) {
         return [[NSUserDefaults standardUserDefaults] objectForKey:defaultName];
     }
-    
+
     CFPropertyListRef obj = CFPreferencesCopyAppValue((__bridge CFStringRef)defaultName, (__bridge CFStringRef)self.defaultsDomain);
     return CFBridgingRelease(obj);
 }
@@ -184,12 +184,12 @@
 // Note this handles nil being passed for defaultName, in which case the user default will be removed
 - (void)setObject:(id)value forUserDefaultsKey:(NSString *)defaultName
 {
-    if (self.usesStandardUserDefaults)
-    {
+	if (self.usesStandardUserDefaults)
+	{
         [[NSUserDefaults standardUserDefaults] setObject:value forKey:defaultName];
-    }
-    else
-    {
+	}
+	else
+	{
         CFPreferencesSetValue((__bridge CFStringRef)defaultName, (__bridge CFPropertyListRef)(value), (__bridge CFStringRef)self.defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
         CFPreferencesSynchronize((__bridge CFStringRef)self.defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
     }
@@ -200,14 +200,14 @@
     if (self.usesStandardUserDefaults) {
         return [[NSUserDefaults standardUserDefaults] boolForKey:defaultName];
     }
-    
+
     BOOL value;
     CFPropertyListRef plr = CFPreferencesCopyAppValue((__bridge CFStringRef)defaultName, (__bridge CFStringRef)self.defaultsDomain);
     if (plr == NULL) {
         value = NO;
-    }
-    else
-    {
+	}
+	else
+	{
         value = (BOOL)CFBooleanGetValue((CFBooleanRef)plr);
         CFRelease(plr);
     }
@@ -216,12 +216,12 @@
 
 - (void)setBool:(BOOL)value forUserDefaultsKey:(NSString *)defaultName
 {
-    if (self.usesStandardUserDefaults)
-    {
+	if (self.usesStandardUserDefaults)
+	{
         [[NSUserDefaults standardUserDefaults] setBool:value forKey:defaultName];
-    }
-    else
-    {
+	}
+	else
+	{
         CFPreferencesSetValue((__bridge CFStringRef)defaultName, (__bridge CFBooleanRef) @(value), (__bridge CFStringRef)self.defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
         CFPreferencesSynchronize((__bridge CFStringRef)self.defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
     }
