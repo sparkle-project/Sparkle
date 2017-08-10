@@ -351,6 +351,9 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         [self.userDriver showCanCheckForUpdates:YES];
         
         [self retrieveNextUpdateCheckInterval:^(NSTimeInterval updateCheckInterval) {
+            // This callback is asynchronous, so the timer may be set. Invalidate to make sure it isn't.
+            [self.updaterTimer invalidate];
+            
             // How long has it been since last we checked for an update?
             NSDate *lastCheckDate = [self lastUpdateCheckDate];
             if (!lastCheckDate) { lastCheckDate = [NSDate distantPast]; }
