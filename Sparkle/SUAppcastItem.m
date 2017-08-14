@@ -151,6 +151,11 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
     return [[self.propertiesDictionary objectForKey:SUAppcastElementTags] containsObject:SUAppcastElementCriticalUpdate];
 }
 
+- (BOOL)isMacOsUpdate
+{
+    return self.osString == nil || [self.osString isEqualToString:SUAppcastAttributeValueMacOS];
+}
+
 - (BOOL)isInformationOnlyUpdate
 {
     return self.infoURL && !self.fileURL;

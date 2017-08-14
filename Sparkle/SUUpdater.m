@@ -64,11 +64,11 @@ static NSMutableDictionary *sharedUpdaters = nil;
 
     id updater = [sharedUpdaters objectForKey:[NSValue valueWithNonretainedObject:bundle]];
     if (updater)
-    {
+	{
         self = updater;
-    }
-    else if (self)
-    {
+	}
+	else if (self)
+	{
         if (sharedUpdaters == nil) {
             sharedUpdaters = [[NSMutableDictionary alloc] init];
         }
@@ -224,7 +224,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
         SULog(SULogLevelError, @"-[%@ installUpdatesIfAvailable] does not function anymore.. Instead a background scheduled update check will be done.", NSStringFromClass([self class]));
         
         self.loggedInstallUpdatesIfAvailableWarning = YES;
-    }
+        }
 
     [self checkForUpdatesInBackground];
 }
@@ -325,7 +325,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
 {
     if ([self.delegate respondsToSelector:@selector(updater:willDownloadUpdate:withRequest:)]) {
         [self.delegate updater:self willDownloadUpdate:item withRequest:request];
-    }
+        }
 }
 
 - (void)updater:(SPUUpdater *)__unused updater failedToDownloadUpdate:(SUAppcastItem *)item error:(NSError *)error

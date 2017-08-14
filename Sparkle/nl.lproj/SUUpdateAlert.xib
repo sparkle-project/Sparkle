@@ -143,11 +143,11 @@
                         </constraints>
                     </customView>
                     <button horizontalHuggingPriority="150" verticalHuggingPriority="750" horizontalCompressionResistancePriority="997" translatesAutoresizingMaskIntoConstraints="NO" id="22">
-                        <rect key="frame" x="269" y="12" width="186" height="32"/>
+                        <rect key="frame" x="319" y="12" width="145" height="32"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="222" constant="90" id="2Zy-5G-GBj"/>
                         </constraints>
-                        <buttonCell key="cell" type="push" title="Herinner mij er later aan" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="171">
+                        <buttonCell key="cell" type="push" title="Herinner mij later" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="171">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
@@ -169,7 +169,7 @@ Gw
                         </connections>
                     </button>
                     <button horizontalHuggingPriority="20" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="76">
-                        <rect key="frame" x="455" y="12" width="151" height="32"/>
+                        <rect key="frame" x="464" y="12" width="142" height="32"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="222" constant="120" id="N94-uf-6oP"/>
                         </constraints>

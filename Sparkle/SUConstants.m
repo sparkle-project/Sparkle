@@ -26,10 +26,13 @@ const NSTimeInterval SUImpatientUpdateCheckInterval = DEBUG ? (60 * 2) : (60 * 6
 
 NSString *const SUBundleIdentifier = @SPARKLE_BUNDLE_IDENTIFIER;
 
+NSString *const SUAppcastAttributeValueMacOS = @"macos";
+
 NSString *const SUTechnicalErrorInformationKey = @"SUTechnicalErrorInformation";
 
 NSString *const SUFeedURLKey = @"SUFeedURL";
 NSString *const SUHasLaunchedBeforeKey = @"SUHasLaunchedBefore";
+NSString *const SUUpdateRelaunchingMarkerKey = @"SUUpdateRelaunchingMarker";
 NSString *const SUShowReleaseNotesKey = @"SUShowReleaseNotes";
 NSString *const SUSkippedVersionKey = @"SUSkippedVersion";
 NSString *const SUScheduledCheckIntervalKey = @"SUScheduledCheckInterval";
@@ -58,6 +61,7 @@ NSString *const SUAppcastAttributeDeltaFrom = @"sparkle:deltaFrom";
 NSString *const SUAppcastAttributeDSASignature = @"sparkle:dsaSignature";
 NSString *const SUAppcastAttributeShortVersionString = @"sparkle:shortVersionString";
 NSString *const SUAppcastAttributeVersion = @"sparkle:version";
+NSString *const SUAppcastAttributeOsType = @"sparkle:os";
 NSString *const SUAppcastAttributeInstallationType = @"sparkle:installationType";
 
 NSString *const SUAppcastElementCriticalUpdate = @"sparkle:criticalUpdate";

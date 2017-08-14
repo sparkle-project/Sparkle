@@ -27,6 +27,7 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 @property (strong, readonly) NSURL *fileURL;
 @property (nonatomic, readonly) uint64_t contentLength;
 @property (copy, readonly) NSString *versionString;
+@property (copy, readonly) NSString *osString;
 @property (copy, readonly) NSString *displayVersionString;
 @property (copy, readonly) NSDictionary *deltaUpdates;
 @property (strong, readonly) NSURL *infoURL;
@@ -38,6 +39,7 @@ SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 
 @property (getter=isDeltaUpdate, readonly) BOOL deltaUpdate;
 @property (getter=isCriticalUpdate, readonly) BOOL criticalUpdate;
+@property (getter=isMacOsUpdate, readonly) BOOL macOsUpdate;
 @property (getter=isInformationOnlyUpdate, readonly) BOOL informationOnlyUpdate;
 
 // Returns the dictionary provided in initWithDictionary; this might be useful later for extensions.
