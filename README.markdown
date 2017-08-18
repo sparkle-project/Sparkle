@@ -33,18 +33,24 @@ Secure and reliable software update framework for Cocoa developers.
 * Build: Xcode 7 and 10.8 SDK or greater
 * HTTPS server for serving updates (see [App Transport Security](http://sparkle-project.org/documentation/app-transport-security/))
 
-## API
+## Usage
+
+See [getting started guide](https://sparkle-project.org/documentation/). No code is necessary, but a bit of Xcode configuration is required.
+
+## Development
+
+### API symbols
 
 Sparkle is built with `-fvisibility=hidden -fvisibility-inlines-hidden` which means no symbols are exported by default.
 If you are adding a symbol to the public API you must decorate the declaration with the `SU_EXPORT` macro (grep the source code for examples).
 
-## Building the distribution package
+### Building the distribution package
 
 `cd` to the root of the Sparkle source tree and run `make release`. Sparkle-*VERSION*.tar.bz2 will be created in a temporary directory and revealed in Finder after the build has completed.
 
 Alternatively, build the Distribution scheme in the Xcode UI.
 
-## Code of Conduct
+### Code of Conduct
 
 We pledge to have an open and welcoming environment. See our [Code of Conduct](CODE_OF_CONDUCT.md).
 

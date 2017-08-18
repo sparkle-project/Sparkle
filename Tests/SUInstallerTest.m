@@ -71,7 +71,7 @@
         }
         
         NSError *finalInstallationError = nil;
-        if (![installer performFinalInstallation:&finalInstallationError]) {
+        if (![installer performFinalInstallationProgressBlock:nil error:&finalInstallationError]) {
             XCTFail(@"Failed to perform final installation with underlying error = %@ ; error = %@", [finalInstallationError.userInfo objectForKey:NSUnderlyingErrorKey], finalInstallationError);
         }
         

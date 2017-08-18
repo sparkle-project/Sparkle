@@ -1,6 +1,6 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ se han descargado y están listos para utilizar. ¿Le gustaría instalar e iniciar %1$@ ahora?";
 
-"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "%1$@ no se puede actualizar cuando se ejecuta desde un volumen de sólo lectura como imagen de disco o medio óptico. Mueva %1$@ a su carpeta de Aplicaciones y trate de iniciarlo desde allí.";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ no se puede actualizar cuando se ejecuta desde un volumen de sólo lectura como imagen de disco o medio óptico. Mueva %1$@ a su carpeta de Aplicaciones y trate de iniciarlo desde allí.";
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ es la última versión disponible.";
 

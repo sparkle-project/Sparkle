@@ -21,9 +21,12 @@ const NSTimeInterval SUDefaultUpdateCheckInterval = DEBUG ? 60 : (60 * 60 * 24);
 
 NSString *const SUBundleIdentifier = @SPARKLE_BUNDLE_IDENTIFIER;
 
+NSString *const SUAppcastAttributeValueMacOS = @"macos";
+
 NSString *const SUTechnicalErrorInformationKey = @"SUTechnicalErrorInformation";
 
 NSString *const SUHasLaunchedBeforeKey = @"SUHasLaunchedBefore";
+NSString *const SUUpdateRelaunchingMarkerKey = @"SUUpdateRelaunchingMarker";
 NSString *const SUFeedURLKey = @"SUFeedURL";
 NSString *const SUShowReleaseNotesKey = @"SUShowReleaseNotes";
 NSString *const SUSkippedVersionKey = @"SUSkippedVersion";
@@ -41,7 +44,6 @@ NSString *const SULastProfileSubmitDateKey = @"SULastProfileSubmissionDate";
 NSString *const SUPromptUserOnFirstLaunchKey = @"SUPromptUserOnFirstLaunch";
 NSString *const SUEnableJavaScriptKey = @"SUEnableJavaScript";
 NSString *const SUFixedHTMLDisplaySizeKey = @"SUFixedHTMLDisplaySize";
-NSString *const SUKeepDownloadOnFailedInstallKey = @"SUKeepDownloadOnFailedInstall";
 NSString *const SUDefaultsDomainKey = @"SUDefaultsDomain";
 NSString *const SUSparkleErrorDomain = @"SUSparkleErrorDomain";
 
@@ -54,6 +56,7 @@ NSString *const SUAppcastAttributeDeltaFrom = @"sparkle:deltaFrom";
 NSString *const SUAppcastAttributeDSASignature = @"sparkle:dsaSignature";
 NSString *const SUAppcastAttributeShortVersionString = @"sparkle:shortVersionString";
 NSString *const SUAppcastAttributeVersion = @"sparkle:version";
+NSString *const SUAppcastAttributeOsType = @"sparkle:os";
 
 NSString *const SUAppcastElementCriticalUpdate = @"sparkle:criticalUpdate";
 NSString *const SUAppcastElementDeltas = @"sparkle:deltas";

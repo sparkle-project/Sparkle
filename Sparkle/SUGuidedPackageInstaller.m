@@ -42,11 +42,11 @@
     return YES;
 }
 
-- (BOOL)performFinalInstallation:(NSError * __autoreleasing *)error
+- (BOOL)performFinalInstallationProgressBlock:(nullable void(^)(double))progressBlock error:(NSError * __autoreleasing *)error
 {
     SUFileManager *fileManager = [SUFileManager fileManagerWithAuthorizationToolPath:self.fileOperationToolPath];
     
-    return [fileManager executePackageAtURL:[NSURL fileURLWithPath:self.packagePath] error:error];
+    return [fileManager executePackageAtURL:[NSURL fileURLWithPath:self.packagePath] progressBlock:progressBlock error:error];
 }
 
 - (BOOL)canInstallSilently

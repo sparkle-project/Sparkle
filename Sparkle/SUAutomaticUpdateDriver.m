@@ -29,7 +29,6 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 @interface SUAutomaticUpdateDriver ()
 
 @property (assign) BOOL postponingInstallation;
-@property (assign) BOOL showErrors;
 @property (assign) BOOL willUpdateOnTermination;
 @property (assign) BOOL isTerminating;
 @property (strong) SUAutomaticUpdateAlert *alert;
@@ -40,7 +39,6 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 @implementation SUAutomaticUpdateDriver
 
 @synthesize postponingInstallation;
-@synthesize showErrors;
 @synthesize willUpdateOnTermination;
 @synthesize isTerminating;
 @synthesize alert;
@@ -202,7 +200,6 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         [self stopUpdatingOnTermination];
     }
 
-    self.showErrors = YES;
     [super installWithToolAndRelaunch:relaunch displayingUserInterface:showUI];
 }
 
@@ -228,23 +225,6 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
 {
     if (!self.isTerminating) {
         [super terminateApp];
-    }
-}
-
-- (void)abortUpdateWithError:(NSError *)error
-{
-    if (self.showErrors) {
-        [super abortUpdateWithError:error];
-    } else {
-        // Call delegate separately here because otherwise it won't know we stopped.
-        // Normally this gets called by the superclass
-        id<SUUpdaterPrivate> updater = self.updater;
-        id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
-        if ([updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
-            [updaterDelegate updater:self.updater didAbortWithError:error];
-        }
-
-        [self abortUpdate];
     }
 }
 

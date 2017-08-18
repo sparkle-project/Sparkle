@@ -208,6 +208,14 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     if (!hasLaunchedBefore) {
         [self.host setBool:YES forUserDefaultsKey:SUHasLaunchedBeforeKey];
     }
+    // Relanching from app update?
+    else if ([self.host boolForUserDefaultsKey:SUUpdateRelaunchingMarkerKey]) {
+        if ([self.delegate respondsToSelector:@selector(updaterDidRelaunchApplication:)]) {
+            [self.delegate updaterDidRelaunchApplication:self];
+        }
+        //Reset flag back to NO.
+        [self.host setBool:NO forUserDefaultsKey:SUUpdateRelaunchingMarkerKey];
+    }
 
     if (shouldPrompt) {
         NSArray<NSDictionary<NSString *, NSString *> *> *profileInfo = [SUSystemProfiler systemProfileArrayForHost:self.host];
@@ -483,6 +491,13 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     return [self.host boolForKey:SUSendProfileInfoKey];
 }
 
+static NSString *escapeURLComponent(NSString *str) {
+    return [[[[str stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
+             stringByReplacingOccurrencesOfString:@"=" withString:@"%3d"]
+             stringByReplacingOccurrencesOfString:@"&" withString:@"%26"]
+             stringByReplacingOccurrencesOfString:@"+" withString:@"%2b"];
+}
+
 - (NSURL *)parameterizedFeedURL
 {
     NSURL *baseFeedURL = [self feedURL];
@@ -512,7 +527,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     // Build up the parameterized URL.
     NSMutableArray *parameterStrings = [NSMutableArray array];
     for (NSDictionary *currentProfileInfo in parameters) {
-        [parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", [[[currentProfileInfo objectForKey:@"key"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], [[[currentProfileInfo objectForKey:@"value"] description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+        [parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", escapeURLComponent([[currentProfileInfo objectForKey:@"key"] description]), escapeURLComponent([[currentProfileInfo objectForKey:@"value"] description])]];
     }
 
     NSString *separatorCharacter = @"?";
