@@ -169,11 +169,17 @@
     [super downloadUpdate];
 }
 
-- (void)download:(NSURLDownload *)__unused download didReceiveResponse:(NSURLResponse *)response
+
+- (void)URLSession:(NSURLSession *)__unused session downloadTask:(NSURLSessionDownloadTask *)__unused downloadTask didWriteData:(int64_t)__unused bytesWritten totalBytesWritten:(int64_t)totalBytesWritten totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
-    long long expectedContentLength = [response expectedContentLength];
-    [self.statusController setMaxProgressValue:expectedContentLength > 0 ? expectedContentLength : self.updateItem.contentLength];
+    [self.statusController setMaxProgressValue:totalBytesExpectedToWrite];
+    [self.statusController setProgressValue:totalBytesWritten];
+    if ([self.statusController maxProgressValue] > 0.0)
+        [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [self localizedStringFromByteCount:(long long)self.statusController.progressValue], [self localizedStringFromByteCount:(long long)self.statusController.maxProgressValue]]];
+    else
+        [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self localizedStringFromByteCount:(long long)self.statusController.progressValue]]];
 }
+
 
 - (NSString *)localizedStringFromByteCount:(long long)value
 {
@@ -205,21 +211,6 @@
 #pragma clang diagnostic pop
 }
 
-- (void)download:(NSURLDownload *)__unused download didReceiveDataOfLength:(NSUInteger)length
-{
-    double newProgressValue = [self.statusController progressValue] + (double)length;
-    
-    // In case our expected content length was incorrect
-    if (newProgressValue > [self.statusController maxProgressValue]) {
-        [self.statusController setMaxProgressValue:newProgressValue];
-    }
-    
-    [self.statusController setProgressValue:newProgressValue];
-    if ([self.statusController maxProgressValue] > 0.0)
-        [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [self localizedStringFromByteCount:(long long)self.statusController.progressValue], [self localizedStringFromByteCount:(long long)self.statusController.maxProgressValue]]];
-    else
-        [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self localizedStringFromByteCount:(long long)self.statusController.progressValue]]];
-}
 
 - (IBAction)cancelDownload:(id)__unused sender
 {
