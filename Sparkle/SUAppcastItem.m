@@ -45,6 +45,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
 @synthesize releaseNotesURL = _releaseNotesURL;
 @synthesize title = _title;
 @synthesize versionString = _versionString;
+@synthesize osString = _osString;
 @synthesize propertiesDictionary = _propertiesDictionary;
 @synthesize installationType = _installationType;
 
