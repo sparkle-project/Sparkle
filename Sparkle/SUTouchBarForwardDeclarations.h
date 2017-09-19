@@ -18,8 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 @class NSTouchBarItem;
 @class NSCustomTouchBarItem;
 
-typedef NSString * NSTouchBarItemIdentifier NS_EXTENSIBLE_STRING_ENUM;
-typedef NSString * NSTouchBarCustomizationIdentifier NS_EXTENSIBLE_STRING_ENUM;
+typedef NSString * NSTouchBarItemIdentifier;
+typedef NSString * NSTouchBarCustomizationIdentifier;
 
 @protocol NSTouchBarDelegate;
 
@@ -49,7 +49,7 @@ NS_CLASS_AVAILABLE_MAC(10_12_2)
                makeItemForIdentifier:(NSTouchBarItemIdentifier)identifier;
 @end
 
-typedef float NSTouchBarItemPriority _NS_TYPED_EXTENSIBLE_ENUM;
+typedef float NSTouchBarItemPriority;
 
 NS_CLASS_AVAILABLE_MAC(10_12_2)
 @interface NSTouchBarItem : NSObject <NSCoding>

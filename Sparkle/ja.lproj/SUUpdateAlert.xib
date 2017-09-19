@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16C68" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="11201"/>
+        <development version="7000" identifier="xcode"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
+        <plugIn identifier="com.apple.WebKitIBPlugin" version="11542"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="box content view" minToolsVersion="7.0"/>
@@ -26,7 +27,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="746" y="229" width="620" height="370"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1057"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="778"/>
             <value key="minSize" type="size" width="550" height="150"/>
             <value key="maxSize" type="size" width="700" height="600"/>
             <view key="contentView" id="6">
@@ -46,7 +47,7 @@
                         </connections>
                     </imageView>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="10" userLabel="Version text field">
-                        <rect key="frame" x="106" y="338" width="494" height="17"/>
+                        <rect key="frame" x="106" y="338" width="498" height="17"/>
                         <constraints>
                             <constraint firstAttribute="height" priority="777" constant="17" id="n8w-DR-XEM"/>
                         </constraints>
@@ -60,7 +61,7 @@
                         </connections>
                     </textField>
                     <textField horizontalHuggingPriority="350" verticalHuggingPriority="999" horizontalCompressionResistancePriority="100" verticalCompressionResistancePriority="1000" preferredMaxLayoutWidth="490" translatesAutoresizingMaskIntoConstraints="NO" id="101" userLabel="Question text field">
-                        <rect key="frame" x="106" y="316" width="494" height="14"/>
+                        <rect key="frame" x="106" y="316" width="498" height="14"/>
                         <constraints>
                             <constraint firstAttribute="height" relation="lessThanOrEqual" priority="300" constant="28" id="H6E-te-Fog"/>
                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="14" id="KUO-Dw-g6s"/>
@@ -75,16 +76,16 @@
                         </connections>
                     </textField>
                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="fKC-QA-GZa" userLabel="Container to hide release notes">
-                        <rect key="frame" x="108" y="74" width="492" height="234"/>
+                        <rect key="frame" x="108" y="74" width="496" height="234"/>
                         <subviews>
                             <box boxType="oldStyle" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="89">
-                                <rect key="frame" x="0.0" y="0.0" width="492" height="214"/>
+                                <rect key="frame" x="0.0" y="0.0" width="496" height="214"/>
                                 <view key="contentView" id="hbB-V1-Bf6">
-                                    <rect key="frame" x="1" y="1" width="490" height="212"/>
+                                    <rect key="frame" x="1" y="1" width="494" height="212"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <webView maintainsBackForwardList="NO" translatesAutoresizingMaskIntoConstraints="NO" id="18">
-                                            <rect key="frame" x="0.0" y="-2" width="492" height="214"/>
+                                            <rect key="frame" x="0.0" y="-2" width="496" height="214"/>
                                             <webPreferences key="preferences" defaultFontSize="12" defaultFixedFontSize="12" minimumFontSize="7" plugInsEnabled="NO" javaEnabled="NO" javaScriptCanOpenWindowsAutomatically="NO">
                                                 <nil key="identifier"/>
                                             </webPreferences>
@@ -115,7 +116,7 @@
                                 </connections>
                             </box>
                             <textField verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="17">
-                                <rect key="frame" x="-2" y="220" width="84" height="14"/>
+                                <rect key="frame" x="-2" y="220" width="94" height="14"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="100" constant="100" id="gkn-FW-9aC"/>
                                 </constraints>
@@ -143,7 +144,7 @@
                         </constraints>
                     </customView>
                     <button horizontalHuggingPriority="150" verticalHuggingPriority="750" horizontalCompressionResistancePriority="997" translatesAutoresizingMaskIntoConstraints="NO" id="22">
-                        <rect key="frame" x="307" y="12" width="102" height="32"/>
+                        <rect key="frame" x="303" y="12" width="94" height="32"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="222" constant="90" id="2Zy-5G-GBj"/>
                         </constraints>
@@ -159,7 +160,7 @@ Gw
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="998" translatesAutoresizingMaskIntoConstraints="NO" id="23">
-                        <rect key="frame" x="103" y="12" width="185" height="32"/>
+                        <rect key="frame" x="103" y="12" width="200" height="32"/>
                         <buttonCell key="cell" type="push" title="このバージョンはスキップ" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="172">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
@@ -169,7 +170,7 @@ Gw
                         </connections>
                     </button>
                     <button horizontalHuggingPriority="20" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="76">
-                        <rect key="frame" x="409" y="12" width="197" height="32"/>
+                        <rect key="frame" x="397" y="12" width="213" height="32"/>
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="222" constant="120" id="N94-uf-6oP"/>
                         </constraints>
@@ -185,7 +186,7 @@ DQ
                         </connections>
                     </button>
                     <button translatesAutoresizingMaskIntoConstraints="NO" id="117">
-                        <rect key="frame" x="106" y="49" width="495" height="20"/>
+                        <rect key="frame" x="106" y="49" width="499" height="20"/>
                         <constraints>
                             <constraint firstAttribute="height" relation="lessThanOrEqual" constant="28" id="0AI-ue-a0r"/>
                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="14" id="yM1-TA-HfP"/>
