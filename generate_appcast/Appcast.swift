@@ -85,7 +85,6 @@ func makeAppcast(archivesSourceDir: URL, privateKey: SecKey) throws -> [String:[
 
                 // Require delta to be a bit smaller
                 if delta.fileSize / 7 < latestItem.fileSize / 8 {
-                    // Max 3 deltas per version (arbitrary limit to reduce amount of work)
                     numDeltas += 1;
                     if numDeltas > maxDeltas {
                         break;
