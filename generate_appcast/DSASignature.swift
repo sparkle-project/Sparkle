@@ -49,6 +49,12 @@ func dsaSignature(path: URL, privateKey: SecKey) throws -> String {
         throw error!.takeRetainedValue();
     }
 
-    let result = SecTransformExecute(group, &error) as! Data;
-    return result.base64EncodedString();
+    let result = SecTransformExecute(group, &error);
+    if (error != nil) {
+        throw error!.takeRetainedValue();
+    }
+    guard let resultData = result as? Data else {
+        throw makeError(code: .signatureError, "SecTransformExecute returned non-data");
+    }
+    return resultData.base64EncodedString();
 }
