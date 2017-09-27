@@ -14,10 +14,10 @@ func makeError(code: SUError, _ description: String) -> NSError {
         ]);
 }
 
-func makeAppcast(archivesSourceDir: URL, privateKey: SecKey) throws -> [String:[ArchiveItem]] {
+func makeAppcast(archivesSourceDir: URL, privateKey: SecKey, verbose: Bool) throws -> [String:[ArchiveItem]] {
     let comparator = SUStandardVersionComparator();
 
-    let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir))
+    let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir, verbose:verbose))
         .sorted(by: {
             .orderedDescending == comparator.compareVersion($0.version, toVersion:$1.version)
         })
