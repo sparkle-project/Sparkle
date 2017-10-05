@@ -266,9 +266,8 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 - (void)updateLastUpdateCheckDate
 {
-    [self setUpdateLastCheckedDate:[NSDate date]];
-    
     [self willChangeValueForKey:@"lastUpdateCheckDate"];
+    [self setUpdateLastCheckedDate:[NSDate date]];
     [self.host setObject:[self updateLastCheckedDate] forUserDefaultsKey:SULastCheckTimeKey];
     [self didChangeValueForKey:@"lastUpdateCheckDate"];
 }
