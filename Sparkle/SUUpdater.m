@@ -49,6 +49,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @property (strong) SUUpdateDriver *driver;
 @property (strong) SUHost *host;
 
+@property (copy) NSDate *updateLastCheckedDate;
+
 @end
 
 @implementation SUUpdater
@@ -61,6 +63,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize host;
 @synthesize sparkleBundle;
 @synthesize decryptionPassword;
+@synthesize updateLastCheckedDate;
 
 static NSMutableDictionary *sharedUpdaters = nil;
 static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
@@ -253,13 +256,19 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 - (NSDate *)lastUpdateCheckDate
 {
-    return [self.host objectForUserDefaultsKey:SULastCheckTimeKey];
+    if (![self updateLastCheckedDate])
+    {
+        [self setUpdateLastCheckedDate:[self.host objectForUserDefaultsKey:SULastCheckTimeKey]];
+    }
+    
+    return [self updateLastCheckedDate];
 }
 
 - (void)updateLastUpdateCheckDate
 {
     [self willChangeValueForKey:@"lastUpdateCheckDate"];
-    [self.host setObject:[NSDate date] forUserDefaultsKey:SULastCheckTimeKey];
+    [self setUpdateLastCheckedDate:[NSDate date]];
+    [self.host setObject:[self updateLastCheckedDate] forUserDefaultsKey:SULastCheckTimeKey];
     [self didChangeValueForKey:@"lastUpdateCheckDate"];
 }
 
