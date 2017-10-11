@@ -14,7 +14,7 @@ func loadPrivateKey(privateKeyPath: URL) throws -> SecKey {
 
     let status = SecItemImport(data as CFData, nil, &format, &type, SecItemImportExportFlags(rawValue: UInt32(0)), nil, nil, &cfitems);
     if (status != errSecSuccess || cfitems == nil) {
-        print("Private DSA key could not be imported", status);
+        print("Private DSA key file", privateKeyPath, "exists, but it could not be read. SecItemImport error", status);
         throw NSError(domain: SUSparkleErrorDomain, code: Int(OSStatus(SUError.signatureError.rawValue)), userInfo: nil);
     }
 
@@ -22,7 +22,7 @@ func loadPrivateKey(privateKeyPath: URL) throws -> SecKey {
         throw makeError(code: .signatureError, "Not an OpensSSL private key \(format) \(type)");
     }
 
-    return (cfitems as! NSArray)[0] as! SecKey;
+    return (cfitems! as NSArray)[0] as! SecKey;
 }
 
 func dsaSignature(path: URL, privateKey: SecKey) throws -> String {
@@ -49,6 +49,12 @@ func dsaSignature(path: URL, privateKey: SecKey) throws -> String {
         throw error!.takeRetainedValue();
     }
 
-    let result = SecTransformExecute(group, &error) as! Data;
-    return result.base64EncodedString();
+    let result = SecTransformExecute(group, &error);
+    if (error != nil) {
+        throw error!.takeRetainedValue();
+    }
+    guard let resultData = result as? Data else {
+        throw makeError(code: .signatureError, "SecTransformExecute returned non-data");
+    }
+    return resultData.base64EncodedString();
 }

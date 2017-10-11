@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 47;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -1047,7 +1047,6 @@
 		1495006D195FBBBD00BC5B5B /* Sparkle */ = {
 			isa = PBXGroup;
 			children = (
-				720767D01E2E3DD300F9A850 /* AppKitPrevention.h */,
 				61299B3909CB055000B7442F /* Appcast Support */,
 				55C14BD5136EEFD000649790 /* Autoupdate */,
 				089C1665FE841158C02AAC07 /* Framework Resources */,
@@ -1056,6 +1055,7 @@
 				6101354A0DD25B7F0049ACDF /* Unarchiving */,
 				61F83F6E0DBFE07A006FDD30 /* Update Control */,
 				61299B3A09CB056100B7442F /* User Interface */,
+				720767D01E2E3DD300F9A850 /* AppKitPrevention.h */,
 			);
 			path = Sparkle;
 			sourceTree = "<group>";
@@ -1633,11 +1633,11 @@
 				TargetAttributes = {
 					5AA96C541E0AE0DB00CA4346 = {
 						CreatedOnToolsVersion = 8.0;
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
 					612279D80DB5470200AB99EA = {
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 0900;
 						TestTargetID = 8DC2EF4F0486A6940098B216;
 					};
 					722954B31D04ADAF00ECF9CA = {
@@ -1651,7 +1651,7 @@
 				};
 			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "Sparkle" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -1879,8 +1879,8 @@
 				55C14F22136EF86000649790 /* SUStandardVersionComparator.m in Sources */,
 				55C14F20136EF84300649790 /* SUStatusController.m in Sources */,
 				55C14F23136EF86700649790 /* SUSystemProfiler.m in Sources */,
-				720767CF1E2DC37400F9A850 /* TerminationListener.m in Sources */,
 				E1EC2A301E21667000245715 /* SUTouchBarButtonGroup.m in Sources */,
+				720767CF1E2DC37400F9A850 /* TerminationListener.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

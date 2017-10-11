@@ -577,6 +577,9 @@
         }
     }
     
+    //Set relaunching flag.
+    [self.host setBool:YES forUserDefaultsKey:SUUpdateRelaunchingMarkerKey];
+    
     [NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:@[[self.host bundlePath],
                                                                     pathToRelaunch,
                                                                     [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]],

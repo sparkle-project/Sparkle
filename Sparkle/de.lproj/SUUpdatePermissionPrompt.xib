@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9060" systemVersion="15B42" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9060"/>
+        <development version="7000" identifier="xcode"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUUpdatePermissionPrompt">
@@ -59,7 +59,7 @@ Gw
                     <textField verticalHuggingPriority="750" id="32">
                         <rect key="frame" x="104" y="131" width="316" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Automatisch nach Aktualisierungen suchen?" id="178">
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Automatisch nach Updates suchen?" id="178">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -137,17 +137,17 @@ Gw
             </connections>
         </arrayController>
         <customView id="39" userLabel="MoreInfoView">
-            <rect key="frame" x="0.0" y="0.0" width="362" height="205"/>
+            <rect key="frame" x="0.0" y="0.0" width="362" height="191"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField verticalHuggingPriority="750" id="46">
-                    <rect key="frame" x="1" y="128" width="358" height="70"/>
+                    <rect key="frame" x="1" y="128" width="358" height="56"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="183">
                         <font key="font" metaFont="smallSystem"/>
-                        <string key="title">Das anonymisierte Systemprofil unterstützt uns bei der zukünftigen Entwicklung. Bitte kontaktieren Sie uns, wenn Sie Fragen hierzu haben.
+                        <string key="title">Das anonymisierte Systemprofil unterstützt uns bei der zukünftigen Entwicklung. Bitte kontaktiere uns, wenn du Fragen hierzu hast.
 
-Diese Informationen würden an uns gesendet:</string>
+Diese Informationen würden an uns gesendet werden:</string>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -160,7 +160,7 @@ Diese Informationen würden an uns gesendet:</string>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowHeight="14" id="41">
-                                <rect key="frame" x="0.0" y="0.0" width="353" height="16"/>
+                                <rect key="frame" x="0.0" y="0.0" width="353" height="113"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -201,7 +201,6 @@ Diese Informationen würden an uns gesendet:</string>
                                 </tableColumns>
                             </tableView>
                         </subviews>
-                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </clipView>
                     <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" controlSize="small" horizontal="YES" id="185">
                         <rect key="frame" x="-100" y="-100" width="345" height="11"/>
