@@ -8,7 +8,7 @@
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ est disponible ; vous utilisez la version %3$@. Voulez-vous le télécharger maintenant ?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ est disponible ; vous utilisez la version %3$@. Voulez-vous en savoir plus sur cette mise à jour sur Internet ?";
 
 "%@ downloaded" = "%@ téléchargé";
 
