@@ -49,6 +49,7 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
 @synthesize downloadFilename = _downloadFilename;
 @synthesize disabledAutomaticTermination = _disabledAutomaticTermination;
 @synthesize mode = _mode;
+@synthesize receivedExpectedBytes = _receivedExpectedBytes;
 
 - (instancetype)initWithDelegate:(id <SPUDownloaderDelegate>)delegate
 {
