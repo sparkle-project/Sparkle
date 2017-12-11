@@ -182,7 +182,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  \param updater The SUUpdater instance.
  \param item The appcast item corresponding to the update that is proposed to be installed.
  */
-- (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)item;
+- (BOOL)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)item;
 
 /*!
  Returns whether the relaunch should be delayed in order to perform other tasks.
