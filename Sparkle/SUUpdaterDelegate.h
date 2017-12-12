@@ -181,6 +181,8 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  
  \param updater The SUUpdater instance.
  \param item The appcast item corresponding to the update that is proposed to be installed.
+ 
+ \return \c NO to prevent any further action. item.localInstallationPath provides the path to the download and extracted archive and any custom actions can be taken at this point.
  */
 - (BOOL)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)item;
 
