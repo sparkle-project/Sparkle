@@ -16,7 +16,7 @@
 
 #include "AppKitPrevention.h"
 
-@interface SPUDownloader () <NSURLSessionDownloadDelegate>
+@interface SPUDownloader ()
 
 @end
 
@@ -41,11 +41,11 @@
 
 // Don't implement dealloc - make the client call cleanup, which is the only way to remove the reference cycle from the delegate anyway
 
-- (void)startPersistentDownloadWithRequest:(SPUURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename
+- (void)startPersistentDownloadWithRequest:(SPUURLRequest *)__unused request bundleIdentifier:(NSString *)__unused bundleIdentifier desiredFilename:(NSString *)__unused desiredFilename
 {
 }
 
-- (void)startTemporaryDownloadWithRequest:(SPUURLRequest *)request
+- (void)startTemporaryDownloadWithRequest:(SPUURLRequest *)__unused request
 {
 }
 
@@ -69,6 +69,10 @@
     }
 }
 
+- (void)cancel
+{
+    
+}
 
 -(void)downloadDidFinishWithData:(SPUDownloadData*)data
 {

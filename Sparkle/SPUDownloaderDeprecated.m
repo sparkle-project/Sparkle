@@ -174,4 +174,9 @@
     [super cleanup];
 }
 
+- (void)cancel
+{
+    [self cleanup];
+}
+
 @end

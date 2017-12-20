@@ -166,6 +166,11 @@
     [super cleanup];
 }
 
+- (void)cancel
+{
+    [self cleanup];
+}
+
 // NSURLDownload has a [downlaod:shouldDecodeSourceDataOfMIMEType:] to determine if the data should be decoded.
 // This does not exist for NSURLSessionDownloadTask and appears unnecessary. Data tasks will decode data, but not download tasks.
 

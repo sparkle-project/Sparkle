@@ -23,6 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)cleanup;
 
+- (void)cancel;
+
 @end
 
 NS_ASSUME_NONNULL_END
