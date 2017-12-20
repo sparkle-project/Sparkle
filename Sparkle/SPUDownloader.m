@@ -43,10 +43,12 @@
 
 - (void)startPersistentDownloadWithRequest:(SPUURLRequest *)__unused request bundleIdentifier:(NSString *)__unused bundleIdentifier desiredFilename:(NSString *)__unused desiredFilename
 {
+    
 }
 
 - (void)startTemporaryDownloadWithRequest:(SPUURLRequest *)__unused request
 {
+    
 }
 
 - (void)enableAutomaticTermination
@@ -70,6 +72,11 @@
 }
 
 - (void)cancel
+{
+    
+}
+
+- (void)downloadDidFinish
 {
     
 }

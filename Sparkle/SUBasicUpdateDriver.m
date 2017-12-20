@@ -293,7 +293,7 @@
 - (void)downloaderDidSetDestinationName:(NSString *)destinationName temporaryDirectory:(NSString *)temporaryDirectory
 {
     self.tempDir = temporaryDirectory;
-    self.downloadPath = destinationName; // TODO: does this need to be a full path?
+    self.downloadPath = [temporaryDirectory stringByAppendingPathComponent:destinationName];
 }
 
 - (void)downloaderDidReceiveExpectedContentLength:(int64_t)__unused expectedContentLength

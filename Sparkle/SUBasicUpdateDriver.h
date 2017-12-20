@@ -38,11 +38,6 @@
 - (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData * _Nullable)downloadData;
 - (void)downloaderDidFailWithError:(NSError *)error;
 
-/*
-- (void)download:(NSURLDownload *)d decideDestinationWithSuggestedFilename:(NSString *)name;
-- (void)downloadDidFinish:(NSURLDownload *)d;
-- (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error;*/
-
 - (void)extractUpdate;
 - (void)failedToApplyDeltaUpdate;
 
