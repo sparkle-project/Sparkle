@@ -35,7 +35,7 @@
 - (void)downloaderDidSetDestinationName:(NSString *)destinationName temporaryDirectory:(NSString *)temporaryDirectory;
 - (void)downloaderDidReceiveExpectedContentLength:(int64_t)expectedContentLength;
 - (void)downloaderDidReceiveDataOfLength:(uint64_t)length;
-- (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData * _Nullable)downloadData;
+- (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData *)downloadData;
 - (void)downloaderDidFailWithError:(NSError *)error;
 
 - (void)extractUpdate;
