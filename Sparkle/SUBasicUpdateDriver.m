@@ -282,7 +282,7 @@
                       willDownloadUpdate:self.updateItem
                              withRequest:request];
     }
-    // TODO: SPUDownloaderDeprecated vs SPUDownloaderSession
+    
     if ([SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 9, 0}]) {
         self.download = [[SPUDownloaderSession alloc] initWithDelegate:self];
     }
