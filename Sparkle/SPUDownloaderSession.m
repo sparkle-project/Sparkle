@@ -135,7 +135,9 @@
 - (void)URLSession:(NSURLSession *)__unused session task:(NSURLSessionTask *)__unused task didCompleteWithError:(NSError *)error
 {
     self.download = nil;
-    [self.delegate downloaderDidFailWithError:error];
+    if (error) {
+        [self.delegate downloaderDidFailWithError:error];
+    }
     [self cleanup];
 }
 
