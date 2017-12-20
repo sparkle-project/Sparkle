@@ -59,6 +59,8 @@
 		34074B9B1FEABD49001CB3A5 /* SPUURLRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B991FEABD49001CB3A5 /* SPUURLRequest.h */; };
 		34074B9E1FEABD5A001CB3A5 /* SPUDownloadData.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074B9C1FEABD5A001CB3A5 /* SPUDownloadData.m */; };
 		34074B9F1FEABD5A001CB3A5 /* SPUDownloadData.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B9D1FEABD5A001CB3A5 /* SPUDownloadData.h */; };
+		34074BA21FEABFD2001CB3A5 /* SPUDownloaderSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074BA01FEABFD2001CB3A5 /* SPUDownloaderSession.h */; };
+		34074BA31FEABFD2001CB3A5 /* SPUDownloaderSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074BA11FEABFD2001CB3A5 /* SPUDownloaderSession.m */; };
 		3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		55C14BD4136EEFCE00649790 /* Autoupdate.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14BD3136EEFCE00649790 /* Autoupdate.m */; };
 		55C14BD9136EF00C00649790 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
@@ -540,6 +542,9 @@
 		34074B991FEABD49001CB3A5 /* SPUURLRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUURLRequest.h; sourceTree = "<group>"; };
 		34074B9C1FEABD5A001CB3A5 /* SPUDownloadData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUDownloadData.m; sourceTree = "<group>"; };
 		34074B9D1FEABD5A001CB3A5 /* SPUDownloadData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUDownloadData.h; sourceTree = "<group>"; };
+		34074BA01FEABFD2001CB3A5 /* SPUDownloaderSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUDownloaderSession.h; sourceTree = "<group>"; };
+		34074BA11FEABFD2001CB3A5 /* SPUDownloaderSession.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPUDownloaderSession.m; sourceTree = "<group>"; };
+		34074BA41FEAC0BC001CB3A5 /* SPUDownloader_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUDownloader_Private.h; sourceTree = "<group>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
 		4607BEA21948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		4607BEA31948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nb; path = nb.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
@@ -1107,6 +1112,9 @@
 				34074B9C1FEABD5A001CB3A5 /* SPUDownloadData.m */,
 				34074B8D1FEABD08001CB3A5 /* SPUDownloader.h */,
 				34074B8C1FEABD08001CB3A5 /* SPUDownloader.m */,
+				34074BA41FEAC0BC001CB3A5 /* SPUDownloader_Private.h */,
+				34074BA01FEABFD2001CB3A5 /* SPUDownloaderSession.h */,
+				34074BA11FEABFD2001CB3A5 /* SPUDownloaderSession.m */,
 				34074B8E1FEABD08001CB3A5 /* SPUDownloaderDelegate.h */,
 				34074B8F1FEABD08001CB3A5 /* SPUDownloaderProtocol.h */,
 				34074B941FEABD23001CB3A5 /* SPULocalCacheDirectory.h */,
@@ -1472,6 +1480,7 @@
 				61A354550DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.h in Headers */,
 				61A2259E0D1C495D00430CCD /* SUVersionComparisonProtocol.h in Headers */,
 				3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */,
+				34074BA21FEABFD2001CB3A5 /* SPUDownloaderSession.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2052,6 +2061,7 @@
 				5D06E8EC0FD68CE4005AE3F6 /* SUBinaryDeltaApply.m in Sources */,
 				34074B971FEABD24001CB3A5 /* SPULocalCacheDirectory.m in Sources */,
 				5D06E8ED0FD68CE4005AE3F6 /* SUBinaryDeltaCommon.m in Sources */,
+				34074BA31FEABFD2001CB3A5 /* SPUDownloaderSession.m in Sources */,
 				5D06E93A0FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m in Sources */,
 				72316BDA1E0E17180039EFD9 /* SUBundleIcon.m in Sources */,
 				61B078CF15A5FB6100600039 /* SUCodeSigningVerifier.m in Sources */,
