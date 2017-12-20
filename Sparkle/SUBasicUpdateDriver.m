@@ -283,7 +283,12 @@
                              withRequest:request];
     }
     // TODO: SPUDownloaderDeprecated vs SPUDownloaderSession
-    self.download = [[SPUDownloaderDeprecated alloc] initWithDelegate:self];
+    if ([SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 9, 0}]) {
+        self.download = [[SPUDownloaderSession alloc] initWithDelegate:self];
+    }
+    else {
+        self.download = [[SPUDownloaderDeprecated alloc] initWithDelegate:self];
+    }
     SPUURLRequest *urlRequest = [SPUURLRequest URLRequestWithRequest:request];
     NSString *desiredFilename = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
     [self.download startPersistentDownloadWithRequest:urlRequest bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];
