@@ -10,6 +10,6 @@
 #import "SPUDownloader.h"
 #import "SPUDownloaderProtocol.h"
 
-@interface SPUDownloaderSession : SPUDownloader<SPUDownloaderProtocol>
+@interface SPUDownloaderSession : SPUDownloader <SPUDownloaderProtocol>
 
 @end

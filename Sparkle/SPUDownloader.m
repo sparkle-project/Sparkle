@@ -18,14 +18,11 @@
 
 @interface SPUDownloader () <NSURLSessionDownloadDelegate>
 
-@property (nonatomic) NSURLSession *downloadSession;
-
 @end
 
 @implementation SPUDownloader
 
 @synthesize delegate = _delegate;
-@synthesize download = _download;
 @synthesize bundleIdentifier = _bundleIdentifier;
 @synthesize desiredFilename = _desiredFilename;
 @synthesize downloadFilename = _downloadFilename;
@@ -40,16 +37,6 @@
         _delegate = delegate;
     }
     return self;
-}
-
-- (void)startDownloadWithRequest:(SPUURLRequest *)request
-{
-    self.downloadSession = [NSURLSession
-        sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
-        delegate:self
-        delegateQueue:[NSOperationQueue mainQueue]];
-    self.download = [self.downloadSession downloadTaskWithRequest:request.request];
-    [self.download resume];
 }
 
 // Don't implement dealloc - make the client call cleanup, which is the only way to remove the reference cycle from the delegate anyway
@@ -73,9 +60,6 @@
 - (void)cleanup
 {
     [self enableAutomaticTermination];
-    [self.download cancel];
-    self.download = nil;
-    self.downloadSession = nil;
     self.delegate = nil;
     
     if (self.mode == SPUDownloadModeTemporary && self.downloadFilename != nil)
@@ -85,26 +69,13 @@
     }
 }
 
-- (void)downloadDidFinish
+
+-(void)downloadDidFinishWithData:(SPUDownloadData*)data
 {
-    assert(self.downloadFilename != nil);
-    
-    SPUDownloadData *downloadData = nil;
-    if (self.mode == SPUDownloadModeTemporary) {
-        NSData *data = [NSData dataWithContentsOfFile:self.downloadFilename];
-        if (data != nil) {
-            NSURLResponse *response = self.download.response;
-            assert(response != nil);
-            downloadData = [[SPUDownloadData alloc] initWithData:data textEncodingName:response.textEncodingName MIMEType:response.MIMEType];
-        }
-    }
-    
-    self.download = nil;
-    
     switch (self.mode) {
         case SPUDownloadModeTemporary:
-            if (downloadData != nil) {
-                [self.delegate downloaderDidFinishWithTemporaryDownloadData:downloadData];
+            if (data != nil) {
+                [self.delegate downloaderDidFinishWithTemporaryDownloadData:data];
             } else {
                 [self.delegate downloaderDidFailWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to read temporary downloaded data from %@", self.downloadFilename]}]];
             }
@@ -113,8 +84,6 @@
             [self.delegate downloaderDidFinishWithTemporaryDownloadData:nil];
             break;
     }
-    
-    [self cleanup];
 }
 
 @end

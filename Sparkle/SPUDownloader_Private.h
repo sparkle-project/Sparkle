@@ -23,7 +23,6 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
 
 // Delegate is intentionally strongly referenced; see header
 @property (nonatomic) id <SPUDownloaderDelegate> delegate;
-@property (nonatomic) NSURLSessionDownloadTask *download;
 @property (nonatomic, copy) NSString *bundleIdentifier;
 @property (nonatomic, copy) NSString *desiredFilename;
 @property (nonatomic, copy) NSString *downloadFilename;
@@ -31,7 +30,7 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
 @property (nonatomic) SPUDownloadMode mode;
 @property (nonatomic) BOOL receivedExpectedBytes;
 
--(void)downloadDidFinish;
+-(void)downloadDidFinishWithData:(SPUDownloadData*)data;
 
 @end
 

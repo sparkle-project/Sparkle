@@ -19,6 +19,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)startTemporaryDownloadWithRequest:(SPUURLRequest *)request;
 
+- (void)downloadDidFinish;
+
+- (void)cleanup;
+
 @end
 
 NS_ASSUME_NONNULL_END

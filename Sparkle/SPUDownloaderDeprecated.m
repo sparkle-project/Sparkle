@@ -1,43 +1,33 @@
 //
-//  SPUDownloaderSession.m
+//  SPUDownloaderDeprecated.m
 //  Sparkle
 //
-//  Created by Deadpikle on 12/20/17.
+//  Created by School of Computing Macbook on 12/20/17.
 //  Copyright © 2017 Sparkle Project. All rights reserved.
 //
 
-#import "SPUDownloaderSession.h"
+#import "SPUDownloaderDeprecated.h"
 #import "SPUURLRequest.h"
 #import "SPUDownloader_Private.h"
+#import "SPUDownloadData.h"
 #import "SPULocalCacheDirectory.h"
 #import "SUErrors.h"
-#import "SPUDownloadData.h"
 
-@interface SPUDownloaderSession () <NSURLSessionDelegate>
+@interface SPUDownloaderDeprecated () <NSURLDownloadDelegate>
 
-@property (nonatomic) NSURLSession *downloadSession;
-@property (nonatomic) NSURLSessionDownloadTask *download;
+@property (nonatomic) NSURLDownload *download;
+@property (nonatomic) NSURLResponse *response;
 
 @end
 
-@implementation SPUDownloaderSession
+@implementation SPUDownloaderDeprecated
 
-@synthesize downloadSession = _downloadSession;
 @synthesize download = _download;
-
-- (void)startDownloadWithRequest:(SPUURLRequest *)request
-{
-    self.downloadSession = [NSURLSession
-                            sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
-                            delegate:self
-                            delegateQueue:[NSOperationQueue mainQueue]];
-    self.download = [self.downloadSession downloadTaskWithRequest:request.request];
-    [self.download resume];
-}
+@synthesize response = _response;
 
 - (void)startPersistentDownloadWithRequest:(SPUURLRequest *)request bundleIdentifier:(NSString *)bundleIdentifier desiredFilename:(NSString *)desiredFilename
 {
-   dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_main_queue(), ^{
         if (self.download == nil && self.delegate != nil) {
             // Prevent service from automatically terminating while downloading the update asynchronously without any reply blocks
             [[NSProcessInfo processInfo] disableAutomaticTermination:SUDownloadingReason];
@@ -47,7 +37,7 @@
             self.desiredFilename = desiredFilename;
             self.bundleIdentifier = bundleIdentifier;
             
-            [self startDownloadWithRequest:request];
+            self.download = [[NSURLDownload alloc] initWithRequest:request.request delegate:self];
         }
     });
 }
@@ -61,17 +51,24 @@
             self.disabledAutomaticTermination = YES;
             
             self.mode = SPUDownloadModeTemporary;
-            [self startDownloadWithRequest:request];
+            self.download = [[NSURLDownload alloc] initWithRequest:request.request delegate:self];
         }
     });
 }
 
-- (void)URLSession:(NSURLSession *)__unused session downloadTask:(NSURLSessionDownloadTask *)__unused downloadTask didFinishDownloadingToURL:(NSURL *)location
+- (void)download:(NSURLDownload *)__unused d decideDestinationWithSuggestedFilename:(NSString *)name
 {
     if (self.mode == SPUDownloadModeTemporary)
     {
-        self.downloadFilename = location.path;
-        [self downloadDidFinish]; // file is already in a system temp dir
+        // Files downloaded in temporary mode should not last for very long,
+        // so it's ideal to place them in a system temporary directory
+        NSString *destinationFilename = NSTemporaryDirectory();
+        if (destinationFilename)
+        {
+            destinationFilename = [destinationFilename stringByAppendingPathComponent:name];
+            
+            [self.download setDestination:destinationFilename allowOverwrite:NO];
+        }
     }
     else
     {
@@ -100,56 +97,67 @@
                 
                 [self.delegate downloaderDidFailWithError:error];
             } else {
-                NSString *name = self.download.response.suggestedFilename;
-                if (!name) {
-                    name = location.lastPathComponent; // This likely contains nothing useful to identify the file (e.g. CFNetworkDownload_87LVIz.tmp)
-                }
-                NSString *toPath = [downloadFileNameDirectory stringByAppendingPathComponent:name];
-                NSString *fromPath = location.path; // suppress moveItemAtPath: non-null warning
-                NSError *error = nil;
-                if ([[NSFileManager defaultManager] moveItemAtPath:fromPath toPath:toPath error:&error]) {
-                    self.downloadFilename = toPath;
-                    [self.delegate downloaderDidSetDestinationName:name temporaryDirectory:downloadFileNameDirectory];
-                    [self downloadDidFinish];
-                } else {
-                    [self.delegate downloaderDidFailWithError:error];
-                }
+                [self.download setDestination:[downloadFileNameDirectory stringByAppendingPathComponent:name] allowOverwrite:YES];
+                
+                [self.delegate downloaderDidSetDestinationName:name temporaryDirectory:downloadFileNameDirectory];
             }
         }
     }
 }
 
-- (void)URLSession:(NSURLSession *)__unused session downloadTask:(NSURLSessionDownloadTask *)__unused downloadTask didWriteData:(int64_t)bytesWritten totalBytesWritten:(int64_t)__unused totalBytesWritten totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
+- (void)download:(NSURLDownload *)__unused aDownload didCreateDestination:(NSString *)path
 {
+    self.downloadFilename = path;
+}
+
+- (void)download:(NSURLDownload *)__unused download didReceiveResponse:(NSURLResponse *)response
+{
+    self.response = response;
     
-    if (self.mode == SPUDownloadModePersistent && totalBytesExpectedToWrite > 0 && !self.receivedExpectedBytes) {
-        self.receivedExpectedBytes = YES;
-        [self.delegate downloaderDidReceiveExpectedContentLength:totalBytesExpectedToWrite];
-    }
-    
-    if (self.mode == SPUDownloadModePersistent && bytesWritten >= 0) {
-        [self.delegate downloaderDidReceiveDataOfLength:(uint64_t)bytesWritten];
+    if (self.mode == SPUDownloadModePersistent) {
+        // It might be tempting to send over the response object instead of the expected content length but this isn't a good idea
+        // For one, we are only ever concerned about the expected content length
+        // Another reason is that NSURLResponse doesn't support NSSecureCoding in older OS releases (eg: 10.8), which cause issues with XPC
+        [self.delegate downloaderDidReceiveExpectedContentLength:response.expectedContentLength];
     }
 }
 
-- (void)URLSession:(NSURLSession *)__unused session task:(NSURLSessionTask *)__unused task didCompleteWithError:(NSError *)error
+- (void)download:(NSURLDownload *)__unused download didReceiveDataOfLength:(NSUInteger)length
+{
+    if (self.mode == SPUDownloadModePersistent) {
+        [self.delegate downloaderDidReceiveDataOfLength:length];
+    }
+}
+
+- (void)downloadDidFinish:(NSURLDownload *)__unused d
+{
+    [self downloadDidFinish];
+}
+
+- (void)download:(NSURLDownload *)__unused download didFailWithError:(NSError *)error
 {
     self.download = nil;
     [self.delegate downloaderDidFailWithError:error];
     [self cleanup];
 }
 
+- (BOOL)download:(NSURLDownload *)__unused download shouldDecodeSourceDataOfMIMEType:(NSString *)encodingType
+{
+    // We don't want the download system to extract our gzips for persistent downloads
+    // Note that we use a substring matching here instead of direct comparison because the docs say "application/gzip" but the system *uses* "application/x-gzip". This is a documentation bug.
+    return (self.mode == SPUDownloadModeTemporary || [encodingType rangeOfString:@"gzip"].location == NSNotFound);
+}
+
 - (void)downloadDidFinish
 {
+    assert(self.response != nil);
     assert(self.downloadFilename != nil);
     
     SPUDownloadData *downloadData = nil;
     if (self.mode == SPUDownloadModeTemporary) {
         NSData *data = [NSData dataWithContentsOfFile:self.downloadFilename];
         if (data != nil) {
-            NSURLResponse *response = self.download.response;
-            assert(response != nil);
-            downloadData = [[SPUDownloadData alloc] initWithData:data textEncodingName:response.textEncodingName MIMEType:response.MIMEType];
+            downloadData = [[SPUDownloadData alloc] initWithData:data textEncodingName:self.response.textEncodingName MIMEType:self.response.MIMEType];
         }
     }
     
@@ -162,11 +170,8 @@
 {
     [self.download cancel];
     self.download = nil;
-    self.downloadSession = nil;
+    self.response = nil;
     [super cleanup];
 }
-
-// NSURLDownload has a [downlaod:shouldDecodeSourceDataOfMIMEType:] to determine if the data should be decoded.
-// This does not exist for NSURLSessionDownloadTask and appears unnecessary. Data tasks will decode data, but not download tasks.
 
 @end
