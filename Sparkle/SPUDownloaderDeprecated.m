@@ -13,6 +13,8 @@
 #import "SPULocalCacheDirectory.h"
 #import "SUErrors.h"
 
+#include "AppKitPrevention.h"
+
 @interface SPUDownloaderDeprecated () <NSURLDownloadDelegate>
 
 @property (nonatomic) NSURLDownload *download;

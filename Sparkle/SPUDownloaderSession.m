@@ -13,6 +13,8 @@
 #import "SUErrors.h"
 #import "SPUDownloadData.h"
 
+#include "AppKitPrevention.h"
+
 @interface SPUDownloaderSession () <NSURLSessionDelegate>
 
 @property (nonatomic) NSURLSession *downloadSession;
