@@ -30,6 +30,10 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
 @property (nonatomic) SPUDownloadMode mode;
 @property (nonatomic) BOOL receivedExpectedBytes;
 
+// returns temp directory location if successful; if not successful,
+// returns nil after sending error message to client and canceling download
+-(NSString*)getAndCleanTempDirectory;
+
 -(void)downloadDidFinishWithData:(SPUDownloadData*)data;
 
 @end

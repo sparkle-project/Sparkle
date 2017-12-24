@@ -70,29 +70,13 @@
 
 - (void)URLSession:(NSURLSession *)__unused session downloadTask:(NSURLSessionDownloadTask *)__unused downloadTask didFinishDownloadingToURL:(NSURL *)location
 {
-    if (self.mode == SPUDownloadModeTemporary)
-    {
+    if (self.mode == SPUDownloadModeTemporary) {
         self.downloadFilename = location.path;
         [self downloadDidFinish]; // file is already in a system temp dir
-    }
-    else
-    {
-        // Remove our old caches path so we don't start accumulating files in there
-        NSString *rootPersistentDownloadCachePath = [[SPULocalCacheDirectory cachePathForBundleIdentifier:self.bundleIdentifier] stringByAppendingPathComponent:@"PersistentDownloads"];
+    } else {
+        NSString *tempDir = [super getAndCleanTempDirectory];
         
-        [SPULocalCacheDirectory removeOldItemsInDirectory:rootPersistentDownloadCachePath];
-        
-        NSString *tempDir = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:rootPersistentDownloadCachePath];
-        if (tempDir == nil)
-        {
-            // Okay, something's really broken with this user's file structure.
-            [self.download cancel];
-            self.download = nil;
-            
-            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Can't make a temporary directory for the update download at %@.", tempDir] }];
-            
-            [self.delegate downloaderDidFailWithError:error];
-        } else {
+        if (tempDir != nil) {
             NSString *downloadFileName = self.desiredFilename;
             NSString *downloadFileNameDirectory = [tempDir stringByAppendingPathComponent:downloadFileName];
             

@@ -97,4 +97,22 @@
     }
 }
 
+-(NSString*)getAndCleanTempDirectory
+{
+    NSString *rootPersistentDownloadCachePath = [[SPULocalCacheDirectory cachePathForBundleIdentifier:self.bundleIdentifier] stringByAppendingPathComponent:@"PersistentDownloads"];
+    
+    [SPULocalCacheDirectory removeOldItemsInDirectory:rootPersistentDownloadCachePath];
+    
+    NSString *tempDir = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:rootPersistentDownloadCachePath];
+    if (tempDir == nil) {
+        // Okay, something's really broken with this user's file structure.
+        NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Can't make a temporary directory for the update download at %@.", tempDir] }];
+        
+        [self.delegate downloaderDidFailWithError:error];
+        
+        [self cancel];
+    }
+    return tempDir;
+}
+
 @end

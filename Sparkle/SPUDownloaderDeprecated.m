@@ -60,36 +60,19 @@
 
 - (void)download:(NSURLDownload *)__unused d decideDestinationWithSuggestedFilename:(NSString *)name
 {
-    if (self.mode == SPUDownloadModeTemporary)
-    {
+    if (self.mode == SPUDownloadModeTemporary) {
         // Files downloaded in temporary mode should not last for very long,
         // so it's ideal to place them in a system temporary directory
         NSString *destinationFilename = NSTemporaryDirectory();
-        if (destinationFilename)
-        {
+        if (destinationFilename) {
             destinationFilename = [destinationFilename stringByAppendingPathComponent:name];
             
             [self.download setDestination:destinationFilename allowOverwrite:NO];
         }
-    }
-    else
-    {
-        // Remove our old caches path so we don't start accumulating files in there
-        NSString *rootPersistentDownloadCachePath = [[SPULocalCacheDirectory cachePathForBundleIdentifier:self.bundleIdentifier] stringByAppendingPathComponent:@"PersistentDownloads"];
+    } else {
+        NSString *tempDir = [super getAndCleanTempDirectory];
         
-        [SPULocalCacheDirectory removeOldItemsInDirectory:rootPersistentDownloadCachePath];
-        
-        NSString *tempDir = [SPULocalCacheDirectory createUniqueDirectoryInDirectory:rootPersistentDownloadCachePath];
-        if (tempDir == nil)
-        {
-            // Okay, something's really broken with this user's file structure.
-            [self.download cancel];
-            self.download = nil;
-            
-            NSError *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Can't make a temporary directory for the update download at %@.", tempDir] }];
-            
-            [self.delegate downloaderDidFailWithError:error];
-        } else {
+        if (tempDir != nil) {
             NSString *downloadFileName = self.desiredFilename;
             NSString *downloadFileNameDirectory = [tempDir stringByAppendingPathComponent:downloadFileName];
             
