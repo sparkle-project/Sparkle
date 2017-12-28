@@ -180,6 +180,11 @@
     }
 }
 
+-(NSArray *)parseAppcastItemsFromXMLFile:(NSURL *)appcastURL error:(NSError *__autoreleasing*)errorp {
+    NSData *data = [NSData dataWithContentsOfURL:appcastURL];
+    return [self parseAppcastItemsFromXMLData:data error:errorp];
+}
+
 -(NSArray *)parseAppcastItemsFromXMLData:(NSData *)appcastData error:(NSError *__autoreleasing*)errorp {
     if (errorp) {
         *errorp = nil;
