@@ -12,6 +12,7 @@ import Sparkle
 class SPUDownloaderTestDelegate: NSObject, SPUDownloaderDelegate {
     
     var asyncExpectation: XCTestExpectation?
+    var tempResult: SPUDownloadData?
     
     func downloaderDidFailWithError(_ error: Error)
     {
@@ -31,9 +32,7 @@ class SPUDownloaderTestDelegate: NSObject, SPUDownloaderDelegate {
     
     func downloaderDidFinish(withTemporaryDownloadData downloadData: SPUDownloadData?)
     {
-        XCTAssert(downloadData != nil)
-        let str = String.init(data: downloadData!.data, encoding: String.Encoding(rawValue: String.Encoding.utf8.rawValue))
-        XCTAssert(str == "<test>appcast</test>\n")
+        self.tempResult = downloadData
         asyncExpectation?.fulfill()
     }
     
@@ -57,7 +56,19 @@ class SPUDownloaderTest: XCTestCase
         let downloaderRequest = SPUURLRequest(request: request as URLRequest)
         downloader.startTemporaryDownload(with: downloaderRequest)
         
-        super.waitForExpectations(timeout: 30.0, handler: nil)
+        super.waitForExpectations(timeout: 30.0) { error in
+            if let error = error {
+                XCTFail("waitForExpectationsWithTimeout had error: \(error)")
+            }
+            
+            guard let result = delegate.tempResult else {
+                XCTFail("Expected delegate to be called")
+                return
+            }
+            
+            let str = String.init(data: result.data, encoding: String.Encoding(rawValue: String.Encoding.utf8.rawValue))
+            XCTAssert(str == "<test>appcast</test>\n")
+        }
     }
     
     func testDeprecatedDownloader()
@@ -66,6 +77,7 @@ class SPUDownloaderTest: XCTestCase
         let downloader = SPUDownloaderDeprecated(delegate: delegate)
         
         self.performTemporaryDownloadTest(withDownloader: downloader!, delegate: delegate)
+        self.performPermanentDownloadTest(withDownloader: downloader!, delegate: delegate)
     }
     
     func testSessionDownloader()
@@ -74,5 +86,6 @@ class SPUDownloaderTest: XCTestCase
         let downloader = SPUDownloaderSession(delegate: delegate)
         
         self.performTemporaryDownloadTest(withDownloader: downloader!, delegate: delegate)
+        self.performPermanentDownloadTest(withDownloader: downloader!, delegate: delegate)
     }
 }
