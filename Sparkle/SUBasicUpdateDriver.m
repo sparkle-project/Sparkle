@@ -344,33 +344,7 @@
     
     [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo]];
 }
-/*
-- (void)download:(NSURLDownload *)__unused d decideDestinationWithSuggestedFilename:(NSString *)name
-{
-    NSString *downloadFileName = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
-    
-    NSString *appCachePath = [self appCachePath];
-    
-    self.tempDir = [appCachePath stringByAppendingPathComponent:downloadFileName];
-    int cnt = 1;
-	while ([[NSFileManager defaultManager] fileExistsAtPath:self.tempDir] && cnt <= 999)
-	{
-        self.tempDir = [appCachePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, cnt++]];
-    }
 
-    // Create the temporary directory if necessary.
-    BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:self.tempDir withIntermediateDirectories:YES attributes:nil error:NULL];
-	if (!success)
-	{
-        // Okay, something's really broken with this user's file structure.
-        [self.download cancel];
-        [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Can't make a temporary directory for the update download at %@.", self.tempDir] }]];
-    }
-
-    self.downloadPath = [self.tempDir stringByAppendingPathComponent:name];
-    [self.download setDestination:self.downloadPath allowOverwrite:YES];
-}
-*/
 - (void)extractUpdate
 {
     id<SUUpdaterPrivate> updater = self.updater;
