@@ -196,10 +196,10 @@
 
     if ([self itemContainsValidUpdate:item]) {
         self.updateItem = item;
-        [self didFindValidUpdate];
+        [self performSelectorOnMainThread:@selector(didFindValidUpdate) withObject:nil waitUntilDone:NO];
     } else {
         self.updateItem = nil;
-        [self didNotFindUpdate];
+        [self performSelectorOnMainThread:@selector(didNotFindUpdate) withObject:nil waitUntilDone:NO];
     }
 }
 
@@ -374,7 +374,7 @@
                 return;
             }
             
-            [self unarchiverDidFinish:nil];
+            [self performSelectorOnMainThread:@selector(unarchiverDidFinish:) withObject:nil waitUntilDone:NO];
         } progressBlock:^(double progress) {
             [self unarchiver:nil extractedProgress:progress];
         }];
