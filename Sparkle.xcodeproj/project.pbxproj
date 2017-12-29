@@ -50,19 +50,20 @@
 		14958C6E19AEBC950061B14F /* signed-test-file.txt in Resources */ = {isa = PBXBuildFile; fileRef = 14958C6B19AEBC530061B14F /* signed-test-file.txt */; };
 		14958C6F19AEBC980061B14F /* test-pubkey.pem in Resources */ = {isa = PBXBuildFile; fileRef = 14958C6C19AEBC610061B14F /* test-pubkey.pem */; };
 		34074B901FEABD08001CB3A5 /* SPUDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074B8C1FEABD08001CB3A5 /* SPUDownloader.m */; };
-		34074B911FEABD08001CB3A5 /* SPUDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B8D1FEABD08001CB3A5 /* SPUDownloader.h */; };
-		34074B921FEABD08001CB3A5 /* SPUDownloaderDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B8E1FEABD08001CB3A5 /* SPUDownloaderDelegate.h */; };
-		34074B931FEABD08001CB3A5 /* SPUDownloaderProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B8F1FEABD08001CB3A5 /* SPUDownloaderProtocol.h */; };
+		34074B911FEABD08001CB3A5 /* SPUDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B8D1FEABD08001CB3A5 /* SPUDownloader.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		34074B921FEABD08001CB3A5 /* SPUDownloaderDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B8E1FEABD08001CB3A5 /* SPUDownloaderDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		34074B931FEABD08001CB3A5 /* SPUDownloaderProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B8F1FEABD08001CB3A5 /* SPUDownloaderProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		34074B961FEABD24001CB3A5 /* SPULocalCacheDirectory.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B941FEABD23001CB3A5 /* SPULocalCacheDirectory.h */; };
 		34074B971FEABD24001CB3A5 /* SPULocalCacheDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074B951FEABD23001CB3A5 /* SPULocalCacheDirectory.m */; };
 		34074B9A1FEABD49001CB3A5 /* SPUURLRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074B981FEABD48001CB3A5 /* SPUURLRequest.m */; };
-		34074B9B1FEABD49001CB3A5 /* SPUURLRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B991FEABD49001CB3A5 /* SPUURLRequest.h */; };
+		34074B9B1FEABD49001CB3A5 /* SPUURLRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B991FEABD49001CB3A5 /* SPUURLRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		34074B9E1FEABD5A001CB3A5 /* SPUDownloadData.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074B9C1FEABD5A001CB3A5 /* SPUDownloadData.m */; };
-		34074B9F1FEABD5A001CB3A5 /* SPUDownloadData.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B9D1FEABD5A001CB3A5 /* SPUDownloadData.h */; };
-		34074BA21FEABFD2001CB3A5 /* SPUDownloaderSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074BA01FEABFD2001CB3A5 /* SPUDownloaderSession.h */; };
+		34074B9F1FEABD5A001CB3A5 /* SPUDownloadData.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B9D1FEABD5A001CB3A5 /* SPUDownloadData.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		34074BA21FEABFD2001CB3A5 /* SPUDownloaderSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074BA01FEABFD2001CB3A5 /* SPUDownloaderSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		34074BA31FEABFD2001CB3A5 /* SPUDownloaderSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074BA11FEABFD2001CB3A5 /* SPUDownloaderSession.m */; };
-		34074BA71FEAC417001CB3A5 /* SPUDownloaderDeprecated.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074BA51FEAC417001CB3A5 /* SPUDownloaderDeprecated.h */; };
+		34074BA71FEAC417001CB3A5 /* SPUDownloaderDeprecated.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074BA51FEAC417001CB3A5 /* SPUDownloaderDeprecated.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		34074BA81FEAC417001CB3A5 /* SPUDownloaderDeprecated.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074BA61FEAC417001CB3A5 /* SPUDownloaderDeprecated.m */; };
+		342731481FF58E5B00285FBD /* SPUDownloaderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 342731461FF58E4F00285FBD /* SPUDownloaderTest.swift */; };
 		3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		55C14BD4136EEFCE00649790 /* Autoupdate.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14BD3136EEFCE00649790 /* Autoupdate.m */; };
 		55C14BD9136EF00C00649790 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
@@ -549,6 +550,7 @@
 		34074BA41FEAC0BC001CB3A5 /* SPUDownloader_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUDownloader_Private.h; sourceTree = "<group>"; };
 		34074BA51FEAC417001CB3A5 /* SPUDownloaderDeprecated.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUDownloaderDeprecated.h; sourceTree = "<group>"; };
 		34074BA61FEAC417001CB3A5 /* SPUDownloaderDeprecated.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPUDownloaderDeprecated.m; sourceTree = "<group>"; };
+		342731461FF58E4F00285FBD /* SPUDownloaderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SPUDownloaderTest.swift; sourceTree = "<group>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
 		4607BEA21948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		4607BEA31948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nb; path = nb.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
@@ -1196,6 +1198,7 @@
 				14958C7019AEBE350061B14F /* Resources */,
 				72AFC6121B9A944200F6B565 /* Sparkle Unit Tests-Bridging-Header.h */,
 				612279DA0DB5470200AB99EA /* SparkleTests-Info.plist */,
+				342731461FF58E4F00285FBD /* SPUDownloaderTest.swift */,
 				5AA4DCD01C73E5510078F128 /* SUAppcastTest.swift */,
 				142E0E0819A83AAC00E4312B /* SUBinaryDeltaTest.m */,
 				F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */,
@@ -1708,6 +1711,9 @@
 						LastSwiftMigration = 0800;
 						TestTargetID = 61B5F90109C4CEE200B25A18;
 					};
+					8DC2EF4F0486A6940098B216 = {
+						LastSwiftMigration = 0920;
+					};
 				};
 			};
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "Sparkle" */;
@@ -2003,6 +2009,7 @@
 				721CF1A81AD7644100D9AC09 /* bspatch.c in Sources */,
 				721CF1A91AD7644C00D9AC09 /* sais.c in Sources */,
 				5A4094481C74EA5200983BE0 /* SUAppcastTest.swift in Sources */,
+				342731481FF58E5B00285FBD /* SPUDownloaderTest.swift in Sources */,
 				72D4DAA11AD7632900B211E2 /* SUBinaryDeltaCreate.m in Sources */,
 				142E0E0919A83AAC00E4312B /* SUBinaryDeltaTest.m in Sources */,
 				F8761EB11ADC5068000C9034 /* SUCodeSigningVerifierTest.m in Sources */,
@@ -2438,6 +2445,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Coverage;
 		};
@@ -2491,6 +2503,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -2498,6 +2515,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

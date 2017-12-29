@@ -13,6 +13,14 @@
 #import "SUVersionComparisonProtocol.h"
 #import "SUStandardVersionComparator.h"
 
+#import "SPUDownloader.h"
+#import "SPUDownloaderDelegate.h"
+#import "SPUDownloaderDeprecated.h"
+#import "SPUDownloadData.h"
+#import "SPUDownloaderProtocol.h"
+#import "SPUDownloaderSession.h"
+#import "SPUURLRequest.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 // Duplicated to avoid exporting a private symbol from SUFileManager
