@@ -86,7 +86,7 @@ class SPUDownloaderTest: XCTestCase
     
     func performPersistentDownloadTest(withDownloader downloader: SPUDownloader, delegate: SPUDownloaderTestDelegate)
     {
-        let delegateExpectation = expectation(description: "SPUDownloader permanent download")
+        let delegateExpectation = expectation(description: "SPUDownloader persistent download")
         delegate.asyncExpectation = delegateExpectation
         
         let url = URL.init(string: "https://sparkle-project.org/unit_test/icon.png")
