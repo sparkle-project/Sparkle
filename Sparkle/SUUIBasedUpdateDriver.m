@@ -169,9 +169,8 @@
     [super downloadUpdate];
 }
 
-- (void)download:(NSURLDownload *)__unused download didReceiveResponse:(NSURLResponse *)response
+- (void)downloaderDidReceiveExpectedContentLength:(int64_t) expectedContentLength
 {
-    long long expectedContentLength = [response expectedContentLength];
     [self.statusController setMaxProgressValue:expectedContentLength > 0 ? expectedContentLength : self.updateItem.contentLength];
 }
 
@@ -205,7 +204,8 @@
 #pragma clang diagnostic pop
 }
 
-- (void)download:(NSURLDownload *)__unused download didReceiveDataOfLength:(NSUInteger)length
+
+- (void)downloaderDidReceiveDataOfLength:(uint64_t) length
 {
     double newProgressValue = [self.statusController progressValue] + (double)length;
     

@@ -49,6 +49,21 @@
 		14950073195FCE4E00BC5B5B /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
 		14958C6E19AEBC950061B14F /* signed-test-file.txt in Resources */ = {isa = PBXBuildFile; fileRef = 14958C6B19AEBC530061B14F /* signed-test-file.txt */; };
 		14958C6F19AEBC980061B14F /* test-pubkey.pem in Resources */ = {isa = PBXBuildFile; fileRef = 14958C6C19AEBC610061B14F /* test-pubkey.pem */; };
+		34074B901FEABD08001CB3A5 /* SPUDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074B8C1FEABD08001CB3A5 /* SPUDownloader.m */; };
+		34074B911FEABD08001CB3A5 /* SPUDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B8D1FEABD08001CB3A5 /* SPUDownloader.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		34074B921FEABD08001CB3A5 /* SPUDownloaderDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B8E1FEABD08001CB3A5 /* SPUDownloaderDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		34074B931FEABD08001CB3A5 /* SPUDownloaderProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B8F1FEABD08001CB3A5 /* SPUDownloaderProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		34074B961FEABD24001CB3A5 /* SPULocalCacheDirectory.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B941FEABD23001CB3A5 /* SPULocalCacheDirectory.h */; };
+		34074B971FEABD24001CB3A5 /* SPULocalCacheDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074B951FEABD23001CB3A5 /* SPULocalCacheDirectory.m */; };
+		34074B9A1FEABD49001CB3A5 /* SPUURLRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074B981FEABD48001CB3A5 /* SPUURLRequest.m */; };
+		34074B9B1FEABD49001CB3A5 /* SPUURLRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B991FEABD49001CB3A5 /* SPUURLRequest.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		34074B9E1FEABD5A001CB3A5 /* SPUDownloadData.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074B9C1FEABD5A001CB3A5 /* SPUDownloadData.m */; };
+		34074B9F1FEABD5A001CB3A5 /* SPUDownloadData.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B9D1FEABD5A001CB3A5 /* SPUDownloadData.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		34074BA21FEABFD2001CB3A5 /* SPUDownloaderSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074BA01FEABFD2001CB3A5 /* SPUDownloaderSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		34074BA31FEABFD2001CB3A5 /* SPUDownloaderSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074BA11FEABFD2001CB3A5 /* SPUDownloaderSession.m */; };
+		34074BA71FEAC417001CB3A5 /* SPUDownloaderDeprecated.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074BA51FEAC417001CB3A5 /* SPUDownloaderDeprecated.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		34074BA81FEAC417001CB3A5 /* SPUDownloaderDeprecated.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074BA61FEAC417001CB3A5 /* SPUDownloaderDeprecated.m */; };
+		342731481FF58E5B00285FBD /* SPUDownloaderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 342731461FF58E4F00285FBD /* SPUDownloaderTest.swift */; };
 		3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		55C14BD4136EEFCE00649790 /* Autoupdate.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14BD3136EEFCE00649790 /* Autoupdate.m */; };
 		55C14BD9136EF00C00649790 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
@@ -520,6 +535,22 @@
 		1A985A511C5C32BB0001163A /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1A985A521C5C32BC0001163A /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1A985A531C5C32BD0001163A /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		34074B8C1FEABD08001CB3A5 /* SPUDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUDownloader.m; sourceTree = "<group>"; };
+		34074B8D1FEABD08001CB3A5 /* SPUDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUDownloader.h; sourceTree = "<group>"; };
+		34074B8E1FEABD08001CB3A5 /* SPUDownloaderDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUDownloaderDelegate.h; sourceTree = "<group>"; };
+		34074B8F1FEABD08001CB3A5 /* SPUDownloaderProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUDownloaderProtocol.h; sourceTree = "<group>"; };
+		34074B941FEABD23001CB3A5 /* SPULocalCacheDirectory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPULocalCacheDirectory.h; sourceTree = "<group>"; };
+		34074B951FEABD23001CB3A5 /* SPULocalCacheDirectory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPULocalCacheDirectory.m; sourceTree = "<group>"; };
+		34074B981FEABD48001CB3A5 /* SPUURLRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUURLRequest.m; sourceTree = "<group>"; };
+		34074B991FEABD49001CB3A5 /* SPUURLRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUURLRequest.h; sourceTree = "<group>"; };
+		34074B9C1FEABD5A001CB3A5 /* SPUDownloadData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUDownloadData.m; sourceTree = "<group>"; };
+		34074B9D1FEABD5A001CB3A5 /* SPUDownloadData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUDownloadData.h; sourceTree = "<group>"; };
+		34074BA01FEABFD2001CB3A5 /* SPUDownloaderSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUDownloaderSession.h; sourceTree = "<group>"; };
+		34074BA11FEABFD2001CB3A5 /* SPUDownloaderSession.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPUDownloaderSession.m; sourceTree = "<group>"; };
+		34074BA41FEAC0BC001CB3A5 /* SPUDownloader_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUDownloader_Private.h; sourceTree = "<group>"; };
+		34074BA51FEAC417001CB3A5 /* SPUDownloaderDeprecated.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPUDownloaderDeprecated.h; sourceTree = "<group>"; };
+		34074BA61FEAC417001CB3A5 /* SPUDownloaderDeprecated.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPUDownloaderDeprecated.m; sourceTree = "<group>"; };
+		342731461FF58E4F00285FBD /* SPUDownloaderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SPUDownloaderTest.swift; sourceTree = "<group>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
 		4607BEA21948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		4607BEA31948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nb; path = nb.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
@@ -1049,6 +1080,7 @@
 			children = (
 				61299B3909CB055000B7442F /* Appcast Support */,
 				55C14BD5136EEFD000649790 /* Autoupdate */,
+				34074B8B1FEABCE7001CB3A5 /* Downloader */,
 				089C1665FE841158C02AAC07 /* Framework Resources */,
 				618FA6DB0DB485440026945C /* Installation */,
 				61B5F8F309C4CE5900B25A18 /* Other Sources */,
@@ -1077,6 +1109,28 @@
 				5F1510A11C96E591006E1629 /* testnamespaces.xml */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		34074B8B1FEABCE7001CB3A5 /* Downloader */ = {
+			isa = PBXGroup;
+			children = (
+				34074B9D1FEABD5A001CB3A5 /* SPUDownloadData.h */,
+				34074B9C1FEABD5A001CB3A5 /* SPUDownloadData.m */,
+				34074B8D1FEABD08001CB3A5 /* SPUDownloader.h */,
+				34074B8C1FEABD08001CB3A5 /* SPUDownloader.m */,
+				34074BA41FEAC0BC001CB3A5 /* SPUDownloader_Private.h */,
+				34074BA51FEAC417001CB3A5 /* SPUDownloaderDeprecated.h */,
+				34074BA61FEAC417001CB3A5 /* SPUDownloaderDeprecated.m */,
+				34074BA01FEABFD2001CB3A5 /* SPUDownloaderSession.h */,
+				34074BA11FEABFD2001CB3A5 /* SPUDownloaderSession.m */,
+				34074B8E1FEABD08001CB3A5 /* SPUDownloaderDelegate.h */,
+				34074B8F1FEABD08001CB3A5 /* SPUDownloaderProtocol.h */,
+				34074B941FEABD23001CB3A5 /* SPULocalCacheDirectory.h */,
+				34074B951FEABD23001CB3A5 /* SPULocalCacheDirectory.m */,
+				34074B991FEABD49001CB3A5 /* SPUURLRequest.h */,
+				34074B981FEABD48001CB3A5 /* SPUURLRequest.m */,
+			);
+			name = Downloader;
 			sourceTree = "<group>";
 		};
 		55C14BD5136EEFD000649790 /* Autoupdate */ = {
@@ -1144,6 +1198,7 @@
 				14958C7019AEBE350061B14F /* Resources */,
 				72AFC6121B9A944200F6B565 /* Sparkle Unit Tests-Bridging-Header.h */,
 				612279DA0DB5470200AB99EA /* SparkleTests-Info.plist */,
+				342731461FF58E4F00285FBD /* SPUDownloaderTest.swift */,
 				5AA4DCD01C73E5510078F128 /* SUAppcastTest.swift */,
 				142E0E0819A83AAC00E4312B /* SUBinaryDeltaTest.m */,
 				F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */,
@@ -1383,8 +1438,11 @@
 				61299B3609CB04E000B7442F /* Sparkle.h in Headers */,
 				61B5FC0D09C4FC8200B25A18 /* SUAppcast.h in Headers */,
 				61B5FC7009C51F4A00B25A18 /* SUAppcastItem.h in Headers */,
+				34074BA71FEAC417001CB3A5 /* SPUDownloaderDeprecated.h in Headers */,
 				72316BDE1E0E17910039EFD9 /* SUApplicationInfo.h in Headers */,
 				6120721209CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.h in Headers */,
+				34074B921FEABD08001CB3A5 /* SPUDownloaderDelegate.h in Headers */,
+				34074B961FEABD24001CB3A5 /* SPULocalCacheDirectory.h in Headers */,
 				61B93B270DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.h in Headers */,
 				61F83F740DBFE141006FDD30 /* SUBasicUpdateDriver.h in Headers */,
 				5D06E9390FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.h in Headers */,
@@ -1393,9 +1451,11 @@
 				61299A5C09CA6D4500B7442F /* SUConstants.h in Headers */,
 				6102FE4A0E07803800F85D09 /* SUDiskImageUnarchiver.h in Headers */,
 				61299A2F09CA2DAB00B7442F /* SUDSAVerifier.h in Headers */,
+				34074B9F1FEABD5A001CB3A5 /* SPUDownloadData.h in Headers */,
 				55E6F33319EC9F6C00005E76 /* SUErrors.h in Headers */,
 				14652F8419A978C200959E44 /* SUExport.h in Headers */,
 				7275F9C11B5F1F2900B1D19E /* SUFileManager.h in Headers */,
+				34074B911FEABD08001CB3A5 /* SPUDownloader.h in Headers */,
 				722954C41D04E66F00ECF9CA /* SUFileOperationConstants.h in Headers */,
 				767B61AC1972D488004E0C3C /* SUGuidedPackageInstaller.h in Headers */,
 				61EF67590E25C5B400F754E0 /* SUHost.h in Headers */,
@@ -1414,10 +1474,12 @@
 				72316BE31E0E1C7F0039EFD9 /* SUSystemUpdateInfo.h in Headers */,
 				E1545EC51E1D7E0200FAECE8 /* SUTouchBarButtonGroup.h in Headers */,
 				61B93A3C0DD02D7000DCD2F8 /* SUUIBasedUpdateDriver.h in Headers */,
+				34074B931FEABD08001CB3A5 /* SPUDownloaderProtocol.h in Headers */,
 				61299A8D09CA790200B7442F /* SUUnarchiver.h in Headers */,
 				722589DA1E0B19F4005EA0B9 /* SUUnarchiverNotifier.h in Headers */,
 				722589D71E0AD86B005EA0B9 /* SUUnarchiverProtocol.h in Headers */,
 				61B5FCDF09C52A9F00B25A18 /* SUUpdateAlert.h in Headers */,
+				34074B9B1FEABD49001CB3A5 /* SPUURLRequest.h in Headers */,
 				610134730DD250470049ACDF /* SUUpdateDriver.h in Headers */,
 				612DCBAF0D488BC60015DBEA /* SUUpdatePermissionPrompt.h in Headers */,
 				7205C4311E1215AD00E370AE /* SUUpdatePermissionResponse.h in Headers */,
@@ -1428,6 +1490,7 @@
 				61A354550DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.h in Headers */,
 				61A2259E0D1C495D00430CCD /* SUVersionComparisonProtocol.h in Headers */,
 				3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */,
+				34074BA21FEABFD2001CB3A5 /* SPUDownloaderSession.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1647,6 +1710,9 @@
 						CreatedOnToolsVersion = 7.2.1;
 						LastSwiftMigration = 0800;
 						TestTargetID = 61B5F90109C4CEE200B25A18;
+					};
+					8DC2EF4F0486A6940098B216 = {
+						LastSwiftMigration = 0920;
 					};
 				};
 			};
@@ -1943,6 +2009,7 @@
 				721CF1A81AD7644100D9AC09 /* bspatch.c in Sources */,
 				721CF1A91AD7644C00D9AC09 /* sais.c in Sources */,
 				5A4094481C74EA5200983BE0 /* SUAppcastTest.swift in Sources */,
+				342731481FF58E5B00285FBD /* SPUDownloaderTest.swift in Sources */,
 				72D4DAA11AD7632900B211E2 /* SUBinaryDeltaCreate.m in Sources */,
 				142E0E0919A83AAC00E4312B /* SUBinaryDeltaTest.m in Sources */,
 				F8761EB11ADC5068000C9034 /* SUCodeSigningVerifierTest.m in Sources */,
@@ -1997,6 +2064,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				723B252D1CEAB3A600909873 /* bscommon.c in Sources */,
+				34074B9E1FEABD5A001CB3A5 /* SPUDownloadData.m in Sources */,
 				5D06E8EB0FD68CE4005AE3F6 /* bspatch.c in Sources */,
 				61B5FBB709C4FAFF00B25A18 /* SUAppcast.m in Sources */,
 				61B5FC6F09C51F4900B25A18 /* SUAppcastItem.m in Sources */,
@@ -2005,7 +2073,9 @@
 				61B93B280DD0FDD300DCD2F8 /* SUAutomaticUpdateDriver.m in Sources */,
 				61F83F720DBFE140006FDD30 /* SUBasicUpdateDriver.m in Sources */,
 				5D06E8EC0FD68CE4005AE3F6 /* SUBinaryDeltaApply.m in Sources */,
+				34074B971FEABD24001CB3A5 /* SPULocalCacheDirectory.m in Sources */,
 				5D06E8ED0FD68CE4005AE3F6 /* SUBinaryDeltaCommon.m in Sources */,
+				34074BA31FEABFD2001CB3A5 /* SPUDownloaderSession.m in Sources */,
 				5D06E93A0FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m in Sources */,
 				72316BDA1E0E17180039EFD9 /* SUBundleIcon.m in Sources */,
 				61B078CF15A5FB6100600039 /* SUCodeSigningVerifier.m in Sources */,
@@ -2017,6 +2087,7 @@
 				767B61AD1972D488004E0C3C /* SUGuidedPackageInstaller.m in Sources */,
 				61EF67560E25B58D00F754E0 /* SUHost.m in Sources */,
 				618FA5020DAE88B40026945C /* SUInstaller.m in Sources */,
+				34074B901FEABD08001CB3A5 /* SPUDownloader.m in Sources */,
 				55C14F07136EF6DB00649790 /* SULog.m in Sources */,
 				726F2CE61BC9C33D001971A4 /* SUOperatingSystem.m in Sources */,
 				618FA5230DAE8E8A0026945C /* SUPackageInstaller.m in Sources */,
@@ -2024,10 +2095,12 @@
 				618FA5060DAE8AB80026945C /* SUPlainInstaller.m in Sources */,
 				6101347C0DD2541A0049ACDF /* SUProbingUpdateDriver.m in Sources */,
 				61B93C0A0DD112FF00DCD2F8 /* SUScheduledUpdateDriver.m in Sources */,
+				34074BA81FEAC417001CB3A5 /* SPUDownloaderDeprecated.m in Sources */,
 				61A225A50D1C4AC000430CCD /* SUStandardVersionComparator.m in Sources */,
 				6196CFFA09C72149000DC222 /* SUStatusController.m in Sources */,
 				61A2279D0D1CEE7600430CCD /* SUSystemProfiler.m in Sources */,
 				72316BE41E0E1C7F0039EFD9 /* SUSystemUpdateInfo.m in Sources */,
+				34074B9A1FEABD49001CB3A5 /* SPUURLRequest.m in Sources */,
 				E1545EC61E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m in Sources */,
 				61B93A3D0DD02D7000DCD2F8 /* SUUIBasedUpdateDriver.m in Sources */,
 				61299A8E09CA790200B7442F /* SUUnarchiver.m in Sources */,
@@ -2372,6 +2445,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Coverage;
 		};
@@ -2425,6 +2503,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -2432,6 +2515,10 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
