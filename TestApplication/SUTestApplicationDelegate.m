@@ -104,7 +104,9 @@ static NSString * const UPDATED_VERSION = @"2.0";
     NSString *zipName = @"Sparkle_Test_App.zip";
     NSTask *dittoTask = [[NSTask alloc] init];
     dittoTask.launchPath = @"/usr/bin/ditto";
-    dittoTask.arguments = @[@"-c", @"-k", @"--sequesterRsrc", @"--keepParent", destinationBundleURL.lastPathComponent, zipName];
+    NSString *lastPathComponent = destinationBundleURL.lastPathComponent;
+    assert(lastPathComponent);
+    dittoTask.arguments = @[@"-c", @"-k", @"--sequesterRsrc", @"--keepParent", lastPathComponent, zipName];
     dittoTask.currentDirectoryPath = serverDirectoryPath;
     [dittoTask launch];
     [dittoTask waitUntilExit];
@@ -125,7 +127,9 @@ static NSString * const UPDATED_VERSION = @"2.0";
     signUpdateTask.launchPath = signUpdatePath;
     
     NSURL *archiveURL = [serverDirectoryURL URLByAppendingPathComponent:zipName];
-    signUpdateTask.arguments = @[archiveURL.path, privateKeyPath];
+    NSString *path = archiveURL.path;
+    assert(path != nil);
+    signUpdateTask.arguments = @[path, privateKeyPath];
     
     NSPipe *outputPipe = [NSPipe pipe];
     signUpdateTask.standardOutput = outputPipe;
