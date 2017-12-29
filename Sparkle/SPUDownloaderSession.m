@@ -29,10 +29,12 @@
 
 - (void)startDownloadWithRequest:(SPUURLRequest *)request
 {
+    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    queue.maxConcurrentOperationCount = 1;
     self.downloadSession = [NSURLSession
-                            sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
-                            delegate:self
-                            delegateQueue:[NSOperationQueue mainQueue]];
+                             sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
+                             delegate:self
+                             delegateQueue:queue];
     self.download = [self.downloadSession downloadTaskWithRequest:request.request];
     [self.download resume];
 }
