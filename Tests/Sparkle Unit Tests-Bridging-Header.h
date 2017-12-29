@@ -21,6 +21,8 @@
 #import "SPUDownloaderSession.h"
 #import "SPUURLRequest.h"
 
+#import <CommonCrypto/CommonCrypto.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 // Duplicated to avoid exporting a private symbol from SUFileManager
