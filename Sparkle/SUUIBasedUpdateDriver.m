@@ -171,7 +171,9 @@
 
 - (void)downloaderDidReceiveExpectedContentLength:(int64_t) expectedContentLength
 {
-    [self.statusController setMaxProgressValue:expectedContentLength > 0 ? expectedContentLength : self.updateItem.contentLength];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.statusController setMaxProgressValue:expectedContentLength > 0 ? expectedContentLength : self.updateItem.contentLength];
+    });
 }
 
 - (NSString *)localizedStringFromByteCount:(long long)value
@@ -207,18 +209,21 @@
 
 - (void)downloaderDidReceiveDataOfLength:(uint64_t) length
 {
-    double newProgressValue = [self.statusController progressValue] + (double)length;
-    
-    // In case our expected content length was incorrect
-    if (newProgressValue > [self.statusController maxProgressValue]) {
-        [self.statusController setMaxProgressValue:newProgressValue];
-    }
-    
-    [self.statusController setProgressValue:newProgressValue];
-    if ([self.statusController maxProgressValue] > 0.0)
-        [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [self localizedStringFromByteCount:(long long)self.statusController.progressValue], [self localizedStringFromByteCount:(long long)self.statusController.maxProgressValue]]];
-    else
-        [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self localizedStringFromByteCount:(long long)self.statusController.progressValue]]];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        double newProgressValue = [self.statusController progressValue] + (double)length;
+
+        // In case our expected content length was incorrect
+        if (newProgressValue > [self.statusController maxProgressValue]) {
+            [self.statusController setMaxProgressValue:newProgressValue];
+        }
+
+        [self.statusController setProgressValue:newProgressValue];
+        if ([self.statusController maxProgressValue] > 0.0) {
+            [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ of %@", nil), [self localizedStringFromByteCount:(long long)self.statusController.progressValue], [self localizedStringFromByteCount:(long long)self.statusController.maxProgressValue]]];
+        } else {
+            [self.statusController setStatusText:[NSString stringWithFormat:SULocalizedString(@"%@ downloaded", nil), [self localizedStringFromByteCount:(long long)self.statusController.progressValue]]];
+        }
+    });
 }
 
 - (IBAction)cancelDownload:(id)__unused sender
@@ -236,19 +241,23 @@
 
 - (void)extractUpdate
 {
-    // Now we have to extract the downloaded archive.
-    [self.statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
-    [self.statusController setButtonEnabled:NO];
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        // Now we have to extract the downloaded archive.
+        [self.statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
+        [self.statusController setButtonEnabled:NO];
+    });
     [super extractUpdate];
 }
 
 - (void)unarchiver:(id)__unused ua extractedProgress:(double)progress
 {
-    // We do this here instead of in extractUpdate so that we only have a determinate progress bar for archives with progress.
-	if ([self.statusController maxProgressValue] == 0.0) {
-        [self.statusController setMaxProgressValue:1];
-    }
-    [self.statusController setProgressValue:progress];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // We do this here instead of in extractUpdate so that we only have a determinate progress bar for archives with progress.
+        if ([self.statusController maxProgressValue] == 0.0) {
+            [self.statusController setMaxProgressValue:1];
+        }
+        [self.statusController setProgressValue:progress];
+    });
 }
 
 - (void)unarchiverDidFinish:(id)__unused ua
@@ -295,14 +304,16 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    if (self.showErrors) {
-        NSAlert *alert = [[NSAlert alloc] init];
-        alert.messageText = SULocalizedString(@"Update Error!", nil);
-        alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
-        [alert addButtonWithTitle:SULocalizedString(@"Cancel Update", nil)];
-        [self showAlert:alert];
-    }
-    [super abortUpdateWithError:error];
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        if (self.showErrors) {
+            NSAlert *alert = [[NSAlert alloc] init];
+            alert.messageText = SULocalizedString(@"Update Error!", nil);
+            alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
+            [alert addButtonWithTitle:SULocalizedString(@"Cancel Update", nil)];
+            [self showAlert:alert];
+        }
+        [super abortUpdateWithError:error];
+    });
 }
 
 - (void)abortUpdate
