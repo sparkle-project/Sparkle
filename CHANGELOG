@@ -1,3 +1,15 @@
+# 1.19.0
+
+ * Refactoring of downloader code to avoid deprecated methods (Deadpikle)
+ * Changes to which methods run on the main thread.
+   Note: some delegate methods may be called on non-main thread now. (Kornel)
+ * Update Japanese localization (1024jp)
+ * Update Sparkle.strings (Stefan Paychère)
+ * Fix Sparkle clients polling too frequently (Jonathan Bullard)
+ * Handle SecTransformExecute errors (Kornel)
+ * Silence Touch Bar availability warnings on Xcode 9 by using API_AVAILABLE. Disable gnu-zero-variadic-macro-arguments to prevent warnings from use of API_AVAILABLE. (Kent Sutherland)
+ * 10.11 SDK compatibility (David Fuhrmann)
+
 # 1.18.1
 
  * Add optional updaterDidRelaunchApplication: method on SUUpdaterDelegate (#1115) (App Tyrant)
