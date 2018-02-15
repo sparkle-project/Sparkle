@@ -2816,7 +2816,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "${SRCROOT}/Configurations/set-ats-exceptions-test-app.sh";
+			shellScript = "\"${SRCROOT}/Configurations/set-ats-exceptions-test-app.sh\"";
 		};
 		729BB3D01D50354C007C4276 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2829,7 +2829,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "${SRCROOT}/Configurations/set-ats-exceptions-downloader-service.sh";
+			shellScript = "\"${SRCROOT}/Configurations/set-ats-exceptions-downloader-service.sh\"";
 		};
 		72A5D5F11D692C860009E5AC /* Run Script: Set Git Version Info */ = {
 			isa = PBXShellScriptBuildPhase;
