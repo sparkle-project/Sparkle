@@ -593,7 +593,32 @@
 // Note: this is overridden by the automatic update driver to not terminate in some cases
 - (void)terminateApp
 {
-    [NSApp terminate:self];
+  BOOL isMainBundle = [self.host.bundle isEqualTo:[NSBundle mainBundle]];
+
+  if (isMainBundle) {
+   [NSApp terminate:self];
+  }
+  else {
+    NSString *bundleID = self.host.bundle.bundleIdentifier;
+    if (bundleID.length > 0) {
+      NSArray *apps = [NSRunningApplication runningApplicationsWithBundleIdentifier:bundleID];
+      for (NSRunningApplication *app in apps) {
+        [app terminate];
+      }
+      
+      // Notify the mainBundle host the target has been terminated
+      id<SUUpdaterPrivate> updater = self.updater;
+      id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
+      if ([updaterDelegate respondsToSelector:@selector(updater:didTerminateTarget:)]) {
+        [updaterDelegate updater:self.updater didTerminateTarget:bundleID];
+      }
+    }
+    else
+    {
+      // Shouldn't happen
+      [NSApp terminate:self];
+    }
+  }
 }
 
 - (void)cleanUpDownload
