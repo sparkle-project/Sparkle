@@ -304,7 +304,7 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    dispatch_sync(dispatch_get_main_queue(), ^{
+    void (^callback)() = ^{
         if (self.showErrors) {
             NSAlert *alert = [[NSAlert alloc] init];
             alert.messageText = SULocalizedString(@"Update Error!", nil);
@@ -313,7 +313,12 @@
             [self showAlert:alert];
         }
         [super abortUpdateWithError:error];
-    });
+    };
+    if ([NSThread isMainThread]) {
+        callback();
+    } else {
+        dispatch_sync(dispatch_get_main_queue(), callback);
+    }
 }
 
 - (void)abortUpdate
