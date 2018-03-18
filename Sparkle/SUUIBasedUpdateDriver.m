@@ -34,6 +34,9 @@
 @end
 #endif
 
+static int kMainQueueKey = 1;
+static int kMainQueueValue = 1;
+
 @interface SUUIBasedUpdateDriver ()
 
 @property (strong) SUStatusController *statusController;
@@ -49,6 +52,11 @@
 
 - (instancetype)initWithUpdater:(id<SUUpdaterPrivate>)anUpdater
 {
+    dispatch_queue_set_specific(dispatch_get_main_queue(),
+                                &kMainQueueKey,
+                                &kMainQueueValue,
+                                nil);
+
     if ((self = [super initWithUpdater:anUpdater])) {
         self.automaticallyInstallUpdates = NO;
         self.showErrors = YES;
@@ -304,16 +312,20 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        if (self.showErrors) {
-            NSAlert *alert = [[NSAlert alloc] init];
-            alert.messageText = SULocalizedString(@"Update Error!", nil);
-            alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
-            [alert addButtonWithTitle:SULocalizedString(@"Cancel Update", nil)];
-            [self showAlert:alert];
-        }
-        [super abortUpdateWithError:error];
-    });
+    if (dispatch_get_specific(&kMainQueueKey) != &kMainQueueValue) {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            return [self abortUpdateWithError:error];
+        });
+        return;
+    }
+    if (self.showErrors) {
+        NSAlert *alert = [[NSAlert alloc] init];
+        alert.messageText = SULocalizedString(@"Update Error!", nil);
+        alert.informativeText = [NSString stringWithFormat:@"%@", [error localizedDescription]];
+        [alert addButtonWithTitle:SULocalizedString(@"Cancel Update", nil)];
+        [self showAlert:alert];
+    }
+    [super abortUpdateWithError:error];
 }
 
 - (void)abortUpdate
