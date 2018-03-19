@@ -8,6 +8,8 @@
 
 import Foundation
 
+var verbose = false;
+
 func main() {
     let args = CommandLine.arguments;
     if args.count < 3 {
@@ -26,7 +28,7 @@ func main() {
     do {
         let privateKey = try loadPrivateKey(privateKeyPath: privateKeyPath);
         do {
-            let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, privateKey: privateKey);
+            let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, privateKey: privateKey, verbose:verbose);
 
             for (appcastFile, updates) in allUpdates {
                 let appcastDestPath = URL(fileURLWithPath: appcastFile, relativeTo: archivesSourceDir);

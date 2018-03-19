@@ -14,10 +14,10 @@ func makeError(code: SUError, _ description: String) -> NSError {
         ]);
 }
 
-func makeAppcast(archivesSourceDir: URL, privateKey: SecKey) throws -> [String:[ArchiveItem]] {
+func makeAppcast(archivesSourceDir: URL, privateKey: SecKey, verbose: Bool) throws -> [String:[ArchiveItem]] {
     let comparator = SUStandardVersionComparator();
 
-    let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir))
+    let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir, verbose:verbose))
         .sorted(by: {
             .orderedDescending == comparator.compareVersion($0.version, toVersion:$1.version)
         })
@@ -85,7 +85,6 @@ func makeAppcast(archivesSourceDir: URL, privateKey: SecKey) throws -> [String:[
 
                 // Require delta to be a bit smaller
                 if delta.fileSize / 7 < latestItem.fileSize / 8 {
-                    // Max 3 deltas per version (arbitrary limit to reduce amount of work)
                     numDeltas += 1;
                     if numDeltas > maxDeltas {
                         break;
