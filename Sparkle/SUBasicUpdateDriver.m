@@ -608,18 +608,13 @@
       for (NSRunningApplication *app in apps) {
         [app terminate];
       }
-      
-      // Notify the mainBundle host the target has been terminated
-      id<SUUpdaterPrivate> updater = self.updater;
-      id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
-      if ([updaterDelegate respondsToSelector:@selector(updater:didTerminateTarget:)]) {
-        [updaterDelegate updater:self.updater didTerminateTarget:bundleID];
-      }
     }
-    else
-    {
-      // Shouldn't happen
-      [NSApp terminate:self];
+    
+    // Notify the mainBundle host the target has been terminated
+    id<SUUpdaterPrivate> updater = self.updater;
+    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
+    if ([updaterDelegate respondsToSelector:@selector(updater:didTerminateTarget:)]) {
+      [updaterDelegate updater:self.updater didTerminateTarget:bundleID];
     }
   }
 }

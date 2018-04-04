@@ -293,7 +293,8 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (void)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationBlock:(void (^)()) restartBlock;
 
 /*!
- Called when the update target is not from the host mainBundle. For example, a helper app updating its parent
+ Called when the update target which is not from the host mainBundle has been terminated.
+ For example, a helper app updating its parent.
  
  \param updater the SUUpdater instance.
  \param targetBundleID the bundle ID of the terminated parent app
