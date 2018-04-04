@@ -150,8 +150,9 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
                 informativeText:[NSString stringWithFormat:SULocalizedString(@"For security reasons, the file (%@) indicated by the '%@' key needs to exist in the bundle's Resources.", nil), publicDSAKeyFileKey, SUPublicDSAKeyFileKey]];
         } else {
             if (!isMainBundle) {
-                [self showAlertText:SULocalizedString(@"Insecure update error!", nil)
-                    informativeText:SULocalizedString(@"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information.", nil)];
+              // Sparkle documentation doesn't explain why this is a requirement. We won't be using DSA keys for now. Codesigning will suffice.
+//                [self showAlertText:SULocalizedString(@"Insecure update error!", nil)
+//                    informativeText:SULocalizedString(@"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information.", nil)];
             } else {
                 if (!hostIsCodeSigned) {
                     [self showAlertText:SULocalizedString(@"Insecure update error!", nil)
