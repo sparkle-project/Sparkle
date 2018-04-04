@@ -18,7 +18,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "726B2B5C1C645FC900388755"
-               BuildableName = ".xctest"
+               BuildableName = "UI Tests.xctest"
                BlueprintName = "UI Tests"
                ReferencedContainer = "container:Sparkle.xcodeproj">
             </BuildableReference>
