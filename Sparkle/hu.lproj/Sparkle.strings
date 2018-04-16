@@ -10,7 +10,7 @@
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "A %1$@ %2$@ verziója már elérhető — az Ön jelenlegi verziója a %3$@. Szeretné most letölteni?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available—you have %3$@. Would you like to learn more about this update on the web?";
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "A %1$@ %2$@ verziója már elérhető — az Ön jelenlegi verziója a %3$@. Szeretne megtekinteni további információkat online?";
 
 "%@ downloaded" = "%@ letöltve";
 
