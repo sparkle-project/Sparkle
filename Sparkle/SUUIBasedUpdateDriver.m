@@ -304,7 +304,7 @@
 
 - (void)abortUpdateWithError:(NSError *)error
 {
-    void (^callback)() = ^{
+    void (^callback)(void) = ^{
         if (self.showErrors) {
             NSAlert *alert = [[NSAlert alloc] init];
             alert.messageText = SULocalizedString(@"Update Error!", nil);

@@ -52,16 +52,20 @@ static NSString *SPUDownloadMIMETypeKey = @"SPUDownloadMIMEType";
 
 - (nullable instancetype)initWithCoder:(NSCoder *)decoder
 {
-    NSData *data = [decoder decodeObjectOfClass:[NSData class] forKey:SPUDownloadDataKey];
-    if (data == nil) {
-        return nil;
+    if (@available(macOS 10.8, *)) {
+        NSData *data = [decoder decodeObjectOfClass:[NSData class] forKey:SPUDownloadDataKey];
+        if (data == nil) {
+            return nil;
+        }
+
+        NSString *textEncodingName = [decoder decodeObjectOfClass:[NSString class] forKey:SPUDownloadTextEncodingKey];
+
+        NSString *MIMEType = [decoder decodeObjectOfClass:[NSString class] forKey:SPUDownloadMIMETypeKey];
+
+        return [self initWithData:data textEncodingName:textEncodingName MIMEType:MIMEType];
+    } else {
+        abort(); // Not used on 10.7
     }
-    
-    NSString *textEncodingName = [decoder decodeObjectOfClass:[NSString class] forKey:SPUDownloadTextEncodingKey];
-    
-    NSString *MIMEType = [decoder decodeObjectOfClass:[NSString class] forKey:SPUDownloadMIMETypeKey];
-    
-    return [self initWithData:data textEncodingName:textEncodingName MIMEType:MIMEType];
 }
 
 @end
