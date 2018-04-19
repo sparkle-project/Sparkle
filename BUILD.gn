@@ -1,0 +1,40 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+
+assert(is_mac)
+
+group("sparkle") {
+  public_configs = [ ":sparkle_config" ]
+  public_deps = [ ":build_sparkle_framework" ]
+}
+
+bundle_data("sparkle_framework") {
+  public_deps = [ ":sparkle" ]
+
+  sources = [ "$root_out_dir/Sparkle.framework" ]
+  outputs = [ "{{bundle_contents_dir}}/Frameworks/{{source_file_part}}" ]
+}
+
+bundle_data("sparkle_resources") {
+  sources = [ "dsa_pub.pem" ]
+  outputs = [ "{{bundle_resources_dir}}/{{source_file_part}}" ]
+}
+
+config("sparkle_config") {
+  libs = [ "Sparkle.framework" ]
+
+  ldflags = [
+    "-Wl,-F" + rebase_path(root_out_dir, root_build_dir),
+  ]
+
+  cflags = [
+    "-F" + rebase_path(root_out_dir, root_build_dir),
+  ]
+}
+
+action("build_sparkle_framework") {
+  script="build_sparkle_framework.py"
+
+  outputs = [ "$root_out_dir/Sparkle.framework" ]
+}
