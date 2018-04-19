@@ -46,6 +46,9 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
     NSString *expectedNewBeforeHash = nil;
     NSString *expectedNewAfterHash = nil;
 
+    NSString *sourceVersion = nil;
+    NSString *destinationVersion = nil;
+
     progressCallback(0/6.0);
 
     xar_subdoc_t subdoc;
@@ -82,6 +85,14 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
             xar_subdoc_prop_get(subdoc, AFTER_TREE_SHA1_OLD_KEY, &value);
             if (value)
                 expectedAfterHashv1 = @(value);
+
+            xar_subdoc_prop_get(subdoc, SOURCE_VERSION_KEY, &value);
+            if (value)
+                sourceVersion = @(value);
+
+            xar_subdoc_prop_get(subdoc, DESTINATION_VERSION_KEY, &value);
+            if (value)
+                destinationVersion = @(value);
         }
     }
 
@@ -262,6 +273,32 @@ BOOL applyBinaryDelta(NSString *source, NSString *destination, NSString *patchFi
         }
     }
     xar_close(x);
+
+    NSBundle* bundle = [NSBundle bundleWithPath:source];
+    NSString* appName = [bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+    NSString* versionPath = [NSString stringWithFormat:@"Contents/Frameworks/%s Framework.framework/Versions", [appName fileSystemRepresentation]];
+    NSString* versionFullPathDestination = [destination stringByAppendingPathComponent:versionPath];
+    NSString* versionCurrentFullPathDestination = [destination stringByAppendingPathComponent:[versionPath stringByAppendingPathComponent:@"Current"]];
+
+    if (verbose) {
+        fprintf(stderr, "\nappName:  %s", [appName fileSystemRepresentation]);
+        fprintf(stderr, "\nversionPath:  %s", [versionPath fileSystemRepresentation]);
+        fprintf(stderr, "\ndestination versionFullPath:  %s", [versionFullPathDestination fileSystemRepresentation]);
+        fprintf(stderr, "\ndestination versionCurrentFullPath:  %s", [versionCurrentFullPathDestination fileSystemRepresentation]);
+    }
+
+    NSString* oldVersionFullPath = [versionFullPathDestination stringByAppendingPathComponent:sourceVersion];
+    NSString* newVersionFullPath = [versionFullPathDestination stringByAppendingPathComponent:destinationVersion];
+    if (verbose) {
+        fprintf(stderr, "\nRename from %s to %s...", [oldVersionFullPath fileSystemRepresentation], [newVersionFullPath fileSystemRepresentation]);
+    }
+    [fileManager moveItemAtPath:oldVersionFullPath toPath:newVersionFullPath error:nil];
+
+    if (verbose) {
+        fprintf(stderr, "\nDelete %s and link Current to %s...", [versionCurrentFullPathDestination fileSystemRepresentation], [destinationVersion fileSystemRepresentation]);
+    }
+    unlink([versionCurrentFullPathDestination fileSystemRepresentation]);
+    [fileManager createSymbolicLinkAtPath:versionCurrentFullPathDestination withDestinationPath:destinationVersion error:nil];
 
     progressCallback(5/6.0);
 

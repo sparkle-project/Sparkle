@@ -31,6 +31,8 @@
 #define EXTRACT_KEY "extract"
 #define BINARY_DELTA_KEY "binary-delta"
 #define MODIFY_PERMISSIONS_KEY "mod-permissions"
+#define SOURCE_VERSION_KEY "source-version"
+#define DESTINATION_VERSION_KEY "destination-version"
 
 // Properties no longer used in new patches
 #define DELETE_THEN_EXTRACT_OLD_KEY "delete-then-extract"
