@@ -4,13 +4,17 @@
 
 assert(is_mac)
 
-group("sparkle") {
-  public_configs = [ ":sparkle_config" ]
-  public_deps = [ ":build_sparkle_framework" ]
+group("sparkle_compile") {
+  public_configs = [ ":sparkle_browser_build_config" ]
+  public_deps = [ ":sparkle_framework" ]
+}
+
+group("sparkle_link") {
+  public_configs = [ ":sparkle_link_config" ]
 }
 
 bundle_data("sparkle_framework") {
-  public_deps = [ ":sparkle" ]
+  public_deps = [ ":build_sparkle_framework" ]
 
   sources = [ "$root_out_dir/Sparkle.framework" ]
   outputs = [ "{{bundle_contents_dir}}/Frameworks/{{source_file_part}}" ]
@@ -21,15 +25,19 @@ bundle_data("sparkle_resources") {
   outputs = [ "{{bundle_resources_dir}}/{{source_file_part}}" ]
 }
 
-config("sparkle_config") {
+# Configuration for building chrome/browser static library.
+config("sparkle_browser_build_config") {
   libs = [ "Sparkle.framework" ]
 
+  cflags = [ "-F" + rebase_path(root_out_dir, root_build_dir) ]
+}
+
+# Configuration for link sparkle into brave framework.
+config("sparkle_link_config") {
   ldflags = [
     "-Wl,-F" + rebase_path(root_out_dir, root_build_dir),
-  ]
-
-  cflags = [
-    "-F" + rebase_path(root_out_dir, root_build_dir),
+    "-Wl,-rpath,@loader_path/Frameworks",
+    "-Wl,-rpath,@loader_path/.",
   ]
 }
 
@@ -38,3 +46,4 @@ action("build_sparkle_framework") {
 
   outputs = [ "$root_out_dir/Sparkle.framework" ]
 }
+
