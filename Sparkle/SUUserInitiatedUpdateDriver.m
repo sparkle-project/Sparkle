@@ -27,6 +27,12 @@
 
 - (void)closeCheckingWindow
 {
+    if (![NSThread isMainThread]) {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self closeCheckingWindow];
+        });
+        return;
+    }
 	if (self.checkingController)
 	{
         [[self.checkingController window] close];
