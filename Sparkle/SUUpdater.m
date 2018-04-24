@@ -299,8 +299,23 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 
 - (void)checkForUpdatesInBackground
 {
+    BOOL automatic = [self automaticallyDownloadsUpdates];
+
+    if (!automatic) {
+        if (@available(macOS 10.9, *)) {
+            NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"com.apple.notificationcenterui"];
+            BOOL dnd = [defaults boolForKey:@"doNotDisturb"];
+            if (dnd) {
+                SULog(SULogLevelDefault, @"Delayed update, because Do Not Disturb is on");
+                [self updateLastUpdateCheckDate];
+                [self scheduleNextUpdateCheck];
+                return;
+            }
+        }
+    }
+
     // Do not use reachability for a preflight check. This can be deceptive and a bad idea. Apple does not recommend doing it.
-    SUUpdateDriver *theUpdateDriver = [[([self automaticallyDownloadsUpdates] ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class])alloc] initWithUpdater:self];
+    SUUpdateDriver *theUpdateDriver = [[(automatic ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class])alloc] initWithUpdater:self];
     
     [self checkForUpdatesWithDriver:theUpdateDriver];
 }
