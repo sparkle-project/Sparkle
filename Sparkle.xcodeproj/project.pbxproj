@@ -2939,6 +2939,67 @@
 			};
 			name = Release;
 		};
+		149B785A1B7D398100D7D62C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 149B78631B7D3A0C00D7D62C /* ConfigCommonCoverage.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		149B785B1B7D398100D7D62C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
+			buildSettings = {
+				LD_DYLIB_INSTALL_NAME = "@loader_path/Frameworks/Sparkle.framework/Sparkle";
+			};
+			name = Coverage;
+		};
+		149B785C1B7D398100D7D62C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA1941CB0D94A70100DD942E /* ConfigTestAppDebug.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		149B785D1B7D398100D7D62C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 149B78641B7D3A4800D7D62C /* ConfigUnitTestCoverage.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		149B785E1B7D398100D7D62C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5D06E8F20FD68D21005AE3F6 /* ConfigBinaryDeltaDebug.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		149B785F1B7D398100D7D62C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		149B78601B7D398100D7D62C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		149B78611B7D398100D7D62C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		149B78621B7D398100D7D62C /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
 		1DEB91AE08733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
@@ -2947,6 +3008,7 @@
 				DEFINES_MODULE = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				LD_DYLIB_INSTALL_NAME = "@loader_path/Frameworks/Sparkle.framework/Sparkle";
 			};
 			name = Debug;
 		};
@@ -2957,6 +3019,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				LD_DYLIB_INSTALL_NAME = "@loader_path/Frameworks/Sparkle.framework/Sparkle";
 			};
 			name = Release;
 		};
