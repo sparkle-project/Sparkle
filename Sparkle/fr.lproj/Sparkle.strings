@@ -1,3 +1,5 @@
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" =  "%1$@ %2$@ a été téléchargé. C'est une mise à jour importante; voulez-vous l’installer et relancer %1$@ maintenant ?";
+
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ a été téléchargé. Voulez-vous l’installer et relancer %1$@ maintenant ?";
 
 "%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ ne peut pas être mis à jour quand il fonctionne à partir d’un volume en lecture seule, comme une image disque ou un lecteur optique. Déplacez %1$@ dans votre dossier Applications, relancez-le à partir de là et réessayez.";
@@ -29,6 +31,8 @@
 "An error occurred while parsing the update feed." = "Une erreur est survenue pendant l’analyse de la mise à jour.";
 
 "An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Une erreur est survenue en relançant %1$@, mais la nouvelle version sera disponible à la prochaine ouverture de %1$@.";
+
+"An important update to %@ is ready to install" = "Une mise à jour importante de %@ est prête à être installée";
 
 /* the unit for bytes */
 "B" = "octets";
