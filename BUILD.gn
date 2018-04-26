@@ -4,33 +4,16 @@
 
 assert(is_mac)
 
-group("sparkle") {
-  public_configs = [ ":sparkle_configs" ]
-  deps = [ ":sparkle_framework" ]
-}
-
-bundle_data("sparkle_framework") {
+bundle_data("sparkle_framework_bundle_data") {
   public_deps = [ ":build_sparkle_framework" ]
 
   sources = [ "$root_out_dir/Sparkle.framework" ]
   outputs = [ "{{bundle_contents_dir}}/Frameworks/{{source_file_part}}" ]
 }
 
-bundle_data("sparkle_resources") {
+bundle_data("sparkle_resources_bundle_data") {
   sources = [ "dsa_pub.pem" ]
   outputs = [ "{{bundle_resources_dir}}/{{source_file_part}}" ]
-}
-
-config("sparkle_configs") {
-  libs = [ "Sparkle.framework" ]
-
-  common_flags = [
-    "-F",
-    rebase_path(root_out_dir, root_build_dir),
-  ]
-
-  cflags = common_flags
-  ldflags = common_flags
 }
 
 action("build_sparkle_framework") {
