@@ -318,7 +318,9 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
-    
+
+    NSLog(@"Sparkle: Authorization required to remove quarantine %@", rootURL);
+
     NSError *executeError = nil;
     BOOL success = [self _authorizeAndExecuteCommand:SUFileOpRemoveQuarantineCommand sourcePath:path destinationPath:NULL error:&executeError];
     if (!success && error != NULL) {
@@ -516,7 +518,9 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
-    
+
+    NSLog(@"Sparkle: Authorization required to copy %@ to %@", sourceURL, destinationURL);
+
     NSError *executeError = nil;
     if (![self _authorizeAndExecuteCommand:SUFileOpCopyCommand sourcePath:sourcePath destinationPath:destinationPath error:&executeError]) {
         if (error != NULL) {
@@ -608,6 +612,8 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
+
+    NSLog(@"Sparkle: Authorization required to move %@ to %@", sourceURL, destinationURL);
 
     char sourcePath[PATH_MAX] = {0};
     if (![sourceURL.path getFileSystemRepresentation:sourcePath maxLength:sizeof(sourcePath)]) {
@@ -778,6 +784,8 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         return NO;
     }
 
+    NSLog(@"Sparkle: Authorization required to change permissions of %@ to match %@", targetURL, matchURL);
+
     NSError *executeError = nil;
     BOOL success = [self _authorizeAndExecuteCommand:SUFileOpChangeOwnerAndGroupCommand sourcePath:targetPath destinationPath:matchPath error:&executeError];
     if (!success && error != NULL) {
@@ -834,7 +842,9 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
-    
+
+    NSLog(@"Sparkle: Authorization required to update timestamp of %@", targetURL);
+
     NSError *executeError = nil;
     BOOL success = [self _authorizeAndExecuteCommand:SUFileOpUpdateModificationAndAccessTimeCommand sourcePath:path destinationPath:NULL error:&executeError];
     if (!success && error != NULL) {
@@ -876,6 +886,8 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
+
+    NSLog(@"Sparkle: Authorization required to make directory %@", url);
 
     char path[PATH_MAX] = {0};
     if (![url.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
@@ -939,6 +951,8 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         return NO;
     }
 
+    NSLog(@"Sparkle: Authorization required to delete %@", url);
+
     char path[PATH_MAX] = {0};
     if (![url.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
         if (error != NULL) {
@@ -974,7 +988,9 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         }
         return NO;
     }
-    
+
+    NSLog(@"Sparkle: Authorization required to run pkg installer %@", packageURL);
+
     NSError *executeError = nil;
     BOOL success = [self _authorizeAndExecuteCommand:SUFileOpInstallCommand sourcePath:path destinationPath:NULL lineCallback:^(NSString *line){
         if ([line hasPrefix:@"installer:%"]) {
