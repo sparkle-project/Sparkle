@@ -64,6 +64,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 @synthesize sparkleBundle;
 @synthesize decryptionPassword;
 @synthesize updateLastCheckedDate;
+@synthesize certChain = _certChain;
+@synthesize identity = _identity;
 
 static NSMutableDictionary *sharedUpdaters = nil;
 static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
@@ -184,6 +186,15 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 - (instancetype)init
 {
     return [self initForBundle:[NSBundle mainBundle]];
+}
+
+- (instancetype)initWithIdentity:(SecIdentityRef)identity andCertificateChain:(NSArray *)certChain {
+    self = [[SUUpdater alloc] init];
+    if (self) {
+        _certChain = certChain;
+        _identity = identity;
+    }
+    return self;
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
@@ -315,7 +326,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     }
 
     // Do not use reachability for a preflight check. This can be deceptive and a bad idea. Apple does not recommend doing it.
-    SUUpdateDriver *theUpdateDriver = [[(automatic ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class])alloc] initWithUpdater:self];
+    SUUpdateDriver *theUpdateDriver = [[(automatic ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class])alloc] initWithUpdater:self identity:self.identity certificateChain:self.certChain];
     
     [self checkForUpdatesWithDriver:theUpdateDriver];
 }
@@ -329,12 +340,12 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         [self.driver abortUpdate];
     }
 
-    [self checkForUpdatesWithDriver:[[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self]];
+    [self checkForUpdatesWithDriver:[[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self identity:self.identity certificateChain:self.certChain]];
 }
 
 - (void)checkForUpdateInformation
 {
-    [self checkForUpdatesWithDriver:[[SUProbingUpdateDriver alloc] initWithUpdater:self]];
+    [self checkForUpdatesWithDriver:[[SUProbingUpdateDriver alloc] initWithUpdater:self identity:self.identity certificateChain:self.certChain]];
 }
 
 - (void)installUpdatesIfAvailable
@@ -346,7 +357,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
         [self.driver abortUpdate];
     }
 
-    SUUIBasedUpdateDriver *theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self];
+    SUUIBasedUpdateDriver *theUpdateDriver = [[SUUserInitiatedUpdateDriver alloc] initWithUpdater:self identity:self.identity certificateChain:self.certChain];
     theUpdateDriver.automaticallyInstallUpdates = YES;
     [self checkForUpdatesWithDriver:theUpdateDriver];
 }

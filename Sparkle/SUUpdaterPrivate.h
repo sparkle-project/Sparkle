@@ -20,4 +20,8 @@
 
 @property (strong, readonly) NSBundle *sparkleBundle;
 
+@property (nonatomic, assign) SecIdentityRef identity;
+
+@property (nonatomic, strong) NSArray *certChain;
+
 @end

@@ -21,5 +21,5 @@
 // Due to XPC remote object reasons, this delegate is strongly referenced
 // Invoke cleanup when done with this instance
 - (instancetype)initWithDelegate:(id <SPUDownloaderDelegate>)delegate;
-
+- (instancetype)initWithDelegate:(id<SPUDownloaderDelegate>)delegate identity:(SecIdentityRef)identity certChain:(NSArray *)chain;
 @end

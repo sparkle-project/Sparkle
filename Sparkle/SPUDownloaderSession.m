@@ -129,6 +129,39 @@
     [self cleanup];
 }
 
+- (void)URLSession:(NSURLSession *)__unused session
+didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
+ completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler
+{
+    // If no idenity is provided, have NSURLSession perform it's default handling
+    if (!self.identity) {
+        completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+    }
+    
+    // Check our authentication method
+    NSString * authenticationMethod = challenge.protectionSpace.authenticationMethod;
+    if ([authenticationMethod isEqualToString:NSURLAuthenticationMethodClientCertificate]) {
+        // Create a client NSURLCredentail to complete challege
+        NSURLCredential *challengeCredential = [self createClientCredential];
+        if (challengeCredential) {
+            completionHandler(NSURLSessionAuthChallengeUseCredential, challengeCredential);
+        }
+    } else {
+        completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+    }
+}
+
+- (NSURLCredential *)createClientCredential {
+    if (self.identity == nil) return nil;
+    
+    SecCertificateRef idCertificate = NULL;
+    SecIdentityCopyCertificate(self.identity, &idCertificate);
+    
+    return [NSURLCredential credentialWithIdentity:self.identity
+                                      certificates:self.certificateChain
+                                       persistence:NSURLCredentialPersistenceForSession];
+}
+
 - (void)downloadDidFinish
 {
     assert(self.downloadFilename != nil);
