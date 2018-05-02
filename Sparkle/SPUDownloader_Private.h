@@ -29,6 +29,8 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
 @property (nonatomic) BOOL disabledAutomaticTermination;
 @property (nonatomic) SPUDownloadMode mode;
 @property (nonatomic) BOOL receivedExpectedBytes;
+@property (nonatomic, assign) SecIdentityRef identity;
+@property (nonatomic, copy) NSArray *certificateChain;
 
 // returns temp directory location if successful; if not successful,
 // returns nil after sending error message to client and canceling download

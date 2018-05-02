@@ -47,9 +47,9 @@
 @synthesize updateAlert;
 @synthesize showErrors;
 
-- (instancetype)initWithUpdater:(id<SUUpdaterPrivate>)anUpdater
+- (instancetype)initWithUpdater:(id<SUUpdaterPrivate>)anUpdater identity:(SecIdentityRef)identity certificateChain:(NSArray *)certChain
 {
-    if ((self = [super initWithUpdater:anUpdater])) {
+    if ((self = [super initWithUpdater:anUpdater identity:identity certificateChain:certChain])) {
         self.automaticallyInstallUpdates = NO;
         self.showErrors = YES;
     }

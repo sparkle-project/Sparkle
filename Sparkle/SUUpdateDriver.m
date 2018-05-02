@@ -18,22 +18,28 @@ NSString *const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 @property (weak) id<SUUpdaterPrivate> updater;
 @property (copy) NSURL *appcastURL;
 @property (getter=isInterruptible) BOOL interruptible;
+@property (nonatomic, assign) SecIdentityRef identity;
+@property (nonatomic, strong) NSArray *certChain;
 
 @end
 
 @implementation SUUpdateDriver
 
-@synthesize updater;
+@synthesize updater = _updater;
 @synthesize host;
 @synthesize interruptible;
 @synthesize finished;
 @synthesize appcastURL;
 @synthesize automaticallyInstallUpdates;
+@synthesize identity = _identity;
+@synthesize certChain = _certChain;
 
-- (instancetype)initWithUpdater:(id<SUUpdaterPrivate>)anUpdater
+- (instancetype)initWithUpdater:(id<SUUpdaterPrivate>)anUpdater identity:(SecIdentityRef)identity certificateChain:(NSArray *)certChain
 {
     if ((self = [super init])) {
-        self.updater = anUpdater;
+        _updater = anUpdater;
+        _identity = identity;
+        _certChain = certChain;
     }
     return self;
 }

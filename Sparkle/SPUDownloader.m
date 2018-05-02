@@ -29,6 +29,16 @@
 @synthesize disabledAutomaticTermination = _disabledAutomaticTermination;
 @synthesize mode = _mode;
 @synthesize receivedExpectedBytes = _receivedExpectedBytes;
+@synthesize identity = _identity;
+
+- (instancetype)initWithDelegate:(id<SPUDownloaderDelegate>)delegate identity:(SecIdentityRef)identity certChain:(NSArray *)chain {
+    self = [[SPUDownloader alloc] initWithDelegate:delegate];
+    if (self) {
+        _identity = identity;
+        _certificateChain = chain;
+    }
+    return self;
+}
 
 - (instancetype)initWithDelegate:(id <SPUDownloaderDelegate>)delegate
 {
@@ -113,6 +123,40 @@
         [self cancel];
     }
     return tempDir;
+}
+
+#pragma mark - NSURLSession super delegate
+- (void)URLSession:(NSURLSession *)__unused session
+didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
+ completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler
+{
+    // If no idenity is provided, have NSURLSession perform it's default handling
+    if (!self.identity) {
+        completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+    }
+    
+    // Check our authentication method
+    NSString * authenticationMethod = challenge.protectionSpace.authenticationMethod;
+    if ([authenticationMethod isEqualToString:NSURLAuthenticationMethodClientCertificate]) {
+        // Create a client NSURLCredentail to complete challege
+        NSURLCredential *challengeCredential = [self createClientCredential];
+        if (challengeCredential) {
+            completionHandler(NSURLSessionAuthChallengeUseCredential, challengeCredential);
+        }
+    } else {
+        completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+    }
+}
+
+- (NSURLCredential *)createClientCredential {
+    if (self.identity == nil) return nil;
+    
+    SecCertificateRef idCertificate = NULL;
+    SecIdentityCopyCertificate(self.identity, &idCertificate);
+    
+    return [NSURLCredential credentialWithIdentity:self.identity
+                                      certificates:self.certificateChain
+                                       persistence:NSURLCredentialPersistenceForSession];
 }
 
 @end
