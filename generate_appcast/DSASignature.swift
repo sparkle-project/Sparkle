@@ -25,6 +25,30 @@ func loadPrivateKey(at privateKeyURL: URL) throws -> SecKey {
     return (cfitems! as NSArray)[0] as! SecKey;
 }
 
+func loadPrivateKey(named keyName: String, fromKeychainAt keychainURL: URL) throws -> SecKey {
+    var keychain: SecKeychain? = nil
+    
+    guard SecKeychainOpen(keychainURL.path, &keychain) == errSecSuccess, keychain != nil else {
+        throw NSError(domain: SUSparkleErrorDomain, code: Int(OSStatus(SUError.signatureError.rawValue)), userInfo: nil)
+    }
+    
+    let query: [CFString: CFTypeRef] = [
+        kSecClass: kSecClassKey,
+        kSecAttrKeyClass: kSecAttrKeyClassPrivate,
+        kSecAttrLabel: keyName as CFString,
+        kSecMatchLimit: kSecMatchLimitOne,
+        kSecUseKeychain: keychain!,
+        kSecReturnRef: kCFBooleanTrue
+    ]
+    
+    var item: CFTypeRef? = nil
+    guard SecItemCopyMatching(query as CFDictionary, &item) == errSecSuccess, item != nil else {
+        throw NSError(domain: SUSparkleErrorDomain, code: Int(OSStatus(SUError.signatureError.rawValue)), userInfo: nil)
+    }
+    
+    return item! as! SecKey
+}
+
 func dsaSignature(path: URL, privateKey: SecKey) throws -> String {
 
     var error: Unmanaged<CFError>?;
