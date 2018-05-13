@@ -5,8 +5,8 @@
 
 import Foundation
 
-func loadPrivateKey(privateKeyPath: URL) throws -> SecKey {
-    let data = try Data(contentsOf: privateKeyPath);
+func loadPrivateKey(at privateKeyURL: URL) throws -> SecKey {
+    let data = try Data(contentsOf: privateKeyURL);
 
     var cfitems: CFArray? = nil;
     var format = SecExternalFormat.formatOpenSSL;
@@ -14,7 +14,7 @@ func loadPrivateKey(privateKeyPath: URL) throws -> SecKey {
 
     let status = SecItemImport(data as CFData, nil, &format, &type, SecItemImportExportFlags(rawValue: UInt32(0)), nil, nil, &cfitems);
     if (status != errSecSuccess || cfitems == nil) {
-        print("Private DSA key file", privateKeyPath, "exists, but it could not be read. SecItemImport error", status);
+        print("Private DSA key file", privateKeyURL.path, "exists, but it could not be read. SecItemImport error", status);
         throw NSError(domain: SUSparkleErrorDomain, code: Int(OSStatus(SUError.signatureError.rawValue)), userInfo: nil);
     }
 

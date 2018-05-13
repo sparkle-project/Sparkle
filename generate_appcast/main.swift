@@ -22,11 +22,11 @@ func main() {
         exit(1);
     }
 
-    let privateKeyPath = URL(fileURLWithPath: args[1]);
+    let privateKeyURL = URL(fileURLWithPath: args[1]);
     let archivesSourceDir = URL(fileURLWithPath: args[2], isDirectory:true);
 
     do {
-        let privateKey = try loadPrivateKey(privateKeyPath: privateKeyPath);
+        let privateKey = try loadPrivateKey(at: privateKeyURL);
         do {
             let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, privateKey: privateKey, verbose:verbose);
 
@@ -40,7 +40,7 @@ func main() {
             exit(1);
         }
     } catch {
-        print("Unable to load DSA private key from", privateKeyPath.path, "\n", error);
+        print("Unable to load DSA private key from", privateKeyURL.path, "\n", error);
         exit(1);
     }
 }
