@@ -22,7 +22,11 @@ func printUsage() {
 
 func main() {
     let args = CommandLine.arguments;
-
+    if args.count < 4 {
+        printUsage()
+        exit(1)
+    }
+    
     let firstOption = args[1]
     let privateKey: SecKey
     
