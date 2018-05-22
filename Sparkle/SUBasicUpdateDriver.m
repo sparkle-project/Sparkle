@@ -318,6 +318,10 @@
 {
     // finished. downloadData should be nil as this was a permanent download
     assert(self.updateItem);
+    id<SUUpdaterPrivate> updater = self.updater;
+    if ([[updater delegate] respondsToSelector:@selector(updater:didDownloadUpdate:)]) {
+        [[updater delegate] updater:self.updater didDownloadUpdate:self.updateItem];
+    }
     
     [self extractUpdate];
 }
@@ -371,10 +375,17 @@
         NSError *reason = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{NSLocalizedDescriptionKey: @"Failed to extract update."}];
         [self unarchiverDidFailWithError:reason];
     } else {
+        if ([[updater delegate] respondsToSelector:@selector(updater:willExtractUpdate:)]) {
+            [[updater delegate] updater:self.updater willExtractUpdate:self.updateItem];
+        }
+        
         [unarchiver unarchiveWithCompletionBlock:^(NSError *err){
             if (err) {
                 [self unarchiverDidFailWithError:err];
                 return;
+            }
+            if ([[updater delegate] respondsToSelector:@selector(updater:didExtractUpdate:)]) {
+                [[updater delegate] updater:self.updater didExtractUpdate:self.updateItem];
             }
             
             [self performSelectorOnMainThread:@selector(unarchiverDidFinish:) withObject:nil waitUntilDone:NO];
