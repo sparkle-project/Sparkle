@@ -241,11 +241,17 @@
 
 - (void)extractUpdate
 {
-    dispatch_sync(dispatch_get_main_queue(), ^{
+    dispatch_block_t updateUI = ^{
         // Now we have to extract the downloaded archive.
         [self.statusController beginActionWithTitle:SULocalizedString(@"Extracting update...", @"Take care not to overflow the status window.") maxProgressValue:0.0 statusText:nil];
         [self.statusController setButtonEnabled:NO];
-    });
+    };
+    
+    if (![NSThread mainThread]) {
+        dispatch_sync(dispatch_get_main_queue(), updateUI);
+    } else {
+        updateUI();
+    }
     [super extractUpdate];
 }
 
