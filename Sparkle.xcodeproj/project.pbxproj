@@ -175,7 +175,7 @@
 		61A354550DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61A354530DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
 		61A354560DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A354540DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.m */; };
 		61AAE8280A321A7F00D8810D /* Sparkle.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61AAE8220A321A7F00D8810D /* Sparkle.strings */; };
-		61B078CE15A5FB6100600039 /* SUCodeSigningVerifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B078CC15A5FB6100600039 /* SUCodeSigningVerifier.h */; };
+		61B078CE15A5FB6100600039 /* SUCodeSigningVerifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B078CC15A5FB6100600039 /* SUCodeSigningVerifier.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		61B078CF15A5FB6100600039 /* SUCodeSigningVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B078CD15A5FB6100600039 /* SUCodeSigningVerifier.m */; };
 		61B5F8ED09C4CE3C00B25A18 /* SUUpdater.h in Headers */ = {isa = PBXBuildFile; fileRef = 61B5F8E309C4CE3C00B25A18 /* SUUpdater.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		61B5F8EE09C4CE3C00B25A18 /* SUUpdater.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B5F8E409C4CE3C00B25A18 /* SUUpdater.m */; };
@@ -475,6 +475,11 @@
 		0263187714FEBB42005EBF43 /* uk */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = uk; path = uk.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
 		0867D69BFE84028FC02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		0A8DAD73207FA6F300FFD934 /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		0A8DAD74207FA6F300FFD934 /* hu */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = hu; path = hu.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
+		0A8DAD75207FA6F300FFD934 /* hu */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = hu; path = hu.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
+		0A8DAD76207FA6F400FFD934 /* hu */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = hu; path = hu.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
+		0A8DAD77207FA6F400FFD934 /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1420DF4D196247B500203BB0 /* build-docs.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = "build-docs.sh"; sourceTree = "<group>"; };
 		1420DF4E196247B500203BB0 /* Doxyfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Doxyfile; sourceTree = "<group>"; };
 		1420DF4F196247F900203BB0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -513,7 +518,6 @@
 		1A985A3B1C5C32A60001163A /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1A985A3C1C5C32A70001163A /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1A985A3D1C5C32A80001163A /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		1A985A3E1C5C32A90001163A /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1A985A3F1C5C32AA0001163A /* id */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = id; path = id.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1A985A401C5C32AA0001163A /* is */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = is; path = is.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1A985A411C5C32AB0001163A /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -1447,9 +1451,9 @@
 				61F83F740DBFE141006FDD30 /* SUBasicUpdateDriver.h in Headers */,
 				5D06E9390FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.h in Headers */,
 				72316BD91E0E17180039EFD9 /* SUBundleIcon.h in Headers */,
-				61B078CE15A5FB6100600039 /* SUCodeSigningVerifier.h in Headers */,
 				61299A5C09CA6D4500B7442F /* SUConstants.h in Headers */,
 				6102FE4A0E07803800F85D09 /* SUDiskImageUnarchiver.h in Headers */,
+				61B078CE15A5FB6100600039 /* SUCodeSigningVerifier.h in Headers */,
 				61299A2F09CA2DAB00B7442F /* SUDSAVerifier.h in Headers */,
 				34074B9F1FEABD5A001CB3A5 /* SPUDownloadData.h in Headers */,
 				55E6F33319EC9F6C00005E76 /* SUErrors.h in Headers */,
@@ -2236,6 +2240,7 @@
 				0263187514FEBB42005EBF43 /* uk */,
 				55C14BEC136EF20D00649790 /* zh_CN */,
 				55C14BED136EF20D00649790 /* zh_TW */,
+				0A8DAD74207FA6F300FFD934 /* hu */,
 			);
 			name = SUAutomaticUpdateAlert.xib;
 			sourceTree = "<group>";
@@ -2270,6 +2275,7 @@
 				0263187614FEBB42005EBF43 /* uk */,
 				55C14C02136EF26100649790 /* zh_CN */,
 				55C14C03136EF26100649790 /* zh_TW */,
+				0A8DAD75207FA6F300FFD934 /* hu */,
 			);
 			name = SUUpdateAlert.xib;
 			sourceTree = "<group>";
@@ -2304,6 +2310,7 @@
 				0263187714FEBB42005EBF43 /* uk */,
 				55C14C17136EF2C700649790 /* zh_CN */,
 				55C14C18136EF2C700649790 /* zh_TW */,
+				0A8DAD76207FA6F400FFD934 /* hu */,
 			);
 			name = SUUpdatePermissionPrompt.xib;
 			sourceTree = "<group>";
@@ -2341,6 +2348,7 @@
 				0263187214FEBB31005EBF43 /* uk */,
 				61131A090F846D0A00E97AF6 /* zh_CN */,
 				61131A0A0F846D1100E97AF6 /* zh_TW */,
+				0A8DAD73207FA6F300FFD934 /* hu */,
 			);
 			name = Sparkle.strings;
 			sourceTree = "<group>";
@@ -2361,7 +2369,6 @@
 				1A985A331C5C329D0001163A /* fr */,
 				1A985A4B1C5C32B60001163A /* fr-CA */,
 				1A985A3D1C5C32A80001163A /* he */,
-				1A985A3E1C5C32A90001163A /* hu */,
 				1A985A3F1C5C32AA0001163A /* id */,
 				1A985A401C5C32AA0001163A /* is */,
 				1A985A361C5C32A20001163A /* it */,
@@ -2383,6 +2390,7 @@
 				1A985A511C5C32BB0001163A /* uk */,
 				1A985A4A1C5C32B50001163A /* zh-Hans */,
 				1A985A351C5C329E0001163A /* zh-Hant */,
+				0A8DAD77207FA6F400FFD934 /* hu */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";

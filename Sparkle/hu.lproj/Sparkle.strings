@@ -1,0 +1,89 @@
+"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?" = "A %1$@ %2$@ verziója letöltődött és készen áll a telepítésre! Ez egy fontos frissítés; szeretné most telepíteni, majd újraindítani a %1$@ alkalmazást?";
+
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "A %1$@ %2$@ verziója letöltődött és készen áll a telepítésre! Szeretné most telepíteni, majd újraindítani a %1$@ alkalmazást?";
+
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "A programot nem lehet frissíteni, amikor egy csak olvasható kötetből (pl. lemezképfájl vagy optikai meghajtó) futtatja. Mozgassa a %1$@ alkalmazást az Alkalmazások mappába, indítsa újra onnan, majd próbálja újra a frissítést.";
+
+"%@ %@ is currently the newest version available." = "A %1$@ %2$@ a jelenleg elérhető legfrissebb verzió.";
+
+/* Description text for SUUpdateAlert when the update is downloadable. */
+"%@ %@ is now available--you have %@. Would you like to download it now?" = "A %1$@ %2$@ verziója már elérhető — az Ön jelenlegi verziója a %3$@. Szeretné most letölteni?";
+
+/* Description text for SUUpdateAlert when the update informational with no download. */
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "A %1$@ %2$@ verziója már elérhető — az Ön jelenlegi verziója a %3$@. Szeretne megtekinteni további információkat online?";
+
+"%@ downloaded" = "%@ letöltve";
+
+"%@ of %@" = "%1$@ / %2$@";
+
+"A new version of %@ is available!" = "A %@ egy újabb verziója elérhető!";
+
+"A new version of %@ is ready to install!" = "A %@ egy újabb verziója készen áll a telepítésre!";
+
+"An error occurred in retrieving update information. Please try again later." = "Hiba történt a frissítések lekérdezésekor. Kérjük, próbálja újra később.";
+
+"An error occurred while downloading the update. Please try again later." = "Hiba történt a frissítés letöltése közben. Kérjük, próbálja újra később.";
+
+"An error occurred while extracting the archive. Please try again later." = "Hiba történt a frissítés kicsomagolása közben. Kérjük, próbálja újra később.";
+
+"An error occurred while installing the update. Please try again later." = "Hiba történt a frissítés telepítése közben. Kérjük, próbálja újra később.";
+
+"An error occurred while parsing the update feed." = "Hiba történt az elérhető frissítések beolvasásakor.";
+
+"An error occurred while relaunching %1$@, but the new version will be available next time you run %1$@." = "Hiba történt a %1$@ újraindítása közben, de az új verzió a %1$@ következő indításakor így is elérhető lesz.";
+
+"An important update to %@ is ready to install" = "A %@ egy fontos frissítése készen áll a telepítésre";
+
+/* the unit for bytes */
+"B" = "B";
+
+"Cancel" = "Mégsem";
+
+"Cancel Update" = "Frissítés megszakítása";
+
+"Checking for updates..." = "Frissítések keresése…";
+
+/* Take care not to overflow the status window. */
+"Downloading update..." = "Frissítés letöltése…";
+
+/* Take care not to overflow the status window. */
+"Extracting update..." = "Frissítés kicsomagolása…";
+
+/* the unit for gigabytes */
+"GB" = "GB";
+
+"Install and Relaunch" = "Telepítés és újraindítás";
+
+/* Take care not to overflow the status window. */
+"Installing update..." = "Frissítés telepítése…";
+
+/* the unit for kilobytes */
+"KB" = "KB";
+
+/* Alternative name for "Install" button if we have a paid update or other update
+	without a download but with a URL. */
+"Learn More..." = "További információ…";
+
+/* the unit for megabytes */
+"MB" = "MB";
+
+/* OK button. */
+"OK" = "OK";
+
+/* Status message on progress window once download has finished. */
+"Ready to Install" = "A telepítő készen áll";
+
+/* Message that is optionally shown at startup to allow users to turn on/off update checks. 1=app name*/
+"Should %1$@ automatically check for updates? You can always check for updates manually from the %1$@ menu." = "Szeretné, hogy a %1$@ ellenőrizze az elérhető frissítéseket induláskor? Ha nem, a frissítések keresését kézzel is elindíthatja a %1$@ menüből.";
+
+"The update is improperly signed." = "A frissítés aláírása sérült.";
+
+"Update Error!" = "Frissítési hiba!";
+
+"Updating %@" = "%@ frissítése";
+
+/* 'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI). 1=app name */
+"You already have the newest version of %@." = "Ez a %@ jelenleg elérhető legfrissebb verziója.";
+
+/* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
+"You're up-to-date!" = "Nincs újabb verzió!";
