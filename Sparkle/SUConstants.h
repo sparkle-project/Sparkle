@@ -21,6 +21,8 @@ extern const NSTimeInterval SUDefaultUpdateCheckInterval;
 
 extern NSString *const SUBundleIdentifier;
 
+extern NSString *const SUAppcastAttributeValueMacOS;
+
 // -----------------------------------------------------------------------------
 //	Notifications:
 // -----------------------------------------------------------------------------
@@ -33,6 +35,7 @@ extern NSString *const SUTechnicalErrorInformationKey;
 
 extern NSString *const SUFeedURLKey;
 extern NSString *const SUHasLaunchedBeforeKey;
+extern NSString *const SUUpdateRelaunchingMarkerKey;
 extern NSString *const SUShowReleaseNotesKey;
 extern NSString *const SUSkippedVersionKey;
 extern NSString *const SUScheduledCheckIntervalKey;
@@ -63,6 +66,9 @@ extern NSString *const SUAppcastAttributeDeltaFrom;
 extern NSString *const SUAppcastAttributeDSASignature;
 extern NSString *const SUAppcastAttributeShortVersionString;
 extern NSString *const SUAppcastAttributeVersion;
+extern NSString *const SUAppcastAttributeOsType;
+
+
 
 extern NSString *const SUAppcastElementCriticalUpdate;
 extern NSString *const SUAppcastElementDeltas;

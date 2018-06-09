@@ -49,7 +49,7 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
             XMLNode.Options.nodePreserveCDATA,
             XMLNode.Options.nodePreserveWhitespace,
         ];
-        doc = try XMLDocument(contentsOf: appcastDestPath, options: Int(options.rawValue));
+        doc = try XMLDocument(contentsOf: appcastDestPath, options: options);
     } catch {
         let root = XMLElement(name: "rss");
         root.addAttribute(XMLNode.attribute(withName: "xmlns:sparkle", stringValue: sparkleNS) as! XMLNode);
@@ -184,7 +184,7 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
     }
 
     let options = XMLNode.Options.nodeCompactEmptyElement;
-    let docData = doc.xmlData(withOptions:Int(options.rawValue));
-    let _ = try XMLDocument(data: docData, options:0); // Verify that it was generated correctly, which does not always happen!
+    let docData = doc.xmlData(options:options);
+    let _ = try XMLDocument(data: docData, options:XMLNode.Options()); // Verify that it was generated correctly, which does not always happen!
     try docData.write(to: appcastDestPath);
 }

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16C68" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
+        <development version="7000" identifier="xcode"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUAutomaticUpdateAlert">
@@ -57,7 +58,7 @@
                         </connections>
                     </textField>
                     <button verticalHuggingPriority="750" id="15">
-                        <rect key="frame" x="435" y="12" width="167" height="32"/>
+                        <rect key="frame" x="436" y="12" width="166" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                         <buttonCell key="cell" type="push" title="Installeer en herstart" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="41">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -71,9 +72,9 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="16">
-                        <rect key="frame" x="306" y="12" width="129" height="32"/>
+                        <rect key="frame" x="246" y="12" width="190" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
-                        <buttonCell key="cell" type="push" title="Installeer bij Stop" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="42">
+                        <buttonCell key="cell" type="push" title="Installeer bij het stoppen" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="42">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                             <string key="keyEquivalent" base64-UTF8="YES">

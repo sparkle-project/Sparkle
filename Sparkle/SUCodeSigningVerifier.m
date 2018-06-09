@@ -121,7 +121,22 @@ static id valueOrNSNull(id value) {
     return value ? value : [NSNull null];
 }
 
-+ (void)logSigningInfoForCode:(SecStaticCodeRef)code label:(NSString*)label {
++ (NSDictionary *)codeSignatureInfoAtBundleURL:(NSURL *)bundlePath {
+    NSDictionary *info = nil;
+    SecStaticCodeRef code = NULL;
+    OSStatus result = SecStaticCodeCreateWithPath((__bridge CFURLRef)bundlePath, kSecCSDefaultFlags, &code);
+    if (result != noErr) {
+        SULog(SULogLevelError, @"Failed to get static code %d", result);
+        goto finally;
+    }
+    info = [self codeSignatureInfoForCode:code];
+    
+finally:
+    if (code) CFRelease(code);
+    return info;
+}
+
++ (NSDictionary *)codeSignatureInfoForCode:(SecStaticCodeRef)code {
     CFDictionaryRef signingInfo = nil;
     const SecCSFlags flags = (SecCSFlags) (kSecCSSigningInformation | kSecCSRequirementInformation | kSecCSDynamicInformation | kSecCSContentInformation);
     if (SecCodeCopySigningInformation(code, flags, &signingInfo) == noErr) {
@@ -133,8 +148,14 @@ static id valueOrNSNull(id value) {
         NSDictionary *infoPlist = [signingDict objectForKey:@"info-plist"];
         [relevantInfo setObject:valueOrNSNull([infoPlist objectForKey:@"CFBundleShortVersionString"]) forKey:@"version"];
         [relevantInfo setObject:valueOrNSNull([infoPlist objectForKey:(__bridge NSString *)kCFBundleVersionKey]) forKey:@"build"];
-        SULog(SULogLevelDefault, @"%@: %@", label, relevantInfo);
+        return [relevantInfo copy];
     }
+    return nil;
+}
+
++ (void)logSigningInfoForCode:(SecStaticCodeRef)code label:(NSString*)label {
+    NSDictionary *relevantInfo = [self codeSignatureInfoForCode:code];
+    SULog(SULogLevelDefault, @"%@: %@", label, relevantInfo);
 }
 
 + (BOOL)bundleAtURLIsCodeSigned:(NSURL *)bundleURL

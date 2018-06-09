@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16C68" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
+        <deployment identifier="macosx"/>
+        <development version="7000" identifier="xcode"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SUAutomaticUpdateAlert">
@@ -57,9 +59,9 @@
                         </connections>
                     </textField>
                     <button verticalHuggingPriority="750" id="15">
-                        <rect key="frame" x="462" y="12" width="215" height="32"/>
+                        <rect key="frame" x="472" y="13" width="205" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
-                        <buttonCell key="cell" type="push" title="Installieren und erneut starten" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="41">
+                        <buttonCell key="cell" type="push" title="Installieren und neu starten" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="41">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
@@ -71,7 +73,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="30">
-                        <rect key="frame" x="102" y="12" width="132" height="32"/>
+                        <rect key="frame" x="101" y="13" width="142" height="32"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <buttonCell key="cell" type="push" title="Nicht installieren" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="44">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -82,9 +84,9 @@ DQ
                         </connections>
                     </button>
                     <button id="17">
-                        <rect key="frame" x="105" y="58" width="619" height="18"/>
+                        <rect key="frame" x="104" y="58" width="569" height="18"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <buttonCell key="cell" type="check" title="Aktualisierungen in Zukunft automatisch herunterladen und installieren" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="43">
+                        <buttonCell key="cell" type="check" title="Updates in Zukunft automatisch laden und installieren" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="43">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                         </buttonCell>
@@ -93,7 +95,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="16">
-                        <rect key="frame" x="265" y="12" width="197" height="32"/>
+                        <rect key="frame" x="275" y="13" width="197" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                         <buttonCell key="cell" type="push" title="Beim Beenden installieren" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="42">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>

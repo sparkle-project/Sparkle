@@ -23,6 +23,7 @@
 @property (copy, readwrite) NSString *maximumSystemVersion;
 @property (strong, readwrite) NSURL *fileURL;
 @property (copy, readwrite) NSString *versionString;
+@property (copy, readwrite) NSString *osString;
 @property (copy, readwrite) NSString *displayVersionString;
 @property (copy, readwrite) NSDictionary *deltaUpdates;
 @property (strong, readwrite) NSURL *infoURL;
@@ -43,6 +44,7 @@
 @synthesize releaseNotesURL;
 @synthesize title;
 @synthesize versionString;
+@synthesize osString;
 @synthesize propertiesDictionary;
 
 - (BOOL)isDeltaUpdate
@@ -54,6 +56,11 @@
 - (BOOL)isCriticalUpdate
 {
     return [[self.propertiesDictionary objectForKey:SUAppcastElementTags] containsObject:SUAppcastElementCriticalUpdate];
+}
+
+- (BOOL)isMacOsUpdate
+{
+    return self.osString == nil || [self.osString isEqualToString:SUAppcastAttributeValueMacOS];
 }
 
 - (BOOL)isInformationOnlyUpdate
@@ -150,8 +157,9 @@
         }
         if (enclosure) {
             self.DSASignature = [enclosure objectForKey:SUAppcastAttributeDSASignature];
+            self.osString = [enclosure objectForKey:SUAppcastAttributeOsType];
         }
-
+  
         self.versionString = newVersion;
         self.minimumSystemVersion = [dict objectForKey:SUAppcastElementMinimumSystemVersion];
         self.maximumSystemVersion = [dict objectForKey:SUAppcastElementMaximumSystemVersion];

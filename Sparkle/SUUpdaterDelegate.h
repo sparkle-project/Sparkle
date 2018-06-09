@@ -138,6 +138,14 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (void)updater:(SUUpdater *)updater willDownloadUpdate:(SUAppcastItem *)item withRequest:(NSMutableURLRequest *)request;
 
 /*!
+ Called immediately after succesfull download of the specified update.
+ 
+ \param updater The SUUpdater instance.
+ \param item The appcast item corresponding to the update that has been downloaded.
+ */
+- (void)updater:(SUUpdater *)updater didDownloadUpdate:(SUAppcastItem *)item;
+
+/*!
  Called after the specified update failed to download.
  
  \param updater The SUUpdater instance.
@@ -152,6 +160,22 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  \param updater The SUUpdater instance.
  */
 - (void)userDidCancelDownload:(SUUpdater *)updater;
+
+/*!
+ Called immediately before extracting the specified downloaded update.
+ 
+ \param updater The SUUpdater instance.
+ \param item The appcast item corresponding to the update that is proposed to be extracted.
+ */
+- (void)updater:(SUUpdater *)updater willExtractUpdate:(SUAppcastItem *)item;
+
+/*!
+ Called immediately after extracting the specified downloaded update.
+ 
+ \param updater The SUUpdater instance.
+ \param item The appcast item corresponding to the update that has been extracted.
+ */
+- (void)updater:(SUUpdater *)updater didExtractUpdate:(SUAppcastItem *)item;
 
 /*!
  Called immediately before installing the specified update.
@@ -191,6 +215,13 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  \param updater The SUUpdater instance.
  */
 - (void)updaterWillRelaunchApplication:(SUUpdater *)updater;
+
+/*!
+ Called immediately after relaunching. SUUpdater delegate must be set before applicationDidFinishLaunching: to catch this event.
+ 
+ \param updater The SUUpdater instance.
+ */
+- (void)updaterDidRelaunchApplication:(SUUpdater *)updater;
 
 /*!
  Returns an object that compares version numbers to determine their arithmetic relation to each other.
