@@ -57,24 +57,24 @@
     self.invalidationBlock = invalidationHandler;
     
     __weak SUXPCInstallerConnection *weakSelf = self;
-    [self.connection.remoteObjectProxy setInvalidationHandler:^{
+    [(id<SUInstallerConnectionProtocol>)self.connection.remoteObjectProxy setInvalidationHandler:^{
         [weakSelf invokeInvalidation];
     }];
 }
 
 - (void)setServiceName:(NSString *)serviceName hostPath:(NSString *)hostPath installationType:(NSString *)installationType
 {
-    [self.connection.remoteObjectProxy setServiceName:serviceName hostPath:hostPath installationType:installationType];
+    [(id<SUInstallerConnectionProtocol>)self.connection.remoteObjectProxy setServiceName:serviceName hostPath:hostPath installationType:installationType];
 }
 
 - (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
 {
-    [self.connection.remoteObjectProxy handleMessageWithIdentifier:identifier data:data];
+    [(id<SUInstallerConnectionProtocol>)self.connection.remoteObjectProxy handleMessageWithIdentifier:identifier data:data];
 }
 
 - (void)invalidate
 {
-    [self.connection.remoteObjectProxy invalidate];
+    [(id<SUInstallerConnectionProtocol>)self.connection.remoteObjectProxy invalidate];
     [self.connection invalidate];
     self.connection = nil;
 }

@@ -64,7 +64,7 @@ New Sparkle classes are now prefixed with `SPU` rather than `SU`. Older classes 
 ## Requirements
 
 * Runtime: **macOS 10.9** or greater for 64bit, **macOS 10.10** or greater for 32bit (this has been bumped up!)
-* Build: At least Xcode 6. Xcode 7 or greater recommended.
+* Build: Xcode 7 or greater required.
 * HTTPS server for serving updates (see [App Transport Security](http://sparkle-project.org/documentation/app-transport-security/))
 
 ## Usage

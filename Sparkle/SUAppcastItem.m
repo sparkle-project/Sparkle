@@ -60,8 +60,8 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
     
     if (self != nil) {
         _deltaUpdates = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [SUAppcastItem class]]] forKey:SUAppcastItemDeltaUpdatesKey];
-        _displayVersionString = [[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemDisplayVersionStringKey] copy];
-        _DSASignature = [[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemDSASignatureKey] copy];
+        _displayVersionString = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemDisplayVersionStringKey] copy];
+        _DSASignature = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemDSASignatureKey] copy];
         _fileURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemFileURLKey];
         _infoURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemInfoURLKey];
         
@@ -72,12 +72,12 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
             return nil;
         }
         
-        _itemDescription = [[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemDescriptionKey] copy];
-        _maximumSystemVersion = [[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemMaximumSystemVersionKey] copy];
-        _minimumSystemVersion = [[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemMinimumSystemVersionKey] copy];
+        _itemDescription = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemDescriptionKey] copy];
+        _maximumSystemVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemMaximumSystemVersionKey] copy];
+        _minimumSystemVersion = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemMinimumSystemVersionKey] copy];
         _releaseNotesURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemReleaseNotesURLKey];
-        _title = [[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemTitleKey] copy];
-        _versionString = [[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemVersionStringKey] copy];
+        _title = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemTitleKey] copy];
+        _versionString = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemVersionStringKey] copy];
         _propertiesDictionary = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [NSString class], [NSDate class], [NSArray class]]] forKey:SUAppcastItemPropertiesKey];
     }
     
@@ -149,7 +149,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
 
 - (BOOL)isCriticalUpdate
 {
-    return [[self.propertiesDictionary objectForKey:SUAppcastElementTags] containsObject:SUAppcastElementCriticalUpdate];
+    return [(NSArray *)[self.propertiesDictionary objectForKey:SUAppcastElementTags] containsObject:SUAppcastElementCriticalUpdate];
 }
 
 - (BOOL)isMacOsUpdate
@@ -191,7 +191,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
 
             // Separate the url by underscores and take the last component, as that'll be closest to the end,
             // then we remove the extension. Hopefully, this will be the version.
-            NSArray *fileComponents = [[enclosure objectForKey:SURSSAttributeURL] componentsSeparatedByString:@"_"];
+            NSArray<NSString *> *fileComponents = [(NSString *)[enclosure objectForKey:SURSSAttributeURL] componentsSeparatedByString:@"_"];
             if ([fileComponents count] > 1) {
                 newVersion = [[fileComponents lastObject] stringByDeletingPathExtension];
             }
@@ -205,9 +205,9 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         }
 
         _propertiesDictionary = [[NSDictionary alloc] initWithDictionary:dict];
-        _title = [[dict objectForKey:SURSSElementTitle] copy];
-        _dateString = [[dict objectForKey:SURSSElementPubDate] copy];
-        _itemDescription = [[dict objectForKey:SURSSElementDescription] copy];
+        _title = [(NSString *)[dict objectForKey:SURSSElementTitle] copy];
+        _dateString = [(NSString *)[dict objectForKey:SURSSElementPubDate] copy];
+        _itemDescription = [(NSString *)[dict objectForKey:SURSSElementDescription] copy];
 
         NSString *theInfoURL = [dict objectForKey:SURSSElementLink];
         if (theInfoURL) {
@@ -250,12 +250,12 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
             _fileURL = [NSURL URLWithString:fileURLString];
         }
         if (enclosure) {
-            _DSASignature = [[enclosure objectForKey:SUAppcastAttributeDSASignature] copy];
+            _DSASignature = [(NSString *)[enclosure objectForKey:SUAppcastAttributeDSASignature] copy];
         }
 
-        _versionString = [newVersion copy];
-        _minimumSystemVersion = [[dict objectForKey:SUAppcastElementMinimumSystemVersion] copy];
-        _maximumSystemVersion = [[dict objectForKey:SUAppcastElementMaximumSystemVersion] copy];
+        _versionString = [(NSString *)newVersion copy];
+        _minimumSystemVersion = [(NSString *)[dict objectForKey:SUAppcastElementMinimumSystemVersion] copy];
+        _maximumSystemVersion = [(NSString *)[dict objectForKey:SUAppcastElementMaximumSystemVersion] copy];
 
         NSString *shortVersionString = [enclosure objectForKey:SUAppcastAttributeShortVersionString];
         if (nil == shortVersionString) {
