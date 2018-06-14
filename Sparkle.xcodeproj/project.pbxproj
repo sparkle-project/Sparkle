@@ -565,6 +565,9 @@
 		555CF29B196C523E0000B31E /* el */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = el; path = el.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
 		555CF29C196C52460000B31E /* el */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = el; path = el.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
 		555CF29D196C524C0000B31E /* el */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = el; path = el.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
+		55BACC1820AF2C5B00ECEBB6 /* fi */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fi; path = fi.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
+		55BACC1920AF2C6D00ECEBB6 /* fi */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fi; path = fi.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
+		55BACC1A20AF2C7D00ECEBB6 /* fi */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = fi; path = fi.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
 		55C14BB7136EEF1500649790 /* Autoupdate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Autoupdate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		55C14BB9136EEF1500649790 /* Autoupdate-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Autoupdate-Info.plist"; sourceTree = "<group>"; };
 		55C14BD3136EEFCE00649790 /* Autoupdate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Autoupdate.m; sourceTree = "<group>"; };
@@ -2241,6 +2244,7 @@
 				55C14BEC136EF20D00649790 /* zh_CN */,
 				55C14BED136EF20D00649790 /* zh_TW */,
 				0A8DAD74207FA6F300FFD934 /* hu */,
+				55BACC1920AF2C6D00ECEBB6 /* fi */,
 			);
 			name = SUAutomaticUpdateAlert.xib;
 			sourceTree = "<group>";
@@ -2276,6 +2280,7 @@
 				55C14C02136EF26100649790 /* zh_CN */,
 				55C14C03136EF26100649790 /* zh_TW */,
 				0A8DAD75207FA6F300FFD934 /* hu */,
+				55BACC1820AF2C5B00ECEBB6 /* fi */,
 			);
 			name = SUUpdateAlert.xib;
 			sourceTree = "<group>";
@@ -2311,6 +2316,7 @@
 				55C14C17136EF2C700649790 /* zh_CN */,
 				55C14C18136EF2C700649790 /* zh_TW */,
 				0A8DAD76207FA6F400FFD934 /* hu */,
+				55BACC1A20AF2C7D00ECEBB6 /* fi */,
 			);
 			name = SUUpdatePermissionPrompt.xib;
 			sourceTree = "<group>";

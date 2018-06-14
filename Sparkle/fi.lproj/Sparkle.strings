@@ -28,7 +28,11 @@
 
 "Cancel" = "Kumoa";
 
+"Cancel Update" = "Peruuta päivitykset";
+
 "Check for updates on startup?" = "Tarkista päivityksiä käynnistyksen yhteydessä?";
+
+"Checking for updates..." = "Tarkistetaan päivityksiä…";
 
 "Downloading update..." = "Haen päivitystä…";
 
