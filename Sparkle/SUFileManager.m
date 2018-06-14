@@ -71,12 +71,12 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
 
 + (instancetype)defaultManager
 {
-    return [[self alloc] initWithAuthorizationToolPath:nil];
+    return [(SUFileManager *)[self alloc] initWithAuthorizationToolPath:nil];
 }
 
 + (instancetype)fileManagerWithAuthorizationToolPath:(NSString *)authorizationToolPath
 {
-    return [[self alloc] initWithAuthorizationToolPath:authorizationToolPath];
+    return [(SUFileManager *)[self alloc] initWithAuthorizationToolPath:authorizationToolPath];
 }
 
 - (instancetype)fileManagerByPreservingAuthorizationRights
@@ -269,7 +269,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     }
 
     if (isDirectory != NULL) {
-        *isDirectory = [[attributes objectForKey:NSFileType] isEqualToString:NSFileTypeDirectory];
+        *isDirectory = [(NSString *)[attributes objectForKey:NSFileType] isEqualToString:NSFileTypeDirectory];
     }
 
     return YES;
@@ -304,7 +304,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
 - (BOOL)_removeQuarantineWithAuthenticationAtRootURL:(NSURL *)rootURL error:(NSError *__autoreleasing *)error
 {
     // Because this is a system utility, it's fine to follow the symbolic link if one exists
-    if (![_fileManager fileExistsAtPath:@(XATTR_UTILITY_PATH)]) {
+    if (![_fileManager fileExistsAtPath:(NSString *)@(XATTR_UTILITY_PATH)]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: @"xattr utility does not exist on this system." }];
         }

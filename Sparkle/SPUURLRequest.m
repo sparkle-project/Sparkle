@@ -50,7 +50,7 @@ static NSString *SPUURLRequestNetworkServiceTypeKey = @"SPUURLRequestNetworkServ
 
 + (instancetype)URLRequestWithRequest:(NSURLRequest *)request
 {
-    return [[[self class] alloc] initWithURL:request.URL cachePolicy:request.cachePolicy timeoutInterval:request.timeoutInterval httpHeaderFields:request.allHTTPHeaderFields networkServiceType:request.networkServiceType];
+    return [(SPUURLRequest *)[[self class] alloc] initWithURL:request.URL cachePolicy:request.cachePolicy timeoutInterval:request.timeoutInterval httpHeaderFields:request.allHTTPHeaderFields networkServiceType:request.networkServiceType];
 }
 
 + (BOOL)supportsSecureCoding
