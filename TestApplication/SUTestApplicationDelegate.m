@@ -30,7 +30,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     NSBundle *mainBundle = [NSBundle mainBundle];
     
     // Check if we are already up to date
-    if ([[mainBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey] isEqualToString:UPDATED_VERSION]) {
+    if ([(NSString *)[mainBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey] isEqualToString:UPDATED_VERSION]) {
         NSAlert *alreadyUpdatedAlert = [[NSAlert alloc] init];
         alreadyUpdatedAlert.messageText = @"Update succeeded!";
         alreadyUpdatedAlert.informativeText = @"This is the updated version of Sparkle Test App.\n\nDelete and rebuild the app to test updates again.";

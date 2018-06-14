@@ -232,7 +232,7 @@ int main(int __unused argc, const char __unused *argv[])
 {
     @autoreleasepool
     {
-        NSArray *args = [[NSProcessInfo processInfo] arguments];
+        NSArray<NSString *> *args = [[NSProcessInfo processInfo] arguments];
         if (args.count < 5 || args.count > 7) {
             return EXIT_FAILURE;
         }

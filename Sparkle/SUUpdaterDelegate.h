@@ -64,11 +64,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  
  \return An array of dictionaries with keys: "key", "value", "displayKey", "displayValue", the latter two being specifically for display to the user.
  */
-#if __has_feature(objc_generics)
 - (NSArray<NSDictionary<NSString *, NSString *> *> *)feedParametersForUpdater:(SUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
-#else
-- (NSArray *)feedParametersForUpdater:(SUUpdater *)updater sendingSystemProfile:(BOOL)sendingProfile;
-#endif
 
 /*!
  Returns a custom appcast URL.

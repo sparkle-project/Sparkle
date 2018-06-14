@@ -242,7 +242,7 @@ BOOL modifyPermissions(NSString *path, mode_t desiredPermissions)
         return NO;
     }
     mode_t newMode = ([permissions unsignedShortValue] & ~PERMISSION_FLAGS) | desiredPermissions;
-    int (*changeModeFunc)(const char *, mode_t) = [[attributes objectForKey:NSFileType] isEqualToString:NSFileTypeSymbolicLink] ? lchmod : chmod;
+    int (*changeModeFunc)(const char *, mode_t) = [(NSString *)[attributes objectForKey:NSFileType] isEqualToString:NSFileTypeSymbolicLink] ? lchmod : chmod;
     if (changeModeFunc([path fileSystemRepresentation], newMode) != 0) {
         return NO;
     }
