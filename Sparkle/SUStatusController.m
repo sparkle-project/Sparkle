@@ -136,7 +136,7 @@ static NSString *const SUStatusControllerTouchBarIndentifier = @"" SPARKLE_BUNDL
 
 - (NSTouchBar *)makeTouchBar
 {
-    NSTouchBar *touchBar = [[NSClassFromString(@"NSTouchBar") alloc] init];
+    NSTouchBar *touchBar = [(NSTouchBar *)[NSClassFromString(@"NSTouchBar") alloc] init];
     touchBar.defaultItemIdentifiers = @[ SUStatusControllerTouchBarIndentifier,];
     touchBar.principalItemIdentifier = SUStatusControllerTouchBarIndentifier;
     touchBar.delegate = self;

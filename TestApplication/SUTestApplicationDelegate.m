@@ -31,7 +31,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     NSBundle *mainBundle = [NSBundle mainBundle];
     
     // Check if we are already up to date
-    if ([[mainBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey] isEqualToString:UPDATED_VERSION]) {
+    if ([(NSString *)[mainBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey] isEqualToString:UPDATED_VERSION]) {
         NSAlert *alreadyUpdatedAlert = [[NSAlert alloc] init];
         alreadyUpdatedAlert.messageText = @"Update succeeded!";
         alreadyUpdatedAlert.informativeText = @"This is the updated version of Sparkle Test App.\n\nDelete and rebuild the app to test updates again.";
@@ -117,7 +117,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
             NSString *zipName = @"Sparkle_Test_App.zip";
             NSTask *dittoTask = [[NSTask alloc] init];
             dittoTask.launchPath = @"/usr/bin/ditto";
-            dittoTask.arguments = @[@"-c", @"-k", @"--sequesterRsrc", @"--keepParent", destinationBundleURL.lastPathComponent, zipName];
+            dittoTask.arguments = @[@"-c", @"-k", @"--sequesterRsrc", @"--keepParent", (NSString *)destinationBundleURL.lastPathComponent, zipName];
             dittoTask.currentDirectoryPath = serverDirectoryPath;
             [dittoTask launch];
             [dittoTask waitUntilExit];
@@ -138,7 +138,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
             signUpdateTask.launchPath = signUpdatePath;
             
             NSURL *archiveURL = [serverDirectoryURL URLByAppendingPathComponent:zipName];
-            signUpdateTask.arguments = @[archiveURL.path, privateKeyPath];
+            signUpdateTask.arguments = @[(NSString *)archiveURL.path, privateKeyPath];
             
             NSPipe *outputPipe = [NSPipe pipe];
             signUpdateTask.standardOutput = outputPipe;
@@ -221,7 +221,7 @@ static NSString * const UPDATED_VERSION = @"2.0";
     codeSignConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(TestAppHelperProtocol)];
     [codeSignConnection resume];
     
-    [codeSignConnection.remoteObjectProxy codeSignApplicationAtPath:applicationPath reply:^(BOOL success) {
+    [(id<TestAppHelperProtocol>)codeSignConnection.remoteObjectProxy codeSignApplicationAtPath:applicationPath reply:^(BOOL success) {
         assert(success);
         [codeSignConnection invalidate];
         

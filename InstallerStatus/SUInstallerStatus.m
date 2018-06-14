@@ -55,12 +55,12 @@
 
 - (void)probeStatusInfoWithReply:(void (^)(NSData * _Nullable installationInfoData))reply
 {
-    [self.connection.remoteObjectProxy probeStatusInfoWithReply:reply];
+    [(id<SUStatusInfoProtocol>)self.connection.remoteObjectProxy probeStatusInfoWithReply:reply];
 }
 
 - (void)probeStatusConnectivityWithReply:(void (^)(void))reply
 {
-    [self.connection.remoteObjectProxy probeStatusConnectivityWithReply:reply];
+    [(id<SUStatusInfoProtocol>)self.connection.remoteObjectProxy probeStatusConnectivityWithReply:reply];
 }
 
 // This method can be called by us or from a remote

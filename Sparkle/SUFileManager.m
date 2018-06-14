@@ -84,7 +84,7 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
     }
 
     if (isDirectory != NULL) {
-        *isDirectory = [[attributes objectForKey:NSFileType] isEqualToString:NSFileTypeDirectory];
+        *isDirectory = [(NSString *)[attributes objectForKey:NSFileType] isEqualToString:NSFileTypeDirectory];
     }
 
     return YES;

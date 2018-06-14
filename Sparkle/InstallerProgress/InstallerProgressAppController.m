@@ -135,7 +135,7 @@ static const NSTimeInterval SUTerminationTimeDelay = 0.3;
     [self.statusInfo startListener];
     
     [self.connection resume];
-    [self.connection.remoteObjectProxy connectionDidInitiateWithReply:^{
+    [(id<SUInstallerAgentInitiationProtocol>)self.connection.remoteObjectProxy connectionDidInitiateWithReply:^{
         dispatch_async(dispatch_get_main_queue(), ^{
             self.connected = YES;
         });

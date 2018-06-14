@@ -76,7 +76,7 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
     }
     
     if (![NSApp modalWindow]) { // do not prompt if there is is another modal window on screen
-        SUUpdatePermissionPrompt *prompt = [[[self class] alloc] initPromptWithHost:host request:request reply:reply];
+        SUUpdatePermissionPrompt *prompt = [(SUUpdatePermissionPrompt *)[[self class] alloc] initPromptWithHost:host request:request reply:reply];
         NSWindow *window = [prompt window];
         if (window) {
             [NSApp runModalForWindow:window];
@@ -86,7 +86,7 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 
 - (BOOL)shouldAskAboutProfile
 {
-    return [[self.host objectForInfoDictionaryKey:SUEnableSystemProfilingKey] boolValue];
+    return [(NSNumber *)[self.host objectForInfoDictionaryKey:SUEnableSystemProfilingKey] boolValue];
 }
 
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
@@ -160,7 +160,7 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
     [self.moreInfoView setHidden:!self.isShowingMoreInfo];
 }
 
-- (IBAction)finishPrompt:(id)sender
+- (IBAction)finishPrompt:(NSButton *)sender
 {
     SUUpdatePermissionResponse *response = [[SUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:([sender tag] == 1) sendSystemProfile:self.shouldSendProfile];
     self.reply(response);
@@ -171,7 +171,7 @@ static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE
 
 - (NSTouchBar *)makeTouchBar
 {
-    NSTouchBar *touchBar = [[NSClassFromString(@"NSTouchBar") alloc] init];
+    NSTouchBar *touchBar = [(NSTouchBar *)[NSClassFromString(@"NSTouchBar") alloc] init];
     touchBar.defaultItemIdentifiers = @[SUUpdatePermissionPromptTouchBarIndentifier,];
     touchBar.principalItemIdentifier = SUUpdatePermissionPromptTouchBarIndentifier;
     touchBar.delegate = self;

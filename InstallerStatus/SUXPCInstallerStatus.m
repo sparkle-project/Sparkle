@@ -50,29 +50,29 @@
     self.invalidationBlock = invalidationHandler;
     
     __weak SUXPCInstallerStatus *weakSelf = self;
-    [self.connection.remoteObjectProxy setInvalidationHandler:^{
+    [(id<SUInstallerStatusProtocol>)self.connection.remoteObjectProxy setInvalidationHandler:^{
         [weakSelf invokeInvalidation];
     }];
 }
 
 - (void)setServiceName:(NSString *)serviceName
 {
-    [self.connection.remoteObjectProxy setServiceName:serviceName];
+    [(id<SUInstallerStatusProtocol>)self.connection.remoteObjectProxy setServiceName:serviceName];
 }
 
 - (void)probeStatusInfoWithReply:(void (^)(NSData * _Nullable installationInfoData))reply
 {
-    [self.connection.remoteObjectProxy probeStatusInfoWithReply:reply];
+    [(id<SUInstallerStatusProtocol>)self.connection.remoteObjectProxy probeStatusInfoWithReply:reply];
 }
 
 - (void)probeStatusConnectivityWithReply:(void (^)(void))reply
 {
-    [self.connection.remoteObjectProxy probeStatusConnectivityWithReply:reply];
+    [(id<SUInstallerStatusProtocol>)self.connection.remoteObjectProxy probeStatusConnectivityWithReply:reply];
 }
 
 - (void)invalidate
 {
-    [self.connection.remoteObjectProxy invalidate];
+    [(id<SUInstallerStatusProtocol>)self.connection.remoteObjectProxy invalidate];
     [self.connection invalidate];
     self.connection = nil;
 }

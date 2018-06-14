@@ -34,7 +34,7 @@
         return NO;
     }
 
-    SUDSAVerifier *verifier = [[self alloc] initWithPublicKeyData:[pkeyString dataUsingEncoding:NSUTF8StringEncoding]];
+    SUDSAVerifier *verifier = [(SUDSAVerifier *)[self alloc] initWithPublicKeyData:[pkeyString dataUsingEncoding:NSUTF8StringEncoding]];
 
     if (!verifier) {
         return NO;

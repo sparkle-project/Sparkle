@@ -91,7 +91,7 @@ static NSString *SUInstallerConnectionKeepAliveReason = @"Installer Connection K
 
 - (void)handleMessageWithIdentifier:(int32_t)identifier data:(NSData *)data
 {
-    [self.connection.remoteObjectProxy handleMessageWithIdentifier:identifier data:data];
+    [(id<SUInstallerCommunicationProtocol>)self.connection.remoteObjectProxy handleMessageWithIdentifier:identifier data:data];
 }
 
 // This method can be called by us or from a remote
