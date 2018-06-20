@@ -1870,6 +1870,7 @@
 			files = (
 			);
 			inputPaths = (
+				$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH,
 			);
 			name = "Run Script: Set Git Version Info";
 			outputPaths = (
@@ -1885,6 +1886,7 @@
 			files = (
 			);
 			inputPaths = (
+				$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH,
 			);
 			name = "Run Script: Set Git Version Info";
 			outputPaths = (
