@@ -1,5 +1,7 @@
 .PHONY: all localizable-strings release build test ci
 
+all: build
+
 ifndef BUILDDIR
     BUILDDIR := $(shell mktemp -d "$(TMPDIR)/Sparkle.XXXXXX")
 endif

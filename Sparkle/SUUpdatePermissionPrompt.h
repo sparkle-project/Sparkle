@@ -24,7 +24,7 @@ typedef NS_ENUM(NSInteger, SUPermissionPromptResult) {
 + (void)promptWithHost:(SUHost *)host systemProfile:(NSArray *)profile reply:(void (^)(SUUpdatePermissionResponse *))reply;
 
 - (IBAction)toggleMoreInfo:(id)sender;
-- (IBAction)finishPrompt:(id)sender;
+- (IBAction)finishPrompt:(NSButton *)sender;
 @end
 
 #endif

@@ -50,14 +50,14 @@
 {
     NSString *bundleVersion = [host objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     NSString *trimmedVersion = @"";
-    
+
     if (bundleVersion != nil) {
         NSMutableCharacterSet *validCharacters = [NSMutableCharacterSet alphanumericCharacterSet];
         [validCharacters formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@".-()"]];
-        
+
         trimmedVersion = [bundleVersion stringByTrimmingCharactersInSet:[validCharacters invertedSet]];
     }
-    
+
     return trimmedVersion.length > 0 ? trimmedVersion : nil;
 }
 
@@ -77,7 +77,7 @@
     }
 
     SUFileManager *fileManager = [SUFileManager fileManagerWithAuthorizationToolPath:fileOperationToolPath];
-    
+
     // Create a temporary directory for our new app that resides on our destination's volume
     NSString *preferredName = [installationURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingString:@" (Incomplete Update)"];
     NSURL *installationDirectory = installationURL.URLByDeletingLastPathComponent;
@@ -107,7 +107,7 @@
     // Release our new app from quarantine, fix its owner and group IDs, and update its modification time while it's at our temporary destination
     // We must leave moving the app to its destination as the final step in installing it, so that
     // it's not possible our new app can be left in an incomplete state at the final destination
-    
+
     NSError *quarantineError = nil;
     if (![fileManager releaseItemFromQuarantineAtRootURL:newTempURL error:&quarantineError]) {
         // Not big enough of a deal to fail the entire installation
@@ -127,14 +127,14 @@
         }
         return NO;
     }
-    
+
     if (![fileManager changeOwnerAndGroupOfItemAtRootURL:newTempURL toMatchURL:oldURL error:error]) {
         // But this is big enough of a deal to fail
         SULog(SULogLevelError, @"Failed to change owner and group of new app at %@ to match old app at %@", newTempURL.path, oldURL.path);
         [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
         return NO;
     }
-    
+
     if (progress) {
         progress(5/10.0);
     }
@@ -152,16 +152,16 @@
     NSString *oldDestinationName = nil;
     if (SPARKLE_APPEND_VERSION_NUMBER) {
         NSString *oldBundleVersion = [self bundleVersionAppropriateForFilenameFromHost:host];
-        
+
         oldDestinationName = [oldURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingFormat:@" (%@)", oldBundleVersion != nil ? oldBundleVersion : @"old"];
     } else {
         oldDestinationName = oldURL.lastPathComponent.stringByDeletingPathExtension;
     }
-    
+
     NSString *oldURLExtension = oldURL.pathExtension;
     NSString *oldDestinationNameWithPathExtension = [oldDestinationName stringByAppendingPathExtension:oldURLExtension];
     NSURL *oldURLDirectory = oldURL.URLByDeletingLastPathComponent;
-    
+
     // Create a temporary directory for our old app that resides on its volume
     NSURL *tempOldDirectoryURL = [fileManager makeTemporaryDirectoryWithPreferredName:oldDestinationName appropriateForDirectoryURL:oldURLDirectory error:error];
     if (tempOldDirectoryURL == nil) {
@@ -178,11 +178,11 @@
     NSURL *oldTempURL = [tempOldDirectoryURL URLByAppendingPathComponent:oldDestinationNameWithPathExtension];
     if (![fileManager moveItemAtURL:oldURL toURL:oldTempURL error:error]) {
         SULog(SULogLevelError, @"Failed to move the old app at %@ to a temporary location at %@", oldURL.path, oldTempURL.path);
-        
+
         // Just forget about our updated app on failure
         [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
         [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
-        
+
         return NO;
     }
 
@@ -193,14 +193,14 @@
     // Move the new app to its final destination
     if (![fileManager moveItemAtURL:newTempURL toURL:installationURL error:error]) {
         SULog(SULogLevelError, @"Failed to move new app at %@ to final destination %@", newTempURL.path, installationURL.path);
-        
+
         // Forget about our updated app on failure
         [fileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
-        
+
         // Attempt to restore our old app back the way it was on failure
         [fileManager moveItemAtURL:oldTempURL toURL:oldURL error:NULL];
         [fileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
-        
+
         return NO;
     }
 
@@ -210,7 +210,7 @@
 
     // From here on out, we don't really need to bring up authorization if we haven't done so prior
     SUFileManager *constrainedFileManager = [fileManager fileManagerByPreservingAuthorizationRights];
-    
+
     // Cleanup
     [constrainedFileManager removeItemAtURL:tempOldDirectoryURL error:NULL];
     [constrainedFileManager removeItemAtURL:tempNewDirectoryURL error:NULL];
@@ -225,20 +225,20 @@
 - (BOOL)performInitialInstallation:(NSError * __autoreleasing *)error
 {
     BOOL allowDowngrades = SPARKLE_AUTOMATED_DOWNGRADES;
-    
+
     // Prevent malicious downgrades
     if (!allowDowngrades) {
         NSString *hostVersion = [self.host version];
-        
+
         NSBundle *bundle = [NSBundle bundleWithPath:self.bundlePath];
         SUHost *updateHost = [[SUHost alloc] initWithBundle:bundle];
         NSString *updateVersion = [updateHost objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
-        
+
         id<SUVersionComparison> comparator = [[SUStandardVersionComparator alloc] init];
         if (!updateVersion || [comparator compareVersion:hostVersion toVersion:updateVersion] == NSOrderedDescending) {
             if (error != NULL) {
                 NSString *errorMessage = [NSString stringWithFormat:@"For security reasons, updates that downgrade version of the application are not allowed. Refusing to downgrade app from version %@ to %@. Aborting update.", hostVersion, updateVersion];
-                
+
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUDowngradeError userInfo:@{ NSLocalizedDescriptionKey: errorMessage }];
             }
             return NO;

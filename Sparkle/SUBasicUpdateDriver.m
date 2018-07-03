@@ -25,10 +25,14 @@
 #import "SUAppcast.h"
 #import "SUAppcastItem.h"
 
+#import "SPUURLRequest.h"
+#import "SPUDownloaderDeprecated.h"
+#import "SPUDownloaderSession.h"
+
 @interface SUBasicUpdateDriver ()
 
 @property (strong) SUAppcastItem *updateItem;
-@property (strong) NSURLDownload *download;
+@property (strong) SPUDownloader *download;
 @property (copy) NSString *downloadPath;
 
 @property (strong) SUAppcastItem *nonDeltaUpdateItem;
@@ -192,10 +196,10 @@
 
     if ([self itemContainsValidUpdate:item]) {
         self.updateItem = item;
-        [self didFindValidUpdate];
+        [self performSelectorOnMainThread:@selector(didFindValidUpdate) withObject:nil waitUntilDone:NO];
     } else {
         self.updateItem = nil;
-        [self didNotFindUpdate];
+        [self performSelectorOnMainThread:@selector(didNotFindUpdate) withObject:nil waitUntilDone:NO];
     }
 }
 
@@ -256,6 +260,9 @@
 
 - (void)downloadUpdate
 {
+    NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
+    assert(bundleIdentifier != nil);
+    
     // Clear cache directory so that downloads can't possibly accumulate inside
     NSString *appCachePath = [self appCachePath];
     if ([[NSFileManager defaultManager] fileExistsAtPath:appCachePath]) {
@@ -275,43 +282,51 @@
                       willDownloadUpdate:self.updateItem
                              withRequest:request];
     }
-    self.download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
+    
+    if ([SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 9, 0}]) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability"
+        self.download = [[SPUDownloaderSession alloc] initWithDelegate:self];
+#pragma clang diagnostic pop
+    }
+    else {
+        self.download = [[SPUDownloaderDeprecated alloc] initWithDelegate:self];
+    }
+    SPUURLRequest *urlRequest = [SPUURLRequest URLRequestWithRequest:request];
+    NSString *desiredFilename = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
+    [self.download startPersistentDownloadWithRequest:urlRequest bundleIdentifier:bundleIdentifier desiredFilename:desiredFilename];
 }
 
-- (void)download:(NSURLDownload *)__unused d decideDestinationWithSuggestedFilename:(NSString *)name
+
+- (void)downloaderDidSetDestinationName:(NSString *)destinationName temporaryDirectory:(NSString *)temporaryDirectory
 {
-    NSString *downloadFileName = [NSString stringWithFormat:@"%@ %@", [self.host name], [self.updateItem versionString]];
-    
-    NSString *appCachePath = [self appCachePath];
-    
-    self.tempDir = [appCachePath stringByAppendingPathComponent:downloadFileName];
-    int cnt = 1;
-	while ([[NSFileManager defaultManager] fileExistsAtPath:self.tempDir] && cnt <= 999)
-	{
-        self.tempDir = [appCachePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@ %d", downloadFileName, cnt++]];
-    }
-
-    // Create the temporary directory if necessary.
-    BOOL success = [[NSFileManager defaultManager] createDirectoryAtPath:self.tempDir withIntermediateDirectories:YES attributes:nil error:NULL];
-	if (!success)
-	{
-        // Okay, something's really broken with this user's file structure.
-        [self.download cancel];
-        [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUTemporaryDirectoryError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Can't make a temporary directory for the update download at %@.", self.tempDir] }]];
-    }
-
-    self.downloadPath = [self.tempDir stringByAppendingPathComponent:name];
-    [self.download setDestination:self.downloadPath allowOverwrite:YES];
+    self.tempDir = temporaryDirectory;
+    self.downloadPath = [temporaryDirectory stringByAppendingPathComponent:destinationName];
 }
 
-- (void)downloadDidFinish:(NSURLDownload *)__unused d
+- (void)downloaderDidReceiveExpectedContentLength:(int64_t)__unused expectedContentLength
 {
+    // don't need to do anything here as there's no GUI with this driver (there can be with child classes)
+}
+
+- (void)downloaderDidReceiveDataOfLength:(uint64_t)__unused length
+{
+    // don't need do anything here as there's no GUI with this driver (there can be with child classes)
+}
+
+- (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData * _Nullable)__unused downloadData
+{
+    // finished. downloadData should be nil as this was a permanent download
     assert(self.updateItem);
-
+    id<SUUpdaterPrivate> updater = self.updater;
+    if ([[updater delegate] respondsToSelector:@selector(updater:didDownloadUpdate:)]) {
+        [[updater delegate] updater:self.updater didDownloadUpdate:self.updateItem];
+    }
+    
     [self extractUpdate];
 }
 
-- (void)download:(NSURLDownload *)__unused download didFailWithError:(NSError *)error
+- (void)downloaderDidFailWithError:(NSError *)error
 {
     NSURL *failingUrl = [error.userInfo objectForKey:NSURLErrorFailingURLErrorKey];
     if (!failingUrl) {
@@ -319,29 +334,22 @@
     }
     
     id<SUUpdaterPrivate> updater = self.updater;
-
+    
     if ([[updater delegate] respondsToSelector:@selector(updater:failedToDownloadUpdate:error:)]) {
         [[updater delegate] updater:self.updater
-                  failedToDownloadUpdate:self.updateItem
-                                   error:error];
+             failedToDownloadUpdate:self.updateItem
+                              error:error];
     }
-
+    
     NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{
-        NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while downloading the update. Please try again later.", nil),
-        NSUnderlyingErrorKey: error,
-    }];
+                                                                                    NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while downloading the update. Please try again later.", nil),
+                                                                                    NSUnderlyingErrorKey: error,
+                                                                                    }];
     if (failingUrl) {
         [userInfo setObject:failingUrl forKey:NSURLErrorFailingURLErrorKey];
     }
-
+    
     [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo]];
-}
-
-- (BOOL)download:(NSURLDownload *)__unused download shouldDecodeSourceDataOfMIMEType:(NSString *)encodingType
-{
-    // We don't want the download system to extract our gzips.
-    // Note that we use a substring matching here instead of direct comparison because the docs say "application/gzip" but the system *uses* "application/x-gzip". This is a documentation bug.
-    return ([encodingType rangeOfString:@"gzip"].location == NSNotFound);
 }
 
 - (void)extractUpdate
@@ -367,13 +375,20 @@
         NSError *reason = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{NSLocalizedDescriptionKey: @"Failed to extract update."}];
         [self unarchiverDidFailWithError:reason];
     } else {
+        if ([[updater delegate] respondsToSelector:@selector(updater:willExtractUpdate:)]) {
+            [[updater delegate] updater:self.updater willExtractUpdate:self.updateItem];
+        }
+        
         [unarchiver unarchiveWithCompletionBlock:^(NSError *err){
             if (err) {
                 [self unarchiverDidFailWithError:err];
                 return;
             }
+            if ([[updater delegate] respondsToSelector:@selector(updater:didExtractUpdate:)]) {
+                [[updater delegate] updater:self.updater didExtractUpdate:self.updateItem];
+            }
             
-            [self unarchiverDidFinish:nil];
+            [self performSelectorOnMainThread:@selector(unarchiverDidFinish:) withObject:nil waitUntilDone:NO];
         } progressBlock:^(double progress) {
             [self unarchiver:nil extractedProgress:progress];
         }];

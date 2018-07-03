@@ -2,7 +2,7 @@
 
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ wurde geladen und steht zur Installation bereit! Möchtest du %1$@ jetzt durch die neue Version ersetzen und neu starten?";
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ kann nicht aktualisiert werden, weil es von einem Ort ohne Schreibzugriff oder temporären Ort aus gestartet wurde. Kopiere %1$@ in den Programmeordner, starte es von dort aus und versuche es erneut zu aktualisieren.";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ kann nicht aktualisiert werden, da es aus dem Downloads-Order, oder von einer DMG Datei oder Laufwerk ohne Schreibzugriff gestartet wurde. Kopiere %1$@ in den Programmeordner, starte es von dort aus und versuche es erneut zu aktualisieren.";
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ ist zurzeit die neueste verfügbare Version.";
 

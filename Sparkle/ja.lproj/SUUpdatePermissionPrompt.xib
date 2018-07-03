@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13529"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -60,7 +60,7 @@ Gw
                     <textField verticalHuggingPriority="750" id="32">
                         <rect key="frame" x="104" y="114" width="289" height="34"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="アップデートを自動で確認しますか？" id="178">
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="アップデートを自動で確認しますか?" id="178">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -145,10 +145,10 @@ Gw
                     <rect key="frame" x="1" y="128" width="358" height="70"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="183">
-                        <font key="font" size="11" name=".HiraKakuInterface-W3"/>
+                        <font key="font" metaFont="smallSystem"/>
                         <string key="title">匿名のシステムプロファイル情報は、今後の開発の参考にさせていただきます。この件に関してご質問があればご連絡下さい。
 
-以下の情報が送信されます：</string>
+以下の情報が送信されます:</string>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
@@ -167,7 +167,7 @@ Gw
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn editable="NO" width="128" minWidth="40" maxWidth="1000" id="42">
+                                    <tableColumn identifier="" editable="NO" width="128" minWidth="40" maxWidth="1000" id="42">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -183,7 +183,7 @@ Gw
                                             <binding destination="24" name="value" keyPath="arrangedObjects.displayKey" id="174"/>
                                         </connections>
                                     </tableColumn>
-                                    <tableColumn editable="NO" width="219" minWidth="40" maxWidth="1000" id="44">
+                                    <tableColumn identifier="" editable="NO" width="219" minWidth="40" maxWidth="1000" id="44">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
