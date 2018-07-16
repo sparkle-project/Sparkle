@@ -589,7 +589,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     NSFileManager *filemgr;
     filemgr = [NSFileManager defaultManager];
     
-    [filemgr removeItemAtPath: patchFile error: NULL];
+    unlink([patchFile fileSystemRepresentation]);
     if ([filemgr copyItemAtPath: temporaryFile toPath: patchFile error: NULL]  == YES)
     {
         NSLog (@"Copy successful");
@@ -599,15 +599,12 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         NSLog (@"Copy failed");
         return NO;
     }
-    if ([filemgr removeItemAtPath: temporaryFile error: NULL] != YES)
-    {
-        if (verbose) {
-            NSLog (@"Failed to remove temporary file, %@!\n", temporaryFile);
-        }
-        return NO;
-    }
+    //link([temporaryFile fileSystemRepresentation], [patchFile fileSystemRepresentation]);
+    unlink([temporaryFile fileSystemRepresentation]);
+
     if (verbose) {
         fprintf(stderr, "\nDone!\n");
     }
+
     return YES;
 }

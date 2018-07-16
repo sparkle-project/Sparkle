@@ -1,0 +1,611 @@
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400   1) //
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400   2) //  SUBinaryDeltaCreate.m
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400   3) //  Sparkle
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400   4) //
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400   5) //  Created by Mayur Pawashe on 4/9/15.
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400   6) //  Copyright (c) 2015 Sparkle Project. All rights reserved.
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400   7) //
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400   8) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400   9) #import "SUBinaryDeltaCreate.h"
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  10) #import <Foundation/Foundation.h>
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  11) #include "SUBinaryDeltaCommon.h"
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  12) #import <CommonCrypto/CommonDigest.h>
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  13) #include <fcntl.h>
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  14) #include <fts.h>
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  15) #include <libgen.h>
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  16) #include <stdio.h>
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  17) #include <sys/mman.h>
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  18) #include <sys/param.h>
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  19) #include <sys/stat.h>
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  20) #include <unistd.h>
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400  21) #include <sys/xattr.h>
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  22) #include <xar/xar.h>
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  23) 
+135d05b8b (Zorg              2017-01-17 07:08:29 -0500  24) #include "AppKitPrevention.h"
+c56694382 (Zorg              2017-01-16 21:17:25 -0500  25) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  26) extern int bsdiff(int argc, const char **argv);
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  27) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  28) @interface CreateBinaryDeltaOperation : NSOperation
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  29) @property (copy) NSString *relativePath;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  30) @property (strong) NSString *resultPath;
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400  31) @property (strong) NSNumber *oldPermissions;
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400  32) @property (strong) NSNumber *permissions;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  33) @property (strong) NSString *_fromPath;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  34) @property (strong) NSString *_toPath;
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400  35) - (id)initWithRelativePath:(NSString *)relativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree oldPermissions:(NSNumber *)oldPermissions newPermissions:(NSNumber *)permissions;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  36) @end
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  37) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  38) @implementation CreateBinaryDeltaOperation
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  39) @synthesize relativePath = _relativePath;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  40) @synthesize resultPath = _resultPath;
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400  41) @synthesize oldPermissions = _oldPermissions;
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400  42) @synthesize permissions = _permissions;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  43) @synthesize _fromPath = _fromPath;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  44) @synthesize _toPath = _toPath;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  45) 
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400  46) - (id)initWithRelativePath:(NSString *)relativePath oldTree:(NSString *)oldTree newTree:(NSString *)newTree oldPermissions:(NSNumber *)oldPermissions newPermissions:(NSNumber *)permissions
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  47) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  48)     if ((self = [super init])) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  49)         self.relativePath = relativePath;
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400  50)         self.oldPermissions = oldPermissions;
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400  51)         self.permissions = permissions;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  52)         self._fromPath = [oldTree stringByAppendingPathComponent:relativePath];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  53)         self._toPath = [newTree stringByAppendingPathComponent:relativePath];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  54)     }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  55)     return self;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  56) }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  57) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  58) - (void)main
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  59) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  60)     NSString *temporaryFile = temporaryFilename(@"BinaryDelta");
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000  61)     const char *argv[] = { "/usr/bin/bsdiff", [self._fromPath fileSystemRepresentation], [self._toPath fileSystemRepresentation], [temporaryFile fileSystemRepresentation] };
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  62)     int result = bsdiff(4, argv);
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  63)     if (!result)
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  64)         self.resultPath = temporaryFile;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  65) }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  66) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  67) @end
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  68) 
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400  69) #define INFO_HASH_KEY @"hash"
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400  70) #define INFO_TYPE_KEY @"type"
+d374d99e5 (Zorg              2015-04-12 19:57:40 -0400  71) #define INFO_PERMISSIONS_KEY @"permissions"
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400  72) #define INFO_SIZE_KEY @"size"
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400  73) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  74) static NSDictionary *infoForFile(FTSENT *ent)
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  75) {
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400  76)     NSData *hash = hashOfFileContents(ent);
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400  77)     if (!hash) {
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400  78)         return nil;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  79)     }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000  80) 
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400  81)     off_t size = (ent->fts_info != FTS_D) ? ent->fts_statp->st_size : 0;
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000  82) 
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400  83)     assert(ent->fts_statp != NULL);
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000  84) 
+d374d99e5 (Zorg              2015-04-12 19:57:40 -0400  85)     mode_t permissions = ent->fts_statp->st_mode & PERMISSION_FLAGS;
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000  86) 
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000  87)     return @{ INFO_HASH_KEY: hash,
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000  88)               INFO_TYPE_KEY: @(ent->fts_info),
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000  89)               INFO_PERMISSIONS_KEY: @(permissions),
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000  90)               INFO_SIZE_KEY: @(size) };
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  91) }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400  92) 
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400  93) static bool isSymLink(const FTSENT *ent)
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400  94) {
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400  95)     if (ent->fts_info == FTS_SL) {
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400  96)         return (true);
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400  97)     }
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400  98)     return false;
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400  99) }
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 100) 
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 101) static bool aclExists(const FTSENT *ent)
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 102) {
+bb624ffa5 (Jake Petroules    2016-06-15 13:46:19 -0700 103)     // macOS does not currently support ACLs for symlinks
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 104)     if (ent->fts_info == FTS_SL) {
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 105)         return NO;
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 106)     }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 107) 
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 108)     acl_t acl = acl_get_link_np(ent->fts_path, ACL_TYPE_EXTENDED);
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 109)     if (acl != NULL) {
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 110)         acl_entry_t entry;
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 111)         int result = acl_get_entry(acl, ACL_FIRST_ENTRY, &entry);
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 112)         assert(acl_free((void *)acl) == 0);
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 113)         return (result == 0);
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 114)     }
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 115)     return false;
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 116) }
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 117) 
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 118) static bool codeSignatureExtendedAttributeExists(const FTSENT *ent)
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 119) {
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 120)     const int options = XATTR_NOFOLLOW;
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 121)     ssize_t listSize = listxattr(ent->fts_path, NULL, 0, options);
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 122)     if (listSize == -1) {
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 123)         return false;
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 124)     }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 125) 
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 126)     char *buffer = malloc((size_t)listSize);
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 127)     assert(buffer != NULL);
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 128) 
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 129)     ssize_t sizeBack = listxattr(ent->fts_path, buffer, (size_t)listSize, options);
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 130)     assert(sizeBack == listSize);
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 131) 
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 132)     size_t startCharacterIndex = 0;
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 133)     for (size_t characterIndex = 0; characterIndex < (size_t)listSize; characterIndex++) {
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 134)         if (buffer[characterIndex] == '\0') {
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 135)             char *attribute = &buffer[startCharacterIndex];
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 136)             size_t length = characterIndex - startCharacterIndex;
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 137)             if (strncmp(APPLE_CODE_SIGN_XATTR_CODE_DIRECTORY_KEY, attribute, length) == 0 || strncmp(APPLE_CODE_SIGN_XATTR_CODE_REQUIREMENTS_KEY, attribute, length) == 0 || strncmp(APPLE_CODE_SIGN_XATTR_CODE_SIGNATURE_KEY, attribute, length) == 0) {
+330c73395 (Zorg              2015-05-05 20:25:42 -0400 138)                 free(buffer);
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 139)                 return true;
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 140)             }
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 141)             startCharacterIndex = characterIndex + 1;
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 142)         }
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 143)     }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 144) 
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 145)     free(buffer);
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 146)     return false;
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 147) }
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 148) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 149) static NSString *absolutePath(NSString *path)
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 150) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 151)     NSURL *url = [[NSURL alloc] initFileURLWithPath:path];
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 152)     return [[url absoluteURL] path];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 153) }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 154) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 155) static NSString *temporaryPatchFile(NSString *patchFile)
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 156) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 157)     NSString *path = absolutePath(patchFile);
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 158)     NSString *directory = [path stringByDeletingLastPathComponent];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 159)     NSString *file = [path lastPathComponent];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 160)     return [NSString stringWithFormat:@"%@/.%@.tmp", directory, file];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 161) }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 162) 
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 163) #define MIN_FILE_SIZE_FOR_CREATING_DELTA 4096
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 164) 
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 165) static BOOL shouldSkipDeltaCompression(NSDictionary *originalInfo, NSDictionary *newInfo)
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 166) {
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 167)     unsigned long long fileSize = [newInfo[INFO_SIZE_KEY] unsignedLongLongValue];
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 168)     if (fileSize < MIN_FILE_SIZE_FOR_CREATING_DELTA) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 169)         return YES;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 170)     }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 171) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 172)     if (!originalInfo) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 173)         return YES;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 174)     }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 175) 
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 176)     if ([originalInfo[INFO_TYPE_KEY] unsignedShortValue] != [newInfo[INFO_TYPE_KEY] unsignedShortValue]) {
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 177)         return YES;
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 178)     }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 179) 
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 180)     if ([originalInfo[INFO_HASH_KEY] isEqual:newInfo[INFO_HASH_KEY]]) {
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 181)         // this is possible if just the permissions have changed
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 182)         return YES;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 183)     }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 184) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 185)     return NO;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 186) }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 187) 
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 188) static BOOL shouldDeleteThenExtract(NSDictionary *originalInfo, NSDictionary *newInfo)
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 189) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 190)     if (!originalInfo) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 191)         return NO;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 192)     }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 193) 
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 194)     if ([originalInfo[INFO_TYPE_KEY] unsignedShortValue] != [newInfo[INFO_TYPE_KEY] unsignedShortValue]) {
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 195)         return YES;
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 196)     }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 197) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 198)     return NO;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 199) }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 200) 
+419b6aabe (Zorg              2015-04-13 00:05:46 -0400 201) static BOOL shouldSkipExtracting(NSDictionary *originalInfo, NSDictionary *newInfo)
+419b6aabe (Zorg              2015-04-13 00:05:46 -0400 202) {
+419b6aabe (Zorg              2015-04-13 00:05:46 -0400 203)     if (!originalInfo) {
+419b6aabe (Zorg              2015-04-13 00:05:46 -0400 204)         return NO;
+419b6aabe (Zorg              2015-04-13 00:05:46 -0400 205)     }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 206) 
+419b6aabe (Zorg              2015-04-13 00:05:46 -0400 207)     if ([originalInfo[INFO_TYPE_KEY] unsignedShortValue] != [newInfo[INFO_TYPE_KEY] unsignedShortValue]) {
+419b6aabe (Zorg              2015-04-13 00:05:46 -0400 208)         return NO;
+419b6aabe (Zorg              2015-04-13 00:05:46 -0400 209)     }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 210) 
+419b6aabe (Zorg              2015-04-13 00:05:46 -0400 211)     if (![originalInfo[INFO_HASH_KEY] isEqual:newInfo[INFO_HASH_KEY]]) {
+419b6aabe (Zorg              2015-04-13 00:05:46 -0400 212)         return NO;
+419b6aabe (Zorg              2015-04-13 00:05:46 -0400 213)     }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 214) 
+419b6aabe (Zorg              2015-04-13 00:05:46 -0400 215)     return YES;
+419b6aabe (Zorg              2015-04-13 00:05:46 -0400 216) }
+419b6aabe (Zorg              2015-04-13 00:05:46 -0400 217) 
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 218) static BOOL shouldChangePermissions(NSDictionary *originalInfo, NSDictionary *newInfo)
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 219) {
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 220)     if (!originalInfo) {
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 221)         return NO;
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 222)     }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 223) 
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 224)     if ([originalInfo[INFO_TYPE_KEY] unsignedShortValue] != [newInfo[INFO_TYPE_KEY] unsignedShortValue]) {
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 225)         return NO;
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 226)     }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 227) 
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 228)     if ([originalInfo[INFO_PERMISSIONS_KEY] unsignedShortValue] == [newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]) {
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 229)         return NO;
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 230)     }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 231) 
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 232)     return YES;
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 233) }
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 234) 
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 235) BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchFile, SUBinaryDeltaMajorVersion majorVersion, BOOL verbose, NSError *__autoreleasing *error)
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 236) {
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 237)     assert(source);
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 238)     assert(destination);
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 239)     assert(patchFile);
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 240)     assert(majorVersion >= FIRST_DELTA_DIFF_MAJOR_VERSION && majorVersion <= LATEST_DELTA_DIFF_MAJOR_VERSION);
+67b1e08a4 (Kornel Lesiński   2017-01-28 11:16:45 +0000 241) 
+67b1e08a4 (Kornel Lesiński   2017-01-28 11:16:45 +0000 242)     int minorVersion = latestMinorVersionForMajorVersion(majorVersion);
+67b1e08a4 (Kornel Lesiński   2017-01-28 11:16:45 +0000 243) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 244)     NSMutableDictionary *originalTreeState = [NSMutableDictionary dictionary];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 245) 
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 246)     char pathBuffer[PATH_MAX] = { 0 };
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 247)     if (![source getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)]) {
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 248)         if (error != NULL) {
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 249)             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to retrieve file system path representation from source %@", source] }];
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 250)         }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 251)         return NO;
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 252)     }
+6d7f95d91 (Jake Petroules    2015-07-09 17:08:33 -0700 253) 
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 254)     char *sourcePaths[] = { pathBuffer, 0 };
+6d7f95d91 (Jake Petroules    2015-07-09 17:08:33 -0700 255)     FTS *fts = fts_open(sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 256)     if (!fts) {
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 257)         if (error != NULL) {
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 258)             *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"fts_open failed on source: %@", @(strerror(errno))] }];
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 259)         }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 260)         return NO;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 261)     }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 262) 
+fef73cc29 (Zorg              2015-04-19 03:40:54 -0400 263)     if (verbose) {
+b780b476c (Zorg              2015-04-19 15:53:36 -0400 264)         fprintf(stderr, "Creating version %u.%u patch...\n", majorVersion, minorVersion);
+fef73cc29 (Zorg              2015-04-19 03:40:54 -0400 265)         fprintf(stderr, "Processing %s...", [source fileSystemRepresentation]);
+fef73cc29 (Zorg              2015-04-19 03:40:54 -0400 266)     }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 267) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 268)     FTSENT *ent = 0;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 269)     while ((ent = fts_read(fts))) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 270)         if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 271)             continue;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 272)         }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 273) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 274)         NSString *key = pathRelativeToDirectory(source, stringWithFileSystemRepresentation(ent->fts_path));
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 275)         if (![key length]) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 276)             continue;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 277)         }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 278) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 279)         NSDictionary *info = infoForFile(ent);
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 280)         if (!info) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 281)             if (verbose) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 282)                 fprintf(stderr, "\n");
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 283)             }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 284)             if (error != NULL) {
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 285)                 *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to retrieve info for file %@", @(ent->fts_path)] }];
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 286)             }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 287)             return NO;
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 288)         }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 289)         originalTreeState[key] = info;
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 290) 
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 291)         if (aclExists(ent)) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 292)             if (verbose) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 293)                 fprintf(stderr, "\n");
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 294)             }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 295)             if (error != NULL) {
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 296)                 *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Diffing ACLs are not supported. Detected ACL in before-tree on file %@", @(ent->fts_path)] }];
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 297)             }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 298)             return NO;
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 299)         }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 300) 
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 301)         if (codeSignatureExtendedAttributeExists(ent)) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 302)             if (verbose) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 303)                 fprintf(stderr, "\n");
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 304)             }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 305)             if (error != NULL) {
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 306)                 *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Diffing code signed extended attributes are not supported. Detected extended attribute in before-tree on file %@", @(ent->fts_path)] }];
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 307)             }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 308)             return NO;
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 309)         }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 310)     }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 311)     fts_close(fts);
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 312) 
+186cfa848 (Zorg              2015-04-17 14:53:54 -0400 313)     NSString *beforeHash = hashOfTreeWithVersion(source, majorVersion);
+186cfa848 (Zorg              2015-04-17 14:53:54 -0400 314) 
+186cfa848 (Zorg              2015-04-17 14:53:54 -0400 315)     if (!beforeHash) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 316)         if (verbose) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 317)             fprintf(stderr, "\n");
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 318)         }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 319)         if (error != NULL) {
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 320)             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to generate hash for tree %@", source] }];
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 321)         }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 322)         return NO;
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 323)     }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 324) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 325)     NSMutableDictionary *newTreeState = [NSMutableDictionary dictionary];
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 326)     for (NSString *key in originalTreeState) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 327)         newTreeState[key] = [NSNull null];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 328)     }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 329) 
+fef73cc29 (Zorg              2015-04-19 03:40:54 -0400 330)     if (verbose) {
+fef73cc29 (Zorg              2015-04-19 03:40:54 -0400 331)         fprintf(stderr, "\nProcessing %s...", [destination fileSystemRepresentation]);
+fef73cc29 (Zorg              2015-04-19 03:40:54 -0400 332)     }
+6d7f95d91 (Jake Petroules    2015-07-09 17:08:33 -0700 333) 
+6d7f95d91 (Jake Petroules    2015-07-09 17:08:33 -0700 334)     pathBuffer[0] = 0;
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 335)     if (![destination getFileSystemRepresentation:pathBuffer maxLength:sizeof(pathBuffer)]) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 336)         if (verbose) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 337)             fprintf(stderr, "\n");
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 338)         }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 339)         if (error != NULL) {
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 340)             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to retrieve file system path representation from destination %@", destination] }];
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 341)         }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 342)         return NO;
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 343)     }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 344) 
+6d7f95d91 (Jake Petroules    2015-07-09 17:08:33 -0700 345)     sourcePaths[0] = pathBuffer;
+6d7f95d91 (Jake Petroules    2015-07-09 17:08:33 -0700 346)     fts = fts_open(sourcePaths, FTS_PHYSICAL | FTS_NOCHDIR, compareFiles);
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 347)     if (!fts) {
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 348)         if (error != NULL) {
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 349)             *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"fts_open failed on destination: %@", @(strerror(errno))] }];
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 350)         }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 351)         return NO;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 352)     }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 353) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 354)     while ((ent = fts_read(fts))) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 355)         if (ent->fts_info != FTS_F && ent->fts_info != FTS_SL && ent->fts_info != FTS_D) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 356)             continue;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 357)         }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 358) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 359)         NSString *key = pathRelativeToDirectory(destination, stringWithFileSystemRepresentation(ent->fts_path));
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 360)         if (![key length]) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 361)             continue;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 362)         }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 363) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 364)         NSDictionary *info = infoForFile(ent);
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 365)         if (!info) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 366)             if (verbose) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 367)                 fprintf(stderr, "\n");
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 368)             }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 369)             if (error != NULL) {
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 370)                 *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to retrieve info from file %@", @(ent->fts_path)] }];
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 371)             }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 372)             return NO;
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 373)         }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 374) 
+186cfa848 (Zorg              2015-04-17 14:53:54 -0400 375)         // We should validate permissions and ACLs even if we don't store the info in the diff in the case of ACLs,
+186cfa848 (Zorg              2015-04-17 14:53:54 -0400 376)         // or in the case of permissions if the patch version is 1
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 377) 
+4dd4548be (Zorg              2015-05-05 21:47:23 -0400 378)         // We should also not allow files with code signed extended attributes since Apple doesn't recommend inserting these
+4dd4548be (Zorg              2015-05-05 21:47:23 -0400 379)         // inside an application, and since we don't preserve extended attribitutes anyway
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 380) 
+d374d99e5 (Zorg              2015-04-12 19:57:40 -0400 381)         mode_t permissions = [info[INFO_PERMISSIONS_KEY] unsignedShortValue];
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 382)         if (!isSymLink(ent) && !IS_VALID_PERMISSIONS(permissions)) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 383)             if (verbose) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 384)                 fprintf(stderr, "\n");
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 385)             }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 386)             if (error != NULL) {
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 387)                 *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Invalid file permissions after-tree on file %@ (only permissions with modes 0755 and 0644 are supported)", @(ent->fts_path)] }];
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 388)             }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 389)             return NO;
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 390)         }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 391) 
+8a4f4677b (Zorg              2015-04-17 01:35:17 -0400 392)         if (aclExists(ent)) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 393)             if (verbose) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 394)                 fprintf(stderr, "\n");
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 395)             }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 396)             if (error != NULL) {
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 397)                 *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Diffing ACLs are not supported. Detected ACL in after-tree on file %@", @(ent->fts_path)] }];
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 398)             }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 399)             return NO;
+d374d99e5 (Zorg              2015-04-12 19:57:40 -0400 400)         }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 401) 
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 402)         if (codeSignatureExtendedAttributeExists(ent)) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 403)             if (verbose) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 404)                 fprintf(stderr, "\n");
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 405)             }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 406)             if (error != NULL) {
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 407)                 *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Diffing code signed extended attributes are not supported. Detected extended attribute in after-tree on file %@", @(ent->fts_path)] }];
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 408)             }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 409)             return NO;
+4c782a67e (Zorg              2015-05-05 20:22:02 -0400 410)         }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 411) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 412)         NSDictionary *oldInfo = originalTreeState[key];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 413) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 414)         if ([info isEqual:oldInfo]) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 415)             [newTreeState removeObjectForKey:key];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 416)         } else {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 417)             newTreeState[key] = info;
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 418) 
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 419)             if (oldInfo && [oldInfo[INFO_TYPE_KEY] unsignedShortValue] == FTS_D && [info[INFO_TYPE_KEY] unsignedShortValue] != FTS_D) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 420)                 NSArray *parentPathComponents = key.pathComponents;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 421) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 422)                 for (NSString *childPath in originalTreeState) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 423)                     NSArray *childPathComponents = childPath.pathComponents;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 424)                     if (childPathComponents.count > parentPathComponents.count &&
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 425)                         [parentPathComponents isEqualToArray:[childPathComponents subarrayWithRange:NSMakeRange(0, parentPathComponents.count)]]) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 426)                         [newTreeState removeObjectForKey:childPath];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 427)                     }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 428)                 }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 429)             }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 430)         }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 431)     }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 432)     fts_close(fts);
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 433) 
+186cfa848 (Zorg              2015-04-17 14:53:54 -0400 434)     NSString *afterHash = hashOfTreeWithVersion(destination, majorVersion);
+186cfa848 (Zorg              2015-04-17 14:53:54 -0400 435)     if (!afterHash) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 436)         if (verbose) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 437)             fprintf(stderr, "\n");
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 438)         }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 439)         if (error != NULL) {
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 440)             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to generate hash for tree %@", destination] }];
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 441)         }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 442)         return NO;
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 443)     }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 444) 
+fef73cc29 (Zorg              2015-04-19 03:40:54 -0400 445)     if (verbose) {
+fef73cc29 (Zorg              2015-04-19 03:40:54 -0400 446)         fprintf(stderr, "\nGenerating delta...");
+fef73cc29 (Zorg              2015-04-19 03:40:54 -0400 447)     }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 448) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 449)     NSString *temporaryFile = temporaryPatchFile(patchFile);
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 450)     if (verbose) {
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 451)         fprintf(stderr, "Writing to temporary file %s...\n", [temporaryFile fileSystemRepresentation]);
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 452)     }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 453)     xar_t x = xar_open([temporaryFile fileSystemRepresentation], WRITE);
+21e4cc42c (Zorg              2015-10-07 18:44:14 -0400 454)     if (!x) {
+21e4cc42c (Zorg              2015-10-07 18:44:14 -0400 455)         if (verbose) {
+21e4cc42c (Zorg              2015-10-07 18:44:14 -0400 456)             fprintf(stderr, "\n");
+21e4cc42c (Zorg              2015-10-07 18:44:14 -0400 457)         }
+21e4cc42c (Zorg              2015-10-07 18:44:14 -0400 458)         if (error != NULL) {
+21e4cc42c (Zorg              2015-10-07 18:44:14 -0400 459)             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to write to %@", temporaryFile] }];
+21e4cc42c (Zorg              2015-10-07 18:44:14 -0400 460)         }
+21e4cc42c (Zorg              2015-10-07 18:44:14 -0400 461)         return NO;
+21e4cc42c (Zorg              2015-10-07 18:44:14 -0400 462)     }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 463) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 464)     xar_opt_set(x, XAR_OPT_COMPRESSION, "bzip2");
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 465) 
+a715babce (Zorg              2015-04-17 16:32:38 -0400 466)     xar_subdoc_t attributes = xar_subdoc_new(x, BINARY_DELTA_ATTRIBUTES_KEY);
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 467) 
+a715babce (Zorg              2015-04-17 16:32:38 -0400 468)     xar_subdoc_prop_set(attributes, MAJOR_DIFF_VERSION_KEY, [[NSString stringWithFormat:@"%u", majorVersion] UTF8String]);
+a715babce (Zorg              2015-04-17 16:32:38 -0400 469)     xar_subdoc_prop_set(attributes, MINOR_DIFF_VERSION_KEY, [[NSString stringWithFormat:@"%u", minorVersion] UTF8String]);
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 470) 
+186cfa848 (Zorg              2015-04-17 14:53:54 -0400 471)     // Version 1 patches don't have a major or minor version field, so we need to differentiate between the hash keys
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 472)     const char *beforeHashKey = MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion) ? BEFORE_TREE_SHA1_KEY : BEFORE_TREE_SHA1_OLD_KEY;
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 473)     const char *afterHashKey = MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion) ? AFTER_TREE_SHA1_KEY : AFTER_TREE_SHA1_OLD_KEY;
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 474) 
+186cfa848 (Zorg              2015-04-17 14:53:54 -0400 475)     xar_subdoc_prop_set(attributes, beforeHashKey, [beforeHash UTF8String]);
+186cfa848 (Zorg              2015-04-17 14:53:54 -0400 476)     xar_subdoc_prop_set(attributes, afterHashKey, [afterHash UTF8String]);
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 477) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 478)     NSOperationQueue *deltaQueue = [[NSOperationQueue alloc] init];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 479)     NSMutableArray *deltaOperations = [NSMutableArray array];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 480) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 481)     // Sort the keys by preferring the ones from the original tree to appear first
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 482)     // We want to enforce deleting before extracting in the case paths differ only by case
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 483)     NSArray *keys = [[newTreeState allKeys] sortedArrayUsingComparator:^NSComparisonResult(NSString *key1, NSString *key2) {
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 484)       NSComparisonResult insensitiveCompareResult = [key1 caseInsensitiveCompare:key2];
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 485)       if (insensitiveCompareResult != NSOrderedSame) {
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 486)           return insensitiveCompareResult;
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 487)       }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 488) 
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 489)       return originalTreeState[key1] ? NSOrderedAscending : NSOrderedDescending;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 490)     }];
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 491)     for (NSString *key in keys) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 492)         id value = [newTreeState valueForKey:key];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 493) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 494)         if ([value isEqual:[NSNull null]]) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 495)             xar_file_t newFile = xar_add_frombuffer(x, 0, [key fileSystemRepresentation], (char *)"", 1);
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 496)             assert(newFile);
+a715babce (Zorg              2015-04-17 16:32:38 -0400 497)             xar_prop_set(newFile, DELETE_KEY, "true");
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 498) 
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400 499)             if (verbose) {
+e978cb0a3 (Zorg              2015-04-19 17:29:51 -0400 500)                 fprintf(stderr, "\n❌  %s %s", VERBOSE_REMOVED, [key fileSystemRepresentation]);
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400 501)             }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 502)             continue;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 503)         }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 504) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 505)         NSDictionary *originalInfo = originalTreeState[key];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 506)         NSDictionary *newInfo = newTreeState[key];
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 507)         if (shouldSkipDeltaCompression(originalInfo, newInfo)) {
+3c78139ec (Zorg              2015-04-17 17:50:21 -0400 508)             if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion) && shouldSkipExtracting(originalInfo, newInfo)) {
+419b6aabe (Zorg              2015-04-13 00:05:46 -0400 509)                 if (shouldChangePermissions(originalInfo, newInfo)) {
+419b6aabe (Zorg              2015-04-13 00:05:46 -0400 510)                     xar_file_t newFile = xar_add_frombuffer(x, 0, [key fileSystemRepresentation], (char *)"", 1);
+419b6aabe (Zorg              2015-04-13 00:05:46 -0400 511)                     assert(newFile);
+a715babce (Zorg              2015-04-17 16:32:38 -0400 512)                     xar_prop_set(newFile, MODIFY_PERMISSIONS_KEY, [[NSString stringWithFormat:@"%u", [newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]] UTF8String]);
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 513) 
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400 514)                     if (verbose) {
+e978cb0a3 (Zorg              2015-04-19 17:29:51 -0400 515)                         fprintf(stderr, "\n👮  %s %s (0%o -> 0%o)", VERBOSE_MODIFIED, [key fileSystemRepresentation], [originalInfo[INFO_PERMISSIONS_KEY] unsignedShortValue], [newInfo[INFO_PERMISSIONS_KEY] unsignedShortValue]);
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400 516)                     }
+419b6aabe (Zorg              2015-04-13 00:05:46 -0400 517)                 }
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 518)             } else {
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 519)                 NSString *path = [destination stringByAppendingPathComponent:key];
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 520)                 xar_file_t newFile = xar_add_frompath(x, 0, [key fileSystemRepresentation], [path fileSystemRepresentation]);
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 521)                 assert(newFile);
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 522) 
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 523)                 if (shouldDeleteThenExtract(originalInfo, newInfo)) {
+9e9fef0d5 (Zorg              2015-04-18 17:59:52 -0400 524)                     if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion)) {
+9e9fef0d5 (Zorg              2015-04-18 17:59:52 -0400 525)                         xar_prop_set(newFile, DELETE_KEY, "true");
+9e9fef0d5 (Zorg              2015-04-18 17:59:52 -0400 526)                     } else {
+9e9fef0d5 (Zorg              2015-04-18 17:59:52 -0400 527)                         xar_prop_set(newFile, DELETE_THEN_EXTRACT_OLD_KEY, "true");
+9e9fef0d5 (Zorg              2015-04-18 17:59:52 -0400 528)                     }
+9e9fef0d5 (Zorg              2015-04-18 17:59:52 -0400 529)                 }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 530) 
+9e9fef0d5 (Zorg              2015-04-18 17:59:52 -0400 531)                 if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion)) {
+9e9fef0d5 (Zorg              2015-04-18 17:59:52 -0400 532)                     xar_prop_set(newFile, EXTRACT_KEY, "true");
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 533)                 }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 534) 
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400 535)                 if (verbose) {
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400 536)                     if (originalInfo) {
+e978cb0a3 (Zorg              2015-04-19 17:29:51 -0400 537)                         fprintf(stderr, "\n✏️  %s %s", VERBOSE_UPDATED, [key fileSystemRepresentation]);
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400 538)                     } else {
+578ba9ada (Zorg              2015-04-19 18:08:06 -0400 539)                         fprintf(stderr, "\n✅  %s %s", VERBOSE_ADDED, [key fileSystemRepresentation]);
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400 540)                     }
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400 541)                 }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 542)             }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 543)         } else {
+186cfa848 (Zorg              2015-04-17 14:53:54 -0400 544)             NSNumber *permissions =
+3c78139ec (Zorg              2015-04-17 17:50:21 -0400 545)                 (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion) && shouldChangePermissions(originalInfo, newInfo)) ?
+186cfa848 (Zorg              2015-04-17 14:53:54 -0400 546)                 newInfo[INFO_PERMISSIONS_KEY] :
+186cfa848 (Zorg              2015-04-17 14:53:54 -0400 547)                 nil;
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400 548)             CreateBinaryDeltaOperation *operation = [[CreateBinaryDeltaOperation alloc] initWithRelativePath:key oldTree:source newTree:destination oldPermissions:originalInfo[INFO_PERMISSIONS_KEY] newPermissions:permissions];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 549)             [deltaQueue addOperation:operation];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 550)             [deltaOperations addObject:operation];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 551)         }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 552)     }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 553) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 554)     [deltaQueue waitUntilAllOperationsAreFinished];
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 555) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 556)     for (CreateBinaryDeltaOperation *operation in deltaOperations) {
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 557)         NSString *resultPath = [operation resultPath];
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 558)         if (!resultPath) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 559)             if (verbose) {
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 560)                 fprintf(stderr, "\n");
+309aa157a (Zorg              2015-09-02 21:39:49 -0400 561)             }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 562)             if (error != NULL) {
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 563)                 *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create patch from source %@ and destination %@", operation.relativePath, resultPath] }];
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 564)             }
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 565)             return NO;
+bcab57d8f (Zorg              2015-04-12 14:46:26 -0400 566)         }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 567) 
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400 568)         if (verbose) {
+e978cb0a3 (Zorg              2015-04-19 17:29:51 -0400 569)             fprintf(stderr, "\n🔨  %s %s", VERBOSE_DIFFED, [[operation relativePath] fileSystemRepresentation]);
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400 570)         }
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 571) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 572)         xar_file_t newFile = xar_add_frompath(x, 0, [[operation relativePath] fileSystemRepresentation], [resultPath fileSystemRepresentation]);
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 573)         assert(newFile);
+a715babce (Zorg              2015-04-17 16:32:38 -0400 574)         xar_prop_set(newFile, BINARY_DELTA_KEY, "true");
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 575)         unlink([resultPath fileSystemRepresentation]);
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 576) 
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 577)         if (operation.permissions) {
+a715babce (Zorg              2015-04-17 16:32:38 -0400 578)             xar_prop_set(newFile, MODIFY_PERMISSIONS_KEY, [[NSString stringWithFormat:@"%u", [operation.permissions unsignedShortValue]] UTF8String]);
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 579) 
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400 580)             if (verbose) {
+e978cb0a3 (Zorg              2015-04-19 17:29:51 -0400 581)                 fprintf(stderr, "\n👮  %s %s (0%o -> 0%o)", VERBOSE_MODIFIED, [[operation relativePath] fileSystemRepresentation], operation.oldPermissions.unsignedShortValue, operation.permissions.unsignedShortValue);
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400 582)             }
+54522aa72 (Zorg              2015-04-12 23:21:40 -0400 583)         }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 584)     }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 585) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 586)     xar_close(x);
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 587) 
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 588)     unlink([patchFile fileSystemRepresentation]);
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 589)     if (verbose) {
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 590)         fprintf(stderr, "\nCopying %s to %s.\n", [temporaryFile fileSystemRepresentation], [patchFile fileSystemRepresentation]);
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 591)     }
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 592)     //link([temporaryFile fileSystemRepresentation], [patchFile fileSystemRepresentation]);
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 593)     NSLog(@"%d",[[NSFileManager defaultManager] isWritableFileAtPath:patchFile]);
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 594)     NSError *myerror;
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 595)     if ([[NSFileManager defaultManager] copyItemAtPath:temporaryFile toPath:patchFile error:&myerror]){
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 596)         NSLog(@"Copy Success: %@", myerror);
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 597)     } else {
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 598)         NSLog(@"Copy error: %@", myerror);
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 599)         *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to copy %@ to %@\n", temporaryFile, patchFile] }];
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 600)         //fprintf(stderr, "ERROR: failed to copy %s to %s.\n", [temporaryFile fileSystemRepresentation], [patchFile fileSystemRepresentation]);
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 601)         return NO;
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 602)     };
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 603)     
+000000000 (Not Committed Yet 2018-07-16 09:38:20 -0400 604)     //unlink([temporaryFile fileSystemRepresentation]);
+155816b60 (Kornel Lesiński   2017-01-28 11:35:48 +0000 605) 
+fef73cc29 (Zorg              2015-04-19 03:40:54 -0400 606)     if (verbose) {
+f9043aa0e (Zorg              2015-04-19 14:04:59 -0400 607)         fprintf(stderr, "\nDone!\n");
+fef73cc29 (Zorg              2015-04-19 03:40:54 -0400 608)     }
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 609) 
+c78070c74 (Zorg              2015-09-02 21:09:11 -0400 610)     return YES;
+08434edf7 (Zorg              2015-04-09 21:39:11 -0400 611) }

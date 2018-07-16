@@ -92,12 +92,12 @@ static NSDictionary *infoForFile(FTSENT *ent)
 
 static bool isSymLink(const FTSENT *ent)
 {
-    if (ent->fts_info == FTS_SL)
-    {
+    if (ent->fts_info == FTS_SL) {
         return (true);
     }
     return false;
 }
+
 
 static bool aclExists(const FTSENT *ent)
 {
@@ -263,7 +263,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
 
     if (verbose) {
         fprintf(stderr, "Creating version %u.%u patch...\n", majorVersion, minorVersion);
-        fprintf(stderr, "Processing source, %s...", [source fileSystemRepresentation]);
+        fprintf(stderr, "Processing %s...", [source fileSystemRepresentation]);
     }
 
     FTSENT *ent = 0;
@@ -329,7 +329,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     }
 
     if (verbose) {
-        fprintf(stderr, "\nProcessing destination, %s...", [destination fileSystemRepresentation]);
+        fprintf(stderr, "\nProcessing %s...", [destination fileSystemRepresentation]);
     }
 
     pathBuffer[0] = 0;
@@ -448,9 +448,6 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     }
 
     NSString *temporaryFile = temporaryPatchFile(patchFile);
-    if (verbose) {
-        fprintf(stderr, "Writing to temporary file %s...\n", [temporaryFile fileSystemRepresentation]);
-    }
     xar_t x = xar_open([temporaryFile fileSystemRepresentation], WRITE);
     if (!x) {
         if (verbose) {
@@ -586,28 +583,13 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
 
     xar_close(x);
 
-    NSFileManager *filemgr;
-    filemgr = [NSFileManager defaultManager];
-    
-    [filemgr removeItemAtPath: patchFile error: NULL];
-    if ([filemgr copyItemAtPath: temporaryFile toPath: patchFile error: NULL]  == YES)
-    {
-        NSLog (@"Copy successful");
-    }
-    else
-    {
-        NSLog (@"Copy failed");
-        return NO;
-    }
-    if ([filemgr removeItemAtPath: temporaryFile error: NULL] != YES)
-    {
-        if (verbose) {
-            NSLog (@"Failed to remove temporary file, %@!\n", temporaryFile);
-        }
-        return NO;
-    }
+    unlink([patchFile fileSystemRepresentation]);
+    link([temporaryFile fileSystemRepresentation], [patchFile fileSystemRepresentation]);
+    unlink([temporaryFile fileSystemRepresentation]);
+
     if (verbose) {
         fprintf(stderr, "\nDone!\n");
     }
+
     return YES;
 }
