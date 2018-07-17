@@ -90,6 +90,15 @@ static NSDictionary *infoForFile(FTSENT *ent)
               INFO_SIZE_KEY: @(size) };
 }
 
+static bool isSymLink(const FTSENT *ent)
+{
+    if (ent->fts_info == FTS_SL)
+    {
+        return (true);
+    }
+    return false;
+}
+
 static bool aclExists(const FTSENT *ent)
 {
     // macOS does not currently support ACLs for symlinks
@@ -254,7 +263,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
 
     if (verbose) {
         fprintf(stderr, "Creating version %u.%u patch...\n", majorVersion, minorVersion);
-        fprintf(stderr, "Processing %s...", [source fileSystemRepresentation]);
+        fprintf(stderr, "Processing source, %s...", [source fileSystemRepresentation]);
     }
 
     FTSENT *ent = 0;
@@ -320,7 +329,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     }
 
     if (verbose) {
-        fprintf(stderr, "\nProcessing %s...", [destination fileSystemRepresentation]);
+        fprintf(stderr, "\nProcessing destination, %s...", [destination fileSystemRepresentation]);
     }
 
     pathBuffer[0] = 0;
@@ -371,7 +380,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         // inside an application, and since we don't preserve extended attribitutes anyway
 
         mode_t permissions = [info[INFO_PERMISSIONS_KEY] unsignedShortValue];
-        if (!IS_VALID_PERMISSIONS(permissions)) {
+        if (!isSymLink(ent) && !IS_VALID_PERMISSIONS(permissions)) {
             if (verbose) {
                 fprintf(stderr, "\n");
             }
@@ -439,6 +448,9 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     }
 
     NSString *temporaryFile = temporaryPatchFile(patchFile);
+    if (verbose) {
+        fprintf(stderr, "\nWriting to temporary file %s...", [temporaryFile fileSystemRepresentation]);
+    }
     xar_t x = xar_open([temporaryFile fileSystemRepresentation], WRITE);
     if (!x) {
         if (verbose) {
@@ -574,13 +586,19 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
 
     xar_close(x);
 
-    unlink([patchFile fileSystemRepresentation]);
-    link([temporaryFile fileSystemRepresentation], [patchFile fileSystemRepresentation]);
-    unlink([temporaryFile fileSystemRepresentation]);
-
+    NSFileManager *filemgr;
+    filemgr = [NSFileManager defaultManager];
+    
+    [filemgr removeItemAtPath: patchFile error: NULL];
+    if ([filemgr moveItemAtPath: temporaryFile toPath: patchFile error: NULL]  != YES)
+    {
+        if (verbose) {
+            fprintf(stderr, "Failed to move temporary file, %s, to %s!\n", [temporaryFile fileSystemRepresentation], [patchFile fileSystemRepresentation]);
+        }
+        return NO;
+    }
     if (verbose) {
         fprintf(stderr, "\nDone!\n");
     }
-
     return YES;
 }
