@@ -449,7 +449,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
 
     NSString *temporaryFile = temporaryPatchFile(patchFile);
     if (verbose) {
-        fprintf(stderr, "Writing to temporary file %s...\n", [temporaryFile fileSystemRepresentation]);
+        fprintf(stderr, "\nWriting to temporary file %s...", [temporaryFile fileSystemRepresentation]);
     }
     xar_t x = xar_open([temporaryFile fileSystemRepresentation], WRITE);
     if (!x) {
@@ -590,19 +590,10 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
     filemgr = [NSFileManager defaultManager];
     
     [filemgr removeItemAtPath: patchFile error: NULL];
-    if ([filemgr copyItemAtPath: temporaryFile toPath: patchFile error: NULL]  == YES)
-    {
-        NSLog (@"Copy successful");
-    }
-    else
-    {
-        NSLog (@"Copy failed");
-        return NO;
-    }
-    if ([filemgr removeItemAtPath: temporaryFile error: NULL] != YES)
+    if ([filemgr moveItemAtPath: temporaryFile toPath: patchFile error: NULL]  != YES)
     {
         if (verbose) {
-            NSLog (@"Failed to remove temporary file, %@!\n", temporaryFile);
+            fprintf(stderr, "Failed to move temporary file, %s, to %s!\n", [temporaryFile fileSystemRepresentation], [patchFile fileSystemRepresentation]);
         }
         return NO;
     }
