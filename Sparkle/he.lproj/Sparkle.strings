@@ -16,11 +16,13 @@
 
 "A new version of %@ is available!" = "גרסה חדשה של %@ זמינה!";
 
-"An error occurred during installation. Please try again later." = "שגיאה בהתקנה. אנא נסה שנית במועד מרוחר יותר.";
+"Cancel Update" = "בטל עדכון";
 
-"An error occurred in retrieving update information. Please try again later." = "שגיאה בקבלת מידע על עדכונים. אנא נסה שנית במועד מרוחר יותר.";
+"An error occurred during installation. Please try again later." = "שגיאה בהתקנה. אנא נסה שנית במועד מאוחר יותר.";
 
-"An error occurred while extracting the archive. Please try again later." = "שגיאה בפתיחת הקובת המקווץ. אנא נסה שנית במועד מרוחר יותר.";
+"An error occurred in retrieving update information. Please try again later." = "שגיאה בקבלת מידע על עדכונים. אנא נסה שנית במועד מאוחר יותר.";
+
+"An error occurred while extracting the archive. Please try again later." = "שגיאה בפתיחת הקובת המקווץ. אנא נסה שנית במועד מאוחר יותר.";
 
 "An error occurred while trying to download the file. Please try again later." = "שגיאה בהורדת הקובץ. אנא נסה שנית במועד מאוחר יותר.";
 
