@@ -58,6 +58,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 @property (weak) IBOutlet NSButton *skipButton;
 @property (weak) IBOutlet NSButton *laterButton;
 
+@property (strong) NSBox *darkBackgroundView;
+
 @end
 
 @implementation SUUpdateAlert
@@ -82,6 +84,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 @synthesize installButton;
 @synthesize skipButton;
 @synthesize laterButton;
+
+@synthesize darkBackgroundView = _darkBackgroundView;
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer
 {
@@ -214,6 +218,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     // "-apple-system-font" is a reference to the system UI font. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
     prefs.standardFontFamily = @"-apple-system-font";
     prefs.defaultFontSize = (int)[NSFont systemFontSize];
+    [self adaptReleaseNotesAppearance];
     
     // Stick a nice big spinner in the middle of the web view until the page is loaded.
     NSRect frame = [[self.releaseNotesView superview] frame];
@@ -229,6 +234,47 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 	{
         [[self.releaseNotesView mainFrame] loadHTMLString:[self.updateItem itemDescription] baseURL:nil];
     }
+}
+
+- (void)adaptReleaseNotesAppearance
+{
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
+    if (@available(macOS 10.14, *))
+    {
+        WebPreferences *prefs = [self.releaseNotesView preferences];
+        if ([self.releaseNotesView effectiveAppearance].name == NSAppearanceNameDarkAqua || [self.releaseNotesView effectiveAppearance].name == NSAppearanceNameAccessibilityHighContrastDarkAqua)
+        {
+            // Set user stylesheet adapted to light on dark
+            prefs.userStyleSheetEnabled = YES;
+            prefs.userStyleSheetLocation = [[NSBundle bundleForClass:[self class]] URLForResource:@"DarkAqua" withExtension:@"css"];
+            
+            // Remove web view background...
+            self.releaseNotesView.drawsBackground = NO;
+            // ... and use NSBox to get the dynamically colored background
+            if (self.darkBackgroundView == nil)
+            {
+                self.darkBackgroundView = [[NSBox alloc] initWithFrame:self.releaseNotesView.frame];
+                self.darkBackgroundView.boxType = NSBoxCustom;
+                self.darkBackgroundView.fillColor = [NSColor textBackgroundColor];
+                self.darkBackgroundView.borderColor = [NSColor clearColor];
+                // Using auto-resizing mask instead of contraints works well enough
+                self.darkBackgroundView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+                [self.releaseNotesView.superview addSubview:self.darkBackgroundView positioned:NSWindowBelow relativeTo:self.releaseNotesView];
+                
+                // The release note user stylesheet will not adjust to the user changing the theme until adaptReleaseNoteAppearance is called again.
+                // So lock the appearance of the background to keep the text readable if the system theme changes.
+                self.darkBackgroundView.appearance = self.darkBackgroundView.effectiveAppearance;
+            }
+        }
+        else
+        {
+            // Restore standard dark on light appearance
+            [self.darkBackgroundView removeFromSuperview];
+            prefs.userStyleSheetEnabled = NO;
+            self.releaseNotesView.drawsBackground = YES;
+        }
+    }
+#endif
 }
 
 - (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
