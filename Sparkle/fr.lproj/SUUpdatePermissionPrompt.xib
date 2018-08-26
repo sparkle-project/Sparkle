@@ -147,7 +147,7 @@ Gw
                         <font key="font" metaFont="smallSystem"/>
                         <string key="title">Les informations anonymes de profil système nous aident à planifier les futurs développements. Contactez-nous pour toute question à ce sujet.
 
-Ci-dessous figurent les informations qui seront transmises :</string>
+Ci-dessous figurent les informations transmises :</string>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
