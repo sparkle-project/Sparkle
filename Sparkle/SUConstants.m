@@ -34,6 +34,7 @@ NSString *const SUScheduledCheckIntervalKey = @"SUScheduledCheckInterval";
 NSString *const SULastCheckTimeKey = @"SULastCheckTime";
 NSString *const SUExpectsDSASignatureKey = @"SUExpectsDSASignature";
 NSString *const SUExpectsEDSignatureKey = @"SUExpectsEDSignatureKey";
+NSString *const SUPublicEDKeyKey = @"SUPublicEDKey";
 NSString *const SUPublicDSAKeyKey = @"SUPublicDSAKey";
 NSString *const SUPublicDSAKeyFileKey = @"SUPublicDSAKeyFile";
 NSString *const SUAutomaticallyUpdateKey = @"SUAutomaticallyUpdate";

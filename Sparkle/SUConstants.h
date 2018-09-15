@@ -42,6 +42,7 @@ extern NSString *const SUScheduledCheckIntervalKey;
 extern NSString *const SULastCheckTimeKey;
 extern NSString *const SUExpectsDSASignatureKey;
 extern NSString *const SUExpectsEDSignatureKey;
+extern NSString *const SUPublicEDKeyKey;
 extern NSString *const SUPublicDSAKeyKey;
 extern NSString *const SUPublicDSAKeyFileKey;
 extern NSString *const SUAutomaticallyUpdateKey;

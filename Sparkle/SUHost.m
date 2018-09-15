@@ -110,6 +110,11 @@
     return (statfs_info.f_flags & MNT_RDONLY) != 0;
 }
 
+- (NSString *__nullable)publicEDKey
+{
+    return [self objectForInfoDictionaryKey:SUPublicEDKeyKey];
+}
+
 - (NSString *__nullable)publicDSAKey
 {
     // Maybe the key is just a string in the Info.plist.
@@ -138,7 +143,7 @@
 
 - (SUPublicKeys *)publicKeys
 {
-    return [[SUPublicKeys alloc] initWithDsa:[self publicDSAKey] ed:nil];
+    return [[SUPublicKeys alloc] initWithDsa:[self publicDSAKey] ed:[self publicEDKey]];
 }
 
 - (NSString * __nullable)publicDSAKeyFileKey
