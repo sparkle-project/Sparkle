@@ -253,7 +253,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     if (@available(macOS 10.14, *))
     {
         WebPreferences *prefs = [self.releaseNotesView preferences];
-        if ([self.releaseNotesView effectiveAppearance].name == NSAppearanceNameDarkAqua || [self.releaseNotesView effectiveAppearance].name == NSAppearanceNameAccessibilityHighContrastDarkAqua)
+        NSAppearanceName bestAppearance = [self.releaseNotesView.effectiveAppearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
+        if ([bestAppearance isEqualToString:NSAppearanceNameDarkAqua])
         {
             // Set user stylesheet adapted to light on dark
             prefs.userStyleSheetEnabled = YES;
