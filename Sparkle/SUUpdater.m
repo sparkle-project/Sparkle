@@ -25,6 +25,7 @@
 #include <SystemConfiguration/SystemConfiguration.h>
 #import "SUSystemProfiler.h"
 #import "SUSystemUpdateInfo.h"
+#import "SUSignatures.h"
 
 NSString *const SUUpdaterDidFinishLoadingAppCastNotification = @"SUUpdaterDidFinishLoadingAppCastNotification";
 NSString *const SUUpdaterDidFindValidUpdateNotification = @"SUUpdaterDidFindValidUpdateNotification";
@@ -138,7 +139,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 }
 
 -(void)checkIfConfiguredProperly {
-    BOOL hasPublicDSAKey = [self.host publicDSAKey] != nil;
+    BOOL hasPublicDSAKey = self.host.publicKeys.dsaPubKey != nil;
     BOOL isMainBundle = [self.host.bundle isEqualTo:[NSBundle mainBundle]];
     BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:self.host.bundle.bundleURL];
     NSURL *feedURL = [self feedURL];

@@ -7,6 +7,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class SUPublicKeys;
+
 @interface SUHost : NSObject
 
 @property (strong, readonly) NSBundle *bundle;
@@ -16,8 +18,9 @@
 @property (readonly, copy) NSString *name;
 @property (readonly, copy) NSString *version;
 @property (readonly, copy) NSString *displayVersion;
+@property (readonly) SUPublicKeys *publicKeys;
+
 @property (getter=isRunningOnReadOnlyVolume, readonly) BOOL runningOnReadOnlyVolume;
-@property (readonly, copy) NSString *publicDSAKey;
 @property (readonly, nonatomic, copy) NSString *publicDSAKeyFileKey;
 
 - (id)objectForInfoDictionaryKey:(NSString *)key;

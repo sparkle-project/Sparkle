@@ -8,17 +8,18 @@
 
 #import "SUSignatures.h"
 #import <assert.h>
+#import "SULog.h"
 
 @implementation SUSignatures
 @synthesize dsaSignature;
 
 static NSData *decode(NSString *str) {
-    NSString *stripped = [str stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-    if (@available(macOS 10.9, *)) {
-        return [[NSData alloc] initWithBase64EncodedString:stripped options:0];
-    } else {
-        return [[NSData alloc] initWithBase64Encoding:stripped];
+    if (str == nil) {
+        return nil;
     }
+
+    NSString *stripped = [str stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    return [[NSData alloc] initWithBase64Encoding:stripped];
 }
 
 - (instancetype)initWithDsa:(NSString * _Nullable)maybeDsa ed:(NSString * _Nullable)maybeEd25519
@@ -35,6 +36,34 @@ static NSData *decode(NSString *str) {
         }
     }
     return self;
+}
+
+@end
+
+@implementation SUPublicKeys
+@synthesize dsaPubKey;
+
+- (instancetype)initWithDsa:(NSString * _Nullable)maybeDsa ed:(NSString * _Nullable)maybeEd25519
+{
+    self = [super init];
+    if (self) {
+        self.dsaPubKey = maybeDsa;
+        if (maybeEd25519 != nil) {
+            NSData *ed = decode(maybeEd25519);
+            assert(32 == sizeof(self->ed25519_public_key));
+            [ed getBytes:self->ed25519_public_key length:sizeof(self->ed25519_public_key)];
+        }
+    }
+    return self;
+}
+
+- (BOOL) isEqualToKey:(SUPublicKeys *)key {
+    NSString *thisKey = self.dsaPubKey;
+    NSString *thatKey = key.dsaPubKey;
+    if (thisKey == nil || thatKey == nil) {
+        return NO;
+    }
+    return [thisKey isEqualToString:thatKey];
 }
 
 @end

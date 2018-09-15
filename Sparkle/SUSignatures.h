@@ -8,6 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 1090
+@interface NSData (SUDSAVerifier)
+- (id)initWithBase64Encoding:(NSString *)base64String;
+@end
+#endif
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface SUSignatures : NSObject {
@@ -16,6 +22,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSData *dsaSignature;
 
 - (instancetype)initWithDsa:(NSString * _Nullable)dsa ed:(NSString * _Nullable)ed;
+@end
+
+@interface SUPublicKeys : NSObject {
+    unsigned char ed25519_public_key[32];
+}
+@property (nullable) NSString *dsaPubKey;
+
+- (instancetype)initWithDsa:(NSString * _Nullable)dsa ed:(NSString * _Nullable)ed;
+- (BOOL) isEqualToKey:(SUPublicKeys *)key;
 @end
 
 NS_ASSUME_NONNULL_END

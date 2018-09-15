@@ -10,7 +10,7 @@
 #import "SUConstants.h"
 #include <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
 #import "SULog.h"
-
+#import "SUSignatures.h"
 
 #include "AppKitPrevention.h"
 
@@ -26,6 +26,7 @@
 @property (nonatomic, readonly) BOOL isMainBundle;
 @property (copy) NSString *defaultsDomain;
 @property (assign) BOOL usesStandardUserDefaults;
+@property (readonly, copy) NSString *publicDSAKey;
 
 @end
 
@@ -133,6 +134,11 @@
         SULog(SULogLevelError, @"Error loading %@: %@", keyPath, error);
     }
     return key;
+}
+
+- (SUPublicKeys *)publicKeys
+{
+    return [[SUPublicKeys alloc] initWithDsa:[self publicDSAKey] ed:nil];
 }
 
 - (NSString * __nullable)publicDSAKeyFileKey
