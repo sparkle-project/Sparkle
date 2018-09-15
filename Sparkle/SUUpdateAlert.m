@@ -219,6 +219,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     prefs.standardFontFamily = @"-apple-system-font";
     prefs.defaultFontSize = (int)[NSFont systemFontSize];
     [self adaptReleaseNotesAppearance];
+    [self.releaseNotesView addObserver:self forKeyPath:@"effectiveAppearance" options:0 context:nil];
     
     // Stick a nice big spinner in the middle of the web view until the page is loaded.
     NSRect frame = [[self.releaseNotesView superview] frame];
@@ -236,13 +237,24 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     }
 }
 
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(__attribute__((unused)) NSDictionary<NSKeyValueChangeKey,id> *)change context:(__attribute__((unused)) void *)context {
+    if (object == self.releaseNotesView && [keyPath isEqualToString:@"effectiveAppearance"]) {
+        [self adaptReleaseNotesAppearance];
+    }
+}
+
+- (void)dealloc {
+    [self.releaseNotesView removeObserver:self forKeyPath:@"effectiveAppearance"];
+}
+
 - (void)adaptReleaseNotesAppearance
 {
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
     if (@available(macOS 10.14, *))
     {
         WebPreferences *prefs = [self.releaseNotesView preferences];
-        if ([self.releaseNotesView effectiveAppearance].name == NSAppearanceNameDarkAqua || [self.releaseNotesView effectiveAppearance].name == NSAppearanceNameAccessibilityHighContrastDarkAqua)
+        NSAppearanceName bestAppearance = [self.releaseNotesView.effectiveAppearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
+        if ([bestAppearance isEqualToString:NSAppearanceNameDarkAqua])
         {
             // Set user stylesheet adapted to light on dark
             prefs.userStyleSheetEnabled = YES;
@@ -270,6 +282,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         {
             // Restore standard dark on light appearance
             [self.darkBackgroundView removeFromSuperview];
+            self.darkBackgroundView = nil;
             prefs.userStyleSheetEnabled = NO;
             self.releaseNotesView.drawsBackground = YES;
         }
