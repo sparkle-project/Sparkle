@@ -282,6 +282,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         {
             // Restore standard dark on light appearance
             [self.darkBackgroundView removeFromSuperview];
+            self.darkBackgroundView = nil;
             prefs.userStyleSheetEnabled = NO;
             self.releaseNotesView.drawsBackground = YES;
         }
