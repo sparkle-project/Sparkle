@@ -58,7 +58,7 @@
     return ([self commandAndArgumentsConformingToTypeOfPath:path] != nil);
 }
 
-+ (BOOL)unsafeIfArchiveIsNotValidated
++ (BOOL)mustValidateBeforeExtraction
 {
     return NO;
 }

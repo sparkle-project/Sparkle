@@ -19,7 +19,8 @@
 @interface SUUpdateValidator ()
 
 @property (nonatomic, readonly) SUHost *host;
-@property (nonatomic, readonly) BOOL prevalidatedDsaSignature;
+@property (nonatomic) BOOL prevalidatedSignature;
+@property (nonatomic) BOOL downloadPrevalidationFailed;
 @property (nonatomic, readonly) SUSignatures *signatures;
 @property (nonatomic, readonly) NSString *downloadPath;
 
@@ -28,41 +29,15 @@
 @implementation SUUpdateValidator
 
 @synthesize host = _host;
-@synthesize canValidate = _canValidate;
-@synthesize prevalidatedDsaSignature = _prevalidatedDsaSignature;
+@synthesize prevalidatedSignature = _prevalidatedSignature;
 @synthesize signatures = _signatures;
+@synthesize downloadPrevalidationFailed = _downloadPrevalidationFailed;
 @synthesize downloadPath = _downloadPath;
 
-- (instancetype)initWithDownloadPath:(NSString *)downloadPath signatures:(SUSignatures *)signatures host:(SUHost *)host performingPrevalidation:(BOOL)performingPrevalidation
+- (instancetype)initWithDownloadPath:(NSString *)downloadPath signatures:(SUSignatures *)signatures host:(SUHost *)host
 {
     self = [super init];
     if (self != nil) {
-        BOOL canValidate;
-        BOOL prevalidatedDsaSignature;
-        if (performingPrevalidation) {
-            SUPublicKeys *publicKeys = host.publicKeys;
-
-            if (publicKeys.dsaPubKey == nil) {
-                prevalidatedDsaSignature = NO;
-                SULog(SULogLevelError, @"Failed to validate update before unarchiving because no DSA public key was found in the old app");
-            } else if (signatures == nil || signatures.dsaSignature == nil) {
-                prevalidatedDsaSignature = NO;
-                SULog(SULogLevelError, @"Failed to validate update before unarchiving because no DSA signature was found");
-            } else {
-                prevalidatedDsaSignature = [SUSignatureVerifier validatePath:downloadPath withSignatures:signatures withPublicKeys:publicKeys];
-                if (!prevalidatedDsaSignature) {
-                    SULog(SULogLevelError, @"DSA signature validation before unarchiving failed for update %@", downloadPath);
-                }
-            }
-
-            canValidate = prevalidatedDsaSignature;
-        } else {
-            prevalidatedDsaSignature = NO;
-            canValidate = YES;
-        }
-
-        _canValidate = canValidate;
-        _prevalidatedDsaSignature = prevalidatedDsaSignature;
         _downloadPath = [downloadPath copy];
         _signatures = [signatures copy];
         _host = host;
@@ -70,16 +45,35 @@
     return self;
 }
 
+- (BOOL)validateDownloadPath {
+    SUPublicKeys *publicKeys = self.host.publicKeys;
+    SUSignatures *signatures = self.signatures;
+
+    if (publicKeys.dsaPubKey == nil) {
+        SULog(SULogLevelError, @"Failed to validate update before unarchiving because no DSA public key was found in the old app");
+    } else if (signatures == nil || signatures.dsaSignature == nil) {
+        SULog(SULogLevelError, @"Failed to validate update before unarchiving because no DSA signature was found");
+    } else {
+        if ([SUSignatureVerifier validatePath:self.downloadPath withSignatures:signatures withPublicKeys:publicKeys]) {
+            self.prevalidatedSignature = YES;
+            return YES;
+        }
+        SULog(SULogLevelError, @"DSA signature validation before unarchiving failed for update %@", self.downloadPath);
+    }
+    self.downloadPrevalidationFailed = YES;
+    return NO;
+}
+
 - (BOOL)validateWithUpdateDirectory:(NSString *)updateDirectory
 {
-    assert(self.canValidate);
+    if (self.downloadPrevalidationFailed) {
+        return NO;
+    }
 
     SUSignatures *signatures = self.signatures;
     SUPublicKeys *publicKeys = self.host.publicKeys;
     NSString *downloadPath = self.downloadPath;
     SUHost *host = self.host;
-
-    BOOL prevalidatedDsaSignature = self.prevalidatedDsaSignature;
 
     BOOL isPackage = NO;
 
@@ -92,7 +86,7 @@
 
     NSURL *installSourceURL = [NSURL fileURLWithPath:installSource];
 
-    if (!prevalidatedDsaSignature) {
+    if (!self.prevalidatedSignature) {
         // Check to see if we have a package or bundle to validate
         if (isPackage) {
             // For package type updates, all we do is check if the DSA signature is valid
