@@ -5,7 +5,17 @@
 
 import Foundation
 
-func loadPrivateKey(at privateKeyURL: URL) throws -> SecKey {
+struct PrivateKeys {
+    var privateDSAKey: SecKey?;
+    var privateEdKey: Data?;
+
+    init(privateDSAKey: SecKey?, privateEdKey: Data?) {
+        self.privateDSAKey = privateDSAKey;
+        self.privateEdKey = privateEdKey;
+    }
+}
+
+func loadPrivateDSAKey(at privateKeyURL: URL) throws -> SecKey {
     let data = try Data(contentsOf: privateKeyURL);
 
     var cfitems: CFArray? = nil;
@@ -25,7 +35,7 @@ func loadPrivateKey(at privateKeyURL: URL) throws -> SecKey {
     return (cfitems! as NSArray)[0] as! SecKey;
 }
 
-func loadPrivateKey(named keyName: String, fromKeychainAt keychainURL: URL) throws -> SecKey {
+func loadPrivateDSAKey(named keyName: String, fromKeychainAt keychainURL: URL) throws -> SecKey {
     var keychain: SecKeychain? = nil
     
     guard SecKeychainOpen(keychainURL.path, &keychain) == errSecSuccess, keychain != nil else {
@@ -49,7 +59,7 @@ func loadPrivateKey(named keyName: String, fromKeychainAt keychainURL: URL) thro
     return item! as! SecKey
 }
 
-func dsaSignature(path: URL, privateKey: SecKey) throws -> String {
+func dsaSignature(path: URL, privateDSAKey: SecKey) throws -> String {
 
     var error: Unmanaged<CFError>?;
 
@@ -57,7 +67,7 @@ func dsaSignature(path: URL, privateKey: SecKey) throws -> String {
     let dataReadTransform = SecTransformCreateReadTransformWithReadStream(stream);
 
     let dataDigestTransform = SecDigestTransformCreate(kSecDigestSHA1, 20, nil);
-    guard let dataSignTransform = SecSignTransformCreate(privateKey, &error) else {
+    guard let dataSignTransform = SecSignTransformCreate(privateDSAKey, &error) else {
         print("can't use the key");
         throw error!.takeRetainedValue();
     }
@@ -81,4 +91,20 @@ func dsaSignature(path: URL, privateKey: SecKey) throws -> String {
         throw makeError(code: .signatureError, "SecTransformExecute returned non-data");
     }
     return resultData.base64EncodedString();
+}
+
+func edSignature(path: URL, publicEdKey: Data, privateEdKey: Data) throws -> String {
+    let data = try Data.init(contentsOf: path, options: .mappedIfSafe);
+    var output = Data(count: 64);
+    let len = data.count;
+    output.withUnsafeMutableBytes({ (output: UnsafeMutablePointer<UInt8>) in
+        data.withUnsafeBytes({ (data: UnsafePointer<UInt8>) in
+            publicEdKey.withUnsafeBytes({ (publicEdKey: UnsafePointer<UInt8>) in
+                privateEdKey.withUnsafeBytes({ (privateEdKey: UnsafePointer<UInt8>) in
+                    ed25519_sign(output, data, len, publicEdKey, privateEdKey)
+                });
+            });
+        })
+    });
+    return output.base64EncodedString();
 }

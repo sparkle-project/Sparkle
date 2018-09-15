@@ -9,6 +9,7 @@ class DeltaUpdate {
     let fromVersion: String;
     let archivePath: URL;
     var dsaSignature: String?;
+    var edSignature: String?;
 
     init(fromVersion: String, archivePath: URL) {
         self.archivePath = archivePath;
@@ -38,18 +39,27 @@ class ArchiveItem: CustomStringConvertible {
     let archivePath: URL;
     let appPath: URL;
     let feedURL: URL?;
+    let publicEdKey: Data?;
+    let supportsDSA: Bool;
     let archiveFileAttributes: [FileAttributeKey:Any];
     var deltas: [DeltaUpdate];
 
     var dsaSignature: String?;
+    var edSignature: String?;
 
-    init(version: String, shortVersion: String?, feedURL: URL?, minimumSystemVersion: String?, appPath: URL, archivePath: URL) throws {
+    init(version: String, shortVersion: String?, feedURL: URL?, minimumSystemVersion: String?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
         self.version = version;
         self._shortVersion = shortVersion;
         self.feedURL = feedURL;
         self.minimumSystemVersion = minimumSystemVersion ?? "10.7";
         self.archivePath = archivePath;
         self.appPath = appPath;
+        self.supportsDSA = supportsDSA;
+        if let publicEdKey = publicEdKey {
+            self.publicEdKey = Data(base64Encoded: publicEdKey);
+        } else {
+            self.publicEdKey = nil;
+        }
         self.archiveFileAttributes = try FileManager.default.attributesOfItem(atPath: self.archivePath.path);
         self.deltas = [];
     }
@@ -70,9 +80,11 @@ class ArchiveItem: CustomStringConvertible {
                 throw makeError(code: .unarchivingError, "No plist \(appPath.path)");
             }
             guard let version = infoPlist[kCFBundleVersionKey] as? String else {
-                throw makeError(code: .unarchivingError, "No Version \(kCFBundleVersionKey) \(appPath)");
+                throw makeError(code: .unarchivingError, "No Version \(kCFBundleVersionKey as String? ?? "missing kCFBundleVersionKey") \(appPath)");
             }
             let shortVersion = infoPlist["CFBundleShortVersionString"] as? String;
+            let publicEdKey = infoPlist["SUPublicEDKey"] as? String;
+            let supportsDSA = infoPlist["SUPublicDSAKey"] != nil || infoPlist["SUPublicDSAKeyFile"] != nil;
 
             var feedURL:URL? = nil;
             if let feedURLStr = infoPlist["SUFeedURL"] as? String {
@@ -83,6 +95,8 @@ class ArchiveItem: CustomStringConvertible {
                            shortVersion: shortVersion,
                            feedURL: feedURL,
                            minimumSystemVersion: infoPlist["LSMinimumSystemVersion"] as? String,
+                           publicEdKey: publicEdKey,
+                           supportsDSA: supportsDSA,
                            appPath: appPath,
                            archivePath: archivePath);
         } else {

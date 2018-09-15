@@ -14,7 +14,7 @@ func makeError(code: SUError, _ description: String) -> NSError {
         ]);
 }
 
-func makeAppcast(archivesSourceDir: URL, privateKey: SecKey, verbose: Bool) throws -> [String:[ArchiveItem]] {
+func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throws -> [String:[ArchiveItem]] {
     let comparator = SUStandardVersionComparator();
 
     let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir, verbose:verbose))
@@ -33,11 +33,29 @@ func makeAppcast(archivesSourceDir: URL, privateKey: SecKey, verbose: Bool) thro
     for update in allUpdates {
         group.enter();
         DispatchQueue.global().async {
-            do {
-                update.dsaSignature = try dsaSignature(path: update.archivePath, privateKey: privateKey);
-            } catch {
-                print(update, error);
+            if update.supportsDSA {
+                if let privateDSAKey = keys.privateDSAKey {
+                    do {
+                        update.dsaSignature = try dsaSignature(path: update.archivePath, privateDSAKey: privateDSAKey);
+                    } catch {
+                        print(update, error);
+                    }
+                } else {
+                    print("Note: did not sign with legacy DSA \(update.archivePath.path) because private DSA key file was not specified");
+                }
             }
+            if let publicEdKey = update.publicEdKey {
+                if let privateEdKey = keys.privateEdKey {
+                    do {
+                        update.edSignature = try edSignature(path: update.archivePath, publicEdKey: publicEdKey, privateEdKey: privateEdKey);
+                    } catch {
+                        print(update, error);
+                    }
+                } else {
+                    print("Warning: could not sign \(update.archivePath.path) due to lack of private ed25519 key");
+                }
+            }
+
             group.leave();
         }
 
@@ -52,6 +70,9 @@ func makeAppcast(archivesSourceDir: URL, privateKey: SecKey, verbose: Bool) thro
         var latestUpdatePerOS:[String:ArchiveItem] = [:];
 
         for update in updates {
+            if !update.supportsDSA && update.publicEdKey == nil {
+                continue;
+            }
             // items are ordered starting latest first
             let os = update.minimumSystemVersion;
             if latestUpdatePerOS[os] == nil {
@@ -92,12 +113,26 @@ func makeAppcast(archivesSourceDir: URL, privateKey: SecKey, verbose: Bool) thro
 
                     group.enter();
                     DispatchQueue.global().async {
-                        do {
-                            delta.dsaSignature = try dsaSignature(path: deltaPath, privateKey: privateKey);
-                            latestItem.deltas.append(delta);
-                        } catch {
-                            print(delta.archivePath.lastPathComponent, error);
+                        if latestItem.supportsDSA, let privateDSAKey = keys.privateDSAKey {
+                            do {
+                                delta.dsaSignature = try dsaSignature(path: deltaPath, privateDSAKey: privateDSAKey);
+                            } catch {
+                                print(delta.archivePath.lastPathComponent, error);
+                            }
                         }
+                        if let publicEdKey = item.publicEdKey, let privateEdKey = keys.privateEdKey {
+                            do {
+                                delta.edSignature = try edSignature(path: deltaPath, publicEdKey: publicEdKey, privateEdKey: privateEdKey);
+                            } catch {
+                                print(delta.archivePath.lastPathComponent, error);
+                            }
+                        }
+                        if delta.dsaSignature != nil || delta.edSignature != nil {
+                            latestItem.deltas.append(delta);
+                        } else {
+                            print("Delta \(delta.archivePath.path) ignored, because it could not be signed");
+                        }
+
                         group.leave();
                     }
                 }
