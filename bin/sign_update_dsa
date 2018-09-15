@@ -2,7 +2,9 @@
 set -e
 set -o pipefail
 if [ "$#" -ne 2 ]; then
-  echo "Usage: $0 update_archive private_key"
+  echo "Usage: $0 update_archive_file dsa_priv.pem"
+  echo "This is an old DSA signing script for deprecated DSA keys."
+  echo "Do not use this for new applications."
   exit 1
 fi
 openssl=/usr/bin/openssl
