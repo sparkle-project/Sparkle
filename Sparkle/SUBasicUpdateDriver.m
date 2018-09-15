@@ -366,7 +366,7 @@
         // Currently unsafe archives are the only case where we can prevalidate before extraction, but that could change in the future
         BOOL needsPrevalidation = [[unarchiver class] unsafeIfArchiveIsNotValidated];
         
-        self.updateValidator = [[SUUpdateValidator alloc] initWithDownloadPath:self.downloadPath dsaSignature:self.updateItem.DSASignature host:self.host performingPrevalidation:needsPrevalidation];
+        self.updateValidator = [[SUUpdateValidator alloc] initWithDownloadPath:self.downloadPath signatures:self.updateItem.signatures host:self.host performingPrevalidation:needsPrevalidation];
         
         success = self.updateValidator.canValidate;
     }

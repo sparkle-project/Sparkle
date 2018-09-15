@@ -9,7 +9,7 @@
 #import "SUAppcastItem.h"
 #import "SULog.h"
 #import "SUConstants.h"
-
+#import "SUSignatures.h"
 
 #include "AppKitPrevention.h"
 
@@ -18,7 +18,7 @@
 @property (copy, readwrite) NSString *dateString;
 @property (copy, readwrite) NSString *itemDescription;
 @property (strong, readwrite) NSURL *releaseNotesURL;
-@property (copy, readwrite) NSString *DSASignature;
+@property (strong, readwrite) SUSignatures *signatures;
 @property (copy, readwrite) NSString *minimumSystemVersion;
 @property (copy, readwrite) NSString *maximumSystemVersion;
 @property (strong, readwrite) NSURL *fileURL;
@@ -34,7 +34,7 @@
 @synthesize dateString;
 @synthesize deltaUpdates;
 @synthesize displayVersionString;
-@synthesize DSASignature;
+@synthesize signatures;
 @synthesize fileURL;
 @synthesize contentLength = _contentLength;
 @synthesize infoURL;
@@ -156,10 +156,10 @@
             self.fileURL = [NSURL URLWithString:fileURLString];
         }
         if (enclosure) {
-            self.DSASignature = [enclosure objectForKey:SUAppcastAttributeDSASignature];
+            self.signatures = [[SUSignatures alloc] initWithDsa:[enclosure objectForKey:SUAppcastAttributeDSASignature] ed:nil];
             self.osString = [enclosure objectForKey:SUAppcastAttributeOsType];
         }
-  
+
         self.versionString = newVersion;
         self.minimumSystemVersion = [dict objectForKey:SUAppcastElementMinimumSystemVersion];
         self.maximumSystemVersion = [dict objectForKey:SUAppcastElementMaximumSystemVersion];

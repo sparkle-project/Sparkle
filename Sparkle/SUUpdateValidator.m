@@ -12,7 +12,7 @@
 #import "SUInstaller.h"
 #import "SUHost.h"
 #import "SULog.h"
-
+#import "SUSignatures.h"
 
 #include "AppKitPrevention.h"
 
@@ -20,7 +20,7 @@
 
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly) BOOL prevalidatedDsaSignature;
-@property (nonatomic, readonly) NSString *dsaSignature;
+@property (nonatomic, readonly) SUSignatures *signatures;
 @property (nonatomic, readonly) NSString *downloadPath;
 
 @end
@@ -30,10 +30,10 @@
 @synthesize host = _host;
 @synthesize canValidate = _canValidate;
 @synthesize prevalidatedDsaSignature = _prevalidatedDsaSignature;
-@synthesize dsaSignature = _dsaSignature;
+@synthesize signatures = _signatures;
 @synthesize downloadPath = _downloadPath;
 
-- (instancetype)initWithDownloadPath:(NSString *)downloadPath dsaSignature:(NSString *)dsaSignature host:(SUHost *)host performingPrevalidation:(BOOL)performingPrevalidation
+- (instancetype)initWithDownloadPath:(NSString *)downloadPath signatures:(SUSignatures *)signatures host:(SUHost *)host performingPrevalidation:(BOOL)performingPrevalidation
 {
     self = [super init];
     if (self != nil) {
@@ -41,6 +41,7 @@
         BOOL prevalidatedDsaSignature;
         if (performingPrevalidation) {
             NSString *publicDSAKey = host.publicDSAKey;
+            NSString *dsaSignature = signatures.dsaSignature;
 
             if (publicDSAKey == nil) {
                 prevalidatedDsaSignature = NO;
@@ -64,7 +65,7 @@
         _canValidate = canValidate;
         _prevalidatedDsaSignature = prevalidatedDsaSignature;
         _downloadPath = [downloadPath copy];
-        _dsaSignature = [dsaSignature copy];
+        _signatures = [signatures copy];
         _host = host;
     }
     return self;
@@ -74,7 +75,7 @@
 {
     assert(self.canValidate);
 
-    NSString *DSASignature = self.dsaSignature;
+    NSString *DSASignature = self.signatures.dsaSignature;
     NSString *publicDSAKey = self.host.publicDSAKey;
     NSString *downloadPath = self.downloadPath;
     SUHost *host = self.host;
