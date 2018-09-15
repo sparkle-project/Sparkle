@@ -19,7 +19,7 @@
 @class SUSignatures;
 @class SUPublicKeys;
 
-@interface SUDSAVerifier : NSObject
+@interface SUSignatureVerifier : NSObject
 
 + (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicKeys:(SUPublicKeys *)pkeys;
 

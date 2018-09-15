@@ -12,7 +12,7 @@
 //  Copyright 2011 Mark Hamlin. Licensed under BSD.
 //
 
-#import "SUDSAVerifier.h"
+#import "SUSignatureVerifier.h"
 #import "SULog.h"
 #import "SUSignatures.h"
 #include <CommonCrypto/CommonDigest.h>
@@ -20,7 +20,7 @@
 
 #include "AppKitPrevention.h"
 
-@implementation SUDSAVerifier {
+@implementation SUSignatureVerifier {
     SecKeyRef _secKey;
 }
 
@@ -40,7 +40,7 @@
         return NO;
     }
 
-    SUDSAVerifier *verifier = [(SUDSAVerifier *)[self alloc] initWithPublicKeys:pkeys];
+    SUSignatureVerifier *verifier = [(SUSignatureVerifier *)[self alloc] initWithPublicKeys:pkeys];
 
     if (!verifier) {
         return NO;

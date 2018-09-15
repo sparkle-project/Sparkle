@@ -99,6 +99,7 @@
 		5AAD00691E0C2DAB00AF411E /* bsdiff.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */; };
 		5AAD006A1E0C2DB500AF411E /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
 		5AAD006C1E0C2DBF00AF411E /* libxar.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AAD006B1E0C2DBF00AF411E /* libxar.tbd */; };
+		5AB8F169214D4AE300A1187F /* SUSignatures.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF04876214D2E5F00B5789F /* SUSignatures.m */; };
 		5AD0FA7F1C73F2E2004BCEFF /* testappcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5AD0FA7E1C73F2E2004BCEFF /* testappcast.xml */; };
 		5AE13F781E0C9B12000D2C2C /* DSASignature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE13F771E0C9B12000D2C2C /* DSASignature.swift */; };
 		5AE13FA01E0D4F65000D2C2C /* Appcast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE13F9F1E0D4F65000D2C2C /* Appcast.swift */; };
@@ -150,8 +151,8 @@
 		61177A1F0D1112E900749C97 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6117796E0D1112E000749C97 /* IOKit.framework */; };
 		6120721209CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.h in Headers */ = {isa = PBXBuildFile; fileRef = 6120721009CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.h */; settings = {ATTRIBUTES = (); }; };
 		6120721309CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 6120721109CC5C4B007FE0F6 /* SUAutomaticUpdateAlert.m */; };
-		61299A2F09CA2DAB00B7442F /* SUDSAVerifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A2D09CA2DAB00B7442F /* SUDSAVerifier.h */; settings = {ATTRIBUTES = (); }; };
-		61299A3009CA2DAB00B7442F /* SUDSAVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A2E09CA2DAB00B7442F /* SUDSAVerifier.m */; settings = {COMPILER_FLAGS = "-Wno-deprecated-declarations"; }; };
+		61299A2F09CA2DAB00B7442F /* SUSignatureVerifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A2D09CA2DAB00B7442F /* SUSignatureVerifier.h */; settings = {ATTRIBUTES = (); }; };
+		61299A3009CA2DAB00B7442F /* SUSignatureVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A2E09CA2DAB00B7442F /* SUSignatureVerifier.m */; settings = {COMPILER_FLAGS = "-Wno-deprecated-declarations"; }; };
 		61299A5C09CA6D4500B7442F /* SUConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A5B09CA6D4500B7442F /* SUConstants.h */; settings = {ATTRIBUTES = (); }; };
 		61299A6009CA6EB100B7442F /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
 		61299A8D09CA790200B7442F /* SUUnarchiver.h in Headers */ = {isa = PBXBuildFile; fileRef = 61299A8B09CA790200B7442F /* SUUnarchiver.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -688,8 +689,8 @@
 		612279D90DB5470200AB99EA /* Sparkle Unit Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Sparkle Unit Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		612279DA0DB5470200AB99EA /* SparkleTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SparkleTests-Info.plist"; sourceTree = "<group>"; };
 		61227A150DB548B800AB99EA /* SUVersionComparisonTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUVersionComparisonTest.m; sourceTree = "<group>"; };
-		61299A2D09CA2DAB00B7442F /* SUDSAVerifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUDSAVerifier.h; sourceTree = "<group>"; };
-		61299A2E09CA2DAB00B7442F /* SUDSAVerifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUDSAVerifier.m; sourceTree = "<group>"; };
+		61299A2D09CA2DAB00B7442F /* SUSignatureVerifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUSignatureVerifier.h; sourceTree = "<group>"; };
+		61299A2E09CA2DAB00B7442F /* SUSignatureVerifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUSignatureVerifier.m; sourceTree = "<group>"; };
 		61299A5B09CA6D4500B7442F /* SUConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUConstants.h; sourceTree = "<group>"; };
 		61299A5F09CA6EB100B7442F /* SUConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUConstants.m; sourceTree = "<group>"; };
 		61299A8B09CA790200B7442F /* SUUnarchiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUUnarchiver.h; sourceTree = "<group>"; };
@@ -1171,9 +1172,34 @@
 			path = generate_appcast;
 			sourceTree = "<group>";
 		};
+		5AB8F16E214D560700A1187F /* ed25519 */ = {
+			isa = PBXGroup;
+			children = (
+				5AB8F171214D564A00A1187F /* add_scalar.c */,
+				5AB8F174214D564B00A1187F /* ed25519.h */,
+				5AB8F17C214D564B00A1187F /* fe.c */,
+				5AB8F173214D564B00A1187F /* fe.h */,
+				5AB8F179214D564B00A1187F /* fixedint.h */,
+				5AB8F175214D564B00A1187F /* ge.c */,
+				5AB8F17A214D564B00A1187F /* ge.h */,
+				5AB8F178214D564B00A1187F /* key_exchange.c */,
+				5AB8F17F214D564C00A1187F /* keypair.c */,
+				5AB8F176214D564B00A1187F /* precomp_data.h */,
+				5AB8F16F214D564A00A1187F /* sc.c */,
+				5AB8F17E214D564B00A1187F /* sc.h */,
+				5AB8F17B214D564B00A1187F /* seed.c */,
+				5AB8F172214D564B00A1187F /* sha512.c */,
+				5AB8F170214D564A00A1187F /* sha512.h */,
+				5AB8F17D214D564B00A1187F /* sign.c */,
+				5AB8F177214D564B00A1187F /* verify.c */,
+			);
+			path = ed25519;
+			sourceTree = "<group>";
+		};
 		5AF04874214D2E2800B5789F /* Signatures */ = {
 			isa = PBXGroup;
 			children = (
+				5AB8F16E214D560700A1187F /* ed25519 */,
 				5AF04875214D2E5F00B5789F /* SUSignatures.h */,
 				5AF04876214D2E5F00B5789F /* SUSignatures.m */,
 			);
@@ -1343,8 +1369,8 @@
 			children = (
 				61B078CC15A5FB6100600039 /* SUCodeSigningVerifier.h */,
 				61B078CD15A5FB6100600039 /* SUCodeSigningVerifier.m */,
-				61299A2D09CA2DAB00B7442F /* SUDSAVerifier.h */,
-				61299A2E09CA2DAB00B7442F /* SUDSAVerifier.m */,
+				61299A2D09CA2DAB00B7442F /* SUSignatureVerifier.h */,
+				61299A2E09CA2DAB00B7442F /* SUSignatureVerifier.m */,
 				729924711DF3478A00DBCDF5 /* SUUpdateValidator.h */,
 				729924721DF3478A00DBCDF5 /* SUUpdateValidator.m */,
 			);
@@ -1456,8 +1482,14 @@
 			files = (
 				723B25301CEAB3A600909873 /* bscommon.h in Headers */,
 				611142E910FB1BE5009810AA /* bspatch.h in Headers */,
+				5AB8F185214D564C00A1187F /* ed25519.h in Headers */,
+				5AB8F184214D564C00A1187F /* fe.h in Headers */,
+				5AB8F18A214D564C00A1187F /* fixedint.h in Headers */,
+				5AB8F18B214D564C00A1187F /* ge.h in Headers */,
+				5AB8F187214D564C00A1187F /* precomp_data.h in Headers */,
+				5AB8F18F214D564C00A1187F /* sc.h in Headers */,
+				5AB8F181214D564C00A1187F /* sha512.h in Headers */,
 				61299B3609CB04E000B7442F /* Sparkle.h in Headers */,
-				5AF04877214D2E5F00B5789F /* SUSignatures.h in Headers */,
 				61B5FC0D09C4FC8200B25A18 /* SUAppcast.h in Headers */,
 				61B5FC7009C51F4A00B25A18 /* SUAppcastItem.h in Headers */,
 				34074BA71FEAC417001CB3A5 /* SPUDownloaderDeprecated.h in Headers */,
@@ -1472,7 +1504,6 @@
 				61299A5C09CA6D4500B7442F /* SUConstants.h in Headers */,
 				6102FE4A0E07803800F85D09 /* SUDiskImageUnarchiver.h in Headers */,
 				61B078CE15A5FB6100600039 /* SUCodeSigningVerifier.h in Headers */,
-				61299A2F09CA2DAB00B7442F /* SUDSAVerifier.h in Headers */,
 				34074B9F1FEABD5A001CB3A5 /* SPUDownloadData.h in Headers */,
 				55E6F33319EC9F6C00005E76 /* SUErrors.h in Headers */,
 				14652F8419A978C200959E44 /* SUExport.h in Headers */,
@@ -1490,6 +1521,8 @@
 				618FA5050DAE8AB80026945C /* SUPlainInstaller.h in Headers */,
 				6101347B0DD2541A0049ACDF /* SUProbingUpdateDriver.h in Headers */,
 				61B93C090DD112FF00DCD2F8 /* SUScheduledUpdateDriver.h in Headers */,
+				5AF04877214D2E5F00B5789F /* SUSignatures.h in Headers */,
+				61299A2F09CA2DAB00B7442F /* SUSignatureVerifier.h in Headers */,
 				61A225A40D1C4AC000430CCD /* SUStandardVersionComparator.h in Headers */,
 				6196CFF909C72148000DC222 /* SUStatusController.h in Headers */,
 				61A2279C0D1CEE7600430CCD /* SUSystemProfiler.h in Headers */,
@@ -1966,6 +1999,7 @@
 				726F2CE71BC9C3E2001971A4 /* SUOperatingSystem.m in Sources */,
 				55C14F24136EF86F00649790 /* SUPackageInstaller.m in Sources */,
 				55C14F21136EF84D00649790 /* SUPlainInstaller.m in Sources */,
+				5AB8F169214D4AE300A1187F /* SUSignatures.m in Sources */,
 				55C14F22136EF86000649790 /* SUStandardVersionComparator.m in Sources */,
 				55C14F20136EF84300649790 /* SUStatusController.m in Sources */,
 				55C14F23136EF86700649790 /* SUSystemProfiler.m in Sources */,
@@ -2090,7 +2124,6 @@
 				723B252D1CEAB3A600909873 /* bscommon.c in Sources */,
 				34074B9E1FEABD5A001CB3A5 /* SPUDownloadData.m in Sources */,
 				5D06E8EB0FD68CE4005AE3F6 /* bspatch.c in Sources */,
-				5AF04878214D2E5F00B5789F /* SUSignatures.m in Sources */,
 				61B5FBB709C4FAFF00B25A18 /* SUAppcast.m in Sources */,
 				61B5FC6F09C51F4900B25A18 /* SUAppcastItem.m in Sources */,
 				72316BDF1E0E17910039EFD9 /* SUApplicationInfo.m in Sources */,
@@ -2106,7 +2139,6 @@
 				61B078CF15A5FB6100600039 /* SUCodeSigningVerifier.m in Sources */,
 				61299A6009CA6EB100B7442F /* SUConstants.m in Sources */,
 				6102FE4B0E07803800F85D09 /* SUDiskImageUnarchiver.m in Sources */,
-				61299A3009CA2DAB00B7442F /* SUDSAVerifier.m in Sources */,
 				7275F9C21B5F1F2900B1D19E /* SUFileManager.m in Sources */,
 				722954C51D04E66F00ECF9CA /* SUFileOperationConstants.m in Sources */,
 				767B61AD1972D488004E0C3C /* SUGuidedPackageInstaller.m in Sources */,
@@ -2121,6 +2153,8 @@
 				6101347C0DD2541A0049ACDF /* SUProbingUpdateDriver.m in Sources */,
 				61B93C0A0DD112FF00DCD2F8 /* SUScheduledUpdateDriver.m in Sources */,
 				34074BA81FEAC417001CB3A5 /* SPUDownloaderDeprecated.m in Sources */,
+				5AF04878214D2E5F00B5789F /* SUSignatures.m in Sources */,
+				61299A3009CA2DAB00B7442F /* SUSignatureVerifier.m in Sources */,
 				61A225A50D1C4AC000430CCD /* SUStandardVersionComparator.m in Sources */,
 				6196CFFA09C72149000DC222 /* SUStatusController.m in Sources */,
 				61A2279D0D1CEE7600430CCD /* SUSystemProfiler.m in Sources */,

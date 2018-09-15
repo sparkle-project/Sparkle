@@ -7,7 +7,7 @@
 //
 
 #import "SUUpdateValidator.h"
-#import "SUDSAVerifier.h"
+#import "SUSignatureVerifier.h"
 #import "SUCodeSigningVerifier.h"
 #import "SUInstaller.h"
 #import "SUHost.h"
@@ -49,7 +49,7 @@
                 prevalidatedDsaSignature = NO;
                 SULog(SULogLevelError, @"Failed to validate update before unarchiving because no DSA signature was found");
             } else {
-                prevalidatedDsaSignature = [SUDSAVerifier validatePath:downloadPath withSignatures:signatures withPublicKeys:publicKeys];
+                prevalidatedDsaSignature = [SUSignatureVerifier validatePath:downloadPath withSignatures:signatures withPublicKeys:publicKeys];
                 if (!prevalidatedDsaSignature) {
                     SULog(SULogLevelError, @"DSA signature validation before unarchiving failed for update %@", downloadPath);
                 }
@@ -96,7 +96,7 @@
         // Check to see if we have a package or bundle to validate
         if (isPackage) {
             // For package type updates, all we do is check if the DSA signature is valid
-            BOOL validationCheckSuccess = [SUDSAVerifier validatePath:downloadPath withSignatures:signatures withPublicKeys:publicKeys];
+            BOOL validationCheckSuccess = [SUSignatureVerifier validatePath:downloadPath withSignatures:signatures withPublicKeys:publicKeys];
             if (!validationCheckSuccess) {
                 SULog(SULogLevelError, @"DSA signature validation of the package failed. The update contains an installer package, and valid DSA signatures are mandatory for all installer packages. The update will be rejected. Sign the installer with a valid DSA key or use an .app bundle update instead.");
             }
@@ -156,7 +156,7 @@
     // In that case, the check ensures that the app author has correctly used DSA keys, so that the app will be updateable in the next version.
     // However if the new and old DSA keys are the same, then this is a security measure.
     if (newPublicKeys.dsaPubKey != nil) {
-        if (![SUDSAVerifier validatePath:downloadedPath withSignatures:signatures withPublicKeys:newPublicKeys]) {
+        if (![SUSignatureVerifier validatePath:downloadedPath withSignatures:signatures withPublicKeys:newPublicKeys]) {
             SULog(SULogLevelError, @"DSA signature validation failed. The update has a public DSA key and is signed with a DSA key, but the %@ doesn't match the signature. The update will be rejected.",
                   dsaKeysMatch ? @"public key" : @"new public key shipped with the update");
             return NO;
