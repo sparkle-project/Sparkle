@@ -20,9 +20,14 @@
 
 #include "AppKitPrevention.h"
 
+@interface SUSignatureVerifier ()
+@property (readonly) SUPublicKeys *pubKeys;
+@end
+
 @implementation SUSignatureVerifier {
-    SecKeyRef _secKey;
 }
+
+@synthesize pubKeys = _pubKeys;
 
 + (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicKeys:(SUPublicKeys *)pkeys
 {
@@ -52,8 +57,14 @@
 - (instancetype)initWithPublicKeys:(SUPublicKeys *)pubkeys
 {
     self = [super init];
+    _pubKeys = pubkeys;
 
-    NSData *data = [pubkeys.dsaPubKey dataUsingEncoding:NSASCIIStringEncoding];
+    return self;
+}
+
+- (SecKeyRef)dsaSecKeyRef {
+
+    NSData *data = [self.pubKeys.dsaPubKey dataUsingEncoding:NSASCIIStringEncoding];
     if (!self || !data.length) {
         SULog(SULogLevelError, @"Could not read public DSA key");
         return nil;
@@ -72,26 +83,19 @@
         return nil;
     }
 
+    SecKeyRef dsaPubKeySecKey = nil;
     if (format == kSecFormatOpenSSL && itemType == kSecItemTypePublicKey && CFArrayGetCount(items) == 1) {
         // Seems silly, but we can't quiet the warning about dropping CFTypeRef's const qualifier through
         // any manner of casting I've tried, including interim explicit cast to void*. The -Wcast-qual
         // warning is on by default with -Weverything and apparently became more noisy as of Xcode 7.
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wcast-qual"
-        _secKey = (SecKeyRef)CFRetain(CFArrayGetValueAtIndex(items, 0));
+        dsaPubKeySecKey = (SecKeyRef)CFRetain(CFArrayGetValueAtIndex(items, 0));
 #pragma clang diagnostic pop
     }
 
     CFRelease(items);
-
-    return self;
-}
-
-- (void)dealloc
-{
-    if (_secKey) {
-        CFRelease(_secKey);
-    }
+    return dsaPubKeySecKey;
 }
 
 - (BOOL)verifyFileAtPath:(NSString *)path signatures:(SUSignatures *)signatures
@@ -112,6 +116,11 @@
         return NO;
     }
 
+    SecKeyRef dsaPubKeySecKey = [self dsaSecKeyRef];
+    if (!dsaPubKeySecKey) {
+        return NO;
+    }
+
     __block SecGroupTransformRef group = SecTransformCreateGroupTransform();
     __block SecTransformRef dataReadTransform = NULL;
     __block SecTransformRef dataDigestTransform = NULL;
@@ -124,6 +133,7 @@
 		if (dataDigestTransform) CFRelease(dataDigestTransform);
 		if (dataVerifyTransform) CFRelease(dataVerifyTransform);
 		if (error) CFRelease(error);
+        if (dsaPubKeySecKey) CFRelease(dsaPubKeySecKey);
 		return NO;
     };
 
@@ -140,7 +150,7 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdirect-ivar-access"
-    dataVerifyTransform = SecVerifyTransformCreate(_secKey, (__bridge CFDataRef)dsaSignature, &error);
+    dataVerifyTransform = SecVerifyTransformCreate(dsaPubKeySecKey, (__bridge CFDataRef)dsaSignature, &error);
 #pragma clang diagnostic pop
     if (!dataVerifyTransform || error) {
         SULog(SULogLevelError, @"Could not understand format of the signature: %@; Signature data: %@", error, dsaSignature);
