@@ -11,7 +11,7 @@
 #import "SULog.h"
 
 @implementation SUSignatures
-@synthesize dsaSignature;
+@synthesize dsaSignature = _dsaSignature;
 
 static NSData *decode(NSString *str) {
     if (str == nil) {
@@ -27,7 +27,7 @@ static NSData *decode(NSString *str) {
     self = [super init];
     if (self) {
         if (maybeDsa != nil) {
-            self.dsaSignature = decode(maybeDsa);
+            _dsaSignature = decode(maybeDsa);
         }
         if (maybeEd25519 != nil) {
             NSData *data = decode(maybeEd25519);
@@ -36,6 +36,15 @@ static NSData *decode(NSString *str) {
         }
     }
     return self;
+}
+
+- (const unsigned char *)ed25519Signature {
+    for(size_t i=0; i < sizeof(self->ed25519_signature); i++) {
+        if (self->ed25519_signature[i] != 0) {
+            return self->ed25519_signature;
+        }
+    }
+    return NULL;
 }
 
 @end
@@ -64,6 +73,16 @@ static NSData *decode(NSString *str) {
         return NO;
     }
     return [thisKey isEqualToString:thatKey];
+}
+
+
+- (const unsigned char *)ed25519PubKey {
+    for(size_t i=0; i < sizeof(self->ed25519_public_key); i++) {
+        if (self->ed25519_public_key[i] != 0) {
+            return self->ed25519_public_key;
+        }
+    }
+    return NULL;
 }
 
 @end
