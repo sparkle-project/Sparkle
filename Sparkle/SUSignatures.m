@@ -12,23 +12,29 @@
 @implementation SUSignatures
 @synthesize dsaSignature;
 
+static NSData *decode(NSString *str) {
+    NSString *stripped = [str stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    if (@available(macOS 10.9, *)) {
+        return [[NSData alloc] initWithBase64EncodedString:stripped options:0];
+    } else {
+        return [[NSData alloc] initWithBase64Encoding:stripped];
+    }
+}
+
 - (instancetype)initWithDsa:(NSString * _Nullable)maybeDsa ed:(NSString * _Nullable)maybeEd25519
 {
     self = [super init];
     if (self) {
-        self.dsaSignature = maybeDsa;
+        if (maybeDsa != nil) {
+            self.dsaSignature = decode(maybeDsa);
+        }
         if (maybeEd25519 != nil) {
-            NSString *ed = maybeEd25519;
-            NSData *data;
-            if (@available(macOS 10.9, *)) {
-                data = [[NSData alloc] initWithBase64EncodedString:ed options:0];
-            } else {
-                data = [[NSData alloc] initWithBase64Encoding:ed];
-            }
+            NSData *data = decode(maybeEd25519);
             assert(64 == sizeof(self->ed25519_signature));
             [data getBytes:self->ed25519_signature length:sizeof(self->ed25519_signature)];
         }
     }
     return self;
 }
+
 @end

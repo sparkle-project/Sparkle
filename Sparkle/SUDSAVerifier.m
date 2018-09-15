@@ -14,6 +14,7 @@
 
 #import "SUDSAVerifier.h"
 #import "SULog.h"
+#import "SUSignatures.h"
 #include <CommonCrypto/CommonDigest.h>
 
 
@@ -23,9 +24,9 @@
     SecKeyRef _secKey;
 }
 
-+ (BOOL)validatePath:(NSString *)path withEncodedDSASignature:(NSString *)encodedSignature withPublicDSAKey:(NSString *)pkeyString
++ (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicDSAKey:(NSString *)pkeyString
 {
-    if (!encodedSignature) {
+    if (!signatures) {
         SULog(SULogLevelError, @"There is no DSA signature to check");
         return NO;
     }
@@ -40,9 +41,7 @@
         return NO;
     }
 
-    NSString *strippedSignature = [encodedSignature stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-    NSData *signature = [[NSData alloc] initWithBase64Encoding:strippedSignature];
-    return [verifier verifyFileAtPath:path signature:signature];
+    return [verifier verifyFileAtPath:path signatures:signatures];
 }
 
 - (instancetype)initWithPublicKeyData:(NSData *)data
@@ -89,18 +88,20 @@
     }
 }
 
-- (BOOL)verifyFileAtPath:(NSString *)path signature:(NSData *)signature
+- (BOOL)verifyFileAtPath:(NSString *)path signatures:(SUSignatures *)signatures
 {
     if (!path.length) {
         return NO;
     }
     NSInputStream *dataInputStream = [NSInputStream inputStreamWithFileAtPath:path];
-    return [self verifyStream:dataInputStream signature:signature];
+    return [self verifyStream:dataInputStream signatures:signatures];
 }
 
-- (BOOL)verifyStream:(NSInputStream *)stream signature:(NSData *)signature
+- (BOOL)verifyStream:(NSInputStream *)stream signatures:(SUSignatures *)signatures
 {
-    if (!stream || !signature) {
+    NSData *dsaSignature = signatures.dsaSignature;
+    
+    if (!stream || !dsaSignature) {
         return NO;
     }
 
@@ -132,10 +133,10 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdirect-ivar-access"
-    dataVerifyTransform = SecVerifyTransformCreate(_secKey, (__bridge CFDataRef)signature, &error);
+    dataVerifyTransform = SecVerifyTransformCreate(_secKey, (__bridge CFDataRef)dsaSignature, &error);
 #pragma clang diagnostic pop
     if (!dataVerifyTransform || error) {
-        SULog(SULogLevelError, @"Could not understand format of the signature: %@; Signature data: %@", error, signature);
+        SULog(SULogLevelError, @"Could not understand format of the signature: %@; Signature data: %@", error, dsaSignature);
         return cleanup();
     }
 

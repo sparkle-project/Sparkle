@@ -41,16 +41,15 @@
         BOOL prevalidatedDsaSignature;
         if (performingPrevalidation) {
             NSString *publicDSAKey = host.publicDSAKey;
-            NSString *dsaSignature = signatures.dsaSignature;
 
             if (publicDSAKey == nil) {
                 prevalidatedDsaSignature = NO;
                 SULog(SULogLevelError, @"Failed to validate update before unarchiving because no DSA key was found");
-            } else if (dsaSignature == nil) {
+            } else if (signatures == nil || signatures.dsaSignature == nil) {
                 prevalidatedDsaSignature = NO;
                 SULog(SULogLevelError, @"Failed to validate update before unarchiving because no DSA signature was found");
             } else {
-                prevalidatedDsaSignature = [SUDSAVerifier validatePath:downloadPath withEncodedDSASignature:dsaSignature withPublicDSAKey:publicDSAKey];
+                prevalidatedDsaSignature = [SUDSAVerifier validatePath:downloadPath withSignatures:signatures withPublicDSAKey:publicDSAKey];
                 if (!prevalidatedDsaSignature) {
                     SULog(SULogLevelError, @"DSA signature validation before unarchiving failed for update %@", downloadPath);
                 }
@@ -75,7 +74,7 @@
 {
     assert(self.canValidate);
 
-    NSString *DSASignature = self.signatures.dsaSignature;
+    SUSignatures *signatures = self.signatures;
     NSString *publicDSAKey = self.host.publicDSAKey;
     NSString *downloadPath = self.downloadPath;
     SUHost *host = self.host;
@@ -97,14 +96,14 @@
         // Check to see if we have a package or bundle to validate
         if (isPackage) {
             // For package type updates, all we do is check if the DSA signature is valid
-            BOOL validationCheckSuccess = [SUDSAVerifier validatePath:downloadPath withEncodedDSASignature:DSASignature withPublicDSAKey:publicDSAKey];
+            BOOL validationCheckSuccess = [SUDSAVerifier validatePath:downloadPath withSignatures:signatures withPublicDSAKey:publicDSAKey];
             if (!validationCheckSuccess) {
                 SULog(SULogLevelError, @"DSA signature validation of the package failed. The update contains an installer package, and valid DSA signatures are mandatory for all installer packages. The update will be rejected. Sign the installer with a valid DSA key or use an .app bundle update instead.");
             }
             return validationCheckSuccess;
         } else {
             // For application bundle updates, we check both the DSA and Apple code signing signatures
-            return [self validateUpdateForHost:host downloadedToPath:downloadPath newBundleURL:installSourceURL DSASignature:DSASignature];
+            return [self validateUpdateForHost:host downloadedToPath:downloadPath newBundleURL:installSourceURL signatures:signatures];
         }
     } else if (isPackage) {
         // We shouldn't get here because we don't validate packages before extracting them currently
@@ -132,7 +131,7 @@
  *  * old and new Code Signing identity are the same and valid
  *
  */
-- (BOOL)validateUpdateForHost:(SUHost *)host downloadedToPath:(NSString *)downloadedPath newBundleURL:(NSURL *)newBundleURL DSASignature:(NSString *)DSASignature
+- (BOOL)validateUpdateForHost:(SUHost *)host downloadedToPath:(NSString *)downloadedPath newBundleURL:(NSURL *)newBundleURL signatures:(SUSignatures *)signatures
 {
     NSBundle *newBundle = [NSBundle bundleWithURL:newBundleURL];
     if (newBundle == nil) {
@@ -157,7 +156,7 @@
     // In that case, the check ensures that the app author has correctly used DSA keys, so that the app will be updateable in the next version.
     // However if the new and old DSA keys are the same, then this is a security measure.
     if (newPublicDSAKey != nil) {
-        if (![SUDSAVerifier validatePath:downloadedPath withEncodedDSASignature:DSASignature withPublicDSAKey:newPublicDSAKey]) {
+        if (![SUDSAVerifier validatePath:downloadedPath withSignatures:signatures withPublicDSAKey:newPublicDSAKey]) {
             SULog(SULogLevelError, @"DSA signature validation failed. The update has a public DSA key and is signed with a DSA key, but the %@ doesn't match the signature. The update will be rejected.",
                   dsaKeysMatch ? @"public key" : @"new public key shipped with the update");
             return NO;

@@ -13,10 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SUSignatures : NSObject {
     unsigned char ed25519_signature[64];
 }
-@property (nullable) NSString *dsaSignature;
+@property (nullable) NSData *dsaSignature;
 
 - (instancetype)initWithDsa:(NSString * _Nullable)dsa ed:(NSString * _Nullable)ed;
-
 @end
 
 NS_ASSUME_NONNULL_END
