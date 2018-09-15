@@ -100,6 +100,23 @@
 		5AAD006A1E0C2DB500AF411E /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
 		5AAD006C1E0C2DBF00AF411E /* libxar.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AAD006B1E0C2DBF00AF411E /* libxar.tbd */; };
 		5AB8F169214D4AE300A1187F /* SUSignatures.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF04876214D2E5F00B5789F /* SUSignatures.m */; };
+		5AB8F180214D564C00A1187F /* sc.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F16F214D564A00A1187F /* sc.c */; };
+		5AB8F181214D564C00A1187F /* sha512.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F170214D564A00A1187F /* sha512.h */; };
+		5AB8F182214D564C00A1187F /* add_scalar.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F171214D564A00A1187F /* add_scalar.c */; };
+		5AB8F183214D564C00A1187F /* sha512.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F172214D564B00A1187F /* sha512.c */; };
+		5AB8F184214D564C00A1187F /* fe.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F173214D564B00A1187F /* fe.h */; };
+		5AB8F185214D564C00A1187F /* ed25519.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F174214D564B00A1187F /* ed25519.h */; };
+		5AB8F186214D564C00A1187F /* ge.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F175214D564B00A1187F /* ge.c */; };
+		5AB8F187214D564C00A1187F /* precomp_data.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F176214D564B00A1187F /* precomp_data.h */; };
+		5AB8F188214D564C00A1187F /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F177214D564B00A1187F /* verify.c */; };
+		5AB8F189214D564C00A1187F /* key_exchange.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F178214D564B00A1187F /* key_exchange.c */; };
+		5AB8F18A214D564C00A1187F /* fixedint.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F179214D564B00A1187F /* fixedint.h */; };
+		5AB8F18B214D564C00A1187F /* ge.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F17A214D564B00A1187F /* ge.h */; };
+		5AB8F18C214D564C00A1187F /* seed.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17B214D564B00A1187F /* seed.c */; };
+		5AB8F18D214D564C00A1187F /* fe.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17C214D564B00A1187F /* fe.c */; };
+		5AB8F18E214D564C00A1187F /* sign.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17D214D564B00A1187F /* sign.c */; };
+		5AB8F18F214D564C00A1187F /* sc.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F17E214D564B00A1187F /* sc.h */; };
+		5AB8F190214D564C00A1187F /* keypair.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17F214D564C00A1187F /* keypair.c */; };
 		5AD0FA7F1C73F2E2004BCEFF /* testappcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5AD0FA7E1C73F2E2004BCEFF /* testappcast.xml */; };
 		5AE13F781E0C9B12000D2C2C /* DSASignature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE13F771E0C9B12000D2C2C /* DSASignature.swift */; };
 		5AE13FA01E0D4F65000D2C2C /* Appcast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE13F9F1E0D4F65000D2C2C /* Appcast.swift */; };
@@ -640,6 +657,23 @@
 		5AA96C5D1E0AE0F900CA4346 /* Appcast-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Appcast-Bridging-Header.h"; sourceTree = "<group>"; };
 		5AAD00511E0BE6BE00AF411E /* ArchiveItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArchiveItem.swift; sourceTree = "<group>"; };
 		5AAD006B1E0C2DBF00AF411E /* libxar.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxar.tbd; path = usr/lib/libxar.tbd; sourceTree = SDKROOT; };
+		5AB8F16F214D564A00A1187F /* sc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sc.c; path = ed25519/src/sc.c; sourceTree = SOURCE_ROOT; };
+		5AB8F170214D564A00A1187F /* sha512.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sha512.h; path = ed25519/src/sha512.h; sourceTree = SOURCE_ROOT; };
+		5AB8F171214D564A00A1187F /* add_scalar.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = add_scalar.c; path = ed25519/src/add_scalar.c; sourceTree = SOURCE_ROOT; };
+		5AB8F172214D564B00A1187F /* sha512.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sha512.c; path = ed25519/src/sha512.c; sourceTree = SOURCE_ROOT; };
+		5AB8F173214D564B00A1187F /* fe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fe.h; path = ed25519/src/fe.h; sourceTree = SOURCE_ROOT; };
+		5AB8F174214D564B00A1187F /* ed25519.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ed25519.h; path = ed25519/src/ed25519.h; sourceTree = SOURCE_ROOT; };
+		5AB8F175214D564B00A1187F /* ge.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ge.c; path = ed25519/src/ge.c; sourceTree = SOURCE_ROOT; };
+		5AB8F176214D564B00A1187F /* precomp_data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = precomp_data.h; path = ed25519/src/precomp_data.h; sourceTree = SOURCE_ROOT; };
+		5AB8F177214D564B00A1187F /* verify.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = verify.c; path = ed25519/src/verify.c; sourceTree = SOURCE_ROOT; };
+		5AB8F178214D564B00A1187F /* key_exchange.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = key_exchange.c; path = ed25519/src/key_exchange.c; sourceTree = SOURCE_ROOT; };
+		5AB8F179214D564B00A1187F /* fixedint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fixedint.h; path = ed25519/src/fixedint.h; sourceTree = SOURCE_ROOT; };
+		5AB8F17A214D564B00A1187F /* ge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ge.h; path = ed25519/src/ge.h; sourceTree = SOURCE_ROOT; };
+		5AB8F17B214D564B00A1187F /* seed.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = seed.c; path = ed25519/src/seed.c; sourceTree = SOURCE_ROOT; };
+		5AB8F17C214D564B00A1187F /* fe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fe.c; path = ed25519/src/fe.c; sourceTree = SOURCE_ROOT; };
+		5AB8F17D214D564B00A1187F /* sign.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sign.c; path = ed25519/src/sign.c; sourceTree = SOURCE_ROOT; };
+		5AB8F17E214D564B00A1187F /* sc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sc.h; path = ed25519/src/sc.h; sourceTree = SOURCE_ROOT; };
+		5AB8F17F214D564C00A1187F /* keypair.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = keypair.c; path = ed25519/src/keypair.c; sourceTree = SOURCE_ROOT; };
 		5AD0FA7E1C73F2E2004BCEFF /* testappcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = testappcast.xml; sourceTree = "<group>"; };
 		5AE13F771E0C9B12000D2C2C /* DSASignature.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DSASignature.swift; sourceTree = "<group>"; };
 		5AE13F9F1E0D4F65000D2C2C /* Appcast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Appcast.swift; sourceTree = "<group>"; };
@@ -2121,9 +2155,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AB8F182214D564C00A1187F /* add_scalar.c in Sources */,
 				723B252D1CEAB3A600909873 /* bscommon.c in Sources */,
 				34074B9E1FEABD5A001CB3A5 /* SPUDownloadData.m in Sources */,
 				5D06E8EB0FD68CE4005AE3F6 /* bspatch.c in Sources */,
+				5AB8F18D214D564C00A1187F /* fe.c in Sources */,
+				5AB8F186214D564C00A1187F /* ge.c in Sources */,
+				5AB8F189214D564C00A1187F /* key_exchange.c in Sources */,
+				5AB8F190214D564C00A1187F /* keypair.c in Sources */,
+				5AB8F180214D564C00A1187F /* sc.c in Sources */,
+				5AB8F18C214D564C00A1187F /* seed.c in Sources */,
+				5AB8F183214D564C00A1187F /* sha512.c in Sources */,
+				5AB8F18E214D564C00A1187F /* sign.c in Sources */,
 				61B5FBB709C4FAFF00B25A18 /* SUAppcast.m in Sources */,
 				61B5FC6F09C51F4900B25A18 /* SUAppcastItem.m in Sources */,
 				72316BDF1E0E17910039EFD9 /* SUApplicationInfo.m in Sources */,
@@ -2171,6 +2214,7 @@
 				61B5F8EE09C4CE3C00B25A18 /* SUUpdater.m in Sources */,
 				729924741DF3478A00DBCDF5 /* SUUpdateValidator.m in Sources */,
 				61A354560DF113C70076ECB1 /* SUUserInitiatedUpdateDriver.m in Sources */,
+				5AB8F188214D564C00A1187F /* verify.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
