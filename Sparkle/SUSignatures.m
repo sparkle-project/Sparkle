@@ -17,6 +17,17 @@
     self = [super init];
     if (self) {
         self.dsaSignature = maybeDsa;
+        if (maybeEd25519 != nil) {
+            NSString *ed = maybeEd25519;
+            NSData *data;
+            if (@available(macOS 10.9, *)) {
+                data = [[NSData alloc] initWithBase64EncodedString:ed options:0];
+            } else {
+                data = [[NSData alloc] initWithBase64Encoding:ed];
+            }
+            assert(64 == sizeof(self->ed25519_signature));
+            [data getBytes:self->ed25519_signature length:sizeof(self->ed25519_signature)];
+        }
     }
     return self;
 }

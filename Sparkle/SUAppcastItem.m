@@ -156,7 +156,7 @@
             self.fileURL = [NSURL URLWithString:fileURLString];
         }
         if (enclosure) {
-            self.signatures = [[SUSignatures alloc] initWithDsa:[enclosure objectForKey:SUAppcastAttributeDSASignature] ed:nil];
+            self.signatures = [[SUSignatures alloc] initWithDsa:[enclosure objectForKey:SUAppcastAttributeDSASignature] ed:[enclosure objectForKey:SUAppcastAttributeEDSignature]];
             self.osString = [enclosure objectForKey:SUAppcastAttributeOsType];
         }
 

@@ -33,6 +33,7 @@ NSString *const SUSkippedVersionKey = @"SUSkippedVersion";
 NSString *const SUScheduledCheckIntervalKey = @"SUScheduledCheckInterval";
 NSString *const SULastCheckTimeKey = @"SULastCheckTime";
 NSString *const SUExpectsDSASignatureKey = @"SUExpectsDSASignature";
+NSString *const SUExpectsEDSignatureKey = @"SUExpectsEDSignatureKey";
 NSString *const SUPublicDSAKeyKey = @"SUPublicDSAKey";
 NSString *const SUPublicDSAKeyFileKey = @"SUPublicDSAKeyFile";
 NSString *const SUAutomaticallyUpdateKey = @"SUAutomaticallyUpdate";
@@ -54,6 +55,7 @@ NSString *const SURelaunchToolNameKey = @"SURelaunchToolName";
 
 NSString *const SUAppcastAttributeDeltaFrom = @"sparkle:deltaFrom";
 NSString *const SUAppcastAttributeDSASignature = @"sparkle:dsaSignature";
+NSString *const SUAppcastAttributeEDSignature = @"sparkle:edSignature";
 NSString *const SUAppcastAttributeShortVersionString = @"sparkle:shortVersionString";
 NSString *const SUAppcastAttributeVersion = @"sparkle:version";
 NSString *const SUAppcastAttributeOsType = @"sparkle:os";
