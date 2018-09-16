@@ -112,19 +112,19 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
             descElement.setChildren([cdata]);
         }
 
-        var minVer = findElement(name: "sparkle:minimumSystemVersion", parent: item);
+        var minVer = findElement(name: SUAppcastElementMinimumSystemVersion, parent: item);
         if nil == minVer {
-            minVer = XMLElement.element(withName: "sparkle:minimumSystemVersion", uri: sparkleNS) as? XMLElement;
+            minVer = XMLElement.element(withName: SUAppcastElementMinimumSystemVersion, uri: sparkleNS) as? XMLElement;
             linebreak(item);
             item.addChild(minVer!);
         }
         minVer?.setChildren([text(update.minimumSystemVersion)]);
 
-        let relElement = findElement(name: "sparkle:releaseNotesLink", parent: item);
+        let relElement = findElement(name: SUAppcastElementReleaseNotesLink, parent: item);
         if let url = update.releaseNotesURL {
             if nil == relElement {
                 linebreak(item);
-                item.addChild(XMLElement.element(withName:"sparkle:releaseNotesLink", stringValue: url.absoluteString) as! XMLElement);
+                item.addChild(XMLElement.element(withName: SUAppcastElementReleaseNotesLink, stringValue: url.absoluteString) as! XMLElement);
             }
         } else if let childIndex = relElement?.index {
             item.removeChild(at: childIndex);
@@ -142,23 +142,23 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
         };
         var attributes = [
             XMLNode.attribute(withName: "url", stringValue: archiveURL) as! XMLNode,
-            XMLNode.attribute(withName: "sparkle:version", uri: sparkleNS, stringValue: update.version) as! XMLNode,
-            XMLNode.attribute(withName: "sparkle:shortVersionString", uri: sparkleNS, stringValue: update.shortVersion) as! XMLNode,
+            XMLNode.attribute(withName: SUAppcastAttributeVersion, uri: sparkleNS, stringValue: update.version) as! XMLNode,
+            XMLNode.attribute(withName: SUAppcastAttributeShortVersionString, uri: sparkleNS, stringValue: update.shortVersion) as! XMLNode,
             XMLNode.attribute(withName: "length", stringValue: String(update.fileSize)) as! XMLNode,
             XMLNode.attribute(withName: "type", stringValue: update.mimeType) as! XMLNode,
         ];
         if let sig = update.edSignature {
-            attributes.append(XMLNode.attribute(withName: "sparkle:edSignature", uri: sparkleNS, stringValue: sig) as! XMLNode);
+            attributes.append(XMLNode.attribute(withName: SUAppcastAttributeEDSignature, uri: sparkleNS, stringValue: sig) as! XMLNode);
         }
         if let sig = update.dsaSignature {
-            attributes.append(XMLNode.attribute(withName: "sparkle:dsaSignature", uri: sparkleNS, stringValue: sig) as! XMLNode);
+            attributes.append(XMLNode.attribute(withName: SUAppcastAttributeDSASignature, uri: sparkleNS, stringValue: sig) as! XMLNode);
         }
         enclosure!.attributes = attributes;
 
         if update.deltas.count > 0 {
-            var deltas = findElement(name: "sparkle:deltas", parent: item);
+            var deltas = findElement(name: SUAppcastElementDeltas, parent: item);
             if nil == deltas {
-                deltas = XMLElement.element(withName: "sparkle:deltas", uri: sparkleNS) as? XMLElement;
+                deltas = XMLElement.element(withName: SUAppcastElementDeltas, uri: sparkleNS) as? XMLElement;
                 linebreak(item);
                 item.addChild(deltas!);
             } else {
@@ -167,17 +167,17 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
             for delta in update.deltas {
                 var attributes = [
                     XMLNode.attribute(withName: "url", stringValue: URL(string: delta.archivePath.lastPathComponent.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlPathAllowed)!, relativeTo: update.archiveURL)!.absoluteString) as! XMLNode,
-                    XMLNode.attribute(withName: "sparkle:version", uri: sparkleNS, stringValue: update.version) as! XMLNode,
-                    XMLNode.attribute(withName: "sparkle:shortVersionString", uri: sparkleNS, stringValue: update.shortVersion) as! XMLNode,
-                    XMLNode.attribute(withName: "sparkle:deltaFrom", uri: sparkleNS, stringValue: delta.fromVersion) as! XMLNode,
+                    XMLNode.attribute(withName: SUAppcastAttributeVersion, uri: sparkleNS, stringValue: update.version) as! XMLNode,
+                    XMLNode.attribute(withName: SUAppcastAttributeShortVersionString, uri: sparkleNS, stringValue: update.shortVersion) as! XMLNode,
+                    XMLNode.attribute(withName: SUAppcastAttributeDeltaFrom, uri: sparkleNS, stringValue: delta.fromVersion) as! XMLNode,
                     XMLNode.attribute(withName: "length", stringValue: String(delta.fileSize)) as! XMLNode,
                     XMLNode.attribute(withName: "type", stringValue: "application/octet-stream") as! XMLNode,
                     ];
                 if let sig = delta.edSignature {
-                    attributes.append(XMLNode.attribute(withName: "sparkle:edSignature", uri: sparkleNS, stringValue: sig) as! XMLNode);
+                    attributes.append(XMLNode.attribute(withName: SUAppcastAttributeEDSignature, uri: sparkleNS, stringValue: sig) as! XMLNode);
                 }
                 if let sig = delta.dsaSignature {
-                    attributes.append(XMLNode.attribute(withName: "sparkle:dsaSignature", uri: sparkleNS, stringValue: sig) as! XMLNode);
+                    attributes.append(XMLNode.attribute(withName: SUAppcastAttributeDSASignature, uri: sparkleNS, stringValue: sig) as! XMLNode);
                 }
                 linebreak(deltas!);
                 deltas!.addChild(XMLNode.element(withName: "enclosure", children: nil, attributes: attributes) as! XMLElement);
