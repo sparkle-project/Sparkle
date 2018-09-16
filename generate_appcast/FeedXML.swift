@@ -147,6 +147,9 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
             XMLNode.attribute(withName: "length", stringValue: String(update.fileSize)) as! XMLNode,
             XMLNode.attribute(withName: "type", stringValue: update.mimeType) as! XMLNode,
         ];
+        if let sig = update.edSignature {
+            attributes.append(XMLNode.attribute(withName: "sparkle:edSignature", uri: sparkleNS, stringValue: sig) as! XMLNode);
+        }
         if let sig = update.dsaSignature {
             attributes.append(XMLNode.attribute(withName: "sparkle:dsaSignature", uri: sparkleNS, stringValue: sig) as! XMLNode);
         }
@@ -170,6 +173,9 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
                     XMLNode.attribute(withName: "length", stringValue: String(delta.fileSize)) as! XMLNode,
                     XMLNode.attribute(withName: "type", stringValue: "application/octet-stream") as! XMLNode,
                     ];
+                if let sig = delta.edSignature {
+                    attributes.append(XMLNode.attribute(withName: "sparkle:edSignature", uri: sparkleNS, stringValue: sig) as! XMLNode);
+                }
                 if let sig = delta.dsaSignature {
                     attributes.append(XMLNode.attribute(withName: "sparkle:dsaSignature", uri: sparkleNS, stringValue: sig) as! XMLNode);
                 }

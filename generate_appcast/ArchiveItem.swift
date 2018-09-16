@@ -83,8 +83,8 @@ class ArchiveItem: CustomStringConvertible {
                 throw makeError(code: .unarchivingError, "No Version \(kCFBundleVersionKey as String? ?? "missing kCFBundleVersionKey") \(appPath)");
             }
             let shortVersion = infoPlist["CFBundleShortVersionString"] as? String;
-            let publicEdKey = infoPlist["SUPublicEDKey"] as? String;
-            let supportsDSA = infoPlist["SUPublicDSAKey"] != nil || infoPlist["SUPublicDSAKeyFile"] != nil;
+            let publicEdKey = infoPlist[SUPublicEDKeyKey] as? String;
+            let supportsDSA = infoPlist[SUPublicDSAKeyKey] != nil || infoPlist[SUPublicDSAKeyFileKey] != nil;
 
             var feedURL:URL? = nil;
             if let feedURLStr = infoPlist["SUFeedURL"] as? String {
