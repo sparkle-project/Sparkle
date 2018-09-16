@@ -33,16 +33,14 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
     for update in allUpdates {
         group.enter();
         DispatchQueue.global().async {
-            if update.supportsDSA {
-                if let privateDSAKey = keys.privateDSAKey {
-                    do {
-                        update.dsaSignature = try dsaSignature(path: update.archivePath, privateDSAKey: privateDSAKey);
-                    } catch {
-                        print(update, error);
-                    }
-                } else {
-                    print("Note: did not sign with legacy DSA \(update.archivePath.path) because private DSA key file was not specified");
+            if let privateDSAKey = keys.privateDSAKey {
+                do {
+                    update.dsaSignature = try dsaSignature(path: update.archivePath, privateDSAKey: privateDSAKey);
+                } catch {
+                    print(update, error);
                 }
+            } else if update.supportsDSA {
+                print("Note: did not sign with legacy DSA \(update.archivePath.path) because private DSA key file was not specified");
             }
             if let publicEdKey = update.publicEdKey {
                 if let privateEdKey = keys.privateEdKey {
@@ -70,9 +68,6 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
         var latestUpdatePerOS:[String:ArchiveItem] = [:];
 
         for update in updates {
-            if !update.supportsDSA && update.publicEdKey == nil {
-                continue;
-            }
             // items are ordered starting latest first
             let os = update.minimumSystemVersion;
             if latestUpdatePerOS[os] == nil {
@@ -86,6 +81,10 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
             for item in updates {
                 // No downgrades
                 if .orderedAscending != comparator.compareVersion(item.version, toVersion: latestItem.version) {
+                    continue;
+                }
+                // Old version will not be able to verify the new version
+                if !item.supportsDSA && item.publicEdKey == nil {
                     continue;
                 }
 
@@ -113,7 +112,7 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
 
                     group.enter();
                     DispatchQueue.global().async {
-                        if latestItem.supportsDSA, let privateDSAKey = keys.privateDSAKey {
+                        if item.supportsDSA, let privateDSAKey = keys.privateDSAKey {
                             do {
                                 delta.dsaSignature = try dsaSignature(path: deltaPath, privateDSAKey: privateDSAKey);
                             } catch {
