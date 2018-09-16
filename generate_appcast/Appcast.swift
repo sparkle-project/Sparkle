@@ -80,6 +80,10 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
             var numDeltas = 0;
             let appBaseName = latestItem.appPath.deletingPathExtension().lastPathComponent;
             for item in updates {
+                if numDeltas > maxDeltas {
+                    break;
+                }
+
                 // No downgrades
                 if .orderedAscending != comparator.compareVersion(item.version, toVersion: latestItem.version) {
                     continue;
@@ -93,7 +97,12 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
                 let deltaPath = archivesSourceDir.appendingPathComponent(deltaBaseName).appendingPathExtension("delta");
 
                 var delta:DeltaUpdate;
-                if !FileManager.default.fileExists(atPath: deltaPath.path) {
+                let ignoreMarkerPath = cacheDir.appendingPathComponent(deltaPath.lastPathComponent).appendingPathExtension(".ignore");
+                let fm = FileManager.default;
+                if fm.fileExists(atPath: ignoreMarkerPath.path) {
+                    continue;
+                }
+                if !fm.fileExists(atPath: deltaPath.path) {
                     do {
                         delta = try DeltaUpdate.create(from: item, to: latestItem, archivePath: deltaPath);
                     } catch {
@@ -104,37 +113,37 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
                     delta = DeltaUpdate(fromVersion: item.version, archivePath: deltaPath);
                 }
 
+                numDeltas += 1;
+
                 // Require delta to be a bit smaller
-                if delta.fileSize / 7 < latestItem.fileSize / 8 {
-                    numDeltas += 1;
-                    if numDeltas > maxDeltas {
-                        break;
-                    }
+                if delta.fileSize / 7 > latestItem.fileSize / 8 {
+                    markDeltaAsIgnored(delta: delta, markerPath: ignoreMarkerPath)
+                    continue;
+                }
 
-                    group.enter();
-                    DispatchQueue.global().async {
-                        if item.supportsDSA, let privateDSAKey = keys.privateDSAKey {
-                            do {
-                                delta.dsaSignature = try dsaSignature(path: deltaPath, privateDSAKey: privateDSAKey);
-                            } catch {
-                                print(delta.archivePath.lastPathComponent, error);
-                            }
+                group.enter();
+                DispatchQueue.global().async {
+                    if item.supportsDSA, let privateDSAKey = keys.privateDSAKey {
+                        do {
+                            delta.dsaSignature = try dsaSignature(path: deltaPath, privateDSAKey: privateDSAKey);
+                        } catch {
+                            print(delta.archivePath.lastPathComponent, error);
                         }
-                        if let publicEdKey = item.publicEdKey, let privateEdKey = keys.privateEdKey {
-                            do {
-                                delta.edSignature = try edSignature(path: deltaPath, publicEdKey: publicEdKey, privateEdKey: privateEdKey);
-                            } catch {
-                                print(delta.archivePath.lastPathComponent, error);
-                            }
-                        }
-                        if delta.dsaSignature != nil || delta.edSignature != nil {
-                            latestItem.deltas.append(delta);
-                        } else {
-                            print("Delta \(delta.archivePath.path) ignored, because it could not be signed");
-                        }
-
-                        group.leave();
                     }
+                    if let publicEdKey = item.publicEdKey, let privateEdKey = keys.privateEdKey {
+                        do {
+                            delta.edSignature = try edSignature(path: deltaPath, publicEdKey: publicEdKey, privateEdKey: privateEdKey);
+                        } catch {
+                            print(delta.archivePath.lastPathComponent, error);
+                        }
+                    }
+                    if delta.dsaSignature != nil || delta.edSignature != nil {
+                        latestItem.deltas.append(delta);
+                    } else {
+                        markDeltaAsIgnored(delta: delta, markerPath: ignoreMarkerPath)
+                        print("Delta \(delta.archivePath.path) ignored, because it could not be signed");
+                    }
+                    group.leave();
                 }
             }
         }
@@ -143,4 +152,9 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
     group.wait();
 
     return updatesByAppcast;
+}
+
+func markDeltaAsIgnored(delta: DeltaUpdate, markerPath: URL) {
+    let _ = try? FileManager.default.removeItem(at: delta.archivePath)
+    let _ = try? Data.init().write(to: markerPath); // 0-sized file
 }
