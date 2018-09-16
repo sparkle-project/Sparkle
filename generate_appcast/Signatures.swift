@@ -94,9 +94,11 @@ func dsaSignature(path: URL, privateDSAKey: SecKey) throws -> String {
 }
 
 func edSignature(path: URL, publicEdKey: Data, privateEdKey: Data) throws -> String {
+    assert(publicEdKey.count == 32)
+    assert(privateEdKey.count == 64)
     let data = try Data.init(contentsOf: path, options: .mappedIfSafe);
-    var output = Data(count: 64);
     let len = data.count;
+    var output = Data(count: 64);
     output.withUnsafeMutableBytes({ (output: UnsafeMutablePointer<UInt8>) in
         data.withUnsafeBytes({ (data: UnsafePointer<UInt8>) in
             publicEdKey.withUnsafeBytes({ (publicEdKey: UnsafePointer<UInt8>) in

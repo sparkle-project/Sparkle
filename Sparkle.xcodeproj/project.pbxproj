@@ -89,6 +89,17 @@
 		5A4094481C74EA5200983BE0 /* SUAppcastTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA4DCD01C73E5510078F128 /* SUAppcastTest.swift */; };
 		5A5AC5361E0C6CA300998119 /* Unarchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5AC5351E0C6CA300998119 /* Unarchive.swift */; };
 		5A5AC5381E0C6D3000998119 /* FeedXML.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5AC5371E0C6D3000998119 /* FeedXML.swift */; };
+		5A5ADEDA214EDE4900DF0099 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5ADED9214EDE4900DF0099 /* main.swift */; };
+		5A5ADEDF214EDF6300DF0099 /* add_scalar.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F171214D564A00A1187F /* add_scalar.c */; };
+		5A5ADEE0214EDF6300DF0099 /* fe.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17C214D564B00A1187F /* fe.c */; };
+		5A5ADEE1214EDF6300DF0099 /* ge.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F175214D564B00A1187F /* ge.c */; };
+		5A5ADEE2214EDF6300DF0099 /* key_exchange.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F178214D564B00A1187F /* key_exchange.c */; };
+		5A5ADEE3214EDF6300DF0099 /* keypair.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17F214D564C00A1187F /* keypair.c */; };
+		5A5ADEE4214EDF6300DF0099 /* sc.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F16F214D564A00A1187F /* sc.c */; };
+		5A5ADEE5214EDF6300DF0099 /* seed.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17B214D564B00A1187F /* seed.c */; };
+		5A5ADEE6214EDF6300DF0099 /* sha512.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F172214D564B00A1187F /* sha512.c */; };
+		5A5ADEE7214EDF6300DF0099 /* sign.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17D214D564B00A1187F /* sign.c */; };
+		5A5ADEE8214EDF6300DF0099 /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F177214D564B00A1187F /* verify.c */; };
 		5A6D31EE1BF53245009C5157 /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7275F9C01B5F1F2900B1D19E /* SUFileManager.m */; };
 		5A6D31EF1BF5325F009C5157 /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		5AA96C581E0AE0DB00CA4346 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA96C571E0AE0DB00CA4346 /* main.swift */; };
@@ -472,6 +483,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5A5ADED5214EDE4900DF0099 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		5AB8F19D214DA72000A1187F /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -682,6 +702,8 @@
 		55E6F33219EC9F6C00005E76 /* SUErrors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUErrors.h; sourceTree = "<group>"; };
 		5A5AC5351E0C6CA300998119 /* Unarchive.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Unarchive.swift; sourceTree = "<group>"; };
 		5A5AC5371E0C6D3000998119 /* FeedXML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedXML.swift; sourceTree = "<group>"; };
+		5A5ADED7214EDE4900DF0099 /* sign_update */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sign_update; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A5ADED9214EDE4900DF0099 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		5AA4DCD01C73E5510078F128 /* SUAppcastTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SUAppcastTest.swift; sourceTree = "<group>"; };
 		5AA96C571E0AE0DB00CA4346 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		5AA96C5D1E0AE0F900CA4346 /* Appcast-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Appcast-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -950,6 +972,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5A5ADED4214EDE4900DF0099 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5AA96C521E0AE0DB00CA4346 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1045,6 +1074,7 @@
 				722954B41D04ADAF00ECF9CA /* fileop */,
 				5AE13FB31E0D9E07000D2C2C /* generate_appcast */,
 				5AB8F19F214DA72000A1187F /* generate_keys */,
+				5A5ADED7214EDE4900DF0099 /* sign_update */,
 				55C14BB7136EEF1500649790 /* Autoupdate.app */,
 				61B5F90209C4CEE200B25A18 /* Sparkle Test App.app */,
 				612279D90DB5470200AB99EA /* Sparkle Unit Tests.xctest */,
@@ -1067,6 +1097,7 @@
 				FA1941C40D94A6EA00DD942E /* Configurations */,
 				726B2B5E1C645FC900388755 /* UI Tests */,
 				5AB8F1A0214DA72000A1187F /* generate_keys */,
+				5A5ADED8214EDE4900DF0099 /* sign_update */,
 				0867D69AFE84028FC02AAC07 /* Frameworks */,
 				034768DFFF38A50411DB9C8B /* Products */,
 			);
@@ -1235,6 +1266,14 @@
 				720767CE1E2DC37400F9A850 /* TerminationListener.m */,
 			);
 			path = Autoupdate;
+			sourceTree = "<group>";
+		};
+		5A5ADED8214EDE4900DF0099 /* sign_update */ = {
+			isa = PBXGroup;
+			children = (
+				5A5ADED9214EDE4900DF0099 /* main.swift */,
+			);
+			path = sign_update;
 			sourceTree = "<group>";
 		};
 		5AA96C561E0AE0DB00CA4346 /* generate_appcast */ = {
@@ -1699,6 +1738,23 @@
 			productReference = 55C14BB7136EEF1500649790 /* Autoupdate.app */;
 			productType = "com.apple.product-type.application";
 		};
+		5A5ADED6214EDE4900DF0099 /* sign_update */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5A5ADEDB214EDE4900DF0099 /* Build configuration list for PBXNativeTarget "sign_update" */;
+			buildPhases = (
+				5A5ADED3214EDE4900DF0099 /* Sources */,
+				5A5ADED4214EDE4900DF0099 /* Frameworks */,
+				5A5ADED5214EDE4900DF0099 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = sign_update;
+			productName = sign_update;
+			productReference = 5A5ADED7214EDE4900DF0099 /* sign_update */;
+			productType = "com.apple.product-type.tool";
+		};
 		5AA96C541E0AE0DB00CA4346 /* generate_appcast */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5AA96C5C1E0AE0DC00CA4346 /* Build configuration list for PBXNativeTarget "generate_appcast" */;
@@ -1853,10 +1909,14 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = SU;
-				LastSwiftUpdateCheck = 0800;
+				LastSwiftUpdateCheck = 1000;
 				LastUpgradeCheck = 0920;
 				ORGANIZATIONNAME = "Sparkle Project";
 				TargetAttributes = {
+					5A5ADED6214EDE4900DF0099 = {
+						CreatedOnToolsVersion = 10.0;
+						ProvisioningStyle = Automatic;
+					};
 					5AA96C541E0AE0DB00CA4346 = {
 						CreatedOnToolsVersion = 8.0;
 						LastSwiftMigration = 0900;
@@ -1948,6 +2008,7 @@
 				722954B31D04ADAF00ECF9CA /* fileop */,
 				5AA96C541E0AE0DB00CA4346 /* generate_appcast */,
 				5AB8F19E214DA72000A1187F /* generate_keys */,
+				5A5ADED6214EDE4900DF0099 /* sign_update */,
 			);
 		};
 /* End PBXProject section */
@@ -2114,6 +2175,24 @@
 				55C14F23136EF86700649790 /* SUSystemProfiler.m in Sources */,
 				E1EC2A301E21667000245715 /* SUTouchBarButtonGroup.m in Sources */,
 				720767CF1E2DC37400F9A850 /* TerminationListener.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A5ADED3214EDE4900DF0099 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5A5ADEDF214EDF6300DF0099 /* add_scalar.c in Sources */,
+				5A5ADEE0214EDF6300DF0099 /* fe.c in Sources */,
+				5A5ADEE1214EDF6300DF0099 /* ge.c in Sources */,
+				5A5ADEE2214EDF6300DF0099 /* key_exchange.c in Sources */,
+				5A5ADEE3214EDF6300DF0099 /* keypair.c in Sources */,
+				5A5ADEDA214EDE4900DF0099 /* main.swift in Sources */,
+				5A5ADEE4214EDF6300DF0099 /* sc.c in Sources */,
+				5A5ADEE5214EDF6300DF0099 /* seed.c in Sources */,
+				5A5ADEE6214EDF6300DF0099 /* sha512.c in Sources */,
+				5A5ADEE7214EDF6300DF0099 /* sign.c in Sources */,
+				5A5ADEE8214EDF6300DF0099 /* verify.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2764,6 +2843,34 @@
 			};
 			name = Release;
 		};
+		5A5ADEDC214EDE4900DF0099 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5AB8F1AA214DA85900A1187F /* ConfigGenerateKeysDebug.xcconfig */;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Debug;
+		};
+		5A5ADEDD214EDE4900DF0099 /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5AB8F1AA214DA85900A1187F /* ConfigGenerateKeysDebug.xcconfig */;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Coverage;
+		};
+		5A5ADEDE214EDE4900DF0099 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5AB8F1A9214DA85900A1187F /* ConfigGenerateKeysRelease.xcconfig */;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+			};
+			name = Release;
+		};
 		5AA96C591E0AE0DC00CA4346 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7205C4351E12CA7000E370AE /* ConfigGenerateAppcastDebug.xcconfig */;
@@ -2964,6 +3071,16 @@
 				55C14BBB136EEF1500649790 /* Debug */,
 				149B785F1B7D398100D7D62C /* Coverage */,
 				55C14BBC136EEF1500649790 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5A5ADEDB214EDE4900DF0099 /* Build configuration list for PBXNativeTarget "sign_update" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5A5ADEDC214EDE4900DF0099 /* Debug */,
+				5A5ADEDD214EDE4900DF0099 /* Coverage */,
+				5A5ADEDE214EDE4900DF0099 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
