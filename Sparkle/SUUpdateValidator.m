@@ -21,7 +21,7 @@
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic) BOOL prevalidatedSignature;
 @property (nonatomic) BOOL downloadPrevalidationFailed;
-@property (nonatomic, readonly) SUSignatures *signatures;
+@property (strong, nonatomic, readonly) SUSignatures *signatures;
 @property (nonatomic, readonly) NSString *downloadPath;
 
 @end
@@ -39,7 +39,7 @@
     self = [super init];
     if (self != nil) {
         _downloadPath = [downloadPath copy];
-        _signatures = [signatures copy];
+        _signatures = signatures;
         _host = host;
     }
     return self;

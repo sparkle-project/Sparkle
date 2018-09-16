@@ -50,13 +50,13 @@ static NSData *decode(NSString *str) {
 @end
 
 @implementation SUPublicKeys
-@synthesize dsaPubKey;
+@synthesize dsaPubKey = _dsaPubKey;
 
 - (instancetype)initWithDsa:(NSString * _Nullable)maybeDsa ed:(NSString * _Nullable)maybeEd25519
 {
     self = [super init];
     if (self) {
-        self.dsaPubKey = maybeDsa;
+        _dsaPubKey = maybeDsa;
         if (maybeEd25519 != nil) {
             NSData *ed = decode(maybeEd25519);
             assert(32 == sizeof(self->ed25519_public_key));

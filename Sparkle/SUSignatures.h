@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SUSignatures : NSObject {
     unsigned char ed25519_signature[64];
 }
-@property (readonly, nullable) NSData *dsaSignature;
+@property (strong, readonly, nullable) NSData *dsaSignature;
 @property (readonly, nullable, nonatomic) const unsigned char *ed25519Signature;
 
 - (instancetype)initWithDsa:(NSString * _Nullable)dsa ed:(NSString * _Nullable)ed;
@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SUPublicKeys : NSObject {
     unsigned char ed25519_public_key[32];
 }
-@property (nullable) NSString *dsaPubKey;
+@property (strong, readonly, nullable) NSString *dsaPubKey;
 @property (readonly, nullable, nonatomic) const unsigned char *ed25519PubKey;
 
 - (instancetype)initWithDsa:(NSString * _Nullable)dsa ed:(NSString * _Nullable)ed;
