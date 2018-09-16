@@ -15,9 +15,10 @@ func makeError(code: SUError, _ description: String) -> NSError {
 }
 
 func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throws -> [String:[ArchiveItem]] {
+    let cacheDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("Sparkle_generate_appcast");
     let comparator = SUStandardVersionComparator();
 
-    let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir, verbose:verbose))
+    let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir, archivesDestDir: cacheDir, verbose:verbose))
         .sorted(by: {
             .orderedDescending == comparator.compareVersion($0.version, toVersion:$1.version)
         })
