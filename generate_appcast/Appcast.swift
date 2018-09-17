@@ -51,7 +51,7 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
                         print(update, error);
                     }
                 } else {
-                    print("Warning: could not sign \(update.archivePath.path) due to lack of private ed25519 key");
+                    print("Warning: could not sign \(update.archivePath.path) due to lack of private EdDSA key");
                 }
             }
 

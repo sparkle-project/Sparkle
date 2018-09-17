@@ -102,9 +102,9 @@
     const unsigned char *edPubKey = self.pubKeys.ed25519PubKey;
 
     if (edPubKey && !edSignature) {
-        SULog(SULogLevelDefault, @"There is no ED25519 signature in the update, but the app is capable of verifying them");
+        SULog(SULogLevelDefault, @"There is no EdDSA signature in the update, but the app is capable of verifying them");
     } if (!edPubKey && edSignature) {
-        SULog(SULogLevelDefault, @"The update has an ED25519 signature, but it won't be used, because the old app doesn't have an ED25519 public key");
+        SULog(SULogLevelDefault, @"The update has an EdDSA signature, but it won't be used, because the old app doesn't have an EdDSA public key");
     } else if (edPubKey && edSignature) {
         NSError *error = nil;
         NSData *data = [NSData dataWithContentsOfFile:path options:NSDataReadingMappedAlways error:&error];
@@ -113,16 +113,16 @@
             return NO;
         }
         if (ed25519_verify(edSignature, data.bytes, data.length, edPubKey)) {
-            SULog(SULogLevelDefault, @"OK: ED25519 signature is correct");
+            SULog(SULogLevelDefault, @"OK: EdDSA signature is correct");
             if (!dsaPubKey) {
                 return YES;
             } else {
                 SULog(SULogLevelDefault, @"This app has a DSA public key, so a DSA signature is required too");
             }
         } else {
-            SULog(SULogLevelError, @"ED25519 signature does not match. Data of the update file being checked is different than data that has been signed, or the public key and the private key are not from the same set.");
+            SULog(SULogLevelError, @"EdDSA signature does not match. Data of the update file being checked is different than data that has been signed, or the public key and the private key are not from the same set.");
             if (dsaSignature) {
-                SULog(SULogLevelDefault, @"DSA signature won't be checked, because ED25519 verification has already failed");
+                SULog(SULogLevelDefault, @"DSA signature won't be checked, because EdDSA verification has already failed");
             }
             return NO;
         }

@@ -1,16 +1,16 @@
 
 # 1.21.0a1
 
- * Added support EDDSA (ed25519) signatures (Kornel)
+ * Added support EdDSA (ed25519) signatures (Kornel)
     * DSA signatures are considered outdated, and Apple's `Security.framework` only supports weaker SHA-1-based DSA.
-    * Both old DSA and new EDDSA are still supported (and one app can use both), but new applications should use EDDSA only, and we recommend migrating away from DSA signatures.
- * `generate_keys` is now a Swift tool that stores EDDSA private keys in the Keychain
+    * Both old DSA and new EdDSA are still supported (and one app can use both), but new applications should use EdDSA only, and we recommend migrating away from DSA signatures.
+ * `generate_keys` is now a Swift tool that stores EdDSA private keys in the Keychain
     * Existing apps can continue using their old DSA keys, but we've dropped support for generation of old DSA keys
- * `sign_update` is now a Swift tool that signs using EDDSA from private keys in the Keychain
+ * `sign_update` is now a Swift tool that signs using EdDSA from private keys in the Keychain
     * The old DSA-based signing script has been moved to `bin/old_dsa_scripts`
     * The old DSA-based signing script has been fixed to work on pre-10.13 systems (Thomas Tempelmann)
- * `generate_appcast` has been updated to support EDDSA signatures
-    * It can sign both DSA (if `dsa_priv.pem` file is specified) and EDDSA (from Keychain)
+ * `generate_appcast` has been updated to support EdDSA signatures
+    * It can sign both DSA (if `dsa_priv.pem` file is specified) and EdDSA (from Keychain)
     * The tool now uses Caches directory and doesn't generate unnecessary delta files
 
 # 1.20.0
