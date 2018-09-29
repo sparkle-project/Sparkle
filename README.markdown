@@ -18,8 +18,8 @@ Secure and reliable software update framework for Cocoa developers.
 
 ## Changes since 1.5b
 
-* Compatibilty with macOS Sierra.
-* Up-to-date with 10.12 SDK and Xcode 8 (supports macOS 10.7+).
+* Compatibilty with macOS Sierra (and all newer versions).
+* Up-to-date with 10.13 SDK and Xcode 9 (supports macOS 10.7+).
 * Important security fixes.
 * Cleaned up and modernized code, using ARC and Autolayout.
 * Truly automatic background updates (no UI at all) when user agreed to "Automatically download and install updates in the future."
@@ -30,8 +30,9 @@ Secure and reliable software update framework for Cocoa developers.
 ## Requirements
 
 * Runtime: macOS 10.7 or greater
-* Build: Xcode 7 and 10.11 SDK or greater
+* Build: Xcode 8 and 10.11 SDK or greater
 * HTTPS server for serving updates (see [App Transport Security](http://sparkle-project.org/documentation/app-transport-security/))
+* No sandboxing. Sparkle 1.x can't update sandboxed apps. Sparkle 2.0 (alpha) can.
 
 ## Usage
 
