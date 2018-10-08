@@ -219,7 +219,12 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     prefs.standardFontFamily = @"-apple-system-font";
     prefs.defaultFontSize = (int)[NSFont systemFontSize];
     [self adaptReleaseNotesAppearance];
-    [self.releaseNotesView addObserver:self forKeyPath:@"effectiveAppearance" options:0 context:nil];
+
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
+    if (@available(macOS 10.14, *)) {
+        [self.releaseNotesView addObserver:self forKeyPath:@"effectiveAppearance" options:0 context:nil];
+    }
+#endif
     
     // Stick a nice big spinner in the middle of the web view until the page is loaded.
     NSRect frame = [[self.releaseNotesView superview] frame];
@@ -238,13 +243,21 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(__attribute__((unused)) NSDictionary<NSKeyValueChangeKey,id> *)change context:(__attribute__((unused)) void *)context {
-    if (object == self.releaseNotesView && [keyPath isEqualToString:@"effectiveAppearance"]) {
-        [self adaptReleaseNotesAppearance];
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
+    if (@available(macOS 10.14, *)) {
+        if (object == self.releaseNotesView && [keyPath isEqualToString:@"effectiveAppearance"]) {
+            [self adaptReleaseNotesAppearance];
+        }
     }
+#endif
 }
 
 - (void)dealloc {
-    [self.releaseNotesView removeObserver:self forKeyPath:@"effectiveAppearance"];
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
+    if (@available(macOS 10.14, *)) {
+        [self.releaseNotesView removeObserver:self forKeyPath:@"effectiveAppearance"];
+    }
+#endif
 }
 
 - (void)adaptReleaseNotesAppearance
