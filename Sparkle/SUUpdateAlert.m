@@ -50,7 +50,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 @property (strong) NSProgressIndicator *releaseNotesSpinner;
 @property (assign) BOOL webViewFinishedLoading;
 
-@property (weak) IBOutlet WebView *releaseNotesView;
+@property (strong) IBOutlet WebView *releaseNotesView;
 @property (weak) IBOutlet NSView *releaseNotesContainerView;
 @property (weak) IBOutlet NSTextField *descriptionField;
 @property (weak) IBOutlet NSButton *automaticallyInstallUpdatesButton;
