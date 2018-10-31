@@ -63,7 +63,7 @@ void SULog(SULogLevel level, NSString *format, ...)
             }
 
             NSString *displayName = [[NSFileManager defaultManager] displayNameAtPath:mainBundle.bundlePath];
-            client = asl_open([displayName stringByAppendingString:@" [Sparkle]"].UTF8String, SPARKLE_BUNDLE_IDENTIFIER, options);
+            client = asl_open([displayName stringByAppendingString:@" [Sparkle " TO_STRING(SPARKLE_VERSION) "]"].UTF8String, SPARKLE_BUNDLE_IDENTIFIER, options);
             queue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
         }
     });
