@@ -190,6 +190,16 @@
 		5D1AF59A0FD767E50065DB48 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5990FD767E50065DB48 /* libz.dylib */; };
 		5D1AF82B0FD768180065DB48 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5990FD767E50065DB48 /* libz.dylib */; };
 		5F1510A21C96E591006E1629 /* testnamespaces.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5F1510A11C96E591006E1629 /* testnamespaces.xml */; };
+		5FD37C9D216B3E5A0003A1B6 /* add_scalar.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F171214D564A00A1187F /* add_scalar.c */; };
+		5FD37C9E216B3E5A0003A1B6 /* fe.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17C214D564B00A1187F /* fe.c */; };
+		5FD37C9F216B3E5A0003A1B6 /* ge.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F175214D564B00A1187F /* ge.c */; };
+		5FD37CA0216B3E5A0003A1B6 /* key_exchange.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F178214D564B00A1187F /* key_exchange.c */; };
+		5FD37CA1216B3E5A0003A1B6 /* keypair.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17F214D564C00A1187F /* keypair.c */; };
+		5FD37CA2216B3E5A0003A1B6 /* sc.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F16F214D564A00A1187F /* sc.c */; };
+		5FD37CA3216B3E5A0003A1B6 /* seed.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17B214D564B00A1187F /* seed.c */; };
+		5FD37CA4216B3E5A0003A1B6 /* sha512.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F172214D564B00A1187F /* sha512.c */; };
+		5FD37CA5216B3E5A0003A1B6 /* sign.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17D214D564B00A1187F /* sign.c */; };
+		5FD37CA6216B3E5A0003A1B6 /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F177214D564B00A1187F /* verify.c */; };
 		610134730DD250470049ACDF /* SUUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 610134710DD250470049ACDF /* SUUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
 		610134740DD250470049ACDF /* SUUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 610134720DD250470049ACDF /* SUUpdateDriver.m */; };
 		6101347B0DD2541A0049ACDF /* SUProbingUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 610134790DD2541A0049ACDF /* SUProbingUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
@@ -2282,11 +2292,21 @@
 			files = (
 				61B5F93009C4CFDC00B25A18 /* main.m in Sources */,
 				726F2CEB1BC9C733001971A4 /* SUConstants.m in Sources */,
+				5FD37CA0216B3E5A0003A1B6 /* key_exchange.c in Sources */,
+				5FD37C9E216B3E5A0003A1B6 /* fe.c in Sources */,
+				5FD37C9F216B3E5A0003A1B6 /* ge.c in Sources */,
 				5A6D31EE1BF53245009C5157 /* SUFileManager.m in Sources */,
 				721BC2111D1DFF05002BC71E /* SUFileOperationConstants.m in Sources */,
+				5FD37CA2216B3E5A0003A1B6 /* sc.c in Sources */,
 				5A6D31EF1BF5325F009C5157 /* SUOperatingSystem.m in Sources */,
 				72E45CF31B640CDD005C701A /* SUTestApplicationDelegate.m in Sources */,
+				5FD37CA6216B3E5A0003A1B6 /* verify.c in Sources */,
+				5FD37CA3216B3E5A0003A1B6 /* seed.c in Sources */,
 				A5BF4F1D1BC7668B007A052A /* SUTestWebServer.m in Sources */,
+				5FD37C9D216B3E5A0003A1B6 /* add_scalar.c in Sources */,
+				5FD37CA4216B3E5A0003A1B6 /* sha512.c in Sources */,
+				5FD37CA5216B3E5A0003A1B6 /* sign.c in Sources */,
+				5FD37CA1216B3E5A0003A1B6 /* keypair.c in Sources */,
 				72E45CF71B640DAE005C701A /* SUUpdateSettingsWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
