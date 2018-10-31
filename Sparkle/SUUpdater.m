@@ -139,30 +139,23 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 }
 
 -(void)checkIfConfiguredProperly {
-    BOOL hasPublicDSAKey = self.host.publicKeys.dsaPubKey != nil;
+    BOOL hasPublicKey = self.host.publicKeys.dsaPubKey != nil || self.host.publicKeys.ed25519PubKey != nil;
     BOOL isMainBundle = [self.host.bundle isEqualTo:[NSBundle mainBundle]];
     BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:self.host.bundle.bundleURL];
     NSURL *feedURL = [self feedURL];
     BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
 
-    if (!hasPublicDSAKey) {
-        // If we failed to retrieve a DSA key but the bundle specifies a path to one, we should consider this a configuration failure
-        NSString *publicDSAKeyFileKey = [self.host publicDSAKeyFileKey];
-        if (publicDSAKeyFileKey != nil) {
-            [self showAlertText:SULocalizedString(@"Insecure update error!", nil)
-                informativeText:[NSString stringWithFormat:SULocalizedString(@"For security reasons, the file (%@) indicated by the '%@' key needs to exist in the bundle's Resources.", nil), publicDSAKeyFileKey, SUPublicDSAKeyFileKey]];
+    if (!hasPublicKey) {
+        if (!isMainBundle) {
+            [self showAlertText:SULocalizedString(@"Auto-update not configured", nil)
+                informativeText:SULocalizedString(@"For security reasons, you need to sign your updates with a EdDSA key. See Sparkle's documentation for more information.", nil)];
         } else {
-            if (!isMainBundle) {
-                [self showAlertText:SULocalizedString(@"Insecure update error!", nil)
-                    informativeText:SULocalizedString(@"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information.", nil)];
-            } else {
-                if (!hostIsCodeSigned) {
-                    [self showAlertText:SULocalizedString(@"Insecure update error!", nil)
-                        informativeText:SULocalizedString(@"For security reasons, you need to code sign your application or sign your updates with a DSA key. See https://sparkle-project.org/documentation/ for more information.", nil)];
-                } else if (!servingOverHttps) {
-                    [self showAlertText:SULocalizedString(@"Insecure update error!", nil)
-                        informativeText:SULocalizedString(@"For security reasons, you need to serve your updates over HTTPS and/or sign your updates with a DSA key. See https://sparkle-project.org/documentation/ for more information.", nil)];
-                }
+            if (!hostIsCodeSigned) {
+                [self showAlertText:SULocalizedString(@"Auto-update not configured", nil)
+                    informativeText:SULocalizedString(@"For security reasons, you need to code sign your application or sign your updates with a EdDSA key. See https://sparkle-project.org/documentation/ for more information.", nil)];
+            } else if (!servingOverHttps) {
+                [self showAlertText:SULocalizedString(@"Auto-update not configured", nil)
+                    informativeText:SULocalizedString(@"For security reasons, you need to serve your updates over HTTPS and/or sign your updates with a EdDSA key. See https://sparkle-project.org/documentation/ for more information.", nil)];
             }
         }
     }
