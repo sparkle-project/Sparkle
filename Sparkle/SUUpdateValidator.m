@@ -137,51 +137,79 @@
 
     SUHost *newHost = [[SUHost alloc] initWithBundle:newBundle];
     SUPublicKeys *newPublicKeys = newHost.publicKeys;
+    BOOL oldHasLegacyDSAKey = publicKeys.dsaPubKey != nil;
+    BOOL oldHasEdDSAKey = publicKeys.ed25519PubKey != nil;
+    BOOL oldHasAnyDSAKey = oldHasLegacyDSAKey || oldHasEdDSAKey;
+    BOOL newHasLegacyDSAKey = newPublicKeys.dsaPubKey != nil;
+    BOOL newHasEdDSAKey = newPublicKeys.ed25519PubKey != nil;
+    BOOL newHasAnyDSAKey = newHasLegacyDSAKey || newHasEdDSAKey;
+    BOOL migratesDSAKeys = oldHasLegacyDSAKey && !oldHasEdDSAKey && newHasEdDSAKey && !newHasLegacyDSAKey;
+    BOOL updateIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:newHost.bundle.bundleURL];
+    BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:host.bundle.bundleURL];
 
-    // Downgrade in DSA security should not be possible
-    if (publicKeys.dsaPubKey != nil && newPublicKeys.dsaPubKey == nil) {
-        SULog(SULogLevelError, @"A public DSA key is found in the old bundle but no public DSA key is found in the new update. For security reasons, the update will be rejected.");
+    // This is not essential for security, only a policy
+    if (oldHasAnyDSAKey && !newHasAnyDSAKey) {
+        SULog(SULogLevelError, @"A public (Ed)DSA key was found in the old bundle but no public (Ed)DSA key was found in the new update. Sparkle only supports rotation, but not removal of (Ed)DSA keys. Please add an EdDSA key to the new app.");
         return NO;
     }
 
-    BOOL dsaKeysMatch = [publicKeys isEqualToKey:newPublicKeys];
+    // Security-critical part starts here
+    BOOL passedDSACheck = NO;
+    BOOL passedCodeSigning = NO;
+
+    if (oldHasAnyDSAKey) {
+        // it's critical to check against the old public key, rather than the new key
+        passedDSACheck = [SUSignatureVerifier validatePath:downloadedPath withSignatures:signatures withPublicKeys:publicKeys];
+    }
+
+    if (hostIsCodeSigned) {
+        NSError *error = nil;
+        passedCodeSigning = [SUCodeSigningVerifier codeSignatureAtBundleURL:host.bundle.bundleURL matchesSignatureAtBundleURL:newHost.bundle.bundleURL error:&error];
+    }
+    // End of security-critical part
 
     // If the new DSA key differs from the old, then this check is not a security measure, because the new key is not trusted.
     // In that case, the check ensures that the app author has correctly used DSA keys, so that the app will be updateable in the next version.
-    // However if the new and old DSA keys are the same, then this is a security measure.
-    if (newPublicKeys.dsaPubKey != nil) {
+    if (!passedDSACheck && newHasAnyDSAKey) {
         if (![SUSignatureVerifier validatePath:downloadedPath withSignatures:signatures withPublicKeys:newPublicKeys]) {
-            SULog(SULogLevelError, @"DSA signature validation failed. The update has a public DSA key and is signed with a DSA key, but the %@ doesn't match the signature. The update will be rejected.",
-                  dsaKeysMatch ? @"public key" : @"new public key shipped with the update");
+            SULog(SULogLevelError, @"The update has a public (Ed)DSA key, but the public key shipped with the update doesn't match the signature. To prevent future problems, the update will be rejected.");
             return NO;
         }
     }
-    BOOL updateIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:newHost.bundle.bundleURL];
 
-    if (dsaKeysMatch) {
-        NSError *error = nil;
-        if (updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:newHost.bundle.bundleURL error:&error]) {
-            SULog(SULogLevelError, @"The update archive has a valid DSA signature, but the app is also signed with Code Signing, which is corrupted: %@. The update will be rejected.", error);
-            return NO;
-        }
+    NSError *error = nil;
+    if (passedDSACheck && updateIsCodeSigned && ![SUCodeSigningVerifier codeSignatureIsValidAtBundleURL:newHost.bundle.bundleURL error:&error]) {
+        SULog(SULogLevelError, @"The update archive has a valid (Ed)DSA signature, but the app is also signed with Code Signing, which is corrupted: %@. The update will be rejected.", error);
+        return NO;
+    }
+
+    // Either DSA must be valid, or Apple Code Signing must be valid.
+    // We allow failure of one of them, because this allows key rotation without breaking chain of trust.
+    if (passedDSACheck || passedCodeSigning) {
+        return YES;
+    }
+
+    // Now this just explains the failure
+
+    NSString *dsaStatus;
+    if (migratesDSAKeys) {
+        dsaStatus = @"migrates to new EdDSA keys without keeping the old DSA key for transition";
+    } else if (newHasAnyDSAKey) {
+        dsaStatus = @"has a new (Ed)DSA key that doesn't match the previous one";
+    } else if (oldHasAnyDSAKey) {
+        dsaStatus = @"removes the (Ed)DSA key";
     } else {
-        BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:host.bundle.bundleURL];
-
-        NSString *dsaStatus = newPublicKeys.dsaPubKey ? @"has a new DSA key that doesn't match the previous one" : (publicKeys.dsaPubKey ? @"removes the DSA key" : @"isn't signed with a DSA key");
-        if (!hostIsCodeSigned || !updateIsCodeSigned) {
-            NSString *acsStatus = !hostIsCodeSigned ? @"old app hasn't been signed with app Code Signing" : @"new app isn't signed with app Code Signing";
-            SULog(SULogLevelError, @"The update archive %@, and the %@. At least one method of signature verification must be valid. The update will be rejected.", dsaStatus, acsStatus);
-            return NO;
-        }
-
-        NSError *error = nil;
-        if (![SUCodeSigningVerifier codeSignatureAtBundleURL:host.bundle.bundleURL matchesSignatureAtBundleURL:newHost.bundle.bundleURL error:&error]) {
-            SULog(SULogLevelError, @"The update archive %@, and the app is signed with a new Code Signing identity that doesn't match code signing of the original app: %@. At least one method of signature verification must be valid. The update will be rejected.", dsaStatus, error);
-            return NO;
-        }
+        dsaStatus = @"isn't signed with an EdDSA key";
     }
 
-    return YES;
+    if (!hostIsCodeSigned || !updateIsCodeSigned) {
+        NSString *acsStatus = !hostIsCodeSigned ? @"old app hasn't been signed with app Code Signing" : @"new app isn't signed with app Code Signing";
+        SULog(SULogLevelError, @"The update archive %@, and the %@. At least one method of signature verification must be valid. The update will be rejected.", dsaStatus, acsStatus);
+    } else {
+        SULog(SULogLevelError, @"The update archive %@, and the app is signed with a new Code Signing identity that doesn't match code signing of the original app: %@. At least one method of signature verification must be valid. The update will be rejected.", dsaStatus, error);
+    }
+
+    return NO;
 }
 
 @end

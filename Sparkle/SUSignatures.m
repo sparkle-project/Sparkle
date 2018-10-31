@@ -72,7 +72,7 @@ static NSData *decode(NSString *str) {
     if (thisKey == nil || thatKey == nil) {
         return NO;
     }
-    return [thisKey isEqualToString:thatKey];
+    return NO;
 }
 
 
