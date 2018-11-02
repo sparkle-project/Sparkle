@@ -1,0 +1,4 @@
+// Installer Launcher Debug
+#include "ConfigInstallerLauncher.xcconfig"
+
+CODE_SIGN_IDENTITY = -

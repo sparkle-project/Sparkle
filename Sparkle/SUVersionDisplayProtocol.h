@@ -6,7 +6,12 @@
 //  Copyright 2009 Elgato Systems GmbH. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#if __has_feature(modules)
+@import Foundation;
+#else
+#import <Foundation/Foundation.h>
+#endif
+
 #import "SUExport.h"
 
 /*!
@@ -20,6 +25,6 @@
     Both versions are provided so that important distinguishing information
     can be displayed while also leaving out unnecessary/confusing parts.
 */
-- (void)formatVersion:(NSString **)inOutVersionA andVersion:(NSString **)inOutVersionB;
+- (void)formatVersion:(NSString *_Nonnull*_Nonnull)inOutVersionA andVersion:(NSString *_Nonnull*_Nonnull)inOutVersionB;
 
 @end

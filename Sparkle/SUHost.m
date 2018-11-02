@@ -8,19 +8,22 @@
 #import "SUHost.h"
 
 #import "SUConstants.h"
-#import "SUSystemProfiler.h"
 #include <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
 #import "SULog.h"
 
-#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101000
-@interface NSProcessInfo ()
-- (NSOperatingSystemVersion)operatingSystemVersion;
-@end
-#endif
+
+#include "AppKitPrevention.h"
+
+// This class should not rely on AppKit and should also be process independent
+// For example, it should not have code that tests writabilty to somewhere on disk,
+// as that may depend on the privileges of the process owner. Or code that depends on
+// if the process is sandboxed or not; eg: finding the user's caches directory. Or code that depends
+// on compilation flags and if other files exist relative to the host bundle.
 
 @interface SUHost ()
 
 @property (strong, readwrite) NSBundle *bundle;
+@property (nonatomic, readonly) BOOL isMainBundle;
 @property (copy) NSString *defaultsDomain;
 @property (assign) BOOL usesStandardUserDefaults;
 
@@ -29,6 +32,7 @@
 @implementation SUHost
 
 @synthesize bundle;
+@synthesize isMainBundle = _isMainBundle;
 @synthesize defaultsDomain;
 @synthesize usesStandardUserDefaults;
 
@@ -36,13 +40,15 @@
 {
 	if ((self = [super init]))
 	{
-        SUParameterAssert(aBundle);
+        NSParameterAssert(aBundle);
         self.bundle = aBundle;
         if (![self.bundle bundleIdentifier]) {
-            SULog(@"Error: the bundle being updated at %@ has no %@! This will cause preference read/write to not work properly.", self.bundle, kCFBundleIdentifierKey);
+            SULog(SULogLevelError, @"Error: the bundle being updated at %@ has no %@! This will cause preference read/write to not work properly.", self.bundle, kCFBundleIdentifierKey);
         }
+        
+        _isMainBundle = [aBundle isEqualTo:[NSBundle mainBundle]];
 
-        self.defaultsDomain = [self.bundle objectForInfoDictionaryKey:SUDefaultsDomainKey];
+        self.defaultsDomain = [self objectForInfoDictionaryKey:SUDefaultsDomainKey];
         if (!self.defaultsDomain) {
             self.defaultsDomain = [self.bundle bundleIdentifier];
         }
@@ -54,104 +60,63 @@
     return self;
 }
 
-
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self bundlePath], [self installationPath]]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self bundlePath]]; }
 
 - (NSString *)bundlePath
 {
     return [self.bundle bundlePath];
 }
 
-- (NSString *)appCachePath
-{
-    NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    NSString *cachePath = nil;
-    if ([cachePaths count]) {
-        cachePath = cachePaths[0];
-    }
-    if (!cachePath) {
-        SULog(@"Failed to find user's cache directory! Using system default");
-        cachePath = NSTemporaryDirectory();
-    }
-
-    NSString *name = [self.bundle bundleIdentifier];
-    if (!name) {
-        name = [self name];
-    }
-
-    cachePath = [cachePath stringByAppendingPathComponent:name];
-    cachePath = [cachePath stringByAppendingPathComponent:@"Sparkle"];
-    return cachePath;
-}
-
-- (NSString *)installationPath
-{
-    if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
-        // We'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
-        NSString *normalizedAppPath = [[[self.bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[self.bundle bundlePath] pathExtension]]];
-
-        if (![[NSFileManager defaultManager] fileExistsAtPath:normalizedAppPath]) {
-            return normalizedAppPath;
-        }
-    }
-    return [self.bundle bundlePath];
-}
-
-- (NSString *__nonnull)name
+- (NSString * _Nonnull)name
 {
     NSString *name;
 
     // Allow host bundle to provide a custom name
     name = [self objectForInfoDictionaryKey:@"SUBundleName"];
-    if (name) return name;
+    if (name && name.length > 0) return name;
 
-    name = [self.bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
-	if (name) return name;
+    name = [self objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+	if (name && name.length > 0) return name;
 
     name = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey];
-	if (name) return name;
+	if (name && name.length > 0) return name;
 
-    return [[[NSFileManager defaultManager] displayNameAtPath:[self.bundle bundlePath]] stringByDeletingPathExtension];
+    return [[[NSFileManager defaultManager] displayNameAtPath:[self bundlePath]] stringByDeletingPathExtension];
 }
 
-- (NSString *__nonnull)version
+- (BOOL)validVersion
 {
-    NSString *version = [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
-    if (!version || [version isEqualToString:@""])
-        [NSException raise:@"SUNoVersionException" format:@"This host (%@) has no %@! This attribute is required.", [self bundlePath], (__bridge NSString *)kCFBundleVersionKey];
+    return [self isValidVersion:[self _version]];
+}
+
+- (BOOL)isValidVersion:(NSString *)version
+{
+    return (version != nil && version.length != 0);
+}
+
+- (NSString *)_version
+{
+    NSString *version = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
+    return ([self isValidVersion:version] ? version : nil);
+}
+
+- (NSString * _Nonnull)version
+{
+    NSString *version = [self _version];
+    if (version == nil) {
+        SULog(SULogLevelError, @"This host (%@) has no %@! This attribute is required.", [self bundlePath], (__bridge NSString *)kCFBundleVersionKey);
+        abort();
+    }
     return version;
 }
 
-- (NSString *__nonnull)displayVersion
+- (NSString * _Nonnull)displayVersion
 {
-    NSString *shortVersionString = [self.bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    NSString *shortVersionString = [self objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     if (shortVersionString)
         return shortVersionString;
     else
         return [self version]; // Fall back on the normal version string.
-}
-
-- (NSImage *__nonnull)icon
-{
-    // Cache the application icon.
-    NSString *iconPath = [self.bundle pathForResource:[self.bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType:@"icns"];
-    // According to the OS X docs, "CFBundleIconFile - This key identifies the file containing
-    // the icon for the bundle. The filename you specify does not need to include the .icns
-    // extension, although it may."
-    //
-    // However, if it *does* include the '.icns' the above method fails (tested on OS X 10.3.9) so we'll also try:
-    if (!iconPath) {
-        iconPath = [self.bundle pathForResource:[self.bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType:nil];
-    }
-    NSImage *icon = [[NSImage alloc] initWithContentsOfFile:iconPath];
-    // Use a default icon if none is defined.
-    if (!icon) {
-        BOOL isMainBundle = (self.bundle == [NSBundle mainBundle]);
-
-        NSString *fileType = isMainBundle ? (__bridge NSString *)kUTTypeApplication : (__bridge NSString *)kUTTypeBundle;
-        icon = [[NSWorkspace sharedWorkspace] iconForFileType:fileType];
-    }
-    return icon;
 }
 
 - (BOOL)isRunningOnReadOnlyVolume
@@ -161,21 +126,16 @@
     return (statfs_info.f_flags & MNT_RDONLY) != 0;
 }
 
-- (BOOL)isBackgroundApplication
-{
-    return ([[NSApplication sharedApplication] activationPolicy] == NSApplicationActivationPolicyAccessory);
-}
-
-- (NSString *__nullable)publicDSAKey
+- (NSString *_Nullable)publicDSAKey
 {
     // Maybe the key is just a string in the Info.plist.
-    NSString *key = [self.bundle objectForInfoDictionaryKey:SUPublicDSAKeyKey];
+    NSString *key = [self objectForInfoDictionaryKey:SUPublicDSAKeyKey];
 	if (key) {
         return key;
     }
 
     // More likely, we've got a reference to a Resources file by filename:
-    NSString *keyFilename = [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];
+    NSString *keyFilename = [self publicDSAKeyFileKey];
 	if (!keyFilename) {
         return nil;
     }
@@ -184,22 +144,41 @@
     if (!keyPath) {
         return nil;
     }
-    return [NSString stringWithContentsOfFile:keyPath encoding:NSASCIIStringEncoding error:nil];
+    NSError *error = nil;
+    key = [NSString stringWithContentsOfFile:keyPath encoding:NSASCIIStringEncoding error:&error];
+    if (error) {
+        SULog(SULogLevelError, @"Error loading %@: %@", keyPath, error);
+    }
+    return key;
 }
 
-- (NSArray *)systemProfile
+- (NSString * _Nullable)publicDSAKeyFileKey
 {
-    return [[SUSystemProfiler sharedSystemProfiler] systemProfileArrayForHost:self];
+    return [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];;
 }
 
 - (id)objectForInfoDictionaryKey:(NSString *)key
 {
-    return [self.bundle objectForInfoDictionaryKey:key];
+    if (self.isMainBundle) {
+        // Common fast path - if we're updating the main bundle, that means our updater and host bundle's lifetime is the same
+        // If the bundle happens to be updated or change, that means our updater process needs to be terminated first to do it safely
+        // Thus we can rely on the cached Info dictionary
+        return [self.bundle objectForInfoDictionaryKey:key];
+    } else {
+        // Slow path - if we're updating another bundle, we should read in the most up to date Info dictionary because
+        // the bundle can be replaced externally or even by us.
+        // This is the easiest way to read the Info dictionary values *correctly* despite some performance loss.
+        // A mutable method to reload the Info dictionary at certain points and have it cached at other points is challenging to do correctly.
+        CFDictionaryRef cfInfoDictionary = CFBundleCopyInfoDictionaryInDirectory((CFURLRef)self.bundle.bundleURL);
+        NSDictionary *infoDictionary = CFBridgingRelease(cfInfoDictionary);
+        
+        return [infoDictionary objectForKey:key];
+    }
 }
 
 - (BOOL)boolForInfoDictionaryKey:(NSString *)key
 {
-    return [[self objectForInfoDictionaryKey:key] boolValue];
+    return [(NSNumber *)[self objectForInfoDictionaryKey:key] boolValue];
 }
 
 - (id)objectForUserDefaultsKey:(NSString *)defaultName
@@ -219,6 +198,7 @@
     return CFBridgingRelease(obj);
 }
 
+// Note this handles nil being passed for defaultName, in which case the user default will be removed
 - (void)setObject:(id)value forUserDefaultsKey:(NSString *)defaultName
 {
 	if (self.usesStandardUserDefaults)
@@ -270,33 +250,6 @@
 
 - (BOOL)boolForKey:(NSString *)key {
     return [self objectForUserDefaultsKey:key] ? [self boolForUserDefaultsKey:key] : [self boolForInfoDictionaryKey:key];
-}
-
-+ (NSOperatingSystemVersion)operatingSystemVersion
-{
-#if __MAC_OS_X_VERSION_MIN_REQUIRED < 1090 // Present in 10.9 despite NS_AVAILABLE's claims
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wselector"
-    // Xcode 5.1.1: operatingSystemVersion is clearly declared, must warn due to a compiler bug?
-    if (![NSProcessInfo instancesRespondToSelector:@selector(operatingSystemVersion)])
-#pragma clang diagnostic pop
-    {
-        NSOperatingSystemVersion version = { 0, 0, 0 };
-        NSURL *coreServices = [[NSFileManager defaultManager] URLForDirectory:NSCoreServiceDirectory inDomain:NSSystemDomainMask appropriateForURL:nil create:NO error:nil];
-        NSArray *components = [[NSDictionary dictionaryWithContentsOfURL:[coreServices URLByAppendingPathComponent:@"SystemVersion.plist"]][@"ProductVersion"] componentsSeparatedByString:@"."];
-        version.majorVersion = components.count > 0 ? [components[0] integerValue] : 0;
-        version.minorVersion = components.count > 1 ? [components[1] integerValue] : 0;
-        version.patchVersion = components.count > 2 ? [components[2] integerValue] : 0;
-        return version;
-    }
-#endif
-    return [[NSProcessInfo processInfo] operatingSystemVersion];
-}
-
-+ (NSString *)systemVersionString
-{
-    NSOperatingSystemVersion version = self.operatingSystemVersion;
-    return [NSString stringWithFormat:@"%ld.%ld.%ld", (long)version.majorVersion, (long)version.minorVersion, (long)version.patchVersion];
 }
 
 @end

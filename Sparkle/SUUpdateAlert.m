@@ -16,6 +16,17 @@
 #import <WebKit/WebKit.h>
 
 #import "SUConstants.h"
+#import "SULog.h"
+#import "SULocalizations.h"
+#import "SUAppcastItem.h"
+#import "SPUDownloadData.h"
+#import "SUApplicationInfo.h"
+#import "SPUUpdaterSettings.h"
+#import "SUSystemUpdateInfo.h"
+#import "SUTouchBarForwardDeclarations.h"
+#import "SUTouchBarButtonGroup.h"
+
+static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUUpdateAlert";
 
 // WebKit protocols are not explicitly declared until 10.11 SDK, so
 // declare dummy protocols to keep the build working on earlier SDKs.
@@ -26,16 +37,20 @@
 @end
 #endif
 
-@interface SUUpdateAlert () <WebFrameLoadDelegate, WebPolicyDelegate>
+@interface SUUpdateAlert () <WebFrameLoadDelegate, WebPolicyDelegate, NSTouchBarDelegate>
 
 @property (strong) SUAppcastItem *updateItem;
+@property (nonatomic) BOOL alreadyDownloaded;
 @property (strong) SUHost *host;
-@property (strong) void(^completionBlock)(SUUpdateAlertChoice);
+@property (nonatomic) BOOL allowsAutomaticUpdates;
+@property (nonatomic, copy, nullable) void(^completionBlock)(SPUUpdateAlertChoice);
+@property (nonatomic, copy, nullable) void(^resumableCompletionBlock)(SPUInstallUpdateStatus);
+@property (nonatomic, copy, nullable) void(^informationalCompletionBlock)(SPUInformationalUpdateAlertChoice);
 
 @property (strong) NSProgressIndicator *releaseNotesSpinner;
 @property (assign) BOOL webViewFinishedLoading;
 
-@property (weak) IBOutlet WebView *releaseNotesView;
+@property (strong) IBOutlet WebView *releaseNotesView;
 @property (weak) IBOutlet NSView *releaseNotesContainerView;
 @property (weak) IBOutlet NSTextField *descriptionField;
 @property (weak) IBOutlet NSButton *automaticallyInstallUpdatesButton;
@@ -43,15 +58,21 @@
 @property (weak) IBOutlet NSButton *skipButton;
 @property (weak) IBOutlet NSButton *laterButton;
 
+@property (strong) NSBox *darkBackgroundView;
+
 @end
 
 @implementation SUUpdateAlert
 
-@synthesize completionBlock;
+@synthesize completionBlock = _completionBlock;
+@synthesize alreadyDownloaded = _alreadyDownloaded;
+@synthesize resumableCompletionBlock = _resumableCompletionBlock;
+@synthesize informationalCompletionBlock = _informationalCompletionBlock;
 @synthesize versionDisplayer;
 
 @synthesize updateItem;
 @synthesize host;
+@synthesize allowsAutomaticUpdates = _allowsAutomaticUpdates;
 
 @synthesize releaseNotesSpinner;
 @synthesize webViewFinishedLoading;
@@ -64,16 +85,20 @@
 @synthesize skipButton;
 @synthesize laterButton;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost completionBlock:(void (^)(SUUpdateAlertChoice))block
+@synthesize darkBackgroundView = _darkBackgroundView;
+
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer
 {
     self = [super initWithWindowNibName:@"SUUpdateAlert"];
-	if (self)
-	{
-        self.completionBlock = block;
+    if (self != nil) {
         host = aHost;
         updateItem = item;
+        versionDisplayer = aVersionDisplayer;
+        
+        SPUUpdaterSettings *updaterSettings = [[SPUUpdaterSettings alloc] initWithHostBundle:host.bundle];
+        _allowsAutomaticUpdates = updaterSettings.allowsAutomaticUpdates && !item.isInformationOnlyUpdate;
         [self setShouldCascadeWindows:NO];
-
+        
         // Alex: This dummy line makes sure that the binary is linked against WebKit.
         // The SUUpdateAlert.xib file contains a WebView and if we don't link against WebKit,
         // we will get a runtime crash when decoding the NIB. It is better to get a link error.
@@ -82,38 +107,101 @@
     return self;
 }
 
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item alreadyDownloaded:(BOOL)alreadyDownloaded host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUpdateAlertChoice))block
+{
+    self = [self initWithAppcastItem:item host:aHost versionDisplayer:aVersionDisplayer];
+	if (self != nil)
+	{
+        _completionBlock = [block copy];
+        _alreadyDownloaded = alreadyDownloaded;
+    }
+    return self;
+}
+
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer resumableCompletionBlock:(void (^)(SPUInstallUpdateStatus))block
+{
+    self = [self initWithAppcastItem:item host:aHost versionDisplayer:aVersionDisplayer];
+    if (self != nil)
+    {
+        _resumableCompletionBlock = [block copy];
+        _alreadyDownloaded = YES;
+    }
+    return self;
+}
+
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer informationalCompletionBlock:(void (^)(SPUInformationalUpdateAlertChoice))block
+{
+    self = [self initWithAppcastItem:item host:aHost versionDisplayer:aVersionDisplayer];
+    if (self != nil)
+    {
+        _informationalCompletionBlock = [block copy];
+    }
+    return self;
+}
+
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
 
+- (void)disableKeyboardShortcutForInstallButton {
+    self.installButton.keyEquivalent = @"";
+}
 
-- (void)endWithSelection:(SUUpdateAlertChoice)choice
+- (void)endWithSelection:(SPUUpdateAlertChoice)choice
 {
     [self.releaseNotesView stopLoading:self];
     [self.releaseNotesView setFrameLoadDelegate:nil];
     [self.releaseNotesView setPolicyDelegate:nil];
     [self.releaseNotesView removeFromSuperview]; // Otherwise it gets sent Esc presses (why?!) and gets very confused.
     [self close];
-    self.completionBlock(choice);
-    self.completionBlock = nil;
+    
+    if (self.completionBlock != nil) {
+        self.completionBlock(choice);
+        self.completionBlock = nil;
+    } else if (self.resumableCompletionBlock != nil) {
+        switch (choice) {
+            case SPUInstallUpdateChoice:
+                self.resumableCompletionBlock(SPUInstallAndRelaunchUpdateNow);
+                break;
+            case SPUInstallLaterChoice:
+                self.resumableCompletionBlock(SPUDismissUpdateInstallation);
+                break;
+            case SPUSkipThisVersionChoice:
+                abort();
+        }
+        self.resumableCompletionBlock = nil;
+    } else if (self.informationalCompletionBlock != nil) {
+        switch (choice) {
+            case SPUInstallLaterChoice:
+                self.informationalCompletionBlock(SPUDismissInformationalNoticeChoice);
+                break;
+            case SPUSkipThisVersionChoice:
+                self.informationalCompletionBlock(SPUSkipThisInformationalVersionChoice);
+                break;
+            case SPUInstallUpdateChoice:
+                abort();
+        }
+    }
 }
 
 - (IBAction)installUpdate:(id)__unused sender
 {
-    [self endWithSelection:SUInstallUpdateChoice];
+    [self endWithSelection:SPUInstallUpdateChoice];
 }
 
 - (IBAction)openInfoURL:(id)__unused sender
 {
-    [self endWithSelection:SUOpenInfoURLChoice];
+    [[NSWorkspace sharedWorkspace] openURL:self.updateItem.infoURL];
+    
+    [self endWithSelection:SPUInstallLaterChoice];
 }
 
 - (IBAction)skipThisVersion:(id)__unused sender
 {
-    [self endWithSelection:SUSkipThisVersionChoice];
+    [self endWithSelection:SPUSkipThisVersionChoice];
 }
 
 - (IBAction)remindMeLater:(id)__unused sender
 {
-    [self endWithSelection:SURemindMeLaterChoice];
+    [self endWithSelection:SPUInstallLaterChoice];
 }
 
 - (void)displayReleaseNotes
@@ -121,14 +209,23 @@
     self.releaseNotesView.preferencesIdentifier = SUBundleIdentifier;
     WebPreferences *prefs = [self.releaseNotesView preferences];
     prefs.plugInsEnabled = NO;
+    prefs.javaEnabled = NO;
+    prefs.javaScriptEnabled = [self.host boolForInfoDictionaryKey:SUEnableJavaScriptKey];
     self.releaseNotesView.frameLoadDelegate = self;
     self.releaseNotesView.policyDelegate = self;
     
     // Set the default font
-    // "-apple-system-font" is a reference to the system UI font on OS X. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
+    // "-apple-system-font" is a reference to the system UI font. "-apple-system" is the new recommended token, but for backward compatibility we can't use it.
     prefs.standardFontFamily = @"-apple-system-font";
     prefs.defaultFontSize = (int)[NSFont systemFontSize];
+    [self adaptReleaseNotesAppearance];
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
+    if (@available(macOS 10.14, *)) {
+        [self.releaseNotesView addObserver:self forKeyPath:@"effectiveAppearance" options:0 context:nil];
+    }
+#endif
+    
     // Stick a nice big spinner in the middle of the web view until the page is loaded.
     NSRect frame = [[self.releaseNotesView superview] frame];
     self.releaseNotesSpinner = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(NSMidX(frame) - 16, NSMidY(frame) - 16, 32, 32)];
@@ -136,23 +233,99 @@
     [self.releaseNotesSpinner startAnimation:self];
     self.webViewFinishedLoading = NO;
     [[self.releaseNotesView superview] addSubview:self.releaseNotesSpinner];
-
-    // If there's a release notes URL, load it; otherwise, just stick the contents of the description into the web view.
-	if ([self.updateItem releaseNotesURL])
-	{
-		if ([[self.updateItem releaseNotesURL] isFileURL])
-		{
-            [[self.releaseNotesView mainFrame] loadHTMLString:@"Release notes with file:// URLs are not supported for security reasons&mdash;Javascript would be able to read files on your file system." baseURL:nil];
-		}
-		else
-		{
-            [[self.releaseNotesView mainFrame] loadRequest:[NSURLRequest requestWithURL:[self.updateItem releaseNotesURL] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30]];
-        }
-	}
-	else
+    
+    // If there's no release notes URL, just stick the contents of the description into the web view
+    // Otherwise we'll wait until the client wants us to show release notes
+	if (self.updateItem.releaseNotesURL == nil)
 	{
         [[self.releaseNotesView mainFrame] loadHTMLString:[self.updateItem itemDescription] baseURL:nil];
     }
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(__attribute__((unused)) NSDictionary<NSKeyValueChangeKey,id> *)change context:(__attribute__((unused)) void *)context {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
+    if (@available(macOS 10.14, *)) {
+        if (object == self.releaseNotesView && [keyPath isEqualToString:@"effectiveAppearance"]) {
+            [self adaptReleaseNotesAppearance];
+        }
+    }
+#endif
+}
+
+- (void)dealloc {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
+    if (@available(macOS 10.14, *)) {
+        [self.releaseNotesView removeObserver:self forKeyPath:@"effectiveAppearance"];
+    }
+#endif
+}
+
+- (void)adaptReleaseNotesAppearance
+{
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
+    if (@available(macOS 10.14, *))
+    {
+        WebPreferences *prefs = [self.releaseNotesView preferences];
+        NSAppearanceName bestAppearance = [self.releaseNotesView.effectiveAppearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
+        if ([bestAppearance isEqualToString:NSAppearanceNameDarkAqua])
+        {
+            // Set user stylesheet adapted to light on dark
+            prefs.userStyleSheetEnabled = YES;
+            prefs.userStyleSheetLocation = [[NSBundle bundleForClass:[self class]] URLForResource:@"DarkAqua" withExtension:@"css"];
+            
+            // Remove web view background...
+            self.releaseNotesView.drawsBackground = NO;
+            // ... and use NSBox to get the dynamically colored background
+            if (self.darkBackgroundView == nil)
+            {
+                self.darkBackgroundView = [[NSBox alloc] initWithFrame:self.releaseNotesView.frame];
+                self.darkBackgroundView.boxType = NSBoxCustom;
+                self.darkBackgroundView.fillColor = [NSColor textBackgroundColor];
+                self.darkBackgroundView.borderColor = [NSColor clearColor];
+                // Using auto-resizing mask instead of contraints works well enough
+                self.darkBackgroundView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+                [self.releaseNotesView.superview addSubview:self.darkBackgroundView positioned:NSWindowBelow relativeTo:self.releaseNotesView];
+                
+                // The release note user stylesheet will not adjust to the user changing the theme until adaptReleaseNoteAppearance is called again.
+                // So lock the appearance of the background to keep the text readable if the system theme changes.
+                self.darkBackgroundView.appearance = self.darkBackgroundView.effectiveAppearance;
+            }
+        }
+        else
+        {
+            // Restore standard dark on light appearance
+            [self.darkBackgroundView removeFromSuperview];
+            self.darkBackgroundView = nil;
+            prefs.userStyleSheetEnabled = NO;
+            self.releaseNotesView.drawsBackground = YES;
+        }
+    }
+#endif
+}
+
+- (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData
+{
+    if (!self.webViewFinishedLoading) {
+        NSURL *baseURL = self.updateItem.releaseNotesURL.URLByDeletingLastPathComponent;
+        // If a MIME type isn't provided, we will pick html as the default, as opposed to plain text. Questionable decision..
+        NSString *chosenMIMEType = (downloadData.MIMEType != nil) ? downloadData.MIMEType : @"text/html";
+        // We'll pick utf-8 as the default text encoding name if one isn't provided which I think is reasonable
+        NSString *chosenTextEncodingName = (downloadData.textEncodingName != nil) ? downloadData.textEncodingName : @"utf-8";
+        
+        [[self.releaseNotesView mainFrame] loadData:downloadData.data MIMEType:chosenMIMEType textEncodingName:chosenTextEncodingName baseURL:baseURL];
+    }
+}
+
+- (void)showReleaseNotesFailedToDownload
+{
+    [self stopReleaseNotesSpinner];
+    self.webViewFinishedLoading = YES;
+}
+
+- (void)stopReleaseNotesSpinner
+{
+    [self.releaseNotesSpinner stopAnimation:self];
+    [self.releaseNotesSpinner setHidden:YES];
 }
 
 - (BOOL)showsReleaseNotes
@@ -169,22 +342,13 @@
         return [shouldShowReleaseNotes boolValue];
 }
 
-- (BOOL)allowsAutomaticUpdates
-{
-    BOOL allowAutoUpdates = YES; // Defaults to YES.
-    if ([self.host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey])
-        allowAutoUpdates = [self.host boolForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
-
-    return allowAutoUpdates;
-}
-
-- (void)awakeFromNib
+- (void)windowDidLoad
 {
     BOOL showReleaseNotes = [self showsReleaseNotes];
 
     [self.window setFrameAutosaveName: showReleaseNotes ? @"SUUpdateAlert" : @"SUUpdateAlertSmall" ];
 
-    if ([self.host isBackgroundApplication]) {
+    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
         [self.window setLevel:NSFloatingWindowLevel]; // This means the window will float over all other apps, if our app is switched out ?!
     }
 
@@ -202,24 +366,63 @@
         
         [self.releaseNotesContainerView removeFromSuperview];
     }
+    
+    // When we show release notes, it looks ugly if the install buttons are not closer to the release notes view
+    // However when we don't show release notes, it looks ugly if the install buttons are too close to the description field. Shrugs.
+    if (showReleaseNotes && ![self allowsAutomaticUpdates]) {
+        NSLayoutConstraint *skipButtonToReleaseNotesContainerConstraint = [NSLayoutConstraint constraintWithItem:self.skipButton attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.releaseNotesContainerView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:12.0];
+        
+        [self.window.contentView addConstraint:skipButtonToReleaseNotesContainerConstraint];
+        
+        [self.automaticallyInstallUpdatesButton removeFromSuperview];
+    }
+    
+    BOOL startedInstalling = (self.resumableCompletionBlock != nil);
+    if (startedInstalling) {
+        // Should we hide the button or disable the button if the update has already started installing?
+        // Personally I think it looks better when the button is visible on the window...
+        // Anyway an already downloaded update can't be skipped
+        self.skipButton.enabled = NO;
+        
+        // We're going to be relaunching pretty instantaneously
+        self.installButton.title = SULocalizedString(@"Install & Relaunch", nil);
+        
+        // We should be explicit that the update will be installed on quit
+        self.laterButton.title = SULocalizedString(@"Install on Quit", nil);
+    }
+
+    if ([self.updateItem isCriticalUpdate]) {
+        self.skipButton.enabled = NO;
+    }
 
     [self.window center];
 }
 
 - (BOOL)windowShouldClose:(NSNotification *) __unused note
 {
-	[self endWithSelection:SURemindMeLaterChoice];
+	[self endWithSelection:SPUInstallLaterChoice];
 	return YES;
 }
 
 - (NSImage *)applicationIcon
 {
-    return [self.host icon];
+    return [SUApplicationInfo bestIconForHost:self.host];
 }
 
 - (NSString *)titleText
 {
-    return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is available!", nil), [self.host name]];
+    if ([self.updateItem isCriticalUpdate])
+    {
+        return [NSString stringWithFormat:SULocalizedString(@"An important update to %@ is ready to install", nil), [self.host name]];
+    }
+    else if (self.alreadyDownloaded)
+    {
+        return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is ready to install!", nil), [self.host name]];
+    }
+    else
+    {
+        return [NSString stringWithFormat:SULocalizedString(@"A new version of %@ is available!", nil), [self.host name]];
+    }
 }
 
 - (NSString *)descriptionText
@@ -234,30 +437,50 @@
         [self.versionDisplayer formatVersion:&updateItemVersion andVersion:&hostVersion];
     }
 
-    // We display a slightly different summary depending on if it's an "info-only" item or not
+    // We display a different summary depending on if it's an "info-only" item, or a "critical update" item, or if we've already downloaded the update and just need to relaunch
     NSString *finalString = nil;
 
     if (self.updateItem.isInformationOnlyUpdate) {
         finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?", @"Description text for SUUpdateAlert when the update informational with no download."), self.host.name, updateItemVersion, hostVersion];
+    } else if ([self.updateItem isCriticalUpdate]) {
+        if (!self.alreadyDownloaded) {
+            finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. This is an important update; would you like to download it now?", @"Description text for SUUpdateAlert when the critical update is downloadable."), self.host.name, updateItemVersion, hostVersion];
+        } else {
+            finalString = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! This is an important update; would you like to install it and relaunch %1$@ now?", @"Description text for SUUpdateAlert when the critical update has already been downloaded and ready to install."), self.host.name, updateItemVersion];
+        }
     } else {
-        finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", @"Description text for SUUpdateAlert when the update is downloadable."), self.host.name, updateItemVersion, hostVersion];
+        if (!self.alreadyDownloaded) {
+            finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", @"Description text for SUUpdateAlert when the update is downloadable."), self.host.name, updateItemVersion, hostVersion];
+        } else {
+            finalString = [NSString stringWithFormat:SULocalizedString(@"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?", @"Description text for SUUpdateAlert when the update has already been downloaded and ready to install."), self.host.name, updateItemVersion];
+        }
     }
     return finalString;
 }
 
-- (void)webView:(WebView *)sender didFinishLoadForFrame:frame
+- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
     if ([frame parentFrame] == nil) {
+        [self stopReleaseNotesSpinner];
         self.webViewFinishedLoading = YES;
-        [self.releaseNotesSpinner setHidden:YES];
         [sender display]; // necessary to prevent weird scroll bar artifacting
     }
 }
 
 - (void)webView:(WebView *)__unused sender decidePolicyForNavigationAction:(NSDictionary *)__unused actionInformation request:(NSURLRequest *)request frame:(WebFrame *)__unused frame decisionListener:(id<WebPolicyDecisionListener>)listener
 {
+    NSURL *requestURL = request.URL;
+    NSString *scheme = requestURL.scheme;
+    BOOL whitelistedSafe = [scheme isEqualToString:@"http"] || [scheme isEqualToString:@"https"] || [requestURL.absoluteString isEqualToString:@"about:blank"];
+
+    // Do not allow redirects to dangerous protocols such as file://
+    if (!whitelistedSafe) {
+        SULog(SULogLevelDefault, @"Blocked display of %@ URL which may be dangerous", scheme);
+        [listener ignore];
+        return;
+    }
+
     if (self.webViewFinishedLoading) {
-        NSURL *requestURL = request.URL;
         if (requestURL) {
             [[NSWorkspace sharedWorkspace] openURL:requestURL];
         }
@@ -297,6 +520,25 @@
     }
 
     return webViewMenuItems;
+}
+
+- (NSTouchBar *)makeTouchBar
+{
+    NSTouchBar *touchBar = [(NSTouchBar *)[NSClassFromString(@"NSTouchBar") alloc] init];
+    touchBar.defaultItemIdentifiers = @[SUUpdateAlertTouchBarIndentifier,];
+    touchBar.principalItemIdentifier = SUUpdateAlertTouchBarIndentifier;
+    touchBar.delegate = self;
+    return touchBar;
+}
+
+- (NSTouchBarItem *)touchBar:(NSTouchBar * __unused)touchBar makeItemForIdentifier:(NSTouchBarItemIdentifier)identifier API_AVAILABLE(macos(10.12.2))
+{
+    if ([identifier isEqualToString:SUUpdateAlertTouchBarIndentifier]) {
+        NSCustomTouchBarItem* item = [(NSCustomTouchBarItem *)[NSClassFromString(@"NSCustomTouchBarItem") alloc] initWithIdentifier:identifier];
+        item.viewController = [[SUTouchBarButtonGroup alloc] initByReferencingButtons:@[self.installButton, self.laterButton, self.skipButton]];
+        return item;
+    }
+    return nil;
 }
 
 @end

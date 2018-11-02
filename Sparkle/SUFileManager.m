@@ -1,0 +1,631 @@
+//
+//  SUFileManager.m
+//  Sparkle
+//
+//  Created by Mayur Pawashe on 7/18/15.
+//  Copyright (c) 2015 zgcoder. All rights reserved.
+//
+
+#import "SUFileManager.h"
+#import "SUErrors.h"
+
+#include <sys/xattr.h>
+#include <sys/errno.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+
+
+#include "AppKitPrevention.h"
+
+static char SUAppleQuarantineIdentifier[] = "com.apple.quarantine";
+
+static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
+
+    char path[PATH_MAX] = {0};
+    if (![url.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"URL of the file (%@) cannot be represented as a file path", url.lastPathComponent] }];
+        }
+        return NO;
+    }
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    OSStatus makeResult = FSPathMakeRefWithOptions((const UInt8 *)path, kFSPathMakeRefDoNotFollowLeafSymlink, ref, NULL);
+#pragma clang diagnostic pop
+    if (makeResult != noErr) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:makeResult userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create file system reference for %@", url.lastPathComponent] }];
+        }
+        return NO;
+    }
+    return YES;
+}
+
+#pragma clang diagnostic push
+// Use direct access because it's easier, clearer, and faster
+#pragma clang diagnostic ignored "-Wdirect-ivar-access"
+
+@implementation SUFileManager
+{
+    NSFileManager *_fileManager;
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self != nil) {
+        _fileManager = [[NSFileManager alloc] init];
+    }
+    return self;
+}
+
+// -[NSFileManager attributesOfItemAtPath:error:] won't follow symbolic links
+
+- (BOOL)_itemExistsAtURL:(NSURL *)fileURL
+{
+    NSString *path = fileURL.path;
+    if (path == nil) {
+        return NO;
+    }
+    return [_fileManager attributesOfItemAtPath:path error:NULL] != nil;
+}
+
+- (BOOL)_itemExistsAtURL:(NSURL *)fileURL isDirectory:(BOOL *)isDirectory
+{
+    NSString *path = fileURL.path;
+    if (path == nil) {
+        return NO;
+    }
+
+    NSDictionary *attributes = [_fileManager attributesOfItemAtPath:path error:NULL];
+    if (attributes == nil) {
+        return NO;
+    }
+
+    if (isDirectory != NULL) {
+        *isDirectory = [(NSString *)[attributes objectForKey:NSFileType] isEqualToString:NSFileTypeDirectory];
+    }
+
+    return YES;
+}
+
+// Wrapper around getxattr()
+- (ssize_t)_getXAttr:(const char *)name fromFile:(NSString *)file options:(int)options
+{
+    char path[PATH_MAX] = {0};
+    if (![file getFileSystemRepresentation:path maxLength:sizeof(path)]) {
+        errno = 0;
+        return -1;
+    }
+
+    return getxattr(path, name, NULL, 0, 0, options);
+}
+
+// Wrapper around removexattr()
+- (int)_removeXAttr:(const char *)attr fromFile:(NSString *)file options:(int)options
+{
+    char path[PATH_MAX] = {0};
+    if (![file getFileSystemRepresentation:path maxLength:sizeof(path)]) {
+        errno = 0;
+        return -1;
+    }
+
+    return removexattr(path, attr, options);
+}
+
+// Removes the directory tree rooted at |root| from the file quarantine.
+// The quarantine was introduced on macOS 10.5 and is described at:
+//
+// http://developer.apple.com/releasenotes/Carbon/RN-LaunchServices/index.html#apple_ref/doc/uid/TP40001369-DontLinkElementID_2
+//
+// If |root| is not a directory, then it alone is removed from the quarantine.
+// Symbolic links, including |root| if it is a symbolic link, will not be
+// traversed.
+
+// Ordinarily, the quarantine is managed by calling LSSetItemAttribute
+// to set the kLSItemQuarantineProperties attribute to a dictionary specifying
+// the quarantine properties to be applied.  However, it does not appear to be
+// possible to remove an item from the quarantine directly through any public
+// Launch Services calls.  Instead, this method takes advantage of the fact
+// that the quarantine is implemented in part by setting an extended attribute,
+// "com.apple.quarantine", on affected files.  Removing this attribute is
+// sufficient to remove files from the quarantine.
+
+// This works by removing the quarantine extended attribute for every file we come across.
+// We used to have code similar to the method below that used -[NSURL getResourceValue:forKey:error:] and -[NSURL setResourceValue:forKey:error:]
+// However, those methods *really suck* - you can't rely on the return value from getting the resource value and if you set the resource value
+// when the key isn't present, errors are spewed out to the console
+- (BOOL)releaseItemFromQuarantineAtRootURL:(NSURL *)rootURL error:(NSError *__autoreleasing *)error
+{
+    static const int removeXAttrOptions = XATTR_NOFOLLOW;
+    BOOL success = YES;
+
+    // First remove quarantine on the root item
+    NSString *rootURLPath = rootURL.path;
+    if ([self _getXAttr:SUAppleQuarantineIdentifier fromFile:rootURLPath options:removeXAttrOptions] >= 0) {
+        BOOL removedRootQuarantine = ([self _removeXAttr:SUAppleQuarantineIdentifier fromFile:rootURLPath options:removeXAttrOptions] == 0);
+        if (!removedRootQuarantine) {
+            success = NO;
+            
+            if (error != NULL) {
+                *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove file quarantine on %@.", rootURL.lastPathComponent] }];
+            }
+        }
+    }
+    
+    // Only recurse if it's actually a directory.  Don't recurse into a root-level symbolic link.
+    // Even if we fail removing the quarantine from the root item or any single item in the directory, we will continue trying to remove the quarantine.
+    // This is because often it may not be a fatal error from the caller to not remove the quarantine of an item
+    NSDictionary *rootAttributes = [_fileManager attributesOfItemAtPath:rootURLPath error:nil];
+    NSString *rootType = [rootAttributes objectForKey:NSFileType]; // 10.7 can't subscript this
+    
+    if ([rootType isEqualToString:NSFileTypeDirectory]) {
+        // The NSDirectoryEnumerator will avoid recursing into any contained
+        // symbolic links, so no further type checks are needed.
+        NSDirectoryEnumerator *directoryEnumerator = [_fileManager enumeratorAtURL:rootURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
+        
+        for (NSURL *fileURL in directoryEnumerator) {
+            if ([self _getXAttr:SUAppleQuarantineIdentifier fromFile:fileURL.path options:removeXAttrOptions] >= 0) {
+                BOOL removedQuarantine = ([self _removeXAttr:SUAppleQuarantineIdentifier fromFile:fileURL.path options:removeXAttrOptions] == 0);
+                
+                if (!removedQuarantine && success) {
+                    success = NO;
+                    
+                    if (error != NULL) {
+                        *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove file quarantine on %@.", fileURL.lastPathComponent] }];
+                    }
+                }
+            }
+        }
+    }
+    return success;
+}
+
+/*
+ * Copies an item from one location to another
+ * This intentionally does *not* use copyfile() or any API that uses it such as NSFileManager's copy item method
+ * This is because copyfile() can fail to copy symbolic links from one network mount to another, which will affect copying apps
+ * This failure occurs because the system may think symbolic links on a SMB mount are zero bytes in size
+ * For more info, see bug reports at http://openradar.appspot.com/radar?id=4925873463492608
+ * and http://openradar.appspot.com/radar?id=5024037222744064
+ */
+- (BOOL)copyItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError * __autoreleasing *)error
+{
+    if (![self _itemExistsAtURL:sourceURL]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source file to copy (%@) does not exist.", sourceURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+
+    if (![self _itemExistsAtURL:destinationURL.URLByDeletingLastPathComponent]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination parent directory to copy into (%@) does not exist.", destinationURL.URLByDeletingLastPathComponent.lastPathComponent] }];
+        }
+        return NO;
+    }
+
+    if ([self _itemExistsAtURL:destinationURL]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination file to copy to (%@) already exists.", destinationURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+
+    FSRef sourceRef;
+    if (!SUMakeRefFromURL(sourceURL, &sourceRef, error)) {
+        return NO;
+    }
+
+    FSRef destinationParentRef;
+    if (!SUMakeRefFromURL(destinationURL.URLByDeletingLastPathComponent, &destinationParentRef, error)) {
+        return NO;
+    }
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    OSStatus copyResult = FSCopyObjectSync(&sourceRef, &destinationParentRef, (__bridge CFStringRef)(destinationURL.lastPathComponent), NULL, kFSFileOperationDefaultOptions);
+#pragma clang diagnostic pop
+
+    if (copyResult != noErr) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSOSStatusErrorDomain code:copyResult userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to copy file (%@)", sourceURL.lastPathComponent] }];
+        }
+    }
+
+    return YES;
+}
+
+/*
+ * Retrieves the volume ID that a particular url resides on
+ * The url must point to a file that exists
+ * There is no cocoa equivalent for obtaining the volume ID
+ * Although NSURLVolumeURLForRemountingKey exists as a resource key for NSURL,
+ * that will not return a URL if the mount is not re-mountable and I otherwise don't trust the API
+ */
+- (BOOL)_getVolumeID:(FSVolumeRefNum *)volumeID ofItemAtURL:(NSURL *)url
+{
+    FSRef pathRef;
+    if (!SUMakeRefFromURL(url, &pathRef, NULL)) {
+        return NO;
+    }
+
+    FSCatalogInfo catalogInfo;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    OSErr catalogError = FSGetCatalogInfo(&pathRef, kFSCatInfoVolume, &catalogInfo, NULL, NULL, NULL);
+#pragma clang diagnostic pop
+    if (catalogError != noErr) {
+        return NO;
+    }
+
+    if (volumeID != NULL) {
+        *volumeID = catalogInfo.volume;
+    }
+
+    return YES;
+}
+
+- (BOOL)moveItemAtURL:(NSURL *)sourceURL toURL:(NSURL *)destinationURL error:(NSError *__autoreleasing *)error
+{
+    if (![self _itemExistsAtURL:sourceURL]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Source file to move (%@) does not exist.", sourceURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+
+    NSURL *destinationURLParent = destinationURL.URLByDeletingLastPathComponent;
+    if (![self _itemExistsAtURL:destinationURLParent]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination parent directory to move into (%@) does not exist.", destinationURLParent.lastPathComponent] }];
+        }
+        return NO;
+    }
+
+    if ([self _itemExistsAtURL:destinationURL]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Destination file to move (%@) already exists.", destinationURL.lastPathComponent] }];
+        }
+        return NO;
+    }
+
+    // If the source and destination are on different volumes, we should not do a move;
+    // from my experience a move may fail when moving particular files from
+    // one network mount to another one. This is possibly related to the fact that
+    // moving a file will try to preserve ownership but copying won't
+
+    FSVolumeRefNum sourceVolume = 0;
+    BOOL foundSourceVolume = [self _getVolumeID:&sourceVolume ofItemAtURL:sourceURL];
+
+    FSVolumeRefNum destinationVolume = 0;
+    BOOL foundDestinationVolume = [self _getVolumeID:&destinationVolume ofItemAtURL:destinationURLParent];
+
+    if (foundSourceVolume && foundDestinationVolume && sourceVolume != destinationVolume) {
+        return ([self copyItemAtURL:sourceURL toURL:destinationURL error:error] && [self removeItemAtURL:sourceURL error:error]);
+    }
+
+    return [_fileManager moveItemAtURL:sourceURL toURL:destinationURL error:error];
+}
+
+- (BOOL)_changeOwnerAndGroupOfItemAtURL:(NSURL *)targetURL ownerID:(NSNumber *)ownerID groupID:(NSNumber *)groupID error:(NSError * __autoreleasing *)error
+{
+    char path[PATH_MAX] = {0};
+    if (![targetURL.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"File to change owner & group (%@) cannot be represented as a valid file name.", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+
+    int fileDescriptor = open(path, O_RDONLY | O_SYMLINK);
+    if (fileDescriptor == -1) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open file descriptor to %@", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    // We use fchown instead of chown because the latter can follow symbolic links
+    BOOL success = (fchown(fileDescriptor, ownerID.unsignedIntValue, groupID.unsignedIntValue) == 0);
+    close(fileDescriptor);
+    
+    if (!success) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to change owner & group for %@ with owner ID %u and group ID %u.", targetURL.path.lastPathComponent, ownerID.unsignedIntValue, groupID.unsignedIntValue] }];
+        }
+    }
+
+    return success;
+}
+
+- (BOOL)changeOwnerAndGroupOfItemAtRootURL:(NSURL *)targetURL toMatchURL:(NSURL *)matchURL error:(NSError * __autoreleasing *)error
+{
+    BOOL isTargetADirectory = NO;
+    if (![self _itemExistsAtURL:targetURL isDirectory:&isTargetADirectory]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to change owner & group IDs because %@ does not exist.", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+
+    if (![self _itemExistsAtURL:matchURL]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to match owner & group IDs because %@ does not exist.", matchURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+
+    NSError *matchFileAttributesError = nil;
+    NSString *matchURLPath = matchURL.path;
+    NSDictionary *matchFileAttributes = [_fileManager attributesOfItemAtPath:matchURLPath error:&matchFileAttributesError];
+    if (matchFileAttributes == nil) {
+        if (error != NULL) {
+            *error = matchFileAttributesError;
+        }
+        return NO;
+    }
+
+    NSError *targetFileAttributesError = nil;
+    NSString *targetURLPath = targetURL.path;
+    NSDictionary *targetFileAttributes = [_fileManager attributesOfItemAtPath:targetURLPath error:&targetFileAttributesError];
+    if (targetFileAttributes == nil) {
+        if (error != NULL) {
+            *error = targetFileAttributesError;
+        }
+        return NO;
+    }
+
+    NSNumber *ownerID = [matchFileAttributes objectForKey:NSFileOwnerAccountID];
+    if (ownerID == nil) {
+        // shouldn't be possible to error here, but just in case
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoPermissionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Owner ID could not be read from %@.", matchURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+
+    NSNumber *groupID = [matchFileAttributes objectForKey:NSFileGroupOwnerAccountID];
+    if (groupID == nil) {
+        // shouldn't be possible to error here, but just in case
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadNoPermissionError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Group ID could not be read from %@.", matchURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+
+    NSNumber *targetOwnerID = [targetFileAttributes objectForKey:NSFileOwnerAccountID];
+    NSNumber *targetGroupID = [targetFileAttributes objectForKey:NSFileGroupOwnerAccountID];
+
+    if ((targetOwnerID != nil && [ownerID isEqualToNumber:targetOwnerID]) && (targetGroupID != nil && [groupID isEqualToNumber:targetGroupID])) {
+        // Assume they're the same even if we don't check every file recursively
+        // Speeds up the common case
+        return YES;
+    }
+
+    if (![self _changeOwnerAndGroupOfItemAtURL:targetURL ownerID:ownerID groupID:groupID error:error]) {
+        return NO;
+    }
+
+    if (isTargetADirectory) {
+        NSDirectoryEnumerator *directoryEnumerator = [_fileManager enumeratorAtURL:targetURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
+        for (NSURL *url in directoryEnumerator) {
+            if (![self _changeOwnerAndGroupOfItemAtURL:url ownerID:ownerID groupID:groupID error:error]) {
+                return NO;
+            }
+        }
+    }
+    
+    return YES;
+}
+
+- (BOOL)_updateItemAtURL:(NSURL *)targetURL withAccessTime:(struct timeval)accessTime error:(NSError * __autoreleasing *)error
+{
+    char path[PATH_MAX] = {0};
+    if (![targetURL.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"File to update modification & access time (%@) cannot be represented as a valid file name.", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+
+    int fileDescriptor = open(path, O_RDONLY | O_SYMLINK);
+    if (fileDescriptor == -1) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open file descriptor to %@", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    struct stat statInfo;
+    if (fstat(fileDescriptor, &statInfo) != 0) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to stat file descriptor to %@", targetURL.path.lastPathComponent] }];
+        }
+        close(fileDescriptor);
+        return NO;
+    }
+
+    // Preserve the modification time
+    struct timeval modTime;
+    TIMESPEC_TO_TIMEVAL(&modTime, &statInfo.st_mtimespec);
+    
+    const struct timeval timeInputs[] = {accessTime, modTime};
+    
+    // Using futimes() because utimes() follows symbolic links
+    BOOL updatedTime = (futimes(fileDescriptor, timeInputs) == 0);
+    
+    close(fileDescriptor);
+    
+    if (!updatedTime) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to update modification & access time for %@", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    return YES;
+}
+
+- (BOOL)updateAccessTimeOfItemAtRootURL:(NSURL *)targetURL error:(NSError * __autoreleasing *)error
+{
+    if (![self _itemExistsAtURL:targetURL]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to update modification & access time recursively because %@ does not exist.", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    // We want to update all files with the same exact time
+    struct timeval currentTime = {0, 0};
+    if (gettimeofday(&currentTime, NULL) != 0) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to update modification & access time recursively because gettimeofday failed."] }];
+        }
+        return NO;
+    }
+
+    // Only recurse if it's actually a directory.  Don't recurse into a
+    // root-level symbolic link.
+    NSString *rootURLPath = targetURL.path;
+    NSDictionary *rootAttributes = [_fileManager attributesOfItemAtPath:rootURLPath error:nil];
+    NSString *rootType = [rootAttributes objectForKey:NSFileType];
+    
+    if (![self _updateItemAtURL:targetURL withAccessTime:currentTime error:error]) {
+        return NO;
+    }
+
+    if ([rootType isEqualToString:NSFileTypeDirectory]) {
+        // The NSDirectoryEnumerator will avoid recursing into any contained
+        // symbolic links, so no further type checks are needed.
+        NSDirectoryEnumerator *directoryEnumerator = [_fileManager enumeratorAtURL:targetURL includingPropertiesForKeys:nil options:(NSDirectoryEnumerationOptions)0 errorHandler:nil];
+        
+        for (NSURL *file in directoryEnumerator) {
+            if (![self _updateItemAtURL:file withAccessTime:currentTime error:error]) {
+                return NO;
+            }
+        }
+    }
+    return YES;
+}
+
+// /usr/bin/touch can be used to update an application, as described in:
+// https://developer.apple.com/library/mac/documentation/Carbon/Conceptual/LaunchServicesConcepts/LSCConcepts/LSCConcepts.html
+// The document says LSRegisterURL() can be used as well but this hasn't worked out well for me in practice
+// Anyway, updating the modification time of the application is important because the system will be aware a new version of your app is available,
+// Finder will report the correct file size and other metadata for it, URL schemes your app may register will be updated, etc.
+// Behind the scenes, touch calls to utimes() which is what we use here
+- (BOOL)updateModificationAndAccessTimeOfItemAtURL:(NSURL *)targetURL error:(NSError * __autoreleasing *)error
+{
+    if (![self _itemExistsAtURL:targetURL]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to update modification & access time because %@ does not exist.", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+
+    char path[PATH_MAX] = {0};
+    if (![targetURL.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"File to update modification & access time (%@) cannot be represented as a valid file name.", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+
+    int fileDescriptor = open(path, O_RDONLY | O_SYMLINK);
+    if (fileDescriptor == -1) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to open file descriptor to %@", targetURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+    
+    // Using futimes() because utimes() follows symbolic links
+    BOOL updatedTime = (futimes(fileDescriptor, NULL) == 0);
+    close(fileDescriptor);
+    
+    if (!updatedTime) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSPOSIXErrorDomain code:errno userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to update modification & access time for %@", targetURL.path.lastPathComponent] }];
+        }
+    }
+    
+    return updatedTime;
+}
+
+// Creates a directory at the item pointed by url
+// An item cannot already exist at the url, but the parent must be a directory that exists
+- (BOOL)makeDirectoryAtURL:(NSURL *)url error:(NSError * __autoreleasing *)error
+{
+    if ([self _itemExistsAtURL:url]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteFileExistsError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create directory because file %@ already exists.", url.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+
+    NSURL *parentURL = [url URLByDeletingLastPathComponent];
+    BOOL isParentADirectory = NO;
+    if (![self _itemExistsAtURL:parentURL isDirectory:&isParentADirectory] || !isParentADirectory) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to create directory because parent directory %@ does not exist.", parentURL.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+
+    NSError *createDirectoryError = nil;
+    if (![_fileManager createDirectoryAtURL:url withIntermediateDirectories:NO attributes:nil error:&createDirectoryError]) {
+        if (error != NULL) {
+            *error = createDirectoryError;
+        }
+        return NO;
+    }
+
+    return YES;
+}
+
+- (NSURL *)makeTemporaryDirectoryWithPreferredName:(NSString *)preferredName appropriateForDirectoryURL:(NSURL *)directoryURL error:(NSError * __autoreleasing *)error
+{
+    NSError *tempError = nil;
+    NSURL *tempURL = [_fileManager URLForDirectory:NSItemReplacementDirectory inDomain:NSUserDomainMask appropriateForURL:directoryURL create:YES error:&tempError];
+
+    if (tempURL != nil) {
+        return tempURL;
+    }
+
+    // It is pretty unlikely in my testing we will get here, but just in case we do, we should create a directory inside
+    // the directory pointed by directoryURL, using the preferredName
+
+    NSURL *desiredURL = [directoryURL URLByAppendingPathComponent:preferredName];
+    NSUInteger tagIndex = 1;
+    while ([self _itemExistsAtURL:desiredURL] && tagIndex <= 9999) {
+        desiredURL = [directoryURL URLByAppendingPathComponent:[preferredName stringByAppendingFormat:@" (%lu)", (unsigned long)++tagIndex]];
+    }
+
+    return [self makeDirectoryAtURL:desiredURL error:error] ? desiredURL : nil;
+}
+
+- (BOOL)removeItemAtURL:(NSURL *)url error:(NSError * __autoreleasing *)error
+{
+    if (![self _itemExistsAtURL:url]) {
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileNoSuchFileError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Failed to remove file %@ because it does not exist.", url.path.lastPathComponent] }];
+        }
+        return NO;
+    }
+
+    NSError *removeError = nil;
+    if (![_fileManager removeItemAtURL:url error:&removeError]) {
+        if (error != NULL) {
+            *error = removeError;
+        }
+        return NO;
+    }
+
+    return YES;
+}
+
+@end
+
+#pragma clang diagnostic pop

@@ -1,10 +1,9 @@
 "%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ 已下载完毕并可以使用！您想要现在安装 %1$@ 吗？";
 
-"%1$@ can't be updated when it's running from a read-only volume like a disk image or an optical drive. Move %1$@ to your Applications folder, relaunch it from there, and try again." = "无法更新 %1$@，因为它运行于一个只读宗卷如磁盘映像或光盘。移动 %1$@ 到应用程序文件夹并再试一次。";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "无法更新 %1$@，因为它运行于一个只读宗卷如磁盘映像或光盘。移动 %1$@ 到应用程序文件夹并再试一次。";
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ 是当前的最新版本。";
 
-/* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ 可供下载，您现在的版本是 %3$@。要现在下载吗？";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
@@ -14,9 +13,9 @@
 
 "%@ of %@" = "%1$@ / %2$@";
 
-"A new version of %@ is available!" = "新版本的 %@ 已经提供下载了！";
+"A new version of %@ is available!" = "新版本的 %@ 已经发布";
 
-"A new version of %@ is ready to install!" = "新版本的 %@ 可以安装了！";
+"A new version of %@ is ready to install!" = "新版本的 %@ 可以安装了";
 
 "An error occurred in retrieving update information. Please try again later." = "获取升级信息时出现错误，请稍后再试。";
 

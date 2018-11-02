@@ -1,6 +1,6 @@
 PROJECT_NAME            = Sparkle
-PROJECT_NUMBER          = 1.7.1
-PROJECT_BRIEF           = "A software update framework for OS X"
+PROJECT_NUMBER          = 1.14.0
+PROJECT_BRIEF           = "A software update framework for macOS"
 PROJECT_LOGO            = Resources/Images.xcassets/AppIcon.appiconset/icon_32x32@2x.png
 
 RECURSIVE               = YES

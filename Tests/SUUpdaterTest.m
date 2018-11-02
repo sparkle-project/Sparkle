@@ -8,70 +8,58 @@
 
 #import <XCTest/XCTest.h>
 #import "SUConstants.h"
-#import "SUUpdater.h"
+#import "SPUUpdater.h"
+#import "SPUStandardUserDriver.h"
+#import "SPUUpdaterDelegate.h"
 
-@interface SUUpdaterTest : XCTestCase <SUUpdaterDelegate>
-@property (strong) NSOperationQueue *queue;
-@property (strong) SUUpdater *updater;
+@interface SUUpdaterTest : XCTestCase <SPUUpdaterDelegate>
+@property (strong) SPUUpdater *updater;
 @end
 
 @implementation SUUpdaterTest
 
-@synthesize queue;
 @synthesize updater;
 
 - (void)setUp
 {
     [super setUp];
-    self.queue = [[NSOperationQueue alloc] init];
-    self.updater = [[SUUpdater alloc] init];
-    self.updater.delegate = self;
+    
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
+    // We really want a useless / not really functional user driver so we will pass nil here
+    // For real world applications we should pass a valid user driver which is why this is not a nullable parameter
+    self.updater = [[SPUUpdater alloc] initWithHostBundle:bundle applicationBundle:bundle userDriver:nil delegate:self];
+#pragma clang diagnostic pop
+    
+    NSError *error = nil;
+    if (![self.updater startUpdater:&error]) {
+        NSLog(@"Updater error: %@", error);
+        abort();
+    }
 }
 
 - (void)tearDown
 {
     self.updater = nil;
-    self.queue = nil;
     [super tearDown];
 }
 
-- (NSString *)feedURLStringForUpdater:(SUUpdater *) __unused updater
+- (NSString *)feedURLStringForUpdater:(id)__unused updater
 {
-    return @"";
+    return @"https://test.example.com";
 }
 
 - (void)testFeedURL
 {
     [self.updater feedURL]; // this WON'T throw
-
-    [self.queue addOperationWithBlock:^{
-        XCTAssertTrue(![NSThread isMainThread]);
-        @try {
-            [self.updater feedURL];
-            XCTFail(@"feedURL did not throw an exception when called on a secondary thread");
-        }
-        @catch (NSException *exception) {
-            NSLog(@"%@", exception);
-        }
-    }];
-    [self.queue waitUntilAllOperationsAreFinished];
 }
 
 - (void)testSetTestFeedURL
 {
-    [self.updater setFeedURL:[NSURL URLWithString:@""]]; // this WON'T throw
-
-    [self.queue addOperationWithBlock:^{
-        XCTAssertTrue(![NSThread isMainThread]);
-        @try {
-            [self.updater setFeedURL:[NSURL URLWithString:@""]];
-            XCTFail(@"setFeedURL: did not throw an exception when called on a secondary thread");
-        }
-        @catch (NSException *exception) {
-            NSLog(@"%@", exception);
-        }
-    }];
-    [self.queue waitUntilAllOperationsAreFinished];
+    NSURL *emptyURL = [NSURL URLWithString:@""];
+    XCTAssertNotNil(emptyURL);
+    [self.updater setFeedURL:emptyURL]; // this WON'T throw
 }
 
 @end

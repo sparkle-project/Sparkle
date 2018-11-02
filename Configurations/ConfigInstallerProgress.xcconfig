@@ -1,0 +1,6 @@
+// Installer Progress only
+
+INFOPLIST_FILE = Sparkle/InstallerProgress/InstallerProgress-Info.plist
+PRODUCT_NAME = $(SPARKLE_INSTALLER_PROGRESS_TOOL_NAME)
+SKIP_INSTALL = YES
+CLANG_ENABLE_MODULES = NO

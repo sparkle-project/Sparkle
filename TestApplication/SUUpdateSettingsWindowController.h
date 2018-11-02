@@ -10,4 +10,6 @@
 
 @interface SUUpdateSettingsWindowController : NSWindowController
 
+- (instancetype)initWithCustomUserDriver:(BOOL)customUserDriver;
+
 @end

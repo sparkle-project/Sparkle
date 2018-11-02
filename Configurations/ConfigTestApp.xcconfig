@@ -1,7 +1,9 @@
-// Test Application only
+// Test Application
 
 INFOPLIST_FILE = TestApplication/TestApplication-Info.plist
 WRAPPER_EXTENSION = app
-ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon
+ASSETCATALOG_COMPILER_APPICON_NAME = $(SPARKLE_ICON_NAME)
 LD_RUNPATH_SEARCH_PATHS = @executable_path/../Frameworks
 PRODUCT_BUNDLE_IDENTIFIER = org.sparkle-project.SparkleTestApp
+CODE_SIGN_ENTITLEMENTS = TestApplication/Sparkle-Test-App.entitlements
+MACOSX_DEPLOYMENT_TARGET = 10.10

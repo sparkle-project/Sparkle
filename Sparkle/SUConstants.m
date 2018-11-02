@@ -6,27 +6,33 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#import "SUUpdater.h"
-
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
-#import "SUVersionComparisonProtocol.h"
 #import "SUConstants.h"
+#import "SUErrors.h"
 
 #ifndef DEBUG
 #define DEBUG 0
 #endif
 
+#include "AppKitPrevention.h"
+
 // Define some minimum intervals to avoid DoS-like checking attacks
 const NSTimeInterval SUMinimumUpdateCheckInterval = DEBUG ? 60 : (60 * 60);
 const NSTimeInterval SUDefaultUpdateCheckInterval = DEBUG ? 60 : (60 * 60 * 24);
 
+// If the update has already been automatically downloaded, we normally don't want to bug the user about the update
+// However if the user has gone a very long time without quitting an application, we will bug them
+// This is the time interval for a "week"; it doesn't matter that this measure is imprecise.
+const NSTimeInterval SUImpatientUpdateCheckInterval = DEBUG ? (60 * 2) : (60 * 60 * 24 * 7);
+
 NSString *const SUBundleIdentifier = @SPARKLE_BUNDLE_IDENTIFIER;
+
+NSString *const SUAppcastAttributeValueMacOS = @"macos";
 
 NSString *const SUTechnicalErrorInformationKey = @"SUTechnicalErrorInformation";
 
-NSString *const SUHasLaunchedBeforeKey = @"SUHasLaunchedBefore";
 NSString *const SUFeedURLKey = @"SUFeedURL";
+NSString *const SUHasLaunchedBeforeKey = @"SUHasLaunchedBefore";
+NSString *const SUUpdateRelaunchingMarkerKey = @"SUUpdateRelaunchingMarker";
 NSString *const SUShowReleaseNotesKey = @"SUShowReleaseNotes";
 NSString *const SUSkippedVersionKey = @"SUSkippedVersion";
 NSString *const SUScheduledCheckIntervalKey = @"SUScheduledCheckInterval";
@@ -38,12 +44,11 @@ NSString *const SUAutomaticallyUpdateKey = @"SUAutomaticallyUpdate";
 NSString *const SUAllowsAutomaticUpdatesKey = @"SUAllowsAutomaticUpdates";
 NSString *const SUEnableSystemProfilingKey = @"SUEnableSystemProfiling";
 NSString *const SUEnableAutomaticChecksKey = @"SUEnableAutomaticChecks";
-NSString *const SUEnableAutomaticChecksKeyOld = @"SUCheckAtStartup";
 NSString *const SUSendProfileInfoKey = @"SUSendProfileInfo";
 NSString *const SULastProfileSubmitDateKey = @"SULastProfileSubmissionDate";
 NSString *const SUPromptUserOnFirstLaunchKey = @"SUPromptUserOnFirstLaunch";
+NSString *const SUEnableJavaScriptKey = @"SUEnableJavaScript";
 NSString *const SUFixedHTMLDisplaySizeKey = @"SUFixedHTMLDisplaySize";
-NSString *const SUKeepDownloadOnFailedInstallKey = @"SUKeepDownloadOnFailedInstall";
 NSString *const SUDefaultsDomainKey = @"SUDefaultsDomain";
 NSString *const SUSparkleErrorDomain = @"SUSparkleErrorDomain";
 
@@ -56,6 +61,8 @@ NSString *const SUAppcastAttributeDeltaFrom = @"sparkle:deltaFrom";
 NSString *const SUAppcastAttributeDSASignature = @"sparkle:dsaSignature";
 NSString *const SUAppcastAttributeShortVersionString = @"sparkle:shortVersionString";
 NSString *const SUAppcastAttributeVersion = @"sparkle:version";
+NSString *const SUAppcastAttributeOsType = @"sparkle:os";
+NSString *const SUAppcastAttributeInstallationType = @"sparkle:installationType";
 
 NSString *const SUAppcastElementCriticalUpdate = @"sparkle:criticalUpdate";
 NSString *const SUAppcastElementDeltas = @"sparkle:deltas";
@@ -65,6 +72,7 @@ NSString *const SUAppcastElementReleaseNotesLink = @"sparkle:releaseNotesLink";
 NSString *const SUAppcastElementTags = @"sparkle:tags";
 
 NSString *const SURSSAttributeURL = @"url";
+NSString *const SURSSAttributeLength = @"length";
 
 NSString *const SURSSElementDescription = @"description";
 NSString *const SURSSElementEnclosure = @"enclosure";

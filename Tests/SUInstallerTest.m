@@ -6,10 +6,12 @@
 //  Copyright (c) 2015 Sparkle Project. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import <XCTest/XCTest.h>
 #import "SUHost.h"
 #import "SUInstaller.h"
+#import "SUInstallerProtocol.h"
+#import "SPUInstallationType.h"
 #import <unistd.h>
 
 @interface SUInstallerTest : XCTestCase
@@ -45,21 +47,34 @@
     [fm removeItemAtPath:expectedDestination error:nil];
     XCTAssertFalse([fm fileExistsAtPath:expectedDestination isDirectory:nil]);
 
-    XCTestExpectation *done = [self expectationWithDescription:@"install finished"];
-
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-    NSString *path = [bundle pathForResource:@"test.sparkle_guided" ofType:@"pkg"];
+    NSString *path = [bundle pathForResource:@"test" ofType:@"pkg"];
     XCTAssertNotNil(path);
 
     SUHost *host = [[SUHost alloc] initWithBundle:bundle];
 
-    [SUInstaller installFromUpdateFolder:[path stringByDeletingLastPathComponent] overHost:host installationPath:@"/tmp" versionComparator:nil completionHandler:^(NSError *error) {
-        XCTAssertNil(error);
-        XCTAssertTrue([fm fileExistsAtPath:expectedDestination isDirectory:nil]);
-        [done fulfill];
-    }];
+    NSError *installerError = nil;
+    id<SUInstallerProtocol> installer = [SUInstaller installerForHost:host expectedInstallationType:SPUInstallationTypeGuidedPackage updateDirectory:[path stringByDeletingLastPathComponent] error:&installerError];
+    
+    if (installer == nil) {
+        XCTFail(@"Installer is nil with error: %@", installerError);
+        return;
+    }
+    
+    NSError *initialInstallError = nil;
+    if (![installer performInitialInstallation:&initialInstallError]) {
+        XCTFail(@"Initial Installation failed with error: %@", initialInstallError);
+        return;
+    }
 
-    [self waitForExpectationsWithTimeout:40 handler:nil];
+    NSError *finalInstallError = nil;
+    if (![installer performFinalInstallationProgressBlock:nil error:&finalInstallError]) {
+        XCTFail(@"Final installation failed with error: %@", finalInstallError);
+        return;
+    }
+
+    XCTAssertTrue([fm fileExistsAtPath:expectedDestination isDirectory:nil]);
+
     [fm removeItemAtPath:expectedDestination error:nil];
 }
 #endif

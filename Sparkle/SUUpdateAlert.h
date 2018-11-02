@@ -9,28 +9,30 @@
 #ifndef SUUPDATEALERT_H
 #define SUUPDATEALERT_H
 
-#import "SUWindowController.h"
+#import <Cocoa/Cocoa.h>
 #import "SUVersionDisplayProtocol.h"
+#import "SPUStatusCompletionResults.h"
 
 @protocol SUUpdateAlertDelegate;
 
-typedef NS_ENUM(NSInteger, SUUpdateAlertChoice) {
-    SUInstallUpdateChoice,
-    SURemindMeLaterChoice,
-    SUSkipThisVersionChoice,
-    SUOpenInfoURLChoice
-};
+@class SUAppcastItem, SPUDownloadData, SUHost;
+@interface SUUpdateAlert : NSWindowController
 
-@class SUAppcastItem, SUHost;
-@interface SUUpdateAlert : SUWindowController
+@property (nonatomic, weak, readonly) id <SUVersionDisplay> versionDisplayer;
 
-@property (weak) id<SUVersionDisplay> versionDisplayer;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item alreadyDownloaded:(BOOL)alreadyDownloaded host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer completionBlock:(void (^)(SPUUpdateAlertChoice))block;
 
-- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)host completionBlock:(void(^)(SUUpdateAlertChoice))c;
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer resumableCompletionBlock:(void (^)(SPUInstallUpdateStatus))block;
+
+- (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer informationalCompletionBlock:(void (^)(SPUInformationalUpdateAlertChoice))block;
+
+- (void)showUpdateReleaseNotesWithDownloadData:(SPUDownloadData *)downloadData;
+- (void)showReleaseNotesFailedToDownload;
 
 - (IBAction)installUpdate:sender;
 - (IBAction)skipThisVersion:sender;
 - (IBAction)remindMeLater:sender;
+- (void)disableKeyboardShortcutForInstallButton;
 
 @end
 

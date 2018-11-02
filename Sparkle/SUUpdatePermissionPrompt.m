@@ -7,68 +7,76 @@
 //
 
 #import "SUUpdatePermissionPrompt.h"
+#import "SPUUpdatePermissionRequest.h"
+#import "SUUpdatePermissionResponse.h"
+#import "SULocalizations.h"
 
 #import "SUHost.h"
 #import "SUConstants.h"
+#import "SUApplicationInfo.h"
+#import "SUTouchBarForwardDeclarations.h"
+#import "SUTouchBarButtonGroup.h"
 
-@interface SUUpdatePermissionPrompt ()
+static NSString *const SUUpdatePermissionPromptTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDENTIFIER ".SUUpdatePermissionPrompt";
+
+@interface SUUpdatePermissionPrompt () <NSTouchBarDelegate>
 
 @property (assign) BOOL isShowingMoreInfo;
 @property (assign) BOOL shouldSendProfile;
 
 @property (strong) SUHost *host;
 @property (strong) NSArray *systemProfileInformationArray;
-@property (weak) id<SUUpdatePermissionPromptDelegate> delegate;
 @property (weak) IBOutlet NSTextField *descriptionTextField;
 @property (weak) IBOutlet NSView *moreInfoView;
 @property (weak) IBOutlet NSButton *moreInfoButton;
 @property (weak) IBOutlet NSTableView *profileTableView;
+@property (weak) IBOutlet NSButton *cancelButton;
+@property (weak) IBOutlet NSButton *checkButton;
+
+@property (nonatomic, readonly) void (^reply)(SUUpdatePermissionResponse *);
 
 @end
 
 @implementation SUUpdatePermissionPrompt
 
+@synthesize reply = _reply;
 @synthesize isShowingMoreInfo = _isShowingMoreInfo;
 @synthesize shouldSendProfile = _shouldSendProfile;
 @synthesize host;
 @synthesize systemProfileInformationArray;
-@synthesize delegate;
 @synthesize descriptionTextField;
 @synthesize moreInfoView;
 @synthesize moreInfoButton;
 @synthesize profileTableView;
+@synthesize cancelButton;
+@synthesize checkButton;
 
-- (BOOL)shouldAskAboutProfile
-{
-    return [[self.host objectForInfoDictionaryKey:SUEnableSystemProfilingKey] boolValue];
-}
-
-- (instancetype)initWithHost:(SUHost *)aHost systemProfile:(NSArray *)profile delegate:(id<SUUpdatePermissionPromptDelegate>)d
+- (instancetype)initPromptWithHost:(SUHost *)theHost request:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply
 {
     self = [super initWithWindowNibName:@"SUUpdatePermissionPrompt"];
-	if (self)
-	{
-        host = aHost;
-        delegate = d;
+    if (self)
+    {
+        _reply = reply;
+        self.host = theHost;
         self.isShowingMoreInfo = NO;
         self.shouldSendProfile = [self shouldAskAboutProfile];
-        systemProfileInformationArray = profile;
+        self.systemProfileInformationArray = request.systemProfile;
         [self setShouldCascadeWindows:NO];
     }
     return self;
 }
 
-+ (void)promptWithHost:(SUHost *)aHost systemProfile:(NSArray *)profile delegate:(id<SUUpdatePermissionPromptDelegate>)d
++ (void)promptWithHost:(SUHost *)host request:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply
 {
     // If this is a background application we need to focus it in order to bring the prompt
     // to the user's attention. Otherwise the prompt would be hidden behind other applications and
     // the user would not know why the application was paused.
-	if ([aHost isBackgroundApplication]) {
+    if ([SUApplicationInfo isBackgroundApplication:[NSApplication sharedApplication]]) {
         [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
     }
-
+    
     if (![NSApp modalWindow]) { // do not prompt if there is is another modal window on screen
-        SUUpdatePermissionPrompt *prompt = [[[self class] alloc] initWithHost:aHost systemProfile:profile delegate:d];
+        SUUpdatePermissionPrompt *prompt = [(SUUpdatePermissionPrompt *)[[self class] alloc] initPromptWithHost:host request:request reply:reply];
         NSWindow *window = [prompt window];
         if (window) {
             [NSApp runModalForWindow:window];
@@ -76,9 +84,14 @@
     }
 }
 
+- (BOOL)shouldAskAboutProfile
+{
+    return [(NSNumber *)[self.host objectForInfoDictionaryKey:SUEnableSystemProfilingKey] boolValue];
+}
+
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
 
-- (void)awakeFromNib
+- (void)windowDidLoad
 {
 	if (![self shouldAskAboutProfile])
 	{
@@ -96,7 +109,7 @@
 
 - (NSImage *)icon
 {
-    return [self.host icon];
+    return [SUApplicationInfo bestIconForHost:self.host];
 }
 
 - (NSString *)promptDescription
@@ -147,15 +160,32 @@
     [self.moreInfoView setHidden:!self.isShowingMoreInfo];
 }
 
-- (IBAction)finishPrompt:(id)sender
+- (IBAction)finishPrompt:(NSButton *)sender
 {
-    if (![self.delegate respondsToSelector:@selector(updatePermissionPromptFinishedWithResult:)]) {
-        [NSException raise:@"SUInvalidDelegate" format:@"SUUpdatePermissionPrompt's delegate (%@) doesn't respond to updatePermissionPromptFinishedWithResult:!", self.delegate];
-    }
-    [self.host setBool:self.shouldSendProfile forUserDefaultsKey:SUSendProfileInfoKey];
-    [self.delegate updatePermissionPromptFinishedWithResult:([sender tag] == 1 ? SUAutomaticallyCheck : SUDoNotAutomaticallyCheck)];
+    SUUpdatePermissionResponse *response = [[SUUpdatePermissionResponse alloc] initWithAutomaticUpdateChecks:([sender tag] == 1) sendSystemProfile:self.shouldSendProfile];
+    self.reply(response);
+    
     [[self window] close];
     [NSApp stopModal];
+}
+
+- (NSTouchBar *)makeTouchBar
+{
+    NSTouchBar *touchBar = [(NSTouchBar *)[NSClassFromString(@"NSTouchBar") alloc] init];
+    touchBar.defaultItemIdentifiers = @[SUUpdatePermissionPromptTouchBarIndentifier,];
+    touchBar.principalItemIdentifier = SUUpdatePermissionPromptTouchBarIndentifier;
+    touchBar.delegate = self;
+    return touchBar;
+}
+
+- (NSTouchBarItem *)touchBar:(NSTouchBar * __unused)touchBar makeItemForIdentifier:(NSTouchBarItemIdentifier)identifier API_AVAILABLE(macos(10.12.2))
+{
+    if ([identifier isEqualToString:SUUpdatePermissionPromptTouchBarIndentifier]) {
+        NSCustomTouchBarItem* item = [(NSCustomTouchBarItem *)[NSClassFromString(@"NSCustomTouchBarItem") alloc] initWithIdentifier:identifier];
+        item.viewController = [[SUTouchBarButtonGroup alloc] initByReferencingButtons:@[self.checkButton, self.cancelButton]];
+        return item;
+    }
+    return nil;
 }
 
 @end

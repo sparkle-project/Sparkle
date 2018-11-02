@@ -1,56 +1,79 @@
-# Sparkle [![Build Status](https://travis-ci.org/sparkle-project/Sparkle.svg?branch=master)](https://travis-ci.org/sparkle-project/Sparkle) <a href='https://app.ship.io/dashboard#/jobs/8814/history' target='_blank'><img src='https://app.ship.io/jobs/V3PoCLcN5ft5Pnq0/build_status.png' height='20' /></a> [![Coverage Status](https://coveralls.io/repos/sparkle-project/Sparkle/badge.svg?branch=master&service=github)](https://coveralls.io/github/sparkle-project/Sparkle?branch=master)
+# Sparkle-XPC-UI
 
-An easy-to-use software update framework for Cocoa developers.
+A major fork to the popular Sparkle update framework that supports sandboxing, custom user interfaces, updating other bundles, and a modern secure architecture.
 
-## Important: About This Fork
+<img src="Resources/Screenshot.png" width="732" alt="Sparkle shows familiar update window with release notes">
 
-This fork by Daniel Jalkut of Red Sweater Software deviates from the canonical sparkle-project repository in a few important ways:
+This fork's current status is beta. I am no longer looking into adding or rewriting major functionality, and would like to finalize and have it be battle tested.
 
-* Rudimentary support for sandboxing is supported through the use of an XPC tool to kick off the install/relaunch process. (Courtesy tumult and wbyoung).
-* Various changes to Sparkle.strings are made to (IMHO) lighten the tone of the language to be less excited and more professional.
+New issues that are found should be [reported here](https://github.com/zorgiepoo/sparkle-ui-xpc-issues/issues), and internal design documents can be found in `Documentation`. Discussion of this fork can be found on the [official branch](https://github.com/sparkle-project/Sparkle/issues/363).
 
-**Do not use this code as is.**
+# Features
 
-The state of this project *right now* is "not tested." I have just on July 27, 2015 finished a merge with sparkle-project but have not yet tested that all the expected XPC-based stuff is working as expected. When the state of this project is once again "stable" I will update this readme to remove this line and replace it with something more encouraging. :)
+## Sandboxing
 
-**If you do use this code.**
+This fork includes several XPC services that are generally optional to include in your application, but are required for sandboxed applications. See the `INSTALL` file for more detail.
 
-If you decide to use this code and test its functionality etc., one caveat you should be aware of is that the XPC service is built with a "red sweater" based reverse domain style name. You probably want to change this to your own organization's ID namespace. Search the project for "com.red-sweater" to find any references along these lines.
+When sandboxed, linked release notes are allowed. External references inside the linked release notes are only allowed if the host application has an incoming network entitlement. Lastly, updates can still be extracted from DMG files just as they are in the official branch.
 
-<img src="Resources/Screenshot.png" width="715" alt="Sparkle shows familiar update window with release notes">
+## Custom User Interfaces
 
-## Changes since 1.5b
+<img src="Resources/Screenshot2.png" width="350" alt="Sparkle shows a custom update window with release notes">
 
-* Up-to-date with 10.11 SDK and Xcode 7. Supports OS X 10.7+.
-* Cleaned up and modernized code, using ARC and Autolayout.
-* Merged bugfixes, security fixes and some features from multiple Sparkle forks.
-* Truly automatic background updates (no UI at all) when user agreed to "Automatically download and install updates in the future."
-* Ability to mark updates as critical.
-* Progress and status notifications for the host app.
-* Name of finish_installation.app can be configured to match your app's name.
-* Upgraded and more reliable binary delta and code signing verification.
+See the `SPUUserDriver` protocol and classes that implement it for how to write your own user interface. This enables extensibility of Sparkle without altering or extending internal classes.
 
-## Features
+Hold shift when launching the `Sparkle Test App` to try out the experimental user interface shown above (note: this custom interface requires running macOS 10.10 or later).
 
-* True self-updating—the user can choose to automatically download and install all updates.
-* Displays a detailed progress window to the user.
-* Supports authentication for installing in secure locations.
-* Supports Apple Code Signing and DSA signatures for ultra-secure updates.
-* Easy to install. Sparkle requires no code in your app, so it's trivial to upgrade or remove the framework.
-* Uses appcasts for release information. Appcasts are supported by 3rd party update-tracking programs and websites.
-* Displays release notes to the user via WebKit.
-* Sparkle doesn't bug the user until second launch for better first impressions.
-* Seamless integration—there's no mention of Sparkle; your icons and app name are used.
-* Deep delegate support to make Sparkle work exactly as you need.
-* Optionally sends system information to the server when checking for updates.
-* Supports bundles, preference panes, plugins, and other non-.app software. Can install .pkg files for more complicated products.
-* Supports branches due to minimum OS version requirements.
+## Command Line Tool
 
-## Developers
+<img src="Resources/Screenshot3.png" width="400" alt="Sparkle shows command line interface to installing updates">
 
-Building Sparkle requires Xcode 5 or above.
+The `sparkle` command line tool can be used to update any Sparkle supported bundle. `sparkle` is a great demonstration of updating other bundles, though that aspect is not limited to just this tool!
 
-### API
+This utility may also be an ideal choice for plug-ins where loading a copy of Sparkle's framework into a host's application may lead to conflicts or have undesirable consequences.
+
+## Modern Security
+
+Not only is sandboxing supported, but launchd is now used for submitting the installer. XPC is used to communicate to the launchd job. Uses of `AuthorizationExecuteWithPrivileges`, which is neither secure or reliable, have been removed. Installation on standard user accounts has been tested heavily rather than being treated as an edge case.
+
+Extraction, validation, and installation of the update are all handled by the installer. The XPC services and the installer job don't implicitly trust the other end of the connection. Signing downloads with a DSA signature is now encouraged more aggressively.
+
+Usage of AppKit has been minimized greatly. No linkage of it is found in the installer daemon. All code core to Sparkle's functionality prevents it from being imported. Only user driver classes and a progress agent may use AppKit for showing UI. A `SparkleCore.framework` target has been created that just uses the core.
+
+## API Compatibility
+
+Despite decoupling update scheduling, UI, installation, and minimizing AppKit usage, a great deal of effort was made to maintain ABI compatibility with older versions of Sparkle. A deprecated `SUUpdater` shim exists for maintaining runtime compatibility. Please check out `SPUStandardUpdaterController` and `SPUUpdater` instead for modern replacements.
+
+Interactive package based installations have been deprecated in favor for guided package installations. As a consequence, interactive installations now have to be opted into (eg: `foo.sparkle_interactive.pkg`). A `sparkle:installationType=package` or `sparkle:installationType=interactive-package` tag is also now required in the appcast enclosure item for package based installs.
+
+No attempt is made to preserve compatibility with regards to subclassing Sparkle's internal classes. Doing this is not supported or maintainable anymore. Much of this desire will go away with the extensibility provided by the user driver API.
+
+New Sparkle classes are now prefixed with `SPU` rather than `SU`. Older classes still use the `SU` prefix to maintain compatibility.
+
+## Misc. Changes
+
+* Updates are more instant to install once extracted. The "installing update" dialog seldomly shows up after the old application quits.
+* The installer will attempt installing the update after extraction is finished, even if the user quits the process and doesn't relaunch the application explicitly.
+* Updates can be downloaded in the background automatically (if enabled) and be resumed by the user later, even if the user has insufficent permission to install them initially.
+* Authentication now occurs before launching the installer and before terminating the application, which can be canceled by the user cleanly.
+* Sudden termination for silent updates isn't disabled because Sparkle doesn't listen for AppKit events anymore such as termination or power off (note the installer running as a separate process listens for termination).
+* Distributing updates without DSA signing the archives is now deprecated.
+* Sparkle's icon in the official branch is no longer used for installation. Instead, the icon of the bundle to update is used. A 32x32 image representation of the icon is needed for the authorization dialog.
+* Delegation methods may have been removed or added to the newer updater API. Please review `SPUUpdaterDelegate` if using `SPUUpdater`.
+
+## Requirements
+
+* Runtime: **macOS 10.9** or greater for 64bit, **macOS 10.10** or greater for 32bit (this has been bumped up!)
+* Build: Xcode 7 or greater required.
+* HTTPS server for serving updates (see [App Transport Security](http://sparkle-project.org/documentation/app-transport-security/))
+
+## Usage
+
+See [getting started guide](https://sparkle-project.org/documentation/). No code is necessary, but a bit of Xcode configuration is required.
+
+## Development
+
+### API symbols
 
 Sparkle is built with `-fvisibility=hidden -fvisibility-inlines-hidden` which means no symbols are exported by default.
 If you are adding a symbol to the public API you must decorate the declaration with the `SU_EXPORT` macro (grep the source code for examples).
@@ -60,3 +83,13 @@ If you are adding a symbol to the public API you must decorate the declaration w
 `cd` to the root of the Sparkle source tree and run `make release`. Sparkle-*VERSION*.tar.bz2 will be created in a temporary directory and revealed in Finder after the build has completed.
 
 Alternatively, build the Distribution scheme in the Xcode UI.
+
+See the `INSTALL` file after building Sparkle, especially if interested in sandboxing support. The XPC services are not required for non-sandboxed applications.
+
+## Code of Conduct
+
+We pledge to have an open and welcoming environment. See our [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Project Sponsor
+
+[StackPath](https://www.stackpath.com/?utm_source=sparkle-github&utm_medium=link&utm_campaign=readme-footer)

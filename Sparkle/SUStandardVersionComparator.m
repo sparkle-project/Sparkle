@@ -6,21 +6,26 @@
 //  Copyright 2007 Andy Matuschak. All rights reserved.
 //
 
-#import "SUUpdater.h"
-
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SUStandardVersionComparator.h"
 
+
+#include "AppKitPrevention.h"
+
 @implementation SUStandardVersionComparator
+
+- (instancetype)init
+{
+    return [super init];
+}
 
 + (SUStandardVersionComparator *)defaultComparator
 {
     static SUStandardVersionComparator *defaultComparator = nil;
-    if (defaultComparator == nil) {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
         defaultComparator = [[SUStandardVersionComparator alloc] init];
-    }
+    });
     return defaultComparator;
 }
 
@@ -91,8 +96,8 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
 
     n = MIN([partsA count], [partsB count]);
     for (i = 0; i < n; ++i) {
-        partA = partsA[i];
-        partB = partsB[i];
+        partA = [partsA objectAtIndex:i];
+        partB = [partsB objectAtIndex:i];
 
         typeA = [self typeOfCharacter:partA];
         typeB = [self typeOfCharacter:partB];
@@ -142,11 +147,11 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
         NSComparisonResult shorterResult, largerResult;
 
         if ([partsA count] > [partsB count]) {
-            missingPart = partsA[n];
+            missingPart = [partsA objectAtIndex:n];
             shorterResult = NSOrderedAscending;
             largerResult = NSOrderedDescending;
         } else {
-            missingPart = partsB[n];
+            missingPart = [partsB objectAtIndex:n];
             shorterResult = NSOrderedDescending;
             largerResult = NSOrderedAscending;
         }

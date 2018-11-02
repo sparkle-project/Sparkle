@@ -9,25 +9,16 @@
 #ifndef SUUPDATEPERMISSIONPROMPT_H
 #define SUUPDATEPERMISSIONPROMPT_H
 
-#import "SUWindowController.h"
+#import <Cocoa/Cocoa.h>
 
-typedef NS_ENUM(NSInteger, SUPermissionPromptResult) {
-    SUAutomaticallyCheck,
-    SUDoNotAutomaticallyCheck
-};
+@class SUHost, SPUUpdatePermissionRequest, SUUpdatePermissionResponse;
 
-@protocol SUUpdatePermissionPromptDelegate;
+@interface SUUpdatePermissionPrompt : NSWindowController
 
-@class SUHost;
-@interface SUUpdatePermissionPrompt : SUWindowController
++ (void)promptWithHost:(SUHost *)host request:(SPUUpdatePermissionRequest *)request reply:(void (^)(SUUpdatePermissionResponse *))reply;
 
-+ (void)promptWithHost:(SUHost *)aHost systemProfile:(NSArray *)profile delegate:(id<SUUpdatePermissionPromptDelegate>)d;
 - (IBAction)toggleMoreInfo:(id)sender;
-- (IBAction)finishPrompt:(id)sender;
-@end
-
-@protocol SUUpdatePermissionPromptDelegate <NSObject>
-- (void)updatePermissionPromptFinishedWithResult:(SUPermissionPromptResult)result;
+- (IBAction)finishPrompt:(NSButton *)sender;
 @end
 
 #endif
