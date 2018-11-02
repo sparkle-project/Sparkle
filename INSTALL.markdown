@@ -1,4 +1,4 @@
-== Building ==
+# Building
 
 If release products have not already been built, they can be built by:
 
@@ -8,7 +8,7 @@ Or build the "Distribution" scheme from within the Xcode project.
 
 Debug builds of Sparkle can also be built from Xcode. Note that debug builds change Sparkle's default behavior to ease development. Never use a debug build of Sparkle for distribution.
 
-== Installing ==
+# Installing
 
 To install Sparkle, you can copy Sparkle.framework into your project as you would any other framework. Make sure you have a build phase to copy the framework into your application's Frameworks directory.
 
@@ -29,10 +29,10 @@ After signing the services, copy them into your project and set up a build phase
 
 Then test if your application works :).
 
-== System Requirements ==
+# System Requirements
 
 This version of Sparkle only supports running on macOS 10.8 and later
 
-== Known Issues ==
+# Known Issues
 
 https://github.com/zorgiepoo/sparkle-ui-xpc-issues/issues
