@@ -30,5 +30,4 @@
 - (void)setBool:(BOOL)value forUserDefaultsKey:(NSString *)defaultName;
 - (id)objectForKey:(NSString *)key;
 - (BOOL)boolForKey:(NSString *)key;
-
 @end
