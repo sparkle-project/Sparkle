@@ -12,7 +12,7 @@ New issues that are found should be [reported here](https://github.com/zorgiepoo
 
 ## Sandboxing
 
-This fork includes several XPC services that are generally optional to include in your application, but are required for sandboxed applications. See the `INSTALL` file for more detail.
+This fork includes several XPC services that are generally optional to include in your application, but are required for sandboxed applications. See the [INSTALL](INSTALL.markdown) file for more detail.
 
 When sandboxed, linked release notes are allowed. External references inside the linked release notes are only allowed if the host application has an incoming network entitlement. Lastly, updates can still be extracted from DMG files just as they are in the official branch.
 
@@ -84,7 +84,7 @@ If you are adding a symbol to the public API you must decorate the declaration w
 
 Alternatively, build the Distribution scheme in the Xcode UI.
 
-See the `INSTALL` file after building Sparkle, especially if interested in sandboxing support. The XPC services are not required for non-sandboxed applications.
+See the [INSTALL](INSTALL.markdown) file after building Sparkle, especially if interested in sandboxing support. The XPC services are not required for non-sandboxed applications.
 
 ## Code of Conduct
 
