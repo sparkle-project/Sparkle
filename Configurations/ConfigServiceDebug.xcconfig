@@ -1,5 +1,0 @@
-#include "ConfigCommon.xcconfig"
-#include "ConfigCommonDebug.xcconfig"
-#include "ConfigService.xcconfig"
-
-OTHER_CFLAGS = -fsingle-precision-constant -DDEBUG

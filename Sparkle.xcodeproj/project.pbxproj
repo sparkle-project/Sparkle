@@ -3993,36 +3993,6 @@
 			};
 			name = Release;
 		};
-		8B887B6B1517F3AC000BB292 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 65CA26041B66A45900A79420 /* ConfigServiceDebug.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = NO;
-				CODE_SIGN_IDENTITY = "Developer ID Application";
-				COMBINE_HIDPI_IMAGES = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				INFOPLIST_FILE = "Sparkle/Sandbox Service/Service/SandboxService.plist";
-				OTHER_CFLAGS = "-DDEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.red-sweater.Sparkle.${PRODUCT_NAME:rfc1034identifier}";
-				VALID_ARCHS = x86_64;
-			};
-			name = Debug;
-		};
-		8B887B6C1517F3AC000BB292 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 65CA26051B66A45900A79420 /* ConfigServiceRelease.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = NO;
-				COMBINE_HIDPI_IMAGES = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				INFOPLIST_FILE = "Sparkle/Sandbox Service/Service/SandboxService.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.red-sweater.Sparkle.${PRODUCT_NAME:rfc1034identifier}";
-				VALID_ARCHS = x86_64;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
