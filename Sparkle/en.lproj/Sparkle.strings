@@ -88,7 +88,3 @@
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
 "You're up-to-date!" = "You’re up to date.";
 
-/* Alternative name for "Install" button if we have a paid update or other update
-	without a download but with a URL. */
-"Learn More..." = "Learn More…";
-
