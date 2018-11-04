@@ -38,4 +38,4 @@ Then test if your application works :).
 
 # Known Issues
 
-https://github.com/zorgiepoo/sparkle-ui-xpc-issues/issues
+Search the (issues database)[issues] for bugs specific to the `ui-separation-and-xpc` branch.
