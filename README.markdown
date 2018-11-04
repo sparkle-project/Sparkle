@@ -69,7 +69,7 @@ New Sparkle classes are now prefixed with `SPU` rather than `SU`. Older classes 
 
 ## Usage
 
-See [getting started guide](https://sparkle-project.org/documentation/). No code is necessary, but a bit of Xcode configuration is required.
+See [getting started guide](https://sparkle-project.org/documentation/). No code is necessary, but a bit of Xcode configuration is required. If your app is sandboxed, see the [INSTALL](INSTALL.markdown) document for more details about installing XPC binaries that support sandboxed apps.
 
 ## Development
 
