@@ -6,7 +6,7 @@ A major fork to the popular Sparkle update framework that supports sandboxing, c
 
 This fork's current status is beta. I am no longer looking into adding or rewriting major functionality, and would like to finalize and have it be battle tested.
 
-New issues that are found should be [reported here](https://github.com/sparkle-project/issues), with an indication in the title that they pertain to the `ui-separation-and-xpc` branch. Internal design documents can be found in (Documentation)[Documentation/]. Discussion of this fork can be found in [this issue](https://github.com/sparkle-project/Sparkle/issues/363).
+New issues that are found should be [reported here](https://github.com/sparkle-project/issues), with an indication in the title that they pertain to the `ui-separation-and-xpc` branch. Internal design documents can be found in (Documentation)[Documentation]. Discussion of this fork can be found in [this issue](https://github.com/sparkle-project/Sparkle/issues/363).
 
 # Features
 
