@@ -14,9 +14,9 @@ To install Sparkle, drag Sparkle.framework into your project as you would any ot
 
 # XPC Services
 
-If your application is sandboxed, you will need to embed one or more of Sparkle's XPC services into your application. These are used to perform privileged operations that your sandboxed app, and the rest of the Sparkle framework, are not authorized to perform.
+If your application is sandboxed, you will need to embed one or more of Sparkle's XPC services into your application. These are used to perform privileged operations that your sandboxed app, and the rest of the Sparkle framework, are not authorized to perform. Even if you are not strictly required to use a particular XPC service, there may still be some merit to separating privileges.
 
-* `SparkleInstallerLauncher`: This is required for all sandboxed apps and is used by Sparkle to perform the privileged operation of upgrading your app and relaunching it.
+* `SparkleInstallerLauncher`, `SparkleInstallerConnection`, and `SparkleInstallerStatus`: These are required for most sandboxed apps, and are used by Sparkle to perform the privileged operations of upgrading your app, relaunching it, and reporting progress to the app as it proceeds.
 
 * `SparkleDownloader`: This is required only if your sandboxed app does not already possess the "com.apple.security.network.client" entitlement, allowing it to make outgoing HTTP(S) connections. If you do decide to include the Downloader service and your app does not pass Apple's App Transport Security requirements, then you may have to add exceptions inside the downloader service's Info.plist.
 
