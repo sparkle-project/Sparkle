@@ -8,6 +8,13 @@ This fork's current status is beta. I am no longer looking into adding or rewrit
 
 New issues that are found should be [reported here](https://github.com/sparkle-project/issues), with an indication in the title that they pertain to the `ui-separation-and-xpc` branch. Internal design documents can be found in [Documentation](Documentation/). Discussion of this fork can be found in [this issue](https://github.com/sparkle-project/Sparkle/issues/363).
 
+# About this Particular Fork
+
+This fork by Daniel Jalkut of Red Sweater Software deviates from the canonical sparkle-project repository in a few important ways:
+
+* It integrates the "ui-separation-and-xpc" branch from the main repository, which reflects the state-of-the-art, as far as I know, which respect to supporting Sparkle self-updating functionality in an otherwise sandboxed app.
+* Various changes to Sparkle.strings are made to (IMHO) lighten the tone of the language to be less artificially excited, and more professional.
+
 # Features
 
 ## Sandboxing
