@@ -10,3 +10,8 @@ GCC_PREPROCESSOR_DEFINITIONS = $(inherited) BUILDING_SPARKLE=1
 SKIP_INSTALL = YES
 DEFINES_MODULE = YES
 PRODUCT_BUNDLE_IDENTIFIER = ${SPARKLE_BUNDLE_IDENTIFIER}
+
+// As long as we don't ourselves depend upon any Frameworks that are incompatible
+// with Application Extensions, then we should allow frameworks that require
+// compatibility to be able to link with us.
+APPLICATION_EXTENSION_API_ONLY = YES
