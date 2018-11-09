@@ -15,7 +15,7 @@ if [ "$ACTION" = "" ] ; then
     rm -f "Sparkle-$CURRENT_PROJECT_VERSION.tar.bz2"
 
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging"
-    cp "$SRCROOT/CHANGELOG" "$SRCROOT/LICENSE" "$SRCROOT/INSTALL" "$SRCROOT/Resources/SampleAppcast.xml" "$CONFIGURATION_BUILD_DIR/staging"
+    cp "$SRCROOT/CHANGELOG" "$SRCROOT/LICENSE" "$SRCROOT/INSTALL.markdown" "$SRCROOT/Resources/SampleAppcast.xml" "$CONFIGURATION_BUILD_DIR/staging"
     cp -R "$SRCROOT/bin" "$CONFIGURATION_BUILD_DIR/staging"
     cp "$CONFIGURATION_BUILD_DIR/BinaryDelta" "$CONFIGURATION_BUILD_DIR/staging/bin"
     cp "$CONFIGURATION_BUILD_DIR/generate_appcast" "$CONFIGURATION_BUILD_DIR/staging/bin"
