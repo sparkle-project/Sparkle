@@ -616,6 +616,12 @@
 		1A985A511C5C32BB0001163A /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1A985A521C5C32BC0001163A /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1A985A531C5C32BD0001163A /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		26B1A4652195FFE900B09783 /* hr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hr; path = hr.lproj/Sparkle.strings; sourceTree = "<group>"; };
+		26B1A4662195FFE900B09783 /* hr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = hr; path = hr.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
+		26B1A4672195FFE900B09783 /* hr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = hr; path = hr.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
+		26B1A4682195FFE900B09783 /* hr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = hr; path = hr.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
+		26B1A4692195FFE900B09783 /* hr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hr; path = hr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		26B1A46A2195FFE900B09783 /* hr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = hr; path = hr.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		34074B8C1FEABD08001CB3A5 /* SPUDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUDownloader.m; sourceTree = "<group>"; };
 		34074B8D1FEABD08001CB3A5 /* SPUDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUDownloader.h; sourceTree = "<group>"; };
 		34074B8E1FEABD08001CB3A5 /* SPUDownloaderDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUDownloaderDelegate.h; sourceTree = "<group>"; };
@@ -1981,6 +1987,7 @@
 				"fr-CA",
 				"pt-PT",
 				"pt-BR",
+				hr,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* Sparkle */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
@@ -2521,6 +2528,7 @@
 				55C14BDF136EF20D00649790 /* es */,
 				55BACC1920AF2C6D00ECEBB6 /* fi */,
 				55C14BE0136EF20D00649790 /* fr */,
+				26B1A4662195FFE900B09783 /* hr */,
 				0A8DAD74207FA6F300FFD934 /* hu */,
 				55C14BE1136EF20D00649790 /* is */,
 				55C14BE2136EF20D00649790 /* it */,
@@ -2557,6 +2565,7 @@
 				55C14BF5136EF26100649790 /* es */,
 				55BACC1820AF2C5B00ECEBB6 /* fi */,
 				55C14BF6136EF26100649790 /* fr */,
+				26B1A4672195FFE900B09783 /* hr */,
 				0A8DAD75207FA6F300FFD934 /* hu */,
 				55C14BF7136EF26100649790 /* is */,
 				55C14BF8136EF26100649790 /* it */,
@@ -2593,6 +2602,7 @@
 				55C14C0A136EF2C700649790 /* es */,
 				55BACC1A20AF2C7D00ECEBB6 /* fi */,
 				55C14C0B136EF2C700649790 /* fr */,
+				26B1A4682195FFE900B09783 /* hr */,
 				0A8DAD76207FA6F400FFD934 /* hu */,
 				55C14C0C136EF2C700649790 /* is */,
 				55C14C0D136EF2C700649790 /* it */,
@@ -2631,6 +2641,7 @@
 				147D6DA91B66EC22006607AB /* fi */,
 				61AAE8590A321B0400D8810D /* fr */,
 				147D6DAA1B66EC25006607AB /* he */,
+				26B1A4652195FFE900B09783 /* hr */,
 				0A8DAD73207FA6F300FFD934 /* hu */,
 				613151B20FB4946A000DCD59 /* is */,
 				61F614540E24A12D009F47E7 /* it */,
@@ -2671,6 +2682,7 @@
 				1A985A331C5C329D0001163A /* fr */,
 				1A985A4B1C5C32B60001163A /* fr-CA */,
 				1A985A3D1C5C32A80001163A /* he */,
+				26B1A4692195FFE900B09783 /* hr */,
 				0A8DAD77207FA6F400FFD934 /* hu */,
 				1A985A3F1C5C32AA0001163A /* id */,
 				1A985A401C5C32AA0001163A /* is */,
@@ -2701,6 +2713,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				61B5F92D09C4CFD800B25A18 /* English */,
+				26B1A46A2195FFE900B09783 /* hr */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
