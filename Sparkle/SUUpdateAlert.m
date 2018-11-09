@@ -45,6 +45,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 @property (strong) NSProgressIndicator *releaseNotesSpinner;
 @property (assign) BOOL webViewFinishedLoading;
+@property (assign) BOOL observingAppearance;
 
 @property (weak) IBOutlet WebView *releaseNotesView;
 @property (weak) IBOutlet NSView *releaseNotesContainerView;
@@ -66,6 +67,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 @synthesize releaseNotesSpinner;
 @synthesize webViewFinishedLoading;
+@synthesize observingAppearance;
 
 @synthesize releaseNotesView;
 @synthesize releaseNotesContainerView;
@@ -95,9 +97,11 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (void)dealloc {
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
-    if (@available(macOS 10.14, *))
-    {
-        [self.window removeObserver:self forKeyPath:@"effectiveAppearance"];
+    if (@available(macOS 10.14, *)) {
+        if (self.observingAppearance) {
+            [self.window removeObserver:self forKeyPath:@"effectiveAppearance"];
+            self.observingAppearance = NO;
+        }
     }
 #endif
 }
@@ -175,7 +179,10 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         self.releaseNotesView.drawsBackground = NO;
 
         prefs.userStyleSheetLocation = [[NSBundle bundleForClass:[self class]] URLForResource:@"DarkAqua" withExtension:@"css"];
-        [self.window addObserver:self forKeyPath:@"effectiveAppearance" options:NSKeyValueObservingOptionInitial context:nil];
+        if (!self.observingAppearance) {
+            [self.window addObserver:self forKeyPath:@"effectiveAppearance" options:NSKeyValueObservingOptionInitial context:nil];
+            self.observingAppearance = YES;
+        }
     }
 #endif
     // Stick a nice big spinner in the middle of the web view until the page is loaded.
