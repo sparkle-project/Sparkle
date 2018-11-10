@@ -87,6 +87,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 @synthesize laterButton;
 
 @synthesize darkBackgroundView = _darkBackgroundView;
+@synthesize observingAppearance;
 
 - (instancetype)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost versionDisplayer:(id <SUVersionDisplay>)aVersionDisplayer
 {
