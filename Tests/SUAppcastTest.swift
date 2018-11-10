@@ -17,7 +17,7 @@ class SUAppcastTest: XCTestCase {
         let testData = NSData(contentsOfFile: testFile)!
         
         do {
-            let items = try appcast.parseAppcastItems(fromXMLData: testData as Data!) as! [SUAppcastItem];
+            let items = try appcast.parseAppcastItems(fromXMLData: testData as Data) as! [SUAppcastItem];
             
             XCTAssertEqual(4, items.count);
             
@@ -72,7 +72,7 @@ class SUAppcastTest: XCTestCase {
         let testData = NSData(contentsOfFile: testFile)!
 
         do {
-            let items = try appcast.parseAppcastItems(fromXMLData: testData as Data!) as! [SUAppcastItem];
+            let items = try appcast.parseAppcastItems(fromXMLData: testData as Data) as! [SUAppcastItem];
 
             XCTAssertEqual(2, items.count);
 

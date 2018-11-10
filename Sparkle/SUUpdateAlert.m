@@ -59,6 +59,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 @property (weak) IBOutlet NSButton *laterButton;
 
 @property (strong) NSBox *darkBackgroundView;
+@property (assign) BOOL observingAppearance;
 
 @end
 
@@ -222,7 +223,10 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
     if (@available(macOS 10.14, *)) {
-        [self.releaseNotesView addObserver:self forKeyPath:@"effectiveAppearance" options:0 context:nil];
+        if (!self.observingAppearance) {
+            [self.releaseNotesView addObserver:self forKeyPath:@"effectiveAppearance" options:0 context:nil];
+            self.observingAppearance = YES;
+        }
     }
 #endif
     
@@ -255,7 +259,10 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 - (void)dealloc {
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
     if (@available(macOS 10.14, *)) {
-        [self.releaseNotesView removeObserver:self forKeyPath:@"effectiveAppearance"];
+        if (self.observingAppearance) {
+            [self.releaseNotesView removeObserver:self forKeyPath:@"effectiveAppearance"];
+            self.observingAppearance = NO;
+        }
     }
 #endif
 }
