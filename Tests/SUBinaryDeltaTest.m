@@ -40,7 +40,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
     NSString *tmp2 = temporaryFilename(@"Sparklęエンジン");
     NSLog(@"Temporary files: %@, %@", tmp1, tmp2);
 #pragma clang diagnostic push
-//#pragma clang diagnostic ignored "-Wobjc-messaging-id"
+#pragma clang diagnostic ignored "-Wobjc-messaging-id"
     XCTAssertNotEqualObjects(tmp1, tmp2);
 #pragma clang diagnostic pop
     XCTAssert(YES, @"Pass");
