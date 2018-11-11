@@ -41,7 +41,7 @@ static NSTimeInterval OLD_ITEM_DELETION_INTERVAL = 86400 * 10; // 10 days
             NSDictionary<NSString *, id> *fileAttributes = [fileManager attributesOfItemAtPath:[directory stringByAppendingPathComponent:filename] error:NULL];
             if (fileAttributes != nil)
             {
-                NSDate *lastModificationDate = fileAttributes[NSFileModificationDate];
+                NSDate *lastModificationDate = [fileAttributes objectForKey:NSFileModificationDate];
                 if ([currentDate timeIntervalSinceDate:lastModificationDate] >= OLD_ITEM_DELETION_INTERVAL)
                 {
                     [filePathsToRemove addObject:[directory stringByAppendingPathComponent:filename]];
