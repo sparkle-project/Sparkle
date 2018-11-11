@@ -423,6 +423,12 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
 - (BOOL)_updateItemAtURL:(NSURL *)targetURL withAccessTime:(struct timeval)accessTime error:(NSError * __autoreleasing *)error
 {
     char path[PATH_MAX] = {0};
+
+    // NOTE: At least on Mojave 10.14.1, running on an APFS filesystem, the act of asking
+    // for a path's file system representation causes the access time of the containing folder
+    // to be updated. Callers should take care when attempting to set a recursive directory's
+    // access time to ensure that the inner-most items get set first, so that the implicitly
+    // updated access times are replaced after this side-effect occurs.
     if (![targetURL.path getFileSystemRepresentation:path maxLength:sizeof(path)]) {
         if (error != NULL) {
             *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadInvalidFileNameError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"File to update modification & access time (%@) cannot be represented as a valid file name.", targetURL.path.lastPathComponent] }];
@@ -486,16 +492,12 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
         return NO;
     }
 
-    // Only recurse if it's actually a directory.  Don't recurse into a
-    // root-level symbolic link.
     NSString *rootURLPath = targetURL.path;
     NSDictionary *rootAttributes = [_fileManager attributesOfItemAtPath:rootURLPath error:nil];
     NSString *rootType = [rootAttributes objectForKey:NSFileType];
-    
-    if (![self _updateItemAtURL:targetURL withAccessTime:currentTime error:error]) {
-        return NO;
-    }
 
+    // Only recurse if it's actually a directory.  Don't recurse into a
+    // root-level symbolic link.
     if ([rootType isEqualToString:NSFileTypeDirectory]) {
         // The NSDirectoryEnumerator will avoid recursing into any contained
         // symbolic links, so no further type checks are needed.
@@ -507,6 +509,14 @@ static BOOL SUMakeRefFromURL(NSURL *url, FSRef *ref, NSError **error) {
             }
         }
     }
+
+    // Set the access time on the container last because the process of setting the access
+    // time on children actually causes the access time of the container directory to be
+    // updated.
+    if (![self _updateItemAtURL:targetURL withAccessTime:currentTime error:error]) {
+        return NO;
+    }
+
     return YES;
 }
 
