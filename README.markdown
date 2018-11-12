@@ -40,6 +40,16 @@ See [getting started guide](https://sparkle-project.org/documentation/). No code
 
 ## Development
 
+### Troubleshooting
+
+  * Please check **Console.app**. Sparkle prints detailed information there about all problems it encounters. It often also suggests solutions to the problems, so please read Sparkle's log messages carefully.
+
+  * Use the `generate_appcast` tool which creates appcast files, correct signatures, and delta updates automatically.
+
+  * Make sure the URL specified in [`SUFeedURL`](https://sparkle-project.org/documentation/customization/) is valid (typos/404s are a common error!), and that it uses modern TLS ([test it](https://www.ssllabs.com/ssltest/)).
+
+  * Delete your app's preferences (in `~/Library/Preferences/<your bundle id>`) if you've set another feed URL programmatically via Sparkle's Objective-C interface.
+
 ### API symbols
 
 Sparkle is built with `-fvisibility=hidden -fvisibility-inlines-hidden` which means no symbols are exported by default.
