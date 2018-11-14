@@ -379,7 +379,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
         // We should also not allow files with code signed extended attributes since Apple doesn't recommend inserting these
         // inside an application, and since we don't preserve extended attribitutes anyway
 
-        mode_t permissions = [info[INFO_PERMISSIONS_KEY] unsignedShortValue];
+        mode_t permissions = [(NSNumber*)info[INFO_PERMISSIONS_KEY] unsignedShortValue];
         if (!isSymLink(ent) && !IS_VALID_PERMISSIONS(permissions)) {
             if (verbose) {
                 fprintf(stderr, "\n");
