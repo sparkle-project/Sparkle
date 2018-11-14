@@ -39,8 +39,11 @@ func unarchive(itemPath:URL, archiveDestDir: URL, callback: @escaping (Error?) -
     }
 }
 
-func unarchiveUpdates(archivesSourceDir: URL) throws -> [ArchiveItem] {
+func unarchiveUpdates(archivesSourceDir: URL, verbose: Bool) throws -> [ArchiveItem] {
     let archivesDestDir = archivesSourceDir.appendingPathComponent(".tmp");
+    if verbose {
+        print("Unarchiving to temp directory", archivesDestDir.path);
+    }
 
     let group = DispatchGroup();
 
@@ -60,10 +63,18 @@ func unarchiveUpdates(archivesSourceDir: URL) throws -> [ArchiveItem] {
         }
 
         let addItem = {
-            if let item = try? ArchiveItem(fromArchive: itemPath, unarchivedDir: archiveDestDir) {
+            do {
+                let item = try ArchiveItem(fromArchive: itemPath, unarchivedDir: archiveDestDir);
+                if verbose {
+                    print("Found archive", item);
+                }
                 objc_sync_enter(unarchived);
                 unarchived.append(item);
                 objc_sync_exit(unarchived);
+            } catch {
+                if verbose {
+                    print("Skipped", item, error);
+                }
             }
         }
 

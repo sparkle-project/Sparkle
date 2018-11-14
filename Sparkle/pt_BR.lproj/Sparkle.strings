@@ -86,4 +86,4 @@
 "You already have the newest version of %@." = "Você já possui a versão mais recente do %@.";
 
 /* Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates. */
-"You're up-to-date!" = "Você está atualizado!";
+"You're up-to-date!" = "O app está atualizado!";
