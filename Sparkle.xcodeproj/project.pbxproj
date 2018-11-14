@@ -2532,6 +2532,7 @@
 					};
 					726E07EE1CAF37BD001A286B = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = 493CVA9A35;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
 								enabled = 1;
@@ -3905,6 +3906,9 @@
 			baseConfigurationReference = 728638EE1CAF589C00783084 /* ConfigDownloader.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				DEVELOPMENT_TEAM = 493CVA9A35;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Release;
 		};
@@ -3954,6 +3958,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */;
 			buildSettings = {
+				DEVELOPMENT_TEAM = "";
 			};
 			name = Debug;
 		};
@@ -3961,6 +3966,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */;
 			buildSettings = {
+				DEVELOPMENT_TEAM = "";
 			};
 			name = Coverage;
 		};
@@ -3968,6 +3974,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CE0D94A70100DD942E /* ConfigRelaunch.xcconfig */;
 			buildSettings = {
+				DEVELOPMENT_TEAM = "";
 			};
 			name = Release;
 		};
