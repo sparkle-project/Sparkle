@@ -107,7 +107,6 @@ LMSsort1(const void *T, sais_index_type *SA,
     }
   }
 }
-
 static
 sais_index_type
 LMSpostproc1(const void *T, sais_index_type *SA,
@@ -154,7 +153,6 @@ LMSpostproc1(const void *T, sais_index_type *SA,
 
   return name;
 }
-
 static
 void
 LMSsort2(const void *T, sais_index_type *SA,
@@ -293,7 +291,6 @@ induceSA(const void *T, sais_index_type *SA,
     }
   }
 }
-
 static
 sais_index_type
 computeBWT(const void *T, sais_index_type *SA,
