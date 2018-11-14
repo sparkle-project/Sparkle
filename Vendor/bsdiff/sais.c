@@ -42,6 +42,13 @@
 #define SAIS_MYFREE(_ptr, _num, _type) free((_ptr))
 #define chr(_a) (cs == sizeof(sais_index_type) ? ((const sais_index_type *)T)[(_a)] : ((const unsigned char *)T)[(_a)])
 
+// This file exhibits several "suspicious comma" warnings. Rather than risk
+// changing a nuanced behavior, I'm assuming the file has been time-tested and
+// behaves as expected in spite of the unconventional use of comma operators
+// in some expressions.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcomma"
+
 /* find the start or end of each bucket */
 static
 void
@@ -532,3 +539,5 @@ sais_int_bwt(const sais_index_type *T, sais_index_type *U, sais_index_type *A, i
   pidx += 1;
   return pidx;
 }
+
+#pragma clang diagnostic pop
