@@ -69,7 +69,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 static NSMutableDictionary *sharedUpdaters = nil;
 static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
 
-#ifdef DEBUG
+#if DEBUG
 + (void)load
 {
     // Debug builds have different configurations for update check intervals
