@@ -44,11 +44,15 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
                 print("Note: did not sign with legacy DSA \(update.archivePath.path) because private DSA key file was not specified");
             }
             if let publicEdKey = update.publicEdKey {
-                if let privateEdKey = keys.privateEdKey {
-                    do {
-                        update.edSignature = try edSignature(path: update.archivePath, publicEdKey: publicEdKey, privateEdKey: privateEdKey);
-                    } catch {
-                        print(update, error);
+                if let privateEdKey = keys.privateEdKey, let expectedPublicKey = keys.publicEdKey {
+                    if publicEdKey == expectedPublicKey {
+                        do {
+                            update.edSignature = try edSignature(path: update.archivePath, publicEdKey: publicEdKey, privateEdKey: privateEdKey);
+                        } catch {
+                            print(update, error);
+                        }
+                    } else {
+                        print("Warning: SUPublicEDKey in the app \(update.archivePath.path) does not match key EdDSA in the Keychain. Run generate_keys and update Info.plist to match");
                     }
                 } else {
                     print("Warning: could not sign \(update.archivePath.path) due to lack of private EdDSA key");

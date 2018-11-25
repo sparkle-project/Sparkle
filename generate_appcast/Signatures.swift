@@ -8,10 +8,12 @@ import Foundation
 struct PrivateKeys {
     var privateDSAKey: SecKey?;
     var privateEdKey: Data?;
+    var publicEdKey: Data?;
 
-    init(privateDSAKey: SecKey?, privateEdKey: Data?) {
+    init(privateDSAKey: SecKey?, privateEdKey: Data?, publicEdKey: Data?) {
         self.privateDSAKey = privateDSAKey;
         self.privateEdKey = privateEdKey;
+        self.publicEdKey = publicEdKey;
     }
 }
 

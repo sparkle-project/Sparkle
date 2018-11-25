@@ -27,6 +27,7 @@ func printUsage() {
 
 func loadPrivateKeys(_ privateDSAKey: SecKey?) -> PrivateKeys {
     var privateEdKey: Data?;
+    var publicEdKey: Data?;
     var item: CFTypeRef?;
     let res = SecItemCopyMatching([
         kSecClass as String: kSecClassGenericPassword,
@@ -37,10 +38,11 @@ func loadPrivateKeys(_ privateDSAKey: SecKey?) -> PrivateKeys {
         ] as CFDictionary, &item);
     if res == errSecSuccess, let encoded = item as? Data, let keys = Data(base64Encoded: encoded) {
         privateEdKey = keys[0..<64];
+        publicEdKey = keys[64...];
     } else {
         print("Warning: Private key not found in the Keychain (\(res)). Please run the generate_keys tool");
     }
-    return PrivateKeys(privateDSAKey: privateDSAKey, privateEdKey: privateEdKey);
+    return PrivateKeys(privateDSAKey: privateDSAKey, privateEdKey: privateEdKey, publicEdKey: publicEdKey);
 }
 
 func main() {
