@@ -7,7 +7,7 @@ Secure and reliable software update framework for Cocoa developers.
 ## Features
 
 * Seamless. There's no mention of Sparkle; your icons and app name are used.
-* Secure. Updates are verified using DSA signatures and Apple Code Signing.
+* Secure. Updates are verified using EdDSA signatures and Apple Code Signing.
 * Fast. Supports delta updates which only patch files that have changed.
 * Easy to install. Sparkle requires no code in your app, and only needs static files on a web server.
 * Supports bundles, preference panes, plugins, and other non-.app software. Can install .pkg files for more complicated products.
@@ -19,8 +19,8 @@ Secure and reliable software update framework for Cocoa developers.
 ## Changes since 1.5b
 
 * Compatibilty with macOS Sierra (and all newer versions).
-* Up-to-date with 10.13 SDK and Xcode 9 (supports macOS 10.7+).
-* Important security fixes.
+* Up-to-date with 10.14 SDK and Xcode 10 (supports macOS 10.7+).
+* Important security fixes and more secure signature algorithm.
 * Cleaned up and modernized code, using ARC and Autolayout.
 * Truly automatic background updates (no UI at all) when user agreed to "Automatically download and install updates in the future."
 * Upgraded and more reliable binary delta and code signing verification.

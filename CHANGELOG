@@ -1,5 +1,5 @@
 
-# 1.21.0a2
+# 1.21.0
 
  * Added support EdDSA (ed25519) signatures (Kornel)
     * DSA signatures are considered outdated, and Apple's `Security.framework` only supports weaker SHA-1-based DSA.
@@ -13,7 +13,7 @@
     * It can sign both DSA (if `dsa_priv.pem` file is specified) and EdDSA (from Keychain)
     * The tool now uses Caches directory and doesn't generate unnecessary delta files
  * Fixed verification of delta updates on filesystems that change permissions of symlinks
- * SPUDownloaderSession leaked because the NSURLSession wasn’t invalidated (Michael Ehrmann)
+ * Fixed `NSURLSession` leak (Michael Ehrmann)
 
 # 1.20.0
 
