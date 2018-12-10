@@ -1919,6 +1919,9 @@
 						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
+					5AB8F19E214DA72000A1187F = {
+						ProvisioningStyle = Automatic;
+					};
 					612279D80DB5470200AB99EA = {
 						LastSwiftMigration = 0900;
 						TestTargetID = 8DC2EF4F0486A6940098B216;
@@ -2878,6 +2881,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5AB8F1AA214DA85900A1187F /* ConfigGenerateKeysDebug.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.2;
@@ -2888,6 +2892,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5AB8F1AA214DA85900A1187F /* ConfigGenerateKeysDebug.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 			};
@@ -2897,6 +2902,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5AB8F1A9214DA85900A1187F /* ConfigGenerateKeysRelease.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
 			};
@@ -2906,6 +2912,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7205C4351E12CA7000E370AE /* ConfigGenerateAppcastDebug.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
 			};
 			name = Debug;
 		};
@@ -2913,6 +2920,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7205C4351E12CA7000E370AE /* ConfigGenerateAppcastDebug.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
 			};
 			name = Coverage;
 		};
@@ -2920,6 +2928,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7205C4341E12C66D00E370AE /* ConfigGenerateAppcastRelease.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
 			};
 			name = Release;
 		};
@@ -2927,6 +2936,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5AB8F1AA214DA85900A1187F /* ConfigGenerateKeysDebug.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_VERSION = 4.2;
@@ -2937,6 +2947,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5AB8F1AA214DA85900A1187F /* ConfigGenerateKeysDebug.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_VERSION = 4.2;
@@ -2947,6 +2958,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5AB8F1A9214DA85900A1187F /* ConfigGenerateKeysRelease.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_VERSION = 4.2;
