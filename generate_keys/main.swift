@@ -31,6 +31,8 @@ func findPublicKey() -> Data? {
     }
     else if res == errSecUserCanceled {
         print("\nABORTED! You've cancelled the request to read the key from the Keychain. Please run the tool again.");
+    } else if res == errSecInteractionNotAllowed {
+        print("\nERROR! The operating system has blocked access to the Keychain.");
     } else {
         print("\nERROR! Unable to access existing item in the Keychain", res, "(you can look it up at osstatus.com)");
     }

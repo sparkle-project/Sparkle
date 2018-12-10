@@ -30,6 +30,8 @@ func findKeys() -> (Data, Data) {
     }
     else if res == errSecUserCanceled {
         print("ABORTED! You've cancelled the request to read the key from the Keychain. Please run the tool again.");
+    } else if res == errSecInteractionNotAllowed {
+        print("ERROR! The operating system has blocked access to the Keychain.");
     } else {
         print("ERROR! Unable to access required key in the Keychain", res, "(you can look it up at osstatus.com)");
     }
