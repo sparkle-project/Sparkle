@@ -69,7 +69,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 static NSMutableDictionary *sharedUpdaters = nil;
 static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
 
-#if DEBUG
+// Debug is not defined in released builds and pedantic mode can enable -Wundef
+#if defined(DEBUG) && DEBUG
 + (void)load
 {
     // Debug builds have different configurations for update check intervals
