@@ -91,6 +91,21 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     return self;
 }
 
+- (void)dealloc {
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
+    if (@available(macOS 10.14, *))
+    {
+        [self.window removeObserver:self forKeyPath:@"effectiveAppearance"];
+    }
+#endif
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(__attribute__((unused)) NSDictionary<NSKeyValueChangeKey,id> *)change context:(__attribute__((unused)) void *)context {
+    if (object == self.window && [keyPath isEqualToString:@"effectiveAppearance"]) {
+        [self adaptReleaseNotesAppearance];
+    }
+}
+
 - (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self.host bundlePath]]; }
 
 - (void)disableKeyboardShortcutForInstallButton {
@@ -143,6 +158,22 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     prefs.standardFontFamily = @"-apple-system-font";
     prefs.defaultFontSize = (int)[NSFont systemFontSize];
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
+    if (@available(macOS 10.14, *))
+    {
+        NSBox *darkBackgroundView = [[NSBox alloc] initWithFrame:self.releaseNotesView.frame];
+        darkBackgroundView.boxType = NSBoxCustom;
+        darkBackgroundView.fillColor = [NSColor textBackgroundColor];
+        darkBackgroundView.borderColor = [NSColor clearColor];
+        // Using auto-resizing mask instead of contraints works well enough
+        darkBackgroundView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+        [self.releaseNotesView.superview addSubview:darkBackgroundView positioned:NSWindowBelow relativeTo:self.releaseNotesView];
+        self.releaseNotesView.drawsBackground = NO;
+
+        prefs.userStyleSheetLocation = [[NSBundle bundleForClass:[self class]] URLForResource:@"DarkAqua" withExtension:@"css"];
+        [self.window addObserver:self forKeyPath:@"effectiveAppearance" options:NSKeyValueObservingOptionInitial context:nil];
+    }
+#endif
     // Stick a nice big spinner in the middle of the web view until the page is loaded.
     NSRect frame = [[self.releaseNotesView superview] frame];
     self.releaseNotesSpinner = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(NSMidX(frame) - 16, NSMidY(frame) - 16, 32, 32)];
@@ -261,6 +292,18 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
         finalString = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is now available--you have %@. Would you like to download it now?", @"Description text for SUUpdateAlert when the update is downloadable."), self.host.name, updateItemVersion, hostVersion];
     }
     return finalString;
+}
+
+- (void)adaptReleaseNotesAppearance
+{
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
+    if (@available(macOS 10.14, *))
+    {
+        NSAppearanceName bestAppearance = [self.window.effectiveAppearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
+        BOOL isDarkAqua = ([bestAppearance isEqualToString:NSAppearanceNameDarkAqua]);
+        self.releaseNotesView.preferences.userStyleSheetEnabled = isDarkAqua;
+    }
+#endif
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame

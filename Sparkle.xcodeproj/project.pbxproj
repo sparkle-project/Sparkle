@@ -342,6 +342,7 @@
 		C23E885B1BE7B24F0050BB73 /* SparkleTestCodeSignApp.enc.dmg in Resources */ = {isa = PBXBuildFile; fileRef = C23E88591BE7AF890050BB73 /* SparkleTestCodeSignApp.enc.dmg */; };
 		E1545EC51E1D7E0200FAECE8 /* SUTouchBarButtonGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = E1545EC31E1D7E0200FAECE8 /* SUTouchBarButtonGroup.h */; };
 		E1545EC61E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = E1545EC41E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m */; };
+		E1D4DDF921C1C5F8003D32E7 /* DarkAqua.css in Resources */ = {isa = PBXBuildFile; fileRef = E1D4DDF821C1C5F8003D32E7 /* DarkAqua.css */; };
 		E1EC2A301E21667000245715 /* SUTouchBarButtonGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = E1545EC41E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m */; };
 		F8761EB11ADC5068000C9034 /* SUCodeSigningVerifierTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */; };
 		F8761EB31ADC50EB000C9034 /* SparkleTestCodeSignApp.zip in Resources */ = {isa = PBXBuildFile; fileRef = F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */; };
@@ -950,6 +951,7 @@
 		E1545EC31E1D7E0200FAECE8 /* SUTouchBarButtonGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUTouchBarButtonGroup.h; sourceTree = "<group>"; };
 		E1545EC41E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUTouchBarButtonGroup.m; sourceTree = "<group>"; };
 		E19CA4901E2E7E4D009D4D18 /* SUTouchBarForwardDeclarations.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUTouchBarForwardDeclarations.h; sourceTree = "<group>"; };
+		E1D4DDF821C1C5F8003D32E7 /* DarkAqua.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = DarkAqua.css; sourceTree = "<group>"; };
 		F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUCodeSigningVerifierTest.m; sourceTree = "<group>"; };
 		F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = SparkleTestCodeSignApp.zip; sourceTree = "<group>"; };
 		FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkDebug.xcconfig; sourceTree = "<group>"; };
@@ -1145,6 +1147,7 @@
 				55C14BD8136EF00C00649790 /* SUStatus.xib */,
 				55C14BF0136EF26100649790 /* SUUpdateAlert.xib */,
 				55C14C05136EF2C700649790 /* SUUpdatePermissionPrompt.xib */,
+				E1D4DDF821C1C5F8003D32E7 /* DarkAqua.css */,
 			);
 			name = "Framework Resources";
 			sourceTree = "<group>";
@@ -2073,6 +2076,7 @@
 				55C14BEF136EF21700649790 /* SUStatus.xib in Resources */,
 				55C14C04136EF26100649790 /* SUUpdateAlert.xib in Resources */,
 				55C14C19136EF2C700649790 /* SUUpdatePermissionPrompt.xib in Resources */,
+				E1D4DDF921C1C5F8003D32E7 /* DarkAqua.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
