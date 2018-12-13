@@ -39,12 +39,16 @@ static NSData *decode(NSString *str) {
 }
 
 - (const unsigned char *)ed25519Signature {
+// Xcode may enable this in pedantic mode
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdirect-ivar-access"
     for(size_t i=0; i < sizeof(self->ed25519_signature); i++) {
         if (self->ed25519_signature[i] != 0) {
             return self->ed25519_signature;
         }
     }
     return NULL;
+#pragma clang diagnostic pop
 }
 
 @end
@@ -77,12 +81,16 @@ static NSData *decode(NSString *str) {
 
 
 - (const unsigned char *)ed25519PubKey {
+// Xcode may enable this in pedantic mode
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdirect-ivar-access"
     for(size_t i=0; i < sizeof(self->ed25519_public_key); i++) {
         if (self->ed25519_public_key[i] != 0) {
             return self->ed25519_public_key;
         }
     }
     return NULL;
+#pragma clang diagnostic pop
 }
 
 @end
