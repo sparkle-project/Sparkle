@@ -115,7 +115,7 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
 {
     [self enableAutomaticTermination];
     [self.download cancel];
-    [self.downloadSession invalidateAndCancel];
+    [self.downloadSession finishTasksAndInvalidate];
     self.download = nil;
     self.downloadSession = nil;
     self.delegate = nil;
