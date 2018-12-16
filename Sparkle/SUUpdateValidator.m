@@ -49,16 +49,14 @@
     SUPublicKeys *publicKeys = self.host.publicKeys;
     SUSignatures *signatures = self.signatures;
 
-    if (publicKeys.dsaPubKey == nil) {
-        SULog(SULogLevelError, @"Failed to validate update before unarchiving because no DSA public key was found in the old app");
-    } else if (signatures == nil || signatures.dsaSignature == nil) {
-        SULog(SULogLevelError, @"Failed to validate update before unarchiving because no DSA signature was found");
+    if (publicKeys.dsaPubKey == nil && publicKeys.ed25519PubKey == nil) {
+        SULog(SULogLevelError, @"Failed to validate update before unarchiving because no (Ed)DSA public key was found in the old app");
     } else {
         if ([SUSignatureVerifier validatePath:self.downloadPath withSignatures:signatures withPublicKeys:publicKeys]) {
             self.prevalidatedSignature = YES;
             return YES;
         }
-        SULog(SULogLevelError, @"DSA signature validation before unarchiving failed for update %@", self.downloadPath);
+        SULog(SULogLevelError, @"(Ed)DSA signature validation before unarchiving failed for update %@", self.downloadPath);
     }
     self.downloadPrevalidationFailed = YES;
     return NO;

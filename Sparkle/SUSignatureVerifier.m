@@ -92,6 +92,7 @@
     }
 
     if (!signatures) {
+        SULog(SULogLevelDefault, @"No signatures given to verifyFileAtPath");
         return NO;
     }
 
