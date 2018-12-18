@@ -1,3 +1,8 @@
+# 1.21.2
+
+ * Allow EdDSA for delta updates, too (Kornel)
+ * Warning fixes (Brian Bergstrand)
+ * Improvements to release notes view context menu and dark mode (Bi11)
 
 # 1.21.0
 
