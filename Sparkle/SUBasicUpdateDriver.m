@@ -557,7 +557,7 @@
             // Perhaps in a sandboxed environment this matters more. Note that this may not be a fatal error.
             NSError *quarantineError = nil;
             if (![fileManager releaseItemFromQuarantineAtRootURL:relaunchCopyTargetURL error:&quarantineError]) {
-                SULog(SULogLevelError, @"Failed to release quarantine on %@ with error %@", relaunchCopyTargetPath, quarantineError);
+                SULog(SULogLevelDefault, @"Warning: could not remove quarantine metadata from %@: %@. This may not be a problem, the update process will continue.", relaunchCopyTargetPath, quarantineError);
             }
         }
     }
