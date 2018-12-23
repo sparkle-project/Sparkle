@@ -82,7 +82,7 @@
 {
     id<SUVersionComparison> comparator = nil;
     id<SUUpdaterPrivate> updater = self.updater;
-    
+
     // Give the delegate a chance to provide a custom version comparator
     if ([[updater delegate] respondsToSelector:@selector(versionComparatorForUpdater:)]) {
         comparator = [[updater delegate] versionComparatorForUpdater:self.updater];
@@ -106,14 +106,14 @@
             }
         }
     }
-    
+
     if (item && deltaItem) {
         SUAppcastItem *deltaUpdateItem = [[item deltaUpdates] objectForKey:hostVersion];
         if (deltaUpdateItem && [[self class] hostSupportsItem:deltaUpdateItem]) {
             *deltaItem = deltaUpdateItem;
         }
     }
-    
+
     return item;
 }
 
@@ -175,7 +175,7 @@
     {
         item = [[updater delegate] bestValidUpdateInAppcast:ac forUpdater:self.updater];
     }
-    
+
     if (item != nil) // Does the delegate want to handle it?
     {
         if ([item isDeltaUpdate]) {
@@ -187,7 +187,7 @@
         // Find the best supported update
         SUAppcastItem *deltaUpdateItem = nil;
         item = [[self class] bestItemFromAppcastItems:ac.items getDeltaItem:&deltaUpdateItem withHostVersion:self.host.version comparator:[self versionComparator]];
-        
+
         if (item && deltaUpdateItem) {
             self.nonDeltaUpdateItem = item;
             item = deltaUpdateItem;
@@ -206,7 +206,7 @@
 - (void)didFindValidUpdate
 {
     assert(self.updateItem);
-    
+
     id<SUUpdaterPrivate> updater = self.updater;
 
     if ([[updater delegate] respondsToSelector:@selector(updater:didFindValidUpdate:)]) {
@@ -222,7 +222,7 @@
 - (void)didNotFindUpdate
 {
     id<SUUpdaterPrivate> updater = self.updater;
-    
+
     if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
         [[updater delegate] updaterDidNotFindUpdate:self.updater];
     }
@@ -247,12 +247,12 @@
         SULog(SULogLevelError, @"Failed to find user's cache directory! Using system default");
         cachePath = NSTemporaryDirectory();
     }
-    
+
     NSString *name = [self.host.bundle bundleIdentifier];
     if (!name) {
         name = [self.host name];
     }
-    
+
     cachePath = [cachePath stringByAppendingPathComponent:name];
     cachePath = [cachePath stringByAppendingPathComponent:@SPARKLE_BUNDLE_IDENTIFIER];
     return cachePath;
@@ -262,7 +262,7 @@
 {
     NSString *bundleIdentifier = self.host.bundle.bundleIdentifier;
     assert(bundleIdentifier != nil);
-    
+
     // Clear cache directory so that downloads can't possibly accumulate inside
     NSString *appCachePath = [self appCachePath];
     if ([[NSFileManager defaultManager] fileExistsAtPath:appCachePath]) {
@@ -282,7 +282,7 @@
                       willDownloadUpdate:self.updateItem
                              withRequest:request];
     }
-    
+
     if ([SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 9, 0}]) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunguarded-availability"
@@ -322,7 +322,7 @@
     if ([[updater delegate] respondsToSelector:@selector(updater:didDownloadUpdate:)]) {
         [[updater delegate] updater:self.updater didDownloadUpdate:self.updateItem];
     }
-    
+
     [self extractUpdate];
 }
 
@@ -332,15 +332,15 @@
     if (!failingUrl) {
         failingUrl = [self.updateItem fileURL];
     }
-    
+
     id<SUUpdaterPrivate> updater = self.updater;
-    
+
     if ([[updater delegate] respondsToSelector:@selector(updater:failedToDownloadUpdate:error:)]) {
         [[updater delegate] updater:self.updater
              failedToDownloadUpdate:self.updateItem
                               error:error];
     }
-    
+
     NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{
                                                                                     NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred while downloading the update. Please try again later.", nil),
                                                                                     NSUnderlyingErrorKey: error,
@@ -348,7 +348,7 @@
     if (failingUrl) {
         [userInfo setObject:failingUrl forKey:NSURLErrorFailingURLErrorKey];
     }
-    
+
     [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain code:SUDownloadError userInfo:userInfo]];
 }
 
@@ -356,7 +356,7 @@
 {
     id<SUUpdaterPrivate> updater = self.updater;
     id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:self.downloadPath updatingHostBundlePath:self.host.bundlePath decryptionPassword:updater.decryptionPassword];
-    
+
     BOOL success = NO;
     if (!unarchiver) {
         SULog(SULogLevelError, @"Error: No valid unarchiver for %@!", self.downloadPath);
@@ -372,7 +372,7 @@
             success = YES;
         }
     }
-    
+
     if (!success) {
         NSError *reason = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{NSLocalizedDescriptionKey: @"Failed to extract update."}];
         [self unarchiverDidFailWithError:reason];
@@ -380,7 +380,7 @@
         if ([[updater delegate] respondsToSelector:@selector(updater:willExtractUpdate:)]) {
             [[updater delegate] updater:self.updater willExtractUpdate:self.updateItem];
         }
-        
+
         [unarchiver unarchiveWithCompletionBlock:^(NSError *err){
             if (err) {
                 [self unarchiverDidFailWithError:err];
@@ -389,7 +389,7 @@
             if ([[updater delegate] respondsToSelector:@selector(updater:didExtractUpdate:)]) {
                 [[updater delegate] updater:self.updater didExtractUpdate:self.updateItem];
             }
-            
+
             [self performSelectorOnMainThread:@selector(unarchiverDidFinish:) withObject:nil waitUntilDone:NO];
         } progressBlock:^(double progress) {
             [self unarchiver:nil extractedProgress:progress];
@@ -415,7 +415,7 @@
 - (void)unarchiverDidFinish:(id)__unused ua
 {
     assert(self.updateItem);
-    
+
     [self installWithToolAndRelaunch:YES];
 }
 
@@ -423,12 +423,12 @@
 {
     // No longer needed
     self.updateValidator = nil;
-    
+
     if ([self.updateItem isDeltaUpdate]) {
         [self failedToApplyDeltaUpdate];
         return;
     }
-    
+
     [self abortUpdateWithError:err];
 }
 
@@ -473,7 +473,7 @@
 {
     assert(self.updateItem);
     assert(self.updateValidator);
-    
+
     BOOL validationCheckSuccess = [self.updateValidator validateWithUpdateDirectory:self.tempDir];
     if (!validationCheckSuccess) {
         NSDictionary *userInfo = @{
@@ -593,10 +593,10 @@
             pathToRelaunch = delegateRelaunchPath;
         }
     }
-    
+
     //Set relaunching flag.
     [self.host setBool:YES forUserDefaultsKey:SUUpdateRelaunchingMarkerKey];
-    
+
     [NSTask launchedTaskWithLaunchPath:relaunchToolPath arguments:@[[self.host bundlePath],
                                                                     pathToRelaunch,
                                                                     [NSString stringWithFormat:@"%d", [[NSProcessInfo processInfo] processIdentifier]],
