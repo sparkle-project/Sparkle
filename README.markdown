@@ -18,7 +18,7 @@ Secure and reliable software update framework for Cocoa developers.
 
 ## Changes since 1.5b
 
-* Compatibilty with macOS Sierra (and all newer versions).
+* Compatibility with macOS Sierra (and all newer versions).
 * Up-to-date with 10.14 SDK and Xcode 10 (supports macOS 10.7+).
 * Important security fixes and more secure signature algorithm.
 * Cleaned up and modernized code, using ARC and Autolayout.
