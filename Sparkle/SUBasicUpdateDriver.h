@@ -24,6 +24,7 @@
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui;
 + (BOOL)hostSupportsItem:(SUAppcastItem *)ui;
++ (BOOL)hostSupportsItem:(SUAppcastItem *)ui validationError:(__autoreleasing NSError**)outValidationError;
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui;
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui validationError:(__autoreleasing NSError**)outValidationError;
 - (void)appcastDidFinishLoading:(SUAppcast *)ac;

@@ -50,6 +50,8 @@ NSString *const SUDefaultsDomainKey = @"SUDefaultsDomain";
 NSString *const SUSparkleErrorDomain = @"SUSparkleErrorDomain";
 NSString *const SUSparkleUpdateValidationErrorDomain = @"SUSparkleUpdateValidationErrorDomain";
 NSString *const SUSparkleUpdateValidationErrorKey = @"SUSparkleUpdateValidationError";
+NSString *const SUSparkleUpdateValidationErrorInfoMinOSVersionKey = @"minOSVersion";
+NSString *const SUSparkleUpdateValidationErrorInfoMaxOSVersionKey = @"maxOSVersion";
 
 NSString *const SUAppendVersionNumberKey = @"SUAppendVersionNumber";
 NSString *const SUEnableAutomatedDowngradesKey = @"SUEnableAutomatedDowngrades";

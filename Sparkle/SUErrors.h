@@ -68,4 +68,25 @@ typedef NS_ENUM(OSStatus, SUError) {
  */
 SU_EXPORT extern NSString *const SUSparkleUpdateValidationErrorDomain;
 
+/**
+ * User Info Key for SUUpdateValidationErrorIncompatibleHostOSTooOld error
+ * Its value is set to the minimum required OS string
+ */
+SU_EXPORT extern NSString *const SUSparkleUpdateValidationErrorInfoMinOSVersionKey;
+/**
+ * User Info Key for SUUpdateValidationErrorIncompatibleHostOSTooNew error
+ * Its value is set to the maximum supported OS string
+ */
+SU_EXPORT extern NSString *const SUSparkleUpdateValidationErrorInfoMaxOSVersionKey;
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++98-compat"
+typedef NS_ENUM(OSStatus, SUUpdateValidationError) {
+    //Incompatible Host
+    SUUpdateValidationErrorIncompatibleHostOSType = 1000,
+    SUUpdateValidationErrorIncompatibleHostOSTooOld = 1001,
+    SUUpdateValidationErrorIncompatibleHostOSTooNew = 1002,
+};
+#pragma clang diagnostic pop
+
 #endif

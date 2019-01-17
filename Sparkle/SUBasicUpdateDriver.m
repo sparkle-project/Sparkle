@@ -136,9 +136,27 @@
 
 + (BOOL)hostSupportsItem:(SUAppcastItem *)ui
 {
+    return [[self class] hostSupportsItem:ui validationError:nil];
+}
+
++ (BOOL)hostSupportsItem:(SUAppcastItem *)ui validationError:(__autoreleasing NSError**)outValidationError
+{
+    NSError* validationError = nil;
     BOOL osOK = [ui isMacOsUpdate];
 	if (([ui minimumSystemVersion] == nil || [[ui minimumSystemVersion] isEqualToString:@""]) &&
         ([ui maximumSystemVersion] == nil || [[ui maximumSystemVersion] isEqualToString:@""])) {
+        if(!osOK) {
+            validationError = [NSError errorWithDomain:SUSparkleUpdateValidationErrorDomain
+                                                  code:SUUpdateValidationErrorIncompatibleHostOSType
+                                              userInfo:@{
+                                                         NSLocalizedDescriptionKey : SULocalizedString(@"Update is not available for your OS", nil),
+                                                         }];
+        }
+
+        if(outValidationError != nil) {
+            *outValidationError = validationError;
+        }
+
         return osOK;
     }
 
@@ -150,11 +168,30 @@
     // Check minimum and maximum System Version
     if ([ui minimumSystemVersion] != nil && ![[ui minimumSystemVersion] isEqualToString:@""]) {
         minimumVersionOK = [versionComparator compareVersion:[ui minimumSystemVersion] toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedDescending;
+        if(!minimumVersionOK) {
+            validationError = [NSError errorWithDomain:SUSparkleUpdateValidationErrorDomain
+                                                  code:SUUpdateValidationErrorIncompatibleHostOSTooOld
+                                              userInfo:@{
+                                                         NSLocalizedDescriptionKey : [NSString stringWithFormat:SULocalizedString(@"There is an update available, but the version of your OS is too old to install it.\n\nAt least version %@ of your OS is required.", nil), [ui minimumSystemVersion]],
+                                                         SUSparkleUpdateValidationErrorInfoMinOSVersionKey : [ui minimumSystemVersion],
+                                                         }];
+        }
     }
     if ([ui maximumSystemVersion] != nil && ![[ui maximumSystemVersion] isEqualToString:@""]) {
         maximumVersionOK = [versionComparator compareVersion:[ui maximumSystemVersion] toVersion:[SUOperatingSystem systemVersionString]] != NSOrderedAscending;
+        if(!maximumVersionOK) {
+            validationError = [NSError errorWithDomain:SUSparkleUpdateValidationErrorDomain
+                                                  code:SUUpdateValidationErrorIncompatibleHostOSTooNew
+                                              userInfo:@{
+                                                         NSLocalizedDescriptionKey : [NSString stringWithFormat:SULocalizedString(@"There is an update available, but the version of your OS is too new for this update.\n\nYour OS is only supported up to version %@.", nil), [ui maximumSystemVersion]],
+                                                         SUSparkleUpdateValidationErrorInfoMaxOSVersionKey : [ui maximumSystemVersion],
+                                                         }];
+        }
     }
 
+    if(outValidationError != nil) {
+        *outValidationError = validationError;
+    }
     return minimumVersionOK && maximumVersionOK && osOK;
 }
 
@@ -172,7 +209,7 @@
 
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui validationError:(__autoreleasing NSError**)validationError
 {
-    return ui && [[self class] hostSupportsItem:ui] && [self isItemNewer:ui] && ![self itemContainsSkippedVersion:ui];
+    return ui && [[self class] hostSupportsItem:ui validationError:validationError] && [self isItemNewer:ui] && ![self itemContainsSkippedVersion:ui];
 }
 
 - (void)appcastDidFinishLoading:(SUAppcast *)ac

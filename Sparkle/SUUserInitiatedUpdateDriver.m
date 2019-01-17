@@ -93,7 +93,7 @@
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui validationError:(__autoreleasing NSError**)outValidationError
 {
     // We don't check to see if this update's been skipped, because the user explicitly *asked* if he had the latest version.
-    return [[self class] hostSupportsItem:ui] && [self isItemNewer:ui];
+    return [[self class] hostSupportsItem:ui validationError:outValidationError] && [self isItemNewer:ui];
 }
 
 @end
