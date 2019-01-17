@@ -102,7 +102,24 @@
     for(SUAppcastItem *candidate in appcastItems) {
         if ([[self class] hostSupportsItem:candidate]) {
             if (!item || [comparator compareVersion:item.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
-                item = candidate;
+                if([comparator compareVersion:hostVersion toVersion:candidate.versionString] == NSOrderedAscending) {
+                    item = candidate;
+                }
+            }
+        }
+    }
+
+    if(item == nil) {
+        // If we did not find an item that is supported on the host, return the highest version that is installable
+        // on macOS
+        // The caller must catch this case and may show a warning to the user that he needs to update his OS
+        for(SUAppcastItem *candidate in appcastItems) {
+            if ([candidate isMacOsUpdate]) {
+                if (!item || [comparator compareVersion:item.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
+                    if([comparator compareVersion:hostVersion toVersion:candidate.versionString] == NSOrderedAscending) {
+                        item = candidate;
+                    }
+                }
             }
         }
     }
