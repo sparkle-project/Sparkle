@@ -15,6 +15,7 @@
 #import "SUOperatingSystem.h"
 #import "SUStatusController.h"
 #import "SUConstants.h"
+#import "SUErrors.h"
 #import "SULocalizations.h"
 #import "SUAppcastItem.h"
 #import "SUApplicationInfo.h"
@@ -109,14 +110,31 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
     if (!self.automaticallyInstallUpdates) {
-        NSAlert *alert = [[NSAlert alloc] init];
-        alert.messageText = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
-        alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
-        [alert addButtonWithTitle:SULocalizedString(@"OK", nil)];
+        NSAlert *alert = [self alertForValidationError:validationError];
         [self showAlert:alert];
     }
     
     [self abortUpdate];
+}
+
+- (NSAlert*) alertForValidationError:(NSError*)validationError
+{
+    NSAssert(validationError == nil || [validationError.domain isEqualToString:SUSparkleUpdateValidationErrorDomain],
+             @"only sparkle update validation errors can be handled, received error with domain %@", validationError.domain);
+
+    NSAlert *alert = [[NSAlert alloc] init];
+    if(validationError == nil) {
+        alert.messageText = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
+        alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
+    }
+    else {
+        alert.messageText = SULocalizedString(@"Update is not available for your OS!", nil);
+        alert.informativeText = validationError.localizedDescription;
+    }
+
+    [alert addButtonWithTitle:SULocalizedString(@"OK", nil)];
+
+    return alert;
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)__unused aNotification
