@@ -25,10 +25,10 @@
 - (BOOL)isItemNewer:(SUAppcastItem *)ui;
 + (BOOL)hostSupportsItem:(SUAppcastItem *)ui;
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui;
-- (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui;
+- (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui validationError:(__autoreleasing NSError**)outValidationError;
 - (void)appcastDidFinishLoading:(SUAppcast *)ac;
 - (void)didFindValidUpdate;
-- (void)didNotFindUpdate;
+- (void)didNotFindUpdate:(NSError*)validationError;
 
 - (void)downloadUpdate;
 // SPUDownloaderDelegate

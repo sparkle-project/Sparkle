@@ -48,6 +48,8 @@ NSString *const SUEnableJavaScriptKey = @"SUEnableJavaScript";
 NSString *const SUFixedHTMLDisplaySizeKey = @"SUFixedHTMLDisplaySize";
 NSString *const SUDefaultsDomainKey = @"SUDefaultsDomain";
 NSString *const SUSparkleErrorDomain = @"SUSparkleErrorDomain";
+NSString *const SUSparkleUpdateValidationErrorDomain = @"SUSparkleUpdateValidationErrorDomain";
+NSString *const SUSparkleUpdateValidationErrorKey = @"SUSparkleUpdateValidationError";
 
 NSString *const SUAppendVersionNumberKey = @"SUAppendVersionNumber";
 NSString *const SUEnableAutomatedDowngradesKey = @"SUEnableAutomatedDowngrades";

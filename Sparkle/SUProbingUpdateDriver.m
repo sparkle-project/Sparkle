@@ -26,7 +26,7 @@
     [self abortUpdate];
 }
 
-- (void)didNotFindUpdate
+- (void)didNotFindUpdate:(__unused NSError*)validationError
 {
     id<SUUpdaterPrivate> updater = self.updater;
     id<SUUpdaterDelegate> updaterDelegate = [updater delegate];

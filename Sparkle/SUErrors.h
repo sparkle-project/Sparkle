@@ -20,6 +20,16 @@
  * Error domain used by Sparkle
  */
 SU_EXPORT extern NSString *const SUSparkleErrorDomain;
+/**
+ * User info key for update validation error
+ *
+ * If an update could not be found because none of the items in
+ * the feed were valid, the value in the user info dictionary
+ * for this key will be set to an error that describes in more
+ * detail why the item was not valid (e.g because the item
+ * is not compatible with the host os).
+ */
+SU_EXPORT extern NSString *const SUSparkleUpdateValidationErrorKey;
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wc++98-compat"
@@ -52,5 +62,10 @@ typedef NS_ENUM(OSStatus, SUError) {
     SUSystemPowerOffError = 5000
 };
 #pragma clang diagnostic pop
+
+/**
+ * Error domain used by Sparkle Updates Validation
+ */
+SU_EXPORT extern NSString *const SUSparkleUpdateValidationErrorDomain;
 
 #endif

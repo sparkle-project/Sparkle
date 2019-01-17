@@ -170,7 +170,7 @@
     return [[self versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
 }
 
-- (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
+- (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui validationError:(__autoreleasing NSError**)validationError
 {
     return ui && [[self class] hostSupportsItem:ui] && [self isItemNewer:ui] && ![self itemContainsSkippedVersion:ui];
 }
@@ -211,12 +211,13 @@
         }
     }
 
-    if ([self itemContainsValidUpdate:item]) {
+    NSError* validationError = nil;
+    if ([self itemContainsValidUpdate:item validationError:&validationError]) {
         self.updateItem = item;
         [self performSelectorOnMainThread:@selector(didFindValidUpdate) withObject:nil waitUntilDone:NO];
     } else {
         self.updateItem = nil;
-        [self performSelectorOnMainThread:@selector(didNotFindUpdate) withObject:nil waitUntilDone:NO];
+        [self performSelectorOnMainThread:@selector(didNotFindUpdate:) withObject:validationError waitUntilDone:NO];
     }
 }
 
@@ -236,7 +237,7 @@
     [self downloadUpdate];
 }
 
-- (void)didNotFindUpdate
+- (void)didNotFindUpdate:(NSError*)validationError
 {
     id<SUUpdaterPrivate> updater = self.updater;
 
@@ -246,11 +247,18 @@
 
     [[NSNotificationCenter defaultCenter] postNotificationName:SUUpdaterDidNotFindUpdateNotification object:self.updater];
 
+    NSMutableDictionary *userInfo = [@{
+                                      NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"You already have the newest version of %@.", "'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI)"), self.host.name]
+                                      } mutableCopy];
+
+    if(validationError != nil) {
+        [userInfo setValue:validationError
+                    forKey:SUSparkleUpdateValidationErrorKey];
+    }
+
     [self abortUpdateWithError:[NSError errorWithDomain:SUSparkleErrorDomain
                                                    code:SUNoUpdateError
-                                               userInfo:@{
-                                                   NSLocalizedDescriptionKey: [NSString stringWithFormat:SULocalizedString(@"You already have the newest version of %@.", "'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI)"), self.host.name]
-                                               }]];
+                                               userInfo:userInfo]];
 }
 
 - (NSString *)appCachePath

@@ -101,7 +101,7 @@
     return NO;
 }
 
-- (void)didNotFindUpdate
+- (void)didNotFindUpdate:(NSError*)validationError
 {
     id<SUUpdaterPrivate> updater = self.updater;
     if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
