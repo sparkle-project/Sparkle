@@ -69,10 +69,16 @@ class ArchiveItem: CustomStringConvertible {
             .filter({ !$0.hasPrefix(".") })
             .map({ unarchivedDir.appendingPathComponent($0) })
 
-        let apps = items.filter({ $0.pathExtension == "app" });
+        let apps = items.filter({
+            if let resourceValues = try? $0.resourceValues(forKeys: [URLResourceKey.typeIdentifierKey]) {
+                return UTTypeConformsTo(resourceValues.typeIdentifier! as CFString, kUTTypeBundle)
+            } else {
+                return false
+            }
+        });
         if apps.count > 0 {
             if apps.count > 1 {
-                throw makeError(code: .unarchivingError, "Too many apps in \(unarchivedDir.path) \(apps)");
+                throw makeError(code: .unarchivingError, "Too many bundles in \(unarchivedDir.path) \(apps)");
             }
 
             let appPath = apps[0];
