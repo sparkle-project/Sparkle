@@ -113,7 +113,13 @@
             [task setStandardOutput:[NSFileHandle fileHandleWithStandardOutput]];
             [task setLaunchPath:command];
             [task setArguments:[args arrayByAddingObject:destination]];
-            [task launch];
+            @try {
+                [task launch];
+            }
+            @catch (NSException *e) {
+                error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUUnarchivingError userInfo:@{ NSLocalizedDescriptionKey:[NSString stringWithFormat:@"Extraction failed, -[NSTask launch] threw exception '%@'", e.description]}];
+                return;
+            }
             
             NSUInteger bytesRead = 0;
             do {
