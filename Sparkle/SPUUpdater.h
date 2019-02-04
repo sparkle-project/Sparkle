@@ -11,8 +11,8 @@
 #else
 #import <Foundation/Foundation.h>
 #endif
-#import "SUExport.h"
-#import "SPUUserDriver.h"
+#import <Sparkle/SUExport.h>
+#import <Sparkle/SPUUserDriver.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

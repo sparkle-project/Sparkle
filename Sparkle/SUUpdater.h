@@ -14,10 +14,10 @@
 #else
 #import <Cocoa/Cocoa.h>
 #endif
-#import "SUExport.h"
-#import "SUVersionComparisonProtocol.h"
-#import "SUVersionDisplayProtocol.h"
-#import "SUUpdaterDelegate.h"
+#import <Sparkle/SUExport.h>
+#import <Sparkle/SUVersionComparisonProtocol.h>
+#import <Sparkle/SUVersionDisplayProtocol.h>
+#import <Sparkle/SUUpdaterDelegate.h>
 
 @class SUAppcastItem, SUAppcast, NSMenuItem;
 

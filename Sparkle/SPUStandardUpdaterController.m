@@ -9,7 +9,7 @@
 #import "SPUStandardUpdaterController.h"
 #import "SPUUpdater.h"
 #import "SUHost.h"
-#import "SPUStandardUserDriver.h"
+#import <Sparkle/SPUStandardUserDriver.h>
 #import "SUConstants.h"
 #import "SULog.h"
 

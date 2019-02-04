@@ -15,10 +15,10 @@
 #import "SULocalizations.h"
 #import "SUHost.h"
 #import "SULog.h"
-#import "SUErrors.h"
+#import <Sparkle/SUErrors.h>
 #import "SPUURLRequest.h"
 #import "SPUDownloadedUpdate.h"
-#import "SPUDownloadData.h"
+#import <Sparkle/SPUDownloadData.h>
 
 
 #include "AppKitPrevention.h"

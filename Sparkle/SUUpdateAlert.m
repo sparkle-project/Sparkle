@@ -18,10 +18,10 @@
 #import "SUConstants.h"
 #import "SULog.h"
 #import "SULocalizations.h"
-#import "SUAppcastItem.h"
-#import "SPUDownloadData.h"
+#import <Sparkle/SUAppcastItem.h>
+#import <Sparkle/SPUDownloadData.h>
 #import "SUApplicationInfo.h"
-#import "SPUUpdaterSettings.h"
+#import <Sparkle/SPUUpdaterSettings.h>
 #import "SUSystemUpdateInfo.h"
 #import "SUTouchBarForwardDeclarations.h"
 #import "SUTouchBarButtonGroup.h"

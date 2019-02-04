@@ -9,11 +9,11 @@
 #import "SPUURLDownload.h"
 #import "SPUXPCServiceInfo.h"
 #import "SPUURLRequest.h"
-#import "SPUDownloadData.h"
+#import <Sparkle/SPUDownloadData.h>
 #import "SPUDownloaderProtocol.h"
 #import "SPUDownloaderDelegate.h"
 #import "SPUDownloader.h"
-#import "SUErrors.h"
+#import <Sparkle/SUErrors.h>
 
 
 #include "AppKitPrevention.h"

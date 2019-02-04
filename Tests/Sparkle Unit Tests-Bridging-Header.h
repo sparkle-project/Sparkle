@@ -8,11 +8,12 @@
 #import "SUPipedUnarchiver.h"
 #import "SUBinaryDeltaCommon.h"
 #import "SUFileManager.h"
+#import <Sparkle/SUExport.h>
 #import "SUAppcast.h"
-#import "SUAppcastItem.h"
+#import <Sparkle/SUAppcastItem.h>
 #import "SUAppcastDriver.h"
-#import "SUVersionComparisonProtocol.h"
-#import "SUStandardVersionComparator.h"
+#import <Sparkle/SUVersionComparisonProtocol.h>
+#import <Sparkle/SUStandardVersionComparator.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
