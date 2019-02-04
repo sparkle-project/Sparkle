@@ -11,7 +11,7 @@
 #import "SUPipedUnarchiver.h"
 #import "SUDiskImageUnarchiver.h"
 #import "SUBinaryDeltaUnarchiver.h"
-
+#import "SUPKGUnarchiver.h"
 
 #include "AppKitPrevention.h"
 
@@ -29,6 +29,9 @@
         assert(hostPath != nil);
         NSString *nonNullHostPath = hostPath;
         return [[SUBinaryDeltaUnarchiver alloc] initWithArchivePath:path updateHostBundlePath:nonNullHostPath];
+
+    } else if ([SUPKGUnarchiver canUnarchivePath:path]) {
+        return [[SUPKGUnarchiver alloc] initWithArchivePath:path];
     }
     return nil;
 }

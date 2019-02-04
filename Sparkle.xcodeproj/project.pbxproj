@@ -50,6 +50,8 @@
 		14950073195FCE4E00BC5B5B /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
 		14958C6E19AEBC950061B14F /* signed-test-file.txt in Resources */ = {isa = PBXBuildFile; fileRef = 14958C6B19AEBC530061B14F /* signed-test-file.txt */; };
 		14958C6F19AEBC980061B14F /* test-pubkey.pem in Resources */ = {isa = PBXBuildFile; fileRef = 14958C6C19AEBC610061B14F /* test-pubkey.pem */; };
+		2A6340E02201F60600C4A68D /* SUPKGUnarchiver.h in Headers */ = {isa = PBXBuildFile; fileRef = 2A6340DE2201F60600C4A68D /* SUPKGUnarchiver.h */; };
+		2A6340E12201F60600C4A68D /* SUPKGUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A6340DF2201F60600C4A68D /* SUPKGUnarchiver.m */; };
 		34074B901FEABD08001CB3A5 /* SPUDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074B8C1FEABD08001CB3A5 /* SPUDownloader.m */; };
 		34074B911FEABD08001CB3A5 /* SPUDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B8D1FEABD08001CB3A5 /* SPUDownloader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		34074B921FEABD08001CB3A5 /* SPUDownloaderDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B8E1FEABD08001CB3A5 /* SPUDownloaderDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -622,6 +624,8 @@
 		26B1A4672195FFE900B09783 /* hr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = hr; path = hr.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
 		26B1A4682195FFE900B09783 /* hr */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = hr; path = hr.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
 		26B1A4692195FFE900B09783 /* hr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hr; path = hr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		2A6340DE2201F60600C4A68D /* SUPKGUnarchiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUPKGUnarchiver.h; sourceTree = "<group>"; };
+		2A6340DF2201F60600C4A68D /* SUPKGUnarchiver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUPKGUnarchiver.m; sourceTree = "<group>"; };
 		34074B8C1FEABD08001CB3A5 /* SPUDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPUDownloader.m; sourceTree = "<group>"; };
 		34074B8D1FEABD08001CB3A5 /* SPUDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUDownloader.h; sourceTree = "<group>"; };
 		34074B8E1FEABD08001CB3A5 /* SPUDownloaderDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPUDownloaderDelegate.h; sourceTree = "<group>"; };
@@ -1365,6 +1369,8 @@
 				722589D81E0B19F4005EA0B9 /* SUUnarchiverNotifier.h */,
 				722589D91E0B19F4005EA0B9 /* SUUnarchiverNotifier.m */,
 				722589D61E0AD86B005EA0B9 /* SUUnarchiverProtocol.h */,
+				2A6340DE2201F60600C4A68D /* SUPKGUnarchiver.h */,
+				2A6340DF2201F60600C4A68D /* SUPKGUnarchiver.m */,
 			);
 			name = Unarchiving;
 			sourceTree = "<group>";
@@ -1646,6 +1652,7 @@
 				767B61AC1972D488004E0C3C /* SUGuidedPackageInstaller.h in Headers */,
 				61EF67590E25C5B400F754E0 /* SUHost.h in Headers */,
 				618FA5010DAE88B40026945C /* SUInstaller.h in Headers */,
+				2A6340E02201F60600C4A68D /* SUPKGUnarchiver.h in Headers */,
 				72316BD61E0DBF730039EFD9 /* SULocalizations.h in Headers */,
 				55C14F06136EF6DB00649790 /* SULog.h in Headers */,
 				726F2CE51BC9C33D001971A4 /* SUOperatingSystem.h in Headers */,
@@ -2349,6 +2356,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AB8F182214D564C00A1187F /* add_scalar.c in Sources */,
+				2A6340E12201F60600C4A68D /* SUPKGUnarchiver.m in Sources */,
 				723B252D1CEAB3A600909873 /* bscommon.c in Sources */,
 				5D06E8EB0FD68CE4005AE3F6 /* bspatch.c in Sources */,
 				5AB8F18D214D564C00A1187F /* fe.c in Sources */,
