@@ -6,7 +6,7 @@
 //  Copyright © 2016 Sparkle Project. All rights reserved.
 //
 
-#import "SPUUserDriverCoreComponent.h"
+#import <Sparkle/SPUUserDriverCoreComponent.h>
 
 
 #include "AppKitPrevention.h"

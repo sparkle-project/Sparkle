@@ -20,12 +20,12 @@
 #import "SPUUpdater.h"
 #import "SPUUpdaterDelegate.h"
 #import "SPUUpdaterSettings.h"
-#import "SUVersionComparisonProtocol.h"
-#import "SUErrors.h"
-#import "SPUUpdatePermissionRequest.h"
-#import "SUUpdatePermissionResponse.h"
-#import "SPUUserDriver.h"
-#import "SPUUserDriverCoreComponent.h"
-#import "SPUDownloadData.h"
+#import <Sparkle/SUVersionComparisonProtocol.h>
+#import <Sparkle/SUErrors.h>
+#import <Sparkle/SPUUpdatePermissionRequest.h>
+#import <Sparkle/SUUpdatePermissionResponse.h>
+#import <Sparkle/SPUUserDriver.h>
+#import <Sparkle/SPUUserDriverCoreComponent.h>
+#import <Sparkle/SPUDownloadData.h>
 
 #endif

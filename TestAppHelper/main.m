@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "TestAppHelper.h"
-#import "SPUUserDriver.h"
+#import <Sparkle/SPUUserDriver.h>
 
 @interface ServiceDelegate : NSObject <NSXPCListenerDelegate>
 @end

@@ -7,7 +7,7 @@
 //
 
 #import "SUConstants.h"
-#import "SUErrors.h"
+#import <Sparkle/SUErrors.h>
 
 #ifndef DEBUG
 #define DEBUG 0

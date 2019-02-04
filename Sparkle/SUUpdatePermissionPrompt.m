@@ -7,8 +7,8 @@
 //
 
 #import "SUUpdatePermissionPrompt.h"
-#import "SPUUpdatePermissionRequest.h"
-#import "SUUpdatePermissionResponse.h"
+#import <Sparkle/SPUUpdatePermissionRequest.h>
+#import <Sparkle/SUUpdatePermissionResponse.h>
 #import "SULocalizations.h"
 
 #import "SUHost.h"
