@@ -8,9 +8,9 @@
 
 #import "SPUScheduledUpdateDriver.h"
 #import "SUHost.h"
-#import "SUErrors.h"
+#import <Sparkle/SUErrors.h>
 #import "SPUUpdaterDelegate.h"
-#import "SPUUserDriver.h"
+#import <Sparkle/SPUUserDriver.h>
 
 
 #include "AppKitPrevention.h"

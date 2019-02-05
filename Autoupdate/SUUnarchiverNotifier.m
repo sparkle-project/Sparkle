@@ -8,7 +8,7 @@
 
 #import "SUUnarchiverNotifier.h"
 #import "SULocalizations.h"
-#import "SUErrors.h"
+#import <Sparkle/SUErrors.h>
 
 
 #include "AppKitPrevention.h"

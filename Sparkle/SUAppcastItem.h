@@ -14,7 +14,7 @@
 #else
 #import <Foundation/Foundation.h>
 #endif
-#import "SUExport.h"
+#import <Sparkle/SUExport.h>
 
 SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 @property (copy, readonly) NSString *title;

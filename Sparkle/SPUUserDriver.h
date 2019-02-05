@@ -12,8 +12,8 @@
 #import <Foundation/Foundation.h>
 #endif
 
-#import "SPUStatusCompletionResults.h"
-#import "SUExport.h"
+#import <Sparkle/SPUStatusCompletionResults.h>
+#import <Sparkle/SUExport.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -8,14 +8,14 @@
 
 #import "SPUUIBasedUpdateDriver.h"
 #import "SPUCoreBasedUpdateDriver.h"
-#import "SPUUserDriver.h"
+#import <Sparkle/SPUUserDriver.h>
 #import "SUHost.h"
 #import "SUConstants.h"
 #import "SPUUpdaterDelegate.h"
 #import "SUAppcastItem.h"
-#import "SUErrors.h"
+#import <Sparkle/SUErrors.h>
 #import "SPUURLDownload.h"
-#import "SPUDownloadData.h"
+#import <Sparkle/SPUDownloadData.h>
 #import "SPUResumableUpdate.h"
 
 

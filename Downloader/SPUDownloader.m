@@ -10,8 +10,8 @@
 #import "SPUDownloaderDelegate.h"
 #import "SPULocalCacheDirectory.h"
 #import "SPUURLRequest.h"
-#import "SPUDownloadData.h"
-#import "SUErrors.h"
+#import <Sparkle/SPUDownloadData.h>
+#import <Sparkle/SUErrors.h>
 
 
 #include "AppKitPrevention.h"
@@ -115,7 +115,7 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
 {
     [self enableAutomaticTermination];
     [self.download cancel];
-    [self.downloadSession invalidateAndCancel];
+    [self.downloadSession finishTasksAndInvalidate];
     self.download = nil;
     self.downloadSession = nil;
     self.delegate = nil;

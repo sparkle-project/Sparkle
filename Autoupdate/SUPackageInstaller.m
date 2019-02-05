@@ -8,7 +8,7 @@
 
 #import "SUPackageInstaller.h"
 #import "SUConstants.h"
-#import "SUErrors.h"
+#import <Sparkle/SUErrors.h>
 #import "SULog.h"
 
 

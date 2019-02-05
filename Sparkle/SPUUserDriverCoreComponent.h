@@ -12,8 +12,8 @@
 #import <Foundation/Foundation.h>
 #endif
 
-#import "SPUStatusCompletionResults.h"
-#import "SUExport.h"
+#import <Sparkle/SPUStatusCompletionResults.h>
+#import <Sparkle/SUExport.h>
 
 @protocol SPUStandardUserDriverDelegate;
 

@@ -8,7 +8,7 @@
 
 #import "SPUUserInitiatedUpdateDriver.h"
 #import "SPUUIBasedUpdateDriver.h"
-#import "SPUUserDriver.h"
+#import <Sparkle/SPUUserDriver.h>
 
 
 #include "AppKitPrevention.h"
