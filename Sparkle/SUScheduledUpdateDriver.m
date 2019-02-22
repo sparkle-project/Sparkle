@@ -47,4 +47,15 @@
     return YES;
 }
 
+- (BOOL)shouldShowUpdateAlert {
+    id<SUUpdaterPrivate> updater = self.updater;
+    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
+
+    if ([updaterDelegate respondsToSelector:@selector(updaterShouldShowUpdateAlertForScheduledUpdate:)]) {
+        return [updaterDelegate updaterShouldShowUpdateAlertForScheduledUpdate:self.updater];
+    }
+
+    return [super shouldShowUpdateAlert];
+}
+
 @end
