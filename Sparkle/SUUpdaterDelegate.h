@@ -115,7 +115,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  \param updater The SUUpdater instance.
  \param item The appcast item corresponding to the update that is proposed to be installed.
  */
-- (void)updater:(SUUpdater *)updater didFindValidUpd ate:(SUAppcastItem *)item;
+- (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)item;
 
 /*!
  Called when a valid update is not found.
