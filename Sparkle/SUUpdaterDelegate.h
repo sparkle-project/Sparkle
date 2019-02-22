@@ -115,7 +115,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  \param updater The SUUpdater instance.
  \param item The appcast item corresponding to the update that is proposed to be installed.
  */
-- (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)item;
+- (void)updater:(SUUpdater *)updater didFindValidUpd ate:(SUAppcastItem *)item;
 
 /*!
  Called when a valid update is not found.
@@ -193,7 +193,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  
  \return \c YES to delay the relaunch until \p invocation is invoked.
  */
-- (BOOL)updater:(SUUpdater *)updater shouldPostponeRelaunchForUpdate:(SUAppcastItem *)item untilInvoking:(NSInvocation *)invocation;
+- (BOOL)updater:(SUUpdater *)updater shouldPostponeRelaunchForUpdate:(SUAppcastItem *)item untilInvoking:(id)invocation;
 
 /*!
  Returns whether the application should be relaunched at all.
@@ -278,7 +278,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  \param item The appcast item corresponding to the update that is proposed to be installed.
  \param invocation Can be used to trigger an immediate silent install and relaunch.
  */
-- (void)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationInvocation:(NSInvocation *)invocation;
+- (void)updater:(SUUpdater *)updater willInstallUpdateOnQuit:(SUAppcastItem *)item immediateInstallationInvocation:(id)invocation;
 
 /*!
  Calls after an update that was scheduled to be silently installed on quit has been canceled.
