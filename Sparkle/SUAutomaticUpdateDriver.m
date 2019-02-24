@@ -96,6 +96,12 @@ static const NSTimeInterval SUAutomaticUpdatePromptImpatienceTimer = 60 * 60 * 2
         
         [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationInvocation:invocation];
     }
+    else if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdateOnQuit:immediateInstallationBlock:)])
+    {
+        [updaterDelegate updater:self.updater willInstallUpdateOnQuit:self.updateItem immediateInstallationBlock:^{
+            [self installWithToolAndRelaunch:YES displayingUserInterface:NO];
+        }];
+    }
 
     // If this is marked as a critical update, we'll prompt the user to install it right away.
     if ([self.updateItem isCriticalUpdate])

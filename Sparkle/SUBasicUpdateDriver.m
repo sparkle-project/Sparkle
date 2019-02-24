@@ -494,18 +494,23 @@
     id<SUUpdaterPrivate> updater = self.updater;
     static BOOL postponedOnce = NO;
     id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
-    if (!postponedOnce && [updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)])
-    {
-        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installWithToolAndRelaunch:)]];
-        [invocation setSelector:@selector(installWithToolAndRelaunch:)];
-        [invocation setArgument:&relaunch atIndex:2];
-        [invocation setTarget:self];
-        postponedOnce = YES;
-        if ([updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:self.updateItem untilInvoking:invocation]) {
-            return;
+    if (!postponedOnce) {
+        if ([updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:untilInvoking:)]) {
+            NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[[self class] instanceMethodSignatureForSelector:@selector(installWithToolAndRelaunch:)]];
+            [invocation setSelector:@selector(installWithToolAndRelaunch:)];
+            [invocation setArgument:&relaunch atIndex:2];
+            [invocation setTarget:self];
+            postponedOnce = YES;
+            if ([updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:self.updateItem untilInvoking:invocation]) {
+                return;
+            }
+        } else if ([updaterDelegate respondsToSelector:@selector(updater:shouldPostponeRelaunchForUpdate:)]) {
+            postponedOnce = YES;
+            if ([updaterDelegate updater:self.updater shouldPostponeRelaunchForUpdate:self.updateItem]) {
+                return;
+            }
         }
     }
-
 
     if ([updaterDelegate respondsToSelector:@selector(updater:willInstallUpdate:)]) {
         [updaterDelegate updater:self.updater willInstallUpdate:self.updateItem];
