@@ -145,18 +145,19 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:self.host.bundle.bundleURL];
     NSURL *feedURL = [self feedURL];
     BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
+    NSString *name = self.host.name;
 
     if (!hasPublicKey) {
         if (!isMainBundle) {
             [self showAlertText:SULocalizedString(@"Auto-update not configured", nil)
-                informativeText:SULocalizedString(@"For security reasons, you need to sign your updates with a EdDSA key. See Sparkle's documentation for more information.", nil)];
+                informativeText:[NSString stringWithFormat:SULocalizedString(@"For security reasons, updates to %@ need to be signed with an EdDSA key. See Sparkle's documentation for more information.", nil), name]];
         } else {
             if (!hostIsCodeSigned) {
                 [self showAlertText:SULocalizedString(@"Auto-update not configured", nil)
-                    informativeText:SULocalizedString(@"For security reasons, you need to code sign your application or sign your updates with a EdDSA key. See https://sparkle-project.org/documentation/ for more information.", nil)];
+                    informativeText:[NSString stringWithFormat:SULocalizedString(@"For security reasons, %@ needs to be code-signed or its updates need to be signed with an EdDSA key. See https://sparkle-project.org/documentation/ for more information.", nil), name]];
             } else if (!servingOverHttps) {
                 [self showAlertText:SULocalizedString(@"Auto-update not configured", nil)
-                    informativeText:SULocalizedString(@"For security reasons, you need to serve your updates over HTTPS and/or sign your updates with a EdDSA key. See https://sparkle-project.org/documentation/ for more information.", nil)];
+                    informativeText:[NSString stringWithFormat:SULocalizedString(@"For security reasons, updates to %@ need to be served over HTTPS and/or signed with an EdDSA key. See https://sparkle-project.org/documentation/ for more information.", nil), name]];
             }
         }
     }
