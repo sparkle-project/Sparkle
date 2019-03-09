@@ -118,6 +118,23 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 - (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)item;
 
 /*!
+ Called just before the scheduled update driver prompts the user to install an update.
+
+ \param updater The SUUpdater instance.
+
+ \return YES to allow the update prompt to be shown (the default behavior), or NO to suppress it.
+ */
+- (BOOL)updaterShouldShowUpdateAlertForScheduledUpdate:(SUUpdater *)updater forItem:(SUAppcastItem *)item;
+
+/*!
+ Called after the user dismisses the update alert.
+
+ \param updater The SUUpdater instance.
+ \param permanently YES if the alert will not appear again for this update; NO if it may reappear.
+ */
+- (void)updater:(SUUpdater *)updater didDismissUpdateAlertPermanently:(BOOL)permanently forItem:(SUAppcastItem *)item;
+
+/*!
  Called when a valid update is not found.
  
  \param updater The SUUpdater instance.

@@ -56,6 +56,10 @@
     return self;
 }
 
+- (BOOL)shouldShowUpdateAlertForItem:(SUAppcastItem *)__unused item {
+    return YES;
+}
+
 - (void)didFindValidUpdate
 {
     id<SUUpdaterPrivate> updater = self.updater;
@@ -64,12 +68,18 @@
     }
 
     if (self.automaticallyInstallUpdates) {
-        [self updateAlertFinishedWithChoice:SUInstallUpdateChoice];
+        [self updateAlertFinishedWithChoice:SUInstallUpdateChoice forItem:nil];
         return;
     }
 
-    self.updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host completionBlock:^(SUUpdateAlertChoice choice) {
-        [self updateAlertFinishedWithChoice:choice];
+    SUAppcastItem *updateItem = self.updateItem;
+    if (![self shouldShowUpdateAlertForItem:updateItem]) {
+        [self abortUpdate];
+        return;
+    }
+
+    self.updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem host:self.host completionBlock:^(SUUpdateAlertChoice choice) {
+        [self updateAlertFinishedWithChoice:choice forItem:updateItem];
     }];
 
     id<SUVersionDisplay> versDisp = nil;
@@ -125,26 +135,40 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
-- (void)updateAlertFinishedWithChoice:(SUUpdateAlertChoice)choice
+- (void)didDismissAlertPermanently:(BOOL)permanently forItem:(SUAppcastItem *)item {
+    if (item == nil) {
+        return;
+    }
+    id<SUUpdaterPrivate> updater = self.updater;
+    if ([updater.delegate respondsToSelector:@selector(updater:didDismissUpdateAlertPermanently:forItem:)]) {
+        [updater.delegate updater:self.updater didDismissUpdateAlertPermanently:permanently forItem:item];
+    }
+}
+
+- (void)updateAlertFinishedWithChoice:(SUUpdateAlertChoice)choice forItem:(SUAppcastItem *)item
 {
     self.updateAlert = nil;
     [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
     switch (choice) {
         case SUInstallUpdateChoice:
+            [self didDismissAlertPermanently:NO forItem:item];
             [self downloadUpdate];
             break;
 
         case SUOpenInfoURLChoice:
+            [self didDismissAlertPermanently:NO forItem:item];
             [[NSWorkspace sharedWorkspace] openURL:[self.updateItem infoURL]];
             [self abortUpdate];
             break;
 
         case SUSkipThisVersionChoice:
+            [self didDismissAlertPermanently:YES forItem:item];
             [self.host setObject:[self.updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
             [self abortUpdate];
             break;
 
         case SURemindMeLaterChoice:
+            [self didDismissAlertPermanently:NO forItem:item];
             [self abortUpdate];
             break;
     }

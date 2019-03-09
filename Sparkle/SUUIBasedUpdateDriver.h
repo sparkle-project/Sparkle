@@ -20,6 +20,7 @@
 - (void)showAlert:(NSAlert *)alert;
 - (IBAction)cancelDownload:(id)sender;
 - (void)installAndRestart:(id)sender;
+- (BOOL)shouldShowUpdateAlertForItem:(SUAppcastItem *)item;
 
 @end
 

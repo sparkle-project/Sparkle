@@ -47,4 +47,15 @@
     return YES;
 }
 
+- (BOOL)shouldShowUpdateAlertForItem:(SUAppcastItem *)item {
+    id<SUUpdaterPrivate> updater = self.updater;
+    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
+
+    if ([updaterDelegate respondsToSelector:@selector(updaterShouldShowUpdateAlertForScheduledUpdate:forItem:)]) {
+        return [updaterDelegate updaterShouldShowUpdateAlertForScheduledUpdate:self.updater forItem:item];
+    }
+
+    return [super shouldShowUpdateAlertForItem:item];
+}
+
 @end
