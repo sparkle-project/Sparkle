@@ -124,7 +124,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
 
  \return YES to allow the update prompt to be shown (the default behavior), or NO to suppress it.
  */
-- (BOOL)updaterShouldShowUpdateAlertForScheduledUpdate:(SUUpdater *)updater;
+- (BOOL)updaterShouldShowUpdateAlertForScheduledUpdate:(SUUpdater *)updater forItem:(SUAppcastItem *)item;
 
 /*!
  Called after the user dismisses the update alert.

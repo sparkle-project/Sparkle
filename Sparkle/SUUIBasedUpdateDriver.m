@@ -56,7 +56,7 @@
     return self;
 }
 
-- (BOOL)shouldShowUpdateAlert {
+- (BOOL)shouldShowUpdateAlertForItem:(SUAppcastItem *)__unused item {
     return YES;
 }
 
@@ -72,12 +72,12 @@
         return;
     }
 
-    if (![self shouldShowUpdateAlert]) {
+    SUAppcastItem *updateItem = self.updateItem;
+    if (![self shouldShowUpdateAlertForItem:updateItem]) {
         [self abortUpdate];
         return;
     }
 
-    SUAppcastItem *updateItem = self.updateItem;
     self.updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem host:self.host completionBlock:^(SUUpdateAlertChoice choice) {
         [self updateAlertFinishedWithChoice:choice forItem:updateItem];
     }];
