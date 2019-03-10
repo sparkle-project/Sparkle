@@ -1,3 +1,10 @@
+# 1.22.0a1
+
+ * Add delegate methods to suppress update alerts (George Nachman)
+ * Disambiguate signing error messages (Nate Weaver)
+ * Fix warnings when using modules (nivekkagicom)
+ * Block-based alternatives to `NSInvocation`-based delegate methods (Fabian Jäger)
+
 # 1.21.3
 
  * Losslessly reduced the size of PNG (Barijaona Ramaholimihaso)
