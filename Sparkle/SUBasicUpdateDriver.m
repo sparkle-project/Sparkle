@@ -283,7 +283,7 @@
                              withRequest:request];
     }
 
-    if ([SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){10, 9, 0}]) {
+    if (SUAVAILABLE(10, 9)) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunguarded-availability"
         self.download = [[SPUDownloaderSession alloc] initWithDelegate:self];
