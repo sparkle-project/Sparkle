@@ -22,3 +22,9 @@ typedef struct {
 + (NSString *)systemVersionString;
 
 @end
+
+#if defined(__clang_major__) && __clang_major__ >= 9
+#define SUAVAILABLE(major, minor) @available(macOS major##.##minor, *)
+#else
+#define SUAVAILABLE(major, minor) [SUOperatingSystem isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){major, minor, 0}]
+#endif
