@@ -21,6 +21,7 @@
 #import "SUAppcastItem.h"
 #import "SUApplicationInfo.h"
 #import "SUSystemUpdateInfo.h"
+#import "SUOperatingSystem.h"
 #import "SUTouchBarForwardDeclarations.h"
 #import "SUTouchBarButtonGroup.h"
 
@@ -97,7 +98,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
 - (void)dealloc {
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
-    if (@available(macOS 10.14, *)) {
+    if (SUAVAILABLE(10, 14)) {
         if (self.observingAppearance) {
             [self.window removeObserver:self forKeyPath:@"effectiveAppearance"];
             self.observingAppearance = NO;
@@ -167,7 +168,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     prefs.defaultFontSize = (int)[NSFont systemFontSize];
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
-    if (@available(macOS 10.14, *))
+    if (SUAVAILABLE(10, 14))
     {
         NSBox *darkBackgroundView = [[NSBox alloc] initWithFrame:self.releaseNotesView.frame];
         darkBackgroundView.boxType = NSBoxCustom;
@@ -308,11 +309,14 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 - (void)adaptReleaseNotesAppearance
 {
 #if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101400
-    if (@available(macOS 10.14, *))
+    if (SUAVAILABLE(10, 14))
     {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability"
         NSAppearanceName bestAppearance = [self.window.effectiveAppearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]];
         BOOL isDarkAqua = ([bestAppearance isEqualToString:NSAppearanceNameDarkAqua]);
         self.releaseNotesView.preferences.userStyleSheetEnabled = isDarkAqua;
+#pragma clang diagnostic pop
     }
 #endif
 }
