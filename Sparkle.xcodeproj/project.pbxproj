@@ -1556,7 +1556,7 @@
 				720B16431C66433D006985FB /* SUTestApplicationTest.swift */,
 				720B16421C66433D006985FB /* UITests-Info.plist */,
 			);
-			path = "UI Tests";
+			path = "UITests";
 			sourceTree = "<group>";
 		};
 		FA1941C40D94A6EA00DD942E /* Configurations */ = {
