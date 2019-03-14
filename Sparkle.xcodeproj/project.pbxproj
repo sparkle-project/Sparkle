@@ -1314,7 +1314,8 @@
 				5AB8F17D214D564B00A1187F /* sign.c */,
 				5AB8F177214D564B00A1187F /* verify.c */,
 			);
-			path = ed25519;
+			name = ed25519;
+			path = ../ed25519;
 			sourceTree = "<group>";
 		};
 		5AB8F1A0214DA72000A1187F /* generate_keys */ = {
@@ -1555,7 +1556,7 @@
 				720B16431C66433D006985FB /* SUTestApplicationTest.swift */,
 				720B16421C66433D006985FB /* UITests-Info.plist */,
 			);
-			path = "UI Tests";
+			path = "UITests";
 			sourceTree = "<group>";
 		};
 		FA1941C40D94A6EA00DD942E /* Configurations */ = {
