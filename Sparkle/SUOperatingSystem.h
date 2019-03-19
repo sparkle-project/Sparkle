@@ -20,6 +20,7 @@ typedef struct {
 + (NSOperatingSystemVersion)operatingSystemVersion;
 + (BOOL)isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion)version;
 + (NSString *)systemVersionString;
++ (NSString *)systemSerialNumber;
 
 @end
 

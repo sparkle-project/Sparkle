@@ -10,6 +10,11 @@
 #import "SUUpdaterPrivate.h"
 #import "SUUpdaterDelegate.h"
 
+#import "SUHost.h"
+#import "SUSystemUpdateInfo.h"
+#import "SUAppcastItem.h"
+#import "SUConstants.h"
+
 @interface SUScheduledUpdateDriver ()
 
 @end
@@ -22,6 +27,46 @@
         self.showErrors = NO;
     }
     return self;
+}
+
+- (NSUInteger)numUpdateGroups {
+    NSNumber *value = [self.host objectForKey:SUNumUpdateGroupsKey];
+    if (value)
+        return [value unsignedIntegerValue];
+    else
+        return SUDefaultNumUpdateGroups;
+}
+
+- (NSTimeInterval)updateGroupInterval {
+    NSNumber *intervalValue = [self.host objectForKey:SUUpdateGroupIntervalKey];
+    if (intervalValue)
+        return [intervalValue doubleValue];
+    else
+        return SUDefaultUpdateGroupInterval;
+}
+
+- (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui {
+    return [self isItemReadyForUpdateGroup:ui] && [super itemContainsValidUpdate:ui];
+}
+
+- (BOOL)isItemReadyForUpdateGroup:(SUAppcastItem *)ui {
+    [self.host objectForKey:SUNumUpdateGroupsKey];
+
+    if([ui isCriticalUpdate] || [self numUpdateGroups] < 2) {
+        return YES;
+    }
+
+    NSDate* itemReleaseDate = ui.date;
+    if(itemReleaseDate) {
+        NSTimeInterval timeSinceRelease = [[NSDate date] timeIntervalSinceDate:itemReleaseDate];
+        NSTimeInterval timeToWaitForGroup = [self updateGroupInterval] * [SUSystemUpdateInfo updateGroupForHost:self.host];
+
+        if(timeSinceRelease < timeToWaitForGroup) {
+            return NO; // not this host's turn yet
+        }
+    }
+
+    return YES;
 }
 
 - (void)didFindValidUpdate

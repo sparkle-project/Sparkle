@@ -20,6 +20,7 @@
 SU_EXPORT @interface SUAppcastItem : NSObject
 @property (copy, readonly) NSString *title;
 @property (copy, readonly) NSString *dateString;
+@property (copy, readonly) NSDate *date;
 @property (copy, readonly) NSString *itemDescription;
 @property (strong, readonly) NSURL *releaseNotesURL;
 @property (strong, readonly) SUSignatures *signatures;

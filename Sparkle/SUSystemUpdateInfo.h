@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SUSystemUpdateInfo : NSObject
 
 + (BOOL)systemAllowsAutomaticUpdatesForHost:(SUHost *)host;
++ (NSUInteger)updateGroupForHost:(SUHost *)host;
 
 @end
 

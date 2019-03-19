@@ -19,6 +19,9 @@
 extern const NSTimeInterval SUMinimumUpdateCheckInterval;
 extern const NSTimeInterval SUDefaultUpdateCheckInterval;
 
+extern const NSUInteger SUDefaultNumUpdateGroups;
+extern const NSTimeInterval SUDefaultUpdateGroupInterval;
+
 extern NSString *const SUBundleIdentifier;
 
 extern NSString *const SUAppcastAttributeValueMacOS;
@@ -50,6 +53,8 @@ extern NSString *const SUAllowsAutomaticUpdatesKey;
 extern NSString *const SUEnableAutomaticChecksKey;
 extern NSString *const SUEnableSystemProfilingKey;
 extern NSString *const SUSendProfileInfoKey;
+extern NSString *const SUNumUpdateGroupsKey;
+extern NSString *const SUUpdateGroupIntervalKey;
 extern NSString *const SULastProfileSubmitDateKey;
 extern NSString *const SUPromptUserOnFirstLaunchKey;
 extern NSString *const SUDefaultsDomainKey;

@@ -63,6 +63,15 @@
     return self.osString == nil || [self.osString isEqualToString:SUAppcastAttributeValueMacOS];
 }
 
+- (NSDate*)date {
+    if(self.dateString == nil) {
+        return nil;
+    }
+
+    NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"E, dd MMM yyyy HH:mm:ss Z" allowNaturalLanguage:NO];
+    return [dateFormatter dateFromString:self.dateString];
+}
+
 - (BOOL)isInformationOnlyUpdate
 {
     return self.infoURL && !self.fileURL;
