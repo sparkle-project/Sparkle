@@ -50,8 +50,6 @@
 }
 
 - (BOOL)isItemReadyForUpdateGroup:(SUAppcastItem *)ui {
-    [self.host objectForKey:SUNumUpdateGroupsKey];
-
     if([ui isCriticalUpdate] || [self numUpdateGroups] < 2) {
         return YES;
     }
