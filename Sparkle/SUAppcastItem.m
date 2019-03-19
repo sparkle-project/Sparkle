@@ -68,7 +68,10 @@
         return nil;
     }
 
-    NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] initWithDateFormat:@"E, dd MMM yyyy HH:mm:ss Z" allowNaturalLanguage:NO];
+    NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
+    dateFormatter.dateFormat = @"E, dd MMM yyyy HH:mm:ss Z";
+    
     return [dateFormatter dateFromString:self.dateString];
 }
 
