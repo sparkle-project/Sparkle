@@ -19,9 +19,6 @@
 const NSTimeInterval SUMinimumUpdateCheckInterval = DEBUG ? 60 : (60 * 60);
 const NSTimeInterval SUDefaultUpdateCheckInterval = DEBUG ? 60 : (60 * 60 * 24);
 
-const NSUInteger SUDefaultNumUpdateGroups = 1;
-const NSTimeInterval SUDefaultUpdateGroupInterval = DEBUG ? 60 : (60 * 60 * 24);
-
 NSString *const SUBundleIdentifier = @SPARKLE_BUNDLE_IDENTIFIER;
 
 NSString *const SUAppcastAttributeValueMacOS = @"macos";
@@ -45,8 +42,7 @@ NSString *const SUAllowsAutomaticUpdatesKey = @"SUAllowsAutomaticUpdates";
 NSString *const SUEnableSystemProfilingKey = @"SUEnableSystemProfiling";
 NSString *const SUEnableAutomaticChecksKey = @"SUEnableAutomaticChecks";
 NSString *const SUSendProfileInfoKey = @"SUSendProfileInfo";
-NSString *const SUNumUpdateGroupsKey = @"SUNumUpdateGroups";
-NSString *const SUUpdateGroupIntervalKey = @"SUUpdateGroupInterval";
+NSString *const SUUpdateGroupIdentifierKey = @"SUUpdateGroupIdentifier";
 NSString *const SULastProfileSubmitDateKey = @"SULastProfileSubmissionDate";
 NSString *const SUPromptUserOnFirstLaunchKey = @"SUPromptUserOnFirstLaunch";
 NSString *const SUEnableJavaScriptKey = @"SUEnableJavaScript";
@@ -72,6 +68,7 @@ NSString *const SUAppcastElementMinimumSystemVersion = @"sparkle:minimumSystemVe
 NSString *const SUAppcastElementMaximumSystemVersion = @"sparkle:maximumSystemVersion";
 NSString *const SUAppcastElementReleaseNotesLink = @"sparkle:releaseNotesLink";
 NSString *const SUAppcastElementTags = @"sparkle:tags";
+NSString *const SUAppcastElementPhasedRolloutInterval = @"sparkle:phasedRolloutInterval";
 
 NSString *const SURSSAttributeURL = @"url";
 NSString *const SURSSAttributeLength = @"length";

@@ -33,6 +33,7 @@ SU_EXPORT @interface SUAppcastItem : NSObject
 @property (copy, readonly) NSString *displayVersionString;
 @property (copy, readonly) NSDictionary *deltaUpdates;
 @property (strong, readonly) NSURL *infoURL;
+@property (copy, readonly) NSNumber* phasedRolloutInterval;
 
 // Initializes with data from a dictionary provided by the RSS class.
 - (instancetype)initWithDictionary:(NSDictionary *)dict;

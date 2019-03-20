@@ -29,35 +29,21 @@
     return self;
 }
 
-- (NSUInteger)numUpdateGroups {
-    NSNumber *value = [self.host objectForKey:SUNumUpdateGroupsKey];
-    if (value)
-        return [value unsignedIntegerValue];
-    else
-        return SUDefaultNumUpdateGroups;
-}
-
-- (NSTimeInterval)updateGroupInterval {
-    NSNumber *intervalValue = [self.host objectForKey:SUUpdateGroupIntervalKey];
-    if (intervalValue)
-        return [intervalValue doubleValue];
-    else
-        return SUDefaultUpdateGroupInterval;
-}
-
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui {
     return [self isItemReadyForUpdateGroup:ui] && [super itemContainsValidUpdate:ui];
 }
 
 - (BOOL)isItemReadyForUpdateGroup:(SUAppcastItem *)ui {
-    if([ui isCriticalUpdate] || [self numUpdateGroups] < 2) {
+    if([ui isCriticalUpdate] || ![ui phasedRolloutInterval]) {
         return YES;
     }
 
     NSDate* itemReleaseDate = ui.date;
     if(itemReleaseDate) {
         NSTimeInterval timeSinceRelease = [[NSDate date] timeIntervalSinceDate:itemReleaseDate];
-        NSTimeInterval timeToWaitForGroup = [self updateGroupInterval] * [SUSystemUpdateInfo updateGroupForHost:self.host];
+
+        NSTimeInterval phasedRolloutInterval = [[ui phasedRolloutInterval] doubleValue];
+        NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * [SUSystemUpdateInfo updateGroupForHost:self.host];
 
         if(timeSinceRelease < timeToWaitForGroup) {
             return NO; // not this host's turn yet
@@ -99,6 +85,11 @@
     }
 
     return [super shouldShowUpdateAlertForItem:item];
+}
+
+- (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData * _Nullable) downloadData {
+    [self.host setNewUpdateGroupIdentifier]; // use new update group next time
+    [super downloaderDidFinishWithTemporaryDownloadData:downloadData];
 }
 
 @end

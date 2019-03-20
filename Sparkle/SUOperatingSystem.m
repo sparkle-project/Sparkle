@@ -64,21 +64,4 @@
     return [NSString stringWithFormat:@"%ld.%ld.%ld", (long)version.majorVersion, (long)version.minorVersion, (long)version.patchVersion];
 }
 
-+ (NSString *)systemSerialNumber {
-    io_service_t ioPlatformExpertDevice = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("IOPlatformExpertDevice"));
-
-    NSString* serialNumber;
-
-    if (ioPlatformExpertDevice) {
-        CFTypeRef platformSerialNumber = IORegistryEntryCreateCFProperty(ioPlatformExpertDevice, CFSTR("IOPlatformSerialNumber"), kCFAllocatorDefault, 0);
-        if (CFGetTypeID(platformSerialNumber) == CFStringGetTypeID()) {
-            serialNumber = [NSString stringWithString:(__bridge NSString*)platformSerialNumber];
-            CFRelease(platformSerialNumber);
-        }
-        IOObjectRelease(ioPlatformExpertDevice);
-    }
-
-    return serialNumber;
-}
-
 @end

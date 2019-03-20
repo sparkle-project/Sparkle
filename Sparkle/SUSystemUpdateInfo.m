@@ -59,31 +59,10 @@
     return changeOwnerAndGroupSuccess;
 }
 
+#define NUM_UPDATE_GROUPS 7
 + (NSUInteger)updateGroupForHost:(SUHost *)host {
-    NSNumber* configuredGroupCount = [host objectForKey:SUNumUpdateGroupsKey];
-    NSUInteger numGroups = MAX(1, [configuredGroupCount unsignedIntegerValue]);
-    if(numGroups == 1) {
-        return 0;
-    }
-
-    NSString* systemSerialNumber = [SUOperatingSystem systemSerialNumber];
-    if(systemSerialNumber == nil) {
-        return 0;
-    }
-
-    NSUInteger serialDigitSum = 0;
-
-    NSUInteger length = systemSerialNumber.length;
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wvla"
-    unichar buffer[length+1];
-#pragma clang diagnostic pop
-    [systemSerialNumber getCharacters:buffer range:NSMakeRange(0, length)];
-    for(NSUInteger i = 0; i < length; i++) {
-        serialDigitSum += buffer[i];
-    }
-
-    return serialDigitSum % numGroups;
+    NSNumber* updateGroupIdentifier = [host updateGroupIdentifier];
+    return ([updateGroupIdentifier unsignedIntValue] % NUM_UPDATE_GROUPS);
 }
 
 @end
