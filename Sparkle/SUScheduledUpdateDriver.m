@@ -10,6 +10,10 @@
 #import "SUUpdaterPrivate.h"
 #import "SUUpdaterDelegate.h"
 
+#import "SUSystemUpdateInfo.h"
+#import "SUAppcastItem.h"
+#import "SUHost.h"
+
 @interface SUScheduledUpdateDriver ()
 
 @end
@@ -22,6 +26,30 @@
         self.showErrors = NO;
     }
     return self;
+}
+
+- (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui {
+    return [self isItemReadyForUpdateGroup:ui] && [super itemContainsValidUpdate:ui];
+}
+
+- (BOOL)isItemReadyForUpdateGroup:(SUAppcastItem *)ui {
+    if([ui isCriticalUpdate] || ![ui phasedRolloutInterval]) {
+        return YES;
+    }
+
+    NSDate* itemReleaseDate = ui.date;
+    if(itemReleaseDate) {
+        NSTimeInterval timeSinceRelease = [[NSDate date] timeIntervalSinceDate:itemReleaseDate];
+
+        NSTimeInterval phasedRolloutInterval = [[ui phasedRolloutInterval] doubleValue];
+        NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * [SUSystemUpdateInfo updateGroupForHost:self.host];
+
+        if(timeSinceRelease < timeToWaitForGroup) {
+            return NO; // not this host's turn yet
+        }
+    }
+
+    return YES;
 }
 
 - (void)didFindValidUpdate
@@ -56,6 +84,11 @@
     }
 
     return [super shouldShowUpdateAlertForItem:item];
+}
+
+- (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData * _Nullable) downloadData {
+    [self.host setNewUpdateGroupIdentifier]; // use new update group next time
+    [super downloaderDidFinishWithTemporaryDownloadData:downloadData];
 }
 
 @end

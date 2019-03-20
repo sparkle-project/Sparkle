@@ -58,4 +58,10 @@
     return changeOwnerAndGroupSuccess;
 }
 
+#define NUM_UPDATE_GROUPS 7
++ (NSUInteger)updateGroupForHost:(SUHost *)host {
+    NSNumber* updateGroupIdentifier = [host updateGroupIdentifier];
+    return ([updateGroupIdentifier unsignedIntValue] % NUM_UPDATE_GROUPS);
+}
+
 @end

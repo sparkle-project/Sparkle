@@ -28,6 +28,7 @@
 @property (copy, readwrite) NSDictionary *deltaUpdates;
 @property (strong, readwrite) NSURL *infoURL;
 @property (readwrite, copy) NSDictionary *propertiesDictionary;
+@property (copy, readwrite) NSNumber* phasedRolloutInterval;
 @end
 
 @implementation SUAppcastItem
@@ -46,6 +47,7 @@
 @synthesize versionString;
 @synthesize osString;
 @synthesize propertiesDictionary;
+@synthesize phasedRolloutInterval;
 
 - (BOOL)isDeltaUpdate
 {
@@ -61,6 +63,18 @@
 - (BOOL)isMacOsUpdate
 {
     return self.osString == nil || [self.osString isEqualToString:SUAppcastAttributeValueMacOS];
+}
+
+- (NSDate*)date {
+    if(self.dateString == nil) {
+        return nil;
+    }
+
+    NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
+    dateFormatter.dateFormat = @"E, dd MMM yyyy HH:mm:ss Z";
+    
+    return [dateFormatter dateFromString:self.dateString];
 }
 
 - (BOOL)isInformationOnlyUpdate
@@ -174,6 +188,8 @@
         } else {
             self.displayVersionString = self.versionString;
         }
+
+        self.phasedRolloutInterval = [enclosure objectForKey:SUAppcastElementPhasedRolloutInterval];
 
         // Find the appropriate release notes URL.
         NSString *releaseNotesString = [dict objectForKey:SUAppcastElementReleaseNotesLink];

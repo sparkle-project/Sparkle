@@ -42,6 +42,7 @@ NSString *const SUAllowsAutomaticUpdatesKey = @"SUAllowsAutomaticUpdates";
 NSString *const SUEnableSystemProfilingKey = @"SUEnableSystemProfiling";
 NSString *const SUEnableAutomaticChecksKey = @"SUEnableAutomaticChecks";
 NSString *const SUSendProfileInfoKey = @"SUSendProfileInfo";
+NSString *const SUUpdateGroupIdentifierKey = @"SUUpdateGroupIdentifier";
 NSString *const SULastProfileSubmitDateKey = @"SULastProfileSubmissionDate";
 NSString *const SUPromptUserOnFirstLaunchKey = @"SUPromptUserOnFirstLaunch";
 NSString *const SUEnableJavaScriptKey = @"SUEnableJavaScript";
@@ -67,6 +68,7 @@ NSString *const SUAppcastElementMinimumSystemVersion = @"sparkle:minimumSystemVe
 NSString *const SUAppcastElementMaximumSystemVersion = @"sparkle:maximumSystemVersion";
 NSString *const SUAppcastElementReleaseNotesLink = @"sparkle:releaseNotesLink";
 NSString *const SUAppcastElementTags = @"sparkle:tags";
+NSString *const SUAppcastElementPhasedRolloutInterval = @"sparkle:phasedRolloutInterval";
 
 NSString *const SURSSAttributeURL = @"url";
 NSString *const SURSSAttributeLength = @"length";
