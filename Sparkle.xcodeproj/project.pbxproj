@@ -50,8 +50,6 @@
 		14950073195FCE4E00BC5B5B /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
 		14958C6E19AEBC950061B14F /* signed-test-file.txt in Resources */ = {isa = PBXBuildFile; fileRef = 14958C6B19AEBC530061B14F /* signed-test-file.txt */; };
 		14958C6F19AEBC980061B14F /* test-pubkey.pem in Resources */ = {isa = PBXBuildFile; fileRef = 14958C6C19AEBC610061B14F /* test-pubkey.pem */; };
-		1F34E6AB22411A1B00DCABB9 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6117796E0D1112E000749C97 /* IOKit.framework */; };
-		1F34E6AC22411A3F00DCABB9 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6117796E0D1112E000749C97 /* IOKit.framework */; };
 		34074B901FEABD08001CB3A5 /* SPUDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074B8C1FEABD08001CB3A5 /* SPUDownloader.m */; };
 		34074B911FEABD08001CB3A5 /* SPUDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B8D1FEABD08001CB3A5 /* SPUDownloader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		34074B921FEABD08001CB3A5 /* SPUDownloaderDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 34074B8E1FEABD08001CB3A5 /* SPUDownloaderDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -980,7 +978,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F34E6AC22411A3F00DCABB9 /* IOKit.framework in Frameworks */,
 				14950071195FCE3D00BC5B5B /* AppKit.framework in Frameworks */,
 				14950070195FCE3A00BC5B5B /* Foundation.framework in Frameworks */,
 				55C14F9A136F045400649790 /* Security.framework in Frameworks */,
@@ -1050,7 +1047,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1F34E6AB22411A1B00DCABB9 /* IOKit.framework in Frameworks */,
 				722954CA1D04EA6000ECF9CA /* AppKit.framework in Frameworks */,
 				722954C91D04EA5C00ECF9CA /* Foundation.framework in Frameworks */,
 				722954CB1D04EA6900ECF9CA /* Security.framework in Frameworks */,
