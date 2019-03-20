@@ -7,7 +7,6 @@
 //
 
 #import "SUSystemUpdateInfo.h"
-#import "SUOperatingSystem.h"
 #import "SUHost.h"
 #import "SUConstants.h"
 #import "SUFileManager.h"

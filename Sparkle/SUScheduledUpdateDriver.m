@@ -10,10 +10,9 @@
 #import "SUUpdaterPrivate.h"
 #import "SUUpdaterDelegate.h"
 
-#import "SUHost.h"
 #import "SUSystemUpdateInfo.h"
 #import "SUAppcastItem.h"
-#import "SUConstants.h"
+#import "SUHost.h"
 
 @interface SUScheduledUpdateDriver ()
 
