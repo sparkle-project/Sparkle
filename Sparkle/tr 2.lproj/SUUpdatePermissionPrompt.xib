@@ -29,9 +29,9 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" tag="1" id="13">
-                        <rect key="frame" x="265" y="12" width="159" height="32"/>
+                        <rect key="frame" x="263" y="12" width="163" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
-                        <buttonCell key="cell" type="push" title="Otomatik olarak ara" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" tag="1" inset="2" id="176">
+                        <buttonCell key="cell" type="push" title="Otomatik Olarak Ara" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" tag="1" inset="2" id="176">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
@@ -43,7 +43,7 @@ DQ
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" id="14">
-                        <rect key="frame" x="186" y="12" width="79" height="32"/>
+                        <rect key="frame" x="183" y="12" width="79" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
                         <buttonCell key="cell" type="push" title="Arama" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="177">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
