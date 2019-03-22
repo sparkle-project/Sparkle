@@ -1,10 +1,10 @@
 /* de_DE v0.1 - No comment provided by engineer. */
 
-"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ indirildi ve kullanıma hazır! Şimdi yüklemek istiyor musunuz? Uygulama yeniden başlatılacaktır.";
+"%1$@ %2$@ has been downloaded and is ready to use! Would you like to install it and relaunch %1$@ now?" = "%1$@ %2$@ indirildi ve kullanıma hazır! Şimdi yüklemek ister misiniz? Uygulama yeniden başlatılacaktır.";
 
 /* de_DE v0.1 - No comment provided by engineer. */
 
-"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ uygulaması disk kalıbı içerisindeyken güncellenemez. Lütfen %1$@ uygulamasını Uygulamalar dizinine kopyalayıp yeniden başlatınız.";
+"%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ uygulaması geçici veya salt okunur bir konumdan açıldığı için güncellenemedi. Lütfen %1$@ uygulamasını Uygulamalar dizinine kopyalayıp yeniden başlatınız.";
 
 /* de_DE v0.1 - No comment provided by engineer. */
 
@@ -16,7 +16,7 @@
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ çıktı (Kullandığınız Sürüm: %3$@). Şimdi yeni sürümü indirmek ister misiniz?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ is now available--you have %3$@. Would you like to learn more about this update on the web?";
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ çıktı (Kullandığınız Sürüm: %3$@). Bu güncelleme ile ilgili olarak web sayfasından daha fazla bilgi almak ister misiniz?";
 
 "%@ downloaded" = "%@ indirildi";
 
@@ -30,7 +30,7 @@
 
 /* de_DE v0.1 - No comment provided by engineer. */
 
-"A new version of %@ is ready to install!" = "%@ uygulamasının yeni bir sürümü yüklemeye hazır!";
+"A new version of %@ is ready to install!" = "%@ uygulamasının yeni bir sürümü yüklenmeye hazır!";
 
 /* de_DE v0.1 - No comment provided by engineer. */
 
@@ -123,4 +123,3 @@
 
 
 "You're up-to-date!" = "Uygulama güncel!";
-

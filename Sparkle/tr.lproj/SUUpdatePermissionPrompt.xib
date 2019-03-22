@@ -31,7 +31,7 @@
                     <button verticalHuggingPriority="750" tag="1" id="13">
                         <rect key="frame" x="265" y="12" width="159" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
-                        <buttonCell key="cell" type="push" title="Otomatik olarak ara" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" tag="1" inset="2" id="176">
+                        <buttonCell key="cell" type="push" title="Otomatik Olarak Ara" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" tag="1" inset="2" id="176">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
@@ -59,7 +59,7 @@ Gw
                     <textField verticalHuggingPriority="750" id="32">
                         <rect key="frame" x="104" y="114" width="289" height="34"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Güncellemeler kendiliğinden aransın mı?" id="178">
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Güncellemeler otomatik olarak aransın mı?" id="178">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -80,7 +80,7 @@ Gw
                     <button focusRingType="none" id="34">
                         <rect key="frame" x="104" y="53" width="278" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="check" title="Sistem bilgilerini anonim olarak gönder" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" focusRingType="none" inset="2" id="180">
+                        <buttonCell key="cell" type="check" title="Sistem bilgilerini kimlik gizlenmiş olarak gönder" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" focusRingType="none" inset="2" id="180">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                         </buttonCell>
