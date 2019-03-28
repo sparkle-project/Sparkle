@@ -246,22 +246,4 @@
     return [self objectForUserDefaultsKey:key] ? [self boolForUserDefaultsKey:key] : [self boolForInfoDictionaryKey:key];
 }
 
-- (NSNumber*)updateGroupIdentifier {
-    NSNumber* updateGroupIdentifier = [self objectForUserDefaultsKey:SUUpdateGroupIdentifierKey];
-    if(updateGroupIdentifier == nil) {
-        updateGroupIdentifier = [self setNewUpdateGroupIdentifier];
-    }
-
-    return updateGroupIdentifier;
-}
-
-- (NSNumber*)setNewUpdateGroupIdentifier {
-    unsigned int r = arc4random_uniform(UINT_MAX);
-    NSNumber* updateGroupIdentifier = @(r);
-
-    [self setObject:updateGroupIdentifier forUserDefaultsKey:SUUpdateGroupIdentifierKey];
-
-    return updateGroupIdentifier;
-}
-
 @end

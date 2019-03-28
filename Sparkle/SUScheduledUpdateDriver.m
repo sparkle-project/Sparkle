@@ -28,11 +28,11 @@
     return self;
 }
 
-- (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui {
-    return [self isItemReadyForUpdateGroup:ui] && [super itemContainsValidUpdate:ui];
++ (BOOL)hostSupportsItem:(SUAppcastItem *)ui {
+    return [super hostSupportsItem:ui] && [self isItemReadyForUpdateGroup:ui];
 }
 
-- (BOOL)isItemReadyForUpdateGroup:(SUAppcastItem *)ui {
++ (BOOL)isItemReadyForUpdateGroup:(SUAppcastItem *)ui {
     if([ui isCriticalUpdate] || ![ui phasedRolloutInterval]) {
         return YES;
     }
@@ -42,7 +42,7 @@
         NSTimeInterval timeSinceRelease = [[NSDate date] timeIntervalSinceDate:itemReleaseDate];
 
         NSTimeInterval phasedRolloutInterval = [[ui phasedRolloutInterval] doubleValue];
-        NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * [SUSystemUpdateInfo updateGroupForHost:self.host];
+        NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * [SUSystemUpdateInfo updateGroup];
 
         if(timeSinceRelease < timeToWaitForGroup) {
             return NO; // not this host's turn yet
@@ -87,7 +87,7 @@
 }
 
 - (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData * _Nullable) downloadData {
-    [self.host setNewUpdateGroupIdentifier]; // use new update group next time
+    [SUSystemUpdateInfo setNewUpdateGroupIdentifier]; // use new update group next time
     [super downloaderDidFinishWithTemporaryDownloadData:downloadData];
 }
 
