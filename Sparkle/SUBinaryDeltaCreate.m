@@ -381,13 +381,10 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
 
         mode_t permissions = [info[INFO_PERMISSIONS_KEY] unsignedShortValue];
         if (!isSymLink(ent) && !IS_VALID_PERMISSIONS(permissions)) {
+            permissions = 0755;
             if (verbose) {
-                fprintf(stderr, "\n");
+                fprintf(stderr, "\nwarning: file permissions %o of '%s' won't be preserved in the delta update (only permissions with modes 0755 and 0644 are supported).\n", permissions & PERMISSION_FLAGS, ent->fts_path);
             }
-            if (error != NULL) {
-                *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileReadUnknownError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Invalid file permissions after-tree on file %@ (only permissions with modes 0755 and 0644 are supported)", @(ent->fts_path)] }];
-            }
-            return NO;
         }
 
         if (aclExists(ent)) {
@@ -588,7 +585,7 @@ BOOL createBinaryDelta(NSString *source, NSString *destination, NSString *patchF
 
     NSFileManager *filemgr;
     filemgr = [NSFileManager defaultManager];
-    
+
     [filemgr removeItemAtPath: patchFile error: NULL];
     if ([filemgr moveItemAtPath: temporaryFile toPath: patchFile error: NULL]  != YES)
     {
