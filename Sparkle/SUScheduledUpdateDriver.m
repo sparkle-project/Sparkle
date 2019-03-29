@@ -12,10 +12,9 @@
 
 #import "SUSystemUpdateInfo.h"
 #import "SUAppcastItem.h"
-#import "SUHost.h"
 
 @interface SUScheduledUpdateDriver ()
-
+- (BOOL)isItemReadyForPhasedRollout:(SUAppcastItem *)ui;
 @end
 
 @implementation SUScheduledUpdateDriver
@@ -28,28 +27,26 @@
     return self;
 }
 
-- (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui {
-    return [self isItemReadyForUpdateGroup:ui] && [super itemContainsValidUpdate:ui];
+- (BOOL)hostSupportsItem:(SUAppcastItem *)ui {
+    return [super hostSupportsItem:ui] && [self isItemReadyForPhasedRollout:ui];
 }
 
-- (BOOL)isItemReadyForUpdateGroup:(SUAppcastItem *)ui {
+- (BOOL)isItemReadyForPhasedRollout:(SUAppcastItem *)ui {
     if([ui isCriticalUpdate] || ![ui phasedRolloutInterval]) {
         return YES;
     }
 
     NSDate* itemReleaseDate = ui.date;
-    if(itemReleaseDate) {
-        NSTimeInterval timeSinceRelease = [[NSDate date] timeIntervalSinceDate:itemReleaseDate];
-
-        NSTimeInterval phasedRolloutInterval = [[ui phasedRolloutInterval] doubleValue];
-        NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * [SUSystemUpdateInfo updateGroupForHost:self.host];
-
-        if(timeSinceRelease < timeToWaitForGroup) {
-            return NO; // not this host's turn yet
-        }
+    if(!itemReleaseDate) {
+        return YES;
     }
 
-    return YES;
+    NSTimeInterval timeSinceRelease = [[NSDate date] timeIntervalSinceDate:itemReleaseDate];
+
+    NSTimeInterval phasedRolloutInterval = [[ui phasedRolloutInterval] doubleValue];
+    NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * [SUSystemUpdateInfo updateGroupForHost:self.host];
+
+    return timeSinceRelease >= timeToWaitForGroup;
 }
 
 - (void)didFindValidUpdate
@@ -87,7 +84,7 @@
 }
 
 - (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData * _Nullable) downloadData {
-    [self.host setNewUpdateGroupIdentifier]; // use new update group next time
+    [SUSystemUpdateInfo setNewUpdateGroupIdentifierForHost:self.host]; // use new update group next time
     [super downloaderDidFinishWithTemporaryDownloadData:downloadData];
 }
 
