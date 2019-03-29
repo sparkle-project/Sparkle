@@ -16,9 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)systemAllowsAutomaticUpdatesForHost:(SUHost *)host;
 
-+ (NSUInteger)updateGroup;
-+ (NSNumber*)updateGroupIdentifier;
-+ (NSNumber*)setNewUpdateGroupIdentifier;
++ (NSUInteger)updateGroupForHost:(SUHost*)host;
++ (NSNumber*)updateGroupIdentifierForHost:(SUHost*)host;
++ (NSNumber*)setNewUpdateGroupIdentifierForHost:(SUHost*)host;
 
 @end
 

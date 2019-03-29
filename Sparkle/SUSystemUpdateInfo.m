@@ -59,25 +59,25 @@
 }
 
 #define NUM_UPDATE_GROUPS 7
-+ (NSUInteger)updateGroup {
-    NSNumber* updateGroupIdentifier = [self updateGroupIdentifier];
++ (NSUInteger)updateGroupForHost:(SUHost*)host {
+    NSNumber* updateGroupIdentifier = [self updateGroupIdentifierForHost:host];
     return ([updateGroupIdentifier unsignedIntValue] % NUM_UPDATE_GROUPS);
 }
 
-+ (NSNumber*)updateGroupIdentifier {
-    NSNumber* updateGroupIdentifier = [[NSUserDefaults standardUserDefaults] objectForKey:SUUpdateGroupIdentifierKey];
++ (NSNumber*)updateGroupIdentifierForHost:(SUHost*)host {
+    NSNumber* updateGroupIdentifier = [host objectForInfoDictionaryKey:SUUpdateGroupIdentifierKey];
     if(updateGroupIdentifier == nil) {
-        updateGroupIdentifier = [self setNewUpdateGroupIdentifier];
+        updateGroupIdentifier = [self setNewUpdateGroupIdentifierForHost:host];
     }
 
     return updateGroupIdentifier;
 }
 
-+ (NSNumber*)setNewUpdateGroupIdentifier {
++ (NSNumber*)setNewUpdateGroupIdentifierForHost:(SUHost*)host {
     unsigned int r = arc4random_uniform(UINT_MAX);
     NSNumber* updateGroupIdentifier = @(r);
 
-    [[NSUserDefaults standardUserDefaults] setObject:updateGroupIdentifier forKey:SUUpdateGroupIdentifierKey];
+    [host setObject:updateGroupIdentifier forUserDefaultsKey:SUUpdateGroupIdentifierKey];
 
     return updateGroupIdentifier;
 }
