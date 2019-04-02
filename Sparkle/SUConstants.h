@@ -71,6 +71,7 @@ extern NSString *const SUAppcastAttributeEDSignature;
 extern NSString *const SUAppcastAttributeShortVersionString;
 extern NSString *const SUAppcastAttributeVersion;
 extern NSString *const SUAppcastAttributeOsType;
+extern NSString *const SUAppcastAttributePhasedRolloutInterval;
 
 extern NSString *const SUAppcastElementCriticalUpdate;
 extern NSString *const SUAppcastElementDeltas;
@@ -78,7 +79,6 @@ extern NSString *const SUAppcastElementMinimumSystemVersion;
 extern NSString *const SUAppcastElementMaximumSystemVersion;
 extern NSString *const SUAppcastElementReleaseNotesLink;
 extern NSString *const SUAppcastElementTags;
-extern NSString *const SUAppcastElementPhasedRolloutInterval;
 
 extern NSString *const SURSSAttributeURL;
 extern NSString *const SURSSAttributeLength;

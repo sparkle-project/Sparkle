@@ -189,7 +189,10 @@
             self.displayVersionString = self.versionString;
         }
 
-        self.phasedRolloutInterval = [enclosure objectForKey:SUAppcastElementPhasedRolloutInterval];
+        NSString* enclosureRolloutIntervalString = [enclosure objectForKey:SUAppcastAttributePhasedRolloutInterval];
+        if(enclosureRolloutIntervalString) {
+            self.phasedRolloutInterval = @(enclosureRolloutIntervalString.integerValue);
+        }
 
         // Find the appropriate release notes URL.
         NSString *releaseNotesString = [dict objectForKey:SUAppcastElementReleaseNotesLink];
