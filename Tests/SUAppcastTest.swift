@@ -32,6 +32,7 @@ class SUAppcastTest: XCTestCase {
             XCTAssertNil(items[1].itemDescription);
             XCTAssertNil(items[1].dateString)
             XCTAssertFalse(items[1].isCriticalUpdate);
+            XCTAssertEqual(items[1].phasedRolloutInterval, 86400);
             
             XCTAssertEqual("Version 4.0", items[2].title);
             XCTAssertNil(items[2].itemDescription);

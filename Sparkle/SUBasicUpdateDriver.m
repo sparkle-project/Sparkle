@@ -22,6 +22,7 @@
 #import "SUUpdateValidator.h"
 #import "SULocalizations.h"
 #import "SUErrors.h"
+#import "SUUpdater.h"
 #import "SUAppcast.h"
 #import "SUAppcastItem.h"
 
@@ -96,19 +97,25 @@
     return comparator;
 }
 
-- (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem
+// This method is only used for testing
++ (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem *_Nullable __autoreleasing *_Nullable)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator {
+    SUBasicUpdateDriver* basicUpdateDriver = [[SUBasicUpdateDriver alloc] initWithUpdater:(id<SUUpdaterPrivate>)[SUUpdater sharedUpdater]];
+    return [basicUpdateDriver bestItemFromAppcastItems:appcastItems getDeltaItem:deltaItem withHostVersion:hostVersion comparator:comparator];
+}
+
+- (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator
 {
     SUAppcastItem *item = nil;
     for(SUAppcastItem *candidate in appcastItems) {
         if ([self hostSupportsItem:candidate]) {
-            if (!item || [[self versionComparator] compareVersion:item.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
+            if (!item || [comparator compareVersion:item.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
                 item = candidate;
             }
         }
     }
 
     if (item && deltaItem) {
-        SUAppcastItem *deltaUpdateItem = [[item deltaUpdates] objectForKey:self.host.version];
+        SUAppcastItem *deltaUpdateItem = [[item deltaUpdates] objectForKey:hostVersion];
         if (deltaUpdateItem && [self hostSupportsItem:deltaUpdateItem]) {
             *deltaItem = deltaUpdateItem;
         }
@@ -186,7 +193,7 @@
     {
         // Find the best supported update
         SUAppcastItem *deltaUpdateItem = nil;
-        item = [self bestItemFromAppcastItems:ac.items getDeltaItem:&deltaUpdateItem];
+        item = [self bestItemFromAppcastItems:ac.items getDeltaItem:&deltaUpdateItem withHostVersion:self.host.version comparator:[self versionComparator]];
 
         if (item && deltaUpdateItem) {
             self.nonDeltaUpdateItem = item;
