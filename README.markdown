@@ -13,17 +13,8 @@ Secure and reliable software update framework for Cocoa developers.
 * Supports bundles, preference panes, plugins, and other non-.app software. Can install .pkg files for more complicated products.
 * Handles permissions, quarantine and automatically asks for authentication if needed.
 * Uses RSS-based appcasts for release information. Appcasts are a de-facto standard supported by 3rd party update-tracking programs and websites.
-* Sparkle stays hidden until second launch for better first impressions.
+* Stays hidden until second launch for better first impressions.
 * Truly self-updating — the user can choose to automatically download and install all updates in the background.
-
-## Changes since 1.5b
-
-* Compatibility with macOS Sierra (and all newer versions).
-* Up-to-date with 10.14 SDK and Xcode 10 (supports macOS 10.7+).
-* Important security fixes and more secure signature algorithm.
-* Cleaned up and modernized code, using ARC and Autolayout.
-* Truly automatic background updates (no UI at all) when user agreed to "Automatically download and install updates in the future."
-* Upgraded and more reliable binary delta and code signing verification.
 * Ability to mark updates as critical.
 * Progress and status notifications for the host app.
 
@@ -39,6 +30,10 @@ Secure and reliable software update framework for Cocoa developers.
 See [getting started guide](https://sparkle-project.org/documentation/). No code is necessary, but a bit of Xcode configuration is required.
 
 ## Development
+
+This repository uses git submodules, and will not build unless you clone recursively. Also, GitHub-provided ZIP/tar archives are broken due to GitHub not supporting git submodules properly.
+
+    git clone --recursive https://github.com/sparkle-project/Sparkle
 
 ### Troubleshooting
 
