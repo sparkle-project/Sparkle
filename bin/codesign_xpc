@@ -10,7 +10,7 @@ def sanitize(argument):
     return ('"' + argument + '"' if ' ' in argument else argument)
 
 def _codesign_service(identity, path, entitlements_path=None):
-    command = ["codesign", "-fs", identity, path] + ([] if entitlements_path is None else ["--entitlements", entitlements_path])
+    command = ["codesign", "-o", "runtime", "-fs", identity, path] + ([] if entitlements_path is None else ["--entitlements", entitlements_path])
     log_message(" ".join(map(sanitize, command)))
 
     process = subprocess.Popen(command, stdout=subprocess.PIPE)
