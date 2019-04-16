@@ -10,7 +10,7 @@
 #import "SULog.h"
 #import "SPUMessageTypes.h"
 #import "SPUXPCServiceInfo.h"
-#import "SPUUpdaterDelegate.h"
+#import <Sparkle/SPUUpdaterDelegate.h>
 #import "SUAppcastItem.h"
 #import "SULog.h"
 #import "SULocalizations.h"
