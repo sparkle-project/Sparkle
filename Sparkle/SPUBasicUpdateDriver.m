@@ -8,7 +8,7 @@
 
 #import "SPUBasicUpdateDriver.h"
 #import "SUAppcastDriver.h"
-#import "SPUUpdaterDelegate.h"
+#import <Sparkle/SPUUpdaterDelegate.h>
 #import <Sparkle/SUErrors.h>
 #import "SULog.h"
 #import "SULocalizations.h"

@@ -10,7 +10,7 @@
 #import "SPUDownloaderDelegate.h"
 #import "SPUDownloader.h"
 #import "SPUXPCServiceInfo.h"
-#import "SUAppcastItem.h"
+#import <Sparkle/SUAppcastItem.h>
 #import "SUFileManager.h"
 #import "SULocalizations.h"
 #import "SUHost.h"
