@@ -2,6 +2,8 @@
 
 "%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "无法更新 %1$@，因为它运行于一个只读宗卷如磁盘映像或光盘。移动 %1$@ 到应用程序文件夹并再试一次。";
 
+"Quit %1$@, move it into your Applications folder, relaunch it from there and try again. %2$@ can’t be updated if it’s running from the location it was downloaded to." = "退出 %1$@，将其移至“应用程序”，并在那里重新启动，然后再试。如果在下载位置运行此程序，则无法对 %2$@ 进行更新。";
+
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ 是当前的最新版本。";
 
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ 可供下载，您现在的版本是 %3$@。要现在下载吗？";

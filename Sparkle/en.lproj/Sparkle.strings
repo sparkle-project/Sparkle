@@ -4,6 +4,8 @@
 
 "%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again.";
 
+"Quit %1$@, move it into your Applications folder, relaunch it from there and try again. %2$@ can’t be updated if it’s running from the location it was downloaded to." = "Quit %1$@, move it into your Applications folder, relaunch it from there and try again. %2$@ can’t be updated if it’s running from the location it was downloaded to.";
+
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ is currently the newest version available.";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
