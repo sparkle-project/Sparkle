@@ -110,6 +110,13 @@
     return (statfs_info.f_flags & MNT_RDONLY) != 0;
 }
 
+- (BOOL)isRunningTranslocated
+{
+    NSString *path = [self.bundle bundlePath];
+    return [path rangeOfString:@"/AppTranslocation/"].location != NSNotFound;
+}
+
+
 - (NSString *__nullable)publicEDKey
 {
     return [self objectForInfoDictionaryKey:SUPublicEDKeyKey];

@@ -4,6 +4,8 @@
 
 "%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@ ne peut pas être mis à jour quand il fonctionne à partir d’un volume en lecture seule, comme une image disque ou un lecteur optique. Déplacez %1$@ dans votre dossier Applications, relancez-le à partir de là et réessayez.";
 
+"Quit %1$@, move it into your Applications folder, relaunch it from there and try again. %2$@ can’t be updated if it’s running from the location it was downloaded to." = "Quittez %1$@ et déplacez-le dans le dossier Applications, relancez-le à partir de ce dossier et essayez à nouveau. %2$@ ne peut pas être mis à jour s'il est exécuté depuis le dossier dans lequel il a été téléchargé.";
+
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ est la version la plus récente disponible.";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */

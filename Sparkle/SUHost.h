@@ -21,6 +21,7 @@
 @property (readonly) SUPublicKeys *publicKeys;
 
 @property (getter=isRunningOnReadOnlyVolume, readonly) BOOL runningOnReadOnlyVolume;
+@property (getter=isRunningTranslocated, readonly) BOOL runningTranslocated;
 @property (readonly, nonatomic, copy) NSString *publicDSAKeyFileKey;
 
 - (id)objectForInfoDictionaryKey:(NSString *)key;
