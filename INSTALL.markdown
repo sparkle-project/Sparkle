@@ -2,9 +2,15 @@
 
 If release products have not already been built, they can be built by:
 
-> make release
+```
+cd <path-to>/Sparkle/
 
-Or build the "Distribution" scheme from within the Xcode project.
+make release
+```
+
+Upon success, a Finder window will open revealing an archive containing the newly-built Sparkle binaries. Expand the archive (e.g., to the Desktop).
+
+Alternatively, you can build the "Distribution" scheme from within the Xcode project.
 
 Debug builds of Sparkle can also be built from Xcode. Note that debug builds change Sparkle's default behavior to ease development. Never use a debug build of Sparkle for distribution.
 
@@ -12,7 +18,7 @@ Debug builds of Sparkle can also be built from Xcode. Note that debug builds cha
 
 To install Sparkle, drag Sparkle.framework into your project as you would any other framework. Make sure you have a build phase to copy the framework into your application's Frameworks directory at build time.
 
-# XPC Services
+# XPC Services and Embedded Applications
 
 If your application is sandboxed, you will need to embed one or more of Sparkle's XPC services into your application. These are used to perform privileged operations that your sandboxed app, and the rest of the Sparkle framework, are not authorized to perform. Even if you are not strictly required to use a particular XPC service, there may still be some merit to separating privileges.
 
@@ -28,13 +34,25 @@ If you want to code sign Sparkle's installer tools (Autoupdate and Updater.app),
 
 If you code sign your application, these XPC services also need to be signed by you with the attached entitlements. Included is a script to automate this.
 
-Here is an example of invoking the script with the default Developer ID identity:
+Here is an example of invoking the script with a Developer ID identity (replace `XXX` appropriately):
 
-> ./bin/codesign_xpc "Developer ID Application" XPCServices/*.xpc
+```
+./bin/codesign_embedded_executable "Developer ID Application: XXX" XPCServices/*.xpc
 
-After signing the services, drag them into your project and set up a build phase to embed the XPC Services into your application.
+./bin/codesign_embedded_executable "Developer ID Application: XXX" ./Sparkle.framework/Versions/A/Resources/Autoupdate
 
-Then test if your application works :).
+./bin/codesign_embedded_executable "Developer ID Application: XXX" ./Sparkle.framework/Versions/A/Resources/Updater.app/
+```
+
+After signing the executables, add them to the appropriate copy phases and link settings in the app target. Check the "Code Sign on Copy" option for the FW phase (it's not offered for the XPC copy phase).
+
+Note that the `codesign_embedded_executable` script uses the hardened runtime option, so your app can be notarized ([required](https://developer.apple.com/documentation/security/notarizing_your_app_before_distribution?language=objc) for macOS 10.14.5 and higher).
+
+# Testing
+
+If you're not using the sandboxed version, you can just lower the `CURRENT_PROJECT_VERSION` in your app target below the latest version in your appcast, build & run from Xcode, and hit the Check for Updates… UI element.
+
+For the sandboxed version, testing with a debug build running from Xcode doesn't work—the "Extracting Update" phase either hangs or fails. You'll have to do an Archive build and export a Developer ID-signed or notarized app.
 
 # Known Issues
 
