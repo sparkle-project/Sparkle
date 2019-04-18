@@ -14,6 +14,8 @@
 
 #include "AppKitPrevention.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 // This class should not rely on AppKit and should also be process independent
 // For example, it should not have code that tests writabilty to somewhere on disk,
 // as that may depend on the privileges of the process owner. Or code that depends on
@@ -24,9 +26,9 @@
 
 @property (strong, readwrite) NSBundle *bundle;
 @property (nonatomic, readonly) BOOL isMainBundle;
-@property (copy) NSString *defaultsDomain;
+@property (copy, nullable) NSString *defaultsDomain;
 @property (assign) BOOL usesStandardUserDefaults;
-@property (readonly, copy) NSString *publicDSAKey;
+@property (readonly, copy, nullable) NSString *publicDSAKey;
 
 @end
 
@@ -69,7 +71,7 @@
     return [self.bundle bundlePath];
 }
 
-- (NSString *__nonnull)name
+- (NSString *)name
 {
     NSString *name;
 
@@ -86,7 +88,7 @@
     return [[[NSFileManager defaultManager] displayNameAtPath:[self bundlePath]] stringByDeletingPathExtension];
 }
 
-- (NSString *__nonnull)version
+- (NSString *)version
 {
     NSString *version = [self objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     if (!version || [version isEqualToString:@""])
@@ -94,7 +96,7 @@
     return version;
 }
 
-- (NSString *__nonnull)displayVersion
+- (NSString *)displayVersion
 {
     NSString *shortVersionString = [self objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     if (shortVersionString)
@@ -158,7 +160,7 @@
     return [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];
 }
 
-- (id)objectForInfoDictionaryKey:(NSString *)key
+- (nullable id)objectForInfoDictionaryKey:(NSString *)key
 {
     if (self.isMainBundle) {
         // Common fast path - if we're updating the main bundle, that means our updater and host bundle's lifetime is the same
@@ -182,7 +184,7 @@
     return [(NSNumber *)[self objectForInfoDictionaryKey:key] boolValue];
 }
 
-- (id)objectForUserDefaultsKey:(NSString *)defaultName
+- (nullable id)objectForUserDefaultsKey:(NSString *)defaultName
 {
     if (!defaultName || !self.defaultsDomain) {
         return nil;
@@ -200,7 +202,7 @@
 }
 
 // Note this handles nil being passed for defaultName, in which case the user default will be removed
-- (void)setObject:(id)value forUserDefaultsKey:(NSString *)defaultName
+- (void)setObject:(nullable id)value forUserDefaultsKey:(NSString *)defaultName
 {
 	if (self.usesStandardUserDefaults)
 	{
@@ -245,7 +247,7 @@
     }
 }
 
-- (id)objectForKey:(NSString *)key {
+- (nullable id)objectForKey:(NSString *)key {
     return [self objectForUserDefaultsKey:key] ? [self objectForUserDefaultsKey:key] : [self objectForInfoDictionaryKey:key];
 }
 
@@ -254,3 +256,5 @@
 }
 
 @end
+
+NS_ASSUME_NONNULL_END
