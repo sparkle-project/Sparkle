@@ -105,6 +105,18 @@ NS_ASSUME_NONNULL_BEGIN
         return [self version]; // Fall back on the normal version string.
 }
 
+- (nullable NSString *)updaterCustomIconPath
+{
+    NSString *configurationPath = [self.bundle objectForInfoDictionaryKey:SUUpdaterCustomIconKey];
+    NSString *iconPath = [self.bundle pathForResource:configurationPath ofType:@"icns"];
+
+    if (!iconPath) {
+        iconPath = [self.bundle pathForResource:configurationPath ofType:nil];
+    }
+    
+    return iconPath;
+}
+
 - (BOOL)isRunningOnReadOnlyVolume
 {
     struct statfs statfs_info;

@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, copy) NSString *name;
 @property (readonly, copy) NSString *version;
 @property (readonly, copy) NSString *displayVersion;
+@property (readonly, copy, nullable) NSString *updaterCustomIconPath;
 @property (readonly) SUPublicKeys *publicKeys;
 
 @property (getter=isRunningOnReadOnlyVolume, readonly) BOOL runningOnReadOnlyVolume;

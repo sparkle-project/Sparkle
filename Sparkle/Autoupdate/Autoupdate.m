@@ -244,6 +244,19 @@ int main(int __unused argc, const char __unused *argv[])
             [application activateIgnoringOtherApps:YES];
         }
         
+        NSBundle *theBundle = [NSBundle bundleWithPath:[args objectAtIndex:1]];
+        SUHost *host = [[SUHost alloc] initWithBundle:theBundle];
+        NSString *customIconPath = host.updaterCustomIconPath;
+        
+        if (customIconPath) {
+            NSImage *customIcon = [[NSImage alloc] initWithContentsOfFile:customIconPath];
+            
+            if (customIcon) {
+                [[NSApplication sharedApplication] setApplicationIconImage:customIcon];
+            }
+        }
+
+        
         AppInstaller *appInstaller = [[AppInstaller alloc] initWithHostPath:[args objectAtIndex:1]
                                                                relaunchPath:[args objectAtIndex:2]
                                                             parentProcessId:[[args objectAtIndex:3] intValue]
