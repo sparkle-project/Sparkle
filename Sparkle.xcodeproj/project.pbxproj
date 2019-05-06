@@ -112,23 +112,23 @@
 		5AAD006A1E0C2DB500AF411E /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
 		5AAD006C1E0C2DBF00AF411E /* libxar.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AAD006B1E0C2DBF00AF411E /* libxar.tbd */; };
 		5AB8F169214D4AE300A1187F /* SUSignatures.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF04876214D2E5F00B5789F /* SUSignatures.m */; };
-		5AB8F180214D564C00A1187F /* sc.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F16F214D564A00A1187F /* sc.c */; };
+		5AB8F180214D564C00A1187F /* sc.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F16F214D564A00A1187F /* sc.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
 		5AB8F181214D564C00A1187F /* sha512.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F170214D564A00A1187F /* sha512.h */; };
-		5AB8F182214D564C00A1187F /* add_scalar.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F171214D564A00A1187F /* add_scalar.c */; };
-		5AB8F183214D564C00A1187F /* sha512.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F172214D564B00A1187F /* sha512.c */; };
+		5AB8F182214D564C00A1187F /* add_scalar.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F171214D564A00A1187F /* add_scalar.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
+		5AB8F183214D564C00A1187F /* sha512.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F172214D564B00A1187F /* sha512.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
 		5AB8F184214D564C00A1187F /* fe.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F173214D564B00A1187F /* fe.h */; };
 		5AB8F185214D564C00A1187F /* ed25519.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F174214D564B00A1187F /* ed25519.h */; };
-		5AB8F186214D564C00A1187F /* ge.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F175214D564B00A1187F /* ge.c */; };
+		5AB8F186214D564C00A1187F /* ge.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F175214D564B00A1187F /* ge.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
 		5AB8F187214D564C00A1187F /* precomp_data.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F176214D564B00A1187F /* precomp_data.h */; };
-		5AB8F188214D564C00A1187F /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F177214D564B00A1187F /* verify.c */; };
-		5AB8F189214D564C00A1187F /* key_exchange.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F178214D564B00A1187F /* key_exchange.c */; };
+		5AB8F188214D564C00A1187F /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F177214D564B00A1187F /* verify.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
+		5AB8F189214D564C00A1187F /* key_exchange.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F178214D564B00A1187F /* key_exchange.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
 		5AB8F18A214D564C00A1187F /* fixedint.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F179214D564B00A1187F /* fixedint.h */; };
 		5AB8F18B214D564C00A1187F /* ge.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F17A214D564B00A1187F /* ge.h */; };
-		5AB8F18C214D564C00A1187F /* seed.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17B214D564B00A1187F /* seed.c */; };
-		5AB8F18D214D564C00A1187F /* fe.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17C214D564B00A1187F /* fe.c */; };
-		5AB8F18E214D564C00A1187F /* sign.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17D214D564B00A1187F /* sign.c */; };
+		5AB8F18C214D564C00A1187F /* seed.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17B214D564B00A1187F /* seed.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
+		5AB8F18D214D564C00A1187F /* fe.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17C214D564B00A1187F /* fe.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
+		5AB8F18E214D564C00A1187F /* sign.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17D214D564B00A1187F /* sign.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
 		5AB8F18F214D564C00A1187F /* sc.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F17E214D564B00A1187F /* sc.h */; };
-		5AB8F190214D564C00A1187F /* keypair.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17F214D564C00A1187F /* keypair.c */; };
+		5AB8F190214D564C00A1187F /* keypair.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17F214D564C00A1187F /* keypair.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
 		5AB8F191214DA5FD00A1187F /* add_scalar.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F171214D564A00A1187F /* add_scalar.c */; };
 		5AB8F192214DA5FD00A1187F /* fe.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17C214D564B00A1187F /* fe.c */; };
 		5AB8F193214DA5FD00A1187F /* ge.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F175214D564B00A1187F /* ge.c */; };
@@ -190,16 +190,16 @@
 		5D1AF59A0FD767E50065DB48 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5990FD767E50065DB48 /* libz.dylib */; };
 		5D1AF82B0FD768180065DB48 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5990FD767E50065DB48 /* libz.dylib */; };
 		5F1510A21C96E591006E1629 /* testnamespaces.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5F1510A11C96E591006E1629 /* testnamespaces.xml */; };
-		5FD37C9D216B3E5A0003A1B6 /* add_scalar.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F171214D564A00A1187F /* add_scalar.c */; };
-		5FD37C9E216B3E5A0003A1B6 /* fe.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17C214D564B00A1187F /* fe.c */; };
-		5FD37C9F216B3E5A0003A1B6 /* ge.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F175214D564B00A1187F /* ge.c */; };
-		5FD37CA0216B3E5A0003A1B6 /* key_exchange.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F178214D564B00A1187F /* key_exchange.c */; };
-		5FD37CA1216B3E5A0003A1B6 /* keypair.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17F214D564C00A1187F /* keypair.c */; };
-		5FD37CA2216B3E5A0003A1B6 /* sc.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F16F214D564A00A1187F /* sc.c */; };
-		5FD37CA3216B3E5A0003A1B6 /* seed.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17B214D564B00A1187F /* seed.c */; };
-		5FD37CA4216B3E5A0003A1B6 /* sha512.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F172214D564B00A1187F /* sha512.c */; };
-		5FD37CA5216B3E5A0003A1B6 /* sign.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17D214D564B00A1187F /* sign.c */; };
-		5FD37CA6216B3E5A0003A1B6 /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F177214D564B00A1187F /* verify.c */; };
+		5FD37C9D216B3E5A0003A1B6 /* add_scalar.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F171214D564A00A1187F /* add_scalar.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
+		5FD37C9E216B3E5A0003A1B6 /* fe.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17C214D564B00A1187F /* fe.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
+		5FD37C9F216B3E5A0003A1B6 /* ge.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F175214D564B00A1187F /* ge.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
+		5FD37CA0216B3E5A0003A1B6 /* key_exchange.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F178214D564B00A1187F /* key_exchange.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
+		5FD37CA1216B3E5A0003A1B6 /* keypair.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17F214D564C00A1187F /* keypair.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
+		5FD37CA2216B3E5A0003A1B6 /* sc.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F16F214D564A00A1187F /* sc.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
+		5FD37CA3216B3E5A0003A1B6 /* seed.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17B214D564B00A1187F /* seed.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
+		5FD37CA4216B3E5A0003A1B6 /* sha512.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F172214D564B00A1187F /* sha512.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
+		5FD37CA5216B3E5A0003A1B6 /* sign.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17D214D564B00A1187F /* sign.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
+		5FD37CA6216B3E5A0003A1B6 /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F177214D564B00A1187F /* verify.c */; settings = {COMPILER_FLAGS = "-Wno-sign-conversion -Wno-conversion -Wno-cast-qual"; }; };
 		610134730DD250470049ACDF /* SUUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 610134710DD250470049ACDF /* SUUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
 		610134740DD250470049ACDF /* SUUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 610134720DD250470049ACDF /* SUUpdateDriver.m */; };
 		6101347B0DD2541A0049ACDF /* SUProbingUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 610134790DD2541A0049ACDF /* SUProbingUpdateDriver.h */; settings = {ATTRIBUTES = (); }; };
@@ -1107,7 +1107,7 @@
 				14732BB51960ECBA00593899 /* Third Party */,
 				1420DE391962322200203BB0 /* Documentation */,
 				FA1941C40D94A6EA00DD942E /* Configurations */,
-				726B2B5E1C645FC900388755 /* UI Tests */,
+				726B2B5E1C645FC900388755 /* UITests */,
 				5AB8F1A0214DA72000A1187F /* generate_keys */,
 				5A5ADED8214EDE4900DF0099 /* sign_update */,
 				0867D69AFE84028FC02AAC07 /* Frameworks */,
@@ -1550,13 +1550,13 @@
 			path = ../../fileop;
 			sourceTree = "<group>";
 		};
-		726B2B5E1C645FC900388755 /* UI Tests */ = {
+		726B2B5E1C645FC900388755 /* UITests */ = {
 			isa = PBXGroup;
 			children = (
 				720B16431C66433D006985FB /* SUTestApplicationTest.swift */,
 				720B16421C66433D006985FB /* UITests-Info.plist */,
 			);
-			path = "UITests";
+			path = UITests;
 			sourceTree = "<group>";
 		};
 		FA1941C40D94A6EA00DD942E /* Configurations */ = {
