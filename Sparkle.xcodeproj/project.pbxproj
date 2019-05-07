@@ -1989,6 +1989,7 @@
 				"pt-PT",
 				"pt-BR",
 				hr,
+				Base,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* Sparkle */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
