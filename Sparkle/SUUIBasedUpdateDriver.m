@@ -149,6 +149,7 @@
 {
     self.updateAlert = nil;
     [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
+    id<SUUpdaterPrivate> updater = self.updater;
     switch (choice) {
         case SUInstallUpdateChoice:
             [self didDismissAlertPermanently:NO forItem:item];
@@ -162,6 +163,7 @@
             break;
 
         case SUSkipThisVersionChoice:
+            [[updater delegate] userDidSkipThisVersion:self.updater];
             [self didDismissAlertPermanently:YES forItem:item];
             [self.host setObject:[self.updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
             [self abortUpdate];
