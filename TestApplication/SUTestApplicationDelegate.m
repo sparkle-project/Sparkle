@@ -10,7 +10,7 @@
 #import "SUUpdateSettingsWindowController.h"
 #import "SUFileManager.h"
 #import "SUTestWebServer.h"
-#import "../ed25519/src/ed25519.h" // run `git submodule update --init` if you get an erorr here
+#import "ed25519.h" // Run `git submodule update --init` if you get an error here
 
 @interface SUTestApplicationDelegate ()
 
