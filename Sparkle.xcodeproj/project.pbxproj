@@ -35,7 +35,6 @@
 		142E0E0919A83AAC00E4312B /* SUBinaryDeltaTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 142E0E0819A83AAC00E4312B /* SUBinaryDeltaTest.m */; };
 		14652F7C19A9725300959E44 /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E20FD68CC7005AE3F6 /* SUBinaryDeltaCommon.m */; };
 		14652F7D19A9726700959E44 /* SUBinaryDeltaApply.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E00FD68CC7005AE3F6 /* SUBinaryDeltaApply.m */; };
-		14652F7E19A9728A00959E44 /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; };
 		14652F8019A9740F00959E44 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
 		14652F8219A9746000959E44 /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
 		14652F8419A978C200959E44 /* SUExport.h in Headers */ = {isa = PBXBuildFile; fileRef = 14652F8319A9759F00959E44 /* SUExport.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -97,9 +96,6 @@
 		5AAD00521E0BE6BE00AF411E /* ArchiveItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AAD00511E0BE6BE00AF411E /* ArchiveItem.swift */; };
 		5AAD00661E0C2D9B00AF411E /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E20FD68CC7005AE3F6 /* SUBinaryDeltaCommon.m */; };
 		5AAD00671E0C2D9B00AF411E /* SUBinaryDeltaCreate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7268AC621AD634C200C3E0C1 /* SUBinaryDeltaCreate.m */; };
-		5AAD00681E0C2DAB00AF411E /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 723B252B1CEAB3A600909873 /* bscommon.c */; };
-		5AAD00691E0C2DAB00AF411E /* bsdiff.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */; };
-		5AAD006A1E0C2DB500AF411E /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
 		5AAD006C1E0C2DBF00AF411E /* libxar.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AAD006B1E0C2DBF00AF411E /* libxar.tbd */; };
 		5AB8F169214D4AE300A1187F /* SUSignatures.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF04876214D2E5F00B5789F /* SUSignatures.m */; };
 		5AB8F181214D564C00A1187F /* sha512.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F170214D564A00A1187F /* sha512.h */; };
@@ -124,7 +120,6 @@
 		5AE13FB81E0D9F8E000D2C2C /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
 		5AE13FB91E0DA384000D2C2C /* SUBinaryDeltaUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E9380FD69271005AE3F6 /* SUBinaryDeltaUnarchiver.m */; };
 		5AE13FBA1E0DA389000D2C2C /* SUBinaryDeltaApply.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E00FD68CC7005AE3F6 /* SUBinaryDeltaApply.m */; };
-		5AE13FBB1E0DA391000D2C2C /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; };
 		5AE13FBD1E0DA39B000D2C2C /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AE13FBC1E0DA39B000D2C2C /* libbz2.tbd */; };
 		5AE459001C34118500E3BB47 /* SUUpdaterTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 14950074195FDF5900BC5B5B /* SUUpdaterTest.m */; };
 		5AE459021C34118500E3BB47 /* SUVersionComparisonTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 61227A150DB548B800AB99EA /* SUVersionComparisonTest.m */; };
@@ -134,9 +129,7 @@
 		5AF6C74F1AEA46D10014A3AB /* test.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 5AF6C74E1AEA46D10014A3AB /* test.pkg */; };
 		5AF6C7541AEA49840014A3AB /* SUInstallerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF6C74C1AEA40760014A3AB /* SUInstallerTest.m */; };
 		5AF9DC3C1981DBEE001EA135 /* SUDSAVerifierTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF9DC3B1981DBEE001EA135 /* SUDSAVerifierTest.m */; };
-		5D06E8E90FD68CDB005AE3F6 /* bsdiff.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */; };
 		5D06E8EA0FD68CDB005AE3F6 /* SUBinaryDeltaTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E30FD68CC7005AE3F6 /* SUBinaryDeltaTool.m */; };
-		5D06E8EB0FD68CE4005AE3F6 /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; };
 		5D06E8EC0FD68CE4005AE3F6 /* SUBinaryDeltaApply.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E00FD68CC7005AE3F6 /* SUBinaryDeltaApply.m */; };
 		5D06E8ED0FD68CE4005AE3F6 /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E20FD68CC7005AE3F6 /* SUBinaryDeltaCommon.m */; };
 		5D06E8FD0FD68D6B005AE3F6 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */; };
@@ -222,12 +215,8 @@
 		720B16451C66433D006985FB /* SUTestApplicationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720B16431C66433D006985FB /* SUTestApplicationTest.swift */; };
 		7210C7681B9A9A1500EB90AC /* SUUnarchiverTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7210C7671B9A9A1500EB90AC /* SUUnarchiverTest.swift */; };
 		721BC2111D1DFF05002BC71E /* SUFileOperationConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 722954C31D04E66F00ECF9CA /* SUFileOperationConstants.m */; };
-		721CF1A71AD7643600D9AC09 /* bsdiff.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */; };
-		721CF1A81AD7644100D9AC09 /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; };
-		721CF1A91AD7644C00D9AC09 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
 		721CF1AA1AD7647000D9AC09 /* libxar.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5890FD7678C0065DB48 /* libxar.1.dylib */; };
 		721CF1AB1AD764EB00D9AC09 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */; };
-		7223E7631AD1AEFF008E3161 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
 		722589D71E0AD86B005EA0B9 /* SUUnarchiverProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 722589D61E0AD86B005EA0B9 /* SUUnarchiverProtocol.h */; };
 		722589DA1E0B19F4005EA0B9 /* SUUnarchiverNotifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 722589D81E0B19F4005EA0B9 /* SUUnarchiverNotifier.h */; };
 		722589DB1E0B19F4005EA0B9 /* SUUnarchiverNotifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 722589D91E0B19F4005EA0B9 /* SUUnarchiverNotifier.m */; };
@@ -254,9 +243,6 @@
 		72316BE41E0E1C7F0039EFD9 /* SUSystemUpdateInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 72316BE21E0E1C7F0039EFD9 /* SUSystemUpdateInfo.m */; };
 		72316BE61E1087060039EFD9 /* SUUpdaterDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 72316BE51E1087060039EFD9 /* SUUpdaterDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		723A920E1D722438004A9DED /* SUSpotlightImporterTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 723A920D1D722438004A9DED /* SUSpotlightImporterTest.swift */; };
-		723B252D1CEAB3A600909873 /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 723B252B1CEAB3A600909873 /* bscommon.c */; };
-		723B252E1CEAB3A600909873 /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 723B252B1CEAB3A600909873 /* bscommon.c */; };
-		723B252F1CEAB3A600909873 /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 723B252B1CEAB3A600909873 /* bscommon.c */; };
 		723B25301CEAB3A600909873 /* bscommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 723B252C1CEAB3A600909873 /* bscommon.h */; };
 		72464F7D1E213ED400FB341C /* SUOperatingSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 726F2CE41BC9C33D001971A4 /* SUOperatingSystem.m */; };
 		72544FFC1D0991A4000CFB2C /* SUFileOperationConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 722954C31D04E66F00ECF9CA /* SUFileOperationConstants.m */; };
@@ -323,6 +309,20 @@
 		EA4311E3229D641400A5503D /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311A0229D5FBC00A5503D /* libed25519.a */; };
 		EA4311E4229D643300A5503D /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311A0229D5FBC00A5503D /* libed25519.a */; };
 		EA4311E5229D644700A5503D /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311A0229D5FBC00A5503D /* libed25519.a */; };
+		EA4311EF229D651F00A5503D /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 723B252B1CEAB3A600909873 /* bscommon.c */; };
+		EA4311F0229D651F00A5503D /* bscommon.h in Sources */ = {isa = PBXBuildFile; fileRef = 723B252C1CEAB3A600909873 /* bscommon.h */; };
+		EA4311F1229D651F00A5503D /* bsdiff.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */; };
+		EA4311F2229D651F00A5503D /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; };
+		EA4311F3229D651F00A5503D /* bspatch.h in Sources */ = {isa = PBXBuildFile; fileRef = 611142E810FB1BE5009810AA /* bspatch.h */; };
+		EA4311F4229D651F00A5503D /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
+		EA4311F5229D651F00A5503D /* sais.h in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7621AD1AEFF008E3161 /* sais.h */; };
+		EA4311F6229D652700A5503D /* bscommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 723B252C1CEAB3A600909873 /* bscommon.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EA4311F7229D652700A5503D /* bspatch.h in Headers */ = {isa = PBXBuildFile; fileRef = 611142E810FB1BE5009810AA /* bspatch.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EA4311F8229D652700A5503D /* sais.h in Headers */ = {isa = PBXBuildFile; fileRef = 7223E7621AD1AEFF008E3161 /* sais.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		EA4311FC229D65E400A5503D /* libbsdiff.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311EA229D651300A5503D /* libbsdiff.a */; };
+		EA4311FD229D65FC00A5503D /* libbsdiff.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311EA229D651300A5503D /* libbsdiff.a */; };
+		EA4311FE229D660B00A5503D /* libbsdiff.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311EA229D651300A5503D /* libbsdiff.a */; };
+		EA4311FF229D662600A5503D /* libbsdiff.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311EA229D651300A5503D /* libbsdiff.a */; };
 		F8761EB11ADC5068000C9034 /* SUCodeSigningVerifierTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */; };
 		F8761EB31ADC50EB000C9034 /* SparkleTestCodeSignApp.zip in Resources */ = {isa = PBXBuildFile; fileRef = F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */; };
 		F8761EB61ADC5E7A000C9034 /* SUCodeSigningVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 61B078CD15A5FB6100600039 /* SUCodeSigningVerifier.m */; };
@@ -935,6 +935,10 @@
 		EA4311C7229D612A00A5503D /* ed25519-Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "ed25519-Shared.xcconfig"; sourceTree = "<group>"; };
 		EA4311C8229D613B00A5503D /* ed25519-Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "ed25519-Release.xcconfig"; sourceTree = "<group>"; };
 		EA4311C9229D614300A5503D /* ed25519-Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "ed25519-Debug.xcconfig"; sourceTree = "<group>"; };
+		EA4311EA229D651300A5503D /* libbsdiff.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libbsdiff.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA4311F9229D655E00A5503D /* bsdiff-Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "bsdiff-Shared.xcconfig"; sourceTree = "<group>"; };
+		EA4311FA229D656700A5503D /* bsdiff-Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "bsdiff-Debug.xcconfig"; sourceTree = "<group>"; };
+		EA4311FB229D657A00A5503D /* bsdiff-Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "bsdiff-Release.xcconfig"; sourceTree = "<group>"; };
 		F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUCodeSigningVerifierTest.m; sourceTree = "<group>"; };
 		F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = SparkleTestCodeSignApp.zip; sourceTree = "<group>"; };
 		FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkDebug.xcconfig; sourceTree = "<group>"; };
@@ -979,6 +983,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA4311FC229D65E400A5503D /* libbsdiff.a in Frameworks */,
 				EA4311BD229D5FF000A5503D /* libed25519.a in Frameworks */,
 				5AE13FBD1E0DA39B000D2C2C /* libbz2.tbd in Frameworks */,
 				5AAD006C1E0C2DBF00AF411E /* libxar.tbd in Frameworks */,
@@ -997,6 +1002,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA4311FD229D65FC00A5503D /* libbsdiff.a in Frameworks */,
 				5D06E9050FD68D7D005AE3F6 /* Foundation.framework in Frameworks */,
 				5D06E8FF0FD68D6D005AE3F6 /* libbz2.dylib in Frameworks */,
 				5D1AF58B0FD7678C0065DB48 /* libxar.1.dylib in Frameworks */,
@@ -1009,6 +1015,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA4311FE229D660B00A5503D /* libbsdiff.a in Frameworks */,
 				14732BD119610A1200593899 /* AppKit.framework in Frameworks */,
 				14732BD019610A0D00593899 /* Foundation.framework in Frameworks */,
 				721CF1AB1AD764EB00D9AC09 /* libbz2.dylib in Frameworks */,
@@ -1051,6 +1058,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA4311FF229D662600A5503D /* libbsdiff.a in Frameworks */,
 				EA4311E4229D643300A5503D /* libed25519.a in Frameworks */,
 				1495006E195FCE1100BC5B5B /* AppKit.framework in Frameworks */,
 				1495006F195FCE1800BC5B5B /* Foundation.framework in Frameworks */,
@@ -1065,6 +1073,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		EA43119E229D5FBC00A5503D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA4311E8229D651300A5503D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1088,6 +1103,7 @@
 				8DC2EF5B0486A6940098B216 /* Sparkle.framework */,
 				726B2B5D1C645FC900388755 /* UI Tests.xctest */,
 				EA4311A0229D5FBC00A5503D /* libed25519.a */,
+				EA4311EA229D651300A5503D /* libbsdiff.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1559,6 +1575,9 @@
 			isa = PBXGroup;
 			children = (
 				14732BB1195FF6B700593899 /* .clang-format */,
+				EA4311FA229D656700A5503D /* bsdiff-Debug.xcconfig */,
+				EA4311FB229D657A00A5503D /* bsdiff-Release.xcconfig */,
+				EA4311F9229D655E00A5503D /* bsdiff-Shared.xcconfig */,
 				5D06E8F10FD68D21005AE3F6 /* ConfigBinaryDelta.xcconfig */,
 				5D06E8F20FD68D21005AE3F6 /* ConfigBinaryDeltaDebug.xcconfig */,
 				5D06E8F30FD68D21005AE3F6 /* ConfigBinaryDeltaRelease.xcconfig */,
@@ -1690,6 +1709,16 @@
 				EA4311BA229D5FD600A5503D /* precomp_data.h in Headers */,
 				EA4311BB229D5FD600A5503D /* sc.h in Headers */,
 				EA4311BC229D5FD600A5503D /* sha512.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA4311E6229D651300A5503D /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA4311F6229D652700A5503D /* bscommon.h in Headers */,
+				EA4311F7229D652700A5503D /* bspatch.h in Headers */,
+				EA4311F8229D652700A5503D /* sais.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1932,6 +1961,23 @@
 			productReference = EA4311A0229D5FBC00A5503D /* libed25519.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		EA4311E9229D651300A5503D /* bsdiff */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EA4311EB229D651300A5503D /* Build configuration list for PBXNativeTarget "bsdiff" */;
+			buildPhases = (
+				EA4311E6229D651300A5503D /* Headers */,
+				EA4311E7229D651300A5503D /* Sources */,
+				EA4311E8229D651300A5503D /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = bsdiff;
+			productName = bsdiff;
+			productReference = EA4311EA229D651300A5503D /* libbsdiff.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1971,6 +2017,9 @@
 						LastSwiftMigration = 0920;
 					};
 					EA43119F229D5FBC00A5503D = {
+						CreatedOnToolsVersion = 10.2.1;
+					};
+					EA4311E9229D651300A5503D = {
 						CreatedOnToolsVersion = 10.2.1;
 					};
 				};
@@ -2046,6 +2095,7 @@
 				5AA96C541E0AE0DB00CA4346 /* generate_appcast */,
 				5AB8F19E214DA72000A1187F /* generate_keys */,
 				5A5ADED6214EDE4900DF0099 /* sign_update */,
+				EA4311E9229D651300A5503D /* bsdiff */,
 				EA43119F229D5FBC00A5503D /* ed25519 */,
 			);
 		};
@@ -2228,12 +2278,8 @@
 			files = (
 				5AE13FA01E0D4F65000D2C2C /* Appcast.swift in Sources */,
 				5AAD00521E0BE6BE00AF411E /* ArchiveItem.swift in Sources */,
-				5AAD00681E0C2DAB00AF411E /* bscommon.c in Sources */,
-				5AAD00691E0C2DAB00AF411E /* bsdiff.c in Sources */,
-				5AE13FBB1E0DA391000D2C2C /* bspatch.c in Sources */,
 				5A5AC5381E0C6D3000998119 /* FeedXML.swift in Sources */,
 				5AA96C581E0AE0DB00CA4346 /* main.swift in Sources */,
-				5AAD006A1E0C2DB500AF411E /* sais.c in Sources */,
 				5AE13F781E0C9B12000D2C2C /* Signatures.swift in Sources */,
 				5AE13FBA1E0DA389000D2C2C /* SUBinaryDeltaApply.m in Sources */,
 				5AAD00661E0C2D9B00AF411E /* SUBinaryDeltaCommon.m in Sources */,
@@ -2265,10 +2311,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				723B252F1CEAB3A600909873 /* bscommon.c in Sources */,
-				5D06E8E90FD68CDB005AE3F6 /* bsdiff.c in Sources */,
-				14652F7E19A9728A00959E44 /* bspatch.c in Sources */,
-				7223E7631AD1AEFF008E3161 /* sais.c in Sources */,
 				14652F7D19A9726700959E44 /* SUBinaryDeltaApply.m in Sources */,
 				14652F7C19A9725300959E44 /* SUBinaryDeltaCommon.m in Sources */,
 				7268AC631AD634C200C3E0C1 /* SUBinaryDeltaCreate.m in Sources */,
@@ -2284,10 +2326,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				723B252E1CEAB3A600909873 /* bscommon.c in Sources */,
-				721CF1A71AD7643600D9AC09 /* bsdiff.c in Sources */,
-				721CF1A81AD7644100D9AC09 /* bspatch.c in Sources */,
-				721CF1A91AD7644C00D9AC09 /* sais.c in Sources */,
 				342731481FF58E5B00285FBD /* SPUDownloaderTest.swift in Sources */,
 				5A4094481C74EA5200983BE0 /* SUAppcastTest.swift in Sources */,
 				72D4DAA11AD7632900B211E2 /* SUBinaryDeltaCreate.m in Sources */,
@@ -2343,8 +2381,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				723B252D1CEAB3A600909873 /* bscommon.c in Sources */,
-				5D06E8EB0FD68CE4005AE3F6 /* bspatch.c in Sources */,
 				34074B9E1FEABD5A001CB3A5 /* SPUDownloadData.m in Sources */,
 				34074B901FEABD08001CB3A5 /* SPUDownloader.m in Sources */,
 				34074BA81FEAC417001CB3A5 /* SPUDownloaderDeprecated.m in Sources */,
@@ -2417,6 +2453,20 @@
 				EA4311B3229D5FC600A5503D /* sha512.h in Sources */,
 				EA4311B4229D5FC600A5503D /* sign.c in Sources */,
 				EA4311B5229D5FC600A5503D /* verify.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA4311E7229D651300A5503D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA4311EF229D651F00A5503D /* bscommon.c in Sources */,
+				EA4311F0229D651F00A5503D /* bscommon.h in Sources */,
+				EA4311F1229D651F00A5503D /* bsdiff.c in Sources */,
+				EA4311F2229D651F00A5503D /* bspatch.c in Sources */,
+				EA4311F3229D651F00A5503D /* bspatch.h in Sources */,
+				EA4311F4229D651F00A5503D /* sais.c in Sources */,
+				EA4311F5229D651F00A5503D /* sais.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3087,6 +3137,27 @@
 			};
 			name = Release;
 		};
+		EA4311EC229D651300A5503D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA4311FA229D656700A5503D /* bsdiff-Debug.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		EA4311ED229D651300A5503D /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA4311FA229D656700A5503D /* bsdiff-Debug.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		EA4311EE229D651300A5503D /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA4311FB229D657A00A5503D /* bsdiff-Release.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -3236,6 +3307,16 @@
 				EA4311A2229D5FBC00A5503D /* Debug */,
 				EA4311A3229D5FBC00A5503D /* Coverage */,
 				EA4311A4229D5FBC00A5503D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EA4311EB229D651300A5503D /* Build configuration list for PBXNativeTarget "bsdiff" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EA4311EC229D651300A5503D /* Debug */,
+				EA4311ED229D651300A5503D /* Coverage */,
+				EA4311EE229D651300A5503D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
