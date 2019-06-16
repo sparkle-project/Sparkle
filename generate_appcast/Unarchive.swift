@@ -13,7 +13,11 @@ func unarchive(itemPath:URL, archiveDestDir: URL, callback: @escaping (Error?) -
     _ = try? fileManager.createDirectory(at: tempDir, withIntermediateDirectories: true, attributes: [:]);
 
     do {
-        try fileManager.linkItem(at: itemPath, to: itemCopy);
+        do {
+            try fileManager.linkItem(at: itemPath, to: itemCopy);
+        } catch {
+            try fileManager.copyItem(at: itemPath, to: itemCopy);
+        }
         if let unarchiver = SUUnarchiver.unarchiver(forPath: itemCopy.path, updatingHostBundlePath:nil, decryptionPassword:nil) {
             unarchiver.unarchive(completionBlock: { (error: Error?) in
                 if error != nil {
@@ -39,8 +43,7 @@ func unarchive(itemPath:URL, archiveDestDir: URL, callback: @escaping (Error?) -
     }
 }
 
-func unarchiveUpdates(archivesSourceDir: URL, verbose: Bool) throws -> [ArchiveItem] {
-    let archivesDestDir = archivesSourceDir.appendingPathComponent(".tmp");
+func unarchiveUpdates(archivesSourceDir: URL, archivesDestDir: URL, verbose: Bool) throws -> [ArchiveItem] {
     if verbose {
         print("Unarchiving to temp directory", archivesDestDir.path);
     }
