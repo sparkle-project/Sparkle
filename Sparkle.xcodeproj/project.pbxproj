@@ -1547,9 +1547,8 @@
 		0867D691FE84028FC02AAC07 /* Sparkle */ = {
 			isa = PBXGroup;
 			children = (
-				7205C43F1E13049400E370AE /* generate_appcast */,
-				EA1E285F22B66487004AA304 /* generate_keys */,
 				1495006D195FBBBD00BC5B5B /* Sparkle */,
+				EA1E288122B6688A004AA304 /* Command Line Tools */,
 				14732BB81960EEB600593899 /* Resources */,
 				61227A100DB5484000AB99EA /* Tests */,
 				61B5F91D09C4CF7F00B25A18 /* Test Application */,
@@ -1557,8 +1556,6 @@
 				1420DE391962322200203BB0 /* Documentation */,
 				FA1941C40D94A6EA00DD942E /* Configurations */,
 				726B2B5E1C645FC900388755 /* UI Tests */,
-				72D9549F1CBB415C006F28BD /* sparkle-cli */,
-				EA1E287722B666EB004AA304 /* sign_update */,
 				0867D69AFE84028FC02AAC07 /* Frameworks */,
 				034768DFFF38A50411DB9C8B /* Products */,
 			);
@@ -2217,6 +2214,17 @@
 				EA1E287822B666EB004AA304 /* main.swift */,
 			);
 			path = sign_update;
+			sourceTree = "<group>";
+		};
+		EA1E288122B6688A004AA304 /* Command Line Tools */ = {
+			isa = PBXGroup;
+			children = (
+				7205C43F1E13049400E370AE /* generate_appcast */,
+				EA1E285F22B66487004AA304 /* generate_keys */,
+				EA1E287722B666EB004AA304 /* sign_update */,
+				72D9549F1CBB415C006F28BD /* sparkle-cli */,
+			);
+			name = "Command Line Tools";
 			sourceTree = "<group>";
 		};
 		FA1941C40D94A6EA00DD942E /* Configurations */ = {
