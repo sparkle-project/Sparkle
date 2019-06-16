@@ -1414,7 +1414,7 @@
 				14732BB81960EEB600593899 /* Resources */,
 				61227A100DB5484000AB99EA /* Tests */,
 				61B5F91D09C4CF7F00B25A18 /* Test Application */,
-				14732BB51960ECBA00593899 /* Third Party */,
+				14732BB51960ECBA00593899 /* Vendor */,
 				1420DE391962322200203BB0 /* Documentation */,
 				FA1941C40D94A6EA00DD942E /* Configurations */,
 				726B2B5E1C645FC900388755 /* UI Tests */,
@@ -1474,12 +1474,11 @@
 			path = Documentation;
 			sourceTree = "<group>";
 		};
-		14732BB51960ECBA00593899 /* Third Party */ = {
+		14732BB51960ECBA00593899 /* Vendor */ = {
 			isa = PBXGroup;
 			children = (
 				14732BB61960ECE800593899 /* bsdiff */,
 			);
-			name = "Third Party";
 			path = Vendor;
 			sourceTree = "<group>";
 		};
