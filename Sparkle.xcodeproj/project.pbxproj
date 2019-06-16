@@ -449,6 +449,12 @@
 		EA1E285422B66115004AA304 /* sc.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = EA1E284322B660ED004AA304 /* sc.h */; };
 		EA1E285522B66115004AA304 /* ge.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = EA1E284422B660ED004AA304 /* ge.h */; };
 		EA1E285622B6619B004AA304 /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA1E282D22B660BE004AA304 /* libed25519.a */; };
+		EA1E286122B66487004AA304 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1E286022B66487004AA304 /* main.swift */; };
+		EA1E286A22B6653D004AA304 /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA1E282D22B660BE004AA304 /* libed25519.a */; };
+		EA1E286E22B665F0004AA304 /* SUSignatures.h in Headers */ = {isa = PBXBuildFile; fileRef = EA1E286C22B665E8004AA304 /* SUSignatures.h */; };
+		EA1E286F22B6661D004AA304 /* SUSignatures.h in Headers */ = {isa = PBXBuildFile; fileRef = EA1E286C22B665E8004AA304 /* SUSignatures.h */; };
+		EA1E287022B66621004AA304 /* SUSignatures.m in Sources */ = {isa = PBXBuildFile; fileRef = EA1E286D22B665E8004AA304 /* SUSignatures.m */; };
+		EA1E287122B66622004AA304 /* SUSignatures.m in Sources */ = {isa = PBXBuildFile; fileRef = EA1E286D22B665E8004AA304 /* SUSignatures.m */; };
 		F8761EB11ADC5068000C9034 /* SUCodeSigningVerifierTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */; };
 		F8761EB31ADC50EB000C9034 /* SparkleTestCodeSignApp.zip in Resources */ = {isa = PBXBuildFile; fileRef = F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */; };
 /* End PBXBuildFile section */
@@ -803,6 +809,15 @@
 			);
 			name = "Copy Headers";
 			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA1E285C22B66487004AA304 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -1302,6 +1317,14 @@
 		EA1E285722B6622E004AA304 /* ed25519-Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "ed25519-Release.xcconfig"; sourceTree = "<group>"; };
 		EA1E285822B6622E004AA304 /* ed25519-Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "ed25519-Debug.xcconfig"; sourceTree = "<group>"; };
 		EA1E285922B6622E004AA304 /* ed25519-Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "ed25519-Shared.xcconfig"; sourceTree = "<group>"; };
+		EA1E285E22B66487004AA304 /* generate_keys */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = generate_keys; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA1E286022B66487004AA304 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		EA1E286622B664A5004AA304 /* Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
+		EA1E286722B664FD004AA304 /* generate_keys-Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "generate_keys-Release.xcconfig"; sourceTree = "<group>"; };
+		EA1E286822B664FD004AA304 /* generate_keys-Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "generate_keys-Debug.xcconfig"; sourceTree = "<group>"; };
+		EA1E286922B664FD004AA304 /* generate_keys-Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "generate_keys-Shared.xcconfig"; sourceTree = "<group>"; };
+		EA1E286C22B665E8004AA304 /* SUSignatures.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SUSignatures.h; sourceTree = "<group>"; };
+		EA1E286D22B665E8004AA304 /* SUSignatures.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SUSignatures.m; sourceTree = "<group>"; };
 		F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUCodeSigningVerifierTest.m; sourceTree = "<group>"; };
 		F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = SparkleTestCodeSignApp.zip; sourceTree = "<group>"; };
 		FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkDebug.xcconfig; sourceTree = "<group>"; };
@@ -1465,6 +1488,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EA1E285B22B66487004AA304 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA1E286A22B6653D004AA304 /* libed25519.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -1488,6 +1519,7 @@
 				721C24451CB753E6005440CB /* Updater.app */,
 				EA1E280F22B64522004AA304 /* libbsdiff.a */,
 				EA1E282D22B660BE004AA304 /* libed25519.a */,
+				EA1E285E22B66487004AA304 /* generate_keys */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1496,6 +1528,7 @@
 			isa = PBXGroup;
 			children = (
 				7205C43F1E13049400E370AE /* generate_appcast */,
+				EA1E285F22B66487004AA304 /* generate_keys */,
 				1495006D195FBBBD00BC5B5B /* Sparkle */,
 				14732BB81960EEB600593899 /* Resources */,
 				61227A100DB5484000AB99EA /* Tests */,
@@ -1621,6 +1654,7 @@
 				721C24461CB753E6005440CB /* Installer Progress */,
 				729746481C91483B00FC134E /* IPC */,
 				61B5F8F309C4CE5900B25A18 /* Other Sources */,
+				EA1E286B22B665DB004AA304 /* Signatures */,
 				61F83F6E0DBFE07A006FDD30 /* Update Control */,
 				61299B3A09CB056100B7442F /* User Interface */,
 				72F94F551CC43D99002DEE68 /* XPC Services */,
@@ -2137,6 +2171,24 @@
 			path = ed25519/src;
 			sourceTree = "<group>";
 		};
+		EA1E285F22B66487004AA304 /* generate_keys */ = {
+			isa = PBXGroup;
+			children = (
+				EA1E286622B664A5004AA304 /* Bridging-Header.h */,
+				EA1E286022B66487004AA304 /* main.swift */,
+			);
+			path = generate_keys;
+			sourceTree = "<group>";
+		};
+		EA1E286B22B665DB004AA304 /* Signatures */ = {
+			isa = PBXGroup;
+			children = (
+				EA1E286C22B665E8004AA304 /* SUSignatures.h */,
+				EA1E286D22B665E8004AA304 /* SUSignatures.m */,
+			);
+			name = Signatures;
+			sourceTree = "<group>";
+		};
 		FA1941C40D94A6EA00DD942E /* Configurations */ = {
 			isa = PBXGroup;
 			children = (
@@ -2183,6 +2235,9 @@
 				EA1E285822B6622E004AA304 /* ed25519-Debug.xcconfig */,
 				EA1E285722B6622E004AA304 /* ed25519-Release.xcconfig */,
 				EA1E285922B6622E004AA304 /* ed25519-Shared.xcconfig */,
+				EA1E286822B664FD004AA304 /* generate_keys-Debug.xcconfig */,
+				EA1E286722B664FD004AA304 /* generate_keys-Release.xcconfig */,
+				EA1E286922B664FD004AA304 /* generate_keys-Shared.xcconfig */,
 				14732BC91960F70A00593899 /* make-release-package.sh */,
 				721D8A831D498F1D0032E472 /* set-agent-signing.sh */,
 				729BB3CE1D50344A007C4276 /* set-ats-exceptions-downloader-service.sh */,
@@ -2205,6 +2260,7 @@
 				72A5D5EB1D692BD40009E5AC /* SPUDownloadData.h in Headers */,
 				72A5D5F91D692F4C0009E5AC /* SPUStatusCompletionResults.h in Headers */,
 				72A5D5E71D692BB00009E5AC /* SPUUpdatePermissionRequest.h in Headers */,
+				EA1E286F22B6661D004AA304 /* SUSignatures.h in Headers */,
 				72A5D5E21D692B770009E5AC /* SPUUpdater.h in Headers */,
 				72A5D5E41D692B770009E5AC /* SPUUpdaterDelegate.h in Headers */,
 				72A5D5E31D692B770009E5AC /* SPUUpdaterSettings.h in Headers */,
@@ -2273,6 +2329,7 @@
 				61EF67590E25C5B400F754E0 /* SUHost.h in Headers */,
 				72162B081C82C9600013C1C5 /* SULocalizations.h in Headers */,
 				55C14F06136EF6DB00649790 /* SULog.h in Headers */,
+				EA1E286E22B665F0004AA304 /* SUSignatures.h in Headers */,
 				72B3DECD1E23479000457642 /* SPUInformationalUpdate.h in Headers */,
 				726F2CE51BC9C33D001971A4 /* SUOperatingSystem.h in Headers */,
 				61A225A40D1C4AC000430CCD /* SUStandardVersionComparator.h in Headers */,
@@ -2657,6 +2714,23 @@
 			productReference = EA1E282D22B660BE004AA304 /* libed25519.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		EA1E285D22B66487004AA304 /* generate_keys */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EA1E286222B66487004AA304 /* Build configuration list for PBXNativeTarget "generate_keys" */;
+			buildPhases = (
+				EA1E285A22B66487004AA304 /* Sources */,
+				EA1E285B22B66487004AA304 /* Frameworks */,
+				EA1E285C22B66487004AA304 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = generate_keys;
+			productName = generate_keys;
+			productReference = EA1E285E22B66487004AA304 /* generate_keys */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -2664,7 +2738,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = SU;
-				LastSwiftUpdateCheck = 0820;
+				LastSwiftUpdateCheck = 1020;
 				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = "Sparkle Project";
 				TargetAttributes = {
@@ -2729,6 +2803,9 @@
 						CreatedOnToolsVersion = 10.2.1;
 					};
 					EA1E282C22B660BE004AA304 = {
+						CreatedOnToolsVersion = 10.2.1;
+					};
+					EA1E285D22B66487004AA304 = {
 						CreatedOnToolsVersion = 10.2.1;
 					};
 				};
@@ -2804,6 +2881,7 @@
 				1495005F195FB89400BC5B5B /* All */,
 				726B2B5C1C645FC900388755 /* UI Tests */,
 				7205C43D1E13049400E370AE /* generate_appcast */,
+				EA1E285D22B66487004AA304 /* generate_keys */,
 				EA1E280E22B64522004AA304 /* bsdiff */,
 				EA1E282C22B660BE004AA304 /* ed25519 */,
 			);
@@ -3289,6 +3367,7 @@
 				72A5D5CD1D6929F80009E5AC /* SPUCoreBasedUpdateDriver.m in Sources */,
 				72A5D5BD1D6929F80009E5AC /* SPUDownloadData.m in Sources */,
 				72A5D5D01D6929F80009E5AC /* SPUDownloadDriver.m in Sources */,
+				EA1E287122B66622004AA304 /* SUSignatures.m in Sources */,
 				72A5D5AF1D6929F80009E5AC /* SPUDownloader.m in Sources */,
 				72A5D5B71D6929F80009E5AC /* SPUInstallationInfo.m in Sources */,
 				72A5D5B41D6929F80009E5AC /* SPUInstallationInputData.m in Sources */,
@@ -3431,6 +3510,7 @@
 				55C14F07136EF6DB00649790 /* SULog.m in Sources */,
 				726F2CE61BC9C33D001971A4 /* SUOperatingSystem.m in Sources */,
 				61A225A50D1C4AC000430CCD /* SUStandardVersionComparator.m in Sources */,
+				EA1E287022B66621004AA304 /* SUSignatures.m in Sources */,
 				6196CFFA09C72149000DC222 /* SUStatusController.m in Sources */,
 				72B3DECA1E23472200457642 /* SPUDownloadedUpdate.m in Sources */,
 				61A2279D0D1CEE7600430CCD /* SUSystemProfiler.m in Sources */,
@@ -3468,6 +3548,14 @@
 				EA1E284A22B660ED004AA304 /* sign.c in Sources */,
 				EA1E284922B660ED004AA304 /* sc.c in Sources */,
 				EA1E284E22B660ED004AA304 /* sha512.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA1E285A22B66487004AA304 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA1E286122B66487004AA304 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4234,6 +4322,27 @@
 			};
 			name = Release;
 		};
+		EA1E286322B66487004AA304 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA1E286822B664FD004AA304 /* generate_keys-Debug.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		EA1E286422B66487004AA304 /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA1E286722B664FD004AA304 /* generate_keys-Release.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		EA1E286522B66487004AA304 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA1E286722B664FD004AA304 /* generate_keys-Release.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -4443,6 +4552,16 @@
 				EA1E282F22B660BE004AA304 /* Debug */,
 				EA1E283022B660BE004AA304 /* Coverage */,
 				EA1E283122B660BE004AA304 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EA1E286222B66487004AA304 /* Build configuration list for PBXNativeTarget "generate_keys" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EA1E286322B66487004AA304 /* Debug */,
+				EA1E286422B66487004AA304 /* Coverage */,
+				EA1E286522B66487004AA304 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
