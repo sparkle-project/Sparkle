@@ -280,6 +280,16 @@
 		E1545EC61E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = E1545EC41E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m */; };
 		E1D4DDF921C1C5F8003D32E7 /* DarkAqua.css in Resources */ = {isa = PBXBuildFile; fileRef = E1D4DDF821C1C5F8003D32E7 /* DarkAqua.css */; };
 		E1EC2A301E21667000245715 /* SUTouchBarButtonGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = E1545EC41E1D7E0200FAECE8 /* SUTouchBarButtonGroup.m */; };
+		EA1E27F722B60B25004AA304 /* bscommon.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 723B252C1CEAB3A600909873 /* bscommon.h */; };
+		EA1E27F822B60B25004AA304 /* bspatch.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 611142E810FB1BE5009810AA /* bspatch.h */; };
+		EA1E27F922B60B25004AA304 /* sais.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 7223E7621AD1AEFF008E3161 /* sais.h */; };
+		EA1E27FB22B60B72004AA304 /* ed25519.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F174214D564B00A1187F /* ed25519.h */; };
+		EA1E27FC22B60B72004AA304 /* fe.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F173214D564B00A1187F /* fe.h */; };
+		EA1E27FD22B60B72004AA304 /* fixedint.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F179214D564B00A1187F /* fixedint.h */; };
+		EA1E27FE22B60B72004AA304 /* ge.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F17A214D564B00A1187F /* ge.h */; };
+		EA1E27FF22B60B72004AA304 /* precomp_data.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F176214D564B00A1187F /* precomp_data.h */; };
+		EA1E280022B60B72004AA304 /* sc.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F17E214D564B00A1187F /* sc.h */; };
+		EA1E280122B60B72004AA304 /* sha512.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F170214D564A00A1187F /* sha512.h */; };
 		EA4311A5229D5FC600A5503D /* add_scalar.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F171214D564A00A1187F /* add_scalar.c */; };
 		EA4311A6229D5FC600A5503D /* ed25519.h in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F174214D564B00A1187F /* ed25519.h */; };
 		EA4311A7229D5FC600A5503D /* fe.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17C214D564B00A1187F /* fe.c */; };
@@ -297,13 +307,6 @@
 		EA4311B3229D5FC600A5503D /* sha512.h in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F170214D564A00A1187F /* sha512.h */; };
 		EA4311B4229D5FC600A5503D /* sign.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17D214D564B00A1187F /* sign.c */; };
 		EA4311B5229D5FC600A5503D /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F177214D564B00A1187F /* verify.c */; };
-		EA4311B6229D5FD600A5503D /* ed25519.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F174214D564B00A1187F /* ed25519.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		EA4311B7229D5FD600A5503D /* fe.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F173214D564B00A1187F /* fe.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		EA4311B8229D5FD600A5503D /* fixedint.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F179214D564B00A1187F /* fixedint.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		EA4311B9229D5FD600A5503D /* ge.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F17A214D564B00A1187F /* ge.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		EA4311BA229D5FD600A5503D /* precomp_data.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F176214D564B00A1187F /* precomp_data.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		EA4311BB229D5FD600A5503D /* sc.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F17E214D564B00A1187F /* sc.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		EA4311BC229D5FD600A5503D /* sha512.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F170214D564A00A1187F /* sha512.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		EA4311BD229D5FF000A5503D /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311A0229D5FBC00A5503D /* libed25519.a */; };
 		EA4311E2229D640400A5503D /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311A0229D5FBC00A5503D /* libed25519.a */; };
 		EA4311E3229D641400A5503D /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311A0229D5FBC00A5503D /* libed25519.a */; };
@@ -316,9 +319,6 @@
 		EA4311F3229D651F00A5503D /* bspatch.h in Sources */ = {isa = PBXBuildFile; fileRef = 611142E810FB1BE5009810AA /* bspatch.h */; };
 		EA4311F4229D651F00A5503D /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
 		EA4311F5229D651F00A5503D /* sais.h in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7621AD1AEFF008E3161 /* sais.h */; };
-		EA4311F6229D652700A5503D /* bscommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 723B252C1CEAB3A600909873 /* bscommon.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		EA4311F7229D652700A5503D /* bspatch.h in Headers */ = {isa = PBXBuildFile; fileRef = 611142E810FB1BE5009810AA /* bspatch.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		EA4311F8229D652700A5503D /* sais.h in Headers */ = {isa = PBXBuildFile; fileRef = 7223E7621AD1AEFF008E3161 /* sais.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		EA4311FC229D65E400A5503D /* libbsdiff.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311EA229D651300A5503D /* libbsdiff.a */; };
 		EA4311FD229D65FC00A5503D /* libbsdiff.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311EA229D651300A5503D /* libbsdiff.a */; };
 		EA4311FE229D660B00A5503D /* libbsdiff.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311EA229D651300A5503D /* libbsdiff.a */; };
@@ -520,6 +520,36 @@
 				722954C11D04D9ED00ECF9CA /* fileop in Copy fileop */,
 			);
 			name = "Copy fileop";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA1E27F622B60AFA004AA304 /* Copy Headers */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+				EA1E27F722B60B25004AA304 /* bscommon.h in Copy Headers */,
+				EA1E27F822B60B25004AA304 /* bspatch.h in Copy Headers */,
+				EA1E27F922B60B25004AA304 /* sais.h in Copy Headers */,
+			);
+			name = "Copy Headers";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA1E27FA22B60B54004AA304 /* Copy Headers */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+				EA1E27FB22B60B72004AA304 /* ed25519.h in Copy Headers */,
+				EA1E27FC22B60B72004AA304 /* fe.h in Copy Headers */,
+				EA1E27FD22B60B72004AA304 /* fixedint.h in Copy Headers */,
+				EA1E27FE22B60B72004AA304 /* ge.h in Copy Headers */,
+				EA1E27FF22B60B72004AA304 /* precomp_data.h in Copy Headers */,
+				EA1E280022B60B72004AA304 /* sc.h in Copy Headers */,
+				EA1E280122B60B72004AA304 /* sha512.h in Copy Headers */,
+			);
+			name = "Copy Headers";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -1697,30 +1727,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		EA43119C229D5FBC00A5503D /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				EA4311B6229D5FD600A5503D /* ed25519.h in Headers */,
-				EA4311B7229D5FD600A5503D /* fe.h in Headers */,
-				EA4311B8229D5FD600A5503D /* fixedint.h in Headers */,
-				EA4311B9229D5FD600A5503D /* ge.h in Headers */,
-				EA4311BA229D5FD600A5503D /* precomp_data.h in Headers */,
-				EA4311BB229D5FD600A5503D /* sc.h in Headers */,
-				EA4311BC229D5FD600A5503D /* sha512.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		EA4311E6229D651300A5503D /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				EA4311F6229D652700A5503D /* bscommon.h in Headers */,
-				EA4311F7229D652700A5503D /* bspatch.h in Headers */,
-				EA4311F8229D652700A5503D /* sais.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXLegacyTarget section */
@@ -1947,9 +1953,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = EA4311A1229D5FBC00A5503D /* Build configuration list for PBXNativeTarget "ed25519" */;
 			buildPhases = (
-				EA43119C229D5FBC00A5503D /* Headers */,
 				EA43119D229D5FBC00A5503D /* Sources */,
 				EA43119E229D5FBC00A5503D /* Frameworks */,
+				EA1E27FA22B60B54004AA304 /* Copy Headers */,
 			);
 			buildRules = (
 			);
@@ -1964,9 +1970,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = EA4311EB229D651300A5503D /* Build configuration list for PBXNativeTarget "bsdiff" */;
 			buildPhases = (
-				EA4311E6229D651300A5503D /* Headers */,
 				EA4311E7229D651300A5503D /* Sources */,
 				EA4311E8229D651300A5503D /* Frameworks */,
+				EA1E27F622B60AFA004AA304 /* Copy Headers */,
 			);
 			buildRules = (
 			);
