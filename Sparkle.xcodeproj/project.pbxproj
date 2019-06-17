@@ -29,7 +29,6 @@
 		142E0E0019A6954400E4312B /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		142E0E0219A6A14700E4312B /* Sparkle.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		142E0E0919A83AAC00E4312B /* SUBinaryDeltaTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 142E0E0819A83AAC00E4312B /* SUBinaryDeltaTest.m */; };
-		14652F7E19A9728A00959E44 /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; };
 		14652F8019A9740F00959E44 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
 		14652F8219A9746000959E44 /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
 		14652F8419A978C200959E44 /* SUExport.h in Headers */ = {isa = PBXBuildFile; fileRef = 14652F8319A9759F00959E44 /* SUExport.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -58,7 +57,6 @@
 		5AF6C74F1AEA46D10014A3AB /* test.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 5AF6C74E1AEA46D10014A3AB /* test.pkg */; };
 		5AF6C7541AEA49840014A3AB /* SUInstallerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF6C74C1AEA40760014A3AB /* SUInstallerTest.m */; };
 		5AF9DC3C1981DBEE001EA135 /* SUDSAVerifierTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF9DC3B1981DBEE001EA135 /* SUDSAVerifierTest.m */; };
-		5D06E8E90FD68CDB005AE3F6 /* bsdiff.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */; };
 		5D06E8FF0FD68D6D005AE3F6 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */; };
 		5D06E9050FD68D7D005AE3F6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		5D1AF58B0FD7678C0065DB48 /* libxar.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5890FD7678C0065DB48 /* libxar.1.dylib */; };
@@ -111,14 +109,10 @@
 		7205C45D1E13065F00E370AE /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
 		7205C45E1E13066800E370AE /* SUFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5E41D3D90AA00D1BF90 /* SUFileManager.m */; };
 		7205C45F1E13066F00E370AE /* SUBinaryDeltaApply.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E56F1D3D895B00D1BF90 /* SUBinaryDeltaApply.m */; };
-		7205C4601E13067E00E370AE /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; };
 		7205C4611E13069000E370AE /* SUBinaryDeltaCreate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5731D3D895B00D1BF90 /* SUBinaryDeltaCreate.m */; };
 		7205C4621E1306A600E370AE /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5711D3D895B00D1BF90 /* SUBinaryDeltaCommon.m */; };
 		7205C4631E1306B500E370AE /* libxar.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E07681CA616A4001A286B /* libxar.tbd */; };
 		7205C4641E1306BE00E370AE /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E076A1CA616B3001A286B /* libbz2.tbd */; };
-		7205C4651E1306C400E370AE /* bsdiff.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */; };
-		7205C4661E1306CC00E370AE /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
-		7205C4671E1306E100E370AE /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 72B09CE91CEA18900052EF9E /* bscommon.c */; };
 		720767D31E2EE9C200F9A850 /* SUTouchBarForwardDeclarations.h in Headers */ = {isa = PBXBuildFile; fileRef = 720767D21E2EE9C200F9A850 /* SUTouchBarForwardDeclarations.h */; };
 		720B16451C66433D006985FB /* SUTestApplicationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720B16431C66433D006985FB /* SUTestApplicationTest.swift */; };
 		720E217B1D0D00BF003A311C /* SPUUpdaterCycle.h in Headers */ = {isa = PBXBuildFile; fileRef = 720E21791D0D00BF003A311C /* SPUUpdaterCycle.h */; };
@@ -138,9 +132,6 @@
 		721C245E1CB757DE005440CB /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
 		721C24611CB75C5D005440CB /* SUHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 61EF67550E25B58D00F754E0 /* SUHost.m */; };
 		721C24621CB75C68005440CB /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
-		721CF1A71AD7643600D9AC09 /* bsdiff.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		721CF1A81AD7644100D9AC09 /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; settings = {COMPILER_FLAGS = "-w"; }; };
-		721CF1A91AD7644C00D9AC09 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		721CF1AA1AD7647000D9AC09 /* libxar.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5890FD7678C0065DB48 /* libxar.1.dylib */; };
 		721CF1AB1AD764EB00D9AC09 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */; };
 		721D8A611D48413B0032E472 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
@@ -149,7 +140,6 @@
 		721D8A811D498B9B0032E472 /* Updater.app in Copy Tools */ = {isa = PBXBuildFile; fileRef = 721C24451CB753E6005440CB /* Updater.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		721D8A861D4ADFEB0032E472 /* SPULocalCacheDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 721BC20D1D1CDE55002BC71E /* SPULocalCacheDirectory.m */; };
 		721D8A871D4C5BF10032E472 /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
-		7223E7631AD1AEFF008E3161 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
 		7229E1B61C97C91100CB50D0 /* SPUUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 7229E1B51C97C91100CB50D0 /* SPUUpdateDriver.h */; };
 		7229E1B91C97CC4D00CB50D0 /* SPUScheduledUpdateDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 7229E1B71C97CC4D00CB50D0 /* SPUScheduledUpdateDriver.h */; };
 		7229E1BA1C97CC4D00CB50D0 /* SPUScheduledUpdateDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7229E1B81C97CC4D00CB50D0 /* SPUScheduledUpdateDriver.m */; };
@@ -157,7 +147,6 @@
 		7229E1BE1C98EFF200CB50D0 /* SPUDownloadDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7229E1BC1C98EFF200CB50D0 /* SPUDownloadDriver.m */; };
 		72316BD31E0DA8430039EFD9 /* SUUnarchiverNotifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 72316BD21E0DA8430039EFD9 /* SUUnarchiverNotifier.m */; };
 		72316BD41E0DB37E0039EFD9 /* SUUnarchiverNotifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 72316BD21E0DA8430039EFD9 /* SUUnarchiverNotifier.m */; };
-		723B252A1CEA7F3B00909873 /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 72B09CE91CEA18900052EF9E /* bscommon.c */; };
 		723B5DA71CF7AB0100365F95 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 723B5DA01CF7AB0100365F95 /* main.m */; };
 		723B5DA91CF7AB0100365F95 /* SPUDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 723B5DA31CF7AB0100365F95 /* SPUDownloader.m */; };
 		723B5DAA1CF7AB6A00365F95 /* SPUDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 723B5DA31CF7AB0100365F95 /* SPUDownloader.m */; };
@@ -237,14 +226,10 @@
 		7267E5CC1D3D8C6B00D1BF90 /* SUConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 61299A5F09CA6EB100B7442F /* SUConstants.m */; };
 		7267E5CD1D3D8C7200D1BF90 /* SPUSecureCoding.m in Sources */ = {isa = PBXBuildFile; fileRef = 726E075B1CA3A6D6001A286B /* SPUSecureCoding.m */; };
 		7267E5CE1D3D8C7500D1BF90 /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
-		7267E5D21D3D8CE800D1BF90 /* bsdiff.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */; };
-		7267E5D31D3D8CF200D1BF90 /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 72B09CE91CEA18900052EF9E /* bscommon.c */; };
-		7267E5D41D3D8CF200D1BF90 /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; };
 		7267E5D51D3D8D2800D1BF90 /* libxar.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E07681CA616A4001A286B /* libxar.tbd */; };
 		7267E5D61D3D8D3500D1BF90 /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 726E076A1CA616B3001A286B /* libbz2.tbd */; };
 		7267E5D71D3D8D3F00D1BF90 /* SUHost.m in Sources */ = {isa = PBXBuildFile; fileRef = 61EF67550E25B58D00F754E0 /* SUHost.m */; };
 		7267E5D81D3D8D4400D1BF90 /* SUStandardVersionComparator.m in Sources */ = {isa = PBXBuildFile; fileRef = 61A225A30D1C4AC000430CCD /* SUStandardVersionComparator.m */; };
-		7267E5D91D3D8D4B00D1BF90 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
 		7267E5DC1D3D8F1E00D1BF90 /* SPUMessageTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B01D3D8AD500D1BF90 /* SPUMessageTypes.m */; };
 		7267E5DF1D3D8FFA00D1BF90 /* SPUInstallationInputData.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5AD1D3D8AB700D1BF90 /* SPUInstallationInputData.m */; };
 		7267E5E11D3D901600D1BF90 /* SPUMessageTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5B01D3D8AD500D1BF90 /* SPUMessageTypes.m */; };
@@ -377,7 +362,6 @@
 		72AC6B2E1B9B218C00F62325 /* SparkleTestCodeSignApp.dmg in Resources */ = {isa = PBXBuildFile; fileRef = 72AC6B2D1B9B218C00F62325 /* SparkleTestCodeSignApp.dmg */; };
 		72B09CE71CE6BCBD0052EF9E /* SPUURLDownload.h in Headers */ = {isa = PBXBuildFile; fileRef = 72B09CE51CE6BCBD0052EF9E /* SPUURLDownload.h */; };
 		72B09CE81CE6BCBD0052EF9E /* SPUURLDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B09CE61CE6BCBD0052EF9E /* SPUURLDownload.m */; };
-		72B09CEC1CEA18900052EF9E /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 72B09CE91CEA18900052EF9E /* bscommon.c */; };
 		72B3DEC91E23472200457642 /* SPUDownloadedUpdate.h in Headers */ = {isa = PBXBuildFile; fileRef = 72B3DEC71E23472200457642 /* SPUDownloadedUpdate.h */; };
 		72B3DECA1E23472200457642 /* SPUDownloadedUpdate.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B3DEC81E23472200457642 /* SPUDownloadedUpdate.m */; };
 		72B3DECD1E23479000457642 /* SPUInformationalUpdate.h in Headers */ = {isa = PBXBuildFile; fileRef = 72B3DECB1E23479000457642 /* SPUInformationalUpdate.h */; };
@@ -436,6 +420,17 @@
 		72F9EC451D5E9ED8004AC8B6 /* SPUDownloadData.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F9EC431D5E9ED8004AC8B6 /* SPUDownloadData.m */; };
 		72F9EC481D5EA904004AC8B6 /* SPUUpdaterDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 72F9EC471D5EA7D3004AC8B6 /* SPUUpdaterDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C23E885B1BE7B24F0050BB73 /* SparkleTestCodeSignApp.enc.dmg in Resources */ = {isa = PBXBuildFile; fileRef = C23E88591BE7AF890050BB73 /* SparkleTestCodeSignApp.enc.dmg */; };
+		EA1E281722B645AE004AA304 /* libbsdiff.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA1E280F22B64522004AA304 /* libbsdiff.a */; };
+		EA1E281822B645CE004AA304 /* libbsdiff.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA1E280F22B64522004AA304 /* libbsdiff.a */; };
+		EA1E281922B645D9004AA304 /* libbsdiff.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA1E280F22B64522004AA304 /* libbsdiff.a */; };
+		EA1E281A22B645F4004AA304 /* libbsdiff.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA1E280F22B64522004AA304 /* libbsdiff.a */; };
+		EA1E282122B64677004AA304 /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 72B09CE91CEA18900052EF9E /* bscommon.c */; };
+		EA1E282222B64677004AA304 /* bsdiff.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */; };
+		EA1E282322B64677004AA304 /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; };
+		EA1E282422B64677004AA304 /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
+		EA1E282622B64693004AA304 /* bscommon.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 72B09CEA1CEA18900052EF9E /* bscommon.h */; };
+		EA1E282722B64694004AA304 /* bspatch.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 611142E810FB1BE5009810AA /* bspatch.h */; };
+		EA1E282822B64694004AA304 /* sais.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 7223E7621AD1AEFF008E3161 /* sais.h */; };
 		F8761EB11ADC5068000C9034 /* SUCodeSigningVerifierTest.m in Sources */ = {isa = PBXBuildFile; fileRef = F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */; };
 		F8761EB31ADC50EB000C9034 /* SparkleTestCodeSignApp.zip in Resources */ = {isa = PBXBuildFile; fileRef = F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */; };
 /* End PBXBuildFile section */
@@ -738,6 +733,19 @@
 				72A5D5F51D692CFE0009E5AC /* SparkleCore.framework in Copy Sparkle */,
 			);
 			name = "Copy Sparkle";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA1E282522B6467A004AA304 /* Copy Headers */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+				EA1E282622B64693004AA304 /* bscommon.h in Copy Headers */,
+				EA1E282722B64694004AA304 /* bspatch.h in Copy Headers */,
+				EA1E282822B64694004AA304 /* sais.h in Copy Headers */,
+			);
+			name = "Copy Headers";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -1213,6 +1221,10 @@
 		A5BF4F1B1BC7668B007A052A /* SUTestWebServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUTestWebServer.h; sourceTree = "<group>"; };
 		A5BF4F1C1BC7668B007A052A /* SUTestWebServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUTestWebServer.m; sourceTree = "<group>"; };
 		C23E88591BE7AF890050BB73 /* SparkleTestCodeSignApp.enc.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = SparkleTestCodeSignApp.enc.dmg; sourceTree = "<group>"; };
+		EA1E280F22B64522004AA304 /* libbsdiff.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libbsdiff.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA1E281422B64548004AA304 /* bsdiff-Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "bsdiff-Debug.xcconfig"; sourceTree = "<group>"; };
+		EA1E281522B64549004AA304 /* bsdiff-Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "bsdiff-Release.xcconfig"; sourceTree = "<group>"; };
+		EA1E281622B64549004AA304 /* bsdiff-Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "bsdiff-Shared.xcconfig"; sourceTree = "<group>"; };
 		F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUCodeSigningVerifierTest.m; sourceTree = "<group>"; };
 		F8761EB21ADC50EB000C9034 /* SparkleTestCodeSignApp.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = SparkleTestCodeSignApp.zip; sourceTree = "<group>"; };
 		FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ConfigFrameworkDebug.xcconfig; sourceTree = "<group>"; };
@@ -1232,6 +1244,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA1E281922B645D9004AA304 /* libbsdiff.a in Frameworks */,
 				5D06E9050FD68D7D005AE3F6 /* Foundation.framework in Frameworks */,
 				5D06E8FF0FD68D6D005AE3F6 /* libbz2.dylib in Frameworks */,
 				5D1AF58B0FD7678C0065DB48 /* libxar.1.dylib in Frameworks */,
@@ -1244,6 +1257,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA1E281822B645CE004AA304 /* libbsdiff.a in Frameworks */,
 				14732BD119610A1200593899 /* AppKit.framework in Frameworks */,
 				14732BD019610A0D00593899 /* Foundation.framework in Frameworks */,
 				721CF1AB1AD764EB00D9AC09 /* libbz2.dylib in Frameworks */,
@@ -1268,6 +1282,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA1E281A22B645F4004AA304 /* libbsdiff.a in Frameworks */,
 				7205C4641E1306BE00E370AE /* libbz2.tbd in Frameworks */,
 				7205C4631E1306B500E370AE /* libxar.tbd in Frameworks */,
 			);
@@ -1337,6 +1352,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA1E281722B645AE004AA304 /* libbsdiff.a in Frameworks */,
 				7267E5C91D3D8C4300D1BF90 /* CoreServices.framework in Frameworks */,
 				7267E5CA1D3D8C4800D1BF90 /* Foundation.framework in Frameworks */,
 				7267E5D61D3D8D3500D1BF90 /* libbz2.tbd in Frameworks */,
@@ -1385,6 +1401,7 @@
 				726E4A161C86C88F00C57C6A /* TestAppHelper.xpc */,
 				726B2B5D1C645FC900388755 /* UI Tests.xctest */,
 				721C24451CB753E6005440CB /* Updater.app */,
+				EA1E280F22B64522004AA304 /* libbsdiff.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1397,7 +1414,7 @@
 				14732BB81960EEB600593899 /* Resources */,
 				61227A100DB5484000AB99EA /* Tests */,
 				61B5F91D09C4CF7F00B25A18 /* Test Application */,
-				14732BB51960ECBA00593899 /* Third Party */,
+				14732BB51960ECBA00593899 /* Vendor */,
 				1420DE391962322200203BB0 /* Documentation */,
 				FA1941C40D94A6EA00DD942E /* Configurations */,
 				726B2B5E1C645FC900388755 /* UI Tests */,
@@ -1457,12 +1474,11 @@
 			path = Documentation;
 			sourceTree = "<group>";
 		};
-		14732BB51960ECBA00593899 /* Third Party */ = {
+		14732BB51960ECBA00593899 /* Vendor */ = {
 			isa = PBXGroup;
 			children = (
 				14732BB61960ECE800593899 /* bsdiff */,
 			);
-			name = "Third Party";
 			path = Vendor;
 			sourceTree = "<group>";
 		};
@@ -2013,6 +2029,9 @@
 			isa = PBXGroup;
 			children = (
 				14732BB1195FF6B700593899 /* .clang-format */,
+				EA1E281422B64548004AA304 /* bsdiff-Debug.xcconfig */,
+				EA1E281522B64549004AA304 /* bsdiff-Release.xcconfig */,
+				EA1E281622B64549004AA304 /* bsdiff-Shared.xcconfig */,
 				5D06E8F10FD68D21005AE3F6 /* ConfigBinaryDelta.xcconfig */,
 				FA1941D00D94A70100DD942E /* ConfigCommon.xcconfig */,
 				149B78631B7D3A0C00D7D62C /* ConfigCommonCoverage.xcconfig */,
@@ -2487,6 +2506,22 @@
 			productReference = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		EA1E280E22B64522004AA304 /* bsdiff */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EA1E281322B64522004AA304 /* Build configuration list for PBXNativeTarget "bsdiff" */;
+			buildPhases = (
+				EA1E280C22B64522004AA304 /* Sources */,
+				EA1E282522B6467A004AA304 /* Copy Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = bsdiff;
+			productName = bsdiff;
+			productReference = EA1E280F22B64522004AA304 /* libbsdiff.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -2554,6 +2589,9 @@
 					};
 					72D9549D1CBB415B006F28BD = {
 						CreatedOnToolsVersion = 7.3;
+					};
+					EA1E280E22B64522004AA304 = {
+						CreatedOnToolsVersion = 10.2.1;
 					};
 				};
 			};
@@ -2628,6 +2666,7 @@
 				1495005F195FB89400BC5B5B /* All */,
 				726B2B5C1C645FC900388755 /* UI Tests */,
 				7205C43D1E13049400E370AE /* generate_appcast */,
+				EA1E280E22B64522004AA304 /* bsdiff */,
 			);
 		};
 /* End PBXProject section */
@@ -2922,10 +2961,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				72B09CEC1CEA18900052EF9E /* bscommon.c in Sources */,
-				5D06E8E90FD68CDB005AE3F6 /* bsdiff.c in Sources */,
-				14652F7E19A9728A00959E44 /* bspatch.c in Sources */,
-				7223E7631AD1AEFF008E3161 /* sais.c in Sources */,
 				7267E5761D3D895B00D1BF90 /* SUBinaryDeltaApply.m in Sources */,
 				7267E5781D3D895B00D1BF90 /* SUBinaryDeltaCommon.m in Sources */,
 				7267E57A1D3D895B00D1BF90 /* SUBinaryDeltaCreate.m in Sources */,
@@ -2940,10 +2975,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				723B252A1CEA7F3B00909873 /* bscommon.c in Sources */,
-				721CF1A71AD7643600D9AC09 /* bsdiff.c in Sources */,
-				721CF1A81AD7644100D9AC09 /* bspatch.c in Sources */,
-				721CF1A91AD7644C00D9AC09 /* sais.c in Sources */,
 				725F97771C8A62F500265BE4 /* SUAdHocCodeSigning.m in Sources */,
 				5A4094481C74EA5200983BE0 /* SUAppcastTest.swift in Sources */,
 				7267E5EE1D3D915900D1BF90 /* SUBinaryDeltaApply.m in Sources */,
@@ -2995,13 +3026,9 @@
 				72464F7C1E2097F600FB341C /* SUOperatingSystem.m in Sources */,
 				7205C44C1E1304CE00E370AE /* Appcast.swift in Sources */,
 				7205C44D1E1304CE00E370AE /* ArchiveItem.swift in Sources */,
-				7205C4671E1306E100E370AE /* bscommon.c in Sources */,
-				7205C4651E1306C400E370AE /* bsdiff.c in Sources */,
-				7205C4601E13067E00E370AE /* bspatch.c in Sources */,
 				7205C44E1E1304CE00E370AE /* DSASignature.swift in Sources */,
 				7205C44F1E1304CE00E370AE /* FeedXML.swift in Sources */,
 				7205C4411E13049400E370AE /* main.swift in Sources */,
-				7205C4661E1306CC00E370AE /* sais.c in Sources */,
 				7205C45F1E13066F00E370AE /* SUBinaryDeltaApply.m in Sources */,
 				7205C4621E1306A600E370AE /* SUBinaryDeltaCommon.m in Sources */,
 				7205C4611E13069000E370AE /* SUBinaryDeltaCreate.m in Sources */,
@@ -3174,11 +3201,7 @@
 				72464F701E1F31E000FB341C /* SUOperatingSystem.m in Sources */,
 				7267E5A81D3D8A9900D1BF90 /* AgentConnection.m in Sources */,
 				7267E5A21D3D8A7E00D1BF90 /* AppInstaller.m in Sources */,
-				7267E5D31D3D8CF200D1BF90 /* bscommon.c in Sources */,
-				7267E5D21D3D8CE800D1BF90 /* bsdiff.c in Sources */,
-				7267E5D41D3D8CF200D1BF90 /* bspatch.c in Sources */,
 				7267E59F1D3D8A6F00D1BF90 /* main.m in Sources */,
-				7267E5D91D3D8D4B00D1BF90 /* sais.c in Sources */,
 				7267E5B81D3D8AEE00D1BF90 /* SPUInstallationInfo.m in Sources */,
 				7267E5AE1D3D8AB700D1BF90 /* SPUInstallationInputData.m in Sources */,
 				721D8A861D4ADFEB0032E472 /* SPULocalCacheDirectory.m in Sources */,
@@ -3278,6 +3301,17 @@
 				72F9EBE31D517E2F004AC8B6 /* SUUpdater.m in Sources */,
 				724BB3881D32A167005D534A /* SUXPCInstallerConnection.m in Sources */,
 				724BB3A91D33461B005D534A /* SUXPCInstallerStatus.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA1E280C22B64522004AA304 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA1E282122B64677004AA304 /* bscommon.c in Sources */,
+				EA1E282222B64677004AA304 /* bsdiff.c in Sources */,
+				EA1E282322B64677004AA304 /* bspatch.c in Sources */,
+				EA1E282422B64677004AA304 /* sais.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3990,6 +4024,27 @@
 			};
 			name = Release;
 		};
+		EA1E281022B64522004AA304 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA1E281422B64548004AA304 /* bsdiff-Debug.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		EA1E281122B64522004AA304 /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA1E281522B64549004AA304 /* bsdiff-Release.xcconfig */;
+			buildSettings = {
+			};
+			name = Coverage;
+		};
+		EA1E281222B64522004AA304 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA1E281522B64549004AA304 /* bsdiff-Release.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -4179,6 +4234,16 @@
 				72D954AC1CBB415C006F28BD /* Debug */,
 				72D954AD1CBB415C006F28BD /* Coverage */,
 				72D954AE1CBB415C006F28BD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EA1E281322B64522004AA304 /* Build configuration list for PBXNativeTarget "bsdiff" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EA1E281022B64522004AA304 /* Debug */,
+				EA1E281122B64522004AA304 /* Coverage */,
+				EA1E281222B64522004AA304 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
