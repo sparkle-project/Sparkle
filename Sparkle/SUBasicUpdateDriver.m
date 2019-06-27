@@ -33,6 +33,8 @@
 @interface SUBasicUpdateDriver ()
 
 @property (strong) SUAppcastItem *updateItem;
+@property (strong) SUAppcastItem *latestAppcastItem;
+@property (assign) NSComparisonResult latestAppcastItemComparisonResult;
 @property (strong) SPUDownloader *download;
 @property (copy) NSString *downloadPath;
 
@@ -47,6 +49,8 @@
 @implementation SUBasicUpdateDriver
 
 @synthesize updateItem;
+@synthesize latestAppcastItem;
+@synthesize latestAppcastItemComparisonResult;
 @synthesize download;
 @synthesize downloadPath;
 
@@ -207,6 +211,10 @@
             item = deltaUpdateItem;
         }
     }
+
+    self.latestAppcastItem = item;
+    self.latestAppcastItemComparisonResult = [[self versionComparator] compareVersion:[self.host version] toVersion:[item versionString]];
+
 
     if ([self itemContainsValidUpdate:item]) {
         self.updateItem = item;
