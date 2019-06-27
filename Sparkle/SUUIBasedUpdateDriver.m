@@ -120,9 +120,25 @@
 
     if (!self.automaticallyInstallUpdates) {
         NSAlert *alert = [[NSAlert alloc] init];
-        alert.messageText = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
-        alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
-        [alert addButtonWithTitle:SULocalizedString(@"OK", nil)];
+        
+        if (self.latestAppcastItem) // if the appcast was successfully loaded
+        {
+            alert.messageText = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
+
+            if (self.latestAppcastItemComparisonResult == NSOrderedDescending ) { // this means the user is a 'newer than latest' version. give a slight hint to the user instead of wrongly claiming this version is identical to the latest feed version.
+                alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.\n(You are currently running version %@.)", nil), [self.host name], self.latestAppcastItem.versionString, [self.host displayVersion]];
+            }
+            else {
+                alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
+            }
+            [alert addButtonWithTitle:SULocalizedString(@"OK", nil)];
+        }
+        else {
+            alert.messageText = SULocalizedString(@"Update Error!", nil);
+            alert.informativeText = SULocalizedString(@"No valid update information could be loaded.", nil);
+            [alert addButtonWithTitle:SULocalizedString(@"Cancel Update", nil)];
+        }
+	    
         [self showAlert:alert];
     }
     
