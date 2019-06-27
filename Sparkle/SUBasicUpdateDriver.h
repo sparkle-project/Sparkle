@@ -17,6 +17,8 @@
 @interface SUBasicUpdateDriver : SUUpdateDriver <SPUDownloaderDelegate>
 
 @property (strong, readonly) SUAppcastItem *updateItem;
+@property (strong, readonly) SUAppcastItem *latestAppcastItem;
+@property (assign, readonly) NSComparisonResult latestAppcastItemComparisonResult;
 @property (strong, readonly) SPUDownloader *download;
 @property (copy, readonly) NSString *downloadPath;
 
