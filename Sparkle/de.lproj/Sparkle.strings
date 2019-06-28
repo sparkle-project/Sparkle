@@ -8,6 +8,8 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ ist zurzeit die neueste verfügbare Version.";
 
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ ist zurzeit die neueste verfügbare Version.\n(Die derzeit installierte Version ist %3$@.)";
+
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ ist verfügbar – du verwendest Version %3$@. Möchtest du die neue Version jetzt laden?";
 

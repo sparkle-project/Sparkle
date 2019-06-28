@@ -8,6 +8,8 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ este cea ultima versiune disponibilă.";
 
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ este cea ultima versiune disponibilă.\n(You are currently running version %3$@.)";
+
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ este disponibilă—tu ai %3$@. Dorești să o descărcarci acum?";
 

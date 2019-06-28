@@ -6,6 +6,8 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ je trenutačno najnovija dostupna inačica.";
 
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ je trenutačno najnovija dostupna inačica.\n(You are currently running version %3$@.)";
+
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ je sada dostupna. Ti koristiš inačicu %3$@. Želiš li je sada preuzeti?";
 

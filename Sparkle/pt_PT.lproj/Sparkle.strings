@@ -4,6 +4,8 @@
 
 "%@ %@ is currently the newest version available." = "O %1$@ %2$@ é neste momento a versão mais recente disponível.";
 
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "O %1$@ %2$@ é neste momento a versão mais recente disponível.\n(You are currently running version %3$@.)";
+
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "O %1$@ %2$@ está agora disponível e tem a versão %3$@. Gostaria de o transferir agora?";
 
