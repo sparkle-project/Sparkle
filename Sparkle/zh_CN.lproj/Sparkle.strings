@@ -6,6 +6,8 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ 是当前的最新版本。";
 
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ 是当前的最新版本。\n(You are currently running version %3$@.)";
+
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ 可供下载，您现在的版本是 %3$@。要现在下载吗？";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */

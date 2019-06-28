@@ -10,6 +10,8 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ mevcut en yeni sürümdür.";
 
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ mevcut en yeni sürümdür.\n(You are currently running version %3$@.)";
+
 /* de_DE v0.1 - No comment provided by engineer. */
 
 /* Description text for SUUpdateAlert when the update is downloadable. */

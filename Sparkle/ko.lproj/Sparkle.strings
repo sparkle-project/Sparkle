@@ -4,6 +4,8 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@이(가) 현재 최신 버전입니다.";
 
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@이(가) 현재 최신 버전입니다.\n(You are currently running version %3$@.)";
+
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@이(가) 업데이트 되었습니다. (현재 버전 : %3$@) 다운로드 하시겠습니까?";
 

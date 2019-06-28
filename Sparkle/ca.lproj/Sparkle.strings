@@ -6,6 +6,8 @@
 
 "%@ %@ is currently the newest version available." = "%@ %@ és la versió disponible més actual.";
 
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%@ %@ és la versió disponible més actual.\n(You are currently running version %@.)";
+
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%@ %@ està disponible (ara teniu %@). Voleu actualitzar?";
 
