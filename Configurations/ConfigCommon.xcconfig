@@ -1,7 +1,7 @@
 // Common
 
-SPARKLE_BUNDLE_IDENTIFIER = org.sparkle-project.Sparkle
-SPARKLE_RELAUNCH_TOOL_NAME = Autoupdate
+SPARKLE_BUNDLE_IDENTIFIER = com.binaryage.sparkle
+SPARKLE_RELAUNCH_TOOL_NAME = Updater
 SPARKLE_FILEOP_TOOL_NAME = fileop
 
 SPARKLE_APPEND_VERSION_NUMBER = 1
@@ -89,4 +89,4 @@ CLANG_ENABLE_MODULES[sdk=macosx10.8] = NO
 WARNING_CFLAGS_EXTRA = -Wno-custom-atomic-properties -Wno-implicit-atomic-properties
 
 // Turn on all warnings, then disable a few which are almost impossible to avoid
-WARNING_CFLAGS = -Wall -Weverything -Wno-unused-macros -Wno-gnu-statement-expression -Wno-arc-repeated-use-of-weak -Wno-auto-import -Wno-gnu-zero-variadic-macro-arguments $(WARNING_CFLAGS_EXTRA)
+WARNING_CFLAGS = -Wall -Weverything -Wno-unused-macros -Wno-gnu-statement-expression -Wno-arc-repeated-use-of-weak -Wno-auto-import -Wno-gnu-zero-variadic-macro-arguments -Wno-dollar-in-identifier-extension $(WARNING_CFLAGS_EXTRA)
