@@ -93,7 +93,7 @@
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
 {
     // We don't check to see if this update's been skipped, because the user explicitly *asked* if he had the latest version.
-    return [[self class] hostSupportsItem:ui] && [self isItemNewer:ui];
+    return [self hostSupportsItem:ui] && [self isItemNewer:ui];
 }
 
 @end

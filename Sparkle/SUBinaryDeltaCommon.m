@@ -190,6 +190,11 @@ NSString *hashOfTreeWithVersion(NSString *path, uint16_t majorVersion)
 
         if (MAJOR_VERSION_IS_AT_LEAST(majorVersion, SUBeigeMajorVersion)) {
             uint16_t mode = ent->fts_statp->st_mode;
+            // permission of symlinks is irrelevant and can't be changed.
+            // hardcoding a value helps avoid differences between filesystems.
+            if (ent->fts_info == FTS_SL) {
+                mode = 0755;
+            }
             uint16_t type = ent->fts_info;
             uint16_t permissions = mode & PERMISSION_FLAGS;
 
@@ -242,7 +247,7 @@ BOOL modifyPermissions(NSString *path, mode_t desiredPermissions)
         return NO;
     }
     mode_t newMode = ([permissions unsignedShortValue] & ~PERMISSION_FLAGS) | desiredPermissions;
-    int (*changeModeFunc)(const char *, mode_t) = [[attributes objectForKey:NSFileType] isEqualToString:NSFileTypeSymbolicLink] ? lchmod : chmod;
+    int (*changeModeFunc)(const char *, mode_t) = [(NSString *)[attributes objectForKey:NSFileType] isEqualToString:NSFileTypeSymbolicLink] ? lchmod : chmod;
     if (changeModeFunc([path fileSystemRepresentation], newMode) != 0) {
         return NO;
     }

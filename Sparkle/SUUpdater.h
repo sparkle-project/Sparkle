@@ -160,11 +160,7 @@ SU_EXPORT @interface SUUpdater : NSObject
 
  The keys of this dictionary are HTTP header fields (NSString) and values are corresponding values (NSString)
  */
-#if __has_feature(objc_generics)
 @property (copy) NSDictionary<NSString *, NSString *> *httpHeaders;
-#else
-@property (copy) NSDictionary *httpHeaders;
-#endif
 
 /*!
  A property indicating whether or not the user's system profile information is sent when checking for updates.
@@ -193,6 +189,8 @@ SU_EXPORT @interface SUUpdater : NSObject
     For UI-less/daemon apps that aren't usually quit, instead of this function,
     you can use the delegate method
     SUUpdaterDelegate::updater:willInstallUpdateOnQuit:immediateInstallationInvocation:
+    or
+    SUUpdaterDelegate::updater:willInstallUpdateOnQuit:immediateInstallationBlock:
     to immediately start installation when an update was found.
 
     A progress dialog is shown but the user will never be prompted to read the

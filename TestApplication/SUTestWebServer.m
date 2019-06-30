@@ -96,7 +96,7 @@
             NSString *requestLine = lines.count >= 3 ? [lines objectAtIndex:0] : nil;
             NSArray *parts = requestLine ? [requestLine componentsSeparatedByString:@" "] : nil;
             // Only process GET requests for existing files
-            if ([[parts objectAtIndex:0] isEqualToString:@"GET"]) {
+            if ([(NSString *)[parts objectAtIndex:0] isEqualToString:@"GET"]) {
                 // Use NSURL to strip out query parameters
                 NSString *path = [NSURL URLWithString:[parts objectAtIndex:1] relativeToURL:nil].path;
                 NSString *filePath = [self.workingDirectory stringByAppendingString:path];

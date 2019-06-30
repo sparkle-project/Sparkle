@@ -8,6 +8,7 @@
 
 #import "SPUDownloadData.h"
 
+#import "SUOperatingSystem.h"
 
 #include "AppKitPrevention.h"
 
@@ -52,7 +53,9 @@ static NSString *SPUDownloadMIMETypeKey = @"SPUDownloadMIMEType";
 
 - (nullable instancetype)initWithCoder:(NSCoder *)decoder
 {
-    if (@available(macOS 10.8, *)) {
+    if (SUAVAILABLE(10, 8)) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability"
         NSData *data = [decoder decodeObjectOfClass:[NSData class] forKey:SPUDownloadDataKey];
         if (data == nil) {
             return nil;
@@ -61,6 +64,7 @@ static NSString *SPUDownloadMIMETypeKey = @"SPUDownloadMIMEType";
         NSString *textEncodingName = [decoder decodeObjectOfClass:[NSString class] forKey:SPUDownloadTextEncodingKey];
 
         NSString *MIMEType = [decoder decodeObjectOfClass:[NSString class] forKey:SPUDownloadMIMETypeKey];
+#pragma clang diagnostic pop
 
         return [self initWithData:data textEncodingName:textEncodingName MIMEType:MIMEType];
     } else {

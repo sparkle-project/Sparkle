@@ -150,6 +150,7 @@
 -(void)cleanup
 {
     [self.download cancel];
+    [self.downloadSession invalidateAndCancel];
     self.download = nil;
     self.downloadSession = nil;
     [super cleanup];

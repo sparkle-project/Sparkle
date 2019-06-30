@@ -251,7 +251,7 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
             XCTFail(@"Failed setting file permissions");
         }
         
-        XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
+        XCTAssertTrue([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     }];
 }
 
@@ -627,10 +627,10 @@ typedef void (^SUDeltaHandler)(NSFileManager *fileManager, NSString *sourceDirec
             XCTFail(@"Failed setting file permissions");
         }
         
-        // This would fail for version 1.0
         XCTAssertFalse([self testDirectoryHashEqualityWithSource:sourceDirectory destination:destinationDirectory]);
     } afterDiffHandler:nil];
-    XCTAssertFalse(success);
+    // we just ignore bad permissions, since that's a too common problem to fail on
+    XCTAssertTrue(success);
 }
 
 - (void)testBadPermissionsInBeforeTree

@@ -110,7 +110,7 @@ static NSString *const SUAutomaticUpdateAlertTouchBarIndentifier = @"" SPARKLE_B
 
 - (NSTouchBar *)makeTouchBar
 {
-    NSTouchBar *touchBar = [[NSClassFromString(@"NSTouchBar") alloc] init];
+    NSTouchBar *touchBar = [(NSTouchBar *)[NSClassFromString(@"NSTouchBar") alloc] init];
     touchBar.defaultItemIdentifiers = @[SUAutomaticUpdateAlertTouchBarIndentifier,];
     touchBar.principalItemIdentifier = SUAutomaticUpdateAlertTouchBarIndentifier;
     touchBar.delegate = self;

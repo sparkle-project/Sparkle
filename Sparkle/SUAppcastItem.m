@@ -9,7 +9,7 @@
 #import "SUAppcastItem.h"
 #import "SULog.h"
 #import "SUConstants.h"
-
+#import "SUSignatures.h"
 
 #include "AppKitPrevention.h"
 
@@ -18,7 +18,7 @@
 @property (copy, readwrite) NSString *dateString;
 @property (copy, readwrite) NSString *itemDescription;
 @property (strong, readwrite) NSURL *releaseNotesURL;
-@property (copy, readwrite) NSString *DSASignature;
+@property (strong, readwrite) SUSignatures *signatures;
 @property (copy, readwrite) NSString *minimumSystemVersion;
 @property (copy, readwrite) NSString *maximumSystemVersion;
 @property (strong, readwrite) NSURL *fileURL;
@@ -28,13 +28,14 @@
 @property (copy, readwrite) NSDictionary *deltaUpdates;
 @property (strong, readwrite) NSURL *infoURL;
 @property (readwrite, copy) NSDictionary *propertiesDictionary;
+@property (copy, readwrite) NSNumber* phasedRolloutInterval;
 @end
 
 @implementation SUAppcastItem
 @synthesize dateString;
 @synthesize deltaUpdates;
 @synthesize displayVersionString;
-@synthesize DSASignature;
+@synthesize signatures;
 @synthesize fileURL;
 @synthesize contentLength = _contentLength;
 @synthesize infoURL;
@@ -46,6 +47,7 @@
 @synthesize versionString;
 @synthesize osString;
 @synthesize propertiesDictionary;
+@synthesize phasedRolloutInterval;
 
 - (BOOL)isDeltaUpdate
 {
@@ -55,12 +57,24 @@
 
 - (BOOL)isCriticalUpdate
 {
-    return [[self.propertiesDictionary objectForKey:SUAppcastElementTags] containsObject:SUAppcastElementCriticalUpdate];
+    return [(NSArray *)[self.propertiesDictionary objectForKey:SUAppcastElementTags] containsObject:SUAppcastElementCriticalUpdate];
 }
 
 - (BOOL)isMacOsUpdate
 {
     return self.osString == nil || [self.osString isEqualToString:SUAppcastAttributeValueMacOS];
+}
+
+- (NSDate*)date {
+    if(self.dateString == nil) {
+        return nil;
+    }
+
+    NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
+    dateFormatter.dateFormat = @"E, dd MMM yyyy HH:mm:ss Z";
+    
+    return [dateFormatter dateFromString:self.dateString];
 }
 
 - (BOOL)isInformationOnlyUpdate
@@ -97,7 +111,7 @@
 
             // Separate the url by underscores and take the last component, as that'll be closest to the end,
             // then we remove the extension. Hopefully, this will be the version.
-            NSArray *fileComponents = [[enclosure objectForKey:SURSSAttributeURL] componentsSeparatedByString:@"_"];
+            NSArray<NSString *> *fileComponents = [(NSString *)[enclosure objectForKey:SURSSAttributeURL] componentsSeparatedByString:@"_"];
             if ([fileComponents count] > 1) {
                 newVersion = [[fileComponents lastObject] stringByDeletingPathExtension];
             }
@@ -156,10 +170,10 @@
             self.fileURL = [NSURL URLWithString:fileURLString];
         }
         if (enclosure) {
-            self.DSASignature = [enclosure objectForKey:SUAppcastAttributeDSASignature];
+            self.signatures = [[SUSignatures alloc] initWithDsa:[enclosure objectForKey:SUAppcastAttributeDSASignature] ed:[enclosure objectForKey:SUAppcastAttributeEDSignature]];
             self.osString = [enclosure objectForKey:SUAppcastAttributeOsType];
         }
-  
+
         self.versionString = newVersion;
         self.minimumSystemVersion = [dict objectForKey:SUAppcastElementMinimumSystemVersion];
         self.maximumSystemVersion = [dict objectForKey:SUAppcastElementMaximumSystemVersion];
@@ -173,6 +187,11 @@
             self.displayVersionString = shortVersionString;
         } else {
             self.displayVersionString = self.versionString;
+        }
+
+        NSString* enclosureRolloutIntervalString = [enclosure objectForKey:SUAppcastAttributePhasedRolloutInterval];
+        if(enclosureRolloutIntervalString) {
+            self.phasedRolloutInterval = @(enclosureRolloutIntervalString.integerValue);
         }
 
         // Find the appropriate release notes URL.

@@ -8,7 +8,7 @@ for file in "dsaparam.pem" "dsa_priv.pem" "dsa_pub.pem"; do
 done
 
 openssl="/usr/bin/openssl"
-$openssl gendsa <($openssl dsaparam 4096) -out dsa_priv.pem
+$openssl gendsa <($openssl dsaparam 2047) -out dsa_priv.pem
 chmod 0400 dsa_priv.pem
 $openssl dsa -in dsa_priv.pem -pubout -out dsa_pub.pem
 

@@ -4,6 +4,8 @@
 
 "%@ %@ is currently the newest version available." = "Το %1$@ %2$@ είναι η τελευταία διαθέσιμη έκδοση.";
 
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "Το %1$@ %2$@ είναι η τελευταία διαθέσιμη έκδοση.\n(Die derzeit installierte Version ist %3$@.)";
+
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "Το %1$@ %2$@ είναι πλέον διαθέσιμο--έχετε το %3$@. Θέλετε να το κατεβάσετε τώρα;";
 

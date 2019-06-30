@@ -117,6 +117,7 @@
 - (void)downloadDidFinish:(NSURLDownload *)__unused d
 {
     [self downloadDidFinish];
+    [self cleanup];
 }
 
 - (void)download:(NSURLDownload *)__unused download didFailWithError:(NSError *)error

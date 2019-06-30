@@ -12,43 +12,46 @@
 //  Copyright 2011 Mark Hamlin. Licensed under BSD.
 //
 
-#import "SUDSAVerifier.h"
+#import "SUSignatureVerifier.h"
 #import "SULog.h"
+#import "SUSignatures.h"
 #include <CommonCrypto/CommonDigest.h>
+#import "ed25519.h" // Run `git submodule update --init` if you get an error here
 
 
 #include "AppKitPrevention.h"
 
-@implementation SUDSAVerifier {
-    SecKeyRef _secKey;
+@interface SUSignatureVerifier ()
+@property (readonly) SUPublicKeys *pubKeys;
+@end
+
+@implementation SUSignatureVerifier {
 }
 
-+ (BOOL)validatePath:(NSString *)path withEncodedDSASignature:(NSString *)encodedSignature withPublicDSAKey:(NSString *)pkeyString
+@synthesize pubKeys = _pubKeys;
+
++ (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicKeys:(SUPublicKeys *)pkeys
 {
-    if (!encodedSignature) {
-        SULog(SULogLevelError, @"There is no DSA signature to check");
-        return NO;
-    }
-
-    if (!path) {
-        return NO;
-    }
-
-    SUDSAVerifier *verifier = [[self alloc] initWithPublicKeyData:[pkeyString dataUsingEncoding:NSUTF8StringEncoding]];
+    SUSignatureVerifier *verifier = [(SUSignatureVerifier *)[self alloc] initWithPublicKeys:pkeys];
 
     if (!verifier) {
         return NO;
     }
 
-    NSString *strippedSignature = [encodedSignature stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-    NSData *signature = [[NSData alloc] initWithBase64Encoding:strippedSignature];
-    return [verifier verifyFileAtPath:path signature:signature];
+    return [verifier verifyFileAtPath:path signatures:signatures];
 }
 
-- (instancetype)initWithPublicKeyData:(NSData *)data
+- (instancetype)initWithPublicKeys:(SUPublicKeys *)pubkeys
 {
     self = [super init];
+    _pubKeys = pubkeys;
 
+    return self;
+}
+
+- (SecKeyRef)dsaSecKeyRef {
+
+    NSData *data = [self.pubKeys.dsaPubKey dataUsingEncoding:NSASCIIStringEncoding];
     if (!self || !data.length) {
         SULog(SULogLevelError, @"Could not read public DSA key");
         return nil;
@@ -67,40 +70,85 @@
         return nil;
     }
 
+    SecKeyRef dsaPubKeySecKey = nil;
     if (format == kSecFormatOpenSSL && itemType == kSecItemTypePublicKey && CFArrayGetCount(items) == 1) {
         // Seems silly, but we can't quiet the warning about dropping CFTypeRef's const qualifier through
         // any manner of casting I've tried, including interim explicit cast to void*. The -Wcast-qual
         // warning is on by default with -Weverything and apparently became more noisy as of Xcode 7.
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wcast-qual"
-        _secKey = (SecKeyRef)CFRetain(CFArrayGetValueAtIndex(items, 0));
+        dsaPubKeySecKey = (SecKeyRef)CFRetain(CFArrayGetValueAtIndex(items, 0));
 #pragma clang diagnostic pop
     }
 
     CFRelease(items);
-
-    return self;
+    return dsaPubKeySecKey;
 }
 
-- (void)dealloc
+- (BOOL)verifyFileAtPath:(NSString *)path signatures:(SUSignatures *)signatures
 {
-    if (_secKey) {
-        CFRelease(_secKey);
-    }
-}
-
-- (BOOL)verifyFileAtPath:(NSString *)path signature:(NSData *)signature
-{
-    if (!path.length) {
+    if (!path || !path.length) {
         return NO;
     }
-    NSInputStream *dataInputStream = [NSInputStream inputStreamWithFileAtPath:path];
-    return [self verifyStream:dataInputStream signature:signature];
+
+    if (!signatures) {
+        SULog(SULogLevelDefault, @"No signatures given to verifyFileAtPath");
+        return NO;
+    }
+
+    NSData *dsaSignature = signatures.dsaSignature;
+    NSString *dsaPubKey = self.pubKeys.dsaPubKey;
+
+    const unsigned char *edSignature = signatures.ed25519Signature;
+    const unsigned char *edPubKey = self.pubKeys.ed25519PubKey;
+
+    if (edPubKey && !edSignature) {
+        SULog(SULogLevelDefault, @"There is no EdDSA signature in the update, but the app is capable of verifying them");
+    } if (!edPubKey && edSignature) {
+        SULog(SULogLevelDefault, @"The update has an EdDSA signature, but it won't be used, because the old app doesn't have an EdDSA public key");
+    } else if (edPubKey && edSignature) {
+        NSError *error = nil;
+        NSData *data = [NSData dataWithContentsOfFile:path options:NSDataReadingMappedAlways error:&error];
+        if (!data || !data.length) {
+            SULog(SULogLevelError, @"Failed to load file %@: %@", path, error);
+            return NO;
+        }
+        if (ed25519_verify(edSignature, data.bytes, data.length, edPubKey)) {
+            SULog(SULogLevelDefault, @"OK: EdDSA signature is correct");
+            if (!dsaPubKey) {
+                return YES;
+            } else {
+                SULog(SULogLevelDefault, @"This app has a DSA public key, so a DSA signature is required too");
+            }
+        } else {
+            SULog(SULogLevelError, @"EdDSA signature does not match. Data of the update file being checked is different than data that has been signed, or the public key and the private key are not from the same set.");
+            if (dsaSignature) {
+                SULog(SULogLevelDefault, @"DSA signature won't be checked, because EdDSA verification has already failed");
+            }
+            return NO;
+        }
+    }
+
+    if (!dsaSignature) {
+        SULog(SULogLevelError, @"There is no DSA signature in the update");
+    } else if (!dsaPubKey) {
+        SULog(SULogLevelDefault, @"The update has a DSA signature, but it can't be used, because the old app doesn't have a DSA public key");
+    } else {
+        NSInputStream *dataInputStream = [NSInputStream inputStreamWithFileAtPath:path];
+        return [self verifyDSASignatureOfStream:dataInputStream dsaSignature:dsaSignature];
+    }
+    return NO;
 }
 
-- (BOOL)verifyStream:(NSInputStream *)stream signature:(NSData *)signature
+- (BOOL)verifyDSASignatureOfStream:(NSInputStream *)stream dsaSignature:(NSData *)dsaSignature
 {
-    if (!stream || !signature) {
+    if (!stream || !dsaSignature) {
+        SULog(SULogLevelError, @"Invalid arguments to verifyStream");
+        return NO;
+    }
+
+    SecKeyRef dsaPubKeySecKey = [self dsaSecKeyRef];
+    if (!dsaPubKeySecKey) {
         return NO;
     }
 
@@ -116,6 +164,7 @@
 		if (dataDigestTransform) CFRelease(dataDigestTransform);
 		if (dataVerifyTransform) CFRelease(dataVerifyTransform);
 		if (error) CFRelease(error);
+        if (dsaPubKeySecKey) CFRelease(dsaPubKeySecKey);
 		return NO;
     };
 
@@ -132,10 +181,10 @@
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdirect-ivar-access"
-    dataVerifyTransform = SecVerifyTransformCreate(_secKey, (__bridge CFDataRef)signature, &error);
+    dataVerifyTransform = SecVerifyTransformCreate(dsaPubKeySecKey, (__bridge CFDataRef)dsaSignature, &error);
 #pragma clang diagnostic pop
     if (!dataVerifyTransform || error) {
-        SULog(SULogLevelError, @"Could not understand format of the signature: %@; Signature data: %@", error, signature);
+        SULog(SULogLevelError, @"Could not understand format of the signature: %@; Signature data: %@", error, dsaSignature);
         return cleanup();
     }
 

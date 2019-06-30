@@ -4,6 +4,8 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ on uusin saatavilla oleva versio.";
 
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ on uusin saatavilla oleva versio.\n(You are currently running version %3$@.)";
+
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ on nyt saatavilla (sinulla on %3$@). Haluatko ladata sen nyt?";
 
@@ -28,7 +30,11 @@
 
 "Cancel" = "Kumoa";
 
+"Cancel Update" = "Peruuta päivitykset";
+
 "Check for updates on startup?" = "Tarkista päivityksiä käynnistyksen yhteydessä?";
+
+"Checking for updates..." = "Tarkistetaan päivityksiä…";
 
 "Downloading update..." = "Haen päivitystä…";
 

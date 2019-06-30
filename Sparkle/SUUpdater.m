@@ -25,6 +25,8 @@
 #include <SystemConfiguration/SystemConfiguration.h>
 #import "SUSystemProfiler.h"
 #import "SUSystemUpdateInfo.h"
+#import "SUSignatures.h"
+#import "SUOperatingSystem.h"
 
 NSString *const SUUpdaterDidFinishLoadingAppCastNotification = @"SUUpdaterDidFinishLoadingAppCastNotification";
 NSString *const SUUpdaterDidFindValidUpdateNotification = @"SUUpdaterDidFindValidUpdateNotification";
@@ -68,7 +70,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 static NSMutableDictionary *sharedUpdaters = nil;
 static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaultsObservationContext";
 
-#ifdef DEBUG
+// Debug is not defined in released builds and pedantic mode can enable -Wundef
+#if defined(DEBUG) && DEBUG
 + (void)load
 {
     // Debug builds have different configurations for update check intervals
@@ -88,7 +91,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     if (bundle == nil) bundle = [NSBundle mainBundle];
     id updater = [sharedUpdaters objectForKey:[NSValue valueWithNonretainedObject:bundle]];
     if (updater == nil) {
-        updater = [[[self class] alloc] initForBundle:bundle];
+        updater = [(SUUpdater *)[[self class] alloc] initForBundle:bundle];
     }
     return updater;
 }
@@ -138,30 +141,24 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
 }
 
 -(void)checkIfConfiguredProperly {
-    BOOL hasPublicDSAKey = [self.host publicDSAKey] != nil;
+    BOOL hasPublicKey = self.host.publicKeys.dsaPubKey != nil || self.host.publicKeys.ed25519PubKey != nil;
     BOOL isMainBundle = [self.host.bundle isEqualTo:[NSBundle mainBundle]];
     BOOL hostIsCodeSigned = [SUCodeSigningVerifier bundleAtURLIsCodeSigned:self.host.bundle.bundleURL];
     NSURL *feedURL = [self feedURL];
     BOOL servingOverHttps = [[[feedURL scheme] lowercaseString] isEqualToString:@"https"];
+    NSString *name = self.host.name;
 
-    if (!hasPublicDSAKey) {
-        // If we failed to retrieve a DSA key but the bundle specifies a path to one, we should consider this a configuration failure
-        NSString *publicDSAKeyFileKey = [self.host publicDSAKeyFileKey];
-        if (publicDSAKeyFileKey != nil) {
-            [self showAlertText:SULocalizedString(@"Insecure update error!", nil)
-                informativeText:[NSString stringWithFormat:SULocalizedString(@"For security reasons, the file (%@) indicated by the '%@' key needs to exist in the bundle's Resources.", nil), publicDSAKeyFileKey, SUPublicDSAKeyFileKey]];
+    if (!hasPublicKey) {
+        if (!isMainBundle) {
+            [self showAlertText:SULocalizedString(@"Auto-update not configured", nil)
+                informativeText:[NSString stringWithFormat:SULocalizedString(@"For security reasons, updates to %@ need to be signed with an EdDSA key. See Sparkle's documentation for more information.", nil), name]];
         } else {
-            if (!isMainBundle) {
-                [self showAlertText:SULocalizedString(@"Insecure update error!", nil)
-                    informativeText:SULocalizedString(@"For security reasons, you need to sign your updates with a DSA key. See Sparkle's documentation for more information.", nil)];
-            } else {
-                if (!hostIsCodeSigned) {
-                    [self showAlertText:SULocalizedString(@"Insecure update error!", nil)
-                        informativeText:SULocalizedString(@"For security reasons, you need to code sign your application or sign your updates with a DSA key. See https://sparkle-project.org/documentation/ for more information.", nil)];
-                } else if (!servingOverHttps) {
-                    [self showAlertText:SULocalizedString(@"Insecure update error!", nil)
-                        informativeText:SULocalizedString(@"For security reasons, you need to serve your updates over HTTPS and/or sign your updates with a DSA key. See https://sparkle-project.org/documentation/ for more information.", nil)];
-                }
+            if (!hostIsCodeSigned) {
+                [self showAlertText:SULocalizedString(@"Auto-update not configured", nil)
+                    informativeText:[NSString stringWithFormat:SULocalizedString(@"For security reasons, %@ needs to be code-signed or its updates need to be signed with an EdDSA key. See https://sparkle-project.org/documentation/ for more information.", nil), name]];
+            } else if (!servingOverHttps) {
+                [self showAlertText:SULocalizedString(@"Auto-update not configured", nil)
+                    informativeText:[NSString stringWithFormat:SULocalizedString(@"For security reasons, updates to %@ need to be served over HTTPS and/or signed with an EdDSA key. See https://sparkle-project.org/documentation/ for more information.", nil), name]];
             }
         }
     }
@@ -302,8 +299,11 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     BOOL automatic = [self automaticallyDownloadsUpdates];
 
     if (!automatic) {
-        if (@available(macOS 10.9, *)) {
+        if (SUAVAILABLE(10, 9)) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability"
             NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"com.apple.notificationcenterui"];
+#pragma clang diagnostic pop
             BOOL dnd = [defaults boolForKey:@"doNotDisturb"];
             if (dnd) {
                 SULog(SULogLevelDefault, @"Delayed update, because Do Not Disturb is on");
@@ -315,7 +315,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     }
 
     // Do not use reachability for a preflight check. This can be deceptive and a bad idea. Apple does not recommend doing it.
-    SUUpdateDriver *theUpdateDriver = [[(automatic ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class])alloc] initWithUpdater:self];
+    SUUpdateDriver *theUpdateDriver = [(SUBasicUpdateDriver *)[(automatic ? [SUAutomaticUpdateDriver class] : [SUScheduledUpdateDriver class])alloc] initWithUpdater:self];
     
     [self checkForUpdatesWithDriver:theUpdateDriver];
 }
@@ -537,7 +537,7 @@ static NSString *escapeURLComponent(NSString *str) {
     const NSTimeInterval oneWeek = 60 * 60 * 24 * 7;
     sendingSystemProfile &= (-[lastSubmitDate timeIntervalSinceNow] >= oneWeek);
 
-    NSArray *parameters = @[];
+    NSArray<NSDictionary<NSString *, NSString *> *> *parameters = @[];
     if ([self.delegate respondsToSelector:@selector(feedParametersForUpdater:sendingSystemProfile:)]) {
         parameters = [parameters arrayByAddingObjectsFromArray:[self.delegate feedParametersForUpdater:self sendingSystemProfile:sendingSystemProfile]];
     }
@@ -550,7 +550,7 @@ static NSString *escapeURLComponent(NSString *str) {
 
     // Build up the parameterized URL.
     NSMutableArray *parameterStrings = [NSMutableArray array];
-    for (NSDictionary *currentProfileInfo in parameters) {
+    for (NSDictionary<NSString *, NSString *> *currentProfileInfo in parameters) {
         [parameterStrings addObject:[NSString stringWithFormat:@"%@=%@", escapeURLComponent([[currentProfileInfo objectForKey:@"key"] description]), escapeURLComponent([[currentProfileInfo objectForKey:@"value"] description])]];
     }
 
