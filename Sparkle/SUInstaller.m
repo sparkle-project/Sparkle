@@ -152,8 +152,14 @@
 {
     NSBundle *bundle = host.bundle;
     assert(bundle != nil);
-    
-    NSString *normalizedAppPath = [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [host objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey], [[bundle bundlePath] pathExtension]]];
+   
+   NSString * baseBundleName = [host objectForInfoDictionaryKey:@"SUBundleName"];
+   
+   if (baseBundleName == nil) {
+      baseBundleName = [host objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey];
+   }
+   
+    NSString *normalizedAppPath = [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", baseBundleName, [[bundle bundlePath] pathExtension]]];
 
     // Roundtrip string through fileSystemRepresentation to ensure it uses filesystem's Unicode normalization
     // rather than arbitrary Unicode form from Info.plist - #1017
