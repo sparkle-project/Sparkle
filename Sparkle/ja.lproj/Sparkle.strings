@@ -8,7 +8,7 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@は現在入手できる最新バージョンです。";
 
-"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@は現在入手できる最新バージョンです。\n(You are currently running version %3$@.)";
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@は現在入手できる最新バージョンです。\n（現在使用中のバージョンは%3$@です。）";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@が入手できます（使用中のバージョンは%3$@です）。今すぐダウンロードしますか?";
