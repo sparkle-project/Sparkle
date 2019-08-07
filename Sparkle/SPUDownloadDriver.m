@@ -131,6 +131,8 @@
         self.connection = nil;
     }
     self.downloadName = nil;
+    
+    [self.downloader cancelDownload];
     self.downloader = nil;
 }
 

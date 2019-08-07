@@ -111,6 +111,11 @@ static NSString *SUDownloadingReason = @"Downloading update related file";
     }
 }
 
+- (void)cancelDownload
+{
+    [self cleanup];
+}
+
 - (void)cleanup
 {
     [self enableAutomaticTermination];
