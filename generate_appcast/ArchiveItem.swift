@@ -96,7 +96,7 @@ class ArchiveItem: CustomStringConvertible {
                 feedURL = URL(string: feedURLStr);
                 if feedURL?.pathExtension == "php" {
                     feedURL?.deletingLastPathComponent()
-                    feedURL?.appendingPathComponent("appcast.php")
+                    feedURL?.appendingPathComponent("appcast.xml")
                 }
             }
 
