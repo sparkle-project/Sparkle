@@ -179,7 +179,7 @@
             break;
 
         case SUSkipThisVersionChoice:
-            if ([[updater delegate] respondsToSelector:@selector(userDidSkipThisVersion:)]) { 
+            if ([[updater delegate] respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) { 
                 [[updater delegate] updater:self.updater userDidSkipThisVersion:self.updateItem]; 
             }
             [self didDismissAlertPermanently:YES forItem:item];

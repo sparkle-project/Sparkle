@@ -146,7 +146,7 @@ SU_EXPORT extern NSString *const SUUpdaterAppcastNotificationKey;
  
  \param updater The SUUpdater instance.
  */
-- (void)userDidSkipThisVersion:(SUUpdater *)updater;
+- (void)updater:(SUUpdater *)updater userDidSkipThisVersion:(SUAppcastItem *)item;
 
 /*!
  Called immediately before downloading the specified update.
