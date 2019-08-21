@@ -93,7 +93,10 @@ class ArchiveItem: CustomStringConvertible {
 
             var feedURL:URL? = nil;
             if let feedURLStr = infoPlist["SUFeedURL"] as? String {
-                feedURL = URL(string: feedURLStr);
+                if let feedURL = URL(string: feedURLStr), feedURL.pathExtension == "php" {
+                    feedURL = feedURL.deletingLastPathComponent()
+                    feedURL = feedURL.appendingPathComponent("appcast.xml")
+                }
             }
 
             try self.init(version: version,
