@@ -25,6 +25,20 @@
 @end
 
 
+// WebKit protocols are not explicitly declared until 10.11 SDK, so
+// declare dummy protocols to keep the build working on earlier SDKs.
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101100
+@protocol WebFrameLoadDelegate <NSObject>
+@end
+@protocol WebPolicyDelegate <NSObject>
+@end
+@protocol WebUIDelegate <NSObject>
+@end
+#endif
+
+@interface SUUpdateAlert () <WebFrameLoadDelegate, WebPolicyDelegate>//, WebUIDelegate, NSTouchBarDelegate>
+@end
+
 @implementation SUUpdateAlert
 
 - (id)initWithAppcastItem:(SUAppcastItem *)item host:(SUHost *)aHost
