@@ -33,7 +33,7 @@ func loadPrivateKeys(_ privateDSAKey: SecKey?, _ privateEdString: String?) -> Pr
 
     // private + public key is provided as argument
     if let privateEdString = privateEdString {
-        if privateEdString.count == 128, let data = privateEdString.data(using: .utf8) {
+        if privateEdString.count == 128, let data = Data(base64Encoded: privateEdString) {
             keys = data
         } else {
             print("Warning: Private key not found in the argument. Please provide a valid key.");
