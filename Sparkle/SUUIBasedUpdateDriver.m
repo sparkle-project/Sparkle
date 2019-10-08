@@ -126,7 +126,7 @@
             alert.messageText = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
 
             if (self.latestAppcastItemComparisonResult == NSOrderedDescending ) { // this means the user is a 'newer than latest' version. give a slight hint to the user instead of wrongly claiming this version is identical to the latest feed version.
-                alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.\n(You are currently running version %@.)", nil), [self.host name], self.latestAppcastItem.versionString, [self.host displayVersion]];
+                alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.\n(You are currently running version %@.)", nil), [self.host name], self.latestAppcastItem.displayVersionString, [self.host displayVersion]];
             }
             else {
                 alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
@@ -165,6 +165,7 @@
 {
     self.updateAlert = nil;
     [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
+    id<SUUpdaterPrivate> updater = self.updater;
     switch (choice) {
         case SUInstallUpdateChoice:
             [self didDismissAlertPermanently:NO forItem:item];
@@ -178,6 +179,9 @@
             break;
 
         case SUSkipThisVersionChoice:
+            if ([[updater delegate] respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) { 
+                [[updater delegate] updater:self.updater userDidSkipThisVersion:self.updateItem]; 
+            }
             [self didDismissAlertPermanently:YES forItem:item];
             [self.host setObject:[self.updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
             [self abortUpdate];

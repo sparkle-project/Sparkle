@@ -25,22 +25,39 @@ func printUsage() {
     )
 }
 
-func loadPrivateKeys(_ privateDSAKey: SecKey?) -> PrivateKeys {
+func loadPrivateKeys(_ privateDSAKey: SecKey?, _ privateEdString: String?) -> PrivateKeys {
     var privateEdKey: Data?;
     var publicEdKey: Data?;
     var item: CFTypeRef?;
-    let res = SecItemCopyMatching([
-        kSecClass as String: kSecClassGenericPassword,
-        kSecAttrService as String: "https://sparkle-project.org",
-        kSecAttrAccount as String: "ed25519",
-        kSecAttrProtocol as String: kSecAttrProtocolSSH,
-        kSecReturnData as String: kCFBooleanTrue,
-        ] as CFDictionary, &item);
-    if res == errSecSuccess, let encoded = item as? Data, let keys = Data(base64Encoded: encoded) {
+    var keys: Data?
+
+    // private + public key is provided as argument
+    if let privateEdString = privateEdString {
+        if privateEdString.count == 128, let data = Data(base64Encoded: privateEdString) {
+            keys = data
+        } else {
+            print("Warning: Private key not found in the argument. Please provide a valid key.");
+        }
+    }
+    // get keys from kechain instead
+    else {
+        let res = SecItemCopyMatching([
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: "https://sparkle-project.org",
+            kSecAttrAccount as String: "ed25519",
+            kSecAttrProtocol as String: kSecAttrProtocolSSH,
+            kSecReturnData as String: kCFBooleanTrue,
+            ] as CFDictionary, &item);
+        if res == errSecSuccess, let encoded = item as? Data, let data = Data(base64Encoded: encoded) {
+            keys = data
+        } else {
+            print("Warning: Private key not found in the Keychain (\(res)). Please run the generate_keys tool");
+        }
+    }
+
+    if let keys = keys {
         privateEdKey = keys[0..<64];
         publicEdKey = keys[64...];
-    } else {
-        print("Warning: Private key not found in the Keychain (\(res)). Please run the generate_keys tool");
     }
     return PrivateKeys(privateDSAKey: privateDSAKey, privateEdKey: privateEdKey, publicEdKey: publicEdKey);
 }
@@ -53,6 +70,7 @@ func main() {
     }
     
     var privateDSAKey: SecKey? = nil;
+    var privateEdString: String? = nil;
 
     // this was typical usage for DSA keys
     if args.count == 3 || (args.count == 4 && args[1] == "-f") {
@@ -98,13 +116,17 @@ func main() {
             exit(1)
         }
     }
+    // private + public EdDSA keys are provided via command line argument
+    else if args.count == 4 && args[1] == "-s" {
+        privateEdString = args[2]
+    }
     else if args.count != 2 {
         printUsage()
         exit(1)
     }
     
     let archivesSourceDir = URL(fileURLWithPath: args.last!, isDirectory: true)
-    let keys = loadPrivateKeys(privateDSAKey)
+    let keys = loadPrivateKeys(privateDSAKey, privateEdString)
 
     do {
         let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, keys: keys, verbose:verbose);
