@@ -61,9 +61,9 @@ static NSString *SPUURLRequestNetworkServiceTypeKey = @"SPUURLRequestNetworkServ
 - (void)encodeWithCoder:(NSCoder *)coder
 {
     [coder encodeObject:self.url forKey:SPUURLRequestURLKey];
-    [coder encodeInteger:self.cachePolicy forKey:SPUURLRequestCachePolicyKey];
+    [coder encodeInteger:(NSInteger)self.cachePolicy forKey:SPUURLRequestCachePolicyKey];
     [coder encodeDouble:self.timeoutInterval forKey:SPUURLRequestTimeoutIntervalKey];
-    [coder encodeInteger:self.networkServiceType forKey:SPUURLRequestNetworkServiceTypeKey];
+    [coder encodeInteger:(NSInteger)self.networkServiceType forKey:SPUURLRequestNetworkServiceTypeKey];
     
     if (self.httpHeaderFields != nil) {
         [coder encodeObject:self.httpHeaderFields forKey:SPUURLRequestHttpHeaderFieldsKey];
