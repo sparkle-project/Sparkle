@@ -262,41 +262,27 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
     if ([self.updateItem isCriticalUpdate]) {
         self.skipButton.enabled = NO;
+        self.skipButton.hidden = YES;
+        self.laterButton.enabled = NO;
+        self.laterButton.hidden = YES;
     }
 
-    if([self shouldHideSkipButton])
-    {
-        [self.skipButton setHidden:YES];
-    }
-
-    if([self shouldHideRemindButton])
-    {
-        [self.laterButton setHidden:YES];
+    if (![self automaticChecksEnabled]) {
+        self.laterButton.enabled = NO;
+        self.laterButton.hidden = YES;
     }
     
     [self.window center];
 }
 
-- (BOOL)shouldHideSkipButton
-{
-    NSNumber *shouldDisableSkipButton = [self.host objectForInfoDictionaryKey:SUHideSkipButtonKey];
-    if (shouldDisableSkipButton == nil)
+- (BOOL)automaticChecksEnabled {
+    NSNumber *automaticChecksEnabled = [self.host objectForInfoDictionaryKey:SUEnableAutomaticChecksKey];
+    if (automaticChecksEnabled == nil)
     {
         return false;
     }
 
-    return [shouldDisableSkipButton boolValue];
-}
-
-- (BOOL)shouldHideRemindButton
-{
-    NSNumber *shouldDisableRemindButton = [self.host objectForInfoDictionaryKey:SUHideRemindButtonKey];
-    if (shouldDisableRemindButton == nil)
-    {
-        return false;
-    }
-
-    return [shouldDisableRemindButton boolValue];
+    return [automaticChecksEnabled boolValue];
 }
 
 - (BOOL)windowShouldClose:(NSNotification *) __unused note
