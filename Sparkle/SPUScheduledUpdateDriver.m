@@ -83,8 +83,8 @@
 - (void)notifyDelegateAboutError:(nullable NSError *)error
 {
     if (error == nil) { return; }
-    if ([self.updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
-        [self.updaterDelegate updater:self.updater didAbortWithError:(NSError * _Nonnull)error];
+    if ([self.updaterDelegate respondsToSelector:@selector(updater:scheduledUpdateCheckDidAbortWithError:)]) {
+        [self.updaterDelegate updater:self.updater scheduledUpdateCheckDidAbortWithError:(NSError * _Nonnull)error];
     }
 }
     
