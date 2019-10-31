@@ -300,6 +300,14 @@ typedef NS_ENUM(NSInteger, SPUUpdateCheck)
  */
 - (void)updater:(SPUUpdater *)updater didAbortWithError:(NSError *)error;
 
+/*!
+ Called after an update is aborted due to an error during an scheduled update check.
+  
+ \param updater The updater instance.
+ \param error The error that caused the abort
+ */
+- (void)updater:(SPUUpdater *)updater scheduledUpdateCheckDidAbortWithError:(NSError *)error;
+
 @end
 
 NS_ASSUME_NONNULL_END
