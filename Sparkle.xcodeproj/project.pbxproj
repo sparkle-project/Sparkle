@@ -65,6 +65,7 @@
 		34074BA81FEAC417001CB3A5 /* SPUDownloaderDeprecated.m in Sources */ = {isa = PBXBuildFile; fileRef = 34074BA61FEAC417001CB3A5 /* SPUDownloaderDeprecated.m */; };
 		342731481FF58E5B00285FBD /* SPUDownloaderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 342731461FF58E4F00285FBD /* SPUDownloaderTest.swift */; };
 		3772FEA913DE0B6B00F79537 /* SUVersionDisplayProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4444E790237B057900CBB3CF /* testlocalizedreleasenotesappcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4444E78E237B047B00CBB3CF /* testlocalizedreleasenotesappcast.xml */; };
 		55C14BD4136EEFCE00649790 /* Autoupdate.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14BD3136EEFCE00649790 /* Autoupdate.m */; };
 		55C14BD9136EF00C00649790 /* SUStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BD8136EF00C00649790 /* SUStatus.xib */; };
 		55C14BEE136EF20D00649790 /* SUAutomaticUpdateAlert.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55C14BDA136EF20D00649790 /* SUAutomaticUpdateAlert.xib */; };
@@ -648,6 +649,7 @@
 		34074BA61FEAC417001CB3A5 /* SPUDownloaderDeprecated.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPUDownloaderDeprecated.m; sourceTree = "<group>"; };
 		342731461FF58E4F00285FBD /* SPUDownloaderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SPUDownloaderTest.swift; sourceTree = "<group>"; };
 		3772FEA813DE0B6B00F79537 /* SUVersionDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SUVersionDisplayProtocol.h; sourceTree = "<group>"; };
+		4444E78E237B047B00CBB3CF /* testlocalizedreleasenotesappcast.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = testlocalizedreleasenotesappcast.xml; sourceTree = "<group>"; };
 		4607BEA21948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		4607BEA31948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nb; path = nb.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
 		4607BEA41948443800EF8DA4 /* nb */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = nb; path = nb.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
@@ -1275,6 +1277,7 @@
 				5AF6C74E1AEA46D10014A3AB /* test.pkg */,
 				5AD0FA7E1C73F2E2004BCEFF /* testappcast.xml */,
 				5F1510A11C96E591006E1629 /* testnamespaces.xml */,
+				4444E78E237B047B00CBB3CF /* testlocalizedreleasenotesappcast.xml */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -2110,6 +2113,7 @@
 				14958C6E19AEBC950061B14F /* signed-test-file.txt in Resources */,
 				72AC6B2E1B9B218C00F62325 /* SparkleTestCodeSignApp.dmg in Resources */,
 				C23E885B1BE7B24F0050BB73 /* SparkleTestCodeSignApp.enc.dmg in Resources */,
+				4444E790237B057900CBB3CF /* testlocalizedreleasenotesappcast.xml in Resources */,
 				72AC6B281B9AAD6700F62325 /* SparkleTestCodeSignApp.tar in Resources */,
 				72AC6B2A1B9AAF3A00F62325 /* SparkleTestCodeSignApp.tar.bz2 in Resources */,
 				72AC6B261B9AAC8800F62325 /* SparkleTestCodeSignApp.tar.gz in Resources */,
