@@ -119,7 +119,12 @@
     SUAppcastItem *item = nil;
     for(SUAppcastItem *candidate in appcastItems) {
         if ([self hostSupportsItem:candidate]) {
-            if (!item || [comparator compareVersion:item.versionString toVersion:candidate.versionString] == NSOrderedAscending) {
+            if (
+                !item || (
+                    [item.date compare:candidate.date] == NSOrderedAscending &&
+                    [comparator compareVersion:item.versionString toVersion:candidate.versionString] != NSOrderedDescending
+                )
+            ) {
                 item = candidate;
             }
         }
