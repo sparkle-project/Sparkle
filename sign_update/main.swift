@@ -66,7 +66,7 @@ func edSignature(data: Data, publicEdKey: Data, privateEdKey: Data) -> String {
 let args = CommandLine.arguments;
 if args.count != 2 && !(args.count == 4 && args[1] == "-s") {
     print("Usage: \n")
-    print("\t1. \(args[0]) <archive to sign>\n\tPrivavte EdDSA (ed25519) key is automatically read from the Keychain.\n");
+    print("\t1. \(args[0]) <archive to sign>\n\tPrivate EdDSA (ed25519) key is automatically read from the Keychain.\n");
     print("\t2 \(args[0]) -s <key> <archive to sign>\n\tThe key's length is 128 that includes private and public key.\n")
     exit(1)
 }
