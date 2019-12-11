@@ -209,11 +209,12 @@
     }
     
     // Try to preserve Finder tags. Failure can be accepted without complaint as previous Sparkle versions did not do this at all
-    NSArray *resourceTags;
-    BOOL success = [oldTempURL getResourceValue:&resourceTags forKey:NSURLTagNamesKey error:NULL];
-    if (success && resourceTags.count)
-    {
-        [destinationAppURL setResourceValue:resourceTags forKey:NSURLTagNamesKey error:NULL];
+    if (SUAVAILABLE(10, 9)) {
+        NSArray *resourceTags;
+        BOOL success = [oldTempURL getResourceValue:&resourceTags forKey:NSURLTagNamesKey error:NULL];
+        if (success && resourceTags.count) {
+            [destinationAppURL setResourceValue:resourceTags forKey:NSURLTagNamesKey error:NULL];
+        }
     }
 
     // From here on out, we don't really need to bring up authorization if we haven't done so prior
