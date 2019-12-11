@@ -32,6 +32,7 @@ class SUAppcastTest: XCTestCase {
             XCTAssertNil(items[1].itemDescription);
             XCTAssertNil(items[1].dateString)
             XCTAssertFalse(items[1].isCriticalUpdate);
+            XCTAssertEqual(items[1].phasedRolloutInterval, 86400);
             
             XCTAssertEqual("Version 4.0", items[2].title);
             XCTAssertNil(items[2].itemDescription);
@@ -64,6 +65,22 @@ class SUAppcastTest: XCTestCase {
         } catch let err as NSError {
             NSLog("%@", err);
             XCTFail(err.localizedDescription);
+        }
+    }
+
+    func testParseAppcastWithLocalizedReleaseNotes() {
+        let appcast = SUAppcast()
+        let testFile = Bundle(for: SUAppcastTest.self).path(forResource: "testlocalizedreleasenotesappcast",
+                                                            ofType: "xml")!
+        let testFileUrl = URL(fileURLWithPath: testFile)
+        XCTAssertNotNil(testFileUrl)
+
+        do {
+            let items = try appcast.parseAppcastItems(fromXMLFile: testFileUrl) as! [SUAppcastItem];
+            XCTAssertEqual("https://sparkle-project.org/#localized_notes_link_works", items[0].releaseNotesURL.absoluteString)
+        } catch let err as NSError {
+            NSLog("%@", err)
+            XCTFail(err.localizedDescription)
         }
     }
 

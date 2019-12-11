@@ -56,6 +56,10 @@
     return self;
 }
 
+- (BOOL)shouldShowUpdateAlertForItem:(SUAppcastItem *)__unused item {
+    return YES;
+}
+
 - (void)didFindValidUpdate
 {
     id<SUUpdaterPrivate> updater = self.updater;
@@ -64,12 +68,18 @@
     }
 
     if (self.automaticallyInstallUpdates) {
-        [self updateAlertFinishedWithChoice:SUInstallUpdateChoice];
+        [self updateAlertFinishedWithChoice:SUInstallUpdateChoice forItem:nil];
         return;
     }
 
-    self.updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:self.updateItem host:self.host completionBlock:^(SUUpdateAlertChoice choice) {
-        [self updateAlertFinishedWithChoice:choice];
+    SUAppcastItem *updateItem = self.updateItem;
+    if (![self shouldShowUpdateAlertForItem:updateItem]) {
+        [self abortUpdate];
+        return;
+    }
+
+    self.updateAlert = [[SUUpdateAlert alloc] initWithAppcastItem:updateItem host:self.host completionBlock:^(SUUpdateAlertChoice choice) {
+        [self updateAlertFinishedWithChoice:choice forItem:updateItem];
     }];
 
     id<SUVersionDisplay> versDisp = nil;
@@ -110,9 +120,25 @@
 
     if (!self.automaticallyInstallUpdates) {
         NSAlert *alert = [[NSAlert alloc] init];
-        alert.messageText = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
-        alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
-        [alert addButtonWithTitle:SULocalizedString(@"OK", nil)];
+        
+        if (self.latestAppcastItem) // if the appcast was successfully loaded
+        {
+            alert.messageText = SULocalizedString(@"You're up-to-date!", "Status message shown when the user checks for updates but is already current or the feed doesn't contain any updates.");
+
+            if (self.latestAppcastItemComparisonResult == NSOrderedDescending ) { // this means the user is a 'newer than latest' version. give a slight hint to the user instead of wrongly claiming this version is identical to the latest feed version.
+                alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.\n(You are currently running version %@.)", nil), [self.host name], self.latestAppcastItem.displayVersionString, [self.host displayVersion]];
+            }
+            else {
+                alert.informativeText = [NSString stringWithFormat:SULocalizedString(@"%@ %@ is currently the newest version available.", nil), [self.host name], [self.host displayVersion]];
+            }
+            [alert addButtonWithTitle:SULocalizedString(@"OK", nil)];
+        }
+        else {
+            alert.messageText = SULocalizedString(@"Update Error!", nil);
+            alert.informativeText = SULocalizedString(@"No valid update information could be loaded.", nil);
+            [alert addButtonWithTitle:SULocalizedString(@"Cancel Update", nil)];
+        }
+	    
         [self showAlert:alert];
     }
     
@@ -125,26 +151,44 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationDidBecomeActiveNotification object:NSApp];
 }
 
-- (void)updateAlertFinishedWithChoice:(SUUpdateAlertChoice)choice
+- (void)didDismissAlertPermanently:(BOOL)permanently forItem:(SUAppcastItem *)item {
+    if (item == nil) {
+        return;
+    }
+    id<SUUpdaterPrivate> updater = self.updater;
+    if ([updater.delegate respondsToSelector:@selector(updater:didDismissUpdateAlertPermanently:forItem:)]) {
+        [updater.delegate updater:self.updater didDismissUpdateAlertPermanently:permanently forItem:item];
+    }
+}
+
+- (void)updateAlertFinishedWithChoice:(SUUpdateAlertChoice)choice forItem:(SUAppcastItem *)item
 {
     self.updateAlert = nil;
     [self.host setObject:nil forUserDefaultsKey:SUSkippedVersionKey];
+    id<SUUpdaterPrivate> updater = self.updater;
     switch (choice) {
         case SUInstallUpdateChoice:
+            [self didDismissAlertPermanently:NO forItem:item];
             [self downloadUpdate];
             break;
 
         case SUOpenInfoURLChoice:
+            [self didDismissAlertPermanently:NO forItem:item];
             [[NSWorkspace sharedWorkspace] openURL:[self.updateItem infoURL]];
             [self abortUpdate];
             break;
 
         case SUSkipThisVersionChoice:
+            if ([[updater delegate] respondsToSelector:@selector(updater:userDidSkipThisVersion:)]) { 
+                [[updater delegate] updater:self.updater userDidSkipThisVersion:self.updateItem]; 
+            }
+            [self didDismissAlertPermanently:YES forItem:item];
             [self.host setObject:[self.updateItem versionString] forUserDefaultsKey:SUSkippedVersionKey];
             [self abortUpdate];
             break;
 
         case SURemindMeLaterChoice:
+            [self didDismissAlertPermanently:NO forItem:item];
             [self abortUpdate];
             break;
     }

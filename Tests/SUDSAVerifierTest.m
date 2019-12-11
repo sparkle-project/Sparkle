@@ -8,7 +8,8 @@
 
 #import <Foundation/Foundation.h>
 #import <XCTest/XCTest.h>
-#import "SUDSAVerifier.h"
+#import "SUSignatureVerifier.h"
+#import "SUSignatures.h"
 
 @interface SUDSAVerifierTest : XCTestCase
 @property NSString *testFile, *pubKeyFile;
@@ -27,7 +28,7 @@
 
 - (void)testVerifyFileAtPath
 {
-    NSData *pubKey = [NSData dataWithContentsOfFile:self.pubKeyFile];
+    NSString *pubKey = [NSString stringWithContentsOfFile:self.pubKeyFile encoding:NSASCIIStringEncoding error:nil];
     XCTAssertNotNil(pubKey, @"Public key must be readable");
 
     NSString *validSig = @"MCwCFCIHCIYYkfZavNzTitTW5tlRp/k5AhQ40poFytqcVhIYdCxQznaXeJPJDQ==";
@@ -38,7 +39,7 @@
                   @"Expected valid signature");
 
     XCTAssertFalse([self checkFile:self.testFile
-                        withPubKey:[NSData dataWithBytes:"lol" length:3]
+                        withPubKey:@"lol"
                          signature:validSig],
                    @"Invalid pubkey");
 
@@ -63,23 +64,29 @@
                    @"Expected invalid signature");
 }
 
-- (BOOL)checkFile:(NSString *)aFile withPubKey:(NSData *)pubKey signature:(NSString *)sigString
+- (BOOL)checkFile:(NSString *)aFile withPubKey:(NSString *)pubKey signature:(NSString *)sigString
 {
-    SUDSAVerifier *v = [[SUDSAVerifier alloc] initWithPublicKeyData:pubKey];
+    SUPublicKeys *pubKeys = [[SUPublicKeys alloc] initWithDsa:pubKey ed:nil];
+    SUSignatureVerifier *v = [[SUSignatureVerifier alloc] initWithPublicKeys:pubKeys];
 
-    NSData *sig = [[NSData alloc] initWithBase64EncodedString:sigString options:(NSDataBase64DecodingOptions)0];
+    SUSignatures *sig = [[SUSignatures alloc] initWithDsa:sigString ed:nil];
 
-    return [v verifyFileAtPath:aFile signature:sig];
+    return [v verifyFileAtPath:aFile signatures:sig];
 }
 
 - (void)testValidatePath
 {
-    NSString *pubkey = [NSString stringWithContentsOfFile:self.pubKeyFile encoding:NSASCIIStringEncoding error:nil];
+    NSString *dsaStr = [NSString stringWithContentsOfFile:self.pubKeyFile encoding:NSASCIIStringEncoding error:nil];
+    XCTAssertNotNil(dsaStr);
+    SUPublicKeys *pubkeys = [[SUPublicKeys alloc] initWithDsa:dsaStr ed:nil];
+    XCTAssertNotNil(pubkeys);
+    XCTAssertNotNil(pubkeys.dsaPubKey);
 
-    XCTAssertTrue([SUDSAVerifier validatePath:self.testFile
-                      withEncodedDSASignature:@"MC0CFFMF3ha5kjvrJ9JTpTR8BenPN9QUAhUAzY06JRdtP17MJewxhK0twhvbKIE="
-                             withPublicDSAKey:pubkey],
-                  @"Expected valid signature");
+    SUSignatures *sig = [[SUSignatures alloc] initWithDsa:@"MC0CFFMF3ha5kjvrJ9JTpTR8BenPN9QUAhUAzY06JRdtP17MJewxhK0twhvbKIE=" ed:nil];
+    XCTAssertNotNil(sig);
+    XCTAssertNotNil(sig.dsaSignature);
+
+    XCTAssertTrue([SUSignatureVerifier validatePath:self.testFile withSignatures:sig withPublicKeys:pubkeys], @"Expected valid signature");
 }
 
 @end

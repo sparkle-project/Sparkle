@@ -148,7 +148,7 @@
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" priority="222" constant="90" id="2Zy-5G-GBj"/>
                         </constraints>
-                        <buttonCell key="cell" type="push" title="tekrar Hatırlat" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="171">
+                        <buttonCell key="cell" type="push" title="Sonra Hatırlat" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="171">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
@@ -160,8 +160,8 @@ Gw
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="998" translatesAutoresizingMaskIntoConstraints="NO" id="23">
-                        <rect key="frame" x="103" y="12" width="131" height="32"/>
-                        <buttonCell key="cell" type="push" title="Bu sürümü geç" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="172">
+                        <rect key="frame" x="103" y="12" width="135" height="32"/>
+                        <buttonCell key="cell" type="push" title="Bu Sürümü Geç" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="172">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>

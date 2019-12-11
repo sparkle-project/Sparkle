@@ -146,9 +146,9 @@ Gw
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="183">
                         <font key="font" metaFont="smallSystem"/>
-                        <string key="title">La información de perfil de sistema anónimo se usa para ayudarnos a planear el trabajo de desarrollo futuro. Por favor, póngase en cantacto con nosotros si tiene preguntas sobre esto.
+                        <string key="title">La información de perfil de sistema anónimo se usa para ayudarnos a planear el trabajo de desarrollo futuro. Por favor, póngase en contacto con nosotros si tiene preguntas sobre esto.
 
-Esta es la información que se nos enviaría:</string>
+Esta es la información que nos enviaría:</string>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>

@@ -4,6 +4,8 @@
 
 "%@ %@ is currently the newest version available." = "%1$@ %2$@ היא הגרסה האחונה הזמינה.";
 
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "%1$@ %2$@ היא הגרסה האחונה הזמינה.\n(You are currently running version %3$@.)";
+
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ זמין כעת (לך יש %3$@). ברצונך להוריד כעת?";
 
@@ -16,11 +18,13 @@
 
 "A new version of %@ is available!" = "גרסה חדשה של %@ זמינה!";
 
-"An error occurred during installation. Please try again later." = "שגיאה בהתקנה. אנא נסה שנית במועד מרוחר יותר.";
+"Cancel Update" = "בטל עדכון";
 
-"An error occurred in retrieving update information. Please try again later." = "שגיאה בקבלת מידע על עדכונים. אנא נסה שנית במועד מרוחר יותר.";
+"An error occurred during installation. Please try again later." = "שגיאה בהתקנה. אנא נסה שנית במועד מאוחר יותר.";
 
-"An error occurred while extracting the archive. Please try again later." = "שגיאה בפתיחת הקובת המקווץ. אנא נסה שנית במועד מרוחר יותר.";
+"An error occurred in retrieving update information. Please try again later." = "שגיאה בקבלת מידע על עדכונים. אנא נסה שנית במועד מאוחר יותר.";
+
+"An error occurred while extracting the archive. Please try again later." = "שגיאה בפתיחת הקובת המקווץ. אנא נסה שנית במועד מאוחר יותר.";
 
 "An error occurred while trying to download the file. Please try again later." = "שגיאה בהורדת הקובץ. אנא נסה שנית במועד מאוחר יותר.";
 

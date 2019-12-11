@@ -8,6 +8,7 @@
 
 #import "SPUURLRequest.h"
 
+#import "SUOperatingSystem.h"
 
 #include "AppKitPrevention.h"
 
@@ -61,9 +62,9 @@ static NSString *SPUURLRequestNetworkServiceTypeKey = @"SPUURLRequestNetworkServ
 - (void)encodeWithCoder:(NSCoder *)coder
 {
     [coder encodeObject:self.url forKey:SPUURLRequestURLKey];
-    [coder encodeInteger:self.cachePolicy forKey:SPUURLRequestCachePolicyKey];
+    [coder encodeInteger:(NSInteger)self.cachePolicy forKey:SPUURLRequestCachePolicyKey];
     [coder encodeDouble:self.timeoutInterval forKey:SPUURLRequestTimeoutIntervalKey];
-    [coder encodeInteger:self.networkServiceType forKey:SPUURLRequestNetworkServiceTypeKey];
+    [coder encodeInteger:(NSInteger)self.networkServiceType forKey:SPUURLRequestNetworkServiceTypeKey];
     
     if (self.httpHeaderFields != nil) {
         [coder encodeObject:self.httpHeaderFields forKey:SPUURLRequestHttpHeaderFieldsKey];
@@ -72,11 +73,14 @@ static NSString *SPUURLRequestNetworkServiceTypeKey = @"SPUURLRequestNetworkServ
 
 - (instancetype)initWithCoder:(NSCoder *)decoder
 {
-    if (@available(macOS 10.8, *)) {
+    if (SUAVAILABLE(10, 8)) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability"
         NSURL *url = [decoder decodeObjectOfClass:[NSURL class] forKey:SPUURLRequestURLKey];
         NSURLRequestCachePolicy cachePolicy = (NSURLRequestCachePolicy)[decoder decodeIntegerForKey:SPUURLRequestCachePolicyKey];
         NSTimeInterval timeoutInterval = [decoder decodeDoubleForKey:SPUURLRequestTimeoutIntervalKey];
         NSDictionary<NSString *, NSString *> *httpHeaderFields = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [NSString class]]] forKey:SPUURLRequestHttpHeaderFieldsKey];
+#pragma clang diagnostic pop
         NSURLRequestNetworkServiceType networkServiceType = (NSURLRequestNetworkServiceType)[decoder decodeIntegerForKey:SPUURLRequestNetworkServiceTypeKey];
 
         return [self initWithURL:url cachePolicy:cachePolicy timeoutInterval:timeoutInterval httpHeaderFields:httpHeaderFields networkServiceType:networkServiceType];

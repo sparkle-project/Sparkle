@@ -10,8 +10,11 @@
 #import "SUUpdaterPrivate.h"
 #import "SUUpdaterDelegate.h"
 
-@interface SUScheduledUpdateDriver ()
+#import "SUSystemUpdateInfo.h"
+#import "SUAppcastItem.h"
 
+@interface SUScheduledUpdateDriver ()
+- (BOOL)isItemReadyForPhasedRollout:(SUAppcastItem *)ui;
 @end
 
 @implementation SUScheduledUpdateDriver
@@ -22,6 +25,28 @@
         self.showErrors = NO;
     }
     return self;
+}
+
+- (BOOL)hostSupportsItem:(SUAppcastItem *)ui {
+    return [super hostSupportsItem:ui] && [self isItemReadyForPhasedRollout:ui];
+}
+
+- (BOOL)isItemReadyForPhasedRollout:(SUAppcastItem *)ui {
+    if([ui isCriticalUpdate] || ![ui phasedRolloutInterval]) {
+        return YES;
+    }
+
+    NSDate* itemReleaseDate = ui.date;
+    if(!itemReleaseDate) {
+        return YES;
+    }
+
+    NSTimeInterval timeSinceRelease = [[NSDate date] timeIntervalSinceDate:itemReleaseDate];
+
+    NSTimeInterval phasedRolloutInterval = [[ui phasedRolloutInterval] doubleValue];
+    NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * [SUSystemUpdateInfo updateGroupForHost:self.host];
+
+    return timeSinceRelease >= timeToWaitForGroup;
 }
 
 - (void)didFindValidUpdate
@@ -45,6 +70,22 @@
 
 - (BOOL)shouldDisableKeyboardShortcutForInstallButton {
     return YES;
+}
+
+- (BOOL)shouldShowUpdateAlertForItem:(SUAppcastItem *)item {
+    id<SUUpdaterPrivate> updater = self.updater;
+    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
+
+    if ([updaterDelegate respondsToSelector:@selector(updaterShouldShowUpdateAlertForScheduledUpdate:forItem:)]) {
+        return [updaterDelegate updaterShouldShowUpdateAlertForScheduledUpdate:self.updater forItem:item];
+    }
+
+    return [super shouldShowUpdateAlertForItem:item];
+}
+
+- (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData * _Nullable) downloadData {
+    [SUSystemUpdateInfo setNewUpdateGroupIdentifierForHost:self.host]; // use new update group next time
+    [super downloaderDidFinishWithTemporaryDownloadData:downloadData];
 }
 
 @end

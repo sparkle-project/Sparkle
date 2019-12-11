@@ -6,6 +6,8 @@
 
 "%@ %@ is currently the newest version available." = "A %1$@ %2$@ a jelenleg elérhető legfrissebb verzió.";
 
+"%@ %@ is currently the newest version available.\n(You are currently running version %@.)" = "A %1$@ %2$@ a jelenleg elérhető legfrissebb verzió.\n(You are currently running version %3$@.)";
+
 /* Description text for SUUpdateAlert when the update is downloadable. */
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "A %1$@ %2$@ verziója már elérhető — az Ön jelenlegi verziója a %3$@. Szeretné most letölteni?";
 

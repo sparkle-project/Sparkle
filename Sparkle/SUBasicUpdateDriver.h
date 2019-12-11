@@ -17,13 +17,15 @@
 @interface SUBasicUpdateDriver : SUUpdateDriver <SPUDownloaderDelegate>
 
 @property (strong, readonly) SUAppcastItem *updateItem;
+@property (strong, readonly) SUAppcastItem *latestAppcastItem;
+@property (assign, readonly) NSComparisonResult latestAppcastItemComparisonResult;
 @property (strong, readonly) SPUDownloader *download;
 @property (copy, readonly) NSString *downloadPath;
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui;
-+ (BOOL)hostSupportsItem:(SUAppcastItem *)ui;
+- (BOOL)hostSupportsItem:(SUAppcastItem *)ui;
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui;
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui;
 - (void)appcastDidFinishLoading:(SUAppcast *)ac;
