@@ -25,6 +25,7 @@
 #import "SUUpdater.h"
 #import "SUAppcast.h"
 #import "SUAppcastItem.h"
+#import "SUGlobalUpdateLock.h"
 
 #import "SPUURLRequest.h"
 #import "SPUDownloaderDeprecated.h"
@@ -300,6 +301,9 @@
     if ([[NSFileManager defaultManager] fileExistsAtPath:appCachePath]) {
         [[NSFileManager defaultManager] removeItemAtPath:appCachePath error:NULL];
     }
+
+    // Ensure no other thirdparty app-updater is concurrently updating this app.
+    [[SUGlobalUpdateLock sharedLock] lock];
 
     id<SUUpdaterPrivate> updater = self.updater;
 
@@ -677,6 +681,9 @@
 
 - (void)abortUpdate
 {
+    // Remove lockfile to prevent 3rd party updaters from updating this app if the update is not going to happen anyway
+    [[SUGlobalUpdateLock sharedLock] unlock];
+
     [self cleanUpDownload];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     self.updateItem = nil;
