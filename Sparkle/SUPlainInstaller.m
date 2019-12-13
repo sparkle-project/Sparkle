@@ -13,6 +13,7 @@
 #import "SUHost.h"
 #import "SULog.h"
 #import "SUErrors.h"
+#import "SUOperatingSystem.h"
 
 
 #include "AppKitPrevention.h"
@@ -213,7 +214,7 @@
         NSArray *resourceTags;
         BOOL success = [oldTempURL getResourceValue:&resourceTags forKey:NSURLTagNamesKey error:NULL];
         if (success && resourceTags.count) {
-            [destinationAppURL setResourceValue:resourceTags forKey:NSURLTagNamesKey error:NULL];
+            [installationURL setResourceValue:resourceTags forKey:NSURLTagNamesKey error:NULL];
         }
     }
 
