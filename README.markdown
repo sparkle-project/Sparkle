@@ -1,8 +1,11 @@
-# Sparkle [![Build Status](https://travis-ci.org/sparkle-project/Sparkle.svg?branch=master)](https://travis-ci.org/sparkle-project/Sparkle) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) [![CocoaPods](https://img.shields.io/cocoapods/v/Sparkle.svg?maxAge=2592000)]() <a href="https://www.stackpath.com/?utm_source=sparkle-github&amp;utm_medium=badge&amp;utm_campaign=readme"><img src="https://img.shields.io/badge/sponsored%20by-StackPath-orange.svg" alt="sponsored by: StackPath"></a>
+# Sparkle 1.x [![Build Status](https://travis-ci.org/sparkle-project/Sparkle.svg?branch=master)](https://travis-ci.org/sparkle-project/Sparkle) [![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) [![CocoaPods](https://img.shields.io/cocoapods/v/Sparkle.svg?maxAge=2592000)]() <a href="https://www.stackpath.com/?utm_source=sparkle-github&amp;utm_medium=badge&amp;utm_campaign=readme"><img src="https://img.shields.io/badge/sponsored%20by-StackPath-orange.svg" alt="sponsored by: StackPath"></a>
 
 Secure and reliable software update framework for Cocoa developers.
 
 <img src="Resources/Screenshot.png" width="732" alt="Sparkle shows familiar update window with release notes">
+
+This branch is the production ready, battle-tested version of Sparkle used by thousands of Mac apps.
+The upcoming Sparkle 2 (currently in beta) can be found in the [2.x branch](https://github.com/sparkle-project/Sparkle/tree/2.x).
 
 ## Features
 
@@ -23,7 +26,7 @@ Secure and reliable software update framework for Cocoa developers.
 * Runtime: macOS 10.7 or greater
 * Build: Xcode 9 and 10.11 SDK or greater
 * HTTPS server for serving updates (see [App Transport Security](http://sparkle-project.org/documentation/app-transport-security/))
-* No sandboxing. Sparkle 1.x can't update sandboxed apps. Sparkle 2.0 (alpha) can.
+* No sandboxing. Sparkle 1.x can't update sandboxed apps. [Sparkle 2.x](https://github.com/sparkle-project/Sparkle/tree/2.x) can.
 
 ## Usage
 
