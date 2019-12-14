@@ -1,4 +1,4 @@
-# Sparkle-XPC-UI
+# Sparkle 2.x (Beta)
 
 A major fork to the popular Sparkle update framework that supports sandboxing, custom user interfaces, updating other bundles, and a modern secure architecture.
 
