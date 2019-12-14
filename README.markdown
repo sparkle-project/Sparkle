@@ -23,7 +23,7 @@ Secure and reliable software update framework for Cocoa developers.
 * Runtime: macOS 10.7 or greater
 * Build: Xcode 9 and 10.11 SDK or greater
 * HTTPS server for serving updates (see [App Transport Security](http://sparkle-project.org/documentation/app-transport-security/))
-* No sandboxing. Sparkle 1.x can't update sandboxed apps. Sparkle 2.0 (alpha) can.
+* No sandboxing. Sparkle 1.x can't update sandboxed apps. [Sparkle 2.x](https://github.com/sparkle-project/Sparkle/tree/2.x) can.
 
 ## Usage
 
