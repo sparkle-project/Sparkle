@@ -84,7 +84,7 @@ static NSMutableDictionary *sharedUpdaters = nil;
         // either in applicationWillFinishLaunching: or by setting properties right after initialisation
         dispatch_async(dispatch_get_main_queue(), ^{
             NSError *updaterError = nil;
-            if (![_updater startUpdater:&updaterError]) {
+            if (![self.updater startUpdater:&updaterError]) {
                 SULog(SULogLevelError, @"Error: Failed to start updater with error: %@", updaterError);
                 abort();
             }
