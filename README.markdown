@@ -4,6 +4,9 @@ Secure and reliable software update framework for Cocoa developers.
 
 <img src="Resources/Screenshot.png" width="732" alt="Sparkle shows familiar update window with release notes">
 
+This branch is the production ready, battle-tested version of Sparkle used by thousands of Mac apps.
+The upcoming Sparkle 2 (currently in beta) can be found in the [2.x branch](https://github.com/sparkle-project/Sparkle/tree/2.x).
+
 ## Features
 
 * Seamless. There's no mention of Sparkle; your icons and app name are used.
