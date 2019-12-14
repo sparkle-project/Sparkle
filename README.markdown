@@ -13,6 +13,8 @@ Sparkle 2.x is currently in beta. Some people already use it in production, but 
 2. Changes from the master branch need to be merged
 3. Bugs and issues have to be fixed
 
+The current status of Sparkle 2.x is tracked in issue #1523.
+
 If you can help with any of the above, please submit pull requests!
 
 New issues that are found should be [reported here](https://github.com/sparkle-project/Sparkle/issues). Internal design documents can be found in [Documentation](Documentation/). Discussion of this fork can be found in [this issue](https://github.com/sparkle-project/Sparkle/issues/363).
