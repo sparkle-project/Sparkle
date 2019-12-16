@@ -43,7 +43,7 @@ static NSString *const SUSystemProfilerPreferredLanguageKey = @"lang";
 
     // Gather profile information and append it to the URL.
     NSMutableArray<NSDictionary<NSString *, NSString *> *> *profileArray = [NSMutableArray array];
-    NSArray *profileDictKeys = @[@"key", @"displayKey", @"value", @"displayValue"];
+    NSArray<NSString *> *profileDictKeys = @[@"key", @"displayKey", @"value", @"displayValue"];
     int error = 0;
     int value = 0;
     size_t length = sizeof(value);

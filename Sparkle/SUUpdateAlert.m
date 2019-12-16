@@ -374,9 +374,9 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 }
 
 // Clean up the contextual menu.
-- (NSArray *)webView:(WebView *)__unused sender contextMenuItemsForElement:(NSDictionary *)__unused element defaultMenuItems:(NSArray *)defaultMenuItems
+- (NSArray<NSMenuItem *> *)webView:(WebView *)__unused sender contextMenuItemsForElement:(NSDictionary *)__unused element defaultMenuItems:(NSArray<NSMenuItem *> *)defaultMenuItems
 {
-    NSMutableArray *webViewMenuItems = [defaultMenuItems mutableCopy];
+    NSMutableArray<NSMenuItem *> *webViewMenuItems = [defaultMenuItems mutableCopy];
 
 	if (webViewMenuItems)
 	{
