@@ -9,7 +9,6 @@
 #import <Foundation/Foundation.h>
 #import <XCTest/XCTest.h>
 #import "SUCodeSigningVerifier.h"
-#import "SUAdHocCodeSigning.h"
 #import "SUFileManager.h"
 
 #if defined(__MAC_10_15)
@@ -99,8 +98,9 @@
     }
 
     self.validSignedAppURL = signedAndValid;
-    if (![SUAdHocCodeSigning codeSignApplicationAtPath:self.validSignedAppURL.path]) {
-        NSLog(@"Failed to codesign %@", self.validSignedAppURL);
+
+    if (![self codesignAppURL:self.validSignedAppURL]) {
+        XCTFail(@"Failed to codesign %@", self.validSignedAppURL);
     }
 }
 
@@ -119,7 +119,7 @@
     // which sounds like some kind of (SIP / attribute?) bug
     [[NSFileManager defaultManager] copyItemAtURL:[NSURL fileURLWithPath:calculatorPath] toURL:calculatorCopy error:&copyError];
 
-    if (![calculatorCopy checkResourceIsReachableAndReturnError:NULL]) {
+    if (![calculatorCopy checkResourceIsReachableAndReturnError:nil]) {
         XCTFail(@"Copied calculator application does not exist");
     }
 
@@ -144,7 +144,7 @@
     [[NSFileManager defaultManager] removeItemAtURL:signedAndInvalid error:NULL];
     if ([[NSFileManager defaultManager] copyItemAtURL:self.notSignedAppURL toURL:signedAndInvalid error:&error]) {
         self.invalidSignedAppURL = signedAndInvalid;
-        if ([SUAdHocCodeSigning codeSignApplicationAtPath:self.invalidSignedAppURL.path]) {
+        if ([self codesignAppURL:self.invalidSignedAppURL]) {
             NSURL *fileInAppBundleToRemove = [self.invalidSignedAppURL URLByAppendingPathComponent:@"Contents/Resources/test_app_only_dsa_pub.pem"];
             if (![[NSFileManager defaultManager] removeItemAtURL:fileInAppBundleToRemove error:&error]) {
                 NSLog(@"Failed to remove %@ with error %@", fileInAppBundleToRemove, error);
@@ -170,6 +170,25 @@
         task.arguments = @[zipPath];
 
         [task launch];
+        [task waitUntilExit];
+        success = (task.terminationStatus == 0);
+    }
+    @catch (NSException *exception)
+    {
+        NSLog(@"exception: %@", exception);
+    }
+    return success;
+}
+
+- (BOOL)codesignAppURL:(NSURL *)appURL
+{
+    BOOL success = NO;
+    @try
+    {
+        // ad-hoc signing with the dash
+        NSString *appPath = [appURL path];
+        NSArray<NSString *> *arguments = @[ @"--force", @"--deep", @"--sign", @"-", appPath ];
+        NSTask *task = [NSTask launchedTaskWithLaunchPath:@"/usr/bin/codesign" arguments:arguments];
         [task waitUntilExit];
         success = (task.terminationStatus == 0);
     }
