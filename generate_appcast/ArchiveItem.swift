@@ -189,5 +189,23 @@ class ArchiveItem: CustomStringConvertible {
         return URL(string: escapedFilename)
     }
 
+    func localizedReleaseNotes() -> [(String, URL)] {
+        let fileManager = FileManager.default
+        var basename = archivePath.deletingPathExtension()
+        if basename.pathExtension == "tar" {
+            basename = basename.deletingPathExtension()
+        }
+        var localizedReleaseNotes = [(String, URL)]()
+        for languageCode in Locale.isoLanguageCodes {
+            let localizedReleaseNoteURL = basename
+                .appendingPathExtension(languageCode)
+                .appendingPathExtension("html")
+            if fileManager.fileExists(atPath: localizedReleaseNoteURL.path) {
+                localizedReleaseNotes.append((languageCode, localizedReleaseNoteURL))
+            }
+        }
+        return localizedReleaseNotes
+    }
+
     let mimeType = "application/octet-stream";
 }

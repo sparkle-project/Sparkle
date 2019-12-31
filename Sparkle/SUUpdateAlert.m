@@ -262,9 +262,27 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 
     if ([self.updateItem isCriticalUpdate]) {
         self.skipButton.enabled = NO;
+        self.skipButton.hidden = YES;
+        self.laterButton.enabled = NO;
+        self.laterButton.hidden = YES;
     }
 
+    if (![self automaticChecksEnabled]) {
+        self.laterButton.enabled = NO;
+        self.laterButton.hidden = YES;
+    }
+    
     [self.window center];
+}
+
+- (BOOL)automaticChecksEnabled {
+    NSNumber *automaticChecksEnabled = [self.host objectForInfoDictionaryKey:SUEnableAutomaticChecksKey];
+    if (automaticChecksEnabled == nil)
+    {
+        return false;
+    }
+
+    return [automaticChecksEnabled boolValue];
 }
 
 - (BOOL)windowShouldClose:(NSNotification *) __unused note
@@ -356,9 +374,9 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 }
 
 // Clean up the contextual menu.
-- (NSArray *)webView:(WebView *)__unused sender contextMenuItemsForElement:(NSDictionary *)__unused element defaultMenuItems:(NSArray *)defaultMenuItems
+- (NSArray<NSMenuItem *> *)webView:(WebView *)__unused sender contextMenuItemsForElement:(NSDictionary *)__unused element defaultMenuItems:(NSArray<NSMenuItem *> *)defaultMenuItems
 {
-    NSMutableArray *webViewMenuItems = [defaultMenuItems mutableCopy];
+    NSMutableArray<NSMenuItem *> *webViewMenuItems = [defaultMenuItems mutableCopy];
 
 	if (webViewMenuItems)
 	{

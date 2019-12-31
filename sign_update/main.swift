@@ -9,6 +9,14 @@
 import Foundation
 import Security
 
+func parseKeysFromString(_ string: String) -> (Data, Data) {
+    if string.count != 128 {
+        print("ERROR! key not found in the argument. Please provide a valid key.")
+        exit(1)
+    }
+    let keys = Data(base64Encoded: string)!
+    return (keys[0..<64], keys[64...])
+}
 func findKeys() -> (Data, Data) {
     var item: CFTypeRef?;
     let res = SecItemCopyMatching([
@@ -56,15 +64,17 @@ func edSignature(data: Data, publicEdKey: Data, privateEdKey: Data) -> String {
 }
 
 let args = CommandLine.arguments;
-if args.count != 2 {
-    print("Usage: \(args[0]) <archive to sign>\nPrivavte EdDSA (ed25519) key is automatically read from the Keychain.\n");
+if args.count != 2 && !(args.count == 4 && args[1] == "-s") {
+    print("Usage: \n")
+    print("\t1. \(args[0]) <archive to sign>\n\tPrivate EdDSA (ed25519) key is automatically read from the Keychain.\n");
+    print("\t2 \(args[0]) -s <key> <archive to sign>\n\tThe key's length is 128 that includes private and public key.\n")
     exit(1)
 }
-
-let(priv, pub) = findKeys();
+let (priv, pub) = args.count == 2 ? findKeys() : parseKeysFromString(args[2])
+let filePath = args.count == 2 ? args[1] : args[3]
 
 do {
-    let data = try Data.init(contentsOf: URL.init(fileURLWithPath: args[1]), options: .mappedIfSafe);
+    let data = try Data.init(contentsOf: URL.init(fileURLWithPath: filePath), options: .mappedIfSafe);
     let sig = edSignature(data:data , publicEdKey: pub, privateEdKey: priv);
     print("sparkle:edSignature=\"\(sig)\" length=\"\(data.count)\"");
 } catch {

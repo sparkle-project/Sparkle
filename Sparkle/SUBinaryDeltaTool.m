@@ -30,14 +30,14 @@ static void printUsage(NSString *programName)
     fprintf(stderr, "%s version [<patch-file>]\n", [programName UTF8String]);
 }
 
-static BOOL runCreateCommand(NSString *programName, NSArray *args)
+static BOOL runCreateCommand(NSString *programName, NSArray<NSString *> *args)
 {
     if (args.count < 3 || args.count > 5) {
         printUsage(programName);
         return NO;
     }
 
-    NSUInteger numberOflagsFound = 0;
+    NSUInteger numberOfFlagsFound = 0;
     NSUInteger verboseIndex = [args indexOfObject:VERBOSE_FLAG];
     NSUInteger versionIndex = NSNotFound;
     for (NSUInteger argumentIndex = 0; argumentIndex < args.count; ++argumentIndex) {
@@ -48,13 +48,13 @@ static BOOL runCreateCommand(NSString *programName, NSArray *args)
     }
 
     if (verboseIndex != NSNotFound) {
-        ++numberOflagsFound;
+        ++numberOfFlagsFound;
     }
     if (versionIndex != NSNotFound) {
-        ++numberOflagsFound;
+        ++numberOfFlagsFound;
     }
 
-    if (args.count - numberOflagsFound < 3) {
+    if (args.count - numberOfFlagsFound < 3) {
         printUsage(programName);
         return NO;
     }
@@ -62,7 +62,7 @@ static BOOL runCreateCommand(NSString *programName, NSArray *args)
     BOOL verbose = (verboseIndex != NSNotFound);
     NSString *versionField = (versionIndex != NSNotFound) ? args[versionIndex] : nil;
 
-    NSArray *versionComponents = nil;
+    NSArray<NSString *> *versionComponents = nil;
     if (versionField) {
         versionComponents = [versionField componentsSeparatedByString:@"="];
         if (versionComponents.count != 2) {
@@ -124,7 +124,7 @@ static BOOL runCreateCommand(NSString *programName, NSArray *args)
     return YES;
 }
 
-static BOOL runApplyCommand(NSString *programName, NSArray *args)
+static BOOL runApplyCommand(NSString *programName, NSArray<NSString *> *args)
 {
     if (args.count < 3 || args.count > 4) {
         printUsage(programName);
@@ -138,7 +138,7 @@ static BOOL runApplyCommand(NSString *programName, NSArray *args)
         return NO;
     }
 
-    NSMutableArray *fileArgs = [NSMutableArray array];
+    NSMutableArray<NSString *> *fileArgs = [NSMutableArray array];
     for (NSString *argument in args) {
         if (![argument isEqualToString:VERBOSE_FLAG]) {
             [fileArgs addObject:argument];
@@ -172,7 +172,7 @@ static BOOL runApplyCommand(NSString *programName, NSArray *args)
     return YES;
 }
 
-static BOOL runVersionCommand(NSString *programName, NSArray *args)
+static BOOL runVersionCommand(NSString *programName, NSArray<NSString *> *args)
 {
     if (args.count > 1) {
         printUsage(programName);
@@ -218,7 +218,7 @@ static BOOL runVersionCommand(NSString *programName, NSArray *args)
 int main(int __unused argc, char __unused *argv[])
 {
     @autoreleasepool {
-        NSArray *args = [[NSProcessInfo processInfo] arguments];
+        NSArray<NSString *> *args = [[NSProcessInfo processInfo] arguments];
         NSString *programName = [args[0] lastPathComponent];
 
         if (args.count < 2) {
@@ -227,7 +227,7 @@ int main(int __unused argc, char __unused *argv[])
         }
 
         NSString *command = args[1];
-        NSArray *commandArguments = [args subarrayWithRange:NSMakeRange(2, args.count - 2)];
+        NSArray<NSString *> *commandArguments = [args subarrayWithRange:NSMakeRange(2, args.count - 2)];
 
         BOOL result;
         if ([command isEqualToString:CREATE_COMMAND]) {
