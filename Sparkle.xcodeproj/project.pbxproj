@@ -292,20 +292,13 @@
 		EA1E280022B60B72004AA304 /* sc.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F17E214D564B00A1187F /* sc.h */; };
 		EA1E280122B60B72004AA304 /* sha512.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 5AB8F170214D564A00A1187F /* sha512.h */; };
 		EA4311A5229D5FC600A5503D /* add_scalar.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F171214D564A00A1187F /* add_scalar.c */; };
-		EA4311A6229D5FC600A5503D /* ed25519.h in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F174214D564B00A1187F /* ed25519.h */; };
 		EA4311A7229D5FC600A5503D /* fe.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17C214D564B00A1187F /* fe.c */; };
-		EA4311A8229D5FC600A5503D /* fe.h in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F173214D564B00A1187F /* fe.h */; };
-		EA4311A9229D5FC600A5503D /* fixedint.h in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F179214D564B00A1187F /* fixedint.h */; };
 		EA4311AA229D5FC600A5503D /* ge.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F175214D564B00A1187F /* ge.c */; };
-		EA4311AB229D5FC600A5503D /* ge.h in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17A214D564B00A1187F /* ge.h */; };
 		EA4311AC229D5FC600A5503D /* key_exchange.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F178214D564B00A1187F /* key_exchange.c */; };
 		EA4311AD229D5FC600A5503D /* keypair.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17F214D564C00A1187F /* keypair.c */; };
-		EA4311AE229D5FC600A5503D /* precomp_data.h in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F176214D564B00A1187F /* precomp_data.h */; };
 		EA4311AF229D5FC600A5503D /* sc.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F16F214D564A00A1187F /* sc.c */; };
-		EA4311B0229D5FC600A5503D /* sc.h in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17E214D564B00A1187F /* sc.h */; };
 		EA4311B1229D5FC600A5503D /* seed.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17B214D564B00A1187F /* seed.c */; };
 		EA4311B2229D5FC600A5503D /* sha512.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F172214D564B00A1187F /* sha512.c */; };
-		EA4311B3229D5FC600A5503D /* sha512.h in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F170214D564A00A1187F /* sha512.h */; };
 		EA4311B4229D5FC600A5503D /* sign.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F17D214D564B00A1187F /* sign.c */; };
 		EA4311B5229D5FC600A5503D /* verify.c in Sources */ = {isa = PBXBuildFile; fileRef = 5AB8F177214D564B00A1187F /* verify.c */; };
 		EA4311BD229D5FF000A5503D /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311A0229D5FBC00A5503D /* libed25519.a */; };
@@ -314,12 +307,9 @@
 		EA4311E4229D643300A5503D /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311A0229D5FBC00A5503D /* libed25519.a */; };
 		EA4311E5229D644700A5503D /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311A0229D5FBC00A5503D /* libed25519.a */; };
 		EA4311EF229D651F00A5503D /* bscommon.c in Sources */ = {isa = PBXBuildFile; fileRef = 723B252B1CEAB3A600909873 /* bscommon.c */; };
-		EA4311F0229D651F00A5503D /* bscommon.h in Sources */ = {isa = PBXBuildFile; fileRef = 723B252C1CEAB3A600909873 /* bscommon.h */; };
 		EA4311F1229D651F00A5503D /* bsdiff.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */; };
 		EA4311F2229D651F00A5503D /* bspatch.c in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */; };
-		EA4311F3229D651F00A5503D /* bspatch.h in Sources */ = {isa = PBXBuildFile; fileRef = 611142E810FB1BE5009810AA /* bspatch.h */; };
 		EA4311F4229D651F00A5503D /* sais.c in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7611AD1AEFF008E3161 /* sais.c */; };
-		EA4311F5229D651F00A5503D /* sais.h in Sources */ = {isa = PBXBuildFile; fileRef = 7223E7621AD1AEFF008E3161 /* sais.h */; };
 		EA4311FC229D65E400A5503D /* libbsdiff.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311EA229D651300A5503D /* libbsdiff.a */; };
 		EA4311FD229D65FC00A5503D /* libbsdiff.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311EA229D651300A5503D /* libbsdiff.a */; };
 		EA4311FE229D660B00A5503D /* libbsdiff.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4311EA229D651300A5503D /* libbsdiff.a */; };
@@ -2441,20 +2431,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				EA4311A5229D5FC600A5503D /* add_scalar.c in Sources */,
-				EA4311A6229D5FC600A5503D /* ed25519.h in Sources */,
 				EA4311A7229D5FC600A5503D /* fe.c in Sources */,
-				EA4311A8229D5FC600A5503D /* fe.h in Sources */,
-				EA4311A9229D5FC600A5503D /* fixedint.h in Sources */,
 				EA4311AA229D5FC600A5503D /* ge.c in Sources */,
-				EA4311AB229D5FC600A5503D /* ge.h in Sources */,
 				EA4311AC229D5FC600A5503D /* key_exchange.c in Sources */,
 				EA4311AD229D5FC600A5503D /* keypair.c in Sources */,
-				EA4311AE229D5FC600A5503D /* precomp_data.h in Sources */,
 				EA4311AF229D5FC600A5503D /* sc.c in Sources */,
-				EA4311B0229D5FC600A5503D /* sc.h in Sources */,
 				EA4311B1229D5FC600A5503D /* seed.c in Sources */,
 				EA4311B2229D5FC600A5503D /* sha512.c in Sources */,
-				EA4311B3229D5FC600A5503D /* sha512.h in Sources */,
 				EA4311B4229D5FC600A5503D /* sign.c in Sources */,
 				EA4311B5229D5FC600A5503D /* verify.c in Sources */,
 			);
@@ -2465,12 +2448,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				EA4311EF229D651F00A5503D /* bscommon.c in Sources */,
-				EA4311F0229D651F00A5503D /* bscommon.h in Sources */,
 				EA4311F1229D651F00A5503D /* bsdiff.c in Sources */,
 				EA4311F2229D651F00A5503D /* bspatch.c in Sources */,
-				EA4311F3229D651F00A5503D /* bspatch.h in Sources */,
 				EA4311F4229D651F00A5503D /* sais.c in Sources */,
-				EA4311F5229D651F00A5503D /* sais.h in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
