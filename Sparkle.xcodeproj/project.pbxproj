@@ -39,10 +39,10 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		01B2795F23DB3740007E1E8C /* Autoupdate.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 55C14BB7136EEF1500649790 /* Autoupdate.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1420DF50196247F900203BB0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1420DF4F196247F900203BB0 /* Images.xcassets */; };
 		142E0E0019A6954400E4312B /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		142E0E0219A6A14700E4312B /* Sparkle.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		142E0E0419A6A26F00E4312B /* Autoupdate.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 55C14BB7136EEF1500649790 /* Autoupdate.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		142E0E0919A83AAC00E4312B /* SUBinaryDeltaTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 142E0E0819A83AAC00E4312B /* SUBinaryDeltaTest.m */; };
 		14652F7C19A9725300959E44 /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E20FD68CC7005AE3F6 /* SUBinaryDeltaCommon.m */; };
 		14652F7D19A9726700959E44 /* SUBinaryDeltaApply.m in Sources */ = {isa = PBXBuildFile; fileRef = 5D06E8E00FD68CC7005AE3F6 /* SUBinaryDeltaApply.m */; };
@@ -332,6 +332,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		01B2795723D8AF1E007E1E8C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EA4311E9229D651300A5503D;
+			remoteInfo = bsdiff;
+		};
+		01B2795923D8AF22007E1E8C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EA43119F229D5FBC00A5503D;
+			remoteInfo = ed25519;
+		};
 		1454BA1519637EDB00344E57 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -551,11 +565,11 @@
 		};
 		142E0E0319A6A24100E4312B /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			dstPath = "";
 			dstSubfolderSpec = 12;
 			files = (
-				142E0E0419A6A26F00E4312B /* Autoupdate.app in CopyFiles */,
+				01B2795F23DB3740007E1E8C /* Autoupdate.app in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -618,6 +632,7 @@
 		004A8653192A492B00C9730D /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = ro.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
 		004A8654192A492B00C9730D /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = ro.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
 		004A8655192A492B00C9730D /* ro */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ro; path = ro.lproj/SUUpdatePermissionPrompt.xib; sourceTree = "<group>"; };
+		01B2795C23DB365C007E1E8C /* fileop */ = {isa = PBXFileReference; lastKnownFileType = folder; path = fileop; sourceTree = "<group>"; };
 		0263187214FEBB31005EBF43 /* uk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		0263187514FEBB42005EBF43 /* uk */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = uk; path = uk.lproj/SUAutomaticUpdateAlert.xib; sourceTree = "<group>"; };
 		0263187614FEBB42005EBF43 /* uk */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = uk; path = uk.lproj/SUUpdateAlert.xib; sourceTree = "<group>"; };
@@ -1199,6 +1214,7 @@
 		0867D691FE84028FC02AAC07 /* Sparkle */ = {
 			isa = PBXGroup;
 			children = (
+				01B2795C23DB365C007E1E8C /* fileop */,
 				5AA96C561E0AE0DB00CA4346 /* generate_appcast */,
 				1495006D195FBBBD00BC5B5B /* Sparkle */,
 				14732BB81960EEB600593899 /* Resources */,
@@ -2006,6 +2022,8 @@
 			dependencies = (
 				5F349B6225683CBA00B015B0 /* PBXTargetDependency */,
 				5F349B6025683CB800B015B0 /* PBXTargetDependency */,
+				01B2795A23D8AF22007E1E8C /* PBXTargetDependency */,
+				01B2795823D8AF1E007E1E8C /* PBXTargetDependency */,
 				55C14F97136F044100649790 /* PBXTargetDependency */,
 			);
 			name = Sparkle;
@@ -2551,6 +2569,16 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		01B2795823D8AF1E007E1E8C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EA4311E9229D651300A5503D /* bsdiff */;
+			targetProxy = 01B2795723D8AF1E007E1E8C /* PBXContainerItemProxy */;
+		};
+		01B2795A23D8AF22007E1E8C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EA43119F229D5FBC00A5503D /* ed25519 */;
+			targetProxy = 01B2795923D8AF22007E1E8C /* PBXContainerItemProxy */;
+		};
 		1454BA1619637EDB00344E57 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 61B5F90109C4CEE200B25A18 /* Sparkle Test App */;
@@ -2950,6 +2978,17 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					$CONFIGURATION_BUILD_DIR/obj/brave/vendor/sparkle/Vendor/bsdiff/,
+					$CONFIGURATION_BUILD_DIR/obj/brave/vendor/sparkle/Vendor/ed25519/,
+				);
+				OTHER_CFLAGS = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Coverage;
 		};
@@ -3006,6 +3045,12 @@
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					$CONFIGURATION_BUILD_DIR/obj/brave/vendor/sparkle/Vendor/bsdiff/,
+					$CONFIGURATION_BUILD_DIR/obj/brave/vendor/sparkle/Vendor/ed25519/,
+				);
+				OTHER_CFLAGS = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				LD_DYLIB_INSTALL_NAME = "@loader_path/Frameworks/Sparkle.framework/Sparkle";
 			};
@@ -3018,7 +3063,13 @@
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				LD_DYLIB_INSTALL_NAME = "@loader_path/Frameworks/Sparkle.framework/Sparkle";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					$CONFIGURATION_BUILD_DIR/obj/brave/vendor/sparkle/Vendor/bsdiff/,
+					$CONFIGURATION_BUILD_DIR/obj/brave/vendor/sparkle/Vendor/ed25519/,
+				);
+				OTHER_CFLAGS = "";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
