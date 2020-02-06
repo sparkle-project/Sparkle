@@ -105,7 +105,8 @@
     NSString *version = [self _version];
     if (version == nil) {
         SULog(SULogLevelError, @"This host (%@) has no %@! This attribute is required.", [self bundlePath], (__bridge NSString *)kCFBundleVersionKey);
-        abort();
+        // Instead of abort()-ing, return an empty string to satisfy the _Nonnull contract.
+        return @"";
     }
     return version;
 }

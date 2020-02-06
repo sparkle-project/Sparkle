@@ -56,7 +56,12 @@
     NSError *updaterError = nil;
     if (![self.updater startUpdater:&updaterError]) {
         NSLog(@"Failed to start updater with error: %@", updaterError);
-        abort();
+        
+        NSAlert *alert = [[NSAlert alloc] init];
+        alert.messageText = @"Updater Error";
+        alert.informativeText = @"The Updater failed to start. For detailed error information, check the Console.app log."
+        [alert addButtonWithTitle:@"OK"];
+        [alert runModal];
     }
 }
 

@@ -73,7 +73,15 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
     NSError *updaterError = nil;
     if (![self.updater startUpdater:&updaterError]) {
         SULog(SULogLevelError, @"Fatal updater error (%ld): %@", updaterError.code, updaterError.localizedDescription);
-        abort();
+        
+        // Delay the alert four seconds so it doesn't show RIGHT as the app launches, but also doesn't interrupt the user once they really get to work.
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            NSAlert *alert = [[NSAlert alloc] init];
+            alert.messageText = @"Unable to Check For Updates";
+            alert.informativeText = @"The update checker failed to start correctly. You should contact the app developer to report this issue and verify that you have the latest version.";
+            [alert addButtonWithTitle:@"OK"];
+            [alert runModal];
+        });
     }
 }
 

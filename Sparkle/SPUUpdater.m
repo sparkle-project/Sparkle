@@ -115,16 +115,24 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 // To prevent subclasses from doing something bad based on older Sparkle code
 - (instancetype)initForBundle:(NSBundle *)__unused bundle
 {
-    SULog(SULogLevelError, @"-[%@ initForBundle:] is not implemented anymore.", NSStringFromClass([self class]));
-    abort();
+    NSString *reason = [NSString stringWithFormat:@"-[%@ initForBundle:] is not implemented anymore in Sparkle 2.", NSStringFromClass([self class])];
+    SULog(SULogLevelError, reason);
+    
+    NSException *exception = [NSException exceptionWithName:@"SUIncorrectAPIUsageException" reason:reason userInfo:nil];
+    @throw exception;
+    
     return nil;
 }
 
 // To prevent trying to stick an SUUpdater in a nib or initializing it in an incorrect way
 - (instancetype)init
 {
-    SULog(SULogLevelError, @"-[%@ init] is not implemented. If you want to drop an updater into a nib, see SPUStandardUpdaterController.", NSStringFromClass([self class]));
-    abort();
+    NSString *reason = [NSString stringWithFormat:@"-[%@ init] is not implemented. If you want to drop an updater into a nib, see SPUStandardUpdaterController.", NSStringFromClass([self class])];
+    SULog(SULogLevelError, reason);
+    
+    NSException *exception = [NSException exceptionWithName:@"SUIncorrectAPIUsageException" reason:reason userInfo:nil];
+    @throw exception;
+    
     return nil;
 }
 
@@ -614,8 +622,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (void)setFeedURL:(NSURL * _Nullable)feedURL
 {
     if (![NSThread isMainThread]) {
-        SULog(SULogLevelError, @"This method must be called on the main thread");
-        abort();
+        SULog(SULogLevelError, @"Error: SPUUpdater -setFeedURL: must be called on the main thread. The call from a background thread was ignored.");
+        return;
     }
 
     // When feedURL is nil, -absoluteString will return nil and will remove the user default key
@@ -625,8 +633,11 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (BOOL)retrieveFeedURL:(NSURL * __autoreleasing *)feedURL error:(NSError * __autoreleasing *)error
 {
     if (![NSThread isMainThread]) {
-        SULog(SULogLevelError, @"This method must be called on the main thread");
-        abort();
+        SULog(SULogLevelError, @"Error: SPUUpdater -retrieveFeedURL:error: must be called on the main thread.");
+        if (error != NULL) {
+            *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUIncorrectAPIUsageError userInfo:@{ NSLocalizedDescriptionKey: @"SUUpdater -retriveFeedURL:error: must be called on the main thread."}];
+        }
+        return NO;
     }
     
     // A value in the user defaults overrides one in the Info.plist (so preferences panels can be created wherein users choose between beta / release feeds).
@@ -657,14 +668,14 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     return YES;
 }
 
-// A client may call this method but do not invoke this method ourselves because its unsafe
+// A client may call this method but do not invoke this method ourselves because it's unsafe
 - (NSURL *)feedURL
 {
     NSURL *feedURL = nil;
     NSError *feedError = nil;
     if (![self retrieveFeedURL:&feedURL error:&feedError]) {
-        SULog(SULogLevelError, @"Fatal Feed Error (%ld): %@", feedError.code, feedError.localizedDescription);
-        abort();
+        SULog(SULogLevelError, @"Feed Error (%ld): %@", feedError.code, feedError.localizedDescription);
+        return nil;
     }
     return feedURL;
 }
