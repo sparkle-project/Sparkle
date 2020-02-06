@@ -86,7 +86,6 @@ static NSMutableDictionary *sharedUpdaters = nil;
             NSError *updaterError = nil;
             if (![self.updater startUpdater:&updaterError]) {
                 SULog(SULogLevelError, @"Error: Failed to start updater with error: %@", updaterError);
-                abort();
             }
         });
     }

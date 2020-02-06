@@ -69,14 +69,12 @@
 {
     // Nothing really to do here.. this shouldn't be called.
     SULog(SULogLevelError, @"Error: resumeInstallingUpdateWithCompletion: called on SPUAutomaticUpdateDriver");
-    abort();
 }
 
 - (void)resumeUpdate:(id<SPUResumableUpdate>)__unused resumableUpdate completion:(SPUUpdateDriverCompletion)__unused completionBlock __attribute__((noreturn))
 {
     // Nothing really to do here.. this shouldn't be called.
     SULog(SULogLevelError, @"Error: resumeDownloadedUpdate:completion: called on SPUAutomaticUpdateDriver");
-    abort();
 }
 
 - (void)basicDriverDidFindUpdateWithAppcastItem:(SUAppcastItem *)updateItem
