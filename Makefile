@@ -14,7 +14,7 @@ localizable-strings:
 
 release:
 	xcodebuild -scheme Distribution -configuration Release -derivedDataPath "$(BUILDDIR)" build
-	open -R "$(BUILDDIR)/Build/Products/Release/Sparkle-"*.tar.bz2
+	open -R "$(BUILDDIR)/Build/Products/Release/Sparkle-"*.tar.xz
 	cat Sparkle.podspec
 	@echo "Don't forget to update CocoaPods! pod trunk push"
 

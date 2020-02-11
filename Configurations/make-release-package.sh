@@ -12,7 +12,7 @@ if [ "$ACTION" = "" ] ; then
     fi
 
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
-    rm -f "Sparkle-$CURRENT_PROJECT_VERSION.tar.bz2"
+    rm -f "Sparkle-$CURRENT_PROJECT_VERSION.tar.xz"
 
     mkdir -p "$CONFIGURATION_BUILD_DIR/staging"
     cp "$SRCROOT/CHANGELOG" "$SRCROOT/LICENSE" "$SRCROOT/Resources/SampleAppcast.xml" "$CONFIGURATION_BUILD_DIR/staging"
@@ -37,6 +37,6 @@ if [ "$ACTION" = "" ] ; then
 
     cd "$CONFIGURATION_BUILD_DIR/staging"
     # Sorted file list groups similar files together, which improves tar compression
-    find . \! -type d | rev | sort | rev | tar cjvf "../Sparkle-$CURRENT_PROJECT_VERSION.tar.bz2" --files-from=-
+    find . \! -type d | rev | sort | rev | tar cv --files-from=- | xz -9 > "../Sparkle-$CURRENT_PROJECT_VERSION.tar.xz"
     rm -rf "$CONFIGURATION_BUILD_DIR/staging"
 fi
