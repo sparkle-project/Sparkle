@@ -25,7 +25,7 @@
 
 @interface SUDSAVerifier : NSObject
 
-+ (BOOL)validatePath:(NSString *)path withEncodedDSASignature:(NSString *)encodedSignature withPublicDSAKey:(NSString *)pkeyString;
++ (BOOL)validatePath:(NSString *)path withDSASignature:(NSData *)signature withPublicDSAKey:(NSString *)pkeyString;
 
 - (instancetype)initWithPublicKeyData:(NSData *)data;
 

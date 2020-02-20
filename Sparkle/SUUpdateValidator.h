@@ -9,11 +9,12 @@
 #import <Foundation/Foundation.h>
 
 @class SUHost;
+@class SUSignatures;
 
 @interface SUUpdateValidator : NSObject
 
 // Pass YES to performingPrevalidation if archive validation must be done immediately, before extraction
-- (instancetype)initWithDownloadPath:(NSString *)downloadPath dsaSignature:(NSString *)dsaSignature host:(SUHost *)host performingPrevalidation:(BOOL)performingPrevalidation;
+- (instancetype)initWithDownloadPath:(NSString *)downloadPath signatures:(SUSignatures *)signatures host:(SUHost *)host performingPrevalidation:(BOOL)performingPrevalidation;
 
 // Indicates whether we can perform (post) validation later
 @property (nonatomic, readonly) BOOL canValidate;

@@ -15,13 +15,14 @@
 #import <Foundation/Foundation.h>
 #endif
 #import <Sparkle/SUExport.h>
+@class SUSignatures;
 
 SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>
 @property (copy, readonly) NSString *title;
 @property (copy, readonly) NSString *dateString;
 @property (copy, readonly) NSString *itemDescription;
 @property (strong, readonly) NSURL *releaseNotesURL;
-@property (copy, readonly) NSString *DSASignature;
+@property (strong, readonly) SUSignatures *signatures;
 @property (copy, readonly) NSString *minimumSystemVersion;
 @property (copy, readonly) NSString *maximumSystemVersion;
 @property (strong, readonly) NSURL *fileURL;

@@ -23,9 +23,9 @@
     SecKeyRef _secKey;
 }
 
-+ (BOOL)validatePath:(NSString *)path withEncodedDSASignature:(NSString *)encodedSignature withPublicDSAKey:(NSString *)pkeyString
++ (BOOL)validatePath:(NSString *)path withDSASignature:(NSData *)signature withPublicDSAKey:(NSString *)pkeyString
 {
-    if (!encodedSignature) {
+    if (!signature) {
         SULog(SULogLevelError, @"There is no DSA signature to check");
         return NO;
     }
@@ -40,13 +40,6 @@
         return NO;
     }
 
-    NSString *strippedSignature = [encodedSignature stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-    NSData *signature =
-#if __MAC_OS_X_VERSION_MIN_REQUIRED < __MAC_10_9
-    [[NSData alloc] initWithBase64Encoding:strippedSignature];
-#else
-    [[NSData alloc] initWithBase64EncodedString:strippedSignature options:NSDataBase64DecodingIgnoreUnknownCharacters];
-#endif
     return [verifier verifyFileAtPath:path signature:signature];
 }
 

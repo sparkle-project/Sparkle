@@ -58,7 +58,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @property (nonatomic, copy) NSString *updateDirectoryPath;
 @property (nonatomic, copy) NSString *downloadName;
 @property (nonatomic, copy) NSString *decryptionPassword;
-@property (nonatomic, copy) NSString *dsaSignature;
+@property (nonatomic, strong) SUSignatures *signatures;
 @property (nonatomic, copy) NSString *relaunchPath;
 @property (nonatomic, copy) NSString *installationType;
 @property (nonatomic, assign) BOOL shouldRelaunch;
@@ -91,7 +91,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
 @synthesize updateDirectoryPath = _updateDirectoryPath;
 @synthesize downloadName = _downloadName;
 @synthesize decryptionPassword = _decryptionPassword;
-@synthesize dsaSignature = _dsaSignature;
+@synthesize signatures = _signatures;
 @synthesize relaunchPath = _relaunchPath;
 @synthesize installationType = _installationType;
 @synthesize shouldRelaunch = _shouldRelaunch;
@@ -198,7 +198,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
         // Normal application updates are a bit more lenient allowing developers to change one of apple dev ID or DSA keys
         BOOL needsPrevalidation = [[unarchiver class] unsafeIfArchiveIsNotValidated] || ![self.installationType isEqualToString:SPUInstallationTypeApplication];
         
-        self.updateValidator = [[SUUpdateValidator alloc] initWithDownloadPath:archivePath dsaSignature:self.dsaSignature host:self.host performingPrevalidation:needsPrevalidation];
+        self.updateValidator = [[SUUpdateValidator alloc] initWithDownloadPath:archivePath signatures:self.signatures host:self.host performingPrevalidation:needsPrevalidation];
         
         success = self.updateValidator.canValidate;
     }
@@ -251,7 +251,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     self.updateDirectoryPath = nil;
     self.downloadName = nil;
     self.decryptionPassword = nil;
-    self.dsaSignature = nil;
+    self.signatures = nil;
     self.relaunchPath = nil;
     self.host = nil;
     
@@ -387,7 +387,7 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
             self.installationType = installationType;
             self.relaunchPath = installationData.relaunchPath;
             self.downloadName = installationData.downloadName;
-            self.dsaSignature = installationData.dsaSignature;
+            self.signatures = installationData.signatures;
             self.updateDirectoryPath = cacheInstallationPath;
             self.host = [[SUHost alloc] initWithBundle:hostBundle];
             

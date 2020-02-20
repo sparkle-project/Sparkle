@@ -10,6 +10,9 @@
 #import <assert.h>
 #import "SULog.h"
 
+static NSString *SUDSASignatureKey = @"SUDSASignature";
+static NSString *SUEDSignatureKey = @"SUEDSignature";
+
 @implementation SUSignatures
 @synthesize dsaSignature = _dsaSignature;
 
@@ -49,6 +52,45 @@ static NSData *decode(NSString *str) {
     }
     return NULL;
 #pragma clang diagnostic pop
+}
+
+- (instancetype)initWithCoder:(NSCoder *)decoder
+{
+    self = [super init];
+    if (self) {
+        NSData *dsaSignature = [decoder decodeObjectOfClass:[NSData class] forKey:SUDSASignatureKey];
+        if (dsaSignature) {
+            _dsaSignature = dsaSignature;
+        }
+
+        NSData *edSignature = [decoder decodeObjectOfClass:[NSData class] forKey:SUEDSignatureKey];
+        if (edSignature) {
+            if (edSignature.length != sizeof(self->ed25519_signature)) {
+                return nil;
+            }
+            [edSignature getBytes:self->ed25519_signature];
+        }
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    if (self.dsaSignature) {
+        [coder encodeObject:self.dsaSignature forKey:SUDSASignatureKey];
+    }
+    if (self.ed25519Signature) {
+// Xcode may enable this in pedantic mode
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdirect-ivar-access"
+        NSData *edSignature = [NSData dataWithBytesNoCopy:&self->ed25519_signature length:sizeof(self->ed25519_signature) freeWhenDone:false];
+#pragma clang diagnostic pop
+        [coder encodeObject:edSignature forKey:SUEDSignatureKey];
+    }
+}
+
++ (BOOL)supportsSecureCoding {
+    return YES;
 }
 
 @end
