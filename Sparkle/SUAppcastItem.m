@@ -251,7 +251,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
             _fileURL = [NSURL URLWithString:fileURLString];
         }
         if (enclosure) {
-            _signatures = [[SUSignatures alloc] initWithDsa:[enclosure objectForKey:SUAppcastAttributeDSASignature] ed:nil];
+            _signatures = [[SUSignatures alloc] initWithDsa:[enclosure objectForKey:SUAppcastAttributeDSASignature] ed:[enclosure objectForKey:SUAppcastAttributeEDSignature]];
         }
 
         _versionString = [(NSString *)newVersion copy];

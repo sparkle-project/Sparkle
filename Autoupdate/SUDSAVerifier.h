@@ -16,6 +16,7 @@
 #define SUDSAVERIFIER_H
 
 #import <Foundation/Foundation.h>
+@class SUSignatures;
 
 #if __MAC_OS_X_VERSION_MAX_ALLOWED < 1090
 @interface NSData (SUDSAVerifier)
@@ -25,12 +26,12 @@
 
 @interface SUDSAVerifier : NSObject
 
-+ (BOOL)validatePath:(NSString *)path withDSASignature:(NSData *)signature withPublicDSAKey:(NSString *)pkeyString;
++ (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicDSAKey:(NSString *)pkeyString;
 
 - (instancetype)initWithPublicKeyData:(NSData *)data;
 
-- (BOOL)verifyFileAtPath:(NSString *)path signature:(NSData *)signature;
-- (BOOL)verifyStream:(NSInputStream *)stream signature:(NSData *)signature;
+- (BOOL)verifyFileAtPath:(NSString *)path signatures:(SUSignatures *)signatures;
+ - (BOOL)verifyStream:(NSInputStream *)stream signatures:(SUSignatures *)signatures;
 
 @end
 

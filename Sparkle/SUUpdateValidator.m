@@ -42,16 +42,15 @@
         BOOL prevalidatedDsaSignature;
         if (performingPrevalidation) {
             NSString *publicDSAKey = host.publicDSAKey;
-            NSData *dsaSignature = signatures.dsaSignature;
 
             if (publicDSAKey == nil) {
                 prevalidatedDsaSignature = NO;
                 SULog(SULogLevelError, @"Failed to validate update before unarchiving because no DSA key was found");
-            } else if (dsaSignature == nil) {
+            } else if (signatures == nil || signatures.dsaSignature == nil) {
                 prevalidatedDsaSignature = NO;
                 SULog(SULogLevelError, @"Failed to validate update before unarchiving because no DSA signature was found");
             } else {
-                prevalidatedDsaSignature = [SUDSAVerifier validatePath:downloadPath withDSASignature:dsaSignature withPublicDSAKey:host.publicDSAKey];
+                prevalidatedDsaSignature = [SUDSAVerifier validatePath:downloadPath withSignatures:signatures withPublicDSAKey:host.publicDSAKey];
                 if (!prevalidatedDsaSignature) {
                     SULog(SULogLevelError, @"DSA signature validation before unarchiving failed for update %@", downloadPath);
                 }
@@ -76,7 +75,7 @@
 {
     assert(self.canValidate);
 
-    NSData *DSASignature = self.signatures.dsaSignature;
+    SUSignatures *signatures = self.signatures;
     NSString *downloadPath = self.downloadPath;
     SUHost *host = self.host;
 
@@ -98,14 +97,14 @@
         if (isPackage) {
             // If we get here, then the appcast installation type was lying to us.. This error will be caught later when starting the installer.
             // For package type updates, all we do is check if the DSA signature is valid
-            BOOL validationCheckSuccess = [SUDSAVerifier validatePath:downloadPath withDSASignature:DSASignature withPublicDSAKey:host.publicDSAKey];
+            BOOL validationCheckSuccess = [SUDSAVerifier validatePath:downloadPath withSignatures:signatures withPublicDSAKey:host.publicDSAKey];
             if (!validationCheckSuccess) {
                 SULog(SULogLevelError, @"DSA signature validation of the package failed. The update contains an installer package, and valid DSA signatures are mandatory for all installer packages. The update will be rejected. Sign the installer with a valid DSA key or use an .app bundle update instead.");
             }
             return validationCheckSuccess;
         } else {
             // For application bundle updates, we check both the DSA and Apple code signing signatures
-            return [self validateBundleUpdateForHost:host newBundleURL:installSourceURL archivePath:downloadPath DSASignature:DSASignature];
+            return [self validateBundleUpdateForHost:host newBundleURL:installSourceURL archivePath:downloadPath signatures:signatures];
         }
     } else if (isPackage) {
         // We already prevalidated the package and nothing else needs to be done
@@ -123,7 +122,7 @@
     }
 }
 
-- (BOOL)validateBundleUpdateForHost:(SUHost *)host newBundleURL:(NSURL *)newBundleURL archivePath:(NSString *)archivePath DSASignature:(NSData *)DSASignature
+- (BOOL)validateBundleUpdateForHost:(SUHost *)host newBundleURL:(NSURL *)newBundleURL archivePath:(NSString *)archivePath signatures:(SUSignatures *)signatures
 {
     NSBundle *newBundle = [NSBundle bundleWithURL:newBundleURL];
     if (newBundle == nil) {
@@ -148,7 +147,7 @@
     // In that case, the check ensures that the app author has correctly used DSA keys, so that the app will be updateable in the next version.
     // However if the new and old DSA keys are the same, then this is a security measure.
     if (newPublicDSAKey != nil) {
-        if (![SUDSAVerifier validatePath:archivePath withDSASignature:DSASignature withPublicDSAKey:newPublicDSAKey]) {
+        if (![SUDSAVerifier validatePath:archivePath withSignatures:signatures withPublicDSAKey:newPublicDSAKey]) {
             SULog(SULogLevelError, @"DSA signature validation failed. The update has a public DSA key and is signed with a DSA key, but the %@ doesn't match the signature. The update will be rejected.",
                   dsaKeysMatch ? @"public key" : @"new public key shipped with the update");
             return NO;
