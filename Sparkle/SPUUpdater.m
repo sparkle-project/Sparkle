@@ -29,6 +29,7 @@
 #import "SPUUpdaterCycle.h"
 #import "SPUUpdaterTimer.h"
 #import "SPUResumableUpdate.h"
+#import "SUSignatures.h"
 
 
 #include "AppKitPrevention.h"
@@ -216,7 +217,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
     }
     
-    BOOL hasPublicDSAKey = [self.host publicDSAKey] != nil;
+    BOOL hasPublicDSAKey = self.host.publicKeys.dsaPubKey != nil;
     if (!hasPublicDSAKey) {
         // If we failed to retrieve a DSA key but the bundle specifies a path to one, we should consider this a configuration failure
         NSString *publicDSAKeyFileKey = [self.host publicDSAKeyFileKey];

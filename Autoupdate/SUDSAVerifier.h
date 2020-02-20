@@ -17,18 +17,13 @@
 
 #import <Foundation/Foundation.h>
 @class SUSignatures;
-
-#if __MAC_OS_X_VERSION_MAX_ALLOWED < 1090
-@interface NSData (SUDSAVerifier)
-- (id)initWithBase64Encoding:(NSString *)base64String;
-@end
-#endif
+@class SUPublicKeys;
 
 @interface SUDSAVerifier : NSObject
 
-+ (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicDSAKey:(NSString *)pkeyString;
++ (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicKeys:(SUPublicKeys *)pkeys;
 
-- (instancetype)initWithPublicKeyData:(NSData *)data;
+- (instancetype)initWithPublicKeys:(SUPublicKeys *)pkeys;
 
 - (BOOL)verifyFileAtPath:(NSString *)path signatures:(SUSignatures *)signatures;
  - (BOOL)verifyStream:(NSInputStream *)stream signatures:(SUSignatures *)signatures;

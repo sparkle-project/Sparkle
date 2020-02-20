@@ -24,18 +24,23 @@
     SecKeyRef _secKey;
 }
 
-+ (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicDSAKey:(NSString *)pkeyString
++ (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicKeys:(SUPublicKeys *)pkeys
 {
-    if (!signatures) {
+    if (!signatures || !signatures.dsaSignature) {
         SULog(SULogLevelError, @"There is no DSA signature to check");
         return NO;
+    }
+
+    if (!pkeys || !pkeys.dsaPubKey) {
+         SULog(SULogLevelError, @"There is no DSA public key to check");
+         return NO;
     }
 
     if (!path) {
         return NO;
     }
 
-    SUDSAVerifier *verifier = [(SUDSAVerifier *)[self alloc] initWithPublicKeyData:[pkeyString dataUsingEncoding:NSUTF8StringEncoding]];
+    SUDSAVerifier *verifier = [(SUDSAVerifier *)[self alloc] initWithPublicKeys:pkeys];
 
     if (!verifier) {
         return NO;
@@ -44,10 +49,11 @@
     return [verifier verifyFileAtPath:path signatures:signatures];
 }
 
-- (instancetype)initWithPublicKeyData:(NSData *)data
+- (instancetype)initWithPublicKeys:(SUPublicKeys *)pubkeys
 {
     self = [super init];
 
+    NSData *data = [pubkeys.dsaPubKey dataUsingEncoding:NSASCIIStringEncoding];
     if (!self || !data.length) {
         SULog(SULogLevelError, @"Could not read public DSA key");
         return nil;
@@ -102,6 +108,7 @@
     NSData *dsaSignature = signatures.dsaSignature;
 
     if (!stream || !dsaSignature) {
+        SULog(SULogLevelError, @"Invalid arguments to verifyStream");
         return NO;
     }
 
