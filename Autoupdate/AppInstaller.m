@@ -188,19 +188,23 @@ static const NSTimeInterval SUDisplayProgressTimeDelay = 0.7;
     NSString *archivePath = [self.updateDirectoryPath stringByAppendingPathComponent:self.downloadName];
     id<SUUnarchiverProtocol> unarchiver = [SUUnarchiver unarchiverForPath:archivePath updatingHostBundlePath:self.host.bundlePath decryptionPassword:self.decryptionPassword];
     
-    BOOL success;
+    BOOL success = NO;
     if (!unarchiver) {
         SULog(SULogLevelError, @"Error: No valid unarchiver for %@", archivePath);
         
         success = NO;
     } else {
+        self.updateValidator = [[SUUpdateValidator alloc] initWithDownloadPath:archivePath signatures:self.signatures host:self.host];
+
         // Delta & package updates will require validation before extraction
         // Normal application updates are a bit more lenient allowing developers to change one of apple dev ID or DSA keys
-        BOOL needsPrevalidation = [[unarchiver class] unsafeIfArchiveIsNotValidated] || ![self.installationType isEqualToString:SPUInstallationTypeApplication];
-        
-        self.updateValidator = [[SUUpdateValidator alloc] initWithDownloadPath:archivePath signatures:self.signatures host:self.host performingPrevalidation:needsPrevalidation];
-        
-        success = self.updateValidator.canValidate;
+        BOOL needsPrevalidation = [[unarchiver class] mustValidateBeforeExtraction] || ![self.installationType isEqualToString:SPUInstallationTypeApplication];
+
+        if (needsPrevalidation) {
+            success = [self.updateValidator validateDownloadPath];
+        } else {
+            success = YES;
+        }
     }
     
     if (!success) {
