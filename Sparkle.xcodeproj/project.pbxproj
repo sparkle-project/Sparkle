@@ -32,7 +32,6 @@
 		14652F8019A9740F00959E44 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 61B5F8F609C4CEB300B25A18 /* Security.framework */; };
 		14652F8219A9746000959E44 /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
 		14652F8419A978C200959E44 /* SUExport.h in Headers */ = {isa = PBXBuildFile; fileRef = 14652F8319A9759F00959E44 /* SUExport.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		14732BC01960F2C200593899 /* test_app_only_dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 14732BBF1960F0AC00593899 /* test_app_only_dsa_pub.pem */; };
 		14732BD019610A0D00593899 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		14732BD119610A1200593899 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D6A5FE840307C02AAC07 /* AppKit.framework */; };
 		14732BD319610A1800593899 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14732BD219610A1800593899 /* XCTest.framework */; };
@@ -402,7 +401,6 @@
 		72E45CF71B640DAE005C701A /* SUUpdateSettingsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72E45CF51B640DAE005C701A /* SUUpdateSettingsWindowController.m */; };
 		72E45CF81B640DAE005C701A /* SUUpdateSettingsWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */; };
 		72E45CFC1B641961005C701A /* sparkletestcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CFB1B641961005C701A /* sparkletestcast.xml */; };
-		72E45CFE1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem in Resources */ = {isa = PBXBuildFile; fileRef = 72E45CFD1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem */; };
 		72E45DDD1B65C3BD005C701A /* sign_update in Resources */ = {isa = PBXBuildFile; fileRef = 72E45DDC1B65C3BD005C701A /* sign_update */; };
 		72E539121D68C3FA0092CE5E /* SPUDownloadData.m in Sources */ = {isa = PBXBuildFile; fileRef = 72F9EC431D5E9ED8004AC8B6 /* SPUDownloadData.m */; };
 		72EB87EA1CB8798800C37F42 /* ShowInstallerProgress.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */; };
@@ -855,7 +853,6 @@
 		14732BB91960EEEE00593899 /* SampleAppcast.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SampleAppcast.xml; sourceTree = "<group>"; };
 		14732BBA1960EF7100593899 /* CHANGELOG */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CHANGELOG; sourceTree = SOURCE_ROOT; };
 		14732BBC1960EFB500593899 /* README.markdown */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.markdown; sourceTree = SOURCE_ROOT; };
-		14732BBF1960F0AC00593899 /* test_app_only_dsa_pub.pem */ = {isa = PBXFileReference; lastKnownFileType = text; path = test_app_only_dsa_pub.pem; sourceTree = "<group>"; };
 		14732BC11960F3B200593899 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = SOURCE_ROOT; usesTabs = 1; };
 		14732BC31960F3FF00593899 /* generate_keys */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = generate_keys; sourceTree = "<group>"; };
 		14732BC41960F3FF00593899 /* sign_update */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = sign_update; sourceTree = "<group>"; };
@@ -1280,7 +1277,6 @@
 		72E45CF51B640DAE005C701A /* SUUpdateSettingsWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUUpdateSettingsWindowController.m; sourceTree = "<group>"; };
 		72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SUUpdateSettingsWindowController.xib; sourceTree = "<group>"; };
 		72E45CFB1B641961005C701A /* sparkletestcast.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = sparkletestcast.xml; sourceTree = "<group>"; };
-		72E45CFD1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test_app_only_dsa_priv_dont_ever_do_this_for_real.pem; sourceTree = "<group>"; };
 		72E45DDC1B65C3BD005C701A /* sign_update */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = sign_update; path = bin/sign_update; sourceTree = SOURCE_ROOT; };
 		72EB87E91CB8798800C37F42 /* ShowInstallerProgress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ShowInstallerProgress.m; path = Sparkle/InstallerProgress/ShowInstallerProgress.m; sourceTree = SOURCE_ROOT; };
 		72F94ED51CC3441A002DEE68 /* ConfigInstallerLauncherDebug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ConfigInstallerLauncherDebug.xcconfig; sourceTree = "<group>"; };
@@ -1890,8 +1886,6 @@
 				72E45CF41B640DAE005C701A /* SUUpdateSettingsWindowController.h */,
 				72E45CF51B640DAE005C701A /* SUUpdateSettingsWindowController.m */,
 				72E45CF61B640DAE005C701A /* SUUpdateSettingsWindowController.xib */,
-				72E45CFD1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem */,
-				14732BBF1960F0AC00593899 /* test_app_only_dsa_pub.pem */,
 				61B5F90409C4CEE200B25A18 /* TestApplication-Info.plist */,
 			);
 			name = "Test Application";
@@ -2980,8 +2974,6 @@
 				72E45CFC1B641961005C701A /* sparkletestcast.xml in Resources */,
 				725F97A61C8B304D00265BE4 /* SUInstallUpdateViewController.xib in Resources */,
 				72E45CF81B640DAE005C701A /* SUUpdateSettingsWindowController.xib in Resources */,
-				72E45CFE1B641D0D005C701A /* test_app_only_dsa_priv_dont_ever_do_this_for_real.pem in Resources */,
-				14732BC01960F2C200593899 /* test_app_only_dsa_pub.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
