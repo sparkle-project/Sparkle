@@ -12,6 +12,7 @@
 #import "SUInstaller.h"
 #import "SUHost.h"
 #import "SULog.h"
+#import "SUSignatures.h"
 
 
 #include "AppKitPrevention.h"
@@ -20,7 +21,7 @@
 
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic, readonly) BOOL prevalidatedDsaSignature;
-@property (nonatomic, readonly) NSString *dsaSignature;
+@property (nonatomic, readonly) SUSignatures *signatures;
 @property (nonatomic, readonly) NSString *downloadPath;
 
 @end
@@ -30,10 +31,10 @@
 @synthesize host = _host;
 @synthesize canValidate = _canValidate;
 @synthesize prevalidatedDsaSignature = _prevalidatedDsaSignature;
-@synthesize dsaSignature = _dsaSignature;
+@synthesize signatures = _signatures;
 @synthesize downloadPath = _downloadPath;
 
-- (instancetype)initWithDownloadPath:(NSString *)downloadPath dsaSignature:(NSString *)dsaSignature host:(SUHost *)host performingPrevalidation:(BOOL)performingPrevalidation
+- (instancetype)initWithDownloadPath:(NSString *)downloadPath signatures:(SUSignatures *)signatures host:(SUHost *)host performingPrevalidation:(BOOL)performingPrevalidation
 {
     self = [super init];
     if (self != nil) {
@@ -41,6 +42,7 @@
         BOOL prevalidatedDsaSignature;
         if (performingPrevalidation) {
             NSString *publicDSAKey = host.publicDSAKey;
+            NSData *dsaSignature = signatures.dsaSignature;
 
             if (publicDSAKey == nil) {
                 prevalidatedDsaSignature = NO;
@@ -49,7 +51,7 @@
                 prevalidatedDsaSignature = NO;
                 SULog(SULogLevelError, @"Failed to validate update before unarchiving because no DSA signature was found");
             } else {
-                prevalidatedDsaSignature = [SUDSAVerifier validatePath:downloadPath withEncodedDSASignature:dsaSignature withPublicDSAKey:host.publicDSAKey];
+                prevalidatedDsaSignature = [SUDSAVerifier validatePath:downloadPath withDSASignature:dsaSignature withPublicDSAKey:host.publicDSAKey];
                 if (!prevalidatedDsaSignature) {
                     SULog(SULogLevelError, @"DSA signature validation before unarchiving failed for update %@", downloadPath);
                 }
@@ -64,7 +66,7 @@
         _canValidate = canValidate;
         _prevalidatedDsaSignature = prevalidatedDsaSignature;
         _downloadPath = [downloadPath copy];
-        _dsaSignature = [dsaSignature copy];
+        _signatures = signatures;
         _host = host;
     }
     return self;
@@ -74,7 +76,7 @@
 {
     assert(self.canValidate);
 
-    NSString *DSASignature = self.dsaSignature;
+    NSData *DSASignature = self.signatures.dsaSignature;
     NSString *downloadPath = self.downloadPath;
     SUHost *host = self.host;
 
@@ -96,7 +98,7 @@
         if (isPackage) {
             // If we get here, then the appcast installation type was lying to us.. This error will be caught later when starting the installer.
             // For package type updates, all we do is check if the DSA signature is valid
-            BOOL validationCheckSuccess = [SUDSAVerifier validatePath:downloadPath withEncodedDSASignature:DSASignature withPublicDSAKey:host.publicDSAKey];
+            BOOL validationCheckSuccess = [SUDSAVerifier validatePath:downloadPath withDSASignature:DSASignature withPublicDSAKey:host.publicDSAKey];
             if (!validationCheckSuccess) {
                 SULog(SULogLevelError, @"DSA signature validation of the package failed. The update contains an installer package, and valid DSA signatures are mandatory for all installer packages. The update will be rejected. Sign the installer with a valid DSA key or use an .app bundle update instead.");
             }
@@ -121,7 +123,7 @@
     }
 }
 
-- (BOOL)validateBundleUpdateForHost:(SUHost *)host newBundleURL:(NSURL *)newBundleURL archivePath:(NSString *)archivePath DSASignature:(NSString *)DSASignature
+- (BOOL)validateBundleUpdateForHost:(SUHost *)host newBundleURL:(NSURL *)newBundleURL archivePath:(NSString *)archivePath DSASignature:(NSData *)DSASignature
 {
     NSBundle *newBundle = [NSBundle bundleWithURL:newBundleURL];
     if (newBundle == nil) {
@@ -146,7 +148,7 @@
     // In that case, the check ensures that the app author has correctly used DSA keys, so that the app will be updateable in the next version.
     // However if the new and old DSA keys are the same, then this is a security measure.
     if (newPublicDSAKey != nil) {
-        if (![SUDSAVerifier validatePath:archivePath withEncodedDSASignature:DSASignature withPublicDSAKey:newPublicDSAKey]) {
+        if (![SUDSAVerifier validatePath:archivePath withDSASignature:DSASignature withPublicDSAKey:newPublicDSAKey]) {
             SULog(SULogLevelError, @"DSA signature validation failed. The update has a public DSA key and is signed with a DSA key, but the %@ doesn't match the signature. The update will be rejected.",
                   dsaKeysMatch ? @"public key" : @"new public key shipped with the update");
             return NO;

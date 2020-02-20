@@ -10,6 +10,7 @@
 #import <Sparkle/SUVersionComparisonProtocol.h>
 #import "SULog.h"
 #import "SUConstants.h"
+#import "SUSignatures.h"
 #import "SPUInstallationType.h"
 
 
@@ -17,7 +18,7 @@
 
 static NSString *SUAppcastItemDeltaUpdatesKey = @"deltaUpdates";
 static NSString *SUAppcastItemDisplayVersionStringKey = @"displayVersionString";
-static NSString *SUAppcastItemDSASignatureKey = @"DSASignature";
+static NSString *SUAppcastItemSignaturesKey = @"signatures";
 static NSString *SUAppcastItemFileURLKey = @"fileURL";
 static NSString *SUAppcastItemInfoURLKey = @"infoURL";
 static NSString *SUAppcastItemContentLengthKey = @"contentLength";
@@ -35,7 +36,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
 @synthesize dateString = _dateString;
 @synthesize deltaUpdates = _deltaUpdates;
 @synthesize displayVersionString = _displayVersionString;
-@synthesize DSASignature = _DSASignature;
+@synthesize signatures = _signatures;
 @synthesize fileURL = _fileURL;
 @synthesize contentLength = _contentLength;
 @synthesize infoURL = _infoURL;
@@ -61,7 +62,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
     if (self != nil) {
         _deltaUpdates = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[[NSDictionary class], [SUAppcastItem class]]] forKey:SUAppcastItemDeltaUpdatesKey];
         _displayVersionString = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemDisplayVersionStringKey] copy];
-        _DSASignature = [(NSString *)[decoder decodeObjectOfClass:[NSString class] forKey:SUAppcastItemDSASignatureKey] copy];
+        _signatures = (SUSignatures *)[decoder decodeObjectOfClass:[SUSignatures class] forKey:SUAppcastItemSignaturesKey];
         _fileURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemFileURLKey];
         _infoURL = [decoder decodeObjectOfClass:[NSURL class] forKey:SUAppcastItemInfoURLKey];
         
@@ -94,8 +95,8 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
         [encoder encodeObject:self.displayVersionString forKey:SUAppcastItemDisplayVersionStringKey];
     }
     
-    if (self.DSASignature != nil) {
-        [encoder encodeObject:self.DSASignature forKey:SUAppcastItemDSASignatureKey];
+    if (self.signatures != nil) {
+        [encoder encodeObject:self.signatures forKey:SUAppcastItemSignaturesKey];
     }
     
     if (self.fileURL != nil) {
@@ -250,7 +251,7 @@ static NSString *SUAppcastItemInstallationTypeKey = @"SUAppcastItemInstallationT
             _fileURL = [NSURL URLWithString:fileURLString];
         }
         if (enclosure) {
-            _DSASignature = [(NSString *)[enclosure objectForKey:SUAppcastAttributeDSASignature] copy];
+            _signatures = [[SUSignatures alloc] initWithDsa:[enclosure objectForKey:SUAppcastAttributeDSASignature] ed:nil];
         }
 
         _versionString = [(NSString *)newVersion copy];

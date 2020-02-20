@@ -16,7 +16,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SUSignatures : NSObject {
+@interface SUSignatures : NSObject <NSSecureCoding> {
     unsigned char ed25519_signature[64];
 }
 @property (strong, readonly, nullable) NSData *dsaSignature;

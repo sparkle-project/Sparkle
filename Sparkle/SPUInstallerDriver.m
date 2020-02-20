@@ -171,15 +171,13 @@
             pathToRelaunch = relaunchPath;
         }
     }
-    
-    NSString *dsaSignature = (self.updateItem.DSASignature == nil) ? @"" : self.updateItem.DSASignature;
-    
+
     NSString *decryptionPassword = nil;
     if ([self.updaterDelegate respondsToSelector:@selector(decryptionPasswordForUpdater:)]) {
         decryptionPassword = [self.updaterDelegate decryptionPasswordForUpdater:self.updater];
     }
     
-    SPUInstallationInputData *installationData = [[SPUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadName:self.downloadName installationType:self.updateItem.installationType dsaSignature:dsaSignature decryptionPassword:decryptionPassword];
+    SPUInstallationInputData *installationData = [[SPUInstallationInputData alloc] initWithRelaunchPath:pathToRelaunch hostBundlePath:self.host.bundlePath updateDirectoryPath:self.temporaryDirectory downloadName:self.downloadName installationType:self.updateItem.installationType signatures:self.updateItem.signatures decryptionPassword:decryptionPassword];
     
     NSData *archivedData = SPUArchiveRootObjectSecurely(installationData);
     if (archivedData == nil) {

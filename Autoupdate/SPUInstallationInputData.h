@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class SUSignatures;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface SPUInstallationInputData : NSObject <NSSecureCoding>
@@ -17,17 +19,17 @@ NS_ASSUME_NONNULL_BEGIN
  * hostBundlePath - path to host bundle to update & replace
  * updateDirectoryPath - path to update directory (i.e, temporary directory containing the new update archive)
  * downloadName - name of update archive in update directory
- * dsaSignature - DSA signature for the update that came from the appcast item
+ * signatures - signatures for the update that came from the appcast item
  * decryptionPassword - optional decryption password for dmg archives
  */
-- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadName:(NSString *)downloadName installationType:(NSString *)installationType dsaSignature:(NSString *)dsaSignature decryptionPassword:(nullable NSString *)decryptionPassword;
+- (instancetype)initWithRelaunchPath:(NSString *)relaunchPath hostBundlePath:(NSString *)hostBundlePath updateDirectoryPath:(NSString *)updateDirectoryPath downloadName:(NSString *)downloadName installationType:(NSString *)installationType signatures:(SUSignatures *)signatures decryptionPassword:(nullable NSString *)decryptionPassword;
 
 @property (nonatomic, copy, readonly) NSString *relaunchPath;
 @property (nonatomic, copy, readonly) NSString *hostBundlePath;
 @property (nonatomic, copy, readonly) NSString *updateDirectoryPath;
 @property (nonatomic, copy, readonly) NSString *downloadName;
 @property (nonatomic, copy, readonly) NSString *installationType;
-@property (nonatomic, copy, readonly) NSString *dsaSignature;
+@property (nonatomic, strong, readonly) SUSignatures *signatures;
 @property (nonatomic, copy, readonly, nullable) NSString *decryptionPassword;
 
 @end

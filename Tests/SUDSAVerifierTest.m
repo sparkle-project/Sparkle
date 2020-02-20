@@ -75,9 +75,10 @@
 - (void)testValidatePath
 {
     NSString *pubkey = [NSString stringWithContentsOfFile:self.pubKeyFile encoding:NSASCIIStringEncoding error:nil];
+    NSData *signature = [[NSData alloc] initWithBase64EncodedString:@"MC0CFFMF3ha5kjvrJ9JTpTR8BenPN9QUAhUAzY06JRdtP17MJewxhK0twhvbKIE=" options:(NSDataBase64DecodingOptions)0];
 
     XCTAssertTrue([SUDSAVerifier validatePath:self.testFile
-                      withEncodedDSASignature:@"MC0CFFMF3ha5kjvrJ9JTpTR8BenPN9QUAhUAzY06JRdtP17MJewxhK0twhvbKIE="
+                             withDSASignature:signature
                              withPublicDSAKey:pubkey],
                   @"Expected valid signature");
 }

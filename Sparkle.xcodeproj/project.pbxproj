@@ -51,6 +51,7 @@
 		55C14F07136EF6DB00649790 /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
 		55E6F33319EC9F6C00005E76 /* SUErrors.h in Headers */ = {isa = PBXBuildFile; fileRef = 55E6F33219EC9F6C00005E76 /* SUErrors.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5A4094481C74EA5200983BE0 /* SUAppcastTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA4DCD01C73E5510078F128 /* SUAppcastTest.swift */; };
+		5A6DD17123FE1FFC000AEF33 /* SUSignatures.m in Sources */ = {isa = PBXBuildFile; fileRef = EA1E286D22B665E8004AA304 /* SUSignatures.m */; };
 		5AD0FA7F1C73F2E2004BCEFF /* testappcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 5AD0FA7E1C73F2E2004BCEFF /* testappcast.xml */; };
 		5AE459001C34118500E3BB47 /* SUUpdaterTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 14950074195FDF5900BC5B5B /* SUUpdaterTest.m */; };
 		5AE459021C34118500E3BB47 /* SUVersionComparisonTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 61227A150DB548B800AB99EA /* SUVersionComparisonTest.m */; };
@@ -3494,6 +3495,7 @@
 				7267E5C21D3D8B2700D1BF90 /* SUGuidedPackageInstaller.m in Sources */,
 				7267E5D71D3D8D3F00D1BF90 /* SUHost.m in Sources */,
 				7267E5C31D3D8B2700D1BF90 /* SUInstaller.m in Sources */,
+				5A6DD17123FE1FFC000AEF33 /* SUSignatures.m in Sources */,
 				7267E5CE1D3D8C7500D1BF90 /* SULog.m in Sources */,
 				7267E5C41D3D8B2700D1BF90 /* SUPackageInstaller.m in Sources */,
 				7267E5871D3D89B300D1BF90 /* SUPipedUnarchiver.m in Sources */,
