@@ -1043,7 +1043,7 @@
 		657C5F2B218CBC1700925834 /* INSTALL.markdown */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = INSTALL.markdown; sourceTree = SOURCE_ROOT; };
 		7205C43E1E13049400E370AE /* generate_appcast */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = generate_appcast; sourceTree = BUILT_PRODUCTS_DIR; };
 		7205C4401E13049400E370AE /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		7205C4461E1304C300E370AE /* Appcast-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Appcast-Bridging-Header.h"; sourceTree = "<group>"; };
+		7205C4461E1304C300E370AE /* Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
 		7205C4471E1304CE00E370AE /* Appcast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Appcast.swift; sourceTree = "<group>"; };
 		7205C4481E1304CE00E370AE /* ArchiveItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArchiveItem.swift; sourceTree = "<group>"; };
 		7205C4491E1304CE00E370AE /* Signatures.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Signatures.swift; sourceTree = "<group>"; };
@@ -1968,7 +1968,7 @@
 		7205C43F1E13049400E370AE /* generate_appcast */ = {
 			isa = PBXGroup;
 			children = (
-				7205C4461E1304C300E370AE /* Appcast-Bridging-Header.h */,
+				7205C4461E1304C300E370AE /* Bridging-Header.h */,
 				7205C4471E1304CE00E370AE /* Appcast.swift */,
 				7205C4481E1304CE00E370AE /* ArchiveItem.swift */,
 				7205C44A1E1304CE00E370AE /* FeedXML.swift */,
