@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <XCTest/XCTest.h>
-#import "SUDSAVerifier.h"
+#import "SUSignatureVerifier.h"
 #import "SUSignatures.h"
 
 @interface SUDSAVerifierTest : XCTestCase
@@ -67,7 +67,7 @@
 - (BOOL)checkFile:(NSString *)aFile withPubKey:(NSString *)pubKey signature:(NSString *)sigString
 {
     SUPublicKeys *pubKeys = [[SUPublicKeys alloc] initWithDsa:pubKey ed:nil];
-    SUDSAVerifier *v = [[SUDSAVerifier alloc] initWithPublicKeys:pubKeys];
+    SUSignatureVerifier *v = [[SUSignatureVerifier alloc] initWithPublicKeys:pubKeys];
 
     SUSignatures *sig = [[SUSignatures alloc] initWithDsa:sigString ed:nil];
 
@@ -86,7 +86,7 @@
     XCTAssertNotNil(sig);
     XCTAssertNotNil(sig.dsaSignature);
 
-    XCTAssertTrue([SUDSAVerifier validatePath:self.testFile withSignatures:sig withPublicKeys:pubkeys], @"Expected valid signature");
+    XCTAssertTrue([SUSignatureVerifier validatePath:self.testFile withSignatures:sig withPublicKeys:pubkeys], @"Expected valid signature");
 }
 
 @end
