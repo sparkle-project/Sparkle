@@ -59,7 +59,7 @@
 		5AE459021C34118500E3BB47 /* SUVersionComparisonTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 61227A150DB548B800AB99EA /* SUVersionComparisonTest.m */; };
 		5AF6C74F1AEA46D10014A3AB /* test.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 5AF6C74E1AEA46D10014A3AB /* test.pkg */; };
 		5AF6C7541AEA49840014A3AB /* SUInstallerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF6C74C1AEA40760014A3AB /* SUInstallerTest.m */; };
-		5AF9DC3C1981DBEE001EA135 /* SUDSAVerifierTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF9DC3B1981DBEE001EA135 /* SUDSAVerifierTest.m */; };
+		5AF9DC3C1981DBEE001EA135 /* SUSignatureVerifierTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF9DC3B1981DBEE001EA135 /* SUSignatureVerifierTest.m */; };
 		5D06E8FF0FD68D6D005AE3F6 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D06E8FB0FD68D61005AE3F6 /* libbz2.dylib */; };
 		5D06E9050FD68D7D005AE3F6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0867D69BFE84028FC02AAC07 /* Foundation.framework */; };
 		5D1AF58B0FD7678C0065DB48 /* libxar.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D1AF5890FD7678C0065DB48 /* libxar.1.dylib */; };
@@ -207,7 +207,7 @@
 		7267E5871D3D89B300D1BF90 /* SUPipedUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5831D3D89B300D1BF90 /* SUPipedUnarchiver.m */; };
 		7267E5881D3D89B300D1BF90 /* SUUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5851D3D89B300D1BF90 /* SUUnarchiver.m */; };
 		7267E59C1D3D8A5A00D1BF90 /* SUCodeSigningVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5991D3D8A5A00D1BF90 /* SUCodeSigningVerifier.m */; };
-		7267E59D1D3D8A5A00D1BF90 /* SUDSAVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E59B1D3D8A5A00D1BF90 /* SUDSAVerifier.m */; };
+		7267E59D1D3D8A5A00D1BF90 /* SUSignatureVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E59B1D3D8A5A00D1BF90 /* SUSignatureVerifier.m */; };
 		7267E59F1D3D8A6F00D1BF90 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E59E1D3D8A6F00D1BF90 /* main.m */; };
 		7267E5A21D3D8A7E00D1BF90 /* AppInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5A11D3D8A7E00D1BF90 /* AppInstaller.m */; };
 		7267E5A81D3D8A9900D1BF90 /* AgentConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5A71D3D8A9900D1BF90 /* AgentConnection.m */; };
@@ -249,7 +249,7 @@
 		7267E5EF1D3D915900D1BF90 /* SUBinaryDeltaCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5711D3D895B00D1BF90 /* SUBinaryDeltaCommon.m */; };
 		7267E5F01D3D915900D1BF90 /* SUBinaryDeltaCreate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5731D3D895B00D1BF90 /* SUBinaryDeltaCreate.m */; };
 		7267E5F11D3D917A00D1BF90 /* SUBinaryDeltaUnarchiver.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E57E1D3D896700D1BF90 /* SUBinaryDeltaUnarchiver.m */; };
-		7267E5F21D3D918000D1BF90 /* SUDSAVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E59B1D3D8A5A00D1BF90 /* SUDSAVerifier.m */; };
+		7267E5F21D3D918000D1BF90 /* SUSignatureVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E59B1D3D8A5A00D1BF90 /* SUSignatureVerifier.m */; };
 		7267E5F31D3D918500D1BF90 /* SUCodeSigningVerifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5991D3D8A5A00D1BF90 /* SUCodeSigningVerifier.m */; };
 		7267E5F41D3D918B00D1BF90 /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5BB1D3D8B2700D1BF90 /* SUGuidedPackageInstaller.m */; };
 		7267E5F51D3D918B00D1BF90 /* SUPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 7267E5BF1D3D8B2700D1BF90 /* SUPackageInstaller.m */; };
@@ -959,7 +959,7 @@
 		5AEF45D9189D1CC90030D7DC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Sparkle.strings; sourceTree = "<group>"; };
 		5AF6C74C1AEA40760014A3AB /* SUInstallerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUInstallerTest.m; sourceTree = "<group>"; };
 		5AF6C74E1AEA46D10014A3AB /* test.pkg */ = {isa = PBXFileReference; lastKnownFileType = file; path = test.pkg; sourceTree = "<group>"; };
-		5AF9DC3B1981DBEE001EA135 /* SUDSAVerifierTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUDSAVerifierTest.m; sourceTree = "<group>"; };
+		5AF9DC3B1981DBEE001EA135 /* SUSignatureVerifierTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SUSignatureVerifierTest.m; sourceTree = "<group>"; };
 		5D06E8D00FD68C7C005AE3F6 /* BinaryDelta */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BinaryDelta; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D06E8DB0FD68CB9005AE3F6 /* bsdiff.c */ = {isa = PBXFileReference; comments = "-Wno-shorten-64-to-32"; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bsdiff.c; sourceTree = "<group>"; };
 		5D06E8DC0FD68CB9005AE3F6 /* bspatch.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bspatch.c; sourceTree = "<group>"; };
@@ -1151,8 +1151,8 @@
 		7267E5891D3D89CA00D1BF90 /* SUUnarchiverProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SUUnarchiverProtocol.h; path = Autoupdate/SUUnarchiverProtocol.h; sourceTree = SOURCE_ROOT; };
 		7267E5981D3D8A5A00D1BF90 /* SUCodeSigningVerifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUCodeSigningVerifier.h; path = Autoupdate/SUCodeSigningVerifier.h; sourceTree = SOURCE_ROOT; };
 		7267E5991D3D8A5A00D1BF90 /* SUCodeSigningVerifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUCodeSigningVerifier.m; path = Autoupdate/SUCodeSigningVerifier.m; sourceTree = SOURCE_ROOT; };
-		7267E59A1D3D8A5A00D1BF90 /* SUDSAVerifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUDSAVerifier.h; path = Autoupdate/SUDSAVerifier.h; sourceTree = SOURCE_ROOT; };
-		7267E59B1D3D8A5A00D1BF90 /* SUDSAVerifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUDSAVerifier.m; path = Autoupdate/SUDSAVerifier.m; sourceTree = SOURCE_ROOT; };
+		7267E59A1D3D8A5A00D1BF90 /* SUSignatureVerifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SUSignatureVerifier.h; path = Autoupdate/SUSignatureVerifier.h; sourceTree = SOURCE_ROOT; };
+		7267E59B1D3D8A5A00D1BF90 /* SUSignatureVerifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SUSignatureVerifier.m; path = Autoupdate/SUSignatureVerifier.m; sourceTree = SOURCE_ROOT; };
 		7267E59E1D3D8A6F00D1BF90 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Autoupdate/main.m; sourceTree = SOURCE_ROOT; };
 		7267E5A01D3D8A7E00D1BF90 /* AppInstaller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppInstaller.h; path = Autoupdate/AppInstaller.h; sourceTree = SOURCE_ROOT; };
 		7267E5A11D3D8A7E00D1BF90 /* AppInstaller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppInstaller.m; path = Autoupdate/AppInstaller.m; sourceTree = SOURCE_ROOT; };
@@ -1768,7 +1768,7 @@
 				5AA4DCD01C73E5510078F128 /* SUAppcastTest.swift */,
 				142E0E0819A83AAC00E4312B /* SUBinaryDeltaTest.m */,
 				F8761EB01ADC5068000C9034 /* SUCodeSigningVerifierTest.m */,
-				5AF9DC3B1981DBEE001EA135 /* SUDSAVerifierTest.m */,
+				5AF9DC3B1981DBEE001EA135 /* SUSignatureVerifierTest.m */,
 				72A4A23F1BB6567D00E7820D /* SUFileManagerTest.swift */,
 				5AF6C74C1AEA40760014A3AB /* SUInstallerTest.m */,
 				72BEBFEE1D7287560019146B /* SUSpotlightImporterTest.swift */,
@@ -1903,8 +1903,8 @@
 			children = (
 				7267E5981D3D8A5A00D1BF90 /* SUCodeSigningVerifier.h */,
 				7267E5991D3D8A5A00D1BF90 /* SUCodeSigningVerifier.m */,
-				7267E59A1D3D8A5A00D1BF90 /* SUDSAVerifier.h */,
-				7267E59B1D3D8A5A00D1BF90 /* SUDSAVerifier.m */,
+				7267E59A1D3D8A5A00D1BF90 /* SUSignatureVerifier.h */,
+				7267E59B1D3D8A5A00D1BF90 /* SUSignatureVerifier.m */,
 			);
 			name = Verifiers;
 			path = ..;
@@ -3263,8 +3263,8 @@
 				7267E5F31D3D918500D1BF90 /* SUCodeSigningVerifier.m in Sources */,
 				F8761EB11ADC5068000C9034 /* SUCodeSigningVerifierTest.m in Sources */,
 				7267E5F61D3D919000D1BF90 /* SUDiskImageUnarchiver.m in Sources */,
-				7267E5F21D3D918000D1BF90 /* SUDSAVerifier.m in Sources */,
-				5AF9DC3C1981DBEE001EA135 /* SUDSAVerifierTest.m in Sources */,
+				7267E5F21D3D918000D1BF90 /* SUSignatureVerifier.m in Sources */,
+				5AF9DC3C1981DBEE001EA135 /* SUSignatureVerifierTest.m in Sources */,
 				7267E5E91D3D90AA00D1BF90 /* SUFileManager.m in Sources */,
 				72A4A2401BB6567D00E7820D /* SUFileManagerTest.swift in Sources */,
 				7267E5F41D3D918B00D1BF90 /* SUGuidedPackageInstaller.m in Sources */,
@@ -3496,7 +3496,7 @@
 				7267E59C1D3D8A5A00D1BF90 /* SUCodeSigningVerifier.m in Sources */,
 				7267E5CC1D3D8C6B00D1BF90 /* SUConstants.m in Sources */,
 				7267E5861D3D89B300D1BF90 /* SUDiskImageUnarchiver.m in Sources */,
-				7267E59D1D3D8A5A00D1BF90 /* SUDSAVerifier.m in Sources */,
+				7267E59D1D3D8A5A00D1BF90 /* SUSignatureVerifier.m in Sources */,
 				7267E5E71D3D90AA00D1BF90 /* SUFileManager.m in Sources */,
 				7267E5C21D3D8B2700D1BF90 /* SUGuidedPackageInstaller.m in Sources */,
 				7267E5D71D3D8D3F00D1BF90 /* SUHost.m in Sources */,

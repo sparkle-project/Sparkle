@@ -1,5 +1,5 @@
 //
-//  SUDSAVerifier.h
+//  SUSignatureVerifier.h
 //  Sparkle
 //
 //  Created by Andy Matuschak on 3/16/06.
@@ -19,7 +19,7 @@
 @class SUSignatures;
 @class SUPublicKeys;
 
-@interface SUDSAVerifier : NSObject
+@interface SUSignatureVerifier : NSObject
 
 + (BOOL)validatePath:(NSString *)path withSignatures:(SUSignatures *)signatures withPublicKeys:(SUPublicKeys *)pkeys;
 
