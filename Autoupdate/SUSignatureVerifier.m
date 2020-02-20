@@ -103,10 +103,10 @@
         return NO;
     }
     NSInputStream *dataInputStream = [NSInputStream inputStreamWithFileAtPath:path];
-    return [self verifyStream:dataInputStream signatures:signatures];
+    return [self verifyDSASignatureOfStream:dataInputStream signatures:signatures];
 }
 
-- (BOOL)verifyStream:(NSInputStream *)stream signatures:(SUSignatures *)signatures
+- (BOOL)verifyDSASignatureOfStream:(NSInputStream *)stream signatures:(SUSignatures *)signatures
 {
     NSData *dsaSignature = signatures.dsaSignature;
 

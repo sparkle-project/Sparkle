@@ -26,7 +26,6 @@
 - (instancetype)initWithPublicKeys:(SUPublicKeys *)pkeys;
 
 - (BOOL)verifyFileAtPath:(NSString *)path signatures:(SUSignatures *)signatures;
- - (BOOL)verifyStream:(NSInputStream *)stream signatures:(SUSignatures *)signatures;
 
 @end
 
