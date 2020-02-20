@@ -135,6 +135,11 @@
     return [path rangeOfString:@"/AppTranslocation/"].location != NSNotFound;
 }
 
+- (NSString *_Nullable)publicEDKey
+{
+    return [self objectForInfoDictionaryKey:SUPublicEDKeyKey];
+}
+
 - (NSString *_Nullable)publicDSAKey
 {
     // Maybe the key is just a string in the Info.plist.
@@ -163,7 +168,7 @@
 
 - (SUPublicKeys *)publicKeys
 {
-    return [[SUPublicKeys alloc] initWithDsa:[self publicDSAKey] ed:nil];
+    return [[SUPublicKeys alloc] initWithDsa:[self publicDSAKey] ed:[self publicEDKey]];
 }
 
 - (NSString * _Nullable)publicDSAKeyFileKey
