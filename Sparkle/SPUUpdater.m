@@ -217,8 +217,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
         }
     }
     
-    BOOL hasPublicDSAKey = self.host.publicKeys.dsaPubKey != nil;
-    if (!hasPublicDSAKey) {
+    BOOL hasPublicKey = self.host.publicKeys.dsaPubKey != nil || self.host.publicKeys.ed25519PubKey != nil;
+    if (!hasPublicKey) {
         // If we failed to retrieve a DSA key but the bundle specifies a path to one, we should consider this a configuration failure
         NSString *publicDSAKeyFileKey = [self.host publicDSAKeyFileKey];
         if (publicDSAKeyFileKey != nil) {
@@ -228,8 +228,8 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
             return NO;
         }
     }
-    
-    if (!hasPublicDSAKey) {
+
+    if (!hasPublicKey) {
         if (!servingOverHttps || ![SUCodeSigningVerifier bundleAtURLIsCodeSigned:[[self hostBundle] bundleURL]]) {
             if (error != NULL) {
                 *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: @"For security reasons, updates need to be signed with a DSA key. See Sparkle's documentation for more information." }];
