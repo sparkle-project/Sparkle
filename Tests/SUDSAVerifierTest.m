@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <XCTest/XCTest.h>
 #import "SUDSAVerifier.h"
+#import "SUSignatures.h"
 
 @interface SUDSAVerifierTest : XCTestCase
 @property NSString *testFile, *pubKeyFile;
@@ -67,18 +68,19 @@
 {
     SUDSAVerifier *v = [[SUDSAVerifier alloc] initWithPublicKeyData:pubKey];
 
-    NSData *sig = [[NSData alloc] initWithBase64EncodedString:sigString options:(NSDataBase64DecodingOptions)0];
+    SUSignatures *sig = [[SUSignatures alloc] initWithDsa:sigString ed:nil];
 
-    return [v verifyFileAtPath:aFile signature:sig];
+    return [v verifyFileAtPath:aFile signatures:sig];
 }
 
 - (void)testValidatePath
 {
     NSString *pubkey = [NSString stringWithContentsOfFile:self.pubKeyFile encoding:NSASCIIStringEncoding error:nil];
-    NSData *signature = [[NSData alloc] initWithBase64EncodedString:@"MC0CFFMF3ha5kjvrJ9JTpTR8BenPN9QUAhUAzY06JRdtP17MJewxhK0twhvbKIE=" options:(NSDataBase64DecodingOptions)0];
+
+    SUSignatures *sig = [[SUSignatures alloc] initWithDsa:@"MC0CFFMF3ha5kjvrJ9JTpTR8BenPN9QUAhUAzY06JRdtP17MJewxhK0twhvbKIE=" ed:nil];
 
     XCTAssertTrue([SUDSAVerifier validatePath:self.testFile
-                             withDSASignature:signature
+                               withSignatures:sig
                              withPublicDSAKey:pubkey],
                   @"Expected valid signature");
 }
