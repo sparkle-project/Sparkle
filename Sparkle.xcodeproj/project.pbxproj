@@ -49,6 +49,9 @@
 		55C14F06136EF6DB00649790 /* SULog.h in Headers */ = {isa = PBXBuildFile; fileRef = 55C14F04136EF6DB00649790 /* SULog.h */; };
 		55C14F07136EF6DB00649790 /* SULog.m in Sources */ = {isa = PBXBuildFile; fileRef = 55C14F05136EF6DB00649790 /* SULog.m */; };
 		55E6F33319EC9F6C00005E76 /* SUErrors.h in Headers */ = {isa = PBXBuildFile; fileRef = 55E6F33219EC9F6C00005E76 /* SUErrors.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		5A06357023FE332300478A72 /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA1E282D22B660BE004AA304 /* libed25519.a */; };
+		5A06357323FE333600478A72 /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA1E282D22B660BE004AA304 /* libed25519.a */; };
+		5A06357423FE33A400478A72 /* libed25519.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA1E282D22B660BE004AA304 /* libed25519.a */; };
 		5A4094481C74EA5200983BE0 /* SUAppcastTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA4DCD01C73E5510078F128 /* SUAppcastTest.swift */; };
 		5A6DD17123FE1FFC000AEF33 /* SUSignatures.m in Sources */ = {isa = PBXBuildFile; fileRef = EA1E286D22B665E8004AA304 /* SUSignatures.m */; };
 		5AA89BA523FE27660094DAB8 /* SUSignatures.m in Sources */ = {isa = PBXBuildFile; fileRef = EA1E286D22B665E8004AA304 /* SUSignatures.m */; };
@@ -539,6 +542,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = EA1E280E22B64522004AA304;
 			remoteInfo = bsdiff;
+		};
+		5A06357123FE332300478A72 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EA1E282C22B660BE004AA304;
+			remoteInfo = ed25519;
 		};
 		61B5F91B09C4CF7200B25A18 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1367,6 +1377,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A06357323FE333600478A72 /* libed25519.a in Frameworks */,
 				EA1E281822B645CE004AA304 /* libbsdiff.a in Frameworks */,
 				14732BD119610A1200593899 /* AppKit.framework in Frameworks */,
 				14732BD019610A0D00593899 /* Foundation.framework in Frameworks */,
@@ -1382,6 +1393,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A06357423FE33A400478A72 /* libed25519.a in Frameworks */,
 				14950073195FCE4E00BC5B5B /* AppKit.framework in Frameworks */,
 				14950072195FCE4B00BC5B5B /* Foundation.framework in Frameworks */,
 				61B5F90F09C4CF3A00B25A18 /* Sparkle.framework in Frameworks */,
@@ -1466,6 +1478,7 @@
 				EA1E281722B645AE004AA304 /* libbsdiff.a in Frameworks */,
 				7267E5C91D3D8C4300D1BF90 /* CoreServices.framework in Frameworks */,
 				7267E5CA1D3D8C4800D1BF90 /* Foundation.framework in Frameworks */,
+				5A06357023FE332300478A72 /* libed25519.a in Frameworks */,
 				7267E5D61D3D8D3500D1BF90 /* libbz2.tbd in Frameworks */,
 				7267E5D51D3D8D2800D1BF90 /* libxar.tbd in Frameworks */,
 				721D8A611D48413B0032E472 /* Security.framework in Frameworks */,
@@ -2666,6 +2679,7 @@
 			);
 			dependencies = (
 				37DC0CE62340667000501A67 /* PBXTargetDependency */,
+				5A06357223FE332300478A72 /* PBXTargetDependency */,
 			);
 			name = Autoupdate;
 			productName = Autoupdate;
@@ -3680,6 +3694,11 @@
 			isa = PBXTargetDependency;
 			target = EA1E280E22B64522004AA304 /* bsdiff */;
 			targetProxy = 37DC0CE52340667000501A67 /* PBXContainerItemProxy */;
+		};
+		5A06357223FE332300478A72 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EA1E282C22B660BE004AA304 /* ed25519 */;
+			targetProxy = 5A06357123FE332300478A72 /* PBXContainerItemProxy */;
 		};
 		61B5F91C09C4CF7200B25A18 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
