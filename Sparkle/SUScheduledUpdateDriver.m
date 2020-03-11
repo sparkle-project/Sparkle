@@ -7,21 +7,47 @@
 //
 
 #import "SUScheduledUpdateDriver.h"
-#import "SUUpdater.h"
+#import "SUUpdaterPrivate.h"
+#import "SUUpdaterDelegate.h"
 
-#import "SUAppcast.h"
+#import "SUSystemUpdateInfo.h"
 #import "SUAppcastItem.h"
-#import "SUVersionComparisonProtocol.h"
 
 @interface SUScheduledUpdateDriver ()
-
-@property (assign) BOOL showErrors;
-
+- (BOOL)isItemReadyForPhasedRollout:(SUAppcastItem *)ui;
 @end
 
 @implementation SUScheduledUpdateDriver
 
-@synthesize showErrors;
+- (instancetype)initWithUpdater:(id<SUUpdaterPrivate>)anUpdater
+{
+    if ((self = [super initWithUpdater:anUpdater])) {
+        self.showErrors = NO;
+    }
+    return self;
+}
+
+- (BOOL)hostSupportsItem:(SUAppcastItem *)ui {
+    return [super hostSupportsItem:ui] && [self isItemReadyForPhasedRollout:ui];
+}
+
+- (BOOL)isItemReadyForPhasedRollout:(SUAppcastItem *)ui {
+    if([ui isCriticalUpdate] || ![ui phasedRolloutInterval]) {
+        return YES;
+    }
+
+    NSDate* itemReleaseDate = ui.date;
+    if(!itemReleaseDate) {
+        return YES;
+    }
+
+    NSTimeInterval timeSinceRelease = [[NSDate date] timeIntervalSinceDate:itemReleaseDate];
+
+    NSTimeInterval phasedRolloutInterval = [[ui phasedRolloutInterval] doubleValue];
+    NSTimeInterval timeToWaitForGroup = phasedRolloutInterval * [SUSystemUpdateInfo updateGroupForHost:self.host];
+
+    return timeSinceRelease >= timeToWaitForGroup;
+}
 
 - (void)didFindValidUpdate
 {
@@ -31,7 +57,8 @@
 
 - (void)didNotFindUpdate
 {
-    id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
+    id<SUUpdaterPrivate> updater = self.updater;
+    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
 
     if ([updaterDelegate respondsToSelector:@selector(updaterDidNotFindUpdate:)]) {
         [updaterDelegate updaterDidNotFindUpdate:self.updater];
@@ -41,20 +68,24 @@
     [self abortUpdate]; // Don't tell the user that no update was found; this was a scheduled update.
 }
 
-- (void)abortUpdateWithError:(NSError *)error
-{
-    if (self.showErrors) {
-        [super abortUpdateWithError:error];
-    } else {
-        // Call delegate separately here because otherwise it won't know we stopped.
-        // Normally this gets called by the superclass
-        id<SUUpdaterDelegate> updaterDelegate = [self.updater delegate];
-        if ([updaterDelegate respondsToSelector:@selector(updater:didAbortWithError:)]) {
-            [updaterDelegate updater:self.updater didAbortWithError:error];
-        }
+- (BOOL)shouldDisableKeyboardShortcutForInstallButton {
+    return YES;
+}
 
-        [self abortUpdate];
+- (BOOL)shouldShowUpdateAlertForItem:(SUAppcastItem *)item {
+    id<SUUpdaterPrivate> updater = self.updater;
+    id<SUUpdaterDelegate> updaterDelegate = [updater delegate];
+
+    if ([updaterDelegate respondsToSelector:@selector(updaterShouldShowUpdateAlertForScheduledUpdate:forItem:)]) {
+        return [updaterDelegate updaterShouldShowUpdateAlertForScheduledUpdate:self.updater forItem:item];
     }
+
+    return [super shouldShowUpdateAlertForItem:item];
+}
+
+- (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData * _Nullable) downloadData {
+    [SUSystemUpdateInfo setNewUpdateGroupIdentifierForHost:self.host]; // use new update group next time
+    [super downloaderDidFinishWithTemporaryDownloadData:downloadData];
 }
 
 @end

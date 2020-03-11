@@ -13,16 +13,28 @@ if [ -z "$SRCROOT" ] || \
     exit 1
 fi
 
-# Get the current Git master hash
-version=$(cd "$SRCROOT" ; git show-ref --abbrev heads/master | awk '{print $1}')
-if [ -z "$version" ] ; then
-	echo "$0: Can't find a Git hash!" 1>&2
+version="$CURRENT_PROJECT_VERSION"
+
+# Get version in format 1.x.x-commits-hash
+gitversion=$( cd "$SRCROOT"; git describe --tags --match '[12].*' || true )
+if [ -z "$gitversion" ] ; then
+    echo "$0: Can't find a Git hash!" 1>&2
     exit 0
 fi
 
-version="$CURRENT_PROJECT_VERSION git-$version"
+# remove everything before the first "-" to keep the hash part only
+versionsuffix=${gitversion#*-};
+if [ "$versionsuffix" != "$gitversion" ]; then
+    version="$version $versionsuffix"
+fi
 
 # and use it to set the CFBundleShortVersionString value
 export PATH="$PATH:/usr/libexec"
-PlistBuddy -c "Set :CFBundleShortVersionString '$version'" \
-    "$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH"
+
+if [ -f "$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH" ] ; then
+    oldversion=$(PlistBuddy -c "Print :CFBundleShortVersionString" "$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH")
+fi
+if [ "$version" != "$oldversion" ] ; then
+    PlistBuddy -c "Set :CFBundleShortVersionString '$version'" \
+        "$BUILT_PRODUCTS_DIR/$INFOPLIST_PATH"
+fi

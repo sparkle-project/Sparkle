@@ -11,7 +11,7 @@
 
 A guided installation allows Sparkle to download and install a package (pkg) or multi-package (mpkg) without user interaction.
 
-The installer package is installed using Mac OS X's built-in command line installer, `/usr/sbin/installer`. No installation interface is shown to the user.
+The installer package is installed using macOS's built-in command line installer, `/usr/sbin/installer`. No installation interface is shown to the user.
 
 A guided installation can be started by applications other than the application being replaced. This is particularly useful where helper applications or agents are used.
 
@@ -19,17 +19,15 @@ A guided installation can be started by applications other than the application 
 - Replace the use of `AuthorizationExecuteWithPrivilegesAndWait`. This method remains because it is well supported and tested. Ideally a helper tool or XPC would be used.
 */
 
-#ifndef SUGUIDEDPACKAGEINSTALLER_H
-#define SUGUIDEDPACKAGEINSTALLER_H
-
 #import <Foundation/Foundation.h>
-#import "Sparkle.h"
-#import "SUInstaller.h"
+#import "SUInstallerProtocol.h"
 
-@interface SUGuidedPackageInstaller : SUInstaller
+NS_ASSUME_NONNULL_BEGIN
 
-/*! Perform the guided installation */
-+ (void)performInstallationToPath:(NSString *)path fromPath:(NSString *)installerGuide host:(SUHost *)host versionComparator:(id<SUVersionComparison>)comparator completionHandler:(void (^)(NSError *))completionHandler;
+@interface SUGuidedPackageInstaller : NSObject <SUInstallerProtocol>
+
+- (instancetype)initWithPackagePath:(NSString *)packagePath installationPath:(NSString *)installationPath fileOperationToolPath:(NSString *)fileOperationToolPath;
+
 @end
 
-#endif
+NS_ASSUME_NONNULL_END

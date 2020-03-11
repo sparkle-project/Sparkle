@@ -1,4 +1,284 @@
-# 1.10.0
+# 1.23.0
+
+ * Support generating appcast with localizations (#1499) (Alik Vovkotrub)
+ * Support versions with git commit SHA (#1504) (Alec Larson)
+ * Hide "Skip..." and "Remind..." buttons when they're not relevant (#1480) (Kenneth Johnsen)
+ * Preserve Finder tags while updating apps (#1512) (CoreCode)
+ * Read-only update alert dialog formatting improvements (#1515) (Quinn Taylor)
+ * Check if `SUBundleName` is set before normalizing (Jake Fenton)
+ * `NSInteger` cast warning on Xcode 11 (Marga Keuvelaar)
+ * Correct appcast file extension (Tom Vos)
+ * Update Sparkle.strings (Emir Sarı)
+ * Fix spelling (#1508) (Frank Chiarulli Jr)
+
+# 1.22.0
+
+ * Enabled "Hardened Runtime" build option for Apple's notarization requirement
+ * Add delegate methods to suppress update alerts (George Nachman)
+ * Improved error when running from translocated location (Michael Buckley)
+ * Add phased rollout feature (#1381) (Fabian Jäger)
+ * Ignore non-standard permissions in delta updates instead of failing the build (Kornel Lesiński)
+ * Notify user when installed version is newer than the latest in the appcast (CoreCode)
+ * Reset timers after computer sleep (CoreCode)
+ * Block-based alternatives to `NSInvocation`-based delegate methods (Fabian Jäger)
+ * Add delegate `userDidSkipThisVersion` (BobZombie, Leo Natan, bono yusuke)
+ * Pass item to updaterShouldShowUpdateAlertForScheduledUpdate delegate method (George Nachman)
+ * Support providing private key as argument in `generate_appcast` (Yakuhzi, marchyang)
+ * Separate the ed25519 sources into a new static library (Tony Arnold)
+ * Disambiguate signing error messages (Nate Weaver)
+ * Use `XMLNode.Options.nodePrettyPrint` in `generate_appcast` instead of trying to add whitespace manually (fumoboy007)
+ * Annotate SUHost for nullability (Michael Buckley)
+ * Use SUAVAILABLE macro (Christiaan Hofman)
+ * Fix warnings when using modules (nivekkagicom)
+ * Correction of Czech localization inconsistency (#1403) (vojtakonarik)
+ * BR locale fix (BR Lingo)
+ * Update Japanese localization (fujisoft)
+ * French Sparkle.strings (Jean-Baptiste)
+
+# 1.21.3
+
+ * Losslessly reduced the size of PNG (Barijaona Ramaholimihaso)
+ * Catch exceptions from subcommands (Julian Mayer)
+ * `generate_appcast` can sign any bundles instead of just apps (Nate Weaver)
+ * Check that effectiveAppearance is being observed before calling removeObserver (Pierluigi)
+
+# 1.21.2
+
+ * Allow EdDSA for delta updates, too (Kornel)
+ * Warning fixes (Brian Bergstrand)
+ * Improvements to release notes view context menu and dark mode (Bi11)
+
+# 1.21.0
+
+ * Added support EdDSA (ed25519) signatures (Kornel)
+    * DSA signatures are considered outdated, and Apple's `Security.framework` only supports weaker SHA-1-based DSA.
+    * Both old DSA and new EdDSA are still supported (and one app can use both), but new applications should use EdDSA only, and we recommend migrating away from DSA signatures.
+ * `generate_keys` is now a Swift tool that stores EdDSA private keys in the Keychain
+    * Existing apps can continue using their old DSA keys, but we've dropped support for generation of old DSA keys
+ * `sign_update` is now a Swift tool that signs using EdDSA from private keys in the Keychain
+    * The old DSA-based signing script has been moved to `bin/old_dsa_scripts`
+    * The old DSA-based signing script has been fixed to work on pre-10.13 systems (Thomas Tempelmann)
+ * `generate_appcast` has been updated to support EdDSA signatures
+    * It can sign both DSA (if `dsa_priv.pem` file is specified) and EdDSA (from Keychain)
+    * The tool now uses Caches directory and doesn't generate unnecessary delta files
+ * Fixed verification of delta updates on filesystems that change permissions of symlinks
+ * Fixed `NSURLSession` leak (Michael Ehrmann)
+
+# 1.20.0
+
+ * `generate_appcast` option to read private key directly from the keychain (Tamás Lustyik)
+ * Add delegate callbacks for fininshed download and extraction related events (Csaba Horony)
+ * Don't check for updates if Do Not Disturb is on (Kornel)
+ * Expose `CodesigningVerifier`, add codesign info API (sunuslee)
+ * Threading fixes:
+   * Fix potential hang with `dispatch_sync` to main thread (Brian Bergstrand)
+   * Fix closeCheckingWindow called from background thread (Alexey Martemyanov)
+ * Improve 'read-only' error message (#1192) (Adrian Thomas)
+ * New Spanish localisation (Ken Arroyo Ohori)
+ * Updated Finnish language resources (Jason Pollack)
+ * Hungarian localization (Csaba Horony)
+ * Log more information about authentication requests (Kornel)
+ * Explicitly specify types to silence "Messaging unqualified id" warning that's new in Xcode 10. Removed __has_feature(objc_generics) check and use generisc to help silence the warnings. (Kent Sutherland)
+ * Fix binary delta creation on network drives (sagecook)
+ * Fix compilation issues on Xcode 10 with new build system (Leo Natan)
+
+# 1.19.0
+
+ * Refactoring of downloader code to avoid deprecated methods (Deadpikle)
+ * Changes to which methods run on the main thread.
+   Note: some delegate methods may be called on non-main thread now. (Kornel)
+ * Update Japanese localization (1024jp)
+ * Update Sparkle.strings (Stefan Paychère)
+ * Fix Sparkle clients polling too frequently (Jonathan Bullard)
+ * Handle SecTransformExecute errors (Kornel)
+ * Silence Touch Bar availability warnings on Xcode 9 by using API_AVAILABLE. Disable gnu-zero-variadic-macro-arguments to prevent warnings from use of API_AVAILABLE. (Kent Sutherland)
+ * 10.11 SDK compatibility (David Fuhrmann)
+
+# 1.18.1
+
+ * Add optional updaterDidRelaunchApplication: method on SUUpdaterDelegate (#1115) (App Tyrant)
+ * Implemented sparkle:os attribute as documented (Memphiz)
+ * Additional termination detection in case kpoll fails. (fujisoft)
+ * Included bin files in CocoaPods installation (Keith Smiley)
+ * Updated Dutch localization (Eitot)
+ * Updated German localization (Eitot)
+ * Updated Japanese translation (1024jp)
+ * Updated Portuguese translation (Victor)
+ * Updated to Xcode 9/Swift 4
+
+ # 1.18.0
+
+ * Name of the host app is used in authorization prompt (the `SPARKLE_RELAUNCH_TOOL_NAME` setting is now obsolete)
+ * More detailed progress bar for package installers (Kornel Lesiński)
+ * Disabled the keyboard shortcut for the install button for scheduled updates to avoid accidental installs. (George Nachman)
+ * generate_appcast tool adds release notes if there's an .html file with the same base name as the archive (Brett Walker)
+ * Added `sparkle:shortVersionString` to the enclosure, #1032 (Brett Walker)
+ * Fixed Japanese localization (1024jp)
+ * Fixed escaping of system profile URLs
+ * Added more logging in various failure cases (Kornel Lesiński)
+ * Better error message for quarantined apps that can't be updated
+
+# 1.17.0
+
+ * Added Touch Bar support (Bi11)
+ * Upgraded SULog to use logging APIs that Apple provides built-in (Zorg)
+ * Skip buttons are disabled if the update is marked as critical (Kornel Lesiński)
+ * Background updates ask OS for lower-priority networking (Kornel Lesiński)
+ * Refactorings to sync with upcoming 2.0
+   * Added kqueue based termination listener (Zorg)
+   * Added AppKit prevention guards to modules that shouldn't import it (Zorg)
+   * Added Obj-C generics where applicable (Zorg)
+   * Made SUBundleIcon & SUApplicationInfo take SUHost, not NSBundle (Zorg)
+   * Improved -[SUHost objectForInfoDictionaryKey:] (Zorg)
+   * Detect and fail if any two-way dependencies exist in the project (Zorg)
+ * generate_appcast:
+   * fixed handling of multiple directories in an archive
+   * percent encode the filename used in the delta url (Brett Walker)
+ * Update Sparkle.strings (BR Lingo)
+ * Improved handling of non-ASCII names in delta archives (Kornel Lesiński)
+ * Don't touch Info.plist unless git version changes (Václav Slavík)
+
+# 1.16.0
+
+ * Guided package installs are now the default for updating packages (Zorg)
+   - `pkg` installers won't show any UI. If you require the old behavior of showing a full installer window, rename the `*.pkg` file to `*.sparkle_interactive.pkg`
+ * Previous version of the app is now deleted instead of staying in the trash (Zorg)
+ * Added `generate_appcast` helper tool (Kornel Lesiński)
+ * Made manual check resume pending automatic updates instead of starting a new update (Kornel Lesiński)
+ * Started using `length` value from RSS if HTTP doesn't give one (Zorg)
+ * Hidden automatic updates checkbox for information only updates (Bi11)
+ * Added progressbar for DMG and binary delta extraction (Kornel Lesiński)
+ * Fixed showing of download status if we attempt a 2nd download (Zorg)
+ * Refactorings to sync with upcoming 2.0
+    * Decoupled and simplified installation code using protocols (Zorg)
+    * Added nullability annotations (Zorg)
+    * Allowed delegate methods that return an object to return nil (Zorg)
+    * Decreased responsibility of SUHost and moved code into other components (Zorg)
+    * Removed Sparkle.pch and many file #includes (Zorg)
+
+# 1.15.0
+
+* A new icon! Thanks to 1024jp
+* Show alert when an update is sent over insecure HTTP with no DSA key (Zorg)
+  - If you can't use HTTPS, you must at least sign updates with a DSA key.
+* Improved binary delta implementation (Zorg)
+* Added improved -validateMenuItem: as a method in SUUpdater.h for public use (Zorg)
+* Removed reachability preflight check (Zorg)
+* Clear update caches directory before downloading new update (Zorg)
+* Check the bundle's parent directory for writability too (Zorg)
+* Don't follow symbolic links for file operations (Zorg)
+* Don't bring up an authorized dialog during cleanup (Zorg)
+* Made Sparkle look for the highest compatible version regardless of timestamps (Zorg)
+* Fixed compatibility with 10.7
+  * Fixed crash on 10.7 - subscript operator not available (kleuter)
+  * Fixed warnings caused by -Wpartial-availability (Zorg)
+* Fixed german l10n. (Sebastian Volland)
+* Error code for download errors (Kornel Lesiński)
+* Update last update check date when the update driver finishes (Zorg)
+* Scale app icon up if needed in Software Update window (Nicholas Riley)
+* Don't register for termination notifications more than once (Zorg)
+* Don't terminate the app if we're already terminating (Zorg)
+* Removed SUEnableAutomaticChecksKeyOld and SUCheckAtStartup constants (Eitot)
+* Updated Sparkle framework headers to use modules if modules are available (B. Kevin Hardman)
+* Fixed warnings, fixed uses of SULocalizedString (Jerry Krinock)
+* Improved signing verifier to take any host and s/application/bundle/ (Zorg)
+* Improved Spotlight updates after delta extraction (Zorg)
+
+# 1.14.0 (Mar 11, 2016)
+
+* Disable javascript by default and make it opt-in (Zorg)
+* URL-encoding of appcast URLs is preserved (Kornel Lesiński)
+* Delegate is asked for fallback updates if delta update fails (Kornel Lesiński)
+* Fixed crash on 10.7 - subscript operator not available (kleuter)
+* Fixed check of feed URL before delegate had a chance to set it (Kornel Lesiński)
+* Re-added support for password-protected dmg images (Andrew K. Boyd)
+* Added warning about ATS blocking (Kornel Lesiński)
+* Translation fixes for pt-BR. (vitu)
+* Add some Japanese lozalized strings (1024jp)
+* Made test app available in all languages #695 (LIU Dongyuan / 柳东原)
+* Czech localizations update (Frantisek Erben)
+* Removed a test resource from the framework bundle (Karl Moskowski)
+* Test if the updated app is the frontmost one (Zorg)
+* UI Tests for the Test Application (Zorg)
+
+# 1.13.1 (Jan 31, 2016)
+
+Important security fixes:
+
+* Prevent inclusion of local files via file:// XML entities
+* Disable redirects to non-HTTP URLs in release notes webview
+
+# 1.13.0 (Dec 18, 2015)
+
+* Changed framework's bundle ID from `org.andymatuschak.Sparkle` to `org.sparkle-project.Sparkle`.
+
+# 1.12.0 (Dec 13, 2015)
+
+* Rewritten file operations for updating an app (Zorg)
+  - Ensuring atomic move operations, robust error handling.
+  - Faster.
+  - Using modern APIs where possible (no FSPathMakeRef, FSGetCatalogInfo, FSFindFolder, etc.)
+  - Strong documentation, easier to read code.
+* Automatic updates won't be installed if the system is about to shut off (Zorg)
+* Deprecated serving over HTTP without DSA (Zorg)
+  - Note that Apple has deprecated insecure HTTP in macOS 10.11
+* Improved Autoupdate application (Zorg)
+    * Do all the installation work after the runloop is set up
+    * TerminationListener only does termination listening now
+    * Handle cases where host path is not installation path and host path is not desired executable path
+    * Don't show Autoupdate dock icon if we shouldn't show UI
+    * Update modification & access time for new update
+* Added installUpdatesIfAvailable (Ian Langworth)
+* Removed extensions from shell scripts (Jake Petroules)
+* Rewritten test app so it works again, and from a local web server (Zorg)
+* Replaced use of Python with built-in web server (Kevin Wojniak)
+* Set LD_RUNPATH_SEARCH_PATHS in Podspec (Jake Petroules)
+* Don't install automatic updates if the system might shut off (Zorg)
+* Don't show Autoupdate dock icon if we shouldn't show UI (Zorg)
+* Updated layout constraints when removing release notes (Zorg)
+* Improved BinaryDelta error handling & logging (Zorg)
+* Refactored quarantine removal (Zorg)
+* Fixed German localization (1024jp)
+* Updated zh_CN translation (LIU Dongyuan / 柳东原)
+* Updated Mac models list until July 2015 (Gabriel Ulici)
+* Updated Polish translation (Kornel Lesiński)
+* Updated Xcode project languages for which we have translations (Jake Petroules)
+* Updated XIB files (Kornel Lesiński)
+* Use NSByteCountFormatter if available (Jake Petroules)
+* Declared protocols on SUUpdateAlert for the 10.11 SDK (Daniel Jalkut)
+* Silenced warning about casting away const-ness and -Wassign-enum (Daniel Jalkut)
+* Added script to generate a report comparing the Sparkle.strings files (Kevin Wojniak)
+* Check for empty strings (as well as nil) in SUHost's -name method (Karl Moskowski)
+* Don't follow symlinks for checking file existence (Zorg)
+* Unit tests in Swift (Zorg, Jake Petroules)
+* Fixed framework imports (Felix Schulze)
+* Fixed issues with copying files from different mounted drives (Zorg)
+* Disallowed automatic updates when user can't write to the bundle (Zorg)
+* Set the task working directories instead of changing the process working directory (Kevin Wojniak)
+
+# 1.11.1 (Nov 9, 2015)
+
+* Don't install automatic updates when system is about to shut down
+
+# 1.11.0 (Aug 24, 2015)
+
+* Big improvements to code signing and DSA verification
+   - Sparkle now checks not only whether an update is correctly signed, but also whether the updated version will be able to verify future updates. Updates now must either use DSA keys correctly, or not try to use them at all. Same goes for Apple Code Signing.
+   - Rely on code signing and the DSA key in the new app instead of appcast. If the new app has a public DSA key, then the appcast item must have a DSA signature for the app, even if the app is code signed. (Zorg)
+* More verbose error message when DSA keys don't match (Kornel Lesiński)
+* Added delegate methods for pre-download and immediately post-failed-download (Isaac Greenspan)
+* Fix Lucida Grande is always used for release notes (LIU Dongyuan / 柳东原)
+* Only remove quarantine with setResourceValue: when it's present. Fixes "Unable to quarantine: 93" messages from showing up in the console. (Zorg)
+* Fixed const and nullability warnings (Jake Petroules, Kornel Lesiński)
+* Replaced deprecated NSRunAlertPanel/alertWithMessageText (Kevin Wojniak)
+* Imported the Foundation umbrella header in all the public headers (C.W. Betts)
+* pt-BR localization update (Victor Figueiredo)
+* Reject unsupported code-signing xattrs in binary delta (Zorg)
+* Fixed crash while applying delta update (antonc27)
+* Added logging of appcast/download URL on error (Kornel Lesiński)
+* More robust reading of Autoupdate.app path from Sparkle bundle
+
+# 1.10.0 (Apr 26, 2015)
 
 * Massive improvements to the BinaryDelta tool (Zorg)
   - Ability to track file permissions (Zorg)
@@ -14,7 +294,7 @@
 * Stdout used for non error outputs (JDuquennoy)
 * French locale update (Kent Sutherland)
 
-# 1.9.0
+# 1.9.0 (Jan 26, 2015)
 
 * Added SUUpdater delegate method for failures. (Benjamin Gordon)
 * Make the error definitions public (C.W. Betts)
@@ -24,7 +304,7 @@
 * Use Library/Caches rather than app support directory (Kornel Lesiński)
 * Check for a modal window being onscreen before trying to put up the Sparkle prompt (Alf Watt)
 * Fixed crashes on 10.7 (Chris Campbell, Ger Teunis)
-* Fixed Sparkle tags parsing (Tamás Lustyik)
+* Fixed Sparkle tags parsing (Tamás Lustyik)
 * SULog code cleanups (Kevin Wojniak)
 * Make sure CFBundleVersion is a semantic version number. (Jake Petroules)
 * Replace typedef enums with typedef NS_ENUM to make Swift happier (C.W. Betts)
@@ -37,18 +317,18 @@
 * Turkish localization fixes (Emir)
 * Proofing of Ukrainian localization (Vera Tkachenko)
 
-# 1.8.0
+# 1.8.0 (Jul 26, 2014)
 
-* New SUDSAVerifier based on up-to-date OS X APIs (Zachary Waldowski)
+* New SUDSAVerifier based on up-to-date macOS APIs (Zachary Waldowski)
 * Detailed error log for failed signature checks (Kornel Lesiński)
 * Converted Sparkle to ARC (C.W. Betts)
 * Converted ivars to properties. (Jake Petroules)
 * Cocoapod support (Xhacker Liu)
-* Quarantine removal on OS X 10.10 (C.W. Betts)
+* Quarantine removal on macOS 10.10 (C.W. Betts)
 * Updated Japanese localization (1024jp)
 * Added Greek localization
 
-# 1.7.1
+# 1.7.1 (Jul 2, 2014)
 
 * Removed option to install unverified updates (Kornel Lesiński)
 * Added detailed log when code signing verification fails (Sam Deane)
@@ -65,7 +345,7 @@
 
 # 1.7.0
 
-* Dropped support for OS X 10.6. Sparkle now supports 10.7 and newer (including 10.10 Yosemite) on 64-bit Intel Macs (the last 32-bit Mac was released in 2006).
+* Dropped support for macOS 10.6. Sparkle now supports 10.7 and newer (including 10.10 Yosemite) on 64-bit Intel Macs (the last 32-bit Mac was released in 2006).
 * Removed use of deprecated functions (Zachary Waldowski)
 * Switched to modern Obj-C runtime and new literals syntax
 * Removed pre-10.7 code. (C.W. Betts)

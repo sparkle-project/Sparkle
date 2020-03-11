@@ -9,16 +9,17 @@
 #ifndef SUBASICUPDATEDRIVER_H
 #define SUBASICUPDATEDRIVER_H
 
-#import <Cocoa/Cocoa.h>
 #import "SUUpdateDriver.h"
-#import "SUUnarchiver.h"
-#import "SUAppcast.h"
+#import "SPUDownloader.h"
+#import "SPUDownloaderDelegate.h"
 
-@class SUAppcastItem, SUHost;
-@interface SUBasicUpdateDriver : SUUpdateDriver <NSURLDownloadDelegate, SUUnarchiverDelegate>
+@class SUAppcast, SUAppcastItem, SUHost, SPUDownloadData;
+@interface SUBasicUpdateDriver : SUUpdateDriver <SPUDownloaderDelegate>
 
 @property (strong, readonly) SUAppcastItem *updateItem;
-@property (strong, readonly) NSURLDownload *download;
+@property (strong, readonly) SUAppcastItem *latestAppcastItem;
+@property (assign, readonly) NSComparisonResult latestAppcastItemComparisonResult;
+@property (strong, readonly) SPUDownloader *download;
 @property (copy, readonly) NSString *downloadPath;
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
@@ -32,14 +33,19 @@
 - (void)didNotFindUpdate;
 
 - (void)downloadUpdate;
-- (void)download:(NSURLDownload *)d decideDestinationWithSuggestedFilename:(NSString *)name;
-- (void)downloadDidFinish:(NSURLDownload *)d;
-- (void)download:(NSURLDownload *)download didFailWithError:(NSError *)error;
+// SPUDownloaderDelegate
+- (void)downloaderDidSetDestinationName:(NSString *)destinationName temporaryDirectory:(NSString *)temporaryDirectory;
+- (void)downloaderDidReceiveExpectedContentLength:(int64_t)expectedContentLength;
+- (void)downloaderDidReceiveDataOfLength:(uint64_t)length;
+- (void)downloaderDidFinishWithTemporaryDownloadData:(SPUDownloadData *)downloadData;
+- (void)downloaderDidFailWithError:(NSError *)error;
 
 - (void)extractUpdate;
-- (void)unarchiverDidFinish:(SUUnarchiver *)ua;
-- (void)unarchiverDidFail:(SUUnarchiver *)ua;
 - (void)failedToApplyDeltaUpdate;
+
+// Needed to preserve compatibility to subclasses, even though our unarchiver code uses blocks now
+- (void)unarchiver:(id)ua extractedProgress:(double)progress;
+- (void)unarchiverDidFinish:(id)ua;
 
 - (void)installWithToolAndRelaunch:(BOOL)relaunch;
 - (void)installWithToolAndRelaunch:(BOOL)relaunch displayingUserInterface:(BOOL)showUI;

@@ -6,36 +6,34 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SUUpdater.h"
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
-#import "SUVersionComparisonProtocol.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
+@class SUPublicKeys;
 
 @interface SUHost : NSObject
 
 @property (strong, readonly) NSBundle *bundle;
 
-+ (NSString *)systemVersionString;
-
 - (instancetype)initWithBundle:(NSBundle *)aBundle;
 @property (readonly, copy) NSString *bundlePath;
-@property (readonly, copy) NSString *appCachePath;
-@property (readonly, copy) NSString *installationPath;
 @property (readonly, copy) NSString *name;
 @property (readonly, copy) NSString *version;
 @property (readonly, copy) NSString *displayVersion;
-@property (readonly, copy) NSImage *icon;
-@property (getter=isRunningOnReadOnlyVolume, readonly) BOOL runningOnReadOnlyVolume;
-@property (getter=isBackgroundApplication, readonly) BOOL backgroundApplication;
-@property (readonly, copy) NSString *publicDSAKey;
-@property (readonly, copy) NSArray *systemProfile;
+@property (readonly) SUPublicKeys *publicKeys;
 
-- (id)objectForInfoDictionaryKey:(NSString *)key;
+@property (getter=isRunningOnReadOnlyVolume, readonly) BOOL runningOnReadOnlyVolume;
+@property (getter=isRunningTranslocated, readonly) BOOL runningTranslocated;
+@property (readonly, nonatomic, copy, nullable) NSString *publicDSAKeyFileKey;
+
+- (nullable id)objectForInfoDictionaryKey:(NSString *)key;
 - (BOOL)boolForInfoDictionaryKey:(NSString *)key;
-- (id)objectForUserDefaultsKey:(NSString *)defaultName;
-- (void)setObject:(id)value forUserDefaultsKey:(NSString *)defaultName;
+- (nullable id)objectForUserDefaultsKey:(NSString *)defaultName;
+- (void)setObject:(nullable id)value forUserDefaultsKey:(NSString *)defaultName;
 - (BOOL)boolForUserDefaultsKey:(NSString *)defaultName;
 - (void)setBool:(BOOL)value forUserDefaultsKey:(NSString *)defaultName;
-- (id)objectForKey:(NSString *)key;
+- (nullable id)objectForKey:(NSString *)key;
 - (BOOL)boolForKey:(NSString *)key;
 @end
+
+NS_ASSUME_NONNULL_END
