@@ -6,21 +6,26 @@
 //  Copyright 2007 Andy Matuschak. All rights reserved.
 //
 
-#import "SUUpdater.h"
-
-#import "SUAppcast.h"
-#import "SUAppcastItem.h"
 #import "SUVersionComparisonProtocol.h"
 #import "SUStandardVersionComparator.h"
 
+
+#include "AppKitPrevention.h"
+
 @implementation SUStandardVersionComparator
+
+- (instancetype)init
+{
+    return [super init];
+}
 
 + (SUStandardVersionComparator *)defaultComparator
 {
     static SUStandardVersionComparator *defaultComparator = nil;
-    if (defaultComparator == nil) {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
         defaultComparator = [[SUStandardVersionComparator alloc] init];
-    }
+    });
     return defaultComparator;
 }
 
@@ -28,12 +33,15 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
     kNumberType,
     kStringType,
     kSeparatorType,
+    kDashType,
 };
 
 - (SUCharacterType)typeOfCharacter:(NSString *)character
 {
     if ([character isEqualToString:@"."]) {
         return kSeparatorType;
+    } else if ([character isEqualToString:@"-"]) {
+        return kDashType;
     } else if ([[NSCharacterSet decimalDigitCharacterSet] characterIsMember:[character characterAtIndex:0]]) {
         return kNumberType;
     } else if ([[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:[character characterAtIndex:0]]) {
@@ -45,7 +53,7 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
     }
 }
 
-- (NSArray *)splitVersionString:(NSString *)version
+- (NSArray<NSString *> *)splitVersionString:(NSString *)version
 {
     NSString *character;
     NSMutableString *s;
@@ -62,6 +70,9 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
     for (i = 1; i <= n; ++i) {
         character = [version substringWithRange:NSMakeRange(i, 1)];
         newType = [self typeOfCharacter:character];
+        if (newType == kDashType) {
+            break;
+        }
         if (oldType != newType || oldType == kSeparatorType) {
             // We've reached a new segment
             NSString *aPart = [[NSString alloc] initWithString:s];
@@ -81,8 +92,8 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
 
 - (NSComparisonResult)compareVersion:(NSString *)versionA toVersion:(NSString *)versionB
 {
-    NSArray *partsA = [self splitVersionString:versionA];
-    NSArray *partsB = [self splitVersionString:versionB];
+    NSArray<NSString *> *partsA = [self splitVersionString:versionA];
+    NSArray<NSString *> *partsB = [self splitVersionString:versionB];
 
     NSString *partA, *partB;
     NSUInteger i, n;
@@ -91,8 +102,8 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
 
     n = MIN([partsA count], [partsB count]);
     for (i = 0; i < n; ++i) {
-        partA = partsA[i];
-        partB = partsB[i];
+        partA = [partsA objectAtIndex:i];
+        partB = [partsB objectAtIndex:i];
 
         typeA = [self typeOfCharacter:partA];
         typeB = [self typeOfCharacter:partB];
@@ -142,11 +153,11 @@ typedef NS_ENUM(NSInteger, SUCharacterType) {
         NSComparisonResult shorterResult, largerResult;
 
         if ([partsA count] > [partsB count]) {
-            missingPart = partsA[n];
+            missingPart = [partsA objectAtIndex:n];
             shorterResult = NSOrderedAscending;
             largerResult = NSOrderedDescending;
         } else {
-            missingPart = partsB[n];
+            missingPart = [partsB objectAtIndex:n];
             shorterResult = NSOrderedDescending;
             largerResult = NSOrderedAscending;
         }

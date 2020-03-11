@@ -1,5 +1,7 @@
 .PHONY: all localizable-strings release build test ci
 
+all: build
+
 ifndef BUILDDIR
     BUILDDIR := $(shell mktemp -d "$(TMPDIR)/Sparkle.XXXXXX")
 endif
@@ -12,17 +14,32 @@ localizable-strings:
 
 release:
 	xcodebuild -scheme Distribution -configuration Release -derivedDataPath "$(BUILDDIR)" build
-	open -R "$(BUILDDIR)/Build/Products/Release/Sparkle-"*.tar.bz2
+	open -R "$(BUILDDIR)/Build/Products/Release/Sparkle-"*.tar.xz
+	cat Sparkle.podspec
+	@echo "Don't forget to update CocoaPods! pod trunk push"
 
 build:
 	xcodebuild clean build
 
 test:
 	xcodebuild -scheme Distribution -configuration Debug test
+	./objc_dep/objc_dep.py -t .
+
+uitest:
+	xcodebuild -scheme UITests -configuration Debug test
 
 ci:
-	for i in {7..11} ; do \
+	for i in {7..9} ; do \
 		if xcrun --sdk "macosx10.$$i" --show-sdk-path 2> /dev/null ; then \
-			xcodebuild -sdk "macosx10.$$i" -scheme Distribution -configuration Debug test ; \
+			( rm -rf build && xcodebuild -sdk "macosx10.$$i" -scheme Distribution -configuration Coverage -derivedDataPath build ) || exit 1 ; \
 		fi ; \
 	done
+	for i in {10..12} ; do \
+		if xcrun --sdk "macosx10.$$i" --show-sdk-path 2> /dev/null ; then \
+			( rm -rf build && xcodebuild -sdk "macosx10.$$i" -scheme Distribution -configuration Coverage -derivedDataPath build test ) || exit 1 ; \
+		fi ; \
+	done
+
+check-localizations:
+	./Sparkle/CheckLocalizations.swift -root . -htmlPath "$(TMPDIR)/LocalizationsReport.htm"
+	open "$(TMPDIR)/LocalizationsReport.htm"

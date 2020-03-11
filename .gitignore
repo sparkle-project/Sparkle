@@ -28,6 +28,13 @@ Icon
 .Spotlight-V100
 .Trashes
 
+# With Carthage, if Sparkle is included as a Git submodule (e.g. with the
+# --use-submodules option), the main module's .gitignore can't reach all the
+# way inside the submodule to ignore the added Carthage/Build symlink, and Git
+# keeps complaining about untracked changes in the submodule forever, which
+# is very annoying. To avoid that issue, ignore here in Sparkle instead.
+Carthage/Build
+
 # Directories potentially created on remote AFP share
 .AppleDB
 .AppleDesktop

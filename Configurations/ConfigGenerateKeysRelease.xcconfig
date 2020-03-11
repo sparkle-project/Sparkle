@@ -1,0 +1,4 @@
+// Generate Appcast Release
+
+#include "ConfigGenerateKeys.xcconfig"
+#include "ConfigSwiftRelease.xcconfig"

@@ -38,6 +38,8 @@ __FBSDID("$FreeBSD: src/usr.bin/bsdiff/bsdiff/bsdiff.c, v 1.1 2005/08/06 01:59:0
 #include <string.h>
 #include <unistd.h>
 
+#include "bscommon.h"
+
 #define MIN(x, y) (((x)<(y)) ? (x) : (y))
 
 /* matchlen(old, oldsize, new, newsize)
@@ -82,7 +84,7 @@ static off_t search(off_t *I, u_char *old, off_t oldsize,
     }
 
     x = st + (en - st)/2;
-    if (memcmp(old + I[x], new, MIN(oldsize - I[x], newsize)) < 0) {
+    if (memcmp(old + I[x], new, (size_t)(MIN(oldsize - I[x], newsize))) < 0) {
         return search(I, old, oldsize, new, newsize, x, en, pos);
     } else {
         return search(I, old, oldsize, new, newsize, st, x, pos);
@@ -101,15 +103,15 @@ static void offtout(off_t x, u_char *buf)
     else
         y = x;
 
-    buf[0] = y % 256;
+    buf[0] = (u_char)(y % 256);
     y -= buf[0];
-    y = y/256; buf[1] = y%256; y -= buf[1];
-    y = y/256; buf[2] = y%256; y -= buf[2];
-    y = y/256; buf[3] = y%256; y -= buf[3];
-    y = y/256; buf[4] = y%256; y -= buf[4];
-    y = y/256; buf[5] = y%256; y -= buf[5];
-    y = y/256; buf[6] = y%256; y -= buf[6];
-    y = y/256; buf[7] = y%256;
+    y = y/256; buf[1] = (u_char)(y%256); y -= buf[1];
+    y = y/256; buf[2] = (u_char)(y%256); y -= buf[2];
+    y = y/256; buf[3] = (u_char)(y%256); y -= buf[3];
+    y = y/256; buf[4] = (u_char)(y%256); y -= buf[4];
+    y = y/256; buf[5] = (u_char)(y%256); y -= buf[5];
+    y = y/256; buf[6] = (u_char)(y%256); y -= buf[6];
+    y = y/256; buf[7] = (u_char)(y%256);
 
     if (x < 0)
         buf[7] |= 0x80;
@@ -119,67 +121,69 @@ int bsdiff(int argc, char *argv[]); // Added by AMM: suppresses a warning about 
 
 int bsdiff(int argc, char *argv[])
 {
-    int fd;
-    u_char *old,*new;           /* contents of old, new files */
-    off_t oldsize, newsize;     /* length of old, new files */
-    off_t *I,*V;                /* arrays used for suffix sort; I is ordering */
-    off_t scan;                 /* position of current match in old file */
+    u_char *old = NULL,*new = NULL;           /* contents of old, new files */
+    off_t oldsize = 0, newsize = 0;     /* length of old, new files */
+    off_t *I = NULL,*V = NULL;                /* arrays used for suffix sort; I is ordering */
+    off_t scan = 0;                 /* position of current match in old file */
     off_t pos = 0;              /* position of current match in new file */
-    off_t len;                  /* length of current match */
-    off_t lastscan;             /* position of previous match in old file */
-    off_t lastpos;              /* position of previous match in new file */
-    off_t lastoffset;           /* lastpos - lastscan */
-    off_t oldscore, scsc;       /* temp variables in match search */
-    off_t s, Sf, lenf, Sb, lenb;    /* temp vars in match extension */
-    off_t overlap, Ss, lens;
-    off_t i;
-    off_t dblen, eblen;         /* length of diff, extra sections */
-    u_char *db,*eb;             /* contents of diff, extra sections */
-    u_char buf[8];
-    u_char header[32];
-    FILE * pf;
+    off_t len = 0;                  /* length of current match */
+    off_t lastscan = 0;             /* position of previous match in old file */
+    off_t lastpos = 0;              /* position of previous match in new file */
+    off_t lastoffset = 0;           /* lastpos - lastscan */
+    off_t oldscore = 0, scsc = 0;       /* temp variables in match search */
+    off_t s = 0, Sf = 0, lenf = 0, Sb = 0, lenb = 0;    /* temp vars in match extension */
+    off_t overlap = 0, Ss = 0, lens = 0;
+    off_t i = 0;
+    off_t dblen = 0, eblen = 0;         /* length of diff, extra sections */
+    u_char *db = NULL,*eb = NULL;             /* contents of diff, extra sections */
+    u_char buf[8] = {0};
+    u_char header[32] = {0};
+    FILE * pf = NULL;
+    int exitstatus = -1;
 
-    if (argc != 4)
-        errx(1,"usage: %s oldfile newfile patchfile\n", argv[0]);
+    if (argc != 4) {
+        warnx("usage: %s oldfile newfile patchfile\n", argv[0]);
+        goto cleanup;
+    }
 
-    /* Allocate oldsize + 1 bytes instead of oldsize bytes to ensure
-        that we never try to malloc(0) and get a NULL pointer */
-    if (((fd = open(argv[1], O_RDONLY, 0)) < 0) ||
-        ((oldsize = lseek(fd, 0, SEEK_END)) == -1) ||
-        ((old = malloc(oldsize + 1)) == NULL) ||
-        (lseek(fd, 0, SEEK_SET) != 0) ||
-        (read(fd, old, oldsize) != oldsize) ||
-        (close(fd) == -1))
-        err(1,"%s", argv[1]);
+    old = readfile(argv[1], &oldsize);
+    if (old == NULL) {
+        warn("old file error: %s", argv[1]);
+        goto cleanup;
+    }
 
-    if (((I = malloc((oldsize + 1) * sizeof(off_t))) == NULL) ||
-        ((V = malloc((oldsize + 1) * sizeof(off_t))) == NULL))
-        err(1, NULL);
+    if (((I = malloc(((size_t)oldsize + 1) * sizeof(off_t))) == NULL) ||
+        ((V = malloc(((size_t)oldsize + 1) * sizeof(off_t))) == NULL)) {
+        warn("Failed to allocate memory for I or V");
+        goto cleanup;
+    }
 
     /* Do a suffix sort on the old file. */
-    I[0] = oldsize; sais(old, I+1, oldsize);
+    I[0] = oldsize;
+    sais(old, I+1, (int)oldsize);
 
     free(V);
+    V = NULL;
+    
+    new = readfile(argv[2], &newsize);
+    if (new == NULL) {
+        warn("new file error: %s", argv[2]);
+        goto cleanup;
+    }
 
-    /* Allocate newsize + 1 bytes instead of newsize bytes to ensure
-        that we never try to malloc(0) and get a NULL pointer */
-    if (((fd = open(argv[2], O_RDONLY, 0)) < 0) ||
-        ((newsize = lseek(fd, 0, SEEK_END)) == -1) ||
-        ((new = malloc(newsize + 1)) == NULL) ||
-        (lseek(fd, 0, SEEK_SET) != 0) ||
-        (read(fd, new, newsize) != newsize) ||
-        (close(fd) == -1))
-        err(1,"%s", argv[2]);
-
-    if (((db = malloc(newsize + 1)) == NULL) ||
-        ((eb = malloc(newsize + 1)) == NULL))
-        err(1, NULL);
+    if (((db = malloc((size_t)newsize + 1)) == NULL) ||
+        ((eb = malloc((size_t)newsize + 1)) == NULL)) {
+        warn("Failed to allocate memory for db or eb");
+        goto cleanup;
+    }
     dblen = 0;
     eblen = 0;
 
     /* Create the patch file */
-    if ((pf = fopen(argv[3], "w")) == NULL)
-        err(1, "%s", argv[3]);
+    if ((pf = fopen(argv[3], "w")) == NULL) {
+        warn("%s", argv[3]);
+        goto cleanup;
+    }
 
     /* Header is
         0    8     "BSDIFN40"
@@ -195,8 +199,10 @@ int bsdiff(int argc, char *argv[])
     offtout(0, header + 8);
     offtout(0, header + 16);
     offtout(newsize, header + 24);
-    if (fwrite(header, 32, 1, pf) != 1)
-        err(1, "fwrite(%s)", argv[3]);
+    if (fwrite(header, 32, 1, pf) != 1) {
+        warn("fwrite(%s)", argv[3]);
+        goto cleanup;
+    }
 
     /* Compute the differences, writing ctrl as we go */
     scan = 0;
@@ -312,16 +318,22 @@ int bsdiff(int argc, char *argv[])
              *      diff, in the old file
              */
             offtout(lenf, buf);
-            if (fwrite(buf, 8, 1, pf) != 1)
-                errx(1, "fwrite");
+            if (fwrite(buf, 8, 1, pf) != 1) {
+                warnx("fwrite");
+                goto cleanup;
+            }
 
             offtout((scan - lenb) - (lastscan + lenf), buf);
-            if (fwrite(buf, 8, 1, pf) != 1)
-                err(1, "fwrite");
+            if (fwrite(buf, 8, 1, pf) != 1) {
+                warn("fwrite");
+                goto cleanup;
+            }
 
             offtout((pos - lenb) - (lastpos + lenf), buf);
-            if (fwrite(buf, 8, 1, pf) != 1)
-                err(1, "fwrite");
+            if (fwrite(buf, 8, 1, pf) != 1) {
+                warn("fwrite");
+                goto cleanup;
+            }
 
             /* Update the variables describing the last match. Note that
              * 'lastscan' is set to the start of the current match _after_ the
@@ -334,37 +346,61 @@ int bsdiff(int argc, char *argv[])
     }
 
     /* Compute size of compressed ctrl data */
-    if ((len = ftello(pf)) == -1)
-        err(1, "ftello");
+    if ((len = ftello(pf)) == -1) {
+        warn("ftello");
+        goto cleanup;
+    }
     offtout(len - 32, header + 8);
 
     /* Write diff data */
-    if (dblen && fwrite(db, dblen, 1, pf) != 1)
-        err(1, "fwrite");
+    if (dblen && fwrite(db, (size_t)dblen, 1, pf) != 1) {
+        warn("fwrite");
+        goto cleanup;
+    }
 
     /* Compute size of compressed diff data */
-    if ((newsize = ftello(pf)) == -1)
-        err(1, "ftello");
+    if ((newsize = ftello(pf)) == -1) {
+        warn("ftello");
+        goto cleanup;
+    }
     offtout(newsize - len, header + 16);
 
     /* Write extra data */
-    if (eblen && fwrite(eb, eblen, 1, pf) != 1)
-        err(1, "fwrite");
+    if (eblen && fwrite(eb, (size_t)eblen, 1, pf) != 1) {
+        warn("fwrite");
+        goto cleanup;
+    }
 
     /* Seek to the beginning, write the header, and close the file */
-    if (fseeko(pf, 0, SEEK_SET))
-        err(1, "fseeko");
-    if (fwrite(header, 32, 1, pf) != 1)
-        err(1, "fwrite(%s)", argv[3]);
-    if (fclose(pf))
-        err(1, "fclose");
+    if (fseeko(pf, 0, SEEK_SET)) {
+        warn("fseeko");
+        goto cleanup;
+    }
+    if (fwrite(header, 32, 1, pf) != 1) {
+        warn("fwrite(%s)", argv[3]);
+        goto cleanup;
+    }
+    if (fclose(pf)) {
+        warn("fclose");
+        pf = NULL;
+        goto cleanup;
+    }
+    pf = NULL;
+    
+    exitstatus = 0;
+cleanup:
 
+    if (pf != NULL) {
+        fclose(pf);
+    }
+    
     /* Free the memory we used */
     free(db);
     free(eb);
     free(I);
+    free(V);
     free(old);
     free(new);
 
-    return 0;
+    return exitstatus;
 }

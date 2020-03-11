@@ -1,0 +1,14 @@
+//  Copyright © 2019 Sparkle Project. All rights reserved.
+
+// Deployment
+SKIP_INSTALL = YES
+
+// Packaging
+EXECUTABLE_PREFIX = lib
+PRODUCT_NAME = $(TARGET_NAME)
+
+// Search Paths
+ALWAYS_SEARCH_USER_PATHS = NO
+
+// Disable Warnings - this is a third-party project, and we'll trust that the maintainers know what they're doing.
+WARNING_CFLAGS = $(inherited) -Wno-comma

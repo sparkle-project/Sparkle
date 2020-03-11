@@ -9,12 +9,13 @@
 #ifndef SUSTATUSCONTROLLER_H
 #define SUSTATUSCONTROLLER_H
 
-#import "SUWindowController.h"
+#import <Cocoa/Cocoa.h>
 
 @class SUHost;
-@interface SUStatusController : SUWindowController
+@interface SUStatusController : NSWindowController
 @property (weak) IBOutlet NSButton *actionButton;
 @property (weak) IBOutlet NSProgressIndicator *progressBar;
+@property (weak) IBOutlet NSTextField *statusTextField;
 
 @property (copy) NSString *statusText;
 @property double progressValue;

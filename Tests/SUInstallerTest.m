@@ -6,10 +6,11 @@
 //  Copyright (c) 2015 Sparkle Project. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import <XCTest/XCTest.h>
 #import "SUHost.h"
 #import "SUInstaller.h"
+#import "SUInstallerProtocol.h"
 #import <unistd.h>
 
 @interface SUInstallerTest : XCTestCase
@@ -48,16 +49,35 @@
     XCTestExpectation *done = [self expectationWithDescription:@"install finished"];
 
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-    NSString *path = [bundle pathForResource:@"test.sparkle_guided" ofType:@"pkg"];
+    NSString *path = [bundle pathForResource:@"test" ofType:@"pkg"];
     XCTAssertNotNil(path);
 
     SUHost *host = [[SUHost alloc] initWithBundle:bundle];
 
-    [SUInstaller installFromUpdateFolder:[path stringByDeletingLastPathComponent] overHost:host installationPath:@"/tmp" versionComparator:nil completionHandler:^(NSError *error) {
-        XCTAssertNil(error);
+    NSString *fileOperationToolPath = [bundle pathForResource:@""SPARKLE_FILEOP_TOOL_NAME ofType:@""];
+    XCTAssertNotNil(fileOperationToolPath);
+    
+    NSError *installerError = nil;
+    id<SUInstallerProtocol> installer = [SUInstaller installerForHost:host fileOperationToolPath:fileOperationToolPath updateDirectory:[path stringByDeletingLastPathComponent] error:&installerError];
+    
+    if (installer == nil) {
+        XCTFail(@"Failed to retrieve installer: %@", installerError);
+    }
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSError *initialInstallationError = nil;
+        if (![installer performInitialInstallation:&initialInstallationError]) {
+            XCTFail(@"Failed to perform initial installation: %@", initialInstallationError);
+        }
+        
+        NSError *finalInstallationError = nil;
+        if (![installer performFinalInstallationProgressBlock:nil error:&finalInstallationError]) {
+            XCTFail(@"Failed to perform final installation with underlying error = %@ ; error = %@", [finalInstallationError.userInfo objectForKey:NSUnderlyingErrorKey], finalInstallationError);
+        }
+        
         XCTAssertTrue([fm fileExistsAtPath:expectedDestination isDirectory:nil]);
         [done fulfill];
-    }];
+    });
 
     [self waitForExpectationsWithTimeout:40 handler:nil];
     [fm removeItemAtPath:expectedDestination error:nil];
