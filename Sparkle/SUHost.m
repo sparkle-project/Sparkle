@@ -109,6 +109,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)isRunningOnReadOnlyVolume
 {
+    NSLog(@"🍒 %s(%@)", __PRETTY_FUNCTION__, [self.bundle bundlePath]);
     struct statfs statfs_info;
     statfs([[self.bundle bundlePath] fileSystemRepresentation], &statfs_info);
     return (statfs_info.f_flags & MNT_RDONLY) != 0;
