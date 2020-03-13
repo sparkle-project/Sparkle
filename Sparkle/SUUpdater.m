@@ -130,7 +130,7 @@ static NSString *const SUUpdaterDefaultsObservationContext = @"SUUpdaterDefaults
             sharedUpdaters = [[NSMutableDictionary alloc] init];
         }
         [sharedUpdaters setObject:self forKey:[NSValue valueWithNonretainedObject:bundle]];
-        host = [[SUHost alloc] initWithBundle:bundle];
+        self.host = [[SUHost alloc] initWithBundle:bundle];
 
         // This runs the permission prompt if needed, but never before the app has finished launching because the runloop won't run before that
         [self performSelector:@selector(startUpdateCycle) withObject:nil afterDelay:0];
