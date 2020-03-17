@@ -4,7 +4,7 @@ Secure and reliable software update framework for Cocoa developers.
 
 <img src="Resources/Screenshot.png" width="732" alt="Sparkle shows familiar update window with release notes">
 
-This branch is the production ready, battle-tested version of Sparkle used by thousands of Mac apps.
+This branch is the production ready, battle-tested version of Sparkle used by thousands of Mac apps.  
 The upcoming Sparkle 2 (currently in beta) can be found in the [2.x branch](https://github.com/sparkle-project/Sparkle/tree/2.x).
 
 ## Features
@@ -26,7 +26,7 @@ The upcoming Sparkle 2 (currently in beta) can be found in the [2.x branch](http
 * Runtime: macOS 10.7 or greater
 * Build: Xcode 9 and 10.11 SDK or greater
 * HTTPS server for serving updates (see [App Transport Security](http://sparkle-project.org/documentation/app-transport-security/))
-* No sandboxing. Sparkle 1.x can't update sandboxed apps. [Sparkle 2.x](https://github.com/sparkle-project/Sparkle/tree/2.x) can.
+* No sandboxing. Sparkle 1.x can't update sandboxed apps. However, [Sparkle 2.x](https://github.com/sparkle-project/Sparkle/tree/2.x) can.
 
 ## Usage
 
