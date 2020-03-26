@@ -105,9 +105,14 @@
         } else {
             SULog(SULogLevelError, @"Encountered download feed error: %@", error);
             
-            NSDictionary *userInfo = [NSDictionary
-                                      dictionaryWithObject: SULocalizedString(@"An error occurred while downloading the update feed.", nil)
-                                      forKey: NSLocalizedDescriptionKey];
+            NSMutableDictionary *userInfo = [NSMutableDictionary
+                                             dictionaryWithObject: SULocalizedString(@"An error occurred while downloading the update feed.", nil)
+                                             forKey: NSLocalizedDescriptionKey];
+            
+            if (error != nil) {
+                NSError *assignedError = error;                                     // Silences a Clang warning about implicit conversion from Nullable to Nonnull.
+                [userInfo setObject:assignedError forKey:NSUnderlyingErrorKey];
+            }
             
             [self reportError:[NSError errorWithDomain:SUSparkleErrorDomain
                                                   code:SUDownloadError
@@ -258,12 +263,17 @@
 
 - (void)reportError:(NSError *)error
 {
-    NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:@{
-        NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil),
-        NSLocalizedFailureReasonErrorKey: [error localizedDescription],
-        NSUnderlyingErrorKey: error,
-    }];
-
+    NSMutableDictionary *userInfo = [error.userInfo mutableCopy];
+    
+    if (!userInfo)
+    {
+        userInfo = [[NSMutableDictionary alloc] initWithDictionary:@{
+            NSLocalizedDescriptionKey: SULocalizedString(@"An error occurred in retrieving update information. Please try again later.", nil),
+            NSLocalizedFailureReasonErrorKey: [error localizedDescription],
+            NSUnderlyingErrorKey: error,
+        }];
+    }
+    
     NSURL *failingUrl = [error.userInfo objectForKey:NSURLErrorFailingURLErrorKey];
     if (failingUrl) {
         [userInfo setObject:failingUrl forKey:NSURLErrorFailingURLErrorKey];
