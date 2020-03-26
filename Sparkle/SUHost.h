@@ -19,6 +19,7 @@
 @property (readonly, nonatomic) BOOL validVersion;
 @property (readonly, copy) NSString *displayVersion;
 @property (getter=isRunningOnReadOnlyVolume, readonly) BOOL runningOnReadOnlyVolume;
+@property (getter=isRunningTranslocated, readonly) BOOL runningTranslocated;
 @property (readonly, copy) NSString *publicDSAKey;
 @property (readonly, nonatomic, copy) NSString *publicDSAKeyFileKey;
 

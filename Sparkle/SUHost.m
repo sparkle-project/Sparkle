@@ -127,6 +127,12 @@
     return (statfs_info.f_flags & MNT_RDONLY) != 0;
 }
 
+- (BOOL)isRunningTranslocated
+{
+    NSString *path = [self.bundle bundlePath];
+    return [path rangeOfString:@"/AppTranslocation/"].location != NSNotFound;
+}
+
 - (NSString *_Nullable)publicDSAKey
 {
     // Maybe the key is just a string in the Info.plist.
@@ -155,7 +161,7 @@
 
 - (NSString * _Nullable)publicDSAKeyFileKey
 {
-    return [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];;
+    return [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];
 }
 
 - (id)objectForInfoDictionaryKey:(NSString *)key
