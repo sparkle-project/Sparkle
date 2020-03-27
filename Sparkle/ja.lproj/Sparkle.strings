@@ -4,6 +4,8 @@
 
 "%1$@ can't be updated, because it was opened from a read-only or a temporary location. Use Finder to copy %1$@ to the Applications folder, relaunch it from there, and try again." = "%1$@は読み出し専用またはテンポラリな場所で開かれているためアップデートできません。%1$@をアプリケーションフォルダに移動し、そこから再起動したあとやり直してください。";
 
+"%1$@ can’t be updated if it’s running from the location it was downloaded to." = "この場所ではダウンロードされたアップデータを %1$@ に適用できません。";
+
 "%@ %@ is currently the newest version available." = "%1$@ %2$@は現在入手できる最新バージョンです。";
 
 /* Description text for SUUpdateAlert when the update is downloadable. */
