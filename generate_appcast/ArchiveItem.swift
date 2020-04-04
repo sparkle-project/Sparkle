@@ -46,6 +46,7 @@ class ArchiveItem: CustomStringConvertible {
 
     var dsaSignature: String?;
     var edSignature: String?;
+    var downloadUrlPrefix: URL?;
 
     init(version: String, shortVersion: String?, feedURL: URL?, minimumSystemVersion: String?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
         self.version = version;

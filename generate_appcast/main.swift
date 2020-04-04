@@ -120,7 +120,7 @@ func main() {
     else if args.count == 4 && args[1] == "-s" {
         privateEdString = args[2]
     }
-    else if args.count != 2 {
+    else if args.count != 2 && !args.contains("--download-url-prefix") {
         printUsage()
         exit(1)
     }
@@ -130,6 +130,30 @@ func main() {
 
     do {
         let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, keys: keys, verbose:verbose);
+        
+        // if the beginning of a static url for downloading the updates was provided set the download url
+        if args.contains("--download-url-prefix") {
+            // check that an url was provided
+            let optionIndex = args.firstIndex(of: "--download-url-prefix")
+            var downloadUrl: URL? = nil
+            if optionIndex != nil && optionIndex! + 1 < args.count {
+                // check that the next argument is a valid url
+                let detector = try! NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+                let nextArgument = args[optionIndex! + 1]
+                if detector.numberOfMatches(in: nextArgument, options: [], range: NSMakeRange(0, nextArgument.count)) != 1  {
+                    print("Please provide a valid download prefix url")
+                }
+                downloadUrl = URL(string: nextArgument)
+            }
+            
+            // set the download prefix url for each archive item
+            for (_, archiveItems) in allUpdates {
+                for archiveItem in archiveItems {
+                    archiveItem.downloadUrlPrefix = downloadUrl
+                }
+            }
+        }
+        
         
         for (appcastFile, updates) in allUpdates {
             let appcastDestPath = URL(fileURLWithPath: appcastFile, relativeTo: archivesSourceDir);
