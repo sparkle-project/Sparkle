@@ -46,6 +46,7 @@ class ArchiveItem: CustomStringConvertible {
 
     var dsaSignature: String?;
     var edSignature: String?;
+    var downloadUrlPrefix: URL?;
 
     init(version: String, shortVersion: String?, feedURL: URL?, minimumSystemVersion: String?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
         self.version = version;
@@ -125,8 +126,11 @@ class ArchiveItem: CustomStringConvertible {
         guard let escapedFilename = self.archivePath.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
             return nil;
         }
-        if let relative = self.feedURL {
-            return URL(string: escapedFilename, relativeTo: relative)
+        if let downloadUrlPrefix = self.downloadUrlPrefix {
+            // if a download url prefix was given use this one
+            return URL(string: escapedFilename, relativeTo: downloadUrlPrefix)
+        } else if let relativeFeedUrl = self.feedURL {
+            return URL(string: escapedFilename, relativeTo: relativeFeedUrl)
         }
         return URL(string: escapedFilename)
     }
