@@ -62,6 +62,123 @@ func loadPrivateKeys(_ privateDSAKey: SecKey?, _ privateEdString: String?) -> Pr
     return PrivateKeys(privateDSAKey: privateDSAKey, privateEdKey: privateEdKey, publicEdKey: publicEdKey);
 }
 
+/**
+ * Parses all possible command line options and returns the values in a tuple.
+ */
+func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?, privateEdString: String?, downloadUrlPrefix: URL?, archivesSourceDir: URL) {
+    // make a mutable copy of the argument list
+    var arguments = argumentList
+    // remove the first element since this is the path to executable which we don't need
+    arguments.removeFirst()
+    
+    // define the variables for the possible argument values
+    var privateDSAKey: SecKey? = nil
+    var privateEdString: String? = nil
+    var downloadUrlPrefix: URL? = nil
+    var archivesSourceDir: URL
+    
+    // check if the private dsa key option is present
+    if let privateDSAKeyOptionIndex = arguments.firstIndex(of: "-f") {
+        // check that when accessing the value of the option we don't get out of bounds
+        if privateDSAKeyOptionIndex + 1 >= arguments.count {
+            print("Too few arguments were given")
+            exit(1)
+        }
+        
+        // get the private DSA key
+        let privateKeyUrl = URL(fileURLWithPath: arguments[privateDSAKeyOptionIndex + 1])
+        do {
+            privateDSAKey = try loadPrivateDSAKey(at: privateKeyUrl)
+        } catch {
+            print("Unable to load DSA private key from", privateKeyUrl.path, "\n", error)
+            exit(1)
+        }
+        
+        // remove the already parsed arguments
+        arguments.remove(at: privateDSAKeyOptionIndex)
+        arguments.remove(at: privateDSAKeyOptionIndex + 1)
+    }
+    
+    // check if the private dsa sould be loaded using the keyname and the name of the keychain
+    if let keyNameOptionIndex = arguments.firstIndex(of: "-n"), let keychainNameOptionIndex = arguments.firstIndex(of: "-k") {
+        // check that when accessing one of the values of the options we don't get out of bounds
+        if keyNameOptionIndex + 1 >= arguments.count || keychainNameOptionIndex + 1 >= arguments.count {
+            print("Too few arguments were given")
+            exit(1)
+        }
+        
+        // get the keyname and the keychain url to load the private DSA key
+        let keyName: String = arguments[keyNameOptionIndex + 1]
+        let keychainUrl: URL = URL(fileURLWithPath: arguments[keychainNameOptionIndex + 1])
+        do {
+            privateDSAKey = try loadPrivateDSAKey(named: keyName, fromKeychainAt: keychainUrl)
+        } catch {
+            print("Unable to load DSA private key '\(keyName)' from keychain at", keychainUrl.path, "\n", error)
+            exit(1)
+        }
+        
+        // remove the already parsed arguments
+        arguments.remove(at: keyNameOptionIndex + 1)
+        arguments.remove(at: keyNameOptionIndex)
+        arguments.remove(at: arguments.firstIndex(of: "-k")! + 1)
+        arguments.remove(at: keychainNameOptionIndex)
+    }
+    
+    // check if the private EdDSA key string was given as an argument
+    if let privateEdDSAKeyOptionIndex = arguments.firstIndex(of: "-s") {
+        // check that when accessing the value of the option we don't get out of bounds
+        if privateEdDSAKeyOptionIndex + 1 >= arguments.count {
+            print("Too few arguments were given")
+            exit(1)
+        }
+        
+        // get the private EdDSA key string
+        privateEdString = arguments[privateEdDSAKeyOptionIndex + 1]
+        
+        // remove the already parsed argument
+        arguments.remove(at: privateEdDSAKeyOptionIndex + 1)
+        arguments.remove(at: privateEdDSAKeyOptionIndex)
+    }
+    
+    // check if a prefix for the download url of the archives was given
+    if let downloadUrlPrefixOptionIndex = arguments.firstIndex(of: "--download-url-prefix") {
+        // check that when accessing the value of the option we don't get out of bounds
+        if downloadUrlPrefixOptionIndex + 1 >= arguments.count {
+            print("Too few arguments were given")
+            exit(1)
+        }
+        
+        // get the download url prefix
+        downloadUrlPrefix = URL(string: arguments[downloadUrlPrefixOptionIndex + 1])
+        
+        // remove the parsed argument
+        arguments.remove(at: downloadUrlPrefixOptionIndex + 1)
+        arguments.remove(at: downloadUrlPrefixOptionIndex)
+    }
+    
+    // now that all command line options have been removed from the arguments array
+    // there should only be the path to the private DSA key (if provided) path to the archives dir left
+    if arguments.count == 2 {
+        // if there are two arguments left they are the private DSA key and the path to the archives directory (in this order)
+        // first get the private DSA key
+        let privateKeyUrl = URL(fileURLWithPath: arguments[0])
+        do {
+            privateDSAKey = try loadPrivateDSAKey(at: privateKeyUrl)
+        } catch {
+            print("Unable to load DSA private key from", privateKeyUrl.path, "\n", error)
+            exit(1)
+        }
+        
+        // remove the parsed path to the DSA key
+        arguments.removeFirst()
+    }
+
+    // now only the archives source dir is left
+    archivesSourceDir = URL(fileURLWithPath: arguments[0], isDirectory: true)
+    
+    return (privateDSAKey, privateEdString, downloadUrlPrefix, archivesSourceDir)
+}
+
 func main() {
     let args = CommandLine.arguments;
     if args.count < 2 {
@@ -71,89 +188,24 @@ func main() {
     
     var privateDSAKey: SecKey? = nil;
     var privateEdString: String? = nil;
-
-    // this was typical usage for DSA keys
-    if args.count == 3 || (args.count == 4 && args[1] == "-f") {
-        // private key specified by filename
-        let privateKeyURL = URL(fileURLWithPath: args.count == 3 ? args[1] : args[2])
-        
-        do {
-            privateDSAKey = try loadPrivateDSAKey(at: privateKeyURL)
-        } catch {
-            print("Unable to load DSA private key from", privateKeyURL.path, "\n", error)
-            exit(1)
-        }
-    }
-    // this is legacy for DSA keychain; probably very rarely used
-    else if args.count == 6 && (args[1] == "-n" || args[1] == "-k") {
-        // private key specified by keychain + key name
-        let keyName: String
-        let keychainURL: URL
-        
-        if args[1] == "-n" {
-            if args[3] != "-k" {
-                printUsage()
-                exit(1)
-            }
-            
-            keyName = args[2]
-            keychainURL = URL(fileURLWithPath: args[4])
-        }
-        else {
-            if args[3] != "-n" {
-                printUsage()
-                exit(1)
-            }
-            
-            keyName = args[4]
-            keychainURL = URL(fileURLWithPath: args[2])
-        }
-
-        do {
-            privateDSAKey = try loadPrivateDSAKey(named: keyName, fromKeychainAt: keychainURL)
-        } catch {
-            print("Unable to load DSA private key '\(keyName)' from keychain at", keychainURL.path, "\n", error)
-            exit(1)
-        }
-    }
-    // private + public EdDSA keys are provided via command line argument
-    else if args.count == 4 && args[1] == "-s" {
-        privateEdString = args[2]
-    }
-    else if args.count != 2 && !args.contains("--download-url-prefix") {
-        printUsage()
-        exit(1)
-    }
+    var downloadUrlPrefix: URL? = nil;
+    var archivesSourceDir: URL
     
-    let archivesSourceDir = URL(fileURLWithPath: args.last!, isDirectory: true)
+    (privateDSAKey, privateEdString, downloadUrlPrefix, archivesSourceDir) = parseCommandLineOptions(argumentList: args)
+    
     let keys = loadPrivateKeys(privateDSAKey, privateEdString)
 
     do {
         let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, keys: keys, verbose:verbose);
         
-        // if the beginning of a static url for downloading the updates was provided set the download url
-        if args.contains("--download-url-prefix") {
-            // check that an url was provided
-            let optionIndex = args.firstIndex(of: "--download-url-prefix")
-            var downloadUrl: URL? = nil
-            if optionIndex != nil && optionIndex! + 1 < args.count {
-                // check that the next argument is a valid url
-                let detector = try! NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
-                let nextArgument = args[optionIndex! + 1]
-                if detector.numberOfMatches(in: nextArgument, options: [], range: NSMakeRange(0, nextArgument.count)) != 1  {
-                    print("Please provide a valid download prefix url")
-                }
-                downloadUrl = URL(string: nextArgument)
-            }
-            
-            // set the download prefix url for each archive item
+        // if a download url prefix was provided set it for each archive item
+        if downloadUrlPrefix != nil {
             for (_, archiveItems) in allUpdates {
                 for archiveItem in archiveItems {
-                    archiveItem.downloadUrlPrefix = downloadUrl
+                    archiveItem.downloadUrlPrefix = downloadUrlPrefix
                 }
             }
         }
-        
         
         for (appcastFile, updates) in allUpdates {
             let appcastDestPath = URL(fileURLWithPath: appcastFile, relativeTo: archivesSourceDir);
