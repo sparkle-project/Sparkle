@@ -232,7 +232,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
     if (!hasPublicKey) {
         if (!servingOverHttps || ![SUCodeSigningVerifier bundleAtURLIsCodeSigned:[[self hostBundle] bundleURL]]) {
             if (error != NULL) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: @"For security reasons, updates need to be signed with a DSA key. See Sparkle's documentation for more information." }];
+                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUNoPublicDSAFoundError userInfo:@{ NSLocalizedDescriptionKey: @"For security reasons, updates need to be signed with an EdDSA key. See Sparkle's documentation for more information." }];
             }
             return NO;
         } else {
@@ -240,7 +240,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
                 // Deprecated because we pass the downloaded archive to the installer and the installer has no way of knowing where the download came from.
                 // Even if it did, the server and the download on it could still be compromised. But if a DSA signature was used, the private key should
                 // not be stored on the server serving the update
-                SULog(SULogLevelDefault, @"DEPRECATION: Serving updates without a DSA key is now deprecated and may be removed from a future release. See Sparkle's documentation for more information.");
+                SULog(SULogLevelDefault, @"DEPRECATION: Serving updates without an EdDSA key is now deprecated and may be removed from a future release. See Sparkle's documentation for more information.");
                 
                 self.loggedDSAWarning = YES;
             }
