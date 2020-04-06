@@ -25,6 +25,19 @@ func printUsage() {
     )
 }
 
+func printHelp() {
+    let command = URL(fileURLWithPath: CommandLine.arguments.first!).lastPathComponent;
+    print(
+        "Usage: \(command) [OPTIONS] [ARCHIVES_FOLDER]\n",
+        "Options:\n",
+        "\t-f: provide the path to the private DSA key\n",
+        "\t-n: provide the name of the private DSA key. This option has to be used together with `-k`\n",
+        "\t-k: provide the name of the keychain. This option has to be used together with `-n`\n",
+        "\t-s: provide the path to the private EdDSA key\n",
+        "\t--download-url-prefix: provide a static url that will be used as prefix for the url from where updates will be downloaded\n"
+    )
+}
+
 func loadPrivateKeys(_ privateDSAKey: SecKey?, _ privateEdString: String?) -> PrivateKeys {
     var privateEdKey: Data?;
     var publicEdKey: Data?;
@@ -66,6 +79,12 @@ func loadPrivateKeys(_ privateDSAKey: SecKey?, _ privateEdString: String?) -> Pr
  * Parses all possible command line options and returns the values in a tuple.
  */
 func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?, privateEdString: String?, downloadUrlPrefix: URL?, archivesSourceDir: URL) {
+    // if the option `-h` is in the argument list print the help dialog
+    if argumentList.contains("-h") {
+        printHelp()
+        exit(1)
+    }
+    
     // make a mutable copy of the argument list
     var arguments = argumentList
     // remove the first element since this is the path to executable which we don't need
