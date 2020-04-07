@@ -87,6 +87,7 @@
     if (!self.prevalidatedSignature) {
         // Check to see if we have a package or bundle to validate
         if (isPackage) {
+            // If we get here, then the appcast installation type was lying to us.. This error will be caught later when starting the installer.
             // For package type updates, all we do is check if the DSA signature is valid
             BOOL validationCheckSuccess = [SUSignatureVerifier validatePath:downloadPath withSignatures:signatures withPublicKeys:publicKeys];
             if (!validationCheckSuccess) {
@@ -98,9 +99,8 @@
             return [self validateUpdateForHost:host downloadedToPath:downloadPath newBundleURL:installSourceURL signatures:signatures];
         }
     } else if (isPackage) {
-        // We shouldn't get here because we don't validate packages before extracting them currently
-        SULog(SULogLevelError, @"Error: not expecting to find package after being required to validate update before extraction");
-        return NO;
+        // We already prevalidated the package and nothing else needs to be done
+        return YES;
     } else {
         // Because we already validated the DSA signature, this is just a consistency check to see
         // if the developer signed their application properly with their Apple ID
