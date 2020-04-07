@@ -13,7 +13,6 @@
 
 @interface SUUpdateValidator : NSObject
 
-// Pass YES to performingPrevalidation if archive validation must be done immediately, before extraction
 - (instancetype)initWithDownloadPath:(NSString *)downloadPath signatures:(SUSignatures *)signatures host:(SUHost *)host;
 
 // This is "pre" validation, before the archive has been extracted

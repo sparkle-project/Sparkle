@@ -20,7 +20,6 @@
 
 @property (nonatomic, readonly) SUHost *host;
 @property (nonatomic) BOOL prevalidatedSignature;
-@property (nonatomic) BOOL downloadPrevalidationFailed;
 @property (strong, nonatomic, readonly) SUSignatures *signatures;
 @property (nonatomic, readonly) NSString *downloadPath;
 
@@ -31,7 +30,6 @@
 @synthesize host = _host;
 @synthesize prevalidatedSignature = _prevalidatedSignature;
 @synthesize signatures = _signatures;
-@synthesize downloadPrevalidationFailed = _downloadPrevalidationFailed;
 @synthesize downloadPath = _downloadPath;
 
 - (instancetype)initWithDownloadPath:(NSString *)downloadPath signatures:(SUSignatures *)signatures host:(SUHost *)host
@@ -58,16 +56,11 @@
         }
         SULog(SULogLevelError, @"(Ed)DSA signature validation before unarchiving failed for update %@", self.downloadPath);
     }
-    self.downloadPrevalidationFailed = YES;
     return NO;
 }
 
 - (BOOL)validateWithUpdateDirectory:(NSString *)updateDirectory
 {
-    if (self.downloadPrevalidationFailed) {
-        return NO;
-    }
-
     SUSignatures *signatures = self.signatures;
     SUPublicKeys *publicKeys = self.host.publicKeys;
     NSString *downloadPath = self.downloadPath;
