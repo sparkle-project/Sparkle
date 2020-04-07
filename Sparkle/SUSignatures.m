@@ -112,15 +112,6 @@ static NSData *decode(NSString *str) {
     return self;
 }
 
-- (BOOL) isEqualToKey:(SUPublicKeys *)key {
-    NSString *thisKey = self.dsaPubKey;
-    NSString *thatKey = key.dsaPubKey;
-    if (thisKey == nil || thatKey == nil) {
-        return NO;
-    }
-    return NO;
-}
-
 
 - (const unsigned char *)ed25519PubKey {
 // Xcode may enable this in pedantic mode

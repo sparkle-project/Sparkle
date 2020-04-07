@@ -33,7 +33,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable, nonatomic) const unsigned char *ed25519PubKey;
 
 - (instancetype)initWithDsa:(NSString * _Nullable)dsa ed:(NSString * _Nullable)ed;
-- (BOOL) isEqualToKey:(SUPublicKeys *)key;
 
 @end
 
