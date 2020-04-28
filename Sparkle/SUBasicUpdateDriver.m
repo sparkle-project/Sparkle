@@ -167,14 +167,14 @@
 
 - (BOOL)isItemNewer:(SUAppcastItem *)ui
 {
-    return [[self versionComparator] compareVersion:[self.host version] toVersion:[ui versionString]] == NSOrderedAscending;
+   return [self cascadeCompare:self.host appcast:ui] == NSOrderedAscending;
 }
 
 - (BOOL)itemContainsSkippedVersion:(SUAppcastItem *)ui
 {
     NSString *skippedVersion = [self.host objectForUserDefaultsKey:SUSkippedVersionKey];
 	if (skippedVersion == nil) { return NO; }
-    return [[self versionComparator] compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
+    return [self.versionComparator compareVersion:[ui versionString] toVersion:skippedVersion] != NSOrderedDescending;
 }
 
 - (BOOL)itemContainsValidUpdate:(SUAppcastItem *)ui
@@ -210,7 +210,7 @@
     {
         // Find the best supported update
         SUAppcastItem *deltaUpdateItem = nil;
-        item = [self bestItemFromAppcastItems:ac.items getDeltaItem:&deltaUpdateItem withHostVersion:self.host.version comparator:[self versionComparator]];
+        item = [self bestItemFromAppcastItems:ac.items getDeltaItem:&deltaUpdateItem withHostVersion:self.host.version comparator:self.versionComparator];
 
         if (item && deltaUpdateItem) {
             self.nonDeltaUpdateItem = item;
@@ -219,9 +219,8 @@
     }
 
     self.latestAppcastItem = item;
-    self.latestAppcastItemComparisonResult = [[self versionComparator] compareVersion:[self.host version] toVersion:[item versionString]];
-
-
+// lets compare apples to apples, FFS
+    self.latestAppcastItemComparisonResult = [self cascadeCompare:self.host appcast:item];
     if ([self itemContainsValidUpdate:item]) {
         self.updateItem = item;
         [self performSelectorOnMainThread:@selector(didFindValidUpdate) withObject:nil waitUntilDone:NO];
@@ -229,6 +228,23 @@
         self.updateItem = nil;
         [self performSelectorOnMainThread:@selector(didNotFindUpdate) withObject:nil waitUntilDone:NO];
     }
+}
+
+// @pixeled: do this universally the same way, every time we need to
+
+- (NSComparisonResult)cascadeCompare:(SUHost*)host_ appcast:(SUAppcastItem*)item_ {
+   NSComparisonResult compare = [self.versionComparator compareVersion:host_.displayVersion toVersion:item_.displayVersionString];
+   NSLog(@"✨ comparing version host \"%@\" to server \"%@\"", host_.displayVersion, item_.displayVersionString);
+   if (compare == NSOrderedSame) { // break tie with build number
+      compare = [self.versionComparator compareVersion:host_.version toVersion:item_.versionString];
+      NSLog(@"✨ tie break: comparing version host \"%@\" to server \"%@\"", host_.version, item_.versionString);
+   }
+   switch (compare) {
+      case NSOrderedAscending:   NSLog(@"✨ newer version on server");   break;
+      case NSOrderedSame:        NSLog(@"✨ same version as on server"); break;
+      case NSOrderedDescending:  NSLog(@"✨ newer version running");     break;
+   }
+   return compare;
 }
 
 - (void)didFindValidUpdate

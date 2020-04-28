@@ -88,16 +88,22 @@ NS_ASSUME_NONNULL_BEGIN
     return [[[NSFileManager defaultManager] displayNameAtPath:[self bundlePath]] stringByDeletingPathExtension];
 }
 
+// @pixeled: throughout sparkle code, this is used to fetch the build number e.g. 2345
+// analog to SUAppcastItem.versionString
+// HENCE the edit to make build number FIRST then fall back to the version string
+// THIS, and the cascading compares in SUBasicUpdateDriver.m bring us back to perfection
 - (NSString *)version
 {
-    NSString *version = [self.bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];  // bt_browser added.  prefer long version string
+    NSString *version = version = [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
     if (!version || [version isEqualToString:@""])  // bt_browser fall back to CFBundleVersion
-        version = [self.bundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleVersionKey];
+        version = [self.bundle objectForInfoDictionaryKey:@"CFBundleShortVersionString"];  // bt_browser added.  prefer long version string
     if (!version || [version isEqualToString:@""])
         [NSException raise:@"SUNoVersionException" format:@"This host (%@) has no %@! This attribute is required.", [self bundlePath], (__bridge NSString *)kCFBundleVersionKey];
     return version;
 }
 
+// @pixeled: throughout sparkle code, this is used to fetch the version number, e.g. 1.0.11
+// analog to SUAppcastItem.displayVersionString
 - (NSString *)displayVersion
 {
     NSString *shortVersionString = [self objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
