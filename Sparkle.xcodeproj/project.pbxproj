@@ -124,7 +124,6 @@
 		5AE13FBD1E0DA39B000D2C2C /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AE13FBC1E0DA39B000D2C2C /* libbz2.tbd */; };
 		5AE459001C34118500E3BB47 /* SUUpdaterTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 14950074195FDF5900BC5B5B /* SUUpdaterTest.m */; };
 		5AE459021C34118500E3BB47 /* SUVersionComparisonTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 61227A150DB548B800AB99EA /* SUVersionComparisonTest.m */; };
-		5AE7E1111DC81AD3009C2C12 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 5AE7E10E1DC81ACA009C2C12 /* AppIcon.icns */; };
 		5AF04877214D2E5F00B5789F /* SUSignatures.h in Headers */ = {isa = PBXBuildFile; fileRef = 5AF04875214D2E5F00B5789F /* SUSignatures.h */; };
 		5AF04878214D2E5F00B5789F /* SUSignatures.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF04876214D2E5F00B5789F /* SUSignatures.m */; };
 		5AF6C74F1AEA46D10014A3AB /* test.pkg in Resources */ = {isa = PBXBuildFile; fileRef = 5AF6C74E1AEA46D10014A3AB /* test.pkg */; };
@@ -1930,6 +1929,7 @@
 				6131B1910DDCDE32005215F0 /* Run Script: Set Git Version Info */,
 				6195D4B40E40505A00D41A50 /* Run Script: Link fr_CA to fr */,
 				61E31A85103299750051D188 /* Run Script: Link pt to pt_BR */,
+				CC50111122C6C533000F7EEB /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -2005,6 +2005,7 @@
 					};
 					722954B31D04ADAF00ECF9CA = {
 						CreatedOnToolsVersion = 7.3.1;
+						DevelopmentTeam = SNBT6M4A7T;
 					};
 					726B2B5C1C645FC900388755 = {
 						CreatedOnToolsVersion = 7.2.1;
@@ -2013,6 +2014,7 @@
 					};
 					8DC2EF4F0486A6940098B216 = {
 						LastSwiftMigration = 0920;
+						ProvisioningStyle = Manual;
 					};
 					EA43119F229D5FBC00A5503D = {
 						CreatedOnToolsVersion = 10.2.1;
@@ -2120,7 +2122,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5AE7E1111DC81AD3009C2C12 /* AppIcon.icns in Resources */,
 				55C14FC7136F05E100649790 /* Sparkle.strings in Resources */,
 				55C14BD9136EF00C00649790 /* SUStatus.xib in Resources */,
 			);
@@ -2227,6 +2228,23 @@
 			shellPath = "/usr/bin/env sh";
 			shellScript = "ln -sfh \"pt_BR.lproj\" \"$BUILT_PRODUCTS_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/pt.lproj\"";
 			showEnvVarsInLog = 0;
+		};
+		CC50111122C6C533000F7EEB /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2809,6 +2827,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 149B78631B7D3A0C00D7D62C /* ConfigCommonCoverage.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = YES;
 			};
 			name = Coverage;
 		};
@@ -2817,8 +2836,16 @@
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				OTHER_CODE_SIGN_FLAGS = "--deep --timestamp --options=runtime";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bittorrent.-";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Coverage;
@@ -2848,6 +2875,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bittorrent.-";
+				SDKROOT = macosx;
 			};
 			name = Coverage;
 		};
@@ -2874,8 +2904,16 @@
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				OTHER_CODE_SIGN_FLAGS = "--deep --timestamp --options=runtime";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bittorrent.-";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -2894,6 +2932,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CF0D94A70100DD942E /* ConfigCommonDebug.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = YES;
 			};
 			name = Debug;
 		};
@@ -2901,6 +2940,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 			};
 			name = Release;
@@ -2909,6 +2949,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D30D94A70100DD942E /* ConfigRelaunchDebug.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bittorrent.-";
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -2916,6 +2959,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D40D94A70100DD942E /* ConfigRelaunchRelease.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				DEVELOPMENT_TEAM = SNBT6M4A7T;
+				ENABLE_HARDENED_RUNTIME = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.bittorrent.-";
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -2952,6 +3000,7 @@
 			baseConfigurationReference = 7205C4351E12CA7000E370AE /* ConfigGenerateAppcastDebug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
@@ -2960,6 +3009,7 @@
 			baseConfigurationReference = 7205C4351E12CA7000E370AE /* ConfigGenerateAppcastDebug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				SDKROOT = macosx;
 			};
 			name = Coverage;
 		};
@@ -2968,6 +3018,7 @@
 			baseConfigurationReference = 7205C4341E12C66D00E370AE /* ConfigGenerateAppcastRelease.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -3047,6 +3098,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 722954C81D04E89500ECF9CA /* ConfigFileop.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				DEVELOPMENT_TEAM = SNBT6M4A7T;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -3056,6 +3110,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 722954C81D04E89500ECF9CA /* ConfigFileop.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -3065,6 +3120,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 722954C81D04E89500ECF9CA /* ConfigFileop.xcconfig */;
 			buildSettings = {
+				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

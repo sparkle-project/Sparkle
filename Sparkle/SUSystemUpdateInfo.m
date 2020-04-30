@@ -19,10 +19,10 @@
 + (BOOL)systemAllowsAutomaticUpdatesForHost:(SUHost *)host
 {
     // Does the developer want us to disable automatic updates?
-    NSNumber *developerAllowsAutomaticUpdates = [host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
-    if (developerAllowsAutomaticUpdates != nil && !developerAllowsAutomaticUpdates.boolValue) {
-        return NO;
-    }
+//    NSNumber *developerAllowsAutomaticUpdates = [host objectForInfoDictionaryKey:SUAllowsAutomaticUpdatesKey];
+//    if (developerAllowsAutomaticUpdates != nil && !developerAllowsAutomaticUpdates.boolValue) {
+//        return NO;
+//    }
     
     // Can we automatically update in the background without bugging the user (e.g, with a administrator password prompt)?
     // Note it's very well possible to have the bundle be writable but not be able to write into the parent directory

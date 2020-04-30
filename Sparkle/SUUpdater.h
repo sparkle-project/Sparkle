@@ -228,6 +228,11 @@ SU_EXPORT @interface SUUpdater : NSObject
  */
 @property (readonly) BOOL updateInProgress;
 
+/*!
+ install already downloaded update. Call it after extract
+ */
+- (void)installDownloadedUpdate;
+
 @end
 
 #endif
