@@ -11,7 +11,11 @@ import CommonCrypto
 
 extension FileHandle {
 
-    func sha256String() -> String? {
+    /// Calculate the SHA-256 hash of the file referenced by the file handle.
+    ///
+    /// - Returns: The SHA-256 hash of the file (as a hexadecimal string).
+    func sha256String() -> String {
+        // This uses CommonCrypto instead of CryptoKit so it can work on macOS < 10.15
         var context = CC_SHA256_CTX()
         CC_SHA256_Init(&context)
 
@@ -36,7 +40,12 @@ extension FileHandle {
 
 extension URL {
 
+    /// Calculates the SHA-256 hash of the file referened by the URL.
+    ///
+    /// - Returns: The SHA-256 hash of the file (as a hexadecimal string), or `nil` if
+    ///   the URL doesn't point to a file.
     func sha256String() -> String? {
+        guard self.isFileURL else { return nil }
         guard let filehandle = try? FileHandle(forReadingFrom: self) else { return nil }
 
         return filehandle.sha256String()
