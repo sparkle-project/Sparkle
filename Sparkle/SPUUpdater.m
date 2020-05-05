@@ -116,7 +116,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (instancetype)initForBundle:(NSBundle *)__unused bundle
 {
     NSString *reason = [NSString stringWithFormat:@"-[%@ initForBundle:] is not implemented anymore in Sparkle 2.", NSStringFromClass([self class])];
-    SULog(SULogLevelError, reason);
+    SULog(SULogLevelError, @"%@", reason);
     
     NSException *exception = [NSException exceptionWithName:@"SUIncorrectAPIUsageException" reason:reason userInfo:nil];
     @throw exception;
@@ -128,7 +128,7 @@ NSString *const SUUpdaterAppcastNotificationKey = @"SUUpdaterAppCastNotification
 - (instancetype)init
 {
     NSString *reason = [NSString stringWithFormat:@"-[%@ init] is not implemented. If you want to drop an updater into a nib, see SPUStandardUpdaterController.", NSStringFromClass([self class])];
-    SULog(SULogLevelError, reason);
+    SULog(SULogLevelError, @"%@", reason);
     
     NSException *exception = [NSException exceptionWithName:@"SUIncorrectAPIUsageException" reason:reason userInfo:nil];
     @throw exception;
