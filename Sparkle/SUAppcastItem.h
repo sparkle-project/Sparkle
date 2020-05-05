@@ -9,11 +9,7 @@
 #ifndef SUAPPCASTITEM_H
 #define SUAPPCASTITEM_H
 
-#if __has_feature(modules)
-@import Foundation;
-#else
 #import <Foundation/Foundation.h>
-#endif
 #import <Sparkle/SUExport.h>
 
 SU_EXPORT @interface SUAppcastItem : NSObject<NSSecureCoding>

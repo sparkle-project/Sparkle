@@ -6,11 +6,7 @@
 //  Copyright 2006 Andy Matuschak. All rights reserved.
 //
 
-#if __has_feature(modules)
-@import Foundation;
-#else
 #import <Foundation/Foundation.h>
-#endif
 #import <Sparkle/SUExport.h>
 #import <Sparkle/SPUUserDriver.h>
 
