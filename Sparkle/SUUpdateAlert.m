@@ -352,7 +352,8 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
 {
     NSURL *requestURL = request.URL;
     NSString *scheme = requestURL.scheme;
-    BOOL whitelistedSafe = [scheme isEqualToString:@"http"] || [scheme isEqualToString:@"https"] || [requestURL.absoluteString isEqualToString:@"about:blank"];
+    BOOL isAboutBlank = [requestURL.absoluteString isEqualToString:@"about:blank"];
+    BOOL whitelistedSafe = [scheme isEqualToString:@"http"] || [scheme isEqualToString:@"https"] || isAboutBlank;
 
     // Do not allow redirects to dangerous protocols such as file://
     if (!whitelistedSafe) {
@@ -362,7 +363,7 @@ static NSString *const SUUpdateAlertTouchBarIndentifier = @"" SPARKLE_BUNDLE_IDE
     }
 
     if (self.webViewFinishedLoading) {
-        if (requestURL) {
+        if (requestURL && !isAboutBlank) {
             [[NSWorkspace sharedWorkspace] openURL:requestURL];
         }
 
