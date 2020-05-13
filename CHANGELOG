@@ -1,3 +1,14 @@
+# 1.24.0-alpha
+
+ * Fixed error about "about:blank" release notes (Louis Pontoise)
+ * Use the SHA-256 hash of the archive as the cache path (Nate Weaver)
+ * Don't return an optional from the FileHandle method (Nate Weaver)
+ * Added URL+Hashing (Nate Weaver)
+ * Update SUUpdateAlert.xib (DanielFirlej)
+ * Added help command line option (Dominik H)
+ * Added function that parses all command line options (Dominik H)
+ * Command line option to provide a download url prefix is now parsed and set on each archive item (Dominik H)
+
 # 1.23.0
 
  * Support generating appcast with localizations (#1499) (Alik Vovkotrub)
