@@ -118,13 +118,17 @@
 - (SUAppcastItem *)bestItemFromAppcastItems:(NSArray *)appcastItems getDeltaItem:(SUAppcastItem * __autoreleasing *)deltaItem withHostVersion:(NSString *)hostVersion comparator:(id<SUVersionComparison>)comparator
 {
     SUAppcastItem *item = nil;
+    NSComparisonResult order;
+
     for(SUAppcastItem *candidate in appcastItems) {
         if ([self hostSupportsItem:candidate]) {
+            // Pick this item if nothing is picked yet. Always pick an item with a higher version. Only if versions are the same
+            // compare their dates and pick this item if its date is not lower – this covers cases when no date is available
+            // and picks items at the end of the appcast list as they are more likely to be the most recent releases.
             if (
-                !item || (
-                    [item.date compare:candidate.date] == NSOrderedAscending &&
-                    [comparator compareVersion:item.versionString toVersion:candidate.versionString] != NSOrderedDescending
-                )
+                !item
+                    || (order = [comparator compareVersion:item.versionString toVersion:candidate.versionString]) == NSOrderedAscending
+                    || (order == NSOrderedSame && [item.date compare:candidate.date] != NSOrderedDescending)
             ) {
                 item = candidate;
             }
