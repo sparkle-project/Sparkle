@@ -1,0 +1,4 @@
+excluded:
+  - Vendor
+disabled_rules:
+  - opening_brace
