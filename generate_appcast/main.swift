@@ -8,10 +8,10 @@
 
 import Foundation
 
-var verbose = false;
+var verbose = false
 
 func printUsage() {
-    let command = URL(fileURLWithPath: CommandLine.arguments.first!).lastPathComponent;
+    let command = URL(fileURLWithPath: CommandLine.arguments.first!).lastPathComponent
     print("Generate appcast from a directory of Sparkle update archives\n",
         "Usage:\n",
         "      \(command) <directory with update files>\n",
@@ -26,7 +26,7 @@ func printUsage() {
 }
 
 func printHelp() {
-    let command = URL(fileURLWithPath: CommandLine.arguments.first!).lastPathComponent;
+    let command = URL(fileURLWithPath: CommandLine.arguments.first!).lastPathComponent
     print(
         "Usage: \(command) [OPTIONS] [ARCHIVES_FOLDER]\n",
         "Options:\n",
@@ -39,9 +39,9 @@ func printHelp() {
 }
 
 func loadPrivateKeys(_ privateDSAKey: SecKey?, _ privateEdString: String?) -> PrivateKeys {
-    var privateEdKey: Data?;
-    var publicEdKey: Data?;
-    var item: CFTypeRef?;
+    var privateEdKey: Data?
+    var publicEdKey: Data?
+    var item: CFTypeRef?
     var keys: Data?
 
     // private + public key is provided as argument
@@ -49,7 +49,7 @@ func loadPrivateKeys(_ privateDSAKey: SecKey?, _ privateEdString: String?) -> Pr
         if privateEdString.count == 128, let data = Data(base64Encoded: privateEdString) {
             keys = data
         } else {
-            print("Warning: Private key not found in the argument. Please provide a valid key.");
+            print("Warning: Private key not found in the argument. Please provide a valid key.")
         }
     }
     // get keys from kechain instead
@@ -60,19 +60,19 @@ func loadPrivateKeys(_ privateDSAKey: SecKey?, _ privateEdString: String?) -> Pr
             kSecAttrAccount as String: "ed25519",
             kSecAttrProtocol as String: kSecAttrProtocolSSH,
             kSecReturnData as String: kCFBooleanTrue,
-            ] as CFDictionary, &item);
+            ] as CFDictionary, &item)
         if res == errSecSuccess, let encoded = item as? Data, let data = Data(base64Encoded: encoded) {
             keys = data
         } else {
-            print("Warning: Private key not found in the Keychain (\(res)). Please run the generate_keys tool");
+            print("Warning: Private key not found in the Keychain (\(res)). Please run the generate_keys tool")
         }
     }
 
     if let keys = keys {
-        privateEdKey = keys[0..<64];
-        publicEdKey = keys[64...];
+        privateEdKey = keys[0..<64]
+        publicEdKey = keys[64...]
     }
-    return PrivateKeys(privateDSAKey: privateDSAKey, privateEdKey: privateEdKey, publicEdKey: publicEdKey);
+    return PrivateKeys(privateDSAKey: privateDSAKey, privateEdKey: privateEdKey, publicEdKey: publicEdKey)
 }
 
 /**
@@ -84,18 +84,18 @@ func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?,
         printHelp()
         exit(1)
     }
-    
+
     // make a mutable copy of the argument list
     var arguments = argumentList
     // remove the first element since this is the path to executable which we don't need
     arguments.removeFirst()
-    
+
     // define the variables for the possible argument values
-    var privateDSAKey: SecKey? = nil
-    var privateEdString: String? = nil
-    var downloadUrlPrefix: URL? = nil
+    var privateDSAKey: SecKey?
+    var privateEdString: String?
+    var downloadUrlPrefix: URL?
     var archivesSourceDir: URL
-    
+
     // check if the private dsa key option is present
     if let privateDSAKeyOptionIndex = arguments.firstIndex(of: "-f") {
         // check that when accessing the value of the option we don't get out of bounds
@@ -103,7 +103,7 @@ func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?,
             print("Too few arguments were given")
             exit(1)
         }
-        
+
         // get the private DSA key
         let privateKeyUrl = URL(fileURLWithPath: arguments[privateDSAKeyOptionIndex + 1])
         do {
@@ -112,12 +112,12 @@ func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?,
             print("Unable to load DSA private key from", privateKeyUrl.path, "\n", error)
             exit(1)
         }
-        
+
         // remove the already parsed arguments
         arguments.remove(at: privateDSAKeyOptionIndex)
         arguments.remove(at: privateDSAKeyOptionIndex + 1)
     }
-    
+
     // check if the private dsa sould be loaded using the keyname and the name of the keychain
     if let keyNameOptionIndex = arguments.firstIndex(of: "-n"), let keychainNameOptionIndex = arguments.firstIndex(of: "-k") {
         // check that when accessing one of the values of the options we don't get out of bounds
@@ -125,7 +125,7 @@ func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?,
             print("Too few arguments were given")
             exit(1)
         }
-        
+
         // get the keyname and the keychain url to load the private DSA key
         let keyName: String = arguments[keyNameOptionIndex + 1]
         let keychainUrl: URL = URL(fileURLWithPath: arguments[keychainNameOptionIndex + 1])
@@ -135,14 +135,14 @@ func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?,
             print("Unable to load DSA private key '\(keyName)' from keychain at", keychainUrl.path, "\n", error)
             exit(1)
         }
-        
+
         // remove the already parsed arguments
         arguments.remove(at: keyNameOptionIndex + 1)
         arguments.remove(at: keyNameOptionIndex)
         arguments.remove(at: arguments.firstIndex(of: "-k")! + 1)
         arguments.remove(at: keychainNameOptionIndex)
     }
-    
+
     // check if the private EdDSA key string was given as an argument
     if let privateEdDSAKeyOptionIndex = arguments.firstIndex(of: "-s") {
         // check that when accessing the value of the option we don't get out of bounds
@@ -150,15 +150,15 @@ func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?,
             print("Too few arguments were given")
             exit(1)
         }
-        
+
         // get the private EdDSA key string
         privateEdString = arguments[privateEdDSAKeyOptionIndex + 1]
-        
+
         // remove the already parsed argument
         arguments.remove(at: privateEdDSAKeyOptionIndex + 1)
         arguments.remove(at: privateEdDSAKeyOptionIndex)
     }
-    
+
     // check if a prefix for the download url of the archives was given
     if let downloadUrlPrefixOptionIndex = arguments.firstIndex(of: "--download-url-prefix") {
         // check that when accessing the value of the option we don't get out of bounds
@@ -166,15 +166,15 @@ func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?,
             print("Too few arguments were given")
             exit(1)
         }
-        
+
         // get the download url prefix
         downloadUrlPrefix = URL(string: arguments[downloadUrlPrefixOptionIndex + 1])
-        
+
         // remove the parsed argument
         arguments.remove(at: downloadUrlPrefixOptionIndex + 1)
         arguments.remove(at: downloadUrlPrefixOptionIndex)
     }
-    
+
     // now that all command line options have been removed from the arguments array
     // there should only be the path to the private DSA key (if provided) path to the archives dir left
     if arguments.count == 2 {
@@ -187,36 +187,36 @@ func parseCommandLineOptions(argumentList: [String]) -> (privateDSAKey: SecKey?,
             print("Unable to load DSA private key from", privateKeyUrl.path, "\n", error)
             exit(1)
         }
-        
+
         // remove the parsed path to the DSA key
         arguments.removeFirst()
     }
 
     // now only the archives source dir is left
     archivesSourceDir = URL(fileURLWithPath: arguments[0], isDirectory: true)
-    
+
     return (privateDSAKey, privateEdString, downloadUrlPrefix, archivesSourceDir)
 }
 
 func main() {
-    let args = CommandLine.arguments;
+    let args = CommandLine.arguments
     if args.count < 2 {
         printUsage()
         exit(1)
     }
-    
-    var privateDSAKey: SecKey? = nil;
-    var privateEdString: String? = nil;
-    var downloadUrlPrefix: URL? = nil;
+
+    var privateDSAKey: SecKey?
+    var privateEdString: String?
+    var downloadUrlPrefix: URL?
     var archivesSourceDir: URL
-    
+
     (privateDSAKey, privateEdString, downloadUrlPrefix, archivesSourceDir) = parseCommandLineOptions(argumentList: args)
-    
+
     let keys = loadPrivateKeys(privateDSAKey, privateEdString)
 
     do {
-        let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, keys: keys, verbose:verbose);
-        
+        let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, keys: keys, verbose: verbose)
+
         // if a download url prefix was provided set it for each archive item
         if downloadUrlPrefix != nil {
             for (_, archiveItems) in allUpdates {
@@ -225,21 +225,21 @@ func main() {
                 }
             }
         }
-        
+
         for (appcastFile, updates) in allUpdates {
-            let appcastDestPath = URL(fileURLWithPath: appcastFile, relativeTo: archivesSourceDir);
-            try writeAppcast(appcastDestPath:appcastDestPath, updates:updates);
-            print("Written", appcastDestPath.path, "based on", updates.count, "updates");
+            let appcastDestPath = URL(fileURLWithPath: appcastFile, relativeTo: archivesSourceDir)
+            try writeAppcast(appcastDestPath: appcastDestPath, updates: updates)
+            print("Written", appcastDestPath.path, "based on", updates.count, "updates")
         }
     } catch {
-        print("Error generating appcast from directory", archivesSourceDir.path, "\n", error);
-        exit(1);
+        print("Error generating appcast from directory", archivesSourceDir.path, "\n", error)
+        exit(1)
     }
 }
 
 DispatchQueue.global().async(execute: {
-    main();
-    CFRunLoopStop(CFRunLoopGetMain());
-});
+    main()
+    CFRunLoopStop(CFRunLoopGetMain())
+})
 
-CFRunLoopRun();
+CFRunLoopRun()

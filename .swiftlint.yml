@@ -2,3 +2,8 @@ excluded:
   - Vendor
 disabled_rules:
   - opening_brace
+  - empty_parentheses_with_trailing_closure
+
+# Rule-specific config
+trailing_comma:
+  mandatory_comma: true
