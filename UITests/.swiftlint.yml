@@ -1,0 +1,4 @@
+# Inherits from top level config
+disabled_rules:
+  - force_try
+  - force_cast
