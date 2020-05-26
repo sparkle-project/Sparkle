@@ -184,6 +184,6 @@ func writeAppcast(appcastDestPath: URL, updates: [ArchiveItem]) throws {
 
     let options = XMLNode.Options.nodeCompactEmptyElement
     let docData = doc.xmlData(options: options)
-    _ = try XMLDocument(data: docData, options: XMLNode.Options()); // Verify that it was generated correctly, which does not always happen!
+    _ = try XMLDocument(data: docData, options: XMLNode.Options()) // Verify that it was generated correctly, which does not always happen!
     try docData.write(to: appcastDestPath)
 }
