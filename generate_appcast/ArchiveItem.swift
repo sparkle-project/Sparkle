@@ -33,6 +33,7 @@ class DeltaUpdate {
 
 class ArchiveItem: CustomStringConvertible {
     let version: String
+    // swiftlint:disable identifier_name
     let _shortVersion: String?
     let minimumSystemVersion: String
     let archivePath: URL
