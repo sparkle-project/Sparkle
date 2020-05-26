@@ -1,5 +1,7 @@
+os: osx
 language: objective-c
-osx_image: xcode9
-before_install:
-  - brew update
-script: make ci
+osx_image:
+  - xcode10.3
+  - xcode11.4
+script:
+  - set -o pipefail && xcodebuild test -project Sparkle.xcodeproj -scheme Distribution -derivedDataPath build -enableCodeCoverage YES | xcpretty
