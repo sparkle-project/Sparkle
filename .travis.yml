@@ -1,5 +1,13 @@
+os: osx
 language: objective-c
-osx_image: xcode9
+osx_image:
+  - xcode8
+  - xcode8.3
+  - xcode9
+  - xcode9.4
+  - xcode10.3
+  - xcode11.4
 before_install:
   - brew update
-script: make ci
+script:
+  - xcodebuild -scheme Distribution -configuration Coverage -derivedDataPath build | xcpretty
