@@ -8,7 +8,7 @@
 
 import Foundation
 
-var verbose = false;
+var verbose = false
 
 func printUsage() {
     let command = URL(fileURLWithPath: CommandLine.arguments.first!).lastPathComponent;
@@ -80,8 +80,7 @@ func main() {
 
             keyName = args[2]
             keychainURL = URL(fileURLWithPath: args[4])
-        }
-        else {
+        } else {
             if args[3] != "-n" {
                 printUsage()
                 exit(1)
@@ -110,19 +109,19 @@ func main() {
         let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, keys: keys, verbose:verbose);
 
         for (appcastFile, updates) in allUpdates {
-            let appcastDestPath = URL(fileURLWithPath: appcastFile, relativeTo: archivesSourceDir);
-            try writeAppcast(appcastDestPath:appcastDestPath, updates:updates);
-            print("Written", appcastDestPath.path, "based on", updates.count, "updates");
+            let appcastDestPath = URL(fileURLWithPath: appcastFile, relativeTo: archivesSourceDir)
+            try writeAppcast(appcastDestPath: appcastDestPath, updates: updates)
+            print("Written", appcastDestPath.path, "based on", updates.count, "updates")
         }
     } catch {
-        print("Error generating appcast from directory", archivesSourceDir.path, "\n", error);
-        exit(1);
+        print("Error generating appcast from directory", archivesSourceDir.path, "\n", error)
+        exit(1)
     }
 }
 
 DispatchQueue.global().async(execute: {
-    main();
-    CFRunLoopStop(CFRunLoopGetMain());
-});
+    main()
+    CFRunLoopStop(CFRunLoopGetMain())
+})
 
-CFRunLoopRun();
+CFRunLoopRun()

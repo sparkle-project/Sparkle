@@ -6,12 +6,12 @@
 import Foundation
 
 // Maximum number of delta updates (per OS).
-let maxDeltas = 5;
+let maxDeltas = 5
 
 func makeError(code: SUError, _ description: String) -> NSError {
     return NSError(domain: SUSparkleErrorDomain, code: Int(OSStatus(code.rawValue)), userInfo: [
         NSLocalizedDescriptionKey: description,
-        ]);
+        ])
 }
 
 func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throws -> [String:[ArchiveItem]] {
@@ -20,19 +20,19 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
 
     let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir, archivesDestDir: cacheDir, verbose:verbose))
         .sorted(by: {
-            .orderedDescending == comparator.compareVersion($0.version, toVersion:$1.version)
+            .orderedDescending == comparator.compareVersion($0.version, toVersion: $1.version)
         })
 
     if allUpdates.count == 0 {
-        throw makeError(code: .noUpdateError, "No usable archives found in \(archivesSourceDir.path)");
+        throw makeError(code: .noUpdateError, "No usable archives found in \(archivesSourceDir.path)")
     }
 
-    var updatesByAppcast:[String:[ArchiveItem]] = [:];
+    var updatesByAppcast: [String: [ArchiveItem]] = [:]
 
-    let group = DispatchGroup();
+    let group = DispatchGroup()
 
     for update in allUpdates {
-        group.enter();
+        group.enter()
         DispatchQueue.global().async {
             if let privateDSAKey = keys.privateDSAKey {
                 do {
@@ -62,27 +62,27 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
             group.leave();
         }
 
-        let appcastFile = update.feedURL?.lastPathComponent ?? "appcast.xml";
+        let appcastFile = update.feedURL?.lastPathComponent ?? "appcast.xml"
         if updatesByAppcast[appcastFile] == nil {
-            updatesByAppcast[appcastFile] = [];
+            updatesByAppcast[appcastFile] = []
         }
-        updatesByAppcast[appcastFile]!.append(update);
+        updatesByAppcast[appcastFile]!.append(update)
     }
 
     for (_, updates) in updatesByAppcast {
-        var latestUpdatePerOS:[String:ArchiveItem] = [:];
+        var latestUpdatePerOS: [String: ArchiveItem] = [:]
 
         for update in updates {
             // items are ordered starting latest first
-            let os = update.minimumSystemVersion;
+            let os = update.minimumSystemVersion
             if latestUpdatePerOS[os] == nil {
-                latestUpdatePerOS[os] = update;
+                latestUpdatePerOS[os] = update
             }
         }
 
-        for (_,latestItem) in latestUpdatePerOS {
-            var numDeltas = 0;
-            let appBaseName = latestItem.appPath.deletingPathExtension().lastPathComponent;
+        for (_, latestItem) in latestUpdatePerOS {
+            var numDeltas = 0
+            let appBaseName = latestItem.appPath.deletingPathExtension().lastPathComponent
             for item in updates {
                 if numDeltas > maxDeltas {
                     break;
@@ -90,15 +90,15 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
 
                 // No downgrades
                 if .orderedAscending != comparator.compareVersion(item.version, toVersion: latestItem.version) {
-                    continue;
+                    continue
                 }
                 // Old version will not be able to verify the new version
                 if !item.supportsDSA && item.publicEdKey == nil {
                     continue;
                 }
 
-                let deltaBaseName = appBaseName + latestItem.version + "-" + item.version;
-                let deltaPath = archivesSourceDir.appendingPathComponent(deltaBaseName).appendingPathExtension("delta");
+                let deltaBaseName = appBaseName + latestItem.version + "-" + item.version
+                let deltaPath = archivesSourceDir.appendingPathComponent(deltaBaseName).appendingPathExtension("delta")
 
                 var delta:DeltaUpdate;
                 let ignoreMarkerPath = cacheDir.appendingPathComponent(deltaPath.lastPathComponent).appendingPathExtension(".ignore");
@@ -108,13 +108,13 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
                 }
                 if !fm.fileExists(atPath: deltaPath.path) {
                     do {
-                        delta = try DeltaUpdate.create(from: item, to: latestItem, archivePath: deltaPath);
+                        delta = try DeltaUpdate.create(from: item, to: latestItem, archivePath: deltaPath)
                     } catch {
-                        print("Could not create delta update", deltaPath.path, error);
-                        continue;
+                        print("Could not create delta update", deltaPath.path, error)
+                        continue
                     }
                 } else {
-                    delta = DeltaUpdate(fromVersion: item.version, archivePath: deltaPath);
+                    delta = DeltaUpdate(fromVersion: item.version, archivePath: deltaPath)
                 }
 
                 numDeltas += 1;
@@ -131,7 +131,7 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
                         do {
                             delta.dsaSignature = try dsaSignature(path: deltaPath, privateDSAKey: privateDSAKey);
                         } catch {
-                            print(delta.archivePath.lastPathComponent, error);
+                            print(delta.archivePath.lastPathComponent, error)
                         }
                     }
                     if let publicEdKey = item.publicEdKey, let privateEdKey = keys.privateEdKey {
@@ -153,9 +153,9 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
         }
     }
 
-    group.wait();
+    group.wait()
 
-    return updatesByAppcast;
+    return updatesByAppcast
 }
 
 func markDeltaAsIgnored(delta: DeltaUpdate, markerPath: URL) {

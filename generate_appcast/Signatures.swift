@@ -20,21 +20,21 @@ struct PrivateKeys {
 func loadPrivateDSAKey(at privateKeyURL: URL) throws -> SecKey {
     let data = try Data(contentsOf: privateKeyURL);
 
-    var cfitems: CFArray? = nil;
-    var format = SecExternalFormat.formatOpenSSL;
-    var type = SecExternalItemType.itemTypePrivateKey;
+    var cfitems: CFArray?
+    var format = SecExternalFormat.formatOpenSSL
+    var type = SecExternalItemType.itemTypePrivateKey
 
-    let status = SecItemImport(data as CFData, nil, &format, &type, SecItemImportExportFlags(rawValue: UInt32(0)), nil, nil, &cfitems);
-    if (status != errSecSuccess || cfitems == nil) {
-        print("Private DSA key file", privateKeyURL.path, "exists, but it could not be read. SecItemImport error", status);
-        throw NSError(domain: SUSparkleErrorDomain, code: Int(OSStatus(SUError.signatureError.rawValue)), userInfo: nil);
+    let status = SecItemImport(data as CFData, nil, &format, &type, SecItemImportExportFlags(rawValue: UInt32(0)), nil, nil, &cfitems)
+    if status != errSecSuccess || cfitems == nil {
+        print("Private DSA key file", privateKeyURL.path, "exists, but it could not be read. SecItemImport error", status)
+        throw NSError(domain: SUSparkleErrorDomain, code: Int(OSStatus(SUError.signatureError.rawValue)), userInfo: nil)
     }
 
-    if (format != SecExternalFormat.formatOpenSSL || type != SecExternalItemType.itemTypePrivateKey) {
-        throw makeError(code: .signatureError, "Not an OpensSSL private key \(format) \(type)");
+    if format != SecExternalFormat.formatOpenSSL || type != SecExternalItemType.itemTypePrivateKey {
+        throw makeError(code: .signatureError, "Not an OpensSSL private key \(format) \(type)")
     }
 
-    return (cfitems! as NSArray)[0] as! SecKey;
+    return (cfitems! as NSArray)[0] as! SecKey
 }
 
 func loadPrivateDSAKey(named keyName: String, fromKeychainAt keychainURL: URL) throws -> SecKey {
@@ -50,7 +50,7 @@ func loadPrivateDSAKey(named keyName: String, fromKeychainAt keychainURL: URL) t
         kSecAttrLabel: keyName as CFString,
         kSecMatchLimit: kSecMatchLimitOne,
         kSecUseKeychain: keychain!,
-        kSecReturnRef: kCFBooleanTrue
+        kSecReturnRef: kCFBooleanTrue,
     ]
 
     var item: CFTypeRef? = nil
@@ -63,10 +63,10 @@ func loadPrivateDSAKey(named keyName: String, fromKeychainAt keychainURL: URL) t
 
 func dsaSignature(path: URL, privateDSAKey: SecKey) throws -> String {
 
-    var error: Unmanaged<CFError>?;
+    var error: Unmanaged<CFError>?
 
-    let stream = InputStream(fileAtPath:path.path)!;
-    let dataReadTransform = SecTransformCreateReadTransformWithReadStream(stream);
+    let stream = InputStream(fileAtPath: path.path)!
+    let dataReadTransform = SecTransformCreateReadTransformWithReadStream(stream)
 
     let dataDigestTransform = SecDigestTransformCreate(kSecDigestSHA1, 20, nil);
     guard let dataSignTransform = SecSignTransformCreate(privateDSAKey, &error) else {
@@ -74,25 +74,25 @@ func dsaSignature(path: URL, privateDSAKey: SecKey) throws -> String {
         throw error!.takeRetainedValue();
     }
 
-    let group = SecTransformCreateGroupTransform();
-    SecTransformConnectTransforms(dataReadTransform, kSecTransformOutputAttributeName, dataDigestTransform, kSecTransformInputAttributeName, group, &error);
-    if (error != nil) {
-        throw error!.takeRetainedValue();
+    let group = SecTransformCreateGroupTransform()
+    SecTransformConnectTransforms(dataReadTransform, kSecTransformOutputAttributeName, dataDigestTransform, kSecTransformInputAttributeName, group, &error)
+    if error != nil {
+        throw error!.takeRetainedValue()
     }
 
-    SecTransformConnectTransforms(dataDigestTransform, kSecTransformOutputAttributeName, dataSignTransform, kSecTransformInputAttributeName, group, &error);
-    if (error != nil) {
-        throw error!.takeRetainedValue();
+    SecTransformConnectTransforms(dataDigestTransform, kSecTransformOutputAttributeName, dataSignTransform, kSecTransformInputAttributeName, group, &error)
+    if error != nil {
+        throw error!.takeRetainedValue()
     }
 
-    let result = SecTransformExecute(group, &error);
-    if (error != nil) {
-        throw error!.takeRetainedValue();
+    let result = SecTransformExecute(group, &error)
+    if error != nil {
+        throw error!.takeRetainedValue()
     }
     guard let resultData = result as? Data else {
-        throw makeError(code: .signatureError, "SecTransformExecute returned non-data");
+        throw makeError(code: .signatureError, "SecTransformExecute returned non-data")
     }
-    return resultData.base64EncodedString();
+    return resultData.base64EncodedString()
 }
 
 func edSignature(path: URL, publicEdKey: Data, privateEdKey: Data) throws -> String {

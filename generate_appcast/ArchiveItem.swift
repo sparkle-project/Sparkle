@@ -12,23 +12,23 @@ class DeltaUpdate {
     var edSignature: String?;
 
     init(fromVersion: String, archivePath: URL) {
-        self.archivePath = archivePath;
-        self.fromVersion = fromVersion;
+        self.archivePath = archivePath
+        self.fromVersion = fromVersion
     }
 
-    var fileSize : Int64 {
-        let archiveFileAttributes = try! FileManager.default.attributesOfItem(atPath: self.archivePath.path);
-        return (archiveFileAttributes[.size] as! NSNumber).int64Value;
+    var fileSize: Int64 {
+        let archiveFileAttributes = try! FileManager.default.attributesOfItem(atPath: self.archivePath.path)
+        return (archiveFileAttributes[.size] as! NSNumber).int64Value
     }
 
     class func create(from: ArchiveItem, to: ArchiveItem, archivePath: URL) throws -> DeltaUpdate {
-        var applyDiffError: NSError? = nil;
+        var applyDiffError: NSError?
 
-        if (!createBinaryDelta(from.appPath.path, to.appPath.path, archivePath.path, .beigeMajorVersion, false, &applyDiffError)) {
-            throw applyDiffError!;
+        if !createBinaryDelta(from.appPath.path, to.appPath.path, archivePath.path, .beigeMajorVersion, false, &applyDiffError) {
+            throw applyDiffError!
         }
 
-        return DeltaUpdate(fromVersion: from.version, archivePath: archivePath);
+        return DeltaUpdate(fromVersion: from.version, archivePath: archivePath)
     }
 }
 
@@ -82,7 +82,7 @@ class ArchiveItem: CustomStringConvertible {
 
             let appPath = bundles[0];
             guard let infoPlist = NSDictionary(contentsOf: appPath.appendingPathComponent("Contents/Info.plist")) else {
-                throw makeError(code: .unarchivingError, "No plist \(appPath.path)");
+                throw makeError(code: .unarchivingError, "No plist \(appPath.path)")
             }
             guard let version = infoPlist[kCFBundleVersionKey] as? String else {
                 throw makeError(code: .unarchivingError, "No Version \(kCFBundleVersionKey as String? ?? "missing kCFBundleVersionKey") \(appPath)");
@@ -91,9 +91,9 @@ class ArchiveItem: CustomStringConvertible {
             let publicEdKey = infoPlist[SUPublicEDKeyKey] as? String;
             let supportsDSA = infoPlist[SUPublicDSAKeyKey] != nil || infoPlist[SUPublicDSAKeyFileKey] != nil;
 
-            var feedURL:URL? = nil;
+            var feedURL: URL?
             if let feedURLStr = infoPlist["SUFeedURL"] as? String {
-                feedURL = URL(string: feedURLStr);
+                feedURL = URL(string: feedURLStr)
             }
 
             try self.init(version: version,
@@ -105,21 +105,21 @@ class ArchiveItem: CustomStringConvertible {
                           appPath: appPath,
                           archivePath: archivePath);
         } else {
-            throw makeError(code: .missingUpdateError, "No supported items in \(unarchivedDir) \(items) [note: only .app bundles are supported]");
+            throw makeError(code: .missingUpdateError, "No supported items in \(unarchivedDir) \(items) [note: only .app bundles are supported]")
         }
     }
 
     var shortVersion: String {
-        return self._shortVersion ?? self.version;
+        return self._shortVersion ?? self.version
     }
 
-    var description : String {
+    var description: String {
         return "\(self.archivePath) \(self.version)"
     }
 
     var archiveURL: URL? {
         guard let escapedFilename = self.archivePath.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
-            return nil;
+            return nil
         }
         if let relative = self.feedURL {
             return URL(string: escapedFilename, relativeTo: relative)
@@ -127,27 +127,27 @@ class ArchiveItem: CustomStringConvertible {
         return URL(string: escapedFilename)
     }
 
-    var pubDate : String {
-        let date = self.archiveFileAttributes[.creationDate] as! Date;
-        let formatter = DateFormatter();
-        formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss ZZ";
-        return formatter.string(from: date);
+    var pubDate: String {
+        let date = self.archiveFileAttributes[.creationDate] as! Date
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss ZZ"
+        return formatter.string(from: date)
     }
 
-    var fileSize : Int64 {
-        return (self.archiveFileAttributes[.size] as! NSNumber).int64Value;
+    var fileSize: Int64 {
+        return (self.archiveFileAttributes[.size] as! NSNumber).int64Value
     }
 
     private var releaseNotesPath : URL? {
         var basename = self.archivePath.deletingPathExtension();
         if basename.pathExtension == "tar" { // tar.gz
-            basename = basename.deletingPathExtension();
+            basename = basename.deletingPathExtension()
         }
-        let releaseNotes = basename.appendingPathExtension("html");
+        let releaseNotes = basename.appendingPathExtension("html")
         if !FileManager.default.fileExists(atPath: releaseNotes.path) {
-            return nil;
+            return nil
         }
-        return releaseNotes;
+        return releaseNotes
     }
 
     private func getReleaseNotesAsHTMLFragment(_ path: URL) -> String?  {
@@ -155,29 +155,29 @@ class ArchiveItem: CustomStringConvertible {
             if html.utf8.count < 1000 &&
                 !html.localizedCaseInsensitiveContains("<!DOCTYPE") &&
                 !html.localizedCaseInsensitiveContains("<body") {
-                return html;
+                return html
             }
         }
-        return nil;
+        return nil
     }
 
-    var releaseNotesHTML : String? {
+    var releaseNotesHTML: String? {
         if let path = self.releaseNotesPath {
-            return self.getReleaseNotesAsHTMLFragment(path);
+            return self.getReleaseNotesAsHTMLFragment(path)
         }
-        return nil;
+        return nil
     }
 
-    var releaseNotesURL : URL? {
+    var releaseNotesURL: URL? {
         guard let path = self.releaseNotesPath else {
-            return nil;
+            return nil
         }
         // The file is already used as inline description
         if self.getReleaseNotesAsHTMLFragment(path) != nil {
-            return nil;
+            return nil
         }
         guard let escapedFilename = path.lastPathComponent.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
-            return nil;
+            return nil
         }
         if let relative = self.feedURL {
             return URL(string: escapedFilename, relativeTo: relative)
@@ -185,5 +185,5 @@ class ArchiveItem: CustomStringConvertible {
         return URL(string: escapedFilename)
     }
 
-    let mimeType = "application/octet-stream";
+    let mimeType = "application/octet-stream"
 }
