@@ -11,7 +11,12 @@
 #import "SUCodeSigningVerifier.h"
 #import "SUFileManager.h"
 
+#if defined(__MAC_10_15)
+// In macOS 10.15 and later, pre-installed apps are installed under the System folder
+#define CALCULATOR_PATH @"/System/Applications/Calculator.app"
+#else
 #define CALCULATOR_PATH @"/Applications/Calculator.app"
+#endif
 
 @interface SUCodeSigningVerifierTest : XCTestCase
 
