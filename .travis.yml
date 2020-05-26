@@ -8,4 +8,4 @@ osx_image:
   - xcode10.3
   - xcode11.4
 script:
-  - set -o pipefail && xcodebuild -scheme Distribution -configuration Coverage -derivedDataPath build | xcpretty
+  - set -o pipefail && xcodebuild test -project Sparkle.xcodeproj -scheme Distribution -derivedDataPath build -enableCodeCoverage YES | xcpretty
