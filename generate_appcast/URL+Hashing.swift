@@ -24,7 +24,7 @@ extension FileHandle {
 
             guard data.count > 0 else { break }
 
-            let _ = data.withUnsafeBytes {
+            _ = data.withUnsafeBytes {
                 CC_SHA256_Update(&context, $0.baseAddress, numericCast($0.count))
             }
         }

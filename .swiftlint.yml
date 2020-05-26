@@ -1,0 +1,20 @@
+excluded:
+  - Vendor
+disabled_rules:
+  - opening_brace
+  - empty_parentheses_with_trailing_closure
+  - function_body_length
+  - line_length
+  - cyclomatic_complexity
+  - large_tuple
+
+# Rule-specific config
+trailing_comma:
+  mandatory_comma: true
+force_try:
+  severity: warning
+force_cast:
+  severity: warning
+identifier_name:
+  min_length:
+    warning: 2
