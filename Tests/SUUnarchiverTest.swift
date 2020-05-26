@@ -47,6 +47,7 @@ class SUUnarchiverTest: XCTestCase
         }, progressBlock: nil)
     }
 
+    // swiftlint:disable function_parameter_count
     func unarchiveTestSuccessAppWithExtension(_ archiveExtension: String, appName: String, tempDirectoryURL: URL, tempArchiveURL: URL, archiveResourceURL: URL, password: String?, testExpectation: XCTestExpectation) {
 
         let fileManager = FileManager.default
