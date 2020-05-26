@@ -1,11 +1,9 @@
 os: osx
 language: objective-c
 osx_image:
-  - xcode8
-  - xcode8.3
-  - xcode9
-  - xcode9.4
+  - xcode10
   - xcode10.3
+  - xcode11.3
   - xcode11.4
 script:
   - set -o pipefail && xcodebuild test -project Sparkle.xcodeproj -scheme Distribution -derivedDataPath build -enableCodeCoverage YES | xcpretty
