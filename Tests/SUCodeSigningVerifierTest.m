@@ -12,7 +12,7 @@
 #import "SUAdHocCodeSigning.h"
 #import "SUFileManager.h"
 
-#define CALCULATOR_PATH @"/Applications/Calculator.app"
+#define CALCULATOR_PATH @"/System/Applications/Calculator.app"
 
 @interface SUCodeSigningVerifierTest : XCTestCase
 
