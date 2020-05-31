@@ -14,7 +14,7 @@
 "%@ %@ is now available--you have %@. Would you like to download it now?" = "%1$@ %2$@ je sada dostupna. Ti koristiš verziju %3$@. Želiš li je sada preuzeti?";
 
 /* Description text for SUUpdateAlert when the update informational with no download. */
-"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ je sada dostupna. Ti koristiš verziju %3$@. Želiš li saznati više o ovoj nadogradnji na internetu?";
+"%@ %@ is now available--you have %@. Would you like to learn more about this update on the web?" = "%1$@ %2$@ je sada dostupna. Ti koristiš verziju %3$@. Želiš li saznati više o ovoj nadogradnji na našim web-stranicama?";
 
 "%@ downloaded" = "%@ preuzeto";
 
@@ -84,7 +84,7 @@
 
 "Update Error!" = "Greška prilikom aktualiziranja!";
 
-"Updating %@" = "Aktualiziranje %@a";
+"Updating %@" = "%@ se aktualizira";
 
 /* 'Error' message when the user checks for updates but is already current or the feed doesn't contain any updates. (not necessarily shown in UI) */
 "You already have the newest version of %@." = "Već koristiš najnoviju verziju za %@.";
