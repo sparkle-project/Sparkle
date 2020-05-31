@@ -61,7 +61,7 @@
                     <button verticalHuggingPriority="750" misplaced="YES" id="15">
                         <rect key="frame" x="407" y="12" width="195" height="32"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
-                        <buttonCell key="cell" type="push" title="Instaliraj i ponovo pokreni" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="41">
+                        <buttonCell key="cell" type="push" title="Instaliraj i pokreni ponovo" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="41">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                             <string key="keyEquivalent" base64-UTF8="YES">
@@ -75,7 +75,7 @@ DQ
                     <button verticalHuggingPriority="750" id="30">
                         <rect key="frame" x="102" y="12" width="116" height="32"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <buttonCell key="cell" type="push" title="Ne instaliraj" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="44">
+                        <buttonCell key="cell" type="push" title="Nemoj instalirati" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="44">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
