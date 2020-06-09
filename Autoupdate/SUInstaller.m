@@ -129,43 +129,25 @@
     // ahead of time whether or not this installer tool should be ran as root or not
     id <SUInstallerProtocol> installer = nil;
     if (isPackage && isGuided) {
-        if (![expectedInstallationType isEqualToString:SPUInstallationTypeGuidedPackage]) {
-            if (error != NULL) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found guided package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SPUInstallationTypeGuidedPackage] }];
-            }
-        } else {
-            installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath installationPath:host.bundlePath];
-        }
+        installer = [[SUGuidedPackageInstaller alloc] initWithPackagePath:newDownloadPath installationPath:host.bundlePath];
     } else if (isPackage) {
-        if (![expectedInstallationType isEqualToString:SPUInstallationTypeInteractivePackage]) {
-            if (error != NULL) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found package installer but '%@=%@' was probably missing in the appcast item enclosure", SUAppcastAttributeInstallationType, SPUInstallationTypeInteractivePackage] }];
-            }
-        } else {
-            installer = [[SUPackageInstaller alloc] initWithPackagePath:newDownloadPath installationPath:host.bundlePath];
-        }
+        installer = [[SUPackageInstaller alloc] initWithPackagePath:newDownloadPath installationPath:host.bundlePath];
     } else {
-        if (![expectedInstallationType isEqualToString:SPUInstallationTypeApplication]) {
-            if (error != NULL) {
-                *error = [NSError errorWithDomain:SUSparkleErrorDomain code:SUInstallationError userInfo:@{ NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Found regular application update but expected '%@=%@' from the appcast item enclosure instead", SUAppcastAttributeInstallationType, expectedInstallationType] }];
-            }
-        } else {
-            NSString *normalizedInstallationPath = nil;
-            if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
-                normalizedInstallationPath = [self normalizedInstallationPathForHost:host];
-            }
+         NSString *normalizedInstallationPath = nil;
+         if (SPARKLE_NORMALIZE_INSTALLED_APPLICATION_NAME) {
+             normalizedInstallationPath = [self normalizedInstallationPathForHost:host];
+         }
             
-            // If we have a normalized path, we'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
-            // Otherwise if there's no normalized path (the more likely case), we'll just use the host bundle's path
-            NSString *installationPath;
-            if (normalizedInstallationPath != nil && ![[NSFileManager defaultManager] fileExistsAtPath:normalizedInstallationPath]) {
-                installationPath = normalizedInstallationPath;
-            } else {
-                installationPath = host.bundlePath;
-            }
+         // If we have a normalized path, we'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
+         // Otherwise if there's no normalized path (the more likely case), we'll just use the host bundle's path
+         NSString *installationPath;
+         if (normalizedInstallationPath != nil && ![[NSFileManager defaultManager] fileExistsAtPath:normalizedInstallationPath]) {
+             installationPath = normalizedInstallationPath;
+         } else {
+             installationPath = host.bundlePath;
+         }
             
-            installer = [[SUPlainInstaller alloc] initWithHost:host bundlePath:newDownloadPath installationPath:installationPath];
-        }
+         installer = [[SUPlainInstaller alloc] initWithHost:host bundlePath:newDownloadPath installationPath:installationPath];
     }
     
     return installer;
