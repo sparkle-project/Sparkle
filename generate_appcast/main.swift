@@ -11,7 +11,7 @@ import Foundation
 var verbose = false
 
 func printUsage() {
-    let command = URL(fileURLWithPath: CommandLine.arguments.first!).lastPathComponent;
+    let command = URL(fileURLWithPath: CommandLine.arguments.first!).lastPathComponent
     print("Generate appcast from a directory of Sparkle update archives\n",
           "Usage:\n",
           "      \(command) <directory with update files>\n",
@@ -26,33 +26,33 @@ func printUsage() {
 }
 
 func loadPrivateKeys(_ privateDSAKey: SecKey?) -> PrivateKeys {
-    var privateEdKey: Data?;
-    var publicEdKey: Data?;
-    var item: CFTypeRef?;
+    var privateEdKey: Data?
+    var publicEdKey: Data?
+    var item: CFTypeRef?
     let res = SecItemCopyMatching([
         kSecClass as String: kSecClassGenericPassword,
         kSecAttrService as String: "https://sparkle-project.org",
         kSecAttrAccount as String: "ed25519",
         kSecAttrProtocol as String: kSecAttrProtocolSSH,
         kSecReturnData as String: kCFBooleanTrue,
-        ] as CFDictionary, &item);
+        ] as CFDictionary, &item)
     if res == errSecSuccess, let encoded = item as? Data, let keys = Data(base64Encoded: encoded) {
-        privateEdKey = keys[0..<64];
-        publicEdKey = keys[64...];
+        privateEdKey = keys[0..<64]
+        publicEdKey = keys[64...]
     } else {
-        print("Warning: Private key not found in the Keychain (\(res)). Please run the generate_keys tool");
+        print("Warning: Private key not found in the Keychain (\(res)). Please run the generate_keys tool")
     }
-    return PrivateKeys(privateDSAKey: privateDSAKey, privateEdKey: privateEdKey, publicEdKey: publicEdKey);
+    return PrivateKeys(privateDSAKey: privateDSAKey, privateEdKey: privateEdKey, publicEdKey: publicEdKey)
 }
 
 func main() {
-    let args = CommandLine.arguments;
+    let args = CommandLine.arguments
     if args.count < 2 {
         printUsage()
         exit(1)
     }
 
-    var privateDSAKey: SecKey? = nil;
+    var privateDSAKey: SecKey?
 
     // this was typical usage for DSA keys
     if args.count == 3 || (args.count == 4 && args[1] == "-f") {
@@ -96,8 +96,7 @@ func main() {
             print("Unable to load DSA private key '\(keyName)' from keychain at", keychainURL.path, "\n", error)
             exit(1)
         }
-    }
-    else if args.count != 2 {
+    } else if args.count != 2 {
         printUsage()
         exit(1)
     }
@@ -106,7 +105,7 @@ func main() {
     let keys = loadPrivateKeys(privateDSAKey)
 
     do {
-        let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, keys: keys, verbose:verbose);
+        let allUpdates = try makeAppcast(archivesSourceDir: archivesSourceDir, keys: keys, verbose: verbose)
 
         for (appcastFile, updates) in allUpdates {
             let appcastDestPath = URL(fileURLWithPath: appcastFile, relativeTo: archivesSourceDir)

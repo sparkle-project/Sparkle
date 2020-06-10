@@ -6,10 +6,10 @@
 import Foundation
 
 class DeltaUpdate {
-    let fromVersion: String;
-    let archivePath: URL;
-    var dsaSignature: String?;
-    var edSignature: String?;
+    let fromVersion: String
+    let archivePath: URL
+    var dsaSignature: String?
+    var edSignature: String?
 
     init(fromVersion: String, archivePath: URL) {
         self.archivePath = archivePath
@@ -33,36 +33,36 @@ class DeltaUpdate {
 }
 
 class ArchiveItem: CustomStringConvertible {
-    let version: String;
+    let version: String
     // swiftlint:disable identifier_name
-    let _shortVersion: String?;
-    let minimumSystemVersion: String;
-    let archivePath: URL;
-    let appPath: URL;
-    let feedURL: URL?;
-    let publicEdKey: Data?;
-    let supportsDSA: Bool;
-    let archiveFileAttributes: [FileAttributeKey:Any];
-    var deltas: [DeltaUpdate];
+    let _shortVersion: String?
+    let minimumSystemVersion: String
+    let archivePath: URL
+    let appPath: URL
+    let feedURL: URL?
+    let publicEdKey: Data?
+    let supportsDSA: Bool
+    let archiveFileAttributes: [FileAttributeKey: Any]
+    var deltas: [DeltaUpdate]
 
-    var dsaSignature: String?;
-    var edSignature: String?;
+    var dsaSignature: String?
+    var edSignature: String?
 
     init(version: String, shortVersion: String?, feedURL: URL?, minimumSystemVersion: String?, publicEdKey: String?, supportsDSA: Bool, appPath: URL, archivePath: URL) throws {
-        self.version = version;
-        self._shortVersion = shortVersion;
-        self.feedURL = feedURL;
-        self.minimumSystemVersion = minimumSystemVersion ?? "10.7";
-        self.archivePath = archivePath;
-        self.appPath = appPath;
-        self.supportsDSA = supportsDSA;
+        self.version = version
+        self._shortVersion = shortVersion
+        self.feedURL = feedURL
+        self.minimumSystemVersion = minimumSystemVersion ?? "10.7"
+        self.archivePath = archivePath
+        self.appPath = appPath
+        self.supportsDSA = supportsDSA
         if let publicEdKey = publicEdKey {
-            self.publicEdKey = Data(base64Encoded: publicEdKey);
+            self.publicEdKey = Data(base64Encoded: publicEdKey)
         } else {
-            self.publicEdKey = nil;
+            self.publicEdKey = nil
         }
-        self.archiveFileAttributes = try FileManager.default.attributesOfItem(atPath: self.archivePath.path);
-        self.deltas = [];
+        self.archiveFileAttributes = try FileManager.default.attributesOfItem(atPath: self.archivePath.path)
+        self.deltas = []
     }
 
     convenience init(fromArchive archivePath: URL, unarchivedDir: URL) throws {
@@ -75,22 +75,22 @@ class ArchiveItem: CustomStringConvertible {
             } else {
                 return false
             }
-        });
+        })
         if bundles.count > 0 {
             if bundles.count > 1 {
-                throw makeError(code: .unarchivingError, "Too many bundles in \(unarchivedDir.path) \(bundles)");
+                throw makeError(code: .unarchivingError, "Too many bundles in \(unarchivedDir.path) \(bundles)")
             }
 
-            let appPath = bundles[0];
+            let appPath = bundles[0]
             guard let infoPlist = NSDictionary(contentsOf: appPath.appendingPathComponent("Contents/Info.plist")) else {
                 throw makeError(code: .unarchivingError, "No plist \(appPath.path)")
             }
             guard let version = infoPlist[kCFBundleVersionKey] as? String else {
-                throw makeError(code: .unarchivingError, "No Version \(kCFBundleVersionKey as String? ?? "missing kCFBundleVersionKey") \(appPath)");
+                throw makeError(code: .unarchivingError, "No Version \(kCFBundleVersionKey as String? ?? "missing kCFBundleVersionKey") \(appPath)")
             }
-            let shortVersion = infoPlist["CFBundleShortVersionString"] as? String;
-            let publicEdKey = infoPlist[SUPublicEDKeyKey] as? String;
-            let supportsDSA = infoPlist[SUPublicDSAKeyKey] != nil || infoPlist[SUPublicDSAKeyFileKey] != nil;
+            let shortVersion = infoPlist["CFBundleShortVersionString"] as? String
+            let publicEdKey = infoPlist[SUPublicEDKeyKey] as? String
+            let supportsDSA = infoPlist[SUPublicDSAKeyKey] != nil || infoPlist[SUPublicDSAKeyFileKey] != nil
 
             var feedURL: URL?
             if let feedURLStr = infoPlist["SUFeedURL"] as? String {
@@ -104,7 +104,7 @@ class ArchiveItem: CustomStringConvertible {
                           publicEdKey: publicEdKey,
                           supportsDSA: supportsDSA,
                           appPath: appPath,
-                          archivePath: archivePath);
+                          archivePath: archivePath)
         } else {
             throw makeError(code: .missingUpdateError, "No supported items in \(unarchivedDir) \(items) [note: only .app bundles are supported]")
         }
@@ -139,8 +139,8 @@ class ArchiveItem: CustomStringConvertible {
         return (self.archiveFileAttributes[.size] as! NSNumber).int64Value
     }
 
-    private var releaseNotesPath : URL? {
-        var basename = self.archivePath.deletingPathExtension();
+    private var releaseNotesPath: URL? {
+        var basename = self.archivePath.deletingPathExtension()
         if basename.pathExtension == "tar" { // tar.gz
             basename = basename.deletingPathExtension()
         }

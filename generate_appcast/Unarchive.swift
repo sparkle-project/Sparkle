@@ -14,11 +14,11 @@ func unarchive(itemPath: URL, archiveDestDir: URL, callback: @escaping (Error?) 
 
     do {
         do {
-            try fileManager.linkItem(at: itemPath, to: itemCopy);
+            try fileManager.linkItem(at: itemPath, to: itemCopy)
         } catch {
-            try fileManager.copyItem(at: itemPath, to: itemCopy);
+            try fileManager.copyItem(at: itemPath, to: itemCopy)
         }
-        if let unarchiver = SUUnarchiver.unarchiver(forPath: itemCopy.path, updatingHostBundlePath:nil, decryptionPassword:nil) {
+        if let unarchiver = SUUnarchiver.unarchiver(forPath: itemCopy.path, updatingHostBundlePath: nil, decryptionPassword: nil) {
             unarchiver.unarchive(completionBlock: { (error: Error?) in
                 if error != nil {
                     callback(error)

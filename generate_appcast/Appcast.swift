@@ -14,11 +14,11 @@ func makeError(code: SUError, _ description: String) -> NSError {
         ])
 }
 
-func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throws -> [String:[ArchiveItem]] {
-    let cacheDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("Sparkle_generate_appcast");
-    let comparator = SUStandardVersionComparator();
+func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throws -> [String: [ArchiveItem]] {
+    let cacheDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("Sparkle_generate_appcast")
+    let comparator = SUStandardVersionComparator()
 
-    let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir, archivesDestDir: cacheDir, verbose:verbose))
+    let allUpdates = (try unarchiveUpdates(archivesSourceDir: archivesSourceDir, archivesDestDir: cacheDir, verbose: verbose))
         .sorted(by: {
             .orderedDescending == comparator.compareVersion($0.version, toVersion: $1.version)
         })
@@ -36,30 +36,30 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
         DispatchQueue.global().async {
             if let privateDSAKey = keys.privateDSAKey {
                 do {
-                    update.dsaSignature = try dsaSignature(path: update.archivePath, privateDSAKey: privateDSAKey);
+                    update.dsaSignature = try dsaSignature(path: update.archivePath, privateDSAKey: privateDSAKey)
                 } catch {
-                    print(update, error);
+                    print(update, error)
                 }
             } else if update.supportsDSA {
-                print("Note: did not sign with legacy DSA \(update.archivePath.path) because private DSA key file was not specified");
+                print("Note: did not sign with legacy DSA \(update.archivePath.path) because private DSA key file was not specified")
             }
             if let publicEdKey = update.publicEdKey {
                 if let privateEdKey = keys.privateEdKey, let expectedPublicKey = keys.publicEdKey {
                     if publicEdKey == expectedPublicKey {
                         do {
-                            update.edSignature = try edSignature(path: update.archivePath, publicEdKey: publicEdKey, privateEdKey: privateEdKey);
+                            update.edSignature = try edSignature(path: update.archivePath, publicEdKey: publicEdKey, privateEdKey: privateEdKey)
                         } catch {
-                            print(update, error);
+                            print(update, error)
                         }
                     } else {
-                        print("Warning: SUPublicEDKey in the app \(update.archivePath.path) does not match key EdDSA in the Keychain. Run generate_keys and update Info.plist to match");
+                        print("Warning: SUPublicEDKey in the app \(update.archivePath.path) does not match key EdDSA in the Keychain. Run generate_keys and update Info.plist to match")
                     }
                 } else {
-                    print("Warning: could not sign \(update.archivePath.path) due to lack of private EdDSA key");
+                    print("Warning: could not sign \(update.archivePath.path) due to lack of private EdDSA key")
                 }
             }
 
-            group.leave();
+            group.leave()
         }
 
         let appcastFile = update.feedURL?.lastPathComponent ?? "appcast.xml"
@@ -85,7 +85,7 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
             let appBaseName = latestItem.appPath.deletingPathExtension().lastPathComponent
             for item in updates {
                 if numDeltas > maxDeltas {
-                    break;
+                    break
                 }
 
                 // No downgrades
@@ -94,17 +94,17 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
                 }
                 // Old version will not be able to verify the new version
                 if !item.supportsDSA && item.publicEdKey == nil {
-                    continue;
+                    continue
                 }
 
                 let deltaBaseName = appBaseName + latestItem.version + "-" + item.version
                 let deltaPath = archivesSourceDir.appendingPathComponent(deltaBaseName).appendingPathExtension("delta")
 
-                var delta:DeltaUpdate;
-                let ignoreMarkerPath = cacheDir.appendingPathComponent(deltaPath.lastPathComponent).appendingPathExtension(".ignore");
-                let fm = FileManager.default;
+                var delta: DeltaUpdate
+                let ignoreMarkerPath = cacheDir.appendingPathComponent(deltaPath.lastPathComponent).appendingPathExtension(".ignore")
+                let fm = FileManager.default
                 if fm.fileExists(atPath: ignoreMarkerPath.path) {
-                    continue;
+                    continue
                 }
                 if !fm.fileExists(atPath: deltaPath.path) {
                     do {
@@ -117,37 +117,37 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
                     delta = DeltaUpdate(fromVersion: item.version, archivePath: deltaPath)
                 }
 
-                numDeltas += 1;
+                numDeltas += 1
 
                 // Require delta to be a bit smaller
                 if delta.fileSize / 7 > latestItem.fileSize / 8 {
                     markDeltaAsIgnored(delta: delta, markerPath: ignoreMarkerPath)
-                    continue;
+                    continue
                 }
 
-                group.enter();
+                group.enter()
                 DispatchQueue.global().async {
                     if item.supportsDSA, let privateDSAKey = keys.privateDSAKey {
                         do {
-                            delta.dsaSignature = try dsaSignature(path: deltaPath, privateDSAKey: privateDSAKey);
+                            delta.dsaSignature = try dsaSignature(path: deltaPath, privateDSAKey: privateDSAKey)
                         } catch {
                             print(delta.archivePath.lastPathComponent, error)
                         }
                     }
                     if let publicEdKey = item.publicEdKey, let privateEdKey = keys.privateEdKey {
                         do {
-                            delta.edSignature = try edSignature(path: deltaPath, publicEdKey: publicEdKey, privateEdKey: privateEdKey);
+                            delta.edSignature = try edSignature(path: deltaPath, publicEdKey: publicEdKey, privateEdKey: privateEdKey)
                         } catch {
-                            print(delta.archivePath.lastPathComponent, error);
+                            print(delta.archivePath.lastPathComponent, error)
                         }
                     }
                     if delta.dsaSignature != nil || delta.edSignature != nil {
-                        latestItem.deltas.append(delta);
+                        latestItem.deltas.append(delta)
                     } else {
                         markDeltaAsIgnored(delta: delta, markerPath: ignoreMarkerPath)
-                        print("Delta \(delta.archivePath.path) ignored, because it could not be signed");
+                        print("Delta \(delta.archivePath.path) ignored, because it could not be signed")
                     }
-                    group.leave();
+                    group.leave()
                 }
             }
         }
@@ -159,6 +159,6 @@ func makeAppcast(archivesSourceDir: URL, keys: PrivateKeys, verbose: Bool) throw
 }
 
 func markDeltaAsIgnored(delta: DeltaUpdate, markerPath: URL) {
-    let _ = try? FileManager.default.removeItem(at: delta.archivePath)
-    let _ = try? Data.init().write(to: markerPath); // 0-sized file
+    _ = try? FileManager.default.removeItem(at: delta.archivePath)
+    _ = try? Data.init().write(to: markerPath); // 0-sized file
 }
