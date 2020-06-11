@@ -156,11 +156,6 @@ struct GenerateAppcast: ParsableCommand {
     }
 
     func run() throws {
-//        var privateDSAKey: SecKey?
-//        var privateEdString: String?
-//        var downloadUrlPrefix: URL?
-//        var archivesSourceDir: URL
-
         let (privateDSAKey, privateEdString, downloadUrlPrefix, archivesSourceDir) = try parseCommandLineOptions()
 
         let keys = loadPrivateKeys(privateDSAKey, privateEdString)
