@@ -99,16 +99,25 @@ func edSignature(path: URL, publicEdKey: Data, privateEdKey: Data) throws -> Str
     assert(publicEdKey.count == 32)
     assert(privateEdKey.count == 64)
     let data = try Data.init(contentsOf: path, options: .mappedIfSafe)
-    let len = data.count
     var output = Data(count: 64)
-    output.withUnsafeMutableBytes({ (output: UnsafeMutablePointer<UInt8>) in
-        data.withUnsafeBytes({ (data: UnsafePointer<UInt8>) in
-            publicEdKey.withUnsafeBytes({ (publicEdKey: UnsafePointer<UInt8>) in
-                privateEdKey.withUnsafeBytes({ (privateEdKey: UnsafePointer<UInt8>) in
-                    ed25519_sign(output, data, len, publicEdKey, privateEdKey)
+
+    output.withUnsafeMutableBytes({ (output: UnsafeMutableRawBufferPointer) in
+        let output = output.bindMemory(to: UInt8.self)
+
+        data.withUnsafeBytes({ (data: UnsafeRawBufferPointer) in
+            let data = data.bindMemory(to: UInt8.self)
+
+            publicEdKey.withUnsafeBytes({ (publicEdKey: UnsafeRawBufferPointer) in
+                let publicEdKey = publicEdKey.bindMemory(to: UInt8.self)
+
+                privateEdKey.withUnsafeBytes({ (privateEdKey: UnsafeRawBufferPointer) in
+                    let privateEdKey = privateEdKey.bindMemory(to: UInt8.self)
+
+                    ed25519_sign(output.baseAddress, data.baseAddress, data.count, publicEdKey.baseAddress, privateEdKey.baseAddress)
                 })
             })
         })
     })
+
     return output.base64EncodedString()
 }
