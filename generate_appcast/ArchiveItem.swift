@@ -86,7 +86,7 @@ class ArchiveItem: CustomStringConvertible {
             guard let infoPlist = NSDictionary(contentsOf: appPath.appendingPathComponent("Contents/Info.plist")) else {
                 throw makeError(code: .unarchivingError, "No plist \(appPath.path)")
             }
-            guard let version = infoPlist[kCFBundleVersionKey] as? String else {
+            guard let version = infoPlist[kCFBundleVersionKey!] as? String else {
                 throw makeError(code: .unarchivingError, "No Version \(kCFBundleVersionKey as String? ?? "missing kCFBundleVersionKey") \(appPath)")
             }
             let shortVersion = infoPlist["CFBundleShortVersionString"] as? String
