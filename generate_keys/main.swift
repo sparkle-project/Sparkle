@@ -41,7 +41,7 @@ func generateKeyPair() -> Data {
     var publicEdKey = Data(count: 32)
     var privateEdKey = Data(count: 64)
 
-    if !seed.withUnsafeMutableBytes { (seed: UnsafeMutablePointer<UInt8>) in 0 == ed25519_create_seed(seed)} {
+    if !seed.withUnsafeMutableBytes({ (seed: UnsafeMutablePointer<UInt8>) in 0 == ed25519_create_seed(seed)}) {
         print("\nERROR: Unable to initialize random seed")
         exit(1)
     }
