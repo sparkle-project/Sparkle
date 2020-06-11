@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 47;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -276,6 +276,7 @@
 		767B61AD1972D488004E0C3C /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */; };
 		767B61AE1972D488004E0C3C /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */; };
 		A5BF4F1D1BC7668B007A052A /* SUTestWebServer.m in Sources */ = {isa = PBXBuildFile; fileRef = A5BF4F1C1BC7668B007A052A /* SUTestWebServer.m */; };
+		B2BE02722491ADCB005BD747 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = B2BE02712491ADCB005BD747 /* ArgumentParser */; };
 		B2D3F865245CEA24009BA78C /* URL+Hashing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D3F864245CEA24009BA78C /* URL+Hashing.swift */; };
 		C23E885B1BE7B24F0050BB73 /* SparkleTestCodeSignApp.enc.dmg in Resources */ = {isa = PBXBuildFile; fileRef = C23E88591BE7AF890050BB73 /* SparkleTestCodeSignApp.enc.dmg */; };
 		E1545EC51E1D7E0200FAECE8 /* SUTouchBarButtonGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = E1545EC31E1D7E0200FAECE8 /* SUTouchBarButtonGroup.h */; };
@@ -1007,6 +1008,7 @@
 				EA4311FC229D65E400A5503D /* libbsdiff.a in Frameworks */,
 				5AE13FBD1E0DA39B000D2C2C /* libbz2.tbd in Frameworks */,
 				EA4311BD229D5FF000A5503D /* libed25519.a in Frameworks */,
+				B2BE02722491ADCB005BD747 /* ArgumentParser in Frameworks */,
 				5AAD006C1E0C2DBF00AF411E /* libxar.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1806,6 +1808,9 @@
 			dependencies = (
 			);
 			name = generate_appcast;
+			packageProductDependencies = (
+				B2BE02712491ADCB005BD747 /* ArgumentParser */,
+			);
 			productName = Appcast;
 			productReference = 5AE13FB31E0D9E07000D2C2C /* generate_appcast */;
 			productType = "com.apple.product-type.tool";
@@ -1822,6 +1827,8 @@
 			dependencies = (
 			);
 			name = generate_keys;
+			packageProductDependencies = (
+			);
 			productName = generate_keys;
 			productReference = 5AB8F19F214DA72000A1187F /* generate_keys */;
 			productType = "com.apple.product-type.tool";
@@ -2068,6 +2075,9 @@
 				hr,
 			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* Sparkle */;
+			packageReferences = (
+				B2BE026E2491AC68005BD747 /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
+			);
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -2809,7 +2819,11 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -2820,7 +2834,11 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
 			};
 			name = Release;
 		};
@@ -2828,7 +2846,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CF0D94A70100DD942E /* ConfigCommonDebug.xcconfig */;
 			buildSettings = {
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -2836,8 +2854,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CC0D94A70100DD942E /* ConfigCommonRelease.xcconfig */;
 			buildSettings = {
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 4.2;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -3160,6 +3179,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B2BE026E2491AC68005BD747 /* XCRemoteSwiftPackageReference "swift-argument-parser" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "git@github.com:apple/swift-argument-parser.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B2BE02712491ADCB005BD747 /* ArgumentParser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B2BE026E2491AC68005BD747 /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
+			productName = ArgumentParser;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0867D690FE84028FC02AAC07 /* Project object */;
 }
