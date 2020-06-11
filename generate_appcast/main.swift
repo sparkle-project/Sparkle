@@ -10,66 +10,45 @@ import Foundation
 import ArgumentParser
 
 struct GenerateAppcast: ParsableCommand {
-    static var configuration = CommandConfiguration(commandName: "generate_appcast", abstract: "Generate appcast from a directory of Sparkle update archives", discussion: """
+    static var commandName = URL(fileURLWithPath: CommandLine.arguments.first!).lastPathComponent
+    static var configuration: CommandConfiguration = {
+        return CommandConfiguration(commandName: commandName, abstract: "Generate appcast from a directory of Sparkle update archives", discussion: """
             Appcast files and deltas will be written to the archives directory.
             Note that pkg-based updates are not supported.
             """)
+    }()
 
-    @Option(name: .customShort("f"), help: ArgumentHelp("provide the path to the private DSA key", valueName: "path"))
+    @Option(name: .customShort("f"), help: ArgumentHelp("The path to the private DSA key.", valueName: "dsa key"))
     var privateDSAKeyPath: String?
 
-    @Option(name: .customShort("n"), help: ArgumentHelp("provide the name of the private DSA key. This option has to be used together with `-k`", valueName: "name"))
+    @Option(name: .customShort("n"), help: ArgumentHelp("The name of the private DSA key. This option must be used together with `-k`.", valueName: "dsa key name"))
     var privateDSAKeyName: String?
 
-    @Option(name: .customShort("k"), help: ArgumentHelp("provide the path to the keychain. This option has to be used together with `-n`", valueName: "path"))
+    @Option(name: .customShort("k"), help: ArgumentHelp("The path to the keychain. This option must be used together with `-n`.", valueName: "keychain"))
     var keychainPath: String?
 
-    @Option(name: .customShort("s"), help: ArgumentHelp("provide the path to the private EdDSA key", valueName: "path"))
+    @Option(name: .customShort("s"), help: ArgumentHelp("The path to the private EdDSA key.", valueName: "eddsa key"))
     var privateEdDSAKeyPath: String?
 
-    @Option(help: ArgumentHelp("provide a static url that will be used as prefix for the url from where updates will be downloaded", valueName: "url"))
+    @Option(help: ArgumentHelp("A static url that will be used as prefix for the url from where updates will be downloaded.", valueName: "url"))
     var downloadURLPrefix: String?
 
     @Argument(help: ArgumentHelp(
         """
         The path to the update directory
+        e.g. \(commandName) ./my-app-release-zipfiles/
         OR for old apps that have DSA keys (deprecated):
             <private dsa key path> <directory with update files>
-        e.g., \(Self.configuration.commandName!) dsa_priv.pem archives/
+        e.g. \(commandName) dsa_priv.pem archives/
         """,
-        valueName: "paths"))
-    var restOfArgs: [String]
+        valueName: "archives folder"))
+    var updatesPathOrDSAKey: String
 
-    var verbose = false
+    @Argument(help: .hidden)
+    var legacyUpdatesPath: String?
 
-//    func printUsage() {
-//        let command = URL(fileURLWithPath: CommandLine.arguments.first!).lastPathComponent
-//        print("Generate appcast from a directory of Sparkle update archives\n",
-//              "Usage:\n",
-//              "      \(command) <directory with update files>\n",
-//            " e.g. \(command) ./my-app-release-zipfiles/\n",
-//            "\nOR for old apps that have a DSA keys (deprecated):\n",
-//            "      \(command) <private DSA key path> <directory with update files>\n",
-//            " e.g. \(command) dsa_priv.pem archives/\n",
-//            "\n",
-//            "Appcast files and deltas will be written to the archives directory.\n",
-//            "Note that pkg-based updates are not supported.\n"
-//        )
-//    }
-//
-//    func printHelp() {
-//        let command = URL(fileURLWithPath: CommandLine.arguments.first!).lastPathComponent
-//        print(
-//            "Usage: \(command) [OPTIONS] [ARCHIVES_FOLDER]\n",
-//            "Options:\n",
-//            "\t-f: provide the path to the private DSA key\n",
-//            "\t-n: provide the name of the private DSA key. This option has to be used together with `-k`\n",
-//            "\t-k: provide the name of the keychain. This option has to be used together with `-n`\n",
-//            "\t-s: provide the path to the private EdDSA key\n",
-//            "\t--download-url-prefix: provide a static url that will be used as prefix for the url from where updates will be downloaded\n"
-//        )
-//    }
-
+    @Flag(help: .hidden)
+    var verbose: Bool
 
     func loadPrivateKeys(_ privateDSAKey: SecKey?, _ privateEdString: String?) -> PrivateKeys {
         var privateEdKey: Data?
@@ -92,7 +71,7 @@ struct GenerateAppcast: ParsableCommand {
                 kSecAttrService as String: "https://sparkle-project.org",
                 kSecAttrAccount as String: "ed25519",
                 kSecAttrProtocol as String: kSecAttrProtocolSSH,
-                kSecReturnData as String: kCFBooleanTrue,
+                kSecReturnData as String: true,
                 ] as CFDictionary, &item)
             if res == errSecSuccess, let encoded = item as? Data, let data = Data(base64Encoded: encoded) {
                 keys = data
@@ -155,36 +134,34 @@ struct GenerateAppcast: ParsableCommand {
 
         // now that all command line options have been removed from the arguments array
         // there should only be the path to the private DSA key (if provided) path to the archives dir left
-        var args = restOfArgs
 
-        if args.count == 2 {
+        if legacyUpdatesPath != nil {
             // if there are two arguments left they are the private DSA key and the path to the archives directory (in this order)
             // first get the private DSA key
-            let privateKeyUrl = URL(fileURLWithPath: restOfArgs[0])
+            let privateKeyUrl = URL(fileURLWithPath: updatesPathOrDSAKey)
             do {
                 privateDSAKey = try loadPrivateDSAKey(at: privateKeyUrl)
             } catch {
                 print("Unable to load DSA private key from", privateKeyUrl.path, "\n", error)
                 throw ExitCode(1)
             }
-
-            // remove the parsed path to the DSA key
-            args.removeFirst()
         }
 
         // now only the archives source dir is left
-        archivesSourceDir = URL(fileURLWithPath: args[0], isDirectory: true)
+        archivesSourceDir = URL(fileURLWithPath: legacyUpdatesPath ?? updatesPathOrDSAKey, isDirectory: true)
+
+        print(archivesSourceDir)
 
         return (privateDSAKey, privateEdString, downloadUrlPrefix, archivesSourceDir)
     }
 
     func run() throws {
-        var privateDSAKey: SecKey?
-        var privateEdString: String?
-        var downloadUrlPrefix: URL?
-        var archivesSourceDir: URL
+//        var privateDSAKey: SecKey?
+//        var privateEdString: String?
+//        var downloadUrlPrefix: URL?
+//        var archivesSourceDir: URL
 
-        (privateDSAKey, privateEdString, downloadUrlPrefix, archivesSourceDir) = try parseCommandLineOptions()
+        let (privateDSAKey, privateEdString, downloadUrlPrefix, archivesSourceDir) = try parseCommandLineOptions()
 
         let keys = loadPrivateKeys(privateDSAKey, privateEdString)
 
@@ -209,14 +186,15 @@ struct GenerateAppcast: ParsableCommand {
             print("Error generating appcast from directory", archivesSourceDir.path, "\n", error)
             throw ExitCode(1)
         }
-    }
 
-//    DispatchQueue.global().async(execute: {
-//    main()
-//    CFRunLoopStop(CFRunLoopGetMain())
-//    })
-//
-//    CFRunLoopRun()
+
+    }
 }
 
-GenerateAppcast.main()
+DispatchQueue.global().async(execute: {
+    GenerateAppcast.main()
+    CFRunLoopStop(CFRunLoopGetMain())
+})
+
+CFRunLoopRun()
+
