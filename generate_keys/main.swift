@@ -11,6 +11,13 @@ import Security
 import ArgumentParser
 
 struct GenerateKeys: ParsableCommand {
+    static let configuration: CommandConfiguration = {
+        let commandName = URL(fileURLWithPath: CommandLine.arguments.first!).lastPathComponent
+        return CommandConfiguration(commandName: commandName, abstract: "Generate or retrieve Ed25519 key pair for Sparkle update signing.")
+    }()
+
+    @Option(name: [.short, .customLong("export")], help: ArgumentHelp("Export saved key pair to a stand-alone keychain.", valueName: "file"))
+    var exportFile: String?
 
     func messageForSecError(_ err: OSStatus) -> String {
         return SecCopyErrorMessageString(err, nil) as String? ?? "\(err) (you can look it up at osstatus.com)"
@@ -25,6 +32,7 @@ struct GenerateKeys: ParsableCommand {
             kSecAttrProtocol as String: kSecAttrProtocolSSH,
             kSecReturnData as String: true,
             ] as CFDictionary, &item)
+
         if res == errSecSuccess, let encoded = item as? Data, let keys = Data(base64Encoded: encoded) {
             print("OK! Read the existing key saved in the Keychain.")
             return keys
@@ -169,8 +177,16 @@ struct GenerateKeys: ParsableCommand {
     func run() throws {
         print("This tool uses macOS Keychain to store the Sparkle private key.")
         print("If the Keychain prompts you for permission, please allow it.")
-        let pubKey = try findPublicKey() ?? generateKeyPair()
-        print("\nIn your app's Info.plist set SUPublicEDKey to:\n\(pubKey.base64EncodedString())\n")
+
+        if let exportFile = exportFile {
+            if let keyPair = try findKeyPair() {
+                try createNewKeychain(withKeyPair: keyPair, named: exportFile)
+            }
+        } else {
+
+            let pubKey = try findPublicKey() ?? generateKeyPair()
+            print("\nIn your app's Info.plist set SUPublicEDKey to:\n\(pubKey.base64EncodedString())\n")
+        }
     }
 
 }
