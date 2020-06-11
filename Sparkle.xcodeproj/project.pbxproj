@@ -1997,7 +1997,7 @@
 					};
 					5AA96C541E0AE0DB00CA4346 = {
 						CreatedOnToolsVersion = 8.0;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1150;
 						ProvisioningStyle = Automatic;
 					};
 					5AB8F19E214DA72000A1187F = {
@@ -2898,6 +2898,7 @@
 			baseConfigurationReference = 7205C4351E12CA7000E370AE /* ConfigGenerateAppcastDebug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -2906,6 +2907,7 @@
 			baseConfigurationReference = 7205C4341E12C66D00E370AE /* ConfigGenerateAppcastRelease.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
