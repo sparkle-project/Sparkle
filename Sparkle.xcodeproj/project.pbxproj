@@ -2898,7 +2898,6 @@
 			baseConfigurationReference = 7205C4351E12CA7000E370AE /* ConfigGenerateAppcastDebug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -2907,7 +2906,6 @@
 			baseConfigurationReference = 7205C4341E12C66D00E370AE /* ConfigGenerateAppcastRelease.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
