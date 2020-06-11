@@ -276,6 +276,7 @@
 		767B61AD1972D488004E0C3C /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */; };
 		767B61AE1972D488004E0C3C /* SUGuidedPackageInstaller.m in Sources */ = {isa = PBXBuildFile; fileRef = 767B61AB1972D488004E0C3C /* SUGuidedPackageInstaller.m */; };
 		A5BF4F1D1BC7668B007A052A /* SUTestWebServer.m in Sources */ = {isa = PBXBuildFile; fileRef = A5BF4F1C1BC7668B007A052A /* SUTestWebServer.m */; };
+		B2354C202492D2A400C12481 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = B2354C1F2492D2A400C12481 /* ArgumentParser */; };
 		B2BE02722491ADCB005BD747 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = B2BE02712491ADCB005BD747 /* ArgumentParser */; };
 		B2D3F865245CEA24009BA78C /* URL+Hashing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D3F864245CEA24009BA78C /* URL+Hashing.swift */; };
 		C23E885B1BE7B24F0050BB73 /* SparkleTestCodeSignApp.enc.dmg in Resources */ = {isa = PBXBuildFile; fileRef = C23E88591BE7AF890050BB73 /* SparkleTestCodeSignApp.enc.dmg */; };
@@ -1017,6 +1018,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B2354C202492D2A400C12481 /* ArgumentParser in Frameworks */,
 				EA4311E2229D640400A5503D /* libed25519.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1828,6 +1830,7 @@
 			);
 			name = generate_keys;
 			packageProductDependencies = (
+				B2354C1F2492D2A400C12481 /* ArgumentParser */,
 			);
 			productName = generate_keys;
 			productReference = 5AB8F19F214DA72000A1187F /* generate_keys */;
@@ -3192,6 +3195,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		B2354C1F2492D2A400C12481 /* ArgumentParser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B2BE026E2491AC68005BD747 /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
+			productName = ArgumentParser;
+		};
 		B2BE02712491ADCB005BD747 /* ArgumentParser */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B2BE026E2491AC68005BD747 /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
