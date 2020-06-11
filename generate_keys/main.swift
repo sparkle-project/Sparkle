@@ -16,7 +16,7 @@ func findPublicKey() -> Data? {
         kSecAttrService as String: "https://sparkle-project.org",
         kSecAttrAccount as String: "ed25519",
         kSecAttrProtocol as String: kSecAttrProtocolSSH,
-        kSecReturnData as String: kCFBooleanTrue,
+        kSecReturnData as String: true,
     ] as CFDictionary, &item)
     if res == errSecSuccess, let encoded = item as? Data, let keys = Data(base64Encoded: encoded) {
         print("OK! Read the existing key saved in the Keychain.")
@@ -41,15 +41,22 @@ func generateKeyPair() -> Data {
     var publicEdKey = Data(count: 32)
     var privateEdKey = Data(count: 64)
 
-    if !seed.withUnsafeMutableBytes({ (seed: UnsafeMutablePointer<UInt8>) in 0 == ed25519_create_seed(seed)}) {
+    if !seed.withUnsafeMutableBytes({ (seed: UnsafeMutableRawBufferPointer) in
+        let seed = seed.bindMemory(to: UInt8.self)
+        return 0 == ed25519_create_seed(seed.baseAddress)
+    }) {
         print("\nERROR: Unable to initialize random seed")
         exit(1)
     }
 
-    seed.withUnsafeBytes({(seed: UnsafePointer<UInt8>) in
-        publicEdKey.withUnsafeMutableBytes({(publicEdKey: UnsafeMutablePointer<UInt8>) in
-            privateEdKey.withUnsafeMutableBytes({(privateEdKey: UnsafeMutablePointer<UInt8>) in
-                ed25519_create_keypair(publicEdKey, privateEdKey, seed)
+    seed.withUnsafeBytes({(seed: UnsafeRawBufferPointer) in
+        publicEdKey.withUnsafeMutableBytes({(publicEdKey: UnsafeMutableRawBufferPointer) in
+            privateEdKey.withUnsafeMutableBytes({(privateEdKey: UnsafeMutableRawBufferPointer) in
+                let seed = seed.bindMemory(to: UInt8.self)
+                let publicEdKey = publicEdKey.bindMemory(to: UInt8.self)
+                let privateEdKey = privateEdKey.bindMemory(to: UInt8.self)
+
+                ed25519_create_keypair(publicEdKey.baseAddress, privateEdKey.baseAddress, seed.baseAddress)
             })
         })
     })
@@ -63,8 +70,8 @@ func generateKeyPair() -> Data {
         kSecAttrAccount as String: "ed25519",
 
         kSecValueData as String: bothKeys.base64EncodedData() as CFData, // it's base64-encoded, because user may request to show it
-        kSecAttrIsSensitive as String: kCFBooleanTrue,
-        kSecAttrIsPermanent as String: kCFBooleanTrue,
+        kSecAttrIsSensitive as String: true,
+        kSecAttrIsPermanent as String: true,
         kSecAttrLabel as String: "Private key for signing Sparkle updates",
         kSecAttrComment as String: "Public key (SUPublicEDKey value) for this key is:\n\n\(publicEdKey.base64EncodedString())",
         kSecAttrDescription as String: "private key",
