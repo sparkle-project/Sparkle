@@ -102,15 +102,12 @@ func edSignature(path: URL, publicEdKey: Data, privateEdKey: Data) throws -> Str
     var output = Data(count: 64)
 
     output.withUnsafeMutableBytes({ (output: UnsafeMutableRawBufferPointer) in
-        let output = output.bindMemory(to: UInt8.self)
-
         data.withUnsafeBytes({ (data: UnsafeRawBufferPointer) in
-            let data = data.bindMemory(to: UInt8.self)
-
             publicEdKey.withUnsafeBytes({ (publicEdKey: UnsafeRawBufferPointer) in
-                let publicEdKey = publicEdKey.bindMemory(to: UInt8.self)
-
                 privateEdKey.withUnsafeBytes({ (privateEdKey: UnsafeRawBufferPointer) in
+                    let output = output.bindMemory(to: UInt8.self)
+                    let data = data.bindMemory(to: UInt8.self)
+                    let publicEdKey = publicEdKey.bindMemory(to: UInt8.self)
                     let privateEdKey = privateEdKey.bindMemory(to: UInt8.self)
 
                     ed25519_sign(output.baseAddress, data.baseAddress, data.count, publicEdKey.baseAddress, privateEdKey.baseAddress)
